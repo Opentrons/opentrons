@@ -2267,6 +2267,7 @@ def test_aspirate_liquid_class_for_transfer_without_volume_config(
         transfer_properties=test_transfer_properties,
         transfer_type=TransferType.ONE_TO_ONE,
         tip_contents=[],
+        max_pipette_and_tip_volume=500,
         volume_for_pipette_mode_configuration=None,
     )
     decoy.verify(
@@ -2368,6 +2369,7 @@ def test_aspirate_liquid_class_using_volume_config_below_2_28(
         transfer_properties=test_transfer_properties,
         transfer_type=TransferType.ONE_TO_ONE,
         tip_contents=[last_liquid_and_airgap_in_tip],
+        max_pipette_and_tip_volume=500,
         volume_for_pipette_mode_configuration=123,
     )
     decoy.verify(
@@ -2456,6 +2458,7 @@ def test_aspirate_liquid_class_using_volume_config_2_28_and_above(
         )
     ).then_return(200)
     decoy.when(mock_protocol_core.api_version).then_return(version)
+
     decoy.when(source_well.labware_id).then_return("source-labware-id")
     decoy.when(source_well.get_name()).then_return("source-well")
     decoy.when(source_well.get_top(2)).then_return(liquid_probe_start_point)
@@ -2501,6 +2504,7 @@ def test_aspirate_liquid_class_using_volume_config_2_28_and_above(
         transfer_properties=test_transfer_properties,
         transfer_type=TransferType.ONE_TO_ONE,
         tip_contents=[last_liquid_and_airgap_in_tip],
+        max_pipette_and_tip_volume=500,
         volume_for_pipette_mode_configuration=123,
     )
     decoy.verify(
@@ -2639,6 +2643,7 @@ def test_aspirate_liquid_class_2_28_and_above_skips_configure_volume(
         transfer_properties=test_transfer_properties,
         transfer_type=TransferType.ONE_TO_ONE,
         tip_contents=[last_liquid_and_airgap_in_tip],
+        max_pipette_and_tip_volume=500,
         volume_for_pipette_mode_configuration=123,
     )
     decoy.verify(
@@ -2701,6 +2706,7 @@ def test_aspirate_liquid_class_for_consolidate(
         transfer_properties=test_transfer_properties,
         transfer_type=TransferType.MANY_TO_ONE,
         tip_contents=[],
+        max_pipette_and_tip_volume=500,
         volume_for_pipette_mode_configuration=None,
     )
     decoy.verify(
@@ -2739,15 +2745,12 @@ def test_aspirate_liquid_class_raises_for_more_than_max_volume(
         "flex_1channel_50", "opentrons_flex_96_tiprack_50ul"
     )
     decoy.when(
-        mock_engine_client.state.pipettes.get_working_volume("abc123")
-    ).then_return(100)
-    decoy.when(
         tx_commons.check_valid_liquid_class_volume_parameters(  # type: ignore[func-returns-value]
             aspirate_volume=123,
             air_gap=test_transfer_properties.aspirate.retract.air_gap_by_volume.get_for_volume(
                 123
             ),
-            max_volume=100,
+            max_volume=500,
             current_volume=4.56,
         )
     ).then_raise(ValueError("Oh oh!"))
@@ -2758,6 +2761,7 @@ def test_aspirate_liquid_class_raises_for_more_than_max_volume(
             transfer_properties=test_transfer_properties,
             transfer_type=TransferType.ONE_TO_ONE,
             tip_contents=[],
+            max_pipette_and_tip_volume=500,
             volume_for_pipette_mode_configuration=None,
             current_volume=4.56,
         )

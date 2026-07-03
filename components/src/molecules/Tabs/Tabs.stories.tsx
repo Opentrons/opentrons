@@ -8,7 +8,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 const meta: Meta<typeof TabsComponent> = {
   title: 'Helix/Molecules/Tabs',
   component: TabsComponent,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   argTypes: {
     tabs: {
       control: {

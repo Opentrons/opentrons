@@ -16,14 +16,18 @@ from aiohttp import web
 from server_utils.auth.scopes import Scope
 
 from . import auth
-from .constants import DEVICE_BOOT_ID_NAME, RESTART_LOCK_NAME
+from .constants import DEVICE_BOOT_ID_NAME, RESTART_LOCK_NAME, SHUTDOWN_LOCK_NAME
 from .name_management import get_name_synchronizer
 
 LOG = logging.getLogger(__name__)
 
 
-def _do_restart():
+def _do_restart() -> None:
     subprocess.check_call(["reboot"])
+
+
+def _do_shutdown() -> None:
+    subprocess.check_call(["shutdown", "-h", "now"])
 
 
 @auth.require_scopes(Scope.RESTART_WRITE)
@@ -35,6 +39,17 @@ async def restart(request: web.Request) -> web.Response:
     async with request.app[RESTART_LOCK_NAME]:
         asyncio.get_event_loop().call_later(1, _do_restart)
     return web.json_response({"message": "Restarting in 1s"}, status=200)
+
+
+@auth.require_scopes(Scope.SHUTDOWN_WRITE)
+async def shutdown(request: web.Request) -> web.Response:
+    """Shut down the robot.
+
+    Blocks while the shutdown lock is held.
+    """
+    async with request.app[SHUTDOWN_LOCK_NAME]:
+        asyncio.get_event_loop().call_later(1, _do_shutdown)
+    return web.json_response({"message": "Shutting down in 1s"}, status=200)
 
 
 def build_health_endpoint(

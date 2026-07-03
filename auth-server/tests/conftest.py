@@ -7,7 +7,11 @@ import requests
 from server_utils.auth.scopes import serialize_scopes
 from tests.dev_server import DevServer
 
-from auth_server.users.models import ACCOUNT_TYPE_TO_SCOPES, AccountType
+from auth_server.users.models import (
+    ACCOUNT_TYPE_TO_SCOPES,
+    RESET_PASSWORD_SCOPES,
+    AccountType,
+)
 
 _INTEGRATION_SERVER_STARTUP_TIMEOUT_S = 30
 
@@ -22,6 +26,12 @@ def admin_scopes_str() -> str:
 def user_scopes_str() -> str:
     """All the OAuth 2 scopes that a regular user should have, as a space-separated string."""
     return serialize_scopes(set(ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]))
+
+
+@pytest.fixture
+def reset_password_scopes_list() -> list[str]:
+    """Scopes returned on a user record while they must reset their password."""
+    return sorted(scope.api_name for scope in RESET_PASSWORD_SCOPES)
 
 
 @pytest.fixture

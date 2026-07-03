@@ -1,0 +1,27 @@
+.container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  padding: var(--spacing-16) var(--spacing-20);
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
+  gap: var(--spacing-8);
+}
+
+.header {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.main_content {
+  gap: var(--spacing-8);
+}
+
+.text_container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}

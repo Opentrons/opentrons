@@ -39,6 +39,7 @@ export const MountingPlate = (
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
             mount: LEFT,
+            motionModifier: 'lowerMountZAxis',
           },
         },
       ],

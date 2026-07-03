@@ -26,17 +26,19 @@ describe('PerStepOverflowMenu', () => {
       setMilliSecondsPerFrame: mockSetMilliSecondsPerFrame,
     }
   })
-  it('renders the overflow menu with 3 buttons', () => {
+  it('renders the overflow menu with 5 buttons', () => {
     render(props)
-    screen.getByText('2s per step')
-    screen.getByText('3s per step')
-    screen.getByText('4s per step')
+    screen.getByText('0.25 s per step')
+    screen.getByText('0.5 s per step')
+    screen.getByText('1 s per step')
+    screen.getByText('2 s per step')
+    screen.getByText('3 s per step')
   })
 
-  it('calls the setSelectedPerdStep function when clicking the 2 seconds per step button', () => {
+  it('calls the setSelectedPerdStep function when clicking the 1 second per step button', () => {
     render(props)
-    fireEvent.click(screen.getByText('2s per step'))
-    expect(mockSetMilliSecondsPerFrame).toHaveBeenCalledWith(2000)
+    fireEvent.click(screen.getByText('1 s per step'))
+    expect(mockSetMilliSecondsPerFrame).toHaveBeenCalledWith(1000)
     expect(mockSetShowPerStepOverflowMenu).toHaveBeenCalledWith(false)
   })
 })

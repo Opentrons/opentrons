@@ -118,7 +118,7 @@ ANALYZER=1 make -C app
 
 [style-guide]: https://standardjs.com
 [style-guide-badge]: https://img.shields.io/badge/code_style-standard-brightgreen.svg?style=flat-square&maxAge=3600
-[download]: http://opentrons.com/ot-app
+[download]: http://opentrons.com/app
 [support]: https://support.opentrons.com/s/ot2-get-started
 [robots]: https://opentrons.com/ot-2/
 [contributing-guide-setup]: ../CONTRIBUTING.md#development-setup

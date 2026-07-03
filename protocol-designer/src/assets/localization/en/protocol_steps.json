@@ -322,6 +322,7 @@
         "add_step": "Add step",
         "cancel": "Cancel",
         "cycle": "Cycle",
+        "cycle_repetitions": "Cycle, {{repetitions}}x",
         "delete": "Delete",
         "edit": "Edit",
         "errors": {
@@ -354,6 +355,7 @@
         "label": "Select the state to change",
         "options": {
           "pump": {
+            "change": "Change vacuum pump settings",
             "off": "Turn off Vacuum pump",
             "on": "Turn on Vacuum pump"
           },
@@ -371,12 +373,13 @@
         "label": "Pump",
         "off": "Off",
         "power": "{{power}}%",
-        "pressure": "{{pressure}} mbar"
+        "pressure": "{{pressure}} mbar",
+        "profile": "Running profile"
       },
       "vent": {
         "closed": "Closed",
         "label": "Vent",
-        "open": "Open"
+        "opened": "Open"
       }
     },
     "step_summary": {

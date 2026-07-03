@@ -42,7 +42,6 @@ export function ResetSettingsModal(
 
   return createPortal(
     <Modal
-      marginLeft="0"
       title={t(`protocol_steps:reset_settings`, { tab })}
       titleElement1={
         <Icon name="ot-alert" color={COLORS.yellow50} size="1.25rem" />

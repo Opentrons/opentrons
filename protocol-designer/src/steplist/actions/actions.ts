@@ -94,10 +94,19 @@ export interface CancelStepFormAction {
   type: 'CANCEL_STEP_FORM'
   payload: null
 }
-export const cancelStepForm = (): CancelStepFormAction => ({
-  type: 'CANCEL_STEP_FORM',
-  payload: null,
-})
+
+export const cancelStepForm = () => (dispatch: any) => {
+  const clearSelectedItemAction: ClearSelectedItemAction = {
+    type: 'CLEAR_SELECTED_ITEM',
+  }
+
+  dispatch(clearSelectedItemAction)
+
+  dispatch({
+    type: 'CANCEL_STEP_FORM',
+    payload: null,
+  })
+}
 
 export interface ReorderStepsAction {
   type: 'REORDER_STEPS'

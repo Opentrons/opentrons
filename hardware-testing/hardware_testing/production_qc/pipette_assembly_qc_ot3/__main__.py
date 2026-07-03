@@ -50,11 +50,8 @@ from .pressure import (  # type: ignore[import]
     PRESSURE_ASPIRATE_DELTA_SPEC,
 )
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import (
-    OT3Mount,
-    Point,
-    Axis,
-)
+from opentrons.hardware_control.types import Axis, OT3Mount
+from opentrons.types import Point
 
 
 DEFAULT_SLOT_TIP_RACK_1000 = 7
@@ -892,7 +889,7 @@ async def _test_for_leak(
             int(hw_pipette.working_volume)
         ][8]
         LOGGING.info(f"current_val:{current_val}")
-        await helpers_ot3.update_pick_up_current(api, mount, current_val)
+        helpers_ot3.update_pick_up_current(api, mount, current_val)
     if fixture:
         assert write_cb, "pressure fixture requires recording data to disk"
         assert (
@@ -1355,7 +1352,7 @@ async def _test_diagnostics_pressure(  # NOQA: C901
             movez = -154.8
             current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][2]
             print("current_val", current_val)
-            await helpers_ot3.update_pick_up_current(api, mount, current_val)
+            helpers_ot3.update_pick_up_current(api, mount, current_val)
 
     elif "p1000" in pipptype["name"]:
         CHTYPE_PIPPETE = 1000
@@ -1366,7 +1363,7 @@ async def _test_diagnostics_pressure(  # NOQA: C901
         elif "multi" in pipptype["name"]:
             current_val = PRESSURE_THRESH_current[pip_channels][CHTYPE_PIPPETE][2]
             print("current_val", current_val)
-            await helpers_ot3.update_pick_up_current(api, mount, current_val)
+            helpers_ot3.update_pick_up_current(api, mount, current_val)
 
     for sensor_id in sensor_ids:
         pressure = await _read_pressure(sensor_id)
@@ -2119,13 +2116,11 @@ async def _main(test_config: TestConfig) -> None:  # noqa: C901
                             PIP_VOL_CURRENT
                         ][2]
                         LOGGING.info(f"current_val:{current_val}")
-                        await helpers_ot3.update_pick_up_current(
-                            api, mount, current_val
-                        )
+                        helpers_ot3.update_pick_up_current(api, mount, current_val)
                     # elif PIP_CHANNELS_CURRENT == 1:
                     #     current_val = PRESSURE_THRESH_current[PIP_CHANNELS_CURRENT][PIP_VOL_CURRENT][1]
                     #     LOGGING.info(f"current_val:{current_val}")
-                    #     await helpers_ot3.update_pick_up_current(api,mount,current_val)
+                    #     helpers_ot3.update_pick_up_current(api,mount,current_val)
 
                     await _pick_up_tip_for_tip_volume(api, mount, tip_vol)
                     for probe in probes:

@@ -16,7 +16,7 @@ export default {
     },
     onOutsideClick: { action: 'clicked' },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   decorators: [
     Story => (
       <MemoryRouter>

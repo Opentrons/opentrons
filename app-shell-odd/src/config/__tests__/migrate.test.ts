@@ -1,5 +1,5 @@
 // config migration tests
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -23,14 +23,16 @@ import {
 } from '../__fixtures__'
 import { migrate } from '../migrate'
 
-vi.mock('uuid/v4')
+vi.mock('uuid', () => ({
+  v4: vi.fn(),
+}))
 
 const NEWEST_VERSION = 28
 const NEWEST_MOCK_CONFIG = MOCK_CONFIG_V28
 
 describe('config migration', () => {
   beforeEach(() => {
-    vi.mocked(uuid).mockReturnValue('MOCK_UUIDv4')
+    vi.mocked(uuid).mockImplementation((() => 'MOCK_UUIDv4') as typeof uuid)
   })
 
   it('should migrate version 12 to latest', () => {

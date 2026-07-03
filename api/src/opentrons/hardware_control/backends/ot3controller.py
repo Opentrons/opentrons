@@ -1976,7 +1976,7 @@ class OT3Controller(FlexBackend):
         return sensor_data.to_float() if sensor_data else None
 
     async def read_capacitive_sensor(
-        self, mount: OT3Mount, primary: bool
+        self, mount: OT3Mount, primary: bool, timeout: int = 1
     ) -> Optional[float]:
         """Read and return the current sensor information."""
         sensor = CapacitiveSensor.build(

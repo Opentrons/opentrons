@@ -20,7 +20,6 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
-import { useHost } from '@opentrons/react-api-client'
 import {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
@@ -36,6 +35,7 @@ import {
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   OT2_ROBOT_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { TertiaryButton } from '/app/atoms/buttons'
@@ -225,7 +225,6 @@ export function ModulesListItem({
     'module_wizard_flows',
     'deck_configuration',
   ])
-  const host = useHost()!
   const moduleConnectionStatus =
     attachedModuleMatch != null
       ? t('module_connected')
@@ -243,7 +242,6 @@ export function ModulesListItem({
       handleModuleWizardFlows({
         attachedModule: attachedModuleMatch,
         robotName,
-        host,
       })
     }
   }
@@ -334,6 +332,7 @@ export function ModulesListItem({
     attachedModuleMatch != null &&
     attachedModuleMatch.moduleType !== ABSORBANCE_READER_TYPE &&
     attachedModuleMatch.moduleType !== FLEX_STACKER_MODULE_TYPE &&
+    attachedModuleMatch.moduleType !== VACUUM_MODULE_TYPE &&
     attachedModuleMatch.moduleOffset?.last_modified == null
 
   if (needsCalibration) {

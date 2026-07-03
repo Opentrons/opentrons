@@ -21,7 +21,7 @@ Many of these settings are covered when you [first set up your Flex](../installa
 
 ### Camera
 
-Every Flex comes equipped with a [built-in camera][camera-features-and-controls], which is off by default. Camera options include on/off settings for still photographs, video, and on-error image capture.
+Every Flex comes equipped with a [built-in camera](../opentrons-app/camera.md), which is off by default. Camera options include on/off settings for still photographs, video, and on-error image capture.
 
 ### Developer Tools
 

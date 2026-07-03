@@ -42,7 +42,7 @@ class _HandlerWithSession(Protocol):
 
 
 def session_from_request(request: web.Request) -> Optional[UpdateSession]:
-    return request.app.get(SESSION_VARNAME, None)
+    return request.app.get(SESSION_VARNAME, None)  # type: ignore[no-any-return]
 
 
 def require_session(handler: _HandlerWithSession) -> Handler:
@@ -130,7 +130,7 @@ def _begin_write(
         )
     )
 
-    def write_done(fut):
+    def write_done(fut: asyncio.Future[update_actions.Partition]) -> None:
         exc = fut.exception()
         if exc:
             session.set_error(getattr(exc, "short", str(type(exc))), str(exc))
@@ -147,7 +147,7 @@ def _begin_validation(
     loop: asyncio.AbstractEventLoop,
     downloaded_update_path: str,
     actions: update_actions.UpdateActionsInterface,
-) -> "asyncio.futures.Future[Optional[str]]":
+) -> asyncio.Future[str]:
     """Start the validation process."""
     session.set_stage(Stages.VALIDATING)
     cert_path = config.update_cert_path if config.signature_required else None
@@ -162,7 +162,7 @@ def _begin_validation(
         )
     )
 
-    def validation_done(fut):
+    def validation_done(fut: asyncio.Future[str]) -> None:
         exc = fut.exception()
         if exc:
             session.set_error(getattr(exc, "short", str(type(exc))), str(exc))

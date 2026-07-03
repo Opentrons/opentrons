@@ -2,7 +2,7 @@ import { useMutation } from 'react-query'
 
 import { createSplash } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError, AxiosResponse } from 'axios'
 import type {
@@ -46,7 +46,7 @@ export function useCreateSplashMutation(
     AxiosError<ErrorResponse>,
     CreateSplashRequestData
   >(
-    [host, 'splash'],
+    getQueryKey(host, 'splash'),
     ({ file }) =>
       createSplash(host!, file).catch(e => {
         throw e

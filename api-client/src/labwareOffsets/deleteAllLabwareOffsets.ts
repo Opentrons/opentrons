@@ -9,5 +9,5 @@ import type { HostConfig } from '../types'
 export function deleteAllLabwareOffsets(
   config: HostConfig
 ): ResponsePromise<{ data: null }> {
-  return request<{ data: null }>(DELETE, '/labwareOffsets', null, config)
+  return request<{ data: null }>(DELETE, '/labwareOffsets', config)
 }

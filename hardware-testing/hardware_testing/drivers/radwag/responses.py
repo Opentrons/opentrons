@@ -1,12 +1,12 @@
 """Radwag Responses."""
 from .commands import RadwagCommand, RADWAG_COMMAND_TERMINATOR
 
-from enum import Enum
+from enum import StrEnum
 from dataclasses import dataclass
 from typing import Optional, List
 
 
-class RadwagResponseCodes(str, Enum):
+class RadwagResponseCodes(StrEnum):
     """Radwag response codes."""
 
     NONE = ""

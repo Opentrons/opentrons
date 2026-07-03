@@ -105,89 +105,6 @@ describe('networking actions', () => {
       },
     },
     {
-      name: 'can create networking:FETCH_WIFI_KEYS',
-      creator: Actions.fetchWifiKeys,
-      args: [mockRobot.name],
-      expected: {
-        type: 'networking:FETCH_WIFI_KEYS',
-        payload: { robotName: mockRobot.name },
-        meta: {} as any,
-      },
-    },
-    {
-      name: 'can create networking:FETCH_WIFI_KEYS_SUCCESS',
-      creator: Actions.fetchWifiKeysSuccess,
-      args: [mockRobot.name, [Fixtures.mockWifiKey], mockRequestMeta],
-      expected: {
-        type: 'networking:FETCH_WIFI_KEYS_SUCCESS',
-        payload: {
-          robotName: mockRobot.name,
-          wifiKeys: [Fixtures.mockWifiKey],
-        },
-        meta: mockRequestMeta,
-      },
-    },
-    {
-      name: 'can create networking:FETCH_WIFI_KEYS_FAILURE',
-      creator: Actions.fetchWifiKeysFailure,
-      args: [
-        mockRobot.name,
-        Fixtures.mockFetchWifiKeysFailure.body,
-        mockRequestMeta,
-      ],
-      expected: {
-        type: 'networking:FETCH_WIFI_KEYS_FAILURE',
-        payload: {
-          robotName: mockRobot.name,
-          error: Fixtures.mockFetchWifiKeysFailure.body,
-        },
-        meta: mockRequestMeta,
-      },
-    },
-    {
-      name: 'can create networking:POST_WIFI_KEYS',
-      creator: Actions.postWifiKeys,
-      args: [mockRobot.name, { name: 'key.crt' } as File],
-      expected: {
-        type: 'networking:POST_WIFI_KEYS',
-        payload: {
-          robotName: mockRobot.name,
-          keyFile: { name: 'key.crt' } as File,
-        },
-        meta: {} as any,
-      },
-    },
-    {
-      name: 'can create networking:POST_WIFI_KEYS_SUCCESS',
-      creator: Actions.postWifiKeysSuccess,
-      args: [mockRobot.name, Fixtures.mockWifiKey, mockRequestMeta],
-      expected: {
-        type: 'networking:POST_WIFI_KEYS_SUCCESS',
-        payload: {
-          robotName: mockRobot.name,
-          wifiKey: Fixtures.mockWifiKey,
-        },
-        meta: mockRequestMeta,
-      },
-    },
-    {
-      name: 'can create networking:POST_WIFI_KEYS_FAILURE',
-      creator: Actions.postWifiKeysFailure,
-      args: [
-        mockRobot.name,
-        Fixtures.mockFetchWifiKeysFailure.body,
-        mockRequestMeta,
-      ],
-      expected: {
-        type: 'networking:POST_WIFI_KEYS_FAILURE',
-        payload: {
-          robotName: mockRobot.name,
-          error: Fixtures.mockPostWifiKeysFailure.body,
-        },
-        meta: mockRequestMeta,
-      },
-    },
-    {
       name: 'can create networking:FETCH_EAP_OPTIONS',
       creator: Actions.fetchEapOptions,
       args: [mockRobot.name],
@@ -223,46 +140,6 @@ describe('networking actions', () => {
         payload: {
           robotName: mockRobot.name,
           error: Fixtures.mockFetchEapOptionsFailure.body,
-        },
-        meta: mockRequestMeta,
-      },
-    },
-    {
-      name: 'can create networking:POST_WIFI_DISCONNECT',
-      creator: Actions.postWifiDisconnect,
-      args: [mockRobot.name, Fixtures.mockNetworkingDisconnect.ssid],
-      expected: {
-        type: 'networking:POST_WIFI_DISCONNECT',
-        payload: {
-          robotName: mockRobot.name,
-          ...Fixtures.mockNetworkingDisconnect,
-        },
-        meta: {} as any,
-      },
-    },
-    {
-      name: 'can create networking:POST_WIFI_DISCONNECT_SUCCESS',
-      creator: Actions.postWifiDisconnectSuccess,
-      args: [mockRobot.name, mockRequestMeta],
-      expected: {
-        type: 'networking:POST_WIFI_DISCONNECT_SUCCESS',
-        payload: { robotName: mockRobot.name },
-        meta: mockRequestMeta,
-      },
-    },
-    {
-      name: 'can create networking:POST_WIFI_DISCONNECT_FAILURE',
-      creator: Actions.postWifiDisconnectFailure,
-      args: [
-        mockRobot.name,
-        Fixtures.mockNetworkingDisconnectFailure.body,
-        mockRequestMeta,
-      ],
-      expected: {
-        type: 'networking:POST_WIFI_DISCONNECT_FAILURE',
-        payload: {
-          robotName: mockRobot.name,
-          error: Fixtures.mockNetworkingDisconnectFailure.body,
         },
         meta: mockRequestMeta,
       },

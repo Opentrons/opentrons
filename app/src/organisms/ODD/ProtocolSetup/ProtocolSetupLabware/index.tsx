@@ -33,12 +33,12 @@ import {
   getLabwareInfoByLiquidId,
   getLabwareLiquidRenderInfoFromStack,
   getModuleFromStack,
+  getSortedStartingDeckEntries,
   getStackedItemsOnStartingDeck,
-  getStacksWithLabware,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
+import { SmallButton, TouchFloatingActionButton } from '/app/atoms/buttons'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -104,10 +104,7 @@ export function ProtocolSetupLabware({
   const labwareByLiquidId = getLabwareInfoByLiquidId(
     mostRecentAnalysis?.commands ?? []
   )
-  const stacksWithLaware = getStacksWithLabware(startingDeck)
-  const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .filter(([key, value]) => key !== 'offDeck')
+  const sortedStartingDeckEntries = getSortedStartingDeckEntries(startingDeck)
   const offDeckItems = useMemo(
     () =>
       mostRecentAnalysis != null
@@ -203,13 +200,13 @@ export function ProtocolSetupLabware({
                     </StyledText>
                   </Flex>
                 </Flex>
-                {sortedStartingDeckEntries.map(([key, value], index) => (
+                {sortedStartingDeckEntries.map(({ location, stack }, index) => (
                   <RowLabware
-                    key={index}
+                    key={`${location}_${index}`}
                     attachedProtocolModules={attachedProtocolModuleMatches}
                     refetchModules={moduleQuery.refetch}
-                    slotName={key}
-                    stackedItems={value}
+                    slotName={location}
+                    stackedItems={stack}
                     labwareByLiquidId={labwareByLiquidId}
                     onClick={setSelectedLabwareStack}
                   />
@@ -229,11 +226,14 @@ export function ProtocolSetupLabware({
               </>
             )}
           </Flex>
-          <FloatingActionButton
+          <TouchFloatingActionButton
             buttonText={showMapView ? t('list_view') : t('map_view')}
             onClick={() => {
               setShowMapView(mapView => !mapView)
             }}
+            aria-label={
+              showMapView ? t('display_list_view') : t('display_map_view')
+            }
           />
         </>
       )}

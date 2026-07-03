@@ -2,7 +2,7 @@ import { useMutation } from 'react-query'
 
 import { createRun } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -34,7 +34,7 @@ export function useCreateRunMutation(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const mutation = useMutation<Run, AxiosError, CreateRunData>(
-    [host, 'runs'],
+    getQueryKey(host, 'runs'),
     createRunData =>
       createRun(host!, createRunData)
         .then(response => response.data)

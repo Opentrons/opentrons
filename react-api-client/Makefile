@@ -33,4 +33,4 @@ test:
 
 .PHONY: test-cov
 test-cov:
-	make -C .. test-js-react-api-client tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
+	$(MAKE) -C .. test-js-react-api-client tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"

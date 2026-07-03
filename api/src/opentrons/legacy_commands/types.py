@@ -101,6 +101,20 @@ FLEX_STACKER_STORE: Final = "command.FLEX_STACKER_STORE"
 FLEX_STACKER_EMPTY: Final = "command.FLEX_STACKER_EMPTY"
 FLEX_STACKER_FILL: Final = "command.FLEX_STACKER_FILL"
 
+VACUUM_MODULE_START_SET_VACUUM_PRESSURE: Final = (
+    "command.VACUUM_MODULE_START_SET_VACUUM_PRESSURE"
+)
+VACUUM_MODULE_START_SET_VACUUM_POWER: Final = (
+    "command.VACUUM_MODULE_START_SET_VACUUM_POWER"
+)
+VACUUM_MODULE_STOP_VACUUM: Final = "command.VACUUM_MODULE_STOP_VACUUM"
+VACUUM_MODULE_START_EXECUTE_PROFILE: Final = (
+    "command.VACUUM_MODULE_START_EXECUTE_PROFILE"
+)
+VACUUM_MODULE_OPEN_VENT: Final = "command.VACUUM_MODULE_OPEN_VENT"
+VACUUM_MODULE_CLOSE_VENT: Final = "command.VACUUM_MODULE_CLOSE_VENT"
+VACUUM_MODULE_WAIT_FOR_TARGET: Final = "command.VACUUM_MODULE_WAIT_FOR_TARGET"
+
 # Robot #
 ROBOT_MOVE_TO: Final = "command.ROBOT_MOVE_TO"
 ROBOT_MOVE_AXES_TO: Final = "command.ROBOT_MOVE_AXES_TO"
@@ -448,6 +462,36 @@ class FlexStackerEmptyCommand(TypedDict):
 
 class FlexStackerFillCommand(TypedDict):
     name: Literal["command.FLEX_STACKER_FILL"]
+    payload: TextOnlyPayload
+
+
+class VacuumModuleStartSetVacuumPressureCommand(TypedDict):
+    name: Literal["command.VACUUM_MODULE_START_SET_VACUUM_PRESSURE"]
+    payload: TextOnlyPayload
+
+
+class VacuumModuleStartSetVacuumPowerCommand(TypedDict):
+    name: Literal["command.VACUUM_MODULE_START_SET_VACUUM_POWER"]
+    payload: TextOnlyPayload
+
+
+class VacuumModuleStopVacuumCommand(TypedDict):
+    name: Literal["command.VACUUM_MODULE_STOP_VACUUM"]
+    payload: TextOnlyPayload
+
+
+class VacuumModuleStartExecuteProfileCommand(TypedDict):
+    name: Literal["command.VACUUM_MODULE_START_EXECUTE_PROFILE"]
+    payload: TextOnlyPayload
+
+
+class VacuumModuleOpenVentCommand(TypedDict):
+    name: Literal["command.VACUUM_MODULE_OPEN_VENT"]
+    payload: TextOnlyPayload
+
+
+class VacuumModuleCloseVentCommand(TypedDict):
+    name: Literal["command.VACUUM_MODULE_CLOSE_VENT"]
     payload: TextOnlyPayload
 
 
@@ -884,6 +928,13 @@ Command = Union[
     FlexStackerStoreCommand,
     FlexStackerEmptyCommand,
     FlexStackerFillCommand,
+    # Vacuum Module commands
+    VacuumModuleStartSetVacuumPressureCommand,
+    VacuumModuleStartSetVacuumPowerCommand,
+    VacuumModuleStopVacuumCommand,
+    VacuumModuleStartExecuteProfileCommand,
+    VacuumModuleOpenVentCommand,
+    VacuumModuleCloseVentCommand,
     # Task commands
     WaitForTasksCommand,
     CreateTimerCommand,

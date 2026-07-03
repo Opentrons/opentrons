@@ -287,6 +287,7 @@ export const HEATER_SHAKER_CUTOUTS: CutoutId[] = [
   ...SINGLE_LEFT_CUTOUTS,
 ]
 export const THERMOCYCLER_MODULE_CUTOUTS: CutoutId[] = ['cutoutA1', 'cutoutB1']
+export const VACUUM_MODULE_CUTOUT: 'cutoutA3' = 'cutoutA3'
 
 export const WASTE_CHUTE_CUTOUT: 'cutoutD3' = 'cutoutD3'
 
@@ -919,3 +920,6 @@ export const SYSTEM_LOCATION = 'systemLocation'
 
 export const PROTOCOL_ENGINE_LID_STACK_LOADNAME =
   'protocol_engine_lid_stack_object'
+
+export const VACUUM_MIN_PRESSURE_MBAR = -800
+export const VACUUM_MAX_PRESSURE_MBAR = 0

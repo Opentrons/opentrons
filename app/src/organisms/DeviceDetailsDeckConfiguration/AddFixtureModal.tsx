@@ -34,7 +34,7 @@ import {
   getModuleOptions,
   getOptions,
 } from '../DeviceDetailsDeckConfiguration/utils'
-import { useSendIdentifyStacker } from '../ModuleWizardFlows/hooks'
+import { useSendIdentifyModule } from '../ModuleWizardFlows/hooks'
 
 import type { TFunction } from 'i18next'
 import type { AttachedModule } from '@opentrons/api-client'
@@ -226,7 +226,7 @@ export function AddFixtureModal({
     )
   }
 
-  const sendIdentifyStacker = useSendIdentifyStacker()
+  const sendIdentifyModule = useSendIdentifyModule()
   const { parseModuleUSBPort } = useModuleUSBPort()
   const [identifyInUse, setIdentifyInUse] = useState<string | null>(null)
   const [identifyTimeout, setTimeoutID] = useState<NodeJS.Timeout | null>(null)
@@ -253,7 +253,7 @@ export function AddFixtureModal({
         unconfiguredMods?.find(m => m.serialNumber === fixtureSerialNumber) ??
         null
       if (module !== null) {
-        sendIdentifyStacker(module, false)
+        sendIdentifyModule(module, false)
         if (identifyTimeout !== null) {
           clearTimeout(identifyTimeout)
         }
@@ -265,11 +265,11 @@ export function AddFixtureModal({
 
   const stackerIdentifyHandler = (module: AttachedModule): void => {
     // Identify the stacker module
-    sendIdentifyStacker(module, true, 'blue')
+    sendIdentifyModule(module, true, 'blue')
     // Ensure that the module reverts after a set time
     setIdentifyInUse(module.serialNumber)
     const timeoutID = setTimeout(() => {
-      sendIdentifyStacker(module, false)
+      sendIdentifyModule(module, false)
       setIdentifyInUse(null)
     }, MODULE_IDENTIFY_TIME_MS)
     setTimeoutID(timeoutID)
@@ -287,7 +287,7 @@ export function AddFixtureModal({
       const previousModule =
         unconfiguredMods.find(m => m.serialNumber === identifyInUse) ?? null
       if (previousModule !== null && module !== null) {
-        sendIdentifyStacker(previousModule, false)
+        sendIdentifyModule(previousModule, false)
         if (identifyTimeout !== null) {
           clearTimeout(identifyTimeout)
         }

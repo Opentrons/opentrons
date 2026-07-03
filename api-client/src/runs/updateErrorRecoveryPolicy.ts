@@ -26,7 +26,9 @@ export function updateErrorRecoveryPolicy(
   return request<
     UpdateErrorRecoveryPolicyResponse,
     UpdateErrorRecoveryPolicyRequest
-  >(PUT, `/runs/${runId}/errorRecoveryPolicy`, { data: policy }, config)
+  >(PUT, `/runs/${runId}/errorRecoveryPolicy`, config, {
+    body: { data: policy },
+  })
 }
 
 function buildErrorRecoveryPolicyBody(

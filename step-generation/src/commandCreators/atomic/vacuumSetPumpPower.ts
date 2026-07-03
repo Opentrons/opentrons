@@ -1,5 +1,12 @@
 import * as errorCreators from '../../errorCreators'
-import { uuid } from '../../utils'
+import { vacuumModuleStateGetter } from '../../robotStateSelectors'
+import {
+  formatPyValue,
+  getModuleHasLiveTask,
+  indentPyLines,
+  uuid,
+} from '../../utils'
+import { getVacuumPumpHoldArgsPython } from '../../utils/vacuumPythonArgs/getVacuumPumpHoldArgsPython'
 
 import type { CommandCreator, VacuumPumpPowerArgs } from '../../types'
 
@@ -9,25 +16,43 @@ export const vacuumSetPumpPower: CommandCreator<VacuumPumpPowerArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { moduleId, powerPercent, duration, ventAfter } = args
+  const { moduleId, percentPower, duration, ventAfter } = args
   const module = invariantContext.moduleEntities[moduleId]
 
-  if (module == null) {
+  const moduleState = vacuumModuleStateGetter(prevRobotState, moduleId)
+  if (moduleState == null || module == null) {
     return {
       errors: [errorCreators.missingModuleError()],
     }
   }
 
-  const holdArgs =
-    duration != null
-      ? {
-          duration,
-          // defaults to true per PE command
-          ventAfter: ventAfter ?? true,
-        }
-      : {}
+  const hasLiveTask = getModuleHasLiveTask(moduleState)
+  if (hasLiveTask) {
+    return {
+      errors: [errorCreators.liveTaskError()],
+    }
+  }
+  const isTimedHold = duration != null
 
-  // TODO: (nd, 2026-04-20) implement Python emission
+  const taskId = isTimedHold
+    ? `${module.pythonName}_task_${moduleState.numPumpActivitiesStarted + 1}`
+    : null
+
+  const holdArgs = isTimedHold
+    ? {
+        duration,
+        ventAfter,
+        taskId,
+      }
+    : null
+
+  const percentPowerArg = `percent_power=${formatPyValue(percentPower)}`
+  const holdArgsPython = isTimedHold
+    ? getVacuumPumpHoldArgsPython(duration, ventAfter)
+    : []
+  const allArgsPython = [percentPowerArg, ...holdArgsPython]
+  const taskPython = isTimedHold ? `${taskId} = ` : ''
+  const python = `${taskPython}${module.pythonName}.start_set_vacuum_power(\n${indentPyLines(allArgsPython.join(',\n'))}\n)`
   return {
     commands: [
       {
@@ -35,10 +60,11 @@ export const vacuumSetPumpPower: CommandCreator<VacuumPumpPowerArgs> = (
         key: uuid(),
         params: {
           moduleId,
-          percentPower: powerPercent,
-          ...holdArgs,
+          percentPower,
+          ...(holdArgs != null ? holdArgs : {}),
         },
       },
     ],
+    python,
   }
 }

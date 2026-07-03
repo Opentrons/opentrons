@@ -16,5 +16,5 @@ export function createLabwareDefinition(
   return request<
     CreateLabwareDefinitionResponsePayload,
     { data: LabwareDefinition }
-  >(POST, `/runs/${runId}/labware_definitions`, { data }, config)
+  >(POST, `/runs/${runId}/labware_definitions`, config, { body: { data } })
 }

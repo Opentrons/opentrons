@@ -50,8 +50,3 @@ jobs:
         run: make -C step-generation lib
       - name: 'run step generation unit tests'
         run: make -C step-generation test-cov
-      - name: 'Upload coverage report'
-        uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5.5.4
-        with:
-          flags: step-generation
-          token: ${{ secrets.CODECOV_TOKEN }}

@@ -143,6 +143,7 @@ from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
 )
 from opentrons.util.pyro.pyro_synchronous_adapter import (
+    convert_result_to_dict_of_proxies,
     convert_result_to_proxy,
     convert_result_to_wrapped_dict,
     convert_result_to_wrapped_typed_dict,
@@ -677,6 +678,7 @@ class OT3API(
     async def create_simulating_peripheral(
         self,
         model: peripherals.types.PeripheralModel,
+        sim_serial: Optional[str] = None,
     ) -> peripherals.AbstractPeripheral:
         """Create a simulating peripheral hardware interface."""
         assert self.is_simulator, (
@@ -689,6 +691,7 @@ class OT3API(
             ),
             type=peripherals.PeripheralType.from_model(model),
             sim_model=model.value,
+            sim_serial=sim_serial,
         )
         assert isinstance(peripheral, peripherals.AbstractPeripheral)
         return peripheral
@@ -2377,7 +2380,9 @@ class OT3API(
         real_mount = OT3Mount.from_mount(mount)
         status = await self.get_tip_presence_status(real_mount, follow_singular_sensor)
         if status != expected:
-            raise FailedTipStateCheck(expected, status)
+            raise FailedTipStateCheck(
+                f"Expected tip state {expected}, but received {status}."
+            )
 
     async def _force_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipActionSpec
@@ -2549,6 +2554,7 @@ class OT3API(
             )
 
     @property
+    @pyro_behavior(specialty_func=convert_result_to_dict_of_proxies, apply_local=False)
     def hardware_pipettes(self) -> InstrumentsByMount[top_types.Mount]:
         # TODO (lc 12-5-2022) We should have ONE entry point into knowing
         # what pipettes are attached from the hardware controller.
@@ -2565,6 +2571,7 @@ class OT3API(
         return self._gripper_handler.get_gripper()
 
     @property
+    @pyro_behavior(specialty_func=convert_result_to_dict_of_proxies, apply_local=False)
     def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:  # type: ignore
         # see comment in `protocols.instrument_configurer`
         # override required for type matching
@@ -3356,12 +3363,15 @@ class OT3API(
         s_data = await self._backend.read_pressure_sensor(realmount, primary)
         return s_data if s_data else 0.0
 
-    async def read_stem_capacitance(
-        self, mount: Union[top_types.Mount, OT3Mount], primary: bool = True
+    async def read_instrument_capacitance(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        primary: bool = True,
+        timeout: int = 1,
     ) -> float:
         """Read and return the current primary stem capacitance."""
         realmount = OT3Mount.from_mount(mount)
-        s_data = await self._backend.read_capacitive_sensor(realmount, primary)
+        s_data = await self._backend.read_capacitive_sensor(realmount, primary, timeout)
         return s_data if s_data else 0.0
 
     async def touch_probe(

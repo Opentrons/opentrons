@@ -1,6 +1,6 @@
 import path from 'path'
 import { app } from 'electron'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 
 import type {
   Config,

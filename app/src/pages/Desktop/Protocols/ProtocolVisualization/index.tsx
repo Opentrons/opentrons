@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 
 import { COLORS, Icon } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
 
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useRobot } from '/app/redux-resources/robots'
 import { fetchProtocols, getStoredProtocol } from '/app/redux/protocol-storage'
 import { getGroupedCommands } from '/app/redux/protocol-storage/utils'
@@ -63,11 +63,7 @@ export function ProtocolVisualization(): JSX.Element {
   if (robot == null) {
     return <LoadingIcon />
   }
-  return (
-    <ApiHostProvider hostname={robot.ip ?? null} robotName={robotName}>
-      {visualizer}
-    </ApiHostProvider>
-  )
+  return <ApiHostProvider robotName={robotName}>{visualizer}</ApiHostProvider>
 }
 
 const LoadingIcon = (): JSX.Element => {

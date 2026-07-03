@@ -21,7 +21,7 @@ import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 import { MiniCard } from '/app/molecules/MiniCard'
 import { getRobotModelByName, OPENTRONS_USB } from '/app/redux/discovery'
 import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
-import { appShellRequestor } from '/app/redux/shell/remote'
+import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
 import type { Dispatch as ReactDispatch } from 'react'
@@ -74,7 +74,7 @@ export function AvailableRobotOption(
     },
     {
       hostname: ip,
-      requestor: ip === OPENTRONS_USB ? appShellRequestor : undefined,
+      requestor: ip === OPENTRONS_USB ? appShellUSBRequestor : undefined,
     }
   )
 
@@ -96,7 +96,7 @@ export function AvailableRobotOption(
     },
     {
       hostname: ip,
-      requestor: ip === OPENTRONS_USB ? appShellRequestor : undefined,
+      requestor: ip === OPENTRONS_USB ? appShellUSBRequestor : undefined,
     }
   )
 

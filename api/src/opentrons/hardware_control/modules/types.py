@@ -29,6 +29,35 @@ from opentrons.drivers.flex_stacker.types import (
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 
+class VacuumModuleStepBase(TypedDict, total=False):
+    enable_pump: bool
+    hold_time_seconds: int | None
+    hold_time_minutes: int | None
+    ramp_rate: float | None
+    timeout_seconds: int | None
+    vent_after: bool | None
+
+
+class VacuumModulePowerStep(VacuumModuleStepBase):
+    percent_power: int | None
+
+
+class VacuumModulePressureStep(VacuumModuleStepBase):
+    gauge_pressure_mbar: int | None
+
+
+class VacuumModuleCycle(TypedDict):
+    steps: List[VacuumModuleStep]
+    repetitions: int
+    vent_after: bool | None
+
+
+VacuumModuleStep = Union[VacuumModulePowerStep, VacuumModulePressureStep]
+VacuumModuleProfileStep = Union[
+    VacuumModulePowerStep, VacuumModulePressureStep, VacuumModuleCycle
+]
+
+
 class ThermocyclerStepBase(TypedDict):
     temperature: float
 
@@ -183,8 +212,7 @@ class ModuleDataValidator:
     def is_vacuum_module_data(
         cls, data: ModuleData | None
     ) -> TypeGuard[VacuumModuleData]:
-        # TODO(nd: 2026-02-12): Add appropriate data key check when VacuumModuleData is defined
-        return data is not None
+        return data is not None and "pumpEngaged" in data.keys()
 
 
 class LiveData(TypedDict):
@@ -465,6 +493,11 @@ class VacuumModuleStatus(StrEnum):
     RUNNING = "running"  # General use- the pump is turned on
 
 
-class VacuumModuleOperationMode(StrEnum):
+class VacuumOperationMode(StrEnum):
     POWER = "power"
     PRESSURE = "pressure"
+
+
+class VentStatus(StrEnum):
+    CLOSED = "closed"
+    OPENED = "opened"

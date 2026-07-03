@@ -34,6 +34,7 @@ package_entries = {
     'performance-metrics': PackageEntry('performance_metrics'),
     'auth-server': PackageEntry('auth_server'),
     'key-server': PackageEntry('key_server'),
+    'audit-server': PackageEntry('audit_server'),
 }
 
 project_entries = {

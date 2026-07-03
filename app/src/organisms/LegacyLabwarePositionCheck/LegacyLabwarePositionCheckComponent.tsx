@@ -47,6 +47,7 @@ import type {
   LegacyLabwareOffsetCreateData,
   LegacyLabwareOffsetLocation,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type {
   CompletedProtocolAnalysis,
   CreateCommand,
@@ -271,10 +272,22 @@ export const LegacyLabwarePositionCheckComponent = (
   }
 
   const [isExiting, setIsExiting] = useState(false)
+  const accessControlDisabledDocumentationState: DocumentationState = {
+    isLoading: false,
+    accessControlEnabled: false,
+  }
   const { createMaintenanceCommand: createSilentCommand } =
-    useCreateMaintenanceCommandMutation()
+    useCreateMaintenanceCommandMutation(
+      accessControlDisabledDocumentationState,
+      [],
+      () => {}
+    ) // No ACM on the OT-2
   const { chainRunCommands, isCommandMutationLoading: isCommandChainLoading } =
-    useChainMaintenanceCommands()
+    useChainMaintenanceCommands(
+      accessControlDisabledDocumentationState,
+      [],
+      () => {}
+    ) // No ACM on the OT-2
 
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
   const handleCleanUpAndClose = (): void => {

@@ -17,7 +17,11 @@ import {
   UpdateChannel,
 } from '/app/organisms/ODD/RobotSettingsDashboard'
 import { CameraPreferences } from '/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences'
-import { getAppLanguage, toggleDevtools } from '/app/redux/config'
+import {
+  getAppLanguage,
+  getFeatureFlags,
+  toggleDevtools,
+} from '/app/redux/config'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { getRobotSettings } from '/app/redux/robot-settings'
@@ -97,6 +101,7 @@ describe('RobotSettingsDashboard', () => {
       toggleERSettings: mockToggleER,
     })
     vi.mocked(getAppLanguage).mockReturnValue(MOCK_DEFAULT_LANGUAGE)
+    vi.mocked(getFeatureFlags).mockReturnValue({ accessControlMode: false })
   })
 
   afterEach(() => {
@@ -304,5 +309,13 @@ describe('RobotSettingsDashboard', () => {
     const button = screen.getByText('Devices')
     fireEvent.click(button)
     expect(vi.mocked(Devices)).toHaveBeenCalled()
+  })
+
+  it('should render the component when tapping show encryption key', () => {
+    vi.mocked(getFeatureFlags).mockReturnValue({ accessControlMode: true })
+    render()
+    const button = screen.getByText('Robot encryption key')
+    fireEvent.click(button)
+    screen.getByText('View robot generated key')
   })
 })

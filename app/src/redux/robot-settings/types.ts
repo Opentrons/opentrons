@@ -7,7 +7,6 @@ import type { RobotApiRequestMeta } from '../robot-api/types'
 
 export interface PerRobotRobotSettingsState {
   settings: RobotSettings
-  restartPath: string | null
 }
 
 export type RobotSettingsState = Partial<{
@@ -69,15 +68,7 @@ export interface UpdateSettingFailureAction {
   meta: RobotApiRequestMeta
 }
 
-// clear restart path
-
-export interface ClearRestartPathAction {
-  type: 'robotSettings:CLEAR_RESTART_PATH'
-  payload: { robotName: string }
-}
-
 export type RobotSettingsAction =
-  | ClearRestartPathAction
   | FetchSettingsAction
   | FetchSettingsSuccessAction
   | FetchSettingsFailureAction

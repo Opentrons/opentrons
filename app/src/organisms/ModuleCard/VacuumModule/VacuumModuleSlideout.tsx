@@ -13,7 +13,11 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  getModuleDisplayName,
+  VACUUM_MAX_PRESSURE_MBAR,
+  VACUUM_MIN_PRESSURE_MBAR,
+} from '@opentrons/shared-data'
 
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
 import { Slideout } from '/app/atoms/Slideout'
@@ -25,10 +29,6 @@ import styles from './vacuummodule.module.css'
 
 import type { VacuumMode } from '/app/redux/modules/api-types'
 import type { VacuumModule } from '/app/redux/modules/types'
-
-// TODO: get from module definition or equivalent; If not, export to a shared location
-const MAX_PRESSURE = 0
-const MIN_PRESSURE = -200
 
 interface VacuumModuleSlideoutProps {
   module: VacuumModule
@@ -51,7 +51,8 @@ export function VacuumModuleSlideout(
     useState<boolean>(false)
   const pressure = parseGaugePressureValue(pressureInput)
   const isPressureRangeError =
-    pressure != null && (pressure < MIN_PRESSURE || pressure > MAX_PRESSURE)
+    pressure != null &&
+    (pressure < VACUUM_MIN_PRESSURE_MBAR || pressure > VACUUM_MAX_PRESSURE_MBAR)
 
   const handleConfirm = (): void => {
     if (modeType == null) {
@@ -140,8 +141,8 @@ export function VacuumModuleSlideout(
             <InputField
               title={t('gauge_pressure')}
               caption={t('valid_range', {
-                min: MIN_PRESSURE,
-                max: MAX_PRESSURE,
+                min: VACUUM_MIN_PRESSURE_MBAR,
+                max: VACUUM_MAX_PRESSURE_MBAR,
               })}
               units={t('mbar')}
               type="text"
@@ -152,8 +153,8 @@ export function VacuumModuleSlideout(
               error={
                 showPressureRangeError && isPressureRangeError
                   ? t('vacuum_range_error', {
-                      min: MIN_PRESSURE,
-                      max: MAX_PRESSURE,
+                      min: VACUUM_MIN_PRESSURE_MBAR,
+                      max: VACUUM_MAX_PRESSURE_MBAR,
                     })
                   : null
               }

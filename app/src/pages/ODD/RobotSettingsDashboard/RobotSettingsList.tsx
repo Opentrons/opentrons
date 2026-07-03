@@ -21,7 +21,6 @@ import {
   getFeatureFlags,
   toggleDevInternalFlag,
   toggleDevtools,
-  useFeatureFlag,
 } from '/app/redux/config'
 import { getLocalRobot, getRobotApiVersion } from '/app/redux/discovery'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
@@ -81,7 +80,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const appLanguage = useSelector(getAppLanguage)
   const currentLanguageOption = LANGUAGES.find(lng => lng.value === appLanguage)
 
-  const enableExternalKeyboardTest = useFeatureFlag('externalKeyboardTest')
+  const devInternalFlags = useSelector(getFeatureFlags)
 
   return (
     <div className={styles.main_content}>
@@ -196,6 +195,16 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           }}
           iconName="privacy"
         />
+        {devInternalFlags?.accessControlMode ? (
+          <RobotSettingButton
+            settingName={t('robot_encryption_key')}
+            dataTestId="RobotSettingButton_encryption"
+            onClick={() => {
+              setCurrentOption('RobotEncryptionKey')
+            }}
+            iconName="verified"
+          />
+        ) : null}
         <RobotSettingButton
           settingName={i18n.format(
             t('app_settings:error_recovery_mode'),
@@ -243,15 +252,6 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           }}
           iconName="update-channel"
         />
-        {enableExternalKeyboardTest ? (
-          <RobotSettingButton
-            settingName={t('documentation_required')}
-            onClick={() => {
-              setCurrentOption('ExternalKeyboardTest')
-            }}
-            iconName="acm"
-          />
-        ) : null}
         <RobotSettingButton
           settingName={t('app_settings:enable_dev_tools')}
           dataTestId="RobotSettingButton_enable_dev_tools"

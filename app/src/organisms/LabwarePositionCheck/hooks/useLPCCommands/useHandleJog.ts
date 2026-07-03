@@ -43,11 +43,18 @@ export function useHandleJog({
   maintenanceRunId,
   setErrorMessage,
   chainLPCCommands,
+  commandDocState,
+  actionsToDocument,
+  addActionToDocument,
 }: UseHandleJogProps): UseHandleJogResult {
   const pipette = useSelector(selectActivePipette(runId))
   const pipetteId = pipette?.id
   const { createMaintenanceCommand: createSilentCommand } =
-    useCreateMaintenanceCommandMutation()
+    useCreateMaintenanceCommandMutation(
+      commandDocState,
+      actionsToDocument,
+      addActionToDocument
+    )
 
   const queueRef = useRef<
     Array<{

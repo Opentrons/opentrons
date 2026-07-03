@@ -8,6 +8,7 @@ from aiohttp import web
 
 from server_utils.auth.resource_server.authorization_checker import (
     AuthorizationChecker,
+    AuthorizationNotRequiredResult,
     AuthorizedResult,
 )
 from server_utils.auth.resource_server.error_responses import build_response_for_error
@@ -47,7 +48,7 @@ def require_scopes(*required_scopes: Scope) -> Callable[[Handler], Handler]:
 
     def decorator(handler: Handler) -> Handler:
         @functools.wraps(handler)
-        async def wrapped(request: web.Request) -> web.Response:
+        async def wrapped(request: web.Request) -> web.StreamResponse:
             authorization_checker = request.app[_AUTHORIZATION_CHECKER_APP_KEY]
             assert isinstance(authorization_checker, AuthorizationChecker), (
                 "The app is missing its AuthorizationChecker. Forgot to initialize it during server startup?"
@@ -56,7 +57,7 @@ def require_scopes(*required_scopes: Scope) -> Callable[[Handler], Handler]:
             result = await authorization_checker.check(
                 token=token, required_scopes=required_scopes_set
             )
-            if isinstance(result, AuthorizedResult):
+            if isinstance(result, (AuthorizationNotRequiredResult, AuthorizedResult)):
                 # The request is authorized.
                 return await handler(request)
             else:
@@ -67,7 +68,7 @@ def require_scopes(*required_scopes: Scope) -> Callable[[Handler], Handler]:
                 return web.json_response(
                     status=status_code,
                     headers=headers,
-                    text=body.model_dump_json(),
+                    text=body.model_dump_json(by_alias=True),
                 )
 
         return wrapped

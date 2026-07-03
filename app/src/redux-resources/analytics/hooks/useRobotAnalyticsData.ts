@@ -7,7 +7,6 @@ import {
   getRobotFirmwareVersion,
   getRobotSerialNumber,
 } from '/app/redux/discovery'
-import { getAttachedPipettes } from '/app/redux/pipettes'
 import { fetchSettings, getRobotSettings } from '/app/redux/robot-settings'
 
 import type { RobotAnalyticsData } from '/app/redux/analytics/types'
@@ -25,9 +24,6 @@ export function useRobotAnalyticsData(
   robotName: string
 ): RobotAnalyticsData | null {
   const robot = useRobot(robotName)
-  const pipettes = useSelector((state: State) =>
-    getAttachedPipettes(state, robotName)
-  )
   const settings = useSelector((state: State) =>
     getRobotSettings(state, robotName)
   )
@@ -39,30 +35,21 @@ export function useRobotAnalyticsData(
     dispatch(fetchSettings(robotName))
   }, [dispatch, robotName])
 
-  // @ts-expect-error RobotAnalyticsData type needs boolean values should it be boolean | string
-  return useMemo(
-    () => {
-      if (robot != null) {
-        return settings.reduce<RobotAnalyticsData>(
-          (result, setting) => ({
-            ...result,
-            [`${FF_PREFIX}${setting.id}`]: !!(setting?.value ?? false),
-          }),
-          // @ts-expect-error RobotAnalyticsData type needs boolean values should it be boolean | string
-          {
-            robotApiServerVersion: getRobotApiVersion(robot) ?? '',
-            robotSmoothieVersion: getRobotFirmwareVersion(robot) ?? '',
-            robotLeftPipette: pipettes.left?.model ?? '',
-            robotRightPipette: pipettes.right?.model ?? '',
-            robotSerialNumber: serialNumber ?? '',
-          }
-        )
-      }
+  return useMemo(() => {
+    if (robot != null) {
+      return settings.reduce<RobotAnalyticsData>(
+        (result, setting) => ({
+          ...result,
+          [`${FF_PREFIX}${setting.id}`]: !!(setting?.value ?? false),
+        }),
+        {
+          robotApiServerVersion: getRobotApiVersion(robot) ?? '',
+          robotSmoothieVersion: getRobotFirmwareVersion(robot) ?? '',
+          robotSerialNumber: serialNumber ?? '',
+        }
+      )
+    }
 
-      return null
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pipettes, robot, settings]
-  )
+    return null
+  }, [robot, settings, serialNumber])
 }

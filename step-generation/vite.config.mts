@@ -3,7 +3,7 @@ import { defineConfig } from 'vite'
 
 function isExternal(id: string): boolean {
   // Keep shared-data external (separate package). Bundle lodash/immer/uuid so Node ESM
-  // can load the entry without extensionless subpath imports (lodash/min, uuid/v4).
+  // can load the entry without legacy extensionless subpath imports.
   return (
     id === '@opentrons/shared-data' || id.startsWith('@opentrons/shared-data/')
   )

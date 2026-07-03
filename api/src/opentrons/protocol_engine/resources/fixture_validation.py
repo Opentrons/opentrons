@@ -1,6 +1,9 @@
 """Validation file for addressable area reference checking functions."""
 
-from opentrons.types import DeckSlotName
+import itertools
+from typing import Union, cast
+
+from opentrons.types import DeckSlotName, StagingSlotName
 
 
 def is_waste_chute(addressable_area_name: str) -> bool:
@@ -66,3 +69,38 @@ def is_stacker_shuttle(addressable_area_name: str) -> bool:
         "flexStackerModuleV1C4",
         "flexStackerModuleV1D4",
     ]
+
+
+def is_vac_dock(addressable_area_name: str) -> bool:
+    """Check if an addressable area is an vacuum module dock area."""
+    return "vacuumModuleV1Dock" in addressable_area_name
+
+
+def get_slot_name_from_addressable_area(
+    addressable_area_name: str,
+) -> Union[DeckSlotName, StagingSlotName]:
+    """Convert an addressable area name to a DeckSlotName or StagingSlotName.
+
+    Tries the full name first (for plain "A3", "D4", etc.), then falls back to the
+    last two characters upper-cased for special areas provided by modules/fixtures
+    (e.g. "vacuumModuleV1DockA4" -> "A4", "vacuumModuleV1A3" -> "A3",
+    "flexStackerModuleV1A4" -> "A4").
+    """
+    # NOTE(ba, 2026-05-1): Some labware like the vacuum module collar
+    # are loaded onto custom addressable areas like `vacuumModuleV1DockV4`.
+    # Currently this does not map well to our convention of everything is
+    # either a DeckSlotName or StagingSlotName. So we need to take the
+    # last 2 characters to convert properly, we should find a better way
+    # of doing this like working with addressableAreaLocation directly.
+    names = (addressable_area_name, addressable_area_name[-2:].upper())
+    for name, slot_type in itertools.product(names, (DeckSlotName, StagingSlotName)):
+        try:
+            return cast(Union[DeckSlotName, StagingSlotName], slot_type).from_primitive(
+                name
+            )
+        except ValueError:
+            continue
+
+    raise ValueError(
+        f"Cannot convert area name '{addressable_area_name}' to DeckSlotName or StagingSlotName."
+    )

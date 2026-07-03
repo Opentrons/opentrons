@@ -97,10 +97,3 @@ def hardware_subprocess_enabled() -> bool:
     return advs.get_setting_with_env_overload(
         "enableHardwareSubprocess", RobotTypeEnum.FLEX
     )
-
-
-def allow_step_grouping() -> bool:
-    return advs.get_setting_with_env_overload(
-        "allowStepGrouping",
-        RobotTypeEnum.FLEX,
-    )

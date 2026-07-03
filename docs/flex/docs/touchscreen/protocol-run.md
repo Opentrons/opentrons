@@ -21,7 +21,7 @@ Swipe from right to left to see an alternative view with smaller controls and mo
 
 ## Error recovery
 
-Starting in robot software version 8.0.0, if something unexpected happens during the protocol run, Flex will pause and give you the option to enter error recovery mode. In earlier versions, Flex cancels the run when an error occurs.
+Starting in robot software version 8.0.0, if something unexpected happens during the protocol run, Flex will pause and give you the option to enter *error recovery mode*. In earlier versions, Flex cancels the run when an error occurs.
 
 ![Error recovery screen showing a pipette overpressure error, with options to cancel the run or launch recovery mode.](../images/touchscreen-error-recovery.png "Error recovery")
 

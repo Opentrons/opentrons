@@ -64,7 +64,7 @@ export function Troubleshooting({
       Promise.all(
         robot.health.logs.map(log => {
           const logFileName: string = last(log.split('/')) ?? 'opentrons.log'
-          return request<string>(GET, log, null, host)
+          return request<string>(GET, log, host)
             .then(res => {
               zip.file(logFileName, res.data)
             })

@@ -1,0 +1,46 @@
+.container_wrapper {
+  width: 100%;
+  padding: var(--spacing-12);
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
+  container-name: pipette-container;
+  container-type: inline-size;
+}
+
+.container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--spacing-12);
+}
+
+.header {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.main_content {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-12);
+}
+
+@container pipette-container (max-width: 299px) {
+  .container {
+    gap: var(--spacing-8);
+  }
+
+  .header {
+    flex-wrap: wrap;
+    gap: var(--spacing-8);
+  }
+
+  .main_content {
+    flex-wrap: wrap;
+    gap: var(--spacing-4);
+  }
+}

@@ -7,7 +7,10 @@ A Vite app and Playwright suite for exercising **packed** builds of:
 - `@opentrons/step-generation`
 - `@opentrons/protocol-visualization`
 
-The demo page includes **ProtocolDeck** (components) and **AnnotatedSteps** (protocol-visualization), which is the current exported UI for protocol visualization and exercises its internal molecules and organisms (command rows, groups, icons, error modal). Visual regression uses **Applitools Eyes**, not committed screenshots.
+The demo app includes two pages: a **Deck map** page built with
+**ProtocolDeck** from `@opentrons/components`, and a **Protocol visualization**
+page built with `@opentrons/protocol-visualization`. Visual regression uses
+**Applitools Eyes**, not committed screenshots.
 
 ## Applitools Eyes
 
@@ -90,7 +93,12 @@ Playwright + Eyes (needs API key). `test-setup` installs Chromium; run after `ma
 
 ## i18n
 
-`AnnotatedSteps` uses `react-i18next` namespace `protocol_visualization`. English strings live in [`src/locale/en/protocol_visualization.json`](src/locale/en/protocol_visualization.json). Keep them aligned with [`app/src/assets/localization/en/protocol_visualization.json`](../app/src/assets/localization/en/protocol_visualization.json) when keys change.
+`ProtocolVisualization` uses the `react-i18next` namespace
+`protocol_visualization`. English strings live in
+[`src/locale/en/protocol_visualization.json`](src/locale/en/protocol_visualization.json).
+Keep them aligned with
+[`app/src/assets/localization/en/protocol_visualization.json`](../app/src/assets/localization/en/protocol_visualization.json)
+when keys change.
 
 ## Package linking
 
@@ -117,7 +125,8 @@ js-package-testing/
 │   ├── locale/en/protocol_visualization.json
 │   └── StackerAnalysis.json
 └── tests/
-    └── protocolDeck.spec.ts
+    ├── protocolDeck.spec.ts
+    └── protocolVisualization.spec.ts
 ```
 
 ## Dependencies (high level)
@@ -139,3 +148,18 @@ Use the `pnpm-lock.yaml` from your branch. If you changed `package.json` locally
 ### Vite build or dev fails resolving `@opentrons/*` or CSS
 
 `pack/opentrons-*` must exist **before** `pnpm install`, because dependencies use `link:pack/...`. Run `make build-local-packages` (or full `make setup`), then `pnpm install` from `js-package-testing/`. If you already installed without `pack/`, rebuild packs and run `pnpm install` again.
+
+### Protocol visualization renders with broken styles
+
+Package CSS for `@opentrons/components` and `@opentrons/protocol-visualization` is imported from [`src/main.tsx`](src/main.tsx) so Vite reliably includes both bundles in the module graph:
+
+- `@opentrons/protocol-visualization/lib/style.css`
+- `@opentrons/components/styles/global`
+- `@opentrons/components/styles`
+
+The bundled CSS for these packages uses **per-module hashed scoped names** (`[name]__[local]__[hash:base64:5]`) so unscoped local names like `.container`, `.header`, `.footer`, `.body_container` cannot collide across `*.module.css` files. This is configured in:
+
+- `components/vite.config.mts` -> `css.modules.generateScopedName`
+- `protocol-visualization/vite.config.mts` -> `css.modules.generateScopedName`
+
+If a future change reverts those scoped names back to `'[local]'`, expect cross-component class collisions in the packed `lib/style.css` (for example the right rail panel collapsing, deck slot labels misrendering, or footer text getting clipped) because many modules share generic class names. The fix is to keep the hashed scoped name pattern in those library `vite.config.mts` files, not to add per-class overrides in this consumer.

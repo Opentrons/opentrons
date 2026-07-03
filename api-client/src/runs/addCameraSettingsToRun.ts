@@ -12,7 +12,7 @@ export function addCameraSettingsToRun(
   return request<CameraResponse, { data: CameraData }>(
     POST,
     `/runs/${runId}/camera/settings`,
-    { data },
-    config
+    config,
+    { body: { data } }
   )
 }

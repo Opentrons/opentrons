@@ -11,7 +11,9 @@ export {
   thermocyclerProfileStep,
   thermocyclerStateStep,
   transfer,
-  vacuumSetPumpProfile,
+  vacuumCloseVentSetPumpPressure,
+  vacuumCloseVentSetPumpPower,
+  vacuumCloseVentStartProfile,
   waitForModuleTask,
 } from './compound'
 
@@ -21,6 +23,8 @@ export {
   absorbanceReaderOpenLid,
   absorbanceReaderRead,
   aspirate,
+  aspirateWhileTracking,
+  dispenseWhileTracking,
   blowOutInWell,
   captureImage,
   comment,
@@ -35,6 +39,10 @@ export {
   flexStackerFillItems,
   flexStackerRetrieve,
   flexStackerStore,
+  home,
+  moveRelative,
+  moveToCoordinates,
+  tryLiquidProbe,
   moveLabware,
   moveToAddressableArea,
   moveToAddressableAreaForDropTip,
@@ -44,6 +52,7 @@ export {
   vacuumOpenVent,
   vacuumSetPumpPower,
   vacuumSetPumpPressure,
+  vacuumStartRunProfile,
   vacuumStopPump,
   waitForTemperature,
 } from './atomic'

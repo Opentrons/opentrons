@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from 'react-query'
 
 import { acknowledgeEstopDisengage } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError, AxiosResponse } from 'axios'
 import type {
@@ -34,18 +34,20 @@ export function useAcknowledgeEstopDisengageMutation(
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const queryClient = useQueryClient()
   const mutation = useMutation<EstopStatus, AxiosError, unknown>(
-    [host, 'robot/control/acknowledgeEstopDisengage'],
+    getQueryKey(host, 'robot/control/acknowledgeEstopDisengage'),
     () => {
       return acknowledgeEstopDisengage(host!)
         .then((response: AxiosResponse<EstopStatus>) => {
           queryClient.setQueryData(
-            [host, 'robot/control/estopStatus'],
+            getQueryKey(host, 'robot/control/estopStatus'),
             response.data
           )
           return response.data
         })
         .catch((e: any) => {
-          queryClient.invalidateQueries([host, 'robot/control/estopStatus'])
+          queryClient.invalidateQueries(
+            getQueryKey(host, 'robot/control/estopStatus')
+          )
           throw e
         })
     },

@@ -15,7 +15,7 @@ This chapter summarizes the functions and physical specifications of modules tha
 
 ## Supported modules
 
-Opentrons Flex is compatible with with the following Opentrons modules:
+Opentrons Flex is compatible with the following Opentrons modules:
 
 - The [**Absorbance Plate Reader**](absorbance-plate-reader.md) is a fully automated spectrophotometer that uses light absorbance to determine sample concentrations. This module is optimized for a variety of applications, including protein quantification, sample normalization, cell viability assays, and monitoring bacterial growth.
 
@@ -33,20 +33,20 @@ Opentrons Flex is compatible with with the following Opentrons modules:
 
 Certain module tasks, like heating from an ambient temperature to a high temperature or executing a Thermocycler profile, take more time than others. Starting with API version 2.27, you can use [concurrent commands](../../python-api/modules/concurrent.md) to continue pipetting and other steps in your Flex protocols. 
 
-Some modules originally designed for the OT-2 are compatible with Flex, as summarized in the table below. A checkmark :material-check-bold:{ .green } indicates compatibility, and an :octicons-x-12:{ .red } indicates incompatibility.
+Some modules originally designed for the OT-2 are compatible with Flex, as summarized in the table below. A checkmark :material-check-bold:{ .opentrons-blue } indicates compatibility, and an :octicons-x-12:{ .red } indicates incompatibility.
 
 
 | Device type and generation | OT-2 | Flex |
 |:---------------------------|:----:|:----:|
-| Absorbance Plate Reader    | :octicons-x-12:{ .red } | :material-check-bold:{ .green } |
-| Heater-Shaker Module GEN1  | :material-check-bold:{ .green } | :material-check-bold:{ .green } |
-| HEPA Module                | :material-check-bold:{ .green } | :octicons-x-12:{ .red } |
-| HEPA/UV Module             | :octicons-x-12:{ .red } | :material-check-bold:{ .green } |
-| Magnetic Block GEN1        | :octicons-x-12:{ .red } | :material-check-bold:{ .green } |
-| Magnetic Module GEN1       | :material-check-bold:{ .green } | :octicons-x-12:{ .red } |
-| Magnetic Module GEN2       | :material-check-bold:{ .green } | :octicons-x-12:{ .red } |
-| Stacker Module GEN1        | :octicons-x-12:{ .red } | :material-check-bold:{ .green } |
-| Temperature Module GEN1    | :material-check-bold:{ .green } | :octicons-x-12:{ .red } |
-| Temperature Module GEN2    | :material-check-bold:{ .green } | :material-check-bold:{ .green } |
-| Thermocycler Module GEN1   | :material-check-bold:{ .green } | :octicons-x-12:{ .red } |
-| Thermocycler Module GEN2   | :material-check-bold:{ .green } | :material-check-bold:{ .green } |
+| Absorbance Plate Reader    | :octicons-x-12:{ .red } | :material-check-bold:{ .opentrons-blue } |
+| Heater-Shaker Module GEN1  | :material-check-bold:{ .opentrons-blue } | :material-check-bold:{ .opentrons-blue } |
+| HEPA Module                | :material-check-bold:{ .opentrons-blue } | :octicons-x-12:{ .red } |
+| HEPA/UV Module             | :octicons-x-12:{ .red } | :material-check-bold:{ .opentrons-blue } |
+| Magnetic Block GEN1        | :octicons-x-12:{ .red } | :material-check-bold:{ .opentrons-blue } |
+| Magnetic Module GEN1       | :material-check-bold:{ .opentrons-blue } | :octicons-x-12:{ .red } |
+| Magnetic Module GEN2       | :material-check-bold:{ .opentrons-blue } | :octicons-x-12:{ .red } |
+| Stacker Module GEN1        | :octicons-x-12:{ .red } | :material-check-bold:{ .opentrons-blue } |
+| Temperature Module GEN1    | :material-check-bold:{ .opentrons-blue } | :octicons-x-12:{ .red } |
+| Temperature Module GEN2    | :material-check-bold:{ .opentrons-blue } | :material-check-bold:{ .opentrons-blue } |
+| Thermocycler Module GEN1   | :material-check-bold:{ .opentrons-blue } | :octicons-x-12:{ .red } |
+| Thermocycler Module GEN2   | :material-check-bold:{ .opentrons-blue } | :material-check-bold:{ .opentrons-blue } |

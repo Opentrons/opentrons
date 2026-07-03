@@ -1,15 +1,18 @@
+import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import partition from 'lodash/partition'
 
 import {
   ALIGN_CENTER,
+  ALIGN_END,
   Box,
   COLORS,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   Flex,
   Icon,
+  InputField,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   Link,
@@ -18,23 +21,25 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { Divider } from '/app/atoms/structure'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { CollapsibleSection } from '/app/molecules/CollapsibleSection'
 import { DevicesEmptyState } from '/app/organisms/Desktop/Devices/DevicesEmptyState'
 import { RobotCard } from '/app/organisms/Desktop/Devices/RobotCard'
+import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
+import { useFeatureFlag } from '/app/redux/config'
 import {
   getConnectableRobots,
   getReachableRobots,
   getScanning,
   getUnreachableRobots,
-  OPENTRONS_USB,
 } from '/app/redux/discovery'
-import { appShellRequestor } from '/app/redux/shell/remote'
 
 import { NewRobotSetupHelp } from './NewRobotSetupHelp'
 
+import type { ReactNode } from 'react'
+import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { State } from '/app/redux/types'
 
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
@@ -42,6 +47,7 @@ export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
 
 export function DevicesLanding(): JSX.Element {
   const { t } = useTranslation('devices_landing')
+  const showSearchBar = useFeatureFlag('robotSearchBar')
 
   const isScanning = useSelector((state: State) => getScanning(state))
   const healthyReachableRobots = useSelector((state: State) =>
@@ -59,12 +65,36 @@ export function DevicesLanding(): JSX.Element {
     robot => robot.healthStatus === 'ok'
   )
 
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const filterRobots = useCallback(
+    (robots: DiscoveredRobot[]): DiscoveredRobot[] => {
+      const query = searchQuery.toLowerCase().trim()
+      if (query === '') {
+        return robots
+      } else {
+        return robots.filter(robot => {
+          const name = robot.name.toLowerCase()
+          const model = robot.robotModel.toLowerCase()
+
+          return name.includes(query) || model.includes(query)
+        })
+      }
+    },
+    [searchQuery]
+  )
+
+  const filteredHealthy = filterRobots(healthyReachableRobots)
+  const filteredUnhealthy = filterRobots(unhealthyReachableRobots)
+  const filteredRecentlySeen = filterRobots(recentlySeenRobots)
+  const filteredUnreachable = filterRobots(unreachableRobots)
+
   const noRobots =
     [
-      ...healthyReachableRobots,
-      ...recentlySeenRobots,
-      ...unhealthyReachableRobots,
-      ...unreachableRobots,
+      ...filteredHealthy,
+      ...filteredRecentlySeen,
+      ...filteredUnhealthy,
+      ...filteredUnreachable,
     ].length === 0
 
   return (
@@ -80,6 +110,26 @@ export function DevicesLanding(): JSX.Element {
         </LegacyStyledText>
         <NewRobotSetupHelp />
       </Flex>
+      {showSearchBar ? (
+        <Flex
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          alignItems={ALIGN_END}
+          width="33%"
+          marginLeft={SPACING.spacingAuto}
+        >
+          <InputField
+            placeholder={t('search_robots')}
+            value={searchQuery}
+            onChange={e => {
+              setSearchQuery(e.target.value)
+            }}
+            leftElement={
+              <Icon name="search" size="1rem" color={COLORS.grey50} />
+            }
+            size="small"
+          />
+        </Flex>
+      ) : null}
       {isScanning && noRobots ? <DevicesLoadingState /> : null}
       {!isScanning && noRobots ? <DevicesEmptyState /> : null}
       {!noRobots ? (
@@ -88,31 +138,20 @@ export function DevicesLanding(): JSX.Element {
             gridGap={SPACING.spacing4}
             marginY={SPACING.spacing8}
             title={t('available', {
-              count: [...healthyReachableRobots, ...unhealthyReachableRobots]
-                .length,
+              count: [...filteredHealthy, ...filteredUnhealthy].length,
             })}
           >
-            {healthyReachableRobots.map(robot => (
-              <ApiHostProvider
-                key={robot.name}
-                hostname={robot.ip ?? null}
-                requestor={
-                  robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
-                }
-              >
-                <RobotCard robot={robot} />
-              </ApiHostProvider>
+            {filteredHealthy.map(robot => (
+              <ApiHostProviderForRobot key={robot.name} robot={robot}>
+                <RobotCertRotator>
+                  <RobotCard robot={robot} />
+                </RobotCertRotator>
+              </ApiHostProviderForRobot>
             ))}
-            {unhealthyReachableRobots.map(robot => (
-              <ApiHostProvider
-                key={robot.name}
-                hostname={robot.ip ?? null}
-                requestor={
-                  robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
-                }
-              >
+            {filteredUnhealthy.map(robot => (
+              <ApiHostProviderForRobot key={robot.name} robot={robot}>
                 <RobotCard robot={robot} />
-              </ApiHostProvider>
+              </ApiHostProviderForRobot>
             ))}
           </CollapsibleSection>
           <Divider />
@@ -120,14 +159,14 @@ export function DevicesLanding(): JSX.Element {
             gridGap={SPACING.spacing4}
             marginY={SPACING.spacing16}
             title={t('not_available', {
-              count: [...recentlySeenRobots, ...unreachableRobots].length,
+              count: [...filteredRecentlySeen, ...filteredUnreachable].length,
             })}
-            isExpandedInitially={healthyReachableRobots.length === 0}
+            isExpandedInitially={filteredHealthy.length === 0}
           >
-            {recentlySeenRobots.map(robot => (
+            {filteredRecentlySeen.map(robot => (
               <RobotCard key={robot.name} robot={{ ...robot, local: null }} />
             ))}
-            {unreachableRobots.map(robot => (
+            {filteredUnreachable.map(robot => (
               <RobotCard key={robot.name} robot={robot} />
             ))}
           </CollapsibleSection>
@@ -187,4 +226,12 @@ function DevicesLoadingState(): JSX.Element {
       </Flex>
     </Flex>
   )
+}
+
+function ApiHostProviderForRobot(props: {
+  robot: DiscoveredRobot
+  children: ReactNode
+}): JSX.Element {
+  const { robot, children } = props
+  return <ApiHostProvider robotName={robot.name}>{children}</ApiHostProvider>
 }

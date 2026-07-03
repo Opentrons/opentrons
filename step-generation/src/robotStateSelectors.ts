@@ -8,7 +8,7 @@ import {
   ALL,
   COLUMN,
   FLEX_STACKER_MODULE_TYPE,
-  getIsLid,
+  getIsTiprack,
   getLabwareDefIsStandard,
   getLabwareDefURI,
   getTiprackVolume,
@@ -23,7 +23,13 @@ import {
 } from '@opentrons/shared-data'
 
 import { CLEAN, COLUMN_4_SLOTS } from './constants'
-import { getDefaultPrimaryNozzle, getSlotInLocationStack } from './utils'
+import {
+  getIsInPipettableLocation,
+  getIsSafePickupWithinTiprack,
+  getLabwareHasLid,
+  getPipetteMovementSafetyStatus,
+  getSlotInLocationStack,
+} from './utils'
 
 import type {
   NozzleConfigurationStyle,
@@ -85,9 +91,6 @@ export function _getNextTip(args: {
   } = args
   const pipetteChannels =
     invariantContext.pipetteEntities[pipetteId]?.spec?.channels
-  const confirmedPrimaryNozzle =
-    primaryNozzle ??
-    getDefaultPrimaryNozzle({ nozzles, channels: pipetteChannels })
   const tiprackDef = invariantContext.labwareEntities[tiprackId]?.def
   const tiprackWellsState = robotState.tipState.tipracks[tiprackId]
   if (!pipetteChannels || !tiprackDef || !tiprackWellsState) {
@@ -116,18 +119,14 @@ export function _getNextTip(args: {
   const firstFullGroupReversed = (groups: string[][]): string[] | null =>
     [...groups].reverse().find(group => group.every(hasCleanTip)) ?? null
   const is8ch1Nozzle = pipetteChannels === 8 && nozzles === SINGLE
-  const is8ch1NozzleFront = is8ch1Nozzle && confirmedPrimaryNozzle === H1_NOZZLE
-  const is8ch1NozzleBack = is8ch1Nozzle && confirmedPrimaryNozzle === A1_NOZZLE
+  const is8ch1NozzleFront = is8ch1Nozzle && primaryNozzle === H1_NOZZLE
+  const is8ch1NozzleBack = is8ch1Nozzle && primaryNozzle === A1_NOZZLE
 
   const is96ch1Nozzle = pipetteChannels === 96 && nozzles === SINGLE
-  const is96ch1NozzleFrontRight =
-    is96ch1Nozzle && confirmedPrimaryNozzle === H12_NOZZLE
-  const is96ch1NozzleBackRight =
-    is96ch1Nozzle && confirmedPrimaryNozzle === A12_NOZZLE
-  const is96ch1NozzleFrontLeft =
-    is96ch1Nozzle && confirmedPrimaryNozzle === H1_NOZZLE
-  const is96ch1NozzleBackLeft =
-    is96ch1Nozzle && confirmedPrimaryNozzle === A1_NOZZLE
+  const is96ch1NozzleFrontRight = is96ch1Nozzle && primaryNozzle === H12_NOZZLE
+  const is96ch1NozzleBackRight = is96ch1Nozzle && primaryNozzle === A12_NOZZLE
+  const is96ch1NozzleFrontLeft = is96ch1Nozzle && primaryNozzle === H1_NOZZLE
+  const is96ch1NozzleBackLeft = is96ch1Nozzle && primaryNozzle === A1_NOZZLE
 
   if (pipetteChannels === 1 || is8ch1NozzleFront || is96ch1NozzleFrontRight) {
     return firstClean(orderedWellsT2B)
@@ -162,7 +161,7 @@ export function _getNextTip(args: {
   if (nozzles === COLUMN) {
     const columns = tiprackDef.ordering
     const column =
-      confirmedPrimaryNozzle === A1_NOZZLE
+      primaryNozzle === A1_NOZZLE
         ? firstFullGroupReversed(columns)
         : firstFullGroup(columns)
     return column?.[0] ?? null
@@ -173,7 +172,7 @@ export function _getNextTip(args: {
     const rows = columns[0].map((_, i) => columns.map(col => col[i]))
 
     const row =
-      confirmedPrimaryNozzle === A1_NOZZLE
+      primaryNozzle === A1_NOZZLE
         ? firstFullGroupReversed(rows)
         : firstFullGroup(rows)
 
@@ -218,26 +217,43 @@ export function getNextTiprack(
       `cannot getNextTiprack, no pipette entity for pipette "${pipetteId}"`
     )
   }
-  // filter out unmounted or non-compatible tiprack models
+  // filter out unmounted or non-compatible or lidded tiprack models
+  const excludedByLid: string[] = []
   const sortedTipracksIds = sortLabwareBySlot(robotState.labware).filter(
     labwareId => {
       console.assert(
         invariantContext.labwareEntities[labwareId]?.labwareDefURI != null,
         `cannot getNextTiprack, no labware entity for "${labwareId}"`
       )
-      const isOnDeck =
-        getSlotInLocationStack(robotState.labware[labwareId].stack) !==
-        'offDeck'
+      const slotInLocationStack = getSlotInLocationStack(
+        robotState.labware[labwareId].stack
+      )
+      const isInPipettableLocation =
+        getIsInPipettableLocation(slotInLocationStack)
+
+      const hasLid = getLabwareHasLid({
+        labwareId,
+        labwareRobotState: robotState.labware,
+        labwareEntities: invariantContext.labwareEntities,
+      })
+      if (
+        isInPipettableLocation &&
+        hasLid &&
+        getIsTiprack(invariantContext.labwareEntities[labwareId].def)
+      ) {
+        excludedByLid.push(labwareId)
+        return false
+      }
+
       const labwareIdDefUri =
         invariantContext.labwareEntities[labwareId].labwareDefURI
-      return isOnDeck && labwareIdDefUri === tipRackUri
+      return isInPipettableLocation && labwareIdDefUri === tipRackUri
     }
   )
   let filteredSortedTiprackIds = sortedTipracksIds
   const is96Channel = pipetteEntity.spec.channels === 96
 
   const excludedBy96Channel: string[] = []
-  const excludedByLid: string[] = []
 
   if (is96Channel) {
     filteredSortedTiprackIds = filteredSortedTiprackIds.filter(tiprackId => {
@@ -257,17 +273,6 @@ export function getNextTiprack(
     })
   }
 
-  filteredSortedTiprackIds = filteredSortedTiprackIds.filter(tiprackId => {
-    const locationHasLid = Object.entries(robotState.labware).find(
-      ([id, temporalProperties]) =>
-        temporalProperties.stack.includes(tiprackId) &&
-        getIsLid(invariantContext.labwareEntities[id].def)
-    )
-    if (locationHasLid != null) {
-      excludedByLid.push(tiprackId)
-    }
-    return locationHasLid == null
-  })
   let firstAvailableTiprack: string | null = null
   let nextTip: string | null = null
 
@@ -280,8 +285,39 @@ export function getNextTiprack(
       robotState,
       primaryNozzle,
     })
+    const { isSafe: isCandidateSafeMovement } =
+      candidateTip != null
+        ? getPipetteMovementSafetyStatus({
+            robotState,
+            invariantContext,
+            pipetteId,
+            labwareId: tiprackId,
+            wellTargetName: candidateTip,
+            primaryNozzle,
+            nozzleConfiguration: nozzles,
+          })
+        : { isSafe: false }
+    const {
+      isSafe: isSafeWithinTiprack,
+      isComplete: isCompletePickup = false,
+    } =
+      candidateTip != null
+        ? getIsSafePickupWithinTiprack({
+            tipState: robotState.tipState.tipracks[tiprackId],
+            primaryNozzle,
+            channels: pipetteEntity.spec.channels,
+            nozzleConfiguration: nozzles,
+            wellName: candidateTip,
+            tiprackDef: invariantContext.labwareEntities[tiprackId].def,
+          })
+        : { isSafe: false }
 
-    if (candidateTip) {
+    if (
+      candidateTip &&
+      isCandidateSafeMovement &&
+      isSafeWithinTiprack &&
+      isCompletePickup
+    ) {
       firstAvailableTiprack = tiprackId
       nextTip = candidateTip
       break

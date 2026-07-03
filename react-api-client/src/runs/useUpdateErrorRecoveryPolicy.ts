@@ -2,7 +2,7 @@ import { useMutation } from 'react-query'
 
 import { updateErrorRecoveryPolicy } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -44,7 +44,7 @@ export function useUpdateErrorRecoveryPolicy(
     AxiosError,
     RecoveryPolicyRulesParams
   >(
-    [host, 'runs', runId, 'errorRecoveryPolicy'],
+    getQueryKey(host, 'runs', runId, 'errorRecoveryPolicy'),
     (policyRules: RecoveryPolicyRulesParams) =>
       updateErrorRecoveryPolicy(host!, runId, policyRules)
         .then(response => response.data)

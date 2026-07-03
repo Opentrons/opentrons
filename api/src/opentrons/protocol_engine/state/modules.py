@@ -21,6 +21,8 @@ from numpy import array, dot
 from numpy import double as npdouble
 from numpy.typing import NDArray
 
+from opentrons_shared_data.deck.types import DeckDefinitionV5
+
 from .. import errors
 from ..actions import (
     Action,
@@ -309,6 +311,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             )
         if state_update.flex_stacker_state_update != update_types.NO_CHANGE:
             self._handle_flex_stacker_commands(state_update.flex_stacker_state_update)
+
+        if state_update.vacuum_module_state_update != update_types.NO_CHANGE:
+            self._handle_vacuum_module_commands(state_update.vacuum_module_state_update)
 
     def _module_model_map(
         self, module_id: str, actual_model: Any, module_live_data: Any
@@ -741,12 +746,18 @@ class ModuleView:
         return None
 
     def get_by_addressable_area(
-        self, addressable_area_name: str
+        self, addressable_area_name: str, deck_definition: DeckDefinitionV5
     ) -> Optional[LoadedModule]:
         """Get the module associated with this addressable area, if any."""
         for module_id in self._state.load_location_by_module_id.keys():
-            if addressable_area_name == self.get_provided_addressable_area(module_id):
-                return self.get(module_id)
+            module_addressable_area = self.get_provided_addressable_area(module_id)
+            cutout_fixtures = deck_configuration_provider.get_potential_cutout_fixtures(
+                module_addressable_area, deck_definition
+            )
+            for fixture in cutout_fixtures[1]:
+                if addressable_area_name in fixture.provided_addressable_areas:
+                    return self.get(module_id)
+
         return None
 
     def _get_module_substate(
@@ -868,7 +879,7 @@ class ModuleView:
         )
 
     def get_vacuum_module_substate(self, module_id: str) -> VacuumModuleSubState:
-        """Return a `VacuumModululeSubState` for the given Vacuum Module.
+        """Return a `VacuumModuleSubState` for the given Vacuum Module.
 
         Raises:
            ModuleNotLoadedError: If module_id has not been loaded.
@@ -1496,6 +1507,17 @@ class ModuleView:
         assert lid_doc_slot is not None
         lid_dock_area = AddressableAreaLocation(
             addressableAreaName="absorbanceReaderV1LidDock" + lid_doc_slot.value
+        )
+        return lid_dock_area
+
+    def vacuum_module_dock_location(self, module_id: str) -> AddressableAreaLocation:
+        """Get the addressable area for the vacuum module dock."""
+        reader_slot = self.get_location(module_id)
+        lid_doc_slot = get_adjacent_staging_slot(reader_slot.slotName)
+        self.get_provided_addressable_area(module_id)
+        assert lid_doc_slot is not None
+        lid_dock_area = AddressableAreaLocation(
+            addressableAreaName="VacuumModuleV1LidDock" + lid_doc_slot.value
         )
         return lid_dock_area
 

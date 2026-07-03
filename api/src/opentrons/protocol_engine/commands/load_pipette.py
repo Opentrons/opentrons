@@ -119,7 +119,6 @@ class LoadPipetteImplementation(
             pipette_id=params.pipetteId,
             tip_overlap_version=params.tipOverlapNotAfterVersion,
         )
-
         state_update = StateUpdate()
         state_update.set_load_pipette(
             pipette_id=loaded_pipette.pipette_id,

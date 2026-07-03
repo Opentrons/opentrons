@@ -1,6 +1,11 @@
 import { useSelector } from 'react-redux'
 
-import { CenterLabwareInSlot, LabwareRender } from '@opentrons/components'
+import {
+  CenterLabwareInSlot,
+  INACCESSIBLE,
+  LabwareRender,
+  SELECTED_ERROR,
+} from '@opentrons/components'
 import { getIsLid } from '@opentrons/shared-data'
 import * as wellContentsSelectors from '@opentrons/step-generation'
 
@@ -34,6 +39,7 @@ interface LabwareOnDeckProps {
   borderStroke?: CSSProperties['stroke']
   ignoreMissingTips?: boolean
   wellLabelOptions?: WellLabelOption
+  centerInSlot?: boolean
 }
 
 export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
@@ -52,6 +58,7 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     borderStroke,
     ignoreMissingTips = false,
     wellLabelOptions,
+    centerInSlot = false,
   } = props
   const missingAndUsedTipsByLabwareId = useSelector(
     tipContentsSelectors.getMissingAndUsedTipsByLabwareId
@@ -81,15 +88,27 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
       : null
   const { missingTips } = labwareTipInfo ?? {}
   const isLid = getIsLid(labwareOnDeck.def)
+  const shouldCenter = isLid || centerInSlot
   const wellFill = wellContentsSelectors.wellFillFromWellContents(
     wellContents,
     liquidDisplayColors
   )
+
+  const newWellFill = statusByWellName
+    ? Object.fromEntries(
+        Object.entries(wellFill).filter(
+          ([wellName]) =>
+            statusByWellName[wellName] !== INACCESSIBLE &&
+            statusByWellName[wellName] !== SELECTED_ERROR
+        )
+      )
+    : wellFill
+
   const labwareRenderComponent = (
     <LabwareRender
       definition={labwareOnDeck.def}
-      positioningMode="offsetInSlot"
-      wellFill={wellFill}
+      positioningMode={shouldCenter ? 'passThrough' : 'offsetInSlot'}
+      wellFill={newWellFill}
       handleClickWell={handleClickWell}
       {...(showHighlightedWells ? { highlightedWells } : {})}
       {...(ignoreMissingTips ? {} : { missingTips })}
@@ -106,7 +125,7 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
   return (
     <g transform={`translate(${x}, ${y})`}>
       {/* TODO (ND, 01/06/2026): Center all labware including non-lids in the slot. Requires a larger audit of LabwareOnDeck implementation. */}
-      {isLid ? (
+      {shouldCenter ? (
         <CenterLabwareInSlot definition={labwareOnDeck.def}>
           {labwareRenderComponent}
         </CenterLabwareInSlot>

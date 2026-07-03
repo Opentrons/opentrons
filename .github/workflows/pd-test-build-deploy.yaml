@@ -80,11 +80,6 @@ jobs:
       - uses: ./.github/actions/js/setup
       - name: 'run unit tests'
         run: make -C protocol-designer test-cov
-      - name: 'Upload coverage report'
-        uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5.5.4
-        with:
-          flags: protocol-designer
-          token: ${{ secrets.CODECOV_TOKEN }}
 
   build-pd:
     timeout-minutes: 20
@@ -108,12 +103,12 @@ jobs:
           NODE_OPTIONS: '--max-old-space-size=5120'
           OT_PD_MIXPANEL_ID: ${{ secrets.OT_PD_MIXPANEL_ID }}
           OT_PD_MIXPANEL_DEV_ID: ${{ secrets.OT_PD_MIXPANEL_DEV_ID }}
-          OT_PD_SENTRY_DSN: ${{ secrets.OT_PD_SENTRY_DSN }}
+          OT_PD_SENTRY_DSN: ${{ vars.OT_PD_SENTRY_DSN }}
           OT_PD_SENTRY_DEV_DSN: ${{ secrets.OT_PD_SENTRY_DEV_DSN }}
           # Used by @sentry/vite-plugin (sourcemap upload is gated by OT_PD_SENTRY_PLUGIN_UPLOAD).
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
           # Only meaningful for tagged releases; empty string is treated as absent.
           SENTRY_RELEASE: ${{ github.ref_type == 'tag' && steps.version.outputs.number || '' }}
           # Opt-in CI sourcemap upload via the Vite plugin (staging/prod tagged releases only).
@@ -126,8 +121,8 @@ jobs:
         uses: getsentry/action-release@5657c9e888b4e2cc85f4d29143ea4131fde4a73a # v3.6.0
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
         with:
           release: ${{ steps.version.outputs.number }}
           set_commits: auto
@@ -204,8 +199,8 @@ jobs:
         uses: getsentry/action-release@5657c9e888b4e2cc85f4d29143ea4131fde4a73a # v3.6.0
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
         with:
           release: ${{ steps.version.outputs.number }}
           finalize: true

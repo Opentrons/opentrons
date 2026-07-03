@@ -25,7 +25,13 @@ function TimelineAlertsComponent(props: StyleProps): JSX.Element | null {
   const timelineErrors = (timeline.errors || ([] as CommandCreatorError[])).map(
     (error: CommandCreatorError) => ({
       title: t(`timeline.error.${error.type}.title`, error.message),
-      description: <ErrorContents level="timeline" errorType={error.type} />,
+      description: (
+        <ErrorContents
+          level="timeline"
+          errorType={error.type}
+          translationParams={error.translationParams}
+        />
+      ),
     })
   )
 

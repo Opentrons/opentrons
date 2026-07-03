@@ -13,8 +13,8 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: password
-        username: test_admin
-        password: test_admin_password
+        username: testadmin
+        password: testadminpassword
     response:
       status_code: 200
       json:
@@ -39,7 +39,7 @@ stages:
       status_code: 200
       json:
         active: true
-        username: test_admin
+        username: testadmin
         scope: *returned_scope
 
   - name: Introspect the refresh token and confirm it's inactive (only access tokens are active)
@@ -88,7 +88,7 @@ stages:
       status_code: 200
       json:
         active: true
-        username: test_admin
+        username: testadmin
         scope: *returned_scope
 
   - name: Introspect the new refresh token and confirm it's inactive (only access tokens are active)
@@ -120,9 +120,9 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: password
-        username: test_user
-        password: test_user_password
-        scope: robot_control.write users.write # test_user is not authorized for users.write.
+        username: testuser
+        password: testuserpassword
+        scope: robot_control.write users.write # testuser is not authorized for users.write.
     response:
       status_code: 400
       json:
@@ -137,8 +137,8 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: password
-        username: test_user
-        password: test_user_password
+        username: testuser
+        password: testuserpassword
     response:
       status_code: 200
       json:
@@ -161,7 +161,7 @@ stages:
         client_id: opentrons_app
         grant_type: refresh_token
         refresh_token: '{refresh_token}'
-        scope: robot_control.write users.write # test_user is not authorized for users.write.
+        scope: robot_control.write users.write # testuser is not authorized for users.write.
     response:
       status_code: 400
       json:
@@ -185,9 +185,9 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: password
-        username: test_admin
-        password: test_admin_password
-        # test_admin would also be authorized for a bunch of other scopes.
+        username: testadmin
+        password: testadminpassword
+        # testadmin would also be authorized for a bunch of other scopes.
         # This should narrow it to just robot_control.write.
         scope: &requested_scope_1 robot_control.write
     response:
@@ -208,8 +208,8 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: password
-        username: test_admin
-        password: test_admin_password
+        username: testadmin
+        password: testadminpassword
     response:
       status_code: 200
       json:
@@ -258,7 +258,7 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: password
-        username: test_admin
+        username: testadmin
         password: not_the_right_password
     response:
       status_code: 400
@@ -334,8 +334,8 @@ stages:
       data:
         client_id: unrecognized_client
         grant_type: password
-        username: test_admin
-        password: test_admin_password
+        username: testadmin
+        password: testadminpassword
     response:
       status_code: 401
       json:
@@ -372,8 +372,8 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: password
-        username: test_admin
-        password: test_admin_password
+        username: testadmin
+        password: testadminpassword
         scope: unrecognized_scope
     response:
       status_code: 400
@@ -389,8 +389,8 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: password
-        username: test_admin
-        password: test_admin_password
+        username: testadmin
+        password: testadminpassword
     response:
       status_code: 200
       json:
@@ -439,8 +439,8 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: '{grant_type}'
-        username: test_admin
-        password: test_admin_password
+        username: testadmin
+        password: testadminpassword
     response:
       status_code: 400
       json:

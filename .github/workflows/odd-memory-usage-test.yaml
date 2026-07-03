@@ -18,7 +18,7 @@ jobs:
       - name: Run memory analysis
         uses: ./.github/actions/odd-resource-analysis
         with:
-          mixpanel-user: ${{ secrets.MIXPANEL_INGEST_USER }}
+          mixpanel-user: ${{ vars.MIXPANEL_INGEST_USER }}
           mixpanel-secret: ${{ secrets.MIXPANEL_INGEST_SECRET }}
           mixpanel-project-id: ${{ secrets.OT_MIXPANEL_PROJECT_ID }}
           previous-version-count: '2'

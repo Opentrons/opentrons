@@ -13,7 +13,6 @@ from Pyro5 import nameserver
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.protocols.types import FlexRobotType
 from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
     register_hardware_types,
 )
@@ -24,7 +23,7 @@ from opentrons.protocol_engine.resources.camera_provider import (
 )
 from opentrons.protocol_engine.resources.file_provider import FileProvider
 from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
-from opentrons.util.pyro.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
+from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 from opentrons_shared_data.robot.types import RobotTypeEnum
 from server_utils.fastapi_utils.app_state import AppState
 
@@ -40,6 +39,8 @@ from robot_server.runs.run_process import (
 from robot_server.runs.run_process_entry_point import initialize_run_process
 from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.service.pyro_utils import pyro_resource, resource_utilities
+
+TEST_PYRO_TIMEOUT = 5
 
 
 @pytest.fixture
@@ -74,16 +75,31 @@ def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 @pytest.fixture
-def ot3_hardware_api(decoy: Decoy, request: pytest.FixtureRequest) -> OT3API:
-    """Get a mocked out OT3API."""
+def ot3_hardware_api(request: pytest.FixtureRequest) -> OT3API:
+    """Real OT3API backed by the software simulator, bound to a dedicated event loop."""
     request.node.add_marker("ot3_only")
     try:
         from opentrons.hardware_control.ot3api import OT3API
 
-        mock = decoy.mock(cls=OT3API)
-        mock._door_state = DoorState.CLOSED
-        decoy.when(mock.get_robot_type()).then_return(FlexRobotType)
-        return mock
+        loop = asyncio.new_event_loop()
+
+        def _event_loop() -> None:
+            asyncio.set_event_loop(loop)
+            loop.run_forever()
+
+        loop_thread = threading.Thread(target=_event_loop, daemon=True)
+        loop_thread.start()
+
+        fut = asyncio.run_coroutine_threadsafe(
+            OT3API.build_hardware_simulator(
+                loop=loop,
+                strict_attached_instruments=False,
+            ),
+            loop,
+        )
+        api = fut.result(timeout=120)
+        api._door_state = DoorState.CLOSED
+        return api
     except ImportError:
         return None  # type: ignore[return-value]
 
@@ -111,7 +127,7 @@ async def _host_pyro_nameserver_and_ot3api(
 
     def _ot3api_pyro_daemon() -> None:
         # Wait for the nameserver to be ready so locate_ns can succeed.
-        name_server_ready.wait(timeout=PYRO_TIMEOUT)
+        name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
         create_pyro_daemon("OT3API", hw_api, register_hardware_types)
 
     ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
@@ -122,7 +138,7 @@ async def _host_pyro_nameserver_and_ot3api(
 
     # Client-side requests below
     register_hardware_types()
-    name_server_ready.wait(timeout=PYRO_TIMEOUT)
+    name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
     # Initialize the RobotServerPyroResource
     pyro_resource.start_initializing_pyro_resource(app_state)
     ns = pyro.locate_ns()
@@ -154,8 +170,11 @@ async def _host_pyro_nameserver_and_ot3api(
 async def test_run_process_proxy(
     mock_app_state: AppState,
     ot3_hardware_api: OT3API,
+    mock_feature_flags: None,
+    decoy: Decoy,
 ) -> None:
     """Test the run process pyro creation and a proxy can be created that returns data and async commands can be called."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
     ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
         ot3_hardware_api, mock_app_state
     )
@@ -224,7 +243,7 @@ async def test_run_process_create(
 
     ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
     ns_thread.start()
-    name_server_ready.wait(timeout=PYRO_TIMEOUT)
+    name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
     ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
         ot3_hardware_api, mock_app_state
     )
@@ -291,6 +310,8 @@ async def test_run_process_create(
     await run_process.create(
         run_id="cool-proxy-run",
         labware_offsets=[],
+        error_recovery_rules=[],
+        error_recovery_is_enabled=False,
         protocol=None,
         run_time_param_values=None,
         run_time_param_paths=None,

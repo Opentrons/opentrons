@@ -32,6 +32,9 @@ from opentrons.protocol_engine import (
     StateView,
 )
 from opentrons.protocol_engine.errors.exceptions import LabwareNotLoadedOnModuleError
+from opentrons.protocol_engine.resources.fixture_validation import (
+    get_slot_name_from_addressable_area,
+)
 from opentrons.types import DeckSlotName, Point, StagingSlotName
 
 if TYPE_CHECKING:
@@ -246,16 +249,10 @@ def _map_labware(
 ]:
     location_from_engine = engine_state.labware.get_location(labware_id=labware_id)
     if isinstance(location_from_engine, AddressableAreaLocation):
-        # This will be guaranteed to be either deck slot name or staging slot name
-        slot: Union[DeckSlotName, StagingSlotName]
-        try:
-            slot = DeckSlotName.from_primitive(location_from_engine.addressableAreaName)
-        except ValueError:
-            slot = StagingSlotName.from_primitive(
-                location_from_engine.addressableAreaName
-            )
         return (
-            slot,
+            get_slot_name_from_addressable_area(
+                location_from_engine.addressableAreaName
+            ),
             wrapped_deck_conflict.Labware(
                 name_for_errors=engine_state.labware.get_load_name(
                     labware_id=labware_id
@@ -359,6 +356,14 @@ def _map_module(
         return (
             mapped_location,
             wrapped_deck_conflict.FlexStackerModule(
+                name_for_errors=name_for_errors,
+                highest_z_including_labware=highest_z_including_labware,
+            ),
+        )
+    elif module_type == ModuleType.VACUUM_MODULE:
+        return (
+            mapped_location,
+            wrapped_deck_conflict.VacuumModule(
                 name_for_errors=name_for_errors,
                 highest_z_including_labware=highest_z_including_labware,
             ),

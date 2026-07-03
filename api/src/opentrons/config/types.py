@@ -154,7 +154,10 @@ class OT3MotionSettings(BaseModel):
     def by_gantry_load(
         self, gantry_load: GantryLoad
     ) -> Dict[str, Dict[OT3AxisKind, float]]:
-        return {name: getattr(self, name)[gantry_load] for name in self.model_fields}
+        return {
+            name: getattr(self, name)[gantry_load]
+            for name in OT3MotionSettings.model_fields
+        }
 
     @field_validator(
         "default_max_speed",
@@ -177,7 +180,10 @@ class OT3CurrentSettings(BaseModel):
     def by_gantry_load(
         self, gantry_load: GantryLoad
     ) -> Dict[str, Dict[OT3AxisKind, float]]:
-        return {name: getattr(self, name)[gantry_load] for name in self.model_fields}
+        return {
+            name: getattr(self, name)[gantry_load]
+            for name in OT3CurrentSettings.model_fields
+        }
 
     @field_validator("hold_current", "run_current", mode="before")
     @classmethod

@@ -16,8 +16,8 @@ import {
   OVERFLOW_SCROLL,
   SPACING,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
 
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useToastOnErrorImage } from '/app/local-resources/images/hooks/useToastOnErrorImage'
 import { RoundTab } from '/app/molecules/RoundTab'
 import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
@@ -28,11 +28,10 @@ import { ProtocolRunModuleControls } from '/app/organisms/Desktop/Devices/Protoc
 import { ProtocolRunRuntimeParameters } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunRunTimeParameters'
 import { ProtocolRunSetup } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunSetup'
 import { RunPreview } from '/app/organisms/Desktop/Devices/RunPreview'
+import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import { useRobot, useRobotType } from '/app/redux-resources/robots'
-import { OPENTRONS_USB } from '/app/redux/discovery'
 import { fetchProtocols } from '/app/redux/protocol-storage'
-import { appShellRequestor } from '/app/redux/shell/remote'
 import {
   useCurrentRunId,
   useModuleRenderInfoForProtocolById,
@@ -60,30 +59,27 @@ export function ProtocolRunDetails(): JSX.Element | null {
     dispatch(fetchProtocols())
   }, [dispatch])
   return robot != null ? (
-    <ApiHostProvider
-      key={robot.name}
-      hostname={robot.ip ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
-      robotName={robot.name}
-    >
-      <Box
-        minWidth="32rem"
-        height="100%"
-        overflow={OVERFLOW_SCROLL}
-        padding={SPACING.spacing16}
-      >
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          marginBottom={SPACING.spacing16}
-          width="100%"
+    <ApiHostProvider key={robot.name} robotName={robotName}>
+      <RobotCertRotator>
+        <Box
+          minWidth="32rem"
+          height="100%"
+          overflow={OVERFLOW_SCROLL}
+          padding={SPACING.spacing16}
         >
-          <PageContents
-            runId={runId}
-            robotName={robotName}
-            protocolRunDetailsTab={protocolRunDetailsTab}
-          />
-        </Flex>
-      </Box>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            marginBottom={SPACING.spacing16}
+            width="100%"
+          >
+            <PageContents
+              runId={runId}
+              robotName={robotName}
+              protocolRunDetailsTab={protocolRunDetailsTab}
+            />
+          </Flex>
+        </Box>
+      </RobotCertRotator>
     </ApiHostProvider>
   ) : null
 }

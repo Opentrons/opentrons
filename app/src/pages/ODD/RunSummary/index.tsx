@@ -35,7 +35,6 @@ import {
 } from '@opentrons/components'
 import {
   useErrorRecoverySettings,
-  useHost,
   useProtocolQuery,
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
@@ -86,7 +85,6 @@ export function RunSummary(): JSX.Element {
   >() as OnDeviceRouteParams
   const { t } = useTranslation('run_details')
   const navigate = useNavigate()
-  const host = useHost()
   const { data: runRecord } = useNotifyRunQuery(runId, {
     staleTime: Infinity,
     onError: () => {
@@ -289,9 +287,9 @@ export function RunSummary(): JSX.Element {
     if (isRunCurrent && aPipetteWithTip != null) {
       void handleTipsAttachedModal({
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleReturnToDash),
-        host,
+        robotName,
         aPipetteWithTip,
-        onSettled: () => {
+        onSuccess: () => {
           closeCurrentRunIfValid(() => {
             navigate('/dashboard')
           })
@@ -308,9 +306,9 @@ export function RunSummary(): JSX.Element {
     if (isRunCurrent && aPipetteWithTip != null) {
       void handleTipsAttachedModal({
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleRunAgain),
-        host,
+        robotName,
         aPipetteWithTip,
-        onSettled: () => {
+        onSuccess: () => {
           runAgain()
         },
       })

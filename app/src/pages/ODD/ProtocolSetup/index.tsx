@@ -404,7 +404,8 @@ function PrepareToRun({
     areFixturesReady &&
     !isAnyNecessaryDefaultOffsetMissing &&
     isCameraReadyToRun
-  const onPlay = (): void => {
+
+  const onPlay = async (): Promise<void> => {
     if (doorStatus.isDoorOpen) {
       if (
         doorStatus.moduleDoorLocation !== null &&
@@ -1077,6 +1078,8 @@ const buildSetupScreenStyle = (
     switch (setupScreen) {
       case 'prepare to run':
         return `0 ${SPACING.spacing32} ${SPACING.spacing40}`
+      case 'view only parameters':
+        return `0 ${SPACING.spacing40} ${SPACING.spacing40}`
       case 'offsets':
       case 'camera':
         return ''

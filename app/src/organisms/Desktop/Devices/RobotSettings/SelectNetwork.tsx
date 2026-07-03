@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
 
+import { useWifiKeysQuery } from '@opentrons/react-api-client'
+
 import { getModalPortalEl } from '/app/App/portal'
 import * as Networking from '/app/redux/networking'
 import * as RobotApi from '/app/redux/robot-api'
@@ -30,9 +32,8 @@ export const SelectNetwork = ({
   isRobotBusy,
 }: SelectNetworkProps): JSX.Element => {
   const list = useWifiList(robotName)
-  const keys = useSelector((state: State) =>
-    Networking.getWifiKeys(state, robotName)
-  )
+  const wifiKeysQuery = useWifiKeysQuery()
+  const keys = wifiKeysQuery.data?.keys ?? []
   const eapOptions = useSelector((state: State) =>
     Networking.getEapOptions(state, robotName)
   )
@@ -59,7 +60,6 @@ export const SelectNetwork = ({
     // populate the configuration forms
     if (changeState.type === CONNECT || changeState.type === JOIN_OTHER) {
       dispatch(Networking.fetchEapOptions(robotName))
-      dispatch(Networking.fetchWifiKeys(robotName))
     }
   }, [robotName, dispatch, changeState.type])
 

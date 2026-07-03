@@ -17,8 +17,8 @@ from opentrons.config.defaults_ot3 import (
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
 
-from hardware_testing.opentrons_api import types
-from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point, OT3AxisKind
+from opentrons.hardware_control.types import Axis, OT3Mount, OT3AxisKind
+from opentrons.types import Point
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing import data
 from hardware_testing.data import ui
@@ -220,10 +220,10 @@ def _record_motion_check_data(
     )
 
 
-def _create_bowtie_points(homed_position: types.Point) -> List[types.Point]:
+def _create_bowtie_points(homed_position: Point) -> List[Point]:
     """Create points for the bowtie movement."""
-    pos_max = homed_position - types.Point(x=1, y=1, z=1)
-    pos_min = types.Point(x=0, y=25, z=pos_max.z)  # stay above deck to be safe
+    pos_max = homed_position - Point(x=1, y=1, z=1)
+    pos_min = Point(x=0, y=25, z=pos_max.z)  # stay above deck to be safe
     bowtie_points = [
         pos_max,  # back-right
         pos_min,  # front-left
@@ -234,10 +234,10 @@ def _create_bowtie_points(homed_position: types.Point) -> List[types.Point]:
     return bowtie_points
 
 
-def _create_hour_glass_points(homed_position: types.Point) -> List[types.Point]:
+def _create_hour_glass_points(homed_position: Point) -> List[Point]:
     """Create points for the hourglass movement."""
-    pos_max = homed_position - types.Point(x=1, y=1, z=1)
-    pos_min = types.Point(x=0, y=25, z=pos_max.z)  # stay above deck to be safe
+    pos_max = homed_position - Point(x=1, y=1, z=1)
+    pos_min = Point(x=0, y=25, z=pos_max.z)  # stay above deck to be safe
     hour_glass_points = [
         pos_max,  # back-right
         pos_min._replace(y=pos_max.y),  # back-left
@@ -248,7 +248,7 @@ def _create_hour_glass_points(homed_position: types.Point) -> List[types.Point]:
     return hour_glass_points
 
 
-def _create_mounts_up_down_points(homed_position: types.Point) -> List[types.Point]:
+def _create_mounts_up_down_points(homed_position: Point) -> List[Point]:
     """Create points for the up and down movement."""
     pos_max = homed_position
     mounts_up_down_points = [
@@ -259,7 +259,7 @@ def _create_mounts_up_down_points(homed_position: types.Point) -> List[types.Poi
 
 
 async def _move_and_check(
-    api: OT3API, is_simulating: bool, mount: OT3Mount, position: types.Point
+    api: OT3API, is_simulating: bool, mount: OT3Mount, position: Point
 ) -> Tuple[Dict[Axis, float], Dict[Axis, float], bool]:
     """Move and check accuracy with encoder."""
     if not is_simulating:
@@ -286,7 +286,7 @@ async def _run_mount_up_down(
     api: OT3API,
     is_simulating: bool,
     mount: OT3Mount,
-    mount_up_down_points: List[types.Point],
+    mount_up_down_points: List[Point],
     write_cb: Callable,
     record_bool: bool = True,
 ) -> bool:
@@ -329,7 +329,7 @@ async def _run_bowtie(
     api: OT3API,
     is_simulating: bool,
     mount: OT3Mount,
-    bowtie_points: List[types.Point],
+    bowtie_points: List[Point],
     write_cb: Callable,
     record_bool: bool = True,
 ) -> bool:
@@ -363,7 +363,7 @@ async def _run_hour_glass(
     api: OT3API,
     is_simulating: bool,
     mount: OT3Mount,
-    hour_glass_points: List[types.Point],
+    hour_glass_points: List[Point],
     write_cb: Callable,
     record_bool: bool = True,
 ) -> bool:
@@ -566,7 +566,7 @@ async def _run_z_motion(
     arguments: argparse.Namespace,
     api: OT3API,
     mount: OT3Mount,
-    mount_up_down_points: Dict[OT3Mount, List[types.Point]],
+    mount_up_down_points: Dict[OT3Mount, List[Point]],
     write_cb: Callable,
 ) -> bool:
     """Test Z at different settings."""
@@ -640,8 +640,8 @@ async def _run_xy_motion(
     arguments: argparse.Namespace,
     api: OT3API,
     mount: OT3Mount,
-    bowtie_points: List[types.Point],
-    hour_glass_points: List[types.Point],
+    bowtie_points: List[Point],
+    hour_glass_points: List[Point],
     write_cb: Callable,
 ) -> bool:
     """Test XY at different settings."""
@@ -739,9 +739,9 @@ async def _run_gantry_cycles(
     arguments: argparse.Namespace,
     api: OT3API,
     mount: OT3Mount,
-    bowtie_points: List[types.Point],
-    hour_glass_points: List[types.Point],
-    mount_up_down_points: Dict[OT3Mount, List[types.Point]],
+    bowtie_points: List[Point],
+    hour_glass_points: List[Point],
+    mount_up_down_points: Dict[OT3Mount, List[Point]],
     csv_cb: CSVCallbacks,
 ) -> bool:
     """Cycle the gantry at nominal settings."""

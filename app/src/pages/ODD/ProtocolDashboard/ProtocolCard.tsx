@@ -24,6 +24,7 @@ import {
   useLongPress,
 } from '@opentrons/components'
 import {
+  getQueryKey,
   useHost,
   useMostRecentSuccessfulAnalysisAsDocumentQuery,
   useProtocolAnalysisAsDocumentQuery,
@@ -160,7 +161,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
         .then(() => deleteProtocol(host, protocol.id))
         .then(() =>
           queryClient
-            .invalidateQueries([host, 'protocols'])
+            .invalidateQueries(getQueryKey(host, 'protocols'))
             .catch((e: Error) => {
               console.error(`error invalidating runs query: ${e.message}`)
             })

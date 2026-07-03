@@ -40,6 +40,7 @@ interface DeckViewStackerProps {
   setSelectedSlot: Dispatch<SetStateAction<string | null>>
   setHoveredSlot: Dispatch<SetStateAction<string | null>>
   hoveredSlot: string | null
+  selectedSlot: string | null
   showModuleCommandSummary: boolean
   showLabwareCommandSummary: boolean
   slot: string
@@ -61,6 +62,7 @@ export function DeckViewStacker(props: DeckViewStackerProps): JSX.Element {
     setHoveredSlot,
     setSelectedSlot,
     hoveredSlot,
+    selectedSlot,
     labwareEntitiesExtended,
     showModuleCommandSummary,
     showLabwareCommandSummary,
@@ -126,6 +128,7 @@ export function DeckViewStacker(props: DeckViewStackerProps): JSX.Element {
           setSelectedSlot={setSelectedSlot}
           setHoveredSlot={setHoveredSlot}
           hover={hoveredSlot}
+          selectedSlot={selectedSlot}
         >
           {showModuleCommandSummary || showLabwareCommandSummary ? null : (
             <StyledText desktopStyle="captionRegular" color={COLORS.white}>
@@ -156,6 +159,7 @@ export function DeckViewStacker(props: DeckViewStackerProps): JSX.Element {
           setSelectedSlot={setSelectedSlot}
           setHoveredSlot={setHoveredSlot}
           hover={hoveredSlot}
+          selectedSlot={selectedSlot}
         >
           {(moduleType === FLEX_STACKER_MODULE_TYPE &&
             selectedRunTimeCommand?.commandType !== 'flexStacker/retrieve') ||

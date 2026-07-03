@@ -60,10 +60,7 @@ from opentrons_hardware.sensors.sensor_types import (
     PressureSensor,
     SensorInformation,
 )
-from opentrons_hardware.sensors.types import (
-    SensorDataType,
-    sensor_fixed_point_conversion,
-)
+from opentrons_hardware.sensors.types import SensorDataType
 
 LOG = getLogger(__name__)
 
@@ -162,7 +159,7 @@ async def _setup_pressure_sensors(
     sensor_id: SensorId,
     tool: PipetteProbeTarget,
     num_baseline_reads: int,
-    threshold_fixed_point: float,
+    threshold_floating_point: float,
     sensor_driver: SensorDriver,
     auto_zero_sensor: bool,
 ) -> Dict[SensorId, PressureSensor]:
@@ -178,7 +175,7 @@ async def _setup_pressure_sensors(
         pressure_sensor = PressureSensor.build(
             sensor_id=sensor,
             node_id=tool,
-            stop_threshold=threshold_fixed_point,
+            stop_threshold=threshold_floating_point,
         )
 
         if auto_zero_sensor:
@@ -280,7 +277,7 @@ async def liquid_probe(
 ) -> Dict[NodeId, MotorPositionStatus]:
     """Move the mount and pipette simultaneously while reading from the pressure sensor."""
     sensor_driver = SensorDriver()
-    threshold_fixed_point = threshold_pascals * sensor_fixed_point_conversion
+    threshold_floating_point = threshold_pascals
     sensor_binding = None
     if sensor_id == SensorId.BOTH and force_both_sensors:
         # this covers the case when we want to use both sensors in an AND configuration
@@ -296,7 +293,7 @@ async def liquid_probe(
         sensor_id,
         tool,
         num_baseline_reads,
-        threshold_fixed_point,
+        threshold_floating_point,
         sensor_driver,
         True,
     )

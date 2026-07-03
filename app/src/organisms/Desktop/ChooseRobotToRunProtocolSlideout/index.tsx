@@ -16,19 +16,15 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import {
-  ApiHostProvider,
-  useUploadCsvFileMutation,
-} from '@opentrons/react-api-client'
+import { useUploadCsvFileMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/hooks'
 import { LegacyApplyHistoricOffsets } from '/app/organisms/LegacyApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useRobotType } from '/app/redux-resources/robots'
-import { OPENTRONS_USB } from '/app/redux/discovery'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
-import { appShellRequestor } from '/app/redux/shell/remote'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
@@ -69,8 +65,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     setSelectedRobot,
   } = props
   const navigate = useNavigate()
-  const isFlex =
-    useRobotType(selectedRobot?.displayName ?? '') === FLEX_ROBOT_TYPE
+  const isFlex = useRobotType(selectedRobot?.name ?? '') === FLEX_ROBOT_TYPE
   const [shouldApplyOffsets, setShouldApplyOffsets] = useState<boolean>(true)
   const { protocolKey, srcFileNames, srcFiles, mostRecentAnalysis } =
     storedProtocolData
@@ -361,13 +356,7 @@ export function ChooseRobotToRunProtocolSlideout(
 ): JSX.Element | null {
   const [selectedRobot, setSelectedRobot] = useState<Robot | null>(null)
   return (
-    <ApiHostProvider
-      hostname={selectedRobot?.ip ?? null}
-      port={selectedRobot?.port ?? null}
-      requestor={
-        selectedRobot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
-      }
-    >
+    <ApiHostProvider robotName={selectedRobot?.name ?? null}>
       <ChooseRobotToRunProtocolSlideoutComponent
         {...{ ...props, selectedRobot, setSelectedRobot }}
       />

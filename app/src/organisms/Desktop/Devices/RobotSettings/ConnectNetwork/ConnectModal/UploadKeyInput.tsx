@@ -1,13 +1,9 @@
-import { forwardRef, useEffect, useRef } from 'react'
-import { useSelector } from 'react-redux'
-import last from 'lodash/last'
+import { forwardRef } from 'react'
 import styled from 'styled-components'
 
-import { getWifiKeyByRequestId, postWifiKeys } from '/app/redux/networking'
-import { useDispatchApiRequest } from '/app/redux/robot-api'
+import { usePostWifiKeysMutation } from '@opentrons/react-api-client'
 
 import type { ChangeEventHandler, ForwardedRef } from 'react'
-import type { State } from '/app/redux/types'
 
 export interface UploadKeyInputProps {
   robotName: string
@@ -31,32 +27,22 @@ const UploadKeyInputComponent = (
   props: UploadKeyInputProps,
   ref: ForwardedRef<HTMLInputElement>
 ): JSX.Element => {
-  const { robotName, label, onUpload } = props
-  const [dispatchApi, requestIds] = useDispatchApiRequest()
-  const handleUpload = useRef<(key: string) => void>()
+  const { label, onUpload } = props
 
-  const createdKeyId = useSelector((state: State) => {
-    return getWifiKeyByRequestId(state, robotName, last(requestIds) ?? null)
-  })?.id
+  const { postWifiKeys } = usePostWifiKeysMutation()
 
   const handleFileInput: ChangeEventHandler<HTMLInputElement> = event => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0]
       event.target.value = ''
 
-      dispatchApi(postWifiKeys(robotName, file))
+      postWifiKeys(file, {
+        onSuccess: wifiKey => {
+          onUpload(wifiKey.id)
+        },
+      })
     }
   }
-
-  useEffect(() => {
-    handleUpload.current = onUpload
-  }, [onUpload])
-
-  useEffect(() => {
-    if (createdKeyId != null && handleUpload.current) {
-      handleUpload.current(createdKeyId)
-    }
-  }, [createdKeyId])
 
   return (
     <HiddenInput

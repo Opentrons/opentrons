@@ -29,6 +29,7 @@ from opentrons.protocols.api_support.util import APIVersionError, AxisMaxSpeeds
 from opentrons.types import (
     DeckSlotName,
     Location,
+    ModuleFixtureLocation,
     Mount,
     Point,
     StagingSlotName,
@@ -173,6 +174,7 @@ class LegacyProtocolCore(
             LegacyLabwareCore,
             legacy_module_core.LegacyModuleCore,
             StagingSlotName,
+            ModuleFixtureLocation,
             OffDeckType,
         ],
         label: Optional[str],
@@ -192,6 +194,10 @@ class LegacyProtocolCore(
         elif isinstance(location, StagingSlotName):
             raise APIVersionError(
                 api_element="Using a staging deck slot", until_version="2.16"
+            )
+        elif isinstance(location, ModuleFixtureLocation):
+            raise APIVersionError(
+                api_element="Using a module addressable area", until_version="2.28"
             )
 
         deck_slot = (
@@ -272,6 +278,7 @@ class LegacyProtocolCore(
             StagingSlotName,
             legacy_module_core.LegacyModuleCore,
             OffDeckType,
+            ModuleFixtureLocation,
         ],
         namespace: Optional[str],
         version: Optional[int],
@@ -304,6 +311,7 @@ class LegacyProtocolCore(
             OffDeckType,
             WasteChute,
             TrashBin,
+            ModuleFixtureLocation,
         ],
         use_gripper: bool,
         pause_for_manual_move: bool,

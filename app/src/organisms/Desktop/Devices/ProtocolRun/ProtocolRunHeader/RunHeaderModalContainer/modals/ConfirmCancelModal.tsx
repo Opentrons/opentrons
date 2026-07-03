@@ -18,6 +18,7 @@ import {
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { useGuardedAction } from '/app/local-resources/access-control/useGuardedAction'
 import { isStoppingOrStopped } from '/app/local-resources/runs/utils'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useIsFlex } from '/app/redux-resources/robots'
@@ -52,7 +53,8 @@ export function ConfirmCancelModal(
   props: ConfirmCancelModalProps
 ): JSX.Element {
   const { onClose, runId, robotName, runStatus } = props
-  const { stopRun } = useStopRunMutation()
+  const documentationState = useGuardedAction()
+  const { stopRun } = useStopRunMutation(documentationState)
   const isFlex = useIsFlex(robotName)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const [isCanceling, setIsCanceling] = useState(false)

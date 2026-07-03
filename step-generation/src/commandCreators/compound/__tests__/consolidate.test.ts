@@ -89,7 +89,7 @@ beforeEach(() => {
     name: 'Consolidate Test',
     description: 'test blah blah',
     pipette: DEFAULT_PIPETTE,
-
+    primaryNozzle: 'A1',
     sourceWells: ['A1', 'A2', 'A3', 'A4'],
     destWell: 'B1',
     sourceLabware: SOURCE_LABWARE,
@@ -262,7 +262,15 @@ mock_pipette.consolidate_with_liquid_class(
                     "delay": {"enabled": False},
                     "end_position": {"offset": {}},
                     "touch_tip": {"enabled": True, "z_offset": -3.4},
-                    "blowout": {"enabled": True, "location": "destination", "flow_rate": 2.3},
+                    "blowout": {
+                        "enabled": True,
+                        "location": "destination",
+                        "flow_rate": 2.3,
+                        "blowout_position": {
+                            "offset": {"x": 0, "y": 0, "z": 3.3},
+                            "position_reference": "well-top",
+                        },
+                    },
                 },
                 "correction_by_volume": [(0, 0)],
                 "push_out_by_volume": [(0, 0)],

@@ -1,4 +1,11 @@
-import { Fragment, useEffect, useReducer, useRef, useState } from 'react'
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
@@ -43,6 +50,7 @@ import { ToggleButton } from '/app/atoms/buttons'
 import { Slideout } from '/app/atoms/Slideout'
 import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
 import { UploadInput } from '/app/molecules/UploadInput'
+import { useFeatureFlag } from '/app/redux/config'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -203,10 +211,32 @@ export function ChooseRobotSlideout(
     {}
   )
 
-  const reducerAvailableRobots = healthyReachableRobots.filter(robot =>
+  const showSearchBar = useFeatureFlag('robotSearchBar')
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const filterRobots = useCallback(
+    (robots: Robot[]): Robot[] => {
+      const query = searchQuery.toLowerCase().trim()
+      if (query === '') {
+        return robots
+      } else {
+        return robots.filter(robot => {
+          const name = robot.name.toLowerCase()
+          const model = robot.robotModel.toLowerCase()
+
+          return name.includes(query) || model.includes(query)
+        })
+      }
+    },
+    [searchQuery]
+  )
+
+  const filteredHealthy = filterRobots(healthyReachableRobots)
+
+  const reducerAvailableRobots = filteredHealthy.filter(robot =>
     showIdleOnly ? !robotBusyStatusByName[robot.name] : robot
   )
-  const reducerBusyCount = healthyReachableRobots.filter(
+  const reducerBusyCount = filteredHealthy.filter(
     robot => robotBusyStatusByName[robot.name]
   ).length
 
@@ -244,6 +274,17 @@ export function ChooseRobotSlideout(
       {isAnalysisStale ? (
         <Banner type="warning">{t('protocol_outdated_app_analysis')}</Banner>
       ) : null}
+      {showSearchBar ? (
+        <InputField
+          placeholder={t('search_robots', { ns: 'devices_landing' })}
+          value={searchQuery}
+          onChange={e => {
+            setSearchQuery(e.target.value)
+          }}
+          leftElement={<Icon name="search" size="1rem" color={COLORS.grey50} />}
+          size="small"
+        />
+      ) : null}
       <Flex alignSelf={ALIGN_FLEX_END} marginY={SPACING.spacing4}>
         {isScanning ? (
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
@@ -267,7 +308,7 @@ export function ChooseRobotSlideout(
           </Link>
         )}
       </Flex>
-      {!isScanning && healthyReachableRobots.length === 0 ? (
+      {!isScanning && filteredHealthy.length === 0 ? (
         <Flex
           css={css`
             ${CARD_OUTLINE_BORDER_STYLE}
@@ -290,7 +331,7 @@ export function ChooseRobotSlideout(
           </LegacyStyledText>
         </Flex>
       ) : (
-        healthyReachableRobots.map(robot => {
+        filteredHealthy.map(robot => {
           const isSelected =
             selectedRobot != null && selectedRobot.ip === robot.ip
           return (

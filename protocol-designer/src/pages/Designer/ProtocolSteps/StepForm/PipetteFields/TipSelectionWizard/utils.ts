@@ -5,9 +5,11 @@ import {
   getPositionFromSlotId,
 } from '@opentrons/shared-data'
 import {
-  COLUMN_4_SLOTS,
+  getIsInPipettableLocation,
   getIsSafePickupWithinTiprack,
-  getIsSafePipetteMovement,
+  getLabwareHasLid,
+  getPipetteCenteringFullOffset,
+  getPipetteMovementSafetyStatus,
   getSlotInLocationStack,
 } from '@opentrons/step-generation'
 
@@ -32,6 +34,7 @@ import type {
 import type {
   InvariantContext,
   LabwareEntities,
+  RobotState,
   TimelineFrame,
 } from '@opentrons/step-generation'
 import type {
@@ -48,6 +51,8 @@ const BASE_OFFSET_Y = 15
 
 // additional offset to account for irregular OT-2 8-channel pipette geometry (right "hump")
 const OFFSET_OT2_8_CHANNEL = 10
+
+type LabwareRobotState = RobotState['labware']
 
 export const getViewboxFromSelectedLabware = (
   selectedLabwareId: string,
@@ -69,8 +74,9 @@ export const getViewboxFromSelectedLabware = (
   const moduleIds = new Set(Object.keys(modules || {}))
 
   // find the first module location
-  const moduleLocation = selectedLabware.stack?.find(loc => moduleIds.has(loc))
-
+  const moduleLocation = labwareState[selectedLabwareId].stack.find(loc =>
+    moduleIds.has(loc)
+  )
   const moduleDef = moduleLocation
     ? getModuleDef(modules[moduleLocation].model)
     : null
@@ -100,6 +106,7 @@ export const getHoveredOffsetFromWell = (args: {
   wellName: string | null
   pipetteSpec: PipetteV2Specs
   primaryNozzle: PrimaryNozzleConfigurationStyle
+  nozzleConfiguration: NozzleConfigurationStyle
 }): { x: number; y: number } => {
   const {
     selectedLabwareId,
@@ -107,6 +114,7 @@ export const getHoveredOffsetFromWell = (args: {
     wellName,
     pipetteSpec,
     primaryNozzle,
+    nozzleConfiguration,
   } = args
   const { nozzleMap, pipetteBoundingBoxOffsets } = pipetteSpec
   const { backLeftCorner, frontRightCorner } = pipetteBoundingBoxOffsets
@@ -125,18 +133,26 @@ export const getHoveredOffsetFromWell = (args: {
     }
   }
   const well = labware.def.wells[wellName]
-  const wellIsRectangular = well.shape === 'rectangular'
 
-  const labwareHasOneRowAndIsRectangular =
-    labware.def.ordering[0].length === 1 && wellIsRectangular
-  const wellHeight = labwareHasOneRowAndIsRectangular ? well.yDimension : well.y
-  const wellX = well.x + xOffset
-  const wellY = wellHeight + yOffset
+  const centeringOffset = getPipetteCenteringFullOffset({
+    wellTargetName: wellName,
+    primaryNozzle,
+    nozzleConfiguration,
+    specs: pipetteSpec,
+    labwareDef: labware.def,
+  })
+
+  const wellX = well.x + centeringOffset.x + xOffset
+  const wellY = well.y + centeringOffset.y + yOffset
   const isSingleChannelPipette = pipetteSpec.channels === 1
 
   return {
     x: wellX,
-    y: isSingleChannelPipette && wellIsRectangular ? wellY / 2 : wellY,
+    y:
+      getIsOnlyRectangularWellInColumn(wellName, labware.def) &&
+      isSingleChannelPipette
+        ? wellY / 2
+        : wellY,
   }
 }
 
@@ -180,7 +196,7 @@ export function getIsTiprackSelectable(args: {
   pipetteSpecs: PipetteV2Specs
   nozzles: NozzleConfigurationStyle
   labwareEntities: LabwareEntities
-  validTiprackIds: string[]
+  labwareRobotState: LabwareRobotState
 }): boolean {
   // TODO: check if tiprack is on stacker. Will bottom of stack still be slot?
   const {
@@ -189,10 +205,10 @@ export function getIsTiprackSelectable(args: {
     pipetteSpecs,
     nozzles,
     labwareEntities,
-    validTiprackIds,
+    labwareRobotState,
   } = args
   const { channels } = pipetteSpecs
-  const { def, labwareDefURI, stack } = labware
+  const { id, def, labwareDefURI, stack } = labware
   const isPickupCompatibleWithPossibleAdapter =
     getIsPickupCompatibleWithPossibleAdapter(
       stack,
@@ -200,14 +216,87 @@ export function getIsTiprackSelectable(args: {
       nozzles,
       channels
     )
-  const slot = getSlotInLocationStack(stack)
+  const hasLid = getLabwareHasLid({
+    labwareId: id,
+    labwareEntities,
+    labwareRobotState,
+  })
+  const location = getSlotInLocationStack(stack)
+  const isInPipettableLocation = getIsInPipettableLocation(location)
+
   return (
     getIsTiprack(def) &&
     labwareDefURI === formTiprackUri &&
-    !COLUMN_4_SLOTS.includes(slot) &&
     isPickupCompatibleWithPossibleAdapter &&
-    validTiprackIds.includes(labware.id)
+    !hasLid &&
+    isInPipettableLocation
   )
+}
+
+interface GetIsTiprackSelectableAndValidArgs {
+  labware: LabwareOnDeck
+  formTiprackUri: string
+  pipetteSpecs: PipetteV2Specs
+  nozzles: NozzleConfigurationStyle
+  labwareEntities: LabwareEntities
+  validTiprackIds: string[]
+  labwareRobotState: LabwareRobotState
+}
+
+export const getIsTiprackSelectableAndValid = (
+  args: GetIsTiprackSelectableAndValidArgs
+): boolean => {
+  const {
+    labware,
+    formTiprackUri,
+    pipetteSpecs,
+    nozzles,
+    labwareEntities,
+    validTiprackIds,
+    labwareRobotState,
+  } = args
+  const isSelectable = getIsTiprackSelectable({
+    labware,
+    formTiprackUri,
+    pipetteSpecs,
+    nozzles,
+    labwareEntities,
+    labwareRobotState,
+  })
+  return isSelectable && validTiprackIds.includes(labware.id)
+}
+
+export const getAreAnyMatchingTipracksSelectable = (args: {
+  allLabware: LabwareOnDeck[]
+  formTiprackUri: string
+  pipetteSpecs: PipetteV2Specs
+  nozzles: NozzleConfigurationStyle
+  labwareEntities: LabwareEntities
+  validTiprackIds: string[]
+  labwareRobotState: LabwareRobotState
+}): boolean => {
+  const {
+    allLabware,
+    formTiprackUri,
+    pipetteSpecs,
+    nozzles,
+    labwareEntities,
+    validTiprackIds,
+    labwareRobotState,
+  } = args
+  return allLabware.some(labware => {
+    if (!validTiprackIds.includes(labware.id)) {
+      return false
+    }
+    return getIsTiprackSelectable({
+      labware,
+      pipetteSpecs,
+      formTiprackUri,
+      nozzles,
+      labwareEntities,
+      labwareRobotState,
+    })
+  })
 }
 
 export const getAllWellsInColumn = (
@@ -295,17 +384,16 @@ export const getValidTiprackIds = (args: {
               tipsToIgnore: addedWells,
             })
           const isSafeMoveConsideringDeck =
-            robotState != null
-              ? getIsSafePipetteMovement({
-                  robotState,
-                  invariantContext,
-                  pipetteId,
-                  labwareId: id,
-                  wellTargetName: wellName,
-                  primaryNozzle,
-                  nozzleConfiguration: nozzles,
-                })
-              : true
+            robotState == null ||
+            getPipetteMovementSafetyStatus({
+              robotState,
+              invariantContext,
+              pipetteId,
+              labwareId: id,
+              wellTargetName: wellName,
+              primaryNozzle,
+              nozzleConfiguration: nozzles,
+            }).isSafe
           if (isSafeWithinTiprack && isSafeMoveConsideringDeck && isComplete) {
             const allAffectedWells = getEntireWellSelection(
               wellName,
@@ -423,4 +511,18 @@ export const getLabelOffsetByPlacement = (args: {
     x: labelOffsetX,
     y: labelOffsetY,
   }
+}
+
+const getIsOnlyRectangularWellInColumn = (
+  wellName: string,
+  def: LabwareDefinition
+): boolean => {
+  const columns = def.ordering
+  const wellColumn = columns.find(column => column.includes(wellName))
+  if (wellColumn == null) {
+    return false
+  }
+  const isWellRectangular = def.wells[wellName].shape === 'rectangular'
+  const isOnlyWellInColumn = wellColumn.length === 1
+  return isWellRectangular && isOnlyWellInColumn
 }

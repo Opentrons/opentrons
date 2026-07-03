@@ -9,6 +9,7 @@ import {
   REDUX_DEVTOOLS,
 } from 'electron-devtools-installer'
 
+import { registerCertIPC } from './certs'
 import { getConfig, getOverrides, getStore, registerConfig } from './config'
 import {
   initializeDiscovery,
@@ -24,8 +25,10 @@ import { registerProtocolAnalysis } from './protocol-analysis'
 import { registerProtocolStorage } from './protocol-storage'
 import { registerRobotUpdate } from './robot-update'
 import {
+  clearMainWindow,
   closeSecondaryWindows,
   registerCameraStream,
+  setMainWindow,
 } from './secondary-windows'
 import { initializeSentry } from './sentry'
 import { registerSystemInfo } from './system-info'
@@ -81,7 +84,7 @@ app
   .whenReady()
   .then(async () => {
     app.setAsDefaultProtocolClient(PROTOCOL_NAME)
-    startUp()
+    await startUp()
 
     if (config.devtools) {
       await installDevtools()
@@ -167,7 +170,7 @@ function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
   return handlerSet ?? null
 }
 
-function startUp(): void {
+async function startUp(): Promise<void> {
   log.info('Starting App')
   process.on('uncaughtException', error => log.error('Uncaught: ', { error }))
   process.on('unhandledRejection', reason =>
@@ -176,9 +179,11 @@ function startUp(): void {
 
   initializeDiscovery()
   mainWindow = createUi()
+  setMainWindow(mainWindow)
   rendererLogger = createRendererLogger()
 
   mainWindow.once('closed', () => {
+    clearMainWindow()
     mainWindow = null
     closeSecondaryWindows()
   })
@@ -223,6 +228,7 @@ function startUp(): void {
       )
     }
   })
+  await registerCertIPC()
 
   log.silly('Global references', { mainWindow, rendererLogger })
 }

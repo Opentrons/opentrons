@@ -1,4 +1,4 @@
-# Contributing Guide
+# Contributing guide
 
 Thanks for your interest in contributing to the Opentrons platform! This Contributing Guide is intended to ensure best practices for both internal Opentrons contributors as well as any external contributors. We want to make sure you’re set up to contribute effectively, no matter if you’re helping us out with bug reports, code, documentation, feature suggestions, or anything else. This guide covers:
 
@@ -27,13 +27,13 @@ This Contributing Guide was influenced by a lot of work done on existing Contrib
 [node-contributing]: https://github.com/nodejs/node/blob/master/CONTRIBUTING.md
 [kibana-contributing]: https://github.com/elastic/kibana/blob/master/CONTRIBUTING.md
 
-## Opening Issues
+## Opening issues
 
 Please note that the issues tab on this repo is disabled. This doesn't mean we don't want to hear from you; it just means that our [support page][support] is a much better way to do so.
 
-## Opening Pull Requests
+## Opening pull requests
 
-If you’d like to contribute code to the Opentrons platform, pull requests (PR's) are the way to do it. Any code contributions are greatly appreciated! If you’re an external contributor, we’re going to assume you are familiar with the fork and pull request flow. If not, this [blog post by Scott Lowe][fork-and-pull] is a good introduction.
+If you’d like to contribute code to the Opentrons platform, pull requests (PRs) are the way to do it. Any code contributions are greatly appreciated! If you’re an external contributor, we’re going to assume you are familiar with the fork and pull request flow. If not, this [blog post by Scott Lowe][fork-and-pull] is a good introduction.
 
 Please note that by contributing to the Opentrons platform, you agree to share those contributions under the terms of the [Apache 2.0 license](./LICENSE).
 
@@ -61,85 +61,69 @@ To ensure your code is reviewed quickly and thoroughly, please fill out the sect
 
 After your Pull Request is merged (or otherwise closed), you’ll want to make sure to delete the branch in GitHub. You probably want to delete your local branch, too, depending on your own personal organizational strategies / general paranoia.
 
-### Deciding What to Work On
+### Deciding what to work on
 
 If you're looking for something to work on, especially for a first contribution, check out [our list of easy issues][easyfix]. Be sure to drop a comment in the thread before starting work to make sure nobody else has picked it up.
 
-## PR Etiquette
+## PR etiquette and conventions
 
 Following these practices helps reviewers focus on substance rather than cleanup and keeps our codebase healthy. A guiding principle: **Does this PR alleviate the burden of the reviewer as best as possible?** Please also read through the [LLM Usage Guidelines](#LLM-system-usage-guidelines)
 
-### Before Marking a PR "Ready for Review"
+### Before marking a PR "ready for review"
 
 - **Proofread the code.** Present a best-effort, functional solution.
-- **Add appropriate tests.** Include tests as appropriate for the scope of the PR.
+
+- **Add appropriate tests and documentation.** Include tests and documentation as appropriate for the scope of the PR.
+
 - **Smoke test the change.** Run through enough manual or automated checks to verify the change behaves as intended.
 
-### While Opening a PR
+- **Keep your commit history reasonably tidy.** Use good commit messages. Ideally, confine each commit to one self-contained change. See [How to Write a Git Commit Message][commit-message-how-to] by Chris Beams for general guidance.
+
+  Don't stress about this too much! When you merge your PR, all of your commits will get squashed down into one, and you'll have an opportunity to rewrite the final message. But it's nice to keep a tidy history, anyway. It helps others scan your changes. It also helps you in case you need to rework your PR with tools like `git revert`.
+
+### While opening a PR
 
 - **Fill out the PR template thoughtfully.** A well-filled template lets reviewers focus on substance rather than chasing basic questions. It reduces back-and-forth, speeds up review, and helps future maintainers. You're welcome to bend the template when it helps you communicate better (e.g., for a bug fix, overview + details might serve readers better than overview + changelog). Just be thoughtful about what you change and why.
-- **Use semantic commit titling.** Use conventional prefixes such as `feat`, `fix`, `refactor`, `style`, `docs`, etc. See [Commit Guidelines](#commit-guidelines) for our [commitizen][] workflow.
 
-### After Receiving PR Approval
+- **Write a semantic PR title.** Following the [Conventional Commits][conventional-commits] specification, your PR title should have one of the following prefixes. For example: `fix(app): Fix spacing in the nav menu`
+  - `feat` - A new feature
+  - `fix` - A bug fix
+  - `docs` - Documentation only changes
+  - `style` - Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc
+  - `refactor` - A code change that neither fixes a bug nor adds a feature
+  - `perf` - A code change that improves performance
+  - `test` - Adding missing tests or correcting existing tests
+  - `build` - Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
+  - `ci` - Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
+  - `chore` - Other changes that don't modify src or test files
 
+### After receiving PR approval
+
+- **Make sure all automated checks are passing.** See the [Testing](#Testing) and [Code quality](#Code-quality) sections for more details.
 - **Perform a final smoke test** before merging, to confirm nothing regressed after approval.
-- **Truncate the commit message before merging.** Keep only the ticket reference and a concise Overview snippet—avoid long, unwieldy merge messages.
 
-## Commit Guidelines
+### Writing the commit message and merging your PR
 
-### Before you commit
+Normally, you will squash all of your commits into one when you merge your PR. GitHub will ask you to enter a summary and description of the squashed commit.
 
-Before you're ready to make a commit, you should do you best to make sure that:
+The summary should be your PR title, followed by your PR number. GitHub will normally prepopulate it, but double-check it. It should look like this:
 
-- All tests are passing
-  - `make test`
-  - See [Testing](#Testing) section for more details
-- All code quality checks are passing
-  - `make format lint`
-  - See [Code quality](#Code-quality) section for more details
-  - Especially consider [setting up your code editor](#Editor-setup) to run formatting and quality checks automatically as you code
-
-### Making your commit
-
-Good commit messages are essential to keeping an organized and readable Git history. A readable Git history makes our lives easier when doing necessary work like writing changelogs or tracking down regressions. Please read [How to Write a Git Commit Message][commit-message-how-to] by Chris Beams and then come back here. These selected guidelines (copied and pasted from that article) are a very good starting point to think about when writing your commit message:
-
-1.  Separate subject from body with a blank line
-2.  Capitalize the subject line
-3.  Do not end the subject line with a period
-4.  Use the imperative mood in the subject line
-5.  Use the body to explain what and why vs. how
-
-When committing, we use [commitizen][] to format our commit messages according to the [Conventional Commits][conventional-commits] specification. This allows us to automatically generate CHANGELOGs based on commit messages. To commit files, first install `commitizen`, then:
-
-```shell
-git add path/to/files
-git cz
+```
+fix(app): Fix spacing in the nav menu (#12345)
 ```
 
-This will launch the commitizen wizard, which will ask you to:
+For the extended description, delete whatever GitHub prepopulates. In its place, write a concise overview, including ticket references. You might base it on the "Overview" and "Changelog" sections of your PR description. For instance:
 
-1.  Select a commit type, which will be one of:
-    1.  `feat` - A new feature
-    2.  `fix` - A bug fix
-    3.  `docs` - Documentation only changes
-    4.  `style` - Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc
-    5.  `refactor` - A code change that neither fixes a bug nor adds a feature
-    6.  `perf` - A code change that improves performance
-    7.  `test` - Adding missing tests or correcting existing tests
-    8.  `build` - Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
-    9.  `ci` - Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
-    10. `chore` - Other changes that don't modify src or test files
-2.  Select a scope
-    - For `feat`, `fix`, `refactor`, and `perf`, this should a top-level project, e.g. `app` or `api`
-    - For other commit types, use your best judgement or omit
-3.  Write a short commit title
-    - Written according to the guidelines above
-4.  Write a longer description if necessary
-    - Also written according to the guidelines above
-5.  Mention any tickets addressed by the commit
-    - e.g. `Closes #xyz`
+```
+This fixes a few things in the top-level navigation menu that didn't match the designs.
+Closes TICKET-1234.
 
-![commitizen](https://user-images.githubusercontent.com/2963448/40452320-776de7e0-5eaf-11e8-9aa7-ad706713b197.gif)
+* Add more vertical space between the text and the underline.
+* Vertically center the overflow button.
+* Add more space to the right of the overflow button.
+```
+
+Good commit messages are essential to keeping an organized and readable Git history. A readable Git history makes our lives easier when doing necessary work like writing changelogs or tracking down regressions. Further reading: [How to Write a Git Commit Message][commit-message-how-to] by Chris Beams.
 
 ## LLM system usage guidelines
 
@@ -158,7 +142,7 @@ That doesn't mean:
 
 Maintainers of the repo follow the same rules, and will never ask you to respond to their LLM outputs.
 
-## Project and Repository Structure
+## Project and repository structure
 
 Most of Opentrons’ projects live in the [Opentrons/opentrons][repo] repository. Having multiple projects in one repository (also known as a monorepo) is convenient for keeping various inter-project dependencies in sync, but does require workflow considerations to keep everything organized and trackable.
 
@@ -174,13 +158,13 @@ Generally, the directory / file structure of our monorepo looks something like t
 
 Our projects use a mix of languages, but mostly Python (backend + robotics) and JavaScript (frontend). Each project has its own `README` + `Makefile` + dependency management.
 
-## Development Setup
+## Development setup
 
 If you'd like to contribute (or maybe just run the very latest and greatest version), this section details what you need to do to get your computer and local repository set up.
 
 Individual projects may have additional instructions, so be sure to check out the various project `README`s, too.
 
-### System and Repository Setup
+### System and repository setup
 
 You will need the following tools installed to develop on the Opentrons platform.
 
@@ -411,9 +395,9 @@ make term ssh_key=/path/to/privkey
 
 If you create the key as `~/.ssh/robot_key` and `~/.ssh/robot_key.pub` then `make term` and `make install-key` will work without arguments.
 
-## Robot Environment
+## Robot environment
 
-### Log Locations
+### Log locations
 
 OT-2 robots use [systemd-journald][] for log management. This is a single log manager for everything on the system. It is administrated using the [journalctl][] utility. You can view logs by just doing `journalctl` (it may be better to do `journalctl --no-pager | less` to get a better log viewer), or stream them by doing `journalctl -f`. Any command that displays logs can be narrowed down by using a syslog identifier: `journalctl -f SYSLOG_IDENTIFIER=opentrons-api` will only print logs from the api server's loggers, for instance. Our syslog identifiers are:
 
@@ -421,7 +405,7 @@ OT-2 robots use [systemd-journald][] for log management. This is a single log ma
 - `opentrons-update-server`: Anything sent to `logging` logs from the update server package
 - `opentrons-api-serial`: The serial logs
 
-### State Management
+### State management
 
 OT-2 robots use `systemd` as their init system. Every process that we run has an associated systemd unit, which defines and configures its behavior when the robot starts. You can use the [systemctl][] utility to mess around with or inspect the system state. For instance, if you do `systemctl status opentrons-api-server` you will see whether the api server is running or not, and a dump of its logs. You can restart units with `systemctl restart (unitname)`, start and stop them with `systemctl start` and `systemctl stop`, and so on. Note that if you make changes to unit files, you have to run `systemctl daemon-reload` (no further arguments) for the init daemon to see the changes.
 
@@ -430,7 +414,7 @@ Our systemd units are:
 - `opentrons-api-server`: The API server
 - `opentrons-update-server`: The update server
 
-### Other System Admin Notes
+### Other system admin notes
 
 An OT-2's filesystem is mounted from two separate locations. `/data`, `/var`, and `/home` are from the "data" partition, and everything else is from the root partition (or generated by the system). The root partition is what gets updated, by being overwritten. To make this work, the root partition is mounted readonly, which causes writes to files in that partition to fail with the error "readonly filesystem". To prevent this, you can remount the partition:
 `mount -o remount,rw /`
@@ -447,7 +431,6 @@ An OT-2's filesystem is mounted from two separate locations. `/data`, `/var`, an
 [makefiles]: https://en.wikipedia.org/wiki/Makefile
 [nvm]: https://github.com/creationix/nvm
 [pnpm]: https://pnpm.io/
-[commitizen]: https://github.com/commitizen/cz-cli
 [conventional-commits]: https://conventionalcommits.org/
 [lerna]: https://github.com/lerna/lerna
 [lerna-version]: https://github.com/lerna/lerna/tree/v3.16.4/commands/version

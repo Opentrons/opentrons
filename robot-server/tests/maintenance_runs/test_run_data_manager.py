@@ -13,6 +13,7 @@ from opentrons.protocol_engine import (
     Liquid,
     LoadedLabware,
     LoadedModule,
+    LoadedPeripheral,
     LoadedPipette,
     StateSummary,
     commands,
@@ -73,6 +74,7 @@ def engine_state_summary() -> StateSummary:
         labwareOffsets=[LabwareOffset.model_construct(id="some-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.model_construct(id="some-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.model_construct(id="some-module-id")],  # type: ignore[call-arg]
+        peripherals=[LoadedPeripheral.model_construct(id="some-module-id")],  # type: ignore[call-arg]
         liquids=[
             Liquid.model_construct(
                 id="some-liquid-id", displayName="liquid", description="desc"
@@ -139,6 +141,7 @@ async def test_create(
             created_at=created_at,
             deck_configuration=[],
             notify_publishers=mock_notify_publishers,
+            proxy_of_callback_for_handling_door_events=None,
         )
     ).then_return(engine_state_summary)
     decoy.when(
@@ -194,6 +197,7 @@ async def test_create_with_options(
             created_at=created_at,
             deck_configuration=[],
             notify_publishers=mock_notify_publishers,
+            proxy_of_callback_for_handling_door_events=None,
         )
     ).then_return(engine_state_summary)
     decoy.when(
@@ -243,6 +247,7 @@ async def test_create_engine_error(
             created_at=created_at,
             deck_configuration=[],
             notify_publishers=mock_notify_publishers,
+            proxy_of_callback_for_handling_door_events=None,
         )
     ).then_raise(RunConflictError("oh no"))
     decoy.when(

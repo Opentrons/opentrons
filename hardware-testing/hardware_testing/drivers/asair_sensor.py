@@ -8,7 +8,7 @@ import abc
 import codecs
 import logging
 import time
-from typing import Tuple
+from typing import Tuple, Optional
 from abc import ABC
 from dataclasses import dataclass
 from . import list_ports_and_select
@@ -101,6 +101,8 @@ def BuildAsairSensor(
                     if len(ser_id) == 8:
                         ui.print_info(f"Found env sensor {ser_id} on port {port}")
                         return sensor
+                    sensor.close()  # 👈 防泄漏
+
                 except:  # noqa: E722
                     pass
             use_sim = ui.get_user_answer("No env sensor found, use simulator?")
@@ -108,6 +110,42 @@ def BuildAsairSensor(
                 raise SerialException("No sensor found")
     ui.print_info("no sensor found returning simulator")
     return SimAsairSensor()
+
+
+def BuildAsairSensorWithPort(
+    simulate: bool, autosearch: bool = True, port_substr: str = ""
+) -> Tuple[AsairSensorBase, Optional[str]]:
+    """Try to find and return an Asair sensor with its port, if not found return a simulator."""
+    ui.print_title("Connecting to Environmental sensor")
+    if not simulate:
+        if not autosearch:
+            port = list_ports_and_select(
+                device_name="Asair environmental sensor", port_substr=port_substr
+            )
+            sensor = AsairSensor.connect(port)
+            ui.print_info(f"Found sensor on port {port}")
+            return sensor, port
+        else:
+            ports = comports()
+            assert ports
+            for _port in ports:
+                port = _port.device  # type: ignore[attr-defined]
+                try:
+                    ui.print_info(f"Trying to connect to env sensor on port {port}")
+                    sensor = AsairSensor.connect(port)
+                    ser_id = sensor.get_serial()
+                    if len(ser_id) == 8:
+                        ui.print_info(f"Found env sensor {ser_id} on port {port}")
+                        return sensor, port
+                    sensor.close()  # 防泄漏
+
+                except:  # noqa: E722
+                    pass
+            use_sim = ui.get_user_answer("No env sensor found, use simulator?")
+            if not use_sim:
+                raise SerialException("No sensor found")
+    ui.print_info("no sensor found returning simulator")
+    return SimAsairSensor(), None
 
 
 class AsairSensor(AsairSensorBase):
@@ -150,14 +188,25 @@ class AsairSensor(AsairSensorBase):
             return cls(connection, sensor_address)
         except SerialException:
             error_msg = (
-                "Unable to access Serial port to Scale: \n"
-                "1. Check that the scale is plugged into the computer. \n"
+                "Unable to access Serial port to Asair sensor: \n"
+                "1. Check that the Asair sensor is plugged into the computer. \n"
                 "2. Check if the assigned port is correct. \n"
             )
             raise SerialException(error_msg)
 
     def get_reading(self, retries: int = 5) -> Reading:
         """Get a reading."""
+        # 检查串口连接状态
+        if not self._th_sensor or not self._th_sensor.is_open:
+            log.warning("Serial port is not open")
+            if retries > 0:
+                # 尝试重新连接
+                try:
+                    self._th_sensor.open()
+                except Exception as e:
+                    log.exception(f"Failed to reopen serial port: {e}")
+                return self.get_reading(retries=retries - 1)
+            raise AsairSensorError("Serial port is not open")
         data_packet = "{}0300000002{}".format(
             self._sensor_address, crc_reading[self._sensor_address]
         )
@@ -168,9 +217,14 @@ class AsairSensor(AsairSensorBase):
             self._th_sensor.flushOutput()  # type: ignore[attr-defined]
 
             self._th_sensor.write(command_bytes)
-            time.sleep(0.1)
-
-            length = self._th_sensor.inWaiting()  # type: ignore[attr-defined]
+            time.sleep(0.5)
+            start_time = time.time()
+            length = 0
+            while time.time() - start_time < 2:
+                length = self._th_sensor.inWaiting()
+                if length > 0:
+                    break
+                time.sleep(0.1)
             res = self._th_sensor.read(length)
             log.debug(f"received {res!r}")
 
@@ -223,6 +277,12 @@ class AsairSensor(AsairSensorBase):
             log.exception("Communication error")
             error_msg = "Asair Sensor not connected. Check if port number is correct."
             raise AsairSensorError(error_msg)
+
+    def close(self) -> None:
+        """Close the serial connection."""
+        if self._th_sensor and hasattr(self._th_sensor, "close"):
+            self._th_sensor.close()
+            ui.print_info("Asair sensor serial connection closed")
 
 
 class SimAsairSensor(AsairSensorBase):

@@ -12,7 +12,7 @@ hide: toc
 
 **Opentrons Labworks Inc.**
 
-July 2024
+September 2025
 
 </div>
 

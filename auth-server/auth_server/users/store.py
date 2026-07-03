@@ -82,7 +82,7 @@ class UserStore:
         hashed_password: str | None = None,
         full_name: str | None = None,
         account_type: str | None = None,
-        reset_password: bool = False,
+        reset_password: bool | None = None,
     ) -> User:
         """Update a user's fields and return the updated User.
 

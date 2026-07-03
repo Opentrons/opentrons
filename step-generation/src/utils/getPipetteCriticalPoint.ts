@@ -1,4 +1,4 @@
-import { COLUMN, ROW } from '@opentrons/shared-data'
+import { ALL, COLUMN, ROW } from '@opentrons/shared-data'
 
 import type {
   LabwareDefinition,
@@ -15,9 +15,11 @@ export const getPipetteCriticalPoint = (
 ): Point => {
   const { spec } = pipetteEntity
   const isRow = nozzleConfiguration === ROW
-  const isColumn = nozzleConfiguration === COLUMN
+  const isColumn =
+    nozzleConfiguration === COLUMN ||
+    (nozzleConfiguration === ALL && spec.channels === 8)
   const labwareHasOneRow = labwareDefinition.ordering[0].length === 1
-  if ((isColumn || isRow) && labwareHasOneRow) {
+  if (isRow && labwareHasOneRow) {
     // return the XY CENTER
     const frontPoint = isColumn
       ? `H${primaryNozzle.slice(1)}`

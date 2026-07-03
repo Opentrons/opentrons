@@ -44,8 +44,9 @@ dev = [
     "pytest-cov==4.1.0",
     "pytest-lazy-fixtures>=1.1.4,<2",
     "pytest-xdist~=2.5.0",
-    "types-requests==2.27.1",
+    "types-requests==2.33.*",
     "tavern>=3.0.2",
+    "requests==2.33.*",
 ]
 
 [tool.ruff.lint]
@@ -131,6 +132,9 @@ addopts = ["--color=yes", "--strict-markers"]
 asyncio_mode = "auto"
 filterwarnings = [
     "error::pydantic.PydanticDeprecatedSince20",
+    # FastAPI 0.100.0 calls pydantic_core's deprecated `general_plain_validator_function`
+    # internally. Ignore until we upgrade FastAPI.
+    "ignore:`general_plain_validator_function` is deprecated:DeprecationWarning",
 ]
 
 [tool.mypy]

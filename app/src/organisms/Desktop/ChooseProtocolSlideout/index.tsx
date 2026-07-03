@@ -37,14 +37,12 @@ import {
   useHoverTooltip,
   useTooltip,
 } from '@opentrons/components'
-import {
-  ApiHostProvider,
-  useUploadCsvFileMutation,
-} from '@opentrons/react-api-client'
+import { useUploadCsvFileMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, sortRuntimeParameters } from '@opentrons/shared-data'
 
 import { ToggleButton } from '/app/atoms/buttons'
 import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useLogger } from '/app/logger'
 import { MiniCard } from '/app/molecules/MiniCard'
 import { UploadInput } from '/app/molecules/UploadInput'
@@ -56,7 +54,7 @@ import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistor
 import { useRobotType } from '/app/redux-resources/robots'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getStoredProtocols } from '/app/redux/protocol-storage'
-import { appShellRequestor } from '/app/redux/shell/remote'
+import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
@@ -183,7 +181,7 @@ export function ChooseProtocolSlideoutComponent(
       ? {
           hostname: robot.ip,
           requestor:
-            robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined,
+            robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined,
         }
       : null
   )
@@ -673,12 +671,7 @@ export function ChooseProtocolSlideoutComponent(
       maxSteps={hasRunTimeParameters ? 2 : 1}
       title={t('choose_protocol_to_run', { name })}
       footer={
-        <ApiHostProvider
-          hostname={robot.ip}
-          requestor={
-            robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
-          }
-        >
+        <ApiHostProvider robotName={name}>
           {currentPage === 1
             ? !isFlex && (
                 <LegacyApplyHistoricOffsets

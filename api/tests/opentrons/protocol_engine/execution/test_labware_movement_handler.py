@@ -32,6 +32,9 @@ from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
 from opentrons.protocol_engine.execution.thermocycler_plate_lifter import (
     ThermocyclerPlateLifter,
 )
+from opentrons.protocol_engine.execution.vacuum_module_movement_flagger import (
+    VacuumModuleMovementFlagger,
+)
 from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
@@ -89,6 +92,12 @@ def heater_shaker_movement_flagger(decoy: Decoy) -> HeaterShakerMovementFlagger:
 
 
 @pytest.fixture
+def vacuum_module_movement_flagger(decoy: Decoy) -> VacuumModuleMovementFlagger:
+    """Get a mocked out VacuumModuleMovementFlagger instance."""
+    return decoy.mock(cls=VacuumModuleMovementFlagger)
+
+
+@pytest.fixture
 def labware_def(decoy: Decoy) -> LabwareDefinition2:
     """Get a mocked out LabwareDefinition2 instance."""
     return decoy.mock(cls=LabwareDefinition2)
@@ -143,6 +152,7 @@ def subject(
     thermocycler_plate_lifter: ThermocyclerPlateLifter,
     thermocycler_movement_flagger: ThermocyclerMovementFlagger,
     heater_shaker_movement_flagger: HeaterShakerMovementFlagger,
+    vacuum_module_movement_flagger: VacuumModuleMovementFlagger,
 ) -> LabwareMovementHandler:
     """Get LabwareMovementHandler for OT3, with its dependencies mocked out."""
     return LabwareMovementHandler(
@@ -153,6 +163,7 @@ def subject(
         thermocycler_plate_lifter=thermocycler_plate_lifter,
         thermocycler_movement_flagger=thermocycler_movement_flagger,
         heater_shaker_movement_flagger=heater_shaker_movement_flagger,
+        vacuum_module_movement_flagger=vacuum_module_movement_flagger,
     )
 
 

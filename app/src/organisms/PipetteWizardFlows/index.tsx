@@ -12,13 +12,15 @@ import {
   WizardHeader,
 } from '@opentrons/components'
 import {
-  ApiHostProvider,
+  isDocumentedMutationError,
   useDeleteMaintenanceRunMutation,
   useHost,
 } from '@opentrons/react-api-client'
 import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { getIsOnDevice } from '/app/redux/config'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -47,7 +49,11 @@ import { RemoveWasteChute } from './RemoveWasteChute'
 import { Results } from './Results'
 import { UnskippableModal } from './UnskippableModal'
 
-import type { CommandData, HostConfig } from '@opentrons/api-client'
+import type { CommandData } from '@opentrons/api-client'
+import type {
+  DocumentationState,
+  DocumentedAction,
+} from '@opentrons/react-api-client'
 import type {
   CreateCommand,
   LoadedPipette,
@@ -64,12 +70,20 @@ interface PipetteWizardFlowsProps {
   closeFlow: () => void
   onComplete?: () => void
   pipetteInfo?: LoadedPipette[]
+  initialDocstate?: DocumentationState
 }
 
 export const PipetteWizardFlows = (
   props: PipetteWizardFlowsProps
 ): JSX.Element | null => {
-  const { flowType, mount, closeFlow, selectedPipette, onComplete } = props
+  const {
+    flowType,
+    mount,
+    closeFlow,
+    selectedPipette,
+    onComplete,
+    initialDocstate,
+  } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
   const deckConfig = useNotifyDeckConfigurationQuery()
@@ -174,17 +188,61 @@ export const PipetteWizardFlows = (
     enabled: createdMaintenanceRunId != null,
   })
 
+  const maintenanceRunAction: DocumentedAction = useMemo(() => {
+    return {
+      type: 'pipette_wizard_flow',
+      mount,
+      flowType,
+      pipette: selectedPipette,
+      pipetteInfo: attachedPipettes[mount] ?? null,
+      step: 'start',
+    }
+  }, [mount, flowType, selectedPipette, attachedPipettes])
+
+  const deleteRunAction: DocumentedAction = useMemo(() => {
+    return {
+      type: 'pipette_wizard_flow',
+      mount,
+      flowType,
+      pipette: selectedPipette,
+      pipetteInfo: attachedPipettes[mount] ?? null,
+      step: 'end',
+    }
+  }, [mount, flowType, selectedPipette, attachedPipettes])
+
+  const {
+    commandDocState,
+    deletionDocState,
+    actionsToDocument,
+    addActionToDocument,
+  } = useMaintenanceRunDocumentation(
+    maintenanceRunAction,
+    closeFlow,
+    initialDocstate
+  )
+
   const { chainRunCommands, isCommandMutationLoading } =
-    useChainMaintenanceCommands()
+    useChainMaintenanceCommands(
+      commandDocState,
+      actionsToDocument,
+      addActionToDocument
+    )
 
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
     useCreateTargetedMaintenanceRunMutation(
+      commandDocState,
+      actionsToDocument,
       {
         onSuccess: response => {
           setCreatedMaintenanceRunId(response.data.id)
         },
-        onError: error => {
-          setShowErrorMessage(error.message)
+        onError: (error: unknown) => {
+          if (isDocumentedMutationError(error)) {
+            return
+          }
+          setShowErrorMessage(
+            error instanceof Error ? error.message : String(error)
+          )
         },
       },
       host
@@ -223,29 +281,31 @@ export const PipetteWizardFlows = (
     }
   }
   const handleClose = (): void => {
-    if (onComplete != null) {
-      onComplete()
-    }
     if (maintenanceRunData != null) {
-      deleteMaintenanceRun(maintenanceRunData?.data.id, {
-        onSettled: closeFlow,
-      })
+      deleteMaintenanceRun(maintenanceRunData?.data.id)
     } else {
+      onComplete?.()
       closeFlow()
     }
   }
 
   const { deleteMaintenanceRun, isLoading: isDeleteLoading } =
-    useDeleteMaintenanceRunMutation({
-      onSuccess: () => {
-        closeFlow()
-      },
-      onError: () => {
-        closeFlow()
-      },
-    })
+    useDeleteMaintenanceRunMutation(
+      deletionDocState,
+      [...actionsToDocument, deleteRunAction],
+      {
+        onSuccess: () => {
+          onComplete?.()
+          closeFlow()
+        },
+        onError: () => {
+          setIsExiting(false)
+        },
+      }
+    )
 
   const handleCleanUpAndClose = (): void => {
+    setIsExiting(true)
     if (maintenanceRunData?.data.id == null) handleClose()
     else {
       chainRunCommands(
@@ -353,6 +413,7 @@ export const PipetteWizardFlows = (
         isCreateLoading={isCreateLoading}
         deckConfig={deckConfig}
         requiredPipette={requiredPipette}
+        documentationState={commandDocState}
       />
     )
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {
@@ -510,18 +571,19 @@ export const PipetteWizardFlows = (
   )
 }
 
-type PipetteWizardFlowsPropsWithHost = PipetteWizardFlowsProps & {
-  host: HostConfig
+type PipetteWizardFlowsModalProps = PipetteWizardFlowsProps & {
+  robotName: string | null
 }
 
 export const handlePipetteWizardFlows = (
-  props: PipetteWizardFlowsPropsWithHost
+  props: PipetteWizardFlowsModalProps
 ): void => {
   NiceModal.show(NiceModalPipetteWizardFlows, props)
 }
 
 const NiceModalPipetteWizardFlows = NiceModal.create(
-  (props: PipetteWizardFlowsPropsWithHost): JSX.Element => {
+  (props: PipetteWizardFlowsModalProps): JSX.Element => {
+    const { robotName, ...pipetteWizardFlowsProps } = props
     const modal = useModal()
     const closeFlowAndModal = (): void => {
       props.closeFlow()
@@ -529,8 +591,11 @@ const NiceModalPipetteWizardFlows = NiceModal.create(
     }
 
     return (
-      <ApiHostProvider {...props.host}>
-        <PipetteWizardFlows {...props} closeFlow={closeFlowAndModal} />
+      <ApiHostProvider robotName={robotName}>
+        <PipetteWizardFlows
+          {...pipetteWizardFlowsProps}
+          closeFlow={closeFlowAndModal}
+        />
       </ApiHostProvider>
     )
   }

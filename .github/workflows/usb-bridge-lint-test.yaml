@@ -69,7 +69,3 @@ jobs:
           project: 'usb-bridge'
       - name: Test
         run: make -C usb-bridge test
-      - uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
-        with:
-          files: ./usb-bridge/coverage.xml
-          flags: usb-bridge

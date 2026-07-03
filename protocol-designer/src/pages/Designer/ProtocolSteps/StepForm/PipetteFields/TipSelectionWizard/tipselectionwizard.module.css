@@ -24,6 +24,10 @@
   gap: var(--spacing-8);
 }
 
+.modal_footer_continue {
+  align-self: flex-end;
+}
+
 .modal_header {
   display: flex;
   flex-direction: row;
@@ -74,4 +78,3 @@
   display: flex;
   width: 10rem;
 }
-

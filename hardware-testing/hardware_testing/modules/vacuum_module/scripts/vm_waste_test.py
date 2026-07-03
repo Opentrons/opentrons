@@ -13,7 +13,7 @@ import csv
 import serial.tools.list_ports  # type: ignore[import]
 
 # target_pressure = 600
-atm_pressure = 1023
+atm_pressure = 1013.25
 # Tunables (can move some to parameters)
 SETTLE_SEC = 21
 RUN_SEC = 35

@@ -157,10 +157,15 @@ jobs:
         working-directory: analyses-snapshot-testing
         run: make snapshot-test
 
-      - name: Run Audit
+      - name: Run snapshot audit
         id: run_audit
         working-directory: analyses-snapshot-testing
         run: make snapshot-audit-test
+
+      - name: Run OT-2 compatibility test
+        id: run_ot2_compatibility
+        working-directory: analyses-snapshot-testing
+        run: make ot2-compatibility-test
 
       - name: Upload Report
         if: '!cancelled()'

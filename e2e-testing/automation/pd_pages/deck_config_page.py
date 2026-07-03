@@ -116,3 +116,36 @@ class DeckConfigPage(BasePage):
             fixture_name: Name of the fixture to remove
         """
         self.page.get_by_role("button", name=fixture_name).click()
+
+    def add_waste_chute(self) -> None:
+        """Add a waste chute fixture at cutout D3."""
+        self.select_slot("D3")
+        fixtures_option = self.page.get_by_test_id("Fixtures")
+        self.wait_for_visible(fixtures_option.first)
+        fixtures_option.first.click()
+
+        waste_chute_entry = self.page.get_by_test_id("Waste chute")
+        if waste_chute_entry.count() > 0:
+            self.wait_for_visible(waste_chute_entry.first)
+            waste_chute_entry.first.click()
+
+        waste_chute_fixture = self.page.get_by_test_id("Waste Chute")
+        self.wait_for_visible(waste_chute_fixture.first)
+        waste_chute_fixture.first.click()
+
+    def configure_initial_deck_hardware(self, *, tc: bool, waste_chute: bool) -> None:
+        """Configure thermocycler and waste chute on the onboarding deck step.
+
+        Args:
+            tc: When True, add a Thermocycler Module GEN2 at B1.
+            waste_chute: When True, remove the default trash bin and add a waste chute at D3.
+        """
+        self.expect_module_overview()
+
+        if waste_chute:
+            self.remove_fixture("Trash bin")
+            self.add_waste_chute()
+
+        if tc:
+            self.select_slot("B1")
+            self.select_module("Thermocycler Module GEN2")

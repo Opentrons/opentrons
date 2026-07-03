@@ -14,7 +14,8 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Mount, Point, Axis
+from opentrons.hardware_control.types import OT3Mount, Axis
+from opentrons.types import Point
 
 NUM_SECONDS_TO_WAIT = 30
 HOVER_HEIGHT_MM = 50

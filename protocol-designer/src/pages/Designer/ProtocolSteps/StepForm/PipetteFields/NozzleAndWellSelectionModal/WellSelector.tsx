@@ -20,7 +20,10 @@ import {
   PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
 } from '@opentrons/shared-data'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import {
+  getPipetteMovementSafetyStatus,
+  getSlotInLocationStack,
+} from '@opentrons/step-generation'
 
 import { LabwareOnDeck } from '/protocol-designer/components/organisms'
 import { SelectionRect } from '/protocol-designer/components/organisms/Labware/SelectionRect'
@@ -31,6 +34,7 @@ import { getCollidingWells } from '/protocol-designer/utils/index'
 import { canPipetteUseLabware } from '../../../../../../utils'
 import { BaseDeckTipSelection } from '../TipSelectionWizard/BaseDeckTipSelection'
 import { INACCESSIBLE_COLLISION } from '../TipSelectionWizard/constants'
+import { getWellsToCheck } from '../TipSelectionWizard/hooks/useMemoizedTipAccessibilityByTiprackIdByWellName'
 import { PipetteShadow } from '../TipSelectionWizard/PipetteShadows/PipetteShadow'
 import { SelectionLegend } from '../TipSelectionWizard/SelectionLegend'
 import { getViewboxFromSelectedLabware } from '../TipSelectionWizard/utils'
@@ -78,7 +82,10 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     .value as PrimaryNozzleConfigurationStyle
   const pipetteId = propsForFields.pipette.value as string
   const isPartialNozzle = nozzleConfiguration === PARTIAL_COLUMN
-
+  const tiprackLabwareDefURI = propsForFields.tipRack.value as string
+  const tiprackId = Object.values(deckSetup.labware).find(
+    labware => labware.labwareDefURI === tiprackLabwareDefURI
+  )?.id
   const robotState = useSelector(getRobotStateAtActiveItem)
   const invariantContext = useSelector(getInvariantContext)
 
@@ -181,43 +188,153 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       leaveTimeoutRef.current = null
     }
 
-    const hovered = getEntireWellSelection(
-      e.wellName,
-      labwareDef.ordering,
-      nozzleConfiguration,
-      primaryNozzle,
-      channels
-    )
+    const { wellName } = e
+    // If the well is a primary, use its pre-computed affectedWells.
+    // If it's a cascading member, redirect to its covering primary's group so
+    // that hover highlights the correct set and reflects the right accessibility.
+    const directStatus = primaryWellAccessibilityByWellName[wellName]
+    let hovered: string[]
+    if (directStatus != null) {
+      hovered = directStatus.affectedWells
+    } else {
+      const coveringStatus = wellToPrimaryStatus[wellName]
+      hovered =
+        coveringStatus != null
+          ? coveringStatus.affectedWells
+          : getEntireWellSelection(
+              wellName,
+              labwareDef.ordering,
+              nozzleConfiguration,
+              primaryNozzle,
+              channels
+            )
+    }
 
     setHoveredWells(hovered)
     setWellShadow(hovered[0])
   }
 
-  const allWellsWithStatus = useMemo(
-    () =>
-      getAllWellsSafetyStatus({
-        allWells,
-        robotState,
-        invariantContext,
-        pipetteId,
-        labwareId,
-        primaryNozzle,
-        nozzleConfiguration,
-      }),
-    [
+  const allWellsWithStatus = useMemo(() => {
+    return getAllWellsSafetyStatus({
       allWells,
-      primaryNozzle,
-      nozzleConfiguration,
-      pipetteId,
-      labwareId,
       robotState,
       invariantContext,
+      pipetteId,
+      labwareId,
+      primaryNozzle,
+      nozzleConfiguration,
+      tiprackId,
+    })
+  }, [
+    allWells,
+    primaryNozzle,
+    nozzleConfiguration,
+    pipetteId,
+    labwareId,
+    robotState,
+    invariantContext,
+    tiprackId,
+  ])
+
+  // primary well name only to mirror the tip selection hook's approach
+  // cascading wells are represented through `affectedWells` on their primary entry
+  // to not inappropriately show that cascading wells are inaccessible when their
+  // primary is accessible
+  const primaryWellAccessibilityByWellName = useMemo(() => {
+    const pipetteCanUseLabware = canPipetteUseLabware(
+      pipetteSpecs,
+      nozzleConfiguration,
+      labwareDef
+    )
+
+    // getWellsToCheck is designed for tipracks (96-well format). For labware like
+    // 384-well plates, skipEveryOtherWell means A1's cascading wells only covers odd rows
+    // Add gaps to primaries so wellToPrimaryStatus has an entry for every well in the labware.
+    const initialPrimaries = getWellsToCheck(
+      nozzleConfiguration,
+      labwareDef.ordering,
+      channels,
+      primaryNozzle
+    )
+    const coveredByInitialPrimaries = new Set<string>()
+    initialPrimaries.forEach(well => {
+      getEntireWellSelection(
+        well,
+        labwareDef.ordering,
+        nozzleConfiguration,
+        primaryNozzle,
+        channels
+      ).forEach(well => coveredByInitialPrimaries.add(well))
+    })
+    const primaryWells = [
+      ...initialPrimaries,
+      ...allWells.flat().filter(w => !coveredByInitialPrimaries.has(w)),
     ]
+    return primaryWells.reduce<
+      Record<string, { isAccessible: boolean; affectedWells: string[] }>
+    >((acc, wellName) => {
+      const isSafe =
+        pipetteCanUseLabware &&
+        (robotState == null ||
+          getPipetteMovementSafetyStatus({
+            robotState,
+            invariantContext,
+            pipetteId,
+            labwareId,
+            wellTargetName: wellName,
+            primaryNozzle,
+            nozzleConfiguration,
+            tiprackId,
+          }).isSafe)
+      const affectedWells = getEntireWellSelection(
+        wellName,
+        labwareDef.ordering,
+        nozzleConfiguration,
+        primaryNozzle,
+        channels
+      )
+      acc[wellName] = { isAccessible: isSafe, affectedWells }
+      return acc
+    }, {})
+  }, [
+    pipetteSpecs,
+    nozzleConfiguration,
+    labwareDef,
+    channels,
+    primaryNozzle,
+    robotState,
+    invariantContext,
+    pipetteId,
+    labwareId,
+    tiprackId,
+    allWells,
+  ])
+
+  // propogate each primary's status to all its cascading wells
+  // accessible primaries take precedence so a cascading well covered by both
+  // an accessible and an inaccessible primary is shown as accessible
+  const wellToPrimaryStatus = Object.entries(
+    primaryWellAccessibilityByWellName
+  ).reduce<Record<string, { isAccessible: boolean; affectedWells: string[] }>>(
+    (acc, [, status]) => {
+      status.affectedWells.forEach(well => {
+        const existing = acc[well]
+        if (
+          existing == null ||
+          (!existing.isAccessible && status.isAccessible)
+        ) {
+          acc[well] = status
+        }
+      })
+      return acc
+    },
+    {}
   )
+
   const allWellsWithState = allWells
     .flat()
     .reduce<Record<string, WellType>>((acc, wellName) => {
-      const accessible = allWellsWithStatus[wellName] === 0
+      const accessible = wellToPrimaryStatus[wellName]?.isAccessible ?? false
 
       if (hoveredWells?.includes(wellName) && !accessible) {
         acc[wellName] = SELECTED_ERROR
@@ -233,21 +350,24 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       }
       return acc
     }, {})
-  const inaccessiblePartialWells = useMemo(
-    () => {
-      if (!isPartialNozzle || selectedWells.length === 0) return []
+  const inaccessiblePartialWells = useMemo(() => {
+    if (!isPartialNozzle || selectedWells.length === 0) {
+      return []
+    }
 
-      return getInaccessibleWellsForPartialNozzleRowMap(
-        selectedWells,
-        labwareDef.ordering,
-        allWellsWithState,
-        PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
-      )
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedWells, isPartialNozzle, primaryNozzle, labwareDef.ordering]
-  )
+    return getInaccessibleWellsForPartialNozzleRowMap(
+      selectedWells,
+      labwareDef.ordering,
+      allWellsWithState,
+      PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
+    )
+  }, [
+    selectedWells,
+    isPartialNozzle,
+    primaryNozzle,
+    labwareDef.ordering,
+    allWellsWithState,
+  ])
 
   const deckDef = getDeckDefFromRobotType(robotType)
   const viewBox = getViewboxFromSelectedLabware(
@@ -280,7 +400,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     }
     return highlightedWells
   }
-
   const handleSelectionMove: (e: MouseEvent, rect: GenericRect) => void = (
     e,
     rect
@@ -305,7 +424,6 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         const allAlreadySelected = wellsUnderRect.every(group =>
           group.every(well => selectedFlat.has(well))
         )
-
         let updated: string[][]
         // Remove all wells if the entire selection is already selected
         if (allAlreadySelected) {
@@ -320,7 +438,12 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
               wellGroup => wellGroup[0] === primaryWellInGroup
             )
             // Add to update list if the well does not currently exist in the list and is accessible
-            if (!exists && allWellsWithStatus[primaryWellInGroup] !== 1) {
+            if (
+              !exists &&
+              (primaryWellAccessibilityByWellName[primaryWellInGroup]
+                ?.isAccessible ??
+                false)
+            ) {
               updated.push(wellGroup)
             }
           })
@@ -371,16 +494,17 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   let controls: JSX.Element = <></>
   const modulesOnDeck = deckSetup.modules
   const moduleIds = new Set(Object.keys(modulesOnDeck))
-  const moduleLocation = labware.stack.find(loc => moduleIds.has(loc))
 
-  const moduleDef = moduleLocation
-    ? getModuleDef(modulesOnDeck[moduleLocation].model)
-    : null
-  const isLabwareOnModule = moduleDef !== null
   const defaultSlotPosition: [number, number, number] = [0, 0, 0]
 
   if (labware && robotState) {
     const activeLabware = robotState.labware[labwareId]
+    const moduleLocation =
+      activeLabware.stack.find(loc => moduleIds.has(loc)) ?? null
+    const isLabwareOnModule = moduleLocation !== null
+    const moduleDef = moduleLocation
+      ? getModuleDef(modulesOnDeck[moduleLocation].model)
+      : null
     const slot = getSlotInLocationStack(activeLabware.stack)
     const slotPosition =
       getPositionFromSlotId(slot, deckDef) ?? defaultSlotPosition

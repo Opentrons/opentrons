@@ -103,4 +103,15 @@ describe('ChooseNumber', () => {
     fireEvent.click(screen.getAllByRole('button')[0])
     expect(mockMakeSnackbar).toHaveBeenCalledWith('Value must be in range')
   })
+
+  it('should delete external keyboard input with the numerical keyboard', () => {
+    props = { ...props, parameter: mockFloatNumberParameterData }
+    render(props)
+    const input = screen.getByLabelText('EtoH Volume')
+
+    fireEvent.change(input, { target: { value: '12' } })
+    fireEvent.click(screen.getByRole('button', { name: 'del' }))
+
+    expect(input).toHaveValue('1')
+  })
 })

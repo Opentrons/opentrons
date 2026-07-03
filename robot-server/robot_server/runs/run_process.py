@@ -27,13 +27,11 @@ from opentrons.protocol_engine import (
     DeckType,
     ErrorOccurrence,
     StateSummary,
-    error_recovery_policy,
 )
 from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
 )
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
 from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
@@ -58,13 +56,13 @@ from opentrons.protocol_runner.protocol_runner import RunResult
 from opentrons.protocol_runner.run_coordinator import AbstractRunCoordinator, ParseMode
 from opentrons.protocol_runner.run_orchestrator import RunOrchestrator
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
-from opentrons.types import NozzleMapInterface
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
     serpent_enum_registration,
 )
 from opentrons.util.pyro.pyro_synchronous_adapter import (
     convert_result_to_proxy,
+    convert_result_to_wrapped_dict,
     pyro_behavior,
 )
 from opentrons_shared_data.labware.labware_definition import (
@@ -76,6 +74,10 @@ from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
 from robot_server.protocols.protocol_store import ProtocolResource
+from robot_server.runs.error_recovery_mapping import (
+    create_error_recovery_policy_from_rules,
+)
+from robot_server.runs.error_recovery_models import ErrorRecoveryRule
 from robot_server.service.pyro_utils.pyro_resource import RobotServerPyroResource
 from robot_server.service.pyro_utils.resource_utilities import get_pyro_resource
 from robot_server.service.pyro_utils.serpent_type_registry import (
@@ -107,6 +109,7 @@ def register_process_types() -> None:
         CommandErrorSlice,
         CommandPointer,
         CommandAnnotationsSlice,
+        ErrorRecoveryRule,
         LabwareDefinition2,
         LabwareDefinition3,
         LabwareOffset,
@@ -117,6 +120,7 @@ def register_process_types() -> None:
         ProtocolResource,
         RunResult,
         StateSummary,
+        FlexStackerSubState,
     ]:
         OpentronsPyroSerializer.register_pydantic_model(pydantic_model)  # type: ignore[arg-type]
     for rtp in get_args(RunTimeParameter):
@@ -165,7 +169,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
             event: HardwareEvent,
         ) -> None:
             if self._run_orchestrator is not None:
-                self._run_orchestrator._protocol_engine._door_watcher._handle_hardware_door_event(
+                self._run_orchestrator._protocol_engine._door_watcher._handle_proxy_hardware_door_event(
                     event
                 )
 
@@ -186,8 +190,8 @@ class DirectedRunProcess(AbstractRunCoordinator):
         self,
         run_id: str,
         labware_offsets: Sequence[LabwareOffsetCreate | LegacyLabwareOffsetCreate],
-        # TODO include this
-        # initial_error_recovery_policy: error_recovery_policy.ErrorRecoveryPolicy,
+        error_recovery_rules: List[ErrorRecoveryRule],
+        error_recovery_is_enabled: bool,
         protocol: Optional[ProtocolResource],
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
         run_time_param_paths: Optional[CSVRuntimeParamPaths] = None,
@@ -203,6 +207,10 @@ class DirectedRunProcess(AbstractRunCoordinator):
         else:
             load_fixed_trash = False
 
+        error_recovery_policy = create_error_recovery_policy_from_rules(
+            error_recovery_rules, error_recovery_is_enabled
+        )
+
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
@@ -212,8 +220,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
                     RobotTypeEnum.robot_literal_to_enum(self._robot_type)
                 ),
             ),
-            # TODO stop hardcoding this at some point
-            error_recovery_policy=error_recovery_policy.never_recover,
+            error_recovery_policy=error_recovery_policy,
             load_fixed_trash=load_fixed_trash,
             deck_configuration=await self._robot_server_resource.get_deck_configuration(),
             file_provider=self._robot_server_resource.get_file_provider(),
@@ -542,19 +549,28 @@ class DirectedRunProcess(AbstractRunCoordinator):
         """Get engine deck type."""
         return self._deck_type
 
-    def get_nozzle_maps(self) -> Mapping[str, NozzleMapInterface]:
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
+    def get_nozzle_maps(self) -> Mapping[str, NozzleMap]:
         """Get current nozzle maps keyed by pipette id."""
-        return self._guaranteed_run_orchestrator.get_nozzle_maps()
+        # NOTE: For the sake of Pyro compatibility this method returns NozzleMap, a serializable type
+        return self._guaranteed_run_orchestrator.get_nozzle_maps()  # type: ignore
 
     def get_tip_attached(self) -> Dict[str, bool]:
         """Get current tip state keyed by pipette id."""
         return self._guaranteed_run_orchestrator.get_tip_attached()
 
-    # TODO figure out how to serialize this
-    def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
+    def set_error_recovery_policy(
+        self,
+        error_recovery_rules: List[ErrorRecoveryRule],
+        error_recovery_is_enabled: bool,
+    ) -> None:
         """Create error recovery policy for the run."""
+        policy = create_error_recovery_policy_from_rules(
+            error_recovery_rules, error_recovery_is_enabled
+        )
         self._guaranteed_run_orchestrator.set_error_recovery_policy(policy)
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
         """Get current (if any) Flex Stacker Substates keyed by module id."""
         return self._guaranteed_run_orchestrator.get_flex_stacker_substate()

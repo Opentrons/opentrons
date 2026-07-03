@@ -5,12 +5,12 @@ from typing import Optional
 
 from opentrons.hardware_control.ot3api import OT3API
 
-from hardware_testing.opentrons_api import types
+from opentrons.hardware_control.types import OT3Mount
 from hardware_testing.opentrons_api import helpers_ot3
 from opentrons_hardware.hardware_control.motion_planning import move_utils
 
 
-async def _exercise_pipette(api: OT3API, mount: types.OT3Mount) -> None:
+async def _exercise_pipette(api: OT3API, mount: OT3Mount) -> None:
     while True:
         msg = (
             '"t"=tip pickup/drop, "a"=aspirate, '
@@ -62,15 +62,13 @@ async def _exercise_gripper(api: OT3API) -> None:
             print(f"unexpected input: {inp}")
 
 
-async def _main(
-    is_simulating: bool, mount: types.OT3Mount, speed: Optional[float]
-) -> None:
+async def _main(is_simulating: bool, mount: OT3Mount, speed: Optional[float]) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.home()
     move_utils.MINIMUM_DISPLACEMENT = 0.009
     while True:
         await helpers_ot3.jog_mount_ot3(api, mount, speed=speed)
-        if mount == types.OT3Mount.GRIPPER:
+        if mount == OT3Mount.GRIPPER:
             await _exercise_gripper(api)
         else:
             await _exercise_pipette(api, mount)
@@ -78,9 +76,9 @@ async def _main(
 
 if __name__ == "__main__":
     mount_options = {
-        "left": types.OT3Mount.LEFT,
-        "right": types.OT3Mount.RIGHT,
-        "gripper": types.OT3Mount.GRIPPER,
+        "left": OT3Mount.LEFT,
+        "right": OT3Mount.RIGHT,
+        "gripper": OT3Mount.GRIPPER,
     }
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")

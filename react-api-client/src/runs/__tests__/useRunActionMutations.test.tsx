@@ -11,6 +11,7 @@ import {
   useStopRunMutation,
 } from '..'
 import { RUN_ID_1 } from '../__fixtures__'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 
 import type * as React from 'react'
 import type {
@@ -73,9 +74,16 @@ describe('useRunActionMutations hook', () => {
         mockResumeRunFromRecoveryAssumingFalsePositive,
     } as unknown as UseResumeRunFromRecoveryAssumingFalsePositiveMutationResult)
 
-    const { result } = renderHook(() => useRunActionMutations(RUN_ID_1), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useRunActionMutations(
+          RUN_ID_1,
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+        ),
+      {
+        wrapper,
+      }
+    )
 
     act(() => result.current.playRun())
     expect(mockPlayRun).toHaveBeenCalledTimes(1)

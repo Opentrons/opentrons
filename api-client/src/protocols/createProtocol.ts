@@ -39,5 +39,7 @@ export function createProtocol(
     )
   }
 
-  return request<Protocol, FormData>(POST, '/protocols', formData, config)
+  return request<Protocol, FormData>(POST, '/protocols', config, {
+    body: formData,
+  })
 }

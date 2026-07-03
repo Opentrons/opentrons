@@ -30,8 +30,8 @@ class LandingPage(BasePage):
         self.dismiss_release_notes_toast()
 
     def click_create_protocol(self) -> None:
-        """Click the 'Create a protocol' button."""
-        self.click_button("Create a protocol")
+        """Click the 'Create a Flex protocol' button."""
+        self.click_button("Create a Flex protocol")
 
     def click_import_existing_protocol(self) -> None:
         """Click the 'Import existing protocol' button."""

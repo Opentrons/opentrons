@@ -8,5 +8,5 @@ export function getSession(
   config: HostConfig,
   sessionId: string
 ): ResponsePromise<Session> {
-  return request<Session>(GET, `/sessions/${sessionId}`, null, config)
+  return request<Session>(GET, `/sessions/${sessionId}`, config)
 }

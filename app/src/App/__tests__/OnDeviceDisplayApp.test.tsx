@@ -9,6 +9,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { Account } from '/app/pages/ODD/Account'
 import { ChooseLanguage } from '/app/pages/ODD/ChooseLanguage'
 import { ConnectViaEthernet } from '/app/pages/ODD/ConnectViaEthernet'
 import { ConnectViaUSB } from '/app/pages/ODD/ConnectViaUSB'
@@ -16,12 +17,12 @@ import { ConnectViaWifi } from '/app/pages/ODD/ConnectViaWifi'
 import { DeckConfigurationEditor } from '/app/pages/ODD/DeckConfiguration'
 import { EmergencyStop } from '/app/pages/ODD/EmergencyStop'
 import { InstrumentsDashboard } from '/app/pages/ODD/InstrumentsDashboard'
-import { NameRobot } from '/app/pages/ODD/NameRobot'
 import { NetworkSetupMenu } from '/app/pages/ODD/NetworkSetupMenu'
 import { ProtocolDashboard } from '/app/pages/ODD/ProtocolDashboard'
 import { ProtocolDetails } from '/app/pages/ODD/ProtocolDetails'
 import { ProtocolSetup } from '/app/pages/ODD/ProtocolSetup'
 import { RobotDashboard } from '/app/pages/ODD/RobotDashboard'
+import { RobotNameEditor } from '/app/pages/ODD/RobotNameEditor'
 import { RobotSettingsDashboard } from '/app/pages/ODD/RobotSettingsDashboard'
 import { RunningProtocol } from '/app/pages/ODD/RunningProtocol'
 import { RunSummary } from '/app/pages/ODD/RunSummary'
@@ -34,12 +35,15 @@ import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
 import { LocalizationProvider } from '../../LocalizationProvider'
 import { LoggedOutOverlay } from '../../molecules/LoggedOutOverlay'
-import { useProtocolReceiptToast, useScrollRef } from '../hooks'
+import { useScrollRef } from '../hooks/useModuleAttachedToast'
+import { useProtocolReceiptToast } from '../hooks/useProtocolReceiptToast'
 import { ODDTopLevelRedirects } from '../ODDTopLevelRedirects'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
 
+import type { HostConfig } from '@opentrons/api-client'
 import type * as ReactApiClient from '@opentrons/react-api-client'
 import type { OnDeviceDisplaySettings } from '/app/redux/config/schema-types'
+import type { State } from '/app/redux/types'
 import type { LocalizationProviderProps } from '../../LocalizationProvider'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
@@ -57,6 +61,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   }
 })
 vi.mock('../../LocalizationProvider')
+vi.mock('/app/pages/ODD/Account')
 vi.mock('/app/pages/ODD/Welcome')
 vi.mock('/app/pages/ODD/NetworkSetupMenu')
 vi.mock('/app/pages/ODD/ChooseLanguage')
@@ -71,7 +76,7 @@ vi.mock('/app/pages/ODD/ProtocolDetails')
 vi.mock('/app/pages/ODD/InstrumentsDashboard')
 vi.mock('/app/pages/ODD/RunningProtocol')
 vi.mock('/app/pages/ODD/RunSummary')
-vi.mock('/app/pages/ODD/NameRobot')
+vi.mock('/app/pages/ODD/RobotNameEditor')
 vi.mock('/app/pages/ODD/EmergencyStop')
 vi.mock('/app/pages/ODD/DeckConfiguration')
 vi.mock('/app/redux/config')
@@ -79,7 +84,9 @@ vi.mock('/app/redux/shell')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/resources/maintenance_runs')
 vi.mock('/app/organisms/ModuleWizardFlows')
-vi.mock('../hooks')
+vi.mock('../hooks/useModuleAttachedToast')
+vi.mock('../hooks/useProtocolReceiptToast')
+vi.mock('../hooks/useSoftwareUpdatePoll')
 vi.mock('../ODDTopLevelRedirects')
 vi.mock('../../molecules/LoggedOutOverlay')
 
@@ -91,11 +98,16 @@ const mockSettings = {
 } as OnDeviceDisplaySettings
 
 const render = (path = '/') => {
-  return renderWithProviders(
+  return renderWithProviders<State>(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
       <OnDeviceDisplayApp />
     </MemoryRouter>,
-    { i18nInstance: i18n }
+    {
+      initialState: {
+        robotAuth: { mostRecentRobotName: null, perRobotAuthStates: {} },
+      } satisfies Partial<State> as State,
+      i18nInstance: i18n,
+    }
   )
 }
 
@@ -165,6 +177,10 @@ describe('OnDeviceDisplayApp', () => {
     render('/dashboard')
     expect(vi.mocked(RobotDashboard)).toHaveBeenCalled()
   })
+  it('renders Account component from /account', () => {
+    render('/account')
+    expect(vi.mocked(Account)).toHaveBeenCalled()
+  })
   it('renders ProtocolDashboard component from /protocols', () => {
     render('/protocols')
     expect(vi.mocked(ProtocolDashboard)).toHaveBeenCalled()
@@ -214,11 +230,23 @@ describe('OnDeviceDisplayApp', () => {
   })
   it('renders DeckConfiguration component from /deck-configuration', () => {
     render('/robot-settings/rename-robot')
-    expect(vi.mocked(NameRobot)).toHaveBeenCalled()
+    expect(vi.mocked(RobotNameEditor)).toHaveBeenCalled()
   })
   it('renders protocol receipt toasts', () => {
     render('/')
     expect(vi.mocked(useProtocolReceiptToast)).toHaveBeenCalled()
+  })
+  it('passes ODD ip to robot settings and access-control queries', () => {
+    render('/')
+    const expectedHostConfig: HostConfig = { hostname: _ODD_IP_ ?? 'localhost' }
+    expect(vi.mocked(useRobotSettingsQuery)).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining(expectedHostConfig)
+    )
+    expect(vi.mocked(useAccessControlEnabledQuery)).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining(expectedHostConfig)
+    )
   })
   it('renders TopLevelRedirects when it should conditionally render', () => {
     vi.mocked(ODDTopLevelRedirects).mockReturnValue(<div>MOCK_REDIRECTS</div>)

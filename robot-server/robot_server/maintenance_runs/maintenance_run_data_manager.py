@@ -3,6 +3,9 @@
 from datetime import datetime
 from typing import Callable, Optional, Sequence
 
+from opentrons.config import (
+    feature_flags as ff,
+)
 from opentrons.protocol_engine import (
     Command,
     CommandPointer,
@@ -22,6 +25,7 @@ from opentrons.system import camera
 from .maintenance_run_models import MaintenanceRun, MaintenanceRunNotFoundError
 from .maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
 from robot_server.service.notifications import MaintenanceRunsPublisher
+from robot_server.service.pyro_utils.resource_utilities import get_pyro_resource
 
 
 def _build_run(
@@ -36,6 +40,7 @@ def _build_run(
         labwareOffsets=[],
         pipettes=[],
         modules=[],
+        peripherals=[],
         liquids=[],
         wells=[],
         files=[],
@@ -113,12 +118,20 @@ class MaintenanceRunDataManager:
         if self._run_orchestrator_store.current_run_id is not None:
             await self._run_orchestrator_store.clear()
 
+        proxy_door_callback = None
+        if ff.hardware_subprocess_enabled():
+            pyro_resource = get_pyro_resource()
+            proxy_door_callback = (
+                pyro_resource.get_maintenance_run_door_watcher_callback()
+            )
+
         state_summary = await self._run_orchestrator_store.create(
             run_id=run_id,
             created_at=created_at,
             labware_offsets=labware_offsets,
             deck_configuration=deck_configuration,
             notify_publishers=notify_publishers,
+            proxy_of_callback_for_handling_door_events=proxy_door_callback,
         )
 
         await camera.update_live_stream_status(

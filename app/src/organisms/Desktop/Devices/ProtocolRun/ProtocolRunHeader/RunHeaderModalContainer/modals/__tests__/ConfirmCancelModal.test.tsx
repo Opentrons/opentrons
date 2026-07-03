@@ -13,6 +13,7 @@ import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useTrackEvent } from '/app/redux/analytics'
@@ -32,6 +33,9 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux-resources/analytics')
 vi.mock('/app/redux-resources/robots')
+vi.mock('/app/local-resources/access-control/useGuardedAction', () => ({
+  useGuardedAction: vi.fn(() => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+}))
 
 const render = (props: ComponentProps<typeof ConfirmCancelModal>) => {
   return renderWithProviders(<ConfirmCancelModal {...props} />, {

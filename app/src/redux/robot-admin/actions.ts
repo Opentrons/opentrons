@@ -28,6 +28,33 @@ export const restartRobotFailure = (
   meta,
 })
 
+export const shutdownRobot = (
+  robotName: string
+): Types.ShutdownRobotAction => ({
+  type: Constants.SHUTDOWN,
+  payload: { robotName },
+  meta: { robot: true },
+})
+
+export const shutdownRobotSuccess = (
+  robotName: string,
+  meta: RobotApiRequestMeta | {}
+): Types.ShutdownRobotSuccessAction => ({
+  type: Constants.SHUTDOWN_SUCCESS,
+  payload: { robotName },
+  meta,
+})
+
+export const shutdownRobotFailure = (
+  robotName: string,
+  error: {},
+  meta: RobotApiRequestMeta
+): Types.ShutdownRobotFailureAction => ({
+  type: Constants.SHUTDOWN_FAILURE,
+  payload: { robotName, error },
+  meta,
+})
+
 export const fetchResetConfigOptions = (
   robotName: string
 ): Types.FetchResetConfigOptionsAction => ({

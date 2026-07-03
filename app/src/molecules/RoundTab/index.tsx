@@ -62,6 +62,7 @@ interface RoundTabProps {
   tabDisabledReason?: string
   to: string
   tabName: string
+  end?: boolean
 }
 
 export function RoundTab({
@@ -69,6 +70,7 @@ export function RoundTab({
   tabDisabledReason,
   to,
   tabName,
+  end,
 }: RoundTabProps): JSX.Element {
   const [targetProps, tooltipProps] = useHoverTooltip()
   return disabled ? (
@@ -81,7 +83,7 @@ export function RoundTab({
       ) : null}
     </>
   ) : (
-    <RoundNavLink to={to} replace>
+    <RoundNavLink to={to} replace end={end}>
       {tabName}
     </RoundNavLink>
   )

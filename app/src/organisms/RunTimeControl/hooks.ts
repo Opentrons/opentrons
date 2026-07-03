@@ -30,6 +30,7 @@ export function useRunControls(
   runId: string | null,
   onCloneRunSuccess?: (createRunResponse: Run) => unknown
 ): RunControls {
+  // TODO (jj): popup doc modal in desktop app
   const {
     playRun,
     pauseRun,
@@ -39,7 +40,10 @@ export function useRunControls(
     isPauseRunActionLoading,
     isStopRunActionLoading,
     isResumeRunFromRecoveryActionLoading,
-  } = useRunActionMutations(runId!)
+  } = useRunActionMutations(runId!, {
+    isLoading: false,
+    accessControlEnabled: false,
+  })
 
   const {
     cloneRun,

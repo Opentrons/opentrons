@@ -11,7 +11,7 @@ Space is a valuable commodity in almost every lab. Your Flex is going to need so
 
 - **Bench surface:** Stationary, sturdy, level, water-resistant surface. Tables or benches with wheels (even locking wheels) are not recommended. Flex moves quickly and has a lot of mass, which can shake or imbalance lightweight or movable tables.
 
-- **Weight bearing:** The robot alone weighs 88.5 kg (195 lb) and should only be lifted by two people working together. Place the robot on a surface that can readily support its weight plus the weight of any modules, labware, liquids, or other lab equipment to be used in your applications.
+- **Weight bearing:** The robot weighs 88.5 kg (195 lb). Moving or lifting it requires a team with sufficient personnel to ensure safe handling. Place the robot on a surface that can readily support its weight plus the weight of any modules, labware, liquids, or other lab equipment to be used in your applications.
 
 - **Operating space:** The robot's base dimensions are 87 cm W x 69 cm D x 84 cm H (about 34" x 27" x 33"). Flex needs 20 cm (8") of side and back clearance for cables, USB connections, and to dissipate exhaust from modules that heat and cool.
 

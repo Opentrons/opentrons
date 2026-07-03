@@ -104,7 +104,7 @@ describe('ProtocolOverflowMenu', () => {
       'This protocol will be moved to this computer’s trash and may be unrecoverable.'
     )
     screen.getByRole('button', { name: 'Yes, delete protocol' })
-    screen.getByRole('button', { name: 'cancel' })
+    screen.getByRole('button', { name: 'Cancel' })
   })
 
   it('should call delete function when clicking yes button', () => {
@@ -126,7 +126,7 @@ describe('ProtocolOverflowMenu', () => {
     fireEvent.click(button)
     const deleteButton = screen.getByText('Delete')
     fireEvent.click(deleteButton)
-    const cancelButton = screen.getByRole('button', { name: 'cancel' })
+    const cancelButton = screen.getByRole('button', { name: 'Cancel' })
     fireEvent.click(cancelButton)
     expect(screen.queryByText('Delete this protocol?')).not.toBeInTheDocument()
   })

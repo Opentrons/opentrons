@@ -8,7 +8,6 @@ import {
   OVERFLOW_AUTO,
   POSITION_RELATIVE,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { LocalizationProvider } from '/app/LocalizationProvider'
 // eslint-disable-next-line opentrons/no-imports-across-applications
@@ -17,10 +16,8 @@ import { CameraPhotoViewer } from '/app/pages/Desktop/CameraPhotoViewer'
 import { LivestreamViewer } from '/app/pages/Desktop/LivestreamViewer'
 // eslint-disable-next-line opentrons/no-imports-across-applications
 import { StepDetailViewer } from '/app/pages/Desktop/StepDetailViewer'
-import { useRobot } from '/app/redux-resources/robots'
-import { OPENTRONS_USB } from '/app/redux/discovery'
-import { appShellRequestor } from '/app/redux/shell/remote'
 
+import { ApiHostProvider } from '../local-resources/api-host-provider/ApiHostProvider'
 import { SecondaryWindowAppFallback } from './SecondaryWindowAppFallback'
 import { ReactQueryDevtools } from './tools'
 
@@ -97,15 +94,6 @@ function HostProvider({ children }: HostProviderProps): JSX.Element | null {
   const deviceRouteMatch = useMatch('/devices/:robotName/*')
   const params = deviceRouteMatch?.params
   const robotName = params?.robotName ?? null
-  const robot = useRobot(robotName)
 
-  return (
-    <ApiHostProvider
-      key={robot?.name}
-      hostname={robot?.ip ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
-    >
-      {children}
-    </ApiHostProvider>
-  )
+  return <ApiHostProvider robotName={robotName}>{children}</ApiHostProvider>
 }

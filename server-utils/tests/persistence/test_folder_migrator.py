@@ -104,7 +104,7 @@ def test_migration_chain_from_scratch(tmp_path: Path) -> None:
     result = subject.migrate_to_latest()
 
     assert result == tmp_path / "c_dir"
-    assert {child.name for child in tmp_path.iterdir()} == {"initial_file", "c_dir"}
+    assert _children(tmp_path) == {"initial_file", "c_dir"}
     assert (tmp_path / "c_dir" / "c_file").exists()
 
 
@@ -148,7 +148,7 @@ def test_migration_chain_from_intermediate(tmp_path: Path) -> None:
     result = subject.migrate_to_latest()
 
     assert result == tmp_path / "c_dir"
-    assert {child.name for child in tmp_path.iterdir()} == {
+    assert _children(tmp_path) == {
         "initial_file",
         "a_dir",
         "c_dir",
@@ -157,9 +157,11 @@ def test_migration_chain_from_intermediate(tmp_path: Path) -> None:
 
 
 def test_aborted_intermediate_migration(tmp_path: Path) -> None:
-    """It should clean up gracefully from exceptions in intermediate migration steps.
+    """It should gracefully handle exceptions in intermediate migration steps.
 
     The directory should be left as it was before the migration started.
+    It's allowed to be polluted with some new temp files,
+    but only if they're marked as such so they can be deleted later.
     """
 
     class MigrationA(Migration):
@@ -178,6 +180,7 @@ def test_aborted_intermediate_migration(tmp_path: Path) -> None:
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
             assert False, "This should never run."
 
+    temp_prefix = "test-temp-prefix"
     subject = MigrationOrchestrator(
         root=tmp_path,
         migrations=[
@@ -186,7 +189,7 @@ def test_aborted_intermediate_migration(tmp_path: Path) -> None:
             MigrationC("c_dir"),
             MigrationD("d_dir"),
         ],
-        temp_file_prefix="temp",
+        temp_file_prefix=temp_prefix,
     )
 
     (tmp_path / "a_dir").mkdir()
@@ -195,6 +198,12 @@ def test_aborted_intermediate_migration(tmp_path: Path) -> None:
     with pytest.raises(RuntimeError, match="oy vey"):
         subject.migrate_to_latest()
 
+    result_non_temp_children = {
+        child for child in _children(tmp_path) if not child.startswith(temp_prefix)
+    }
+    assert result_non_temp_children == initial_children
+
+    subject.clean_up_stray_temp_files()
     assert _children(tmp_path) == initial_children
 
 
@@ -202,6 +211,8 @@ def test_aborted_final_migration(tmp_path: Path) -> None:
     """It should clean up gracefully from exceptions in the final migration step.
 
     The directory should be left as it was before the migration started.
+    It's allowed to be polluted with some new temp files,
+    but only if they're marked as such so they can be deleted later.
     """
 
     class MigrationA(Migration):
@@ -216,6 +227,7 @@ def test_aborted_final_migration(tmp_path: Path) -> None:
         def migrate(self, source_dir: Path, dest_dir: Path) -> None:
             raise RuntimeError("oy vey")
 
+    temp_prefix = "test-temp-prefix"
     subject = MigrationOrchestrator(
         root=tmp_path,
         migrations=[
@@ -223,7 +235,7 @@ def test_aborted_final_migration(tmp_path: Path) -> None:
             MigrationB("b_dir"),
             MigrationC("c_dir"),
         ],
-        temp_file_prefix="temp",
+        temp_file_prefix=temp_prefix,
     )
 
     (tmp_path / "a_dir").mkdir()
@@ -232,6 +244,12 @@ def test_aborted_final_migration(tmp_path: Path) -> None:
     with pytest.raises(RuntimeError, match="oy vey"):
         subject.migrate_to_latest()
 
+    result_non_temp_children = {
+        child for child in _children(tmp_path) if not child.startswith(temp_prefix)
+    }
+    assert result_non_temp_children == initial_children
+
+    subject.clean_up_stray_temp_files()
     assert _children(tmp_path) == initial_children
 
 

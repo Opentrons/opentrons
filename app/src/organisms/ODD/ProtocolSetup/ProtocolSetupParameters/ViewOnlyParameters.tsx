@@ -1,18 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
-import {
-  ALIGN_CENTER,
-  BORDERS,
-  Chip,
-  COLORS,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  Flex,
-  LegacyStyledText,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { Chip, COLORS, StyledText } from '@opentrons/components'
 import {
   formatRunTimeParameterValue,
   sortRuntimeParameters,
@@ -21,6 +9,8 @@ import {
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
+
+import styles from './viewonlyparameters.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { SetupScreens } from '../types'
@@ -44,7 +34,7 @@ export function ViewOnlyParameters({
   const parameters = mostRecentAnalysis?.runTimeParameters ?? []
 
   return (
-    <>
+    <div className={styles.screen}>
       <ChildNavigation
         header={t('parameters')}
         onClickBack={() => {
@@ -55,50 +45,36 @@ export function ViewOnlyParameters({
           heading: t('values_are_view_only'),
         }}
       />
-      <Flex
-        marginTop="7.75rem"
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing8}
-        paddingX={SPACING.spacing8}
-      >
-        <Flex
-          gridGap={SPACING.spacing8}
-          color={COLORS.grey60}
-          fontSize={TYPOGRAPHY.fontSize20}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          lineHeight={TYPOGRAPHY.lineHeight24}
-        >
-          <LegacyStyledText paddingLeft={SPACING.spacing16} width="50%">
-            {t('name')}
-          </LegacyStyledText>
-          <LegacyStyledText>{t('value')}</LegacyStyledText>
-        </Flex>
+      <div className={styles.content_container}>
+        <div className={styles.header_container}>
+          <div className={styles.header_name}>
+            <StyledText oddStyle="smallBodyTextSemiBold" color={COLORS.grey60}>
+              {t('name')}
+            </StyledText>
+          </div>
+          <StyledText oddStyle="smallBodyTextSemiBold" color={COLORS.grey60}>
+            {t('value')}
+          </StyledText>
+        </div>
         {sortRuntimeParameters(parameters).map((parameter, index) => {
           return (
-            <Flex
+            <div
               onClick={handleOnClick}
               key={`${parameter.displayName}_${index}`}
-              alignItems={ALIGN_CENTER}
-              backgroundColor={COLORS.grey35}
-              borderRadius={BORDERS.borderRadius8}
-              padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-              gridGap={SPACING.spacing24}
+              className={styles.parameter_row}
             >
-              <LegacyStyledText
-                width="48%"
-                forwardedAs="p"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              >
-                {parameter.displayName}
-              </LegacyStyledText>
-              <Flex
-                alignItems={ALIGN_CENTER}
-                flexDirection={DIRECTION_ROW}
-                gridGap={SPACING.spacing8}
-              >
-                <LegacyStyledText forwardedAs="p" css={PARAMETER_VALUE_STYLE}>
+              <div className={styles.parameter_name}>
+                <StyledText oddStyle="bodyTextSemiBold">
+                  {parameter.displayName}
+                </StyledText>
+              </div>
+              <div className={styles.parameter_value_container}>
+                <StyledText
+                  oddStyle="bodyTextRegular"
+                  className={styles.parameter_value}
+                >
                   {formatRunTimeParameterValue(parameter, t)}
-                </LegacyStyledText>
+                </StyledText>
                 {parameter.type === 'csv_file' ||
                 parameter.value !== parameter.default ? (
                   <Chip
@@ -109,22 +85,11 @@ export function ViewOnlyParameters({
                     chipSize="small"
                   />
                 ) : null}
-              </Flex>
-            </Flex>
+              </div>
+            </div>
           )
         })}
-      </Flex>
-    </>
+      </div>
+    </div>
   )
 }
-
-const PARAMETER_VALUE_STYLE = css`
-  color: ${COLORS.grey60};
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-wrap: break-word;
-  -webkit-line-clamp: 1;
-  max-width: 15rem;
-`

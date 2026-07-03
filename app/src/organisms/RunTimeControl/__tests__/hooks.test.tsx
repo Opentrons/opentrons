@@ -7,6 +7,7 @@ import '@testing-library/jest-dom/vitest'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { useRunActionMutations } from '@opentrons/react-api-client'
 
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import {
   useCloneRun,
   useCurrentRunId,
@@ -44,19 +45,21 @@ describe('useRunControls hook', () => {
     const mockResumeRunFromRecovery = vi.fn()
     const mockResumeRunFromRecoveryAssumingFalsePositive = vi.fn()
 
-    when(useRunActionMutations).calledWith(mockPausedRun.id).thenReturn({
-      playRun: mockPlayRun,
-      pauseRun: mockPauseRun,
-      stopRun: mockStopRun,
-      resumeRunFromRecovery: mockResumeRunFromRecovery,
-      resumeRunFromRecoveryAssumingFalsePositive:
-        mockResumeRunFromRecoveryAssumingFalsePositive,
-      isPlayRunActionLoading: false,
-      isPauseRunActionLoading: false,
-      isStopRunActionLoading: false,
-      isResumeRunFromRecoveryActionLoading: false,
-      isResumeRunFromRecoveryAssumingFalsePositiveActionLoading: false,
-    })
+    when(useRunActionMutations)
+      .calledWith(mockPausedRun.id, ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE)
+      .thenReturn({
+        playRun: mockPlayRun,
+        pauseRun: mockPauseRun,
+        stopRun: mockStopRun,
+        resumeRunFromRecovery: mockResumeRunFromRecovery,
+        resumeRunFromRecoveryAssumingFalsePositive:
+          mockResumeRunFromRecoveryAssumingFalsePositive,
+        isPlayRunActionLoading: false,
+        isPauseRunActionLoading: false,
+        isStopRunActionLoading: false,
+        isResumeRunFromRecoveryActionLoading: false,
+        isResumeRunFromRecoveryAssumingFalsePositiveActionLoading: false,
+      })
     when(useCloneRun).calledWith(mockPausedRun.id, undefined, true).thenReturn({
       cloneRun: mockCloneRun,
       isCloning: false,

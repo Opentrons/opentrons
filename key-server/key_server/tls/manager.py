@@ -1,14 +1,17 @@
 """tls.manager contains code for managing the robot's TLS stack."""
 
 import asyncio
+import base64
 import logging
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Awaitable, Callable, Final, Literal, Self, Type, cast
 
 from .ca_manager import TLSCAManager
+from .cert_encryption_manager import CertEncryptionManager
 from .cryptography_utils import make_pem_bundle
 from .ee_manager import TLSEEManager
+from .models import CertPassword, OldAndNewEncryptedCert, UnencryptedCert
 from .robot_details.interface import RobotDetails
 
 LOG = logging.getLogger(__name__)
@@ -24,6 +27,7 @@ class TLSManager:
         ca_manager: TLSCAManager,
         ee_manager: TLSEEManager,
         robot_details: RobotDetails,
+        cert_encryption_manager: CertEncryptionManager,
     ) -> None:
         """Build the TLSManager."""
         self._ca_manager = ca_manager
@@ -31,6 +35,7 @@ class TLSManager:
         self._expiry_task: "asyncio.Task[None] | None" = None
         self._robot_details_task: "asyncio.Task[None] | None" = None
         self._robot_details = robot_details
+        self._cert_encryption_manager = cert_encryption_manager
 
     @classmethod
     async def create(
@@ -39,6 +44,8 @@ class TLSManager:
         ca_key_dir: Path,
         tls_ee_dir: Path,
         terminator_reload: Literal["systemd-nginx", "dev-none", "dev-mitmproxy"],
+        cert_password_length_words: int,
+        cert_password_rotation_time_s: int,
         mitmproxy_touch_path: Path | None = None,
     ) -> Self:
         """Create a TLS manager, taking several useful setup steps."""
@@ -71,9 +78,16 @@ class TLSManager:
             robot_ips=robot_ips,
             rotate_fn=rotators[terminator_reload],
         )
+        cert_encryptor = await CertEncryptionManager.create(
+            password_size_words=cert_password_length_words,
+            password_timestep_s=cert_password_rotation_time_s,
+        )
 
         obj = cls(
-            ca_manager=ca_manager, ee_manager=ee_manager, robot_details=robot_details
+            ca_manager=ca_manager,
+            ee_manager=ee_manager,
+            robot_details=robot_details,
+            cert_encryption_manager=cert_encryptor,
         )
         if terminator_reload == "dev-mitmproxy":
             mitm_rotator.set_manager(obj)
@@ -81,6 +95,49 @@ class TLSManager:
         await obj.schedule_expiry_task(cls.EXPIRY_CHECKER_POLL_PERIOD)
         await obj.schedule_robot_details_task()
         return obj
+
+    async def get_current_cert_password(self) -> CertPassword:
+        """Get the currently-valid password for an encrypted certificate."""
+        key = await self._cert_encryption_manager.current_key(
+            datetime.now(timezone.utc)
+        )
+        return CertPassword(
+            password=key.key.password,
+            valid_from_utc=key.first_used_at_discretized,
+            valid_until_utc=key.first_used_at_discretized
+            + self._cert_encryption_manager.key_validity_time,
+        )
+
+    async def get_current_ca_cert_der(self) -> UnencryptedCert:
+        """Get the current CA certificate encoded as plaintext DER."""
+        return UnencryptedCert(
+            cert_data=base64.urlsafe_b64encode(
+                self._ca_manager.get_current_certificate_der_bytes()
+            )
+        )
+
+    async def get_next_ca_cert_der(self) -> UnencryptedCert | None:
+        """Get the next CA certificate (if there is one) encoded as plaintext DER."""
+        cert_bytes = self._ca_manager.get_next_certificate_der_bytes()
+        if not cert_bytes:
+            return None
+        return UnencryptedCert(cert_data=base64.urlsafe_b64encode(cert_bytes))
+
+    async def get_current_ca_cert_encrypted(self) -> OldAndNewEncryptedCert:
+        """Get the current CA certificate as encrypted DER and metadata."""
+        return await self._cert_encryption_manager.encrypt_cert_der_bytes(
+            datetime.now(timezone.utc),
+            self._ca_manager.get_current_certificate_der_bytes(),
+        )
+
+    async def get_next_ca_cert_encrypted(self) -> OldAndNewEncryptedCert | None:
+        """Get the next CA certificate as encrypted DER and metadata."""
+        next_bytes = self._ca_manager.get_next_certificate_der_bytes()
+        if not next_bytes:
+            return None
+        return await self._cert_encryption_manager.encrypt_cert_der_bytes(
+            datetime.now(timezone.utc), next_bytes
+        )
 
     async def teardown(self) -> None:
         """Tear down the TLS manager at the end of a session."""

@@ -103,6 +103,24 @@ class TLSCAManager:
             )
             self.build_next(now)
 
+    def get_current_certificate_der_bytes(self) -> bytes:
+        """Get the currently-valid CA certificate in DER-encoded form.
+
+        This data should not be sent in unencrypted form over an unencrypted connection.
+        """
+        return cryptography_utils.get_cert_bytes_der(self._current_ca.cert)
+
+    def get_next_certificate_der_bytes(self) -> bytes | None:
+        """Get the next valid CA certificate, if there is one, in DER-encoded form.
+
+        This data should not be sent in unencrypted form over an unencrypted connection.
+        """
+        return (
+            cryptography_utils.get_cert_bytes_der(self._next_ca.cert)
+            if self._next_ca
+            else None
+        )
+
     def must_rotate(self, now: datetime) -> bool:
         """True if we need to rotate certificates."""
         must_rotate = self._current_ca.cert.not_valid_after_utc < (

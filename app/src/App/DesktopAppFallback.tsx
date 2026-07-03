@@ -13,7 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { useSentryReport } from '/app/App/hooks'
+import { useSentryReport } from '/app/App/hooks/useSentryReport'
 import { reloadUi } from '/app/redux/shell'
 
 import type { FallbackProps } from 'react-error-boundary'
@@ -32,7 +32,7 @@ export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
   useSentryReport(error)
 
   return (
-    <Modal type="warning" title={t('error_boundary_title')} marginLeft="0">
+    <Modal type="warning" title={t('error_boundary_title')}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           <LegacyStyledText forwardedAs="p">

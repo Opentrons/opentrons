@@ -21,9 +21,7 @@ import {
   LINK_BUTTON_STYLE,
   NAV_BAR_HEIGHT_REM,
 } from '/protocol-designer/components/atoms'
-import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
 import { getFileMetadata } from '/protocol-designer/file-data/selectors'
-import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import {
   END_TERMINAL_ITEM_ID,
   START_TERMINAL_ITEM_ID,
@@ -62,12 +60,6 @@ export function TimelineToolbox({
   const fileMetadata = useSelector(getFileMetadata)
   const navigate = useNavigate()
   const dispatch = useDispatch<ThunkDispatch<any>>()
-  const initialDeckSetup = useSelector(getInitialDeckSetup)
-  const { makeSnackbar } = useKitchen()
-  const { additionalEquipmentOnDeck } = initialDeckSetup
-  const hasTrash = Object.values(additionalEquipmentOnDeck).some(
-    ae => ae.name === 'trashBin' || ae.name === 'wasteChute'
-  )
   const isWidthForBackText = sidebarWidth < SIDEBAR_MIN_WIDTH_FOR_BACK_TEXT
   const protocolName = fileMetadata.protocolName
 
@@ -101,18 +93,14 @@ export function TimelineToolbox({
   )
 
   const handleGoBack = (): void => {
-    if (hasTrash) {
-      navigate('/overview')
-      dispatch(selectTerminalItem(START_TERMINAL_ITEM_ID))
-      dispatch(
-        selectDropdownItem({
-          selection: null,
-          mode: 'clear',
-        })
-      )
-    } else {
-      makeSnackbar(t('starting_deck_state:trash_required') as string)
-    }
+    navigate('/overview')
+    dispatch(selectTerminalItem(START_TERMINAL_ITEM_ID))
+    dispatch(
+      selectDropdownItem({
+        selection: null,
+        mode: 'clear',
+      })
+    )
   }
 
   const name: string =

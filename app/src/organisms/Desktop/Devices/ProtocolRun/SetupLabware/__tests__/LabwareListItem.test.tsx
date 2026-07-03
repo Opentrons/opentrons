@@ -3,7 +3,10 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import { opentrons96PcrAdapterV1 } from '@opentrons/shared-data'
+import {
+  opentrons96PcrAdapterV1,
+  VACUUM_MODULE_TYPE,
+} from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -521,5 +524,25 @@ describe('LabwareListItem', () => {
     screen.getByTestId('RobotInfoLabel_A2')
     screen.getByText('Quantity: 2')
     screen.getByText('Multiple liquid layouts')
+  })
+  it('renders the vacuum module icon for dock labware via moduleTypeOverride', () => {
+    render({
+      stackedItems: [
+        {
+          labwareId: 'dock-labware-id',
+          displayName: 'Filter Plate',
+          definitionUri: 'mockDefUri',
+        },
+      ],
+      slotName: 'A4',
+      extraAttentionModules: [],
+      attachedModuleInfo: {},
+      isFlex: true,
+      onClick: vi.fn(),
+      moduleTypeOverride: VACUUM_MODULE_TYPE,
+    })
+    screen.getByText('Filter Plate')
+    screen.getByTestId('RobotInfoLabel_A4')
+    screen.getByTestId('RobotInfoLabel_ot-vacuum')
   })
 })

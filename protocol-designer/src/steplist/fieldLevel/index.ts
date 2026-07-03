@@ -1,4 +1,7 @@
-import { getTrashBinAddressableAreaName } from '@opentrons/step-generation'
+import {
+  getIsSlotAVacuumDock,
+  getTrashBinAddressableAreaName,
+} from '@opentrons/step-generation'
 
 import { getStagingAreaAddressableAreas } from '../../utils'
 import {
@@ -145,6 +148,8 @@ const getLabwareLocation = (
       )
     }
     return { addressableAreaName }
+  } else if (getIsSlotAVacuumDock(newLocationString)) {
+    return { addressableAreaName: newLocationString as AddressableAreaName }
   } else {
     return { slotName: newLocationString }
   }
@@ -449,6 +454,7 @@ const stepFieldHelperMap = {
   }),
   pressureMbar: stepFieldHelpers({
     maskValue: composeMaskers(maskToSignedDecimal),
+    castValue: numberOrNull,
   }),
 }
 

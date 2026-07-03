@@ -1,21 +1,26 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { useHomeMutation } from '@opentrons/react-api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { home } from '/app/redux/robot-controls'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useLights } from '/app/resources/devices'
 
 import { NavigationMenu } from '../NavigationMenu'
 import { RestartRobotConfirmationModal } from '../RestartRobotConfirmationModal'
+import { ShutdownRobotConfirmationModal } from '../ShutdownRobotConfirmationModal'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
 
+vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/robot-admin')
-vi.mock('/app/redux/robot-controls')
 vi.mock('/app/resources/devices')
+vi.mock('/app/redux-resources/robots')
 vi.mock('../RestartRobotConfirmationModal')
+vi.mock('../ShutdownRobotConfirmationModal')
 
 const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {
@@ -27,6 +32,7 @@ vi.mock('react-router-dom', async importOriginal => {
 })
 
 const mockToggleLights = vi.fn()
+const mockHome = vi.fn()
 
 const render = (props: ComponentProps<typeof NavigationMenu>) => {
   return renderWithProviders(<NavigationMenu {...props} />, {
@@ -46,21 +52,26 @@ describe('NavigationMenu', () => {
       lightsOn: false,
       toggleLights: mockToggleLights,
     })
+    vi.mocked(useHomeMutation).mockReturnValue({ home: mockHome } as any)
+    vi.mocked(useIsFlex).mockReturnValue(true)
     vi.mocked(RestartRobotConfirmationModal).mockReturnValue(
       <div>mock RestartRobotConfirmationModal</div>
+    )
+    vi.mocked(ShutdownRobotConfirmationModal).mockReturnValue(
+      <div>mock ShutdownRobotConfirmationModal</div>
     )
   })
 
   afterEach(() => {
     vi.resetAllMocks()
   })
-  it('should render the home menu item and clicking home gantry, dispatches home and call a mock function', () => {
+  it('should render the home menu item and clicking home gantry, homes the robot and call a mock function', () => {
     render(props)
     fireEvent.click(screen.getByLabelText('BackgroundOverlay_ModalShell'))
     expect(props.onClick).toHaveBeenCalled()
     screen.getByLabelText('reset-position_icon')
     fireEvent.click(screen.getByText('Home gantry'))
-    expect(vi.mocked(home)).toHaveBeenCalled()
+    expect(mockHome).toHaveBeenCalledWith({ target: 'robot' })
     expect(props.setShowNavMenu).toHaveBeenCalled()
   })
 
@@ -70,6 +81,14 @@ describe('NavigationMenu', () => {
     screen.getByLabelText('restart_icon')
     fireEvent.click(restart)
     screen.getByText('mock RestartRobotConfirmationModal')
+  })
+
+  it('should render the turn off robot menu item and clicking it, dispatches turn off robot', () => {
+    render(props)
+    const turnOff = screen.getByText('Turn off robot')
+    screen.getByLabelText('power-off_icon')
+    fireEvent.click(turnOff)
+    screen.getByText('mock ShutdownRobotConfirmationModal')
   })
 
   it('should render the lights menu item with lights off and clicking it, calls useLights', () => {

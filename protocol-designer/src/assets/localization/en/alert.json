@@ -256,9 +256,9 @@
         "title": "Not enough tips arranged correctly to complete action"
       },
       "INSUFFICIENT_TIPS": {
-        "body": "Add another tip rack to your deck or change your tip management during transfer and mix steps.",
+        "body": "Add or move a tip rack on your deck to avoid collisions, or change your tip pickup settings for this action.",
         "link": "Edit starting deck",
-        "title": "Not enough tips to complete action"
+        "title": "Not enough accessible tips"
       },
       "LABWARE_DISCARDED_IN_TRASH": {
         "body": "This step uses labware that has previously been discarded into a trash.",
@@ -325,8 +325,16 @@
         "body": "Picking up labware with the gripper while tips are on an adjacent pipette can cause collisions. Drop tips from all pipettes before this step.",
         "title": "Gripper movement with tips attached"
       },
-      "POSSIBLE_PIPETTE_COLLISION": {
-        "body": "There is a possibility that the pipette will collide with the adjacent labware, modules, or trash fixtures for partial tip pick up.",
+      "POSSIBLE_PIPETTE_COLLISION_ADJACENT_ADDRESSABLE_AREA": {
+        "body": "There is a possibility that the pipette will collide with adjacent items in {{addressableAreaCausingCollisionDisplayName}}.",
+        "title": "Pipette collisions likely"
+      },
+      "POSSIBLE_PIPETTE_COLLISION_OUTSIDE_DECK_EXTENTS": {
+        "body": "There is a possibility that the pipette will move outside the deck extents.",
+        "title": "Pipette collisions likely"
+      },
+      "POSSIBLE_PIPETTE_COLLISION_THERMOCYCLER_LID": {
+        "body": "There is a possibility that the pipette will collide with the Thermocycler lid.",
         "title": "Pipette collisions likely"
       },
       "REMOVE_96_CHANNEL_TIPRACK_ADAPTER": {
@@ -364,6 +372,10 @@
       },
       "TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER": {
         "body": "The Heater-Shaker labware latch will collide with labware over 53 mm. Move labware to a different slot."
+      },
+      "VACUUM_UNDER_PRESSURE": {
+        "body": "Deactivate the pump to move labware to or from it.",
+        "title": "The vacuum module is under pressure."
       }
     },
     "warning": {

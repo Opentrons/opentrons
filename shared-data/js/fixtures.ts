@@ -7,6 +7,7 @@ import {
   FLEX_STACKER_FIXTURES,
   FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES,
   THERMOCYCLER_MODULE_CUTOUTS,
+  VACUUM_MODULE_CUTOUT,
   VACUUM_MODULE_V1,
   WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_FLEX_STACKER_FIXTURES,
@@ -109,6 +110,7 @@ import type {
   CutoutConfig,
   CutoutConfigMap,
   CutoutFixture,
+  DeckConfiguration,
   DeckDefinition,
   DeckDefinitionWithFakes,
   ModuleModel,
@@ -404,6 +406,50 @@ export function getPositionFromSlotId(
       : null
 
   return slotPosition
+}
+
+export function getPositionFromAddressableAreaId(args: {
+  addressableAreaId: AddressableAreaName
+  deckDef: DeckDefinition
+  deckConfiguration: DeckConfiguration
+}): CoordinateTuple | null {
+  const { addressableAreaId, deckDef, deckConfiguration } = args
+
+  for (const cutoutFixture of deckDef.cutoutFixtures) {
+    const match = Object.entries(cutoutFixture.providesAddressableAreas).find(
+      ([_, providedAA]) => providedAA.includes(addressableAreaId)
+    )
+    const isInDeckConfig = deckConfiguration.some(
+      config => config.cutoutFixtureId === cutoutFixture.id
+    )
+    if (match == null) {
+      continue
+    }
+    const [cutoutMatch] = match
+    if (isInDeckConfig) {
+      const addressableAreaOffset = getAAByAAId(
+        addressableAreaId,
+        deckDef
+      ).offsetFromCutoutFixture
+      const cutoutPosition =
+        deckDef.locations.cutouts.find(cutout => cutout.id === cutoutMatch)
+          ?.position ?? null
+      if (cutoutPosition == null) {
+        continue
+      }
+      return [
+        cutoutPosition[0] + addressableAreaOffset[0],
+        cutoutPosition[1] + addressableAreaOffset[1],
+        cutoutPosition[2] + addressableAreaOffset[2],
+      ]
+    }
+  }
+  console.warn('no match found', {
+    addressableAreaId,
+    deckDef,
+    deckConfiguration,
+  })
+  return [0, 0, 0]
 }
 
 export function getAddressableAreaFromSlotId(
@@ -1003,6 +1049,22 @@ export const replaceCutoutFixtureWithComboFixture = (
     if (
       THERMOCYCLER_MODULE_CUTOUTS.includes(cutoutId) &&
       MODULE_FIXTURES_BY_MODEL.thermocyclerModuleV2?.includes(
+        aaCutoutItem.cutoutFixtureId as CutoutFixtureId
+      )
+    ) {
+      return {
+        cutoutFixtureId: getReplacementFixtureForFakeFixture(
+          aaCutoutItem.cutoutFixtureId
+        ) as CutoutFixtureId,
+        cutoutId: aaCutoutItem.cutoutId,
+        opentronsModuleSerialNumber: aaCutoutItem.opentronsModuleSerialNumber,
+      }
+    }
+
+    // Handle vacuum module fixtures
+    if (
+      cutoutId === VACUUM_MODULE_CUTOUT &&
+      MODULE_FIXTURES_BY_MODEL[VACUUM_MODULE_V1]?.includes(
         aaCutoutItem.cutoutFixtureId as CutoutFixtureId
       )
     ) {

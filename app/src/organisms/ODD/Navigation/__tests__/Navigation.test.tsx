@@ -7,6 +7,7 @@ import { i18n } from '/app/i18n'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
+import { useAccountIconInitial } from '/app/resources/access-control/useAccountIconInitial'
 import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
 
 import { Navigation } from '..'
@@ -14,10 +15,11 @@ import { NavigationMenu } from '../NavigationMenu'
 
 import type { ComponentProps } from 'react'
 
+vi.mock('/app/local-resources/dom-utils')
 vi.mock('/app/resources/networking/hooks/useNetworkConnection')
 vi.mock('/app/redux/discovery')
+vi.mock('/app/resources/access-control/useAccountIconInitial')
 vi.mock('../NavigationMenu')
-vi.mock('/app/local-resources/dom-utils')
 
 mockConnectedRobot.name = '12345678901234567'
 
@@ -35,6 +37,9 @@ describe('Navigation', () => {
   beforeEach(() => {
     props = {}
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
+    vi.mocked(useAccountIconInitial).mockReturnValue({
+      showIcon: false,
+    })
     vi.mocked(NavigationMenu).mockReturnValue(<div>mock NavigationMenu</div>)
     vi.mocked(useNetworkConnection).mockReturnValue({
       isEthernetConnected: false,
@@ -92,14 +97,26 @@ describe('Navigation', () => {
     screen.getByText('mock NavigationMenu')
     expect(props.setNavMenuIsOpened).toHaveBeenCalled()
   })
-  it('should change z index of nav bar when longPressModalIsOpened is defined and true', () => {
-    props = {
-      ...props,
-      longPressModalIsOpened: true,
-    }
-    render(props)
-    expect(screen.getByLabelText('Navigation_container')).toHaveStyle({
-      zIndex: 0,
+  describe('account icon', () => {
+    const linkName = 'Account'
+    it('should not render the account control when logged out', () => {
+      vi.mocked(useAccountIconInitial).mockReturnValue({
+        showIcon: false,
+      })
+      render(props)
+      expect(
+        screen.queryByRole('link', { name: linkName })
+      ).not.toBeInTheDocument()
+    })
+    it('should render the account initial and link to the account page when logged in', () => {
+      vi.mocked(useAccountIconInitial).mockReturnValue({
+        showIcon: true,
+        iconContents: 'T',
+      })
+      render(props)
+      const accountLink = screen.getByRole('link', { name: linkName })
+      expect(accountLink).toHaveAttribute('href', '/account')
+      expect(accountLink).toHaveTextContent('T')
     })
   })
 })

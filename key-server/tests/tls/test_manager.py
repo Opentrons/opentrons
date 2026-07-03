@@ -1,6 +1,7 @@
 """Tests for the TLS system manager."""
 
 import asyncio
+import base64
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import AsyncIterator
@@ -31,11 +32,32 @@ def ca_key_dir(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
+def cert_password_length_words() -> int:
+    return 3
+
+
+@pytest.fixture
+def cert_password_rotation_time_s() -> int:
+    return 30
+
+
+@pytest.fixture
 async def subject(
-    ee_dir: Path, ca_cert_dir: Path, ca_key_dir: Path
+    ee_dir: Path,
+    ca_cert_dir: Path,
+    ca_key_dir: Path,
+    cert_password_length_words: int,
+    cert_password_rotation_time_s: int,
 ) -> AsyncIterator[TLSManager]:
     """A TLSManager instance."""
-    manager = await TLSManager.create(ca_cert_dir, ca_key_dir, ee_dir, "dev-none")
+    manager = await TLSManager.create(
+        ca_cert_dir,
+        ca_key_dir,
+        ee_dir,
+        "dev-none",
+        cert_password_length_words,
+        cert_password_rotation_time_s,
+    )
     try:
         yield manager
     finally:
@@ -128,7 +150,11 @@ async def test_robot_details_task_lifetime(subject: TLSManager) -> None:
 
 
 async def test_rotates_ca_while_live(
-    ca_cert_dir: Path, ca_key_dir: Path, ee_dir: Path
+    ca_cert_dir: Path,
+    ca_key_dir: Path,
+    ee_dir: Path,
+    cert_password_length_words: int,
+    cert_password_rotation_time_s: int,
 ) -> None:
     """While the manager is running, if it detects expiry it should rotate CAs."""
     nowish = datetime.now(timezone.utc)
@@ -143,6 +169,8 @@ async def test_rotates_ca_while_live(
         ca_key_dir=ca_key_dir,
         tls_ee_dir=ee_dir,
         terminator_reload="dev-none",
+        cert_password_length_words=cert_password_length_words,
+        cert_password_rotation_time_s=cert_password_rotation_time_s,
     )
     await subject.cancel_expiry_task()
 
@@ -156,7 +184,11 @@ async def test_rotates_ca_while_live(
 
 
 async def test_rotates_tls_while_live(
-    ca_cert_dir: Path, ca_key_dir: Path, ee_dir: Path
+    ca_cert_dir: Path,
+    ca_key_dir: Path,
+    ee_dir: Path,
+    cert_password_length_words: int,
+    cert_password_rotation_time_s: int,
 ) -> None:
     """It should rotate TLS EE certs when they expire."""
     subject = await TLSManager.create(
@@ -164,6 +196,8 @@ async def test_rotates_tls_while_live(
         ca_key_dir=ca_key_dir,
         tls_ee_dir=ee_dir,
         terminator_reload="dev-none",
+        cert_password_length_words=cert_password_length_words,
+        cert_password_rotation_time_s=cert_password_rotation_time_s,
     )
     await subject.cancel_expiry_task()
     subject._ee_manager.EE_EXPIRY_DURATION = timedelta(seconds=3)  # type: ignore[misc]
@@ -179,7 +213,11 @@ async def test_rotates_tls_while_live(
 
 
 async def test_rotates_tls_after_ca(
-    ca_cert_dir: Path, ca_key_dir: Path, ee_dir: Path
+    ca_cert_dir: Path,
+    ca_key_dir: Path,
+    ee_dir: Path,
+    cert_password_length_words: int,
+    cert_password_rotation_time_s: int,
 ) -> None:
     """If the CA rotated, the EE should also."""
     nowish = datetime.now(timezone.utc)
@@ -194,6 +232,8 @@ async def test_rotates_tls_after_ca(
         ca_key_dir=ca_key_dir,
         tls_ee_dir=ee_dir,
         terminator_reload="dev-none",
+        cert_password_length_words=cert_password_length_words,
+        cert_password_rotation_time_s=cert_password_rotation_time_s,
     )
     await subject.cancel_expiry_task()
     subject._ee_manager.EE_EXPIRY_DURATION = timedelta(seconds=5)  # type: ignore[misc]
@@ -247,3 +287,37 @@ async def test_does_not_rotate_if_not_needed(subject: TLSManager) -> None:
     assert cryptography_utils.fingerprint(current_ee) == cryptography_utils.fingerprint(
         orig_ee
     )
+
+
+async def test_get_unencrypted_current_encodes(subject: TLSManager) -> None:
+    """It should encode unencrypted certs safely."""
+    cert = await subject.get_current_ca_cert_der()
+    loaded_cert = x509.load_der_x509_certificate(
+        base64.urlsafe_b64decode(cert.cert_data)
+    )
+    assert cryptography_utils.fingerprint(
+        loaded_cert
+    ) == cryptography_utils.fingerprint(subject._ca_manager._current_ca.cert)
+
+
+async def test_get_unencrypted_next_ca_returns_none(subject: TLSManager) -> None:
+    """It should return None for the next CA if it has no next CA."""
+    assert await subject.get_next_ca_cert_der() is None
+
+
+async def test_get_unencrypted_next_ca_encodes(
+    subject: TLSManager, ca_key_dir: Path, ca_cert_dir: Path
+) -> None:
+    """It should encoded the next CA base64."""
+    next_ca = cryptography_utils.create_ca(
+        ca_key_dir, ca_cert_dir, datetime.now(timezone.utc), timedelta(days=300)
+    )
+    subject._ca_manager._next_ca = next_ca
+    encoded_next = await subject.get_next_ca_cert_der()
+    assert encoded_next is not None
+    decoded_cert = x509.load_der_x509_certificate(
+        base64.urlsafe_b64decode(encoded_next.cert_data)
+    )
+    assert cryptography_utils.fingerprint(
+        decoded_cert
+    ) == cryptography_utils.fingerprint(next_ca.cert)

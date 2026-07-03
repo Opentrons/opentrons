@@ -17,7 +17,7 @@ export const vacuumStopPump: CommandCreator<
     }
   }
 
-  // TODO: (nd, 2026-04-20) implement Python emission
+  const python = `${module.pythonName}.stop_vacuum_pump()`
   return {
     commands: [
       {
@@ -28,5 +28,6 @@ export const vacuumStopPump: CommandCreator<
         },
       },
     ],
+    python,
   }
 }

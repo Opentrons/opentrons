@@ -124,7 +124,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
             mount: RIGHT,
-            maintenancePosition: 'attachPlate',
+            motionModifier: 'lowerZAxesSequentially',
           },
         },
       ],

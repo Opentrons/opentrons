@@ -1,5 +1,5 @@
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
@@ -553,7 +553,7 @@ describe('ProtocolSetup', () => {
     expect(screen.getAllByText('SKELETON').length).toBeGreaterThanOrEqual(2)
   })
 
-  it('should render toast and make a button disabled when a robot door is open', () => {
+  it('should render toast and make a button disabled when a robot door is open', async () => {
     const mockOpenDoorStatus = {
       isDoorOpen: true,
       moduleDoorLocation: null,
@@ -563,11 +563,15 @@ describe('ProtocolSetup', () => {
       .thenReturn(mockOpenDoorStatus)
     render(`/runs/${RUN_ID}/setup/`)
     fireEvent.click(screen.getByRole('button', { name: 'play' }))
-    expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
-      'Close the robot door before starting the run.'
-    )
+    // onPlay runs through the access-control gate (async) before the snackbar
+    // call lands, so await the side effect rather than asserting synchronously.
+    await waitFor(() => {
+      expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
+        'Close the robot door before starting the run.'
+      )
+    })
   })
-  it('should render toast and make a button disabled when a stacker door is open', () => {
+  it('should render toast and make a button disabled when a stacker door is open', async () => {
     const mockOpenDoorStatus = {
       isDoorOpen: true,
       moduleDoorLocation: NOT_CONFIGURED,
@@ -577,9 +581,11 @@ describe('ProtocolSetup', () => {
       .thenReturn(mockOpenDoorStatus)
     render(`/runs/${RUN_ID}/setup/`)
     fireEvent.click(screen.getByRole('button', { name: 'play' }))
-    expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
-      'A stacker door is open. Close the stacker door before starting the run.'
-    )
+    await waitFor(() => {
+      expect(MOCK_MAKE_SNACKBAR).toBeCalledWith(
+        'A stacker door is open. Close the stacker door before starting the run.'
+      )
+    })
   })
 
   it.skip('calls trackProtocolRunEvent when tapping play button', () => {

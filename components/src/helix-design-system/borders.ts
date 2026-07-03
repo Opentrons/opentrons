@@ -9,6 +9,10 @@ export const borderRadius8 = '8px'
 export const borderRadius12 = '12px'
 export const borderRadius16 = '16px'
 export const borderRadius40 = '40px'
+/**
+ * Round to a pill or full circle. The exact value here is arbitrary and might change.
+ * It just needs to be greater than the element's width and height.
+ */
 export const borderRadiusFull = '200px'
 
 /**

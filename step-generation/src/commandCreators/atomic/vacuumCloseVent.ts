@@ -1,5 +1,6 @@
 import * as errorCreators from '../../errorCreators'
-import { uuid } from '../../utils'
+import { vacuumModuleStateGetter } from '../../robotStateSelectors'
+import { getModuleHasLiveTask, uuid } from '../../utils'
 
 import type { CommandCreator, VacuumCloseVentArgs } from '../../types'
 
@@ -11,14 +12,22 @@ export const vacuumCloseVent: CommandCreator<VacuumCloseVentArgs> = (
 ) => {
   const { moduleId } = args
   const module = invariantContext.moduleEntities[moduleId]
+  const moduleState = vacuumModuleStateGetter(prevRobotState, moduleId)
 
-  if (module == null) {
+  if (module == null || moduleState == null) {
     return {
       errors: [errorCreators.missingModuleError()],
     }
   }
 
-  // TODO: (nd, 2026-04-20) implement Python emission
+  const hasLiveTask = getModuleHasLiveTask(moduleState)
+  if (hasLiveTask) {
+    return {
+      errors: [errorCreators.liveTaskError()],
+    }
+  }
+
+  const python = `${module.pythonName}.close_vent()`
   return {
     commands: [
       {
@@ -29,5 +38,6 @@ export const vacuumCloseVent: CommandCreator<VacuumCloseVentArgs> = (
         },
       },
     ],
+    python,
   }
 }

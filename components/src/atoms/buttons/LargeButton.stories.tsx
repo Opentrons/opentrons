@@ -6,6 +6,12 @@ import { LargeButton } from './LargeButton'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
+// Helper function to safely check button type
+const isDarkBackgroundButtonType = (buttonType: unknown): boolean => {
+  const type = String(buttonType ?? '')
+  return ['alertStroke', 'alertAlt'].includes(type)
+}
+
 const meta: Meta<typeof LargeButton> = {
   title: 'Helix/Atoms/Buttons/LargeButton',
   component: LargeButton,
@@ -39,7 +45,7 @@ const meta: Meta<typeof LargeButton> = {
         width={'fit-content'}
         padding={SPACING.spacing32}
         backgroundColor={
-          ['alertStroke', 'alertAlt'].includes(context.args.buttonType)
+          isDarkBackgroundButtonType(context.args.buttonType)
             ? COLORS.black90
             : COLORS.white
         }

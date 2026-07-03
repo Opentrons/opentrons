@@ -34,6 +34,11 @@ class Scope(enum.Enum):
         "Restart the robot.",
     )
 
+    SHUTDOWN_WRITE = (
+        "shutdown.write",
+        "Shut down the robot.",
+    )
+
     ROBOT_CONTROL_WRITE = (
         "robot_control.write",
         (
@@ -69,9 +74,28 @@ class Scope(enum.Enum):
         "Update the robot's software.",
     )
 
-    USERS_READ = (
-        "users.read",
-        "Read users.",
+    USERS_READ_OTHERS = (
+        "users.read.others",
+        "List all users and read their details.",
+    )
+
+    USERS_READ_SELF = (
+        "users.read.self",
+        "Read the details of the currently authenticated user.",
+    )
+
+    USERS_WRITE_SELF = (
+        "users.write.self",
+        "Update the currently authenticated user's own account (e.g. change password).",
+    )
+
+    USERS_WRITE_SELF_PASSWORD = (
+        "users.write.self.password",
+        (
+            "Change the currently authenticated user's own password."
+            " This is the minimum scope granted to a user who must reset their"
+            " password before they can do anything else."
+        ),
     )
 
     USERS_WRITE = (

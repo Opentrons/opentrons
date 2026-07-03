@@ -13,22 +13,28 @@ interface VacuumModuleStateProps {
 export function VacuumModuleState(props: VacuumModuleStateProps): JSX.Element {
   const { vacuumModuleState } = props
   const { t } = useTranslation('protocol_steps')
-  const { vacuumState, ventStatus } = vacuumModuleState ?? {}
+  const { currentPumpActivity, ventStatus } = vacuumModuleState ?? {}
   const ventText =
     ventStatus != null
       ? t(`vacuum.previous_state.vent.${ventStatus}`)
       : t(`vacuum.previous_state.vent.${VACUUM_VENT_OPEN}`) // default to open if value is null (initial)
   let pumpText: string
-  if (vacuumState == null) {
+  if (
+    currentPumpActivity == null ||
+    currentPumpActivity?.type === 'pumpDeactivated'
+  ) {
     pumpText = t('vacuum.previous_state.pump.off')
+  } else if (currentPumpActivity.type === 'profile') {
+    // This is an error case handled by step generation (you cannot run a vacuum step when a profile is running)
+    pumpText = t('vacuum.previous_state.pump.profile')
   } else {
     pumpText =
-      vacuumState.modeType === VACUUM_MODE_POWER
+      currentPumpActivity.mode === VACUUM_MODE_POWER
         ? t('vacuum.previous_state.pump.power', {
-            power: vacuumState.targetPower,
+            power: currentPumpActivity.targetPower,
           })
         : t('vacuum.previous_state.pump.pressure', {
-            pressure: vacuumState.targetPressure,
+            pressure: currentPumpActivity.targetPressure,
           })
   }
   return (

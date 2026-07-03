@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from 'react-query'
 
 import { deleteRun } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type {
   UseMutateFunction,
@@ -34,10 +34,12 @@ export function useDeleteRunMutation(
   const mutation = useMutation<EmptyResponse, unknown, string>(
     (runId: string) =>
       deleteRun(host!, runId).then(response => {
-        queryClient.removeQueries([host, 'runs', runId])
-        queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
-          console.error(`error invalidating runs query: ${e.message}`)
-        })
+        queryClient.removeQueries(getQueryKey(host, 'runs', runId))
+        queryClient
+          .invalidateQueries(getQueryKey(host, 'runs'))
+          .catch((e: Error) => {
+            console.error(`error invalidating runs query: ${e.message}`)
+          })
         return response.data
       }),
     options

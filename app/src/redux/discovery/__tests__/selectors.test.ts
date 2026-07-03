@@ -30,27 +30,28 @@ const MOCK_STATE: State = {
   },
   discovery: {
     robotsByName: {
-      foo: {
-        name: 'foo',
-        health: mockLegacyHealthResponse,
-        serverHealth: null,
+      ot2Robot: {
+        name: 'ot2Robot',
+        health: mockOT2HealthResponse,
+        serverHealth: mockOT2ServerHealthResponse,
         addresses: [
           {
             ip: '10.0.0.1',
             port: 31950,
             seen: true,
             healthStatus: HEALTH_STATUS_OK,
-            serverHealthStatus: HEALTH_STATUS_NOT_OK,
+            serverHealthStatus: HEALTH_STATUS_OK,
             healthError: null,
-            serverHealthError: mockHealthErrorStringResponse,
-            advertisedModel: null,
+            serverHealthError: null,
+            advertisedModel: ROBOT_MODEL_OT2,
           },
         ],
       },
-      bar: {
-        name: 'bar',
-        health: mockLegacyHealthResponse,
-        serverHealth: mockLegacyServerHealthResponse,
+      // OT-3 connectable: health defined and healthStatus OK
+      flexConnectable: {
+        name: 'flexConnectable',
+        health: mockOT3HealthResponse,
+        serverHealth: mockOT3ServerHealthResponse,
         addresses: [
           {
             ip: '10.0.0.2',
@@ -60,14 +61,15 @@ const MOCK_STATE: State = {
             serverHealthStatus: HEALTH_STATUS_OK,
             healthError: null,
             serverHealthError: null,
-            advertisedModel: null,
+            advertisedModel: ROBOT_MODEL_OT3,
           },
         ],
       },
-      baz: {
-        name: 'baz',
-        health: mockOT2HealthResponse,
-        serverHealth: mockOT2ServerHealthResponse,
+      // OT-3 reachable: healthStatus notOk (error response), but serverHealthStatus OK
+      flexReachableError: {
+        name: 'flexReachableError',
+        health: mockOT3HealthResponse,
+        serverHealth: mockOT3ServerHealthResponse,
         addresses: [
           {
             ip: '10.0.0.3',
@@ -77,12 +79,13 @@ const MOCK_STATE: State = {
             serverHealthStatus: HEALTH_STATUS_OK,
             healthError: mockHealthErrorStringResponse,
             serverHealthError: null,
-            advertisedModel: ROBOT_MODEL_OT2,
+            advertisedModel: ROBOT_MODEL_OT3,
           },
         ],
       },
-      qux: {
-        name: 'qux',
+      // OT-3 reachable: recently seen but IP unreachable
+      flexReachableSeen: {
+        name: 'flexReachableSeen',
         health: mockOT3HealthResponse,
         serverHealth: mockOT3ServerHealthResponse,
         addresses: [
@@ -98,10 +101,11 @@ const MOCK_STATE: State = {
           },
         ],
       },
-      fizz: {
-        name: 'fizz',
-        health: mockOT2HealthResponse,
-        serverHealth: mockOT2ServerHealthResponse,
+      // OT-3 unreachable: IP unreachable and not seen recently
+      flexUnreachable: {
+        name: 'flexUnreachable',
+        health: mockOT3HealthResponse,
+        serverHealth: mockOT3ServerHealthResponse,
         addresses: [
           {
             ip: '10.0.0.5',
@@ -111,96 +115,55 @@ const MOCK_STATE: State = {
             serverHealthStatus: HEALTH_STATUS_UNREACHABLE,
             healthError: mockHealthFetchErrorResponse,
             serverHealthError: mockHealthFetchErrorResponse,
-            advertisedModel: ROBOT_MODEL_OT2,
-          },
-        ],
-      },
-      buzz: {
-        name: 'buzz',
-        health: mockOT2HealthResponse,
-        serverHealth: mockOT2ServerHealthResponse,
-        addresses: [],
-        advertisedModel: ROBOT_MODEL_OT2,
-      },
-      fizzbuzz: {
-        name: 'fizzbuzz',
-        health: mockOT3HealthResponse,
-        serverHealth: mockOT3ServerHealthResponse,
-        addresses: [
-          {
-            ip: '10.0.0.2',
-            port: 31950,
-            seen: true,
-            healthStatus: HEALTH_STATUS_OK,
-            serverHealthStatus: HEALTH_STATUS_OK,
-            healthError: null,
-            serverHealthError: null,
             advertisedModel: ROBOT_MODEL_OT3,
           },
         ],
+      },
+      // OT-3 unreachable: no IP addresses
+      flexNoAddress: {
+        name: 'flexNoAddress',
+        health: mockOT3HealthResponse,
+        serverHealth: mockOT3ServerHealthResponse,
+        addresses: [],
+        advertisedModel: ROBOT_MODEL_OT3,
       },
     },
   },
 } as any
 
-// foo is connectable because health is defined and healthStatus of primary
-// address is "ok". These are all saying it's an OT-2, so it's an OT-2
-const EXPECTED_FOO = {
-  name: 'foo',
-  displayName: 'foo',
+// flexConnectable is connectable because health is defined and healthStatus is "ok"
+const EXPECTED_FLEX_CONNECTABLE = {
+  name: 'flexConnectable',
   status: CONNECTABLE,
   local: false,
   seen: true,
-  health: mockLegacyHealthResponse,
-  serverHealth: null,
-  healthStatus: HEALTH_STATUS_OK,
-  serverHealthStatus: HEALTH_STATUS_NOT_OK,
-  ip: '10.0.0.1',
-  port: 31950,
-  robotModel: ROBOT_MODEL_OT2,
-}
-
-// bar is connectable because health is defined and healthStatus of primary
-// address is "ok"
-const EXPECTED_BAR = {
-  name: 'bar',
-  displayName: 'bar',
-  status: CONNECTABLE,
-  local: false,
-  seen: true,
-  health: mockLegacyHealthResponse,
-  serverHealth: mockLegacyServerHealthResponse,
+  health: mockOT3HealthResponse,
+  serverHealth: mockOT3ServerHealthResponse,
   healthStatus: HEALTH_STATUS_OK,
   serverHealthStatus: HEALTH_STATUS_OK,
   ip: '10.0.0.2',
   port: 31950,
-  robotModel: ROBOT_MODEL_OT2,
+  robotModel: ROBOT_MODEL_OT3,
 }
 
-// baz is reachable because healthStatus is "notOk", which means it responded
-// with an error code. The cached health values still indicate that it's an
-// OT-2.
-const EXPECTED_BAZ = {
-  name: 'baz',
-  displayName: 'baz',
+// flexReachableError is reachable because healthStatus is "notOk" (responded with error)
+const EXPECTED_FLEX_REACHABLE_ERROR = {
+  name: 'flexReachableError',
   status: REACHABLE,
   local: false,
   seen: true,
-  health: mockOT2HealthResponse,
-  serverHealth: mockOT2ServerHealthResponse,
+  health: mockOT3HealthResponse,
+  serverHealth: mockOT3ServerHealthResponse,
   healthStatus: HEALTH_STATUS_NOT_OK,
   serverHealthStatus: HEALTH_STATUS_OK,
   ip: '10.0.0.3',
   port: 31950,
-  robotModel: ROBOT_MODEL_OT2,
+  robotModel: ROBOT_MODEL_OT3,
 }
 
-// qux is reachable because it was recently seen, even though primary IP is
-// not currently responding in any way. Cached health responses have no model
-// data, but the MDNS data says it's an OT-3.
-const EXPECTED_QUX = {
-  name: 'qux',
-  displayName: 'qux',
+// flexReachableSeen is reachable because it was recently seen, even though IP is unreachable
+const EXPECTED_FLEX_REACHABLE_SEEN = {
+  name: 'flexReachableSeen',
   status: REACHABLE,
   local: false,
   seen: true,
@@ -213,67 +176,36 @@ const EXPECTED_QUX = {
   robotModel: ROBOT_MODEL_OT3,
 }
 
-// fizz is unreachable because IP is unreachable and we haven't seen any of
-// this robot's IP addresses recently. Cached health responses indicate it's
-// an OT-2.
-const EXPECTED_FIZZ = {
-  name: 'fizz',
-  displayName: 'fizz',
+// flexUnreachable is unreachable because IP is unreachable and not seen recently
+const EXPECTED_FLEX_UNREACHABLE = {
+  name: 'flexUnreachable',
   status: UNREACHABLE,
   local: false,
   seen: false,
-  health: mockOT2HealthResponse,
-  serverHealth: mockOT2ServerHealthResponse,
+  health: mockOT3HealthResponse,
+  serverHealth: mockOT3ServerHealthResponse,
   healthStatus: HEALTH_STATUS_UNREACHABLE,
   serverHealthStatus: HEALTH_STATUS_UNREACHABLE,
   ip: '10.0.0.5',
   port: 31950,
-  robotModel: ROBOT_MODEL_OT2,
+  robotModel: ROBOT_MODEL_OT3,
 }
 
-// buzz is unreachable because we don't have any IP addresses for it
-const EXPECTED_BUZZ = {
-  name: 'buzz',
-  displayName: 'buzz',
+// flexNoAddress is unreachable because we don't have any IP addresses for it
+const EXPECTED_FLEX_NO_ADDRESS = {
+  name: 'flexNoAddress',
   status: UNREACHABLE,
   local: null,
   seen: false,
-  health: mockOT2HealthResponse,
-  serverHealth: mockOT2ServerHealthResponse,
+  health: mockOT3HealthResponse,
+  serverHealth: mockOT3ServerHealthResponse,
   healthStatus: null,
   serverHealthStatus: null,
   ip: null,
   port: null,
-  advertisedModel: ROBOT_MODEL_OT2,
-  robotModel: ROBOT_MODEL_OT2,
-}
-
-// fizzbuzz is as foo and therefore connectable, but is an OT-3
-const EXPECTED_FIZZBUZZ = {
-  name: 'fizzbuzz',
-  displayName: 'fizzbuzz',
-  status: CONNECTABLE,
-  local: false,
-  seen: true,
-  health: mockOT3HealthResponse,
-  serverHealth: mockOT3ServerHealthResponse,
-  healthStatus: HEALTH_STATUS_OK,
-  serverHealthStatus: HEALTH_STATUS_OK,
-  ip: '10.0.0.2',
-  port: 31950,
+  advertisedModel: ROBOT_MODEL_OT3,
   robotModel: ROBOT_MODEL_OT3,
 }
-
-const MOCK_STATE_WITH_IGNORE_OT2: State = {
-  config: {
-    devInternal: {
-      ignoreOT2App: true,
-    },
-  },
-  discovery: {
-    ...MOCK_STATE.discovery,
-  },
-} as any
 
 describe('discovery selectors', () => {
   const SPECS: Array<{
@@ -300,62 +232,38 @@ describe('discovery selectors', () => {
       selector: discovery.getDiscoveredRobots,
       state: MOCK_STATE,
       expected: [
-        EXPECTED_FOO,
-        EXPECTED_BAR,
-        EXPECTED_BAZ,
-        EXPECTED_QUX,
-        EXPECTED_FIZZ,
-        EXPECTED_BUZZ,
-        EXPECTED_FIZZBUZZ,
+        EXPECTED_FLEX_CONNECTABLE,
+        EXPECTED_FLEX_REACHABLE_ERROR,
+        EXPECTED_FLEX_REACHABLE_SEEN,
+        EXPECTED_FLEX_UNREACHABLE,
+        EXPECTED_FLEX_NO_ADDRESS,
       ],
     },
     {
-      name: 'getDiscoveredRobots filters out OT-2 robots when ignoreOT2App is true',
+      name: 'getDiscoveredRobots filters out OT-2 robots',
       selector: discovery.getDiscoveredRobots,
-      state: MOCK_STATE_WITH_IGNORE_OT2,
-      expected: [EXPECTED_QUX, EXPECTED_FIZZBUZZ],
-    },
-    {
-      name: 'getConnectableRobots filters out OT-2 robots when ignoreOT2App is true',
-      selector: discovery.getConnectableRobots,
-      state: MOCK_STATE_WITH_IGNORE_OT2,
-      expected: [EXPECTED_FIZZBUZZ],
-    },
-    {
-      name: 'getReachableRobots filters out OT-2 robots when ignoreOT2App is true',
-      selector: discovery.getReachableRobots,
-      state: MOCK_STATE_WITH_IGNORE_OT2,
-      expected: [EXPECTED_QUX],
-    },
-    {
-      name: 'getUnreachableRobots filters out OT-2 robots when ignoreOT2App is true',
-      selector: discovery.getUnreachableRobots,
-      state: MOCK_STATE_WITH_IGNORE_OT2,
-      expected: [],
-    },
-    {
-      name: 'getViewableRobots filters out OT-2 robots when ignoreOT2App is true',
-      selector: discovery.getViewableRobots,
-      state: MOCK_STATE_WITH_IGNORE_OT2,
-      expected: [EXPECTED_FIZZBUZZ, EXPECTED_QUX],
+      state: MOCK_STATE,
+      expected: expect.not.arrayContaining([
+        expect.objectContaining({ name: 'ot2Robot' }),
+      ]),
     },
     {
       name: 'getConnectableRobots grabs robots with connectable status',
       selector: discovery.getConnectableRobots,
       state: MOCK_STATE,
-      expected: [EXPECTED_BAR, EXPECTED_FIZZBUZZ, EXPECTED_FOO],
+      expected: [EXPECTED_FLEX_CONNECTABLE],
     },
     {
       name: 'getReachableRobots grabs robots with reachable status',
       selector: discovery.getReachableRobots,
       state: MOCK_STATE,
-      expected: [EXPECTED_BAZ, EXPECTED_QUX],
+      expected: [EXPECTED_FLEX_REACHABLE_ERROR, EXPECTED_FLEX_REACHABLE_SEEN],
     },
     {
       name: 'getUnreachableRobots grabs robots with unreachable status',
       selector: discovery.getUnreachableRobots,
       state: MOCK_STATE,
-      expected: [EXPECTED_BUZZ, EXPECTED_FIZZ],
+      expected: [EXPECTED_FLEX_NO_ADDRESS, EXPECTED_FLEX_UNREACHABLE],
     },
     {
       name: 'display name removes opentrons- from connectable robot names',
@@ -366,17 +274,15 @@ describe('discovery selectors', () => {
           robotsByName: {
             'opentrons-foo': {
               name: 'opentrons-foo',
-              health: mockOT2HealthResponse,
-              serverHealth: mockOT2ServerHealthResponse,
+              health: mockOT3HealthResponse,
+              serverHealth: mockOT3ServerHealthResponse,
               addresses: [],
             },
           },
         },
         robot: { connection: { connectedTo: '' } },
       },
-      expected: [
-        expect.objectContaining({ name: 'opentrons-foo', displayName: 'foo' }),
-      ],
+      expected: [expect.objectContaining({ name: 'opentrons-foo' })],
     },
     {
       name: 'handles legacy IPv6 robots by wrapping IP in [] and setting as local',
@@ -387,8 +293,8 @@ describe('discovery selectors', () => {
           robotsByName: {
             'opentrons-foo': {
               name: 'opentrons-foo',
-              health: mockLegacyHealthResponse,
-              serverHealth: mockLegacyServerHealthResponse,
+              health: mockOT3HealthResponse,
+              serverHealth: mockOT3ServerHealthResponse,
               addresses: [
                 {
                   ip: 'fd00:0:cafe:fefe::1',
@@ -423,8 +329,8 @@ describe('discovery selectors', () => {
           robotsByName: {
             'opentrons-foo': {
               name: 'opentrons-foo',
-              health: mockLegacyHealthResponse,
-              serverHealth: mockLegacyServerHealthResponse,
+              health: mockOT3HealthResponse,
+              serverHealth: mockOT3ServerHealthResponse,
               addresses: [
                 {
                   ip: 'opentrons-usb',
@@ -455,11 +361,9 @@ describe('discovery selectors', () => {
       selector: discovery.getViewableRobots,
       state: MOCK_STATE,
       expected: [
-        EXPECTED_BAR,
-        EXPECTED_BAZ,
-        EXPECTED_FIZZBUZZ,
-        EXPECTED_FOO,
-        EXPECTED_QUX,
+        EXPECTED_FLEX_CONNECTABLE,
+        EXPECTED_FLEX_REACHABLE_ERROR,
+        EXPECTED_FLEX_REACHABLE_SEEN,
       ],
     },
     {
@@ -577,91 +481,98 @@ describe('discovery selectors', () => {
       name: 'getRobotByName returns connectable robot by name',
       selector: discovery.getRobotByName,
       state: MOCK_STATE,
-      args: ['foo'],
-      expected: EXPECTED_FOO,
+      args: ['flexConnectable'],
+      expected: EXPECTED_FLEX_CONNECTABLE,
     },
     {
       name: 'getRobotByName returns reachable robot by name',
       selector: discovery.getRobotByName,
       state: MOCK_STATE,
-      args: ['baz'],
-      expected: EXPECTED_BAZ,
+      args: ['flexReachableSeen'],
+      expected: EXPECTED_FLEX_REACHABLE_SEEN,
     },
     {
-      name: 'getRobotByName returns null if robot is not connectable',
+      name: 'getRobotByName returns null if robot is not viewable',
       selector: discovery.getRobotByName,
       state: MOCK_STATE,
-      args: ['fizz'],
+      args: ['flexUnreachable'],
       expected: null,
     },
     {
       name: 'getDiscoverableRobotByName returns connectable robot by name',
       selector: discovery.getDiscoverableRobotByName,
       state: MOCK_STATE,
-      args: ['foo'],
-      expected: EXPECTED_FOO,
+      args: ['flexConnectable'],
+      expected: EXPECTED_FLEX_CONNECTABLE,
     },
     {
       name: 'getDiscoverableRobotByName returns reachable robot by name',
       selector: discovery.getDiscoverableRobotByName,
       state: MOCK_STATE,
-      args: ['baz'],
-      expected: EXPECTED_BAZ,
+      args: ['flexReachableSeen'],
+      expected: EXPECTED_FLEX_REACHABLE_SEEN,
     },
     {
-      name: 'getDiscoverableRobotByName returns discoverable robot by name if robot is not connectable',
+      name: 'getDiscoverableRobotByName returns unreachable robot by name',
       selector: discovery.getDiscoverableRobotByName,
       state: MOCK_STATE,
-      args: ['fizz'],
-      expected: EXPECTED_FIZZ,
+      args: ['flexUnreachable'],
+      expected: EXPECTED_FLEX_UNREACHABLE,
+    },
+    {
+      name: 'getDiscoverableRobotByName returns null for filtered OT-2 robot',
+      selector: discovery.getDiscoverableRobotByName,
+      state: MOCK_STATE,
+      args: ['ot2Robot'],
+      expected: null,
     },
     {
       name: 'getRobotApiVersionByName returns API version of connectable robot',
       selector: discovery.getRobotApiVersionByName,
       state: MOCK_STATE,
-      args: ['foo'],
-      expected: EXPECTED_FOO.health.api_version,
+      args: ['flexConnectable'],
+      expected: EXPECTED_FLEX_CONNECTABLE.health.api_version,
     },
     {
       name: 'getRobotApiVersionByName returns API version of reachable robot',
       selector: discovery.getRobotApiVersionByName,
       state: MOCK_STATE,
-      args: ['baz'],
-      expected: EXPECTED_BAZ.health.api_version,
+      args: ['flexReachableSeen'],
+      expected: EXPECTED_FLEX_REACHABLE_SEEN.health.api_version,
     },
     {
       name: 'getRobotType returns type of a connectable OT-3',
       selector: discovery.getRobotModelByName,
       state: MOCK_STATE,
-      args: ['fizzbuzz'],
+      args: ['flexConnectable'],
       expected: 'Opentrons Flex',
     },
     {
-      name: 'getRobotType returns type of a connectable OT-2',
+      name: 'getRobotType returns type of a reachable OT-3',
       selector: discovery.getRobotModelByName,
       state: MOCK_STATE,
-      args: ['foo'],
-      expected: 'OT-2',
-    },
-    {
-      name: 'getRobotType returns OT-2 for a reachable but cached robot',
-      selector: discovery.getRobotModelByName,
-      state: MOCK_STATE,
-      args: ['baz'],
-      expected: 'OT-2',
-    },
-    {
-      name: 'getRobotType returns OT-2 by default for an unreachable robot',
-      selector: discovery.getRobotModelByName,
-      state: MOCK_STATE,
-      args: ['qux'],
+      args: ['flexReachableSeen'],
       expected: 'Opentrons Flex',
+    },
+    {
+      name: 'getRobotType returns type of an unreachable OT-3',
+      selector: discovery.getRobotModelByName,
+      state: MOCK_STATE,
+      args: ['flexUnreachable'],
+      expected: 'Opentrons Flex',
+    },
+    {
+      name: 'getRobotType returns null for filtered OT-2 robot',
+      selector: discovery.getRobotModelByName,
+      state: MOCK_STATE,
+      args: ['ot2Robot'],
+      expected: null,
     },
     {
       name: 'getRobotAddressesByName returns addresses by name',
       selector: discovery.getRobotAddressesByName,
       state: MOCK_STATE,
-      args: ['qux'],
+      args: ['flexReachableSeen'],
       expected: [
         {
           ip: '10.0.0.4',
@@ -675,6 +586,13 @@ describe('discovery selectors', () => {
         },
       ],
     },
+    {
+      name: 'getRobotAddressesByName returns empty array for robot with no addresses',
+      selector: discovery.getRobotAddressesByName,
+      state: MOCK_STATE,
+      args: ['flexNoAddress'],
+      expected: [],
+    },
   ]
 
   SPECS.forEach(spec => {
@@ -687,17 +605,22 @@ describe('getRobotSerialNumber', () => {
   const SPECS: Array<{ name: string; robot: any; expected: string | null }> = [
     {
       name: 'returns health serial on flex',
-      robot: MOCK_STATE.discovery.robotsByName.fizzbuzz,
+      robot: MOCK_STATE.discovery.robotsByName.flexConnectable,
       expected: 'this is a flex serial',
     },
     {
       name: 'getRobotSerial returns health serial on ot2 if available',
-      robot: MOCK_STATE.discovery.robotsByName.baz,
+      robot: MOCK_STATE.discovery.robotsByName.ot2Robot,
       expected: 'this is an ot2 serial',
     },
     {
       name: 'getRobotSerial falls back to update server if necessary',
-      robot: MOCK_STATE.discovery.robotsByName.bar,
+      robot: {
+        name: 'fallbackRobot',
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
+        addresses: [],
+      },
       expected: '12345',
     },
   ]

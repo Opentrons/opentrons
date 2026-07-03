@@ -10,6 +10,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 import {
+  getQueryKey,
   useCreateProtocolAnalysisMutation,
   useCreateRunMutation,
   useHost,
@@ -20,7 +21,7 @@ import {
   sortRuntimeParameters,
 } from '@opentrons/shared-data'
 
-import { useScrollRef } from '/app/App/hooks'
+import { useScrollRef } from '/app/App/hooks/useModuleAttachedToast'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'
 import {
@@ -176,9 +177,11 @@ export function ProtocolSetupParameters({
 
   const { createRun, isLoading: isRunLoading } = useCreateRunMutation({
     onSuccess: data => {
-      queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
-        console.error(`could not invalidate runs cache: ${e.message}`)
-      })
+      queryClient
+        .invalidateQueries(getQueryKey(host, 'runs'))
+        .catch((e: Error) => {
+          console.error(`could not invalidate runs cache: ${e.message}`)
+        })
     },
   })
   const handleConfirmValues = (): void => {

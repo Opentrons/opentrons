@@ -16,7 +16,6 @@ export function deleteLabwareOffset(
   return request<{ data: StoredLabwareOffset }>(
     DELETE,
     `/labwareOffsets/${id}`,
-    null,
     config
   )
 }

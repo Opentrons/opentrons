@@ -79,6 +79,8 @@ export function ModalShell(props: ModalShellProps): JSX.Element {
       <ContentArea zIndex={zIndex} position={position} noPadding={noPadding}>
         <ModalArea
           aria-label="ModalShell_ModalArea"
+          role="dialog"
+          aria-modal="true"
           isFullPage={fullPage}
           onClick={(e: MouseEvent) => {
             e.stopPropagation()

@@ -2,7 +2,7 @@ import { useMutation } from 'react-query'
 
 import { getOAuth2Token } from '@opentrons/api-client'
 
-import { useHost } from '../../api'
+import { getQueryKey, useHost } from '../../api'
 
 import type {
   UseMutateFunction,
@@ -44,7 +44,7 @@ export function useGetOAuth2TokenMutation(
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
 
   const mutation = useMutation(
-    [host, 'auth/oauth2/token'],
+    getQueryKey(host, 'auth/oauth2/token'),
     body => getOAuth2Token(host!, body),
     options
   )

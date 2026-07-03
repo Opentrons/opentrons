@@ -27,6 +27,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  getQueryKey,
   useCreateRunMutation,
   useHost,
   useProtocolAnalysisAsDocumentQuery,
@@ -295,7 +296,6 @@ const ProtocolSectionContent = ({
   }
   return (
     <Flex
-      paddingTop={SPACING.spacing32}
       justifyContent={currentOption === 'deck' ? JUSTIFY_CENTER : undefined}
     >
       {protocolSection}
@@ -347,9 +347,11 @@ export function ProtocolDetails(): JSX.Element | null {
 
   const { createRun } = useCreateRunMutation({
     onSuccess: data => {
-      queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
-        console.error(`could not invalidate runs cache: ${e.message}`)
-      })
+      queryClient
+        .invalidateQueries(getQueryKey(host, 'runs'))
+        .catch((e: Error) => {
+          console.error(`could not invalidate runs cache: ${e.message}`)
+        })
     },
   })
 
@@ -494,7 +496,11 @@ export function ProtocolDetails(): JSX.Element | null {
           isScrolled={isScrolled}
           isProtocolFetching={isProtocolFetching}
         />
-        <Flex flexDirection={DIRECTION_COLUMN} paddingTop={SPACING.spacing6}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          paddingTop={SPACING.spacing6}
+          gap={SPACING.spacing32}
+        >
           <ProtocolSectionTabs
             currentOption={currentOption}
             setCurrentOption={setCurrentOption}
@@ -508,36 +514,36 @@ export function ProtocolDetails(): JSX.Element | null {
           ) : (
             <ProtocolDetailsSectionContentSkeleton />
           )}
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing8}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            paddingTop={
-              // Skeleton is large. Better UX not to scroll to see buttons while loading.
-              !isProtocolFetching ? SPACING.spacing60 : SPACING.spacing24
+        </Flex>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          gridGap={SPACING.spacing8}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          paddingTop={
+            // Skeleton is large. Better UX not to scroll to see buttons while loading.
+            !isProtocolFetching ? SPACING.spacing60 : SPACING.spacing24
+          }
+        >
+          <MediumButton
+            buttonText={
+              pinned
+                ? t('protocol_info:unpin_protocol')
+                : t('protocol_info:pin_protocol')
             }
-          >
-            <MediumButton
-              buttonText={
-                pinned
-                  ? t('protocol_info:unpin_protocol')
-                  : t('protocol_info:pin_protocol')
-              }
-              buttonType="secondary"
-              iconName="pin"
-              onClick={handlePinClick}
-              width="100%"
-            />
-            <MediumButton
-              buttonText={t('protocol_info:delete_protocol')}
-              buttonType="alertSecondary"
-              iconName="trash"
-              onClick={() => {
-                setShowConfirmationDeleteProtocol(true)
-              }}
-              width="100%"
-            />
-          </Flex>
+            buttonType="secondary"
+            iconName="pin"
+            onClick={handlePinClick}
+            width="100%"
+          />
+          <MediumButton
+            buttonText={t('protocol_info:delete_protocol')}
+            buttonType="alertSecondary"
+            iconName="trash"
+            onClick={() => {
+              setShowConfirmationDeleteProtocol(true)
+            }}
+            width="100%"
+          />
         </Flex>
       </Flex>
     </>

@@ -58,7 +58,7 @@ The Stacker accepts Opentrons Flex tip racks, selected items in our [Labware Lib
 
 ### Module compatibility
 
-Any Flex with a [serial number version](../system-description/specs.md#serial-number) that includes **A10** or **A20** _requires_ a Stacker retrofit kit. Robots with serial number version **A30** (or higher) are fully compatible with the Stacker; the retrofit kit is not required. The kit adds new firmware and hardware to your Flex which:
+Any Flex with a [serial number version](../system-description/specs.md#model-and-serial-numbers) that includes **A10** or **A20** _requires_ a Stacker retrofit kit. Robots with serial number version **A30** (or higher) are fully compatible with the Stacker; the retrofit kit is not required. The kit adds new firmware and hardware to your Flex which:
 
 - Allows early model robots to recognize and communicate with the Staker.
 - Prevents the HEPA/UV module from operating if the Stacker is improperly installed.

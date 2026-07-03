@@ -6,7 +6,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 const meta: Meta<typeof StepMeterComponent> = {
   title: 'Helix/Atoms/StepMeter',
   component: StepMeterComponent,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 }
 
 export default meta

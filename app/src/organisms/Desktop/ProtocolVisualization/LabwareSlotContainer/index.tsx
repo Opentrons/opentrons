@@ -71,6 +71,7 @@ export function LabwareSlotContainer(
   const { labware, pipettes, liquidState } = robotState
   const labwareLoadCommand = commands.find(
     command =>
+      command.result != null &&
       'labwareId' in command.result &&
       command.result.labwareId === topLabwareOnSlotId
   )

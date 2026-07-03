@@ -6,7 +6,7 @@ description: "Configure labware and liquids, and prepare to run a protocol on th
 When you start setup for a protocol, you'll see the "Prepare to run" screen, which summarizes all of the requirements for the protocol.
 
 <figure class="screenshot" markdown>
-![Prepare to run screen for a nucleic acid purification protocol, showing instrument setup as complete (green); module and deck setup as incomplete (orange); and Labware Position Check, labware setup, and liquid setup as not started (grey).](../images/touchscreen-prepare-to-run.png "Prepare to run")
+![Prepare to run screen for a nucleic acid purification protocol, showing instrument setup as complete (green); module and deck setup as incomplete (orange); and Labware Position Check, labware setup, and liquid setup as not started (grey).](../images/touchscreen-prepare-to-run.svg)
 <figcaption>All sections of the "Prepare to run" screen. On the touchscreen, scroll the list to see all sections.</figcaption>
 </figure>
 
@@ -14,13 +14,68 @@ If hardware is not connected or calibrated, you will see a warning icon (exclama
 
 Tap any row with a right arrow to show more information for that category. (The one exception is tapping Labware Position Check, which begins that process. See the Labware Position Check section below for more details.)
 
-| Category   | Description |
-|------------|------------|
-| Instruments    | See if all instruments are attached to the correct mounts and calibrated.<br />Tap <b>Attach</b> or <b>Calibrate</b> to set up any that aren't. |
-| Parameters     | See the names, descriptions, and default values of runtime parameters for the protocol.<br />Tap a parameter to edit its value. See the Runtime Parameters section below for more details. |
-| Hardware       | See the locations and connection statuses of hardware on the deck.<br><ul><li>Tap :fontawesome-solid-circle-info: <b>Setup Instructions</b> to get detailed instructions.</li><li>Tap <b>Map View</b> to switch to a visual layout of hardware positions.</li></ul> |
-| Labware        | See the locations of labware. Each labware lists its initial deck location, and icons indicate labware that are on top of modules.<br />Tap <b>Map View</b> to switch to a visual layout of labware positions. |
-| Liquids        | See the types and total volumes of liquids.<br />Tap any liquid name to expand a list of well-by-well volumes. In turn, tap an individual volume row to show a visual layout of its location within labware. |
+<table>
+  <thead>
+    <tr>
+      <th>Category</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Parameters</td>
+      <td>
+        <p>Review the names, descriptions, and default values of runtime parameters for the protocol.</p>
+        <p>Tap a parameter to edit its value. See the <a href="#runtime-parameters">Runtime Parameters section</a> for more information.</p>
+      </td>
+    </tr>
+    <tr>
+      <td>Instruments</td>
+      <td>
+        <p>Verify that all instruments are attached to the correct mounts and calibrated.</p>
+        <p>Tap <strong>Attach</strong> or <strong>Calibrate</strong> to set up any that aren't.</p>
+      </td>
+    </tr>
+    <tr>
+      <td>Deck hardware</td>
+      <td>
+        <p>Check the physical locations and connection statuses of hardware on the deck.</p>
+        <ul>
+          <li>Tap <img src="../../images/info-icon.svg" alt="More information icon" style="vertical-align: middle; height: 1.25em;"> <strong>Setup Instructions</strong> to get detailed instructions.</li>
+          <li>Tap <strong>Map View</strong> to switch to a visual layout of hardware positions.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td>Labware Offsets</td>
+      <td>
+        <p>Manage existing offset measurements or run <a href="#labware-offsets-and-position-checking">Labware Position Check</a>.</p>
+        <ul>
+          <li>Tap <strong>Apply Offsets</strong> to apply offset data to labware.</li>
+          <li>Tap <strong>Labware Position Check</strong> to verify or reverify offset data.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td>Labware &amp; Liquids</td>
+      <td>
+        <p>Inspect deck locations alongside the specific types and total volumes of liquids loaded.</p>
+        <ul>
+          <li>Tap <strong>Map View</strong> or <strong>List View</strong> to switch between a visual map or list of on-deck labware.</li>
+          <li>Tap any labware to see a list of well-by-well liquids and volumes.</li>
+          <li>Tap <strong>Confirm Placements</strong> to verify labware locations.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td>Camera</td>
+      <td>
+        <p>Take still images with the built-in camera or watch a live video of a protocol in operation.</p>
+        <p>See <a href="../../opentrons-app/camera/">Using the Camera</a> for more information about settings and features for this device.</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 On any category screen, return to the "Prepare to run" screen by tapping the back arrow in the top left.
 
@@ -66,7 +121,7 @@ Parameter and CSV file selections are still editable until you tap **Confirm val
 ## Labware offsets and position checking
 
 ### Labware offsets
-Labware offsets are fine-tuned positional coordinates that help your robot align its pipette relative to a specific piece of labware. The release of robot software version 8.4 introduced significant improvements to the labware offset and position checking system.
+*Labware offsets* are fine-tuned positional coordinates that help your robot align its pipette relative to a specific piece of labware. The release of robot software version 8.4 introduced significant improvements to the labware offset and position checking system.
 
 | Feature | Description |
 |----|----|
@@ -83,7 +138,7 @@ This illustration shows how the different types of offsets appear as you're conf
 
 ### Labware Position Check
 
-Labware Position Check lets you align a pipette relative to a piece of labware (e.g., a well plate), which helps ensure accurate and reproducible pipetting results.
+*Labware Position Check* lets you align a pipette relative to a piece of labware (e.g., a well plate), which helps ensure accurate and reproducible pipetting results.
 
 You must ensure that each piece of labware used in your protocol has a default or applied offset associated with it. As shown in the example below, you cannot run a protocol (the play button is inactive) if it uses labware that is missing offset data.
 

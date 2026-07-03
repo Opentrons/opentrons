@@ -10,8 +10,8 @@ import {
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
-  getIsSafePipetteMovement,
   getLabwareSlot,
+  getPipetteMovementSafetyStatus,
   getSlotInLocationStack,
   modulePipetteCollision,
   pipetteAdjacentHeaterShakerWhileShaking,
@@ -186,25 +186,31 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
   const isMultiChannelPipette =
     invariantContext.pipetteEntities[pipetteId]?.spec.channels !== 1
   const pipetteSpecs = invariantContext.pipetteEntities[pipetteId]?.spec
+
+  const pipetteMovementSafetyStatus = getPipetteMovementSafetyStatus({
+    robotState: prevRobotState,
+    invariantContext,
+    pipetteId,
+    labwareId,
+    wellLocationOffset: (wellLocation?.offset as Point) ?? {
+      x: 0,
+      y: 0,
+      z: 0,
+    },
+    wellTargetName: wellName,
+    nozzleConfiguration,
+    primaryNozzle,
+  })
   if (
     isMultiChannelPipette &&
     pipetteSpecs &&
-    !getIsSafePipetteMovement({
-      robotState: prevRobotState,
-      invariantContext,
-      pipetteId,
-      labwareId,
-      wellLocationOffset: (wellLocation?.offset as Point) ?? {
-        x: 0,
-        y: 0,
-        z: 0,
-      },
-      wellTargetName: wellName,
-      nozzleConfiguration,
-      primaryNozzle,
-    })
+    !pipetteMovementSafetyStatus.isSafe
   ) {
-    errors.push(errorCreators.possiblePipetteCollision())
+    errors.push(
+      errorCreators.possiblePipetteCollision({
+        unsafePipetteMovementReason: pipetteMovementSafetyStatus.reason,
+      })
+    )
   }
   if (errors.length > 0) {
     return {

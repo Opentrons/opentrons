@@ -39,7 +39,7 @@ from server_utils.auth.resource_server.authorization_checker import (
     AlwaysAllowedAuthorizationChecker,
     AuthorizationChecker,
 )
-from server_utils.auth.resource_server.fastapi_dependencies import (
+from server_utils.auth.resource_server.fastapi import (
     get_authorization_checker,
 )
 

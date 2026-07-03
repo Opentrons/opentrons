@@ -3,8 +3,8 @@ import pytest
 
 from ..dev_server import DevServer
 
-_ADMIN_USERNAME = "test_admin"
-_ADMIN_PASSWORD = "test_admin_password"
+_ADMIN_USERNAME = "testadmin"
+_ADMIN_PASSWORD = "testadminpassword"
 _CLIENT_ID = "opentrons_app"
 
 

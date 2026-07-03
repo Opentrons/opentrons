@@ -28,10 +28,12 @@ async def build_tls_manager(
     """Build the TLS manager to control TLS certificates."""
     secure_dir = secure_volume_manager.path
     return await TLSManager.create(
-        config.tls_directory,
-        secure_dir / "ca_keys",
-        config.tls_directory,
-        config.tls_server_integration,
+        ca_cert_dir=config.tls_directory,
+        ca_key_dir=secure_dir / "ca_keys",
+        tls_ee_dir=config.tls_directory,
+        terminator_reload=config.tls_server_integration,
+        cert_password_length_words=config.cert_password_length_words,
+        cert_password_rotation_time_s=config.cert_password_rotation_time_s,
     )
 
 

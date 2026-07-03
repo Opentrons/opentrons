@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { usePlayRunMutation } from '@opentrons/react-api-client'
 
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
+
 import { RECOVERY_MAP } from '../../constants'
 import { useRecoveryActionMutation } from '../useRecoveryActionMutation'
 
@@ -31,9 +33,13 @@ describe('useRecoveryActionMutation', () => {
 
   it('should return resumeRecovery and isResumeRecoveryLoading', () => {
     const { result } = renderHook(() =>
-      useRecoveryActionMutation(mockRunId, {
-        proceedToRouteAndStep: mockProceedToRouteAndStep,
-      } as any)
+      useRecoveryActionMutation(
+        mockRunId,
+        {
+          proceedToRouteAndStep: mockProceedToRouteAndStep,
+        } as any,
+        ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+      )
     )
 
     expect(result.current).toHaveProperty('resumeRecovery')
@@ -43,9 +49,13 @@ describe('useRecoveryActionMutation', () => {
 
   it('should return updated isResumeRecoveryLoading when it changes', () => {
     const { result, rerender } = renderHook(() =>
-      useRecoveryActionMutation(mockRunId, {
-        proceedToRouteAndStep: mockProceedToRouteAndStep,
-      } as any)
+      useRecoveryActionMutation(
+        mockRunId,
+        {
+          proceedToRouteAndStep: mockProceedToRouteAndStep,
+        } as any,
+        ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+      )
     )
 
     expect(result.current.isResumeRecoveryLoading).toBe(false)
@@ -63,9 +73,13 @@ describe('useRecoveryActionMutation', () => {
 
   it('should call mutateAsync with runId when resumeRecovery is called', async () => {
     const { result } = renderHook(() =>
-      useRecoveryActionMutation(mockRunId, {
-        proceedToRouteAndStep: mockProceedToRouteAndStep,
-      } as any)
+      useRecoveryActionMutation(
+        mockRunId,
+        {
+          proceedToRouteAndStep: mockProceedToRouteAndStep,
+        } as any,
+        ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+      )
     )
 
     mockMutateAsync.mockResolvedValue('MOCK_RESULT')
@@ -77,9 +91,13 @@ describe('useRecoveryActionMutation', () => {
 
   it('should handle error and proceed to error route when resumeRecovery fails', async () => {
     const { result } = renderHook(() =>
-      useRecoveryActionMutation(mockRunId, {
-        proceedToRouteAndStep: mockProceedToRouteAndStep,
-      } as any)
+      useRecoveryActionMutation(
+        mockRunId,
+        {
+          proceedToRouteAndStep: mockProceedToRouteAndStep,
+        } as any,
+        ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+      )
     )
 
     mockMutateAsync.mockRejectedValue(new Error('MOCK_ERROR'))

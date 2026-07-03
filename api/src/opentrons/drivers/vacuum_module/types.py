@@ -33,6 +33,7 @@ class HardwareRevision(Enum):
 
     NFF = "nff"
     EVT = "a1"
+    DVT = "b1"
 
 
 @dataclass
@@ -110,6 +111,7 @@ class VacuumState:
     pressure_abs_b: float
     pressure_atm: float
     vacuum_enabled: bool
+    vacuum_duration: int
     vent_state: VentState
 
 

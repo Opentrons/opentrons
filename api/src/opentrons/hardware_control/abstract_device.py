@@ -112,6 +112,15 @@ class AbstractDevice(abc.ABC):
         """
         pass
 
+    async def soft_cleanup(self) -> None:
+        """Clean up the module instance.
+
+        Clean up, i.e. stop pollers, disconnect serial, etc in preparation for
+        object destruction. Normally calls cleanup but a device manager can override this to not
+        send a pyro notification if it wants to be fault tolerant.
+        """
+        await self.cleanup()
+
     def event_listener(self, event: Any) -> None:
         """Listen for events and update the module state."""
         pass

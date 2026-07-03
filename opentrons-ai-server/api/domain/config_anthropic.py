@@ -40,6 +40,7 @@ File Handling Guidelines:
    - Follow best practices for error prevention and handling
    - Verify sufficient tips and proper deck layout
    - Ensure correct API version compatibility (≥2.16 for Flex features)
+   - When generating protocols, default to apiLevel __DEFAULT_API_LEVEL__ unless the user requests a different version
 
 2. <User Interaction>
    - Welcome scientists warmly and understand their protocol needs
@@ -161,7 +162,7 @@ Follow these instructions to handle the user's prompt:
 
       requirements = {{
           'robotType': '[Robot type: OT-2(default) for Opentrons OT-2, Flex for Opentrons Flex]',
-          'apiLevel': '[apiLevel, default: 2.25]' # if user does not specify, then use 2.25
+          'apiLevel': '[apiLevel, default: __DEFAULT_API_LEVEL__]' # if user does not specify, then use __DEFAULT_API_LEVEL__
       }}
 
       def add_parameters(parameters): # this required only if users want runtime parameters in the protocol
@@ -411,7 +412,7 @@ Consider the <about> sections for each file to understand their content.
 Instructions:
 - Analyze the query to identify key concepts (e.g., modules, pipettes, labware, specific robot types)
 - Match these concepts with the appropriate documentation files based on their <about> descriptions
-- List the complete file paths as they appear in the documentation structure (e.g., docs/v2/new_modules.rst)
+- List the complete file paths as they appear in the documentation structure (e.g., modules/index.md)
 - If a query involves multiple concepts, include all relevant files
 - Be selective - only include files that directly relate to the query
 - Format your response with <relevant_files> tags
@@ -419,10 +420,10 @@ Instructions:
 
 Format your response exactly like this:
 <relevant_files>
-docs/v2/new_modules.rst,
-docs/v2/new_pipette.rst,
-docs/v2/index.rst,
-docs/v2/example_protocols/dilution_tutorial_flex.py
+modules/index.md,
+pipettes/index.md,
+index.md,
+examples.md
 </relevant_files>
 
 Important: Use the exact file paths as shown in the documentation structure, separated by commas.

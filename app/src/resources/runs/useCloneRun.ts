@@ -2,6 +2,7 @@ import { useQueryClient } from 'react-query'
 import isEqual from 'lodash/isEqual'
 
 import {
+  getQueryKey,
   useCreateProtocolAnalysisMutation,
   useCreateRunMutation,
   useHost,
@@ -33,12 +34,12 @@ export function useCloneRun(
   const protocolKey = runRecord?.data.protocolId ?? null
   const { createRun, isLoading: isCloning } = useCreateRunMutation({
     onSuccess: response => {
-      const invalidateRuns = queryClient.invalidateQueries([host, 'runs'])
-      const invalidateProtocols = queryClient.invalidateQueries([
-        host,
-        'protocols',
-        protocolKey,
-      ])
+      const invalidateRuns = queryClient.invalidateQueries(
+        getQueryKey(host, 'runs')
+      )
+      const invalidateProtocols = queryClient.invalidateQueries(
+        getQueryKey(host, 'protocols', protocolKey)
+      )
       Promise.all([invalidateRuns, invalidateProtocols]).catch((e: Error) => {
         console.error(`error invalidating runs query: ${e.message}`)
       })

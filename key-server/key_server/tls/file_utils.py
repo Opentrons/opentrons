@@ -286,3 +286,11 @@ def make_pem_bundle(
         combined_pem.write(tls_cert.public_bytes(serialization.Encoding.PEM))
         combined_pem.write(b"\n")
         combined_pem.write(ca_cert.public_bytes(serialization.Encoding.PEM))
+
+
+def load_wordlist() -> list[str]:
+    """Load the built-in wordlist (EFF Short V2 from https://www.eff.org/files/2016/09/08/eff_short_wordlist_2_0.txt)."""
+    wordsfile = Path(__file__).parent / "eff_wordlist_short_2.0.txt"
+    words = wordsfile.read_text("UTF-8")
+    lines = words.split("\n")
+    return [line.split("\t")[1] for line in lines if line]

@@ -1,5 +1,12 @@
 import * as errorCreators from '../../errorCreators'
-import { uuid } from '../../utils'
+import { vacuumModuleStateGetter } from '../../robotStateSelectors'
+import {
+  formatPyValue,
+  getModuleHasLiveTask,
+  indentPyLines,
+  uuid,
+} from '../../utils'
+import { getVacuumPumpHoldArgsPython } from '../../utils/vacuumPythonArgs/getVacuumPumpHoldArgsPython'
 
 import type { CommandCreator, VacuumPumpPressureArgs } from '../../types'
 
@@ -12,22 +19,40 @@ export const vacuumSetPumpPressure: CommandCreator<VacuumPumpPressureArgs> = (
   const { moduleId, gaugePressure, duration, ventAfter } = args
   const module = invariantContext.moduleEntities[moduleId]
 
-  if (module == null) {
+  const moduleState = vacuumModuleStateGetter(prevRobotState, moduleId)
+  if (moduleState == null || module == null) {
     return {
       errors: [errorCreators.missingModuleError()],
     }
   }
 
-  const holdArgs =
-    duration != null
-      ? {
-          duration,
-          // defaults to true per PE command
-          ventAfter: ventAfter ?? true,
-        }
-      : {}
+  const hasLiveTask = getModuleHasLiveTask(moduleState)
+  if (hasLiveTask) {
+    return {
+      errors: [errorCreators.liveTaskError()],
+    }
+  }
 
-  // TODO: (nd, 2026-04-20) implement Python emission
+  const isTimedHold = duration != null
+  const taskId = isTimedHold
+    ? `${module.pythonName}_task_${moduleState.numPumpActivitiesStarted + 1}`
+    : null
+
+  const holdArgs = isTimedHold
+    ? {
+        duration,
+        ventAfter,
+        taskId,
+      }
+    : null
+
+  const gaugePressureArg = `gauge_pressure_mbar=${formatPyValue(gaugePressure)}`
+  const holdArgsPython = isTimedHold
+    ? getVacuumPumpHoldArgsPython(duration, ventAfter)
+    : []
+  const allArgsPython = [gaugePressureArg, ...holdArgsPython]
+  const taskPython = isTimedHold ? `${taskId} = ` : ''
+  const python = `${taskPython}${module.pythonName}.start_set_vacuum_pressure(\n${indentPyLines(allArgsPython.join(',\n'))}\n)`
   return {
     commands: [
       {
@@ -36,10 +61,10 @@ export const vacuumSetPumpPressure: CommandCreator<VacuumPumpPressureArgs> = (
         params: {
           moduleId,
           gaugePressure,
-          ...holdArgs,
-          // making this explicit for ease of use with statte upd
+          ...(holdArgs != null ? holdArgs : {}),
         },
       },
     ],
+    python,
   }
 }

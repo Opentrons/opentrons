@@ -2,6 +2,7 @@ import {
   A1_NOZZLE,
   A12_NOZZLE,
   ALL,
+  B1_ADDRESSABLE_AREA,
   COLUMN,
   FLEX_ROBOT_TYPE,
   getAddressableAreaFromSlotId,
@@ -15,6 +16,7 @@ import {
   OT2_ROBOT_TYPE,
   PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
+  QUADRANT,
   ROW,
   SINGLE,
   THERMOCYCLER_MODULE_TYPE,
@@ -22,7 +24,7 @@ import {
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { EMPTY, OT2_TC_SLOTS } from '../constants'
+import { EMPTY } from '../constants'
 import { getPipetteCriticalPoint } from './getPipetteCriticalPoint'
 import { getFullStackFromLabwares, getSlotInLocationStack } from './misc'
 
@@ -45,6 +47,7 @@ import type {
   LabwareEntity,
   ModuleEntities,
   PipetteEntity,
+  PipetteMovementSafetyStatus,
   Point,
   RobotState,
   TipState,
@@ -66,14 +69,16 @@ const FLEX_TC_LID_FRONT_RIGHT_PT = {
   z: FLEX_TC_LID_COLLISION_ZONE.front_right.z,
 }
 
+const FULL_96_PIPETTE_NOZZLE_OFFSET_X_MM = 49.5 // designates half of full width of pipette nozzle plane for 96-ch pipettes
+
 interface SlotInfo {
   addressableArea: AddressableArea | null
   position: CoordinateTuple | null
 }
 
-export const getCutoutIdFromSlot = (slotInfo: SlotInfo): CutoutId | null => {
+export const getCutoutFromSlot = (slotInfo: SlotInfo): CutoutId | null => {
   if (slotInfo.addressableArea?.areaType === 'slot') {
-    const testCutoutId = `cutoutId${slotInfo.addressableArea?.id}`
+    const testCutoutId = `cutout${slotInfo.addressableArea?.id}`
     if (testCutoutId as CutoutId) {
       return testCutoutId as CutoutId
     }
@@ -81,7 +86,7 @@ export const getCutoutIdFromSlot = (slotInfo: SlotInfo): CutoutId | null => {
   return null
 }
 
-// return pipette bounds at a sepcific position
+// return pipette bounds at a specific position
 // note that this calculation is pessimistic to mirror behavior on protocol engine
 // the returned plane is defined by the z-height of the empty nozzles (lowest case scenario)
 // and the x-y bounds defined by the outer-most bounds of the pipette
@@ -185,7 +190,7 @@ const getHighestZInSlot = (
       moduleId => modules[moduleId].slot === slotId
     )
     const wasteChuteInSlot = Object.values(wasteChuteEntities).find(
-      wasteChute => wasteChute.location === getCutoutIdFromSlot(slotInfo)
+      wasteChute => wasteChute.location === getCutoutFromSlot(slotInfo)
     )
     // if slot has waste chute
     if (wasteChuteInSlot) {
@@ -217,31 +222,16 @@ const getHighestZInSlot = (
 }
 
 //  check if the slot overlaps with the pipette position
-const getSlotHasPotentialCollidingObject = (
+const getSlotPotentialCollidingObject = (
   pipetteBounds: Point[],
   slotInfo: SlotInfo[],
   robotState: RobotState,
   invariantContext: InvariantContext,
   robotType: RobotType
-): boolean => {
-  const isThermocyclerOnDeck = Object.values(
-    invariantContext.moduleEntities
-  ).some(({ type }) => type === THERMOCYCLER_MODULE_TYPE)
-
+): { addressableAreaCausingCollision: AddressableArea } | null => {
   for (const slot of slotInfo) {
     const slotBounds = slot.addressableArea?.boundingBox
     const slotPosition = slot.position
-    // explicit OT-2 check for if the pipette will enter the space above a thermocycler-occupied slot
-    const willCollideWithThermocycler =
-      isThermocyclerOnDeck &&
-      robotType === OT2_ROBOT_TYPE &&
-      slot.addressableArea?.id != null &&
-      OT2_TC_SLOTS.includes(slot.addressableArea.id as OT2AddressableAreaName)
-
-    if (willCollideWithThermocycler) {
-      return true
-    }
-
     // If slotPosition or slotBounds is null, continue to the next iteration
     if (slotPosition == null || slotBounds == null) {
       continue
@@ -271,12 +261,16 @@ const getSlotHasPotentialCollidingObject = (
         slot,
         robotType
       )
-      if (highestZInSurroundingSlot >= pipetteBounds[0]?.z) {
-        return true
+
+      if (
+        highestZInSurroundingSlot >= pipetteBounds[0]?.z &&
+        slot.addressableArea != null
+      ) {
+        return { addressableAreaCausingCollision: slot.addressableArea }
       }
     }
   }
-  return false
+  return null
 }
 
 const getWillCollideWithThermocyclerLid = (
@@ -303,7 +297,6 @@ const getWellPosition = (
   labwareEntity: LabwareEntity,
   wellName: string,
   wellLocationOffset: Point,
-  addressableAreaOffset: CoordinateTuple,
   hasTip: boolean
 ): Point => {
   const { wells } = labwareEntity.def
@@ -311,27 +304,26 @@ const getWellPosition = (
   //  note: api includes calibration data here which PD does not have knowledge of at the moment
   const wellDef = wells[wellName]
   return {
-    x: wellDef.x + wellLocationOffset.x + (addressableAreaOffset?.[0] ?? 0),
-    y: wellDef.y + wellLocationOffset.y + (addressableAreaOffset?.[1] ?? 0),
+    x: wellDef.x + wellLocationOffset.x,
+    y: wellDef.y + wellLocationOffset.y,
     z: hasTip
-      ? wellDef.z +
-        (wellLocationOffset.z ?? 0) +
-        (addressableAreaOffset?.[2] ?? 0)
+      ? wellDef.z + (wellLocationOffset.z ?? 0)
       : labwareEntity.def.dimensions.zDimension,
   }
 }
 
 //  util to use in step-generation for if the pipette movement is safe
-export const getIsSafePipetteMovement = (args: {
+export const getPipetteMovementSafetyStatus = (args: {
   robotState: RobotState
   invariantContext: InvariantContext
   pipetteId: string
   labwareId: string
   wellLocationOffset?: Point
   wellTargetName?: string
+  tiprackId?: string
   primaryNozzle: PrimaryNozzleConfigurationStyle
   nozzleConfiguration: NozzleConfigurationStyle
-}): boolean => {
+}): PipetteMovementSafetyStatus => {
   const {
     robotState,
     invariantContext,
@@ -341,6 +333,7 @@ export const getIsSafePipetteMovement = (args: {
     wellTargetName,
     primaryNozzle,
     nozzleConfiguration,
+    tiprackId,
   } = args
   const {
     pipetteEntities,
@@ -352,58 +345,97 @@ export const getIsSafePipetteMovement = (args: {
 
   const pipetteEntity = pipetteEntities[pipetteId]
 
+  // if pipette entity is not found, return safe, since the responsibility of this function is to check if the pipette movement is safe, not to check if the pipette exists
+  if (pipetteEntity == null) {
+    return { isSafe: true }
+  }
+
   const { spec: pipetteSpecs } = pipetteEntity
+  const { channels } = pipetteSpecs
 
   // NOTE: I don't like this, but step-generation is currently blind to robot type, so we'll infer from the pipette specs
   const displayCategory = pipetteSpecs?.displayCategory
   const isFlexPipette = displayCategory === 'FLEX'
   const robotType = isFlexPipette ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
+
   const deckDefinition = getDeckDefFromRobotType(robotType)
-
-  //  early exit if labwareId is a trashBin or wasteChute or if no well name is provided
-  if (labwareEntities[labwareId] == null || wellTargetName == null) {
-    return true
+  //  early exit if labwareId is a trashBin or wasteChute or if no well name is provided or if 1ch pipette
+  if (
+    labwareEntities[labwareId] == null ||
+    wellTargetName == null ||
+    channels === 1
+  ) {
+    return { isSafe: true }
   }
+  // If tiprackId is explicitly provided, assume the pipette currently has a tip attached.
+  // This is used in WellSelector.ts / getAllWellsSafetyStatus to force "tip present"
+  // during collision detection scenarios.
+  const pipetteHasTip = tiprackId
+    ? true
+    : (tipState.pipettes[pipetteId]?.hasTip ?? false)
 
-  const tiprackId = tipState.pipettes[pipetteId]?.tiprackURI
-  const tiprackEntity = tiprackId != null ? labwareEntities[tiprackId] : null
+  // Use the provided tiprackId if available; otherwise fall back to the
+  // tiprack recorded in tipState for this pipette.
+  const confirmedTiprackId =
+    tiprackId ?? tipState.pipettes[pipetteId]?.tiprackURI
+  const tiprackEntity =
+    confirmedTiprackId != null ? labwareEntities[confirmedTiprackId] : null
   const tiprackTipLength =
     tiprackEntity != null ? tiprackEntity.def.parameters.tipLength : 0
   const stagingAreaSlots = Object.values(stagingAreaEntities).map(
     stagingArea => stagingArea.location as string
   )
-  const pipetteHasTip = tipState.pipettes[pipetteId]?.hasTip ?? false
+
   // account for tip length if picking up tip
   const tipLength = pipetteHasTip ? (tiprackTipLength ?? 0) : 0
   const labwareSlot = getSlotInLocationStack(labwareState[labwareId].stack)
-  const addressableAreaOffset = getPositionFromSlotId(
-    labwareSlot,
-    deckDefinition
-  ) ?? [0, 0, 0]
-  const isOnFlexThermocycler =
-    robotType === FLEX_ROBOT_TYPE &&
-    labwareState[labwareId].stack.some(
-      item => moduleEntities[item]?.type === THERMOCYCLER_MODULE_TYPE
-    )
-  const thermocyclerOffset = isOnFlexThermocycler
-    ? (deckDefinition.locations.addressableAreas.find(
+
+  const hasThermocycler = labwareState[labwareId].stack.some(item => {
+    return moduleEntities[item]?.type === THERMOCYCLER_MODULE_TYPE
+  })
+
+  // special logic for thermocycler addressable area offset for the OT-2
+  const flexDeckDefinition = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  const addressableAreaOffset = (hasThermocycler
+    ? getPositionFromSlotId(B1_ADDRESSABLE_AREA, flexDeckDefinition)
+    : getPositionFromSlotId(labwareSlot, deckDefinition)) ?? [0, 0, 0]
+
+  const thermocyclerOffset = hasThermocycler
+    ? (flexDeckDefinition.locations.addressableAreas.find(
         addressableArea => addressableArea.id === THERMOCYCLER_MODULE_V2
       )?.offsetFromCutoutFixture ?? [0, 0, 0])
     : [0, 0, 0]
-  const fullOffset = [
-    thermocyclerOffset[0] + addressableAreaOffset[0],
-    thermocyclerOffset[1] + addressableAreaOffset[1],
-    thermocyclerOffset[2] + addressableAreaOffset[2],
-  ]
+  const fullOffsetForThermocyclerAndAA: Point = {
+    x: thermocyclerOffset[0] + addressableAreaOffset[0],
+    y: thermocyclerOffset[1] + addressableAreaOffset[1],
+    z: thermocyclerOffset[2] + addressableAreaOffset[2],
+  }
+  const { def: labwareDef } = labwareEntities[labwareId]
+  const centeringOffset = getPipetteCenteringFullOffset({
+    wellTargetName,
+    primaryNozzle,
+    nozzleConfiguration,
+    specs: pipetteSpecs,
+    labwareDef,
+  })
+  const fullWellLocationOffset = {
+    x:
+      wellLocationOffset.x +
+      centeringOffset.x +
+      fullOffsetForThermocyclerAndAA.x,
+    y:
+      wellLocationOffset.y +
+      centeringOffset.y +
+      fullOffsetForThermocyclerAndAA.y,
+    z: (wellLocationOffset.z ?? 0) + (fullOffsetForThermocyclerAndAA.z ?? 0),
+  }
+
   const wellTargetPoint = getWellPosition(
     labwareEntities[labwareId],
     wellTargetName,
-    wellLocationOffset,
-    fullOffset as CoordinateTuple,
+    fullWellLocationOffset,
     pipetteHasTip
   )
-
-  const { channels } = pipetteSpecs
 
   const tipOverlapOnNozzle =
     tiprackEntity != null
@@ -419,8 +451,7 @@ export const getIsSafePipetteMovement = (args: {
     tipLength,
     wellTargetPoint,
     labwareDefinition,
-    primaryNozzle ??
-      getDefaultPrimaryNozzle({ nozzles: nozzleConfiguration, channels }),
+    primaryNozzle,
     nozzleConfiguration,
     tipOverlapOnNozzle
   )
@@ -430,8 +461,9 @@ export const getIsSafePipetteMovement = (args: {
     boundingBox: pipetteBoundsAtWellLocation,
     robotType,
   })
+
   if (!isWithinPipetteExtents) {
-    return false
+    return { isSafe: false, reason: { type: 'outsidePipetteExtents' } }
   }
   const surroundingSlots =
     robotType === OT2_ROBOT_TYPE
@@ -445,19 +477,35 @@ export const getIsSafePipetteMovement = (args: {
       position,
     }
   })
-  return (
-    !getWillCollideWithThermocyclerLid(
+  if (
+    getWillCollideWithThermocyclerLid(
       pipetteBoundsAtWellLocation,
       moduleEntities
-    ) &&
-    !getSlotHasPotentialCollidingObject(
-      pipetteBoundsAtWellLocation,
-      slotInfos,
-      robotState,
-      invariantContext,
-      robotType
     )
+  ) {
+    return {
+      isSafe: false,
+      reason: { type: 'thermocyclerLidCollision' },
+    }
+  }
+  const slotPotentialCollidingObject = getSlotPotentialCollidingObject(
+    pipetteBoundsAtWellLocation,
+    slotInfos,
+    robotState,
+    invariantContext,
+    robotType
   )
+  if (slotPotentialCollidingObject != null) {
+    return {
+      isSafe: false,
+      reason: {
+        type: 'adjacentAdressableAreaCollision',
+        addressableAreaCausingCollision:
+          slotPotentialCollidingObject.addressableAreaCausingCollision,
+      },
+    }
+  }
+  return { isSafe: true }
 }
 
 interface TipPickupAvailability {
@@ -511,13 +559,31 @@ export const getIsSafePickupWithinTiprack = (args: {
       const targetWellIndex = tipColumnOrdered.indexOf(wellName)
       const targetWellLength =
         PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
+      // Active nozzle positions in the (possibly reversed) column ordering.
+      // Reversed columns grow toward index 0 (H→G→F→...) so active wells are
+      // slice(targetWellIndex - count + 1, targetWellIndex + 1).
+      // Non-reversed (A1 primary) columns grow toward higher indices so active
+      // wells are slice(targetWellIndex, targetWellIndex + count).
+      const activeWells = shouldReverse
+        ? tipColumnOrdered.slice(
+            targetWellIndex - targetWellLength + 1,
+            targetWellIndex + 1
+          )
+        : tipColumnOrdered.slice(
+            targetWellIndex,
+            targetWellIndex + targetWellLength
+          )
       return {
         isSafe: tipColumnOrdered
-          .slice(targetWellIndex + targetWellLength, tipColumnOrdered.length)
+          .slice(targetWellIndex + 1)
           .every(
             well => tipState[well] === EMPTY || tipsToIgnore.includes(well)
           ),
-        isComplete: tipState[wellName] !== EMPTY,
+        // All active nozzle wells must have tips AND must not be claimed by an
+        // earlier selection in the same wizard session (tipsToIgnore).
+        isComplete: activeWells.every(
+          well => tipState[well] !== EMPTY && !tipsToIgnore.includes(well)
+        ),
       }
     }
     // 8 channel pickup, full column
@@ -652,15 +718,8 @@ export const getTargetTipsFromWellSets = (args: {
   primaryNozzle: string
 }): string[] => {
   const { wellSets, nozzles, channels, primaryNozzle } = args
-  // 96-channel pipette with ROW nozzle configuration needs to transpose wellSets
   if (nozzles === ROW) {
-    const numCols = wellSets[0].length
-    const transposed: string[][] = Array.from(
-      { length: numCols },
-      (_, colIndex) => wellSets.map(row => row[colIndex])
-    )
-    // Pick the first well from each row
-    return transposed.map(row => row[0])
+    return wellSets.map(row => row[0])
   }
   return wellSets.map(wellSet => {
     // 96-channel pipette with ALL nozzle configuration or 8ch with PARTIAL
@@ -777,4 +836,109 @@ const getIsMovementWithinDeckExtents = (args: {
     }
   }
   return true
+}
+
+// gets arbitrary span between two pipette nozzles, assuming constant grid spacing
+const getNozzleGapFromPipetteSpecs = (specs: PipetteV2Specs): number => {
+  const { channels, nozzleMap } = specs
+  if (channels === 1) {
+    return 0
+  }
+
+  // for 96- and 8-channel pipettes, the gap between nozzles A1 and B1
+  // is consistent for all nozzles
+  const [nozzleX1, nozzleX2] = ['A1', 'B1'].map(key => nozzleMap[key][1])
+  const nozzleGap = Math.abs(nozzleX1 - nozzleX2)
+  return nozzleGap
+}
+
+interface PipetteCenteringArgs {
+  wellTargetName: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
+  nozzleConfiguration: NozzleConfigurationStyle
+  specs: PipetteV2Specs
+  labwareDef: LabwareDefinition
+}
+
+export const getPipetteCenteringFullOffset = (
+  args: PipetteCenteringArgs
+): Point => {
+  const centeringXOffset = getPipetteCenteringXOffset(args)
+  const centeringYOffset = getPipetteCenteringYOffset(args)
+  return {
+    x: centeringXOffset,
+    y: centeringYOffset,
+  }
+}
+
+const getPipetteCenteringXOffset = (args: PipetteCenteringArgs): number => {
+  const { primaryNozzle, nozzleConfiguration, specs, labwareDef } = args
+  const { channels } = specs
+  if (channels !== 96) {
+    return 0
+  }
+  const { ordering } = labwareDef
+  const shouldCenterInX = ordering.length === 1 // labware is comprised of 1 column (row-format, as an 8-ch reservoir)
+  if (!shouldCenterInX) {
+    return 0
+  }
+  let numNozzleColumns: number
+  const directionForXOffset = getTipColumnName(primaryNozzle) === '12' ? 1 : -1
+  if (
+    (nozzleConfiguration === ALL && channels === 96) ||
+    nozzleConfiguration === ROW
+  ) {
+    numNozzleColumns = 12
+  } else if (nozzleConfiguration === QUADRANT) {
+    numNozzleColumns = 6
+  } else {
+    return directionForXOffset * FULL_96_PIPETTE_NOZZLE_OFFSET_X_MM
+  }
+  const nozzleGap = getNozzleGapFromPipetteSpecs(specs)
+  return shouldCenterInX
+    ? (((numNozzleColumns - 1) * nozzleGap) / 2) * directionForXOffset
+    : 0
+}
+
+const getPipetteCenteringYOffset = (args: PipetteCenteringArgs): number => {
+  const {
+    wellTargetName,
+    primaryNozzle,
+    nozzleConfiguration,
+    specs,
+    labwareDef,
+  } = args
+  const { channels } = specs
+  if (channels === 1) {
+    return 0
+  }
+  const nozzleGap = getNozzleGapFromPipetteSpecs(specs)
+  const { ordering } = labwareDef
+  const wellTargetColumnIndex = ordering.findIndex(column =>
+    column.includes(wellTargetName)
+  )
+  const wellTargetColumn = ordering[wellTargetColumnIndex]
+  if (wellTargetColumn.length !== 1) {
+    return 0
+  }
+  if (nozzleConfiguration === PARTIAL_COLUMN) {
+    // determine number of nozzle gaps between nozzle A and primary
+    const spanFromAToPrimary =
+      8 - PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
+
+    // shift forward such that nozzle A targets the well center
+    const offsetToNozzleA = -1 * spanFromAToPrimary * nozzleGap
+
+    // since there are 7 "gaps" between front and back nozzles
+    const offsetFromNozzleAToBack = (7 * nozzleGap) / 2
+
+    // "push" pipette back to center the pipette
+    return offsetToNozzleA + offsetFromNozzleAToBack
+  }
+
+  // all other 96- and 8-channel nozzle configs
+  const directionForYOffset = getTipRowName(primaryNozzle) === 'H' ? -1 : 1
+
+  // 7 here again since there are 7 "gaps" between front and back nozzles
+  return ((7 * nozzleGap) / 2) * directionForYOffset
 }

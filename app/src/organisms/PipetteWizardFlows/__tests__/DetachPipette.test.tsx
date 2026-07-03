@@ -13,7 +13,7 @@ import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
 import {
   mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
-} from '/app/redux/pipettes/__fixtures__'
+} from '/app/resources/instruments/__fixtures__'
 import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 
 import { FLOWS } from '../constants'

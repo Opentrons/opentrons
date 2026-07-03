@@ -9,6 +9,9 @@ import { cssModuleSideEffect } from './cssModulesSideEffect'
 export default defineConfig({
   plugins: [react(), cssModuleSideEffect()],
   root: '.',
+  define: {
+    'process.env': {},
+  },
   server: {
     hmr: {
       overlay: false,

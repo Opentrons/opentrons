@@ -86,6 +86,7 @@ def _build_run(
             labwareOffsets=[],
             pipettes=[],
             modules=[],
+            peripherals=[],
             liquids=[],
             liquidClasses=[],
             wells=[],
@@ -260,6 +261,8 @@ class RunDataManager:
             run_id=run_id,
             labware_offsets=labware_offsets,
             initial_error_recovery_policy=initial_error_recovery_policy,
+            error_recovery_rules=self._current_run_error_recovery_rules,
+            error_recovery_is_enabled=error_recovery_is_enabled,
             deck_configuration=deck_configuration,
             file_provider=self._file_provider,
             camera_provider=camera_provider,
@@ -644,7 +647,11 @@ class RunDataManager:
         mapped_policy = error_recovery_mapping.create_error_recovery_policy_from_rules(
             self._current_run_error_recovery_rules, is_enabled
         )
-        self._run_orchestrator_store.set_error_recovery_policy(policy=mapped_policy)
+        self._run_orchestrator_store.set_error_recovery_policy(
+            policy=mapped_policy,
+            error_recovery_rules=self._current_run_error_recovery_rules,
+            error_recovery_is_enabled=is_enabled,
+        )
 
     def get_error_recovery_rules(self, run_id: str) -> List[ErrorRecoveryRule]:
         """Get the run's error recovery policy."""

@@ -137,7 +137,7 @@ const compareUsbSysfsNames = (
 }
 
 export const getUsbDevices = async (): Promise<AppShellUsbDevice[]> => {
-  log.info(`Reading USB devices from ${USB_SYS_PATH}`)
+  log.debug(`Reading USB devices from ${USB_SYS_PATH}`)
 
   try {
     const entries = await fsPromises.readdir(USB_SYS_PATH, {
@@ -158,7 +158,7 @@ export const getUsbDevices = async (): Promise<AppShellUsbDevice[]> => {
       .filter((device): device is AppShellUsbDevice => device != null)
       .sort(compareUsbSysfsNames)
 
-    log.info(`Found ${result.length} USB devices`)
+    log.debug(`Found ${result.length} USB devices`)
     log.debug(`USB devices: ${JSON.stringify(result)}`)
 
     return result

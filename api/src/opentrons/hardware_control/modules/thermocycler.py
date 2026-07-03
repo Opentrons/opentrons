@@ -6,9 +6,11 @@ from typing import Callable, Dict, List, Mapping, Optional, Union, cast
 
 from ..execution_manager import ExecutionManager
 from . import mod_abc, types, update
+from opentrons.config import IS_ROBOT
 from opentrons.drivers.asyncio.communication.errors import UnhandledGcode
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.thermocycler import (
+    DEFAULT_COMMAND_RETRIES,
     AbstractThermocyclerDriver,
     SimulatingDriver,
     ThermocyclerDriverFactory,
@@ -24,6 +26,7 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.util.pyro.pyro_synchronous_adapter import (
+    convert_result_to_proxy,
     pyro_behavior,
     remove_pyro_synchronous_object,
 )
@@ -174,12 +177,36 @@ class Thermocycler(mod_abc.AbstractModule):
             self._enter_error_state
         )
 
-    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
-    async def cleanup(self) -> None:
+    async def soft_cleanup(self) -> None:
         """Stop the poller task."""
         self._unsubscribe_reader()
         await self._poller.stop()
         await self._driver.disconnect()
+
+    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
+    async def cleanup(self) -> None:
+        """Stop the poller task."""
+        await self.soft_cleanup()
+
+    async def move_port(self, port: str, usb_port: USBPort) -> None:
+        self._port = port
+        self._usb_port = usb_port
+        await self._driver.move_port(port)
+
+    async def attempt_reconnect(self) -> None:
+        """Attempt to reestablish connections."""
+        if not IS_ROBOT:
+            return
+        try:
+            if not await self._driver.is_connected():
+                self._driver = await ThermocyclerDriverFactory.create(
+                    port=self.port, loop=self.loop
+                )
+                self._reader._driver = self._driver
+            await self._poller.stop()
+            await self._poller.start()
+        except BaseException as e:
+            log.error(f"Got {e} when trying to reconnect.")
 
     @classmethod
     def name(cls) -> str:
@@ -201,6 +228,7 @@ class Thermocycler(mod_abc.AbstractModule):
             # Real module that is not a V2
             return V1_MODULE_STRING
 
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def bootloader(self) -> types.UploadFunction:
         if self.model() == V2_MODULE_STRING:
             return update.upload_via_dfu
@@ -353,10 +381,9 @@ class Thermocycler(mod_abc.AbstractModule):
         await self._driver.set_plate_temperature(
             temp=temperature, hold_time=hold_time, volume=volume, ramp_rate=ramp_rate
         )
-
-        task = self._loop.create_task(self._wait_for_block_target())
-        self.make_cancellable(task)
-        await task
+        await self.run_task_fault_tolerant(
+            self._wait_for_block_target, DEFAULT_COMMAND_RETRIES
+        )
 
     async def wait_for_block_target(self) -> None:
         """
@@ -370,9 +397,9 @@ class Thermocycler(mod_abc.AbstractModule):
         Returns: None
         """
         await self.wait_for_is_running()
-        task = self._loop.create_task(self._wait_for_block_target())
-        self.make_cancellable(task)
-        await task
+        await self.run_task_fault_tolerant(
+            self._wait_for_block_target, DEFAULT_COMMAND_RETRIES
+        )
 
     async def cycle_temperatures(
         self,
@@ -435,18 +462,16 @@ class Thermocycler(mod_abc.AbstractModule):
         """Set the lid temperature in degrees Celsius"""
         await self.wait_for_is_running()
         await self._driver.set_lid_temperature(temp=temperature)
-
-        task = self._loop.create_task(self._wait_for_lid_target())
-        self.make_cancellable(task)
-        await task
+        await self.run_task_fault_tolerant(
+            self._wait_for_lid_target, DEFAULT_COMMAND_RETRIES
+        )
 
     async def wait_for_lid_target(self) -> None:
         """Set the lid temperature in degrees Celsius"""
         await self.wait_for_is_running()
-
-        task = self._loop.create_task(self._wait_for_lid_target())
-        self.make_cancellable(task)
-        await task
+        await self.run_task_fault_tolerant(
+            self._wait_for_lid_target, DEFAULT_COMMAND_RETRIES
+        )
 
     # TODO(mc, 2022-04-25): de-duplicate with `set_temperature`
     async def set_target_block_temperature(

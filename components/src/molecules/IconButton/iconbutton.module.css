@@ -9,6 +9,14 @@
   background-color: var(--variant-default);
 }
 
+.size_sm {
+  padding: var(--spacing-8);
+}
+
+.size_md {
+  padding: var(--spacing-12);
+}
+
 .icon_button:active {
   background-color: var(--variant-active);
 }

@@ -12,8 +12,8 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '/app/i18n'
 import { useIsFlex } from '/app/redux-resources/robots'
-import * as PipetteConstants from '/app/redux/pipettes/constants'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { PIPETTE_MOUNTS } from '/app/resources/instruments/constants'
 import { isGripperInCommands } from '/app/resources/protocols/utils'
 import {
   useMostRecentCompletedAnalysis,
@@ -70,7 +70,7 @@ export function SetupInstrumentCalibration({
       >
         {i18n.format(t('required_instrument_calibrations'), 'titleCase')}
       </LegacyStyledText>
-      {PipetteConstants.PIPETTE_MOUNTS.map((mount, index) => {
+      {PIPETTE_MOUNTS.map((mount, index) => {
         const pipetteInfo = runPipetteInfoByMount[mount]
         if (pipetteInfo != null && !isFlex) {
           return (

@@ -1,10 +1,15 @@
 """Robot-server resouce class and functions for Pyro compatibility."""
 
+from __future__ import annotations
+
 import asyncio
 import logging
 import threading
 from typing import TYPE_CHECKING, Any, Callable, Optional
 
+from opentrons.config import (
+    feature_flags as ff,
+)
 from opentrons.hardware_control.types import HardwareEvent, HardwareEventHandler
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
@@ -29,11 +34,9 @@ if TYPE_CHECKING:
     from robot_server.deck_configuration.store import DeckConfigurationStore
     from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
         MaintenanceRunOrchestratorStore,
-        handle_estop_event,
     )
     from robot_server.runs.run_orchestrator_store import (
         RunOrchestratorStore,
-        handle_hardware_event,
     )
 
 robot_server_pyro_resource_accessor = AppStateAccessor["RobotServerPyroResource"](
@@ -55,6 +58,9 @@ class RobotServerPyroResource:
     """
 
     def __init__(self, loop: asyncio.AbstractEventLoop) -> None:
+        # Specialty private member for daemon execution overloading - Relevant to PyroSynchronousObjects only
+        self._execute_on_pyro_daemon_overload = True
+
         self._loop = loop
 
         # Default the resource variables to None - these will be set as services spin up
@@ -123,7 +129,7 @@ class RobotServerPyroResource:
                 event: HardwareEvent,
             ) -> None:
                 asyncio.run_coroutine_threadsafe(
-                    handle_hardware_event(orchestrator_store, event),
+                    orchestrator_store.handle_proxy_hardware_event(event),
                     self._loop,
                 )
 
@@ -146,7 +152,7 @@ class RobotServerPyroResource:
                 event: HardwareEvent,
             ) -> None:
                 asyncio.run_coroutine_threadsafe(
-                    handle_estop_event(orchestrator_store, event),
+                    orchestrator_store.handle_proxy_estop_event(event),
                     self._loop,
                 )
 
@@ -155,6 +161,32 @@ class RobotServerPyroResource:
         else:
             raise RuntimeError(
                 "Cannot provider a estop listener from the RobotServerPyroResource without a MaintenanceRunOrchestratorStore."
+            )
+
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def get_maintenance_run_door_watcher_callback(self) -> HardwareEventHandler:
+        """Get a door watcher callback from a non-subprocess Maintenance Run."""
+        orchestrator_store = self._maintenance_run_orchestrator_store
+        if orchestrator_store is not None:
+            return (
+                orchestrator_store.maintenance_run_door_watcher_callback_route_for_proxy
+            )
+        else:
+            raise RuntimeError(
+                "Cannot provider a maintenance run door watcher from the RobotServerPyroResource without a MaintenanceRunOrchestratorStore."
+            )
+
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def get_default_run_orchestrator_door_watcher_callback(
+        self,
+    ) -> HardwareEventHandler:
+        """Get a door watcher callback from a non-subprocess Default Run Orchestrator."""
+        orchestrator_store = self._run_orchestrator_store
+        if orchestrator_store is not None:
+            return orchestrator_store.default_run_orchestrator_door_watcher_callback_route_for_proxy
+        else:
+            raise RuntimeError(
+                "Cannot provider a default run orchestrator door watcher from the RobotServerPyroResource without a RunOrchestratorStore."
             )
 
     async def get_deck_configuration(self) -> DeckConfigurationType:
@@ -226,14 +258,16 @@ def start_initializing_pyro_resource(app_state: AppState) -> None:
     resource = RobotServerPyroResource(loop=asyncio.get_event_loop())
     robot_server_pyro_resource_accessor.set_on(app_state, resource)
 
-    pyro_daemon_thread = threading.Thread(
-        target=_start_and_run_pyro_daemon,
-        name="RobotServerResourceThread",
-        args=(),
-        kwargs={
-            "pyroname": RS_PYRONAME,
-            "registry": register_robot_server_types,
-        },
-        daemon=True,
-    )
-    pyro_daemon_thread.start()
+    # Only spin up a request handling daemon if subprocess mode is enabled
+    if ff.hardware_subprocess_enabled():
+        pyro_daemon_thread = threading.Thread(
+            target=_start_and_run_pyro_daemon,
+            name="RobotServerResourceThread",
+            args=(),
+            kwargs={
+                "pyroname": RS_PYRONAME,
+                "registry": register_robot_server_types,
+            },
+            daemon=True,
+        )
+        pyro_daemon_thread.start()

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
 
@@ -20,14 +20,20 @@ import {
   useMenuHandleClickOutside,
   useMountEffect,
 } from '@opentrons/components'
+import {
+  useCreateLiveCommandMutation,
+  useHomeMutation,
+  useSetLightsMutation,
+} from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
 import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
-import { useIsRobotBusy } from '/app/redux-resources/robots'
+import { RobotCertImportModal } from '/app/organisms/Desktop/RobotCertImport/RobotCertImportModal'
+import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
+import * as Config from '/app/redux/config'
 import { CONNECTABLE, REACHABLE, UNREACHABLE } from '/app/redux/discovery'
-import { restartRobot } from '/app/redux/robot-admin'
-import { home, ROBOT } from '/app/redux/robot-controls'
+import { restartRobot, shutdownRobot } from '/app/redux/robot-admin'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { checkShellUpdate } from '/app/redux/shell'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
@@ -49,7 +55,12 @@ export const RobotOverviewOverflowMenu = (
   props: RobotOverviewOverflowMenuProps
 ): JSX.Element => {
   const { robot } = props
-  const { t } = useTranslation(['devices_landing', 'robot_controls', 'shared'])
+  const { t } = useTranslation([
+    'devices_landing',
+    'robot_controls',
+    'shared',
+    'device_settings',
+  ])
   const {
     menuOverlay,
     handleOverflowClick,
@@ -63,13 +74,30 @@ export const RobotOverviewOverflowMenu = (
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robot.name)
 
   const dispatch = useDispatch<Dispatch>()
+  const isFlex = useIsFlex(robot.name)
+  const { setLights } = useSetLightsMutation()
+  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { home } = useHomeMutation()
 
   const handleClickRestart: MouseEventHandler<HTMLButtonElement> = () => {
     dispatch(restartRobot(robot.name))
   }
 
+  const handleClickShutdown: MouseEventHandler<HTMLButtonElement> = () => {
+    createLiveCommand({
+      command: { commandType: 'setStatusBar', params: { animation: 'off' } },
+    })
+      .catch(() => {
+        console.warn('Failed to set status bar animation to off')
+      })
+      .finally(() => {
+        setLights({ on: false })
+        dispatch(shutdownRobot(robot.name))
+      })
+  }
+
   const handleClickHomeGantry: MouseEventHandler<HTMLButtonElement> = () => {
-    dispatch(home(robot.name, ROBOT))
+    home({ target: 'robot' })
   }
 
   const [showChooseProtocolSlideout, setShowChooseProtocolSlideout] =
@@ -98,6 +126,9 @@ export const RobotOverviewOverflowMenu = (
     isRobotOnWrongVersionOfSoftware &&
     !isRobotUnavailable &&
     !isEstopNotDisengaged
+  const [showRobotCertImportModal, setShowRobotCertImportModal] =
+    useState<boolean>(false)
+  const devInternalFlags = useSelector(Config.getFeatureFlags)
 
   return (
     <Flex data-testid="RobotOverview_overflowMenu" position={POSITION_RELATIVE}>
@@ -108,6 +139,16 @@ export const RobotOverviewOverflowMenu = (
                 setShowDisconnectModal(false)
               }}
               robotName={robot.name}
+            />,
+            getTopPortalEl()
+          )
+        : null}
+      {showRobotCertImportModal
+        ? createPortal(
+            <RobotCertImportModal
+              onClose={() => {
+                setShowRobotCertImportModal(false)
+              }}
             />,
             getTopPortalEl()
           )
@@ -201,6 +242,17 @@ export const RobotOverviewOverflowMenu = (
           >
             {t('robot_controls:restart_label')}
           </MenuItem>
+          {isFlex ? (
+            <MenuItem
+              disabled={isRobotUnavailable || isEstopNotDisengaged}
+              onClick={handleClickShutdown}
+              data-testid={`RobotOverviewOverflowMenu_shutdownRobot_${String(
+                robot.name
+              )}`}
+            >
+              {t('robot_controls:turn_off_label')}
+            </MenuItem>
+          ) : null}
           <Divider marginY="0" />
           <MenuItem
             onClick={() => {
@@ -222,6 +274,20 @@ export const RobotOverviewOverflowMenu = (
           >
             {t('robot_settings')}
           </MenuItem>
+          {!!devInternalFlags.accessControlMode ? (
+            <MenuItem
+              onClick={() => {
+                setShowRobotCertImportModal(true)
+              }}
+              data-testid={`RobotOverviewOverflowMenu_robotCertImport_${String(robot.name)}`}
+              css={css`
+                border-radius: 0 0 ${BORDERS.borderRadius8}
+                  ${BORDERS.borderRadius8};
+              `}
+            >
+              {t('device_settings:verify_robot_encryption_key')}
+            </MenuItem>
+          ) : null}
         </Flex>
       ) : null}
       {robot.status === CONNECTABLE ? (

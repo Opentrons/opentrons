@@ -118,7 +118,8 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
         {showOverflowMenu ? (
           <LabwareCardOverflowMenu
             setShowOverflowMenu={setShowOverflowMenu}
-            labwareIds={filteredStack}
+            // fixes bug where deleting a labware from its overflow menu deletes all non-adapter labware in the stack
+            labwareIds={quantity === 1 ? [labware.id] : filteredStack}
             lidId={lidId}
           />
         ) : null}

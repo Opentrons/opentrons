@@ -190,8 +190,8 @@ function CheckLabwareContentODD(props: CheckLabwareContentProps): JSX.Element {
         {...props}
         header={contentHeader}
         desktopHeaderBtnCopy={t('exit')}
-        desktopFooterBtnCopy={t('confirm_placement')}
-        oddHeaderBtnCopy={t('confirm_placement')}
+        desktopFooterBtnCopy={t('confirm_offset')}
+        oddHeaderBtnCopy={t('confirm_offset')}
         onClickButton={handleProceed}
         onClickBack={handleGoBack}
       >
@@ -279,8 +279,8 @@ function CheckLabwareContentDesktop(
       {...props}
       header={contentHeader}
       desktopHeaderBtnCopy={t('exit')}
-      desktopFooterBtnCopy={t('confirm_placement')}
-      oddHeaderBtnCopy={t('confirm_placement')}
+      desktopFooterBtnCopy={t('confirm_offset')}
+      oddHeaderBtnCopy={t('confirm_offset')}
       onClickButton={handleProceed}
       onClickBack={handleGoBack}
       containerStyle={DESKTOP_CONTAINER_STYLE}

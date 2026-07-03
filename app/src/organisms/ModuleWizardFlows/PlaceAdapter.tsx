@@ -166,7 +166,6 @@ export function PlaceAdapter(props: PlaceAdapterProps): JSX.Element {
         commandType: 'calibration/moveToMaintenancePosition',
         params: {
           mount,
-          maintenancePosition: 'attachInstrument',
         },
       },
     ]

@@ -566,6 +566,16 @@ class CriticalPoint(enum.Enum):
     channel pipette.
     """
 
+    X_CENTER = enum.auto()
+    """
+    Similar to Y_CENTER, but here the X_CENTER critical point that is the same
+    Y coordinate as the default nozzle point, but halfway in between the X axis
+    bounding box of the pipette. In other words it is the XY center of the first
+    row of the pipette. This is only relevant for the 96 channel when interfacing
+    with labware with rows. On an eight or one channel this will be the same as the
+    starting nozzle.
+    """
+
 
 class ExecutionState(enum.Enum):
     RUNNING = enum.auto()
@@ -742,14 +752,6 @@ class EarlyLiquidSenseTrigger(RuntimeError):
 
 class FailedTipStateCheck(RuntimeError):
     """Error raised if the tip ejector state does not match the expected value."""
-
-    def __init__(
-        self, expected_state: TipStateType, actual_state: TipStateType
-    ) -> None:
-        """Initialize FailedTipStateCheck error."""
-        super().__init__(
-            f"Expected tip state {expected_state}, but received {actual_state}."
-        )
 
 
 @enum.unique

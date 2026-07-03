@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { ALL, COLUMN, fixtureP100096V2Specs } from '@opentrons/shared-data'
+import {
+  ALL,
+  COLUMN,
+  fixtureP100096V2Specs,
+  PARTIAL_COLUMN,
+} from '@opentrons/shared-data'
 
 import { getSuccessResult } from '../../../fixtures'
 import { configureNozzleLayout } from '../configureNozzleLayout'
@@ -87,6 +92,37 @@ mock_pipette.configure_nozzle_layout(
 mock_pipette.configure_nozzle_layout(
     protocol_api.COLUMN,
     start="A12",
+)`.trimStart()
+    )
+  })
+  it('should call configureNozzleLayout with correct params for partial column', () => {
+    const result = configureNozzleLayout(
+      {
+        configurationParams: {
+          primaryNozzle: 'D1',
+          style: PARTIAL_COLUMN,
+        },
+        pipetteId: mockPipette,
+      },
+      invariantContext,
+      robotInitialState
+    )
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
+      {
+        commandType: 'configureNozzleLayout',
+        key: expect.any(String),
+        params: {
+          pipetteId: mockPipette,
+          configurationParams: { primaryNozzle: 'D1', style: PARTIAL_COLUMN },
+        },
+      },
+    ])
+    expect(res.python).toBe(
+      `
+mock_pipette.configure_nozzle_layout(
+    protocol_api.PARTIAL_COLUMN,
+    start="H1", end="D1",
 )`.trimStart()
     )
   })

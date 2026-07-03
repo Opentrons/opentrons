@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -15,15 +14,16 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useHomeMutation } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { home, ROBOT } from '/app/redux/robot-controls'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useLights } from '/app/resources/devices'
 
 import { RestartRobotConfirmationModal } from './RestartRobotConfirmationModal'
+import { ShutdownRobotConfirmationModal } from './ShutdownRobotConfirmationModal'
 
 import type { MouseEventHandler } from 'react'
-import type { Dispatch } from '/app/redux/types'
 
 interface NavigationMenuProps {
   onClick: MouseEventHandler
@@ -35,20 +35,29 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
   const { onClick, robotName, setShowNavMenu } = props
   const { t, i18n } = useTranslation(['devices_landing', 'robot_controls'])
   const { lightsOn, toggleLights } = useLights()
-  const dispatch = useDispatch<Dispatch>()
+  const { home } = useHomeMutation()
   const [
     showRestartRobotConfirmationModal,
     setShowRestartRobotConfirmationModal,
   ] = useState<boolean>(false)
+  const [
+    showShutdownRobotConfirmationModal,
+    setShowShutdownRobotConfirmationModal,
+  ] = useState<boolean>(false)
 
   const navigate = useNavigate()
+  const isFlex = useIsFlex(robotName)
 
   const handleRestart = (): void => {
     setShowRestartRobotConfirmationModal(true)
   }
 
+  const handleShutdown = (): void => {
+    setShowShutdownRobotConfirmationModal(true)
+  }
+
   const handleHomeGantry = (): void => {
-    dispatch(home(robotName, ROBOT))
+    home({ target: 'robot' })
     setShowNavMenu(false)
   }
 
@@ -59,6 +68,14 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
           robotName={robotName}
           setShowRestartRobotConfirmationModal={
             setShowRestartRobotConfirmationModal
+          }
+        />
+      ) : null}
+      {showShutdownRobotConfirmationModal ? (
+        <ShutdownRobotConfirmationModal
+          robotName={robotName}
+          setShowShutdownRobotConfirmationModal={
+            setShowShutdownRobotConfirmationModal
           }
         />
       ) : null}
@@ -96,6 +113,25 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
             </LegacyStyledText>
           </Flex>
         </MenuItem>
+        {isFlex ? (
+          <MenuItem key="shutdown" onClick={handleShutdown}>
+            <Flex alignItems={ALIGN_CENTER}>
+              <Icon
+                name="power-off"
+                size="2.5rem"
+                color={COLORS.black90}
+                aria-label="power-off_icon"
+              />
+              <LegacyStyledText
+                forwardedAs="h4"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                marginLeft={SPACING.spacing12}
+              >
+                {t('robot_controls:turn_off_label')}
+              </LegacyStyledText>
+            </Flex>
+          </MenuItem>
+        ) : null}
         <MenuItem
           key="deck-configuration"
           onClick={() => {
