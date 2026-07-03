@@ -28,9 +28,7 @@ _(Optional)_ Run the relevant Jest/Vitest test suite for the modified files to e
 
 - **Prop Shadowing** in new component interfaces.
 - **Leak** across Atomic Design layers or style boundaries.
-- **Blind Spot** occurrences in interactive or dynamic elements.
-- **Drift** from core Opentrons patterns or design tokens.
-- **Unprotected** components or logic that lack proper sibling tests or edge-case coverage.
+- **Over-baked** components that choose speculative over-engineering over tight, modular separation.
 
 ## Output Format
 

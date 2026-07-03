@@ -6,6 +6,7 @@ This glossary defines both Opentrons hardware/software domain concepts and speci
 
 - **Prop Shadowing** — The anti-pattern of manually typing standard HTML attributes (e.g., `onClick`, `className`) into a custom component's props interface instead of extending native element types.
 - **Leak** — A failure in component isolation, such as a CSS Module rule bleeding outward, or a presentation component importing global state hooks.
+- **Over-baked** — Speculative or over-engineered code that introduces premature complexity, handles unrequested future use-cases, or crams multiple responsibilities into a single component instead of modularizing.
 
 ## Opentrons Domain Concepts
 
