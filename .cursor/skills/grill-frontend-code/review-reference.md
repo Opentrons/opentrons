@@ -3,37 +3,44 @@
 This reference governs the architectural boundaries of Opentrons UI development.
 
 ## 1. Atomic Design Layers
+
 Opentrons enforces strict boundaries across component directories. Detect any layer-crossing violations:
 
-* **Atoms (`src/atoms`)**: Pure presentational elements. 
-  * *Criterion*: Must NOT import any other component. Must NOT import hooks that pull state from the global store (e.g., redux, react-query).
-* **Molecules (`src/molecules`)**: Combinations of atoms.
-  * *Criterion*: Can import atoms. Must NOT import organisms or pages.
-* **Organisms (`src/organisms`)**: Functional blocks.
-  * *Criterion*: Can leverage complex state hooks and orchestrate multiple molecules/atoms.
+- **Atoms (`src/atoms`)**: Pure presentational elements.
+  - _Criterion_: Must NOT import any other component. Must NOT import hooks that pull state from the global store (e.g., redux, react-query).
+- **Molecules (`src/molecules`)**: Combinations of atoms.
+  - _Criterion_: Can import atoms. Must NOT import organisms or pages.
+- **Organisms (`src/organisms`)**: Functional blocks.
+  - _Criterion_: Can leverage complex state hooks and orchestrate multiple molecules/atoms.
 
 ## 2. CSS Modules & Styles
+
 Opentrons uses CSS Modules for component isolation to ensure styles don't leak.
-* **Co-location**: A component `MyComponent.tsx` must have its companion `mycomponent.module.css` in the same directory.
-* **No Global Drift**: Standard HTML tags (e.g., `div`, `button`, `span`) must not be styled inside modules without a class selector, unless resetting.
-* **Class Names**: Use camelCase for class names in CSS, and bind them via `styles.className`. Avoid raw string literals for class assignment where modules are present.
+
+- **Co-location**: A component `MyComponent.tsx` must have its companion `mycomponent.module.css` in the same directory.
+- **No Global Drift**: Standard HTML tags (e.g., `div`, `button`, `span`) must not be styled inside modules without a class selector, unless resetting.
+- **Class Names**: Use camelCase for class names in CSS, and bind them via `styles.className`. Avoid raw string literals for class assignment where modules are present.
 
 ## 3. Web Accessibility (a11y)
+
 Opentrons interfaces are used in physical lab environments. Accessibility is functional reliability.
-* **Interactivity**: Any clickable element that is not a semantic `<button>` or `<a>` must be rejected. Do not allow `onClick` on a raw `<div>` without appropriate `role` and `tabIndex`.
-* **Visual Labels**: Icon-only buttons (e.g., an X close button) must explicitly declare an `aria-label` or `aria-describedby`.
-* **Dynamic States**: Loading indicators must possess `aria-busy="true"`.
+
+- **Interactivity**: Any clickable element that is not a semantic `<button>` or `<a>` must be rejected. Do not allow `onClick` on a raw `<div>` without appropriate `role` and `tabIndex`.
+- **Visual Labels**: Icon-only buttons (e.g., an X close button) must explicitly declare an `aria-label` or `aria-describedby`.
+- **Dynamic States**: Loading indicators must possess `aria-busy="true"`.
 
 ## 4. TypeScript & Logic Rigor
-* **Strict Types**: The `any` type is an automatic failure. If a type is genuinely polymorphic, enforce `unknown` and require type-guards.
-* **Nullability**: Optional or nullable fields must use strict inequality/equality checks (`!== null` or `!== undefined`). Do not allow loose `!= null` checks.
-* **Ternary Ceiling**: Nested ternary operators (`condition ? a : condition2 ? b : c`) are strictly prohibited. Demand extraction into early returns or explicit local switch/if blocks.
+
+- **Strict Types**: The `any` type is an automatic failure. If a type is genuinely polymorphic, enforce `unknown` and require type-guards.
+- **Nullability**: Optional or nullable fields must use strict inequality/equality checks (`!== null` or `!== undefined`). Do not allow loose `!= null` checks.
+- **Ternary Ceiling**: Nested ternary operators (`condition ? a : condition2 ? b : c`) are strictly prohibited. Demand extraction into early returns or explicit local switch/if blocks.
 
 ## 5. Component API Design (Props Extension)
+
 Standard HTML attributes must not be manually replicated. Components that wrap native HTML elements must explicitly extend native attributes to maintain web standards and prevent configuration creep.
 
-* **Anti-Pattern (Manual Shadowing)**: Do not manually type ubiquitous props like `onClick`, `className`, `id`, or `style` in custom prop interfaces.
-* **Enforced Pattern**: Always extend `React.ComponentPropsWithoutRef<'tag'>` (or `React.ComponentPropsWithRef<'tag'>` if forwarding refs).
+- **Anti-Pattern (Manual Shadowing)**: Do not manually type ubiquitous props like `onClick`, `className`, `id`, or `style` in custom prop interfaces.
+- **Enforced Pattern**: Always extend `React.ComponentPropsWithoutRef<'tag'>` (or `React.ComponentPropsWithRef<'tag'>` if forwarding refs).
 
 ```ts
 // ❌ BAD: Manual and brittle replication
@@ -48,3 +55,13 @@ interface ButtonProps {
 interface ButtonProps extends React.ComponentPropsWithoutRef<'button'> {
   label: string // Only define custom business props here
 }
+```
+
+## 6. Test Coverage & Rigor (Unprotected Code)
+
+Every feature branch must guard against regression. Code without test coverage is an automatic failure.
+
+- **Sibling Rule**: Any new component `MyComponent.tsx` or hook `useMyHook.ts` must be accompanied by a sibling `__tests__/MyComponent.test.tsx` or `MyComponent.test.ts` file within the same directory.
+- **RTL Standards**: Opentrons uses React Testing Library.
+  - Avoid testing internal state; always test observable behavior from the user's perspective (e.g., fireEvent/userEvent).
+  - Enforce explicit MSW (Mock Service Worker) handlers for any network/API layer mock, rather than manual `jest.fn()` overrides of global fetch.
