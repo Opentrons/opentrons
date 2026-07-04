@@ -67,9 +67,10 @@ Every feature branch must guard against regression. Code without test coverage i
   - Enforce explicit MSW (Mock Service Worker) handlers for any network/API layer mock, rather than manual `jest.fn()` overrides of global fetch.
 
 ## 7. Modularization vs. Over-engineering (Over-baked Code)
+
 Components must be lean, single-purpose, and modular. Do not write speculative code for future feature requirements.
 
-* **The 300-Line Ceiling**: Any component file exceeding 300 lines of code (including styles and types) is an automatic trigger for structural review. Demand that the author split the file and extract sub-sections into dedicated Atoms or Molecules.
-* **Single Responsibility**: If a component is handling both complex layouts, business logic fetching, and deep sub-UI states, it must be split regardless of line count.
-* **Speculative Props**: Reject any prop, utility function, or configuration object added "for future flexibility" that is not actively utilized in the current PR's user stories.
-* **YAGNI Enforced**: Lean on the side of minimal code. If a component can be achieved with standard primitives and design tokens without adding new custom wrapper functions, force the simpler path.
+- **The 300-Line Ceiling**: Any component file exceeding 300 lines of code (including styles and types) is an automatic trigger for structural review. Demand that the author split the file and extract sub-sections into dedicated Atoms or Molecules.
+- **Single Responsibility**: If a component is handling both complex layouts, business logic fetching, and deep sub-UI states, it must be split regardless of line count.
+- **Speculative Props**: Reject any prop, utility function, or configuration object added "for future flexibility" that is not actively utilized in the current PR's user stories.
+- **YAGNI Enforced**: Lean on the side of minimal code. If a component can be achieved with standard primitives and design tokens without adding new custom wrapper functions, force the simpler path.
