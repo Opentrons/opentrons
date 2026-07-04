@@ -111,7 +111,6 @@ class StartSetVacuumPowerImpl(
     ) -> SuccessData[StartSetVacuumPowerResult]:
         """Start the vacuum pump."""
         state_update = update_types.StateUpdate()
-        vm_state = self._state_view.modules.get_vacuum_module_substate(params.moduleId)
         state_update.update_vacuum_module_pump_engaged(
             params.moduleId, params.duration is None
         )
@@ -125,6 +124,7 @@ class StartSetVacuumPowerImpl(
                 f"pump power {params.percentPower} invalid must be between 1 and 100%"
             )
 
+        vm_state = self._state_view.modules.get_vacuum_module_substate(params.moduleId)
         vm_hardware = self._equipment.get_module_hardware_api(vm_state.module_id)
 
         async def start_set_vacuum_power(task_handler: TaskHandler) -> None:

@@ -112,7 +112,6 @@ class StartSetVacuumPressureImpl(
     ) -> SuccessData[StartSetVacuumPressureResult]:
         """Start the vacuum pump."""
         state_update = update_types.StateUpdate()
-        vm_state = self._state_view.modules.get_vacuum_module_substate(params.moduleId)
         state_update.update_vacuum_module_pump_engaged(
             params.moduleId, params.duration is None
         )
@@ -130,6 +129,7 @@ class StartSetVacuumPressureImpl(
                 f"Gauge pressure {params.gaugePressure} invalid must be between {MAX_GAUGE_PRESSURE_MBAR} and {MIN_GAUGE_PRESSURE_MBAR} mbar."
             )
 
+        vm_state = self._state_view.modules.get_vacuum_module_substate(params.moduleId)
         vm_hardware = self._equipment.get_module_hardware_api(vm_state.module_id)
 
         async def start_set_vacuum_pressure(task_handler: TaskHandler) -> None:

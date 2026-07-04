@@ -175,8 +175,6 @@ class StartRunProfileImpl(AbstractCommandImpl[StartRunProfileParams, _ExecuteRet
     ) -> SuccessData[StartRunProfileResult]:
         """Run a vacuum module profile."""
         state_update = update_types.StateUpdate()
-        vm_state = self._state_view.modules.get_vacuum_module_substate(params.moduleId)
-        vm_hardware = self._equipment.get_module_hardware_api(vm_state.module_id)
         profile: List[hc_profile_step] = []
         pump_engaged = False
         for step in params.profile:
@@ -190,6 +188,9 @@ class StartRunProfileImpl(AbstractCommandImpl[StartRunProfileParams, _ExecuteRet
             state_update.record_module_background_command(
                 params.moduleId, running_command_id
             )
+
+        vm_state = self._state_view.modules.get_vacuum_module_substate(params.moduleId)
+        vm_hardware = self._equipment.get_module_hardware_api(vm_state.module_id)
 
         async def start_run_profile(task_handler: TaskHandler) -> None:
             if vm_hardware is not None:

@@ -530,6 +530,29 @@ class VacuumModule(mod_abc.AbstractModule):
                 vent_after=vent_after,
             )
 
+    def _operation_was_stopped(self) -> bool:
+        """Return whether vacuum/pump operation was stopped externally."""
+        vacuum_state = self._reader.vacuum_state
+        pump_state = self._reader.pump_state
+        return not (
+            (vacuum_state.vacuum_enabled if vacuum_state is not None else False)
+            or (pump_state.pump_running if pump_state is not None else False)
+        )
+
+    async def _wait_for_step_completion(self, step: VacuumModuleStep) -> bool:
+        """Wait for a profile step to complete.
+
+        Returns True when the step was stopped externally via stopVacuum.
+        """
+        if (
+            step["hold_time_minutes"] is not None
+            or step["hold_time_seconds"] is not None
+        ):
+            await self.wait_for_command_duration()
+        else:
+            await self.wait_for_target()
+        return step["enable_pump"] and self._operation_was_stopped()
+
     async def _execute_profile(
         self,
         profile: List[Union[VacuumModuleCycle, VacuumModuleStep]],
@@ -546,20 +569,16 @@ class VacuumModule(mod_abc.AbstractModule):
                     for step in this_cycle["steps"]:
                         self._current_step_index += 1
                         await self._execute_cycle_step(step)
-                        if (
-                            step["hold_time_minutes"] is not None
-                            or step["hold_time_seconds"] is not None
-                        ):
-                            await self.wait_for_command_duration()
-                        else:
-                            await self.wait_for_target()
+                        if await self._wait_for_step_completion(step):
+                            return
                 if this_cycle["vent_after"] is not None:
                     await self.set_vent_state(
                         vent_state=VentState(this_cycle["vent_after"])
                     )
             else:
                 await self._execute_cycle_step(step_or_cycle)
-                await self.wait_for_command_duration()
+                if await self._wait_for_step_completion(step_or_cycle):
+                    return
         if vent_after:
             await self.set_vent_state(VentState.OPENED)
 
@@ -589,13 +608,11 @@ class VacuumModule(mod_abc.AbstractModule):
 
     async def _wait_for_command_duration(self) -> None:
         await self._reader.update_vacuum_state()
-
         while self.vacuum_state.vacuum_duration > 0:
             await self._poller.wait_next_poll()
 
     async def wait_for_command_duration(self) -> None:
         await self.wait_for_is_running()
-
         task = self._loop.create_task(self._wait_for_command_duration())
         self.make_cancellable(task)
         await task

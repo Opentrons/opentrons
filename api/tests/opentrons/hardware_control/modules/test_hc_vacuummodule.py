@@ -31,6 +31,7 @@ from opentrons.hardware_control.modules.types import (
     VacuumModuleCycle,
     VacuumModulePowerStep,
     VacuumModulePressureStep,
+    VacuumModuleStep,
     VacuumOperationMode,
     VentStatus,
 )
@@ -705,6 +706,16 @@ async def test_execute_profile(
             vent_state=VentState.CLOSED,
         )
     )
+    decoy.when(await mock_driver.get_pump_state()).then_return(
+        PumpState(
+            target_rpm=0,
+            current_rpm=0,
+            target_pwm=0,
+            current_pwm=0,
+            pump_running=True,
+            manual_control=True,
+        )
+    )
 
     async def _fake_wait_for_target() -> None:
         return
@@ -787,6 +798,88 @@ async def test_execute_profile(
             vent_after=False,
         )
     )
+
+
+async def test_execute_profile_aborts_when_stopped(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """Stopping vacuum during a profile should abort remaining steps and vent_after."""
+    profile: List[
+        Union[VacuumModuleCycle, VacuumModulePowerStep, VacuumModulePressureStep]
+    ] = [
+        {
+            "enable_pump": True,
+            "hold_time_seconds": 10,
+            "hold_time_minutes": None,
+            "ramp_rate": None,
+            "timeout_seconds": None,
+            "vent_after": None,
+            "gauge_pressure_mbar": -100,
+        },
+        {
+            "enable_pump": True,
+            "hold_time_seconds": 10,
+            "hold_time_minutes": None,
+            "ramp_rate": None,
+            "timeout_seconds": None,
+            "vent_after": None,
+            "gauge_pressure_mbar": -200,
+        },
+    ]
+
+    decoy.when(await mock_driver.get_vacuum_state()).then_return(
+        VacuumState(
+            target_gauge_pressure=-100,
+            current_gauge_pressure=-100,
+            pressure_abs_a=0,
+            pressure_abs_b=0,
+            pressure_atm=0,
+            vacuum_enabled=True,
+            vacuum_duration=0,
+            vent_state=VentState.CLOSED,
+        )
+    )
+
+    execute_step_count = 0
+    original_execute_cycle_step = subject._execute_cycle_step
+
+    async def counting_execute_cycle_step(step: VacuumModuleStep) -> None:
+        nonlocal execute_step_count
+        execute_step_count += 1
+        await original_execute_cycle_step(step)
+
+    async def stop_on_first_wait() -> None:
+        await subject.set_vacuum_state(enable_vacuum=False)
+        subject._reader.vacuum_state = VacuumState(
+            target_gauge_pressure=0,
+            current_gauge_pressure=0,
+            pressure_abs_a=0,
+            pressure_abs_b=0,
+            pressure_atm=0,
+            vacuum_enabled=False,
+            vacuum_duration=0,
+            vent_state=VentState.CLOSED,
+        )
+
+    subject._execute_cycle_step = counting_execute_cycle_step  # type: ignore[method-assign]
+    subject.wait_for_command_duration = stop_on_first_wait  # type: ignore[method-assign]
+
+    await subject.execute_profile(profile, vent_after=True)
+
+    assert execute_step_count == 1
+    decoy.verify(
+        await mock_driver.set_vacuum_state(
+            enable_vacuum=True,
+            gauge_pressure_mbar=-100,
+            duration_s=10,
+            timeout_s=None,
+            rate=None,
+            vent_after=None,
+        ),
+    )
+    decoy.verify(await mock_driver.set_vent_state(state=VentState.OPENED), times=0)
 
 
 @pytest.mark.parametrize(
