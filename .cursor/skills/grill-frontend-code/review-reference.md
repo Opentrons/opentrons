@@ -4,22 +4,16 @@ This reference governs the architectural boundaries of Opentrons UI development.
 
 ## 1. Atomic Design Layers
 
-Opentrons enforces strict boundaries across component directories. Detect any layer-crossing violations:
-
-- **Atoms (`app/src/atoms`, `components/src/atoms`)**: Pure presentational elements.
-  - _Criterion_: Must NOT import any other component. Must NOT import hooks that pull state from the global store (e.g., redux, react-query).
-- **Molecules (`app/src/molecules`, `components/src/molecules`)**: Combinations of atoms.
-  - _Criterion_: Can import atoms. Must NOT import organisms or pages.
-- **Organisms (`app/src/organisms`, `components/src/organisms`)**: Functional blocks.
-  - _Criterion_: Can leverage complex state hooks and orchestrate multiple molecules/atoms.
+Canonical source: `.cursor/skills/opentrons-typescript/SKILL.md` § "Atomic Design Hierarchy".
+Open it and check the diff against the layer-import rules there (atoms → molecules →
+organisms → pages, the `no-imports-up-the-tree-of-life` ESLint rule). Cite the exact
+violated rule from that file in your `Details` — do not re-derive the boundary from memory.
 
 ## 2. CSS Modules & Styles
 
-Opentrons uses CSS Modules for component isolation to ensure styles don't leak.
-
-- **Co-location**: A component `MyComponent.tsx` must have a co-located CSS Module file (e.g., `MyComponent.module.css` or `mycomponent.module.css`) in the same directory.
-- **No Global Drift**: Standard HTML tags (e.g., `div`, `button`, `span`) must not be styled inside modules without a class selector, unless resetting.
-- **Class Names**: Use snake_case for class names in CSS, and bind them via `styles.className`. Avoid raw string literals for class assignment where modules are present.
+Canonical source: `.cursor/skills/css-modules/SKILL.md`.
+Open it and check file naming, class naming, design-token usage, and Stylelint rules
+against that file. Do not restate these rules here — they will drift out of sync.
 
 ## 3. Web Accessibility (a11y)
 
@@ -31,9 +25,9 @@ Opentrons interfaces are used in physical lab environments. Accessibility is fun
 
 ## 4. TypeScript & Logic Rigor
 
-- **Strict Types**: The `any` type is an automatic failure. If a type is genuinely polymorphic, enforce `unknown` and require type-guards.
-- **Nullability**: Prefer explicit checks (`value !== null` / `value !== undefined`) when you need to distinguish them; `value != null` is acceptable shorthand for checking both `null` and `undefined` and is used throughout the codebase.
-- **Ternary Ceiling**: Nested ternary operators (`condition ? a : condition2 ? b : c`) are strictly prohibited. Demand extraction into early returns or explicit local switch/if blocks.
+Canonical source: `.cursor/skills/opentrons-typescript/SKILL.md` § "Common Pitfalls" and
+"TypeScript Configuration". Cross-check `any` usage, nullability checks, and nested-ternary
+usage against that list.
 
 ## 5. Component API Design (Props Extension)
 
