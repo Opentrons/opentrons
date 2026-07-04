@@ -19,7 +19,7 @@ Opentrons uses CSS Modules for component isolation to ensure styles don't leak.
 
 - **Co-location**: A component `MyComponent.tsx` must have a co-located CSS Module file (e.g., `MyComponent.module.css` or `mycomponent.module.css`) in the same directory.
 - **No Global Drift**: Standard HTML tags (e.g., `div`, `button`, `span`) must not be styled inside modules without a class selector, unless resetting.
-- **Class Names**: Use camelCase for class names in CSS, and bind them via `styles.className`. Avoid raw string literals for class assignment where modules are present.
+- **Class Names**: Use snake_case for class names in CSS, and bind them via `styles.className`. Avoid raw string literals for class assignment where modules are present.
 
 ## 3. Web Accessibility (a11y)
 
