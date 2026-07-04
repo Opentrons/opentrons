@@ -64,7 +64,7 @@ Every feature branch must guard against regression. Code without test coverage i
 - **Sibling Rule**: Any new component `MyComponent.tsx` or hook `useMyHook.ts` must be accompanied by a sibling `__tests__/MyComponent.test.tsx` or `MyComponent.test.ts` file within the same directory.
 - **RTL Standards**: Opentrons uses React Testing Library.
   - Avoid testing internal state; always test observable behavior from the user's perspective (e.g., fireEvent/userEvent).
-  - Enforce explicit MSW (Mock Service Worker) handlers for any network/API layer mock, rather than manual `jest.fn()` overrides of global fetch.
+  - Enforce explicit MSW (Mock Service Worker) handlers for any network/API layer mock, rather than manual `vi.fn()` overrides of global fetch.
 
 ## 7. Modularization vs. Over-engineering (Over-baked Code)
 
