@@ -37,7 +37,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
       <div className={styles.nav_container}>
         <img
           src={PROJECT === 'ot3' ? logoSvgThree : logoSvg}
-          alt="opentrons logo"
+          alt={t('opentrons_logo')}
           className={styles.logo_img}
         />
         {navRoutes.map(({ name, navLinkTo }: RouteProps) => (

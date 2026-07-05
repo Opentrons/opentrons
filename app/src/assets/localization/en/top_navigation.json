@@ -15,6 +15,7 @@
   "log_in": "Log in",
   "log_out": "Log out",
   "modules": "modules",
+  "opentrons_logo": "Opentrons logo",
   "pipettes": "pipettes",
   "pipettes_not_calibrated": "Please calibrate all pipettes specified in loaded protocol to proceed",
   "please_connect_to_a_robot": "Please connect to a robot to proceed",

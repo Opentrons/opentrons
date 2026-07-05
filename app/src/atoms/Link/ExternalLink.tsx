@@ -21,11 +21,7 @@ export const ExternalLink = (props: ExternalLinkProps): JSX.Element => (
   <Link external {...props} css={TYPOGRAPHY.linkPSemiBold}>
     {props.children}
     <span css={SPAN_STYLE}></span>
-    <Icon
-      size={SPACING.spacing8}
-      name="open-in-new"
-      aria-label="open_in_new_icon"
-    />
+    <Icon size={SPACING.spacing8} name="open-in-new" aria-hidden="true" />
   </Link>
 )
 

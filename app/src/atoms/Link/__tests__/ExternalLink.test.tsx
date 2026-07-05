@@ -39,9 +39,9 @@ describe('ExternalLink', () => {
 
   it('renders open-in-new icon', () => {
     render(props)
-
-    const icon = screen.getByLabelText('open_in_new_icon')
+    const link = screen.getByRole('link', { name: 'Test Link' })
+    const icon = link.querySelector('svg')
     expect(icon).toBeInTheDocument()
-    expect(icon).toHaveStyle('width: 0.5rem; height: 0.5rem')
+    expect(icon).toHaveAttribute('aria-hidden', 'true')
   })
 })
