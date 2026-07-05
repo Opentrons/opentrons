@@ -228,6 +228,7 @@ module.exports = {
       rules: {
         'import/no-default-export': 'off',
         '@typescript-eslint/consistent-type-assertions': 'off',
+        'no-restricted-syntax': 'off',
       },
     },
     // Allow HTTP hooks in notification wrappers and tests
