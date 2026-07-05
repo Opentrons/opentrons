@@ -52,14 +52,20 @@ class RTScanner(AbstractBarcodeScannerDriver):
     """Driver for the RTC214C."""
 
     @classmethod
-    async def create(cls) -> "RTScanner":
+    async def create(cls, port: Optional[str]) -> "RTScanner":
         device = None
-        for p in comports():
-            # RT214c vid:pid 1eab:1d06
-            if p.vid and p.vid == 0x1EAB:
-                device = p.device
+        ports = comports()
+        if not port:
+            for p in ports:
+                # RT214c vid:pid 1eab:1d06
+                if p.vid and p.vid == 0x1EAB:
+                    device = p.device
+        else:
+            for p in ports:
+                if p.device == port and p.vid == 0x1EAB:
+                    device = port
         if device is None:
-            raise RuntimeError("No RT scanner found.")
+            raise RuntimeError("No scanner found.")
         read_timeout_ms = 3000
         connection = await AsyncSerial.create(
             port=device,

@@ -5,6 +5,7 @@ import {
   getIsLoggedInToLocalRobot,
   getLocalRobotAuthState,
   getMostRecentRobotName,
+  getUsernameForRobot,
 } from '../slice'
 
 import type {
@@ -50,6 +51,20 @@ describe('robot auth selectors', () => {
         refreshToken: null,
         expiresAt: 1234,
       })
+    })
+  })
+
+  describe('getUsernameForRobot', () => {
+    it('returns null when robot name is null', () => {
+      expect(getUsernameForRobot(stateWithRobotA, null)).toEqual(null)
+    })
+
+    it('returns username when logged in to robot', () => {
+      expect(getUsernameForRobot(stateWithRobotA, 'robotA')).toEqual('alice')
+    })
+
+    it('returns null when not logged in to robot', () => {
+      expect(getUsernameForRobot(emptyRobotAuthState, 'robotA')).toEqual(null)
     })
   })
 

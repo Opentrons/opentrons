@@ -213,7 +213,7 @@ const mockVacuumModuleActive = {
     targetPressure: 500,
     currentPower: null,
     targetPower: null,
-    ventStatus: 'open',
+    ventStatus: 'opened',
     modeType: 'pressure',
     status: 'running',
   },

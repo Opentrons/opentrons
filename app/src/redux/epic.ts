@@ -7,7 +7,6 @@ import { calibrationEpic } from './calibration/epic'
 import { discoveryEpic } from './discovery/epic'
 import { modulesEpic } from './modules/epic'
 import { networkingEpic } from './networking/epic'
-import { pipettesEpic } from './pipettes/epic'
 import { robotAdminEpic } from './robot-admin/epic'
 import { robotSettingsEpic } from './robot-settings/epic'
 import { robotUpdateEpic } from './robot-update/epic'
@@ -23,7 +22,6 @@ export const rootEpic = combineEpics<Epic>(
   robotAdminEpic,
   robotSettingsEpic,
   robotUpdateEpic,
-  pipettesEpic,
   modulesEpic,
   networkingEpic,
   shellEpic,

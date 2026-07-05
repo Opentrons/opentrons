@@ -6,9 +6,13 @@ import {
   useAuthSettingsQuery,
 } from '@opentrons/react-api-client'
 
+import { useCurrentUsername } from '/app/redux/robot-auth'
+
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../__fixtures__/documentationState'
 import { usePromptForInteractionReason } from '../usePromptForInteractionReason'
 import {
   mockShowDocumentationRequiredModal,
+  mockShowLoginModal,
   wrapWithDocumentationRequiredModal,
 } from './documentationRequiredModalTestUtils'
 
@@ -33,7 +37,8 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
   const actual = await importOriginal()
   return {
     ...(actual as any),
-    getCurrentUsernameForLocalRobot: vi.fn(() => null),
+    useCurrentUsername: vi.fn(() => 'alice'),
+    useCurrentRobotName: vi.fn(() => 'otie'),
   }
 })
 
@@ -90,9 +95,7 @@ describe('usePromptForInteractionReason', () => {
       }
     )
 
-    expect(
-      !result.current.isLoading && result.current.reasonForInteractionRequired
-    ).toBe(false)
+    expect(result.current).toEqual(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE)
     expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
   })
 
@@ -119,10 +122,29 @@ describe('usePromptForInteractionReason', () => {
       }
     )
     expect(
-      !result.current.isLoading && result.current.reasonForInteractionRequired
-    ).toBe(false)
+      !result.current.isLoading && result.current.accessControlEnabled
+    ).toBe(true)
+    if (!result.current.isLoading && result.current.accessControlEnabled) {
+      expect(result.current.reasonForInteractionRequired).toBe(false)
+    }
     expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
   })
+  it('calls onCancel when login modal is dismissed without logging in', async () => {
+    vi.mocked(useCurrentUsername).mockReturnValue(null)
+    vi.mocked(mockShowLoginModal).mockResolvedValue(null)
+    const onCancel = vi.fn()
+
+    renderHook(() => usePromptForInteractionReason(['lpc_flow'], onCancel), {
+      wrapper,
+    })
+
+    await waitFor(() => {
+      expect(mockShowLoginModal).toHaveBeenCalled()
+    })
+    expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
+    expect(onCancel).toHaveBeenCalled()
+  })
+
   it('prompts for documentation when access control is enabled', async () => {
     const { result } = renderHook(
       () => usePromptForInteractionReason(['lpc_flow']),
@@ -137,13 +159,15 @@ describe('usePromptForInteractionReason', () => {
 
     await waitFor(() => {
       expect(
-        !result.current.isLoading && result.current.reasonForInteractionRequired
+        !result.current.isLoading && result.current.accessControlEnabled
       ).toBe(true)
-      expect(
+      if (
         !result.current.isLoading &&
-          result.current.reasonForInteractionRequired &&
-          result.current.docreport
-      ).toEqual(mockDocreport)
+        result.current.accessControlEnabled &&
+        result.current.reasonForInteractionRequired
+      ) {
+        expect(result.current.docreport).toEqual(mockDocreport)
+      }
     })
   })
 })

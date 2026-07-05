@@ -9,8 +9,14 @@ export interface DocumentationRequiredModalContextType {
   showDocumentationRequiredModal: (
     username: string,
     actionsToDocument: DocumentedAction[],
-    onCancel?: () => void
+    onCancel?: () => void,
+    initialDocreport?: DocumentationReport
   ) => Promise<DocumentationReport>
+  showLoginModal: ({
+    robotName,
+  }: {
+    robotName: string
+  }) => Promise<{ username: string } | null>
 }
 
 /**
@@ -21,8 +27,10 @@ export const DocumentationRequiredModalContext =
     showDocumentationRequiredModal: (
       username: string,
       actionsToDocument: DocumentedAction[],
-      onCancel?: () => void
+      onCancel?: () => void,
+      initialDocreport?: DocumentationReport
     ) => {
       return Promise.resolve('' as DocumentationReport)
     },
+    showLoginModal: () => Promise.resolve(null),
   })

@@ -6,6 +6,11 @@ import {
   useAuthSettingsQuery,
 } from '@opentrons/react-api-client'
 
+import {
+  ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+  createReasonRequiredWithDocReport,
+  createReasonRequiredWithoutDocReport,
+} from '../__fixtures__/documentationState'
 import { useMaintenanceRunDocumentation } from '../useMaintenanceRunDocumentation'
 import { isDocumentationProvided } from '../utils'
 import {
@@ -37,7 +42,8 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
   const actual = await importOriginal()
   return {
     ...(actual as any),
-    getCurrentUsernameForLocalRobot: vi.fn(() => null),
+    useCurrentUsername: vi.fn(() => 'alice'),
+    useCurrentRobotName: vi.fn(() => 'otie'),
   }
 })
 
@@ -46,31 +52,23 @@ const wrapper = wrapWithDocumentationRequiredModal()
 
 describe('isDocumentationProvided', () => {
   it('returns true when access control is disabled', () => {
-    const state: DocumentationState = {
-      reasonForInteractionRequired: false,
-      isLoading: false,
-    }
+    const state: DocumentationState =
+      ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
 
     expect(isDocumentationProvided(state)).toBe(true)
   })
 
   it('returns true when documentation is provided', () => {
-    const state: DocumentationState = {
-      reasonForInteractionRequired: true,
-      docreport: mockDocreport,
-      isLoading: false,
-    }
+    const state: DocumentationState =
+      createReasonRequiredWithDocReport(mockDocreport)
 
     expect(isDocumentationProvided(state)).toBe(true)
   })
 
   it('returns false when access control is enabled and documentation is missing', () => {
-    const state: DocumentationState = {
-      reasonForInteractionRequired: true,
-      docreport: null,
-      askForDocumentation: vi.fn(),
-      isLoading: false,
-    }
+    const state: DocumentationState = createReasonRequiredWithoutDocReport(
+      vi.fn()
+    )
 
     expect(isDocumentationProvided(state)).toBe(false)
   })
@@ -117,26 +115,30 @@ describe('useMaintenanceRunDocumentation', () => {
     await waitFor(() => {
       expect(
         !result.current.commandDocState.isLoading &&
-          result.current.commandDocState.reasonForInteractionRequired &&
-          result.current.commandDocState.docreport
-      ).toEqual(mockDocreport)
+          result.current.commandDocState.accessControlEnabled
+      ).toBe(true)
+      if (
+        !result.current.commandDocState.isLoading &&
+        result.current.commandDocState.accessControlEnabled &&
+        result.current.commandDocState.reasonForInteractionRequired
+      ) {
+        expect(result.current.commandDocState.docreport).toEqual(mockDocreport)
+      }
     })
 
+    const { deletionDocState } = result.current
+
     expect(
-      !result.current.deletionDocState.isLoading &&
-        result.current.deletionDocState.reasonForInteractionRequired
+      !deletionDocState.isLoading && deletionDocState.accessControlEnabled
     ).toBe(true)
-    expect(
-      !result.current.deletionDocState.isLoading &&
-        result.current.deletionDocState.reasonForInteractionRequired &&
-        result.current.deletionDocState.docreport
-    ).toBeNull()
-    expect(
-      !result.current.deletionDocState.isLoading &&
-        result.current.deletionDocState.reasonForInteractionRequired &&
-        result.current.deletionDocState.docreport == null &&
-        result.current.deletionDocState.askForDocumentation
-    ).toBeDefined()
+    if (
+      !deletionDocState.isLoading &&
+      deletionDocState.accessControlEnabled &&
+      deletionDocState.reasonForInteractionRequired
+    ) {
+      expect(deletionDocState.docreport).toBeNull()
+      expect(deletionDocState.askForDocumentation).toBeDefined()
+    }
   })
 
   it('prompts for deletion documentation only when askForDocumentation is invoked', async () => {
@@ -152,12 +154,14 @@ describe('useMaintenanceRunDocumentation', () => {
     })
 
     await act(async () => {
+      const { deletionDocState } = result.current
       if (
-        !result.current.deletionDocState.isLoading &&
-        result.current.deletionDocState.reasonForInteractionRequired &&
-        result.current.deletionDocState.docreport == null
+        !deletionDocState.isLoading &&
+        deletionDocState.accessControlEnabled &&
+        deletionDocState.reasonForInteractionRequired &&
+        deletionDocState.docreport == null
       ) {
-        await result.current.deletionDocState.askForDocumentation(
+        await deletionDocState.askForDocumentation(
           result.current.actionsToDocument
         )
       }

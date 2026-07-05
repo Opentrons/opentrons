@@ -16,20 +16,15 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import {
-  ApiHostProvider,
-  useUploadCsvFileMutation,
-} from '@opentrons/react-api-client'
+import { useUploadCsvFileMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/hooks'
 import { LegacyApplyHistoricOffsets } from '/app/organisms/LegacyApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useRobotType } from '/app/redux-resources/robots'
-import { OPENTRONS_USB } from '/app/redux/discovery'
-import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
-import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
@@ -360,16 +355,8 @@ export function ChooseRobotToRunProtocolSlideout(
   props: ChooseRobotToRunProtocolSlideoutProps
 ): JSX.Element | null {
   const [selectedRobot, setSelectedRobot] = useState<Robot | null>(null)
-  const token = useAccessTokenForRobot(selectedRobot?.name ?? null)
   return (
-    <ApiHostProvider
-      hostname={selectedRobot?.ip ?? null}
-      port={selectedRobot?.port ?? null}
-      requestor={
-        selectedRobot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined
-      }
-      token={token}
-    >
+    <ApiHostProvider robotName={selectedRobot?.name ?? null}>
       <ChooseRobotToRunProtocolSlideoutComponent
         {...{ ...props, selectedRobot, setSelectedRobot }}
       />

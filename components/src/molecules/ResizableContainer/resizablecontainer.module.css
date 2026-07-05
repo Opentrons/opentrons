@@ -1,0 +1,37 @@
+.container {
+  position: relative;
+  min-width: 0;
+  height: 100%;
+  box-sizing: border-box;
+  padding: var(--spacing-12);
+}
+
+.handle {
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  bottom: 0;
+  width: 0.5rem;
+  cursor: col-resize;
+  touch-action: none;
+  transition: background-color 0.2s ease;
+}
+
+.handle.left {
+  left: calc(var(--spacing-4) * -1);
+}
+
+.handle.right {
+  right: calc(var(--spacing-4) * -1);
+}
+
+.handle:hover::after,
+.handle.resizing::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 3px;
+  width: 2px;
+  background-color: var(--blue-50);
+  content: '';
+}

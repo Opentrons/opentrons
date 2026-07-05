@@ -1,292 +1,59 @@
-import { Fragment, useState } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Divider, StyledText } from '@opentrons/components'
-
-import { ToggleButton } from '/app/atoms/buttons'
+import {
+  useAuthSettingsMutation,
+  useAuthSettingsQuery,
+  useGetRobotServerAccessControlSettingsQuery,
+  usePatchRobotServerAccessControlSettingsMutation,
+} from '@opentrons/react-api-client'
 
 import { Accordion } from './Accordion'
+import {
+  getAuthInputPatch,
+  getFieldValuesFromSettings,
+} from './complianceReadySettingsHelper'
+import {
+  isAuthServerSettingKey,
+  isRobotServerSettingKey,
+} from './complianceReadySettingsTypes'
 import styles from './compliancereadysoftwaresettings.module.css'
+import { ComplianceReadyToggleField } from './ComplianceReadyToggleField'
 import { InputSetting } from './InputSetting'
 
-import type { JSX } from 'react'
-import type { AuthSettingsResponse } from '@opentrons/api-client'
+import type { JSX, ReactNode } from 'react'
+import type {
+  AuthSettingFieldId,
+  SettingFieldId,
+} from './complianceReadySettingsTypes'
+
+export type { UiSettingFieldId } from './complianceReadySettingsTypes'
+export { UI_ONLY_FIELD_IDS } from './complianceReadySettingsTypes'
 
 export interface ComplianceReadySoftwareSettingsProps {
   robotName: string
 }
 
-type AuthSettingFieldId = keyof AuthSettingsResponse['data']
-
-// TODO(tz, 2026-06-18): Get robot server acm settings
-export const UI_ONLY_FIELD_IDS = [
-  'passwordResetEnabled',
-  'passwordComplexityEnabled',
-  'requireProtocolLogsSignedAndSaved',
-  'automaticallyDeleteProtocolRunLogs',
-] as const
-
-type UiSettingFieldId = (typeof UI_ONLY_FIELD_IDS)[number]
-
-type SettingFieldId = AuthSettingFieldId | UiSettingFieldId
-
-type FieldValues = Record<SettingFieldId, string | boolean>
-
-interface InputFieldConfig {
-  type: 'input'
-  id: AuthSettingFieldId
-  labelKey: string
-  unitsKey?: string
-}
-
-interface ToggleFieldConfig {
-  type: 'toggle'
-  id: SettingFieldId
-  labelKey: string
-  children?: Array<InputFieldConfig | ToggleFieldConfig>
-}
-
-type ComplianceReadyFieldConfig = InputFieldConfig | ToggleFieldConfig
-
-interface ComplianceReadySettingsSectionConfig {
-  titleKey: string
-  fields: ComplianceReadyFieldConfig[]
-}
-
-// TODO(tz, 2026-06-18): Remove default values and use defult values from API
-const INITIAL_FIELD_VALUES: FieldValues = {
-  maxNumberOfLoginAttempts: '',
-  idleLogout: '',
-  passwordResetEnabled: false,
-  passwordResetTime: '',
-  passwordComplexityEnabled: false,
-  passwordComplexitySpecialCharacters: false,
-  passwordComplexityMinimumLength: '',
-  requireAdminCredsWhenUpdatingRobotSoftware: false,
-  requireAdminCredsWhenSendingProtocolToRobot: false,
-  requireAdminCredsForSignoffProtocol: false,
-  requireReasonForInteraction: false,
-  minLengthOfReasonForInteraction: '',
-  requireProtocolLogsSignedAndSaved: false,
-  automaticallyDeleteProtocolRunLogs: false,
-}
-
-export const SETTINGS_SECTIONS: ComplianceReadySettingsSectionConfig[] = [
-  {
-    titleKey: 'desktop_login_and_security',
-    fields: [
-      {
-        type: 'input',
-        id: 'maxNumberOfLoginAttempts',
-        labelKey: 'desktop_maximum_login_attempts_before_account_deactivation',
-        unitsKey: 'desktop_logins',
-      },
-      {
-        type: 'toggle',
-        id: 'passwordResetEnabled',
-        labelKey: 'desktop_require_password_change_after_time',
-        children: [
-          {
-            type: 'input',
-            id: 'passwordResetTime',
-            labelKey: 'desktop_length_of_time',
-            unitsKey: 'desktop_days',
-          },
-        ],
-      },
-      {
-        type: 'toggle',
-        id: 'passwordComplexityEnabled',
-        labelKey: 'desktop_require_password_complexity_requirements',
-        children: [
-          {
-            type: 'toggle',
-            id: 'passwordComplexitySpecialCharacters',
-            labelKey: 'desktop_require_special_characters',
-          },
-          {
-            type: 'input',
-            id: 'passwordComplexityMinimumLength',
-            labelKey: 'desktop_minimum_password_length',
-            unitsKey: 'desktop_characters',
-          },
-        ],
-      },
-      {
-        type: 'input',
-        id: 'idleLogout',
-        labelKey: 'desktop_auto_logout_inactivity_length',
-        unitsKey: 'desktop_minutes',
-      },
-    ],
-  },
-  {
-    titleKey: 'desktop_actions_requiring_admin_credentials',
-    fields: [
-      {
-        type: 'toggle',
-        id: 'requireAdminCredsWhenUpdatingRobotSoftware',
-        labelKey: 'desktop_require_admin_credentials_to_update_robots',
-      },
-      {
-        type: 'toggle',
-        id: 'requireAdminCredsWhenSendingProtocolToRobot',
-        labelKey: 'desktop_require_admin_credentials_to_send_protocols',
-      },
-      {
-        type: 'toggle',
-        id: 'requireAdminCredsForSignoffProtocol',
-        labelKey:
-          'desktop_require_admin_credentials_to_sign_protocol_run_records',
-      },
-    ],
-  },
-  {
-    titleKey: 'desktop_protocol_logs',
-    fields: [
-      {
-        type: 'toggle',
-        id: 'requireProtocolLogsSignedAndSaved',
-        labelKey: 'desktop_require_protocol_logs_signed_and_saved',
-      },
-      {
-        type: 'toggle',
-        id: 'automaticallyDeleteProtocolRunLogs',
-        labelKey: 'desktop_automatically_delete_protocol_run_logs',
-      },
-    ],
-  },
-  {
-    titleKey: 'desktop_audit_log_requirements',
-    fields: [
-      {
-        type: 'toggle',
-        id: 'requireReasonForInteraction',
-        labelKey: 'desktop_require_documentation_for_robot_actions',
-        children: [
-          {
-            type: 'input',
-            id: 'minLengthOfReasonForInteraction',
-            labelKey:
-              'desktop_minimum_length_for_documentation_for_robot_actions',
-            unitsKey: 'desktop_characters',
-          },
-        ],
-      },
-    ],
-  },
-]
-
-interface ComplianceReadySettingFieldProps {
-  field: ComplianceReadyFieldConfig
-  values: FieldValues
-  onInputChange: (id: AuthSettingFieldId, value: string) => void
-  onToggleChange: (id: SettingFieldId) => void
-}
-
-function ComplianceReadySettingField({
-  field,
-  values,
-  onInputChange,
-  onToggleChange,
-}: ComplianceReadySettingFieldProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
-
-  if (field.type === 'input') {
-    return (
-      <InputSetting
-        label={t(field.labelKey)}
-        value={String(values[field.id])}
-        units={field.unitsKey != null ? t(field.unitsKey) : undefined}
-        onChange={event => {
-          onInputChange(field.id, event.target.value)
-        }}
-      />
-    )
-  }
-
-  const toggledOn = Boolean(values[field.id])
-  const label = t(field.labelKey)
-
-  const toggleRow = (
-    <div className={styles.toggle_row}>
-      <StyledText
-        desktopStyle="bodyDefaultRegular"
-        className={styles.toggle_label}
-      >
-        {label}
-      </StyledText>
-      <ToggleButton
-        id={field.id}
-        label={label}
-        toggledOn={toggledOn}
-        onClick={() => {
-          onToggleChange(field.id)
-        }}
-      />
-    </div>
-  )
-
-  if (field.children == null) {
-    return toggleRow
-  }
-
-  return (
-    <div className={styles.toggle_setting}>
-      {toggleRow}
-      {toggledOn ? (
-        <div className={styles.sub_fields}>
-          {field.children.map(child => (
-            <ComplianceReadySettingField
-              key={child.id}
-              field={child}
-              values={values}
-              onInputChange={onInputChange}
-              onToggleChange={onToggleChange}
-            />
-          ))}
-        </div>
-      ) : null}
-    </div>
-  )
-}
-
 interface ComplianceReadySettingsSectionProps {
-  section: ComplianceReadySettingsSectionConfig
+  titleKey: string
   isLastSection: boolean
-  values: FieldValues
-  onInputChange: (id: AuthSettingFieldId, value: string) => void
-  onToggleChange: (id: SettingFieldId) => void
+  children: ReactNode
 }
 
 function ComplianceReadySettingsSection({
-  section,
+  titleKey,
   isLastSection,
-  values,
-  onInputChange,
-  onToggleChange,
+  children,
 }: ComplianceReadySettingsSectionProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
   return (
     <div className={styles.section}>
-      <StyledText desktopStyle="bodyDefaultSemiBold">
-        {t(section.titleKey)}
-      </StyledText>
+      <StyledText desktopStyle="bodyDefaultSemiBold">{t(titleKey)}</StyledText>
       <div className={styles.field_list}>
-        {section.fields.map((field, index) => (
-          <Fragment key={field.id}>
-            <ComplianceReadySettingField
-              field={field}
-              values={values}
-              onInputChange={onInputChange}
-              onToggleChange={onToggleChange}
-            />
-            {index < section.fields.length - 1 || !isLastSection ? (
-              <Divider />
-            ) : null}
-          </Fragment>
-        ))}
+        {children}
+        {!isLastSection ? <Divider /> : null}
       </div>
     </div>
   )
@@ -296,21 +63,61 @@ export function ComplianceReadySoftwareSettings({
   robotName: _robotName,
 }: ComplianceReadySoftwareSettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const [fieldValues, setFieldValues] =
-    useState<FieldValues>(INITIAL_FIELD_VALUES)
+  const authSettingsQuery = useAuthSettingsQuery()
+  const robotServerAccessControlSettingsQuery =
+    useGetRobotServerAccessControlSettingsQuery()
+  const { mutate: patchAuthSettings } = useAuthSettingsMutation()
+  const { mutate: patchRobotServerAccessControlSettings } =
+    usePatchRobotServerAccessControlSettingsMutation()
 
-  const handleInputChange = (id: AuthSettingFieldId, value: string): void => {
-    setFieldValues(current => ({
-      ...current,
-      [id]: value,
-    }))
+  const fieldValues = useMemo(
+    () =>
+      getFieldValuesFromSettings(
+        authSettingsQuery.data?.data,
+        robotServerAccessControlSettingsQuery.data?.data
+      ),
+    [
+      authSettingsQuery.data?.data,
+      robotServerAccessControlSettingsQuery.data?.data,
+    ]
+  )
+
+  const handleInputBlur = (id: AuthSettingFieldId, value: string): void => {
+    const authPatch = getAuthInputPatch(id, value, fieldValues)
+    if (authPatch != null) {
+      patchAuthSettings(authPatch)
+    }
   }
 
-  const handleToggleChange = (id: SettingFieldId): void => {
-    setFieldValues(current => ({
-      ...current,
-      [id]: !current[id],
-    }))
+  const handleToggleChange = (
+    fieldId: SettingFieldId,
+    toggledOn: boolean
+  ): void => {
+    switch (fieldId) {
+      case 'passwordResetEnabled':
+        if (!toggledOn) {
+          patchAuthSettings({ data: { passwordResetTime: null } })
+        }
+        return
+      case 'passwordComplexityEnabled':
+        if (!toggledOn) {
+          patchAuthSettings({
+            data: {
+              passwordComplexitySpecialCharacters: null,
+              passwordComplexityMinimumLength: null,
+            },
+          })
+        }
+        return
+      default:
+        if (isRobotServerSettingKey(fieldId)) {
+          patchRobotServerAccessControlSettings({
+            data: { [fieldId]: toggledOn },
+          })
+        } else if (isAuthServerSettingKey(fieldId)) {
+          patchAuthSettings({ data: { [fieldId]: toggledOn } })
+        }
+    }
   }
 
   return (
@@ -319,16 +126,171 @@ export function ComplianceReadySoftwareSettings({
       title={t('desktop_compliance_ready_software_settings')}
     >
       <div className={styles.content}>
-        {SETTINGS_SECTIONS.map((section, index) => (
-          <ComplianceReadySettingsSection
-            key={section.titleKey}
-            section={section}
-            isLastSection={index === SETTINGS_SECTIONS.length - 1}
-            values={fieldValues}
-            onInputChange={handleInputChange}
-            onToggleChange={handleToggleChange}
+        <ComplianceReadySettingsSection
+          titleKey="desktop_login_and_security"
+          isLastSection={false}
+        >
+          <InputSetting
+            key={String(fieldValues.maxNumberOfLoginAttempts)}
+            label={t(
+              'desktop_maximum_login_attempts_before_account_deactivation'
+            )}
+            value={String(fieldValues.maxNumberOfLoginAttempts)}
+            units={t('desktop_logins')}
+            onBlur={value => {
+              handleInputBlur('maxNumberOfLoginAttempts', value)
+            }}
           />
-        ))}
+          <Divider />
+          <ComplianceReadyToggleField
+            id="passwordResetEnabled"
+            labelKey="desktop_require_password_change_after_time"
+            values={fieldValues}
+            onToggleChange={toggledOn => {
+              handleToggleChange('passwordResetEnabled', toggledOn)
+            }}
+          >
+            <InputSetting
+              key={String(fieldValues.passwordResetTime)}
+              label={t('desktop_length_of_time')}
+              value={String(fieldValues.passwordResetTime)}
+              units={t('desktop_days')}
+              onBlur={value => {
+                handleInputBlur('passwordResetTime', value)
+              }}
+            />
+          </ComplianceReadyToggleField>
+          <Divider />
+          <ComplianceReadyToggleField
+            id="passwordComplexityEnabled"
+            labelKey="desktop_require_password_complexity_requirements"
+            values={fieldValues}
+            onToggleChange={toggledOn => {
+              handleToggleChange('passwordComplexityEnabled', toggledOn)
+            }}
+          >
+            <ComplianceReadyToggleField
+              id="passwordComplexitySpecialCharacters"
+              labelKey="desktop_require_special_characters"
+              values={fieldValues}
+              onToggleChange={toggledOn => {
+                handleToggleChange(
+                  'passwordComplexitySpecialCharacters',
+                  toggledOn
+                )
+              }}
+            />
+            <InputSetting
+              key={String(fieldValues.passwordComplexityMinimumLength)}
+              label={t('desktop_minimum_password_length')}
+              value={String(fieldValues.passwordComplexityMinimumLength)}
+              units={t('desktop_characters')}
+              onBlur={value => {
+                handleInputBlur('passwordComplexityMinimumLength', value)
+              }}
+            />
+          </ComplianceReadyToggleField>
+          <Divider />
+          <InputSetting
+            key={String(fieldValues.idleLogout)}
+            label={t('desktop_auto_logout_inactivity_length')}
+            value={String(fieldValues.idleLogout)}
+            units={t('desktop_minutes')}
+            onBlur={value => {
+              handleInputBlur('idleLogout', value)
+            }}
+          />
+        </ComplianceReadySettingsSection>
+
+        <ComplianceReadySettingsSection
+          titleKey="desktop_actions_requiring_admin_credentials"
+          isLastSection={false}
+        >
+          <ComplianceReadyToggleField
+            id="requireAdminCredsWhenUpdatingRobotSoftware"
+            labelKey="desktop_require_admin_credentials_to_update_robots"
+            values={fieldValues}
+            onToggleChange={toggledOn => {
+              handleToggleChange(
+                'requireAdminCredsWhenUpdatingRobotSoftware',
+                toggledOn
+              )
+            }}
+          />
+          <Divider />
+          <ComplianceReadyToggleField
+            id="requireAdminCredsWhenSendingProtocolToRobot"
+            labelKey="desktop_require_admin_credentials_to_send_protocols"
+            values={fieldValues}
+            onToggleChange={toggledOn => {
+              handleToggleChange(
+                'requireAdminCredsWhenSendingProtocolToRobot',
+                toggledOn
+              )
+            }}
+          />
+          <Divider />
+          <ComplianceReadyToggleField
+            id="requireAdminCredsForSignoffProtocol"
+            labelKey="desktop_require_admin_credentials_to_sign_protocol_run_records"
+            values={fieldValues}
+            onToggleChange={toggledOn => {
+              handleToggleChange(
+                'requireAdminCredsForSignoffProtocol',
+                toggledOn
+              )
+            }}
+          />
+        </ComplianceReadySettingsSection>
+
+        <ComplianceReadySettingsSection
+          titleKey="desktop_protocol_logs"
+          isLastSection={false}
+        >
+          <ComplianceReadyToggleField
+            id="requireSignoffForProtocolLog"
+            labelKey="desktop_require_signoff_for_protocol_log"
+            values={fieldValues}
+            onToggleChange={toggledOn => {
+              handleToggleChange('requireSignoffForProtocolLog', toggledOn)
+            }}
+          />
+          <Divider />
+          <ComplianceReadyToggleField
+            id="deleteOverMaxOnDiskProtocols"
+            labelKey="desktop_automatically_delete_protocol_run_logs"
+            values={fieldValues}
+            onToggleChange={toggledOn => {
+              handleToggleChange('deleteOverMaxOnDiskProtocols', toggledOn)
+            }}
+          />
+        </ComplianceReadySettingsSection>
+
+        <ComplianceReadySettingsSection
+          titleKey="desktop_audit_log_requirements"
+          isLastSection
+        >
+          <ComplianceReadyToggleField
+            id="requireReasonForInteraction"
+            labelKey="desktop_require_documentation_for_robot_actions"
+            values={fieldValues}
+            onToggleChange={toggledOn => {
+              handleToggleChange('requireReasonForInteraction', toggledOn)
+            }}
+          >
+            <InputSetting
+              key={String(fieldValues.minLengthOfReasonForInteraction)}
+              label={t(
+                'desktop_minimum_length_for_documentation_for_robot_actions'
+              )}
+              value={String(fieldValues.minLengthOfReasonForInteraction)}
+              units={t('desktop_characters')}
+              onBlur={value => {
+                handleInputBlur('minLengthOfReasonForInteraction', value)
+              }}
+            />
+          </ComplianceReadyToggleField>
+        </ComplianceReadySettingsSection>
       </div>
     </Accordion>
   )

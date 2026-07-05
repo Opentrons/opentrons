@@ -9,6 +9,7 @@ import {
 } from '@opentrons/react-api-client'
 import { WELL_ORIGIN_TOP } from '@opentrons/shared-data'
 
+import { useGuardedAction } from '/app/local-resources/access-control/useGuardedAction'
 import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
 import {
   useChainRunCommands,
@@ -122,11 +123,8 @@ export function useRecoveryCommands({
   const { mutateAsync: resumeRunFromRecoveryAssumingFalsePositive } =
     useResumeRunFromRecoveryAssumingFalsePositiveMutation()
 
-  // TODO(jj): add doc state to desktop app
-  const { stopRun } = useStopRunMutation({
-    reasonForInteractionRequired: false,
-    isLoading: false,
-  })
+  const documentationState = useGuardedAction()
+  const { stopRun } = useStopRunMutation(documentationState)
   const updateErrorRecoveryPolicy = useUpdateRecoveryPolicyWithStrategy(runId)
   const currentRecoveryPolicy = useErrorRecoveryPolicy(runId)?.data?.data
   const { chainRunCommands } = useChainRunCommands(

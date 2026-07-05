@@ -1,47 +1,90 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
+
+import {
+  useAuthSettingsMutation,
+  useAuthSettingsQuery,
+  useGetRobotServerAccessControlSettingsQuery,
+  usePatchRobotServerAccessControlSettingsMutation,
+} from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
-import {
-  ComplianceReadySoftwareSettings,
-  SETTINGS_SECTIONS,
-  UI_ONLY_FIELD_IDS,
-} from '../ComplianceReadySoftwareSettings'
+import { UI_ONLY_FIELD_IDS } from '../complianceReadySettingsTypes'
+import { ComplianceReadySoftwareSettings } from '../ComplianceReadySoftwareSettings'
 
-import type { AuthSettingsResponse } from '@opentrons/api-client'
+import type { RenderResult } from '@testing-library/react'
+import type {
+  AuthSettingsResponse,
+  RobotServerAccessControlSettingsResponse,
+} from '@opentrons/api-client'
 
-const AUTH_SETTING_KEYS = Object.keys({
-  maxNumberOfLoginAttempts: null,
-  passwordResetTime: null,
-  passwordComplexityMinimumLength: null,
-  passwordComplexitySpecialCharacters: false,
-  idleLogout: 180,
-  requireReasonForInteraction: true,
-  minLengthOfReasonForInteraction: null,
-  requireAdminCredsWhenUpdatingRobotSoftware: true,
-  requireAdminCredsWhenSendingProtocolToRobot: true,
-  requireAdminCredsForSignoffProtocol: false,
-} satisfies AuthSettingsResponse['data'])
-
-function getFieldIds(
-  fields: (typeof SETTINGS_SECTIONS)[number]['fields']
-): string[] {
-  return fields.flatMap(field => [
-    field.id,
-    ...('children' in field && field.children != null
-      ? getFieldIds(field.children)
-      : []),
-  ])
+const MOCK_AUTH_SETTINGS: AuthSettingsResponse = {
+  data: {
+    maxNumberOfLoginAttempts: 5,
+    passwordResetTime: null,
+    passwordComplexityMinimumLength: null,
+    passwordComplexitySpecialCharacters: false,
+    idleLogout: 180,
+    requireReasonForInteraction: true,
+    minLengthOfReasonForInteraction: null,
+    requireAdminCredsWhenUpdatingRobotSoftware: true,
+    requireAdminCredsWhenSendingProtocolToRobot: true,
+    requireAdminCredsForSignoffProtocol: false,
+  },
 }
 
-const render = (): void => {
-  renderWithProviders(<ComplianceReadySoftwareSettings robotName="flex-1" />, {
-    i18nInstance: i18n,
-  })
+const MOCK_ROBOT_SERVER_ACCESS_CONTROL_SETTINGS: RobotServerAccessControlSettingsResponse =
+  {
+    data: {
+      requireSignoffForProtocolLog: true,
+      requireLogsToBeSavedInApp: false,
+      deleteOverMaxOnDiskProtocols: true,
+    },
+  }
+
+const AUTH_SETTING_KEYS = Object.keys(MOCK_AUTH_SETTINGS.data)
+const ROBOT_SERVER_ACCESS_CONTROL_SETTING_KEYS = Object.keys(
+  MOCK_ROBOT_SERVER_ACCESS_CONTROL_SETTINGS.data
+)
+
+const COMPLIANCE_READY_FIELD_IDS = [
+  'maxNumberOfLoginAttempts',
+  'passwordResetEnabled',
+  'passwordResetTime',
+  'passwordComplexityEnabled',
+  'passwordComplexitySpecialCharacters',
+  'passwordComplexityMinimumLength',
+  'idleLogout',
+  'requireAdminCredsWhenUpdatingRobotSoftware',
+  'requireAdminCredsWhenSendingProtocolToRobot',
+  'requireAdminCredsForSignoffProtocol',
+  'requireSignoffForProtocolLog',
+  'deleteOverMaxOnDiskProtocols',
+  'requireReasonForInteraction',
+  'minLengthOfReasonForInteraction',
+]
+
+vi.mock('@opentrons/react-api-client')
+
+const mockPatchAuthSettings = vi.fn()
+const mockPatchRobotServerAccessControlSettings = vi.fn()
+
+let unmountPreviousRender: (() => void) | undefined
+
+const render = (): RenderResult => {
+  unmountPreviousRender?.()
+  const [view] = renderWithProviders(
+    <ComplianceReadySoftwareSettings robotName="flex-1" />,
+    {
+      i18nInstance: i18n,
+    }
+  )
+  unmountPreviousRender = view.unmount
+  return view
 }
 
 const expandAccordion = (): void => {
@@ -53,17 +96,37 @@ const expandAccordion = (): void => {
 }
 
 describe('ComplianceReadySoftwareSettings', () => {
-  it('should only use auth setting ids or explicit UI-only ids', () => {
+  beforeEach(() => {
+    mockPatchAuthSettings.mockClear()
+    mockPatchRobotServerAccessControlSettings.mockClear()
+    mockPatchAuthSettings.mockResolvedValue(undefined)
+    mockPatchRobotServerAccessControlSettings.mockResolvedValue(undefined)
+    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+      data: MOCK_AUTH_SETTINGS,
+    } as ReturnType<typeof useAuthSettingsQuery>)
+    vi.mocked(useGetRobotServerAccessControlSettingsQuery).mockReturnValue({
+      data: MOCK_ROBOT_SERVER_ACCESS_CONTROL_SETTINGS,
+    } as ReturnType<typeof useGetRobotServerAccessControlSettingsQuery>)
+    vi.mocked(useAuthSettingsMutation).mockReturnValue({
+      mutate: mockPatchAuthSettings,
+    } as any)
+    vi.mocked(usePatchRobotServerAccessControlSettingsMutation).mockReturnValue(
+      {
+        mutate: mockPatchRobotServerAccessControlSettings,
+      } as any
+    )
+  })
+
+  it('should only use auth setting ids, robot server setting ids, or explicit UI-only ids', () => {
     const allowedIds = new Set<string>([
       ...AUTH_SETTING_KEYS,
+      ...ROBOT_SERVER_ACCESS_CONTROL_SETTING_KEYS,
       ...UI_ONLY_FIELD_IDS,
     ])
 
-    SETTINGS_SECTIONS.flatMap(section => getFieldIds(section.fields)).forEach(
-      fieldId => {
-        expect(allowedIds.has(fieldId)).toBe(true)
-      }
-    )
+    COMPLIANCE_READY_FIELD_IDS.forEach(fieldId => {
+      expect(allowedIds.has(fieldId)).toBe(true)
+    })
   })
 
   it('should render settings sections when expanded', () => {
@@ -88,7 +151,7 @@ describe('ComplianceReadySoftwareSettings', () => {
     expect(screen.queryByText('Login and security')).not.toBeInTheDocument()
   })
 
-  it('should show nested inputs only after enabling the parent toggle', () => {
+  it('should expand password reset sub-setting and patch on blur', async () => {
     render()
     expandAccordion()
 
@@ -101,22 +164,70 @@ describe('ComplianceReadySoftwareSettings', () => {
     )
 
     screen.getByText('Edit length of time')
+    expect(mockPatchAuthSettings).not.toHaveBeenCalled()
+
+    const passwordResetTimeField = screen.getByLabelText('Edit length of time')
+    fireEvent.change(passwordResetTimeField, {
+      target: { value: '90' },
+    })
+    expect(mockPatchAuthSettings).not.toHaveBeenCalled()
+
+    fireEvent.blur(passwordResetTimeField)
+
+    await waitFor(() => {
+      expect(mockPatchAuthSettings).toHaveBeenCalledWith({
+        data: { passwordResetTime: 90 * 24 * 60 * 60 },
+      })
+    })
   })
 
-  it('should update toggle state', () => {
+  it('should populate fields from auth and robot server settings', () => {
     render()
     expandAccordion()
 
-    const updateRobotsToggle = screen.getByRole('switch', {
-      name: 'Require admin credentials to update robots',
-    })
-
-    expect(updateRobotsToggle).toHaveAttribute('aria-checked', 'false')
-    fireEvent.click(updateRobotsToggle)
-    expect(updateRobotsToggle).toHaveAttribute('aria-checked', 'true')
+    expect(
+      screen.getByLabelText(
+        'Maximum login attempts before account deactivation'
+      )
+    ).toHaveValue(5)
+    expect(
+      screen.getByLabelText('Length of time for auto-logout due to inactivity')
+    ).toHaveValue(3)
+    expect(
+      screen.getByRole('switch', {
+        name: 'Require admin credentials to update robots',
+      })
+    ).toHaveAttribute('aria-checked', 'true')
+    expect(
+      screen.getByRole('switch', {
+        name: 'Require signoff for protocol logs',
+      })
+    ).toHaveAttribute('aria-checked', 'true')
+    expect(
+      screen.getByRole('switch', {
+        name: 'Automatically delete protocol run logs on the robot when there are 20 protocol run records',
+      })
+    ).toHaveAttribute('aria-checked', 'true')
   })
 
-  it('should update input values', () => {
+  it('should patch auth settings when toggling', async () => {
+    render()
+    expandAccordion()
+
+    fireEvent.click(
+      screen.getByRole('switch', {
+        name: 'Require admin credentials to update robots',
+      })
+    )
+
+    await waitFor(() => {
+      expect(mockPatchAuthSettings).toHaveBeenCalledWith({
+        data: { requireAdminCredsWhenUpdatingRobotSoftware: false },
+      })
+    })
+  })
+
+  it('should update input values without patching until blur', async () => {
     render()
     expandAccordion()
 
@@ -125,5 +236,14 @@ describe('ComplianceReadySoftwareSettings', () => {
     )
     fireEvent.change(loginAttemptsField, { target: { value: '3' } })
     expect(loginAttemptsField).toHaveValue(3)
+    expect(mockPatchAuthSettings).not.toHaveBeenCalled()
+
+    fireEvent.blur(loginAttemptsField)
+
+    await waitFor(() => {
+      expect(mockPatchAuthSettings).toHaveBeenCalledWith({
+        data: { maxNumberOfLoginAttempts: 3 },
+      })
+    })
   })
 })

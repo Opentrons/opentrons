@@ -9,7 +9,7 @@ import {
   mock8ChannelAttachedPipetteInformation,
   mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
-} from '/app/redux/pipettes/__fixtures__'
+} from '/app/resources/instruments/__fixtures__'
 import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 
 import { AttachProbe } from '../AttachProbe'

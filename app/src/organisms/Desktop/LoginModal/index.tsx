@@ -12,13 +12,9 @@ import {
   SecondaryButton,
   StyledText,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { useRobot } from '/app/redux-resources/robots'
-import { OPENTRONS_USB } from '/app/redux/discovery'
-import { useAccessTokenForRobot } from '/app/redux/robot-auth'
-import { appShellUSBRequestor } from '/app/redux/shell/remote'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
@@ -92,20 +88,16 @@ interface LoginModalProps {
 }
 
 /** Open the desktop login modal in the appropriate React portal. */
-export const showLoginModal = (props: LoginModalProps): void => {
-  void NiceModal.show(LoginModal, props)
+export const showLoginModal = async (
+  props: LoginModalProps
+): Promise<{ username: string } | null> => {
+  return await NiceModal.show(LoginModal, props)
 }
 
 const LoginModal = NiceModal.create((props: LoginModalProps) => {
   const { robotName } = props
-  const robot = useRobot(robotName)
-  const token = useAccessTokenForRobot(robotName)
   return (
-    <ApiHostProvider
-      hostname={robot?.ip ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
-      token={token}
-    >
+    <ApiHostProvider robotName={robotName}>
       <LoginModalImpl robotName={robotName} />
     </ApiHostProvider>
   )
@@ -128,6 +120,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const loginFormId = useId()
 
   const handleClose = (): void => {
+    modal.resolve(null)
     modal.remove()
   }
 
@@ -144,6 +137,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       }
 
       storeLoginState(robotName, successfulUsername, response)
+      modal.resolve({ username: successfulUsername })
       modal.remove()
     },
     onError: message => {
@@ -155,6 +149,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
     useSetNewPasswordAndSignIn({
       onSuccess: (successfulUsername, response) => {
         storeLoginState(robotName, successfulUsername, response)
+        modal.resolve({ username: successfulUsername })
         modal.remove()
       },
       onError: message => {

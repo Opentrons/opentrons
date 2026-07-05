@@ -2,6 +2,8 @@ import { createPortal } from 'react-dom'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
+import { useCurrentRobotName } from '/app/redux/robot-auth'
 
 import { DocumentationRequired } from './DocumentationRequired'
 
@@ -15,12 +17,15 @@ const DocumentationRequiredModalImpl = NiceModal.create(
     username,
     actionsToDocument,
     onCancel,
+    initialDocreport,
   }: {
     username: string
     actionsToDocument: DocumentedAction[]
     onCancel?: () => void
+    initialDocreport?: DocumentationReport
   }): JSX.Element => {
     const modal = useModal()
+    const robotName = useCurrentRobotName()
 
     const handleConfirm = (note: string): void => {
       const result: DocumentationReport = note as DocumentationReport
@@ -35,12 +40,15 @@ const DocumentationRequiredModalImpl = NiceModal.create(
     }
 
     return createPortal(
-      <DocumentationRequired
-        username={username}
-        actionsToDocument={actionsToDocument}
-        onConfirm={handleConfirm}
-        onClose={handleBack}
-      />,
+      <ApiHostProvider robotName={robotName}>
+        <DocumentationRequired
+          username={username}
+          actionsToDocument={actionsToDocument}
+          onConfirm={handleConfirm}
+          onClose={handleBack}
+          initialDocreport={initialDocreport}
+        />
+      </ApiHostProvider>,
       getTopPortalEl()
     )
   }
@@ -49,10 +57,12 @@ const DocumentationRequiredModalImpl = NiceModal.create(
 export const showDocumentationRequiredModal = (
   username: string,
   actionsToDocument: DocumentedAction[],
-  onCancel?: () => void
+  onCancel?: () => void,
+  initialDocreport?: DocumentationReport
 ): Promise<DocumentationReport> =>
   NiceModal.show(DocumentationRequiredModalImpl, {
     username,
     actionsToDocument,
     onCancel,
+    initialDocreport,
   })

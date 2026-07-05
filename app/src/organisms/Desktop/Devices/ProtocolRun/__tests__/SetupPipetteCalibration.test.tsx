@@ -13,7 +13,7 @@ import {
 import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
 import { SetupPipetteCalibrationItem } from '../SetupPipetteCalibrationItem'
 
-import type { PipetteInfo } from '/app/redux/pipettes'
+import type { PipetteInfo } from '/app/resources/runs/types'
 
 vi.mock('../SetupPipetteCalibrationItem')
 vi.mock('/app/redux-resources/robots')

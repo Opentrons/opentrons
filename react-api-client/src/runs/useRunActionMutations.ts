@@ -10,7 +10,7 @@ import {
 } from '..'
 import { getQueryKey } from '../api'
 
-import type { DocumentationState } from '../access_control'
+import type { DocumentationState } from '../accessControl'
 
 interface UseRunActionMutations {
   playRun: () => void

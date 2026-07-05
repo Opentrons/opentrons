@@ -11,13 +11,17 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { ActionsView } from './ActionsView'
 import styles from './documentationrequired.module.css'
 
-import type { DocumentedAction } from '@opentrons/react-api-client'
+import type {
+  DocumentationReport,
+  DocumentedAction,
+} from '@opentrons/react-api-client'
 
 interface DocumentationRequiredProps {
   username: string
   actionsToDocument: DocumentedAction[]
   onConfirm: (note: string) => void
   onBack: () => void
+  initialDocreport?: DocumentationReport
 }
 
 export function DocumentationRequired({
@@ -25,9 +29,10 @@ export function DocumentationRequired({
   actionsToDocument,
   onConfirm,
   onBack,
+  initialDocreport,
 }: DocumentationRequiredProps): JSX.Element {
   const { t } = useTranslation(['access_control', 'shared'])
-  const [inputText, setInputText] = useState<string>('')
+  const [inputText, setInputText] = useState<string>(initialDocreport ?? '')
   const [keyboardExpanded, setKeyboardExpanded] = useState(true)
   const keyboardRef = useRef(null)
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
@@ -83,9 +88,6 @@ export function DocumentationRequired({
                 label={t('access_control_note', { user: username })}
                 onChange={e => {
                   setInputText(e.target.value)
-                }}
-                onBlur={e => {
-                  e.target.focus()
                 }}
               />
             </div>

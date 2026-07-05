@@ -14,14 +14,16 @@ Welcome to the v9.1.0 release of the Opentrons Flex robot software! This release
 
 - Use new methods to create step groups within your Python protocols. These groups are visible in your protocol file, or in [protocol visualization](https://docs.opentrons.com/flex/opentrons-app/protocol-viz/).
 - Use the `set_empty()` method to label a tip rack as empty, and return used tips to an empty rack throughout your protocol.
+- Attach and use a keyboard (via USB) to set up quick transfer protocols, enter passwords and runtime parameters, and more on the Flex touchscreen.
+- Adds the ability to turn off the Flex from the touchscreen. Click the three-dot menu, then click to **Turn off robot**. When it's time to restart your Flex, use the power switch on the rear panel.
 
 ### Feature Improvements
 
-Most Flex pipettes no longer descend during attachment, detachment, or probe attachment to prevent collision risk. The 96-channel pipette still descends.
+- Most Flex pipettes no longer descend during attachment, detachment, or probe attachment to prevent collision risk. The 96-channel pipette still descends.
 
 ### Bug Fixes
 
-Distributing with a liquid class now correctly calculates maximum aspirate volume for Flex 50 µL pipettes using 20 µL tips.
+Transfers, consolidates, and distributes using a liquid class now correctly calculate the maximum aspirate volume for Flex 50 µL pipettes (using 20 or 30 µL tips). Each liquid handling action now uses the correct volume mode to determine the amount of liquid that should be in the tip.
 
 ---
 

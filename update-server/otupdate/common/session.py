@@ -4,22 +4,23 @@ Update session object for tracking state across multiple calls
 
 import base64
 import enum
-import functools
 import logging
 import os
 import shutil
 import uuid
-from collections import namedtuple
-from typing import Mapping, Optional, Union
+from typing import Mapping, NamedTuple, Optional, Union
 
 from aiohttp import web
 
-from . import config, constants
+from . import constants
 
 SESSION_VARNAME = constants.APP_VARIABLE_PREFIX + "session"
 LOG = logging.getLogger(__name__)
 
-Value = namedtuple("Value", ("short", "human"))
+
+class Value(NamedTuple):
+    short: str
+    human: str
 
 
 class Stages(enum.Enum):
@@ -132,30 +133,4 @@ class UpdateSession:
 
 
 def session_from_request(request: web.Request) -> Optional[UpdateSession]:
-    return request.app.get(SESSION_VARNAME, None)
-
-
-def active_session_check(handler):
-    """decorator to check session status"""
-
-    @functools.wraps(handler)
-    async def decorated(request: web.Request) -> web.Response:
-        # checks if session exists!
-        if session_from_request(request) is not None:
-            LOG.warning("check_session: active session exists!")
-            return web.json_response(
-                data={
-                    "message": "An update session is already active on this robot",
-                    "error": "session-already-active",
-                },
-                status=409,
-            )
-        else:
-            session = UpdateSession(
-                config.config_from_request(request).download_storage_path
-            )
-            request.app[SESSION_VARNAME] = session
-            return web.json_response(data={"token": session.token}, status=201)
-        return await handler(request)
-
-    return decorated
+    return request.app.get(SESSION_VARNAME, None)  # type: ignore[no-any-return]

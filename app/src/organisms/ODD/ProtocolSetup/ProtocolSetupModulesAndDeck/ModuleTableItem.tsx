@@ -14,7 +14,6 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useHost } from '@opentrons/react-api-client'
 import {
   FLEX_STACKER_MODULE_TYPE,
   getFixtureDisplayName,
@@ -118,7 +117,6 @@ export function ModuleTableItem({
     'module_wizard_flows',
     'deck_configuration',
   ])
-  const host = useHost()!
 
   const { makeSnackbar } = useToaster()
 
@@ -130,7 +128,6 @@ export function ModuleTableItem({
         handleModuleWizardFlows({
           attachedModule: module.attachedModuleMatch,
           robotName,
-          host,
         })
       }
     } else {

@@ -20,7 +20,6 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
-import { useHost } from '@opentrons/react-api-client'
 import {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
@@ -226,7 +225,6 @@ export function ModulesListItem({
     'module_wizard_flows',
     'deck_configuration',
   ])
-  const host = useHost()!
   const moduleConnectionStatus =
     attachedModuleMatch != null
       ? t('module_connected')
@@ -244,7 +242,6 @@ export function ModulesListItem({
       handleModuleWizardFlows({
         attachedModule: attachedModuleMatch,
         robotName,
-        host,
       })
     }
   }

@@ -138,26 +138,6 @@ ignore_missing_imports = true
 # and remove these overrides when able.
 [[tool.mypy.overrides]]
 module = [
-    "otupdate.common.control",
-    "otupdate.common.session",
-    "otupdate.common.update",
-    "otupdate.buildroot",
-]
-disallow_untyped_defs = false
-disallow_untyped_calls = false
-warn_return_any = false
-
-[[tool.mypy.overrides]]
-module = [
-    "otupdate.buildroot.update_actions",
-    "otupdate.openembedded",
-    "otupdate.openembedded.updater",
-]
-disallow_untyped_defs = false
-disallow_untyped_calls = false
-
-[[tool.mypy.overrides]]
-module = [
     "tests.conftest",
     "tests.buildroot.conftest",
     "tests.buildroot.test_control",
