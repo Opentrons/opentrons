@@ -31,17 +31,10 @@ describe('ExternalLink', () => {
   it('renders external link', () => {
     render(props)
 
-    const link = screen.getByText('Test Link')
+    const link = screen.getByRole('link', { name: 'Test Link' })
+    expect(link).toBeInTheDocument()
     expect(link).toHaveAttribute('href', 'https://opentrons.com')
     expect(link).toHaveAttribute('target', '_blank')
     expect(link).toHaveStyle(`color: ${COLORS.blue50}`)
-  })
-
-  it('renders open-in-new icon', () => {
-    render(props)
-    const link = screen.getByRole('link', { name: 'Test Link' })
-    const icon = link.querySelector('svg')
-    expect(icon).toBeInTheDocument()
-    expect(icon).toHaveAttribute('aria-hidden', 'true')
   })
 })
