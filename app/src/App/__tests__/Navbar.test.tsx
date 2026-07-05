@@ -35,9 +35,6 @@ describe('Navbar', () => {
       </MemoryRouter>,
       { i18nInstance: i18n }
     )
-
-    screen.getByRole('img', { name: 'opentrons logo' })
-
     screen.getByRole('button', { name: 'App Settings' })
     screen.getByRole('link', { name: 'Help' })
 

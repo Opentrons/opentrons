@@ -70,6 +70,7 @@
   "opentrons_def": "Verified Definition",
   "opentrons_flex_quickstart_guide": "Quickstart Guide",
   "opentrons_labware_def": "Verified labware definition",
+  "opentrons_logo": "App logo",
   "opentrons_tip_rack_name": "opentrons",
   "opentrons_tip_racks_recommended": "Opentrons tip racks are highly recommended. Accuracy cannot be guaranteed with other tip racks.",
   "ot2_protocol_detected": "Incorrect protocol type detected",

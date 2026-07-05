@@ -18,7 +18,7 @@ const PROJECT: string = _OPENTRONS_PROJECT_
 const DEBOUNCE_DURATION_MS = 300
 
 export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
-  const { t } = useTranslation('top_navigation')
+  const { t } = useTranslation(['top_navigation', 'branded'])
   const navigate = useNavigate()
   const navRoutes = routes.filter(
     ({ navLinkTo }: RouteProps) => navLinkTo != null
