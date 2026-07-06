@@ -16,7 +16,7 @@ Please have the module’s serial number available when contacting support. You 
 
 Control your liquid handling robot and module using the Opentrons App. Download the app for Windows, macOS, or Ubuntu at <https://opentrons.com/ot-app>.
 
-## Manufacturer Description¶
+## Manufacturer Description
 
 Opentrons Labworks Inc  
 45-18 Ct Square W  

@@ -7,12 +7,10 @@ div.parts-list {
   gap: 5px;
 }
 
-/* NEW MODIFIER START */
 /* Overrides bottom-alignment problems for lists with multi-line captions */
 div.parts-list.align-top {
   align-items: flex-start;
 }
-/* NEW MODIFIER END */
 
 div.parts-list figure {
   width: 200px;
