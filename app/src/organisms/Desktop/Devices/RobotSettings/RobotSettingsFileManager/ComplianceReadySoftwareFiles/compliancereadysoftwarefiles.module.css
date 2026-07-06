@@ -1,0 +1,64 @@
+/* Left: 12px(container padding) + 16px(CheckboxBasic) + 12px(HEADER_ICON_CHILD gap) = 40px
+   Right: 12px(container padding) + 24px(chevron) + 24px(HEADER_CONTAINER gap) = 60px */
+.compliance_table_header_row {
+  display: flex;
+  height: 20px;
+  align-items: center;
+  padding: var(--spacing-4) 60px var(--spacing-4) 40px;
+  color: var(--grey-60);
+  gap: var(--spacing-12);
+}
+
+/* Aligns with the 3 data columns in compliance_period_card_inner.
+   Offset = checkbox touch target (24px) + period-row gap (12px) + card inner padding-left (12px). */
+.compliance_period_col_headers {
+  display: flex;
+  padding-left: 40px;
+  color: var(--grey-60);
+  gap: var(--spacing-24);
+}
+
+.compliance_checkbox_wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.compliance_accordion_content {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: var(--spacing-12);
+}
+
+.compliance_period_row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-12);
+}
+
+.compliance_period_card_outer {
+  min-width: 0;
+  flex: 1;
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-20);
+}
+
+.compliance_period_card_inner {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-12) 0 var(--spacing-12) var(--spacing-12);
+  border-radius: var(--border-radius-4);
+  background-color: var(--white);
+  gap: var(--spacing-24);
+}
+
+.log_file_col {
+  min-width: 0;
+  flex: 1;
+}
+
+.log_date_col {
+  min-width: 0;
+  flex: 1;
+}
