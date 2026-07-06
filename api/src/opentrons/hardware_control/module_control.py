@@ -112,6 +112,21 @@ class AttachedModulesControl:
         # time it experiences an EMI disconnect
         return self._available_modules + self._recently_removed_modules
 
+    def _dedupe_available_modules(self, new_mod: modules.AbstractModule) -> None:
+        """
+        Remove any existing entry in _available_modules that shares new_mod's
+        serial, then append new_mod and re-sort.
+        """
+        serial = new_mod.serial_number
+        if serial is not None:
+            self._available_modules = [
+                m for m in self._available_modules if m.serial_number != serial
+            ]
+        self._available_modules.append(new_mod)
+        self._available_modules = sorted(
+            self._available_modules, key=modules.AbstractModule.sort_key
+        )
+
     async def clean_up(self) -> None:
         """Clean up all registered modules and emulator scanning tasks (if any)."""
         for module in self._available_modules:
@@ -137,10 +152,7 @@ class AttachedModulesControl:
         module = await self.build_module(
             "", simulated_usb_port, type, sim_model, sim_serial_number=None
         )
-        self._available_modules.append(module)
-        self._available_modules = sorted(
-            self._available_modules, key=modules.AbstractModule.sort_key
-        )
+        self._dedupe_available_modules(module)
         return module
 
     async def build_module(
@@ -223,7 +235,8 @@ class AttachedModulesControl:
             # removed so that the recursion terminates next loop
             old_mod.disconnected_callback()
             log.info(f"did not find {old_mod.serial_number}")
-            self._recently_removed_modules.remove(old_mod)
+            if old_mod in self._recently_removed_modules:
+                self._recently_removed_modules.remove(old_mod)
 
     async def _reconnect_patch(self, attempts_left: int) -> None:
         if attempts_left == 0:
@@ -233,33 +246,32 @@ class AttachedModulesControl:
 
         await asyncio.sleep(1)
         try:
-            for old_mod in self._recently_removed_modules:
+            for old_mod in list(self._recently_removed_modules):
                 log.info(
                     f"Attempting to find and reconect {old_mod.serial_number} attempt {RECONNECT_ATTEMPTS-attempts_left+1}"
                 )
-                for attached_mod in self._available_modules:
-                    if attached_mod.serial_number == old_mod.serial_number:
-                        log.info(f"Found {old_mod.serial_number} was reconnected")
-                        # module reattached to a new virtual port, create a symlink to it
-                        await attached_mod.cleanup()
-                        if attached_mod.port != old_mod.port:
-                            log.info(
-                                f"module moved from {old_mod.port} to {attached_mod.port}"
-                            )
-                            await old_mod.move_port(
-                                attached_mod.port, attached_mod.usb_port
-                            )
-                        await old_mod.attempt_reconnect()
-                        self._available_modules.remove(attached_mod)
-                        self._available_modules.append(old_mod)
-                        self._recently_removed_modules.remove(old_mod)
-                        self._available_modules = sorted(
-                            self._available_modules, key=modules.AbstractModule.sort_key
-                        )
+                await self._reconnect_single_module(old_mod)
         except BaseException:
             log.exception("Encountered an error during reconnect attempt.")
         if len(self._recently_removed_modules) > 0:
             self._api.loop.create_task(self._reconnect_patch(attempts_left - 1))
+
+    async def _reconnect_single_module(self, old_mod: modules.AbstractModule) -> None:
+        """Find an attached module matching old_mod's serial and swap it in."""
+        for attached_mod in list(self._available_modules):
+            if attached_mod.serial_number != old_mod.serial_number:
+                continue
+            log.info(f"Found {old_mod.serial_number} was reconnected")
+            # module reattached to a new virtual port, create a symlink to it
+            await attached_mod.cleanup()
+            if attached_mod.port != old_mod.port:
+                log.info(f"module moved from {old_mod.port} to {attached_mod.port}")
+                await old_mod.move_port(attached_mod.port, attached_mod.usb_port)
+            await old_mod.attempt_reconnect()
+            if old_mod in self._recently_removed_modules:
+                self._recently_removed_modules.remove(old_mod)
+            self._dedupe_available_modules(old_mod)
+            break
 
     async def unregister_modules(  # noqa: C901
         self,
@@ -345,7 +357,7 @@ class AttachedModulesControl:
                         mod.model if isinstance(mod, SimulatingModuleAtPort) else None
                     ),
                 )
-                self._available_modules.append(new_instance)
+                self._dedupe_available_modules(new_instance)
                 log.info(
                     f"Module {mod.name} discovered and attached"
                     f" at port {mod.port}, new_instance: {new_instance}"
@@ -354,9 +366,6 @@ class AttachedModulesControl:
                 log.exception(
                     f"Failed to build module {mod.name} at port {mod.port}: {e}"
                 )
-        self._available_modules = sorted(
-            self._available_modules, key=modules.AbstractModule.sort_key
-        )
 
     def scan(self) -> List[modules.ModuleAtPort]:
         """Scan for connected modules and return list of
