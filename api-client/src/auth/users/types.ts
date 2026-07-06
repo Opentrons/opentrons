@@ -15,6 +15,8 @@ export interface AuthUserResponse {
 
 export interface UpdateSelfRequest {
   data: {
-    password: string
+    username?: string
+    fullName?: string
+    password?: string
   }
 }

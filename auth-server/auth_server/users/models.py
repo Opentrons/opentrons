@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Annotated, Literal, Sequence, TypedDict
+from typing import Annotated, Literal, Self, Sequence, TypedDict
 
-from pydantic import BaseModel, Field, SecretStr
+from pydantic import BaseModel, Field, SecretStr, model_validator
 
 from server_utils.auth.scopes import Scope
 
@@ -43,6 +43,7 @@ ACCOUNT_TYPE_TO_SCOPES: dict[AccountType, set[Scope]] = {
 # Scopes granted while resetPassword is true, before the user chooses a new password.
 RESET_PASSWORD_SCOPES: set[Scope] = {
     Scope.USERS_READ_SELF,
+    Scope.USERS_WRITE_SELF,
     Scope.USERS_WRITE_SELF_PASSWORD,
 }
 
@@ -95,10 +96,24 @@ class UpdateUser(BaseModel):
 class UpdateSelf(BaseModel):
     """Request body for updating the logged-in user."""
 
+    username: Annotated[
+        str | None,
+        Field(default=None, description="The username of the user."),
+    ] = None
+    fullName: Annotated[
+        str | None,
+        Field(default=None, description="The full name of the user."),
+    ] = None
     password: Annotated[
-        SecretStr,
-        Field(..., description="The new password for the user."),
-    ]
+        SecretStr | None,
+        Field(default=None, description="The new password for the user."),
+    ] = None
+
+    @model_validator(mode="after")
+    def check_at_least_one_field(self) -> Self:
+        if self.username is None and self.fullName is None and self.password is None:
+            raise ValueError("At least one field must be provided")
+        return self
 
 
 class UserResponse(BaseModel):

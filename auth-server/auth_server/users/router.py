@@ -293,23 +293,33 @@ async def update_self(
     request_body: RequestModel[UpdateSelf],
     authorization_details: Annotated[
         RequireScopesResult,
-        fastapi.Depends(require_scopes(Scope.USERS_WRITE_SELF_PASSWORD)),
+        fastapi.Depends(require_scopes(Scope.USERS_WRITE_SELF)),
     ],
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
-    """Set the current user's password and clear the resetPassword flag."""
+    """Update the current user's profile and/or password."""
     if isinstance(authorization_details, AuthorizationNotRequiredResult):
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_401_UNAUTHORIZED,
             detail="This endpoint needs an access token to determine the current user.",
         )
 
+    update_data = request_body.data
     try:
         result = user_data_manager.update_user(
             authorization_details.username,
-            new_password=request_body.data.password.get_secret_value(),
+            new_username=update_data.username,
+            new_password=update_data.password.get_secret_value()
+            if update_data.password is not None
+            else None,
+            new_full_name=update_data.fullName,
+        )
+    except UserAlreadyExistsError:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            detail="User already exists",
         )
     except PasswordTooShortError as e:
         raise APIError(
