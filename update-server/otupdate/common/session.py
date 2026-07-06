@@ -52,10 +52,10 @@ class UpdateSession:
             shutil.rmtree(self._storage_path)
         os.makedirs(self._storage_path, mode=0o700, exist_ok=True)
 
-    def __del__(self) -> None:
-        if hasattr(self, "_storage_path"):
-            shutil.rmtree(self._storage_path)
-        LOG.info(f"Update session: removed {getattr(self, '_token', '<unknown>')}")
+    def close(self) -> None:
+        """Clean up the storage used by this session."""
+        shutil.rmtree(self._storage_path)
+        LOG.info(f"Update session: removed {self._token}")
 
     def set_stage(self, stage: Stages) -> None:
         """Convenience method to set the stage and lookup message"""

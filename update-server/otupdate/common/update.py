@@ -81,7 +81,15 @@ async def begin(request: web.Request) -> web.Response:
 
 @auth.require_scopes(Scope.UPDATES_WRITE)
 async def cancel(request: web.Request) -> web.Response:
-    set_current_session(request, None)
+    session = get_current_session(request)
+    if session is not None:
+        # fixme(mm, 2026-07-06):
+        #   * This is a concurrency hazard: it might close a session and delete its
+        #     storage while a background task is still using it.
+        #   * session.close() currently only cleans up storage. We also need to clean
+        #     up background tasks.
+        session.close()
+        set_current_session(request, None)
     return web.json_response(data={"message": "Session cancelled"}, status=200)
 
 
