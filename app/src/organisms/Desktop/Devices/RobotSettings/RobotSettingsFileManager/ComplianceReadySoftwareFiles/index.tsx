@@ -12,12 +12,12 @@ import {
 import { useLogPeriodSummariesQuery } from '@opentrons/react-api-client'
 
 import { useToaster } from '/app/organisms/ToasterOven'
+import { formatTimestamp } from '/app/transformations/runs'
 
 import { DeleteRecordsModal } from '../../../DeleteRecordsModal'
 import { FileManagementSectionHeader } from '../FileManagementSectionHeader'
 import { useRecordSelection } from '../hooks/useRecordSelection'
 import fileManagerStyles from '../robotsettingsfilemanager.module.css'
-import { formatRecordDate } from '../utils/formatRecordDate'
 import styles from './compliancereadysoftwarefiles.module.css'
 import { LogPeriodRow } from './LogPeriodRow'
 
@@ -66,11 +66,11 @@ export function ComplianceReadySoftwareFiles(): JSX.Element {
   const newestPeriod = periods[0]
   const firstDate =
     oldestPeriod?.startedAt != null
-      ? formatRecordDate(oldestPeriod.startedAt)
+      ? formatTimestamp(oldestPeriod.startedAt)
       : t('na')
   const lastDate =
     newestPeriod != null
-      ? formatRecordDate(newestPeriod.endedAt ?? newestPeriod.startedAt)
+      ? formatTimestamp(newestPeriod.endedAt ?? newestPeriod.startedAt)
       : t('na')
 
   const handleDownloadSelected = (): void => {

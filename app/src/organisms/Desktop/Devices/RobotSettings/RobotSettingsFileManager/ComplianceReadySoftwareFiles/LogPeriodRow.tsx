@@ -2,7 +2,8 @@ import { useTranslation } from 'react-i18next'
 
 import { CheckboxBasic, Chip, COLORS, Tag } from '@opentrons/components'
 
-import { formatRecordDate } from '../utils/formatRecordDate'
+import { formatTimestamp } from '/app/transformations/runs'
+
 import styles from './compliancereadysoftwarefiles.module.css'
 
 import type { LogPeriodSummary } from '@opentrons/api-client'
@@ -32,7 +33,7 @@ export function LogPeriodRow({
         <div className={styles.compliance_period_card_inner}>
           <div className={styles.log_date_col}>
             <Tag
-              text={formatRecordDate(period.startedAt)}
+              text={formatTimestamp(period.startedAt)}
               type="default"
               shrinkToContent
             />
@@ -41,7 +42,7 @@ export function LogPeriodRow({
             <Tag
               text={
                 period.endedAt != null
-                  ? formatRecordDate(period.endedAt)
+                  ? formatTimestamp(period.endedAt)
                   : t('na')
               }
               type="default"

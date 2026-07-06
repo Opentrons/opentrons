@@ -7,7 +7,6 @@ import {
   StyledText,
   WARNING_TOAST,
 } from '@opentrons/components'
-import { useDeleteRunMutation } from '@opentrons/react-api-client'
 
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'

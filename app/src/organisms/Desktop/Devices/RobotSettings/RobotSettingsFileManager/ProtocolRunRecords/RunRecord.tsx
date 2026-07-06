@@ -9,9 +9,10 @@ import {
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
+import { formatTimestamp } from '/app/transformations/runs'
+
 import { DisplayRunStatus } from '../../../ProtocolRun/ProtocolRunHeader/DisplayRunStatus'
 import { useRunFileCount } from '../hooks/useRunFileCount'
-import { formatRecordDate } from '../utils/formatRecordDate'
 import styles from './protocolrunrecords.module.css'
 
 import type { RunData } from '@opentrons/api-client'
@@ -50,7 +51,7 @@ export function RunRecord({
     <div className={styles.run_record_header_content}>
       <div className={styles.run_date_col}>
         <Tag
-          text={formatRecordDate(run.createdAt)}
+          text={formatTimestamp(run.createdAt)}
           type="default"
           shrinkToContent
         />
