@@ -14,7 +14,7 @@ Follow these instructions to install the Vacuum Module.
 
 1. Clear the deck of all modules and labware to give yourself sufficient room to work.
 
-2. Remove the waste bin (if installed) and any modules, labware, or deck adapters and/or plates from slots A3–A4.
+2. Remove the trash bin (if installed) and any modules, labware, deck adapters, or plates from slots A3–A4.
 
     <figure markdown>
     ![Deck map with sots A3 and A4 highlighted](images/deck-map.png)
@@ -23,7 +23,7 @@ Follow these instructions to install the Vacuum Module.
 
 3. Install the Vacuum Module deck adapter in slots A3–A4 only. Fasten the adapter to the deck with the original screws or use the screws provided with the module.
 
-4. Set the vacuum base on the deck adapter in slot A-3.
+4. Set the vacuum base on the deck adapter in slot A3.
 
 5. Attach the 6 mm (&frac14;") vacuum hose to the quick connect fitting on the base plate. The quick connect fittings lock into place with an audible click.
 
