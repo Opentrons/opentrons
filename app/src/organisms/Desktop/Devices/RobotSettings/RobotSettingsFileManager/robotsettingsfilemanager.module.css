@@ -12,3 +12,21 @@
   background-color: var(--white);
   gap: var(--spacing-16);
 }
+
+.file_management_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.file_management_header_button_group {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-8);
+}
+
+.log_table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
