@@ -1,13 +1,12 @@
 """E2E tests for 8-channel partial/single tip pickup and multi-transfer workflows."""
 
-
-'''
+"""
 TODO:
 For 8ch/1ch, you’re more likely under-covered: manual tip tracking (called out TODO), waste chute, additional partial counts/primaries, and manual tracking on 8ch partial.
 Also, I think you can only do 1ch “consolidate” steps, so that’s 1 less type of step.
 We can also do a more comprehensive 8ch/1ch test by adding some 8ch partial steps.
 
-'''
+"""
 
 from typing import List
 
@@ -38,7 +37,7 @@ def test_pd_single_eight_partial_tip_workflow(page: Page) -> None:
     editor = ProtocolEditorPage(page)
     transfer = TransferPage(page)
 
-    print('8ch single-nozzle distribute from 384 plate to all 24 temp-deck tubes')
+    print("8ch single-nozzle distribute from 384 plate to all 24 temp-deck tubes")
     add_transfer_step(
         editor,
         transfer,
@@ -56,7 +55,7 @@ def test_pd_single_eight_partial_tip_workflow(page: Page) -> None:
         ),
     )
 
-    print('8ch partial 5/8 nozzles from 384 column 23 to TC 96-well column 1')
+    print("8ch partial 5/8 nozzles from 384 column 23 to TC 96-well column 1")
     add_transfer_step(
         editor,
         transfer,
@@ -75,7 +74,7 @@ def test_pd_single_eight_partial_tip_workflow(page: Page) -> None:
         ),
     )
 
-    print('1ch distribute TC → temp 24')
+    print("1ch distribute TC → temp 24")
     add_transfer_step(
         editor,
         transfer,
@@ -92,7 +91,7 @@ def test_pd_single_eight_partial_tip_workflow(page: Page) -> None:
         ),
     )
 
-    print('1ch consolidate temp 24 → TC')
+    print("1ch consolidate temp 24 → TC")
     add_transfer_step(
         editor,
         transfer,
@@ -109,8 +108,8 @@ def test_pd_single_eight_partial_tip_workflow(page: Page) -> None:
         ),
     )
 
-    print('1ch single transfer TC → temp with manual tip tracking')
-    print('todo: add manual tip tracking')
+    print("1ch single transfer TC → temp with manual tip tracking")
+    print("todo: add manual tip tracking")
     add_transfer_step(
         editor,
         transfer,
@@ -126,7 +125,7 @@ def test_pd_single_eight_partial_tip_workflow(page: Page) -> None:
             change_tip="Once",
         ),
     )
-    print('1ch single transfer temp → TC reusing tip from previous')
+    print("1ch single transfer temp → TC reusing tip from previous")
     add_transfer_step(
         editor,
         transfer,

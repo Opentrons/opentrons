@@ -1,7 +1,6 @@
 """Pytest configuration for Playwright e2e tests."""
 
 import os
-import re
 import select
 import subprocess
 import time
@@ -19,16 +18,16 @@ from _pytest.python import Function
 from playwright.sync_api import BrowserContext, Page, Video
 from playwright.sync_api import Error as PlaywrightError
 
-from utility import troubleshoot_and_pause
+from automation.app_helpers.reporting import ensure_test_results_dir, slugify_nodeid
+from run_config import effective_headless, is_headed_run, publish_playwright_headless_mode
+from utility import _pause_for_debugging, troubleshoot_and_pause
 
 # Expose fixtures defined in e2e-testing/eyes.py (e.g. the `eyes` fixture).
 pytest_plugins = ["eyes"]
 
 
 def pytest_collection_modifyitems(config: Config, items: List[Item]) -> None:
-    is_headed = bool(config.getoption("--headed", False)) or os.getenv("HEADLESS") == "false"
-
-    if is_headed:
+    if is_headed_run(config):
         for item in items:
             # Check if it's a function-based test (it usually is)
             if isinstance(item, Function):
@@ -36,19 +35,14 @@ def pytest_collection_modifyitems(config: Config, items: List[Item]) -> None:
                 item.obj = troubleshoot_and_pause(item.obj)
 
 
-def _ensure_test_results_dir() -> None:
-    """Ensure the test-results directory exists."""
-    os.makedirs("test-results", exist_ok=True)
-
-
-def _slugify_nodeid(nodeid: str) -> str:
-    """Convert a pytest node ID to a filesystem-friendly slug."""
-    test_identifier = nodeid.split("::")[-1]
-    candidate = re.sub(r"[^A-Za-z0-9_.-]+", "_", test_identifier)
-    candidate = candidate.strip("_")
-    if not candidate:
-        return "test"
-    return candidate[:200]
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item: Item, call: pytest.CallInfo) -> Generator[None, None, None]:
+    """Same pause path as ``troubleshoot_and_pause`` when fixture setup fails."""
+    outcome = yield
+    report = outcome.get_result()
+    if report.failed and call.when == "setup" and is_headed_run(item.config):
+        error = report.longrepr if isinstance(report.longrepr, BaseException) else None
+        _pause_for_debugging(item.nodeid, error, item=item)
 
 
 def _save_video_with_test_name(video: Video, nodeid: str) -> None:
@@ -66,7 +60,7 @@ def _save_video_with_test_name(video: Video, nodeid: str) -> None:
     except PlaywrightError:
         original_path = None
 
-    slug = _slugify_nodeid(nodeid)
+    slug = slugify_nodeid(nodeid)
     destination = videos_dir / f"{slug}{suffix}"
     counter = 1
     while destination.exists():
@@ -88,7 +82,7 @@ def _save_video_with_test_name(video: Video, nodeid: str) -> None:
 
 def pytest_configure(config: Any) -> None:
     """Create test-results directory if it doesn't exist."""
-    _ensure_test_results_dir()
+    ensure_test_results_dir()
 
 
 def _ensure_applitools_batch_env() -> None:
@@ -160,14 +154,14 @@ def _ensure_applitools_batch_env() -> None:
 
 def pytest_sessionstart(session: pytest.Session) -> None:
     """Ensure artifacts directory exists before tests begin."""
-    _ensure_test_results_dir()
+    ensure_test_results_dir()
     _ensure_applitools_batch_env()
 
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
     """Guarantee artifacts directory exists before report generation."""
-    _ensure_test_results_dir()
+    ensure_test_results_dir()
 
 
 @pytest.fixture(scope="session")
@@ -187,22 +181,8 @@ def browser_context_args() -> dict[str, Any]:
 @pytest.fixture(scope="session")
 def browser_type_launch_args(pytestconfig: pytest.Config) -> dict[str, Any]:
     """Configure browser launch arguments."""
-    is_ci = os.environ.get("CI", "false").lower() == "true"
-    headed_cli = bool(pytestconfig.getoption("headed"))
-    headless_env = os.environ.get("HEADLESS")
-
-    if is_ci:
-        headless = True
-    elif headed_cli:
-        headless = False
-    elif headless_env is not None:
-        headless = headless_env.lower() == "true"
-    else:
-        headless = True
-
-    # Expose the effective headless/headed mode to helpers that don't have
-    # access to pytestconfig (e.g. Applitools Eyes helper).
-    os.environ["PW_E2E_HEADLESS"] = "true" if headless else "false"
+    headless = effective_headless(pytestconfig)
+    publish_playwright_headless_mode(headless)
 
     return {
         "headless": headless,

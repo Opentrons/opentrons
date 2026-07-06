@@ -23,6 +23,8 @@ from applitools.playwright import Target
 from dotenv import find_dotenv, load_dotenv
 from playwright.sync_api import Locator, Page
 
+from run_config import is_headed_from_playwright_env
+
 
 class Eyes(ApplitoolsEyes):
     """Applitools Eyes with PD E2E convenience methods.
@@ -84,29 +86,6 @@ def create_eyes(*, api_key: str | None = None) -> Eyes:
     return eyes
 
 
-def _is_headed_run() -> bool:
-    """Return True when the current test run is headed (non-headless).
-
-    We prefer an explicit signal from our pytest Playwright configuration via
-    the `PW_E2E_HEADLESS` env var (set in `conftest.py`).
-    """
-
-    pw_e2e_headless = os.getenv("PW_E2E_HEADLESS")
-    if pw_e2e_headless is not None:
-        return pw_e2e_headless.lower() == "false"
-
-    # Back-compat for local make targets.
-    headless_env = os.getenv("HEADLESS")
-    if headless_env is not None:
-        return headless_env.lower() == "false"
-
-    # Playwright debug mode is effectively headed.
-    if os.getenv("PWDEBUG") not in (None, "", "0", "false", "False"):
-        return True
-
-    return False
-
-
 def _print_once(message: str, *, guard_env_var: str) -> None:
     """Print a message only once per process to avoid noisy logs."""
 
@@ -125,7 +104,7 @@ def eyes_singleton() -> Eyes | None:
     """
 
     # If we're headed, never do Applitools checks.
-    if _is_headed_run():
+    if is_headed_from_playwright_env():
         _print_once("Applitools disabled for this run (headed mode).", guard_env_var="_APPLITOOLS_DISABLED_HEADED")
         return None
 
