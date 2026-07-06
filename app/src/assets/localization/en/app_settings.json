@@ -59,8 +59,8 @@
   "heater_shaker_attach_description": "Display a reminder to attach the Heater-Shaker properly before running a test shake or using it in a protocol.",
   "heater_shaker_attach_visible": "Confirm Heater-Shaker Module Attachment",
   "how_to_restore": "How to Restore a Previous Software Version",
-  "installing_update": "Installing update...",
   "if_on_fetch_updates_in_the_background": "If on, fetch updates in the background when released.",
+  "installing_update": "Installing update...",
   "ip_available": "Available",
   "ip_description_first": "Enter an IP address or hostname to connect to a robot.",
   "language": "Language",
@@ -125,8 +125,8 @@
   "usb_to_ethernet_unknown_manufacturer": "Unknown Manufacturer",
   "usb_to_ethernet_unknown_product": "Unknown Adapter",
   "use_system_language": "Use system language",
-  "when_enabled_updates_are_downloaded_automatically": "When enabled, updates are downloaded automatically so they're ready to install later. When disabled, you'll choose when updates are downloaded.",
   "view_adapter_info": "view adapter info",
   "view_software_update": "View software update",
-  "view_update": "View Update"
+  "view_update": "View Update",
+  "when_enabled_updates_are_downloaded_automatically": "When enabled, updates are downloaded automatically so they're ready to install later. When disabled, you'll choose when updates are downloaded."
 }
