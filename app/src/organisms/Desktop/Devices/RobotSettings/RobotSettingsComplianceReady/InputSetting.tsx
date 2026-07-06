@@ -13,6 +13,7 @@ export interface InputSettingProps {
   placeholder?: string
   min?: number
   max?: number
+  validate?: (value: string) => string | null
   onBlur: (value: string) => void
 }
 
@@ -24,9 +25,11 @@ export function InputSetting({
   placeholder,
   min,
   max,
+  validate,
 }: InputSettingProps): JSX.Element {
   const inputId = useId()
   const [inputValue, setInputValue] = useState(value)
+  const [error, setError] = useState<string | null>(null)
 
   return (
     <div className={styles.field_row}>
@@ -41,6 +44,7 @@ export function InputSetting({
           placeholder={placeholder}
           min={min}
           max={max}
+          error={error}
           units={
             units != null ? (
               <StyledText
@@ -53,9 +57,19 @@ export function InputSetting({
           }
           onChange={event => {
             setInputValue(event.target.value)
+            if (error != null) {
+              setError(null)
+            }
           }}
           onBlur={event => {
-            onBlur(event.target.value)
+            const nextValue = event.target.value
+            const validationError = validate?.(nextValue) ?? null
+            if (validationError != null) {
+              setError(validationError)
+              return
+            }
+            setError(null)
+            onBlur(nextValue)
           }}
         />
       </div>

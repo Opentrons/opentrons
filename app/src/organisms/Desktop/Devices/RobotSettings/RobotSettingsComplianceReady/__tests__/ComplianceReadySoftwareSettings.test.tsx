@@ -308,17 +308,32 @@ describe('ComplianceReadySoftwareSettings', () => {
     })
   })
   it('should not patch idleLogout when blurred value is not greater than zero', async () => {
+    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+      data: {
+        data: {
+          ...MOCK_AUTH_SETTINGS.data,
+          idleLogout: 300,
+        },
+      },
+    } as ReturnType<typeof useAuthSettingsQuery>)
+
     render()
     expandAccordion()
 
     const idleLogoutField = screen.getByLabelText(
       'Length of time for auto-logout due to inactivity'
     )
+    expect(idleLogoutField).toHaveValue(5)
+
     fireEvent.change(idleLogoutField, { target: { value: '0' } })
     fireEvent.blur(idleLogoutField)
 
     await waitFor(() => {
       expect(mockPatchAuthSettings).not.toHaveBeenCalled()
+      expect(
+        screen.getByText('Must be greater than 0 minutes')
+      ).toBeInTheDocument()
+      expect(idleLogoutField).toHaveValue(0)
     })
   })
 })
