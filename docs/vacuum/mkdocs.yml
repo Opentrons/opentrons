@@ -9,7 +9,7 @@ nav:
   - Maintenance and Cleaning: maintenance.md
   - Vacuum Module G-Codes:
       - Vacuum Module G-Code Concepts: g-code-concepts.md
-      - Vacuum Module G-Code: g-code.md
+      - Vacuum Module G-Codes: g-codes.md
       - Vacuum Module Error Codes: error-codes.md
   - Additional Product Information: additional-info.md
 

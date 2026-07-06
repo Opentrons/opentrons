@@ -43,7 +43,7 @@ Follow these instructions to install the Vacuum Module.
 7.  Remove a lower cosmetic side panel on the robot and bring the remaining hose section through this opening. From here, you can connect the hose to the waste collection jar.
 
     <figure class="screenshot" markdown>
-    ![Flex with a single lower cosmetic panel removed. Shows vacuum hose exiting robot.](images/side-panel.png)
+    ![Flex with a single lower cosmetic panel removed. Shows vacuum hose exiting robot.](images/flex-lower-side-panel.png)
     <figcaption>Vacuum hose exiting Flex from a lower side panel.</figcaption>
     </figure>
 
