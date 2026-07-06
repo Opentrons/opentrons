@@ -41,7 +41,7 @@ def _generate_temporary_password(
     )
 
 
-def _temporary_password_requirements(
+def _password_complexity_requirements(
     settings: SettingsResponseData,
 ) -> tuple[int, bool]:
     """Return (min_length, require_special_characters) from auth settings."""
@@ -50,6 +50,20 @@ def _temporary_password_requirements(
     )
     require_special = settings.passwordComplexitySpecialCharacters is True
     return min_length, require_special
+
+
+def _validate_password_complexity(
+    password: str, settings: SettingsResponseData
+) -> None:
+    """Validate that a user-chosen password meets configured complexity rules."""
+    min_length, require_special = _password_complexity_requirements(settings)
+    actual_length = len(password)
+    if actual_length < min_length:
+        raise PasswordTooShortError(
+            actual_length=actual_length, required_length=min_length
+        )
+    if require_special and not any(c in _PASSWORD_SPECIAL_CHARACTERS for c in password):
+        raise PasswordMissingSpecialCharactersError()
 
 
 class UserNotFoundError(ValueError):
@@ -64,13 +78,28 @@ class InvalidInputError(ValueError):
     """Raised when user input fails validation."""
 
 
-def _validate_fields(
+class PasswordTooShortError(InvalidInputError):
+    """Raised when a password does not meet the configured length requirements."""
+
+    def __init__(self, *, actual_length: int, required_length: int) -> None:
+        super().__init__(
+            f"Required password length of {required_length} but got {actual_length}."
+        )
+        self.actual_length = actual_length
+        self.required_length = required_length
+
+
+class PasswordMissingSpecialCharactersError(InvalidInputError):
+    """Raised when a password does not meet the configured requirements on special chars."""
+
+
+def _validate_fields_non_empty(
     username: str | None = None,
     password: str | None = None,
     full_name: str | None = None,
     account_type: str | None = None,
 ) -> None:
-    """Validate that provided fields are non-empty and passwords meet length requirements."""
+    """Validate that provided fields are non-empty."""
     for field_name, value in [
         ("username", username),
         ("password", password),
@@ -79,9 +108,6 @@ def _validate_fields(
     ]:
         if value is not None and value == "":
             raise InvalidInputError(f"{field_name} must not be empty")
-
-    if password is not None and len(password) < 8:
-        raise InvalidInputError("Password must be at least 8 characters long")
 
 
 def get_scope_set_of_user(user: User) -> set[Scope]:
@@ -146,12 +172,13 @@ class UserDataManager:
         account_type: str,
     ) -> UserResponse:
         """Validate inputs, check for duplicates, and create a new user."""
-        _validate_fields(
+        _validate_fields_non_empty(
             username=username,
             password=password,
             full_name=full_name,
             account_type=account_type,
         )
+        _validate_password_complexity(password, self._settings_store.get_settings())
         if self._user_store.get(username) is not None:
             raise UserAlreadyExistsError(f"User {username!r} already exists")
         new_user = self._user_store.add(
@@ -187,12 +214,16 @@ class UserDataManager:
         reset_password: bool = False,
     ) -> UserResponse:
         """Validate inputs, then update a user or raise UserNotFoundError."""
-        _validate_fields(
+        _validate_fields_non_empty(
             username=new_username,
             password=new_password,
             full_name=new_full_name,
             account_type=new_account_type,
         )
+        if new_password is not None:
+            _validate_password_complexity(
+                new_password, self._settings_store.get_settings()
+            )
         if (
             new_username is not None
             and new_username != username_to_update
@@ -221,7 +252,7 @@ class UserDataManager:
 
     def reset_user_password(self, username: str) -> ResetPasswordResponse:
         """Reset a user's password to a random temporary password."""
-        min_length, require_special = _temporary_password_requirements(
+        min_length, require_special = _password_complexity_requirements(
             self._settings_store.get_settings()
         )
         temporary_password = _generate_temporary_password(min_length, require_special)

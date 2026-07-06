@@ -15,6 +15,7 @@ from server_utils.auth.resource_server.fastapi import (
     install_authorization_checker,
 )
 
+from auth_server.api_error import APIError, handle_api_error
 from auth_server.authorization_checker import build_authorization_checker
 from auth_server.oauth2.backend import Backend as OAuth2Backend
 from auth_server.oauth2.fastapi_dependencies import (
@@ -102,6 +103,7 @@ app = FastAPI(
 )
 
 
+app.exception_handler(APIError)(handle_api_error)
 app.exception_handler(AuthorizationError)(handle_authorization_error)
 
 
