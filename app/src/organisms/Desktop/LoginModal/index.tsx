@@ -12,6 +12,7 @@ import {
   SecondaryButton,
   StyledText,
 } from '@opentrons/components'
+import { useHost } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
@@ -20,7 +21,9 @@ import {
   useOAuth2PasswordLogin,
   useSetNewPasswordAndSignIn,
 } from '/app/resources/auth'
+import { isSSLError } from '/app/resources/auth/hooks/isSSLError'
 
+import { RobotCertImportModal } from '../RobotCertImport'
 import styles from './loginmodal.module.css'
 
 import type { ComponentProps, Dispatch, SetStateAction } from 'react'
@@ -110,6 +113,7 @@ interface LoginModalImplProps {
 function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const { robotName } = props
   const modal = useModal()
+  const host = useHost()
   const { t } = useTranslation()
   const [screen, setScreen] = useState<LoginModalScreen>({
     kind: 'login',
@@ -118,10 +122,20 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const storeLoginState = useStoreLoginState()
 
   const loginFormId = useId()
+  const [showRobotCertImportModal, setShowRobotCertImportModal] =
+    useState<boolean>(false)
 
   const handleClose = (): void => {
     modal.resolve(null)
     modal.remove()
+  }
+
+  const handleError = (message: string, error?: unknown): void => {
+    if (isSSLError(error, host?.hostname)) {
+      setShowRobotCertImportModal(true)
+      return
+    }
+    updateLoginFormData(setScreen, { error: message })
   }
 
   const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
@@ -140,9 +154,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       modal.resolve({ username: successfulUsername })
       modal.remove()
     },
-    onError: message => {
-      updateLoginFormData(setScreen, { error: message })
-    },
+    onError: handleError,
   })
 
   const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
@@ -232,59 +244,71 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   })()
 
   return createPortal(
-    <Modal
-      title={t('access_control:desktop_login_modal_header')}
-      onClose={handleClose}
-      footer={<div className={styles.modal_footer_container}>{footer}</div>}
-    >
-      <div className={styles.content_container}>
-        {screen.kind === 'login' ? (
-          <LoginView
-            formId={loginFormId}
-            formData={screen.formData}
-            onSubmit={handleLoginSubmit}
-            onUsernameChange={value => {
-              updateLoginFormData(setScreen, { username: value, error: null })
-            }}
-            onLogInPasswordChange={value => {
-              updateLoginFormData(setScreen, {
-                logInPassword: value,
-                error: null,
-              })
-            }}
-            onForgotPasswordClick={() => {
-              setScreen({ kind: 'forgotPassword', formData: screen.formData })
-            }}
-          />
-        ) : screen.kind === 'forgotPassword' ? (
-          <ForgotPasswordView />
-        ) : (
-          <SetNewPasswordView
-            formData={screen.formData}
-            onNewPasswordChange={value => {
-              updateSetNewPasswordFormData(setScreen, {
-                newPassword: value,
-                error: null,
-                confirmPasswordError: null,
-              })
-            }}
-            onConfirmPasswordChange={value => {
-              updateSetNewPasswordFormData(setScreen, {
-                confirmPassword: value,
-                error: null,
-                confirmPasswordError: null,
-              })
-            }}
-            onPasswordFieldBlur={() => {
-              const { newPassword, confirmPassword } = screen.formData
-              if (newPassword !== '' && confirmPassword !== '') {
-                validateConfirmPasswordMatch(screen.formData)
-              }
-            }}
-          />
-        )}
-      </div>
-    </Modal>,
+    <>
+      {showRobotCertImportModal
+        ? createPortal(
+            <RobotCertImportModal
+              onClose={() => {
+                setShowRobotCertImportModal(false)
+              }}
+            />,
+            getTopPortalEl()
+          )
+        : null}
+      <Modal
+        title={t('access_control:desktop_login_modal_header')}
+        onClose={handleClose}
+        footer={<div className={styles.modal_footer_container}>{footer}</div>}
+      >
+        <div className={styles.content_container}>
+          {screen.kind === 'login' ? (
+            <LoginView
+              formId={loginFormId}
+              formData={screen.formData}
+              onSubmit={handleLoginSubmit}
+              onUsernameChange={value => {
+                updateLoginFormData(setScreen, { username: value, error: null })
+              }}
+              onLogInPasswordChange={value => {
+                updateLoginFormData(setScreen, {
+                  logInPassword: value,
+                  error: null,
+                })
+              }}
+              onForgotPasswordClick={() => {
+                setScreen({ kind: 'forgotPassword', formData: screen.formData })
+              }}
+            />
+          ) : screen.kind === 'forgotPassword' ? (
+            <ForgotPasswordView />
+          ) : (
+            <SetNewPasswordView
+              formData={screen.formData}
+              onNewPasswordChange={value => {
+                updateSetNewPasswordFormData(setScreen, {
+                  newPassword: value,
+                  error: null,
+                  confirmPasswordError: null,
+                })
+              }}
+              onConfirmPasswordChange={value => {
+                updateSetNewPasswordFormData(setScreen, {
+                  confirmPassword: value,
+                  error: null,
+                  confirmPasswordError: null,
+                })
+              }}
+              onPasswordFieldBlur={() => {
+                const { newPassword, confirmPassword } = screen.formData
+                if (newPassword !== '' && confirmPassword !== '') {
+                  validateConfirmPasswordMatch(screen.formData)
+                }
+              }}
+            />
+          )}
+        </div>
+      </Modal>
+    </>,
     getTopPortalEl()
   )
 }

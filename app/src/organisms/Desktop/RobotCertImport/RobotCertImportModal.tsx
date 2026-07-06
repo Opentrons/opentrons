@@ -52,6 +52,7 @@ export function RobotCertImportModal(
       closeOnOutsideClick={true}
       footer={footer}
       onClose={handleClose}
+      zIndexOverlay={10000}
     >
       <div className={styles.robot_cert_import_container}>
         <div>
