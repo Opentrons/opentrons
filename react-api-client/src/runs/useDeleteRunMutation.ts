@@ -13,7 +13,7 @@ import type { DeleteRunData, EmptyResponse } from '@opentrons/api-client'
 
 export interface DeleteRunParams {
   runId: string
-  settings: DeleteRunData
+  settings?: DeleteRunData
 }
 
 export type UseDeleteRunMutationResult = UseMutationResult<
