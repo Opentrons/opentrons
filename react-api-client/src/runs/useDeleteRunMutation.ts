@@ -9,20 +9,25 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type { EmptyResponse } from '@opentrons/api-client'
+import type { DeleteRunData, EmptyResponse } from '@opentrons/api-client'
+
+export interface DeleteRunParams {
+  runId: string
+  settings: DeleteRunData
+}
 
 export type UseDeleteRunMutationResult = UseMutationResult<
   EmptyResponse,
   unknown,
-  string
+  DeleteRunParams
 > & {
-  deleteRun: UseMutateFunction<EmptyResponse, unknown, string>
+  deleteRun: UseMutateFunction<EmptyResponse, unknown, DeleteRunParams>
 }
 
 export type UseDeleteRunMutationOptions = UseMutationOptions<
   EmptyResponse,
   unknown,
-  string
+  DeleteRunParams
 >
 
 export function useDeleteRunMutation(
@@ -31,9 +36,9 @@ export function useDeleteRunMutation(
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<EmptyResponse, unknown, string>(
-    (runId: string) =>
-      deleteRun(host!, runId).then(response => {
+  const mutation = useMutation<EmptyResponse, unknown, DeleteRunParams>(
+    ({ runId, settings }) =>
+      deleteRun(host!, runId, settings).then(response => {
         queryClient.removeQueries(getQueryKey(host, 'runs', runId))
         queryClient
           .invalidateQueries(getQueryKey(host, 'runs'))
