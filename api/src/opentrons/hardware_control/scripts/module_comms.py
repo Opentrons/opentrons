@@ -20,7 +20,7 @@ COMMANDS = {
 # the modules as they appear in /dev/ mapped to their respective GCODES
 MODULE_NAMES = {
     "thermocycler": TC_GCODES,
-    "vacuum": VM_GCODES,
+    "vacuummodule": VM_GCODES,
     "heatershaker": HS_GCODES,
     "magdeck": MD_GCODES,
     "flexstacker": FS_GCODES,
@@ -29,13 +29,17 @@ MODULE_NAMES = {
 
 MODULE_NAME_INDEX = 0
 SERIAL_OBJ_INDEX = 1
-BAUD_RATE = 115200
+BAUD_RATE = 96200
+
+
+def _module_kind(module_name: str) -> str:
+    return module_name.split("_")[-1][:-1]
 
 
 # returns format "GET_DEVICE_INFO" : "M115"
 def get_commands_for_module(module_name: str) -> Dict[str, str]:
     # take the 'ot_module_' and the number off the ends of the name
-    module_kind = module_name.split("_")[-1][:-1]
+    module_kind = _module_kind(module_name)
     module_gcodes = MODULE_NAMES[module_kind]
     return {_cmd.value: _cmd.name for _cmd in list(module_gcodes)}
 
@@ -70,7 +74,6 @@ def prompt_which_module(
             name = name_pair[MODULE_NAME_INDEX].split("_")[-1]
             print(f"\t{index} : {name}")
         which_mod = input("\n enter module >>> ")
-        print()
         if which_mod == "quit":
             sys.exit(0)
         try:
@@ -96,7 +99,7 @@ def prompt_gcode_command(
 
     display_name = module_name.split("_")[-1]
     print(
-        f"enter gcode command for {display_name}:\n\t'0' to list commands\n\t'!' to go back to modules"
+        f"\nenter gcode command for {display_name}:\n\t'0' to list commands\n\t'!' to go back to modules"
     )
     usr_input = input(">>> ").upper()
     print()
@@ -121,9 +124,6 @@ def prompt_gcode_command(
 
 
 async def comms_loop(modules_dict: Dict[int, Tuple[str, Serial]]) -> None:
-    # TODO : maybe also catch and handle typos
-    # find a way to get the gcode arguments
-
     command = ""
     prompt_module = True
     while prompt_module:
@@ -159,7 +159,9 @@ async def main() -> None:
         capture_output=True,
         text=True,
     ).stdout
-    modules_found = subprocess_output.split()
+    modules_found = [
+        mod for mod in subprocess_output.split() if _module_kind(mod) in MODULE_NAMES
+    ]
 
     if not modules_found:
         print("No modules found. Exiting.")
