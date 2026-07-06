@@ -17,7 +17,6 @@ from audit_server.log_storage.store import (
     NoLogInPeriodError,
 )
 from audit_server.log_storage.types import StoredLog
-from audit_server.settings.models import LoggingEnabledResponseData
 from audit_server.settings.store import SettingsStore
 
 
@@ -39,9 +38,7 @@ def mock_time(decoy: Decoy) -> _GetTime:
 def mock_settings(decoy: Decoy) -> SettingsStore:
     """A mock settings store."""
     settings = decoy.mock(cls=SettingsStore)
-    decoy.when(settings.get_logging_enabled_settings()).then_return(
-        LoggingEnabledResponseData(loggingEnabled=True)
-    )
+    decoy.when(settings.get_logging_enabled()).then_return(True)
     return settings
 
 
@@ -69,9 +66,7 @@ def subject(
 @pytest.fixture
 def disable_logging(mock_settings: SettingsStore, decoy: Decoy) -> None:
     """Force logging off."""
-    decoy.when(mock_settings.get_logging_enabled_settings()).then_return(
-        LoggingEnabledResponseData(loggingEnabled=False)
-    )
+    decoy.when(mock_settings.get_logging_enabled()).then_return(False)
 
 
 async def test_store_log_stores_nothing_if_logging_disabled(

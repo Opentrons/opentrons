@@ -10,6 +10,13 @@ async def enable_logging(run_server: DevServer) -> None:
     async with httpx.AsyncClient() as client:
         response = await client.patch(
             f"{run_server.base_url}/audit/internal/loggingEnabled",
-            json={"data": {"loggingEnabled": True}},
+            json={
+                "data": {
+                    "loggingEnabled": True,
+                    "accountName": "test",
+                    "legalName": "Test",
+                    "reason": "enabled for integration testing",
+                }
+            },
         )
         response.raise_for_status()

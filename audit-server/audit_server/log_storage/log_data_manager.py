@@ -51,7 +51,7 @@ class LogDataManager:
 
         Returns the hash of the final message in the period.
         """
-        if not self._settings.get_logging_enabled_settings().loggingEnabled:
+        if not self._settings.get_logging_enabled():
             return ""
         async with self._lock:
             return await self._do_rotate_periods()
@@ -62,7 +62,7 @@ class LogDataManager:
         If the key server is not available, this method raises before storing
         the current log, but it will log an (unsigned) error message first.
         """
-        if not self._settings.get_logging_enabled_settings().loggingEnabled:
+        if not self._settings.get_logging_enabled():
             return ""
         async with self._lock:
             return await self._do_store_log(log_message)

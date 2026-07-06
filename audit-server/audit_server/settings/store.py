@@ -17,8 +17,6 @@ from server_utils.sql_utils import JsonPythonValue
 from audit_server.persistence.fastapi_dependencies import get_sql_engine
 from audit_server.persistence.orm_models import LoggingEnabled, Setting
 from audit_server.settings.models import (
-    LoggingEnabledResponseData,
-    PatchLoggingEnabledRequestData,
     PatchSettingsRequestData,
     SettingsResponseData,
 )
@@ -87,10 +85,10 @@ class SettingsStore:
                 return None
             return bool(row.enabled)
 
-    def get_logging_enabled_settings(self) -> LoggingEnabledResponseData:
+    def get_logging_enabled(self) -> bool:
         """Get the current logging-enabled setting (defaults to False)."""
         enabled = self._get_logging_enabled()
-        return LoggingEnabledResponseData(loggingEnabled=enabled or False)
+        return enabled or False
 
     def update_logging_enabled_table(self, loggingEnabled: bool) -> None:
         """Set the logging-enabled setting."""
@@ -104,16 +102,14 @@ class SettingsStore:
                 row.enabled = loggingEnabled
             session.commit()
 
-    def patch_logging_enabled(
-        self, patch: PatchLoggingEnabledRequestData
-    ) -> LoggingEnabledResponseData:
+    def patch_logging_enabled(self, new_state: bool) -> bool:
         """Patch the logging-enabled setting.
 
         Unlike auth-server's access-control flag, this is freely toggleable in
         both directions. An omitted ``loggingEnabled`` leaves the setting as-is.
         """
-        self.update_logging_enabled_table(patch.loggingEnabled)
-        return self.get_logging_enabled_settings()
+        self.update_logging_enabled_table(new_state)
+        return self.get_logging_enabled()
 
 
 _accessor = AppStateAccessor[SettingsStore]("settings_store")
