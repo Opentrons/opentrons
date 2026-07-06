@@ -15,7 +15,7 @@ from .plugins import PluginStarter
 from .protocol_engine import ProtocolEngine
 from .resources import DeckDataProvider, FileProvider, ModelUtils, ModuleDataProvider
 from .state.config import Config
-from .state.state import StateStore
+from .state.state import EngineEventNotification, StateStore
 from .types import DeckConfigurationType, PostRunHardwareState
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import DoorState, HardwareEventHandler
@@ -40,6 +40,9 @@ async def create_protocol_engine(
     file_provider: typing.Optional[FileProvider] = None,
     camera_provider: typing.Optional[CameraProvider] = None,
     notify_publishers: typing.Optional[typing.Callable[[], None]] = None,
+    updates_callback: typing.Optional[
+        typing.Callable[[list[EngineEventNotification]], None]
+    ] = None,
     proxy_of_callback_for_handling_door_events: typing.Optional[
         HardwareEventHandler
     ] = None,
@@ -56,6 +59,7 @@ async def create_protocol_engine(
         file_provider: Provides access to robot server file writing procedures for protocol output.
         camera_provider: Provides access to camera interface with image capture and callbacks.
         notify_publishers: Notifies robot server publishers of internal state change.
+        updates_callback: Notified robot server of specific Protocol Engine events.
         proxy_of_callback_for_handling_door_events: Optional remote callback for door events, used when in subprocess mode.
     """
     deck_data = DeckDataProvider(config.deck_type)
@@ -77,6 +81,7 @@ async def create_protocol_engine(
         module_calibration_offsets=module_calibration_offsets,
         deck_configuration=deck_configuration,
         notify_publishers=notify_publishers,
+        updates_callback=updates_callback,
     )
     hardware_state_synchronizer = ErrorRecoveryHardwareStateSynchronizer(
         hardware_api, state_store

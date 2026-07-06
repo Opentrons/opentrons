@@ -6,6 +6,7 @@ import math
 from dataclasses import dataclass
 from typing import (
     Any,
+    Callable,
     Dict,
     List,
     NamedTuple,
@@ -20,6 +21,7 @@ from typing import (
 from numpy import array, dot
 from numpy import double as npdouble
 from numpy.typing import NDArray
+from pydantic import BaseModel
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 
@@ -100,6 +102,12 @@ from opentrons.protocol_engine.state.module_substates.absorbance_reader_substate
 from opentrons.types import DeckSlotName, MountType, Point, StagingSlotName
 
 ModuleSubStateT = TypeVar("ModuleSubStateT", bound=ModuleSubStateType)
+
+
+class FlexStackerSubstateNotification(BaseModel):
+    """Engine notification for Flex Stacker substate change."""
+
+    stacker_substate_map: Dict[str, FlexStackerSubState]
 
 
 class SlotTransit(NamedTuple):
@@ -222,6 +230,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         config: Config,
         deck_fixed_labware: Sequence[DeckFixedLabware],
         module_calibration_offsets: Optional[Dict[str, ModuleOffsetData]] = None,
+        updates_callback: Optional[
+            Callable[[FlexStackerSubstateNotification | Any], None]
+        ] = None,
     ) -> None:
         """Initialize a ModuleStore and its state."""
         self._state = ModuleState(
@@ -235,6 +246,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             deck_fixed_labware=deck_fixed_labware,
         )
         self._robot_type = config.robot_type
+        self._updates_callback = updates_callback
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
@@ -669,6 +681,15 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         self._state.substate_by_module_id[module_id] = (
             prev_substate.new_from_state_change(state_update)
         )
+        if self._updates_callback:
+            stackers: Dict[str, FlexStackerSubState] = {}
+            for module_id, substate in self._state.substate_by_module_id.items():
+                if isinstance(substate, FlexStackerSubState):
+                    stackers[module_id] = substate
+
+            self._updates_callback(
+                FlexStackerSubstateNotification(stacker_substate_map=stackers)
+            )
 
     def _handle_vacuum_module_commands(
         self, state_update: VacuumModuleStateUpdate

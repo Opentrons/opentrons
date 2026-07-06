@@ -15,6 +15,7 @@ from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
 )
 from opentrons.protocol_engine.resources.file_provider import FileProvider
+from opentrons.protocol_engine.state.state import EngineEventNotification
 from opentrons.protocol_engine.types import DeckConfigurationType
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 from opentrons.util.pyro.pyro_synchronous_adapter import (
@@ -26,6 +27,7 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
 )
 
+from robot_server.hardware import HardwareStateStore
 from robot_server.service.pyro_utils.serpent_type_registry import (
     register_robot_server_types,
 )
@@ -72,6 +74,7 @@ class RobotServerPyroResource:
         self._camera_provider: Optional[CameraProvider] = None
         self._file_provider: Optional[FileProvider] = None
         self._notify_publishers: Optional[Callable[[], None]] = None
+        self._hardware_state_store: Optional[HardwareStateStore] = None
 
     ### Setters for procedural state gathering - Not to be used from remote process ###
     def set_run_orchestrator_store(
@@ -114,6 +117,10 @@ class RobotServerPyroResource:
         # Do we need an entirely seperate notification publisher for maintenance runs?
         self._notify_publishers = notify_publishers
 
+    def set_hardware_state_store(self, hardware_store: HardwareStateStore) -> None:
+        """Set the HardwareStateStore of the RobotServerPyroResource, not serialized for remote processes."""
+        self._hardware_state_store = hardware_store
+
     ### Interface methods for remote access ###
 
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
@@ -136,7 +143,7 @@ class RobotServerPyroResource:
             return run_handler_in_engine_thread_from_hardware_thread
         else:
             raise RuntimeError(
-                "Cannot provider a hardware listener from the RobotServerPyroResource without a RunOrchestratorStore."
+                "Cannot provide a hardware listener from the RobotServerPyroResource without a RunOrchestratorStore."
             )
 
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
@@ -160,7 +167,7 @@ class RobotServerPyroResource:
 
         else:
             raise RuntimeError(
-                "Cannot provider a estop listener from the RobotServerPyroResource without a MaintenanceRunOrchestratorStore."
+                "Cannot provide a estop listener from the RobotServerPyroResource without a MaintenanceRunOrchestratorStore."
             )
 
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
@@ -173,7 +180,7 @@ class RobotServerPyroResource:
             )
         else:
             raise RuntimeError(
-                "Cannot provider a maintenance run door watcher from the RobotServerPyroResource without a MaintenanceRunOrchestratorStore."
+                "Cannot provide a maintenance run door watcher from the RobotServerPyroResource without a MaintenanceRunOrchestratorStore."
             )
 
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
@@ -186,7 +193,7 @@ class RobotServerPyroResource:
             return orchestrator_store.default_run_orchestrator_door_watcher_callback_route_for_proxy
         else:
             raise RuntimeError(
-                "Cannot provider a default run orchestrator door watcher from the RobotServerPyroResource without a RunOrchestratorStore."
+                "Cannot provide a default run orchestrator door watcher from the RobotServerPyroResource without a RunOrchestratorStore."
             )
 
     async def get_deck_configuration(self) -> DeckConfigurationType:
@@ -237,6 +244,45 @@ class RobotServerPyroResource:
         """
 
         return self._notify_publishers
+
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def create_hardware_state_update_callback(self) -> HardwareEventHandler:
+        """Create a callback for hardware events to report to the HardwareStateStore.
+
+        The returned callback is meant to run in the hardware API's thread.
+        """
+        hardware_store = self._hardware_state_store
+        if hardware_store is not None:
+
+            def run_hardware_event_update_from_hardware_thread(
+                event: HardwareEvent,
+            ) -> None:
+                async def _async_call(event: HardwareEvent) -> None:
+                    hardware_store.update_hardware_status_callback(event)
+
+                asyncio.run_coroutine_threadsafe(
+                    _async_call(event),
+                    self._loop,
+                )
+
+            return run_hardware_event_update_from_hardware_thread
+        else:
+            raise RuntimeError(
+                "Cannot provide a hardware updates callback from the RobotServerPyroResource without a HardwareStateStore."
+            )
+
+    def get_engine_updates_callback(
+        self, events: list[EngineEventNotification]
+    ) -> None:
+        """Update the RunOrchestratorStore local store of Engine state status."""
+        orchestrator_store = self._run_orchestrator_store
+        if orchestrator_store is not None:
+            orchestrator_store.update_engine_status_callback(events)
+
+        else:
+            raise RuntimeError(
+                "Cannot provide a protocol engine listener from the RobotServerPyroResource without a RunOrchestratorStore."
+            )
 
 
 ### Utility methods for initializing and registering state within the RobotServerPyroResource
