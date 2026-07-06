@@ -39,7 +39,7 @@ To remove the separator bowl:
 
 <figure markdown>
 ![Separator bowl showing detachment procedure](images/separator-bowl-detach.svg){ width="55%" }
-<figcaption>Detaching the separator bowl</figcaption>
+<figcaption>Detaching the separator bowl.</figcaption>
 </figure>
 
 4. Twist the bowl slightly to the right or left to disengage the retaining lugs.
@@ -60,7 +60,7 @@ To reattach the separator bowl:
 
 <figure markdown>
 ![Separator bowl illustration showing reattachment procedure](images/separator-bowl-attach.svg){ width="50%" }
-<figcaption>Reattaching the separator bowl</figcaption>
+<figcaption>Reattaching the separator bowl.</figcaption>
 </figure>
 
 2. Pull down on the locking tab.

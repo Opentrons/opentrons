@@ -29,12 +29,12 @@ Unnamed box 1 includes deck components that hold labware and other components fo
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Short spacer, 27 mm](images/spacer-short3.svg "Short spacer, 27 mm")
+![Short spacer, 27 mm](images/spacer-short.svg "Short spacer, 27 mm")
 <figcaption>(1) Short spacer, 27 mm</figcaption>
 </figure>
 
 <figure markdown>
-![Tall spacer, 34 mm](images/spacer-tall3.svg "Tall spacer, 34 mm")
+![Tall spacer, 34 mm](images/spacer-tall.svg "Tall spacer, 34 mm")
 <figcaption>(1) Tall spacer, 34 mm</figcaption>
 </figure>
 
@@ -43,7 +43,7 @@ Unnamed box 1 includes deck components that hold labware and other components fo
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Vacuum manifold base](images/base_iso_right2.svg "Manifold base")
+![Vacuum manifold base](images/vacuum-module-base.svg "Manifold base")
 <figcaption>(1) Vacuum base</figcaption>
 </figure>
 
@@ -51,12 +51,12 @@ Unnamed box 1 includes deck components that hold labware and other components fo
 
 ### Unnamed box 2
 
-Unnamed box 2 includes the Control Box (vacuum pump), a deck adapter (and screws), a region-specific power cable, and a USB A-B data cable.
+Unnamed box 2 includes the Control Box (vacuum pump and electronics), a deck adapter (and screws), a region-specific power cable, and a USB A-B data cable.
 
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Control Box, vacuum pump and electronics](images/pump-unit.png "Control Box includes pump and electronics")
+![Control Box, vacuum pump and electronics](images/control-box.png "Control Box includes pump and electronics")
 <figcaption>(1) Control Box</figcaption>
 </figure>
 
@@ -111,8 +111,8 @@ Unnamed box 3 includes the waste collection jar and cap, a stabilization cradle,
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Vacuum 6 mm and 9.5 mm diameter vacuum hoses hoses](images/hoses5.png "6 mm and 9.5 mm diameter vacuum hoses")
-<figcaption>(2) Vacuum hoses, 6 mm and 9.5 mm</figcaption>
+![Vacuum 6 mm and 9.5 mm diameter vacuum hoses hoses](images/vacuum-module-hoses.png "6 mm and 9.5 mm inner diameter (ID) vacuum hoses")
+<figcaption>(2) Vacuum hoses, 6 mm and 9.5 mm inner diameter (ID)</figcaption>
 </figure>
 
 <figure markdown>
@@ -170,8 +170,8 @@ The Vacuum Module ships with two vacuum hoses and factory installed quick connec
       <td><strong>Hose dimensions</strong></td>
       <td>
         <ul>
-          <li>6 mm (&frac14;") ID, 2 m L (&asymp; 79")</li>
-          <li>9.5 mm (&frac38;") ID, 2 m L (&asymp; 79")</li>
+          <li>6 mm (&frac14;") ID, 2 m length (&asymp; 79")</li>
+          <li>9.5 mm (&frac38;") ID, 2 m length (&asymp; 79")</li>
         </ul>
       </td>
     </tr>
@@ -230,15 +230,15 @@ The Vacuum Module requires the following power inputs, which are met by its inte
   <tbody>
     <tr>
       <td><strong>Manufacturer and model</strong></td>
-        <td>The module is powered by a <a href="https://www.meanwell.com/index.aspx">Mean Well</a> LOP-200-24 series low-profile, open-frame internal power supply.
+        <td>The module is powered by a Mean Well LOP-200-24 series low-profile, open-frame internal power supply.
         </td>
     </tr>
     <tr>
       <td><strong>Input Power</strong></td>
       <td>
         <ul>
-          <li>80—264 VAC</li>
-          <li>47—63 Hz</li>
+          <li>80&ndash;264 VAC</li>
+          <li>47&ndash;63 Hz</li>
           <li>1 A at 230 VAC or 2.5 A at 115 VAC</li>
         </ul>
       </td>
