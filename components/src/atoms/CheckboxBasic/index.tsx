@@ -19,7 +19,6 @@ export interface CheckboxBasicProps {
    * When indeterminate: fills the dash mark.
    */
   backgroundColor?: string
-  tabIndex?: number
 }
 
 export function CheckboxBasic(props: CheckboxBasicProps): JSX.Element {
@@ -29,7 +28,6 @@ export function CheckboxBasic(props: CheckboxBasicProps): JSX.Element {
     disabled = false,
     onColor = false,
     backgroundColor,
-    tabIndex = 0,
   } = props
 
   const isChecked = checked === true
@@ -46,11 +44,9 @@ export function CheckboxBasic(props: CheckboxBasicProps): JSX.Element {
   // For unselected and checked: backgroundColor goes on the box div.
   // For checked, it shows through the transparent ot-checkbox hole → becomes the checkmark color.
   // For indeterminate: backgroundColor is the dash color; box bg stays from CSS.
-  const boxStyle =
-    backgroundColor != null && !isIndeterminate
-      ? { backgroundColor }
-      : undefined
-  const dashStyle = backgroundColor != null ? { backgroundColor } : undefined
+  const boxColor =
+    backgroundColor != null && !isIndeterminate ? { backgroundColor } : {}
+  const dashColor = backgroundColor != null ? { backgroundColor } : {}
 
   return (
     <label className={clsx(styles.root, { [styles.root_disabled]: disabled })}>
@@ -60,7 +56,8 @@ export function CheckboxBasic(props: CheckboxBasicProps): JSX.Element {
         checked={isChecked}
         onChange={onChange}
         disabled={disabled}
-        tabIndex={tabIndex}
+        aria-label="Checkbox"
+        aria-checked={isIndeterminate ? 'mixed' : isChecked}
       />
       <div
         className={clsx(styles.box, {
@@ -86,7 +83,7 @@ export function CheckboxBasic(props: CheckboxBasicProps): JSX.Element {
           [styles.box_on_color_indeterminate_disabled]:
             isIndeterminate && onColor && disabled,
         })}
-        style={boxStyle}
+        style={{ ...boxColor }}
       >
         {isChecked && <Icon name="ot-checkbox" color={iconColor} />}
         {isIndeterminate && (
@@ -95,7 +92,7 @@ export function CheckboxBasic(props: CheckboxBasicProps): JSX.Element {
               [styles.dash_on_color]: onColor,
               [styles.dash_disabled]: !onColor && disabled,
             })}
-            style={dashStyle}
+            style={{ ...dashColor }}
           />
         )}
       </div>
