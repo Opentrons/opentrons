@@ -76,4 +76,18 @@ describe('ProgressBar', () => {
     expect(bar).toHaveStyle(`background: ${COLORS.red50}`)
     expect(bar).toHaveStyle('width: 50%')
   })
+
+  it('limits the progress to 0 if a negative value is passed', () => {
+    props.percentComplete = -20
+    render(props)
+    const container = screen.getByRole('progressbar')
+    expect(container).toHaveAttribute('aria-valuenow', '0')
+  })
+
+  it('limits the progress to 100 if a value greater than 100 is passed', () => {
+    props.percentComplete = 150
+    render(props)
+    const container = screen.getByRole('progressbar')
+    expect(container).toHaveAttribute('aria-valuenow', '100')
+  })
 })
