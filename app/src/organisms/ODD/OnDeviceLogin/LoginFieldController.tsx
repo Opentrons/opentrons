@@ -38,6 +38,7 @@ export function LoginFieldController({
             error={null}
             isPasswordField={false}
             onClearError={onClearFieldErrors}
+            autoFocus
           />
         )}
       />
@@ -64,6 +65,7 @@ export function LoginFieldController({
             error={passwordError}
             isPasswordField={true}
             onClearError={onClearFieldErrors}
+            autoFocus
           />
         )}
       />
@@ -83,6 +85,7 @@ export function LoginFieldController({
             error={confirmPasswordError}
             isPasswordField={true}
             onClearError={onClearFieldErrors}
+            autoFocus
           />
         )}
       />

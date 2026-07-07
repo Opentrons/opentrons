@@ -18,6 +18,7 @@ export interface LoginFieldInputProps<
   error: string | null
   isPasswordField: boolean
   onClearError?: () => void
+  autoFocus?: boolean
 }
 
 export function LoginFieldInput<
@@ -28,6 +29,7 @@ export function LoginFieldInput<
   error,
   isPasswordField,
   onClearError,
+  autoFocus,
 }: LoginFieldInputProps<TFieldName>): JSX.Element {
   const [showPassword, setShowPassword] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -42,7 +44,7 @@ export function LoginFieldInput<
   const inputField = (
     <TouchInputField
       ref={setRefs(inputRef, field.ref)}
-      autoFocus
+      autoFocus={autoFocus}
       type={inputType}
       label={label}
       error={error}
