@@ -156,9 +156,7 @@ export function useRecoveryCommands({
   )
 
   const buildRetryPrepMove = ():
-    | MoveToCoordinatesCreateCommand
-    | LiquidProbeCreateCommand
-    | null => {
+    MoveToCoordinatesCreateCommand | LiquidProbeCreateCommand | null => {
     type InPlaceCommand =
       | AspirateInPlaceRunTimeCommand
       | BlowoutInPlaceRunTimeCommand
@@ -166,8 +164,7 @@ export function useRecoveryCommands({
       | DropTipInPlaceRunTimeCommand
       | PrepareToAspirateRunTimeCommand
     type CommandsWithDynamicLiquidTracking =
-      | AspirateWhileTrackingRunTimeCommand
-      | DispenseWhileTrackingRunTimeCommand
+      AspirateWhileTrackingRunTimeCommand | DispenseWhileTrackingRunTimeCommand
 
     const IN_PLACE_COMMAND_TYPES = [
       'aspirateInPlace',
@@ -192,8 +189,7 @@ export function useRecoveryCommands({
     const requiresMoveToError = (
       error?: RunCommandError | null
     ): error is
-      | RunCommandErrorOverpressure
-      | RunCommandErrorTipPhysicallyAttached =>
+      RunCommandErrorOverpressure | RunCommandErrorTipPhysicallyAttached =>
       error != null &&
       error.isDefined &&
       (error.errorType === DEFINED_ERROR_TYPES.OVERPRESSURE ||

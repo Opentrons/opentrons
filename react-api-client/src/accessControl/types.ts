@@ -157,9 +157,7 @@ export type DocumentedAction =
  * login_cancelled: user closed out of the login modal
  */
 export type DocumentedMutationErrorType =
-  | 'no_documentation_report'
-  | 'access_control_loading'
-  | 'login_cancelled'
+  'no_documentation_report' | 'access_control_loading' | 'login_cancelled'
 
 const DOCUMENTED_MUTATION_ERROR_MESSAGES: Record<
   DocumentedMutationErrorType,

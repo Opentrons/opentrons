@@ -82,11 +82,7 @@ interface ProtocolDetailsProps extends StoredProtocolData {
 }
 
 export type ProtocolDetailsTab =
-  | 'robot_config'
-  | 'labware'
-  | 'liquids'
-  | 'stats'
-  | 'parameters'
+  'robot_config' | 'labware' | 'liquids' | 'stats' | 'parameters'
 
 export function ProtocolDetailsContents(
   props: ProtocolDetailsProps
