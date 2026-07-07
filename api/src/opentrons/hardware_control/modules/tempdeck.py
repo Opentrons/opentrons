@@ -354,9 +354,13 @@ class TempDeckReader(Reader):
     def on_error(self, exception: Exception) -> None:
         self._debounce_count -= 1
         if self._error_callback:
-            if self._debounce_count != 0:
+            if self._debounce_count > 0:
                 log.error(
                     f"Reader encountered error {exception} but has {self._debounce_count} tries left"
                 )
             else:
+                # Reached the terminal state: fire the callback and reset the
+                # counter so a future error cycle can fire again instead of
+                # running the counter negative and never recovering.
                 self._error_callback(exception)
+                self._debounce_count = DEFAULT_COMMAND_RETRIES

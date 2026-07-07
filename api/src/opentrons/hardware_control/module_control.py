@@ -115,7 +115,7 @@ class AttachedModulesControl:
     def _dedupe_available_modules(self, new_mod: modules.AbstractModule) -> None:
         """
         Remove any existing entry in _available_modules that shares new_mod's
-        serial, then append new_mod and re-sort. 
+        serial, then append new_mod and re-sort.
         Also evicts any stale entry with the same serial.
         """
         serial = new_mod.serial_number
