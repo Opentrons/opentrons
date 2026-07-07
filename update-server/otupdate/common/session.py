@@ -37,14 +37,24 @@ class UpdateSession:
     State machine for update sessions
     """
 
-    def __init__(self, storage_path: str) -> None:
+    def __init__(
+        self,
+        *,
+        storage_path: str,
+        auto_commit_and_restart: bool,
+    ) -> None:
         self._token = base64.urlsafe_b64encode(uuid.uuid4().bytes).decode().strip("=")
+
         self._stage = Stages.AWAITING_FILE
         self._progress = 0.0
         self._message = ""
         self._error: Optional[Value] = None
+
         self._storage_path = storage_path
+        self._auto_commit_and_restart = auto_commit_and_restart
+
         self._setup_dl_area()
+
         LOG.info(f"update session: created {self._token}")
 
     def _setup_dl_area(self) -> None:
@@ -78,6 +88,10 @@ class UpdateSession:
     @property
     def download_path(self) -> str:
         return self._storage_path
+
+    @property
+    def auto_commit_and_restart(self) -> bool:
+        return self._auto_commit_and_restart
 
     @property
     def token(self) -> str:
