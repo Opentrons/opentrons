@@ -22,8 +22,10 @@ Collars sit directly on the vacuum base. They support filter plates used during 
 
 The Vacuum Module includes two collars to match different labware profiles:
 
-* **Short Collar (42 mm):** Accommodates standard microliter (μL) filter plates.
-* **Tall Collar (72 mm):** Accommodates deep-well filter plates (typically up to 2 mL).
+* **Short Collar (42 mm):** Optimized for standard microliter filter plates that typically have working volume ranges between 50 μL and 250 μL.
+* **Tall Collar (72 mm):** Optimized for deep-well filter plates that typically have working volumes up to 1.8 mL.
+
+Both collars accommodate standard ANSI/SLAS compliant filter plates across a span of different membrane pore sizes, ranging from very fine (0.22 μm) to coarse (100.0 μm).
 
 <figure class="side-by-side" markdown>
 ![Illustration of short collar, 42 mm](images/collar-short.png)
