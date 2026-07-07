@@ -202,9 +202,11 @@ async def test_register_modules_sort(
 
 async def test_dedupe_available_modules_replaces_stale_entry(
     decoy: Decoy,
+    hardware_api: HardwareAPI,
     subject: AttachedModulesControl,
 ) -> None:
     """_dedupe_available_modules should replace an existing entry with the same serial."""
+    decoy.when(hardware_api.is_simulator).then_return(False)
     stale = _make_module(decoy, serial="ABC", port="/dev/ot_module_tempdeck0")
     fresh = _make_module(decoy, serial="ABC", port="/dev/ot_module_tempdeck0")
 
@@ -217,9 +219,11 @@ async def test_dedupe_available_modules_replaces_stale_entry(
 
 async def test_dedupe_available_modules_keeps_other_serials(
     decoy: Decoy,
+    hardware_api: HardwareAPI,
     subject: AttachedModulesControl,
 ) -> None:
     """_dedupe_available_modules should only remove entries sharing the serial."""
+    decoy.when(hardware_api.is_simulator).then_return(False)
     other = _make_module(
         decoy,
         serial="OTHER",
@@ -243,9 +247,11 @@ async def test_dedupe_available_modules_keeps_other_serials(
 
 async def test_dedupe_available_modules_appends_when_no_existing(
     decoy: Decoy,
+    hardware_api: HardwareAPI,
     subject: AttachedModulesControl,
 ) -> None:
     """_dedupe_available_modules should append when no matching serial exists."""
+    decoy.when(hardware_api.is_simulator).then_return(False)
     mod = _make_module(decoy, serial="NEW")
 
     subject._dedupe_available_modules(mod)
@@ -255,11 +261,13 @@ async def test_dedupe_available_modules_appends_when_no_existing(
 
 async def test_dedupe_available_modules_evicts_parked_entry_same_serial(
     decoy: Decoy,
+    hardware_api: HardwareAPI,
     subject: AttachedModulesControl,
 ) -> None:
     """_dedupe_available_modules should evict a stale entry parked in
     _recently_removed_modules when a fresh instance with the same serial lands.
     """
+    decoy.when(hardware_api.is_simulator).then_return(False)
     parked = _make_module(decoy, serial="DUP", port="/dev/ot_module_tempdeck0")
     fresh = _make_module(decoy, serial="DUP", port="/dev/ot_module_tempdeck0")
 
@@ -281,6 +289,7 @@ async def test_register_modules_dedupes_on_attach(
     subject: AttachedModulesControl,
 ) -> None:
     """register_modules should not create a duplicate when a stale entry exists."""
+    decoy.when(hardware_api.is_simulator).then_return(False)
     stale = _make_module(decoy, serial="DUP", port="/dev/foo")
     fresh = _make_module(
         decoy,

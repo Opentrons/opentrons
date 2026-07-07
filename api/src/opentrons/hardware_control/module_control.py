@@ -118,14 +118,17 @@ class AttachedModulesControl:
         serial, then append new_mod and re-sort.
         Also evicts any stale entry with the same serial.
         """
-        serial = new_mod.serial_number
-        if serial is not None:
-            self._available_modules = [
-                m for m in self._available_modules if m.serial_number != serial
-            ]
-            self._recently_removed_modules = [
-                m for m in self._recently_removed_modules if m.serial_number != serial
-            ]
+        if not self._api.is_simulator:
+            serial = new_mod.serial_number
+            if serial is not None:
+                self._available_modules = [
+                    m for m in self._available_modules if m.serial_number != serial
+                ]
+                self._recently_removed_modules = [
+                    m
+                    for m in self._recently_removed_modules
+                    if m.serial_number != serial
+                ]
         self._available_modules.append(new_mod)
         self._available_modules = sorted(
             self._available_modules, key=modules.AbstractModule.sort_key
