@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Tabs } from '@opentrons/components'
@@ -7,6 +7,8 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import styles from './filemanager.module.css'
 
+import type { ComponentProps } from 'react'
+import type { SmallButton } from '/app/atoms/buttons'
 import type { SetSettingOption } from '../types'
 
 type FileManagerTab = 'diagnostic' | 'compliance' | 'records'
@@ -23,6 +25,47 @@ export function FileManager({
 
   const showDeleteAll = activeTab === 'compliance' || activeTab === 'records'
 
+  const tabs = useMemo(() => {
+    return [
+      {
+        text: t('diagnostic_files'),
+        onClick: () => {
+          setActiveTab('diagnostic')
+        },
+        isActive: activeTab === 'diagnostic',
+      },
+      {
+        text: t('compliance_ready_files'),
+        onClick: () => {
+          setActiveTab('compliance')
+        },
+        isActive: activeTab === 'compliance',
+      },
+      {
+        text: t('protocol_run_records'),
+        onClick: () => {
+          setActiveTab('records')
+        },
+        isActive: activeTab === 'records',
+      },
+    ]
+  }, [activeTab, t])
+
+  const secondaryButtonProps: ComponentProps<typeof SmallButton> | null =
+    showDeleteAll
+      ? {
+          buttonType: 'primary',
+          buttonCategory: 'rounded',
+          buttonText: t('download_all'),
+          onClick: () => {},
+          iconName: 'download',
+          iconPlacement: 'startIcon',
+        }
+      : null
+  const iconProps = showDeleteAll
+    ? { iconName: 'download', iconPlacement: 'startIcon' }
+    : null
+
   return (
     <div className={styles.container}>
       <ChildNavigation
@@ -34,45 +77,11 @@ export function FileManager({
         buttonType={showDeleteAll ? 'alert' : 'primary'}
         buttonCategory="rounded"
         onClickButton={() => {}}
-        {...(showDeleteAll
-          ? {
-              secondaryButtonProps: {
-                buttonType: 'primary',
-                buttonCategory: 'rounded',
-                buttonText: t('download_all'),
-                onClick: () => {},
-                iconName: 'download',
-                iconPlacement: 'startIcon',
-              },
-            }
-          : { iconName: 'download', iconPlacement: 'startIcon' })}
+        {...(secondaryButtonProps != null ? { secondaryButtonProps } : {})}
+        {...(iconProps != null ? { iconProps } : {})}
       />
       <div className={styles.content}>
-        <Tabs
-          tabs={[
-            {
-              text: t('diagnostic_files'),
-              onClick: () => {
-                setActiveTab('diagnostic')
-              },
-              isActive: activeTab === 'diagnostic',
-            },
-            {
-              text: t('compliance_ready_files'),
-              onClick: () => {
-                setActiveTab('compliance')
-              },
-              isActive: activeTab === 'compliance',
-            },
-            {
-              text: t('protocol_run_records'),
-              onClick: () => {
-                setActiveTab('records')
-              },
-              isActive: activeTab === 'records',
-            },
-          ]}
-        />
+        <Tabs tabs={tabs} />
         {/* TODO: add content for each tab */}
         <div>{activeTab}</div>
       </div>
