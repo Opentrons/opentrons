@@ -66,11 +66,7 @@ Sealed, unopened packages of Opentrons pipette tips are certified to be free of 
 
 ### Tip racks 
 
-Opentrons Flex tip racks consist of a lid, a mid-plate that holds 96 filtered or unfiltered tips, and a reusable base plate. These pieces are made of different thermoplastics as follows:
-
-- Lid: Polypropylene
-- Mid-plate:<font color="red"><strong> TBD</strong></font>
-- Base: <font color="red"><strong> TBD</strong></font>
+Opentrons Flex tip racks consist of a lid, a mid-plate that holds 96 filtered or unfiltered tips, and a reusable base plate. Like the pipette tips, tip rack lids are made of polypropylene. The tip rack mid-plate and base plate are made from a  polycarbonate-ABS (PC-ABS) blend.
 
 To help with identification, each tip rack package includes an 8-digit lot number in YYYYMMDD format, which reflects the production date. Additionally, individual tip racks are color coded and labeled based on the maximum rated volume for each tip type.
 
@@ -112,7 +108,7 @@ When ordering or reordering, tips are available as racks or refills. Both racks 
           <li>All mid-plates are nested in blister packs to minimize packaging waste.</li>
           <li>2 individually shrink-wrapped base plates are included separately.</li>
         </ul>
-        <p><strong>Note:</strong> Refills do not include lids.
+        <p><strong>Note:</strong> Refills do not include lids.</p>
       </td>
     </tr>
   </tbody>
