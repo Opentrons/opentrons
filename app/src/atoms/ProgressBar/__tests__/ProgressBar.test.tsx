@@ -29,6 +29,9 @@ describe('ProgressBar', () => {
   it('renders LinerProgress Bar at 0% width', () => {
     render(props)
     const container = screen.getByRole('progressbar')
+    expect(container).toHaveAttribute('aria-valuenow', '0')
+    expect(container).toHaveAttribute('aria-valuemin', '0')
+    expect(container).toHaveAttribute('aria-valuemax', '100')
     // eslint-disable-next-line testing-library/no-node-access
     const bar = container.firstChild
     expect(container).toHaveStyle(`background: ${COLORS.white}`)
@@ -39,6 +42,9 @@ describe('ProgressBar', () => {
     props.percentComplete = 50
     render(props)
     const container = screen.getByRole('progressbar')
+    expect(container).toHaveAttribute('aria-valuenow', '50')
+    expect(container).toHaveAttribute('aria-valuemin', '0')
+    expect(container).toHaveAttribute('aria-valuemax', '100')
     // eslint-disable-next-line testing-library/no-node-access
     const bar = container.firstChild
     expect(bar).toHaveStyle(`background: ${COLORS.blue50}`)
@@ -49,6 +55,7 @@ describe('ProgressBar', () => {
     props.percentComplete = 100
     render(props)
     const container = screen.getByRole('progressbar')
+    expect(container).toHaveAttribute('aria-valuenow', '100')
     // eslint-disable-next-line testing-library/no-node-access
     const bar = container.firstChild
     expect(bar).toHaveStyle(`background: ${COLORS.blue50}`)
@@ -62,6 +69,7 @@ describe('ProgressBar', () => {
     `
     render(props)
     const container = screen.getByRole('progressbar')
+    expect(container).toHaveAttribute('aria-valuenow', '50')
     // eslint-disable-next-line testing-library/no-node-access
     const bar = container.firstChild
     expect(bar).not.toHaveStyle(`background: ${COLORS.blue50}`)

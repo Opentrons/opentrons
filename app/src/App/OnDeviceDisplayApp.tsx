@@ -236,7 +236,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     // ensure we know whether access control is enabled or not,
     // so on first render we can immediately show the LoggedOutOverlay, if appropriate.
     accessControlEnabledQuery.isSuccess
-
+  const dummy = true
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
     // to make sure that the host config stays stable and in step with the initial queries,
@@ -247,7 +247,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
         <LocalizationProvider>
           <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
             <Box width="100%" css="user-select: none;">
-              {isIdle ? (
+              {dummy ? (
                 <SleepScreen aria-label={t('exit_sleep_mode')} />
               ) : (
                 <>
