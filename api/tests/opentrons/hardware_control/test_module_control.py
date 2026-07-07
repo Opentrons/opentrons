@@ -253,6 +253,26 @@ async def test_dedupe_available_modules_appends_when_no_existing(
     assert subject._available_modules == [mod]
 
 
+async def test_dedupe_available_modules_evicts_parked_entry_same_serial(
+    decoy: Decoy,
+    subject: AttachedModulesControl,
+) -> None:
+    """_dedupe_available_modules should evict a stale entry parked in
+    _recently_removed_modules when a fresh instance with the same serial lands.
+    """
+    parked = _make_module(decoy, serial="DUP", port="/dev/ot_module_tempdeck0")
+    fresh = _make_module(decoy, serial="DUP", port="/dev/ot_module_tempdeck0")
+
+    subject._recently_removed_modules = [parked]
+    subject._available_modules = []
+
+    subject._dedupe_available_modules(fresh)
+
+    assert subject._available_modules == [fresh]
+    assert subject._recently_removed_modules == []
+    assert subject.available_modules == [fresh]
+
+
 async def test_register_modules_dedupes_on_attach(
     decoy: Decoy,
     usb_bus: USBDriverInterface,
@@ -385,12 +405,7 @@ async def test_reconnect_patch_guarded_remove(
     hardware_api: HardwareAPI,
     subject: AttachedModulesControl,
 ) -> None:
-    """_reconnect_patch should not raise if old_mod was concurrently removed.
-
-    If _clear_old_modules (or a prior _reconnect_patch attempt) already removed
-    old_mod from _recently_removed_modules, the membership guard keeps this
-    attempt from crashing with ValueError.
-    """
+    """_reconnect_patch should not raise if old_mod was concurrently removed."""
     old_mod = _make_module(
         decoy,
         serial="CONCURRENT",
@@ -410,9 +425,6 @@ async def test_reconnect_patch_guarded_remove(
     decoy.when(hardware_api.is_simulator).then_return(False)
     decoy.when(await attached_mod.cleanup())
 
-    # Simulate concurrent removal: empty the list before _reconnect_patch
-    # reaches its own .remove() call. We do this by having attempt_reconnect
-    # clear the list as a side effect.
     async def _clear_concurrently() -> None:
         subject._recently_removed_modules.clear()
 
