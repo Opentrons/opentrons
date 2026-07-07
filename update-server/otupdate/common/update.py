@@ -18,15 +18,14 @@ from typing_extensions import Protocol
 from server_utils.auth.scopes import Scope
 
 from . import auth, config, update_actions
-from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
+from .constants import RESTART_LOCK_NAME
 from .handler_type import Handler
-from .session import Stages, UpdateSession
+from .session import Stages, UpdateSession, get_current_session, set_current_session
 from otupdate.buildroot.update_actions import UPDATE_PKG_BR
 from otupdate.openembedded.update_actions import UPDATE_PKG_OE
 
 VALID_UPDATE_PKG = UPDATE_PKG_OE + UPDATE_PKG_BR
 
-SESSION_VARNAME = APP_VARIABLE_PREFIX + "session"
 LOG = logging.getLogger(__name__)
 
 
@@ -41,17 +40,13 @@ class _HandlerWithSession(Protocol):
     ) -> web.Response: ...
 
 
-def session_from_request(request: web.Request) -> Optional[UpdateSession]:
-    return request.app.get(SESSION_VARNAME, None)  # type: ignore[no-any-return]
-
-
 def require_session(handler: _HandlerWithSession) -> Handler:
     """Decorator to ensure a session is properly in the request"""
 
     @functools.wraps(handler)
     async def decorated(request: web.Request) -> web.Response:
         request_session_token = request.match_info["session"]
-        session = session_from_request(request)
+        session = get_current_session(request)
         if not session or request_session_token != session.token:
             LOG.warning(f"request for invalid session {request_session_token}")
             return web.json_response(
@@ -69,7 +64,7 @@ def require_session(handler: _HandlerWithSession) -> Handler:
 @auth.require_scopes(Scope.UPDATES_WRITE)
 async def begin(request: web.Request) -> web.Response:
     """Begin a session"""
-    if None is not session_from_request(request):
+    if None is not get_current_session(request):
         LOG.warning("begin: requested with active session")
         return web.json_response(
             data={
@@ -80,13 +75,21 @@ async def begin(request: web.Request) -> web.Response:
         )
 
     session = UpdateSession(config.config_from_request(request).download_storage_path)
-    request.app[SESSION_VARNAME] = session
+    set_current_session(request, session)
     return web.json_response(data={"token": session.token}, status=201)
 
 
 @auth.require_scopes(Scope.UPDATES_WRITE)
 async def cancel(request: web.Request) -> web.Response:
-    request.app.pop(SESSION_VARNAME, None)
+    session = get_current_session(request)
+    if session is not None:
+        # fixme(mm, 2026-07-06):
+        #   * This is a concurrency hazard: it might close a session and delete its
+        #     storage while a background task is still using it.
+        #   * session.close() currently only cleans up storage. We also need to clean
+        #     up background tasks.
+        session.close()
+        set_current_session(request, None)
     return web.json_response(data={"message": "Session cancelled"}, status=200)
 
 

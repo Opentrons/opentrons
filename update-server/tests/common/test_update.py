@@ -18,7 +18,7 @@ from tests.openembedded.conftest import (
 
 from otupdate.buildroot import config, update, update_actions
 from otupdate.common import file_actions
-from otupdate.common.session import Stages, UpdateSession
+from otupdate.common.session import SESSION_VARNAME, Stages, UpdateSession
 from otupdate.common.update_actions import UpdateActionsInterface
 from otupdate.openembedded import OT3UpdateActions, RootFSInterface
 
@@ -41,8 +41,8 @@ async def test_begin(test_cli: Tuple[HTTPTestClient, str]):
     body = await resp.json()
     assert resp.status == 201
     assert "token" in body
-    assert test_cli[0].server.app.get(update.SESSION_VARNAME)
-    assert test_cli[0].server.app[update.SESSION_VARNAME].token == body["token"]
+    assert test_cli[0].server.app.get(SESSION_VARNAME)
+    assert test_cli[0].server.app[SESSION_VARNAME].token == body["token"]
 
     # Creating a session twice shouldn’t
     resp = await test_cli[0].post("/server/update/begin")
@@ -54,11 +54,11 @@ async def test_begin(test_cli: Tuple[HTTPTestClient, str]):
 async def test_cancel(test_cli: Tuple[HTTPTestClient, str]):
     # cancelling when there’s a session should work great
     resp = await test_cli[0].post("/server/update/begin")
-    assert test_cli[0].server.app.get(update.SESSION_VARNAME)
+    assert test_cli[0].server.app.get(SESSION_VARNAME)
 
     resp = await test_cli[0].post("/server/update/cancel")
     assert resp.status == 200
-    assert test_cli[0].server.app.get(update.SESSION_VARNAME) is None
+    assert test_cli[0].server.app.get(SESSION_VARNAME) is None
 
     # and so should cancelling when there isn’t one
 
