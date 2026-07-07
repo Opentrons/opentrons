@@ -21,6 +21,9 @@ interface PinnedProtocolCarouselProps {
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
   setTargetProtocolId: (targetProtocolId: string) => void
   isRequiredCSV?: boolean
+  isEditMode?: boolean
+  selectedProtocolIds?: string[]
+  onToggleSelect?: (protocolId: string) => void
 }
 
 export function PinnedProtocolCarousel(
@@ -32,6 +35,9 @@ export function PinnedProtocolCarousel(
     setShowDeleteConfirmationModal,
     setTargetProtocolId,
     isRequiredCSV = false,
+    isEditMode = false,
+    selectedProtocolIds = [],
+    onToggleSelect,
   } = props
   const runs = useNotifyAllRunsQuery()
   const cardSize = (): CardSizeType => {
@@ -63,6 +69,9 @@ export function PinnedProtocolCarousel(
               setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
               setTargetProtocolId={setTargetProtocolId}
               isRequiredCSV={isRequiredCSV}
+              isEditMode={isEditMode}
+              isSelected={selectedProtocolIds.includes(protocol.id)}
+              onToggleSelect={onToggleSelect}
             />
           )
         })}

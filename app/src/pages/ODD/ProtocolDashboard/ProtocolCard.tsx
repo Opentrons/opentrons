@@ -53,6 +53,9 @@ interface ProtocolCardProps {
   setTargetProtocolId: (targetProtocolId: string) => void
   lastRun?: string
   setIsRequiredCSV: (isRequiredCSV: boolean) => void
+  isEditMode?: boolean
+  isSelected?: boolean
+  onToggleSelect?: (protocolId: string) => void
 }
 
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
@@ -63,6 +66,9 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
     setShowDeleteConfirmationModal,
     setTargetProtocolId,
     setIsRequiredCSV,
+    isEditMode = false,
+    isSelected = false,
+    onToggleSelect,
   } = props
   const navigate = useNavigate()
   const [showIcon, setShowIcon] = useState<boolean>(false)
@@ -122,7 +128,9 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
     longpress: UseLongPressResult,
     protocolId: string
   ): void => {
-    if (isFailedAnalysis) {
+    if (isEditMode) {
+      onToggleSelect?.(protocolId)
+    } else if (isFailedAnalysis) {
       setShowFailedAnalysisModal(true)
     } else if (!longpress.isLongPressed) {
       navigate(`/protocols/${protocolId}`)
@@ -130,12 +138,13 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
   }
 
   useEffect(() => {
-    if (longpress.isLongPressed) {
+    if (!isEditMode && longpress.isLongPressed) {
       longPress(true)
       setTargetProtocolId(protocol.id)
       setIsRequiredCSV(isRequiredCSV)
     }
   }, [
+    isEditMode,
     longpress.isLongPressed,
     longPress,
     protocol.id,
@@ -221,6 +230,13 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
       css={PUSHED_STATE_STYLE}
       data-testid="protocol_card"
     >
+      {isEditMode ? (
+        <Icon
+          name={isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'}
+          color={isSelected ? COLORS.blue50 : COLORS.grey60}
+          size="2rem"
+        />
+      ) : null}
       {isPendingAnalysis ? (
         <Icon
           name="ot-spinner"
@@ -269,7 +285,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
         <LegacyStyledText forwardedAs="p" color={COLORS.grey60}>
           {formatTimeWithUtcLabel(protocol.createdAt)}
         </LegacyStyledText>
-        {longpress.isLongPressed && !isFailedAnalysis && (
+        {!isEditMode && longpress.isLongPressed && !isFailedAnalysis && (
           <LongPressModal
             longpress={longpress}
             protocolId={protocol.id}
@@ -277,61 +293,62 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
             setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
           />
         )}
-        {(showFailedAnalysisModal ||
-          (isFailedAnalysis && longpress.isLongPressed)) && (
-          <OddModal
-            header={failedAnalysisHeader}
-            onOutsideClick={() => {
-              setShowFailedAnalysisModal(false)
-            }}
-          >
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing32}
-              width="100%"
+        {!isEditMode &&
+          (showFailedAnalysisModal ||
+            (isFailedAnalysis && longpress.isLongPressed)) && (
+            <OddModal
+              header={failedAnalysisHeader}
+              onOutsideClick={() => {
+                setShowFailedAnalysisModal(false)
+              }}
             >
               <Flex
                 flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing8}
-                maxWidth="100%"
-                whiteSpace="break-spaces"
+                gridGap={SPACING.spacing32}
+                width="100%"
               >
-                <Trans
-                  t={t}
-                  i18nKey={t('error_analyzing', { protocolName })}
-                  components={{
-                    block: (
-                      <LegacyStyledText
-                        forwardedAs="p"
-                        css={css`
-                          display: -webkit-box;
-                          -webkit-box-orient: vertical;
-                          -webkit-line-clamp: 3;
-                          overflow: hidden;
-                          overflow-wrap: ${OVERFLOW_WRAP_BREAK_WORD};
-                          height: max-content;
-                        `}
-                      />
-                    ),
-                    bold: <strong />,
-                  }}
-                />
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  gridGap={SPACING.spacing8}
+                  maxWidth="100%"
+                  whiteSpace="break-spaces"
+                >
+                  <Trans
+                    t={t}
+                    i18nKey={t('error_analyzing', { protocolName })}
+                    components={{
+                      block: (
+                        <LegacyStyledText
+                          forwardedAs="p"
+                          css={css`
+                            display: -webkit-box;
+                            -webkit-box-orient: vertical;
+                            -webkit-line-clamp: 3;
+                            overflow: hidden;
+                            overflow-wrap: ${OVERFLOW_WRAP_BREAK_WORD};
+                            height: max-content;
+                          `}
+                        />
+                      ),
+                      bold: <strong />,
+                    }}
+                  />
 
-                <LegacyStyledText forwardedAs="p">
-                  {t('branded:delete_protocol_from_app')}
-                </LegacyStyledText>
+                  <LegacyStyledText forwardedAs="p">
+                    {t('branded:delete_protocol_from_app')}
+                  </LegacyStyledText>
+                </Flex>
+                <SmallButton
+                  onClick={handleDeleteProtocol}
+                  buttonText={t('delete_protocol')}
+                  buttonType="alert"
+                  iconPlacement={showIcon ? 'startIcon' : undefined}
+                  iconName={showIcon ? 'ot-spinner' : undefined}
+                  disabled={showIcon}
+                />
               </Flex>
-              <SmallButton
-                onClick={handleDeleteProtocol}
-                buttonText={t('delete_protocol')}
-                buttonType="alert"
-                iconPlacement={showIcon ? 'startIcon' : undefined}
-                iconName={showIcon ? 'ot-spinner' : undefined}
-                disabled={showIcon}
-              />
-            </Flex>
-          </OddModal>
-        )}
+            </OddModal>
+          )}
       </Flex>
     </Flex>
   )

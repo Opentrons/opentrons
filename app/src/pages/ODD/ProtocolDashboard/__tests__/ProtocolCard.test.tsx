@@ -235,4 +235,53 @@ describe('ProtocolCard', () => {
     screen.getByText('mock Chip')
     screen.getByTestId('protocol_card')
   })
+
+  describe('edit mode', () => {
+    beforeEach(() => {
+      mockNavigate.mockClear()
+    })
+
+    it('should call onToggleSelect instead of navigating when tapped', () => {
+      const mockOnToggleSelect = vi.fn()
+      render({ ...props, isEditMode: true, onToggleSelect: mockOnToggleSelect })
+
+      fireEvent.click(screen.getByText('yay mock protocol'))
+
+      expect(mockOnToggleSelect).toHaveBeenCalledWith('mockProtocol1')
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    it('should render an unchecked checkbox when not selected', () => {
+      const [{ container }] = render({ ...props, isEditMode: true })
+
+      expect(
+        container.querySelector(
+          '[aria-roledescription="checkbox-blank-outline"]'
+        )
+      ).toBeInTheDocument()
+      expect(
+        container.querySelector('[aria-roledescription="checkbox-marked"]')
+      ).not.toBeInTheDocument()
+    })
+
+    it('should render a checked checkbox when selected', () => {
+      const [{ container }] = render({
+        ...props,
+        isEditMode: true,
+        isSelected: true,
+      })
+
+      expect(
+        container.querySelector('[aria-roledescription="checkbox-marked"]')
+      ).toBeInTheDocument()
+    })
+
+    it('should not open the long-press menu while in edit mode', () => {
+      mockLongPress.isLongPressed = true
+      render({ ...props, isEditMode: true })
+
+      expect(screen.queryByText('Run protocol')).not.toBeInTheDocument()
+      expect(screen.queryByText('Delete protocol')).not.toBeInTheDocument()
+    })
+  })
 })

@@ -10,6 +10,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   POSITION_STATIC,
   POSITION_STICKY,
@@ -20,7 +21,11 @@ import {
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 
-import { SmallButton, TouchFloatingActionButton } from '/app/atoms/buttons'
+import {
+  MediumButton,
+  SmallButton,
+  TouchFloatingActionButton,
+} from '/app/atoms/buttons'
 import { Navigation } from '/app/organisms/ODD/Navigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_FLOW_STARTED } from '/app/redux/analytics'
@@ -31,6 +36,7 @@ import {
 } from '/app/redux/config'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
+import { BatchDeleteProtocolsModal } from './BatchDeleteProtocolsModal'
 import { DeleteProtocolConfirmationModal } from './DeleteProtocolConfirmationModal'
 import { NoProtocols } from './NoProtocols'
 import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
@@ -60,6 +66,10 @@ export function ProtocolDashboard(): JSX.Element {
   const [targetProtocolId, setTargetProtocolId] = useState<string>('')
   const [isRequiredCSV, setIsRequiredCSV] = useState<boolean>(false)
   const [showPipetteNotAttachedModal, setShowPipetteNotAttachedModal] =
+    useState<boolean>(false)
+  const [isEditMode, setIsEditMode] = useState<boolean>(false)
+  const [selectedProtocolIds, setSelectedProtocolIds] = useState<string[]>([])
+  const [showBatchDeleteModal, setShowBatchDeleteModal] =
     useState<boolean>(false)
 
   const sortBy = useSelector(getProtocolsOnDeviceSortKey) ?? 'alphabetical'
@@ -161,12 +171,41 @@ export function ProtocolDashboard(): JSX.Element {
     }
   }
 
+  const handleToggleEditMode = (): void => {
+    setIsEditMode(!isEditMode)
+    setSelectedProtocolIds([])
+  }
+
+  const handleToggleSelectProtocol = (protocolId: string): void => {
+    setSelectedProtocolIds(currentIds =>
+      currentIds.includes(protocolId)
+        ? currentIds.filter(id => id !== protocolId)
+        : [...currentIds, protocolId]
+    )
+  }
+
+  const handleCloseBatchDeleteModal = (): void => {
+    setShowBatchDeleteModal(false)
+    setIsEditMode(false)
+    setSelectedProtocolIds([])
+  }
+
+  const selectedProtocols = protocolsData.filter(protocol =>
+    selectedProtocolIds.includes(protocol.id)
+  )
+
   return (
     <>
       {showDeleteConfirmationModal ? (
         <DeleteProtocolConfirmationModal
           protocolId={targetProtocolId}
           setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
+        />
+      ) : null}
+      {showBatchDeleteModal ? (
+        <BatchDeleteProtocolsModal
+          protocols={selectedProtocols}
+          onClose={handleCloseBatchDeleteModal}
         />
       ) : null}
       {showPipetteNotAttachedModal ? (
@@ -207,6 +246,9 @@ export function ProtocolDashboard(): JSX.Element {
                 setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
                 setTargetProtocolId={setTargetProtocolId}
                 isRequiredCSV={isRequiredCSV}
+                isEditMode={isEditMode}
+                selectedProtocolIds={selectedProtocolIds}
+                onToggleSelect={handleToggleSelectProtocol}
               />
             </Flex>
           )}
@@ -216,6 +258,7 @@ export function ProtocolDashboard(): JSX.Element {
                 alignItems={ALIGN_CENTER}
                 backgroundColor={COLORS.white}
                 flexDirection={DIRECTION_ROW}
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
                 paddingTop={SPACING.spacing16}
                 paddingBottom={SPACING.spacing16}
                 position={
@@ -227,63 +270,70 @@ export function ProtocolDashboard(): JSX.Element {
                 zIndex={navMenuIsOpened || longPressModalIsOpened ? 0 : 2.5}
                 width="100%"
               >
-                <Flex width="32.3125rem">
-                  <SmallButton
-                    buttonText={t('protocol_name_title')}
-                    buttonType={
-                      sortBy === 'alphabetical' || sortBy === 'reverse'
-                        ? 'secondary'
-                        : 'tertiaryLowLight'
-                    }
-                    iconName={
-                      sortBy === 'alphabetical' || sortBy === 'reverse'
-                        ? sortBy === 'alphabetical'
-                          ? 'arrow-down'
-                          : 'arrow-up'
-                        : undefined
-                    }
-                    iconPlacement="endIcon"
-                    onClick={handleSortByName}
-                  />
+                <Flex flexDirection={DIRECTION_ROW}>
+                  <Flex width="32.3125rem">
+                    <SmallButton
+                      buttonText={t('protocol_name_title')}
+                      buttonType={
+                        sortBy === 'alphabetical' || sortBy === 'reverse'
+                          ? 'secondary'
+                          : 'tertiaryLowLight'
+                      }
+                      iconName={
+                        sortBy === 'alphabetical' || sortBy === 'reverse'
+                          ? sortBy === 'alphabetical'
+                            ? 'arrow-down'
+                            : 'arrow-up'
+                          : undefined
+                      }
+                      iconPlacement="endIcon"
+                      onClick={handleSortByName}
+                    />
+                  </Flex>
+                  <Flex width="12rem">
+                    <SmallButton
+                      buttonText={t('last_run')}
+                      buttonType={
+                        sortBy === 'recentRun' || sortBy === 'oldRun'
+                          ? 'secondary'
+                          : 'tertiaryLowLight'
+                      }
+                      iconName={
+                        sortBy === 'recentRun' || sortBy === 'oldRun'
+                          ? sortBy === 'recentRun'
+                            ? 'arrow-down'
+                            : 'arrow-up'
+                          : undefined
+                      }
+                      iconPlacement="endIcon"
+                      onClick={handleSortByLastRun}
+                    />
+                  </Flex>
+                  <Flex width="14.625rem">
+                    <SmallButton
+                      buttonText={t('date_added')}
+                      buttonType={
+                        sortBy === 'recentCreated' || sortBy === 'oldCreated'
+                          ? 'secondary'
+                          : 'tertiaryLowLight'
+                      }
+                      iconName={
+                        sortBy === 'recentCreated' || sortBy === 'oldCreated'
+                          ? sortBy === 'recentCreated'
+                            ? 'arrow-down'
+                            : 'arrow-up'
+                          : undefined
+                      }
+                      iconPlacement="endIcon"
+                      onClick={handleSortByDate}
+                    />
+                  </Flex>
                 </Flex>
-                <Flex width="12rem">
-                  <SmallButton
-                    buttonText={t('last_run')}
-                    buttonType={
-                      sortBy === 'recentRun' || sortBy === 'oldRun'
-                        ? 'secondary'
-                        : 'tertiaryLowLight'
-                    }
-                    iconName={
-                      sortBy === 'recentRun' || sortBy === 'oldRun'
-                        ? sortBy === 'recentRun'
-                          ? 'arrow-down'
-                          : 'arrow-up'
-                        : undefined
-                    }
-                    iconPlacement="endIcon"
-                    onClick={handleSortByLastRun}
-                  />
-                </Flex>
-                <Flex width="14.625rem">
-                  <SmallButton
-                    buttonText={t('date_added')}
-                    buttonType={
-                      sortBy === 'recentCreated' || sortBy === 'oldCreated'
-                        ? 'secondary'
-                        : 'tertiaryLowLight'
-                    }
-                    iconName={
-                      sortBy === 'recentCreated' || sortBy === 'oldCreated'
-                        ? sortBy === 'recentCreated'
-                          ? 'arrow-down'
-                          : 'arrow-up'
-                        : undefined
-                    }
-                    iconPlacement="endIcon"
-                    onClick={handleSortByDate}
-                  />
-                </Flex>
+                <SmallButton
+                  buttonText={isEditMode ? t('done') : t('edit_protocols')}
+                  buttonType={isEditMode ? 'primary' : 'tertiaryLowLight'}
+                  onClick={handleToggleEditMode}
+                />
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN}>
                 {sortedProtocols.map(protocol => {
@@ -303,6 +353,9 @@ export function ProtocolDashboard(): JSX.Element {
                       }
                       setTargetProtocolId={setTargetProtocolId}
                       setIsRequiredCSV={setIsRequiredCSV}
+                      isEditMode={isEditMode}
+                      isSelected={selectedProtocolIds.includes(protocol.id)}
+                      onToggleSelect={handleToggleSelectProtocol}
                     />
                   )
                 })}
@@ -311,12 +364,28 @@ export function ProtocolDashboard(): JSX.Element {
           ) : pinnedProtocols.length === 0 ? (
             <NoProtocols />
           ) : null}
-          <TouchFloatingActionButton
-            buttonText={t('quick_transfer')}
-            iconName="plus"
-            onClick={handleCreateNewQuickTransfer}
-            aria-label={t('create_quick_transfer')}
-          />
+          {isEditMode && selectedProtocolIds.length > 0 ? (
+            <MediumButton
+              buttonText={t('delete_protocols', {
+                count: selectedProtocolIds.length,
+              })}
+              buttonType="alert"
+              iconName="trash"
+              onClick={() => {
+                setShowBatchDeleteModal(true)
+              }}
+              position="fixed"
+              right={SPACING.spacing24}
+              bottom={SPACING.spacing24}
+            />
+          ) : !isEditMode ? (
+            <TouchFloatingActionButton
+              buttonText={t('quick_transfer')}
+              iconName="plus"
+              onClick={handleCreateNewQuickTransfer}
+              aria-label={t('create_quick_transfer')}
+            />
+          ) : null}
         </Box>
       </Flex>
     </>

@@ -11,6 +11,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
@@ -71,6 +72,9 @@ interface PinnedProtocolProps {
   cardSize?: CardSizeType
   lastRun?: string
   isRequiredCSV?: boolean
+  isEditMode?: boolean
+  isSelected?: boolean
+  onToggleSelect?: (protocolId: string) => void
 }
 
 export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
@@ -82,6 +86,9 @@ export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
     lastRun,
     cardSize: size,
     isRequiredCSV = false,
+    isEditMode = false,
+    isSelected = false,
+    onToggleSelect,
   } = props
   const cardSize = size ?? 'full'
   const navigate = useNavigate()
@@ -96,15 +103,17 @@ export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
     longpress: UseLongPressResult,
     protocolId: string
   ): void => {
-    if (!longpress.isLongPressed) {
+    if (isEditMode) {
+      onToggleSelect?.(protocolId)
+    } else if (!longpress.isLongPressed) {
       navigate(`/protocols/${protocolId}`)
     }
   }
   useEffect(() => {
-    if (longpress.isLongPressed) {
+    if (!isEditMode && longpress.isLongPressed) {
       longPress(true)
     }
-  }, [longpress.isLongPressed, longPress])
+  }, [isEditMode, longpress.isLongPressed, longPress])
 
   const pushedBackgroundColor = isRequiredCSV ? COLORS.yellow40 : COLORS.grey50
   const PUSHED_STATE_STYLE = css`
@@ -133,6 +142,13 @@ export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
       ref={longpress.ref}
       data-testid={`${cardSize}_pinned_protocol_card`}
     >
+      {isEditMode ? (
+        <Icon
+          name={isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'}
+          color={isSelected ? COLORS.blue50 : COLORS.grey60}
+          size="2rem"
+        />
+      ) : null}
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
         {isRequiredCSV ? (
           <Chip
@@ -167,7 +183,7 @@ export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
           })}
         </LegacyStyledText>
       </Flex>
-      {longpress.isLongPressed && (
+      {!isEditMode && longpress.isLongPressed && (
         <LongPressModal
           longpress={longpress}
           protocolId={protocol.id}
