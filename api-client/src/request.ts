@@ -114,7 +114,13 @@ export function request<
       : 'http'
   const defaultPort = protocol === 'https' ? DEFAULT_HTTPS_PORT : DEFAULT_PORT
 
-  const baseURL = `${protocol}://${hostname}:${port ?? defaultPort}`
+  const portToUse = port
+    ? port === DEFAULT_PORT && protocol === 'https'
+      ? DEFAULT_HTTPS_PORT
+      : port
+    : defaultPort
+
+  const baseURL = `${protocol}://${hostname}:${portToUse}`
 
   return requestor<ResponseBodyT>({
     method,
