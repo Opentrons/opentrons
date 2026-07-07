@@ -8,6 +8,7 @@ from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
 
 from opentrons.drivers.asyncio.communication.errors import SerialException
 from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnectedError
+from serial.serialutil import SerialException as PySerialSerialException  # type: ignore[import-untyped]
 
 log = logging.getLogger(__name__)
 
@@ -116,7 +117,7 @@ class Poller:
         except AbsorbanceReaderDisconnectedError as e:
             self._error_callback(e)
             self._complete_all(e, previous_waiters)
-        except SerialException as se:
+        except (SerialException, PySerialSerialException) as se:
             log.error(f"Polling gcode error: {se}")
             self._error_callback(se)
             self._complete_all(se, previous_waiters)
