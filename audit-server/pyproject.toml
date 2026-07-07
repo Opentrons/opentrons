@@ -29,6 +29,7 @@ dev = {requires-python = ">=3.11"}
 robot = [
     "server-utils==0.0.0",
     "opentrons-shared-data==0.0.0",
+    "jsonschema==4.17.3",
     "fastapi==0.100.0",
     "pydantic==2.11.7",
     "pydantic-settings==2.4.0",
