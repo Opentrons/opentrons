@@ -226,7 +226,7 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
                 } as const
               })
               .then(result => {
-                log.info(`Update download complete: ${result}`)
+                log.info('Update download complete')
                 webUpdate = result
                 dispatchStaticUpdateData()
                 dispatch({ type: 'robotUpdate:DOWNLOAD_DONE', payload: 'flex' })
