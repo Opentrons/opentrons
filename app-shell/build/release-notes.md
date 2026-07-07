@@ -10,7 +10,7 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 Welcome to the v9.1.1 release of the Opentrons App! This release is designed specifically for use with Opentrons Flex and includes other new features, improvements, and bug fixes.
 
-**OT-2 robots will no longer appear in the Opentrons App.** v9.1.0 will prompt you to get the separate Opentrons OT-2 App, or you can download it directly from <https://opentrons.com/app>.
+**OT-2 robots will no longer appear in the Opentrons App.** v9.1.1 will prompt you to get the separate Opentrons OT-2 App, or you can download it directly from <https://opentrons.com/app>.
 
 You'll need to use the Opentrons App to update from the previous release (v9.0.0) to any other release. Read about other changes to software updates below.
 
