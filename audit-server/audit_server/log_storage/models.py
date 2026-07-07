@@ -31,6 +31,16 @@ class UserLogEntry(pydantic.BaseModel):
     sig_version: str
 
 
+class UserLogForExport(pydantic.BaseModel):
+    """User log data for export."""
+
+    user_log_entries: list[UserLogEntry]
+    startedAt: datetime
+    endedAt: Optional[datetime] = pydantic.Field(
+        description="The time this period ended, or null if the period is still active."
+    )
+
+
 class RobotLogPaths(pydantic.BaseModel):
     """Robot Log Entry information to be exported."""
 
@@ -43,5 +53,5 @@ class RobotLogPaths(pydantic.BaseModel):
 class LogPeriodEntries(pydantic.BaseModel):
     """Entries associated with a particular log period."""
 
-    user_log_entries: list[UserLogEntry]
+    user_log: UserLogForExport
     robot_log_entries: list[RobotLogPaths]
