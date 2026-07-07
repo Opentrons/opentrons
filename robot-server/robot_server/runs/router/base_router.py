@@ -375,15 +375,32 @@ async def get_run(
 async def remove_run(
     runId: str,
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
+    shouldDeleteAllRunFiles: Annotated[
+        bool,
+        Query(
+            description=(
+                "If true, also delete this run's images and output data files"
+                " from disk, in addition to the run record."
+            ),
+        ),
+    ] = False,
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete a run by its ID.
 
     Arguments:
         runId: Run ID pulled from URL.
         run_data_manager: Current and historical run data management.
+        data_files_store: Database of data file resources.
+        shouldDeleteAllRunFiles: If true, also delete this run's images and
+            output data files from disk, in addition to the run record.
     """
     try:
-        await run_data_manager.delete(runId)
+        await run_data_manager.delete(
+            runId,
+            data_files_store=data_files_store,
+            should_delete_all_run_files=shouldDeleteAllRunFiles,
+        )
 
     except RunConflictError as e:
         raise RunNotIdle().as_error(status.HTTP_409_CONFLICT) from e

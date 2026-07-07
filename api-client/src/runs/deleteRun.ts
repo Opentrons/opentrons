@@ -2,17 +2,17 @@ import { DELETE, request } from '../request'
 
 import type { ResponsePromise } from '../request'
 import type { EmptyResponse, HostConfig } from '../types'
-import type { DeleteRunData } from './types'
+import type { DeleteRunParams } from './types'
 
 export function deleteRun(
   config: HostConfig,
   runId: string,
-  data: DeleteRunData = {}
+  params?: DeleteRunParams
 ): ResponsePromise<EmptyResponse> {
-  return request<EmptyResponse, { data: DeleteRunData }>(
+  return request<EmptyResponse, { data: DeleteRunParams }>(
     DELETE,
     `/runs/${runId}`,
     config,
-    { body: { data } }
+    { queryParams: { ...params } }
   )
 }

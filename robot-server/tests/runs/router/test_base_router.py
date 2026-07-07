@@ -551,11 +551,23 @@ async def test_get_runs_not_empty(
 async def test_delete_run_by_id(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    mock_data_files_store: DataFilesStore,
 ) -> None:
     """It should be able to remove a run by ID."""
-    result = await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
+    result = await remove_run(
+        runId="run-id",
+        run_data_manager=mock_run_data_manager,
+        data_files_store=mock_data_files_store,
+    )
 
-    decoy.verify(await mock_run_data_manager.delete("run-id"), times=1)
+    decoy.verify(
+        await mock_run_data_manager.delete(
+            "run-id",
+            data_files_store=mock_data_files_store,
+            should_delete_all_run_files=False,
+        ),
+        times=1,
+    )
 
     assert result.content == SimpleEmptyBody()
     assert result.status_code == 200
@@ -564,14 +576,25 @@ async def test_delete_run_by_id(
 async def test_delete_run_with_bad_id(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    mock_data_files_store: DataFilesStore,
 ) -> None:
     """It should 404 if the run ID does not exist."""
     key_error = RunNotFoundError(run_id="run-id")
 
-    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(key_error)  # type: ignore[func-returns-value]
+    decoy.when(
+        await mock_run_data_manager.delete(  # type: ignore[func-returns-value]
+            "run-id",
+            data_files_store=mock_data_files_store,
+            should_delete_all_run_files=False,
+        )
+    ).then_raise(key_error)
 
     with pytest.raises(ApiError) as exc_info:
-        await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
+        await remove_run(
+            runId="run-id",
+            run_data_manager=mock_run_data_manager,
+            data_files_store=mock_data_files_store,
+        )
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
@@ -580,14 +603,23 @@ async def test_delete_run_with_bad_id(
 async def test_delete_active_run(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    mock_data_files_store: DataFilesStore,
 ) -> None:
     """It should 409 if the run is not finished."""
-    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(  # type: ignore[func-returns-value]
-        RunConflictError("oh no")
-    )
+    decoy.when(
+        await mock_run_data_manager.delete(  # type: ignore[func-returns-value]
+            "run-id",
+            data_files_store=mock_data_files_store,
+            should_delete_all_run_files=False,
+        )
+    ).then_raise(RunConflictError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
-        await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
+        await remove_run(
+            runId="run-id",
+            run_data_manager=mock_run_data_manager,
+            data_files_store=mock_data_files_store,
+        )
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunNotIdle"

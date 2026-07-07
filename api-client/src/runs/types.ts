@@ -250,6 +250,7 @@ export interface FlexStackerState {
   maxCount: number
 }
 
-export interface DeleteRunData {
+export interface DeleteRunParams {
+  /** If true, also delete this run's input and output data files from disk, in addition to the run record. */
   shouldDeleteAllRunFiles?: boolean
 }

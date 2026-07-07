@@ -37,6 +37,7 @@ from .run_models import BadRun, Run, RunDataError
 from .run_orchestrator_store import RunOrchestratorStore
 from .run_store import BadRunResource, BadStateSummary, RunResource, RunStore
 from robot_server.camera.settings.store import CameraSettingStore
+from robot_server.data_files.data_files_store import DataFilesStore
 from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.notifications import RunsPublisher
@@ -372,11 +373,20 @@ class RunDataManager:
             for run_resource in self._run_store.get_all(length)
         ]
 
-    async def delete(self, run_id: str) -> None:
+    async def delete(
+        self,
+        run_id: str,
+        data_files_store: DataFilesStore,
+        should_delete_all_run_files: bool = False,
+    ) -> None:
         """Delete a current or historical run.
 
         Args:
             run_id: The identifier of the run to remove.
+            data_files_store: Database of data file resources, required if
+                should_delete_all_run_files is True.
+            should_delete_all_run_files: If true, also delete this run's output
+                data files and images from disk.
 
         Raises:
             RunConflictError: If deleting the current run, the current run
@@ -387,6 +397,9 @@ class RunDataManager:
             await self._run_orchestrator_store.clear()
 
         self._runs_publisher.clean_up_run(run_id=run_id)
+
+        if should_delete_all_run_files and data_files_store is not None:
+            data_files_store.remove_all_by_run_id(run_id)
 
         self._run_store.remove(run_id=run_id)
 
