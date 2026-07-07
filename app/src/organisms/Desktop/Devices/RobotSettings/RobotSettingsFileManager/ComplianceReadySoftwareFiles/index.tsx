@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   CheckboxBasic,
   COLORS,
+  InfoScreen,
   ListAccordion,
   StyledText,
   Tag,
@@ -21,34 +22,16 @@ import fileManagerStyles from '../robotsettingsfilemanager.module.css'
 import styles from './compliancereadysoftwarefiles.module.css'
 import { LogPeriodRow } from './LogPeriodRow'
 
-import type { LogPeriodSummary } from '@opentrons/api-client'
-
-// TODO: remove once real API data is available
-const STUB_LOG_PERIODS: LogPeriodSummary[] = [
-  {
-    id: 'period-1',
-    startedAt: '2026-01-15T08:00:00.000Z',
-    endedAt: '2026-03-01T17:30:00.000Z',
-  },
-  {
-    id: 'period-2',
-    startedAt: '2026-03-01T17:30:00.000Z',
-    endedAt: '2026-05-10T12:00:00.000Z',
-  },
-  {
-    id: 'period-3',
-    startedAt: '2026-05-10T12:00:00.000Z',
-    endedAt: null,
-  },
-]
-
 export function ComplianceReadySoftwareFiles(): JSX.Element {
   const { t } = useTranslation('device_details')
   const { makeToast } = useToaster()
   const { data: logPeriodSummariesData } = useLogPeriodSummariesQuery()
+
   // API returns periods oldest-to-newest; reverse for newest-first display.
-  const rawPeriods = logPeriodSummariesData?.data ?? STUB_LOG_PERIODS
-  const periods = useMemo(() => [...rawPeriods].reverse(), [rawPeriods])
+  const periods = useMemo(
+    () => [...(logPeriodSummariesData?.data ?? [])].reverse(),
+    [logPeriodSummariesData?.data]
+  )
 
   const {
     selectedIds,
@@ -113,94 +96,98 @@ export function ComplianceReadySoftwareFiles(): JSX.Element {
           onDownloadSelected={handleDownloadSelected}
           onDeleteSelected={handleDeleteSelected}
         />
-        <div className={fileManagerStyles.log_table}>
-          <div className={styles.compliance_table_header_row}>
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              className={styles.log_file_col}
-            >
-              {t('file')}
-            </StyledText>
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              className={styles.log_date_col}
-            >
-              {t('date_created')}
-            </StyledText>
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              className={styles.log_date_col}
-            >
-              {t('last_updated')}
-            </StyledText>
-          </div>
-
-          <ListAccordion
-            alertKind="default"
-            tableHeaders={undefined}
-            icon={
-              <div
-                className={styles.compliance_checkbox_wrapper}
-                onClick={e => {
-                  e.stopPropagation()
-                }}
-              >
-                <CheckboxBasic
-                  checked={isSomeSelected ? 'indeterminate' : isAllSelected}
-                  onChange={toggleAll}
-                  backgroundColor={COLORS.white}
-                />
-              </div>
-            }
-            headerChild={
-              <div className={styles.compliance_accordion_content}>
-                <StyledText
-                  desktopStyle="bodyDefaultRegular"
-                  className={styles.log_file_col}
-                >
-                  {t('user_action_logs')}
-                </StyledText>
-                <div className={styles.log_date_col}>
-                  <Tag text={firstDate} type="default" shrinkToContent />
-                </div>
-                <div className={styles.log_date_col}>
-                  <Tag text={lastDate} type="default" shrinkToContent />
-                </div>
-              </div>
-            }
-          >
-            <div className={styles.compliance_period_col_headers}>
+        {periods.length === 0 ? (
+          <InfoScreen content={t('no_user_action_logs')} />
+        ) : (
+          <div className={fileManagerStyles.log_table}>
+            <div className={styles.compliance_table_header_row}>
               <StyledText
                 desktopStyle="bodyDefaultRegular"
-                className={styles.log_date_col}
+                className={styles.log_file_col}
               >
-                {t('started')}
+                {t('file')}
               </StyledText>
               <StyledText
                 desktopStyle="bodyDefaultRegular"
                 className={styles.log_date_col}
               >
-                {t('ended')}
+                {t('date_created')}
               </StyledText>
               <StyledText
                 desktopStyle="bodyDefaultRegular"
                 className={styles.log_date_col}
               >
-                {t('status')}
+                {t('last_updated')}
               </StyledText>
             </div>
-            {periods.map(period => (
-              <LogPeriodRow
-                key={period.id}
-                period={period}
-                isSelected={selectedIds.has(period.id)}
-                onToggle={() => {
-                  togglePeriod(period.id)
-                }}
-              />
-            ))}
-          </ListAccordion>
-        </div>
+
+            <ListAccordion
+              alertKind="default"
+              tableHeaders={undefined}
+              icon={
+                <div
+                  className={styles.compliance_checkbox_wrapper}
+                  onClick={e => {
+                    e.stopPropagation()
+                  }}
+                >
+                  <CheckboxBasic
+                    checked={isSomeSelected ? 'indeterminate' : isAllSelected}
+                    onChange={toggleAll}
+                    backgroundColor={COLORS.white}
+                  />
+                </div>
+              }
+              headerChild={
+                <div className={styles.compliance_accordion_content}>
+                  <StyledText
+                    desktopStyle="bodyDefaultRegular"
+                    className={styles.log_file_col}
+                  >
+                    {t('user_action_logs')}
+                  </StyledText>
+                  <div className={styles.log_date_col}>
+                    <Tag text={firstDate} type="default" shrinkToContent />
+                  </div>
+                  <div className={styles.log_date_col}>
+                    <Tag text={lastDate} type="default" shrinkToContent />
+                  </div>
+                </div>
+              }
+            >
+              <div className={styles.compliance_period_col_headers}>
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  className={styles.log_date_col}
+                >
+                  {t('started')}
+                </StyledText>
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  className={styles.log_date_col}
+                >
+                  {t('ended')}
+                </StyledText>
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  className={styles.log_date_col}
+                >
+                  {t('status')}
+                </StyledText>
+              </div>
+              {periods.map(period => (
+                <LogPeriodRow
+                  key={period.id}
+                  period={period}
+                  isSelected={selectedIds.has(period.id)}
+                  onToggle={() => {
+                    togglePeriod(period.id)
+                  }}
+                />
+              ))}
+            </ListAccordion>
+          </div>
+        )}
       </div>
     </>
   )

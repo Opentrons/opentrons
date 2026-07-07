@@ -163,6 +163,7 @@
   "no_protocols_found": "No protocols found",
   "no_recent_runs": "No recent runs",
   "no_recent_runs_description": "After you run some protocols, they will appear here.",
+  "no_user_action_logs": "No user action logs",
   "num_units": "{{num}} mm",
   "offline_deck_configuration": "Robot must be on the network to see deck configuration",
   "offline_input_devices": "Robot must be on the network to see connected peripherals",
