@@ -163,3 +163,9 @@ class PasswordMissingSpecialCharactersErrorDetails(BaseModel):
     """An error response when a new password does not meet the configured special characters requirements."""
 
     id: Literal["passwordMissingSpecialCharacters"]
+
+
+class UserAlreadyExistsErrorDetails(BaseModel):
+    """An error when a username is already taken."""
+
+    id: Literal["userAlreadyExists"]

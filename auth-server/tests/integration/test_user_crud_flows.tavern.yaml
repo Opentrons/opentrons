@@ -359,3 +359,45 @@ stages:
       status_code: 200
       json:
         data: !force_original_structure '{regular_user_2_data}'
+
+---
+test_name: Creating a user with an existing username
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+
+stages:
+  - name: Create a user
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: duplicate_user_test
+          password: securepassword123!
+          fullName: Duplicate User Test
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 201
+
+  - name: Reject creating a user with an existing username
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: duplicate_user_test
+          password: securepassword123!
+          fullName: Another User
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 400
+      json:
+        errors:
+          - id: userAlreadyExists

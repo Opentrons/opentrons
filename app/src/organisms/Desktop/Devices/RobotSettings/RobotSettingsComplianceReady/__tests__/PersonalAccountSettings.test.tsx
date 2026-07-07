@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest'
 
 import { fireEvent, screen, waitFor } from '@testing-library/react'
+import axios from 'axios'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -15,7 +16,7 @@ import { i18n } from '/app/i18n'
 import { PersonalAccountSettings } from '../PersonalAccountSettings'
 
 import type { RenderResult } from '@testing-library/react'
-import type { AuthUserResponse } from '@opentrons/api-client'
+import type { AuthUserResponse, UpdateSelfRequest } from '@opentrons/api-client'
 
 const ROBOT_NAME = 'flex-1'
 
@@ -33,6 +34,7 @@ const MOCK_SELF_RESPONSE = {
 vi.mock('@opentrons/react-api-client')
 
 const mockUpdateSelf = vi.fn()
+let selfResponse = MOCK_SELF_RESPONSE
 
 const render = (): RenderResult => {
   return renderWithProviders(
@@ -51,17 +53,51 @@ function openEditForm(): void {
   fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
 }
 
+function createUsernameExistsError(): any {
+  return {
+    isAxiosError: true,
+    message: 'Request failed',
+    name: 'AxiosError',
+    response: {
+      status: 400,
+      data: {
+        errors: [{ id: 'userAlreadyExists' }],
+      },
+      statusText: 'Bad Request',
+      headers: {},
+      config: {},
+    },
+  } as any
+}
+
 describe('PersonalAccountSettings', () => {
   beforeEach(() => {
+    selfResponse = MOCK_SELF_RESPONSE
     mockUpdateSelf.mockReset()
-    mockUpdateSelf.mockResolvedValue(undefined)
+    mockUpdateSelf.mockImplementation(async (request: UpdateSelfRequest) => {
+      selfResponse = {
+        data: {
+          ...selfResponse.data,
+          ...(request.data.username != null
+            ? { username: request.data.username }
+            : {}),
+          ...(request.data.fullName != null
+            ? { fullName: request.data.fullName }
+            : {}),
+        },
+      }
+      return selfResponse
+    })
     vi.mocked(useHost).mockReturnValue({
       hostname: '10.0.0.1',
       port: 31950,
     } as ReturnType<typeof useHost>)
-    vi.mocked(useSelfQuery).mockReturnValue({
-      data: MOCK_SELF_RESPONSE,
-    } as any)
+    vi.mocked(useSelfQuery).mockImplementation(
+      () =>
+        ({
+          data: selfResponse,
+        }) as ReturnType<typeof useSelfQuery>
+    )
     vi.mocked(useUpdateSelfMutation).mockReturnValue({
       updateSelf: mockUpdateSelf,
       isLoading: false,
@@ -88,8 +124,8 @@ describe('PersonalAccountSettings', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('calls updateSelf and returns to view mode on successful save', async () => {
-    const { container } = render()
+  it('calls updateSelf and returns to view mode with updated fields on successful save', async () => {
+    render()
     openEditForm()
     fireEvent.change(screen.getByDisplayValue('Alice Example'), {
       target: { value: 'Alice Updated' },
@@ -103,11 +139,13 @@ describe('PersonalAccountSettings', () => {
     expect(updateData).toEqual({ fullName: 'Alice Updated' })
     expect(updateData).not.toHaveProperty('username')
     expect(updateData).not.toHaveProperty('password')
+    await waitFor(() => {
+      screen.getByText('Alice Updated')
+    })
     expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: 'save' })
     ).not.toBeInTheDocument()
-    expect(container.textContent).not.toContain('Alice Updated')
   })
 
   it.each<{
@@ -163,5 +201,25 @@ describe('PersonalAccountSettings', () => {
       screen.getByText('Unable to save account settings. Try again.')
     })
     expect(screen.getByRole('button', { name: 'save' })).toBeInTheDocument()
+  })
+
+  it('shows a username error when updateSelf returns username already exists', async () => {
+    mockUpdateSelf.mockRejectedValue(createUsernameExistsError())
+    render()
+    openEditForm()
+    fireEvent.change(screen.getByDisplayValue('alice'), {
+      target: { value: 'bob' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'save' }))
+
+    await waitFor(() => {
+      screen.getByText(
+        'This username is already taken. Choose a different username.'
+      )
+    })
+    expect(screen.getByRole('button', { name: 'save' })).toBeInTheDocument()
+    expect(
+      screen.queryByText('Unable to save account settings. Try again.')
+    ).not.toBeInTheDocument()
   })
 })

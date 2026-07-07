@@ -59,7 +59,8 @@ describe('PersonalAccountSettingsEditForm', () => {
 
   it('calls onSave with password when both password fields match', () => {
     const { container } = render(props)
-    const [firstPasswordInput, secondPasswordInput] = getPasswordInputs(container)
+    const [firstPasswordInput, secondPasswordInput] =
+      getPasswordInputs(container)
     fireEvent.change(firstPasswordInput, { target: { value: 'new-password' } })
     fireEvent.change(secondPasswordInput, {
       target: { value: 'different-password' },
@@ -89,5 +90,16 @@ describe('PersonalAccountSettingsEditForm', () => {
       saveError: 'Unable to save account settings. Try again.',
     })
     screen.getByText('Unable to save account settings. Try again.')
+  })
+
+  it('shows a username error on the username field', () => {
+    render({
+      ...props,
+      usernameError:
+        'This username is already taken. Choose a different username.',
+    })
+    screen.getByText(
+      'This username is already taken. Choose a different username.'
+    )
   })
 })

@@ -18,6 +18,7 @@ export interface PersonalAccountSettingsEditFormProps {
   username: string
   fullName: string
   isSaving: boolean
+  usernameError?: string | null
   saveError?: string | null
   onSave: (data: UpdateSelfRequest['data']) => void
   onCancel: () => void
@@ -41,6 +42,7 @@ export function PersonalAccountSettingsEditForm({
   username,
   fullName,
   isSaving,
+  usernameError = null,
   saveError = null,
   onSave,
   onCancel,
@@ -109,6 +111,7 @@ export function PersonalAccountSettingsEditForm({
         <FieldGroup label={t('desktop_username')}>
           <InputField
             value={usernameInput}
+            error={usernameError}
             onChange={event => {
               setUsernameInput(event.target.value)
             }}

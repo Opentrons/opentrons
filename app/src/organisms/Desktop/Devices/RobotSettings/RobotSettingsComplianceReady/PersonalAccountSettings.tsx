@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useSelector } from 'react-redux'
+import axios from 'axios'
 
 import { Divider, StyledText } from '@opentrons/components'
 import {
@@ -51,21 +52,39 @@ export function PersonalAccountSettings({
   )
   const selfQuery = useSelfQuery({ enabled: authState != null })
   const { updateSelf, isLoading: isSaving } = useUpdateSelfMutation()
-  const username = selfQuery.data?.data.username ?? authState?.username ?? ''
+  const username = selfQuery.data?.data.username ?? ''
   const fullName = selfQuery.data?.data.fullName ?? ''
 
   const [isEditing, setIsEditing] = useState(false)
+  const [usernameError, setUsernameError] = useState<string | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
+
+  const clearSaveErrors = (): void => {
+    setUsernameError(null)
+    setSaveError(null)
+  }
 
   const handleSave = (updateData: UpdateSelfRequest['data']): void => {
     void updateSelf({ data: updateData })
-      .then(() => {
-        void queryClient.invalidateQueries(getSelfQueryKey(host))
-        setSaveError(null)
+      .then(updatedSelf => {
+        queryClient.setQueryData(getSelfQueryKey(host), updatedSelf)
+        clearSaveErrors()
         setIsEditing(false)
       })
-      .catch(() => {
-        setSaveError(t('desktop_personal_account_settings_save_error'))
+      .catch((error: unknown) => {
+        const errorId = axios.isAxiosError(error)
+          ? error.response?.data?.errors?.[0]?.id
+          : null
+
+        if (errorId === 'userAlreadyExists') {
+          setUsernameError(
+            t('desktop_personal_account_settings_username_exists_error')
+          )
+          setSaveError(null)
+        } else {
+          setUsernameError(null)
+          setSaveError(t('desktop_personal_account_settings_save_error'))
+        }
       })
   }
 
@@ -80,7 +99,7 @@ export function PersonalAccountSettings({
             type="button"
             className={styles.edit_button}
             onClick={() => {
-              setSaveError(null)
+              clearSaveErrors()
               setIsEditing(false)
             }}
           >
@@ -93,7 +112,7 @@ export function PersonalAccountSettings({
             type="button"
             className={styles.edit_button}
             onClick={() => {
-              setSaveError(null)
+              clearSaveErrors()
               setIsEditing(true)
             }}
           >
@@ -109,10 +128,11 @@ export function PersonalAccountSettings({
             username={username}
             fullName={fullName}
             isSaving={isSaving}
+            usernameError={usernameError}
             saveError={saveError}
             onSave={handleSave}
             onCancel={() => {
-              setSaveError(null)
+              clearSaveErrors()
               setIsEditing(false)
             }}
           />
