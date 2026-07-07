@@ -85,12 +85,6 @@ def handle_recoverable_vacuum_error(
     model_utils: ModelUtils,
 ) -> VacuumModuleDefinedErrorData:
     """Map a recoverable vacuum hardware error to defined command error data."""
-    if not isinstance(error, RecoverableVacuumHwExceptionTypes):
-        raise TypeError(
-            f"No defined error mapping for recoverable vacuum hardware error "
-            f"{type(error).__name__!r}."
-        )
-
     timestamp = model_utils.get_timestamp()
     wrapped_error = ErrorOccurrence.from_failed(
         id=model_utils.generate_id(),
@@ -127,8 +121,9 @@ def handle_recoverable_vacuum_error(
             state_update_if_false_positive=state_update,
         )
 
-    raise AssertionError(
-        "Unreachable: all recoverable hardware errors should be handled above."
+    raise TypeError(
+        f"No defined error mapping for recoverable vacuum hardware error "
+        f"{type(error).__name__!r}."
     )
 
 
