@@ -2,10 +2,14 @@ import { useCloneRun } from './useCloneRun'
 import { useCloseCurrentRun } from './useCloseCurrentRun'
 import { useMostRecentRunId } from './useMostRecentRunId'
 
-export function useRestartRun(): () => void {
+import type { DocumentationState } from '@opentrons/react-api-client'
+
+export function useRestartRun(
+  documentationState: DocumentationState
+): () => void {
   const mostRecentRunId = useMostRecentRunId()
   const { cloneRun } = useCloneRun(mostRecentRunId!)
-  const { closeCurrentRun } = useCloseCurrentRun()
+  const { closeCurrentRun } = useCloseCurrentRun(documentationState)
 
   return () => {
     if (mostRecentRunId != null) {

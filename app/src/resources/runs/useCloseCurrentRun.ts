@@ -4,18 +4,19 @@ import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
 
 import { useCurrentRunId } from '/app/resources/runs'
 
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type { UseDismissCurrentRunMutationOptions } from '@opentrons/react-api-client/src/runs/useDismissCurrentRunMutation'
 
 type CloseCallback = (options?: UseDismissCurrentRunMutationOptions) => void
 
-export function useCloseCurrentRun(): {
+export function useCloseCurrentRun(documentationState: DocumentationState): {
   closeCurrentRun: CloseCallback
   isClosingCurrentRun: boolean
 } {
   const currentRunId = useCurrentRunId()
 
   const { dismissCurrentRun, isLoading: isDismissing } =
-    useDismissCurrentRunMutation()
+    useDismissCurrentRunMutation(documentationState)
 
   const closeCurrentRun = (
     options?: UseDismissCurrentRunMutationOptions

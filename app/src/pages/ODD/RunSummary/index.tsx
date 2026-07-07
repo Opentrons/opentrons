@@ -39,6 +39,7 @@ import {
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { RunTimer } from '/app/molecules/RunTimer'
@@ -146,7 +147,8 @@ export function RunSummary(): JSX.Element {
   const trackEvent = useTrackEvent()
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
-  const { closeCurrentRun } = useCloseCurrentRun()
+  const documentationState = useDocumentationState()
+  const { closeCurrentRun } = useCloseCurrentRun(documentationState)
   // Close the current run only if it's active and then execute the onSuccess callback. Prefer this wrapper over
   // closeCurrentRun directly, since the callback is swallowed if currentRun is null.
   const closeCurrentRunIfValid = (onSettled?: () => void): void => {
