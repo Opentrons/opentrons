@@ -104,6 +104,9 @@ async def begin(request: web.Request) -> web.Response:
             },
             status=409,
         )
+        # fixme(mm, 2026-07-06): There's a concurrency hazard here because we're checking
+        # for a preexisting session and setting the new session non-atomically. Two
+        # concurrent requests can result in two simultaneous active sessions.
 
     try:
         options = await _BeginSessionOptions.parse_from_request(request)
@@ -186,6 +189,10 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
 async def commit(request: web.Request, session: UpdateSession) -> web.Response:
     """Serves /update/:session/commit"""
     if session.stage != Stages.DONE:
+        # fixme(mm, 2026-07-07): This stage check is insufficient; it can allow
+        # multiple commits to run concurrently on a single session, because we
+        # non-atomically enforce Stages.DONE, do commit process, and then set
+        # Stages.READY_FOR_RESTART.
         return web.json_response(
             data={
                 "error": "not-ready",
