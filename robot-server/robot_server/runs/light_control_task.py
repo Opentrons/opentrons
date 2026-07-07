@@ -15,6 +15,7 @@ from opentrons.hardware_control.types import (
 from opentrons.protocol_engine.types import EngineStatus
 
 from .run_orchestrator_store import RunOrchestratorStore
+from robot_server.hardware import HardwareStateStore
 
 log = getLogger(__name__)
 
@@ -93,11 +94,13 @@ class LightController:
         self,
         api: HardwareControlAPI,
         run_orchestrator_store: Optional[RunOrchestratorStore],
+        hardware_state_store: HardwareStateStore,
     ) -> None:
         """Create a new LightController."""
         self._api = api
         self._run_orchestrator_store = run_orchestrator_store
         self._initialization_done = False
+        self._hardware_state_store = hardware_state_store
 
     def mark_initialization_done(self) -> None:
         """Called once the robot server hardware initialization finishes."""
@@ -154,7 +157,7 @@ class LightController:
         """Get any active firmware updates."""
         return [
             subsystem
-            for subsystem, status in self._api.attached_subsystems.items()
+            for subsystem, status in self._hardware_state_store.attached_subsystems.items()
             if status.update_state is not None
             and status.update_state is UpdateState.updating
         ]
@@ -163,7 +166,7 @@ class LightController:
         """Get the overall status of the system for light purposes."""
         return Status(
             active_updates=self._get_active_updates(),
-            estop_status=self._api.get_estop_state(),
+            estop_status=self._hardware_state_store.get_estop_state(),
             engine_status=self._get_current_engine_status(),
         )
 

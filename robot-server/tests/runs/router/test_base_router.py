@@ -50,6 +50,7 @@ from robot_server.data_files.data_files_store import (
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ApiError
 from robot_server.file_provider.provider import FileProviderExecutor
+from robot_server.hardware import HardwareStateStore
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import (
     ProtocolNotFoundError,
@@ -896,10 +897,12 @@ async def test_get_current_state_success(
         mock_run_data_manager.get_flex_stacker_substate(run_id=run_id)
     ).then_return(stacker_substates)
 
+    hardware_store = HardwareStateStore(hardware_resource=mock_hardware_api)
+
     result = await get_current_state(
         runId=run_id,
         run_data_manager=mock_run_data_manager,
-        hardware=mock_hardware_api,
+        hardware_store=hardware_store,
         robot_type=RobotTypeEnum.FLEX,
     )
 
@@ -949,11 +952,13 @@ async def test_get_current_state_run_not_current(
         RunNotCurrentError("Run is not current")
     )
 
+    hardware_store = HardwareStateStore(hardware_resource=mock_hardware_api)
+
     with pytest.raises(ApiError) as exc_info:
         await get_current_state(
             runId=run_id,
             run_data_manager=mock_run_data_manager,
-            hardware=mock_hardware_api,
+            hardware_store=hardware_store,
             robot_type=RobotTypeEnum.FLEX,
         )
 

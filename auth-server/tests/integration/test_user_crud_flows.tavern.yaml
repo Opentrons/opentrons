@@ -31,23 +31,6 @@ stages:
           locked: false
           scopes: !force_original_structure '{user_scopes_list}'
           resetPassword: false
-  - name: Create a new user with a password less than 8 characters
-    request:
-      method: POST
-      url: '{run_server.base_url}/auth/users'
-      headers:
-        Authorization: '{admin_access_token}'
-      json:
-        data:
-          username: test_new_user_password_less_than_8_characters
-          password: '1234567'
-          fullName: Test New User
-          accountType: user
-    response:
-      status_code: 400
-      json:
-        detail: Password must be at least 8 characters long
-
   - name: Get a user information
     request:
       method: GET

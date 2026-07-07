@@ -10,13 +10,16 @@ from decoy import Decoy, matchers
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
     EstopState,
+    EstopStateNotification,
     StatusBarState,
     SubSystem,
+    SubsystemConnectionNotification,
     SubSystemState,
     UpdateState,
 )
 from opentrons.protocol_engine.types import EngineStatus
 
+from robot_server.hardware import HardwareStateStore
 from robot_server.runs.light_control_task import LightController, Status
 from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
 
@@ -35,8 +38,11 @@ def subject(
 ) -> LightController:
     """Test subject - LightController."""
     decoy.when(hardware_api.attached_subsystems).then_return({})
+    hardware_store = HardwareStateStore(hardware_api)
     return LightController(
-        api=hardware_api, run_orchestrator_store=run_orchestrator_store
+        api=hardware_api,
+        run_orchestrator_store=run_orchestrator_store,
+        hardware_state_store=hardware_store,
     )
 
 
@@ -68,6 +74,9 @@ async def test_get_current_status_ot2(
     )
     decoy.when(run_orchestrator_store.get_status()).then_return(status)
     decoy.when(hardware_api.get_estop_state()).then_return(estop)
+    subject._hardware_state_store.update_hardware_status_callback(
+        event=EstopStateNotification()
+    )
 
     expected = Status(
         active_updates=[],
@@ -113,6 +122,9 @@ async def test_get_current_status(
         for node in all_nodes
     }
     decoy.when(hardware_api.attached_subsystems).then_return(mock_ret)
+    subject._hardware_state_store.update_hardware_status_callback(
+        event=SubsystemConnectionNotification()
+    )
 
     result = subject.get_current_status().active_updates
     assert len(result) == len(active_updates)
@@ -200,8 +212,14 @@ async def test_provide_run_orchestrator_store(
 ) -> None:
     """Test providing an engine store after initialization."""
     decoy.when(hardware_api.attached_subsystems).then_return({})
-    subject = LightController(api=hardware_api, run_orchestrator_store=None)
+    hardware_store = HardwareStateStore(hardware_api)
+    subject = LightController(
+        api=hardware_api,
+        run_orchestrator_store=None,
+        hardware_state_store=hardware_store,
+    )
     decoy.when(hardware_api.get_estop_state()).then_return(EstopState.DISENGAGED)
+    hardware_store.update_hardware_status_callback(event=EstopStateNotification())
     assert subject.get_current_status() == Status(
         active_updates=[],
         estop_status=EstopState.DISENGAGED,

@@ -15,6 +15,7 @@ from server_utils.fastapi_utils.app_state import (
     AppState,
 )
 
+from robot_server.hardware import HardwareStateStore
 from robot_server.service.pyro_utils.pyro_resource import (
     RS_PYRONAME,
     RobotServerPyroResource,
@@ -142,4 +143,17 @@ def register_notify_publishers_to_pyro_resource(
     else:
         raise RuntimeError(
             "Cannot set Notification Publishers, RobotServerPyroResource is not initialized."
+        )
+
+
+def register_hardware_state_store_to_pyro_resource(
+    app_state: AppState, hardware_store: HardwareStateStore
+) -> None:
+    """Set the provided Hardware State Store as the active instance to be used by the Robot Server's Pyro Resource."""
+    robot_server_pyro_resource = robot_server_pyro_resource_accessor.get_from(app_state)
+    if robot_server_pyro_resource is not None:
+        robot_server_pyro_resource.set_hardware_state_store(hardware_store)
+    else:
+        raise RuntimeError(
+            "Cannot set HardwareStateStore, RobotServerPyroResource is not initialized."
         )

@@ -33,8 +33,17 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
-from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
+from opentrons.protocol_engine.state.commands import (
+    CommandAnnotationsSlice,
+    CurrentCommandNotification,
+    FinalizedCommandNotification,
+)
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
+from opentrons.protocol_engine.state.modules import FlexStackerSubstateNotification
+from opentrons.protocol_engine.state.pipettes import (
+    NozzleMapNotification,
+    TipAttachedNotification,
+)
 from opentrons.protocol_engine.types import (
     CommandAnnotation,
     CommandPreconditions,
@@ -121,6 +130,11 @@ def register_process_types() -> None:
         RunResult,
         StateSummary,
         FlexStackerSubState,
+        NozzleMapNotification,
+        TipAttachedNotification,
+        FlexStackerSubstateNotification,
+        CurrentCommandNotification,
+        FinalizedCommandNotification,
     ]:
         OpentronsPyroSerializer.register_pydantic_model(pydantic_model)  # type: ignore[arg-type]
     for rtp in get_args(RunTimeParameter):
@@ -226,6 +240,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
             file_provider=self._robot_server_resource.get_file_provider(),
             camera_provider=self._robot_server_resource.get_camera_provider(),
             notify_publishers=self._robot_server_resource.get_notify_publishers(),
+            updates_callback=self._robot_server_resource.get_engine_updates_callback,
             proxy_of_callback_for_handling_door_events=proxy_of_callback_for_handling_door_events,
         )
 

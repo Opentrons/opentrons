@@ -92,6 +92,7 @@ class SubsystemManager:
         )
         # This is intended to be an internal variable but is modified in unit tests to avoid long timeouts
         self._check_device_update_timeout = 10.0
+        self._event_callback: Optional[Callable[[], None]] = None
 
     @property
     def ok(self) -> bool:
@@ -426,6 +427,10 @@ class SubsystemManager:
                 self._tool_task_state = True
                 self._tool_task_condition.notify_all()
 
+            if self._event_callback is not None:
+                # Notify the subsystem event callback
+                self._event_callback()
+
     def _tool_if_ok(self, tool: ToolType, node: NodeId) -> ToolType:
         if tool is ToolType.nothing_attached:
             return tool
@@ -435,3 +440,6 @@ class SubsystemManager:
         if not device_info[node].ok:
             return ToolType.nothing_attached
         return tool
+
+    def set_event_callback(self, callback: Callable[[], None]) -> None:
+        self._event_callback = callback

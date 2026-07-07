@@ -15,11 +15,13 @@ from auth_server.users.models import (
 from auth_server.users.store import UserStore
 from auth_server.users.user_data_manager import (
     InvalidInputError,
+    PasswordMissingSpecialCharactersError,
+    PasswordTooShortError,
     UserAlreadyExistsError,
     UserDataManager,
     UserNotFoundError,
     _generate_temporary_password,
-    _temporary_password_requirements,
+    _password_complexity_requirements,
 )
 
 
@@ -32,7 +34,9 @@ def mock_store(decoy: Decoy) -> UserStore:
 @pytest.fixture()
 def mock_settings(decoy: Decoy) -> SettingsStore:
     """Get a mock SettingsStore."""
-    return decoy.mock(cls=SettingsStore)
+    mock = decoy.mock(cls=SettingsStore)
+    decoy.when(mock.get_settings()).then_return(SettingsResponseData())
+    return mock
 
 
 @pytest.fixture()
@@ -181,13 +185,87 @@ def test_create_user_empty_password_raises(manager: UserDataManager) -> None:
 
 
 def test_create_user_short_password_raises(manager: UserDataManager) -> None:
-    with pytest.raises(InvalidInputError, match="at least 8 characters"):
+    with pytest.raises(PasswordTooShortError) as exc_info:
         manager.create_user(
             username="short_pw",
             password="1234567",
             full_name="X",
             account_type=AccountType.USER,
         )
+    assert exc_info.value.actual_length == 7
+    assert exc_info.value.required_length == 8
+
+
+def test_create_user_enforces_password_length(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    minimum_length = 12
+    decoy.when(mock_settings.get_settings()).then_return(
+        SettingsResponseData(
+            passwordComplexityMinimumLength=minimum_length,
+            passwordComplexitySpecialCharacters=False,
+        )
+    )
+    decoy.when(
+        mock_store.add(
+            username="test_user",
+            hashed_password=matchers.IsA(str),
+            full_name="Test User",
+            account_type=AccountType.USER,
+        )
+    ).then_return(_make_orm_user(username="test_user"))
+    with pytest.raises(PasswordTooShortError) as exc_info:
+        manager.create_user(
+            password="☃" * (minimum_length - 1),
+            username="test_user",
+            full_name="Test User",
+            account_type=AccountType.USER,
+        )
+    assert exc_info.value.actual_length == minimum_length - 1
+    assert exc_info.value.required_length == minimum_length
+    manager.create_user(  # Should not raise.
+        password="☃" * minimum_length,
+        username="test_user",
+        full_name="Test User",
+        account_type=AccountType.USER,
+    )
+
+
+def test_create_user_enforces_password_special_characters(
+    decoy: Decoy,
+    mock_settings: SettingsStore,
+    mock_store: UserStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(
+        SettingsResponseData(
+            passwordComplexityMinimumLength=3, passwordComplexitySpecialCharacters=True
+        )
+    )
+    decoy.when(
+        mock_store.add(
+            username="test_user",
+            hashed_password=matchers.IsA(str),
+            full_name="Test User",
+            account_type=AccountType.USER,
+        )
+    ).then_return(_make_orm_user(username="test_user"))
+    with pytest.raises(PasswordMissingSpecialCharactersError):
+        manager.create_user(
+            password="aaa",
+            username="test_user",
+            full_name="Test User",
+            account_type=AccountType.USER,
+        )
+    manager.create_user(  # Should not raise.
+        password="aa!",
+        username="test_user",
+        full_name="Test User",
+        account_type=AccountType.USER,
+    )
 
 
 def test_create_user_empty_full_name_raises(manager: UserDataManager) -> None:
@@ -487,7 +565,7 @@ def test_temporary_password_requirements(
     expected_min_length: int,
     expected_require_special: bool,
 ) -> None:
-    min_length, require_special = _temporary_password_requirements(settings)
+    min_length, require_special = _password_complexity_requirements(settings)
     assert min_length == expected_min_length
     assert require_special is expected_require_special
 
@@ -504,5 +582,19 @@ def test_update_user_empty_username_raises(manager: UserDataManager) -> None:
 
 
 def test_update_user_short_password_raises(manager: UserDataManager) -> None:
-    with pytest.raises(InvalidInputError, match="at least 8 characters"):
+    with pytest.raises(PasswordTooShortError) as exc_info:
         manager.update_user("testadmin", new_password="short")
+    assert exc_info.value.actual_length == 5
+    assert exc_info.value.required_length == 8
+
+
+def test_update_user_password_missing_special_character(
+    decoy: Decoy,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(
+        SettingsResponseData(passwordComplexitySpecialCharacters=True)
+    )
+    with pytest.raises(PasswordMissingSpecialCharactersError):
+        manager.update_user("testadmin", new_password="validpass123")
