@@ -41,7 +41,7 @@ export function ConfirmCancelRunModal({
   const documentationState = useDocumentationState()
   const { stopRun } = useStopRunMutation(documentationState)
   const { dismissCurrentRun, isLoading: isDismissing } =
-    useDismissCurrentRunMutation()
+    useDismissCurrentRunMutation(documentationState)
   const localRobot = useSelector(getLocalRobot)
   const { data, isError: isRunFetchError } = useNotifyRunQuery(runId)
   const { status: runStatus, current: isRunCurrent } = data?.data ?? {}
