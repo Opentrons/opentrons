@@ -146,6 +146,15 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="language"
         />
         <RobotSettingButton
+          settingName={t('app_settings:file_manager')}
+          settingInfo={t('app_settings:file_manager_description')}
+          dataTestId="RobotSettingButton_file_manager"
+          onClick={() => {
+            setCurrentOption('FileManager')
+          }}
+          iconName="folder"
+        />
+        <RobotSettingButton
           settingName={t('display_led_lights')}
           dataTestId="RobotSettingButton_display_led_lights"
           settingInfo={t('display_led_lights_description')}
