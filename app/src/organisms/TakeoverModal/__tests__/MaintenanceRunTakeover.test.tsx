@@ -16,8 +16,8 @@ import type { MaintenanceRunStatus } from '../MaintenanceRunStatusProvider'
 
 vi.mock('../useMaintenanceRunTakeover')
 vi.mock('/app/resources/maintenance_runs')
-vi.mock('/app/local-resources/access-control/useGuardedAction', () => ({
-  useGuardedAction: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
 }))
 
 const MOCK_MAINTENANCE_RUN: MaintenanceRunStatus = {

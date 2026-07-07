@@ -9,7 +9,7 @@ import {
 import { useCurrentUsername } from '/app/redux/robot-auth'
 
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../__fixtures__/documentationState'
-import { usePromptForInteractionReason } from '../usePromptForInteractionReason'
+import { usePromptForDocumentation } from '../usePromptForDocumentation'
 import {
   mockShowDocumentationRequiredModal,
   mockShowLoginModal,
@@ -45,7 +45,7 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
 const mockDocreport = 'starting calibration' as DocumentationReport
 const wrapper = wrapWithDocumentationRequiredModal()
 
-describe('usePromptForInteractionReason', () => {
+describe('usePromptForDocumentation', () => {
   beforeEach(() => {
     vi.mocked(useAuthSettingsQuery).mockReturnValue({
       data: {
@@ -89,7 +89,7 @@ describe('usePromptForInteractionReason', () => {
     } as ReturnType<typeof useAccessControlEnabledQuery>)
 
     const { result } = renderHook(
-      () => usePromptForInteractionReason(['lpc_flow']),
+      () => usePromptForDocumentation(['lpc_flow']),
       {
         wrapper,
       }
@@ -116,7 +116,7 @@ describe('usePromptForInteractionReason', () => {
       },
     } as ReturnType<typeof useAuthSettingsQuery>)
     const { result } = renderHook(
-      () => usePromptForInteractionReason(['lpc_flow']),
+      () => usePromptForDocumentation(['lpc_flow']),
       {
         wrapper,
       }
@@ -134,7 +134,7 @@ describe('usePromptForInteractionReason', () => {
     vi.mocked(mockShowLoginModal).mockResolvedValue(null)
     const onCancel = vi.fn()
 
-    renderHook(() => usePromptForInteractionReason(['lpc_flow'], onCancel), {
+    renderHook(() => usePromptForDocumentation(['lpc_flow'], onCancel), {
       wrapper,
     })
 
@@ -147,7 +147,7 @@ describe('usePromptForInteractionReason', () => {
 
   it('prompts for documentation when access control is enabled', async () => {
     const { result } = renderHook(
-      () => usePromptForInteractionReason(['lpc_flow']),
+      () => usePromptForDocumentation(['lpc_flow']),
       {
         wrapper,
       }

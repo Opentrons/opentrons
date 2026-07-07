@@ -28,7 +28,7 @@ import type {
  *
  * The second option is to be used for one-off mutations where a popup is desired. i.e. playing pausing or canceling a run.
  *
- * useGuardedAction is a helper hook in /app that generates a documentation state.
+ * useDocumentationState is a helper hook in /app that generates a documentation state.
  *
  * Call signatures live in ./types as `UseDocumentedMutation`.
  */

@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react'
 
-import { useGuardedAction } from './useGuardedAction'
-import { usePromptForInteractionReason } from './usePromptForInteractionReason'
+import { useDocumentationState } from './useDocumentationState'
+import { usePromptForDocumentation } from './usePromptForDocumentation'
 
 import type {
   DocumentationState,
@@ -36,12 +36,12 @@ export const useMaintenanceRunDocumentation = (
   const [actionsToDocument, setActionsToDocument] = useState<
     DocumentedAction[]
   >([maintenanceRunName])
-  const commandDocState = usePromptForInteractionReason(
+  const commandDocState = usePromptForDocumentation(
     [maintenanceRunName],
     onCancelStart,
     initialDocstate
   )
-  const deletionDocState = useGuardedAction()
+  const deletionDocState = useDocumentationState()
 
   const addActionToDocument = useCallback((action: DocumentedAction) => {
     setActionsToDocument(prev => [...prev, action])
