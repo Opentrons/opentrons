@@ -115,9 +115,6 @@ export function PersonalAccountSettings({
               setSaveError(null)
               setIsEditing(false)
             }}
-            onDismissSaveError={() => {
-              setSaveError(null)
-            }}
           />
         ) : (
           <>

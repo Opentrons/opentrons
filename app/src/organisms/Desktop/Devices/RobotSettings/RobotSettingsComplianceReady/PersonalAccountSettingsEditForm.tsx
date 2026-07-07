@@ -21,7 +21,6 @@ export interface PersonalAccountSettingsEditFormProps {
   saveError?: string | null
   onSave: (data: UpdateSelfRequest['data']) => void
   onCancel: () => void
-  onDismissSaveError?: () => void
 }
 
 interface FieldGroupProps {
@@ -45,7 +44,6 @@ export function PersonalAccountSettingsEditForm({
   saveError = null,
   onSave,
   onCancel,
-  onDismissSaveError,
 }: PersonalAccountSettingsEditFormProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const [usernameInput, setUsernameInput] = useState(username)
@@ -113,7 +111,6 @@ export function PersonalAccountSettingsEditForm({
             value={usernameInput}
             onChange={event => {
               setUsernameInput(event.target.value)
-              onDismissSaveError?.()
             }}
           />
         </FieldGroup>
@@ -122,7 +119,6 @@ export function PersonalAccountSettingsEditForm({
             value={fullNameInput}
             onChange={event => {
               setFullNameInput(event.target.value)
-              onDismissSaveError?.()
             }}
           />
         </FieldGroup>
@@ -133,7 +129,6 @@ export function PersonalAccountSettingsEditForm({
             value={password}
             onChange={event => {
               setPassword(event.target.value)
-              onDismissSaveError?.()
               if (confirmPasswordError != null) {
                 setConfirmPasswordError(null)
               }
@@ -147,7 +142,6 @@ export function PersonalAccountSettingsEditForm({
             error={confirmPasswordError ?? saveError}
             onChange={event => {
               setConfirmPassword(event.target.value)
-              onDismissSaveError?.()
               if (confirmPasswordError != null) {
                 setConfirmPasswordError(null)
               }
