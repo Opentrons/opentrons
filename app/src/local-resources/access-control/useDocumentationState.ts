@@ -30,7 +30,7 @@ import type {
  *
  * @param docreport - optional pre-provided documentation report
  */
-export function useGuardedAction(
+export function useDocumentationState(
   docreport?: DocumentationReport
 ): DocumentationState {
   const authSettingsQuery = useAuthSettingsQuery()

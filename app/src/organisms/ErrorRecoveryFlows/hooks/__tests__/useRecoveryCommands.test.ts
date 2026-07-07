@@ -29,8 +29,10 @@ import {
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs')
 vi.mock('/app/organisms/ErrorRecoveryFlows/utils')
-vi.mock('/app/local-resources/access-control/useGuardedAction', () => ({
-  useGuardedAction: vi.fn(() => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: vi.fn(
+    () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+  ),
 }))
 
 describe('useRecoveryCommands', () => {
