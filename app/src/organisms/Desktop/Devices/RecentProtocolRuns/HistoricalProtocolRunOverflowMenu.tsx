@@ -185,7 +185,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const handleDeleteClick: MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    deleteRun(runId)
+    deleteRun({ runId })
     closeOverflowMenu(e)
   }
 

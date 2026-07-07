@@ -177,6 +177,7 @@ async def get_health(
         robot_serial=(await hardware.get_serial_number()),
         disk_details=DiskDetails(
             systemAvailableMb=disk_monitor.get_available_disk_space_mb(),
+            systemTotalMb=disk_monitor.get_total_disk_space_mb(),
             imagesDirectorySizeMb=disk_monitor.get_images_directory_size_mb(),
         ),
     )

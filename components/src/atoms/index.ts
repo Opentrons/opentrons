@@ -1,6 +1,7 @@
 export * from './AnimationVideo'
 export * from './buttons'
 export * from './Checkbox'
+export * from './CheckboxBasic'
 export * from './CheckboxField'
 export * from './Chip'
 export * from './CodeBlock'

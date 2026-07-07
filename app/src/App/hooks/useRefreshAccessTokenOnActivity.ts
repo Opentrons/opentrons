@@ -18,7 +18,7 @@ import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import type { HostConfig, RefreshRequest } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 
-const THROTTLE_SEC = 30
+const THROTTLE_SEC = 10
 
 /**
  * This keeps the user logged in to their robot while they're actively using the UI.
@@ -65,7 +65,7 @@ export function useRefreshAccessTokenOnActivity(): void {
     try {
       const response = await getOAuth2Token(hostConfig, request)
       const expiresIn = response.data.expires_in ?? null
-      const expiresAt = expiresIn != null ? Date.now() + expiresIn : null
+      const expiresAt = expiresIn != null ? Date.now() + expiresIn * 1000 : null
       dispatch(
         refreshLogin({
           robotName,

@@ -28,7 +28,7 @@ class SettingsResponseData(_StrictBaseModel):
     )
     passwordComplexityMinimumLength: int | None = pydantic.Field(
         default=None,
-        description="Minimum length of password. Set to null to remove the limit.",
+        description="Minimum length of passwords, measured in Unicode codepoints. Set to null to remove the length requirement.",
     )
     passwordComplexitySpecialCharacters: bool | None = pydantic.Field(
         default=None,
@@ -81,7 +81,9 @@ class PatchSettingsRequestData(_StrictBaseModel):
     ] = None
     passwordComplexityMinimumLength: Annotated[
         int | None,
-        pydantic.Field(description="Minimum length of password."),
+        pydantic.Field(
+            description="Minimum length of passwords, measured in Unicode codepoints. Set to null to remove the length requirement."
+        ),
     ] = None
     passwordComplexitySpecialCharacters: Annotated[
         bool | None,
