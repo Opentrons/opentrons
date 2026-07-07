@@ -276,7 +276,7 @@ export function getProvider(
     getUpdateDetails: () => currentUpdate.update,
     scanUpdate: (progress: ProgressCallback) => {
       if (currentCheck != null) {
-        return Promise.reject(new Error('Check already ongoing'))
+        return Promise.reject(new Error('ongoing'))
       } else {
         const checkerPromise = updateChecker(progress)
         currentCheck = checkerPromise
@@ -287,7 +287,7 @@ export function getProvider(
     },
     downloadUpdate: (progress: ProgressCallback) => {
       if (currentCheck != null) {
-        return Promise.reject(new Error('Check already ongoing'))
+        return Promise.reject(new Error('ongoing'))
       } else {
         const updaterPromise = updater(progress)
         currentCheck = updaterPromise

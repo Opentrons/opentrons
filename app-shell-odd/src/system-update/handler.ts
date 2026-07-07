@@ -138,17 +138,21 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
               }
             })
             .catch(err => {
-              log.warn(
-                `Error finding updates with ${webProvider.name()}: ${
-                  err.name
-                }: ${err.message}`
-              )
-              return {
-                version: null,
-                files: { system: null, releaseNotes: null },
-                downloadProgress: 0,
-                releaseNotes: null,
-              } as const
+              if (err.name === 'ongoing') {
+                return webUpdate
+              } else {
+                log.warn(
+                  `Error finding updates with ${webProvider.name()}: ${
+                    err.name
+                  }: ${err.message}`
+                )
+                return {
+                  version: null,
+                  files: { system: null, releaseNotes: null },
+                  downloadProgress: 0,
+                  releaseNotes: null,
+                } as const
+              }
             })
             .then(result => {
               webUpdate = result
