@@ -61,8 +61,8 @@ Unnamed box 2 includes the Control Box (vacuum pump and electronics), a deck ada
 </figure>
 
 <figure markdown>
-![Deck plate adapter](images/deck-adapter.png" Deck plate adapter")
-<figcaption>(1) Deck adapter</figcaption>
+![Deck plate adapter](images/deck-plate.png" Deck adapter plate")
+<figcaption>(1) Deck plate adapter</figcaption>
 </figure>
 
 </div>
