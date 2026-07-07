@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Sequence, TypedDict
 
 from pydantic import BaseModel, Field, SecretStr
 
@@ -121,3 +121,30 @@ class ResetPasswordResponse(UserResponse):
             description="The newly generated temporary password for the user.",
         ),
     ]
+
+
+# todo(mm, 2026-06-23): Deduplicate with robot-server's ErrorBody, via server-utils.
+class ErrorBody[ErrorDetailsT](BaseModel):
+    """A general error response envelope. More specific details will be inside `errors`."""
+
+    errors: Sequence[ErrorDetailsT]
+
+
+class PasswordTooShortErrorDetails(BaseModel):
+    """An error when a new password does not meet the configured length requirements."""
+
+    id: Literal["passwordTooShort"]
+    meta: _PasswordTooShortMeta
+
+
+class _PasswordTooShortMeta(TypedDict):
+    """Extra error information specific to PasswordTooShortErrorDetails."""
+
+    requiredLength: int
+    actualLength: int
+
+
+class PasswordMissingSpecialCharactersErrorDetails(BaseModel):
+    """An error response when a new password does not meet the configured special characters requirements."""
+
+    id: Literal["passwordMissingSpecialCharacters"]

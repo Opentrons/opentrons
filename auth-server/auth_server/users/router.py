@@ -17,8 +17,12 @@ from server_utils.fastapi_utils.models.json_api import (
     SimpleEmptyBody,
 )
 
+from auth_server.api_error import APIError
 from auth_server.users.dependencies import get_user_by_username, get_user_data_manager
 from auth_server.users.models import (
+    ErrorBody,
+    PasswordMissingSpecialCharactersErrorDetails,
+    PasswordTooShortErrorDetails,
     ResetPasswordResponse,
     UpdateSelf,
     UpdateUser,
@@ -27,6 +31,8 @@ from auth_server.users.models import (
 )
 from auth_server.users.user_data_manager import (
     InvalidInputError,
+    PasswordMissingSpecialCharactersError,
+    PasswordTooShortError,
     UserAlreadyExistsError,
     UserDataManager,
 )
@@ -41,6 +47,12 @@ router = fastapi.APIRouter()
     description="Create a new user.",
     responses={
         fastapi.status.HTTP_201_CREATED: {"model": SimpleBody[UserResponse]},
+        fastapi.status.HTTP_400_BAD_REQUEST: {
+            "model": ErrorBody[
+                PasswordTooShortErrorDetails
+                | PasswordMissingSpecialCharactersErrorDetails
+            ]
+        },
     },
     dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
@@ -62,11 +74,22 @@ async def post_users(
             account_type=user_create.accountType,
         )
     except UserAlreadyExistsError:
+        # todo(mm, 2026-06-24): Convert this to a more structured error response.
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
             detail="User already exists",
         )
+    except PasswordTooShortError as e:
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST, _build_password_too_short_error(e)
+        ) from e
+    except PasswordMissingSpecialCharactersError as e:
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST,
+            _build_password_missing_special_characters_error(e),
+        ) from e
     except InvalidInputError as e:
+        # todo(mm, 2026-06-24): Convert this to a more structured error response.
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
             detail=str(e),
@@ -129,6 +152,12 @@ async def delete_user(
     description="Update a specific user, identified by their unique username.",
     responses={
         fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
+        fastapi.status.HTTP_400_BAD_REQUEST: {
+            "model": ErrorBody[
+                PasswordTooShortErrorDetails
+                | PasswordMissingSpecialCharactersErrorDetails
+            ]
+        },
     },
     dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
@@ -158,6 +187,15 @@ async def update_user(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
             detail="User already exists",
         )
+    except PasswordTooShortError as e:
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST, _build_password_too_short_error(e)
+        ) from e
+    except PasswordMissingSpecialCharactersError as e:
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST,
+            _build_password_missing_special_characters_error(e),
+        ) from e
     except InvalidInputError as e:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
@@ -242,7 +280,12 @@ async def get_self(  # noqa: D103
     ),
     responses={
         fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
-        fastapi.status.HTTP_400_BAD_REQUEST: {},
+        fastapi.status.HTTP_400_BAD_REQUEST: {
+            "model": ErrorBody[
+                PasswordTooShortErrorDetails
+                | PasswordMissingSpecialCharactersErrorDetails
+            ]
+        },
         fastapi.status.HTTP_401_UNAUTHORIZED: {},
     },
 )
@@ -268,6 +311,15 @@ async def update_self(
             authorization_details.username,
             new_password=request_body.data.password.get_secret_value(),
         )
+    except PasswordTooShortError as e:
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST, _build_password_too_short_error(e)
+        ) from e
+    except PasswordMissingSpecialCharactersError as e:
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST,
+            _build_password_missing_special_characters_error(e),
+        ) from e
     except InvalidInputError as e:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
@@ -276,4 +328,32 @@ async def update_self(
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
         content=SimpleBody(data=result),
+    )
+
+
+def _build_password_too_short_error(
+    error: PasswordTooShortError,
+) -> ErrorBody[PasswordTooShortErrorDetails]:
+    return ErrorBody(
+        errors=[
+            PasswordTooShortErrorDetails(
+                id="passwordTooShort",
+                meta={
+                    "actualLength": error.actual_length,
+                    "requiredLength": error.required_length,
+                },
+            )
+        ]
+    )
+
+
+def _build_password_missing_special_characters_error(
+    error: PasswordMissingSpecialCharactersError,
+) -> ErrorBody[PasswordMissingSpecialCharactersErrorDetails]:
+    return ErrorBody(
+        errors=[
+            PasswordMissingSpecialCharactersErrorDetails(
+                id="passwordMissingSpecialCharacters"
+            )
+        ]
     )

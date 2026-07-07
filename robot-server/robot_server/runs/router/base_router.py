@@ -12,7 +12,6 @@ from typing import Annotated, Callable, Dict, Final, Literal, Optional, Union
 from fastapi import Depends, Query, status
 from pydantic import BaseModel, Field
 
-from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules.absorbance_reader import AbsorbanceReader
 from opentrons.hardware_control.types import EstopState
 from opentrons.protocol_engine import (
@@ -77,7 +76,11 @@ from robot_server.deck_configuration.fastapi_dependencies import (
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
-from robot_server.hardware import get_hardware, get_robot_type_enum
+from robot_server.hardware import (
+    HardwareStateStore,
+    get_hardware_state_store,
+    get_robot_type_enum,
+)
 from robot_server.protocols.dependencies import get_protocol_store
 from robot_server.protocols.protocol_store import (
     ProtocolNotFoundError,
@@ -531,7 +534,7 @@ async def get_run_commands_error(
 async def get_current_state(  # noqa: C901
     runId: str,
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
-    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    hardware_store: Annotated[HardwareStateStore, Depends(get_hardware_state_store)],
     robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
 ) -> PydanticResponse[Body[RunCurrentState, CurrentStateLinks]]:
     """Get current state associated with a run if the run is current.
@@ -539,7 +542,7 @@ async def get_current_state(  # noqa: C901
     Arguments:
         runId: Run ID pulled from URL.
         run_data_manager: Run data retrieval interface.
-        hardware: Hardware control interface.
+        hardware_store: Robot-server store of hardware status.
         robot_type: The type of robot.
     """
     try:
@@ -569,7 +572,7 @@ async def get_current_state(  # noqa: C901
     estop_engaged = False
     place_labware = None
     if robot_type == RobotTypeEnum.FLEX:
-        estop_engaged = hardware.get_estop_state() in [
+        estop_engaged = hardware_store.get_estop_state() in [
             EstopState.PHYSICALLY_ENGAGED,
             EstopState.LOGICALLY_ENGAGED,
         ]
@@ -600,7 +603,7 @@ async def get_current_state(  # noqa: C901
                     and mod.id != command.params.moduleId
                 ):
                     continue
-                for hw_mod in hardware.attached_modules:
+                for hw_mod in hardware_store.attached_modules:
                     if (
                         mod.location is not None
                         and hw_mod.serial_number == mod.serialNumber
