@@ -20,7 +20,7 @@ from .common import (
     RecoverableVacuumHwExceptionTypes,
     VacuumModuleCarboyFullError,
     VacuumModuleDefinedErrorData,
-    VacuumModulePressureNotReachedError,
+    VacuumPressureNotReachedError,
     handle_recoverable_vacuum_error,
 )
 from opentrons.hardware_control.modules.types import (
@@ -221,7 +221,7 @@ class StartRunProfile(
     BaseCommand[
         StartRunProfileParams,
         StartRunProfileResult,
-        VacuumModulePressureNotReachedError | VacuumModuleCarboyFullError,
+        VacuumPressureNotReachedError | VacuumModuleCarboyFullError,
     ]
 ):
     """A command to run a vacuum module profile."""

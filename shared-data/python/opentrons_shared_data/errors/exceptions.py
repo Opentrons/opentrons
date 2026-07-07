@@ -1365,6 +1365,7 @@ class VacuumModulePressureNotReachedError(RoboticsControlError):
         self.target_pressure = target_pressure
         self.current_pressure = current_pressure
         self.mode = mode
+        self.args = (*checked_detail.values(), wrapping)
         super().__init__(
             ErrorCodes.VACUUM_PRESSURE_NOT_REACHED,
             message,
@@ -1387,6 +1388,7 @@ class VacuumModuleWasteFullError(RoboticsControlError):
         checked_detail: Dict[str, str] = detail or {}
         checked_detail["serial"] = serial
         self.serial = serial
+        self.args = (*checked_detail.values(), wrapping)
         super().__init__(
             ErrorCodes.VACUUM_WASTE_CONTAINER_FULL,
             message,

@@ -20,7 +20,7 @@ from .common import (
     RecoverableVacuumHwExceptionTypes,
     VacuumModuleCarboyFullError,
     VacuumModuleDefinedErrorData,
-    VacuumModulePressureNotReachedError,
+    VacuumPressureNotReachedError,
     handle_recoverable_vacuum_error,
 )
 from opentrons.drivers.vacuum_module.driver import (
@@ -172,7 +172,7 @@ class StartSetVacuumPressure(
     BaseCommand[
         StartSetVacuumPressureParams,
         StartSetVacuumPressureResult,
-        VacuumModulePressureNotReachedError | VacuumModuleCarboyFullError,
+        VacuumPressureNotReachedError | VacuumModuleCarboyFullError,
     ]
 ):
     """A command to start the vacuum pump."""

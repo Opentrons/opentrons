@@ -7,9 +7,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.errors.exceptions import (
-    VacuumModulePressureNotReachedError as HwVacuumModulePressureNotReachedError,
-)
-from opentrons_shared_data.errors.exceptions import (
+    VacuumModulePressureNotReachedError,
     VacuumModuleWasteFullError,
 )
 
@@ -18,7 +16,7 @@ from opentrons.protocol_engine.commands.vacuum_module.common import (
     VACUUM_WASTE_CONTAINER_FULL_ERROR_CODE,
     RecoverableVacuumHwExceptions,
     VacuumModuleCarboyFullError,
-    VacuumModulePressureNotReachedError,
+    VacuumPressureNotReachedError,
     defined_error_data_from_task_error,
     handle_recoverable_vacuum_error,
 )
@@ -73,7 +71,7 @@ def test_defined_error_data_from_task_error_maps_pressure_not_reached(
     result = defined_error_data_from_task_error(task_error, model_utils)
 
     assert result is not None
-    assert isinstance(result.public, VacuumModulePressureNotReachedError)
+    assert isinstance(result.public, VacuumPressureNotReachedError)
     assert result.public.errorType == "vacuumPressureNotReached"
     assert result.public.errorInfo == {
         "mode": "pressure",
@@ -111,7 +109,7 @@ def test_handle_recoverable_vacuum_error_maps_pressure_not_reached(
     decoy.when(model_utils.generate_id()).then_return("defined-error-id")
 
     result = handle_recoverable_vacuum_error(
-        HwVacuumModulePressureNotReachedError(
+        VacuumModulePressureNotReachedError(
             "VM123",
             -100.0,
             -75.0,
@@ -121,7 +119,7 @@ def test_handle_recoverable_vacuum_error_maps_pressure_not_reached(
         model_utils,
     )
 
-    assert isinstance(result.public, VacuumModulePressureNotReachedError)
+    assert isinstance(result.public, VacuumPressureNotReachedError)
     assert result.public.errorType == "vacuumPressureNotReached"
     assert result.public.errorInfo == {
         "mode": "power",

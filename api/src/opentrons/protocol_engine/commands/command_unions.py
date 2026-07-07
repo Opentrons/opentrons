@@ -1017,7 +1017,7 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[FlexStackerLabwareRetrieveError],
     DefinedErrorData[FlexStackerShuttleOccupiedError],
     DefinedErrorData[FlexStackerLabwareStoreError],
-    DefinedErrorData[vacuum_module.VacuumModulePressureNotReachedError],
+    DefinedErrorData[vacuum_module.VacuumPressureNotReachedError],
     DefinedErrorData[vacuum_module.VacuumModuleCarboyFullError],
 ]
 

@@ -7,12 +7,8 @@ from typing import Literal, Mapping, TypedDict, Union, cast
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.errors.exceptions import (
     EnumeratedError,
-)
-from opentrons_shared_data.errors.exceptions import (
-    VacuumModulePressureNotReachedError as HwVacuumModulePressureNotReachedError,
-)
-from opentrons_shared_data.errors.exceptions import (
-    VacuumModuleWasteFullError as HwVacuumModuleWasteFullError,
+    VacuumModulePressureNotReachedError,
+    VacuumModuleWasteFullError,
 )
 
 from ...commands.command import DefinedErrorData
@@ -44,7 +40,7 @@ class FailedOperation(TypedDict, total=False):
     current: float
 
 
-class VacuumModulePressureNotReachedError(ErrorOccurrence):
+class VacuumPressureNotReachedError(ErrorOccurrence):
     """Returned when the target pressure is not reached within a timeout."""
 
     isDefined: bool = True
@@ -69,17 +65,17 @@ class VacuumModuleCarboyFullError(ErrorOccurrence):
 
 
 VacuumModuleDefinedErrorData = Union[
-    DefinedErrorData[VacuumModulePressureNotReachedError],
+    DefinedErrorData[VacuumPressureNotReachedError],
     DefinedErrorData[VacuumModuleCarboyFullError],
 ]
 
 RecoverableVacuumHwExceptionTypes = (
-    HwVacuumModulePressureNotReachedError,
-    HwVacuumModuleWasteFullError,
+    VacuumModulePressureNotReachedError,
+    VacuumModuleWasteFullError,
 )
 
 RecoverableVacuumHwExceptions = (
-    HwVacuumModulePressureNotReachedError | HwVacuumModuleWasteFullError
+    VacuumModulePressureNotReachedError | VacuumModuleWasteFullError
 )
 
 
@@ -102,7 +98,7 @@ def handle_recoverable_vacuum_error(
         error=error,
     )
 
-    if isinstance(error, HwVacuumModuleWasteFullError):
+    if isinstance(error, VacuumModuleWasteFullError):
         return DefinedErrorData(
             public=VacuumModuleCarboyFullError(
                 id=model_utils.generate_id(),
@@ -113,9 +109,9 @@ def handle_recoverable_vacuum_error(
             state_update_if_false_positive=state_update,
         )
 
-    elif isinstance(error, HwVacuumModulePressureNotReachedError):
+    elif isinstance(error, VacuumModulePressureNotReachedError):
         return DefinedErrorData(
-            public=VacuumModulePressureNotReachedError(
+            public=VacuumPressureNotReachedError(
                 id=model_utils.generate_id(),
                 createdAt=timestamp,
                 wrappedErrors=[wrapped_error],
@@ -194,7 +190,7 @@ def defined_error_data_from_task_error(
     elif error_code == VACUUM_PRESSURE_NOT_REACHED_ERROR_CODE:
         mode_value = task_error.errorInfo.get("mode", VacuumOperationMode.PRESSURE)
         return DefinedErrorData(
-            public=VacuumModulePressureNotReachedError(
+            public=VacuumPressureNotReachedError(
                 id=error_id,
                 createdAt=timestamp,
                 wrappedErrors=[task_error],

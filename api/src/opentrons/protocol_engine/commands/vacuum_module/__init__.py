@@ -9,7 +9,7 @@ from .close_vent import (
 )
 from .common import (
     VacuumModuleCarboyFullError,
-    VacuumModulePressureNotReachedError,
+    VacuumPressureNotReachedError,
 )
 from .open_vent import (
     OpenVent,
@@ -55,7 +55,7 @@ from .stop_vacuum import (
 __all__ = [
     # Vacuum module defined errors
     "VacuumModuleCarboyFullError",
-    "VacuumModulePressureNotReachedError",
+    "VacuumPressureNotReachedError",
     # Stop vacuum command models
     "StopVacuum",
     "StopVacuumCommandType",

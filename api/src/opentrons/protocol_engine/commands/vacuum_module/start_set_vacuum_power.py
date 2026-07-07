@@ -20,7 +20,7 @@ from .common import (
     RecoverableVacuumHwExceptionTypes,
     VacuumModuleCarboyFullError,
     VacuumModuleDefinedErrorData,
-    VacuumModulePressureNotReachedError,
+    VacuumPressureNotReachedError,
     handle_recoverable_vacuum_error,
 )
 from opentrons.protocol_engine.resources import ModelUtils
@@ -167,7 +167,7 @@ class StartSetVacuumPower(
     BaseCommand[
         StartSetVacuumPowerParams,
         StartSetVacuumPowerResult,
-        VacuumModulePressureNotReachedError | VacuumModuleCarboyFullError,
+        VacuumPressureNotReachedError | VacuumModuleCarboyFullError,
     ]
 ):
     """A command to set the vacuum pump power."""
