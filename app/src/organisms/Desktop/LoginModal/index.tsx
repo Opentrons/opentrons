@@ -243,72 +243,71 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
     }
   })()
 
+  if (showRobotCertImportModal) {
+    return createPortal(
+      <RobotCertImportModal
+        onClose={() => {
+          setShowRobotCertImportModal(false)
+        }}
+      />,
+      getTopPortalEl()
+    )
+  }
+
   return createPortal(
-    <>
-      {showRobotCertImportModal
-        ? createPortal(
-            <RobotCertImportModal
-              onClose={() => {
-                setShowRobotCertImportModal(false)
-              }}
-            />,
-            getTopPortalEl()
-          )
-        : null}
-      <Modal
-        title={t('access_control:desktop_login_modal_header')}
-        onClose={handleClose}
-        footer={<div className={styles.modal_footer_container}>{footer}</div>}
-      >
-        <div className={styles.content_container}>
-          {screen.kind === 'login' ? (
-            <LoginView
-              formId={loginFormId}
-              formData={screen.formData}
-              onSubmit={handleLoginSubmit}
-              onUsernameChange={value => {
-                updateLoginFormData(setScreen, { username: value, error: null })
-              }}
-              onLogInPasswordChange={value => {
-                updateLoginFormData(setScreen, {
-                  logInPassword: value,
-                  error: null,
-                })
-              }}
-              onForgotPasswordClick={() => {
-                setScreen({ kind: 'forgotPassword', formData: screen.formData })
-              }}
-            />
-          ) : screen.kind === 'forgotPassword' ? (
-            <ForgotPasswordView />
-          ) : (
-            <SetNewPasswordView
-              formData={screen.formData}
-              onNewPasswordChange={value => {
-                updateSetNewPasswordFormData(setScreen, {
-                  newPassword: value,
-                  error: null,
-                  confirmPasswordError: null,
-                })
-              }}
-              onConfirmPasswordChange={value => {
-                updateSetNewPasswordFormData(setScreen, {
-                  confirmPassword: value,
-                  error: null,
-                  confirmPasswordError: null,
-                })
-              }}
-              onPasswordFieldBlur={() => {
-                const { newPassword, confirmPassword } = screen.formData
-                if (newPassword !== '' && confirmPassword !== '') {
-                  validateConfirmPasswordMatch(screen.formData)
-                }
-              }}
-            />
-          )}
-        </div>
-      </Modal>
-    </>,
+    <Modal
+      title={t('access_control:desktop_login_modal_header')}
+      onClose={handleClose}
+      footer={<div className={styles.modal_footer_container}>{footer}</div>}
+    >
+      <div className={styles.content_container}>
+        {screen.kind === 'login' ? (
+          <LoginView
+            formId={loginFormId}
+            formData={screen.formData}
+            onSubmit={handleLoginSubmit}
+            onUsernameChange={value => {
+              updateLoginFormData(setScreen, { username: value, error: null })
+            }}
+            onLogInPasswordChange={value => {
+              updateLoginFormData(setScreen, {
+                logInPassword: value,
+                error: null,
+              })
+            }}
+            onForgotPasswordClick={() => {
+              setScreen({ kind: 'forgotPassword', formData: screen.formData })
+            }}
+          />
+        ) : screen.kind === 'forgotPassword' ? (
+          <ForgotPasswordView />
+        ) : (
+          <SetNewPasswordView
+            formData={screen.formData}
+            onNewPasswordChange={value => {
+              updateSetNewPasswordFormData(setScreen, {
+                newPassword: value,
+                error: null,
+                confirmPasswordError: null,
+              })
+            }}
+            onConfirmPasswordChange={value => {
+              updateSetNewPasswordFormData(setScreen, {
+                confirmPassword: value,
+                error: null,
+                confirmPasswordError: null,
+              })
+            }}
+            onPasswordFieldBlur={() => {
+              const { newPassword, confirmPassword } = screen.formData
+              if (newPassword !== '' && confirmPassword !== '') {
+                validateConfirmPasswordMatch(screen.formData)
+              }
+            }}
+          />
+        )}
+      </div>
+    </Modal>,
     getTopPortalEl()
   )
 }
