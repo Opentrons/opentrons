@@ -276,7 +276,8 @@ export function getProvider(
     getUpdateDetails: () => currentUpdate.update,
     scanUpdate: (progress: ProgressCallback) => {
       if (currentCheck != null) {
-        return Promise.reject(new Error('Check already ongoing'))
+        // callers check for this exact message. im sorry
+        return Promise.reject(new Error('ongoing'))
       } else {
         const checkerPromise = updateChecker(progress)
         currentCheck = checkerPromise
@@ -287,7 +288,8 @@ export function getProvider(
     },
     downloadUpdate: (progress: ProgressCallback) => {
       if (currentCheck != null) {
-        return Promise.reject(new Error('Check already ongoing'))
+        // callers check for this exact message. im sorry
+        return Promise.reject(new Error('ongoing'))
       } else {
         const updaterPromise = updater(progress)
         currentCheck = updaterPromise
@@ -299,6 +301,7 @@ export function getProvider(
 
     teardown: () => {
       lockCache()
+      log.warn('tearing down and removing cache dir because teardown()')
       return rm(from.updateCacheDirectory, { recursive: true, force: true })
     },
     lockUpdateCache: lockCache,

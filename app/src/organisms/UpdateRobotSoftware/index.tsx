@@ -70,9 +70,7 @@ export function UpdateRobotSoftware(
   if (step === 'finished') {
     return <CompleteUpdateSoftware robotName={robotName} />
   } else {
-    if (isDownloading && (step === 'restart' || step === 'restarting')) {
-      updateType = 'downloading'
-    } else if (step === 'getToken' || step === 'uploadFile') {
+    if (step === 'getToken' || step === 'uploadFile') {
       updateType = 'sendingFile'
     } else if (step === 'processFile' || step === 'commitUpdate') {
       if (stage === 'awaiting-file' || stage === 'validating') {
@@ -81,6 +79,8 @@ export function UpdateRobotSoftware(
         updateType = 'installing'
         beforeCommittingSuccessfulUpdate && beforeCommittingSuccessfulUpdate()
       }
+    } else if (isDownloading) {
+      updateType = 'downloading'
     }
     return <UpdateSoftware updateType={updateType} />
   }

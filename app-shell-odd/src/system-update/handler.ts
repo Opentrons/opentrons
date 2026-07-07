@@ -138,17 +138,21 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
               }
             })
             .catch(err => {
-              log.warn(
-                `Error finding updates with ${webProvider.name()}: ${
-                  err.name
-                }: ${err.message}`
-              )
-              return {
-                version: null,
-                files: { system: null, releaseNotes: null },
-                downloadProgress: 0,
-                releaseNotes: null,
-              } as const
+              if (err?.message === 'ongoing') {
+                return webUpdate
+              } else {
+                log.warn(
+                  `Error finding updates with ${webProvider.name()}: ${
+                    err.name
+                  }: ${err.message}`
+                )
+                return {
+                  version: null,
+                  files: { system: null, releaseNotes: null },
+                  downloadProgress: 0,
+                  releaseNotes: null,
+                } as const
+              }
             })
             .then(result => {
               webUpdate = result
@@ -166,57 +170,69 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
                 })
               }
             })
-        case 'robotUpdate:DOWNLOAD_UPDATE':
-          return webProvider
-            .downloadUpdate(updateStatus => {
-              webUpdate = updateStatus
-              if (
-                updateStatus.version != null &&
-                updateStatus.files.system == null &&
-                updateStatus.downloadProgress === 0
-              ) {
-                dispatch({
-                  type: 'robotUpdate:UPDATE_VERSION',
-                  payload: {
-                    version: updateStatus.version,
-                    force: false,
-                    target: 'flex',
-                  },
-                })
-              } else if (
-                updateStatus.version != null &&
-                updateStatus.files.system == null &&
-                updateStatus.downloadProgress !== 0
-              ) {
-                dispatch({
-                  // TODO: change this action type to 'systemUpdate:DOWNLOAD_PROGRESS'
-                  type: 'robotUpdate:DOWNLOAD_PROGRESS',
-                  payload: {
-                    progress: updateStatus.downloadProgress,
-                    target: 'flex',
-                  },
-                })
-              } else if (updateStatus.files.system != null) {
+        case 'robotUpdate:DOWNLOAD_UPDATE': {
+          const check = webProvider.ongoingCheck() ?? Promise.resolve()
+          log.info('enqueueing download now')
+          return check.then(() => {
+            log.info('beginning download of robot update now')
+            let lastProgress = 0
+            return webProvider
+              .downloadUpdate(updateStatus => {
+                webUpdate = updateStatus
+                if (
+                  updateStatus.version != null &&
+                  updateStatus.files.system == null &&
+                  updateStatus.downloadProgress === 0
+                ) {
+                  dispatch({
+                    type: 'robotUpdate:UPDATE_VERSION',
+                    payload: {
+                      version: updateStatus.version,
+                      force: false,
+                      target: 'flex',
+                    },
+                  })
+                } else if (
+                  updateStatus.version != null &&
+                  updateStatus.files.system == null &&
+                  updateStatus.downloadProgress !== 0
+                ) {
+                  if (updateStatus.downloadProgress - lastProgress >= 1) {
+                    dispatch({
+                      // TODO: change this action type to 'systemUpdate:DOWNLOAD_PROGRESS'
+                      type: 'robotUpdate:DOWNLOAD_PROGRESS',
+                      payload: {
+                        progress: updateStatus.downloadProgress,
+                        target: 'flex',
+                      },
+                    })
+                    lastProgress = updateStatus.downloadProgress
+                  }
+                } else if (updateStatus.files.system != null) {
+                  dispatchStaticUpdateData()
+                }
+              })
+              .catch(err => {
+                log.warn(
+                  `Error finding updates with ${webProvider.name()}: ${
+                    err.name
+                  }: ${err.message}`
+                )
+                return {
+                  version: null,
+                  files: { system: null, releaseNotes: null },
+                  downloadProgress: 0,
+                  releaseNotes: null,
+                } as const
+              })
+              .then(result => {
+                log.info('Update download complete')
+                webUpdate = result
                 dispatchStaticUpdateData()
-              }
-            })
-            .catch(err => {
-              log.warn(
-                `Error finding updates with ${webProvider.name()}: ${
-                  err.name
-                }: ${err.message}`
-              )
-              return {
-                version: null,
-                files: { system: null, releaseNotes: null },
-                downloadProgress: 0,
-                releaseNotes: null,
-              } as const
-            })
-            .then(result => {
-              webUpdate = result
-              dispatchStaticUpdateData()
-            })
+                dispatch({ type: 'robotUpdate:DOWNLOAD_DONE', payload: 'flex' })
+              })
+          })
+        }
         case 'shell:ROBOT_MASS_STORAGE_DEVICE_ENUMERATED':
           log.info(
             `mass storage device enumerated at ${action.payload.rootPath}`
