@@ -1,0 +1,47 @@
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+
+import { Icon, InputField } from '@opentrons/components'
+
+import styles from './passwordinputfield.module.css'
+
+import type { ChangeEvent, FocusEvent, JSX } from 'react'
+
+export interface PasswordInputFieldProps {
+  value: string
+  error?: string | null
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void
+  onBlur?: (event: FocusEvent<HTMLInputElement>) => void
+}
+
+export function PasswordInputField({
+  value,
+  error,
+  onChange,
+  onBlur,
+}: PasswordInputFieldProps): JSX.Element {
+  const { t } = useTranslation('device_settings')
+  const [showPassword, setShowPassword] = useState(false)
+
+  return (
+    <InputField
+      type={showPassword ? 'text' : 'password'}
+      value={value}
+      error={error}
+      onChange={onChange}
+      onBlur={onBlur}
+      rightElement={
+        <button
+          type="button"
+          className={styles.password_visibility_button}
+          aria-label={t('toggle_password_visibility')}
+          onClick={() => {
+            setShowPassword(current => !current)
+          }}
+        >
+          <Icon name={showPassword ? 'eye-slash' : 'eye'} size="1.25rem" />
+        </button>
+      }
+    />
+  )
+}
