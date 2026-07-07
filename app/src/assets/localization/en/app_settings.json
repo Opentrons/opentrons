@@ -52,6 +52,7 @@
   "error_boundary_title": "An unknown error has occurred",
   "error_recovery_mode": "Recovery mode",
   "error_recovery_mode_description": "Pause on protocol errors instead of canceling the run.",
+  "exit_sleep_mode": "Exit sleep mode",
   "feature_flags": "Feature Flags",
   "general": "General",
   "get_update": "get update",
