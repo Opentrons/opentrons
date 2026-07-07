@@ -246,7 +246,7 @@ class RobotServerPyroResource:
         if self._notify_publishers:
 
             def call_soon_notify_publishers() -> None:
-                # Call soon on the thread notification publisher locally executes from
+                # Call soon on the thread notification publisher locally executes
                 assert self._notify_publishers is not None
                 self._loop.call_soon_threadsafe(self._notify_publishers)
 
