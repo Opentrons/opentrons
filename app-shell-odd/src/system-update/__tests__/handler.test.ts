@@ -406,6 +406,82 @@ describe('update driver', () => {
         })
       })
   })
+  it('does not clear update data if a scan fails because a check is ongoing', async () => {
+    const thisSubject = subject!
+    when(getConfig)
+      .calledWith('update')
+      .thenReturn({ automaticallyDownloadUpdates: false })
+    when(fakeProvider.scanUpdate)
+      .calledWith(expect.any(Function))
+      .thenDo(
+        progress =>
+          new Promise(resolve => {
+            progress({
+              version: '1.2.3',
+              files: {
+                system: null,
+                releaseNotes: '/some/path/to/releasenotes.md',
+              },
+              downloadProgress: 0,
+              releaseNotes: 'hello',
+            })
+            resolve({
+              version: '1.2.3',
+              files: {
+                system: null,
+                releaseNotes: '/some/path/to/releasenotes.md',
+              },
+              downloadProgress: 0,
+              releaseNotes: 'hello',
+            })
+          })
+      )
+    await thisSubject.handleAction({
+      type: 'shell:CHECK_UPDATE',
+      meta: { shell: true },
+    })
+    expect(dispatch).toHaveBeenNthCalledWith(1, {
+      type: 'robotUpdate:UPDATE_VERSION',
+      payload: { version: '1.2.3', force: false, target: 'flex' },
+    })
+    expect(dispatch).toHaveBeenNthCalledWith(2, {
+      type: 'robotUpdate:UPDATE_INFO',
+      payload: {
+        version: '1.2.3',
+        force: false,
+        target: 'flex',
+        releaseNotes: 'hello',
+      },
+    })
+    when(fakeProvider.scanUpdate)
+      .calledWith(expect.any(Function))
+      .thenReject(new Error('ongoing'))
+    await thisSubject.handleAction({
+      type: 'shell:CHECK_UPDATE',
+      meta: { shell: true },
+    })
+    expect(dispatch).toHaveBeenNthCalledWith(3, {
+      type: 'robotUpdate:UPDATE_VERSION',
+      payload: {
+        version: '1.2.3',
+        force: false,
+        target: 'flex',
+      },
+    })
+    expect(dispatch).toHaveBeenNthCalledWith(4, {
+      type: 'robotUpdate:UPDATE_INFO',
+      payload: {
+        version: '1.2.3',
+        force: false,
+        target: 'flex',
+        releaseNotes: 'hello',
+      },
+    })
+    expect(dispatch).not.toHaveBeenCalledWith({
+      type: 'robotUpdate:UPDATE_VERSION',
+      payload: { version: null, force: false, target: 'flex' },
+    })
+  })
   it('downloads updates when told and no USB updates are present and updates are on', () => {
     when(getConfig)
       .calledWith('update')

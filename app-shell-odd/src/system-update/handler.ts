@@ -138,7 +138,7 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
               }
             })
             .catch(err => {
-              if (err.name === 'ongoing') {
+              if (err?.message === 'ongoing') {
                 return webUpdate
               } else {
                 log.warn(
