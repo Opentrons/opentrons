@@ -299,6 +299,7 @@ export function getProvider(
 
     teardown: () => {
       lockCache()
+      log.warn('tearing down and removing cache dir because teardown()')
       return rm(from.updateCacheDirectory, { recursive: true, force: true })
     },
     lockUpdateCache: lockCache,

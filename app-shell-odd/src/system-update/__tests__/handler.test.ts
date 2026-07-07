@@ -493,7 +493,7 @@ describe('update driver', () => {
         progress =>
           new Promise(resolve => {
             progress({
-              version: null,
+              version: '1.2.3',
               files: { system: null, releaseNotes: null },
               downloadProgress: 0,
               releaseNotes: null,
@@ -501,13 +501,19 @@ describe('update driver', () => {
             progress({
               version: '1.2.3',
               files: { system: null, releaseNotes: null },
-              downloadProgress: 0,
+              downloadProgress: 1,
               releaseNotes: null,
             })
             progress({
               version: '1.2.3',
               files: { system: null, releaseNotes: null },
               downloadProgress: 50,
+              releaseNotes: null,
+            })
+            progress({
+              version: '1.2.3',
+              files: { system: null, releaseNotes: null },
+              downloadProgress: 50.1,
               releaseNotes: null,
             })
             progress({
@@ -542,22 +548,17 @@ describe('update driver', () => {
         })
         expect(dispatch).toHaveBeenNthCalledWith(2, {
           type: 'robotUpdate:DOWNLOAD_PROGRESS',
-          payload: { progress: 50, target: 'flex' },
+          payload: { progress: 1, target: 'flex' },
         })
         expect(dispatch).toHaveBeenNthCalledWith(3, {
-          type: 'robotUpdate:UPDATE_INFO',
-          payload: {
-            version: '1.2.3',
-            releaseNotes: 'some release notes',
-            force: false,
-            target: 'flex',
-          },
+          type: 'robotUpdate:DOWNLOAD_PROGRESS',
+          payload: { progress: 50, target: 'flex' },
+        })
+        expect(dispatch).not.toHaveBeenCalledWith({
+          type: 'robotUpdate:DOWNLOAD_PROGRESS',
+          payload: { progress: 50.1, target: 'flex' },
         })
         expect(dispatch).toHaveBeenNthCalledWith(4, {
-          type: 'robotUpdate:UPDATE_VERSION',
-          payload: { version: '1.2.3', force: false, target: 'flex' },
-        })
-        expect(dispatch).toHaveBeenNthCalledWith(5, {
           type: 'robotUpdate:UPDATE_INFO',
           payload: {
             version: '1.2.3',
@@ -566,9 +567,26 @@ describe('update driver', () => {
             target: 'flex',
           },
         })
-        expect(dispatch).toHaveBeenNthCalledWith(6, {
+        expect(dispatch).toHaveBeenNthCalledWith(5, {
           type: 'robotUpdate:UPDATE_VERSION',
           payload: { version: '1.2.3', force: false, target: 'flex' },
+        })
+        expect(dispatch).toHaveBeenNthCalledWith(6, {
+          type: 'robotUpdate:UPDATE_INFO',
+          payload: {
+            version: '1.2.3',
+            releaseNotes: 'some release notes',
+            force: false,
+            target: 'flex',
+          },
+        })
+        expect(dispatch).toHaveBeenNthCalledWith(7, {
+          type: 'robotUpdate:UPDATE_VERSION',
+          payload: { version: '1.2.3', force: false, target: 'flex' },
+        })
+        expect(dispatch).toHaveBeenNthCalledWith(8, {
+          type: 'robotUpdate:DOWNLOAD_DONE',
+          payload: 'flex',
         })
       })
   })
