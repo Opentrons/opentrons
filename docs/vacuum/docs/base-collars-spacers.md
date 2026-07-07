@@ -7,11 +7,11 @@ Module deck components consist of a vacuum base, interchangeable collars, and in
 
 ## Vacuum base
 
-The vacuum base sits directly on the deck plate adapter. It serves as the foundation of the module's hardware stack, supporting all internal spacers, collars, and protocol labware.
+The vacuum base sits directly on its own deck plate. The vacuum base serves as the foundation of the module's hardware stack, supporting all internal spacers, collars, and protocol labware.
 
 <figure markdown>
   ![Vacuum base](images/vacuum-module-base.svg){ width="90%" }
-  <figcaption>Vacuum base with quick-connect manifold.</figcaption>
+  <figcaption>Vacuum base with quick-connect manifold</figcaption>
 </figure>
 
 When connected to the off-deck waste carboy and Control Box, negative pressure draws liquid down cleanly through the module assembly. The vacuum base collects this fluid, routing it into an internal collection plate or out to the external 2-liter waste jar via the attached 6 mm hose.
