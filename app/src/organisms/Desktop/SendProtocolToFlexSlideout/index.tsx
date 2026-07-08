@@ -58,6 +58,7 @@ export function SendProtocolToFlexSlideout(
 
   const token = useAccessTokenForRobot(selectedRobot?.name ?? null)
 
+  // TODO(jj, 2026-07-08): Remove all manual host configs
   const hostConfig = useMemo(() => {
     return selectedRobot != null
       ? {

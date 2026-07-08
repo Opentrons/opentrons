@@ -175,16 +175,7 @@ export function ChooseProtocolSlideoutComponent(
     robot.ip
   )
 
-  const { uploadCsvFile } = useUploadCsvFileMutation(
-    {},
-    robot != null
-      ? {
-          hostname: robot.ip,
-          requestor:
-            robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined,
-        }
-      : null
-  )
+  const { uploadCsvFile } = useUploadCsvFileMutation()
 
   const srcFileObjects =
     selectedProtocol != null
@@ -221,7 +212,7 @@ export function ChooseProtocolSlideoutComponent(
         })
       },
     },
-    { hostname: robot.ip },
+    undefined,
     shouldApplyOffsets
       ? offsetCandidates.map(({ vector, location, definitionUri }) => ({
           vector,
@@ -671,7 +662,7 @@ export function ChooseProtocolSlideoutComponent(
       maxSteps={hasRunTimeParameters ? 2 : 1}
       title={t('choose_protocol_to_run', { name })}
       footer={
-        <ApiHostProvider robotName={name}>
+        <>
           {currentPage === 1
             ? !isFlex && (
                 <LegacyApplyHistoricOffsets
@@ -697,7 +688,7 @@ export function ChooseProtocolSlideoutComponent(
               )
             : null}
           {hasRunTimeParameters ? multiPageFooter : singlePageFooter}
-        </ApiHostProvider>
+          </>
       }
     >
       {showSlideout ? (
