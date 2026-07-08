@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Update Opentrons Flex (OT-3) system software from GitHub or a local zip, over network or USB.
 
+Script location (from monorepo root)::
+
+    .cursor/skills/Regression_test_tooling/scripts/update_robot.py
+
 Requires: httpx — install into the *same* interpreter you use to run this script::
 
     python3 -m pip install httpx
@@ -8,12 +12,45 @@ Requires: httpx — install into the *same* interpreter you use to run this scri
 (On macOS, ``pip install`` alone may target pyenv/Homebrew while ``python3`` is
 Apple CommandLineTools — use ``python3 -m pip``.) For ``--usb``: ``python3 -m pip install pyserial``.
 
-Usage:
-    # Over network (robot has IP)
-    python update_robot.py 10.14.19.233 --version 8.8.1
-    python update_robot.py 10.14.19.233 --file /path/to/ot3-system-8.8.1.zip -y
-    # Over USB (Flex/OT-3 only; Wi‑Fi can be off). Requires --file.
-    python update_robot.py --usb --file .cursor/skills/robot-ip-health/scripts/ot3-system-8.8.1.zip -y
+Consecutive updates (demo progression)
+----------------------------------------
+Apply four versions **in order**, waiting for the robot to come back after each restart::
+
+    8.8.1  →  9.0.0  →  8.7.0  →  9.0.0
+
+**Wi‑Fi / Ethernet** — script downloads each zip from GitHub (replace IP with your robot)::
+
+    python .cursor/skills/Regression_test_tooling/scripts/update_robot.py 10.14.19.233 \\
+        --version 8.8.1 9.0.0 8.7.0 9.0.0 \\
+        --yes
+
+**USB** — Wi‑Fi can be off; pass one ``--file`` per step (version is read from each filename)::
+
+    python .cursor/skills/Regression_test_tooling/scripts/update_robot.py --usb \\
+        --file .cursor/skills/Regression_test_tooling/scripts/ot3-system-8.8.1.zip \\
+        --file .cursor/skills/Regression_test_tooling/scripts/ot3-system-9.0.0.zip \\
+        --file .cursor/skills/Regression_test_tooling/scripts/ot3-system-8.7.0.zip \\
+        --file .cursor/skills/Regression_test_tooling/scripts/ot3-system-9.0.0.zip \\
+        --yes
+
+The script prints ``Update 1/4``, ``Update 2/4``, … and a state table after each step.
+
+Other usage (run from monorepo root)
+------------------------------------
+
+Single version over Wi‑Fi::
+
+    python .cursor/skills/Regression_test_tooling/scripts/update_robot.py 10.14.19.233 --version 8.8.1
+
+Single version over USB (local zip only)::
+
+    python .cursor/skills/Regression_test_tooling/scripts/update_robot.py --usb \\
+        --file .cursor/skills/Regression_test_tooling/scripts/ot3-system-8.8.1.zip -y
+
+Local dev server (update-server on port 34000)::
+
+    python .cursor/skills/Regression_test_tooling/scripts/update_robot.py localhost \\
+        --version 8.8.1 --port 34000 --yes
 """
 
 import argparse

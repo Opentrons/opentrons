@@ -1,13 +1,13 @@
 ---
 name: e2e-testing
-description: E2E testing conventions for Protocol Designer and Labware Library using Playwright + pytest in e2e-testing/. Use when writing, running, or modifying end-to-end tests, page objects, or Playwright tests.
+description: E2E testing conventions for Protocol Designer, Labware Library, and the Opentrons desktop app using Playwright + pytest in e2e-testing/. Use when writing, running, or modifying end-to-end tests, page objects, or Playwright tests.
 ---
 
 # E2E Testing Instructions
 
 ## Project Overview
 
-The `e2e-testing` directory contains end-to-end tests for **Protocol Designer (PD)** and **Labware Library (LL)** using:
+The `e2e-testing` directory contains end-to-end tests for **Protocol Designer (PD)**, **Labware Library (LL)**, and the **Opentrons desktop app (Electron)** using:
 
 - **Playwright** — Browser automation (Chromium)
 - **pytest** — Test framework
@@ -20,8 +20,12 @@ The `e2e-testing` directory contains end-to-end tests for **Protocol Designer (P
 - `automation/base_page.py` — Shared `BasePage` class inherited by all page objects
 - `automation/pd_pages/` — PD page objects (import from `automation.pd_pages`)
 - `automation/ll_pages/` — LL page objects (import from `automation.ll_pages`)
+- `automation/app_pages/` — Opentrons desktop app page objects (import from `automation.app_pages`)
+- `automation/app_helpers/` — Electron CDP launch, robot USB/Wi-Fi checks, reporting
 - `tests/pd/` — PD E2E tests (marked `@pytest.mark.pdE2E`)
 - `tests/ll/` — LL E2E tests (marked `@pytest.mark.llE2E`)
+- `tests/app/` — Opentrons app tests (`@pytest.mark.smoke`, `@pytest.mark.device_cards`)
+- `open_app.py`, `configure_robot.py`, `main_script.py` — app suite entry points
 - `fixtures/` — Protocol JSON files, labware definitions, and test data
 
 ## Architecture — Page Object Model
@@ -170,6 +174,20 @@ make test-ll-local-headed                        # Headed
 make test-ll-staging                             # Against staging
 make test-ll-prod                                # Against prod
 ```
+
+**Running Opentrons App (Electron) tests:**
+
+```bash
+make configure-robot                             # Write .env (robot name, IP, protocol)
+make check-robot                                 # USB/Wi-Fi health preflight
+make test-app                                    # Full app suite
+make test-app-nav                                # Navigation smoke only
+make test-app-nav-headed                         # Headed Electron window
+make test-app-device-cards-headed                # Device card exercises
+python main_script.py fake-robot tests/app/nav/  # Positional fake-robot profile
+```
+
+App tests use session fixture `run_local_app` (not `page`). Key env vars: `ROBOT_NAME`, `ROBOT_IP`, `PROTOCOL_NAME`, `HEADED`, `ATTACH`.
 
 **Other targets:**
 
