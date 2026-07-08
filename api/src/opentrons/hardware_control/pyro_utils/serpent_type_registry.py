@@ -18,6 +18,7 @@ import opentrons.calibration_storage.types
 import opentrons.config.types
 import opentrons.drivers.rpi_drivers.types
 import opentrons.drivers.types
+import opentrons.drivers.vacuum_module.types
 import opentrons.hardware_control.dev_types
 import opentrons.hardware_control.instruments.ot3.instrument_calibration
 import opentrons.hardware_control.modules.module_calibration
@@ -37,6 +38,8 @@ from opentrons.util.pyro.pyro_serialization import (
     register_enumerated_errors,
     register_type_to_serpent,
     serpent_enum_registration,
+    enumerated_error_class_to_dict,
+    enumerated_error_dict_to_class,
 )
 
 Pyro5.config.SERPENT_BYTES_REPR = True  # type: ignore
@@ -506,38 +509,6 @@ def _error_notif_dict_to_class(  # type: ignore
     )
 
 
-# enumerate error helpers
-def _enumerated_error_deconstructor(e_obj) -> Dict:  # type: ignore
-    # unzip the error and any nested ones
-    return {
-        "code": e_obj.code,
-        "message": e_obj.message,
-        "detail": e_obj.detail,
-        "wrapping": None
-        if e_obj.wrapping is None
-        else [
-            _enumerated_error_deconstructor(wrapped_item)
-            for wrapped_item in e_obj.wrapping
-        ],
-    }
-
-
-def _enumerated_error_reconstructor(
-    e_dict: Dict[str, Any],
-) -> opentrons.hardware_control.types.EnumeratedError:  # type: ignore
-    # reassmble the error and any nested ones
-    return opentrons.hardware_control.types.EnumeratedError(  # type: ignore
-        code=opentrons_shared_data.errors.codes.ErrorCodes(e_dict["code"]["value"]),
-        message=e_dict["message"],
-        detail=e_dict["detail"],
-        wrapping=None
-        if e_dict["wrapping"] is None
-        else [
-            _enumerated_error_reconstructor(wrapped_dict)
-            for wrapped_dict in e_dict["wrapping"]
-        ],
-    )
-
 
 def _module_model_reconstructor(
     module_str: str,
@@ -557,7 +528,7 @@ def _async_mod_error_notif_class_to_dict(obj) -> Dict:  # type: ignore
     return {
         "__class__": "opentrons.hardware_control.types.AsynchronousModuleErrorNotification",
         "event": obj.event,
-        "exception": _enumerated_error_deconstructor(obj.exception),
+        "exception": enumerated_error_class_to_dict(obj.exception),
         "module_serial": obj.module_serial,
         "module_model": obj.module_model.name,
         "port": obj.port,
@@ -569,7 +540,7 @@ def _async_mod_error_notif_dict_to_class(  # type: ignore
 ) -> opentrons.hardware_control.types.AsynchronousModuleErrorNotification:
     return opentrons.hardware_control.types.AsynchronousModuleErrorNotification(
         event=opentrons.hardware_control.types.HardwareEventType(d["event"]["value"]),  # type: ignore
-        exception=_enumerated_error_reconstructor(d["exception"]),
+        exception=enumerated_error_dict_to_class(class_name="opentrons.hardware_control.types.EnumeratedError", d=d["exception"]),
         module_serial=d["module_serial"],
         module_model=_module_model_reconstructor(d["module_model"]),
         port=d["port"],
@@ -740,6 +711,7 @@ def register_hardware_types() -> None:
             opentrons.calibration_storage.types,
             opentrons.drivers.types,
             opentrons.hardware_control.modules.types,
+            opentrons.drivers.vacuum_module.types,
         ]
     )
 
@@ -904,6 +876,20 @@ def register_hardware_types() -> None:
         class_type=opentrons.drivers.types.ABSMeasurementConfig,
         dict_to_class=_ABSMeasurementConfig_dict_to_class,
         class_to_dict=_ABSMeasurementConfig_class_to_dict,
+    )
+
+    # VacuumState registration
+    register_type_to_serpent(
+        class_type=opentrons.drivers.vacuum_module.types.VacuumState,
+        dict_to_class=opentrons.drivers.vacuum_module.types.VacuumState.from_pyro_dict,
+        class_to_dict=opentrons.drivers.vacuum_module.types.VacuumState.to_pyro_dict,
+    )
+
+    # PumpState registration
+    register_type_to_serpent(
+        class_type=opentrons.drivers.vacuum_module.types.PumpState,
+        dict_to_class=opentrons.drivers.vacuum_module.types.PumpState.from_pyro_dict,
+        class_to_dict=opentrons.drivers.vacuum_module.types.PumpState.to_pyro_dict,
     )
 
     # handle Typed Dicts for the hardware controller

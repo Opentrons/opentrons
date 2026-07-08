@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict
+from typing import Any, Dict
 
 from opentrons_shared_data.util import StrEnum
 
@@ -114,6 +114,33 @@ class VacuumState:
     vacuum_duration: int
     vent_state: VentState
 
+    @staticmethod
+    def to_pyro_dict(obj: "VacuumState") -> Dict[str, Any]:
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "target_gauge_pressure": obj.target_gauge_pressure,
+            "current_gauge_pressure": obj.current_gauge_pressure,
+            "pressure_abs_a": obj.pressure_abs_a,
+            "pressure_abs_b": obj.pressure_abs_b,
+            "pressure_atm": obj.pressure_atm,
+            "vacuum_enabled": obj.vacuum_enabled,
+            "vacuum_duration": obj.vacuum_duration,
+            "vent_state": obj.vent_state.value,
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "VacuumState":
+        return VacuumState(
+            target_gauge_pressure=data["target_gauge_pressure"],
+            current_gauge_pressure=data["current_gauge_pressure"],
+            pressure_abs_a=data["pressure_abs_a"],
+            pressure_abs_b=data["pressure_abs_b"],
+            pressure_atm=data["pressure_atm"],
+            vacuum_enabled=data["vacuum_enabled"],
+            vacuum_duration=data["vacuum_duration"],
+            vent_state=VentState(data["vent_state"]),
+        )
+
 
 @dataclass
 class PressureControlTunings:
@@ -154,3 +181,26 @@ class PumpState:
     current_pwm: float
     pump_running: bool
     manual_control: bool
+
+    @staticmethod
+    def to_pyro_dict(obj: "PumpState") -> Dict[str, Any]:
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "target_rpm": obj.target_rpm,
+            "current_rpm": obj.current_rpm,
+            "target_pwm": obj.target_pwm,
+            "current_pwm": obj.current_pwm,
+            "pump_running": obj.pump_running,
+            "manual_control": obj.manual_control,
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "PumpState":
+        return PumpState(
+            target_rpm=data["target_rpm"],
+            current_rpm=data["current_rpm"],
+            target_pwm=data["target_pwm"],
+            current_pwm=data["current_pwm"],
+            pump_running=data["pump_running"],
+            manual_control=data["manual_control"],
+        )
