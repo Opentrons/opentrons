@@ -7,8 +7,6 @@ from auth_server.persistence.orm_models import User
 from auth_server.settings.models import SettingsResponseData
 from auth_server.settings.store import SettingsStore
 from auth_server.users.models import (
-    ACCOUNT_TYPE_TO_SCOPES,
-    RESET_PASSWORD_SCOPES,
     AccountType,
     UserResponse,
 )
@@ -110,9 +108,6 @@ def test_create_user_success(
         username="new_user",
         fullName="New User",
         accountType=AccountType.USER,
-        scopes=sorted(
-            scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]
-        ),
         locked=False,
         resetPassword=False,
     )
@@ -141,9 +136,6 @@ def test_create_user_hashes_password(
         username="hash_check",
         fullName="X",
         accountType=AccountType.USER,
-        scopes=sorted(
-            scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]
-        ),
         locked=False,
         resetPassword=False,
     )
@@ -295,9 +287,6 @@ def test_get_user_returns_existing(
         username="admin",
         fullName="Full Name",
         accountType=AccountType.ADMIN,
-        scopes=sorted(
-            scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.ADMIN]
-        ),
         locked=False,
         resetPassword=False,
     )
@@ -322,9 +311,6 @@ def test_get_user_locked_when_failed_logins_reach_limit(
         username="alice",
         fullName="Alice",
         accountType=AccountType.USER,
-        scopes=sorted(
-            scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]
-        ),
         locked=True,
         resetPassword=False,
     )
@@ -390,9 +376,6 @@ def test_update_user_username(
         username="new_name",
         fullName="Name Test",
         accountType=AccountType.USER,
-        scopes=sorted(
-            scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]
-        ),
         locked=False,
         resetPassword=False,
     )
@@ -479,7 +462,6 @@ def test_reset_user_password(
 
     assert result.username == "reset_me"
     assert result.resetPassword is True
-    assert result.scopes == sorted(scope.api_name for scope in RESET_PASSWORD_SCOPES)
     assert len(result.temporaryPassword) == 8
     assert all(
         c in string.ascii_letters + string.digits for c in result.temporaryPassword

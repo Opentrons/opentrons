@@ -4,9 +4,6 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
-      - admin_scopes_list
-      - user_scopes_list
-      - reset_password_scopes_list
 
 stages:
   - name: Create a new user
@@ -29,7 +26,6 @@ stages:
           fullName: Test New User
           accountType: user
           locked: false
-          scopes: !force_original_structure '{user_scopes_list}'
           resetPassword: false
   - name: Get a user information
     request:
@@ -45,7 +41,6 @@ stages:
           fullName: Test New User
           username: test_new_user
           locked: false
-          scopes: !force_original_structure '{user_scopes_list}'
           resetPassword: false
   - name: Update the user
     request:
@@ -65,7 +60,6 @@ stages:
           fullName: Test New User Updated
           username: test_new_user
           locked: false
-          scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: false
   - name: Update the username and password
     request:
@@ -85,7 +79,6 @@ stages:
           fullName: Test New User Updated
           username: test_new_user_updated
           locked: false
-          scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: false
   - name: Update the reset password flag
     request:
@@ -104,7 +97,6 @@ stages:
           fullName: Test New User Updated
           username: test_new_user_updated
           locked: false
-          scopes: !force_original_structure '{reset_password_scopes_list}'
           resetPassword: true
   - name: Get the user information
     request:
@@ -120,7 +112,6 @@ stages:
           fullName: Test New User Updated
           username: test_new_user_updated
           locked: false
-          scopes: !force_original_structure '{reset_password_scopes_list}'
           resetPassword: true
   - name: Reset the user's password to a temporary password
     request:
@@ -139,7 +130,6 @@ stages:
           fullName: Test New User Updated
           username: test_new_user_updated
           locked: false
-          scopes: !force_original_structure '{reset_password_scopes_list}'
           resetPassword: true
           temporaryPassword: !anystr
 
@@ -194,7 +184,6 @@ stages:
           fullName: Test New User Updated
           username: test_new_user_updated
           locked: false
-          scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: false
 
   - name: Get a new access token with the updated username and password

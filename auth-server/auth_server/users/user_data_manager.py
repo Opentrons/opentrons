@@ -135,13 +135,11 @@ class UserDataManager:
         )
 
         account_type = AccountType(user.account_type)
-        scopes = sorted(scope.api_name for scope in get_scope_set_of_user(user))
 
         return UserResponse(
             username=user.username,
             fullName=user.full_name,
             accountType=account_type,
-            scopes=scopes,
             locked=is_currently_locked,
             resetPassword=user.reset_password,
         )
