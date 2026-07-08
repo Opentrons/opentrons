@@ -40,6 +40,7 @@ stages:
       json:
         active: true
         username: testadmin
+        ot-fullname: Test Admin
         scope: *returned_scope
 
   - name: Introspect the refresh token and confirm it's inactive (only access tokens are active)
@@ -89,6 +90,7 @@ stages:
       json:
         active: true
         username: testadmin
+        ot-fullname: Test Admin
         scope: *returned_scope
 
   - name: Introspect the new refresh token and confirm it's inactive (only access tokens are active)
