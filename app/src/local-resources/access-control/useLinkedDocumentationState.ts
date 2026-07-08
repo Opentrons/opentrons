@@ -18,7 +18,9 @@ export const useLinkedDocumentationState = (
 
   const onPromptForDocumentation = useCallback(
     (docreport: DocumentationReport) => {
-      setDocreport(docreport)
+      if (docreport.length > 0) {
+        setDocreport(docreport)
+      }
     },
     []
   )

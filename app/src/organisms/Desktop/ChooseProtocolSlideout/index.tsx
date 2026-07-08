@@ -723,7 +723,11 @@ export function ChooseProtocolSlideoutComponent(
 export function ChooseProtocolSlideout(
   props: ChooseProtocolSlideoutProps
 ): JSX.Element | null {
-  return <ChooseProtocolSlideoutComponent {...props} />
+  return (
+    <ApiHostProvider robotName={props.robot.name}>
+      <ChooseProtocolSlideoutComponent {...props} />
+    </ApiHostProvider>
+  )
 }
 
 interface StoredProtocolListProps {
