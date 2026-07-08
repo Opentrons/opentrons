@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import axios from 'axios'
@@ -11,7 +11,7 @@ import {
   useUpdateSelfMutation,
 } from '@opentrons/react-api-client'
 
-import { useUsernameForRobot } from '/app/redux/robot-auth'
+import { useUsernameForRobot } from '/app/redux/robot-auth/hooks'
 
 import styles from './personalaccountsettings.module.css'
 import { PersonalAccountSettingsEditForm } from './PersonalAccountSettingsEditForm'
@@ -55,6 +55,15 @@ export function PersonalAccountSettings({
   const [usernameError, setUsernameError] = useState<string | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
 
+  const previousUsernameRef = useRef<string | null | undefined>(undefined)
+  useEffect(() => {
+    if (previousUsernameRef.current !== username) {
+      void queryClient.invalidateQueries(getSelfQueryKey(host))
+    }
+
+    previousUsernameRef.current = username
+  }, [username, host, queryClient])
+
   const clearSaveErrors = (): void => {
     setUsernameError(null)
     setSaveError(null)
@@ -87,7 +96,6 @@ export function PersonalAccountSettings({
         }
       })
   }
-
   return (
     <div className={styles.container}>
       <div className={styles.header}>

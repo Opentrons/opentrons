@@ -25,6 +25,8 @@ import type {
   RobotServerAccessControlSettingsResponse,
 } from '@opentrons/api-client'
 
+const ROBOT_NAME = 'flex-1'
+
 const MOCK_AUTH_SETTINGS: AuthSettingsResponse = {
   data: {
     maxNumberOfLoginAttempts: 5,
@@ -88,7 +90,7 @@ let unmountPreviousRender: (() => void) | undefined
 const render = (): RenderResult => {
   unmountPreviousRender?.()
   const [view] = renderWithProviders(
-    <ComplianceReadySoftwareSettings robotName="flex-1" />,
+    <ComplianceReadySoftwareSettings robotName={ROBOT_NAME} />,
     {
       i18nInstance: i18n,
     }
