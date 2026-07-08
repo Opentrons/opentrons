@@ -329,11 +329,10 @@ describe('ComplianceReadySoftwareSettings', () => {
     fireEvent.blur(idleLogoutField)
 
     await waitFor(() => {
-      expect(mockPatchAuthSettings).not.toHaveBeenCalled()
-      expect(
-        screen.getByText('Must be greater than 0 minutes')
-      ).toBeInTheDocument()
-      expect(idleLogoutField).toHaveValue(0)
+      screen.getByText('Must be greater than 0 minutes')
     })
+
+    expect(mockPatchAuthSettings).not.toHaveBeenCalled()
+    expect(idleLogoutField).toHaveValue(0)
   })
 })

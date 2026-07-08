@@ -22,7 +22,7 @@ const SECONDS_PER_MINUTE = 60
 const SECONDS_PER_DAY = 24 * 60 * 60
 export const MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH = 256
 
-export function isPositiveNumber(value: string): boolean {
+export function isValidLogoutIdleTime(value: string): boolean {
   const parsedValue = Number(value)
   return Number.isFinite(parsedValue) && parsedValue > 0
 }
@@ -138,7 +138,7 @@ export function getAuthInputPatch(
         data: { maxNumberOfLoginAttempts: value === '' ? null : Number(value) },
       }
     case 'idleLogout':
-      if (!isPositiveNumber(value)) {
+      if (!isValidLogoutIdleTime(value)) {
         return null
       }
       return { data: { idleLogout: Number(value) * SECONDS_PER_MINUTE } }

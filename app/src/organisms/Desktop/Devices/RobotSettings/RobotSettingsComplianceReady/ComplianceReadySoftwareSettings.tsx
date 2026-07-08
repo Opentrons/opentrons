@@ -16,7 +16,7 @@ import {
   getAuditInputPatch,
   getAuthInputPatch,
   getFieldValuesFromSettings,
-  isPositiveNumber,
+  isValidLogoutIdleTime,
   isValidPasswordComplexityMinimumLength,
   MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
 } from './complianceReadySettingsHelper'
@@ -236,7 +236,7 @@ export function ComplianceReadySoftwareSettings({
             value={String(fieldValues.idleLogout)}
             units={t('desktop_minutes')}
             validate={value =>
-              isPositiveNumber(value)
+              isValidLogoutIdleTime(value)
                 ? null
                 : t('desktop_idle_logout_must_be_greater_than_zero')
             }
