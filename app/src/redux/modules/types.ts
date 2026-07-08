@@ -28,17 +28,7 @@ export type CommonModuleInfo = Omit<
 >
 
 export type Slot =
-  | '1'
-  | '2'
-  | '3'
-  | '4'
-  | '5'
-  | '6'
-  | '7'
-  | '8'
-  | '9'
-  | '10'
-  | '11'
+  '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11'
 
 export interface TemperatureModule extends CommonModuleInfo {
   moduleType: typeof TEMPERATURE_MODULE_TYPE
@@ -135,9 +125,7 @@ export interface UpdateModuleFailureAction {
 // action union
 
 export type ModulesAction =
-  | UpdateModuleAction
-  | UpdateModuleSuccessAction
-  | UpdateModuleFailureAction
+  UpdateModuleAction | UpdateModuleSuccessAction | UpdateModuleFailureAction
 
 // state types
 

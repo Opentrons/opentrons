@@ -55,9 +55,7 @@ export interface NetworkingStatusResponse {
 // GET /wifi/list
 
 export type WifiSecurityType =
-  | typeof SECURITY_NONE
-  | typeof SECURITY_WPA_PSK
-  | typeof SECURITY_WPA_EAP
+  typeof SECURITY_NONE | typeof SECURITY_WPA_PSK | typeof SECURITY_WPA_EAP
 
 export interface WifiNetwork {
   ssid: string
@@ -94,9 +92,7 @@ export interface WifiConfigureResponse {
 // GET /wifi/eap-options
 
 export type WifiAuthFieldType =
-  | typeof AUTH_TYPE_STRING
-  | typeof AUTH_TYPE_PASSWORD
-  | typeof AUTH_TYPE_FILE
+  typeof AUTH_TYPE_STRING | typeof AUTH_TYPE_PASSWORD | typeof AUTH_TYPE_FILE
 
 export interface WifiAuthField {
   name: string

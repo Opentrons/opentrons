@@ -49,9 +49,7 @@ export const UI_ONLY_FIELD_IDS = [
 export type UiSettingFieldId = (typeof UI_ONLY_FIELD_IDS)[number]
 
 export type SettingFieldId =
-  | AuthSettingFieldId
-  | UiSettingFieldId
-  | RobotServerSettingFieldId
+  AuthSettingFieldId | UiSettingFieldId | RobotServerSettingFieldId
 
 export function isAuthInputFieldId(
   id: SettingFieldId

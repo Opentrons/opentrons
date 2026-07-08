@@ -61,12 +61,10 @@ export interface SequenceFullParams extends SequenceBaseParams {
 }
 
 export type GetLabwareLocationParams =
-  | LocationSlotOnlyParams
-  | LocationFullParams
+  LocationSlotOnlyParams | LocationFullParams
 
 export type GetLabwareLocationFromSequenceParams =
-  | SequenceSlotOnlyParams
-  | SequenceFullParams
+  SequenceSlotOnlyParams | SequenceFullParams
 
 export function getLabwareLocationFromSequence(
   params: GetLabwareLocationFromSequenceParams

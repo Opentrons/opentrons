@@ -34,6 +34,16 @@ class DiskMonitor:
 
         return available_bytes / (1024 * 1024)
 
+    def get_total_disk_space_mb(self) -> float:
+        """Get the total disk space of the /data partition in megabytes."""
+        if sys.platform == "win32" or not hasattr(os, "statvfs"):
+            return _FALLBACK_DEFAULT_DISK_SPACE_MB
+
+        stat = os.statvfs(self._images_directory)
+        total_bytes = stat.f_blocks * stat.f_frsize
+
+        return total_bytes / (1024 * 1024)
+
     def is_disk_space_low(self) -> bool:
         """Check if available disk space is below the configured threshold."""
         available_mb = self.get_available_disk_space_mb()

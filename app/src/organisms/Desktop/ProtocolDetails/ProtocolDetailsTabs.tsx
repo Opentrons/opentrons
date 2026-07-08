@@ -7,11 +7,7 @@ import { useFeatureFlag } from '/app/redux/config'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 type ProtocolDetailsTab =
-  | 'robot_config'
-  | 'labware'
-  | 'liquids'
-  | 'stats'
-  | 'parameters'
+  'robot_config' | 'labware' | 'liquids' | 'stats' | 'parameters'
 
 export interface ProtocolDetailsTabsProps {
   mostRecentAnalysis: ProtocolAnalysisOutput | null

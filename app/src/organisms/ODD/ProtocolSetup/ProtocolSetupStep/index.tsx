@@ -21,10 +21,7 @@ import { useToaster } from '../../../ToasterOven'
 const CSV_FILE_MAX_LENGTH = 18 // truncated text + three dots
 
 export type ProtocolSetupStepStatus =
-  | 'ready'
-  | 'not ready'
-  | 'general'
-  | 'inform'
+  'ready' | 'not ready' | 'general' | 'inform'
 export interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
   status: ProtocolSetupStepStatus

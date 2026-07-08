@@ -37,15 +37,24 @@ class UpdateSession:
     State machine for update sessions
     """
 
-    def __init__(self, storage_path: str) -> None:
+    def __init__(
+        self,
+        *,
+        storage_path: str,
+        auto_commit_and_restart: bool,
+    ) -> None:
         self._token = base64.urlsafe_b64encode(uuid.uuid4().bytes).decode().strip("=")
+
         self._stage = Stages.AWAITING_FILE
         self._progress = 0.0
         self._message = ""
         self._error: Optional[Value] = None
+
         self._storage_path = storage_path
+        self._auto_commit_and_restart = auto_commit_and_restart
+
         self._setup_dl_area()
-        self._rootfs_file: Optional[str] = None
+
         LOG.info(f"update session: created {self._token}")
 
     def _setup_dl_area(self) -> None:
@@ -53,10 +62,10 @@ class UpdateSession:
             shutil.rmtree(self._storage_path)
         os.makedirs(self._storage_path, mode=0o700, exist_ok=True)
 
-    def __del__(self) -> None:
-        if hasattr(self, "_storage_path"):
-            shutil.rmtree(self._storage_path)
-        LOG.info(f"Update session: removed {getattr(self, '_token', '<unknown>')}")
+    def close(self) -> None:
+        """Clean up the storage used by this session."""
+        shutil.rmtree(self._storage_path)
+        LOG.info(f"Update session: removed {self._token}")
 
     def set_stage(self, stage: Stages) -> None:
         """Convenience method to set the stage and lookup message"""
@@ -81,8 +90,8 @@ class UpdateSession:
         return self._storage_path
 
     @property
-    def rootfs_file(self) -> Optional[str]:
-        return self._rootfs_file
+    def auto_commit_and_restart(self) -> bool:
+        return self._auto_commit_and_restart
 
     @property
     def token(self) -> str:
@@ -132,5 +141,9 @@ class UpdateSession:
             }
 
 
-def session_from_request(request: web.Request) -> Optional[UpdateSession]:
+def get_current_session(request: web.Request) -> UpdateSession | None:
     return request.app.get(SESSION_VARNAME, None)  # type: ignore[no-any-return]
+
+
+def set_current_session(request: web.Request, session: UpdateSession | None) -> None:
+    request.app[SESSION_VARNAME] = session

@@ -27,17 +27,10 @@ export type RobotSettingsTab =
   | 'feature-flags'
 
 export type AppSettingsTab =
-  | 'general'
-  | 'privacy'
-  | 'advanced'
-  | 'feature-flags'
+  'general' | 'privacy' | 'advanced' | 'feature-flags'
 
 export type ProtocolRunDetailsTab =
-  | 'setup'
-  | 'module-controls'
-  | 'run-preview'
-  | 'runtime-parameters'
-  | 'camera'
+  'setup' | 'module-controls' | 'run-preview' | 'runtime-parameters' | 'camera'
 
 /**
  * desktop app route params type definition

@@ -190,6 +190,14 @@ class OT2UpdateActions(UpdateActionsInterface):
             except Exception:
                 LOG.exception(f"Could not delete update file {filepath}.")
 
+    def restart(self) -> None:
+        """Restart the robot."""
+        subprocess.check_call(["reboot"])
+
+    def shutdown(self) -> None:
+        """Shut down the robot."""
+        subprocess.check_call(["shutdown", "-h", "now"])
+
 
 def _find_unused_partition() -> RootPartitions:
     """Find the currently-unused root partition to write to"""

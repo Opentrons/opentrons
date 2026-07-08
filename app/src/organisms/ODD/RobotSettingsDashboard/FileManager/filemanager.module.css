@@ -1,0 +1,14 @@
+.container {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+.content {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  padding: 7.75rem var(--spacing-40) var(--spacing-40);
+  gap: var(--spacing-24);
+  overflow-y: auto;
+}

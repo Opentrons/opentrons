@@ -5,7 +5,7 @@ import {
   useRunCurrentState,
 } from '@opentrons/react-api-client'
 
-import { useGuardedAction } from '/app/local-resources/access-control/useGuardedAction'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useRecoveryAnalytics } from '/app/redux-resources/analytics'
 import { getRunningStepCountsFrom } from '/app/resources/protocols'
 import {
@@ -186,7 +186,7 @@ export function useERUtils({
     recoveryMap,
   })
 
-  const documentationState = useGuardedAction()
+  const documentationState = useDocumentationState()
   const recoveryActionMutationUtils = useRecoveryActionMutation(
     runId,
     routeUpdateActions,

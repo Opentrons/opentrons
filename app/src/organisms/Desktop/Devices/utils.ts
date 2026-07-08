@@ -42,8 +42,7 @@ export function getIs96ChannelPipetteAttached(
 export function getOffsetCalibrationForMount(
   pipetteOffsetCalibrations: PipetteOffsetCalibration[] | null,
   attachedPipettes:
-    | FetchPipettesResponseBody
-    | { left: undefined; right: undefined },
+    FetchPipettesResponseBody | { left: undefined; right: undefined },
   mount: Mount
 ): PipetteOffsetCalibration | null {
   if (pipetteOffsetCalibrations == null) {

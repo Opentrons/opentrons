@@ -66,8 +66,7 @@ import type { StepType } from '/protocol-designer/form-types'
 import type { OT2ModuleType, ThunkDispatch } from '/protocol-designer/types'
 
 type MagneticModuleModels =
-  | typeof MAGNETIC_MODULE_V1
-  | typeof MAGNETIC_MODULE_V2
+  typeof MAGNETIC_MODULE_V1 | typeof MAGNETIC_MODULE_V2
 
 const mapModTypeToStepTypeOt2: Record<OT2ModuleType, StepType> = {
   heaterShakerModuleType: 'heaterShaker',

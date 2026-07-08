@@ -103,7 +103,7 @@ describe('DetachPipette', () => {
       isFetching: true,
     }
     render(props)
-    screen.getAllByTestId('Skeleton')
+    screen.getAllByRole('status')
     const backBtn = screen.getByLabelText('back')
     expect(backBtn).toBeDisabled()
   })

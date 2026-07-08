@@ -4,10 +4,7 @@ import type { SVGProps } from 'react'
 import type { DeckDefinition, ModuleType } from '@opentrons/shared-data'
 
 export type StagingAreaLocation =
-  | 'cutoutA3'
-  | 'cutoutB3'
-  | 'cutoutC3'
-  | 'cutoutD3'
+  'cutoutA3' | 'cutoutB3' | 'cutoutC3' | 'cutoutD3'
 
 interface StagingAreaFixtureProps extends SVGProps<SVGGElement> {
   cutoutId: StagingAreaLocation

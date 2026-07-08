@@ -20,7 +20,7 @@ import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
 
 // TODO(jh, 04-23-25): Prettier import order affects testing. Investigate further.
 // prettier-ignore
-import { AlertsModal } from '/app/organisms/Desktop/Alerts/AlertsModal';
+import { AlertsModal } from '/app/organisms/Desktop/Alerts/AlertsModal'
 
 import { ProtocolVisualization } from '/app/pages/Desktop/Protocols/ProtocolVisualization'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'

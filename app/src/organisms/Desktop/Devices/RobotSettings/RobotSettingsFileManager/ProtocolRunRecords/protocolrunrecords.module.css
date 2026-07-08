@@ -1,0 +1,41 @@
+.run_record_header_content {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: var(--spacing-24);
+}
+
+.run_date_col {
+  min-width: 0;
+  flex: 3;
+}
+
+.run_protocol_col {
+  overflow: hidden;
+  min-width: 0;
+  flex: 4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.run_records_header_row {
+  display: flex;
+  height: 20px;
+  align-items: center;
+  padding: var(--spacing-4) var(--spacing-60) var(--spacing-4) var(--spacing-12);
+  color: var(--grey-60);
+  gap: var(--spacing-12);
+}
+
+.run_status_col {
+  display: flex;
+  min-width: 0;
+  flex: 2;
+  align-items: center;
+}
+
+.run_files_col {
+  min-width: 0;
+  flex: 1;
+}

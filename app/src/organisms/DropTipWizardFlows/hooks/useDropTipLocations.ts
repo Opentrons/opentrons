@@ -17,8 +17,7 @@ import type {
 import type { ValidDropTipBlowoutLocation } from '../types'
 
 export type DropTipBlowoutSlotName =
-  | AddressableAreaName
-  | 'CHOOSE_DECK_LOCATION'
+  AddressableAreaName | 'CHOOSE_DECK_LOCATION'
 
 export interface DropTipBlowoutLocationDetails {
   slotName: DropTipBlowoutSlotName

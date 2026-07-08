@@ -33,8 +33,10 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux-resources/analytics')
 vi.mock('/app/redux-resources/robots')
-vi.mock('/app/local-resources/access-control/useGuardedAction', () => ({
-  useGuardedAction: vi.fn(() => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: vi.fn(
+    () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+  ),
 }))
 
 const render = (props: ComponentProps<typeof ConfirmCancelModal>) => {

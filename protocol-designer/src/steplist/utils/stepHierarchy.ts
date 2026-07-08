@@ -72,9 +72,7 @@ export interface VacuumStateDurationGroup extends ConcurrentGroupFields {
 }
 
 export type ConcurrentGroup =
-  | ThermocyclerProfileGroup
-  | VacuumProfileGroup
-  | VacuumStateDurationGroup
+  ThermocyclerProfileGroup | VacuumProfileGroup | VacuumStateDurationGroup
 
 export function isConcurrentGroup(
   item: StandaloneStep | ConcurrentGroup
@@ -91,9 +89,7 @@ function isVacuumStateWithPumpDuration(step: FormData): boolean {
 }
 
 type OpenConcurrentGroupKind =
-  | 'thermocycler'
-  | 'vacuumProfile'
-  | 'vacuumStateDuration'
+  'thermocycler' | 'vacuumProfile' | 'vacuumStateDuration'
 
 interface OpenConcurrentGroup {
   kind: OpenConcurrentGroupKind
