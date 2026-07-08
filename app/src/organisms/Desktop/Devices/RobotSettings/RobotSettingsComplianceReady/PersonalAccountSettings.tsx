@@ -54,9 +54,7 @@ export function PersonalAccountSettings({
   const [saveError, setSaveError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (username == null) {
-      void queryClient.removeQueries(getSelfQueryKey(host))
-    }
+    if (username == null) queryClient.removeQueries(getSelfQueryKey(host))
   }, [username, host, queryClient])
 
   const clearSaveErrors = (): void => {

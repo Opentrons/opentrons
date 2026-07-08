@@ -26,7 +26,6 @@ import type {
   AuthSettingsResponse,
   RobotServerAccessControlSettingsResponse,
 } from '@opentrons/api-client'
-import type { State } from '/app/redux/types'
 
 const ROBOT_NAME = 'flex-1'
 
@@ -365,22 +364,25 @@ describe('RobotSettingsComplianceReady', () => {
       },
     } as any)
 
-    renderWithProviders(<RobotSettingsComplianceReady robotName={ROBOT_NAME} />, {
-      i18nInstance: i18n,
-      initialState: {
-        robotAuth: {
-          perRobotAuthStates: {
-            [ROBOT_NAME]: {
-              username,
-              accessToken: 'access-token',
-              refreshToken: 'refresh-token',
-              expiresAt: null,
+    renderWithProviders(
+      <RobotSettingsComplianceReady robotName={ROBOT_NAME} />,
+      {
+        i18nInstance: i18n,
+        initialState: {
+          robotAuth: {
+            perRobotAuthStates: {
+              [ROBOT_NAME]: {
+                username,
+                accessToken: 'access-token',
+                refreshToken: 'refresh-token',
+                expiresAt: null,
+              },
             },
+            mostRecentRobotName: ROBOT_NAME,
           },
-          mostRecentRobotName: ROBOT_NAME,
-        },
-      } as any,
-    })
+        } as any,
+      }
+    )
   }
 
   it('hides admin sections for non-admin users', () => {
