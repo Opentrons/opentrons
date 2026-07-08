@@ -19,7 +19,9 @@ export function RobotSettingsComplianceReady({
   const username = useUsernameForRobot(robotName)
   const selfQuery = useSelfQuery({ enabled: username != null })
   const isAdmin =
-    username != null && selfQuery.data?.data.accountType === 'admin'
+    username != null &&
+    selfQuery.data?.data.username === username &&
+    selfQuery.data?.data.accountType === 'admin'
 
   return (
     <div className={styles.page}>
@@ -31,9 +33,11 @@ export function RobotSettingsComplianceReady({
           <UserManagement />
         </div>
       ) : null}
-      <div className={`${styles.section} ${styles.section_accordion}`}>
-        <ComplianceReadySoftwareSettings robotName={robotName} />
-      </div>
+      {isAdmin ? (
+        <div className={`${styles.section} ${styles.section_accordion}`}>
+          <ComplianceReadySoftwareSettings robotName={robotName} />
+        </div>
+      ) : null}
     </div>
   )
 }

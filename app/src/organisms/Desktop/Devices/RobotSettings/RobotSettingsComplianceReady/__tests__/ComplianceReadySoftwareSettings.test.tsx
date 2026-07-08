@@ -10,6 +10,7 @@ import {
   useAuthSettingsQuery,
   useGetRobotServerAccessControlSettingsQuery,
   usePatchRobotServerAccessControlSettingsMutation,
+  useSelfQuery,
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -17,6 +18,7 @@ import { i18n } from '/app/i18n'
 
 import { UI_ONLY_FIELD_IDS } from '../complianceReadySettingsTypes'
 import { ComplianceReadySoftwareSettings } from '../ComplianceReadySoftwareSettings'
+import { RobotSettingsComplianceReady } from '../index'
 
 import type { RenderResult } from '@testing-library/react'
 import type {
@@ -24,6 +26,7 @@ import type {
   AuthSettingsResponse,
   RobotServerAccessControlSettingsResponse,
 } from '@opentrons/api-client'
+import type { State } from '/app/redux/types'
 
 const ROBOT_NAME = 'flex-1'
 
@@ -80,6 +83,10 @@ const COMPLIANCE_READY_FIELD_IDS = [
 ]
 
 vi.mock('@opentrons/react-api-client')
+
+vi.mock('../PersonalAccountSettings', () => ({
+  PersonalAccountSettings: () => null,
+}))
 
 const mockPatchAuthSettings = vi.fn()
 const mockPatchAuditSettings = vi.fn()
@@ -336,5 +343,67 @@ describe('ComplianceReadySoftwareSettings', () => {
 
     expect(mockPatchAuthSettings).not.toHaveBeenCalled()
     expect(idleLogoutField).toHaveValue(0)
+  })
+})
+
+describe('RobotSettingsComplianceReady', () => {
+  const renderPage = (
+    username: string,
+    selfUsername: string,
+    accountType: 'admin' | 'user'
+  ): void => {
+    vi.mocked(useSelfQuery).mockReturnValue({
+      data: {
+        data: {
+          username: selfUsername,
+          fullName: 'Test User',
+          accountType,
+          scopes: [],
+          locked: false,
+          resetPassword: false,
+        },
+      },
+    } as any)
+
+    renderWithProviders(<RobotSettingsComplianceReady robotName={ROBOT_NAME} />, {
+      i18nInstance: i18n,
+      initialState: {
+        robotAuth: {
+          perRobotAuthStates: {
+            [ROBOT_NAME]: {
+              username,
+              accessToken: 'access-token',
+              refreshToken: 'refresh-token',
+              expiresAt: null,
+            },
+          },
+          mostRecentRobotName: ROBOT_NAME,
+        },
+      } as any,
+    })
+  }
+
+  it('hides admin sections for non-admin users', () => {
+    renderPage('regular-user', 'regular-user', 'user')
+
+    expect(screen.queryByText('User management')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', {
+        name: 'Compliance Ready Software settings',
+      })
+    ).not.toBeInTheDocument()
+  })
+
+  it('ignores stale admin self data for non-admin users', () => {
+    renderPage('regular-user', 'admin', 'admin')
+
+    expect(screen.queryByText('User management')).not.toBeInTheDocument()
+  })
+
+  it('shows admin sections for admin users', () => {
+    renderPage('admin', 'admin', 'admin')
+
+    screen.getByText('User management')
+    screen.getByRole('button', { name: 'Compliance Ready Software settings' })
   })
 })

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import axios from 'axios'
@@ -45,23 +45,18 @@ export function PersonalAccountSettings({
   const { t } = useTranslation(['device_settings', 'shared'])
   const queryClient = useQueryClient()
   const host = useHost()
-  const loggedInUsername = useUsernameForRobot(robotName)
-  const selfQuery = useSelfQuery({ enabled: loggedInUsername != null })
+  const username = useUsernameForRobot(robotName)
   const { updateSelf, isLoading: isSaving } = useUpdateSelfMutation()
-  const username = selfQuery.data?.data.username ?? loggedInUsername ?? ''
-  const fullName = selfQuery.data?.data.fullName ?? ''
+  const { data: selfResponse } = useSelfQuery({ enabled: username != null })
 
   const [isEditing, setIsEditing] = useState(false)
   const [usernameError, setUsernameError] = useState<string | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
 
-  const previousUsernameRef = useRef<string | null | undefined>(undefined)
   useEffect(() => {
-    if (previousUsernameRef.current !== username) {
-      void queryClient.invalidateQueries(getSelfQueryKey(host))
+    if (username == null) {
+      void queryClient.removeQueries(getSelfQueryKey(host))
     }
-
-    previousUsernameRef.current = username
   }, [username, host, queryClient])
 
   const clearSaveErrors = (): void => {
@@ -96,13 +91,15 @@ export function PersonalAccountSettings({
         }
       })
   }
+  const fullName = selfResponse?.data.fullName ?? null
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <StyledText desktopStyle="bodyLargeSemiBold">
           {t('desktop_personal_account_settings')}
         </StyledText>
-        {loggedInUsername != null &&
+        {username != null &&
           (isEditing ? (
             <BasicButton
               type="button"
