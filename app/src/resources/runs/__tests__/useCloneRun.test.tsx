@@ -9,6 +9,8 @@ import {
   useHost,
 } from '@opentrons/react-api-client'
 
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
+
 import { useCloneRun } from '../useCloneRun'
 import { useNotifyRunQuery } from '../useNotifyRunQuery'
 
@@ -17,6 +19,9 @@ import type { HostConfig, LabwareOffset } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs/useNotifyRunQuery')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const RUN_ID_NO_RTP: string = 'run_id_no_rtp'
@@ -128,7 +133,7 @@ describe('useCloneRun hook', () => {
       } as any)
 
     when(vi.mocked(useCreateRunMutation))
-      .calledWith(expect.anything())
+      .calledWith(expect.anything(), expect.anything())
       .thenReturn({ createRun: vi.fn() } as any)
     vi.mocked(useCreateProtocolAnalysisMutation).mockReturnValue({
       createProtocolAnalysis: vi.fn(),

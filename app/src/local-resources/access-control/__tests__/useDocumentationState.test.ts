@@ -6,7 +6,7 @@ import {
   useAuthSettingsQuery,
 } from '@opentrons/react-api-client'
 
-import { useCurrentUsername } from '/app/redux/robot-auth'
+import { useUsernameForRobot } from '/app/redux/robot-auth'
 
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../__fixtures__/documentationState'
 import { useDocumentationState } from '../useDocumentationState'
@@ -37,8 +37,8 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
   const actual = await importOriginal()
   return {
     ...(actual as any),
-    useCurrentUsername: vi.fn(() => 'alice'),
     useCurrentRobotName: vi.fn(() => 'otie'),
+    useUsernameForRobot: vi.fn(() => 'alice'),
   }
 })
 
@@ -158,7 +158,7 @@ describe('useDocumentationState', () => {
     }
   })
   it('opens login modal when username is not provided', async () => {
-    vi.mocked(useCurrentUsername).mockReturnValue(null)
+    vi.mocked(useUsernameForRobot).mockReturnValue(null)
     const { result } = renderHook(() => useDocumentationState(), { wrapper })
 
     await act(async () => {
@@ -176,7 +176,7 @@ describe('useDocumentationState', () => {
   })
 
   it('calls onCancel when login modal is dismissed without logging in', async () => {
-    vi.mocked(useCurrentUsername).mockReturnValue(null)
+    vi.mocked(useUsernameForRobot).mockReturnValue(null)
     vi.mocked(mockShowLoginModal).mockResolvedValue(null)
     const onCancel = vi.fn()
     const { result } = renderHook(() => useDocumentationState(), { wrapper })
