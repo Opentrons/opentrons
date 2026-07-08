@@ -1,5 +1,4 @@
 """Helper functions commonly used in protocols."""
-
 from opentrons.protocol_api import (
     ProtocolContext,
     Labware,
@@ -487,7 +486,6 @@ def run(protocol: ProtocolContext) -> None:
     # reagent
     AMPure = reservoir["A1"]
     SMB = reservoir["A2"]
-
     EtOH = reservoir["A4"]
     RSB = reservoir["A5"]
     Liquid_trash_well_1 = reservoir["A9"]
