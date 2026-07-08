@@ -85,7 +85,7 @@ async def test_non_ascii_utf8_message_forwarded_verbatim(
     mock_log_data_manager: LogDataManager, decoy: Decoy
 ) -> None:
     """Non-ASCII characters that round-trip cleanly through UTF-8 must reach
-    the LDM with their code points intact."""
+    the log data manager with their code points intact."""
     # Includes Latin diacritics, CJK ideographs, a zero-width joiner emoji
     # sequence, and a high-plane emoji to cover BMP + supplementary planes.
     non_ascii_message = "Démarrage du protocole №1: 实验开始 — 🧬👩‍🔬🚀 (β=½)"
