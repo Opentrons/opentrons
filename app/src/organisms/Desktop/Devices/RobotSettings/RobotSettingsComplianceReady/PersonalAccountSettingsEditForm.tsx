@@ -11,7 +11,6 @@ import {
 import { PasswordInputField } from './PasswordInputField'
 import styles from './personalaccountsettings.module.css'
 
-import type { TFunction } from 'i18next'
 import type { JSX, ReactNode } from 'react'
 import type { UpdateSelfRequest } from '@opentrons/api-client'
 
@@ -48,9 +47,7 @@ export function PersonalAccountSettingsEditForm({
   onSave,
   onCancel,
 }: PersonalAccountSettingsEditFormProps): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'shared']) as {
-    t: TFunction
-  }
+  const { t } = useTranslation(['device_settings', 'shared'])
   const [usernameInput, setUsernameInput] = useState(username)
   const [fullNameInput, setFullNameInput] = useState(fullName)
   const [password, setPassword] = useState('')
