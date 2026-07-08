@@ -8,8 +8,9 @@ from audit_server.log_ingest.models import AuditLogMessage, SubmitAuditLogMessag
 
 class RecentTimestampMatcher:
     def __eq__(self, other: object) -> bool:
-        assert isinstance(other, datetime.datetime)
-        return bool(_assert_loggedat_is_recent_utc_iso(other))
+        return isinstance(other, datetime.datetime) and _loggedat_is_recent_utc_iso(
+            other
+        )
 
 
 class LogPayloadMatcher:
@@ -26,30 +27,30 @@ class LogPayloadMatcher:
         self._extra = extra
 
     def __eq__(self, other: object) -> bool:
-        assert isinstance(other, str)
+        if not isinstance(other, str):
+            return False
         incoming = AuditLogMessage.model_validate_json(other)
-        assert incoming.action == self._message.action
-        assert incoming.accountName == self._message.accountName
-        assert incoming.legalName == self._message.legalName
-        assert incoming.message == self._message.message
-        assert incoming.reason == self._message.reason
-        assert incoming.loggedAt == self._loggedAt
-        if self._extra:
-            self._extra(other)
-        return True
+        return (
+            incoming.action == self._message.action
+            and incoming.accountName == self._message.accountName
+            and incoming.legalName == self._message.legalName
+            and incoming.message == self._message.message
+            and incoming.reason == self._message.reason
+            and incoming.loggedAt == self._loggedAt
+            and (self._extra(other) if self._extra else True)
+        )
 
 
-def _assert_loggedat_is_recent_utc_iso(parsed: datetime.datetime) -> datetime.datetime:
+def _loggedat_is_recent_utc_iso(parsed: datetime.datetime) -> bool:
     """Assert ``value`` is an ISO-8601 UTC datetime near the current wall clock."""
 
-    assert parsed.tzinfo is not None, f"loggedAt {parsed!r} must include tz info"
-    assert parsed.utcoffset() == datetime.timedelta(0), (
-        f"loggedAt {parsed!r} must be UTC"
-    )
+    if parsed.tzinfo is None:
+        return False
+    if parsed.utcoffset() != datetime.timedelta(0):
+        return False
     # The route stamps loggedAt at request handling time; allow a generous skew so
     # the test isn't flaky on slow CI.
     now = datetime.datetime.now(datetime.timezone.utc)
-    assert abs((now - parsed).total_seconds()) < 60, (
-        f"loggedAt {parsed!r} is too far from now {now.isoformat()}"
-    )
-    return parsed
+    if (now - parsed).total_seconds() > 60:
+        return False
+    return True
