@@ -251,6 +251,6 @@ export interface FlexStackerState {
 }
 
 export interface DeleteRunParams {
-  /** If true, also delete this run's input and output data files from disk, in addition to the run record. */
+  /** If true, also delete this run's output data files and images from disk, in addition to the run record. */
   shouldDeleteAllRunFiles?: boolean
 }
