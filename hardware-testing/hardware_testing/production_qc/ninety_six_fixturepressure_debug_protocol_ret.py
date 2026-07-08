@@ -170,9 +170,12 @@ CHANNEL_LEAK_HISTORY: Dict[str, List[List[float]]] = {}
 INSERT_PRESSURE_FAILED_COUNTS: Dict[int, int] = {}
 INSERT_PRESSURE_LAST_FAILED_VALUE: Dict[int, float] = {}
 NON_RETESTABLE_PRESSURE_FAILED = False
-RETEST_FIXTURE_WELL = "E7"
+RETEST_FIXTURE_WELL = "H1"
 RETEST_FIXTURE_CHANNEL_INDEX = 0
 RETEST_FIXTURE_CHANNEL_LABEL = "CH1"
+RETEST_KIND_LEAK_RATE = "leak-rate"
+RETEST_KIND_INSERT_PRESSURE = "insert-pressure"
+RETEST_KIND_INSERT_AND_LEAK = "insert-pressure+leak-rate"
 
 
 TRASH_HEIGHT = 40  # DVT trash
@@ -257,6 +260,7 @@ class ChannelRetestResult:
     phase_name: str
     channel: int
     nozzle: str
+    retest_kind: str
     volume_ul: float
     leak_threshold: float
     sample_count: int
@@ -265,6 +269,19 @@ class ChannelRetestResult:
     leak_rate: float
     passed: bool
     error: Optional[str] = None
+    insert_average: Optional[float] = None
+    insert_threshold: Optional[float] = None
+    insert_passed: Optional[bool] = None
+
+
+def _format_optional_float(value: Optional[float]) -> Any:
+    if value is None:
+        return ""
+    if math.isinf(value):
+        return "inf"
+    if math.isnan(value):
+        return "nan"
+    return round(value, 4)
 
 
 def _write_single_channel_retest_result(
@@ -276,12 +293,36 @@ def _write_single_channel_retest_result(
             result.phase_name,
             f"CH{result.channel}",
             result.nozzle,
+            result.retest_kind,
             f"{result.volume_ul}ul",
             result.sample_count,
-            round(result.minimum, 4),
-            round(result.maximum, 4),
-            round(result.leak_rate, 4) if not math.isinf(result.leak_rate) else "inf",
+            "insert-average-pressure",
+            _format_optional_float(result.insert_average),
+            "insert-threshold",
+            _format_optional_float(result.insert_threshold),
+            "insert-pass",
+            "" if result.insert_passed is None else _bool_to_pass_fail(result.insert_passed),
+            "leak-min",
+            (
+                _format_optional_float(result.minimum)
+                if result.retest_kind != RETEST_KIND_INSERT_PRESSURE
+                else ""
+            ),
+            "leak-max",
+            (
+                _format_optional_float(result.maximum)
+                if result.retest_kind != RETEST_KIND_INSERT_PRESSURE
+                else ""
+            ),
+            "leak-rate",
+            (
+                _format_optional_float(result.leak_rate)
+                if result.retest_kind != RETEST_KIND_INSERT_PRESSURE
+                else ""
+            ),
+            "leak-threshold",
             result.leak_threshold,
+            "pass",
             _bool_to_pass_fail(result.passed),
             result.error or "",
         ]
@@ -663,6 +704,10 @@ def _single_fixture_leak_rate(values: List[float]) -> Tuple[float, float, float]
     return minimum, maximum, (maximum - minimum) / LEAK_RATE_WINDOW_SECONDS
 
 
+def _is_insert_pressure_phase(phase_name: str) -> bool:
+    return "insert-pressure" in phase_name
+
+
 async def _run_single_channel_fixture_retest_for_row(
     api: OT3API,
     mount: OT3Mount,
@@ -674,13 +719,31 @@ async def _run_single_channel_fixture_retest_for_row(
 ) -> ChannelRetestResult:
     phase_name, channel = _summary_row_key(summary_row)
     volume_ul = _phase_volume_ul(phase_name)
-    if volume_ul is None:
+    is_insert_phase = _is_insert_pressure_phase(phase_name)
+    is_leak_phase = volume_ul is not None
+    if is_insert_phase and is_leak_phase:
+        retest_kind = RETEST_KIND_INSERT_AND_LEAK
+    elif is_insert_phase:
+        retest_kind = RETEST_KIND_INSERT_PRESSURE
+    elif is_leak_phase:
+        retest_kind = RETEST_KIND_LEAK_RATE
+    else:
+        retest_kind = "unsupported"
+
+    nozzle = _channel_to_nozzle(channel)
+    leak_threshold = (
+        leak_thresholds.get(_phase_volume_key(phase_name), leak_thresholds.get("default", 1.0))
+        if is_leak_phase
+        else INSERT_PRESSURE_MIN
+    )
+    if retest_kind == "unsupported":
         return ChannelRetestResult(
             phase_name=phase_name,
             channel=channel,
-            nozzle=_channel_to_nozzle(channel),
+            nozzle=nozzle,
+            retest_kind=retest_kind,
             volume_ul=0.0,
-            leak_threshold=float(summary_row[2]),
+            leak_threshold=leak_threshold,
             sample_count=0,
             minimum=0.0,
             maximum=0.0,
@@ -688,11 +751,6 @@ async def _run_single_channel_fixture_retest_for_row(
             passed=False,
             error=f"unsupported retest phase {phase_name}",
         )
-
-    nozzle = _channel_to_nozzle(channel)
-    leak_threshold = leak_thresholds.get(
-        _phase_volume_key(phase_name), leak_thresholds.get("default", 1.0)
-    )
     event_config = RETEST_PRESSURE_CFG[_single_channel_retest_event()]
     write_cb(
         [
@@ -700,7 +758,8 @@ async def _run_single_channel_fixture_retest_for_row(
             phase_name,
             f"CH{channel}",
             nozzle,
-            f"{volume_ul}ul",
+            retest_kind,
+            f"{volume_ul or 0.0}ul",
             RETEST_FIXTURE_CHANNEL_LABEL,
             RETEST_FIXTURE_WELL,
         ]
@@ -729,6 +788,7 @@ async def _run_single_channel_fixture_retest_for_row(
                 "single-channel-retest-partial-pickup",
                 phase_name,
                 f"CH{channel}",
+                retest_kind,
                 "current",
                 RETEST_PARTIAL_PICKUP_CURRENT,
                 "distance-mm",
@@ -755,6 +815,8 @@ async def _run_single_channel_fixture_retest_for_row(
             RETEST_PRESSURE_CFG[RETEST_PRESSURE_EVENT.INSERT].sample_count,
             RETEST_PRESSURE_CFG[RETEST_PRESSURE_EVENT.INSERT].sample_delay,
         )
+        insert_average = statistics.fmean(insert_values)
+        insert_passed = insert_average > INSERT_PRESSURE_MIN
         write_cb(
             [
                 "single-channel-retest-insert-values",
@@ -763,6 +825,35 @@ async def _run_single_channel_fixture_retest_for_row(
                 "|".join(f"{value:.2f}" for value in insert_values),
             ]
         )
+        write_cb(
+            [
+                "single-channel-retest-insert-average",
+                phase_name,
+                f"CH{channel}",
+                round(insert_average, 4),
+                "threshold",
+                INSERT_PRESSURE_MIN,
+                _bool_to_pass_fail(insert_passed),
+            ]
+        )
+        if not is_leak_phase:
+            return ChannelRetestResult(
+                phase_name=phase_name,
+                channel=channel,
+                nozzle=nozzle,
+                retest_kind=retest_kind,
+                volume_ul=0.0,
+                leak_threshold=leak_threshold,
+                sample_count=len(insert_values),
+                minimum=0.0,
+                maximum=0.0,
+                leak_rate=0.0,
+                passed=insert_passed,
+                insert_average=insert_average,
+                insert_threshold=INSERT_PRESSURE_MIN,
+                insert_passed=insert_passed,
+            )
+        assert volume_ul is not None
         await api.aspirate(mount, volume_ul)
         if not api.is_simulator:
             await asyncio.sleep(event_config.stability_delay)
@@ -773,13 +864,15 @@ async def _run_single_channel_fixture_retest_for_row(
             event_config.sample_delay,
         )
         minimum, maximum, leak_rate = _single_fixture_leak_rate(values)
-        passed = leak_rate <= leak_threshold
+        leak_passed = leak_rate <= leak_threshold
+        passed = leak_passed and insert_passed
         await api.dispense(mount, volume_ul)
         await asyncio.sleep(1)
         return ChannelRetestResult(
             phase_name=phase_name,
             channel=channel,
             nozzle=nozzle,
+            retest_kind=retest_kind,
             volume_ul=volume_ul,
             leak_threshold=leak_threshold,
             sample_count=len(values),
@@ -787,13 +880,17 @@ async def _run_single_channel_fixture_retest_for_row(
             maximum=maximum,
             leak_rate=leak_rate,
             passed=passed,
+            insert_average=insert_average,
+            insert_threshold=INSERT_PRESSURE_MIN,
+            insert_passed=insert_passed,
         )
     except Exception as err:
         return ChannelRetestResult(
             phase_name=phase_name,
             channel=channel,
             nozzle=nozzle,
-            volume_ul=volume_ul,
+            retest_kind=retest_kind,
+            volume_ul=volume_ul or 0.0,
             leak_threshold=leak_threshold,
             sample_count=0,
             minimum=0.0,
@@ -825,6 +922,7 @@ async def _run_single_channel_fixture_retests(
         row
         for row in abnormal_rows
         if _phase_volume_key(str(row[0])) in {"1ul", "50ul", "200ul"}
+        or _is_insert_pressure_phase(str(row[0]))
     ]
     if not retest_rows:
         return {}
@@ -1315,7 +1413,7 @@ DEFAULT_RETEST_MODE = False
 FIXTURE_LABWARE_NAME = "opentrons_flex_96_tiprack_200ul"
 FIXTURE_ADAPTER_NAME = "opentrons_flex_96_tiprack_adapter"
 FIXTURE_SLOT = "B3"
-RETEST_FIXTURE_SLOT = "D3"
+RETEST_FIXTURE_SLOT = "B2"
 DEFAULT_FIXTURE_PICKUP_Z_OFFSET = 0.0
 CLI_FIXTURE_PICKUP_POINT = Point(x=342, y=288, z=111.5)
 
@@ -1471,7 +1569,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         minimum=-20.0,
         maximum=30.0,
         description=(
-            "Extra Z offset for calibrated B3 pressure fixture and D3 retest fixture pickup."
+            "Extra Z offset for calibrated B3 pressure fixture and B2 retest fixture pickup."
         ),
     )
 
@@ -1657,14 +1755,28 @@ def _failed_single_channel_retest_result(
     error: str,
 ) -> ChannelRetestResult:
     phase_name, channel = _summary_row_key(row)
-    volume_ul = _phase_volume_ul(phase_name) or 0.0
-    leak_threshold = leak_thresholds.get(
-        _phase_volume_key(phase_name), leak_thresholds.get("default", 1.0)
+    volume_value = _phase_volume_ul(phase_name)
+    volume_ul = volume_value or 0.0
+    is_insert_phase = _is_insert_pressure_phase(phase_name)
+    is_leak_phase = volume_value is not None
+    if is_insert_phase and is_leak_phase:
+        retest_kind = RETEST_KIND_INSERT_AND_LEAK
+    elif is_insert_phase:
+        retest_kind = RETEST_KIND_INSERT_PRESSURE
+    elif is_leak_phase:
+        retest_kind = RETEST_KIND_LEAK_RATE
+    else:
+        retest_kind = "unsupported"
+    leak_threshold = (
+        leak_thresholds.get(_phase_volume_key(phase_name), leak_thresholds.get("default", 1.0))
+        if is_leak_phase
+        else INSERT_PRESSURE_MIN
     )
     return ChannelRetestResult(
         phase_name=phase_name,
         channel=channel,
         nozzle=_channel_to_nozzle(channel),
+        retest_kind=retest_kind,
         volume_ul=volume_ul,
         leak_threshold=leak_threshold,
         sample_count=0,
@@ -1673,6 +1785,8 @@ def _failed_single_channel_retest_result(
         leak_rate=math.inf,
         passed=False,
         error=error,
+        insert_threshold=INSERT_PRESSURE_MIN if is_insert_phase else None,
+        insert_passed=False if is_insert_phase else None,
     )
 
 
@@ -1713,10 +1827,11 @@ def _summarize_channel_leak_history(
     overall_pass = True
     retest_results = retest_results or {}
     if not CHANNEL_LEAK_HISTORY:
-        return overall_pass, []
+        compact_summary_rows: List[List[Any]] = []
+    else:
+        compact_summary_rows = []
     write_cb(["-------------"])
     write_cb(["CHANNEL-LEAK-STATS"])
-    compact_summary_rows: List[List[Any]] = []
     for phase_name, channel_histories in sorted(
         CHANNEL_LEAK_HISTORY.items(),
         key=lambda item: _phase_sort_order(item[0]),
@@ -1732,10 +1847,7 @@ def _summarize_channel_leak_history(
             mad_value = _calculate_mad(channel_values)
             fail_count = sum(value > leak_threshold for value in channel_values)
             insert_fail_count = INSERT_PRESSURE_FAILED_COUNTS.get(channel_index, 0)
-            if insert_fail_count >= fail_count_threshold:
-                channel_passed = False
-                decision_reason = "insert-pressure-fail-count-threshold"
-            elif median_value <= leak_threshold:
+            if median_value <= leak_threshold:
                 channel_passed = True
                 decision_reason = "median-ok"
             elif cv_value <= cv_threshold:
@@ -1839,6 +1951,94 @@ def _summarize_channel_leak_history(
                     _bool_to_pass_fail(channel_passed),
                 ]
             )
+    for channel_index, insert_fail_count in sorted(INSERT_PRESSURE_FAILED_COUNTS.items()):
+        if insert_fail_count < fail_count_threshold:
+            continue
+        original_passed = False
+        original_status = _channel_status_label(original_passed, False)
+        phase_name = "insert-pressure"
+        decision_reason = "insert-pressure-fail-count-threshold"
+        retest_result = retest_results.get((phase_name, channel_index))
+        if retest_result and retest_result.passed:
+            channel_passed = True
+            channel_status = "PASS"
+            final_decision_reason = "single-channel-retest-pass"
+        else:
+            channel_passed = False
+            channel_status = original_status
+            final_decision_reason = decision_reason
+        overall_pass = overall_pass and channel_passed
+        channel_tag = f"channel-leak-{phase_name}-ch{channel_index}"
+        write_cb([channel_tag, "original-decision-reason", decision_reason])
+        write_cb([channel_tag, "insert-fail-count", insert_fail_count])
+        if channel_index in INSERT_PRESSURE_LAST_FAILED_VALUE:
+            write_cb(
+                [
+                    channel_tag,
+                    "last-insert-average-pressure",
+                    round(INSERT_PRESSURE_LAST_FAILED_VALUE[channel_index], 4),
+                ]
+            )
+        write_cb([channel_tag, "original-status", original_status])
+        write_cb([channel_tag, "original-pass", _bool_to_pass_fail(original_passed)])
+        if retest_result:
+            write_cb(
+                [
+                    channel_tag,
+                    "retest-fixture",
+                    f"{RETEST_FIXTURE_CHANNEL_LABEL}@{RETEST_FIXTURE_WELL}",
+                ]
+            )
+            write_cb(
+                [
+                    channel_tag,
+                    "retest-insert-average-pressure",
+                    _format_optional_float(retest_result.insert_average),
+                ]
+            )
+            write_cb([channel_tag, "retest-insert-threshold", INSERT_PRESSURE_MIN])
+            write_cb(
+                [
+                    channel_tag,
+                    "retest-status",
+                    "PASS" if retest_result.passed else "FAIL",
+                ]
+            )
+            if retest_result.error:
+                write_cb([channel_tag, "retest-error", retest_result.error])
+        else:
+            write_cb([channel_tag, "retest-status", "NOT_RUN"])
+        write_cb([channel_tag, "decision-reason", final_decision_reason])
+        write_cb([channel_tag, "status", channel_status])
+        write_cb([channel_tag, "pass", _bool_to_pass_fail(channel_passed)])
+        compact_summary_rows.append(
+            [
+                phase_name,
+                f"CH{channel_index}",
+                INSERT_PRESSURE_MIN,
+                (
+                    round(INSERT_PRESSURE_LAST_FAILED_VALUE[channel_index], 4)
+                    if channel_index in INSERT_PRESSURE_LAST_FAILED_VALUE
+                    else ""
+                ),
+                "",
+                "",
+                "",
+                0,
+                insert_fail_count,
+                original_status,
+                _bool_to_pass_fail(original_passed),
+                (
+                    "PASS"
+                    if retest_result and retest_result.passed
+                    else "FAIL"
+                    if retest_result
+                    else "NOT_RUN"
+                ),
+                channel_status,
+                _bool_to_pass_fail(channel_passed),
+            ]
+        )
     write_cb(["-------------"])
     write_cb(["CHANNEL-LEAK-SUMMARY"])
     write_cb(
