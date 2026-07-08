@@ -158,12 +158,43 @@ class SucceedCommandAction:
 
 
 @dataclasses.dataclass(frozen=True)
+class BeginAwaitingRecoveryAction:
+    """Enter error recovery without marking the associated command as failed.
+
+    Used when a background task or async module error occurs after a ``start_*``
+    command has already succeeded.
+    """
+
+    command_id: str
+    """The command to recover from."""
+
+    error_id: str
+    """An ID to assign to the recovery error.
+
+    Must be unique to this occurrence of the error.
+    """
+
+    failed_at: datetime
+    """When the error occurred."""
+
+    error: Union[CommandDefinedErrorData, EnumeratedError]
+    """The error that triggered recovery."""
+
+    notes: List[CommandNote]
+    """Debug notes to associate with the recovery error."""
+
+    type: ErrorRecoveryType
+    """How this error should be handled in the context of the overall run."""
+
+    command: Command
+    """The associated command in its current state."""
+
+
+@dataclasses.dataclass(frozen=True)
 class FailCommandAction:
     """Mark a given command as failed.
 
-    Normally dispatched while the command is running. May also target a prior
-    background ``start_*`` command when an associated task or async module error
-    is handled after that command has already succeeded.
+    Normally dispatched while the command is running.
     """
 
     command_id: str
@@ -344,6 +375,7 @@ Action = Union[
     QueueCommandAction,
     RunCommandAction,
     SucceedCommandAction,
+    BeginAwaitingRecoveryAction,
     FailCommandAction,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,

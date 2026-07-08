@@ -86,13 +86,13 @@ def handle_recoverable_vacuum_error(
 ) -> VacuumModuleDefinedErrorData:
     """Map a recoverable vacuum hardware error to defined command error data."""
     timestamp = model_utils.get_timestamp()
-    wrapped_error = ErrorOccurrence.from_failed(
-        id=model_utils.generate_id(),
-        createdAt=timestamp,
-        error=error,
-    )
 
     if isinstance(error, VacuumModuleWasteFullError):
+        wrapped_error = ErrorOccurrence.from_failed(
+            id=model_utils.generate_id(),
+            createdAt=timestamp,
+            error=error,
+        )
         return DefinedErrorData(
             public=VacuumModuleCarboyFullError(
                 id=model_utils.generate_id(),
@@ -104,6 +104,11 @@ def handle_recoverable_vacuum_error(
         )
 
     elif isinstance(error, VacuumModulePressureNotReachedError):
+        wrapped_error = ErrorOccurrence.from_failed(
+            id=model_utils.generate_id(),
+            createdAt=timestamp,
+            error=error,
+        )
         return DefinedErrorData(
             public=VacuumPressureNotReachedError(
                 id=model_utils.generate_id(),

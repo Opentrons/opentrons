@@ -9,7 +9,7 @@ from opentrons_shared_data.errors.exceptions import VacuumModuleWasteFullError
 
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
-    FailCommandAction,
+    BeginAwaitingRecoveryAction,
     FinishTaskAction,
 )
 from opentrons.protocol_engine.commands.command import CommandStatus
@@ -140,9 +140,9 @@ def test_finish_task_dispatches_fail_for_associated_start_command(
 
     decoy.verify(
         action_dispatcher.dispatch(
-            FailCommandAction(
+            BeginAwaitingRecoveryAction(
                 command_id="start-command-id",
-                running_command=start_command,
+                command=start_command,
                 error_id="defined-error-id",
                 failed_at=timestamp,
                 error=matchers.Anything(),
@@ -209,9 +209,9 @@ def test_try_recover_from_module_error_uses_resolver(
     assert recovered is True
     decoy.verify(
         action_dispatcher.dispatch(
-            FailCommandAction(
+            BeginAwaitingRecoveryAction(
                 command_id="start-command-id",
-                running_command=start_command,
+                command=start_command,
                 error_id="defined-error-id",
                 failed_at=timestamp,
                 error=matchers.Anything(),

@@ -249,7 +249,7 @@ async def test_injected_async_error_enters_associated_command_recovery(
     driver_error: WasteContainerFull | PressureNotReached,
     expected_error_type: str,
 ) -> None:
-    """Injected HW errors should fail the associated start command and enter recovery."""
+    """Injected HW errors should enter recovery without failing the start command."""
     vacuum, received_errors = sim_vacuum_for_recovery
     driver = vacuum._driver
     assert isinstance(driver, SimulatingDriver)
@@ -262,10 +262,10 @@ async def test_injected_async_error_enters_associated_command_recovery(
     assert len(received_errors) == 1
     assert state_store.commands.get_status() == EngineStatus.AWAITING_RECOVERY
 
-    failed_command = state_store.commands.get("start-command-id")
-    assert failed_command.status == CommandStatus.FAILED
-    assert failed_command.error is not None
-    assert failed_command.error.errorType == expected_error_type
+    recovering_command = state_store.commands.get("start-command-id")
+    assert recovering_command.status == CommandStatus.SUCCEEDED
+    assert recovering_command.error is not None
+    assert recovering_command.error.errorType == expected_error_type
 
     recovery_target = state_store.commands.get_recovery_target()
     assert recovery_target is not None

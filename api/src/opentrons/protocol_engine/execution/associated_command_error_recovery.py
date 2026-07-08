@@ -9,6 +9,7 @@ from opentrons_shared_data.errors.exceptions import EnumeratedError
 
 from ..actions import Action, FinishTaskAction
 from ..actions.action_handler import ActionHandler
+from ..commands import CommandStatus
 from ..commands.vacuum_module.recovery import (
     VacuumModuleAssociatedCommandRecoveryResolver,
 )
@@ -18,6 +19,7 @@ from ..resources import ModelUtils
 from ..types import ModuleModel
 from .associated_command_recovery_resolver import AssociatedCommandRecoveryResolver
 from .defined_error_failure import (
+    dispatch_begin_awaiting_recovery_for_defined_error,
     dispatch_fail_command_for_defined_error,
     get_error_recovery_type_for_defined_error,
 )
@@ -141,7 +143,12 @@ class AssociatedCommandErrorRecoveryOrchestrator(ActionHandler):
         if error_recovery_type != ErrorRecoveryType.WAIT_FOR_RECOVERY:
             return False
 
-        dispatch_fail_command_for_defined_error(
+        dispatch_defined_error = (
+            dispatch_begin_awaiting_recovery_for_defined_error
+            if associated_command.status == CommandStatus.SUCCEEDED
+            else dispatch_fail_command_for_defined_error
+        )
+        dispatch_defined_error(
             action_dispatcher=self._action_dispatcher,
             state_store=self._state_store,
             command_id=command_id,

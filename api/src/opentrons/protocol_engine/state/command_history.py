@@ -234,7 +234,6 @@ class CommandHistory:
         assert (
             prev_entry.command.status == CommandStatus.RUNNING
             or prev_entry.command.status == CommandStatus.QUEUED
-            or prev_entry.command.status == CommandStatus.SUCCEEDED
         )
         assert command.status == CommandStatus.FAILED
 

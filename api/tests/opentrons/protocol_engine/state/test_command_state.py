@@ -1021,6 +1021,65 @@ def test_recovery_target_tracking() -> None:
     assert subject_view.get_has_entered_recovery_mode() is True
 
 
+def test_begin_awaiting_recovery_keeps_succeeded_command_status() -> None:
+    """It should enter recovery without retroactively failing a succeeded command."""
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        is_door_open=False,
+    )
+    subject_view = CommandView(subject.state)
+    now = datetime.now()
+
+    subject.handle_action(
+        actions.QueueCommandAction(
+            "c1",
+            created_at=now,
+            request=commands.CommentCreate(params=commands.CommentParams(message="")),
+            request_hash=None,
+        )
+    )
+    subject.handle_action(actions.RunCommandAction(command_id="c1", started_at=now))
+    succeeded_command = subject_view.get("c1").model_copy(
+        update={
+            "status": commands.CommandStatus.SUCCEEDED,
+            "completedAt": now,
+        }
+    )
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            command=succeeded_command, state_update=StateUpdate()
+        )
+    )
+
+    recovery_error = PythonException(RuntimeError("async vacuum error"))
+    subject.handle_action(
+        actions.BeginAwaitingRecoveryAction(
+            command_id="c1",
+            error_id="c1-error",
+            failed_at=now,
+            error=recovery_error,
+            notes=[],
+            type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+            command=succeeded_command,
+        )
+    )
+
+    assert subject_view.get_status() == EngineStatus.AWAITING_RECOVERY
+    recovery_target = subject_view.get_recovery_target()
+    assert recovery_target is not None
+    assert recovery_target.command_id == "c1"
+
+    history_command = subject.state.command_history.get("c1").command
+    assert history_command.status == commands.CommandStatus.SUCCEEDED
+    assert history_command.error is None
+
+    recovering_command = subject_view.get("c1")
+    assert recovering_command.status == commands.CommandStatus.SUCCEEDED
+    assert recovering_command.error is not None
+    assert recovering_command.error.errorType == "PythonException"
+
+
 @pytest.mark.parametrize(
     "ending_action",
     [

@@ -14,6 +14,7 @@ from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonExce
 
 from ..actions import (
     Action,
+    BeginAwaitingRecoveryAction,
     CreateUserCommandAnnotation,
     DoorChangeAction,
     FailCommandAction,
@@ -166,12 +167,15 @@ class CommandAnnotationsSlice(BaseModel):
 
 @dataclass(frozen=True)
 class _RecoveryTargetInfo:
-    """Info about the failed command that we're currently recovering from."""
+    """Info about the command that we're currently recovering from."""
 
     command_id: str
 
     state_update_if_false_positive: update_types.StateUpdate
     """See `CommandView.get_state_update_if_continued()`."""
+
+    error: Optional[ErrorOccurrence] = None
+    """The recovery error, when the target command has not been marked failed."""
 
 
 @dataclass
@@ -309,6 +313,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 self._handle_run_command_action(action)
             case SucceedCommandAction():
                 self._handle_succeed_command_action(action)
+            case BeginAwaitingRecoveryAction():
+                self._handle_begin_awaiting_recovery_action(action)
             case FailCommandAction():
                 self._handle_fail_command_action(action)
             case PlayAction():
@@ -375,6 +381,40 @@ class CommandStore(HasState[CommandState], HandlesActions):
     def _handle_succeed_command_action(self, action: SucceedCommandAction) -> None:
         succeeded_command = action.command
         self._state.command_history.set_command_succeeded(succeeded_command)
+
+    def _handle_begin_awaiting_recovery_action(
+        self, action: BeginAwaitingRecoveryAction
+    ) -> None:
+        if isinstance(action.error, EnumeratedError):
+            public_error_occurrence = ErrorOccurrence.from_failed(
+                id=action.error_id,
+                createdAt=action.failed_at,
+                error=action.error,
+            )
+            state_update_if_false_positive = update_types.StateUpdate()
+        else:
+            public_error_occurrence = action.error.public
+            state_update_if_false_positive = action.error.state_update_if_false_positive
+
+        self._state.command_error_recovery_types[action.command_id] = action.type
+
+        if (
+            action.command.intent in (CommandIntent.PROTOCOL, None)
+            and action.type == ErrorRecoveryType.WAIT_FOR_RECOVERY
+        ):
+            if (
+                self._state.queue_status == QueueStatus.PAUSED
+                or self._state.is_door_blocking
+            ):
+                self._state.queue_status = QueueStatus.AWAITING_RECOVERY_PAUSED
+            else:
+                self._state.queue_status = QueueStatus.AWAITING_RECOVERY
+            self._state.recovery_target = _RecoveryTargetInfo(
+                command_id=action.command_id,
+                state_update_if_false_positive=state_update_if_false_positive,
+                error=public_error_occurrence,
+            )
+            self._state.has_entered_error_recovery = True
 
     def _handle_fail_command_action(  # noqa: C901
         self, action: FailCommandAction
@@ -675,7 +715,15 @@ class CommandView:
 
     def get(self, command_id: str) -> Command:
         """Get a command by its unique identifier."""
-        return self._state.command_history.get(command_id).command
+        command = self._state.command_history.get(command_id).command
+        recovery_target = self._state.recovery_target
+        if (
+            recovery_target is not None
+            and recovery_target.command_id == command_id
+            and recovery_target.error is not None
+        ):
+            return command.model_copy(update={"error": recovery_target.error})
+        return command
 
     def get_all(self) -> List[Command]:
         """Get a list of all commands in state.
@@ -1028,14 +1076,24 @@ class CommandView:
         including in between commands.
         """
         failed_command = self._state.failed_command
+        recovery_target = self._state.recovery_target
+        error: Optional[ErrorOccurrence] = None
         if (
             failed_command
             and failed_command.command.error
             and failed_command.command.intent != CommandIntent.SETUP
         ):
+            error = failed_command.command.error
+        elif recovery_target and recovery_target.error is not None:
+            recovery_command = self._state.command_history.get(
+                recovery_target.command_id
+            ).command
+            if recovery_command.intent != CommandIntent.SETUP:
+                error = recovery_target.error
+        if error is not None:
             raise ProtocolCommandFailedError(
-                original_error=failed_command.command.error,
-                message=failed_command.command.error.detail,
+                original_error=error,
+                message=error.detail,
             )
 
     def get_error_recovery_type(self, command_id: str) -> ErrorRecoveryType:
