@@ -165,11 +165,11 @@ async def create_run_command(
         bool,
         Query(
             description=(
-                "If `true`, the command will be rejected if the robot's"
-                " front door is open at enqueue time."
+                "If `True`, the command will be rejected if"
+                " the robot's front door is open at enqueue time."
             ),
         ),
-    ] = False,
+    ] = True,
 ) -> PydanticResponse[SimpleBody[pe_commands.Command]]:
     """Enqueue a protocol command.
 

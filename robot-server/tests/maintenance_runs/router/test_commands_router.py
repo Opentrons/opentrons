@@ -98,6 +98,8 @@ async def test_create_run_command(
         params=pe_commands.WaitForResumeParams(message="Hello"),
     )
 
+    decoy.when(mock_hardware_api.door_state).then_return(DoorState.CLOSED)
+
     decoy.when(
         await mock_maintenance_run_orchestrator_store.add_command_and_wait_for_interval(
             request=pe_commands.WaitForResumeCreate(
@@ -147,6 +149,8 @@ async def test_create_run_command_blocking_completion(
         result=pe_commands.WaitForResumeResult(),
     )
 
+    decoy.when(mock_hardware_api.door_state).then_return(DoorState.CLOSED)
+
     decoy.when(
         await mock_maintenance_run_orchestrator_store.add_command_and_wait_for_interval(
             request=command_request, wait_until_complete=True, timeout=999
@@ -171,12 +175,12 @@ async def test_create_run_command_blocking_completion(
     assert result.status_code == 201
 
 
-async def test_create_run_command_door_open_blocks_when_requires_closed_door(
+async def test_create_run_command_door_open_blocks_by_default(
     decoy: Decoy,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     mock_hardware_api: HardwareControlAPI,
 ) -> None:
-    """It should return a 409 when requiresClosedDoor=True and the door is open."""
+    """It should return a 409 by default when the door is open."""
     command_request = pe_commands.HomeCreate(params=pe_commands.HomeParams())
 
     decoy.when(mock_hardware_api.door_state).then_return(DoorState.OPEN)
@@ -190,19 +194,18 @@ async def test_create_run_command_door_open_blocks_when_requires_closed_door(
             timeout=None,
             check_estop=True,
             hardware=mock_hardware_api,
-            requiresClosedDoor=True,
         )
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "MaintenanceCommandDoorOpen"
 
 
-async def test_create_run_command_door_open_allows_when_not_required(
+async def test_create_run_command_door_open_allows_when_opted_out(
     decoy: Decoy,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     mock_hardware_api: HardwareControlAPI,
 ) -> None:
-    """It should allow commands through when requiresClosedDoor is not set, even if the door is open."""
+    """It should allow commands through when requiresClosedDoor is False, even if the door is open."""
     command_request = pe_commands.HomeCreate(params=pe_commands.HomeParams())
 
     command_once_added = pe_commands.Home(
