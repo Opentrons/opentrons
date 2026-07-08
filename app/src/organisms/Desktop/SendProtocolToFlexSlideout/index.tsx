@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -12,10 +12,12 @@ import { useCreateProtocolMutation } from '@opentrons/react-api-client'
 import { FLEX_DISPLAY_NAME, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getValidCustomLabwareFiles } from '/app/redux/custom-labware'
 import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage'
+import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import { getAnalysisStatus } from '/app/transformations/analysis'
@@ -54,23 +56,33 @@ export function SendProtocolToFlexSlideout(
 
   const { eatToast, makeToast } = useToaster()
 
-  const documentationState = useDocumentationState(
-    undefined,
-    selectedRobot?.name
-  )
+  const token = useAccessTokenForRobot(selectedRobot?.name ?? null)
 
-  const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation(
-    documentationState,
-    {},
-    selectedRobot != null
+  const hostConfig = useMemo(() => {
+    return selectedRobot != null
       ? {
           hostname: selectedRobot.ip,
+          robotName: selectedRobot.name,
+          token,
+          port: selectedRobot.port,
           requestor:
             selectedRobot?.ip === OPENTRONS_USB
               ? appShellUSBRequestor
               : undefined,
         }
       : null
+  }, [selectedRobot, token])
+
+  const documentationState = useDocumentationState(
+    undefined,
+    selectedRobot?.name,
+    hostConfig
+  )
+
+  const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation(
+    documentationState,
+    {},
+    hostConfig
   )
 
   const isAnalyzing = useSelector((state: State) =>
@@ -147,31 +159,33 @@ export function SendProtocolToFlexSlideout(
   }
 
   return (
-    <ChooseRobotSlideout
-      isExpanded={isExpanded}
-      isSelectedRobotOnDifferentSoftwareVersion={
-        isSelectedRobotOnDifferentSoftwareVersion
-      }
-      onCloseClick={onCloseClick}
-      title={t('protocol_list:send_to_robot', {
-        robot_display_name: FLEX_DISPLAY_NAME,
-      })}
-      footer={
-        <PrimaryButton
-          disabled={
-            selectedRobot == null || isSelectedRobotOnDifferentSoftwareVersion
-          }
-          onClick={handleSendClick}
-          width="100%"
-        >
-          {t('protocol_details:send')}
-        </PrimaryButton>
-      }
-      selectedRobot={selectedRobot}
-      setSelectedRobot={setSelectedRobot}
-      robotType={FLEX_ROBOT_TYPE}
-      isAnalysisError={analysisStatus === 'error'}
-      isAnalysisStale={analysisStatus === 'stale'}
-    />
+    <ApiHostProvider robotName={selectedRobot?.name ?? null}>
+      <ChooseRobotSlideout
+        isExpanded={isExpanded}
+        isSelectedRobotOnDifferentSoftwareVersion={
+          isSelectedRobotOnDifferentSoftwareVersion
+        }
+        onCloseClick={onCloseClick}
+        title={t('protocol_list:send_to_robot', {
+          robot_display_name: FLEX_DISPLAY_NAME,
+        })}
+        footer={
+          <PrimaryButton
+            disabled={
+              selectedRobot == null || isSelectedRobotOnDifferentSoftwareVersion
+            }
+            onClick={handleSendClick}
+            width="100%"
+          >
+            {t('protocol_details:send')}
+          </PrimaryButton>
+        }
+        selectedRobot={selectedRobot}
+        setSelectedRobot={setSelectedRobot}
+        robotType={FLEX_ROBOT_TYPE}
+        isAnalysisError={analysisStatus === 'error'}
+        isAnalysisStale={analysisStatus === 'stale'}
+      />
+    </ApiHostProvider>
   )
 }

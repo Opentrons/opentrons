@@ -9,7 +9,7 @@ import {
   useHost,
 } from '@opentrons/react-api-client'
 
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { getValidCustomLabwareFiles } from '/app/redux/custom-labware/selectors'
 
 import type { UseMutateFunction } from 'react-query'
@@ -50,7 +50,11 @@ export function useCreateRunFromProtocol(
     getValidCustomLabwareFiles(state)
   )
 
-  const documentationState = useDocumentationState(undefined, host?.robotName)
+  const documentationState = useLinkedDocumentationState(
+    ['create_protocol', 'play_run'],
+    host?.robotName,
+    host
+  )
 
   const {
     createRun,

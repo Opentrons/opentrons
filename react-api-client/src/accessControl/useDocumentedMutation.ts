@@ -152,11 +152,14 @@ async function runMutation<TData, TVariables>(
           : '',
     })
     .catch(async e => {
+      console.log('hit error', e)
+      console.log(documentationState)
       if (
         e.isAxiosError &&
         e.response?.status === 401 &&
         documentationState.accessControlEnabled
       ) {
+        console.log('hit 401')
         return await runMutation(
           { ...documentationState, loginExpired: true },
           actionsToDocument,

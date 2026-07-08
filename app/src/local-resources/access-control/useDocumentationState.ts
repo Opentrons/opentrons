@@ -9,6 +9,7 @@ import { useCurrentRobotName, useUsernameForRobot } from '/app/redux/robot-auth'
 
 import { DocumentationRequiredModalContext } from './DocumentationRequiredModalContext'
 
+import type { HostConfig } from '@opentrons/api-client'
 import type {
   DocumentationReport,
   DocumentationState,
@@ -18,24 +19,28 @@ import type {
 } from '@opentrons/react-api-client'
 
 /**
- * API for the access-control gate.
- *
- *  Runs the access-control gate and returns the following states:
- *   1. If access control is disabled on the robot, the gate returns { reasonForInteractionRequired: false}
- *   2. If access control is enabled and documentation is provided from state, the gate returns the provided docreport
- *   3. If access control is enabled and documentation is not provided or is invalid, the gate returns a function that, when invoked,
- *   opens the documentation modal and returns the documentation report
- *
- *  This documentation state is designed to be passed along to the useDocumentedMutation hook.
+ * Provides a documentation state for use in the useDocumentedMutation hook.
+ * Runs the appropriate auth settings queries to see what login or documentation checks are needed.
+ * When a mutation runs, if no initial docreport is provided, the documentation modal will pop up.
+ * Notably, the result of this modal is not stored, and only passed along to the single mutation that called it.
+ * If you need to pass one docreport along to multiple mutations, use either useMaintenanceRunDocumentation or useLinkedDocumentationState.
  *
  * @param docreport - optional pre-provided documentation report
+ * @param robotName - for use when this is called on the desktop but not from a /devices/<robotName> route
+ * @returns a documentation state object
  */
 export function useDocumentationState(
   docreport?: DocumentationReport,
-  robotName?: string | null
+  robotName?: string | null,
+  hostOverride?: HostConfig | null,
+  onPromptForDocumentation?: (docreport: DocumentationReport) => void,
+  providedActionsToDocument?: DocumentedAction[]
 ): DocumentationState {
-  const authSettingsQuery = useAuthSettingsQuery()
-  const accessControlEnabledQuery = useAccessControlEnabledQuery()
+  const authSettingsQuery = useAuthSettingsQuery(undefined, hostOverride)
+  const accessControlEnabledQuery = useAccessControlEnabledQuery(
+    undefined,
+    hostOverride
+  )
 
   const foundName = useCurrentRobotName()
   const currentRobotName = robotName ?? foundName
@@ -87,13 +92,21 @@ export function useDocumentationState(
       }
       const docResult = await requireDocumentation(
         username ?? '',
-        actionsToDocument,
+        providedActionsToDocument ?? actionsToDocument,
         handleCancel,
         initialDocreport
       )
+      onPromptForDocumentation?.(docResult)
       return docResult
     },
-    [currentRobotName, currentUsername, requireDocumentation, requireLogin]
+    [
+      currentRobotName,
+      currentUsername,
+      onPromptForDocumentation,
+      providedActionsToDocument,
+      requireDocumentation,
+      requireLogin,
+    ]
   )
 
   const askForLogin = useCallback(async () => {

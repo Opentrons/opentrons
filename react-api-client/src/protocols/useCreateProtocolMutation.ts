@@ -1,8 +1,8 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { createProtocol } from '@opentrons/api-client'
 
-import { DocumentationState, useDocumentedMutation } from '../accessControl'
+import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
@@ -18,6 +18,7 @@ import type {
   RunTimeParameterFilesCreateData,
   RunTimeParameterValuesCreateData,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
 
 export interface CreateProtocolVariables {
   files: File[]
