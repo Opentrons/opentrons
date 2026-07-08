@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Annotated, Literal, Self, Sequence, TypedDict
+from typing import Annotated, Literal, Sequence, TypedDict
 
-from pydantic import BaseModel, Field, SecretStr, model_validator
+from pydantic import BaseModel, Field, SecretStr
 
 from server_utils.auth.scopes import Scope
 
@@ -31,7 +31,6 @@ ACCOUNT_TYPE_TO_SCOPES: dict[AccountType, set[Scope]] = {
         # todo(mm, 2026-03-17): Protocol uploads should be togglable to admin-only by an auth setting.
         Scope.USERS_READ_SELF,
         Scope.USERS_WRITE_SELF,
-        Scope.USERS_WRITE_SELF_PASSWORD,
         Scope.PROTOCOLS_WRITE,
     },
     # Auditors should have read-only access to everything. Our read-only endpoints are
@@ -44,7 +43,6 @@ ACCOUNT_TYPE_TO_SCOPES: dict[AccountType, set[Scope]] = {
 RESET_PASSWORD_SCOPES: set[Scope] = {
     Scope.USERS_READ_SELF,
     Scope.USERS_WRITE_SELF,
-    Scope.USERS_WRITE_SELF_PASSWORD,
 }
 
 
@@ -108,13 +106,6 @@ class UpdateSelf(BaseModel):
         SecretStr | None,
         Field(default=None, description="The new password for the user."),
     ] = None
-
-    @model_validator(mode="after")
-    def check_at_least_one_field(self) -> Self:
-        """Check that at least one field is provided."""
-        if self.username is None and self.fullName is None and self.password is None:
-            raise ValueError("At least one field must be provided")
-        return self
 
 
 class UserResponse(BaseModel):

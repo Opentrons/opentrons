@@ -308,6 +308,18 @@ async def update_self(
         )
 
     update_data = request_body.data
+    if (
+        update_data.username is None
+        and update_data.fullName is None
+        and update_data.password is None
+    ):
+        return await PydanticResponse.create(
+            status_code=fastapi.status.HTTP_200_OK,
+            content=SimpleBody(
+                data=user_data_manager.get_user(authorization_details.username)
+            ),
+        )
+
     try:
         result = user_data_manager.update_user(
             authorization_details.username,
