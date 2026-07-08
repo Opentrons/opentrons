@@ -14,6 +14,8 @@ import styles from './personalaccountsettings.module.css'
 import type { JSX, ReactNode } from 'react'
 import type { UpdateSelfRequest } from '@opentrons/api-client'
 
+const PASSWORD_PLACEHOLDER = '************************'
+
 export interface PersonalAccountSettingsEditFormProps {
   username: string
   fullName: string
@@ -130,6 +132,7 @@ export function PersonalAccountSettingsEditForm({
         <FieldGroup label={t('desktop_password')}>
           <PasswordInputField
             value={password}
+            placeholder={PASSWORD_PLACEHOLDER}
             onChange={event => {
               setPassword(event.target.value)
               if (confirmPasswordError != null) {
@@ -142,6 +145,7 @@ export function PersonalAccountSettingsEditForm({
         <FieldGroup label={t('desktop_confirm_password')}>
           <PasswordInputField
             value={confirmPassword}
+            placeholder={PASSWORD_PLACEHOLDER}
             error={confirmPasswordError ?? saveError}
             onChange={event => {
               setConfirmPassword(event.target.value)

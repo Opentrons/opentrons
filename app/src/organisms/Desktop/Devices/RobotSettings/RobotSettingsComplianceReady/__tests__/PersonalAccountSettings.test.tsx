@@ -17,8 +17,16 @@ import { PersonalAccountSettings } from '../PersonalAccountSettings'
 
 import type { RenderResult } from '@testing-library/react'
 import type { AuthUserResponse, UpdateSelfRequest } from '@opentrons/api-client'
+import type { State } from '/app/redux/types'
 
 const ROBOT_NAME = 'flex-1'
+
+const MOCK_AUTH_STATE = {
+  username: 'alice',
+  accessToken: 'access-token',
+  refreshToken: 'refresh-token',
+  expiresAt: null,
+}
 
 const MOCK_SELF_RESPONSE = {
   data: {
@@ -36,10 +44,21 @@ vi.mock('@opentrons/react-api-client')
 const mockUpdateSelf = vi.fn()
 let selfResponse = MOCK_SELF_RESPONSE
 
-const render = (): RenderResult => {
+const render = (initialState: Partial<State> = {}): RenderResult => {
   return renderWithProviders(
     <PersonalAccountSettings robotName={ROBOT_NAME} />,
-    { i18nInstance: i18n }
+    {
+      i18nInstance: i18n,
+      initialState: {
+        robotAuth: {
+          perRobotAuthStates: {
+            [ROBOT_NAME]: MOCK_AUTH_STATE,
+          },
+          mostRecentRobotName: ROBOT_NAME,
+        },
+        ...initialState,
+      } as State,
+    }
   )[0]
 }
 
@@ -93,9 +112,9 @@ describe('PersonalAccountSettings', () => {
       port: 31950,
     } as ReturnType<typeof useHost>)
     vi.mocked(useSelfQuery).mockImplementation(
-      () =>
+      options =>
         ({
-          data: selfResponse,
+          data: options?.enabled === false ? undefined : selfResponse,
         }) as ReturnType<typeof useSelfQuery>
     )
     vi.mocked(useUpdateSelfMutation).mockReturnValue({

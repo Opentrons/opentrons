@@ -50,6 +50,16 @@ describe('PasswordInputField', () => {
     expect(props.onChange).toHaveBeenCalled()
   })
 
+  it('renders a placeholder when the field is empty', () => {
+    const { container } = render({
+      ...props,
+      placeholder: '**********',
+    })
+    const input = container.querySelector('input')
+    expect(input).toHaveAttribute('placeholder', '**********')
+    expect(input).toHaveValue('')
+  })
+
   it('displays a validation error', () => {
     render({ ...props, error: 'Passwords do not match' })
     screen.getByText('Passwords do not match')

@@ -9,6 +9,7 @@ import type { ChangeEvent, FocusEvent, JSX } from 'react'
 
 export interface PasswordInputFieldProps {
   value: string
+  placeholder?: string
   error?: string | null
   onChange: (event: ChangeEvent<HTMLInputElement>) => void
   onBlur?: (event: FocusEvent<HTMLInputElement>) => void
@@ -16,6 +17,7 @@ export interface PasswordInputFieldProps {
 
 export function PasswordInputField({
   value,
+  placeholder,
   error,
   onChange,
   onBlur,
@@ -27,6 +29,7 @@ export function PasswordInputField({
     <InputField
       type={showPassword ? 'text' : 'password'}
       value={value}
+      placeholder={placeholder}
       error={error}
       onChange={onChange}
       onBlur={onBlur}
