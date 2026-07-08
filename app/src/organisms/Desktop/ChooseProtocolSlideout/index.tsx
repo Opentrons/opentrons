@@ -52,9 +52,7 @@ import { getAnalysisStatus } from '/app/organisms/Desktop/ProtocolsLanding/utils
 import { LegacyApplyHistoricOffsets } from '/app/organisms/LegacyApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useRobotType } from '/app/redux-resources/robots'
-import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getStoredProtocols } from '/app/redux/protocol-storage'
-import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
@@ -175,16 +173,7 @@ export function ChooseProtocolSlideoutComponent(
     robot.ip
   )
 
-  const { uploadCsvFile } = useUploadCsvFileMutation(
-    {},
-    robot != null
-      ? {
-          hostname: robot.ip,
-          requestor:
-            robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined,
-        }
-      : null
-  )
+  const { uploadCsvFile } = useUploadCsvFileMutation()
 
   const srcFileObjects =
     selectedProtocol != null
@@ -221,7 +210,7 @@ export function ChooseProtocolSlideoutComponent(
         })
       },
     },
-    { hostname: robot.ip },
+    undefined,
     shouldApplyOffsets
       ? offsetCandidates.map(({ vector, location, definitionUri }) => ({
           vector,
@@ -671,7 +660,7 @@ export function ChooseProtocolSlideoutComponent(
       maxSteps={hasRunTimeParameters ? 2 : 1}
       title={t('choose_protocol_to_run', { name })}
       footer={
-        <ApiHostProvider robotName={name}>
+        <>
           {currentPage === 1
             ? !isFlex && (
                 <LegacyApplyHistoricOffsets
@@ -697,7 +686,7 @@ export function ChooseProtocolSlideoutComponent(
               )
             : null}
           {hasRunTimeParameters ? multiPageFooter : singlePageFooter}
-        </ApiHostProvider>
+        </>
       }
     >
       {showSlideout ? (
@@ -723,7 +712,11 @@ export function ChooseProtocolSlideoutComponent(
 export function ChooseProtocolSlideout(
   props: ChooseProtocolSlideoutProps
 ): JSX.Element | null {
-  return <ChooseProtocolSlideoutComponent {...props} />
+  return (
+    <ApiHostProvider robotName={props.robot.name}>
+      <ChooseProtocolSlideoutComponent {...props} />
+    </ApiHostProvider>
+  )
 }
 
 interface StoredProtocolListProps {

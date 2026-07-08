@@ -19,6 +19,7 @@ import {
   useHost,
 } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import {
@@ -73,9 +74,12 @@ export function SummaryAndSettings(
     initializeSummaryState
   )
 
-  const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation()
+  const documentationState = useDocumentationState()
+  const { mutateAsync: createProtocolAsync } =
+    useCreateProtocolMutation(documentationState)
 
   const { createRun } = useCreateRunMutation(
+    documentationState,
     {
       onSuccess: data => {
         queryClient

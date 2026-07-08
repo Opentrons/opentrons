@@ -1,7 +1,6 @@
-import { useMutation } from 'react-query'
-
 import { createRun } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
@@ -11,6 +10,10 @@ import type {
   UseMutationResult,
 } from 'react-query'
 import type { CreateRunData, HostConfig, Run } from '@opentrons/api-client'
+import type {
+  DocumentationState,
+  DocumentedMutationParameters,
+} from '../accessControl/types'
 
 export type UseCreateRunMutationResult = UseMutationResult<
   Run,
@@ -27,15 +30,21 @@ export type UseCreateRunMutationOptions = UseMutationOptions<
 >
 
 export function useCreateRunMutation(
+  documentationState: DocumentationState,
   options: UseCreateRunMutationOptions = {},
   hostOverride?: HostConfig | null
 ): UseCreateRunMutationResult {
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
-  const mutation = useMutation<Run, AxiosError, CreateRunData>(
+  const mutation = useDocumentedMutation<Run, AxiosError, CreateRunData>(
+    documentationState,
+    ['play_run'],
     getQueryKey(host, 'runs'),
-    createRunData =>
+    ({
+      variables: createRunData,
+      userNotes,
+    }: DocumentedMutationParameters<CreateRunData>) =>
       createRun(host!, createRunData)
         .then(response => response.data)
         .catch(e => {

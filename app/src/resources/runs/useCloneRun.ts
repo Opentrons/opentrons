@@ -8,6 +8,7 @@ import {
   useHost,
 } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
@@ -32,22 +33,26 @@ export function useCloneRun(
   const queryClient = useQueryClient()
   const { data: runRecord, isLoading: isLoadingRun } = useNotifyRunQuery(runId)
   const protocolKey = runRecord?.data.protocolId ?? null
-  const { createRun, isLoading: isCloning } = useCreateRunMutation({
-    onSuccess: response => {
-      const invalidateRuns = queryClient.invalidateQueries(
-        getQueryKey(host, 'runs')
-      )
-      const invalidateProtocols = queryClient.invalidateQueries(
-        getQueryKey(host, 'protocols', protocolKey)
-      )
-      Promise.all([invalidateRuns, invalidateProtocols]).catch((e: Error) => {
-        console.error(`error invalidating runs query: ${e.message}`)
-      })
-      // The onSuccess callback is not awaited until query invalidation, because currently, in every instance this
-      // onSuccessCallback is utilized, we only use it for navigating. We may need to revisit this.
-      onSuccessCallback?.(response)
-    },
-  })
+  const documentationState = useDocumentationState()
+  const { createRun, isLoading: isCloning } = useCreateRunMutation(
+    documentationState,
+    {
+      onSuccess: response => {
+        const invalidateRuns = queryClient.invalidateQueries(
+          getQueryKey(host, 'runs')
+        )
+        const invalidateProtocols = queryClient.invalidateQueries(
+          getQueryKey(host, 'protocols', protocolKey)
+        )
+        Promise.all([invalidateRuns, invalidateProtocols]).catch((e: Error) => {
+          console.error(`error invalidating runs query: ${e.message}`)
+        })
+        // The onSuccess callback is not awaited until query invalidation, because currently, in every instance this
+        // onSuccessCallback is utilized, we only use it for navigating. We may need to revisit this.
+        onSuccessCallback?.(response)
+      },
+    }
+  )
   const { createProtocolAnalysis } = useCreateProtocolAnalysisMutation(
     protocolKey,
     host
