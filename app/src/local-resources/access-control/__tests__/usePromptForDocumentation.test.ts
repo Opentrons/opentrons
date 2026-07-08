@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   useAccessControlEnabledQuery,
-  useAuthSettingsQuery,
+  useAuditSettingsQuery,
 } from '@opentrons/react-api-client'
 
 import { useUsernameForRobot } from '/app/redux/robot-auth'
@@ -20,7 +20,7 @@ import type ReactRedux from 'react-redux'
 import type { DocumentationReport } from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', () => ({
-  useAuthSettingsQuery: vi.fn(),
+  useAuditSettingsQuery: vi.fn(),
   useAccessControlEnabledQuery: vi.fn(),
 }))
 
@@ -47,14 +47,14 @@ const wrapper = wrapWithDocumentationRequiredModal()
 
 describe('usePromptForDocumentation', () => {
   beforeEach(() => {
-    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+    vi.mocked(useAuditSettingsQuery).mockReturnValue({
       data: {
         data: {
           requireReasonForInteraction: true,
           minLengthOfReasonForInteraction: 10,
         },
       },
-    } as ReturnType<typeof useAuthSettingsQuery>)
+    } as ReturnType<typeof useAuditSettingsQuery>)
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
       data: {
         data: {
@@ -72,14 +72,14 @@ describe('usePromptForDocumentation', () => {
   })
 
   it('does not prompt when access control is disabled', () => {
-    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+    vi.mocked(useAuditSettingsQuery).mockReturnValue({
       data: {
         data: {
           requireReasonForInteraction: true,
           minLengthOfReasonForInteraction: 10,
         },
       },
-    } as ReturnType<typeof useAuthSettingsQuery>)
+    } as ReturnType<typeof useAuditSettingsQuery>)
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
       data: {
         data: {
@@ -107,14 +107,14 @@ describe('usePromptForDocumentation', () => {
         },
       },
     } as ReturnType<typeof useAccessControlEnabledQuery>)
-    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+    vi.mocked(useAuditSettingsQuery).mockReturnValue({
       data: {
         data: {
           requireReasonForInteraction: false,
           minLengthOfReasonForInteraction: 10,
         },
       },
-    } as ReturnType<typeof useAuthSettingsQuery>)
+    } as ReturnType<typeof useAuditSettingsQuery>)
     const { result } = renderHook(
       () => usePromptForDocumentation(['lpc_flow']),
       {

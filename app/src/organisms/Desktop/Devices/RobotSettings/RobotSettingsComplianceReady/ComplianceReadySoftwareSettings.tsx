@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 
 import { Divider, StyledText } from '@opentrons/components'
 import {
+  useAuditSettingsMutation,
+  useAuditSettingsQuery,
   useAuthSettingsMutation,
   useAuthSettingsQuery,
   useGetRobotServerAccessControlSettingsQuery,
@@ -11,10 +13,12 @@ import {
 
 import { Accordion } from './Accordion'
 import {
+  getAuditInputPatch,
   getAuthInputPatch,
   getFieldValuesFromSettings,
 } from './complianceReadySettingsHelper'
 import {
+  isAuditServerSettingKey,
   isAuthServerSettingKey,
   isRobotServerSettingKey,
 } from './complianceReadySettingsTypes'
@@ -24,6 +28,7 @@ import { InputSetting } from './InputSetting'
 
 import type { JSX, ReactNode } from 'react'
 import type {
+  AuditServerSettingFieldId,
   AuthSettingFieldId,
   SettingFieldId,
 } from './complianceReadySettingsTypes'
@@ -64,9 +69,11 @@ export function ComplianceReadySoftwareSettings({
 }: ComplianceReadySoftwareSettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const authSettingsQuery = useAuthSettingsQuery()
+  const auditSettingsQuery = useAuditSettingsQuery()
   const robotServerAccessControlSettingsQuery =
     useGetRobotServerAccessControlSettingsQuery()
   const { mutate: patchAuthSettings } = useAuthSettingsMutation()
+  const { mutate: patchAuditSettings } = useAuditSettingsMutation()
   const { mutate: patchRobotServerAccessControlSettings } =
     usePatchRobotServerAccessControlSettingsMutation()
 
@@ -74,18 +81,33 @@ export function ComplianceReadySoftwareSettings({
     () =>
       getFieldValuesFromSettings(
         authSettingsQuery.data?.data,
-        robotServerAccessControlSettingsQuery.data?.data
+        robotServerAccessControlSettingsQuery.data?.data,
+        auditSettingsQuery.data?.data
       ),
     [
       authSettingsQuery.data?.data,
       robotServerAccessControlSettingsQuery.data?.data,
+      auditSettingsQuery.data?.data,
     ]
   )
 
-  const handleInputBlur = (id: AuthSettingFieldId, value: string): void => {
+  const handleAuthSettingInputBlur = (
+    id: AuthSettingFieldId,
+    value: string
+  ): void => {
     const authPatch = getAuthInputPatch(id, value, fieldValues)
     if (authPatch != null) {
       patchAuthSettings(authPatch)
+    }
+  }
+
+  const handleAuditSettingInputBlur = (
+    id: AuditServerSettingFieldId,
+    value: string
+  ): void => {
+    const auditPatch = getAuditInputPatch(id, value, fieldValues)
+    if (auditPatch != null) {
+      patchAuditSettings(auditPatch)
     }
   }
 
@@ -116,6 +138,8 @@ export function ComplianceReadySoftwareSettings({
           })
         } else if (isAuthServerSettingKey(fieldId)) {
           patchAuthSettings({ data: { [fieldId]: toggledOn } })
+        } else if (isAuditServerSettingKey(fieldId)) {
+          patchAuditSettings({ data: { [fieldId]: toggledOn } })
         }
     }
   }
@@ -138,7 +162,7 @@ export function ComplianceReadySoftwareSettings({
             value={String(fieldValues.maxNumberOfLoginAttempts)}
             units={t('desktop_logins')}
             onBlur={value => {
-              handleInputBlur('maxNumberOfLoginAttempts', value)
+              handleAuthSettingInputBlur('maxNumberOfLoginAttempts', value)
             }}
           />
           <Divider />
@@ -156,7 +180,7 @@ export function ComplianceReadySoftwareSettings({
               value={String(fieldValues.passwordResetTime)}
               units={t('desktop_days')}
               onBlur={value => {
-                handleInputBlur('passwordResetTime', value)
+                handleAuthSettingInputBlur('passwordResetTime', value)
               }}
             />
           </ComplianceReadyToggleField>
@@ -186,7 +210,10 @@ export function ComplianceReadySoftwareSettings({
               value={String(fieldValues.passwordComplexityMinimumLength)}
               units={t('desktop_characters')}
               onBlur={value => {
-                handleInputBlur('passwordComplexityMinimumLength', value)
+                handleAuthSettingInputBlur(
+                  'passwordComplexityMinimumLength',
+                  value
+                )
               }}
             />
           </ComplianceReadyToggleField>
@@ -197,7 +224,7 @@ export function ComplianceReadySoftwareSettings({
             value={String(fieldValues.idleLogout)}
             units={t('desktop_minutes')}
             onBlur={value => {
-              handleInputBlur('idleLogout', value)
+              handleAuthSettingInputBlur('idleLogout', value)
             }}
           />
         </ComplianceReadySettingsSection>
@@ -286,7 +313,10 @@ export function ComplianceReadySoftwareSettings({
               value={String(fieldValues.minLengthOfReasonForInteraction)}
               units={t('desktop_characters')}
               onBlur={value => {
-                handleInputBlur('minLengthOfReasonForInteraction', value)
+                handleAuditSettingInputBlur(
+                  'minLengthOfReasonForInteraction',
+                  value
+                )
               }}
             />
           </ComplianceReadyToggleField>

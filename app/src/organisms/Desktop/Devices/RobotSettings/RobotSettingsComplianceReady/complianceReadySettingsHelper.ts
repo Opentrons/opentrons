@@ -1,14 +1,18 @@
 import {
+  AUDIT_SERVER_SETTING_FIELD_IDS,
   AUTH_SERVER_SETTING_FIELD_IDS,
   ROBOT_SERVER_SETTING_FIELD_IDS,
 } from './complianceReadySettingsTypes'
 
 import type {
+  AuditSettingsData,
   AuthSettingsData,
+  PatchAuditSettingsRequest,
   PatchAuthSettingsRequest,
   RobotServerAccessControlSettingsData,
 } from '@opentrons/api-client'
 import type {
+  AuditServerSettingFieldId,
   AuthSettingFieldId,
   FieldValues,
   RobotServerSettingFieldId,
@@ -40,12 +44,29 @@ function getAuthSettingFieldValue(
   }
 }
 
+function getAuditSettingFieldValue(
+  key: AuditServerSettingFieldId,
+  auditSettings: AuditSettingsData
+): string | boolean {
+  switch (key) {
+    default: {
+      const value = auditSettings[key]
+      if (typeof value === 'boolean') {
+        return value
+      }
+      return value != null ? String(value) : ''
+    }
+  }
+}
+
 /** Map auth and robot-server access-control settings responses to form field values. */
 export function getFieldValuesFromSettings(
   authSettings?: AuthSettingsData,
-  robotServerAccessControlSettings?: RobotServerAccessControlSettingsData
+  robotServerAccessControlSettings?: RobotServerAccessControlSettingsData,
+  auditSettings?: AuditSettingsData
 ): FieldValues {
   const authSettingsData = authSettings ?? {}
+  const auditSettingsData = auditSettings ?? {}
   const robotServerAccessControlSettingsData =
     robotServerAccessControlSettings ?? {}
 
@@ -55,6 +76,16 @@ export function getFieldValuesFromSettings(
     (acc, key) => ({
       ...acc,
       [key]: getAuthSettingFieldValue(key, authSettingsData),
+    }),
+    {}
+  )
+
+  const auditFieldValues = (
+    Object.keys(AUDIT_SERVER_SETTING_FIELD_IDS) as AuditServerSettingFieldId[]
+  ).reduce<Partial<Pick<FieldValues, AuditServerSettingFieldId>>>(
+    (acc, key) => ({
+      ...acc,
+      [key]: getAuditSettingFieldValue(key, auditSettingsData),
     }),
     {}
   )
@@ -71,6 +102,7 @@ export function getFieldValuesFromSettings(
 
   return {
     ...(authFieldValues as Pick<FieldValues, AuthSettingFieldId>),
+    ...(auditFieldValues as Pick<FieldValues, AuditServerSettingFieldId>),
     ...(robotFieldValues as Pick<FieldValues, RobotServerSettingFieldId>),
     passwordResetEnabled: Boolean(authSettingsData.passwordResetTime),
     passwordComplexityEnabled:
@@ -105,6 +137,18 @@ export function getAuthInputPatch(
         return null
       }
       return { data: { passwordComplexityMinimumLength: Number(value) } }
+
+    default:
+      return null
+  }
+}
+
+export function getAuditInputPatch(
+  id: AuditServerSettingFieldId,
+  value: string,
+  fieldValues: FieldValues
+): PatchAuditSettingsRequest | null {
+  switch (id) {
     case 'minLengthOfReasonForInteraction':
       if (!fieldValues.requireReasonForInteraction || value === '') {
         return null
