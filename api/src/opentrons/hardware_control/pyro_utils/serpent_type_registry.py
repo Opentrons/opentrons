@@ -32,14 +32,14 @@ from opentrons.calibration_storage.ot3.models.v1 import CalibrationStatus
 from opentrons.hardware_control import modules
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
+    enumerated_error_class_to_dict,
+    enumerated_error_dict_to_class,
     find_enums_in_packages,
     find_pydantic_classes_in_packages,
     find_typed_dict_classes_in_packages,
     register_enumerated_errors,
     register_type_to_serpent,
     serpent_enum_registration,
-    enumerated_error_class_to_dict,
-    enumerated_error_dict_to_class,
 )
 
 Pyro5.config.SERPENT_BYTES_REPR = True  # type: ignore
@@ -509,7 +509,6 @@ def _error_notif_dict_to_class(  # type: ignore
     )
 
 
-
 def _module_model_reconstructor(
     module_str: str,
 ) -> modules.types.ModuleModel:
@@ -540,7 +539,10 @@ def _async_mod_error_notif_dict_to_class(  # type: ignore
 ) -> opentrons.hardware_control.types.AsynchronousModuleErrorNotification:
     return opentrons.hardware_control.types.AsynchronousModuleErrorNotification(
         event=opentrons.hardware_control.types.HardwareEventType(d["event"]["value"]),  # type: ignore
-        exception=enumerated_error_dict_to_class(class_name="opentrons.hardware_control.types.EnumeratedError", d=d["exception"]),
+        exception=enumerated_error_dict_to_class(
+            class_name="opentrons.hardware_control.types.EnumeratedError",
+            d=d["exception"],
+        ),
         module_serial=d["module_serial"],
         module_model=_module_model_reconstructor(d["module_model"]),
         port=d["port"],
@@ -878,19 +880,20 @@ def register_hardware_types() -> None:
         class_to_dict=_ABSMeasurementConfig_class_to_dict,
     )
 
-    # VacuumState registration
-    register_type_to_serpent(
-        class_type=opentrons.drivers.vacuum_module.types.VacuumState,
-        dict_to_class=opentrons.drivers.vacuum_module.types.VacuumState.from_pyro_dict,
-        class_to_dict=opentrons.drivers.vacuum_module.types.VacuumState.to_pyro_dict,
-    )
+    # Dataclass generic registration
+    # todo(chb, 07-08-2026): This should probably be changes to automatically detect our pyro compatible dataclasses once the cross-layer classes all have `to_pyro` and `from_pyro` methods
+    # todo(chb, 07-08-2026): Once the others all contain to and from methods the above restrigries can be removed
+    opentrons_dataclass_types = [
+        opentrons.drivers.vacuum_module.types.VacuumState,
+        opentrons.drivers.vacuum_module.types.PumpState,
+    ]
 
-    # PumpState registration
-    register_type_to_serpent(
-        class_type=opentrons.drivers.vacuum_module.types.PumpState,
-        dict_to_class=opentrons.drivers.vacuum_module.types.PumpState.from_pyro_dict,
-        class_to_dict=opentrons.drivers.vacuum_module.types.PumpState.to_pyro_dict,
-    )
+    for dataclass_type in opentrons_dataclass_types:
+        register_type_to_serpent(
+            class_type=dataclass_type,
+            dict_to_class=dataclass_type.from_pyro_dict,  # type: ignore
+            class_to_dict=dataclass_type.to_pyro_dict,  # type: ignore
+        )
 
     # handle Typed Dicts for the hardware controller
     OpentronsPyroSerializer.register_opentrons_typed_dicts(_typed_dict_dict_to_class)
