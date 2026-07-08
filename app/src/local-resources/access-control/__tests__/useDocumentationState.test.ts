@@ -9,7 +9,7 @@ import {
 import { useCurrentUsername } from '/app/redux/robot-auth'
 
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../__fixtures__/documentationState'
-import { useGuardedAction } from '../useGuardedAction'
+import { useDocumentationState } from '../useDocumentationState'
 import {
   mockShowDocumentationRequiredModal,
   mockShowLoginModal,
@@ -44,7 +44,7 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
 
 const wrapper = wrapWithDocumentationRequiredModal()
 
-describe('useGuardedAction', () => {
+describe('useDocumentationState', () => {
   beforeEach(() => {
     vi.mocked(useAuthSettingsQuery).mockReturnValue({
       data: {
@@ -84,7 +84,7 @@ describe('useGuardedAction', () => {
       },
     } as ReturnType<typeof useAuthSettingsQuery>)
 
-    const { result } = renderHook(() => useGuardedAction(), { wrapper })
+    const { result } = renderHook(() => useDocumentationState(), { wrapper })
 
     await act(async () => {
       expect(result.current).toEqual(
@@ -110,7 +110,7 @@ describe('useGuardedAction', () => {
       },
     } as ReturnType<typeof useAuthSettingsQuery>)
 
-    const { result } = renderHook(() => useGuardedAction(), { wrapper })
+    const { result } = renderHook(() => useDocumentationState(), { wrapper })
 
     await act(async () => {
       expect(
@@ -126,7 +126,7 @@ describe('useGuardedAction', () => {
   it('skips guards when documentation is provided', async () => {
     const docreport = 'starting calibration' as DocumentationReport
 
-    const { result } = renderHook(() => useGuardedAction(docreport), {
+    const { result } = renderHook(() => useDocumentationState(docreport), {
       wrapper,
     })
 
@@ -143,7 +143,7 @@ describe('useGuardedAction', () => {
   })
 
   it('returns callback to open modal when documentation is not provided', async () => {
-    const { result } = renderHook(() => useGuardedAction(), { wrapper })
+    const { result } = renderHook(() => useDocumentationState(), { wrapper })
 
     expect(
       !result.current.isLoading && result.current.accessControlEnabled
@@ -159,7 +159,7 @@ describe('useGuardedAction', () => {
   })
   it('opens login modal when username is not provided', async () => {
     vi.mocked(useCurrentUsername).mockReturnValue(null)
-    const { result } = renderHook(() => useGuardedAction(), { wrapper })
+    const { result } = renderHook(() => useDocumentationState(), { wrapper })
 
     await act(async () => {
       if (
@@ -179,7 +179,7 @@ describe('useGuardedAction', () => {
     vi.mocked(useCurrentUsername).mockReturnValue(null)
     vi.mocked(mockShowLoginModal).mockResolvedValue(null)
     const onCancel = vi.fn()
-    const { result } = renderHook(() => useGuardedAction(), { wrapper })
+    const { result } = renderHook(() => useDocumentationState(), { wrapper })
 
     await act(async () => {
       if (
@@ -200,7 +200,7 @@ describe('useGuardedAction', () => {
 
   it('passes initialDocreport to the documentation modal', async () => {
     const initialDocreport = 'previous note' as DocumentationReport
-    const { result } = renderHook(() => useGuardedAction(), { wrapper })
+    const { result } = renderHook(() => useDocumentationState(), { wrapper })
 
     await act(async () => {
       if (
@@ -226,7 +226,7 @@ describe('useGuardedAction', () => {
   })
 
   it('exposes askForLogin when access control is enabled', async () => {
-    const { result } = renderHook(() => useGuardedAction(), { wrapper })
+    const { result } = renderHook(() => useDocumentationState(), { wrapper })
 
     expect(
       !result.current.isLoading && result.current.accessControlEnabled

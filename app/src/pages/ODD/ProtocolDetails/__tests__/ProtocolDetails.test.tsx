@@ -218,7 +218,7 @@ describe('ODDProtocolDetails', () => {
       isLoading: true,
     } as any)
     render()
-    expect(screen.getAllByTestId('Skeleton').length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('status').length).toBeGreaterThan(0)
   })
 
   it('renders the parameters screen', () => {

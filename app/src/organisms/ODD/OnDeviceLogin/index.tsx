@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
-import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
@@ -58,7 +57,6 @@ export function OnDeviceLogin({
     },
   })
 
-  const [showKeyboard, setShowKeyboard] = useState(false)
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
 
   const username = watch('username')
@@ -86,11 +84,10 @@ export function OnDeviceLogin({
 
   // reset keyboard input when switching steps
   useEffect(() => {
-    if (!showKeyboard) return
     const kb = keyboardRef.current
     if (kb == null) return
     kb.setInput(keyboardFieldValue)
-  }, [step, showKeyboard, keyboardFieldValue])
+  }, [step, keyboardFieldValue])
 
   const handleNext = useCallback((): void => {
     if (step === 'username') {
@@ -204,28 +201,21 @@ export function OnDeviceLogin({
               loginError={loginError}
               confirmPasswordError={confirmPasswordError}
               onClearFieldErrors={clearFieldErrors}
-              onFocus={() => {
-                setShowKeyboard(true)
-              }}
             />
           </div>
         </div>
       </div>
-      {showKeyboard ? (
-        <div className={styles.keyboard_container}>
-          <AccordionKeyboard isOpen={showKeyboard} onToggle={() => {}}>
-            <FullKeyboard
-              onChange={(input: string) => {
-                setValue(activeFieldName, input, {
-                  shouldDirty: true,
-                  shouldTouch: true,
-                })
-              }}
-              keyboardRef={keyboardRef}
-            />
-          </AccordionKeyboard>
-        </div>
-      ) : null}
+      <div className={styles.keyboard_container}>
+        <FullKeyboard
+          onChange={(input: string) => {
+            setValue(activeFieldName, input, {
+              shouldDirty: true,
+              shouldTouch: true,
+            })
+          }}
+          keyboardRef={keyboardRef}
+        />
+      </div>
     </>
   )
 }

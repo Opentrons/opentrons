@@ -14,6 +14,9 @@ class DiskDetails(BaseModel):
     systemAvailableMb: float = Field(
         ..., description="The system's available disk space in MB."
     )
+    systemTotalMb: float = Field(
+        ..., description="The total disk space of the /data partition in MB."
+    )
     imagesDirectorySizeMb: float = Field(
         ..., description="The system's images directory disk size in MB."
     )

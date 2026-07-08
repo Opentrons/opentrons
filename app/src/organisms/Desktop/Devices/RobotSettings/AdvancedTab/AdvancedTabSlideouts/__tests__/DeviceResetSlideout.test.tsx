@@ -111,7 +111,6 @@ describe('RobotSettings DeviceResetSlideout', () => {
     screen.getByRole('checkbox', { name: 'Clear custom boot scripts' })
     screen.getByRole('checkbox', { name: 'Clear SSH public keys' })
     screen.getByRole('button', { name: 'Clear data and restart robot' })
-    screen.getByTestId('Slideout_icon_close_Device Reset')
   })
 
   it('should change some options and text for Flex', () => {
@@ -151,7 +150,7 @@ describe('RobotSettings DeviceResetSlideout', () => {
 
   it('should close the slideout when clicking close icon button', () => {
     render()
-    const closeButton = screen.getByTestId('Slideout_icon_close_Device Reset')
+    const closeButton = screen.getByRole('button', { name: 'exit' })
     fireEvent.click(closeButton)
     expect(mockOnCloseClick).toHaveBeenCalled()
   })

@@ -99,3 +99,11 @@ class UpdateActionsInterface:
     def clean_up(self, download_dir: str) -> None:
         """Deletes the update files from the download dir."""
         ...
+
+    @abc.abstractmethod
+    def restart(self) -> None:
+        """Restart the robot."""
+
+    @abc.abstractmethod
+    def shutdown(self) -> None:
+        """Shut down the robot."""

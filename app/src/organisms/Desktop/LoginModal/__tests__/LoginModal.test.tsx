@@ -4,11 +4,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useRobot } from '/app/redux-resources/robots'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
   useSetNewPasswordAndSignIn,
 } from '/app/resources/auth'
+import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/encryptionKeys'
 
 import { showLoginModal } from '..'
 
@@ -16,6 +19,13 @@ import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
 
 vi.mock('/app/resources/access-control/useStoreLoginState')
 vi.mock('/app/resources/auth')
+vi.mock('/app/resources/client_data/encryptionKeys')
+vi.mock('/app/redux/shell/remote', () => ({
+  appShellListener: vi.fn(),
+  appShellUSBRequestor: {},
+  tryInstallEncryptedRobotCertificate: vi.fn(),
+  tryInstallPlaintextRobotCertificate: vi.fn(),
+}))
 vi.mock('/app/redux-resources/robots', () => ({
   useRobot: vi.fn(() => null),
 }))
@@ -70,6 +80,20 @@ function mockLoginFailure(message: string): void {
   vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onError }) => ({
     submitPassword: () => {
       onError(message)
+    },
+    isAuthLoading: false,
+  }))
+}
+
+function mockLoginSSLError(): void {
+  const sslError = {
+    isAxiosError: true,
+    message: 'Network Error',
+    code: 'ERR_NETWORK',
+  }
+  vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onError }) => ({
+    submitPassword: () => {
+      onError('Network Error', sslError)
     },
     isAuthLoading: false,
   }))
@@ -143,6 +167,11 @@ describe('LoginModal', () => {
       submitNewPassword,
       isLoading: false,
     })
+    vi.mocked(useRobot).mockReturnValue(null)
+    vi.mocked(useUpdateClientDataEncryptionKeys).mockReturnValue({
+      requestKeyDisplay: vi.fn(() => 'request-key'),
+      clearKeyDisplay: vi.fn(),
+    } as any as ReturnType<typeof useUpdateClientDataEncryptionKeys>)
   })
 
   afterEach(() => {
@@ -308,5 +337,28 @@ describe('LoginModal', () => {
     fireEvent.blur(screen.getByLabelText('Confirm password'))
 
     screen.getByText('Passwords do not match.')
+  })
+
+  it('shows a robot cert import modal when the login fails due to an SSL error', () => {
+    vi.mocked(useRobot).mockReturnValue({
+      ...mockConnectableRobot,
+      ip: '1.2.3.4',
+    })
+    mockLoginSSLError()
+
+    renderAndOpenLoginModal()
+
+    fireEvent.change(screen.getByLabelText('Username'), {
+      target: { value: 'alice' },
+    })
+    fireEvent.change(screen.getByLabelText('Password'), {
+      target: { value: 'secret-password' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+
+    screen.getByText('Robot encryption key verification')
+    screen.getByText('Verify robot encryption key')
+    screen.getByLabelText('Robot encryption key')
+    expect(screen.queryByText('Network Error')).toBeNull()
   })
 })

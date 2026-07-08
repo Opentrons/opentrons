@@ -10,11 +10,7 @@ export type RobotRestartStatus =
   | 'restart-failed'
 
 export type RobotAdminStatus =
-  | 'up'
-  | 'down'
-  | 'restart-pending'
-  | 'restarting'
-  | 'restart-failed'
+  'up' | 'down' | 'restart-pending' | 'restarting' | 'restart-failed'
 
 export interface ResetConfigOption {
   id: string

@@ -273,8 +273,7 @@ function LabwareLatch({
   let icon: 'latch-open' | 'latch-closed' | null = null
 
   const latchCommand:
-    | HeaterShakerOpenLatchCreateCommand
-    | HeaterShakerCloseLatchCreateCommand = {
+    HeaterShakerOpenLatchCreateCommand | HeaterShakerCloseLatchCreateCommand = {
     commandType: isLatchClosed
       ? 'heaterShaker/openLabwareLatch'
       : 'heaterShaker/closeLabwareLatch',

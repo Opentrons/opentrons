@@ -546,8 +546,7 @@ interface HardwareRequiredStepCompletion {
 }
 
 type StepRightElementProps =
-  | NoHardwareRequiredStepCompletion
-  | HardwareRequiredStepCompletion
+  NoHardwareRequiredStepCompletion | HardwareRequiredStepCompletion
 
 const stepRequiresHW = (
   props: StepRightElementProps

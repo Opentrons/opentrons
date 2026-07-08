@@ -243,7 +243,16 @@ class RobotServerPyroResource:
         the Robot Server.
         """
 
-        return self._notify_publishers
+        if self._notify_publishers:
+
+            def call_soon_notify_publishers() -> None:
+                # Call soon on the thread notification publisher locally executes
+                assert self._notify_publishers is not None
+                self._loop.call_soon_threadsafe(self._notify_publishers)
+
+            return call_soon_notify_publishers
+        else:
+            return None
 
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def create_hardware_state_update_callback(self) -> HardwareEventHandler:

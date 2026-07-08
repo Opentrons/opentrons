@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
-import { useGuardedAction } from '/app/local-resources/access-control/useGuardedAction'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
 import { MaintenanceRunStatusProvider } from './MaintenanceRunStatusProvider'
 import { TakeoverModal } from './TakeoverModal'
@@ -44,7 +44,7 @@ export function MaintenanceRunTakeoverModal(
     isMaintenanceRunCurrent && oddRunId !== currentRunId
 
   // TODO(jj): This needs to access the docstate and actions for the current maintenance run.
-  const docState = useGuardedAction()
+  const docState = useDocumentationState()
 
   const { deleteMaintenanceRun, reset } = useDeleteMaintenanceRunMutation(
     docState,

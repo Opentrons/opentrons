@@ -10,42 +10,15 @@ export type DocumentationReport = string & {
   readonly _brand: 'DocumentationReport'
 }
 
-export type DocumentedMutationErrorType =
-  | 'no_documentation_report'
-  | 'access_control_loading'
-  | 'login_cancelled'
-
-const DOCUMENTED_MUTATION_ERROR_MESSAGES: Record<
-  DocumentedMutationErrorType,
-  string
-> = {
-  no_documentation_report: 'No documentation report provided',
-  access_control_loading: 'Access control queries are still loading',
-  login_cancelled: 'Login cancelled by user',
-}
-
-export class DocumentedMutationError extends Error {
-  declare readonly name: 'DocumentedMutationError'
-  declare readonly type: DocumentedMutationErrorType
-
-  constructor(type: DocumentedMutationErrorType) {
-    super(DOCUMENTED_MUTATION_ERROR_MESSAGES[type])
-    this.name = 'DocumentedMutationError'
-    this.type = type
-  }
-}
-
-export function isDocumentedMutationError(
-  error: unknown
-): error is DocumentedMutationError {
-  return error instanceof DocumentedMutationError
-}
-
 /**
  * Documentation state to be passed to the useDocumentedMutation hook.
  *
+ * @param isLoading - whether the access control queries are still loading
  * @param accessControlEnabled - whether access control is enabled
- * @param docreport - the documentation report
+ * @param loginExpired - whether the login has expired
+ * @param askForLogin - a function that opens the login modal and returns the username
+ * @param reasonForInteractionRequired - whether user documentation is required
+ * @param docreport - the documentation report, a branded string
  * @param askForDocumentation - a function that opens the documentation modal and returns the documentation report
  */
 export type DocumentationState =
@@ -59,6 +32,9 @@ export type DocumentationState =
     } & MutationAuthenticationState &
       MutationDocumentationState)
 
+/**
+ * State of user login and authentication. Necessary to pop up login modal when user is idle logged out.
+ */
 export interface MutationAuthenticationState {
   accessControlEnabled: true
   loginExpired: boolean
@@ -85,13 +61,17 @@ export interface DocumentedMutationParameters<TVariables = void> {
   variables: TVariables
 }
 
+/**
+ * Signature to enable passing along documentation state with mutations.
+ * All mutation functions should have this signature.
+ */
 export type DocumentedMutationFunction<TData = unknown, TVariables = void> = (
   parameters: DocumentedMutationParameters<TVariables>
 ) => Promise<TData>
 
 /**
- * Call signatures for useDocumentedMutation — mirrors the `useMutation`
- * shapes actually used in this codebase:
+ * Call signatures for useDocumentedMutation
+ * these mirror the `useMutation` shapes used in this codebase:
  *   (state, mutationFn, options?)
  *   (state, mutationKey, mutationFn, options?)
  */
@@ -111,6 +91,10 @@ export interface UseDocumentedMutation {
     options?: UseMutationOptions<TData, TError, TVariables, TContext>
   ): UseMutationResult<TData, TError, TVariables, TContext>
 }
+
+/**
+ * DocumentedActions for pipette wizard flows.
+ */
 export interface PipetteWizardFlowAction {
   type: 'pipette_wizard_flow'
   mount: PipetteMount
@@ -130,6 +114,10 @@ export interface AttachingModuleAction {
   step: 'start' | 'end'
 }
 
+/**
+ * DocumentedActions for one-off mutations without more needed context.
+ * These should match keys in audit_log.json
+ */
 type AuditLogAction =
   | 'stop_run'
   | 'play_run'
@@ -153,8 +141,46 @@ type AuditLogAction =
   | 'attach_pipette_left'
   | 'attach_pipette_right'
 
+/**
+ * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.
+ */
 export type DocumentedAction =
   | AuditLogAction
   | RunTimeCommand
   | PipetteWizardFlowAction
   | AttachingModuleAction
+
+/**
+ * Error specification for errors thrown by useDocumentedMutation.
+ * no_documentation_report: user closed out of the documentation modal
+ * access_control_loading: access control queries are still loading
+ * login_cancelled: user closed out of the login modal
+ */
+export type DocumentedMutationErrorType =
+  'no_documentation_report' | 'access_control_loading' | 'login_cancelled'
+
+const DOCUMENTED_MUTATION_ERROR_MESSAGES: Record<
+  DocumentedMutationErrorType,
+  string
+> = {
+  no_documentation_report: 'No documentation report provided',
+  access_control_loading: 'Access control queries are still loading',
+  login_cancelled: 'Login cancelled by user',
+}
+
+export class DocumentedMutationError extends Error {
+  declare readonly name: 'DocumentedMutationError'
+  declare readonly type: DocumentedMutationErrorType
+
+  constructor(type: DocumentedMutationErrorType) {
+    super(DOCUMENTED_MUTATION_ERROR_MESSAGES[type])
+    this.name = 'DocumentedMutationError'
+    this.type = type
+  }
+}
+
+export function isDocumentedMutationError(
+  error: unknown
+): error is DocumentedMutationError {
+  return error instanceof DocumentedMutationError
+}

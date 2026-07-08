@@ -6,13 +6,8 @@ import type {
 } from '@opentrons/react-api-client'
 
 /**
- * Guard that captures a pops DocumentationRequiredModal and returns the documentation report
+ * Callback that opens the DocumentationRequiredModal and returns the documentation report
  *
- * Assumes access control is enabled and the user is authenticated.
- *
- * TODO(jj): do something with the actionsToDocument
- *
- * @throws {Error} if the documentation report is invalid
  */
 export async function requireDocumentation(
   username: string,

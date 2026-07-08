@@ -6,10 +6,7 @@ export interface DoorStatus {
   }
 }
 export type EstopState =
-  | 'physicallyEngaged'
-  | 'logicallyEngaged'
-  | 'notPresent'
-  | 'disengaged'
+  'physicallyEngaged' | 'logicallyEngaged' | 'notPresent' | 'disengaged'
 
 export type EstopPhysicalStatus = 'engaged' | 'disengaged' | 'notPresent'
 
@@ -32,8 +29,7 @@ export interface SetLightsData {
 export type HomeTarget = 'robot' | 'pipette'
 
 export type HomeData =
-  | { target: 'robot' }
-  | { target: 'pipette'; mount: 'left' | 'right' }
+  { target: 'robot' } | { target: 'pipette'; mount: 'left' | 'right' }
 
 export interface HomeResponse {
   message: string

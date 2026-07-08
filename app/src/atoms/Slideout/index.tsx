@@ -209,17 +209,11 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
                 forwardedAs="h2"
                 overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                data-testid={`Slideout_title_${title}`}
               >
                 {title}
               </LegacyStyledText>
               <Flex alignItems={ALIGN_CENTER}>
-                <Btn
-                  size="1.5rem"
-                  onClick={handleClose}
-                  aria-label="exit"
-                  data-testid={`Slideout_icon_close_${title}`}
-                >
+                <Btn size="1.5rem" onClick={handleClose} aria-label="exit">
                   <Icon name="close" css={CLOSE_ICON_STYLE} />
                 </Btn>
               </Flex>
@@ -232,9 +226,6 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
             padding={childrenPadding}
             flex="1 1 auto"
             overflowY="auto"
-            data-testid={`Slideout_body_${
-              typeof title === 'string' ? title : ''
-            }`}
             ref={slideOutRef}
             onScroll={handleScroll}
           >

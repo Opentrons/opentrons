@@ -120,10 +120,12 @@ describe('UpdateAppModal', () => {
     expect(
       screen.getByText('Download complete, restarting the app...')
     ).toBeInTheDocument()
-    expect(screen.getByRole('progressbar')).toBeInTheDocument()
-    expect(getComputedStyle(screen.getByTestId('ProgressBar_Bar')).width).toBe(
-      '100%'
-    )
+    const container = screen.getByRole('progressbar')
+    expect(container).toBeInTheDocument()
+    // eslint-disable-next-line testing-library/no-node-access
+    const bar = container.firstChild
+    expect(bar).toBeInTheDocument()
+    expect(bar).toHaveStyle('width: 100%')
   })
   it('renders an error message when an error occurs', () => {
     vi.mocked(getShellUpdateState).mockReturnValue({

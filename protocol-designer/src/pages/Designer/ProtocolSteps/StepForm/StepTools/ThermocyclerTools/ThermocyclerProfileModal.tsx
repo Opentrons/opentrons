@@ -26,8 +26,7 @@ import type { ThermocyclerCycleType } from './ThermocyclerCycle'
 import type { ThermocyclerStepType } from './ThermocyclerStep'
 
 export type ThermocyclerStepTypeGeneral =
-  | ThermocyclerCycleType
-  | ThermocyclerStepType
+  ThermocyclerCycleType | ThermocyclerStepType
 
 interface ThermocyclerModalProps {
   formData: FormData
