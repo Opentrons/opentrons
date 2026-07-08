@@ -5,7 +5,7 @@ import {
   useAuthSettingsQuery,
 } from '@opentrons/react-api-client'
 
-import { useCurrentRobotName, useCurrentUsername } from '/app/redux/robot-auth'
+import { useCurrentRobotName, useUsernameForRobot } from '/app/redux/robot-auth'
 
 import { DocumentationRequiredModalContext } from './DocumentationRequiredModalContext'
 
@@ -31,13 +31,15 @@ import type {
  * @param docreport - optional pre-provided documentation report
  */
 export function useDocumentationState(
-  docreport?: DocumentationReport
+  docreport?: DocumentationReport,
+  robotName?: string | null
 ): DocumentationState {
   const authSettingsQuery = useAuthSettingsQuery()
   const accessControlEnabledQuery = useAccessControlEnabledQuery()
 
-  const currentUsername = useCurrentUsername()
-  const currentRobotName = useCurrentRobotName()
+  const foundName = useCurrentRobotName()
+  const currentRobotName = robotName ?? foundName
+  const currentUsername = useUsernameForRobot(currentRobotName)
 
   const accessControlEnabled =
     accessControlEnabledQuery?.data?.data?.accessControlEnabled ?? false
@@ -72,6 +74,7 @@ export function useDocumentationState(
     ) => {
       let username = usernameOverride ?? currentUsername
       if (username == null || username.length === 0) {
+        console.log('calling requireLogin', currentRobotName)
         const loginResult = await requireLogin({
           robotName: currentRobotName ?? '',
         })

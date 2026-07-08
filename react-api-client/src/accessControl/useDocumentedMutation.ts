@@ -88,6 +88,12 @@ async function runMutation<TData, TVariables>(
   >,
   variables: TVariables
 ): Promise<TData> {
+  console.log('running mutation', {
+    documentationState,
+    actionsToDocument,
+    mutationFnRef,
+    variables,
+  })
   if (documentationState.isLoading) {
     throw new DocumentedMutationError('access_control_loading')
   }

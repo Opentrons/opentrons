@@ -30,5 +30,6 @@
   "attach_pipette_right": "Launching attach pipette on right mount flow",
   "finish_attach_gripper": "Finishing attach gripper flow",
   "finish_detach_gripper": "Finishing detach gripper flow",
-  "finish_recalibrate_gripper": "Finishing recalibrate gripper flow"
+  "finish_recalibrate_gripper": "Finishing recalibrate gripper flow",
+  "create_protocol": "Creating protocol"
 }

@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from 'react-query'
 
 import { createProtocol } from '@opentrons/api-client'
 
+import { DocumentationState, useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
@@ -44,6 +45,7 @@ export type UseCreateProtocolMutationOptions = UseMutationOptions<
 >
 
 export function useCreateProtocolMutation(
+  documentationState: DocumentationState,
   options: UseCreateProtocolMutationOptions = {},
   hostOverride?: HostConfig | null
 ): UseCreateProtocolMutationResult {
@@ -52,18 +54,23 @@ export function useCreateProtocolMutation(
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     Protocol,
     AxiosError<ErrorResponse>,
     CreateProtocolVariables
   >(
+    documentationState,
+    ['create_protocol'],
     getQueryKey(host, 'protocols'),
     ({
-      files: protocolFiles,
-      protocolKey,
-      protocolKind = 'standard',
-      runTimeParameterValues,
-      runTimeParameterFiles,
+      variables: {
+        files: protocolFiles,
+        protocolKey,
+        protocolKind = 'standard',
+        runTimeParameterValues,
+        runTimeParameterFiles,
+      },
+      userNotes,
     }) =>
       createProtocol(
         host!,
@@ -71,7 +78,8 @@ export function useCreateProtocolMutation(
         protocolKey,
         protocolKind,
         runTimeParameterValues,
-        runTimeParameterFiles
+        runTimeParameterFiles,
+        userNotes
       )
         .then(response => {
           const protocolId = response.data.data.id

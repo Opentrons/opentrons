@@ -40,6 +40,7 @@ export function ApiHostProvider({
             port: robot.port,
             requestor: requestorToUse,
             token,
+            robotName,
           }
         : null,
     [requestorToUse, robot?.ip, robot?.port, robotName, token]

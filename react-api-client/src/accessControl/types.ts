@@ -140,7 +140,7 @@ type AuditLogAction =
   | 'end_drop_tips'
   | 'attach_pipette_left'
   | 'attach_pipette_right'
-
+  | 'create_protocol'
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.
  */
@@ -157,7 +157,9 @@ export type DocumentedAction =
  * login_cancelled: user closed out of the login modal
  */
 export type DocumentedMutationErrorType =
-  'no_documentation_report' | 'access_control_loading' | 'login_cancelled'
+  | 'no_documentation_report'
+  | 'access_control_loading'
+  | 'login_cancelled'
 
 const DOCUMENTED_MUTATION_ERROR_MESSAGES: Record<
   DocumentedMutationErrorType,

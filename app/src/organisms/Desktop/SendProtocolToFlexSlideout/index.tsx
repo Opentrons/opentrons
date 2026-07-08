@@ -11,6 +11,7 @@ import {
 import { useCreateProtocolMutation } from '@opentrons/react-api-client'
 import { FLEX_DISPLAY_NAME, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getValidCustomLabwareFiles } from '/app/redux/custom-labware'
 import { OPENTRONS_USB } from '/app/redux/discovery'
@@ -53,7 +54,13 @@ export function SendProtocolToFlexSlideout(
 
   const { eatToast, makeToast } = useToaster()
 
+  const documentationState = useDocumentationState(
+    undefined,
+    selectedRobot?.name
+  )
+
   const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation(
+    documentationState,
     {},
     selectedRobot != null
       ? {
