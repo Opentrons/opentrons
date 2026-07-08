@@ -10,6 +10,8 @@ import { PasswordInputField } from '../PasswordInputField'
 
 import type { ComponentProps } from 'react'
 
+const PASSWORD_PLACEHOLDER = '**********'
+
 const render = (props: ComponentProps<typeof PasswordInputField>) => {
   return renderWithProviders(<PasswordInputField {...props} />, {
     i18nInstance: i18n,
@@ -22,41 +24,41 @@ describe('PasswordInputField', () => {
   beforeEach(() => {
     props = {
       value: '',
+      placeholder: PASSWORD_PLACEHOLDER,
       onChange: vi.fn(),
     }
   })
 
   it('renders a masked password input by default', () => {
-    const { container } = render(props)
-    const input = container.querySelector('input')
-    expect(input).toHaveAttribute('type', 'password')
+    render(props)
+    expect(screen.getByPlaceholderText(PASSWORD_PLACEHOLDER)).toHaveAttribute(
+      'type',
+      'password'
+    )
   })
 
   it('reveals the password when the visibility toggle is clicked', () => {
-    const { container } = render({ ...props, value: 'secret' })
+    render({ ...props, value: 'secret' })
     fireEvent.click(
       screen.getByRole('button', { name: 'Toggle password visibility' })
     )
-    const input = container.querySelector('input')
+    const input = screen.getByDisplayValue('secret')
     expect(input).toHaveAttribute('type', 'text')
     expect(input).toHaveValue('secret')
   })
 
   it('calls onChange when the value changes', () => {
-    const { container } = render(props)
-    const input = container.querySelector('input')
-    expect(input).not.toBeNull()
-    fireEvent.change(input!, { target: { value: 'new-password' } })
+    render(props)
+    fireEvent.change(screen.getByPlaceholderText(PASSWORD_PLACEHOLDER), {
+      target: { value: 'new-password' },
+    })
     expect(props.onChange).toHaveBeenCalled()
   })
 
   it('renders a placeholder when the field is empty', () => {
-    const { container } = render({
-      ...props,
-      placeholder: '**********',
-    })
-    const input = container.querySelector('input')
-    expect(input).toHaveAttribute('placeholder', '**********')
+    render(props)
+    const input = screen.getByPlaceholderText(PASSWORD_PLACEHOLDER)
+    expect(input).toHaveAttribute('placeholder', PASSWORD_PLACEHOLDER)
     expect(input).toHaveValue('')
   })
 

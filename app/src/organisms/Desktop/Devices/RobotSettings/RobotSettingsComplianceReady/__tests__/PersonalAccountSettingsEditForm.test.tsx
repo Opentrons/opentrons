@@ -54,7 +54,7 @@ describe('PersonalAccountSettingsEditForm', () => {
       target: { value: 'alice2' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'save' }))
-    expect(props.onSave).toHaveBeenCalledWith({ username: 'alice2' })
+    expect(props.onSave).toHaveBeenCalledWith({ data: { username: 'alice2' } })
   })
 
   it('calls onSave with password when both password fields match', () => {
@@ -75,7 +75,9 @@ describe('PersonalAccountSettingsEditForm', () => {
       target: { value: 'new-password' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'save' }))
-    expect(props.onSave).toHaveBeenCalledWith({ password: 'new-password' })
+    expect(props.onSave).toHaveBeenCalledWith({
+      data: { password: 'new-password' },
+    })
   })
 
   it('calls onCancel when the cancel button is clicked', () => {

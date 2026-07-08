@@ -1,7 +1,6 @@
 import '@testing-library/jest-dom/vitest'
 
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import axios from 'axios'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -128,7 +127,7 @@ describe('PersonalAccountSettings', () => {
     screen.getByText('Personal account settings')
     screen.getByText('alice')
     screen.getByText('Alice Example')
-    screen.getByText('••••••••')
+    screen.getByText('************************')
     screen.getByRole('button', { name: 'Edit' })
 
     openEditForm()

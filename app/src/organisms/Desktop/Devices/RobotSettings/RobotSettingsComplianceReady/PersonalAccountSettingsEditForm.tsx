@@ -11,6 +11,7 @@ import {
 import { PasswordInputField } from './PasswordInputField'
 import styles from './personalaccountsettings.module.css'
 
+import type { TFunction } from 'i18next'
 import type { JSX, ReactNode } from 'react'
 import type { UpdateSelfRequest } from '@opentrons/api-client'
 
@@ -20,7 +21,7 @@ export interface PersonalAccountSettingsEditFormProps {
   isSaving: boolean
   usernameError?: string | null
   saveError?: string | null
-  onSave: (data: UpdateSelfRequest['data']) => void
+  onSave: (data: UpdateSelfRequest) => void
   onCancel: () => void
 }
 
@@ -47,7 +48,9 @@ export function PersonalAccountSettingsEditForm({
   onSave,
   onCancel,
 }: PersonalAccountSettingsEditFormProps): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'shared'])
+  const { t } = useTranslation(['device_settings', 'shared']) as {
+    t: TFunction
+  }
   const [usernameInput, setUsernameInput] = useState(username)
   const [fullNameInput, setFullNameInput] = useState(fullName)
   const [password, setPassword] = useState('')
@@ -66,7 +69,7 @@ export function PersonalAccountSettingsEditForm({
       return true
     }
     if (password !== confirmPassword) {
-      setConfirmPasswordError(t('desktop_password_mismatch'))
+      setConfirmPasswordError(t('desktop_password_mismatch') as string)
       return false
     }
     setConfirmPasswordError(null)
@@ -97,7 +100,7 @@ export function PersonalAccountSettingsEditForm({
       updateData.password = password
     }
 
-    onSave(updateData)
+    onSave({ data: updateData })
   }
 
   const isSaveDisabled =

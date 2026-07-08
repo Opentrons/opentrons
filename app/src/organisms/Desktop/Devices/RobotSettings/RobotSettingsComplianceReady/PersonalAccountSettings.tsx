@@ -64,8 +64,8 @@ export function PersonalAccountSettings({
     setSaveError(null)
   }
 
-  const handleSave = (updateData: UpdateSelfRequest['data']): void => {
-    void updateSelf({ data: updateData })
+  const handleSave = (request: UpdateSelfRequest): void => {
+    void updateSelf(request)
       .then(updatedSelf => {
         queryClient.setQueryData(getSelfQueryKey(host), updatedSelf)
         clearSaveErrors()
@@ -78,12 +78,16 @@ export function PersonalAccountSettings({
 
         if (errorId === 'userAlreadyExists') {
           setUsernameError(
-            t('desktop_personal_account_settings_username_exists_error')
+            t(
+              'desktop_personal_account_settings_username_exists_error'
+            ) as string
           )
           setSaveError(null)
         } else {
           setUsernameError(null)
-          setSaveError(t('desktop_personal_account_settings_save_error'))
+          setSaveError(
+            t('desktop_personal_account_settings_save_error') as string
+          )
         }
       })
   }
@@ -161,7 +165,7 @@ export function PersonalAccountSettings({
                 desktopStyle="bodyDefaultRegular"
                 className={styles.field_value_text}
               >
-                ••••••••
+                {t('desktop_password_placeholder')}
               </StyledText>
             </FieldRow>
           </>
