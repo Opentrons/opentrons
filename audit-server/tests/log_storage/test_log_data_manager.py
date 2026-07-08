@@ -17,7 +17,6 @@ from audit_server.log_storage.store import (
     NoLogInPeriodError,
 )
 from audit_server.log_storage.types import StoredLog
-from audit_server.settings.models import LoggingEnabledResponseData
 from audit_server.settings.store import SettingsStore
 
 
@@ -39,9 +38,7 @@ def mock_time(decoy: Decoy) -> _GetTime:
 def mock_settings(decoy: Decoy) -> SettingsStore:
     """A mock settings store."""
     settings = decoy.mock(cls=SettingsStore)
-    decoy.when(settings.get_logging_enabled_settings()).then_return(
-        LoggingEnabledResponseData(loggingEnabled=True)
-    )
+    decoy.when(settings.get_logging_enabled()).then_return(True)
     return settings
 
 
@@ -69,9 +66,7 @@ def subject(
 @pytest.fixture
 def disable_logging(mock_settings: SettingsStore, decoy: Decoy) -> None:
     """Force logging off."""
-    decoy.when(mock_settings.get_logging_enabled_settings()).then_return(
-        LoggingEnabledResponseData(loggingEnabled=False)
-    )
+    decoy.when(mock_settings.get_logging_enabled()).then_return(False)
 
 
 async def test_store_log_stores_nothing_if_logging_disabled(
@@ -156,7 +151,8 @@ async def test_store_log_rotates_if_cannot_get_tail_hash(
     decoy.when(
         await mock_key_client.sign_message(
             SignMessageData.model_construct(
-                message=matchers.StringMatching(".*Log period begun.*"), previousHash=""
+                message=matchers.StringMatching(".*Log period begun.*"),
+                previousHash=None,
             )
         )
     ).then_return(
@@ -324,7 +320,7 @@ async def test_rotate_no_previous_period(
                 message=matchers.StringMatching(
                     f".*{constants.ACTION_LOG_PERIOD_START}.*"
                 ),
-                previousHash="",
+                previousHash=None,
             )
         )
     ).then_return(
@@ -388,7 +384,7 @@ async def test_rotate_no_previous_log(
                 message=matchers.StringMatching(
                     f".*{constants.MESSAGE_NO_PREVIOUS_LOG}.*"
                 ),
-                previousHash="",
+                previousHash=None,
             )
         )
     ).then_return(
@@ -501,7 +497,7 @@ async def test_rotate_log_happypath_handles_no_keyserver(
                 message=matchers.StringMatching(
                     f".*{constants.MESSAGE_LOG_PERIOD_START}.*"
                 ),
-                previousHash="",
+                previousHash=None,
             )
         )
     ).then_raise(KeyStorageUnavailableError())
@@ -545,7 +541,7 @@ async def test_rotate_no_previous_period_handles_no_keyserver(
                 message=matchers.StringMatching(
                     f".*{constants.ACTION_LOG_PERIOD_START}.*"
                 ),
-                previousHash="",
+                previousHash=None,
             )
         )
     ).then_raise(KeyStorageUnavailableError())
@@ -555,7 +551,7 @@ async def test_rotate_no_previous_period_handles_no_keyserver(
                 message=matchers.StringMatching(
                     f".*{constants.MESSAGE_NO_PREVIOUS_PERIOD}.*"
                 ),
-                previousHash="",
+                previousHash=None,
             )
         )
     ).then_raise(KeyStorageUnavailableError())
@@ -615,7 +611,7 @@ async def test_rotate_no_previous_log_handles_no_key_server(
                 message=matchers.StringMatching(
                     f".*{constants.MESSAGE_NO_PREVIOUS_LOG}.*"
                 ),
-                previousHash="",
+                previousHash=None,
             )
         )
     ).then_raise(KeyStorageUnavailableError())
@@ -625,7 +621,7 @@ async def test_rotate_no_previous_log_handles_no_key_server(
                 message=matchers.StringMatching(
                     f".*{constants.MESSAGE_LOG_PERIOD_END}.*"
                 ),
-                previousHash="",
+                previousHash=None,
             )
         )
     ).then_raise(KeyStorageUnavailableError())
@@ -669,7 +665,7 @@ async def test_rotate_no_previous_log_handles_no_key_server(
                 message=matchers.StringMatching(
                     f".*{constants.MESSAGE_LOG_PERIOD_START}.*"
                 ),
-                previousHash="",
+                previousHash=None,
             )
         )
     ).then_raise(KeyStorageUnavailableError())

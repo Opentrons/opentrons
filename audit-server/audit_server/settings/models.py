@@ -45,11 +45,7 @@ class LoggingEnabledResponseData(pydantic.BaseModel):
 class PatchLoggingEnabledRequestData(_StrictBaseModel):
     """A request to change the logging-enabled setting."""
 
-    loggingEnabled: Annotated[
-        bool,
-        pydantic.Field(
-            description=(
-                "Set to `true` to enable audit logging, or `false` to disable it."
-            )
-        ),
-    ]
+    loggingEnabled: bool
+    accountName: str
+    legalName: str
+    reason: str | None

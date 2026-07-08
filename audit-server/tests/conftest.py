@@ -7,10 +7,13 @@ from typing import Callable, Generator
 import aiohttp.web
 import pytest
 import requests
+from decoy import Decoy
 from sqlalchemy.engine import Engine as SQLEngine
 
+from server_utils.keys.key_server import Client as KeyClient
 from tests.dev_server import DevServer
 
+from audit_server.log_storage.log_data_manager import LogDataManager
 from audit_server.persistence.database import create_schema, sql_engine_ctx
 
 _INTEGRATION_SERVER_STARTUP_TIMEOUT_S = 30
@@ -41,6 +44,17 @@ def configure_test_logs(caplog: pytest.LogCaptureFixture) -> None:
     # WARNING, even if you pass --log-level=DEBUG to pytest on the command line.
     # See: https://docs.sqlalchemy.org/en/14/core/engines.html#configuring-logging
     caplog.set_level("NOTSET", logger="sqlalchemy")
+
+
+@pytest.fixture
+def mock_key_client(decoy: Decoy) -> KeyClient:
+    """A decoy mock key client."""
+    return decoy.mock(cls=KeyClient)
+
+
+@pytest.fixture
+def mock_log_data_manager(decoy: Decoy) -> LogDataManager:
+    return decoy.mock(cls=LogDataManager)
 
 
 @pytest.fixture
