@@ -4,7 +4,7 @@ import { useQueryClient } from 'react-query'
 import { useSelector } from 'react-redux'
 import axios from 'axios'
 
-import { Divider, StyledText } from '@opentrons/components'
+import { BasicButton, Divider, StyledText } from '@opentrons/components'
 import {
   getSelfQueryKey,
   useHost,
@@ -99,31 +99,27 @@ export function PersonalAccountSettings({
           {t('desktop_personal_account_settings')}
         </StyledText>
         {isEditing ? (
-          <button
+          <BasicButton
             type="button"
-            className={styles.edit_button}
+            underLine
             onClick={() => {
               clearSaveErrors()
               setIsEditing(false)
             }}
           >
-            <StyledText desktopStyle="bodyDefaultRegLink">
-              {t('shared:cancel')}
-            </StyledText>
-          </button>
+            {t('shared:cancel')}
+          </BasicButton>
         ) : (
-          <button
+          <BasicButton
             type="button"
-            className={styles.edit_button}
+            underLine
             onClick={() => {
               clearSaveErrors()
               setIsEditing(true)
             }}
           >
-            <StyledText desktopStyle="bodyDefaultRegLink">
-              {t('desktop_edit')}
-            </StyledText>
-          </button>
+            {t('desktop_edit')}
+          </BasicButton>
         )}
       </div>
       <div className={styles.content}>
