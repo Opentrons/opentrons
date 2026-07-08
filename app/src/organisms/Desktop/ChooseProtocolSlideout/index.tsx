@@ -686,7 +686,7 @@ export function ChooseProtocolSlideoutComponent(
               )
             : null}
           {hasRunTimeParameters ? multiPageFooter : singlePageFooter}
-          </>
+        </>
       }
     >
       {showSlideout ? (
