@@ -151,7 +151,8 @@ async def test_store_log_rotates_if_cannot_get_tail_hash(
     decoy.when(
         await mock_key_client.sign_message(
             SignMessageData.model_construct(
-                message=matchers.StringMatching(".*Log period begun.*"), previousHash=""
+                message=matchers.StringMatching(".*Log period begun.*"),
+                previousHash=None,
             )
         )
     ).then_return(
@@ -319,7 +320,7 @@ async def test_rotate_no_previous_period(
                 message=matchers.StringMatching(
                     f".*{constants.ACTION_LOG_PERIOD_START}.*"
                 ),
-                previousHash="",
+                previousHash=None,
             )
         )
     ).then_return(
@@ -383,7 +384,7 @@ async def test_rotate_no_previous_log(
                 message=matchers.StringMatching(
                     f".*{constants.MESSAGE_NO_PREVIOUS_LOG}.*"
                 ),
-                previousHash="",
+                previousHash=None,
             )
         )
     ).then_return(
@@ -496,7 +497,7 @@ async def test_rotate_log_happypath_handles_no_keyserver(
                 message=matchers.StringMatching(
                     f".*{constants.MESSAGE_LOG_PERIOD_START}.*"
                 ),
-                previousHash="",
+                previousHash=None,
             )
         )
     ).then_raise(KeyStorageUnavailableError())
@@ -540,7 +541,7 @@ async def test_rotate_no_previous_period_handles_no_keyserver(
                 message=matchers.StringMatching(
                     f".*{constants.ACTION_LOG_PERIOD_START}.*"
                 ),
-                previousHash="",
+                previousHash=None,
             )
         )
     ).then_raise(KeyStorageUnavailableError())
@@ -550,7 +551,7 @@ async def test_rotate_no_previous_period_handles_no_keyserver(
                 message=matchers.StringMatching(
                     f".*{constants.MESSAGE_NO_PREVIOUS_PERIOD}.*"
                 ),
-                previousHash="",
+                previousHash=None,
             )
         )
     ).then_raise(KeyStorageUnavailableError())
@@ -610,7 +611,7 @@ async def test_rotate_no_previous_log_handles_no_key_server(
                 message=matchers.StringMatching(
                     f".*{constants.MESSAGE_NO_PREVIOUS_LOG}.*"
                 ),
-                previousHash="",
+                previousHash=None,
             )
         )
     ).then_raise(KeyStorageUnavailableError())
@@ -620,7 +621,7 @@ async def test_rotate_no_previous_log_handles_no_key_server(
                 message=matchers.StringMatching(
                     f".*{constants.MESSAGE_LOG_PERIOD_END}.*"
                 ),
-                previousHash="",
+                previousHash=None,
             )
         )
     ).then_raise(KeyStorageUnavailableError())
@@ -664,7 +665,7 @@ async def test_rotate_no_previous_log_handles_no_key_server(
                 message=matchers.StringMatching(
                     f".*{constants.MESSAGE_LOG_PERIOD_START}.*"
                 ),
-                previousHash="",
+                previousHash=None,
             )
         )
     ).then_raise(KeyStorageUnavailableError())

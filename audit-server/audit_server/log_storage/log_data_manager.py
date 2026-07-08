@@ -120,7 +120,7 @@ class LogDataManager:
         return message_obj.model_dump_json(indent=None)
 
     def _build_sign_error_message(
-        self, sign_error: BaseException, previous_hash: str
+        self, sign_error: BaseException, previous_hash: str | None
     ) -> StoredLog:
         """If the key server isn't running, we need to be able to log that.
 
@@ -160,7 +160,7 @@ class LogDataManager:
             # signing errors are swallowed here because log rotation is an automated
             # process during boot that we can't cancel.
             if sign_error:
-                ending_messages.append(self._build_sign_error_message(sign_error, ""))
+                ending_messages.append(self._build_sign_error_message(sign_error, None))
                 current_tail_hash = ""
 
         # the actual end message required for log validity
@@ -172,7 +172,7 @@ class LogDataManager:
         # signing errors are swallowed here because log rotation is an automated process
         # during boot that we can't handle.
         if sign_error:
-            ending_messages.append(self._build_sign_error_message(sign_error, ""))
+            ending_messages.append(self._build_sign_error_message(sign_error, None))
         ending_messages.append(signed_end_log)
         return self._store.end_period(ending_messages)
 
@@ -184,7 +184,7 @@ class LogDataManager:
             action=constants.ACTION_LOG_PERIOD_START,
             message=constants.MESSAGE_LOG_PERIOD_START,
         )
-        tracking_tail_hash = stop_result if isinstance(stop_result, str) else ""
+        tracking_tail_hash = stop_result if isinstance(stop_result, str) else None
         signed_start, sign_error = await self._sign_log(
             start_message, tracking_tail_hash
         )
@@ -222,7 +222,7 @@ class LogDataManager:
         return self._store.start_period(start_messages)
 
     async def _sign_log(
-        self, log: str, previous_hash: str
+        self, log: str, previous_hash: str | None
     ) -> tuple[StoredLog, Exception | None]:
         """Sign a log message and return it, or a stand-in and an error.
 
@@ -231,6 +231,8 @@ class LogDataManager:
         log rotation and needs to write SOMETHING down, or maybe it's a human and
         needs to reject the action.
         """
+        if previous_hash == "":
+            previous_hash = None
         try:
             signed_message = await self._key_client.sign_message(
                 SignMessageData(message=log, previousHash=previous_hash)
