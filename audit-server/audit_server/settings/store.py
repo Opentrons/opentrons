@@ -106,7 +106,7 @@ class SettingsStore:
         """Patch the logging-enabled setting.
 
         Unlike auth-server's access-control flag, this is freely toggleable in
-        both directions. An omitted ``loggingEnabled`` leaves the setting as-is.
+        both directions.
         """
         self.update_logging_enabled_table(new_state)
         return self.get_logging_enabled()
