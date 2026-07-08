@@ -1,3 +1,4 @@
+import { customViewports } from '../../../../.storybook/preview'
 import { ICON_DATA_BY_NAME } from '../../icons/icon-data'
 import { Flex } from '../../primitives'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
@@ -28,7 +29,9 @@ const meta: Meta<typeof TagComponent> = {
     },
   },
   component: TagComponent,
-  ...VIEWPORT.touchScreenViewport,
+  viewport: {
+    options: [VIEWPORT.touchScreenViewport, customViewports],
+  },
   decorators: [
     Story => (
       <Flex padding={SPACING.spacing16} width="59rem">
