@@ -3,12 +3,14 @@ from __future__ import annotations
 import asyncio
 import logging
 import math
-from typing import Any, Awaitable, Callable, List, Mapping, Optional, Union
+from typing import Any, Awaitable, Callable, List, Mapping, Optional, Type, Union
 
 from typing_extensions import cast
 
 from opentrons_shared_data.errors.exceptions import (
+    EnumeratedError,
     VacuumModulePressureNotReachedError,
+    VacuumModuleUnknownError,
     VacuumModuleWasteFullError,
 )
 
@@ -56,6 +58,20 @@ from opentrons.util.pyro.pyro_synchronous_adapter import (
 )
 
 log = logging.getLogger(__name__)
+
+_RecoverableVacuumEnumeratedError = Type[
+    Union[
+        VacuumModulePressureNotReachedError,
+        VacuumModuleWasteFullError,
+    ]
+]
+
+_RECOVERABLE_VACUUM_DRIVER_ERRORS: dict[
+    type[Exception], _RecoverableVacuumEnumeratedError
+] = {
+    PressureNotReached: VacuumModulePressureNotReachedError,
+    WasteContainerFull: VacuumModuleWasteFullError,
+}
 
 POLL_PERIOD = 2.0
 SIMULATING_POLL_PERIOD = POLL_PERIOD / 20.0
@@ -184,21 +200,22 @@ class VacuumModule(mod_abc.AbstractModule):
     def _async_error_callback(self, exception: Exception) -> None:
         self.error_callback(self._to_enumerated_error(exception))
 
-    def _to_enumerated_error(self, exception: Exception) -> Exception:
-        if isinstance(exception, PressureNotReached):
-            vacuum_state = self._reader.vacuum_state
-            current_pressure = (
-                vacuum_state.current_gauge_pressure if vacuum_state is not None else 0.0
-            )
-            return VacuumModulePressureNotReachedError(
-                self.serial_number or "",
-                self._reader.target_pressure or 0.0,
-                current_pressure,
-                mode=self._reader.operation_mode.value,
-            )
-        if isinstance(exception, WasteContainerFull):
-            return VacuumModuleWasteFullError(self.serial_number or "")
-        return exception
+    def _to_enumerated_error(self, exception: Exception) -> EnumeratedError:
+        serial = self.serial_number or ""
+        target = self._reader.vacuum_state.target_gauge_pressure
+        current = self._reader.vacuum_state.current_gauge_pressure
+        mode = self.operation_mode.value
+        if self.operation_mode == VacuumOperationMode.POWER:
+            target = self._reader.pump_state.target_pwm
+            current = self._reader.pump_state.current_pwm
+
+        for (
+            driver_error_type,
+            enumerated_error_type,
+        ) in _RECOVERABLE_VACUUM_DRIVER_ERRORS.items():
+            if isinstance(exception, driver_error_type):
+                return enumerated_error_type(serial, mode, target, current)
+        return VacuumModuleUnknownError(serial, mode, target, current)
 
     @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
     async def cleanup(self) -> None:

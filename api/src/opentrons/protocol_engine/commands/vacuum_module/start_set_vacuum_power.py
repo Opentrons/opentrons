@@ -8,20 +8,13 @@ from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 from typing_extensions import Literal, Type
 
+from ...errors.error_occurrence import ErrorOccurrence
 from ...state import update_types
 from ..command import (
     AbstractCommandImpl,
     BaseCommand,
     BaseCommandCreate,
     SuccessData,
-)
-from .common import (
-    RecoverableVacuumHwExceptions,
-    RecoverableVacuumHwExceptionTypes,
-    VacuumModuleCarboyFullError,
-    VacuumModuleDefinedErrorData,
-    VacuumPressureNotReachedError,
-    handle_recoverable_vacuum_error,
 )
 from opentrons.protocol_engine.resources import ModelUtils
 
@@ -68,10 +61,7 @@ class StartSetVacuumPowerResult(BaseModel):
     taskId: str = Field(..., description="The id of the task")
 
 
-_ExecuteReturn = Union[
-    SuccessData[StartSetVacuumPowerResult],
-    VacuumModuleDefinedErrorData,
-]
+_ExecuteReturn = Union[SuccessData[StartSetVacuumPowerResult],]
 
 
 class StartSetVacuumPowerImpl(
@@ -93,18 +83,6 @@ class StartSetVacuumPowerImpl(
         self._movement = movement
         self._task_handler = task_handler
         self._model_utils = model_utils
-
-    def handle_recoverable_error(
-        self,
-        error: RecoverableVacuumHwExceptions,
-        state_update: update_types.StateUpdate,
-    ) -> VacuumModuleDefinedErrorData:
-        """Handle a recoverable error raised during command execution."""
-        return handle_recoverable_vacuum_error(
-            error=error,
-            state_update=state_update,
-            model_utils=self._model_utils,
-        )
 
     async def execute(
         self, params: StartSetVacuumPowerParams
@@ -129,29 +107,24 @@ class StartSetVacuumPowerImpl(
 
         async def start_set_vacuum_power(task_handler: TaskHandler) -> None:
             if vm_hardware is not None:
-                try:
-                    async with task_handler.synchronize_cancel_latest(
-                        vm_state.module_id
-                    ):
-                        await vm_hardware.set_pump_state(
-                            start_pump=True,
-                            duty_cycle=params.percentPower,
-                            duration_s=params.duration,
-                            timeout_s=params.timeout,
-                            rate=params.rate,
-                            vent_after=params.ventAfter,
-                        )
+                async with task_handler.synchronize_cancel_latest(vm_state.module_id):
+                    await vm_hardware.set_pump_state(
+                        start_pump=True,
+                        duty_cycle=params.percentPower,
+                        duration_s=params.duration,
+                        timeout_s=params.timeout,
+                        rate=params.rate,
+                        vent_after=params.ventAfter,
+                    )
 
-                        if params.duration is not None:
-                            await vm_hardware.wait_for_command_duration()
-                        else:
-                            await vm_hardware.wait_for_target()
+                    if params.duration is not None:
+                        await vm_hardware.wait_for_command_duration()
+                    else:
+                        await vm_hardware.wait_for_target()
 
-                        state_update.update_vacuum_module_pump_engaged(
-                            params.moduleId, vm_hardware.pump_running
-                        )
-                except RecoverableVacuumHwExceptionTypes as error:
-                    raise error
+                    state_update.update_vacuum_module_pump_engaged(
+                        params.moduleId, vm_hardware.pump_running
+                    )
 
         task = await self._task_handler.create_task(
             task_function=start_set_vacuum_power, id=params.taskId
@@ -167,7 +140,7 @@ class StartSetVacuumPower(
     BaseCommand[
         StartSetVacuumPowerParams,
         StartSetVacuumPowerResult,
-        VacuumPressureNotReachedError | VacuumModuleCarboyFullError,
+        ErrorOccurrence,
     ]
 ):
     """A command to set the vacuum pump power."""

@@ -32,7 +32,7 @@ RECOVERABLE_VACUUM_ERROR_CODES = frozenset(
 )
 
 
-class FailedOperation(TypedDict, total=False):
+class FailedOperation(TypedDict):
     """Holds the target and current data when the error occured."""
 
     mode: VacuumOperationMode
@@ -61,12 +61,31 @@ class VacuumModuleCarboyFullError(ErrorOccurrence):
     errorCode: str = ErrorCodes.VACUUM_WASTE_CONTAINER_FULL.value.code
     detail: str = ErrorCodes.VACUUM_WASTE_CONTAINER_FULL.value.detail
 
-    errorInfo: dict[str, object]
+    errorInfo: FailedOperation
 
+
+class VacuumModuleError(ErrorOccurrence):
+    """Returned when a recoverable vacuum module error has no specific mapping."""
+
+    isDefined: bool = False
+    errorType: Literal["vacuumModuleError"] = "vacuumModuleError"
+
+    errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
+    detail: str = ErrorCodes.GENERAL_ERROR.value.detail
+
+    errorInfo: FailedOperation
+
+
+VacuumModuleCommandDefinedError = Union[
+    VacuumPressureNotReachedError,
+    VacuumModuleCarboyFullError,
+    VacuumModuleError,
+]
 
 VacuumModuleDefinedErrorData = Union[
     DefinedErrorData[VacuumPressureNotReachedError],
     DefinedErrorData[VacuumModuleCarboyFullError],
+    DefinedErrorData[VacuumModuleError],
 ]
 
 RecoverableVacuumHwExceptionTypes = (
@@ -79,6 +98,40 @@ RecoverableVacuumHwExceptions = (
 )
 
 
+def _float_from_optional(value: object | None) -> float:
+    if isinstance(value, (int, float)):
+        return float(value)
+    if isinstance(value, str):
+        return float(value)
+    return 0.0
+
+
+def _vacuum_operation_error_info(
+    *,
+    mode: object | None = None,
+    target: object | None = None,
+    current: object | None = None,
+) -> FailedOperation:
+    return {
+        "mode": cast(
+            VacuumOperationMode,
+            mode if mode is not None else VacuumOperationMode.PRESSURE,
+        ),
+        "target": _float_from_optional(target),
+        "current": _float_from_optional(current),
+    }
+
+
+def _vacuum_operation_error_info_from_mapping(
+    error_info: Mapping[str, object],
+) -> FailedOperation:
+    return _vacuum_operation_error_info(
+        mode=error_info.get("mode"),
+        target=error_info.get("target"),
+        current=error_info.get("current"),
+    )
+
+
 def handle_recoverable_vacuum_error(
     error: RecoverableVacuumHwExceptions,
     state_update: update_types.StateUpdate,
@@ -86,59 +139,58 @@ def handle_recoverable_vacuum_error(
 ) -> VacuumModuleDefinedErrorData:
     """Map a recoverable vacuum hardware error to defined command error data."""
     timestamp = model_utils.get_timestamp()
+    enumerated_error = (
+        error if isinstance(error, EnumeratedError) else EnumeratedError.ensure(error)
+    )
+    wrapped_error = ErrorOccurrence.from_failed(
+        id=model_utils.generate_id(),
+        createdAt=timestamp,
+        error=enumerated_error,
+    )
 
     if isinstance(error, VacuumModuleWasteFullError):
-        wrapped_error = ErrorOccurrence.from_failed(
-            id=model_utils.generate_id(),
-            createdAt=timestamp,
-            error=error,
-        )
         return DefinedErrorData(
             public=VacuumModuleCarboyFullError(
                 id=model_utils.generate_id(),
                 createdAt=timestamp,
                 wrappedErrors=[wrapped_error],
-                errorInfo={},
+                errorInfo=_vacuum_operation_error_info(
+                    mode=error.mode,
+                    target=error.target,
+                    current=error.current,
+                ),
             ),
             state_update_if_false_positive=state_update,
         )
 
-    elif isinstance(error, VacuumModulePressureNotReachedError):
-        wrapped_error = ErrorOccurrence.from_failed(
-            id=model_utils.generate_id(),
-            createdAt=timestamp,
-            error=error,
-        )
+    if isinstance(error, VacuumModulePressureNotReachedError):
         return DefinedErrorData(
             public=VacuumPressureNotReachedError(
                 id=model_utils.generate_id(),
                 createdAt=timestamp,
                 wrappedErrors=[wrapped_error],
-                errorInfo={
-                    "mode": cast(
-                        VacuumOperationMode,
-                        error.detail.get("mode", VacuumOperationMode.PRESSURE),
-                    ),
-                    "target": error.target_pressure,
-                    "current": error.current_pressure,
-                },
+                errorInfo=_vacuum_operation_error_info(
+                    mode=error.mode,
+                    target=error.target_pressure,
+                    current=error.current_pressure,
+                ),
             ),
             state_update_if_false_positive=state_update,
         )
 
-    raise TypeError(
-        f"No defined error mapping for recoverable vacuum hardware error "
-        f"{type(error).__name__!r}."
+    return DefinedErrorData(
+        public=VacuumModuleError(
+            id=model_utils.generate_id(),
+            createdAt=timestamp,
+            wrappedErrors=[wrapped_error],
+            errorInfo=_vacuum_operation_error_info(
+                mode=enumerated_error.detail.get("mode"),
+                target=enumerated_error.detail.get("target"),
+                current=enumerated_error.detail.get("current"),
+            ),
+        ),
+        state_update_if_false_positive=state_update,
     )
-
-
-def _float_from_error_info(error_info: Mapping[str, object], key: str) -> float:
-    value = error_info.get(key)
-    if isinstance(value, (int, float)):
-        return float(value)
-    if isinstance(value, str):
-        return float(value)
-    return 0.0
 
 
 def is_recoverable_module_error(error: ErrorOccurrence | EnumeratedError) -> bool:
@@ -176,29 +228,28 @@ def defined_error_data_from_task_error(
         else update_types.StateUpdate()
     )
 
+    operation_error_info = _vacuum_operation_error_info_from_mapping(
+        task_error.errorInfo
+    )
+
     if error_code == VACUUM_WASTE_CONTAINER_FULL_ERROR_CODE:
         return DefinedErrorData(
             public=VacuumModuleCarboyFullError(
                 id=error_id,
                 createdAt=timestamp,
                 wrappedErrors=[task_error],
-                errorInfo={},
+                errorInfo=operation_error_info,
             ),
             state_update_if_false_positive=false_positive_update,
         )
 
     elif error_code == VACUUM_PRESSURE_NOT_REACHED_ERROR_CODE:
-        mode_value = task_error.errorInfo.get("mode", VacuumOperationMode.PRESSURE)
         return DefinedErrorData(
             public=VacuumPressureNotReachedError(
                 id=error_id,
                 createdAt=timestamp,
                 wrappedErrors=[task_error],
-                errorInfo={
-                    "mode": cast(VacuumOperationMode, mode_value),
-                    "target": _float_from_error_info(task_error.errorInfo, "target"),
-                    "current": _float_from_error_info(task_error.errorInfo, "current"),
-                },
+                errorInfo=operation_error_info,
             ),
             state_update_if_false_positive=false_positive_update,
         )

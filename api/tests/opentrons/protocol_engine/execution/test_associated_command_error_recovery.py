@@ -203,7 +203,7 @@ def test_try_recover_from_module_error_uses_resolver(
     recovered = subject.try_recover_from_module_error(
         module_model=ModuleModel.VACUUM_MODULE_V1,
         module_serial="VM123",
-        error=VacuumModuleWasteFullError(serial="VM123"),
+        error=VacuumModuleWasteFullError("VM123", "pressure", 0.0, 0.0),
     )
 
     assert recovered is True
@@ -299,7 +299,7 @@ def test_try_recover_from_module_error_returns_false_for_non_recoverable_policy(
     recovered = subject.try_recover_from_module_error(
         module_model=ModuleModel.VACUUM_MODULE_V1,
         module_serial="VM123",
-        error=VacuumModuleWasteFullError(serial="VM123"),
+        error=VacuumModuleWasteFullError("VM123", "pressure", 0.0, 0.0),
     )
 
     assert recovered is False

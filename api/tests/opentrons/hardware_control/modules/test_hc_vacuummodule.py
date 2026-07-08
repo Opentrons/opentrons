@@ -45,6 +45,36 @@ from opentrons.hardware_control.poller import Poller
 from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
 
 
+def _set_reader_async_error_context(
+    reader: VacuumModuleReader,
+    *,
+    mode: VacuumOperationMode,
+    target: float,
+    current: float,
+) -> None:
+    """Seed reader state the way async error enumeration reads it."""
+    reader.set_operation_mode(mode)
+    reader.vacuum_state = VacuumState(
+        target_gauge_pressure=target,
+        current_gauge_pressure=current,
+        pressure_abs_a=0,
+        pressure_abs_b=0,
+        pressure_atm=0,
+        vacuum_enabled=True,
+        vacuum_duration=0,
+        vent_state=VentState.CLOSED,
+    )
+    if mode == VacuumOperationMode.POWER:
+        reader.pump_state = PumpState(
+            target_rpm=0,
+            current_rpm=0,
+            target_pwm=target,
+            current_pwm=current,
+            pump_running=True,
+            manual_control=True,
+        )
+
+
 @pytest.fixture
 def usb_port() -> USBPort:
     """Token USB port."""
@@ -887,11 +917,13 @@ async def test_execute_profile_aborts_when_stopped(
     [
         (
             PressureNotReached("port", "response", "command"),
-            VacuumModulePressureNotReachedError("dummySerialFS", -100.0, 0.0),
+            VacuumModulePressureNotReachedError(
+                "dummySerialFS", "pressure", -500.0, -300.0
+            ),
         ),
         (
             WasteContainerFull("port", "response", "command"),
-            VacuumModuleWasteFullError("dummySerialFS"),
+            VacuumModuleWasteFullError("dummySerialFS", "pressure", -500.0, -300.0),
         ),
     ],
 )
@@ -903,7 +935,12 @@ def test_async_error_callback_maps_driver_errors(
     expected_error: Exception,
 ) -> None:
     """It should map vacuum module driver async errors to enumerated errors."""
-    subject._reader.set_target_pressure(-100.0)
+    _set_reader_async_error_context(
+        subject._reader,
+        mode=VacuumOperationMode.PRESSURE,
+        target=-500.0,
+        current=-300.0,
+    )
     subject._async_error_callback(driver_error)
     decoy.verify(
         module_error_callback(
@@ -921,18 +958,19 @@ def test_async_error_callback_includes_operation_mode_in_pressure_error_detail(
     decoy: Decoy,
 ) -> None:
     """Pressure-not-reached async errors should include the active operation mode."""
-    subject._reader.set_target_pressure(-100.0)
-    subject._reader.set_operation_mode(VacuumOperationMode.POWER)
+    _set_reader_async_error_context(
+        subject._reader,
+        mode=VacuumOperationMode.PRESSURE,
+        target=-500.0,
+        current=-300.0,
+    )
     subject._async_error_callback(
         PressureNotReached("port", "async ERR400:pressure not reached", "M121")
     )
     decoy.verify(
         module_error_callback(
             VacuumModulePressureNotReachedError(
-                "dummySerialFS",
-                -100.0,
-                0.0,
-                mode="power",
+                "dummySerialFS", "pressure", -500.0, -300.0
             ),
             "vacuumModuleV1",
             "/dev/ot_module_sim_vacuummodule0",

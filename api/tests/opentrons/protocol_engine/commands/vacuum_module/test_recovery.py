@@ -41,7 +41,12 @@ def test_can_handle_recoverable_vacuum_errors() -> None:
     )
 
     assert subject.can_handle_error(task_error) is True
-    assert subject.can_handle_error(VacuumModuleWasteFullError(serial="VM123")) is True
+    assert (
+        subject.can_handle_error(
+            VacuumModuleWasteFullError("VM123", "pressure", 0.0, 0.0)
+        )
+        is True
+    )
 
 
 def test_get_command_id_for_async_notification(
@@ -113,7 +118,7 @@ def test_to_defined_error_data_maps_carboy_full(
     )
 
     result = subject.to_defined_error_data(
-        error=VacuumModuleWasteFullError(serial="VM123"),
+        error=VacuumModuleWasteFullError("VM123", "pressure", 0.0, 0.0),
         command=command,
         state_view=state_view,
         model_utils=model_utils,
