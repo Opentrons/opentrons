@@ -18,9 +18,7 @@ export type PipetteWizardStep =
   | AttachWasteChuteStep
 
 export type PipetteWizardFlow =
-  | typeof FLOWS.ATTACH
-  | typeof FLOWS.DETACH
-  | typeof FLOWS.CALIBRATE
+  typeof FLOWS.ATTACH | typeof FLOWS.DETACH | typeof FLOWS.CALIBRATE
 
 export interface BaseStep {
   mount: PipetteMount

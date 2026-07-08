@@ -113,7 +113,7 @@
     "postcss-color-mod-function": "3.0.3",
     "postcss-import": "16.0.0",
     "postcss-preset-env": "9.3.0",
-    "prettier": "3.8.4",
+    "prettier": "3.9.4",
     "react": "catalog:react18",
     "react-docgen-typescript": "^1.21.0",
     "react-dom": "catalog:react18",

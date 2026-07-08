@@ -172,10 +172,11 @@ export function getPipetteAnimations(
       css={css`
         padding-top: ${SPACING.spacing4};
         width: 100%;
-        min-height: ${section === SECTIONS.ATTACH_PROBE ||
-        section === SECTIONS.DETACH_PROBE
-          ? `18rem`
-          : `12rem`};
+        min-height: ${
+          section === SECTIONS.ATTACH_PROBE || section === SECTIONS.DETACH_PROBE
+            ? `18rem`
+            : `12rem`
+        };
       `}
       data-testid={
         section === SECTIONS.ATTACH_PROBE || section === SECTIONS.DETACH_PROBE

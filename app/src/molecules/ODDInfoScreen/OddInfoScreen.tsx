@@ -14,11 +14,7 @@ import {
 import type { IconName, ODDStyles, StyleProps } from '@opentrons/components'
 
 export type OddInfoScreenType =
-  | 'error'
-  | 'alt'
-  | 'neutral'
-  | 'success'
-  | 'warning'
+  'error' | 'alt' | 'neutral' | 'success' | 'warning'
 
 interface OddInfoScreenProps extends StyleProps {
   type: OddInfoScreenType

@@ -76,8 +76,7 @@ export interface InputFieldProps {
   min?: number | string
   /** horizontal text alignment for title, input, and (sub)captions */
   textAlign?:
-    | typeof TYPOGRAPHY.textAlignLeft
-    | typeof TYPOGRAPHY.textAlignCenter
+    typeof TYPOGRAPHY.textAlignLeft | typeof TYPOGRAPHY.textAlignCenter
   /** small or medium input field height, relevant only */
   size?: 'medium' | 'small'
   /** optional element to display aligned to the left of the input field */
@@ -136,14 +135,16 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 
     const INPUT_FIELD = css`
       background-color: ${hasBackgroundError ? COLORS.red30 : COLORS.white};
-      border-radius: ${borderRadius != null
-        ? borderRadius
-        : BORDERS.borderRadius4};
+      border-radius: ${
+        borderRadius != null ? borderRadius : BORDERS.borderRadius4
+      };
       padding: ${padding ?? SPACING.spacing8};
-      border: ${hasBackgroundError
-        ? 'none'
-        : `1px ${BORDERS.styleSolid}
-        ${hasError ? COLORS.red50 : COLORS.grey50}`};
+      border: ${
+        hasBackgroundError
+          ? 'none'
+          : `1px ${BORDERS.styleSolid}
+        ${hasError ? COLORS.red50 : COLORS.grey50}`
+      };
       font-size: ${TYPOGRAPHY.fontSizeP};
       width: 100%;
       height: ${size === 'small' ? '2rem' : '2.75rem'};

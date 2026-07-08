@@ -192,9 +192,7 @@ function BreadcrumbsComponent(): JSX.Element | null {
   // determines whether a crumb is displayed for a path, and the displayed name
   const crumbNameByPath: {
     [index: string]:
-      | string
-      | null
-      | { linkPath: string; crumbName: string | null }
+      string | null | { linkPath: string; crumbName: string | null }
   } = {
     '/devices': !(isOnDevice ?? false) ? t('devices') : null,
     [`/devices/${robotName}`]: robotName,
