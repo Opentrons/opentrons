@@ -111,6 +111,7 @@ class UpdateSelf(BaseModel):
 
     @model_validator(mode="after")
     def check_at_least_one_field(self) -> Self:
+        """Check that at least one field is provided."""
         if self.username is None and self.fullName is None and self.password is None:
             raise ValueError("At least one field must be provided")
         return self

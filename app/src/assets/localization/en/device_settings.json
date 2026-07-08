@@ -113,6 +113,7 @@
   "desktop_minimum_password_length": "Minimum password length",
   "desktop_minutes": "mins",
   "desktop_password": "Password",
+  "desktop_password_placeholder": "************************",
   "desktop_confirm_password": "Confirm password",
   "desktop_password_mismatch": "Passwords do not match",
   "desktop_personal_account_settings": "Personal account settings",
