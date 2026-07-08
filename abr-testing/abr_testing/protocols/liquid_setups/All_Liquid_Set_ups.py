@@ -35,7 +35,7 @@ SLOTS = {
     "FULL_TIP_RACK": "A1",
     "PARTIAL_TIP_RACK_1000": ["C2", "B3"],
     "SRC_RESERVOIR": "B1",
-    "LABWARE": ["D1", "D2", "D3", "C1", "C3"],
+    "LABWARE": ["D1", "D2", "D3", "C1", "C3", "B2"],
     "TRASH_BIN": "A3",
 }
 
@@ -322,13 +322,24 @@ def run(protocol: ProtocolContext) -> None:
         dna_plate = protocol.load_labware(
             "opentrons_96_wellplate_200ul_pcr_full_skirt", SLOTS["LABWARE"][3], "DNA"
         )
+
+        pcr_dilution = protocol.load_labware(
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            str(SLOTS["LABWARE"][4]),
+            "PCR Dilution",
+        )
+        pcr_dilution2 = protocol.load_labware(
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            str(SLOTS["LABWARE"][5]),
+            "PCR Dilution Plate",
+        )
         # RESERVOIR, INDICES PLATE, DNA PLATE
         pipette.configure_nozzle_layout(style=ALL, tip_racks=[tip_rack])
         pipette.reset_tipracks()
         pipette.transfer(
-            volume=[150, 100, 100],
-            source=3 * [src_reservoir["A1"]],
-            dest=[reservoir["A1"], indices_plate["A1"], dna_plate["A1"]],
+            volume=[200, 200, 100, 200, 200],
+            source=5 * [src_reservoir["A1"]],
+            dest=[reservoir["A1"], indices_plate["A1"], dna_plate["A1"], pcr_dilution["A1"], pcr_dilution2["A1"]],
             trash=False,
             blow_out=False,
             blowout_location="destination well",
@@ -351,7 +362,7 @@ def run(protocol: ProtocolContext) -> None:
             blow_out=False,
             blowout_location="destination well",
         )
-        dvt2abr5_plates = [reservoir, pcr_reagents_plate, indices_plate, dna_plate]
+        dvt2abr5_plates = [reservoir, pcr_reagents_plate, indices_plate, dna_plate, pcr_dilution, pcr_dilution2]
         for plate in dvt2abr5_plates:
             protocol.move_labware(plate, OFF_DECK, use_gripper=False)
 

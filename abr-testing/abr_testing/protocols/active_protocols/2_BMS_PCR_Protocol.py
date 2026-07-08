@@ -46,7 +46,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="disposable_lid",
         display_name="Disposable Lid",
         description="True means use lid.",
-        default=True,
+        default=False,
     )
     """Create parameter for sample volume csvs."""
     parameters.add_csv_file(
@@ -60,7 +60,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="deck_riser",
         display_name="Deck Riser",
         description="True means use deck riser.",
-        default=True,
+        default=False,
     )
     """Create parameter for deactivating modules at the end fof run."""
     parameters.add_bool(
