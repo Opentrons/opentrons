@@ -27,7 +27,11 @@ from robot_server.camera.settings.store import (
     CameraSettingStore,
     get_camera_setting_store,
 )
-from robot_server.data_files.dependencies import get_data_file_auto_deleter
+from robot_server.data_files.data_files_store import DataFilesStore
+from robot_server.data_files.dependencies import (
+    get_data_file_auto_deleter,
+    get_data_files_store,
+)
 from robot_server.data_files.file_auto_deleter import DataFileAutoDeleter
 from robot_server.deletion_planner import RunDeletionPlanner
 from robot_server.error_recovery.settings.store import (
@@ -233,6 +237,7 @@ async def get_run_data_manager(
         CameraSettingStore, Depends(get_camera_setting_store)
     ],
     file_provider: Annotated[FileProvider, Depends(get_file_provider)],
+    data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
 ) -> RunDataManager:
     """Get a singleton run data manager to keep track of current/historical run data."""
     run_data_manager = _run_data_manager_accessor.get_from(app_state)
@@ -246,6 +251,7 @@ async def get_run_data_manager(
             task_runner=task_runner,
             runs_publisher=runs_publisher,
             file_provider=file_provider,
+            data_files_store=data_files_store,
         )
         _run_data_manager_accessor.set_on(app_state, run_data_manager)
 

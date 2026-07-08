@@ -103,6 +103,12 @@ def mock_camera_setting_store(decoy: Decoy) -> CameraSettingStore:
     return decoy.mock(cls=CameraSettingStore)
 
 
+@pytest.fixture
+def mock_data_files_store(decoy: Decoy) -> DataFilesStore:
+    """Get a mock DataFilesStore."""
+    return decoy.mock(cls=DataFilesStore)
+
+
 @pytest.fixture()
 def mock_task_runner(decoy: Decoy) -> TaskRunner:
     """Get a mock background TaskRunner."""
@@ -252,6 +258,7 @@ def subject(
     mock_task_runner: TaskRunner,
     mock_runs_publisher: RunsPublisher,
     mock_file_provider: FileProvider,
+    mock_data_files_store: DataFilesStore,
 ) -> RunDataManager:
     """Get a RunDataManager test subject."""
     return RunDataManager(
@@ -262,6 +269,7 @@ def subject(
         task_runner=mock_task_runner,
         runs_publisher=mock_runs_publisher,
         file_provider=mock_file_provider,
+        data_files_store=mock_data_files_store,
     )
 
 
@@ -723,9 +731,8 @@ async def test_delete_current_run(
     """It should delete the current run from the engine."""
     run_id = "hello world"
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
-    mock_data_files_store = decoy.mock(cls=DataFilesStore)
 
-    await subject.delete(run_id=run_id, data_files_store=mock_data_files_store)
+    await subject.delete(run_id=run_id)
 
     decoy.verify(
         await mock_run_orchestrator_store.clear(),
@@ -742,9 +749,8 @@ async def test_delete_historical_run(
     """It should delete a historical run from the store."""
     run_id = "hello world"
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("some other id")
-    mock_data_files_store = decoy.mock(cls=DataFilesStore)
 
-    await subject.delete(run_id=run_id, data_files_store=mock_data_files_store)
+    await subject.delete(run_id=run_id)
 
     decoy.verify(await mock_run_orchestrator_store.clear(), times=0)
     decoy.verify(mock_run_store.remove(run_id=run_id), times=1)
@@ -754,18 +760,14 @@ async def test_delete_run_with_all_run_files(
     decoy: Decoy,
     mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
+    mock_data_files_store: DataFilesStore,
     subject: RunDataManager,
 ) -> None:
     """It should remove the run's data files from disk when requested."""
     run_id = "hello world"
-    mock_data_files_store = decoy.mock(cls=DataFilesStore)
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("some other id")
 
-    await subject.delete(
-        run_id=run_id,
-        data_files_store=mock_data_files_store,
-        should_delete_all_run_files=True,
-    )
+    await subject.delete(run_id=run_id, should_delete_all_run_files=True)
 
     decoy.verify(
         mock_data_files_store.remove_all_by_run_id(run_id),
@@ -777,18 +779,14 @@ async def test_delete_run_without_all_run_files(
     decoy: Decoy,
     mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
+    mock_data_files_store: DataFilesStore,
     subject: RunDataManager,
 ) -> None:
     """It should not touch the data files store when not requested."""
     run_id = "hello world"
-    mock_data_files_store = decoy.mock(cls=DataFilesStore)
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("some other id")
 
-    await subject.delete(
-        run_id=run_id,
-        data_files_store=mock_data_files_store,
-        should_delete_all_run_files=False,
-    )
+    await subject.delete(run_id=run_id, should_delete_all_run_files=False)
 
     decoy.verify(mock_data_files_store.remove_all_by_run_id(run_id), times=0)
 

@@ -551,19 +551,16 @@ async def test_get_runs_not_empty(
 async def test_delete_run_by_id(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
-    mock_data_files_store: DataFilesStore,
 ) -> None:
     """It should be able to remove a run by ID."""
     result = await remove_run(
         runId="run-id",
         run_data_manager=mock_run_data_manager,
-        data_files_store=mock_data_files_store,
     )
 
     decoy.verify(
         await mock_run_data_manager.delete(
             "run-id",
-            data_files_store=mock_data_files_store,
             should_delete_all_run_files=False,
         ),
         times=1,
@@ -576,7 +573,6 @@ async def test_delete_run_by_id(
 async def test_delete_run_with_bad_id(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
-    mock_data_files_store: DataFilesStore,
 ) -> None:
     """It should 404 if the run ID does not exist."""
     key_error = RunNotFoundError(run_id="run-id")
@@ -584,7 +580,6 @@ async def test_delete_run_with_bad_id(
     decoy.when(
         await mock_run_data_manager.delete(  # type: ignore[func-returns-value]
             "run-id",
-            data_files_store=mock_data_files_store,
             should_delete_all_run_files=False,
         )
     ).then_raise(key_error)
@@ -593,7 +588,6 @@ async def test_delete_run_with_bad_id(
         await remove_run(
             runId="run-id",
             run_data_manager=mock_run_data_manager,
-            data_files_store=mock_data_files_store,
         )
 
     assert exc_info.value.status_code == 404
@@ -603,13 +597,11 @@ async def test_delete_run_with_bad_id(
 async def test_delete_active_run(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
-    mock_data_files_store: DataFilesStore,
 ) -> None:
     """It should 409 if the run is not finished."""
     decoy.when(
         await mock_run_data_manager.delete(  # type: ignore[func-returns-value]
             "run-id",
-            data_files_store=mock_data_files_store,
             should_delete_all_run_files=False,
         )
     ).then_raise(RunConflictError("oh no"))
@@ -618,7 +610,6 @@ async def test_delete_active_run(
         await remove_run(
             runId="run-id",
             run_data_manager=mock_run_data_manager,
-            data_files_store=mock_data_files_store,
         )
 
     assert exc_info.value.status_code == 409

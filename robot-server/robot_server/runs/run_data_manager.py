@@ -169,6 +169,7 @@ class RunDataManager:
         task_runner: TaskRunner,
         runs_publisher: RunsPublisher,
         file_provider: FileProvider,
+        data_files_store: DataFilesStore,
     ) -> None:
         self._run_orchestrator_store = run_orchestrator_store
         self._run_store = run_store
@@ -184,6 +185,7 @@ class RunDataManager:
         self._task_runner = task_runner
         self._runs_publisher = runs_publisher
         self._file_provider = file_provider
+        self._data_files_store = data_files_store
 
     @property
     def current_run_id(self) -> Optional[str]:
@@ -376,15 +378,12 @@ class RunDataManager:
     async def delete(
         self,
         run_id: str,
-        data_files_store: DataFilesStore,
         should_delete_all_run_files: bool = False,
     ) -> None:
         """Delete a current or historical run.
 
         Args:
             run_id: The identifier of the run to remove.
-            data_files_store: Database of data file resources, required if
-                should_delete_all_run_files is True.
             should_delete_all_run_files: If true, also delete this run's output
                 data files and images from disk.
 
@@ -398,8 +397,8 @@ class RunDataManager:
 
         self._runs_publisher.clean_up_run(run_id=run_id)
 
-        if should_delete_all_run_files and data_files_store is not None:
-            data_files_store.remove_all_by_run_id(run_id)
+        if should_delete_all_run_files:
+            self._data_files_store.remove_all_by_run_id(run_id)
 
         self._run_store.remove(run_id=run_id)
 
