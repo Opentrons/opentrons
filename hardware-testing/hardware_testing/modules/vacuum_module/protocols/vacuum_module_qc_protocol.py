@@ -1,20 +1,36 @@
 """Vacuum Module QC Protocol."""
-from typing import cast
+from typing import List, cast
+
 from opentrons.protocol_api import (
-    ProtocolContext,
     ParameterContext,
+    ProtocolContext,
     VacuumModuleContext,
 )
+from opentrons.protocols.parameters.types import ParameterChoice
 
 
 metadata = {
-    "protocolName": "Vacuum Module DVT QC Protocol V0.2",
+    "protocolName": "Vacuum Module DVT QC Protocol V0.3",
     "author": "Opentrons <protocols@opentrons.com>",
 }
 requirements = {
     "robotType": "Flex",
     "apiLevel": "2.30",
 }
+
+PIPETTE_CHOICES: List[ParameterChoice] = [
+    {"display_name": "1ch 50µL", "value": "flex_1channel_50"},
+    {"display_name": "1ch 1000µL", "value": "flex_1channel_1000"},
+    {"display_name": "8ch 50µL", "value": "flex_8channel_50"},
+    {"display_name": "8ch 1000µL", "value": "flex_8channel_1000"},
+    {"display_name": "96ch 200µL", "value": "flex_96channel_200"},
+    {"display_name": "96ch 1000µL", "value": "flex_96channel_1000"},
+]
+
+MOUNT_CHOICES: List[ParameterChoice] = [
+    {"display_name": "Left", "value": "left"},
+    {"display_name": "Right", "value": "right"},
+]
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -73,6 +89,20 @@ def add_parameters(parameters: ParameterContext) -> None:
         description="Ramps the vacuum starting at -200 - -800.",
         default=True,
     )
+    parameters.add_str(
+        variable_name="pipette_type",
+        display_name="Pipette Type",
+        description="Pipette model.",
+        default="flex_96channel_1000",
+        choices=PIPETTE_CHOICES,
+    )
+    parameters.add_str(
+        variable_name="mount",
+        display_name="Mount Location",
+        description="Pipette mount location.",
+        default="left",
+        choices=MOUNT_CHOICES,
+    )
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -94,6 +124,11 @@ def run(ctx: ProtocolContext) -> None:
         "D1",
         adapter="opentrons_flex_96_tiprack_adapter",
     )
+    tiprack_50 = ctx.load_labware(
+        "opentrons_flex_96_tiprack_50ul",
+        "D2",
+        adapter="opentrons_flex_96_tiprack_adapter",
+    )
 
     # Load Labware
     manifold_collar = vm_mod.load_adapter_to_dock(ctx.params.collar)  # type: ignore[attr-defined]
@@ -103,9 +138,20 @@ def run(ctx: ProtocolContext) -> None:
     reservoir_1 = ctx.load_labware("opentrons_tough_1_reservoir_300ml", "C2")
     reservoir_2 = ctx.load_labware("opentrons_tough_1_reservoir_300ml", "C3")
 
+    # Manually set offsets
+    tiprack_50.set_offset(x=0.00, y=0.00, z=0.00)
+    tiprack_200.set_offset(x=0.00, y=0.00, z=0.00)
+    tiprack_1000.set_offset(x=0.00, y=0.00, z=0.00)
+    black_flat_plate.set_offset(x=0.00, y=0.00, z=0.00)
+    deep_well_plate.set_offset(x=0.00, y=0.00, z=0.00)
+    reservoir_1.set_offset(x=0.00, y=0.00, z=0.00)
+    reservoir_2.set_offset(x=0.00, y=0.00, z=0.00)
+
     # Load Instruments + Trash
     pip = ctx.load_instrument(
-        "flex_96channel_1000", "left", tip_racks=[tiprack_200, tiprack_1000]
+        ctx.params.pipette_type,  # type: ignore[attr-defined]
+        ctx.params.mount,  # type: ignore[attr-defined]
+        tip_racks=[tiprack_50, tiprack_200, tiprack_1000],
     )
     ctx.load_trash_bin("A1")
 
@@ -123,10 +169,10 @@ def run(ctx: ProtocolContext) -> None:
         # You can move the collar with the plate ontop from the dock to the module
         ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
 
-        # Aspirate 500ul with 1000ul tips from reservoir2 onto filter plate
+        # Aspirate 50ul with 1000ul tips from reservoir2 onto filter plate
         pip.pick_up_tip(tiprack_1000)
-        pip.aspirate(500, reservoir_2["A1"].bottom(z=5))
-        pip.dispense(500, white_filter_plate.wells()[0].top())
+        pip.aspirate(50, reservoir_2["A1"].bottom(z=5))
+        pip.dispense(50, white_filter_plate.wells()[0].top())
         pip.return_tip()
         tiprack_1000.reset()
 
@@ -145,13 +191,14 @@ def run(ctx: ProtocolContext) -> None:
         ctx.move_labware(manifold_collar, vm_mod.manifold_dock, use_gripper=True)  # type: ignore[attr-defined]
         # Move the black flat plate onto the vacuum module
         ctx.move_labware(black_flat_plate, vm_mod, use_gripper=True)
+        black_flat_plate.set_offset(x=0.00, y=0.00, z=0.00)
         # Move collar with filter plate to the vacuum module base
         ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
 
-        # Aspirate 150ul with 200ul tips from reservoir1 onto filter plate
+        # Aspirate 50ul with 200ul tips from reservoir1 onto filter plate
         pip.pick_up_tip(tiprack_200)
-        pip.aspirate(150, reservoir_1["A1"].bottom(z=5))
-        pip.dispense(150, white_filter_plate.wells()[0].top())
+        pip.aspirate(50, reservoir_1["A1"].bottom(z=5))
+        pip.dispense(50, white_filter_plate.wells()[0].top())
         pip.return_tip()
         tiprack_200.reset()
 
@@ -165,10 +212,10 @@ def run(ctx: ProtocolContext) -> None:
         # Move the collar with filter plate to the dock
         ctx.move_labware(manifold_collar, vm_mod.manifold_dock, use_gripper=True)
 
-        # Aspirate 150ml from the deep well onto the flat plate
-        pip.pick_up_tip(tiprack_200)
-        pip.aspirate(150, deep_well_plate["A1"].bottom(z=5))
-        pip.dispense(150, black_flat_plate.wells()[0].top())
+        # Aspirate 50ml from the deep well onto the flat plate
+        pip.pick_up_tip(tiprack_50)
+        pip.aspirate(50, deep_well_plate["A1"].bottom(z=5))
+        pip.dispense(50, black_flat_plate.wells()[0].top())
         pip.return_tip()
         tiprack_200.reset()
 

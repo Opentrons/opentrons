@@ -206,6 +206,7 @@ def run(ctx: ProtocolContext) -> None:
     vm_mod.close_vent()
 
     vacuum_task = _start_vacuum_task(vm_mod, ctx)
+    timer_task = ctx.create_timer(inject_delay*1.5)
 
     ctx.delay(
         seconds=inject_delay,
