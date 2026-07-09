@@ -93,7 +93,23 @@ The Flex has not been evaluated for use with flammable liquids and should not be
 
 ## Regulatory compliance
 
-Opentrons Flex complies with all applicable requirements of the following safety and electromagnetic standards.
+Opentrons Flex complies with all applicable requirements of the following safety and electromagnetic certification and standards. You can also find compliance information on a sticker affixed to the back of Flex near the on/off switch.
+
+<figure markdown>
+![Flex regulatory and compliance sticker](images/regulatory-specs-sticker.png)
+<figcaption>Example of the Flex regulatory and compliance sticker.</figcaption>
+</figure>
+
+### Certification marks
+
+The Flex carries various certification logos on its back panel sticker. These symbols serve as our verified declarations of conformity with international and regional directives and standards.
+
+| Symbol | Market Area | Description |
+|----|----|----|
+|![CE certification](images/certification-ce.png)| European Economic Area (EEA) | Declares compliance with all applicable European Union (EU) directives (e.g., Low Voltage Directive, Machinery Directive, EMC Directive, etc.) |
+|![UK post-Brexit certification](images/certification-uk.png)| Great Britain | This post-Brexit certification declares conformity with all applicable Designated Standards under United Kingdom statutory instruments. It excludes Northern Ireland and the EU. |
+|![Australia and New Zealand certification](images/certification-auz-nz.png)| Australia and New Zealand | Declares compliance with shared trans-Tasman electromagnetic (EMC) baseline standards for commercial radio noise limits.|
+|![North America Intertek listed certification](images/certification-us-can.png)| Canada and United Stated | Certified and third-party listed by Intertek testing laboratories (ETL control number: 5016401). |
 
 ### Safety
 
