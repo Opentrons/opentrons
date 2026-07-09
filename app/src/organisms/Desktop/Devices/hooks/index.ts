@@ -1,4 +1,6 @@
 export * from './useDeckCalibrationData'
+export * from './useDownloadCalibrationData'
+export * from './useDownloadRobotLogs'
 export * from './useDownloadRunLog'
 export * from './useCalibrationTaskList'
 export * from './usePipetteOffsetCalibrations'

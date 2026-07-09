@@ -81,7 +81,7 @@ export function RobotSettingsComponent({
     camera: (
       <RobotSettingsCamera robotName={robotName} isRobotBusy={isRobotBusy} />
     ),
-    'file-manager': <RobotSettingsFileManager />,
+    'file-manager': <RobotSettingsFileManager robotName={robotName} />,
     advanced: (
       <RobotSettingsAdvanced robotName={robotName} isRobotBusy={isRobotBusy} />
     ),

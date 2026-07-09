@@ -1,0 +1,90 @@
+import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { saveAs } from 'file-saver'
+import JSZip from 'jszip'
+import last from 'lodash/last'
+
+import { GET, request } from '@opentrons/api-client'
+import { ERROR_TOAST, INFO_TOAST } from '@opentrons/components'
+import { useHost } from '@opentrons/react-api-client'
+
+import { useToaster } from '/app/organisms/ToasterOven'
+import { useRobot } from '/app/redux-resources/robots'
+import { CONNECTABLE } from '/app/redux/discovery'
+
+import type { IconProps } from '@opentrons/components'
+
+interface UseDownloadRobotLogsResult {
+  downloadLogs: () => void
+  isDownloading: boolean
+  canDownload: boolean
+}
+
+export function useDownloadRobotLogs(
+  robotName: string
+): UseDownloadRobotLogsResult {
+  const { t } = useTranslation('device_settings')
+  const robot = useRobot(robotName)
+  const host = useHost()
+  const { makeToast, eatToast } = useToaster()
+  const [isDownloading, setIsDownloading] = useState(false)
+  const isMounted = useRef(false)
+
+  useEffect(() => {
+    isMounted.current = true
+    return () => {
+      isMounted.current = false
+    }
+  }, [])
+
+  const canDownload =
+    robot?.status === CONNECTABLE && robot?.health?.logs != null
+
+  const downloadLogs = (): void => {
+    if (!canDownload || host == null || robot?.health?.logs == null) return
+
+    setIsDownloading(true)
+    const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
+    const toastId = makeToast(t('downloading_logs') as string, INFO_TOAST, {
+      disableTimeout: true,
+      icon: toastIcon,
+    })
+
+    const zip = new JSZip()
+    Promise.all(
+      robot.health.logs.map(log => {
+        const logFileName = last(log.split('/')) ?? 'opentrons.log'
+        return request<string>(GET, log, host)
+          .then(res => {
+            zip.file(logFileName, res.data)
+          })
+          .catch((e: Error) =>
+            makeToast(e?.message, ERROR_TOAST, { closeButton: true })
+          )
+      })
+    )
+      .then(() =>
+        zip
+          .generateAsync({ type: 'blob' })
+          .then(blob => {
+            saveAs(blob, `${robotName}_logs.zip`)
+          })
+          .catch((e: Error) => {
+            eatToast(toastId)
+            makeToast(e?.message, ERROR_TOAST, { closeButton: true })
+            if (isMounted.current) setIsDownloading(false)
+          })
+      )
+      .then(() => {
+        eatToast(toastId)
+        if (isMounted.current) setIsDownloading(false)
+      })
+      .catch((e: Error) => {
+        eatToast(toastId)
+        makeToast(e?.message, ERROR_TOAST, { closeButton: true })
+        if (isMounted.current) setIsDownloading(false)
+      })
+  }
+
+  return { downloadLogs, isDownloading, canDownload }
+}
