@@ -36,9 +36,9 @@ def get_audit_client(
     Endpoints can take this as a dependency to submit audit log messages.
     """
     client = _audit_client_accessor.get_from(app_state)
-    assert (
-        client is not None
-    ), "Forgot to initialize audit client as part of server startup?"
+    assert client is not None, (
+        "Forgot to initialize audit client as part of server startup?"
+    )
     return client
 
 

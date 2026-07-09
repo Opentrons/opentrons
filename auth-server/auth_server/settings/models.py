@@ -142,12 +142,14 @@ class AccessControlResponseData(pydantic.BaseModel):
 
     accessControlEnabled: Annotated[
         bool,
-        pydantic.Field(description=dedent("""\
+        pydantic.Field(
+            description=dedent("""\
                 When enabled, authorization is enforced throughout the robot's HTTP APIs.
                 Protected endpoints are blocked unless the request carries an
                 OAuth 2 access token with the appropriate scopes. See the `/auth/oauth2`
                 endpoints.
 
                 When disabled (the default), all endpoints allow unauthenticated access.
-                """)),
+                """)
+        ),
     ]
