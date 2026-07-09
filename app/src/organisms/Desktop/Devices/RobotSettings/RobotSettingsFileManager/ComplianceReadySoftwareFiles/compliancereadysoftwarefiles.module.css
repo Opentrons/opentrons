@@ -2,9 +2,9 @@
    Right: 12px(container padding) + 24px(chevron) + 24px(HEADER_CONTAINER gap) = 60px */
 .compliance_table_header_row {
   display: flex;
-  height: 20px;
+  height: 1.25rem;
   align-items: center;
-  padding: var(--spacing-4) 60px var(--spacing-4) 40px;
+  padding: var(--spacing-4) var(--spacing-60) var(--spacing-4) var(--spacing-40);
   color: var(--grey-60);
   gap: var(--spacing-12);
 }
@@ -13,7 +13,7 @@
    Offset = checkbox touch target (24px) + period-row gap (12px) + card inner padding-left (12px). */
 .compliance_period_col_headers {
   display: flex;
-  padding-left: 40px;
+  padding-left: var(--spacing-40);
   color: var(--grey-60);
   gap: var(--spacing-24);
 }

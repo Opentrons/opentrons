@@ -45,7 +45,7 @@ export function ComplianceReadySoftwareFiles(): JSX.Element {
     useState<boolean>(false)
 
   // Sorted newest-first; oldest is last in array, newest is first
-  const oldestPeriod = periods[periods.length - 1]
+  const oldestPeriod = periods.at(-1)
   const newestPeriod = periods[0]
   const firstDate =
     oldestPeriod?.startedAt != null
@@ -75,6 +75,11 @@ export function ComplianceReadySoftwareFiles(): JSX.Element {
     }
     setShowDeleteRecordsModal(true)
   }
+  const periodHeaderKeys: Array<'started' | 'ended' | 'status'> = [
+    'started',
+    'ended',
+    'status',
+  ]
 
   return (
     <>
@@ -101,24 +106,15 @@ export function ComplianceReadySoftwareFiles(): JSX.Element {
         ) : (
           <div className={fileManagerStyles.log_table}>
             <div className={styles.compliance_table_header_row}>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                className={styles.log_file_col}
-              >
-                {t('file')}
-              </StyledText>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                className={styles.log_date_col}
-              >
-                {t('date_created')}
-              </StyledText>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                className={styles.log_date_col}
-              >
-                {t('last_updated')}
-              </StyledText>
+              {periodHeaderKeys.map(key => (
+                <StyledText
+                  key={key}
+                  desktopStyle="bodyDefaultRegular"
+                  className={styles.log_date_col}
+                >
+                  {t(key)}
+                </StyledText>
+              ))}
             </div>
 
             <ListAccordion
