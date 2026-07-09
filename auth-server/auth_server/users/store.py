@@ -92,18 +92,18 @@ class UserStore:
             user = session.scalar(select(User).where(User.username == username))
             if user is None:
                 raise ValueError(f"User {username!r} not found")
-            updates: dict[str, object] = {
-                "username": new_username,
-                "hashed_password": hashed_password,
-                "full_name": full_name,
-                "account_type": AccountType(account_type)
-                if account_type is not None
-                else None,
-                "reset_password": reset_password,
-            }
-            for attr, value in updates.items():
-                if value is not None:
-                    setattr(user, attr, value)
+
+            if new_username is not None:
+                user.username = new_username
+            if hashed_password is not None:
+                user.hashed_password = hashed_password
+            if full_name is not None:
+                user.full_name = full_name
+            if account_type is not None:
+                user.account_type = AccountType(account_type)
+            if reset_password is not None:
+                user.reset_password = reset_password
+
             session.commit()
             session.expunge(user)
             return user
