@@ -141,6 +141,8 @@ type AuditLogAction =
   | 'attach_pipette_left'
   | 'attach_pipette_right'
   | 'create_protocol'
+  | 'launching_error_recovery'
+  | 'resume_run_from_recovery'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.

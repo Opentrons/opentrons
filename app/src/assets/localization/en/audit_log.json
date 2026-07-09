@@ -31,5 +31,7 @@
   "finish_attach_gripper": "Finishing attach gripper flow",
   "finish_detach_gripper": "Finishing detach gripper flow",
   "finish_recalibrate_gripper": "Finishing recalibrate gripper flow",
-  "create_protocol": "Creating protocol"
+  "create_protocol": "Creating protocol",
+  "launching_error_recovery": "Launching error recovery",
+  "resume_run_from_recovery": "Resuming protocol run from recovery mode"
 }

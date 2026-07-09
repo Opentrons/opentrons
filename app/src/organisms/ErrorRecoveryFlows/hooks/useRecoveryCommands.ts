@@ -9,7 +9,7 @@ import {
 } from '@opentrons/react-api-client'
 import { WELL_ORIGIN_TOP } from '@opentrons/shared-data'
 
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useErrorRecoveryDocumentation } from '/app/local-resources/access-control/useErrorRecoveryDocumentation'
 import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
 import {
   useChainRunCommands,
@@ -116,19 +116,23 @@ export function useRecoveryCommands({
   selectedRecoveryOption,
 }: UseRecoveryCommandsParams): UseRecoveryCommandsResult {
   const [ignoreErrors, setIgnoreErrors] = useState(false)
+  const { documentationState, actionsToDocument, addActionToDocument } =
+    useErrorRecoveryDocumentation()
 
   const { proceedToRouteAndStep } = routeUpdateActions
   const { mutateAsync: resumeRunFromRecovery } =
-    useResumeRunFromRecoveryMutation()
+    useResumeRunFromRecoveryMutation(documentationState)
   const { mutateAsync: resumeRunFromRecoveryAssumingFalsePositive } =
-    useResumeRunFromRecoveryAssumingFalsePositiveMutation()
+    useResumeRunFromRecoveryAssumingFalsePositiveMutation(documentationState)
 
-  const documentationState = useDocumentationState()
   const { stopRun } = useStopRunMutation(documentationState)
   const updateErrorRecoveryPolicy = useUpdateRecoveryPolicyWithStrategy(runId)
   const currentRecoveryPolicy = useErrorRecoveryPolicy(runId)?.data?.data
   const { chainRunCommands } = useChainRunCommands(
     runId,
+    documentationState,
+    actionsToDocument,
+    addActionToDocument,
     unvalidatedFailedCommand?.id,
     currentRecoveryPolicy
   )
