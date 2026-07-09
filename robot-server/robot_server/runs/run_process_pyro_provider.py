@@ -127,7 +127,7 @@ class RunProcessPyroProvider:
                 process_name,
             ],
             env={k: v for k, v in os.environ.items()},
-            # user="ot-protocol"
+            user="ot-protocol"
         )
 
     @staticmethod
