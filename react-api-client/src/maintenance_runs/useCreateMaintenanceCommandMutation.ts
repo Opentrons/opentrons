@@ -10,16 +10,17 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type { CommandData, CreateCommandParams } from '@opentrons/api-client'
+import type {
+  CommandData,
+  CreateMaintenanceCommandParams,
+} from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { DocumentationState, DocumentedAction } from '../accessControl'
 import type { DocumentedMutationParameters } from '../accessControl/types'
 
-interface CreateMaintenanceCommandMutateParams extends CreateCommandParams {
+interface CreateMaintenanceCommandMutateParams extends CreateMaintenanceCommandParams {
   maintenanceRunId: string
   command: CreateCommand
-  waitUntilComplete?: boolean
-  timeout?: number
 }
 
 export type UseCreateMaintenanceCommandMutationResult = UseMutationResult<
@@ -56,7 +57,13 @@ export function useCreateMaintenanceCommandMutation(
     documentationState,
     actionsToDocument,
     ({
-      variables: { maintenanceRunId, command, waitUntilComplete, timeout },
+      variables: {
+        maintenanceRunId,
+        command,
+        waitUntilComplete,
+        timeout,
+        requiresClosedDoor = true,
+      },
       userNotes,
     }: DocumentedMutationParameters<CreateMaintenanceCommandMutateParams>) =>
       createMaintenanceCommand(
@@ -66,6 +73,7 @@ export function useCreateMaintenanceCommandMutation(
         {
           waitUntilComplete,
           timeout,
+          requiresClosedDoor,
         },
         userNotes
       )
