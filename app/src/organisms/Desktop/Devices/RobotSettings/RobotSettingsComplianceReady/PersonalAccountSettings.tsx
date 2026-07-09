@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
-import { useSelector } from 'react-redux'
 import axios from 'axios'
 
 import { BasicButton, Divider, StyledText } from '@opentrons/components'
@@ -12,14 +11,13 @@ import {
   useUpdateSelfMutation,
 } from '@opentrons/react-api-client'
 
-import { getAuthStateForRobot } from '/app/redux/robot-auth'
+import { useUsernameForRobot } from '/app/redux/robot-auth'
 
 import styles from './personalaccountsettings.module.css'
 import { PersonalAccountSettingsEditForm } from './PersonalAccountSettingsEditForm'
 
 import type { JSX, ReactNode } from 'react'
 import type { UpdateSelfRequest } from '@opentrons/api-client'
-import type { State } from '/app/redux/types'
 
 export interface PersonalAccountSettingsProps {
   robotName: string
@@ -47,12 +45,10 @@ export function PersonalAccountSettings({
   const { t } = useTranslation(['device_settings', 'shared'])
   const queryClient = useQueryClient()
   const host = useHost()
-  const authState = useSelector((state: State) =>
-    getAuthStateForRobot(state, robotName)
-  )
-  const selfQuery = useSelfQuery({ enabled: authState != null })
+  const loggedInUsername = useUsernameForRobot(robotName)
+  const selfQuery = useSelfQuery({ enabled: loggedInUsername != null })
   const { updateSelf, isLoading: isSaving } = useUpdateSelfMutation()
-  const username = selfQuery.data?.data.username ?? ''
+  const username = selfQuery.data?.data.username ?? loggedInUsername ?? ''
   const fullName = selfQuery.data?.data.fullName ?? ''
 
   const [isEditing, setIsEditing] = useState(false)
@@ -98,29 +94,30 @@ export function PersonalAccountSettings({
         <StyledText desktopStyle="bodyLargeSemiBold">
           {t('desktop_personal_account_settings')}
         </StyledText>
-        {isEditing ? (
-          <BasicButton
-            type="button"
-            underLine
-            onClick={() => {
-              clearSaveErrors()
-              setIsEditing(false)
-            }}
-          >
-            {t('shared:cancel')}
-          </BasicButton>
-        ) : (
-          <BasicButton
-            type="button"
-            underLine
-            onClick={() => {
-              clearSaveErrors()
-              setIsEditing(true)
-            }}
-          >
-            {t('desktop_edit')}
-          </BasicButton>
-        )}
+        {loggedInUsername != null &&
+          (isEditing ? (
+            <BasicButton
+              type="button"
+              underLine
+              onClick={() => {
+                clearSaveErrors()
+                setIsEditing(false)
+              }}
+            >
+              {t('shared:cancel')}
+            </BasicButton>
+          ) : (
+            <BasicButton
+              type="button"
+              underLine
+              onClick={() => {
+                clearSaveErrors()
+                setIsEditing(true)
+              }}
+            >
+              {t('desktop_edit')}
+            </BasicButton>
+          ))}
       </div>
       <div className={styles.content}>
         {isEditing ? (

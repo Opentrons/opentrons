@@ -61,12 +61,6 @@ const render = (initialState: Partial<State> = {}): RenderResult => {
   )[0]
 }
 
-function getPasswordInputs(container: HTMLElement): HTMLInputElement[] {
-  return Array.from(container.querySelectorAll('input')).filter(
-    (input): input is HTMLInputElement => input.type === 'password'
-  )
-}
-
 function openEditForm(): void {
   fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
 }
@@ -142,6 +136,19 @@ describe('PersonalAccountSettings', () => {
     ).not.toBeInTheDocument()
   })
 
+  it('does not show the edit button when the user is not logged in', () => {
+    render({
+      robotAuth: {
+        perRobotAuthStates: {},
+        mostRecentRobotName: null,
+      },
+    })
+    screen.getByText('Personal account settings')
+    expect(
+      screen.queryByRole('button', { name: 'Edit' })
+    ).not.toBeInTheDocument()
+  })
+
   it('calls updateSelf and returns to view mode with updated fields on successful save', async () => {
     render()
     openEditForm()
@@ -168,7 +175,7 @@ describe('PersonalAccountSettings', () => {
 
   it.each<{
     description: string
-    applyChange: (container: HTMLElement) => void
+    applyChange: () => void
     expectedData: { username?: string; password?: string }
   }>([
     {
@@ -182,22 +189,21 @@ describe('PersonalAccountSettings', () => {
     },
     {
       description: 'password only',
-      applyChange: container => {
-        const [passwordInput, confirmPasswordInput] =
-          getPasswordInputs(container)
-        fireEvent.change(passwordInput, { target: { value: 'new-password' } })
-        fireEvent.change(confirmPasswordInput, {
-          target: { value: 'new-password' },
-        })
+      applyChange: () => {
+        screen
+          .getAllByPlaceholderText('************************')
+          .forEach(input => {
+            fireEvent.change(input, { target: { value: 'new-password' } })
+          })
       },
       expectedData: { password: 'new-password' },
     },
   ])(
     'calls updateSelf with $description when password fields are otherwise empty',
     async ({ applyChange, expectedData }) => {
-      const { container } = render()
+      render()
       openEditForm()
-      applyChange(container)
+      applyChange()
       fireEvent.click(screen.getByRole('button', { name: 'save' }))
 
       await waitFor(() => {

@@ -10,7 +10,9 @@ import { PasswordInputField } from '../PasswordInputField'
 
 import type { ComponentProps } from 'react'
 
-const PASSWORD_PLACEHOLDER = '**********'
+const PASSWORD_PLACEHOLDER = i18n.t('desktop_password_placeholder', {
+  ns: 'device_settings',
+})
 
 const render = (props: ComponentProps<typeof PasswordInputField>) => {
   return renderWithProviders(<PasswordInputField {...props} />, {

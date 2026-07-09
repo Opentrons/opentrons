@@ -69,10 +69,7 @@ export function PersonalAccountSettingsEditForm({
       }
     }
 
-    if (
-      values.password !== '' &&
-      values.password !== values.confirmPassword
-    ) {
+    if (values.password !== '' && values.password !== values.confirmPassword) {
       errors.confirmPassword = {
         type: 'validate',
         message: t('desktop_password_mismatch') as string,
@@ -82,11 +79,7 @@ export function PersonalAccountSettingsEditForm({
     return { values, errors }
   }
 
-  const {
-    control,
-    handleSubmit,
-    watch,
-  } = useForm<FormValues>({
+  const { control, handleSubmit, watch } = useForm<FormValues>({
     defaultValues: {
       username,
       fullName,
@@ -98,8 +91,12 @@ export function PersonalAccountSettingsEditForm({
     reValidateMode: 'onChange',
   })
 
-  const { username: usernameInput, fullName: fullNameInput, password, confirmPassword } =
-    watch()
+  const {
+    username: usernameInput,
+    fullName: fullNameInput,
+    password,
+    confirmPassword,
+  } = watch()
   const trimmedUsername = usernameInput.trim()
   const trimmedFullName = fullNameInput.trim()
   const hasProfileChanges =

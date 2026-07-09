@@ -55,7 +55,9 @@ describe('PersonalAccountSettingsEditForm', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'save' }))
     await waitFor(() => {
-      expect(props.onSave).toHaveBeenCalledWith({ data: { username: 'alice2' } })
+      expect(props.onSave).toHaveBeenCalledWith({
+        data: { username: 'alice2' },
+      })
     })
   })
 
