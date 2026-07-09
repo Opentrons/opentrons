@@ -9,6 +9,10 @@ from fastapi import FastAPI
 from opentrons_shared_data.errors.exceptions import AuditLoggingError
 
 from server_utils import systemd_utils
+from server_utils.auth.resource_server.fastapi import (
+    build_authorization_checker,
+    install_authorization_checker,
+)
 from server_utils.keys.fastapi import build_key_client, install_key_client
 from server_utils.keys.key_server import Client as KeyClientABC
 from server_utils.keys.key_server import SignedMessageData, SignMessageData
@@ -92,6 +96,13 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         log_data_manager = build_log_data_manager(
             app.state, log_store, settings_store, key_client
         )
+        authorization_checker = await exit_stack.enter_async_context(
+            build_authorization_checker(
+                auth_server_uds=configuration.auth_server_uds,
+                auth_server_url=configuration.auth_server_url,
+            )
+        )
+        install_authorization_checker(app.state, authorization_checker)
         await log_data_manager.rotate_periods()
         systemd_utils.notify_up()
         yield

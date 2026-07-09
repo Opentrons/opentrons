@@ -63,3 +63,19 @@ class AuditServerConfiguration(BaseSettings):
             " request that requires the key-server client will fail."
         ),
     )
+    auth_server_uds: str | None = Field(
+        default=None,
+        description=(
+            "The path to the Unix domain socket where auth-server is listening."
+            " This is mutually exclusive with auth_server_url."
+            " If both are unset, authentication cannot be checked and modification requests will fail."
+        ),
+    )
+    auth_server_url: str | None = Field(
+        default=None,
+        description=(
+            "The base URL (e.g. `http://localhost:33960`) where auth-server is listening."
+            " This is mutually exclusive with auth_server_uds."
+            " If both are unset, authentication cannot be checked and modification requests will fail."
+        ),
+    )
