@@ -76,7 +76,7 @@ class PatchSettingsRequestData(_StrictBaseModel):
     passwordResetTime: Annotated[
         float | None,
         pydantic.Field(
-            description="Duration in seconds until password must be changed."
+            description="Duration in seconds until password must be changed. Set to null to remove the limit.",
         ),
     ] = None
     passwordComplexityMinimumLength: Annotated[

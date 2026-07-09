@@ -49,6 +49,7 @@ class UserStore:
         hashed_password: str,
         full_name: str,
         account_type: str,
+        now: datetime.datetime,
     ) -> User:
         """Create a user, persist it, and return it."""
         new_user = User(
@@ -56,6 +57,7 @@ class UserStore:
             hashed_password=hashed_password,
             full_name=full_name,
             account_type=AccountType(account_type),
+            password_set_at=now,
         )
         with self._session() as session:
             session.add(new_user)
@@ -83,6 +85,8 @@ class UserStore:
         full_name: str | None = None,
         account_type: str | None = None,
         reset_password: bool | None = None,
+        *,
+        now: datetime.datetime,
     ) -> User:
         """Update a user's fields and return the updated User.
 
@@ -97,6 +101,7 @@ class UserStore:
                 user.username = new_username
             if hashed_password is not None:
                 user.hashed_password = hashed_password
+                user.password_set_at = now
             if full_name is not None:
                 user.full_name = full_name
             if account_type is not None:
