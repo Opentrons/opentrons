@@ -195,7 +195,7 @@ class AuthServerAuthorizationChecker(AuthorizationChecker):
                     "Username not present in token introspection response."
                     " This is a bug in auth-server."
                 )
-            elif token_info.fullname is None:
+            elif token_info.ot_fullname is None:
                 # Similarly, our custom fullname field should be returned always.
                 raise RuntimeError(
                     "Fullname not present in token introspection response."
@@ -203,7 +203,7 @@ class AuthServerAuthorizationChecker(AuthorizationChecker):
                 )
             else:
                 return AuthorizedResult(
-                    username=token_info.username, fullname=token_info.fullname
+                    username=token_info.username, fullname=token_info.ot_fullname
                 )
 
     @override

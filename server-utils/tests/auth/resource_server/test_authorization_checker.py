@@ -130,7 +130,7 @@ class TestAuthServerAuthorizationChecker:
                 active=True,
                 scope=serialize_scopes({Scope.ROBOT_CONTROL_WRITE, Scope.USERS_WRITE}),
                 username="test-username",
-                fullname="Test Fullname",
+                ot_fullname="Test Fullname",
             )
         )
 

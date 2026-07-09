@@ -147,7 +147,7 @@ class LocalHTTPClient(Client):
 
 
 class _StrictBaseModel(pydantic.BaseModel):
-    model_config = {"strict": True, "validate_by_name": True}
+    model_config = {"strict": True}
 
 
 class TokenIntrospectionResponse(_StrictBaseModel):
@@ -159,7 +159,7 @@ class TokenIntrospectionResponse(_StrictBaseModel):
     active: bool
     scope: str = ""
     username: str | None = None
-    fullname: str | None = pydantic.Field(None, alias="ot-fullname")
+    ot_fullname: str | None = None
 
 
 class TokenIntrospectionRequestFormData(typing.TypedDict):
