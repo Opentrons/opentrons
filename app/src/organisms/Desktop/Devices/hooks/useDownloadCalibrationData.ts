@@ -34,7 +34,7 @@ export function useDownloadCalibrationData(
           moduleData: attachedModules,
         }),
       ]),
-      `opentrons-${robotName}-calibration.json`
+      `${robotName}-calibration.json`
     )
   }
 

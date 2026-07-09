@@ -53,7 +53,7 @@ export function useDownloadRobotLogs(
     const zip = new JSZip()
     Promise.all(
       robot.health.logs.map(log => {
-        const logFileName = last(log.split('/')) ?? 'opentrons.log'
+        const logFileName = last(log.split('/')) ?? 'robot.log'
         return request<string>(GET, log, host)
           .then(res => {
             zip.file(logFileName, res.data)
