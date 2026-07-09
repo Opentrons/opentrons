@@ -119,6 +119,7 @@
   "desktop_personal_account_settings": "Personal account settings",
   "desktop_personal_account_settings_save_error": "Unable to save account settings. Try again.",
   "desktop_personal_account_settings_username_exists_error": "This username is already taken. Choose a different username.",
+  "desktop_personal_account_settings_username_required_error": "Username is required.",
   "desktop_protocol_logs": "Protocol logs",
   "desktop_require_admin_credentials_to_send_protocols": "Require admin credentials to send protocols to this robot",
   "desktop_require_admin_credentials_to_sign_protocol_run_records": "Require admin credentials to sign protocol run records",

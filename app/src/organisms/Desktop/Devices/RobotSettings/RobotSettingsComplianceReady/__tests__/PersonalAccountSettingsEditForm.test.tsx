@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest'
 
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -48,16 +48,54 @@ describe('PersonalAccountSettingsEditForm', () => {
     expect(props.onSave).not.toHaveBeenCalled()
   })
 
-  it('calls onSave with only changed profile fields', () => {
+  it('calls onSave with only changed profile fields', async () => {
     render(props)
     fireEvent.change(screen.getByDisplayValue('alice'), {
       target: { value: 'alice2' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'save' }))
-    expect(props.onSave).toHaveBeenCalledWith({ data: { username: 'alice2' } })
+    await waitFor(() => {
+      expect(props.onSave).toHaveBeenCalledWith({ data: { username: 'alice2' } })
+    })
   })
 
-  it('calls onSave with password when both password fields match', () => {
+  it('does not include username when it is unchanged', async () => {
+    render(props)
+    fireEvent.change(screen.getByDisplayValue('Alice Example'), {
+      target: { value: 'Alice Updated' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'save' }))
+    await waitFor(() => {
+      expect(props.onSave).toHaveBeenCalledWith({
+        data: { fullName: 'Alice Updated' },
+      })
+    })
+  })
+
+  it('does not save whitespace-only username changes', async () => {
+    render(props)
+    fireEvent.change(screen.getByDisplayValue('alice'), {
+      target: { value: '   ' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'save' }))
+    await waitFor(() => {
+      expect(props.onSave).not.toHaveBeenCalled()
+    })
+  })
+
+  it('shows a required username error when the username is cleared', async () => {
+    render(props)
+    const usernameInput = screen.getByDisplayValue('alice')
+    fireEvent.change(usernameInput, {
+      target: { value: '' },
+    })
+    fireEvent.blur(usernameInput)
+    await waitFor(() => {
+      screen.getByText('Username is required.')
+    })
+  })
+
+  it('calls onSave with password when both password fields match', async () => {
     const { container } = render(props)
     const [firstPasswordInput, secondPasswordInput] =
       getPasswordInputs(container)
@@ -66,7 +104,9 @@ describe('PersonalAccountSettingsEditForm', () => {
       target: { value: 'different-password' },
     })
     fireEvent.blur(secondPasswordInput)
-    screen.getByText('Passwords do not match')
+    await waitFor(() => {
+      screen.getByText('Passwords do not match')
+    })
     fireEvent.click(screen.getByRole('button', { name: 'save' }))
     expect(props.onSave).not.toHaveBeenCalled()
     const [passwordInput, confirmPasswordInput] = getPasswordInputs(container)
@@ -75,8 +115,10 @@ describe('PersonalAccountSettingsEditForm', () => {
       target: { value: 'new-password' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'save' }))
-    expect(props.onSave).toHaveBeenCalledWith({
-      data: { password: 'new-password' },
+    await waitFor(() => {
+      expect(props.onSave).toHaveBeenCalledWith({
+        data: { password: 'new-password' },
+      })
     })
   })
 

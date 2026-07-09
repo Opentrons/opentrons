@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -12,6 +12,7 @@ import { PasswordInputField } from './PasswordInputField'
 import styles from './personalaccountsettings.module.css'
 
 import type { JSX, ReactNode } from 'react'
+import type { FieldError, Resolver } from 'react-hook-form'
 import type { UpdateSelfRequest } from '@opentrons/api-client'
 
 export interface PersonalAccountSettingsEditFormProps {
@@ -22,6 +23,13 @@ export interface PersonalAccountSettingsEditFormProps {
   saveError?: string | null
   onSave: (data: UpdateSelfRequest) => void
   onCancel: () => void
+}
+
+interface FormValues {
+  username: string
+  fullName: string
+  password: string
+  confirmPassword: string
 }
 
 interface FieldGroupProps {
@@ -48,121 +56,141 @@ export function PersonalAccountSettingsEditForm({
   onCancel,
 }: PersonalAccountSettingsEditFormProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
-  const [usernameInput, setUsernameInput] = useState(username)
-  const [fullNameInput, setFullNameInput] = useState(fullName)
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [confirmPasswordError, setConfirmPasswordError] = useState<
-    string | null
-  >(null)
 
+  const resolver: Resolver<FormValues> = values => {
+    const errors: Partial<Record<keyof FormValues, FieldError>> = {}
+
+    if (values.username.trim() === '') {
+      errors.username = {
+        type: 'required',
+        message: t(
+          'desktop_personal_account_settings_username_required_error'
+        ) as string,
+      }
+    }
+
+    if (
+      values.password !== '' &&
+      values.password !== values.confirmPassword
+    ) {
+      errors.confirmPassword = {
+        type: 'validate',
+        message: t('desktop_password_mismatch') as string,
+      }
+    }
+
+    return { values, errors }
+  }
+
+  const {
+    control,
+    handleSubmit,
+    watch,
+  } = useForm<FormValues>({
+    defaultValues: {
+      username,
+      fullName,
+      password: '',
+      confirmPassword: '',
+    },
+    resolver,
+    mode: 'onBlur',
+    reValidateMode: 'onChange',
+  })
+
+  const { username: usernameInput, fullName: fullNameInput, password, confirmPassword } =
+    watch()
+  const trimmedUsername = usernameInput.trim()
+  const trimmedFullName = fullNameInput.trim()
   const hasProfileChanges =
-    usernameInput.trim() !== username || fullNameInput.trim() !== fullName
+    trimmedUsername !== username || trimmedFullName !== fullName
   const hasPasswordChange = password !== ''
-
-  const validatePasswords = (): boolean => {
-    if (!hasPasswordChange) {
-      setConfirmPasswordError(null)
-      return true
-    }
-    if (password !== confirmPassword) {
-      setConfirmPasswordError(t('desktop_password_mismatch') as string)
-      return false
-    }
-    setConfirmPasswordError(null)
-    return true
-  }
-
-  const handleSave = (): void => {
-    if (!validatePasswords()) {
-      return
-    }
-
-    if (!hasProfileChanges && !hasPasswordChange) {
-      onCancel()
-      return
-    }
-
-    const trimmedUsername = usernameInput.trim()
-    const trimmedFullName = fullNameInput.trim()
-    const updateData: UpdateSelfRequest['data'] = {}
-
-    if (trimmedUsername !== username) {
-      updateData.username = trimmedUsername
-    }
-    if (trimmedFullName !== fullName) {
-      updateData.fullName = trimmedFullName
-    }
-    if (hasPasswordChange) {
-      updateData.password = password
-    }
-
-    onSave({ data: updateData })
-  }
 
   const isSaveDisabled =
     isSaving ||
     (!hasProfileChanges && !hasPasswordChange) ||
     (hasPasswordChange && (password === '' || confirmPassword === ''))
 
+  const onSubmit = (): void => {
+    onSave({
+      data: {
+        ...(trimmedUsername !== username ? { username: trimmedUsername } : {}),
+        ...(trimmedFullName !== fullName ? { fullName: trimmedFullName } : {}),
+        ...(hasPasswordChange ? { password } : {}),
+      },
+    })
+  }
+
   return (
-    <>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div className={styles.fields_row}>
         <FieldGroup label={t('desktop_username')}>
-          <InputField
-            value={usernameInput}
-            error={usernameError}
-            onChange={event => {
-              setUsernameInput(event.target.value)
-            }}
+          <Controller
+            control={control}
+            name="username"
+            render={({ field, fieldState }) => (
+              <InputField
+                value={field.value}
+                error={fieldState.error?.message ?? usernameError}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+              />
+            )}
           />
         </FieldGroup>
         <FieldGroup label={t('desktop_legal_name')}>
-          <InputField
-            value={fullNameInput}
-            onChange={event => {
-              setFullNameInput(event.target.value)
-            }}
+          <Controller
+            control={control}
+            name="fullName"
+            render={({ field }) => (
+              <InputField
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+              />
+            )}
           />
         </FieldGroup>
       </div>
       <div className={styles.fields_row}>
         <FieldGroup label={t('desktop_password')}>
-          <PasswordInputField
-            value={password}
-            placeholder={t('desktop_password_placeholder')}
-            onChange={event => {
-              setPassword(event.target.value)
-              if (confirmPasswordError != null) {
-                setConfirmPasswordError(null)
-              }
-            }}
-            onBlur={validatePasswords}
+          <Controller
+            control={control}
+            name="password"
+            render={({ field }) => (
+              <PasswordInputField
+                value={field.value}
+                placeholder={t('desktop_password_placeholder')}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+              />
+            )}
           />
         </FieldGroup>
         <FieldGroup label={t('desktop_confirm_password')}>
-          <PasswordInputField
-            value={confirmPassword}
-            placeholder={t('desktop_password_placeholder')}
-            error={confirmPasswordError ?? saveError}
-            onChange={event => {
-              setConfirmPassword(event.target.value)
-              if (confirmPasswordError != null) {
-                setConfirmPasswordError(null)
-              }
-            }}
-            onBlur={validatePasswords}
+          <Controller
+            control={control}
+            name="confirmPassword"
+            render={({ field, fieldState }) => (
+              <PasswordInputField
+                value={field.value}
+                placeholder={t('desktop_password_placeholder')}
+                error={fieldState.error?.message ?? saveError}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+              />
+            )}
           />
         </FieldGroup>
       </div>
       <div className={styles.actions}>
-        <SecondaryButton onClick={onCancel}>
+        <SecondaryButton type="button" onClick={onCancel}>
           {t('shared:cancel')}
         </SecondaryButton>
-        <PrimaryButton disabled={isSaveDisabled} onClick={handleSave}>
+        <PrimaryButton type="submit" disabled={isSaveDisabled}>
           {t('shared:save')}
         </PrimaryButton>
       </div>
-    </>
+    </form>
   )
 }
