@@ -170,4 +170,34 @@ describe('usePromptForDocumentation', () => {
       }
     })
   })
+
+  it('does not prompt when promptEnabled is false', async () => {
+    const { result, rerender } = renderHook(
+      ({ promptEnabled }) =>
+        usePromptForDocumentation(
+          ['lpc_flow'],
+          undefined,
+          undefined,
+          promptEnabled
+        ),
+      {
+        wrapper,
+        initialProps: { promptEnabled: false },
+      }
+    )
+
+    await waitFor(() => {
+      expect(
+        !result.current.isLoading && result.current.accessControlEnabled
+      ).toBe(true)
+    })
+
+    expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
+
+    rerender({ promptEnabled: true })
+
+    await waitFor(() => {
+      expect(mockShowDocumentationRequiredModal).toHaveBeenCalledTimes(1)
+    })
+  })
 })

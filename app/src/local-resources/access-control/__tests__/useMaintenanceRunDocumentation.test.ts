@@ -169,4 +169,32 @@ describe('useMaintenanceRunDocumentation', () => {
 
     expect(mockShowDocumentationRequiredModal).toHaveBeenCalledTimes(2)
   })
+
+  it('does not auto-prompt when promptEnabled is false', async () => {
+    const { result, rerender } = renderHook(
+      ({ promptEnabled }) =>
+        useMaintenanceRunDocumentation(
+          'lpc_flow',
+          undefined,
+          undefined,
+          promptEnabled
+        ),
+      {
+        wrapper,
+        initialProps: { promptEnabled: false },
+      }
+    )
+
+    await waitFor(() => {
+      expect(!result.current.commandDocState.isLoading).toBe(true)
+    })
+
+    expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
+
+    rerender({ promptEnabled: true })
+
+    await waitFor(() => {
+      expect(mockShowDocumentationRequiredModal).toHaveBeenCalledTimes(1)
+    })
+  })
 })
