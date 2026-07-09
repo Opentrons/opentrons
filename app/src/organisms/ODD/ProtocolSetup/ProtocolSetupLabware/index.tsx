@@ -124,7 +124,10 @@ export function ProtocolSetupLabware({
   const moduleQuery = useModulesQuery({
     refetchInterval: MODULE_REFETCH_INTERVAL_MS,
   })
-  const attachedModules = moduleQuery?.data?.data ?? []
+  const attachedModules = useMemo(
+    () => moduleQuery?.data?.data ?? [],
+    [moduleQuery?.data?.data]
+  )
   const protocolModulesInfo = useMemo(
     () =>
       mostRecentAnalysis != null
