@@ -130,12 +130,13 @@ class TestAuthServerAuthorizationChecker:
                 active=True,
                 scope=serialize_scopes({Scope.ROBOT_CONTROL_WRITE, Scope.USERS_WRITE}),
                 username="test-username",
+                ot_fullname="Test Fullname",
             )
         )
 
         assert await subject.check(
             "test-token-abc123", {Scope.ROBOT_CONTROL_WRITE, Scope.USERS_WRITE}
-        ) == AuthorizedResult(username="test-username")
+        ) == AuthorizedResult(username="test-username", fullname="Test Fullname")
 
         # Inactive -> do not authorize
         decoy.when(await mock_client.introspect_token("test-token-abc123")).then_return(
