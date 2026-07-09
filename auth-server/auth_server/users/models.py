@@ -107,7 +107,6 @@ class UserResponse(BaseModel):
     username: str
     fullName: str
     accountType: AccountType
-    scopes: list[str]
     locked: bool
     resetPassword: bool
 

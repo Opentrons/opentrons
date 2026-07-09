@@ -4,7 +4,6 @@ export interface AuthUser {
   username: string
   fullName: string
   accountType: AuthUserAccountType
-  scopes: string[]
   locked: boolean
   resetPassword: boolean
 }
