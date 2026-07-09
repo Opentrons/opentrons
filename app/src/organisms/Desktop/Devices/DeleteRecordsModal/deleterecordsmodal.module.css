@@ -1,7 +1,6 @@
 .button_row {
   display: flex;
   height: 100%;
-  align-items: center;
   justify-content: flex-end;
   gap: var(--spacing-8);
 }
