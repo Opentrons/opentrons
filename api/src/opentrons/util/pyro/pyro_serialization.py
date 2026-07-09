@@ -109,6 +109,7 @@ def register_type_to_serpent(
 
 
 def enumerated_error_class_to_dict(obj: EnumeratedError) -> dict[str, Any]:
+    """Serializes enumerated errors to a bytes dictionary."""
     return {
         "__class__": "opentrons_shared_data.errors.exceptions.EnumeratedError",
         "bytes": pickle.dumps(obj),

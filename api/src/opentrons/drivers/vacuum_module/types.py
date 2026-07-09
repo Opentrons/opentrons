@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from enum import Enum
 from typing import Any, Dict
 
@@ -116,29 +116,23 @@ class VacuumState:
 
     @staticmethod
     def to_pyro_dict(obj: "VacuumState") -> Dict[str, Any]:
-        """Convert to a Pyro Dictionary."""
-        pyro_dict: Dict[str, Any] = {
-            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}"
-        }
-        for k, v in obj.__annotations__.items():
-            if k == "vent_state":
-                pyro_dict[k] = obj.vent_state.value
-            else:
-                pyro_dict[k] = getattr(obj, k)
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        pyro_dict = asdict(obj)
+        # Override specific variables for safe conversion
+        pyro_dict["__class__"] = f"{obj.__module__}.{obj.__class__.__qualname__}"
+        pyro_dict["vent_state"] = obj.vent_state.value
+
         return pyro_dict
 
     @staticmethod
     def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "VacuumState":
-        """Convert from a Pyro Dictionary."""
+        """Consumed by Serpent, convert to type from a Pyro Dictionary."""
+        data.pop("__class__", None)
         return VacuumState(
-            target_gauge_pressure=data["target_gauge_pressure"],
-            current_gauge_pressure=data["current_gauge_pressure"],
-            pressure_abs_a=data["pressure_abs_a"],
-            pressure_abs_b=data["pressure_abs_b"],
-            pressure_atm=data["pressure_atm"],
-            vacuum_enabled=data["vacuum_enabled"],
-            vacuum_duration=data["vacuum_duration"],
-            vent_state=VentState(data["vent_state"]),
+            **{  # type: ignore
+                key: (VentState(data[key]) if key == "vent_state" else data[key])
+                for key, value in data.items()
+            }
         )
 
 
@@ -184,20 +178,13 @@ class PumpState:
 
     @staticmethod
     def to_pyro_dict(obj: "PumpState") -> Dict[str, Any]:
-        """Convert to a Pyro Dictionary."""
-        pyro_dict = {"__class__": f"{obj.__module__}.{obj.__class__.__qualname__}"}
-        for k, v in obj.__annotations__.items():
-            pyro_dict[k] = getattr(obj, k)
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        pyro_dict = asdict(obj)
+        pyro_dict["__class__"] = f"{obj.__module__}.{obj.__class__.__qualname__}"
         return pyro_dict
 
     @staticmethod
     def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "PumpState":
         """Convert from a Pyro Dictionary."""
-        return PumpState(
-            target_rpm=data["target_rpm"],
-            current_rpm=data["current_rpm"],
-            target_pwm=data["target_pwm"],
-            current_pwm=data["current_pwm"],
-            pump_running=data["pump_running"],
-            manual_control=data["manual_control"],
-        )
+        data.pop("__class__", None)
+        return PumpState(**data)

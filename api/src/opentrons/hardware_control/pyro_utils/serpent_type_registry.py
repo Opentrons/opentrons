@@ -881,7 +881,7 @@ def register_hardware_types() -> None:
     )
 
     # Dataclass generic registration
-    # todo(chb, 07-08-2026): This should probably be changes to automatically detect our pyro compatible dataclasses once the cross-layer classes all have `to_pyro` and `from_pyro` methods
+    # todo(chb, 07-08-2026): This should probably be changed to automatically detect our pyro compatible dataclasses once the cross-layer classes all have `to_pyro` and `from_pyro` methods
     # todo(chb, 07-08-2026): Once the others all contain to and from methods the above restrigries can be removed
     opentrons_dataclass_types = [
         opentrons.drivers.vacuum_module.types.VacuumState,
