@@ -32,7 +32,7 @@ vi.mock('/app/redux/analytics')
 const ROBOT_NAME = 'otie'
 
 describe('useDownloadCalibrationData', () => {
-  let mockTrackEvent: ReturnType<typeof vi.fn>
+  let mockTrackEvent: any
   let wrapper: FunctionComponent<{ children: ReactNode }>
 
   beforeEach(() => {
