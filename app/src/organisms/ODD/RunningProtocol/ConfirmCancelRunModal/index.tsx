@@ -12,7 +12,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { OddModal } from '/app/molecules/OddModal'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
@@ -38,7 +38,10 @@ export function ConfirmCancelRunModal({
   protocolId,
 }: ConfirmCancelRunModalProps): JSX.Element {
   const { t } = useTranslation(['run_details', 'shared'])
-  const documentationState = useDocumentationState()
+  const documentationState = useLinkedDocumentationState([
+    'stop_run',
+    'dismiss_run',
+  ])
   const { stopRun } = useStopRunMutation(documentationState)
   const { dismissCurrentRun, isLoading: isDismissing } =
     useDismissCurrentRunMutation(documentationState)
