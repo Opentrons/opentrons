@@ -367,6 +367,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - user_scopes_list
 
 stages:
   - name: Enable access control mode
@@ -474,6 +475,7 @@ stages:
           username: self_update_user_1
           fullName: Self Update User 1 Renamed
           accountType: user
+          scopes: !force_original_structure '{user_scopes_list}'
           locked: false
           resetPassword: false
 
@@ -522,6 +524,7 @@ stages:
           username: self_update_user_1_renamed
           fullName: Self Update User 1 Renamed
           accountType: user
+          scopes: !force_original_structure '{user_scopes_list}'
           locked: false
           resetPassword: false
 
