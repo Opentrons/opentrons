@@ -59,7 +59,7 @@ export function useDownloadRobotLogs(
             zip.file(logFileName, res.data)
           })
           .catch((e: Error) =>
-            makeToast(e?.message, ERROR_TOAST, { closeButton: true })
+            makeToast(e.message, ERROR_TOAST, { closeButton: true })
           )
       })
     )
@@ -71,7 +71,7 @@ export function useDownloadRobotLogs(
           })
           .catch((e: Error) => {
             eatToast(toastId)
-            makeToast(e?.message, ERROR_TOAST, { closeButton: true })
+            makeToast(e.message, ERROR_TOAST, { closeButton: true })
             if (isMounted.current) setIsDownloading(false)
           })
       )
@@ -81,7 +81,7 @@ export function useDownloadRobotLogs(
       })
       .catch((e: Error) => {
         eatToast(toastId)
-        makeToast(e?.message, ERROR_TOAST, { closeButton: true })
+        makeToast(e.message, ERROR_TOAST, { closeButton: true })
         if (isMounted.current) setIsDownloading(false)
       })
   }
