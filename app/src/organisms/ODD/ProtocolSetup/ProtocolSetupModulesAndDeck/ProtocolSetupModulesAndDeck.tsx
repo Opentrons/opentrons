@@ -84,10 +84,13 @@ export function ProtocolSetupModulesAndDeck({
   const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery({
     refetchInterval: DECK_CONFIG_POLL_MS,
   })
-  const attachedModules =
-    useAttachedModules({
-      refetchInterval: ATTACHED_MODULE_POLL_MS,
-    }) ?? []
+  const attachedModulesData = useAttachedModules({
+    refetchInterval: ATTACHED_MODULE_POLL_MS,
+  })
+  const attachedModules = useMemo(
+    () => attachedModulesData ?? [],
+    [attachedModulesData]
+  )
 
   const protocolModulesInfo =
     mostRecentAnalysis != null
