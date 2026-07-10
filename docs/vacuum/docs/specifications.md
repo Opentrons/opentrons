@@ -15,12 +15,12 @@ Unnamed box 1 includes deck components that hold labware and other components fo
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Short vacuum collar](images/collar-short.png "Short vacuum collar")  
+![Short vacuum collar](images/collar-short.svg "Short vacuum collar")  
 <figcaption>(1) Short collar, 42 mm </figcaption>
 </figure>
 
 <figure markdown>
-![Tall vacuum collar](images/collar-tall.png "Tall vacuum collar")
+![Tall vacuum collar](images/collar-tall.svg "Tall vacuum collar")
 <figcaption>(1) Tall collar, 72 mm</figcaption>
 </figure>
 
