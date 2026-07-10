@@ -73,16 +73,23 @@ export function GripperCard({
   // this gives the instruments endpoint time to start reporting
   // a good instrument
   useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout>
     if (attachedGripper?.ok === false) {
       setPollForSubsystemUpdate(true)
     } else if (
       subsystemUpdateData != null &&
       subsystemUpdateData.data.updateStatus === 'done'
     ) {
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setPollForSubsystemUpdate(false)
       }, POLL_DURATION_MS)
     }
+
+    return () => {
+        if (timeoutId == null) {
+          clearTimeout(timeoutId);
+        }
+      };
   }, [attachedGripper?.ok, subsystemUpdateData])
 
   const menuOverlayItems =
