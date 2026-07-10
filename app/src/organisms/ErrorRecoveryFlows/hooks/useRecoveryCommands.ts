@@ -21,7 +21,6 @@ import { DEFINED_ERROR_TYPES, ERROR_KINDS, RECOVERY_MAP } from '../constants'
 
 import type { CommandData, IfMatchType, RunAction } from '@opentrons/api-client'
 import type { WellGroup } from '@opentrons/components'
-import type { DocumentedAction } from '@opentrons/react-api-client'
 import type {
   AspDispWhileTrackingParams,
   AspirateInPlaceRunTimeCommand,
@@ -139,6 +138,15 @@ export function useRecoveryCommands({
     unvalidatedFailedCommand?.id,
     currentRecoveryPolicy
   )
+
+  const { chainRunCommands: chainRetryRunCommands } = useChainRunCommands(
+    runId,
+    documentationState,
+    [...actionsToDocument, 'retry_action'],
+    addActionToDocument,
+    unvalidatedFailedCommand?.id,
+    currentRecoveryPolicy
+  )
   const { makeSuccessToast } = recoveryToastUtils
 
   const reportAndRouteFailedCmd = (e: Error): Promise<never> => {
@@ -157,11 +165,10 @@ export function useRecoveryCommands({
     (
       commands: CreateCommand[],
       continuePastFailure: boolean = false,
-      recoveryAction?: DocumentedAction
+      chain: typeof chainRunCommands = chainRunCommands
     ): Promise<CommandData[]> => {
-      if (!!recoveryAction) addActionToDocument(recoveryAction)
       return (
-        chainRunCommands(commands, continuePastFailure)
+        chain(commands, continuePastFailure)
           // the catch never occurs if continuePastCommandFailure is "true"
           .catch((e: Error) => {
             // User cancelled documentation/login — return to the screen from
@@ -176,12 +183,7 @@ export function useRecoveryCommands({
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      analytics,
-      selectedRecoveryOption,
-      addActionToDocument,
-      handleMotionRouting,
-    ]
+    [analytics, selectedRecoveryOption, chainRunCommands, handleMotionRouting]
   )
 
   const buildRetryPrepMove = ():
@@ -329,12 +331,16 @@ export function useRecoveryCommands({
           { commandType, params }, // retry the command that failed
         ].filter(c => c != null) as CreateCommand[],
         false,
-        'retry_action'
+        chainRetryRunCommands
       ) // the created command is the same command that failed
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [chainRunRecoveryCommands, unvalidatedFailedCommand?.key]
+    [
+      chainRunRecoveryCommands,
+      chainRetryRunCommands,
+      unvalidatedFailedCommand?.key,
+    ]
   )
 
   // Homes the Z-axis of all attached pipettes.
