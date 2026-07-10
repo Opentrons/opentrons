@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import head from 'lodash/head'
 
 import {
+  isDocumentedMutationError,
   useErrorRecoveryPolicy,
   useResumeRunFromRecoveryAssumingFalsePositiveMutation,
   useResumeRunFromRecoveryMutation,
@@ -120,7 +121,8 @@ export function useRecoveryCommands({
   const { documentationState, actionsToDocument, addActionToDocument } =
     useErrorRecoveryDocumentation()
 
-  const { proceedToRouteAndStep } = routeUpdateActions
+  const { proceedToRouteAndStep, handleMotionRouting, stashedMapRef } =
+    routeUpdateActions
   const { mutateAsync: resumeRunFromRecovery } =
     useResumeRunFromRecoveryMutation(documentationState)
   const { mutateAsync: resumeRunFromRecoveryAssumingFalsePositive } =
@@ -142,6 +144,10 @@ export function useRecoveryCommands({
   const reportAndRouteFailedCmd = (e: Error): Promise<never> => {
     console.warn(`Error executing "fixit" command: ${e}`)
     analytics.reportActionSelectedResult(selectedRecoveryOption, 'failed')
+    // Drop any in-motion stash so a later documentation cancel (e.g. from the
+    // recovery-failed "back to menu" home) restores this error screen, not the
+    // pre-retry step that was stashed when the failed action began.
+    stashedMapRef.current = null
     void proceedToRouteAndStep(RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE)
 
     return Promise.reject(new Error(`Could not execute command: ${e}`))
@@ -157,12 +163,25 @@ export function useRecoveryCommands({
       return (
         chainRunCommands(commands, continuePastFailure)
           // the catch never occurs if continuePastCommandFailure is "true"
-          .catch((e: Error) => reportAndRouteFailedCmd(e))
+          .catch((e: Error) => {
+            // User cancelled documentation/login — return to the screen from
+            // before this mutation (stashed by handleMotionRouting(true)).
+            // Callers such as launch may still close the wizard afterward.
+            if (isDocumentedMutationError(e)) {
+              return handleMotionRouting(false).then(() => Promise.reject(e))
+            }
+            return reportAndRouteFailedCmd(e)
+          })
       )
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [analytics, selectedRecoveryOption, addActionToDocument]
+    [
+      analytics,
+      selectedRecoveryOption,
+      addActionToDocument,
+      handleMotionRouting,
+    ]
   )
 
   const buildRetryPrepMove = ():
@@ -407,6 +426,12 @@ export function useRecoveryCommands({
           )
           makeSuccessToast()
         })
+        .catch((error: unknown) => {
+          if (isDocumentedMutationError(error)) {
+            return handleMotionRouting(false)
+          }
+          return Promise.reject(error)
+        })
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -417,18 +442,40 @@ export function useRecoveryCommands({
       handleIgnoringErrorKind,
       selectedRecoveryOption,
       makeSuccessToast,
+      handleMotionRouting,
     ]
   )
 
-  const cancelRun = useCallback(
-    (): void => {
-      analytics.reportActionSelectedResult(selectedRecoveryOption, 'succeeded')
-      stopRun(runId)
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [runId]
-  )
+  const cancelRun = useCallback((): void => {
+    stopRun(runId, {
+      onSuccess: () => {
+        analytics.reportActionSelectedResult(
+          selectedRecoveryOption,
+          'succeeded'
+        )
+      },
+      onError: (error: unknown) => {
+        // stopRun is not routed through chainRunRecoveryCommands, so handle
+        // documentation cancel here. Always return to confirm-cancel rather than
+        // restoring a DROP_TIP_FLOWS stash — after tips are removed, that would
+        // re-enter the drop tip wizard from the start.
+        if (isDocumentedMutationError(error)) {
+          stashedMapRef.current = null
+          void proceedToRouteAndStep(
+            RECOVERY_MAP.CANCEL_RUN.ROUTE,
+            RECOVERY_MAP.CANCEL_RUN.STEPS.CONFIRM_CANCEL
+          )
+        }
+      },
+    })
+  }, [
+    runId,
+    stopRun,
+    proceedToRouteAndStep,
+    stashedMapRef,
+    selectedRecoveryOption,
+    analytics,
+  ])
 
   const handleResumeAction = (): Promise<RunAction> => {
     if (isAssumeFalsePositiveResumeKind(failedCommand)) {
@@ -440,15 +487,21 @@ export function useRecoveryCommands({
 
   const skipFailedCommand = useCallback(
     (): void => {
-      void handleIgnoringErrorKind().then(() =>
-        handleResumeAction().then(() => {
+      void handleIgnoringErrorKind()
+        .then(() => handleResumeAction())
+        .then(() => {
           analytics.reportActionSelectedResult(
             selectedRecoveryOption,
             'succeeded'
           )
           makeSuccessToast()
         })
-      )
+        .catch((error: unknown) => {
+          if (isDocumentedMutationError(error)) {
+            return handleMotionRouting(false)
+          }
+          return Promise.reject(error)
+        })
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -458,6 +511,7 @@ export function useRecoveryCommands({
       handleIgnoringErrorKind,
       selectedRecoveryOption,
       makeSuccessToast,
+      handleMotionRouting,
     ]
   )
 

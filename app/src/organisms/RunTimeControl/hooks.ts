@@ -17,7 +17,7 @@ export interface RunControls {
   play: () => void
   pause: () => void
   stop: () => void
-  reset: () => void
+  reset: (options?: { onError?: (error: unknown) => void }) => void
   resumeFromRecovery: () => void
   isPlayRunActionLoading: boolean
   isPauseRunActionLoading: boolean

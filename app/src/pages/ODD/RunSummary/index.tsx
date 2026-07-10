@@ -257,7 +257,12 @@ export function RunSummary(): JSX.Element {
   // TODO(jh, 05-30-24): EXEC-487. Refactor reset() so we can redirect to the setup page, showing the shimmer skeleton instead.
   const runAgain = (): void => {
     setShowRunAgainSpinner(true)
-    reset()
+    reset({
+      onError: () => {
+        // e.g. user cancelled the documentation modal
+        setShowRunAgainSpinner(false)
+      },
+    })
     if (isQuickTransfer) {
       trackEventWithRobotSerial({
         name: ANALYTICS_QUICK_TRANSFER_RERUN,

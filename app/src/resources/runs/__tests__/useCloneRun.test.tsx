@@ -159,18 +159,21 @@ describe('useCloneRun hook', () => {
 
     const { result } = renderHook(() => useCloneRun(RUN_ID_NO_RTP), { wrapper })
     result.current && result.current.cloneRun()
-    expect(mockCreateRun).toHaveBeenCalledWith({
-      protocolId: 'protocolId',
-      labwareOffsets: [
-        {
-          definitionUri: 'uri1',
-          locationSequence: [1, 2],
-          offset: { x: 1, y: 1, z: 1 },
-        },
-      ],
-      runTimeParameterValues: {},
-      runTimeParameterFiles: {},
-    })
+    expect(mockCreateRun).toHaveBeenCalledWith(
+      {
+        protocolId: 'protocolId',
+        labwareOffsets: [
+          {
+            definitionUri: 'uri1',
+            locationSequence: [1, 2],
+            offset: { x: 1, y: 1, z: 1 },
+          },
+        ],
+        runTimeParameterValues: {},
+        runTimeParameterFiles: {},
+      },
+      { onError: expect.any(Function) }
+    )
   })
 
   it('should return a function that when called, calls createRun run with runTimeParameterValues overrides', async () => {
@@ -181,23 +184,26 @@ describe('useCloneRun hook', () => {
 
     const { result } = renderHook(() => useCloneRun(RUN_ID_RTP), { wrapper })
     result.current && result.current.cloneRun()
-    expect(mockCreateRun).toHaveBeenCalledWith({
-      protocolId: 'protocolId',
-      labwareOffsets: [
-        {
-          definitionUri: 'uri1',
-          locationSequence: [1, 2],
-          offset: { x: 1, y: 1, z: 1 },
+    expect(mockCreateRun).toHaveBeenCalledWith(
+      {
+        protocolId: 'protocolId',
+        labwareOffsets: [
+          {
+            definitionUri: 'uri1',
+            locationSequence: [1, 2],
+            offset: { x: 1, y: 1, z: 1 },
+          },
+        ],
+        runTimeParameterValues: {
+          number_param: 2,
+          boolean_param: false,
         },
-      ],
-      runTimeParameterValues: {
-        number_param: 2,
-        boolean_param: false,
+        runTimeParameterFiles: {
+          file_param: 'fileId_123',
+        },
       },
-      runTimeParameterFiles: {
-        file_param: 'fileId_123',
-      },
-    })
+      { onError: expect.any(Function) }
+    )
   })
 
   it('should filter duplicate labware offsets and keep only the most recent ones', async () => {
@@ -224,12 +230,32 @@ describe('useCloneRun hook', () => {
       },
     ]
 
-    expect(mockCreateRun).toHaveBeenCalledWith({
-      protocolId: 'protocolId',
-      labwareOffsets: expectedOffsets,
-      runTimeParameterValues: {},
-      runTimeParameterFiles: {},
+    expect(mockCreateRun).toHaveBeenCalledWith(
+      {
+        protocolId: 'protocolId',
+        labwareOffsets: expectedOffsets,
+        runTimeParameterValues: {},
+        runTimeParameterFiles: {},
+      },
+      { onError: expect.any(Function) }
+    )
+  })
+
+  it('should invoke onError when createRun fails', () => {
+    const mockCreateRun = vi.fn((_vars, options) => {
+      options?.onError?.(new Error('documentation cancelled'))
     })
+    const mockOnError = vi.fn()
+    vi.mocked(useCreateRunMutation).mockReturnValue({
+      createRun: mockCreateRun,
+    } as any)
+
+    const { result } = renderHook(() => useCloneRun(RUN_ID_NO_RTP), { wrapper })
+    result.current.cloneRun({ onError: mockOnError })
+
+    expect(mockOnError).toHaveBeenCalledWith(
+      new Error('documentation cancelled')
+    )
   })
 
   it('should handle analysis trigger when specified', async () => {

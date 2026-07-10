@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import {
-  isDocumentedMutationError,
   useCreateCommandMutation,
   useCreateLiveCommandMutation,
   useCreateMaintenanceRunMutation,
@@ -108,12 +107,7 @@ export function useChainRunCommands(
         continuePastCommandFailure,
         setIsLoading,
         recoveryPolicy
-      ).catch(error => {
-        if (isDocumentedMutationError(error)) {
-          return new Promise(() => {})
-        }
-        return Promise.reject(error)
-      }),
+      ),
     isCommandMutationLoading: isLoading,
   }
 }

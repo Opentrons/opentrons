@@ -211,7 +211,12 @@ export function useActionButtonProperties({
     buttonText = t('run_again')
     handleButtonClick = () => {
       isResetRunLoadingRef.current = true
-      reset()
+      reset({
+        onError: () => {
+          // e.g. user cancelled the documentation modal
+          isResetRunLoadingRef.current = false
+        },
+      })
       runHeaderModalContainerUtils.dropTipUtils.resetTipStatus()
       trackEvent({
         name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
