@@ -4,6 +4,7 @@ from _pytest.fixtures import SubRequest
 from mock import AsyncMock, call
 import mock
 from unittest.mock import patch
+from serial import PortNotOpenError  # type: ignore[import-untyped]
 from opentrons.drivers.asyncio.communication.async_serial import AsyncSerial
 from opentrons.drivers.asyncio.communication.serial_connection import (
     SerialConnection,
@@ -86,6 +87,20 @@ async def async_subject(
 
 
 @pytest.fixture
+async def sync_subject(mock_serial_port: AsyncMock, ack: str) -> SerialConnection:
+    """Create a base SerialConnection test subject."""
+    return SerialConnection(
+        serial=mock_serial_port,
+        ack=ack,
+        name="name",
+        port="port",
+        retry_wait_time_seconds=0,
+        error_keyword="error",
+        alarm_keyword="alarm",
+    )
+
+
+@pytest.fixture
 async def subject_raise_on_error_patched(
     async_subject: AsyncResponseSerialConnection,
 ) -> AsyncGenerator[AsyncResponseSerialConnection, None]:
@@ -127,6 +142,23 @@ async def test_send_command_with_retry(
             call(match=ack.encode()),
         ]
     )
+
+
+async def test_send_command_reopens_port_on_port_not_open(
+    mock_serial_port: AsyncMock, sync_subject: SerialConnection, ack: str
+) -> None:
+    """It should reopen and retry when the port is closed out from under it."""
+    serial_response = "response data " + ack
+    mock_serial_port.write.side_effect = [PortNotOpenError, None]
+    mock_serial_port.read_until.return_value = serial_response.encode()
+
+    await sync_subject.send_data(data="send data", retries=1)
+
+    mock_serial_port.open.assert_called_once()
+    mock_serial_port.write.assert_has_calls(
+        calls=[call(data=b"send data"), call(data=b"send data")]
+    )
+    mock_serial_port.read_until.assert_called_once_with(match=ack.encode())
 
 
 async def test_send_command_with_zero_retries(
