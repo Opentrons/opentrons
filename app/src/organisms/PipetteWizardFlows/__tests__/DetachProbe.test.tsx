@@ -36,6 +36,9 @@ describe('DetachProbe', () => {
       flowType: FLOWS.CALIBRATE,
       errorMessage: null,
       setShowErrorMessage: vi.fn(),
+      isDoorOpenError: false,
+      setIsDoorOpenError: vi.fn(),
+      dismissDoorOpenError: vi.fn(),
       isRobotMoving: false,
       isOnDevice: false,
     }
