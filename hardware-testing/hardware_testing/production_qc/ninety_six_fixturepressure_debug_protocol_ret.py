@@ -2009,8 +2009,10 @@ def _summarize_channel_leak_history(
                 summary_leak_threshold = retest_result.leak_threshold
                 summary_median_value = retest_result.leak_rate
                 summary_cv_threshold = cv_threshold
-                summary_cv_value: Union[float, str] = 0.0
-                summary_mad_value = 0.0
+                summary_cv_value: Union[float, str] = (
+                    "inf" if math.isinf(cv_value) else round(cv_value, 4)
+                )
+                summary_mad_value = mad_value
                 summary_fail_count = 0
                 summary_insert_fail_count = 0
                 summary_original_status = "PASS"
