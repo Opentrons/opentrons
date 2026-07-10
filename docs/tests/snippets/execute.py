@@ -247,3 +247,53 @@ def run_fragment(case: SnippetCase, docs_root: Path) -> None:
         exec(compile(case.page_seed, f"<page-template:{case.snippet.rel_path}>", "exec"), namespace)
     for code in case.chain:
         exec(compile(code, case.snippet.location, "exec"), namespace)
+
+
+# A fragment fails to simulate for one of two reasons. Either it needs prior
+# protocol *context* an earlier snippet (or a full protocol) would have set up —
+# a name, an attached tip, an open module, a loaded pipette, a runtime parameter —
+# in which case it simply can't run standalone and we report it as xfail. Or it
+# has a genuine *defect* — a wrong keyword, unknown labware, bad argument order —
+# which must fail the suite. These signatures identify the first kind; everything
+# else is treated as a real defect.
+_CONTEXT_FAILURE_NAMES = frozenset(
+    {
+        "NameError",  # references a variable defined earlier on the page
+        "TipNotAttachedError",  # needs a tip picked up by a prior snippet
+        "TipAttachedError",  # a prior snippet already picked up a tip
+        "UnexpectedTipRemovalError",
+        "OutOfTipsError",
+        "LocationIsOccupiedError",  # labware loaded by a prior snippet/template
+        "DeckConflictError",
+        "IncompatibleAddressableAreaError",
+        "RuntimeParameterRequired",  # needs a runtime parameter value
+        "ThermocyclerNotOpenError",  # needs the lid opened by a prior snippet
+        "PipetteNotReadyToAspirateError",
+        "ThreadManagerException",  # opentrons.execute example — needs real hardware
+    }
+)
+_CONTEXT_FAILURE_MESSAGES = (
+    "already present on",  # pipette already loaded (by the base template)
+    "has no lid",  # lid not loaded by a prior snippet
+    "blow out is called without an explicit location",  # needs prior positioning
+    "Last tip location should be a Well but it is: None",  # needs a prior pickup
+)
+
+
+def is_context_failure(exc: BaseException) -> bool:
+    """Whether a fragment failed only for lack of prior protocol context/state.
+
+    ``ProtocolCommandFailedError`` wraps the underlying cause in its message, so
+    the class-name set is matched against the message too.
+    """
+    name = type(exc).__name__
+    message = str(exc)
+    if name in _CONTEXT_FAILURE_NAMES:
+        return True
+    if any(n in message for n in _CONTEXT_FAILURE_NAMES):
+        return True
+    if any(s in message for s in _CONTEXT_FAILURE_MESSAGES):
+        return True
+    if name == "AttributeError" and ("Parameters" in message or "params" in message):
+        return True
+    return False

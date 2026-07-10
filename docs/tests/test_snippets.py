@@ -18,6 +18,7 @@ from tests.snippets.execute import (
     SnippetCase,
     build_cases,
     check_syntax,
+    is_context_failure,
     run_complete,
     run_fragment,
 )
@@ -67,14 +68,15 @@ def test_complete_protocol_simulates(case: SnippetCase) -> None:
 @pytest.mark.tier3
 @pytest.mark.parametrize("case", _FRAGMENT, ids=_ids(_FRAGMENT))
 def test_fragment_simulates(case: SnippetCase) -> None:
-    """Best-effort: run each fragment against the seeded (base + page-template) context.
+    """Run each fragment against the seeded (base + page-template) context.
 
-    Many fragments can't simulate standalone — they carry forward protocol state
-    (a tip picked up in a previous example) or need runtime parameter values that
-    only exist mid-protocol. This tier is therefore **non-blocking**: a fragment
-    that doesn't simulate is reported as ``xfail`` (with the exception type) rather
-    than failing the suite. Tiers 1 and 2 are the blocking gate. Fragments that do
-    simulate — and there are many — give real API-misuse coverage in the report.
+    A fragment that fails only for lack of prior protocol context — an undefined
+    name, an attached tip, an open module, a runtime parameter — can't simulate
+    standalone, so it's reported as ``xfail`` (non-blocking). Any *other* failure
+    (a wrong keyword, unknown labware, bad argument order) is a real defect and
+    **fails** the suite. So the many fragments that genuinely run against the
+    template give real, blocking API-misuse coverage, while the ones that can't
+    run stand aside gracefully. See ``is_context_failure``.
     """
     try:
         if case.directives.raises:
@@ -82,5 +84,7 @@ def test_fragment_simulates(case: SnippetCase) -> None:
                 run_fragment(case, DOCS_ROOT)
         else:
             run_fragment(case, DOCS_ROOT)
-    except Exception as exc:  # noqa: BLE001 — best-effort tier, downgrade to xfail
-        pytest.xfail(f"not simulatable standalone: {type(exc).__name__}")
+    except Exception as exc:
+        if is_context_failure(exc):
+            pytest.xfail(f"needs prior protocol context: {type(exc).__name__}")
+        raise

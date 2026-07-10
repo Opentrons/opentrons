@@ -218,14 +218,14 @@ For example, to transfer 50 µL of liquid from the first well of a reservoir to 
 
 ```python
 for well in plate.rows()[0]:
-    pipette.transfer(reservoir["A1"], well, 50)
+    pipette.transfer(50, reservoir["A1"], well)
 ```
 
 Equivalently, using `rows_by_name`:
 
 ```python
-for well in plate.rows_by_name()["A"].values():
-    pipette.transfer(reservoir["A1"], well, 50)
+for well in plate.rows_by_name()["A"]:
+    pipette.transfer(50, reservoir["A1"], well)
 ```
 *New in version 2.0*
 

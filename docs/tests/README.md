@@ -8,13 +8,15 @@ macros, and checks it at one of three tiers.
 ## Running
 
 ```sh
-make test            # everything (Tier 3 is best-effort — see below)
+make test            # everything (see Tier 3 below)
 make test TIER=1     # syntax only
 make test TIER=2     # syntax + complete-protocol simulation
 ```
 
 `TIER` is cumulative (`N` runs tiers 1..N; default `all`). Equivalent directly:
-`uv run pytest tests/ --tier=2`.
+`uv run pytest tests/ --tier=2`. The run ends with a per-`.md`-file table
+(pass / xfail / FAIL counts) so it's clear what got tested — the default
+`.`/`x` progress dots hide which files are covered.
 
 ## Tiers
 
@@ -22,13 +24,19 @@ make test TIER=2     # syntax + complete-protocol simulation
 |---|---|---|
 | **1 — syntax** | `compile()` every snippet (after macro rendering). | **Yes** |
 | **2 — complete protocols** | Snippets with `def run(` are simulated. Flex via `opentrons.simulate.simulate`; OT-2 via `get_protocol_api` + calling `run()` (the top-level `simulate` refuses OT-2 in this build). A missing `requirements`/`metadata` header is synthesized from the enclosing tab. | **Yes** |
-| **3 — fragments** | Bare command snippets, run against a context seeded from the Flex/OT-2 **base template** (`examples.md`, "Protocol template") plus any page-template. | **Best-effort** |
+| **3 — fragments** | Bare command snippets, run against a context seeded from the Flex/OT-2 **base template** (`examples.md`, "Protocol template") plus any page-template. | **Partial** — see below |
 
-**Tier 3 is best-effort by design.** Most fragments can't run standalone — they
-carry forward protocol state (a tip picked up in an earlier example) or need
-runtime-parameter values that only exist mid-protocol. Those are reported as
-`xfail` (with the exception type) rather than failing the suite; the ~100+ that
-*do* simulate give real API-misuse coverage. Tiers 1 and 2 are the hard gate.
+**Tier 3 distinguishes "can't run standalone" from "actually broken."** Many
+fragments can't run on their own — they carry forward protocol state (a tip
+picked up in an earlier example), reference a name defined earlier on the page,
+or need a runtime-parameter value. When a fragment fails for one of those
+reasons it's reported as `xfail` (non-blocking). But any *other* failure — a
+wrong keyword, unknown labware, bad argument order — is a real defect and
+**fails** the suite. So the many fragments that genuinely run against the
+template give real, blocking API-misuse coverage, while the ones that can't run
+stand aside gracefully. The classifier is `is_context_failure` in
+`snippets/execute.py` (a small, centralized signature list — extend it if a new
+"missing-context" error type shows up as a false failure).
 
 ## Classification
 
