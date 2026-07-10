@@ -13,6 +13,7 @@ import asyncio
 import logging
 from typing import Dict, Optional
 from enum import Enum
+from serial import PortNotOpenError
 
 from opentrons.drivers import utils
 from opentrons.drivers.types import Temperature
@@ -25,7 +26,6 @@ log = logging.getLogger(__name__)
 DEFAULT_TEMP_DECK_TIMEOUT = 1
 
 DEFAULT_COMMAND_RETRIES = 3
-
 
 class GCODE(str, Enum):
     GET_TEMP = "M105"
@@ -191,7 +191,13 @@ class TempDeckDriver(AbstractTempDeckDriver):
         Returns:
             command response
         """
-        response = await self._connection.send_command(
-            command=command, retries=DEFAULT_COMMAND_RETRIES
-        )
-        return response
+        try:
+            return await self._connection.send_command(
+                command=command, retries=DEFAULT_COMMAND_RETRIES
+            )
+        except PortNotOpenError:
+            log.warning("Temp-Deck port was closed; reopening and retrying once.")
+            await self._connection.open()
+            return await self._connection.send_command(
+                command=command, retries=DEFAULT_COMMAND_RETRIES
+            )
