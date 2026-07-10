@@ -195,8 +195,16 @@ class AuthServerAuthorizationChecker(AuthorizationChecker):
                     "Username not present in token introspection response."
                     " This is a bug in auth-server."
                 )
+            elif token_info.ot_fullname is None:
+                # Similarly, our custom fullname field should be returned always.
+                raise RuntimeError(
+                    "Fullname not present in token introspection response."
+                    " This is a bug in auth-server."
+                )
             else:
-                return AuthorizedResult(username=token_info.username)
+                return AuthorizedResult(
+                    username=token_info.username, fullname=token_info.ot_fullname
+                )
 
     @override
     async def is_reason_for_interaction_required(self) -> bool:
@@ -228,6 +236,7 @@ class AuthorizedResult:
     """The request is authorized with a valid access token."""
 
     username: str
+    fullname: str
     """The user who issued the request."""
 
 

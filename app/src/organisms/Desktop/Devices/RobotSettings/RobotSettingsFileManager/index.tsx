@@ -1,11 +1,18 @@
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
 import { ComplianceReadySoftwareFiles } from './ComplianceReadySoftwareFiles'
+import { DiagnosticsFiles } from './DiagnosticFiles'
 import { ProtocolRunRecords } from './ProtocolRunRecords'
 import styles from './robotsettingsfilemanager.module.css'
 import { RobotStorage } from './RobotStorage'
 
-export function RobotSettingsFileManager(): JSX.Element {
+interface RobotSettingsFileManagerProps {
+  robotName: string
+}
+
+export function RobotSettingsFileManager({
+  robotName,
+}: RobotSettingsFileManagerProps): JSX.Element {
   const { data: accessControlData } = useAccessControlEnabledQuery()
   const isComplianceReady =
     accessControlData?.data?.accessControlEnabled ?? false
@@ -13,6 +20,7 @@ export function RobotSettingsFileManager(): JSX.Element {
   return (
     <div className={styles.container}>
       <RobotStorage />
+      <DiagnosticsFiles robotName={robotName} />
       {isComplianceReady ? <ComplianceReadySoftwareFiles /> : null}
       <ProtocolRunRecords />
     </div>

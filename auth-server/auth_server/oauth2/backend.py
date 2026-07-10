@@ -322,6 +322,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
                 refresh_token=refresh_token,
                 expires_at=expires_at,
                 scopes=scopes,
+                fullname=user.full_name,
             )
         )
 
@@ -387,9 +388,12 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         else:
             # Values defined by:
             # https://datatracker.ietf.org/doc/html/rfc7662#section-2.2
+            # except ot_fullname, which is custom to us. if you add other custom fields,
+            # please prefix them with ot-.
             return {
                 "scope": serialize_scopes(found_access_token.scopes),
                 "username": found_access_token.username,
+                "ot_fullname": found_access_token.fullname,
                 # "active": True is set implicitly by oauthlib.
             }
 
@@ -441,6 +445,7 @@ class _TokenIssuance:
     # to resist problems from clock adjustment.
     expires_at: datetime
     scopes: set[Scope]
+    fullname: str
 
 
 class _TokenStore:

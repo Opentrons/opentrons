@@ -6,7 +6,8 @@ name: 'Update Server test/lint'
 on:
   push:
     paths:
-      - 'update-server/**/*'
+      - 'update-server/**'
+      - 'server-utils/**'
       - 'Makefile'
       - 'scripts/**/*.mk'
       - 'scripts/**/*.py'
@@ -19,7 +20,8 @@ on:
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
     paths:
-      - 'update-server/**/*'
+      - 'update-server/**'
+      - 'server-utils/**'
       - 'Makefile'
       - 'scripts/**/*.mk'
       - 'scripts/**/*.py'

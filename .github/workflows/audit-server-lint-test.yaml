@@ -13,6 +13,8 @@ on:
       - '.github/workflows/audit-server-lint-test.yaml'
       - '.github/actions/python/**'
       - 'server-utils/**'
+      - 'shared-data/**'
+      - '!shared-data/js/**'
     branches: # ignore any release-related thing (handled elsewhere)
       - 'edge'
     tags-ignore:
@@ -27,6 +29,8 @@ on:
       - '.github/workflows/audit-server-lint-test.yaml'
       - '.github/actions/python/**'
       - 'server-utils/**'
+      - 'shared-data/**'
+      - '!shared-data/js/**'
   workflow_dispatch:
 
 permissions: {}

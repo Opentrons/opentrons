@@ -27,6 +27,7 @@ from auth_server.users.models import (
     ResetPasswordResponse,
     UpdateSelf,
     UpdateUser,
+    UserAlreadyExistsErrorDetails,
     UserCreate,
     UserResponse,
 )
@@ -52,6 +53,7 @@ router = fastapi.APIRouter()
             "model": ErrorBody[
                 PasswordTooShortErrorDetails
                 | PasswordMissingSpecialCharactersErrorDetails
+                | UserAlreadyExistsErrorDetails
             ]
         },
     },
@@ -75,10 +77,8 @@ async def post_users(
             now=now,
         )
     except UserAlreadyExistsError:
-        # todo(mm, 2026-06-24): Convert this to a more structured error response.
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-            detail="User already exists",
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST, _build_user_already_exists_error()
         )
     except PasswordTooShortError as e:
         raise APIError(
@@ -157,6 +157,7 @@ async def delete_user(
             "model": ErrorBody[
                 PasswordTooShortErrorDetails
                 | PasswordMissingSpecialCharactersErrorDetails
+                | UserAlreadyExistsErrorDetails
             ]
         },
     },
@@ -186,9 +187,8 @@ async def update_user(
             reset_password=update_data.resetPassword is True,
         )
     except UserAlreadyExistsError:
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-            detail="User already exists",
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST, _build_user_already_exists_error()
         )
     except PasswordTooShortError as e:
         raise APIError(
@@ -290,6 +290,7 @@ async def get_self(  # noqa: D103
             "model": ErrorBody[
                 PasswordTooShortErrorDetails
                 | PasswordMissingSpecialCharactersErrorDetails
+                | UserAlreadyExistsErrorDetails
             ]
         },
         fastapi.status.HTTP_401_UNAUTHORIZED: {},
@@ -299,24 +300,45 @@ async def update_self(
     request_body: RequestModel[UpdateSelf],
     authorization_details: Annotated[
         RequireScopesResult,
-        fastapi.Depends(require_scopes(Scope.USERS_WRITE_SELF_PASSWORD)),
+        fastapi.Depends(require_scopes(Scope.USERS_WRITE_SELF)),
     ],
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
-    """Set the current user's password and clear the resetPassword flag."""
+    """Update the current user's profile and/or password."""
     if isinstance(authorization_details, AuthorizationNotRequiredResult):
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_401_UNAUTHORIZED,
             detail="This endpoint needs an access token to determine the current user.",
         )
 
+    update_data = request_body.data
+    if (
+        update_data.username is None
+        and update_data.fullName is None
+        and update_data.password is None
+    ):
+        return await PydanticResponse.create(
+            status_code=fastapi.status.HTTP_200_OK,
+            content=SimpleBody(
+                data=user_data_manager.get_user(authorization_details.username)
+            ),
+        )
+
     try:
         result = user_data_manager.update_user(
             authorization_details.username,
+            new_username=update_data.username,
+            new_password=update_data.password.get_secret_value()
+            if update_data.password is not None
+            else None,
+            new_full_name=update_data.fullName,
             now=datetime.datetime.now(tz=datetime.UTC),
-            new_password=request_body.data.password.get_secret_value(),
+        )
+    except UserAlreadyExistsError:
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST, _build_user_already_exists_error()
         )
     except PasswordTooShortError as e:
         raise APIError(
@@ -336,6 +358,10 @@ async def update_self(
         status_code=fastapi.status.HTTP_200_OK,
         content=SimpleBody(data=result),
     )
+
+
+def _build_user_already_exists_error() -> ErrorBody[UserAlreadyExistsErrorDetails]:
+    return ErrorBody(errors=[UserAlreadyExistsErrorDetails(id="userAlreadyExists")])
 
 
 def _build_password_too_short_error(

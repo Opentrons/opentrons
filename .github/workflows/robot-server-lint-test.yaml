@@ -9,6 +9,7 @@ on:
     paths:
       - 'api/**/*'
       - 'hardware/**/*'
+      - 'hardware-testing/**/*'
       - 'Makefile'
       - 'shared-data/**/*'
       - 'server-utils/**/*'
@@ -28,6 +29,7 @@ on:
     paths:
       - 'api/**/*'
       - 'hardware/**/*'
+      - 'hardware-testing/**/*'
       - 'Makefile'
       - 'shared-data/**/*'
       - 'server-utils/**/*'
