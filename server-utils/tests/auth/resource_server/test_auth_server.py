@@ -16,8 +16,6 @@ from server_utils.auth.resource_server.auth_server import (
     AuthSettingsResponse,
     AuthSettingsResponseData,
     LocalHTTPClient,
-    RequireReasonForInteractionSettingsResponse,
-    RequireReasonForInteractionSettingsResponseData,
     TokenIntrospectionResponse,
 )
 
@@ -146,37 +144,6 @@ async def test_settings(mock_server: tuple[AppMock, LocalHTTPClient]) -> None:
     settings_result = await client.get_auth_settings()
     assert settings_result == AuthSettingsResponse(
         data=AuthSettingsResponseData(accessControlEnabled=True)
-    )
-
-
-async def test_require_reason_for_interaction_settings(
-    mock_server: tuple[AppMock, LocalHTTPClient],
-) -> None:
-    """Test that the client can retrieve the require-reason-for-interaction setting."""
-    app_mock, client = mock_server
-
-    app_mock.all_auth_settings_response = {
-        "data": {
-            "requireReasonForInteraction": True,
-            "accessControlEnabled": True,
-            "idleLogout": 180.0,
-        }
-    }
-    result = await client.get_require_reason_for_interaction_settings()
-    assert result == RequireReasonForInteractionSettingsResponse(
-        data=RequireReasonForInteractionSettingsResponseData(
-            requireReasonForInteraction=True
-        )
-    )
-
-    app_mock.all_auth_settings_response = {
-        "data": {"requireReasonForInteraction": False, "idleLogout": 60.0}
-    }
-    result = await client.get_require_reason_for_interaction_settings()
-    assert result == RequireReasonForInteractionSettingsResponse(
-        data=RequireReasonForInteractionSettingsResponseData(
-            requireReasonForInteraction=False
-        )
     )
 
 

@@ -2,7 +2,7 @@ import { useCallback, useContext, useMemo } from 'react'
 
 import {
   useAccessControlEnabledQuery,
-  useAuthSettingsQuery,
+  useAuditSettingsQuery,
 } from '@opentrons/react-api-client'
 
 import { useCurrentRobotName, useUsernameForRobot } from '/app/redux/robot-auth'
@@ -36,7 +36,7 @@ export function useDocumentationState(
   onPromptForDocumentation?: (docreport: DocumentationReport) => void,
   providedActionsToDocument?: DocumentedAction[]
 ): DocumentationState {
-  const authSettingsQuery = useAuthSettingsQuery(undefined, hostOverride)
+  const auditSettingsQuery = useAuditSettingsQuery(undefined, hostOverride)
   const accessControlEnabledQuery = useAccessControlEnabledQuery(
     undefined,
     hostOverride
@@ -49,15 +49,15 @@ export function useDocumentationState(
   const accessControlEnabled =
     accessControlEnabledQuery?.data?.data?.accessControlEnabled ?? false
   const requireReasonForInteraction =
-    authSettingsQuery?.data?.data?.requireReasonForInteraction ?? false
+    auditSettingsQuery?.data?.data?.requireReasonForInteraction ?? false
 
   // TODO(jj): add length check for documentation report
   // const minLengthOfReasonForInteraction =
-  //   authSettingsQuery?.data?.data?.minLengthOfReasonForInteraction ?? 0
+  //   auditSettingsQuery?.data?.data?.minLengthOfReasonForInteraction ?? 0
 
   const reasonForInteractionLoading = useMemo(
-    () => authSettingsQuery?.isLoading || accessControlEnabledQuery?.isLoading,
-    [accessControlEnabledQuery?.isLoading, authSettingsQuery?.isLoading]
+    () => auditSettingsQuery?.isLoading || accessControlEnabledQuery?.isLoading,
+    [accessControlEnabledQuery?.isLoading, auditSettingsQuery?.isLoading]
   )
 
   const reasonForInteractionRequired = useMemo(

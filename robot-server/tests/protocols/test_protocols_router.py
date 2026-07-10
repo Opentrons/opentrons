@@ -29,9 +29,8 @@ from opentrons.protocol_reader import (
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
-from server_utils.auth.resource_server.authorization_checker import (
-    AlwaysAllowedAuthorizationChecker,
-)
+from server_utils.audit.audit_logger import AuditLogger as AuditServerLogger
+from server_utils.audit.audit_server import NoOpClient
 from server_utils.fastapi_utils.models.json_api import (
     MultiBodyMeta,
     RequestModel,
@@ -94,7 +93,7 @@ def _test_audit_logger(created_at: datetime | None = None) -> AuditLogger:
     audit_logger = AuditLogger(
         user_notes=None,
         created_at=created_at or datetime(year=2021, month=1, day=1),
-        authorization_checker=AlwaysAllowedAuthorizationChecker(),
+        audit_server_logger=AuditServerLogger(audit_client=NoOpClient()),
     )
     audit_logger.did_log = True
     return audit_logger
