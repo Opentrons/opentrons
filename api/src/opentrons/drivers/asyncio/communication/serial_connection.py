@@ -4,6 +4,7 @@ import asyncio
 import logging
 from typing import Type, Literal, AsyncIterator
 import os
+from serial import PortNotOpenError  # type: ignore[import-untyped]
 from opentrons.drivers.command_builder import CommandBuilder
 
 from .errors import (
@@ -203,11 +204,16 @@ class SerialConnection:
         data_encode = data.encode()
 
         for retry in range(retries + 1):
-            log.debug(f"{self.name}: Write -> {data_encode!r}")
-            await self._serial.write(data=data_encode)
+            try:
+                log.debug(f"{self.name}: Write -> {data_encode!r}")
+                await self._serial.write(data=data_encode)
 
-            response = await self._serial.read_until(match=self._ack)
-            log.debug(f"{self.name}: Read <- {response!r}")
+                response = await self._serial.read_until(match=self._ack)
+                log.debug(f"{self.name}: Read <- {response!r}")
+            except PortNotOpenError:
+                log.warning(f"{self.name}: port was closed; reopening and retrying.")
+                await self.open()
+                continue
 
             if (
                 self._ack in response
