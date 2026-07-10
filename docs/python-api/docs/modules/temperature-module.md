@@ -7,6 +7,7 @@ The Temperature Module acts as both a cooling and heating device. It can control
 
 The Temperature Module is represented in code by a [`TemperatureModuleContext`][opentrons.protocol_api.TemperatureModuleContext] object, which has methods for setting target temperatures and reading the module's status. This example demonstrates loading a Temperature Module GEN2 on the deck.
 
+<!-- test: page-template -->
 ```python
 temp_mod = protocol.load_module(
     module_name="temperature module gen2", location="D3"

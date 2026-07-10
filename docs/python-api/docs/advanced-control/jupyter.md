@@ -38,6 +38,7 @@ You should use the same [`ProtocolContext`][opentrons.protocol_api.ProtocolConte
 
 You can also use Jupyter to run a protocol that you have already written. To do so, first copy the entire text of the protocol into a cell and run that cell:
 
+<!-- test: skip -->
 ```python
 import opentrons.execute
 from opentrons import protocol_api

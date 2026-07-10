@@ -482,7 +482,7 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
             pipette.transfer(
                 volume=30,
                 source=row[:11],
-                source=row[1:],
+                dest=row[1:],
                 mix_after=(3, 25)
             )
     ```

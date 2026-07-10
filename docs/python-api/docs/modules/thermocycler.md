@@ -23,6 +23,7 @@ For each module action, the API lets you choose whether to perform other protoco
 
 This section covers using the Thermocycler Module, including its blocking and concurrent commands. The examples in this section will use a Thermocycler Module GEN2 loaded as follows: 
 
+<!-- test: page-template -->
 ```python
 tc_mod = protocol.load_module(module_name="thermocyclerModuleV2")
 plate = tc_mod.load_labware(name="opentrons_96_wellplate_200ul_pcr_full_skirt")
@@ -104,7 +105,7 @@ You can optionally instruct the Thermocycler to hold its block temperature for a
         hold_time_seconds=15)
     pipette.pick_up_tip()
     pipette.aspirate(50, plate["A1"])
-    pipette.dispense(50, plate["B1])
+    pipette.dispense(50, plate["B1"])
     pipette.drop_tip()
     ```
 
@@ -121,7 +122,7 @@ You can optionally instruct the Thermocycler to hold its block temperature for a
     # complete pipetting actions while the block cools
     pipette.pick_up_tip()
     pipette.aspirate(50, plate["A1"])
-    pipette.dispense(50, plate["B1])
+    pipette.dispense(50, plate["B1"])
     pipette.drop_tip()
     # wait for the block to reach the target temperature
     protocol.wait_for_tasks([cool_task])

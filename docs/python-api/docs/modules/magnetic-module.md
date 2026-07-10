@@ -12,6 +12,7 @@ The Magnetic Module is represented by a [`MagneticModuleContext`][opentrons.prot
 
 The examples in this section apply to an OT-2 with a Magnetic Module GEN2 loaded in slot 6:
 
+<!-- test: robot=ot2 -->
 ```python
 def run(protocol: protocol_api.ProtocolContext):
     mag_mod = protocol.load_module(

@@ -36,6 +36,7 @@ def add_parameters(parameters):
 ```
 All of the possible values are multiples of 8, because the protocol will use an 8-channel pipette to process an entire column of samples at once. Considering how 8-channel pipettes access wells, it may be more useful to operate with a *column count* in code. We can set a `column_count` very early in the `run()` function by accessing the value of `params.sample_count` and dividing it by 8:
 
+<!-- test: syntax-only -->
 ```python
 def run(protocol):
     column_count = protocol.params.sample_count // 8
@@ -263,6 +264,7 @@ This will replace the first 200 µL tip rack (in slot A2) with the last 200 µL 
 
 However, in the full protocol, sample count is not the only parameter that affects the rate of tip use. It would be unwieldy to calculate in advance all the permutations of when tip replenishment is necessary. Instead, before each stage of the protocol, we could use [`Well.has_tip()`][opentrons.protocol_api.Well.has_tip] to check whether the first tip rack is empty. If the *last well* of the rack is empty, you can assume that the entire rack is empty and needs to be replaced:
 
+<!-- test: skip -->
 ```python
 if tip_racks_200[0].wells()[-1].has_tip is False:
     # same move_labware() steps as above

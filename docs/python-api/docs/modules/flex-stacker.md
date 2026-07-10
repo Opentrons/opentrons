@@ -13,6 +13,7 @@ Up to four Stacker Modules can be attached to the right side of your Flex. Each 
 
 Start by loading each Stacker in column 4:
 
+<!-- test: page-template -->
 ```python
 stacker_1 = protocol.load_module(
     module_name="flexStackerModuleV1",

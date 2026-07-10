@@ -22,6 +22,7 @@ The Absorbance Plate Reader can only be loaded in slots A3–D3. If you try to l
 
 The examples in this section will use an Absorbance Plate Reader Module loaded as follows:
 
+<!-- test: page-template -->
 ```python
 pr_mod = protocol.load_module(
     module_name="absorbanceReaderV1",
