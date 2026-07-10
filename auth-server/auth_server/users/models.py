@@ -31,7 +31,6 @@ ACCOUNT_TYPE_TO_SCOPES: dict[AccountType, set[Scope]] = {
         # todo(mm, 2026-03-17): Protocol uploads should be togglable to admin-only by an auth setting.
         Scope.USERS_READ_SELF,
         Scope.USERS_WRITE_SELF,
-        Scope.USERS_WRITE_SELF_PASSWORD,
         Scope.PROTOCOLS_WRITE,
     },
     # Auditors should have read-only access to everything. Our read-only endpoints are
@@ -43,7 +42,7 @@ ACCOUNT_TYPE_TO_SCOPES: dict[AccountType, set[Scope]] = {
 # Scopes granted while resetPassword is true, before the user chooses a new password.
 RESET_PASSWORD_SCOPES: set[Scope] = {
     Scope.USERS_READ_SELF,
-    Scope.USERS_WRITE_SELF_PASSWORD,
+    Scope.USERS_WRITE_SELF,
 }
 
 
@@ -95,10 +94,18 @@ class UpdateUser(BaseModel):
 class UpdateSelf(BaseModel):
     """Request body for updating the logged-in user."""
 
+    username: Annotated[
+        str | None,
+        Field(default=None, description="The username of the user."),
+    ] = None
+    fullName: Annotated[
+        str | None,
+        Field(default=None, description="The full name of the user."),
+    ] = None
     password: Annotated[
-        SecretStr,
-        Field(..., description="The new password for the user."),
-    ]
+        SecretStr | None,
+        Field(default=None, description="The new password for the user."),
+    ] = None
 
 
 class UserResponse(BaseModel):
@@ -147,3 +154,9 @@ class PasswordMissingSpecialCharactersErrorDetails(BaseModel):
     """An error response when a new password does not meet the configured special characters requirements."""
 
     id: Literal["passwordMissingSpecialCharacters"]
+
+
+class UserAlreadyExistsErrorDetails(BaseModel):
+    """An error when a username is already taken."""
+
+    id: Literal["userAlreadyExists"]
