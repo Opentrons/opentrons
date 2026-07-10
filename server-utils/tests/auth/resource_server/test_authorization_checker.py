@@ -12,9 +12,11 @@ from server_utils.auth.resource_server.authorization_checker import (
     AuthorizationNotRequiredResult,
     AuthorizedResult,
     AuthServerAuthorizationChecker,
+    FailedClosedAuthorizationChecker,
     InsufficientScopeResult,
     MissingTokenResult,
     NotAnActiveTokenResult,
+    UnableToContactAuthServerResult,
 )
 from server_utils.auth.scopes import Scope, serialize_scopes
 
@@ -37,6 +39,21 @@ class TestAlwaysAllowedAuthorizationChecker:
                 token="token-abc123", required_scopes={Scope.USERS_WRITE}
             )
             == AuthorizationNotRequiredResult()
+        )
+
+
+class TestFailedClosedAuthorizationChecker:
+    async def test_check(self) -> None:
+        subject = FailedClosedAuthorizationChecker()
+        assert (
+            await subject.check(token=None, required_scopes={Scope.USERS_WRITE})
+            == UnableToContactAuthServerResult()
+        )
+        assert (
+            await subject.check(
+                token="token-abc1234", required_scopes={Scope.USERS_WRITE}
+            )
+            == UnableToContactAuthServerResult()
         )
 
 
