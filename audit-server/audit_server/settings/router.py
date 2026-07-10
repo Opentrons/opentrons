@@ -11,6 +11,8 @@ from typing import Annotated
 
 import fastapi
 
+from server_utils.auth.resource_server.fastapi import require_scopes
+from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.models.json_api import (
     PydanticResponse,
     RequestModel,
@@ -40,14 +42,12 @@ ACTION_LOG_DISABLE = "log-disable"
     router.get,
     path="/audit/internal/loggingEnabled",
     summary="Get the logging-enabled setting",
-    description=dedent(
-        """\
+    description=dedent("""\
         Get the current logging-enabled setting.
 
         This is separated from the generic settings endpoints because it is a
         special case controlled through an internal-only API.
-        """
-    ),
+        """),
 )
 async def get_logging_enabled_settings(  # noqa: D103
     settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
@@ -126,14 +126,13 @@ async def get_settings(  # noqa: D103
     router.patch,
     path="/audit/external/settings",
     summary="Change audit settings",
-    description=dedent(
-        """\
+    description=dedent("""\
         Change audit-server settings.
 
         Only fields present in the request body are updated. The new settings
         are returned.
-        """
-    ),
+        """),
+    dependencies=[fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE))],
 )
 async def patch_settings(  # noqa: D103
     request_body: RequestModel[PatchSettingsRequestData],
@@ -150,13 +149,12 @@ async def patch_settings(  # noqa: D103
     router.delete,
     path="/audit/external/settings",
     summary="Reset audit settings",
-    description=dedent(
-        """\
+    description=dedent("""\
         Reset audit-server settings to their defaults.
 
         The new settings are returned.
-        """
-    ),
+        """),
+    dependencies=[fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE))],
 )
 async def delete_settings(  # noqa: D103
     settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],

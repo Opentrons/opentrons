@@ -35,6 +35,18 @@ class AuthorizationChecker(ABC):
         pass
 
 
+class FailedClosedAuthorizationChecker(AuthorizationChecker):
+    """An `AuthorizationChecker` that always denies access.
+
+    This is useful as a fail-closed fallback if configuration is missing.
+    """
+
+    @override
+    async def check(self, token: str | None, required_scopes: set[Scope]) -> Result:
+        """See base class for documentation."""
+        return UnableToContactAuthServerResult()
+
+
 class AlwaysAllowedAuthorizationChecker(AuthorizationChecker):
     """An `AuthorizationChecker` that always allows access."""
 
@@ -132,10 +144,18 @@ class NotAnActiveTokenResult:
     pass
 
 
+@dataclass
+class UnableToContactAuthServerResult:
+    """The authorization server couldn't be contacted."""
+
+    pass
+
+
 Result: TypeAlias = (
     AuthorizationNotRequiredResult
     | AuthorizedResult
     | InsufficientScopeResult
     | MissingTokenResult
     | NotAnActiveTokenResult
+    | UnableToContactAuthServerResult
 )

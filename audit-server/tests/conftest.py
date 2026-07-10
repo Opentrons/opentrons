@@ -58,6 +58,44 @@ def mock_log_data_manager(decoy: Decoy) -> LogDataManager:
 
 
 @pytest.fixture
+def fake_auth_server(
+    unused_tcp_port_factory: Callable[[], int],
+) -> Generator[str, None, None]:
+    """Run a minimal in-process standin for auth-server on a TCP port.
+
+    Yields the base URL. Always pretends that auth is disabled.
+    """
+    port = unused_tcp_port_factory()
+
+    async def fake_auth_off(request: aiohttp.web.Request) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(data={"data": {"accessControlEnabled": False}})
+
+    app = aiohttp.web.Application()
+    app.router.add_get("/auth/settings/accessControlEnabled", fake_auth_off)
+    loop = asyncio.new_event_loop()
+    runner = aiohttp.web.AppRunner(app)
+
+    def serve() -> None:
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(runner.setup())
+        site = aiohttp.web.TCPSite(runner, host="127.0.0.1", port=port)
+        loop.run_until_complete(site.start())
+        loop.run_forever()
+
+    thread = threading.Thread(target=serve, name="fake-auth-server", daemon=True)
+    thread.start()
+
+    base_url = f"http://127.0.0.1:{port}"
+    _wait_for_tcp(base_url)
+    try:
+        yield base_url
+    finally:
+        loop.call_soon_threadsafe(loop.stop)
+        thread.join(timeout=5)
+        asyncio.run(runner.cleanup())
+
+
+@pytest.fixture
 def fake_key_server(
     unused_tcp_port_factory: Callable[[], int],
 ) -> Generator[str, None, None]:
@@ -112,14 +150,17 @@ def fake_key_server(
 
 @pytest.fixture
 def run_server(
-    unused_tcp_port: int, fake_key_server: str
+    unused_tcp_port: int, fake_key_server: str, fake_auth_server: str
 ) -> Generator[DevServer, None, None]:
     """Run a dev server as a fixture scoped to the test.
 
     The dev server is configured to talk to the in-process ``fake_key_server``
     so that routes that depend on the key-server client resolve cleanly.
     """
-    extra_env = {"OT_AUDIT_SERVER_key_server_url": fake_key_server}
+    extra_env = {
+        "OT_AUDIT_SERVER_key_server_url": fake_key_server,
+        "OT_AUDIT_SERVER_auth_server_url": fake_auth_server,
+    }
     with DevServer(port=unused_tcp_port, extra_env=extra_env) as dev_server:
         dev_server.start()
         base_url = f"http://localhost:{dev_server.port}"
