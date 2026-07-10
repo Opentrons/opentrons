@@ -5,12 +5,14 @@ from contextlib import AsyncExitStack, asynccontextmanager
 from pathlib import Path
 from typing import AsyncGenerator, Optional, override
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from opentrons_shared_data.errors.exceptions import AuditLoggingError
 
 from server_utils import systemd_utils
 from server_utils.auth.resource_server.fastapi import (
+    AuthorizationError,
     build_authorization_checker,
+    handle_authorization_error,
     install_authorization_checker,
 )
 from server_utils.keys.fastapi import build_key_client, install_key_client
@@ -108,12 +110,19 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         yield
 
 
+async def _handle_auth_error_async(
+    request: Request, error: AuthorizationError
+) -> Response:
+    return handle_authorization_error(request, error)
+
+
 app = FastAPI(
     title="Opentrons Audit Server",
     openapi_url=None,
     docs_url=None,
     redoc_url=None,
     lifespan=_lifespan,
+    exception_handlers={AuthorizationError: _handle_auth_error_async},
 )
 
 app.include_router(ingest_router)
