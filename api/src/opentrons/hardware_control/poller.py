@@ -4,11 +4,14 @@ import logging
 from abc import ABC, abstractmethod
 from typing import AsyncGenerator, List, Optional
 
+from serial.serialutil import (  # type: ignore[import-untyped]
+    SerialException as PySerialSerialException,
+)
+
 from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
 
 from opentrons.drivers.asyncio.communication.errors import SerialException
 from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnectedError
-from serial.serialutil import SerialException as PySerialSerialException  # type: ignore[import-untyped]
 
 log = logging.getLogger(__name__)
 
