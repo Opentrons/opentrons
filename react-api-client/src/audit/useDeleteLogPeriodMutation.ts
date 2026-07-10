@@ -11,20 +11,29 @@ import type {
 } from 'react-query'
 import type { EmptyResponse } from '@opentrons/api-client'
 
+export interface DeleteLogPeriodParams {
+  logPeriodId: string
+  deletionKey: string
+}
+
 // TODO(nd, 2026-07-09): mirrors the TODO in deleteLogPeriod.ts — drop
 // EmptyResponse here too if the real server response shape differs.
 export type UseDeleteLogPeriodMutationResult = UseMutationResult<
   EmptyResponse,
   unknown,
-  string
+  DeleteLogPeriodParams
 > & {
-  deleteLogPeriod: UseMutateFunction<EmptyResponse, unknown, string>
+  deleteLogPeriod: UseMutateFunction<
+    EmptyResponse,
+    unknown,
+    DeleteLogPeriodParams
+  >
 }
 
 export type UseDeleteLogPeriodMutationOptions = UseMutationOptions<
   EmptyResponse,
   unknown,
-  string
+  DeleteLogPeriodParams
 >
 
 export function useDeleteLogPeriodMutation(
@@ -33,9 +42,9 @@ export function useDeleteLogPeriodMutation(
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<EmptyResponse, unknown, string>(
-    logPeriodId =>
-      deleteLogPeriod(host!, logPeriodId).then(response => {
+  const mutation = useMutation<EmptyResponse, unknown, DeleteLogPeriodParams>(
+    ({ logPeriodId, deletionKey }) =>
+      deleteLogPeriod(host!, logPeriodId, { deletionKey }).then(response => {
         queryClient
           .invalidateQueries(getQueryKey(host, 'audit', 'logPeriods'))
           .catch((e: Error) => {

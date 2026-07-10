@@ -10,3 +10,7 @@ export interface LogPeriodSummariesResponse {
 }
 
 export type DownloadedLogPeriodResponse = Blob | string
+
+export interface DeleteLogPeriodQueryParams {
+  deletionKey: string
+}

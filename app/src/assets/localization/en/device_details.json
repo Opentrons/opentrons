@@ -138,6 +138,7 @@
   "location": "Location",
   "location_conflicts": "Location conflicts",
   "log_period": "Log period {{number}}",
+  "log_period_deletion_key_missing": "Download this log period before deleting it.",
   "magdeck_gen1_height": "Height: {{height}}",
   "magdeck_gen2_height": "Height: {{height}} mm",
   "max_engage_height": "Max Engage Height",
