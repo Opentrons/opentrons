@@ -43,85 +43,85 @@ Pyro5.config.SERPENT_BYTES_REPR = True  # type: ignore
 
 
 # Estop Overall Status registry
-def _estop_overall_status_dict_to_class(  # type: ignore
-    classname, d
-) -> opentrons.hardware_control.types.EstopOverallStatus:
-    return opentrons.hardware_control.types.EstopOverallStatus(
-        state=opentrons.hardware_control.types.EstopState(d["state"]),
-        left_physical_state=opentrons.hardware_control.types.EstopPhysicalStatus(
-            d["left_physical_state"]
-        ),
-        right_physical_state=opentrons.hardware_control.types.EstopPhysicalStatus(
-            d["right_physical_state"]
-        ),
-    )
+# def _estop_overall_status_dict_to_class(  # type: ignore
+#     classname, d
+# ) -> opentrons.hardware_control.types.EstopOverallStatus:
+#     return opentrons.hardware_control.types.EstopOverallStatus(
+#         state=opentrons.hardware_control.types.EstopState(d["state"]),
+#         left_physical_state=opentrons.hardware_control.types.EstopPhysicalStatus(
+#             d["left_physical_state"]
+#         ),
+#         right_physical_state=opentrons.hardware_control.types.EstopPhysicalStatus(
+#             d["right_physical_state"]
+#         ),
+#     )
 
 
-def _estop_overall_status_class_to_dict(obj) -> Dict:  # type: ignore
-    return {
-        "__class__": "opentrons.hardware_control.types.EstopOverallStatus",
-        "state": obj.state.value,
-        "left_physical_state": obj.left_physical_state.value,
-        "right_physical_state": obj.right_physical_state.value,
-    }
+# def _estop_overall_status_class_to_dict(obj) -> Dict:  # type: ignore
+#     return {
+#         "__class__": "opentrons.hardware_control.types.EstopOverallStatus",
+#         "state": obj.state.value,
+#         "left_physical_state": obj.left_physical_state.value,
+#         "right_physical_state": obj.right_physical_state.value,
+#     }
 
 
 # GRIPPER CALIBRATION
 # todo(chb, 04-08-2026): This should be consumed into an automated registry process
-def _GripperCalibrationOffset_dict_to_class(  # type: ignore
-    classname, d
-) -> opentrons.hardware_control.instruments.ot3.instrument_calibration.GripperCalibrationOffset:
-    modified = (
-        None
-        if d["last_modified"] is None
-        else datetime.datetime.fromisoformat(d["last_modified"])
-    )
-    markedAt = (
-        None
-        if d["status_markedAt"] is None
-        else datetime.datetime.fromisoformat(d["status_markedAt"])
-    )
-    status_source = (
-        None
-        if d["status_source"] is None
-        else opentrons.hardware_control.instruments.ot3.instrument_calibration.SourceType(
-            d["status_source"]["value"]
-        )
-    )
-    return opentrons.hardware_control.instruments.ot3.instrument_calibration.GripperCalibrationOffset(
-        offset=opentrons.types.Point(x=d["offset_x"], y=d["offset_y"], z=d["offset_z"]),
-        source=opentrons.hardware_control.instruments.ot3.instrument_calibration.SourceType(
-            d["source"]["value"]
-        ),
-        status=opentrons.hardware_control.instruments.ot3.instrument_calibration.CalibrationStatus(
-            markedBad=(d["status_markedBad"] == "True"),
-            source=status_source,
-            markedAt=markedAt,
-        ),
-        last_modified=modified,
-    )
+# def _GripperCalibrationOffset_dict_to_class(  # type: ignore
+#     classname, d
+# ) -> opentrons.hardware_control.instruments.ot3.instrument_calibration.GripperCalibrationOffset:
+#     modified = (
+#         None
+#         if d["last_modified"] is None
+#         else datetime.datetime.fromisoformat(d["last_modified"])
+#     )
+#     markedAt = (
+#         None
+#         if d["status_markedAt"] is None
+#         else datetime.datetime.fromisoformat(d["status_markedAt"])
+#     )
+#     status_source = (
+#         None
+#         if d["status_source"] is None
+#         else opentrons.hardware_control.instruments.ot3.instrument_calibration.SourceType(
+#             d["status_source"]["value"]
+#         )
+#     )
+#     return opentrons.hardware_control.instruments.ot3.instrument_calibration.GripperCalibrationOffset(
+#         offset=opentrons.types.Point(x=d["offset_x"], y=d["offset_y"], z=d["offset_z"]),
+#         source=opentrons.hardware_control.instruments.ot3.instrument_calibration.SourceType(
+#             d["source"]["value"]
+#         ),
+#         status=opentrons.hardware_control.instruments.ot3.instrument_calibration.CalibrationStatus(
+#             markedBad=(d["status_markedBad"] == "True"),
+#             source=status_source,
+#             markedAt=markedAt,
+#         ),
+#         last_modified=modified,
+#     )
 
 
-def _GripperCalibrationOffset_class_to_dict(obj) -> Dict:  # type: ignore
-    if isinstance(obj.last_modified, datetime.datetime):
-        modified = obj.last_modified.isoformat()
-    else:
-        modified = None
-    if isinstance(obj.status.markedAt, datetime.datetime):
-        markedAt = obj.status.markedAt.isoformat()
-    else:
-        markedAt = None
-    return {
-        "__class__": "opentrons.hardware_control.instruments.ot3.instrument_calibration.GripperCalibrationOffset",
-        "offset_x": obj.offset.x,
-        "offset_y": obj.offset.y,
-        "offset_z": obj.offset.z,
-        "source": obj.source,
-        "status_markedBad": obj.status.markedBad,
-        "status_source": obj.status.source,
-        "status_markedAt": markedAt,
-        "last_modified": modified,
-    }
+# def _GripperCalibrationOffset_class_to_dict(obj) -> Dict:  # type: ignore
+#     if isinstance(obj.last_modified, datetime.datetime):
+#         modified = obj.last_modified.isoformat()
+#     else:
+#         modified = None
+#     if isinstance(obj.status.markedAt, datetime.datetime):
+#         markedAt = obj.status.markedAt.isoformat()
+#     else:
+#         markedAt = None
+#     return {
+#         "__class__": "opentrons.hardware_control.instruments.ot3.instrument_calibration.GripperCalibrationOffset",
+#         "offset_x": obj.offset.x,
+#         "offset_y": obj.offset.y,
+#         "offset_z": obj.offset.z,
+#         "source": obj.source,
+#         "status_markedBad": obj.status.markedBad,
+#         "status_source": obj.status.source,
+#         "status_markedAt": markedAt,
+#         "last_modified": modified,
+#     }
 
 
 # PIPETTER CALIBRATION
@@ -782,32 +782,33 @@ def register_hardware_types() -> None:
     # E-Stop Overall registration
     register_type_to_serpent(
         class_type=opentrons.hardware_control.types.EstopOverallStatus,
-        dict_to_class=_estop_overall_status_dict_to_class,
-        class_to_dict=_estop_overall_status_class_to_dict,
+        dict_to_class=opentrons.hardware_control.types.EstopOverallStatus.from_pyro_dict,
+        class_to_dict=opentrons.hardware_control.types.EstopOverallStatus.to_pyro_dict,
     )
 
     # todo(chb: 04-09-2026): These are direct serializations to support the initial robot server intergration, replace with automated solution where appropriate
     # gripper calibration
     register_type_to_serpent(
         class_type=opentrons.hardware_control.instruments.ot3.instrument_calibration.GripperCalibrationOffset,
-        dict_to_class=_GripperCalibrationOffset_dict_to_class,
-        class_to_dict=_GripperCalibrationOffset_class_to_dict,
+        dict_to_class=opentrons.hardware_control.instruments.ot3.instrument_calibration.GripperCalibrationOffset.from_pyro_dict,
+        class_to_dict=opentrons.hardware_control.instruments.ot3.instrument_calibration.GripperCalibrationOffset.to_pyro_dict,
     )
 
     # pipette calibration
     register_type_to_serpent(
         class_type=opentrons.hardware_control.instruments.ot3.instrument_calibration.PipetteOffsetSummary,
-        dict_to_class=_PipetteOffsetSummary_dict_to_class,
-        class_to_dict=_PipetteOffsetSummary_class_to_dict,
+        dict_to_class=opentrons.hardware_control.instruments.ot3.instrument_calibration.PipetteOffsetSummary.from_pyro_dict,
+        class_to_dict=opentrons.hardware_control.instruments.ot3.instrument_calibration.PipetteOffsetSummary.to_pyro_dict,
     )
 
     # OT3 Transforms
     register_type_to_serpent(
         class_type=opentrons.hardware_control.ot3_calibration.OT3Transforms,
-        dict_to_class=_ot3_transforms_dict_to_class,
-        class_to_dict=_ot3_transforms_class_to_dict,
+        dict_to_class=opentrons.hardware_control.ot3_calibration.OT3Transforms.from_pyro_dict,
+        class_to_dict=opentrons.hardware_control.ot3_calibration.OT3Transforms.to_pyro_dict,
     )
 
+    # CASEY NOTE this one remains
     # numpy registration
     register_type_to_serpent(
         class_type=float64,
@@ -818,15 +819,15 @@ def register_hardware_types() -> None:
     # point registration
     register_type_to_serpent(
         class_type=opentrons.types.Point,
-        dict_to_class=_point_dict_to_class,
-        class_to_dict=_point_class_to_dict,
+        dict_to_class=opentrons.types.Point.from_pyro_dict,
+        class_to_dict=opentrons.types.Point.to_pyro_dict,
     )
 
     # DoorStateNotification registration
     register_type_to_serpent(
         class_type=opentrons.hardware_control.types.DoorStateNotification,
-        dict_to_class=_door_notif_dict_to_class,
-        class_to_dict=_door_notif_class_to_dict,
+        dict_to_class=opentrons.hardware_control.types.DoorStateNotification.from_pyro_dict,
+        class_to_dict=opentrons.hardware_control.types.DoorStateNotification.to_pyro_dict,
     )
 
     # EstopStateNotification registration
@@ -878,6 +879,7 @@ def register_hardware_types() -> None:
         class_to_dict=_usb_port_class_to_dict,
     )
 
+    # CASEY NOTE: LEAVE THIS ONE
     # pathlib Path registration
     register_type_to_serpent(
         class_type=Path,

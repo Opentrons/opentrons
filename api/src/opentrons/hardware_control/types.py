@@ -1,7 +1,7 @@
 import enum
 import logging
 from asyncio import Queue
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from typing import (
     TYPE_CHECKING,
     Callable,
@@ -12,6 +12,7 @@ from typing import (
     TypeVar,
     Union,
     cast,
+    Any,
 )
 
 from pydantic import BaseModel, ConfigDict
@@ -389,6 +390,26 @@ class EstopOverallStatus:
     left_physical_state: EstopPhysicalStatus
     right_physical_state: EstopPhysicalStatus
 
+    @staticmethod
+    def to_pyro_dict(obj: "EstopOverallStatus") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        pyro_dict = {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "state": obj.state.value,
+            "left_physical_state": obj.left_physical_state.value,
+            "right_physical_state": obj.right_physical_state.value,
+        }
+        return pyro_dict
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "EstopOverallStatus":
+        """Consumed by Serpent, Convert from a Pyro Dictionary."""
+        return EstopOverallStatus(
+            state=EstopState(data["state"]),
+            left_physical_state=EstopPhysicalStatus(data["left_physical_state"]),
+            right_physical_state=EstopPhysicalStatus(data["right_physical_state"]),
+        )
+
 
 @dataclass
 class HepaFanState:
@@ -410,6 +431,26 @@ class DoorStateNotification:
     )
     new_state: DoorState = DoorState.CLOSED
     module_serial: str | None = None
+
+    @staticmethod
+    def to_pyro_dict(obj: "DoorStateNotification") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "event": obj.event,
+            "new_state": obj.new_state,
+            "module_serial": obj.module_serial,
+        }
+    
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "DoorStateNotification":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return DoorStateNotification(
+            event=HardwareEventType(data["event"]["value"]),
+            new_state=DoorState(data["new_state"]["value"]),
+            module_serial=data["module_serial"],
+        )
+
 
 
 @dataclass(frozen=True)
