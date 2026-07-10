@@ -9,6 +9,9 @@ from fastapi import FastAPI, Request, Response
 from opentrons_shared_data.errors.exceptions import AuditLoggingError
 
 from server_utils import systemd_utils
+from server_utils.auth.resource_server.authorization_checker import (
+    FailedClosedAuthorizationChecker,
+)
 from server_utils.auth.resource_server.fastapi import (
     AuthorizationError,
     build_authorization_checker,
@@ -102,6 +105,7 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             build_authorization_checker(
                 auth_server_uds=configuration.auth_server_uds,
                 auth_server_url=configuration.auth_server_url,
+                fallback=FailedClosedAuthorizationChecker,
             )
         )
         install_authorization_checker(app.state, authorization_checker)
