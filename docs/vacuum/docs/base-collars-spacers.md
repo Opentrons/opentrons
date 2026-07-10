@@ -28,8 +28,8 @@ The Vacuum Module includes two collars to match different labware profiles:
 Both collars accommodate standard ANSI/SLAS compliant filter plates across a span of different membrane pore sizes, ranging from very fine (0.22 μm) to coarse (100.0 μm).
 
 <figure class="side-by-side" markdown>
-![Illustration of short collar, 42 mm](images/collar-short.png)
-![Illustration of tall collar, 72 mm](images/collar-tall.png)
+![Illustration of short collar, 42 mm](images/collar-short.svg)
+![Illustration of tall collar, 72 mm](images/collar-tall.svg)
 <figcaption>Short collar (42 mm) and tall collar (72 mm)</figcaption>
 </figure>
 
