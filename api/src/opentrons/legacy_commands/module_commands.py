@@ -344,8 +344,13 @@ def vacuum_module_start_set_vacuum_pressure(
     ramp_rate: float | None,
     timeout_s: int | None,
     vent_after: bool | None,
+    equalize_timeout_s: int | None = None,
 ) -> command_types.VacuumModuleStartSetVacuumPressureCommand:
-    text = f"Setting module {self} pressure to {gauge_pressure_mbar} mbar: duration_s={duration_s}, ramp_rate={ramp_rate}, timeout_s={timeout_s}, vent_after={vent_after}"
+    text = (
+        f"Setting module {self} pressure to {gauge_pressure_mbar} mbar: "
+        f"duration_s={duration_s}, ramp_rate={ramp_rate}, timeout_s={timeout_s}, "
+        f"vent_after={vent_after}, equalize_timeout_s={equalize_timeout_s}"
+    )
     return {
         "name": command_types.VACUUM_MODULE_START_SET_VACUUM_PRESSURE,
         "payload": {"text": text},
@@ -359,8 +364,13 @@ def vacuum_module_start_set_vacuum_power(
     ramp_rate: float | None,
     timeout_s: int | None,
     vent_after: bool | None,
+    equalize_timeout_s: int | None = None,
 ) -> command_types.VacuumModuleStartSetVacuumPowerCommand:
-    text = f"Setting module {self} power to {percent_power}%: duration_s={duration_s}, ramp_rate={ramp_rate}, timeout_s={timeout_s}, vent_after={vent_after}"
+    text = (
+        f"Setting module {self} power to {percent_power}%: "
+        f"duration_s={duration_s}, ramp_rate={ramp_rate}, timeout_s={timeout_s}, "
+        f"vent_after={vent_after}, equalize_timeout_s={equalize_timeout_s}"
+    )
     return {
         "name": command_types.VACUUM_MODULE_START_SET_VACUUM_POWER,
         "payload": {"text": text},
@@ -396,8 +406,9 @@ def vacuum_module_start_execute_profile(
 
 def vacuum_module_open_vent(
     self: Any,
+    equalize_timeout_s: int | None = None,
 ) -> command_types.VacuumModuleOpenVentCommand:
-    text = f"Opening vent for {self}"
+    text = f"Opening vent for {self}: equalize_timeout_s={equalize_timeout_s}"
     return {
         "name": command_types.VACUUM_MODULE_OPEN_VENT,
         "payload": {"text": text},

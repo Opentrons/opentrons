@@ -67,7 +67,7 @@ class VacuumModuleCarboyFullError(ErrorOccurrence):
 class VacuumModuleError(ErrorOccurrence):
     """Returned when a recoverable vacuum module error has no specific mapping."""
 
-    isDefined: bool = False
+    isDefined: bool = True
     errorType: Literal["vacuumModuleError"] = "vacuumModuleError"
 
     errorCode: str = ErrorCodes.GENERAL_ERROR.value.code

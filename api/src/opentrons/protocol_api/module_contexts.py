@@ -1957,6 +1957,7 @@ class VacuumModuleContext(ModuleContext):
         ramp_rate: Optional[float] = None,
         timeout_s: Optional[int] = None,
         vent_after: Optional[bool] = None,
+        equalize_timeout_s: Optional[int] = None,
     ) -> Task:
         task = self._core.start_set_vacuum_pressure(
             gauge_pressure_mbar=gauge_pressure_mbar,
@@ -1964,6 +1965,7 @@ class VacuumModuleContext(ModuleContext):
             ramp_rate=ramp_rate,
             timeout_s=timeout_s,
             vent_after=vent_after,
+            equalize_timeout_s=equalize_timeout_s,
         )
 
         return Task(api_version=self._api_version, core=task)
@@ -1977,6 +1979,7 @@ class VacuumModuleContext(ModuleContext):
         ramp_rate: Optional[float] = None,
         timeout_s: Optional[int] = None,
         vent_after: Optional[bool] = None,
+        equalize_timeout_s: Optional[int] = None,
     ) -> Task:
         task = self._core.start_set_vacuum_power(
             percent_power=percent_power,
@@ -1984,6 +1987,7 @@ class VacuumModuleContext(ModuleContext):
             ramp_rate=ramp_rate,
             timeout_s=timeout_s,
             vent_after=vent_after,
+            equalize_timeout_s=equalize_timeout_s,
         )
 
         return Task(api_version=self._api_version, core=task)
@@ -2000,6 +2004,7 @@ class VacuumModuleContext(ModuleContext):
         steps: List[VacuumModuleStep],
         repetitions: int = 1,
         vent_after: bool = False,
+        equalize_timeout_s: Optional[int] = None,
     ) -> Task:
         """
         Starts a defined Vacuum Module profile and returns a [`Task`][opentrons.protocol_api.Task] representing its concurrent execution.
@@ -2027,15 +2032,18 @@ class VacuumModuleContext(ModuleContext):
             min_pressure=self.min_gauge_pressure_mbar,
         )
         task = self._core.start_execute_profile(
-            steps=validated_steps, repetitions=repetitions, vent_after=vent_after
+            steps=validated_steps,
+            repetitions=repetitions,
+            vent_after=vent_after,
+            equalize_timeout_s=equalize_timeout_s,
         )
         return Task(api_version=self._api_version, core=task)
 
     @requires_version(2, 30)
     @publish(command=cmds.vacuum_module_open_vent)
-    def open_vent(self) -> None:
+    def open_vent(self, equalize_timeout_s: Optional[int] = None) -> None:
         """Opens the vent."""
-        self._core.open_vent()
+        self._core.open_vent(equalize_timeout_s=equalize_timeout_s)
 
     @requires_version(2, 30)
     @publish(command=cmds.vacuum_module_close_vent)

@@ -16,6 +16,7 @@ from ..command import (
     BaseCommandCreate,
     SuccessData,
 )
+from opentrons.drivers.vacuum_module.driver import MAX_VAC_DURATION_S
 from opentrons.hardware_control.modules.types import (
     VacuumModuleCycle,
     VacuumModulePowerStep,
@@ -120,6 +121,10 @@ class StartRunProfileParams(BaseModel):
     ventAfter: bool = Field(
         False, description="Whether to open the vent after the profile is complete."
     )
+    equalizeTimeout: int | SkipJsonSchema[None] = Field(
+        None,
+        description="Time in seconds to wait for pressure equalization after the profile completes if ventAfter is True. Does not wait if None.",
+    )
     taskId: str | None = Field(None, description="The id of the profile task")
 
 
@@ -152,6 +157,12 @@ class StartRunProfileImpl(AbstractCommandImpl[StartRunProfileParams, _ExecuteRet
         self, params: StartRunProfileParams
     ) -> SuccessData[StartRunProfileResult]:
         """Run a vacuum module profile."""
+        e_timeout = params.equalizeTimeout
+        if e_timeout is not None and (e_timeout < 0 or e_timeout > MAX_VAC_DURATION_S):
+            raise ValueError(
+                f"Equalize timeout {e_timeout} is invalid, must be between 0-{MAX_VAC_DURATION_S} seconds."
+            )
+
         state_update = update_types.StateUpdate()
         profile: List[hc_profile_step] = []
         pump_engaged = False
@@ -176,6 +187,17 @@ class StartRunProfileImpl(AbstractCommandImpl[StartRunProfileParams, _ExecuteRet
                     await vm_hardware.execute_profile(
                         profile=profile, vent_after=params.ventAfter
                     )
+
+                    # Wait until we equalize pressure if the vent is open and the
+                    # pump is off
+                    if (
+                        params.equalizeTimeout is not None
+                        and not vm_hardware.pump_running
+                        and params.ventAfter
+                    ):
+                        await vm_hardware.wait_for_pressure_equalization(
+                            params.equalizeTimeout
+                        )
 
                     state_update.update_vacuum_module_pump_engaged(
                         params.moduleId, vm_hardware.pump_running

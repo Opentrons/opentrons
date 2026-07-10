@@ -1198,6 +1198,7 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
         ramp_rate: Optional[float] = None,
         timeout_s: Optional[int] = None,
         vent_after: Optional[bool] = None,
+        equalize_timeout_s: Optional[int] = None,
     ) -> EngineTaskCore:
         """Set vacuum pressure."""
         result = self._engine_client.execute_command_without_recovery(
@@ -1207,7 +1208,8 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
                 duration=duration,
                 rate=ramp_rate,
                 timeout=timeout_s,
-                ventAfter=vent_after if vent_after is not None else False,
+                ventAfter=vent_after if vent_after is not None else True,
+                equalizeTimeout=equalize_timeout_s,
             ),
             command_annotations=self._protocol_core.annotation_ids,
         )
@@ -1224,6 +1226,7 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
         ramp_rate: Optional[float] = None,
         timeout_s: Optional[int] = None,
         vent_after: Optional[bool] = None,
+        equalize_timeout_s: Optional[int] = None,
     ) -> EngineTaskCore:
         """Set vacuum power."""
         result = self._engine_client.execute_command_without_recovery(
@@ -1233,7 +1236,8 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
                 duration=duration,
                 rate=ramp_rate,
                 timeout=timeout_s,
-                ventAfter=vent_after if vent_after is not None else False,
+                ventAfter=vent_after if vent_after is not None else True,
+                equalizeTimeout=equalize_timeout_s,
             ),
             command_annotations=self._protocol_core.annotation_ids,
         )
@@ -1293,6 +1297,7 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
         steps: List[VacuumModuleStep],
         repetitions: int,
         vent_after: bool = False,
+        equalize_timeout_s: Optional[int] = None,
     ) -> EngineTaskCore:
         """Start the execution of a vacuum module profile and return a task."""
         self._repetitions = repetitions
@@ -1302,7 +1307,10 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
         )
         result = self._engine_client.execute_command_without_recovery(
             cmd.vacuum_module.StartRunProfileParams(
-                moduleId=self.module_id, profile=engine_steps, ventAfter=vent_after
+                moduleId=self.module_id,
+                profile=engine_steps,
+                ventAfter=vent_after,
+                equalizeTimeout=equalize_timeout_s,
             ),
             command_annotations=self._protocol_core.annotation_ids,
         )
@@ -1311,9 +1319,12 @@ class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
         )
         return start_execute_profile_result
 
-    def open_vent(self) -> None:
+    def open_vent(self, equalize_timeout_s: Optional[int] = None) -> None:
         self._engine_client.execute_command(
-            cmd.vacuum_module.OpenVentParams(moduleId=self.module_id),
+            cmd.vacuum_module.OpenVentParams(
+                moduleId=self.module_id,
+                equalizeTimeout=equalize_timeout_s,
+            ),
             command_annotations=self._protocol_core.annotation_ids,
         )
 

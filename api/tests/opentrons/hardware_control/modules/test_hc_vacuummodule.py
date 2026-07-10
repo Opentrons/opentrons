@@ -282,25 +282,25 @@ async def test_live_data_includes_target_power_after_set_pump_state(
         "pressure_atm",
         "firmware_gauge_pressure",
         "expected_gauge_pressure",
-        "expected_under_vacuum",
+        "expected_pressure_equalized",
     ),
     [
-        (700.0, 700.0, 1013.0, 0.0, -313.0, True),
-        (1013.0, 1013.0, 1013.0, 0.0, 0.0, False),
+        (700.0, 700.0, 1013.0, 0.0, -313.0, False),
+        (1013.0, 1013.0, 1013.0, 0.0, 0.0, True),
         (750.0, 700.0, 1013.0, -250.0, -288.0, False),
-        (1009.5, 1007.0, 1012.2, -5.2, -3.95, False),
+        (1009.5, 1007.0, 1012.2, -5.2, -3.95, True),
     ],
 )
-async def test_current_gauge_pressure_mbar_and_under_vacuum(
+async def test_current_gauge_pressure_mbar_and_pressure_equalized(
     subject: modules.VacuumModule,
     pressure_abs_a: float,
     pressure_abs_b: float,
     pressure_atm: float,
     firmware_gauge_pressure: float,
     expected_gauge_pressure: float,
-    expected_under_vacuum: bool,
+    expected_pressure_equalized: bool,
 ) -> None:
-    """Gauge pressure should be computed from absolute and atmospheric sensors."""
+    """Gauge pressure and pressure_equalized should be derived from sensor readings."""
     subject._reader.vacuum_state = VacuumState(
         target_gauge_pressure=-300.0,
         current_gauge_pressure=firmware_gauge_pressure,
@@ -313,7 +313,143 @@ async def test_current_gauge_pressure_mbar_and_under_vacuum(
     )
 
     assert subject.current_gauge_pressure_mbar == expected_gauge_pressure
-    assert subject.under_vacuum is expected_under_vacuum
+    assert subject.pressure_equalized is expected_pressure_equalized
+
+
+async def test_wait_for_pressure_equalization_returns_when_already_equalized(
+    subject: modules.VacuumModule,
+) -> None:
+    """It should return immediately when pressure is already equalized."""
+    subject._reader.vacuum_state = VacuumState(
+        target_gauge_pressure=0.0,
+        current_gauge_pressure=0.0,
+        pressure_abs_a=1013.0,
+        pressure_abs_b=1013.0,
+        pressure_atm=1013.0,
+        vacuum_enabled=False,
+        vacuum_duration=0,
+        vent_state=VentState.OPENED,
+    )
+
+    await subject.wait_for_pressure_equalization()
+
+
+async def test_wait_for_pressure_equalization_waits_until_equalized(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """It should poll until chamber pressure equalizes."""
+    subject._reader.vacuum_state = VacuumState(
+        target_gauge_pressure=0.0,
+        current_gauge_pressure=-300.0,
+        pressure_abs_a=700.0,
+        pressure_abs_b=700.0,
+        pressure_atm=1013.0,
+        vacuum_enabled=False,
+        vacuum_duration=0,
+        vent_state=VentState.OPENED,
+    )
+    unequalized_states = [
+        VacuumState(
+            target_gauge_pressure=0.0,
+            current_gauge_pressure=-300.0,
+            pressure_abs_a=700.0,
+            pressure_abs_b=700.0,
+            pressure_atm=1013.0,
+            vacuum_enabled=False,
+            vacuum_duration=0,
+            vent_state=VentState.OPENED,
+        ),
+        VacuumState(
+            target_gauge_pressure=0.0,
+            current_gauge_pressure=-50.0,
+            pressure_abs_a=950.0,
+            pressure_abs_b=950.0,
+            pressure_atm=1013.0,
+            vacuum_enabled=False,
+            vacuum_duration=0,
+            vent_state=VentState.OPENED,
+        ),
+    ]
+    equalized_state = VacuumState(
+        target_gauge_pressure=0.0,
+        current_gauge_pressure=0.0,
+        pressure_abs_a=1013.0,
+        pressure_abs_b=1013.0,
+        pressure_atm=1013.0,
+        vacuum_enabled=False,
+        vacuum_duration=0,
+        vent_state=VentState.OPENED,
+    )
+    read_calls = 0
+
+    async def _vacuum_state_side_effect() -> VacuumState:
+        nonlocal read_calls
+        read_calls += 1
+        if read_calls <= len(unequalized_states):
+            return unequalized_states[read_calls - 1]
+        return equalized_state
+
+    decoy.when(await mock_driver.get_vacuum_state()).then_do(_vacuum_state_side_effect)
+
+    await subject.wait_for_pressure_equalization(timeout_s=5.0)
+
+    assert read_calls >= len(unequalized_states)
+
+
+async def test_wait_for_pressure_equalization_raises_on_timeout(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """It should raise when pressure does not equalize within the timeout."""
+    stuck_state = VacuumState(
+        target_gauge_pressure=0.0,
+        current_gauge_pressure=-300.0,
+        pressure_abs_a=700.0,
+        pressure_abs_b=700.0,
+        pressure_atm=1013.0,
+        vacuum_enabled=False,
+        vacuum_duration=0,
+        vent_state=VentState.OPENED,
+    )
+    subject._reader.vacuum_state = stuck_state
+
+    async def _vacuum_state_side_effect() -> VacuumState:
+        return stuck_state
+
+    decoy.when(await mock_driver.get_vacuum_state()).then_do(_vacuum_state_side_effect)
+
+    with pytest.raises(RuntimeError, match="did not equalize"):
+        await subject.wait_for_pressure_equalization(timeout_s=0.05)
+
+
+async def test_wait_for_pressure_equalization_does_not_complete_when_sensors_disagree(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """It should keep waiting when derived gauge pressure is not yet equalized."""
+    disagreeing_state = VacuumState(
+        target_gauge_pressure=0.0,
+        current_gauge_pressure=-50.0,
+        pressure_abs_a=1013.0,
+        pressure_abs_b=950.0,
+        pressure_atm=1013.0,
+        vacuum_enabled=False,
+        vacuum_duration=0,
+        vent_state=VentState.OPENED,
+    )
+    subject._reader.vacuum_state = disagreeing_state
+
+    async def _vacuum_state_side_effect() -> VacuumState:
+        return disagreeing_state
+
+    decoy.when(await mock_driver.get_vacuum_state()).then_do(_vacuum_state_side_effect)
+
+    with pytest.raises(RuntimeError, match="did not equalize"):
+        await subject.wait_for_pressure_equalization(timeout_s=0.05)
 
 
 @pytest.mark.parametrize(
