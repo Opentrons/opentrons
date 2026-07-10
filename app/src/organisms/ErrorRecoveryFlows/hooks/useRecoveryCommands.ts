@@ -20,6 +20,7 @@ import { DEFINED_ERROR_TYPES, ERROR_KINDS, RECOVERY_MAP } from '../constants'
 
 import type { CommandData, IfMatchType, RunAction } from '@opentrons/api-client'
 import type { WellGroup } from '@opentrons/components'
+import type { DocumentedAction } from '@opentrons/react-api-client'
 import type {
   AspDispWhileTrackingParams,
   AspirateInPlaceRunTimeCommand,
@@ -149,14 +150,19 @@ export function useRecoveryCommands({
   const chainRunRecoveryCommands = useCallback(
     (
       commands: CreateCommand[],
-      continuePastFailure: boolean = false
-    ): Promise<CommandData[]> =>
-      chainRunCommands(commands, continuePastFailure)
-        // the catch never occurs if continuePastCommandFailure is "true"
-        .catch((e: Error) => reportAndRouteFailedCmd(e)),
+      continuePastFailure: boolean = false,
+      recoveryAction?: DocumentedAction
+    ): Promise<CommandData[]> => {
+      if (!!recoveryAction) addActionToDocument(recoveryAction)
+      return (
+        chainRunCommands(commands, continuePastFailure)
+          // the catch never occurs if continuePastCommandFailure is "true"
+          .catch((e: Error) => reportAndRouteFailedCmd(e))
+      )
+    },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [analytics, selectedRecoveryOption]
+    [analytics, selectedRecoveryOption, addActionToDocument]
   )
 
   const buildRetryPrepMove = ():
@@ -302,7 +308,9 @@ export function useRecoveryCommands({
           // move back to the location of the command if it is an in-place command
           buildRetryPrepMove(),
           { commandType, params }, // retry the command that failed
-        ].filter(c => c != null) as CreateCommand[]
+        ].filter(c => c != null) as CreateCommand[],
+        false,
+        'retry_action'
       ) // the created command is the same command that failed
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.

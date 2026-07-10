@@ -144,6 +144,7 @@ type AuditLogAction =
   | 'launching_error_recovery'
   | 'resume_run_from_recovery'
   | 'dismiss_run'
+  | 'retry_action'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.

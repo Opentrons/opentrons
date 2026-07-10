@@ -34,5 +34,6 @@
   "finish_recalibrate_gripper": "Finishing recalibrate gripper flow",
   "create_protocol": "Creating protocol",
   "launching_error_recovery": "Launching error recovery",
-  "resume_run_from_recovery": "Resuming protocol run from recovery mode"
+  "resume_run_from_recovery": "Resuming protocol run from recovery mode",
+  "retry_action": "Retrying step"
 }
