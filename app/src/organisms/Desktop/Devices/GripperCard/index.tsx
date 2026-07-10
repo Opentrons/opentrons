@@ -86,10 +86,10 @@ export function GripperCard({
     }
 
     return () => {
-        if (timeoutId == null) {
-          clearTimeout(timeoutId);
-        }
-      };
+      if (timeoutId == null) {
+        clearTimeout(timeoutId)
+      }
+    }
   }, [attachedGripper?.ok, subsystemUpdateData])
 
   const menuOverlayItems =
