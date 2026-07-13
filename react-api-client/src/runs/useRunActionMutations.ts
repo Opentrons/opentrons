@@ -58,12 +58,12 @@ export function useRunActionMutations(
   const {
     resumeRunFromRecovery,
     isLoading: isResumeRunFromRecoveryActionLoading,
-  } = useResumeRunFromRecoveryMutation()
+  } = useResumeRunFromRecoveryMutation(documentationState)
 
   const {
     resumeRunFromRecoveryAssumingFalsePositive,
     isLoading: isResumeRunFromRecoveryAssumingFalsePositiveActionLoading,
-  } = useResumeRunFromRecoveryAssumingFalsePositiveMutation()
+  } = useResumeRunFromRecoveryAssumingFalsePositiveMutation(documentationState)
 
   return {
     playRun: () => {

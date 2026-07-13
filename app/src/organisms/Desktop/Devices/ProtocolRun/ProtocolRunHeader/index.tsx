@@ -12,6 +12,7 @@ import {
 } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useInitializeCameraState } from '/app/local-resources/images/hooks/useInitializeCameraState'
 import { isCancellableStatus } from '/app/local-resources/runs/utils'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
@@ -68,7 +69,10 @@ export function ProtocolRunHeader(
     runStatus: runStatus,
     runId,
   })
-  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
+
+  const documentationState = useDocumentationState()
+  const { closeCurrentRun, isClosingCurrentRun } =
+    useCloseCurrentRun(documentationState)
 
   const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
   const protocolRunControls = useRunHeaderRunControls(runId, robotName)

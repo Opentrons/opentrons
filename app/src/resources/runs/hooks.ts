@@ -48,9 +48,16 @@ type CreateRunCommandMutation = Omit<
 
 export function useCreateRunCommandMutation(
   runId: string,
+  documentationState: DocumentationState,
+  actionsToDocument: DocumentedAction[],
+  addActionToDocument: (action: DocumentedAction) => void,
   failedCommandId?: string
 ): CreateRunCommandMutation {
-  const createCommandMutation = useCreateCommandMutation()
+  const createCommandMutation = useCreateCommandMutation(
+    documentationState,
+    actionsToDocument,
+    addActionToDocument
+  )
 
   return {
     ...createCommandMutation,
@@ -68,6 +75,9 @@ export function useCreateRunCommandMutation(
 
 export function useChainRunCommands(
   runId: string,
+  documentationState: DocumentationState,
+  actionsToDocument: DocumentedAction[],
+  addActionToDocument: (action: DocumentedAction) => void,
   failedCommandId?: string,
   recoveryPolicy?: ErrorRecoveryPolicy
 ): {
@@ -81,6 +91,9 @@ export function useChainRunCommands(
 
   const { createRunCommand } = useCreateRunCommandMutation(
     runId,
+    documentationState,
+    actionsToDocument,
+    addActionToDocument,
     failedCommandId
   )
   return {

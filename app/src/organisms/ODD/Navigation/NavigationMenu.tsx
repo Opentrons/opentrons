@@ -17,6 +17,7 @@ import {
 import { useHomeMutation } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useLights } from '/app/resources/devices'
 
@@ -34,8 +35,9 @@ interface NavigationMenuProps {
 export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
   const { onClick, robotName, setShowNavMenu } = props
   const { t, i18n } = useTranslation(['devices_landing', 'robot_controls'])
+  const documentationState = useDocumentationState()
   const { lightsOn, toggleLights } = useLights()
-  const { home } = useHomeMutation()
+  const { home } = useHomeMutation(documentationState)
   const [
     showRestartRobotConfirmationModal,
     setShowRestartRobotConfirmationModal,

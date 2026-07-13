@@ -44,7 +44,12 @@ export function useDropTipWithType(
     deletionDocState,
     actionsToDocument,
     addActionToDocument,
-  } = useMaintenanceRunDocumentation('drop_tips', closeFlow)
+  } = useMaintenanceRunDocumentation(
+    'drop_tips',
+    // Prefer the fixit cancel handler so ER does not re-enter drop tip (and
+    // re-prompt) when the user backs out of documentation.
+    fixitCommandTypeUtils?.onDocumentationCancel ?? closeFlow
+  )
   const activeMaintenanceRunId = useDropTipMaintenanceRun({
     ...params,
     setErrorDetails,

@@ -124,6 +124,7 @@ type AuditLogAction =
   | 'place_plate_reader_lid'
   | 'end_plate_reader_lid'
   | 'home_pipettes'
+  | 'home_robot'
   | 'end_home_pipettes'
   | 'attach_gripper'
   | 'detach_gripper'
@@ -141,6 +142,10 @@ type AuditLogAction =
   | 'attach_pipette_left'
   | 'attach_pipette_right'
   | 'create_protocol'
+  | 'launching_error_recovery'
+  | 'resume_run_from_recovery'
+  | 'dismiss_run'
+  | 'retry_action'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.

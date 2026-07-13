@@ -7,6 +7,12 @@ import { useCommandTextString } from '@opentrons/components'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+import {
+  useCurrentRunId,
+  useMostRecentCompletedAnalysis,
+  useNotifyRunQuery,
+  useRunLoadedLabwareDefinitionsByUri,
+} from '/app/resources/runs'
 
 import { ActionsView } from '../ActionsView'
 
@@ -14,6 +20,12 @@ import type { DocumentedAction } from '@opentrons/react-api-client'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 
 vi.mock('/app/resources/maintenance_runs')
+vi.mock('/app/resources/runs', () => ({
+  useCurrentRunId: vi.fn(),
+  useNotifyRunQuery: vi.fn(),
+  useMostRecentCompletedAnalysis: vi.fn(),
+  useRunLoadedLabwareDefinitionsByUri: vi.fn(),
+}))
 vi.mock('@opentrons/components', async () => {
   const actual = await vi.importActual('@opentrons/components')
   return {
@@ -48,6 +60,10 @@ const renderWithModal = (actionsToDocument: DocumentedAction[]) => {
 
 describe('ActionsView', () => {
   beforeEach(() => {
+    vi.mocked(useCurrentRunId).mockReturnValue(null)
+    vi.mocked(useNotifyRunQuery).mockReturnValue({ data: undefined } as any)
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue(null)
+    vi.mocked(useRunLoadedLabwareDefinitionsByUri).mockReturnValue(null)
     vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
       data: {
         data: {
@@ -150,7 +166,40 @@ describe('ActionsView', () => {
     )
   })
 
-  it('renders stringified runtime commands when maintenance run data is unavailable', () => {
+  it('renders command text for runtime commands when protocol run data is available', () => {
+    vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
+      data: undefined,
+    } as any)
+    vi.mocked(useCurrentRunId).mockReturnValue('run-id')
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: {
+        data: {
+          pipettes: [],
+          labware: [],
+          modules: [],
+          liquids: [],
+        },
+      },
+    } as any)
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
+      commands: [],
+    } as any)
+    vi.mocked(useRunLoadedLabwareDefinitionsByUri).mockReturnValue({})
+
+    renderWithModal([HOME_COMMAND])
+    screen.getByText('Mock command text')
+    expect(useCommandTextString).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: HOME_COMMAND,
+        robotType: 'OT-3 Standard',
+        commandTextData: expect.objectContaining({
+          commands: [HOME_COMMAND],
+        }),
+      })
+    )
+  })
+
+  it('renders stringified runtime commands when run data is unavailable', () => {
     vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
       data: undefined,
     } as any)

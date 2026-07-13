@@ -2,6 +2,7 @@ import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  isDocumentedMutationError,
   useErrorRecoveryPolicy,
   useResumeRunFromRecoveryAssumingFalsePositiveMutation,
   useResumeRunFromRecoveryMutation,
@@ -47,8 +48,10 @@ describe('useRecoveryCommands', () => {
     pickUpTipLabware: { id: 'MOCK_LW_ID' },
   } as any
   const mockProceedToRouteAndStep = vi.fn()
+  const mockStashedMapRef = { current: null as any }
   const mockRouteUpdateActions = {
     proceedToRouteAndStep: mockProceedToRouteAndStep,
+    stashedMapRef: mockStashedMapRef,
   } as any
   const mockMakeSuccessToast = vi.fn()
   const mockResumeRunFromRecovery = vi.fn(() =>
@@ -81,6 +84,7 @@ describe('useRecoveryCommands', () => {
   }
 
   beforeEach(() => {
+    vi.mocked(isDocumentedMutationError).mockReturnValue(false)
     vi.mocked(useResumeRunFromRecoveryMutation).mockReturnValue({
       mutateAsync: mockResumeRunFromRecovery,
     } as any)
@@ -116,6 +120,10 @@ describe('useRecoveryCommands', () => {
 
   it(`should call proceedToRouteAndStep with ${RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE} when chainRunCommands throws an error`, async () => {
     const mockError = new Error('Mock error')
+    mockStashedMapRef.current = {
+      route: RECOVERY_MAP.RETRY_STEP.ROUTE,
+      step: RECOVERY_MAP.RETRY_STEP.STEPS.CONFIRM_RETRY,
+    }
     vi.mocked(useChainRunCommands).mockReturnValue({
       chainRunCommands: vi.fn().mockRejectedValue(mockError),
     } as any)
@@ -128,9 +136,37 @@ describe('useRecoveryCommands', () => {
       )
     })
 
+    expect(mockStashedMapRef.current).toBeNull()
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE
     )
+  })
+
+  it('should rethrow DocumentedMutationError without routing to ERROR_WHILE_RECOVERING', async () => {
+    const mockError = new Error('No documentation report provided')
+    const mockHandleMotionRouting = vi.fn(() => Promise.resolve())
+    mockProceedToRouteAndStep.mockClear()
+    vi.mocked(isDocumentedMutationError).mockReturnValue(true)
+    vi.mocked(useChainRunCommands).mockReturnValue({
+      chainRunCommands: vi.fn().mockRejectedValue(mockError),
+    } as any)
+
+    const { result } = renderHook(() =>
+      useRecoveryCommands({
+        ...props,
+        routeUpdateActions: {
+          ...mockRouteUpdateActions,
+          handleMotionRouting: mockHandleMotionRouting,
+        },
+      })
+    )
+
+    await act(async () => {
+      await expect(result.current.homePipetteZAxes()).rejects.toBe(mockError)
+    })
+
+    expect(mockHandleMotionRouting).toHaveBeenCalledWith(false)
+    expect(mockProceedToRouteAndStep).not.toHaveBeenCalled()
   })
 
   it('should call retryFailedCommand with the failedCommand', async () => {
@@ -401,12 +437,69 @@ describe('useRecoveryCommands', () => {
     expect(mockMakeSuccessToast).toHaveBeenCalled()
   })
 
+  it('should restore the previous screen when resumeRun documentation is cancelled', async () => {
+    const mockHandleMotionRouting = vi.fn(() => Promise.resolve())
+    mockMakeSuccessToast.mockClear()
+    vi.mocked(isDocumentedMutationError).mockReturnValue(true)
+    mockResumeRunFromRecovery.mockRejectedValueOnce(
+      new Error('No documentation report provided')
+    )
+
+    const { result } = renderHook(() =>
+      useRecoveryCommands({
+        ...props,
+        routeUpdateActions: {
+          ...mockRouteUpdateActions,
+          handleMotionRouting: mockHandleMotionRouting,
+        },
+      })
+    )
+
+    await act(async () => {
+      result.current.resumeRun()
+    })
+
+    expect(mockHandleMotionRouting).toHaveBeenCalledWith(false)
+    expect(mockMakeSuccessToast).not.toHaveBeenCalled()
+  })
+
   it('should call cancelRun with runId', () => {
     const { result } = renderHook(() => useRecoveryCommands(props))
 
     result.current.cancelRun()
 
-    expect(mockStopRun).toHaveBeenCalledWith(mockRunId)
+    expect(mockStopRun).toHaveBeenCalledWith(
+      mockRunId,
+      expect.objectContaining({
+        onSuccess: expect.any(Function),
+        onError: expect.any(Function),
+      })
+    )
+  })
+
+  it('should return to confirm cancel when cancelRun documentation is cancelled', async () => {
+    mockStopRun.mockClear()
+    mockProceedToRouteAndStep.mockClear()
+    mockStashedMapRef.current = {
+      route: RECOVERY_MAP.DROP_TIP_FLOWS.ROUTE,
+      step: RECOVERY_MAP.DROP_TIP_FLOWS.STEPS.BEFORE_BEGINNING,
+    }
+    vi.mocked(isDocumentedMutationError).mockReturnValue(true)
+
+    const { result } = renderHook(() => useRecoveryCommands(props))
+
+    result.current.cancelRun()
+
+    const onError = mockStopRun.mock.calls[0][1].onError as (
+      error: unknown
+    ) => void
+    onError(new Error('No documentation report provided'))
+
+    expect(mockStashedMapRef.current).toBeNull()
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+      RECOVERY_MAP.CANCEL_RUN.ROUTE,
+      RECOVERY_MAP.CANCEL_RUN.STEPS.CONFIRM_CANCEL
+    )
   })
 
   it('should call homePipetteZAxes with the appropriate command', async () => {
@@ -618,6 +711,32 @@ describe('useRecoveryCommands', () => {
 
     expect(mockResumeRunFromRecovery).toHaveBeenCalledWith(mockRunId)
     expect(mockMakeSuccessToast).toHaveBeenCalled()
+  })
+
+  it('should restore the previous screen when skipFailedCommand documentation is cancelled', async () => {
+    const mockHandleMotionRouting = vi.fn(() => Promise.resolve())
+    mockMakeSuccessToast.mockClear()
+    vi.mocked(isDocumentedMutationError).mockReturnValue(true)
+    mockResumeRunFromRecovery.mockRejectedValueOnce(
+      new Error('No documentation report provided')
+    )
+
+    const { result } = renderHook(() =>
+      useRecoveryCommands({
+        ...props,
+        routeUpdateActions: {
+          ...mockRouteUpdateActions,
+          handleMotionRouting: mockHandleMotionRouting,
+        },
+      })
+    )
+
+    await act(async () => {
+      result.current.skipFailedCommand()
+    })
+
+    expect(mockHandleMotionRouting).toHaveBeenCalledWith(false)
+    expect(mockMakeSuccessToast).not.toHaveBeenCalled()
   })
 
   it('should call updateErrorRecoveryPolicy with correct policy rules when failedCommand has an error', async () => {

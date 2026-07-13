@@ -37,6 +37,7 @@ import {
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 import { useModuleUSBPort } from '/app/local-resources/modules'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
@@ -73,6 +74,7 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     createMaintenanceRun,
     maintenanceRunId,
     setErrorMessage,
+    setIsDoorOpenError,
   } = props
 
   const configuredFixtureIdByCutoutId = getFixtureIdByCutoutIdForModule(
@@ -94,7 +96,12 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     if (maintenanceRunId == null) {
       createMaintenanceRun({})
         .catch(error => {
-          setErrorMessage(error.message as string)
+          if (isMaintenanceDoorOpenError(error)) {
+            setIsDoorOpenError(true)
+            setErrorMessage(t('door_is_open') as string)
+          } else {
+            setErrorMessage(error.message as string)
+          }
         })
         .then(proceed)
     } else {
