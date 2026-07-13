@@ -17,7 +17,7 @@ Flex partial-tip tests in Protocol Designer. Each test imports a deck fixture, a
 - Fixture: `single_eight_partial_tip_setup.py`
 - 18 steps: partial nozzles **2/8–7/8** × paths **transfer / distribute / consolidate**
 - Per path: mix of **Always / Once**, **automatic / manual** tip tracking, **tip rack / waste chute** drop
-- Wells aligned to bottom *N* rows of a column; primary nozzle bottom-aligned (e.g. 5/8 → D1)
+- Wells aligned to bottom _N_ rows of a column; primary nozzle bottom-aligned (e.g. 5/8 → D1)
 - Once steps run before Always (manual tips not blocked by prior auto pickups)
 - Extra steps:
   - 5/8 partial, 384→TC, manual tips, waste chute (H23→H1)
