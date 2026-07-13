@@ -2,5 +2,6 @@
 *.egg
 build
 htmlcov
-
+*.env
 abr_testing/_version.py
+slack_app_manifest.yaml

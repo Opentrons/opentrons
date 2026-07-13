@@ -209,6 +209,12 @@ def run(protocol: ProtocolContext) -> None:
         # Always use 96-channel (ALL) configuration - no column pickups allowed
         p200.configure_nozzle_layout(style=ALL, tip_racks=[tip_rack])
 
+    # tiprack_20_X is the C2 wash rack. It must not be re-picked after tips are
+    # consumed; replace_tiprack_20_X_on_c2() discards the spent rack and loads
+    # a full one. Defined after stackers load (see below).
+    tiprack_20_X: Labware | None = None
+    b4_full_20ul_remaining = 6
+
     # ========== FIRST ROW ===========
     try:
         if ONDECK_THERMO:
@@ -378,6 +384,60 @@ def run(protocol: ProtocolContext) -> None:
             # DECK OFFSETS
             deck_drop_offset = {"x": 0, "y": 0, "z": 0}
             deck_pick_up_offset = {"x": 0, "y": 0, "z": 0}
+
+        def take_full_20ul_from_b4() -> Labware:
+            """Retrieve a full 20 µL tiprack from B4, refilling when virgin stock is gone.
+
+            B4 must stay a virgin-only source: never store spent racks into
+            stacker_20_2 (use A4 / trash instead). Stored empties become the
+            next retrieve and cause OutOfTipsError on wash pickups.
+            """
+            nonlocal b4_full_20ul_remaining
+            if b4_full_20ul_remaining <= 0:
+                if len(stacker_20_2.get_stored_labware()) > 0:
+                    stacker_20_2.empty(
+                        message="Remove empty/recycled 20 µL tipracks from B4"
+                    )
+                stacker_20_2.fill(
+                    count=6,
+                    message="Refill B4 with FULL 20 µL tipracks for wash/sup steps",
+                )
+                b4_full_20ul_remaining = 6
+            tiprack = stacker_20_2.retrieve()
+            b4_full_20ul_remaining -= 1
+            return tiprack
+
+        def discard_tiprack_20_X_from_c2() -> None:
+            """Move spent tiprack_20_X off C2 (do not recycle empties into A4)."""
+            nonlocal tiprack_20_X
+            assert tiprack_20_X is not None
+            protocol.comment("MOVING: tiprack_20_X = SCP_Position --> TRASH (spent)")
+            protocol.move_labware(
+                labware=tiprack_20_X,
+                new_location=TRASH,
+                use_gripper=True,
+                pick_up_offset=deck_pick_up_offset,
+            )
+            tiprack_20_X = None
+
+        def retrieve_tiprack_20_X_to_c2() -> Labware:
+            """Retrieve a full 20 µL rack from B4 onto C2 for the next wash."""
+            nonlocal tiprack_20_X
+            protocol.comment("MOVING: tiprack_20_X = B4 --> SCP_Position")
+            tiprack_20_X = take_full_20ul_from_b4()
+            protocol.move_labware(
+                labware=tiprack_20_X,
+                new_location=tiprack_C2_adapter,
+                use_gripper=True,
+                pick_up_offset=deck_pick_up_offset,
+                drop_offset=deck_drop_offset,
+            )
+            return tiprack_20_X
+
+        def replace_tiprack_20_X_on_c2() -> Labware:
+            """Discard spent C2 wash rack and load a fresh one from the stacker."""
+            discard_tiprack_20_X_from_c2()
+            return retrieve_tiprack_20_X_to_c2()
 
         # ========================================================
         # ========================================= PROTOCOL START
@@ -687,7 +747,7 @@ def run(protocol: ProtocolContext) -> None:
                 )
             protocol.comment("MOVING: tiprack_20_2 = A4 --> tiprack_A3_adapter")
             protocol.move_labware(CleanupPlate_2, stacker_50_1, use_gripper=True)
-            tiprack_20_2 = stacker_20_2.retrieve()
+            tiprack_20_2 = take_full_20ul_from_b4()
             protocol.move_labware(
                 labware=tiprack_20_2,
                 new_location=tiprack_A3_adapter,
@@ -746,7 +806,7 @@ def run(protocol: ProtocolContext) -> None:
                     use_gripper=False,
                 )
             protocol.comment("MOVING: tiprack_20_X = B4 --> SCP_Position")
-            tiprack_20_X = stacker_20_2.retrieve()
+            tiprack_20_X = take_full_20ul_from_b4()
             protocol.move_labware(
                 labware=tiprack_20_X,
                 new_location=tiprack_C2_adapter,
@@ -777,13 +837,13 @@ def run(protocol: ProtocolContext) -> None:
             p200.move_to(sample_plate_1["A1"].top(z=5))
             p200.move_to(sample_plate_1["A1"].top(z=0))
             p200.move_to(sample_plate_1["A1"].top(z=5))
-            p200.return_tip()
+            p200.drop_tip()
             # ===============================================
 
             # ============================================================================================
             protocol.comment("DISPENSING: tiprack_20_3 = #2--> A4")
             protocol.comment("MOVING: tiprack_20_3 = A4 --> tiprack_A3_adapter")
-            tiprack_20_3 = stacker_20_2.retrieve()
+            tiprack_20_3 = take_full_20ul_from_b4()
             protocol.move_labware(
                 labware=tiprack_20_3,
                 new_location=tiprack_A3_adapter,
@@ -816,6 +876,9 @@ def run(protocol: ProtocolContext) -> None:
             p200.return_tip()
             # ===============================================
 
+            # Fresh rack for ETOH Wash 1B — do not re-pick spent tips on C2
+            tiprack_20_X = replace_tiprack_20_X_on_c2()
+
             protocol.comment("--> ETOH Wash 1B")
             ETOHMaxVol = 12
             p200.flow_rate.aspirate = p200_flow_rate_aspirate_default * 0.5
@@ -823,7 +886,6 @@ def run(protocol: ProtocolContext) -> None:
             p200.flow_rate.blow_out = p200_flow_rate_blow_out_default * 0.5
             nozzlecheck("96", tiprack_20_X)
             # ===============================================
-            p200.reset_tipracks()
             p200.pick_up_tip()
             p200.aspirate(
                 ETOHMaxVol, ETOH_reservoir["A1"].bottom(z=Deepwell_Z_offset + 1)
@@ -838,7 +900,7 @@ def run(protocol: ProtocolContext) -> None:
             p200.move_to(sample_plate_1["A1"].top(z=5))
             p200.move_to(sample_plate_1["A1"].top(z=0))
             p200.move_to(sample_plate_1["A1"].top(z=5))
-            p200.return_tip()
+            p200.drop_tip()
             # ===============================================
 
             # ============================================================================================
@@ -863,7 +925,7 @@ def run(protocol: ProtocolContext) -> None:
                     pick_up_offset=deck_pick_up_offset,
                 )
             protocol.comment("DISPENSING: tiprack_20_4 = #3--> A4")
-            tiprack_20_4 = stacker_20_2.retrieve()
+            tiprack_20_4 = take_full_20ul_from_b4()
             protocol.comment("MOVING: tiprack_20_4 = A4 --> tiprack_A3_adapter")
             protocol.move_labware(
                 labware=tiprack_20_4,
@@ -925,12 +987,8 @@ def run(protocol: ProtocolContext) -> None:
             protocol.move_labware(
                 labware=CleanupPlate_1, new_location=stacker_20_1, use_gripper=True
             )
-            protocol.comment("MOVING: tiprack_20_X = SCP_Position --> A3")
-            protocol.move_labware(
-                labware=tiprack_20_X,
-                new_location=tiprack_A3_adapter,
-                use_gripper=True,
-            )
+            # Free C2 for 50 µL tips; spent wash rack is discarded (not reused)
+            discard_tiprack_20_X_from_c2()
 
             protocol.comment("DISPENSING: tiprack_50_4 = #3--> D4")
             tiprack_50_4 = stacker_50_2.retrieve()
@@ -994,14 +1052,6 @@ def run(protocol: ProtocolContext) -> None:
                     use_gripper=True,
                     pick_up_offset=deck_pick_up_offset,
                 )
-            protocol.comment("MOVING: tiprack_20_X = B4 --> SCP_Position")
-            protocol.move_labware(
-                labware=tiprack_20_X,
-                new_location=tiprack_C2_adapter,
-                use_gripper=True,
-                pick_up_offset=deck_pick_up_offset,
-                drop_offset=deck_drop_offset,
-            )
             protocol.comment("DISPENSING: tiprack_50_5 = #4--> D4")
             tiprack_50_5 = stacker_50_2.retrieve()
             protocol.comment("MOVING: tiprack_50_5 = D4 --> tiprack_A3_adapter")
@@ -1101,15 +1151,6 @@ def run(protocol: ProtocolContext) -> None:
                     use_gripper=True,
                     pick_up_offset=deck_pick_up_offset,
                 )
-            protocol.comment(
-                "MOVING: tiprack_20_X = SCP_Position --> tiprack_A3_adapter"
-            )
-
-            protocol.move_labware(
-                labware=tiprack_20_X,
-                new_location=tiprack_A3_adapter,
-                use_gripper=True,
-            )
             protocol.comment("DISPENSING: tiprack_50_6 = #4--> D4")
             tiprack_50_6 = stacker_50_2.retrieve()
             protocol.comment("MOVING: tiprack_50_6 = D4 --> SCP_Position")
@@ -1187,16 +1228,7 @@ def run(protocol: ProtocolContext) -> None:
                     new_location=OFF_DECK,
                     use_gripper=False,
                 )
-            protocol.comment(
-                "MOVING: tiprack_20_X = tiprack_A3_adapter --> SCP_Position"
-            )
-            protocol.move_labware(
-                labware=tiprack_20_X,
-                new_location=tiprack_C2_adapter,
-                use_gripper=True,
-                pick_up_offset=deck_pick_up_offset,
-                drop_offset=deck_drop_offset,
-            )
+            # Clear B4 carriage (CleanupPlate_2) before any stacker_20_2 retrieve
             protocol.comment("MOVING: CleanupPlate_1 = A4 --> D4")
             protocol.move_labware(
                 labware=CleanupPlate_1,
@@ -1205,9 +1237,12 @@ def run(protocol: ProtocolContext) -> None:
                 pick_up_offset=deck_pick_up_offset,
                 drop_offset=deck_drop_offset,
             )
-            protocol.comment("DISPENSING: tiprack_20_5 = #3--> A4")
+            protocol.comment("MOVING: CleanupPlate_2 = B4 --> C4")
             protocol.move_labware(CleanupPlate_2, stacker_50_1, use_gripper=True)
-            tiprack_20_5 = stacker_20_2.retrieve()
+            # Load a fresh wash rack onto C2 for Wash 1
+            tiprack_20_X = retrieve_tiprack_20_X_to_c2()
+            protocol.comment("DISPENSING: tiprack_20_5 = #3--> A4")
+            tiprack_20_5 = take_full_20ul_from_b4()
             protocol.move_labware(
                 labware=tiprack_20_5,
                 new_location=tiprack_A3_adapter,
@@ -1237,7 +1272,6 @@ def run(protocol: ProtocolContext) -> None:
             nozzlecheck("96", tiprack_20_X)
             # ===============================================
             # 96-channel operation - multi-well aspiration for sufficient volume
-            p200.reset_tipracks()
             p200.pick_up_tip()
             # Aspirate from multiple TWB wells to get sufficient volume (A2, B2)
             p200.aspirate(
@@ -1253,8 +1287,7 @@ def run(protocol: ProtocolContext) -> None:
                 ),
             )
             p200.dispense(2, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
-            # Return tips to origin tiprack instead of dropping
-            p200.return_tip()
+            p200.drop_tip()
             # ===============================================
 
             # ============================================================================================
@@ -1283,8 +1316,10 @@ def run(protocol: ProtocolContext) -> None:
                     new_location=OFF_DECK,
                     use_gripper=False,
                 )
+            # Fresh rack for Wash 2
+            tiprack_20_X = replace_tiprack_20_X_on_c2()
             protocol.comment("DISPENSING: tiprack_20_6 = #4--> A4")
-            tiprack_20_6 = stacker_20_2.retrieve()
+            tiprack_20_6 = take_full_20ul_from_b4()
             protocol.move_labware(
                 labware=tiprack_20_6,
                 new_location=tiprack_A3_adapter,
@@ -1292,9 +1327,6 @@ def run(protocol: ProtocolContext) -> None:
                 pick_up_offset=deck_pick_up_offset,
                 drop_offset=deck_drop_offset,
             )
-            # stacker B empty
-            # Stacker A full
-
             # ============================================================================================
 
             protocol.comment("--> Removing Supernatant")
@@ -1317,7 +1349,6 @@ def run(protocol: ProtocolContext) -> None:
             nozzlecheck("96", tiprack_20_X)
             # ===============================================
             # 96-channel operation - multi-well aspiration for sufficient volume
-            p200.reset_tipracks()
             p200.pick_up_tip()
             # Aspirate from multiple TWB wells to get sufficient volume (A2, B2)
             p200.aspirate(
@@ -1333,24 +1364,23 @@ def run(protocol: ProtocolContext) -> None:
                 ),
             )
             p200.dispense(1, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
-            # Return tips to origin tiprack instead of dropping
-            p200.return_tip()
+            p200.drop_tip()
             # ===============================================
 
             # ============================================================================================
             if MODETRASH == "RECYCLE":
+                # Store empties in A4 only — never into B4 (virgin tip source)
                 protocol.comment(
-                    "MOVING: tiprack_20_6 = tiprack_A3_adapter --> stacker 200|B"
+                    "MOVING: tiprack_20_6 = tiprack_A3_adapter --> stacker 200|A"
                 )
                 protocol.move_labware(
                     labware=tiprack_20_6,
-                    new_location=stacker_20_2,
+                    new_location=stacker_20_1,
                     use_gripper=True,
                     pick_up_offset=deck_pick_up_offset,
                 )
                 protocol.comment("storing tiprack in A4")
-                stacker_20_2.store()
-                protocol.comment("stacker A full")
+                stacker_20_1.store()
             else:
                 protocol.comment("MOVING: tiprack_20_6 = tiprack_A3_adapter --> B3")
                 protocol.move_labware(
@@ -1364,6 +1394,8 @@ def run(protocol: ProtocolContext) -> None:
                     new_location=OFF_DECK,
                     use_gripper=False,
                 )
+            # Fresh rack for Wash 3
+            tiprack_20_X = replace_tiprack_20_X_on_c2()
             protocol.comment("DISPENSING: tiprack_20_7 = #5--> A4")
             tiprack_20_7 = stacker_20_1.retrieve()
             protocol.move_labware(
@@ -1394,7 +1426,6 @@ def run(protocol: ProtocolContext) -> None:
             nozzlecheck("96", tiprack_20_X)
             # ===============================================
             # 96-channel operation - multi-well aspiration for sufficient volume
-            p200.reset_tipracks()
             p200.pick_up_tip()
             # Aspirate from multiple TWB wells to get sufficient volume (A2, B2)
             p200.aspirate(
@@ -1410,23 +1441,22 @@ def run(protocol: ProtocolContext) -> None:
                 ),
             )
             p200.dispense(14, sample_plate_2["A1"].bottom(z=PCRPlate_Z_offset))
-            # Return tips to origin tiprack instead of dropping
-            p200.return_tip()
+            p200.drop_tip()
             # ===============================================
 
             # ============================================================================================
             if MODETRASH == "RECYCLE":
                 protocol.comment(
-                    "MOVING: tiprack_20_7 = tiprack_A3_adapter --> stacker 200|B"
+                    "MOVING: tiprack_20_7 = tiprack_A3_adapter --> stacker 200|A"
                 )
                 protocol.move_labware(
                     labware=tiprack_20_7,
-                    new_location=stacker_20_2,
+                    new_location=stacker_20_1,
                     use_gripper=True,
                     pick_up_offset=deck_pick_up_offset,
                 )
-                protocol.comment("stacker B store")
-                stacker_20_2.store()
+                protocol.comment("storing tiprack in A4")
+                stacker_20_1.store()
             else:
                 protocol.comment("MOVING: tiprack_20_7 = tiprack_A3_adapter --> B3")
                 protocol.move_labware(
@@ -1440,6 +1470,8 @@ def run(protocol: ProtocolContext) -> None:
                     new_location=OFF_DECK,
                     use_gripper=False,
                 )
+            # Discard spent Wash 3 rack; C2 free for later cleanup washes
+            discard_tiprack_20_X_from_c2()
             protocol.comment("DISPENSING: tiprack_20_8 = #6--> A4")
             tiprack_20_8 = stacker_20_1.retrieve()
             protocol.move_labware(
@@ -1468,16 +1500,16 @@ def run(protocol: ProtocolContext) -> None:
             # ============================================================================================
             if MODETRASH == "RECYCLE":
                 protocol.comment(
-                    "MOVING: tiprack_20_8 = tiprack_A3_adapter --> stacker 200|B"
+                    "MOVING: tiprack_20_8 = tiprack_A3_adapter --> stacker 200|A"
                 )
                 protocol.move_labware(
                     labware=tiprack_20_8,
-                    new_location=stacker_20_2,
+                    new_location=stacker_20_1,
                     use_gripper=True,
                     pick_up_offset=deck_pick_up_offset,
                 )
-                protocol.comment("stacker B store")
-                stacker_20_2.store()
+                protocol.comment("storing tiprack in A4")
+                stacker_20_1.store()
             else:
                 protocol.comment("MOVING: tiprack_20_8 = tiprack_A3_adapter --> B3")
                 protocol.move_labware(
@@ -1641,6 +1673,9 @@ def run(protocol: ProtocolContext) -> None:
             p200.return_tip()
             # ===============================================
 
+            # Fresh rack for cleanup ETOH Wash 1A
+            tiprack_20_X = retrieve_tiprack_20_X_to_c2()
+
             protocol.comment("--> ETOH Wash 1A")
             ETOHMaxVol = 8.5
             p200.flow_rate.aspirate = p200_flow_rate_aspirate_default
@@ -1649,27 +1684,25 @@ def run(protocol: ProtocolContext) -> None:
             nozzlecheck("96", tiprack_20_X)
             # ===============================================
             # 96-channel operation - process entire plate at once
-            p200.reset_tipracks()
             p200.pick_up_tip()
             p200.aspirate(ETOHMaxVol, ETOH_reservoir["A1"].bottom(z=Deepwell_Z_offset))
             p200.dispense(ETOHMaxVol, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
-            # Return tips to origin tiprack instead of dropping
-            p200.return_tip()
+            p200.drop_tip()
             # ===============================================
 
             # ============================================================================================
             if MODETRASH == "RECYCLE":
                 protocol.comment(
-                    "MOVING: tiprack_20_9 = tiprack_A3_adapter --> stacker 200|B"
+                    "MOVING: tiprack_20_9 = tiprack_A3_adapter --> stacker 200|A"
                 )
                 protocol.move_labware(
                     labware=tiprack_20_9,
-                    new_location=stacker_20_2,
+                    new_location=stacker_20_1,
                     use_gripper=True,
                     pick_up_offset=deck_pick_up_offset,
                 )
-                protocol.comment("stacker B store")
-                stacker_20_2.store()
+                protocol.comment("storing tiprack in A4")
+                stacker_20_1.store()
             else:
                 protocol.comment("MOVING: tiprack_20_9 = tiprack_A3_adapter --> B3")
                 protocol.move_labware(
@@ -1683,6 +1716,8 @@ def run(protocol: ProtocolContext) -> None:
                     new_location=OFF_DECK,
                     use_gripper=False,
                 )
+            # Fresh rack for cleanup ETOH Wash 1B
+            tiprack_20_X = replace_tiprack_20_X_on_c2()
             protocol.comment("DISPENSING: tiprack_20_10 = #3--> B4")
             tiprack_20_10 = stacker_20_1.retrieve()
             protocol.comment("MOVING: tiprack_20_10 = B4 --> tiprack_A3_adapter")
@@ -1715,27 +1750,25 @@ def run(protocol: ProtocolContext) -> None:
             nozzlecheck("96", tiprack_20_X)
             # ===============================================
             # 96-channel operation - process entire plate at once
-            p200.reset_tipracks()
             p200.pick_up_tip()
             p200.aspirate(ETOHMaxVol, ETOH_reservoir["A1"].bottom(z=Deepwell_Z_offset))
             p200.dispense(ETOHMaxVol, CleanupPlate_1["A1"].bottom(z=Deepwell_Z_offset))
-            # Return tips to origin tiprack instead of dropping
-            p200.return_tip()
+            p200.drop_tip()
             # ===============================================
 
             # ============================================================================================
             if MODETRASH == "RECYCLE":
                 protocol.comment(
-                    "MOVING: tiprack_20_10 = tiprack_A3_adapter --> stacker 200|B"
+                    "MOVING: tiprack_20_10 = tiprack_A3_adapter --> stacker 200|A"
                 )
                 protocol.move_labware(
                     labware=tiprack_20_10,
-                    new_location=stacker_20_2,
+                    new_location=stacker_20_1,
                     use_gripper=True,
                     pick_up_offset=deck_pick_up_offset,
                 )
-                protocol.comment("stacker B store")
-                stacker_20_2.store()
+                protocol.comment("storing tiprack in A4")
+                stacker_20_1.store()
             else:
                 protocol.comment("MOVING: tiprack_20_10 = tiprack_A3_adapter --> B3")
                 protocol.move_labware(
@@ -1776,16 +1809,16 @@ def run(protocol: ProtocolContext) -> None:
             # ============================================================================================
             if MODETRASH == "RECYCLE":
                 protocol.comment(
-                    "MOVING: tiprack_20_11 = tiprack_A3_adapter --> stacker 200|B"
+                    "MOVING: tiprack_20_11 = tiprack_A3_adapter --> stacker 200|A"
                 )
                 protocol.move_labware(
                     labware=tiprack_20_11,
-                    new_location=stacker_20_2,
+                    new_location=stacker_20_1,
                     use_gripper=True,
                     pick_up_offset=deck_pick_up_offset,
                 )
-                protocol.comment("stacker B store")
-                stacker_20_2.store()
+                protocol.comment("storing tiprack in A4")
+                stacker_20_1.store()
             else:
                 protocol.comment("MOVING: tiprack_20_11 = tiprack_A3_adapter --> B3")
                 protocol.move_labware(
@@ -1799,14 +1832,8 @@ def run(protocol: ProtocolContext) -> None:
                     new_location=OFF_DECK,
                     use_gripper=False,
                 )
-            protocol.comment("MOVING: tiprack_20_X = SCP_Position --> B4")
-            protocol.move_labware(
-                labware=tiprack_20_X,
-                new_location=stacker_20_2,
-                use_gripper=True,
-                pick_up_offset=deck_pick_up_offset,
-                drop_offset=deck_drop_offset,
-            )
+            # Park spent cleanup wash rack off C2 (do not reuse for later steps)
+            discard_tiprack_20_X_from_c2()
 
             protocol.comment("MOVING: CleanupPlate_2 = C4 --> A4")
             protocol.move_labware(
@@ -2066,14 +2093,8 @@ def run(protocol: ProtocolContext) -> None:
                 pick_up_offset=deck_pick_up_offset,
                 drop_offset=deck_drop_offset,
             )
-            protocol.comment("MOVING: tiprack_20_X = B4 --> SCP_Position")
-            protocol.move_labware(
-                labware=tiprack_20_X,
-                new_location=tiprack_C2_adapter,
-                use_gripper=True,
-                pick_up_offset=deck_pick_up_offset,
-                drop_offset=deck_drop_offset,
-            )
+            # Fresh 20 µL rack on C2 for capture (R8) steps
+            tiprack_20_X = retrieve_tiprack_20_X_to_c2()
             if MODETRASH == "RECYCLE":
                 protocol.comment("MOVING: CleanupPlate_1 = mag_block --> TRASH")
                 protocol.move_labware(
@@ -2228,38 +2249,16 @@ def run(protocol: ProtocolContext) -> None:
             # ===============================================
 
             # ============================================================================================
-            if MODETRASH == "RECYCLE":
-                protocol.comment(
-                    "MOVING: tiprack_20_X = SCP_Position --> stacker 200|A"
-                )
-                protocol.move_labware(
-                    labware=tiprack_20_X,
-                    new_location=stacker_20_1,
-                    use_gripper=True,
-                    pick_up_offset=deck_pick_up_offset,
-                )
-                protocol.comment("stacker B store")
-                stacker_20_1.store()
-            else:
-                protocol.comment("MOVING: tiprack_20_X = SCP_Position --> B3")
-                protocol.move_labware(
-                    labware=tiprack_20_X,
-                    new_location="B3",
-                    use_gripper=True,
-                    pick_up_offset=deck_pick_up_offset,
-                )
-                protocol.move_labware(
-                    labware=tiprack_20_X,
-                    new_location=OFF_DECK,
-                    use_gripper=False,
-                )
-            protocol.comment("DISPENSING: tiprack_20_XX = #5--> B4")
-            tiprack_20_XX = stacker_20_1.retrieve()
-            protocol.comment("MOVING: tiprack_20_XX = B4 --> SCP_Position")
+            # A4 hopper is full of spent racks — trash capture rack; load XX from B4 virgin stock
+            discard_tiprack_20_X_from_c2()
+            protocol.comment("DISPENSING: tiprack_20_XX = B4 --> SCP_Position")
+            tiprack_20_XX = take_full_20ul_from_b4()
             protocol.move_labware(
                 labware=tiprack_20_XX,
                 new_location=tiprack_C2_adapter,
                 use_gripper=True,
+                pick_up_offset=deck_pick_up_offset,
+                drop_offset=deck_drop_offset,
             )
             # ============================================================================================
 

@@ -70,7 +70,6 @@ ModuleTypes = Union[
 # SCRIPT SETTINGS
 DRYRUN = False  # True = skip incubation times, shorten mix, for testing purposes
 USE_GRIPPER = True  # True = Uses Gripper, False = Manual Move
-TIP_TRASH = False  # True = Used tips go in Trash, False = Used tips go back into rack
 HYBRID_PAUSE = True  # True = sets a pause on the Hybridization
 
 
@@ -144,6 +143,13 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Disposable Lid",
         description="True means use lid.",
         default=True,
+    )
+    """Create parameter to save tips without using trash bin."""
+    parameters.add_bool(
+        variable_name="use_trash_bin",
+        display_name="Use Trash Bin",
+        description="Save tips without using trash bin.",
+        default=False,
     )
     """Create parameter for tc lid deck riser."""
     parameters.add_bool(
@@ -436,13 +442,14 @@ def run(protocol: ProtocolContext) -> None:
     probe_liquid_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
+    use_trash_bin = protocol.params.use_trash_bin  # type: ignore[attr-defined]
     global p200_tips
     global p50_tips
 
     protocol.comment("THIS IS A DRY RUN") if DRYRUN else protocol.comment(
         "THIS IS A REACTION RUN"
     )
-    protocol.comment("USED TIPS WILL GO IN TRASH") if TIP_TRASH else protocol.comment(
+    protocol.comment("USED TIPS WILL GO IN TRASH") if use_trash_bin else protocol.comment(
         "USED TIPS WILL BE RE-RACKED"
     )
 
@@ -676,7 +683,7 @@ def run(protocol: ProtocolContext) -> None:
                     NHB2Vol, sample_plate_1[X].meniscus(z=meniscus_z, target="end")
                 )  # original = ()
                 p50.touch_tip(sample_plate_1[X])
-                p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
+                p50.return_tip() if use_trash_bin is False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
 
@@ -692,7 +699,7 @@ def run(protocol: ProtocolContext) -> None:
                 )
                 p50.touch_tip(sample_plate_1[X])
                 # original = ()
-                p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
+                p50.return_tip() if use_trash_bin is False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
 
@@ -715,7 +722,7 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.mix(EHB2MixRep, EHB2MixVol)
                 # checked
                 p1000.touch_tip(sample_plate_1[X])
-                p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
+                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
                 p50_tips += 1
                 tipcheck()
 
@@ -800,7 +807,7 @@ def run(protocol: ProtocolContext) -> None:
                 )
                 p1000.touch_tip(sample_plate_2[column_2_list[loop]])
                 # checked
-                p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
+                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
                 p200_tips += 1
                 tipcheck()
             if disposable_lid:
@@ -853,7 +860,7 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.move_to(sample_plate_2[X].top(z=0))
                 p1000.move_to(sample_plate_2[X].top(z=5))
                 p1000.touch_tip(sample_plate_2[X])
-                p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
+                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
                 p200_tips += 1
                 tipcheck()
             # ==============================
@@ -890,7 +897,7 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.move_to(sample_plate_2[X].bottom(0.5))
                 p1000.aspirate(200, rate=0.25)
                 trash_liquid(protocol, p1000, 200.0, liquid_trash_list)
-                p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
+                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
                 p200_tips += 1
                 tipcheck()
 
@@ -914,7 +921,7 @@ def run(protocol: ProtocolContext) -> None:
                         EEWVol, sample_plate_2[X].bottom(z=dot_bottom)
                     )  # original = ()
                     p1000.touch_tip(sample_plate_2[X])
-                    p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
+                    p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
                     p200_tips += 1
                     tipcheck()
                 set_hs_speed(
@@ -952,7 +959,7 @@ def run(protocol: ProtocolContext) -> None:
                         float(p1000.current_volume),
                         liquid_trash_list,
                     )
-                    p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
+                    p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
                     p200_tips += 1
                     tipcheck()
 
@@ -974,7 +981,7 @@ def run(protocol: ProtocolContext) -> None:
                     EEWVol, sample_plate_2[X].bottom(z=dot_bottom)
                 )  # original = ()
                 p1000.touch_tip(sample_plate_2[X])
-                p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
+                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
                 p200_tips += 1
                 tipcheck()
 
@@ -994,7 +1001,7 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.dispense(
                     TransferSup, sample_plate_2[column_3_list[loop]].bottom(z=1)
                 )
-                p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
+                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
                 p200_tips += 1
                 tipcheck()
 
@@ -1021,7 +1028,7 @@ def run(protocol: ProtocolContext) -> None:
                 trash_liquid(
                     protocol, p1000, float(p1000.current_volume), liquid_trash_list
                 )
-                p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
+                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
                 p200_tips += 1
                 tipcheck()
 
@@ -1036,7 +1043,7 @@ def run(protocol: ProtocolContext) -> None:
                 trash_liquid(
                     protocol, p50, float(p50.current_volume), liquid_trash_list
                 )
-                p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
+                p50.return_tip() if use_trash_bin is False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
 
@@ -1056,7 +1063,7 @@ def run(protocol: ProtocolContext) -> None:
                     EluteVol, sample_plate_2[X].bottom(z=dot_bottom)
                 )  # original = ()
                 p50.touch_tip(sample_plate_2[X])
-                p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
+                p50.return_tip() if use_trash_bin is False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
             protocol.move_lid(lid, reagent_plate, use_gripper=True)
@@ -1089,7 +1096,7 @@ def run(protocol: ProtocolContext) -> None:
                     TransferSup + 1, sample_plate_1[column_4_list[loop]].bottom(z=1)
                 )
                 p50.touch_tip(sample_plate_1[column_4_list[loop]])
-                p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
+                p50.return_tip() if use_trash_bin is False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
 
@@ -1108,7 +1115,7 @@ def run(protocol: ProtocolContext) -> None:
                 p50.move_to(sample_plate_1[X].bottom(z=dot_bottom))  # original = ()
                 p50.mix(ET2MixRep, ET2MixVol)
                 p50.touch_tip(sample_plate_1[X])
-                p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
+                p50.return_tip() if use_trash_bin is False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
         if STEP_PCR == 1:
@@ -1124,7 +1131,7 @@ def run(protocol: ProtocolContext) -> None:
                 p50.dispense(
                     PPCVol, sample_plate_1[X].bottom(z=dot_bottom)
                 )  # original = ()
-                p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
+                p50.return_tip() if use_trash_bin is False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
             protocol.comment("--> Adding EPM")
@@ -1140,7 +1147,7 @@ def run(protocol: ProtocolContext) -> None:
                 p50.touch_tip(sample_plate_1[X])
                 p50.move_to(sample_plate_1[X].bottom(z=dot_bottom))  # original = ()
                 p50.mix(EPMMixRep, EPMMixVol)
-                p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
+                p50.return_tip() if use_trash_bin is False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
         protocol.move_lid(lid, reagent_plate, use_gripper=True)
@@ -1210,7 +1217,7 @@ def run(protocol: ProtocolContext) -> None:
                     TransferSup + 1, sample_plate_2[column_5_list[loop]].bottom(z=1)
                 )
                 p50.touch_tip(sample_plate_2[column_5_list[loop]])
-                p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
+                p50.return_tip() if use_trash_bin is False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
 
@@ -1240,7 +1247,7 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.move_to(sample_plate_2[X].top(z=5))
                 p1000.move_to(sample_plate_2[X].top(z=0))
                 p1000.move_to(sample_plate_2[X].top(z=5))
-                p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
+                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
                 p200_tips += 1
                 tipcheck()
             # ========NEW HS MIX=========================
@@ -1275,7 +1282,7 @@ def run(protocol: ProtocolContext) -> None:
                 trash_liquid(
                     protocol, p1000, float(p1000.current_volume), liquid_trash_list
                 )
-                p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
+                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
                 p200_tips += 1
                 tipcheck()
 
@@ -1297,7 +1304,7 @@ def run(protocol: ProtocolContext) -> None:
                     p1000.move_to(sample_plate_2[X].top(z=0))
                     p1000.move_to(sample_plate_2[X].top(z=5))
                     p1000.touch_tip(sample_plate_2[X])
-                    p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
+                    p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
                     p200_tips += 1
                     tipcheck()
 
@@ -1321,7 +1328,7 @@ def run(protocol: ProtocolContext) -> None:
                         float(p1000.current_volume),
                         liquid_trash_list,
                     )
-                    p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
+                    p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
                     p200_tips += 1
                     tipcheck()
 
@@ -1339,7 +1346,7 @@ def run(protocol: ProtocolContext) -> None:
                 trash_liquid(
                     protocol, p1000, float(p1000.current_volume), liquid_trash_list
                 )
-                p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
+                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
                 p200_tips += 1
                 tipcheck()
 
@@ -1386,7 +1393,7 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.move_to(sample_plate_2.wells_by_name()[X].top(z=5))
                 p1000.move_to(sample_plate_2.wells_by_name()[X].top(z=0))
                 p1000.move_to(sample_plate_2.wells_by_name()[X].top(z=5))
-                p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
+                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
                 p200_tips += 1
                 tipcheck()
                 if DRYRUN is False:
@@ -1422,7 +1429,7 @@ def run(protocol: ProtocolContext) -> None:
                     ),
                 )
                 p1000.touch_tip(sample_plate_1[column_6_list[loop]])
-                p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
+                p1000.return_tip() if use_trash_bin is False else p1000.drop_tip()
                 p200_tips += 1
                 tipcheck()
     liquids_to_probe_at_end = [

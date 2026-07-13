@@ -181,12 +181,20 @@ def add_parameters(parameters: ParameterContext) -> None:
         unit="seconds",
     )
 
+    parameters.add_bool(
+        variable_name="use_trash_bin",
+        display_name="Use Trash Bin",
+        description="Save tips without using trash bin.",
+        default=True,
+    )
+
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
     all_data = protocol.params.parameters_csv.parse_as_csv()  # type: ignore[attr-defined]
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
+    use_trash_bin = protocol.params.use_trash_bin  # type: ignore[attr-defined]
     length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     data = all_data[1:]
 
@@ -326,7 +334,10 @@ def run(protocol: ProtocolContext) -> None:
             p1000.blow_out(location=waste_reservoir["A1"])
             p1000.touch_tip()
             current += 1
-        p1000.drop_tip()
+        if protocol.params.use_trash_bin is True:
+            p1000.drop_tip()
+        else:
+            p1000.return_tip()
 
         protocol.comment("Changing pipette configuration to 8ch.")
 
