@@ -20,7 +20,7 @@ all: clean build
 
 .PHONY: clean
 clean:
-  pnpm shx rm -rf dist
+	pnpm shx rm -rf dist
 
 .PHONY: build
 build: export NODE_ENV := production
