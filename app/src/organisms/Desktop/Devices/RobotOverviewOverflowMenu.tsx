@@ -28,6 +28,7 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
 import { RobotCertImportModal } from '/app/organisms/Desktop/RobotCertImport/RobotCertImportModal'
 import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
@@ -68,6 +69,7 @@ export const RobotOverviewOverflowMenu = (
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
   const navigate = useNavigate()
+  const documentationState = useDocumentationState()
   const isRobotBusy = useIsRobotBusy()
   const runId = useCurrentRunId()
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -77,7 +79,7 @@ export const RobotOverviewOverflowMenu = (
   const isFlex = useIsFlex(robot.name)
   const { setLights } = useSetLightsMutation()
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const { home } = useHomeMutation()
+  const { home } = useHomeMutation(documentationState)
 
   const handleClickRestart: MouseEventHandler<HTMLButtonElement> = () => {
     dispatch(restartRobot(robot.name))

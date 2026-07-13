@@ -4,6 +4,7 @@
   "place_plate_reader_lid": "Placing plate reader lid",
   "end_plate_reader_lid": "Finishing place plate reader lid",
   "home_pipettes": "Homing pipettes",
+  "home_robot": "Homing gantry",
   "end_home_pipettes": "Finishing home pipettes",
   "attach_gripper": "Attaching gripper",
   "detach_gripper": "Detaching gripper",

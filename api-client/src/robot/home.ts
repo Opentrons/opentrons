@@ -6,9 +6,11 @@ import type { HomeData, HomeResponse } from './types'
 
 export function home(
   config: HostConfig,
-  data: HomeData
+  data: HomeData,
+  userNotes?: string
 ): ResponsePromise<HomeResponse> {
   return request<HomeResponse, HomeData>(POST, '/robot/home', config, {
     body: data,
+    userNotes,
   })
 }
