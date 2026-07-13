@@ -1080,6 +1080,102 @@ def test_begin_awaiting_recovery_keeps_succeeded_command_status() -> None:
     assert recovering_command.error.errorType == "PythonException"
 
 
+def test_resume_from_recovery_returns_to_paused_when_pause_was_deferred() -> None:
+    """It should restore protocol pause after recovery when pause was interrupted."""
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        is_door_open=False,
+    )
+    subject_view = CommandView(subject.state)
+    now = datetime.now()
+
+    subject.handle_action(PlayAction(requested_at=now))
+    subject.handle_action(actions.PauseAction(source=actions.PauseSource.PROTOCOL))
+    subject.handle_action(
+        actions.QueueCommandAction(
+            "c1",
+            created_at=now,
+            request=commands.CommentCreate(params=commands.CommentParams(message="")),
+            request_hash=None,
+        )
+    )
+    subject.handle_action(actions.RunCommandAction(command_id="c1", started_at=now))
+    succeeded_command = subject_view.get("c1").model_copy(
+        update={
+            "status": commands.CommandStatus.SUCCEEDED,
+            "completedAt": now,
+        }
+    )
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            command=succeeded_command, state_update=StateUpdate()
+        )
+    )
+    subject.handle_action(
+        actions.BeginAwaitingRecoveryAction(
+            command_id="c1",
+            error_id="c1-error",
+            failed_at=now,
+            error=PythonException(RuntimeError("async vacuum error")),
+            notes=[],
+            type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+            command=succeeded_command,
+        )
+    )
+    subject.handle_action(actions.MarkProtocolPauseDeferredAction())
+
+    assert subject_view.get_status() == EngineStatus.AWAITING_RECOVERY_PAUSED
+    assert subject_view.get_protocol_pause_deferred() is True
+
+    subject.handle_action(actions.ResumeFromRecoveryAction(StateUpdate()))
+
+    assert subject_view.get_status() == EngineStatus.PAUSED
+    assert subject_view.get_protocol_pause_deferred() is False
+    assert subject_view.get_recovery_target() is None
+
+
+def test_resume_from_recovery_returns_to_running_when_pause_not_deferred() -> None:
+    """It should resume protocol execution after recovery when pause was not interrupted."""
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        is_door_open=False,
+    )
+    subject_view = CommandView(subject.state)
+    now = datetime.now()
+
+    subject.handle_action(PlayAction(requested_at=now))
+    subject.handle_action(
+        actions.QueueCommandAction(
+            "c1",
+            created_at=now,
+            request=commands.CommentCreate(params=commands.CommentParams(message="")),
+            request_hash=None,
+        )
+    )
+    subject.handle_action(actions.RunCommandAction(command_id="c1", started_at=now))
+    subject.handle_action(
+        actions.FailCommandAction(
+            command_id="c1",
+            error_id="c1-error",
+            failed_at=now,
+            error=PythonException(RuntimeError("recoverable")),
+            notes=[],
+            type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+            running_command=subject_view.get("c1"),
+        )
+    )
+
+    assert subject_view.get_status() == EngineStatus.AWAITING_RECOVERY
+    assert subject_view.get_protocol_pause_deferred() is False
+
+    subject.handle_action(actions.ResumeFromRecoveryAction(StateUpdate()))
+
+    assert subject_view.get_status() == EngineStatus.RUNNING
+    assert subject_view.get_recovery_target() is None
+
+
 @pytest.mark.parametrize(
     "ending_action",
     [

@@ -2,7 +2,12 @@
 
 import asyncio
 
-from ..actions import ActionDispatcher, PauseAction, PauseSource
+from ..actions import (
+    ActionDispatcher,
+    MarkProtocolPauseDeferredAction,
+    PauseAction,
+    PauseSource,
+)
 from ..state.state import StateStore
 
 
@@ -27,6 +32,11 @@ class RunControlHandler:
             await self._state_store.wait_for(
                 condition=self._can_resume_from_protocol_pause
             )
+            if (
+                self._state_store.commands.get_is_awaiting_recovery()
+                and not self._state_store.commands.get_is_running()
+            ):
+                self._action_dispatcher.dispatch(MarkProtocolPauseDeferredAction())
 
     def _can_resume_from_protocol_pause(self) -> bool:
         """Return whether a protocol pause should stop waiting."""

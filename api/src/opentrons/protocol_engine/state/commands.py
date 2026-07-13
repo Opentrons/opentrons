@@ -50,6 +50,7 @@ from .config import Config
 from opentrons.hardware_control.types import DoorState
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.actions.actions import (
+    MarkProtocolPauseDeferredAction,
     ResumeFromRecoveryAction,
     RunCommandAction,
     SetErrorRecoveryPolicyAction,
@@ -257,6 +258,9 @@ class CommandState:
     has_entered_error_recovery: bool
     """Whether the run has entered error recovery."""
 
+    protocol_pause_deferred: bool
+    """Whether recovery interrupted a protocol pause that should resume afterward."""
+
     stopped_by_async_error: bool
     """If this is set to True, the engine was stopped by an async event."""
 
@@ -301,6 +305,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             is_stopping_because_of_async_error=False,
             error_recovery_policy=error_recovery_policy,
             has_entered_error_recovery=False,
+            protocol_pause_deferred=False,
             command_annotations={},
         )
 
@@ -321,6 +326,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 self._handle_play_action(action)
             case PauseAction():
                 self._handle_pause_action(action)
+            case MarkProtocolPauseDeferredAction():
+                self._handle_mark_protocol_pause_deferred_action(action)
             case ResumeFromRecoveryAction():
                 self._handle_resume_from_recovery_action(action)
             case StopAction():
@@ -527,15 +534,25 @@ class CommandStore(HasState[CommandState], HandlesActions):
     def _handle_pause_action(self, action: PauseAction) -> None:
         self._state.queue_status = QueueStatus.PAUSED
 
+    def _handle_mark_protocol_pause_deferred_action(
+        self, action: MarkProtocolPauseDeferredAction
+    ) -> None:
+        self._state.protocol_pause_deferred = True
+
     def _handle_resume_from_recovery_action(
         self, action: ResumeFromRecoveryAction
     ) -> None:
-        self._state.queue_status = QueueStatus.RUNNING
+        if self._state.protocol_pause_deferred:
+            self._state.queue_status = QueueStatus.PAUSED
+            self._state.protocol_pause_deferred = False
+        else:
+            self._state.queue_status = QueueStatus.RUNNING
         self._state.recovery_target = None
 
     def _handle_stop_action(self, action: StopAction) -> None:
         if not self._state.run_result:
             self._state.recovery_target = None
+            self._state.protocol_pause_deferred = False
             self._state.queue_status = QueueStatus.PAUSED
 
             if action.from_asynchronous_error:
@@ -548,6 +565,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
     def _handle_finish_action(self, action: FinishAction) -> None:
         if not self._state.run_result:
             self._state.recovery_target = None
+            self._state.protocol_pause_deferred = False
             self._state.queue_status = QueueStatus.PAUSED
 
             if action.set_run_status:
@@ -937,6 +955,10 @@ class CommandView:
             EngineStatus.AWAITING_RECOVERY_PAUSED,
             EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
         )
+
+    def get_protocol_pause_deferred(self) -> bool:
+        """Return whether recovery interrupted a protocol pause."""
+        return self._state.protocol_pause_deferred
 
     def get_most_recently_finalized_command(self) -> Optional[CommandEntry]:
         """Get the most recent command that has reached its final `status`. See get_command_is_final."""

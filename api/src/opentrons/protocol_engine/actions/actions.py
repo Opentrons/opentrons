@@ -75,6 +75,11 @@ class ResumeFromRecoveryAction:
 
 
 @dataclasses.dataclass(frozen=True)
+class MarkProtocolPauseDeferredAction:
+    """Record that error recovery interrupted an in-flight protocol pause."""
+
+
+@dataclasses.dataclass(frozen=True)
 class FinishErrorDetails:
     """Error details for the payload of a FinishAction or HardwareStoppedAction."""
 
@@ -367,6 +372,7 @@ class CreateUserCommandAnnotation:
 Action = Union[
     PlayAction,
     PauseAction,
+    MarkProtocolPauseDeferredAction,
     StopAction,
     ResumeFromRecoveryAction,
     FinishAction,
