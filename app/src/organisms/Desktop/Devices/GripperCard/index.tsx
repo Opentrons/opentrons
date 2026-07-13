@@ -86,7 +86,7 @@ export function GripperCard({
     }
 
     return () => {
-      if (timeoutId == null) {
+      if (timeoutId != null) {
         clearTimeout(timeoutId)
       }
     }
