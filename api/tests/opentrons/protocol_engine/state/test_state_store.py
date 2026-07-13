@@ -167,7 +167,9 @@ async def test_wait_for_raises(decoy: Decoy, subject: StateStore) -> None:
         await subject.wait_for_not(check_condition)
 
 
-def _queue_and_succeed_comment(subject: StateStore, command_id: str, now: datetime) -> None:
+def _queue_and_succeed_comment(
+    subject: StateStore, command_id: str, now: datetime
+) -> None:
     subject.handle_action(
         QueueCommandAction(
             command_id,
@@ -184,7 +186,9 @@ def _queue_and_succeed_comment(subject: StateStore, command_id: str, now: dateti
         }
     )
     subject.handle_action(
-        SucceedCommandAction(command=succeeded_command, state_update=update_types.StateUpdate())
+        SucceedCommandAction(
+            command=succeeded_command, state_update=update_types.StateUpdate()
+        )
     )
 
 
@@ -258,9 +262,10 @@ async def test_failed_task_failures_absorbed_by_active_recovery_when_uncovered(
     await _finish_task_with_error(subject, "task-1", "start-command", now)
     await _finish_task_with_error(subject, "task-2", "other-command", now)
 
-    assert subject.failed_task_failures_absorbed_by_active_recovery(
-        ["task-1", "task-2"]
-    ) is False
+    assert (
+        subject.failed_task_failures_absorbed_by_active_recovery(["task-1", "task-2"])
+        is False
+    )
 
 
 async def test_failed_task_failures_absorbed_by_active_recovery_without_recovery(

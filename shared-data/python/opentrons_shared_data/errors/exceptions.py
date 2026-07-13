@@ -1356,7 +1356,7 @@ class VacuumModuleUnknownError(RoboticsControlError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a VacuumModuleUnknownError."""
-        checked_detail: Dict[str, str] = detail or {}
+        checked_detail: Dict[str, str] = dict(detail) if detail else {}
         checked_detail["serial"] = serial
         checked_detail["mode"] = mode
         checked_detail["target"] = str(target)
@@ -1365,11 +1365,19 @@ class VacuumModuleUnknownError(RoboticsControlError):
         self.mode = mode
         self.target = target
         self.current = current
-        self.args = (*checked_detail.values(), wrapping)
         super().__init__(
             ErrorCodes.GENERAL_ERROR,
             message,
             checked_detail,
+            wrapping,
+        )
+        self.args = (
+            serial,
+            mode,
+            target,
+            current,
+            message,
+            detail,
             wrapping,
         )
 
@@ -1388,7 +1396,7 @@ class VacuumModulePressureNotReachedError(RoboticsControlError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a VacuumModulePressureNotReachedError."""
-        checked_detail: Dict[str, str] = detail or {}
+        checked_detail: Dict[str, str] = dict(detail) if detail else {}
         checked_detail["serial"] = serial
         checked_detail["mode"] = mode
         checked_detail["target"] = str(target_pressure)
@@ -1397,11 +1405,19 @@ class VacuumModulePressureNotReachedError(RoboticsControlError):
         self.mode = mode
         self.target_pressure = target_pressure
         self.current_pressure = current_pressure
-        self.args = (*checked_detail.values(), wrapping)
         super().__init__(
             ErrorCodes.VACUUM_PRESSURE_NOT_REACHED,
             message,
             checked_detail,
+            wrapping,
+        )
+        self.args = (
+            serial,
+            target_pressure,
+            current_pressure,
+            mode,
+            message,
+            detail,
             wrapping,
         )
 
@@ -1420,7 +1436,7 @@ class VacuumModuleWasteFullError(RoboticsControlError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a VacuumModuleWasteFullError."""
-        checked_detail: Dict[str, str] = detail or {}
+        checked_detail: Dict[str, str] = dict(detail) if detail else {}
         checked_detail["serial"] = serial
         checked_detail["mode"] = mode
         checked_detail["target"] = str(target)
@@ -1429,11 +1445,11 @@ class VacuumModuleWasteFullError(RoboticsControlError):
         self.mode = mode
         self.target = target
         self.current = current
-        self.args = (*checked_detail.values(), wrapping)
         super().__init__(
             ErrorCodes.VACUUM_WASTE_CONTAINER_FULL,
             message,
             checked_detail,
             wrapping,
         )
+        self.args = (serial, message, detail, wrapping)
 
