@@ -23,7 +23,6 @@ For each module action, the API lets you choose whether to perform other protoco
 
 This section covers using the Thermocycler Module, including its blocking and concurrent commands. The examples in this section will use a Thermocycler Module GEN2 loaded as follows: 
 
-<!-- test: page-template -->
 ```python
 tc_mod = protocol.load_module(module_name="thermocyclerModuleV2")
 plate = tc_mod.load_labware(name="opentrons_96_wellplate_200ul_pcr_full_skirt")

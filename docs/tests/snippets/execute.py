@@ -6,9 +6,24 @@ Tiers (independently selectable via the ``--tier`` pytest option):
 * **2 — complete protocols:** run ``def run()`` protocols through
   ``opentrons.simulate.simulate`` (robotType/apiLevel come from the snippet).
 * **3 — fragments:** exec each fragment on top of a fresh context seeded from
-  the Flex/OT-2 base template in ``examples.md``. A ``continue-previous`` fragment
-  reuses the prior fragment's namespace, so its case replays the whole chain in
-  one context.
+  the Flex/OT-2 base template in ``templates.py``, plus any registry object
+  seeds the fragment (or its ``continue-previous`` chain) actually references
+  — see :func:`_object_setup_for`. A ``continue-previous`` fragment reuses the
+  prior fragment's namespace, so its case replays the whole chain in one
+  context.
+
+Every simulated context created here (Tier 2's OT-2 branch and all of Tier 3)
+is torn down with :func:`_release_simulated_context` right after use. Nothing
+about ``opentrons.simulate.get_protocol_api`` cleans itself up automatically —
+each call leaves a hardware-simulator thread and a Protocol Engine thread
+running (see the module docstring on ``simulate._LIVE_PROTOCOL_ENGINE_CONTEXTS``),
+and this suite calls it once per test case. Skipping the teardown doesn't just
+cost a fixed amount of memory per leaked thread — every additional live event
+loop adds scheduling overhead for the whole process, so tests run later in the
+suite get progressively slower as the thread count grows. Flex's Tier 2 path
+(``simulate.simulate``) already cleans up on its own, since it owns its
+hardware simulator via a local context manager rather than through
+``get_protocol_api``.
 """
 
 from __future__ import annotations
@@ -30,6 +45,7 @@ from tests.snippets.classify import (
 )
 from tests.snippets.extract import Snippet, discover_snippets
 from tests.snippets.render import macro_context, render
+from tests.snippets.templates import BASE_BODY_BY_TRACK, OBJECT_SEEDS
 
 
 @dataclass
@@ -45,6 +61,9 @@ class SnippetCase:
     test_id: str
     api_version: str  # macro apiLevel of the snippet's page, for header synthesis
     page_seed: str | None = None  # page-template setup exec'd after the base template
+    object_seed: str | None = (
+        None  # registry object setup for names the chain references
+    )
 
 
 def _slug(text: str | None) -> str:
@@ -63,6 +82,41 @@ def _seed_code(rendered: str) -> str:
     if "def run(" in rendered:
         return _template_body(rendered)
     return rendered
+
+
+_OBJECT_NAME_RE = {name: re.compile(rf"\b{name}\b") for name in OBJECT_SEEDS}
+_OBJECT_ASSIGN_RE = {name: re.compile(rf"(?m)^\s*{name}\s*=") for name in OBJECT_SEEDS}
+
+
+def _object_setup_for(
+    chain_code: str, page_seed: str | None, track: Track
+) -> str | None:
+    """Setup code for any registry object the chain references but doesn't define.
+
+    A name only needs injecting if it's actually referenced somewhere in the
+    fragment/chain *and* nothing in the page-template seed or the chain itself
+    already assigns it (e.g. a page whose own first fragment loads ``hs_mod``
+    locally shouldn't also get one injected out from under it). Assignment is
+    detected with a simple ``^name =`` line scan, matching the plain
+    assignment style used throughout the docs.
+    """
+    already_defined = f"{page_seed or ''}\n{chain_code}"
+    pieces: list[str] = []
+    for name, seed in OBJECT_SEEDS.items():
+        track_seed = seed.flex if track is Track.FLEX else seed.ot2
+        if track_seed is None:
+            continue
+        if not _OBJECT_NAME_RE[name].search(chain_code):
+            continue
+        if _OBJECT_ASSIGN_RE[name].search(already_defined):
+            continue
+        code = track_seed.load
+        if track_seed.ready and not (
+            track_seed.ready_marker and track_seed.ready_marker in chain_code
+        ):
+            code += track_seed.ready
+        pieces.append(code)
+    return "".join(pieces) if pieces else None
 
 
 def build_cases(roots: list[Path], docs_root: Path) -> list[SnippetCase]:
@@ -108,6 +162,12 @@ def build_cases(roots: list[Path], docs_root: Path) -> list[SnippetCase]:
         else:
             chain = [rendered]
 
+        object_seed = (
+            _object_setup_for("\n".join(chain), page_seed, track)
+            if category is Category.FRAGMENT
+            else None
+        )
+
         test_id = f"{snippet.rel_path}::{snippet.tab or '_'}::{_slug(snippet.heading)}::L{snippet.start_line}"
         cases.append(
             SnippetCase(
@@ -120,6 +180,7 @@ def build_cases(roots: list[Path], docs_root: Path) -> list[SnippetCase]:
                 test_id=test_id,
                 api_version=api_version,
                 page_seed=page_seed,
+                object_seed=object_seed,
             )
         )
     return cases
@@ -144,32 +205,16 @@ def _template_body(full_src: str) -> str:
 
 @functools.lru_cache(maxsize=None)
 def load_templates(docs_root: Path) -> dict[Track, tuple[str, str]]:
-    """Extract the Flex/OT-2 base templates and API version from examples.md.
+    """Return the Flex/OT-2 base templates and API version.
 
-    Returns ``{track: (rendered_body, api_version)}``. The templates are the
-    two blocks under the "Protocol template" heading — themselves subject to
-    the same extraction/rendering, so they are never duplicated in Python.
+    Returns ``{track: (body, api_version)}``. The bodies are the minimal
+    synthetic templates in ``templates.py`` (not derived from any doc page);
+    the API version is still read from the python-api docs' macro config,
+    since the templates target that same ``apiLevel``.
     """
     examples = docs_root / "python-api" / "docs" / "examples.md"
-    snippets = discover_snippets([examples], docs_root)
-    ctx = macro_context(examples, docs_root)
-    version = str(ctx["apiLevel"])
-
-    templates: dict[Track, tuple[str, str]] = {}
-    for snippet in snippets:
-        if (snippet.heading or "").strip() != "Protocol template":
-            continue
-        label = (snippet.tab or "").lower()
-        track = Track.FLEX if "flex" in label else Track.OT2 if "ot-2" in label or "ot2" in label else None
-        if track is None or track in templates:
-            continue
-        body = _template_body(render(snippet.code, ctx))
-        templates[track] = (body, version)
-
-    missing = {t for t in Track} - set(templates)
-    if missing:
-        raise RuntimeError(f"missing base template(s) in examples.md: {missing}")
-    return templates
+    version = str(macro_context(examples, docs_root)["apiLevel"])
+    return {track: (body, version) for track, body in BASE_BODY_BY_TRACK.items()}
 
 
 # --- Tier runners ----------------------------------------------------------
@@ -199,6 +244,30 @@ def _declared_target(case: SnippetCase) -> tuple[str, str]:
     return robot_type, version
 
 
+def _release_simulated_context(context: object) -> None:
+    """Tear down a ``get_protocol_api()`` context's background resources.
+
+    ``get_protocol_api`` has no way to know when a caller is done with the
+    context it returns, so it deliberately leaks a hardware-simulator thread
+    and (for apiLevel >= ``ENGINE_CORE_API_VERSION``) a Protocol Engine thread
+    per call, keeping them alive on the module-global
+    ``simulate._LIVE_PROTOCOL_ENGINE_CONTEXTS`` stack. Calling this after every
+    simulated context releases both: ``context.cleanup()`` unsubscribes
+    command callbacks and (pre-Protocol-Engine apiLevels) cleans up the
+    hardware simulator directly; closing the live-contexts stack stops the
+    Protocol Engine thread and cleans up the hardware simulator for
+    Protocol-Engine apiLevels. Without this, hundreds of per-test contexts
+    accumulate threads and event loops over a single pytest run, making later
+    tests progressively slower rather than costing a fixed amount per test.
+    """
+    from opentrons import simulate
+
+    cleanup = getattr(context, "cleanup", None)
+    if cleanup is not None:
+        cleanup()
+    simulate._LIVE_PROTOCOL_ENGINE_CONTEXTS.close()
+
+
 def run_complete(case: SnippetCase) -> None:
     """Tier 2: run a ``def run()`` protocol against a simulated context.
 
@@ -208,9 +277,11 @@ def run_complete(case: SnippetCase) -> None:
     body itself is exercised.
 
     Flex protocols go through the full ``simulate.simulate`` engine (which also
-    runs any ``add_parameters``). OT-2 protocols are rejected by that top-level
-    entrypoint in this build (OT-2 moved to a separate app), so they run via
-    ``get_protocol_api`` + calling ``run()`` directly.
+    runs any ``add_parameters``); it manages its own hardware simulator via a
+    local context manager, so it cleans itself up without help. OT-2 protocols
+    are rejected by that top-level entrypoint in this build (OT-2 moved to a
+    separate app), so they run via ``get_protocol_api`` + calling ``run()``
+    directly, which we do need to release afterward.
     """
     from opentrons import simulate
 
@@ -230,7 +301,10 @@ def run_complete(case: SnippetCase) -> None:
         exec("from opentrons import protocol_api", namespace)
         exec(compile(src, case.snippet.location, "exec"), namespace)
         context = simulate.get_protocol_api(version=version, robot_type="OT-2")
-        namespace["run"](context)
+        try:
+            namespace["run"](context)
+        finally:
+            _release_simulated_context(context)
 
 
 def run_fragment(case: SnippetCase, docs_root: Path) -> None:
@@ -239,14 +313,30 @@ def run_fragment(case: SnippetCase, docs_root: Path) -> None:
 
     body, version = load_templates(docs_root)[case.track]
     namespace: dict = {}
-    namespace["protocol"] = simulate.get_protocol_api(
+    context = simulate.get_protocol_api(
         version=version, robot_type=case.track.robot_type
     )
-    exec(compile(body, f"<template:{case.track.value}>", "exec"), namespace)
-    if case.page_seed:
-        exec(compile(case.page_seed, f"<page-template:{case.snippet.rel_path}>", "exec"), namespace)
-    for code in case.chain:
-        exec(compile(code, case.snippet.location, "exec"), namespace)
+    namespace["protocol"] = context
+    try:
+        exec(compile(body, f"<template:{case.track.value}>", "exec"), namespace)
+        if case.page_seed:
+            exec(
+                compile(
+                    case.page_seed, f"<page-template:{case.snippet.rel_path}>", "exec"
+                ),
+                namespace,
+            )
+        if case.object_seed:
+            exec(
+                compile(
+                    case.object_seed, f"<object-seed:{case.snippet.rel_path}>", "exec"
+                ),
+                namespace,
+            )
+        for code in case.chain:
+            exec(compile(code, case.snippet.location, "exec"), namespace)
+    finally:
+        _release_simulated_context(context)
 
 
 # A fragment fails to simulate for one of two reasons. Either it needs prior
@@ -277,6 +367,9 @@ _CONTEXT_FAILURE_MESSAGES = (
     "has no lid",  # lid not loaded by a prior snippet
     "blow out is called without an explicit location",  # needs prior positioning
     "Last tip location should be a Well but it is: None",  # needs a prior pickup
+    "labware latch has not been set to closed",  # needs the latch closed by a prior snippet
+    "with its lid closed",  # needs the Thermocycler lid opened by a prior snippet
+    "without calling `.initialize(...)` first",  # needs the reader initialized by a prior snippet
 )
 
 

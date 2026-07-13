@@ -12,7 +12,6 @@ Because the Magnetic Block is unpowered, neither your robot nor the Opentrons Ap
 
 The Magnetic Block is represented by a [`MagneticBlockContext`][opentrons.protocol_api.MagneticBlockContext] object which lets you load labware on top of the module.
 
-<!-- test: page-template -->
 ```python
 # Load the Magnetic Block in deck slot D1
 magnetic_block = protocol.load_module(
