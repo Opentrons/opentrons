@@ -9,6 +9,7 @@ import { useHomeMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
 import { useIsRobotBusy } from '/app/redux-resources/robots'
 import {
@@ -46,6 +47,9 @@ vi.mock('/app/resources/runs')
 vi.mock('../RobotSettings/UpdateBuildroot')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 vi.mock('/app/redux-resources/robots')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const render = (props: ComponentProps<typeof RobotOverviewOverflowMenu>) => {
   return renderWithProviders(

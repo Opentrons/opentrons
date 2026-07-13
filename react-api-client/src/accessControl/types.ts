@@ -124,6 +124,7 @@ type AuditLogAction =
   | 'place_plate_reader_lid'
   | 'end_plate_reader_lid'
   | 'home_pipettes'
+  | 'home_robot'
   | 'end_home_pipettes'
   | 'attach_gripper'
   | 'detach_gripper'

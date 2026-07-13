@@ -5,6 +5,7 @@ import { useHomeMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useLights } from '/app/resources/devices'
 
@@ -21,6 +22,9 @@ vi.mock('/app/resources/devices')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../RestartRobotConfirmationModal')
 vi.mock('../ShutdownRobotConfirmationModal')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {
