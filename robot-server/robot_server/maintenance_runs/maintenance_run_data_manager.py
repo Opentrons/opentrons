@@ -23,7 +23,10 @@ from opentrons.protocol_engine.types import DeckConfigurationType
 from opentrons.system import camera
 
 from .maintenance_run_models import MaintenanceRun, MaintenanceRunNotFoundError
-from .maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
+from .maintenance_run_orchestrator_store import (
+    MaintenanceRunOrchestratorStore,
+    NoRunOrchestrator,
+)
 from robot_server.service.notifications import MaintenanceRunsPublisher
 from robot_server.service.pyro_utils.resource_utilities import get_pyro_resource
 
@@ -117,6 +120,7 @@ class MaintenanceRunDataManager:
         """
         if self._run_orchestrator_store.current_run_id is not None:
             await self._run_orchestrator_store.clear()
+            self._maintenance_runs_publisher.stop_publishing_for_maintenance_run()
 
         proxy_door_callback = None
         if ff.hardware_subprocess_enabled():
@@ -197,9 +201,7 @@ class MaintenanceRunDataManager:
         """
         if run_id == self._run_orchestrator_store.current_run_id:
             await self._run_orchestrator_store.clear()
-            await (
-                self._maintenance_runs_publisher.publish_current_maintenance_run_async()
-            )
+            self._maintenance_runs_publisher.stop_publishing_for_maintenance_run()
 
             if camera_settings is not None:
                 # Restart the live stream for the external run when the maintenance run has ended.
@@ -283,4 +285,8 @@ class MaintenanceRunDataManager:
         return self._run_orchestrator_store.get_command(command_id=command_id)
 
     def _get_state_summary(self, run_id: str) -> Optional[StateSummary]:
-        return self._run_orchestrator_store.get_state_summary()
+        try:
+            return self._run_orchestrator_store.get_state_summary()
+        except NoRunOrchestrator:
+            # Race with teardown / late PE notify while hooks are still armed.
+            return None

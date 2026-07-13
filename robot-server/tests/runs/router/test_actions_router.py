@@ -17,6 +17,7 @@ from robot_server.runs.action_models import RunAction, RunActionCreate, RunActio
 from robot_server.runs.router.actions_router import create_run_action
 from robot_server.runs.run_controller import RunActionNotAllowedError, RunController
 from robot_server.runs.run_models import RunNotFoundError
+from robot_server.service.notifications import MaintenanceRunsPublisher
 
 
 @pytest.fixture
@@ -31,11 +32,18 @@ def mock_audit_logger(decoy: Decoy) -> AuditLogger:
     return decoy.mock(cls=AuditLogger)
 
 
+@pytest.fixture
+def mock_maintenance_runs_publisher(decoy: Decoy) -> MaintenanceRunsPublisher:
+    """Get a fake MaintenanceRunsPublisher dependency."""
+    return decoy.mock(cls=MaintenanceRunsPublisher)
+
+
 async def test_create_run_action(
     decoy: Decoy,
     mock_run_controller: RunController,
     mock_audit_logger: AuditLogger,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
+    mock_maintenance_runs_publisher: MaintenanceRunsPublisher,
     mock_deck_configuration_store: DeckConfigurationStore,
 ) -> None:
     """It should create a run action."""
@@ -72,6 +80,7 @@ async def test_create_run_action(
         action_id=action_id,
         created_at=created_at,
         maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
+        maintenance_runs_publisher=mock_maintenance_runs_publisher,
         deck_configuration_store=mock_deck_configuration_store,
         check_estop=True,
     )
@@ -89,6 +98,7 @@ async def test_play_action_clears_maintenance_run(
     mock_run_controller: RunController,
     mock_audit_logger: AuditLogger,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
+    mock_maintenance_runs_publisher: MaintenanceRunsPublisher,
     mock_deck_configuration_store: DeckConfigurationStore,
 ) -> None:
     """It should clear an existing maintenance run before issuing play action."""
@@ -127,11 +137,16 @@ async def test_play_action_clears_maintenance_run(
         action_id=action_id,
         created_at=created_at,
         maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
+        maintenance_runs_publisher=mock_maintenance_runs_publisher,
         deck_configuration_store=mock_deck_configuration_store,
         check_estop=True,
     )
 
-    decoy.verify(await mock_maintenance_run_orchestrator_store.clear(), times=1)
+    decoy.verify(
+        await mock_maintenance_run_orchestrator_store.clear(),
+        mock_maintenance_runs_publisher.stop_publishing_for_maintenance_run(),
+        times=1,
+    )
     assert result.content.data == expected_result
     assert result.status_code == 201
 
@@ -151,6 +166,7 @@ async def test_create_play_action_not_allowed(
     expected_error_id: str,
     expected_status_code: int,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
+    mock_maintenance_runs_publisher: MaintenanceRunsPublisher,
     mock_deck_configuration_store: DeckConfigurationStore,
 ) -> None:
     """It should 409 if the runner is not able to handle the action."""
@@ -184,6 +200,7 @@ async def test_create_play_action_not_allowed(
             action_id=action_id,
             created_at=created_at,
             maintenance_run_orchestrator_store=mock_maintenance_run_orchestrator_store,
+            maintenance_runs_publisher=mock_maintenance_runs_publisher,
             deck_configuration_store=mock_deck_configuration_store,
             check_estop=True,
         )

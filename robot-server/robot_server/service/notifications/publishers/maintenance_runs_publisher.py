@@ -66,6 +66,12 @@ class MaintenanceRunsPublisher:
 
         await self.publish_current_maintenance_run_async()
 
+    def stop_publishing_for_maintenance_run(self) -> None:
+        """Disarm PE notify hooks after the maintenance run is cleared."""
+        self._run_hooks = None
+        self._engine_state_slice = None
+        self.publish_current_maintenance_run()
+
     async def publish_current_maintenance_run_async(
         self,
     ) -> None:

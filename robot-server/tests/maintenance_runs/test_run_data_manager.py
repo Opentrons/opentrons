@@ -3,7 +3,7 @@
 from datetime import datetime
 
 import pytest
-from decoy import Decoy
+from decoy import Decoy, matchers
 
 from opentrons.protocol_engine import (
     CommandSlice,
@@ -34,6 +34,7 @@ from robot_server.maintenance_runs.maintenance_run_models import (
 )
 from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
+    NoRunOrchestrator,
     RunConflictError,
 )
 from robot_server.service.notifications import (
@@ -126,6 +127,7 @@ def mock_camera_provider(
 async def test_create(
     decoy: Decoy,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
+    mock_maintenance_runs_publisher: MaintenanceRunsPublisher,
     subject: MaintenanceRunDataManager,
     engine_state_summary: StateSummary,
     mock_camera_provider: CameraProvider,
@@ -170,6 +172,58 @@ async def test_create(
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
         liquidClasses=engine_state_summary.liquidClasses,
+    )
+    decoy.verify(
+        await mock_maintenance_runs_publisher.start_publishing_for_maintenance_run(
+            run_id=run_id,
+            get_state_summary=matchers.Anything(),
+        ),
+        times=1,
+    )
+
+
+async def test_create_clears_existing_run(
+    decoy: Decoy,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
+    mock_maintenance_runs_publisher: MaintenanceRunsPublisher,
+    subject: MaintenanceRunDataManager,
+    engine_state_summary: StateSummary,
+    mock_camera_provider: CameraProvider,
+) -> None:
+    """Replacing a maintenance run should clear and disarm the previous one."""
+    run_id = "new-run"
+    created_at = datetime(year=2021, month=1, day=1)
+
+    decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(
+        "old-run"
+    )
+    decoy.when(
+        await mock_maintenance_run_orchestrator_store.create(
+            run_id=run_id,
+            labware_offsets=[],
+            created_at=created_at,
+            deck_configuration=[],
+            notify_publishers=mock_notify_publishers,
+            proxy_of_callback_for_handling_door_events=None,
+        )
+    ).then_return(engine_state_summary)
+
+    await subject.create(
+        run_id=run_id,
+        created_at=created_at,
+        labware_offsets=[],
+        deck_configuration=[],
+        notify_publishers=mock_notify_publishers,
+        camera_provider=mock_camera_provider,
+    )
+
+    decoy.verify(
+        await mock_maintenance_run_orchestrator_store.clear(),
+        mock_maintenance_runs_publisher.stop_publishing_for_maintenance_run(),
+        await mock_maintenance_runs_publisher.start_publishing_for_maintenance_run(
+            run_id=run_id,
+            get_state_summary=matchers.Anything(),
+        ),
     )
 
 
@@ -323,6 +377,7 @@ async def test_get_run_not_current(
 async def test_delete_current_run(
     decoy: Decoy,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
+    mock_maintenance_runs_publisher: MaintenanceRunsPublisher,
     mock_camera_provider: CameraProvider,
     subject: MaintenanceRunDataManager,
 ) -> None:
@@ -338,7 +393,21 @@ async def test_delete_current_run(
 
     decoy.verify(
         await mock_maintenance_run_orchestrator_store.clear(),
+        mock_maintenance_runs_publisher.stop_publishing_for_maintenance_run(),
     )
+
+
+def test_get_state_summary_returns_none_without_orchestrator(
+    decoy: Decoy,
+    mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
+    subject: MaintenanceRunDataManager,
+) -> None:
+    """Missing orchestrator should map to None for publisher hooks."""
+    decoy.when(mock_maintenance_run_orchestrator_store.get_state_summary()).then_raise(
+        NoRunOrchestrator()
+    )
+
+    assert subject._get_state_summary(run_id="any-run") is None
 
 
 def test_get_commands_slice_current_run(
