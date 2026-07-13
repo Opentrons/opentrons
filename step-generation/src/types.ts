@@ -114,9 +114,7 @@ export interface ThermocyclerModuleState {
 
   /** What the thermal block is currently doing. */
   currentBlockActivity:
-    | ProfileBlockActivity
-    | TargetTempBlockActivity
-    | DeactivatedBlockActivity
+    ProfileBlockActivity | TargetTempBlockActivity | DeactivatedBlockActivity
 
   /** If false, closed. If null, unknown. */
   lidOpen: boolean | null
@@ -145,7 +143,7 @@ export interface ProfileBlockActivity {
 
 export interface VacuumPumpProfileActivity {
   type: 'profile'
-  profileElements: VacuumRunProfileParams['profile']
+  profileElements: VacuumRunProfileParams['steps']
   taskId: string
   ventAfter: boolean
 }
@@ -305,10 +303,7 @@ export interface Ingredients {
 }
 
 export type AdditionalEquipmentName =
-  | 'gripper'
-  | 'wasteChute'
-  | 'stagingArea'
-  | 'trashBin'
+  'gripper' | 'wasteChute' | 'stagingArea' | 'trashBin'
 
 export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
@@ -387,11 +382,7 @@ export interface PipetteEntities {
 
 // ===== MIX-IN TYPES =====
 export type ChangeTipOptions =
-  | 'always'
-  | 'once'
-  | 'never'
-  | 'perDest'
-  | 'perSource'
+  'always' | 'once' | 'never' | 'perDest' | 'perSource'
 
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
 
@@ -892,14 +883,14 @@ export type VacuumPumpArgs =
 export interface VacuumStartRunProfileArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumStartRunProfile'
-  profile: VacuumRunProfileParams['profile']
+  profile: VacuumRunProfileParams['steps']
   ventAfter: boolean
 }
 
 export interface VacuumCloseVentStartProfileArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'vacuumCloseVentStartProfile'
-  profile: VacuumRunProfileParams['profile']
+  profile: VacuumRunProfileParams['steps']
   ventAfter: boolean
 }
 
@@ -1089,6 +1080,7 @@ export type ErrorType =
   | 'TIP_VOLUME_EXCEEDED'
   | 'TIPRACK_LID_NOT_ALLOWED_ON_DECK'
   | 'TOO_MANY_TIPS'
+  | 'VACUUM_UNDER_PRESSURE'
 
 export interface CommandCreatorError {
   message: string
@@ -1134,8 +1126,7 @@ export interface CommandsAndWarnings extends StepInfo {
   python?: string
 }
 export type CommandCreatorResult =
-  | CommandsAndWarnings
-  | CommandCreatorErrorResponse
+  CommandsAndWarnings | CommandCreatorErrorResponse
 export type CommandCreator<Args> = (
   args: Args,
   invariantContext: InvariantContext,
@@ -1184,5 +1175,4 @@ export type UnsafePipetteMovementReason =
     }
 
 export type PipetteMovementSafetyStatus =
-  | { isSafe: true }
-  | { isSafe: false; reason: UnsafePipetteMovementReason }
+  { isSafe: true } | { isSafe: false; reason: UnsafePipetteMovementReason }

@@ -41,7 +41,7 @@ async def test_bearer_token_extraction_passed_to_checker(
     client, mock_checker = auth_test_cli
     decoy.when(
         await mock_checker.check(matchers.Anything(), matchers.Anything())
-    ).then_return(AuthorizedResult(username="test-username"))
+    ).then_return(AuthorizedResult(username="test-username", fullname="test-fullname"))
 
     # An arbitrary endpoint that requires authorization.
     await client.post(
@@ -59,7 +59,7 @@ async def test_authorized_result(
     """When the AuthorizationChecker returns an AuthorizedResult, the request handler should run as normal."""
     client, mock_checker = auth_test_cli
     decoy.when(await mock_checker.check(None, matchers.Anything())).then_return(
-        AuthorizedResult(username="test-username")
+        AuthorizedResult(username="test-username", fullname="test-fullname")
     )
 
     # An arbitrary endpoint that requires authorization.
@@ -83,9 +83,9 @@ async def test_authorized_result(
 async def test_not_authorized_result(
     auth_test_cli: tuple[HTTPTestClient, AuthorizationChecker],
     decoy: Decoy,
-    authorization_result: MissingTokenResult
-    | NotAnActiveTokenResult
-    | InsufficientScopeResult,
+    authorization_result: (
+        MissingTokenResult | NotAnActiveTokenResult | InsufficientScopeResult
+    ),
     expected_status: int,
     expected_provided_scopes: list[str],
 ) -> None:

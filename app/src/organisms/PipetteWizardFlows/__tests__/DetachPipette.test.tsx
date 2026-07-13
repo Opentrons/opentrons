@@ -44,6 +44,9 @@ describe('DetachPipette', () => {
       flowType: FLOWS.DETACH,
       errorMessage: null,
       setShowErrorMessage: vi.fn(),
+      isDoorOpenError: false,
+      setIsDoorOpenError: vi.fn(),
+      dismissDoorOpenError: vi.fn(),
       isRobotMoving: false,
       isFetching: false,
       setFetching: vi.fn(),
@@ -103,7 +106,7 @@ describe('DetachPipette', () => {
       isFetching: true,
     }
     render(props)
-    screen.getAllByTestId('Skeleton')
+    screen.getAllByRole('status')
     const backBtn = screen.getByLabelText('back')
     expect(backBtn).toBeDisabled()
   })

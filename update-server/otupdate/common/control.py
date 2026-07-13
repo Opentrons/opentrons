@@ -6,7 +6,6 @@ This has endpoints like /restart that aren't specific to update tasks or machine
 
 import asyncio
 import logging
-import subprocess
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable, Coroutine, Mapping
@@ -15,19 +14,11 @@ from aiohttp import web
 
 from server_utils.auth.scopes import Scope
 
-from . import auth
+from . import auth, update_actions
 from .constants import DEVICE_BOOT_ID_NAME, RESTART_LOCK_NAME, SHUTDOWN_LOCK_NAME
 from .name_management import get_name_synchronizer
 
 LOG = logging.getLogger(__name__)
-
-
-def _do_restart():
-    subprocess.check_call(["reboot"])
-
-
-def _do_shutdown():
-    subprocess.check_call(["shutdown", "-h", "now"])
 
 
 @auth.require_scopes(Scope.RESTART_WRITE)
@@ -36,8 +27,18 @@ async def restart(request: web.Request) -> web.Response:
 
     Blocks while the restart lock is held.
     """
+    actions = update_actions.UpdateActionsInterface.from_request(request)
+    if not actions:
+        return web.json_response(
+            data={
+                "error": "no-actions-set",
+                "message": "Internal error: no actions object for hardware",
+            },
+            status=500,
+        )
+
     async with request.app[RESTART_LOCK_NAME]:
-        asyncio.get_event_loop().call_later(1, _do_restart)
+        asyncio.get_event_loop().call_later(1, actions.restart)
     return web.json_response({"message": "Restarting in 1s"}, status=200)
 
 
@@ -47,8 +48,18 @@ async def shutdown(request: web.Request) -> web.Response:
 
     Blocks while the shutdown lock is held.
     """
+    actions = update_actions.UpdateActionsInterface.from_request(request)
+    if not actions:
+        return web.json_response(
+            data={
+                "error": "no-actions-set",
+                "message": "Internal error: no actions object for hardware",
+            },
+            status=500,
+        )
+
     async with request.app[SHUTDOWN_LOCK_NAME]:
-        asyncio.get_event_loop().call_later(1, _do_shutdown)
+        asyncio.get_event_loop().call_later(1, actions.shutdown)
     return web.json_response({"message": "Shutting down in 1s"}, status=200)
 
 

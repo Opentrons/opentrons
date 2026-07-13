@@ -21,9 +21,7 @@ export type {
 } from '/app/redux/networking/types'
 
 export type NetworkChangeType =
-  | typeof CONNECT
-  | typeof DISCONNECT
-  | typeof JOIN_OTHER
+  typeof CONNECT | typeof DISCONNECT | typeof JOIN_OTHER
 
 export type NetworkChangeState =
   | { type: typeof CONNECT; ssid: string; network: WifiNetwork }
@@ -69,9 +67,7 @@ export interface ConnectFormSecurityField extends ConnectFormFieldCommon {
 }
 
 export type ConnectFormField =
-  | ConnectFormTextField
-  | ConnectFormKeyField
-  | ConnectFormSecurityField
+  ConnectFormTextField | ConnectFormKeyField | ConnectFormSecurityField
 
 export type ConnectFormFieldProps = Readonly<{
   value: string | null

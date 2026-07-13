@@ -213,7 +213,7 @@ function StepEndingHoldField(props: {
   const { toggledOn, onChange } = props
   const { t } = useTranslation('protocol_steps')
   const label = toggledOn
-    ? t('vacuum.previous_state.vent.open')
+    ? t('vacuum.previous_state.vent.opened')
     : t('vacuum.previous_state.vent.closed')
 
   return (

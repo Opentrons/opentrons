@@ -3,10 +3,11 @@ import { Trans, useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import { COLORS, LegacyStyledText } from '@opentrons/components'
-import { ApiHostProvider, useModulesQuery } from '@opentrons/react-api-client'
+import { useModulesQuery } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import { useGetModulesNeedingSetupThatCanCurrentlyBeSetUp } from '/app/App/hooks/useGetModulesNeedingSetup'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
@@ -30,7 +31,7 @@ import { Success } from './Success'
 import { UpdateFirmware } from './UpdateFirmware'
 import { useModuleSetupWizard } from './useModuleSetupWizard'
 
-import type { AttachedModule, HostConfig } from '@opentrons/api-client'
+import type { AttachedModule } from '@opentrons/api-client'
 
 interface ModuleWizardFlowsProps {
   robotName: string
@@ -397,28 +398,23 @@ export function ModuleWizardFlows(
   }
 }
 
-interface ModuleWizardFlowsPropsWithHost extends Omit<
-  ModuleWizardFlowsProps,
-  'closeFlow'
-> {
-  host: HostConfig
-}
+type ModuleWizardFlowsModalProps = Omit<ModuleWizardFlowsProps, 'closeFlow'>
 
 export const handleModuleWizardFlows = (
-  props: ModuleWizardFlowsPropsWithHost
+  props: ModuleWizardFlowsModalProps
 ): void => {
   NiceModal.show(NiceModalModuleWizardFlows, props)
 }
 
 const NiceModalModuleWizardFlows = NiceModal.create(
-  (props: ModuleWizardFlowsPropsWithHost): JSX.Element => {
+  (props: ModuleWizardFlowsModalProps): JSX.Element => {
     const modal = useModal()
     const closeFlow = (): void => {
       modal.remove()
     }
 
     return (
-      <ApiHostProvider {...props.host}>
+      <ApiHostProvider robotName={props.robotName}>
         <ModuleWizardFlows {...props} closeFlow={closeFlow} />
       </ApiHostProvider>
     )

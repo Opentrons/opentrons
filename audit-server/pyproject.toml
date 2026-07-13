@@ -10,6 +10,7 @@ classifiers = [
 
 dependencies = [
     "server-utils==0.0.0",
+    "opentrons-shared-data==0.0.0",
     "fastapi==0.100.0",
     "pydantic==2.11.7",
     "pydantic-settings==2.4.0",
@@ -27,6 +28,8 @@ dev = {requires-python = ">=3.11"}
 # Robot dependencies - exact versions for robot deployment
 robot = [
     "server-utils==0.0.0",
+    "opentrons-shared-data==0.0.0",
+    "jsonschema==4.17.3",
     "fastapi==0.100.0",
     "pydantic==2.11.7",
     "pydantic-settings==2.4.0",
@@ -89,6 +92,7 @@ exclude-newer = "1 week"
 # local editable sources satisfying the 0.0.0 placeholders
 [tool.uv.sources]
 server-utils = { path = "../server-utils", editable = true }
+opentrons-shared-data = { path = "../shared-data", editable = true }
 
 [build-system]
 requires = [
@@ -100,7 +104,7 @@ build-backend = "hatchling.build"
 
 # --- hatch-dependency-coversion: exact co-versioning of specific deps ---
 [tool.hatch.metadata.hooks.dependency-coversion]
-override-versions-of = ["server-utils"]
+override-versions-of = ["server-utils", "opentrons-shared-data"]
 
 # --- hatch-vcs-tunable: VCS-derived version with env-tunable settings ---
 [tool.hatch.build.hooks.vcs-tunable]
@@ -113,7 +117,7 @@ source = "vcs-tunable"
 
 [tool.hatch.version.raw-options]
 root = ".."
-git_describe_command = "git describe --dirty --tags --long --match=v*"
+git_describe_command = "git describe --dirty --tags --long --match=v[0-9]*.[0-9]*"
 fallback_version = "0.0.0-dev"
 version_scheme = "only-version"
 local_scheme = "no-local-version"

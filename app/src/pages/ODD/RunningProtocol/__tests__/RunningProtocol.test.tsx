@@ -17,6 +17,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
 /* eslint-disable-next-line opentrons/no-imports-across-applications */
 import { mockUseAllCommandsResponseNonDeterministic } from '/app/organisms/Desktop/RunProgressMeter/__fixtures__'
@@ -143,10 +144,7 @@ describe('RunningProtocol', () => {
       completedAt: '2022-05-04T18:24:41.833862+00:00',
     })
     when(vi.mocked(useRunActionMutations))
-      .calledWith(RUN_ID, {
-        reasonForInteractionRequired: false,
-        isLoading: false,
-      })
+      .calledWith(RUN_ID, ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE)
       .thenReturn({
         playRun: mockPlayRun,
         pauseRun: mockPauseRun,

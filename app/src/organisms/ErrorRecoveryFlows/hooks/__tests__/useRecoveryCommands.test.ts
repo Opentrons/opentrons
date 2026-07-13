@@ -8,6 +8,7 @@ import {
   useStopRunMutation,
 } from '@opentrons/react-api-client'
 
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
 import {
   useChainRunCommands,
@@ -28,6 +29,11 @@ import {
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs')
 vi.mock('/app/organisms/ErrorRecoveryFlows/utils')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: vi.fn(
+    () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+  ),
+}))
 
 describe('useRecoveryCommands', () => {
   const mockFailedCommand = {

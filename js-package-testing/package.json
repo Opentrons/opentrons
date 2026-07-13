@@ -29,7 +29,7 @@
     "clsx": "2.1.1",
     "dotenv": "^16.6.1",
     "typescript": "5.3.3",
-    "vite": "7.3.2"
+    "vite": "7.3.5"
   },
   "packageManager": "pnpm@10.32.1"
 }

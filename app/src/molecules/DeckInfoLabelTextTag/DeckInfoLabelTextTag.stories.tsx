@@ -1,6 +1,7 @@
 import { RobotInfoLabel, Tag, VIEWPORT } from '@opentrons/components'
 
 import { DeckInfoLabelTextTag as DeckInfoLabelTextTagComponent } from '.'
+import { customViewports } from '../../../../.storybook/preview'
 
 import type { Meta, Story } from '@storybook/react'
 
@@ -22,7 +23,9 @@ export default {
       description: 'Sample text to display in the example child component.',
     },
   },
-  ...VIEWPORT.touchScreenViewport,
+  viewport: {
+    options: [VIEWPORT.touchScreenViewport, customViewports],
+  },
 } as Meta
 
 interface DeckInfoLabelTextTagStoryProps {

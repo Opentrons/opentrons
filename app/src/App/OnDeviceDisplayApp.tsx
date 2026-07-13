@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import NiceModal from '@ebay/nice-modal-react'
@@ -12,7 +13,7 @@ import {
   POSITION_RELATIVE,
 } from '@opentrons/components'
 import {
-  ApiHostProvider,
+  ApiHostContext,
   useAccessControlEnabledQuery,
   useRobotSettingsQuery,
 } from '@opentrons/react-api-client'
@@ -62,6 +63,7 @@ import { getIsShellReady, updateBrightness } from '/app/redux/shell'
 import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { LocalizationProvider } from '../LocalizationProvider'
 import { requireDocumentation } from '../organisms/ODD/DocumentationRequired/requireDocumentation'
+import { showLoginModal } from '../organisms/ODD/OnDeviceLogin/LoginModal'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
 import { hackWindowNavigatorOnLine } from './hacks'
 import {
@@ -167,6 +169,7 @@ const TURN_OFF_BACKLIGHT = '7'
 const RETRY_DELAY_MS = 1000
 
 export const OnDeviceDisplayApp = (): JSX.Element => {
+  const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
 
   const [showModuleSetupModal, setShowModuleSetupModal] = useState(false)
@@ -182,8 +185,9 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     () => ({
       hostname: _ODD_IP_ ?? 'localhost',
       token: accessToken,
+      port: localRobot?.port ?? null,
     }),
-    [accessToken]
+    [accessToken, localRobot?.port]
   )
 
   const { brightness: userSetBrightness, sleepMs } = useSelector(
@@ -232,23 +236,25 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     // ensure we know whether access control is enabled or not,
     // so on first render we can immediately show the LoggedOutOverlay, if appropriate.
     accessControlEnabledQuery.isSuccess
-
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
-    <ApiHostProvider {...hostConfig}>
+    // to make sure that the host config stays stable and in step with the initial queries,
+    // we use an ApiHostContext.Provider here instead of an ApiHostProvider.
+    <ApiHostContext.Provider value={hostConfig}>
       <ReactQueryDevtools />
       {isReady ? (
         <LocalizationProvider>
           <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
             <Box width="100%" css="user-select: none;">
               {isIdle ? (
-                <SleepScreen />
+                <SleepScreen aria-label={t('exit_sleep_mode')} />
               ) : (
                 <>
                   <IncompatibleModuleTakeover isOnDevice={true} />
                   <DocumentationRequiredModalContext.Provider
                     value={{
                       showDocumentationRequiredModal: requireDocumentation,
+                      showLoginModal,
                     }}
                   >
                     <MaintenanceRunTakeover>
@@ -294,7 +300,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
       ) : (
         <InitialLoadingScreen />
       )}
-    </ApiHostProvider>
+    </ApiHostContext.Provider>
   )
 }
 

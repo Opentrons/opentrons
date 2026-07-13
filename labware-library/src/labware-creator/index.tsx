@@ -248,8 +248,7 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
   const onUpload = React.useCallback(
     (
       event:
-        | React.DragEvent<HTMLLabelElement>
-        | React.ChangeEvent<HTMLInputElement>
+        React.DragEvent<HTMLLabelElement> | React.ChangeEvent<HTMLInputElement>
     ) => {
       let files: FileList | never[] = []
       if ('dataTransfer' in event && event.dataTransfer.files !== null) {
@@ -595,8 +594,7 @@ interface CreateFileFormProps {
   currentWizardStep: WizardStep
   onUpload: (
     event:
-      | React.DragEvent<HTMLLabelElement>
-      | React.ChangeEvent<HTMLInputElement>
+      React.DragEvent<HTMLLabelElement> | React.ChangeEvent<HTMLInputElement>
   ) => void
   goBack: (stepsBack: number) => void
   onExportClick: () => void

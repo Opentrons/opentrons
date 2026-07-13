@@ -9,6 +9,7 @@ import {
   useHost,
 } from '@opentrons/react-api-client'
 
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { getValidCustomLabwareFiles } from '/app/redux/custom-labware/selectors'
 
 import type { UseMutateFunction } from 'react-query'
@@ -49,12 +50,19 @@ export function useCreateRunFromProtocol(
     getValidCustomLabwareFiles(state)
   )
 
+  const documentationState = useLinkedDocumentationState(
+    ['create_protocol', 'play_run'],
+    host?.robotName,
+    host
+  )
+
   const {
     createRun,
     isLoading: isCreatingRun,
     reset: resetRunMutation,
     error: runError,
   } = useCreateRunMutation(
+    documentationState,
     {
       ...options,
       onSuccess: (...args) => {
@@ -74,6 +82,7 @@ export function useCreateRunFromProtocol(
     error: protocolError,
     reset: resetProtocolMutation,
   } = useCreateProtocolMutation(
+    documentationState,
     {
       onSuccess: (data, { runTimeParameterValues, runTimeParameterFiles }) => {
         createRun({

@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import { TextAreaField as TextAreaFieldComponent } from '.'
+import { customViewports } from '../../../../.storybook/preview'
 import { DIRECTION_COLUMN } from '../../styles'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
 
@@ -10,7 +11,9 @@ import type { ComponentProps } from 'react'
 const meta: Meta<typeof TextAreaFieldComponent> = {
   title: 'Helix/Molecules/TextAreaField',
   component: TextAreaFieldComponent,
-  ...VIEWPORT.touchScreenViewport,
+  viewport: {
+    options: [VIEWPORT.touchScreenViewport, customViewports],
+  },
   argTypes: {},
 }
 

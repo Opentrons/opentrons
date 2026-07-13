@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { AlertPrimaryButton, SPACING } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 
 import { DROP_TIP_SPECIAL_ERROR_TYPES } from '../constants'
 
@@ -13,6 +14,23 @@ export interface SetRobotErrorDetailsParams {
   message: string | null
   header?: string
   type?: RunCommandError['errorType']
+}
+
+/**
+ * If the given error is a door-open maintenance command rejection, return
+ * SetRobotErrorDetailsParams that will render the door-open error variant.
+ * Otherwise return null.
+ */
+export function getDoorOpenErrorDetails(
+  error: unknown
+): SetRobotErrorDetailsParams | null {
+  if (isMaintenanceDoorOpenError(error)) {
+    return {
+      type: DROP_TIP_SPECIAL_ERROR_TYPES.DOOR_OPEN_ERROR as unknown as RunCommandError['errorType'],
+      message: null,
+    }
+  }
+  return null
 }
 
 /**
@@ -32,6 +50,12 @@ export function useDropTipCommandErrors(
         header: headerText,
         message: messageText,
         type: DROP_TIP_SPECIAL_ERROR_TYPES.MUST_HOME_ERROR,
+      })
+    } else if (type === DROP_TIP_SPECIAL_ERROR_TYPES.DOOR_OPEN_ERROR) {
+      setErrorDetails({
+        header: t('door_is_open'),
+        message: t('close_door_and_try_again'),
+        type: DROP_TIP_SPECIAL_ERROR_TYPES.DOOR_OPEN_ERROR,
       })
     } else {
       const messageText = message ?? ''
@@ -53,6 +77,7 @@ export interface UseDropTipErrorComponentsProps {
   isOnDevice: boolean
   errorDetails: ErrorDetails | null
   handleMustHome: () => Promise<void>
+  handleClearError: () => void
 }
 
 /**
@@ -62,6 +87,7 @@ export function useDropTipErrorComponents({
   errorDetails,
   isOnDevice,
   handleMustHome,
+  handleClearError,
 }: UseDropTipErrorComponentsProps): DropTipErrorComponents {
   const { t } = useTranslation('drop_tip_wizard')
 
@@ -100,6 +126,26 @@ export function useDropTipErrorComponents({
     }
   }
 
+  function buildDoorOpenError(): DropTipErrorComponents {
+    return {
+      button: isOnDevice ? (
+        <SmallButton
+          buttonText={t('try_again')}
+          onClick={handleClearError}
+          marginRight={SPACING.spacing4}
+        />
+      ) : (
+        <AlertPrimaryButton onClick={handleClearError}>
+          {t('try_again')}
+        </AlertPrimaryButton>
+      ),
+      subHeader: <>{errorDetails?.message}</>,
+    }
+  }
+
+  if (errorDetails?.type === DROP_TIP_SPECIAL_ERROR_TYPES.DOOR_OPEN_ERROR) {
+    return buildDoorOpenError()
+  }
   return errorDetails?.type === DROP_TIP_SPECIAL_ERROR_TYPES.MUST_HOME_ERROR
     ? buildHandleMustHome()
     : buildGenericError()

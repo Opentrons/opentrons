@@ -63,11 +63,7 @@ export interface RichOption {
 export type RichOptions = readonly RichOption[]
 
 export type LabwareType =
-  | 'wellPlate'
-  | 'reservoir'
-  | 'tubeRack'
-  | 'aluminumBlock'
-  | 'tipRack'
+  'wellPlate' | 'reservoir' | 'tubeRack' | 'aluminumBlock' | 'tipRack'
 export const labwareTypeOptions: Options = [
   { name: 'Well Plate', value: 'wellPlate' },
   { name: 'Reservoir', value: 'reservoir' },

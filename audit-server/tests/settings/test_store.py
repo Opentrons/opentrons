@@ -9,7 +9,6 @@ from sqlalchemy.orm import Session
 
 from audit_server.persistence.orm_models import Setting
 from audit_server.settings.models import (
-    PatchLoggingEnabledRequestData,
     PatchSettingsRequestData,
     SettingsResponseData,
 )
@@ -24,35 +23,30 @@ def settings_store(db_engine: SQLEngine) -> SettingsStore:
 
 def test_logging_enabled_defaults_to_false(settings_store: SettingsStore) -> None:
     """Before it's ever set, loggingEnabled reads as False."""
-    fetched = settings_store.get_logging_enabled_settings()
-    assert fetched.loggingEnabled is False
+    fetched = settings_store.get_logging_enabled()
+    assert fetched is False
 
 
 def test_patch_logging_enabled_enables_and_persists(
     settings_store: SettingsStore,
 ) -> None:
     """Patching loggingEnabled to True is reflected and persisted."""
-    returned = settings_store.patch_logging_enabled(
-        PatchLoggingEnabledRequestData(loggingEnabled=True)
-    )
-    assert returned.loggingEnabled is True
-    assert settings_store.get_logging_enabled_settings().loggingEnabled is True
+    returned = settings_store.patch_logging_enabled(True)
+    assert returned is True
+    assert settings_store.get_logging_enabled() is True
 
 
 def test_patch_logging_enabled_is_toggleable_both_ways(
     settings_store: SettingsStore,
 ) -> None:
     """Unlike auth-server access control, loggingEnabled can be turned back off."""
-    returned_set = settings_store.patch_logging_enabled(
-        PatchLoggingEnabledRequestData(loggingEnabled=True)
-    )
-    assert returned_set.loggingEnabled is True
-    assert settings_store.get_logging_enabled_settings().loggingEnabled is True
-    returned = settings_store.patch_logging_enabled(
-        PatchLoggingEnabledRequestData(loggingEnabled=False)
-    )
-    assert returned.loggingEnabled is False
-    assert settings_store.get_logging_enabled_settings().loggingEnabled is False
+    returned_set = settings_store.patch_logging_enabled(True)
+    assert returned_set is True
+    assert settings_store.get_logging_enabled() is True
+    returned = settings_store.patch_logging_enabled(False)
+
+    assert returned is False
+    assert settings_store.get_logging_enabled() is False
 
 
 def test_get_settings_returns_defaults_when_empty(

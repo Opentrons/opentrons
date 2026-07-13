@@ -13,6 +13,8 @@ on:
       - 'scripts/**.py'
       - '.github/workflows/hardware-lint-test.yaml'
       - '.github/actions/python/**'
+      - 'shared-data/**'
+      - '!shared-data/js/**'
     branches:
       - 'edge'
       - 'release'
@@ -26,6 +28,8 @@ on:
       - 'scripts/**.py'
       - '.github/workflows/hardware-lint-test.yaml'
       - '.github/actions/python/**'
+      - 'shared-data/**'
+      - '!shared-data/js/**'
 
   workflow_dispatch:
 

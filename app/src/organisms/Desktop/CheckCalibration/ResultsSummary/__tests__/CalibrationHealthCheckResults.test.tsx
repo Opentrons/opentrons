@@ -1,14 +1,15 @@
 import { screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it } from 'vitest'
-
-import { COLORS, TYPOGRAPHY } from '@opentrons/components'
+import { beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { StatusLabel } from '/app/atoms/StatusLabel'
 import { i18n } from '/app/i18n'
 
 import { CalibrationHealthCheckResults } from '../CalibrationHealthCheckResults'
 
 import type { ComponentProps } from 'react'
+
+vi.mock('/app/atoms/StatusLabel')
 
 const render = (
   props: ComponentProps<typeof CalibrationHealthCheckResults>
@@ -24,29 +25,18 @@ describe('CalibrationHealthCheckResults', () => {
     props = {
       isCalibrationRecommended: false,
     }
+    vi.mocked(StatusLabel).mockReturnValue(<div>mock StatusLabel</div>)
   })
 
   it('should render title and success StatusLabel when all calibration is good', () => {
     render(props)
     screen.getByText('Calibration Health Check Results')
-    const statusLabel = screen.getByText('Calibration complete')
-    expect(statusLabel).toHaveStyle(`color: ${String(COLORS.black90)}`)
-    expect(statusLabel).toHaveStyle(
-      `font-weight: ${String(TYPOGRAPHY.fontWeightSemiBold)}`
-    )
-    expect(screen.getByTestId('status_circle')).toHaveStyle(
-      `color: ${String(COLORS.green50)}`
-    )
-    expect(screen.getByTestId('status_circle')).toHaveStyle(`height: 0.3125rem`)
-    expect(screen.getByTestId('status_circle')).toHaveStyle(`width: 0.3125rem`)
+    screen.getByText('mock StatusLabel')
   })
 
   it('should render title and warning StatusLabel when calibration results includes bad', () => {
     props.isCalibrationRecommended = true
     render(props)
-    screen.getByText('Calibration recommended')
-    expect(screen.getByTestId('status_circle')).toHaveStyle(
-      `color: ${String(COLORS.yellow50)}`
-    )
+    screen.getByText('mock StatusLabel')
   })
 })

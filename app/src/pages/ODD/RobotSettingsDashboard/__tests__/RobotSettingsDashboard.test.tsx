@@ -17,6 +17,7 @@ import {
   UpdateChannel,
 } from '/app/organisms/ODD/RobotSettingsDashboard'
 import { CameraPreferences } from '/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences'
+import { FileManager } from '/app/organisms/ODD/RobotSettingsDashboard/FileManager'
 import {
   getAppLanguage,
   getFeatureFlags,
@@ -56,6 +57,7 @@ vi.mock('/app/organisms/ODD/RobotSettingsDashboard/Privacy')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/LanguageSetting')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/Devices')
+vi.mock('/app/organisms/ODD/RobotSettingsDashboard/FileManager')
 
 const mockToggleLights = vi.fn()
 const mockToggleER = vi.fn()
@@ -124,6 +126,8 @@ describe('RobotSettingsDashboard', () => {
     screen.getByText(
       'Control the strip of color lights on the front of the robot.'
     )
+    screen.getByText('File Manager')
+    screen.getByText('Download and delete robot files.')
     screen.getByText('Touchscreen Sleep')
     screen.getByText('Touchscreen Brightness')
     screen.getByText('Privacy')
@@ -302,6 +306,14 @@ describe('RobotSettingsDashboard', () => {
     const button = screen.getByText('Language')
     fireEvent.click(button)
     expect(vi.mocked(LanguageSetting)).toHaveBeenCalled()
+  })
+
+  it('should render component when tapping File Manager', () => {
+    render()
+
+    const button = screen.getByText('File Manager')
+    fireEvent.click(button)
+    expect(vi.mocked(FileManager)).toHaveBeenCalled()
   })
 
   it('should call a mock function when tapping devices', () => {

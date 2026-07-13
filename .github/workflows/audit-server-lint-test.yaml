@@ -13,6 +13,8 @@ on:
       - '.github/workflows/audit-server-lint-test.yaml'
       - '.github/actions/python/**'
       - 'server-utils/**'
+      - 'shared-data/**'
+      - '!shared-data/js/**'
     branches: # ignore any release-related thing (handled elsewhere)
       - 'edge'
     tags-ignore:
@@ -27,6 +29,8 @@ on:
       - '.github/workflows/audit-server-lint-test.yaml'
       - '.github/actions/python/**'
       - 'server-utils/**'
+      - 'shared-data/**'
+      - '!shared-data/js/**'
   workflow_dispatch:
 
 permissions: {}
@@ -75,7 +79,3 @@ jobs:
           project: 'audit-server'
       - name: Test
         run: make -C audit-server test
-      - uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
-        with:
-          files: ./audit-server/coverage.xml
-          flags: audit-server

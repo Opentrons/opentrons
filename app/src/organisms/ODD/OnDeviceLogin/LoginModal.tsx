@@ -19,10 +19,6 @@ import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 import type { LoginStep } from './index'
 
-export interface LoginModalResult {
-  username: string
-}
-
 type LoginModalPhase = 'login' | 'chooseNewPassword'
 
 const LoginModalImpl = NiceModal.create((): JSX.Element => {
@@ -47,8 +43,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
 
   const finishModal = useCallback(
     (username: string): void => {
-      const result: LoginModalResult = { username }
-      modal.resolve(result)
+      modal.resolve({ username })
       modal.remove()
     },
     [modal]
@@ -137,8 +132,8 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
 /**
  * Open the login modal and await the result.
  */
-export function showLoginModal(): Promise<LoginModalResult | null> {
-  return NiceModal.show(LoginModalImpl) as Promise<LoginModalResult | null>
+export function showLoginModal(): Promise<{ username: string } | null> {
+  return NiceModal.show(LoginModalImpl)
 }
 
 /**

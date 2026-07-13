@@ -598,6 +598,44 @@ def _mod_disconnect_notif_dict_to_class(  # type: ignore
     )
 
 
+# ModuleConnectedNotification serializers
+def _mod_connected_notif_class_to_dict(obj) -> Dict:  # type: ignore
+    return {
+        "__class__": "opentrons.hardware_control.types.ModuleConnectedNotification",
+        "event": obj.event,
+        "module_serial": obj.module_serial,
+        "name": obj.name,
+        "port": obj.port,
+    }
+
+
+def _mod_connected_notif_dict_to_class(  # type: ignore
+    classname, d
+) -> opentrons.hardware_control.types.ModuleConnectedNotification:
+    return opentrons.hardware_control.types.ModuleConnectedNotification(
+        event=opentrons.hardware_control.types.HardwareEventType(d["event"]["value"]),  # type: ignore
+        module_serial=d["module_serial"],
+        name=d["name"],
+        port=d["port"],
+    )
+
+
+# SubsystemConnectionNotification serializers
+def _subsys_connected_notif_class_to_dict(obj) -> Dict:  # type: ignore
+    return {
+        "__class__": "opentrons.hardware_control.types.SubsystemConnectionNotification",
+        "event": obj.event,
+    }
+
+
+def _subsys_connected_notif_dict_to_class(  # type: ignore
+    classname, d
+) -> opentrons.hardware_control.types.SubsystemConnectionNotification:
+    return opentrons.hardware_control.types.SubsystemConnectionNotification(
+        event=opentrons.hardware_control.types.HardwareEventType(d["event"]["value"]),  # type: ignore
+    )
+
+
 # Robot type registry - of note, this is meant to return a "pure" type
 def _robot_type_class_to_dict(obj) -> Dict:  # type: ignore
     return {"__class__": ".".join((obj.__module__, obj.__class__.__name__))}
@@ -817,6 +855,20 @@ def register_hardware_types() -> None:
         class_type=opentrons.hardware_control.types.ModuleDisconnectedNotification,
         dict_to_class=_mod_disconnect_notif_dict_to_class,
         class_to_dict=_mod_disconnect_notif_class_to_dict,
+    )
+
+    # ModuleConnectedNotification registration
+    register_type_to_serpent(
+        class_type=opentrons.hardware_control.types.ModuleConnectedNotification,
+        dict_to_class=_mod_connected_notif_dict_to_class,
+        class_to_dict=_mod_connected_notif_class_to_dict,
+    )
+
+    # SubsystemConnectionNotification registration
+    register_type_to_serpent(
+        class_type=opentrons.hardware_control.types.SubsystemConnectionNotification,
+        dict_to_class=_subsys_connected_notif_dict_to_class,
+        class_to_dict=_subsys_connected_notif_class_to_dict,
     )
 
     # USBPort registration

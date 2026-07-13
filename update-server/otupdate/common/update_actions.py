@@ -45,7 +45,7 @@ class UpdateActionsInterface:
         filepath: str,
         progress_callback: Callable[[float], None],
         cert_path: Optional[str],
-    ) -> Optional[str]:
+    ) -> str:
         """Worker for validation. Call in an executor (so it can return things)
 
         - Unzips filepath to its directory
@@ -99,3 +99,11 @@ class UpdateActionsInterface:
     def clean_up(self, download_dir: str) -> None:
         """Deletes the update files from the download dir."""
         ...
+
+    @abc.abstractmethod
+    def restart(self) -> None:
+        """Restart the robot."""
+
+    @abc.abstractmethod
+    def shutdown(self) -> None:
+        """Shut down the robot."""

@@ -76,18 +76,14 @@ export function registerRobotUpdate(dispatch: Dispatch): Dispatch {
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         startPremigration(robot)
-          .then(
-            (): RobotUpdateAction => ({
-              type: 'robotUpdate:PREMIGRATION_DONE',
-              payload: robot.name,
-            })
-          )
-          .catch(
-            (error: Error): RobotUpdateAction => ({
-              type: 'robotUpdate:PREMIGRATION_ERROR',
-              payload: { message: error.message },
-            })
-          )
+          .then((): RobotUpdateAction => ({
+            type: 'robotUpdate:PREMIGRATION_DONE',
+            payload: robot.name,
+          }))
+          .catch((error: Error): RobotUpdateAction => ({
+            type: 'robotUpdate:PREMIGRATION_ERROR',
+            payload: { message: error.message },
+          }))
           .then(dispatch)
 
         break

@@ -1,7 +1,7 @@
 [project]
 name = "robot_server"
 dynamic = ["version"]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
 authors = [{ name = "Opentrons", email = "engineering@opentrons.com" }]
 classifiers = [
@@ -30,8 +30,6 @@ dependencies = [
     "aiohttp>=3.12.14,<4",
     "Pyro5>=5.16,<6",
 ]
-[tool.uv.dependency-groups]
-dev = {requires-python = ">=3.11"}
 
 [dependency-groups]
 # Robot dependencies - exact versions for robot deployment
@@ -154,7 +152,7 @@ source = "vcs-tunable"
 
 [tool.hatch.version.raw-options]
 root = ".."
-git_describe_command = "git describe --dirty --tags --long --match=v*"
+git_describe_command = "git describe --dirty --tags --long --match=v[0-9]*.[0-9]*"
 fallback_version = "0.0.0-dev"
 version_scheme = "only-version"
 local_scheme = "no-local-version"

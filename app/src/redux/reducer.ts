@@ -2,6 +2,8 @@ import { combineReducers } from 'redux'
 
 // app-wide alerts state
 import { alertsReducer } from './alerts/reducer'
+// audit log period deletion key state
+import { auditReducer } from './audit/slice'
 // calibration data state
 import { calibrationReducer } from './calibration/reducer'
 // config state
@@ -41,6 +43,7 @@ export const rootReducer: Reducer<State, Action> = (
   action: Action
 ): State => {
   const combinedReducer = combineReducers({
+    audit: auditReducer,
     robotAdmin: robotAdminReducer,
     robotApi: robotApiReducer,
     robotAuth: robotAuthReducer,

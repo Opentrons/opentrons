@@ -9,6 +9,7 @@ import {
 } from '@opentrons/react-api-client'
 import { WELL_ORIGIN_TOP } from '@opentrons/shared-data'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
 import {
   useChainRunCommands,
@@ -122,11 +123,8 @@ export function useRecoveryCommands({
   const { mutateAsync: resumeRunFromRecoveryAssumingFalsePositive } =
     useResumeRunFromRecoveryAssumingFalsePositiveMutation()
 
-  // TODO(jj): add doc state to desktop app
-  const { stopRun } = useStopRunMutation({
-    reasonForInteractionRequired: false,
-    isLoading: false,
-  })
+  const documentationState = useDocumentationState()
+  const { stopRun } = useStopRunMutation(documentationState)
   const updateErrorRecoveryPolicy = useUpdateRecoveryPolicyWithStrategy(runId)
   const currentRecoveryPolicy = useErrorRecoveryPolicy(runId)?.data?.data
   const { chainRunCommands } = useChainRunCommands(
@@ -158,9 +156,7 @@ export function useRecoveryCommands({
   )
 
   const buildRetryPrepMove = ():
-    | MoveToCoordinatesCreateCommand
-    | LiquidProbeCreateCommand
-    | null => {
+    MoveToCoordinatesCreateCommand | LiquidProbeCreateCommand | null => {
     type InPlaceCommand =
       | AspirateInPlaceRunTimeCommand
       | BlowoutInPlaceRunTimeCommand
@@ -168,8 +164,7 @@ export function useRecoveryCommands({
       | DropTipInPlaceRunTimeCommand
       | PrepareToAspirateRunTimeCommand
     type CommandsWithDynamicLiquidTracking =
-      | AspirateWhileTrackingRunTimeCommand
-      | DispenseWhileTrackingRunTimeCommand
+      AspirateWhileTrackingRunTimeCommand | DispenseWhileTrackingRunTimeCommand
 
     const IN_PLACE_COMMAND_TYPES = [
       'aspirateInPlace',
@@ -194,8 +189,7 @@ export function useRecoveryCommands({
     const requiresMoveToError = (
       error?: RunCommandError | null
     ): error is
-      | RunCommandErrorOverpressure
-      | RunCommandErrorTipPhysicallyAttached =>
+      RunCommandErrorOverpressure | RunCommandErrorTipPhysicallyAttached =>
       error != null &&
       error.isDefined &&
       (error.errorType === DEFINED_ERROR_TYPES.OVERPRESSURE ||

@@ -15,6 +15,7 @@ import {
   WizardHeader,
 } from '@opentrons/components'
 import {
+  isDocumentedMutationError,
   useCreateMaintenanceCommandMutation,
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
@@ -106,8 +107,11 @@ export function GripperWizardFlows(
       onSuccess: response => {
         setCreatedMaintenanceRunId(response.data.id)
       },
-      onError: error => {
-        setErrorMessage(error.message)
+      onError: (error: unknown) => {
+        if (isDocumentedMutationError(error)) {
+          return
+        }
+        setErrorMessage(error instanceof Error ? error.message : String(error))
       },
     })
 
@@ -206,7 +210,14 @@ export function GripperWizardFlows(
       handleCleanUpAndClose={handleCleanUpAndClose}
       handleClose={handleClose}
       chainRunCommands={chainRunCommands}
-      createRunCommand={createMaintenanceCommand}
+      createRunCommand={params =>
+        createMaintenanceCommand(params).catch(error => {
+          if (isDocumentedMutationError(error)) {
+            return new Promise(() => {})
+          }
+          return Promise.reject(error)
+        })
+      }
       errorMessage={errorMessage}
       setErrorMessage={setErrorMessage}
       isExiting={isExiting}

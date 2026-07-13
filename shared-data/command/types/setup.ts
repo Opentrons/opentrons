@@ -237,9 +237,7 @@ interface ReloadLabwareResult {
 }
 
 export type LabwareMovementStrategy =
-  | 'usingGripper'
-  | 'manualMoveWithPause'
-  | 'manualMoveWithoutPause'
+  'usingGripper' | 'manualMoveWithPause' | 'manualMoveWithoutPause'
 
 export interface MoveLabwareParams {
   labwareId: string

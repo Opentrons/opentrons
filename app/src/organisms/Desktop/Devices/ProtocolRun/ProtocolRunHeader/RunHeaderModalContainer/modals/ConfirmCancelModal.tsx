@@ -18,6 +18,7 @@ import {
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { isStoppingOrStopped } from '/app/local-resources/runs/utils'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useIsFlex } from '/app/redux-resources/robots'
@@ -52,11 +53,8 @@ export function ConfirmCancelModal(
   props: ConfirmCancelModalProps
 ): JSX.Element {
   const { onClose, runId, robotName, runStatus } = props
-  // TODO(jj): add doc state to desktop app
-  const { stopRun } = useStopRunMutation({
-    reasonForInteractionRequired: false,
-    isLoading: false,
-  })
+  const documentationState = useDocumentationState()
+  const { stopRun } = useStopRunMutation(documentationState)
   const isFlex = useIsFlex(robotName)
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const [isCanceling, setIsCanceling] = useState(false)

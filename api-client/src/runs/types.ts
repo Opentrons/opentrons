@@ -223,6 +223,8 @@ export interface UpdateErrorRecoveryPolicyRequest {
 export type UpdateErrorRecoveryPolicyResponse = Record<string, never>
 export type ErrorRecoveryPolicyResponse = UpdateErrorRecoveryPolicyRequest
 
+export type DownloadedRunResponse = Blob | string
+
 /**
  * Current Run State Data
  */
@@ -248,4 +250,8 @@ export interface FlexStackerState {
   lidLabwareURI?: string
   count: number
   maxCount: number
+}
+
+export interface DeleteRunData {
+  shouldDeleteAllRunFiles?: boolean
 }

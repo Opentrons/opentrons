@@ -27,7 +27,7 @@ class VacuumModuleSubState:
         """Return a new state with the given update applied."""
         new_pump_engaged = self.pump_engaged
         if isinstance(update.pump_engaged, bool):
-            new_pump_engaged = self.pump_engaged
+            new_pump_engaged = update.pump_engaged
         return VacuumModuleSubState(
             module_id=self.module_id, pump_engaged=new_pump_engaged
         )

@@ -99,33 +99,22 @@ export interface VacuumModuleData {
   currentPower: number | null
   targetPower: number | null
   modeType: VacuumMode
-  ventStatus: 'open' | 'closed'
+  ventStatus: 'opened' | 'closed'
   status: VacuumModuleStatus
 }
 
 export type TemperatureStatus =
-  | 'idle'
-  | 'holding at target'
-  | 'cooling'
-  | 'heating'
+  'idle' | 'holding at target' | 'cooling' | 'heating'
 
 export type ThermocyclerStatus =
-  | 'idle'
-  | 'holding at target'
-  | 'cooling'
-  | 'heating'
-  | 'error'
+  'idle' | 'holding at target' | 'cooling' | 'heating' | 'error'
 
 export type MagneticStatus = 'engaged' | 'disengaged'
 
 export type HeaterShakerStatus = 'idle' | 'running' | 'error'
 
 export type SpeedStatus =
-  | 'holding at target'
-  | 'speeding up'
-  | 'slowing down'
-  | 'idle'
-  | 'error'
+  'holding at target' | 'speeding up' | 'slowing down' | 'idle' | 'error'
 
 export type LatchStatus =
   | 'opening'
@@ -140,12 +129,7 @@ export type AbsorbanceReaderStatus = 'idle' | 'measuring' | 'error'
 export type FlexStackerStatus = 'idle' | 'dispensing' | 'storing' | 'error'
 
 export type VacuumModuleStatus =
-  | 'idle'
-  | 'ramping'
-  | 'holding'
-  | 'venting'
-  | 'complete'
-  | 'error'
+  'idle' | 'ramping' | 'holding' | 'venting' | 'complete' | 'error'
 
 export type VacuumMode = 'pressure' | 'power'
 export interface ApiTemperatureModule extends ApiBaseModule {

@@ -21,9 +21,9 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { Divider } from '/app/atoms/structure'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { CollapsibleSection } from '/app/molecules/CollapsibleSection'
 import { DevicesEmptyState } from '/app/organisms/Desktop/Devices/DevicesEmptyState'
 import { RobotCard } from '/app/organisms/Desktop/Devices/RobotCard'
@@ -34,10 +34,7 @@ import {
   getReachableRobots,
   getScanning,
   getUnreachableRobots,
-  OPENTRONS_USB,
 } from '/app/redux/discovery'
-import { useAccessTokenForRobot } from '/app/redux/robot-auth'
-import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
 import { NewRobotSetupHelp } from './NewRobotSetupHelp'
 
@@ -236,14 +233,5 @@ function ApiHostProviderForRobot(props: {
   children: ReactNode
 }): JSX.Element {
   const { robot, children } = props
-  const token = useAccessTokenForRobot(robot?.name ?? null)
-  return (
-    <ApiHostProvider
-      hostname={robot.ip ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
-      token={token}
-    >
-      {children}
-    </ApiHostProvider>
-  )
+  return <ApiHostProvider robotName={robot.name}>{children}</ApiHostProvider>
 }
