@@ -6,6 +6,8 @@
   "end_plate_reader_lid": "Finishing place plate reader lid",
   "home_pipettes": "Homing pipettes",
   "end_home_pipettes": "Finishing home pipettes",
+  "home_gantry": "Homing gantry",
+  "end_home_gantry": "Finishing home gantry",
   "attach_gripper": "Attaching gripper",
   "detach_gripper": "Detaching gripper",
   "recalibrate_gripper": "Recalibrating gripper",

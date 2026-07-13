@@ -14,9 +14,9 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useHomeMutation } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { useHomeGantry } from '/app/local-resources/instruments'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useLights } from '/app/resources/devices'
 
@@ -35,7 +35,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
   const { onClick, robotName, setShowNavMenu } = props
   const { t, i18n } = useTranslation(['devices_landing', 'robot_controls'])
   const { lightsOn, toggleLights } = useLights()
-  const { home } = useHomeMutation()
+  const { homeGantry } = useHomeGantry({})
   const [
     showRestartRobotConfirmationModal,
     setShowRestartRobotConfirmationModal,
@@ -57,7 +57,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
   }
 
   const handleHomeGantry = (): void => {
-    home({ target: 'robot' })
+    void homeGantry()
     setShowNavMenu(false)
   }
 

@@ -5,10 +5,9 @@ import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
-import { useHomeMutation } from '@opentrons/react-api-client'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useHomeGantry } from '/app/local-resources/instruments'
 import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
 import { useIsRobotBusy } from '/app/redux-resources/robots'
 import {
@@ -27,15 +26,8 @@ import { DisconnectModal } from '../RobotSettings/ConnectNetwork/DisconnectModal
 import { handleUpdateBuildroot } from '../RobotSettings/UpdateBuildroot'
 
 import type { ComponentProps } from 'react'
-import type * as ReactApiClient from '@opentrons/react-api-client'
 
-vi.mock('@opentrons/react-api-client', async importOriginal => {
-  const actual = await importOriginal<typeof ReactApiClient>()
-  return {
-    ...actual,
-    useHomeMutation: vi.fn(),
-  }
-})
+vi.mock('/app/local-resources/instruments')
 vi.mock('/app/redux/robot-admin')
 vi.mock('../hooks')
 vi.mock('/app/redux/robot-update')
@@ -58,14 +50,17 @@ const render = (props: ComponentProps<typeof RobotOverviewOverflowMenu>) => {
   )[0]
 }
 
-const mockHome = vi.fn()
+const mockHomeGantry = vi.fn()
 
 describe('RobotOverviewOverflowMenu', () => {
   let props: ComponentProps<typeof RobotOverviewOverflowMenu>
   vi.useFakeTimers()
 
   beforeEach(() => {
-    vi.mocked(useHomeMutation).mockReturnValue({ home: mockHome } as any)
+    vi.mocked(useHomeGantry).mockReturnValue({
+      homeGantry: mockHomeGantry,
+      isHoming: false,
+    } as any)
     props = { robot: mockConnectableRobot }
     vi.mocked(useIsRobotOnWrongVersionOfSoftware).mockReturnValue(false)
     vi.mocked(useCurrentRunId).mockReturnValue(null)
@@ -174,7 +169,7 @@ describe('RobotOverviewOverflowMenu', () => {
     const homeBtn = screen.getByRole('button', { name: 'Home gantry' })
     fireEvent.click(homeBtn)
 
-    expect(mockHome).toHaveBeenCalledWith({ target: 'robot' })
+    expect(mockHomeGantry).toHaveBeenCalled()
   })
 
   it('should render disabled disconnect button in the menu when the robot cannot disconnect', () => {

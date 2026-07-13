@@ -22,12 +22,12 @@ import {
 } from '@opentrons/components'
 import {
   useCreateLiveCommandMutation,
-  useHomeMutation,
   useSetLightsMutation,
 } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
+import { useHomeGantry } from '/app/local-resources/instruments'
 import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
 import { RobotCertImportModal } from '/app/organisms/Desktop/RobotCertImport/RobotCertImportModal'
 import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
@@ -77,7 +77,7 @@ export const RobotOverviewOverflowMenu = (
   const isFlex = useIsFlex(robot.name)
   const { setLights } = useSetLightsMutation()
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const { home } = useHomeMutation()
+  const { homeGantry } = useHomeGantry({})
 
   const handleClickRestart: MouseEventHandler<HTMLButtonElement> = () => {
     dispatch(restartRobot(robot.name))
@@ -97,7 +97,7 @@ export const RobotOverviewOverflowMenu = (
   }
 
   const handleClickHomeGantry: MouseEventHandler<HTMLButtonElement> = () => {
-    home({ target: 'robot' })
+    void homeGantry()
   }
 
   const [showChooseProtocolSlideout, setShowChooseProtocolSlideout] =
