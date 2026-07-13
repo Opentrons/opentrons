@@ -93,16 +93,14 @@ The Flex has not been evaluated for use with flammable liquids and should not be
 
 ## Regulatory compliance
 
-Opentrons Flex complies with all applicable requirements of the following safety and electromagnetic certification and standards. You can also find compliance information on a sticker affixed to the back of Flex near the on/off switch.
+Opentrons Flex complies with all applicable requirements of the following certification and standards. You can find standards and compliance information on the sticker affixed to the back of the robot near the on/off switch.
 
 <figure markdown>
 ![Flex regulatory and compliance sticker](images/regulatory-specs-sticker.png)
-<figcaption>Example of the Flex regulatory and compliance sticker.</figcaption>
+<figcaption>Flex compliance sticker</figcaption>
 </figure>
 
-### Certification marks
-
-The Flex carries various certification logos on its back panel sticker. These symbols serve as our verified declarations of conformity with international and regional directives and standards.
+These symbols indicate Flex conforms to international and regional regulatory directives and standards.
 
 | Symbol | Market Area | Description |
 |----|----|----|
@@ -124,7 +122,6 @@ The Flex carries various certification logos on its back panel sticker. These sy
 | :------ | :---- |
 | **EN/BSI 61326-1** | Electrical Equipment for Measurement, Control, and Laboratory Use – EMC Requirements – Part 1: General Requirements |
 | **FCC 47 CFR Part 15 Subpart B Class A** | Unintentional Radiators |
-| **IC ICES-003** | Spectrum Management and Telecommunications – Interference- Causing Equipment Standard – Information Technology Equipment (Including Digital Apparatus) |
 
 ### FCC warnings and notes
 
@@ -146,10 +143,6 @@ This product meets the applicable Innovation, Science and Economic Development C
 
 Le présent produit est conforme aux spécifications techniques applicables d'Innovation, Sciences et Développement économique Canada.
 
-### Environmental warning
-
-**Warning:** Cancer and Reproductive Harm – <https://www.P65Warnings.ca.gov>
-
 ### WEEE policy
 
 <img src="../images/regulatory-marks/WEEE.svg" style="float: right;" width="10%">
@@ -163,12 +156,12 @@ If you or your business have Opentrons products that are at end of life or need 
 
 The Wi-Fi module is precertified for use in many regions:
 
+- Canada (IC): Hardware Version Identification Number W8997-M1216
+- European Economic Area (CE): No public identifier (self-declaration)
+- India (WPC): Registration number ETA-SD-20191005525 (self-declaration)
+- Japan (TELEC): Certified number 020-170034
 - United States (FCC): FCC Identifier UAY-W8997-M1216
 
-- European Economic Area (CE): No public identifier (self-declaration)
+### California environmental warning
 
-- Canada (IC): Hardware Version Identification Number W8997-M1216
-
-- Japan (TELEC): Certified number 020-170034
-
-- India (WPC): Registration number ETA-SD-20191005525 (self-declaration)
+**Warning:** Cancer and Reproductive Harm – <https://www.P65Warnings.ca.gov>
