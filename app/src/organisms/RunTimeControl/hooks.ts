@@ -1,5 +1,6 @@
 import { useRunActionMutations } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import {
   DEFAULT_RUN_QUERY_REFETCH_INTERVAL,
   DEFAULT_STATUS_REFETCH_INTERVAL,
@@ -16,7 +17,7 @@ export interface RunControls {
   play: () => void
   pause: () => void
   stop: () => void
-  reset: () => void
+  reset: (options?: { onError?: (error: unknown) => void }) => void
   resumeFromRecovery: () => void
   isPlayRunActionLoading: boolean
   isPauseRunActionLoading: boolean
@@ -30,7 +31,8 @@ export function useRunControls(
   runId: string | null,
   onCloneRunSuccess?: (createRunResponse: Run) => unknown
 ): RunControls {
-  // TODO (jj): popup doc modal in desktop app
+  const documentationState = useDocumentationState()
+
   const {
     playRun,
     pauseRun,
@@ -40,10 +42,7 @@ export function useRunControls(
     isPauseRunActionLoading,
     isStopRunActionLoading,
     isResumeRunFromRecoveryActionLoading,
-  } = useRunActionMutations(runId!, {
-    isLoading: false,
-    accessControlEnabled: false,
-  })
+  } = useRunActionMutations(runId!, documentationState)
 
   const {
     cloneRun,

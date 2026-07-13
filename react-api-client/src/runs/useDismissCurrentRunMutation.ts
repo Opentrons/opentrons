@@ -1,7 +1,8 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { dismissCurrentRun } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
 import type {
@@ -10,6 +11,8 @@ import type {
   UseMutationResult,
 } from 'react-query'
 import type { EmptyResponse } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
+import type { DocumentedMutationParameters } from '../accessControl/types'
 
 export type UseDismissCurrentRunMutationResult = UseMutationResult<
   EmptyResponse,
@@ -26,14 +29,17 @@ export type UseDismissCurrentRunMutationOptions = UseMutationOptions<
 >
 
 export function useDismissCurrentRunMutation(
+  documentationState: DocumentationState,
   options: UseDismissCurrentRunMutationOptions = {}
 ): UseDismissCurrentRunMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<EmptyResponse, unknown, string>(
-    (runId: string) =>
-      dismissCurrentRun(host!, runId).then(response => {
+  const mutation = useDocumentedMutation<EmptyResponse, unknown, string>(
+    documentationState,
+    ['dismiss_run'],
+    ({ userNotes, variables: runId }: DocumentedMutationParameters<string>) =>
+      dismissCurrentRun(host!, runId, userNotes).then(response => {
         queryClient.removeQueries(getQueryKey(host, 'runs', runId))
         queryClient
           .invalidateQueries(getQueryKey(host, 'runs'))

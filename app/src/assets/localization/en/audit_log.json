@@ -2,6 +2,7 @@
   "stop_run": "Stopping protocol run",
   "play_run": "Playing protocol",
   "place_plate_reader_lid": "Placing plate reader lid",
+  "dismiss_run": "Dismissing protocol run",
   "end_plate_reader_lid": "Finishing place plate reader lid",
   "home_pipettes": "Homing pipettes",
   "end_home_pipettes": "Finishing home pipettes",
@@ -31,5 +32,8 @@
   "finish_attach_gripper": "Finishing attach gripper flow",
   "finish_detach_gripper": "Finishing detach gripper flow",
   "finish_recalibrate_gripper": "Finishing recalibrate gripper flow",
-  "create_protocol": "Creating protocol"
+  "create_protocol": "Creating protocol",
+  "launching_error_recovery": "Launching error recovery",
+  "resume_run_from_recovery": "Resuming protocol run from recovery mode",
+  "retry_action": "Retrying step"
 }

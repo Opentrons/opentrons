@@ -6,6 +6,7 @@ import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 
 import { AnalysisFailedModal } from '../AnalysisFailedModal'
 
@@ -21,6 +22,9 @@ const mockDismissCurrentRunAsync = vi.fn(
 )
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 vi.mock('react-router-dom', async importOriginal => {
   const reactRouterDom = await importOriginal<NavigateFunction>()
   return {
@@ -38,12 +42,13 @@ const render = (props: ComponentProps<typeof AnalysisFailedModal>) => {
 describe('AnalysisFailedModal', () => {
   let props: ComponentProps<typeof AnalysisFailedModal>
 
-  when(vi.mocked(useDismissCurrentRunMutation))
-    .calledWith()
-    .thenReturn({
-      mutateAsync: mockDismissCurrentRunAsync,
-    } as any)
   beforeEach(() => {
+    mockDismissCurrentRunAsync.mockClear()
+    when(vi.mocked(useDismissCurrentRunMutation))
+      .calledWith(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE)
+      .thenReturn({
+        mutateAsync: mockDismissCurrentRunAsync,
+      } as any)
     props = {
       errors: [
         'analysis failed reason message 1',
@@ -74,7 +79,6 @@ describe('AnalysisFailedModal', () => {
   it('should call mock dismiss current run function when tapping restart setup button', () => {
     render(props)
     fireEvent.click(screen.getByText('Restart setup'))
-    console.log(mockDismissCurrentRunAsync)
-    expect(mockDismissCurrentRunAsync).toBeCalled()
+    expect(mockDismissCurrentRunAsync).toHaveBeenCalledWith(RUN_ID)
   })
 })
