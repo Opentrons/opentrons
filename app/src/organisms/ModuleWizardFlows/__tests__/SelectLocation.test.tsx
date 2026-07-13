@@ -114,6 +114,9 @@ describe('SelectLocation', () => {
       deckConfig: mockSimpleDeckConfig,
       createMaintenanceRun: vi.fn(),
       setErrorMessage: vi.fn(),
+      isDoorOpenError: false,
+      setIsDoorOpenError: vi.fn(),
+      dismissDoorOpenError: vi.fn(),
       maintenanceRunId: RUN_ID_1,
       isLoadedInRun: false,
       isOnDevice: false,
@@ -177,6 +180,9 @@ describe('handleAddFixture', () => {
       deckConfig: mockSimpleDeckConfig,
       createMaintenanceRun: vi.fn(),
       setErrorMessage: vi.fn(),
+      isDoorOpenError: false,
+      setIsDoorOpenError: vi.fn(),
+      dismissDoorOpenError: vi.fn(),
       maintenanceRunId: RUN_ID_1,
       isLoadedInRun: false,
       isOnDevice: false,
@@ -266,6 +272,9 @@ describe('handleRemoveFixture', () => {
       deckConfig: mockSimpleDeckConfig,
       createMaintenanceRun: vi.fn(),
       setErrorMessage: vi.fn(),
+      isDoorOpenError: false,
+      setIsDoorOpenError: vi.fn(),
+      dismissDoorOpenError: vi.fn(),
       maintenanceRunId: RUN_ID_1,
       isLoadedInRun: false,
       isOnDevice: false,
@@ -294,5 +303,72 @@ describe('handleRemoveFixture', () => {
     expect(mockUpdateDeckConfiguration).toHaveBeenCalledWith(
       mockSimpleDeckConfig
     )
+  })
+})
+
+describe('door open error handling', () => {
+  let props: ComponentProps<typeof SelectLocation>
+
+  beforeEach(() => {
+    props = {
+      proceed: vi.fn(),
+      goBack: vi.fn(),
+      restartSetup: vi.fn(),
+      isRobotMoving: false,
+      isModuleUpdating: false,
+      setIsModuleUpdating: vi.fn(),
+      attachedModule: attachedModule as AttachedModule,
+      deckConfig: mockSimpleDeckConfig,
+      createMaintenanceRun: vi.fn(),
+      setErrorMessage: vi.fn(),
+      isDoorOpenError: false,
+      setIsDoorOpenError: vi.fn(),
+      dismissDoorOpenError: vi.fn(),
+      maintenanceRunId: null,
+      isLoadedInRun: false,
+      isOnDevice: false,
+      errorMessage: '',
+      attachedPipette: {} as PipetteInformation,
+    }
+    vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
+      updateDeckConfiguration: mockUpdateDeckConfiguration,
+    } as any)
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+      data: [],
+    } as unknown as UseQueryResult<DeckConfiguration>)
+  })
+
+  it('sets door open error state when createMaintenanceRun rejects with a door-open error', async () => {
+    const doorOpenError = {
+      isAxiosError: true,
+      response: {
+        status: 409,
+        data: {
+          errors: [{ id: 'MaintenanceCommandDoorOpen' }],
+        },
+      },
+    }
+    props.createMaintenanceRun = vi.fn().mockRejectedValue(doorOpenError as any)
+
+    props.deckConfig = mockSimpleDeckConfig.map(dc => {
+      const updatedDc = { ...dc }
+      if (updatedDc.cutoutId === 'cutoutD1') {
+        updatedDc.cutoutFixtureId = TEMPERATURE_MODULE_V2_FIXTURE
+        updatedDc.opentronsModuleSerialNumber = 'test123'
+      }
+      return updatedDc
+    })
+
+    render(props)
+    fireEvent.click(screen.getByTestId('A1'))
+    await waitFor(() => {
+      expect(screen.getByText('Confirm location')).toBeEnabled()
+    })
+    fireEvent.click(screen.getByText('Confirm location'))
+
+    await waitFor(() => {
+      expect(props.setIsDoorOpenError).toHaveBeenCalledWith(true)
+    })
+    expect(props.setErrorMessage).toHaveBeenCalledWith('Robot door is open')
   })
 })

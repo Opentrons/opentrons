@@ -62,6 +62,9 @@ export interface ModuleSetupWizardBaseStepProps {
   attachedModule: AttachedModule
   errorMessage: string | null
   setErrorMessage: (message: string | null) => void
+  isDoorOpenError: boolean
+  setIsDoorOpenError: (isDoorOpenError: boolean) => void
+  dismissDoorOpenError: () => void
   isOnDevice: boolean
 }
 

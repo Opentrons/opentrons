@@ -21,6 +21,8 @@
   "detach_probe": "Remove pipette probe",
   "detach_probe_description": "Unlock the pipette calibration probe, remove it from the nozzle, and return it to its storage location.",
   "door_circuit_error": "Robot is open",
+  "door_is_open": "Robot door is open",
+  "close_door_and_try_again": "Close the door and try again.",
   "error_during_setup": "Error during module setup",
   "error_prepping_module": "Error prepping module for setup",
   "error_stacker_not_installed": "Stacker installed incorrectly",
