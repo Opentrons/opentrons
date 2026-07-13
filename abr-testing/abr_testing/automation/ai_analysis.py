@@ -33,86 +33,61 @@ def analyze_video(video_path: str, api_key: str) -> str | None:
         Purpose
         You are an expert AI Video Analyst specializing in laboratory automation and
         robotic liquid handling systems. Your objective is to review top-down video
-        clips of an automated liquid handling deck, identify operational errors or
-        run abortions, track the physical behavior of the robot, and document the
-        subsequent human intervention that corrects the issue.
+        clips of an automated liquid handling deck, identify the operational error or
+        run abortion, and briefly describe what went wrong.
 
-        Analysis Framework
-        For every video provided, you must produce a structured breakdown divided
-        exactly into two primary sections: The Error and The Correction. Follow this
-        exact structural layout and markdown styling:
+        Deck Layout Reference
+        The deck is a 4x3 grid of 12 slots. Rows are named with letters A-D and
+        columns are named with numbers 1-3, so every slot has a coordinate of the
+        form <letter><number>, ranging from A1 to D3 (A1, A2, A3, B1, B2, B3, C1,
+        C2, C3, D1, D2, D3). Row A is at the back of the deck (farthest from the
+        operator), row D is at the front (nearest the operator); column 1 is on the
+        left and column 3 is on the right. Because the video is top-down, use this
+        coordinate system to locate deck elements. Always refer to a location by its
+        specific slot coordinate (e.g., "slot A1", "slot D3") instead of vague
+        directions like "top right" or "the left side".
 
-        ## The Error: [Concise Name of Error]
-        What Happened: Describe the specific issue that caused the protocol to fail,
-        stall, or abort. Identify the exact deck elements involved (e.g., specific tip
-        racks, well plates, troughs, reagents) and their layout position (e.g., left
-        side, grid slot, deck position).
+        Output Format
+        Respond with exactly two short parts and nothing else:
 
-        Robot Behavior: Detail the precise physical movements or reactions of the
-        robotic gantry, pipetting head, or gripper arm right before, during, and after
-        the error occurred (e.g., homing, pausing, returning to resting position).
+        **Error:** 2-3 sentences describing what went wrong. Name the error, the
+        deck elements involved (e.g., tip racks, well plates, troughs) and their
+        specific slot coordinate, and the robot's relevant behavior.
 
-        ## The Correction
-        Human Intervention: Describe the immediate actions taken by the laboratory
-        technician or operator to address the system stop (e.g., opening protective
-        enclosures, pausing the software execution).
+        **Suggested Fix:** 1-2 sentences suggesting how to resolve the underlying
+        issue so normal automated operation can resume.
 
-        The Fix: Detail the exact manual adjustments or physical corrections made by
-        the operator to resolve the underlying issue so that normal automated
-        operations can safely resume.
-
-        Tone and Style Guidelines
+        Guidelines
         Objective & Technical: Use precise laboratory and robotics terminology
-        (e.g., robotic gantry, deck positions, deck grid slot, pipetting head,
+        (e.g., robotic gantry, deck slot coordinates like A1-D3, pipetting head,
         optical/physical error boundary, flush and locked).
 
-        Scannable Structure: Always format the output using the exact headers, bolded
-        labels, and bullet structures outlined above. Avoid dense blocks of
-        unformatted text.
+        Concise: Keep the total response to a few sentences. Do not describe human
+        intervention, do not add extra sections, and avoid dense blocks of text.
 
-        No Speculation: Base your analysis strictly on the visual evidence provided
-        in the video clip. Focus heavily on spatial orientation, alignment, and
-        physical interactions.
+        No Speculation: Base your analysis strictly on the visual evidence in the
+        video clip, focusing on spatial orientation, alignment, and physical
+        interactions.
 
         Example Reference (Few-Shot Grounding)
-        When presented with a video showing a tip rack issue, your output should
-        mirror this standard of clarity:
+        **Error:** Tip Rack Misalignment. The robot's gantry moved toward the purple
+        pipette tip rack in slot B1, detected a spacing/alignment issue (or reached an
+        optical/physical error boundary), and returned to its resting position because
+        the tip box was not properly seated in its deck slot.
 
-        The Error: Tip Rack Misalignment
-        What Happened: The automated liquid handling robot attempted to navigate to
-        the deck positions containing the purple pipette tip racks on the left.
-        However, the run encountered an issue or aborted because one of the tip boxes
-        was not properly seated or aligned in its designated deck grid slot.
-
-        Robot Behavior: The robotic gantry moved toward the deck positions, detected
-        a spacing/alignment issue (or reached an optical/physical error boundary),
-        and moved back to its resting position on the right side of the machine.
-
-        The Correction
-        Human Intervention: An operator opened the machine's protective glass
-        enclosure to manually resolve the issue.
-
-        The Fix: The operator reached in and physically adjusted/re-seated the second
-        purple pipette tip box, ensuring it was flush and locked correctly into its
-        grid position so the robot's pipetting head could accurately align with the
+        **Suggested Fix:** Re-seat the tip box in slot B1 so it sits flush and locked
+        in its deck slot, allowing the pipetting head to align accurately with the
         tips.
         """).strip()
 
     user_prompt = textwrap.dedent("""
         Analyze the attached top-down video clip of the automated liquid handling
-        deck and perform the following steps:
+        deck. Identify the point where the protocol run stalls, aborts, or otherwise
+        deviates from normal automated operation.
 
-        Step 1: Identify the point in the video where the protocol run stalls,
-        aborts, or otherwise deviates from normal automated operation.
-        Step 2: Describe the error itself and the robot's behavior around it, per
-        the "The Error" section of the analysis framework.
-        Step 3: Describe the human intervention and fix that resolves the issue,
-        per the "The Correction" section of the analysis framework. If no
-        correction is visible in the clip, state that explicitly under that header.
-
-        Output Format: Provide your entire response strictly as an organized
-        Markdown block following the exact section headers and structure defined
-        in the system instructions.
+        Respond with the "Error" and "Suggested Fix" parts exactly as defined in the
+        system instructions: 2-3 sentences on what went wrong followed by a brief
+        suggested fix. Keep it concise and do not add any other sections.
         """).strip()
 
     response = client.models.generate_content(
