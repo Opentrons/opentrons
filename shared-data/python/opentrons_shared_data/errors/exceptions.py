@@ -1452,4 +1452,3 @@ class VacuumModuleWasteFullError(RoboticsControlError):
             wrapping,
         )
         self.args = (serial, message, detail, wrapping)
-
