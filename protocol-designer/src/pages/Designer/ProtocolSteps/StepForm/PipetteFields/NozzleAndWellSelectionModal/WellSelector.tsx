@@ -246,12 +246,30 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       nozzleConfiguration,
       labwareDef
     )
-    const primaryWells = getWellsToCheck(
+
+    // getWellsToCheck is designed for tipracks (96-well format). For labware like
+    // 384-well plates, skipEveryOtherWell means A1's cascading wells only covers odd rows
+    // Add gaps to primaries so wellToPrimaryStatus has an entry for every well in the labware.
+    const initialPrimaries = getWellsToCheck(
       nozzleConfiguration,
       labwareDef.ordering,
       channels,
       primaryNozzle
     )
+    const coveredByInitialPrimaries = new Set<string>()
+    initialPrimaries.forEach(well => {
+      getEntireWellSelection(
+        well,
+        labwareDef.ordering,
+        nozzleConfiguration,
+        primaryNozzle,
+        channels
+      ).forEach(well => coveredByInitialPrimaries.add(well))
+    })
+    const primaryWells = [
+      ...initialPrimaries,
+      ...allWells.flat().filter(w => !coveredByInitialPrimaries.has(w)),
+    ]
     return primaryWells.reduce<
       Record<string, { isAccessible: boolean; affectedWells: string[] }>
     >((acc, wellName) => {
@@ -289,6 +307,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
     pipetteId,
     labwareId,
     tiprackId,
+    allWells,
   ])
 
   // propogate each primary's status to all its cascading wells

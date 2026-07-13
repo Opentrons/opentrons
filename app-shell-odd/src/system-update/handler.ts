@@ -24,6 +24,7 @@ export interface UpdateDriver {
   reload: () => Promise<void>
   shouldReload: () => boolean
   teardown: () => Promise<void>
+  cleanup: () => Promise<void>
 }
 
 export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
@@ -321,6 +322,16 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
           log.info('all providers torn down')
         })
     },
+    cleanup: async () => {
+      try {
+        await Promise.allSettled([
+          webProvider.cleanup(),
+          ...Object.values(usbProviders).map(provider => provider.cleanup()),
+        ])
+      } catch (err: unknown) {
+        log.warn(`provider cleanup failed: ${err}`)
+      }
+    },
   }
 }
 
@@ -333,25 +344,27 @@ export function manageDriver(dispatch: Dispatch): UpdatableDriver {
   let updateDriver: UpdateDriver | null = null
   return {
     handleAction: action => {
-      if (action.type === CONFIG_INITIALIZED) {
-        log.info('Initializing update driver')
-        return new Promise(resolve => {
+      if (updateDriver == null) {
+        if (action.type === CONFIG_INITIALIZED) {
+          log.info('Initializing update driver')
           updateDriver = createUpdateDriver(dispatch)
-          resolve()
-        })
-      } else if (updateDriver != null) {
-        if (action.type === VALUE_UPDATED && updateDriver.shouldReload()) {
+          return updateDriver.cleanup()
+        } else {
+          log.warn(
+            `update driver manager received action ${action.type} before initialization`
+          )
+          return Promise.resolve()
+        }
+      } else {
+        if (
+          (action.type === CONFIG_INITIALIZED ||
+            action.type === VALUE_UPDATED) &&
+          updateDriver.shouldReload()
+        ) {
           return updateDriver.reload()
         } else {
           return updateDriver.handleAction(action)
         }
-      } else {
-        return new Promise(resolve => {
-          log.warn(
-            `update driver manager received action ${action.type} before initialization`
-          )
-          resolve()
-        })
       }
     },
     getUpdateDriver: () => updateDriver,

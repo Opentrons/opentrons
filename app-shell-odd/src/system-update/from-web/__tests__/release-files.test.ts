@@ -11,6 +11,7 @@ import {
   ensureCleanReleaseCacheForVersion,
   getOrDownloadReleaseFiles,
   getReleaseFiles,
+  removeTemporaryDownloads,
 } from '../release-files'
 
 import type { ReleaseSetUrls } from '../../types'
@@ -221,6 +222,7 @@ describe('downloadReleaseFiles', () => {
   it('should try and fetch both system zip and release notes', () =>
     directoryWithCleanup(directory => {
       let tempSystemPath = ''
+      let tempReleaseNotesPath = ''
       when(fetchToFile)
         .calledWith(
           'http://opentrons.com/ot3-system.zip',
@@ -240,6 +242,7 @@ describe('downloadReleaseFiles', () => {
           expect.any(Object)
         )
         .thenDo((_url, dest) => {
+          tempReleaseNotesPath = dest
           return fs
             .writeFile(dest, 'this is the contents of the release notes')
             .then(() => dest)
@@ -272,7 +275,8 @@ describe('downloadReleaseFiles', () => {
                 'this is the contents of the release notes'
               )
             ),
-          expect(fs.stat(path.dirname(tempSystemPath))).rejects.toThrow(),
+          expect(fs.stat(tempSystemPath)).rejects.toThrow(),
+          expect(fs.stat(tempReleaseNotesPath)).rejects.toThrow(),
         ])
       })
     }))
@@ -354,7 +358,7 @@ describe('downloadReleaseFiles', () => {
     }))
   it('should fail if it cannot fetch system zip', () =>
     directoryWithCleanup(directory => {
-      let tempSystemPath = ''
+      let tempReleaseNotesPath = ''
       when(fetchToFile)
         .calledWith(
           'http://opentrons.com/ot3-system.zip',
@@ -369,7 +373,7 @@ describe('downloadReleaseFiles', () => {
           expect.any(Object)
         )
         .thenDo((_url, dest) => {
-          tempSystemPath = dest
+          tempReleaseNotesPath = dest
           return fs
             .writeFile(dest, 'this is the contents of the release notes')
             .then(() => dest)
@@ -387,9 +391,7 @@ describe('downloadReleaseFiles', () => {
         )
       )
         .rejects.toThrow()
-        .then(() =>
-          expect(fs.stat(path.dirname(tempSystemPath))).rejects.toThrow()
-        )
+        .then(() => expect(fs.stat(tempReleaseNotesPath)).rejects.toThrow())
     }))
   it('should allow the http requests to be aborted', () =>
     directoryWithCleanup(directory => {
@@ -517,4 +519,62 @@ describe('getOrDownloadReleaseFiles', () => {
         )
       ).rejects.toThrow()
     }))
+})
+
+describe('removeTemporaryDownloads', () => {
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
+  it('should remove files with the .odd-download suffix', async () => {
+    await directoryWithCleanup(async directory => {
+      await fs.mkdir(path.join(directory, 'fake-version-1'))
+      await fs.writeFile(
+        path.join(directory, 'fake-version-1', 'something.zip.odd-download'),
+        'hello'
+      )
+      await fs.writeFile(
+        path.join(directory, 'fake-version-1', 'something.md.odd-download'),
+        'goodbye'
+      )
+      await fs.mkdir(path.join(directory, 'fake-version-2'))
+      await fs.writeFile(
+        path.join(directory, 'fake-version-2', 'fakedl.zip.odd-download'),
+        'woohoo'
+      )
+      await removeTemporaryDownloads(directory)
+      const fv1dir = await fs.readdir(path.join(directory, 'fake-version-1'))
+      expect(fv1dir).toEqual([])
+      const fv2dir = await fs.readdir(path.join(directory, 'fake-version-2'))
+      expect(fv2dir).toEqual([])
+    })
+  })
+  it('should not remove files without the .odd-download suffix', async () => {
+    await directoryWithCleanup(async directory => {
+      await fs.mkdir(path.join(directory, 'fake-version-1'))
+      await fs.writeFile(
+        path.join(directory, 'fake-version-1', 'something.zip'),
+        'hello'
+      )
+      await fs.writeFile(
+        path.join(directory, 'fake-version-1', 'something.md'),
+        'goodbye'
+      )
+      await fs.mkdir(path.join(directory, 'fake-version-2'))
+      await fs.writeFile(
+        path.join(directory, 'fake-version-2', 'fakedl.zip'),
+        'woohoo'
+      )
+      await removeTemporaryDownloads(directory)
+      const fv1dir = await fs.readdir(path.join(directory, 'fake-version-1'))
+      expect(fv1dir).toEqual(['something.md', 'something.zip'])
+      const fv2dir = await fs.readdir(path.join(directory, 'fake-version-2'))
+      expect(fv2dir).toEqual(['fakedl.zip'])
+    })
+  })
+  it('should not throw if directories cant be read', async () => {
+    await directoryWithCleanup(async directory => {
+      await fs.writeFile(path.join(directory, 'something'), 'hi')
+      await removeTemporaryDownloads(directory)
+    })
+  })
 })
