@@ -10,8 +10,18 @@ class FlexStackerPage(BasePage):
         super().__init__(page)
 
     def _wait_for_stacker_form(self) -> None:
-        """Wait until the flex stacker step form is rendered."""
+        """Wait until the flex stacker step form is rendered.
+
+        Multi-stacker forms open with Module unset ("Choose option").
+        Single-stacker forms auto-select the module, so "Module controls" appears.
+        """
         self.dismiss_release_notes_toast()
+        choose_option = self.page.get_by_text("Choose option", exact=True)
+        module_controls = self.page.get_by_text("Module controls", exact=False)
+        self.wait_for_visible(choose_option.or_(module_controls).first, timeout=10000)
+
+    def _wait_for_module_controls(self) -> None:
+        """Wait until Module controls render after a stacker module is selected."""
         self.wait_for_visible(
             self.page.get_by_text("Module controls", exact=False).first,
             timeout=10000,
@@ -28,6 +38,7 @@ class FlexStackerPage(BasePage):
         if dropdown.count() > 0:
             dropdown.click()
             self.page.get_by_role("button", name=stacker).click()
+            self._wait_for_module_controls()
             return
 
         # Single stacker: moduleId is auto-selected (no dropdown). Verify the module field.
@@ -35,6 +46,7 @@ class FlexStackerPage(BasePage):
         self.wait_for_visible(self.page.get_by_text("Flex Stacker", exact=False).first, timeout=10000)
         if slot:
             self.wait_for_visible(self.page.get_by_text(slot, exact=True).first, timeout=10000)
+        self._wait_for_module_controls()
 
     def _select_stacker_action(self, action_subtext: str) -> None:
         """Select a stacker action via its radio-button description."""

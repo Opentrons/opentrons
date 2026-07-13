@@ -37,17 +37,21 @@ class MixStepForm(BasePage):
         self.wait_for_visible(self.page.get_by_text(text).first)
 
     def expect_tip_handling_options(self, options: Sequence[str]) -> None:
-        """Verify the tip handling dropdown exposes the expected options."""
+        """Verify the tip handling dropdown exposes the expected options.
 
-        dropdown = self._dropdown_by_title("Tip handling")
+        Leaves the listbox open so ``select_tip_handling_option`` can reuse it
+        (Escape does not reliably dismiss this dropdown).
+        """
+
+        dropdown = self._change_tip_dropdown()
         self.wait_for_visible(dropdown)
-        dropdown.click()
+        listbox = self.page.get_by_role("listbox")
+        if listbox.count() == 0 or not listbox.first.is_visible():
+            dropdown.click()
+            self.wait_for_visible(listbox)
 
-        listbox = self.page.locator("div[role='listbox']").last
-        self.wait_for_visible(listbox)
-        available = [" ".join(text.split()) for text in listbox.locator("button").all_inner_texts()]
+        available = [" ".join(text.split()) for text in listbox.get_by_role("button").all_inner_texts()]
         missing = [option for option in options if option not in available]
-        self.page.keyboard.press("Escape")
         if missing:
             raise AssertionError(f"Missing tip handling options: {missing}. Available options: {available}")
 
@@ -384,7 +388,21 @@ class MixStepForm(BasePage):
     def select_tip_handling_option(self, option: str) -> None:
         """Choose a tip handling option such as ``Once`` or ``Always``."""
 
-        self._select_dropdown_option("Tip handling", option)
+        listbox = self.page.get_by_role("listbox")
+        if listbox.count() == 0 or not listbox.first.is_visible():
+            dropdown = self._change_tip_dropdown()
+            self.wait_for_visible(dropdown)
+            dropdown.click()
+            self.wait_for_visible(listbox)
+        listbox.get_by_text(option, exact=True).click()
+
+    def _change_tip_dropdown(self) -> Locator:
+        """Return the Mix/Transfer tip-handling (changeTip) dropdown control."""
+
+        dropdown = self.page.get_by_test_id("changeTip_dropdownMenu")
+        if dropdown.count() > 0:
+            return dropdown.first
+        return self._dropdown_by_title("Tip handling")
 
     def _fill_input_and_blur(self, selector: str, value: str) -> None:
         locator = self.page.locator(selector).first

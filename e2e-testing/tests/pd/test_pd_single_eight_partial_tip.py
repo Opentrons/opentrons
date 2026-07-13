@@ -237,9 +237,7 @@ def _partial_8ch_scenarios() -> List[Partial8chScenario]:
             source_col_value = override.get("source_col", MANUAL_TIP_COL_BY_COUNT[count])
             dest_col_value = override.get("dest_col", MANUAL_TIP_COL_BY_COUNT[count] + 1)
             manual_tip_col = (
-                manual_tip_col_value
-                if isinstance(manual_tip_col_value, int)
-                else MANUAL_TIP_COL_BY_COUNT[count]
+                manual_tip_col_value if isinstance(manual_tip_col_value, int) else MANUAL_TIP_COL_BY_COUNT[count]
             )
             source_col = source_col_value if isinstance(source_col_value, int) else MANUAL_TIP_COL_BY_COUNT[count]
             dest_col = dest_col_value if isinstance(dest_col_value, int) else MANUAL_TIP_COL_BY_COUNT[count] + 1
@@ -251,16 +249,10 @@ def _partial_8ch_scenarios() -> List[Partial8chScenario]:
                     if isinstance(override_manual_tips, list)
                     else _manual_tips_for_partial(count, manual_tip_col)
                 )
-            source_labware = (
-                override["source_labware"]
-                if isinstance(override.get("source_labware"), str)
-                else TC_96
-            )
-            dest_labware = (
-                override["dest_labware"]
-                if isinstance(override.get("dest_labware"), str)
-                else TC_96
-            )
+            source_labware_value = override.get("source_labware")
+            dest_labware_value = override.get("dest_labware")
+            source_labware = source_labware_value if isinstance(source_labware_value, str) else TC_96
+            dest_labware = dest_labware_value if isinstance(dest_labware_value, str) else TC_96
             scenarios.append(
                 Partial8chScenario(
                     label=f"8ch partial {count}/8 {path.lower()}",

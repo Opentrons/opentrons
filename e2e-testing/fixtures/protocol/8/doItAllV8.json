@@ -358,15 +358,6 @@
           "stepType": "heaterShaker",
           "stepName": "heater-shaker",
           "stepDetails": ""
-        },
-        "ed84f11e-db82-4039-9e04-e619b03af42f": {
-          "labware": "f2d371ea-5146-4c89-8200-9c056a7f321a:opentrons/opentrons_flex_96_tiprack_1000ul/1",
-          "newLocation": "cutoutD3",
-          "useGripper": true,
-          "id": "ed84f11e-db82-4039-9e04-e619b03af42f",
-          "stepType": "moveLabware",
-          "stepName": "move labware",
-          "stepDetails": ""
         }
       },
       "orderedStepIds": [
@@ -380,8 +371,7 @@
         "8782dcc1-8960-4d13-9b29-e8837228ba56",
         "8622d8f8-acbc-48ff-86f8-0476d1de0e02",
         "2b8f84e2-b079-41e8-a66e-ff8d9c5dfe1d",
-        "07dd4472-3ea4-475c-8fd3-18819519b401",
-        "ed84f11e-db82-4039-9e04-e619b03af42f"
+        "07dd4472-3ea4-475c-8fd3-18819519b401"
       ],
       "pipettes": {
         "9fcd50d9-92b2-45ac-acf1-e2cf773feffc": {
@@ -5434,17 +5424,6 @@
         "strategy": "usingGripper",
         "newLocation": {
           "addressableAreaName": "B4"
-        }
-      }
-    },
-    {
-      "commandType": "moveLabware",
-      "key": "34680223-c566-4231-92b8-2a5fafe79484",
-      "params": {
-        "labwareId": "f2d371ea-5146-4c89-8200-9c056a7f321a:opentrons/opentrons_flex_96_tiprack_1000ul/1",
-        "strategy": "usingGripper",
-        "newLocation": {
-          "addressableAreaName": "gripperWasteChute"
         }
       }
     }

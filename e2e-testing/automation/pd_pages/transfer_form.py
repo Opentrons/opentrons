@@ -155,20 +155,28 @@ class TransferPage(BasePage):
         self.wells_select("Destination", dest_labware, dest_wells, True)
 
     def _click_well_in_modal(self, modal: Locator, well: str) -> None:
-        """Click a well or tip in a modal via mouse coordinates for SelectionRect."""
-        well_locator = modal.locator(f"#{well}")
+        """Click a well or tip in a modal via mouse coordinates for SelectionRect.
+
+        Prefer ``data-wellname`` (the element ``getCollidingWells`` uses) over ``#id``,
+        which can resolve to a non-interactive outer SVG wrapper.
+        """
+        well_locator = modal.locator(f"[data-wellname='{well}']").first
         if well_locator.count() == 0:
-            well_locator = modal.locator(f"[data-wellname='{well}']").first
+            well_locator = modal.locator(f"#{well}").first
         if well_locator.count() == 0:
             well_locator = modal.locator(f"[id='{well}']").first
         well_locator.scroll_into_view_if_needed()
         self.wait_for_visible(well_locator)
         box = well_locator.bounding_box()
         if box is not None:
-            self.page.mouse.click(
-                box["x"] + box["width"] / 2,
-                box["y"] + box["height"] / 2,
-            )
+            cx = box["x"] + box["width"] / 2
+            cy = box["y"] + box["height"] / 2
+            # Tiny non-zero drag so SelectionRect registers a collision without
+            # spanning neighboring wells on a dense 96-well map.
+            self.page.mouse.move(cx, cy)
+            self.page.mouse.down()
+            self.page.mouse.move(cx + 1, cy + 1)
+            self.page.mouse.up()
         else:
             well_locator.click(force=True)
 
@@ -184,33 +192,63 @@ class TransferPage(BasePage):
         self, location: locations, labwareName: str, wells: Union[str, List[str]], finalStep: bool
     ) -> None:
         """
-        Select source wells.
-        Args:
-            wells: A single well name (e.g., "A1") or a list (e.g., ["A1", "B1", "C1"]).
-            rect: If True, uses the 'rect' selector logic for SVG grids.
+        Select source or destination wells in the nozzle/well modal.
+
+        Well-selector headings use labware *def* metadata.displayName (not deck nicknames),
+        so match the heading prefix only.
+
+        Changing nozzles clears well fields. For 1-well labware the UI still *renders* A1 as
+        selected (computedSelectedWells), so the first click toggles that fake selection off;
+        a second click is required to write A1 into the form field.
         """
         modal = self._modal_area()
-        labware_label = self._well_selector_labware_label(labwareName)
         if location == "Source":
-            self.wait_for_visible(
-                modal.get_by_text(f"Select wells to aspirate liquid from {labware_label}", exact=False).first
-            )
+            aspirate_heading = "Select wells to aspirate liquid from"
+            self.wait_for_visible(modal.get_by_text(aspirate_heading, exact=False).first)
         elif location == "Destination":
+            dispense_heading = "Select wells to dispense liquid into"
             self.wait_for_visible(
-                modal.get_by_text(f"Select wells to dispense liquid into in {labware_label}", exact=False).first,
+                modal.get_by_text(dispense_heading, exact=False).first,
                 timeout=10000,
             )
 
-        # 2. Convert single string to list for uniform processing
         well_list = [wells] if isinstance(wells, str) else wells
+        action_button = modal.get_by_role("button", name="Save" if finalStep else "Continue")
+        modal_shell = self.page.locator("#main-page-modal-portal-root").get_by_label("ModalShell_ModalArea")
 
-        for well in well_list:
-            self._click_well_in_modal(modal, well)
-        if finalStep:
-            modal.get_by_role("button", name="Save").click()
-            self.page.get_by_test_id("nozzle_and_well_modal").wait_for(state="visible", timeout=10000)
-        else:
-            modal.get_by_role("button", name="Continue").click()
+        def _click_wells() -> None:
+            for well in well_list:
+                self._click_well_in_modal(modal, well)
+
+        def _advance_succeeded() -> bool:
+            # Disabled Save/Continue means wells are not written yet — do not wait
+            # the full action timeout on a disabled control.
+            if not action_button.is_enabled():
+                return False
+            action_button.click()
+            if finalStep:
+                try:
+                    modal_shell.wait_for(state="hidden", timeout=2000)
+                    return True
+                except Exception:
+                    return False
+            # Source Continue: success when aspirate heading is gone.
+            heading = modal.get_by_text("Select wells to aspirate liquid from", exact=False)
+            try:
+                heading.first.wait_for(state="hidden", timeout=2000)
+                return True
+            except Exception:
+                return False
+
+        # Click wells first. Up to 2 rounds: 1-well labware may render a fake A1
+        # selection that the first click clears; the second writes the field.
+        # Do not click Save/Continue before selecting — a disabled button stalls.
+        for _ in range(2):
+            _click_wells()
+            if _advance_succeeded():
+                return
+
+        raise AssertionError(f"Could not complete well selection for {location} wells={well_list!r}")
 
     def destination_labware_select(self, labware: str) -> None:
         """Select destination labware in transfer step."""
@@ -618,10 +656,13 @@ class TransferPage(BasePage):
         self.page.get_by_text("No tips selected").click()
         modal = self._modal_area()
         self.wait_for_visible(modal.get_by_text("Select tips for manual tip tracking"))
+        tip_map = modal.get_by_text("Click to select tips in", exact=False)
         continue_button = modal.get_by_role("button", name="Continue")
-        if continue_button.count() > 0 and continue_button.is_visible():
+        # Tiprack step: Continue advances only when a tiprack is selected (auto-select
+        # during render or preselected from the prior transfer). Skip if tip map already open.
+        if tip_map.count() == 0 and continue_button.count() > 0 and continue_button.is_visible():
             continue_button.click()
-        self.wait_for_visible(modal.get_by_text("Click to select tips in", exact=False))
+        self.wait_for_visible(tip_map, timeout=10000)
         for tip in tips:
             # One primary per pickup group (e.g. A4 for 3/8 partial → A4–C4).
             self._click_well_in_modal(modal, tip)

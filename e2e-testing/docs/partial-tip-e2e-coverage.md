@@ -47,15 +47,29 @@ Flex partial-tip tests in Protocol Designer. Each test imports a deck fixture, a
 
 ## `test_pd_96_channel_partial_tip.py`
 
-### `test_pd_96_channel_partial_tip_strategies` (900s)
+Partial-tip coverage is split into three ~7-step suites (each starts from a fresh
+`96_channel_setup.py` import + gripper Move B3→B2).
 
-- Fixture: `96_channel_setup.py`
-- 384-well plate; primary nozzles at **A1, A12, H1, H12**
-- **Single nozzle** (6 steps): transfer + distribute; Always/Once; automatic/manual; tip rack/waste chute
-- **Single row** (7 steps): same tip strategies; includes **distribute**, consolidate + manual + waste chute (H1)
-- **Single column** (6 steps): same tip strategies; includes distribute + manual + waste chute (A12)
-- Extra: single A12 Once → single A12 **Never** (tip reuse)
-- Re-opens sample step indices `[0, 7, 14, 20]`; exports `96ch_partial_tip_strategies.py`
+### `test_pd_96ch_partial_single_nozzle_tip_strategies` (600s)
+
+- **Deck prep:** gripper Move of 1000 µL tiprack **B3 → B2** (stacker collision)
+- Five **single-nozzle** transfers on 384-well plate (A12/H12/H1/A1 primaries)
+- **Returned tip ⇒ manual:** H1-primary auto returns tip at cascade corner **A12**; distribute reuses A12 manually
+- **Last pickup before Never:** H1 Once, **manual A12**, Waste Chute (tip stays on pipette) — not auto
+- **Never:** matching H1 single nozzle (same layout as manual setup)
+- Exports `96ch_partial_single_nozzle.py`
+
+### `test_pd_96ch_partial_row_nozzle_tip_strategies` (600s, xfail)
+
+- Move + six **row** transfers (H1/A1, Once/Always, distribute/consolidate)
+- **xfail:** row pickup needs cascade-empty path (H1 ⇒ A–G empty; A1 ⇒ B–H empty); depletion setup TBD
+- Exports `96ch_partial_row_nozzle.py` when un-xfails
+
+### `test_pd_96ch_partial_column_nozzle_tip_strategies` (600s, xfail)
+
+- Move + six **column** A1 transfers (Once/Always, return/waste, distribute/consolidate)
+- **xfail:** column A1 needs cols 2–12 empty; depletion setup TBD
+- Exports `96ch_partial_column_nozzle.py` when un-xfails
 
 ### `test_pd_96_channel_full_rack_and_manual_tip_selection` (600s)
 
@@ -64,18 +78,34 @@ Flex partial-tip tests in Protocol Designer. Each test imports a deck fixture, a
 - Transfer Always → waste chute
 - Distribute, Once, **manual** tips (full row A1–A12)
 - Once setup → **Never** reuse (full rack)
-- Re-opens sample step indices `[0, 2, 4]`; exports `96ch_full_rack_manual_tips.py`
+- Re-opens sample step indices `[0, 5, 6]`; exports `96ch_full_rack_manual_tips.py`
 
 ---
 
 ## `test_pd_pd90_regression.py` (related)
 
-Import-only customer protocol regressions (not wizard-authored partial-tip steps):
+Customer protocol regressions (RQA-5529 Maor / RQA-5354 post-tagmentation).
+
+**Import-only:**
 
 - `test_pd_import_maor_protocol_no_reservoir_timeline_errors` — RQA-5529, 96 steps
 - `test_pd_maor_protocol_reservoir_transfer_steps_have_no_errors` — RQA-5529, sample reservoir steps + export
 - `test_pd_import_post_tagmentation_no_timeline_errors` — RQA-5354
 - `test_pd_post_tagmentation_reservoir_wash_steps_have_no_errors` — RQA-5354, named wash steps
+
+**Post-import wizard steps** (split like 96ch partial suites — tip inventory after long protocols is depleted; do not assume fresh full racks / tip well == primary):
+
+Shared tip rules: auto only picks **CLEAN** tips; 96ch SINGLE tip well is the cascade corner opposite the primary (`A1→H12`, `A12→H1`, …); Once + Tip rack returns `DIRTY` (next Once needs **manual**); Once + Waste Chute keeps tip on pipette for Never.
+
+Maor (50 µL tiprack on D4; clear C4/D2 adapters + depleted 1000 µL neighbors; Greiner `(1)` only; single-A1 tip AABB stays blocked on this dense deck):
+
+- `test_pd_maor_96ch_reservoir_column_transfer` — 12-reservoir → Greiner, column A12, Once + Waste Chute
+
+Post-tagmentation (move unused tiprack `(4) B3→A1` after clearing A2 + A3 tipracks, B1 Indexes, and B2 Waste Plate):
+
+- `test_pd_post_tagmentation_96ch_wash_like_single_transfer` — TWB → LP1, single A1 Once + Waste (no ALL without a full CLEAN rack)
+- `test_pd_post_tagmentation_96ch_lp1_single_once` — LP1 → LP1, single A1 Once + Waste
+- `test_pd_post_tagmentation_96ch_single_always_distribute` — distribute, single A1 Always + Waste (row A1 needs B–H empty)
 
 ---
 
