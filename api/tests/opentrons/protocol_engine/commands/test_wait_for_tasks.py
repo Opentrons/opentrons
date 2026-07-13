@@ -39,7 +39,6 @@ async def test_wait_for_tasks_implementation_no_error(
     task_ids = ["task1", "task2"]
     data = WaitForTasksParams(task_ids=task_ids)
 
-    decoy.when(state_view.commands.get_is_awaiting_recovery()).then_return(False)
     decoy.when(state_view.tasks.get_failed_tasks(task_ids)).then_return([])
     result = await subject.execute(data)
     for task in task_ids:
@@ -69,8 +68,10 @@ async def test_wait_for_tasks_implementation_with_error(
     task_ids = ["task1", "task2"]
     data = WaitForTasksParams(task_ids=task_ids)
     created_timestamp = datetime.now()
-    decoy.when(state_view.commands.get_is_awaiting_recovery()).then_return(False)
     decoy.when(state_view.tasks.get_failed_tasks(task_ids)).then_return([task_ids[0]])
+    decoy.when(
+        state_view.failed_task_failures_absorbed_by_active_recovery(task_ids)
+    ).then_return(False)
     decoy.when(state_view.tasks.get_finished(task_ids[0])).then_return(
         FinishedTask(
             id=task_ids[0],
@@ -98,13 +99,13 @@ async def test_wait_for_tasks_implementation_with_error(
     decoy.verify(await run_control.wait_for_tasks(task_ids))
 
 
-async def test_wait_for_tasks_succeeds_when_recovery_already_entered(
+async def test_wait_for_tasks_succeeds_when_recovery_active_with_no_failed_tasks(
     decoy: Decoy,
     run_control: RunControlHandler,
     real_task_handler: TaskHandler,
     state_view: StateView,
 ) -> None:
-    """It should succeed when an associated start command already entered recovery."""
+    """It should succeed when recovery was entered via a late async notification."""
     subject = WaitForTasksImplementation(
         run_control=run_control,
         task_handler=real_task_handler,
@@ -113,11 +114,83 @@ async def test_wait_for_tasks_succeeds_when_recovery_already_entered(
     task_ids = ["task1"]
     data = WaitForTasksParams(task_ids=task_ids)
 
-    decoy.when(state_view.commands.get_is_awaiting_recovery()).then_return(True)
+    decoy.when(state_view.tasks.get_failed_tasks(task_ids)).then_return([])
     fake_task = decoy.mock(cls=Task)
     decoy.when(state_view.tasks.get(task_ids[0])).then_return(fake_task)
 
     result = await subject.execute(data)
 
     assert result == SuccessData(public=WaitForTasksResult(task_ids=task_ids))
+    decoy.verify(await run_control.wait_for_tasks(task_ids))
+
+
+async def test_wait_for_tasks_succeeds_when_recoverable_failure_absorbed(
+    decoy: Decoy,
+    run_control: RunControlHandler,
+    real_task_handler: TaskHandler,
+    state_view: StateView,
+) -> None:
+    """It should succeed when every failed task is covered by active recovery."""
+    subject = WaitForTasksImplementation(
+        run_control=run_control,
+        task_handler=real_task_handler,
+        state_view=state_view,
+    )
+    task_ids = ["task1"]
+    data = WaitForTasksParams(task_ids=task_ids)
+
+    decoy.when(state_view.tasks.get_failed_tasks(task_ids)).then_return(task_ids)
+    decoy.when(
+        state_view.failed_task_failures_absorbed_by_active_recovery(task_ids)
+    ).then_return(True)
+    fake_task = decoy.mock(cls=Task)
+    decoy.when(state_view.tasks.get(task_ids[0])).then_return(fake_task)
+
+    result = await subject.execute(data)
+
+    assert result == SuccessData(public=WaitForTasksResult(task_ids=task_ids))
+    decoy.verify(await run_control.wait_for_tasks(task_ids))
+
+
+async def test_wait_for_tasks_raises_when_recovery_active_but_uncovered_failure(
+    decoy: Decoy,
+    run_control: RunControlHandler,
+    real_task_handler: TaskHandler,
+    state_view: StateView,
+) -> None:
+    """It should fail when recovery is active but a waited-on task failed uncovered."""
+    subject = WaitForTasksImplementation(
+        run_control=run_control,
+        task_handler=real_task_handler,
+        state_view=state_view,
+    )
+    task_ids = ["task1", "task2"]
+    data = WaitForTasksParams(task_ids=task_ids)
+    created_timestamp = datetime.now()
+
+    decoy.when(state_view.tasks.get_failed_tasks(task_ids)).then_return(task_ids)
+    decoy.when(
+        state_view.failed_task_failures_absorbed_by_active_recovery(task_ids)
+    ).then_return(False)
+    for task_id in task_ids:
+        decoy.when(state_view.tasks.get_finished(task_id)).then_return(
+            FinishedTask(
+                id=task_id,
+                createdAt=matchers.Anything(),
+                finishedAt=matchers.Anything(),
+                error=ErrorOccurrence(
+                    id=f"{task_id}-error",
+                    createdAt=created_timestamp,
+                    errorType="TaskFailedError",
+                    detail="detail",
+                ),
+            )
+        )
+        fake_task = decoy.mock(cls=Task)
+        decoy.when(state_view.tasks.get(task_id)).then_return(fake_task)
+
+    with pytest.raises(TaskFailedError) as exc_info:
+        await subject.execute(data)
+
+    assert exc_info.value.message == "2 tasks failed."
     decoy.verify(await run_control.wait_for_tasks(task_ids))

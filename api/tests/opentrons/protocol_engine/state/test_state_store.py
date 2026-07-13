@@ -1,5 +1,6 @@
 """Tests for the top-level StateStore/StateView."""
 
+import asyncio
 from datetime import datetime
 from typing import Any, Callable, Union
 
@@ -7,11 +8,24 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.errors.exceptions import PythonException
 
-from opentrons.protocol_engine.actions import PlayAction
+from opentrons.protocol_engine import commands
+from opentrons.protocol_engine.actions import (
+    BeginAwaitingRecoveryAction,
+    FinishTaskAction,
+    PlayAction,
+    QueueCommandAction,
+    RunCommandAction,
+    StartTaskAction,
+    SucceedCommandAction,
+)
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
+from opentrons.protocol_engine.errors import ErrorOccurrence
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.state import State, StateStore
-from opentrons.protocol_engine.types import DeckType
+from opentrons.protocol_engine.types import DeckType, Task
 from opentrons.util.change_notifier import ChangeNotifier
 
 
@@ -151,3 +165,111 @@ async def test_wait_for_raises(decoy: Decoy, subject: StateStore) -> None:
 
     with pytest.raises(ValueError, match="oh no"):
         await subject.wait_for_not(check_condition)
+
+
+def _queue_and_succeed_comment(subject: StateStore, command_id: str, now: datetime) -> None:
+    subject.handle_action(
+        QueueCommandAction(
+            command_id,
+            created_at=now,
+            request=commands.CommentCreate(params=commands.CommentParams(message="")),
+            request_hash=None,
+        )
+    )
+    subject.handle_action(RunCommandAction(command_id=command_id, started_at=now))
+    succeeded_command = subject.commands.get(command_id).model_copy(
+        update={
+            "status": commands.CommandStatus.SUCCEEDED,
+            "completedAt": now,
+        }
+    )
+    subject.handle_action(
+        SucceedCommandAction(command=succeeded_command, state_update=update_types.StateUpdate())
+    )
+
+
+async def _finish_task_with_error(
+    subject: StateStore, task_id: str, originating_command_id: str, now: datetime
+) -> None:
+    asyncio_task = asyncio.create_task(asyncio.sleep(0))
+    subject.handle_action(
+        StartTaskAction(
+            task=Task(id=task_id, createdAt=now, asyncioTask=asyncio_task),
+            originating_command_id=originating_command_id,
+        )
+    )
+    subject.handle_action(
+        FinishTaskAction(
+            task_id=task_id,
+            finished_at=now,
+            error=ErrorOccurrence.from_failed(
+                id=f"{task_id}-error",
+                createdAt=now,
+                error=PythonException(RuntimeError("task failed")),
+            ),
+        )
+    )
+
+
+async def test_failed_task_failures_absorbed_by_active_recovery_when_covered(
+    subject: StateStore,
+) -> None:
+    """It should report absorbed failures when they map to the recovery target."""
+    now = datetime.now()
+    subject.handle_action(PlayAction(requested_at=now))
+    _queue_and_succeed_comment(subject, "start-command", now)
+    succeeded_command = subject.commands.get("start-command")
+    subject.handle_action(
+        BeginAwaitingRecoveryAction(
+            command_id="start-command",
+            error_id="start-command-error",
+            failed_at=now,
+            error=PythonException(RuntimeError("recoverable")),
+            notes=[],
+            type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+            command=succeeded_command,
+        )
+    )
+    await _finish_task_with_error(subject, "task-1", "start-command", now)
+
+    assert subject.failed_task_failures_absorbed_by_active_recovery(["task-1"]) is True
+
+
+async def test_failed_task_failures_absorbed_by_active_recovery_when_uncovered(
+    subject: StateStore,
+) -> None:
+    """It should not absorb failures from tasks unrelated to the recovery target."""
+    now = datetime.now()
+    subject.handle_action(PlayAction(requested_at=now))
+    _queue_and_succeed_comment(subject, "start-command", now)
+    _queue_and_succeed_comment(subject, "other-command", now)
+    succeeded_command = subject.commands.get("start-command")
+    subject.handle_action(
+        BeginAwaitingRecoveryAction(
+            command_id="start-command",
+            error_id="start-command-error",
+            failed_at=now,
+            error=PythonException(RuntimeError("recoverable")),
+            notes=[],
+            type=ErrorRecoveryType.WAIT_FOR_RECOVERY,
+            command=succeeded_command,
+        )
+    )
+    await _finish_task_with_error(subject, "task-1", "start-command", now)
+    await _finish_task_with_error(subject, "task-2", "other-command", now)
+
+    assert subject.failed_task_failures_absorbed_by_active_recovery(
+        ["task-1", "task-2"]
+    ) is False
+
+
+async def test_failed_task_failures_absorbed_by_active_recovery_without_recovery(
+    subject: StateStore,
+) -> None:
+    """It should not absorb failures when the engine is not awaiting recovery."""
+    now = datetime.now()
+    subject.handle_action(PlayAction(requested_at=now))
+    _queue_and_succeed_comment(subject, "start-command", now)
+    await _finish_task_with_error(subject, "task-1", "start-command", now)
+
+    assert subject.failed_task_failures_absorbed_by_active_recovery(["task-1"]) is False

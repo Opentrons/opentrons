@@ -64,11 +64,10 @@ class WaitForTasksImplementation(
 
         await self._run_control.wait_for_tasks(params.task_ids)
 
-        if self._state_view.commands.get_is_awaiting_recovery():
-            return SuccessData(public=WaitForTasksResult(task_ids=params.task_ids))
-
         failed_tasks = self._state_view.tasks.get_failed_tasks(params.task_ids)
-        if failed_tasks:
+        if failed_tasks and not self._state_view.failed_task_failures_absorbed_by_active_recovery(
+            params.task_ids
+        ):
             raise TaskFailedError(
                 message=f"{len(failed_tasks)} tasks failed.",
                 details={"failed_task_ids": failed_tasks},
