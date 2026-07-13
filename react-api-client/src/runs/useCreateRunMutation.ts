@@ -45,7 +45,7 @@ export function useCreateRunMutation(
       variables: createRunData,
       userNotes,
     }: DocumentedMutationParameters<CreateRunData>) =>
-      createRun(host!, createRunData)
+      createRun(host!, createRunData, userNotes)
         .then(response => response.data)
         .catch(e => {
           throw e
