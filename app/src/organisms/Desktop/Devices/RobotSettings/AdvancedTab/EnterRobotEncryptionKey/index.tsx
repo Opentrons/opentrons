@@ -2,29 +2,21 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
-import {
-  ALIGN_CENTER,
-  Box,
-  Flex,
-  JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
-  SPACING,
-  SPACING_AUTO,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { LegacyStyledText, SPACING, TYPOGRAPHY } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { TertiaryButton } from '/app/atoms/buttons'
+
+import styles from './index.module.css'
 import { RobotCertImportModal } from './RobotCertImportModal'
 
 export function EnterRobotEncryptionKey(): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const [showRobotCertImportModal, setShowRobotCertImportModal] =
-    useState(false)
+  const [showModal, setShowRobotCertImportModal] = useState(false)
 
   return (
     <>
-      {showRobotCertImportModal
+      {showModal
         ? createPortal(
             <RobotCertImportModal
               onClose={() => {
@@ -34,21 +26,20 @@ export function EnterRobotEncryptionKey(): JSX.Element {
             getTopPortalEl()
           )
         : null}
-      <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Box width="70%">
+      <div className={styles.container}>
+        <div className={styles.text_container}>
           <LegacyStyledText
             css={TYPOGRAPHY.pSemiBold}
             marginBottom={SPACING.spacing4}
-            id="AdvancedSettings_robotEncryptionKey"
+            id="AdvancedSettings_About"
           >
             {t('robot_encryption_key')}
           </LegacyStyledText>
           <LegacyStyledText forwardedAs="p">
             {t('enter_robot_encryption_key_description')}
           </LegacyStyledText>
-        </Box>
+        </div>
         <TertiaryButton
-          marginLeft={SPACING_AUTO}
           onClick={() => {
             setShowRobotCertImportModal(true)
           }}
@@ -56,7 +47,7 @@ export function EnterRobotEncryptionKey(): JSX.Element {
         >
           {t('enter_encryption_key')}
         </TertiaryButton>
-      </Flex>
+      </div>
     </>
   )
 }
