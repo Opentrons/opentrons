@@ -93,27 +93,25 @@ The Flex has not been evaluated for use with flammable liquids and should not be
 
 ## Regulatory compliance
 
-You can find Flex compliance information below and on the sticker affixed to the back of the robot near the on/off switch.
+You can find Flex compliance information on the sticker affixed to the back of the robot near the on/off switch and in the sections below.
 
 <figure markdown>
 ![Flex regulatory and compliance sticker](images/regulatory-specs-sticker.png)
 <figcaption>Flex compliance sticker</figcaption>
 </figure>
 
-These symbols indicate Flex conforms to various international and regional regulatory directives and standards.
+These marks indicate Flex conforms to various international and regional regulatory directives and standards.
 
 | Symbol | Market Area | Description |
 |----|----|----|
 |![CE certification](images/certification-ce.png)| European Economic Area (EEA) | Declares compliance with all applicable European Union (EU) directives (e.g., Low Voltage Directive, Machinery Directive, EMC Directive, etc.) |
 |![UK post-Brexit certification](images/certification-uk.png)| Great Britain | This post-Brexit certification declares conformity with all applicable Designated Standards under United Kingdom statutory instruments<!-- "statutory instruments" is a real thing -->, excluding Northern Ireland and the EU. |
 |![Australia and New Zealand certification](images/certification-auz-nz.png)| Australia and New Zealand | Declares compliance with shared trans-Tasman electromagnetic (EMC) baseline standards for commercial radio noise limits.|
-|![North America Intertek listed certification](images/certification-us-can.png)| Canada and United Stated | Certified and third-party listed by Intertek testing laboratories (ETL control number: 5016401). |
+|![North America Intertek listed certification](images/certification-us-can.png)| Canada and United States | Certified and third-party listed by Intertek testing laboratories (ETL control number: 5016401). |
 
 ### North American compliance
 
-In the United States and Canada, safety auditors and facilities inspectors can verify Flex compliance through our Nationally Recognized Testing Laboratory (NRTL) listing data.
-
-To satisfy these national requirements, Flex is certified and listed by Intertek testing laboratories (an accredited NRTL) under ETL control number 5016401. This listing confirms the robot satisfies the following national safety standards:
+In the United States and Canada, safety auditors and facilities inspectors can verify Flex compliance through our Nationally Recognized Testing Laboratory (NRTL) listing data. Flex is certified and listed by Intertek, an accredited NRTL. The ETL control number is 5016401.
 
 * **United States:** Conforms to UL STD 61010-1 (Electrical Safety Requirements for Laboratory Use) and UL STD 61010-2-051 (Particular Requirements for Laboratory Mixing and Stirring Equipment).
 * **Canada:** Certified to CSA STD C22.2 No. 61010-1-12 and CSA STD C22.2 No. 61010-2-051.
@@ -146,13 +144,13 @@ Opentrons products that fall under the WEEE directive are labeled with the <img 
 
 If you or your business have Opentrons products that are at end of life or need to be discarded for a separate purpose, contact Opentrons for proper disposal and recycling.
 
-### Wireless
+### Wireless compliance
 
-Flex is compatible with 802.11 ac/a/b/g/n wireless networks using internal, dual-band 2.4/5 GHz antennas. This Wi-Fi capability makes the robot an intentional radio frequency radiator. As a result, it holds the following pre-certifications and approvals:
+Flex is compatible with 802.11 ac/a/b/g/n wireless networks using internal, dual-band 2.4/5 GHz antennas. This Wi-Fi capability makes the robot an intentional radio frequency radiator.
 
 * **Canada (ISED):** Certified under IC Identifier W8997-M1216. Unintentional emissions are constrained within Class A limits in accordance with ICES-003.
 * **China (MIIT):** Radio Transmission Equipment Type Approval Certificate Identifier CMIIT ID: 2023AP17820.
-* **European Economic Area (CE):** Authorized under the harmonized Radio Equipment Directive (RED) via manufacturer self-declaration. Unintentional noise satisifies EN 61326-1 laboratory EMC parameters.
+* **EEA (CE):** Authorized under the harmonized Radio Equipment Directive (RED) via manufacturer self-declaration. Unintentional noise satisfies EN 61326-1 laboratory EMC parameters.
 * **India (WPC):** Equipment Type Approval Registration Number ETA-SD-20191005525 (issued via fast-track self-declaration clearing).
 * **Japan (TELEC/MIC):** Certified Ordinance Type Radio Equipment Registry Number 020-170034.
 * **United States (FCC):** Certified under FCC Identifier UAY-W8997-M1216. Unintentional high-frequency noise is limited within industrial boundaries pursuant to FCC 47 CFR Part 15 Subpart B Class A rules.
