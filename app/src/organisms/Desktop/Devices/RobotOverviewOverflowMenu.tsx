@@ -24,6 +24,7 @@ import {
   useCreateLiveCommandMutation,
   useHomeMutation,
   useSetLightsMutation,
+  useShutdownMutation,
 } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -34,7 +35,7 @@ import { RobotCertImportModal } from '/app/organisms/Desktop/RobotCertImport/Rob
 import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
 import * as Config from '/app/redux/config'
 import { CONNECTABLE, REACHABLE, UNREACHABLE } from '/app/redux/discovery'
-import { restartRobot, shutdownRobot } from '/app/redux/robot-admin'
+import { restartRobot } from '/app/redux/robot-admin'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { checkShellUpdate } from '/app/redux/shell'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
@@ -80,6 +81,7 @@ export const RobotOverviewOverflowMenu = (
   const { setLights } = useSetLightsMutation()
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { home } = useHomeMutation(documentationState)
+  const { shutdown } = useShutdownMutation()
 
   const handleClickRestart: MouseEventHandler<HTMLButtonElement> = () => {
     dispatch(restartRobot(robot.name))
@@ -94,7 +96,7 @@ export const RobotOverviewOverflowMenu = (
       })
       .finally(() => {
         setLights({ on: false })
-        dispatch(shutdownRobot(robot.name))
+        shutdown()
       })
   }
 

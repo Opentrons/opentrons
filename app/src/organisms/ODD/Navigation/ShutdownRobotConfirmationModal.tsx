@@ -1,5 +1,4 @@
 import { Trans, useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 
 import {
   DIRECTION_COLUMN,
@@ -11,14 +10,13 @@ import {
 import {
   useCreateLiveCommandMutation,
   useSetLightsMutation,
+  useShutdownMutation,
 } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
-import { shutdownRobot } from '/app/redux/robot-admin'
 
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-import type { Dispatch } from '/app/redux/types'
 
 interface ShutdownRobotConfirmationModalProps {
   robotName: string
@@ -35,9 +33,9 @@ export function ShutdownRobotConfirmationModal({
     title: t('turn_off_robot'),
     iconName: 'power-off',
   }
-  const dispatch = useDispatch<Dispatch>()
   const { setLights } = useSetLightsMutation()
   const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { shutdown } = useShutdownMutation()
 
   return (
     <OddModal header={modalHeader}>
@@ -84,7 +82,7 @@ export function ShutdownRobotConfirmationModal({
                 })
                 .finally(() => {
                   setLights({ on: false })
-                  dispatch(shutdownRobot(robotName))
+                  shutdown()
                 })
             }}
           />
