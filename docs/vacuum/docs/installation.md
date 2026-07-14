@@ -10,7 +10,15 @@ Follow these instructions to install the Vacuum Module.
 
 <div class="instruction-list" markdown>
 
-## Part 1: Deck components
+## Part X: Unboxing
+
+Open boxes. Inner box wrapped with a blue protective shipping bag. Parts are sealed in a blue protective shipping bags. Cut bag and remove any foam padding and then the box containing your parts. The box with the waste jar includes region-specific IEC power cable in its own small box.
+
+- Open external boxes
+- Cut open and remove any padding material
+- Removed inner boxes containing vacuum module parts.
+
+## Part N: Deck components
 
 1. Clear the deck of all modules and labware to give yourself sufficient room to work.
 
@@ -25,7 +33,7 @@ Follow these instructions to install the Vacuum Module.
 
 4. Set the vacuum base on the deck adapter in slot A3.
 
-5. Attach the 6 mm (&frac14;") vacuum hose to the quick connect fitting on the base plate. The quick connect fittings lock into place with an audible click.
+5. Attach the L-shaped 6 mm (&frac14;") quick connect to the corresponding fitting on the base plate. The quick connect fittings lock into place with an audible click.
 
 <!-- Images won't center or render without left justify?!? -->
 <figure class="screenshot side-by-side" markdown>
@@ -55,9 +63,9 @@ Follow these instructions to install the Vacuum Module.
 
 10. Place the cap on the waste jar and hand tighten it. Do not over-tighten the cap; this is not a trial of strength.
 
-11. Attach the free end of the 6 mm (&frac14;") vacuum tube into the quick connect fitting on the cap. You can cut the tubing to length as needed.
+11. Attach the free end of the 6 mm (&frac14;") quck connect on the vacuum tube into the quick connect fitting on the cap. You can cut the tubing to length as needed.
 
-12. Attach the 9.5 mm (&frac38;") vacuum hose and coupling inserts into the connector on the cap and on the Control Box.  You can cut the tubing to length as needed.
+12. Attach the 9.5 mm (&frac38;") vacuum hose and coupling inserts into the connector on the cap and on the Control Box. You can cut the tubing to length as needed.
 
 ## Part 3: Data and power connections
 
