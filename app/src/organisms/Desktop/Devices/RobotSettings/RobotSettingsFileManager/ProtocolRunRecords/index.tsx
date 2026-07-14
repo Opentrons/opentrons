@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -15,14 +15,25 @@ import { DeleteRecordsModal } from '../../../DeleteRecordsModal'
 import { FileManagementSectionHeader } from '../FileManagementSectionHeader'
 import { useRecordSelection } from '../hooks/useRecordSelection'
 import fileManagerStyles from '../robotsettingsfilemanager.module.css'
+import { useDeleteSelectedRuns } from './hooks/useDeleteSelectedRuns'
+import { useDownloadSelectedRuns } from './hooks/useDownloadSelectedRuns'
 import protocolRunRecordsStyles from './protocolrunrecords.module.css'
 import { RunRecord } from './RunRecord'
 
-export function ProtocolRunRecords(): JSX.Element {
+interface ProtocolRunRecordsProps {
+  robotName: string
+}
+
+export function ProtocolRunRecords({
+  robotName,
+}: ProtocolRunRecordsProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const { makeToast } = useToaster()
   const { data: runData } = useNotifyAllRunsQuery()
-  const runs = [...(runData?.data ?? [])]
+  const runs = useMemo(() => [...(runData?.data ?? [])], [runData?.data])
+  const { downloadSelectedRuns, isDownloading: isDownloadingRuns } =
+    useDownloadSelectedRuns(robotName)
+  const { deleteSelectedRuns, deletingIds } = useDeleteSelectedRuns()
 
   const {
     selectedIds,
@@ -40,10 +51,13 @@ export function ProtocolRunRecords(): JSX.Element {
     })
   }
 
-  // no-op: download not yet implemented
   const handleDownloadSelected = (): void => {
     if (selectedIds.size === 0) {
       handleNoRunsSelected('download')
+      return
+    }
+    if (!isDownloadingRuns) {
+      downloadSelectedRuns(runs.filter(run => selectedIds.has(run.id)))
     }
   }
 
@@ -63,6 +77,7 @@ export function ProtocolRunRecords(): JSX.Element {
             setShowDeleteRecordsModal(false)
           }}
           onConfirm={() => {
+            deleteSelectedRuns(runs.filter(run => selectedIds.has(run.id)))
             setShowDeleteRecordsModal(false)
           }}
           type="selectedRuns"
@@ -71,6 +86,7 @@ export function ProtocolRunRecords(): JSX.Element {
       <div className={fileManagerStyles.file_management_group}>
         <FileManagementSectionHeader
           titleText={t('protocol_run_records')}
+          showButtons={isSomeSelected || isAllSelected}
           onDownloadSelected={handleDownloadSelected}
           onDeleteSelected={handleDeleteSelected}
         />
@@ -113,6 +129,7 @@ export function ProtocolRunRecords(): JSX.Element {
                 key={run.id}
                 run={run}
                 isSelected={selectedIds.has(run.id)}
+                isDeleting={deletingIds.has(run.id)}
                 onToggle={() => {
                   handleToggleRun(run.id)
                 }}
