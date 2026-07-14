@@ -8,9 +8,10 @@ Tiers (independently selectable via the ``--tier`` pytest option):
 * **3 — fragments:** exec each fragment on top of a fresh context seeded from
   the Flex/OT-2 base template in ``templates.py``, plus any registry object
   seeds the fragment (or its ``continue-previous`` chain) actually references
-  — see :func:`_object_setup_for`. A ``continue-previous`` fragment reuses the
-  prior fragment's namespace, so its case replays the whole chain in one
-  context.
+  (:func:`_object_setup_for`) and a preemptive ``pick_up_tip()`` for any
+  pipette it uses tip-less (:func:`_tip_setup_for`). A ``continue-previous``
+  fragment reuses the prior fragment's namespace, so its case replays the
+  whole chain in one context.
 
 Every simulated context created here (Tier 2's OT-2 branch and all of Tier 3)
 is torn down with :func:`_release_simulated_context` right after use. Nothing
@@ -64,6 +65,7 @@ class SnippetCase:
     object_seed: str | None = (
         None  # registry object setup for names the chain references
     )
+    tip_seed: str | None = None  # pick_up_tip() for pipettes the chain uses tip-less
 
 
 def _slug(text: str | None) -> str:
@@ -86,6 +88,55 @@ def _seed_code(rendered: str) -> str:
 
 _OBJECT_NAME_RE = {name: re.compile(rf"\b{name}\b") for name in OBJECT_SEEDS}
 _OBJECT_ASSIGN_RE = {name: re.compile(rf"(?m)^\s*{name}\s*=") for name in OBJECT_SEEDS}
+
+# Methods that raise TipNotAttachedError/UnexpectedTipRemovalError without a
+# tip already picked up.
+_TIP_REQUIRED_METHODS = (
+    "aspirate",
+    "dispense",
+    "mix",
+    "dynamic_mix",
+    "touch_tip",
+    "air_gap",
+    "blow_out",
+    "drop_tip",
+    "return_tip",
+)
+_TIP_CALL_RE = re.compile(rf"\b(\w+)\.(?:{'|'.join(_TIP_REQUIRED_METHODS)})\(")
+
+
+def _tip_setup_for(chain_code: str) -> str | None:
+    """Preemptive tip + liquid setup for any pipette the chain uses tip-less.
+
+    Many building-block examples show a bare liquid-handling call (aspirate,
+    mix, touch_tip, drop_tip, ...) that assumes state from an earlier, unmarked
+    example on the same page — the single largest source of otherwise-genuine
+    "needs prior context" xfails. For any name the chain calls a tip-requiring
+    method on, inject (each skipped if the chain already does its own):
+
+    * ``pick_up_tip()`` — without it, everything below raises
+      ``TipNotAttachedError``/``UnexpectedTipRemovalError``.
+    * ``aspirate(<max_volume> / 2, plate["A1"])`` — a location-less
+      ``dispense()``, ``mix()``, or ``touch_tip()`` operates at the pipette's
+      "current well," which a bare ``pick_up_tip()`` doesn't set (it leaves
+      the pipette over the tip rack); and a bare ``dispense()`` needs volume
+      in the tip to dispense in the first place. One aspirate fixes both.
+      Half of ``max_volume`` (rather than all of it) leaves headroom for a
+      fragment that itself does another aspirate or an ``air_gap()`` on top.
+    """
+    names = dict.fromkeys(_TIP_CALL_RE.findall(chain_code))
+    pieces = []
+    for name in names:
+        needs_pick_up = f"{name}.pick_up_tip(" not in chain_code
+        if needs_pick_up:
+            pieces.append(f"{name}.pick_up_tip()\n")
+        # Only add the aspirate half of the precondition alongside our own
+        # pick_up_tip(): if the chain calls pick_up_tip() itself (even later,
+        # e.g. after some setup), a tip isn't attached yet at the very start
+        # of the chain, so aspirating here first would itself be invalid.
+        if needs_pick_up and f"{name}.aspirate(" not in chain_code:
+            pieces.append(f'{name}.aspirate({name}.max_volume / 2, plate["A1"])\n')
+    return "".join(pieces) if pieces else None
 
 
 def _object_setup_for(
@@ -162,11 +213,13 @@ def build_cases(roots: list[Path], docs_root: Path) -> list[SnippetCase]:
         else:
             chain = [rendered]
 
+        chain_text = "\n".join(chain)
         object_seed = (
-            _object_setup_for("\n".join(chain), page_seed, track)
+            _object_setup_for(chain_text, page_seed, track)
             if category is Category.FRAGMENT
             else None
         )
+        tip_seed = _tip_setup_for(chain_text) if category is Category.FRAGMENT else None
 
         test_id = f"{snippet.rel_path}::{snippet.tab or '_'}::{_slug(snippet.heading)}::L{snippet.start_line}"
         cases.append(
@@ -181,6 +234,7 @@ def build_cases(roots: list[Path], docs_root: Path) -> list[SnippetCase]:
                 api_version=api_version,
                 page_seed=page_seed,
                 object_seed=object_seed,
+                tip_seed=tip_seed,
             )
         )
     return cases
@@ -333,6 +387,11 @@ def run_fragment(case: SnippetCase, docs_root: Path) -> None:
                 ),
                 namespace,
             )
+        if case.tip_seed:
+            exec(
+                compile(case.tip_seed, f"<tip-seed:{case.snippet.rel_path}>", "exec"),
+                namespace,
+            )
         for code in case.chain:
             exec(compile(code, case.snippet.location, "exec"), namespace)
     finally:
@@ -370,6 +429,8 @@ _CONTEXT_FAILURE_MESSAGES = (
     "labware latch has not been set to closed",  # needs the latch closed by a prior snippet
     "with its lid closed",  # needs the Thermocycler lid opened by a prior snippet
     "without calling `.initialize(...)` first",  # needs the reader initialized by a prior snippet
+    "before specifying WellOrigin.MENISCUS",  # needs LiquidProbe/load_liquid from a prior snippet
+    "cannot probe for liquid when the tip has liquid in it",  # needs an empty tip from a prior snippet
 )
 
 

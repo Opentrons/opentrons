@@ -58,6 +58,19 @@ for the ones actually referenced *and* not already defined by a page-template
 or the chain itself — so a page whose own snippet loads `hs_mod` locally isn't
 handed a second, conflicting one.
 
+### Pipette-tip preconditions
+
+The same on-demand idea applies to pipette state. Plenty of building-block
+examples (`touch_tip()`, `mix()`, `dispense()`, `air_gap()`, ...) assume a tip
+was already picked up — and often that liquid was already aspirated — by an
+earlier, unmarked example on the same page. `execute._tip_setup_for` scans a
+fragment's rendered code for tip-requiring method calls and, for each pipette
+name that doesn't call `pick_up_tip()` itself, injects `pick_up_tip()` plus an
+`aspirate()` at half the pipette's `max_volume` (enough headroom either way:
+room to dispense, or room to aspirate/air_gap more on top). A fragment that
+manages its own tip lifecycle (`pick_up_tip()`/`drop_tip()` pairs, partial-tip
+layouts, etc.) is left alone.
+
 ## Classification
 
 By convention, no annotation needed:
