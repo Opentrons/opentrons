@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -30,7 +30,7 @@ export function ProtocolRunRecords({
   const { t } = useTranslation('device_details')
   const { makeToast } = useToaster()
   const { data: runData } = useNotifyAllRunsQuery()
-  const runs = [...(runData?.data ?? [])]
+  const runs = useMemo(() => [...(runData?.data ?? [])], [runData?.data])
   const { downloadSelectedRuns, isDownloading: isDownloadingRuns } =
     useDownloadSelectedRuns(robotName)
   const { deleteSelectedRuns, deletingIds } = useDeleteSelectedRuns()
