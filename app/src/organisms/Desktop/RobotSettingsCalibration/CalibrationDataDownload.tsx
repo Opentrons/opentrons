@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 
 import { TertiaryButton } from '/app/atoms/buttons'
-import { useDownloadCalibrationData } from '/app/organisms/Desktop/Devices/hooks'
+import { useDownloadCalibrationData } from '/app/resources/devices/hooks'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 import type { MouseEventHandler } from 'react'

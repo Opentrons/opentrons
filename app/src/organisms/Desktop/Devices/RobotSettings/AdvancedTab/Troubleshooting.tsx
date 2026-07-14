@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 
 import { TertiaryButton } from '/app/atoms/buttons'
-import { useDownloadRobotLogs } from '/app/organisms/Desktop/Devices/hooks'
+import { useDownloadRobotLogs } from '/app/resources/devices/hooks'
 
 import type { MouseEventHandler } from 'react'
 

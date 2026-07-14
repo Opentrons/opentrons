@@ -5,7 +5,7 @@ import { CheckboxBasic, COLORS, StyledText } from '@opentrons/components'
 import {
   useDownloadCalibrationData,
   useDownloadRobotLogs,
-} from '/app/organisms/Desktop/Devices/hooks'
+} from '/app/resources/devices/hooks'
 
 import { FileManagementSectionHeader } from '../FileManagementSectionHeader'
 import { useRecordSelection } from '../hooks/useRecordSelection'

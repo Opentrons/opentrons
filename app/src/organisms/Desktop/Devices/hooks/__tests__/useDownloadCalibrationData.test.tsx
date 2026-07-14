@@ -16,7 +16,7 @@ import {
   useTrackEvent,
 } from '/app/redux/analytics'
 
-import { useDownloadCalibrationData } from '../useDownloadCalibrationData'
+import { useDownloadCalibrationData } from '/app/resources/devices/hooks'
 
 import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'

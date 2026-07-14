@@ -37,6 +37,7 @@
   "error": "error",
   "error_encountered": "Error encountered",
   "exit": "exit",
+  "finish": "finish",
   "extension_mount": "extension mount",
   "flow_complete": "{{flowName}} complete!",
   "get_started": "Get started",

@@ -10,6 +10,7 @@ import {
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
   useTrackEvent,
 } from '/app/redux/analytics'
+import { saveFileToUsb } from '/app/redux/shell/remote'
 
 interface UseDownloadCalibrationDataResult {
   downloadCalibration: () => void
@@ -17,7 +18,8 @@ interface UseDownloadCalibrationDataResult {
 }
 
 export function useDownloadCalibrationData(
-  robotName: string
+  robotName: string,
+  savePath?: string
 ): UseDownloadCalibrationDataResult {
   const doTrackEvent = useTrackEvent()
   const { data: attachedInstruments, isLoading: isLoadingInstruments } =
@@ -30,15 +32,17 @@ export function useDownloadCalibrationData(
       name: ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
       properties: { robotType: FLEX_ROBOT_TYPE },
     })
-    saveAs(
-      new Blob([
-        JSON.stringify({
-          instrumentData: attachedInstruments,
-          moduleData: attachedModules,
-        }),
-      ]),
-      `${robotName}-calibration.json`
-    )
+    const filename = `${robotName}-calibration.json`
+    const jsonString = JSON.stringify({
+      instrumentData: attachedInstruments,
+      moduleData: attachedModules,
+    })
+    if (savePath != null) {
+      const buffer = new TextEncoder().encode(jsonString).buffer
+      void saveFileToUsb(`${savePath}/${filename}`, buffer)
+    } else {
+      saveAs(new Blob([jsonString]), filename)
+    }
   }
 
   return {

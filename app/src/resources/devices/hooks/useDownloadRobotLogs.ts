@@ -11,23 +11,27 @@ import { useHost } from '@opentrons/react-api-client'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useRobot } from '/app/redux-resources/robots'
 import { CONNECTABLE } from '/app/redux/discovery'
+import { saveFileToUsb } from '/app/redux/shell/remote'
 
 import type { IconProps } from '@opentrons/components'
 
 interface UseDownloadRobotLogsResult {
   downloadLogs: () => void
   isDownloading: boolean
+  hasError: boolean
   canDownload: boolean
 }
 
 export function useDownloadRobotLogs(
-  robotName: string
+  robotName: string,
+  savePath?: string
 ): UseDownloadRobotLogsResult {
   const { t } = useTranslation('device_settings')
   const robot = useRobot(robotName)
   const host = useHost()
   const { makeToast, eatToast } = useToaster()
   const [isDownloading, setIsDownloading] = useState(false)
+  const [hasError, setHasError] = useState(false)
   const isMounted = useRef(false)
 
   useEffect(() => {
@@ -44,6 +48,7 @@ export function useDownloadRobotLogs(
     if (!canDownload || host == null || robot?.health?.logs == null) return
 
     setIsDownloading(true)
+    setHasError(false)
     const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
     const toastId = makeToast(t('downloading_logs') as string, INFO_TOAST, {
       disableTimeout: true,
@@ -65,14 +70,22 @@ export function useDownloadRobotLogs(
     )
       .then(() =>
         zip
-          .generateAsync({ type: 'blob' })
-          .then(blob => {
-            saveAs(blob, `${robotName}_logs.zip`)
+          .generateAsync({ type: 'arraybuffer' })
+          .then(async buffer => {
+            const filename = `${robotName}_logs.zip`
+            if (savePath != null) {
+              await saveFileToUsb(`${savePath}/${filename}`, buffer)
+            } else {
+              saveAs(new Blob([buffer]), filename)
+            }
           })
           .catch((e: Error) => {
             eatToast(toastId)
             makeToast(e.message, ERROR_TOAST, { closeButton: true })
-            if (isMounted.current) setIsDownloading(false)
+            if (isMounted.current) {
+              setHasError(true)
+              setIsDownloading(false)
+            }
           })
       )
       .then(() => {
@@ -82,9 +95,12 @@ export function useDownloadRobotLogs(
       .catch((e: Error) => {
         eatToast(toastId)
         makeToast(e.message, ERROR_TOAST, { closeButton: true })
-        if (isMounted.current) setIsDownloading(false)
+        if (isMounted.current) {
+          setHasError(true)
+          setIsDownloading(false)
+        }
       })
   }
 
-  return { downloadLogs, isDownloading, canDownload }
+  return { downloadLogs, isDownloading, hasError, canDownload }
 }
