@@ -20,6 +20,12 @@ IGNORED_ENDPOINTS: set[tuple[str, str]] = {
     ("post", "/labwareOffsets/searches"),
     # Protocol analyses are just disposable simulations.
     ("post", "/protocols/{protocolId}/analyses"),
+    # Light control is intentionally unauthenticated. The client uses these implicitly
+    # without a login at certain times, e.g. during ODD startup (?).
+    # If a user is doing science where lights need to be well-controlled, they probably
+    # need hardware modifications anyway.
+    ("post", "/identify"),
+    ("post", "/robot/lights"),
 }
 
 
