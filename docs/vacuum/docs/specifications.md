@@ -6,11 +6,11 @@ title: "Vacuum Module: Product Specifications"
 
 ## Vacuum Module parts
 
-The Vacuum Module ships in three separate boxes.
+The Vacuum Module ships in 3 separate boxes.
 
-### Unnamed box 1
+### Box 1: deck components
 
-Unnamed box 1 includes deck components that hold labware and other components for vacuum-rated applications.
+Unnamed box 1 includes deck pieces like the manifold base along with collars and spacers that hold well plates used in vacuum-rated protocols.
 
 <div class="parts-list" markdown>
 
@@ -49,9 +49,9 @@ Unnamed box 1 includes deck components that hold labware and other components fo
 
 </div>
 
-### Unnamed box 2
+### Box 2: pump components
 
-Unnamed box 2 includes the Control Box (vacuum pump and electronics), a deck adapter (and screws), a region-specific power cable, and a USB A-B data cable.
+Unnamed box 2 includes the Control Box (vacuum pump and electronics), a deck adapter (and screws), an IEC power cable, a USB A-B data cable, and assorted fasteners.
 
 <div class="parts-list" markdown>
 
@@ -76,7 +76,7 @@ Unnamed box 2 includes the Control Box (vacuum pump and electronics), a deck ada
 
 <figure markdown>
 ![IEC power cable, region specific](images/iec-plugs.png "IEC power cable")
-<figcaption>(1) IEC power cable</figcaption>
+<figcaption>(1) Region-specific IEC power cable</figcaption>
 </figure>
 
 </div>
@@ -85,20 +85,28 @@ Unnamed box 2 includes the Control Box (vacuum pump and electronics), a deck ada
 
 <figure markdown>
 ![Spare deck plate screws, M4 x 10](images/deck-screws.png "Spare deck plate screws"){ width="50%" }
-<figcaption>(2) Deck adapter screws, M4x10</figcaption>
+<figcaption>(2) Deck plate screws, M4x10</figcaption>
 </figure>
+
+<figure markdown>
+![Placeholder for manifold screws](images/parts_placeholder.png)
+<figcaption>(6) Manifold screws, M x X</figcaption>
 
 </div>
 
-### Unnamed box 3
+### Box 3: waste collection components
 
-Unnamed box 3 includes the waste collection jar and cap, a stabilization cradle, along with the hoses and couplings that connect the deck pieces and jar to the vacuum pump in the Control Box.
+Box 3 includes the waste collection jar and cap, a jar holder (to help prevent tip-overs), vacuum hoses, hose clamps, and extra barbed quick connect/disconnect fittings.
+
+* The jar, cap, and hoses ship with quick connector fittings already installed at the factory.
+* The hoses are wrapped around the shaped foam padding in the bottom of the box.
+* You can use extra hardware (fittings and clamps) to create your own, customized set of vacuum hoses.
 
 <div class="parts-list" markdown>
 
 <figure markdown>
 ![Glass 2 liter waste jar and cap](images/waste-jar.png "2 liter glass waste jar and cap"){ width="70%" }
-<figcaption>(1) Waste jar and cap, 2 liter</figcaption>
+<figcaption>(1) Waste jar and cap</figcaption>
 </figure>
 
 <figure markdown>
@@ -111,13 +119,18 @@ Unnamed box 3 includes the waste collection jar and cap, a stabilization cradle,
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Vacuum 6 mm and 9.5 mm diameter vacuum hoses hoses](images/vacuum-module-hoses.png "6 mm and 9.5 mm inner diameter (ID) vacuum hoses")
-<figcaption>(2) Vacuum hoses, 6 mm and 9.5 mm inner diameter (ID)</figcaption>
+![Vacuum hoses hoses](images/vacuum-module-hoses.png "6 mm and 9.5 mm inner diameter (ID) vacuum hoses")
+<figcaption>(2) Vacuum hoses</figcaption>
 </figure>
 
 <figure markdown>
-![Threaded and snap-on quick connectors](images/quick-connectors.png "Threaded and snap-on quick connectors")
-<figcaption>(8) Quick connectors</figcaption>
+![Placeholder for missing image](images/parts_placeholder.png)
+<figcaption>(2) Spare hose clamps</figcaption>
+</figure>
+
+<figure markdown>
+![Placeholder for missing image](images/parts_placeholder.png)
+<figcaption>(2) Spare hose fittings</figcaption>
 </figure>
 
 </div>
@@ -177,14 +190,14 @@ The Vacuum Module ships with two vacuum hoses and factory installed quick connec
     </tr>
     <tr>
       <td><strong>Material composition</strong></td>
-      <td>Perfluoroalkoxy (PFA)</td>
+      <td><font color="red">TBD</font></td>
     </tr>
   </tbody>
 </table>
 
-### Carboy
+### Waste collection jar
 
-The Vacuum Module ships with glass carboy for waste collection and a safety cradle to help keep the carboy secure on the workbench and prevent tip-overs.
+The Vacuum Module ships with glass waste collection jar (carboy) and a safety cradle. The cradle helps keep the jar upright and prevents tip-overs.
 
 <table>
   <thead>
@@ -195,7 +208,7 @@ The Vacuum Module ships with glass carboy for waste collection and a safety crad
   </thead>
   <tbody>
     <tr>
-      <td><strong>Carboy</strong></td>
+      <td><strong>Waste jar</strong></td>
       <td> <ul>
           <li>Composition: clear glass</li>
           <li>Capacity: 2 liters</li>
