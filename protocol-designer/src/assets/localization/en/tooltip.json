@@ -1,19 +1,36 @@
 {
   "advanced_settings": "Advanced Settings",
-  "disabled_no_trash": "Select the Trash Bin or Waste Chute in order to continue",
+  "cancel_batch_edit": "Reset unsaved changes to the form",
   "disabled_cannot_delete_trash": "A Trash Bin or Waste Chute is required",
+  "disabled_no_space_additional_items": "No space for this combination of staging area slots, trash, and modules.",
+  "disabled_no_space_pipette": "Only up to 3 tipracks can be assigned",
+  "disabled_no_trash": "Select the Trash Bin or Waste Chute in order to continue",
   "disabled_off_deck": "Off-deck labware cannot be modified unless on starting deck state.",
   "disabled_step_creation": "New steps cannot be added in Batch Edit mode.",
-  "disabled_no_space_additional_items": "No space for this combination of staging area slots, trash, and modules.",
   "disabled_you_can_add_one_type": "Only one module of each type is allowed on the deck at a time",
-  "disabled_no_space_pipette": "Only up to 3 tipracks can be assigned",
-  "not_enough_space_for_temperatureModuleType": "There is not enough space on the deck to add more temperature modules",
+  "edit_module_card": {
+    "magnetic_module_collision": "When magnetic module is in Slot 1, GEN1 8-Channel pipette cannot access Slot 4.",
+    "temperature_module_collision": "When temperature module is in Slot 3, GEN1 8-Channel pipette cannot access Slot 6. "
+  },
+  "edit_module_modal": {
+    "slot_selection": "To enable non-default/unrestricted positioning, go to Settings > App > Experimental settings."
+  },
+  "missing_tiprack": "Missing a tiprack? Make sure it is added to the deck",
   "not_enough_space_for_heaterShakerModuleType": "There is not enough space on the deck to add more heater-shaker modules",
   "not_enough_space_for_magneticBlockType": "There is not enough space on the deck to add more magnetic blocks",
+  "not_enough_space_for_temperatureModuleType": "There is not enough space on the deck to add more temperature modules",
   "not_in_beta": "ⓘ Coming Soon",
-  "missing_tiprack": "Missing a tiprack? Make sure it is added to the deck",
-  "y_position_value": "A negative value moves towards the front",
-
+  "profile": {
+    "add_cycle": "Add a series of steps that cycle",
+    "add_step": "Add a single non-cycling step",
+    "add_step_to_cycle": "Add a step to the cycle",
+    "delete_cycle": "Delete cycle and steps",
+    "delete_step": "Delete profile step"
+  },
+  "save_batch_edit": {
+    "disabled": "No new changes to save",
+    "enabled": "Apply changes to all selected steps"
+  },
   "step_description": {
     "comment": "Add a comment anywhere between steps in your protocol",
     "heaterShaker": "Set heat, shake, or labware latch commands for the Heater-Shaker module",
@@ -27,6 +44,18 @@
   },
 
   "step_fields": {
+    "batch_edit": {
+      "disabled": {
+        "aspirate-labware-different": "Cannot edit unless selected steps share the same type of source labware.",
+        "dispense-labware-different": "Cannot edit unless selected steps share the same type of destination labware.",
+        "labware-different": "Cannot edit unless selected steps share the same type of labware.",
+        "multi-aspirate-present": "Cannot edit while one or more selected steps uses the multi-aspirate path.",
+        "multi-aspirate-present-pipette-different": "Cannot edit while one or more selected steps uses the multi-aspirate path. Selected steps must also share the same pipette.",
+        "multi-dispense-present": "Cannot edit while one or more selected steps uses the multi-dispense path.",
+        "multi-dispense-present-pipette-different": "Cannot edit while one or more selected steps uses the multi-dispense path. Selected steps must also share the same pipette.",
+        "pipette-different": "Cannot edit unless selected steps share the same pipette."
+      }
+    },
     "defaults": {
       "aspirate_airGap_checkbox": "Draw air into the tip after aspirating",
       "aspirate_delay_checkbox": "Delay after each aspiration",
@@ -35,12 +64,12 @@
       "aspirate_labware": "Pipette unable to access labware in staging area",
       "aspirate_mix_checkbox": "Aspirate and dispense repeatedly before main aspiration",
       "aspirate_mmFromBottom": "Adjust tip position for aspirate",
-      "aspirate_touchTip_checkbox": "Touch tip to each side of the well after aspirating",
-      "aspirate_touchTip_mmFromTop": "Distance from the top of the well",
       "aspirate_retract": "Withdraw the tip from the liquid after aspirating",
       "aspirate_retract_mmFromBottom": "Adjust tip position for retract after aspirate",
       "aspirate_submerge": "Lower the tip into the liquid before aspirating",
       "aspirate_submerge_mmFromBottom": "Adjust tip position for submerge before aspirate",
+      "aspirate_touchTip_checkbox": "Touch tip to each side of the well after aspirating",
+      "aspirate_touchTip_mmFromTop": "Distance from the top of the well",
       "aspirate_wells": "First select a source labware",
       "blowout_checkbox": "Blow extra air through the tip",
       "blowout_flowRate": "Blowout speed",
@@ -76,8 +105,13 @@
       "preWetTip": "Pre-wet by aspirating and dispensing the total aspiration volume",
       "pushOut_checkbox": "Helps ensure all liquid leaves the tip",
       "setTemperature": "Select the temperature to set your module to",
-      "wells": "Select wells",
-      "volume": "Volume to dispense in each well"
+      "volume": "Volume to dispense in each well",
+      "wells": "Select wells"
+    },
+    "heaterShaker": {
+      "disabled": {
+        "latchOpen": "Labware Latch cannot be open while the module is shaking"
+      }
     },
     "indeterminate": {
       "aspirate_airGap_checkbox": "Not all selected steps are using this setting",
@@ -94,17 +128,22 @@
     },
     "mix": {
       "disabled": {
-        "wells": "Select a labware before selecting wells",
+        "blowout_z_offset": "Blowout location and destination labware must first be selected",
         "mix_mmFromBottom": "Tip position adjustment is not supported",
-        "blowout_z_offset": "Blowout location and destination labware must first be selected"
+        "wells": "Select a labware before selecting wells"
+      }
+    },
+    "moveLabware": {
+      "disabled": {
+        "gripper_not_used": "Attach Gripper to move labware"
       }
     },
     "moveLiquid": {
       "disabled": {
         "$generic": "Incompatible with current path",
         "aspirate_airGap_checkbox": "Air gap after aspirate not available with conditioning volume configured",
-        "aspirate_mmFromBottom": "Tip position adjustment is not supported",
         "aspirate_mix_checkbox": "Advanced setting not compatible with pipette path",
+        "aspirate_mmFromBottom": "Tip position adjustment is not supported",
         "aspirate_touchTip_checkbox": "Touch tip is not supported",
         "aspirate_wells": "Select a source labware in order to select wells",
         "blowout_checkbox": "Blowout already set with disposal volume",
@@ -118,51 +157,11 @@
         "preWetTip": "Advanced setting not compatible with pipette path"
       }
     },
-    "moveLabware": {
-      "disabled": {
-        "gripper_not_used": "Attach Gripper to move labware"
-      }
-    },
-    "batch_edit": {
-      "disabled": {
-        "aspirate-labware-different": "Cannot edit unless selected steps share the same type of source labware.",
-        "dispense-labware-different": "Cannot edit unless selected steps share the same type of destination labware.",
-        "labware-different": "Cannot edit unless selected steps share the same type of labware.",
-        "multi-aspirate-present-pipette-different": "Cannot edit while one or more selected steps uses the multi-aspirate path. Selected steps must also share the same pipette.",
-        "multi-aspirate-present": "Cannot edit while one or more selected steps uses the multi-aspirate path.",
-        "multi-dispense-present-pipette-different": "Cannot edit while one or more selected steps uses the multi-dispense path. Selected steps must also share the same pipette.",
-        "multi-dispense-present": "Cannot edit while one or more selected steps uses the multi-dispense path.",
-        "pipette-different": "Cannot edit unless selected steps share the same pipette."
-      }
-    },
     "pauseAction": {
       "disabled": {
         "wait_until_temp": "There is no temperature module on the deck"
       }
-    },
-    "heaterShaker": {
-      "disabled": {
-        "latchOpen": "Labware Latch cannot be open while the module is shaking"
-      }
     }
   },
-  "edit_module_card": {
-    "magnetic_module_collision": "When magnetic module is in Slot 1, GEN1 8-Channel pipette cannot access Slot 4.",
-    "temperature_module_collision": "When temperature module is in Slot 3, GEN1 8-Channel pipette cannot access Slot 6. "
-  },
-  "edit_module_modal": {
-    "slot_selection": "To enable non-default/unrestricted positioning, go to Settings > App > Experimental settings."
-  },
-  "profile": {
-    "add_cycle": "Add a series of steps that cycle",
-    "add_step_to_cycle": "Add a step to the cycle",
-    "add_step": "Add a single non-cycling step",
-    "delete_cycle": "Delete cycle and steps",
-    "delete_step": "Delete profile step"
-  },
-  "save_batch_edit": {
-    "disabled": "No new changes to save",
-    "enabled": "Apply changes to all selected steps"
-  },
-  "cancel_batch_edit": "Reset unsaved changes to the form"
+  "y_position_value": "A negative value moves towards the front"
 }
