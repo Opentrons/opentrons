@@ -126,6 +126,8 @@ type AuditLogAction =
   | 'home_pipettes'
   | 'home_robot'
   | 'end_home_pipettes'
+  | 'home_gantry'
+  | 'end_home_gantry'
   | 'attach_gripper'
   | 'detach_gripper'
   | 'recalibrate_gripper'

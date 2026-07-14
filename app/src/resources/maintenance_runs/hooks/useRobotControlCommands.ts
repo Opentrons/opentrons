@@ -38,6 +38,8 @@ export interface UseRobotControlCommandsProps {
   continuePastCommandFailure: boolean
   /* An onSuccess callback executed after the deletion of the maintenance run. */
   onSuccess?: () => void
+  /* An onError callback executed when command execution fails, before the maintenance run is deleted. */
+  onError?: (error: Error) => void
   runStartedAction: DocumentedAction
   runEndedAction: DocumentedAction
 }
@@ -49,6 +51,7 @@ export function useRobotControlCommands({
   commands,
   continuePastCommandFailure,
   onSuccess,
+  onError,
   runStartedAction,
   runEndedAction,
 }: UseRobotControlCommandsProps): UseRobotControlCommandsResult {
@@ -112,6 +115,7 @@ export function useRobotControlCommands({
             )
             .catch((error: Error) => {
               console.error(error.message)
+              onError?.(error)
             })
             .finally(() =>
               deleteMaintenanceRun(runId, {
