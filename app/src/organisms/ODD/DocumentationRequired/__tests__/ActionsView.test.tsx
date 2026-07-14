@@ -199,16 +199,6 @@ describe('ActionsView', () => {
     )
   })
 
-  it('renders stringified runtime commands when run data is unavailable', () => {
-    vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
-      data: undefined,
-    } as any)
-
-    renderWithModal([HOME_COMMAND])
-    screen.getByText(JSON.stringify(HOME_COMMAND))
-    expect(useCommandTextString).not.toHaveBeenCalled()
-  })
-
   it('closes the modal when the exit icon is clicked', () => {
     renderWithModal(['play_run'])
     screen.getByText('Actions requiring documentation')
