@@ -357,7 +357,7 @@ describe('LoginModal', () => {
 
     screen.getByText('Enter robot encryption key')
     screen.getByText(
-      'Verify the robot encryption key to use the robot. The encryption key can be found under Robot Settings on the touchscreen.'
+      'The encryption key can be found under settings on the on-device touchscreen.'
     )
     screen.getByLabelText('Robot encryption key')
     expect(screen.queryByText('Network Error')).toBeNull()

@@ -9,10 +9,10 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import { useHandleRobotCertImport } from '/app/organisms/Desktop/RobotCertImport/useHandleRobotCertImport'
 import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/encryptionKeys'
 
 import styles from './robot_cert_import.module.css'
-import { useHandleRobotCertImport } from './useHandleRobotCertImport'
 
 export interface RobotCertImportModalProps {
   onClose: () => unknown

@@ -15,7 +15,7 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { TertiaryButton } from '/app/atoms/buttons'
-import { RobotCertImportModal } from '/app/organisms/Desktop/RobotCertImport/RobotCertImportModal'
+import { RobotCertImportModal } from './RobotCertImportModal'
 
 export function EnterRobotEncryptionKey(): JSX.Element {
   const { t } = useTranslation('device_settings')

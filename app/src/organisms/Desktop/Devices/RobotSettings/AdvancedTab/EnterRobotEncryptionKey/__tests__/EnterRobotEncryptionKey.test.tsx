@@ -6,11 +6,11 @@ import '@testing-library/jest-dom/vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { RobotCertImportModal } from '/app/organisms/Desktop/RobotCertImport/RobotCertImportModal'
 
-import { EnterRobotEncryptionKey } from '../EnterRobotEncryptionKey'
+import { EnterRobotEncryptionKey } from '..'
+import { RobotCertImportModal } from '../RobotCertImportModal'
 
-vi.mock('/app/organisms/Desktop/RobotCertImport/RobotCertImportModal')
+vi.mock('../RobotCertImportModal')
 vi.mock('/app/App/portal', () => ({
   getTopPortalEl: () => globalThis.document.body,
 }))

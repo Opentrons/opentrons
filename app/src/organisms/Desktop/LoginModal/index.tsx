@@ -16,6 +16,7 @@ import { useHost } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
+import { RobotCertImportModal } from '/app/organisms/Desktop/Devices/RobotSettings/AdvancedTab/EnterRobotEncryptionKey/RobotCertImportModal'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
@@ -23,7 +24,6 @@ import {
 } from '/app/resources/auth'
 import { isSSLError } from '/app/resources/auth/hooks/isSSLError'
 
-import { RobotCertImportModal } from '../RobotCertImport'
 import styles from './loginmodal.module.css'
 
 import type { ComponentProps, Dispatch, SetStateAction } from 'react'
