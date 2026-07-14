@@ -101,10 +101,14 @@ export function ProtocolSetupLabware({
       ),
     [mostRecentAnalysis]
   )
-  const labwareByLiquidId = getLabwareInfoByLiquidId(
-    mostRecentAnalysis?.commands ?? []
+  const labwareByLiquidId = useMemo(
+      () => getLabwareInfoByLiquidId(mostRecentAnalysis?.commands ?? []),
+      [mostRecentAnalysis]
+    )
+  const stacksWithLaware = useMemo(
+    () => getStacksWithLabware(startingDeck),
+    [startingDeck]
   )
-  const stacksWithLaware = getStacksWithLabware(startingDeck)
   const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
     .sort((a, b) => a[0].localeCompare(b[0]))
     .filter(([key, value]) => key !== 'offDeck')
@@ -135,10 +139,14 @@ export function ProtocolSetupLabware({
     [mostRecentAnalysis, deckDef]
   )
 
-  const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
-    attachedModules,
-    protocolModulesInfo,
-    deckConfig
+  const attachedProtocolModuleMatches = useMemo(
+      () =>
+        getAttachedProtocolModuleMatches(
+          attachedModules,
+          protocolModulesInfo,
+          deckConfig
+        ),
+      [attachedModules, protocolModulesInfo, deckConfig]
   )
 
   return (

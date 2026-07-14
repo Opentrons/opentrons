@@ -92,15 +92,22 @@ export function ProtocolSetupModulesAndDeck({
     [attachedModulesData]
   )
 
-  const protocolModulesInfo =
-    mostRecentAnalysis != null
-      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-      : []
+  const protocolModulesInfo = useMemo(
+      () =>
+        mostRecentAnalysis != null
+          ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+          : [],
+      [mostRecentAnalysis, deckDef]
+    )
 
-  const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
-    attachedModules,
-    protocolModulesInfo,
-    deckConfig
+  const attachedProtocolModuleMatches = useMemo(
+      () =>
+        getAttachedProtocolModuleMatches(
+          attachedModules,
+          protocolModulesInfo,
+          deckConfig
+        ),
+    [attachedModules, protocolModulesInfo, deckConfig]
   )
 
   const hasModules = attachedProtocolModuleMatches.length > 0
