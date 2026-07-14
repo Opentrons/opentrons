@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -40,17 +40,15 @@ export function RobotCertImportModal(
   const handleImport = useHandleRobotCertImport({
     onSuccessfulImport: handleClose,
   })
+  const formId = useId()
+  const isDisabled =
+    handleImport.passwordValue === '' || handleImport.importInProgress
   const footer = (
     <div className={styles.modal_footer_container}>
       <SecondaryButton onClick={handleClose}>
         {t('shared:cancel')}
       </SecondaryButton>
-      <PrimaryButton
-        onClick={handleImport.tryImport}
-        disabled={
-          handleImport.passwordValue === '' || handleImport.importInProgress
-        }
-      >
+      <PrimaryButton type="submit" form={formId} disabled={isDisabled}>
         {t('shared:submit')}
       </PrimaryButton>
     </div>
@@ -64,7 +62,16 @@ export function RobotCertImportModal(
       onClose={handleClose}
       zIndexOverlay={10000}
     >
-      <div className={styles.robot_cert_import_container}>
+      <form
+        className={styles.robot_cert_import_container}
+        id={formId}
+        onSubmit={e => {
+          e.preventDefault()
+          if (!isDisabled) {
+            handleImport.tryImport()
+          }
+        }}
+      >
         <StyledText desktopStyle="bodyDefaultRegular">
           {t('verify_the_robot_encryption_key_to_use_the_robot')}
         </StyledText>
@@ -82,7 +89,7 @@ export function RobotCertImportModal(
           value={handleImport.passwordValue}
           autoFocus={true}
         />
-      </div>
+      </form>
     </Modal>
   )
 }
