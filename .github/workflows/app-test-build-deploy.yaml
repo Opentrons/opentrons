@@ -371,13 +371,16 @@ jobs:
           for variant in release internal-release ; do
               dir=./to_upload_${variant}
               echo "Checking for ${variant} builds in ${dir}"
-              ls ${dir}/Opentrons* || continue
-              _windows_build=$(basename $(ls ./to_upload_${variant}/Opentrons*.exe))
-              _mac_build=$(basename $(ls ./to_upload_${variant}/Opentrons*.dmg))
-              _linux_build=$(basename $(ls ./to_upload_${variant}/Opentrons*.AppImage))
-              echo "windows-${variant}=$_windows_build">>$GITHUB_OUTPUT
-              echo "mac-${variant}=$_mac_build">>$GITHUB_OUTPUT
-              echo "linux-${variant}=$_linux_build">>$GITHUB_OUTPUT
+              _windows_path=$(find "${dir}" -maxdepth 1 -name 'Opentrons*.exe' -print -quit)
+              if [[ -z "${_windows_path}" ]]; then
+                  continue
+              fi
+              _windows_build=$(basename "${_windows_path}")
+              _mac_build=$(basename "$(find "${dir}" -maxdepth 1 -name 'Opentrons*.dmg' -print -quit)")
+              _linux_build=$(basename "$(find "${dir}" -maxdepth 1 -name 'Opentrons*.AppImage' -print -quit)")
+              echo "windows-${variant}=${_windows_build}">>$GITHUB_OUTPUT
+              echo "mac-${variant}=${_mac_build}">>$GITHUB_OUTPUT
+              echo "linux-${variant}=${_linux_build}">>$GITHUB_OUTPUT
           done
       - name: 'slack notify internal-release'
         uses: slackapi/slack-github-action@d09f6a279ff492756a31df59952ee6dce8c9b772 # v1.14.0
