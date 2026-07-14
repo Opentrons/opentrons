@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { saveAs } from 'file-saver'
@@ -31,14 +31,6 @@ export function useDownloadSelectedLogPeriods(
   const dispatch = useDispatch<Dispatch>()
   const { makeToast, eatToast } = useToaster()
   const [isDownloading, setIsDownloading] = useState(false)
-  const isMounted = useRef(false)
-
-  useEffect(() => {
-    isMounted.current = true
-    return () => {
-      isMounted.current = false
-    }
-  }, [])
 
   const downloadSelectedLogPeriods = (periods: LogPeriodSummary[]): void => {
     if (host == null || periods.length === 0 || isDownloading) {
@@ -84,17 +76,17 @@ export function useDownloadSelectedLogPeriods(
           .catch((e: Error) => {
             eatToast(toastId)
             makeToast(e.message, ERROR_TOAST, { closeButton: true })
-            if (isMounted.current) setIsDownloading(false)
+            setIsDownloading(false)
           })
       )
       .then(() => {
         eatToast(toastId)
-        if (isMounted.current) setIsDownloading(false)
+        setIsDownloading(false)
       })
       .catch((e: Error) => {
         eatToast(toastId)
         makeToast(e.message, ERROR_TOAST, { closeButton: true })
-        if (isMounted.current) setIsDownloading(false)
+        setIsDownloading(false)
       })
   }
 

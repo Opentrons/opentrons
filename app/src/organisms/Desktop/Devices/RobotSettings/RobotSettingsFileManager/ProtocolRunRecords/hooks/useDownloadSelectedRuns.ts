@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
@@ -24,14 +24,6 @@ export function useDownloadSelectedRuns(
   const host = useHost()
   const { makeToast, eatToast } = useToaster()
   const [isDownloading, setIsDownloading] = useState(false)
-  const isMounted = useRef(false)
-
-  useEffect(() => {
-    isMounted.current = true
-    return () => {
-      isMounted.current = false
-    }
-  }, [])
 
   const downloadSelectedRuns = (runs: RunData[]): void => {
     if (host == null || runs.length === 0 || isDownloading) {
@@ -67,17 +59,17 @@ export function useDownloadSelectedRuns(
           .catch((e: Error) => {
             eatToast(toastId)
             makeToast(e.message, ERROR_TOAST, { closeButton: true })
-            if (isMounted.current) setIsDownloading(false)
+            setIsDownloading(false)
           })
       )
       .then(() => {
         eatToast(toastId)
-        if (isMounted.current) setIsDownloading(false)
+        setIsDownloading(false)
       })
       .catch((e: Error) => {
         eatToast(toastId)
         makeToast(e.message, ERROR_TOAST, { closeButton: true })
-        if (isMounted.current) setIsDownloading(false)
+        setIsDownloading(false)
       })
   }
 

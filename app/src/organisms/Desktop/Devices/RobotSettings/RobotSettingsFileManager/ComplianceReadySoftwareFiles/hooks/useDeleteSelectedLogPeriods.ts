@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useDispatch, useSelector } from 'react-redux'
@@ -29,14 +29,6 @@ export function useDeleteSelectedLogPeriods(): UseDeleteSelectedLogPeriodsResult
   const queryClient = useQueryClient()
   const { makeToast } = useToaster()
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set())
-  const isMounted = useRef(false)
-
-  useEffect(() => {
-    isMounted.current = true
-    return () => {
-      isMounted.current = false
-    }
-  }, [])
 
   const deleteSelectedLogPeriods = (periods: LogPeriodSummary[]): void => {
     if (host == null || periods.length === 0 || deletingIds.size > 0) {
@@ -82,11 +74,11 @@ export function useDeleteSelectedLogPeriods(): UseDeleteSelectedLogPeriodsResult
           })
       )
       .then(() => {
-        if (isMounted.current) setDeletingIds(new Set())
+        setDeletingIds(new Set())
       })
       .catch((e: Error) => {
         makeToast(e.message, ERROR_TOAST, { closeButton: true })
-        if (isMounted.current) setDeletingIds(new Set())
+        setDeletingIds(new Set())
       })
   }
 

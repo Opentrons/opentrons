@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useQueryClient } from 'react-query'
 
 import { deleteRun } from '@opentrons/api-client'
@@ -19,14 +19,6 @@ export function useDeleteSelectedRuns(): UseDeleteSelectedRunsResult {
   const queryClient = useQueryClient()
   const { makeToast } = useToaster()
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set())
-  const isMounted = useRef(false)
-
-  useEffect(() => {
-    isMounted.current = true
-    return () => {
-      isMounted.current = false
-    }
-  }, [])
 
   const deleteSelectedRuns = (runs: RunData[]): void => {
     if (host == null || runs.length === 0 || deletingIds.size > 0) {
@@ -50,11 +42,11 @@ export function useDeleteSelectedRuns(): UseDeleteSelectedRunsResult {
           })
       )
       .then(() => {
-        if (isMounted.current) setDeletingIds(new Set())
+        setDeletingIds(new Set())
       })
       .catch((e: Error) => {
         makeToast(e.message, ERROR_TOAST, { closeButton: true })
-        if (isMounted.current) setDeletingIds(new Set())
+        setDeletingIds(new Set())
       })
   }
 
