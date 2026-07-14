@@ -284,15 +284,15 @@ Common reuse cases:
 
 - **Back-to-back `Once` steps** with the same nozzle layout on a depleted rack (e.g. Maor post-import: first `Once` returns a single-column tip to the rack; the next `Once` on the same column must use `tip_tracking="Manual tip tracking"` and `manual_tips=["A1"]` or whatever position is still selectable).
 - **Partial-nozzle manual pickup** after prior steps consumed most of the rack — only one primary well may remain (often `A1`). Override default `MANUAL_TIP_COL_BY_COUNT` / `_manual_tips_for_partial()` values when headed runs show a single accessible tip.
-- **`Never` reuse** — different rule: the tip **stays on the pipette** from the immediately prior adjacent `Once`/`Always` step with the **same nozzle configuration**. `save_transfer_with_tip_settings` skips the tip-tracking UI when `change_tip="Never"`. Do **not** open manual selection on the `Never` step itself; configure the **setup** step instead (manual selection or waste-chute drop so the tip remains on-pipette).
+- **`Never`** — no tip-tracking UI; tip must already be on the pipette. Treat setup/`drop_location` **case by case** in headed mode (do not assume waste chute leaves the tip on-pipette).
 
 ### Authoring checklist
 
 1. **Order steps** — Run `Once` (especially manual) before `Always` on the same rack so automatic pickups do not block manual selection.
-2. **`Never` pairs** — Place `Never` immediately after its setup step; match `nozzle_config`, `partial_count`, and `primary_nozzle` exactly (e.g. 4/8 cannot reuse a 5/8 tip).
-3. **Waste chute vs tip rack** — Drop to **Waste Chute** on the setup step when the tip must stay on the pipette for the following `Never` step; drop to **Tip rack** when the next step should pick the same tip back up manually.
-4. **Partial manual wizard** — Click one **top-row primary** per pickup group (e.g. `A4` for 3/8 partial selects A4–C4). Pass that well in `manual_tips`.
-5. **Verify in headed mode** — When a manual wizard stalls, inspect which wells are **Selected** vs **Inaccessible** and align `manual_tips` to an accessible primary.
+2. **Return tip vs waste** — Use **Tip rack** when a later pickup still needs that well present (e.g. return single `H1` before full-row `H1`). Use **Waste Chute** to **drop** tips when a later cascade needs those wells empty (e.g. waste row H1 before row A1) or for dispose-tip coverage.
+3. **`Never` pairs** — Only after confirming tip-on-pipette for that nozzle layout; match `nozzle_config` / `primary_nozzle` / `partial_count` on adjacent steps.
+4. **Partial manual wizard** — Click one **accessible** primary per pickup group. For 96ch SINGLE on a populated rack that is the corner **opposite** the primary nozzle (H12→A1, A12→H1, H1→A12, A1→H12) — the same well auto tip search uses. Do not assume the tip well equals the primary-nozzle name. For 8ch partial, e.g. `A4` for 3/8 selects A4–C4.
+5. **Verify in headed mode** — Align `manual_tips` to Selected vs Inaccessible; inaccessible is often intentional cascade/collision safety.
 
 ### Example — reused single-column tip (post-import)
 
@@ -316,14 +316,15 @@ add_transfer_step(editor, transfer, TransferStepConfig(
 ))
 ```
 
-### Example — `Never` after manual setup
+### Example — `Never` (verify case by case)
 
 ```python
-# Setup: manual pickup, drop to waste chute so tip stays on pipette.
+# Setup + Never: confirm in headed mode that the tip is still on the pipette
+# for this nozzle layout before asserting a clean timeline.
 add_transfer_step(editor, transfer, TransferStepConfig(
     ...,
     change_tip="Once",
-    drop_location="Waste Chute",
+    drop_location="Tip rack",  # or Waste Chute — confirm which leaves tip on-pipette for your case
     tip_tracking="Manual tip tracking",
     manual_tips=["A1"],
     nozzle_config="Partial nozzles",
@@ -331,7 +332,6 @@ add_transfer_step(editor, transfer, TransferStepConfig(
     primary_nozzle="E1",
 ))
 
-# Reuse: no tip-tracking UI; same nozzle layout as setup.
 add_transfer_step(editor, transfer, TransferStepConfig(
     ...,
     change_tip="Never",
@@ -342,6 +342,50 @@ add_transfer_step(editor, transfer, TransferStepConfig(
 ```
 
 See also `e2e-testing/docs/partial-tip-e2e-coverage.md` for per-test coverage notes.
+
+### Change tip: Once / Always / Never (case by case)
+
+| `changeTip` | Pickups (`getNumPickups`) | Meaning                                                 |
+| ----------- | ------------------------- | ------------------------------------------------------- |
+| Always      | wells × volume chunks     | Fresh tip before each aspirate                          |
+| Once        | 1                         | One tip for the whole step, then drop per drop-location |
+| Never       | 0                         | No tip pickup UI — tip must already be on the pipette   |
+
+**Drop location is separate from Never.** Prefer stating the concrete goal:
+
+- **Tip rack (return tip)** — tip goes back onto the rack (still present for later `isComplete` / cascade). Use this when a later row/column pickup still needs that well (e.g. return single H1 before a full-row H1 step).
+- **Waste Chute** — tip is disposed (gone from rack). Use when you intentionally want coverage of dispose-tip, or when the tip must not remain available on the rack.
+
+**Never:** do not invent a global “waste chute keeps tip on pipette” rule without checking — but for PD transfer command creators, **Once + tip rack** returns the tip (`return_tip`), while **Once + Waste Chute/trash** omits the final drop (`keep_last_tip`). Pair Never with a prior Once that uses Waste Chute (or trash) so `tipState.pipettes[id].tiprackURI` is still set. Confirm in headed mode for that nozzle layout. `save_transfer_with_tip_settings` skips tip-tracking UI when `change_tip="Never"`.
+
+Source of truth for pickup count: `protocol-designer/.../PipetteFields/utils.ts` → `getNumPickups`.
+
+### Pipette collision / tip accessibility (PD vs analysis)
+
+When a tip well is **Inaccessible** or auto tip tracking reports no tips, do **not** invent deck rules. Check these APIs:
+
+**Protocol Designer + step-generation (JS)** — shared safety helpers:
+
+- `step-generation/src/utils/safePipetteMovements.ts`
+  - `getPipetteMovementSafetyStatus` — deck AABB / Z collisions (including neighbors of staging / column-4 slots)
+  - `getIsSafePickupWithinTiprack` — tip present + **cascade** rules for 8ch/96ch partial layouts (SINGLE / COLUMN / ROW / ALL)
+- `step-generation/src/robotStateSelectors.ts` → `getNextTiprack` — auto tip search filtered by both checks
+- Tip UI map: `TipSelectionWizard/hooks/useMemoizedTipAccessibilityByTiprackIdByWellName.ts` and `getValidTiprackIds`
+
+**Two different reasons a tip shows Inaccessible:**
+
+1. **Deck / module collision** — pipette AABB would hit a neighbor (e.g. Flex Stacker in column 4). PE mirror: `pipette_movement_conflict.check_safe_for_pipette_movement` (explicit column-4 stacker path).
+2. **In-rack cascade** — unused nozzles would sweep over tips still in the rack, so the pickup would take **more tips than configured**. On a populated 96ch rack this often leaves **only A1** selectable for partial/single pickups; clicking A12/H12/etc. is correctly blocked until the cascade path is empty.
+
+**Protocol analysis / runtime (Python):**
+
+- `api/src/opentrons/protocol_api/core/engine/pipette_movement_conflict.py` → `check_safe_for_pipette_movement`
+- Tip search: `api/src/opentrons/protocol_engine/state/tips.py` (`get_next_tip` / nozzle-map cascade)
+
+**E2E implications:**
+
+- Tiprack beside a Flex Stacker (e.g. B3 next to A4): gripper-move the rack to a clear slot (e.g. B2) before right-corner / A12 deck-collision cases.
+- Manual tip wizard on a populated 96ch rack: for SINGLE, pass the cascade-safe opposite corner (H12→`A1`, H1→`A12`, etc.), not the primary-nozzle name. Do not click wells marked Inaccessible — that is cascade safety, not a flaky selector.
 
 ## Common Patterns
 
