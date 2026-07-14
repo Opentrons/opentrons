@@ -20,6 +20,7 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import successIcon from '/app/assets/images/icon_success.png'
 import { ProgressBar } from '/app/atoms/ProgressBar'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import {
   clearRobotUpdateSession,
   getRobotUpdateDownloadError,
@@ -273,7 +274,10 @@ function useAllowExitIfUpdateStalled(
 }
 
 function useStatusBarAnimation(isError: boolean): void {
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  // setStatusBar does not require documentation, as it's not a user action.
+  const { createLiveCommand } = useCreateLiveCommandMutation(
+    ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+  )
   const updatingCommand: SetStatusBarCreateCommand = {
     commandType: 'setStatusBar',
     params: { animation: 'updating' },

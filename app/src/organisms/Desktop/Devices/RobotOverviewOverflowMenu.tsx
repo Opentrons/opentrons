@@ -28,6 +28,7 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
 import { RobotCertImportModal } from '/app/organisms/Desktop/RobotCertImport/RobotCertImportModal'
@@ -78,8 +79,11 @@ export const RobotOverviewOverflowMenu = (
   const dispatch = useDispatch<Dispatch>()
   const isFlex = useIsFlex(robot.name)
   const { setLights } = useSetLightsMutation()
-  const { createLiveCommand } = useCreateLiveCommandMutation()
   const { home } = useHomeMutation(documentationState)
+  // setStatusBar does not require documentation, as it's not a user action.
+  const { createLiveCommand } = useCreateLiveCommandMutation(
+    ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+  )
 
   const handleClickRestart: MouseEventHandler<HTMLButtonElement> = () => {
     dispatch(restartRobot(robot.name))

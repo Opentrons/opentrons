@@ -1,5 +1,4 @@
-import { useCallback, useState } from 'react'
-
+import { useActionsToDocumentList } from './useActionsToDocumentList'
 import { useDocumentationState } from './useDocumentationState'
 import { usePromptForDocumentation } from './usePromptForDocumentation'
 
@@ -35,9 +34,7 @@ export const useMaintenanceRunDocumentation = (
   addActionToDocument: (action: DocumentedAction) => void
   isLoading: boolean
 } => {
-  const [actionsToDocument, setActionsToDocument] = useState<
-    DocumentedAction[]
-  >([maintenanceRunName])
+  const [actionsToDocument, addActionToDocument] = useActionsToDocumentList()
   const commandDocState = usePromptForDocumentation(
     [maintenanceRunName],
     onCancelStart,
@@ -45,10 +42,6 @@ export const useMaintenanceRunDocumentation = (
     promptEnabled
   )
   const deletionDocState = useDocumentationState()
-
-  const addActionToDocument = useCallback((action: DocumentedAction) => {
-    setActionsToDocument(prev => [...prev, action])
-  }, [])
 
   return {
     isLoading: commandDocState.isLoading || deletionDocState.isLoading,

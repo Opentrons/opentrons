@@ -15,6 +15,7 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import welcomeModalImage from '/app/assets/images/on-device-display/welcome_dashboard_modal.png'
 import { SmallButton } from '/app/atoms/buttons'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { OddModal } from '/app/molecules/OddModal'
 import { updateConfigValue } from '/app/redux/config'
 
@@ -31,7 +32,10 @@ export function WelcomeModal({
   const { t } = useTranslation(['device_details', 'shared'])
   const dispatch = useDispatch<Dispatch>()
 
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  // setStatusBar does not require documentation, as it's not a user action.
+  const { createLiveCommand } = useCreateLiveCommandMutation(
+    ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+  )
   const animationCommand: SetStatusBarCreateCommand = {
     commandType: 'setStatusBar',
     params: { animation: 'disco' },
