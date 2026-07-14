@@ -5,6 +5,7 @@ import {
   FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
   FLEX_STACKER_MODULE_TYPE,
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
+  getIsDeckSlotCompatible,
   getIsLid,
   getModuleDisplayName,
   OT2_SINGLE_SLOT_ADDRESSABLE_AREAS,
@@ -166,6 +167,17 @@ export function LabwareLocationField(
       )
   }
 
+  const movingLabwareDef = labwareEntities[labware]?.def
+  if (
+    movingLabwareDef != null &&
+    !getIsDeckSlotCompatible(movingLabwareDef)
+  ) {
+    unoccupiedLabwareLocationsOptions =
+      unoccupiedLabwareLocationsOptions.filter(
+        option => !allSlotNames.includes(option.value as AddressableAreaName)
+      )
+  }
+
   if (stackHasANonTiprackLid) {
     unoccupiedLabwareLocationsOptions =
       unoccupiedLabwareLocationsOptions.filter(
@@ -179,7 +191,6 @@ export function LabwareLocationField(
   // compatible— filter plates can go anywhere, adapters with
   // providesStackingDefault accept any labware, otherwise fall back to
   // explicit compatibleParentLabware / stackingOffsetWithLabware
-  const movingLabwareDef = labwareEntities[labware]?.def
   const isMovingLabwareFilterPlate =
     movingLabwareDef?.parameters.quirks?.includes('filterPlate') ?? false
   if (movingLabwareDef != null && !isMovingLabwareFilterPlate) {
