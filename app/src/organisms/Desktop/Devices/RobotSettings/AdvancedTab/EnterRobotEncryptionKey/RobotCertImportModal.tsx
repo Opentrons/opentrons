@@ -56,7 +56,7 @@ export function RobotCertImportModal(
   // TODO(jj): fix z-index
   return (
     <Modal
-      title={t('enter_robot_encryption_key')}
+      title={t('encryption_key_modal_title')}
       closeOnOutsideClick={true}
       footer={footer}
       onClose={handleClose}
@@ -73,17 +73,17 @@ export function RobotCertImportModal(
         }}
       >
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('verify_the_robot_encryption_key_to_use_the_robot')}
+          {t('encryption_key_modal_body')}
         </StyledText>
         <InputField
           name="robot encryption key"
-          title={t('robot_encryption_key')}
+          title={t('encryption_key_modal_input_label')}
           onChange={e => {
             handleImport.setPasswordValue(e.target.value)
           }}
           error={
             handleImport.passwordError != null
-              ? t('invalid_encryption_key_try_again')
+              ? t('encryption_key_modal_error')
               : null
           }
           value={handleImport.passwordValue}

@@ -33,10 +33,10 @@ export function EnterRobotEncryptionKey(): JSX.Element {
             marginBottom={SPACING.spacing4}
             id="AdvancedSettings_About"
           >
-            {t('robot_encryption_key')}
+            {t('encryption_key_title')}
           </LegacyStyledText>
           <LegacyStyledText forwardedAs="p">
-            {t('enter_robot_encryption_key_description')}
+            {t('encryption_key_description')}
           </LegacyStyledText>
         </div>
         <TertiaryButton
@@ -45,7 +45,7 @@ export function EnterRobotEncryptionKey(): JSX.Element {
           }}
           id="RobotSettings_EnterEncryptionKeyButton"
         >
-          {t('enter_encryption_key')}
+          {t('encryption_key_button')}
         </TertiaryButton>
       </div>
     </>
