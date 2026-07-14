@@ -3847,6 +3847,7 @@
           "compatibleParentLabware": [
             "opentrons_flex_96_filtertiprack_1000ul",
             "opentrons_flex_96_filtertiprack_200ul",
+            "opentrons_flex_96_filtertiprack_20ul",
             "opentrons_flex_96_filtertiprack_50ul",
             "opentrons_flex_96_tiprack_1000ul",
             "opentrons_flex_96_tiprack_200ul",
@@ -3927,6 +3928,11 @@
               "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_200ul": {
+              "x": 0,
+              "y": 0,
+              "z": 14.25
+            },
+            "opentrons_flex_96_filtertiprack_20ul": {
               "x": 0,
               "y": 0,
               "z": 14.25
@@ -11464,6 +11470,7 @@
           "compatibleParentLabware": [
             "opentrons_flex_96_filtertiprack_1000ul",
             "opentrons_flex_96_filtertiprack_200ul",
+            "opentrons_flex_96_filtertiprack_20ul",
             "opentrons_flex_96_filtertiprack_50ul",
             "opentrons_flex_96_tiprack_1000ul",
             "opentrons_flex_96_tiprack_200ul",
@@ -11544,6 +11551,11 @@
               "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_200ul": {
+              "x": 0,
+              "y": 0,
+              "z": 14.25
+            },
+            "opentrons_flex_96_filtertiprack_20ul": {
               "x": 0,
               "y": 0,
               "z": 14.25
@@ -13406,6 +13418,7 @@
           "compatibleParentLabware": [
             "opentrons_flex_96_filtertiprack_1000ul",
             "opentrons_flex_96_filtertiprack_200ul",
+            "opentrons_flex_96_filtertiprack_20ul",
             "opentrons_flex_96_filtertiprack_50ul",
             "opentrons_flex_96_tiprack_1000ul",
             "opentrons_flex_96_tiprack_200ul",
@@ -13486,6 +13499,11 @@
               "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_200ul": {
+              "x": 0,
+              "y": 0,
+              "z": 14.25
+            },
+            "opentrons_flex_96_filtertiprack_20ul": {
               "x": 0,
               "y": 0,
               "z": 14.25
@@ -22376,6 +22394,7 @@
           "compatibleParentLabware": [
             "opentrons_flex_96_filtertiprack_1000ul",
             "opentrons_flex_96_filtertiprack_200ul",
+            "opentrons_flex_96_filtertiprack_20ul",
             "opentrons_flex_96_filtertiprack_50ul",
             "opentrons_flex_96_tiprack_1000ul",
             "opentrons_flex_96_tiprack_200ul",
@@ -22456,6 +22475,11 @@
               "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_200ul": {
+              "x": 0,
+              "y": 0,
+              "z": 14.25
+            },
+            "opentrons_flex_96_filtertiprack_20ul": {
               "x": 0,
               "y": 0,
               "z": 14.25
