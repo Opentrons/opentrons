@@ -33,7 +33,7 @@ export function ShutdownRobotConfirmationModal({
     title: t('turn_off_robot'),
     iconName: 'power-off',
   }
-  const { setLights } = useSetLightsMutation()
+  const setLightsMutation = useSetLightsMutation()
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { shutdown } = useShutdownMutation()
 
@@ -80,8 +80,12 @@ export function ShutdownRobotConfirmationModal({
                 .catch(() => {
                   console.warn('Failed to set status bar animation to off')
                 })
-                .finally(() => {
-                  setLights({ on: false })
+                .then(() =>
+                  setLightsMutation.mutateAsync({ on: false }).catch(() => {
+                    console.warn('Failed to set lights off')
+                  })
+                )
+                .then(() => {
                   shutdown()
                 })
             }}

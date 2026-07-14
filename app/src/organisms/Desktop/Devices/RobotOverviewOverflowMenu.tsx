@@ -78,7 +78,7 @@ export const RobotOverviewOverflowMenu = (
 
   const dispatch = useDispatch<Dispatch>()
   const isFlex = useIsFlex(robot.name)
-  const { setLights } = useSetLightsMutation()
+  const setLightsMutation = useSetLightsMutation()
   const { createLiveCommand } = useCreateLiveCommandMutation()
   const { home } = useHomeMutation(documentationState)
   const { shutdown } = useShutdownMutation()
@@ -94,8 +94,12 @@ export const RobotOverviewOverflowMenu = (
       .catch(() => {
         console.warn('Failed to set status bar animation to off')
       })
-      .finally(() => {
-        setLights({ on: false })
+      .then(() =>
+        setLightsMutation.mutateAsync({ on: false }).catch(() => {
+          console.warn('Failed to set lights off')
+        })
+      )
+      .then(() => {
         shutdown()
       })
   }

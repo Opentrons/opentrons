@@ -33,7 +33,7 @@ export function useShutdownMutation(
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
-  const mutation = useMutation<ShutdownResponse, AxiosError, void>(
+  const mutation = useMutation<ShutdownResponse, AxiosError>(
     getQueryKey(host, 'server', 'shutdown'),
     () =>
       shutdown(host!)
