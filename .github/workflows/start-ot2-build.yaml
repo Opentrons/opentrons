@@ -36,8 +36,7 @@ jobs:
             {
               "buildroot-ref": "-",
               "monorepo-ref": "${{ github.ref }}",
-              "infra-stage": "stage-prod",
-              "monorepo-is-fork": true
+              "infra-stage": "stage-prod"
             }
 
 
