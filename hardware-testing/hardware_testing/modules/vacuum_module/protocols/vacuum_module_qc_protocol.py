@@ -2,7 +2,6 @@
 from typing import List, cast
 
 from opentrons.hardware_control.adapters import SynchronousAdapter
-from opentrons.protocols.parameters.types import ParameterChoice
 from opentrons.protocol_api import (
     Labware,
     ParameterContext,
@@ -10,6 +9,8 @@ from opentrons.protocol_api import (
     ParameterContext,
     VacuumModuleContext,
 )
+from opentrons.protocol_api.core.engine.module_core import VacuumModuleCore
+from opentrons.protocols.parameters.types import ParameterChoice
 
 
 metadata = {
@@ -136,7 +137,8 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def enable_waste_detection(vm_mod: VacuumModuleContext, enable: bool = False) -> None:
     """Hack: send M127 E0 via the driver. Not part of public PAPI."""
-    adapter = vm_mod._core._sync_module_hardware
+    core = cast(VacuumModuleCore, vm_mod._core)
+    adapter = core._sync_module_hardware
     vacuum_hw = object.__getattribute__(adapter, "_obj_to_adapt")
     driver = vacuum_hw._driver
 
@@ -155,7 +157,10 @@ def run(ctx: ProtocolContext) -> None:
         ctx.load_module(module_name="vacuumModuleV1", location="A3"),
     )
     # set the waste detection for vm mod
-    enable_waste_detection(vm_mod, ctx.params.enable_waste_detection)  # type: ignore[attr-defined])
+    enable_waste_detection(
+        vm_mod,
+        ctx.params.enable_waste_detection,  # type: ignore[attr-defined]
+    )
 
     # Load Tipracks
     adapter = (
