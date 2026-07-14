@@ -102,9 +102,9 @@ export function ProtocolSetupLabware({
     [mostRecentAnalysis]
   )
   const labwareByLiquidId = useMemo(
-      () => getLabwareInfoByLiquidId(mostRecentAnalysis?.commands ?? []),
-      [mostRecentAnalysis]
-    )
+    () => getLabwareInfoByLiquidId(mostRecentAnalysis?.commands ?? []),
+    [mostRecentAnalysis]
+  )
   const stacksWithLaware = useMemo(
     () => getStacksWithLabware(startingDeck),
     [startingDeck]
@@ -140,13 +140,13 @@ export function ProtocolSetupLabware({
   )
 
   const attachedProtocolModuleMatches = useMemo(
-      () =>
-        getAttachedProtocolModuleMatches(
-          attachedModules,
-          protocolModulesInfo,
-          deckConfig
-        ),
-      [attachedModules, protocolModulesInfo, deckConfig]
+    () =>
+      getAttachedProtocolModuleMatches(
+        attachedModules,
+        protocolModulesInfo,
+        deckConfig
+      ),
+    [attachedModules, protocolModulesInfo, deckConfig]
   )
 
   return (

@@ -263,12 +263,12 @@ function PrepareToRun({
   const deckDef = getDeckDefFromRobotType(robotType)
 
   const protocolModulesInfo = useMemo(
-      () =>
-        mostRecentAnalysis != null
-          ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-          : [],
-      [mostRecentAnalysis, deckDef]
-    )
+    () =>
+      mostRecentAnalysis != null
+        ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+        : [],
+    [mostRecentAnalysis, deckDef]
+  )
 
   const { missingModuleIds } = getUnmatchedModulesForProtocol(
     attachedModules,
@@ -558,9 +558,9 @@ function PrepareToRun({
 
   // Labware information
   const { offDeckItems, onDeckItems } = useMemo(
-      () => getLabwareSetupItemGroups(mostRecentAnalysis?.commands ?? []),
-      [mostRecentAnalysis]
-    )
+    () => getLabwareSetupItemGroups(mostRecentAnalysis?.commands ?? []),
+    [mostRecentAnalysis]
+  )
 
   const onDeckLabwareCount = onDeckItems.length
   const additionalLabwareCount = offDeckItems.length
@@ -835,12 +835,12 @@ export function ProtocolSetup(): JSX.Element {
   const deckDef = getDeckDefFromRobotType(robotType)
 
   const protocolModulesInfo = useMemo(
-      () =>
-        mostRecentAnalysis != null
-          ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-          : [],
-      [mostRecentAnalysis, deckDef]
-    )
+    () =>
+      mostRecentAnalysis != null
+        ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+        : [],
+    [mostRecentAnalysis, deckDef]
+  )
 
   const { missingModuleIds } = getUnmatchedModulesForProtocol(
     attachedModules,

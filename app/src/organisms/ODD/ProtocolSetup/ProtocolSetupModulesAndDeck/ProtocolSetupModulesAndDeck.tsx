@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -93,20 +93,20 @@ export function ProtocolSetupModulesAndDeck({
   )
 
   const protocolModulesInfo = useMemo(
-      () =>
-        mostRecentAnalysis != null
-          ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-          : [],
-      [mostRecentAnalysis, deckDef]
-    )
+    () =>
+      mostRecentAnalysis != null
+        ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+        : [],
+    [mostRecentAnalysis, deckDef]
+  )
 
   const attachedProtocolModuleMatches = useMemo(
-      () =>
-        getAttachedProtocolModuleMatches(
-          attachedModules,
-          protocolModulesInfo,
-          deckConfig
-        ),
+    () =>
+      getAttachedProtocolModuleMatches(
+        attachedModules,
+        protocolModulesInfo,
+        deckConfig
+      ),
     [attachedModules, protocolModulesInfo, deckConfig]
   )
 
