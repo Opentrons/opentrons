@@ -15,7 +15,7 @@ export interface AuditState {
    * able to replay an old deletion key after a reload.
    */
   logPeriodDeletionKeysById: {
-    [logPeriodId: string]: string | undefined
+    [logPeriodId: string]: string
   }
 }
 
