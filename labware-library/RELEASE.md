@@ -10,12 +10,12 @@ Releases are intended to run from the Github Actions workflow: `.github/workflow
 
 **Source of truth:** what runs in CI and where artifacts go is defined in [`.github/workflows/ll-test-build-deploy.yaml`](https://github.com/Opentrons/opentrons/blob/edge/.github/workflows/ll-test-build-deploy.yaml) on `edge`.
 
-| Trigger | Where it deploys |
-| --- | --- |
+| Trigger                                    | Where it deploys                                          |
+| ------------------------------------------ | --------------------------------------------------------- |
 | Open PR (when workflow path filters match) | Sandbox: `https://sandbox.labware.opentrons.com/{branch}` |
-| Push to `edge` or `chore_release*` | Sandbox: `https://sandbox.labware.opentrons.com/{branch}` |
-| Push tag `staging-labware-library@*` | Staging: <https://staging.labware.opentrons.com/> |
-| Push tag `labware-library@*` | Production: <https://labware.opentrons.com/> |
+| Push to `edge` or `chore_release*`         | Sandbox: `https://sandbox.labware.opentrons.com/{branch}` |
+| Push tag `staging-labware-library@*`       | Staging: <https://staging.labware.opentrons.com/>         |
+| Push tag `labware-library@*`               | Production: <https://labware.opentrons.com/>              |
 
 Tagged **production** builds need an **LL release team** member to approve the deployment in GitHub Actions before they go live. Staging and sandbox deploys (PRs, branch pushes, `staging-labware-library@*` tags) do not use that approval gate.
 
