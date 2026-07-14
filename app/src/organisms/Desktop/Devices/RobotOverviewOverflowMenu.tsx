@@ -28,8 +28,10 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
 import { useHomeGantry } from '/app/local-resources/instruments'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
 import { RobotCertImportModal } from '/app/organisms/Desktop/RobotCertImport/RobotCertImportModal'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
 import * as Config from '/app/redux/config'
 import { CONNECTABLE, REACHABLE, UNREACHABLE } from '/app/redux/discovery'
@@ -77,7 +79,14 @@ export const RobotOverviewOverflowMenu = (
   const isFlex = useIsFlex(robot.name)
   const { setLights } = useSetLightsMutation()
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const { homeGantry } = useHomeGantry({})
+  const { makeSnackbar } = useToaster()
+  const { homeGantry } = useHomeGantry({
+    onError: error => {
+      if (isMaintenanceDoorOpenError(error)) {
+        makeSnackbar(t('close_door_to_home') as string)
+      }
+    },
+  })
 
   const handleClickRestart: MouseEventHandler<HTMLButtonElement> = () => {
     dispatch(restartRobot(robot.name))

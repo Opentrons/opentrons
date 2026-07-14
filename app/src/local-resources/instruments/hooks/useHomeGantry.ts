@@ -11,7 +11,10 @@ export interface UseHomeGantryResult {
   homeGantry: UseRobotControlCommandsResult['executeCommands']
 }
 
-export type UseHomeGantryProps = Pick<UseRobotControlCommandsProps, 'onSuccess'>
+export type UseHomeGantryProps = Pick<
+  UseRobotControlCommandsProps,
+  'onSuccess' | 'onError'
+>
 
 // Home all gantry axes via a maintenance run.
 export function useHomeGantry(props: UseHomeGantryProps): UseHomeGantryResult {

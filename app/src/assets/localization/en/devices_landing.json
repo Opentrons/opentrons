@@ -12,6 +12,7 @@
   "forget_unavailable_robot": "Forget unavailable robot",
   "go_to_run": "Go to Run",
   "home_gantry": "Home gantry",
+  "close_door_to_home": "Close the robot door to home gantry",
   "how_to_setup_a_robot": "How to set up a new robot",
   "idle": "Idle",
   "if_connecting_via_usb": "If connecting via USB",

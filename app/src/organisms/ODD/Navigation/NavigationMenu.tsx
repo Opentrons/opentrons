@@ -17,6 +17,8 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { useHomeGantry } from '/app/local-resources/instruments'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useLights } from '/app/resources/devices'
 
@@ -35,7 +37,14 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
   const { onClick, robotName, setShowNavMenu } = props
   const { t, i18n } = useTranslation(['devices_landing', 'robot_controls'])
   const { lightsOn, toggleLights } = useLights()
-  const { homeGantry } = useHomeGantry({})
+  const { makeSnackbar } = useToaster()
+  const { homeGantry } = useHomeGantry({
+    onError: error => {
+      if (isMaintenanceDoorOpenError(error)) {
+        makeSnackbar(t('close_door_to_home') as string)
+      }
+    },
+  })
   const [
     showRestartRobotConfirmationModal,
     setShowRestartRobotConfirmationModal,

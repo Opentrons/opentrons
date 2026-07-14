@@ -10,6 +10,7 @@ import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useHomeGantry } from '/app/local-resources/instruments'
 import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsRobotBusy } from '/app/redux-resources/robots'
 import {
   mockConnectableRobot,
@@ -29,6 +30,7 @@ import { handleUpdateBuildroot } from '../RobotSettings/UpdateBuildroot'
 import type { ComponentProps } from 'react'
 
 vi.mock('/app/local-resources/instruments')
+vi.mock('/app/organisms/ToasterOven')
 vi.mock('/app/redux/robot-admin')
 vi.mock('../hooks')
 vi.mock('/app/redux/robot-update')
@@ -55,15 +57,28 @@ const render = (props: ComponentProps<typeof RobotOverviewOverflowMenu>) => {
 }
 
 const mockHomeGantry = vi.fn()
+const mockMakeSnackbar = vi.fn()
+let capturedHomeGantryProps: {
+  onSuccess?: () => void
+  onError?: (error: Error) => void
+} = {}
 
 describe('RobotOverviewOverflowMenu', () => {
   let props: ComponentProps<typeof RobotOverviewOverflowMenu>
   vi.useFakeTimers()
 
   beforeEach(() => {
-    vi.mocked(useHomeGantry).mockReturnValue({
-      homeGantry: mockHomeGantry,
-      isHoming: false,
+    mockHomeGantry.mockResolvedValue(undefined)
+    capturedHomeGantryProps = {}
+    vi.mocked(useHomeGantry).mockImplementation((props: any) => {
+      capturedHomeGantryProps = props
+      return {
+        homeGantry: mockHomeGantry,
+        isHoming: false,
+      } as any
+    })
+    vi.mocked(useToaster).mockReturnValue({
+      makeSnackbar: mockMakeSnackbar,
     } as any)
     props = { robot: mockConnectableRobot }
     vi.mocked(useIsRobotOnWrongVersionOfSoftware).mockReturnValue(false)
@@ -174,6 +189,45 @@ describe('RobotOverviewOverflowMenu', () => {
     fireEvent.click(homeBtn)
 
     expect(mockHomeGantry).toHaveBeenCalled()
+  })
+
+  it('clicking home gantry should show a close-door snackbar when homing fails because the door is open', () => {
+    const doorOpenError = {
+      isAxiosError: true,
+      message: 'Request failed with status code 409',
+      response: {
+        status: 409,
+        data: {
+          errors: [{ id: 'MaintenanceCommandDoorOpen' }],
+        },
+      },
+    }
+    render(props)
+
+    fireEvent.click(screen.getByRole('button'))
+
+    const homeBtn = screen.getByRole('button', { name: 'Home gantry' })
+    fireEvent.click(homeBtn)
+
+    expect(mockHomeGantry).toHaveBeenCalled()
+    expect(capturedHomeGantryProps.onError).toEqual(expect.any(Function))
+    capturedHomeGantryProps.onError?.(doorOpenError as any)
+    expect(mockMakeSnackbar).toHaveBeenCalledWith(
+      'Close the robot door to home gantry'
+    )
+  })
+
+  it('clicking home gantry should not show a snackbar when homing fails for a non-door reason', () => {
+    mockMakeSnackbar.mockClear()
+    render(props)
+
+    fireEvent.click(screen.getByRole('button'))
+
+    const homeBtn = screen.getByRole('button', { name: 'Home gantry' })
+    fireEvent.click(homeBtn)
+
+    capturedHomeGantryProps.onError?.(new Error('boom'))
+    expect(mockMakeSnackbar).not.toHaveBeenCalled()
   })
 
   it('should render disabled disconnect button in the menu when the robot cannot disconnect', () => {
