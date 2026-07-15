@@ -1,11 +1,18 @@
 import type { CameraImageSettings } from '@opentrons/api-client'
 import type { CameraId } from '@opentrons/shared-data'
 import type {
+  UPDATE_CAMERA_ENABLEMENT,
+  UPDATE_CAMERA_RECOVERY_ENABLEMENT,
+  UPDATE_CAMERA_STREAM_ENABLEMENT,
+  UPDATE_CAMERA_USAGE_SETTINGS,
+  UPDATE_CAMERA_SPECIFIC_SETTINGS,
+
   CAMERA_SETUP_STEP_KEY,
   LABWARE_SETUP_STEP_KEY,
   LPC_STEP_KEY,
   MODULE_SETUP_STEP_KEY,
   ROBOT_CALIBRATION_STEP_KEY,
+
   UPDATE_RUN_SETUP_STEPS_COMPLETE,
   UPDATE_RUN_SETUP_STEPS_REQUIRED,
 } from '../constants'
@@ -76,7 +83,7 @@ export interface UpdateRunSetupStepsRequiredAction {
 }
 
 export interface UpdateCameraEnablement {
-  type: typeof CAMERA_SETUP_STEP_KEY
+  type: typeof UPDATE_CAMERA_ENABLEMENT
   payload: {
     runId: string
     cameraEnabled: boolean
@@ -84,14 +91,14 @@ export interface UpdateCameraEnablement {
 }
 
 export interface UpdateCameraErrorRecoveryEnablement {
-  type: typeof CAMERA_SETUP_STEP_KEY
+  type: typeof UPDATE_CAMERA_RECOVERY_ENABLEMENT
   payload: {
     runId: string
     recoveryEnabled: boolean
   }
 }
 export interface UpdateLivestreamEnabled {
-  type: typeof CAMERA_SETUP_STEP_KEY
+  type: typeof UPDATE_CAMERA_STREAM_ENABLEMENT
   payload: {
     runId: string
     liveStreamEnabled: boolean
@@ -99,7 +106,7 @@ export interface UpdateLivestreamEnabled {
 }
 
 export interface UpdateAllCameraSettings {
-  type: typeof CAMERA_SETUP_STEP_KEY
+  type: typeof UPDATE_CAMERA_USAGE_SETTINGS
   payload: {
     runId: string
     liveStreamEnabled: boolean
@@ -109,7 +116,7 @@ export interface UpdateAllCameraSettings {
 }
 
 export interface UpdateCameraSpecificImageSettings {
-  type: typeof CAMERA_SETUP_STEP_KEY
+  type: typeof UPDATE_CAMERA_SPECIFIC_SETTINGS
   payload: {
     runId: string
     cameraId: string

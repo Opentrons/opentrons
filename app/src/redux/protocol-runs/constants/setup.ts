@@ -15,6 +15,12 @@ export const SETUP_STEP_KEYS = [
   CAMERA_SETUP_STEP_KEY,
 ] as const
 
+export const UPDATE_CAMERA_ENABLEMENT = 'protocolRuns:UPDATE_CAMERA_ENABLEMENT' as const
+export const UPDATE_CAMERA_RECOVERY_ENABLEMENT = 'protocolRuns:UPDATE_CAMERA_RECOVERY_ENABLEMENT' as const
+export const UPDATE_CAMERA_STREAM_ENABLEMENT = 'protocolRuns:UPDATE_CAMERA_STREAM_ENABLEMENT' as const
+export const UPDATE_CAMERA_USAGE_SETTINGS = 'protocolRuns:UPDATE_CAMERA_USAGE_SETTINGS' as const
+export const UPDATE_CAMERA_SPECIFIC_SETTINGS = 'protocolRuns:UPDATE_CAMERA_SPECIFIC_SETTINGS' as const
+
 export const STEP_KEY_TO_I18N_KEY = {
   [LPC_STEP_KEY]: 'applied_labware_offsets',
   [LABWARE_SETUP_STEP_KEY]: 'labware_placement',

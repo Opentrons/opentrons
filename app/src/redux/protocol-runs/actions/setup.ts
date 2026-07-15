@@ -24,7 +24,7 @@ export const updateCameraEnablement = (
   runId: string,
   cameraEnabled: boolean
 ): Types.UpdateCameraEnablement => ({
-  type: Constants.CAMERA_SETUP_STEP_KEY,
+  type: Constants.UPDATE_CAMERA_ENABLEMENT,
   payload: { runId, cameraEnabled },
 })
 
@@ -32,7 +32,7 @@ export const updateCameraRecoveryEnablement = (
   runId: string,
   recoveryEnabled: boolean
 ): Types.UpdateCameraErrorRecoveryEnablement => ({
-  type: Constants.CAMERA_SETUP_STEP_KEY,
+  type: Constants.UPDATE_CAMERA_RECOVERY_ENABLEMENT,
   payload: { runId, recoveryEnabled },
 })
 
@@ -40,7 +40,7 @@ export const updateCameraStreamEnablement = (
   runId: string,
   liveStreamEnabled: boolean
 ): Types.UpdateLivestreamEnabled => ({
-  type: Constants.CAMERA_SETUP_STEP_KEY,
+  type: Constants.UPDATE_CAMERA_STREAM_ENABLEMENT,
   payload: { runId, liveStreamEnabled },
 })
 
@@ -50,7 +50,7 @@ export const updateCameraUsageSettings = (allCameraArgs: {
   liveStreamEnabled: boolean
   recoveryEnabled: boolean
 }): Types.UpdateAllCameraSettings => ({
-  type: Constants.CAMERA_SETUP_STEP_KEY,
+  type: Constants.UPDATE_CAMERA_USAGE_SETTINGS,
   payload: allCameraArgs,
 })
 
@@ -59,6 +59,6 @@ export const updateCameraSpecificSettings = (
   cameraId: CameraId,
   cameraImageSettings: CameraImageSettings
 ): Types.UpdateCameraSpecificImageSettings => ({
-  type: Constants.CAMERA_SETUP_STEP_KEY,
+  type: Constants.UPDATE_CAMERA_SPECIFIC_SETTINGS,
   payload: { runId, cameraId, cameraImageSettings },
 })

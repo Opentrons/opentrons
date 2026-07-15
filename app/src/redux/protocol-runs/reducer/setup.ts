@@ -55,28 +55,32 @@ export function setupReducer(
         state
       )
 
-    case Constants.CAMERA_SETUP_STEP_KEY: {
+    case Constants.UPDATE_CAMERA_ENABLEMENT: 
+    case Constants.UPDATE_CAMERA_RECOVERY_ENABLEMENT:
+    case Constants.UPDATE_CAMERA_STREAM_ENABLEMENT:
+    case Constants.UPDATE_CAMERA_USAGE_SETTINGS: {
       const { runId, ...rest } = action.payload
+      return {
+        ...state,
+        [Constants.CAMERA_SETUP_STEP_KEY]: {
+          ...state[Constants.CAMERA_SETUP_STEP_KEY],
+          ...rest,
+        },
+      }
+      
+    }
 
-      if ('cameraId' in rest && 'cameraImageSettings' in rest) {
-        return {
-          ...state,
-          [Constants.CAMERA_SETUP_STEP_KEY]: {
-            ...state[Constants.CAMERA_SETUP_STEP_KEY],
-            cameraImageSettings: {
-              ...state[Constants.CAMERA_SETUP_STEP_KEY].cameraImageSettings,
-              [rest.cameraId]: rest.cameraImageSettings,
-            },
+    case Constants.UPDATE_CAMERA_SPECIFIC_SETTINGS: {
+      const {cameraId, cameraImageSettings} = action.payload
+      return {
+        ...state,
+        [Constants.CAMERA_SETUP_STEP_KEY]: {
+          ...state[Constants.CAMERA_SETUP_STEP_KEY],
+          cameraImageSettings: {
+            ...state[Constants.CAMERA_SETUP_STEP_KEY].cameraImageSettings,
+            [cameraId]: cameraImageSettings,
           },
-        }
-      } else {
-        return {
-          ...state,
-          [Constants.CAMERA_SETUP_STEP_KEY]: {
-            ...state[Constants.CAMERA_SETUP_STEP_KEY],
-            ...rest,
-          },
-        }
+        },
       }
     }
 

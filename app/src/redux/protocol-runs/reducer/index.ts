@@ -21,7 +21,11 @@ export const protocolRunReducer: Reducer<ProtocolRunState, Action> = (
   switch (action.type) {
     case Constants.UPDATE_RUN_SETUP_STEPS_COMPLETE:
     case Constants.UPDATE_RUN_SETUP_STEPS_REQUIRED:
-    case Constants.CAMERA_SETUP_STEP_KEY: {
+    case Constants.UPDATE_CAMERA_ENABLEMENT: 
+    case Constants.UPDATE_CAMERA_RECOVERY_ENABLEMENT:
+    case Constants.UPDATE_CAMERA_STREAM_ENABLEMENT:
+    case Constants.UPDATE_CAMERA_USAGE_SETTINGS:
+    case Constants.UPDATE_CAMERA_SPECIFIC_SETTINGS:{
       const runId = action.payload.runId
       const currentRunState = state[runId]
 
