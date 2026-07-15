@@ -36,10 +36,10 @@ export function DiagnosticsFiles({
 
   const handleDownloadSelected = (): void => {
     if (selectedIds.has('troubleshooting') && !isDownloadingLogs) {
-      downloadLogs()
+      void downloadLogs()
     }
     if (selectedIds.has('calibration') && !isLoadingCalibration) {
-      downloadCalibration()
+      void downloadCalibration()
     }
   }
 

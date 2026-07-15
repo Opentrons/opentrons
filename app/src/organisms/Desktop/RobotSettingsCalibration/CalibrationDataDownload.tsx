@@ -38,7 +38,7 @@ export function CalibrationDataDownload({
 
   const onClickSaveAs: MouseEventHandler = e => {
     e.preventDefault()
-    downloadCalibration()
+    void downloadCalibration()
   }
 
   return (

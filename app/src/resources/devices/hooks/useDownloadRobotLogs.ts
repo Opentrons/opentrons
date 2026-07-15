@@ -17,15 +17,14 @@ import { saveFileToUsb } from '/app/redux/shell/remote'
 import type { IconProps } from '@opentrons/components'
 
 interface UseDownloadRobotLogsResult {
-  downloadLogs: () => void
+  downloadLogs: (usbPath?: string) => Promise<void>
   isDownloading: boolean
   hasError: boolean
   canDownload: boolean
 }
 
 export function useDownloadRobotLogs(
-  robotName: string,
-  usbPath?: string
+  robotName: string
 ): UseDownloadRobotLogsResult {
   const { t } = useTranslation('device_settings')
   const robot = useRobot(robotName)
@@ -45,8 +44,10 @@ export function useDownloadRobotLogs(
   const canDownload =
     robot?.status === CONNECTABLE && robot?.health?.logs != null
 
-  const downloadLogs = (): void => {
-    if (!canDownload || host == null || robot?.health?.logs == null) return
+  const downloadLogs = (usbPath?: string): Promise<void> => {
+    if (!canDownload || host == null || robot?.health?.logs == null) {
+      return Promise.resolve()
+    }
 
     setIsDownloading(true)
     setHasError(false)
@@ -57,41 +58,28 @@ export function useDownloadRobotLogs(
     })
 
     const zip = new JSZip()
-    Promise.all(
+    return Promise.all(
       robot.health.logs.map(log => {
         const logFileName = last(log.split('/')) ?? 'robot.log'
-        return request<string>(GET, log, host)
-          .then(res => {
-            zip.file(logFileName, res.data)
-          })
-          .catch((e: Error) =>
-            makeToast(e.message, ERROR_TOAST, { closeButton: true })
-          )
+        return request<string>(GET, log, host).then(res => {
+          zip.file(logFileName, res.data)
+        })
       })
     )
-      .then(() =>
-        zip
-          .generateAsync({ type: 'arraybuffer' })
-          .then(async buffer => {
-            const filename = `${robotName}_logs.zip`
-            if (usbPath != null) {
-              await saveFileToUsb(`${usbPath}/${filename}`, buffer)
-            } else {
-              saveAs(new Blob([buffer]), filename)
-            }
-          })
-          .catch((e: Error) => {
-            eatToast(toastId)
-            makeToast(e.message, ERROR_TOAST, { closeButton: true })
-            if (isMounted.current) {
-              setHasError(true)
-              setIsDownloading(false)
-            }
-          })
-      )
+      .then(() => zip.generateAsync({ type: 'arraybuffer' }))
+      .then(async buffer => {
+        const filename = `${robotName}_logs.zip`
+        if (usbPath != null) {
+          await saveFileToUsb(`${usbPath}/${filename}`, buffer)
+        } else {
+          saveAs(new Blob([buffer]), filename)
+        }
+      })
       .then(() => {
         eatToast(toastId)
-        if (isMounted.current) setIsDownloading(false)
+        if (isMounted.current) {
+          setIsDownloading(false)
+        }
       })
       .catch((e: Error) => {
         eatToast(toastId)
@@ -100,6 +88,7 @@ export function useDownloadRobotLogs(
           setHasError(true)
           setIsDownloading(false)
         }
+        throw e
       })
   }
 

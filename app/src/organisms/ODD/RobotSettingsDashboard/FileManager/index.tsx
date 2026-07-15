@@ -6,7 +6,7 @@ import { Tabs } from '@opentrons/components'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import { DiagnosticFiles } from './DiagnosticFiles'
-import { DownloadDiagnosticFilesModal } from './DownloadDiagnosticFilesModal'
+import { DownloadDiagnosticFilesWizard } from './FileManagerWizardFlows/DownloadDiagnosticFilesWizard'
 import styles from './filemanager.module.css'
 
 import type { ComponentProps } from 'react'
@@ -92,7 +92,7 @@ export function FileManager({
         {activeTab === 'diagnostic' ? <DiagnosticFiles /> : null}
       </div>
       {showDownloadModal && activeTab === 'diagnostic' ? (
-        <DownloadDiagnosticFilesModal
+        <DownloadDiagnosticFilesWizard
           onClose={() => {
             setShowDownloadModal(false)
           }}

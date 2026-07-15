@@ -13,13 +13,12 @@ import {
 import { saveFileToUsb } from '/app/redux/shell/remote'
 
 interface UseDownloadCalibrationDataResult {
-  downloadCalibration: () => void
+  downloadCalibration: (usbPath?: string) => Promise<void>
   isLoading: boolean
 }
 
 export function useDownloadCalibrationData(
-  robotName: string,
-  savePath?: string
+  robotName: string
 ): UseDownloadCalibrationDataResult {
   const doTrackEvent = useTrackEvent()
   const { data: attachedInstruments, isLoading: isLoadingInstruments } =
@@ -27,7 +26,7 @@ export function useDownloadCalibrationData(
   const { data: attachedModules, isLoading: isLoadingModules } =
     useModulesQuery()
 
-  const downloadCalibration = (): void => {
+  const downloadCalibration = (usbPath?: string): Promise<void> => {
     doTrackEvent({
       name: ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
       properties: { robotType: FLEX_ROBOT_TYPE },
@@ -37,11 +36,12 @@ export function useDownloadCalibrationData(
       instrumentData: attachedInstruments,
       moduleData: attachedModules,
     })
-    if (savePath != null) {
+    if (usbPath != null) {
       const buffer = new TextEncoder().encode(jsonString).buffer
-      void saveFileToUsb(`${savePath}/${filename}`, buffer)
+      return saveFileToUsb(`${usbPath}/${filename}`, buffer)
     } else {
       saveAs(new Blob([jsonString]), filename)
+      return Promise.resolve()
     }
   }
 
