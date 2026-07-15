@@ -34,9 +34,11 @@ export const useMaintenanceRunDocumentation = (
   addActionToDocument: (action: DocumentedAction) => void
   isLoading: boolean
 } => {
-  const [actionsToDocument, addActionToDocument] = useActionsToDocumentList()
+  const [actionsToDocument, addActionToDocument] = useActionsToDocumentList([
+    maintenanceRunName,
+  ])
   const commandDocState = usePromptForDocumentation(
-    [maintenanceRunName],
+    actionsToDocument,
     onCancelStart,
     initialDocstate,
     promptEnabled

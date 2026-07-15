@@ -120,6 +120,7 @@ describe('SelectLocation', () => {
       maintenanceRunId: RUN_ID_1,
       isLoadedInRun: false,
       isOnDevice: false,
+      sendIdentifyModule: vi.fn(),
       errorMessage: '',
       attachedPipette: {} as PipetteInformation,
     }
@@ -186,6 +187,7 @@ describe('handleAddFixture', () => {
       maintenanceRunId: RUN_ID_1,
       isLoadedInRun: false,
       isOnDevice: false,
+      sendIdentifyModule: vi.fn(),
       errorMessage: '',
       attachedPipette: {} as PipetteInformation,
     }
@@ -278,6 +280,7 @@ describe('handleRemoveFixture', () => {
       maintenanceRunId: RUN_ID_1,
       isLoadedInRun: false,
       isOnDevice: false,
+      sendIdentifyModule: vi.fn(),
       errorMessage: '',
       attachedPipette: {} as PipetteInformation,
     }
@@ -327,6 +330,7 @@ describe('door open error handling', () => {
       maintenanceRunId: null,
       isLoadedInRun: false,
       isOnDevice: false,
+      sendIdentifyModule: vi.fn(),
       errorMessage: '',
       attachedPipette: {} as PipetteInformation,
     }
