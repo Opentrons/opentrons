@@ -264,6 +264,7 @@ The `display_color` parameter accepts a hex color code, which adds a color to th
 
 This example uses `load_liquid()` to label the initial well location, contents, and volume (in µL) for the liquid objects created by `define_liquid()`. Notice how values of the `liquid` argument use the variable names `greenWater` and `blueWater` (defined above) to associate wells in each labware with a particular liquid:
 
+<!-- test: continue-previous -->
 ```python
 ## load entire well plate with greenWater
 plate.load_liquid(
@@ -274,7 +275,7 @@ plate.load_liquid(
 
 ## load entire reservoir with blueWater
 reservoir.load_liquid(
-    wells=[A1], # using list of well names
+    wells=["A1"], # using list of well names
     volume=50,
     liquid=blueWater
 )
@@ -282,6 +283,7 @@ reservoir.load_liquid(
 
 `load_liquid()` makes it easy to load an entire well plate with a single command. Let's say you only need to load liquid in a few wells, or want to load multiple liquids or volumes in the same labware.
 
+<!-- test: continue-previous -->
 ```python
 plate.load_liquid_by_well({'A1': 200, 'A2': 100, 'A3': 50}, greenWater)
 plate.load_liquid_by_well({'B1': 200, 'B2': 100, 'B3': 50}, blueWater)

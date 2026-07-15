@@ -61,6 +61,8 @@ In the case of this DNA prep protocol, we can create formulas for the number of 
 Since each tip rack has 12 columns, divide the number of pickup actions by 12 to get the number of racks needed. And always round up — performing 13 pickups requires 2 racks. The [`math.ceil()`](https://docs.python.org/3/library/math.html#math.ceil) method rounds up to the nearest integer. We'll add `from math import ceil` at the top of the protocol and then calculate the number of tip racks as follows:
 
 ```python
+from math import ceil
+
 tip_rack_50_count = ceil((1 + 7 * column_count) / 12)
 tip_rack_200_count = ceil((2 + 13 * column_count) / 12)
 ```

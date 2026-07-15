@@ -295,7 +295,7 @@ The following code sample shows how to perform these steps, using the riser and 
 ```python
 # load riser
 riser = protocol.load_adapter(
-    load_name="opentrons_flex_deck_riser", location="A2"
+    load_name="opentrons_flex_deck_riser", location="D4"
 )
 
 # load a stack of three lids
@@ -323,6 +323,7 @@ tc_mod.close_lid()
 
 When you're finished with a lid, use the gripper to dispose of it in either the waste chute or a trash bin:
 
+<!-- test: continue-previous -->
 ```python
 tc_mod.open_lid()
 protocol.move_lid(

@@ -220,6 +220,8 @@ When instructing the robot to move, it's important to consider the difference be
 This distinction is important for the [`Location.move()`][opentrons.types.Location.move] method, which operates on a location, takes a point as an argument, and outputs an updated location. To use this method, include `from opentrons import types` at the start of your protocol. The `move()` method does not mutate the location it is called on, so to perform an action at the updated location, use it as an argument of another method or save it to a variable. For example:
 
 ```python
+from opentrons import types
+
 # get the location at the center of well A1
 center_location = plate["A1"].center()
 
@@ -236,6 +238,7 @@ pipette.dispense(50, center_location.move(types.Point(x=1, y=1, z=1)))
 !!! note
     The additional `z` arguments of the `top()` and `bottom()` methods (see [Position Relative to Labware][position-relative-to-labware] above) are shorthand for adjusting the top and bottom locations with `move()`. You still need to use `move()` to adjust these positions along the x- or y-axis:
     
+    <!-- test: continue-previous -->
     ```python
     # the following are equivalent
     pipette.move_to(plate["A1"].bottom(z=2))

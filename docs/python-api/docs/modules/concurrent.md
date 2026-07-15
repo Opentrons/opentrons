@@ -72,7 +72,7 @@ hs_mod.set_shake_speed(300)
 protocol.wait_for_tasks([heat_task])
 
 # create timer for sample incubation
-hs_timer = create_timer(seconds=300)
+hs_timer = protocol.create_timer(seconds=300)
 
 # hold samples at target temperature
 protocol.wait_for_tasks([hs_timer])

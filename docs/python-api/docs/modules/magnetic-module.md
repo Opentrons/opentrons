@@ -43,6 +43,8 @@ To check whether a custom labware definition specifies this measurement, load th
 Raise and lower the module's magnets with the [`engage()`][opentrons.protocol_api.MagneticModuleContext.engage] and [`disengage()`][opentrons.protocol_api.MagneticModuleContext.disengage] functions, respectively.
 
 If your loaded labware is fully compatible with the Magnetic Module, you can call `engage()` with no argument:
+
+<!-- test: robot=ot2 -->
 ```python
 mag_mod.engage()
 ```
@@ -57,6 +59,7 @@ For certain applications, you may want to move the magnets to a different height
 
 Here are some examples of where the magnets will move when using the different parameters in combination with the loaded NEST PCR plate, which specifies a default height of 20 mm:
 
+<!-- test: robot=ot2 -->
 ```python
 mag_mod.engage(height_from_base=13.5)  # 13.5 mm
 mag_mod.engage(offset=-2)              # 15.5 mm
@@ -69,6 +72,8 @@ Note that `offset` takes into account the fact that the magnets' home position i
 *Changed in version 2.2:* Added the `height_from_base` parameter.
 
 To retract the magnets back to their home position, call [`disengage()`][opentrons.protocol_api.MagneticModuleContext.disengage]:
+
+<!-- test: robot=ot2 -->
 ```python
 mag_mod.disengage()  # -2.5 mm
 ```

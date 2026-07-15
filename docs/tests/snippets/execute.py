@@ -431,6 +431,7 @@ _CONTEXT_FAILURE_MESSAGES = (
     "without calling `.initialize(...)` first",  # needs the reader initialized by a prior snippet
     "before specifying WellOrigin.MENISCUS",  # needs LiquidProbe/load_liquid from a prior snippet
     "cannot probe for liquid when the tip has liquid in it",  # needs an empty tip from a prior snippet
+    "only supported on 96-Channel pipettes",  # needs a 96-channel pipette instead of the base template's
 )
 
 

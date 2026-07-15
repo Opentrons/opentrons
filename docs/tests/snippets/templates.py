@@ -38,17 +38,23 @@ to rely on that). Per ``deck-slots.md``:
   (lid clearance) — confirmed empirically via ``DeckConflictError``.
 
 Flex layout: A1+B1 thermocycler (fixed) · A2 reservoir · A3 absorbance
-reader · B2 plate · B3 trash · C2 tiprack · C3 temperature module ·
-D1 heater-shaker · D2 magnetic block · D3 waste chute · D4 stacker. Trash
-lives at B3 rather than the more obvious C1 because C1 is a
-[north/south/east/west neighbor][heater-shaker-deck-slots] of the Heater-Shaker
-at D1: pipetting to a slot adjacent to it while it's shaking is a real,
-robot-enforced restriction (``PipetteMovementRestrictedByHeaterShakerError``),
-confirmed empirically here, and the Heater-Shaker's own docs page shakes and
-then immediately pipettes to `plate`/drops into `trash`. D1's other neighbor,
-D2, holds the Magnetic Block instead — nothing in this corpus pipettes to a
-Magnetic Block while a Heater-Shaker on the same deck is mid-shake, so that
-residual adjacency is unexercised rather than unsafe-by-design.
+reader · B2 plate · B3 trash · C1 right-mount tip rack · C2 tiprack ·
+C3 temperature module · D1 heater-shaker · D2 magnetic block · D3 waste
+chute · D4 stacker. Trash lives at B3 rather than the more obvious C1
+because C1 is a [north/south/east/west neighbor][heater-shaker-deck-slots]
+of the Heater-Shaker at D1: pipetting to a slot adjacent to it while it's
+shaking is a real, robot-enforced restriction
+(``PipetteMovementRestrictedByHeaterShakerError``), confirmed empirically
+here, and the Heater-Shaker's own docs page shakes and then immediately
+pipettes to `plate`/drops into `trash`. D1's other neighbor, D2, holds the
+Magnetic Block instead — nothing in this corpus pipettes to a Magnetic
+Block while a Heater-Shaker on the same deck is mid-shake, so that residual
+adjacency is unexercised rather than unsafe-by-design. The ``right_pipette``
+seed's tip rack uses C1 for the same reason trash avoids it — but no current
+fragment references both `right_pipette` and a shaking `hs_mod`, so that
+adjacency, too, is unexercised rather than unsafe-by-design. Columns 4
+(A4/B4/C4/D4) are staging-area slots a pipette can't reach directly, so they
+aren't candidates for a pipette's own tip rack even when otherwise free.
 
 OT-2 layout: tiprack 5 · plate 3 · reservoir 2 · heater-shaker 1 ·
 magnetic module 6 · temperature module 9 · thermocycler fixed (7/8/10/11,
@@ -68,6 +74,8 @@ from tests.snippets.classify import Track
 # --- Base template -----------------------------------------------------
 
 FLEX_BASE = """\
+from opentrons import protocol_api
+
 tiprack = protocol.load_labware(
     load_name="opentrons_flex_96_tiprack_1000ul", location="C2"
 )
@@ -86,6 +94,8 @@ trash = protocol.load_trash_bin(location="B3")
 """
 
 OT2_BASE = """\
+from opentrons import protocol_api
+
 tiprack = protocol.load_labware(
     load_name="opentrons_96_tiprack_300ul", location=5
 )
@@ -184,7 +194,9 @@ OBJECT_SEEDS: dict[str, ObjectSeed] = {
             )
         ),
     ),
-    # Magnetic Module (legacy): not compatible with Flex.
+    # Magnetic Module (legacy): not compatible with Flex. Its own docs load a
+    # PCR plate on it right away, since engage()/disengage() need labware
+    # with a default engage height loaded to work without an explicit height.
     "mag_mod": ObjectSeed(
         flex=None,
         ot2=TrackSeed(
@@ -192,7 +204,13 @@ OBJECT_SEEDS: dict[str, ObjectSeed] = {
                 "mag_mod = protocol.load_module(\n"
                 '    module_name="magnetic module gen2", location="6"\n'
                 ")\n"
-            )
+            ),
+            ready=(
+                "mag_mod.load_labware(\n"
+                '    name="nest_96_wellplate_100ul_pcr_full_skirt"\n'
+                ")\n"
+            ),
+            ready_marker=".load_labware(",
         ),
     ),
     # Magnetic Block: Flex-only replacement for the Magnetic Module.
@@ -243,6 +261,41 @@ OBJECT_SEEDS: dict[str, ObjectSeed] = {
     # setup.
     "chute": ObjectSeed(
         flex=TrackSeed(load="chute = protocol.load_waste_chute()\n"),
+        ot2=None,
+    ),
+    # Second pipette (right mount), for fragments that pair it with the base
+    # template's left-mount `pipette`. Only a Flex seed is provided: the
+    # OT-2 base template's four fixed slots plus the other seeds' slots (see
+    # module docstring) already leave no slot free for a second tip rack.
+    "right_pipette": ObjectSeed(
+        flex=TrackSeed(
+            load=(
+                "right_tiprack = protocol.load_labware(\n"
+                '    load_name="opentrons_flex_96_tiprack_1000ul", location="C1"\n'
+                ")\n"
+                "right_pipette = protocol.load_instrument(\n"
+                '    instrument_name="flex_8channel_1000", mount="right",\n'
+                "    tip_racks=[right_tiprack]\n"
+                ")\n"
+            )
+        ),
+        ot2=None,
+    ),
+    # Flex 1-Channel 50 µL pipette, for fragments demonstrating low-volume
+    # mode (`configure_for_volume()`) or tip refilling with a small-capacity
+    # pipette. Flex-only: the OT-2 has no 50 µL pipette.
+    "pipette50": ObjectSeed(
+        flex=TrackSeed(
+            load=(
+                "pipette50_tiprack = protocol.load_labware(\n"
+                '    load_name="opentrons_flex_96_tiprack_50ul", location="C1"\n'
+                ")\n"
+                "pipette50 = protocol.load_instrument(\n"
+                '    instrument_name="flex_1channel_50", mount="right",\n'
+                "    tip_racks=[pipette50_tiprack]\n"
+                ")\n"
+            )
+        ),
         ot2=None,
     ),
 }
