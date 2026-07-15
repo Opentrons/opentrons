@@ -40,7 +40,7 @@ export function IndividualKey({
       onChange={onChange}
       layoutName="default"
       display={customDisplayForIndividual}
-      useButtonTag={true}
+      useButtonTag={false}
       {...numericalKeyboard}
       width="100%"
       debug={debug} // If true, <ENTER> will input a \n

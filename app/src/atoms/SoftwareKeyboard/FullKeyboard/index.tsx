@@ -153,7 +153,7 @@ export function FullKeyboard({
       }
       display={display}
       mergeDisplay={true}
-      useButtonTag={true}
+      useButtonTag={false}
       debug={debug} // If true, <ENTER> will input a \n
       baseClass="fullKeyboard"
       buttonTheme={[

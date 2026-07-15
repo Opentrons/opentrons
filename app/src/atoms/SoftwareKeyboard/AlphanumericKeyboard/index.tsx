@@ -87,7 +87,7 @@ export function AlphanumericKeyboard({
       }
       display={customDisplay}
       mergeDisplay={true}
-      useButtonTag={true}
+      useButtonTag={false}
       width="100%"
       debug={debug} // If true, <ENTER> will input a \n
     />

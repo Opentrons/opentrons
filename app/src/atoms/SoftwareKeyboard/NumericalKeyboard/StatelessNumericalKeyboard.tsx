@@ -53,7 +53,7 @@ export function StatelessNumericalKeyboard({
         )
       }}
       display={numericalCustom}
-      useButtonTag={true}
+      useButtonTag={false}
       layoutName={layoutName}
       layout={numericalKeyboardLayout}
       debug={debug}

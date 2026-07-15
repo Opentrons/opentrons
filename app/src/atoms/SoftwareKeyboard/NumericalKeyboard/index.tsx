@@ -32,10 +32,6 @@ export function NumericalKeyboard({
   }`
 
   return (
-    /*
-     *  autoUseTouchEvents: for Flex on-device app
-     *  useButtonTag: this is for testing purpose that each key renders as a button
-     */
     <Keyboard
       keyboardRef={r => {
         keyboardRef.current = r
@@ -46,7 +42,7 @@ export function NumericalKeyboard({
       }}
       onChange={onChange}
       display={numericalCustom}
-      useButtonTag={true}
+      useButtonTag={false}
       layoutName={layoutName}
       layout={numericalKeyboardLayout}
       debug={debug} // If true, <ENTER> will input a \n
