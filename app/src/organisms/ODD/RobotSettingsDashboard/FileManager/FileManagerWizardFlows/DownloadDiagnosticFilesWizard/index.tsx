@@ -11,13 +11,12 @@ import { useDownloadCalibrationData } from '/app/resources/devices/hooks/useDown
 import { useDownloadRobotLogs } from '/app/resources/devices/hooks/useDownloadRobotLogs'
 
 import { ErrorScreen } from '../shared/ErrorScreen'
+import styles from '../shared/shared.module.css'
 import { SpinnerScreen } from '../shared/SpinnerScreen'
 import { SuccessScreen } from '../shared/SuccessScreen'
 import { UsbSelectionScreen } from '../shared/UsbSelectionScreen'
-
-import styles from '../shared/shared.module.css'
-
 import { STEP_TYPES } from './types'
+
 import type { StepType } from './types'
 
 interface DownloadDiagnosticFilesWizardProps {
@@ -47,8 +46,6 @@ export function DownloadDiagnosticFilesWizard({
         setStep(STEP_TYPES.ERROR)
       })
   }
-
-  const isActiveStep = step === STEP_TYPES.DOWNLOADING
 
   return createPortal(
     <div className={styles.overlay} aria-modal="true" role="dialog">
