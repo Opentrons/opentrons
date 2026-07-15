@@ -93,73 +93,89 @@ export const FlexTrash = ({
   // rotate trash around x,y midpoint of standard slot bounding box
   const rotateXCoord = x + slotXDimension / 2
   const rotateYCoord = y + slotYDimension / 2
+  const trashX = x + xAdjustment
+  const trashY = y + yAdjustment
+
+  // DeckLabelSet must stay outside the SVG rotate so its text stays rotated correctly
+  // for column 1, place it relative to the trash AABB after the 180degree rotation
+  const isRotated = rotateDegrees === '180'
+  const labelX = isRotated
+    ? 2 * rotateXCoord - trashX - xDimension
+    : trashX
+  const labelY = isRotated
+    ? 2 * rotateYCoord - trashY - yDimension - HEIGHT_OF_TAG
+    : trashY - HEIGHT_OF_TAG
 
   return x != null && y != null && xDimension != null && yDimension != null ? (
-    <g transform={`rotate(${rotateDegrees}, ${rotateXCoord}, ${rotateYCoord})`}>
-      <RobotCoordsForeignObject
-        width={xDimension}
-        height={yDimension}
-        x={x + xAdjustment}
-        y={y + yAdjustment}
-        flexProps={{
-          flex: '1',
-        }}
-        flexEvents={{
-          onClick: onClick,
-          onMouseEnter: onMouseEnter,
-          onMouseLeave: onMouseLeave,
-        }}
-        foreignObjectProps={{
-          flex: '1',
-          cursor: onClick != null ? 'pointer' : 'default',
-        }}
+    <>
+      <g
+        transform={`rotate(${rotateDegrees}, ${rotateXCoord}, ${rotateYCoord})`}
       >
-        <div
-          className={clsx(styles.trash_container, {
-            [styles.trash_container_highlight]: showHighlight,
-          })}
-          style={{ backgroundColor }}
+        <RobotCoordsForeignObject
+          width={xDimension}
+          height={yDimension}
+          x={trashX}
+          y={trashY}
+          flexProps={{
+            flex: '1',
+          }}
+          flexEvents={{
+            onClick: onClick,
+            onMouseEnter: onMouseEnter,
+            onMouseLeave: onMouseLeave,
+          }}
+          foreignObjectProps={{
+            flex: '1',
+            cursor: onClick != null ? 'pointer' : 'default',
+          }}
         >
-          {rotateDegrees === '180' ? (
-            <div
-              className={styles.trash_container_rotate_copy}
-              style={{ transform: `rotate(${rotateDegrees}deg)` }}
-            >
+          <div
+            className={clsx(styles.trash_container, {
+              [styles.trash_container_highlight]: showHighlight,
+            })}
+            style={{ backgroundColor }}
+          >
+            {isRotated ? (
+              <div
+                className={styles.trash_container_rotate_copy}
+                style={{ transform: `rotate(${rotateDegrees}deg)` }}
+              >
+                <PlaceholderStyledText
+                  color={COLORS.white}
+                  desktopStyle="bodyDefaultSemiBold"
+                >
+                  Trash bin
+                </PlaceholderStyledText>
+              </div>
+            ) : null}
+            <Icon
+              name="trash"
+              color={trashIconColor}
+              height="2rem"
+              // rotate icon back 180 degrees
+              transform={`rotate(${rotateDegrees}deg)`}
+              transformOrigin="center"
+            />
+            {!isRotated ? (
               <PlaceholderStyledText
                 color={COLORS.white}
                 desktopStyle="bodyDefaultSemiBold"
               >
                 Trash bin
               </PlaceholderStyledText>
-            </div>
-          ) : null}
-          <Icon
-            name="trash"
-            color={trashIconColor}
-            height="2rem"
-            // rotate icon back 180 degrees
-            transform={`rotate(${rotateDegrees}deg)`}
-            transformOrigin="center"
-          />
-          {rotateDegrees === '0' ? (
-            <PlaceholderStyledText
-              color={COLORS.white}
-              desktopStyle="bodyDefaultSemiBold"
-            >
-              Trash bin
-            </PlaceholderStyledText>
-          ) : null}
-        </div>
-      </RobotCoordsForeignObject>
+            ) : null}
+          </div>
+        </RobotCoordsForeignObject>
+      </g>
       {tagInfo != null && tagInfo.length > 0 ? (
         <DeckLabelSet
           width={xDimension}
           height={yDimension}
-          x={x + xAdjustment}
-          y={y + yAdjustment - HEIGHT_OF_TAG}
+          x={labelX}
+          y={labelY}
           deckLabels={tagInfo}
         />
       ) : null}
-    </g>
+    </>
   ) : null
 }
