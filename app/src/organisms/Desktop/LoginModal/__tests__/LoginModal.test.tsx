@@ -355,8 +355,10 @@ describe('LoginModal', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
 
-    screen.getByText('Robot encryption key verification')
-    screen.getByText('Verify robot encryption key')
+    screen.getByText('Enter robot encryption key')
+    screen.getByText(
+      'Verify the robot encryption key to use the robot. The encryption key can be found under Robot Settings on the touchscreen.'
+    )
     screen.getByLabelText('Robot encryption key')
     expect(screen.queryByText('Network Error')).toBeNull()
   })
