@@ -31,6 +31,7 @@ import {
 } from '../AdvancedTab'
 import { RobotSettingsAdvanced } from '../RobotSettingsAdvanced'
 
+import type * as Config from '/app/redux/config'
 import type { ShellUpdateState } from '/app/redux/shell/types'
 import type * as ShellUpdate from '/app/redux/shell/update'
 
@@ -38,7 +39,7 @@ vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/robot-settings/selectors')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/config', async importOriginal => {
-  const actual = await importOriginal<typeof import('/app/redux/config')>()
+  const actual = await importOriginal<typeof Config>()
   return {
     ...actual,
     getFeatureFlags: vi.fn(),
