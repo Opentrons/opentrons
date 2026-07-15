@@ -1,7 +1,6 @@
-import { useMutation } from 'react-query'
-
 import { shutdown } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
@@ -11,6 +10,7 @@ import type {
   UseMutationResult,
 } from 'react-query'
 import type { HostConfig, ShutdownResponse } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
 
 export type UseShutdownMutationResult = UseMutationResult<
   ShutdownResponse,
@@ -27,16 +27,19 @@ export type UseShutdownMutationOptions = UseMutationOptions<
 >
 
 export function useShutdownMutation(
+  documentationState: DocumentationState,
   options: UseShutdownMutationOptions = {},
   hostOverride?: HostConfig | null
 ): UseShutdownMutationResult {
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
-  const mutation = useMutation<ShutdownResponse, AxiosError>(
+  const mutation = useDocumentedMutation<ShutdownResponse, AxiosError>(
+    documentationState,
+    [],
     getQueryKey(host, 'server', 'shutdown'),
-    () =>
-      shutdown(host!)
+    ({ userNotes }) =>
+      shutdown(host!, userNotes)
         .then(response => response.data)
         .catch(e => {
           throw e
