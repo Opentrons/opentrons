@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 
 import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
+import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
 
 import { useCreateTargetedMaintenanceRunMutation } from '../../runs'
 import { useChainMaintenanceCommands } from './useChainMaintenanceCommands'
@@ -75,8 +76,14 @@ export function useRobotControlCommands({
     isLoading: isDocumentationLoading,
   } = useMaintenanceRunDocumentation(
     runStartedAction,
-    handleDocumentationCancel
+    handleDocumentationCancel,
+    undefined,
+    isExecuting // block prompting until execution begins
   )
+
+  // wait until documentation is ready before executing commands
+  const isExecutionBlocked =
+    isDocumentationLoading || !isDocumentationProvided(commandDocState)
 
   const { chainRunCommands } = useChainMaintenanceCommands(
     commandDocState,
@@ -136,7 +143,7 @@ export function useRobotControlCommands({
   // If documentation state is loading, we queue the execution, and run it in the useEffect when the documentation is ready.
   // If documentation state is not loading, we can execute the commands immediately.
   useEffect(() => {
-    if (isDocumentationLoading || pendingExecutionRef.current == null) {
+    if (isExecutionBlocked || pendingExecutionRef.current == null) {
       return
     }
 
@@ -144,12 +151,12 @@ export function useRobotControlCommands({
     pendingExecutionRef.current = null
 
     void createTargetedMaintenanceRun({}).then(resolve).catch(reject)
-  }, [createTargetedMaintenanceRun, isDocumentationLoading])
+  }, [createTargetedMaintenanceRun, isExecutionBlocked])
 
   const executeCommands = (): Promise<MaintenanceRun> => {
     setIsExecuting(true)
 
-    if (isDocumentationLoading) {
+    if (isExecutionBlocked) {
       return new Promise((resolve, reject) => {
         pendingExecutionRef.current = { resolve, reject }
       })
