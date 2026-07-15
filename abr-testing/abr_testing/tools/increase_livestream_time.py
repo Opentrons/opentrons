@@ -6,16 +6,15 @@ import subprocess
 def edit_livestream_length(ip: str, time: str) -> None:
     """SSH into robot and increase livestream time."""
     key = "hls_playlist_length"
-    ssh_command = f"""
-    ssh root@{ip} '
-        mount -o remount,rw / &&
-        sed -i "s/{key} *[0-9][0-9]*s;/{key} {time}s;/g" /etc/nginx/nginx.conf &&
-        systemctl daemon-reload &&
-        systemctl restart nginx
-    '
-    """
+    remote_command = (
+        f'mount -o remount,rw / && '
+        f'sed -i "s/{key} *[0-9][0-9]*s;/{key} {time}s;/g" /etc/nginx/nginx.conf && '
+        f'systemctl daemon-reload && '
+        f'systemctl restart nginx'
+    )
+    ssh_command = ["ssh", f"root@{ip}", remote_command]
     try:
-        subprocess.run(ssh_command, shell=True, check=True)
+        subprocess.run(ssh_command, check=True)
         print(f"Successfully updated livestream length on {ip}")
     except subprocess.CalledProcessError as e:
         print(f"Failed to update {ip}: {e}")
