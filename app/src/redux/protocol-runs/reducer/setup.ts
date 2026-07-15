@@ -55,7 +55,7 @@ export function setupReducer(
         state
       )
 
-    case Constants.UPDATE_CAMERA_ENABLEMENT: 
+    case Constants.UPDATE_CAMERA_ENABLEMENT:
     case Constants.UPDATE_CAMERA_RECOVERY_ENABLEMENT:
     case Constants.UPDATE_CAMERA_STREAM_ENABLEMENT:
     case Constants.UPDATE_CAMERA_USAGE_SETTINGS: {
@@ -67,11 +67,10 @@ export function setupReducer(
           ...rest,
         },
       }
-      
     }
 
     case Constants.UPDATE_CAMERA_SPECIFIC_SETTINGS: {
-      const {cameraId, cameraImageSettings} = action.payload
+      const { cameraId, cameraImageSettings } = action.payload
       return {
         ...state,
         [Constants.CAMERA_SETUP_STEP_KEY]: {
