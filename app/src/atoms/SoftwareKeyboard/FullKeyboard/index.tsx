@@ -8,6 +8,7 @@ import {
   customDisplay,
   fullKeyboardLayout,
   layoutCandidates,
+  softwareKeyboardButtonAttributes,
 } from '../constants'
 
 import type { MutableRefObject } from 'react'
@@ -154,6 +155,7 @@ export function FullKeyboard({
       display={display}
       mergeDisplay={true}
       useButtonTag={false}
+      buttonAttributes={softwareKeyboardButtonAttributes}
       debug={debug} // If true, <ENTER> will input a \n
       baseClass="fullKeyboard"
       buttonTheme={[

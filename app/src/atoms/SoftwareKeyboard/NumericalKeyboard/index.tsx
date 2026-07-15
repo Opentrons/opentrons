@@ -1,6 +1,10 @@
 import { KeyboardReact as Keyboard } from 'react-simple-keyboard'
 
-import { numericalCustom, numericalKeyboardLayout } from '../constants'
+import {
+  numericalCustom,
+  numericalKeyboardLayout,
+  softwareKeyboardButtonAttributes,
+} from '../constants'
 
 import type { MutableRefObject } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
@@ -43,6 +47,7 @@ export function NumericalKeyboard({
       onChange={onChange}
       display={numericalCustom}
       useButtonTag={false}
+      buttonAttributes={softwareKeyboardButtonAttributes}
       layoutName={layoutName}
       layout={numericalKeyboardLayout}
       debug={debug} // If true, <ENTER> will input a \n

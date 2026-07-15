@@ -8,6 +8,7 @@ import {
   alphanumericKeyboardLayout,
   customDisplay,
   layoutCandidates,
+  softwareKeyboardButtonAttributes,
 } from '../constants'
 
 import type { MutableRefObject } from 'react'
@@ -88,6 +89,7 @@ export function AlphanumericKeyboard({
       display={customDisplay}
       mergeDisplay={true}
       useButtonTag={false}
+      buttonAttributes={softwareKeyboardButtonAttributes}
       width="100%"
       debug={debug} // If true, <ENTER> will input a \n
     />

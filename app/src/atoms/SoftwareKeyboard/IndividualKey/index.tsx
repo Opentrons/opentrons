@@ -1,6 +1,9 @@
 import { KeyboardReact as Keyboard } from 'react-simple-keyboard'
 
-import { customDisplayForIndividual } from '../constants'
+import {
+  customDisplayForIndividual,
+  softwareKeyboardButtonAttributes,
+} from '../constants'
 
 import type { MutableRefObject } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
@@ -41,6 +44,7 @@ export function IndividualKey({
       layoutName="default"
       display={customDisplayForIndividual}
       useButtonTag={false}
+      buttonAttributes={softwareKeyboardButtonAttributes}
       {...numericalKeyboard}
       width="100%"
       debug={debug} // If true, <ENTER> will input a \n
