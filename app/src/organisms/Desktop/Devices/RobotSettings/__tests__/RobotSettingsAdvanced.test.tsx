@@ -16,6 +16,7 @@ import {
   DeviceReset,
   DisableStackerSensors,
   DisplayRobotName,
+  EnableComplianceReadySoftware,
   EnableStatusLight,
   EnterRobotEncryptionKey,
   GantryHoming,
@@ -53,6 +54,7 @@ vi.mock('/app/redux/shell/update', async importOriginal => {
 })
 vi.mock('../AdvancedTab/DeviceReset')
 vi.mock('../AdvancedTab/DisplayRobotName')
+vi.mock('../AdvancedTab/EnableComplianceReadySoftware')
 vi.mock('../AdvancedTab/EnableStatusLight')
 vi.mock('../AdvancedTab/EnterRobotEncryptionKey')
 vi.mock('../AdvancedTab/GantryHoming')
@@ -131,6 +133,9 @@ describe('RobotSettings Advanced tab', () => {
     vi.mocked(EnterRobotEncryptionKey).mockReturnValue(
       <div>Mock EnterRobotEncryptionKey Section</div>
     )
+    vi.mocked(EnableComplianceReadySoftware).mockReturnValue(
+      <div>Mock EnableComplianceReadySoftware Section</div>
+    )
     vi.mocked(getFeatureFlags).mockReturnValue({})
     vi.mocked(useIsRobotBusy).mockReturnValue(false)
     vi.mocked(useCurrentRun).mockReturnValue(null)
@@ -145,11 +150,24 @@ describe('RobotSettings Advanced tab', () => {
     screen.getByText('Mock AboutRobotName Section')
   })
 
+  it('should not render EnableComplianceReadySoftware when accessControlMode is off', () => {
+    render()
+    expect(
+      screen.queryByText('Mock EnableComplianceReadySoftware Section')
+    ).toBeNull()
+  })
+
   it('should not render EnterRobotEncryptionKey when accessControlMode is off', () => {
     render()
     expect(
       screen.queryByText('Mock EnterRobotEncryptionKey Section')
     ).toBeNull()
+  })
+
+  it('should render EnableComplianceReadySoftware when accessControlMode is on', () => {
+    vi.mocked(getFeatureFlags).mockReturnValue({ accessControlMode: true })
+    render()
+    screen.getByText('Mock EnableComplianceReadySoftware Section')
   })
 
   it('should render EnterRobotEncryptionKey when accessControlMode is on', () => {
