@@ -93,14 +93,9 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <Box>
-            <LegacyStyledText forwardedAs="h3">
-              {displayName}
-            </LegacyStyledText>
+            <LegacyStyledText forwardedAs="h3">{displayName}</LegacyStyledText>
             {isCustomDefinition ? (
-              <LegacyStyledText
-                forwardedAs="label"
-                color={COLORS.grey50}
-              >
+              <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
                 {t('custom_def')}
               </LegacyStyledText>
             ) : (
@@ -150,10 +145,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
               <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
                 {t('date_added')}
               </LegacyStyledText>
-              <LegacyStyledText
-                forwardedAs="label"
-                color={COLORS.grey50}
-              >
+              <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
                 {format(new Date(modified), 'MM/dd/yyyy')}
               </LegacyStyledText>
             </Flex>

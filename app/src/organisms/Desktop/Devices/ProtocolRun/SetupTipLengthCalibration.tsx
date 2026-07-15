@@ -30,10 +30,7 @@ export function SetupTipLengthCalibration({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-      <LegacyStyledText
-        color={COLORS.black90}
-        css={TYPOGRAPHY.pSemiBold}
-      >
+      <LegacyStyledText color={COLORS.black90} css={TYPOGRAPHY.pSemiBold}>
         {t('required_tip_racks_title')}
       </LegacyStyledText>
       {PIPETTE_MOUNTS.map(mount => {

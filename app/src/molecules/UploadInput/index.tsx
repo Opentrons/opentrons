@@ -126,9 +126,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
           )}
         </>
       ) : null}
-      <PrimaryButton
-        onClick={handleClick}
-      >
+      <PrimaryButton onClick={handleClick}>
         {uploadButtonText ?? t('upload')}
       </PrimaryButton>
 

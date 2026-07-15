@@ -93,9 +93,7 @@ export function SetupPipetteCalibrationItem({
     button = (
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <RRDLink to={deviceDetailsUrl}>
-          <TertiaryButton>
-            {t('attach_pipette_cta')}
-          </TertiaryButton>
+          <TertiaryButton>{t('attach_pipette_cta')}</TertiaryButton>
         </RRDLink>
       </Flex>
     )
@@ -113,10 +111,7 @@ export function SetupPipetteCalibrationItem({
           <RRDLink
             to={`/devices/${robotName}/robot-settings/calibration/dashboard`}
           >
-            <TertiaryButton
-              disabled={!isDeckCalibrated}
-              {...targetProps}
-            >
+            <TertiaryButton disabled={!isDeckCalibrated} {...targetProps}>
               {t('calibrate_now')}
             </TertiaryButton>
           </RRDLink>

@@ -63,10 +63,7 @@ export function SetupInstrumentCalibration({
       {getShowPipetteCalibrationWarning(instrumentsQueryData) && (
         <PipetteRecalibrationWarning />
       )}
-      <LegacyStyledText
-        color={COLORS.black90}
-        css={TYPOGRAPHY.pSemiBold}
-      >
+      <LegacyStyledText color={COLORS.black90} css={TYPOGRAPHY.pSemiBold}>
         {i18n.format(t('required_instrument_calibrations'), 'titleCase')}
       </LegacyStyledText>
       {PIPETTE_MOUNTS.map((mount, index) => {

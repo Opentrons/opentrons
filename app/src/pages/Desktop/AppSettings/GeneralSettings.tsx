@@ -126,9 +126,7 @@ export function GeneralSettings(): JSX.Element {
         paddingY={SPACING.spacing24}
       >
         {showUpdateBanner && (
-          <Box
-            marginBottom={SPACING.spacing16}
-          >
+          <Box marginBottom={SPACING.spacing16}>
             <Banner
               type="warning"
               onCloseClick={() => {
@@ -223,9 +221,7 @@ export function GeneralSettings(): JSX.Element {
               >
                 {t('restore_previous')}
               </Link>
-              <ExternalLink
-                href={SOFTWARE_SYNC_URL}
-              >
+              <ExternalLink href={SOFTWARE_SYNC_URL}>
                 {t('branded:versions_sync')}
               </ExternalLink>
             </Flex>

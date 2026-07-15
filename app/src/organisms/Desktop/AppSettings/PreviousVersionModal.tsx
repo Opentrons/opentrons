@@ -32,23 +32,16 @@ export function PreviousVersionModal(
         <LegacyStyledText forwardedAs="p" paddingBottom={SPACING.spacing8}>
           {t('branded:restore_description')}
         </LegacyStyledText>
-        <ExternalLink
-          href={UNINSTALL_APP_URL}
-        >
+        <ExternalLink href={UNINSTALL_APP_URL}>
           {t('branded:learn_uninstalling')}
         </ExternalLink>
         <Box marginY={SPACING.spacing8} />
-        <ExternalLink
-          href={PREVIOUS_RELEASES_URL}
-        >
+        <ExternalLink href={PREVIOUS_RELEASES_URL}>
           {t('branded:previous_releases')}
         </ExternalLink>
       </Box>
       <Flex justifyContent={JUSTIFY_FLEX_END}>
-        <PrimaryButton
-          marginTop={SPACING.spacing24}
-          onClick={props.closeModal}
-        >
+        <PrimaryButton marginTop={SPACING.spacing24} onClick={props.closeModal}>
           {t('close')}
         </PrimaryButton>
       </Flex>

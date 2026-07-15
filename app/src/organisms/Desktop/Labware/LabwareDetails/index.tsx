@@ -101,10 +101,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       )}
       {modified != null && filename != null && (
         <div className={styles.last_updated_container}>
-          <LegacyStyledText
-            forwardedAs="label"
-            color={COLORS.grey50}
-          >
+          <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
             {t('last_updated')} {format(new Date(modified), 'MM/dd/yyyy')}
           </LegacyStyledText>
           <CustomLabwareOverflowMenu

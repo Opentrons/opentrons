@@ -43,9 +43,7 @@ export function BackToTopButton({
         })
       }}
     >
-      <SecondaryButton>
-        {t('back_to_top')}
-      </SecondaryButton>
+      <SecondaryButton>{t('back_to_top')}</SecondaryButton>
     </Link>
   )
 }
