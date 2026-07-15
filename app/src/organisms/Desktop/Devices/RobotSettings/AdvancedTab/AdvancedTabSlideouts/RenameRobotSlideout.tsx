@@ -18,6 +18,7 @@ import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { Slideout } from '/app/atoms/Slideout'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { ANALYTICS_RENAME_ROBOT, useTrackEvent } from '/app/redux/analytics'
 import {
@@ -132,8 +133,8 @@ export function RenameRobotSlideout({
     updateRobotName(newName)
     reset({ newRobotName: '' })
   }
-
-  const { updateRobotName } = useUpdateRobotNameMutation({
+  const documentationState = useDocumentationState()
+  const { updateRobotName } = useUpdateRobotNameMutation(documentationState, {
     onSuccess: (data: UpdatedRobotName) => {
       // TODO: 6/10/2022 kj for the robot name, we need to use GET: /server/name
       // data.name != null && navigate(`/devices/${data.name}/robot-settings`)
