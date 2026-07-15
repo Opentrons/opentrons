@@ -56,9 +56,9 @@ export function DownloadDiagnosticFilesWizard({
         <WizardHeader
           title={t('download_diagnostic_files')}
           onExit={onClose}
-          totalSteps={isActiveStep || step === STEP_TYPES.SUCCESS ? null : 1}
-          currentStep={isActiveStep || step === STEP_TYPES.SUCCESS ? null : 1}
-          hideStepText={step === STEP_TYPES.SUCCESS}
+          totalSteps={2}
+          currentStep={step === STEP_TYPES.SUCCESS ? 2 : 1}
+          hideStepText
         />
         <div className={styles.body}>
           {step === STEP_TYPES.USB ? (
