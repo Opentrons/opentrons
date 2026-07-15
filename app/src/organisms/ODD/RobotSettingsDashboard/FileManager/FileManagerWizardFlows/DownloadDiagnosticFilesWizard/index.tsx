@@ -43,7 +43,7 @@ export function DownloadDiagnosticFilesWizard({
         setStep(STEP_TYPES.SUCCESS)
       })
       .catch(() => {
-        setErrorSubText(t('diagnostic_files_download_failed'))
+        setErrorSubText(t('diagnostic_files_download_failed') as string)
         setStep(STEP_TYPES.ERROR)
       })
   }
