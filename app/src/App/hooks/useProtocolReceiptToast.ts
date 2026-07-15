@@ -12,7 +12,7 @@ import {
   useHost,
 } from '@opentrons/react-api-client'
 
-import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/utils'
 import { useToaster } from '/app/organisms/ToasterOven'
 
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
@@ -33,7 +33,9 @@ export function useProtocolReceiptToast(): void {
   const protocolIds = protocolIdsQuery.data?.data ?? []
   const protocolIdsRef = useRef(protocolIds)
   const hasRefetched = useRef(true)
-  // setStatusBar does not require documentation, as it's not a user action.
+  // TODO(jj): setStatusBar will fail in CRS mode.
+  // We don't want to prompt the user for documentation or require login here
+  // We need to add a new backend endpoint for setStatusBar specifically.
   const { createLiveCommand } = useCreateLiveCommandMutation(
     ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
   )

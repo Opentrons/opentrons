@@ -15,7 +15,7 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import welcomeModalImage from '/app/assets/images/on-device-display/welcome_dashboard_modal.png'
 import { SmallButton } from '/app/atoms/buttons'
-import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/utils'
 import { OddModal } from '/app/molecules/OddModal'
 import { updateConfigValue } from '/app/redux/config'
 
@@ -32,7 +32,9 @@ export function WelcomeModal({
   const { t } = useTranslation(['device_details', 'shared'])
   const dispatch = useDispatch<Dispatch>()
 
-  // setStatusBar does not require documentation, as it's not a user action.
+  // TODO(jj): setStatusBar will fail in CRS mode.
+  // We don't want to prompt the user for documentation or require login here
+  // We need to add a new backend endpoint for setStatusBar specifically.
   const { createLiveCommand } = useCreateLiveCommandMutation(
     ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
   )

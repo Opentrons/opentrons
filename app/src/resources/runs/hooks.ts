@@ -7,7 +7,7 @@ import {
   useCreateMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
 
-import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/utils'
 // TODO: refactor this so helper code doesn't spawn UI
 /* eslint-disable-next-line opentrons/no-imports-across-applications */
 import { useMaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
