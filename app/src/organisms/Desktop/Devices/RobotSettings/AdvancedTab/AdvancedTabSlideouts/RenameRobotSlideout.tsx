@@ -26,6 +26,7 @@ import {
   getReachableRobots,
   getUnreachableRobots,
   removeRobot,
+  startDiscovery,
 } from '/app/redux/discovery'
 
 import type { ChangeEvent } from 'react'
@@ -142,6 +143,7 @@ export function RenameRobotSlideout({
       // https://github.com/Opentrons/opentrons/issues/10709
       data.name != null && navigate('/devices')
       dispatch(removeRobot(previousRobotName))
+      dispatch(startDiscovery())
     },
     onError: (error: Error) => {
       // TODO kj 5/25/2022: when a user lost connection while the user is renaming a robot,
