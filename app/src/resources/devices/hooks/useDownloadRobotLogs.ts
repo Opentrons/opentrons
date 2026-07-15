@@ -8,6 +8,7 @@ import { GET, request } from '@opentrons/api-client'
 import { ERROR_TOAST, INFO_TOAST } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
+// eslint-disable-next-line opentrons/no-imports-across-applications
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useRobot } from '/app/redux-resources/robots'
 import { CONNECTABLE } from '/app/redux/discovery'
@@ -24,7 +25,7 @@ interface UseDownloadRobotLogsResult {
 
 export function useDownloadRobotLogs(
   robotName: string,
-  savePath?: string
+  usbPath?: string
 ): UseDownloadRobotLogsResult {
   const { t } = useTranslation('device_settings')
   const robot = useRobot(robotName)
@@ -73,8 +74,8 @@ export function useDownloadRobotLogs(
           .generateAsync({ type: 'arraybuffer' })
           .then(async buffer => {
             const filename = `${robotName}_logs.zip`
-            if (savePath != null) {
-              await saveFileToUsb(`${savePath}/${filename}`, buffer)
+            if (usbPath != null) {
+              await saveFileToUsb(`${usbPath}/${filename}`, buffer)
             } else {
               saveAs(new Blob([buffer]), filename)
             }
