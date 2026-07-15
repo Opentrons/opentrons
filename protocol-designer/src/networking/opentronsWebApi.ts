@@ -1,5 +1,5 @@
-const PRODUCTION_HOST = 'designer.opentrons.com'
-const STAGING_HOST = 'staging.designer.opentrons.com'
+const PRODUCTION_HOST = 'ot2.designer.opentrons.com'
+const STAGING_HOST = 'ot2.staging.designer.opentrons.com'
 
 const getHost = (): string => global.location.host
 
