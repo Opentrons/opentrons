@@ -1,6 +1,6 @@
 import { Icon, StyledText } from '@opentrons/components'
 
-import styles from './filemanagerwizardshared.module.css'
+import styles from './shared.module.css'
 
 interface SpinnerScreenProps {
   statusText: string

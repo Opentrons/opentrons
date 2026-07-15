@@ -4,7 +4,7 @@ import { RadioButton, StyledText } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 
-import styles from './filemanagerwizardshared.module.css'
+import styles from './shared.module.css'
 
 interface Choice {
   value: string

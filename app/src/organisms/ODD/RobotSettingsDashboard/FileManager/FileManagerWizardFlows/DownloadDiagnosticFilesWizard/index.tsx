@@ -15,7 +15,7 @@ import { SpinnerScreen } from '../shared/SpinnerScreen'
 import { SuccessScreen } from '../shared/SuccessScreen'
 import { UsbSelectionScreen } from '../shared/UsbSelectionScreen'
 
-import styles from '../shared/filemanagerwizardshared.module.css'
+import styles from '../shared/shared.module.css'
 
 import { STEP_TYPES } from './types'
 import type { StepType } from './types'

@@ -40,21 +40,6 @@
   overflow-y: auto;
 }
 
-.button_list::-webkit-scrollbar {
-  width: 0.75rem;
-  background-color: var(--grey-35);
-}
-
-.button_list::-webkit-scrollbar-track {
-  margin-top: var(--spacing-16);
-  margin-bottom: var(--spacing-16);
-}
-
-.button_list::-webkit-scrollbar-thumb {
-  border-radius: 11px;
-  background: var(--grey-50);
-}
-
 .scrollable_content {
   display: flex;
   min-height: 0;

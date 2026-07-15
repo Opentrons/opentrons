@@ -8,7 +8,7 @@ import { SmallButton } from '/app/atoms/buttons'
 import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
 import { getShellUsbMountPaths } from '/app/redux/shell'
 
-import styles from './filemanagerwizardshared.module.css'
+import styles from './shared.module.css'
 
 import type { State } from '/app/redux/types'
 

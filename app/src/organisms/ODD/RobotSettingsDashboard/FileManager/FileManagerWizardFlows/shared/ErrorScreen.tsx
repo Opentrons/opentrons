@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { SmallButton } from '/app/atoms/buttons'
 import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
 
-import styles from './filemanagerwizardshared.module.css'
+import styles from './shared.module.css'
 
 interface ErrorScreenProps {
   subText: string

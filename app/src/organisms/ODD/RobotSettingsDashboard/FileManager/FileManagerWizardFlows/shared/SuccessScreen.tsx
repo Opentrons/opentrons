@@ -5,7 +5,7 @@ import { StyledText } from '@opentrons/components'
 import SuccessIcon from '/app/assets/images/icon_success.png'
 import { SmallButton } from '/app/atoms/buttons'
 
-import styles from './filemanagerwizardshared.module.css'
+import styles from './shared.module.css'
 
 interface SuccessScreenProps {
   message: string
