@@ -37,21 +37,6 @@
   overflow-y: auto;
 }
 
-.usb_content::-webkit-scrollbar {
-  width: 0.75rem;
-  background-color: var(--grey-35);
-}
-
-.usb_content::-webkit-scrollbar-track {
-  margin-top: var(--spacing-16);
-  margin-bottom: var(--spacing-16);
-}
-
-.usb_content::-webkit-scrollbar-thumb {
-  border-radius: 11px;
-  background: var(--grey-50);
-}
-
 .question {
   flex-shrink: 0;
   color: var(--black-90);
