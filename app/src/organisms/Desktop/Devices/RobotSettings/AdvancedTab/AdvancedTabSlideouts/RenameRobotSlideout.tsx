@@ -143,6 +143,7 @@ export function RenameRobotSlideout({
       // https://github.com/Opentrons/opentrons/issues/10709
       data.name != null && navigate('/devices')
       dispatch(removeRobot(previousRobotName))
+      // TODO(jj  07/15/2026): preserve ip address in hostsByIp during removal, to prevent having to search for the robot again
       dispatch(startDiscovery())
     },
     onError: (error: Error) => {
