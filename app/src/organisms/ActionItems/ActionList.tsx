@@ -97,5 +97,11 @@ function getCommandTextData(
     }
   }
 
-  return null
+  return {
+    pipettes: [],
+    labware: [],
+    modules: [],
+    liquids: [],
+    commands: documentedCommands,
+  }
 }

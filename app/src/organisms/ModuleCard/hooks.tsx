@@ -15,6 +15,7 @@ import {
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import {
   useCurrentRunId,
@@ -53,7 +54,8 @@ interface LatchControls {
 }
 
 export function useLatchControls(module: AttachedModule): LatchControls {
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const documentationState = useDocumentationState()
+  const { createLiveCommand } = useCreateLiveCommandMutation(documentationState)
   const { reportModuleCommand } = useModuleCommandAnalytics()
   const isLatchClosed =
     module.moduleType === 'heaterShakerModuleType' &&
@@ -134,7 +136,8 @@ export function useModuleOverflowMenu(
   isIncompatibleWithOT3: boolean
 ): ModuleOverflowMenu {
   const { t } = useTranslation(['device_details', 'heater_shaker'])
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const documentationState = useDocumentationState()
+  const { createLiveCommand } = useCreateLiveCommandMutation(documentationState)
   const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { deactivateVacuum, openVent, closeVent } =

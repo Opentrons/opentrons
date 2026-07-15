@@ -18,7 +18,6 @@ import {
 } from '/app/redux/robot-api'
 import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 
-import { useSendIdentifyModule } from '../hooks'
 import { UpdateFirmware } from '../UpdateFirmware'
 
 import type { ComponentProps } from 'react'
@@ -30,7 +29,6 @@ import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/robot-api')
 vi.mock('/app/organisms/ModuleCard/utils')
-vi.mock('/app/organisms/ModuleWizardFlows/hooks.tsx')
 vi.mock('@opentrons/react-api-client')
 
 const LAST_ID = 'lastRequestId'
@@ -75,6 +73,7 @@ describe('UpdateFirmware', () => {
       robotName: ROBOT_NAME,
       maintenanceRunId: '123',
       patchModuleAfterUpdate: vi.fn(),
+      sendIdentifyModule,
     }
     vi.mocked(useModuleApiRequests).mockReturnValue([
       () => LAST_ID,
@@ -87,7 +86,6 @@ describe('UpdateFirmware', () => {
       dispatchApiRequest,
       [LAST_ID],
     ])
-    vi.mocked(useSendIdentifyModule).mockReturnValue(sendIdentifyModule)
   })
 
   afterEach(() => {

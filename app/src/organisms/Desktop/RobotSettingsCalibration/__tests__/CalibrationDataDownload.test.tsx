@@ -56,6 +56,7 @@ describe('CalibrationDataDownload', () => {
     mockDownloadCalibration.mockClear()
     when(useDownloadCalibrationData).calledWith(ROBOT_NAME).thenReturn({
       downloadCalibration: mockDownloadCalibration,
+      isLoading: false,
     })
     when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
   })
