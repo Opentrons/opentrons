@@ -42,6 +42,7 @@ export function UsbSelectionScreen({
           iconName="ot-alert"
           header={t('device_details:no_usb_connected')}
           subText={t('device_details:connect_usb_to_download')}
+          height='100%'
         />
       </div>
     )
