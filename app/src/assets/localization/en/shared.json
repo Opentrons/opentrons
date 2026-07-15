@@ -82,6 +82,7 @@
   "starting": "starting",
   "step": "Step {{current}} / {{max}}",
   "stop": "stop",
+  "submit": "Submit",
   "terminate": "Terminate remote activity",
   "terminate_activity": "Terminate activity",
   "try_again": "try again",
