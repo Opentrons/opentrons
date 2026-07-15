@@ -1,5 +1,4 @@
-import { useCallback, useState } from 'react'
-
+import { useActionsToDocumentList } from './useActionsToDocumentList'
 import { useDocumentationState } from './useDocumentationState'
 
 import type {
@@ -12,13 +11,7 @@ export const useErrorRecoveryDocumentation = (): {
   actionsToDocument: DocumentedAction[]
   addActionToDocument: (action: DocumentedAction) => void
 } => {
-  const [actionsToDocument, setActionsToDocument] = useState<
-    DocumentedAction[]
-  >(['launching_error_recovery'])
-  const addActionToDocument = useCallback((action: DocumentedAction) => {
-    setActionsToDocument(prev => [...prev, action])
-  }, [])
-
+  const [actionsToDocument, addActionToDocument] = useActionsToDocumentList()
   const documentationState = useDocumentationState()
 
   return { documentationState, actionsToDocument, addActionToDocument }

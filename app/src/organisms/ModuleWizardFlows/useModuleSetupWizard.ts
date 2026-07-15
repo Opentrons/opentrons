@@ -24,7 +24,7 @@ import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
 import type { PipetteInformation } from '/app/resources/instruments/types'
-import type { ModuleSetupWizardStep } from './types'
+import type { ModuleSetupWizardStep, SendIdentifyModule } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
 
@@ -56,6 +56,7 @@ export interface UseModuleSetupWizardResult {
     isOnDevice: boolean
     attachedModule: AttachedModule | null
     isExiting: boolean
+    sendIdentifyModule: SendIdentifyModule
   }
   buildFlowForSelectedModule: (module: AttachedModule) => void
   patchModuleAfterUpdate: (module: AttachedModule) => void
@@ -74,7 +75,7 @@ export function useModuleSetupWizard(
   const { closeFlow, attachedModuleOnLaunch, onComplete } = params
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('module_wizard_flows')
-  const sendIdentifyModule = useSendIdentifyModule()
+
   const [state, dispatch] = useReducer(moduleSetupWizardReducer, {
     currentStepIndex: 0,
     currentStep: null,
@@ -112,6 +113,12 @@ export function useModuleSetupWizard(
       actionsToDocument,
       addActionToDocument
     )
+
+  const sendIdentifyModule = useSendIdentifyModule(
+    commandDocState,
+    actionsToDocument,
+    addActionToDocument
+  )
 
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
     useCreateTargetedMaintenanceRunMutation(
@@ -250,6 +257,7 @@ export function useModuleSetupWizard(
     isOnDevice,
     attachedModule,
     isExiting,
+    sendIdentifyModule,
   }
 
   const buildFlowForSelectedModule = (

@@ -14,6 +14,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { OddModal } from '/app/molecules/OddModal'
 import { shutdownRobot } from '/app/redux/robot-admin'
 
@@ -37,7 +38,12 @@ export function ShutdownRobotConfirmationModal({
   }
   const dispatch = useDispatch<Dispatch>()
   const { setLights } = useSetLightsMutation()
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  // TODO(jj): setStatusBar will fail in CRS mode.
+  // We don't want to prompt the user for documentation or require login here
+  // We need to add a new backend endpoint for setStatusBar specifically.
+  const { createLiveCommand } = useCreateLiveCommandMutation(
+    ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+  )
 
   return (
     <OddModal header={modalHeader}>

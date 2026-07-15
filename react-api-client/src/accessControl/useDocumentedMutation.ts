@@ -40,7 +40,10 @@ export const useDocumentedMutation: UseDocumentedMutation = (
   arg3?
 ) => {
   const hasKey = typeof arg1 !== 'function'
-  const mutationFn = (hasKey ? arg2 : arg1) as DocumentedMutationFunction
+  const mutationFn = (hasKey ? arg2 : arg1) as DocumentedMutationFunction<
+    any,
+    any
+  >
   const options = (hasKey ? arg3 : arg2) as UseMutationOptions | undefined
 
   const wrappedMutationFn = useWrappedMutationFn(
@@ -52,14 +55,15 @@ export const useDocumentedMutation: UseDocumentedMutation = (
   return useMutation({
     ...options,
     ...(hasKey ? { mutationKey: arg1 as MutationKey } : {}),
-    mutationFn: wrappedMutationFn,
-  })
+    mutationFn: wrappedMutationFn as MutationFunction<any, any>,
+  }) // Generics are getting lost here but I promise its ok
 }
 
 function useWrappedMutationFn<TData, TVariables>(
   mutationFn: DocumentedMutationFunction<TData, TVariables>,
   documentationState: DocumentationState,
-  actionsToDocument: DocumentedAction[]
+  actionsToDocument:
+    DocumentedAction[] | ((variables: TVariables) => DocumentedAction[])
 ): MutationFunction<TData, TVariables> {
   // using a ref avoids stale mutation functions after a change in the host causes a rerender
   // i.e. when the user is prompted to log in again
@@ -68,9 +72,13 @@ function useWrappedMutationFn<TData, TVariables>(
 
   const wrappedMutationFn = useCallback(
     async (variables: TVariables) => {
+      const actionsToUse =
+        typeof actionsToDocument === 'function'
+          ? actionsToDocument(variables)
+          : actionsToDocument
       return await runMutation(
         documentationState,
-        actionsToDocument,
+        actionsToUse,
         mutationFnRef,
         variables
       )
