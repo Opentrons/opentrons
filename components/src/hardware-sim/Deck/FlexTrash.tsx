@@ -99,9 +99,7 @@ export const FlexTrash = ({
   // DeckLabelSet must stay outside the SVG rotate so its text stays rotated correctly
   // for column 1, place it relative to the trash AABB after the 180degree rotation
   const isRotated = rotateDegrees === '180'
-  const labelX = isRotated
-    ? 2 * rotateXCoord - trashX - xDimension
-    : trashX
+  const labelX = isRotated ? 2 * rotateXCoord - trashX - xDimension : trashX
   const labelY = isRotated
     ? 2 * rotateYCoord - trashY - yDimension - HEIGHT_OF_TAG
     : trashY - HEIGHT_OF_TAG
