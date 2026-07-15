@@ -31,10 +31,6 @@ export function IndividualKey({
     },
   }
   return (
-    /*
-     *  autoUseTouchEvents: for Flex on-device app
-     *  useButtonTag: this is for testing purpose that each key renders as a button
-     */
     <Keyboard
       keyboardRef={r => {
         keyboardRef.current = r
