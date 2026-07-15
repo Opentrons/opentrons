@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 
-import { SmallButton } from '/app/atoms/buttons'
 import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
 
 import styles from './shared.module.css'
@@ -20,12 +19,7 @@ export function ErrorScreen({ subText, onExit }: ErrorScreenProps): JSX.Element 
           type="error"
           header={i18n.format(t('something_went_wrong'), 'capitalize')}
           subText={subText}
-        />
-      </div>
-      <div className={styles.buttons}>
-        <SmallButton
-          buttonText={i18n.format(t('exit'), 'capitalize')}
-          onClick={onExit}
+          height='100%'
         />
       </div>
     </>
