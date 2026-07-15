@@ -5,6 +5,7 @@ import {
   InputField,
   Modal,
   PrimaryButton,
+  SecondaryButton,
   StyledText,
 } from '@opentrons/components'
 
@@ -20,7 +21,7 @@ export interface RobotCertImportModalProps {
 export function RobotCertImportModal(
   props: RobotCertImportModalProps
 ): JSX.Element {
-  const { t } = useTranslation(['device_settings'])
+  const { t } = useTranslation(['device_settings', 'shared'])
   const { requestKeyDisplay, clearKeyDisplay } =
     useUpdateClientDataEncryptionKeys()
   const [requestKey, setRequestKey] = useState<string | null>(null)
@@ -41,46 +42,46 @@ export function RobotCertImportModal(
   })
   const footer = (
     <div className={styles.modal_footer_container}>
-      <PrimaryButton onClick={handleImport.tryImport}>
-        <StyledText>{t('verify')}</StyledText>
+      <SecondaryButton onClick={handleClose}>
+        {t('shared:cancel')}
+      </SecondaryButton>
+      <PrimaryButton
+        onClick={handleImport.tryImport}
+        disabled={
+          handleImport.passwordValue === '' || handleImport.importInProgress
+        }
+      >
+        {t('shared:submit')}
       </PrimaryButton>
     </div>
   )
   // TODO(jj): fix z-index
   return (
     <Modal
-      title={t('robot_encryption_key_verification')}
+      title={t('enter_robot_encryption_key')}
       closeOnOutsideClick={true}
       footer={footer}
       onClose={handleClose}
       zIndexOverlay={10000}
     >
       <div className={styles.robot_cert_import_container}>
-        <div>
-          <StyledText desktopStyle="headingSmallBold">
-            {t('verify_robot_encryption_key')}
-          </StyledText>
-
-          <StyledText desktopStyle="bodyDefaultRegular">
-            {t('verify_the_robot_encryption_key_to_use_the_robot')}
-          </StyledText>
-        </div>
-        <div>
-          <InputField
-            name="robot encryption key"
-            title={t('robot_encryption_key')}
-            onChange={e => {
-              handleImport.setPasswordValue(e.target.value)
-            }}
-            error={
-              handleImport.passwordError != null
-                ? t('invalid_encryption_key_try_again')
-                : null
-            }
-            value={handleImport.passwordValue}
-            autoFocus={true}
-          />
-        </div>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('verify_the_robot_encryption_key_to_use_the_robot')}
+        </StyledText>
+        <InputField
+          name="robot encryption key"
+          title={t('robot_encryption_key')}
+          onChange={e => {
+            handleImport.setPasswordValue(e.target.value)
+          }}
+          error={
+            handleImport.passwordError != null
+              ? t('invalid_encryption_key_try_again')
+              : null
+          }
+          value={handleImport.passwordValue}
+          autoFocus={true}
+        />
       </div>
     </Modal>
   )

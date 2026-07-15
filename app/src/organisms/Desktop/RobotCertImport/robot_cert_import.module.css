@@ -4,6 +4,7 @@
   flex-direction: row;
   justify-content: flex-end;
   padding: var(--spacing-16) var(--spacing-24) var(--spacing-24);
+  gap: var(--spacing-8);
 }
 
 .robot_cert_import_container {
