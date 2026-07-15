@@ -1,7 +1,7 @@
 """Fixture Pump Driver."""
 
 from serial import Serial  # type: ignore[import-untyped]
-from typing import Optional, Protocol
+from typing import Optional, Protocol, Dict, List
 import asyncio
 import logging
 import os
@@ -32,10 +32,12 @@ COMMANDS = {
     "autoOn": "AUTO ON",
     "autoOff": "AUTO OFF",
     "check": "CHECK",
+    "reference": "REFERENCE",
+    "level": "LEVEL",
     "status": "STATUS",
 }
 
-"""Ready. Commands: ON, OFF, AUTO ON, AUTO OFF, CHECK, STATUS"""
+"""Ready. Commands: ON, OFF, AUTO ON, AUTO OFF, CHECK, REFERENCE, LEVEL, STATUS"""
 
 BAUDRATE = 115200
 DEFAULT_V_TIMEOUT = 1
@@ -61,7 +63,7 @@ class AbstractWaterPump(Protocol):
         """Change the state of the Pump to off."""
         ...
 
-    async def check_water_level(self) -> None:
+    async def check_water_level(self) -> float:
         """Check the current water level."""
         ...
 
@@ -111,8 +113,9 @@ class WaterPump(AbstractWaterPump):
         """Change the state of the Pump to on."""
         try:
             command = f"{COMMANDS['pumpOn']}{V_ACK}"
-            await asyncio.to_thread(self.connection.reset_input_buffer)
-            await asyncio.to_thread(self.connection.reset_output_buffer)
+            print(f"{COMMANDS['pumpOn']}{V_ACK}")
+            # await asyncio.to_thread(self.connection.reset_input_buffer)
+            # await asyncio.to_thread(self.connection.reset_output_buffer)
             await self._write(command.encode())
             self._logger.debug("Motor turned on")
         except Exception as e:
@@ -123,8 +126,9 @@ class WaterPump(AbstractWaterPump):
         """Change the state of the Pump to off."""
         try:
             command = f"{COMMANDS['pumpOff']}{V_ACK}"
-            await asyncio.to_thread(self.connection.reset_input_buffer)
-            await asyncio.to_thread(self.connection.reset_output_buffer)
+            print(f"{COMMANDS['pumpOff']}{V_ACK}")
+            # await asyncio.to_thread(self.connection.reset_input_buffer)
+            # await asyncio.to_thread(self.connection.reset_output_buffer)
             await self._write(command.encode())
             self._logger.debug("Motor turned off")
         except Exception as e:
@@ -138,7 +142,7 @@ class WaterPump(AbstractWaterPump):
         try:
             await self.turn_motor_on()
             while time.perf_counter() - loop_st < run_time:
-                await asyncio.sleep(1)
+                await asyncio.sleep(0.5)
             self._logger.info("Water fill timer complete")
         except Exception as e:
             self._logger.error(f"Water fill timer error: {e}")
@@ -146,22 +150,83 @@ class WaterPump(AbstractWaterPump):
         finally:
             await self.turn_motor_off()
 
-    async def check_water_level(self) -> None:
-        """Check the current water level."""
-        command = f"{COMMANDS['CHECK']}{V_ACK}"
+    async def water_fill_auto(self, target: float) -> bool:
+        self._logger.info(
+            f"Starting water fill for target level {target} mm"
+        )
+
+        try:
+            await self.turn_motor_on()
+
+            # Blocks until target level is reached
+            state = await self.limit_water_fill(target)
+
+            self._logger.info("Target water level reached")
+            
+        except Exception as e:
+            self._logger.error(f"Water fill error: {e}")
+            raise
+        finally:
+            await self.turn_motor_off()
+            await asyncio.sleep(1)  # Allow time for the pump to stop
+            return state
+
+    async def limit_water_fill(self, water_level: float) -> bool:
+        """Run the pump for the specified water level in millimeters."""
+        current_water_level = await self.check_water_level()
+        tolerance = 2  # Allowable tolerance in mm
+        try:
+            print(abs(current_water_level - water_level))
+            while abs(current_water_level - water_level) > tolerance:
+                current_water_level = await self.check_water_level()
+                print(f"Current water level: {current_water_level} mm")
+                print(abs(current_water_level - water_level))
+                if current_water_level > water_level:
+                    return True
+
+        except Exception as e:
+            self._logger.error(f"Water level read error: {e}")
+            raise
+        return True
+
+    def parse_water_level_data(self, line: list[str]) -> List[float]:
+        """Convert sensor output lines into a dictionary."""
+        data = []
+        for value in line:
+            try:
+                data.append(float(value))
+            except ValueError:
+                continue
+
+        return data
+
+    async def check_water_level(self) -> float:
+        """Read and parse water level data."""
+        command = f"{COMMANDS['level']}{V_ACK}"
         await self._write(command.encode())
+
         try:
             while True:
-                line = await self._readline()
-                self._logger.info(f"Water level: {line.strip()}")
+                line = (await self._readline()).strip().split(",")
+                if not line:
+                    continue
+
+                self._logger.info(f"Water level: {line}")
+                # Stop after all expected values are received
+                if len(line) >= 6:
+                    break
+
+            return self.parse_water_level_data(line)[len(line)-1]
+
         except Exception as e:
-            self._logger.error(f"Continuous read error: {e}")
+            self._logger.error(f"Water level read error: {e}")
             raise
 
     async def _write(self, data: bytes) -> None:
         """Non-blocking write operation."""
         try:
             # Offload write to another thread to avoid blocking the event loop
+            print(f"Writing data: {data}")
             await asyncio.to_thread(self.connection.write, data)
         except Exception:
             raise
@@ -187,3 +252,36 @@ class WaterPump(AbstractWaterPump):
     def enable_logging(self) -> None:
         """Re-enable logging at DEBUG level."""
         self._logger.setLevel(logging.DEBUG)
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Water Pump Driver")
+    parser.add_argument("--port", type=str, required=True, help="Serial port")
+    parser.add_argument(
+        "--baudrate", type=int, default=BAUDRATE, help="Serial baud rate"
+    )
+    args = parser.parse_args()
+
+    async def main():
+        logging.disable(logging.INFO)  # Disable debug logging for the main function
+        pump = await WaterPump.create(args.port, args.baudrate, asyncio.get_event_loop())
+        await pump.connect()
+        start_time = time.perf_counter()
+        condition = True
+        while condition:
+            data = await pump.check_water_level()
+            elasped_time = time.perf_counter() - start_time
+            print(f"Time: {elasped_time} , {data}")
+            water_reached = await pump.water_fill_auto(18)  # Example target level in mm
+            print(f"Water reached: {water_reached}")
+            if water_reached == True:
+                condition = False
+        # await pump.turn_motor_on()
+        # await asyncio.sleep(1)  # Run the pump for 5 seconds
+        # await pump.turn_motor_off()
+
+        # await pump.disconnect()
+
+    asyncio.run(main())
