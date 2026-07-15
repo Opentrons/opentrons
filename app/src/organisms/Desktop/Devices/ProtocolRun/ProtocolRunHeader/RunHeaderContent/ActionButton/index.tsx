@@ -92,7 +92,6 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
       boxShadow="none"
       display={DISPLAY_FLEX}
       onClick={handleButtonClick}
-      id="ProtocolRunHeader_runControlButton"
       borderRadius={BORDERS.borderRadiusFull}
       gap={buttonIconName != null ? SPACING.spacing8 : 0}
     >

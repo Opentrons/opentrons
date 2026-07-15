@@ -270,7 +270,7 @@ export function RobotSettingsNetworking({
               flexDirection={DIRECTION_COLUMN}
               marginTop={SPACING.spacing16}
             >
-              <ExternalLink href={HELP_CENTER_URL} id="WiredUSB_description">
+              <ExternalLink href={HELP_CENTER_URL}>
                 {t('wired_usb_description')}
               </ExternalLink>
               <LegacyStyledText

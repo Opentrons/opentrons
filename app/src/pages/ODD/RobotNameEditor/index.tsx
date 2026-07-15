@@ -273,7 +273,6 @@ export function RobotNameEditor(): JSX.Element {
                   <TouchInputField
                     autoFocus
                     data-testid="name-robot_input"
-                    id="newRobotName"
                     name="newRobotName"
                     type="text"
                     value={field.value}

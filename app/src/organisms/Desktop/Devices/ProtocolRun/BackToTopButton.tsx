@@ -43,7 +43,7 @@ export function BackToTopButton({
         })
       }}
     >
-      <SecondaryButton id="LabwareSetup_proceedToRunButton">
+      <SecondaryButton>
         {t('back_to_top')}
       </SecondaryButton>
     </Link>

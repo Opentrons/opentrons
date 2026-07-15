@@ -125,7 +125,6 @@ export function UpdateRobotModal({
         css={css`
           font-size: 0.875rem;
         `}
-        id="SoftwareUpdateReleaseNotesLink"
       >
         {t('release_notes')}
       </ExternalLink>

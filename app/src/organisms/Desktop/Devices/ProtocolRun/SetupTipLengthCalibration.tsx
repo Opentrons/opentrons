@@ -33,7 +33,6 @@ export function SetupTipLengthCalibration({
       <LegacyStyledText
         color={COLORS.black90}
         css={TYPOGRAPHY.pSemiBold}
-        id="TipRackCalibration_requiredTipLengthTitle"
       >
         {t('required_tip_racks_title')}
       </LegacyStyledText>

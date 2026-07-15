@@ -191,7 +191,6 @@ export function RenameRobotSlideout({
             name="newRobotName"
             render={({ field, fieldState }) => (
               <InputField
-                id="newRobotName"
                 name="newRobotName"
                 type="text"
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {

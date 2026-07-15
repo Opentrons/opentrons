@@ -50,7 +50,6 @@ export function UsageSettings({
         <LegacyStyledText
           css={TYPOGRAPHY.h2SemiBold}
           marginBottom={SPACING.spacing16}
-          id="AdvancedSettings_UsageSettings"
         >
           {t('usage_settings')}
         </LegacyStyledText>
@@ -69,7 +68,6 @@ export function UsageSettings({
         label="usage_settings_pause_protocol"
         toggledOn={settings?.value === true}
         onClick={handleClick}
-        id="RobotSettings_usageSettingsToggleButton"
         disabled={isRobotBusy}
       />
     </Flex>

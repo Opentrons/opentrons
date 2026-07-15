@@ -77,7 +77,6 @@ export function SetupPipetteCalibrationItem({
               lineHeight={TYPOGRAPHY.lineHeight12}
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
               href={inexactPipetteSupportArticle}
-              id="PipetteCalibration_pipetteMismatchHelpLink"
             >
               {t('learn_more')}
             </Link>
@@ -94,7 +93,7 @@ export function SetupPipetteCalibrationItem({
     button = (
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <RRDLink to={deviceDetailsUrl}>
-          <TertiaryButton id="PipetteCalibration_attachPipetteButton">
+          <TertiaryButton>
             {t('attach_pipette_cta')}
           </TertiaryButton>
         </RRDLink>
@@ -116,7 +115,6 @@ export function SetupPipetteCalibrationItem({
           >
             <TertiaryButton
               disabled={!isDeckCalibrated}
-              id="PipetteCalibration_calibratePipetteButton"
               {...targetProps}
             >
               {t('calibrate_now')}
@@ -143,7 +141,6 @@ export function SetupPipetteCalibrationItem({
       subText={subText}
       label={t(`devices_landing:${mount}_mount`)}
       title={pipetteInfo.pipetteSpecs?.displayName}
-      id={`PipetteCalibration_${mount}MountTitle`}
       runId={runId}
     />
   )

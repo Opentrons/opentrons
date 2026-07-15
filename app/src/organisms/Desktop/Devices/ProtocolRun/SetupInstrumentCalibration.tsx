@@ -66,7 +66,6 @@ export function SetupInstrumentCalibration({
       <LegacyStyledText
         color={COLORS.black90}
         css={TYPOGRAPHY.pSemiBold}
-        id="PipetteCalibration_requiredPipettesTitle"
       >
         {i18n.format(t('required_instrument_calibrations'), 'titleCase')}
       </LegacyStyledText>

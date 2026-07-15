@@ -104,7 +104,6 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           to={`/devices/${name}/protocol-runs/${currentRunId}/${
             currentRunStatus === RUN_STATUS_IDLE ? 'setup' : 'run-preview'
           }`}
-          id={`RobotStatusHeader_${String(name)}_goToRun`}
         >
           <QuaternaryButton>{t('go_to_run')}</QuaternaryButton>
         </Link>
@@ -168,7 +167,6 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           desktopStyle="bodyDefaultRegular"
           color={COLORS.grey60}
           textTransform={TYPOGRAPHY.textTransformUppercase}
-          id={`RobotStatusHeader_${String(name)}_robotModel`}
         >
           {robotModel}
         </StyledText>
@@ -176,7 +174,6 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           <RobotNameContainer isGoToRun={isGoToRun}>
             <StyledText
               desktopStyle="bodyLargeSemiBold"
-              id={`RobotStatusHeader_${String(name)}_robotName`}
               overflow="hidden"
               textOverflow="ellipsis"
             >

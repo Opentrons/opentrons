@@ -48,7 +48,6 @@ export function SetupDeckCalibration({
         <LegacyStyledText
           color={COLORS.black90}
           css={TYPOGRAPHY.pSemiBold}
-          id="DeckCalibration_deckCalibrationTitle"
         >
           {t('deck_calibration_title')}
         </LegacyStyledText>

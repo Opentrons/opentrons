@@ -34,14 +34,12 @@ export function PreviousVersionModal(
         </LegacyStyledText>
         <ExternalLink
           href={UNINSTALL_APP_URL}
-          id="PreviousVersionModal_uninstallingAppLink"
         >
           {t('branded:learn_uninstalling')}
         </ExternalLink>
         <Box marginY={SPACING.spacing8} />
         <ExternalLink
           href={PREVIOUS_RELEASES_URL}
-          id="PreviousVersionModal_previousReleases"
         >
           {t('branded:previous_releases')}
         </ExternalLink>
@@ -50,7 +48,6 @@ export function PreviousVersionModal(
         <PrimaryButton
           marginTop={SPACING.spacing24}
           onClick={props.closeModal}
-          id="PreviousVersionModal_closeButton"
         >
           {t('close')}
         </PrimaryButton>
