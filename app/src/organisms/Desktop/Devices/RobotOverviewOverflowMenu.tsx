@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
 
@@ -30,9 +30,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
-import { RobotCertImportModal } from '/app/organisms/Desktop/RobotCertImport/RobotCertImportModal'
 import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
-import * as Config from '/app/redux/config'
 import { CONNECTABLE, REACHABLE, UNREACHABLE } from '/app/redux/discovery'
 import { restartRobot, shutdownRobot } from '/app/redux/robot-admin'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
@@ -56,12 +54,7 @@ export const RobotOverviewOverflowMenu = (
   props: RobotOverviewOverflowMenuProps
 ): JSX.Element => {
   const { robot } = props
-  const { t } = useTranslation([
-    'devices_landing',
-    'robot_controls',
-    'shared',
-    'device_settings',
-  ])
+  const { t } = useTranslation(['devices_landing', 'robot_controls', 'shared'])
   const {
     menuOverlay,
     handleOverflowClick,
@@ -128,9 +121,6 @@ export const RobotOverviewOverflowMenu = (
     isRobotOnWrongVersionOfSoftware &&
     !isRobotUnavailable &&
     !isEstopNotDisengaged
-  const [showRobotCertImportModal, setShowRobotCertImportModal] =
-    useState<boolean>(false)
-  const devInternalFlags = useSelector(Config.getFeatureFlags)
 
   return (
     <Flex data-testid="RobotOverview_overflowMenu" position={POSITION_RELATIVE}>
@@ -141,16 +131,6 @@ export const RobotOverviewOverflowMenu = (
                 setShowDisconnectModal(false)
               }}
               robotName={robot.name}
-            />,
-            getTopPortalEl()
-          )
-        : null}
-      {showRobotCertImportModal
-        ? createPortal(
-            <RobotCertImportModal
-              onClose={() => {
-                setShowRobotCertImportModal(false)
-              }}
             />,
             getTopPortalEl()
           )
@@ -276,20 +256,6 @@ export const RobotOverviewOverflowMenu = (
           >
             {t('robot_settings')}
           </MenuItem>
-          {!!devInternalFlags.accessControlMode ? (
-            <MenuItem
-              onClick={() => {
-                setShowRobotCertImportModal(true)
-              }}
-              data-testid={`RobotOverviewOverflowMenu_robotCertImport_${String(robot.name)}`}
-              css={css`
-                border-radius: 0 0 ${BORDERS.borderRadius8}
-                  ${BORDERS.borderRadius8};
-              `}
-            >
-              {t('device_settings:verify_robot_encryption_key')}
-            </MenuItem>
-          ) : null}
         </Flex>
       ) : null}
       {robot.status === CONNECTABLE ? (
