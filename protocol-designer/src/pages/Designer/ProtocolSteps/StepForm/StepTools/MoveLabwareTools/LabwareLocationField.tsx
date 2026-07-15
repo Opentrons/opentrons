@@ -168,10 +168,7 @@ export function LabwareLocationField(
   }
 
   const movingLabwareDef = labwareEntities[labware]?.def
-  if (
-    movingLabwareDef != null &&
-    !getIsDeckSlotCompatible(movingLabwareDef)
-  ) {
+  if (movingLabwareDef != null && !getIsDeckSlotCompatible(movingLabwareDef)) {
     unoccupiedLabwareLocationsOptions =
       unoccupiedLabwareLocationsOptions.filter(
         option => !allSlotNames.includes(option.value as AddressableAreaName)

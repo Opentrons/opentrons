@@ -319,7 +319,10 @@ export function SelectLabwareModal(
       const isAdapter96Channel = parameters.loadName === ADAPTER_96_CHANNEL
       const isVacuumCollar = getIsVacuumCollar(labwareDef)
       const isBaseDeckSlot =
-        moduleType == null && !isOnVacuumDock && !isOnHopper && slot !== 'offDeck'
+        moduleType == null &&
+        !isOnVacuumDock &&
+        !isOnHopper &&
+        slot !== 'offDeck'
 
       // for vacuum dock, show collars when empty, filter plates when collar present
       if (isOnVacuumDock) {
