@@ -19,6 +19,7 @@ import {
 
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
 import { Slideout } from '/app/atoms/Slideout'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import type { MouseEventHandler } from 'react'
@@ -37,7 +38,8 @@ export const HeaterShakerSlideout = (
   const { module, onCloseClick, isExpanded } = props
   const { t } = useTranslation('device_details')
   const [hsValue, setHsValue] = useState<number | null>(null)
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const documentationState = useDocumentationState()
+  const { createLiveCommand } = useCreateLiveCommandMutation(documentationState)
   const moduleName = getModuleDisplayName(module.moduleModel)
   const modulePart = t('temperature')
   const { reportModuleCommand } = useModuleCommandAnalytics()

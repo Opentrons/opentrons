@@ -72,3 +72,14 @@ def test_get_supplied_user_notes_returns_none_without_header() -> None:
     response = client.put("/notes", json={"data": "ignored"})
     assert response.status_code == 200
     assert response.json() == {"userNotes": None}
+
+
+def test_get_supplied_user_notes_percent_encoding() -> None:
+    """Clients percent-encode the header; the server must decode it."""
+    client = _build_client()
+    response = client.post(
+        "/notes",
+        headers={USER_NOTES_HEADER: "line%201%0Aline%202%0A%F0%9F%A5%9F"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {"userNotes": "line 1\nline 2\n🥟"}

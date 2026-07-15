@@ -13,14 +13,17 @@ import {
 
 interface UseDownloadCalibrationDataResult {
   downloadCalibration: () => void
+  isLoading: boolean
 }
 
 export function useDownloadCalibrationData(
   robotName: string
 ): UseDownloadCalibrationDataResult {
   const doTrackEvent = useTrackEvent()
-  const { data: attachedInstruments } = useInstrumentsQuery()
-  const { data: attachedModules } = useModulesQuery()
+  const { data: attachedInstruments, isLoading: isLoadingInstruments } =
+    useInstrumentsQuery()
+  const { data: attachedModules, isLoading: isLoadingModules } =
+    useModulesQuery()
 
   const downloadCalibration = (): void => {
     doTrackEvent({
@@ -38,5 +41,8 @@ export function useDownloadCalibrationData(
     )
   }
 
-  return { downloadCalibration }
+  return {
+    downloadCalibration,
+    isLoading: isLoadingInstruments || isLoadingModules,
+  }
 }
