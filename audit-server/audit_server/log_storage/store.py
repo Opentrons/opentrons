@@ -170,8 +170,6 @@ class LogStore:
                 )
                 for user_log in log_period.log_entries
             ]
-            # TODO: As far as I understand it this should be a singular robot log,
-            #   but the ORM model has a list. For labware json/runtime CSVs?
             robot_log_entries = [
                 RobotLogPaths(
                     file_path=robot_log.file_path,
