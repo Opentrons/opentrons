@@ -3,14 +3,15 @@ import { beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { CommandSteps } from '../../CommandSteps'
-import { Controls } from '../../Controls'
+
+import { PlayBackControls } from '../../../molecules/PlayBackControls'
 import { DeckView } from '../../DeckView'
 import { StepDetailContainer } from '../../StepDetailContainer'
 import { ProtocolVisualization } from '../index'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../Controls')
+vi.mock('../../../molecules/PlayBackControls')
 vi.mock('../../StepDetailContainer')
 vi.mock('../../CommandSteps')
 vi.mock('../../DeckView')
@@ -78,7 +79,7 @@ describe('ProtocolVisualization', () => {
       analysis: mockAnalysis,
       groupedCommands: [],
     }
-    vi.mocked(Controls).mockReturnValue(<div>mock Controls</div>)
+    vi.mocked(PlayBackControls).mockReturnValue(<div>mock PlayBackControls</div>)
     vi.mocked(StepDetailContainer).mockReturnValue(
       <div>mock StepDetailContainer</div>
     )
@@ -88,7 +89,7 @@ describe('ProtocolVisualization', () => {
 
   it('should render mock components', () => {
     render(props)
-    screen.getByText('mock Controls')
+    screen.getByText('mock PlayBackControls')
     screen.getByText('mock CommandSteps')
     screen.getByText('mock DeckView')
   })

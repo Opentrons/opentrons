@@ -10,8 +10,8 @@ import {
   getResultingTimelineFrameFromRunCommands,
 } from '@opentrons/step-generation'
 
+import { PlayBackControls } from '../../molecules/PlayBackControls'
 import { CommandSteps } from '../CommandSteps'
-import { Controls } from '../Controls'
 import { DeckView } from '../DeckView'
 import { SlotDetails } from '../SlotDetails'
 import { StepDetailContainer } from '../StepDetailContainer'
@@ -338,19 +338,6 @@ export function ProtocolVisualization(
           }}
         />
         <div className={styles.center_column}>
-          <Controls
-            protocolName={protocolDisplayName}
-            numErrors={analysis.errors.length}
-            numCommandLength={filteredCommands.length}
-            currentCommandIndex={filteredSelectedCommandIndex}
-            setSelectedCommand={setSelectedCommand}
-            handlePlayPause={handlePlayPause}
-            isPlaying={isPlaying}
-            commands={filteredCommands}
-            groupedCommands={groupedCommands}
-            milliSecondsPerFrame={milliSecondsPerFrame}
-            setMilliSecondsPerFrame={setMilliSecondsPerFrame}
-          />
           <DeckView
             filteredCommands={filteredCommands}
             commands={analysis.commands}
@@ -362,6 +349,20 @@ export function ProtocolVisualization(
               setSelectedSlot(slot)
             }}
             selectedRunTimeCommand={selectedRunTimeCommand}
+          />
+          <PlayBackControls
+            isPlaying={isPlaying}
+            handlePlayPause={handlePlayPause}
+            currentCommandIndex={filteredSelectedCommandIndex}
+            numCommandLength={filteredCommands.length}
+            commands={filteredCommands}
+            setSelectedCommand={setSelectedCommand}
+            milliSecondsPerFrame={milliSecondsPerFrame}
+            setMilliSecondsPerFrame={setMilliSecondsPerFrame}
+            // 将来のサイドバー制御をバインド可能
+            onClickStepDetail={() => {
+              console.log('Toggle sidebar action')
+            }}
           />
         </div>
         {/* Gutter between center & right */}

@@ -4,6 +4,7 @@
   height: 100%;
   box-sizing: border-box;
   padding: var(--spacing-16);
+  background-color: var(--grey-10);
 }
 
 .left_column {
@@ -24,6 +25,8 @@
   flex: 1;
   flex-direction: column;
   overflow-y: auto;
+  gap: var(--spacing-40);
+  align-items: center;
 }
 
 .right_column {

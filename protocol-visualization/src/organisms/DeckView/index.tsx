@@ -6,12 +6,10 @@ import {
   DeckFromLayers,
   FixedTrashText,
   FlexTrash,
-  NO_WRAP,
   RobotCoordinateSpaceWithRef,
   SingleSlotFixture,
   SlotLabels,
   StagingAreaFixture,
-  StyledText,
   WasteChuteFixture,
   WasteChuteStagingAreaFixture,
 } from '@opentrons/components'
@@ -151,18 +149,6 @@ export function DeckView(props: DeckViewProps): JSX.Element {
 
   return (
     <div className={styles.deck_view_container}>
-      <div className={styles.header_container}>
-        <StyledText desktopStyle="bodyDefaultSemiBold">
-          {t('deck_view')}
-        </StyledText>
-        <StyledText
-          color={COLORS.grey60}
-          desktopStyle="bodyDefaultRegular"
-          whiteSpace={NO_WRAP}
-        >
-          {t('step', { number: selectedCommandIndex })}
-        </StyledText>
-      </div>
       <div className={styles.body_container}>
         <div className={styles.deck_svg_wrapper}>
           <RobotCoordinateSpaceWithRef
