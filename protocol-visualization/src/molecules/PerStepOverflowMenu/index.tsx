@@ -1,7 +1,4 @@
-import { useTranslation } from 'react-i18next'
-
 import { MenuItem, MenuList, useOnClickOutside } from '@opentrons/components'
-
 import styles from './perstepoverflowmenu.module.css'
 
 interface PerStepOverflowMenuProps {
@@ -9,13 +6,17 @@ interface PerStepOverflowMenuProps {
   setMilliSecondsPerFrame: (secondsPerFrame: number) => void
 }
 
-const PER_STEP_OPTIONS = [0.25, 0.5, 1, 2, 3]
+const PLAYBACK_SPEED_OPTIONS = [
+  { label: '4x', seconds: 0.25 },
+  { label: '2x', seconds: 0.5 },
+  { label: '1x', seconds: 1.0 },
+  { label: '0.5x', seconds: 2.0 },
+  { label: '0.33x', seconds: 3.0 },
+]
 
-// This will be removed when replacing Controls with PlayBackControls
 export function PerStepOverflowMenu(
   props: PerStepOverflowMenuProps
 ): JSX.Element {
-  const { t } = useTranslation('protocol_visualization')
   const { setShowPerStepOverflowMenu, setMilliSecondsPerFrame } = props
   const perStepOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
@@ -31,14 +32,14 @@ export function PerStepOverflowMenu(
   return (
     <div ref={perStepOverflowWrapperRef} className={styles.container}>
       <MenuList>
-        {PER_STEP_OPTIONS.map(seconds => (
+        {PLAYBACK_SPEED_OPTIONS.map(option => (
           <MenuItem
-            key={seconds}
+            key={option.seconds}
             onClick={() => {
-              handleClick(seconds)
+              handleClick(option.seconds)
             }}
           >
-            {t('seconds_per_step', { seconds })}
+            {option.label}
           </MenuItem>
         ))}
       </MenuList>

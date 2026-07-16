@@ -234,6 +234,15 @@ module.exports = {
       },
     },
     {
+      files: ['./protocol-visualization/src/**/*.@(ts|tsx)'],
+      rules: {
+        'opentrons/no-imports-up-the-tree-of-life': 'warn',
+        'opentrons/no-margins-in-css': 'warn',
+        'opentrons/no-margins-inline': 'warn',
+        '@eslint-react/no-nested-component-definitions': 'error',
+      },
+    },
+    {
       files: ['**/*.tsx'],
       excludedFiles: ['**/*.stories.tsx'],
       rules: {
