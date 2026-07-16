@@ -113,7 +113,7 @@ export function PlayBackControls(props: PlayBackControlsProps): JSX.Element {
           <StyledText desktopStyle='captionRegular'>{formatTime(totalSeconds, false)}</StyledText>
         </div>
 
-        {/* 倍率設定 (スピード変更) */}
+        {/* speed switch */}
         <div className={styles.speed_wrapper}>
           <button
             type="button"
