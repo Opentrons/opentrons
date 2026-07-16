@@ -44,7 +44,7 @@ Unnamed box 1 includes deck pieces like the manifold base along with collars and
 
 <figure markdown>
 ![Vacuum manifold base](images/vacuum-module-base.svg "Manifold base")
-<figcaption>(1) Vacuum base</figcaption>
+<figcaption>(1) Vacuum manifold base</figcaption>
 </figure>
 
 </div>
