@@ -8,15 +8,18 @@ import { GET, request } from '@opentrons/api-client'
 import { ERROR_TOAST, INFO_TOAST } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
+// eslint-disable-next-line opentrons/no-imports-across-applications
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useRobot } from '/app/redux-resources/robots'
 import { CONNECTABLE } from '/app/redux/discovery'
+import { saveFileToUsb } from '/app/redux/shell/remote'
 
 import type { IconProps } from '@opentrons/components'
 
 interface UseDownloadRobotLogsResult {
-  downloadLogs: () => void
+  downloadLogs: (usbPath?: string) => Promise<void>
   isDownloading: boolean
+  hasError: boolean
   canDownload: boolean
 }
 
@@ -28,6 +31,7 @@ export function useDownloadRobotLogs(
   const host = useHost()
   const { makeToast, eatToast } = useToaster()
   const [isDownloading, setIsDownloading] = useState(false)
+  const [hasError, setHasError] = useState(false)
   const isMounted = useRef(false)
 
   useEffect(() => {
@@ -40,10 +44,15 @@ export function useDownloadRobotLogs(
   const canDownload =
     robot?.status === CONNECTABLE && robot?.health?.logs != null
 
-  const downloadLogs = (): void => {
-    if (!canDownload || host == null || robot?.health?.logs == null) return
+  const downloadLogs = (usbPath?: string): Promise<void> => {
+    if (!canDownload || host == null || robot?.health?.logs == null) {
+      return Promise.reject(
+        new Error('Unable to download robot logs: robot is not connectable')
+      )
+    }
 
     setIsDownloading(true)
+    setHasError(false)
     const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
     const toastId = makeToast(t('downloading_logs') as string, INFO_TOAST, {
       disableTimeout: true,
@@ -51,40 +60,43 @@ export function useDownloadRobotLogs(
     })
 
     const zip = new JSZip()
-    Promise.all(
+    return Promise.all(
       robot.health.logs.map(log => {
         const logFileName = last(log.split('/')) ?? 'robot.log'
         return request<string>(GET, log, host)
           .then(res => {
             zip.file(logFileName, res.data)
           })
-          .catch((e: Error) =>
+          .catch((e: Error) => {
             makeToast(e.message, ERROR_TOAST, { closeButton: true })
-          )
+          })
       })
     )
-      .then(() =>
-        zip
-          .generateAsync({ type: 'blob' })
-          .then(blob => {
-            saveAs(blob, `${robotName}_logs.zip`)
-          })
-          .catch((e: Error) => {
-            eatToast(toastId)
-            makeToast(e.message, ERROR_TOAST, { closeButton: true })
-            if (isMounted.current) setIsDownloading(false)
-          })
-      )
+      .then(() => zip.generateAsync({ type: 'arraybuffer' }))
+      .then(async buffer => {
+        const filename = `${robotName}_logs.zip`
+        if (usbPath != null) {
+          await saveFileToUsb(`${usbPath}/${filename}`, buffer)
+        } else {
+          saveAs(new Blob([buffer]), filename)
+        }
+      })
       .then(() => {
         eatToast(toastId)
-        if (isMounted.current) setIsDownloading(false)
+        if (isMounted.current) {
+          setIsDownloading(false)
+        }
       })
       .catch((e: Error) => {
         eatToast(toastId)
         makeToast(e.message, ERROR_TOAST, { closeButton: true })
-        if (isMounted.current) setIsDownloading(false)
+        if (isMounted.current) {
+          setHasError(true)
+          setIsDownloading(false)
+        }
+        throw e
       })
   }
 
-  return { downloadLogs, isDownloading, canDownload }
+  return { downloadLogs, isDownloading, hasError, canDownload }
 }

@@ -32,6 +32,7 @@
   "launching_error_recovery": "Launching error recovery",
   "left_mount": "left mount",
   "lpc_flow": "Launching labware position check",
+  "pause_run": "Pausing protocol run",
   "pipette_wizard_flow": "{{flowtype}} {{pipette}} pipette on {{mount}}",
   "place_plate_reader_lid": "Placing plate reader lid",
   "play_run": "Playing protocol",
