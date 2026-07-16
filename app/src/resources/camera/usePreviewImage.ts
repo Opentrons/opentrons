@@ -6,6 +6,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import type { CameraImageSettings } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 
 export interface UsePreviewImageResult {
   imgPath: string | null
@@ -15,7 +16,8 @@ export interface UsePreviewImageResult {
 
 export function usePreviewImage(
   settings: CameraImageSettings,
-  runId: string | null
+  runId: string | null,
+  documentationState: DocumentationState
 ): UsePreviewImageResult {
   const [imageBlob, setImageBlob] = useState<Blob | null>(null)
   const capturePreviewImageCbs = {
@@ -28,7 +30,7 @@ export function usePreviewImage(
       console.error('Failed to capture preview image', error)
     },
   }
-  const capturePreviewImage = useCapturePreviewImage()
+  const capturePreviewImage = useCapturePreviewImage(documentationState)
   const capturePreviewImageToRun = useCapturePreviewImageToRun(runId ?? '')
 
   const takePhoto = (): void => {

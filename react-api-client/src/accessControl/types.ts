@@ -152,6 +152,8 @@ type AuditLogAction =
   | 'retry_action'
   | 'shutdown_robot'
   | 'update_robot_name'
+  | 'capture_preview_image'
+  | 'create_camera_image_settings'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.

@@ -7,6 +7,8 @@
   "attach_pipette_left": "Launching attach pipette on left mount flow",
   "attach_pipette_right": "Launching attach pipette on right mount flow",
   "calibrate": "Calibrating",
+  "capture_preview_image": "Capturing preview image",
+  "create_camera_image_settings": "Updating camera image settings",
   "create_protocol": "Creating protocol",
   "detach": "Detaching",
   "detach_gripper": "Detaching gripper",
