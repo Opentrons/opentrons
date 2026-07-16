@@ -127,7 +127,8 @@ class RunProcessPyroProvider:
                 process_name,
             ],
             env={k: v for k, v in os.environ.items()},
-            user="ot-protocol",
+            # todo(chb, 2026-07-16): The determination for what 'user' to boot under needs to be set outside of this logic and passed in here when the run is made.
+            # user="ot-protocol",
         )
 
     @staticmethod
