@@ -148,6 +148,7 @@ module.exports = {
         './app/src/**/*.@(ts|tsx)',
         './opentrons-ai-client/src/**/*.@(ts|tsx)',
         './protocol-designer/src/**/*.@(ts|tsx)',
+        './protocol-visualization/src/**/*.@(ts|tsx)',
       ],
       rules: {
         'import/no-absolute-path': 'off',

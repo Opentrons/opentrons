@@ -47,6 +47,10 @@ export function PlayBackControls(props: PlayBackControlsProps): JSX.Element {
     id: string
     value: number
   }): void => {
+    if (numCommandLength <= 1) {
+      return
+    }
+
     const normalizedValue = updatedTrack.value / 100
     const nextIndex = Math.min(
       Math.max(Math.round(normalizedValue * (numCommandLength - 1)), 0),
@@ -63,7 +67,7 @@ export function PlayBackControls(props: PlayBackControlsProps): JSX.Element {
   const totalSeconds = numCommandLength >= 0 ? numCommandLength : 0
   const forceHours = totalSeconds >= 3600
   const currentProgress =
-    numCommandLength > 0
+    numCommandLength > 1
       ? (currentCommandIndex / (numCommandLength - 1)) * 100
       : 0
   const tracks = [
@@ -137,7 +141,7 @@ export function PlayBackControls(props: PlayBackControlsProps): JSX.Element {
       <div className={styles.divider} />
       {/* right edge */}
       <div className={styles.controls_right}>
-        <button type="button" onClick={() => { }} className={styles.icon_button} >
+        <button type="button" onClick={() => { }} className={styles.icon_button} aria-label={t('step_details')} >
           <Icon name="step-detail" size="1rem" />
         </button>
       </div>

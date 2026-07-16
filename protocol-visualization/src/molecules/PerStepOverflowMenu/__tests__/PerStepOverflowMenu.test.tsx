@@ -34,7 +34,7 @@ describe('PerStepOverflowMenu', () => {
     screen.getByText('0.33x')
   })
 
-  it('calls the setSelectedPerdStep function when clicking the 1 second per step button', () => {
+  it('calls the setSelectedPerdStep function when clicking the 1x per step button', () => {
     render(props)
     fireEvent.click(screen.getByText('1x'))
     expect(mockSetMilliSecondsPerFrame).toHaveBeenCalledWith(1000)
