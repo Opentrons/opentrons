@@ -8,6 +8,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { CameraSettings } from '/app/organisms/ODD/CameraSettings'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -23,6 +24,13 @@ vi.mock('/app/molecules/ODDBackButton')
 vi.mock('/app/redux/protocol-runs')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ToasterOven')
+vi.mock(
+  '/app/local-resources/access-control/useLinkedDocumentationState',
+  () => ({
+    useLinkedDocumentationState: () =>
+      ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+  })
+)
 
 const render = (props: ProtocolSetupCameraProps) => {
   return renderWithProviders(<ProtocolSetupCamera {...props} />, {

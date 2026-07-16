@@ -152,6 +152,10 @@ type AuditLogAction =
   | 'retry_action'
   | 'shutdown_robot'
   | 'update_robot_name'
+  | 'capture_preview_image'
+  | 'create_camera_image_settings'
+  | 'update_camera'
+  | 'update_camera_settings_for_run'
   | 'pause_run'
 
 /**
