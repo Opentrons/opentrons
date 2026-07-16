@@ -23,6 +23,8 @@ from api.utils.sync_api_docs import (
     sync_api_docs,
 )
 
+from tests.helpers.synced_docs import require_synced_api_docs
+
 
 @pytest.mark.unit
 def test_parse_api_level_from_mkdocs_yml() -> None:
@@ -169,8 +171,7 @@ def test_assert_curation_coverage_raises_on_gaps(tmp_path: Path) -> None:
 @pytest.mark.unit
 def test_synced_api_docs_have_full_curation_coverage() -> None:
     """Every synced markdown doc must have a curated entry in api_docs_struct_about.md."""
-    if not DOCS_V2_DIR.is_dir():
-        pytest.skip("Synced API docs not present; run make sync-api-docs first.")
+    require_synced_api_docs()
 
     assert CURATED_ABOUT_PATH.is_file(), f"Missing curated about file: {CURATED_ABOUT_PATH}"
 

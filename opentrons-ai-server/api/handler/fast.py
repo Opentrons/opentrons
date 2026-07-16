@@ -45,7 +45,6 @@ from api.models.update_protocol import UpdateProtocol
 from api.models.user import User
 from api.services.file_processor import FileProcessor
 from api.settings import Settings, get_settings
-
 settings: Settings = get_settings()
 setup_logging(json_logs=settings.json_logging, log_level=settings.log_level.upper())
 

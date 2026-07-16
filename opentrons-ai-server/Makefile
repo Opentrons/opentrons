@@ -5,8 +5,12 @@ include ../scripts/python-uv.mk
 # Pin the Python API docs release synced into LLM context. Bump when publishing new mkdocs tags.
 DOCS_TAG ?= mkdocs-2026-06-02
 
+.PHONY: ensure-synced-api-docs
+ensure-synced-api-docs:
+	@test -d api/storage/api_docs/docs/v2 || $(MAKE) sync-api-docs
+
 .PHONY: check-api-docs-curation
-check-api-docs-curation:
+check-api-docs-curation: ensure-synced-api-docs
 	$(python) -m api.utils.api_docs_struct_curated --check
 
 .PHONY: sync-api-docs
@@ -63,7 +67,7 @@ gen-env:
 	$(python) -m api.settings
 
 .PHONY: unit-test
-unit-test:
+unit-test: ensure-synced-api-docs
 	$(pytest) tests -m unit
 
 .PHONY: gen-requirements
