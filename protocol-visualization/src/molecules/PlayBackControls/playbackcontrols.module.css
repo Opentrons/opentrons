@@ -31,12 +31,12 @@
 
 /* to prevent the :horizontal shift */
 .time_current {
-  min-width: 65px;
+  min-width: 4.0625rem;
   text-align: right;
 }
 
 .time_total {
-  min-width: 65px;
+  min-width: 4.0625rem;
   text-align: left;
 }
 
@@ -68,9 +68,7 @@
 .divider {
   width: 1px;
   height: 2rem;
-  background-color: var(--border-color-gray, #e1e1e1);
-
-  /* margin: 0 var(--spacing-20); */
+  background-color: var(--grey-30);
 }
 
 .controls_right {
