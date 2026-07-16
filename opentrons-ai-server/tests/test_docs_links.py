@@ -13,17 +13,13 @@ from tests.helpers.synced_docs import require_synced_api_docs
 @pytest.mark.unit
 def test_doc_href_to_production_url_for_relative_markdown_path() -> None:
     assert (
-        doc_href_to_production_url("modules/flex-stacker.md", "index.md")
-        == "https://docs.opentrons.com/python-api/modules/flex-stacker/"
+        doc_href_to_production_url("modules/flex-stacker.md", "index.md") == "https://docs.opentrons.com/python-api/modules/flex-stacker/"
     )
 
 
 @pytest.mark.unit
 def test_doc_href_to_production_url_resolves_same_directory_links() -> None:
-    assert (
-        doc_href_to_production_url("loading.md", "pipettes/index.md")
-        == "https://docs.opentrons.com/python-api/pipettes/loading/"
-    )
+    assert doc_href_to_production_url("loading.md", "pipettes/index.md") == "https://docs.opentrons.com/python-api/pipettes/loading/"
 
 
 @pytest.mark.unit
@@ -36,10 +32,7 @@ def test_doc_href_to_production_url_resolves_parent_directory_links() -> None:
 
 @pytest.mark.unit
 def test_doc_href_to_production_url_maps_flex_docs_outside_python_api() -> None:
-    assert (
-        doc_href_to_production_url("../flex/installation/index.md", "tutorial.md")
-        == "https://docs.opentrons.com/flex/installation/"
-    )
+    assert doc_href_to_production_url("../flex/installation/index.md", "tutorial.md") == "https://docs.opentrons.com/flex/installation/"
 
 
 @pytest.mark.unit
@@ -59,10 +52,7 @@ def test_doc_href_to_production_url_leaves_absolute_links() -> None:
 @pytest.mark.unit
 def test_rewrite_parent_index_link_to_docs_home() -> None:
     text = "See [other docs](../index.md)."
-    assert (
-        rewrite_markdown_doc_links(text, "index.md")
-        == "See [other docs](https://docs.opentrons.com/)."
-    )
+    assert rewrite_markdown_doc_links(text, "index.md") == "See [other docs](https://docs.opentrons.com/)."
 
 
 @pytest.mark.unit

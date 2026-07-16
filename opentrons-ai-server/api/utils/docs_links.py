@@ -169,9 +169,7 @@ def audit_synced_doc_links(docs_root: Path) -> SyncedDocLinkAudit:
             unrewritten_relative_links.append((source_relpath, href))
         if is_invalid_production_docs_url(href):
             invalid_production_doc_links.append((source_relpath, href))
-        if href.startswith(f"{OPENTRONS_PYTHON_API_DOCS_ORIGIN}/") or href.startswith(
-            f"{OPENTRONS_DOCS_ORIGIN}/flex/"
-        ):
+        if href.startswith(f"{OPENTRONS_PYTHON_API_DOCS_ORIGIN}/") or href.startswith(f"{OPENTRONS_DOCS_ORIGIN}/flex/"):
             production_doc_urls.add(href)
 
     return SyncedDocLinkAudit(
@@ -188,7 +186,7 @@ def check_production_docs_url(url: str, timeout: float = 20.0) -> int | None:
         request = urllib.request.Request(url, method=method, headers=headers)
         try:
             with urllib.request.urlopen(request, timeout=timeout) as response:
-                return response.status
+                return int(response.status)
         except urllib.error.HTTPError as exc:
             if method == "HEAD" and exc.code in (403, 405):
                 continue
