@@ -57,6 +57,7 @@ TARGET_REACHED_POLL_PERIOD = 0.5
 PRESSURE_COMPARISON_WINDOW_SIZE = 5
 POWER_COMPARISON_WINDOW_SIZE = 5
 PRESSURE_TOL = 5.0
+UNDER_VACUUM_PRESSURE_OFFSET = 100
 POWER_TOL = 1.0
 
 
@@ -270,7 +271,9 @@ class VacuumModule(mod_abc.AbstractModule):
         avg_pressure = (state.pressure_abs_a + state.pressure_abs_b) / 2
         return math.isclose(
             state.pressure_abs_a, state.pressure_abs_b, abs_tol=PRESSURE_TOL
-        ) and not math.isclose(avg_pressure, atm_pressure, abs_tol=PRESSURE_TOL)
+        ) and not math.isclose(
+            avg_pressure, atm_pressure, abs_tol=UNDER_VACUUM_PRESSURE_OFFSET
+        )
 
     @property
     def total_cycle_count(self) -> Optional[int]:
