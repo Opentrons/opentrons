@@ -3,52 +3,79 @@ title: "Vacuum Module: Installation"
 description: "Installing the Vacuum Module on a Flex robot."
 ---
 
-Follow these instructions to install the Vacuum Module.
+The Vacuum Module ships in three separate boxes. One contains the vacuum pump and deck plate, another holds the waste jar and hoses, and the third includes individual deck pieces (e.g., manifold, collars, and spacers). The boxes that hold the waste jar and pump unit also include additional parts. Together, the parts boxes include everything you need to assemble and use the Vacuum Module. Follow these instructions to get started.
 
 !!! warning
-    Turn off the power to the Flex before beginning the installation process. This prevents the robot from operating unexpectedly during setup.
+    Turn off the power to the Flex before beginning the installation process. This prevents the robot from operating unexpectedly during setup and allows the gantry to move freely.
 
 <div class="instruction-list" markdown>
 
-## Part X: Unboxing
+## Part 1: Unboxing
 
-Open boxes. Inner box wrapped with a blue protective shipping bag. Parts are sealed in a blue protective shipping bags. Cut bag and remove any foam padding and then the box containing your parts. The box with the waste jar includes region-specific IEC power cable in its own small box.
+1. Open the shipping boxes.
 
-- Open external boxes
-- Cut open and remove any padding material
-- Removed inner boxes containing vacuum module parts.
+2. Cut open and remove any shipping material and padding protecting the internal boxes that contain the component parts to your module.
 
-## Part N: Deck components
+3. Remove the inner boxes from the shipping boxes.
 
-1. Clear the deck of all modules and labware to give yourself sufficient room to work.
+    !!! note
+        The vacuum hoses, and attached connectors, ship in the box that holds the waste collection jar. You can find the hoses wrapped around the specially shaped foam padding on the bottom of their box.
 
-2. Remove the trash bin (if installed) and any modules, labware, deck adapters, or plates from slots A3–A4.
+## Part 2: Deck hardware assembly
+
+3. Clear the deck of all modules and labware. With the robot powered off, you can also gently move the gantry aside to give yourself room to work.
+
+4. Remove the trash bin (if installed) or any modules, labware, and plates from slots A3–A4.
 
     <figure markdown>
     ![Deck map with sots A3 and A4 highlighted](images/deck-map.png)
     <figcaption>The Vacuum Module installs in slots A3–A4.</figcaption>
     </figure>
 
-3. Install the Vacuum Module deck adapter in slots A3–A4 only. Fasten the adapter to the deck with the original screws or use the screws provided with the module.
+5. Remove the deck adapter and the small bag of manifold screws from their packaging. You will use the included screwdriver and screws to fasten the vacuum base to the deck adapter before placing it on the robot.
 
-4. Set the vacuum base on the deck adapter in slot A3.
+<font color="red">Image: show base and screws</font>
 
-5. Attach the L-shaped 6 mm (&frac14;") quick connect to the corresponding fitting on the base plate. The quick connect fittings lock into place with an audible click.
+6. Remove the vacuum base from its packaging.
 
-<!-- Images won't center or render without left justify?!? -->
-<figure class="screenshot side-by-side" markdown>
-![Manifold fitting disconnected](images/fitting-disconnected.svg)
-![Manifold fitting connected](images/fitting-connected.svg)
-</figure>
+    <figure markdown>
+    ![Image placeholder](images/vacuum-module-base.svg)
+    <figcaption>manifold base</figcaption>
+    </figure>
 
-6. Run the hose from the manifold through the notch on the side of the deck plate adapter into the space below the deck. This area keeps cables, tubes, hoses, and other module connections from cluttering the deck.
+7. Place the vacuum base in the recessed slot on the deck adapter.
+
+    <figure markdown>
+    ![Image placeholder](images/parts_placeholder.png)
+    <figcaption>show base in deck plate adapter</figcaption>
+    </figure>
+
+8. Insert the 4 screws through the holes from the bottom of the deck adapter and tighten them securely into the vacuum base using the supplied 7/64" screwdriver (the vacuum base does not use metric threads).
+
+    <figure markdown>
+    ![Image placeholder](images/parts_placeholder.png)
+    <figcaption>Need to show manifold, plate, and screws going in from underneath</figcaption>
+    </figure>
+
+    !!! note
+        The deck adapter holes are unthreaded. The screws pass through these openings from underneath the adapter to engage with threaded holes in the vacuum base. Complete this step off-deck before mounting the assembled unit to the robot.
+
+9. Set the assembled piece (deck adapter and attached vacuum base) in slot A3–A4. Align the this piece so vacuum base occupies slot A3. The raised part of the adapter (the "dock") occupies slot A4.
+
+10. Using a 2.5 mm screwdriver, fasten the deck adapter to the deck with the original screws or the deck screws provided with the module.
+
+10. Press the L-shaped 6 mm (&frac14;") quick connect fitting into the exhaust manifold on the base plate. The quick connect fittings lock into place with an audible click.
+
+<font color="red">Image placeholder: show before and after L-shaped quick connect</font>
+
+11. Run the hose from the exhaust manifold through the notch on the side of the deck plate adapter into the space below the deck. This area keeps cables, tubes, hoses, and other module connections from cluttering the deck.
 
     <figure markdown>
     ![Deck plate with magnified image of vacuum hose notch](images/deck-plate-notch.png){ width="80%" }
     <figcaption>Adapter notch provides below-deck access for the vacuum hose.</figcaption>
     </figure>
 
-7.  Remove a lower cosmetic side panel on the robot and bring the remaining hose section through this opening. From here, you can connect the hose to the waste collection jar.
+12.  Remove a lower cosmetic side panel on the robot and bring the remaining hose section through this opening. From here, you can connect the hose to the waste collection jar.
 
     <figure class="screenshot" markdown>
     ![Flex with a single lower cosmetic panel removed. Shows vacuum hose exiting robot.](images/flex-lower-side-panel.png)
@@ -57,23 +84,23 @@ Open boxes. Inner box wrapped with a blue protective shipping bag. Parts are sea
 
 ## Part 2: Carboy and vacuum hose connections
 
-8. Place the Control Box on or below your workbench.
+13. Place the Control Box on or below your workbench.
 
-9. Put the waste jar in the support cradle and place it on the workbench at or below the same level as the Control Box.
+14. Put the waste jar in the support cradle and place it on the workbench at or below the same level as the Control Box.
 
-10. Place the cap on the waste jar and hand tighten it. Do not over-tighten the cap; this is not a trial of strength.
+15. Place the cap on the waste jar and hand tighten it. Do not over-tighten the cap; this is not a trial of strength.
 
-11. Attach the free end of the 6 mm (&frac14;") quck connect on the vacuum tube into the quick connect fitting on the cap. You can cut the tubing to length as needed.
+16. Attach the free end of the 6 mm (&frac14;") quick connect on the vacuum tube into the quick connect fitting on the cap. You can cut the tubing to length if needed.
 
-12. Attach the 9.5 mm (&frac38;") vacuum hose and coupling inserts into the connector on the cap and on the Control Box. You can cut the tubing to length as needed.
+17. Attach the 9.5 mm (&frac38;") vacuum hose and coupling inserts into the connector on the cap and on the Control Box. You can cut the tubing to length if needed.
 
 ## Part 3: Data and power connections
 
-13. Connect the USB cable to the USB port on the Control Box and to an available USB port on the side of your Flex.
+18. Connect the USB cable to the USB port on the Control Box and to an available USB port on the side of your Flex.
 
-14. Connect the power cable to the Control Box power inlet and plug it into a power outlet.
+19. Connect the power cable to the Control Box power inlet and and into a power outlet.
 
-15. Turn on the power to the Flex. After the robot reboots, then power on the Vacuum Module. The LED status light on the Control Box illuminates <font color="red"><strong>LED STATUS LIGHT CONDITION HERE</strong></font> when the module is ready for use.
+20. Turn on the power to the Flex. After the robot reboots, then power on the Vacuum Module. The LED status light on the Control Box illuminates <font color="red"><strong>LED STATUS LIGHT CONDITION HERE</strong></font> when the module is ready for use.
 
 </div>
 
