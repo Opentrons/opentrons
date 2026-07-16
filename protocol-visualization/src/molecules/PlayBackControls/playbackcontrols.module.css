@@ -58,8 +58,6 @@
   background: none;
   color: var(--text-color-black, #1d1d1d);
   cursor: pointer;
-  font-size: 16px;
-  font-weight: 600;
   outline: none;
   user-select: none;
 }

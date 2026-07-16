@@ -120,7 +120,9 @@ export function PlayBackControls(props: PlayBackControlsProps): JSX.Element {
             className={styles.speed_button}
             onClick={handlePerStepOverflowClick}
           >
-            {getSpeedMultiplierText(milliSecondsPerFrame)}
+            <StyledText desktopStyle='captionSemiBold'>
+              {getSpeedMultiplierText(milliSecondsPerFrame)}
+            </StyledText>
           </button>
 
           {showPerStepOverflowMenu && (
