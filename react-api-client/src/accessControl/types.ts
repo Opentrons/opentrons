@@ -153,6 +153,7 @@ type AuditLogAction =
   | 'shutdown_robot'
   | 'update_robot_name'
   | 'pause_run'
+  | 'update_deck_configuration'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.

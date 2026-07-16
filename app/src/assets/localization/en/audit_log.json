@@ -1,6 +1,6 @@
 {
   "96_channel": "96 channel",
-  "add_module": "Adding module to deck configuration",
+  "add_module": "Launching module setup flow",
   "attach": "Attaching",
   "attach_gripper": "Attaching gripper",
   "attach_module": "Launching setup flow for {{module}}",
@@ -41,5 +41,6 @@
   "shutdown_robot": "Shutting down robot",
   "single_channel_and_8_channel": "single channel or 8 channel",
   "stop_run": "Stopping protocol run",
+  "update_deck_configuration": "Updating deck configuration",
   "update_robot_name": "Updating robot name"
 }
