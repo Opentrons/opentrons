@@ -63,10 +63,11 @@ async def download_log_period(
 
     zip_file_name = persistence_dir / "log_period.zip"
     with zipfile.ZipFile(zip_file_name, mode="w") as zh:
-        zh.write(user_log_path)
-        zh.write(pem_key_path)
+        zh.write(user_log_path, arcname=user_log_path.name)
+        zh.write(pem_key_path, arcname=pem_key_path.name)
         for robot_log in periods.robot_log_entries:
-            zh.write(robot_log.file_path)
+            robot_log_path = Path(robot_log.file_path)
+            zh.write(robot_log_path, arcname=robot_log_path.name)
 
     def cleanup_files() -> None:
         os.remove(user_log_path)
