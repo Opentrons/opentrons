@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import { useSelector } from 'react-redux'
 
 import { useRobotSettingsQuery } from '@opentrons/react-api-client'
 
@@ -11,7 +10,6 @@ import {
 } from '/app/redux/discovery'
 
 import type { RobotAnalyticsData } from '/app/redux/analytics/types'
-import type { State } from '/app/redux/types'
 
 const FF_PREFIX = 'robotFF_'
 

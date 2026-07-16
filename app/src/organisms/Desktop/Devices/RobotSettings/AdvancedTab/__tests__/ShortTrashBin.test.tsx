@@ -1,6 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
