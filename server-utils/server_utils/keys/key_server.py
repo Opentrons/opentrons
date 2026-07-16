@@ -106,11 +106,11 @@ class LocalHTTPClient(Client):
     @typing.override
     async def get_key_and_hash(self) -> PublicKeyAndHash:
         async with self._session.get(PUBLIC_KEY_ENDPOINT_PATH) as response:
-            response = await response.json()
+            response_json = await response.json()
         response.raise_for_status()
         return PublicKeyAndHash(
-            publicKey=response["data"]["publicKeyPem"],
-            publicHash=response["data"]["hashedKey"],
+            publicKey=response_json["data"]["publicKeyPem"],
+            publicHash=response_json["data"]["hashedKey"],
         )
 
 
