@@ -11,7 +11,12 @@ Tiers (independently selectable via the ``--tier`` pytest option):
   (:func:`_object_setup_for`) and a preemptive ``pick_up_tip()`` for any
   pipette it uses tip-less (:func:`_tip_setup_for`). A ``continue-previous``
   fragment reuses the prior fragment's namespace, so its case replays the
-  whole chain in one context.
+  whole chain in one context. Every fragment also gets a throwaway
+  ``parameters`` object (a real ``ParameterContext``), so a snippet written
+  for ``add_parameters()`` scope can run standalone; a page's own
+  ``params-template`` snippet additionally gets replayed against a *separate*
+  ``ParameterContext`` whose export becomes that page's ``protocol.params``,
+  so fragments written for ``run()`` scope see real parameter values.
 
 Every simulated context created here (Tier 2's OT-2 branch and all of Tier 3)
 is torn down with :func:`_release_simulated_context` right after use. Nothing
@@ -62,6 +67,9 @@ class SnippetCase:
     test_id: str
     api_version: str  # macro apiLevel of the snippet's page, for header synthesis
     page_seed: str | None = None  # page-template setup exec'd after the base template
+    params_seed: str | None = (
+        None  # params-template add_parameters() code exec'd against a real ParameterContext
+    )
     object_seed: str | None = (
         None  # registry object setup for names the chain references
     )
@@ -83,6 +91,24 @@ def _seed_code(rendered: str) -> str:
     """
     if "def run(" in rendered:
         return _template_body(rendered)
+    return rendered
+
+
+def _params_seed_code(rendered: str) -> str:
+    """The ``add_parameters()``-scope code a params-template snippet contributes.
+
+    Mirrors :func:`_seed_code` for page-template: a snippet written as a full
+    ``def add_parameters(parameters):`` function contributes its dedented body
+    (so the ``add_*`` calls land at ``add_parameters()`` scope, matching how
+    the docs actually call them); the more common bare-statement style
+    (already written as if inside the function) contributes as-is.
+    """
+    if "def add_parameters(" not in rendered:
+        return rendered
+    lines = rendered.splitlines()
+    for idx, line in enumerate(lines):
+        if line.lstrip().startswith("def add_parameters("):
+            return textwrap.dedent("\n".join(lines[idx + 1 :]))
     return rendered
 
 
@@ -177,11 +203,21 @@ def build_cases(roots: list[Path], docs_root: Path) -> list[SnippetCase]:
     # First pass: collect page-template setup code per file (in document order),
     # keyed by the defining snippet's line so a template isn't seeded onto itself.
     page_seeds: dict[str, list[tuple[int, str]]] = {}
+    # Same idea for params-template: a page's real add_parameters() code, kept
+    # separate from page_seeds since it's replayed against a ParameterContext
+    # rather than exec'd directly into the fragment namespace (see run_fragment).
+    params_seeds: dict[str, list[tuple[int, str]]] = {}
     for snippet in snippets:
-        if parse_directives(snippet).page_template:
+        directives = parse_directives(snippet)
+        if directives.page_template:
             rendered = render(snippet.code, macro_context(snippet.path, docs_root))
             page_seeds.setdefault(snippet.rel_path, []).append(
                 (snippet.start_line, _seed_code(rendered))
+            )
+        if directives.params_template:
+            rendered = render(snippet.code, macro_context(snippet.path, docs_root))
+            params_seeds.setdefault(snippet.rel_path, []).append(
+                (snippet.start_line, _params_seed_code(rendered))
             )
 
     cases: list[SnippetCase] = []
@@ -202,6 +238,13 @@ def build_cases(roots: list[Path], docs_root: Path) -> list[SnippetCase]:
             if line != snippet.start_line
         ]
         page_seed = "\n".join(seeds) if seeds else None
+
+        p_seeds = [
+            code
+            for line, code in params_seeds.get(snippet.rel_path, [])
+            if line != snippet.start_line
+        ]
+        params_seed = "\n".join(p_seeds) if p_seeds else None
 
         if category is Category.FRAGMENT:
             key = (snippet.rel_path, track)
@@ -233,6 +276,7 @@ def build_cases(roots: list[Path], docs_root: Path) -> list[SnippetCase]:
                 test_id=test_id,
                 api_version=api_version,
                 page_seed=page_seed,
+                params_seed=params_seed,
                 object_seed=object_seed,
                 tip_seed=tip_seed,
             )
@@ -364,6 +408,8 @@ def run_complete(case: SnippetCase) -> None:
 def run_fragment(case: SnippetCase, docs_root: Path) -> None:
     """Tier 3: exec the fragment (and any continue-previous chain) on a seeded context."""
     from opentrons import simulate
+    from opentrons.protocol_api import ParameterContext
+    from opentrons.protocols.api_support.types import APIVersion
 
     body, version = load_templates(docs_root)[case.track]
     namespace: dict = {}
@@ -371,8 +417,33 @@ def run_fragment(case: SnippetCase, docs_root: Path) -> None:
         version=version, robot_type=case.track.robot_type
     )
     namespace["protocol"] = context
+    # Every fragment can assume `parameters`, just like `protocol` — a snippet
+    # written for add_parameters() scope (`parameters.add_bool(...)`) can then
+    # run standalone. It's a throwaway: registering into it has no effect on
+    # `protocol.params` unless the page also has a params-template (below).
+    namespace["parameters"] = ParameterContext(
+        api_version=APIVersion.from_string(version)
+    )
     try:
         exec(compile(body, f"<template:{case.track.value}>", "exec"), namespace)
+        if case.params_seed:
+            # Replay the page's real add_parameters() definitions against a
+            # *separate*, fresh ParameterContext, then attach the export to
+            # `protocol.params` — exactly what a real run does before run()
+            # ever executes — so fragments written for run() scope see real
+            # parameter values instead of an empty Parameters().
+            parameter_context = ParameterContext(
+                api_version=APIVersion.from_string(version)
+            )
+            exec(
+                compile(
+                    case.params_seed,
+                    f"<params-seed:{case.snippet.rel_path}>",
+                    "exec",
+                ),
+                {"parameters": parameter_context},
+            )
+            context._params = parameter_context.export_parameters_for_protocol()
         if case.page_seed:
             exec(
                 compile(

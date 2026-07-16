@@ -17,6 +17,7 @@ The destination labware and well order will remain fixed, to focus on using thes
 
 To get started, let's set up the CSV parameter. The data format we expect for this protocol is simple enough to fully explain in the parameter's description:
 
+<!-- test: params-template -->
 ```python
 def add_parameters(parameters):
     parameters.add_csv_file(

@@ -8,6 +8,11 @@ Convention is the default (no annotation needed):
 The small set of exceptions is expressed by ``<!-- test: ... -->`` markers parsed
 by :mod:`extract`. This module turns a :class:`~tests.snippets.extract.Snippet`'s
 raw marker tokens into a structured :class:`Directives` plus a category.
+
+``page-template`` and ``params-template`` both accumulate a page's setup code
+for later fragments to run against (protocol-level and ``add_parameters()``-level,
+respectively) — see the docstrings on :func:`tests.snippets.execute.build_cases`
+and :func:`tests.snippets.execute.run_fragment`.
 """
 
 from __future__ import annotations
@@ -39,11 +44,13 @@ class Directives:
     raises: bool = False
     continue_previous: bool = False
     page_template: bool = False
+    params_template: bool = False
     forced_track: Track | None = None
 
 
 def parse_directives(snippet: Snippet) -> Directives:
     skip = syntax_only = raises = continue_previous = page_template = False
+    params_template = False
     forced_track: Track | None = None
     for token in snippet.markers:
         if token == "skip":
@@ -56,6 +63,8 @@ def parse_directives(snippet: Snippet) -> Directives:
             continue_previous = True
         elif token == "page-template":
             page_template = True
+        elif token == "params-template":
+            params_template = True
         elif token.startswith("robot="):
             value = token.split("=", 1)[1].lower()
             if value in ("flex",):
@@ -72,6 +81,7 @@ def parse_directives(snippet: Snippet) -> Directives:
         raises=raises,
         continue_previous=continue_previous,
         page_template=page_template,
+        params_template=params_template,
         forced_track=forced_track,
     )
 
