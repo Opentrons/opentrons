@@ -156,6 +156,7 @@ type AuditLogAction =
   | 'create_camera_image_settings'
   | 'update_camera'
   | 'update_camera_settings_for_run'
+  | 'update_error_recovery_settings'
   | 'pause_run'
 
 /**
