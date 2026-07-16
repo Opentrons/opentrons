@@ -9,7 +9,10 @@ interface ErrorScreenProps {
   onExit: () => void
 }
 
-export function ErrorScreen({ subText, onExit }: ErrorScreenProps): JSX.Element {
+export function ErrorScreen({
+  subText,
+  onExit,
+}: ErrorScreenProps): JSX.Element {
   const { t, i18n } = useTranslation('shared')
 
   return (
@@ -19,7 +22,7 @@ export function ErrorScreen({ subText, onExit }: ErrorScreenProps): JSX.Element 
           type="error"
           header={i18n.format(t('something_went_wrong'), 'capitalize')}
           subText={subText}
-          height='100%'
+          height="100%"
         />
       </div>
     </>

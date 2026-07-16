@@ -15,7 +15,6 @@ import {
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
   useTrackEvent,
 } from '/app/redux/analytics'
-
 import { useDownloadCalibrationData } from '/app/resources/devices/hooks'
 
 import type { Store } from 'redux'

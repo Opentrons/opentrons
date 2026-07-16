@@ -5,4 +5,4 @@ export const STEP_TYPES = {
   ERROR: 'error',
 } as const
 
-export type StepType = typeof STEP_TYPES[keyof typeof STEP_TYPES]
+export type StepType = (typeof STEP_TYPES)[keyof typeof STEP_TYPES]

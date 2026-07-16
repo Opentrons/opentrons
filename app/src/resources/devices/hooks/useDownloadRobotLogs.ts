@@ -46,7 +46,9 @@ export function useDownloadRobotLogs(
 
   const downloadLogs = (usbPath?: string): Promise<void> => {
     if (!canDownload || host == null || robot?.health?.logs == null) {
-      return Promise.resolve()
+      return Promise.reject(
+        new Error('Unable to download robot logs: robot is not connectable')
+      )
     }
 
     setIsDownloading(true)
@@ -61,9 +63,13 @@ export function useDownloadRobotLogs(
     return Promise.all(
       robot.health.logs.map(log => {
         const logFileName = last(log.split('/')) ?? 'robot.log'
-        return request<string>(GET, log, host).then(res => {
-          zip.file(logFileName, res.data)
-        })
+        return request<string>(GET, log, host)
+          .then(res => {
+            zip.file(logFileName, res.data)
+          })
+          .catch((e: Error) => {
+            makeToast(e.message, ERROR_TOAST, { closeButton: true })
+          })
       })
     )
       .then(() => zip.generateAsync({ type: 'arraybuffer' }))

@@ -29,7 +29,7 @@ export function Troubleshooting({
     useDownloadRobotLogs(robotName)
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = () => {
-    void downloadLogs()
+    downloadLogs().catch(() => {})
   }
 
   return (

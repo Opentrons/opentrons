@@ -6,8 +6,8 @@ import { Tabs } from '@opentrons/components'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import { DiagnosticFiles } from './DiagnosticFiles'
-import { DownloadDiagnosticFilesWizard } from './FileManagerWizardFlows/DownloadDiagnosticFilesWizard'
 import styles from './filemanager.module.css'
+import { DownloadDiagnosticFilesWizard } from './FileManagerWizardFlows/DownloadDiagnosticFilesWizard'
 
 import type { ComponentProps } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'

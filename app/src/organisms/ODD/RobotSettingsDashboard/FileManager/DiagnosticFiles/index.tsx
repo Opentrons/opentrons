@@ -22,7 +22,9 @@ export function DiagnosticFiles(): JSX.Element {
       <div className={styles.list}>
         {DIAGNOSTIC_ROWS.map(row => (
           <div key={row.id} className={styles.list_item}>
-            <StyledText oddStyle="bodyTextSemiBold">{t(row.i18nKey)}</StyledText>
+            <StyledText oddStyle="bodyTextSemiBold">
+              {t(row.i18nKey)}
+            </StyledText>
           </div>
         ))}
       </div>

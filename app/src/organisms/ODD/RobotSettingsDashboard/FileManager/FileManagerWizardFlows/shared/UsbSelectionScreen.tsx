@@ -1,11 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { RadioButton, StyledText } from '@opentrons/components'
+import { INFO_TOAST, RadioButton, StyledText } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { getShellUsbMountPaths } from '/app/redux/shell'
 
 import styles from './shared.module.css'
@@ -28,6 +29,15 @@ export function UsbSelectionScreen({
   const [selectedPath, setSelectedPath] = useState<string | null>(
     usbMountPaths[0] ?? null
   )
+  const { makeToast } = useToaster()
+
+  useEffect(() => {
+    // if previously selected path is not in the updated mount paths,
+    // ensure the selected path is reset
+    if (selectedPath != null && !usbMountPaths.includes(selectedPath)) {
+      setSelectedPath(usbMountPaths.length > 0 ? usbMountPaths[0] : null)
+    }
+  }, [usbMountPaths, selectedPath])
 
   const getUsbLabel = (index: number): string =>
     usbMountPaths.length > 1
@@ -42,7 +52,7 @@ export function UsbSelectionScreen({
           iconName="ot-alert"
           header={t('device_details:no_usb_connected')}
           subText={t('device_details:connect_usb_to_download')}
-          height='100%'
+          height="100%"
         />
       </div>
     )
@@ -74,6 +84,8 @@ export function UsbSelectionScreen({
           onClick={() => {
             if (selectedPath != null) {
               onContinue(selectedPath)
+            } else {
+              makeToast(t('select_usb_to_continue') as string, INFO_TOAST)
             }
           }}
           disabled={selectedPath == null}

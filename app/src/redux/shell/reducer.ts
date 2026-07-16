@@ -74,11 +74,11 @@ export function usbMountPathsReducer(
 ): string[] {
   switch (action.type) {
     case 'shell:ROBOT_MASS_STORAGE_DEVICE_ADDED':
-      return [...state, (action as any).payload.rootPath]
+      return state.includes(action.payload.rootPath)
+        ? state
+        : [...state, action.payload.rootPath]
     case 'shell:ROBOT_MASS_STORAGE_DEVICE_REMOVED':
-      return state.filter(
-        (p: string) => p !== (action as any).payload.rootPath
-      )
+      return state.filter(p => p !== action.payload.rootPath)
   }
   return state
 }
