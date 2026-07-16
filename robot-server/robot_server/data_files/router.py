@@ -1,15 +1,13 @@
 """Router for /dataFiles endpoints."""
 
-import asyncio
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
-from typing import Annotated, AsyncIterator, Final, Literal, Optional, Union
+from typing import Annotated, Final, Literal, Optional, Union
 
 from fastapi import Depends, File, Form, Query, Response, UploadFile, status
 from fastapi.responses import FileResponse, StreamingResponse
 
-from opentrons import config
 from opentrons.protocol_reader import FileHasher, FileReaderWriter
 from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
 from server_utils.auth.resource_server.fastapi import require_scopes
@@ -46,6 +44,11 @@ from .models import (
     ImageFileMetadata,
     NoImagesFound,
     ZipCreationFailed,
+)
+from .zip_utils import (
+    build_run_zip_filename,
+    collect_existing_run_images,
+    stream_zip,
 )
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
 from robot_server.protocols.protocol_store import ProtocolStore
@@ -582,115 +585,22 @@ async def download_run_images(
         run_store: Store for run data management.
         protocol_store: Store for protocol storage access.
     """
-    info_slice = data_files_store.get_files_info_by_run_mime_type(
-        run_id=runId,
-        mime_type=MimeType.IMAGE_JPEG,
-        offset=0,
-        limit=None,
-    )
-
-    if not info_slice.file_info:
-        raise NoImagesFound(detail=f"No images found for run '{runId}'").as_error(
-            status.HTTP_404_NOT_FOUND
-        )
-
-    existing_files = []
-    for file_info in info_slice.file_info:
-        image_path = Path(file_info.path)
-        if image_path.exists() and image_path.is_file():
-            existing_files.append((image_path, file_info.name))
+    existing_files = collect_existing_run_images(runId, data_files_store)
 
     if not existing_files:
         raise NoImagesFound(
             detail=f"No accessible images found for run '{runId}'"
         ).as_error(status.HTTP_404_NOT_FOUND)
 
-    zip_filename = _build_zip_filename(
-        run_id=runId, run_store=run_store, protocol_store=protocol_store
+    run = run_store.get(runId)
+    zip_filename = build_run_zip_filename(
+        run=run,
+        protocol_store=protocol_store,
+        fallback_filename=f"{runId}_images.zip",
     )
 
     return StreamingResponse(
-        _stream_zip_from_subprocess(existing_files),
+        stream_zip(existing_files),
         media_type="application/zip",
         headers={"Content-Disposition": f"attachment; filename={zip_filename}"},
     )
-
-
-async def _stream_zip_from_subprocess(
-    files: list[tuple[Path, str]],
-    chunk_size: int = 65536,
-) -> AsyncIterator[bytes]:
-    """Offload zipping to a subprocess, yielding the final zip file chunks, `chunk_size` bytes in size."""
-    process = None
-
-    try:
-        file_paths = [str(file_path) for file_path, _ in files]
-
-        process = await asyncio.create_subprocess_exec(
-            "zip",
-            "-q",  # quiet
-            "-j",  # junk paths (store only filenames)
-            "-",  # write zip output to stdout
-            *file_paths,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-
-        if process.stdout is None:
-            raise RuntimeError("stdout was not captured")
-        if process.stderr is None:
-            raise RuntimeError("stderr was not captured")
-
-        while True:
-            chunk = await process.stdout.read(chunk_size)
-            if not chunk:
-                break
-            yield chunk
-
-        await process.wait()
-
-        if process.returncode != 0:
-            stderr_output = await process.stderr.read()
-            error_msg = stderr_output.decode() if stderr_output else "Unknown error"
-            raise Exception(
-                f"zip command failed with code {process.returncode}: {error_msg}"
-            )
-
-    except Exception as e:
-        # Clean up process if still running
-        if process is not None and process.returncode is None:
-            process.kill()
-            await process.wait()
-
-        raise ZipCreationFailed(
-            detail=f"Unexpected error during zip creation: {str(e)}"
-        ).as_error(status.HTTP_500_INTERNAL_SERVER_ERROR) from e
-
-
-def _build_zip_filename(
-    run_id: str, run_store: RunStore, protocol_store: ProtocolStore
-) -> str:
-    run_info = run_store.get(run_id)
-    protocol_id = run_info.protocol_id if run_info else None
-
-    if protocol_id is not None:
-        protocol = protocol_store.get(protocol_id)
-        protocol_name = (
-            protocol.source.metadata.get(
-                "protocolName", protocol.source.files[0].path.name
-            )
-            if protocol is not None
-            else None
-        )
-        robot_name = config.name()
-        timestamp = run_info.created_at.strftime("%Y%m%d_%H%M%S")
-        final_str = f"{robot_name}_{_sanitize_str(protocol_name)}_{timestamp}.zip"
-
-        return final_str
-
-    return f"{run_id}_images.zip"
-
-
-def _sanitize_str(input_str: str) -> str:
-    """Ensure that the input string contains only alphanumeric characters."""
-    return "".join(c if c.isalnum() or c in ("-", "_") else "_" for c in input_str)
