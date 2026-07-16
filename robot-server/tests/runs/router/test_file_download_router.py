@@ -19,25 +19,28 @@ from robot_server.data_files.data_files_store import (
     DataFileWithCommandsInfoSlice,
 )
 from robot_server.errors.error_responses import ApiError
-from robot_server.protocols.protocol_store import ProtocolStore
+from robot_server.protocols.protocol_store import ProtocolNotFoundError, ProtocolStore
 from robot_server.runs.router.file_download_router import download_run_files
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.run_store import RunStore
 
 
-async def test_download_run_files_with_images(
+async def test_download_run_files_with_images_and_protocol(
     decoy: Decoy,
     mock_run_store: RunStore,
     mock_protocol_store: ProtocolStore,
     tmp_path: Path,
 ) -> None:
-    """It should zip images under images/."""
+    """It should zip images under images/ and include the protocol file."""
     data_files_store = decoy.mock(cls=DataFilesStore)
 
     image1_path = tmp_path / "image1.jpeg"
     image2_path = tmp_path / "image2.jpeg"
     image1_path.write_bytes(b"fake image data 1")
     image2_path.write_bytes(b"fake image data 2")
+
+    protocol_path = tmp_path / "my_protocol.py"
+    protocol_path.write_text("metadata = {'protocolName': 'Test'}\n")
 
     file_info_1 = DataFileInfoWithCommands.model_construct(
         id="file-id-1",
@@ -83,11 +86,23 @@ async def test_download_run_files_with_images(
 
     mock_run = decoy.mock(name="run_data")
     decoy.when(mock_run.run_id).then_return("run-id")
-    decoy.when(mock_run.protocol_id).then_return(None)
+    decoy.when(mock_run.protocol_id).then_return("protocol-id")
     decoy.when(mock_run.created_at).then_return(
         datetime(year=2024, month=6, day=20, hour=10, minute=30, second=15)
     )
     decoy.when(mock_run_store.get("run-id")).then_return(mock_run)
+
+    mock_protocol = decoy.mock(name="protocol")
+    mock_source = decoy.mock(name="source")
+    mock_files = [decoy.mock(name="file")]
+    mock_path = decoy.mock(name="path")
+    decoy.when(mock_path.name).then_return("my_protocol.py")
+    decoy.when(mock_files[0].path).then_return(mock_path)
+    decoy.when(mock_source.files).then_return(mock_files)
+    decoy.when(mock_source.metadata).then_return({"protocolName": "Test Protocol"})
+    decoy.when(mock_source.main_file).then_return(protocol_path)
+    decoy.when(mock_protocol.source).then_return(mock_source)
+    decoy.when(mock_protocol_store.get("protocol-id")).then_return(mock_protocol)
 
     result = await download_run_files(
         runId="run-id",
@@ -109,7 +124,129 @@ async def test_download_run_files_with_images(
         names = set(zf.namelist())
         assert "images/image1.jpeg" in names
         assert "images/image2.jpeg" in names
+        assert "my_protocol.py" in names
         assert zf.read("images/image1.jpeg") == b"fake image data 1"
+        assert zf.read("my_protocol.py") == protocol_path.read_bytes()
+
+
+async def test_download_run_files_protocol_json_keeps_extension(
+    decoy: Decoy,
+    mock_run_store: RunStore,
+    mock_protocol_store: ProtocolStore,
+    tmp_path: Path,
+) -> None:
+    """It should keep the .json extension for JSON protocol files."""
+    data_files_store = decoy.mock(cls=DataFilesStore)
+
+    protocol_path = tmp_path / "my_protocol.json"
+    protocol_path.write_text('{"metadata": {"protocolName": "JSON Proto"}}')
+
+    decoy.when(
+        data_files_store.get_files_info_by_run_mime_type(
+            run_id="run-id",
+            mime_type=MimeType.IMAGE_JPEG,
+            offset=0,
+            limit=None,
+        )
+    ).then_return(DataFileWithCommandsInfoSlice(file_info=[], total_length=0))
+
+    mock_run = decoy.mock(name="run_data")
+    decoy.when(mock_run.run_id).then_return("run-id")
+    decoy.when(mock_run.protocol_id).then_return("protocol-id")
+    decoy.when(mock_run.created_at).then_return(
+        datetime(year=2024, month=6, day=20, hour=10, minute=30, second=15)
+    )
+    decoy.when(mock_run_store.get("run-id")).then_return(mock_run)
+
+    mock_protocol = decoy.mock(name="protocol")
+    mock_source = decoy.mock(name="source")
+    mock_files = [decoy.mock(name="file")]
+    mock_path = decoy.mock(name="path")
+    decoy.when(mock_path.name).then_return("my_protocol.json")
+    decoy.when(mock_files[0].path).then_return(mock_path)
+    decoy.when(mock_source.files).then_return(mock_files)
+    decoy.when(mock_source.metadata).then_return({"protocolName": "JSON Proto"})
+    decoy.when(mock_source.main_file).then_return(protocol_path)
+    decoy.when(mock_protocol.source).then_return(mock_source)
+    decoy.when(mock_protocol_store.get("protocol-id")).then_return(mock_protocol)
+
+    result = await download_run_files(
+        runId="run-id",
+        run_store=mock_run_store,
+        data_files_store=data_files_store,
+        protocol_store=mock_protocol_store,
+    )
+
+    chunks = []
+    async for chunk in result.body_iterator:
+        chunks.append(chunk)
+
+    with zipfile.ZipFile(io.BytesIO(b"".join(chunks))) as zf:
+        assert "my_protocol.json" in zf.namelist()
+
+
+async def test_download_run_files_skips_missing_protocol_silently(
+    decoy: Decoy,
+    mock_run_store: RunStore,
+    mock_protocol_store: ProtocolStore,
+    tmp_path: Path,
+) -> None:
+    """It should omit a missing protocol file and still return images."""
+    data_files_store = decoy.mock(cls=DataFilesStore)
+
+    image_path = tmp_path / "image1.jpeg"
+    image_path.write_bytes(b"fake image data")
+
+    file_info = DataFileInfoWithCommands.model_construct(
+        id="file-id-1",
+        name="image1.jpeg",
+        file_hash="hash1",
+        created_at=datetime(year=2024, month=6, day=20),
+        mime_type=MimeType.IMAGE_JPEG,
+        path=str(image_path),
+        generated=True,
+        stored=True,
+        command_info=CmdDataFileInfo(
+            command_id="command-1",
+            prev_command_id="prev-1",
+        ),
+    )
+
+    decoy.when(
+        data_files_store.get_files_info_by_run_mime_type(
+            run_id="run-id",
+            mime_type=MimeType.IMAGE_JPEG,
+            offset=0,
+            limit=None,
+        )
+    ).then_return(DataFileWithCommandsInfoSlice(file_info=[file_info], total_length=1))
+
+    mock_run = decoy.mock(name="run_data")
+    decoy.when(mock_run.run_id).then_return("run-id")
+    decoy.when(mock_run.protocol_id).then_return("protocol-id")
+    decoy.when(mock_run.created_at).then_return(
+        datetime(year=2024, month=6, day=20, hour=10, minute=30, second=15)
+    )
+    decoy.when(mock_run_store.get("run-id")).then_return(mock_run)
+    decoy.when(mock_protocol_store.get("protocol-id")).then_raise(
+        ProtocolNotFoundError("protocol-id")
+    )
+
+    result = await download_run_files(
+        runId="run-id",
+        run_store=mock_run_store,
+        data_files_store=data_files_store,
+        protocol_store=mock_protocol_store,
+    )
+
+    chunks = []
+    async for chunk in result.body_iterator:
+        chunks.append(chunk)
+
+    with zipfile.ZipFile(io.BytesIO(b"".join(chunks))) as zf:
+        names = zf.namelist()
+        assert "images/image1.jpeg" in names
+        assert not any(name.endswith(".py") or name.endswith(".json") for name in names)
 
 
 async def test_download_run_files_run_not_found(

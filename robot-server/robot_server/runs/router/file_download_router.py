@@ -1,7 +1,8 @@
 """Router for /runs/{runId}/download file bundle endpoints."""
 
+from pathlib import Path
 from textwrap import dedent
-from typing import Annotated, Literal, Union
+from typing import Annotated, List, Literal, Optional, Tuple, Union
 
 from fastapi import Depends, status
 from fastapi.responses import StreamingResponse
@@ -19,7 +20,7 @@ from robot_server.data_files.zip_utils import (
 )
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
 from robot_server.protocols.dependencies import get_protocol_store
-from robot_server.protocols.protocol_store import ProtocolStore
+from robot_server.protocols.protocol_store import ProtocolNotFoundError, ProtocolStore
 from robot_server.runs.dependencies import get_run_store
 from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.run_store import RunStore
@@ -44,6 +45,7 @@ class NoDownloadContent(ErrorDetails):
         The archive includes, when available:
 
         - Camera images under an `images/` directory
+        - The protocol source file
         """
     ),
     responses={
@@ -76,9 +78,15 @@ async def download_run_files(
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
-    zip_entries = collect_existing_run_images(
-        runId, data_files_store, archive_prefix="images"
+    # (filesystem path, archive path within the zip)
+    zip_entries: List[Tuple[Path, str]] = []
+
+    zip_entries.extend(
+        collect_existing_run_images(runId, data_files_store, archive_prefix="images")
     )
+    protocol_entry = _collect_protocol_file(run.protocol_id, protocol_store)
+    if protocol_entry is not None:
+        zip_entries.append(protocol_entry)
 
     if not zip_entries:
         raise NoDownloadContent(
@@ -96,3 +104,22 @@ async def download_run_files(
         media_type="application/zip",
         headers={"Content-Disposition": f"attachment; filename={zip_filename}"},
     )
+
+
+def _collect_protocol_file(
+    protocol_id: Optional[str], protocol_store: ProtocolStore
+) -> Optional[Tuple[Path, str]]:
+    """Return the protocol main file for the zip, or None if unavailable."""
+    if protocol_id is None:
+        return None
+
+    try:
+        protocol = protocol_store.get(protocol_id)
+    except ProtocolNotFoundError:
+        return None
+
+    main_file = protocol.source.main_file
+    if not main_file.exists() or not main_file.is_file():
+        return None
+
+    return (main_file, main_file.name)
