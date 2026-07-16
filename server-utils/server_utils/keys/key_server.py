@@ -15,7 +15,6 @@ from abc import ABC, abstractmethod
 
 import aiohttp
 import pydantic
-from requests import session
 
 SIGN_MESSAGE_ENDPOINT_PATH = "keys/internal/logSigning/signMessage"
 PUBLIC_KEY_ENDPOINT_PATH = "/keys/external/logSigning/publicKey"
