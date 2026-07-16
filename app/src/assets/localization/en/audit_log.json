@@ -37,6 +37,8 @@
   "resume_run_from_recovery": "Resuming protocol run from recovery mode",
   "retry_action": "Retrying step",
   "right_mount": "right mount",
+  "shutdown_robot": "Shutting down robot",
   "single_channel_and_8_channel": "single channel or 8 channel",
-  "stop_run": "Stopping protocol run"
+  "stop_run": "Stopping protocol run",
+  "update_robot_name": "Updating robot name"
 }

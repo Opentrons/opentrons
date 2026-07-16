@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import { useVacuumModuleControls } from '../useVacuumModuleControls'
@@ -11,6 +12,9 @@ import type { AttachedModule } from '/app/redux/modules/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/analytics')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const mockVacuumModule = {
   id: 'vacuum_id',
