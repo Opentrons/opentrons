@@ -117,18 +117,31 @@ export function useRecoveryCommands({
   selectedRecoveryOption,
 }: UseRecoveryCommandsParams): UseRecoveryCommandsResult {
   const [ignoreErrors, setIgnoreErrors] = useState(false)
-  const { documentationState, actionsToDocument, addActionToDocument } =
-    useErrorRecoveryDocumentation()
+  const {
+    documentationState,
+    actionsToDocument,
+    addActionToDocument,
+    resumeAndHandleErrorPolicyDocState,
+    clearResumeAndHandleErrorPolicyDocreport,
+  } = useErrorRecoveryDocumentation({
+    ignoreErrors,
+    recoverySessionKey: unvalidatedFailedCommand?.id ?? null,
+  })
 
   const { proceedToRouteAndStep, handleMotionRouting, stashedMapRef } =
     routeUpdateActions
   const { mutateAsync: resumeRunFromRecovery } =
-    useResumeRunFromRecoveryMutation(documentationState)
+    useResumeRunFromRecoveryMutation(resumeAndHandleErrorPolicyDocState)
   const { mutateAsync: resumeRunFromRecoveryAssumingFalsePositive } =
-    useResumeRunFromRecoveryAssumingFalsePositiveMutation(documentationState)
-
+    useResumeRunFromRecoveryAssumingFalsePositiveMutation(
+      resumeAndHandleErrorPolicyDocState
+    )
   const { stopRun } = useStopRunMutation(documentationState)
-  const updateErrorRecoveryPolicy = useUpdateRecoveryPolicyWithStrategy(runId)
+
+  const updateErrorRecoveryPolicy = useUpdateRecoveryPolicyWithStrategy(
+    runId,
+    resumeAndHandleErrorPolicyDocState
+  )
   const currentRecoveryPolicy = useErrorRecoveryPolicy(runId)?.data?.data
   const { chainRunCommands } = useChainRunCommands(
     runId,
@@ -398,11 +411,16 @@ export function useRecoveryCommands({
 
           return updateErrorRecoveryPolicy(ignorePolicyRules, 'append')
             .then(() => Promise.resolve())
-            .catch((e: Error) =>
-              reportAndRouteFailedCmd(
+            .catch((e: Error) => {
+              // User cancelled documentation — let resumeRun/skipFailedCommand
+              // restore the previous screen instead of showing action-failed.
+              if (isDocumentedMutationError(e)) {
+                return Promise.reject(e)
+              }
+              return reportAndRouteFailedCmd(
                 new Error(`Failed to update recovery policy: ${e.message}`)
               )
-            )
+            })
         } else {
           return reportAndRouteFailedCmd(
             new Error('Could not execute command. No failed command.')
@@ -433,10 +451,13 @@ export function useRecoveryCommands({
           makeSuccessToast()
         })
         .catch((error: unknown) => {
+          // Allow a retry to re-prompt; policy may have already succeeded.
+          clearResumeAndHandleErrorPolicyDocreport()
           if (isDocumentedMutationError(error)) {
             return handleMotionRouting(false)
           }
-          return Promise.reject(error)
+          // Non-documentation failures already route to ERROR_WHILE_RECOVERING
+          // (e.g. via handleIgnoringErrorKind).
         })
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
@@ -449,6 +470,7 @@ export function useRecoveryCommands({
       selectedRecoveryOption,
       makeSuccessToast,
       handleMotionRouting,
+      clearResumeAndHandleErrorPolicyDocreport,
     ]
   )
 
@@ -503,10 +525,14 @@ export function useRecoveryCommands({
           makeSuccessToast()
         })
         .catch((error: unknown) => {
+          // Allow a retry to re-prompt; policy may have already succeeded.
+          clearResumeAndHandleErrorPolicyDocreport()
           if (isDocumentedMutationError(error)) {
             return handleMotionRouting(false)
           }
-          return Promise.reject(error)
+          // Non-documentation failures already route to ERROR_WHILE_RECOVERING
+          // (e.g. via handleIgnoringErrorKind). Avoid an unhandled rejection
+          // from void call sites.
         })
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
@@ -518,6 +544,7 @@ export function useRecoveryCommands({
       selectedRecoveryOption,
       makeSuccessToast,
       handleMotionRouting,
+      clearResumeAndHandleErrorPolicyDocreport,
     ]
   )
 

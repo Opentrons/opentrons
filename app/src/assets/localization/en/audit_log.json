@@ -40,5 +40,6 @@
   "shutdown_robot": "Shutting down robot",
   "single_channel_and_8_channel": "single channel or 8 channel",
   "stop_run": "Stopping protocol run",
+  "update_error_recovery_policy": "Updating error recovery policy",
   "update_robot_name": "Updating robot name"
 }

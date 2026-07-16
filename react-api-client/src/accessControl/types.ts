@@ -152,6 +152,7 @@ type AuditLogAction =
   | 'retry_action'
   | 'shutdown_robot'
   | 'update_robot_name'
+  | 'update_error_recovery_policy'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.
