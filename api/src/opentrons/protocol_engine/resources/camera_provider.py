@@ -70,6 +70,9 @@ class CameraProvider:
         image_capture_callback: Optional[
             Callable[[RobotType, ImageParameters], Awaitable[bytes | CameraError]]
         ] = None,
+        update_live_stream_status: Optional[
+            Callable[[RobotType, bool, CameraSettings | None], Awaitable[None]]
+        ] = None,
     ) -> None:
         """Initialize the interface callbacks of the Camera Provider within the Protocol Engine.
 
@@ -79,6 +82,7 @@ class CameraProvider:
         """
         self._camera_settings_callback = camera_settings_callback
         self._image_capture_callback = image_capture_callback
+        self._update_live_stream_status = update_live_stream_status
 
     async def get_camera_settings(self) -> CameraSettings:
         """Query the Robot Server for the current Camera Enablement settings."""
@@ -111,3 +115,17 @@ class CameraProvider:
                 raise CameraCaptureError(message=error_str)
         # Return None if the image capture callback is unavailable (simulation)
         return None
+
+    async def update_live_stream_status(
+        self,
+        robot_type: RobotType,
+        stream_status: bool,
+        enablement_settings: CameraSettings | None = None,
+    ) -> None:
+        """Update the Opentrons Live Stream status to toggle the live stream on and off, or adjust
+        the camera settings used by the live stream.
+        """
+        if self._update_live_stream_status is not None:
+            await self._update_live_stream_status(
+                robot_type, stream_status, enablement_settings
+            )

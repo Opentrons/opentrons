@@ -106,9 +106,10 @@ def add_column(
             )
         )
 
+
 def set_permissions(src: Path, permissions_octal: str) -> None:
     """Set the permissions of a path.
-    
+
     Used to alter user permissions for a path, this helps to ensure that users like 'ot-protocol'
     have the necessary access to be able to read protocol file data.
     """

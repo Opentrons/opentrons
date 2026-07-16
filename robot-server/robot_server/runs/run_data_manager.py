@@ -291,7 +291,7 @@ class RunDataManager:
         await camera.update_live_stream_status(
             self._run_orchestrator_store._robot_type,
             True,
-            camera_provider,
+            await camera_provider.get_camera_settings(),
             state_summary.cameraSettings,
         )
         self._run_orchestrator_store.add_camera_capture_image_settings(

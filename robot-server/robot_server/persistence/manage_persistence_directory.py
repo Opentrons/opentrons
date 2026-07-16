@@ -69,7 +69,7 @@ def make_migration_orchestrator(prepared_root: Path) -> MigrationOrchestrator:
             v13_to_v14.Migration13to14(subdirectory="14"),
             v14_to_v15.Migration14to15(subdirectory="15"),
             v15_to_v16.Migration15to16(subdirectory="16"),
-            v16_to_v17.Migration16to17(subdirectory=LATEST_VERSION_DIRECTORY)
+            v16_to_v17.Migration16to17(subdirectory=LATEST_VERSION_DIRECTORY),
         ],
         temp_file_prefix="temp-",
     )
