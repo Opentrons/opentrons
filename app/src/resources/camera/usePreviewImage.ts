@@ -31,7 +31,10 @@ export function usePreviewImage(
     },
   }
   const capturePreviewImage = useCapturePreviewImage(documentationState)
-  const capturePreviewImageToRun = useCapturePreviewImageToRun(runId ?? '')
+  const capturePreviewImageToRun = useCapturePreviewImageToRun(
+    documentationState,
+    runId ?? ''
+  )
 
   const takePhoto = (): void => {
     if (runId == null) {

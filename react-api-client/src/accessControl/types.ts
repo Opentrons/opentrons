@@ -155,6 +155,7 @@ type AuditLogAction =
   | 'capture_preview_image'
   | 'create_camera_image_settings'
   | 'update_camera'
+  | 'update_camera_settings_for_run'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.

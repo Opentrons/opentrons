@@ -43,5 +43,6 @@
   "single_channel_and_8_channel": "single channel or 8 channel",
   "stop_run": "Stopping protocol run",
   "update_camera": "Updating camera settings",
+  "update_camera_settings_for_run": "Updating camera settings for this run",
   "update_robot_name": "Updating robot name"
 }
