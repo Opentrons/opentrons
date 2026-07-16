@@ -123,6 +123,7 @@ describe('SelectLocation', () => {
       sendIdentifyModule: vi.fn(),
       errorMessage: '',
       attachedPipette: {} as PipetteInformation,
+      updateDeckConfiguration: vi.fn(),
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
@@ -190,6 +191,7 @@ describe('handleAddFixture', () => {
       sendIdentifyModule: vi.fn(),
       errorMessage: '',
       attachedPipette: {} as PipetteInformation,
+      updateDeckConfiguration: vi.fn(),
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
@@ -283,6 +285,7 @@ describe('handleRemoveFixture', () => {
       sendIdentifyModule: vi.fn(),
       errorMessage: '',
       attachedPipette: {} as PipetteInformation,
+      updateDeckConfiguration: vi.fn(),
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
@@ -333,6 +336,7 @@ describe('door open error handling', () => {
       sendIdentifyModule: vi.fn(),
       errorMessage: '',
       attachedPipette: {} as PipetteInformation,
+      updateDeckConfiguration: vi.fn(),
     }
     vi.mocked(useUpdateDeckConfigurationMutation).mockReturnValue({
       updateDeckConfiguration: mockUpdateDeckConfiguration,
