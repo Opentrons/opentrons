@@ -52,6 +52,7 @@ class NoDownloadContent(ErrorDetails):
         - Camera images under an `images/` directory
         - The protocol source file
         - The run log
+        - Labware offset data
         """
     ),
     responses={
@@ -106,6 +107,16 @@ async def download_run_files(
     if run_log_entry is not None:
         zip_entries.append(run_log_entry)
         temp_paths.append(run_log_entry[0])
+
+    offsets_entry = _collect_labware_offsets(
+        run_id=runId,
+        run=run,
+        run_data_manager=run_data_manager,
+        protocol_store=protocol_store,
+    )
+    if offsets_entry is not None:
+        zip_entries.append(offsets_entry)
+        temp_paths.append(offsets_entry[0])
 
     if not zip_entries:
         raise NoDownloadContent(
@@ -198,18 +209,42 @@ def _collect_run_log(
         }
 
         archive_name = _build_run_log_filename(run=run, protocol_store=protocol_store)
-        with tempfile.NamedTemporaryFile(
-            mode="w",
-            suffix=".json",
-            delete=False,
-            encoding="utf-8",
-        ) as temp_file:
-            json.dump(run_details, temp_file)
-            temp_path = Path(temp_file.name)
-
-        return (temp_path, archive_name)
+        return _write_temp_json(run_details, archive_name)
     except Exception:
         return None
+
+
+def _collect_labware_offsets(
+    run_id: str,
+    run: Union[RunResource, BadRunResource],
+    run_data_manager: RunDataManager,
+    protocol_store: ProtocolStore,
+) -> Optional[Tuple[Path, str]]:
+    """Build a labware offsets JSON file from the run record, or None if unavailable."""
+    try:
+        run_record = run_data_manager.get(run_id)
+        offsets_payload = [
+            offset.model_dump(mode="json", by_alias=True)
+            for offset in run_record.labwareOffsets
+        ]
+        archive_name = _build_labware_offsets_filename(
+            run=run, protocol_store=protocol_store
+        )
+        return _write_temp_json(offsets_payload, archive_name)
+    except Exception:
+        return None
+
+
+def _write_temp_json(payload: object, archive_name: str) -> Tuple[Path, str]:
+    """Write JSON payload to a temp file for inclusion in the zip."""
+    with tempfile.NamedTemporaryFile(
+        mode="w",
+        suffix=".json",
+        delete=False,
+        encoding="utf-8",
+    ) as temp_file:
+        json.dump(payload, temp_file)
+        return (Path(temp_file.name), archive_name)
 
 
 def _build_run_log_filename(
@@ -221,6 +256,22 @@ def _build_run_log_filename(
     name_stem = _protocol_display_name_stem(run=run, protocol_store=protocol_store)
     return f"{name_stem}_{created_at}.json"
 
+
+def _build_labware_offsets_filename(
+    run: Union[RunResource, BadRunResource],
+    protocol_store: ProtocolStore,
+) -> str:
+    """Build `{protocolFileName}_{ISO-timestamp}_offsetdata.json`."""
+    created_at = _format_download_timestamp(run.created_at)
+    name_stem = _protocol_file_name_stem(run=run, protocol_store=protocol_store)
+    return f"{name_stem}_{created_at}_offsetdata.json"
+
+
+def _protocol_display_name_stem(
+    run: Union[RunResource, BadRunResource],
+    protocol_store: ProtocolStore,
+) -> str:
+    """Prefer protocolName metadata, then protocol file name, then ids."""
     if run.protocol_id is not None:
         try:
             protocol = protocol_store.get(run.protocol_id)
@@ -239,7 +290,28 @@ def _build_run_log_filename(
         return sanitize_filename_component(run.run_id)
 
 
-def _format_run_log_timestamp(created_at: datetime) -> str:
+def _protocol_file_name_stem(
+    run: Union[RunResource, BadRunResource],
+    protocol_store: ProtocolStore,
+) -> str:
+    """Prefer the protocol main file stem, then ids."""
+    if run.protocol_id is not None:
+        try:
+            protocol = protocol_store.get(run.protocol_id)
+        except ProtocolNotFoundError:
+            protocol = None
+
+        if protocol is not None:
+            return sanitize_filename_component(protocol.source.main_file.stem)
+
+        else:
+            return sanitize_filename_component(run.protocol_id)
+
+    else:
+        return sanitize_filename_component(run.run_id)
+
+
+def _format_download_timestamp(created_at: datetime) -> str:
     """Format a run createdAt timestamp like JS toISOString, with ':' -> '_'."""
     if created_at.tzinfo is None:
         created_at = created_at.replace(tzinfo=timezone.utc)

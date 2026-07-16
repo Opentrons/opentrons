@@ -11,6 +11,8 @@ from decoy import Decoy
 
 from opentrons.protocol_engine import CommandSlice
 from opentrons.protocol_engine import commands as pe_commands
+from opentrons.protocol_engine import types as pe_types
+from opentrons.types import DeckSlotName
 from opentrons_shared_data.data_files import (
     CmdDataFileInfo,
     DataFileInfoWithCommands,
@@ -42,16 +44,18 @@ def _make_home_command() -> pe_commands.Command:
     )
 
 
-def _stub_run_log(
+def _stub_run_record_for_download(
     decoy: Decoy,
     run_data_manager: RunDataManager,
     *,
     run_id: str = "run-id",
+    labware_offsets: list[pe_types.LabwareOffset] | None = None,
 ) -> Run:
     mock_run_record = decoy.mock(cls=Run)
     decoy.when(mock_run_record.model_dump(mode="json", by_alias=True)).then_return(
         {"id": run_id, "protocolId": "protocol-id"}
     )
+    decoy.when(mock_run_record.labwareOffsets).then_return(labware_offsets or [])
     decoy.when(run_data_manager.get(run_id)).then_return(mock_run_record)
 
     command = _make_home_command()
@@ -76,14 +80,14 @@ def _stub_run_log(
     return mock_run_record
 
 
-async def test_download_run_files_with_images_protocol_and_run_log(
+async def test_download_run_files_with_images_protocol_run_log_and_offsets(
     decoy: Decoy,
     mock_run_store: RunStore,
     mock_run_data_manager: RunDataManager,
     mock_protocol_store: ProtocolStore,
     tmp_path: Path,
 ) -> None:
-    """It should zip images, protocol file, and run log."""
+    """It should zip images, protocol file, run log, and labware offsets."""
     data_files_store = decoy.mock(cls=DataFilesStore)
 
     image1_path = tmp_path / "image1.jpeg"
@@ -156,7 +160,16 @@ async def test_download_run_files_with_images_protocol_and_run_log(
     decoy.when(mock_protocol.source).then_return(mock_source)
     decoy.when(mock_protocol_store.get("protocol-id")).then_return(mock_protocol)
 
-    _stub_run_log(decoy, mock_run_data_manager)
+    labware_offset = pe_types.LabwareOffset(
+        id="labware-offset-id",
+        createdAt=datetime(2024, 6, 20, 10, 30, 15, tzinfo=timezone.utc),
+        definitionUri="opentrons/biorad_96_wellplate_200ul_pcr/1",
+        location=pe_types.LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        vector=pe_types.LabwareOffsetVector(x=1.11, y=2.22, z=3.33),
+    )
+    _stub_run_record_for_download(
+        decoy, mock_run_data_manager, labware_offsets=[labware_offset]
+    )
 
     result = await download_run_files(
         runId="run-id",
@@ -181,6 +194,7 @@ async def test_download_run_files_with_images_protocol_and_run_log(
         assert "images/image2.jpeg" in names
         assert "my_protocol.py" in names
         assert "pcrprep-standard_2024-06-20T10_30_15.354Z.json" in names
+        assert "my_protocol_2024-06-20T10_30_15.354Z_offsetdata.json" in names
         assert zf.read("images/image1.jpeg") == b"fake image data 1"
         assert zf.read("my_protocol.py") == protocol_path.read_bytes()
 
@@ -188,6 +202,15 @@ async def test_download_run_files_with_images_protocol_and_run_log(
         assert run_log["data"]["id"] == "run-id"
         assert run_log["commands"]["meta"]["totalLength"] == 1
         assert len(run_log["commands"]["data"]) == 1
+
+        offsets = json.loads(
+            zf.read("my_protocol_2024-06-20T10_30_15.354Z_offsetdata.json")
+        )
+        assert len(offsets) == 1
+        assert offsets[0]["definitionUri"] == (
+            "opentrons/biorad_96_wellplate_200ul_pcr/1"
+        )
+        assert offsets[0]["vector"] == {"x": 1.11, "y": 2.22, "z": 3.33}
 
 
 async def test_download_run_files_protocol_json_keeps_extension(
@@ -322,14 +345,14 @@ async def test_download_run_files_skips_missing_protocol_silently(
         )
 
 
-async def test_download_run_files_skips_missing_run_log_silently(
+async def test_download_run_files_skips_missing_run_log_and_offsets_silently(
     decoy: Decoy,
     mock_run_store: RunStore,
     mock_run_data_manager: RunDataManager,
     mock_protocol_store: ProtocolStore,
     tmp_path: Path,
 ) -> None:
-    """It should omit a failed run log and still return other files."""
+    """It should omit failed run log/offsets and still return other files."""
     data_files_store = decoy.mock(cls=DataFilesStore)
     image_path = tmp_path / "image1.jpeg"
     image_path.write_bytes(b"fake image data")
