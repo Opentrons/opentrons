@@ -7,6 +7,7 @@ import {
   InlineNotification,
   LegacyStyledText,
 } from '@opentrons/components'
+import { useRobotSettingsQuery } from '@opentrons/react-api-client'
 
 import { LANGUAGES, US_ENGLISH_DISPLAY_NAME } from '/app/i18n'
 import { Navigation } from '/app/organisms/ODD/Navigation'
@@ -24,7 +25,7 @@ import {
 } from '/app/redux/config'
 import { getLocalRobot, getRobotApiVersion } from '/app/redux/discovery'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
-import { getRobotSettings, updateSetting } from '/app/redux/robot-settings'
+import { updateSetting } from '/app/redux/robot-settings'
 import { getRobotUpdateAvailable } from '/app/redux/robot-update'
 import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 import { useNetworkConnection } from '/app/resources/networking'
@@ -58,9 +59,8 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const robotServerVersion =
     localRobot?.status != null ? getRobotApiVersion(localRobot) : null
 
-  const allRobotSettings = useSelector((state: State) =>
-    getRobotSettings(state, robotName)
-  )
+  const robotSettingsQuery = useRobotSettingsQuery()
+  const allRobotSettings = robotSettingsQuery.data?.settings ?? []
 
   const isHomeGantryOn =
     allRobotSettings.find(({ id }) => id === HOME_GANTRY_SETTING_ID)?.value ??

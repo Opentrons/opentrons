@@ -2,6 +2,8 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { useRobotSettingsQuery } from '@opentrons/react-api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { Navigation } from '/app/organisms/ODD/Navigation'
@@ -11,6 +13,7 @@ import {
   LanguageSetting,
   NetworkSettings,
   Privacy,
+  RobotEncryptionKeySettingOption,
   RobotSystemVersion,
   TouchscreenBrightness,
   TouchScreenSleep,
@@ -25,10 +28,9 @@ import {
 } from '/app/redux/config'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
-import { getRobotSettings } from '/app/redux/robot-settings'
 import { getRobotUpdateAvailable } from '/app/redux/robot-update'
 import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
-import { useNetworkConnection } from '/app/resources/networking'
+import { useNetworkConnection, useWifiList } from '/app/resources/networking'
 import {
   useDisableStackerSensors,
   useLEDLights,
@@ -36,9 +38,17 @@ import {
 
 import { RobotSettingsDashboard } from '../'
 
+import type { UseQueryResult } from 'react-query'
+import type { RobotSettingsResponse } from '@opentrons/api-client'
+
+vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/networking', async () => {
   const actual = await vi.importActual('/app/resources/networking')
-  return { ...actual, useNetworkConnection: vi.fn() }
+  return {
+    ...actual,
+    useNetworkConnection: vi.fn(),
+    useWifiList: vi.fn(),
+  }
 })
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
@@ -58,6 +68,9 @@ vi.mock('/app/organisms/ODD/RobotSettingsDashboard/LanguageSetting')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/Devices')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/FileManager')
+vi.mock(
+  '/app/organisms/ODD/RobotSettingsDashboard/RobotEncryptionKey/RobotEncryptionKeySettingOption'
+)
 
 const mockToggleLights = vi.fn()
 const mockToggleER = vi.fn()
@@ -80,15 +93,19 @@ const MOCK_DEFAULT_LANGUAGE = 'en-US'
 describe('RobotSettingsDashboard', () => {
   beforeEach(() => {
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
-    vi.mocked(getRobotSettings).mockReturnValue([
-      {
-        id: 'disableHomeOnBoot',
-        title: 'Disable home on boot',
-        description: 'Prevent robot from homing motors on boot',
-        restart_required: false,
-        value: true,
+    vi.mocked(useRobotSettingsQuery).mockReturnValue({
+      data: {
+        settings: [
+          {
+            id: 'disableHomeOnBoot',
+            title: 'Disable home on boot',
+            description: 'Prevent robot from homing motors on boot',
+            restart_required: false,
+            value: true,
+          },
+        ],
       },
-    ])
+    } as unknown as UseQueryResult<RobotSettingsResponse>)
     vi.mocked(useLEDLights).mockReturnValue({
       lightsEnabled: false,
       toggleLights: mockToggleLights,
@@ -98,6 +115,7 @@ describe('RobotSettingsDashboard', () => {
       toggleSensors: mockToggleStackerSensors,
     })
     vi.mocked(useNetworkConnection).mockReturnValue({} as any)
+    vi.mocked(useWifiList).mockReturnValue([])
     vi.mocked(useErrorRecoverySettingsToggle).mockReturnValue({
       isEREnabled: true,
       toggleERSettings: mockToggleER,
@@ -271,15 +289,19 @@ describe('RobotSettingsDashboard', () => {
   })
 
   it('should render text with home gantry off', () => {
-    vi.mocked(getRobotSettings).mockReturnValue([
-      {
-        id: 'disableHomeOnBoot',
-        title: 'Disable home on boot',
-        description: 'Prevent robot from homing motors on boot',
-        restart_required: false,
-        value: false,
+    vi.mocked(useRobotSettingsQuery).mockReturnValue({
+      data: {
+        settings: [
+          {
+            id: 'disableHomeOnBoot',
+            title: 'Disable home on boot',
+            description: 'Prevent robot from homing motors on boot',
+            restart_required: false,
+            value: false,
+          },
+        ],
       },
-    ])
+    } as unknown as UseQueryResult<RobotSettingsResponse>)
     render()
     expect(
       screen.getByTestId('RobotSettingButton_home_gantry_on_restart')
@@ -328,6 +350,6 @@ describe('RobotSettingsDashboard', () => {
     render()
     const button = screen.getByText('Robot encryption key')
     fireEvent.click(button)
-    screen.getByText('View robot generated key')
+    expect(vi.mocked(RobotEncryptionKeySettingOption)).toHaveBeenCalled()
   })
 })

@@ -1,15 +1,18 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
+import { useRobotSettingsQuery } from '@opentrons/react-api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
-import { getRobotSettings } from '/app/redux/robot-settings'
 
 import { RobotSettingsFeatureFlags } from '../RobotSettingsFeatureFlags'
 
-vi.mock('/app/redux/robot-settings')
+import type { UseQueryResult } from 'react-query'
+import type { RobotSettingsResponse } from '@opentrons/api-client'
+
+vi.mock('@opentrons/react-api-client')
 
 const MOCK_FF_FIELD = {
   id: 'ff_1',
@@ -25,26 +28,28 @@ const render = () => {
 
 describe('RobotSettings Advanced tab', () => {
   beforeEach(() => {
-    when(getRobotSettings)
-      .calledWith(expect.any(Object), 'otie')
-      .thenReturn([
-        MOCK_FF_FIELD,
-        { ...MOCK_FF_FIELD, id: 'ff_2', title: 'some feature flag 2' },
-        ...[
-          'enableDoorSafetySwitch',
-          'disableHomeOnBoot',
-          'disableHomeOnBoot',
-          'deckCalibrationDots',
-          'shortFixedTrash',
-          'useOldAspirationFunctions',
-          'disableFastProtocolUpload',
-        ].map(id => ({
-          id,
-          title: 'some setting',
-          description: 'this setting is important',
-          value: null,
-        })),
-      ])
+    vi.mocked(useRobotSettingsQuery).mockReturnValue({
+      data: {
+        settings: [
+          MOCK_FF_FIELD,
+          { ...MOCK_FF_FIELD, id: 'ff_2', title: 'some feature flag 2' },
+          ...[
+            'enableDoorSafetySwitch',
+            'disableHomeOnBoot',
+            'disableHomeOnBoot',
+            'deckCalibrationDots',
+            'shortFixedTrash',
+            'useOldAspirationFunctions',
+            'disableFastProtocolUpload',
+          ].map(id => ({
+            id,
+            title: 'some setting',
+            description: 'this setting is important',
+            value: null,
+          })),
+        ],
+      },
+    } as UseQueryResult<RobotSettingsResponse>)
   })
 
   it('should render Toggle for both feature flags and none of the settings', () => {

@@ -1,16 +1,13 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { getRobotSettings } from '/app/redux/robot-settings'
 
 import { UseOlderAspirateBehavior } from '../UseOlderAspirateBehavior'
-
-vi.mock('/app/redux/robot-settings/selectors')
 
 const mockSettings = {
   id: 'useOldAspirationFunctions',
@@ -35,10 +32,6 @@ const render = (isRobotBusy = false) => {
 }
 
 describe('RobotSettings UseOlderAspirateBehavior', () => {
-  beforeEach(() => {
-    vi.mocked(getRobotSettings).mockReturnValue([mockSettings])
-  })
-
   it('should render title, description and toggle button', () => {
     render()
     screen.getByText('Use older aspirate behavior')
@@ -52,11 +45,6 @@ describe('RobotSettings UseOlderAspirateBehavior', () => {
   })
 
   it('should change the value when a user clicks a toggle button', () => {
-    const tempMockSettings = {
-      ...mockSettings,
-      value: false,
-    }
-    vi.mocked(getRobotSettings).mockReturnValue([tempMockSettings])
     render()
     const toggleButton = screen.getByRole('switch', {
       name: 'use_older_aspirate_behavior',

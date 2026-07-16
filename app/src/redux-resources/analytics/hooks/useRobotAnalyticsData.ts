@@ -1,5 +1,7 @@
-import { useEffect, useMemo } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useMemo } from 'react'
+import { useSelector } from 'react-redux'
+
+import { useRobotSettingsQuery } from '@opentrons/react-api-client'
 
 import { useRobot } from '/app/redux-resources/robots'
 import {
@@ -7,10 +9,9 @@ import {
   getRobotFirmwareVersion,
   getRobotSerialNumber,
 } from '/app/redux/discovery'
-import { fetchSettings, getRobotSettings } from '/app/redux/robot-settings'
 
 import type { RobotAnalyticsData } from '/app/redux/analytics/types'
-import type { Dispatch, State } from '/app/redux/types'
+import type { State } from '/app/redux/types'
 
 const FF_PREFIX = 'robotFF_'
 
@@ -24,16 +25,10 @@ export function useRobotAnalyticsData(
   robotName: string
 ): RobotAnalyticsData | null {
   const robot = useRobot(robotName)
-  const settings = useSelector((state: State) =>
-    getRobotSettings(state, robotName)
-  )
+  const robotSettingsQuery = useRobotSettingsQuery()
+  const settings = robotSettingsQuery.data?.settings ?? []
   const serialNumber =
     robot?.status != null ? getRobotSerialNumber(robot) : null
-  const dispatch = useDispatch<Dispatch>()
-
-  useEffect(() => {
-    dispatch(fetchSettings(robotName))
-  }, [dispatch, robotName])
 
   return useMemo(() => {
     if (robot != null) {

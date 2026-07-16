@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -11,6 +11,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useRobotSettingsQuery } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { ToggleButton } from '/app/atoms/buttons'
@@ -18,11 +19,7 @@ import { Divider } from '/app/atoms/structure'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { getFeatureFlags } from '/app/redux/config'
 import { getRobotSerialNumber, UNREACHABLE } from '/app/redux/discovery'
-import {
-  fetchSettings,
-  getRobotSettings,
-  updateSetting,
-} from '/app/redux/robot-settings'
+import { updateSetting } from '/app/redux/robot-settings'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { useCurrentRun } from '/app/resources/runs'
 
@@ -52,12 +49,9 @@ import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRo
 import { handleUpdateBuildroot } from './UpdateBuildroot'
 
 import type { MouseEventHandler } from 'react'
+import type { RobotSettingsField } from '@opentrons/api-client'
 import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
-import type {
-  RobotSettings,
-  RobotSettingsField,
-} from '/app/redux/robot-settings/types'
-import type { Dispatch, State } from '/app/redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 interface RobotSettingsAdvancedProps {
   robotName: string
@@ -84,9 +78,8 @@ export function RobotSettingsAdvanced({
   const robot = useRobot(robotName)
   const isFlex = useIsFlex(robotName)
   const ipAddress = robot?.ip != null ? robot.ip : ''
-  const settings = useSelector<State, RobotSettings>((state: State) =>
-    getRobotSettings(state, robotName)
-  )
+  const robotSettingsQuery = useRobotSettingsQuery()
+  const settings = robotSettingsQuery.data?.settings ?? []
   const reachable = robot?.status !== UNREACHABLE
   const sn = robot?.status != null ? getRobotSerialNumber(robot) : null
 
@@ -120,10 +113,6 @@ export function RobotSettingsAdvanced({
   }
 
   const dispatch = useDispatch<Dispatch>()
-
-  useEffect(() => {
-    dispatch(fetchSettings(robotName))
-  }, [dispatch, robotName])
 
   return (
     <>

@@ -1,5 +1,5 @@
 import type { State } from '../types'
-import type { PerRobotRobotSettingsState, RobotSettings } from './types'
+import type { PerRobotRobotSettingsState } from './types'
 
 const robotState = (
   state: State,

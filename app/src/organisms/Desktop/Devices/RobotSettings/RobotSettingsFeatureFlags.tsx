@@ -1,5 +1,4 @@
-import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -10,20 +9,14 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useRobotSettingsQuery } from '@opentrons/react-api-client'
 
 import { ToggleButton } from '/app/atoms/buttons'
-import {
-  fetchSettings,
-  getRobotSettings,
-  updateSetting,
-} from '/app/redux/robot-settings'
+import { updateSetting } from '/app/redux/robot-settings'
 
 import type { MouseEventHandler } from 'react'
-import type {
-  RobotSettings,
-  RobotSettingsField,
-} from '/app/redux/robot-settings/types'
-import type { Dispatch, State } from '/app/redux/types'
+import type { RobotSettingsField } from '@opentrons/api-client'
+import type { Dispatch } from '/app/redux/types'
 
 interface RobotSettingsFeatureFlagsProps {
   robotName: string
@@ -43,18 +36,13 @@ const NON_FEATURE_FLAG_SETTINGS = [
 export function RobotSettingsFeatureFlags({
   robotName,
 }: RobotSettingsFeatureFlagsProps): JSX.Element {
-  const settings = useSelector<State, RobotSettings>((state: State) =>
-    getRobotSettings(state, robotName)
-  )
+  const robotSettingsQuery = useRobotSettingsQuery()
+  const settings = robotSettingsQuery.data?.settings ?? []
   const featureFlags = settings.filter(
     ({ id }) => !NON_FEATURE_FLAG_SETTINGS.includes(id)
   )
 
   const dispatch = useDispatch<Dispatch>()
-
-  useEffect(() => {
-    dispatch(fetchSettings(robotName))
-  }, [dispatch, robotName])
 
   return (
     <>
