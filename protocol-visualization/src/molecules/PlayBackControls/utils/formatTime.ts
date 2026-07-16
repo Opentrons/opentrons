@@ -8,9 +8,7 @@ export function formatTime(seconds: number, forceHoursFormat: boolean): string {
   const secs = Math.floor(seconds % 60)
 
   const formattedMins =
-    forceHoursFormat || hrs > 0
-      ? String(mins).padStart(2, '0')
-      : String(mins)
+    forceHoursFormat || hrs > 0 ? String(mins).padStart(2, '0') : String(mins)
   const formattedSecs = String(secs).padStart(2, '0')
 
   if (forceHoursFormat || hrs > 0) {

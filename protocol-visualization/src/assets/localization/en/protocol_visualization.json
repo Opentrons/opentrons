@@ -45,7 +45,7 @@
   "stacker_slot": "Stacker {{slot}}",
   "status": "Status",
   "step": "Step {{number}}",
-  "step_details":"Step details",
+  "step_details": "Step details",
   "step_error": "Step error",
   "target_block_temperature": "Target block temperature",
   "target_lid_temperature": "Target lid temperature",

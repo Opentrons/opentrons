@@ -1,12 +1,17 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { NewIconButton, TimelineScrubber, Icon, StyledText } from '@opentrons/components'
+import {
+  Icon,
+  NewIconButton,
+  StyledText,
+  TimelineScrubber,
+} from '@opentrons/components'
+
 import { PerStepOverflowMenu } from '../PerStepOverflowMenu'
+import styles from './playbackcontrols.module.css'
 import { formatTime } from './utils/formatTime'
 import { getSpeedMultiplierText } from './utils/getSpeedMultiplierText'
-
-import styles from './playbackcontrols.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { RunTimeCommand } from '@opentrons/shared-data'
@@ -104,7 +109,9 @@ export function PlayBackControls(props: PlayBackControlsProps): JSX.Element {
 
         {/* elapsed time */}
         <div className={`${styles.time_label} ${styles.time_current}`}>
-          <StyledText desktopStyle='captionRegular'>{formatTime(elapsedSeconds, forceHours)}</StyledText>
+          <StyledText desktopStyle="captionRegular">
+            {formatTime(elapsedSeconds, forceHours)}
+          </StyledText>
         </div>
 
         {/* time slider */}
@@ -114,7 +121,9 @@ export function PlayBackControls(props: PlayBackControlsProps): JSX.Element {
 
         {/* total time */}
         <div className={`${styles.time_label} ${styles.time_total}`}>
-          <StyledText desktopStyle='captionRegular'>{formatTime(totalSeconds, false)}</StyledText>
+          <StyledText desktopStyle="captionRegular">
+            {formatTime(totalSeconds, false)}
+          </StyledText>
         </div>
 
         {/* speed switch */}
@@ -124,7 +133,7 @@ export function PlayBackControls(props: PlayBackControlsProps): JSX.Element {
             className={styles.speed_button}
             onClick={handlePerStepOverflowClick}
           >
-            <StyledText desktopStyle='captionSemiBold'>
+            <StyledText desktopStyle="captionSemiBold">
               {getSpeedMultiplierText(milliSecondsPerFrame)}
             </StyledText>
           </button>
@@ -141,7 +150,12 @@ export function PlayBackControls(props: PlayBackControlsProps): JSX.Element {
       <div className={styles.divider} />
       {/* right edge */}
       <div className={styles.controls_right}>
-        <button type="button" onClick={() => { }} className={styles.icon_button} aria-label={t('step_details')} >
+        <button
+          type="button"
+          onClick={() => {}}
+          className={styles.icon_button}
+          aria-label={t('step_details')}
+        >
           <Icon name="step-detail" size="1rem" />
         </button>
       </div>

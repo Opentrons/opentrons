@@ -8,9 +8,9 @@ const PRESET_SPEEDS: Record<number, string> = {
   1: '1x',
   2: '0.5x',
   3: '0.33x',
-};
+}
 
 export function getSpeedMultiplierText(milliSecondsPerFrame: number): string {
-  const seconds = milliSecondsPerFrame / 1000;
-  return PRESET_SPEEDS[seconds] ?? `${(1 / seconds).toFixed(2)}x`;
+  const seconds = milliSecondsPerFrame / 1000
+  return PRESET_SPEEDS[seconds] ?? `${(1 / seconds).toFixed(2)}x`
 }
