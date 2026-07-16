@@ -74,6 +74,7 @@ export interface ShellState {
   update: ShellUpdateState
   isReady: boolean
   filePaths: string[]
+  usbMountPaths: string[]
   systemLanguage: string[] | null
   stepDetailViewerClosed: StepDetailViewerClosedState
 }
