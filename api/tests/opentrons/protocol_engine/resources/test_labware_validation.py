@@ -247,3 +247,40 @@ def test_validate_definition_is_filter_plate(
 ) -> None:
     """It should validate if definition is defined as a labware with a `filterPlate` quirk."""
     assert subject.validate_definition_is_filter_plate(definition) == expected_result
+
+
+@pytest.mark.parametrize(
+    ("definition", "expected_result"),
+    [
+        (
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                parameters=Parameters2.model_construct()  # type: ignore[call-arg]
+            ),
+            True,
+        ),
+        (
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+                    isDeckSlotCompatible=True
+                )
+            ),
+            True,
+        ),
+        (
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+                    isDeckSlotCompatible=False
+                )
+            ),
+            False,
+        ),
+    ],
+)
+def test_validate_definition_is_deck_slot_compatible(
+    definition: LabwareDefinition, expected_result: bool
+) -> None:
+    """It should validate if definition can be loaded onto a base deck slot."""
+    assert (
+        subject.validate_definition_is_deck_slot_compatible(definition)
+        == expected_result
+    )

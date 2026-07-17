@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useErrorRecoveryFlows } from '/app/organisms/ErrorRecoveryFlows'
 import { useApplyOffsets } from '/app/organisms/LabwarePositionCheck'
 import {
@@ -112,8 +113,9 @@ export function useRunHeaderModalContainer({
   const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
   const { applyOffsets, isApplyingOffsets } = useApplyOffsets(runId)
   const areCameraPreferencesConfirmed = runRecord?.data.cameraSettings != null
+  const documentationState = useDocumentationState()
   const { mutateAsync: addCameraSettingsToRun } =
-    useAddCameraSettingsToRunMutation()
+    useAddCameraSettingsToRunMutation(documentationState)
   const runCameraSettings = useSelector((state: State) =>
     getCameraUsageState(state, runId)
   )

@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 
 import { TertiaryButton } from '/app/atoms/buttons'
-import { useDownloadRobotLogs } from '/app/organisms/Desktop/Devices/hooks'
+import { useDownloadRobotLogs } from '/app/resources/devices/hooks'
 
 import type { MouseEventHandler } from 'react'
 
@@ -29,7 +29,7 @@ export function Troubleshooting({
     useDownloadRobotLogs(robotName)
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = () => {
-    downloadLogs()
+    downloadLogs().catch(() => {})
   }
 
   return (
@@ -58,7 +58,6 @@ export function Troubleshooting({
         disabled={!canDownload || isDownloading}
         marginLeft={SPACING_AUTO}
         onClick={handleClick}
-        id="AdvancedSettings_downloadLogsButton"
         alignSelf={ALIGN_END}
       >
         {t('download_logs')}

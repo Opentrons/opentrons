@@ -105,9 +105,7 @@ export function DevicesLanding(): JSX.Element {
         marginTop={SPACING.spacing8}
         height="2.25rem"
       >
-        <LegacyStyledText forwardedAs="h1" id="DevicesLanding_title">
-          {t('devices')}
-        </LegacyStyledText>
+        <LegacyStyledText forwardedAs="h1">{t('devices')}</LegacyStyledText>
         <NewRobotSetupHelp />
       </Flex>
       {showSearchBar ? (
@@ -214,7 +212,6 @@ function DevicesLoadingState(): JSX.Element {
           href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
           display={DISPLAY_FLEX}
           alignItems={ALIGN_CENTER}
-          id="DevicesEmptyState_troubleshootingConnectionProblems"
         >
           {t('troubleshooting_connection_problems')}
           <Icon

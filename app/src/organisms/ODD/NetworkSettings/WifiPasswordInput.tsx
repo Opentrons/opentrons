@@ -53,7 +53,6 @@ export function WifiPasswordInput({
             <div className={styles.input_field_wrapper}>
               <TouchInputField
                 aria-label="wifi_password"
-                id="wifiPassword"
                 value={password}
                 type={showPassword ? 'text' : 'password'}
                 onBlur={handleBlur}

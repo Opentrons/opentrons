@@ -5,7 +5,9 @@ import { Tabs } from '@opentrons/components'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
+import { DiagnosticFiles } from './DiagnosticFiles'
 import styles from './filemanager.module.css'
+import { DownloadDiagnosticFilesWizard } from './FileManagerWizardFlows/DownloadDiagnosticFilesWizard'
 
 import type { ComponentProps } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
@@ -22,6 +24,7 @@ export function FileManager({
 }: FileManagerProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const [activeTab, setActiveTab] = useState<FileManagerTab>('diagnostic')
+  const [showDownloadModal, setShowDownloadModal] = useState(false)
 
   const showDeleteAll = activeTab === 'compliance' || activeTab === 'records'
 
@@ -62,9 +65,12 @@ export function FileManager({
           iconPlacement: 'startIcon',
         }
       : null
-  const iconProps = showDeleteAll
-    ? { iconName: 'download', iconPlacement: 'startIcon' }
-    : null
+
+  const handleClickButton = (): void => {
+    if (activeTab === 'diagnostic') {
+      setShowDownloadModal(true)
+    }
+  }
 
   return (
     <div className={styles.container}>
@@ -76,15 +82,22 @@ export function FileManager({
         buttonText={showDeleteAll ? t('delete_all') : t('download_all')}
         buttonType={showDeleteAll ? 'alert' : 'primary'}
         buttonCategory="rounded"
-        onClickButton={() => {}}
+        iconName={showDeleteAll ? undefined : 'download'}
+        iconPlacement={showDeleteAll ? undefined : 'startIcon'}
+        onClickButton={handleClickButton}
         {...(secondaryButtonProps != null ? { secondaryButtonProps } : {})}
-        {...(iconProps != null ? { iconProps } : {})}
       />
       <div className={styles.content}>
         <Tabs tabs={tabs} />
-        {/* TODO: add content for each tab */}
-        <div>{activeTab}</div>
+        {activeTab === 'diagnostic' ? <DiagnosticFiles /> : null}
       </div>
+      {showDownloadModal && activeTab === 'diagnostic' ? (
+        <DownloadDiagnosticFilesWizard
+          onClose={() => {
+            setShowDownloadModal(false)
+          }}
+        />
+      ) : null}
     </div>
   )
 }

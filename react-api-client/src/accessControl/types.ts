@@ -153,6 +153,14 @@ type AuditLogAction =
   | 'shutdown_robot'
   | 'update_robot_name'
   | 'update_error_recovery_policy'
+  | 'capture_preview_image'
+  | 'create_camera_image_settings'
+  | 'update_camera'
+  | 'update_camera_settings_for_run'
+  | 'pause_run'
+  | 'delete_run'
+  | 'delete_runs'
+  | 'update_deck_configuration'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.
