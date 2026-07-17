@@ -61,6 +61,7 @@ from .errors.robot_errors import (
 from .robot.control.estop_handler import EstopHandler
 from .service.task_runner import TaskRunner, get_task_runner
 from .settings import RobotServerSettings, get_settings
+from .simulator_calibration_seed import seed_simulator_calibration
 from .subsystems.firmware_update_manager import (
     FirmwareUpdateManager,
     UpdateProcessHandle,
@@ -484,9 +485,12 @@ async def _postinit_ot3_tasks(
     )
 
     hardware = cast("OT3API", hardware_resource)
+    settings = get_settings()
 
     try:
         await _do_updates(hardware, update_manager)
+        if settings.simulator_configuration_file_path is not None:
+            seed_simulator_calibration(Path(settings.simulator_configuration_file_path))
         await hardware.cache_instruments()
         await _home_on_boot(hardware)
         await hardware.set_status_bar_state(StatusBarState.ACTIVATION)
