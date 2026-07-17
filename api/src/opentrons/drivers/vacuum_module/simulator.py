@@ -44,6 +44,10 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
     async def is_connected(self) -> bool:
         return True
 
+    @ensure_yield
+    async def move_port(self, new_port: str) -> None:
+        pass
+
     def reset_serial_buffers(self) -> None:
         pass
 

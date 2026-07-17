@@ -7,6 +7,7 @@ from typing import Any, Awaitable, Callable, List, Mapping, Optional, Union
 
 from typing_extensions import cast
 
+from opentrons.config import IS_ROBOT
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.vacuum_module.abstract import AbstractVacuumModuleDriver
 from opentrons.drivers.vacuum_module.driver import (
@@ -173,11 +174,45 @@ class VacuumModule(mod_abc.AbstractModule):
     def _async_error_callback(self, exception: Exception) -> None:
         self.error_callback(exception)
 
-    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
-    async def cleanup(self) -> None:
-        """Stop the poller task"""
+    async def soft_cleanup(self) -> None:
+        """Stop the poller and disconnect the serial driver without notifying pyro."""
+        self._unsubscribe_init()
+        self._unsubscribe_error()
         await self._poller.stop()
         await self._driver.disconnect()
+
+    @pyro_behavior(specialty_func=remove_pyro_synchronous_object, apply_local=True)
+    async def cleanup(self) -> None:
+        """Stop the poller task."""
+        await self.soft_cleanup()
+
+    async def move_port(self, port: str, usb_port: USBPort) -> None:
+        """Update the module's virtual and physical port after a USB renumber."""
+        self._port = port
+        self._usb_port = usb_port
+        await self._driver.move_port(port)
+
+    async def attempt_reconnect(self) -> None:
+        """Reopen the serial connection and restart the poller after a brief disconnect."""
+        if not IS_ROBOT:
+            return
+        log.info("attempting vacuum module reconnect.")
+        try:
+            if not await self._driver.is_connected():
+                self._driver = await VacuumModuleDriver.create(
+                    port=self.port, loop=self.loop
+                )
+                self._reader._driver = self._driver
+            self._unsubscribe_init = self._reader.set_initialized_callback(
+                self._initialized_callback
+            )
+            self._unsubscribe_error = self._reader.set_error_callback(
+                self._async_error_callback
+            )
+            await self._poller.stop()
+            await self._poller.start()
+        except BaseException:
+            log.exception("Got an error when trying to reconnect vacuum module.")
 
     @classmethod
     def name(cls) -> str:
