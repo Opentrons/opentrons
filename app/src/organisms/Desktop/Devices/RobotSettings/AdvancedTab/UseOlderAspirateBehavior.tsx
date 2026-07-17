@@ -46,7 +46,6 @@ export function UseOlderAspirateBehavior({
         <LegacyStyledText
           css={TYPOGRAPHY.pSemiBold}
           paddingBottom={SPACING.spacing4}
-          id="AdvancedSettings_devTools"
         >
           {t('use_older_aspirate')}
         </LegacyStyledText>
@@ -58,7 +57,6 @@ export function UseOlderAspirateBehavior({
         label="use_older_aspirate_behavior"
         toggledOn={settings?.value === true}
         onClick={handleClick}
-        id="AdvancedSettings_useOlderAspirate"
         disabled={isRobotBusy}
       />
     </Flex>

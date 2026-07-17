@@ -51,7 +51,6 @@ export function WifiSsidInput({
           autoFocus
           aria-label="wifi_ssid"
           value={inputSsid}
-          id="wifiSsid"
           onChange={e => {
             setInputSsid(e.target.value)
           }}

@@ -82,7 +82,6 @@ export function VacuumModuleSlideout(
       isExpanded={isExpanded}
       footer={
         <SubmitPrimaryButton
-          form="VacuumModuleSlideout_submitValue"
           value={t('confirm')}
           onClick={handleConfirm}
           data-testid={`VacuumModuleSlideout_btn_${module.serialNumber}`}

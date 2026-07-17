@@ -174,7 +174,6 @@ export function useModuleOverflowMenu(
   const aboutModuleBtn = (
     <MenuItem
       key={`about_module_${String(module.moduleModel)}`}
-      id={`about_module_${String(module.moduleModel)}`}
       data-testid={`about_module_${String(module.moduleModel)}`}
       disabled={isIncompatibleWithOT3}
       onClick={() => {
@@ -214,7 +213,6 @@ export function useModuleOverflowMenu(
     module.data.speedStatus !== 'idle' ? (
       <MenuItem
         key={`test_shake_${String(module.moduleModel)}`}
-        id={`test_shake_${String(module.moduleModel)}`}
         data-testid={`test_shake_${String(module.moduleModel)}`}
         disabled={isDisabled}
         onClick={() => {
