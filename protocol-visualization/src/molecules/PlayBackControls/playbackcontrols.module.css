@@ -1,10 +1,10 @@
 .container {
-  /* ウィンドウ基準の固定配置へ変更 */
   position: fixed;
+  z-index: 10;
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 999; /* 確実に最前面に浮かす */
+
 
   display: flex;
   align-items: center;
@@ -16,7 +16,6 @@
   padding: 0 var(--spacing-20);
   border-radius: var(--border-radius-full);
   background-color: var(--white);
-  /* 上部も綺麗に回り込むソフトなシャドウ */
   box-shadow: 0 0 6px 1px rgb(22 33 45 / 15%);
   overflow: visible;
 }
@@ -82,7 +81,6 @@
   align-items: center;
 }
 
-/* 通常時から常に正円を維持し、マウスリーブ時の四角形化を防御 */
 .icon_button {
   display: flex;
   width: 2rem;
@@ -91,7 +89,7 @@
   justify-content: center;
   padding: 0;
   border: none;
-  border-radius: 50%; /* 常に円形 */
+  border-radius: 50%;
   background-color: transparent;
   cursor: pointer;
   outline: none;
