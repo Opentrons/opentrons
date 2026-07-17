@@ -14,9 +14,9 @@ from server_utils.keys.key_server import Client as KeyClient
 from server_utils.keys.key_server import SignMessageData
 
 from . import constants
-from .models import LogPeriodEntries, LogPeriodSummary
+from .models import LogPeriodSummary
 from .store import LogStore, NoActivePeriodError, NoLogInPeriodError
-from .types import StoredLog
+from .types import LogPeriodEntries, StoredLog
 from audit_server.log_ingest.models import AuditLogMessage
 from audit_server.settings.store import (
     SettingsStore,

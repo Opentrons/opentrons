@@ -5,12 +5,12 @@ from sqlalchemy import select
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session
 
-from audit_server.log_storage.models import LogPeriodEntries, UserLogEntry
+from audit_server.log_storage.models import UserLogEntry
 from audit_server.log_storage.store import (
     LogStore,
     NoActivePeriodError,
 )
-from audit_server.log_storage.types import StoredLog
+from audit_server.log_storage.types import LogPeriodEntries, StoredLog
 from audit_server.persistence.orm_models import LogPeriod
 
 
@@ -346,7 +346,7 @@ def test_get_period_entries(
 
     log_period_entry = subject_with_period.get_period_entries(str(period_id))
     assert isinstance(log_period_entry, LogPeriodEntries)
-    assert log_period_entry.user_log.user_log_entries == [
+    assert log_period_entry.user_log.userLogEntries == [
         UserLogEntry(
             message="starting tests",
             message_hash="asdasd",

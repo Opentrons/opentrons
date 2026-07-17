@@ -7,13 +7,11 @@ from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session, sessionmaker
 
 from .models import (
-    LogPeriodEntries,
     LogPeriodSummary,
-    RobotLogPaths,
     UserLogEntry,
     UserLogForExport,
 )
-from .types import StoredLog
+from .types import LogPeriodEntries, RobotLogPaths, StoredLog
 from audit_server.persistence.orm_models import LogEntry, LogPeriod
 
 
@@ -189,7 +187,7 @@ class LogStore:
             ]
             return LogPeriodEntries(
                 user_log=UserLogForExport(
-                    user_log_entries=user_log_entries,
+                    userLogEntries=user_log_entries,
                     startedAt=log_period.started_at,
                     endedAt=log_period.ended_at,
                 ),
