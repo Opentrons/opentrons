@@ -13,7 +13,7 @@ vi.mock('../../../log')
 const fetchJson = vi.mocked(_fetchJson)
 
 const MOCK_MANIFEST = {
-  production: {
+  productionV2: {
     '1.2.3': {
       fullImage: 'https://opentrons.com/no',
       system: 'https://opentrons.com/no2',
@@ -121,7 +121,7 @@ describe('ensureCacheDirectory', () => {
 
 describe('getOrDownloadManifest', () => {
   const localManifest = {
-    production: {
+    productionV2: {
       '4.5.6': {
         fullImage: 'https://opentrons.com/no',
         system: 'https://opentrons.com/no2',

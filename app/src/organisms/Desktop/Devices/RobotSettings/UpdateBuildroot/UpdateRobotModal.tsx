@@ -25,6 +25,7 @@ import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { useIsRobotBusy } from '/app/redux-resources/robots'
 import {
   DOWNGRADE,
+  downloadRobotUpdate,
   getRobotUpdateDisplayInfo,
   getRobotUpdateVersion,
   REINSTALL,
@@ -138,6 +139,7 @@ export function UpdateRobotModal({
         </SecondaryButton>
         <PrimaryButton
           onClick={() => {
+            dispatch(downloadRobotUpdate())
             dispatchStartRobotUpdate(robotName)
           }}
           css={FOOTER_BUTTON_STYLE}

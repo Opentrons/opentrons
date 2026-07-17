@@ -43,7 +43,11 @@ import {
   ANALYTICS_LANGUAGE_UPDATED_DESKTOP_APP_SETTINGS,
   useTrackEvent,
 } from '/app/redux/analytics'
-import { getAppLanguage, updateConfigValue } from '/app/redux/config'
+import {
+  getAppLanguage,
+  toggleConfigValue,
+  updateConfigValue,
+} from '/app/redux/config'
 import {
   checkShellUpdate,
   CURRENT_VERSION,
@@ -57,6 +61,7 @@ const GITHUB_LINK =
   'https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md'
 
 const ENABLE_APP_UPDATE_NOTIFICATIONS = 'Enable app update notifications'
+const ENABLE_UPDATE_AUTODOWNLOAD = 'Enable update autodownload'
 const uuid: () => string = uuidv4
 
 export function GeneralSettings(): JSX.Element {
@@ -90,14 +95,19 @@ export function GeneralSettings(): JSX.Element {
     useState<boolean>(updateAvailable)
   const [showConnectRobotSlideout, setShowConnectRobotSlideout] =
     useState(false)
-
+  const automaticUpdateDownloadEnabled = useSelector(
+    (s: State) => s.config?.update.automaticallyDownloadUpdates
+  )
   // may be enabled, disabled, or unknown (because config is loading)
   const updateAlertEnabled = useSelector((s: State) => {
     const ignored = getAlertIsPermanentlyIgnored(s, ALERT_APP_UPDATE_AVAILABLE)
     return ignored !== null ? !ignored : null
   })
   const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false)
-  const handleToggle = (): void => {
+  const handleToggleAutomaticUpdateDownloads = (): void => {
+    dispatch(toggleConfigValue('update.automaticallyDownloadUpdates'))
+  }
+  const handleToggleUpdateAlerts = (): void => {
     if (updateAlertEnabled !== null) {
       dispatch(
         updateAlertEnabled
@@ -232,8 +242,29 @@ export function GeneralSettings(): JSX.Element {
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
         >
-          {t('update_alerts')}
+          {t('software_update')}
         </LegacyStyledText>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+        >
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+              {t('automatically_download_updates')}
+            </LegacyStyledText>
+            <LegacyStyledText forwardedAs="p">
+              {t('when_enabled_updates_are_downloaded_automatically')}
+            </LegacyStyledText>
+          </Flex>
+          <ToggleButton
+            label={ENABLE_UPDATE_AUTODOWNLOAD}
+            marginRight={SPACING.spacing16}
+            disabled={false}
+            toggledOn={automaticUpdateDownloadEnabled === true}
+            onClick={handleToggleAutomaticUpdateDownloads}
+          />
+        </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
@@ -247,7 +278,7 @@ export function GeneralSettings(): JSX.Element {
             marginRight={SPACING.spacing16}
             disabled={updateAlertEnabled === null}
             toggledOn={updateAlertEnabled === true}
-            onClick={handleToggle}
+            onClick={handleToggleUpdateAlerts}
           />
         </Flex>
         <Divider marginY={SPACING.spacing24} />

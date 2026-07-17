@@ -94,7 +94,23 @@ describe('NavigationMenu', () => {
     screen.getByLabelText('reset-position_icon')
     fireEvent.click(screen.getByText('Home gantry'))
     expect(mockHomeGantry).toHaveBeenCalled()
+    expect(props.setShowNavMenu).not.toHaveBeenCalled()
+    capturedHomeGantryProps.onSuccess?.()
     expect(props.setShowNavMenu).toHaveBeenCalled()
+  })
+
+  it('should disable the home menu item and show a spinner while homing', () => {
+    vi.mocked(useHomeGantry).mockReturnValue({
+      homeGantry: mockHomeGantry,
+      isHoming: true,
+    })
+    render(props)
+
+    expect(screen.getByRole('button', { name: /Home gantry/ })).toBeDisabled()
+    screen.getByLabelText('spinner')
+    expect(
+      screen.queryByLabelText('reset-position_icon')
+    ).not.toBeInTheDocument()
   })
 
   it('should show a close-door snackbar when homing the gantry fails because the door is open', () => {

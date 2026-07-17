@@ -32,6 +32,7 @@ import {
   getInvalidCharForKeyboard,
   shouldAcceptKeyboardInput,
 } from '/app/atoms/SoftwareKeyboard'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ConfirmRobotName } from '/app/organisms/ODD/NameRobot/ConfirmRobotName'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 import { ANALYTICS_RENAME_ROBOT, useTrackEvent } from '/app/redux/analytics'
@@ -145,24 +146,29 @@ export function RobotNameEditor(): JSX.Element {
     reset({ newRobotName: '' })
   }
 
-  const { updateRobotName, isLoading: isNaming } = useUpdateRobotNameMutation({
-    onSuccess: (data: UpdatedRobotName) => {
-      if (data.name != null) {
-        setNewName(data.name)
-        if (!isUnboxingFlowOngoing) {
-          navigate('/robot-settings')
-        } else {
-          setIsShowConfirmRobotName(true)
+  const documentationState = useDocumentationState()
+
+  const { updateRobotName, isLoading: isNaming } = useUpdateRobotNameMutation(
+    documentationState,
+    {
+      onSuccess: (data: UpdatedRobotName) => {
+        if (data.name != null) {
+          setNewName(data.name)
+          if (!isUnboxingFlowOngoing) {
+            navigate('/robot-settings')
+          } else {
+            setIsShowConfirmRobotName(true)
+          }
+          if (previousName != null) {
+            dispatch(removeRobot(previousName))
+          }
         }
-        if (previousName != null) {
-          dispatch(removeRobot(previousName))
-        }
-      }
-    },
-    onError: (error: Error) => {
-      console.error('error', error.message)
-    },
-  })
+      },
+      onError: (error: Error) => {
+        console.error('error', error.message)
+      },
+    }
+  )
 
   const handleConfirm = async (): Promise<void> => {
     await trigger('newRobotName')
@@ -278,9 +284,6 @@ export function RobotNameEditor(): JSX.Element {
                     value={field.value}
                     error={fieldState.error?.message && ''}
                     textAlign={TYPOGRAPHY.textAlignCenter}
-                    onBlur={e => {
-                      e.target.focus()
-                    }}
                     onChange={e => {
                       const newVal = e.target.value
                       if (

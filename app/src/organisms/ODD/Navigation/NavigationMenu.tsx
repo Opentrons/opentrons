@@ -38,11 +38,15 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
   const { t, i18n } = useTranslation(['devices_landing', 'robot_controls'])
   const { lightsOn, toggleLights } = useLights()
   const { makeSnackbar } = useToaster()
-  const { homeGantry } = useHomeGantry({
+  const { homeGantry, isHoming } = useHomeGantry({
     onError: error => {
       if (isMaintenanceDoorOpenError(error)) {
         makeSnackbar(t('close_door_to_home') as string)
       }
+      setShowNavMenu(false)
+    },
+    onSuccess: () => {
+      setShowNavMenu(false)
     },
   })
   const [
@@ -67,7 +71,6 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
 
   const handleHomeGantry = (): void => {
     void homeGantry()
-    setShowNavMenu(false)
   }
 
   return createPortal(
@@ -89,13 +92,21 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
         />
       ) : null}
       <MenuList onClick={onClick} isOnDevice={true}>
-        <MenuItem key="reset-position" onClick={handleHomeGantry}>
+        <MenuItem
+          key="reset-position"
+          onClick={handleHomeGantry}
+          disabled={isHoming}
+        >
           <Flex alignItems={ALIGN_CENTER}>
-            <Icon
-              name="reset-position"
-              aria-label="reset-position_icon"
-              size="2.5rem"
-            />
+            {isHoming ? (
+              <Icon name="ot-spinner" aria-label="spinner" size="2.5rem" spin />
+            ) : (
+              <Icon
+                name="reset-position"
+                aria-label="reset-position_icon"
+                size="2.5rem"
+              />
+            )}
             <LegacyStyledText
               forwardedAs="h4"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}

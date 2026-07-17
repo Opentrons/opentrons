@@ -5,7 +5,7 @@ import { CheckboxBasic, COLORS, StyledText } from '@opentrons/components'
 import {
   useDownloadCalibrationData,
   useDownloadRobotLogs,
-} from '/app/organisms/Desktop/Devices/hooks'
+} from '/app/resources/devices/hooks'
 
 import { FileManagementSectionHeader } from '../FileManagementSectionHeader'
 import { useRecordSelection } from '../hooks/useRecordSelection'
@@ -36,10 +36,10 @@ export function DiagnosticsFiles({
 
   const handleDownloadSelected = (): void => {
     if (selectedIds.has('troubleshooting') && !isDownloadingLogs) {
-      downloadLogs()
+      downloadLogs().catch(() => {})
     }
     if (selectedIds.has('calibration') && !isLoadingCalibration) {
-      downloadCalibration()
+      downloadCalibration().catch(() => {})
     }
   }
 

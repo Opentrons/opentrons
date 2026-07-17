@@ -32,7 +32,7 @@ import { registerUpdateBrightness } from './system'
 import { registerRobotSystemUpdate } from './system-update'
 import systemd from './systemd'
 import { createUi, waitForBackendAndShowMainWindow } from './ui'
-import { registerSystemInfo } from './usb'
+import { registerSystemInfo, registerUsbDeviceHandlers } from './usb'
 import { registerDataFiles, watchForMassStorage } from './usb/usb'
 
 import type { BrowserWindow } from 'electron'
@@ -157,6 +157,8 @@ function startUp(): void {
     registerDataFiles(dispatch),
     registerSystemInfo(dispatch),
   ]
+
+  registerUsbDeviceHandlers()
 
   ipcMain.on('dispatch', (_, action) => {
     log.debug('Received action via IPC from renderer', { action })
