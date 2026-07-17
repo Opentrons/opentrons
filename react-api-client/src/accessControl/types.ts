@@ -157,6 +157,8 @@ type AuditLogAction =
   | 'update_camera'
   | 'update_camera_settings_for_run'
   | 'pause_run'
+  | 'disconnect_wifi'
+  | 'connect_wifi'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.
