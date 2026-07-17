@@ -24,9 +24,9 @@
   min-width: 9.25rem; /* 148px */
   flex: 1;
   flex-direction: column;
-  overflow-y: auto;
-  gap: var(--spacing-40);
   align-items: center;
+  gap: var(--spacing-40);
+  overflow-y: auto;
 }
 
 .right_column {
