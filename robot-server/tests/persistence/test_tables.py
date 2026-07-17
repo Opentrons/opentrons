@@ -293,6 +293,9 @@ EXPECTED_STATEMENTS_V16 = [
     """,
 ]
 
+EXPECTED_STATEMENTS_V17 = EXPECTED_STATEMENTS_V16
+EXPECTED_STATEMENTS_LATEST = EXPECTED_STATEMENTS_V17
+
 EXPECTED_STATEMENTS_V15 = [
     """
     CREATE TABLE protocol (
@@ -542,8 +545,6 @@ EXPECTED_STATEMENTS_V15 = [
     CREATE INDEX ix_labware_offset_sequence_components_offset_id ON labware_offset_sequence_components (offset_id)
     """,
 ]
-
-EXPECTED_STATEMENTS_LATEST = EXPECTED_STATEMENTS_V16
 
 EXPECTED_STATEMENTS_V14 = [
     """
@@ -2064,6 +2065,10 @@ EXPECTED_STATEMENTS_V2 = [
     ("metadata", "expected_statements"),
     [
         (latest_metadata, EXPECTED_STATEMENTS_LATEST),
+        (
+            schema_16.metadata,
+            EXPECTED_STATEMENTS_V17,
+        ),  # schema 17 = schema 16 with file permissions
         (schema_16.metadata, EXPECTED_STATEMENTS_V16),
         (schema_15.metadata, EXPECTED_STATEMENTS_V15),
         (schema_14.metadata, EXPECTED_STATEMENTS_V14),

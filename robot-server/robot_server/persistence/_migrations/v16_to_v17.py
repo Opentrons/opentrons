@@ -32,11 +32,13 @@ class Migration16to17(Migration):
 def _migrate_permissions(dest_dir: Path) -> None:
     protocols_dir = dest_dir / PROTOCOLS_DIRECTORY
 
-    os.chmod(protocols_dir, PROTOCOL_DIR_PERMISSIONS)
-    for item in protocols_dir.glob("**/*"):
-        if item.is_dir():
-            os.chmod(item, PROTOCOL_DIR_PERMISSIONS)
-        else:
-            # Gaurantee read permissions on migrated files to ensure accessibility, even
-            # if they were already readable under the existing umask rules.
-            os.chmod(item, PROTOCOL_FILE_PERMISSIONS)
+    # Ensure a protocols directory is present before setting permissions
+    if protocols_dir.is_dir():
+        os.chmod(protocols_dir, PROTOCOL_DIR_PERMISSIONS)
+        for item in protocols_dir.glob("**/*"):
+            if item.is_dir():
+                os.chmod(item, PROTOCOL_DIR_PERMISSIONS)
+            else:
+                # Gaurantee read permissions on migrated files to ensure accessibility, even
+                # if they were already readable under the existing umask rules.
+                os.chmod(item, PROTOCOL_FILE_PERMISSIONS)
