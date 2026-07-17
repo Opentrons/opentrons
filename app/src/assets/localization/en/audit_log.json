@@ -8,6 +8,8 @@
   "attach_pipette_right": "Launching attach pipette on right mount flow",
   "calibrate": "Calibrating",
   "create_protocol": "Creating protocol",
+  "delete_run": "Deleting protocol run record",
+  "delete_runs": "Deleting protocol run records",
   "detach": "Detaching",
   "detach_gripper": "Detaching gripper",
   "dismiss_run": "Dismissing protocol run",
