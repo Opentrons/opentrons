@@ -11,8 +11,7 @@ const OFFSET_8_CHANNEL = 9 // offset in mm between tips
 const COLUMN_TIP_COUNT = 8
 const ROW_TIP_COUNT = 12
 
-const MULTICHANNEL_COLUMN_TIP_SPAN =
-  OFFSET_8_CHANNEL * (COLUMN_TIP_COUNT - 1)
+const MULTICHANNEL_COLUMN_TIP_SPAN = OFFSET_8_CHANNEL * (COLUMN_TIP_COUNT - 1)
 const MULTICHANNEL_ROW_TIP_SPAN = OFFSET_8_CHANNEL * (ROW_TIP_COUNT - 1)
 
 /** returns true when labware is a series of row-length wells (ex: 8-well reservoir). */

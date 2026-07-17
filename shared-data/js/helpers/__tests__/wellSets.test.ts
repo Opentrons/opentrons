@@ -2,11 +2,11 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { get96Channel384WellPlateWells, orderWells } from '..'
 import { ALL, COLUMN, ROW, SINGLE } from '../../../command/types'
+import nest_8_reservoir_22ml from '../../../labware/definitions/2/nest_8_reservoir_22ml/2.json'
 import fixture_12_trough from '../../../labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '../../../labware/fixtures/2/fixture_96_plate.json'
 import fixture_384_plate from '../../../labware/fixtures/2/fixture_384_plate.json'
 import fixture_overlappy_wellplate from '../../../labware/fixtures/2/fixture_overlappy_wellplate.json'
-import nest_8_reservoir_22ml from '../../../labware/definitions/2/nest_8_reservoir_22ml/2.json'
 import {
   fixtureP10MultiV2Specs,
   fixtureP10SingleV2Specs,
