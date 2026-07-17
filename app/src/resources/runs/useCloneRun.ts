@@ -54,6 +54,7 @@ export function useCloneRun(
     }
   )
   const { createProtocolAnalysis } = useCreateProtocolAnalysisMutation(
+    documentationState,
     protocolKey,
     host
   )

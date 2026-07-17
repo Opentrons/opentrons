@@ -11,6 +11,7 @@ import {
 } from '@opentrons/components'
 import {
   getQueryKey,
+  isDocumentedMutationError,
   useCreateProtocolAnalysisMutation,
   useCreateRunMutation,
   useHost,
@@ -171,12 +172,12 @@ export function ProtocolSetupParameters({
     }
   }
 
+  const documentationState = useDocumentationState()
+
   const { createProtocolAnalysis, isLoading: isAnalysisLoading } =
-    useCreateProtocolAnalysisMutation(protocolId, host)
+    useCreateProtocolAnalysisMutation(documentationState, protocolId, host)
 
   const { uploadCsvFile } = useUploadCsvFileMutation({}, host)
-
-  const documentationState = useDocumentationState()
 
   const { createRun, isLoading: isRunLoading } = useCreateRunMutation(
     documentationState,
@@ -241,11 +242,25 @@ export function ProtocolSetupParameters({
           },
           {
             onSuccess: () => {
-              createRun({
-                protocolId,
-                runTimeParameterValues,
-                runTimeParameterFiles,
-              })
+              createRun(
+                {
+                  protocolId,
+                  runTimeParameterValues,
+                  runTimeParameterFiles,
+                },
+                {
+                  onError: (error: unknown) => {
+                    if (isDocumentedMutationError(error)) {
+                      setStartSetup(false)
+                    }
+                  },
+                }
+              )
+            },
+            onError: (error: unknown) => {
+              if (isDocumentedMutationError(error)) {
+                setStartSetup(false)
+              }
             },
           }
         )

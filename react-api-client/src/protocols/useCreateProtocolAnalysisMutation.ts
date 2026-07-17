@@ -1,7 +1,8 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { createProtocolAnalysis } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
@@ -17,6 +18,8 @@ import type {
   RunTimeParameterFilesCreateData,
   RunTimeParameterValuesCreateData,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
+import type { DocumentedMutationParameters } from '../accessControl/types'
 
 export interface CreateProtocolAnalysisVariables {
   protocolKey: string
@@ -43,6 +46,7 @@ export type UseCreateProtocolAnalysisMutationOptions = UseMutationOptions<
 >
 
 export function useCreateProtocolAnalysisMutation(
+  documentationState: DocumentationState,
   protocolId: string | null,
   hostOverride?: HostConfig | null,
   options: UseCreateProtocolAnalysisMutationOptions | undefined = {}
@@ -52,24 +56,30 @@ export function useCreateProtocolAnalysisMutation(
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     ProtocolAnalysisSummaryResult,
     AxiosError<ErrorResponse>,
     CreateProtocolAnalysisVariables
   >(
+    documentationState,
+    ['create_protocol_analysis'],
     getQueryKey(host, 'protocols', protocolId, 'analyses'),
     ({
-      protocolKey,
-      runTimeParameterValues,
-      runTimeParameterFiles,
-      forceReAnalyze,
-    }) =>
+      variables: {
+        protocolKey,
+        runTimeParameterValues,
+        runTimeParameterFiles,
+        forceReAnalyze,
+      },
+      userNotes,
+    }: DocumentedMutationParameters<CreateProtocolAnalysisVariables>) =>
       createProtocolAnalysis(
         host!,
         protocolKey,
         runTimeParameterValues,
         runTimeParameterFiles,
-        forceReAnalyze
+        forceReAnalyze,
+        userNotes
       )
         .then(response => {
           queryClient

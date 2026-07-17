@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 
 import {
+  isDocumentedMutationError,
   useCreateProtocolAnalysisMutation,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import {
   ANALYTICS_LPC_ANALYSIS_KIND,
   useTrackEvent,
@@ -38,8 +40,11 @@ export function useCompatibleAnalysis(
 
   const trackEvent = useTrackEvent()
   const protocolId = runRecord?.data.protocolId ?? ''
-  const { createProtocolAnalysis } =
-    useCreateProtocolAnalysisMutation(protocolId)
+  const documentationState = useDocumentationState()
+  const { createProtocolAnalysis } = useCreateProtocolAnalysisMutation(
+    documentationState,
+    protocolId
+  )
   const { data: freshAnalysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
     compatibleAnalysisId,
@@ -80,6 +85,11 @@ export function useCompatibleAnalysis(
                   const data = res.data
                   // The last analysis is the most recent.
                   setCompatibleAnalysisId(data[data.length - 1].id as string)
+                }
+              },
+              onError: (error: unknown) => {
+                if (isDocumentedMutationError(error)) {
+                  hasProcessedAnalysis.current = false
                 }
               },
             }
