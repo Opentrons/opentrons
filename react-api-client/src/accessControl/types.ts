@@ -160,6 +160,9 @@ type AuditLogAction =
   | 'delete_run'
   | 'delete_runs'
   | 'update_deck_configuration'
+  | 'update_audit_settings'
+  | 'update_auth_settings'
+  | 'patch_robot_server_crs_settings'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.
