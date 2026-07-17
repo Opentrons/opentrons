@@ -76,7 +76,6 @@ describe('useAccountInfo', () => {
           username: 'test-user',
           fullName: 'Test User Name',
           accountType: 'user',
-          scopes: [],
           locked: false,
           resetPassword: false,
         },

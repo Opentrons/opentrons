@@ -16,6 +16,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { ToggleButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
+import { getFeatureFlags } from '/app/redux/config'
 import { getRobotSerialNumber, UNREACHABLE } from '/app/redux/discovery'
 import {
   fetchSettings,
@@ -31,6 +32,7 @@ import {
   DisplayRobotName,
   EnableErrorRecoveryMode,
   EnableStatusLight,
+  EnterRobotEncryptionKey,
   FactoryMode,
   GantryHoming,
   LegacySettings,
@@ -77,6 +79,7 @@ export function RobotSettingsAdvanced({
 
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
   const currentRun = useCurrentRun()
+  const featureFlags = useSelector(getFeatureFlags)
 
   const robot = useRobot(robotName)
   const isFlex = useIsFlex(robotName)
@@ -176,6 +179,15 @@ export function RobotSettingsAdvanced({
         <RobotServerVersion robotName={robotName} />
         <Divider marginY={SPACING.spacing16} />
         <RobotInformation robotName={robotName} />
+        {featureFlags.accessControlMode ? (
+          <>
+            <Divider marginY={SPACING.spacing16} />
+            <EnterRobotEncryptionKey
+            // Note: Unlike other buttons on this page,
+            // this should be available even if the robot is busy.
+            />
+          </>
+        ) : null}
         {isFlex ? null : (
           <>
             <Divider marginY={SPACING.spacing16} />

@@ -6,6 +6,7 @@ import styles from './robotsettingsfilemanager.module.css'
 
 interface FileManagementSectionHeaderProps {
   titleText: string
+  showButtons: boolean
   onDownloadSelected: () => void
   onDeleteSelected?: () => void
 }
@@ -13,21 +14,23 @@ interface FileManagementSectionHeaderProps {
 export function FileManagementSectionHeader(
   props: FileManagementSectionHeaderProps
 ): JSX.Element {
-  const { titleText, onDownloadSelected, onDeleteSelected } = props
+  const { titleText, onDownloadSelected, onDeleteSelected, showButtons } = props
   const { t } = useTranslation('device_details')
   return (
     <div className={styles.file_management_header}>
       <StyledText desktopStyle="bodyLargeSemiBold">{titleText}</StyledText>
-      <div className={styles.file_management_header_button_group}>
-        <BasicButton onClick={onDownloadSelected} iconName="download">
-          {t('download_selected')}
-        </BasicButton>
-        {onDeleteSelected != null ? (
-          <BasicButton onClick={onDeleteSelected}>
-            {t('delete_selected')}
+      {showButtons ? (
+        <div className={styles.file_management_header_button_group}>
+          <BasicButton onClick={onDownloadSelected} iconName="download">
+            {t('download_selected')}
           </BasicButton>
-        ) : null}
-      </div>
+          {onDeleteSelected != null ? (
+            <BasicButton onClick={onDeleteSelected}>
+              {t('delete_selected')}
+            </BasicButton>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   )
 }

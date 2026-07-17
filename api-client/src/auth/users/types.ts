@@ -4,7 +4,6 @@ export interface AuthUser {
   username: string
   fullName: string
   accountType: AuthUserAccountType
-  scopes: string[]
   locked: boolean
   resetPassword: boolean
 }
@@ -15,6 +14,8 @@ export interface AuthUserResponse {
 
 export interface UpdateSelfRequest {
   data: {
-    password: string
+    username?: string
+    fullName?: string
+    password?: string
   }
 }

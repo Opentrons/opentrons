@@ -17,12 +17,14 @@ import type {
  * If mutations can prompt for documentation themselves, use useDocumentationState instead.
  *
  *  @param initialDocstate - an optional documentation state to use as a base. To be used when a flow needs to sometimes but not always prompt before the first mutation.
+ *  @param promptEnabled - when false, defer prompting until set to true. Defaults to true.
  *
  */
 export const usePromptForDocumentation = (
   actionsToDocument: DocumentedAction[],
   onCancel?: () => void,
-  initialDocstate?: DocumentationState
+  initialDocstate?: DocumentationState,
+  promptEnabled: boolean = true
 ): DocumentationState => {
   const [docReport, setDocReport] = useState<DocumentationReport>()
   const docStateToUse =
@@ -36,6 +38,12 @@ export const usePromptForDocumentation = (
   const promptInFlight = useRef(false)
 
   useEffect(() => {
+    if (!promptEnabled) {
+      setDocReport(undefined)
+      promptInFlight.current = false
+      return
+    }
+
     const promptForDocumentation = async (): Promise<void> => {
       if (
         !docState.isLoading &&
@@ -56,7 +64,7 @@ export const usePromptForDocumentation = (
     if (!docState.isLoading) {
       void promptForDocumentation()
     }
-  }, [actionsToDocument, docReport, docState, onCancel])
+  }, [actionsToDocument, docReport, docState, onCancel, promptEnabled])
 
   return docState
 }

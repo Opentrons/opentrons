@@ -17,6 +17,7 @@ import {
 import { OT_SYSTEM_CAMERA } from '@opentrons/shared-data'
 
 import { ToggleButton } from '/app/atoms/buttons'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
 import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -56,10 +57,13 @@ export function SetupCamera({
   const { makeSnackbar } = useToaster()
   const storageInfo = useRobotStorageInfo()
   const dispatch = useDispatch()
+  const documentationState = useLinkedDocumentationState([
+    'update_camera_settings_for_run',
+  ])
   const { mutateAsync: addCameraSettingsToRunAsync } =
-    useAddCameraSettingsToRunMutation()
+    useAddCameraSettingsToRunMutation(documentationState)
   const { mutateAsync: addCameraImageSettingsToRunAsync } =
-    useAddCameraImageSettingsToRunMutation(runId)
+    useAddCameraImageSettingsToRunMutation(documentationState, runId)
   const isFlex = useIsFlex(robotName)
 
   const [isConfirmPending, setIsConfirmPending] = useState(false)

@@ -33,6 +33,10 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   }
 })
 
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
+
 vi.mock('/app/resources/protocols')
 vi.mock('/app/resources/runs')
 

@@ -94,7 +94,10 @@ export function request<
   const tokenHeader = token != null ? { Authorization: `Bearer ${token}` } : {}
   const userNotesHeader =
     requestConfig?.userNotes != null
-      ? { 'Opentrons-User-Notes': requestConfig.userNotes }
+      ? // encodeURI() is nominally for URIs, and this is a header, not a URI.
+        // But encodeURI() is sufficient for percent-encoding all the characters
+        // that would be invalid in a header.
+        { 'Opentrons-User-Notes': encodeURI(requestConfig.userNotes) }
       : {}
   const extraHeaders = requestConfig?.headers ?? {}
   const headers = {

@@ -122,6 +122,7 @@ export const RECOMMENDED_LABWARE_BY_MODULE: {
     'opentrons_flex_96_tiprack_1000ul',
     'opentrons_flex_96_tiprack_200ul',
     'opentrons_flex_96_tiprack_50ul',
+    'opentrons_flex_96_tiprack_20ul',
     // tested and verified well plates
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
     'biorad_96_wellplate_200ul_pcr',

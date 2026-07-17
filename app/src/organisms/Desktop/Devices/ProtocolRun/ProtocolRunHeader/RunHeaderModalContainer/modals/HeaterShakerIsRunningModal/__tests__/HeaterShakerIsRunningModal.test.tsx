@@ -5,6 +5,7 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { useAttachedModules } from '/app/resources/modules'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
@@ -22,6 +23,9 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
     useCreateLiveCommandMutation: vi.fn(),
   }
 })
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 vi.mock('/app/resources/modules')
 vi.mock('/app/resources/runs')
 vi.mock('../HeaterShakerModuleCard')

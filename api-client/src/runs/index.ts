@@ -1,4 +1,5 @@
 export { getRun } from './getRun'
+export { getRunRaw } from './getRunRaw'
 export { deleteRun } from './deleteRun'
 export { createRun } from './createRun'
 export { getRuns } from './getRuns'
