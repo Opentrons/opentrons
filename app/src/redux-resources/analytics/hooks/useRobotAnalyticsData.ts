@@ -24,7 +24,8 @@ export function useRobotAnalyticsData(
 ): RobotAnalyticsData | null {
   const robot = useRobot(robotName)
   const robotSettingsQuery = useRobotSettingsQuery()
-  const settings = robotSettingsQuery.data?.settings ?? []
+  const settingsData = robotSettingsQuery.data?.settings
+  const settings = useMemo(() => settingsData ?? [], [settingsData])
   const serialNumber =
     robot?.status != null ? getRobotSerialNumber(robot) : null
 
