@@ -175,9 +175,6 @@ export const getEntireWellSelection = (
   const columnIndex = wellOrdering.findIndex(column =>
     column.includes(wellName)
   )
-  const indexInColumn = wellOrdering[columnIndex].findIndex(
-    well => well === wellName
-  )
   if (columnIndex === -1) return []
   const rowIndex = wellOrdering[columnIndex].indexOf(wellName)
   const is384Plate = wellOrdering.flat().length === 384
@@ -226,9 +223,9 @@ export const getEntireWellSelection = (
       return is384Plate
         ? skipEveryOtherWell(
             wellName,
-            column.slice(indexInColumn, Math.min(end, column.length))
+            column.slice(rowIndex, Math.min(end, column.length))
           )
-        : column.slice(indexInColumn, Math.min(end, column.length))
+        : column.slice(rowIndex, Math.min(end, column.length))
     }
     default:
       return [wellName]
