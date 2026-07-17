@@ -82,7 +82,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     selectedRunTimeCommand,
     liquids,
     commands,
-    filteredCommands,
+    // filteredCommands,
   } = props
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null)
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
