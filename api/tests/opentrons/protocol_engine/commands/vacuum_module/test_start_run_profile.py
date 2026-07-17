@@ -43,7 +43,10 @@ async def test_start_run_profile(
 ) -> None:
     """It should be able to execute the specified module's profile run."""
     subject = StartRunProfileImpl(
-        state_view=state_view, equipment=equipment, task_handler=real_task_handler
+        state_view=state_view,
+        equipment=equipment,
+        task_handler=real_task_handler,
+        model_utils=model_utils,
     )
 
     cycle_power_step = VacuumModuleProfilePowerStep(

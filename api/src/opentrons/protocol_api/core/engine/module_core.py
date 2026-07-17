@@ -135,6 +135,21 @@ class ModuleCore(AbstractModuleCore[LabwareCore]):
         """Get the min allowed gauge pressure in mbar."""
         return MIN_GAUGE_PRESSURE_MBAR
 
+    def inject_async_gcode_response(
+        self,
+        gcode_response: str,
+        command: str,
+    ) -> None:
+        """Inject a firmware-style async G-code error for module testing."""
+        inject = getattr(
+            self._sync_module_hardware, "inject_async_gcode_response", None
+        )
+        if inject is None:
+            raise NotImplementedError(
+                f"inject_async_gcode_response is not supported by {self.get_model()}"
+            )
+        inject(gcode_response=gcode_response, command=command)
+
 
 class NonConnectedModuleCore(AbstractModuleCore[LabwareCore]):
     """Not connected module core logic implementation for Python protocols.

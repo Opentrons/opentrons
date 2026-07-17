@@ -685,16 +685,13 @@ class LabwareView:
         definition = self.get_definition(labware_id)
         return definition.parameters.quirks or []
 
-    def get_should_center_column_on_target_well(self, labware_id: str) -> bool:
-        """True if a pipette moving to this labware should center its active column on the target.
+    def get_should_center_column_or_row_on_target_well(self, labware_id: str) -> bool:
+        """True if a pipette moving to this labware should center its active column or row on the target.
 
-        This is true for labware that have wells spanning entire columns.
+        This is true for labware that have wells spanning entire columns or rows.
         """
         has_quirk = self.get_has_quirk(labware_id, "centerMultichannelOnWells")
-        return has_quirk and (
-            len(self.get_definition(labware_id).wells) > 1
-            and len(self.get_definition(labware_id).wells) < 96
-        )
+        return has_quirk and 1 < len(self.get_definition(labware_id).wells) < 96
 
     def get_labware_stacking_maximum(self, labware: LabwareDefinition) -> int:
         """Returns the maximum number of labware allowed in a stack for a given labware definition.
@@ -721,6 +718,18 @@ class LabwareView:
     def get_has_12_subwells(self, labware_id: str) -> bool:
         """True if a labware is a reservoir with a 12-grid of sub-wells."""
         return self.get_has_quirk(labware_id, "offsetPipetteFor12GridSubwells")
+
+    def get_is_column_labware(self, labware_id: str) -> bool:
+        """True if a labware is a series of column-length wells. One well reservoirs do not count."""
+        definition = self.get_definition(labware_id)
+        return len(definition.wells) > 1 and all(
+            len(column) == 1 for column in definition.ordering
+        )
+
+    def get_is_row_labware(self, labware_id: str) -> bool:
+        """True if a labware is a series of row-length wells. One well reservoirs do not count."""
+        definition = self.get_definition(labware_id)
+        return len(definition.wells) > 1 and len(definition.ordering) == 1
 
     def get_well_definition(
         self,
@@ -1189,6 +1198,13 @@ class LabwareView:
             return False
 
         labware_definition = self.get_definition(labware_id)
+
+        # Labware staged off-deck for maintenance runs are not physically stacked.
+        # Skip containedSpace checks so unrelated off-deck labware (e.g. a collar and
+        # a plate loaded separately for LPC) can be moved independently.
+        if labware.location == OFF_DECK_LOCATION:
+            return True
+
         # Check every other loaded labware to see if any contains this one
         for container in self.get_all():
             if container.id == labware_id:

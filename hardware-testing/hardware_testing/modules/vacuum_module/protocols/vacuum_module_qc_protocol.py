@@ -6,7 +6,6 @@ from opentrons.protocol_api import (
     Labware,
     ParameterContext,
     ProtocolContext,
-    ParameterContext,
     VacuumModuleContext,
 )
 from opentrons.protocol_api.core.engine.module_core import VacuumModuleCore
@@ -14,14 +13,13 @@ from opentrons.protocols.parameters.types import ParameterChoice
 
 
 metadata = {
-    "protocolName": "Vacuum Module DVT QC Protocol V0.2",
+    "protocolName": "Vacuum Module DVT QC Protocol V0.3",
     "author": "Opentrons <protocols@opentrons.com>",
 }
 requirements = {
     "robotType": "Flex",
     "apiLevel": "2.30",
 }
-
 
 PIPETTE_CHOICES: List[ParameterChoice] = [
     {"display_name": "1ch 50µL", "value": "flex_1channel_50"},
@@ -96,7 +94,6 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="target_pressure",
         description="The target gauge pressure in mbar.",
         default=-200,
-        minimum=-800,
         maximum=0,
     )
     parameters.add_int(
@@ -183,6 +180,11 @@ def run(ctx: ProtocolContext) -> None:
         "D2",
         adapter=adapter,
     )
+    tiprack_50 = ctx.load_labware(
+        "opentrons_flex_96_tiprack_50ul",
+        "D2",
+        adapter="opentrons_flex_96_tiprack_adapter",
+    )
 
     # Load Labware
     manifold_collar = vm_mod.load_adapter_to_dock(ctx.params.collar)  # type: ignore[attr-defined]
@@ -253,6 +255,7 @@ def run(ctx: ProtocolContext) -> None:
         ctx.move_labware(manifold_collar, vm_mod.manifold_dock, use_gripper=True)  # type: ignore[attr-defined]
         # Move the black flat plate onto the vacuum module
         ctx.move_labware(black_flat_plate, vm_mod, use_gripper=True)
+        black_flat_plate.set_offset(x=0.00, y=0.00, z=0.00)
         # Move collar with filter plate to the vacuum module base
         ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
 

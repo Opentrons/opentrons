@@ -37,6 +37,7 @@ async def test_start_set_vacuum_presure(
         equipment=equipment,
         movement=movement,
         task_handler=real_task_handler,
+        model_utils=model_utils,
     )
 
     gauge_pressure = -444.0

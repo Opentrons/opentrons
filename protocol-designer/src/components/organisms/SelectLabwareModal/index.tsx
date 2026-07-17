@@ -31,6 +31,7 @@ import {
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_V1,
   getAreSlotsHorizontallyAdjacent,
+  getIsDeckSlotCompatible,
   getIsLabwareAboveHeight,
   getLabwareDefIsStandard,
   getLabwareDefURI,
@@ -317,6 +318,11 @@ export function SelectLabwareModal(
       const isLid = labwareDef.allowedRoles?.includes('lid')
       const isAdapter96Channel = parameters.loadName === ADAPTER_96_CHANNEL
       const isVacuumCollar = getIsVacuumCollar(labwareDef)
+      const isBaseDeckSlot =
+        moduleType == null &&
+        !isOnVacuumDock &&
+        !isOnHopper &&
+        slot !== 'offDeck'
 
       // for vacuum dock, show collars when empty, filter plates when collar present
       if (isOnVacuumDock) {
@@ -370,6 +376,7 @@ export function SelectLabwareModal(
           moduleType !== VACUUM_MODULE_TYPE) ||
         (isAdapter96Channel && !has96Channel) ||
         (slot === 'offDeck' && (isAdapter || isLid)) ||
+        (isBaseDeckSlot && !getIsDeckSlotCompatible(labwareDef)) ||
         (PLATE_READER_LOADNAME === parameters.loadName &&
           moduleType !== ABSORBANCE_READER_TYPE) ||
         parameters.loadName === TIPRACK_LID_LOADNAME

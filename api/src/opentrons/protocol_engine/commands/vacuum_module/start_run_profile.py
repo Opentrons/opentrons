@@ -26,6 +26,7 @@ from opentrons.hardware_control.modules.types import (
 from opentrons.hardware_control.modules.types import (
     VacuumModuleProfileStep as hc_profile_step,
 )
+from opentrons.protocol_engine.resources import ModelUtils
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
@@ -133,9 +134,10 @@ class StartRunProfileResult(BaseModel):
     taskId: str = Field(..., description="The id of the profile task")
 
 
-class StartRunProfileImpl(
-    AbstractCommandImpl[StartRunProfileParams, SuccessData[StartRunProfileResult]]
-):
+_ExecuteReturn = Union[SuccessData[StartRunProfileResult],]
+
+
+class StartRunProfileImpl(AbstractCommandImpl[StartRunProfileParams, _ExecuteReturn]):
     """Execution implementation of a run vacuum profile command."""
 
     def __init__(
@@ -143,11 +145,13 @@ class StartRunProfileImpl(
         state_view: StateView,
         equipment: EquipmentHandler,
         task_handler: TaskHandler,
+        model_utils: ModelUtils,
         **unused_dependencies: object,
     ) -> None:
         self._state_view = state_view
         self._equipment = equipment
         self._task_handler = task_handler
+        self._model_utils = model_utils
 
     async def execute(
         self, params: StartRunProfileParams
@@ -160,8 +164,6 @@ class StartRunProfileImpl(
             )
 
         state_update = update_types.StateUpdate()
-        vm_state = self._state_view.modules.get_vacuum_module_substate(params.moduleId)
-        vm_hardware = self._equipment.get_module_hardware_api(vm_state.module_id)
         profile: List[hc_profile_step] = []
         pump_engaged = False
         for step in params.profile:
@@ -170,6 +172,14 @@ class StartRunProfileImpl(
                 pump_engaged = step.enablePump
 
         state_update.update_vacuum_module_pump_engaged(params.moduleId, pump_engaged)
+        running_command_id = self._state_view.commands.get_running_command_id()
+        if running_command_id is not None:
+            state_update.record_module_background_command(
+                params.moduleId, running_command_id
+            )
+
+        vm_state = self._state_view.modules.get_vacuum_module_substate(params.moduleId)
+        vm_hardware = self._equipment.get_module_hardware_api(vm_state.module_id)
 
         async def start_run_profile(task_handler: TaskHandler) -> None:
             if vm_hardware is not None:
@@ -203,7 +213,11 @@ class StartRunProfileImpl(
 
 
 class StartRunProfile(
-    BaseCommand[StartRunProfileParams, StartRunProfileResult, ErrorOccurrence]
+    BaseCommand[
+        StartRunProfileParams,
+        StartRunProfileResult,
+        ErrorOccurrence,
+    ]
 ):
     """A command to run a vacuum module profile."""
 

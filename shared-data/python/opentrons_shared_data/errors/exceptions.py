@@ -1340,3 +1340,115 @@ class MissingConfigurationData(GeneralError):
         super().__init__(
             ErrorCodes.MISSING_CONFIGURATION_DATA, message, detail, wrapping
         )
+
+
+class VacuumModuleUnknownError(RoboticsControlError):
+    """An error indicating that some unknown issue has happened with the vacuum module."""
+
+    def __init__(
+        self,
+        serial: str,
+        mode: str,
+        target: float,
+        current: float,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a VacuumModuleUnknownError."""
+        checked_detail: Dict[str, str] = dict(detail) if detail else {}
+        checked_detail["serial"] = serial
+        checked_detail["mode"] = mode
+        checked_detail["target"] = str(target)
+        checked_detail["current"] = str(current)
+        self.serial = serial
+        self.mode = mode
+        self.target = target
+        self.current = current
+        super().__init__(
+            ErrorCodes.GENERAL_ERROR,
+            message,
+            checked_detail,
+            wrapping,
+        )
+        self.args = (
+            serial,
+            mode,
+            target,
+            current,
+            message,
+            detail,
+            wrapping,
+        )
+
+
+class VacuumModulePressureNotReachedError(RoboticsControlError):
+    """An error indicating that the target pressure was not reached in the vacuum module."""
+
+    def __init__(
+        self,
+        serial: str,
+        mode: str,
+        target_pressure: float,
+        current_pressure: float,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a VacuumModulePressureNotReachedError."""
+        checked_detail: Dict[str, str] = dict(detail) if detail else {}
+        checked_detail["serial"] = serial
+        checked_detail["mode"] = mode
+        checked_detail["target"] = str(target_pressure)
+        checked_detail["current"] = str(current_pressure)
+        self.serial = serial
+        self.mode = mode
+        self.target_pressure = target_pressure
+        self.current_pressure = current_pressure
+        super().__init__(
+            ErrorCodes.VACUUM_PRESSURE_NOT_REACHED,
+            message,
+            checked_detail,
+            wrapping,
+        )
+        self.args = (
+            serial,
+            target_pressure,
+            current_pressure,
+            mode,
+            message,
+            detail,
+            wrapping,
+        )
+
+
+class VacuumModuleWasteFullError(RoboticsControlError):
+    """An error indicating that the vacuum module waste container is full."""
+
+    def __init__(
+        self,
+        serial: str,
+        mode: str,
+        target: float,
+        current: float,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a VacuumModuleWasteFullError."""
+        checked_detail: Dict[str, str] = dict(detail) if detail else {}
+        checked_detail["serial"] = serial
+        checked_detail["mode"] = mode
+        checked_detail["target"] = str(target)
+        checked_detail["current"] = str(current)
+        self.serial = serial
+        self.mode = mode
+        self.target = target
+        self.current = current
+        super().__init__(
+            ErrorCodes.VACUUM_WASTE_CONTAINER_FULL,
+            message,
+            checked_detail,
+            wrapping,
+        )
+        self.args = (serial, message, detail, wrapping)

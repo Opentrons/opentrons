@@ -175,6 +175,32 @@ class StateView(HasState[State]):
         """Get state view selectors for task state."""
         return self._tasks
 
+    def failed_task_failures_absorbed_by_active_recovery(
+        self, task_ids: list[str]
+    ) -> bool:
+        """Return whether every failed waited-on task is covered by active recovery.
+
+        A failed task is covered when the engine is awaiting recovery and the task's
+        originating command is the current recovery target. This lets ``waitForTasks``
+        succeed after associated-command recovery without masking unrelated failures.
+        """
+        failed_task_ids = self._tasks.get_failed_tasks(task_ids)
+        if not failed_task_ids:
+            return True
+
+        if not self._commands.get_is_awaiting_recovery():
+            return False
+
+        recovery_target = self._commands.get_recovery_target()
+        if recovery_target is None:
+            return False
+
+        recovery_command_id = recovery_target.command_id
+        return all(
+            self._tasks.get_originating_command_id(task_id) == recovery_command_id
+            for task_id in failed_task_ids
+        )
+
     def get_summary(self) -> StateSummary:
         """Get protocol run data."""
         error = self._commands.get_error()

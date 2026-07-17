@@ -14,6 +14,7 @@ from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonExce
 
 from ..actions import (
     Action,
+    BeginAwaitingRecoveryAction,
     CreateUserCommandAnnotation,
     DoorChangeAction,
     FailCommandAction,
@@ -49,6 +50,7 @@ from .config import Config
 from opentrons.hardware_control.types import DoorState
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.actions.actions import (
+    MarkProtocolPauseDeferredAction,
     ResumeFromRecoveryAction,
     RunCommandAction,
     SetErrorRecoveryPolicyAction,
@@ -166,12 +168,15 @@ class CommandAnnotationsSlice(BaseModel):
 
 @dataclass(frozen=True)
 class _RecoveryTargetInfo:
-    """Info about the failed command that we're currently recovering from."""
+    """Info about the command that we're currently recovering from."""
 
     command_id: str
 
     state_update_if_false_positive: update_types.StateUpdate
     """See `CommandView.get_state_update_if_continued()`."""
+
+    error: Optional[ErrorOccurrence] = None
+    """The recovery error, when the target command has not been marked failed."""
 
 
 @dataclass
@@ -253,6 +258,9 @@ class CommandState:
     has_entered_error_recovery: bool
     """Whether the run has entered error recovery."""
 
+    protocol_pause_deferred: bool
+    """Whether recovery interrupted a protocol pause that should resume afterward."""
+
     stopped_by_async_error: bool
     """If this is set to True, the engine was stopped by an async event."""
 
@@ -297,6 +305,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             is_stopping_because_of_async_error=False,
             error_recovery_policy=error_recovery_policy,
             has_entered_error_recovery=False,
+            protocol_pause_deferred=False,
             command_annotations={},
         )
 
@@ -309,12 +318,16 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 self._handle_run_command_action(action)
             case SucceedCommandAction():
                 self._handle_succeed_command_action(action)
+            case BeginAwaitingRecoveryAction():
+                self._handle_begin_awaiting_recovery_action(action)
             case FailCommandAction():
                 self._handle_fail_command_action(action)
             case PlayAction():
                 self._handle_play_action(action)
             case PauseAction():
                 self._handle_pause_action(action)
+            case MarkProtocolPauseDeferredAction():
+                self._handle_mark_protocol_pause_deferred_action(action)
             case ResumeFromRecoveryAction():
                 self._handle_resume_from_recovery_action(action)
             case StopAction():
@@ -375,6 +388,40 @@ class CommandStore(HasState[CommandState], HandlesActions):
     def _handle_succeed_command_action(self, action: SucceedCommandAction) -> None:
         succeeded_command = action.command
         self._state.command_history.set_command_succeeded(succeeded_command)
+
+    def _handle_begin_awaiting_recovery_action(
+        self, action: BeginAwaitingRecoveryAction
+    ) -> None:
+        if isinstance(action.error, EnumeratedError):
+            public_error_occurrence = ErrorOccurrence.from_failed(
+                id=action.error_id,
+                createdAt=action.failed_at,
+                error=action.error,
+            )
+            state_update_if_false_positive = update_types.StateUpdate()
+        else:
+            public_error_occurrence = action.error.public
+            state_update_if_false_positive = action.error.state_update_if_false_positive
+
+        self._state.command_error_recovery_types[action.command_id] = action.type
+
+        if (
+            action.command.intent in (CommandIntent.PROTOCOL, None)
+            and action.type == ErrorRecoveryType.WAIT_FOR_RECOVERY
+        ):
+            if (
+                self._state.queue_status == QueueStatus.PAUSED
+                or self._state.is_door_blocking
+            ):
+                self._state.queue_status = QueueStatus.AWAITING_RECOVERY_PAUSED
+            else:
+                self._state.queue_status = QueueStatus.AWAITING_RECOVERY
+            self._state.recovery_target = _RecoveryTargetInfo(
+                command_id=action.command_id,
+                state_update_if_false_positive=state_update_if_false_positive,
+                error=public_error_occurrence,
+            )
+            self._state.has_entered_error_recovery = True
 
     def _handle_fail_command_action(  # noqa: C901
         self, action: FailCommandAction
@@ -487,15 +534,25 @@ class CommandStore(HasState[CommandState], HandlesActions):
     def _handle_pause_action(self, action: PauseAction) -> None:
         self._state.queue_status = QueueStatus.PAUSED
 
+    def _handle_mark_protocol_pause_deferred_action(
+        self, action: MarkProtocolPauseDeferredAction
+    ) -> None:
+        self._state.protocol_pause_deferred = True
+
     def _handle_resume_from_recovery_action(
         self, action: ResumeFromRecoveryAction
     ) -> None:
-        self._state.queue_status = QueueStatus.RUNNING
+        if self._state.protocol_pause_deferred:
+            self._state.queue_status = QueueStatus.PAUSED
+            self._state.protocol_pause_deferred = False
+        else:
+            self._state.queue_status = QueueStatus.RUNNING
         self._state.recovery_target = None
 
     def _handle_stop_action(self, action: StopAction) -> None:
         if not self._state.run_result:
             self._state.recovery_target = None
+            self._state.protocol_pause_deferred = False
             self._state.queue_status = QueueStatus.PAUSED
 
             if action.from_asynchronous_error:
@@ -508,6 +565,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
     def _handle_finish_action(self, action: FinishAction) -> None:
         if not self._state.run_result:
             self._state.recovery_target = None
+            self._state.protocol_pause_deferred = False
             self._state.queue_status = QueueStatus.PAUSED
 
             if action.set_run_status:
@@ -675,7 +733,15 @@ class CommandView:
 
     def get(self, command_id: str) -> Command:
         """Get a command by its unique identifier."""
-        return self._state.command_history.get(command_id).command
+        command = self._state.command_history.get(command_id).command
+        recovery_target = self._state.recovery_target
+        if (
+            recovery_target is not None
+            and recovery_target.command_id == command_id
+            and recovery_target.error is not None
+        ):
+            return command.model_copy(update={"error": recovery_target.error})
+        return command
 
     def get_all(self) -> List[Command]:
         """Get a list of all commands in state.
@@ -882,6 +948,18 @@ class CommandView:
         """Get whether the protocol is running & queued commands should be executed."""
         return self._state.queue_status == QueueStatus.RUNNING
 
+    def get_is_awaiting_recovery(self) -> bool:
+        """Get whether the run is waiting for client-driven error recovery."""
+        return self.get_status() in (
+            EngineStatus.AWAITING_RECOVERY,
+            EngineStatus.AWAITING_RECOVERY_PAUSED,
+            EngineStatus.AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+        )
+
+    def get_protocol_pause_deferred(self) -> bool:
+        """Return whether recovery interrupted a protocol pause."""
+        return self._state.protocol_pause_deferred
+
     def get_most_recently_finalized_command(self) -> Optional[CommandEntry]:
         """Get the most recent command that has reached its final `status`. See get_command_is_final."""
         run_requested_to_stop = self._state.run_result is not None
@@ -1020,14 +1098,24 @@ class CommandView:
         including in between commands.
         """
         failed_command = self._state.failed_command
+        recovery_target = self._state.recovery_target
+        error: Optional[ErrorOccurrence] = None
         if (
             failed_command
             and failed_command.command.error
             and failed_command.command.intent != CommandIntent.SETUP
         ):
+            error = failed_command.command.error
+        elif recovery_target and recovery_target.error is not None:
+            recovery_command = self._state.command_history.get(
+                recovery_target.command_id
+            ).command
+            if recovery_command.intent != CommandIntent.SETUP:
+                error = recovery_target.error
+        if error is not None:
             raise ProtocolCommandFailedError(
-                original_error=failed_command.command.error,
-                message=failed_command.command.error.detail,
+                original_error=error,
+                message=error.detail,
             )
 
     def get_error_recovery_type(self, command_id: str) -> ErrorRecoveryType:

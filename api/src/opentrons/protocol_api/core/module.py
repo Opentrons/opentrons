@@ -45,6 +45,16 @@ class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
     def get_display_name(self) -> str:
         """Get the module's display name."""
 
+    def inject_async_gcode_response(
+        self,
+        gcode_response: str,
+        command: str,
+    ) -> None:
+        """Inject a firmware-style async G-code error for module testing."""
+        raise NotImplementedError(
+            "inject_async_gcode_response is not supported by this module."
+        )
+
 
 ModuleCoreType = TypeVar("ModuleCoreType", bound=AbstractModuleCore[Any])
 

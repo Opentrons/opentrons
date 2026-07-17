@@ -1,4 +1,5 @@
 import {
+  getIsDeckSlotCompatible,
   getLabwareDefIsStandard,
   locationIsOffDeck,
 } from '@opentrons/shared-data'
@@ -33,6 +34,10 @@ const getMoveLabwareError = (
       invariantContext.moduleEntities[newLocation.moduleId].type
     errorString = !getLabwareCompatibleWithModule(labware.def, moduleType)
       ? 'Labware incompatible with this module'
+      : null
+  } else if ('slotName' in newLocation) {
+    errorString = !getIsDeckSlotCompatible(labware.def)
+      ? 'Labware cannot be loaded onto a deck slot'
       : null
   } else if ('labwareId' in newLocation) {
     const adapterDef =
