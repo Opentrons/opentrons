@@ -377,6 +377,8 @@
   "troubleshooting": "故障排查",
   "try_again": "再试一次",
   "try_restarting_the_update": "尝试重新启动更新。",
+  "turn_off_robot": "关闭机器人",
+  "turn_off_robot_confirmation_description": "<span><bold>{{robotName}}</bold> 将关闭。</span>",
   "unable_to_cancel_update": "无法取消正在进行的更新",
   "unable_to_commit_update": "无法提交更新",
   "unable_to_connect": "无法连接到 Wi-Fi",

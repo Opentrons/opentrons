@@ -3,15 +3,28 @@ from __future__ import annotations
 import asyncio
 import logging
 import math
-from typing import Any, Awaitable, Callable, List, Mapping, Optional, Union
+from typing import Any, Awaitable, Callable, List, Mapping, Optional, Type, Union
 
 from typing_extensions import cast
+
+from opentrons_shared_data.errors.exceptions import (
+    EnumeratedError,
+    VacuumModulePressureNotReachedError,
+    VacuumModuleUnknownError,
+    VacuumModuleWasteFullError,
+)
 
 from opentrons.config import IS_ROBOT
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.vacuum_module.abstract import AbstractVacuumModuleDriver
 from opentrons.drivers.vacuum_module.driver import (
     VacuumModuleDriver,
+)
+from opentrons.drivers.vacuum_module.errors import (
+    FailedToVent,
+    PressureNotReached,
+    WasteContainerFull,
+    async_gcode_response_to_error,
 )
 from opentrons.drivers.vacuum_module.simulator import SimulatingDriver
 from opentrons.drivers.vacuum_module.types import (
@@ -47,8 +60,23 @@ from opentrons.util.pyro.pyro_synchronous_adapter import (
 
 log = logging.getLogger(__name__)
 
+_RecoverableVacuumEnumeratedError = Type[
+    Union[
+        VacuumModulePressureNotReachedError,
+        VacuumModuleWasteFullError,
+    ]
+]
+
+_RECOVERABLE_VACUUM_DRIVER_ERRORS: dict[
+    type[Exception], _RecoverableVacuumEnumeratedError
+] = {
+    PressureNotReached: VacuumModulePressureNotReachedError,
+    WasteContainerFull: VacuumModuleWasteFullError,
+}
+
 POLL_PERIOD = 2.0
 SIMULATING_POLL_PERIOD = POLL_PERIOD / 20.0
+DEFAULT_EQUALIZE_TIMEOUT_S = 120.0
 
 DFU_PID = "df11"
 
@@ -172,7 +200,24 @@ class VacuumModule(mod_abc.AbstractModule):
             await self._handle_status_bar_event(self._last_status_bar_event)
 
     def _async_error_callback(self, exception: Exception) -> None:
-        self.error_callback(exception)
+        self.error_callback(self._to_enumerated_error(exception))
+
+    def _to_enumerated_error(self, exception: Exception) -> EnumeratedError:
+        serial = self.serial_number or ""
+        target = self._reader.vacuum_state.target_gauge_pressure
+        current = self._reader.vacuum_state.current_gauge_pressure
+        mode = self.operation_mode.value
+        if self.operation_mode == VacuumOperationMode.POWER:
+            target = self._reader.pump_state.target_pwm
+            current = self._reader.pump_state.current_pwm
+
+        for (
+            driver_error_type,
+            enumerated_error_type,
+        ) in _RECOVERABLE_VACUUM_DRIVER_ERRORS.items():
+            if isinstance(exception, driver_error_type):
+                return enumerated_error_type(serial, mode, target, current)
+        return VacuumModuleUnknownError(serial, mode, target, current)
 
     async def soft_cleanup(self) -> None:
         """Stop the poller and disconnect the serial driver without notifying pyro."""
@@ -251,6 +296,29 @@ class VacuumModule(mod_abc.AbstractModule):
     def is_simulated(self) -> bool:
         return isinstance(self._driver, SimulatingDriver)
 
+    def inject_async_gcode_response(
+        self,
+        gcode_response: str,
+        command: str = "M121",
+    ) -> None:
+        """Inject a firmware-style async G-code error for vacuum module testing.
+
+        On simulated modules the error is queued on the next polled driver read.
+        On real hardware the error is delivered through the module reader callback
+        path, which matches how async firmware errors surface during a run.
+        """
+        driver_error = async_gcode_response_to_error(
+            port=self.port,
+            gcode_response=gcode_response,
+            command=command,
+        )
+        if self.is_simulated:
+            sim_driver = self._driver
+            if isinstance(sim_driver, SimulatingDriver):
+                sim_driver.inject_async_error(driver_error)
+                return
+        self._reader.on_error(driver_error)
+
     @property
     def live_data(self) -> LiveData:
         data: VacuumModuleData = {
@@ -288,24 +356,17 @@ class VacuumModule(mod_abc.AbstractModule):
             or self._reader.vacuum_state.vacuum_enabled
         )
 
-    def _average_absolute_pressure_mbar(self) -> float:
-        state = self.vacuum_state
-        return round((state.pressure_abs_a + state.pressure_abs_b) / 2, 2)
-
     @property
     def current_gauge_pressure_mbar(self) -> float:
         """Gauge pressure derived from absolute and atmospheric sensor readings."""
         state = self.vacuum_state
-        return round(self._average_absolute_pressure_mbar() - state.pressure_atm, 2)
+        avg_pressure = round((state.pressure_abs_a + state.pressure_abs_b) / 2, 2)
+        return round(avg_pressure - state.pressure_atm, 2)
 
     @property
-    def under_vacuum(self) -> bool:
-        state = self.vacuum_state
-        atm_pressure = state.pressure_atm
-        avg_pressure = (state.pressure_abs_a + state.pressure_abs_b) / 2
-        return math.isclose(
-            state.pressure_abs_a, state.pressure_abs_b, abs_tol=PRESSURE_TOL
-        ) and not math.isclose(avg_pressure, atm_pressure, abs_tol=PRESSURE_TOL)
+    def pressure_equalized(self) -> bool:
+        """True when derived gauge pressure indicates atmospheric pressure."""
+        return math.isclose(self.current_gauge_pressure_mbar, 0.0, abs_tol=PRESSURE_TOL)
 
     @property
     def total_cycle_count(self) -> Optional[int]:
@@ -421,8 +482,10 @@ class VacuumModule(mod_abc.AbstractModule):
 
     async def set_vent_state(self, vent_state: VentState) -> None:
         """Open or close the vent."""
-        # TODO: Handle error
-        await self._driver.set_vent_state(state=vent_state)
+        try:
+            await self._driver.set_vent_state(state=vent_state)
+        except FailedToVent:
+            raise
 
     async def set_vacuum_state(
         self,
@@ -513,6 +576,29 @@ class VacuumModule(mod_abc.AbstractModule):
                 vent_after=vent_after,
             )
 
+    def _operation_was_stopped(self) -> bool:
+        """Return whether vacuum/pump operation was stopped externally."""
+        vacuum_state = self._reader.vacuum_state
+        pump_state = self._reader.pump_state
+        return not (
+            (vacuum_state.vacuum_enabled if vacuum_state is not None else False)
+            or (pump_state.pump_running if pump_state is not None else False)
+        )
+
+    async def _wait_for_step_completion(self, step: VacuumModuleStep) -> bool:
+        """Wait for a profile step to complete.
+
+        Returns True when the step was stopped externally via stopVacuum.
+        """
+        if (
+            step["hold_time_minutes"] is not None
+            or step["hold_time_seconds"] is not None
+        ):
+            await self.wait_for_command_duration()
+        else:
+            await self.wait_for_target()
+        return step["enable_pump"] and self._operation_was_stopped()
+
     async def _execute_profile(
         self,
         profile: List[Union[VacuumModuleCycle, VacuumModuleStep]],
@@ -529,27 +615,23 @@ class VacuumModule(mod_abc.AbstractModule):
                     for step in this_cycle["steps"]:
                         self._current_step_index += 1
                         await self._execute_cycle_step(step)
-                        if (
-                            step["hold_time_minutes"] is not None
-                            or step["hold_time_seconds"] is not None
-                        ):
-                            await self.wait_for_command_duration()
-                        else:
-                            await self.wait_for_target()
+                        if await self._wait_for_step_completion(step):
+                            return
                 if this_cycle["vent_after"] is not None:
                     await self.set_vent_state(
                         vent_state=VentState(this_cycle["vent_after"])
                     )
             else:
                 await self._execute_cycle_step(step_or_cycle)
-                await self.wait_for_command_duration()
+                if await self._wait_for_step_completion(step_or_cycle):
+                    return
         if vent_after:
             await self.set_vent_state(VentState.OPENED)
 
     async def execute_profile(
         self,
         profile: List[Union[VacuumModuleCycle, VacuumModuleStep]],
-        vent_after: bool = False,
+        vent_after: bool = True,
     ) -> None:
         await self.wait_for_is_running()
         self._total_cycle_count = 0
@@ -566,19 +648,19 @@ class VacuumModule(mod_abc.AbstractModule):
             else:
                 self._total_step_count += 1
                 self._total_cycle_count += 1
-        task = self._loop.create_task(self._execute_profile(profile))
+        task = self._loop.create_task(
+            self._execute_profile(profile, vent_after=vent_after)
+        )
         self.make_cancellable(task)
         await task
 
     async def _wait_for_command_duration(self) -> None:
         await self._reader.update_vacuum_state()
-
         while self.vacuum_state.vacuum_duration > 0:
             await self._poller.wait_next_poll()
 
     async def wait_for_command_duration(self) -> None:
         await self.wait_for_is_running()
-
         task = self._loop.create_task(self._wait_for_command_duration())
         self.make_cancellable(task)
         await task
@@ -586,6 +668,28 @@ class VacuumModule(mod_abc.AbstractModule):
     async def wait_for_target(self) -> None:
         await self.wait_for_is_running()
         task = self._loop.create_task(self._wait_for_target())
+        self.make_cancellable(task)
+        await task
+
+    async def _wait_for_pressure_equalization(self, timeout_s: float) -> None:
+        """Poll until chamber pressure has equalized to atmospheric."""
+        start = self._loop.time()
+        while not self.pressure_equalized:
+            if self._loop.time() - start >= timeout_s:
+                raise RuntimeError(
+                    "Vacuum module pressure did not equalize within "
+                    f"{timeout_s}s. Current gauge pressure: "
+                    f"{self.current_gauge_pressure_mbar} mbar."
+                )
+            await self._poller.wait_next_poll()
+
+    async def wait_for_pressure_equalization(
+        self,
+        timeout_s: float = DEFAULT_EQUALIZE_TIMEOUT_S,
+    ) -> None:
+        """Wait until the chamber is no longer under vacuum."""
+        await self.wait_for_is_running()
+        task = self._loop.create_task(self._wait_for_pressure_equalization(timeout_s))
         self.make_cancellable(task)
         await task
 

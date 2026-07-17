@@ -10,6 +10,7 @@ from opentrons.protocol_engine.actions.actions import (
     StartTaskAction,
 )
 from opentrons.protocol_engine.errors import ErrorOccurrence
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.tasks import TaskStore, TaskView
 from opentrons.protocol_engine.types import FinishedTask, Task
 
@@ -254,6 +255,17 @@ async def test_all_tasks_finished_or_any_task_failed(subject: TaskStore) -> None
         {task_id_finished, task_id_error}
     )
     assert result
+
+
+def test_record_module_background_command(subject: TaskStore) -> None:
+    """It should record the latest background command for a module."""
+    state_update = update_types.StateUpdate()
+    state_update.record_module_background_command("module-id", "command-id")
+    subject._handle_state_update(state_update)
+
+    view = TaskView(subject._state)
+    assert view.get_last_background_command_id("module-id") == "command-id"
+    assert view.get_last_background_command_id("unknown-module") is None
 
 
 def test_get_failed_tasks(subject: TaskStore) -> None:

@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 
 from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
 from typing_extensions import Literal, Type
 
 from ...errors.error_occurrence import ErrorOccurrence
@@ -23,6 +24,10 @@ class OpenVentParams(BaseModel):
     """Input parameters to open the vent."""
 
     moduleId: str = Field(..., description="Unique ID of the vacuum module.")
+    equalizeTimeout: int | SkipJsonSchema[None] = Field(
+        None,
+        description="Time in seconds to wait for pressure equalization after opening the vent. Does not wait if None.",
+    )
 
 
 class OpenVentResult(BaseModel):
@@ -50,6 +55,8 @@ class OpenVentImpl(AbstractCommandImpl[OpenVentParams, SuccessData[OpenVentResul
         vm_hardware = self._equipment.get_module_hardware_api(vm_state.module_id)
         if vm_hardware is not None:
             await vm_hardware.set_vent_state(vent_state=VentState.OPENED)
+            if params.equalizeTimeout is not None:
+                await vm_hardware.wait_for_pressure_equalization(params.equalizeTimeout)
 
         return SuccessData(public=OpenVentResult(), state_update=state_update)
 

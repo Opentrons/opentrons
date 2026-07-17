@@ -94,6 +94,12 @@ export const initializeSentry = (isAnalyticsEnabled: boolean): void => {
 
         return event
       },
+      beforeSendTransaction(event) {
+        if (event.transaction === '/') {
+          return null
+        }
+        return event
+      },
     })
 
     isSentryInitialized = true

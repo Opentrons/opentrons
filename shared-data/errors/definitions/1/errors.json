@@ -230,6 +230,14 @@
       "detail": "Barcode scanner failed to find barcode.",
       "category": "roboticsInteractionError"
     },
+    "3040": {
+      "detail": "Vacuum Module Pressure Not Reached",
+      "category": "roboticsInteractionError"
+    },
+    "3041": {
+      "detail": "Vacuum Module Waste Container Full",
+      "category": "roboticsInteractionError"
+    },
     "4000": {
       "detail": "Unknown or Uncategorized Error",
       "category": "generalError"

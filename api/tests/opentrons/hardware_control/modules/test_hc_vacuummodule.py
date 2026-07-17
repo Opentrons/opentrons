@@ -5,7 +5,16 @@ from unittest import mock
 import pytest
 from decoy import Decoy
 
+from opentrons_shared_data.errors.exceptions import (
+    VacuumModulePressureNotReachedError,
+    VacuumModuleWasteFullError,
+)
+
 from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.vacuum_module.errors import (
+    PressureNotReached,
+    WasteContainerFull,
+)
 from opentrons.drivers.vacuum_module.simulator import SimulatingDriver
 from opentrons.drivers.vacuum_module.types import (
     HardwareRevision,
@@ -23,6 +32,7 @@ from opentrons.hardware_control.modules.types import (
     VacuumModuleCycle,
     VacuumModulePowerStep,
     VacuumModulePressureStep,
+    VacuumModuleStep,
     VacuumOperationMode,
     VentStatus,
 )
@@ -34,6 +44,36 @@ from opentrons.hardware_control.modules.vacuum_module import (
 )
 from opentrons.hardware_control.poller import Poller
 from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
+
+
+def _set_reader_async_error_context(
+    reader: VacuumModuleReader,
+    *,
+    mode: VacuumOperationMode,
+    target: float,
+    current: float,
+) -> None:
+    """Seed reader state the way async error enumeration reads it."""
+    reader.set_operation_mode(mode)
+    reader.vacuum_state = VacuumState(
+        target_gauge_pressure=target,
+        current_gauge_pressure=current,
+        pressure_abs_a=0,
+        pressure_abs_b=0,
+        pressure_atm=0,
+        vacuum_enabled=True,
+        vacuum_duration=0,
+        vent_state=VentState.CLOSED,
+    )
+    if mode == VacuumOperationMode.POWER:
+        reader.pump_state = PumpState(
+            target_rpm=0,
+            current_rpm=0,
+            target_pwm=target,
+            current_pwm=current,
+            pump_running=True,
+            manual_control=True,
+        )
 
 
 @pytest.fixture
@@ -243,25 +283,25 @@ async def test_live_data_includes_target_power_after_set_pump_state(
         "pressure_atm",
         "firmware_gauge_pressure",
         "expected_gauge_pressure",
-        "expected_under_vacuum",
+        "expected_pressure_equalized",
     ),
     [
-        (700.0, 700.0, 1013.0, 0.0, -313.0, True),
-        (1013.0, 1013.0, 1013.0, 0.0, 0.0, False),
+        (700.0, 700.0, 1013.0, 0.0, -313.0, False),
+        (1013.0, 1013.0, 1013.0, 0.0, 0.0, True),
         (750.0, 700.0, 1013.0, -250.0, -288.0, False),
-        (1009.5, 1007.0, 1012.2, -5.2, -3.95, False),
+        (1009.5, 1007.0, 1012.2, -5.2, -3.95, True),
     ],
 )
-async def test_current_gauge_pressure_mbar_and_under_vacuum(
+async def test_current_gauge_pressure_mbar_and_pressure_equalized(
     subject: modules.VacuumModule,
     pressure_abs_a: float,
     pressure_abs_b: float,
     pressure_atm: float,
     firmware_gauge_pressure: float,
     expected_gauge_pressure: float,
-    expected_under_vacuum: bool,
+    expected_pressure_equalized: bool,
 ) -> None:
-    """Gauge pressure should be computed from absolute and atmospheric sensors."""
+    """Gauge pressure and pressure_equalized should be derived from sensor readings."""
     subject._reader.vacuum_state = VacuumState(
         target_gauge_pressure=-300.0,
         current_gauge_pressure=firmware_gauge_pressure,
@@ -274,7 +314,143 @@ async def test_current_gauge_pressure_mbar_and_under_vacuum(
     )
 
     assert subject.current_gauge_pressure_mbar == expected_gauge_pressure
-    assert subject.under_vacuum is expected_under_vacuum
+    assert subject.pressure_equalized is expected_pressure_equalized
+
+
+async def test_wait_for_pressure_equalization_returns_when_already_equalized(
+    subject: modules.VacuumModule,
+) -> None:
+    """It should return immediately when pressure is already equalized."""
+    subject._reader.vacuum_state = VacuumState(
+        target_gauge_pressure=0.0,
+        current_gauge_pressure=0.0,
+        pressure_abs_a=1013.0,
+        pressure_abs_b=1013.0,
+        pressure_atm=1013.0,
+        vacuum_enabled=False,
+        vacuum_duration=0,
+        vent_state=VentState.OPENED,
+    )
+
+    await subject.wait_for_pressure_equalization()
+
+
+async def test_wait_for_pressure_equalization_waits_until_equalized(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """It should poll until chamber pressure equalizes."""
+    subject._reader.vacuum_state = VacuumState(
+        target_gauge_pressure=0.0,
+        current_gauge_pressure=-300.0,
+        pressure_abs_a=700.0,
+        pressure_abs_b=700.0,
+        pressure_atm=1013.0,
+        vacuum_enabled=False,
+        vacuum_duration=0,
+        vent_state=VentState.OPENED,
+    )
+    unequalized_states = [
+        VacuumState(
+            target_gauge_pressure=0.0,
+            current_gauge_pressure=-300.0,
+            pressure_abs_a=700.0,
+            pressure_abs_b=700.0,
+            pressure_atm=1013.0,
+            vacuum_enabled=False,
+            vacuum_duration=0,
+            vent_state=VentState.OPENED,
+        ),
+        VacuumState(
+            target_gauge_pressure=0.0,
+            current_gauge_pressure=-50.0,
+            pressure_abs_a=950.0,
+            pressure_abs_b=950.0,
+            pressure_atm=1013.0,
+            vacuum_enabled=False,
+            vacuum_duration=0,
+            vent_state=VentState.OPENED,
+        ),
+    ]
+    equalized_state = VacuumState(
+        target_gauge_pressure=0.0,
+        current_gauge_pressure=0.0,
+        pressure_abs_a=1013.0,
+        pressure_abs_b=1013.0,
+        pressure_atm=1013.0,
+        vacuum_enabled=False,
+        vacuum_duration=0,
+        vent_state=VentState.OPENED,
+    )
+    read_calls = 0
+
+    async def _vacuum_state_side_effect() -> VacuumState:
+        nonlocal read_calls
+        read_calls += 1
+        if read_calls <= len(unequalized_states):
+            return unequalized_states[read_calls - 1]
+        return equalized_state
+
+    decoy.when(await mock_driver.get_vacuum_state()).then_do(_vacuum_state_side_effect)
+
+    await subject.wait_for_pressure_equalization(timeout_s=5.0)
+
+    assert read_calls >= len(unequalized_states)
+
+
+async def test_wait_for_pressure_equalization_raises_on_timeout(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """It should raise when pressure does not equalize within the timeout."""
+    stuck_state = VacuumState(
+        target_gauge_pressure=0.0,
+        current_gauge_pressure=-300.0,
+        pressure_abs_a=700.0,
+        pressure_abs_b=700.0,
+        pressure_atm=1013.0,
+        vacuum_enabled=False,
+        vacuum_duration=0,
+        vent_state=VentState.OPENED,
+    )
+    subject._reader.vacuum_state = stuck_state
+
+    async def _vacuum_state_side_effect() -> VacuumState:
+        return stuck_state
+
+    decoy.when(await mock_driver.get_vacuum_state()).then_do(_vacuum_state_side_effect)
+
+    with pytest.raises(RuntimeError, match="did not equalize"):
+        await subject.wait_for_pressure_equalization(timeout_s=0.05)
+
+
+async def test_wait_for_pressure_equalization_does_not_complete_when_sensors_disagree(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """It should keep waiting when derived gauge pressure is not yet equalized."""
+    disagreeing_state = VacuumState(
+        target_gauge_pressure=0.0,
+        current_gauge_pressure=-50.0,
+        pressure_abs_a=1013.0,
+        pressure_abs_b=950.0,
+        pressure_atm=1013.0,
+        vacuum_enabled=False,
+        vacuum_duration=0,
+        vent_state=VentState.OPENED,
+    )
+    subject._reader.vacuum_state = disagreeing_state
+
+    async def _vacuum_state_side_effect() -> VacuumState:
+        return disagreeing_state
+
+    decoy.when(await mock_driver.get_vacuum_state()).then_do(_vacuum_state_side_effect)
+
+    with pytest.raises(RuntimeError, match="did not equalize"):
+        await subject.wait_for_pressure_equalization(timeout_s=0.05)
 
 
 @pytest.mark.parametrize(
@@ -697,6 +873,16 @@ async def test_execute_profile(
             vent_state=VentState.CLOSED,
         )
     )
+    decoy.when(await mock_driver.get_pump_state()).then_return(
+        PumpState(
+            target_rpm=0,
+            current_rpm=0,
+            target_pwm=0,
+            current_pwm=0,
+            pump_running=True,
+            manual_control=True,
+        )
+    )
 
     async def _fake_wait_for_target() -> None:
         return
@@ -912,3 +1098,231 @@ async def test_attempt_reconnect_swallows_factory_failure(
         ),
     ):
         await subject.attempt_reconnect()
+
+
+async def test_execute_profile_aborts_when_stopped(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """Stopping vacuum during a profile should abort remaining steps and vent_after."""
+    profile: List[
+        Union[VacuumModuleCycle, VacuumModulePowerStep, VacuumModulePressureStep]
+    ] = [
+        {
+            "enable_pump": True,
+            "hold_time_seconds": 10,
+            "hold_time_minutes": None,
+            "ramp_rate": None,
+            "timeout_seconds": None,
+            "vent_after": None,
+            "gauge_pressure_mbar": -100,
+        },
+        {
+            "enable_pump": True,
+            "hold_time_seconds": 10,
+            "hold_time_minutes": None,
+            "ramp_rate": None,
+            "timeout_seconds": None,
+            "vent_after": None,
+            "gauge_pressure_mbar": -200,
+        },
+    ]
+
+    decoy.when(await mock_driver.get_vacuum_state()).then_return(
+        VacuumState(
+            target_gauge_pressure=-100,
+            current_gauge_pressure=-100,
+            pressure_abs_a=0,
+            pressure_abs_b=0,
+            pressure_atm=0,
+            vacuum_enabled=True,
+            vacuum_duration=0,
+            vent_state=VentState.CLOSED,
+        )
+    )
+
+    execute_step_count = 0
+    original_execute_cycle_step = subject._execute_cycle_step
+
+    async def counting_execute_cycle_step(step: VacuumModuleStep) -> None:
+        nonlocal execute_step_count
+        execute_step_count += 1
+        await original_execute_cycle_step(step)
+
+    async def stop_on_first_wait() -> None:
+        await subject.set_vacuum_state(enable_vacuum=False)
+        subject._reader.vacuum_state = VacuumState(
+            target_gauge_pressure=0,
+            current_gauge_pressure=0,
+            pressure_abs_a=0,
+            pressure_abs_b=0,
+            pressure_atm=0,
+            vacuum_enabled=False,
+            vacuum_duration=0,
+            vent_state=VentState.CLOSED,
+        )
+
+    subject._execute_cycle_step = counting_execute_cycle_step  # type: ignore[method-assign]
+    subject.wait_for_command_duration = stop_on_first_wait  # type: ignore[method-assign]
+
+    await subject.execute_profile(profile, vent_after=True)
+
+    assert execute_step_count == 1
+    decoy.verify(
+        await mock_driver.set_vacuum_state(
+            enable_vacuum=True,
+            gauge_pressure_mbar=-100,
+            duration_s=10,
+            timeout_s=None,
+            rate=None,
+            vent_after=None,
+        ),
+    )
+    decoy.verify(await mock_driver.set_vent_state(state=VentState.OPENED), times=0)
+
+
+@pytest.mark.parametrize(
+    ("driver_error", "expected_error"),
+    [
+        (
+            PressureNotReached("port", "response", "command"),
+            VacuumModulePressureNotReachedError(
+                "dummySerialFS", "pressure", -500.0, -300.0
+            ),
+        ),
+        (
+            WasteContainerFull("port", "response", "command"),
+            VacuumModuleWasteFullError("dummySerialFS", "pressure", -500.0, -300.0),
+        ),
+    ],
+)
+def test_async_error_callback_maps_driver_errors(
+    subject: modules.VacuumModule,
+    module_error_callback: ModuleErrorCallback,
+    decoy: Decoy,
+    driver_error: Exception,
+    expected_error: Exception,
+) -> None:
+    """It should map vacuum module driver async errors to enumerated errors."""
+    _set_reader_async_error_context(
+        subject._reader,
+        mode=VacuumOperationMode.PRESSURE,
+        target=-500.0,
+        current=-300.0,
+    )
+    subject._async_error_callback(driver_error)
+    decoy.verify(
+        module_error_callback(
+            expected_error,
+            "vacuumModuleV1",
+            "/dev/ot_module_sim_vacuummodule0",
+            "dummySerialFS",
+        )
+    )
+
+
+def test_async_error_callback_includes_operation_mode_in_pressure_error_detail(
+    subject: modules.VacuumModule,
+    module_error_callback: ModuleErrorCallback,
+    decoy: Decoy,
+) -> None:
+    """Pressure-not-reached async errors should include the active operation mode."""
+    _set_reader_async_error_context(
+        subject._reader,
+        mode=VacuumOperationMode.PRESSURE,
+        target=-500.0,
+        current=-300.0,
+    )
+    subject._async_error_callback(
+        PressureNotReached("port", "async ERR400:pressure not reached", "M121")
+    )
+    decoy.verify(
+        module_error_callback(
+            VacuumModulePressureNotReachedError(
+                "dummySerialFS", "pressure", -500.0, -300.0
+            ),
+            "vacuumModuleV1",
+            "/dev/ot_module_sim_vacuummodule0",
+            "dummySerialFS",
+        )
+    )
+
+
+@pytest.fixture
+async def sim_vacuum_with_injected_error(
+    usb_port: USBPort,
+    mock_execution_manager: ExecutionManager,
+    module_disconnected_callback: ModuleDisconnectedCallback,
+) -> AsyncGenerator[tuple[modules.VacuumModule, List[Exception]], None]:
+    """Build a sim vacuum module wired to capture async errors from polling."""
+    driver = SimulatingDriver(serial_number="dummySerialFS")
+    reader = VacuumModuleReader(driver=driver)
+    poller = Poller(reader=reader, interval=SIMULATING_POLL_PERIOD)
+    received_errors: List[Exception] = []
+
+    def error_callback(
+        exc: Exception,
+        model: str,
+        port: str,
+        serial: str | None,
+    ) -> None:
+        received_errors.append(exc)
+
+    vacuum = modules.VacuumModule(
+        port="/dev/ot_module_sim_vacuummodule0",
+        usb_port=usb_port,
+        driver=driver,
+        reader=reader,
+        poller=poller,
+        device_info={
+            "serial": "dummySerialFS",
+            "model": "nff",
+            "version": "vacuum-fw",
+            "reset_reason": "0",
+        },
+        hw_control_loop=asyncio.get_running_loop(),
+        execution_manager=mock_execution_manager,
+        error_callback=error_callback,
+        disconnected_callback=module_disconnected_callback,
+    )
+
+    await poller.start()
+    try:
+        yield vacuum, received_errors
+    finally:
+        await vacuum.cleanup()
+
+
+async def test_injected_async_error_reaches_module_error_callback(
+    sim_vacuum_with_injected_error: tuple[modules.VacuumModule, List[Exception]],
+) -> None:
+    """Injected driver errors should bubble through the poller to the module callback."""
+    vacuum, received_errors = sim_vacuum_with_injected_error
+    driver = vacuum._driver
+    assert isinstance(driver, SimulatingDriver)
+
+    driver.inject_async_error(
+        WasteContainerFull("port", "async ERR401:waste full", "M121")
+    )
+
+    # The poller surfaces read failures to waiters; sleep for a background poll cycle.
+    await asyncio.sleep(SIMULATING_POLL_PERIOD * 3)
+
+    assert len(received_errors) == 1
+    assert isinstance(received_errors[0], VacuumModuleWasteFullError)
+    assert received_errors[0].serial == "dummySerialFS"
+
+
+async def test_inject_async_gcode_response_reaches_module_error_callback(
+    sim_vacuum_with_injected_error: tuple[modules.VacuumModule, List[Exception]],
+) -> None:
+    """G-code injection should parse ERR401 and reach the module error callback."""
+    vacuum, received_errors = sim_vacuum_with_injected_error
+
+    vacuum.inject_async_gcode_response("async ERR401:waste container full")
+
+    await asyncio.sleep(SIMULATING_POLL_PERIOD * 3)
+
+    assert len(received_errors) == 1
+    assert isinstance(received_errors[0], VacuumModuleWasteFullError)

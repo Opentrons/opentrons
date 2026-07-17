@@ -10,6 +10,7 @@ from .types import (
     VentState,
     WasteConfigParameters,
 )
+from opentrons.drivers.asyncio.communication.errors import SerialException
 from opentrons.util.async_helpers import ensure_yield
 
 
@@ -28,6 +29,17 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
         self.current_pressure = 0.0
         self.target_rpm = 0
         self.current_rpm = 0
+        self._pending_async_error: Optional[SerialException] = None
+
+    def inject_async_error(self, error: SerialException) -> None:
+        """Queue an async module error to raise on the next polled driver read."""
+        self._pending_async_error = error
+
+    def _raise_pending_async_error(self) -> None:
+        if self._pending_async_error is not None:
+            error = self._pending_async_error
+            self._pending_async_error = None
+            raise error
 
     def model(self) -> str:
         return self._model
@@ -106,6 +118,7 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
 
     async def get_vacuum_state(self) -> VacuumState:
         """Get the pressure state."""
+        self._raise_pending_async_error()
         return VacuumState(
             self.target_pressure,
             self.current_pressure,
@@ -133,6 +146,7 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
 
     async def get_pump_state(self) -> PumpState:
         """Get the pump state."""
+        self._raise_pending_async_error()
         return PumpState(0, 0, 0, 0, False, False)
 
     async def set_vent_state(self, state: VentState) -> None:
