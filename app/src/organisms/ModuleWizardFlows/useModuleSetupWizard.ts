@@ -2,7 +2,10 @@ import { useEffect, useReducer, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
+import {
+  useDeleteMaintenanceRunMutation,
+  useUpdateDeckConfigurationMutation,
+} from '@opentrons/react-api-client'
 
 import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
 import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
@@ -24,7 +27,7 @@ import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
 import type { PipetteInformation } from '/app/resources/instruments/types'
-import type { ModuleSetupWizardStep } from './types'
+import type { ModuleSetupWizardStep, SendIdentifyModule } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
 
@@ -56,6 +59,8 @@ export interface UseModuleSetupWizardResult {
     isOnDevice: boolean
     attachedModule: AttachedModule | null
     isExiting: boolean
+    sendIdentifyModule: SendIdentifyModule
+    updateDeckConfiguration: (deckConfig: DeckConfiguration) => void
   }
   buildFlowForSelectedModule: (module: AttachedModule) => void
   patchModuleAfterUpdate: (module: AttachedModule) => void
@@ -74,7 +79,7 @@ export function useModuleSetupWizard(
   const { closeFlow, attachedModuleOnLaunch, onComplete } = params
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('module_wizard_flows')
-  const sendIdentifyModule = useSendIdentifyModule()
+
   const [state, dispatch] = useReducer(moduleSetupWizardReducer, {
     currentStepIndex: 0,
     currentStep: null,
@@ -112,6 +117,21 @@ export function useModuleSetupWizard(
       actionsToDocument,
       addActionToDocument
     )
+
+  const sendIdentifyModule = useSendIdentifyModule(
+    commandDocState,
+    actionsToDocument,
+    addActionToDocument
+  )
+
+  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation(
+    commandDocState,
+    {
+      onSuccess: () => {
+        addActionToDocument('update_deck_configuration')
+      },
+    }
+  )
 
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
     useCreateTargetedMaintenanceRunMutation(
@@ -250,6 +270,8 @@ export function useModuleSetupWizard(
     isOnDevice,
     attachedModule,
     isExiting,
+    sendIdentifyModule,
+    updateDeckConfiguration,
   }
 
   const buildFlowForSelectedModule = (

@@ -18,6 +18,7 @@ import {
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import { useAttachedModules } from '/app/resources/modules'
 
@@ -67,7 +68,8 @@ export const HeaterShakerIsRunningModal = (
 ): JSX.Element => {
   const { closeModal, module, startRun } = props
   const { t } = useTranslation('heater_shaker')
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const documentationState = useDocumentationState()
+  const { createLiveCommand } = useCreateLiveCommandMutation(documentationState)
   const attachedModules = useAttachedModules()
   const moduleIds = attachedModules
     .filter(

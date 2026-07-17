@@ -78,14 +78,16 @@ export type DocumentedMutationFunction<TData = unknown, TVariables = void> = (
 export interface UseDocumentedMutation {
   <TData = unknown, TError = unknown, TVariables = void, TContext = unknown>(
     documentationState: DocumentationState,
-    actionsToDocument: DocumentedAction[],
+    actionsToDocument:
+      DocumentedAction[] | ((variables: TVariables) => DocumentedAction[]),
     mutationFn: DocumentedMutationFunction<TData, TVariables>,
     options?: UseMutationOptions<TData, TError, TVariables, TContext>
   ): UseMutationResult<TData, TError, TVariables, TContext>
 
   <TData = unknown, TError = unknown, TVariables = void, TContext = unknown>(
     documentationState: DocumentationState,
-    actionsToDocument: DocumentedAction[],
+    actionsToDocument:
+      DocumentedAction[] | ((variables: TVariables) => DocumentedAction[]),
     mutationKey: MutationKey,
     mutationFn: DocumentedMutationFunction<TData, TVariables>,
     options?: UseMutationOptions<TData, TError, TVariables, TContext>
@@ -126,6 +128,8 @@ type AuditLogAction =
   | 'home_pipettes'
   | 'home_robot'
   | 'end_home_pipettes'
+  | 'home_gantry'
+  | 'end_home_gantry'
   | 'attach_gripper'
   | 'detach_gripper'
   | 'recalibrate_gripper'
@@ -146,6 +150,14 @@ type AuditLogAction =
   | 'resume_run_from_recovery'
   | 'dismiss_run'
   | 'retry_action'
+  | 'shutdown_robot'
+  | 'update_robot_name'
+  | 'capture_preview_image'
+  | 'create_camera_image_settings'
+  | 'update_camera'
+  | 'update_camera_settings_for_run'
+  | 'pause_run'
+  | 'update_deck_configuration'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.

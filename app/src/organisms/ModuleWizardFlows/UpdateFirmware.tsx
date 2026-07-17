@@ -20,8 +20,6 @@ import {
   SUCCESS,
 } from '/app/redux/robot-api'
 
-import { useSendIdentifyModule } from './hooks'
-
 import type { AttachedModule } from '@opentrons/api-client'
 import type { Dispatch, State } from '/app/redux/types'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
@@ -44,11 +42,11 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
     patchModuleAfterUpdate,
     setIsModuleUpdating,
     isOnDevice,
+    sendIdentifyModule,
   } = props
   const { t } = useTranslation('module_wizard_flows')
 
   const dispatch = useDispatch<Dispatch>()
-  const sendIdentifyModule = useSendIdentifyModule()
   const [getLatestRequestId, handleModuleApiRequests] = useModuleApiRequests()
   const moduleSerialNumber = props.attachedModule.serialNumber
   const [moduleRequestTimeoutId, setModuleRequestTimeoutId] =

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   CheckboxBasic,
   COLORS,
+  Icon,
   ListAccordion,
   StyledText,
   Tag,
@@ -20,12 +21,14 @@ import type { RunData } from '@opentrons/api-client'
 interface RunRecordProps {
   run: RunData
   isSelected: boolean
+  isDeleting: boolean
   onToggle: () => void
 }
 
 export function RunRecord({
   run,
   isSelected,
+  isDeleting,
   onToggle,
 }: RunRecordProps): JSX.Element {
   const { t } = useTranslation('device_details')
@@ -39,11 +42,15 @@ export function RunRecord({
         e.stopPropagation()
       }}
     >
-      <CheckboxBasic
-        checked={isSelected}
-        onChange={onToggle}
-        backgroundColor={COLORS.white}
-      />
+      {isDeleting ? (
+        <Icon name="ot-spinner" spin size="1rem" color={COLORS.grey60} />
+      ) : (
+        <CheckboxBasic
+          checked={isSelected}
+          onChange={onToggle}
+          backgroundColor={COLORS.white}
+        />
+      )}
     </div>
   )
 

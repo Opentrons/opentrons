@@ -1,9 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { PerStepOverflowMenu } from '../'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
-import { PerStepOverflowMenu } from '../PerStepOverflowMenu'
 
 import type { ComponentProps } from 'react'
 
@@ -27,16 +27,16 @@ describe('PerStepOverflowMenu', () => {
   })
   it('renders the overflow menu with 5 buttons', () => {
     render(props)
-    screen.getByText('0.25 s per step')
-    screen.getByText('0.5 s per step')
-    screen.getByText('1 s per step')
-    screen.getByText('2 s per step')
-    screen.getByText('3 s per step')
+    screen.getByText('4x')
+    screen.getByText('2x')
+    screen.getByText('1x')
+    screen.getByText('0.5x')
+    screen.getByText('0.33x')
   })
 
-  it('calls the setSelectedPerdStep function when clicking the 1 second per step button', () => {
+  it('calls the setSelectedPerdStep function when clicking the 1x per step button', () => {
     render(props)
-    fireEvent.click(screen.getByText('1 s per step'))
+    fireEvent.click(screen.getByText('1x'))
     expect(mockSetMilliSecondsPerFrame).toHaveBeenCalledWith(1000)
     expect(mockSetShowPerStepOverflowMenu).toHaveBeenCalledWith(false)
   })
