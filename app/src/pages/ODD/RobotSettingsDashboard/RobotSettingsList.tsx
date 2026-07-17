@@ -240,12 +240,12 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           settingInfo={t('gantry_homing_description')}
           iconName="gantry-homing"
           rightElement={<OnOffToggle isOn={!isHomeGantryOn} />}
-          onClick={() =>
+          onClick={() => {
             updateRobotSetting({
               id: HOME_GANTRY_SETTING_ID,
               value: !isHomeGantryOn,
             })
-          }
+          }}
         />
         <RobotSettingButton
           settingName={t('disable_stacker_sensors')}
