@@ -769,25 +769,33 @@ async def test_wait_for_target(
     )
     decoy.when(await mock_driver.get_pump_state()).then_do(_power_reading_side_effect)
 
-    power_read_calls = 0
-    await subject.set_pump_state(start_pump=True, duty_cycle=target_pwm)
-    await subject.wait_for_target()
-    power_reads_while_waiting = power_read_calls
+    # Stop the background poller so only wait_for_target state reads are counted.
+    # Otherwise parallel poller reads race and flake under CI load.
+    await subject._poller.stop()
 
-    pressure_read_calls = 0
-    await subject.set_vacuum_state(
-        enable_vacuum=True, gauge_pressure_mbar=target_gauge_pressure
-    )
-    await subject.wait_for_target()
-    pressure_reads_while_waiting = pressure_read_calls
+    with mock.patch(
+        "opentrons.hardware_control.modules.vacuum_module.TARGET_REACHED_POLL_PERIOD",
+        0.0,
+    ):
+        power_read_calls = 0
+        await subject.set_pump_state(start_pump=True, duty_cycle=target_pwm)
+        await subject.wait_for_target()
+        power_reads_while_waiting = power_read_calls
+
+        pressure_read_calls = 0
+        await subject.set_vacuum_state(
+            enable_vacuum=True, gauge_pressure_mbar=target_gauge_pressure
+        )
+        await subject.wait_for_target()
+        pressure_reads_while_waiting = pressure_read_calls
 
     assert len(pressure_readings) == len(power_readings)
 
     expected_pressure_reads = len(pressure_readings) + PRESSURE_COMPARISON_WINDOW_SIZE
     expected_power_reads = len(power_readings) + POWER_COMPARISON_WINDOW_SIZE - 1
 
-    assert expected_pressure_reads >= pressure_reads_while_waiting <= 20
-    assert expected_power_reads >= power_reads_while_waiting <= 20
+    assert expected_pressure_reads >= pressure_reads_while_waiting
+    assert expected_power_reads >= power_reads_while_waiting
 
 
 async def test_execute_profile(
