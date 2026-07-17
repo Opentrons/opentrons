@@ -1,6 +1,5 @@
 """Shared helpers for migrations."""
 
-import os
 import shutil
 import typing
 from pathlib import Path
@@ -105,16 +104,3 @@ def add_column(
                 f"ALTER TABLE {table_name} ADD COLUMN {column.key} {column_type}"
             )
         )
-
-
-def set_permissions(src: Path, permissions_octal: str) -> None:
-    """Set the permissions of a path.
-
-    Used to alter user permissions for a path, this helps to ensure that users like 'ot-protocol'
-    have the necessary access to be able to read protocol file data.
-    """
-    if len(permissions_octal) > 2 and permissions_octal[:2] == "0o":
-        # If using octal literal format, prepare for int conversion first
-        permissions_octal = permissions_octal[2:]
-    mode = int(permissions_octal, 8)
-    os.chmod(src, mode)
