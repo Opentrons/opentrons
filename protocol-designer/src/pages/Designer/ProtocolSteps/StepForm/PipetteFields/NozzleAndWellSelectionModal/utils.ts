@@ -175,7 +175,9 @@ export const getEntireWellSelection = (
   const columnIndex = wellOrdering.findIndex(column =>
     column.includes(wellName)
   )
-  if (columnIndex === -1) return []
+  if (columnIndex === -1) {
+    return []
+  }
   const rowIndex = wellOrdering[columnIndex].indexOf(wellName)
   const is384Plate = wellOrdering.flat().length === 384
 
