@@ -158,6 +158,7 @@ type AuditLogAction =
   | 'update_camera_settings_for_run'
   | 'pause_run'
   | 'delete_run'
+  | 'delete_run_images'
   | 'delete_runs'
   | 'update_deck_configuration'
 
