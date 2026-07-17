@@ -620,6 +620,32 @@ def mock_backend_get_tip_status(hardware_backend: OT3Simulator) -> Iterator[Asyn
         yield mock_tip_status
 
 
+async def test_verify_tip_presence_simulates_probe_attachment_on_simulator(
+    ot3_hardware: ThreadManager[OT3API],
+    managed_obj: OT3API,
+    hardware_backend: OT3Simulator,
+) -> None:
+    """Simulator tip sensors are absent; verifying PRESENT should succeed."""
+    pipette_config = load_pipette_data.load_definition(
+        PipetteModelType("p1000"),
+        PipetteChannelType(8),
+        PipetteVersionType(3, 4),
+        PipetteOEMType.OT,
+    )
+    instr_data = AttachedPipette(config=pipette_config, id="fakepip")
+    await ot3_hardware.cache_pipette(OT3Mount.RIGHT, instr_data, None)
+
+    assert hardware_backend.current_tip_state(OT3Mount.RIGHT) is False
+
+    await managed_obj.verify_tip_presence(
+        OT3Mount.RIGHT,
+        TipStateType.PRESENT,
+        InstrumentProbeType.PRIMARY,
+    )
+
+    assert hardware_backend.current_tip_state(OT3Mount.RIGHT) is True
+
+
 @pytest.fixture
 def mock_verify_tip_presence(
     managed_obj: OT3API,

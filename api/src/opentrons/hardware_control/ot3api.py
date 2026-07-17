@@ -2392,6 +2392,11 @@ class OT3API(
         follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
         real_mount = OT3Mount.from_mount(mount)
+        if isinstance(self._backend, OT3Simulator) and expected == TipStateType.PRESENT:
+            # The simulator has no physical tip/probe sensors. LPC and other
+            # calibration flows call verify_tip_presence after the user attaches
+            # a probe; simulate that attachment here.
+            self._backend._update_tip_state(real_mount, True)
         status = await self.get_tip_presence_status(real_mount, follow_singular_sensor)
         if status != expected:
             raise FailedTipStateCheck(

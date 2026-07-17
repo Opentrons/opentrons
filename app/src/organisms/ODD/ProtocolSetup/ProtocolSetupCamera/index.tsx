@@ -10,6 +10,7 @@ import {
 import { OT_SYSTEM_CAMERA } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { CameraSettings } from '/app/organisms/ODD/CameraSettings'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -46,10 +47,13 @@ export function ProtocolSetupCamera(
   const { runId, confirmCameraSettings, cameraConfirmed } = props
   const { t } = useTranslation('protocol_setup')
   const dispatch = useDispatch()
+  const documentationState = useLinkedDocumentationState([
+    'update_camera_settings_for_run',
+  ])
   const { mutateAsync: addCameraSettingsToRunAsync } =
-    useAddCameraSettingsToRunMutation()
+    useAddCameraSettingsToRunMutation(documentationState)
   const { mutateAsync: addCameraImageSettingsToRunAsync } =
-    useAddCameraImageSettingsToRunMutation(runId)
+    useAddCameraImageSettingsToRunMutation(documentationState, runId)
   const { makeSnackbar } = useToaster()
 
   const [isConfirmPending, setIsConfirmPending] = useState(false)

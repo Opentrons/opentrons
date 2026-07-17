@@ -26,6 +26,7 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 
 from ..errors import (
+    LabwareIsNotAllowedInLocationError,
     LabwareMovementNotAllowedError,
     LabwareOffsetDoesNotExistError,
     NotSupportedOnRobotType,
@@ -309,6 +310,24 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             state_update.set_addressable_area_used(
                 addressable_area_name=params.newLocation.slotName.id
             )
+
+        if isinstance(params.newLocation, DeckSlotLocation):
+            if not labware_validation.validate_definition_is_deck_slot_compatible(
+                current_labware_definition
+            ):
+                raise LabwareIsNotAllowedInLocationError(
+                    f'Labware "{current_labware.loadName}" cannot be moved onto a deck slot.'
+                )
+        elif isinstance(params.newLocation, AddressableAreaLocation):
+            area_name = params.newLocation.addressableAreaName
+            if fixture_validation.is_deck_slot(
+                area_name
+            ) and not labware_validation.validate_definition_is_deck_slot_compatible(
+                current_labware_definition
+            ):
+                raise LabwareIsNotAllowedInLocationError(
+                    f'Labware "{current_labware.loadName}" cannot be moved onto a deck slot.'
+                )
 
         available_new_location = self._state_view.geometry.ensure_location_not_occupied(
             params.newLocation, None, current_labware_definition

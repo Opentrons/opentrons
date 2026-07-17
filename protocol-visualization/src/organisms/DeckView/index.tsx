@@ -1,17 +1,14 @@
 import { Fragment, useMemo, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 
 import {
   COLORS,
   DeckFromLayers,
   FixedTrashText,
   FlexTrash,
-  NO_WRAP,
   RobotCoordinateSpaceWithRef,
   SingleSlotFixture,
   SlotLabels,
   StagingAreaFixture,
-  StyledText,
   WasteChuteFixture,
   WasteChuteStagingAreaFixture,
 } from '@opentrons/components'
@@ -85,9 +82,8 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     selectedRunTimeCommand,
     liquids,
     commands,
-    filteredCommands,
+    // filteredCommands,
   } = props
-  const { t } = useTranslation('protocol_visualization')
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null)
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
   const {
@@ -142,27 +138,8 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
   )
 
-  const selectedCommandIndex =
-    selectedRunTimeCommand != null
-      ? filteredCommands.findIndex(
-          command => command.id === selectedRunTimeCommand.id
-        )
-      : 0
-
   return (
     <div className={styles.deck_view_container}>
-      <div className={styles.header_container}>
-        <StyledText desktopStyle="bodyDefaultSemiBold">
-          {t('deck_view')}
-        </StyledText>
-        <StyledText
-          color={COLORS.grey60}
-          desktopStyle="bodyDefaultRegular"
-          whiteSpace={NO_WRAP}
-        >
-          {t('step', { number: selectedCommandIndex })}
-        </StyledText>
-      </div>
       <div className={styles.body_container}>
         <div className={styles.deck_svg_wrapper}>
           <RobotCoordinateSpaceWithRef
