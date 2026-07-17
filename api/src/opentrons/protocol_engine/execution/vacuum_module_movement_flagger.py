@@ -75,7 +75,7 @@ class VacuumModuleMovementFlagger:
 
         if not self._state_store.config.use_virtual_modules:
             vacuum_module = await self._get_hardware_vacuum_module(module_id=module_id)
-            if vacuum_module.under_vacuum:
+            if not vacuum_module.pressure_equalized:
                 raise VacuumModuleStillUnderVacuumError(
                     module_id=vm_substate.module_id,
                     current_gauge_pressure_mbar=vacuum_module.current_gauge_pressure_mbar,

@@ -568,6 +568,7 @@ class AbstractVacuumModuleCore(
         ramp_rate: float | None,
         timeout_s: int | None,
         vent_after: bool | None,
+        equalize_timeout_s: int | None = None,
     ) -> AbstractTaskCore:
         """Set vacuum pressure."""
 
@@ -579,6 +580,7 @@ class AbstractVacuumModuleCore(
         ramp_rate: float | None,
         timeout_s: int | None,
         vent_after: bool | None,
+        equalize_timeout_s: int | None = None,
     ) -> AbstractTaskCore:
         """Set vacuum power."""
 
@@ -590,13 +592,18 @@ class AbstractVacuumModuleCore(
 
     @abstractmethod
     def start_execute_profile(
-        self, steps: List[VacuumModuleStep], repetitions: int, vent_after: bool = False
+        self,
+        steps: List[VacuumModuleStep],
+        repetitions: int,
+        vent_after: bool = False,
+        equalize_timeout_s: int | None = None,
     ) -> AbstractTaskCore:
         """Start a vacuum module profile."""
 
     @abstractmethod
     def open_vent(
         self,
+        equalize_timeout_s: int | None = None,
     ) -> None:
         """Open the vent."""
 

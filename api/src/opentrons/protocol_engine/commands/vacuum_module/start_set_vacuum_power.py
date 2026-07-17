@@ -10,7 +10,14 @@ from typing_extensions import Literal, Type
 
 from ...errors.error_occurrence import ErrorOccurrence
 from ...state import update_types
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+    SuccessData,
+)
+from opentrons.drivers.vacuum_module.driver import MAX_VAC_DURATION_S
+from opentrons.protocol_engine.resources import ModelUtils
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import (
@@ -45,6 +52,10 @@ class StartSetVacuumPowerParams(BaseModel):
     ventAfter: bool = Field(
         True,
         description="Whether the system should open the vent after the target power is held for the duration.",
+    )
+    equalizeTimeout: int | SkipJsonSchema[None] = Field(
+        None,
+        description="Time in seconds to wait for pressure equalization after opening the vent. Does not wait if None.",
     )
     taskId: str | None = Field(None, description="The id of the task")
 
@@ -88,6 +99,11 @@ class StartSetVacuumPowerImpl(
             raise ValueError(
                 f"pump power {params.percentPower} invalid must be between 1 and 100%"
             )
+        for p in [params.duration, params.timeout, params.equalizeTimeout]:
+            if p is not None and (p < 0 or p > MAX_VAC_DURATION_S):
+                raise ValueError(
+                    f"Duration or timeout {p} is invalid, must be between 0-{MAX_VAC_DURATION_S} seconds."
+                )
 
         vm_hardware = self._equipment.get_module_hardware_api(vm_state.module_id)
 
@@ -107,6 +123,17 @@ class StartSetVacuumPowerImpl(
                         await vm_hardware.wait_for_command_duration()
                     else:
                         await vm_hardware.wait_for_target()
+
+                    # Wait until we equalize pressure if vent is open and there
+                    # is a set duration until the pump shuts down.
+                    if (
+                        params.equalizeTimeout is not None
+                        and params.duration is not None
+                        and params.ventAfter
+                    ):
+                        await vm_hardware.wait_for_pressure_equalization(
+                            params.equalizeTimeout
+                        )
 
                     state_update.update_vacuum_module_pump_engaged(
                         params.moduleId, vm_hardware.pump_running
