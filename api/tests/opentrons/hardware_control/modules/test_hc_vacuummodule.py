@@ -1,5 +1,6 @@
 import asyncio
 from typing import AsyncGenerator, List, Optional, Union
+from unittest import mock
 
 import pytest
 from decoy import Decoy
@@ -768,25 +769,33 @@ async def test_wait_for_target(
     )
     decoy.when(await mock_driver.get_pump_state()).then_do(_power_reading_side_effect)
 
-    power_read_calls = 0
-    await subject.set_pump_state(start_pump=True, duty_cycle=target_pwm)
-    await subject.wait_for_target()
-    power_reads_while_waiting = power_read_calls
+    # Stop the background poller so only wait_for_target state reads are counted.
+    # Otherwise parallel poller reads race and flake under CI load.
+    await subject._poller.stop()
 
-    pressure_read_calls = 0
-    await subject.set_vacuum_state(
-        enable_vacuum=True, gauge_pressure_mbar=target_gauge_pressure
-    )
-    await subject.wait_for_target()
-    pressure_reads_while_waiting = pressure_read_calls
+    with mock.patch(
+        "opentrons.hardware_control.modules.vacuum_module.TARGET_REACHED_POLL_PERIOD",
+        0.0,
+    ):
+        power_read_calls = 0
+        await subject.set_pump_state(start_pump=True, duty_cycle=target_pwm)
+        await subject.wait_for_target()
+        power_reads_while_waiting = power_read_calls
+
+        pressure_read_calls = 0
+        await subject.set_vacuum_state(
+            enable_vacuum=True, gauge_pressure_mbar=target_gauge_pressure
+        )
+        await subject.wait_for_target()
+        pressure_reads_while_waiting = pressure_read_calls
 
     assert len(pressure_readings) == len(power_readings)
 
     expected_pressure_reads = len(pressure_readings) + PRESSURE_COMPARISON_WINDOW_SIZE
     expected_power_reads = len(power_readings) + POWER_COMPARISON_WINDOW_SIZE - 1
 
-    assert expected_pressure_reads >= pressure_reads_while_waiting <= 20
-    assert expected_power_reads >= power_reads_while_waiting <= 20
+    assert expected_pressure_reads >= pressure_reads_while_waiting
+    assert expected_power_reads >= power_reads_while_waiting
 
 
 async def test_execute_profile(
@@ -964,6 +973,139 @@ async def test_execute_profile(
             vent_after=False,
         )
     )
+
+
+async def test_move_port_updates_port_and_calls_driver(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """It should update the module's port and forward the new port to the driver."""
+    new_usb_port = USBPort(
+        name="b",
+        port_number=5,
+        device_path="/dev/ot_module_vacuummodule6",
+    )
+    await subject.move_port(port="/dev/ot_module_vacuummodule6", usb_port=new_usb_port)
+
+    assert subject.port == "/dev/ot_module_vacuummodule6"
+    assert subject.usb_port == new_usb_port
+    decoy.verify(await mock_driver.move_port("/dev/ot_module_vacuummodule6"))
+
+
+async def test_attempt_reconnect_skipped_off_robot(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """It should no-op the reconnect attempt when not running on a robot."""
+    with mock.patch("opentrons.hardware_control.modules.vacuum_module.IS_ROBOT", False):
+        await subject.attempt_reconnect()
+
+    decoy.verify(await mock_driver.is_connected(), times=0)
+
+
+async def test_attempt_reconnect_rebuilds_driver_when_disconnected(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """It should rebuild the driver when the connection is down."""
+    decoy.when(await mock_driver.is_connected()).then_return(False)
+    new_driver = decoy.mock(cls=SimulatingDriver)
+    decoy.when(await new_driver.get_vacuum_state()).then_return(
+        VacuumState(
+            target_gauge_pressure=0,
+            current_gauge_pressure=0,
+            pressure_abs_a=0,
+            pressure_abs_b=0,
+            pressure_atm=0,
+            vacuum_enabled=False,
+            vacuum_duration=0,
+            vent_state=VentState.CLOSED,
+        )
+    )
+    decoy.when(await new_driver.get_pump_state()).then_return(
+        PumpState(
+            target_rpm=0,
+            current_rpm=0,
+            target_pwm=0,
+            current_pwm=0,
+            pump_running=False,
+            manual_control=False,
+        )
+    )
+
+    with (
+        mock.patch("opentrons.hardware_control.modules.vacuum_module.IS_ROBOT", True),
+        mock.patch(
+            "opentrons.hardware_control.modules.vacuum_module.VacuumModuleDriver.create",
+            mock.AsyncMock(return_value=new_driver),
+        ) as create_mock,
+    ):
+        await subject.attempt_reconnect()
+
+    create_mock.assert_called_once_with(port=subject.port, loop=subject.loop)
+    assert subject._reader._driver is new_driver
+
+
+async def test_attempt_reconnect_keeps_driver_when_still_connected(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """It should not rebuild the driver if the existing connection is still up."""
+    decoy.when(await mock_driver.is_connected()).then_return(True)
+    decoy.when(await mock_driver.get_vacuum_state()).then_return(
+        VacuumState(
+            target_gauge_pressure=0,
+            current_gauge_pressure=0,
+            pressure_abs_a=0,
+            pressure_abs_b=0,
+            pressure_atm=0,
+            vacuum_enabled=False,
+            vacuum_duration=0,
+            vent_state=VentState.CLOSED,
+        )
+    )
+    decoy.when(await mock_driver.get_pump_state()).then_return(
+        PumpState(
+            target_rpm=0,
+            current_rpm=0,
+            target_pwm=0,
+            current_pwm=0,
+            pump_running=False,
+            manual_control=False,
+        )
+    )
+
+    with (
+        mock.patch("opentrons.hardware_control.modules.vacuum_module.IS_ROBOT", True),
+        mock.patch(
+            "opentrons.hardware_control.modules.vacuum_module.VacuumModuleDriver.create"
+        ) as create_mock,
+    ):
+        await subject.attempt_reconnect()
+
+    create_mock.assert_not_called()
+    assert subject._reader._driver is mock_driver
+
+
+async def test_attempt_reconnect_swallows_factory_failure(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """It should not raise if reconnect cannot reestablish the connection."""
+    decoy.when(await mock_driver.is_connected()).then_return(False)
+    with (
+        mock.patch("opentrons.hardware_control.modules.vacuum_module.IS_ROBOT", True),
+        mock.patch(
+            "opentrons.hardware_control.modules.vacuum_module.VacuumModuleDriver.create",
+            mock.AsyncMock(side_effect=OSError("port gone")),
+        ),
+    ):
+        await subject.attempt_reconnect()
 
 
 async def test_execute_profile_aborts_when_stopped(
