@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 
 import { getSubsystemUpdate } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { SubsystemUpdateProgressData } from '@opentrons/api-client'
@@ -13,7 +13,7 @@ export function useSubsystemUpdateQuery<TError = Error>(
 ): UseQueryResult<SubsystemUpdateProgressData, TError> {
   const host = useHost()
   const query = useQuery<SubsystemUpdateProgressData, TError>(
-    [host, 'subsystems/updates/all/', updateId],
+    getQueryKey(host, 'subsystems/updates/all/', updateId),
     () => getSubsystemUpdate(host!, updateId!).then(response => response.data),
     {
       ...options,

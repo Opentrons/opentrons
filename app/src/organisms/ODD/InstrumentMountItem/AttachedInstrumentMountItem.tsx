@@ -88,11 +88,12 @@ export function AttachedInstrumentMountItem(
       />
       {showChoosePipetteModal ? (
         <ChoosePipette
-          proceed={() => {
+          proceed={initialDocstate => {
             setWizardProps({
               mount: mount as Mount,
               flowType: FLOWS.ATTACH,
               selectedPipette,
+              initialDocstate,
               closeFlow: () => {
                 setWizardProps(null)
                 setSelectedPipette(SINGLE_MOUNT_PIPETTES)

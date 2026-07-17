@@ -413,6 +413,20 @@ async def test_execute_profile(
             "gauge_pressure_mbar": -111,
         },
     ]
+
+    decoy.when(await mock_driver.get_vacuum_state()).then_return(
+        VacuumState(
+            target_gauge_pressure=0,
+            current_gauge_pressure=0,
+            pressure_abs_a=0,
+            pressure_abs_b=0,
+            pressure_atm=0,
+            vacuum_enabled=True,
+            vacuum_duration=0,
+            vent_state=VentState.CLOSED,
+        )
+    )
+
     await subject.execute_profile(profile)
 
     decoy.verify(

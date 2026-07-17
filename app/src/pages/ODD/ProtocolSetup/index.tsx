@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -47,7 +47,6 @@ import {
   useLPCFlows,
 } from '/app/organisms/LabwarePositionCheck'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
-import { useGuardedAction } from '/app/organisms/ODD/AccessControl'
 import {
   AnalysisFailedModal,
   getUnmatchedModulesForProtocol,
@@ -406,15 +405,7 @@ function PrepareToRun({
     !isAnyNecessaryDefaultOffsetMissing &&
     isCameraReadyToRun
 
-  const actionsToDocument = useMemo(
-    () => [{ kind: 'PROTOCOL_PLAY' as const }],
-    []
-  )
-  const checkAccessControl = useGuardedAction(actionsToDocument)
-
   const onPlay = async (): Promise<void> => {
-    if (!(await checkAccessControl())) return
-
     if (doorStatus.isDoorOpen) {
       if (
         doorStatus.moduleDoorLocation !== null &&

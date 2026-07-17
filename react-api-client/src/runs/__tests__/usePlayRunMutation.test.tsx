@@ -36,9 +36,10 @@ describe('usePlayRunMutation hook', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(createRunAction).mockRejectedValue('oh no')
 
-    const { result } = renderHook(usePlayRunMutation, {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => usePlayRunMutation({ accessControlEnabled: false }),
+      { wrapper }
+    )
 
     expect(result.current.data).toBeUndefined()
     act(() => result.current.playRun(RUN_ID_1))
@@ -53,9 +54,12 @@ describe('usePlayRunMutation hook', () => {
       data: mockPlayRunAction,
     } as Response<RunAction>)
 
-    const { result } = renderHook(usePlayRunMutation, {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => usePlayRunMutation({ accessControlEnabled: false }),
+      {
+        wrapper,
+      }
+    )
     act(() => result.current.playRun(RUN_ID_1))
 
     await waitFor(() => {

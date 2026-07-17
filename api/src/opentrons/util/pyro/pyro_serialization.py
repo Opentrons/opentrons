@@ -3,6 +3,7 @@
 import builtins
 import enum
 import inspect
+import pickle
 from contextlib import contextmanager
 from types import ModuleType
 from typing import Any, Callable, Iterator
@@ -11,6 +12,10 @@ import serpent
 from pydantic import BaseModel
 from Pyro5 import api as pyro
 from typing_extensions import TypedDict, is_typeddict
+
+from opentrons_shared_data.errors.exceptions import EnumeratedError
+
+PYRO_PROXY = "PYRO_PROXY"
 
 
 class TypedDictWrapper(BaseModel):
@@ -102,6 +107,34 @@ def register_type_to_serpent(
     return class_path
 
 
+def _enumerated_error_class_to_dict(obj: EnumeratedError) -> dict[str, Any]:
+    return {
+        "__class__": "opentrons_shared_data.errors.exceptions.EnumeratedError",
+        "bytes": pickle.dumps(obj),
+    }
+
+
+def _enumerated_error_dict_to_class(
+    class_name: str, d: dict[str, Any]
+) -> EnumeratedError:
+    """Deserializes errors via pickle."""
+    error = pickle.loads(d["bytes"])
+    if not isinstance(error, EnumeratedError):
+        raise ValueError(
+            f"Class '{class_name}' labeled as enumerated error is a {type(error)}"
+        )
+    return error
+
+
+def register_enumerated_errors() -> None:
+    """Registers serializer and deserializer for enumerated errors."""
+    register_type_to_serpent(
+        class_type=EnumeratedError,
+        dict_to_class=_enumerated_error_dict_to_class,
+        class_to_dict=_enumerated_error_class_to_dict,
+    )
+
+
 class OpentronsPyroSerializer:
     """A pyro serializer for custom Opentrons classes."""
 
@@ -149,8 +182,26 @@ class OpentronsPyroSerializer:
 
     @classmethod
     def _pydantic_class_to_dict(cls, model: BaseModel) -> dict[str, Any]:
-        model_dict = model.model_dump(mode="json", by_alias=True)
-        model_dict["__class__"] = ".".join((model.__module__, model.__class__.__name__))
+        # Handle dictionaries of proxies
+        if (
+            isinstance(model, NonBuiltinKeyDictWrapper)
+            and model.value_type == PYRO_PROXY
+        ):
+            # A dictionary of proxies requires specialized serializaiton
+            model_dict = model.model_dump(mode="python", by_alias=True)
+            model_dict["dictionary"] = {
+                key.value: value for key, value in model_dict["dictionary"].items()
+            }
+            model_dict["__class__"] = ".".join(
+                (model.__module__, model.__class__.__name__)
+            )
+
+        # Handle standard pydantic models
+        else:
+            model_dict = model.model_dump(mode="json", by_alias=True)
+            model_dict["__class__"] = ".".join(
+                (model.__module__, model.__class__.__name__)
+            )
         return model_dict
 
     @classmethod
@@ -244,7 +295,10 @@ class OpentronsPyroSerializer:
         for registry in registries:
             if d["key_type"] in registry:
                 key_type = registry[d["key_type"]]
-            if d["value_type"] in registry:
+            if d["value_type"] in PYRO_PROXY:
+                # Specialized overload for dictionaries of proxies
+                value_type = pyro.Proxy
+            elif d["value_type"] in registry:
                 value_type = registry[d["value_type"]]
 
         if key_type is None or value_type is None:
@@ -269,6 +323,9 @@ class OpentronsPyroSerializer:
             if d["dictionary"][key] is None:
                 # Catching values that may have been `typing.Optional`
                 unwrapped_value = d["dictionary"][key]
+            elif issubclass(value_type, pyro.Proxy):
+                pyro_uri = d["dictionary"][key]["state"][0]
+                unwrapped_value = value_type(pyro_uri)
             elif issubclass(value_type, enum.Enum):
                 try:
                     unwrapped_value = value_type(int(d["dictionary"][key]))

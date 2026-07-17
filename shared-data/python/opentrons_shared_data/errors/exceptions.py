@@ -240,6 +240,9 @@ class PythonException(GeneralError):
             detail=base_details,
             wrapping=_descend_exc_ctx(exc),
         )
+        # Overwriting this here in case this was called with `exc=`, which breaks
+        # pickle serialization
+        self.args = (exc,)
 
 
 class RobotInUseError(CommunicationError):
@@ -483,15 +486,14 @@ class CalibrationStructureNotFoundError(RoboticsControlError):
 
     def __init__(
         self,
-        structure_height: float,
-        lower_limit: float,
+        message: Optional[str] = None,
         detail: Optional[Dict[str, str]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a CalibrationStructureNotFoundError."""
         super().__init__(
             ErrorCodes.CALIBRATION_STRUCTURE_NOT_FOUND,
-            f"Structure height at z={structure_height}mm beyond lower limit: {lower_limit}.",
+            message,
             detail,
             wrapping,
         )
@@ -520,15 +522,14 @@ class EdgeNotFoundError(RoboticsControlError):
 
     def __init__(
         self,
-        edge_name: str,
-        stride: float,
+        message: Optional[str] = None,
         detail: Optional[Dict[str, str]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a EdgeNotFoundError."""
         super().__init__(
             ErrorCodes.EDGE_NOT_FOUND,
-            f"Edge {edge_name} could not be verified at {stride} mm resolution.",
+            message,
             detail,
             wrapping,
         )
@@ -539,15 +540,14 @@ class EarlyCapacitiveSenseTrigger(RoboticsControlError):
 
     def __init__(
         self,
-        found: float,
-        nominal: float,
+        message: Optional[str] = None,
         detail: Optional[Dict[str, str]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a EarlyCapacitiveSenseTrigger."""
         super().__init__(
             ErrorCodes.EARLY_CAPACITIVE_SENSE_TRIGGER,
-            f"Calibration triggered early at z={found}mm, expected {nominal}",
+            message,
             detail,
             wrapping,
         )
@@ -558,19 +558,14 @@ class InaccurateNonContactSweepError(RoboticsControlError):
 
     def __init__(
         self,
-        found: float,
-        nominal: float,
+        message: Optional[str] = None,
         detail: Optional[Dict[str, str]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a InaccurateNonContactSweepError."""
-        msg = (
-            f"Calibration detected a slot width of {found:.3f}mm, "
-            f"which is too far from the design width of {nominal:.3f}mm"
-        )
         super().__init__(
             ErrorCodes.INACCURATE_NON_CONTACT_SWEEP,
-            msg,
+            message,
             detail,
             wrapping,
         )
@@ -620,6 +615,7 @@ class UnmatchedTipPresenceStates(RoboticsControlError):
             detail,
             wrapping,
         )
+        self.args = (states, detail, wrapping)
 
 
 class PositionUnknownError(RoboticsControlError):
@@ -755,6 +751,7 @@ class UnexpectedTipRemovalError(RoboticsInteractionError):
         super().__init__(
             ErrorCodes.UNEXPECTED_TIP_REMOVAL, message, checked_detail, wrapping
         )
+        self.args = (action, pipette_name, message, detail, wrapping)
 
 
 class UnexpectedTipAttachError(RoboticsInteractionError):
@@ -775,6 +772,7 @@ class UnexpectedTipAttachError(RoboticsInteractionError):
         checked_detail["mount"] = mount
         message = f"Cannot perform {action} with a tip already attached."
         super().__init__(ErrorCodes.UNEXPECTED_TIP_ATTACH, message, detail, wrapping)
+        self.args = (action, pipette_name, message, detail, wrapping)
 
 
 class HepaUVFailedError(RoboticsInteractionError):
@@ -820,6 +818,7 @@ class FlexStackerShuttleMissingError(RoboticsInteractionError):
             checked_detail,
             wrapping,
         )
+        self.args = (serial, expected_state, shuttle_state, message, detail, wrapping)
 
 
 class FlexStackerShuttleLabwareError(RoboticsInteractionError):
@@ -851,6 +850,7 @@ class FlexStackerShuttleLabwareError(RoboticsInteractionError):
             checked_detail,
             wrapping,
         )
+        self.args = (serial, shuttle_state, labware_expected, message, detail, wrapping)
 
 
 class FlexStackerHopperLabwareError(RoboticsInteractionError):
@@ -878,6 +878,7 @@ class FlexStackerHopperLabwareError(RoboticsInteractionError):
             checked_detail,
             wrapping,
         )
+        self.args = (serial, labware_expected, message, detail, wrapping)
 
 
 class FlexStackerShuttleNotEmptyError(RoboticsInteractionError):
@@ -907,6 +908,7 @@ class FlexStackerShuttleNotEmptyError(RoboticsInteractionError):
             checked_detail,
             wrapping,
         )
+        self.args = (serial, shuttle_state, labware_expected, message, detail, wrapping)
 
 
 class BarcodeScanFailureError(RoboticsInteractionError):
@@ -949,6 +951,7 @@ class FirmwareUpdateRequiredError(RoboticsInteractionError):
         checked_detail["subsystems_to_update"] = subsystems_to_update
         message = f"Cannot perform {action} until {subsystems_to_update} are updated."
         super().__init__(ErrorCodes.FIRMWARE_UPDATE_REQUIRED, message, detail, wrapping)
+        self.args = (action, subsystems_to_update, message, detail, wrapping)
 
 
 class PipetteOverpressureError(RoboticsInteractionError):
@@ -1046,6 +1049,7 @@ class ModuleNotPresent(RoboticsInteractionError):
         super().__init__(
             ErrorCodes.MODULE_NOT_PRESENT, checked_message, checked_detail, wrapping
         )
+        self.args = (identifier, message, detail, wrapping)
 
 
 class InvalidInstrumentData(RoboticsInteractionError):
@@ -1266,6 +1270,13 @@ class CommandParameterLimitViolated(GeneralError):
                 PythonException(e) if isinstance(e, BaseException) else e
                 for e in wrapping_checked
             ],
+        )
+        self.args = (
+            command_name,
+            parameter_name,
+            limit_statement,
+            actual_value,
+            wrapping,
         )
 
 

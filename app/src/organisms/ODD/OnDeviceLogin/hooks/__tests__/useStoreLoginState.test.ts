@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { logInOrRefresh } from '/app/redux/robot-auth'
+import { logIn } from '/app/redux/robot-auth'
 
 import { useStoreLoginState } from '../useStoreLoginState'
 
@@ -41,7 +41,7 @@ describe('useStoreLoginState', () => {
     })
 
     expect(mockDispatch).toHaveBeenCalledWith(
-      logInOrRefresh({
+      logIn({
         username: 'test-user',
         robotName: 'local-robot',
         accessToken: 'access-token',

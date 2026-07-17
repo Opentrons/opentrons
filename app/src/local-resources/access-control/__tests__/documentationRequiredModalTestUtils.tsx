@@ -1,0 +1,37 @@
+import { vi } from 'vitest'
+
+import { DocumentationRequiredModalContext } from '../DocumentationRequiredModalContext'
+
+import type { FunctionComponent, ReactNode } from 'react'
+import type { DocumentationReport } from '@opentrons/react-api-client'
+
+export const mockShowDocumentationRequiredModal: (
+  username: string
+) => Promise<DocumentationReport> =
+  vi.fn<(username: string) => Promise<DocumentationReport>>()
+
+export const DocumentationRequiredModalTestProvider: FunctionComponent<{
+  children: ReactNode
+}> = ({ children }) => (
+  <DocumentationRequiredModalContext.Provider
+    value={{
+      showDocumentationRequiredModal: mockShowDocumentationRequiredModal,
+    }}
+  >
+    {children}
+  </DocumentationRequiredModalContext.Provider>
+)
+
+export const wrapWithDocumentationRequiredModal = (
+  InnerWrapper?: FunctionComponent<{ children: ReactNode }>
+): FunctionComponent<{ children: ReactNode }> => {
+  if (InnerWrapper == null) {
+    return DocumentationRequiredModalTestProvider
+  }
+
+  return ({ children }) => (
+    <DocumentationRequiredModalTestProvider>
+      <InnerWrapper>{children}</InnerWrapper>
+    </DocumentationRequiredModalTestProvider>
+  )
+}

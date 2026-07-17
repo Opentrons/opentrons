@@ -5,7 +5,7 @@ import {
   RUN_ACTION_TYPE_RESUME_FROM_RECOVERY,
 } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -34,7 +34,7 @@ export const useResumeRunFromRecoveryMutation = (
 ): UseResumeRunFromRecoveryMutationResult => {
   const host = useHost()
   const mutation = useMutation<RunAction, AxiosError, string>(
-    [host, 'runs', RUN_ACTION_TYPE_RESUME_FROM_RECOVERY],
+    getQueryKey(host, 'runs', RUN_ACTION_TYPE_RESUME_FROM_RECOVERY),
     (runId: string) =>
       createRunAction(host!, runId, {
         actionType: RUN_ACTION_TYPE_RESUME_FROM_RECOVERY,

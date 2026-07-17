@@ -5,6 +5,9 @@ import logging
 from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
 
 from opentrons.config import feature_flags
+from opentrons.config import (
+    feature_flags as ff,
+)
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
     AsynchronousModuleErrorNotification,
@@ -66,6 +69,7 @@ from .run_process import DirectedRunProcess
 from .run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
+from robot_server.service.pyro_utils.resource_utilities import get_pyro_resource
 
 _log = logging.getLogger(__name__)
 
@@ -205,6 +209,15 @@ class RunOrchestratorStore:
             self.run_coordinator.run_id if self._run_coordinator is not None else None
         )
 
+    def default_run_orchestrator_door_watcher_callback_route_for_proxy(
+        self, event: HardwareEvent
+    ) -> None:
+        """Callback to expose the default run orchestrator door watcher callback to a remote processes."""
+        assert self._default_run_orchestrator is not None
+        self._default_run_orchestrator._protocol_engine._door_watcher._handle_proxy_hardware_door_event(
+            event
+        )
+
     # TODO(mc, 2022-03-21): this resource locking is insufficient;
     # come up with something more sophisticated without race condition holes.
     async def get_default_orchestrator(self) -> RunOrchestrator:
@@ -220,6 +233,13 @@ class RunOrchestratorStore:
         ):
             raise RunConflictError("A run is currently active")
 
+        proxy_door_callback = None
+        if ff.hardware_subprocess_enabled():
+            pyro_resource = get_pyro_resource()
+            proxy_door_callback = (
+                pyro_resource.get_default_run_orchestrator_door_watcher_callback()
+            )
+
         default_orchestrator = self._default_run_orchestrator
         if default_orchestrator is None:
             engine = await create_protocol_engine(
@@ -233,6 +253,7 @@ class RunOrchestratorStore:
                 # for example, there would be no equivalent to the `POST /runs/{id}/actions`
                 # endpoint to resume normal operation.
                 error_recovery_policy=error_recovery_policy.never_recover,
+                proxy_of_callback_for_handling_door_events=proxy_door_callback,
             )
             self._default_run_orchestrator = RunOrchestrator.build_orchestrator(
                 protocol_engine=engine, hardware_api=self._hardware_api

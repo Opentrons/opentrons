@@ -919,3 +919,6 @@ export const SYSTEM_LOCATION = 'systemLocation'
 
 export const PROTOCOL_ENGINE_LID_STACK_LOADNAME =
   'protocol_engine_lid_stack_object'
+
+export const VACUUM_MIN_PRESSURE_MBAR = -800
+export const VACUUM_MAX_PRESSURE_MBAR = 0

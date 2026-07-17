@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from 'react-query'
 
 import { addCameraSettingsToRun } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type { UseMutateFunction, UseMutationResult } from 'react-query'
@@ -41,7 +41,7 @@ export function useAddCameraSettingsToRunMutation(): UseAddCameraSettingsToRunMu
     addCameraSettingsToRun(host!, runId, settings)
       .then(response => {
         queryClient
-          .invalidateQueries([host, 'runs', runId])
+          .invalidateQueries(getQueryKey(host, 'runs', runId))
           .catch((e: Error) => {
             console.error(`error invalidating runs query: ${e.message}`)
           })

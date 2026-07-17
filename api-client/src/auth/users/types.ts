@@ -1,7 +1,7 @@
 export type AuthUserAccountType = 'admin' | 'user' | 'auditor' | 'service'
 
 export interface AuthUser {
-  userName: string
+  username: string
   fullName: string
   accountType: AuthUserAccountType
   scopes: string[]

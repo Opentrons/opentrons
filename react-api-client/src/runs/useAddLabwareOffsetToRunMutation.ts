@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from 'react-query'
 
 import { addLabwareOffsetToRun } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { UseMutateAsyncFunction, UseMutationResult } from 'react-query'
 import type {
@@ -39,9 +39,11 @@ export function useAddLabwareOffsetToRunMutation(): UseAddLabwareOffsetToRun {
   >(({ runId, data }) =>
     addLabwareOffsetToRun(host!, runId, data)
       .then(response => {
-        queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
-          console.error(`error invalidating runs query: ${e.message}`)
-        })
+        queryClient
+          .invalidateQueries(getQueryKey(host, 'runs'))
+          .catch((e: Error) => {
+            console.error(`error invalidating runs query: ${e.message}`)
+          })
         return response.data
       })
       .catch((e: Error) => {

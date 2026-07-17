@@ -53,11 +53,7 @@ def test_pyro_synchronous_adapter_ot3api(managed_obj: OT3API) -> None:
             assert name in pyro_object_members
 
         # Now check to ensure that things thate aren't supposed to be there (like private methods) aren't present
-        if "__" not in name and (
-            name.startswith("_")
-            or (inspect.ismethod(attr) and inspect.isclass(attr.__self__))
-            or isinstance(attr, TypeVar)
-        ):
+        if "__" not in name and (name.startswith("_") or isinstance(attr, TypeVar)):
             assert name not in pyro_object_members
 
 

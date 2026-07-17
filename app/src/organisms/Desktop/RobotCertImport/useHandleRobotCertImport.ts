@@ -6,7 +6,7 @@ import {
   getEncryptedCACertificates,
   getPlaintextCACertificates,
 } from '@opentrons/api-client'
-import { useHost } from '@opentrons/react-api-client'
+import { getQueryKey, useHost } from '@opentrons/react-api-client'
 
 import {
   tryInstallEncryptedRobotCertificate,
@@ -86,7 +86,7 @@ export function useHandleRobotCertImport(
       }
       return true
     },
-    mutationKey: [host!, 'encrypted_ca_certs'],
+    mutationKey: getQueryKey(host, 'encrypted_ca_certs'),
     onError: (err: any) => {
       setPasswordError((err as Error)?.message ?? t('invalid_password'))
     },

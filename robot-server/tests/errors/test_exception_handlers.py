@@ -9,6 +9,7 @@ from fastapi.testclient import TestClient
 from pydantic import BaseModel
 
 from server_utils.auth.resource_server.authorization_checker import (
+    MissingUserNotesError,
     NotAnActiveTokenResult,
 )
 from server_utils.auth.resource_server.fastapi import AuthorizationError
@@ -202,6 +203,31 @@ def test_handles_query_validation_error(app: FastAPI, client: TestClient) -> Non
                 "detail": "Input should be a valid integer, unable to parse "
                 "string as an integer",
                 "source": {"parameter": "count"},
+            },
+        ]
+    }
+
+
+def test_handles_missing_user_notes(app: FastAPI, client: TestClient) -> None:
+    """It should map MissingUserNotesError to a 422 with the header in source."""
+
+    @app.post("/items")
+    def create_item() -> None:
+        raise MissingUserNotesError(
+            "Opentrons-User-Notes is required when require-reason-for-interaction is enabled."
+        )
+
+    response = client.post("/items")
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.json() == {
+        "errors": [
+            {
+                "errorCode": "4000",
+                "id": "InvalidRequest",
+                "title": "Invalid Request",
+                "detail": "Opentrons-User-Notes is required when require-reason-for-interaction is enabled.",
+                "source": {"header": "Opentrons-User-Notes"},
             },
         ]
     }

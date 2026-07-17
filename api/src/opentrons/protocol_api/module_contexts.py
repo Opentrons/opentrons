@@ -36,7 +36,11 @@ from opentrons.legacy_broker import LegacyBroker
 from opentrons.legacy_commands import module_commands as cmds
 from opentrons.legacy_commands.publisher import CommandPublisher, publish
 from opentrons.protocol_engine.types import ABSMeasureMode
-from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
+from opentrons.protocols.api_support.types import (
+    APIVersion,
+    ThermocyclerStep,
+    VacuumModuleStep,
+)
 from opentrons.protocols.api_support.util import (
     APIVersionError,
     UnsupportedAPIError,
@@ -842,7 +846,7 @@ class ThermocyclerContext(ModuleContext):
         *Changed in version 2.21:* Fixed run log listing number of steps instead of
         number of repetitions.
         """
-        repetitions = validation.ensure_thermocycler_repetition_count(repetitions)
+        repetitions = validation.ensure_profile_repetition_count(repetitions)
         validated_steps = validation.ensure_thermocycler_profile_steps(steps)
         self._core.execute_profile(
             steps=validated_steps,
@@ -876,7 +880,7 @@ class ThermocyclerContext(ModuleContext):
                 individual well of the loaded labware, in µL. If not specified, the
                 default is 25 µL.
         """
-        repetitions = validation.ensure_thermocycler_repetition_count(repetitions)
+        repetitions = validation.ensure_profile_repetition_count(repetitions)
         validated_steps = validation.ensure_thermocycler_profile_steps(steps)
         task = self._core.start_execute_profile(
             steps=validated_steps,
@@ -1972,3 +1976,49 @@ class VacuumModuleContext(ModuleContext):
     @publish(command=cmds.vacuum_module_stop_vacuum)
     def stop_vacuum_pump(self) -> None:
         self._core.stop_vacuum()
+
+    @requires_version(2, 28)
+    @publish(command=cmds.vacuum_module_start_execute_profile)
+    def start_execute_profile(
+        self,
+        steps: List[VacuumModuleStep],
+        repetitions: int = 1,
+    ) -> Task:
+        """
+        Starts a defined Vacuum Module profile and returns a [`Task`][opentrons.protocol_api.Task] representing its concurrent execution.
+        Profile is defined as a cycle of `steps`, for a given number of `repetitions`.
+
+        Pass the task object to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
+        to wait for the profile to complete.
+
+        Args:
+            steps: List of steps that make up a single cycle.
+            repetitions: How many times to perform the entire profile.
+                The dictionary's keys must be
+            enable_pump: whether to enable the pump motor
+                Optional arguments are:
+            hold_time_seconds: time in seconds to hold pressure/power for after target is reached
+            hold_time_minutes: time in minutes to hold pressure/power for after target is reached
+            ramp_rate: rate to increase the motor power at (get unit for this)
+            timeout_seconds: the time to wait for target pressure/power before throwing an error
+            vent_after: wheter to open the vent after the step is complete
+        """
+        repetitions = validation.ensure_profile_repetition_count(repetitions)
+        validated_steps = validation.ensure_vacuum_module_profile(steps)
+        task = self._core.start_execute_profile(
+            steps=validated_steps,
+            repetitions=repetitions,
+        )
+        return Task(api_version=self._api_version, core=task)
+
+    @requires_version(2, 28)
+    @publish(command=cmds.vacuum_module_open_vent)
+    def open_vent(self) -> None:
+        """Opens the vent."""
+        self._core.open_vent()
+
+    @requires_version(2, 28)
+    @publish(command=cmds.vacuum_module_close_vent)
+    def close_vent(self) -> None:
+        """Closes the vent."""
+        self._core.close_vent()

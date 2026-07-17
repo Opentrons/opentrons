@@ -38,6 +38,7 @@ from opentrons.hardware_control.modules.types import (
 from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
 from opentrons.util.pyro.pyro_synchronous_adapter import (
+    convert_result_to_proxy,
     pyro_behavior,
     remove_pyro_synchronous_object,
 )
@@ -274,6 +275,7 @@ class VacuumModule(mod_abc.AbstractModule):
         dfu_info = await update.find_dfu_device(pid=DFU_PID, expected_device_count=3)
         return dfu_info
 
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def bootloader(self) -> UploadFunction:
         return update.upload_via_dfu
 
@@ -455,12 +457,14 @@ class VacuumModule(mod_abc.AbstractModule):
                     for step in this_cycle["steps"]:
                         self._current_step_index += 1
                         await self._execute_cycle_step(step)
+                        await self.wait_for_command_duration()
                 if this_cycle["vent_after"] is not None:
                     await self.set_vent_state(
                         vent_state=VentState(this_cycle["vent_after"])
                     )
             else:
                 await self._execute_cycle_step(step_or_cycle)
+                await self.wait_for_command_duration()
 
     # TODO: implement a wait_for in running profiles
     async def execute_profile(
@@ -482,6 +486,19 @@ class VacuumModule(mod_abc.AbstractModule):
                 self._total_step_count += 1
                 self._total_cycle_count += 1
         task = self._loop.create_task(self._execute_profile(profile))
+        self.make_cancellable(task)
+        await task
+
+    async def _wait_for_command_duration(self) -> None:
+        await self._reader.update_vacuum_state()
+
+        while self.vacuum_state.vacuum_duration > 0:
+            await self._poller.wait_next_poll()
+
+    async def wait_for_command_duration(self) -> None:
+        await self.wait_for_is_running()
+
+        task = self._loop.create_task(self._wait_for_command_duration())
         self.make_cancellable(task)
         await task
 

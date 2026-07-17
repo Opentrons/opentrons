@@ -13,6 +13,7 @@ import {
   Tabs,
 } from '@opentrons/components'
 import {
+  getQueryKey,
   useCreateProtocolMutation,
   useCreateRunMutation,
   useHost,
@@ -77,9 +78,11 @@ export function SummaryAndSettings(
   const { createRun } = useCreateRunMutation(
     {
       onSuccess: data => {
-        queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
-          console.error(`error invalidating runs query: ${e.message}`)
-        })
+        queryClient
+          .invalidateQueries(getQueryKey(host, 'runs'))
+          .catch((e: Error) => {
+            console.error(`error invalidating runs query: ${e.message}`)
+          })
         navigate(`/runs/${data.data.id}/setup`)
       },
     },

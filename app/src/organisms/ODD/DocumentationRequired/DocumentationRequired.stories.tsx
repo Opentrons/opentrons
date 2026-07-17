@@ -1,11 +1,12 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import React from 'react'
 import { Provider } from 'react-redux'
 import { legacy_createStore } from 'redux'
 import { action } from 'storybook/actions'
 
 import { VIEWPORT } from '@opentrons/components'
 
-import { configReducer } from '/app/redux/config/reducer'
-
+import { configReducer } from '../../../redux/config/reducer'
 import { DocumentationRequired as DocumentationRequiredComponent } from './DocumentationRequired'
 
 import type { Meta, StoryObj } from '@storybook/react'
@@ -43,7 +44,7 @@ type Story = StoryObj<typeof DocumentationRequiredComponent>
 
 export const DocumentationRequired: Story = {
   args: {
-    userName: 'John Doe',
+    username: 'John Doe',
     onBack: action('onBack'),
     onConfirm: action('onConfirm'),
   },

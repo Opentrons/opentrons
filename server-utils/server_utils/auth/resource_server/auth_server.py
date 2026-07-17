@@ -6,6 +6,7 @@ This is just the bare minimum required by resource servers.
 from __future__ import annotations
 
 import contextlib
+import json
 import typing
 from abc import ABC, abstractmethod
 
@@ -13,6 +14,7 @@ import aiohttp
 import pydantic
 
 SETTINGS_ENDPOINT_PATH = "auth/settings/accessControlEnabled"
+ALL_AUTH_SETTINGS_ENDPOINT_PATH = "auth/settings"
 TOKEN_ENDPOINT_PATH = "auth/oauth2/token"
 TOKEN_INTROSPECTION_ENDPOINT_PATH = "auth/oauth2/introspect"
 
@@ -34,6 +36,17 @@ class Client(ABC):
     @abstractmethod
     async def get_auth_settings(self) -> AuthSettingsResponse:
         """Ask the Opentrons auth-server what the current system-wide auth settings are.
+
+        If there's an internal error (e.g. the auth server is unconnectable),
+        the implementation should raise it as an exception.
+        """
+        pass
+
+    @abstractmethod
+    async def get_require_reason_for_interaction_settings(
+        self,
+    ) -> RequireReasonForInteractionSettingsResponse:
+        """Read ``requireReasonForInteraction`` from GET /auth/settings.
 
         If there's an internal error (e.g. the auth server is unconnectable),
         the implementation should raise it as an exception.
@@ -104,6 +117,20 @@ class LocalHTTPClient(Client):
         return parsed_response
 
     @typing.override
+    async def get_require_reason_for_interaction_settings(
+        self,
+    ) -> RequireReasonForInteractionSettingsResponse:
+        async with self._session.get(ALL_AUTH_SETTINGS_ENDPOINT_PATH) as response:
+            response_bytes = await response.read()
+        response.raise_for_status()
+        body = json.loads(response_bytes)
+        return RequireReasonForInteractionSettingsResponse(
+            data=RequireReasonForInteractionSettingsResponseData(
+                requireReasonForInteraction=body["data"]["requireReasonForInteraction"],
+            )
+        )
+
+    @typing.override
     async def introspect_token(self, token: str) -> TokenIntrospectionResponse:
         request_form_data: TokenIntrospectionRequestFormData = {
             "token": token,
@@ -155,3 +182,15 @@ class AuthSettingsResponseData(_StrictBaseModel):
     """Response body data from auth-server's /settings endpoint."""
 
     accessControlEnabled: bool
+
+
+class RequireReasonForInteractionSettingsResponse(_StrictBaseModel):
+    """A response body with the require-reason-for-interaction setting."""
+
+    data: RequireReasonForInteractionSettingsResponseData
+
+
+class RequireReasonForInteractionSettingsResponseData(_StrictBaseModel):
+    """Response body data for the require-reason-for-interaction setting."""
+
+    requireReasonForInteraction: bool

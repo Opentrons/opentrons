@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from 'react-query'
 
 import { updateSubsystem } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -45,9 +45,9 @@ export function useUpdateSubsystemMutation(
   >(
     (subsystem: Subsystem) =>
       updateSubsystem(host!, subsystem).then(response => {
-        queryClient.removeQueries([host, 'subsystems/updates'])
+        queryClient.removeQueries(getQueryKey(host, 'subsystems/updates'))
         queryClient
-          .invalidateQueries([host, 'subsystems/updates'])
+          .invalidateQueries(getQueryKey(host, 'subsystems/updates'))
           .catch((e: Error) => {
             console.error(`error invalidating subsystems query: ${e.message}`)
           })

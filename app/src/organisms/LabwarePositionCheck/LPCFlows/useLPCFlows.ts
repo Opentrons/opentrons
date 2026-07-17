@@ -7,6 +7,7 @@ import {
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
 import { useInitLPCStore } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import {
@@ -72,6 +73,8 @@ export function useLPCFlows({
   const [isLaunching, setIsLaunching] = useState(false)
   const [hasCreatedLPCRun, setHasCreatedLPCRun] = useState(false)
 
+  const { commandDocState, deletionDocState } = useMaintenanceRunDocumentation()
+
   const isFlex = robotType === FLEX_ROBOT_TYPE
   const deckConfig = useNotifyDeckConfigurationQuery().data
   const { data: runRecord } = useNotifyRunQuery(runId ?? null, {
@@ -131,11 +134,11 @@ export function useLPCFlows({
   useMonitorMaintenanceRunForDeletion({ maintenanceRunId, setMaintenanceRunId })
 
   const { createTargetedMaintenanceRun } =
-    useCreateTargetedMaintenanceRunMutation()
+    useCreateTargetedMaintenanceRunMutation(commandDocState)
   const { createLabwareDefinition } =
     useCreateMaintenanceRunLabwareDefinitionMutation()
   const { deleteMaintenanceRun, isLoading: isClosing } =
-    useDeleteMaintenanceRunMutation()
+    useDeleteMaintenanceRunMutation(deletionDocState)
 
   // After the maintenance run is created, add labware defs to the maintenance run.
   useEffect(

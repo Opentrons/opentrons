@@ -20,6 +20,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { getIsOnDevice } from '/app/redux/config'
 import {
@@ -62,12 +63,14 @@ export function GripperWizardFlows(
   props: MaintenanceRunManagerProps
 ): JSX.Element {
   const { flowType, closeFlow, attachedGripper } = props
+
+  const { commandDocState, deletionDocState } = useMaintenanceRunDocumentation()
   const {
     chainRunCommands,
     isCommandMutationLoading: isChainCommandMutationLoading,
-  } = useChainMaintenanceCommands()
+  } = useChainMaintenanceCommands(commandDocState)
   const { createMaintenanceCommand, isLoading: isCommandLoading } =
-    useCreateMaintenanceCommandMutation()
+    useCreateMaintenanceCommandMutation(commandDocState)
 
   const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = useState<
     string | null
@@ -82,7 +85,7 @@ export function GripperWizardFlows(
   ] = useState<boolean>(false)
 
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
-    useCreateTargetedMaintenanceRunMutation({
+    useCreateTargetedMaintenanceRunMutation(commandDocState, {
       onSuccess: response => {
         setCreatedMaintenanceRunId(response.data.id)
       },
@@ -132,7 +135,7 @@ export function GripperWizardFlows(
   }
 
   const { deleteMaintenanceRun, isLoading: isDeleteLoading } =
-    useDeleteMaintenanceRunMutation({
+    useDeleteMaintenanceRunMutation(deletionDocState, {
       onSuccess: () => {
         closeFlow()
       },

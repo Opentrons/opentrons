@@ -18,7 +18,7 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 import {
   useGetModulesNeedingSetup,
   useGetModulesNeedingSetupThatCanCurrentlyBeSetUp,
-} from '/app/App/hooks'
+} from '/app/App/hooks/useGetModulesNeedingSetup'
 import { SmallButton } from '/app/atoms/buttons'
 import { i18n } from '/app/i18n'
 import { useModuleUSBPort } from '/app/local-resources/modules'

@@ -2,7 +2,7 @@ import { useMutation } from 'react-query'
 
 import { updateErrorRecoverySettings } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -36,7 +36,7 @@ export function useUpdateErrorRecoverySettings(
 ): UseUpdateErrorRecoverySettingsMutationResult {
   const host = useHost()
   const mutation = useMutation(
-    [host, 'errorRecovery', 'settings'],
+    getQueryKey(host, 'errorRecovery', 'settings'),
     (settings: ErrorRecoverySettingsRequest) =>
       updateErrorRecoverySettings(host!, settings)
         .then(response => response.data)

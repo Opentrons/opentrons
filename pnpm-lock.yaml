@@ -4,6 +4,31 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@types/lodash':
+      specifier: 4.17.24
+      version: 4.17.24
+    lodash:
+      specifier: 4.18.1
+      version: 4.18.1
+    react-i18next:
+      specifier: 14.0.0
+      version: 14.0.0
+    react-router-dom:
+      specifier: 6.24.1
+      version: 6.24.1
+  react18:
+    '@types/react-dom':
+      specifier: 18.2.0
+      version: 18.2.0
+    react:
+      specifier: 18.2.0
+      version: 18.2.0
+    react-dom:
+      specifier: 18.2.0
+      version: 18.2.0
+
 overrides:
   '@storybook/react-docgen-typescript-plugin': 1.0.6--canary.9.cd77847.0
 
@@ -74,9 +99,6 @@ importers:
       '@types/glob':
         specifier: 7.1.3
         version: 7.1.3
-      '@types/lodash':
-        specifier: 4.17.24
-        version: 4.17.24
       '@types/netmask':
         specifier: ^1.0.30
         version: 1.0.30
@@ -90,7 +112,7 @@ importers:
         specifier: ^3.0.6
         version: 3.0.13(@types/react@18.2.51)
       '@types/react-dom':
-        specifier: 18.2.0
+        specifier: catalog:react18
         version: 18.2.0
       '@types/react-redux':
         specifier: 7.1.32
@@ -255,16 +277,16 @@ importers:
         specifier: 3.7.4
         version: 3.7.4
       react:
-        specifier: 18.2.0
+        specifier: catalog:react18
         version: 18.2.0
       react-docgen-typescript:
         specifier: ^1.21.0
         version: 1.22.0(typescript@5.3.3)
       react-dom:
-        specifier: 18.2.0
+        specifier: catalog:react18
         version: 18.2.0(react@18.2.0)
       react-i18next:
-        specifier: 14.0.0
+        specifier: 'catalog:'
         version: 14.0.0(i18next@19.9.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react-query:
         specifier: 3.35.0
@@ -321,7 +343,7 @@ importers:
   api-client:
     dependencies:
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       '@types/lodash':
         specifier: 4.17.24
@@ -348,25 +370,25 @@ importers:
         specifier: 5.0.3
         version: 5.0.3
       '@opentrons/api-client':
-        specifier: link:../api-client
+        specifier: workspace:*
         version: link:../api-client
       '@opentrons/components':
-        specifier: link:../components
+        specifier: workspace:*
         version: link:../components
       '@opentrons/discovery-client':
-        specifier: link:../discovery-client
+        specifier: workspace:*
         version: link:../discovery-client
       '@opentrons/labware-library':
-        specifier: link:../labware-library
+        specifier: workspace:*
         version: link:../labware-library
       '@opentrons/react-api-client':
-        specifier: link:../react-api-client
+        specifier: workspace:*
         version: link:../react-api-client
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       '@opentrons/step-generation':
-        specifier: link:../step-generation
+        specifier: workspace:*
         version: link:../step-generation
       '@reduxjs/toolkit':
         specifier: 2.11.2
@@ -420,10 +442,10 @@ importers:
         specifier: 2.6.7
         version: 2.6.7(encoding@0.1.13)
       react:
-        specifier: 18.2.0
+        specifier: catalog:react18
         version: 18.2.0
       react-dom:
-        specifier: 18.2.0
+        specifier: catalog:react18
         version: 18.2.0(react@18.2.0)
       react-error-boundary:
         specifier: ^4.0.10
@@ -438,7 +460,7 @@ importers:
         specifier: 8.1.2
         version: 8.1.2(@types/react-dom@18.2.18)(@types/react@18.2.51)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(redux@5.0.1)
       react-router-dom:
-        specifier: 6.24.1
+        specifier: 'catalog:'
         version: 6.24.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react-select:
         specifier: 5.4.0
@@ -529,16 +551,16 @@ importers:
   app-shell:
     dependencies:
       '@opentrons/app':
-        specifier: link:../app
+        specifier: workspace:*
         version: link:../app
       '@opentrons/discovery-client':
-        specifier: link:../discovery-client
+        specifier: workspace:*
         version: link:../discovery-client
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       '@opentrons/step-generation':
-        specifier: link:../step-generation
+        specifier: workspace:*
         version: link:../step-generation
       '@opentrons/usb-bridge/node-client':
         specifier: link:../usb-bridge/node-client
@@ -553,7 +575,7 @@ importers:
         specifier: 9.0.13
         version: 9.0.13
       '@types/lodash':
-        specifier: 4.17.24
+        specifier: 'catalog:'
         version: 4.17.24
       '@types/pump':
         specifier: ^1.1.0
@@ -607,7 +629,7 @@ importers:
         specifier: 5.1.0
         version: 5.1.0
       lodash:
-        specifier: 4.18.1
+        specifier: 'catalog:'
         version: 4.18.1
       mdns-js:
         specifier: 1.0.1
@@ -680,10 +702,10 @@ importers:
   app-shell-odd:
     dependencies:
       '@opentrons/discovery-client':
-        specifier: link:../discovery-client
+        specifier: workspace:*
         version: link:../discovery-client
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       '@sentry/electron':
         specifier: 7.5.0
@@ -695,7 +717,7 @@ importers:
         specifier: 9.0.13
         version: 9.0.13
       '@types/lodash':
-        specifier: 4.17.24
+        specifier: 'catalog:'
         version: 4.17.24
       '@types/pump':
         specifier: ^1.1.0
@@ -731,7 +753,7 @@ importers:
         specifier: 5.1.0
         version: 5.1.0
       lodash:
-        specifier: 4.18.1
+        specifier: 'catalog:'
         version: 4.18.1
       merge-options:
         specifier: 1.0.1
@@ -768,7 +790,7 @@ importers:
         version: 13.1.2
     devDependencies:
       '@opentrons/app':
-        specifier: link:../app
+        specifier: workspace:*
         version: link:../app
       '@types/node-fetch':
         specifier: 2.6.11
@@ -795,10 +817,10 @@ importers:
   components:
     dependencies:
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       '@opentrons/step-generation':
-        specifier: link:../step-generation
+        specifier: workspace:*
         version: link:../step-generation
       '@popperjs/core':
         specifier: 2.1.1
@@ -813,7 +835,7 @@ importers:
         specifier: 2.2.5
         version: 2.2.5
       '@types/lodash':
-        specifier: 4.17.24
+        specifier: 'catalog:'
         version: 4.17.24
       '@types/styled-components':
         specifier: ^5.1.26
@@ -831,13 +853,13 @@ importers:
         specifier: ^1.10.27
         version: 1.10.27
       lodash:
-        specifier: 4.18.1
+        specifier: 'catalog:'
         version: 4.18.1
       react:
-        specifier: 18.2.0
+        specifier: catalog:react18
         version: 18.2.0
       react-dom:
-        specifier: 18.2.0
+        specifier: catalog:react18
         version: 18.2.0(react@18.2.0)
       react-markdown:
         specifier: 9.0.3
@@ -868,7 +890,7 @@ importers:
   discovery-client:
     dependencies:
       '@types/lodash':
-        specifier: 4.17.24
+        specifier: 'catalog:'
         version: 4.17.24
       '@types/node-fetch':
         specifier: 2.6.11
@@ -883,7 +905,7 @@ importers:
         specifier: 5.0.1
         version: 5.0.1
       lodash:
-        specifier: 4.18.1
+        specifier: 'catalog:'
         version: 4.18.1
       mdns-js:
         specifier: 1.0.1
@@ -971,10 +993,10 @@ importers:
   labware-designer:
     dependencies:
       '@opentrons/components':
-        specifier: link:../components
+        specifier: workspace:*
         version: link:../components
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       styled-components:
         specifier: 5.3.6
@@ -987,10 +1009,10 @@ importers:
   labware-library:
     dependencies:
       '@opentrons/components':
-        specifier: link:../components
+        specifier: workspace:*
         version: link:../components
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       ajv:
         specifier: 6.12.3
@@ -1011,7 +1033,7 @@ importers:
         specifier: 2.1.4
         version: 2.1.4(react@18.2.0)
       lodash:
-        specifier: 4.18.1
+        specifier: 'catalog:'
         version: 4.18.1
       mixpanel-browser:
         specifier: 2.29.1
@@ -1020,13 +1042,13 @@ importers:
         specifier: 6.2.0
         version: 6.2.0
       react:
-        specifier: 18.2.0
+        specifier: catalog:react18
         version: 18.2.0
       react-dom:
-        specifier: 18.2.0
+        specifier: catalog:react18
         version: 18.2.0(react@18.2.0)
       react-router-dom:
-        specifier: 6.24.1
+        specifier: 'catalog:'
         version: 6.24.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       styled-components:
         specifier: 5.3.6
@@ -1048,7 +1070,7 @@ importers:
         specifier: 3.1.7
         version: 3.1.7
       '@types/lodash':
-        specifier: 4.17.24
+        specifier: 'catalog:'
         version: 4.17.24
       '@types/mixpanel-browser':
         specifier: ^2.35.6
@@ -1075,10 +1097,10 @@ importers:
         specifier: 5.0.3
         version: 5.0.3
       '@opentrons/components':
-        specifier: link:../components
+        specifier: workspace:*
         version: link:../components
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       axios:
         specifier: ^0.21.1
@@ -1087,16 +1109,16 @@ importers:
         specifier: 2.8.0
         version: 2.8.0(@types/react@18.2.51)(react@18.2.0)
       lodash:
-        specifier: 4.18.1
+        specifier: 'catalog:'
         version: 4.18.1
       mixpanel-browser:
         specifier: 2.22.1
         version: 2.22.1
       react:
-        specifier: 18.2.0
+        specifier: catalog:react18
         version: 18.2.0
       react-dom:
-        specifier: 18.2.0
+        specifier: catalog:react18
         version: 18.2.0(react@18.2.0)
       react-error-boundary:
         specifier: ^4.0.10
@@ -1108,7 +1130,7 @@ importers:
         specifier: 9.0.1
         version: 9.0.1(@types/react@18.2.51)(react@18.2.0)
       react-router-dom:
-        specifier: 6.24.1
+        specifier: 'catalog:'
         version: 6.24.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react-transition-group:
         specifier: 4.4.5
@@ -1121,7 +1143,7 @@ importers:
         version: 14.0.0
     devDependencies:
       '@types/lodash':
-        specifier: 4.17.24
+        specifier: 'catalog:'
         version: 4.17.24
       '@types/mixpanel-browser':
         specifier: 2.35.6
@@ -1157,13 +1179,13 @@ importers:
         specifier: 3.1.1
         version: 3.1.1(react-hook-form@7.49.3(react@18.2.0))
       '@opentrons/components':
-        specifier: link:../components
+        specifier: workspace:*
         version: link:../components
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       '@opentrons/step-generation':
-        specifier: link:../step-generation
+        specifier: workspace:*
         version: link:../step-generation
       '@sentry/react':
         specifier: ^9.12.0
@@ -1172,7 +1194,7 @@ importers:
         specifier: 2.0.1
         version: 2.0.1
       '@types/lodash':
-        specifier: 4.17.24
+        specifier: 'catalog:'
         version: 4.17.24
       '@types/redux-actions':
         specifier: 2.6.1
@@ -1208,7 +1230,7 @@ importers:
         specifier: ^10.1.3
         version: 10.2.0
       lodash:
-        specifier: 4.18.1
+        specifier: 'catalog:'
         version: 4.18.1
       lost:
         specifier: 8.3.1
@@ -1241,7 +1263,7 @@ importers:
         specifier: 6.2.0
         version: 6.2.0
       react:
-        specifier: 18.2.0
+        specifier: catalog:react18
         version: 18.2.0
       react-dnd:
         specifier: 16.0.1
@@ -1250,7 +1272,7 @@ importers:
         specifier: 16.0.1
         version: 16.0.1
       react-dom:
-        specifier: 18.2.0
+        specifier: catalog:react18
         version: 18.2.0(react@18.2.0)
       react-error-boundary:
         specifier: ^4.0.10
@@ -1268,7 +1290,7 @@ importers:
         specifier: 8.1.2
         version: 8.1.2(@types/react-dom@18.2.18)(@types/react@18.2.51)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(redux@5.0.1)
       react-router-dom:
-        specifier: 6.24.1
+        specifier: 'catalog:'
         version: 6.24.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       redux:
         specifier: 5.0.1
@@ -1311,28 +1333,31 @@ importers:
   protocol-visualization:
     dependencies:
       '@opentrons/components':
-        specifier: link:../components
+        specifier: workspace:*
         version: link:../components
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       '@opentrons/step-generation':
-        specifier: link:../step-generation
+        specifier: workspace:*
         version: link:../step-generation
+      '@types/lodash':
+        specifier: 'catalog:'
+        version: 4.17.24
       clsx:
         specifier: 2.1.1
         version: 2.1.1
       lodash:
-        specifier: 4.17.21
-        version: 4.17.21
+        specifier: 'catalog:'
+        version: 4.18.1
       react:
-        specifier: 18.2.0
+        specifier: catalog:react18
         version: 18.2.0
       react-dom:
-        specifier: 18.2.0
+        specifier: catalog:react18
         version: 18.2.0(react@18.2.0)
       react-i18next:
-        specifier: 14.0.0
+        specifier: 'catalog:'
         version: 14.0.0(i18next@19.9.2)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react-window:
         specifier: 2.2.4
@@ -1341,19 +1366,22 @@ importers:
   react-api-client:
     dependencies:
       '@opentrons/api-client':
-        specifier: link:../api-client
+        specifier: workspace:*
         version: link:../api-client
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
+      '@types/lodash':
+        specifier: 'catalog:'
+        version: 4.17.24
       axios:
         specifier: ^0.21.1
         version: 0.21.4
       lodash:
-        specifier: 4.18.1
+        specifier: 'catalog:'
         version: 4.18.1
       react:
-        specifier: 18.2.0
+        specifier: catalog:react18
         version: 18.2.0
       react-query:
         specifier: 3.35.0
@@ -1365,14 +1393,14 @@ importers:
         specifier: ^6.12.3
         version: 6.12.3
       lodash:
-        specifier: 4.18.1
+        specifier: 'catalog:'
         version: 4.18.1
       path-browserify:
         specifier: 1.0.1
         version: 1.0.1
     devDependencies:
       '@types/lodash':
-        specifier: 4.17.24
+        specifier: 'catalog:'
         version: 4.17.24
       '@types/path-browserify':
         specifier: 1.0.3
@@ -1381,7 +1409,7 @@ importers:
   step-generation:
     dependencies:
       '@opentrons/shared-data':
-        specifier: link:../shared-data
+        specifier: workspace:*
         version: link:../shared-data
       core-js:
         specifier: 3.2.1
@@ -1390,14 +1418,14 @@ importers:
         specifier: ^10.1.3
         version: 10.2.0
       lodash:
-        specifier: 4.18.1
+        specifier: 'catalog:'
         version: 4.18.1
       uuid:
         specifier: 14.0.0
         version: 14.0.0
     devDependencies:
       '@types/lodash':
-        specifier: 4.17.24
+        specifier: 'catalog:'
         version: 4.17.24
 
   usb-bridge/node-client:
@@ -8498,9 +8526,6 @@ packages:
   lodash.truncate@4.4.2:
     resolution: {integrity: sha512-jttmRe7bRse52OsWIMDLaXxWqRAmtIUccAQ3garviCqJjafXOfNMO0yMfNpdD6zbGaTU0P5Nz7e7gAT6cKmJRw==}
 
-  lodash@4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
-
   lodash@4.18.1:
     resolution: {integrity: sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==}
 
@@ -14219,7 +14244,7 @@ snapshots:
 
   '@isaacs/fs-minipass@4.0.1':
     dependencies:
-      minipass: 7.1.2
+      minipass: 7.1.3
 
   '@jest/schemas@30.0.5':
     dependencies:
@@ -17534,7 +17559,7 @@ snapshots:
       fs-minipass: 3.0.3
       glob: 10.5.0
       lru-cache: 10.4.3
-      minipass: 7.1.2
+      minipass: 7.1.3
       minipass-collect: 2.0.1
       minipass-flush: 1.0.5
       minipass-pipeline: 1.2.4
@@ -19894,7 +19919,7 @@ snapshots:
 
   fs-minipass@3.0.3:
     dependencies:
-      minipass: 7.1.2
+      minipass: 7.1.3
 
   fs.realpath@1.0.0: {}
 
@@ -20070,7 +20095,7 @@ snapshots:
       foreground-child: 3.3.1
       jackspeak: 3.4.3
       minimatch: 9.0.5
-      minipass: 7.1.2
+      minipass: 7.1.3
       package-json-from-dist: 1.0.1
       path-scurry: 1.11.1
 
@@ -21235,8 +21260,6 @@ snapshots:
 
   lodash.truncate@4.4.2: {}
 
-  lodash@4.17.21: {}
-
   lodash@4.18.1: {}
 
   log-symbols@4.1.0:
@@ -21384,7 +21407,7 @@ snapshots:
       '@npmcli/agent': 3.0.0
       cacache: 19.0.1
       http-cache-semantics: 4.2.0
-      minipass: 7.1.2
+      minipass: 7.1.3
       minipass-fetch: 4.0.1
       minipass-flush: 1.0.5
       minipass-pipeline: 1.2.4
@@ -21831,7 +21854,7 @@ snapshots:
 
   minipass-collect@2.0.1:
     dependencies:
-      minipass: 7.1.2
+      minipass: 7.1.3
 
   minipass-fetch@2.1.2:
     dependencies:
@@ -21843,7 +21866,7 @@ snapshots:
 
   minipass-fetch@4.0.1:
     dependencies:
-      minipass: 7.1.2
+      minipass: 7.1.3
       minipass-sized: 1.0.3
       minizlib: 3.1.0
     optionalDependencies:
@@ -21880,7 +21903,7 @@ snapshots:
 
   minizlib@3.1.0:
     dependencies:
-      minipass: 7.1.2
+      minipass: 7.1.3
 
   mixpanel-browser@2.22.1: {}
 
@@ -24131,7 +24154,7 @@ snapshots:
 
   ssri@12.0.0:
     dependencies:
-      minipass: 7.1.2
+      minipass: 7.1.3
 
   ssri@9.0.1:
     dependencies:

@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from 'react-query'
 
 import { createCameraImageSettings } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -43,11 +43,11 @@ export function useCreateCameraImageSettings(
     AxiosError<ErrorResponse>,
     CameraImageSettings
   >(
-    [host, 'camera', 'cameraSettings'],
+    getQueryKey(host, 'camera', 'cameraSettings'),
     (data: CameraImageSettings) =>
       createCameraImageSettings(host!, data).then(response => {
         queryClient
-          .invalidateQueries([host, 'camera', 'cameraSettings'])
+          .invalidateQueries(getQueryKey(host, 'camera', 'cameraSettings'))
           .catch(e => {
             throw e
           })

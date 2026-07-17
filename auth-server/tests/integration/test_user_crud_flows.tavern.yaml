@@ -14,7 +14,7 @@ stages:
       url: '{run_server.base_url}/auth/users'
       json:
         data:
-          userName: test_new_user
+          username: test_new_user
           password: securepassword123
           fullName: Test New User
           accountType: user
@@ -24,13 +24,12 @@ stages:
       status_code: 201
       json:
         data:
-          userName: test_new_user
+          username: test_new_user
           fullName: Test New User
           accountType: user
           locked: false
           scopes: !force_original_structure '{user_scopes_list}'
           resetPassword: false
-
   - name: Create a new user with a password less than 8 characters
     request:
       method: POST
@@ -39,7 +38,7 @@ stages:
         Authorization: '{admin_access_token}'
       json:
         data:
-          userName: test_new_user_password_less_than_8_characters
+          username: test_new_user_password_less_than_8_characters
           password: '1234567'
           fullName: Test New User
           accountType: user
@@ -60,11 +59,10 @@ stages:
         data:
           accountType: user
           fullName: Test New User
-          userName: test_new_user
+          username: test_new_user
           locked: false
           scopes: !force_original_structure '{user_scopes_list}'
           resetPassword: false
-
   - name: Update the user
     request:
       method: PATCH
@@ -81,18 +79,17 @@ stages:
         data:
           accountType: admin
           fullName: Test New User Updated
-          userName: test_new_user
+          username: test_new_user
           locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: false
-
   - name: Update the username and password
     request:
       method: PATCH
       url: '{run_server.base_url}/auth/users/byUsername/test_new_user'
       json:
         data:
-          userName: test_new_user_updated
+          username: test_new_user_updated
           password: securepassword123
       headers:
         Authorization: '{admin_access_token}'
@@ -102,11 +99,10 @@ stages:
         data:
           accountType: admin
           fullName: Test New User Updated
-          userName: test_new_user_updated
+          username: test_new_user_updated
           locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: false
-
   - name: Update the reset password flag
     request:
       method: PATCH
@@ -122,11 +118,10 @@ stages:
         data:
           accountType: admin
           fullName: Test New User Updated
-          userName: test_new_user_updated
+          username: test_new_user_updated
           locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: true
-
   - name: Get the user information
     request:
       method: GET
@@ -139,10 +134,84 @@ stages:
         data:
           accountType: admin
           fullName: Test New User Updated
-          userName: test_new_user_updated
+          username: test_new_user_updated
           locked: false
           scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: true
+  - name: Reset the user's password to a temporary password
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_updated/resetPassword'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      save:
+        json:
+          temporary_password: data.temporaryPassword
+      json:
+        data:
+          accountType: admin
+          fullName: Test New User Updated
+          username: test_new_user_updated
+          locked: false
+          scopes: !force_original_structure '{admin_scopes_list}'
+          resetPassword: true
+          temporaryPassword: !anystr
+
+  - name: Log in with the temporary password
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: test_new_user_updated
+        password: '{temporary_password}'
+    response:
+      status_code: 200
+      json:
+        access_token: !anystr
+        refresh_token: !anystr
+        token_type: Bearer
+        expires_in: !anyint
+        scope: !anystr
+
+  - name: User cannot log in with the previous password after reset
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: test_new_user_updated
+        password: securepassword123
+    response:
+      status_code: 400
+      json:
+        error: invalid_grant
+        error_description: Invalid credentials given.
+        opentrons_login_attempts_remaining: !anyint
+
+  - name: Admin sets a new password for the user
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_updated'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          password: securepassword123
+    response:
+      status_code: 200
+      json:
+        data:
+          accountType: admin
+          fullName: Test New User Updated
+          username: test_new_user_updated
+          locked: false
+          scopes: !force_original_structure '{admin_scopes_list}'
+          resetPassword: false
 
   - name: Get a new access token with the updated username and password
     request:
@@ -210,7 +279,7 @@ stages:
       url: '{run_server.base_url}/auth/users'
       json:
         data:
-          userName: regular_user_1
+          username: regular_user_1
           password: securepassword123
           fullName: Regular User 1
           accountType: user
@@ -228,7 +297,7 @@ stages:
       url: '{run_server.base_url}/auth/users'
       json:
         data:
-          userName: regular_user_2
+          username: regular_user_2
           password: securepassword123
           fullName: Regular User 2
           accountType: user

@@ -355,6 +355,7 @@
         "label": "Select the state to change",
         "options": {
           "pump": {
+            "change": "Change vacuum pump settings",
             "off": "Turn off Vacuum pump",
             "on": "Turn on Vacuum pump"
           },

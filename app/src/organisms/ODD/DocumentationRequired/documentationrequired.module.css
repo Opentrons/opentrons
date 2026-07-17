@@ -83,6 +83,7 @@
 
 .overlay {
   position: fixed;
+  z-index: 1000;
   background-color: var(--white);
   inset: 0;
 }

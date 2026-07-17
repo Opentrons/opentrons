@@ -141,6 +141,7 @@ async def test_create(
             created_at=created_at,
             deck_configuration=[],
             notify_publishers=mock_notify_publishers,
+            proxy_of_callback_for_handling_door_events=None,
         )
     ).then_return(engine_state_summary)
     decoy.when(
@@ -196,6 +197,7 @@ async def test_create_with_options(
             created_at=created_at,
             deck_configuration=[],
             notify_publishers=mock_notify_publishers,
+            proxy_of_callback_for_handling_door_events=None,
         )
     ).then_return(engine_state_summary)
     decoy.when(
@@ -245,6 +247,7 @@ async def test_create_engine_error(
             created_at=created_at,
             deck_configuration=[],
             notify_publishers=mock_notify_publishers,
+            proxy_of_callback_for_handling_door_events=None,
         )
     ).then_raise(RunConflictError("oh no"))
     decoy.when(

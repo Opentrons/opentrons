@@ -13,10 +13,14 @@ from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonExce
 from opentrons_shared_data.errors.exceptions import (
     FirmwareUpdateRequiredError as HWFirmwareUpdateRequired,
 )
+from server_utils.auth.resource_server.authorization_checker import (
+    MissingUserNotesError,
+)
 from server_utils.auth.resource_server.fastapi import (
     AuthorizationError,
     handle_authorization_error,
 )
+from server_utils.fastapi_utils.documented_interaction import USER_NOTES_HEADER
 
 from .error_responses import (
     ApiError,
@@ -180,6 +184,19 @@ async def _handle_authorization_error_async(
     return handle_authorization_error(request, error)
 
 
+async def handle_missing_user_notes(
+    request: Request, error: MissingUserNotesError
+) -> JSONResponse:
+    """Map missing audit notes to a 422 validation-style response."""
+    response = InvalidRequest(
+        detail=str(error),
+        source=ErrorSource(header=USER_NOTES_HEADER),
+    )
+    return await handle_api_error(
+        request, response.as_error(status.HTTP_422_UNPROCESSABLE_ENTITY)
+    )
+
+
 exception_handlers: Dict[
     Union[int, Type[Exception]],
     Callable[[Request, Any], Coroutine[Any, Any, Response]],
@@ -189,5 +206,6 @@ exception_handlers: Dict[
     RequestValidationError: handle_validation_error,
     HWFirmwareUpdateRequired: handle_firmware_upgrade_required_error,
     AuthorizationError: _handle_authorization_error_async,
+    MissingUserNotesError: handle_missing_user_notes,
     Exception: handle_unexpected_error,
 }

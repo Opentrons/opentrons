@@ -27,6 +27,7 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.util.pyro.pyro_synchronous_adapter import (
+    convert_result_to_proxy,
     pyro_behavior,
     remove_pyro_synchronous_object,
 )
@@ -241,6 +242,7 @@ class Thermocycler(mod_abc.AbstractModule):
             # Real module that is not a V2
             return V1_MODULE_STRING
 
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def bootloader(self) -> types.UploadFunction:
         if self.model() == V2_MODULE_STRING:
             return update.upload_via_dfu

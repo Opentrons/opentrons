@@ -142,19 +142,21 @@ describe('RunningProtocol', () => {
       stoppedAt: '',
       completedAt: '2022-05-04T18:24:41.833862+00:00',
     })
-    when(vi.mocked(useRunActionMutations)).calledWith(RUN_ID).thenReturn({
-      playRun: mockPlayRun,
-      pauseRun: mockPauseRun,
-      stopRun: mockStopRun,
-      resumeRunFromRecovery: mockResumeRunFromRecovery,
-      resumeRunFromRecoveryAssumingFalsePositive:
-        mockResumeRunFromRecoveryAssumingFalsePositive,
-      isPlayRunActionLoading: false,
-      isPauseRunActionLoading: false,
-      isStopRunActionLoading: false,
-      isResumeRunFromRecoveryActionLoading: false,
-      isResumeRunFromRecoveryAssumingFalsePositiveActionLoading: false,
-    })
+    when(vi.mocked(useRunActionMutations))
+      .calledWith(RUN_ID, { accessControlEnabled: false })
+      .thenReturn({
+        playRun: mockPlayRun,
+        pauseRun: mockPauseRun,
+        stopRun: mockStopRun,
+        resumeRunFromRecovery: mockResumeRunFromRecovery,
+        resumeRunFromRecoveryAssumingFalsePositive:
+          mockResumeRunFromRecoveryAssumingFalsePositive,
+        isPlayRunActionLoading: false,
+        isPauseRunActionLoading: false,
+        isStopRunActionLoading: false,
+        isResumeRunFromRecoveryActionLoading: false,
+        isResumeRunFromRecoveryAssumingFalsePositiveActionLoading: false,
+      })
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(mockRobotSideAnalysis)

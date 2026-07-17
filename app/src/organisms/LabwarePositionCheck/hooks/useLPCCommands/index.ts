@@ -15,6 +15,7 @@ import { useHandleValidMoveToMaintenancePosition } from './useHandleValidMoveToM
 import { useSaveWorkingOffsets } from './useSaveWorkingOffsets'
 
 import type { CommandData } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { LPCWizardFlexProps } from '/app/organisms/LabwarePositionCheck/LPCWizardFlex'
 import type { UseHandleConditionalCleanupResult } from './useHandleClose'
@@ -28,7 +29,9 @@ import type { UseHandleStartLPCResult } from './useHandleStartLPC'
 import type { UseHandleValidMoveToMaintenancePositionResult } from './useHandleValidMoveToMaintenancePosition'
 import type { UseBuildOffsetsToApplyResult } from './useSaveWorkingOffsets'
 
-export interface UseLPCCommandsProps extends LPCWizardFlexProps {}
+export interface UseLPCCommandsProps extends LPCWizardFlexProps {
+  commandDocState: DocumentationState
+}
 
 export type UseLPCCommandsResult = UseHandleJogResult &
   UseHandleConditionalCleanupResult &
@@ -53,7 +56,9 @@ export function useLPCCommands(
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isRobotMoving, setIsRobotMoving] = useState(false)
 
-  const { chainRunCommands } = useChainMaintenanceCommands()
+  const { chainRunCommands } = useChainMaintenanceCommands(
+    props.commandDocState
+  )
 
   const chainLPCCommands = (
     commands: CreateCommand[],

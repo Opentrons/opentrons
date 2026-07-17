@@ -2,7 +2,7 @@ import { useMutation } from 'react-query'
 
 import { patchAccessControlEnabled } from '@opentrons/api-client'
 
-import { useHost } from '../../api'
+import { getQueryKey, useHost } from '../../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -36,7 +36,7 @@ export function useAccessControlEnabledMutation(
 ): UseAccessControlEnabledMutationResult {
   const host = useHost()
   const mutation = useMutation(
-    [host, 'auth', 'settings', 'accessControlEnabled'],
+    getQueryKey(host, 'auth', 'settings', 'accessControlEnabled'),
     (body: PatchAccessControlEnabledSettingsRequest) =>
       patchAccessControlEnabled(host!, body)
         .then(response => response.data)

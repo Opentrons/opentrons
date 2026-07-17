@@ -21,6 +21,7 @@ import {
 import type { ErrorRecoveryPolicy, HostConfig } from '@opentrons/api-client'
 import type {
   CreateMaintenanceRunType,
+  DocumentationState,
   useCreateMaintenanceCommandMutation,
   UseCreateMaintenanceRunMutationOptions,
   UseCreateMaintenanceRunMutationResult,
@@ -128,10 +129,12 @@ type CreateTargetedMaintenanceRunMutation =
 
 // A wrapper around useCreateMaintenanceRunMutation that ensures the ODD TakeoverModal renders, if applicable.
 export function useCreateTargetedMaintenanceRunMutation(
+  documentationState: DocumentationState,
   options: UseCreateMaintenanceRunMutationOptions = {},
   hostOverride?: HostConfig | null
 ): CreateTargetedMaintenanceRunMutation {
   const createMaintenanceRunMutation = useCreateMaintenanceRunMutation(
+    documentationState,
     options,
     hostOverride
   )

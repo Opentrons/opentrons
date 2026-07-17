@@ -2,7 +2,7 @@ import { useMutation } from 'react-query'
 
 import { updateRobotSetting } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -46,12 +46,12 @@ export function useUpdateRobotSettingMutation(
     AxiosError<ErrorResponse>,
     UpdateRobotSettingVariables
   >(
-    [host, 'robot_settings'],
+    getQueryKey(host, 'robot_settings'),
     ({ id, value }) =>
       updateRobotSetting(host!, id, value).then(response => {
         // TODO: investigate ODD top level behavior when invalidating this query
         // queryClient
-        //   .invalidateQueries([host, 'robot_settings'])
+        //   .invalidateQueries(getQueryKey(host, 'robot_settings'))
         //   .catch((e: Error) => {
         //     throw e
         //   })

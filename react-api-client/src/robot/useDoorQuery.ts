@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 
 import { getDoorStatus } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { DoorStatus } from '@opentrons/api-client'
@@ -17,7 +17,7 @@ export function useDoorQuery<TError = Error>(
 ): UseQueryResult<DoorStatus, TError> {
   const host = useHost()
   const query = useQuery<DoorStatus, TError>(
-    [host!, '/robot/door/status'],
+    getQueryKey(host, '/robot/door/status'),
     () => getDoorStatus(host!).then(response => response.data),
     { enabled: host !== null, ...options }
   )

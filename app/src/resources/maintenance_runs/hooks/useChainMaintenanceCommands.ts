@@ -4,9 +4,12 @@ import { useCreateMaintenanceCommandMutation } from '@opentrons/react-api-client
 
 import { chainMaintenanceCommandsRecursive } from '../../runs'
 
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 
-export function useChainMaintenanceCommands(): {
+export function useChainMaintenanceCommands(
+  documentationState: DocumentationState
+): {
   chainRunCommands: (
     maintenanceRunId: string,
     commands: CreateCommand[],
@@ -15,7 +18,8 @@ export function useChainMaintenanceCommands(): {
   isCommandMutationLoading: boolean
 } {
   const [isLoading, setIsLoading] = useState(false)
-  const { createMaintenanceCommand } = useCreateMaintenanceCommandMutation()
+  const { createMaintenanceCommand } =
+    useCreateMaintenanceCommandMutation(documentationState)
   return {
     chainRunCommands: (
       maintenanceRunId,

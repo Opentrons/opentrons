@@ -13,6 +13,7 @@ import {
   getModuleDisplayName,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import { getIsSlotAVacuumDock } from '@opentrons/step-generation'
 
 import { formatTime } from '/protocol-designer/pages/Designer/utils'
 import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
@@ -269,7 +270,8 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
     }
 
     case 'moveLabware': {
-      const { labware, newLocation, useGripper } = currentStep
+      const { labware, newLocation: newLocationRaw, useGripper } = currentStep
+      const newLocation = newLocationRaw as string
       const labwareName = labwareNicknamesById[labware]
       let newLocationName = newLocation
       if (newLocation in modules) {
@@ -280,6 +282,8 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
         newLocationName = t('off_deck')
       } else if (newLocation === WASTE_CHUTE_CUTOUT) {
         newLocationName = t('shared:wasteChute')
+      } else if (getIsSlotAVacuumDock(newLocation)) {
+        newLocationName = t('shared:vacuum_dock')
       }
       stepSummaryContent = (
         <StyledTrans

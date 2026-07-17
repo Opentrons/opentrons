@@ -1,0 +1,7 @@
+{
+  "detach_pipette": "Detach pipette",
+  "stop_run": "Stop run",
+  "play_run": "Play run",
+  "end_maintenance_run": "End maintenance run",
+  "start_maintenance_run": "Start maintenance run"
+}

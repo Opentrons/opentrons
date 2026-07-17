@@ -17,6 +17,8 @@ import {
 import {
   VACUUM_MAX_PRESSURE_MBAR,
   VACUUM_MIN_PRESSURE_MBAR,
+} from '@opentrons/shared-data'
+import {
   VACUUM_MODE_POWER,
   VACUUM_MODE_PRESSURE,
 } from '@opentrons/step-generation'

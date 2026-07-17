@@ -15,11 +15,16 @@ from .open_vent import (
     OpenVentResult,
 )
 from .start_run_profile import (
+    ProfileType,
     StartRunProfile,
     StartRunProfileCommandType,
     StartRunProfileCreate,
     StartRunProfileParams,
     StartRunProfileResult,
+    StartRunProfileStepParams,
+    VacuumModuleProfileCycle,
+    VacuumModuleProfilePowerStep,
+    VacuumModuleProfilePressureStep,
 )
 from .start_set_vacuum_power import (
     StartSetVacuumPower,
@@ -80,4 +85,9 @@ __all__ = [
     "StartRunProfileCreate",
     "StartRunProfileParams",
     "StartRunProfileResult",
+    "VacuumModuleProfileCycle",
+    "VacuumModuleProfilePowerStep",
+    "VacuumModuleProfilePressureStep",
+    "ProfileType",
+    "StartRunProfileStepParams",
 ]

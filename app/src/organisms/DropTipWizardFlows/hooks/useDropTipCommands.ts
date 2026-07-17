@@ -13,6 +13,7 @@ import {
 import { getAddressableAreaFromConfig } from '../utils'
 
 import type { CommandData, PipetteData } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type {
   AddressableAreaName,
   CreateCommand,
@@ -42,6 +43,8 @@ type UseDropTipSetupCommandsParams = UseDTWithTypeParams & {
   setErrorDetails: (errorDetails: SetRobotErrorDetailsParams) => void
   toggleIsExiting: () => void
   fixitCommandTypeUtils?: FixitCommandTypeUtils
+  commandDocState: DocumentationState
+  deletionDocState: DocumentationState
 }
 
 export interface UseDropTipCommandsResult {
@@ -69,6 +72,8 @@ export function useDropTipCommands({
   instrumentModelSpecs,
   robotType,
   fixitCommandTypeUtils,
+  commandDocState,
+  deletionDocState,
 }: UseDropTipSetupCommandsParams): UseDropTipCommandsResult {
   const isFlex = robotType === FLEX_ROBOT_TYPE
   const [hasSeenClose, setHasSeenClose] = useState(false)
@@ -76,7 +81,8 @@ export function useDropTipCommands({
   const [isJogging, setIsJogging] = useState(false)
   const pipetteId = fixitCommandTypeUtils?.pipetteId ?? null
 
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
+  const { deleteMaintenanceRun } =
+    useDeleteMaintenanceRunMutation(deletionDocState)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
   const handleCleanUpAndClose = (homeOnExit: boolean = true): Promise<void> => {

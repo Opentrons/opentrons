@@ -42,7 +42,7 @@ ACCOUNT_TYPE_TO_SCOPES: dict[AccountType, set[Scope]] = {
 class UserCreate(BaseModel):
     """Request body for creating a user."""
 
-    userName: Annotated[str, Field(..., description="The username of the user.")]
+    username: Annotated[str, Field(..., description="The username of the user.")]
     password: Annotated[SecretStr, Field(..., description="The password for the user.")]
     fullName: Annotated[str, Field(..., description="The full name of the user.")]
     accountType: Annotated[
@@ -53,7 +53,7 @@ class UserCreate(BaseModel):
 class UpdateUser(BaseModel):
     """Request body for updating a user."""
 
-    userName: Annotated[
+    username: Annotated[
         str | None,
         Field(description="The username of the user."),
     ] = None
@@ -78,7 +78,7 @@ class UpdateUser(BaseModel):
     resetPassword: Annotated[
         bool,
         Field(
-            description="Set to true to reset the password for this user.",
+            description="Set to true to require this user to change their password.",
             default=False,
         ),
     ] = False
@@ -87,9 +87,20 @@ class UpdateUser(BaseModel):
 class UserResponse(BaseModel):
     """Response body for a user (no password)."""
 
-    userName: str
+    username: str
     fullName: str
     accountType: AccountType
     scopes: list[str]
     locked: bool
     resetPassword: bool
+
+
+class ResetPasswordResponse(UserResponse):
+    """Response body for a password reset, including the new temporary password."""
+
+    temporaryPassword: Annotated[
+        str,
+        Field(
+            description="The newly generated temporary password for the user.",
+        ),
+    ]

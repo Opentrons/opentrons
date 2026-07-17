@@ -155,14 +155,14 @@ def run(protocol: ProtocolContext) -> None:
     )
 
     reagent_plate_2 = protocol.load_labware(
-        "greiner_384_wellplate_240ul", "B3", "Reagent Plate 2"
+        "opentrons_96_wellplate_200ul_pcr_full_skirt", "B3", "Reagent Plate 2"
     )
     # ========== THIRD ROW ===========
     temp_block: TemperatureModuleContext = protocol.load_module(
         run_helpers.temp_str, "C1"
     )  # type: ignore[assignment]
     reagent_plate_1 = temp_block.load_labware(
-        "greiner_384_wellplate_240ul", "Reagent Plate 1"
+        "opentrons_96_wellplate_200ul_pcr_full_skirt", "Reagent Plate 1"
     )
     ETOH_Reservoir = protocol.load_labware(
         "nest_96_wellplate_2ml_deep", "C2", "EtOH Reservoir"
@@ -307,43 +307,43 @@ def run(protocol: ProtocolContext) -> None:
     Barcodes = reagent_plate_2["B1"]
 
     # Reagent Plate 1
-    for row in Row_Quadrant12:
+    for row in Row_96:
         if FRAG_MODE == "EZ":
-            for col in Column_Quadrant13:
+            for col in Column_96:
                 reagent_plate_1.wells_by_name()[row + col].load_liquid(
                     liquid=Reagent_FRERAT, volume=Reagent_Vol_FRERAT
                 )
-            for col in Column_Quadrant13:
+            for col in Column_96:
                 reagent_plate_1.wells_by_name()[row + col].load_liquid(
                     liquid=Reagent_ERAT, volume=Reagent_Vol_ERAT
                 )
-        for col in Column_Quadrant24:
+        for col in Column_96:
             reagent_plate_1.wells_by_name()[row + col].load_liquid(
                 liquid=Reagent_LIG, volume=Reagent_Vol_LIG
             )
-    for row in Row_Quadrant34:
-        for col in Column_Quadrant13:
+    for row in Row_96:
+        for col in Column_96:
             reagent_plate_1.wells_by_name()[row + col].load_liquid(
                 liquid=Reagent_PCR, volume=Reagent_Vol_PCR * (1 / 12)
             )
-        for col in Column_Quadrant24:
+        for col in Column_96:
             reagent_plate_1.wells_by_name()[row + col].load_liquid(
                 liquid=Reagent_RSB, volume=Reagent_Vol_RSB * (1 / 12)
             )
 
-    # Reagent Plate 1
-    for row in Row_Quadrant12:
-        for col in Column_Quadrant13:
+    # Reagent Plate 2
+    for row in Row_96:
+        for col in Column_96:
             reagent_plate_2.wells_by_name()[row + col].load_liquid(
                 liquid=Reagent_CleanupBead,
                 volume=Reagent_Vol_CleanupBead_Volume,
             )
-        for col in Column_Quadrant24:
+        for col in Column_96:
             reagent_plate_2.wells_by_name()[row + col].load_liquid(
                 liquid=Reagent_Adapter, volume=Reagent_Vol_Adapter
             )
-    for row in Row_Quadrant34:
-        for col in Column_Quadrant13:
+    for row in Row_96:
+        for col in Column_96:
             reagent_plate_2.wells_by_name()[row + col].load_liquid(
                 liquid=Reagent_Barcodes, volume=5
             )
@@ -1118,8 +1118,12 @@ def run(protocol: ProtocolContext) -> None:
             p1000.move_to(CleanupBead.bottom(z=1))
             p1000.mix(CleanupBeadPremix, 30, rate=0.5)
             p1000.prepare_to_aspirate()
-            p1000.aspirate(CleanupBeadVol, location=CleanupBead.bottom(1))
-            p1000.move_to(CleanupBead.top(z=-3))
+            p1000.aspirate(
+                CleanupBeadVol,
+                location=CleanupBead.meniscus(z=-1, target="start"),
+                end_location=CleanupBead.meniscus(z=-1, target="end"),
+            )
+            p1000.move_to(CleanupBead.top(z=1))
             p1000.dispense(CleanupBeadVol, CleanupPlate_2["A1"].bottom(z=0.5))
             p1000.move_to(CleanupPlate_2["A1"].bottom(z=2.5))
             p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.5

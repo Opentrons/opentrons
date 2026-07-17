@@ -33,9 +33,12 @@ describe('useStopRunMutation hook', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(createRunAction).mockRejectedValue('oops')
 
-    const { result } = renderHook(() => useStopRunMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useStopRunMutation({ accessControlEnabled: false }),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
     result.current.stopRun(RUN_ID_1)
@@ -50,9 +53,12 @@ describe('useStopRunMutation hook', () => {
       data: mockStopRunAction,
     } as Response<RunAction>)
 
-    const { result } = renderHook(() => useStopRunMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useStopRunMutation({ accessControlEnabled: false }),
+      {
+        wrapper,
+      }
+    )
     act(() => result.current.stopRun(RUN_ID_1))
 
     await waitFor(() => {

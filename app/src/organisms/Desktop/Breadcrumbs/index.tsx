@@ -1,19 +1,9 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { Link, useLocation, useParams } from 'react-router-dom'
+import clsx from 'clsx'
 
-import {
-  ALIGN_CENTER,
-  ALIGN_FLEX_START,
-  BORDERS,
-  Box,
-  COLORS,
-  DIRECTION_ROW,
-  Flex,
-  Icon,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { Icon } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { useRobot } from '/app/redux-resources/robots'
@@ -37,21 +27,14 @@ interface CrumbNameProps {
 
 function CrumbName({ crumbName, isLastCrumb }: CrumbNameProps): JSX.Element {
   return (
-    <Flex
-      alignItems={ALIGN_CENTER}
-      className={isLastCrumb ? styles.crumb_inactive : styles.crumb_active}
-    >
-      <Box
-        paddingRight={SPACING.spacing4}
-        textTransform={TYPOGRAPHY.textTransformNone}
-        className={styles.text_style}
-      >
+    <div className={isLastCrumb ? styles.crumb_inactive : styles.crumb_active}>
+      <div className={clsx(styles.crumb_name, styles.text_style)}>
         {crumbName}
-      </Box>
+      </div>
       {!isLastCrumb ? (
         <Icon name="caret-right" width="0.25rem" height="0.3125rem" />
       ) : null}
-    </Flex>
+    </div>
   )
 }
 
@@ -141,19 +124,12 @@ function BreadcrumbsComponent(): JSX.Element | null {
   })
 
   return pathCrumbs.length > 1 ? (
-    <Flex
-      alignItems={ALIGN_FLEX_START}
-      backgroundColor={COLORS.white}
-      borderBottom={BORDERS.lineBorder}
-      flexDirection={DIRECTION_ROW}
-      padding={`${SPACING.spacing4} 0 ${SPACING.spacing4} ${SPACING.spacing8}`}
-      className={styles.text_style}
-    >
+    <div className={styles.root_container}>
       {pathCrumbs.map((crumb, i) => {
         const isLastCrumb = i === pathCrumbs.length - 1
 
         return (
-          <Flex key={crumb.linkPath} paddingRight={SPACING.spacing4}>
+          <div className={styles.crumb_container} key={crumb.linkPath}>
             <Link
               className={
                 isLastCrumb ? styles.crumb_link_inactive : styles.crumb_link
@@ -165,10 +141,10 @@ function BreadcrumbsComponent(): JSX.Element | null {
                 isLastCrumb={isLastCrumb}
               />
             </Link>
-          </Flex>
+          </div>
         )
       })}
-    </Flex>
+    </div>
   ) : null
 }
 

@@ -19,6 +19,7 @@ import {
 import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { getIsOnDevice } from '/app/redux/config'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -48,6 +49,7 @@ import { Results } from './Results'
 import { UnskippableModal } from './UnskippableModal'
 
 import type { CommandData, HostConfig } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type {
   CreateCommand,
   LoadedPipette,
@@ -64,12 +66,20 @@ interface PipetteWizardFlowsProps {
   closeFlow: () => void
   onComplete?: () => void
   pipetteInfo?: LoadedPipette[]
+  initialDocstate?: DocumentationState
 }
 
 export const PipetteWizardFlows = (
   props: PipetteWizardFlowsProps
 ): JSX.Element | null => {
-  const { flowType, mount, closeFlow, selectedPipette, onComplete } = props
+  const {
+    flowType,
+    mount,
+    closeFlow,
+    selectedPipette,
+    onComplete,
+    initialDocstate,
+  } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
   const deckConfig = useNotifyDeckConfigurationQuery()
@@ -174,11 +184,15 @@ export const PipetteWizardFlows = (
     enabled: createdMaintenanceRunId != null,
   })
 
+  const { commandDocState, deletionDocState } =
+    useMaintenanceRunDocumentation(initialDocstate)
+
   const { chainRunCommands, isCommandMutationLoading } =
-    useChainMaintenanceCommands()
+    useChainMaintenanceCommands(commandDocState)
 
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
     useCreateTargetedMaintenanceRunMutation(
+      commandDocState,
       {
         onSuccess: response => {
           setCreatedMaintenanceRunId(response.data.id)
@@ -236,7 +250,7 @@ export const PipetteWizardFlows = (
   }
 
   const { deleteMaintenanceRun, isLoading: isDeleteLoading } =
-    useDeleteMaintenanceRunMutation({
+    useDeleteMaintenanceRunMutation(deletionDocState, {
       onSuccess: () => {
         closeFlow()
       },
@@ -353,6 +367,7 @@ export const PipetteWizardFlows = (
         isCreateLoading={isCreateLoading}
         deckConfig={deckConfig}
         requiredPipette={requiredPipette}
+        documentationState={commandDocState}
       />
     )
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {

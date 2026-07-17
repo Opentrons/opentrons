@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useSelfQuery } from '@opentrons/react-api-client'
 
 import { getLocalRobot } from '/app/redux/discovery'
-import { getLocalRobotAuthState, logOutOrTimeOut } from '/app/redux/robot-auth'
+import { getLocalRobotAuthState, logOut } from '/app/redux/robot-auth'
 
 import { useAccountInfo, useLogOut } from '../hooks'
 
@@ -74,7 +74,7 @@ describe('useAccountInfo', () => {
     vi.mocked(useSelfQuery).mockReturnValue({
       data: {
         data: {
-          userName: 'test-user',
+          username: 'test-user',
           fullName: 'Test User Name',
           accountType: 'user',
           scopes: [],
@@ -154,7 +154,7 @@ describe('useLogOut', () => {
     result.current()
 
     expect(store.dispatch).toHaveBeenCalledWith(
-      logOutOrTimeOut({ robotName: 'my-robot' })
+      logOut({ robotName: 'my-robot' })
     )
   })
 

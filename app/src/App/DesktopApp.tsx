@@ -35,17 +35,21 @@ import { OPENTRONS_USB } from '/app/redux/discovery'
 import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
+import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { ProtocolVisualization } from '../pages/Desktop/Protocols/ProtocolVisualization'
 import { DesktopAppFallback } from './DesktopAppFallback'
-import { useSoftwareUpdatePoll } from './hooks'
+import { useRefreshAccessTokenOnActivity } from './hooks/useRefreshAccessTokenOnActivity'
+import { useSoftwareUpdatePoll } from './hooks/useSoftwareUpdatePoll'
 import { Navbar } from './Navbar'
 import { ModalPortalRoot } from './portal'
 import { ReactQueryDevtools } from './tools'
 
+import type { DocumentationReport } from '@opentrons/react-api-client'
 import type { RouteProps } from './types'
 
 export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()
+  useRefreshAccessTokenOnActivity()
   const [isEmergencyStopModalDismissed, setIsEmergencyStopModalDismissed] =
     useState<boolean>(false)
 
@@ -124,48 +128,52 @@ export const DesktopApp = (): JSX.Element => {
                 setIsEmergencyStopModalDismissed,
               }}
             >
-              <Box width="100%" height="100vh">
-                <Alerts>
-                  <Routes>
-                    {desktopRoutes.map(({ Component, path }: RouteProps) => {
-                      return (
-                        <Route
-                          key={path}
-                          element={
-                            <Box
-                              key={Component.name}
-                              display="flex"
-                              flexDirection="column"
-                              height="100%"
-                            >
-                              <Breadcrumbs />
+              <DocumentationRequiredModalContext.Provider
+                value={{ showDocumentationRequiredModal }}
+              >
+                <Box width="100%" height="100vh">
+                  <Alerts>
+                    <Routes>
+                      {desktopRoutes.map(({ Component, path }: RouteProps) => {
+                        return (
+                          <Route
+                            key={path}
+                            element={
                               <Box
-                                position={POSITION_RELATIVE}
-                                width="100%"
-                                flex="1"
-                                minHeight="0"
+                                key={Component.name}
+                                display="flex"
+                                flexDirection="column"
+                                height="100%"
                               >
+                                <Breadcrumbs />
                                 <Box
+                                  position={POSITION_RELATIVE}
                                   width="100%"
-                                  height="100%"
-                                  backgroundColor={COLORS.grey10}
-                                  overflow={OVERFLOW_AUTO}
+                                  flex="1"
+                                  minHeight="0"
                                 >
-                                  <ModalPortalRoot />
-                                  <Component />
+                                  <Box
+                                    width="100%"
+                                    height="100%"
+                                    backgroundColor={COLORS.grey10}
+                                    overflow={OVERFLOW_AUTO}
+                                  >
+                                    <ModalPortalRoot />
+                                    <Component />
+                                  </Box>
                                 </Box>
                               </Box>
-                            </Box>
-                          }
-                          path={path}
-                        />
-                      )
-                    })}
-                    <Route path="*" element={<Navigate to="/protocols" />} />
-                  </Routes>
-                  <RobotControlTakeover />
-                </Alerts>
-              </Box>
+                            }
+                            path={path}
+                          />
+                        )
+                      })}
+                      <Route path="*" element={<Navigate to="/protocols" />} />
+                    </Routes>
+                    <RobotControlTakeover />
+                  </Alerts>
+                </Box>
+              </DocumentationRequiredModalContext.Provider>
             </EmergencyStopContext.Provider>
           </ToasterOven>
         </ErrorBoundary>
@@ -216,4 +224,13 @@ function FlexOnlyRobotControlTakeover({
     return null
   }
   return <EstopTakeover robotName={robotName} />
+}
+
+// TODO(jj): remove this once we have a real implementation
+function showDocumentationRequiredModal(
+  username: string
+): Promise<DocumentationReport> {
+  return Promise.resolve(
+    'NO DOCUMENTATION PROVIDED - DESKTOP' as DocumentationReport
+  )
 }

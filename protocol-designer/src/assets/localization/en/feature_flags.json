@@ -23,10 +23,6 @@
     "title": "Timeline editing guidance",
     "description": "Show information about working with steps next to the protocol timeline"
   },
-  "OT_PD_ENABLE_MULTIPLE_TEMPS_OT2": {
-    "title": "Allow two temperature modules on OT-2",
-    "description": "This experimental setting may cause collisions, and Opentrons will not be responsible for any damage resulting from its use."
-  },
   "OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS": {
     "title": "Enable experimental concurrent module actions",
     "description": "Features and design changes related to doing stuff with modules while other steps run at the same time"
