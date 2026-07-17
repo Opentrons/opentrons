@@ -55,6 +55,7 @@ class NoDownloadContent(ErrorDetails):
         - The run log
         - Labware offset data
         - CSV output files
+        - The CSV runtime parameter input file
         """
     ),
     responses={
@@ -99,6 +100,14 @@ async def download_run_files(
     protocol_entry = _collect_protocol_file(run.protocol_id, protocol_store)
     if protocol_entry is not None:
         zip_entries.append(protocol_entry)
+
+    rtp_csv_entry = _collect_rtp_csv(
+        run_id=runId,
+        run_data_manager=run_data_manager,
+        data_files_store=data_files_store,
+    )
+    if rtp_csv_entry is not None:
+        zip_entries.append(rtp_csv_entry)
 
     run_log_entry = _collect_run_log(
         run_id=runId,
@@ -165,6 +174,25 @@ def _collect_protocol_file(
         return None
 
     return (main_file, main_file.name)
+
+
+def _collect_rtp_csv(
+    run_id: str,
+    run_data_manager: RunDataManager,
+    data_files_store: DataFilesStore,
+) -> Optional[Tuple[Path, str]]:
+    """Return the CSV runtime parameter input file, or None if unavailable."""
+    try:
+        run_record = run_data_manager.get(run_id)
+        for param in run_record.runTimeParameters:
+            if param.type == "csv_file" and param.file is not None:
+                file_info = data_files_store.get(param.file.id)
+                file_path = Path(file_info.path)
+                if file_path.exists() and file_path.is_file():
+                    return (file_path, file_info.name)
+        return None
+    except Exception:
+        return None
 
 
 def _collect_run_log(

@@ -58,12 +58,14 @@ def _stub_run_record_for_download(
     *,
     run_id: str = "run-id",
     labware_offsets: list[pe_types.LabwareOffset] | None = None,
+    run_time_parameters: list[object] | None = None,
 ) -> Run:
     mock_run_record = decoy.mock(cls=Run)
     decoy.when(mock_run_record.model_dump(mode="json", by_alias=True)).then_return(
         {"id": run_id, "protocolId": "protocol-id"}
     )
     decoy.when(mock_run_record.labwareOffsets).then_return(labware_offsets or [])
+    decoy.when(mock_run_record.runTimeParameters).then_return(run_time_parameters or [])
     decoy.when(run_data_manager.get(run_id)).then_return(mock_run_record)
 
     command = _make_home_command()
@@ -107,6 +109,8 @@ async def test_download_run_files_with_images_protocol_run_log_and_offsets(
     protocol_path.write_text("metadata = {'protocolName': 'Test'}\n")
     csv_path = tmp_path / "plate_read450nm.csv"
     csv_path.write_text("wl,a1\n450,0.12\n")
+    rtp_csv_path = tmp_path / "samples.csv"
+    rtp_csv_path.write_text("sample,well\nA,A1\n")
 
     file_info_1 = DataFileInfoWithCommands.model_construct(
         id="file-id-1",
@@ -194,8 +198,28 @@ async def test_download_run_files_with_images_protocol_run_log_and_offsets(
         location=pe_types.LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
         vector=pe_types.LabwareOffsetVector(x=1.11, y=2.22, z=3.33),
     )
+    rtp_param = pe_types.CSVParameter(
+        variableName="csv_data",
+        displayName="CSV Data",
+        file=pe_types.FileInfo(id="rtp-file-id", name="samples.csv"),
+    )
+    decoy.when(data_files_store.get("rtp-file-id")).then_return(
+        DataFileInfo(
+            id="rtp-file-id",
+            name="samples.csv",
+            file_hash="rtp-hash",
+            created_at=datetime(2024, 6, 20),
+            mime_type=MimeType.TEXT_CSV,
+            path=str(rtp_csv_path),
+            generated=False,
+            stored=True,
+        )
+    )
     _stub_run_record_for_download(
-        decoy, mock_run_data_manager, labware_offsets=[labware_offset]
+        decoy,
+        mock_run_data_manager,
+        labware_offsets=[labware_offset],
+        run_time_parameters=[rtp_param],
     )
 
     result = await download_run_files(
@@ -220,6 +244,7 @@ async def test_download_run_files_with_images_protocol_run_log_and_offsets(
         assert "images/image1.jpeg" in names
         assert "images/image2.jpeg" in names
         assert "my_protocol.py" in names
+        assert "samples.csv" in names
         assert "pcrprep-standard_2024-06-20T10_30_15.354Z.json" in names
         assert "my_protocol_2024-06-20T10_30_15.354Z_offsetdata.json" in names
         assert (
@@ -228,6 +253,7 @@ async def test_download_run_files_with_images_protocol_run_log_and_offsets(
         ) in names
         assert zf.read("images/image1.jpeg") == b"fake image data 1"
         assert zf.read("my_protocol.py") == protocol_path.read_bytes()
+        assert zf.read("samples.csv") == rtp_csv_path.read_bytes()
         assert (
             zf.read(
                 "my_protocol_2024-06-20T10_30_15.354Z_output/"
