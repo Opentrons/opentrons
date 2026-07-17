@@ -53,25 +53,15 @@ async def download_log_period(
     periods = log_data_manager.get_period_entries(period_id=periodId)
     signing_key = await key_client.get_key_and_hash()
 
-    user_log_path = persistence_dir / "log_period.json"
-    with open(user_log_path, "w", encoding="utf-8") as fh:
-        fh.write(periods.user_log.model_dump_json())
-
-    pem_key_path = persistence_dir / "signing_key.pem"
-    with open(pem_key_path, "w", encoding="utf-8") as fh:
-        fh.write(signing_key.publicKey)
-
     zip_file_name = persistence_dir / "log_period.zip"
     with zipfile.ZipFile(zip_file_name, mode="w") as zh:
-        zh.write(user_log_path, arcname=user_log_path.name)
-        zh.write(pem_key_path, arcname=pem_key_path.name)
+        zh.writestr("log_period.json", periods.user_log.model_dump_json())
+        zh.writestr("signing_key.pem", signing_key.publicKey)
         for robot_log in periods.robot_log_entries:
             robot_log_path = Path(robot_log.file_path)
             zh.write(robot_log_path, arcname=robot_log_path.name)
 
     def cleanup_files() -> None:
-        os.remove(user_log_path)
-        os.remove(pem_key_path)
         os.remove(zip_file_name)
 
     return FileResponse(
