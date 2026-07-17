@@ -1,5 +1,4 @@
 import { Fragment, useMemo, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 
 import {
   COLORS,
@@ -85,7 +84,6 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     commands,
     filteredCommands,
   } = props
-  const { t } = useTranslation('protocol_visualization')
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null)
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
   const {
@@ -139,13 +137,6 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
   )
-
-  const selectedCommandIndex =
-    selectedRunTimeCommand != null
-      ? filteredCommands.findIndex(
-          command => command.id === selectedRunTimeCommand.id
-        )
-      : 0
 
   return (
     <div className={styles.deck_view_container}>

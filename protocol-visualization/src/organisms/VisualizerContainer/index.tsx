@@ -171,10 +171,6 @@ export function ProtocolVisualization(
     id => invariantContext.moduleEntities[id].type === THERMOCYCLER_MODULE_TYPE
   )
 
-  const protocolDisplayName =
-    props.protocolDisplayName ??
-    analysis.metadata?.protocolName ??
-    'Untitled Protocol'
   const clamp = (n: number, min: number, max: number): number =>
     Math.min(max, Math.max(min, n))
   let percentComplete = 0
