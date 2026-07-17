@@ -181,7 +181,6 @@ export function RobotSettingsAdvanced({
             <Divider marginY={SPACING.spacing16} />
             <UsageSettings
               settings={findSettings('enableDoorSafetySwitch')}
-              robotName={robotName}
               isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
           </>
@@ -189,17 +188,13 @@ export function RobotSettingsAdvanced({
         <Divider marginY={SPACING.spacing16} />
         <GantryHoming
           settings={findSettings('disableHomeOnBoot')}
-          robotName={robotName}
           isRobotBusy={isRobotBusy || isEstopNotDisengaged}
         />
 
         {isFlex ? (
           <>
             <Divider marginY={SPACING.spacing16} />
-            <EnableStatusLight
-              robotName={robotName}
-              isEstopNotDisengaged={isEstopNotDisengaged}
-            />
+            <EnableStatusLight isEstopNotDisengaged={isEstopNotDisengaged} />
           </>
         ) : null}
         {isFlex ? (
@@ -212,7 +207,6 @@ export function RobotSettingsAdvanced({
           <>
             <Divider marginY={SPACING.spacing16} />
             <DisableStackerSensors
-              robotName={robotName}
               isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
           </>
@@ -252,19 +246,16 @@ export function RobotSettingsAdvanced({
             <Divider marginY={SPACING.spacing16} />
             <LegacySettings
               settings={findSettings('deckCalibrationDots')}
-              robotName={robotName}
               isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
             <Divider marginY={SPACING.spacing16} />
             <ShortTrashBin
               settings={findSettings('shortFixedTrash')}
-              robotName={robotName}
               isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
             <Divider marginY={SPACING.spacing16} />
             <UseOlderAspirateBehavior
               settings={findSettings('useOldAspirationFunctions')}
-              robotName={robotName}
               isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
           </>
@@ -276,13 +267,11 @@ export function RobotSettingsAdvanced({
 
 interface FeatureFlagToggleProps {
   settingField: RobotSettingsField
-  robotName: string
   isRobotBusy: boolean
 }
 
 export function FeatureFlagToggle({
   settingField,
-  robotName,
   isRobotBusy,
 }: FeatureFlagToggleProps): JSX.Element | null {
   const { updateRobotSetting } = useUpdateRobotSettingMutation()

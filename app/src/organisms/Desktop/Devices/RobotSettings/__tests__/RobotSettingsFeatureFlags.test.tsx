@@ -3,7 +3,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { useRobotSettingsQuery, useUpdateRobotSettingMutation } from '@opentrons/react-api-client'
+import {
+  useRobotSettingsQuery,
+  useUpdateRobotSettingMutation,
+} from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
@@ -23,7 +26,7 @@ const MOCK_FF_FIELD = {
 }
 
 const render = () => {
-  return renderWithProviders(<RobotSettingsFeatureFlags robotName="otie" />)
+  return renderWithProviders(<RobotSettingsFeatureFlags />)
 }
 
 describe('RobotSettings Advanced tab', () => {

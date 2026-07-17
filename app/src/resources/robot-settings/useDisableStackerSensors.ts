@@ -6,7 +6,7 @@ import {
 } from '@opentrons/react-api-client'
 
 // not releveant to the OT-2, this controls the front LED lights on the Flex
-export function useDisableStackerSensors(robotName: string): {
+export function useDisableStackerSensors(): {
   sensorsDisabled: boolean
   toggleSensors: () => void
 } {

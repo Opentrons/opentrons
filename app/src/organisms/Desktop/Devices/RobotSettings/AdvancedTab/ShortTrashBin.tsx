@@ -18,13 +18,11 @@ import type { RobotSettingsField } from '@opentrons/api-client'
 
 interface ShortTrashBinProps {
   settings: RobotSettingsField | undefined
-  robotName: string
   isRobotBusy: boolean
 }
 
 export function ShortTrashBin({
   settings,
-  robotName,
   isRobotBusy,
 }: ShortTrashBinProps): JSX.Element {
   const { t } = useTranslation('device_settings')

@@ -21,7 +21,7 @@ const mockSettings = {
 const render = (isRobotBusy = false) => {
   return renderWithProviders(
     <MemoryRouter>
-      <LegacySettings settings={mockSettings} robotName="otie" isRobotBusy />
+      <LegacySettings settings={mockSettings} isRobotBusy />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )

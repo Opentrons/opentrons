@@ -22,7 +22,7 @@ const mockSettings = {
 const render = (isRobotBusy = false) => {
   return renderWithProviders(
     <MemoryRouter>
-      <GantryHoming settings={mockSettings} robotName="otie" isRobotBusy />
+      <GantryHoming settings={mockSettings} isRobotBusy />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )

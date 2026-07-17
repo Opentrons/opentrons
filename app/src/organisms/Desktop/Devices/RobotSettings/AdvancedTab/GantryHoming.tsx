@@ -18,13 +18,11 @@ import type { RobotSettingsField } from '@opentrons/api-client'
 
 interface GantryHomingProps {
   settings: RobotSettingsField | undefined
-  robotName: string
   isRobotBusy: boolean
 }
 
 export function GantryHoming({
   settings,
-  robotName,
   isRobotBusy,
 }: GantryHomingProps): JSX.Element {
   const { t } = useTranslation('device_settings')

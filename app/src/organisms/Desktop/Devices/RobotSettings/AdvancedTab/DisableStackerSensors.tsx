@@ -14,16 +14,14 @@ import { ToggleButton } from '/app/atoms/buttons'
 import { useDisableStackerSensors } from '/app/resources/robot-settings'
 
 interface DisableStackerSensorsProps {
-  robotName: string
   isRobotBusy: boolean
 }
 
 export function DisableStackerSensors({
-  robotName,
   isRobotBusy,
 }: DisableStackerSensorsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const { sensorsDisabled, toggleSensors } = useDisableStackerSensors(robotName)
+  const { sensorsDisabled, toggleSensors } = useDisableStackerSensors()
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>

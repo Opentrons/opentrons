@@ -17,10 +17,6 @@ import { ToggleButton } from '/app/atoms/buttons'
 import type { MouseEventHandler } from 'react'
 import type { RobotSettingsField } from '@opentrons/api-client'
 
-interface RobotSettingsFeatureFlagsProps {
-  robotName: string
-}
-
 const NON_FEATURE_FLAG_SETTINGS = [
   'enableDoorSafetySwitch',
   'enableOEMMode',
@@ -32,9 +28,7 @@ const NON_FEATURE_FLAG_SETTINGS = [
   'disableStatusBar',
 ]
 
-export function RobotSettingsFeatureFlags({
-  robotName,
-}: RobotSettingsFeatureFlagsProps): JSX.Element {
+export function RobotSettingsFeatureFlags(): JSX.Element {
   const robotSettingsQuery = useRobotSettingsQuery()
   const settings = robotSettingsQuery.data?.settings ?? []
   const featureFlags = settings.filter(
@@ -44,11 +38,7 @@ export function RobotSettingsFeatureFlags({
   return (
     <>
       {featureFlags.map(field => (
-        <FeatureFlagToggle
-          key={field.id}
-          settingField={field}
-          robotName={robotName}
-        />
+        <FeatureFlagToggle key={field.id} settingField={field} />
       ))}
     </>
   )
@@ -56,12 +46,10 @@ export function RobotSettingsFeatureFlags({
 
 interface FeatureFlagToggleProps {
   settingField: RobotSettingsField
-  robotName: string
 }
 
 export function FeatureFlagToggle({
   settingField,
-  robotName,
 }: FeatureFlagToggleProps): JSX.Element | null {
   const { updateRobotSetting } = useUpdateRobotSettingMutation()
   const { value, id, title, description } = settingField

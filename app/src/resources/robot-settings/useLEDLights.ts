@@ -6,7 +6,7 @@ import {
 } from '@opentrons/react-api-client'
 
 // not releveant to the OT-2, this controls the front LED lights on the Flex
-export function useLEDLights(robotName: string): {
+export function useLEDLights(): {
   lightsEnabled: boolean
   toggleLights: () => void
 } {

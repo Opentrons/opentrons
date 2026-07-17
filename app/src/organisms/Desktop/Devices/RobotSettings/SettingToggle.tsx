@@ -15,7 +15,6 @@ import type { MouseEventHandler } from 'react'
 import type { RobotSettingsField } from '@opentrons/api-client'
 
 interface SettingToggleProps extends RobotSettingsField {
-  robotName: string
   /**
    * invert the meaning of the setting sent over from the robot
    * this is helpful when a value the robot exposes "disables" something
@@ -29,7 +28,6 @@ export function SettingToggle({
   id,
   title,
   description,
-  robotName,
   invert = false,
 }: SettingToggleProps): JSX.Element | null {
   const { updateRobotSetting } = useUpdateRobotSettingMutation()

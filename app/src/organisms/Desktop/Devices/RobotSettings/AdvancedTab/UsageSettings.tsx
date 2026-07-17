@@ -18,13 +18,11 @@ import type { RobotSettingsField } from '@opentrons/api-client'
 
 interface UsageSettingsProps {
   settings: RobotSettingsField | undefined
-  robotName: string
   isRobotBusy: boolean
 }
 
 export function UsageSettings({
   settings,
-  robotName,
   isRobotBusy,
 }: UsageSettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')

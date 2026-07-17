@@ -18,13 +18,11 @@ import type { RobotSettingsField } from '@opentrons/api-client'
 
 interface UseOlderAspirateBehaviorProps {
   settings: RobotSettingsField | undefined
-  robotName: string
   isRobotBusy: boolean
 }
 
 export function UseOlderAspirateBehavior({
   settings,
-  robotName,
   isRobotBusy,
 }: UseOlderAspirateBehaviorProps): JSX.Element {
   const { t } = useTranslation('device_settings')

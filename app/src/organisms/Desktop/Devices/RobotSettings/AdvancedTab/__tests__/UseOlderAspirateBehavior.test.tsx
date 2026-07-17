@@ -21,11 +21,7 @@ const mockSettings = {
 const render = (isRobotBusy = false) => {
   return renderWithProviders(
     <MemoryRouter>
-      <UseOlderAspirateBehavior
-        settings={mockSettings}
-        robotName="otie"
-        isRobotBusy
-      />
+      <UseOlderAspirateBehavior settings={mockSettings} isRobotBusy />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )

@@ -20,7 +20,7 @@ const mockSettings = {
 const render = (isRobotBusy = false) => {
   return renderWithProviders(
     <MemoryRouter>
-      <ShortTrashBin settings={mockSettings} robotName="otie" isRobotBusy />
+      <ShortTrashBin settings={mockSettings} isRobotBusy />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )

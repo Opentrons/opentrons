@@ -11,6 +11,7 @@ import {
   useRobotSettingsQuery,
   useUpdateRobotSettingMutation,
 } from '@opentrons/react-api-client'
+
 import { LANGUAGES, US_ENGLISH_DISPLAY_NAME } from '/app/i18n'
 import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
@@ -75,8 +76,8 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   })
   const isUpdateAvailable = robotUpdateType === 'upgrade'
   const devToolsOn = useSelector(getDevtoolsEnabled)
-  const { lightsEnabled, toggleLights } = useLEDLights(robotName)
-  const { sensorsDisabled, toggleSensors } = useDisableStackerSensors(robotName)
+  const { lightsEnabled, toggleLights } = useLEDLights()
+  const { sensorsDisabled, toggleSensors } = useDisableStackerSensors()
   const { toggleERSettings, isEREnabled } = useErrorRecoverySettingsToggle()
 
   const appLanguage = useSelector(getAppLanguage)
