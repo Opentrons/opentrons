@@ -362,7 +362,7 @@ def _protocol_file_name_stem(
 
 
 def _format_download_timestamp(created_at: datetime) -> str:
-    """Format a run createdAt timestamp like JS toISOString, with ':' -> '_'."""
+    """Format a run createdAt timestamp like JS toISOString."""
     if created_at.tzinfo is None:
         created_at = created_at.replace(tzinfo=timezone.utc)
     else:

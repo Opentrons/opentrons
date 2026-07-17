@@ -29,7 +29,7 @@ def collect_existing_run_images(
         data_files_store: Store for data files database access.
         archive_prefix: Optional directory prefix inside the zip
             (e.g. ``"images"`` -> ``images/foo.jpeg``). When ``None``,
-            files are stored at the zip root using their basename.
+            files are stored using their basename.
 
     Returns:
         A list of ``(filesystem_path, archive_path)`` tuples for files
@@ -63,14 +63,13 @@ def collect_existing_run_output_csvs(
 ) -> List[Tuple[Path, str]]:
     """Collect existing CSV output files for a run under ``archive_prefix``.
 
-    Camera images are excluded (they belong in the images folder). File names
-    are prefixed with the data file id because ``data_files.name`` is not unique.
+    File names are prefixed with the data file id because ``data_files.name`` is not unique.
 
     Args:
         run_id: The run to collect output CSVs for.
         data_files_store: Store for data files database access.
         archive_prefix: Directory prefix inside the zip
-            (e.g. ``"my_protocol_2024-06-20T10_30_15.354Z_output"``).
+            (e.x. ``"my_protocol_2024-06-20T10_30_15.354Z_output"``).
 
     Returns:
         A list of ``(filesystem_path, archive_path)`` tuples for files
@@ -182,8 +181,8 @@ def build_run_zip_filename(
                 f"{robot_name}_{sanitize_filename_component(str(protocol_name))}"
                 f"_{timestamp}.zip"
             )
-
-    return fallback_filename
+    else:
+        return fallback_filename
 
 
 def sanitize_filename_component(input_str: str) -> str:
