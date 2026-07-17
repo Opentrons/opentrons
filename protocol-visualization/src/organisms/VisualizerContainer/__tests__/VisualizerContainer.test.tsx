@@ -2,9 +2,8 @@ import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-import { CommandSteps } from '../../CommandSteps'
-
 import { PlayBackControls } from '../../../molecules/PlayBackControls'
+import { CommandSteps } from '../../CommandSteps'
 import { DeckView } from '../../DeckView'
 import { StepDetailContainer } from '../../StepDetailContainer'
 import { ProtocolVisualization } from '../index'
@@ -79,7 +78,9 @@ describe('ProtocolVisualization', () => {
       analysis: mockAnalysis,
       groupedCommands: [],
     }
-    vi.mocked(PlayBackControls).mockReturnValue(<div>mock PlayBackControls</div>)
+    vi.mocked(PlayBackControls).mockReturnValue(
+      <div>mock PlayBackControls</div>
+    )
     vi.mocked(StepDetailContainer).mockReturnValue(
       <div>mock StepDetailContainer</div>
     )
