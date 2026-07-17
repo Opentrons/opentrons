@@ -40,6 +40,7 @@ import {
 
 import { getModalPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useRunControls } from '/app/organisms/RunTimeControl'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import {
@@ -141,7 +142,8 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
 
   const isRobotOnWrongVersionOfSoftware =
     useIsRobotOnWrongVersionOfSoftware(robotName)
-  const { mutateAsync: deleteRunImages } = useDeleteRunImages()
+  const { mutateAsync: deleteRunImages, isLoading: isDeletingImages } =
+    useDeleteRunImages()
 
   const [targetProps, tooltipProps] = useHoverTooltip()
   const onResetSuccess = (createRunResponse: Run): void => {
@@ -161,7 +163,9 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     runId,
     onResetSuccess
   )
-  const { deleteRun, isLoading: isDeletingImages } = useDeleteRunMutation()
+  const documentationState = useDocumentationState()
+  const { deleteRun, isLoading: isDeletingRun } =
+    useDeleteRunMutation(documentationState)
   const robot = useRobot(robotName)
   const robotType = useRobotType(robotName)
 
@@ -288,6 +292,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       <Divider marginY="0" />
       <MenuItem
         onClick={handleDeleteClick}
+        disabled={isDeletingRun}
         data-testid="RecentProtocolRun_OverflowMenu_deleteRun"
       >
         {t('delete_run')}

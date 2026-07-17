@@ -10,6 +10,8 @@
   "capture_preview_image": "Capturing preview image",
   "create_camera_image_settings": "Updating camera image settings",
   "create_protocol": "Creating protocol",
+  "delete_run": "Deleting protocol run record",
+  "delete_runs": "Deleting protocol run records",
   "detach": "Detaching",
   "detach_gripper": "Detaching gripper",
   "dismiss_run": "Dismissing protocol run",
