@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
@@ -10,7 +10,13 @@ from typing_extensions import Literal, Type
 
 from ...errors.error_occurrence import ErrorOccurrence
 from ...state import update_types
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+    SuccessData,
+)
+from opentrons.protocol_engine.resources import ModelUtils
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import (
@@ -55,10 +61,11 @@ class StartSetVacuumPowerResult(BaseModel):
     taskId: str = Field(..., description="The id of the task")
 
 
+_ExecuteReturn = Union[SuccessData[StartSetVacuumPowerResult],]
+
+
 class StartSetVacuumPowerImpl(
-    AbstractCommandImpl[
-        StartSetVacuumPowerParams, SuccessData[StartSetVacuumPowerResult]
-    ]
+    AbstractCommandImpl[StartSetVacuumPowerParams, _ExecuteReturn]
 ):
     """Execution implementation of a start set vacuum pump command."""
 
@@ -68,27 +75,34 @@ class StartSetVacuumPowerImpl(
         equipment: EquipmentHandler,
         movement: MovementHandler,
         task_handler: TaskHandler,
+        model_utils: ModelUtils,
         **unused_dependencies: object,
     ) -> None:
         self._state_view = state_view
         self._equipment = equipment
         self._movement = movement
         self._task_handler = task_handler
+        self._model_utils = model_utils
 
     async def execute(
         self, params: StartSetVacuumPowerParams
     ) -> SuccessData[StartSetVacuumPowerResult]:
         """Start the vacuum pump."""
         state_update = update_types.StateUpdate()
-        vm_state = self._state_view.modules.get_vacuum_module_substate(params.moduleId)
         state_update.update_vacuum_module_pump_engaged(
             params.moduleId, params.duration is None
         )
+        running_command_id = self._state_view.commands.get_running_command_id()
+        if running_command_id is not None:
+            state_update.record_module_background_command(
+                params.moduleId, running_command_id
+            )
         if params.percentPower < 0 or params.percentPower > 100:
             raise ValueError(
                 f"pump power {params.percentPower} invalid must be between 1 and 100%"
             )
 
+        vm_state = self._state_view.modules.get_vacuum_module_substate(params.moduleId)
         vm_hardware = self._equipment.get_module_hardware_api(vm_state.module_id)
 
         async def start_set_vacuum_power(task_handler: TaskHandler) -> None:
@@ -123,7 +137,11 @@ class StartSetVacuumPowerImpl(
 
 
 class StartSetVacuumPower(
-    BaseCommand[StartSetVacuumPowerParams, StartSetVacuumPowerResult, ErrorOccurrence]
+    BaseCommand[
+        StartSetVacuumPowerParams,
+        StartSetVacuumPowerResult,
+        ErrorOccurrence,
+    ]
 ):
     """A command to set the vacuum pump power."""
 

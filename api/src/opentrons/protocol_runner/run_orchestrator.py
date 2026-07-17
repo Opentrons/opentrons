@@ -6,6 +6,7 @@ from typing import Any, AsyncGenerator, Dict, List, Mapping, Optional, Tuple, Un
 
 from anyio import move_on_after
 
+from opentrons_shared_data.errors import EnumeratedError
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType
@@ -434,7 +435,10 @@ class RunOrchestrator(AbstractRunCoordinator):
         return self._protocol_engine.estop()
 
     async def asynchronous_module_error(
-        self, module_model: HardwareModuleModel, module_serial: str | None
+        self,
+        module_model: HardwareModuleModel,
+        module_serial: str | None,
+        error: EnumeratedError | None = None,
     ) -> bool:
         """Handle an asynchronous module error reported by hardware.
 
@@ -442,7 +446,9 @@ class RunOrchestrator(AbstractRunCoordinator):
         False, the caller should not call finish() until it otherwise would.
         """
         return await self._protocol_engine.async_module_error(
-            module_model=ModuleModel.from_hardware(module_model), serial=module_serial
+            module_model=ModuleModel.from_hardware(module_model),
+            serial=module_serial,
+            error=error,
         )
 
     async def module_disconnected(
