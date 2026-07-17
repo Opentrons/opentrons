@@ -55,6 +55,40 @@ def collect_existing_run_images(
     return entries
 
 
+def collect_existing_run_output_csvs(
+    run_id: str,
+    data_files_store: DataFilesStore,
+    *,
+    archive_prefix: str,
+) -> List[Tuple[Path, str]]:
+    """Collect existing CSV output files for a run under ``archive_prefix``.
+
+    Camera images are excluded (they belong in the images folder). File names
+    are prefixed with the data file id because ``data_files.name`` is not unique.
+
+    Args:
+        run_id: The run to collect output CSVs for.
+        data_files_store: Store for data files database access.
+        archive_prefix: Directory prefix inside the zip
+            (e.g. ``"my_protocol_2024-06-20T10_30_15.354Z_output"``).
+
+    Returns:
+        A list of ``(filesystem_path, archive_path)`` tuples for files
+        that exist on disk.
+    """
+    files_by_run = data_files_store.get_data_files_by_run_id(run_id)
+
+    entries: List[Tuple[Path, str]] = []
+    for file_info in files_by_run.output_files:
+        if file_info.mime_type != MimeType.TEXT_CSV:
+            continue
+        file_path = Path(file_info.path)
+        if file_path.exists() and file_path.is_file():
+            archive_name = f"{archive_prefix}/{file_info.id}_{file_info.name}"
+            entries.append((file_path, archive_name))
+    return entries
+
+
 async def stream_zip(
     entries: List[Tuple[Path, str]],
     chunk_size: int = 65536,

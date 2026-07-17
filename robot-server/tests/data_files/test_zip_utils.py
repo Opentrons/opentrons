@@ -9,17 +9,20 @@ from decoy import Decoy
 
 from opentrons_shared_data.data_files import (
     CmdDataFileInfo,
+    DataFileInfo,
     DataFileInfoWithCommands,
     MimeType,
 )
 
 from robot_server.data_files.data_files_store import (
+    DataFilesByRunInfo,
     DataFilesStore,
     DataFileWithCommandsInfoSlice,
 )
 from robot_server.data_files.zip_utils import (
     build_run_zip_filename,
     collect_existing_run_images,
+    collect_existing_run_output_csvs,
     sanitize_filename_component,
     stream_zip,
 )
@@ -112,6 +115,67 @@ def test_collect_existing_run_images_flat(decoy: Decoy, tmp_path: Path) -> None:
     entries = collect_existing_run_images("run-id", data_files_store)
 
     assert entries == [(existing, "a.jpeg")]
+
+
+def test_collect_existing_run_output_csvs(decoy: Decoy, tmp_path: Path) -> None:
+    """It should include CSV outputs under the prefix, prefixed by file id."""
+    data_files_store = decoy.mock(cls=DataFilesStore)
+    csv_path = tmp_path / "plate_read450nm.csv"
+    jpeg_path = tmp_path / "photo.jpeg"
+    missing_path = tmp_path / "missing.csv"
+    csv_path.write_text("a,b,c\n")
+    jpeg_path.write_bytes(b"img")
+
+    decoy.when(data_files_store.get_data_files_by_run_id("run-id")).then_return(
+        DataFilesByRunInfo(
+            input_files=[],
+            output_files=[
+                DataFileInfo(
+                    id="csv-file-id",
+                    name="plate_read450nm.csv",
+                    file_hash="h1",
+                    created_at=datetime(2024, 6, 20),
+                    mime_type=MimeType.TEXT_CSV,
+                    path=str(csv_path),
+                    generated=True,
+                    stored=True,
+                ),
+                DataFileInfo(
+                    id="image-file-id",
+                    name="photo.jpeg",
+                    file_hash="h2",
+                    created_at=datetime(2024, 6, 20),
+                    mime_type=MimeType.IMAGE_JPEG,
+                    path=str(jpeg_path),
+                    generated=True,
+                    stored=True,
+                ),
+                DataFileInfo(
+                    id="missing-file-id",
+                    name="missing.csv",
+                    file_hash="h3",
+                    created_at=datetime(2024, 6, 20),
+                    mime_type=MimeType.TEXT_CSV,
+                    path=str(missing_path),
+                    generated=True,
+                    stored=False,
+                ),
+            ],
+        )
+    )
+
+    entries = collect_existing_run_output_csvs(
+        "run-id",
+        data_files_store,
+        archive_prefix="my_protocol_2024-06-20T10_30_15.354Z_output",
+    )
+
+    assert entries == [
+        (
+            csv_path,
+            "my_protocol_2024-06-20T10_30_15.354Z_output/csv-file-id_plate_read450nm.csv",
+        )
+    ]
 
 
 async def test_stream_zip_preserves_archive_paths(tmp_path: Path) -> None:

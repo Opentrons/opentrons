@@ -15,11 +15,13 @@ from opentrons.protocol_engine import types as pe_types
 from opentrons.types import DeckSlotName
 from opentrons_shared_data.data_files import (
     CmdDataFileInfo,
+    DataFileInfo,
     DataFileInfoWithCommands,
     MimeType,
 )
 
 from robot_server.data_files.data_files_store import (
+    DataFilesByRunInfo,
     DataFilesStore,
     DataFileWithCommandsInfoSlice,
 )
@@ -41,6 +43,12 @@ def _make_home_command() -> pe_commands.Command:
         completedAt=datetime(2024, 6, 20, 10, 30, 17, tzinfo=timezone.utc),
         params=pe_commands.HomeParams(),
         result=pe_commands.HomeResult(),
+    )
+
+
+def _stub_empty_output_files(decoy: Decoy, data_files_store: DataFilesStore) -> None:
+    decoy.when(data_files_store.get_data_files_by_run_id("run-id")).then_return(
+        DataFilesByRunInfo(input_files=[], output_files=[])
     )
 
 
@@ -97,6 +105,8 @@ async def test_download_run_files_with_images_protocol_run_log_and_offsets(
 
     protocol_path = tmp_path / "my_protocol.py"
     protocol_path.write_text("metadata = {'protocolName': 'Test'}\n")
+    csv_path = tmp_path / "plate_read450nm.csv"
+    csv_path.write_text("wl,a1\n450,0.12\n")
 
     file_info_1 = DataFileInfoWithCommands.model_construct(
         id="file-id-1",
@@ -137,6 +147,23 @@ async def test_download_run_files_with_images_protocol_run_log_and_offsets(
     ).then_return(
         DataFileWithCommandsInfoSlice(
             file_info=[file_info_1, file_info_2], total_length=2
+        )
+    )
+    decoy.when(data_files_store.get_data_files_by_run_id("run-id")).then_return(
+        DataFilesByRunInfo(
+            input_files=[],
+            output_files=[
+                DataFileInfo(
+                    id="csv-file-id",
+                    name="plate_read450nm.csv",
+                    file_hash="csv-hash",
+                    created_at=datetime(2024, 6, 20),
+                    mime_type=MimeType.TEXT_CSV,
+                    path=str(csv_path),
+                    generated=True,
+                    stored=True,
+                ),
+            ],
         )
     )
 
@@ -195,8 +222,19 @@ async def test_download_run_files_with_images_protocol_run_log_and_offsets(
         assert "my_protocol.py" in names
         assert "pcrprep-standard_2024-06-20T10_30_15.354Z.json" in names
         assert "my_protocol_2024-06-20T10_30_15.354Z_offsetdata.json" in names
+        assert (
+            "my_protocol_2024-06-20T10_30_15.354Z_output/"
+            "csv-file-id_plate_read450nm.csv"
+        ) in names
         assert zf.read("images/image1.jpeg") == b"fake image data 1"
         assert zf.read("my_protocol.py") == protocol_path.read_bytes()
+        assert (
+            zf.read(
+                "my_protocol_2024-06-20T10_30_15.354Z_output/"
+                "csv-file-id_plate_read450nm.csv"
+            )
+            == csv_path.read_bytes()
+        )
 
         run_log = json.loads(zf.read("pcrprep-standard_2024-06-20T10_30_15.354Z.json"))
         assert run_log["data"]["id"] == "run-id"
@@ -234,6 +272,7 @@ async def test_download_run_files_protocol_json_keeps_extension(
             limit=None,
         )
     ).then_return(DataFileWithCommandsInfoSlice(file_info=[], total_length=0))
+    _stub_empty_output_files(decoy, data_files_store)
 
     mock_run = decoy.mock(name="run_data")
     decoy.when(mock_run.run_id).then_return("run-id")
@@ -310,6 +349,7 @@ async def test_download_run_files_skips_missing_protocol_silently(
             limit=None,
         )
     ).then_return(DataFileWithCommandsInfoSlice(file_info=[file_info], total_length=1))
+    _stub_empty_output_files(decoy, data_files_store)
 
     mock_run = decoy.mock(name="run_data")
     decoy.when(mock_run.run_id).then_return("run-id")
@@ -379,6 +419,7 @@ async def test_download_run_files_skips_missing_run_log_and_offsets_silently(
             limit=None,
         )
     ).then_return(DataFileWithCommandsInfoSlice(file_info=[file_info], total_length=1))
+    _stub_empty_output_files(decoy, data_files_store)
 
     mock_run = decoy.mock(name="run_data")
     decoy.when(mock_run.run_id).then_return("run-id")
@@ -456,6 +497,7 @@ async def test_download_run_files_no_content(
             limit=None,
         )
     ).then_return(DataFileWithCommandsInfoSlice(file_info=[], total_length=0))
+    _stub_empty_output_files(decoy, data_files_store)
     decoy.when(mock_run_data_manager.get("run-id")).then_raise(RuntimeError("skip"))
 
     with pytest.raises(ApiError) as exc_info:

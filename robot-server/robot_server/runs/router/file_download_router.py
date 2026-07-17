@@ -19,6 +19,7 @@ from robot_server.data_files.models import ZipCreationFailed
 from robot_server.data_files.zip_utils import (
     build_run_zip_filename,
     collect_existing_run_images,
+    collect_existing_run_output_csvs,
     sanitize_filename_component,
     stream_zip,
 )
@@ -53,6 +54,7 @@ class NoDownloadContent(ErrorDetails):
         - The protocol source file
         - The run log
         - Labware offset data
+        - CSV output files
         """
     ),
     responses={
@@ -117,6 +119,16 @@ async def download_run_files(
     if offsets_entry is not None:
         zip_entries.append(offsets_entry)
         temp_paths.append(offsets_entry[0])
+
+    zip_entries.extend(
+        collect_existing_run_output_csvs(
+            runId,
+            data_files_store,
+            archive_prefix=_build_output_csvs_directory_name(
+                run=run, protocol_store=protocol_store
+            ),
+        )
+    )
 
     if not zip_entries:
         raise NoDownloadContent(
@@ -265,6 +277,16 @@ def _build_labware_offsets_filename(
     created_at = _format_download_timestamp(run.created_at)
     name_stem = _protocol_file_name_stem(run=run, protocol_store=protocol_store)
     return f"{name_stem}_{created_at}_offsetdata.json"
+
+
+def _build_output_csvs_directory_name(
+    run: Union[RunResource, BadRunResource],
+    protocol_store: ProtocolStore,
+) -> str:
+    """Build `{protocolFileStem}_{ISO-timestamp}_output` directory name."""
+    created_at = _format_download_timestamp(run.created_at)
+    name_stem = _protocol_file_name_stem(run=run, protocol_store=protocol_store)
+    return f"{name_stem}_{created_at}_output"
 
 
 def _protocol_display_name_stem(
