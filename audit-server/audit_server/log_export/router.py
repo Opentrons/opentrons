@@ -1,6 +1,6 @@
 """Route handlers for audit log export endpoints."""
 
-import os
+import tempfile
 import zipfile
 from pathlib import Path
 from typing import Annotated
@@ -53,8 +53,10 @@ async def download_log_period(
     periods = log_data_manager.get_period_entries(period_id=periodId)
     signing_key = await key_client.get_key_and_hash()
 
-    zip_file_name = persistence_dir / "log_period.zip"
-    with zipfile.ZipFile(zip_file_name, mode="w") as zh:
+    temp_dir = tempfile.TemporaryDirectory(prefix="temp-download-staging", dir=persistence_dir)
+
+    zip_file_path = Path(temp_dir.name) / "log_period.zip"
+    with zipfile.ZipFile(zip_file_path, mode="w") as zh:
         zh.writestr("log_period.json", periods.user_log.model_dump_json())
         zh.writestr("signing_key.pem", signing_key.publicKey)
         for robot_log in periods.robot_log_entries:
@@ -62,10 +64,11 @@ async def download_log_period(
             zh.write(robot_log_path, arcname=robot_log_path.name)
 
     def cleanup_files() -> None:
-        os.remove(zip_file_name)
+        zip_file_path.unlink()
+        temp_dir.cleanup()
 
     return FileResponse(
-        zip_file_name,
+        zip_file_path,
         media_type="application/zip",
         background=BackgroundTask(cleanup_files),
     )
