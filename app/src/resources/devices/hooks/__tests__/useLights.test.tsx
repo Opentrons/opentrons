@@ -9,6 +9,8 @@ import {
   useSetLightsMutation,
 } from '@opentrons/react-api-client'
 
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
+
 import { useLights } from '../useLights'
 
 import type { Store } from 'redux'
@@ -16,6 +18,9 @@ import type { Mock } from 'vitest'
 import type { FunctionComponent, ReactNode } from 'react'
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const store: Store<any> = legacy_createStore(vi.fn(), {})
 
@@ -46,6 +51,9 @@ describe('useLights hook', () => {
     const { result } = renderHook(() => useLights(), { wrapper })
 
     expect(result.current.lightsOn).toEqual(true)
+    expect(useSetLightsMutation).toHaveBeenCalledWith(
+      ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+    )
     result.current.toggleLights()
     expect(setLights).toBeCalledWith({ on: false })
   })
@@ -58,6 +66,9 @@ describe('useLights hook', () => {
     })
 
     expect(result.current.lightsOn).toEqual(false)
+    expect(useSetLightsMutation).toHaveBeenCalledWith(
+      ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+    )
     result.current.toggleLights()
     expect(setLights).toBeCalledWith({ on: true })
   })
