@@ -1,0 +1,102 @@
+.container {
+  position: relative;
+  display: flex;
+  overflow: visible;
+  width: 100%;
+  min-width: 26.25rem;
+  max-width: 43.75rem;
+  height: 4.5rem;
+  box-sizing: border-box;
+  align-items: center;
+  padding: 0 var(--spacing-20);
+  border-radius: var(--border-radius-full);
+
+  /* this margin is for box-shadow */
+  margin: var(--spacing-8) var(--spacing-4);
+  background-color: var(--white);
+  box-shadow: 0 0 6px 1px rgb(22 33 45 / 15%);
+}
+
+.controls_left {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--spacing-16);
+}
+
+.time_label {
+  text-align: center;
+  user-select: none;
+}
+
+/* to prevent the :horizontal shift */
+.time_current {
+  min-width: 4.0625rem;
+  text-align: right;
+}
+
+.time_total {
+  min-width: 4.0625rem;
+  text-align: left;
+}
+
+.slider_wrapper {
+  display: flex;
+  flex: 1;
+  align-items: center;
+}
+
+.speed_wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.speed_button {
+  padding: 0 var(--spacing-8);
+  border: none;
+  background: none;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+}
+
+.speed_button:hover {
+  opacity: 0.7;
+}
+
+.divider {
+  width: 1px;
+  height: 2rem;
+  background-color: var(--grey-30);
+}
+
+.controls_right {
+  display: flex;
+  align-items: center;
+}
+
+.icon_button {
+  display: flex;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--transparent);
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.15s ease;
+}
+
+.icon_button:hover {
+  border-radius: 50%;
+  background-color: var(--grey-30);
+}
+
+.icon_button:active {
+  border-radius: 50%;
+  background-color: var(--grey-35);
+}
