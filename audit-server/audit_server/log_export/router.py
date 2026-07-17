@@ -16,6 +16,7 @@ from server_utils.keys.key_server import Client as KeyClient
 from audit_server.log_storage.dependency import get_log_data_manager
 from audit_server.log_storage.log_data_manager import LogDataManager
 from audit_server.log_storage.models import LogPeriodSummary
+from audit_server.log_storage.store import NoPeriodById
 from audit_server.persistence.fastapi_dependencies import get_persistence_directory_root
 
 router = fastapi.APIRouter()
@@ -42,6 +43,11 @@ async def get_log_periods(
     summary="Download a zipped verifiable audit log period",
     description="Exports a zip file with the period's user action logs, robot logs,"
     " robot log signing public key, and robot identity file.",
+    responses={
+        fastapi.status.HTTP_404_NOT_FOUND: {
+            "description": "No log period could be found for the period ID."
+        }
+    },
 )
 async def download_log_period(
     periodId: str,
@@ -50,10 +56,18 @@ async def download_log_period(
     persistence_dir: Annotated[Path, fastapi.Depends(get_persistence_directory_root)],
 ) -> FileResponse:
     """Get all audit log periods."""
-    periods = log_data_manager.get_period_entries(period_id=periodId)
+    try:
+        periods = log_data_manager.get_period_entries(period_id=periodId)
+    except NoPeriodById as exc:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail=(f"No log period found with ID {periodId}"),
+        ) from exc
     signing_key = await key_client.get_key_and_hash()
 
-    temp_dir = tempfile.TemporaryDirectory(prefix="temp-download-staging", dir=persistence_dir)
+    temp_dir = tempfile.TemporaryDirectory(
+        prefix="temp-download-staging", dir=persistence_dir
+    )
 
     zip_file_path = Path(temp_dir.name) / "log_period.zip"
     with zipfile.ZipFile(zip_file_path, mode="w") as zh:

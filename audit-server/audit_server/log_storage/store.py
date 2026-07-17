@@ -21,6 +21,10 @@ class NoLogInPeriodError(Exception):
     """A log period has no logs associated."""
 
 
+class NoPeriodById(Exception):
+    """There is no log period associated with given ID."""
+
+
 class NoActivePeriodError(Exception):
     """There is no currently-active log period."""
 
@@ -156,11 +160,15 @@ class LogStore:
     def get_period_entries(self, period_id: str) -> LogPeriodEntries:
         """Get the given log period's user and robot log entries."""
         with self._session() as session:
-            log_period = session.scalar(
-                select(LogPeriod).where(LogPeriod.id == int(period_id))
-            )
+            try:
+                log_period = session.scalar(
+                    select(LogPeriod).where(LogPeriod.id == int(period_id))
+                )
+            # This will raise if `period_id` is not an int
+            except ValueError:
+                log_period = None
             if log_period is None:
-                raise NoLogInPeriodError()
+                raise NoPeriodById()
             user_log_entries = [
                 UserLogEntry(
                     message=user_log.message,
