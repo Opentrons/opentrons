@@ -55,7 +55,10 @@ describe('useLights hook', () => {
       ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
     )
     result.current.toggleLights()
-    expect(setLights).toBeCalledWith({ on: false })
+    expect(setLights).toBeCalledWith(
+      { on: false },
+      { onError: expect.any(Function) }
+    )
   })
 
   it('toggles lights on when off', () => {
@@ -70,6 +73,9 @@ describe('useLights hook', () => {
       ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
     )
     result.current.toggleLights()
-    expect(setLights).toBeCalledWith({ on: true })
+    expect(setLights).toBeCalledWith(
+      { on: true },
+      { onError: expect.any(Function) }
+    )
   })
 })
