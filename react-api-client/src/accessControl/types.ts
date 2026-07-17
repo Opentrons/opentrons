@@ -158,6 +158,7 @@ type AuditLogAction =
   | 'update_camera_settings_for_run'
   | 'pause_run'
   | 'update_deck_configuration'
+  | 'update_subsystem'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.
