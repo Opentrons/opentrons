@@ -1,64 +1,56 @@
-import * as Constants from '../constants'
+import { createAction } from '@reduxjs/toolkit'
 
 import type { CameraImageSettings } from '@opentrons/api-client'
 import type { CameraId } from '@opentrons/shared-data'
-import type * as Types from '../types'
+import type { StepKey } from '../types'
 
-export const updateRunSetupStepsComplete = (
-  runId: string,
-  complete: Types.UpdateRunSetupStepsCompleteAction['payload']['complete']
-): Types.UpdateRunSetupStepsCompleteAction => ({
-  type: Constants.UPDATE_RUN_SETUP_STEPS_COMPLETE,
-  payload: { runId, complete },
-})
+export const updateRunSetupStepsComplete = createAction(
+  'protocolRuns/updateRunSetupStepsComplete',
+  (runId: string, complete: Partial<{ [Step in StepKey]: boolean }>) => ({
+    payload: { runId, complete },
+  })
+)
 
-export const updateRunSetupStepsRequired = (
-  runId: string,
-  required: Types.UpdateRunSetupStepsRequiredAction['payload']['required']
-): Types.UpdateRunSetupStepsRequiredAction => ({
-  type: Constants.UPDATE_RUN_SETUP_STEPS_REQUIRED,
-  payload: { runId, required },
-})
+export const updateRunSetupStepsRequired = createAction(
+  'protocolRuns/updateRunSetupStepsRequired',
+  (runId: string, required: Partial<{ [Step in StepKey]: boolean }>) => ({
+    payload: { runId, required },
+  })
+)
 
-export const updateCameraEnablement = (
-  runId: string,
-  cameraEnabled: boolean
-): Types.UpdateCameraEnablement => ({
-  type: Constants.UPDATE_CAMERA_ENABLEMENT,
-  payload: { runId, cameraEnabled },
-})
+export const updateCameraEnablement = createAction(
+  'protocolRuns/updateCameraEnablement',
+  (runId: string, cameraEnabled: boolean) => ({
+    payload: { runId, cameraEnabled },
+  })
+)
 
-export const updateCameraRecoveryEnablement = (
-  runId: string,
-  recoveryEnabled: boolean
-): Types.UpdateCameraErrorRecoveryEnablement => ({
-  type: Constants.UPDATE_CAMERA_RECOVERY_ENABLEMENT,
-  payload: { runId, recoveryEnabled },
-})
+export const updateCameraRecoveryEnablement = createAction(
+  'protocolRuns/updateCameraRecoveryEnablement',
+  (runId: string, recoveryEnabled: boolean) => ({
+    payload: { runId, recoveryEnabled },
+  })
+)
 
-export const updateCameraStreamEnablement = (
-  runId: string,
-  liveStreamEnabled: boolean
-): Types.UpdateLivestreamEnabled => ({
-  type: Constants.UPDATE_CAMERA_STREAM_ENABLEMENT,
-  payload: { runId, liveStreamEnabled },
-})
+export const updateCameraStreamEnablement = createAction(
+  'protocolRuns/updateCameraStreamEnablement',
+  (runId: string, liveStreamEnabled: boolean) => ({
+    payload: { runId, liveStreamEnabled },
+  })
+)
 
-export const updateCameraUsageSettings = (allCameraArgs: {
+export const updateCameraUsageSettings = createAction<{
   runId: string
   cameraEnabled: boolean
   liveStreamEnabled: boolean
   recoveryEnabled: boolean
-}): Types.UpdateAllCameraSettings => ({
-  type: Constants.UPDATE_CAMERA_USAGE_SETTINGS,
-  payload: allCameraArgs,
-})
+}>('protocolRuns/updateCameraUsageSettings')
 
-export const updateCameraSpecificSettings = (
-  runId: string,
-  cameraId: CameraId,
-  cameraImageSettings: CameraImageSettings
-): Types.UpdateCameraSpecificImageSettings => ({
-  type: Constants.UPDATE_CAMERA_SPECIFIC_SETTINGS,
-  payload: { runId, cameraId, cameraImageSettings },
-})
+export const updateCameraSpecificSettings = createAction(
+  'protocolRuns/updateCameraSpecificSettings',
+  (
+    runId: string,
+    cameraId: CameraId,
+    cameraImageSettings: CameraImageSettings
+  ) => ({ payload: { runId, cameraId, cameraImageSettings } })
+)

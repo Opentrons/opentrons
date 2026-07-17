@@ -1,3 +1,12 @@
+import {
+  updateCameraEnablement,
+  updateCameraRecoveryEnablement,
+  updateCameraSpecificSettings,
+  updateCameraStreamEnablement,
+  updateCameraUsageSettings,
+  updateRunSetupStepsComplete,
+  updateRunSetupStepsRequired,
+} from '../actions'
 import * as Constants from '../constants'
 
 import type { ProtocolRunAction, RunSetupStatus } from '../types'
@@ -29,7 +38,7 @@ export function setupReducer(
   action: ProtocolRunAction
 ): RunSetupStatus {
   switch (action.type) {
-    case Constants.UPDATE_RUN_SETUP_STEPS_COMPLETE:
+    case updateRunSetupStepsComplete.type:
       return Constants.SETUP_STEP_KEYS.reduce(
         (currentState, step) => ({
           ...currentState,
@@ -42,7 +51,7 @@ export function setupReducer(
         state
       )
 
-    case Constants.UPDATE_RUN_SETUP_STEPS_REQUIRED:
+    case updateRunSetupStepsRequired.type:
       return Constants.SETUP_STEP_KEYS.reduce(
         (currentState, step) => ({
           ...currentState,
@@ -55,10 +64,10 @@ export function setupReducer(
         state
       )
 
-    case Constants.UPDATE_CAMERA_ENABLEMENT:
-    case Constants.UPDATE_CAMERA_RECOVERY_ENABLEMENT:
-    case Constants.UPDATE_CAMERA_STREAM_ENABLEMENT:
-    case Constants.UPDATE_CAMERA_USAGE_SETTINGS: {
+    case updateCameraEnablement.type:
+    case updateCameraRecoveryEnablement.type:
+    case updateCameraStreamEnablement.type:
+    case updateCameraUsageSettings.type: {
       const { runId, ...rest } = action.payload
       return {
         ...state,
@@ -69,7 +78,7 @@ export function setupReducer(
       }
     }
 
-    case Constants.UPDATE_CAMERA_SPECIFIC_SETTINGS: {
+    case updateCameraSpecificSettings.type: {
       const { cameraId, cameraImageSettings } = action.payload
       return {
         ...state,
