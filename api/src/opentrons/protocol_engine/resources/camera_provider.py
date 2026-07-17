@@ -122,9 +122,7 @@ class CameraProvider:
         stream_status: bool,
         enablement_settings: CameraSettings | None = None,
     ) -> None:
-        """Update the Opentrons Live Stream status to toggle the live stream on and off, or adjust
-        the camera settings used by the live stream.
-        """
+        """Update the Opentrons Live Stream status to toggle the live stream or adjust camera settings."""
         if self._update_live_stream_status is not None:
             await self._update_live_stream_status(
                 robot_type, stream_status, enablement_settings
