@@ -57,10 +57,7 @@ export function useUpdateRobotSettingMutation(
     robotSettingsQueryKey(host),
     ({ id, value }) =>
       updateRobotSetting(host!, id, value).then(response => {
-        queryClient.setQueryData(
-          robotSettingsQueryKey(host),
-          response.data
-        )
+        queryClient.setQueryData(robotSettingsQueryKey(host), response.data)
         return response.data
       }),
     options

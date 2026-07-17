@@ -36,10 +36,11 @@ describe('useUpdateRobotSettingMutation hook', () => {
 
   beforeEach(() => {
     queryClient = new QueryClient()
-    const clientProvider: React.FunctionComponent<{ children: React.ReactNode }> =
-      ({ children }) => (
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      )
+    const clientProvider: React.FunctionComponent<{
+      children: React.ReactNode
+    }> = ({ children }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    )
 
     wrapper = clientProvider
   })
@@ -67,8 +68,8 @@ describe('useUpdateRobotSettingMutation hook', () => {
       expect(result.current.isSuccess).toBe(true)
     })
 
-    expect(queryClient.getQueryData(robotSettingsQueryKey(HOST_CONFIG))).toEqual(
-      ROBOT_SETTINGS_RESPONSE
-    )
+    expect(
+      queryClient.getQueryData(robotSettingsQueryKey(HOST_CONFIG))
+    ).toEqual(ROBOT_SETTINGS_RESPONSE)
   })
 })
