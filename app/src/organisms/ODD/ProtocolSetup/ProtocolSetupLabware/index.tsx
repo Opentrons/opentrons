@@ -101,10 +101,14 @@ export function ProtocolSetupLabware({
       ),
     [mostRecentAnalysis]
   )
-  const labwareByLiquidId = getLabwareInfoByLiquidId(
-    mostRecentAnalysis?.commands ?? []
+  const labwareByLiquidId = useMemo(
+    () => getLabwareInfoByLiquidId(mostRecentAnalysis?.commands ?? []),
+    [mostRecentAnalysis]
   )
-  const stacksWithLaware = getStacksWithLabware(startingDeck)
+  const stacksWithLaware = useMemo(
+    () => getStacksWithLabware(startingDeck),
+    [startingDeck]
+  )
   const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
     .sort((a, b) => a[0].localeCompare(b[0]))
     .filter(([key, value]) => key !== 'offDeck')
@@ -123,16 +127,26 @@ export function ProtocolSetupLabware({
   const moduleQuery = useModulesQuery({
     refetchInterval: MODULE_REFETCH_INTERVAL_MS,
   })
-  const attachedModules = moduleQuery?.data?.data ?? []
-  const protocolModulesInfo =
-    mostRecentAnalysis != null
-      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-      : []
+  const attachedModules = useMemo(
+    () => moduleQuery?.data?.data ?? [],
+    [moduleQuery?.data?.data]
+  )
+  const protocolModulesInfo = useMemo(
+    () =>
+      mostRecentAnalysis != null
+        ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+        : [],
+    [mostRecentAnalysis, deckDef]
+  )
 
-  const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
-    attachedModules,
-    protocolModulesInfo,
-    deckConfig
+  const attachedProtocolModuleMatches = useMemo(
+    () =>
+      getAttachedProtocolModuleMatches(
+        attachedModules,
+        protocolModulesInfo,
+        deckConfig
+      ),
+    [attachedModules, protocolModulesInfo, deckConfig]
   )
 
   return (
