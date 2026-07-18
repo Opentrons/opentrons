@@ -13,6 +13,7 @@
   "create_camera_image_settings": "Updating camera image settings",
   "create_offsets": "Saving new labware offsets",
   "create_protocol": "Creating protocol",
+  "create_user": "Creating user",
   "delete_offsets": "Deleting old labware offsets",
   "delete_run": "Deleting protocol run record",
   "delete_runs": "Deleting protocol run records",
