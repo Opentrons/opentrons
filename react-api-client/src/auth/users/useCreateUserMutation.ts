@@ -35,10 +35,10 @@ export function useCreateUserMutation(
   const host = useHost()
   const mutation = useDocumentedMutation(
     documentationState,
-    [],
+    ['create_user'],
     getQueryKey(host, 'auth', 'users'),
     ({ variables: data, userNotes }) =>
-      createUser(host!, data).then(response => response.data),
+      createUser(host!, data, userNotes).then(response => response.data),
     options
   )
 
