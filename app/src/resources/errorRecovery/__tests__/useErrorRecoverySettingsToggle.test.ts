@@ -6,9 +6,14 @@ import {
   useUpdateErrorRecoverySettings,
 } from '@opentrons/react-api-client'
 
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
+
 import { useErrorRecoverySettingsToggle } from '..'
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 describe('useErrorRecoverySettingsToggle', () => {
   beforeEach(() => {
@@ -16,7 +21,7 @@ describe('useErrorRecoverySettingsToggle', () => {
       data: undefined,
     } as any)
     vi.mocked(useUpdateErrorRecoverySettings).mockReturnValue({
-      useErrorRecoverySettings: vi.fn(),
+      updateErrorRecoverySettings: vi.fn(),
     } as any)
   })
 
@@ -62,6 +67,9 @@ describe('useErrorRecoverySettingsToggle', () => {
     expect(mockUpdateSettings).toHaveBeenCalledWith({
       data: { enabled: false },
     })
+    expect(useUpdateErrorRecoverySettings).toHaveBeenCalledWith(
+      ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+    )
 
     act(() => {
       result.current.toggleERSettings()

@@ -7,6 +7,10 @@ import {
   InlineNotification,
   LegacyStyledText,
 } from '@opentrons/components'
+import {
+  useRobotSettingsQuery,
+  useUpdateRobotSettingMutation,
+} from '@opentrons/react-api-client'
 
 import { LANGUAGES, US_ENGLISH_DISPLAY_NAME } from '/app/i18n'
 import { Navigation } from '/app/organisms/ODD/Navigation'
@@ -26,7 +30,6 @@ import {
 } from '/app/redux/config'
 import { getLocalRobot, getRobotApiVersion } from '/app/redux/discovery'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
-import { getRobotSettings, updateSetting } from '/app/redux/robot-settings'
 import { getRobotUpdateAvailable } from '/app/redux/robot-update'
 import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 import { useNetworkConnection } from '/app/resources/networking'
@@ -53,6 +56,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
     'branded',
   ])
   const dispatch = useDispatch<Dispatch>()
+  const { updateRobotSetting } = useUpdateRobotSettingMutation()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const networkConnection = useNetworkConnection(robotName)
@@ -60,9 +64,8 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const robotServerVersion =
     localRobot?.status != null ? getRobotApiVersion(localRobot) : null
 
-  const allRobotSettings = useSelector((state: State) =>
-    getRobotSettings(state, robotName)
-  )
+  const robotSettingsQuery = useRobotSettingsQuery()
+  const allRobotSettings = robotSettingsQuery.data?.settings ?? []
 
   const isHomeGantryOn =
     allRobotSettings.find(({ id }) => id === HOME_GANTRY_SETTING_ID)?.value ??
@@ -75,8 +78,8 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   })
   const isUpdateAvailable = robotUpdateType === 'upgrade'
   const devToolsOn = useSelector(getDevtoolsEnabled)
-  const { lightsEnabled, toggleLights } = useLEDLights(robotName)
-  const { sensorsDisabled, toggleSensors } = useDisableStackerSensors(robotName)
+  const { lightsEnabled, toggleLights } = useLEDLights()
+  const { sensorsDisabled, toggleSensors } = useDisableStackerSensors()
   const { toggleERSettings, isEREnabled } = useErrorRecoverySettingsToggle()
   const automaticSoftwareUpdateDownloadsEnabled =
     useSelector(getConfig)?.update?.automaticallyDownloadUpdates
@@ -255,11 +258,12 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           settingInfo={t('gantry_homing_description')}
           iconName="gantry-homing"
           rightElement={<OnOffToggle isOn={!isHomeGantryOn} />}
-          onClick={() =>
-            dispatch(
-              updateSetting(robotName, HOME_GANTRY_SETTING_ID, !isHomeGantryOn)
-            )
-          }
+          onClick={() => {
+            updateRobotSetting({
+              id: HOME_GANTRY_SETTING_ID,
+              value: !isHomeGantryOn,
+            })
+          }}
         />
         <RobotSettingButton
           settingName={t('disable_stacker_sensors')}

@@ -861,7 +861,10 @@ export function ProtocolSetup(): JSX.Element {
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
 
   const offsetsConfirmed = useSelector(selectAreOffsetsApplied(runId))
-  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(runId)
+  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(
+    runId,
+    documentationState
+  )
 
   const [cameraSettingsConfirmed, setCameraSettingsConfirmed] = useState(false)
   const { data: initialRobotCameraSettings } = useNotifyCamera({
