@@ -19,7 +19,8 @@ export type RecoveryPolicyRulesParams = Array<{
 export function updateErrorRecoveryPolicy(
   config: HostConfig,
   runId: string,
-  policyRules: RecoveryPolicyRulesParams
+  policyRules: RecoveryPolicyRulesParams,
+  userNotes: string
 ): ResponsePromise<UpdateErrorRecoveryPolicyResponse> {
   const policy = buildErrorRecoveryPolicyBody(policyRules)
 
@@ -28,6 +29,7 @@ export function updateErrorRecoveryPolicy(
     UpdateErrorRecoveryPolicyRequest
   >(PUT, `/runs/${runId}/errorRecoveryPolicy`, config, {
     body: { data: policy },
+    userNotes,
   })
 }
 

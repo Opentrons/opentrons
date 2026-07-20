@@ -36,7 +36,6 @@ export function EnableStatusLight({
           <LegacyStyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            id="AdvancedSettings_Enable_Status_Light"
           >
             {t('enable_status_light')}
           </LegacyStyledText>
@@ -49,7 +48,6 @@ export function EnableStatusLight({
         label="enable_status_light"
         toggledOn={lightsEnabled}
         onClick={toggleLights}
-        id="RobotSettings_enableStatusLightToggleButton"
         disabled={isEstopNotDisengaged}
       />
     </Flex>

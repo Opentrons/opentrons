@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import { Chip, RobotInfoLabel, StyledText } from '@opentrons/components'
@@ -22,6 +23,7 @@ interface ModuleContainerProps {
   moduleEntities: ModuleEntities
   moduleRobotState: RobotState['modules']
   slotId: string
+  headerPortalEl?: HTMLElement | null
 }
 
 export function ModuleContainer({
@@ -29,6 +31,7 @@ export function ModuleContainer({
   moduleEntities,
   moduleRobotState,
   slotId,
+  headerPortalEl,
 }: ModuleContainerProps): JSX.Element {
   const { t } = useTranslation('protocol_visualization')
   const { model } = moduleEntities[moduleId]
@@ -224,13 +227,19 @@ export function ModuleContainer({
       )
   }
 
+  const header = (
+    <>
+      <RobotInfoLabel deckLabel={slotId} />
+      <StyledText desktopStyle="bodyDefaultSemiBold">
+        {moduleDisplayName}
+      </StyledText>
+    </>
+  )
+
   return (
     <div className={styles.container}>
       <div className={styles.main_content}>
-        <RobotInfoLabel deckLabel={slotId} />
-        <StyledText desktopStyle="bodyDefaultSemiBold">
-          {moduleDisplayName}
-        </StyledText>
+        {headerPortalEl != null ? createPortal(header, headerPortalEl) : header}
         {moduleDetails}
       </div>
     </div>

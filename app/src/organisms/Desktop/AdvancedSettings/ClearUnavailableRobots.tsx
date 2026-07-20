@@ -114,7 +114,6 @@ export function ClearUnavailableRobots(): JSX.Element {
           <LegacyStyledText
             css={TYPOGRAPHY.h3SemiBold}
             paddingBottom={SPACING.spacing8}
-            id="AdvancedSettings_clearRobots"
           >
             {t('clear_unavail_robots')}
           </LegacyStyledText>
@@ -125,7 +124,6 @@ export function ClearUnavailableRobots(): JSX.Element {
         <TertiaryButton
           marginLeft={SPACING_AUTO}
           onClick={confirmDeleteUnavailRobots}
-          id="AdvancedSettings_clearUnavailableRobots"
         >
           {t('clear_robots_button')}
         </TertiaryButton>

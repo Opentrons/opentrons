@@ -225,6 +225,7 @@ stages:
             compatibleWithRobot: true
             moduleType: thermocyclerModuleType
             moduleModel: thermocyclerModuleV2
+            moduleOffset: !anydict
             usbPort:
               port: !anyint
               hub: !anybool
@@ -247,6 +248,7 @@ stages:
             compatibleWithRobot: true
             moduleType: heaterShakerModuleType
             moduleModel: heaterShakerModuleV1
+            moduleOffset: !anydict
             usbPort:
               port: !anyint
               hub: !anybool
@@ -267,6 +269,7 @@ stages:
             compatibleWithRobot: true
             moduleType: flexStackerModuleType
             moduleModel: flexStackerModuleV1
+            moduleOffset: !anydict
             usbPort:
               port: !anyint
               hub: !anybool
@@ -286,6 +289,7 @@ stages:
             compatibleWithRobot: true
             moduleType: flexStackerModuleType
             moduleModel: flexStackerModuleV1
+            moduleOffset: !anydict
             usbPort:
               port: !anyint
               hub: !anybool
@@ -305,6 +309,7 @@ stages:
             compatibleWithRobot: true
             moduleType: temperatureModuleType
             moduleModel: temperatureModuleV2
+            moduleOffset: !anydict
             usbPort:
               port: !anyint
               hub: !anybool
@@ -322,6 +327,7 @@ stages:
             compatibleWithRobot: true
             moduleType: temperatureModuleType
             moduleModel: temperatureModuleV2
+            moduleOffset: !anydict
             usbPort:
               port: !anyint
               hub: !anybool

@@ -25,6 +25,7 @@ import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { useIsRobotBusy } from '/app/redux-resources/robots'
 import {
   DOWNGRADE,
+  downloadRobotUpdate,
   getRobotUpdateDisplayInfo,
   getRobotUpdateVersion,
   REINSTALL,
@@ -125,7 +126,6 @@ export function UpdateRobotModal({
         css={css`
           font-size: 0.875rem;
         `}
-        id="SoftwareUpdateReleaseNotesLink"
       >
         {t('release_notes')}
       </ExternalLink>
@@ -139,6 +139,7 @@ export function UpdateRobotModal({
         </SecondaryButton>
         <PrimaryButton
           onClick={() => {
+            dispatch(downloadRobotUpdate())
             dispatchStartRobotUpdate(robotName)
           }}
           css={FOOTER_BUTTON_STYLE}

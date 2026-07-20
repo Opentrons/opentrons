@@ -37,7 +37,6 @@ export function EnableDevTools(): JSX.Element {
         <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
-          id="AdvancedSettings_devTools"
         >
           {t('enable_dev_tools')}
         </LegacyStyledText>
@@ -49,7 +48,6 @@ export function EnableDevTools(): JSX.Element {
         label="enable_dev_tools"
         toggledOn={devToolsOn}
         onClick={toggleDevTools}
-        id="AdvancedSettings_devTooltoggle"
       />
     </Flex>
   )

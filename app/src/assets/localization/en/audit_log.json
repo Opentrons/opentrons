@@ -1,6 +1,6 @@
 {
   "96_channel": "96 channel",
-  "add_module": "Adding module to deck configuration",
+  "add_module": "Launching module setup flow",
   "attach": "Attaching",
   "attach_gripper": "Attaching gripper",
   "attach_module": "Launching setup flow for {{module}}",
@@ -11,6 +11,8 @@
   "connect_wifi": "Connect to wifi network",
   "create_camera_image_settings": "Updating camera image settings",
   "create_protocol": "Creating protocol",
+  "delete_run": "Deleting protocol run record",
+  "delete_runs": "Deleting protocol run records",
   "detach": "Detaching",
   "detach_gripper": "Detaching gripper",
   "disconnect_wifi": "Disconnecting robot from wifi",
@@ -47,5 +49,8 @@
   "stop_run": "Stopping protocol run",
   "update_camera": "Updating camera settings",
   "update_camera_settings_for_run": "Updating camera settings for this run",
+  "update_deck_configuration": "Updating deck configuration",
+  "update_error_recovery_policy": "Updating error recovery policy",
+  "update_error_recovery_settings": "Updating error recovery settings",
   "update_robot_name": "Updating robot name"
 }

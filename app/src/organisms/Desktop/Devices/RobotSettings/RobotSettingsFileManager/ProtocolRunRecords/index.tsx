@@ -8,6 +8,7 @@ import {
   WARNING_TOAST,
 } from '@opentrons/components'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
@@ -31,9 +32,11 @@ export function ProtocolRunRecords({
   const { makeToast } = useToaster()
   const { data: runData } = useNotifyAllRunsQuery()
   const runs = useMemo(() => [...(runData?.data ?? [])], [runData?.data])
+  const documentationState = useDocumentationState()
   const { downloadSelectedRuns, isDownloading: isDownloadingRuns } =
     useDownloadSelectedRuns(robotName)
-  const { deleteSelectedRuns, deletingIds } = useDeleteSelectedRuns()
+  const { deleteSelectedRuns, deletingIds } =
+    useDeleteSelectedRuns(documentationState)
 
   const {
     selectedIds,

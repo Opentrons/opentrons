@@ -46,7 +46,6 @@ export function ShortTrashBin({
         <LegacyStyledText
           css={TYPOGRAPHY.pSemiBold}
           paddingBottom={SPACING.spacing4}
-          id="AdvancedSettings_devTools"
         >
           {t('short_trash_bin')}
         </LegacyStyledText>
@@ -58,7 +57,6 @@ export function ShortTrashBin({
         label="short_trash_bin"
         toggledOn={settings?.value === true}
         onClick={handleClick}
-        id="AdvancedSettings_shortTrashBin"
         disabled={isRobotBusy}
       />
     </Flex>

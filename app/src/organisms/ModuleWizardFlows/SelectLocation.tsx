@@ -9,7 +9,6 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   COMBO_FIXTURES,
   FAKE_FIXTURE_IDS,
@@ -64,6 +63,7 @@ export interface SelectLocationProps extends ModuleSetupWizardMaybePipetteStepPr
   deckConfig: DeckConfiguration
   createMaintenanceRun: CreateMaintenanceRunType
   isLoadedInRun: boolean
+  updateDeckConfiguration: (deckConfig: DeckConfiguration) => void
 }
 export function SelectLocation(props: SelectLocationProps): JSX.Element {
   const {
@@ -75,6 +75,7 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     maintenanceRunId,
     setErrorMessage,
     setIsDoorOpenError,
+    updateDeckConfiguration,
   } = props
 
   const configuredFixtureIdByCutoutId = getFixtureIdByCutoutIdForModule(
@@ -108,7 +109,6 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
       proceed()
     }
   }
-  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const cutoutConfig = deckConfig.find(
     cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber

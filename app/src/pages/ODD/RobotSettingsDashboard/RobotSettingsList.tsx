@@ -17,8 +17,10 @@ import {
 import {
   DEV_INTERNAL_FLAGS,
   getAppLanguage,
+  getConfig,
   getDevtoolsEnabled,
   getFeatureFlags,
+  toggleConfigValue,
   toggleDevInternalFlag,
   toggleDevtools,
 } from '/app/redux/config'
@@ -76,7 +78,8 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const { lightsEnabled, toggleLights } = useLEDLights(robotName)
   const { sensorsDisabled, toggleSensors } = useDisableStackerSensors(robotName)
   const { toggleERSettings, isEREnabled } = useErrorRecoverySettingsToggle()
-
+  const automaticSoftwareUpdateDownloadsEnabled =
+    useSelector(getConfig)?.update?.automaticallyDownloadUpdates
   const appLanguage = useSelector(getAppLanguage)
   const currentLanguageOption = LANGUAGES.find(lng => lng.value === appLanguage)
 
@@ -160,6 +163,20 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="light"
           rightElement={<OnOffToggle isOn={lightsEnabled} />}
           onClick={toggleLights}
+        />
+        <RobotSettingButton
+          settingName={t('app_settings:automatically_download_updates')}
+          dataTestId="RobotSettingButton_automatically_download_updates"
+          settingInfo={t('app_settings:if_on_fetch_updates_in_the_background')}
+          iconName="download"
+          rightElement={
+            <OnOffToggle
+              isOn={automaticSoftwareUpdateDownloadsEnabled === true}
+            />
+          }
+          onClick={() => {
+            dispatch(toggleConfigValue('update.automaticallyDownloadUpdates'))
+          }}
         />
         <RobotSettingButton
           settingName={t('touchscreen_sleep')}
