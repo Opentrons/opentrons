@@ -58,9 +58,10 @@ export function SetupCamera({
   const { makeSnackbar } = useToaster()
   const storageInfo = useRobotStorageInfo()
   const dispatch = useDispatch()
-  const { documentationState, clearDocreport } = useLinkedDocumentationState([
-    'update_camera_settings_for_run',
-  ])
+  const { documentationState, clearDocreport } = useLinkedDocumentationState(
+    ['update_camera_settings_for_run'],
+    runId
+  )
   const { mutateAsync: addCameraSettingsToRunAsync } =
     useAddCameraSettingsToRunMutation(documentationState)
   const { mutateAsync: addCameraImageSettingsToRunAsync } =

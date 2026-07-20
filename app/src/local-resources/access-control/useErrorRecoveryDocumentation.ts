@@ -40,12 +40,7 @@ export const useErrorRecoveryDocumentation = ({
   const {
     documentationState: resumeAndHandleErrorPolicyDocState,
     clearDocreport: clearResumeAndHandleErrorPolicyDocreport,
-  } = useLinkedDocumentationState(
-    resumeAndPolicyActions,
-    undefined,
-    undefined,
-    recoverySessionKey
-  )
+  } = useLinkedDocumentationState(resumeAndPolicyActions, recoverySessionKey)
 
   return {
     documentationState,

@@ -48,9 +48,10 @@ export function ProtocolSetupCamera(
   const { runId, confirmCameraSettings, cameraConfirmed } = props
   const { t } = useTranslation('protocol_setup')
   const dispatch = useDispatch()
-  const { documentationState, clearDocreport } = useLinkedDocumentationState([
-    'update_camera_settings_for_run',
-  ])
+  const { documentationState, clearDocreport } = useLinkedDocumentationState(
+    ['update_camera_settings_for_run'],
+    runId
+  )
   const { mutateAsync: addCameraSettingsToRunAsync } =
     useAddCameraSettingsToRunMutation(documentationState)
   const { mutateAsync: addCameraImageSettingsToRunAsync } =

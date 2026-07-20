@@ -22,13 +22,12 @@ export interface LinkedDocumentationStateResult {
  * hold a ref to this object see the report before the next render.
  *
  * @param resetKey - when this value changes, the stored report is cleared
- *   (e.g. a new failed command / recovery session)
  */
 export const useLinkedDocumentationState = (
   actionsToDocument: DocumentedAction[],
+  resetKey: string | null,
   robotName?: string | null,
-  hostOverride?: HostConfig | null,
-  resetKey?: string | null
+  hostOverride?: HostConfig | null
 ): LinkedDocumentationStateResult => {
   const [docreport, setDocreport] = useState<DocumentationReport>()
   const documentationStateRef = useRef<DocumentationState>({ isLoading: true })

@@ -55,7 +55,8 @@ export function ConfirmCancelRunModal({
   const dismissStartedRef = useRef(false)
 
   const { documentationState, clearDocreport } = useLinkedDocumentationState(
-    isActiveRun ? ACTIVE_RUN_CANCEL_ACTIONS : INACTIVE_RUN_CANCEL_ACTIONS
+    isActiveRun ? ACTIVE_RUN_CANCEL_ACTIONS : INACTIVE_RUN_CANCEL_ACTIONS,
+    runId
   )
   const { stopRun } = useStopRunMutation(documentationState)
   const { dismissCurrentRun, isLoading: isDismissing } =

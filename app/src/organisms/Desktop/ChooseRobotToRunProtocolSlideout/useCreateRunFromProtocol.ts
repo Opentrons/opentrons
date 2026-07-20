@@ -52,6 +52,7 @@ export function useCreateRunFromProtocol(
 
   const { documentationState, clearDocreport } = useLinkedDocumentationState(
     ['create_protocol', 'play_run'],
+    host?.robotName ?? null,
     host?.robotName,
     host
   )
