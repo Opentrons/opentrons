@@ -13,7 +13,7 @@ import { useDeleteSelectedRuns } from '/app/resources/devices/hooks/useDeleteSel
 import { useDownloadSelectedRuns } from '/app/resources/devices/hooks/useDownloadSelectedRuns'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
-import { ProtocolRunRecords } from '..'
+import { ProtocolRunRecords } from '../index'
 
 import type { RunData } from '@opentrons/api-client'
 
