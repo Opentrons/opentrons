@@ -165,6 +165,7 @@ type AuditLogAction =
   | 'delete_run_images'
   | 'delete_runs'
   | 'update_deck_configuration'
+  | 'upload_csv'
   | 'update_audit_settings'
   | 'update_auth_settings'
   | 'patch_robot_server_crs_settings'
