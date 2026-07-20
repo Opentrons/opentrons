@@ -1,5 +1,6 @@
 {
   "96_channel": "96 channel",
+  "acknowledge_estop": "Acknowledging emergency stop disengage",
   "add_module": "Launching module setup flow",
   "apply_offsets": "Applying labware offsets to run",
   "attach": "Attaching",

@@ -22,10 +22,14 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useAcknowledgeEstopDisengageMutation } from '@opentrons/react-api-client'
+import {
+  isDocumentedMutationError,
+  useAcknowledgeEstopDisengageMutation,
+} from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { OddModal } from '/app/molecules/OddModal'
 import { getIsOnDevice } from '/app/redux/config'
 import { usePlacePlateReaderLid } from '/app/resources/modules'
@@ -83,7 +87,9 @@ function TouchscreenModal({
 }: EstopPressedModalProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'branded'])
   const [isResuming, setIsResuming] = useState<boolean>(false)
-  const { acknowledgeEstopDisengage } = useAcknowledgeEstopDisengageMutation()
+  const documentationState = useDocumentationState()
+  const { acknowledgeEstopDisengage } =
+    useAcknowledgeEstopDisengageMutation(documentationState)
 
   const { handlePlaceReaderLid, isValidPlateReaderMove } =
     usePlacePlateReaderLid({
@@ -100,12 +106,20 @@ function TouchscreenModal({
   }
   const handleClick = (): void => {
     setIsResuming(true)
-    setIsWaitingForResumeOperation()
-    acknowledgeEstopDisengage(null)
-    handlePlaceReaderLid()
-    if (!isValidPlateReaderMove) {
-      closeModal()
-    }
+    acknowledgeEstopDisengage(undefined, {
+      onSuccess: () => {
+        setIsWaitingForResumeOperation()
+        handlePlaceReaderLid()
+        if (!isValidPlateReaderMove) {
+          closeModal()
+        }
+      },
+      onError: error => {
+        if (isDocumentedMutationError(error)) {
+          setIsResuming(false)
+        }
+      },
+    })
   }
   return (
     <OddModal {...modalProps}>
@@ -162,7 +176,9 @@ function DesktopModal({
 }: EstopPressedModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const [isResuming, setIsResuming] = useState<boolean>(false)
-  const { acknowledgeEstopDisengage } = useAcknowledgeEstopDisengageMutation()
+  const documentationState = useDocumentationState()
+  const { acknowledgeEstopDisengage } =
+    useAcknowledgeEstopDisengageMutation(documentationState)
   const { handlePlaceReaderLid, isValidPlateReaderMove } =
     usePlacePlateReaderLid({
       onSuccess: closeModal,
@@ -180,12 +196,20 @@ function DesktopModal({
   const handleClick: MouseEventHandler<HTMLButtonElement> = (e): void => {
     e.preventDefault()
     setIsResuming(true)
-    setIsWaitingForResumeOperation()
-    acknowledgeEstopDisengage(null)
-    handlePlaceReaderLid()
-    if (!isValidPlateReaderMove) {
-      closeModal()
-    }
+    acknowledgeEstopDisengage(undefined, {
+      onSuccess: () => {
+        setIsWaitingForResumeOperation()
+        handlePlaceReaderLid()
+        if (!isValidPlateReaderMove) {
+          closeModal()
+        }
+      },
+      onError: error => {
+        if (isDocumentedMutationError(error)) {
+          setIsResuming(false)
+        }
+      },
+    })
   }
 
   return (
