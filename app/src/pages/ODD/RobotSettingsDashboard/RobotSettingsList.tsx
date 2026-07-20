@@ -13,6 +13,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { LANGUAGES, US_ENGLISH_DISPLAY_NAME } from '/app/i18n'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
   OnOffToggle,
@@ -56,7 +57,9 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
     'branded',
   ])
   const dispatch = useDispatch<Dispatch>()
-  const { updateRobotSetting } = useUpdateRobotSettingMutation()
+  const documentationState = useDocumentationState()
+  const { updateRobotSetting } =
+    useUpdateRobotSettingMutation(documentationState)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const networkConnection = useNetworkConnection(robotName)
