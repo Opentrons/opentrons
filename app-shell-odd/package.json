@@ -53,7 +53,7 @@
     "electron-store": "5.1.1",
     "electron-updater": "6.3.9",
     "execa": "4.0.0",
-    "form-data": "2.5.4",
+    "form-data": "2.5.6",
     "fs-extra": "10.0.0",
     "get-stream": "5.1.0",
     "lodash": "catalog:",

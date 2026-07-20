@@ -3,16 +3,13 @@ name: 'hardware-testing testing protocols'
 on:
   # Run on any change to the api directory
   pull_request:
-    paths:
-      - 'api/**'
-      - 'hardware-testing/**'
-      - 'Makefile'
-  push:
-    paths:
+    paths: &paths
       - 'api/**'
       - 'hardware-testing/**'
       - 'Makefile'
       - '.github/workflows/hardware-testing-protocols.yaml'
+  push:
+    paths: *paths
     branches:
       - 'edge'
       - 'release'

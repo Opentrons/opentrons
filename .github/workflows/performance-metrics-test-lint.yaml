@@ -33,7 +33,7 @@ jobs:
           cache: 'pipenv'
           cache-dependency-path: performance-metrics/Pipfile.lock
 
-      - name: "Install Python deps"
+      - name: 'Install Python deps'
         uses: './.github/actions/python/setup'
         with:
           project: 'performance-metrics'

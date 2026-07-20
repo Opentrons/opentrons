@@ -45,11 +45,7 @@ export function SetupDeckCalibration({
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <LegacyStyledText
-          color={COLORS.black90}
-          css={TYPOGRAPHY.pSemiBold}
-          id="DeckCalibration_deckCalibrationTitle"
-        >
+        <LegacyStyledText color={COLORS.black90} css={TYPOGRAPHY.pSemiBold}>
           {t('deck_calibration_title')}
         </LegacyStyledText>
       </Flex>

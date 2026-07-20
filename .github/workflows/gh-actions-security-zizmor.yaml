@@ -2,11 +2,10 @@ name: GitHub Actions security checks
 
 on:
   push:
-    paths:
+    paths: &paths
       - .github/**
   pull_request:
-    paths:
-      - .github/**
+    paths: *paths
   workflow_dispatch: {}
 
 permissions: {}

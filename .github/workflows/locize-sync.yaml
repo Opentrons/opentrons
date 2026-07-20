@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       locize_action:
-        description: "Locize action to run"
+        description: 'Locize action to run'
         type: choice
         options:
           - push-local
@@ -12,7 +12,7 @@ on:
         default: download-remote
         required: true
       target_branch:
-        description: "Branch to checkout and base the pull request on"
+        description: 'Branch to checkout and base the pull request on'
         type: string
         default: release
         required: true
@@ -56,8 +56,8 @@ jobs:
         with:
           branch: automation/locize-${{ inputs.locize_action }}-${{ github.run_id }}
           base: ${{ inputs.target_branch }}
-          commit-message: "chore(locize): ${{ inputs.locize_action }} via workflow"
-          title: "chore(locize): ${{ inputs.locize_action }}"
+          commit-message: 'chore(locize): ${{ inputs.locize_action }} via workflow'
+          title: 'chore(locize): ${{ inputs.locize_action }}'
           body: |
             Automated Locize `${{ inputs.locize_action }}` run triggered via workflow dispatch.
             - branch: `${{ inputs.target_branch }}`

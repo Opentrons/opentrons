@@ -87,7 +87,6 @@ export function UpdateRobotSoftware({
           <LegacyStyledText
             css={TYPOGRAPHY.pSemiBold}
             marginBottom={SPACING.spacing8}
-            id="AdvancedSettings_updateRobotSoftware"
           >
             {t('update_robot_software')}
           </LegacyStyledText>
@@ -100,7 +99,6 @@ export function UpdateRobotSoftware({
         </Box>
         <TertiaryButton
           marginLeft={SPACING_AUTO}
-          id="AdvancedSettings_softwareUpdateButton"
           {...updateButtonProps}
           disabled={updateDisabled || isRunActive}
           onClick={handleClick}

@@ -4,7 +4,7 @@ name: 'Step generation test'
 
 on:
   pull_request:
-    paths:
+    paths: &paths
       - 'step-generation/**'
       - 'shared-data/**'
       - 'package.json'
@@ -14,15 +14,7 @@ on:
       - '.github/actions/environment/complex-variables/action.yml'
       - 'vitest.config.*'
   push:
-    paths:
-      - 'step-generation/**'
-      - 'shared-data/**'
-      - 'package.json'
-      - '.github/workflows/step-generation-test.yaml'
-      - '.github/actions/js/setup/action.yml'
-      - '.github/actions/git/resolve-tag/action.yml'
-      - '.github/actions/environment/complex-variables/action.yml'
-      - 'vitest.config.*'
+    paths: *paths
     branches:
       - '*'
 

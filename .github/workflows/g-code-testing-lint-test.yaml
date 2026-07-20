@@ -6,7 +6,7 @@ name: 'G-Code Testing Lint & Test'
 on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   push:
-    paths:
+    paths: &paths
       - 'Makefile'
       - 'api/**'
       - 'g-code-testing/**'
@@ -19,14 +19,7 @@ on:
       - 'release'
       - '*hotfix*'
   pull_request:
-    paths:
-      - 'Makefile'
-      - 'g-code-testing/**'
-      - 'api/**'
-      - 'scripts/**.mk'
-      - 'scripts/**.py'
-      - '.github/workflows/g-code-testing-lint-test.yaml'
-      - '.github/actions/python/**'
+    paths: *paths
   workflow_dispatch:
 
 concurrency:

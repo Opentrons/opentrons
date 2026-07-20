@@ -4,19 +4,14 @@ name: 'JS API Clients test'
 
 on:
   pull_request:
-    paths:
+    paths: &paths
       - 'react-api-client/**'
       - 'api-client/**'
       - 'package.json'
       - '.github/workflows/react-api-client-test.yaml'
       - 'vitest.config.*'
   push:
-    paths:
-      - 'react-api-client/**'
-      - 'api-client/**'
-      - 'package.json'
-      - '.github/workflows/react-api-client-test.yaml'
-      - 'vitest.config.*'
+    paths: *paths
     branches:
       - '*'
   workflow_dispatch:

@@ -6,7 +6,7 @@ name: 'Robot server lint/test'
 on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   push:
-    paths:
+    paths: &paths
       - 'api/**/*'
       - 'hardware/**/*'
       - 'hardware-testing/**/*'
@@ -26,19 +26,7 @@ on:
     tags-ignore:
       - '*'
   pull_request:
-    paths:
-      - 'api/**/*'
-      - 'hardware/**/*'
-      - 'hardware-testing/**/*'
-      - 'Makefile'
-      - 'shared-data/**/*'
-      - 'server-utils/**/*'
-      - '!shared-data/js/**/*'
-      - 'robot-server/**/*'
-      - 'scripts/**/*.mk'
-      - 'scripts/**/*.py'
-      - '.github/workflows/robot-server-lint-test.yaml'
-      - '.github/actions/python/**'
+    paths: *paths
   workflow_dispatch:
 
 concurrency:

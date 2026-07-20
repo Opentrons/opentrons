@@ -3,16 +3,13 @@ name: 'G-Code-Confirm'
 on:
   # Run on any change to the api directory
   pull_request:
-    paths:
-      - 'api/**'
-      - 'g-code-testing/**'
-      - 'Makefile'
-  push:
-    paths:
+    paths: &paths
       - 'api/**'
       - 'g-code-testing/**'
       - 'Makefile'
       - '.github/workflows/g-code-confirm-tests.yaml'
+  push:
+    paths: *paths
     branches:
       - 'edge'
       - 'release'

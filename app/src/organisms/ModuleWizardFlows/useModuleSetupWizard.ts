@@ -2,7 +2,10 @@ import { useEffect, useReducer, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
+import {
+  useDeleteMaintenanceRunMutation,
+  useUpdateDeckConfigurationMutation,
+} from '@opentrons/react-api-client'
 
 import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
 import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
@@ -57,6 +60,7 @@ export interface UseModuleSetupWizardResult {
     attachedModule: AttachedModule | null
     isExiting: boolean
     sendIdentifyModule: SendIdentifyModule
+    updateDeckConfiguration: (deckConfig: DeckConfiguration) => void
   }
   buildFlowForSelectedModule: (module: AttachedModule) => void
   patchModuleAfterUpdate: (module: AttachedModule) => void
@@ -118,6 +122,15 @@ export function useModuleSetupWizard(
     commandDocState,
     actionsToDocument,
     addActionToDocument
+  )
+
+  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation(
+    commandDocState,
+    {
+      onSuccess: () => {
+        addActionToDocument('update_deck_configuration')
+      },
+    }
   )
 
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
@@ -258,6 +271,7 @@ export function useModuleSetupWizard(
     attachedModule,
     isExiting,
     sendIdentifyModule,
+    updateDeckConfiguration,
   }
 
   const buildFlowForSelectedModule = (

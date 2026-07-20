@@ -4,7 +4,7 @@ name: 'App test, build, and deploy'
 
 on:
   push:
-    paths:
+    paths: &paths
       - 'Makefile'
       - 'app/**'
       - 'app-shell/**'
@@ -27,19 +27,7 @@ on:
       - 'v[0-9]*.[0-9]*'
       - 'ot3@*'
   pull_request:
-    paths:
-      - 'Makefile'
-      - 'app/**'
-      - 'app-shell/**'
-      - 'app-shell-odd/**'
-      - 'components/**'
-      - 'shared-data/**'
-      - 'discovery-client/**'
-      - '*.js'
-      - '*.json'
-      - 'pnpm-lock.yaml'
-      - 'scripts/**'
-      - '.vitest.config.*'
+    paths: *paths
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}

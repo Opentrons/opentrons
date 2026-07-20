@@ -55,7 +55,6 @@ export function UpdatedChannel(): JSX.Element {
         <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
-          id="AdvancedSettings_updatedChannel"
         >
           {t('update_channel')}
         </LegacyStyledText>

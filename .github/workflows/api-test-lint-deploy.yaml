@@ -6,7 +6,7 @@ name: 'API test/lint/deploy'
 on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   pull_request:
-    paths:
+    paths: &paths
       - 'api/**'
       - 'Makefile'
       - 'shared-data/**'
@@ -19,17 +19,7 @@ on:
       - '.github/workflows/utils.js'
       - 'package-testing/**'
   push:
-    paths:
-      - 'api/**'
-      - 'Makefile'
-      - 'shared-data/**'
-      - '!shared-data/js/**'
-      - 'hardware/**'
-      - 'scripts/**.mk'
-      - 'scripts/**.py'
-      - '.github/workflows/api-test-lint-deploy.yaml'
-      - '.github/actions/python/**'
-      - '.github/workflows/utils.js'
+    paths: *paths
     branches:
       - 'edge'
       - 'release'

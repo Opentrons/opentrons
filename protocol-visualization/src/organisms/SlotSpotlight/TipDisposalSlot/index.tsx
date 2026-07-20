@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import { RobotInfoLabel } from '@opentrons/components'
@@ -9,11 +10,14 @@ import type { RobotState } from '@opentrons/step-generation'
 interface TipDisposalSlotProps {
   robotState: RobotState
   disposalType: 'trash' | 'wasteChute'
+  // when set, the header block is rendered into this element via portal
+  headerPortalEl?: HTMLElement | null
 }
 
 export function TipDisposalSlot({
   robotState,
   disposalType,
+  headerPortalEl,
 }: TipDisposalSlotProps): JSX.Element {
   const { t } = useTranslation('protocol_visualization')
   // temporary commenting out for Rs 9.0.0
@@ -26,13 +30,17 @@ export function TipDisposalSlot({
   //     ),
   //   0
   // )
+  const header = (
+    <div className={styles.header}>
+      <RobotInfoLabel
+        deckLabel={disposalType === 'trash' ? t('trash') : t('waste_chute')}
+      />
+    </div>
+  )
+
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <RobotInfoLabel
-          deckLabel={disposalType === 'trash' ? t('trash') : t('waste_chute')}
-        />
-      </div>
+      {headerPortalEl != null ? createPortal(header, headerPortalEl) : header}
       <div className={styles.main_content}>
         {/* <div className={styles.text_container}>
           <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>

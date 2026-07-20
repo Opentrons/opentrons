@@ -15,7 +15,6 @@ import { UpdateRobotSoftware } from '../UpdateRobotSoftware'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('/app/redux/robot-settings/selectors')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update/selectors')
 vi.mock('../../../hooks')
