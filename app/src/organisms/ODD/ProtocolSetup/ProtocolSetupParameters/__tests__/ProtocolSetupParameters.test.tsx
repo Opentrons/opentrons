@@ -83,7 +83,11 @@ describe('ProtocolSetupParameters', () => {
       .calledWith(expect.anything(), expect.anything())
       .thenReturn({ createRun: mockCreateRun } as any)
     when(vi.mocked(useUploadCsvFileMutation))
-      .calledWith(expect.anything(), expect.anything())
+      .calledWith(
+        ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+        expect.anything(),
+        expect.anything()
+      )
       .thenReturn({ uploadCsvFile: mockUploadCsvFile } as any)
     vi.mocked(useToaster).mockReturnValue({
       makeSnackbar: mockMakeSnackbar,

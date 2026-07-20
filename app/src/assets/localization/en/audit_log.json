@@ -1,5 +1,6 @@
 {
   "96_channel": "96 channel",
+  "acknowledge_estop": "Acknowledging emergency stop disengage",
   "add_module": "Launching module setup flow",
   "apply_offsets": "Applying labware offsets to run",
   "attach": "Attaching",
@@ -13,6 +14,7 @@
   "create_camera_image_settings": "Updating camera image settings",
   "create_offsets": "Saving new labware offsets",
   "create_protocol": "Creating protocol",
+  "create_user": "Creating user",
   "delete_offsets": "Deleting old labware offsets",
   "delete_run": "Deleting protocol run record",
   "delete_run_images": "Deleting run images",
@@ -40,6 +42,7 @@
   "launching_error_recovery": "Launching error recovery",
   "left_mount": "left mount",
   "lpc_flow": "Launching labware position check",
+  "patch_robot_server_crs_settings": "Updating protocol log settings",
   "pause_run": "Pausing protocol run",
   "pipette_wizard_flow": "{{flowtype}} {{pipette}} pipette on {{mount}}",
   "place_plate_reader_lid": "Placing plate reader lid",
@@ -52,12 +55,16 @@
   "shutdown_robot": "Shutting down robot",
   "single_channel_and_8_channel": "single channel or 8 channel",
   "stop_run": "Stopping protocol run",
+  "update_audit_settings": "Updating reason for interaction log settings",
+  "update_auth_settings": "Updating authentication settings",
   "update_camera": "Updating camera settings",
   "update_camera_settings_for_run": "Updating camera settings for this run",
   "update_deck_configuration": "Updating deck configuration",
   "update_error_recovery_policy": "Updating error recovery policy",
   "update_error_recovery_settings": "Updating error recovery settings",
   "update_robot_name": "Updating robot name",
+  "update_self": "Saving user settings",
   "update_settings": "Updating robot settings",
-  "update_subsystem": "Updating subsystem firmware"
+  "update_subsystem": "Updating subsystem firmware",
+  "upload_csv": "Uploading runtime parameters as CSV"
 }

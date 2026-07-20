@@ -6,12 +6,13 @@ import type { AuthSettingsResponse, PatchAuthSettingsRequest } from './types'
 
 export function patchAuthSettings(
   config: HostConfig,
-  body: PatchAuthSettingsRequest
+  body: PatchAuthSettingsRequest,
+  userNotes: string
 ): ResponsePromise<AuthSettingsResponse> {
   return request<AuthSettingsResponse, PatchAuthSettingsRequest>(
     PATCH,
     '/auth/settings',
     config,
-    { body }
+    { body, userNotes }
   )
 }
