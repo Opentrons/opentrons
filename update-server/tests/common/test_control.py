@@ -7,14 +7,17 @@ from unittest import mock
 # Avoid pytest trying to collect TestClient because it begins with "Test".
 from aiohttp.test_utils import TestClient as HTTPTestClient
 
-from otupdate.common import control
+from otupdate.common.update_actions import UpdateActionsInterface
 
 
 async def test_restart(test_cli: Tuple[HTTPTestClient, str], monkeypatch) -> None:
     """It should restart the robot"""
     restart_mock = mock.Mock()
+    actions_mock = mock.Mock(restart=restart_mock)
 
-    monkeypatch.setattr(control, "_do_restart", restart_mock)
+    monkeypatch.setattr(
+        UpdateActionsInterface, "from_request", lambda request: actions_mock
+    )
     resp = await test_cli[0].post("/server/restart")
 
     assert resp.status == 200

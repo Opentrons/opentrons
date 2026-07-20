@@ -1,3 +1,4 @@
+import { customViewports } from '../../../../.storybook/preview'
 import { VIEWPORT } from '../../ui-style-constants'
 import { InlineNotification } from './index'
 
@@ -51,7 +52,9 @@ export default {
       if: { arg: 'hasLink' },
     },
   },
-  ...VIEWPORT.touchScreenViewport,
+  viewport: {
+    options: [VIEWPORT.touchScreenViewport, customViewports],
+  },
 } as Meta
 
 export interface WrapperProps extends React.ComponentProps<

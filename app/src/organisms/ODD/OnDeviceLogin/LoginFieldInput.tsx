@@ -18,7 +18,7 @@ export interface LoginFieldInputProps<
   error: string | null
   isPasswordField: boolean
   onClearError?: () => void
-  onFocus: () => void
+  autoFocus?: boolean
 }
 
 export function LoginFieldInput<
@@ -29,7 +29,7 @@ export function LoginFieldInput<
   error,
   isPasswordField,
   onClearError,
-  onFocus,
+  autoFocus,
 }: LoginFieldInputProps<TFieldName>): JSX.Element {
   const [showPassword, setShowPassword] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -44,18 +44,21 @@ export function LoginFieldInput<
   const inputField = (
     <TouchInputField
       ref={setRefs(inputRef, field.ref)}
+      autoFocus={autoFocus}
       type={inputType}
       label={label}
       error={error}
       value={field.value ?? ''}
       name={field.name}
       id={field.name}
-      onBlur={field.onBlur}
+      onBlur={e => {
+        field.onBlur()
+        e.target.focus()
+      }}
       onChange={(e: ChangeEvent<HTMLInputElement>) => {
         field.onChange(e.target.value)
         onClearError?.()
       }}
-      onFocus={onFocus}
     />
   )
 

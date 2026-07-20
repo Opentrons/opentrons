@@ -4,11 +4,9 @@ import { useSelector } from 'react-redux'
 import { Navigate, useParams } from 'react-router-dom'
 
 import { Banner, LegacyStyledText, SPACING } from '@opentrons/components'
-import {
-  ApiHostProvider,
-  useAccessControlEnabledQuery,
-} from '@opentrons/react-api-client'
+import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { RoundTab } from '/app/molecules/RoundTab'
 import { ReachableBanner } from '/app/organisms/Desktop/Devices/ReachableBanner'
 import { RobotSettingsAdvanced } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsAdvanced'
@@ -21,15 +19,8 @@ import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCe
 import { RobotSettingsCalibration } from '/app/organisms/Desktop/RobotSettingsCalibration'
 import { useIsRobotBusy, useRobot } from '/app/redux-resources/robots'
 import { getDevtoolsEnabled } from '/app/redux/config'
-import {
-  CONNECTABLE,
-  OPENTRONS_USB,
-  REACHABLE,
-  UNREACHABLE,
-} from '/app/redux/discovery'
-import { useAccessTokenForRobot } from '/app/redux/robot-auth'
+import { CONNECTABLE, REACHABLE, UNREACHABLE } from '/app/redux/discovery'
 import { getRobotUpdateSession } from '/app/redux/robot-update'
-import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
 import styles from './robotsettings.module.css'
 
@@ -41,15 +32,9 @@ export function RobotSettings(): JSX.Element {
     keyof DesktopRouteParams
   >() as DesktopRouteParams
   const robot = useRobot(robotName)
-  const token = useAccessTokenForRobot(robotName)
 
   return (
-    <ApiHostProvider
-      hostname={robot?.ip ?? null}
-      port={robot?.port ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
-      token={token}
-    >
+    <ApiHostProvider robotName={robotName}>
       <RobotCertRotator>
         <RobotSettingsComponent robot={robot} />
       </RobotCertRotator>
@@ -96,12 +81,12 @@ export function RobotSettingsComponent({
     camera: (
       <RobotSettingsCamera robotName={robotName} isRobotBusy={isRobotBusy} />
     ),
-    'file-manager': <RobotSettingsFileManager />,
+    'file-manager': <RobotSettingsFileManager robotName={robotName} />,
     advanced: (
       <RobotSettingsAdvanced robotName={robotName} isRobotBusy={isRobotBusy} />
     ),
     'compliance-ready': <RobotSettingsComplianceReady robotName={robotName} />,
-    'feature-flags': <RobotSettingsFeatureFlags robotName={robotName} />,
+    'feature-flags': <RobotSettingsFeatureFlags />,
   }
 
   const devToolsOn = useSelector(getDevtoolsEnabled)

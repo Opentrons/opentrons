@@ -4,7 +4,7 @@ import json
 import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from typing import Any, NotRequired, TypedDict, TypeGuard, cast, override
+from typing import Any, Callable, NotRequired, TypedDict, TypeGuard, cast, override
 
 import fastapi
 import oauthlib.common
@@ -42,7 +42,9 @@ class Backend:
         # "Legacy" refers to the fact that it uses the "resource owner password credentials"
         # grant type.
         self._inner_backend = oauthlib.oauth2.LegacyApplicationServer(
-            _RequestValidator(_TokenStore(), user_store, settings_store),
+            _RequestValidator(
+                _TokenStore(), user_store, settings_store, lambda: datetime.now(tz=UTC)
+            ),
             token_expires_in=get_token_expires_in,
         )
 
@@ -131,10 +133,13 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         token_store: _TokenStore,
         user_store: UserStore,
         settings_store: SettingsStore,
+        get_now: Callable[[], datetime],
     ) -> None:
         self.__token_store = token_store
         self.__user_store = user_store
         self.__settings_store = settings_store
+        self.__get_now = get_now
+
         super().__init__()
 
     @override
@@ -174,7 +179,12 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
 
         requested_scopes = set(scopes)
         return requested_scopes.issubset(
-            s.api_name for s in get_scope_set_of_user(user)
+            s.api_name
+            for s in get_scope_set_of_user(
+                user,
+                self.__get_now(),
+                self.__settings_store.get_settings().passwordResetTime,
+            )
         )
 
     @override
@@ -185,7 +195,12 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         """Scopes that we'll authorize a client for, if it doesn't ask for any explicitly."""
         assert isinstance(request.user, ORMUser)
         user: ORMUser = request.user
-        return sorted(s.api_name for s in get_scope_set_of_user(user))
+        scopes = get_scope_set_of_user(
+            user,
+            self.__get_now(),
+            self.__settings_store.get_settings().passwordResetTime,
+        )
+        return sorted(s.api_name for s in scopes)
 
     @override
     @pydantic.validate_call(config=_validate_call_config)
@@ -296,7 +311,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         client_id = request.client_id
         assert isinstance(client_id, str)
 
-        now = _now()
+        now = self.__get_now()
         expires_at = now + timedelta(seconds=expires_in)
         self.__token_store.prune_inactive(now)
         self.__token_store.save(
@@ -307,6 +322,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
                 refresh_token=refresh_token,
                 expires_at=expires_at,
                 scopes=scopes,
+                fullname=user.full_name,
             )
         )
 
@@ -323,7 +339,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
     ) -> bool:
         """Check if a refresh token is valid."""
         issuance = self.__token_store.find_active_refresh_token(
-            refresh_token, now=_now()
+            refresh_token, now=self.__get_now()
         )
         if issuance is not None:
             user = self.__user_store.get(issuance.username)
@@ -345,7 +361,9 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         These will be passed on to the refreshed access token if the client did not
         specify a scope during the request.
         """
-        token = self.__token_store.find_active_refresh_token(refresh_token, now=_now())
+        token = self.__token_store.find_active_refresh_token(
+            refresh_token, now=self.__get_now()
+        )
         assert token is not None
         return sorted(s.api_name for s in token.scopes)
 
@@ -363,16 +381,19 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         # oauthlib sets `"active": True` on any non-None response, and our resource
         # servers interpret that as meaning "this is a currently valid access token".
         found_access_token = self.__token_store.find_active_access_token(
-            token, now=_now()
+            token, now=self.__get_now()
         )
         if found_access_token is None:
             return None
         else:
             # Values defined by:
             # https://datatracker.ietf.org/doc/html/rfc7662#section-2.2
+            # except ot_fullname, which is custom to us. if you add other custom fields,
+            # please prefix them with ot-.
             return {
                 "scope": serialize_scopes(found_access_token.scopes),
                 "username": found_access_token.username,
+                "ot_fullname": found_access_token.fullname,
                 # "active": True is set implicitly by oauthlib.
             }
 
@@ -424,6 +445,7 @@ class _TokenIssuance:
     # to resist problems from clock adjustment.
     expires_at: datetime
     scopes: set[Scope]
+    fullname: str
 
 
 class _TokenStore:
@@ -466,7 +488,3 @@ def _is_list_of_type[ElementT](
         isinstance(element, expected_element_type)
         for element in cast(list[object], alleged_list)
     )
-
-
-def _now() -> datetime:
-    return datetime.now(tz=UTC)

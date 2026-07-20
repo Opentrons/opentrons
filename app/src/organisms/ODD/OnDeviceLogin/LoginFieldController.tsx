@@ -14,7 +14,6 @@ export interface LoginFieldControllerProps {
   loginError: string | null
   confirmPasswordError: string | null
   onClearFieldErrors: () => void
-  onFocus: () => void
 }
 
 export function LoginFieldController({
@@ -25,7 +24,6 @@ export function LoginFieldController({
   loginError,
   confirmPasswordError,
   onClearFieldErrors,
-  onFocus,
 }: LoginFieldControllerProps): JSX.Element | null {
   if (step === 'username') {
     return (
@@ -40,7 +38,7 @@ export function LoginFieldController({
             error={null}
             isPasswordField={false}
             onClearError={onClearFieldErrors}
-            onFocus={onFocus}
+            autoFocus
           />
         )}
       />
@@ -67,7 +65,7 @@ export function LoginFieldController({
             error={passwordError}
             isPasswordField={true}
             onClearError={onClearFieldErrors}
-            onFocus={onFocus}
+            autoFocus
           />
         )}
       />
@@ -87,7 +85,7 @@ export function LoginFieldController({
             error={confirmPasswordError}
             isPasswordField={true}
             onClearError={onClearFieldErrors}
-            onFocus={onFocus}
+            autoFocus
           />
         )}
       />

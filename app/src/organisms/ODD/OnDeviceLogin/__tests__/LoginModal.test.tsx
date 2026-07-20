@@ -37,7 +37,6 @@ function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
     username: 'alice',
     fullName: 'Alice',
     accountType: 'user',
-    scopes: [],
     locked: false,
     resetPassword: false,
     ...overrides,

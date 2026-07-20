@@ -173,6 +173,7 @@ export function InstrumentsAndModules({
                         : null
                     }
                     mount={LEFT}
+                    robotName={robotName}
                     isRunActive={currentRunId != null && isRunRunning}
                     isEstopNotDisengaged={isEstopNotDisengaged}
                   />
@@ -220,6 +221,7 @@ export function InstrumentsAndModules({
                       : null
                   }
                   mount={RIGHT}
+                  robotName={robotName}
                   isRunActive={currentRunId != null && isRunRunning}
                   isEstopNotDisengaged={isEstopNotDisengaged}
                 />

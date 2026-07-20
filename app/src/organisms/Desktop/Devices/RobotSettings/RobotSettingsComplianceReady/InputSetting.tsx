@@ -1,27 +1,28 @@
-import { useId } from 'react'
+import { useId, useState } from 'react'
 
 import { COLORS, InputField, StyledText } from '@opentrons/components'
 
 import styles from './inputsetting.module.css'
 
-import type { ChangeEventHandler, JSX } from 'react'
+import type { JSX } from 'react'
 
 export interface InputSettingProps {
   label: string
   value: string
   units?: string
   placeholder?: string
-  onChange: ChangeEventHandler<HTMLInputElement>
+  onBlur: (value: string) => void
 }
 
 export function InputSetting({
   label,
   value,
   units,
-  onChange,
+  onBlur,
   placeholder,
 }: InputSettingProps): JSX.Element {
   const inputId = useId()
+  const [inputValue, setInputValue] = useState(value)
 
   return (
     <div className={styles.field_row}>
@@ -32,7 +33,7 @@ export function InputSetting({
         <InputField
           id={inputId}
           type="number"
-          value={value}
+          value={inputValue}
           placeholder={placeholder}
           units={
             units != null ? (
@@ -44,7 +45,12 @@ export function InputSetting({
               </StyledText>
             ) : undefined
           }
-          onChange={onChange}
+          onChange={event => {
+            setInputValue(event.target.value)
+          }}
+          onBlur={event => {
+            onBlur(event.target.value)
+          }}
         />
       </div>
     </div>

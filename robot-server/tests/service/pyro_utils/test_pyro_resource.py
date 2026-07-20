@@ -35,6 +35,7 @@ from opentrons_shared_data.robot.types import RobotTypeEnum
 from server_utils.fastapi_utils.app_state import AppState
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
+from robot_server.hardware import HardwareStateStore
 from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
 )
@@ -354,3 +355,46 @@ async def test_notify_publisher(
     result = robot_server_resource.get_notify_publishers()
 
     assert isinstance(result, ClientPyroFunctionWrapper)
+
+
+async def test_run_hardware_state_update_callback(
+    ot3_hardware_api: OT3API,
+    mock_app_state: AppState,
+    mock_feature_flags: None,
+    mock_run_process_pyro_provider: RunProcessPyroProvider,
+    decoy: Decoy,
+) -> None:
+    """Enforce that the RobotServerPyroResource provides a proxy of a callback.
+
+    It should be provided to the hardware state update handler, and recieves a callback proxy in response.
+    """
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
+    ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
+        hw_api=ot3_hardware_api, app_state=mock_app_state
+    )
+    # Cast the two Async proxies on the nameserver as a locally useful type
+    ot3api = cast(OT3API, ot3_async)
+    robot_server_resource = cast(pyro_resource.RobotServerPyroResource, rs_async)
+
+    run_store = RunOrchestratorStore(
+        hardware_api=ot3api,
+        robot_type="OT-3 Standard",
+        deck_type=DeckType("ot3_standard"),
+        run_process_pyro_provider=mock_run_process_pyro_provider,
+    )
+
+    resource_utilities.register_run_orchestrator_store_to_pyro_resource(
+        mock_app_state, run_store
+    )
+
+    hardware_store = HardwareStateStore(hardware_resource=ot3_hardware_api)
+
+    resource_utilities.register_hardware_state_store_to_pyro_resource(
+        mock_app_state, hardware_store
+    )
+
+    hardware_event_callback = ot3api.register_callback(
+        robot_server_resource.create_hardware_state_update_callback()
+    )
+
+    assert isinstance(hardware_event_callback, ClientPyroFunctionWrapper)

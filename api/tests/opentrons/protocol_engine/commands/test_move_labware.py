@@ -66,6 +66,11 @@ def patch_mock_labware_validation(
     """Mock out labware_validation.py functions."""
     for name, func in inspect.getmembers(labware_validation, inspect.isfunction):
         monkeypatch.setattr(labware_validation, name, decoy.mock(func=func))
+    decoy.when(
+        labware_validation.validate_definition_is_deck_slot_compatible(
+            matchers.Anything()
+        )
+    ).then_return(True)
 
 
 @pytest.fixture
@@ -531,6 +536,17 @@ async def test_clears_location_if_current_labware_moved_from_under_pipette(
             offsetId=None,
         )
     )
+
+    lw_def = LabwareDefinition2.model_construct(
+        namespace="opentrons-test",
+        parameters=Parameters2.model_construct(),  # type: ignore[call-arg]
+    )
+    decoy.when(
+        state_view.labware.get_definition(labware_id=moved_labware_id)
+    ).then_return(lw_def)
+    decoy.when(
+        state_view.geometry.ensure_location_not_occupied(to_location, None, lw_def)
+    ).then_return(to_location)
 
     decoy.when(state_view.pipettes.get_current_location()).then_return(
         CurrentWell(

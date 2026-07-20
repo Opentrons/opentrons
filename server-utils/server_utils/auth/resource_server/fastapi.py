@@ -11,6 +11,7 @@ from typing import (
     Awaitable,
     Callable,
     Final,
+    Type,
     TypeAlias,
 )
 
@@ -28,6 +29,7 @@ from .authorization_checker import (
     InsufficientScopeResult,
     MissingTokenResult,
     NotAnActiveTokenResult,
+    UnableToContactAuthServerResult,
 )
 from .error_responses import build_response_for_error
 from server_utils.auth.scopes import Scope
@@ -147,7 +149,10 @@ def install_authorization_checker(
 
 @asynccontextmanager
 async def build_authorization_checker(
-    *, auth_server_uds: str | None = None, auth_server_url: str | None = None
+    *,
+    auth_server_uds: str | None = None,
+    auth_server_url: str | None = None,
+    fallback: Type[AuthorizationChecker] = AlwaysAllowedAuthorizationChecker,
 ) -> AsyncGenerator[AuthorizationChecker, None]:
     """Build an `AuthorizationChecker` appropriately configured for most servers.
 
@@ -163,7 +168,7 @@ async def build_authorization_checker(
             " Access control will be disabled."
             " (This is normal in dev mode and on OT-2s.)"
         )
-        yield AlwaysAllowedAuthorizationChecker()
+        yield fallback()
 
     else:
         async with LocalHTTPClient(
@@ -196,9 +201,12 @@ class AuthorizationError(Exception):
 
     def __init__(
         self,
-        authorization_error: InsufficientScopeResult
-        | MissingTokenResult
-        | NotAnActiveTokenResult,
+        authorization_error: (
+            InsufficientScopeResult
+            | MissingTokenResult
+            | NotAnActiveTokenResult
+            | UnableToContactAuthServerResult
+        ),
         required_scopes: set[Scope],
     ) -> None:
         self.authorization_error: Final = authorization_error

@@ -5,7 +5,7 @@ from typing import Optional
 from unittest.mock import sentinel
 
 import pytest
-from decoy import Decoy
+from decoy import Decoy, matchers
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
@@ -50,6 +50,11 @@ def patch_mock_labware_validation(
     """Mock out labware_validations.py functions."""
     for name, func in inspect.getmembers(labware_validation, inspect.isfunction):
         monkeypatch.setattr(labware_validation, name, decoy.mock(func=func))
+    decoy.when(
+        labware_validation.validate_definition_is_deck_slot_compatible(
+            matchers.Anything()
+        )
+    ).then_return(True)
 
 
 @pytest.mark.parametrize("display_name", ["My custom display name", None])
@@ -149,6 +154,40 @@ async def test_load_labware_on_slot_or_addressable_area(
             ),
         ),
     )
+
+
+async def test_load_labware_raises_if_not_deck_slot_compatible(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    equipment: EquipmentHandler,
+    state_view: StateView,
+) -> None:
+    """A LoadLabware command should raise if labware cannot load onto a deck slot."""
+    subject = LoadLabwareImplementation(equipment=equipment, state_view=state_view)
+
+    data = LoadLabwareParams(
+        location=AddressableAreaLocation(addressableAreaName="D2"),
+        loadName="millipore_96_wellplate_300ul_hts_filter",
+        namespace="opentrons",
+        version=1,
+    )
+
+    decoy.when(
+        await equipment.load_definition_for_details(
+            load_name="millipore_96_wellplate_300ul_hts_filter",
+            namespace="opentrons",
+            version=1,
+        )
+    ).then_return(
+        (well_plate_def, "opentrons/millipore_96_wellplate_300ul_hts_filter/1")
+    )
+
+    decoy.when(
+        labware_validation.validate_definition_is_deck_slot_compatible(well_plate_def)
+    ).then_return(False)
+
+    with pytest.raises(LabwareIsNotAllowedInLocationError):
+        await subject.execute(data)
 
 
 async def test_load_labware_raises_location_not_allowed(

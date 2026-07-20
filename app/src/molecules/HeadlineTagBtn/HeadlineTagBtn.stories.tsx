@@ -1,6 +1,7 @@
 import { Tag, VIEWPORT } from '@opentrons/components'
 
 import { HeadlineTagBtn as HeadlineTagBtnComponent } from '.'
+import { customViewports } from '../../../../.storybook/preview'
 
 import type { Meta, Story } from '@storybook/react'
 
@@ -26,7 +27,9 @@ export default {
       if: { arg: 'hasTag', eq: true },
     },
   },
-  ...VIEWPORT.touchScreenViewport,
+  viewport: {
+    options: [VIEWPORT.touchScreenViewport, customViewports],
+  },
 } as Meta
 
 interface HeadlineTagBtnStoryProps {

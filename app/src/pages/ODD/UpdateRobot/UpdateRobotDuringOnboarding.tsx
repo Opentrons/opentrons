@@ -20,6 +20,7 @@ import { getLocalRobot } from '/app/redux/discovery'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
 import {
   clearRobotUpdateSession,
+  downloadRobotUpdate,
   getRobotUpdateAvailable,
 } from '/app/redux/robot-update'
 import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
@@ -94,6 +95,7 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
             <MediumButton
               flex="1"
               onClick={() => {
+                dispatch(downloadRobotUpdate())
                 dispatchStartRobotUpdate(robotName)
               }}
               buttonText={i18n.format(t('shared:try_again'), 'capitalize')}

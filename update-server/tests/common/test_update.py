@@ -18,7 +18,7 @@ from tests.openembedded.conftest import (
 
 from otupdate.buildroot import config, update, update_actions
 from otupdate.common import file_actions
-from otupdate.common.session import Stages, UpdateSession
+from otupdate.common.session import SESSION_VARNAME, Stages, UpdateSession
 from otupdate.common.update_actions import UpdateActionsInterface
 from otupdate.openembedded import OT3UpdateActions, RootFSInterface
 
@@ -36,13 +36,14 @@ def session_endpoint(token, endpoint):
 
 
 async def test_begin(test_cli: Tuple[HTTPTestClient, str]):
-    # Creating a session should work
+    # Creating a session with an empty body should work
     resp = await test_cli[0].post("/server/update/begin")
     body = await resp.json()
     assert resp.status == 201
     assert "token" in body
-    assert test_cli[0].server.app.get(update.SESSION_VARNAME)
-    assert test_cli[0].server.app[update.SESSION_VARNAME].token == body["token"]
+    assert test_cli[0].server.app.get(SESSION_VARNAME)
+    assert test_cli[0].server.app[SESSION_VARNAME].token == body["token"]
+    assert body["auto_commit_and_restart"] is False
 
     # Creating a session twice shouldn’t
     resp = await test_cli[0].post("/server/update/begin")
@@ -51,14 +52,58 @@ async def test_begin(test_cli: Tuple[HTTPTestClient, str]):
     assert "message" in body
 
 
+@pytest.mark.parametrize("auto_commit_and_restart", [True, False, None])
+async def test_begin_with_params(
+    test_cli: Tuple[HTTPTestClient, str],
+    auto_commit_and_restart: bool | None,
+) -> None:
+    # Creating a session with parameters should reflect those parameters in the response body
+    request_body = {}
+    if auto_commit_and_restart is not None:
+        request_body["auto_commit_and_restart"] = auto_commit_and_restart
+
+    resp = await test_cli[0].post("/server/update/begin", json=request_body)
+    body = await resp.json()
+
+    assert resp.status == 201
+    assert "token" in body
+    assert body["auto_commit_and_restart"] == (auto_commit_and_restart or False)
+
+
+async def test_begin_invalid_request(test_cli: Tuple[HTTPTestClient, str]) -> None:
+    resp = await test_cli[0].post("/server/update/begin", data="not json")
+    body = await resp.json()
+    assert resp.status == 400
+    assert body["error"] == "invalid-request"
+    assert "message" in body
+    assert test_cli[0].server.app.get(SESSION_VARNAME) is None
+
+    resp = await test_cli[0].post(
+        "/server/update/begin",
+        json={"auto_commit_and_restart": 1},
+    )
+    body = await resp.json()
+    assert resp.status == 400
+    assert body["error"] == "invalid-request"
+    assert body["message"] == "auto_commit_and_restart must be a boolean"
+    assert test_cli[0].server.app.get(SESSION_VARNAME) is None
+
+    resp = await test_cli[0].post("/server/update/begin", data="null")
+    body = await resp.json()
+    assert resp.status == 400
+    assert body["error"] == "invalid-request"
+    assert body["message"] == "Request body must be a JSON object"
+    assert test_cli[0].server.app.get(SESSION_VARNAME) is None
+
+
 async def test_cancel(test_cli: Tuple[HTTPTestClient, str]):
     # cancelling when there’s a session should work great
     resp = await test_cli[0].post("/server/update/begin")
-    assert test_cli[0].server.app.get(update.SESSION_VARNAME)
+    assert test_cli[0].server.app.get(SESSION_VARNAME)
 
     resp = await test_cli[0].post("/server/update/cancel")
     assert resp.status == 200
-    assert test_cli[0].server.app.get(update.SESSION_VARNAME) is None
+    assert test_cli[0].server.app.get(SESSION_VARNAME) is None
 
     # and so should cancelling when there isn’t one
 
@@ -94,7 +139,10 @@ async def test_updater_chain(
     sys_handler,
 ):
     conf = config.load_from_path(otupdate_config)
-    session = UpdateSession(conf.download_storage_path)
+    session = UpdateSession(
+        storage_path=conf.download_storage_path,
+        auto_commit_and_restart=False,
+    )
     fut = update._begin_validation(
         session,
         conf,
@@ -127,7 +175,10 @@ async def test_session_catches_validation_fail(
     sys_handler,
 ):
     conf = config.load_from_path(otupdate_config)
-    session = UpdateSession(conf.download_storage_path)
+    session = UpdateSession(
+        storage_path=conf.download_storage_path,
+        auto_commit_and_restart=False,
+    )
     fut = update._begin_validation(
         session,
         conf,

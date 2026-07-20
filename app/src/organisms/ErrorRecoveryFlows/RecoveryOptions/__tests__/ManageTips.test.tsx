@@ -348,6 +348,35 @@ describe('useDropTipFlowUtils', () => {
     expect(mockUpdateSubMap).toHaveBeenCalledWith(currentMap)
   })
 
+  it('should route to begin removal when documentation is cancelled with no selected option', () => {
+    const { result } = renderHook(() => useDropTipFlowUtils(mockProps))
+
+    result.current.onDocumentationCancel?.()
+
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+      DROP_TIP_FLOWS.ROUTE,
+      DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL
+    )
+  })
+
+  it('should route to confirm cancel when documentation is cancelled during cancel run', () => {
+    const { result } = renderHook(() =>
+      useDropTipFlowUtils({
+        ...mockProps,
+        currentRecoveryOptionUtils: {
+          selectedRecoveryOption: RECOVERY_MAP.CANCEL_RUN.ROUTE,
+        },
+      } as any)
+    )
+
+    result.current.onDocumentationCancel?.()
+
+    expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
+      RECOVERY_MAP.CANCEL_RUN.ROUTE,
+      RECOVERY_MAP.CANCEL_RUN.STEPS.CONFIRM_CANCEL
+    )
+  })
+
   it('should return the correct error overrides', () => {
     const { result } = renderHook(() => useDropTipFlowUtils(mockProps))
 

@@ -99,6 +99,10 @@ async function prefixForProject(project) {
   return (await gitVersion()).prefixForProject(project)
 }
 
+async function tagGlobForProject(project) {
+  return (await gitVersion()).tagGlobForProject(project)
+}
+
 async function versionDetailsFromGit(tag, allowOld) {
   if (!allowOld) {
     const git = await monorepoGit()
@@ -115,15 +119,25 @@ async function versionDetailsFromGit(tag, allowOld) {
 
   const [project, currentVersion] = await detailsFromTag(tag)
   const prefix = await prefixForProject(project)
-  const allTags = (await (await monorepoGit()).tags([prefix + '*'])).all
+  const tagPattern = await tagGlobForProject(project)
+  const allTags = (await (await monorepoGit()).tags([tagPattern])).all
   if (!allTags.includes(tag)) {
     throw new Error(
       `Tag ${tag} does not exist - create it before running this script`
     )
   }
   const allVersions = await Promise.all(allTags.map(tag => detailsFromTag(tag)))
+  const invalidTags = allTags.filter(
+    (candidateTag, index) => semver.valid(allVersions[index][1]) == null
+  )
+  if (invalidTags.length > 0) {
+    console.warn(
+      `Ignoring tags with non-semver robot-stack versions: ${invalidTags.join(', ')}`
+    )
+  }
   const sortedVersions = allVersions
     .map(details => details[1])
+    .filter(version => semver.valid(version) != null)
     .sort(semver.compare)
     .reverse()
   const previousVersion = versionPrevious(currentVersion, sortedVersions)

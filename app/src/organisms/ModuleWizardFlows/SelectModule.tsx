@@ -28,9 +28,8 @@ import {
   SimpleWizardBodyContainer,
 } from '/app/molecules/SimpleWizardBody'
 
-import { useSendIdentifyModule } from './hooks'
-
 import type { AttachedModule } from '@opentrons/api-client'
+import type { SendIdentifyModule } from './types'
 
 interface SelectModuleProps {
   buildFlowForSelectedModule: (module: AttachedModule) => void
@@ -39,6 +38,7 @@ interface SelectModuleProps {
   setSelectedModule: (module: AttachedModule | null) => void
   setShowLaunchSetup: (show: boolean) => void
   attachedModuleOnLaunch?: AttachedModule | null
+  sendIdentifyModule: SendIdentifyModule
 }
 
 interface ModuleNameAndPort {
@@ -54,6 +54,7 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
     setSelectedModule,
     setShowLaunchSetup,
     attachedModuleOnLaunch = null,
+    sendIdentifyModule,
   } = props
   const { t } = useTranslation('module_wizard_flows')
 
@@ -75,7 +76,6 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
   const isSingleModule = newModules.length === 1 && !hasUnsetupabbleModules
   // Unless, of course, we're being invoked by a caller giving us a specific module
   const shortCircuitFlow = attachedModuleOnLaunch != null || isSingleModule
-  const sendIdentifyModule = useSendIdentifyModule()
 
   const getModuleNameAndPort = (module: AttachedModule): ModuleNameAndPort => {
     const name = getModuleDisplayName(module.moduleModel)

@@ -35,11 +35,11 @@ import {
 } from '@opentrons/components'
 import {
   useErrorRecoverySettings,
-  useHost,
   useProtocolQuery,
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { RunTimer } from '/app/molecules/RunTimer'
@@ -86,7 +86,6 @@ export function RunSummary(): JSX.Element {
   >() as OnDeviceRouteParams
   const { t } = useTranslation('run_details')
   const navigate = useNavigate()
-  const host = useHost()
   const { data: runRecord } = useNotifyRunQuery(runId, {
     staleTime: Infinity,
     onError: () => {
@@ -148,7 +147,8 @@ export function RunSummary(): JSX.Element {
   const trackEvent = useTrackEvent()
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
-  const { closeCurrentRun } = useCloseCurrentRun()
+  const documentationState = useDocumentationState()
+  const { closeCurrentRun } = useCloseCurrentRun(documentationState)
   // Close the current run only if it's active and then execute the onSuccess callback. Prefer this wrapper over
   // closeCurrentRun directly, since the callback is swallowed if currentRun is null.
   const closeCurrentRunIfValid = (onSettled?: () => void): void => {
@@ -257,7 +257,12 @@ export function RunSummary(): JSX.Element {
   // TODO(jh, 05-30-24): EXEC-487. Refactor reset() so we can redirect to the setup page, showing the shimmer skeleton instead.
   const runAgain = (): void => {
     setShowRunAgainSpinner(true)
-    reset()
+    reset({
+      onError: () => {
+        // e.g. user cancelled the documentation modal
+        setShowRunAgainSpinner(false)
+      },
+    })
     if (isQuickTransfer) {
       trackEventWithRobotSerial({
         name: ANALYTICS_QUICK_TRANSFER_RERUN,
@@ -289,7 +294,7 @@ export function RunSummary(): JSX.Element {
     if (isRunCurrent && aPipetteWithTip != null) {
       void handleTipsAttachedModal({
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleReturnToDash),
-        host,
+        robotName,
         aPipetteWithTip,
         onSuccess: () => {
           closeCurrentRunIfValid(() => {
@@ -308,7 +313,7 @@ export function RunSummary(): JSX.Element {
     if (isRunCurrent && aPipetteWithTip != null) {
       void handleTipsAttachedModal({
         setTipStatusResolved: setTipStatusResolvedAndRoute(handleRunAgain),
-        host,
+        robotName,
         aPipetteWithTip,
         onSuccess: () => {
           runAgain()

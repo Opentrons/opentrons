@@ -22,6 +22,7 @@ import {
   UpdateChannel,
 } from '/app/organisms/ODD/RobotSettingsDashboard'
 import { CameraPreferences } from '/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences'
+import { FileManager } from '/app/organisms/ODD/RobotSettingsDashboard/FileManager'
 import { EthernetConnectionDetails } from '/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings/EthernetConnectionDetails'
 import {
   getLocalRobot,
@@ -232,6 +233,8 @@ export function RobotSettingsDashboard(): JSX.Element {
       return (
         <RobotEncryptionKeySettingOption setCurrentOption={setCurrentOption} />
       )
+    case 'FileManager':
+      return <FileManager setCurrentOption={setCurrentOption} />
 
     // fallthrough option: render the robot settings list of buttons
     default:

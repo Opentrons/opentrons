@@ -46,7 +46,6 @@ describe('useSetNewPasswordAndSignIn', () => {
         username: 'alice',
         fullName: 'Alice',
         accountType: 'user',
-        scopes: [],
         locked: false,
         resetPassword: false,
       },
@@ -70,9 +69,13 @@ describe('useSetNewPasswordAndSignIn', () => {
     })
 
     await waitFor(() => {
-      expect(mockUpdateSelf).toHaveBeenCalledWith(host, {
-        data: { password: 'new-secret' },
-      })
+      expect(mockUpdateSelf).toHaveBeenCalledWith(
+        host,
+        {
+          data: { password: 'new-secret' },
+        },
+        ''
+      )
     })
     expect(mockGetOAuth2Token).toHaveBeenCalledWith(host, {
       grant_type: 'password',

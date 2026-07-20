@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import { Snackbar as SnackbarComponent } from '.'
+import { customViewports } from '../../../../.storybook/preview'
 import { Flex, STYLE_PROPS } from '../../primitives'
 import {
   ALIGN_CENTER,
@@ -17,7 +18,9 @@ import type { Meta, StoryObj } from '@storybook/react'
 const meta: Meta<typeof SnackbarComponent> = {
   title: 'Helix/Atoms/Snackbar',
   component: SnackbarComponent,
-  ...VIEWPORT.touchScreenViewport,
+  viewport: {
+    options: [VIEWPORT.touchScreenViewport, customViewports],
+  },
   argTypes: {
     // Disable all StyleProps
     ...Object.fromEntries(

@@ -7,12 +7,13 @@ import type { RobotSettingsResponse, UpdateRobotSettingRequest } from './types'
 export function updateRobotSetting(
   config: HostConfig,
   id: string,
-  value: boolean
+  value: boolean,
+  userNotes: string
 ): ResponsePromise<RobotSettingsResponse> {
   return request<RobotSettingsResponse, UpdateRobotSettingRequest>(
     POST,
     '/settings',
     config,
-    { body: { id, value } }
+    { body: { id, value }, userNotes }
   )
 }

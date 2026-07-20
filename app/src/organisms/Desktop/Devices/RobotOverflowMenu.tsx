@@ -111,7 +111,6 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           to={`/devices/${robot.name}/robot-settings`}
           as={Link}
           textTransform={TYPOGRAPHY.textTransformCapitalize}
-          id={`RobotOverflowMenu_${robot.name}_robotSettings`}
           css={css`
             border-radius: 0 0 ${BORDERS.borderRadius8} ${BORDERS.borderRadius8};
           `}
@@ -126,7 +125,6 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
         to={`/devices/${robot.name}/robot-settings`}
         as={Link}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
-        id={`RobotOverflowMenu_${robot.name}_robotSettings_${runId}`}
         css={css`
           border-radius: ${BORDERS.borderRadius8};
         `}
@@ -139,7 +137,6 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
       <>
         <MenuItem
           onClick={handleClickConnectionTroubleshooting}
-          id={`RobotOverflowMenu_${String(robot.name)}_robotUnavailable`}
           css={css`
             border-radius: ${BORDERS.borderRadius8} ${BORDERS.borderRadius8} 0 0;
           `}
@@ -148,7 +145,6 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
         </MenuItem>
         <MenuItem
           onClick={() => dispatch(removeRobot(robot.name))}
-          id={`RobotOverflowMenu_${String(robot.name)}_removeRobot`}
           css={css`
             border-radius: 0 0 ${BORDERS.borderRadius8} ${BORDERS.borderRadius8};
           `}
@@ -184,7 +180,6 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           top="2.25rem"
           right="0"
           flexDirection={DIRECTION_COLUMN}
-          id={`RobotOverflowMenu_${String(robot.name)}_buttons`}
         >
           {menuItems}
         </Flex>

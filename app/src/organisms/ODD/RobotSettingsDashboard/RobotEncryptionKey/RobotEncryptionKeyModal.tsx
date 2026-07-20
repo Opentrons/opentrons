@@ -3,14 +3,13 @@ import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import { StyledText } from '@opentrons/components'
-import {
-  ApiHostProvider,
-  useCACertPasswordQuery,
-} from '@opentrons/react-api-client'
+import { useCACertPasswordQuery } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { OddModal } from '/app/molecules/OddModal'
 import { RadialTimer } from '/app/molecules/RadialTimer'
+import { useLocalRobotName } from '/app/redux-resources/robots/hooks/useLocalRobotName'
 import { appShellInternalApiRequestor } from '/app/redux/shell/remote'
 import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/encryptionKeys'
 
@@ -112,9 +111,11 @@ function RobotEncryptionKeyModalElement({
 
 export const RobotEncryptionKeyModal = NiceModal.create((): JSX.Element => {
   const { clearClientData } = useUpdateClientDataEncryptionKeys()
+  const robotName = useLocalRobotName()
+
   return (
     <ApiHostProvider
-      hostname={_ODD_IP_ ?? 'localhost'}
+      robotName={robotName}
       requestor={appShellInternalApiRequestor}
     >
       <RobotEncryptionKeyModalElement clearClientData={clearClientData} />

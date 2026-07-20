@@ -56,7 +56,6 @@ export function RunHeaderSectionUpper(
             <AlertPrimaryButton
               borderRadius={BORDERS.borderRadiusFull}
               onClick={handleCancelRunClick}
-              id="RunHeader_cancelRunButton"
             >
               <StyledText
                 oddStyle="bodyTextSemiBold"

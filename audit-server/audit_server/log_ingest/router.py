@@ -4,23 +4,25 @@ import datetime
 from logging import getLogger
 from typing import Annotated
 
-import aiohttp
 import fastapi
+from opentrons_shared_data.errors.exceptions import (
+    AuditLoggingError,
+    KeyStorageUnavailableError,
+)
 
 from server_utils.fastapi_utils.models.json_api import (
     PydanticResponse,
     RequestModel,
     SimpleBody,
 )
-from server_utils.keys.fastapi import get_key_client
-from server_utils.keys.key_server import Client as KeyClient
-from server_utils.keys.key_server import SignMessageData
 
 from .models import (
     AuditLogMessage,
     SubmitAuditLogMessageData,
     SubmitAuditLogSuccessData,
 )
+from audit_server.log_storage.dependency import get_log_data_manager
+from audit_server.log_storage.log_data_manager import LogDataManager
 
 LOG = getLogger(__name__)
 
@@ -41,11 +43,14 @@ router = fastapi.APIRouter()
                 " could not be signed."
             ),
         },
+        fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR: {
+            "description": "The audit log request failed for an unknown reason."
+        },
     },
 )
 async def post_log_message(
     request_body: RequestModel[SubmitAuditLogMessageData],
-    key_client: Annotated[KeyClient, fastapi.Depends(get_key_client)],
+    log_data_manager: Annotated[LogDataManager, fastapi.Depends(get_log_data_manager)],
 ) -> PydanticResponse[SimpleBody[SubmitAuditLogSuccessData]]:
     """Log an audit message."""
     ingest_time = datetime.datetime.now(datetime.timezone.utc)
@@ -59,23 +64,19 @@ async def post_log_message(
     )
     message_str = message.model_dump_json(indent=None)
     try:
-        signed_message = await key_client.sign_message(
-            SignMessageData(message=message_str, previousHash=None)
-        )
-    except aiohttp.ClientConnectionError as exc:
-        # The key-server is unreachable. We refuse to ingest the message rather
-        # than persisting it without a signature, so callers can retry once the
-        # key-server is back up.
-        LOG.warning("Key-server is unreachable: %s", exc)
+        await log_data_manager.store_log(message_str)
+    except KeyStorageUnavailableError as exc:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=(
                 "Audit log message could not be signed: key-server is unavailable."
             ),
         ) from exc
-    LOG.info(
-        f"Logged message={signed_message.message} hash={signed_message.messageHash} sig={signed_message.messageSignature} ver={signed_message.signatureVersion}"
-    )
+    except AuditLoggingError as exc:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Audit log could not be stored.",
+        ) from exc
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_201_CREATED,
         content=SimpleBody(data=SubmitAuditLogSuccessData(loggedAt=ingest_time)),

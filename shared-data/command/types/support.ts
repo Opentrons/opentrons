@@ -6,9 +6,7 @@ import type {
 } from '../../js/constants'
 
 type BaseWellOrigin =
-  | typeof WELL_ORIGIN_TOP
-  | typeof WELL_ORIGIN_BOTTOM
-  | typeof WELL_ORIGIN_CENTER
+  typeof WELL_ORIGIN_TOP | typeof WELL_ORIGIN_BOTTOM | typeof WELL_ORIGIN_CENTER
 
 export type WellOrigin = BaseWellOrigin | typeof WELL_ORIGIN_MENISCUS
 export interface WellOffset {

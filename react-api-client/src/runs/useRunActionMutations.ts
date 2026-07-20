@@ -10,7 +10,7 @@ import {
 } from '..'
 import { getQueryKey } from '../api'
 
-import type { DocumentationState } from '../access_control'
+import type { DocumentationState } from '../accessControl'
 
 interface UseRunActionMutations {
   playRun: () => void
@@ -48,9 +48,12 @@ export function useRunActionMutations(
     }
   )
 
-  const { pauseRun, isLoading: isPauseRunActionLoading } = usePauseRunMutation({
-    onSuccess,
-  })
+  const { pauseRun, isLoading: isPauseRunActionLoading } = usePauseRunMutation(
+    documentationState,
+    {
+      onSuccess,
+    }
+  )
 
   const { stopRun, isLoading: isStopRunActionLoading } =
     useStopRunMutation(documentationState)
@@ -58,12 +61,12 @@ export function useRunActionMutations(
   const {
     resumeRunFromRecovery,
     isLoading: isResumeRunFromRecoveryActionLoading,
-  } = useResumeRunFromRecoveryMutation()
+  } = useResumeRunFromRecoveryMutation(documentationState)
 
   const {
     resumeRunFromRecoveryAssumingFalsePositive,
     isLoading: isResumeRunFromRecoveryAssumingFalsePositiveActionLoading,
-  } = useResumeRunFromRecoveryAssumingFalsePositiveMutation()
+  } = useResumeRunFromRecoveryAssumingFalsePositiveMutation(documentationState)
 
   return {
     playRun: () => {

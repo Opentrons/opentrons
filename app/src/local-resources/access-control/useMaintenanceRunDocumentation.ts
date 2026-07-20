@@ -1,7 +1,6 @@
-import { useCallback, useState } from 'react'
-
-import { useGuardedAction } from './useGuardedAction'
-import { usePromptForInteractionReason } from './usePromptForInteractionReason'
+import { useActionsToDocumentList } from './useActionsToDocumentList'
+import { useDocumentationState } from './useDocumentationState'
+import { usePromptForDocumentation } from './usePromptForDocumentation'
 
 import type {
   DocumentationState,
@@ -16,6 +15,7 @@ import type {
  * @param maintenanceRunName: The name of the maintenance run, to be displayed in the initial documentation modal.
  * @param onCancelStart: Optional callback when the user backs out of the initial documentation modal.
  * @param initialDocstate: An optional documentation state - to be used in flows like attaching where prompting needs to occur before the first mutation.
+ * @param promptEnabled: When false, defer the command documentation prompt until set to true. Defaults to true.
  *
  * @returns commandDocState: DocumentationState to be passed to the creation hook and the maintenance run commands.
  * @returns deletionDocState: DocumentationState to be passed to the deletion hook.
@@ -25,7 +25,8 @@ import type {
 export const useMaintenanceRunDocumentation = (
   maintenanceRunName: DocumentedAction,
   onCancelStart?: () => void,
-  initialDocstate?: DocumentationState
+  initialDocstate?: DocumentationState,
+  promptEnabled: boolean = true
 ): {
   commandDocState: DocumentationState
   deletionDocState: DocumentationState
@@ -33,19 +34,16 @@ export const useMaintenanceRunDocumentation = (
   addActionToDocument: (action: DocumentedAction) => void
   isLoading: boolean
 } => {
-  const [actionsToDocument, setActionsToDocument] = useState<
-    DocumentedAction[]
-  >([maintenanceRunName])
-  const commandDocState = usePromptForInteractionReason(
-    [maintenanceRunName],
+  const [actionsToDocument, addActionToDocument] = useActionsToDocumentList([
+    maintenanceRunName,
+  ])
+  const commandDocState = usePromptForDocumentation(
+    actionsToDocument,
     onCancelStart,
-    initialDocstate
+    initialDocstate,
+    promptEnabled
   )
-  const deletionDocState = useGuardedAction()
-
-  const addActionToDocument = useCallback((action: DocumentedAction) => {
-    setActionsToDocument(prev => [...prev, action])
-  }, [])
+  const deletionDocState = useDocumentationState()
 
   return {
     isLoading: commandDocState.isLoading || deletionDocState.isLoading,

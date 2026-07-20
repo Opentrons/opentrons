@@ -112,6 +112,7 @@ from .types import (
     HepaFanState,
     HepaUVState,
     InstrumentProbeType,
+    ModuleConnectedNotification,
     ModuleDisconnectedNotification,
     MotionChecks,
     OT3AxisKind,
@@ -123,6 +124,7 @@ from .types import (
     StatusBarUpdateListener,
     StatusBarUpdateUnsubscriber,
     SubSystem,
+    SubsystemConnectionNotification,
     SubSystemState,
     TipScrapeType,
     TipStateType,
@@ -381,17 +383,27 @@ class OT3API(
             (
                 AsynchronousModuleErrorNotification,
                 ModuleDisconnectedNotification,
+                ModuleConnectedNotification,
             ),
         ):
             return
         mod_log.info(
-            f"Forwarding module event {event.event} for {event.module_model} {event.module_serial} at {event.port}"
+            f"Forwarding module event {event.event} for {event.name if isinstance(event, ModuleConnectedNotification) else event.module_model} {event.module_serial} at {event.port}"
         )
         for cb in self._callbacks:
             try:
                 cb(event)
             except Exception:
                 mod_log.exception("Errored during module asynchronous callback")
+
+    def _send_subsystem_notification(self) -> None:
+        subsystem_event = SubsystemConnectionNotification()
+        mod_log.info("Forwarding subsystem event.")
+        for cb in self._callbacks:
+            try:
+                cb(subsystem_event)
+            except Exception:
+                mod_log.exception("Errored during subsystem asynchronous callback")
 
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
@@ -446,6 +458,8 @@ class OT3API(
             config=checked_config,
             feature_flags=feature_flags,
         )
+
+        backend.set_subsystem_event_callback(api_instance._send_subsystem_notification)
 
         await api_instance.set_status_bar_enabled(status_bar_enabled)
         module_controls = await AttachedModulesControl.build(
@@ -2378,6 +2392,11 @@ class OT3API(
         follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
         real_mount = OT3Mount.from_mount(mount)
+        if isinstance(self._backend, OT3Simulator) and expected == TipStateType.PRESENT:
+            # The simulator has no physical tip/probe sensors. LPC and other
+            # calibration flows call verify_tip_presence after the user attaches
+            # a probe; simulate that attachment here.
+            self._backend._update_tip_state(real_mount, True)
         status = await self.get_tip_presence_status(real_mount, follow_singular_sensor)
         if status != expected:
             raise FailedTipStateCheck(

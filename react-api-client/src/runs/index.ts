@@ -1,5 +1,6 @@
 export { useAllRunsQuery } from './useAllRunsQuery'
 export { useRunQuery } from './useRunQuery'
+export { useRunRawQuery } from './useRunRawQuery'
 export { useRunCurrentState } from './useRunCurrentState'
 export { useCreateRunMutation } from './useCreateRunMutation'
 export { useDeleteRunMutation } from './useDeleteRunMutation'

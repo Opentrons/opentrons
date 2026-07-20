@@ -14,13 +14,19 @@ import { useDropTipWizardFlows } from '..'
 import { handleTipsAttachedModal } from '../TipsAttachedModal'
 
 import type { Mock } from 'vitest'
-import type { HostConfig } from '@opentrons/api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { PipetteWithTip } from '/app/resources/instruments'
 
 vi.mock('/app/resources/runs/useCloseCurrentRun')
 vi.mock('..')
 vi.mock('/app/local-resources/instruments')
+vi.mock('/app/redux-resources/robots', () => ({
+  useRobot: vi.fn().mockReturnValue({
+    name: 'otie',
+    ip: '127.0.0.1',
+    port: 31950,
+  }),
+}))
 
 const MOCK_ACTUAL_PIPETTE = {
   ...mockPipetteInfo.pipetteSpecs,
@@ -43,7 +49,7 @@ const MOCK_A_PIPETTE_WITH_TIP: PipetteWithTip = {
 const MOCK_96_WITH_TIP: PipetteWithTip = { mount: LEFT, specs: ninetySixSpecs }
 
 const mockSetTipStatusResolved = vi.fn()
-const MOCK_HOST: HostConfig = { hostname: 'MOCK_HOST' }
+const MOCK_ROBOT_NAME = 'MOCK_ROBOT'
 
 const render = (aPipetteWithTip: PipetteWithTip) => {
   return renderWithProviders(
@@ -51,7 +57,7 @@ const render = (aPipetteWithTip: PipetteWithTip) => {
       <button
         onClick={() =>
           handleTipsAttachedModal({
-            host: MOCK_HOST,
+            robotName: MOCK_ROBOT_NAME,
             aPipetteWithTip,
             setTipStatusResolved: mockSetTipStatusResolved,
             onSuccess: vi.fn(),

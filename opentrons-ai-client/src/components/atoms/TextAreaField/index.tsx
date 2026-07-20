@@ -74,8 +74,7 @@ export interface TextAreaFieldProps {
   min?: number
   /** horizontal text alignment for title, textarea, and (sub)captions */
   textAlign?:
-    | typeof TYPOGRAPHY.textAlignLeft
-    | typeof TYPOGRAPHY.textAlignCenter
+    typeof TYPOGRAPHY.textAlignLeft | typeof TYPOGRAPHY.textAlignCenter
   /** react useRef to control textarea field instead of react event */
   ref?: MutableRefObject<HTMLTextAreaElement | null>
   /** optional IconName to display icon aligned to left of textarea field */
@@ -121,9 +120,9 @@ export const TextAreaField = forwardRef<
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       grid-gap: ${SPACING.spacing8};
       &:focus-within {
-        filter: ${hasError
-          ? 'none'
-          : `drop-shadow(0px 0px 10px ${COLORS.blue50})`};
+        filter: ${
+          hasError ? 'none' : `drop-shadow(0px 0px 10px ${COLORS.blue50})`
+        };
       }
     }
   `
@@ -133,10 +132,12 @@ export const TextAreaField = forwardRef<
     background-color: ${hasBackgroundError ? COLORS.red30 : COLORS.white};
     border-radius: ${borderRadius ?? BORDERS.borderRadius4};
     padding: ${padding ?? SPACING.spacing8};
-    border: ${hasBackgroundError
-      ? 'none'
-      : `1px ${BORDERS.styleSolid}
-        ${hasError ? COLORS.red50 : COLORS.grey50}`};
+    border: ${
+      hasBackgroundError
+        ? 'none'
+        : `1px ${BORDERS.styleSolid}
+        ${hasError ? COLORS.red50 : COLORS.grey50}`
+    };
     font-size: ${TYPOGRAPHY.fontSizeP};
     width: 100%;
     height: ${height};

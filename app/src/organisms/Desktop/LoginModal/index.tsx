@@ -12,19 +12,18 @@ import {
   SecondaryButton,
   StyledText,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
+import { useHost } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { useRobot } from '/app/redux-resources/robots'
-import { OPENTRONS_USB } from '/app/redux/discovery'
-import { useAccessTokenForRobot } from '/app/redux/robot-auth'
-import { appShellUSBRequestor } from '/app/redux/shell/remote'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
   useSetNewPasswordAndSignIn,
 } from '/app/resources/auth'
+import { isSSLError } from '/app/resources/auth/hooks/isSSLError'
 
+import { RobotCertImportModal } from '../RobotCertImport'
 import styles from './loginmodal.module.css'
 
 import type { ComponentProps, Dispatch, SetStateAction } from 'react'
@@ -100,14 +99,8 @@ export const showLoginModal = async (
 
 const LoginModal = NiceModal.create((props: LoginModalProps) => {
   const { robotName } = props
-  const robot = useRobot(robotName)
-  const token = useAccessTokenForRobot(robotName)
   return (
-    <ApiHostProvider
-      hostname={robot?.ip ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
-      token={token}
-    >
+    <ApiHostProvider robotName={robotName}>
       <LoginModalImpl robotName={robotName} />
     </ApiHostProvider>
   )
@@ -120,6 +113,7 @@ interface LoginModalImplProps {
 function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const { robotName } = props
   const modal = useModal()
+  const host = useHost()
   const { t } = useTranslation()
   const [screen, setScreen] = useState<LoginModalScreen>({
     kind: 'login',
@@ -128,10 +122,20 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const storeLoginState = useStoreLoginState()
 
   const loginFormId = useId()
+  const [showRobotCertImportModal, setShowRobotCertImportModal] =
+    useState<boolean>(false)
 
   const handleClose = (): void => {
     modal.resolve(null)
     modal.remove()
+  }
+
+  const handleError = (message: string, error?: unknown): void => {
+    if (isSSLError(error, host?.hostname)) {
+      setShowRobotCertImportModal(true)
+      return
+    }
+    updateLoginFormData(setScreen, { error: message })
   }
 
   const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
@@ -143,16 +147,12 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
           kind: 'setNewPassword',
           formData: setNewPasswordStateForm(successfulUsername),
         })
-        return
+      } else {
+        modal.resolve({ username: successfulUsername })
+        modal.remove()
       }
-
-      storeLoginState(robotName, successfulUsername, response)
-      modal.resolve({ username: successfulUsername })
-      modal.remove()
     },
-    onError: message => {
-      updateLoginFormData(setScreen, { error: message })
-    },
+    onError: handleError,
   })
 
   const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
@@ -240,6 +240,17 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       }
     }
   })()
+
+  if (showRobotCertImportModal) {
+    return createPortal(
+      <RobotCertImportModal
+        onClose={() => {
+          setShowRobotCertImportModal(false)
+        }}
+      />,
+      getTopPortalEl()
+    )
+  }
 
   return createPortal(
     <Modal

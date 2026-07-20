@@ -26,9 +26,9 @@ vi.mock('/app/local-resources/access-control/utils', () => ({
   isDocumentationProvided: vi.fn(() => true),
 }))
 vi.mock(
-  '/app/local-resources/access-control/usePromptForInteractionReason',
+  '/app/local-resources/access-control/usePromptForDocumentation',
   () => ({
-    usePromptForInteractionReason: vi.fn(() => ({
+    usePromptForDocumentation: vi.fn(() => ({
       accessControlEnabled: false,
     })),
   })

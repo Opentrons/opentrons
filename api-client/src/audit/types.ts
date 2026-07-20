@@ -8,3 +8,9 @@ export interface LogPeriodSummariesResponse {
   data: LogPeriodSummary[]
   meta: { totalLength: number }
 }
+
+export type DownloadedLogPeriodResponse = Blob | string
+
+export interface DeleteLogPeriodQueryParams {
+  deletionKey: string
+}

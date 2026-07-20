@@ -35,6 +35,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { TertiaryButton } from '/app/atoms/buttons'
 import { Slideout } from '/app/atoms/Slideout'
 import { Divider } from '/app/atoms/structure'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { getIsHeaterShakerAttached } from '/app/redux/config'
 
 import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
@@ -60,7 +61,8 @@ export const TestShakeSlideout = (
 ): JSX.Element | null => {
   const { module, onCloseClick, isExpanded } = props
   const { t } = useTranslation(['heater_shaker', 'device_details', 'shared'])
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const documentationState = useDocumentationState()
+  const { createLiveCommand } = useCreateLiveCommandMutation(documentationState)
   const name = getModuleDisplayName(module.moduleModel)
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'left',
@@ -307,7 +309,6 @@ export const TestShakeSlideout = (
         role="button"
         marginTop={SPACING.spacing4}
         css={TYPOGRAPHY.linkPSemiBold}
-        id="HeaterShaker_Attachment_Instructions"
         onClick={() => {
           setShowModuleSetupModal(true)
         }}

@@ -404,7 +404,6 @@ export function ProtocolRunSetup({
             color={COLORS.black90}
             css={TYPOGRAPHY.pSemiBold}
             marginRight={SPACING.spacing16}
-            id={`RunSetupCard_${LABWARE_SETUP_STEP_KEY}_incompleteText`}
             whiteSpace={NO_WRAP}
           >
             {t('check_locations_and_volumes')}
@@ -546,8 +545,7 @@ interface HardwareRequiredStepCompletion {
 }
 
 type StepRightElementProps =
-  | NoHardwareRequiredStepCompletion
-  | HardwareRequiredStepCompletion
+  NoHardwareRequiredStepCompletion | HardwareRequiredStepCompletion
 
 const stepRequiresHW = (
   props: StepRightElementProps
@@ -569,13 +567,11 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           color={COLORS.green60}
           marginRight={SPACING.spacing8}
           name="ot-check"
-          id={`RunSetupCard_${props.stepKey}_completeIcon`}
         />
         <StyledText
           desktopStyle="bodyDefaultSemiBold"
           color={COLORS.green60}
           marginRight={SPACING.spacing16}
-          id={`RunSetupCard_${props.stepKey}_completeText`}
         >
           {props.completeText}
         </StyledText>
@@ -595,7 +591,6 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           }
           marginRight={SPACING.spacing8}
           name="ot-alert"
-          id={`RunSetupCard_${props.stepKey}_missingHardwareIcon`}
         />
         <StyledText
           desktopStyle="bodyDefaultSemiBold"
@@ -607,7 +602,6 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
                 : COLORS.grey60
           }
           marginRight={SPACING.spacing16}
-          id={`RunSetupCard_${props.stepKey}_missingHardwareText`}
         >
           {props.missingHardware
             ? props.missingHardwareText
@@ -623,13 +617,11 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           color={COLORS.grey60}
           marginRight={SPACING.spacing8}
           name="ot-alert"
-          id={`RunSetupCard_${props.stepKey}_incompleteIcon`}
         />
         <StyledText
           desktopStyle="bodyDefaultSemiBold"
           color={COLORS.grey60}
           marginRight={SPACING.spacing16}
-          id={`RunSetupCard_${props.stepKey}_incompleteText`}
         >
           {props.incompleteText}
         </StyledText>

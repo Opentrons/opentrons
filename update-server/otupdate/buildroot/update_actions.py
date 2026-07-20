@@ -47,7 +47,7 @@ class OT2UpdateActions(UpdateActionsInterface):
         filepath: str,
         progress_callback: Callable[[float], None],
         cert_path: Optional[str],
-    ) -> Optional[str]:
+    ) -> str:
         """Worker for validation. Call in an executor (so it can return things)
 
         - Unzips filepath to its directory
@@ -72,7 +72,7 @@ class OT2UpdateActions(UpdateActionsInterface):
             LOG.error(msg)
             raise InvalidPKGName(msg)
 
-        def zip_callback(progress):
+        def zip_callback(progress: float) -> None:
             progress_callback(progress / 2.0)
 
         required = [ROOTFS_NAME, ROOTFS_HASH_NAME]
@@ -80,7 +80,7 @@ class OT2UpdateActions(UpdateActionsInterface):
             required.append(ROOTFS_SIG_NAME)
         files, sizes = unzip_update(filepath, zip_callback, UPDATE_FILES, required)
 
-        def hash_callback(progress):
+        def hash_callback(progress: float) -> None:
             progress_callback(progress / 2.0 + 0.5)
 
         version_file = str(files.get("VERSION.json"))
@@ -190,6 +190,14 @@ class OT2UpdateActions(UpdateActionsInterface):
             except Exception:
                 LOG.exception(f"Could not delete update file {filepath}.")
 
+    def restart(self) -> None:
+        """Restart the robot."""
+        subprocess.check_call(["reboot"])
+
+    def shutdown(self) -> None:
+        """Shut down the robot."""
+        subprocess.check_call(["shutdown", "-h", "now"])
+
 
 def _find_unused_partition() -> RootPartitions:
     """Find the currently-unused root partition to write to"""
@@ -217,7 +225,7 @@ def write_file(
     """
     total_written = 0
     with open(infile, "rb") as img, open(outfile, "wb") as part:
-        if None is file_size:
+        if file_size is None:
             file_size = img.seek(0, 2)
             img.seek(0)
             LOG.info(f"write_file: file size calculated as {file_size}B")
@@ -234,7 +242,7 @@ def write_file(
                 break
 
 
-def _mountpoint_root():
+def _mountpoint_root() -> str:
     """provides mountpoint location for :py:meth:`mount_update`.
 
     exists only for ease of mocking

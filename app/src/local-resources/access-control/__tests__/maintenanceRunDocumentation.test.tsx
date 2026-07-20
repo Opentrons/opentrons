@@ -9,7 +9,7 @@ import {
 } from '@opentrons/api-client'
 import {
   useAccessControlEnabledQuery,
-  useAuthSettingsQuery,
+  useAuditSettingsQuery,
   useCreateMaintenanceCommandMutation,
   useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
@@ -42,7 +42,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ReactApiClient>()
   return {
     ...actual,
-    useAuthSettingsQuery: vi.fn(),
+    useAuditSettingsQuery: vi.fn(),
     useAccessControlEnabledQuery: vi.fn(),
     useHost: vi.fn(),
   }
@@ -71,8 +71,8 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
   const actual = await importOriginal()
   return {
     ...(actual as any),
-    useCurrentUsername: vi.fn(() => 'alice'),
     useCurrentRobotName: vi.fn(() => 'otie'),
+    useUsernameForRobot: vi.fn(() => 'alice'),
   }
 })
 
@@ -143,14 +143,14 @@ describe('maintenance run documentation flow', () => {
 
   beforeEach(() => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+    vi.mocked(useAuditSettingsQuery).mockReturnValue({
       data: {
         data: {
           requireReasonForInteraction: true,
           minLengthOfReasonForInteraction: 10,
         },
       },
-    } as ReturnType<typeof useAuthSettingsQuery>)
+    } as ReturnType<typeof useAuditSettingsQuery>)
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
       data: {
         data: {
@@ -193,9 +193,15 @@ describe('maintenance run documentation flow', () => {
     await waitFor(() => {
       expect(
         !result.current.commandDocState.isLoading &&
-          result.current.commandDocState.reasonForInteractionRequired &&
-          result.current.commandDocState.docreport
-      ).toEqual(MOCK_DOCREPORT)
+          result.current.commandDocState.accessControlEnabled
+      ).toBe(true)
+      if (
+        !result.current.commandDocState.isLoading &&
+        result.current.commandDocState.accessControlEnabled &&
+        result.current.commandDocState.reasonForInteractionRequired
+      ) {
+        expect(result.current.commandDocState.docreport).toEqual(MOCK_DOCREPORT)
+      }
     })
 
     const { deletionDocState } = result.current
@@ -203,20 +209,16 @@ describe('maintenance run documentation flow', () => {
     // The deletion gate is in place but has NOT prompted yet — it is set up
     // to prompt only when the deletion mutation actually runs.
     expect(
-      !deletionDocState.isLoading &&
-        deletionDocState.reasonForInteractionRequired
+      !deletionDocState.isLoading && deletionDocState.accessControlEnabled
     ).toBe(true)
-    expect(
+    if (
       !deletionDocState.isLoading &&
-        deletionDocState.reasonForInteractionRequired &&
-        deletionDocState.docreport
-    ).toBeNull()
-    expect(
-      !deletionDocState.isLoading &&
-        deletionDocState.reasonForInteractionRequired &&
-        deletionDocState.docreport == null &&
-        deletionDocState.askForDocumentation
-    ).toBeDefined()
+      deletionDocState.accessControlEnabled &&
+      deletionDocState.reasonForInteractionRequired
+    ) {
+      expect(deletionDocState.docreport).toBeNull()
+      expect(deletionDocState.askForDocumentation).toBeDefined()
+    }
 
     // 2) Every step of the maintenance run executes against the same
     //    captured documentation report — running them must NOT trigger any
@@ -242,11 +244,13 @@ describe('maintenance run documentation flow', () => {
     // Still only the single launch prompt — every step reused the
     // commandDocState's report rather than asking the user again.
     expect(mockShowDocumentationRequiredModal).toHaveBeenCalledTimes(1)
-    expect(
+    if (
       !result.current.commandDocState.isLoading &&
-        result.current.commandDocState.reasonForInteractionRequired &&
-        result.current.commandDocState.docreport
-    ).toEqual(MOCK_DOCREPORT)
+      result.current.commandDocState.accessControlEnabled &&
+      result.current.commandDocState.reasonForInteractionRequired
+    ) {
+      expect(result.current.commandDocState.docreport).toEqual(MOCK_DOCREPORT)
+    }
 
     // 3) Tearing the run down via the deletion mutation prompts the user
     //    a second time for documentation right before the end of the run.

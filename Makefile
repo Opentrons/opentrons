@@ -44,7 +44,8 @@ watch ?= false
 cover ?= true
 quiet ?= true
 
-FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|yml|mjs|mts)" "**/*.@(ts|tsx|js|mts|mjs|json|md|yml)"
+format_file_exts = ts|tsx|js|mts|mjs|json|md|yaml|yml
+FORMAT_FILE_GLOB = ".*.@($(format_file_exts))" "**/*.@($(format_file_exts))"
 
 ifeq ($(watch), true)
 	cover := false
@@ -340,10 +341,10 @@ dev-backend:
 .PHONY: dev-backend-flex
 dev-backend-flex:
 	$(python) scripts/run_concurrently.py \
-		$(MAKE) -C auth-server dev ';' \
-		$(MAKE) -C audit-server dev OT_AUDIT_SERVER_key_server_url=http://localhost:33960 ';' \
-		$(MAKE) -C robot-server dev-flex OT_ROBOT_SERVER_auth_server_url=http://localhost:31950 BEHIND_DEV_PROXY=1 ';' \
-		$(MAKE) -C system-server dev OT_SYSTEM_SERVER_auth_server_url=http://localhost:31950 ';' \
+		$(MAKE) -C auth-server dev OT_AUTH_SERVER_audit_server_url=http://localhost:33970 ';' \
+		$(MAKE) -C audit-server dev OT_AUDIT_SERVER_key_server_url=http://localhost:33960 OT_AUDIT_SERVER_auth_server_url=http://localhost:31950 ';' \
+		$(MAKE) -C robot-server dev-flex OT_ROBOT_SERVER_auth_server_url=http://localhost:31950 OT_ROBOT_SERVER_audit_server_url=http://localhost:33970 BEHIND_DEV_PROXY=1 ';' \
+		$(MAKE) -C system-server dev OT_SYSTEM_SERVER_auth_server_url=http://localhost:31950 OT_SYSTEM_SERVER_audit_server_url=http://localhost:33970 ';' \
 		$(MAKE) -C key-server dev-mitmproxy ';' \
 		$(MAKE) dev-proxy ';' \
 		$(MAKE) dev-proxy-tls

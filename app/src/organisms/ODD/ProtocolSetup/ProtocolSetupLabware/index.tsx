@@ -39,6 +39,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton, TouchFloatingActionButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -101,10 +102,14 @@ export function ProtocolSetupLabware({
       ),
     [mostRecentAnalysis]
   )
-  const labwareByLiquidId = getLabwareInfoByLiquidId(
-    mostRecentAnalysis?.commands ?? []
+  const labwareByLiquidId = useMemo(
+    () => getLabwareInfoByLiquidId(mostRecentAnalysis?.commands ?? []),
+    [mostRecentAnalysis]
   )
-  const sortedStartingDeckEntries = getSortedStartingDeckEntries(startingDeck)
+  const sortedStartingDeckEntries = useMemo(
+    () => getSortedStartingDeckEntries(startingDeck),
+    [startingDeck]
+  )
   const offDeckItems = useMemo(
     () =>
       mostRecentAnalysis != null
@@ -120,16 +125,26 @@ export function ProtocolSetupLabware({
   const moduleQuery = useModulesQuery({
     refetchInterval: MODULE_REFETCH_INTERVAL_MS,
   })
-  const attachedModules = moduleQuery?.data?.data ?? []
-  const protocolModulesInfo =
-    mostRecentAnalysis != null
-      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-      : []
+  const attachedModules = useMemo(
+    () => moduleQuery?.data?.data ?? [],
+    [moduleQuery?.data?.data]
+  )
+  const protocolModulesInfo = useMemo(
+    () =>
+      mostRecentAnalysis != null
+        ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+        : [],
+    [mostRecentAnalysis, deckDef]
+  )
 
-  const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
-    attachedModules,
-    protocolModulesInfo,
-    deckConfig
+  const attachedProtocolModuleMatches = useMemo(
+    () =>
+      getAttachedProtocolModuleMatches(
+        attachedModules,
+        protocolModulesInfo,
+        deckConfig
+      ),
+    [attachedModules, protocolModulesInfo, deckConfig]
   )
 
   return (
@@ -257,8 +272,9 @@ function LabwareLatch({
   refetchModules,
 }: LabwareLatchProps): JSX.Element {
   const { t } = useTranslation(['heater_shaker', 'protocol_setup'])
+  const documentationState = useDocumentationState()
   const { createLiveCommand, isLoading: isLiveCommandLoading } =
-    useCreateLiveCommandMutation()
+    useCreateLiveCommandMutation(documentationState)
   const [isRefetchingModules, setIsRefetchingModules] = useState(false)
   const isLatchLoading =
     isLiveCommandLoading ||
@@ -273,8 +289,7 @@ function LabwareLatch({
   let icon: 'latch-open' | 'latch-closed' | null = null
 
   const latchCommand:
-    | HeaterShakerOpenLatchCreateCommand
-    | HeaterShakerCloseLatchCreateCommand = {
+    HeaterShakerOpenLatchCreateCommand | HeaterShakerCloseLatchCreateCommand = {
     commandType: isLatchClosed
       ? 'heaterShaker/openLabwareLatch'
       : 'heaterShaker/closeLabwareLatch',

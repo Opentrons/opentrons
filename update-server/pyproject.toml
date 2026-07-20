@@ -84,7 +84,7 @@ source = 'vcs-tunable'
 
 [tool.hatch.version.raw-options]
 root = '..'
-git_describe_command = 'git describe --dirty --tags --long --match=v*'
+git_describe_command = 'git describe --dirty --tags --long --match=v[0-9]*.[0-9]*'
 fallback_version='0.0.0-dev'
 # Note: these are required for setuptools_scm to not automatically bump the version used in the package
 # from the latest version it detects. This would actually be kind of useful, but we can only do it if
@@ -136,26 +136,6 @@ ignore_missing_imports = true
 
 # TODO(mm, 2022-05-25): Resolve the typing errors in these files
 # and remove these overrides when able.
-[[tool.mypy.overrides]]
-module = [
-    "otupdate.common.control",
-    "otupdate.common.session",
-    "otupdate.common.update",
-    "otupdate.buildroot",
-]
-disallow_untyped_defs = false
-disallow_untyped_calls = false
-warn_return_any = false
-
-[[tool.mypy.overrides]]
-module = [
-    "otupdate.buildroot.update_actions",
-    "otupdate.openembedded",
-    "otupdate.openembedded.updater",
-]
-disallow_untyped_defs = false
-disallow_untyped_calls = false
-
 [[tool.mypy.overrides]]
 module = [
     "tests.conftest",

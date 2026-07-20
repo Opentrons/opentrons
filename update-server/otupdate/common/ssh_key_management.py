@@ -30,7 +30,7 @@ def require_linklocal(handler: Handler) -> Handler:
     """
 
     @functools.wraps(handler)
-    async def decorated(request: web.Request) -> web.Response:
+    async def decorated(request: web.Request) -> web.StreamResponse:
         ipaddr_str = request.headers.get("x-host-ip")
         invalid_req_data = {
             "error": "bad-interface",

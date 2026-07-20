@@ -5,7 +5,7 @@ name: 'shared-data test/lint/deploy'
 
 on:
   push:
-    paths:
+    paths: &paths
       - 'Makefile'
       - 'shared-data/*/**'
       - 'scripts/**/*.mk'
@@ -19,19 +19,11 @@ on:
       - 'release'
       - '*hotfix*'
     tags:
-      - 'v*'
+      - 'v[0-9]*.[0-9]*'
       - 'shared-data*'
       - 'components*'
   pull_request:
-    paths:
-      - 'Makefile'
-      - 'shared-data/*/**'
-      - 'scripts/**/*.mk'
-      - 'scripts/**/*.py'
-      - '.github/workflows/shared-data-test-lint-deploy.yaml'
-      - '.github/actions/python/**/*'
-      - '.github/workflows/utils.js'
-      - 'vitest.config.*'
+    paths: *paths
   workflow_dispatch:
 
 concurrency:

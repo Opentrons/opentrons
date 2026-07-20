@@ -9,7 +9,6 @@ import {
   OVERFLOW_AUTO,
   POSITION_RELATIVE,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { LocalizationProvider } from '/app/LocalizationProvider'
 import { Alerts } from '/app/organisms/Desktop/Alerts'
@@ -30,12 +29,10 @@ import { RobotSettings } from '/app/pages/Desktop/Devices/RobotSettings'
 import { Labware } from '/app/pages/Desktop/Labware'
 import { ProtocolDetails } from '/app/pages/Desktop/Protocols/ProtocolDetails'
 import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
-import { useIsFlex, useRobot } from '/app/redux-resources/robots'
-import { OPENTRONS_USB } from '/app/redux/discovery'
-import { useAccessTokenForRobot } from '/app/redux/robot-auth'
-import { appShellUSBRequestor } from '/app/redux/shell/remote'
+import { useIsFlex } from '/app/redux-resources/robots'
 
 import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
+import { ApiHostProvider } from '../local-resources/api-host-provider/ApiHostProvider'
 import { showDocumentationRequiredModal } from '../organisms/Desktop/DocumentationRequired/DocumentationRequiredModal'
 import { showLoginModal } from '../organisms/Desktop/LoginModal'
 import { ProtocolVisualization } from '../pages/Desktop/Protocols/ProtocolVisualization'
@@ -117,20 +114,20 @@ export const DesktopApp = (): JSX.Element => {
 
   return (
     <LocalizationProvider>
-      <NiceModal.Provider>
-        <ErrorBoundary FallbackComponent={DesktopAppFallback}>
-          <ReactQueryDevtools />
-          <SystemLanguagePreferenceModal />
-          <Navbar routes={desktopRoutes} />
-          <ToasterOven>
-            <EmergencyStopContext.Provider
-              value={{
-                isEmergencyStopModalDismissed,
-                setIsEmergencyStopModalDismissed,
-              }}
-            >
-              <DocumentationRequiredModalContext.Provider
-                value={{ showDocumentationRequiredModal, showLoginModal }}
+      <DocumentationRequiredModalContext.Provider
+        value={{ showDocumentationRequiredModal, showLoginModal }}
+      >
+        <NiceModal.Provider>
+          <ErrorBoundary FallbackComponent={DesktopAppFallback}>
+            <ReactQueryDevtools />
+            <SystemLanguagePreferenceModal />
+            <Navbar routes={desktopRoutes} />
+            <ToasterOven>
+              <EmergencyStopContext.Provider
+                value={{
+                  isEmergencyStopModalDismissed,
+                  setIsEmergencyStopModalDismissed,
+                }}
               >
                 <Box width="100%" height="100vh">
                   <Alerts>
@@ -174,11 +171,11 @@ export const DesktopApp = (): JSX.Element => {
                     <RobotControlTakeover />
                   </Alerts>
                 </Box>
-              </DocumentationRequiredModalContext.Provider>
-            </EmergencyStopContext.Provider>
-          </ToasterOven>
-        </ErrorBoundary>
-      </NiceModal.Provider>
+              </EmergencyStopContext.Provider>
+            </ToasterOven>
+          </ErrorBoundary>
+        </NiceModal.Provider>
+      </DocumentationRequiredModalContext.Provider>
     </LocalizationProvider>
   )
 }
@@ -187,19 +184,12 @@ function RobotControlTakeover(): JSX.Element | null {
   const deviceRouteMatch = useMatch('/devices/:robotName/*')
   const params = deviceRouteMatch?.params
   const robotName = params?.robotName ?? null
-  const robot = useRobot(robotName)
-  const token = useAccessTokenForRobot(robotName)
-  if (deviceRouteMatch == null || robot == null || robotName == null) {
+  if (robotName == null) {
     return null
   }
 
   return (
-    <ApiHostProvider
-      key={robot.name}
-      hostname={robot.ip ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
-      token={token}
-    >
+    <ApiHostProvider key={robotName} robotName={robotName}>
       <FlexOnlyRobotControlTakeover robotName={robotName} />
       <AllRobotsRobotControlTakeover robotName={robotName} />
     </ApiHostProvider>

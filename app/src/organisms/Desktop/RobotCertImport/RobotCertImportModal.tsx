@@ -46,12 +46,14 @@ export function RobotCertImportModal(
       </PrimaryButton>
     </div>
   )
+  // TODO(jj): fix z-index
   return (
     <Modal
       title={t('robot_encryption_key_verification')}
       closeOnOutsideClick={true}
       footer={footer}
       onClose={handleClose}
+      zIndexOverlay={10000}
     >
       <div className={styles.robot_cert_import_container}>
         <div>

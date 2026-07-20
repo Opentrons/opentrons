@@ -10,11 +10,7 @@ export type RobotRestartStatus =
   | 'restart-failed'
 
 export type RobotAdminStatus =
-  | 'up'
-  | 'down'
-  | 'restart-pending'
-  | 'restarting'
-  | 'restart-failed'
+  'up' | 'down' | 'restart-pending' | 'restarting' | 'restart-failed'
 
 export interface ResetConfigOption {
   id: string
@@ -61,24 +57,6 @@ export interface RestartRobotSuccessAction {
 
 export interface RestartRobotFailureAction {
   type: 'robotAdmin:RESTART_FAILURE'
-  payload: { robotName: string; error: {} }
-  meta: RobotApiRequestMeta
-}
-
-export interface ShutdownRobotAction {
-  type: 'robotAdmin:SHUTDOWN'
-  payload: { robotName: string }
-  meta: Partial<RobotApiRequestMeta & { robot: true }>
-}
-
-export interface ShutdownRobotSuccessAction {
-  type: 'robotAdmin:SHUTDOWN_SUCCESS'
-  payload: { robotName: string }
-  meta: RobotApiRequestMeta | {}
-}
-
-export interface ShutdownRobotFailureAction {
-  type: 'robotAdmin:SHUTDOWN_FAILURE'
   payload: { robotName: string; error: {} }
   meta: RobotApiRequestMeta
 }
@@ -130,9 +108,6 @@ export type RobotAdminAction =
   | RestartStatusChangedAction
   | RestartRobotSuccessAction
   | RestartRobotFailureAction
-  | ShutdownRobotAction
-  | ShutdownRobotSuccessAction
-  | ShutdownRobotFailureAction
   | FetchResetConfigOptionsAction
   | FetchResetConfigOptionsSuccessAction
   | FetchResetConfigOptionsFailureAction

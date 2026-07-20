@@ -1,7 +1,6 @@
-import { useMutation } from 'react-query'
-
 import { postWifiDisconnect } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../accessControl'
 import { useHost } from '../api'
 
 import type { AxiosError } from 'axios'
@@ -11,10 +10,10 @@ import type {
   UseMutationResult,
 } from 'react-query'
 import type {
-  HostConfig,
   WifiDisconnectRequest,
   WifiDisconnectResponse,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
 
 export type UsePostWifiDisconnectMutationResult = UseMutationResult<
   WifiDisconnectResponse,
@@ -35,17 +34,23 @@ export type UsePostWifiDisconnectMutationOptions = UseMutationOptions<
 >
 
 export function usePostWifiDisconnectMutation(
-  options: UsePostWifiDisconnectMutationOptions = {},
-  hostOverride?: HostConfig | null
+  documentationState: DocumentationState,
+  options: UsePostWifiDisconnectMutationOptions = {}
 ): UsePostWifiDisconnectMutationResult {
-  const contextHost = useHost()
-  const host =
-    hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
-  const mutation = useMutation<
+  const host = useHost()
+  const mutation = useDocumentedMutation<
     WifiDisconnectResponse,
     AxiosError,
     WifiDisconnectRequest
-  >(async data => (await postWifiDisconnect(host!, data)).data, options)
+  >(
+    documentationState,
+    ['disconnect_wifi'],
+    ({ variables: data, userNotes }) =>
+      postWifiDisconnect(host!, data, userNotes).then(
+        response => response.data
+      ),
+    options
+  )
   return {
     ...mutation,
     postWifiDisconnect: mutation.mutate,
