@@ -45,18 +45,12 @@ nav:
   - About Compliance Ready Software: 
       - Introduction: introduction.md
       - Activation: activation.md
-      - Roles: roles.md
-      - User Experience: experience.md
   - Compliance Ready Features: 
-      - Features: features.md # includes encryption key, devices, data protection, 
+      - Features: features.md # includes roles, encryption key, devices, and data protection.
       - Documentation: documentation.md
       - Settings: settings.md # administrator and any other settings
       - Protocol run records: records.md #here, link to the larger run log article
   - Using Compliance Ready Software: using.md #includes logging in, setting up and running a protocol, etc.
   - Log Files: 
       - Log types: files.md
-      - Viewing logs: viewer.md
-      - Export logs: export.md
-      - Reading logs: reading.md # for viewing outside of the log viewer
-
-      # the FAQs can be split up from the outline; no need for an additional section
+      - Viewing logs: viewer.md # includes exporting and viewing logs (in the dedicated viewer or without)

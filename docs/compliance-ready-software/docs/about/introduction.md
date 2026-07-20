@@ -11,7 +11,7 @@ description: "Introduction to Flex Compliance-Ready Software."
 
 Compliance-Ready software irreversibly adds technical controls, like required documentation and log files, to comply with FDA regulation 21 CFR part 11. After installation by an Opentrons-trained representative, you'll add your own validations, protocols, and data management practices to make your Flex fully audit-ready.
 
-This manual describes Opentrons Compliance-Ready software's key features, including roles, documentation, and log files, and shows you what you'll experience when using the software at the lab bench. 
+This manual describes Opentrons Compliance-Ready software's [key features], including [roles], [documentation], and [log files], and shows you what you'll experience when using the software at the lab bench. 
 
 Have questions about software controls or compliance? Get in touch with Opentrons. 
 
@@ -20,6 +20,6 @@ Have questions about software controls or compliance? Get in touch with Opentron
 TODO: 
 - confirm phrases in "phrases for review" tab of the outline doc
 - link to product page? 
-- who to link to to get in touch with at Opentrons? support? 
+- link to relevant sections of the manual as they're built
 
 ----->
