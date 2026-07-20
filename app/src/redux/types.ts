@@ -24,10 +24,6 @@ import type {
 import type { RobotAdminAction, RobotAdminState } from './robot-admin/types'
 import type { RobotApiAction, RobotApiState } from './robot-api/types'
 import type { RobotAuthAction, RobotAuthState } from './robot-auth'
-import type {
-  RobotSettingsAction,
-  RobotSettingsState,
-} from './robot-settings/types'
 import type { RobotUpdateAction, RobotUpdateState } from './robot-update/types'
 import type { SessionsAction, SessionState } from './sessions/types'
 import type {
@@ -42,7 +38,6 @@ export interface State {
   readonly robotApi: RobotApiState
   readonly robotAuth: RobotAuthState
   readonly robotAdmin: RobotAdminState
-  readonly robotSettings: RobotSettingsState
   readonly robotUpdate: RobotUpdateState
   readonly config: ConfigState
   readonly discovery: DiscoveryState
@@ -62,7 +57,6 @@ export type Action =
   | RobotApiAction
   | RobotAdminAction
   | RobotAuthAction
-  | RobotSettingsAction
   | RobotUpdateAction
   | ModulesAction
   | ShellAction

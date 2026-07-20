@@ -1,16 +1,14 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { getRobotSettings } from '/app/redux/robot-settings'
 
 import { GantryHoming } from '../GantryHoming'
 
-vi.mock('/app/redux/robot-settings/selectors')
 vi.mock('../../../hooks')
 
 const mockSettings = {
@@ -24,17 +22,13 @@ const mockSettings = {
 const render = (isRobotBusy = false) => {
   return renderWithProviders(
     <MemoryRouter>
-      <GantryHoming settings={mockSettings} robotName="otie" isRobotBusy />
+      <GantryHoming settings={mockSettings} isRobotBusy />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
 }
 
 describe('RobotSettings DisableHoming', () => {
-  beforeEach(() => {
-    vi.mocked(getRobotSettings).mockReturnValue([mockSettings])
-  })
-
   it('should render title, description and toggle button', () => {
     render()
     screen.getByText('Home Gantry on Restart')
@@ -44,11 +38,6 @@ describe('RobotSettings DisableHoming', () => {
   })
 
   it('should change the value when a user clicks a toggle button', () => {
-    const tempMockSettings = {
-      ...mockSettings,
-      value: false,
-    }
-    vi.mocked(getRobotSettings).mockReturnValue([tempMockSettings])
     render()
     const toggleButton = screen.getByRole('switch', {
       name: 'gantry_homing',

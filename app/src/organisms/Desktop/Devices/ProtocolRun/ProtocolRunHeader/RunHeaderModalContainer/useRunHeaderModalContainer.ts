@@ -111,9 +111,12 @@ export function useRunHeaderModalContainer({
     useSelector(selectOffsetSource(runId)) === OFFSETS_CONFLICT
   const isThisRunCurrent = runId === useCurrentRunId()
   const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
-  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(runId)
   const areCameraPreferencesConfirmed = runRecord?.data.cameraSettings != null
   const documentationState = useDocumentationState()
+  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(
+    runId,
+    documentationState
+  )
   const { mutateAsync: addCameraSettingsToRun } =
     useAddCameraSettingsToRunMutation(documentationState)
   const runCameraSettings = useSelector((state: State) =>
