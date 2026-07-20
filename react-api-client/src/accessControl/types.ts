@@ -121,6 +121,7 @@ export interface AttachingModuleAction {
  * These should match keys in audit_log.json
  */
 type AuditLogAction =
+  | 'acknowledge_estop'
   | 'stop_run'
   | 'play_run'
   | 'place_plate_reader_lid'

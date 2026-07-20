@@ -1,5 +1,6 @@
 {
   "96_channel": "96 channel",
+  "acknowledge_estop": "Acknowledging emergency stop disengage",
   "add_module": "Launching module setup flow",
   "attach": "Attaching",
   "attach_gripper": "Attaching gripper",
