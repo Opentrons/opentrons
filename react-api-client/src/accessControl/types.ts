@@ -170,6 +170,7 @@ type AuditLogAction =
   | 'set_lights'
   | 'apply_offsets'
   | 'update_subsystem'
+  | 'update_settings'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.

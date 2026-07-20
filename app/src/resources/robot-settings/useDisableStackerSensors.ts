@@ -5,6 +5,8 @@ import {
   useUpdateRobotSettingMutation,
 } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+
 // not releveant to the OT-2, this controls the front LED lights on the Flex
 export function useDisableStackerSensors(): {
   sensorsDisabled: boolean
@@ -12,8 +14,10 @@ export function useDisableStackerSensors(): {
 } {
   const [sensorDisabledCache, setSensorsDisabledCache] =
     useState<boolean>(false)
+  const documentationState = useDocumentationState()
 
-  const { updateRobotSetting } = useUpdateRobotSettingMutation()
+  const { updateRobotSetting } =
+    useUpdateRobotSettingMutation(documentationState)
 
   const robotSettingsQuery = useRobotSettingsQuery()
   const settings = robotSettingsQuery.data?.settings ?? []

@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { updateRobotSetting } from '@opentrons/api-client'
 
 import { useUpdateRobotSettingMutation } from '..'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
 import { robotSettingsQueryKey } from '../useRobotSettingsQuery'
 
@@ -55,9 +56,15 @@ describe('useUpdateRobotSettingMutation hook', () => {
       data: ROBOT_SETTINGS_RESPONSE,
     } as Response<RobotSettingsResponse>)
 
-    const { result } = renderHook(() => useUpdateRobotSettingMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useUpdateRobotSettingMutation(
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+        ),
+      {
+        wrapper,
+      }
+    )
 
     result.current.updateRobotSetting({
       id: 'disableHomeOnBoot',
@@ -68,6 +75,12 @@ describe('useUpdateRobotSettingMutation hook', () => {
       expect(result.current.isSuccess).toBe(true)
     })
 
+    expect(updateRobotSetting).toHaveBeenCalledWith(
+      HOST_CONFIG,
+      'disableHomeOnBoot',
+      true,
+      ''
+    )
     expect(
       queryClient.getQueryData(robotSettingsQueryKey(HOST_CONFIG))
     ).toEqual(ROBOT_SETTINGS_RESPONSE)

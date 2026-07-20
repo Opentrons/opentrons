@@ -19,6 +19,7 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import { ToggleButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { getFeatureFlags } from '/app/redux/config'
 import { getRobotSerialNumber, UNREACHABLE } from '/app/redux/discovery'
@@ -274,7 +275,9 @@ export function FeatureFlagToggle({
   settingField,
   isRobotBusy,
 }: FeatureFlagToggleProps): JSX.Element | null {
-  const { updateRobotSetting } = useUpdateRobotSettingMutation()
+  const documentationState = useDocumentationState()
+  const { updateRobotSetting } =
+    useUpdateRobotSettingMutation(documentationState)
   const { value, id, title, description } = settingField
 
   if (id == null) return null

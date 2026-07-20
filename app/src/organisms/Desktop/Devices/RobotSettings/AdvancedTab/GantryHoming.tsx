@@ -12,6 +12,7 @@ import {
 import { useUpdateRobotSettingMutation } from '@opentrons/react-api-client'
 
 import { ToggleButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
 import type { MouseEventHandler } from 'react'
 import type { RobotSettingsField } from '@opentrons/api-client'
@@ -26,7 +27,9 @@ export function GantryHoming({
   isRobotBusy,
 }: GantryHomingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const { updateRobotSetting } = useUpdateRobotSettingMutation()
+  const documentationState = useDocumentationState()
+  const { updateRobotSetting } =
+    useUpdateRobotSettingMutation(documentationState)
   const value = settings?.value ? settings.value : false
   const id = settings?.id ? settings.id : 'disableHomeOnBoot'
 
