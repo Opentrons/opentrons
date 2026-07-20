@@ -9,12 +9,13 @@ import type { DeleteLogPeriodQueryParams } from './types'
 export function deleteLogPeriod(
   config: HostConfig,
   logPeriodId: string,
-  params: DeleteLogPeriodQueryParams
+  params: DeleteLogPeriodQueryParams,
+  userNotes?: string
 ): ResponsePromise<EmptyResponse> {
   return request<EmptyResponse>(
     DELETE,
     `/audit/external/logPeriods/${logPeriodId}`,
     config,
-    { queryParams: { ...params } }
+    { queryParams: { ...params }, userNotes }
   )
 }

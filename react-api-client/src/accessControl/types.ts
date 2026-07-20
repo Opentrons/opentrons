@@ -178,6 +178,7 @@ type AuditLogAction =
   | 'update_subsystem'
   | 'update_settings'
   | 'create_user'
+  | 'delete_log_period'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.
