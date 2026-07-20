@@ -27,11 +27,6 @@ The Vacuum Module ships in three separate boxes. One contains the vacuum pump an
 
 5. Remove the trash bin (if installed) or any modules, labware, and plates from slots A3–A4.
 
-    <figure markdown>
-    ![Deck map with sots A3 and A4 highlighted](images/deck-map.png)
-    <figcaption>The Vacuum Module installs in slots A3–A4 only.</figcaption>
-    </figure>
-
 6. Remove the deck adapter and the small bag of manifold screws from their packaging. You will use the included screwdriver and screws to fasten the vacuum base to the deck adapter before placing it on the robot.
 
 <font color="red">Image: show base and screws</font>
@@ -81,9 +76,14 @@ The Vacuum Module ships in three separate boxes. One contains the vacuum pump an
     <figcaption>Vacuum hose exiting Flex from a lower side panel.</figcaption>
     </figure>
 
-14. Set the assembled piece (deck adapter and attached vacuum base) in slot A3–A4. Align the this piece so vacuum base occupies slot A3. The raised part of the adapter (the "dock") occupies slot A4.
+14. Place the assembled piece (deck adapter and attached vacuum base) into slots A3–A4. Align the assembly so vacuum base occupies slot A3 and the raised part of the adapter (the "dock") occupies slot A4.
 
-15. Using a 2.5 mm screwdriver, fasten the deck adapter to the deck with the original screws or the deck screws provided with the module.
+    <figure markdown>
+    ![Deck map with sots A3 and A4 highlighted](images/deck-map.png)
+    <figcaption>The Vacuum Module installs in slots A3–A4 only.</figcaption>
+    </figure>
+
+15. Using a 2.5 mm screwdriver, fasten the deck adapter to the deck with the original screws or the two deck screws provided with the module.
 
 ## Part 2: Carboy and vacuum hose connections
 
