@@ -1,4 +1,6 @@
+export * from './useDeleteSelectedRuns'
 export * from './useDownloadCalibrationData'
+export * from './useDownloadSelectedRuns'
 export * from './useDownloadRobotLogs'
 export * from './useFullShutdownMutation'
 export * from './useIsEstopNotDisengaged'
