@@ -8,6 +8,18 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 9.0.1
+
+**Welcome to Protocol Designer 9.0.1.!**
+
+This release includes bug fixes for Protocol Designer for Opentrons Flex.
+
+### Bug Fixes
+
+- Flex 20 µL filter pipette tips are compatible with the Flex Stacker in Protocol Designer protocols.
+- Protocol Designer no longer crashes when selecting multiple wells in a row for a transfer step's source or destination.
+- Flex 96-channel pipettes aspirate and dispense from the proper positions in NEST 8 well reservoirs (22 mL).
+
 ## Opentrons Protocol Designer Changes in 9.0.0
 
 **Welcome to Protocol Designer 9.0.0!**
