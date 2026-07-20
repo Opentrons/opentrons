@@ -48,5 +48,6 @@
   "update_camera": "Updating camera settings",
   "update_camera_settings_for_run": "Updating camera settings for this run",
   "update_deck_configuration": "Updating deck configuration",
+  "update_error_recovery_settings": "Updating error recovery settings",
   "update_robot_name": "Updating robot name"
 }
