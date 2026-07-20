@@ -3,7 +3,6 @@ import { useQueryClient } from 'react-query'
 import { patchRobotServerAccessControlSettings } from '@opentrons/api-client'
 
 import { getQueryKey, useHost } from '../api'
-
 import { useDocumentedMutation } from './useDocumentedMutation'
 
 import type { AxiosError } from 'axios'
@@ -16,10 +15,7 @@ import type {
   PatchRobotServerAccessControlSettingsRequest,
   RobotServerAccessControlSettingsResponse,
 } from '@opentrons/api-client'
-import type {
-  DocumentationState,
-  DocumentedMutationParameters,
-} from './types'
+import type { DocumentationState, DocumentedMutationParameters } from './types'
 
 export type UsePatchRobotServerAccessControlSettingsMutationResult =
   UseMutationResult<
