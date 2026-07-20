@@ -176,6 +176,7 @@ type AuditLogAction =
   | 'apply_offsets'
   | 'update_subsystem'
   | 'create_user'
+  | 'delete_log_period'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.

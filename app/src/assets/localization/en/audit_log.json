@@ -15,6 +15,7 @@
   "create_offsets": "Saving new labware offsets",
   "create_protocol": "Creating protocol",
   "create_user": "Creating user",
+  "delete_log_period": "Deleting log period",
   "delete_offsets": "Deleting old labware offsets",
   "delete_run": "Deleting protocol run record",
   "delete_run_images": "Deleting run images",
