@@ -3,6 +3,7 @@
 import io
 import json
 import zipfile
+from collections.abc import AsyncIterable
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -52,13 +53,21 @@ def _stub_empty_output_files(decoy: Decoy, data_files_store: DataFilesStore) -> 
     )
 
 
+async def _collect_zip_bytes(body_iterator: AsyncIterable[bytes | str]) -> bytes:
+    chunks: list[bytes] = []
+    async for chunk in body_iterator:
+        assert isinstance(chunk, bytes)
+        chunks.append(chunk)
+    return b"".join(chunks)
+
+
 def _stub_run_record_for_download(
     decoy: Decoy,
     run_data_manager: RunDataManager,
     *,
     run_id: str = "run-id",
     labware_offsets: list[pe_types.LabwareOffset] | None = None,
-    run_time_parameters: list[object] | None = None,
+    run_time_parameters: list[pe_types.RunTimeParameter] | None = None,
 ) -> Run:
     mock_run_record = decoy.mock(cls=Run)
     decoy.when(mock_run_record.model_dump(mode="json", by_alias=True)).then_return(
@@ -234,11 +243,7 @@ async def test_download_run_files_with_images_protocol_run_log_and_offsets(
     assert "attachment" in result.headers["Content-Disposition"]
     assert ".zip" in result.headers["Content-Disposition"]
 
-    chunks = []
-    async for chunk in result.body_iterator:
-        chunks.append(chunk)
-
-    zip_bytes = b"".join(chunks)
+    zip_bytes = await _collect_zip_bytes(result.body_iterator)
     with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
         names = set(zf.namelist())
         assert "images/image1.jpeg" in names
@@ -331,11 +336,8 @@ async def test_download_run_files_protocol_json_keeps_extension(
         protocol_store=mock_protocol_store,
     )
 
-    chunks = []
-    async for chunk in result.body_iterator:
-        chunks.append(chunk)
-
-    with zipfile.ZipFile(io.BytesIO(b"".join(chunks))) as zf:
+    zip_bytes = await _collect_zip_bytes(result.body_iterator)
+    with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
         assert "my_protocol.json" in zf.namelist()
 
 
@@ -397,11 +399,8 @@ async def test_download_run_files_skips_missing_protocol_silently(
         protocol_store=mock_protocol_store,
     )
 
-    chunks = []
-    async for chunk in result.body_iterator:
-        chunks.append(chunk)
-
-    with zipfile.ZipFile(io.BytesIO(b"".join(chunks))) as zf:
+    zip_bytes = await _collect_zip_bytes(result.body_iterator)
+    with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
         names = zf.namelist()
         assert "images/image1.jpeg" in names
         assert not any(
@@ -464,11 +463,8 @@ async def test_download_run_files_skips_missing_run_log_and_offsets_silently(
         protocol_store=mock_protocol_store,
     )
 
-    chunks = []
-    async for chunk in result.body_iterator:
-        chunks.append(chunk)
-
-    with zipfile.ZipFile(io.BytesIO(b"".join(chunks))) as zf:
+    zip_bytes = await _collect_zip_bytes(result.body_iterator)
+    with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
         assert "images/image1.jpeg" in zf.namelist()
         assert not any(name.endswith(".json") for name in zf.namelist())
 

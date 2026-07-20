@@ -181,8 +181,8 @@ def build_run_zip_filename(
                 f"{robot_name}_{sanitize_filename_component(str(protocol_name))}"
                 f"_{timestamp}.zip"
             )
-    else:
-        return fallback_filename
+
+    return fallback_filename
 
 
 def sanitize_filename_component(input_str: str) -> str:
