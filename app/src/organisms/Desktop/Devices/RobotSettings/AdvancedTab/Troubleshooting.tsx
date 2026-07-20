@@ -58,7 +58,6 @@ export function Troubleshooting({
         disabled={!canDownload || isDownloading}
         marginLeft={SPACING_AUTO}
         onClick={handleClick}
-        id="AdvancedSettings_downloadLogsButton"
         alignSelf={ALIGN_END}
       >
         {t('download_logs')}

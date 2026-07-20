@@ -5,10 +5,15 @@ import '@testing-library/jest-dom/vitest'
 
 import { when } from 'vitest-when'
 
-import { usePostWifiDisconnectMutation } from '@opentrons/react-api-client'
+import {
+  DocumentedMutationError,
+  isDocumentedMutationError,
+  usePostWifiDisconnectMutation,
+} from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useRobot } from '/app/redux-resources/robots'
 import {
   mockConnectableRobot,
@@ -31,9 +36,14 @@ vi.mock('/app/resources/networking/hooks')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/networking')
 
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
+
 const ROBOT_NAME = 'otie'
 const mockOnCancel = vi.fn()
 const mockMutate = vi.fn()
+const mockReset = vi.fn()
 const MOCK_WIFI = {
   ipAddress: '127.0.0.100',
   subnetMask: '255.255.255.230',
@@ -48,6 +58,7 @@ function mockDisconnectMutation(
 ): MutationReturn {
   return {
     mutate: mockMutate,
+    reset: mockReset,
     status: 'idle',
     ...overrides,
   } as MutationReturn
@@ -66,6 +77,8 @@ describe('DisconnectModal', () => {
   beforeEach(() => {
     mockOnCancel.mockClear()
     mockMutate.mockClear()
+    mockReset.mockClear()
+    vi.mocked(isDocumentedMutationError).mockReturnValue(false)
     vi.mocked(usePostWifiDisconnectMutation).mockReturnValue(
       mockDisconnectMutation()
     )
@@ -169,12 +182,57 @@ describe('DisconnectModal', () => {
     screen.getByRole('button', { name: 'Disconnect' })
   })
 
+  it('does not show disconnect failure when documentation modal is cancelled', () => {
+    const documentedError = new DocumentedMutationError(
+      'no_documentation_report'
+    )
+    vi.mocked(isDocumentedMutationError).mockReturnValue(true)
+    vi.mocked(usePostWifiDisconnectMutation).mockReturnValue(
+      mockDisconnectMutation({
+        status: 'error',
+        error: documentedError as any,
+      })
+    )
+    render()
+
+    screen.getByText('Disconnect from foo')
+    screen.getByText('Are you sure you want to disconnect from foo?')
+    expect(
+      screen.queryByText(
+        'Your robot was unable to disconnect from Wi-Fi network foo.'
+      )
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('No documentation report provided')
+    ).not.toBeInTheDocument()
+    screen.getByRole('button', { name: 'Cancel' })
+    screen.getByRole('button', { name: 'Disconnect' })
+  })
+
+  it('resets mutation when documentation modal is cancelled', () => {
+    const documentedError = new DocumentedMutationError(
+      'no_documentation_report'
+    )
+    vi.mocked(isDocumentedMutationError).mockReturnValue(true)
+    render()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Disconnect' }))
+    const onError = mockMutate.mock.calls[0][1].onError
+    onError(documentedError)
+
+    expect(mockReset).toHaveBeenCalled()
+    expect(mockOnCancel).not.toHaveBeenCalled()
+  })
+
   it('calls postWifiDisconnect mutation on click Disconnect', () => {
     render()
 
     expect(mockMutate).not.toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Disconnect' }))
-    expect(mockMutate).toHaveBeenCalledWith({ ssid: 'foo' })
+    expect(mockMutate).toHaveBeenCalledWith(
+      { ssid: 'foo' },
+      expect.objectContaining({ onError: expect.any(Function) })
+    )
   })
 
   it('calls onCancel on cancel', () => {

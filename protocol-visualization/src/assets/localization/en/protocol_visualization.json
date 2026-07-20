@@ -3,6 +3,7 @@
   "TEMPERATURE_AT_TARGET": "Target temperature",
   "TEMPERATURE_DEACTIVATED": "Deactivated",
   "active": "Active",
+  "close_slot_spotlight": "Close slot spotlight",
   "closed": "Closed",
   "closed_and_locked": "Closed and locked",
   "deactivated": "Deactivated",

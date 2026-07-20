@@ -23,6 +23,7 @@ export interface KeyFileFieldProps {
   wifiKeys: WifiKey[]
   field: ControllerRenderProps<FieldValues, any>
   fieldState: ControllerFieldState
+  onCancel: () => void
   className?: string
 }
 
@@ -44,6 +45,7 @@ export const KeyFileField = (props: KeyFileFieldProps): JSX.Element => {
     wifiKeys,
     field,
     fieldState,
+    onCancel,
   } = props
   const { t } = useTranslation('device_settings')
   const ADD_NEW_KEY_OPTION_GROUP = {
@@ -86,6 +88,7 @@ export const KeyFileField = (props: KeyFileFieldProps): JSX.Element => {
         label={t('add_new')}
         robotName={robotName}
         onUpload={setValue}
+        onCancel={onCancel}
       />
     </>
   )

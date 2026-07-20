@@ -24,8 +24,6 @@ import { robotAdminReducer } from './robot-admin/reducer'
 import { robotApiReducer } from './robot-api/reducer'
 // robot auth state
 import { robotAuthReducer } from './robot-auth/slice'
-// robot settings state
-import { robotSettingsReducer } from './robot-settings/reducer'
 // robot robot update state
 import { robotUpdateReducer } from './robot-update/reducer'
 // robot  calibration and (eventually) protocol sessions state
@@ -47,7 +45,6 @@ export const rootReducer: Reducer<State, Action> = (
     robotAdmin: robotAdminReducer,
     robotApi: robotApiReducer,
     robotAuth: robotAuthReducer,
-    robotSettings: robotSettingsReducer,
     robotUpdate: robotUpdateReducer,
     networking: networkingReducer,
     config: configReducer,
