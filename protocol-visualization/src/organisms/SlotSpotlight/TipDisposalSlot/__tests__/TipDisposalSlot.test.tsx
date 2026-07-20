@@ -3,9 +3,9 @@ import { beforeEach, describe, it } from 'vitest'
 
 import { CLEAN, EMPTY } from '@opentrons/step-generation'
 
+import { TipDisposalSlot } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../i18n'
-import { TipDisposalSlot } from '../index'
 
 import type { ComponentProps } from 'react'
 

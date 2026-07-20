@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -43,6 +44,8 @@ interface LabwareSlotContainerProps {
   liquids: Liquid[]
   robotState: RobotState
   moduleEntities: ModuleEntities
+  // when set, the header block is rendered into this element via portal
+  headerPortalEl?: HTMLElement | null
 }
 export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
   const {
@@ -52,6 +55,7 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
     liquids,
     robotState,
     moduleEntities,
+    headerPortalEl,
   } = props
   const { labware, pipettes, liquidState, modules } = robotState
   const { t } = useTranslation('protocol_visualization')
@@ -176,60 +180,64 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
   const showStackedIcon =
     hasStackedLabware || (hopperGroups != null && hopperGroups.length > 1)
 
+  const header = (
+    <div className={styles.header}>
+      {/* header icon part */}
+      <div className={styles.header_icons}>
+        <RobotInfoLabel
+          key="slotLabel"
+          deckLabel={hasHopper ? t('stacker_slot', { slot }) : slot}
+        />
+        {moduleStackItems.map((item, index) => (
+          <RobotInfoLabel
+            key={`${item}-${index}`}
+            iconName={MODULE_ICON_NAME_BY_TYPE[moduleEntities[item].type]}
+          />
+        ))}
+        {showStackedIcon ? (
+          <RobotInfoLabel key="stackedIcon" iconName="stacked" />
+        ) : null}
+      </div>
+      {/* header icon part */}
+
+      {/* header text part */}
+      <div className={styles.header_container}>
+        <div className={styles.header_text}>
+          {labwareNickname != null ? (
+            <StyledText desktopStyle="captionSemiBold">
+              {labwareNickname}
+            </StyledText>
+          ) : null}
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {labwareDisplayName}
+          </StyledText>
+          {isTopLabwareLid ? (
+            <StyledText desktopStyle="captionSemiBold">
+              {`With ${labwareEntities[topLabwareOnSlotId].def.metadata.displayName}`}
+            </StyledText>
+          ) : null}
+        </div>
+        {quantity > 1 ? (
+          <div className={styles.tag_container}>
+            <Tag text={t('quantity', { quantity })} type="default" />
+          </div>
+        ) : null}
+      </div>
+      {adapterId != null ? (
+        <>
+          <Divider className={styles.full_width_divider} />
+          <StyledText desktopStyle="captionSemiBold">
+            {labwareEntities[adapterId].def.metadata.displayName}
+          </StyledText>
+        </>
+      ) : null}
+      {/* header text part */}
+    </div>
+  )
+
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        {/* header icon part */}
-        <div className={styles.header_icons}>
-          <RobotInfoLabel
-            key="slotLabel"
-            deckLabel={hasHopper ? t('stacker_slot', { slot: slot }) : slot}
-          />
-          {moduleStackItems.map((item, index) => (
-            <RobotInfoLabel
-              key={`${item}-${index}`}
-              iconName={MODULE_ICON_NAME_BY_TYPE[moduleEntities[item].type]}
-            />
-          ))}
-          {showStackedIcon ? (
-            <RobotInfoLabel key="stackedIcon" iconName="stacked" />
-          ) : null}
-        </div>
-        {/* header icon part */}
-
-        {/* header text part */}
-        <div className={styles.header_container}>
-          <div className={styles.header_text}>
-            {labwareNickname != null ? (
-              <StyledText desktopStyle="captionSemiBold">
-                {labwareNickname}
-              </StyledText>
-            ) : null}
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {labwareDisplayName}
-            </StyledText>
-            {isTopLabwareLid ? (
-              <StyledText desktopStyle="captionSemiBold">
-                {`With ${labwareEntities[topLabwareOnSlotId].def.metadata.displayName}`}
-              </StyledText>
-            ) : null}
-          </div>
-          {quantity > 1 ? (
-            <div className={styles.tag_container}>
-              <Tag text={t('quantity', { quantity })} type="default" />
-            </div>
-          ) : null}
-        </div>
-        {adapterId != null ? (
-          <>
-            <Divider className={styles.full_width_divider} />
-            <StyledText desktopStyle="captionSemiBold">
-              {labwareEntities[adapterId].def.metadata.displayName}
-            </StyledText>
-          </>
-        ) : null}
-        {/* header text part */}
-      </div>
+      {headerPortalEl != null ? createPortal(header, headerPortalEl) : header}
       <div className={styles.body_container}>
         <WellTooltip
           ingredNames={ingredNames}
