@@ -5,13 +5,17 @@ import {
   useSetLightsMutation,
 } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+
 const LIGHTS_POLL_MS = 5000
 export function useLights(): {
   lightsOn: boolean | null
   toggleLights: () => void
 } {
+  const documentationState = useDocumentationState()
   const [lightsOnCache, setLightsOnCache] = useState(false)
-  const { setLights, data: setLightsData } = useSetLightsMutation()
+  const { setLights, data: setLightsData } =
+    useSetLightsMutation(documentationState)
   const { data: lightsData } = useLightsQuery({
     refetchInterval: LIGHTS_POLL_MS,
   })
@@ -25,8 +29,16 @@ export function useLights(): {
   }, [lightsData, setLightsData])
 
   const toggleLights = (): void => {
-    setLightsOnCache(!Boolean(lightsOnCache))
-    setLights({ on: !Boolean(lightsOnCache) })
+    const newLightsOn = !Boolean(lightsOnCache)
+    setLightsOnCache(newLightsOn)
+    setLights(
+      { on: newLightsOn },
+      {
+        onError: () => {
+          setLightsOnCache(!newLightsOn)
+        },
+      }
+    )
   }
 
   return { lightsOn: lightsOnCache, toggleLights }

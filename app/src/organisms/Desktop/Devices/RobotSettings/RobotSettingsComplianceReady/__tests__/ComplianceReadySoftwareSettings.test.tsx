@@ -14,6 +14,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 
 import { UI_ONLY_FIELD_IDS } from '../complianceReadySettingsTypes'
 import { ComplianceReadySoftwareSettings } from '../ComplianceReadySoftwareSettings'
@@ -78,6 +79,9 @@ const COMPLIANCE_READY_FIELD_IDS = [
 ]
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const mockPatchAuthSettings = vi.fn()
 const mockPatchAuditSettings = vi.fn()

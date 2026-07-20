@@ -126,6 +126,7 @@ export const FormModal = (props: FormModalProps): JSX.Element => {
                     {...fieldProps}
                     field={field}
                     fieldState={fieldState}
+                    onCancel={onCancel}
                   />
                 )}
               />

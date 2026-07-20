@@ -15,15 +15,13 @@ import { ToggleButton } from '/app/atoms/buttons'
 import { useLEDLights } from '/app/resources/robot-settings'
 
 interface EnableStatusLightProps {
-  robotName: string
   isEstopNotDisengaged: boolean
 }
 export function EnableStatusLight({
-  robotName,
   isEstopNotDisengaged,
 }: EnableStatusLightProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const { lightsEnabled, toggleLights } = useLEDLights(robotName)
+  const { lightsEnabled, toggleLights } = useLEDLights()
 
   return (
     <Flex

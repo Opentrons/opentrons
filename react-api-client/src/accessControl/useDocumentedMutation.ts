@@ -69,6 +69,8 @@ function useWrappedMutationFn<TData, TVariables>(
   // i.e. when the user is prompted to log in again
   const mutationFnRef = useRef(mutationFn)
   mutationFnRef.current = mutationFn
+  const docStateRef = useRef(documentationState)
+  docStateRef.current = documentationState
 
   const wrappedMutationFn = useCallback(
     async (variables: TVariables) => {
@@ -77,24 +79,26 @@ function useWrappedMutationFn<TData, TVariables>(
           ? actionsToDocument(variables)
           : actionsToDocument
       return await runMutation(
-        documentationState,
+        docStateRef,
         actionsToUse,
         mutationFnRef,
         variables
       )
     },
-    [actionsToDocument, documentationState]
+    [actionsToDocument]
   )
   return wrappedMutationFn
 }
 
 async function runMutation<TData, TVariables>(
-  documentationState: DocumentationState,
+  docStateRef: MutableRefObject<DocumentationState>,
   actionsToDocument: DocumentedAction[],
   mutationFnRef: MutableRefObject<
     DocumentedMutationFunction<TData, TVariables>
   >,
-  variables: TVariables
+  variables: TVariables,
+  // local overrides for in-flight retries; do not write these back to the ref
+  documentationState: DocumentationState = docStateRef.current
 ): Promise<TData> {
   console.log('running mutation', {
     documentationState,
@@ -117,10 +121,11 @@ async function runMutation<TData, TVariables>(
     if (documentationState.docreport == null) {
       const dr = await documentationState.askForDocumentation(actionsToDocument)
       return await runMutation(
-        { ...documentationState, docreport: dr },
+        docStateRef,
         actionsToDocument,
         mutationFnRef,
-        variables
+        variables,
+        { ...documentationState, docreport: dr }
       )
     }
   }
@@ -142,10 +147,11 @@ async function runMutation<TData, TVariables>(
         loginResult?.username
       )
       return await runMutation(
-        { ...documentationState, docreport: dr, loginExpired: false },
+        docStateRef,
         actionsToDocument,
         mutationFnRef,
-        variables
+        variables,
+        { ...documentationState, docreport: dr, loginExpired: false }
       )
     }
   }
@@ -169,10 +175,11 @@ async function runMutation<TData, TVariables>(
       ) {
         console.log('hit 401')
         return await runMutation(
-          { ...documentationState, loginExpired: true },
+          docStateRef,
           actionsToDocument,
           mutationFnRef,
-          variables
+          variables,
+          { ...documentationState, loginExpired: true }
         )
       } else throw e
     })
