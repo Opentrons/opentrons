@@ -11,6 +11,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 import {
+  isDocumentedMutationError,
   useAddCameraImageSettingsToRunMutation,
   useAddCameraSettingsToRunMutation,
 } from '@opentrons/react-api-client'
@@ -57,9 +58,10 @@ export function SetupCamera({
   const { makeSnackbar } = useToaster()
   const storageInfo = useRobotStorageInfo()
   const dispatch = useDispatch()
-  const documentationState = useLinkedDocumentationState([
-    'update_camera_settings_for_run',
-  ])
+  const { documentationState, clearDocreport } = useLinkedDocumentationState(
+    ['update_camera_settings_for_run'],
+    runId
+  )
   const { mutateAsync: addCameraSettingsToRunAsync } =
     useAddCameraSettingsToRunMutation(documentationState)
   const { mutateAsync: addCameraImageSettingsToRunAsync } =
@@ -106,7 +108,11 @@ export function SetupCamera({
           : Promise.resolve(null)
       )
       .then(confirmCameraSettings)
-      .catch(() => {
+      .catch((error: unknown) => {
+        clearDocreport()
+        if (isDocumentedMutationError(error)) {
+          return
+        }
         // This request only fails if the camera is not connected to the robot.
         // We only want to surface the error if a user expects the camera to be enabled.
         if (cameraEnabled) {
