@@ -44,7 +44,7 @@ watch ?= false
 cover ?= true
 quiet ?= true
 
-format_file_exts = ts|tsx|js|mts|mjs|json|md|yml
+format_file_exts = ts|tsx|js|mts|mjs|json|md|yaml|yml
 FORMAT_FILE_GLOB = ".*.@($(format_file_exts))" "**/*.@($(format_file_exts))"
 
 ifeq ($(watch), true)
