@@ -1,6 +1,7 @@
 {
   "96_channel": "96 channel",
   "add_module": "Launching module setup flow",
+  "apply_offsets": "Applying labware offsets to run",
   "attach": "Attaching",
   "attach_gripper": "Attaching gripper",
   "attach_module": "Launching setup flow for {{module}}",

@@ -12,6 +12,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useApplyOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows'
 import {
   selectIsAnyNecessaryDefaultOffsetMissing,
@@ -85,7 +86,8 @@ export function LPCSetupFlexBtns({
     }
   }
 
-  const { applyOffsets } = useApplyOffsets(runId)
+  const documentationState = useDocumentationState()
+  const { applyOffsets } = useApplyOffsets(runId, documentationState)
   const onApplyOffsets = (): void => {
     void applyOffsets().then(() => {
       setOffsetsConfirmed(true)
