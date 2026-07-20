@@ -1,10 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  useAllProtocolsQuery,
-  useDeleteRunMutation,
-} from '@opentrons/react-api-client'
+import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -12,6 +9,7 @@ import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resource
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getLocalRobot } from '/app/redux/discovery'
 import { getShellUsbMountPaths } from '/app/redux/shell'
+import { useDeleteSelectedRuns } from '/app/resources/devices/hooks/useDeleteSelectedRuns'
 import { useDownloadSelectedRuns } from '/app/resources/devices/hooks/useDownloadSelectedRuns'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
@@ -23,6 +21,7 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/shell')
 vi.mock('/app/organisms/ToasterOven')
+vi.mock('/app/resources/devices/hooks/useDeleteSelectedRuns')
 vi.mock('/app/resources/devices/hooks/useDownloadSelectedRuns')
 vi.mock('/app/resources/runs')
 vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
@@ -52,15 +51,16 @@ const mockRun: RunData = {
 } as any
 
 describe('ProtocolRunRecords', () => {
-  let mockDeleteRun: ReturnType<typeof vi.fn>
+  let mockDeleteSelectedRuns: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
     vi.mocked(useAllProtocolsQuery).mockReturnValue({
       data: { data: [] },
     } as any)
-    mockDeleteRun = vi.fn()
-    vi.mocked(useDeleteRunMutation).mockReturnValue({
-      deleteRun: mockDeleteRun,
+    mockDeleteSelectedRuns = vi.fn()
+    vi.mocked(useDeleteSelectedRuns).mockReturnValue({
+      deleteSelectedRuns: mockDeleteSelectedRuns,
+      deletingIds: new Set(),
     } as any)
     vi.mocked(getLocalRobot).mockReturnValue({ name: 'otie' } as any)
     vi.mocked(getShellUsbMountPaths).mockReturnValue(['/mnt/usb1'])
@@ -72,7 +72,7 @@ describe('ProtocolRunRecords', () => {
       downloadRuns: vi.fn().mockResolvedValue(undefined),
       isDownloading: false,
       hasError: false,
-    })
+    } as any)
   })
 
   it('renders real rows when the query returns runs', () => {
@@ -92,7 +92,7 @@ describe('ProtocolRunRecords', () => {
     expect(screen.queryAllByText('N/A')).toHaveLength(0)
   })
 
-  it('calls deleteRun with the run id when the delete menu item is clicked', () => {
+  it('calls deleteSelectedRuns with the run when the delete menu item is clicked', () => {
     vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
       data: { data: [mockRun] },
     } as any)
@@ -102,7 +102,7 @@ describe('ProtocolRunRecords', () => {
     fireEvent.click(screen.getByRole('button'))
     fireEvent.click(screen.getByText('Delete protocol record'))
 
-    expect(mockDeleteRun).toHaveBeenCalledWith({ runId: 'run-1' })
+    expect(mockDeleteSelectedRuns).toHaveBeenCalledWith([mockRun])
   })
 
   it('opens the download wizard when the download menu item is clicked', () => {
