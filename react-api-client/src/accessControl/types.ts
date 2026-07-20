@@ -162,6 +162,7 @@ type AuditLogAction =
   | 'disconnect_wifi'
   | 'connect_wifi'
   | 'delete_run'
+  | 'delete_run_images'
   | 'delete_runs'
   | 'update_deck_configuration'
   | 'delete_offsets'
