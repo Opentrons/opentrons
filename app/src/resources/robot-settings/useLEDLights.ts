@@ -28,8 +28,16 @@ export function useLEDLights(): {
   }, [isStatusBarEnabled])
 
   const toggleLights = (): void => {
-    updateRobotSetting({ id: 'disableStatusBar', value: lightsEnabledCache })
-    setLightsEnabledCache(!lightsEnabledCache)
+    const newLightsEnabled = !lightsEnabledCache
+    setLightsEnabledCache(newLightsEnabled)
+    updateRobotSetting(
+      { id: 'disableStatusBar', value: lightsEnabledCache },
+      {
+        onError: () => {
+          setLightsEnabledCache(lightsEnabledCache)
+        },
+      }
+    )
   }
 
   return { lightsEnabled: lightsEnabledCache, toggleLights }

@@ -64,9 +64,12 @@ describe('useErrorRecoverySettingsToggle', () => {
     })
 
     expect(result.current.isEREnabled).toBe(false)
-    expect(mockUpdateSettings).toHaveBeenCalledWith({
-      data: { enabled: false },
-    })
+    expect(mockUpdateSettings).toHaveBeenCalledWith(
+      {
+        data: { enabled: false },
+      },
+      { onError: expect.any(Function) }
+    )
     expect(useUpdateErrorRecoverySettings).toHaveBeenCalledWith(
       ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
     )
@@ -76,6 +79,9 @@ describe('useErrorRecoverySettingsToggle', () => {
     })
 
     expect(result.current.isEREnabled).toBe(true)
-    expect(mockUpdateSettings).toHaveBeenCalledWith({ data: { enabled: true } })
+    expect(mockUpdateSettings).toHaveBeenCalledWith(
+      { data: { enabled: true } },
+      { onError: expect.any(Function) }
+    )
   })
 })

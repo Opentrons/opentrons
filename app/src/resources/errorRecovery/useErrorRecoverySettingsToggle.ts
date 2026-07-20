@@ -28,10 +28,16 @@ export function useErrorRecoverySettingsToggle(): UseERSettingsToggleResult {
   }, [isEREnabledData])
 
   const toggleERSettings = (): void => {
-    setIsEREnabled(isEREnabled => {
-      updateErrorRecoverySettings({ data: { enabled: !isEREnabled } })
-      return !isEREnabled
-    })
+    const newIsEREnabled = !isEREnabled
+    setIsEREnabled(newIsEREnabled)
+    updateErrorRecoverySettings(
+      { data: { enabled: newIsEREnabled } },
+      {
+        onError: () => {
+          setIsEREnabled(isEREnabled)
+        },
+      }
+    )
   }
 
   return { isEREnabled, toggleERSettings }

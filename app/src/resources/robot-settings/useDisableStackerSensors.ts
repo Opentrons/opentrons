@@ -31,11 +31,19 @@ export function useDisableStackerSensors(): {
   }, [sensorsDisabledFromSettings])
 
   const toggleSensors = (): void => {
-    setSensorsDisabledCache(!sensorDisabledCache)
-    updateRobotSetting({
-      id: 'disableFlexStackerLabwareDetection',
-      value: !sensorDisabledCache,
-    })
+    const newSensorsDisabled = !sensorDisabledCache
+    setSensorsDisabledCache(newSensorsDisabled)
+    updateRobotSetting(
+      {
+        id: 'disableFlexStackerLabwareDetection',
+        value: newSensorsDisabled,
+      },
+      {
+        onError: () => {
+          setSensorsDisabledCache(sensorDisabledCache)
+        },
+      }
+    )
   }
 
   return { sensorsDisabled: sensorDisabledCache, toggleSensors }
