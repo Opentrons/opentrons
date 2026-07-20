@@ -1,16 +1,15 @@
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
   COLORS,
   LabwareRender,
   NO,
-  RobotInfoLabel,
   RobotWorkSpace,
   StyledText,
   tipStateToTipType,
 } from '@opentrons/components'
 import { getLabwareViewBox } from '@opentrons/shared-data'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { getMissingTips } from '../../utils/getMissingTips'
 import styles from './tippickupslot.module.css'
@@ -22,13 +21,15 @@ import type { LabwareEntityExtended } from '../../DeckView'
 interface TipPickupSlotProps {
   tiprackEntity: LabwareEntityExtended
   robotState: RobotState
+  // when set, the header block is rendered into this element via portal
+  headerPortalEl?: HTMLElement | null
 }
 
 export function TipPickupSlot(props: TipPickupSlotProps): JSX.Element {
-  const { tiprackEntity, robotState } = props
+  const { tiprackEntity, robotState, headerPortalEl } = props
   const { t } = useTranslation('protocol_visualization')
   const { id, def, nickName } = tiprackEntity
-  const { tipState, labware } = robotState
+  const { tipState } = robotState
   const tipStateInfo = tipState.tipracks[id]
   const tipStatusByWellName =
     tipStateInfo != null
@@ -42,22 +43,24 @@ export function TipPickupSlot(props: TipPickupSlotProps): JSX.Element {
       : {}
   const labwareViewBox = getLabwareViewBox(def)
   const missingTips = getMissingTips(tipState, id)
-  const slot = getSlotInLocationStack(labware[id].stack)
   const tipsRemaining = Object.values(tipStatusByWellName).filter(
     state => state !== NO
   ).length
 
+  const header = (
+    <div className={styles.header}>
+      {nickName != null ? (
+        <StyledText desktopStyle="bodyDefaultSemiBold">{nickName}</StyledText>
+      ) : null}
+      <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+        {def.metadata.displayName}
+      </StyledText>
+    </div>
+  )
+
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <RobotInfoLabel deckLabel={slot} />
-        {nickName != null ? (
-          <StyledText desktopStyle="bodyDefaultSemiBold">{nickName}</StyledText>
-        ) : null}
-        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-          {def.metadata.displayName}
-        </StyledText>
-      </div>
+      {headerPortalEl != null ? createPortal(header, headerPortalEl) : header}
       <div className={styles.main_content}>
         <RobotWorkSpace
           key={id}
