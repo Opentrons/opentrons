@@ -57,5 +57,6 @@
   "update_error_recovery_policy": "Updating error recovery policy",
   "update_error_recovery_settings": "Updating error recovery settings",
   "update_robot_name": "Updating robot name",
+  "update_self": "Saving user settings",
   "update_subsystem": "Updating subsystem firmware"
 }

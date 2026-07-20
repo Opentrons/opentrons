@@ -50,7 +50,7 @@ export function useSetNewPasswordAndSignIn(
       void (async () => {
         try {
           try {
-            await updateSelf(host, { data: { password } })
+            await updateSelf(host, { data: { password } }, '')
           } catch (error) {
             console.error(
               'useSetNewPasswordAndSignIn: failed to update password',
