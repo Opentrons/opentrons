@@ -160,6 +160,7 @@ type AuditLogAction =
   | 'delete_run'
   | 'delete_runs'
   | 'update_deck_configuration'
+  | 'upload_csv'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.
