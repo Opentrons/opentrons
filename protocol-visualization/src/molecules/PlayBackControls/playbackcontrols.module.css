@@ -1,5 +1,8 @@
 .container {
-  position: relative;
+  position: fixed;
+  z-index: 10;
+  bottom: 2rem;
+  left: 50%;
   display: flex;
   overflow: visible;
   width: 100%;
@@ -10,11 +13,9 @@
   align-items: center;
   padding: 0 var(--spacing-20);
   border-radius: var(--border-radius-full);
-
-  /* this margin is for box-shadow */
-  margin: var(--spacing-8) var(--spacing-4);
   background-color: var(--white);
   box-shadow: 0 0 6px 1px rgb(22 33 45 / 15%);
+  transform: translateX(-50%);
 }
 
 .controls_left {
@@ -29,14 +30,13 @@
   user-select: none;
 }
 
-/* to prevent the :horizontal shift */
 .time_current {
-  min-width: 4.0625rem;
+  min-width: 65px;
   text-align: right;
 }
 
 .time_total {
-  min-width: 4.0625rem;
+  min-width: 65px;
   text-align: left;
 }
 
@@ -56,7 +56,10 @@
   padding: 0 var(--spacing-8);
   border: none;
   background: none;
+  color: var(--text-color-black, #1d1d1d);
   cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
   outline: none;
   user-select: none;
 }
@@ -68,7 +71,7 @@
 .divider {
   width: 1px;
   height: 2rem;
-  background-color: var(--grey-30);
+  background-color: var(--border-color-gray, #e1e1e1);
 }
 
 .controls_right {
@@ -85,18 +88,16 @@
   padding: 0;
   border: none;
   border-radius: 50%;
-  background-color: var(--transparent);
+  background-color: transparent;
   cursor: pointer;
   outline: none;
   transition: background-color 0.15s ease;
 }
 
 .icon_button:hover {
-  border-radius: 50%;
   background-color: var(--grey-30);
 }
 
 .icon_button:active {
-  border-radius: 50%;
   background-color: var(--grey-35);
 }

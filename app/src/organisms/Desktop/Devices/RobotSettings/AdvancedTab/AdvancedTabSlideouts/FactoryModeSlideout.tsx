@@ -227,7 +227,6 @@ export function FactoryModeSlideout({
             name="factoryModeInput"
             render={({ field }) => (
               <InputField
-                id="factoryModeInput"
                 name="factoryModeInput"
                 type="text"
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {

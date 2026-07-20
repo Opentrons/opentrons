@@ -45,7 +45,6 @@ export function DisplayRobotName({
           forwardedAs="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing16}
-          id="AdvancedSettings_About"
         >
           {t('about_advanced')}
         </LegacyStyledText>
@@ -63,7 +62,6 @@ export function DisplayRobotName({
       <TertiaryButton
         marginLeft={SPACING_AUTO}
         onClick={handleClick}
-        id="RobotSettings_RenameRobot"
         disabled={isRobotBusy}
       >
         {t('rename_robot')}
