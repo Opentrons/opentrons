@@ -50,6 +50,8 @@ export function useSetNewPasswordAndSignIn(
       void (async () => {
         try {
           try {
+            // ok so usually using react-api-client functions outside of mutations is bad
+            // but here, we need to specifically not ask for documentation as were in the middle of login
             await updateSelf(host, { data: { password } }, '')
           } catch (error) {
             console.error(
