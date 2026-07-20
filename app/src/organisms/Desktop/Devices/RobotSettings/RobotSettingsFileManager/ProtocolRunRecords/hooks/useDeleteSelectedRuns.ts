@@ -30,7 +30,7 @@ export function useDeleteSelectedRuns(
   const mutation = useDocumentedMutation<unknown, unknown, RunData[]>(
     documentationState,
     ['delete_runs'],
-    ({ variables: runs }) => {
+    ({ variables: runs, userNotes }) => {
       const currentHost = host
       if (currentHost == null || runs.length === 0) {
         return Promise.resolve()
@@ -38,7 +38,7 @@ export function useDeleteSelectedRuns(
 
       return Promise.all(
         runs.map(run =>
-          deleteRun(currentHost, run.id).catch((e: Error) =>
+          deleteRun(currentHost, run.id, userNotes).catch((e: Error) =>
             makeToast(e.message, ERROR_TOAST, { closeButton: true })
           )
         )

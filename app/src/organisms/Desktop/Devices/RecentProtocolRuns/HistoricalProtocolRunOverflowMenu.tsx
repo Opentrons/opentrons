@@ -34,6 +34,7 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 import {
+  isDocumentedMutationError,
   useDeleteRunImages,
   useDeleteRunMutation,
 } from '@opentrons/react-api-client'
@@ -142,8 +143,9 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
 
   const isRobotOnWrongVersionOfSoftware =
     useIsRobotOnWrongVersionOfSoftware(robotName)
+  const documentationState = useDocumentationState()
   const { mutateAsync: deleteRunImages, isLoading: isDeletingImages } =
-    useDeleteRunImages()
+    useDeleteRunImages(documentationState)
 
   const [targetProps, tooltipProps] = useHoverTooltip()
   const onResetSuccess = (createRunResponse: Run): void => {
@@ -163,7 +165,6 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     runId,
     onResetSuccess
   )
-  const documentationState = useDocumentationState()
   const { deleteRun, isLoading: isDeletingRun } =
     useDeleteRunMutation(documentationState)
   const robot = useRobot(robotName)
@@ -193,10 +194,8 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     closeOverflowMenu(e)
   }
 
-  const onDeleteRunImages = (onClose: () => void): void => {
-    void deleteRunImages(runId).finally(() => {
-      onClose()
-    })
+  const onDeleteRunImages = (): ReturnType<typeof deleteRunImages> => {
+    return deleteRunImages(runId)
   }
   const { reportPhotoAccessUsage } = useCameraAnalytics({
     source: SOURCE_RUN_RECORD,
@@ -302,7 +301,9 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
 }
 
 interface DeleteRunImagesModalProps {
-  onDeleteRunImages: (onClose: () => void) => void
+  onDeleteRunImages: () => ReturnType<
+    ReturnType<typeof useDeleteRunImages>['mutateAsync']
+  >
 }
 
 const handleDeleteRunImagesModal = (props: DeleteRunImagesModalProps): void => {
@@ -322,7 +323,17 @@ const DeleteRunImagesModal = NiceModal.create(
     const onDelete = (): void => {
       if (!isDeleting) {
         setIsDeleting(true)
-        onDeleteRunImages(modal.remove)
+        void onDeleteRunImages()
+          .then(() => {
+            modal.remove()
+          })
+          .catch((error: unknown) => {
+            if (isDocumentedMutationError(error)) {
+              setIsDeleting(false)
+            } else {
+              modal.remove()
+            }
+          })
       }
     }
 

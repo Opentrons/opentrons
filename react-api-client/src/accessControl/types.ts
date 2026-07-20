@@ -121,6 +121,7 @@ export interface AttachingModuleAction {
  * These should match keys in audit_log.json
  */
 type AuditLogAction =
+  | 'acknowledge_estop'
   | 'stop_run'
   | 'play_run'
   | 'place_plate_reader_lid'
@@ -163,13 +164,19 @@ type AuditLogAction =
   | 'disconnect_wifi'
   | 'connect_wifi'
   | 'delete_run'
+  | 'delete_run_images'
   | 'delete_runs'
   | 'update_deck_configuration'
+  | 'upload_csv'
+  | 'update_audit_settings'
+  | 'update_auth_settings'
+  | 'patch_robot_server_crs_settings'
   | 'delete_offsets'
   | 'create_offsets'
   | 'set_lights'
   | 'apply_offsets'
   | 'update_subsystem'
+  | 'create_user'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.
