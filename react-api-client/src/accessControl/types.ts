@@ -164,6 +164,8 @@ type AuditLogAction =
   | 'delete_run'
   | 'delete_runs'
   | 'update_deck_configuration'
+  | 'delete_offsets'
+  | 'create_offsets'
   | 'set_lights'
   | 'apply_offsets'
   | 'update_subsystem'
