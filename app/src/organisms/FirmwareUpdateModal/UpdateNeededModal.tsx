@@ -19,6 +19,7 @@ import { LEFT, RIGHT } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { OddModal } from '/app/molecules/OddModal'
 
 import { UpdateInProgressModal } from './UpdateInProgressModal'
@@ -49,7 +50,8 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
     instrument => instrument.subsystem === subsystem
   )
 
-  const { updateSubsystem } = useUpdateSubsystemMutation({
+  const documentationState = useDocumentationState()
+  const { updateSubsystem } = useUpdateSubsystemMutation(documentationState, {
     onSuccess: data => {
       setUpdateId(data.data.id)
     },

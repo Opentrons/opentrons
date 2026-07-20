@@ -91,6 +91,9 @@ describe('ConfirmCancelRunModal', () => {
       dismissCurrentRun: mockDismissCurrentRun,
       isLoading: false,
     } as any)
+    mockDismissCurrentRun.mockImplementation((_id: string, options?: any) => {
+      options?.onSuccess?.()
+    })
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
@@ -177,7 +180,13 @@ describe('ConfirmCancelRunModal', () => {
     expect(mockTrackProtocolRunEvent).toHaveBeenCalledWith({
       name: 'runCancel',
     })
-    expect(mockDismissCurrentRun).toHaveBeenCalledWith(RUN_ID)
+    expect(mockDismissCurrentRun).toHaveBeenCalledWith(
+      RUN_ID,
+      expect.objectContaining({
+        onSuccess: expect.any(Function),
+        onError: expect.any(Function),
+      })
+    )
     expect(mockNavigate).toHaveBeenCalledWith('/protocols')
   })
 
@@ -196,7 +205,13 @@ describe('ConfirmCancelRunModal', () => {
     const button = screen.getByText('Cancel run')
     fireEvent.click(button)
 
-    expect(mockDismissCurrentRun).toHaveBeenCalledWith(RUN_ID)
+    expect(mockDismissCurrentRun).toHaveBeenCalledWith(
+      RUN_ID,
+      expect.objectContaining({
+        onSuccess: expect.any(Function),
+        onError: expect.any(Function),
+      })
+    )
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith('/protocols/test-protocol-id')
   })
@@ -229,7 +244,13 @@ describe('ConfirmCancelRunModal', () => {
     const button = screen.getByText('Cancel run')
     fireEvent.click(button)
 
-    expect(mockDismissCurrentRun).toHaveBeenCalledWith(RUN_ID)
+    expect(mockDismissCurrentRun).toHaveBeenCalledWith(
+      RUN_ID,
+      expect.objectContaining({
+        onSuccess: expect.any(Function),
+        onError: expect.any(Function),
+      })
+    )
     expect(mockNavigate).toHaveBeenCalledWith('/protocols')
     expect(mockTrackProtocolRunEvent).not.toHaveBeenCalled()
   })

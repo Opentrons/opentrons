@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -10,33 +9,30 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useUpdateRobotSettingMutation } from '@opentrons/react-api-client'
 
 import { ToggleButton } from '/app/atoms/buttons'
-import { updateSetting } from '/app/redux/robot-settings'
 
 import type { MouseEventHandler } from 'react'
-import type { RobotSettingsField } from '/app/redux/robot-settings/types'
-import type { Dispatch } from '/app/redux/types'
+import type { RobotSettingsField } from '@opentrons/api-client'
 
 interface GantryHomingProps {
   settings: RobotSettingsField | undefined
-  robotName: string
   isRobotBusy: boolean
 }
 
 export function GantryHoming({
   settings,
-  robotName,
   isRobotBusy,
 }: GantryHomingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const dispatch = useDispatch<Dispatch>()
+  const { updateRobotSetting } = useUpdateRobotSettingMutation()
   const value = settings?.value ? settings.value : false
   const id = settings?.id ? settings.id : 'disableHomeOnBoot'
 
   const handleClick: MouseEventHandler<Element> = () => {
     if (!isRobotBusy) {
-      dispatch(updateSetting(robotName, id, !value))
+      updateRobotSetting({ id, value: !value })
     }
   }
 
@@ -46,7 +42,6 @@ export function GantryHoming({
         <LegacyStyledText
           css={TYPOGRAPHY.pSemiBold}
           paddingBottom={SPACING.spacing4}
-          id="AdvancedSettings_homing"
         >
           {t('gantry_homing')}
         </LegacyStyledText>
@@ -58,7 +53,6 @@ export function GantryHoming({
         label="gantry_homing"
         toggledOn={!value}
         onClick={handleClick}
-        id="RobotSettings_gantryHomingToggleButton"
         disabled={isRobotBusy}
       />
     </Flex>

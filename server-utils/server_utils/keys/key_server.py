@@ -17,6 +17,7 @@ import aiohttp
 import pydantic
 
 SIGN_MESSAGE_ENDPOINT_PATH = "keys/internal/logSigning/signMessage"
+PUBLIC_KEY_ENDPOINT_PATH = "/keys/external/logSigning/publicKey"
 
 _log = logging.getLogger(__name__)
 
@@ -32,6 +33,11 @@ class Client(ABC):
         the implementation must raise an exception. Callers should never see a
         silently-discarded signing request.
         """
+        pass
+
+    @abstractmethod
+    async def get_key_and_hash(self) -> PublicKeyAndHash:
+        """Get the public key and hash of the public signing certificate."""
         pass
 
 
@@ -96,6 +102,16 @@ class LocalHTTPClient(Client):
         parsed_response = SignMessageResponseBody.model_validate_json(response_bytes)
         return parsed_response.data
 
+    @typing.override
+    async def get_key_and_hash(self) -> PublicKeyAndHash:
+        async with self._session.get(PUBLIC_KEY_ENDPOINT_PATH) as response:
+            response_json = await response.json()
+        response.raise_for_status()
+        return PublicKeyAndHash(
+            publicKey=response_json["data"]["publicKeyPem"],
+            publicHash=response_json["data"]["hashedKey"],
+        )
+
 
 class _StrictBaseModel(pydantic.BaseModel):
     model_config = {"strict": True}
@@ -127,3 +143,10 @@ class SignMessageResponseBody(_StrictBaseModel):
     """Response envelope for sign-message."""
 
     data: SignedMessageData
+
+
+class PublicKeyAndHash(_StrictBaseModel):
+    """The robot's log signing public key and the hash of the public signing cert."""
+
+    publicKey: str
+    publicHash: str

@@ -5,11 +5,12 @@ from sqlalchemy import select
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session
 
+from audit_server.log_storage.models import UserLogEntry
 from audit_server.log_storage.store import (
     LogStore,
     NoActivePeriodError,
 )
-from audit_server.log_storage.types import StoredLog
+from audit_server.log_storage.types import LogPeriodEntries, StoredLog
 from audit_server.persistence.orm_models import LogPeriod
 
 
@@ -332,3 +333,28 @@ def test_list_periods_ordered_oldest_first(
     assert periods[1].startedAt > periods[0].startedAt
     assert periods[0].endedAt is not None
     assert periods[1].endedAt is None
+
+
+def test_get_period_entries(
+    subject_with_period: LogStore,
+) -> None:
+    """It should return the period entry for the given period"""
+    periods = subject_with_period.list_periods()
+    assert len(periods) == 1
+
+    period_id = periods[0].id
+
+    log_period_entry = subject_with_period.get_period_entries(str(period_id))
+    assert isinstance(log_period_entry, LogPeriodEntries)
+    assert log_period_entry.user_log.userLogEntries == [
+        UserLogEntry(
+            message="starting tests",
+            message_hash="asdasd",
+            message_sig="ddddd",
+            sig_version="1",
+        )
+    ]
+    assert log_period_entry.user_log.startedAt is not None
+    assert log_period_entry.user_log.endedAt is None
+
+    assert log_period_entry.robot_log_entries == []

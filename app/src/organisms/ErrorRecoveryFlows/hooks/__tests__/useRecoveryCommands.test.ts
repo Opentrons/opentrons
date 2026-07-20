@@ -795,16 +795,70 @@ describe('useRecoveryCommands', () => {
       new Error('Update policy failed')
     )
 
-    const { result } = renderHook(() => useRecoveryCommands(testProps))
+    const { result, rerender } = renderHook(() =>
+      useRecoveryCommands(testProps)
+    )
 
     await act(async () => {
       await result.current.ignoreErrorKindThisRun(true)
+    })
+
+    rerender()
+
+    await act(async () => {
+      result.current.skipFailedCommand()
     })
 
     expect(mockUpdateErrorRecoveryPolicy).toHaveBeenCalled()
     expect(mockProceedToRouteAndStep).toHaveBeenCalledWith(
       RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE
     )
+  })
+
+  it('should restore the previous screen when updateErrorRecoveryPolicy documentation is cancelled', async () => {
+    const mockHandleMotionRouting = vi.fn(() => Promise.resolve())
+    const mockFailedCommandWithError = {
+      ...mockFailedCommand,
+      commandType: 'aspirateInPlace',
+      error: {
+        errorType: 'mockErrorType',
+      },
+    }
+
+    mockMakeSuccessToast.mockClear()
+    mockProceedToRouteAndStep.mockClear()
+    vi.mocked(isDocumentedMutationError).mockReturnValue(true)
+    mockUpdateErrorRecoveryPolicy.mockRejectedValueOnce(
+      new Error('No documentation report provided')
+    )
+
+    const { result, rerender } = renderHook(() =>
+      useRecoveryCommands({
+        ...props,
+        unvalidatedFailedCommand: mockFailedCommandWithError,
+        routeUpdateActions: {
+          ...mockRouteUpdateActions,
+          handleMotionRouting: mockHandleMotionRouting,
+        },
+      })
+    )
+
+    await act(async () => {
+      await result.current.ignoreErrorKindThisRun(true)
+    })
+
+    rerender()
+
+    await act(async () => {
+      result.current.skipFailedCommand()
+    })
+
+    expect(mockUpdateErrorRecoveryPolicy).toHaveBeenCalled()
+    expect(mockHandleMotionRouting).toHaveBeenCalledWith(false)
+    expect(mockProceedToRouteAndStep).not.toHaveBeenCalledWith(
+      RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE
+    )
+    expect(mockMakeSuccessToast).not.toHaveBeenCalled()
   })
 
   describe('skipFailedCommand with false positive handling', () => {

@@ -309,7 +309,6 @@ export const TestShakeSlideout = (
         role="button"
         marginTop={SPACING.spacing4}
         css={TYPOGRAPHY.linkPSemiBold}
-        id="HeaterShaker_Attachment_Instructions"
         onClick={() => {
           setShowModuleSetupModal(true)
         }}
