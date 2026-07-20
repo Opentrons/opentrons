@@ -1005,8 +1005,9 @@
   ],
   "parameters": {
     "format": "96Standard",
-    "quirks": ["filterPlate"],
+    "quirks": ["filterPlate", "noLabwarePositionCheck"],
     "isTiprack": false,
+    "isDeckSlotCompatible": false,
     "isMagneticModuleCompatible": false,
     "loadName": "millipore_96_wellplate_300ul_hts_filter"
   },

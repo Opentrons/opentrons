@@ -29,7 +29,6 @@ export function DisableStackerSensors({
         <LegacyStyledText
           css={TYPOGRAPHY.pSemiBold}
           paddingBottom={SPACING.spacing4}
-          id="AdvancedSettings_disableStackerSensors"
         >
           {t('disable_stacker_sensors')}
         </LegacyStyledText>
@@ -41,7 +40,6 @@ export function DisableStackerSensors({
         label="disable_stacker_sensors"
         toggledOn={sensorsDisabled}
         onClick={toggleSensors}
-        id="RobotSettings_DisableStackerSensorsToggleButton"
         disabled={isRobotBusy}
       />
     </Flex>

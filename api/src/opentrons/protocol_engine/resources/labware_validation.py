@@ -58,6 +58,15 @@ def validate_definition_is_filter_plate(definition: LabwareDefinition) -> bool:
     )
 
 
+def validate_definition_is_deck_slot_compatible(
+    definition: LabwareDefinition,
+) -> bool:
+    """Validate that labware can be loaded directly onto a base deck slot."""
+    if definition.parameters.isDeckSlotCompatible is None:
+        return True
+    return definition.parameters.isDeckSlotCompatible
+
+
 def validate_legacy_labware_can_be_stacked(
     child_labware_definition: LabwareDefinition2,
     parent_labware_definition: LabwareDefinition2,

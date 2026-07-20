@@ -47,7 +47,6 @@ export function LegacySettings({
           forwardedAs="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing16}
-          id="AdvancedSettings_showLink"
         >
           {t('legacy_settings')}
         </LegacyStyledText>
@@ -62,7 +61,6 @@ export function LegacySettings({
         label="legacy_settings"
         toggledOn={settings?.value === true}
         onClick={handleClick}
-        id="RobotSettings_legacySettingsToggleButton"
         disabled={isRobotBusy}
       />
     </Flex>

@@ -45,14 +45,12 @@ export function SetupStep({
               <StyledText
                 color={COLORS.black90}
                 desktopStyle="bodyLargeSemiBold"
-                id={`CollapsibleStep_${String(title)}`}
               >
                 {title}
               </StyledText>
               <StyledText
                 desktopStyle="bodyDefaultRegular"
                 color={COLORS.black90}
-                id={`CollapsibleStep_${description}`}
                 className={styles.description_text}
               >
                 {description}

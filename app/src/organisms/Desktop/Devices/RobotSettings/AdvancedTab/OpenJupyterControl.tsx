@@ -43,7 +43,6 @@ export function OpenJupyterControl({
         <LegacyStyledText
           css={TYPOGRAPHY.pSemiBold}
           marginBottom={SPACING.spacing8}
-          id="AdvancedSettings_About"
         >
           {t('jupyter_notebook')}
         </LegacyStyledText>

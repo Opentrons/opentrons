@@ -42,7 +42,6 @@ export function GantryHoming({
         <LegacyStyledText
           css={TYPOGRAPHY.pSemiBold}
           paddingBottom={SPACING.spacing4}
-          id="AdvancedSettings_homing"
         >
           {t('gantry_homing')}
         </LegacyStyledText>
@@ -54,7 +53,6 @@ export function GantryHoming({
         label="gantry_homing"
         toggledOn={!value}
         onClick={handleClick}
-        id="RobotSettings_gantryHomingToggleButton"
         disabled={isRobotBusy}
       />
     </Flex>
