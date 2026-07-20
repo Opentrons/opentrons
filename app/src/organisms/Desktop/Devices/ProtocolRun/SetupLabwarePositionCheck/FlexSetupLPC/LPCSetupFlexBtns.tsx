@@ -96,7 +96,6 @@ export function LPCSetupFlexBtns({
     <Flex justifyContent={JUSTIFY_CENTER} gridGap={SPACING.spacing8}>
       <SecondaryButton
         onClick={launchLPC}
-        id="LabwareSetup_checkLabwarePositionsButton"
         {...runLPCTargetProps}
         disabled={lpcDisabledReason !== null || offsetsConfirmed}
       >
@@ -109,7 +108,6 @@ export function LPCSetupFlexBtns({
       ) : null}
       <PrimaryButton
         onClick={onApplyOffsets}
-        id="LPC_setOffsetsConfirmed"
         padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
         disabled={isApplyOffsetsBtnDisabled}
         {...confirmOffsetsTargetProps}

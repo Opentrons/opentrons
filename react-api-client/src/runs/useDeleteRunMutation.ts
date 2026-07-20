@@ -1,7 +1,8 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { deleteRun } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
 import type {
@@ -10,6 +11,7 @@ import type {
   UseMutationResult,
 } from 'react-query'
 import type { DeleteRunData, EmptyResponse } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
 
 export interface DeleteRunParams {
   runId: string
@@ -31,13 +33,20 @@ export type UseDeleteRunMutationOptions = UseMutationOptions<
 >
 
 export function useDeleteRunMutation(
+  documentationState: DocumentationState,
   options: UseDeleteRunMutationOptions = {}
 ): UseDeleteRunMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<EmptyResponse, unknown, DeleteRunParams>(
-    ({ runId, settings }) =>
+  const mutation = useDocumentedMutation<
+    EmptyResponse,
+    unknown,
+    DeleteRunParams
+  >(
+    documentationState,
+    ['delete_run'],
+    ({ variables: { runId, settings } }) =>
       deleteRun(host!, runId, settings).then(response => {
         queryClient.removeQueries(getQueryKey(host, 'runs', runId))
         queryClient

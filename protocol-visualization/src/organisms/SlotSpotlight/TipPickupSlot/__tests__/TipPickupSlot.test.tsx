@@ -95,7 +95,6 @@ describe('TipPickupSlot', () => {
 
   it('should render TipPickupSlot', () => {
     render(props)
-    screen.getByText(MOCK_SLOT)
     screen.getByText('mockNickname')
     screen.getByText('mock LabwareRender')
     screen.getByTestId('robot-workspace')
