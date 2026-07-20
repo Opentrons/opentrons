@@ -5,7 +5,7 @@ name: 'JS checks'
 
 on:
   pull_request:
-    paths:
+    paths: &paths
       - '**.js'
       - '**.cjs'
       - '**.mjs'
@@ -18,18 +18,7 @@ on:
       - '**.md'
       - '.github/workflows/js-check.yaml'
   push:
-    paths:
-      - '**.js'
-      - '**.cjs'
-      - '**.mjs'
-      - '**.ts'
-      - '**.cts'
-      - '**.mts'
-      - '**.tsx'
-      - '**.json'
-      - '**.css'
-      - '**.md'
-      - '.github/workflows/js-check.yaml'
+    paths: *paths
   workflow_dispatch:
 
 concurrency:
