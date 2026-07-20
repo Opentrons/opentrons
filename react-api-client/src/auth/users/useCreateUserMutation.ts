@@ -25,12 +25,12 @@ export type UseCreateUserMutationResult = UseMutationResult<
 }
 
 export function useCreateUserMutation(
+  documentationState: DocumentationState,
   options: UseMutationOptions<
     AuthUserResponse,
     AxiosError,
     CreateUserRequest
-  > = {},
-  documentationState: DocumentationState
+  > = {}
 ): UseCreateUserMutationResult {
   const host = useHost()
   const mutation = useDocumentedMutation(
