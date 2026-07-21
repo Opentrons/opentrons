@@ -8,8 +8,7 @@ import {
   ROBOT_FIELD_NAME,
 } from '/ai-client/components/organisms/InstrumentsSection'
 import { i18n } from '/ai-client/i18n'
-import { PROTOCOL_FORMAT, PYTHON } from '/ai-client/resources/constants'
-import { fillProtocolFormatSectionAndClickConfirm } from '/ai-client/resources/utils/createProtocolTestUtils'
+import { fillApplicationSectionAndClickConfirm } from '/ai-client/resources/utils/createProtocolTestUtils'
 
 import { ProtocolSectionsContainer } from '..'
 
@@ -37,7 +36,6 @@ const render = (defaultValues = {}): ReturnType<typeof renderWithProviders> => {
 describe('ProtocolSectionsContainer', () => {
   it('should render all five accordions for each step of Protocol Creation', () => {
     render()
-    expect(screen.getByText('Protocol Format')).toBeInTheDocument()
     expect(screen.getByText('Application')).toBeInTheDocument()
     expect(screen.getByText('Instruments')).toBeInTheDocument()
     expect(screen.getByText('Modules')).toBeInTheDocument()
@@ -45,11 +43,11 @@ describe('ProtocolSectionsContainer', () => {
     expect(screen.getByText('Steps')).toBeInTheDocument()
   })
 
-  it('should render the Protocol Format section opened by default', () => {
+  it('should render the Application section opened by default', () => {
     render()
 
     expect(
-      screen.getByRole('button', { name: 'Protocol Format' })
+      screen.getByRole('button', { name: 'Application' })
     ).toHaveAttribute('aria-expanded', 'true')
   })
 
@@ -76,20 +74,20 @@ describe('ProtocolSectionsContainer', () => {
   it('should go back to previous section when clicking on the previous section', async () => {
     render()
 
-    const protocolFormatButton = screen.getByRole('button', {
-      name: 'Protocol Format',
+    const applicationButton = screen.getByRole('button', {
+      name: 'Application',
     })
-    expect(protocolFormatButton).toHaveAttribute('aria-expanded', 'true')
+    expect(applicationButton).toHaveAttribute('aria-expanded', 'true')
 
-    await fillProtocolFormatSectionAndClickConfirm()
+    await fillApplicationSectionAndClickConfirm()
 
     await waitFor(() => {
-      expect(protocolFormatButton).toHaveAttribute('aria-expanded', 'false')
+      expect(applicationButton).toHaveAttribute('aria-expanded', 'false')
     })
-    fireEvent.click(protocolFormatButton)
+    fireEvent.click(applicationButton)
 
     await waitFor(() => {
-      expect(protocolFormatButton).toHaveAttribute('aria-expanded', 'true')
+      expect(applicationButton).toHaveAttribute('aria-expanded', 'true')
     })
   })
 
@@ -110,22 +108,20 @@ describe('ProtocolSectionsContainer', () => {
 
   it('should include Runtime Parameters section between Labware & Liquids and Steps', () => {
     render({
-      [PROTOCOL_FORMAT]: PYTHON,
       [ROBOT_FIELD_NAME]: OPENTRONS_FLEX,
     })
 
     // Get all accordion buttons
     const buttons = screen.getAllByRole('button', {
-      name: /Protocol Format|Application|Instruments|Modules|Labware & Liquids|Runtime Parameters|Steps/,
+      name: /Application|Instruments|Modules|Labware & Liquids|Runtime Parameters|Steps/,
     })
 
     // Verify order of sections by their headings
-    expect(buttons[0]).toHaveTextContent('Protocol Format')
-    expect(buttons[1]).toHaveTextContent('Application')
-    expect(buttons[2]).toHaveTextContent('Instruments')
-    expect(buttons[3]).toHaveTextContent('Modules')
-    expect(buttons[4]).toHaveTextContent('Labware & Liquids')
-    expect(buttons[5]).toHaveTextContent('Runtime Parameters')
-    expect(buttons[6]).toHaveTextContent('Steps')
+    expect(buttons[0]).toHaveTextContent('Application')
+    expect(buttons[1]).toHaveTextContent('Instruments')
+    expect(buttons[2]).toHaveTextContent('Modules')
+    expect(buttons[3]).toHaveTextContent('Labware & Liquids')
+    expect(buttons[4]).toHaveTextContent('Runtime Parameters')
+    expect(buttons[5]).toHaveTextContent('Steps')
   })
 })
