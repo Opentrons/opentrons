@@ -84,6 +84,15 @@ def doc_href_to_production_url(href: str, source_relpath: str = "") -> str | Non
     return _resolved_path_to_url(resolved_path, fragment_suffix)
 
 
+def synced_doc_path_to_production_url(source_relpath: str, fragment: str = "") -> str:
+    """Return the production docs URL for a synced markdown relative path."""
+    href = source_relpath if not fragment else f"{source_relpath}#{fragment}"
+    url = doc_href_to_production_url(href, "")
+    if url is None:
+        raise ValueError(f"Cannot map synced doc path to production URL: {source_relpath!r}")
+    return url
+
+
 def rewrite_markdown_doc_links(text: str, source_relpath: str = "") -> str:
     """Rewrite markdown link targets that point at API docs."""
     pieces: list[str] = []

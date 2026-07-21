@@ -217,3 +217,21 @@ def test_api_doc_resolve_path_supports_markdown_paths() -> None:
     assert markdown_path is not None
     assert markdown_path.name == "index.md"
     assert predict._api_doc_resolve_path("docs/v2/new_modules.rst") is None
+
+
+@pytest.mark.unit
+def test_parse_relevant_files_includes_production_url(tmp_path: Path) -> None:
+    docs_root = tmp_path / "docs" / "v2"
+    doc_path = docs_root / "complex-commands" / "parameters.md"
+    doc_path.parent.mkdir(parents=True)
+    doc_path.write_text("## Blow out { #blow-out-complex }\n", encoding="utf-8")
+
+    with patch("api.domain.anthropic_predict.get_default_api_level", return_value="2.28"):
+        predict = AnthropicPredict(settings=MagicMock())
+    predict._api_docs_content_root = docs_root
+
+    xml = predict.parse_relevant_files_and_get_content("<relevant_files>\ncomplex-commands/parameters.md\n</relevant_files>")
+
+    assert "url='https://docs.opentrons.com/python-api/complex-commands/parameters/'" in xml
+    assert "<production_url>https://docs.opentrons.com/python-api/complex-commands/parameters/</production_url>" in xml
+    assert "Blow out" in xml

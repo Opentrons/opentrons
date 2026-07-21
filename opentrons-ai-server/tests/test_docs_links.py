@@ -5,6 +5,7 @@ from api.utils.docs_links import (
     check_production_docs_url,
     doc_href_to_production_url,
     rewrite_markdown_doc_links,
+    synced_doc_path_to_production_url,
 )
 
 from tests.helpers.synced_docs import require_synced_api_docs
@@ -47,6 +48,20 @@ def test_doc_href_to_production_url_preserves_fragment() -> None:
 def test_doc_href_to_production_url_leaves_absolute_links() -> None:
     assert doc_href_to_production_url("https://docs.opentrons.com/python-api/labware") is None
     assert doc_href_to_production_url("https://docs.opentrons.com/v1/index.html") is None
+
+
+@pytest.mark.unit
+def test_synced_doc_path_to_production_url() -> None:
+    assert (
+        synced_doc_path_to_production_url("complex-commands/parameters.md")
+        == "https://docs.opentrons.com/python-api/complex-commands/parameters/"
+    )
+    assert (
+        synced_doc_path_to_production_url("complex-commands/parameters.md", "blow-out-complex")
+        == "https://docs.opentrons.com/python-api/complex-commands/parameters/#blow-out-complex"
+    )
+    assert synced_doc_path_to_production_url("modules/index.md") == "https://docs.opentrons.com/python-api/modules/"
+    assert synced_doc_path_to_production_url("index.md") == "https://docs.opentrons.com/python-api/"
 
 
 @pytest.mark.unit
