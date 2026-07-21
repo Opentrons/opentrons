@@ -576,9 +576,7 @@ async def download_run_images(
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     run_store: Annotated[RunStore, Depends(get_run_store)],
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
-    persistence_directory: Annotated[
-        Path, Depends(get_active_persistence_directory)
-    ],
+    persistence_directory: Annotated[Path, Depends(get_active_persistence_directory)],
 ) -> FileResponse:
     """Download all camera images for a run as a zip file.
 

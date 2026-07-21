@@ -77,9 +77,7 @@ async def download_run_files(
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
-    persistence_directory: Annotated[
-        Path, Depends(get_active_persistence_directory)
-    ],
+    persistence_directory: Annotated[Path, Depends(get_active_persistence_directory)],
 ) -> FileResponse:
     """Download files associated with a run as a zip archive.
 
@@ -387,4 +385,3 @@ def _format_download_timestamp(created_at: datetime) -> str:
 
     iso = created_at.isoformat(timespec="milliseconds").replace("+00:00", "Z")
     return iso.replace(":", "_")
-
