@@ -44,7 +44,6 @@ from .models import (
     FileNotFound,
     ImageFileMetadata,
     NoImagesFound,
-    ZipCreationFailed,
 )
 from .zip_utils import (
     build_run_zip_filename,
@@ -570,7 +569,6 @@ async def delete_run_images(
             "description": "A zip file containing all camera images for the run",
         },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[NoImagesFound]},
-        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ErrorBody[ZipCreationFailed]},
     },
 )
 async def download_run_images(

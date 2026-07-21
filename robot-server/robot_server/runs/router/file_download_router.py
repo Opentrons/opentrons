@@ -16,7 +16,6 @@ from server_utils.fastapi_utils.light_router import LightRouter
 from .base_router import RunNotFound
 from robot_server.data_files.data_files_store import DataFilesStore
 from robot_server.data_files.dependencies import get_data_files_store
-from robot_server.data_files.models import ZipCreationFailed
 from robot_server.data_files.zip_utils import (
     build_run_zip_filename,
     collect_existing_run_images,
@@ -54,7 +53,7 @@ class NoDownloadContent(ErrorDetails):
 
         The archive includes, when available:
 
-        - Camera images under an `images/` directory
+        - Camera images
         - The protocol source file
         - The run log
         - Labware offset data
@@ -70,7 +69,6 @@ class NoDownloadContent(ErrorDetails):
         status.HTTP_404_NOT_FOUND: {
             "model": ErrorBody[Union[RunNotFound, NoDownloadContent]]
         },
-        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ErrorBody[ZipCreationFailed]},
     },
 )
 async def download_run_files(

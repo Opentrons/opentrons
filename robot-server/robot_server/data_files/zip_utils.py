@@ -6,13 +6,10 @@ import zipfile
 from pathlib import Path
 from typing import Callable, Final, List, Optional, Tuple, Union
 
-from fastapi import status
-
 from opentrons import config
 from opentrons_shared_data.data_files import MimeType
 
 from .data_files_store import DataFilesStore
-from .models import ZipCreationFailed
 from robot_server.protocols.protocol_store import ProtocolNotFoundError, ProtocolStore
 from robot_server.runs.run_store import BadRunResource, RunResource
 
@@ -131,12 +128,7 @@ async def create_zip_for_download(
         entries: ``(filesystem_path, archive_path)`` pairs to include.
         staging_root: Directory that should hold the staging temp dir.
     """
-    try:
-        return await asyncio.to_thread(_create_zip_for_download, entries, staging_root)
-    except Exception as e:
-        raise ZipCreationFailed(
-            detail=f"Unexpected error during zip creation: {str(e)}"
-        ).as_error(status.HTTP_500_INTERNAL_SERVER_ERROR) from e
+    return await asyncio.to_thread(_create_zip_for_download, entries, staging_root)
 
 
 def build_run_zip_filename(

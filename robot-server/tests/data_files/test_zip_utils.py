@@ -26,7 +26,6 @@ from robot_server.data_files.zip_utils import (
     create_zip_for_download,
     sanitize_filename_component,
 )
-from robot_server.errors.error_responses import ApiError
 from robot_server.protocols.protocol_store import ProtocolNotFoundError, ProtocolStore
 
 
@@ -206,18 +205,15 @@ async def test_create_zip_for_download_preserves_archive_paths(tmp_path: Path) -
     assert not zip_path.exists()
 
 
-async def test_create_zip_for_download_raises_zip_creation_failed_for_missing_file(
+async def test_create_zip_for_download_raises_for_missing_file(
     tmp_path: Path,
 ) -> None:
-    """It should map zip build failures to ZipCreationFailed."""
+    """It should let filesystem errors from zip creation propagate."""
     missing = tmp_path / "missing.jpeg"
     staging_root = tmp_path / "persistence"
 
-    with pytest.raises(ApiError) as exc_info:
+    with pytest.raises(FileNotFoundError):
         await create_zip_for_download([(missing, "missing.jpeg")], staging_root)
-
-    assert exc_info.value.status_code == 500
-    assert exc_info.value.content["errors"][0]["id"] == "ZipCreationFailed"
 
 
 def test_build_run_zip_filename_with_protocol(decoy: Decoy) -> None:
