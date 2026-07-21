@@ -6,7 +6,8 @@ from textwrap import dedent
 from typing import Annotated, Final, Literal, Optional, Union
 
 from fastapi import Depends, File, Form, Query, Response, UploadFile, status
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse
+from starlette.background import BackgroundTask
 
 from opentrons.protocol_reader import FileHasher, FileReaderWriter
 from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
@@ -48,9 +49,12 @@ from .models import (
 from .zip_utils import (
     build_run_zip_filename,
     collect_existing_run_images,
-    stream_zip,
+    create_zip_for_download,
 )
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
+from robot_server.persistence.fastapi_dependencies import (
+    get_active_persistence_directory,
+)
 from robot_server.protocols.protocol_store import ProtocolStore
 from robot_server.runs.dependencies import get_run_data_manager, get_run_store
 from robot_server.runs.router.base_router import RunNotFound
@@ -574,7 +578,10 @@ async def download_run_images(
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     run_store: Annotated[RunStore, Depends(get_run_store)],
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
-) -> StreamingResponse:
+    persistence_directory: Annotated[
+        Path, Depends(get_active_persistence_directory)
+    ],
+) -> FileResponse:
     """Download all camera images for a run as a zip file.
 
     Arguments:
@@ -582,6 +589,7 @@ async def download_run_images(
         data_files_store: Store for data files database access.
         run_store: Store for run data management.
         protocol_store: Store for protocol storage access.
+        persistence_directory: Persistence directory used for zip staging.
     """
     existing_files = collect_existing_run_images(runId, data_files_store)
 
@@ -596,9 +604,13 @@ async def download_run_images(
         protocol_store=protocol_store,
         fallback_filename=f"{runId}_images.zip",
     )
+    zip_path, cleanup = await create_zip_for_download(
+        existing_files, persistence_directory
+    )
 
-    return StreamingResponse(
-        stream_zip(existing_files),
+    return FileResponse(
+        path=zip_path,
         media_type="application/zip",
-        headers={"Content-Disposition": f"attachment; filename={zip_filename}"},
+        filename=zip_filename,
+        background=BackgroundTask(cleanup),
     )

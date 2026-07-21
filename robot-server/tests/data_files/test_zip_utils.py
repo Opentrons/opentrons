@@ -1,6 +1,5 @@
 """Tests for data_files zip_utils."""
 
-import io
 import zipfile
 from datetime import datetime
 from pathlib import Path
@@ -24,8 +23,8 @@ from robot_server.data_files.zip_utils import (
     build_run_zip_filename,
     collect_existing_run_images,
     collect_existing_run_output_csvs,
+    create_zip_for_download,
     sanitize_filename_component,
-    stream_zip,
 )
 from robot_server.errors.error_responses import ApiError
 from robot_server.protocols.protocol_store import ProtocolNotFoundError, ProtocolStore
@@ -180,40 +179,42 @@ def test_collect_existing_run_output_csvs(decoy: Decoy, tmp_path: Path) -> None:
     ]
 
 
-async def test_stream_zip_preserves_archive_paths(tmp_path: Path) -> None:
-    """It should put files under the provided archive paths."""
+async def test_create_zip_for_download_preserves_archive_paths(tmp_path: Path) -> None:
+    """It should put files under the provided archive paths on disk staging."""
     image = tmp_path / "photo.jpeg"
     protocol = tmp_path / "protocol.py"
+    staging_root = tmp_path / "persistence"
     image.write_bytes(b"image-bytes")
     protocol.write_text("print('hi')")
 
-    chunks = [
-        chunk
-        async for chunk in stream_zip(
-            [(image, "images/photo.jpeg"), (protocol, "protocol.py")],
-            chunk_size=8,
-        )
-    ]
+    zip_path, cleanup = await create_zip_for_download(
+        [(image, "images/photo.jpeg"), (protocol, "protocol.py")],
+        staging_root,
+    )
 
-    assert len(chunks) > 1
-    with zipfile.ZipFile(io.BytesIO(b"".join(chunks))) as zf:
-        names = set(zf.namelist())
-        assert "images/photo.jpeg" in names
-        assert "protocol.py" in names
-        assert zf.read("images/photo.jpeg") == b"image-bytes"
-        assert zf.read("protocol.py") == b"print('hi')"
+    try:
+        assert zip_path.is_relative_to(staging_root)
+        with zipfile.ZipFile(zip_path) as zf:
+            names = set(zf.namelist())
+            assert "images/photo.jpeg" in names
+            assert "protocol.py" in names
+            assert zf.read("images/photo.jpeg") == b"image-bytes"
+            assert zf.read("protocol.py") == b"print('hi')"
+    finally:
+        cleanup()
+
+    assert not zip_path.exists()
 
 
-async def test_stream_zip_raises_zip_creation_failed_for_missing_file(
+async def test_create_zip_for_download_raises_zip_creation_failed_for_missing_file(
     tmp_path: Path,
 ) -> None:
     """It should map zip build failures to ZipCreationFailed."""
     missing = tmp_path / "missing.jpeg"
-    chunks = stream_zip([(missing, "missing.jpeg")])
+    staging_root = tmp_path / "persistence"
 
     with pytest.raises(ApiError) as exc_info:
-        async for _ in chunks:
-            pass
+        await create_zip_for_download([(missing, "missing.jpeg")], staging_root)
 
     assert exc_info.value.status_code == 500
     assert exc_info.value.content["errors"][0]["id"] == "ZipCreationFailed"

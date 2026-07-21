@@ -5,10 +5,11 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from textwrap import dedent
-from typing import Annotated, AsyncIterator, List, Literal, Optional, Tuple, Union
+from typing import Annotated, List, Literal, Optional, Tuple, Union
 
 from fastapi import Depends, status
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse
+from starlette.background import BackgroundTask
 
 from server_utils.fastapi_utils.light_router import LightRouter
 
@@ -20,10 +21,13 @@ from robot_server.data_files.zip_utils import (
     build_run_zip_filename,
     collect_existing_run_images,
     collect_existing_run_output_csvs,
+    create_zip_for_download,
     sanitize_filename_component,
-    stream_zip,
 )
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
+from robot_server.persistence.fastapi_dependencies import (
+    get_active_persistence_directory,
+)
 from robot_server.protocols.dependencies import get_protocol_store
 from robot_server.protocols.protocol_store import ProtocolNotFoundError, ProtocolStore
 from robot_server.runs.dependencies import get_run_data_manager, get_run_store
@@ -75,7 +79,10 @@ async def download_run_files(
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
-) -> StreamingResponse:
+    persistence_directory: Annotated[
+        Path, Depends(get_active_persistence_directory)
+    ],
+) -> FileResponse:
     """Download files associated with a run as a zip archive.
 
     Arguments:
@@ -84,6 +91,7 @@ async def download_run_files(
         run_data_manager: Run data retrieval interface.
         data_files_store: Store for data files database access.
         protocol_store: Store for protocol storage access.
+        persistence_directory: Persistence directory used for zip staging.
     """
     try:
         run = run_store.get(runId)
@@ -149,11 +157,23 @@ async def download_run_files(
         protocol_store=protocol_store,
         fallback_filename=f"{runId}.zip",
     )
+    zip_path, cleanup_zip = await create_zip_for_download(
+        zip_entries, persistence_directory
+    )
 
-    return StreamingResponse(
-        _stream_zip_cleaning_temps(zip_entries, temp_paths),
+    def cleanup() -> None:
+        cleanup_zip()
+        for path in temp_paths:
+            try:
+                path.unlink(missing_ok=True)
+            except OSError:
+                pass
+
+    return FileResponse(
+        path=zip_path,
         media_type="application/zip",
-        headers={"Content-Disposition": f"attachment; filename={zip_filename}"},
+        filename=zip_filename,
+        background=BackgroundTask(cleanup),
     )
 
 
@@ -371,18 +391,3 @@ def _format_download_timestamp(created_at: datetime) -> str:
     iso = created_at.isoformat(timespec="milliseconds").replace("+00:00", "Z")
     return iso.replace(":", "_")
 
-
-async def _stream_zip_cleaning_temps(
-    entries: List[Tuple[Path, str]],
-    temp_paths: List[Path],
-) -> AsyncIterator[bytes]:
-    """Stream a zip archive, then delete any temporary files used as entries."""
-    try:
-        async for chunk in stream_zip(entries):
-            yield chunk
-    finally:
-        for path in temp_paths:
-            try:
-                path.unlink(missing_ok=True)
-            except OSError:
-                pass

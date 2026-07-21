@@ -3,12 +3,12 @@
 import io
 import json
 import zipfile
-from collections.abc import AsyncIterable
 from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
 from decoy import Decoy
+from fastapi.responses import FileResponse
 
 from opentrons.protocol_engine import CommandSlice
 from opentrons.protocol_engine import commands as pe_commands
@@ -53,12 +53,13 @@ def _stub_empty_output_files(decoy: Decoy, data_files_store: DataFilesStore) -> 
     )
 
 
-async def _collect_zip_bytes(body_iterator: AsyncIterable[bytes | str]) -> bytes:
-    chunks: list[bytes] = []
-    async for chunk in body_iterator:
-        assert isinstance(chunk, bytes)
-        chunks.append(chunk)
-    return b"".join(chunks)
+async def _read_and_cleanup_zip(result: FileResponse) -> zipfile.ZipFile:
+    """Copy zip bytes, run background cleanup, then open an in-memory ZipFile."""
+    assert isinstance(result, FileResponse)
+    zip_bytes = Path(result.path).read_bytes()
+    if result.background is not None:
+        await result.background()
+    return zipfile.ZipFile(io.BytesIO(zip_bytes))
 
 
 def _stub_run_record_for_download(
@@ -237,14 +238,14 @@ async def test_download_run_files_with_images_protocol_run_log_and_offsets(
         run_data_manager=mock_run_data_manager,
         data_files_store=data_files_store,
         protocol_store=mock_protocol_store,
+        persistence_directory=tmp_path,
     )
 
     assert result.media_type == "application/zip"
     assert "attachment" in result.headers["Content-Disposition"]
     assert ".zip" in result.headers["Content-Disposition"]
 
-    zip_bytes = await _collect_zip_bytes(result.body_iterator)
-    with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
+    with await _read_and_cleanup_zip(result) as zf:
         names = set(zf.namelist())
         assert "images/image1.jpeg" in names
         assert "images/image2.jpeg" in names
@@ -334,10 +335,10 @@ async def test_download_run_files_protocol_json_keeps_extension(
         run_data_manager=mock_run_data_manager,
         data_files_store=data_files_store,
         protocol_store=mock_protocol_store,
+        persistence_directory=tmp_path,
     )
 
-    zip_bytes = await _collect_zip_bytes(result.body_iterator)
-    with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
+    with await _read_and_cleanup_zip(result) as zf:
         assert "my_protocol.json" in zf.namelist()
 
 
@@ -397,10 +398,10 @@ async def test_download_run_files_skips_missing_protocol_silently(
         run_data_manager=mock_run_data_manager,
         data_files_store=data_files_store,
         protocol_store=mock_protocol_store,
+        persistence_directory=tmp_path,
     )
 
-    zip_bytes = await _collect_zip_bytes(result.body_iterator)
-    with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
+    with await _read_and_cleanup_zip(result) as zf:
         names = zf.namelist()
         assert "images/image1.jpeg" in names
         assert not any(
@@ -461,10 +462,10 @@ async def test_download_run_files_skips_missing_run_log_and_offsets_silently(
         run_data_manager=mock_run_data_manager,
         data_files_store=data_files_store,
         protocol_store=mock_protocol_store,
+        persistence_directory=tmp_path,
     )
 
-    zip_bytes = await _collect_zip_bytes(result.body_iterator)
-    with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
+    with await _read_and_cleanup_zip(result) as zf:
         assert "images/image1.jpeg" in zf.namelist()
         assert not any(name.endswith(".json") for name in zf.namelist())
 
@@ -474,6 +475,7 @@ async def test_download_run_files_run_not_found(
     mock_run_store: RunStore,
     mock_run_data_manager: RunDataManager,
     mock_protocol_store: ProtocolStore,
+    tmp_path: Path,
 ) -> None:
     """It should 404 when the run does not exist."""
     data_files_store = decoy.mock(cls=DataFilesStore)
@@ -488,6 +490,7 @@ async def test_download_run_files_run_not_found(
             run_data_manager=mock_run_data_manager,
             data_files_store=data_files_store,
             protocol_store=mock_protocol_store,
+            persistence_directory=tmp_path,
         )
 
     assert exc_info.value.status_code == 404
@@ -499,6 +502,7 @@ async def test_download_run_files_no_content(
     mock_run_store: RunStore,
     mock_run_data_manager: RunDataManager,
     mock_protocol_store: ProtocolStore,
+    tmp_path: Path,
 ) -> None:
     """It should 404 when the run exists but has nothing downloadable."""
     data_files_store = decoy.mock(cls=DataFilesStore)
@@ -529,6 +533,7 @@ async def test_download_run_files_no_content(
             run_data_manager=mock_run_data_manager,
             data_files_store=data_files_store,
             protocol_store=mock_protocol_store,
+            persistence_directory=tmp_path,
         )
 
     assert exc_info.value.status_code == 404

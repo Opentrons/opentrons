@@ -1,10 +1,10 @@
 """Shared helpers for building and streaming zip downloads."""
 
 import asyncio
-import io
+import tempfile
 import zipfile
 from pathlib import Path
-from typing import AsyncIterator, List, Optional, Tuple, Union
+from typing import Callable, Final, List, Optional, Tuple, Union
 
 from fastapi import status
 
@@ -15,6 +15,8 @@ from .data_files_store import DataFilesStore
 from .models import ZipCreationFailed
 from robot_server.protocols.protocol_store import ProtocolNotFoundError, ProtocolStore
 from robot_server.runs.run_store import BadRunResource, RunResource
+
+_DOWNLOAD_STAGING_PREFIX: Final = "temp-download-staging-"
 
 
 def collect_existing_run_images(
@@ -89,31 +91,48 @@ def collect_existing_run_output_csvs(
     return entries
 
 
-def _build_zip_bytes(entries: List[Tuple[Path, str]]) -> bytes:
-    """Build a zip archive in memory from filesystem/archive path pairs."""
-    buffer = io.BytesIO()
-    with zipfile.ZipFile(
-        buffer, mode="w", compression=zipfile.ZIP_DEFLATED
-    ) as zip_file:
-        for source_path, archive_name in entries:
-            zip_file.write(source_path, arcname=archive_name)
-    return buffer.getvalue()
-
-
-async def stream_zip(
+def _create_zip_for_download(
     entries: List[Tuple[Path, str]],
-    chunk_size: int = 65536,
-) -> AsyncIterator[bytes]:
-    """Build a zip archive off the event loop and stream it in chunks.
+    staging_root: Path,
+) -> Tuple[Path, Callable[[], None]]:
+    """Write a zip under ``staging_root`` and return ``(zip_path, cleanup)``."""
+    staging_root.mkdir(parents=True, exist_ok=True)
+    temp_dir = tempfile.TemporaryDirectory(
+        prefix=_DOWNLOAD_STAGING_PREFIX, dir=str(staging_root)
+    )
+    zip_path = Path(temp_dir.name) / "download.zip"
+    try:
+        with zipfile.ZipFile(
+            zip_path, mode="w", compression=zipfile.ZIP_DEFLATED
+        ) as zip_file:
+            for source_path, archive_name in entries:
+                zip_file.write(source_path, arcname=archive_name)
+    except Exception:
+        temp_dir.cleanup()
+        raise
+
+    def cleanup() -> None:
+        try:
+            zip_path.unlink(missing_ok=True)
+        except OSError:
+            pass
+        temp_dir.cleanup()
+
+    return zip_path, cleanup
+
+
+async def create_zip_for_download(
+    entries: List[Tuple[Path, str]],
+    staging_root: Path,
+) -> Tuple[Path, Callable[[], None]]:
+    """Build a zip archive off the event loop under ``staging_root``.
 
     Args:
         entries: ``(filesystem_path, archive_path)`` pairs to include.
-        chunk_size: Number of bytes to yield per chunk.
+        staging_root: Directory that should hold the staging temp dir.
     """
     try:
-        zip_bytes = await asyncio.to_thread(_build_zip_bytes, entries)
-        for offset in range(0, len(zip_bytes), chunk_size):
-            yield zip_bytes[offset : offset + chunk_size]
+        return await asyncio.to_thread(_create_zip_for_download, entries, staging_root)
     except Exception as e:
         raise ZipCreationFailed(
             detail=f"Unexpected error during zip creation: {str(e)}"
