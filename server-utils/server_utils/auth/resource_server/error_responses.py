@@ -8,7 +8,7 @@ from typing import Annotated
 import fastapi
 from pydantic import BaseModel, Field
 
-from .authorization_checker import (
+from .types import (
     InsufficientScopeResult,
     MissingTokenResult,
     NotAnActiveTokenResult,

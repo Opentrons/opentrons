@@ -13,9 +13,11 @@ from server_utils.auth.resource_server.auth_server import (
     CLIENT_ID,
     SETTINGS_ENDPOINT_PATH,
     TOKEN_INTROSPECTION_ENDPOINT_PATH,
+    LocalHTTPClient,
+)
+from server_utils.auth.resource_server.types import (
     AuthSettingsResponse,
     AuthSettingsResponseData,
-    LocalHTTPClient,
     TokenIntrospectionResponse,
 )
 
