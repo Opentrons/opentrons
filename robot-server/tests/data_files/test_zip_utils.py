@@ -23,8 +23,10 @@ from robot_server.data_files.zip_utils import (
     build_run_zip_filename,
     collect_existing_run_images,
     collect_existing_run_output_csvs,
+    create_download_staging_dir,
     create_zip_for_download,
     sanitize_filename_component,
+    write_zip_for_download,
 )
 from robot_server.protocols.protocol_store import ProtocolNotFoundError, ProtocolStore
 
@@ -203,6 +205,31 @@ async def test_create_zip_for_download_preserves_archive_paths(tmp_path: Path) -
         cleanup()
 
     assert not zip_path.exists()
+
+
+async def test_write_zip_for_download_uses_existing_scratch_dir(tmp_path: Path) -> None:
+    """It should write the zip into a caller-owned scratch directory."""
+    image = tmp_path / "photo.jpeg"
+    image.write_bytes(b"image-bytes")
+    staging_root = tmp_path / "persistence"
+    staging_dir = create_download_staging_dir(staging_root)
+    staging_path = Path(staging_dir.name)
+    scratch_file = staging_path / "notes.json"
+    scratch_file.write_text('{"ok": true}')
+
+    try:
+        zip_path = await write_zip_for_download(
+            [(image, "images/photo.jpeg"), (scratch_file, "notes.json")],
+            staging_path,
+        )
+        assert zip_path.parent == staging_path
+        with zipfile.ZipFile(zip_path) as zf:
+            assert zf.read("notes.json") == b'{"ok": true}'
+            assert zf.read("images/photo.jpeg") == b"image-bytes"
+    finally:
+        staging_dir.cleanup()
+
+    assert not staging_path.exists()
 
 
 async def test_create_zip_for_download_raises_for_missing_file(

@@ -1,7 +1,6 @@
 """Router for /runs/{runId}/download file bundle endpoints."""
 
 import json
-import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from textwrap import dedent
@@ -20,8 +19,9 @@ from robot_server.data_files.zip_utils import (
     build_run_zip_filename,
     collect_existing_run_images,
     collect_existing_run_output_csvs,
-    create_zip_for_download,
+    create_download_staging_dir,
     sanitize_filename_component,
+    write_zip_for_download,
 )
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
 from robot_server.persistence.fastapi_dependencies import (
@@ -89,89 +89,87 @@ async def download_run_files(
         run_data_manager: Run data retrieval interface.
         data_files_store: Store for data files database access.
         protocol_store: Store for protocol storage access.
-        persistence_directory: Persistence directory used for zip staging.
+        persistence_directory: Persistence directory used for download staging.
     """
     try:
         run = run_store.get(runId)
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
-    # (filesystem path, archive path within the zip)
-    zip_entries: List[Tuple[Path, str]] = []
-    temp_paths: List[Path] = []
+    staging_dir = create_download_staging_dir(persistence_directory)
+    staging_path = Path(staging_dir.name)
 
-    zip_entries.extend(
-        collect_existing_run_images(runId, data_files_store, archive_prefix="images")
-    )
-    protocol_entry = _collect_protocol_file(run.protocol_id, protocol_store)
-    if protocol_entry is not None:
-        zip_entries.append(protocol_entry)
+    try:
+        # (filesystem path, archive path within the zip)
+        zip_entries: List[Tuple[Path, str]] = []
 
-    rtp_csv_entry = _collect_rtp_csv(
-        run_id=runId,
-        run_data_manager=run_data_manager,
-        data_files_store=data_files_store,
-    )
-    if rtp_csv_entry is not None:
-        zip_entries.append(rtp_csv_entry)
-
-    run_log_entry = _collect_run_log(
-        run_id=runId,
-        run=run,
-        run_data_manager=run_data_manager,
-        protocol_store=protocol_store,
-    )
-    if run_log_entry is not None:
-        zip_entries.append(run_log_entry)
-        temp_paths.append(run_log_entry[0])
-
-    offsets_entry = _collect_labware_offsets(
-        run_id=runId,
-        run=run,
-        run_data_manager=run_data_manager,
-        protocol_store=protocol_store,
-    )
-    if offsets_entry is not None:
-        zip_entries.append(offsets_entry)
-        temp_paths.append(offsets_entry[0])
-
-    zip_entries.extend(
-        collect_existing_run_output_csvs(
-            runId,
-            data_files_store,
-            archive_prefix=_build_output_csvs_directory_name(
-                run=run, protocol_store=protocol_store
-            ),
+        zip_entries.extend(
+            collect_existing_run_images(
+                runId, data_files_store, archive_prefix="images"
+            )
         )
-    )
+        protocol_entry = _collect_protocol_file(run.protocol_id, protocol_store)
+        if protocol_entry is not None:
+            zip_entries.append(protocol_entry)
 
-    if not zip_entries:
-        raise NoDownloadContent(
-            detail=f"No downloadable content found for run '{runId}'"
-        ).as_error(status.HTTP_404_NOT_FOUND)
+        rtp_csv_entry = _collect_rtp_csv(
+            run_id=runId,
+            run_data_manager=run_data_manager,
+            data_files_store=data_files_store,
+        )
+        if rtp_csv_entry is not None:
+            zip_entries.append(rtp_csv_entry)
 
-    zip_filename = build_run_zip_filename(
-        run=run,
-        protocol_store=protocol_store,
-        fallback_filename=f"{runId}.zip",
-    )
-    zip_path, cleanup_zip = await create_zip_for_download(
-        zip_entries, persistence_directory
-    )
+        run_log_entry = _collect_run_log(
+            run_id=runId,
+            run=run,
+            run_data_manager=run_data_manager,
+            protocol_store=protocol_store,
+            staging_dir=staging_path,
+        )
+        if run_log_entry is not None:
+            zip_entries.append(run_log_entry)
 
-    def cleanup() -> None:
-        cleanup_zip()
-        for path in temp_paths:
-            try:
-                path.unlink(missing_ok=True)
-            except OSError:
-                pass
+        offsets_entry = _collect_labware_offsets(
+            run_id=runId,
+            run=run,
+            run_data_manager=run_data_manager,
+            protocol_store=protocol_store,
+            staging_dir=staging_path,
+        )
+        if offsets_entry is not None:
+            zip_entries.append(offsets_entry)
+
+        zip_entries.extend(
+            collect_existing_run_output_csvs(
+                runId,
+                data_files_store,
+                archive_prefix=_build_output_csvs_directory_name(
+                    run=run, protocol_store=protocol_store
+                ),
+            )
+        )
+
+        if not zip_entries:
+            raise NoDownloadContent(
+                detail=f"No downloadable content found for run '{runId}'"
+            ).as_error(status.HTTP_404_NOT_FOUND)
+
+        zip_filename = build_run_zip_filename(
+            run=run,
+            protocol_store=protocol_store,
+            fallback_filename=f"{runId}.zip",
+        )
+        zip_path = await write_zip_for_download(zip_entries, staging_path)
+    except Exception:
+        staging_dir.cleanup()
+        raise
 
     return FileResponse(
         path=zip_path,
         media_type="application/zip",
         filename=zip_filename,
-        background=BackgroundTask(cleanup),
+        background=BackgroundTask(staging_dir.cleanup),
     )
 
 
@@ -218,8 +216,9 @@ def _collect_run_log(
     run: Union[RunResource, BadRunResource],
     run_data_manager: RunDataManager,
     protocol_store: ProtocolStore,
+    staging_dir: Path,
 ) -> Optional[Tuple[Path, str]]:
-    """Build a run log JSON file, or None if unavailable."""
+    """Build a run log JSON file in ``staging_dir``, or None if unavailable."""
     try:
         run_record = run_data_manager.get(run_id)
         length_probe = run_data_manager.get_commands_slice(
@@ -267,7 +266,7 @@ def _collect_run_log(
         }
 
         archive_name = _build_run_log_filename(run=run, protocol_store=protocol_store)
-        return _write_temp_json(run_details, archive_name)
+        return _write_staging_json(run_details, archive_name, staging_dir)
     except Exception:
         return None
 
@@ -277,8 +276,9 @@ def _collect_labware_offsets(
     run: Union[RunResource, BadRunResource],
     run_data_manager: RunDataManager,
     protocol_store: ProtocolStore,
+    staging_dir: Path,
 ) -> Optional[Tuple[Path, str]]:
-    """Build a labware offsets JSON file from the run record, or None if unavailable."""
+    """Build labware offsets JSON in ``staging_dir``, or None if unavailable."""
     try:
         run_record = run_data_manager.get(run_id)
         offsets_payload = [
@@ -288,21 +288,20 @@ def _collect_labware_offsets(
         archive_name = _build_labware_offsets_filename(
             run=run, protocol_store=protocol_store
         )
-        return _write_temp_json(offsets_payload, archive_name)
+        return _write_staging_json(offsets_payload, archive_name, staging_dir)
     except Exception:
         return None
 
 
-def _write_temp_json(payload: object, archive_name: str) -> Tuple[Path, str]:
-    """Write JSON payload to a temp file for inclusion in the zip."""
-    with tempfile.NamedTemporaryFile(
-        mode="w",
-        suffix=".json",
-        delete=False,
-        encoding="utf-8",
-    ) as temp_file:
-        json.dump(payload, temp_file)
-        return (Path(temp_file.name), archive_name)
+def _write_staging_json(
+    payload: object, archive_name: str, staging_dir: Path
+) -> Tuple[Path, str]:
+    """Write JSON payload into the request scratch directory for zip inclusion."""
+    file_path = staging_dir / archive_name
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    with file_path.open(mode="w", encoding="utf-8") as json_file:
+        json.dump(payload, json_file)
+    return (file_path, archive_name)
 
 
 def _build_run_log_filename(

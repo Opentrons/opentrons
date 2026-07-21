@@ -14,6 +14,7 @@ from robot_server.protocols.protocol_store import ProtocolNotFoundError, Protoco
 from robot_server.runs.run_store import BadRunResource, RunResource
 
 _DOWNLOAD_STAGING_PREFIX: Final = "temp-download-staging-"
+_DOWNLOAD_ZIP_NAME: Final = "download.zip"
 
 
 def collect_existing_run_images(
@@ -88,47 +89,57 @@ def collect_existing_run_output_csvs(
     return entries
 
 
-def _create_zip_for_download(
-    entries: List[Tuple[Path, str]],
-    staging_root: Path,
-) -> Tuple[Path, Callable[[], None]]:
-    """Write a zip under ``staging_root`` and return ``(zip_path, cleanup)``."""
+def create_download_staging_dir(staging_root: Path) -> tempfile.TemporaryDirectory[str]:
+    """Create a unique request-scoped staging directory under ``staging_root``."""
     staging_root.mkdir(parents=True, exist_ok=True)
-    temp_dir = tempfile.TemporaryDirectory(
+    return tempfile.TemporaryDirectory(
         prefix=_DOWNLOAD_STAGING_PREFIX, dir=str(staging_root)
     )
-    zip_path = Path(temp_dir.name) / "download.zip"
-    try:
-        with zipfile.ZipFile(
-            zip_path, mode="w", compression=zipfile.ZIP_DEFLATED
-        ) as zip_file:
-            for source_path, archive_name in entries:
-                zip_file.write(source_path, arcname=archive_name)
-    except Exception:
-        temp_dir.cleanup()
-        raise
 
-    def cleanup() -> None:
-        try:
-            zip_path.unlink(missing_ok=True)
-        except OSError:
-            pass
-        temp_dir.cleanup()
 
-    return zip_path, cleanup
+def _write_zip_file(entries: List[Tuple[Path, str]], zip_path: Path) -> None:
+    """Write ``entries`` into ``zip_path``."""
+    with zipfile.ZipFile(
+        zip_path, mode="w", compression=zipfile.ZIP_DEFLATED
+    ) as zip_file:
+        for source_path, archive_name in entries:
+            zip_file.write(source_path, arcname=archive_name)
+
+
+async def write_zip_for_download(
+    entries: List[Tuple[Path, str]],
+    staging_dir: Path,
+) -> Path:
+    """Build ``download.zip`` inside an existing staging directory.
+
+    Args:
+        entries: ``(filesystem_path, archive_path)`` pairs to include.
+        staging_dir: Already-created request scratch directory.
+
+    Returns:
+        Path to the created zip file inside ``staging_dir``.
+    """
+    zip_path = staging_dir / _DOWNLOAD_ZIP_NAME
+    await asyncio.to_thread(_write_zip_file, entries, zip_path)
+    return zip_path
 
 
 async def create_zip_for_download(
     entries: List[Tuple[Path, str]],
     staging_root: Path,
 ) -> Tuple[Path, Callable[[], None]]:
-    """Build a zip archive off the event loop under ``staging_root``.
+    """Create a staging directory, build a zip inside it, and return cleanup.
 
-    Args:
-        entries: ``(filesystem_path, archive_path)`` pairs to include.
-        staging_root: Directory that should hold the staging temp dir.
+    Convenience wrapper for callers that do not need the scratch directory for
+    anything other than the zip itself.
     """
-    return await asyncio.to_thread(_create_zip_for_download, entries, staging_root)
+    temp_dir = create_download_staging_dir(staging_root)
+    try:
+        zip_path = await write_zip_for_download(entries, Path(temp_dir.name))
+    except Exception:
+        temp_dir.cleanup()
+        raise
+    return zip_path, temp_dir.cleanup
 
 
 def build_run_zip_filename(
