@@ -10,7 +10,7 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ## Opentrons Protocol Designer Changes in 9.0.1
 
-**Welcome to Protocol Designer 9.0.1.!**
+**Welcome to Protocol Designer 9.0.1!**
 
 This release includes bug fixes for Protocol Designer for Opentrons Flex.
 
