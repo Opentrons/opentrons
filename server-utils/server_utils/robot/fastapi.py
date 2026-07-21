@@ -45,7 +45,7 @@ async def build_robot_client(
     robot_server_uds: str | None = None,
     robot_server_url: str | None = None,
 ) -> AsyncGenerator[Client, None]:
-    """Build a robot-server `Client` appropriately configured for most servers. """
+    """Build a robot-server `Client` appropriately configured for most servers."""
     async with LocalHTTPClient(
         robot_server_uds=robot_server_uds, robot_server_url=robot_server_url
     ) as client:

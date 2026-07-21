@@ -42,7 +42,9 @@ class LocalHTTPClient(Client):
                 via TCP.
         """
         if robot_server_uds is not None and robot_server_url is not None:
-            raise ValueError("Specify only one of robot_server_uds or robot_server_url.")
+            raise ValueError(
+                "Specify only one of robot_server_uds or robot_server_url."
+            )
 
         if robot_server_uds is not None:
             connector = aiohttp.UnixConnector(path=robot_server_uds)
@@ -55,7 +57,9 @@ class LocalHTTPClient(Client):
                 headers={"Opentrons-Version": "2"},
             )
         elif robot_server_url is not None:
-            session = aiohttp.ClientSession(base_url=robot_server_url, headers={"Opentrons-Version": "2"})
+            session = aiohttp.ClientSession(
+                base_url=robot_server_url, headers={"Opentrons-Version": "2"}
+            )
         else:
             raise ValueError("Specify robot_server_uds or robot_server_url.")
 
@@ -77,19 +81,19 @@ class LocalHTTPClient(Client):
     async def get_name_and_serial(self) -> RobotNameandSerial:
         async with self._session.get(HEALTH_ENDPOINT_PATH) as response:
             response_json = await response.json()
-        #raise ValueError(f"JEREMY NOTE {response_json}")
         response.raise_for_status()
         return RobotNameandSerial(
             name=response_json["name"],
             serial=response_json["robot_serial"],
         )
 
+
 class _StrictBaseModel(pydantic.BaseModel):
     model_config = {"strict": True}
 
 
 class RobotNameandSerial(_StrictBaseModel):
-    """Robot name and serial number received via the health endpoint"""
+    """Robot name and serial number received via the health endpoint."""
 
     name: str
     serial: typing.Optional[str]
