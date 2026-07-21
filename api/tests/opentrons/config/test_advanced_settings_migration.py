@@ -34,6 +34,7 @@ def default_file_settings() -> Dict[str, Any]:
         "disableFlexStackerLabwareDetection": None,
         "enableProtocolSubprocess": False,
         "enableHardwareSubprocess": False,
+        "manuallyRunProtocolAsUser": False,
     }
 
 
@@ -485,6 +486,16 @@ def v41_config(v40_config: Dict[str, Any]) -> Dict[str, Any]:
     r["_version"] = 41
     return r
 
+@pytest.fixture
+def v42_config(v41_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v41_config.copy()
+    r.update(
+        {
+            "_version": 42,
+            "manuallyRunProtocolAsUser": False,
+        }
+    )
+    return r
 
 @pytest.fixture(
     params=[
