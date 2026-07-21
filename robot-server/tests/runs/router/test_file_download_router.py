@@ -249,20 +249,20 @@ async def test_download_run_files_with_images_protocol_run_log_and_offsets(
         names = set(zf.namelist())
         assert "images/image1.jpeg" in names
         assert "images/image2.jpeg" in names
-        assert "my_protocol.py" in names
+        assert "pcrprep-standard.py" in names
         assert "samples.csv" in names
         assert "pcrprep-standard_2024-06-20T10_30_15.354Z.json" in names
-        assert "my_protocol_2024-06-20T10_30_15.354Z_offsetdata.json" in names
+        assert "pcrprep-standard_2024-06-20T10_30_15.354Z_offsetdata.json" in names
         assert (
-            "my_protocol_2024-06-20T10_30_15.354Z_output/"
+            "pcrprep-standard_2024-06-20T10_30_15.354Z_output/"
             "csv-file-id_plate_read450nm.csv"
         ) in names
         assert zf.read("images/image1.jpeg") == b"fake image data 1"
-        assert zf.read("my_protocol.py") == protocol_path.read_bytes()
+        assert zf.read("pcrprep-standard.py") == protocol_path.read_bytes()
         assert zf.read("samples.csv") == rtp_csv_path.read_bytes()
         assert (
             zf.read(
-                "my_protocol_2024-06-20T10_30_15.354Z_output/"
+                "pcrprep-standard_2024-06-20T10_30_15.354Z_output/"
                 "csv-file-id_plate_read450nm.csv"
             )
             == csv_path.read_bytes()
@@ -274,7 +274,7 @@ async def test_download_run_files_with_images_protocol_run_log_and_offsets(
         assert len(run_log["commands"]["data"]) == 1
 
         offsets = json.loads(
-            zf.read("my_protocol_2024-06-20T10_30_15.354Z_offsetdata.json")
+            zf.read("pcrprep-standard_2024-06-20T10_30_15.354Z_offsetdata.json")
         )
         assert len(offsets) == 1
         assert offsets[0]["definitionUri"] == (
@@ -290,7 +290,7 @@ async def test_download_run_files_protocol_json_keeps_extension(
     mock_protocol_store: ProtocolStore,
     tmp_path: Path,
 ) -> None:
-    """It should keep the .json extension for JSON protocol files."""
+    """It should keep the .json extension on the protocolName-based archive name."""
     data_files_store = decoy.mock(cls=DataFilesStore)
 
     protocol_path = tmp_path / "my_protocol.json"
@@ -339,7 +339,8 @@ async def test_download_run_files_protocol_json_keeps_extension(
     )
 
     with await _read_and_cleanup_zip(result) as zf:
-        assert "my_protocol.json" in zf.namelist()
+        assert "JSON_Proto.json" in zf.namelist()
+        assert zf.read("JSON_Proto.json") == protocol_path.read_bytes()
 
 
 async def test_download_run_files_skips_missing_protocol_silently(

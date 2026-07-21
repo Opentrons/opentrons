@@ -106,7 +106,7 @@ async def download_run_files(
                 runId, data_files_store, archive_prefix="images"
             )
         )
-        protocol_entry = _collect_protocol_file(run.protocol_id, protocol_store)
+        protocol_entry = _collect_protocol_file(run=run, protocol_store=protocol_store)
         if protocol_entry is not None:
             zip_entries.append(protocol_entry)
 
@@ -172,14 +172,15 @@ async def download_run_files(
 
 
 def _collect_protocol_file(
-    protocol_id: Optional[str], protocol_store: ProtocolStore
+    run: Union[RunResource, BadRunResource],
+    protocol_store: ProtocolStore,
 ) -> Optional[Tuple[Path, str]]:
     """Return the protocol main file for the zip, or None if unavailable."""
-    if protocol_id is None:
+    if run.protocol_id is None:
         return None
 
     try:
-        protocol = protocol_store.get(protocol_id)
+        protocol = protocol_store.get(run.protocol_id)
     except ProtocolNotFoundError:
         return None
 
@@ -187,7 +188,8 @@ def _collect_protocol_file(
     if not main_file.exists() or not main_file.is_file():
         return None
 
-    return (main_file, main_file.name)
+    name_stem = _protocol_download_name_stem(run=run, protocol_store=protocol_store)
+    return (main_file, f"{name_stem}{main_file.suffix}")
 
 
 def _collect_rtp_csv(
@@ -308,7 +310,7 @@ def _build_run_log_filename(
 ) -> str:
     """Build `{protocolName}_{ISO-timestamp}.json`."""
     created_at = _format_download_timestamp(run.created_at)
-    name_stem = _protocol_display_name_stem(run=run, protocol_store=protocol_store)
+    name_stem = _protocol_download_name_stem(run=run, protocol_store=protocol_store)
     return f"{name_stem}_{created_at}.json"
 
 
@@ -316,9 +318,9 @@ def _build_labware_offsets_filename(
     run: Union[RunResource, BadRunResource],
     protocol_store: ProtocolStore,
 ) -> str:
-    """Build `{protocolFileName}_{ISO-timestamp}_offsetdata.json`."""
+    """Build `{protocolName}_{ISO-timestamp}_offsetdata.json`."""
     created_at = _format_download_timestamp(run.created_at)
-    name_stem = _protocol_file_name_stem(run=run, protocol_store=protocol_store)
+    name_stem = _protocol_download_name_stem(run=run, protocol_store=protocol_store)
     return f"{name_stem}_{created_at}_offsetdata.json"
 
 
@@ -326,17 +328,21 @@ def _build_output_csvs_directory_name(
     run: Union[RunResource, BadRunResource],
     protocol_store: ProtocolStore,
 ) -> str:
-    """Build `{protocolFileStem}_{ISO-timestamp}_output` directory name."""
+    """Build `{protocolName}_{ISO-timestamp}_output` directory name."""
     created_at = _format_download_timestamp(run.created_at)
-    name_stem = _protocol_file_name_stem(run=run, protocol_store=protocol_store)
+    name_stem = _protocol_download_name_stem(run=run, protocol_store=protocol_store)
     return f"{name_stem}_{created_at}_output"
 
 
-def _protocol_display_name_stem(
+def _protocol_download_name_stem(
     run: Union[RunResource, BadRunResource],
     protocol_store: ProtocolStore,
 ) -> str:
-    """Prefer protocolName metadata, then protocol file name, then ids."""
+    """Shared name stem for download zip entries derived from the protocol.
+
+    Prefers metadata ``protocolName``, then the protocol main file stem, then
+    protocol/run ids. The result is filesystem-safe.
+    """
     if run.protocol_id is not None:
         try:
             protocol = protocol_store.get(run.protocol_id)
@@ -346,34 +352,12 @@ def _protocol_display_name_stem(
         if protocol is not None:
             protocol_name = protocol.source.metadata.get("protocolName")
             if protocol_name is None:
-                protocol_name = protocol.source.main_file.name
+                protocol_name = protocol.source.main_file.stem
             return sanitize_filename_component(str(protocol_name))
-        else:
-            return sanitize_filename_component(run.protocol_id)
 
-    else:
-        return sanitize_filename_component(run.run_id)
+        return sanitize_filename_component(run.protocol_id)
 
-
-def _protocol_file_name_stem(
-    run: Union[RunResource, BadRunResource],
-    protocol_store: ProtocolStore,
-) -> str:
-    """Prefer the protocol main file stem, then ids."""
-    if run.protocol_id is not None:
-        try:
-            protocol = protocol_store.get(run.protocol_id)
-        except ProtocolNotFoundError:
-            protocol = None
-
-        if protocol is not None:
-            return sanitize_filename_component(protocol.source.main_file.stem)
-
-        else:
-            return sanitize_filename_component(run.protocol_id)
-
-    else:
-        return sanitize_filename_component(run.run_id)
+    return sanitize_filename_component(run.run_id)
 
 
 def _format_download_timestamp(created_at: datetime) -> str:
