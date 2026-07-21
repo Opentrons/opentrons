@@ -3,22 +3,58 @@ import { useQueryClient } from 'react-query'
 
 import { deleteRun } from '@opentrons/api-client'
 import { ERROR_TOAST } from '@opentrons/components'
-import { getQueryKey, useHost } from '@opentrons/react-api-client'
+import {
+  getQueryKey,
+  useDocumentedMutation,
+  useHost,
+} from '@opentrons/react-api-client'
 
 import { useToaster } from '/app/organisms/ToasterOven'
 
 import type { RunData } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 
 interface UseDeleteSelectedRunsResult {
   deleteSelectedRuns: (runs: RunData[]) => void
   deletingIds: Set<string>
 }
 
-export function useDeleteSelectedRuns(): UseDeleteSelectedRunsResult {
+export function useDeleteSelectedRuns(
+  documentationState: DocumentationState
+): UseDeleteSelectedRunsResult {
   const host = useHost()
   const queryClient = useQueryClient()
   const { makeToast } = useToaster()
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set())
+
+  const mutation = useDocumentedMutation<unknown, unknown, RunData[]>(
+    documentationState,
+    ['delete_runs'],
+    ({ variables: runs, userNotes }) => {
+      const currentHost = host
+      if (currentHost == null || runs.length === 0) {
+        return Promise.resolve()
+      }
+
+      return Promise.all(
+        runs.map(run =>
+          deleteRun(currentHost, run.id, userNotes).catch((e: Error) =>
+            makeToast(e.message, ERROR_TOAST, { closeButton: true })
+          )
+        )
+      )
+        .then(() =>
+          queryClient
+            .invalidateQueries(getQueryKey(currentHost, 'runs'))
+            .catch((e: Error) => {
+              console.error(`error invalidating runs query: ${e.message}`)
+            })
+        )
+        .catch((e: Error) => {
+          makeToast(e.message, ERROR_TOAST, { closeButton: true })
+        })
+    }
+  )
 
   const deleteSelectedRuns = (runs: RunData[]): void => {
     if (host == null || runs.length === 0 || deletingIds.size > 0) {
@@ -27,27 +63,11 @@ export function useDeleteSelectedRuns(): UseDeleteSelectedRunsResult {
 
     setDeletingIds(new Set(runs.map(run => run.id)))
 
-    Promise.all(
-      runs.map(run =>
-        deleteRun(host, run.id).catch((e: Error) =>
-          makeToast(e.message, ERROR_TOAST, { closeButton: true })
-        )
-      )
-    )
-      .then(() =>
-        queryClient
-          .invalidateQueries(getQueryKey(host, 'runs'))
-          .catch((e: Error) => {
-            console.error(`error invalidating runs query: ${e.message}`)
-          })
-      )
-      .then(() => {
+    mutation.mutate(runs, {
+      onSettled: () => {
         setDeletingIds(new Set())
-      })
-      .catch((e: Error) => {
-        makeToast(e.message, ERROR_TOAST, { closeButton: true })
-        setDeletingIds(new Set())
-      })
+      },
+    })
   }
 
   return { deleteSelectedRuns, deletingIds }

@@ -11,6 +11,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 
 import { PersonalAccountSettings } from '../PersonalAccountSettings'
 
@@ -39,6 +40,9 @@ const MOCK_SELF_RESPONSE = {
 } as AuthUserResponse
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const mockUpdateSelf = vi.fn()
 let selfResponse = MOCK_SELF_RESPONSE

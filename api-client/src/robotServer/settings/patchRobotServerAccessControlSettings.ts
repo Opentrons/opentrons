@@ -9,10 +9,11 @@ import type {
 
 export function patchRobotServerAccessControlSettings(
   config: HostConfig,
-  body: PatchRobotServerAccessControlSettingsRequest
+  body: PatchRobotServerAccessControlSettingsRequest,
+  userNotes: string
 ): ResponsePromise<RobotServerAccessControlSettingsResponse> {
   return request<
     RobotServerAccessControlSettingsResponse,
     PatchRobotServerAccessControlSettingsRequest
-  >(PATCH, '/accessControl/settings', config, { body })
+  >(PATCH, '/accessControl/settings', config, { body, userNotes })
 }

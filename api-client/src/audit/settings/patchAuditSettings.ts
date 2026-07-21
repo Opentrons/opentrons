@@ -6,12 +6,13 @@ import type { AuditSettingsResponse, PatchAuditSettingsRequest } from './types'
 
 export function patchAuditSettings(
   config: HostConfig,
-  body: PatchAuditSettingsRequest
+  body: PatchAuditSettingsRequest,
+  userNotes: string
 ): ResponsePromise<AuditSettingsResponse> {
   return request<AuditSettingsResponse, PatchAuditSettingsRequest>(
     PATCH,
     '/audit/external/settings',
     config,
-    { body }
+    { body, userNotes }
   )
 }
