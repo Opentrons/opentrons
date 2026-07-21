@@ -155,9 +155,11 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
         )
         .then(referencingRunIds => {
           return Promise.all(
+            // eslint-disable-next-line opentrons/no-direct-mutating -- TODO(jj, 07-21-26): no direct mutations
             referencingRunIds?.map(runId => deleteRun(host, runId))
           )
         })
+        // eslint-disable-next-line opentrons/no-direct-mutating -- TODO(jj, 07-21-26): no direct mutations
         .then(() => deleteProtocol(host, protocol.id))
         .then(() =>
           queryClient
