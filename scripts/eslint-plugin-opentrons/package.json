@@ -18,6 +18,7 @@
     "lint:eslint-docs": "npm-run-all \"update:eslint-docs -- --check\"",
     "lint:js": "eslint .",
     "generate:mutating-api-client-exports": "node ./generate-mutating-api-client-exports.js",
+    "check:mutating-api-client-exports": "node ./generate-mutating-api-client-exports.js --check",
     "test": "mocha tests --recursive",
     "update:eslint-docs": "eslint-doc-generator"
   },
