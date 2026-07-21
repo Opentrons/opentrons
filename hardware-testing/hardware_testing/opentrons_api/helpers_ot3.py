@@ -1660,3 +1660,11 @@ def get_input_number(
         else:
             ctx.pause("扫描失败，请重试" if LOCALIZE else "Failed to scan, try again.")
     return default
+
+
+def enable_stall_detection(api: SyncHardwareAPI, enable: bool) -> None:
+    """Toggle stall detection on or off."""
+    flags = api.hardware_feature_flags
+    flags.stall_detection_enabled = enable
+    # for some reason mypy gets the property method but isn't the seeing the setter as a member
+    api.hardware_feature_flags = flags  # type: ignore[attr-defined]

@@ -1,17 +1,11 @@
 import { useTranslation } from 'react-i18next'
 
-import {
-  CheckboxBasic,
-  COLORS,
-  StyledText,
-  WARNING_TOAST,
-} from '@opentrons/components'
+import { CheckboxBasic, COLORS, StyledText } from '@opentrons/components'
 
 import {
   useDownloadCalibrationData,
   useDownloadRobotLogs,
-} from '/app/organisms/Desktop/Devices/hooks'
-import { useToaster } from '/app/organisms/ToasterOven'
+} from '/app/resources/devices/hooks'
 
 import { FileManagementSectionHeader } from '../FileManagementSectionHeader'
 import { useRecordSelection } from '../hooks/useRecordSelection'
@@ -31,24 +25,21 @@ export function DiagnosticsFiles({
   robotName,
 }: DiagnosticsFilesProps): JSX.Element {
   const { t } = useTranslation('device_details')
-  const { makeToast } = useToaster()
 
-  const { downloadLogs } = useDownloadRobotLogs(robotName)
-  const { downloadCalibration } = useDownloadCalibrationData(robotName)
+  const { downloadLogs, isDownloading: isDownloadingLogs } =
+    useDownloadRobotLogs(robotName)
+  const { downloadCalibration, isLoading: isLoadingCalibration } =
+    useDownloadCalibrationData(robotName)
 
   const { selectedIds, isAllSelected, isSomeSelected, toggleAll, toggleOne } =
     useRecordSelection(DIAGNOSTIC_ROWS)
 
   const handleDownloadSelected = (): void => {
-    if (selectedIds.size === 0) {
-      makeToast(t('select_entry_to_download') as string, WARNING_TOAST)
-      return
+    if (selectedIds.has('troubleshooting') && !isDownloadingLogs) {
+      downloadLogs().catch(() => {})
     }
-    if (selectedIds.has('troubleshooting')) {
-      downloadLogs()
-    }
-    if (selectedIds.has('calibration')) {
-      downloadCalibration()
+    if (selectedIds.has('calibration') && !isLoadingCalibration) {
+      downloadCalibration().catch(() => {})
     }
   }
 
@@ -56,6 +47,7 @@ export function DiagnosticsFiles({
     <div className={fileManagerStyles.file_management_group}>
       <FileManagementSectionHeader
         titleText={t('diagnostic_files')}
+        showButtons={isSomeSelected || isAllSelected}
         onDownloadSelected={handleDownloadSelected}
       />
       <div className={fileManagerStyles.log_table}>

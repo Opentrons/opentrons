@@ -50,8 +50,9 @@ export function useCreateRunFromProtocol(
     getValidCustomLabwareFiles(state)
   )
 
-  const documentationState = useLinkedDocumentationState(
+  const { documentationState, clearDocreport } = useLinkedDocumentationState(
     ['create_protocol', 'play_run'],
+    host?.robotName ?? null,
     host?.robotName,
     host
   )
@@ -73,6 +74,10 @@ export function useCreateRunFromProtocol(
           })
         options.onSuccess?.(...args)
       },
+      onError: (error, variables, context) => {
+        clearDocreport()
+        options.onError?.(error, variables, context)
+      },
     },
     host
   )
@@ -91,6 +96,9 @@ export function useCreateRunFromProtocol(
           runTimeParameterValues,
           runTimeParameterFiles,
         })
+      },
+      onError: () => {
+        clearDocreport()
       },
     },
     host
@@ -120,6 +128,7 @@ export function useCreateRunFromProtocol(
       },
       ...args
     ) => {
+      clearDocreport()
       resetRunMutation()
       createProtocolRun(
         {
@@ -135,6 +144,7 @@ export function useCreateRunFromProtocol(
     runCreationError: error,
     runCreationErrorCode: errorCode,
     reset: () => {
+      clearDocreport()
       resetProtocolMutation()
       resetRunMutation()
     },

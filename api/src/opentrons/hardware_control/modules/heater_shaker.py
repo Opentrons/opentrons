@@ -18,6 +18,7 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import RPM, HeaterShakerLabwareLatchStatus, Temperature
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.modules import mod_abc, update
+from opentrons.hardware_control.modules.retry import retry_module_init
 from opentrons.hardware_control.modules.types import (
     HeaterShakerData,
     HeaterShakerStatus,
@@ -87,11 +88,24 @@ class HeaterShaker(mod_abc.AbstractModule):
         """
         driver: AbstractHeaterShakerDriver
         if not simulating:
-            driver = await HeaterShakerDriver.create(port=port, loop=hw_control_loop)
             poll_interval_seconds = poll_interval_seconds or POLL_PERIOD
+
+            async def _init_driver() -> tuple[
+                AbstractHeaterShakerDriver, Mapping[str, str]
+            ]:
+                d = await HeaterShakerDriver.create(port=port, loop=hw_control_loop)
+                try:
+                    info = await d.get_device_info()
+                    return d, info
+                except BaseException:
+                    await d.disconnect()
+                    raise
+
+            driver, device_info = await retry_module_init(_init_driver, port=port)
         else:
             driver = SimulatingDriver(serial_number=sim_serial_number)
             poll_interval_seconds = poll_interval_seconds or SIMULATING_POLL_PERIOD
+            device_info = await driver.get_device_info()
 
         reader = HeaterShakerReader(driver=driver)
         poller = Poller(reader=reader, interval=poll_interval_seconds)
@@ -101,7 +115,7 @@ class HeaterShaker(mod_abc.AbstractModule):
             driver=driver,
             reader=reader,
             poller=poller,
-            device_info=await driver.get_device_info(),
+            device_info=device_info,
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
             disconnected_callback=disconnected_callback,

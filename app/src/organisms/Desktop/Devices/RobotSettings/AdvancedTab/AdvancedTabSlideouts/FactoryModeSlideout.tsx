@@ -24,6 +24,7 @@ import {
 
 import { ToggleButton } from '/app/atoms/buttons'
 import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { FileUpload } from '/app/molecules/FileUpload'
 import { UploadInput } from '/app/molecules/UploadInput'
 import { restartRobot } from '/app/redux/robot-admin'
@@ -82,15 +83,19 @@ export function FactoryModeSlideout({
     },
   })
 
-  const { updateRobotSetting } = useUpdateRobotSettingMutation({
-    onSuccess: () => {
-      if (toggleValue && file != null) {
-        createSplash({ file })
-      } else {
-        onFinishCompleteClick()
-      }
-    },
-  })
+  const documentationState = useDocumentationState()
+  const { updateRobotSetting } = useUpdateRobotSettingMutation(
+    documentationState,
+    {
+      onSuccess: () => {
+        if (toggleValue && file != null) {
+          createSplash({ file })
+        } else {
+          onFinishCompleteClick()
+        }
+      },
+    }
+  )
 
   const validate = (
     data: FormValues,
@@ -227,7 +232,6 @@ export function FactoryModeSlideout({
             name="factoryModeInput"
             render={({ field }) => (
               <InputField
-                id="factoryModeInput"
                 name="factoryModeInput"
                 type="text"
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {

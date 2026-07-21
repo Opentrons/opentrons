@@ -1,7 +1,8 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { deleteLogPeriod } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
 import type {
@@ -10,6 +11,8 @@ import type {
   UseMutationResult,
 } from 'react-query'
 import type { EmptyResponse } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
+import type { DocumentedMutationParameters } from '../accessControl/types'
 
 export interface DeleteLogPeriodParams {
   logPeriodId: string
@@ -37,21 +40,33 @@ export type UseDeleteLogPeriodMutationOptions = UseMutationOptions<
 >
 
 export function useDeleteLogPeriodMutation(
+  documentationState: DocumentationState,
   options: UseDeleteLogPeriodMutationOptions = {}
 ): UseDeleteLogPeriodMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<EmptyResponse, unknown, DeleteLogPeriodParams>(
-    ({ logPeriodId, deletionKey }) =>
-      deleteLogPeriod(host!, logPeriodId, { deletionKey }).then(response => {
-        queryClient
-          .invalidateQueries(getQueryKey(host, 'audit', 'logPeriods'))
-          .catch((e: Error) => {
-            console.error(`error invalidating logPeriods query: ${e.message}`)
-          })
-        return response.data
-      }),
+  const mutation = useDocumentedMutation<
+    EmptyResponse,
+    unknown,
+    DeleteLogPeriodParams
+  >(
+    documentationState,
+    ['delete_log_period'],
+    ({
+      variables: { logPeriodId, deletionKey },
+      userNotes,
+    }: DocumentedMutationParameters<DeleteLogPeriodParams>) =>
+      deleteLogPeriod(host!, logPeriodId, { deletionKey }, userNotes).then(
+        response => {
+          queryClient
+            .invalidateQueries(getQueryKey(host, 'audit', 'logPeriods'))
+            .catch((e: Error) => {
+              console.error(`error invalidating logPeriods query: ${e.message}`)
+            })
+          return response.data
+        }
+      ),
     options
   )
 

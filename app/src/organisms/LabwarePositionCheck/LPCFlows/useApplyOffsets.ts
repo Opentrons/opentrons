@@ -12,19 +12,25 @@ import {
   selectLabwareOffsetsToAddToRun,
 } from '/app/redux/protocol-runs'
 
+import type { DocumentationState } from '@opentrons/react-api-client'
+
 interface ApplyOffsetsResult {
   applyOffsets: () => Promise<void>
   isApplyingOffsets: boolean
 }
 
-export function useApplyOffsets(runId: string): ApplyOffsetsResult {
+export function useApplyOffsets(
+  runId: string,
+  documentationState: DocumentationState
+): ApplyOffsetsResult {
   const { t } = useTranslation('protocol_setup')
   const lwOffsetsForRun = useSelector(selectLabwareOffsetsToAddToRun(runId))
   const isNecessaryDefaultOffsetMissing = useSelector(
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
   const { makeSnackbar } = useToaster()
-  const { createLabwareOffset } = useAddLabwareOffsetToRunMutation()
+  const { createLabwareOffset } =
+    useAddLabwareOffsetToRunMutation(documentationState)
   const { reportApplyOffsets } = useLPCAnalytics({
     runId,
     robotType: FLEX_ROBOT_TYPE,

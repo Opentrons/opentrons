@@ -24,6 +24,19 @@ const CERT_SUBDIR = 'robot-certificates'
 
 const log = createLogger('certs')
 
+/**
+ * Convert a Node.js certificate fingerprint into a safe filename.
+ *
+ * `X509Certificate.fingerprint256` is colon-separated hex, e.g. `AB:CD:...`.
+ * Colons are illegal in Windows filenames and display oddly in macOS Finder,
+ * so strip them and keep only the hex digits.
+ *
+ * Exported for tests.
+ */
+export function getCertificateFilename(certificate: X509Certificate): string {
+  return `${certificate.fingerprint256.replaceAll(':', '')}.cer`
+}
+
 async function wrappedStat(
   path: string
 ): Promise<Awaited<ReturnType<typeof stat>> | null> {
@@ -66,7 +79,7 @@ async function saveCertificateToDisk(
   certificate: X509Certificate
 ): Promise<void> {
   const certDir = await getCertDir()
-  const certPath = join(certDir, `${certificate.fingerprint256}.cer`)
+  const certPath = join(certDir, getCertificateFilename(certificate))
   await writeFile(certPath, certificate.raw)
   log.info(`Saved certificate to ${certPath}`)
   addCertificateToMap(certificate)

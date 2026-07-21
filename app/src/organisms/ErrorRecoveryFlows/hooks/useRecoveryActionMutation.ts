@@ -1,4 +1,7 @@
-import { usePlayRunMutation } from '@opentrons/react-api-client'
+import {
+  isDocumentedMutationError,
+  usePlayRunMutation,
+} from '@opentrons/react-api-client'
 
 import { RECOVERY_MAP } from '../constants'
 
@@ -23,6 +26,10 @@ export function useRecoveryActionMutation(
 
   const resumeRecovery = (): Promise<RunAction> => {
     return mutateAsync(runId).catch(e => {
+      // User cancelled documentation/login — stay on the current screen.
+      if (isDocumentedMutationError(e)) {
+        return Promise.reject(e)
+      }
       return proceedToRouteAndStep(
         RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE
       ).then(() => {

@@ -38,6 +38,7 @@
   "error_encountered": "Error encountered",
   "exit": "exit",
   "extension_mount": "extension mount",
+  "finish": "finish",
   "flow_complete": "{{flowName}} complete!",
   "get_started": "Get started",
   "github": "GitHub",

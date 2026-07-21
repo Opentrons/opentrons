@@ -4686,8 +4686,9 @@
   ],
   "parameters": {
     "format": "384Standard",
-    "quirks": ["filterPlate"],
+    "quirks": ["filterPlate", "noLabwarePositionCheck"],
     "isTiprack": false,
+    "isDeckSlotCompatible": false,
     "isMagneticModuleCompatible": false,
     "loadName": "millipore_384_wellplate_100ul_filter"
   },

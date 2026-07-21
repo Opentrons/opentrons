@@ -5,6 +5,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--spacing-12);
+  border: none;
   border-radius: 50%;
   background-color: var(--variant-default);
 }

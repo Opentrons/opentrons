@@ -39,6 +39,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { SmallButton, TouchFloatingActionButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -271,8 +272,9 @@ function LabwareLatch({
   refetchModules,
 }: LabwareLatchProps): JSX.Element {
   const { t } = useTranslation(['heater_shaker', 'protocol_setup'])
+  const documentationState = useDocumentationState()
   const { createLiveCommand, isLoading: isLiveCommandLoading } =
-    useCreateLiveCommandMutation()
+    useCreateLiveCommandMutation(documentationState)
   const [isRefetchingModules, setIsRefetchingModules] = useState(false)
   const isLatchLoading =
     isLiveCommandLoading ||

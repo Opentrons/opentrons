@@ -1,12 +1,12 @@
 # E2E Testing Checks Workflow
 
-name: "E2E Test Checks"
+name: 'E2E Test Checks'
 
 on:
   pull_request:
     paths:
-      - "e2e-testing/**"
-      - ".github/workflows/e2e-test-checks.yaml"
+      - 'e2e-testing/**'
+      - '.github/workflows/e2e-test-checks.yaml'
   workflow_dispatch: {}
 
 concurrency:
@@ -18,33 +18,33 @@ defaults:
     shell: bash
 
 env:
-  CI: "true"
+  CI: 'true'
 
 jobs:
   checks:
-    name: "E2E test checks (lint + typecheck)"
-    runs-on: "ubuntu-24.04"
+    name: 'E2E test checks (lint + typecheck)'
+    runs-on: 'ubuntu-24.04'
     timeout-minutes: 5
     steps:
-      - name: "Checkout Repository"
+      - name: 'Checkout Repository'
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
 
-      - name: "Setup UV"
+      - name: 'Setup UV'
         uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
         with:
-          python-version: "3.12"
+          python-version: '3.12'
           cache-dependency-glob: |
-              e2e-testing/uv.lock
-              e2e-testing/pyproject.toml
+            e2e-testing/uv.lock
+            e2e-testing/pyproject.toml
 
-      - name: "Install E2E test dependencies"
+      - name: 'Install E2E test dependencies'
         working-directory: e2e-testing
         run: make setup
 
-      - name: "Run lint, format check, and type check"
+      - name: 'Run lint, format check, and type check'
         working-directory: e2e-testing
         run: make check
 
-      - name: "Run unit tests"
+      - name: 'Run unit tests'
         working-directory: e2e-testing
         run: make test-unit

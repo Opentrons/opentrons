@@ -2,7 +2,7 @@
 
 React components for Opentrons' applications. Visit the [Opentrons Components Library][components-library] to see available components.
 
-[components-library]: https://s3-us-west-2.amazonaws.com/opentrons-components/edge/index.html
+[components-library]: https://sandbox.components.opentrons.com/edge/
 
 ## example usage
 

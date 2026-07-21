@@ -77,7 +77,6 @@ export function SetupFlexPipetteCalibrationItem({
     button = (
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <TertiaryButton
-          id="PipetteCalibration_attachPipetteButton"
           onClick={() => {
             setShowFlexPipetteFlow(true)
           }}
@@ -98,7 +97,6 @@ export function SetupFlexPipetteCalibrationItem({
           gridGap={SPACING.spacing8}
         >
           <TertiaryButton
-            id="PipetteCalibration_calibratePipetteButton"
             onClick={() => {
               setShowFlexPipetteFlow(true)
             }}
@@ -138,7 +136,6 @@ export function SetupFlexPipetteCalibrationItem({
             : t(`devices_landing:${mount}_mount`)
         }
         title={requestedPipetteSpecs?.displayName}
-        id={`PipetteCalibration_${mount}MountTitle`}
         runId={runId}
       />
     </>

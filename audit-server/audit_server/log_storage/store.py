@@ -6,13 +6,21 @@ from sqlalchemy import select
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session, sessionmaker
 
-from .models import LogPeriodSummary
-from .types import StoredLog
+from .models import (
+    LogPeriodSummary,
+    UserLogEntry,
+    UserLogForExport,
+)
+from .types import LogPeriodEntries, RobotLogPaths, StoredLog
 from audit_server.persistence.orm_models import LogEntry, LogPeriod
 
 
 class NoLogInPeriodError(Exception):
     """A log period has no logs associated."""
+
+
+class NoPeriodById(Exception):
+    """There is no log period associated with given ID."""
 
 
 class NoActivePeriodError(Exception):
@@ -146,6 +154,45 @@ class LogStore:
             if not isinstance(latest_record, LogEntry):
                 return latest_record
             return latest_record.message_hash
+
+    def get_period_entries(self, period_id: str) -> LogPeriodEntries:
+        """Get the given log period's user and robot log entries."""
+        with self._session() as session:
+            try:
+                log_period = session.scalar(
+                    select(LogPeriod).where(LogPeriod.id == int(period_id))
+                )
+            # This will raise if `period_id` is not an int
+            except ValueError:
+                log_period = None
+            if log_period is None:
+                raise NoPeriodById()
+            user_log_entries = [
+                UserLogEntry(
+                    message=user_log.message,
+                    message_hash=user_log.message_hash,
+                    message_sig=user_log.message_sig,
+                    sig_version=user_log.sig_version,
+                )
+                for user_log in log_period.log_entries
+            ]
+            robot_log_entries = [
+                RobotLogPaths(
+                    file_path=robot_log.file_path,
+                    file_hash=robot_log.file_hash,
+                    file_sig=robot_log.file_sig,
+                    file_sig_version=robot_log.file_sig_version,
+                )
+                for robot_log in log_period.robot_logs
+            ]
+            return LogPeriodEntries(
+                user_log=UserLogForExport(
+                    userLogEntries=user_log_entries,
+                    startedAt=log_period.started_at,
+                    endedAt=log_period.ended_at,
+                ),
+                robot_log_entries=robot_log_entries,
+            )
 
     def list_periods(self) -> list[LogPeriodSummary]:
         """Return all log periods, oldest first, with their entry IDs in ordinal order."""

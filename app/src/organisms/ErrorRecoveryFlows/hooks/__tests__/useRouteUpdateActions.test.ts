@@ -200,6 +200,52 @@ describe('useRouteUpdateActions', () => {
     })
   })
 
+  it('does not overwrite the restored route when handleMotionRouting(false) is called twice', async () => {
+    const { result, rerender } = renderHook(
+      ({ recoveryMap }) =>
+        useRouteUpdateActions({
+          ...useRouteUpdateActionsParams,
+          recoveryMap,
+        }),
+      {
+        initialProps: {
+          recoveryMap: useRouteUpdateActionsParams.recoveryMap,
+        },
+      }
+    )
+
+    await result.current.handleMotionRouting(true)
+    await result.current.handleMotionRouting(false)
+    rerender({
+      recoveryMap: {
+        route: RECOVERY_MAP.RETRY_STEP.ROUTE,
+        step: RECOVERY_MAP.RETRY_STEP.STEPS.CONFIRM_RETRY,
+      },
+    })
+    mockSetRecoveryMap.mockClear()
+
+    await result.current.handleMotionRouting(false)
+    expect(mockSetRecoveryMap).not.toHaveBeenCalled()
+  })
+
+  it('falls back to option selection when ending motion with no stash while still on a motion route', async () => {
+    const { result } = renderHook(() =>
+      useRouteUpdateActions({
+        ...useRouteUpdateActionsParams,
+        recoveryMap: {
+          route: RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE,
+          step: RECOVERY_MAP.ROBOT_IN_MOTION.STEPS.IN_MOTION,
+        },
+      })
+    )
+
+    await result.current.handleMotionRouting(false)
+    expect(mockSetRecoveryMap).toHaveBeenCalledWith({
+      route: OPTION_SELECTION.ROUTE,
+      step: OPTION_SELECTION.STEPS.SELECT,
+    })
+  })
+
   it('routes to the first step of the supplied route when proceedToRouteAndStep is called without a step', () => {
     const { result } = renderHook(() =>
       useRouteUpdateActions(useRouteUpdateActionsParams)
