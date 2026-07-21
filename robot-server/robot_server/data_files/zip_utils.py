@@ -1,8 +1,9 @@
 """Shared helpers for building and streaming zip downloads."""
 
 import asyncio
+import io
+import zipfile
 from pathlib import Path
-from tempfile import TemporaryDirectory
 from typing import AsyncIterator, List, Optional, Tuple, Union
 
 from fastapi import status
@@ -88,62 +89,32 @@ def collect_existing_run_output_csvs(
     return entries
 
 
+def _build_zip_bytes(entries: List[Tuple[Path, str]]) -> bytes:
+    """Build a zip archive in memory from filesystem/archive path pairs."""
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(
+        buffer, mode="w", compression=zipfile.ZIP_DEFLATED
+    ) as zip_file:
+        for source_path, archive_name in entries:
+            zip_file.write(source_path, arcname=archive_name)
+    return buffer.getvalue()
+
+
 async def stream_zip(
     entries: List[Tuple[Path, str]],
     chunk_size: int = 65536,
 ) -> AsyncIterator[bytes]:
-    """Stage files into a temp tree and stream a zip with preserved archive paths.
+    """Build a zip archive off the event loop and stream it in chunks.
 
     Args:
         entries: ``(filesystem_path, archive_path)`` pairs to include.
         chunk_size: Number of bytes to yield per chunk.
     """
-    process = None
-
     try:
-        with TemporaryDirectory() as staging_dir:
-            staging_path = Path(staging_dir)
-            for source_path, archive_name in entries:
-                destination = staging_path / archive_name
-                destination.parent.mkdir(parents=True, exist_ok=True)
-                destination.symlink_to(source_path.resolve())
-
-            process = await asyncio.create_subprocess_exec(
-                "zip",
-                "-q",  # quiet
-                "-r",  # recurse into directories
-                "-",  # write zip output to stdout
-                ".",
-                cwd=str(staging_path),
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-
-            if process.stdout is None:
-                raise RuntimeError("stdout was not captured")
-            if process.stderr is None:
-                raise RuntimeError("stderr was not captured")
-
-            while True:
-                chunk = await process.stdout.read(chunk_size)
-                if not chunk:
-                    break
-                yield chunk
-
-            await process.wait()
-
-            if process.returncode != 0:
-                stderr_output = await process.stderr.read()
-                error_msg = stderr_output.decode() if stderr_output else "Unknown error"
-                raise Exception(
-                    f"zip command failed with code {process.returncode}: {error_msg}"
-                )
-
+        zip_bytes = await asyncio.to_thread(_build_zip_bytes, entries)
+        for offset in range(0, len(zip_bytes), chunk_size):
+            yield zip_bytes[offset : offset + chunk_size]
     except Exception as e:
-        if process is not None and process.returncode is None:
-            process.kill()
-            await process.wait()
-
         raise ZipCreationFailed(
             detail=f"Unexpected error during zip creation: {str(e)}"
         ).as_error(status.HTTP_500_INTERNAL_SERVER_ERROR) from e

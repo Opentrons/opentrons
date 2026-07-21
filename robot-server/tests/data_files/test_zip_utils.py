@@ -5,6 +5,7 @@ import zipfile
 from datetime import datetime
 from pathlib import Path
 
+import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.data_files import (
@@ -26,6 +27,7 @@ from robot_server.data_files.zip_utils import (
     sanitize_filename_component,
     stream_zip,
 )
+from robot_server.errors.error_responses import ApiError
 from robot_server.protocols.protocol_store import ProtocolNotFoundError, ProtocolStore
 
 
@@ -188,15 +190,33 @@ async def test_stream_zip_preserves_archive_paths(tmp_path: Path) -> None:
     chunks = [
         chunk
         async for chunk in stream_zip(
-            [(image, "images/photo.jpeg"), (protocol, "protocol.py")]
+            [(image, "images/photo.jpeg"), (protocol, "protocol.py")],
+            chunk_size=8,
         )
     ]
 
+    assert len(chunks) > 1
     with zipfile.ZipFile(io.BytesIO(b"".join(chunks))) as zf:
         names = set(zf.namelist())
         assert "images/photo.jpeg" in names
         assert "protocol.py" in names
         assert zf.read("images/photo.jpeg") == b"image-bytes"
+        assert zf.read("protocol.py") == b"print('hi')"
+
+
+async def test_stream_zip_raises_zip_creation_failed_for_missing_file(
+    tmp_path: Path,
+) -> None:
+    """It should map zip build failures to ZipCreationFailed."""
+    missing = tmp_path / "missing.jpeg"
+    chunks = stream_zip([(missing, "missing.jpeg")])
+
+    with pytest.raises(ApiError) as exc_info:
+        async for _ in chunks:
+            pass
+
+    assert exc_info.value.status_code == 500
+    assert exc_info.value.content["errors"][0]["id"] == "ZipCreationFailed"
 
 
 def test_build_run_zip_filename_with_protocol(decoy: Decoy) -> None:

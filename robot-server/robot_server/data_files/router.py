@@ -577,8 +577,6 @@ async def download_run_images(
 ) -> StreamingResponse:
     """Download all camera images for a run as a zip file.
 
-    Streams the resultant zip file via a spawned subprocess.
-
     Arguments:
         runId: The run ID associated with the camera image files.
         data_files_store: Store for data files database access.
