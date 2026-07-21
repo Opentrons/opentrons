@@ -103,7 +103,11 @@ async def download_run_files(
 
         zip_entries.extend(
             collect_existing_run_images(
-                runId, data_files_store, archive_prefix="images"
+                runId,
+                data_files_store,
+                archive_prefix=_build_download_artifact_name(
+                    run=run, protocol_store=protocol_store, suffix="_images"
+                ),
             )
         )
         protocol_entry = _collect_protocol_file(run=run, protocol_store=protocol_store)
@@ -142,8 +146,8 @@ async def download_run_files(
             collect_existing_run_output_csvs(
                 runId,
                 data_files_store,
-                archive_prefix=_build_output_csvs_directory_name(
-                    run=run, protocol_store=protocol_store
+                archive_prefix=_build_download_artifact_name(
+                    run=run, protocol_store=protocol_store, suffix="_output"
                 ),
             )
         )
@@ -304,14 +308,26 @@ def _write_staging_json(
     return (file_path, archive_name)
 
 
+def _build_download_artifact_name(
+    run: Union[RunResource, BadRunResource],
+    protocol_store: ProtocolStore,
+    *,
+    suffix: str,
+) -> str:
+    """Build `{protocolName}_{ISO-timestamp}{suffix}` for zip entries/directories."""
+    created_at = _format_download_timestamp(run.created_at)
+    name_stem = _protocol_download_name_stem(run=run, protocol_store=protocol_store)
+    return f"{name_stem}_{created_at}{suffix}"
+
+
 def _build_run_log_filename(
     run: Union[RunResource, BadRunResource],
     protocol_store: ProtocolStore,
 ) -> str:
     """Build `{protocolName}_{ISO-timestamp}.json`."""
-    created_at = _format_download_timestamp(run.created_at)
-    name_stem = _protocol_download_name_stem(run=run, protocol_store=protocol_store)
-    return f"{name_stem}_{created_at}.json"
+    return _build_download_artifact_name(
+        run=run, protocol_store=protocol_store, suffix=".json"
+    )
 
 
 def _build_labware_offsets_filename(
@@ -319,30 +335,16 @@ def _build_labware_offsets_filename(
     protocol_store: ProtocolStore,
 ) -> str:
     """Build `{protocolName}_{ISO-timestamp}_offsetdata.json`."""
-    created_at = _format_download_timestamp(run.created_at)
-    name_stem = _protocol_download_name_stem(run=run, protocol_store=protocol_store)
-    return f"{name_stem}_{created_at}_offsetdata.json"
-
-
-def _build_output_csvs_directory_name(
-    run: Union[RunResource, BadRunResource],
-    protocol_store: ProtocolStore,
-) -> str:
-    """Build `{protocolName}_{ISO-timestamp}_output` directory name."""
-    created_at = _format_download_timestamp(run.created_at)
-    name_stem = _protocol_download_name_stem(run=run, protocol_store=protocol_store)
-    return f"{name_stem}_{created_at}_output"
+    return _build_download_artifact_name(
+        run=run, protocol_store=protocol_store, suffix="_offsetdata.json"
+    )
 
 
 def _protocol_download_name_stem(
     run: Union[RunResource, BadRunResource],
     protocol_store: ProtocolStore,
 ) -> str:
-    """Shared name stem for download zip entries derived from the protocol.
-
-    Prefers metadata ``protocolName``, then the protocol main file stem, then
-    protocol/run ids. The result is filesystem-safe.
-    """
+    """Prefer protocolName metadata, then protocol file name, then ids."""
     if run.protocol_id is not None:
         try:
             protocol = protocol_store.get(run.protocol_id)

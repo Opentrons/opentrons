@@ -247,8 +247,8 @@ async def test_download_run_files_with_images_protocol_run_log_and_offsets(
 
     with await _read_and_cleanup_zip(result) as zf:
         names = set(zf.namelist())
-        assert "images/image1.jpeg" in names
-        assert "images/image2.jpeg" in names
+        assert "pcrprep-standard_2024-06-20T10_30_15.354Z_images/image1.jpeg" in names
+        assert "pcrprep-standard_2024-06-20T10_30_15.354Z_images/image2.jpeg" in names
         assert "pcrprep-standard.py" in names
         assert "samples.csv" in names
         assert "pcrprep-standard_2024-06-20T10_30_15.354Z.json" in names
@@ -257,7 +257,10 @@ async def test_download_run_files_with_images_protocol_run_log_and_offsets(
             "pcrprep-standard_2024-06-20T10_30_15.354Z_output/"
             "csv-file-id_plate_read450nm.csv"
         ) in names
-        assert zf.read("images/image1.jpeg") == b"fake image data 1"
+        assert (
+            zf.read("pcrprep-standard_2024-06-20T10_30_15.354Z_images/image1.jpeg")
+            == b"fake image data 1"
+        )
         assert zf.read("pcrprep-standard.py") == protocol_path.read_bytes()
         assert zf.read("samples.csv") == rtp_csv_path.read_bytes()
         assert (
@@ -404,11 +407,11 @@ async def test_download_run_files_skips_missing_protocol_silently(
 
     with await _read_and_cleanup_zip(result) as zf:
         names = zf.namelist()
-        assert "images/image1.jpeg" in names
+        assert "protocol-id_2024-06-20T10_30_15.000Z_images/image1.jpeg" in names
         assert not any(
             name.endswith(".py") or (name.endswith(".json") and "/" not in name)
             for name in names
-            if not name.startswith("images/")
+            if not name.startswith("protocol-id_2024-06-20T10_30_15.000Z_images/")
         )
 
 
@@ -467,7 +470,7 @@ async def test_download_run_files_skips_missing_run_log_and_offsets_silently(
     )
 
     with await _read_and_cleanup_zip(result) as zf:
-        assert "images/image1.jpeg" in zf.namelist()
+        assert "run-id_2024-06-20T10_30_15.000Z_images/image1.jpeg" in zf.namelist()
         assert not any(name.endswith(".json") for name in zf.namelist())
 
 
