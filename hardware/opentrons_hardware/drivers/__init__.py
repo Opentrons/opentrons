@@ -16,11 +16,11 @@ class SystemDrivers:
         can_messenger: CanMessenger,
         gpio_dev: Union[OT3GPIO, RemoteOT3GPIO],
         eeprom: EEPROMDriver,
-        usb_messenger: Optional[BinaryMessenger] = None,
+        usb_messenger: BinaryMessenger,
     ) -> None:
         """Constructor"""
         self.can_messenger: CanMessenger = can_messenger
-        self.usb_messenger: Optional[BinaryMessenger] = usb_messenger
+        self.usb_messenger: BinaryMessenger = usb_messenger
         self.gpio_dev: Union[OT3GPIO, RemoteOT3GPIO] = gpio_dev
         self.eeprom: EEPROMDriver = eeprom
 

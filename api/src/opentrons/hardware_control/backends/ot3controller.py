@@ -282,7 +282,7 @@ class OT3Controller(FlexBackend):
 
     _initialized: bool
     _messenger: CanMessenger
-    _usb_messenger: Optional[BinaryMessenger]
+    _usb_messenger: BinaryMessenger
     _position: Dict[NodeId, float]
     _encoder_position: Dict[NodeId, float]
     _motor_status: Dict[NodeId, MotorStatus]
@@ -326,7 +326,7 @@ class OT3Controller(FlexBackend):
         self,
         config: OT3Config,
         driver: AbstractCanDriver,
-        usb_driver: Optional[SerialUsbDriver] = None,
+        usb_driver: SerialUsbDriver,
         eeprom_driver: Optional[EEPROMDriver] = None,
         check_updates: bool = True,
         feature_flags: Optional[HardwareFeatureFlags] = None,
@@ -477,18 +477,16 @@ class OT3Controller(FlexBackend):
     @staticmethod
     def _build_system_hardware(
         can_messenger: CanMessenger,
-        usb_driver: Optional[SerialUsbDriver],
+        usb_driver: SerialUsbDriver,
         eeprom_driver: Optional[EEPROMDriver],
     ) -> SystemDrivers:
         gpio = OT3GPIO("hardware_control")
         eeprom_driver = eeprom_driver or EEPROMDriver(gpio)
         eeprom_driver.setup()
         gpio_dev: Union[OT3GPIO, RemoteOT3GPIO] = gpio
-        usb_messenger: Optional[BinaryMessenger] = None
-        if usb_driver:
-            usb_messenger = BinaryMessenger(usb_driver)
-            usb_messenger.start()
-            gpio_dev = RemoteOT3GPIO(usb_messenger)
+        usb_messenger = BinaryMessenger(usb_driver)
+        usb_messenger.start()
+        gpio_dev = RemoteOT3GPIO(usb_messenger)
         return SystemDrivers(
             can_messenger,
             gpio_dev,
@@ -1721,18 +1719,15 @@ class OT3Controller(FlexBackend):
             )
             _module_door_listener(door_state)
 
-        if self._usb_messenger is not None:
-            self._usb_messenger.add_listener(
-                _door_listener,
-                lambda message_id: bool(
-                    message_id == BinaryMessageId.door_switch_state_info
-                ),
-            )
+        self._usb_messenger.add_listener(
+            _door_listener,
+            lambda message_id: bool(
+                message_id == BinaryMessageId.door_switch_state_info
+            ),
+        )
 
     async def build_estop_detector(self) -> bool:
         """Must be called to set up the estop detector & state machine."""
-        if self._drivers.usb_messenger is None:
-            return False
         self._estop_detector = await EstopDetector.build(
             usb_messenger=self._drivers.usb_messenger
         )

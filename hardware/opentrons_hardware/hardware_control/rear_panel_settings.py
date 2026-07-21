@@ -53,12 +53,9 @@ class RearPinState:
 
 
 async def write_eeprom(
-    messenger: Optional[BinaryMessenger], data_addr: int, data_len: int, data: bytes
+    messenger: BinaryMessenger, data_addr: int, data_len: int, data: bytes
 ) -> bool:
     """Writes up to 8 bytes from the eeprom."""
-    if messenger is None:
-        # the EVT bots don't have switches so just return that the door is closed
-        return False
     if data_addr < 0 or data_addr > 0x4000 or data_len < 0 or data_len > 8:
         return False
     response = await messenger.send_and_receive(
@@ -73,12 +70,9 @@ async def write_eeprom(
 
 
 async def read_eeprom(
-    messenger: Optional[BinaryMessenger], data_addr: int, data_len: int
+    messenger: BinaryMessenger, data_addr: int, data_len: int
 ) -> bytes:
     """Reads up to 8 bytes from the eeprom."""
-    if messenger is None:
-        # the EVT bots don't have switches so just return that the door is closed
-        return b""
     if data_addr < 0 or data_addr > 0x4000 or data_len < 0 or data_len > 8:
         return b""
     response = await messenger.send_and_receive(
@@ -93,11 +87,8 @@ async def read_eeprom(
     return bytes(cast(ReadEEPromResponse, response).data.value)
 
 
-async def get_door_state(messenger: Optional[BinaryMessenger]) -> bool:
+async def get_door_state(messenger: BinaryMessenger) -> bool:
     """Returns true if the door is currently open."""
-    if messenger is None:
-        # the EVT bots don't have switches so just return that the door is closed
-        return False
     response = await messenger.send_and_receive(
         message=DoorSwitchStateRequest(),
         response_type=DoorSwitchStateInfo,
@@ -107,11 +98,8 @@ async def get_door_state(messenger: Optional[BinaryMessenger]) -> bool:
     return bool(cast(DoorSwitchStateInfo, response).door_open.value)
 
 
-async def set_deck_light(setting: int, messenger: Optional[BinaryMessenger]) -> bool:
+async def set_deck_light(setting: int, messenger: BinaryMessenger) -> bool:
     """Turn the deck light on or off."""
-    if messenger is None:
-        # the EVT bots don't have rear panels...
-        return False
     response = await messenger.send_and_receive(
         message=SetDeckLightRequest(setting=utils.UInt8Field(setting)),
         response_type=Ack,
@@ -119,11 +107,8 @@ async def set_deck_light(setting: int, messenger: Optional[BinaryMessenger]) -> 
     return response is not None
 
 
-async def get_deck_light_state(messenger: Optional[BinaryMessenger]) -> bool:
+async def get_deck_light_state(messenger: BinaryMessenger) -> bool:
     """Returns true if the light is currently on."""
-    if messenger is None:
-        # the EVT bots don't have switches so just return that the door is closed
-        return False
     response = await messenger.send_and_receive(
         message=GetDeckLightRequest(),
         response_type=GetDeckLightResponse,
@@ -133,11 +118,8 @@ async def get_deck_light_state(messenger: Optional[BinaryMessenger]) -> bool:
     return bool(cast(GetDeckLightResponse, response).setting.value)
 
 
-async def set_sync_pin(setting: int, messenger: Optional[BinaryMessenger]) -> bool:
+async def set_sync_pin(setting: int, messenger: BinaryMessenger) -> bool:
     """Turn the sync pin on or off."""
-    if messenger is None:
-        # the EVT bots don't have rear panels...
-        return False
     message: BinaryMessageDefinition = ReleaseSyncOut()
     if setting:
         message = EngageSyncOut()
@@ -158,12 +140,9 @@ def _clamp_rgb(val: int) -> int:
 
 
 async def set_ui_color(
-    red: int, blue: int, green: int, white: int, messenger: Optional[BinaryMessenger]
+    red: int, blue: int, green: int, white: int, messenger: BinaryMessenger
 ) -> bool:
     """Command the UI light to set to a particular RGBW value."""
-    if messenger is None:
-        # the EVT bots don't have rear panels...
-        return False
     response = await messenger.send_and_receive(
         message=AddLightActionRequest(
             red=utils.UInt8Field(_clamp_rgb(red)),
@@ -182,11 +161,9 @@ async def set_ui_color(
     return response is not None
 
 
-async def get_all_pin_state(messenger: Optional[BinaryMessenger]) -> RearPinState:
+async def get_all_pin_state(messenger: BinaryMessenger) -> RearPinState:
     """Returns the state of all IO GPIO pins on the rear panel."""
     current_state = RearPinState()
-    if messenger is None:
-        return current_state
 
     # estop port detection pins
     response = await messenger.send_and_receive(
