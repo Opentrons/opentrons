@@ -429,7 +429,6 @@ class OT3API(
         config: Union[OT3Config, RobotConfig, None] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
-        use_usb_bus: bool = False,
         update_firmware: bool = True,
         status_bar_enabled: bool = True,
         feature_flags: Optional[HardwareFeatureFlags] = None,
@@ -447,7 +446,6 @@ class OT3API(
 
         backend = await OT3Controller.build(
             checked_config,
-            use_usb_bus,
             check_updates=update_firmware,
             feature_flags=feature_flags,
         )

@@ -293,7 +293,6 @@ class OT3Controller(FlexBackend):
     async def build(
         cls,
         config: OT3Config,
-        use_usb_bus: bool = False,
         check_updates: bool = True,
         feature_flags: Optional[HardwareFeatureFlags] = None,
     ) -> OT3Controller:
@@ -306,15 +305,13 @@ class OT3Controller(FlexBackend):
             Instance.
         """
         driver = await build_driver(DriverSettings())
-        usb_driver = None
-        if use_usb_bus:
-            try:
-                usb_driver = await build_rear_panel_driver()
-            except IOError as e:
-                log.error(
-                    "No rear panel device found, probably an EVT bot, disable rearPanelIntegration feature flag if it is"
-                )
-                raise e
+        try:
+            usb_driver = await build_rear_panel_driver()
+        except IOError as e:
+            log.error(
+                "No rear panel device found, probably an EVT bot, Downgrade to v9.1.2 or lower and disable rearPanelIntegration feature flag if it is"
+            )
+            raise e
         inst = cls(
             config,
             driver=driver,
