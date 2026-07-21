@@ -23,7 +23,10 @@ from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_engine.types import CSVRuntimeParamPaths, DeckSlotLocation
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.robot.types import RobotTypeEnum
-from server_utils.auth.resource_server.fastapi import require_scopes
+from server_utils.auth.resource_server.fastapi import (
+    get_access_control_status,
+    require_scopes,
+)
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
 from server_utils.fastapi_utils.models.json_api import (
@@ -204,6 +207,7 @@ async def create_run(  # noqa: C901
     ],
     camera_provider: Annotated[CameraProvider, Depends(get_camera_provider)],
     notify_publishers: Annotated[Callable[[], None], Depends(get_pe_notify_publishers)],
+    access_control_status: Annotated[bool, Depends(get_access_control_status)],
     request_body: Optional[RequestModel[RunCreate]] = None,
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Create a new run.
@@ -275,6 +279,7 @@ async def create_run(  # noqa: C901
             run_time_param_paths=rtp_paths,
             protocol=protocol_resource,
             notify_publishers=notify_publishers,
+            access_control_status=access_control_status,
         )
     except RunConflictError as e:
         raise RunAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e

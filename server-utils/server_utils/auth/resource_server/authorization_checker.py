@@ -34,6 +34,11 @@ class AuthorizationChecker(ABC):
         """
         pass
 
+    @abstractmethod
+    async def access_control_status(self) -> bool:
+        """Check whether access control mode is enabled on the auth-server."""
+        pass
+
 
 class FailedClosedAuthorizationChecker(AuthorizationChecker):
     """An `AuthorizationChecker` that always denies access.
@@ -46,6 +51,11 @@ class FailedClosedAuthorizationChecker(AuthorizationChecker):
         """See base class for documentation."""
         return UnableToContactAuthServerResult()
 
+    @override
+    async def access_control_status(self) -> bool:
+        """See base class for documentation."""
+        return False
+
 
 class AlwaysAllowedAuthorizationChecker(AuthorizationChecker):
     """An `AuthorizationChecker` that always allows access."""
@@ -54,7 +64,11 @@ class AlwaysAllowedAuthorizationChecker(AuthorizationChecker):
     async def check(self, token: str | None, required_scopes: set[Scope]) -> Result:
         """See base class for documentation."""
         return AuthorizationNotRequiredResult()
-
+    
+    @override
+    async def access_control_status(self) -> bool:
+        """See base class for documentation."""
+        return True
 
 class AuthServerAuthorizationChecker(AuthorizationChecker):
     """An `AuthorizationChecker` that queries auth-server to check authorization."""
@@ -104,6 +118,13 @@ class AuthServerAuthorizationChecker(AuthorizationChecker):
                 return AuthorizedResult(
                     username=token_info.username, fullname=token_info.ot_fullname
                 )
+
+    @override
+    async def access_control_status(self) -> bool:
+        """Check the status of access control enablement."""
+        return (
+            await self._client.get_auth_settings()
+        ).data.accessControlEnabled
 
 
 @dataclass

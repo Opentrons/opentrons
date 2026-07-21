@@ -38,7 +38,7 @@ class RunProcessPyroProvider:
         # The protocol subprocess username defaults to root unless otherwise specified
         self._protocol_username: str = "root"
 
-    def initialize(self) -> None:
+    def initialize(self, access_control_mode: bool) -> None:
         """Called when server first starts up.
 
         If feature flag is on for protocol subprocess, registers the process types
@@ -48,14 +48,17 @@ class RunProcessPyroProvider:
         If feature flag is on for running as a user with limited permissions then
         ensure the protocol user name is set.
         """
+        if feature_flags.run_protocol_as_restricted_user() or access_control_mode:
+            self._protocol_username = _RESTRICTED_USER_NAME
+        elif (
+            feature_flags.run_protocol_as_restricted_user() is False
+            and access_control_mode is False
+        ):
+            self._protocol_username = _ROOT_USER_NAME
         if feature_flags.protocol_subprocess_enabled():
             register_process_types()
             self._start_run_process()
             self._start_simulating_process()
-        if feature_flags.run_protocol_as_restricted_user():
-            self._protocol_username = _RESTRICTED_USER_NAME
-        elif feature_flags.run_protocol_as_restricted_user() is False:
-            self._protocol_username = _ROOT_USER_NAME
 
     async def teardown(self) -> None:
         """Called when server ends.
@@ -70,27 +73,31 @@ class RunProcessPyroProvider:
                 ns.remove(_RUN_PROXY_NAME)
                 ns.remove(_SIMULATING_RUN_PROXY_NAME)
 
-    async def refresh(self) -> None:
+    async def refresh(self, access_control_mode: bool) -> None:
         """Ends the currently running process and starts a new one."""
         await self._end_run_process()
         # Validate user level settings
-        # CASEY NOTE: extend this to account for the audit server settings
-        if feature_flags.run_protocol_as_restricted_user():
+        if feature_flags.run_protocol_as_restricted_user() or access_control_mode:
             self._protocol_username = _RESTRICTED_USER_NAME
-        elif feature_flags.run_protocol_as_restricted_user() is False:
+        elif (
+            feature_flags.run_protocol_as_restricted_user() is False
+            and access_control_mode is False
+        ):
             self._protocol_username = _ROOT_USER_NAME
         with Pyro5.api.locate_ns() as ns:
             ns.remove(_RUN_PROXY_NAME)
         self._start_run_process()
 
-    async def refresh_simulating(self) -> None:
+    async def refresh_simulating(self, access_control_mode: bool) -> None:
         """Ends the currently running simulating process and starts a new one."""
         await self._end_simulating_process()
         # Validate user level settings
-        # CASEY NOTE: extend this to account for the audit server settings
-        if feature_flags.run_protocol_as_restricted_user():
+        if feature_flags.run_protocol_as_restricted_user() or access_control_mode:
             self._protocol_username = _RESTRICTED_USER_NAME
-        elif feature_flags.run_protocol_as_restricted_user() is False:
+        elif (
+            feature_flags.run_protocol_as_restricted_user() is False
+            and access_control_mode is False
+        ):
             self._protocol_username = _ROOT_USER_NAME
         with Pyro5.api.locate_ns() as ns:
             ns.remove(_SIMULATING_RUN_PROXY_NAME)
@@ -171,7 +178,9 @@ class RunProcessPyroProvider:
         if self._run_process is not None:
             return
 
-        self._run_process = self._open_process(process_name=_RUN_PROXY_NAME, user_name=self._protocol_username)
+        self._run_process = self._open_process(
+            process_name=_RUN_PROXY_NAME, user_name=self._protocol_username
+        )
 
     async def _end_run_process(self) -> None:
         if self._run_process is None:
@@ -184,7 +193,9 @@ class RunProcessPyroProvider:
         if self._simulating_run_process is not None:
             return
 
-        self._simulating_run_process = self._open_process(process_name=_SIMULATING_RUN_PROXY_NAME, user_name=self._protocol_username)
+        self._simulating_run_process = self._open_process(
+            process_name=_SIMULATING_RUN_PROXY_NAME, user_name=self._protocol_username
+        )
 
     async def _end_simulating_process(self) -> None:
         if self._simulating_run_process is None:

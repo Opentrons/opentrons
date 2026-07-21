@@ -183,6 +183,7 @@ class RunOrchestratorStore:
         robot_type: RobotType,
         deck_type: DeckType,
         run_process_pyro_provider: RunProcessPyroProvider,
+        access_control_status: bool,
     ) -> None:
         """Initialize a run orchestrator storage interface.
 
@@ -211,6 +212,7 @@ class RunOrchestratorStore:
         self._current_command: Optional[CommandPointer] = None
         self._most_recent_finalized_command: Optional[CommandPointer] = None
         self._flex_stacker_substate: Optional[Mapping[str, FlexStackerSubState]] = None
+        self._access_control_mode = access_control_status
 
     @property
     def run_coordinator(self) -> Union[RunOrchestrator, DirectedRunProcess]:
@@ -484,7 +486,9 @@ class RunOrchestratorStore:
 
         run_data = self.run_coordinator.get_state_summary()
 
-        await self._run_process_pyro_provider.refresh()
+        await self._run_process_pyro_provider.refresh(
+            access_control_mode=self._access_control_mode
+        )
 
         self._run_coordinator = None
 
@@ -674,6 +678,10 @@ class RunOrchestratorStore:
             self.run_coordinator.set_error_recovery_policy(
                 error_recovery_rules, error_recovery_is_enabled
             )
+
+    def set_access_control_status(self, access_control_mode: bool) -> None:
+        """Set the access control policy for the Run Orchestrator Store."""
+        self._access_control_mode = access_control_mode
 
     def add_camera_enablement_settings(
         self, enablement_settings: CameraSettings
