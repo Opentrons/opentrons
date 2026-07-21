@@ -25,6 +25,7 @@ from server_utils.keys.key_server import (
     SignedMessageData,
     SignMessageData,
 )
+from server_utils.robot.fastapi import build_robot_client, install_robot_server_client
 
 from audit_server.log_export.router import router as log_export_router
 from audit_server.log_ingest.router import router as ingest_router
@@ -105,6 +106,19 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             )
             key_client = _NoOpFailKeyClient()
         install_key_client(app.state, key_client)
+        if (
+            configuration.robot_server_uds is not None
+            or configuration.robot_server_url is not None
+        ):
+            robot_server_client = await exit_stack.enter_async_context(
+                build_robot_client(
+                    robot_server_uds=configuration.robot_server_uds,
+                    robot_server_url=configuration.robot_server_url,
+                )
+            )
+        else:
+            raise RuntimeError("Cannot establish robot server client.")
+        install_robot_server_client(app.state, robot_server_client)
         log_store = build_log_store(app.state, engine)
         log_data_manager = build_log_data_manager(
             app.state, log_store, settings_store, key_client
