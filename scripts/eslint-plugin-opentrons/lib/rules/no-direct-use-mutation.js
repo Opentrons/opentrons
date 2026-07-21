@@ -12,12 +12,12 @@ module.exports = {
     type: 'problem',
     docs: {
       description:
-        'Disallow direct useMutation calls; use useDocumentedMutation instead',
+        'Disallow direct useMutation calls; use useDocumentedMutation instead.',
       recommended: false,
     },
     messages: {
       noDirectUseMutation:
-        'Directly calling useMutation is deprecated. Use useDocumentedMutation instead to maintain Compliance Ready Software standards.',
+        'Directly calling useMutation is deprecated. Use useDocumentedMutation instead to maintain Compliance Ready Software standards. See react-api-client/src/accessControl/GUIDE.md for more information.',
     },
     schema: [],
   },
