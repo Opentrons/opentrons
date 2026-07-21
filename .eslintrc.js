@@ -200,6 +200,8 @@ module.exports = {
       files: ['./app/src/**/*.@(ts|tsx)'],
       rules: {
         'opentrons/no-imports-up-the-tree-of-life': 'error',
+        // Ban direct calls to mutating api-client helpers; use react-api-client mutations.
+        'opentrons/no-direct-mutating': 'error',
       },
     },
     {
