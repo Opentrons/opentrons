@@ -11,7 +11,8 @@
  *
  * Options:
  *   --version <ver>    Semver string to publish as (required, e.g. 0.3.0-alpha.1)
- *   --tag <tag>        npm dist-tag (default: "latest")
+ *   --tag <tag>        npm dist-tag(s); comma-separated or repeatable
+ *                      (default: "alpha,latest")
  *   --registry <url>   npm registry URL (default: https://registry.npmjs.org)
  *   --dry-run          Build and patch everything but skip `npm publish`
  *   --skip-build       Skip make build steps (useful when lib/ is already fresh)
@@ -32,7 +33,7 @@
  *
  * To run from repo root:
  *   node --experimental-strip-types js-package-testing/publish.mts \
- *     --version 0.3.0-alpha.1 --tag alpha --dry-run
+ *     --version 0.3.7-alpha.0 --dry-run
  */
 
 import { spawnSync } from 'node:child_process'
@@ -53,10 +54,32 @@ import {
 
 type Args = {
   version: string
-  tag: string
+  tags: string[]
   registry: string
   dryRun: boolean
   skipBuild: boolean
+}
+
+const DEFAULT_TAGS = ['alpha', 'latest']
+
+function parseTags(argv: string[]): string[] {
+  const tags: string[] = []
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] !== '--tag') continue
+    const value = argv[i + 1]
+    if (value == null || value.startsWith('--')) {
+      console.error('Error: --tag requires a value')
+      process.exit(1)
+    }
+    tags.push(
+      ...value
+        .split(',')
+        .map(tag => tag.trim())
+        .filter(Boolean)
+    )
+    i++
+  }
+  return tags.length > 0 ? [...new Set(tags)] : DEFAULT_TAGS
 }
 
 function parseArgs(): Args {
@@ -74,7 +97,7 @@ function parseArgs(): Args {
 
   return {
     version,
-    tag: get('--tag') ?? 'latest',
+    tags: parseTags(argv),
     registry: get('--registry') ?? 'https://registry.npmjs.org',
     dryRun: argv.includes('--dry-run'),
     skipBuild: argv.includes('--skip-build'),
@@ -262,8 +285,14 @@ function publishPackage(
     // Write patched package.json
     writeJson(path.join(stagingDir, 'package.json'), patchedPkgJson)
 
+    const [primaryTag, ...extraTags] = args.tags
+
     if (args.dryRun) {
-      console.log(`  DRY RUN — would publish from ${stagingDir}`)
+      console.log(`  DRY RUN - would publish from ${stagingDir}`)
+      console.log(`  Would publish with tag "${primaryTag}"`)
+      for (const tag of extraTags) {
+        console.log(`  Would add dist-tag "${tag}"`)
+      }
       console.log('  Patched package.json:')
       console.log(JSON.stringify(patchedPkgJson, null, 2))
       console.log('\n  README.md:')
@@ -280,10 +309,18 @@ function publishPackage(
     const safeName = name.replace('@', '').replace('/', '-')
     const tarball = path.join(stagingDir, `${safeName}-${version}.tgz`)
     run(
-      `npm publish ${tarball} --registry ${args.registry} --tag ${args.tag} --access public`,
+      `npm publish ${tarball} --registry ${args.registry} --tag ${primaryTag} --access public`,
       stagingDir
     )
-    console.log(`  Published ${name}@${version} with tag "${args.tag}"`)
+    for (const tag of extraTags) {
+      run(
+        `npm dist-tag add ${name}@${version} ${tag} --registry ${args.registry}`,
+        stagingDir
+      )
+    }
+    console.log(
+      `  Published ${name}@${version} with tag(s): ${args.tags.join(', ')}`
+    )
   } finally {
     rmSync(stagingDir, { recursive: true, force: true })
   }
@@ -298,7 +335,7 @@ async function main(): Promise<void> {
 
   console.log(`\nPublish settings:`)
   console.log(`  version:  ${args.version}`)
-  console.log(`  tag:      ${args.tag}`)
+  console.log(`  tags:     ${args.tags.join(', ')}`)
   console.log(`  registry: ${args.registry}`)
   console.log(`  dry-run:  ${args.dryRun}`)
 

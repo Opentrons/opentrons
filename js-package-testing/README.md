@@ -154,9 +154,9 @@ It rewrites:
 - `files` allowlists, `exports` maps, and README/LICENSE injection
 
 ```bash
-# From monorepo root
+# From monorepo root (defaults to npm dist-tags alpha + latest)
 node --experimental-strip-types js-package-testing/publish.mts \
-  --version 0.3.0-alpha.1 --tag alpha --dry-run
+  --version 0.3.7-alpha.0 --dry-run
 ```
 
 ### How js-package-testing simulates npm install
