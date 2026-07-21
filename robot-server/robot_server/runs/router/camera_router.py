@@ -117,7 +117,7 @@ async def add_camera_settings(
         stream_status=response_data.liveStreamEnabled
         if response_data.cameraEnabled is True
         else False,
-        camera_provider=camera_provider,
+        camera_settings=await camera_provider.get_camera_settings(),
         override_settings=camera_settings,
     )
 
