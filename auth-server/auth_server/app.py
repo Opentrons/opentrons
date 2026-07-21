@@ -12,11 +12,11 @@ from server_utils import systemd_utils
 from server_utils.auth.resource_server.fastapi import (
     AuthorizationError,
     handle_authorization_error,
-    install_authorization_checker,
+    install_authentication_checker,
 )
 
 from auth_server.api_error import APIError, handle_api_error
-from auth_server.authorization_checker import build_authorization_checker
+from auth_server.authentication_checker import build_authentication_checker
 from auth_server.oauth2.backend import Backend as OAuth2Backend
 from auth_server.oauth2.fastapi_dependencies import (
     install_oauth2_backend,
@@ -71,10 +71,10 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         )
         user_service.seed_initial_users()
         install_settings_store(app.state, settings_store)
-        authorization_checker = build_authorization_checker(
+        authentication_checker = build_authentication_checker(
             settings_store, oauth2_backend
         )
-        install_authorization_checker(app.state, authorization_checker)
+        install_authentication_checker(app.state, authentication_checker)
 
         systemd_utils.notify_up()
         yield
