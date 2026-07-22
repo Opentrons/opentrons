@@ -53,7 +53,7 @@ Shared patching: `package-json-patches.mts` (used by `publish.mts` and `patch-pa
 From repo root:
 
 ```bash
-node --experimental-strip-types js-package-testing/next-npm-version.mts
+node --experimental-strip-types scripts/next-npm-version.mts
 node --experimental-strip-types js-package-testing/publish.mts \
   --version X.Y.Z-alpha.0 --dry-run
 ```

@@ -99,7 +99,7 @@ jobs:
         env:
           INPUT_DRY_RUN: ${{ inputs.dry_run }}
         run: |
-          VERSION="$(node --experimental-strip-types js-package-testing/next-npm-version.mts)"
+          VERSION="$(node --experimental-strip-types scripts/next-npm-version.mts)"
           echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
           echo "Publishing version: ${VERSION} (dist-tag latest)"
           {

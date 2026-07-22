@@ -155,7 +155,7 @@ It rewrites:
 
 ```bash
 # From monorepo root (always publishes dist-tag "latest")
-node --experimental-strip-types js-package-testing/next-npm-version.mts
+node --experimental-strip-types scripts/next-npm-version.mts
 node --experimental-strip-types js-package-testing/publish.mts \
   --version 0.3.9-alpha.0 --dry-run
 ```

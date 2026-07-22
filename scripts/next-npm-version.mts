@@ -6,7 +6,7 @@
  *   0.3.8-alpha.0 -> 0.3.9-alpha.0
  *
  * Run from repo root:
- *   node --experimental-strip-types js-package-testing/next-npm-version.mts
+ *   node --experimental-strip-types scripts/next-npm-version.mts
  *
  * Prints only the version string to stdout (suitable for CI capture).
  */

@@ -38,7 +38,7 @@
  *     inherited from the monorepo root).
  *
  * To run from repo root:
- *   node --experimental-strip-types js-package-testing/next-npm-version.mts
+ *   node --experimental-strip-types scripts/next-npm-version.mts
  *   node --experimental-strip-types js-package-testing/publish.mts \
  *     --version 0.3.9-alpha.0 --dry-run
  */
