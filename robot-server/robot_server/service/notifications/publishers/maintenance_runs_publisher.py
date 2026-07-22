@@ -69,7 +69,6 @@ class MaintenanceRunsPublisher:
     def stop_publishing_for_maintenance_run(self) -> None:
         """Drop PE notify hooks and advise clients to refetch current-run.
 
-        Nulls hooks so late PE callbacks cannot read a cleared maintenance run.
         """
         self._run_hooks = None
         self._engine_state_slice = None
