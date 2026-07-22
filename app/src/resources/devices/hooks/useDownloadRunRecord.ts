@@ -31,7 +31,7 @@ export function useDownloadRunRecord(
       return Promise.resolve()
     }
     setIsDownloading(true)
-    const filename = `${matchingProtocolName}_${runDateTransformed}.zip`
+    const filename = `${matchingProtocolName ?? run.id}_${runDateTransformed}.zip`
     return getRunRaw(host, run.id, 'blob')
       .then(async res => {
         if (usbPath != null) {

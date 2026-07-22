@@ -41,23 +41,24 @@ export function useDeleteSelectedRuns(
         return Promise.resolve()
       }
 
+      let hasDeleteError = false
       return Promise.all(
         runs.map(run =>
-          deleteRun(currentHost, run.id, userNotes).catch((e: Error) =>
+          deleteRun(currentHost, run.id, userNotes).catch((e: Error) => {
             makeToast(e.message, ERROR_TOAST, { closeButton: true })
-          )
+            hasDeleteError = true
+          })
         )
-      )
-        .then(() =>
-          queryClient
-            .invalidateQueries(getQueryKey(currentHost, 'runs'))
-            .catch((e: Error) => {
-              console.error(`error invalidating runs query: ${e.message}`)
-            })
-        )
-        .catch((e: Error) => {
-          makeToast(e.message, ERROR_TOAST, { closeButton: true })
-        })
+      ).then(async () => {
+        if (hasDeleteError) {
+          throw new Error('One or more runs failed to delete')
+        }
+        await queryClient
+          .invalidateQueries(getQueryKey(currentHost, 'runs'))
+          .catch((e: Error) => {
+            console.error(`error invalidating runs query: ${e.message}`)
+          })
+      })
     }
   )
 

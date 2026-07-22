@@ -12,7 +12,7 @@ export function registerUsbDeviceHandlers(): void {
     'usb:saveFile',
     async (
       _,
-      { filePath, buffer }: { filePath: string; buffer: ArrayBuffer }
+      { filePath, buffer }: { filePath: string; buffer: number[] }
     ) => {
       await writeFile(filePath, Buffer.from(buffer))
     }

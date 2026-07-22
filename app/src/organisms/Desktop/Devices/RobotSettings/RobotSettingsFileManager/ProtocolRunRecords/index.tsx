@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   CheckboxBasic,
+  ERROR_TOAST,
   InfoScreen,
   StyledText,
   WARNING_TOAST,
@@ -62,7 +63,11 @@ export function ProtocolRunRecords({
       return
     }
     if (!isDownloadingRuns) {
-      void downloadRuns(runs.filter(run => selectedIds.has(run.id)))
+      void downloadRuns(runs.filter(run => selectedIds.has(run.id))).catch(
+        (e: Error) => {
+          makeToast(e.message, ERROR_TOAST, { closeButton: true })
+        }
+      )
     }
   }
 

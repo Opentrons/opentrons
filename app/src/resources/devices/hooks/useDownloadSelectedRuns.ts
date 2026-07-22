@@ -49,12 +49,14 @@ export function useDownloadSelectedRuns(
         )
         const matchingProtocolName = matchingProtocol?.metadata.protocolName
         const runDateTransformed = run.createdAt.replaceAll(':', '_')
-        return getRunRaw(currentHost, run.id, 'blob').then(res => {
-          zip.file(
-            `${matchingProtocolName ?? run.id}_${runDateTransformed}.zip`,
-            res.data
-          )
-        })
+        return getRunRaw(currentHost, run.id, 'blob')
+          .then(res => (res.data as Blob).arrayBuffer())
+          .then(buf => {
+            zip.file(
+              `${matchingProtocolName ?? run.id}_${runDateTransformed}.zip`,
+              buf
+            )
+          })
       })
     )
       .then(() => zip.generateAsync({ type: 'arraybuffer' }))
