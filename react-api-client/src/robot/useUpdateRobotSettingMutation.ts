@@ -1,7 +1,8 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { updateRobotSetting } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../accessControl'
 import { useHost } from '../api'
 import { robotSettingsQueryKey } from './useRobotSettingsQuery'
 
@@ -16,6 +17,8 @@ import type {
   HostConfig,
   RobotSettingsResponse,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
+import type { DocumentedMutationParameters } from '../accessControl/types'
 
 export interface UpdateRobotSettingVariables {
   id: string
@@ -41,6 +44,7 @@ export type UseUpdateRobotSettingMutationOptions = UseMutationOptions<
 >
 
 export function useUpdateRobotSettingMutation(
+  documentationState: DocumentationState,
   options: UseUpdateRobotSettingMutationOptions = {},
   hostOverride?: HostConfig | null
 ): UseUpdateRobotSettingMutationResult {
@@ -49,14 +53,19 @@ export function useUpdateRobotSettingMutation(
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     RobotSettingsResponse,
     AxiosError<ErrorResponse>,
     UpdateRobotSettingVariables
   >(
+    documentationState,
+    ['update_settings'],
     robotSettingsQueryKey(host),
-    ({ id, value }) =>
-      updateRobotSetting(host!, id, value).then(response => {
+    ({
+      variables: { id, value },
+      userNotes,
+    }: DocumentedMutationParameters<UpdateRobotSettingVariables>) =>
+      updateRobotSetting(host!, id, value, userNotes).then(response => {
         queryClient.setQueryData(robotSettingsQueryKey(host), response.data)
         return response.data
       }),

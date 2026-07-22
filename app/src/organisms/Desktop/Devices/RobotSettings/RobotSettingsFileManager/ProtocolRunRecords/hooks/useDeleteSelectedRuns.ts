@@ -38,6 +38,8 @@ export function useDeleteSelectedRuns(
 
       return Promise.all(
         runs.map(run =>
+          // custom mutation, its OK to mutate here
+          // eslint-disable-next-line opentrons/no-direct-mutating
           deleteRun(currentHost, run.id, userNotes).catch((e: Error) =>
             makeToast(e.message, ERROR_TOAST, { closeButton: true })
           )

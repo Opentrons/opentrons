@@ -10,6 +10,7 @@ import {
 import { useUpdateRobotSettingMutation } from '@opentrons/react-api-client'
 
 import { ToggleButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
 import type { MouseEventHandler } from 'react'
 import type { RobotSettingsField } from '@opentrons/api-client'
@@ -30,7 +31,9 @@ export function SettingToggle({
   description,
   invert = false,
 }: SettingToggleProps): JSX.Element | null {
-  const { updateRobotSetting } = useUpdateRobotSettingMutation()
+  const documentationState = useDocumentationState()
+  const { updateRobotSetting } =
+    useUpdateRobotSettingMutation(documentationState)
 
   if (id == null) return null
 

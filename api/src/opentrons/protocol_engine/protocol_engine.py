@@ -64,7 +64,6 @@ from .types import (
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
-from opentrons.system import camera
 
 _log = getLogger(__name__)
 
@@ -599,11 +598,10 @@ class ProtocolEngine:
             finish_error_details = None
 
         try:
-            await camera.update_live_stream_status(
-                self.state_view.config.robot_type,
-                False,
-                self._camera_provider,
-                self.state_view.camera.get_enablement_settings(),
+            await self._camera_provider.update_live_stream_status(
+                robot_type=self.state_view.config.robot_type,
+                stream_status=False,
+                enablement_settings=self.state_view.camera.get_enablement_settings(),
             )
         except Exception as e:
             _log.exception(f"Exception during live stream post-run cleanup: {e}")
