@@ -3,7 +3,7 @@ revision = 3
 requires-python = ">=3.12"
 
 [options]
-exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.
+exclude-newer = "2026-07-16T20:59:26.604557Z"
 exclude-newer-span = "P1W"
 
 [manifest]
@@ -1692,6 +1692,7 @@ dev = [
     { name = "pytest-asyncio", specifier = ">=1,<2" },
     { name = "pytest-cov", specifier = "==4.1.0" },
     { name = "pytest-xdist", specifier = "~=2.5.0" },
+    { name = "python-multipart", specifier = "==0.0.28" },
     { name = "requests", specifier = "==2.31.0" },
     { name = "ruff", specifier = "==0.14.10" },
     { name = "setuptools", specifier = "==80.9.0" },
