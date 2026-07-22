@@ -47,6 +47,7 @@ module.exports = {
     '@typescript-eslint/default-param-last': 'off',
     '@typescript-eslint/consistent-indexed-object-style': 'off',
     '@typescript-eslint/no-non-null-assertion': 'warn',
+    'opentrons/no-direct-use-mutation': 'error',
 
     // TODO(mc, 2021-01-29): fix these and remove warning overrides
     'lines-between-class-members': 'warn',
