@@ -46,7 +46,9 @@ describe('useDownloadSelectedRuns', () => {
   beforeEach(() => {
     when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
     vi.mocked(useAllProtocolsQuery).mockReturnValue({ data: undefined } as any)
-    vi.mocked(getRunRaw).mockResolvedValue({ data: 'raw-run-data' } as any)
+    vi.mocked(getRunRaw).mockResolvedValue({
+      data: { arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)) },
+    } as any)
     mockJSZip.file.mockClear()
     mockJSZip.generateAsync.mockClear()
     mockJSZip.generateAsync.mockResolvedValue(new ArrayBuffer(0))
@@ -76,11 +78,11 @@ describe('useDownloadSelectedRuns', () => {
     expect(getRunRaw).toHaveBeenCalledWith(HOST_CONFIG, 'run-2', 'blob')
     expect(mockJSZip.file).toHaveBeenCalledWith(
       'run-1_2024-01-01T10_00_00.000Z.zip',
-      'raw-run-data'
+      expect.any(ArrayBuffer)
     )
     expect(mockJSZip.file).toHaveBeenCalledWith(
       'run-2_2024-01-02T10_00_00.000Z.zip',
-      'raw-run-data'
+      expect.any(ArrayBuffer)
     )
     expect(mockSaveAs).toHaveBeenCalledWith(
       expect.any(Blob),
@@ -134,7 +136,9 @@ describe('useDownloadSelectedRuns', () => {
       () =>
         new Promise(resolve => {
           resolveFirstFetch = () => {
-            resolve({ data: 'raw-run-data' } as any)
+            resolve({
+              data: { arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)) },
+            } as any)
           }
         })
     )

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Tabs } from '@opentrons/components'
+import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
@@ -28,6 +29,9 @@ export function FileManager({
   const [showDownloadModal, setShowDownloadModal] = useState(false)
   const [showDownloadRecordsWizard, setShowDownloadRecordsWizard] =
     useState(false)
+  const { data: accessControlData } = useAccessControlEnabledQuery()
+  const isComplianceReady =
+    accessControlData?.data?.accessControlEnabled ?? false
 
   const showDeleteAll = activeTab === 'compliance' || activeTab === 'records'
 
@@ -40,13 +44,17 @@ export function FileManager({
         },
         isActive: activeTab === 'diagnostic',
       },
-      {
-        text: t('compliance_ready_files'),
-        onClick: () => {
-          setActiveTab('compliance')
-        },
-        isActive: activeTab === 'compliance',
-      },
+      ...(isComplianceReady
+        ? [
+            {
+              text: t('compliance_ready_files'),
+              onClick: () => {
+                setActiveTab('compliance')
+              },
+              isActive: activeTab === 'compliance',
+            },
+          ]
+        : []),
       {
         text: t('protocol_run_records'),
         onClick: () => {
@@ -55,7 +63,7 @@ export function FileManager({
         isActive: activeTab === 'records',
       },
     ]
-  }, [activeTab, t])
+  }, [activeTab, t, isComplianceReady])
 
   const secondaryButtonProps: ComponentProps<typeof SmallButton> | null =
     showDeleteAll

@@ -162,7 +162,9 @@ describe('useRunFileCount', () => {
   })
 
   it('handles undefined runDataFilesData gracefully (query loading)', () => {
-    vi.mocked(useRunDataFileMetadata).mockReturnValue({ data: undefined } as any)
+    vi.mocked(useRunDataFileMetadata).mockReturnValue({
+      data: undefined,
+    } as any)
     const { result } = renderHook(() => useRunFileCount(KNOWN_GOOD_RUN))
     expect(result.current).toBe(3)
   })

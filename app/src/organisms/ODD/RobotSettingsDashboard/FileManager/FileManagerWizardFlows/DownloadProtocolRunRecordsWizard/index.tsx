@@ -12,15 +12,15 @@ import { useDeleteSelectedRuns } from '/app/resources/devices/hooks/useDeleteSel
 import { useDownloadSelectedRuns } from '/app/resources/devices/hooks/useDownloadSelectedRuns'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
+import { STEP_TYPES } from '../shared/constants'
 import { ErrorScreen } from '../shared/ErrorScreen'
 import styles from '../shared/shared.module.css'
 import { SimpleChoiceScreen } from '../shared/SimpleChoiceScreen'
 import { SpinnerScreen } from '../shared/SpinnerScreen'
 import { SuccessScreen } from '../shared/SuccessScreen'
 import { UsbSelectionScreen } from '../shared/UsbSelectionScreen'
-import { STEP_TYPES } from './types'
 
-import type { StepType } from './types'
+import type { StepType } from '../shared/types'
 
 interface DownloadProtocolRunRecordsWizardProps {
   onClose: () => void
@@ -50,6 +50,18 @@ export function DownloadProtocolRunRecordsWizard({
     step === STEP_TYPES.DOWNLOADING || step === STEP_TYPES.DELETING
   const currentStepNumber =
     step === STEP_TYPES.USB ? 1 : step === STEP_TYPES.CONFIRM_DELETE ? 2 : null
+
+  const isSuccessStep = step === STEP_TYPES.SUCCESS
+
+  let totalSteps: number | null = 2
+  let currentStep: number | null = currentStepNumber
+  if (isSuccessStep) {
+    totalSteps = 1
+    currentStep = 1
+  } else if (isActiveStep) {
+    totalSteps = null
+    currentStep = null
+  }
 
   const deleteChoices = [
     { value: true, label: t('yes_delete_records') },
@@ -93,15 +105,9 @@ export function DownloadProtocolRunRecordsWizard({
         <WizardHeader
           title={t('download_all_protocol_run_records')}
           onExit={onClose}
-          totalSteps={step === STEP_TYPES.SUCCESS ? 1 : isActiveStep ? null : 2}
-          currentStep={
-            step === STEP_TYPES.SUCCESS
-              ? 1
-              : isActiveStep
-                ? null
-                : currentStepNumber
-          }
-          hideStepText={step === STEP_TYPES.SUCCESS}
+          totalSteps={totalSteps}
+          currentStep={currentStep}
+          hideStepText={isSuccessStep}
         />
         <div className={styles.body}>
           {step === STEP_TYPES.USB ? (

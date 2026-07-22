@@ -73,8 +73,6 @@
   "delete_all_run_records_recommendation": "We recommend downloading all protocol files before proceeding.",
   "delete_protocol_record": "Delete protocol record",
   "delete_records_after_download": "Delete all protocol run records after download?",
-  "keep_records": "Keep records",
-  "yes_delete_records": "Yes, delete records",
   "delete_run": "Delete protocol run record",
   "delete_selected": "Delete selected",
   "delete_selected_logs": "Delete all selected user action logs?",
@@ -152,6 +150,7 @@
   "instrument_attached": "Instrument attached",
   "instrument_calibration_logs": "Instrument Calibration Logs",
   "instruments_and_modules": "Instruments and Modules",
+  "keep_records": "Keep records",
   "labware_bottom": "Labware Bottom",
   "last_run_date": "Last Run Date",
   "last_run_time": "last run {{number}}",
@@ -346,5 +345,6 @@
   "which_usb_for_protocol_files": "Which USB device do you want to download all protocol run records to?",
   "which_usb_for_run_record": "Which USB device do you want to download this run record to?",
   "yes": "Yes",
+  "yes_delete_records": "Yes, delete records",
   "yes_update_now": "Yes, update now"
 }

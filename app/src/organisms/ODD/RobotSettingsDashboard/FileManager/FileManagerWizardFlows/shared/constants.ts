@@ -6,5 +6,3 @@ export const STEP_TYPES = {
   SUCCESS: 'success',
   ERROR: 'error',
 } as const
-
-export type StepType = (typeof STEP_TYPES)[keyof typeof STEP_TYPES]
