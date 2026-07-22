@@ -143,6 +143,7 @@ async function main(): Promise<void> {
       console.log(`${name}`)
       console.log(`  latest (dist-tag): ${latest}`)
       console.log(`  dist-tags:         ${formatDistTags(tags)}`)
+      // blank line between packages for readability
       console.log('')
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)

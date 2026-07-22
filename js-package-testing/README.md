@@ -36,6 +36,13 @@ you use:
 | `@opentrons/protocol-visualization` | Annotated protocol steps UI                                |
 
 ```bash
+# pnpm (recommended for Opentrons consumers)
+pnpm add @opentrons/shared-data@X.Y.Z \
+  @opentrons/step-generation@X.Y.Z \
+  @opentrons/components@X.Y.Z \
+  @opentrons/protocol-visualization@X.Y.Z
+
+# npm also fine
 npm install @opentrons/shared-data@X.Y.Z \
   @opentrons/step-generation@X.Y.Z \
   @opentrons/components@X.Y.Z \

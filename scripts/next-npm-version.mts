@@ -2,7 +2,7 @@
  * next-npm-version.mts
  *
  * Reads the npm "latest" dist-tag for @opentrons/components and prints the
- * next patch alpha version (hardcoded strategy):
+ * next patch alpha version (always *-alpha.0):
  *   0.3.8-alpha.0 -> 0.3.9-alpha.0
  *
  * Run from repo root:
@@ -33,7 +33,14 @@ async function fetchPackageDoc(
   return (await res.json()) as NpmPackageDoc
 }
 
-/** 0.3.8-alpha.0 (or 0.3.8) -> 0.3.9-alpha.0 */
+/**
+ * Always emit X.Y.(Z+1)-alpha.0 (never alpha.1, alpha.2, ...).
+ *
+ * Why keep `-alpha.0` on every publish:
+ * - Version string always signals unsupported / internal-only alpha
+ * - One simple monotonic line for internal web consumers on npm `latest`
+ * - Avoids mixing prerelease increments (alpha.N) with patch bumps
+ */
 function nextPatchAlpha(current: string): string {
   const match = current.match(/^(\d+)\.(\d+)\.(\d+)(?:-alpha\.(\d+))?$/)
   if (!match) {
