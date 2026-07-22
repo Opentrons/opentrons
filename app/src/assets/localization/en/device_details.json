@@ -345,5 +345,6 @@
   "which_usb_for_protocol_files": "Which USB device do you want to download all protocol run records to?",
   "which_usb_for_run_record": "Which USB device do you want to download this run record to?",
   "yes": "Yes",
+  "yes_delete_records": "Yes, delete records",
   "yes_update_now": "Yes, update now"
 }
