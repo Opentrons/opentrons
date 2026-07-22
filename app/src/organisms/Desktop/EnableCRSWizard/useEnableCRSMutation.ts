@@ -78,6 +78,10 @@ export function useEnableCRSMutation(): UseMutationResult<
       accessControlEnabledQueryKey(hostConfig),
       response.data
     )
+
+    // The designs also call for a robot restart here.
+    // The backend doesn't actually need that, at the time of writing,
+    // so it's left out for now.
   }
 
   // We're using just a plain react-query useMutation() here instead of
