@@ -171,7 +171,10 @@ export function RobotSettingsAdvanced({
         {featureFlags.accessControlMode ? (
           <>
             <Divider marginY={SPACING.spacing16} />
-            <EnableComplianceReadySoftware />
+            <EnableComplianceReadySoftware
+              isRobotBusy={isRobotBusy}
+              robotName={robotName}
+            />
             <Divider marginY={SPACING.spacing16} />
             <EnterRobotEncryptionKey
             // Note: Unlike other buttons on this page,

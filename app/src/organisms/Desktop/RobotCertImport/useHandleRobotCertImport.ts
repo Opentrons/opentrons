@@ -19,10 +19,10 @@ export interface UseHandleRobotCertImportProps {
 
 export interface UseHandleRobotCertImportResult {
   passwordError: string | null
-  setPasswordValue: (password: string) => unknown
+  setPasswordValue: (password: string) => void
   passwordValue: string
   importInProgress: boolean
-  tryImport: () => unknown
+  tryImport: () => void
 }
 export function useHandleRobotCertImport(
   props: UseHandleRobotCertImportProps
