@@ -12,6 +12,7 @@ import {
 // eslint-disable-next-line opentrons/no-imports-across-applications
 import { useToaster } from '/app/organisms/ToasterOven'
 
+import type { QueryKey } from 'react-query'
 import type { RunData } from '@opentrons/api-client'
 import type { DocumentationState } from '@opentrons/react-api-client'
 
@@ -55,8 +56,9 @@ export function useDeleteSelectedRuns(
         if (hasDeleteError) {
           throw new Error('One or more runs failed to delete')
         }
+        const runsQueryKey: QueryKey = getQueryKey(currentHost, 'runs')
         await queryClient
-          .invalidateQueries(getQueryKey(currentHost, 'runs'))
+          .invalidateQueries(runsQueryKey)
           .catch((e: Error) => {
             console.error(`error invalidating runs query: ${e.message}`)
           })
