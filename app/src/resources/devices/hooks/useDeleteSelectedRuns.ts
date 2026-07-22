@@ -57,11 +57,9 @@ export function useDeleteSelectedRuns(
           throw new Error('One or more runs failed to delete')
         }
         const runsQueryKey: QueryKey = getQueryKey(currentHost, 'runs')
-        await queryClient
-          .invalidateQueries(runsQueryKey)
-          .catch((e: Error) => {
-            console.error(`error invalidating runs query: ${e.message}`)
-          })
+        await queryClient.invalidateQueries(runsQueryKey).catch((e: Error) => {
+          console.error(`error invalidating runs query: ${e.message}`)
+        })
       })
     }
   )
