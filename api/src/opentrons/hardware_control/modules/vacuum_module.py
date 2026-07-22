@@ -404,7 +404,13 @@ class VacuumModule(mod_abc.AbstractModule):
         return update.upload_via_dfu
 
     async def deactivate(self, must_be_running: bool = True) -> None:
-        pass
+        """Stop the pump, and open the vent."""
+        if must_be_running:
+            await self.wait_for_is_running()
+        await self._driver.set_vacuum_state(False)
+        await self._driver.set_vent_state(VentState.OPENED)
+        self._reader.reset_pressure_target()
+        self._reader.reset_power_target()
 
     async def set_led_state(
         self,
