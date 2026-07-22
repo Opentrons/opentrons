@@ -245,9 +245,9 @@ settings = [
         internal_only=True,
     ),
     SettingDefinition(
-        _id="manuallyRunProtocolAsUser",
+        _id="alwaysRunProtocolAsUser",
         title="Run protocols under the 'ot-protocol' user account",
-        description="Manually set the protocol subprocess to execute under the 'ot-protocol' user on the Flex with limited permissions.",
+        description="Always set the protocol subprocess to execute under the 'ot-protocol' user on the Flex with limited permissions.",
         robot_type=[RobotTypeEnum.FLEX],
         internal_only=True,
     ),
@@ -805,12 +805,12 @@ def _migrate40to41(previous: SettingsMap) -> SettingsMap:
 def _migrate41to42(previous: SettingsMap) -> SettingsMap:
     """Migrate to version 42 of the feature flags file.
 
-    -  Adds the manuallyRunProtocolAsUser config element.
+    -  Adds the alwaysRunProtocolAsUser config element.
     -  Ensure element begins as false.
 
     """
     newmap = {k: v for k, v in previous.items()}
-    newmap["manuallyRunProtocolAsUser"] = False
+    newmap["alwaysRunProtocolAsUser"] = False
     return newmap
 
 

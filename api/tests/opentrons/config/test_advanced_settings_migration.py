@@ -34,7 +34,7 @@ def default_file_settings() -> Dict[str, Any]:
         "disableFlexStackerLabwareDetection": None,
         "enableProtocolSubprocess": False,
         "enableHardwareSubprocess": False,
-        "manuallyRunProtocolAsUser": False,
+        "alwaysRunProtocolAsUser": False,
     }
 
 
@@ -493,7 +493,7 @@ def v42_config(v41_config: Dict[str, Any]) -> Dict[str, Any]:
     r.update(
         {
             "_version": 42,
-            "manuallyRunProtocolAsUser": False,
+            "alwaysRunProtocolAsUser": False,
         }
     )
     return r
@@ -638,5 +638,5 @@ def test_ensures_config() -> None:
         "disableFlexStackerLabwareDetection": None,
         "enableProtocolSubprocess": None,
         "enableHardwareSubprocess": None,
-        "manuallyRunProtocolAsUser": None,
+        "alwaysRunProtocolAsUser": None,
     }

@@ -101,5 +101,5 @@ def hardware_subprocess_enabled() -> bool:
 
 def run_protocol_as_restricted_user() -> bool:
     return advs.get_setting_with_env_overload(
-        "manuallyRunProtocolAsUser", RobotTypeEnum.FLEX
+        "alwaysRunProtocolAsUser", RobotTypeEnum.FLEX
     )
