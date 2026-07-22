@@ -5,6 +5,7 @@ from contextlib import AsyncExitStack, asynccontextmanager
 from pathlib import Path
 from typing import AsyncGenerator, Optional, override
 
+from anyio import to_thread
 from fastapi import FastAPI, Request, Response
 from opentrons_shared_data.errors.exceptions import AuditLoggingError
 
@@ -24,6 +25,9 @@ from server_utils.keys.key_server import (
     PublicKeyAndHash,
     SignedMessageData,
     SignMessageData,
+)
+from server_utils.persistence.persistence_directory import (
+    cleanup_persistence_temp_directory,
 )
 
 from audit_server.log_export.router import router as log_export_router
@@ -75,6 +79,7 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     configuration = get_configuration()
     persistence_directory_root = _get_persistence_directory_root(configuration)
     prepared_root = await prepare_root(persistence_directory_root)
+    await to_thread.run_sync(cleanup_persistence_temp_directory, prepared_root)
     set_persistence_directory(app.state, prepared_root)
 
     active_subdirectory = await prepare_active_subdirectory(prepared_root)

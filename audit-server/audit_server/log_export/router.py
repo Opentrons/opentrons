@@ -3,7 +3,7 @@
 import tempfile
 import zipfile
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Final
 
 import fastapi
 from fastapi.responses import FileResponse
@@ -12,6 +12,9 @@ from starlette.background import BackgroundTask
 from server_utils.fastapi_utils.models.json_api import MultiBodyMeta, SimpleMultiBody
 from server_utils.keys.fastapi import get_key_client
 from server_utils.keys.key_server import Client as KeyClient
+from server_utils.persistence.persistence_directory import (
+    ensure_persistence_temp_directory,
+)
 
 from audit_server.log_storage.dependency import get_log_data_manager
 from audit_server.log_storage.log_data_manager import LogDataManager
@@ -20,6 +23,8 @@ from audit_server.log_storage.store import NoPeriodById
 from audit_server.persistence.fastapi_dependencies import get_persistence_directory_root
 
 router = fastapi.APIRouter()
+
+_DOWNLOAD_STAGING_PREFIX: Final = "temp-download-staging-"
 
 
 @router.get(
@@ -53,9 +58,11 @@ async def download_log_period(
     periodId: str,
     log_data_manager: Annotated[LogDataManager, fastapi.Depends(get_log_data_manager)],
     key_client: Annotated[KeyClient, fastapi.Depends(get_key_client)],
-    persistence_dir: Annotated[Path, fastapi.Depends(get_persistence_directory_root)],
+    persistence_directory_root: Annotated[
+        Path, fastapi.Depends(get_persistence_directory_root)
+    ],
 ) -> FileResponse:
-    """Get all audit log periods."""
+    """Download a zipped verifiable audit log period."""
     try:
         periods = log_data_manager.get_period_entries(period_id=periodId)
     except NoPeriodById as exc:
@@ -65,8 +72,9 @@ async def download_log_period(
         ) from exc
     signing_key = await key_client.get_key_and_hash()
 
+    temp_root = ensure_persistence_temp_directory(persistence_directory_root)
     temp_dir = tempfile.TemporaryDirectory(
-        prefix="temp-download-staging", dir=persistence_dir
+        prefix=_DOWNLOAD_STAGING_PREFIX, dir=str(temp_root)
     )
 
     zip_file_path = Path(temp_dir.name) / "log_period.zip"
