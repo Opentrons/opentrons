@@ -9,7 +9,7 @@ import { useNotifyImageFileQuery } from '/app/resources/dataFiles/useNotifyImage
 import styles from './protocolrunrecords.module.css'
 
 import type { RunData } from '@opentrons/api-client'
-import type { ProtocolResource } from '@opentrons/shared-data'
+import type { CsvFileParameter, ProtocolResource } from '@opentrons/shared-data'
 
 interface RunRecordDrawerProps {
   run: RunData
@@ -94,7 +94,9 @@ export function RunRecordDrawer(props: RunRecordDrawerProps): JSX.Element {
   const runDateTime = run.createdAt
   const csvRtpFiles =
     'runTimeParameters' in run
-      ? run.runTimeParameters.filter(rtp => rtp.type === 'csv_file')
+      ? run.runTimeParameters.filter(
+          (rtp): rtp is CsvFileParameter => rtp.type === 'csv_file'
+        )
       : []
   const csvRtpFileName = first(csvRtpFiles)?.file?.name ?? null
   const drawerFilesData = getRunRecordDrawerFiles({
