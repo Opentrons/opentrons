@@ -37,7 +37,10 @@ export function ProtocolRunRecords({
   const { t } = useTranslation('device_details')
   const { makeToast, eatToast } = useToaster()
   const { data: runData } = useNotifyAllRunsQuery()
-  const runs = useMemo(() => [...(runData?.data ?? [])], [runData?.data])
+  const runs = useMemo(
+    () => [...(runData?.data ?? [])].reverse(),
+    [runData?.data]
+  )
   const documentationState = useDocumentationState()
   const { downloadRuns, isDownloading: isDownloadingRuns } =
     useDownloadSelectedRuns(robotName)

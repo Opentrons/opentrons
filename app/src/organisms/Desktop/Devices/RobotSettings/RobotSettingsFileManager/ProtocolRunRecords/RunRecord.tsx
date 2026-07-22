@@ -15,6 +15,7 @@ import { formatTimestamp } from '/app/transformations/runs'
 import { DisplayRunStatus } from '../../../ProtocolRun/ProtocolRunHeader/DisplayRunStatus'
 import { useRunFileCount } from '../hooks/useRunFileCount'
 import styles from './protocolrunrecords.module.css'
+import { RunRecordDrawer } from './RunRecordDrawer'
 
 import type { RunData } from '@opentrons/api-client'
 
@@ -88,7 +89,7 @@ export function RunRecord({
       headerChild={headerContent}
       tableHeaders={[]}
     >
-      <div>TODO: wire up drawer</div>
+      <RunRecordDrawer run={run} runProtocol={protocol} />
     </ListAccordion>
   )
 }

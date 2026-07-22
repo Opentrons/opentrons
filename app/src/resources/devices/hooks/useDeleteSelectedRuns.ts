@@ -38,17 +38,19 @@ export function useDeleteSelectedRuns(
         return Promise.resolve()
       }
 
-      let hasDeleteError = false
-      return Promise.all(
-        runs.map(run =>
+      const processSequentially = async (): Promise<void> => {
+        let hasDeleteError = false
+        // process one run at a time so deletions are applied sequentially
+        // rather than concurrently, and a single failure doesn't abort the rest
+        for (const run of runs) {
           // deleteRun call is safe here within /app since we are wrapped in a useDocumentedMutation
           // eslint-disable-next-line opentrons/no-direct-mutating
-          deleteRun(currentHost, run.id, userNotes).catch((e: Error) => {
+          await deleteRun(currentHost, run.id, userNotes).catch((e: Error) => {
             makeToast(e.message, ERROR_TOAST, { closeButton: true })
             hasDeleteError = true
           })
-        )
-      ).then(async () => {
+        }
+
         if (hasDeleteError) {
           throw new Error('One or more runs failed to delete')
         }
@@ -56,7 +58,9 @@ export function useDeleteSelectedRuns(
         await queryClient.invalidateQueries(runsQueryKey).catch((e: Error) => {
           console.error(`error invalidating runs query: ${e.message}`)
         })
-      })
+      }
+
+      return processSequentially()
     }
   )
 
