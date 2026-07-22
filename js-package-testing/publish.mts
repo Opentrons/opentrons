@@ -11,11 +11,17 @@
  *
  * Options:
  *   --version <ver>    Semver string to publish as (required, e.g. 0.3.0-alpha.1)
- *   --tag <tag>        npm dist-tag(s); comma-separated or repeatable
- *                      (default: "alpha,latest")
  *   --registry <url>   npm registry URL (default: https://registry.npmjs.org)
  *   --dry-run          Build and patch everything but skip `npm publish`
  *   --skip-build       Skip make build steps (useful when lib/ is already fresh)
+ *
+ * Always publishes with the "latest" dist-tag (not configurable).
+ *
+ * Auth (script itself is unchanged locally vs CI; only npm auth differs):
+ *   - GitHub Actions: Trusted Publishing OIDC (no token; see workflow)
+ *   - Local dry-run: no auth needed
+ *   - Local real publish: interactive `npm login` + 2FA OTP (these packages
+ *     disallow automation tokens). Prefer the CI workflow for releases.
  *
  * What this script fixes vs raw monorepo package.json files:
  *  1. workspace:* / link: deps rewritten to real semver so published packages are usable.
@@ -32,8 +38,9 @@
  *     inherited from the monorepo root).
  *
  * To run from repo root:
+ *   node --experimental-strip-types js-package-testing/next-npm-version.mts
  *   node --experimental-strip-types js-package-testing/publish.mts \
- *     --version 0.3.7-alpha.0 --dry-run
+ *     --version 0.3.9-alpha.0 --dry-run
  */
 
 import { spawnSync } from 'node:child_process'
@@ -54,39 +61,26 @@ import {
 
 type Args = {
   version: string
-  tags: string[]
   registry: string
   dryRun: boolean
   skipBuild: boolean
 }
 
-const DEFAULT_TAGS = ['alpha', 'latest']
-
-function parseTags(argv: string[]): string[] {
-  const tags: string[] = []
-  for (let i = 0; i < argv.length; i++) {
-    if (argv[i] !== '--tag') continue
-    const value = argv[i + 1]
-    if (value == null || value.startsWith('--')) {
-      console.error('Error: --tag requires a value')
-      process.exit(1)
-    }
-    tags.push(
-      ...value
-        .split(',')
-        .map(tag => tag.trim())
-        .filter(Boolean)
-    )
-    i++
-  }
-  return tags.length > 0 ? [...new Set(tags)] : DEFAULT_TAGS
-}
+/** Hardcoded: every publish lands on the npm "latest" dist-tag. */
+const DIST_TAG = 'latest'
 
 function parseArgs(): Args {
   const argv = process.argv.slice(2)
   const get = (flag: string): string | undefined => {
     const idx = argv.indexOf(flag)
     return idx !== -1 ? argv[idx + 1] : undefined
+  }
+
+  if (argv.includes('--tag')) {
+    console.error(
+      'Error: --tag is not supported; publishes always use the "latest" dist-tag'
+    )
+    process.exit(1)
   }
 
   const version = get('--version')
@@ -97,7 +91,6 @@ function parseArgs(): Args {
 
   return {
     version,
-    tags: parseTags(argv),
     registry: get('--registry') ?? 'https://registry.npmjs.org',
     dryRun: argv.includes('--dry-run'),
     skipBuild: argv.includes('--skip-build'),
@@ -134,6 +127,25 @@ function readJson(filePath: string): Record<string, unknown> {
 
 function writeJson(filePath: string, data: unknown): void {
   writeFileSync(filePath, JSON.stringify(data, null, 2) + '\n', 'utf8')
+}
+
+/**
+ * npm trusted publishing requires package.json repository.url to match the
+ * GitHub repo exactly. Normalize away git+ prefixes / .git variants.
+ * @see https://docs.npmjs.com/trusted-publishers#troubleshooting
+ */
+const CANONICAL_REPOSITORY = {
+  type: 'git',
+  url: 'https://github.com/Opentrons/opentrons.git',
+} as const
+
+function withCanonicalRepository(
+  pkg: Record<string, unknown>
+): Record<string, unknown> {
+  return {
+    ...pkg,
+    repository: { ...CANONICAL_REPOSITORY },
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -285,14 +297,9 @@ function publishPackage(
     // Write patched package.json
     writeJson(path.join(stagingDir, 'package.json'), patchedPkgJson)
 
-    const [primaryTag, ...extraTags] = args.tags
-
     if (args.dryRun) {
       console.log(`  DRY RUN - would publish from ${stagingDir}`)
-      console.log(`  Would publish with tag "${primaryTag}"`)
-      for (const tag of extraTags) {
-        console.log(`  Would add dist-tag "${tag}"`)
-      }
+      console.log(`  Would publish with tag "${DIST_TAG}"`)
       console.log('  Patched package.json:')
       console.log(JSON.stringify(patchedPkgJson, null, 2))
       console.log('\n  README.md:')
@@ -305,22 +312,16 @@ function publishPackage(
     // Pack to a tarball first, then publish the tarball.
     // Publishing a tarball (not a directory) bypasses all files/npmignore
     // heuristics and guarantees exactly what's in stagingDir gets shipped.
+    // In GitHub Actions, npm CLI >= 11.5.1 uses OIDC trusted publishing
+    // automatically when id-token: write is set (no NPM_TOKEN needed).
     run('npm pack', stagingDir)
     const safeName = name.replace('@', '').replace('/', '-')
     const tarball = path.join(stagingDir, `${safeName}-${version}.tgz`)
     run(
-      `npm publish ${tarball} --registry ${args.registry} --tag ${primaryTag} --access public`,
+      `npm publish ${tarball} --registry ${args.registry} --tag ${DIST_TAG} --access public`,
       stagingDir
     )
-    for (const tag of extraTags) {
-      run(
-        `npm dist-tag add ${name}@${version} ${tag} --registry ${args.registry}`,
-        stagingDir
-      )
-    }
-    console.log(
-      `  Published ${name}@${version} with tag(s): ${args.tags.join(', ')}`
-    )
+    console.log(`  Published ${name}@${version} with tag "${DIST_TAG}"`)
   } finally {
     rmSync(stagingDir, { recursive: true, force: true })
   }
@@ -335,7 +336,7 @@ async function main(): Promise<void> {
 
   console.log(`\nPublish settings:`)
   console.log(`  version:  ${args.version}`)
-  console.log(`  tags:     ${args.tags.join(', ')}`)
+  console.log(`  tag:      ${DIST_TAG}`)
   console.log(`  registry: ${args.registry}`)
   console.log(`  dry-run:  ${args.dryRun}`)
 
@@ -362,21 +363,29 @@ async function main(): Promise<void> {
   )
 
   // Patch package.json files
-  const sharedDataPkg = patchSharedDataPackageJson(
-    readJson(path.join(SHARED_DATA_ROOT, 'package.json')),
-    args.version
+  const sharedDataPkg = withCanonicalRepository(
+    patchSharedDataPackageJson(
+      readJson(path.join(SHARED_DATA_ROOT, 'package.json')),
+      args.version
+    )
   )
-  const stepGenerationPkg = patchStepGenerationPackageJson(
-    readJson(path.join(STEP_GENERATION_ROOT, 'package.json')),
-    args.version
+  const stepGenerationPkg = withCanonicalRepository(
+    patchStepGenerationPackageJson(
+      readJson(path.join(STEP_GENERATION_ROOT, 'package.json')),
+      args.version
+    )
   )
-  const componentsPkg = patchComponentsPackageJson(
-    readJson(path.join(COMPONENTS_ROOT, 'package.json')),
-    args.version
+  const componentsPkg = withCanonicalRepository(
+    patchComponentsPackageJson(
+      readJson(path.join(COMPONENTS_ROOT, 'package.json')),
+      args.version
+    )
   )
-  const protocolVisualizationPkg = patchProtocolVisualizationPackageJson(
-    readJson(path.join(PROTOCOL_VISUALIZATION_ROOT, 'package.json')),
-    args.version
+  const protocolVisualizationPkg = withCanonicalRepository(
+    patchProtocolVisualizationPackageJson(
+      readJson(path.join(PROTOCOL_VISUALIZATION_ROOT, 'package.json')),
+      args.version
+    )
   )
 
   // Publish in dependency order, then protocol-visualization

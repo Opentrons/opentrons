@@ -154,10 +154,15 @@ It rewrites:
 - `files` allowlists, `exports` maps, and README/LICENSE injection
 
 ```bash
-# From monorepo root (defaults to npm dist-tags alpha + latest)
+# From monorepo root (always publishes dist-tag "latest")
+node --experimental-strip-types js-package-testing/next-npm-version.mts
 node --experimental-strip-types js-package-testing/publish.mts \
-  --version 0.3.7-alpha.0 --dry-run
+  --version 0.3.9-alpha.0 --dry-run
 ```
+
+Dry-run needs no npm auth. A real local publish uses whatever `npm` is logged in
+as (interactive 2FA); these packages disallow automation tokens, so prefer the
+GitHub Actions workflow for releases. Do not pass `--tag` (hardcoded to `latest`).
 
 ### How js-package-testing simulates npm install
 
