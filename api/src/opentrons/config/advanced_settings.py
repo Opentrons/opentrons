@@ -814,6 +814,17 @@ def _migrate41to42(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate42to43(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 43 of the feature flags file.
+
+    -  Ensure the subprocess flags default to True ensuring the hardware always runs with Pyro.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enableProtocolSubprocess"] = True
+    newmap["enableHardwareSubprocess"] = True
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -857,6 +868,7 @@ _MIGRATIONS = [
     _migrate39to40,
     _migrate40to41,
     _migrate41to42,
+    _migrate42to43,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
