@@ -501,7 +501,16 @@ function AdminPasswordPage({
             <Controller
               name="password"
               control={control}
-              rules={{ required: t('setup_wizard_field_required') }}
+              rules={{
+                required: t('setup_wizard_field_required'),
+                minLength: {
+                  // Theoretically, the minimum password length is configurable on the server side,
+                  // but in practice, until Compliance Ready Software has been enabled,
+                  // there's no user-facing way to adjust it from the default of 8.
+                  value: 8,
+                  message: t('setup_wizard_password_too_short'),
+                },
+              }}
               render={({ field, fieldState }) => (
                 <InputField
                   title={t('login_form_password_field')}
