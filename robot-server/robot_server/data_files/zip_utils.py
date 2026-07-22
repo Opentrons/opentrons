@@ -1,6 +1,8 @@
 """Shared helpers for building and streaming zip downloads."""
 
 import asyncio
+import logging
+import shutil
 import tempfile
 import zipfile
 from pathlib import Path
@@ -12,6 +14,8 @@ from opentrons_shared_data.data_files import MimeType
 from .data_files_store import DataFilesStore
 from robot_server.protocols.protocol_store import ProtocolNotFoundError, ProtocolStore
 from robot_server.runs.run_store import BadRunResource, RunResource
+
+_log = logging.getLogger(__name__)
 
 _DOWNLOAD_STAGING_PREFIX: Final = "temp-download-staging-"
 _DOWNLOAD_ZIP_NAME: Final = "download.zip"
@@ -95,6 +99,27 @@ def create_download_staging_dir(staging_root: Path) -> tempfile.TemporaryDirecto
     return tempfile.TemporaryDirectory(
         prefix=_DOWNLOAD_STAGING_PREFIX, dir=str(staging_root)
     )
+
+
+def cleanup_orphaned_download_staging_dirs(staging_root: Path) -> None:
+    """Delete abandoned ``temp-download-staging-*`` entries under ``staging_root``."""
+    if not staging_root.is_dir():
+        return
+
+    to_clean = (
+        entry
+        for entry in staging_root.iterdir()
+        if entry.name.startswith(_DOWNLOAD_STAGING_PREFIX)
+    )
+
+    for item in to_clean:
+        try:
+            if item.is_dir():
+                shutil.rmtree(item)
+            else:
+                item.unlink()
+        except Exception:
+            _log.warning(f"Error deleting {item.resolve()}.", exc_info=True)
 
 
 def _write_zip_file(entries: List[Tuple[Path, str]], zip_path: Path) -> None:
