@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useQueryClient } from 'react-query'
 import styled from 'styled-components'
 
-import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
+import { deleteRun, getProtocol } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   Box,
@@ -16,12 +15,14 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  getQueryKey,
+  isDocumentedMutationError,
+  useDeleteProtocolMutation,
   useHost,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { OddModal } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 
@@ -45,7 +46,8 @@ export function DeleteProtocolConfirmationModal({
     iconColor: COLORS.yellow50,
   }
   const host = useHost()
-  const queryClient = useQueryClient()
+  const documentationState = useDocumentationState()
+  const { deleteProtocol } = useDeleteProtocolMutation(documentationState)
   const { data: protocolRecord } = useProtocolQuery(protocolId)
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
@@ -68,21 +70,17 @@ export function DeleteProtocolConfirmationModal({
             referencingRunIds?.map(runId => deleteRun(host, runId))
           )
         })
-        // eslint-disable-next-line opentrons/no-direct-mutating -- TODO(jj, 07-21-26): no direct mutations
-        .then(() => deleteProtocol(host, protocolId))
-        .then(() =>
-          queryClient
-            .invalidateQueries(getQueryKey(host, 'protocols'))
-            .catch((e: Error) => {
-              console.error(`error invalidating runs query: ${e.message}`)
-            })
-        )
+        .then(() => deleteProtocol(protocolId))
         .then(() => {
           setShowIcon(false)
           setShowDeleteConfirmationModal(false)
           makeSnackbar(t('protocol_deleted') as string)
         })
         .catch((e: Error) => {
+          if (isDocumentedMutationError(e)) {
+            setShowIcon(false)
+            return
+          }
           console.error(`error deleting resources: ${e.message}`)
         })
     } else {

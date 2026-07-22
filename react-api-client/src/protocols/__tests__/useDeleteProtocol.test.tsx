@@ -47,7 +47,9 @@ describe('useDeleteProtocolMutation hook', () => {
     )
 
     expect(result.current.data).toBeUndefined()
-    result.current.deleteProtocol(protocolId)
+    await expect(
+      result.current.deleteProtocol(protocolId)
+    ).rejects.toBeDefined()
     await waitFor(() => {
       expect(result.current.data).toBeUndefined()
     })
@@ -66,7 +68,9 @@ describe('useDeleteProtocolMutation hook', () => {
         wrapper,
       }
     )
-    act(() => result.current.deleteProtocol(protocolId))
+    await act(async () => {
+      await result.current.deleteProtocol(protocolId)
+    })
 
     await waitFor(() => {
       expect(result.current.data).toEqual(DELETE_PROTOCOL_RESPONSE)

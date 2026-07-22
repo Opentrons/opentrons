@@ -5,9 +5,10 @@ import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
-import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
+import { deleteRun, getProtocol } from '@opentrons/api-client'
 import {
   useCreateRunMutation,
+  useDeleteProtocolMutation,
   useHost,
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
@@ -56,6 +57,7 @@ vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
 
 const MOCK_HOST_CONFIG = {} as HostConfig
 const mockCreateRun = vi.fn((id: string) => {})
+const mockDeleteProtocol = vi.fn()
 const MOCK_DATA = {
   data: {
     id: 'mockProtocol1',
@@ -94,6 +96,10 @@ describe('ODDProtocolDetails', () => {
     vi.mocked(useCreateRunMutation).mockReturnValue({
       createRun: mockCreateRun,
     } as any)
+    vi.mocked(useDeleteProtocolMutation).mockReturnValue({
+      deleteProtocol: mockDeleteProtocol,
+    } as any)
+    mockDeleteProtocol.mockResolvedValue(undefined)
     vi.mocked(useHardwareStatusText).mockReturnValue(
       'mock missing hardware chip text'
     )
@@ -184,10 +190,7 @@ describe('ODDProtocolDetails', () => {
       expect(vi.mocked(deleteRun)).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '2')
     )
     await waitFor(() =>
-      expect(vi.mocked(deleteProtocol)).toHaveBeenCalledWith(
-        MOCK_HOST_CONFIG,
-        'fakeProtocolId'
-      )
+      expect(mockDeleteProtocol).toHaveBeenCalledWith('fakeProtocolId')
     )
   })
 

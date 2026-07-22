@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router-dom'
 import last from 'lodash/last'
 import { css } from 'styled-components'
 
-import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
+import { deleteRun, getProtocol } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   ALIGN_END,
@@ -24,13 +23,15 @@ import {
   useLongPress,
 } from '@opentrons/components'
 import {
-  getQueryKey,
+  isDocumentedMutationError,
+  useDeleteProtocolMutation,
   useHost,
   useMostRecentSuccessfulAnalysisAsDocumentQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { OddModal } from '/app/molecules/OddModal'
 import { useUpdatedLastRunTime } from '/app/pages/ODD/ProtocolDashboard/hooks'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
@@ -69,8 +70,9 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_info', 'branded'])
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
   const longpress = useLongPress()
-  const queryClient = useQueryClient()
   const host = useHost()
+  const documentationState = useDocumentationState()
+  const { deleteProtocol } = useDeleteProtocolMutation(documentationState)
   const updatedLastRun = useUpdatedLastRunTime(lastRun)
 
   const { id: protocolId, analysisSummaries } = protocol
@@ -159,19 +161,15 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
             referencingRunIds?.map(runId => deleteRun(host, runId))
           )
         })
-        // eslint-disable-next-line opentrons/no-direct-mutating -- TODO(jj, 07-21-26): no direct mutations
-        .then(() => deleteProtocol(host, protocol.id))
-        .then(() =>
-          queryClient
-            .invalidateQueries(getQueryKey(host, 'protocols'))
-            .catch((e: Error) => {
-              console.error(`error invalidating runs query: ${e.message}`)
-            })
-        )
+        .then(() => deleteProtocol(protocol.id))
         .then(() => {
           setShowIcon(false)
         })
         .catch((e: Error) => {
+          if (isDocumentedMutationError(e)) {
+            setShowIcon(false)
+            return
+          }
           console.error(`error deleting resources: ${e.message}`)
         })
     } else {

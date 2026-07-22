@@ -3,6 +3,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  useDeleteProtocolMutation,
   useMostRecentSuccessfulAnalysisAsDocumentQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
@@ -126,6 +127,9 @@ describe('ProtocolCard', () => {
     vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
       data: { result: 'ok' } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
+    vi.mocked(useDeleteProtocolMutation).mockReturnValue({
+      deleteProtocol: vi.fn(),
+    } as any)
     vi.mocked(useFeatureFlag).mockReturnValue(false)
   })
 

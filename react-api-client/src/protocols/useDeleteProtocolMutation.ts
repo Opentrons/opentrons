@@ -6,7 +6,7 @@ import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
 import type {
-  UseMutateFunction,
+  UseMutateAsyncFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
@@ -19,7 +19,7 @@ export type UseDeleteProtocolMutationResult = UseMutationResult<
   unknown,
   string
 > & {
-  deleteProtocol: UseMutateFunction<EmptyResponse, unknown, string>
+  deleteProtocol: UseMutateAsyncFunction<EmptyResponse, unknown, string>
 }
 
 export type UseDeleteProtocolMutationOptions = UseMutationOptions<
@@ -51,6 +51,6 @@ export function useDeleteProtocolMutation(
 
   return {
     ...mutation,
-    deleteProtocol: mutation.mutate,
+    deleteProtocol: mutation.mutateAsync,
   }
 }

@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import last from 'lodash/last'
 
-import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
+import { deleteRun, getProtocol } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -28,7 +28,9 @@ import {
 } from '@opentrons/components'
 import {
   getQueryKey,
+  isDocumentedMutationError,
   useCreateRunMutation,
+  useDeleteProtocolMutation,
   useHost,
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
@@ -346,6 +348,7 @@ export function ProtocolDetails(): JSX.Element | null {
     { enabled: protocolRecord != null }
   )
   const documentationState = useDocumentationState()
+  const { deleteProtocol } = useDeleteProtocolMutation(documentationState)
   const { createRun } = useCreateRunMutation(documentationState, {
     onSuccess: data => {
       queryClient
@@ -391,7 +394,6 @@ export function ProtocolDetails(): JSX.Element | null {
     useState<boolean>(false)
 
   const handleDeleteClick = (): void => {
-    setShowConfirmationDeleteProtocol(false)
     if (host != null) {
       getProtocol(host, protocolId)
         .then(
@@ -402,13 +404,17 @@ export function ProtocolDetails(): JSX.Element | null {
           // eslint-disable-next-line opentrons/no-direct-mutating -- TODO(jj, 07-21-26): no direct mutations
           Promise.all(referencingRunIds?.map(runId => deleteRun(host, runId)))
         )
-        // eslint-disable-next-line opentrons/no-direct-mutating -- TODO(jj, 07-21-26): no direct mutations
-        .then(() => deleteProtocol(host, protocolId))
+        .then(() => deleteProtocol(protocolId))
         .then(() => {
+          setShowConfirmationDeleteProtocol(false)
           navigate('/protocols')
         })
         .catch((e: Error) => {
+          if (isDocumentedMutationError(e)) {
+            return
+          }
           console.error(`error deleting resources: ${e.message}`)
+          setShowConfirmationDeleteProtocol(false)
           navigate('/protocols')
         })
     } else {
