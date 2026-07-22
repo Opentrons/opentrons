@@ -39,12 +39,15 @@ export const updateCameraStreamEnablement = createAction(
   })
 )
 
-export const updateCameraUsageSettings = createAction<{
-  runId: string
-  cameraEnabled: boolean
-  liveStreamEnabled: boolean
-  recoveryEnabled: boolean
-}>('protocolRuns/updateCameraUsageSettings')
+export const updateCameraUsageSettings = createAction(
+  'protocolRuns/updateCameraUsageSettings',
+  (settings: {
+    runId: string
+    cameraEnabled: boolean
+    liveStreamEnabled: boolean
+    recoveryEnabled: boolean
+  }) => ({ payload: settings })
+)
 
 export const updateCameraSpecificSettings = createAction(
   'protocolRuns/updateCameraSpecificSettings',
