@@ -42,12 +42,12 @@ Library runtime deps (`styled-components`, `redux`, etc.) are bundled; host app 
 **Order matters:** build packs first, patch manifests, then install.
 
 1. `make pack` in each library → extract to `pack/opentrons-*/`
-2. `patch-packed-packages.mts` rewrites `pack/*/package.json` (same logic as `publish.mts`)
+2. `scripts/patch-packed-packages.mts` rewrites `pack/*/package.json` (same logic as `publish.mts`)
 3. `pnpm install` with `link:pack/...` deps
 4. `pnpm-workspace.yaml` **overrides** pin transitive `@opentrons/*` to `pack/`
 
 Shared patching: `scripts/package-json-patches.mts` (single source of truth for
-`scripts/publish.mts` and `patch-packed-packages.mts`).
+`scripts/publish.mts` and `scripts/patch-packed-packages.mts`).
 
 ## Publish
 
@@ -71,12 +71,12 @@ scripts/
 ├── next-npm-version.mts       # patch bump from npm latest
 ├── npm-latest-versions.mts    # print npm dist-tags
 ├── package-json-patches.mts   # single source of truth for published manifests
+├── patch-packed-packages.mts  # applies patches to js-package-testing/pack/
 └── publish.mts                # npm publish pipeline
 
 js-package-testing/
 ├── Makefile
 ├── package.json
-├── patch-packed-packages.mts  # applies scripts/package-json-patches to pack/
 ├── pnpm-workspace.yaml
 ├── playwright.config.ts
 ├── cssModulesSideEffect.ts

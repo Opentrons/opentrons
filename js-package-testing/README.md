@@ -147,7 +147,8 @@ specifiers that **do not work on npm**. Always publish with
 
 Shared patching logic lives in
 [`../scripts/package-json-patches.mts`](../scripts/package-json-patches.mts)
-(single source of truth for both `scripts/publish.mts` and local `pack/`).
+(single source of truth for both `scripts/publish.mts` and
+`scripts/patch-packed-packages.mts`).
 It rewrites:
 
 - `workspace:*` / `link:` → matching publish semver for `@opentrons/*` deps
@@ -173,7 +174,7 @@ Local dev does **not** use monorepo `workspace:*` links to source. The Makefile:
 
 1. Runs `make pack` in each library (builds `lib/` + `pnpm pack`)
 2. Extracts tarballs to `pack/opentrons-*/`
-3. Runs [`patch-packed-packages.mts`](patch-packed-packages.mts) so each
+3. Runs [`../scripts/patch-packed-packages.mts`](../scripts/patch-packed-packages.mts) so each
    `pack/*/package.json` matches what `publish.mts` would ship
 4. `pnpm install` with `link:pack/...` deps and [`pnpm-workspace.yaml`](pnpm-workspace.yaml)
    **overrides** so transitive `@opentrons/*` also resolve to `pack/`
@@ -255,7 +256,7 @@ make teardown setup dev
 2. Same for `step-generation` → `pack/opentrons-step-generation/`.
 3. Same for `components` → `pack/opentrons-components/`.
 4. Same for `protocol-visualization` → `pack/opentrons-protocol-visualization/`.
-5. `node --experimental-strip-types patch-packed-packages.mts` (rewrite manifests for external consumers).
+5. `node --experimental-strip-types ../scripts/patch-packed-packages.mts` (rewrite manifests for external consumers).
 6. `pnpm install --frozen-lockfile`.
 
 Extracted directories must exist before `pnpm install` because direct dependencies use `link:pack/...`.
@@ -289,7 +290,7 @@ when keys change.
 
 Direct deps use `link:pack/opentrons-*`. [`pnpm-workspace.yaml`](pnpm-workspace.yaml) **`overrides`** force the same four paths for transitive `@opentrons/*` resolution.
 
-After extraction, [`patch-packed-packages.mts`](patch-packed-packages.mts) rewrites each `pack/*/package.json` using [`../scripts/package-json-patches.mts`](../scripts/package-json-patches.mts) (same module as `scripts/publish.mts`): `workspace:*` and `catalog:` become concrete semver, `@types/*` move to devDependencies, and export maps match npm publishes.
+After extraction, [`../scripts/patch-packed-packages.mts`](../scripts/patch-packed-packages.mts) rewrites each `pack/*/package.json` using [`../scripts/package-json-patches.mts`](../scripts/package-json-patches.mts) (same module as `scripts/publish.mts`): `workspace:*` and `catalog:` become concrete semver, `@types/*` move to devDependencies, and export maps match npm publishes.
 
 The `pack/` directory is gitignored. Committed `link:` entries and `pnpm-lock.yaml` describe the strategy; linked contents can change without lockfile churn for those packages.
 
@@ -300,12 +301,12 @@ scripts/
 ├── publish.mts                # npm publish pipeline
 ├── next-npm-version.mts       # patch bump from npm latest
 ├── npm-latest-versions.mts    # print npm dist-tags
-└── package-json-patches.mts   # single source of truth for published manifests
+├── package-json-patches.mts   # single source of truth for published manifests
+└── patch-packed-packages.mts  # applies patches to js-package-testing/pack/
 
 js-package-testing/
 ├── Makefile
 ├── package.json
-├── patch-packed-packages.mts  # applies scripts/package-json-patches to pack/
 ├── pnpm-workspace.yaml
 ├── playwright.config.ts
 ├── vite.config.mts

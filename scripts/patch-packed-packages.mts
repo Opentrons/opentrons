@@ -1,17 +1,19 @@
 /**
- * Patches extracted pack/ directories so their package.json files match what
- * npm consumers receive after publish.mts runs.
+ * Patches extracted js-package-testing/pack/ directories so their package.json
+ * files match what npm consumers receive after scripts/publish.mts runs.
  *
- * Run from js-package-testing/ after build-local-packages:
- *   node --experimental-strip-types patch-packed-packages.mts
+ * Run from repo root (or via js-package-testing Makefile):
+ *   node --experimental-strip-types scripts/patch-packed-packages.mts
  */
 
 import { readFileSync, writeFileSync } from 'node:fs'
 import * as path from 'node:path'
 
-import { patchPackageJsonByName } from '../scripts/package-json-patches.mts'
+import { patchPackageJsonByName } from './package-json-patches.mts'
 
 const PACK_VERSION = '0.0.0-dev'
+const MONO_ROOT = path.resolve(import.meta.dirname, '..')
+const JS_PACKAGE_TESTING_ROOT = path.join(MONO_ROOT, 'js-package-testing')
 
 const PACK_DIRS = [
   'pack/opentrons-shared-data',
@@ -29,15 +31,17 @@ function writeJson(filePath: string, data: unknown): void {
 }
 
 function main(): void {
-  const root = import.meta.dirname
-
   for (const packDir of PACK_DIRS) {
-    const packageJsonPath = path.join(root, packDir, 'package.json')
+    const packageJsonPath = path.join(
+      JS_PACKAGE_TESTING_ROOT,
+      packDir,
+      'package.json'
+    )
     const pkg = readJson(packageJsonPath)
     const patched = patchPackageJsonByName(pkg, PACK_VERSION)
 
     writeJson(packageJsonPath, patched)
-    console.log(`Patched ${packDir}/package.json`)
+    console.log(`Patched js-package-testing/${packDir}/package.json`)
   }
 }
 

@@ -2,7 +2,7 @@
  * Shared package.json patching for npm publish and js-package-testing pack/.
  *
  * Single source of truth: both scripts/publish.mts and
- * js-package-testing/patch-packed-packages.mts import from this module.
+ * scripts/patch-packed-packages.mts import from this module.
  * Do not duplicate patch logic elsewhere; if published manifests change, edit
  * here so pack/ and npm stay aligned.
  *
