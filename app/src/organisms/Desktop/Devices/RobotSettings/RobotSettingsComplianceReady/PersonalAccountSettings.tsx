@@ -1,15 +1,25 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+import { useQueryClient } from 'react-query'
+import axios from 'axios'
 
-import { Divider, StyledText } from '@opentrons/components'
-import { useSelfQuery } from '@opentrons/react-api-client'
+import { BasicButton, Divider, StyledText } from '@opentrons/components'
+import {
+  getSelfQueryKey,
+  isDocumentedMutationError,
+  useHost,
+  useSelfQuery,
+  useUpdateSelfMutation,
+} from '@opentrons/react-api-client'
 
-import { getAuthStateForRobot } from '/app/redux/robot-auth'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useUsernameForRobot } from '/app/redux/robot-auth'
 
 import styles from './personalaccountsettings.module.css'
+import { PersonalAccountSettingsEditForm } from './PersonalAccountSettingsEditForm'
 
 import type { JSX, ReactNode } from 'react'
-import type { State } from '/app/redux/types'
+import type { UpdateSelfRequest } from '@opentrons/api-client'
 
 export interface PersonalAccountSettingsProps {
   robotName: string
@@ -34,13 +44,58 @@ function FieldRow({ label, children }: FieldRowProps): JSX.Element {
 export function PersonalAccountSettings({
   robotName,
 }: PersonalAccountSettingsProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
-  const authState = useSelector((state: State) =>
-    getAuthStateForRobot(state, robotName)
-  )
-  const selfQuery = useSelfQuery({ enabled: authState != null })
-  const username = authState?.username
-  const fullName = selfQuery.data?.data.fullName ?? null
+  const { t } = useTranslation(['device_settings', 'shared'])
+  const queryClient = useQueryClient()
+  const host = useHost()
+  const documentationState = useDocumentationState(undefined, robotName)
+  const loggedInUsername = useUsernameForRobot(robotName)
+  const selfQuery = useSelfQuery({ enabled: loggedInUsername != null })
+  const { updateSelf, isLoading: isSaving } =
+    useUpdateSelfMutation(documentationState)
+  const username = selfQuery.data?.data.username ?? loggedInUsername ?? ''
+  const fullName = selfQuery.data?.data.fullName ?? ''
+
+  const [isEditing, setIsEditing] = useState(false)
+  const [usernameError, setUsernameError] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
+
+  const clearSaveErrors = (): void => {
+    setUsernameError(null)
+    setSaveError(null)
+  }
+
+  const handleSave = (request: UpdateSelfRequest): void => {
+    void updateSelf(request)
+      .then(updatedSelf => {
+        queryClient.setQueryData(getSelfQueryKey(host), updatedSelf)
+        clearSaveErrors()
+        setIsEditing(false)
+      })
+      .catch((error: unknown) => {
+        // User cancelled the documentation/login modal — stay on the edit form.
+        if (isDocumentedMutationError(error)) {
+          return
+        }
+
+        const errorId = axios.isAxiosError(error)
+          ? error.response?.data?.errors?.[0]?.id
+          : null
+
+        if (errorId === 'userAlreadyExists') {
+          setUsernameError(
+            t(
+              'desktop_personal_account_settings_username_exists_error'
+            ) as string
+          )
+          setSaveError(null)
+        } else {
+          setUsernameError(null)
+          setSaveError(
+            t('desktop_personal_account_settings_save_error') as string
+          )
+        }
+      })
+  }
 
   return (
     <div className={styles.container}>
@@ -48,39 +103,75 @@ export function PersonalAccountSettings({
         <StyledText desktopStyle="bodyLargeSemiBold">
           {t('desktop_personal_account_settings')}
         </StyledText>
-        <button type="button" className={styles.edit_button}>
-          <StyledText desktopStyle="bodyDefaultRegLink">
-            {t('desktop_edit')}
-          </StyledText>
-        </button>
+        {loggedInUsername != null &&
+          (isEditing ? (
+            <BasicButton
+              type="button"
+              underLine
+              onClick={() => {
+                clearSaveErrors()
+                setIsEditing(false)
+              }}
+            >
+              {t('shared:cancel')}
+            </BasicButton>
+          ) : (
+            <BasicButton
+              type="button"
+              underLine
+              onClick={() => {
+                clearSaveErrors()
+                setIsEditing(true)
+              }}
+            >
+              {t('desktop_edit')}
+            </BasicButton>
+          ))}
       </div>
       <div className={styles.content}>
-        <FieldRow label={t('desktop_username')}>
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
-            className={styles.field_value_text}
-          >
-            {username}
-          </StyledText>
-        </FieldRow>
-        <Divider />
-        <FieldRow label={t('desktop_legal_name')}>
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
-            className={styles.field_value_text}
-          >
-            {fullName}
-          </StyledText>
-        </FieldRow>
-        <Divider />
-        <FieldRow label={t('desktop_password')}>
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
-            className={styles.field_value_text}
-          >
-            ••••••••
-          </StyledText>
-        </FieldRow>
+        {isEditing ? (
+          <PersonalAccountSettingsEditForm
+            username={username}
+            fullName={fullName}
+            isSaving={isSaving}
+            usernameError={usernameError}
+            saveError={saveError}
+            onSave={handleSave}
+            onCancel={() => {
+              clearSaveErrors()
+              setIsEditing(false)
+            }}
+          />
+        ) : (
+          <>
+            <FieldRow label={t('desktop_username')}>
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                className={styles.field_value_text}
+              >
+                {username}
+              </StyledText>
+            </FieldRow>
+            <Divider />
+            <FieldRow label={t('desktop_legal_name')}>
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                className={styles.field_value_text}
+              >
+                {fullName}
+              </StyledText>
+            </FieldRow>
+            <Divider />
+            <FieldRow label={t('desktop_password')}>
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                className={styles.field_value_text}
+              >
+                {t('desktop_password_placeholder')}
+              </StyledText>
+            </FieldRow>
+          </>
+        )}
       </div>
     </div>
   )

@@ -5,13 +5,31 @@ from contextlib import AsyncExitStack, asynccontextmanager
 from pathlib import Path
 from typing import AsyncGenerator, Optional, override
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from opentrons_shared_data.errors.exceptions import AuditLoggingError
 
 from server_utils import systemd_utils
+from server_utils.auth.resource_server.authorization_checker import (
+    FailedClosedAuthorizationChecker,
+)
+from server_utils.auth.resource_server.fastapi import (
+    AuthorizationError,
+    build_authorization_checker,
+    handle_authorization_error,
+    install_authorization_checker,
+)
 from server_utils.keys.fastapi import build_key_client, install_key_client
-from server_utils.keys.key_server import Client as KeyClientABC
-from server_utils.keys.key_server import SignedMessageData, SignMessageData
+from server_utils.keys.key_server import (
+    Client as KeyClientABC,
+)
+from server_utils.keys.key_server import (
+    PublicKeyAndHash,
+    SignedMessageData,
+    SignMessageData,
+)
+from server_utils.robot.fastapi import build_robot_client, install_robot_server_client
+from server_utils.robot.robot_server import Client as RobotClientABC
+from server_utils.robot.robot_server import RobotNameandSerial
 
 from audit_server.log_export.router import router as log_export_router
 from audit_server.log_ingest.router import router as ingest_router
@@ -52,6 +70,21 @@ class _NoOpFailKeyClient(KeyClientABC):
     async def sign_message(self, message: SignMessageData) -> SignedMessageData:
         raise AuditLoggingError(message="Key server unavailable (not configured)")
 
+    @override
+    async def get_key_and_hash(self) -> PublicKeyAndHash:
+        raise AuditLoggingError(message="Key server unavailable (not configured)")
+
+
+class _StubRobotServerClient(RobotClientABC):
+    """A local robot server client when no robot server url/uds has been provided."""
+
+    @override
+    async def get_name_and_serial(self) -> RobotNameandSerial:
+        return RobotNameandSerial(
+            name="localrobot",
+            serial=None,
+        )
+
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
@@ -88,13 +121,46 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             )
             key_client = _NoOpFailKeyClient()
         install_key_client(app.state, key_client)
+        if (
+            configuration.robot_server_uds is not None
+            or configuration.robot_server_url is not None
+        ):
+            robot_server_client = await exit_stack.enter_async_context(
+                build_robot_client(
+                    robot_server_uds=configuration.robot_server_uds,
+                    robot_server_url=configuration.robot_server_url,
+                )
+            )
+        else:
+            _log.warning(
+                "robot-server is not configured."
+                " robot identity file in log period download"
+                " will return stub data."
+            )
+            robot_server_client = _StubRobotServerClient()
+
+        install_robot_server_client(app.state, robot_server_client)
         log_store = build_log_store(app.state, engine)
         log_data_manager = build_log_data_manager(
             app.state, log_store, settings_store, key_client
         )
+        authorization_checker = await exit_stack.enter_async_context(
+            build_authorization_checker(
+                auth_server_uds=configuration.auth_server_uds,
+                auth_server_url=configuration.auth_server_url,
+                fallback=FailedClosedAuthorizationChecker,
+            )
+        )
+        install_authorization_checker(app.state, authorization_checker)
         await log_data_manager.rotate_periods()
         systemd_utils.notify_up()
         yield
+
+
+async def _handle_auth_error_async(
+    request: Request, error: AuthorizationError
+) -> Response:
+    return handle_authorization_error(request, error)
 
 
 app = FastAPI(
@@ -103,6 +169,7 @@ app = FastAPI(
     docs_url=None,
     redoc_url=None,
     lifespan=_lifespan,
+    exception_handlers={AuthorizationError: _handle_auth_error_async},
 )
 
 app.include_router(ingest_router)

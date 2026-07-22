@@ -46,7 +46,6 @@ const AUTH_USER: AuthUser = {
   username: 'alice',
   fullName: 'Alice',
   accountType: 'user',
-  scopes: [],
   locked: false,
   resetPassword: false,
 }

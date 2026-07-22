@@ -46,11 +46,13 @@ export function DeleteRecordsModal(
             'device_details:delete_selected_run_records_recommendation'
           ),
         }
-      case 'allLogs':
+      case 'selectedLogs':
         return {
-          title: t('device_details:delete_all_logs'),
-          description: t('device_details:delete_all_logs_description'),
-          recommendation: t('device_details:delete_all_logs_recommendation'),
+          title: t('device_details:delete_selected_logs'),
+          description: t('device_details:delete_selected_logs_description'),
+          recommendation: t(
+            'device_details:delete_selected_logs_recommendation'
+          ),
         }
     }
   })()

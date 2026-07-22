@@ -102,7 +102,6 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
               src={FLEX_PNG}
               width="52.9px"
               height="50.14px"
-              id={`RobotCard_${String(robotName)}_robotImage`}
               alt="Flex image"
             />
             <RobotStatusHeader

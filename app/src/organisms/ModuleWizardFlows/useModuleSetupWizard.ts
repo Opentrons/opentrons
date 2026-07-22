@@ -1,9 +1,14 @@
 import { useEffect, useReducer, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
+import {
+  useDeleteMaintenanceRunMutation,
+  useUpdateDeckConfigurationMutation,
+} from '@opentrons/react-api-client'
 
 import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 import { getIsOnDevice } from '/app/redux/config'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
@@ -22,7 +27,7 @@ import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
 import type { PipetteInformation } from '/app/resources/instruments/types'
-import type { ModuleSetupWizardStep } from './types'
+import type { ModuleSetupWizardStep, SendIdentifyModule } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
 
@@ -48,9 +53,14 @@ export interface UseModuleSetupWizardResult {
     goBack: () => void
     setErrorMessage: (message: string | null) => void
     errorMessage: string | null
+    isDoorOpenError: boolean
+    setIsDoorOpenError: (isDoorOpenError: boolean) => void
+    dismissDoorOpenError: () => void
     isOnDevice: boolean
     attachedModule: AttachedModule | null
     isExiting: boolean
+    sendIdentifyModule: SendIdentifyModule
+    updateDeckConfiguration: (deckConfig: DeckConfiguration) => void
   }
   buildFlowForSelectedModule: (module: AttachedModule) => void
   patchModuleAfterUpdate: (module: AttachedModule) => void
@@ -68,7 +78,8 @@ export function useModuleSetupWizard(
 ): UseModuleSetupWizardResult {
   const { closeFlow, attachedModuleOnLaunch, onComplete } = params
   const isOnDevice = useSelector(getIsOnDevice)
-  const sendIdentifyModule = useSendIdentifyModule()
+  const { t } = useTranslation('module_wizard_flows')
+
   const [state, dispatch] = useReducer(moduleSetupWizardReducer, {
     currentStepIndex: 0,
     currentStep: null,
@@ -107,6 +118,21 @@ export function useModuleSetupWizard(
       addActionToDocument
     )
 
+  const sendIdentifyModule = useSendIdentifyModule(
+    commandDocState,
+    actionsToDocument,
+    addActionToDocument
+  )
+
+  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation(
+    commandDocState,
+    {
+      onSuccess: () => {
+        addActionToDocument('update_deck_configuration')
+      },
+    }
+  )
+
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
     useCreateTargetedMaintenanceRunMutation(
       commandDocState,
@@ -127,6 +153,11 @@ export function useModuleSetupWizard(
   })
 
   const [errorMessage, setErrorMessage] = useState<null | string>(null)
+  const [isDoorOpenError, setIsDoorOpenError] = useState<boolean>(false)
+  const dismissDoorOpenError = (): void => {
+    setErrorMessage(null)
+    setIsDoorOpenError(false)
+  }
   const [isExiting, setIsExiting] = useState<boolean>(false)
   const proceed = (): void => {
     if (!isCommandMutationLoading) {
@@ -179,8 +210,14 @@ export function useModuleSetupWizard(
           deleteMaintenanceRun(maintenanceRunId)
         })
         .catch(error => {
-          console.error(error.message)
-          handleClose()
+          if (isMaintenanceDoorOpenError(error)) {
+            setIsExiting(false)
+            setIsDoorOpenError(true)
+            setErrorMessage(t('door_is_open') as string)
+          } else {
+            console.error(error.message)
+            handleClose()
+          }
         })
     }
   }
@@ -227,9 +264,14 @@ export function useModuleSetupWizard(
     restartSetup,
     setErrorMessage,
     errorMessage,
+    isDoorOpenError,
+    setIsDoorOpenError,
+    dismissDoorOpenError,
     isOnDevice,
     attachedModule,
     isExiting,
+    sendIdentifyModule,
+    updateDeckConfiguration,
   }
 
   const buildFlowForSelectedModule = (

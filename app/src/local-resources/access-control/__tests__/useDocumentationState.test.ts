@@ -3,10 +3,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   useAccessControlEnabledQuery,
-  useAuthSettingsQuery,
+  useAuditSettingsQuery,
 } from '@opentrons/react-api-client'
 
-import { useCurrentUsername } from '/app/redux/robot-auth'
+import { useUsernameForRobot } from '/app/redux/robot-auth'
 
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../__fixtures__/documentationState'
 import { useDocumentationState } from '../useDocumentationState'
@@ -20,7 +20,7 @@ import type ReactRedux from 'react-redux'
 import type { DocumentationReport } from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', () => ({
-  useAuthSettingsQuery: vi.fn(),
+  useAuditSettingsQuery: vi.fn(),
   useAccessControlEnabledQuery: vi.fn(),
 }))
 
@@ -37,8 +37,8 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
   const actual = await importOriginal()
   return {
     ...(actual as any),
-    useCurrentUsername: vi.fn(() => 'alice'),
     useCurrentRobotName: vi.fn(() => 'otie'),
+    useUsernameForRobot: vi.fn(() => 'alice'),
   }
 })
 
@@ -46,14 +46,14 @@ const wrapper = wrapWithDocumentationRequiredModal()
 
 describe('useDocumentationState', () => {
   beforeEach(() => {
-    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+    vi.mocked(useAuditSettingsQuery).mockReturnValue({
       data: {
         data: {
           requireReasonForInteraction: true,
           minLengthOfReasonForInteraction: 10,
         },
       },
-    } as ReturnType<typeof useAuthSettingsQuery>)
+    } as ReturnType<typeof useAuditSettingsQuery>)
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
       data: {
         data: {
@@ -75,14 +75,14 @@ describe('useDocumentationState', () => {
         },
       },
     } as ReturnType<typeof useAccessControlEnabledQuery>)
-    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+    vi.mocked(useAuditSettingsQuery).mockReturnValue({
       data: {
         data: {
           requireReasonForInteraction: true,
           minLengthOfReasonForInteraction: 10,
         },
       },
-    } as ReturnType<typeof useAuthSettingsQuery>)
+    } as ReturnType<typeof useAuditSettingsQuery>)
 
     const { result } = renderHook(() => useDocumentationState(), { wrapper })
 
@@ -101,14 +101,14 @@ describe('useDocumentationState', () => {
         },
       },
     } as ReturnType<typeof useAccessControlEnabledQuery>)
-    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+    vi.mocked(useAuditSettingsQuery).mockReturnValue({
       data: {
         data: {
           requireReasonForInteraction: false,
           minLengthOfReasonForInteraction: 10,
         },
       },
-    } as ReturnType<typeof useAuthSettingsQuery>)
+    } as ReturnType<typeof useAuditSettingsQuery>)
 
     const { result } = renderHook(() => useDocumentationState(), { wrapper })
 
@@ -158,7 +158,7 @@ describe('useDocumentationState', () => {
     }
   })
   it('opens login modal when username is not provided', async () => {
-    vi.mocked(useCurrentUsername).mockReturnValue(null)
+    vi.mocked(useUsernameForRobot).mockReturnValue(null)
     const { result } = renderHook(() => useDocumentationState(), { wrapper })
 
     await act(async () => {
@@ -176,7 +176,7 @@ describe('useDocumentationState', () => {
   })
 
   it('calls onCancel when login modal is dismissed without logging in', async () => {
-    vi.mocked(useCurrentUsername).mockReturnValue(null)
+    vi.mocked(useUsernameForRobot).mockReturnValue(null)
     vi.mocked(mockShowLoginModal).mockResolvedValue(null)
     const onCancel = vi.fn()
     const { result } = renderHook(() => useDocumentationState(), { wrapper })

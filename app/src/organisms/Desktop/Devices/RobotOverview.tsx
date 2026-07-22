@@ -90,7 +90,6 @@ export function RobotOverview({
                 width: '6rem',
                 height: '5.4375rem',
               }}
-              id="RobotOverview_robotImage"
               alt={
                 robotModel === 'OT-2' ? 'Image of `OT-2 image' : 'Flex image'
               }
@@ -137,7 +136,6 @@ export function RobotOverview({
                         }
                         onClick={toggleLights}
                         height="0.813rem"
-                        id="RobotOverview_lightsToggle"
                       />
                     </Flex>
                     <LegacyStyledText

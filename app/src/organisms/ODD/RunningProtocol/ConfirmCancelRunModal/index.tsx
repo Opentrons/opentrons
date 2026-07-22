@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -12,7 +12,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { OddModal } from '/app/molecules/OddModal'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
@@ -22,6 +22,7 @@ import { useNotifyRunQuery } from '/app/resources/runs'
 import { CancelingRunModal } from '../CancelingRunModal'
 import styles from './confirmcancelmodal.module.css'
 
+import type { DocumentedAction } from '@opentrons/react-api-client'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface ConfirmCancelRunModalProps {
@@ -31,6 +32,12 @@ interface ConfirmCancelRunModalProps {
   protocolId?: string | null
 }
 
+const ACTIVE_RUN_CANCEL_ACTIONS: DocumentedAction[] = ['stop_run']
+const INACTIVE_RUN_CANCEL_ACTIONS: DocumentedAction[] = [
+  'stop_run',
+  'dismiss_run',
+]
+
 export function ConfirmCancelRunModal({
   runId,
   setShowConfirmCancelRunModal,
@@ -38,10 +45,6 @@ export function ConfirmCancelRunModal({
   protocolId,
 }: ConfirmCancelRunModalProps): JSX.Element {
   const { t } = useTranslation(['run_details', 'shared'])
-  const documentationState = useDocumentationState()
-  const { stopRun } = useStopRunMutation(documentationState)
-  const { dismissCurrentRun, isLoading: isDismissing } =
-    useDismissCurrentRunMutation()
   const localRobot = useSelector(getLocalRobot)
   const { data, isError: isRunFetchError } = useNotifyRunQuery(runId)
   const { status: runStatus, current: isRunCurrent } = data?.data ?? {}
@@ -49,6 +52,15 @@ export function ConfirmCancelRunModal({
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const navigate = useNavigate()
   const [isCanceling, setIsCanceling] = useState(false)
+  const dismissStartedRef = useRef(false)
+
+  const { documentationState, clearDocreport } = useLinkedDocumentationState(
+    isActiveRun ? ACTIVE_RUN_CANCEL_ACTIONS : INACTIVE_RUN_CANCEL_ACTIONS,
+    runId
+  )
+  const { stopRun } = useStopRunMutation(documentationState)
+  const { dismissCurrentRun, isLoading: isDismissing } =
+    useDismissCurrentRunMutation(documentationState)
 
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('cancel_run_modal_heading'),
@@ -57,16 +69,35 @@ export function ConfirmCancelRunModal({
     iconColor: COLORS.yellow50,
   }
 
-  const dismissAndNavigate = useCallback((): void => {
-    if (!isActiveRun) {
-      dismissCurrentRun(runId)
-      if (protocolId != null) {
-        navigate(`/protocols/${protocolId}`)
-      } else {
-        navigate('/protocols')
-      }
+  const navigateAway = useCallback((): void => {
+    if (protocolId != null) {
+      navigate(`/protocols/${protocolId}`)
+    } else {
+      navigate('/protocols')
     }
-  }, [isActiveRun, dismissCurrentRun, runId, protocolId, navigate])
+  }, [protocolId, navigate])
+
+  const dismissAndNavigate = useCallback((): void => {
+    if (isActiveRun || dismissStartedRef.current) {
+      return
+    }
+    dismissStartedRef.current = true
+    setIsCanceling(true)
+    dismissCurrentRun(runId, {
+      onSuccess: () => {
+        navigateAway()
+      },
+      onError: (error: unknown) => {
+        clearDocreport()
+        dismissStartedRef.current = false
+        if (isDocumentedMutationError(error)) {
+          setIsCanceling(false)
+        } else {
+          navigateAway()
+        }
+      },
+    })
+  }, [isActiveRun, dismissCurrentRun, runId, navigateAway, clearDocreport])
 
   const handleCancelRun = (): void => {
     setIsCanceling(true)
@@ -76,6 +107,7 @@ export function ConfirmCancelRunModal({
         dismissAndNavigate()
       },
       onError: (error: unknown) => {
+        clearDocreport()
         if (isDocumentedMutationError(error)) {
           setIsCanceling(false)
         } else {

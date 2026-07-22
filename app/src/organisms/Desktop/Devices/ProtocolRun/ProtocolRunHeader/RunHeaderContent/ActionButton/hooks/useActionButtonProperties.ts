@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import {
   isModuleConfirmationStatus,
   isRunAgainStatus,
@@ -95,7 +96,9 @@ export function useActionButtonProperties({
   const missingSetupSteps = useSelector<State, StepKey[]>((state: State) =>
     getMissingSetupSteps(state, runId)
   )
-  const { addCameraSettingsToRun } = useAddCameraSettingsToRunMutation()
+  const documentationState = useDocumentationState()
+  const { addCameraSettingsToRun } =
+    useAddCameraSettingsToRunMutation(documentationState)
   const runCameraSettings = useSelector((state: State) =>
     getCameraUsageState(state, runId)
   )
@@ -211,7 +214,12 @@ export function useActionButtonProperties({
     buttonText = t('run_again')
     handleButtonClick = () => {
       isResetRunLoadingRef.current = true
-      reset()
+      reset({
+        onError: () => {
+          // e.g. user cancelled the documentation modal
+          isResetRunLoadingRef.current = false
+        },
+      })
       runHeaderModalContainerUtils.dropTipUtils.resetTipStatus()
       trackEvent({
         name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,

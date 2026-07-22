@@ -1098,8 +1098,9 @@
   ],
   "parameters": {
     "format": "96Standard",
-    "quirks": ["filterPlate"],
+    "quirks": ["filterPlate", "noLabwarePositionCheck"],
     "isTiprack": false,
+    "isDeckSlotCompatible": false,
     "isMagneticModuleCompatible": false,
     "loadName": "thermoscientificnunc_96_wellplate_1000ul_filter"
   },

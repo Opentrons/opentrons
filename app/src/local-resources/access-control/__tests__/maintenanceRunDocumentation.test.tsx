@@ -9,7 +9,7 @@ import {
 } from '@opentrons/api-client'
 import {
   useAccessControlEnabledQuery,
-  useAuthSettingsQuery,
+  useAuditSettingsQuery,
   useCreateMaintenanceCommandMutation,
   useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
@@ -42,7 +42,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ReactApiClient>()
   return {
     ...actual,
-    useAuthSettingsQuery: vi.fn(),
+    useAuditSettingsQuery: vi.fn(),
     useAccessControlEnabledQuery: vi.fn(),
     useHost: vi.fn(),
   }
@@ -71,8 +71,8 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
   const actual = await importOriginal()
   return {
     ...(actual as any),
-    useCurrentUsername: vi.fn(() => 'alice'),
     useCurrentRobotName: vi.fn(() => 'otie'),
+    useUsernameForRobot: vi.fn(() => 'alice'),
   }
 })
 
@@ -143,14 +143,14 @@ describe('maintenance run documentation flow', () => {
 
   beforeEach(() => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+    vi.mocked(useAuditSettingsQuery).mockReturnValue({
       data: {
         data: {
           requireReasonForInteraction: true,
           minLengthOfReasonForInteraction: 10,
         },
       },
-    } as ReturnType<typeof useAuthSettingsQuery>)
+    } as ReturnType<typeof useAuditSettingsQuery>)
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
       data: {
         data: {

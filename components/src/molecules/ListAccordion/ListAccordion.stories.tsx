@@ -9,6 +9,7 @@ import {
 } from '@opentrons/components'
 
 import { ListAccordion as ListAccordionComponent } from '.'
+import { customViewports } from '../../../../.storybook/preview'
 import { DISPLAY_FLEX, DISPLAY_GRID } from '../../styles'
 
 import type { Meta, Story } from '@storybook/react'
@@ -43,7 +44,9 @@ export default {
       description: 'See header text. Does nothing in Storybook.',
     },
   },
-  ...VIEWPORT.touchScreenViewport,
+  viewport: {
+    options: [VIEWPORT.touchScreenViewport, customViewports],
+  },
 } as Meta
 
 interface ListAccordionStoryProps extends Omit<

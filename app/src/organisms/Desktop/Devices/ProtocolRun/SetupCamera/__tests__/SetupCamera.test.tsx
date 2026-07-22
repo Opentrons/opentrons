@@ -10,6 +10,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
 import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
 import { useIsFlex } from '/app/redux-resources/robots'
@@ -38,6 +39,13 @@ vi.mock('/app/redux/config')
 vi.mock('/app/redux/protocol-runs')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/robots')
+vi.mock(
+  '/app/local-resources/access-control/useLinkedDocumentationState',
+  () => ({
+    useLinkedDocumentationState: () =>
+      ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+  })
+)
 
 const render = (props: SetupCameraProps) => {
   return renderWithProviders(<SetupCamera {...props} />, {

@@ -40,7 +40,10 @@ export const useDocumentedMutation: UseDocumentedMutation = (
   arg3?
 ) => {
   const hasKey = typeof arg1 !== 'function'
-  const mutationFn = (hasKey ? arg2 : arg1) as DocumentedMutationFunction
+  const mutationFn = (hasKey ? arg2 : arg1) as DocumentedMutationFunction<
+    any,
+    any
+  >
   const options = (hasKey ? arg3 : arg2) as UseMutationOptions | undefined
 
   const wrappedMutationFn = useWrappedMutationFn(
@@ -52,42 +55,57 @@ export const useDocumentedMutation: UseDocumentedMutation = (
   return useMutation({
     ...options,
     ...(hasKey ? { mutationKey: arg1 as MutationKey } : {}),
-    mutationFn: wrappedMutationFn,
-  })
+    mutationFn: wrappedMutationFn as MutationFunction<any, any>,
+  }) // Generics are getting lost here but I promise its ok
 }
 
 function useWrappedMutationFn<TData, TVariables>(
   mutationFn: DocumentedMutationFunction<TData, TVariables>,
   documentationState: DocumentationState,
-  actionsToDocument: DocumentedAction[]
+  actionsToDocument:
+    DocumentedAction[] | ((variables: TVariables) => DocumentedAction[])
 ): MutationFunction<TData, TVariables> {
   // using a ref avoids stale mutation functions after a change in the host causes a rerender
   // i.e. when the user is prompted to log in again
   const mutationFnRef = useRef(mutationFn)
   mutationFnRef.current = mutationFn
+  const docStateRef = useRef(documentationState)
+  docStateRef.current = documentationState
 
   const wrappedMutationFn = useCallback(
     async (variables: TVariables) => {
+      const actionsToUse =
+        typeof actionsToDocument === 'function'
+          ? actionsToDocument(variables)
+          : actionsToDocument
       return await runMutation(
-        documentationState,
-        actionsToDocument,
+        docStateRef,
+        actionsToUse,
         mutationFnRef,
         variables
       )
     },
-    [actionsToDocument, documentationState]
+    [actionsToDocument]
   )
   return wrappedMutationFn
 }
 
 async function runMutation<TData, TVariables>(
-  documentationState: DocumentationState,
+  docStateRef: MutableRefObject<DocumentationState>,
   actionsToDocument: DocumentedAction[],
   mutationFnRef: MutableRefObject<
     DocumentedMutationFunction<TData, TVariables>
   >,
-  variables: TVariables
+  variables: TVariables,
+  // local overrides for in-flight retries; do not write these back to the ref
+  documentationState: DocumentationState = docStateRef.current
 ): Promise<TData> {
+  console.log('running mutation', {
+    documentationState,
+    actionsToDocument,
+    mutationFnRef,
+    variables,
+  })
   if (documentationState.isLoading) {
     throw new DocumentedMutationError('access_control_loading')
   }
@@ -103,10 +121,11 @@ async function runMutation<TData, TVariables>(
     if (documentationState.docreport == null) {
       const dr = await documentationState.askForDocumentation(actionsToDocument)
       return await runMutation(
-        { ...documentationState, docreport: dr },
+        docStateRef,
         actionsToDocument,
         mutationFnRef,
-        variables
+        variables,
+        { ...documentationState, docreport: dr }
       )
     }
   }
@@ -128,10 +147,11 @@ async function runMutation<TData, TVariables>(
         loginResult?.username
       )
       return await runMutation(
-        { ...documentationState, docreport: dr, loginExpired: false },
+        docStateRef,
         actionsToDocument,
         mutationFnRef,
-        variables
+        variables,
+        { ...documentationState, docreport: dr, loginExpired: false }
       )
     }
   }
@@ -146,16 +166,20 @@ async function runMutation<TData, TVariables>(
           : '',
     })
     .catch(async e => {
+      console.log('hit error', e)
+      console.log(documentationState)
       if (
         e.isAxiosError &&
         e.response?.status === 401 &&
         documentationState.accessControlEnabled
       ) {
+        console.log('hit 401')
         return await runMutation(
-          { ...documentationState, loginExpired: true },
+          docStateRef,
           actionsToDocument,
           mutationFnRef,
-          variables
+          variables,
+          { ...documentationState, loginExpired: true }
         )
       } else throw e
     })

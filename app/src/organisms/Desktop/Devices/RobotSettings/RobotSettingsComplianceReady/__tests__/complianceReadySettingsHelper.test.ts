@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  getAuditInputPatch,
   getAuthInputPatch,
   getFieldValuesFromSettings,
 } from '../complianceReadySettingsHelper'
 
 import type {
+  AuditSettingsData,
   AuthSettingsData,
   RobotServerAccessControlSettingsData,
 } from '@opentrons/api-client'
@@ -17,8 +19,6 @@ const AUTH_SETTINGS: AuthSettingsData = {
   passwordComplexityMinimumLength: 8,
   passwordComplexitySpecialCharacters: true,
   idleLogout: 180,
-  requireReasonForInteraction: true,
-  minLengthOfReasonForInteraction: 10,
   requireAdminCredsWhenUpdatingRobotSoftware: true,
   requireAdminCredsWhenSendingProtocolToRobot: false,
   requireAdminCredsForSignoffProtocol: false,
@@ -30,9 +30,15 @@ const ROBOT_SERVER_SETTINGS: RobotServerAccessControlSettingsData = {
   deleteOverMaxOnDiskProtocols: true,
 }
 
+const AUDIT_SERVER_SETTINGS: AuditSettingsData = {
+  requireReasonForInteraction: true,
+  minLengthOfReasonForInteraction: 10,
+}
+
 const BASE_FIELD_VALUES = getFieldValuesFromSettings(
   AUTH_SETTINGS,
-  ROBOT_SERVER_SETTINGS
+  ROBOT_SERVER_SETTINGS,
+  AUDIT_SERVER_SETTINGS
 )
 
 describe('getFieldValuesFromSettings', () => {
@@ -55,6 +61,13 @@ describe('getFieldValuesFromSettings', () => {
       requireSignoffForProtocolLog: false,
       requireLogsToBeSavedInApp: false,
       deleteOverMaxOnDiskProtocols: false,
+    })
+  })
+
+  it('should map audit server settings to form field values', () => {
+    expect(BASE_FIELD_VALUES).toMatchObject({
+      requireReasonForInteraction: true,
+      minLengthOfReasonForInteraction: '10',
     })
   })
 })
@@ -84,7 +97,9 @@ describe('getAuthInputPatch', () => {
       getAuthInputPatch('passwordResetTime', '30', BASE_FIELD_VALUES)
     ).toEqual({ data: { passwordResetTime: 30 * 24 * 60 * 60 } })
   })
+})
 
+describe('getAuditInputPatch', () => {
   it('should not patch minLengthOfReasonForInteraction when parent is off', () => {
     const fieldValues: FieldValues = {
       ...BASE_FIELD_VALUES,
@@ -92,7 +107,7 @@ describe('getAuthInputPatch', () => {
     }
 
     expect(
-      getAuthInputPatch('minLengthOfReasonForInteraction', '10', fieldValues)
+      getAuditInputPatch('minLengthOfReasonForInteraction', '10', fieldValues)
     ).toBeNull()
   })
 })

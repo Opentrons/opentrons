@@ -36,6 +36,7 @@ import {
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
 import { MediumButton, SmallButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { OddModal, SmallModalChildren } from '/app/molecules/OddModal'
 import {
@@ -344,8 +345,8 @@ export function ProtocolDetails(): JSX.Element | null {
     last(protocolRecord?.data.analysisSummaries)?.id ?? null,
     { enabled: protocolRecord != null }
   )
-
-  const { createRun } = useCreateRunMutation({
+  const documentationState = useDocumentationState()
+  const { createRun } = useCreateRunMutation(documentationState, {
     onSuccess: data => {
       queryClient
         .invalidateQueries(getQueryKey(host, 'runs'))
@@ -398,8 +399,10 @@ export function ProtocolDetails(): JSX.Element | null {
             response.data.links?.referencingRuns.map(({ id }) => id) ?? []
         )
         .then(referencingRunIds =>
+          // eslint-disable-next-line opentrons/no-direct-mutating -- TODO(jj, 07-21-26): no direct mutations
           Promise.all(referencingRunIds?.map(runId => deleteRun(host, runId)))
         )
+        // eslint-disable-next-line opentrons/no-direct-mutating -- TODO(jj, 07-21-26): no direct mutations
         .then(() => deleteProtocol(host, protocolId))
         .then(() => {
           navigate('/protocols')

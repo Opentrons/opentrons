@@ -3,10 +3,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   useAccessControlEnabledQuery,
-  useAuthSettingsQuery,
+  useAuditSettingsQuery,
 } from '@opentrons/react-api-client'
 
-import { useCurrentUsername } from '/app/redux/robot-auth'
+import { useUsernameForRobot } from '/app/redux/robot-auth'
 
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../__fixtures__/documentationState'
 import { usePromptForDocumentation } from '../usePromptForDocumentation'
@@ -20,7 +20,7 @@ import type ReactRedux from 'react-redux'
 import type { DocumentationReport } from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', () => ({
-  useAuthSettingsQuery: vi.fn(),
+  useAuditSettingsQuery: vi.fn(),
   useAccessControlEnabledQuery: vi.fn(),
 }))
 
@@ -37,7 +37,7 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
   const actual = await importOriginal()
   return {
     ...(actual as any),
-    useCurrentUsername: vi.fn(() => 'alice'),
+    useUsernameForRobot: vi.fn(() => 'alice'),
     useCurrentRobotName: vi.fn(() => 'otie'),
   }
 })
@@ -47,14 +47,14 @@ const wrapper = wrapWithDocumentationRequiredModal()
 
 describe('usePromptForDocumentation', () => {
   beforeEach(() => {
-    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+    vi.mocked(useAuditSettingsQuery).mockReturnValue({
       data: {
         data: {
           requireReasonForInteraction: true,
           minLengthOfReasonForInteraction: 10,
         },
       },
-    } as ReturnType<typeof useAuthSettingsQuery>)
+    } as ReturnType<typeof useAuditSettingsQuery>)
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
       data: {
         data: {
@@ -72,14 +72,14 @@ describe('usePromptForDocumentation', () => {
   })
 
   it('does not prompt when access control is disabled', () => {
-    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+    vi.mocked(useAuditSettingsQuery).mockReturnValue({
       data: {
         data: {
           requireReasonForInteraction: true,
           minLengthOfReasonForInteraction: 10,
         },
       },
-    } as ReturnType<typeof useAuthSettingsQuery>)
+    } as ReturnType<typeof useAuditSettingsQuery>)
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
       data: {
         data: {
@@ -107,14 +107,14 @@ describe('usePromptForDocumentation', () => {
         },
       },
     } as ReturnType<typeof useAccessControlEnabledQuery>)
-    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+    vi.mocked(useAuditSettingsQuery).mockReturnValue({
       data: {
         data: {
           requireReasonForInteraction: false,
           minLengthOfReasonForInteraction: 10,
         },
       },
-    } as ReturnType<typeof useAuthSettingsQuery>)
+    } as ReturnType<typeof useAuditSettingsQuery>)
     const { result } = renderHook(
       () => usePromptForDocumentation(['lpc_flow']),
       {
@@ -130,7 +130,7 @@ describe('usePromptForDocumentation', () => {
     expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
   })
   it('calls onCancel when login modal is dismissed without logging in', async () => {
-    vi.mocked(useCurrentUsername).mockReturnValue(null)
+    vi.mocked(useUsernameForRobot).mockReturnValue(null)
     vi.mocked(mockShowLoginModal).mockResolvedValue(null)
     const onCancel = vi.fn()
 
@@ -168,6 +168,36 @@ describe('usePromptForDocumentation', () => {
       ) {
         expect(result.current.docreport).toEqual(mockDocreport)
       }
+    })
+  })
+
+  it('does not prompt when promptEnabled is false', async () => {
+    const { result, rerender } = renderHook(
+      ({ promptEnabled }) =>
+        usePromptForDocumentation(
+          ['lpc_flow'],
+          undefined,
+          undefined,
+          promptEnabled
+        ),
+      {
+        wrapper,
+        initialProps: { promptEnabled: false },
+      }
+    )
+
+    await waitFor(() => {
+      expect(
+        !result.current.isLoading && result.current.accessControlEnabled
+      ).toBe(true)
+    })
+
+    expect(mockShowDocumentationRequiredModal).not.toHaveBeenCalled()
+
+    rerender({ promptEnabled: true })
+
+    await waitFor(() => {
+      expect(mockShowDocumentationRequiredModal).toHaveBeenCalledTimes(1)
     })
   })
 })

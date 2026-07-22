@@ -40,7 +40,8 @@ export function useCreateSplashMutation(
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
-
+  // For factory use only, does not require documentation.
+  // eslint-disable-next-line opentrons/no-direct-use-mutation
   const mutation = useMutation<
     AxiosResponse<void>,
     AxiosError<ErrorResponse>,

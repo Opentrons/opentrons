@@ -17,8 +17,12 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { usePostWifiDisconnectMutation } from '@opentrons/react-api-client'
+import {
+  isDocumentedMutationError,
+  usePostWifiDisconnectMutation,
+} from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useRobot } from '/app/redux-resources/robots'
 import { CONNECTABLE } from '/app/redux/discovery'
 import { clearWifiStatus, getNetworkInterfaces } from '/app/redux/networking'
@@ -37,7 +41,8 @@ export const DisconnectModal = ({
 }: DisconnectModalProps): JSX.Element => {
   const { t } = useTranslation(['device_settings', 'shared', 'branded'])
 
-  const disconnectMutation = usePostWifiDisconnectMutation()
+  const documentationState = useDocumentationState(undefined, robotName)
+  const disconnectMutation = usePostWifiDisconnectMutation(documentationState)
 
   const wifiList = useWifiList(robotName)
   const { wifi } = useSelector((state: State) =>
@@ -49,11 +54,25 @@ export const DisconnectModal = ({
 
   const handleDisconnect = (): void => {
     if (ssid != null) {
-      disconnectMutation.mutate({ ssid })
+      disconnectMutation.mutate(
+        { ssid },
+        {
+          onError: error => {
+            // User cancelled the documentation/login modal — stay on the confirm UI.
+            if (isDocumentedMutationError(error)) {
+              disconnectMutation.reset()
+            }
+          },
+        }
+      )
     }
   }
 
   const dispatch = useDispatch<Dispatch>()
+
+  const isDocumentedCancel =
+    disconnectMutation.error != null &&
+    isDocumentedMutationError(disconnectMutation.error)
 
   // if the disconnect request is sent when there is no wired connection, we will not receive a success response to the request once wi-fi has disconnected
   // check for connectable robot health status and presume successful disconnection if request pending and robot not connectable
@@ -61,8 +80,11 @@ export const DisconnectModal = ({
   const isDisconnected =
     disconnectMutation.status === 'success' ||
     ((disconnectMutation.status === 'loading' ||
-      disconnectMutation.status === 'error') &&
+      (disconnectMutation.status === 'error' && !isDocumentedCancel)) &&
       (status !== CONNECTABLE || wifi?.ipAddress == null))
+
+  const showDisconnectError =
+    disconnectMutation.status === 'error' && !isDocumentedCancel
 
   let disconnectModalBody: string = t('are_you_sure_you_want_to_disconnect', {
     ssid,
@@ -71,7 +93,7 @@ export const DisconnectModal = ({
     disconnectModalBody = t('disconnect_from_wifi_network_success')
   } else if (disconnectMutation.status === 'loading') {
     disconnectModalBody = t('disconnecting_from_wifi_network', { ssid })
-  } else if (disconnectMutation.status === 'error') {
+  } else if (showDisconnectError) {
     disconnectModalBody = t('disconnect_from_wifi_network_failure', { ssid })
   }
 
@@ -97,7 +119,7 @@ export const DisconnectModal = ({
       onClose={onCancel}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        {disconnectMutation.status === 'error' ? (
+        {showDisconnectError ? (
           <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
             {disconnectMutation.error != null &&
             'message' in disconnectMutation.error
@@ -108,7 +130,7 @@ export const DisconnectModal = ({
         <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
           {disconnectModalBody}
         </LegacyStyledText>
-        {disconnectMutation.status === 'error' ? (
+        {showDisconnectError ? (
           <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
             {t('branded:general_error_message')}
           </LegacyStyledText>

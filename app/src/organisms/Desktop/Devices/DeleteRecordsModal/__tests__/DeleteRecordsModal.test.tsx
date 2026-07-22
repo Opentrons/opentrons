@@ -37,14 +37,14 @@ describe('DeleteRecordsModal', () => {
     )
   })
 
-  it('renders allLogs copy', () => {
-    render('allLogs')
-    screen.getByText('Delete all logs?')
+  it('renders selectedLogs copy', () => {
+    render('selectedLogs')
+    screen.getByText('Delete all selected user action logs?')
     screen.getByText(
-      'Deleting all logs will permanently remove them from the robot. This action cannot be undone.'
+      'Deleting all selected user action logs will permanently remove them from the robot. This action cannot be undone.'
     )
     screen.getByText(
-      'We recommend downloading all log files before proceeding.'
+      'We recommend downloading all user action logs before proceeding.'
     )
   })
 })

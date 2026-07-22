@@ -16,8 +16,6 @@ export interface AuthSettingsData {
   passwordComplexityMinimumLength?: number | null
   passwordComplexitySpecialCharacters?: boolean | null
   idleLogout?: number | null
-  requireReasonForInteraction?: boolean | null
-  minLengthOfReasonForInteraction?: number | null
   requireAdminCredsWhenUpdatingRobotSoftware?: boolean | null
   requireAdminCredsWhenSendingProtocolToRobot?: boolean | null
   requireAdminCredsForSignoffProtocol?: boolean | null

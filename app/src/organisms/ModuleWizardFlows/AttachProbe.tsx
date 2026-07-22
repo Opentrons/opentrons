@@ -15,6 +15,7 @@ import { LEFT, WASTE_CHUTE_FIXTURES } from '@opentrons/shared-data'
 import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
@@ -42,6 +43,7 @@ export function AttachProbe(props: AttachProbeProps): JSX.Element {
     goBack,
     chainRunCommands,
     setErrorMessage,
+    setIsDoorOpenError,
     adapterId,
     isRobotMoving,
     attachedModule,
@@ -109,7 +111,12 @@ export function AttachProbe(props: AttachProbeProps): JSX.Element {
         proceed()
       })
       .catch((e: Error) => {
-        setErrorMessage(`error starting module calibration: ${e.message}`)
+        if (isMaintenanceDoorOpenError(e)) {
+          setIsDoorOpenError(true)
+          setErrorMessage(t('module_wizard_flows:door_is_open') as string)
+        } else {
+          setErrorMessage(`error starting module calibration: ${e.message}`)
+        }
       })
   }
 

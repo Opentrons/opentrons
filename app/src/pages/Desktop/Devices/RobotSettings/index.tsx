@@ -81,12 +81,12 @@ export function RobotSettingsComponent({
     camera: (
       <RobotSettingsCamera robotName={robotName} isRobotBusy={isRobotBusy} />
     ),
-    'file-manager': <RobotSettingsFileManager />,
+    'file-manager': <RobotSettingsFileManager robotName={robotName} />,
     advanced: (
       <RobotSettingsAdvanced robotName={robotName} isRobotBusy={isRobotBusy} />
     ),
     'compliance-ready': <RobotSettingsComplianceReady robotName={robotName} />,
-    'feature-flags': <RobotSettingsFeatureFlags robotName={robotName} />,
+    'feature-flags': <RobotSettingsFeatureFlags />,
   }
 
   const devToolsOn = useSelector(getDevtoolsEnabled)
