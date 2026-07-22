@@ -44,6 +44,8 @@ export function useDeleteSelectedRuns(
       let hasDeleteError = false
       return Promise.all(
         runs.map(run =>
+          // deleteRun call is safe here within /app since we are wrapped in a useDocumentedMutation
+          // eslint-disable-next-line opentrons/no-direct-mutating
           deleteRun(currentHost, run.id, userNotes).catch((e: Error) => {
             makeToast(e.message, ERROR_TOAST, { closeButton: true })
             hasDeleteError = true
