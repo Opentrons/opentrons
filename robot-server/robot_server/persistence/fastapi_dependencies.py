@@ -17,13 +17,13 @@ from server_utils.fastapi_utils.app_state import (
 )
 from server_utils.persistence.persistence_directory import (
     PersistenceResetter,
+    cleanup_persistence_temp_directory,
 )
 
 from .database import create_sql_engine
 from .file_and_directory_names import DB_FILE
 from .images_directory import ImagesResetter, prepare_images_directory
 from .manage_persistence_directory import prepare_active_subdirectory, prepare_root
-from robot_server.data_files.zip_utils import cleanup_orphaned_download_staging_dirs
 from robot_server.errors.error_responses import ErrorDetails
 
 _log = logging.getLogger(__name__)
@@ -69,7 +69,10 @@ def start_initializing_persistence(  # noqa: C901
 
     async def init_root_persistence_directory() -> Path:
         try:
-            return await prepare_root(persistence_directory_root)
+            prepared_root = await prepare_root(persistence_directory_root)
+            await to_thread.run_sync(cleanup_persistence_temp_directory, prepared_root)
+            
+            return prepared_root
         except Exception:
             _log.exception(
                 "Exception initializing persistence directory root in the background."
@@ -84,11 +87,7 @@ def start_initializing_persistence(  # noqa: C901
             assert root_prep_task is not None
             prepared_root = await root_prep_task
 
-            active_subdirectory = await prepare_active_subdirectory(prepared_root)
-            await to_thread.run_sync(
-                cleanup_orphaned_download_staging_dirs, active_subdirectory
-            )
-            return active_subdirectory
+            return await prepare_active_subdirectory(prepared_root)
 
         except Exception:
             _log.exception(
@@ -271,7 +270,7 @@ async def get_active_persistence_directory_failsafe(
         return None
 
 
-async def _get_persistence_directory_root(
+async def get_persistence_directory_root(
     app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> Path:
     """Return the root persistence directory.
@@ -287,7 +286,7 @@ async def _get_persistence_directory_root(
 
 async def get_persistence_resetter(
     # We want to reset everything, not only the *active* persistence directory.
-    directory_to_reset: Annotated[Path, Depends(_get_persistence_directory_root)],
+    directory_to_reset: Annotated[Path, Depends(get_persistence_directory_root)],
 ) -> PersistenceResetter:
     """Get a `PersistenceResetter` to reset the robot-server's stored data."""
     return PersistenceResetter(directory_to_reset)

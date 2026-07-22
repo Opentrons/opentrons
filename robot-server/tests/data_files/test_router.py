@@ -779,7 +779,7 @@ async def test_download_run_images_success(
         data_files_store=data_files_store,
         run_store=run_store,
         protocol_store=protocol_store,
-        persistence_directory=tmp_path,
+        persistence_directory_root=tmp_path,
     )
 
     assert result.media_type == "application/zip"
@@ -816,7 +816,7 @@ async def test_download_run_images_no_images_found(
             data_files_store=data_files_store,
             run_store=run_store,
             protocol_store=protocol_store,
-            persistence_directory=tmp_path,
+            persistence_directory_root=tmp_path,
         )
 
     assert exc_info.value.status_code == 404
