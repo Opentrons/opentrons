@@ -48,13 +48,8 @@ class RunProcessPyroProvider:
         If feature flag is on for running as a user with limited permissions then
         ensure the protocol user name is set.
         """
-        if feature_flags.run_protocol_as_restricted_user() or access_control_mode:
-            self._protocol_username = _RESTRICTED_USER_NAME
-        elif (
-            feature_flags.run_protocol_as_restricted_user() is False
-            and access_control_mode is False
-        ):
-            self._protocol_username = _ROOT_USER_NAME
+        self._protocol_username = _ROOT_USER_NAME
+        self._update_user_subprocess(access_control_mode)
         if feature_flags.protocol_subprocess_enabled():
             register_process_types()
             self._start_run_process()
@@ -76,14 +71,7 @@ class RunProcessPyroProvider:
     async def refresh(self, access_control_mode: bool) -> None:
         """Ends the currently running process and starts a new one."""
         await self._end_run_process()
-        # Validate user level settings
-        if feature_flags.run_protocol_as_restricted_user() or access_control_mode:
-            self._protocol_username = _RESTRICTED_USER_NAME
-        elif (
-            feature_flags.run_protocol_as_restricted_user() is False
-            and access_control_mode is False
-        ):
-            self._protocol_username = _ROOT_USER_NAME
+        self._update_user_subprocess(access_control_mode=access_control_mode)
         with Pyro5.api.locate_ns() as ns:
             ns.remove(_RUN_PROXY_NAME)
         self._start_run_process()
@@ -91,14 +79,7 @@ class RunProcessPyroProvider:
     async def refresh_simulating(self, access_control_mode: bool) -> None:
         """Ends the currently running simulating process and starts a new one."""
         await self._end_simulating_process()
-        # Validate user level settings
-        if feature_flags.run_protocol_as_restricted_user() or access_control_mode:
-            self._protocol_username = _RESTRICTED_USER_NAME
-        elif (
-            feature_flags.run_protocol_as_restricted_user() is False
-            and access_control_mode is False
-        ):
-            self._protocol_username = _ROOT_USER_NAME
+        self._update_user_subprocess(access_control_mode=access_control_mode)
         with Pyro5.api.locate_ns() as ns:
             ns.remove(_SIMULATING_RUN_PROXY_NAME)
         self._start_simulating_process()
@@ -203,3 +184,10 @@ class RunProcessPyroProvider:
 
         await self._end_process(self._simulating_run_process)
         self._simulating_run_process = None
+
+    def _update_user_subprocess(self, access_control_mode: bool) -> None:
+        """Update which system user should execute the protocol subprocess."""
+        if feature_flags.run_protocol_as_restricted_user() or access_control_mode:
+            self._protocol_username = _RESTRICTED_USER_NAME
+        else:
+            self._protocol_username = _ROOT_USER_NAME
