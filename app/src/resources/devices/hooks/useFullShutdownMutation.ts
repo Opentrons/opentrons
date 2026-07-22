@@ -1,3 +1,4 @@
+/* eslint-disable opentrons/no-direct-mutating */
 import { createLiveCommand, setLights, shutdown } from '@opentrons/api-client'
 import { useDocumentedMutation, useHost } from '@opentrons/react-api-client'
 
