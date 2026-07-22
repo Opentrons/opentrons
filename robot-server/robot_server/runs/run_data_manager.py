@@ -200,6 +200,7 @@ class RunDataManager:
         run_time_param_paths: Optional[CSVRuntimeParamPaths],
         notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
+        access_control_status: bool,
     ) -> Union[Run, BadRun]:
         """Create a new, current run.
 
@@ -213,6 +214,7 @@ class RunDataManager:
             run_time_param_values: Any runtime parameter values to set.
             run_time_param_paths: Any runtime filepath to set.
             protocol: The protocol to load the runner with, if any.
+            access_control_status: Status of the Auth-Server access control enablement.
 
         Returns:
             The run resource.
@@ -221,6 +223,9 @@ class RunDataManager:
             RunConflictError: There is a currently active run that cannot
                 be superceded by this new run.
         """
+        self._run_orchestrator_store.set_access_control_status(
+            access_control_mode=access_control_status
+        )
         prev_run_id = self._run_orchestrator_store.current_run_id
         if prev_run_id is not None:
             # Allow clear() to propagate RunConflictError.

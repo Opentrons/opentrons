@@ -77,7 +77,7 @@ def protocol_store(sql_engine: SQLEngine) -> ProtocolStore:
 @pytest.fixture
 def subject(sql_engine: SQLEngine) -> AnalysisStore:
     """Return the `AnalysisStore` test subject."""
-    return AnalysisStore(sql_engine=sql_engine)
+    return AnalysisStore(sql_engine=sql_engine, access_control_status=False)
 
 
 def make_dummy_protocol_resource(protocol_id: str) -> ProtocolResource:
@@ -395,7 +395,11 @@ async def test_update_adds_rtp_values_to_completed_store(
     )
 
     mock_completed_store = decoy.mock(cls=CompletedAnalysisStore)
-    subject = AnalysisStore(sql_engine=sql_engine, completed_store=mock_completed_store)
+    subject = AnalysisStore(
+        sql_engine=sql_engine,
+        access_control_status=False,
+        completed_store=mock_completed_store,
+    )
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
 
     subject.add_pending(
@@ -566,7 +570,11 @@ async def test_save_initialization_failed_analysis(
     )
 
     mock_completed_store = decoy.mock(cls=CompletedAnalysisStore)
-    subject = AnalysisStore(sql_engine=sql_engine, completed_store=mock_completed_store)
+    subject = AnalysisStore(
+        sql_engine=sql_engine,
+        access_control_status=False,
+        completed_store=mock_completed_store,
+    )
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
 
     await subject.save_initialization_failed_analysis(
@@ -642,7 +650,11 @@ async def test_matching_rtp_values_in_analysis(
 ) -> None:
     """It should return whether the client's RTP values match with those in the last analysis of protocol."""
     mock_completed_store = decoy.mock(cls=CompletedAnalysisStore)
-    subject = AnalysisStore(sql_engine=sql_engine, completed_store=mock_completed_store)
+    subject = AnalysisStore(
+        sql_engine=sql_engine,
+        access_control_status=False,
+        completed_store=mock_completed_store,
+    )
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
 
     decoy.when(
@@ -686,7 +698,11 @@ async def test_matching_rtp_values_in_analysis_with_no_rtps(
 ) -> None:
     """It should handle the cases of no RTPs, either previously or newly, appropriately."""
     mock_completed_store = decoy.mock(cls=CompletedAnalysisStore)
-    subject = AnalysisStore(sql_engine=sql_engine, completed_store=mock_completed_store)
+    subject = AnalysisStore(
+        sql_engine=sql_engine,
+        access_control_status=False,
+        completed_store=mock_completed_store,
+    )
     protocol_store.insert(make_dummy_protocol_resource(protocol_id="protocol-id"))
 
     decoy.when(

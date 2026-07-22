@@ -65,6 +65,7 @@ async def subject(
         robot_type="OT-2 Standard",
         deck_type=pe_types.DeckType.OT2_SHORT_TRASH,
         run_process_pyro_provider=mock_run_process_pyro_provider,
+        access_control_status=False,
     )
 
 
@@ -134,6 +135,7 @@ async def test_create_engine_uses_robot_type(
         robot_type=robot_type,
         deck_type=deck_type,
         run_process_pyro_provider=mock_run_process_pyro_provider,
+        access_control_status=False,
     )
 
     await subject.create(
@@ -345,6 +347,7 @@ async def test_get_default_orchestrator_robot_type(
         robot_type=robot_type,
         deck_type=deck_type,
         run_process_pyro_provider=mock_run_process_pyro_provider,
+        access_control_status=False,
     )
 
     result = await subject.get_default_orchestrator()
