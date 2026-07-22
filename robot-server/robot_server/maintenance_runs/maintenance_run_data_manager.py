@@ -287,7 +287,6 @@ class MaintenanceRunDataManager:
         return self._run_orchestrator_store.get_command(command_id=command_id)
 
     def _get_state_summary(self, run_id: str) -> Optional[StateSummary]:
-        # Return None if the orchestrator is already gone (late PE notify after clear).
         try:
             return self._run_orchestrator_store.get_state_summary()
         except NoRunOrchestrator:
