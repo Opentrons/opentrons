@@ -25,6 +25,7 @@ describe('requireDocumentation', () => {
     expect(showDocumentationRequiredModal).toHaveBeenCalledWith(
       'alice',
       [],
+      0,
       undefined
     )
   })
