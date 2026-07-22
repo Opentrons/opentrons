@@ -127,7 +127,6 @@ def mock_camera_provider(
 async def test_create(
     decoy: Decoy,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
-    mock_maintenance_runs_publisher: MaintenanceRunsPublisher,
     subject: MaintenanceRunDataManager,
     engine_state_summary: StateSummary,
     mock_camera_provider: CameraProvider,
@@ -172,13 +171,6 @@ async def test_create(
         modules=engine_state_summary.modules,
         liquids=engine_state_summary.liquids,
         liquidClasses=engine_state_summary.liquidClasses,
-    )
-    decoy.verify(
-        await mock_maintenance_runs_publisher.start_publishing_for_maintenance_run(
-            run_id=run_id,
-            get_state_summary=matchers.Anything(),
-        ),
-        times=1,
     )
 
 

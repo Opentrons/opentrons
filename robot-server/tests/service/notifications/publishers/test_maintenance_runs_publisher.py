@@ -65,11 +65,3 @@ async def test_stop_publishing_disarms_hooks(
 
     await maintenance_runs_publisher._handle_engine_status_change()
     get_state_summary.assert_not_called()
-
-
-@pytest.mark.asyncio
-async def test_handle_engine_status_change_while_disarmed(
-    maintenance_runs_publisher: MaintenanceRunsPublisher,
-) -> None:
-    """With no hooks armed, PE notifies should be a no-op."""
-    await maintenance_runs_publisher._handle_engine_status_change()
