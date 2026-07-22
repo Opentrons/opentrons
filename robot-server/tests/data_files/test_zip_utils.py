@@ -21,6 +21,7 @@ from robot_server.data_files.data_files_store import (
 )
 from robot_server.data_files.zip_utils import (
     build_run_zip_filename,
+    cleanup_orphaned_download_staging_dirs,
     collect_existing_run_images,
     collect_existing_run_output_csvs,
     create_download_staging_dir,
@@ -289,3 +290,36 @@ def test_build_run_zip_filename_missing_protocol_uses_fallback(
 def test_sanitize_filename_component() -> None:
     """It should replace unsafe characters."""
     assert sanitize_filename_component("Test Protocol!") == "Test_Protocol_"
+
+
+def test_cleanup_orphaned_download_staging_dirs(tmp_path: Path) -> None:
+    """It should remove only abandoned download staging entries."""
+    staging_root = tmp_path / "persistence"
+    staging_root.mkdir()
+
+    orphan_dir = staging_root / "temp-download-staging-abc123"
+    orphan_dir.mkdir()
+    (orphan_dir / "download.zip").write_bytes(b"zip")
+
+    orphan_file = staging_root / "temp-download-staging-orphan.file"
+    orphan_file.write_text("leftover")
+
+    keep_dir = staging_root / "protocols"
+    keep_dir.mkdir()
+    (keep_dir / "protocol.py").write_text("print('hi')")
+
+    keep_file = staging_root / "robot_server.db"
+    keep_file.write_bytes(b"db")
+
+    cleanup_orphaned_download_staging_dirs(staging_root)
+
+    assert not orphan_dir.exists()
+    assert not orphan_file.exists()
+    assert keep_dir.exists()
+    assert (keep_dir / "protocol.py").exists()
+    assert keep_file.exists()
+
+
+def test_cleanup_orphaned_download_staging_dirs_missing_root(tmp_path: Path) -> None:
+    """It should no-op when the staging root does not exist."""
+    cleanup_orphaned_download_staging_dirs(tmp_path / "does-not-exist")
