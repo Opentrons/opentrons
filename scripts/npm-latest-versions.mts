@@ -6,7 +6,7 @@
  * PACKAGES below or pass extra names as argv (after --).
  *
  * Run from repo root:
- *   node --experimental-strip-types js-package-testing/npm-latest-versions.mts
+ *   node --experimental-strip-types scripts/npm-latest-versions.mts
  *
  * Options:
  *   --registry <url>   npm registry (default: https://registry.npmjs.org)
@@ -18,8 +18,8 @@
  *   Prefer env vars over flags so tokens do not end up in shell history.
  *
  * Examples:
- *   node --experimental-strip-types js-package-testing/npm-latest-versions.mts
- *   node --experimental-strip-types js-package-testing/npm-latest-versions.mts --registry https://registry.npmjs.org -- @opentrons/api-client
+ *   node --experimental-strip-types scripts/npm-latest-versions.mts
+ *   node --experimental-strip-types scripts/npm-latest-versions.mts --registry https://registry.npmjs.org -- @opentrons/api-client
  */
 
 // ---------------------------------------------------------------------------

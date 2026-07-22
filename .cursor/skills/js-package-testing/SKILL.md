@@ -46,7 +46,8 @@ Library runtime deps (`styled-components`, `redux`, etc.) are bundled; host app 
 3. `pnpm install` with `link:pack/...` deps
 4. `pnpm-workspace.yaml` **overrides** pin transitive `@opentrons/*` to `pack/`
 
-Shared patching: `package-json-patches.mts` (used by `publish.mts` and `patch-packed-packages.mts`).
+Shared patching: `scripts/package-json-patches.mts` (single source of truth for
+`scripts/publish.mts` and `patch-packed-packages.mts`).
 
 ## Publish
 
@@ -67,14 +68,15 @@ Never publish raw monorepo manifests (`workspace:*`, `catalog:` break npm consum
 
 ```text
 scripts/
-├── next-npm-version.mts      # patch bump from npm latest
-└── publish.mts               # npm publish pipeline
+├── next-npm-version.mts       # patch bump from npm latest
+├── npm-latest-versions.mts    # print npm dist-tags
+├── package-json-patches.mts   # single source of truth for published manifests
+└── publish.mts                # npm publish pipeline
 
 js-package-testing/
 ├── Makefile
 ├── package.json
-├── package-json-patches.mts  # shared by publish.mts + pack/
-├── patch-packed-packages.mts
+├── patch-packed-packages.mts  # applies scripts/package-json-patches to pack/
 ├── pnpm-workspace.yaml
 ├── playwright.config.ts
 ├── cssModulesSideEffect.ts

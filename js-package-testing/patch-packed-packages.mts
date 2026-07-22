@@ -9,7 +9,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import * as path from 'node:path'
 
-import { patchPackageJsonByName } from './package-json-patches.mts'
+import { patchPackageJsonByName } from '../scripts/package-json-patches.mts'
 
 const PACK_VERSION = '0.0.0-dev'
 

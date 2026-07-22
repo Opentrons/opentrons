@@ -53,7 +53,7 @@ import {
   patchProtocolVisualizationPackageJson,
   patchSharedDataPackageJson,
   patchStepGenerationPackageJson,
-} from '../js-package-testing/package-json-patches.mts'
+} from './package-json-patches.mts'
 
 // ---------------------------------------------------------------------------
 // CLI arg parsing

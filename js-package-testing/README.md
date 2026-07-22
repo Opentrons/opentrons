@@ -145,7 +145,9 @@ specifiers that **do not work on npm**. Always publish with
 [`../scripts/publish.mts`](../scripts/publish.mts) (not raw `pnpm pack` +
 `npm publish`).
 
-Shared patching logic lives in [`package-json-patches.mts`](package-json-patches.mts).
+Shared patching logic lives in
+[`../scripts/package-json-patches.mts`](../scripts/package-json-patches.mts)
+(single source of truth for both `scripts/publish.mts` and local `pack/`).
 It rewrites:
 
 - `workspace:*` / `link:` → matching publish semver for `@opentrons/*` deps
@@ -287,18 +289,23 @@ when keys change.
 
 Direct deps use `link:pack/opentrons-*`. [`pnpm-workspace.yaml`](pnpm-workspace.yaml) **`overrides`** force the same four paths for transitive `@opentrons/*` resolution.
 
-After extraction, [`patch-packed-packages.mts`](patch-packed-packages.mts) rewrites each `pack/*/package.json` using the same logic as [`../scripts/publish.mts`](../scripts/publish.mts) / [`package-json-patches.mts`](package-json-patches.mts): `workspace:*` and `catalog:` become concrete semver, `@types/*` move to devDependencies, and export maps match npm publishes.
+After extraction, [`patch-packed-packages.mts`](patch-packed-packages.mts) rewrites each `pack/*/package.json` using [`../scripts/package-json-patches.mts`](../scripts/package-json-patches.mts) (same module as `scripts/publish.mts`): `workspace:*` and `catalog:` become concrete semver, `@types/*` move to devDependencies, and export maps match npm publishes.
 
 The `pack/` directory is gitignored. Committed `link:` entries and `pnpm-lock.yaml` describe the strategy; linked contents can change without lockfile churn for those packages.
 
 ## Project structure
 
 ```text
+scripts/
+├── publish.mts                # npm publish pipeline
+├── next-npm-version.mts       # patch bump from npm latest
+├── npm-latest-versions.mts    # print npm dist-tags
+└── package-json-patches.mts   # single source of truth for published manifests
+
 js-package-testing/
 ├── Makefile
 ├── package.json
-├── package-json-patches.mts   # shared publish / pack manifest patching
-├── patch-packed-packages.mts  # applies patches to pack/ after extract
+├── patch-packed-packages.mts  # applies scripts/package-json-patches to pack/
 ├── pnpm-workspace.yaml
 ├── playwright.config.ts
 ├── vite.config.mts
