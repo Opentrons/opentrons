@@ -74,7 +74,7 @@ describe('DownloadProtocolRunRecordsWizard', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
 
     screen.getByText('Delete all protocol run records after download?')
-    fireEvent.click(screen.getByText('Keep records'))
+    fireEvent.click(screen.getByText('No'))
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
 
     screen.getByText('Downloading all protocol files')
@@ -90,7 +90,7 @@ describe('DownloadProtocolRunRecordsWizard', () => {
     render()
 
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
-    fireEvent.click(screen.getByText('Yes, delete records'))
+    fireEvent.click(screen.getByText('Yes'))
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
 
     await waitFor(() => {
@@ -108,7 +108,7 @@ describe('DownloadProtocolRunRecordsWizard', () => {
     render()
 
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
-    fireEvent.click(screen.getByText('Keep records'))
+    fireEvent.click(screen.getByText('No'))
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
 
     await waitFor(() => {
@@ -127,7 +127,7 @@ describe('DownloadProtocolRunRecordsWizard', () => {
     render()
 
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
-    fireEvent.click(screen.getByText('Yes, delete records'))
+    fireEvent.click(screen.getByText('Yes'))
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
 
     await waitFor(() => {
@@ -139,7 +139,7 @@ describe('DownloadProtocolRunRecordsWizard', () => {
     render()
 
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
-    fireEvent.click(screen.getByText('Keep records'))
+    fireEvent.click(screen.getByText('No'))
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
 
     await waitFor(() => {

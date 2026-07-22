@@ -64,8 +64,8 @@ export function DownloadProtocolRunRecordsWizard({
   }
 
   const deleteChoices = [
-    { value: true, label: t('yes_delete_records') },
-    { value: false, label: t('keep_records') },
+    { value: true, label: t('yes') },
+    { value: false, label: t('no') },
   ]
 
   const handleContinueFromUsb = (path: string): void => {
