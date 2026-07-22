@@ -194,6 +194,7 @@ class RunOrchestratorStore:
             deck_type: Passed along to `opentrons.protocol_engine.Config`.
             run_process_pyro_provider: If in protocol subprocess mode, provides
                 the run process proxy when running a protocol.
+            access_control_status: Status of the Auth-Server access control enablement.
         """
         self._hardware_api = hardware_api
         self._robot_type = robot_type

@@ -64,11 +64,12 @@ class AlwaysAllowedAuthorizationChecker(AuthorizationChecker):
     async def check(self, token: str | None, required_scopes: set[Scope]) -> Result:
         """See base class for documentation."""
         return AuthorizationNotRequiredResult()
-    
+
     @override
     async def access_control_status(self) -> bool:
         """See base class for documentation."""
         return True
+
 
 class AuthServerAuthorizationChecker(AuthorizationChecker):
     """An `AuthorizationChecker` that queries auth-server to check authorization."""
@@ -122,9 +123,7 @@ class AuthServerAuthorizationChecker(AuthorizationChecker):
     @override
     async def access_control_status(self) -> bool:
         """Check the status of access control enablement."""
-        return (
-            await self._client.get_auth_settings()
-        ).data.accessControlEnabled
+        return (await self._client.get_auth_settings()).data.accessControlEnabled
 
 
 @dataclass

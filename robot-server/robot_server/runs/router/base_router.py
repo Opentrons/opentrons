@@ -227,6 +227,7 @@ async def create_run(  # noqa: C901
         deck_configuration_store: Dependency to fetch the deck configuration.
         camera_provider: Dependency to provide access to the Camera Settings to the run.
         notify_publishers: Utilized by the engine to notify publishers of state changes.
+        access_control_status: Status of the Auth-Server access control enablement.
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None
     offsets = request_body.data.labwareOffsets if request_body is not None else []
