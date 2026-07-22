@@ -23,6 +23,7 @@ from .database import create_sql_engine
 from .file_and_directory_names import DB_FILE
 from .images_directory import ImagesResetter, prepare_images_directory
 from .manage_persistence_directory import prepare_active_subdirectory, prepare_root
+from robot_server.data_files.zip_utils import cleanup_orphaned_download_staging_dirs
 from robot_server.errors.error_responses import ErrorDetails
 
 _log = logging.getLogger(__name__)
@@ -84,6 +85,9 @@ def start_initializing_persistence(  # noqa: C901
             prepared_root = await root_prep_task
 
             active_subdirectory = await prepare_active_subdirectory(prepared_root)
+            await to_thread.run_sync(
+                cleanup_orphaned_download_staging_dirs, active_subdirectory
+            )
             return active_subdirectory
 
         except Exception:
