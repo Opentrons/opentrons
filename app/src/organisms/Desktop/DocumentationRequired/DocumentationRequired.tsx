@@ -23,6 +23,7 @@ interface DocumentationRequiredProps {
   actionsToDocument: DocumentedAction[]
   onConfirm: (note: string) => void
   onClose: () => void
+  minReportLength: number
   initialDocreport?: DocumentationReport
 }
 
@@ -31,15 +32,25 @@ export function DocumentationRequired({
   actionsToDocument,
   onConfirm,
   onClose,
+  minReportLength,
   initialDocreport,
 }: DocumentationRequiredProps): JSX.Element {
   const { t } = useTranslation(['access_control', 'shared'])
   const [inputText, setInputText] = useState<string>(initialDocreport ?? '')
+  const [error, setError] = useState<string | null>(null)
+
+  const handleInputChange = (value: string): void => {
+    setInputText(value)
+    setError(null)
+  }
 
   const trimmedNote = inputText.trim()
-  // TODO(jj): check against min length
   const handleConfirm = (): void => {
     if (trimmedNote === '') return
+    if (trimmedNote.length < minReportLength) {
+      setError(t('must_be_at_least_characters', { minLength: minReportLength }))
+      return
+    }
     onConfirm(trimmedNote)
   }
 
@@ -69,8 +80,12 @@ export function DocumentationRequired({
             <TextAreaField
               multiline
               value={inputText}
+              error={error}
+              // reserve space for the error line so the textarea height
+              // doesn't shift when an error appears; text only shows on error
+              caption={minReportLength > 0 ? '\u00A0' : undefined}
               onChange={e => {
-                setInputText(e.target.value)
+                handleInputChange(e.target.value)
               }}
               label={t('access_control_note', { user: username })}
             />

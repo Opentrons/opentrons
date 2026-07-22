@@ -16,11 +16,13 @@ const DocumentationRequiredModalImpl = NiceModal.create(
   ({
     username,
     actionsToDocument,
+    minReportLength,
     onCancel,
     initialDocreport,
   }: {
     username: string
     actionsToDocument: DocumentedAction[]
+    minReportLength: number
     onCancel?: () => void
     initialDocreport?: DocumentationReport
   }): JSX.Element => {
@@ -46,6 +48,7 @@ const DocumentationRequiredModalImpl = NiceModal.create(
           actionsToDocument={actionsToDocument}
           onConfirm={handleConfirm}
           onClose={handleBack}
+          minReportLength={minReportLength}
           initialDocreport={initialDocreport}
         />
       </ApiHostProvider>,
@@ -57,12 +60,14 @@ const DocumentationRequiredModalImpl = NiceModal.create(
 export const showDocumentationRequiredModal = (
   username: string,
   actionsToDocument: DocumentedAction[],
+  minReportLength: number,
   onCancel?: () => void,
   initialDocreport?: DocumentationReport
 ): Promise<DocumentationReport> =>
   NiceModal.show(DocumentationRequiredModalImpl, {
     username,
     actionsToDocument,
+    minReportLength,
     onCancel,
     initialDocreport,
   })
