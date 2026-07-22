@@ -3,7 +3,7 @@ import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 
 import { getRunRaw } from '@opentrons/api-client'
-import { useHost } from '@opentrons/react-api-client'
+import { useAllProtocolsQuery, useHost } from '@opentrons/react-api-client'
 
 import { saveFileToUsb } from '/app/redux/shell/remote'
 
@@ -26,6 +26,8 @@ export function useDownloadSelectedRuns(
   const [isDownloading, setIsDownloading] = useState(false)
   const [hasError, setHasError] = useState(false)
 
+  const { data: protocols } = useAllProtocolsQuery()
+
   const downloadRuns = (
     runs: readonly RunData[],
     callTimeUsbPath?: string
@@ -41,11 +43,19 @@ export function useDownloadSelectedRuns(
     const effectiveUsbPath = callTimeUsbPath ?? usbPath
     const zip = new JSZip()
     return Promise.all(
-      runs.map(run =>
-        getRunRaw(currentHost, run.id, 'blob').then(res => {
-          zip.file(`${run.id}.json`, res.data)
+      runs.map(run => {
+        const matchingProtocol = protocols?.data.find(
+          ({ id: protocolId }) => run.protocolId === protocolId
+        )
+        const matchingProtocolName = matchingProtocol?.metadata.protocolName
+        const runDateTransformed = run.createdAt.replaceAll(':', '_')
+        return getRunRaw(currentHost, run.id, 'blob').then(res => {
+          zip.file(
+            `${matchingProtocolName ?? run.id}_${runDateTransformed}.zip`,
+            res.data
+          )
         })
-      )
+      })
     )
       .then(() => zip.generateAsync({ type: 'arraybuffer' }))
       .then(async buffer => {
@@ -59,9 +69,10 @@ export function useDownloadSelectedRuns(
       .then(() => {
         setIsDownloading(false)
       })
-      .catch(() => {
+      .catch((e: Error) => {
         setHasError(true)
         setIsDownloading(false)
+        throw e
       })
   }
 

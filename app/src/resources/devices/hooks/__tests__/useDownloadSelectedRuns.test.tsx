@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import { getRunRaw } from '@opentrons/api-client'
-import { useHost } from '@opentrons/react-api-client'
+import { useAllProtocolsQuery, useHost } from '@opentrons/react-api-client'
 
 import { saveFileToUsb } from '/app/redux/shell/remote'
 
@@ -31,12 +31,21 @@ vi.mock('/app/redux/shell/remote', () => ({ saveFileToUsb: vi.fn() }))
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const ROBOT_NAME = 'otie'
-const mockRunOne = { id: 'run-1' } as RunData
-const mockRunTwo = { id: 'run-2' } as RunData
+const mockRunOne = {
+  id: 'run-1',
+  createdAt: '2024-01-01T10:00:00.000Z',
+  protocolId: null,
+} as unknown as RunData
+const mockRunTwo = {
+  id: 'run-2',
+  createdAt: '2024-01-02T10:00:00.000Z',
+  protocolId: null,
+} as unknown as RunData
 
 describe('useDownloadSelectedRuns', () => {
   beforeEach(() => {
     when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
+    vi.mocked(useAllProtocolsQuery).mockReturnValue({ data: undefined } as any)
     vi.mocked(getRunRaw).mockResolvedValue({ data: 'raw-run-data' } as any)
     mockJSZip.file.mockClear()
     mockJSZip.generateAsync.mockClear()
@@ -65,8 +74,14 @@ describe('useDownloadSelectedRuns', () => {
 
     expect(getRunRaw).toHaveBeenCalledWith(HOST_CONFIG, 'run-1', 'blob')
     expect(getRunRaw).toHaveBeenCalledWith(HOST_CONFIG, 'run-2', 'blob')
-    expect(mockJSZip.file).toHaveBeenCalledWith('run-1.json', 'raw-run-data')
-    expect(mockJSZip.file).toHaveBeenCalledWith('run-2.json', 'raw-run-data')
+    expect(mockJSZip.file).toHaveBeenCalledWith(
+      'run-1_2024-01-01T10_00_00.000Z.zip',
+      'raw-run-data'
+    )
+    expect(mockJSZip.file).toHaveBeenCalledWith(
+      'run-2_2024-01-02T10_00_00.000Z.zip',
+      'raw-run-data'
+    )
     expect(mockSaveAs).toHaveBeenCalledWith(
       expect.any(Blob),
       `${ROBOT_NAME}-run-records.zip`
@@ -105,7 +120,7 @@ describe('useDownloadSelectedRuns', () => {
     vi.mocked(getRunRaw).mockRejectedValue(new Error('nope'))
     const { result } = renderHook(() => useDownloadSelectedRuns(ROBOT_NAME))
 
-    await result.current.downloadRuns([mockRunOne])
+    await result.current.downloadRuns([mockRunOne]).catch(() => {})
 
     await waitFor(() => {
       expect(result.current.hasError).toEqual(true)

@@ -36,9 +36,7 @@ export function DownloadProtocolRunRecordsWizard({
 
   const [step, setStep] = useState<StepType>(STEP_TYPES.USB)
   const [selectedPath, setSelectedPath] = useState<string | null>(null)
-  const [deleteAfterDownload, setDeleteAfterDownload] = useState<
-    boolean | null
-  >(null)
+  const [deleteAfterDownload, setDeleteAfterDownload] = useState<boolean>(true)
   const [errorSubText, setErrorSubText] = useState('')
 
   const documentationState = useDocumentationState()
@@ -67,7 +65,7 @@ export function DownloadProtocolRunRecordsWizard({
     setStep(STEP_TYPES.DOWNLOADING)
     downloadRuns(allRuns)
       .then(() => {
-        if (deleteAfterDownload !== true) {
+        if (!deleteAfterDownload) {
           setStep(STEP_TYPES.SUCCESS)
           return
         }
