@@ -1,7 +1,10 @@
-import { useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 
 import { createUser, patchAccessControlEnabled } from '@opentrons/api-client'
-import { useHost } from '@opentrons/react-api-client'
+import {
+  accessControlEnabledQueryKey,
+  useHost,
+} from '@opentrons/react-api-client'
 
 import type { UseMutationResult } from 'react-query'
 
@@ -31,6 +34,7 @@ export function useEnableCRSMutation(): UseMutationResult<
   EnableCRSParams
 > {
   const hostConfig = useHost()
+  const queryClient = useQueryClient()
 
   const enableCRS = async (params: EnableCRSParams): Promise<void> => {
     if (hostConfig == null) {
@@ -67,11 +71,13 @@ export function useEnableCRSMutation(): UseMutationResult<
       },
     })
 
-    await patchAccessControlEnabled(hostConfig, {
+    const response = await patchAccessControlEnabled(hostConfig, {
       data: { accessControlEnabled: true },
     })
-
-    // TODO: Set the cache data
+    queryClient.setQueryData(
+      accessControlEnabledQueryKey(hostConfig),
+      response.data
+    )
   }
 
   // We're using just a plain react-query useMutation() here instead of
