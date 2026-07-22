@@ -110,6 +110,7 @@ These log files are yours, and are never viewed or stored by Opentrons. Read mor
 
 TODO: 
 - the audit log sections seems weird here. maybe rework or it should go elsewhere?
+- include here a section on the measures we've taken to prevent outside users interacting with the Flex: disable Jupyter and SSH access; login required for any action on the ODD/in the app, and our pyro changes to make sure only verified Python protocols are run
 
 -------------->
 
