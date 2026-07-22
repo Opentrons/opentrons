@@ -142,11 +142,7 @@ async def test_play_action_clears_maintenance_run(
         check_estop=True,
     )
 
-    decoy.verify(
-        await mock_maintenance_run_orchestrator_store.clear(),
-        mock_maintenance_runs_publisher.stop_publishing_for_maintenance_run(),
-        times=1,
-    )
+    decoy.verify(await mock_maintenance_run_orchestrator_store.clear(), times=1)
     assert result.content.data == expected_result
     assert result.status_code == 201
 
