@@ -53,7 +53,9 @@ export function DocumentationRequired({
   const handleConfirm = (): void => {
     if (trimmedNote === '') return
     if (trimmedNote.length < minReportLength) {
-      setError(t('must_be_at_least_characters', { minLength: minReportLength }))
+      setError(
+        '' + t('must_be_at_least_characters', { minLength: minReportLength })
+      )
       return
     }
     onConfirm(trimmedNote)
