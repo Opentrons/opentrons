@@ -64,6 +64,7 @@ async def terminate_process(
         # Forceful termination after timeout: send SIGKILL to the entire process group.
         with contextlib.suppress(ProcessLookupError):
             os.killpg(process.pid, signal.SIGKILL)
+        await process.wait()
 
 
 def split(
