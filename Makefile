@@ -44,7 +44,8 @@ watch ?= false
 cover ?= true
 quiet ?= true
 
-FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|yml|mjs|mts)" "**/*.@(ts|tsx|js|mts|mjs|json|md|yml)"
+format_file_exts = ts|tsx|js|mts|mjs|json|md|yaml|yml
+FORMAT_FILE_GLOB = ".*.@($(format_file_exts))" "**/*.@($(format_file_exts))"
 
 ifeq ($(watch), true)
 	cover := false
@@ -254,7 +255,17 @@ $(SHARED_DATA_DIR)-py-lint:
 	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
 
 .PHONY: lint-js
-lint-js: lint-js-eslint lint-js-prettier
+lint-js: check-mutating-api-client-exports lint-js-eslint lint-js-prettier
+
+# Regenerate the denylist used by opentrons/no-direct-mutating.
+.PHONY: generate-mutating-api-client-exports
+generate-mutating-api-client-exports:
+	node scripts/eslint-plugin-opentrons/generate-mutating-api-client-exports.js
+
+# Fail if the committed denylist is stale vs api-client POST/PUT/PATCH/DELETE exports.
+.PHONY: check-mutating-api-client-exports
+check-mutating-api-client-exports:
+	node scripts/eslint-plugin-opentrons/generate-mutating-api-client-exports.js --check
 
 .PHONY: lint-js-eslint
 lint-js-eslint:

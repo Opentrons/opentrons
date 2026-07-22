@@ -45,7 +45,9 @@ export function useRunQuery<TError = Error>(
           ((query.data?.data?.errors ?? []) as RunError[]).map(estopInErrorTree)
         )
       ) {
-        queryClient.invalidateQueries(getQueryKey(host, '/robot/control'))
+        queryClient.invalidateQueries(
+          getQueryKey(host, 'robot/control/estopStatus')
+        )
       }
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.

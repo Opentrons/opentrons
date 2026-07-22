@@ -121,11 +121,14 @@ push: push-no-restart
 .PHONY: push-no-restart-ot3
 push-no-restart-ot3: wheel
 	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-robot-server/)
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-audit-server/)
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3
 	$(call stop-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
+	$(call stop-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-audit-server")
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-pyro-nameserver opentrons-hardware-api")
+	$(call start-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-audit-server")
 	$(call start-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: deploy

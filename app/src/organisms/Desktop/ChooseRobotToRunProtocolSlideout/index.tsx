@@ -16,9 +16,13 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { useUploadCsvFileMutation } from '@opentrons/react-api-client'
+import {
+  isDocumentedMutationError,
+  useUploadCsvFileMutation,
+} from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/hooks'
 import { LegacyApplyHistoricOffsets } from '/app/organisms/LegacyApplyHistoricOffsets'
@@ -100,7 +104,8 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     null
   )
 
-  const { uploadCsvFile } = useUploadCsvFileMutation()
+  const documentationState = useDocumentationState()
+  const { uploadCsvFile } = useUploadCsvFileMutation(documentationState)
 
   const {
     createRunFromProtocolSource,
@@ -152,26 +157,32 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
         const varName = Promise.resolve(key)
         return Promise.all([fileResponse, varName])
       })
-    ).then(responseTuples => {
-      const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
-        Record<string, string>
-      >((acc, [uploadedFileResponse, variableName]) => {
-        return { ...acc, [variableName]: uploadedFileResponse.data.id }
-      }, {})
-      const runTimeParameterValues = getRunTimeParameterValuesForRun(
-        runTimeParametersOverrides
-      )
-      const runTimeParameterFiles = getRunTimeParameterFilesForRun(
-        runTimeParametersOverrides,
-        mappedResolvedCsvVariableToFileId
-      )
-      createRunFromProtocolSource({
-        files: srcFileObjects,
-        protocolKey,
-        runTimeParameterValues,
-        runTimeParameterFiles,
+    )
+      .then(responseTuples => {
+        const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
+          Record<string, string>
+        >((acc, [uploadedFileResponse, variableName]) => {
+          return { ...acc, [variableName]: uploadedFileResponse.data.id }
+        }, {})
+        const runTimeParameterValues = getRunTimeParameterValuesForRun(
+          runTimeParametersOverrides
+        )
+        const runTimeParameterFiles = getRunTimeParameterFilesForRun(
+          runTimeParametersOverrides,
+          mappedResolvedCsvVariableToFileId
+        )
+        createRunFromProtocolSource({
+          files: srcFileObjects,
+          protocolKey,
+          runTimeParameterValues,
+          runTimeParameterFiles,
+        })
       })
-    })
+      .catch((error: unknown) => {
+        if (!isDocumentedMutationError(error)) {
+          throw error
+        }
+      })
   }
 
   const isSelectedRobotOnDifferentSoftwareVersion =

@@ -399,8 +399,10 @@ export function ProtocolDetails(): JSX.Element | null {
             response.data.links?.referencingRuns.map(({ id }) => id) ?? []
         )
         .then(referencingRunIds =>
+          // eslint-disable-next-line opentrons/no-direct-mutating -- TODO(jj, 07-21-26): no direct mutations
           Promise.all(referencingRunIds?.map(runId => deleteRun(host, runId)))
         )
+        // eslint-disable-next-line opentrons/no-direct-mutating -- TODO(jj, 07-21-26): no direct mutations
         .then(() => deleteProtocol(host, protocolId))
         .then(() => {
           navigate('/protocols')

@@ -48,9 +48,12 @@ export function useRunActionMutations(
     }
   )
 
-  const { pauseRun, isLoading: isPauseRunActionLoading } = usePauseRunMutation({
-    onSuccess,
-  })
+  const { pauseRun, isLoading: isPauseRunActionLoading } = usePauseRunMutation(
+    documentationState,
+    {
+      onSuccess,
+    }
+  )
 
   const { stopRun, isLoading: isStopRunActionLoading } =
     useStopRunMutation(documentationState)

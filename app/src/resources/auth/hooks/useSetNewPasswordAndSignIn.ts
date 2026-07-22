@@ -50,7 +50,10 @@ export function useSetNewPasswordAndSignIn(
       void (async () => {
         try {
           try {
-            await updateSelf(host, { data: { password } })
+            // ok so usually using react-api-client functions outside of mutations is bad
+            // but here, we need to specifically not ask for documentation as were in the middle of login
+            // eslint-disable-next-line opentrons/no-direct-mutating
+            await updateSelf(host, { data: { password } }, '')
           } catch (error) {
             console.error(
               'useSetNewPasswordAndSignIn: failed to update password',
@@ -60,6 +63,7 @@ export function useSetNewPasswordAndSignIn(
             return
           }
 
+          // eslint-disable-next-line opentrons/no-direct-mutating
           const tokenResponse = await getOAuth2Token(host, {
             grant_type: 'password',
             username,

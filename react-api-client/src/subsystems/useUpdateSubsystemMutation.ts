@@ -1,7 +1,8 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { updateSubsystem } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
@@ -14,6 +15,7 @@ import type {
   Subsystem,
   SubsystemUpdateProgressData,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
 
 export type UseUpdateSubsystemMutationResult = UseMutationResult<
   SubsystemUpdateProgressData,
@@ -33,18 +35,21 @@ export type UseUpdateSubsystemMutationOptions = UseMutationOptions<
 >
 
 export function useUpdateSubsystemMutation(
+  documentationState: DocumentationState,
   options: UseUpdateSubsystemMutationOptions = {}
 ): UseUpdateSubsystemMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     SubsystemUpdateProgressData,
     AxiosError,
     Subsystem
   >(
-    (subsystem: Subsystem) =>
-      updateSubsystem(host!, subsystem).then(response => {
+    documentationState,
+    ['update_subsystem'],
+    ({ variables: subsystem, userNotes }) =>
+      updateSubsystem(host!, subsystem, userNotes).then(response => {
         queryClient.removeQueries(getQueryKey(host, 'subsystems/updates'))
         queryClient
           .invalidateQueries(getQueryKey(host, 'subsystems/updates'))

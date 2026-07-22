@@ -122,8 +122,19 @@ def fake_key_server(
             }
         )
 
+    async def get_key_and_hash(request: aiohttp.web.Request) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(
+            data={
+                "data": {
+                    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAqvlF5UaVgYPvt/vNtirrzIWSlARPyf69ZVWpnSqpdB4=\n-----END PUBLIC KEY-----\n",
+                    "hashedKey": "sha256:7joao5sCagU94b_QvDskeDWJGikWPJJdsrlG6kSuWiI=",
+                }
+            }
+        )
+
     app = aiohttp.web.Application()
     app.router.add_post("/keys/internal/logSigning/signMessage", sign_message)
+    app.router.add_get("/keys/external/logSigning/publicKey", get_key_and_hash)
 
     loop = asyncio.new_event_loop()
     runner = aiohttp.web.AppRunner(app)

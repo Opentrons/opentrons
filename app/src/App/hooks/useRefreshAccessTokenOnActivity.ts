@@ -63,6 +63,8 @@ export function useRefreshAccessTokenOnActivity(): void {
 
     isRequestInFlight.current = true
     try {
+      // Auth mutations are OK
+      // eslint-disable-next-line opentrons/no-direct-mutating
       const response = await getOAuth2Token(hostConfig, request)
       const expiresIn = response.data.expires_in ?? null
       const expiresAt = expiresIn != null ? Date.now() + expiresIn * 1000 : null

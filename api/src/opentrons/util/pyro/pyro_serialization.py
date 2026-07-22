@@ -108,14 +108,15 @@ def register_type_to_serpent(
     return class_path
 
 
-def _enumerated_error_class_to_dict(obj: EnumeratedError) -> dict[str, Any]:
+def enumerated_error_class_to_dict(obj: EnumeratedError) -> dict[str, Any]:
+    """Serializes enumerated errors to a bytes dictionary."""
     return {
         "__class__": "opentrons_shared_data.errors.exceptions.EnumeratedError",
         "bytes": pickle.dumps(obj),
     }
 
 
-def _enumerated_error_dict_to_class(
+def enumerated_error_dict_to_class(
     class_name: str, d: dict[str, Any]
 ) -> EnumeratedError:
     """Deserializes errors via pickle."""
@@ -131,8 +132,8 @@ def register_enumerated_errors() -> None:
     """Registers serializer and deserializer for enumerated errors."""
     register_type_to_serpent(
         class_type=EnumeratedError,
-        dict_to_class=_enumerated_error_dict_to_class,
-        class_to_dict=_enumerated_error_class_to_dict,
+        dict_to_class=enumerated_error_dict_to_class,
+        class_to_dict=enumerated_error_class_to_dict,
     )
 
 

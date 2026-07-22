@@ -131,7 +131,6 @@ export function ChooseCsvFile({
                       onChange={() => {
                         setCsvFileSelected({ id: csv.id, fileName: csv.name })
                       }}
-                      id={`${csv.id}-on-robot`}
                       isSelected={csvFileSelected?.id === csv.id}
                       maxLines={3}
                     />
@@ -166,7 +165,6 @@ export function ChooseCsvFile({
                               fileName,
                             })
                           }}
-                          id={`${csvFilePath.replace('/', '-')}}-on-usb`}
                           isSelected={csvFileSelected?.filePath === csvFilePath}
                           maxLines={3}
                         />

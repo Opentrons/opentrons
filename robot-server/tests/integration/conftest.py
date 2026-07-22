@@ -79,17 +79,17 @@ def _ot2_session_server(
 
 @pytest.fixture(scope="session")
 def _ot3_session_server(
-    server_temp_directory: str,
     # We need unused_tcp_port_factory instead of unused_tcp_port to avoid a ScopeMismatch
     # error, since it's function-scoped and we're session-scoped.
     unused_tcp_port_factory: Callable[[], int],
 ) -> Generator[str, None, None]:
+    # Use a dedicated OT_API_CONFIG_DIR so Flex simulator calibration seeding
+    # cannot leak module offsets into the shared OT-2 session server.
     port = unused_tcp_port_factory()
     base_url = f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{port}"
     with DevServer(
         port=str(port),
         is_ot3=True,
-        ot_api_config_dir=Path(server_temp_directory),
     ) as dev_server:
         dev_server.start()
         _wait_until_ready(base_url)

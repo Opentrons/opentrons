@@ -6,6 +6,7 @@ import { TRASH_BIN_ADAPTER_FIXTURE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { NotConfiguredModal } from '../NotConfiguredModal'
@@ -16,6 +17,12 @@ import type { DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/deck_configuration')
+
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: vi
+    .fn()
+    .mockReturnValue(ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE),
+}))
 
 const render = (props: ComponentProps<typeof NotConfiguredModal>) => {
   return renderWithProviders(<NotConfiguredModal {...props} />, {

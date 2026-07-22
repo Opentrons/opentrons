@@ -14,10 +14,11 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useHomeMutation } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useHomeGantry } from '/app/local-resources/instruments'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useLights } from '/app/resources/devices'
 
@@ -35,9 +36,19 @@ interface NavigationMenuProps {
 export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
   const { onClick, robotName, setShowNavMenu } = props
   const { t, i18n } = useTranslation(['devices_landing', 'robot_controls'])
-  const documentationState = useDocumentationState()
   const { lightsOn, toggleLights } = useLights()
-  const { home } = useHomeMutation(documentationState)
+  const { makeSnackbar } = useToaster()
+  const { homeGantry, isHoming } = useHomeGantry({
+    onError: error => {
+      if (isMaintenanceDoorOpenError(error)) {
+        makeSnackbar(t('close_door_to_home') as string)
+      }
+      setShowNavMenu(false)
+    },
+    onSuccess: () => {
+      setShowNavMenu(false)
+    },
+  })
   const [
     showRestartRobotConfirmationModal,
     setShowRestartRobotConfirmationModal,
@@ -59,8 +70,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
   }
 
   const handleHomeGantry = (): void => {
-    home({ target: 'robot' })
-    setShowNavMenu(false)
+    void homeGantry()
   }
 
   return createPortal(
@@ -82,13 +92,21 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
         />
       ) : null}
       <MenuList onClick={onClick} isOnDevice={true}>
-        <MenuItem key="reset-position" onClick={handleHomeGantry}>
+        <MenuItem
+          key="reset-position"
+          onClick={handleHomeGantry}
+          disabled={isHoming}
+        >
           <Flex alignItems={ALIGN_CENTER}>
-            <Icon
-              name="reset-position"
-              aria-label="reset-position_icon"
-              size="2.5rem"
-            />
+            {isHoming ? (
+              <Icon name="ot-spinner" aria-label="spinner" size="2.5rem" spin />
+            ) : (
+              <Icon
+                name="reset-position"
+                aria-label="reset-position_icon"
+                size="2.5rem"
+              />
+            )}
             <LegacyStyledText
               forwardedAs="h4"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}

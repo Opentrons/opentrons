@@ -20,7 +20,11 @@ from server_utils.auth.resource_server.fastapi import (
 )
 from server_utils.keys.fastapi import build_key_client, install_key_client
 from server_utils.keys.key_server import Client as KeyClientABC
-from server_utils.keys.key_server import SignedMessageData, SignMessageData
+from server_utils.keys.key_server import (
+    PublicKeyAndHash,
+    SignedMessageData,
+    SignMessageData,
+)
 
 from audit_server.log_export.router import router as log_export_router
 from audit_server.log_ingest.router import router as ingest_router
@@ -59,6 +63,10 @@ class _NoOpFailKeyClient(KeyClientABC):
 
     @override
     async def sign_message(self, message: SignMessageData) -> SignedMessageData:
+        raise AuditLoggingError(message="Key server unavailable (not configured)")
+
+    @override
+    async def get_key_and_hash(self) -> PublicKeyAndHash:
         raise AuditLoggingError(message="Key server unavailable (not configured)")
 
 
