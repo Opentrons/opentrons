@@ -71,7 +71,7 @@ def start_initializing_persistence(  # noqa: C901
         try:
             prepared_root = await prepare_root(persistence_directory_root)
             await to_thread.run_sync(cleanup_persistence_temp_directory, prepared_root)
-            
+
             return prepared_root
         except Exception:
             _log.exception(
