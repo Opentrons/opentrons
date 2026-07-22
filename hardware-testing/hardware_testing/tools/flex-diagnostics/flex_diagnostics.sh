@@ -613,8 +613,14 @@ emmc_health_report() {
     echo "=== Starting full diagnostics on $# robots ==="
     for ip in $ip_addresses; do
         echo "→ Diagnosing $ip ..."
-        SSH_OUTPUT=$(ssh -Tq -o stricthostkeychecking=no -o userknownhostsfile=/dev/null \
-            root@$ip <<'EOF'
+        local SSH_ERR_FILE
+        SSH_ERR_FILE=$(mktemp)
+        # BatchMode avoids hanging on password prompts when the key is missing.
+        # Capture stderr separately so auth failures can be distinguished from network errors.
+        set +e
+        SSH_OUTPUT=$(ssh -T -o BatchMode=yes -o ConnectTimeout=10 \
+            -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            root@$ip 2>"$SSH_ERR_FILE" <<'EOF'
             echo "=== ROBOT_NAME ==="
             host_name=$(hostnamectl --pretty)
             echo $host_name
@@ -647,10 +653,36 @@ emmc_health_report() {
             cat /proc/diskstats | grep mmcblk0 | head -1
 EOF
         )
+        local SSH_EXIT=$?
+        set -e
+        local SSH_ERR
+        SSH_ERR=$(cat "$SSH_ERR_FILE" 2>/dev/null || true)
+        rm -f "$SSH_ERR_FILE"
 
-        if [[ $? -ne 0 ]] || [ -z "$SSH_OUTPUT" ]; then
-            echo "   ❌ Unreachable: $ip"
-            echo "$ip,Unreachable,Unreachable,---,0,0,Unreachable,0,Unreachable,\"Could not connect via SSH\"" >> "$RESULTS_FILE"
+        if [[ $SSH_EXIT -ne 0 ]] || [ -z "$SSH_OUTPUT" ]; then
+            if echo "$SSH_ERR" | grep -qiE 'permission denied|publickey|authentication failed|no identities|too many authentication failures'; then
+                echo "   ❌ SSH auth failed: $ip"
+                echo "      Missing or incorrect SSH key for root@$ip."
+                echo "      Load the robot's key (e.g. ssh-add ~/.ssh/<key>) and ensure it is authorized on the robot."
+                if [[ -n "$SSH_ERR" ]]; then
+                    echo "      SSH error: $(echo "$SSH_ERR" | tr '\n' ' ' | xargs)"
+                fi
+                echo "$ip,AuthFailed,AuthFailed,---,0,0,AuthFailed,0,AuthFailed,\"SSH authentication failed - missing or incorrect key\"" >> "$RESULTS_FILE"
+            elif echo "$SSH_ERR" | grep -qiE 'connection timed out|connection refused|no route to host|network is unreachable|host is down|could not resolve'; then
+                echo "   ❌ Unreachable: $ip"
+                if [[ -n "$SSH_ERR" ]]; then
+                    echo "      SSH error: $(echo "$SSH_ERR" | tr '\n' ' ' | xargs)"
+                fi
+                echo "$ip,Unreachable,Unreachable,---,0,0,Unreachable,0,Unreachable,\"Could not connect via SSH\"" >> "$RESULTS_FILE"
+            else
+                echo "   ❌ SSH failed: $ip"
+                if [[ -n "$SSH_ERR" ]]; then
+                    echo "      SSH error: $(echo "$SSH_ERR" | tr '\n' ' ' | xargs)"
+                else
+                    echo "      Could not connect via SSH (check network, robot power, and SSH key)."
+                fi
+                echo "$ip,Unreachable,Unreachable,---,0,0,Unreachable,0,Unreachable,\"Could not connect via SSH\"" >> "$RESULTS_FILE"
+            fi
             continue
         fi
 
@@ -697,7 +729,7 @@ emmc_health_analyze() {
     echo "                  RANKED ROBOTS BY eMMC WEAR (Lifetime)"
     echo "================================================================="
 
-    awk -F, 'NR>1 && $2 != "Unreachable"' "$RESULTS_FILE" |
+    awk -F, 'NR>1 && $2 != "Unreachable" && $2 != "AuthFailed"' "$RESULTS_FILE" |
     awk -F, '{
         lifetime_str=$4
         if (lifetime_str ~ /Exceeded/) {
