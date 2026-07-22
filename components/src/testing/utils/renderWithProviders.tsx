@@ -1,15 +1,11 @@
-// render using targetted component using @testing-library/react
-// with wrapping providers for i18next and redux
+// render using targeted component using @testing-library/react
+// with wrapping providers for i18next and react-query
 
 import { I18nextProvider } from 'react-i18next'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { Provider } from 'react-redux'
 import { render } from '@testing-library/react'
-import { legacy_createStore } from 'redux'
-import { vi } from 'vitest'
 
 import type { RenderOptions, RenderResult } from '@testing-library/react'
-import type { Store } from 'redux'
 import type {
   ComponentProps,
   ComponentType,
@@ -17,20 +13,15 @@ import type {
   ReactElement,
 } from 'react'
 
-export interface RenderWithProvidersOptions<State> extends RenderOptions {
-  initialState?: State
-  i18nInstance: ComponentProps<typeof I18nextProvider>['i18n']
+export interface RenderWithProvidersOptions extends RenderOptions {
+  i18nInstance?: ComponentProps<typeof I18nextProvider>['i18n']
 }
 
-export function renderWithProviders<State>(
+export function renderWithProviders(
   Component: ReactElement,
-  options?: RenderWithProvidersOptions<State>
-): [RenderResult, Store<State>] {
-  const { initialState = {}, i18nInstance = null } = options || {}
-
-  const store: Store<State> = legacy_createStore(vi.fn(), initialState)
-  store.dispatch = vi.fn()
-  store.getState = vi.fn(() => initialState) as () => State
+  options?: RenderWithProvidersOptions
+): [RenderResult] {
+  const { i18nInstance = null, ...renderOptions } = options || {}
 
   const queryClient = new QueryClient()
 
@@ -38,18 +29,15 @@ export function renderWithProviders<State>(
     children,
   }) => {
     const BaseWrapper = (
-      <QueryClientProvider client={queryClient}>
-        <Provider store={store}>{children}</Provider>
-      </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     if (i18nInstance != null) {
       return (
         <I18nextProvider i18n={i18nInstance}>{BaseWrapper}</I18nextProvider>
       )
-    } else {
-      return BaseWrapper
     }
+    return BaseWrapper
   }
 
-  return [render(Component, { wrapper: ProviderWrapper }), store]
+  return [render(Component, { wrapper: ProviderWrapper, ...renderOptions })]
 }
