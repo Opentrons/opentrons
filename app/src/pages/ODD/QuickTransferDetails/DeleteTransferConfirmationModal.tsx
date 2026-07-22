@@ -21,7 +21,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { OddModal } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 
@@ -46,7 +46,10 @@ export function DeleteTransferConfirmationModal({
     iconColor: COLORS.yellow50,
   }
   const host = useHost()
-  const documentationState = useDocumentationState()
+  const { documentationState } = useLinkedDocumentationState(
+    ['delete_protocol', 'delete_runs'],
+    transferId
+  )
   const { deleteProtocol } = useDeleteProtocolMutation(documentationState)
   const { deleteRun } = useDeleteRunMutation(documentationState)
   const { data: protocolRecord } = useProtocolQuery(transferId)

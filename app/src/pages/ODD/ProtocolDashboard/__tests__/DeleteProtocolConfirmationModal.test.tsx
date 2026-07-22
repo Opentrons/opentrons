@@ -23,9 +23,15 @@ import type { HostConfig } from '@opentrons/api-client'
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ToasterOven')
-vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
-  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
-}))
+vi.mock(
+  '/app/local-resources/access-control/useLinkedDocumentationState',
+  () => ({
+    useLinkedDocumentationState: () => ({
+      documentationState: ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+      clearDocreport: vi.fn(),
+    }),
+  })
+)
 
 const mockFunc = vi.fn()
 const PROTOCOL_ID = 'mockProtocolId'

@@ -40,6 +40,7 @@ import {
 import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
 import { MediumButton, SmallButton } from '/app/atoms/buttons'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { OddModal, SmallModalChildren } from '/app/molecules/OddModal'
 import {
@@ -348,9 +349,11 @@ export function ProtocolDetails(): JSX.Element | null {
     last(protocolRecord?.data.analysisSummaries)?.id ?? null,
     { enabled: protocolRecord != null }
   )
+  const { documentationState: deleteDocumentationState } =
+    useLinkedDocumentationState(['delete_protocol', 'delete_runs'], protocolId)
+  const { deleteProtocol } = useDeleteProtocolMutation(deleteDocumentationState)
+  const { deleteRun } = useDeleteRunMutation(deleteDocumentationState)
   const documentationState = useDocumentationState()
-  const { deleteProtocol } = useDeleteProtocolMutation(documentationState)
-  const { deleteRun } = useDeleteRunMutation(documentationState)
   const { createRun } = useCreateRunMutation(documentationState, {
     onSuccess: data => {
       queryClient

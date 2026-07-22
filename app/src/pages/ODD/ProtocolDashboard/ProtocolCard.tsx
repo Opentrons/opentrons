@@ -32,7 +32,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { OddModal } from '/app/molecules/OddModal'
 import { useUpdatedLastRunTime } from '/app/pages/ODD/ProtocolDashboard/hooks'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
@@ -72,7 +72,10 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
   const longpress = useLongPress()
   const host = useHost()
-  const documentationState = useDocumentationState()
+  const { documentationState } = useLinkedDocumentationState(
+    ['delete_protocol', 'delete_runs'],
+    protocol.id
+  )
   const { deleteProtocol } = useDeleteProtocolMutation(documentationState)
   const { deleteRun } = useDeleteRunMutation(documentationState)
   const updatedLastRun = useUpdatedLastRunTime(lastRun)
