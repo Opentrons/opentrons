@@ -111,7 +111,9 @@ export function useRequiredSetupStepsInOrder({
       dispatch(
         updateRunSetupStepsRequired(runId, {
           ...ALL_STEPS_IN_ORDER.reduce<
-            ReturnType<typeof updateRunSetupStepsRequired>['payload']['required']
+            ReturnType<
+              typeof updateRunSetupStepsRequired
+            >['payload']['required']
           >(
             (acc, thiskey) => ({
               ...acc,
