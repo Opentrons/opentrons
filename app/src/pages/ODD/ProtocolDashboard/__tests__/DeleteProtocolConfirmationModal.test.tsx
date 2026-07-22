@@ -2,9 +2,10 @@ import { act, fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { deleteRun, getProtocol } from '@opentrons/api-client'
+import { getProtocol } from '@opentrons/api-client'
 import {
   useDeleteProtocolMutation,
+  useDeleteRunMutation,
   useHost,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
@@ -30,6 +31,7 @@ const mockFunc = vi.fn()
 const PROTOCOL_ID = 'mockProtocolId'
 const mockMakeSnackbar = vi.fn()
 const mockDeleteProtocol = vi.fn()
+const mockDeleteRun = vi.fn()
 const MOCK_HOST_CONFIG = {} as HostConfig
 
 const render = (
@@ -66,7 +68,11 @@ describe('DeleteProtocolConfirmationModal', () => {
     vi.mocked(useDeleteProtocolMutation).mockReturnValue({
       deleteProtocol: mockDeleteProtocol,
     } as any)
+    vi.mocked(useDeleteRunMutation).mockReturnValue({
+      deleteRun: mockDeleteRun,
+    } as any)
     mockDeleteProtocol.mockResolvedValue(undefined)
+    mockDeleteRun.mockResolvedValue(undefined)
   })
 
   afterEach(() => {
@@ -99,8 +105,8 @@ describe('DeleteProtocolConfirmationModal', () => {
       screen.getByText('Delete').click()
     })
     await new Promise(setImmediate)
-    expect(vi.mocked(deleteRun)).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')
-    expect(vi.mocked(deleteRun)).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '2')
+    expect(mockDeleteRun).toHaveBeenCalledWith({ runId: '1' })
+    expect(mockDeleteRun).toHaveBeenCalledWith({ runId: '2' })
     expect(mockDeleteProtocol).toHaveBeenCalledWith(PROTOCOL_ID)
     expect(mockMakeSnackbar).toHaveBeenCalledWith('Protocol deleted')
   })

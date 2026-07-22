@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   useDeleteProtocolMutation,
+  useDeleteRunMutation,
   useMostRecentSuccessfulAnalysisAsDocumentQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
@@ -129,6 +130,9 @@ describe('ProtocolCard', () => {
     } as UseQueryResult<CompletedProtocolAnalysis>)
     vi.mocked(useDeleteProtocolMutation).mockReturnValue({
       deleteProtocol: vi.fn(),
+    } as any)
+    vi.mocked(useDeleteRunMutation).mockReturnValue({
+      deleteRun: vi.fn(),
     } as any)
     vi.mocked(useFeatureFlag).mockReturnValue(false)
   })

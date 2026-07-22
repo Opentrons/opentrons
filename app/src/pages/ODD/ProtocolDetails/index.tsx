@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import last from 'lodash/last'
 
-import { deleteRun, getProtocol } from '@opentrons/api-client'
+import { getProtocol } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -31,6 +31,7 @@ import {
   isDocumentedMutationError,
   useCreateRunMutation,
   useDeleteProtocolMutation,
+  useDeleteRunMutation,
   useHost,
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
@@ -349,6 +350,7 @@ export function ProtocolDetails(): JSX.Element | null {
   )
   const documentationState = useDocumentationState()
   const { deleteProtocol } = useDeleteProtocolMutation(documentationState)
+  const { deleteRun } = useDeleteRunMutation(documentationState)
   const { createRun } = useCreateRunMutation(documentationState, {
     onSuccess: data => {
       queryClient
@@ -401,10 +403,11 @@ export function ProtocolDetails(): JSX.Element | null {
             response.data.links?.referencingRuns.map(({ id }) => id) ?? []
         )
         .then(referencingRunIds =>
-          // eslint-disable-next-line opentrons/no-direct-mutating -- TODO(jj, 07-21-26): no direct mutations
-          Promise.all(referencingRunIds?.map(runId => deleteRun(host, runId)))
+          Promise.all(referencingRunIds?.map(runId => deleteRun({ runId })))
         )
-        .then(() => deleteProtocol(protocolId))
+        .then(() => {
+          return deleteProtocol(protocolId)
+        })
         .then(() => {
           setShowConfirmationDeleteProtocol(false)
           navigate('/protocols')

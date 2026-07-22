@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import last from 'lodash/last'
 import { css } from 'styled-components'
 
-import { deleteRun, getProtocol } from '@opentrons/api-client'
+import { getProtocol } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   ALIGN_END,
@@ -25,6 +25,7 @@ import {
 import {
   isDocumentedMutationError,
   useDeleteProtocolMutation,
+  useDeleteRunMutation,
   useHost,
   useMostRecentSuccessfulAnalysisAsDocumentQuery,
   useProtocolAnalysisAsDocumentQuery,
@@ -73,6 +74,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
   const host = useHost()
   const documentationState = useDocumentationState()
   const { deleteProtocol } = useDeleteProtocolMutation(documentationState)
+  const { deleteRun } = useDeleteRunMutation(documentationState)
   const updatedLastRun = useUpdatedLastRunTime(lastRun)
 
   const { id: protocolId, analysisSummaries } = protocol
@@ -157,11 +159,12 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
         )
         .then(referencingRunIds => {
           return Promise.all(
-            // eslint-disable-next-line opentrons/no-direct-mutating -- TODO(jj, 07-21-26): no direct mutations
-            referencingRunIds?.map(runId => deleteRun(host, runId))
+            referencingRunIds?.map(runId => deleteRun({ runId }))
           )
         })
-        .then(() => deleteProtocol(protocol.id))
+        .then(() => {
+          return deleteProtocol(protocol.id)
+        })
         .then(() => {
           setShowIcon(false)
         })

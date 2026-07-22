@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
-import { deleteRun, getProtocol } from '@opentrons/api-client'
+import { getProtocol } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   COLORS,
@@ -15,6 +15,7 @@ import {
 import {
   isDocumentedMutationError,
   useDeleteProtocolMutation,
+  useDeleteRunMutation,
   useHost,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
@@ -47,6 +48,7 @@ export function DeleteTransferConfirmationModal({
   const host = useHost()
   const documentationState = useDocumentationState()
   const { deleteProtocol } = useDeleteProtocolMutation(documentationState)
+  const { deleteRun } = useDeleteRunMutation(documentationState)
   const { data: protocolRecord } = useProtocolQuery(transferId)
   const transferName =
     protocolRecord?.data.metadata.protocolName ??
@@ -65,11 +67,12 @@ export function DeleteTransferConfirmationModal({
         )
         .then(referencingRunIds => {
           return Promise.all(
-            // eslint-disable-next-line opentrons/no-direct-mutating -- TODO(jj, 07-21-26): no direct mutations
-            referencingRunIds?.map(runId => deleteRun(host, runId))
+            referencingRunIds?.map(runId => deleteRun({ runId }))
           )
         })
-        .then(() => deleteProtocol(transferId))
+        .then(() => {
+          return deleteProtocol(transferId)
+        })
         .then(() => {
           setShowIcon(false)
           setShowDeleteConfirmationModal(false)
