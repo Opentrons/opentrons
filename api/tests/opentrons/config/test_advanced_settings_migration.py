@@ -9,7 +9,7 @@ from opentrons.config.advanced_settings import _ensure, _migrate
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 41
+    return 42
 
 
 # make sure to set a boolean value in default_file_settings only if
@@ -486,6 +486,7 @@ def v41_config(v40_config: Dict[str, Any]) -> Dict[str, Any]:
     r["_version"] = 41
     return r
 
+
 @pytest.fixture
 def v42_config(v41_config: Dict[str, Any]) -> Dict[str, Any]:
     r = v41_config.copy()
@@ -496,6 +497,7 @@ def v42_config(v41_config: Dict[str, Any]) -> Dict[str, Any]:
         }
     )
     return r
+
 
 @pytest.fixture(
     params=[
@@ -542,6 +544,7 @@ def v42_config(v41_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v39_config"),
         lazy_fixture("v40_config"),
         lazy_fixture("v41_config"),
+        lazy_fixture("v42_config"),
     ],
 )
 def old_settings(request: SubRequest) -> Dict[str, Any]:
@@ -635,4 +638,5 @@ def test_ensures_config() -> None:
         "disableFlexStackerLabwareDetection": None,
         "enableProtocolSubprocess": None,
         "enableHardwareSubprocess": None,
+        "manuallyRunProtocolAsUser": None,
     }

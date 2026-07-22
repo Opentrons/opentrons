@@ -801,6 +801,7 @@ def _migrate40to41(previous: SettingsMap) -> SettingsMap:
     """
     return {k: v for k, v in previous.items() if "allowStepGrouping" != k}
 
+
 def _migrate41to42(previous: SettingsMap) -> SettingsMap:
     """Migrate to version 42 of the feature flags file.
 
@@ -811,6 +812,7 @@ def _migrate41to42(previous: SettingsMap) -> SettingsMap:
     newmap = {k: v for k, v in previous.items()}
     newmap["manuallyRunProtocolAsUser"] = False
     return newmap
+
 
 _MIGRATIONS = [
     _migrate0to1,
