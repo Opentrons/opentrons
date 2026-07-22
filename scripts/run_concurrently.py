@@ -9,6 +9,9 @@ Make sure it's appropriately quoted if you're running this in a shell.
 
 import asyncio
 import asyncio.subprocess
+import contextlib
+import os
+import signal
 import sys
 import typing
 
@@ -22,6 +25,7 @@ async def run_command(command: list[str]) -> None:
         command[0],
         *command[1:],
         stdin=asyncio.subprocess.DEVNULL,
+        start_new_session=True,  # For os.killpg().
     )
     try:
         await subprocess.wait()
@@ -51,12 +55,16 @@ async def terminate_process(
         return  # Already stopped.
 
     try:
+        # Polite termination: send SIGTERM to our direct child process.
+        # If it has its own children, let it terminate them on its own terms.
         async with asyncio.timeout(timeout_sec):
             process.terminate()
             await process.wait()
     except asyncio.TimeoutError:
-        process.kill()
-        await process.wait()
+        # Forceful termination after timeout: send SIGKILL to the entire process group.
+        with contextlib.suppress(ProcessLookupError):
+            os.killpg(process.pid, signal.SIGKILL)
+
 
 def split(
     source: typing.Iterable[str], delimiter: str
