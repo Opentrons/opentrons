@@ -1,5 +1,5 @@
 # Publish @opentrons/{shared-data,step-generation,components,protocol-visualization}
-# via js-package-testing/publish.mts using npm Trusted Publishing (OIDC).
+# via scripts/publish.mts using npm Trusted Publishing (OIDC).
 #
 # Follows https://docs.npmjs.com/trusted-publishers
 #   - GitHub-hosted runner (required; self-hosted not supported)
@@ -123,4 +123,4 @@ jobs:
           if [[ "${INPUT_DRY_RUN}" == "true" ]]; then
             ARGS+=(--dry-run)
           fi
-          node --experimental-strip-types js-package-testing/publish.mts "${ARGS[@]}"
+          node --experimental-strip-types scripts/publish.mts "${ARGS[@]}"

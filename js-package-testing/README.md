@@ -142,7 +142,8 @@ work without aliases.
 
 Monorepo `package.json` files use `workspace:*`, `link:`, and `catalog:`
 specifiers that **do not work on npm**. Always publish with
-[`publish.mts`](publish.mts) (not raw `pnpm pack` + `npm publish`).
+[`../scripts/publish.mts`](../scripts/publish.mts) (not raw `pnpm pack` +
+`npm publish`).
 
 Shared patching logic lives in [`package-json-patches.mts`](package-json-patches.mts).
 It rewrites:
@@ -156,7 +157,7 @@ It rewrites:
 ```bash
 # From monorepo root (always publishes dist-tag "latest")
 node --experimental-strip-types scripts/next-npm-version.mts
-node --experimental-strip-types js-package-testing/publish.mts \
+node --experimental-strip-types scripts/publish.mts \
   --version 0.3.9-alpha.0 --dry-run
 ```
 
@@ -286,7 +287,7 @@ when keys change.
 
 Direct deps use `link:pack/opentrons-*`. [`pnpm-workspace.yaml`](pnpm-workspace.yaml) **`overrides`** force the same four paths for transitive `@opentrons/*` resolution.
 
-After extraction, [`patch-packed-packages.mts`](patch-packed-packages.mts) rewrites each `pack/*/package.json` using the same logic as [`publish.mts`](publish.mts) / [`package-json-patches.mts`](package-json-patches.mts): `workspace:*` and `catalog:` become concrete semver, `@types/*` move to devDependencies, and export maps match npm publishes.
+After extraction, [`patch-packed-packages.mts`](patch-packed-packages.mts) rewrites each `pack/*/package.json` using the same logic as [`../scripts/publish.mts`](../scripts/publish.mts) / [`package-json-patches.mts`](package-json-patches.mts): `workspace:*` and `catalog:` become concrete semver, `@types/*` move to devDependencies, and export maps match npm publishes.
 
 The `pack/` directory is gitignored. Committed `link:` entries and `pnpm-lock.yaml` describe the strategy; linked contents can change without lockfile churn for those packages.
 
@@ -298,7 +299,6 @@ js-package-testing/
 ├── package.json
 ├── package-json-patches.mts   # shared publish / pack manifest patching
 ├── patch-packed-packages.mts  # applies patches to pack/ after extract
-├── publish.mts                # npm publish pipeline
 ├── pnpm-workspace.yaml
 ├── playwright.config.ts
 ├── vite.config.mts

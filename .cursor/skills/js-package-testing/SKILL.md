@@ -54,7 +54,7 @@ From repo root:
 
 ```bash
 node --experimental-strip-types scripts/next-npm-version.mts
-node --experimental-strip-types js-package-testing/publish.mts \
+node --experimental-strip-types scripts/publish.mts \
   --version X.Y.Z-alpha.0 --dry-run
 ```
 
@@ -66,12 +66,15 @@ Never publish raw monorepo manifests (`workspace:*`, `catalog:` break npm consum
 ## Project structure
 
 ```text
+scripts/
+├── next-npm-version.mts      # patch bump from npm latest
+└── publish.mts               # npm publish pipeline
+
 js-package-testing/
 ├── Makefile
 ├── package.json
-├── package-json-patches.mts
+├── package-json-patches.mts  # shared by publish.mts + pack/
 ├── patch-packed-packages.mts
-├── publish.mts
 ├── pnpm-workspace.yaml
 ├── playwright.config.ts
 ├── cssModulesSideEffect.ts

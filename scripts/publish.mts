@@ -7,7 +7,7 @@
  * injects a README and LICENSE into each tarball, and publishes all four to npm.
  *
  * Run with Node >= 22:
- *   node --experimental-strip-types js-package-testing/publish.mts [options]
+ *   node --experimental-strip-types scripts/publish.mts [options]
  *
  * Options:
  *   --version <ver>    Semver string to publish as (required, e.g. 0.3.0-alpha.1)
@@ -39,7 +39,7 @@
  *
  * To run from repo root:
  *   node --experimental-strip-types scripts/next-npm-version.mts
- *   node --experimental-strip-types js-package-testing/publish.mts \
+ *   node --experimental-strip-types scripts/publish.mts \
  *     --version 0.3.9-alpha.0 --dry-run
  */
 
@@ -53,7 +53,7 @@ import {
   patchProtocolVisualizationPackageJson,
   patchSharedDataPackageJson,
   patchStepGenerationPackageJson,
-} from './package-json-patches.mts'
+} from '../js-package-testing/package-json-patches.mts'
 
 // ---------------------------------------------------------------------------
 // CLI arg parsing
