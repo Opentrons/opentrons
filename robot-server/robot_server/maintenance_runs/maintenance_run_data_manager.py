@@ -120,8 +120,6 @@ class MaintenanceRunDataManager:
         """
         if self._run_orchestrator_store.current_run_id is not None:
             await self._run_orchestrator_store.clear()
-            # Drop publisher hooks for the prior maintenance run before starting
-            # the new one (e.g. opening a new calibration while one is open).
             self._maintenance_runs_publisher.stop_publishing_for_maintenance_run()
 
         proxy_door_callback = None

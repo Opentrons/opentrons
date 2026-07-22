@@ -67,9 +67,7 @@ class MaintenanceRunsPublisher:
         await self.publish_current_maintenance_run_async()
 
     def stop_publishing_for_maintenance_run(self) -> None:
-        """Drop PE notify hooks and advise clients to refetch current-run.
-
-        """
+        """Drop PE notify hooks and advise clients to refetch current-run."""
         self._run_hooks = None
         self._engine_state_slice = None
         self.publish_current_maintenance_run()
