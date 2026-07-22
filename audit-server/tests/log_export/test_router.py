@@ -5,11 +5,13 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from pathlib import Path
 
-from decoy import Decoy
+from decoy import Decoy, matchers
 
 from server_utils.keys.key_server import Client as KeyClient
-from server_utils.keys.key_server import PublicKeyAndHash
+from server_utils.keys.key_server import PublicKeyAndHash, SignedMessageData
 from server_utils.persistence.persistence_directory import PERSISTENCE_TEMP_SUBDIRECTORY
+from server_utils.robot.robot_server import Client as RobotServerClient
+from server_utils.robot.robot_server import RobotNameandSerial
 
 from audit_server.log_export.router import download_log_period, get_log_periods
 from audit_server.log_storage.log_data_manager import LogDataManager
@@ -78,6 +80,7 @@ async def test_download_log_period_stages_under_persistence_temp(
     tmp_path: Path,
 ) -> None:
     """It should stage the zip under persistence_root/temp/."""
+    mock_robot_server_client = decoy.mock(cls=RobotServerClient)
     period_entries = LogPeriodEntries(
         user_log=UserLogForExport(
             userLogEntries=[],
@@ -92,11 +95,23 @@ async def test_download_log_period_stages_under_persistence_temp(
     decoy.when(await mock_key_client.get_key_and_hash()).then_return(
         PublicKeyAndHash(publicKey="public-key", publicHash="public-hash")
     )
+    decoy.when(await mock_robot_server_client.get_name_and_serial()).then_return(
+        RobotNameandSerial(name="my robot", serial="123abc")
+    )
+    decoy.when(await mock_key_client.sign_message(matchers.Anything())).then_return(
+        SignedMessageData(
+            message="{}",
+            messageHash="hash",
+            messageSignature="sig",
+            signatureVersion=1,
+        )
+    )
 
     result = await download_log_period(
         periodId="1",
         log_data_manager=mock_log_data_manager,
         key_client=mock_key_client,
+        robot_server_client=mock_robot_server_client,
         persistence_directory_root=tmp_path,
     )
 
