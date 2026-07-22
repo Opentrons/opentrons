@@ -6,6 +6,12 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 By installing and using Opentrons software, you agree to the Opentrons End-User License Agreement (EULA). You can view the EULA at [opentrons.com/eula](https://opentrons.com/eula).
 
+## Opentrons App Changes in 9.1.2
+
+Welcome to the v9.1.2 release of the Opentrons App! This release resolves a bug to prevent the Flex touchscreen from freezing while selecting runtime parameters for a protocol run.
+
+---
+
 ## Opentrons App Changes in 9.1.1
 
 Welcome to the v9.1.1 release of the Opentrons App! This release is designed specifically for use with Opentrons Flex and includes other new features, improvements, and bug fixes.
