@@ -160,8 +160,51 @@ def fake_key_server(
 
 
 @pytest.fixture
+def fake_robot_server(
+    unused_tcp_port_factory: Callable[[], int],
+) -> Generator[str, None, None]:
+    """Run a minimal in-process standin for robot-server on a TCP port.
+
+    Yields the base URL.
+    """
+    port = unused_tcp_port_factory()
+
+    async def fake_stub_health(request: aiohttp.web.Request) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(
+            data={"name": "my robot", "robot_serial": "123abc"}
+        )
+
+    app = aiohttp.web.Application()
+    app.router.add_get("/health", fake_stub_health)
+    loop = asyncio.new_event_loop()
+    runner = aiohttp.web.AppRunner(app)
+
+    def serve() -> None:
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(runner.setup())
+        site = aiohttp.web.TCPSite(runner, host="127.0.0.1", port=port)
+        loop.run_until_complete(site.start())
+        loop.run_forever()
+
+    thread = threading.Thread(target=serve, name="fake-robot-server", daemon=True)
+    thread.start()
+
+    base_url = f"http://127.0.0.1:{port}"
+    _wait_for_tcp(base_url)
+    try:
+        yield base_url
+    finally:
+        loop.call_soon_threadsafe(loop.stop)
+        thread.join(timeout=5)
+        asyncio.run(runner.cleanup())
+
+
+@pytest.fixture
 def run_server(
-    unused_tcp_port: int, fake_key_server: str, fake_auth_server: str
+    unused_tcp_port: int,
+    fake_key_server: str,
+    fake_auth_server: str,
+    fake_robot_server: str,
 ) -> Generator[DevServer, None, None]:
     """Run a dev server as a fixture scoped to the test.
 
@@ -171,6 +214,7 @@ def run_server(
     extra_env = {
         "OT_AUDIT_SERVER_key_server_url": fake_key_server,
         "OT_AUDIT_SERVER_auth_server_url": fake_auth_server,
+        "OT_AUDIT_SERVER_robot_server_url": fake_robot_server,
     }
     with DevServer(port=unused_tcp_port, extra_env=extra_env) as dev_server:
         dev_server.start()

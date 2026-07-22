@@ -19,12 +19,17 @@ from server_utils.auth.resource_server.fastapi import (
     install_authorization_checker,
 )
 from server_utils.keys.fastapi import build_key_client, install_key_client
-from server_utils.keys.key_server import Client as KeyClientABC
+from server_utils.keys.key_server import (
+    Client as KeyClientABC,
+)
 from server_utils.keys.key_server import (
     PublicKeyAndHash,
     SignedMessageData,
     SignMessageData,
 )
+from server_utils.robot.fastapi import build_robot_client, install_robot_server_client
+from server_utils.robot.robot_server import Client as RobotClientABC
+from server_utils.robot.robot_server import RobotNameandSerial
 
 from audit_server.log_export.router import router as log_export_router
 from audit_server.log_ingest.router import router as ingest_router
@@ -70,6 +75,17 @@ class _NoOpFailKeyClient(KeyClientABC):
         raise AuditLoggingError(message="Key server unavailable (not configured)")
 
 
+class _StubRobotServerClient(RobotClientABC):
+    """A local robot server client when no robot server url/uds has been provided."""
+
+    @override
+    async def get_name_and_serial(self) -> RobotNameandSerial:
+        return RobotNameandSerial(
+            name="localrobot",
+            serial=None,
+        )
+
+
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     configuration = get_configuration()
@@ -105,6 +121,25 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             )
             key_client = _NoOpFailKeyClient()
         install_key_client(app.state, key_client)
+        if (
+            configuration.robot_server_uds is not None
+            or configuration.robot_server_url is not None
+        ):
+            robot_server_client = await exit_stack.enter_async_context(
+                build_robot_client(
+                    robot_server_uds=configuration.robot_server_uds,
+                    robot_server_url=configuration.robot_server_url,
+                )
+            )
+        else:
+            _log.warning(
+                "robot-server is not configured."
+                " robot identity file in log period download"
+                " will return stub data."
+            )
+            robot_server_client = _StubRobotServerClient()
+
+        install_robot_server_client(app.state, robot_server_client)
         log_store = build_log_store(app.state, engine)
         log_data_manager = build_log_data_manager(
             app.state, log_store, settings_store, key_client

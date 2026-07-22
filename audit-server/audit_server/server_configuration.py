@@ -79,3 +79,19 @@ class AuditServerConfiguration(BaseSettings):
             " If both are unset, authentication cannot be checked and modification requests will fail."
         ),
     )
+    robot_server_uds: str | None = Field(
+        default=None,
+        description=(
+            "The path to the Unix domain socket where robot-server is listening."
+            " This is mutually exclusive with robot_server_url."
+            " If both are unset, robot name and serial name can not be obtained and log period download will fail."
+        ),
+    )
+    robot_server_url: str | None = Field(
+        default=None,
+        description=(
+            "The base URL (e.g. `http://localhost:33960`) where robot-server is listening."
+            " This is mutually exclusive with robot_server_uds."
+            " If both are unset, robot name and serial name can not be obtained and log period download will fail.."
+        ),
+    )
