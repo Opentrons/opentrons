@@ -203,7 +203,6 @@ class MaintenanceRunDataManager:
         """
         if run_id == self._run_orchestrator_store.current_run_id:
             await self._run_orchestrator_store.clear()
-            # Drop publisher hooks when a maintenance run is cleared.
             self._maintenance_runs_publisher.stop_publishing_for_maintenance_run()
 
             if camera_settings is not None:
