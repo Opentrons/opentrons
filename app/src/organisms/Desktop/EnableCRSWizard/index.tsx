@@ -32,17 +32,15 @@ import styles from './enablecrswizard.module.css'
 import { generatePassword } from './generatePassword'
 import { useEnableCRSMutation } from './useEnableCRSMutation'
 
-import type { ComponentType, FormEvent, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
-/**
- * The fields collected by the react-hook-form portion of the wizard.
- *
- * Note that the robot encryption key is deliberately NOT part of this form:
- * the "verify robot encryption key" step is its own asynchronous submission
- * (see `useHandleRobotCertImport`), which owns that value, its error, and its
- * loading state.
- */
-interface CRSWizardFormValues {
+const WIZARD_MODAL_WIDTH = '31.25rem'
+const SERVICE_ACCOUNT_USERNAME = 'service'
+const SERVICE_ACCOUNT_FULL_NAME = 'Service Account (created by system)'
+const RECOVERY_ACCOUNT_USERNAME = 'recovery'
+const RECOVERY_ACCOUNT_FULL_NAME = 'Recovery Account (created by system)'
+
+interface FormValues {
   servicePIN: string
   adminUsername: string
   adminLegalName: string
@@ -50,50 +48,13 @@ interface CRSWizardFormValues {
   confirmPassword: string
 }
 
-const CRS_WIZARD_STEPS = [
-  'enterServicePIN',
-  'verifyRobotEncryptionKey',
-  'createServiceAccount',
-  'createAdminAccount',
-  'createPassword',
-  'recoveryAccountDetails',
-] as const
-
-type CrsWizardStep = (typeof CRS_WIZARD_STEPS)[number]
-
-/**
- * Props shared by every step page. Each page renders its own `ModalShell` so
- * that a step which needs to coordinate its body and footer (e.g. the
- * encryption-key submission step) can do so from a single component.
- */
-interface CrsWizardPageProps {
-  formId: string
+interface CommonPageProps {
   header: ReactNode
   onBack: () => void
   onNext: () => void
   serviceAccountPassword: string
   recoveryAccountPassword: string
 }
-
-/**
- * The react-hook-form fields that must be valid before advancing past each
- * step. Steps with no react-hook-form inputs (review-only pages, or the
- * self-validating encryption-key step) map to an empty list.
- */
-const STEP_FIELDS: Record<CrsWizardStep, Array<keyof CRSWizardFormValues>> = {
-  enterServicePIN: ['servicePIN'],
-  verifyRobotEncryptionKey: [],
-  createServiceAccount: [],
-  createAdminAccount: ['adminUsername', 'adminLegalName'],
-  createPassword: ['password', 'confirmPassword'],
-  recoveryAccountDetails: [],
-}
-
-const WIZARD_MODAL_WIDTH = '31.25rem'
-const SERVICE_ACCOUNT_USERNAME = 'service'
-const SERVICE_ACCOUNT_FULL_NAME = 'Service Account (created by system)'
-const RECOVERY_ACCOUNT_USERNAME = 'recovery'
-const RECOVERY_ACCOUNT_FULL_NAME = 'Recovery Account (created by system)'
 
 export interface EnableCRSWizardProps {
   robotName: string
@@ -103,26 +64,12 @@ export const handleEnableCRSWizard = (props: EnableCRSWizardProps): void => {
   void NiceModal.show(EnableCRSWizard, props)
 }
 
-const STEP_PAGES: Record<CrsWizardStep, ComponentType<CrsWizardPageProps>> = {
-  enterServicePIN: EnterServicePINPage,
-  verifyRobotEncryptionKey: VerifyRobotEncryptionKeyPage,
-  createServiceAccount: CreateServiceAccountPage,
-  createAdminAccount: CreateAdminAccountPage,
-  createPassword: AdminPasswordPage,
-  recoveryAccountDetails: RecoveryAccountDetailsPage,
-}
-
 const EnableCRSWizard = NiceModal.create(
   (props: EnableCRSWizardProps): JSX.Element => {
     const { robotName } = props
     const modal = useModal()
     const { t } = useTranslation('access_control')
-    const [currentStep, setCurrentStep] = useState<CrsWizardStep>(
-      CRS_WIZARD_STEPS[0]
-    )
-    const currentStepIndex = CRS_WIZARD_STEPS.indexOf(currentStep)
-    const isFirstStep = currentStepIndex === 0
-    const isLastStep = currentStepIndex === CRS_WIZARD_STEPS.length - 1
+    const [currentStepIndex, setCurrentStepIndex] = useState(0)
 
     // Generate passwords when the wizard opens and keep them static even when the user
     // navigates back and forth between pages.
@@ -133,7 +80,7 @@ const EnableCRSWizard = NiceModal.create(
       modal.remove()
     }
 
-    const formMethods = useForm<CRSWizardFormValues>({
+    const formMethods = useForm<FormValues>({
       defaultValues: {
         servicePIN: '',
         adminUsername: '',
@@ -141,65 +88,57 @@ const EnableCRSWizard = NiceModal.create(
         password: '',
         confirmPassword: '',
       },
+      // The default mode onSubmit would only validate
+      // at the very end of the entire wizard.
       mode: 'onBlur',
     })
-    const { trigger } = formMethods
 
     const handleNext = (): void => {
-      // TODO: Move triggering elsewhere.
-      // Think carefully about isLastStep/return.
-      void trigger(STEP_FIELDS[currentStep]).then(isValid => {
-        if (!isValid) {
-          return
-        }
-        if (isLastStep) {
-          onClose()
-          return
-        }
-        setCurrentStep(CRS_WIZARD_STEPS[currentStepIndex + 1])
-      })
+      if (currentStepIndex === STEP_PAGES.length - 1) {
+        onClose()
+      } else {
+        setCurrentStepIndex(currentStepIndex + 1)
+      }
     }
 
     const handleBack = (): void => {
-      if (isFirstStep) {
+      if (currentStepIndex === 0) {
         onClose()
-        return
+      } else {
+        setCurrentStepIndex(currentStepIndex - 1)
       }
-      setCurrentStep(CRS_WIZARD_STEPS[currentStepIndex - 1])
     }
-
-    const formId = useId()
 
     const header = (
       <WizardHeader
         title={
-          isFirstStep
+          currentStepIndex === 0
             ? t('setup_wizard_enable_title')
             : t('setup_wizard_setup_title')
         }
         onExit={onClose}
         currentStep={currentStepIndex + 1}
-        totalSteps={CRS_WIZARD_STEPS.length}
+        totalSteps={STEP_PAGES.length}
         hideStepText
       />
     )
 
-    const pageProps: CrsWizardPageProps = {
+    const pageProps: CommonPageProps = {
       recoveryAccountPassword,
       serviceAccountPassword,
-      formId,
       header,
       onBack: handleBack,
       onNext: handleNext,
     }
 
-    const Page = STEP_PAGES[currentStep]
+    const Page = STEP_PAGES[currentStepIndex]
 
     // todo(mm, 2026-07-22):
     // Each page renders as its own ModalShell, as opposed to swapping out the contents
     // inside one ModalShell. This is good because it gives each page control over its
     // own buttons in the ModalShell `footer`, but bad because it makes the progress
-    // bar at the top of the modal not animate across pages it should.
+    // bar at the top of the modal not animate across pages it should. I don't know
+    // how to fix this without intrusive ModalShell refactors or some portal BS.
     return createPortal(
       <ApiHostProvider robotName={robotName}>
         <FormProvider {...formMethods}>
@@ -212,13 +151,13 @@ const EnableCRSWizard = NiceModal.create(
 )
 
 function EnterServicePINPage({
-  formId,
   header,
   onBack,
   onNext,
-}: CrsWizardPageProps): JSX.Element {
+}: CommonPageProps): JSX.Element {
   const { t } = useTranslation(['access_control', 'shared'])
-  const { control } = useFormContext<CRSWizardFormValues>()
+  const { control, trigger } = useFormContext<FormValues>()
+  const formId = useId()
 
   const serialNumber = useSerialNumber()
   const validate = useCallback(
@@ -243,7 +182,7 @@ function EnterServicePINPage({
           <SecondaryButton onClick={onBack}>
             {t('shared:cancel')}
           </SecondaryButton>
-          <AlertPrimaryButton onClick={onNext}>
+          <AlertPrimaryButton type="submit" form={formId}>
             {t('setup_wizard_confirm_enable')}
           </AlertPrimaryButton>
         </div>
@@ -251,7 +190,14 @@ function EnterServicePINPage({
     >
       <form
         id={formId}
-        onSubmit={handleFormSubmit(onNext)}
+        onSubmit={event => {
+          event.preventDefault()
+          void trigger('servicePIN').then(isValid => {
+            if (isValid) {
+              onNext()
+            }
+          })
+        }}
         className={styles.content}
       >
         <div className={styles.step_body}>
@@ -288,18 +234,12 @@ function EnterServicePINPage({
   )
 }
 
-/**
- * The encryption-key step is its own submission: `useHandleRobotCertImport`
- * verifies the entered key by attempting to install the robot's CA
- * certificates with it. Because this step owns its `ModalShell`, both the input
- * (body) and the verify button (footer) can share a single hook instance.
- */
 function VerifyRobotEncryptionKeyPage({
-  formId,
   header,
   onNext,
-}: CrsWizardPageProps): JSX.Element {
+}: CommonPageProps): JSX.Element {
   const { t } = useTranslation(['access_control', 'device_settings', 'shared'])
+  const formId = useId()
 
   const {
     passwordValue,
@@ -317,7 +257,11 @@ function VerifyRobotEncryptionKeyPage({
       header={header}
       footer={
         <div className={styles.footer}>
-          <PrimaryButton onClick={tryImport} disabled={importInProgress}>
+          <PrimaryButton
+            type="submit"
+            form={formId}
+            disabled={importInProgress}
+          >
             {t('shared:next')}
           </PrimaryButton>
         </div>
@@ -325,7 +269,10 @@ function VerifyRobotEncryptionKeyPage({
     >
       <form
         id={formId}
-        onSubmit={handleFormSubmit(tryImport)}
+        onSubmit={event => {
+          event.preventDefault()
+          tryImport()
+        }}
         className={styles.content}
       >
         <div className={styles.step_body}>
@@ -356,12 +303,21 @@ function VerifyRobotEncryptionKeyPage({
   )
 }
 
+const STEP_PAGES = [
+  EnterServicePINPage,
+  VerifyRobotEncryptionKeyPage,
+  CreateServiceAccountPage,
+  CreateAdminAccountPage,
+  AdminPasswordPage,
+  RecoveryAccountDetailsPage,
+] as const
+
 function CreateServiceAccountPage({
   header,
   onBack,
   onNext,
   serviceAccountPassword,
-}: CrsWizardPageProps): JSX.Element {
+}: CommonPageProps): JSX.Element {
   const { t } = useTranslation(['access_control', 'shared'])
 
   return (
@@ -412,13 +368,13 @@ function CreateServiceAccountPage({
 }
 
 function CreateAdminAccountPage({
-  formId,
   header,
   onBack,
   onNext,
-}: CrsWizardPageProps): JSX.Element {
+}: CommonPageProps): JSX.Element {
   const { t } = useTranslation(['access_control', 'shared'])
-  const { control } = useFormContext<CRSWizardFormValues>()
+  const { control, trigger } = useFormContext<FormValues>()
+  const formId = useId()
 
   return (
     <ModalShell
@@ -427,13 +383,22 @@ function CreateAdminAccountPage({
       footer={
         <div className={styles.footer}>
           <SecondaryButton onClick={onBack}>{t('shared:back')}</SecondaryButton>
-          <PrimaryButton onClick={onNext}>{t('shared:next')}</PrimaryButton>
+          <PrimaryButton type="submit" form={formId}>
+            {t('shared:next')}
+          </PrimaryButton>
         </div>
       }
     >
       <form
         id={formId}
-        onSubmit={handleFormSubmit(onNext)}
+        onSubmit={event => {
+          event.preventDefault()
+          void trigger(['adminUsername', 'adminLegalName']).then(isValid => {
+            if (isValid) {
+              onNext()
+            }
+          })
+        }}
         className={styles.content}
       >
         <div className={styles.step_body}>
@@ -479,13 +444,13 @@ function CreateAdminAccountPage({
 }
 
 function AdminPasswordPage({
-  formId,
   header,
   onBack,
   onNext,
-}: CrsWizardPageProps): JSX.Element {
+}: CommonPageProps): JSX.Element {
   const { t } = useTranslation(['access_control', 'shared'])
-  const { control, getValues } = useFormContext<CRSWizardFormValues>()
+  const { control, getValues, trigger } = useFormContext<FormValues>()
+  const formId = useId()
 
   return (
     <ModalShell
@@ -494,13 +459,22 @@ function AdminPasswordPage({
       footer={
         <div className={styles.footer}>
           <SecondaryButton onClick={onBack}>{t('shared:back')}</SecondaryButton>
-          <PrimaryButton onClick={onNext}>{t('shared:next')}</PrimaryButton>
+          <PrimaryButton type="submit" form={formId}>
+            {t('shared:next')}
+          </PrimaryButton>
         </div>
       }
     >
       <form
         id={formId}
-        onSubmit={handleFormSubmit(onNext)}
+        onSubmit={event => {
+          event.preventDefault()
+          void trigger(['password', 'confirmPassword']).then(isValid => {
+            if (isValid) {
+              onNext()
+            }
+          })
+        }}
         className={styles.content}
       >
         <div className={styles.step_body}>
@@ -558,36 +532,32 @@ function RecoveryAccountDetailsPage({
   onNext,
   recoveryAccountPassword,
   serviceAccountPassword,
-}: CrsWizardPageProps): JSX.Element {
+}: CommonPageProps): JSX.Element {
   const { t } = useTranslation(['access_control', 'shared'])
-  const { getValues } = useFormContext<CRSWizardFormValues>()
+  const { getValues } = useFormContext<FormValues>()
   const enableCRSMutation = useEnableCRSMutation()
   const { isLoading, error: submissionError } = enableCRSMutation
 
   const handleCompleteSetup = async (): Promise<void> => {
-    try {
-      const { adminUsername, adminLegalName, password } = getValues()
-      await enableCRSMutation.mutateAsync({
-        adminAccount: {
-          username: adminUsername,
-          password,
-          fullName: adminLegalName,
-        },
-        recoveryAccount: {
-          username: RECOVERY_ACCOUNT_USERNAME,
-          password: recoveryAccountPassword,
-          fullName: RECOVERY_ACCOUNT_FULL_NAME,
-        },
-        serviceAccount: {
-          username: SERVICE_ACCOUNT_USERNAME,
-          password: serviceAccountPassword,
-          fullName: SERVICE_ACCOUNT_FULL_NAME,
-        },
-      })
-      onNext()
-    } catch {
-      // Mutation errors are rendered below and the wizard remains open for retry.
-    }
+    const { adminUsername, adminLegalName, password } = getValues()
+    await enableCRSMutation.mutateAsync({
+      adminAccount: {
+        username: adminUsername,
+        password,
+        fullName: adminLegalName,
+      },
+      recoveryAccount: {
+        username: RECOVERY_ACCOUNT_USERNAME,
+        password: recoveryAccountPassword,
+        fullName: RECOVERY_ACCOUNT_FULL_NAME,
+      },
+      serviceAccount: {
+        username: SERVICE_ACCOUNT_USERNAME,
+        password: serviceAccountPassword,
+        fullName: SERVICE_ACCOUNT_FULL_NAME,
+      },
+    })
+    onNext()
   }
 
   return (
@@ -654,20 +624,6 @@ function RecoveryAccountDetailsPage({
       </div>
     </ModalShell>
   )
-}
-
-/**
- * Prevents the browser's default full-page submit and delegates to the given
- * handler, so pressing Enter in a field behaves like clicking the footer's
- * primary button.
- */
-function handleFormSubmit(
-  onSubmit: () => void
-): (event: FormEvent<HTMLFormElement>) => void {
-  return event => {
-    event.preventDefault()
-    onSubmit()
-  }
 }
 
 /**
