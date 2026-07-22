@@ -67,10 +67,9 @@ class MaintenanceRunsPublisher:
         await self.publish_current_maintenance_run_async()
 
     def stop_publishing_for_maintenance_run(self) -> None:
-        """Disarm maintenance notify hooks after the maintenance run is cleared.
+        """Drop PE notify hooks and advise clients to refetch current-run.
 
-        Triggered when a current maintenance run is torn down so late PE
-        callbacks cannot use the old hooks.
+        Nulls hooks so late PE callbacks cannot read a cleared maintenance run.
         """
         self._run_hooks = None
         self._engine_state_slice = None

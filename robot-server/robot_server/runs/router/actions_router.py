@@ -152,7 +152,7 @@ async def create_run_action(
         and maintenance_run_orchestrator_store.current_run_id is not None
     ):
         await maintenance_run_orchestrator_store.clear()
-        # Called when a protocol run is played while a maintenance run is still open
+        # Drop publisher hooks for the maintenance run cleared by protocol play.
         maintenance_runs_publisher.stop_publishing_for_maintenance_run()
     try:
         deck_configuration: DeckConfigurationType = []

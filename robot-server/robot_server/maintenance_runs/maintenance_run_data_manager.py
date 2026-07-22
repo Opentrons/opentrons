@@ -120,8 +120,8 @@ class MaintenanceRunDataManager:
         """
         if self._run_orchestrator_store.current_run_id is not None:
             await self._run_orchestrator_store.clear()
-            # Called when creating a maintenance run while another is already
-            # open (IE starting a new calibration while one is open).
+            # Drop publisher hooks for the prior maintenance run before starting
+            # the new one (e.g. opening a new calibration while one is open).
             self._maintenance_runs_publisher.stop_publishing_for_maintenance_run()
 
         proxy_door_callback = None
@@ -203,7 +203,7 @@ class MaintenanceRunDataManager:
         """
         if run_id == self._run_orchestrator_store.current_run_id:
             await self._run_orchestrator_store.clear()
-            # Called when deleting the current maintenance run
+            # Drop publisher hooks when a maintenance run is cleared.
             self._maintenance_runs_publisher.stop_publishing_for_maintenance_run()
 
             if camera_settings is not None:
@@ -288,8 +288,7 @@ class MaintenanceRunDataManager:
         return self._run_orchestrator_store.get_command(command_id=command_id)
 
     def _get_state_summary(self, run_id: str) -> Optional[StateSummary]:
-        # Called from publisher hooks on PE status changes; can race with
-        # teardown after the maintenance run has already been cleared.
+        # Return None if the orchestrator is already gone (late PE notify after clear).
         try:
             return self._run_orchestrator_store.get_state_summary()
         except NoRunOrchestrator:
