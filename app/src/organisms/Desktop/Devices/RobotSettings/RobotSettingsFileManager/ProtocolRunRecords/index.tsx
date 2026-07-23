@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   CheckboxBasic,
   ERROR_TOAST,
+  INFO_TOAST,
   InfoScreen,
   StyledText,
   WARNING_TOAST,
@@ -24,6 +25,8 @@ import fileManagerStyles from '../robotsettingsfilemanager.module.css'
 import protocolRunRecordsStyles from './protocolrunrecords.module.css'
 import { RunRecord } from './RunRecord'
 
+import type { IconProps } from '@opentrons/components'
+
 interface ProtocolRunRecordsProps {
   robotName: string
 }
@@ -32,7 +35,7 @@ export function ProtocolRunRecords({
   robotName,
 }: ProtocolRunRecordsProps): JSX.Element {
   const { t } = useTranslation('device_details')
-  const { makeToast } = useToaster()
+  const { makeToast, eatToast } = useToaster()
   const { data: runData } = useNotifyAllRunsQuery()
   const runs = useMemo(() => [...(runData?.data ?? [])], [runData?.data])
   const documentationState = useDocumentationState()
@@ -63,11 +66,19 @@ export function ProtocolRunRecords({
       return
     }
     if (!isDownloadingRuns) {
-      void downloadRuns(runs.filter(run => selectedIds.has(run.id))).catch(
-        (e: Error) => {
-          makeToast(e.message, ERROR_TOAST, { closeButton: true })
-        }
+      const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
+      const toastId = makeToast(
+        t('downloading_run_records') as string,
+        INFO_TOAST,
+        { disableTimeout: true, icon: toastIcon }
       )
+      void downloadRuns(runs.filter(run => selectedIds.has(run.id)))
+        .catch((e: Error) => {
+          makeToast(e.message, ERROR_TOAST, { closeButton: true })
+        })
+        .finally(() => {
+          eatToast(toastId)
+        })
     }
   }
 
