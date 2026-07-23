@@ -6,28 +6,22 @@
  * Do not duplicate patch logic elsewhere; if published manifests change, edit
  * here so pack/ and npm stay aligned.
  *
- * This is where catalog / workspace / peerDependency rewriting actually lives.
- * publish.mts only imports these helpers; it does not reimplement them.
+ * Protocol rewrite ownership:
+ *   - `catalog:` / `workspace:*` → left for `pnpm pack` (do not rewrite here)
+ *   - publish.mts temporarily sets each package version, then runs `pnpm pack`,
+ *     so workspace deps resolve to the publish semver instead of 0.0.0-dev
  *
- * Monorepo manifests use workspace, link, and catalog specifiers that are
- * invalid for external npm consumers. These helpers rewrite them to concrete
- * semver strings and apply other publish-time fixes (exports, files allowlists).
+ * What this module still owns (monorepo debt / consumer hygiene):
+ *   - move `@types/*` (and a few unused runtime deps) out of dependencies
+ *   - peerDependency ranges preferred for external consumers (`^…`)
+ *   - `files` allowlists and `exports` maps
+ *
  * README/LICENSE file contents are written by publish.mts, not here.
+ *
+ * Follow-up (when the monorepo moves to pnpm 11): switch the publish step from
+ * `npm publish` to `pnpm publish` for native OIDC Trusted Publishing. Keep
+ * `pnpm pack` (or equivalent) for protocol rewriting until then.
  */
-
-/** Matches pnpm-workspace.yaml catalog entries used by the four library packages. */
-export const MONOREPO_CATALOG: Record<string, string> = {
-  lodash: '4.18.1',
-  'react-i18next': '14.0.0',
-  '@types/lodash': '4.17.24',
-}
-
-/** Matches pnpm-workspace.yaml catalogs.react18 entries. */
-export const REACT18_CATALOG: Record<string, string> = {
-  react: '18.2.0',
-  'react-dom': '18.2.0',
-  '@types/react-dom': '18.2.0',
-}
 
 /** Peer dependency ranges recommended for external consumers. */
 export const PEER_VERSION_RANGES: Record<string, string> = {
@@ -37,59 +31,23 @@ export const PEER_VERSION_RANGES: Record<string, string> = {
   i18next: '^19.8.3',
 }
 
-export function isMonorepoLocalRange(range: string): boolean {
-  return range === 'workspace:*' || range.startsWith('link:')
-}
-
-export function resolveDependencyRange(
-  depName: string,
-  range: string,
-  publishVersion: string
-): string {
-  if (isMonorepoLocalRange(range)) {
-    if (depName.startsWith('@opentrons/')) {
-      return publishVersion
-    }
-    console.warn(
-      `  WARNING: unknown monorepo-local dep ${depName}=${range}, rewriting to "*"`
-    )
-    return '*'
-  }
-
-  if (range === 'catalog:react18') {
-    return REACT18_CATALOG[depName] ?? PEER_VERSION_RANGES[depName] ?? '^18.2.0'
-  }
-
-  if (range === 'catalog:' || range.startsWith('catalog:')) {
-    const resolved = MONOREPO_CATALOG[depName]
-    if (resolved != null) {
-      return resolved
-    }
-    console.warn(`  WARNING: unknown catalog dep ${depName}=${range}`)
-    return range
-  }
-
-  return range
-}
-
+/**
+ * Prefer npm-friendly peer ranges. Leaves unknown peers unchanged
+ * (including values already rewritten by `pnpm pack`).
+ */
 export function resolvePeerDependencyRange(
   depName: string,
   range: string
 ): string {
-  if (range === 'catalog:react18') {
-    return PEER_VERSION_RANGES[depName] ?? '^18.2.0'
-  }
-
-  if (range === 'catalog:' || range.startsWith('catalog:')) {
-    return PEER_VERSION_RANGES[depName] ?? MONOREPO_CATALOG[depName] ?? range
-  }
-
-  return range
+  return PEER_VERSION_RANGES[depName] ?? range
 }
 
+/**
+ * Move `@types/*` out of runtime dependencies. Leave all other ranges as-is
+ * so `pnpm pack` can rewrite `catalog:` / `workspace:*`.
+ */
 export function patchDependencySections(
-  pkg: Record<string, unknown>,
-  publishVersion: string
+  pkg: Record<string, unknown>
 ): Record<string, unknown> {
   const devDeps: Record<string, string> = {
     ...((pkg.devDependencies as Record<string, string> | undefined) ?? {}),
@@ -100,10 +58,10 @@ export function patchDependencySections(
     (pkg.dependencies as Record<string, string> | undefined) ?? {}
   )) {
     if (name.startsWith('@types/')) {
-      devDeps[name] = resolveDependencyRange(name, range, publishVersion)
+      devDeps[name] = range
       continue
     }
-    cleanDeps[name] = resolveDependencyRange(name, range, publishVersion)
+    cleanDeps[name] = range
   }
 
   const peerDeps: Record<string, string> = {}
@@ -134,7 +92,7 @@ export function patchSharedDataPackageJson(
   pkg: Record<string, unknown>,
   version: string
 ): Record<string, unknown> {
-  const patched = patchDependencySections(pkg, version)
+  const patched = patchDependencySections(pkg)
 
   return {
     ...patched,
@@ -160,7 +118,7 @@ export function patchStepGenerationPackageJson(
   pkg: Record<string, unknown>,
   version: string
 ): Record<string, unknown> {
-  const patched = patchDependencySections(pkg, version)
+  const patched = patchDependencySections(pkg)
 
   return {
     ...patched,
@@ -185,10 +143,10 @@ export function patchComponentsPackageJson(
       COMPONENTS_TYPE_ONLY_DEPS.has(name) ||
       COMPONENTS_UNUSED_RUNTIME_DEPS.has(name)
     ) {
-      devDeps[name] = resolveDependencyRange(name, range, version)
+      devDeps[name] = range
       continue
     }
-    cleanDeps[name] = resolveDependencyRange(name, range, version)
+    cleanDeps[name] = range
   }
 
   const peerDeps: Record<string, string> = {}
@@ -235,7 +193,7 @@ export function patchProtocolVisualizationPackageJson(
   pkg: Record<string, unknown>,
   version: string
 ): Record<string, unknown> {
-  const patched = patchDependencySections(pkg, version)
+  const patched = patchDependencySections(pkg)
 
   return {
     ...patched,

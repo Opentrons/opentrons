@@ -14,7 +14,9 @@ Reference **external consumer** for four npm packages:
 - `@opentrons/components`
 - `@opentrons/protocol-visualization`
 
-Builds packed artifacts (not live monorepo source), patches manifests like `publish.mts`, links via `link:pack/...`, and runs a Vite demo plus Playwright + Applitools Eyes.
+Builds packed artifacts (not live monorepo source), applies the same debt
+patches as `publish.mts` (after `pnpm pack` rewrote catalog/workspace), links
+via `link:pack/...`, and runs a Vite demo plus Playwright + Applitools Eyes.
 
 **Full external consumer docs:** `js-package-testing/README.md` section "External consumer guide".
 
@@ -41,13 +43,13 @@ Library runtime deps (`styled-components`, `redux`, etc.) are bundled; host app 
 
 **Order matters:** build packs first, patch manifests, then install.
 
-1. `make pack` in each library → extract to `pack/opentrons-*/`
-2. `scripts/patch-packed-packages.mts` rewrites `pack/*/package.json` (same logic as `publish.mts`)
+1. `make pack` in each library (`pnpm pack` rewrites catalog/workspace) → extract to `pack/opentrons-*/`
+2. `scripts/patch-packed-packages.mts` applies debt patches (same module as `publish.mts`)
 3. `pnpm install` with `link:pack/...` deps
 4. `pnpm-workspace.yaml` **overrides** pin transitive `@opentrons/*` to `pack/`
 
-Shared patching: `scripts/package-json-patches.mts` (single source of truth for
-`scripts/publish.mts` and `scripts/patch-packed-packages.mts`).
+Shared debt patches: `scripts/package-json-patches.mts` (not catalog/workspace;
+those are pnpm's job).
 
 ## Publish
 
@@ -59,10 +61,12 @@ node --experimental-strip-types scripts/publish.mts \
   --version X.Y.Z-alpha.0 --dry-run
 ```
 
+Flow: debt-patch manifests → `pnpm pack` (protocol rewrite) → inject README/LICENSE
+→ `npm publish` (OIDC on pnpm 10). **When the monorepo is on pnpm 11+, switch
+the last step to `pnpm publish`.**
+
 Always publishes dist-tag `latest` (no `--tag` flag). Dry-run needs no auth; real
 local publish needs interactive npm 2FA (tokens disallowed). Prefer CI for releases.
-
-Never publish raw monorepo manifests (`workspace:*`, `catalog:` break npm consumers).
 
 ## Project structure
 
@@ -70,9 +74,9 @@ Never publish raw monorepo manifests (`workspace:*`, `catalog:` break npm consum
 scripts/
 ├── next-npm-version.mts       # patch bump from npm latest
 ├── npm-latest-versions.mts    # print npm dist-tags
-├── package-json-patches.mts   # single source of truth for published manifests
-├── patch-packed-packages.mts  # applies patches to js-package-testing/pack/
-└── publish.mts                # npm publish pipeline
+├── package-json-patches.mts   # debt patches (files/exports/@types/peers)
+├── patch-packed-packages.mts  # applies debt patches to js-package-testing/pack/
+└── publish.mts                # pnpm pack + npm publish (pnpm publish on pnpm 11+)
 
 js-package-testing/
 ├── Makefile

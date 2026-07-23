@@ -1,6 +1,12 @@
 # Publish @opentrons/{shared-data,step-generation,components,protocol-visualization}
 # via scripts/publish.mts using npm Trusted Publishing (OIDC).
 #
+# Pack/publish split (pnpm 10.x):
+#   - pnpm pack rewrites catalog: / workspace:*
+#   - npm publish performs OIDC Trusted Publishing
+# Follow-up when the monorepo moves to pnpm 11+: switch publish.mts to
+# `pnpm publish` (native OIDC) and keep pnpm for protocol rewriting.
+#
 # Follows https://docs.npmjs.com/trusted-publishers
 #   - GitHub-hosted runner (required; self-hosted not supported)
 #   - Node >= 22.14.0, npm CLI >= 11.5.1

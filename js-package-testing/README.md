@@ -145,28 +145,29 @@ CSS path aliases in the demo Vite config are a fallback when subpath exports
 resolve unexpectedly; with a normal npm install the import paths above should
 work without aliases.
 
-### What publish.mts fixes before npm
+### What publish.mts does before npm
 
-Monorepo `package.json` files use `workspace:*`, `link:`, and `catalog:`
-specifiers that **do not work on npm**. Always publish with
-[`../scripts/publish.mts`](../scripts/publish.mts) (not raw `pnpm pack` +
-`npm publish`).
+Monorepo `package.json` files use `workspace:*` and `catalog:` specifiers that
+**do not work on npm**. Always publish with
+[`../scripts/publish.mts`](../scripts/publish.mts).
 
-Shared patching logic lives in
-[`../scripts/package-json-patches.mts`](../scripts/package-json-patches.mts)
-(single source of truth for both `scripts/publish.mts` and
-`scripts/patch-packed-packages.mts`). Look there for the rewrites, not only in
-`publish.mts`. It rewrites:
+Pipeline:
 
-- `workspace:*` / `link:` → matching publish semver for `@opentrons/*` deps
-- `catalog:` / `catalog:react18` → concrete semver (from root `pnpm-workspace.yaml`)
-- `@types/*` from runtime `dependencies` → `devDependencies`
-- `peerDependencies` → npm-compatible ranges (`^18.2.0`, etc.)
-- `files` allowlists and `exports` maps (including `README.md` / `LICENSE` in
-  `files[]`)
+1. **Debt patches** via
+   [`../scripts/package-json-patches.mts`](../scripts/package-json-patches.mts)
+   (shared with `scripts/patch-packed-packages.mts`):
+   - `@types/*` (and a few unused runtime deps) moved out of `dependencies`
+   - `peerDependencies` → npm-friendly ranges (`^18.2.0`, etc.)
+   - `files` allowlists and `exports` maps
+2. **Temporarily set** each package `version` to the publish semver, then run
+   **`pnpm pack`** so pnpm rewrites `catalog:` / `workspace:*` (do not
+   reimplement that in our scripts)
+3. Inject README + LICENSE, then **`npm publish`** the tarball (OIDC Trusted
+   Publishing on pnpm 10.x)
 
-`publish.mts` additionally writes the README contents and copies `LICENSE` into
-each staged tarball before `npm publish`.
+**Follow-up:** when the monorepo moves to **pnpm 11+**, switch the publish step
+from `npm publish` to `pnpm publish` (native OIDC). Keep using pnpm for
+`catalog:` / `workspace:*` rewriting.
 
 ```bash
 # From monorepo root (always publishes dist-tag "latest")
@@ -301,7 +302,11 @@ when keys change.
 
 Direct deps use `link:pack/opentrons-*`. [`pnpm-workspace.yaml`](pnpm-workspace.yaml) **`overrides`** force the same four paths for transitive `@opentrons/*` resolution.
 
-After extraction, [`../scripts/patch-packed-packages.mts`](../scripts/patch-packed-packages.mts) rewrites each `pack/*/package.json` using [`../scripts/package-json-patches.mts`](../scripts/package-json-patches.mts) (same module as `scripts/publish.mts`): `workspace:*` and `catalog:` become concrete semver, `@types/*` move to devDependencies, and export maps match npm publishes.
+After extraction, [`../scripts/patch-packed-packages.mts`](../scripts/patch-packed-packages.mts)
+applies the same debt patches as `scripts/publish.mts` via
+[`../scripts/package-json-patches.mts`](../scripts/package-json-patches.mts)
+(`@types/*` moves, peer ranges, `files` / `exports`). `catalog:` / `workspace:*`
+were already rewritten by each library's `pnpm pack`.
 
 The `pack/` directory is gitignored. Committed `link:` entries and `pnpm-lock.yaml` describe the strategy; linked contents can change without lockfile churn for those packages.
 

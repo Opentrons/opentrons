@@ -2,6 +2,10 @@
  * Patches extracted js-package-testing/pack/ directories so their package.json
  * files match what npm consumers receive after scripts/publish.mts runs.
  *
+ * `pnpm pack` (via each library Makefile) already rewrote catalog: / workspace:*.
+ * This script applies the remaining debt patches from package-json-patches.mts
+ * (files / exports / @types moves / peer ranges).
+ *
  * Run from repo root (or via js-package-testing Makefile):
  *   node --experimental-strip-types scripts/patch-packed-packages.mts
  */

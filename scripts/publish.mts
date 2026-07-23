@@ -3,8 +3,9 @@
  *
  * Builds @opentrons/shared-data, @opentrons/step-generation,
  * @opentrons/components, and @opentrons/protocol-visualization from monorepo
- * source, fixes every known issue that broke the 0.2.1-alpha.0 npm releases,
- * injects a README and LICENSE into each tarball, and publishes all four to npm.
+ * source, applies consumer-facing package.json patches, packs with `pnpm pack`
+ * (so `catalog:` / `workspace:*` are rewritten by pnpm), injects a README and
+ * LICENSE into each tarball, and publishes all four to npm via `npm publish`.
  *
  * Run with Node >= 22:
  *   node --experimental-strip-types scripts/publish.mts [options]
@@ -12,7 +13,7 @@
  * Options:
  *   --version <ver>    Semver string to publish as (required, e.g. 0.3.9-alpha.0)
  *   --registry <url>   npm registry URL (default: https://registry.npmjs.org)
- *   --dry-run          Build and patch everything but skip `npm publish`
+ *   --dry-run          Build and pack everything but skip `npm publish`
  *   --skip-build       Skip make build steps (useful when lib/ is already fresh)
  *
  * Always publishes with the "latest" dist-tag (not configurable).
@@ -23,24 +24,23 @@
  *   - Local real publish: interactive `npm login` + 2FA OTP (these packages
  *     disallow automation tokens). Prefer the CI workflow for releases.
  *
- * Manifest rewrites (items 1-8) live in ./package-json-patches.mts. This file
- * imports those helpers, then builds, smoke-tests, stages tarballs, and publishes.
- * Do not look only at this file for catalog / peerDependency rewriting.
+ * Why pnpm pack + npm publish (not pnpm publish):
+ *   - `pnpm pack` owns `catalog:` / `workspace:*` rewriting (do not reimplement)
+ *   - On pnpm 10.x, Trusted Publishing OIDC is reliable via `npm publish`
+ *   - When the monorepo moves to pnpm 11+, switch the publish step to
+ *     `pnpm publish` (native OIDC) and drop the npm publish call
  *
- * Via package-json-patches.mts:
- *  1. workspace / link deps rewritten to real semver so published packages are usable.
- *  2. catalog / catalog:react18 specifiers rewritten to concrete semver ranges.
- *  3. @types/* and unused runtime deps moved to devDependencies so consumers
- *     don't install them.
- *  4. peerDependencies rewritten to npm-compatible semver ranges.
- *  5. shared-data gets a proper `files` allowlist (lib/ only, no Makefile/Python).
- *  6. shared-data exports map points at real CJS + ESM outputs.
- *  7. components exports map (require -> .js, import -> .mjs).
- *  8. protocol-visualization exports include ./styles -> lib/style.css.
+ * Debt patches (files / exports / @types / peer ranges) live in
+ * ./package-json-patches.mts. Prefer fixing source package.jsons over time
+ * and shrinking that module.
  *
  * Done here in publish.mts:
- *  9. Smoke-tests the ESM output with Node's native dynamic import before publish.
- * 10. Writes README (alpha disclaimer) and copies LICENSE into each staged tarball.
+ *  1. Build + smoke-test ESM outputs
+ *  2. Temporarily write patched manifests (with publish version) into each
+ *     package dir so `pnpm pack` resolves workspace deps to that version
+ *  3. `pnpm pack` each package, restore original package.json files
+ *  4. Inject README + LICENSE + canonical repository into each tarball
+ *  5. `npm publish` each tarball (OIDC in CI)
  *
  * To run from repo root:
  *   node --experimental-strip-types scripts/next-npm-version.mts
@@ -49,7 +49,14 @@
  */
 
 import { spawnSync } from 'node:child_process'
-import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  cpSync,
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import * as path from 'node:path'
 
@@ -116,6 +123,24 @@ const PROTOCOL_VISUALIZATION_ROOT = path.join(
 )
 const ROOT_LICENSE = path.join(MONO_ROOT, 'LICENSE')
 
+interface PackageTarget {
+  root: string
+  patch: (
+    pkg: Record<string, unknown>,
+    version: string
+  ) => Record<string, unknown>
+}
+
+const PACKAGE_TARGETS: PackageTarget[] = [
+  { root: SHARED_DATA_ROOT, patch: patchSharedDataPackageJson },
+  { root: STEP_GENERATION_ROOT, patch: patchStepGenerationPackageJson },
+  { root: COMPONENTS_ROOT, patch: patchComponentsPackageJson },
+  {
+    root: PROTOCOL_VISUALIZATION_ROOT,
+    patch: patchProtocolVisualizationPackageJson,
+  },
+]
+
 function run(cmd: string, cwd: string): void {
   console.log(`\n$ ${cmd}  (cwd: ${cwd})`)
   const result = spawnSync(cmd, { cwd, shell: true, stdio: 'inherit' })
@@ -151,6 +176,14 @@ function withCanonicalRepository(
     ...pkg,
     repository: { ...CANONICAL_REPOSITORY },
   }
+}
+
+function packageJsonPath(packageRoot: string): string {
+  return path.join(packageRoot, 'package.json')
+}
+
+function tarballFileName(packageName: string, version: string): string {
+  return `${packageName.replace('@', '').replace('/', '-')}-${version}.tgz`
 }
 
 // ---------------------------------------------------------------------------
@@ -237,7 +270,7 @@ async function smokeTestEsm(
     const message = err instanceof Error ? err.message : String(err)
     if (message.includes('not found') || message.includes('CommonJS')) {
       console.error(
-        `\n  FATAL: ESM import failed for ${packageName} — likely a lodash CJS interop issue.\n` +
+        `\n  FATAL: ESM import failed for ${packageName} - likely a lodash CJS interop issue.\n` +
           `  Error: ${message}\n` +
           `  Fix: ensure vite.config commonjsOptions.transformMixedEsModules = true is set.`
       )
@@ -251,84 +284,105 @@ async function smokeTestEsm(
 }
 
 // ---------------------------------------------------------------------------
-// Stage and publish a single package
+// Temporarily patch source package.json files, pnpm pack, then restore
 // ---------------------------------------------------------------------------
 
-function publishPackage(
-  sourceRoot: string,
-  patchedPkgJson: Record<string, unknown>,
+function withPatchedPackageJsons<T>(version: string, fn: () => T): T {
+  const backups = PACKAGE_TARGETS.map(target => {
+    const pkgPath = packageJsonPath(target.root)
+    return {
+      pkgPath,
+      original: readFileSync(pkgPath, 'utf8'),
+      patched: withCanonicalRepository(
+        target.patch(readJson(pkgPath), version)
+      ),
+    }
+  })
+
+  try {
+    // Write all versions before any pack so workspace:* resolves to publishVersion
+    for (const backup of backups) {
+      writeJson(backup.pkgPath, backup.patched)
+      console.log(
+        `  Wrote patched package.json for ${String(backup.patched.name)}@${version}`
+      )
+    }
+    return fn()
+  } finally {
+    for (const backup of backups) {
+      writeFileSync(backup.pkgPath, backup.original, 'utf8')
+      console.log(`  Restored ${backup.pkgPath}`)
+    }
+  }
+}
+
+function pnpmPackPackage(
+  packageRoot: string,
+  packageName: string,
+  version: string,
+  packDest: string
+): string {
+  run(`pnpm pack --pack-destination "${packDest}"`, packageRoot)
+  const tarball = path.join(packDest, tarballFileName(packageName, version))
+  if (!existsSync(tarball)) {
+    throw new Error(`Expected tarball missing after pnpm pack: ${tarball}`)
+  }
+  return tarball
+}
+
+/**
+ * Extract a pnpm-packed tarball, inject README + LICENSE, re-pack with npm so
+ * the published tarball matches what we intend to ship, then publish (or dry-run).
+ */
+function finalizeAndPublishTarball(
+  packedTarball: string,
   version: string,
   args: Args
 ): void {
-  const name = patchedPkgJson.name as string
-
-  console.log(`\n=== Publishing ${name}@${version} ===`)
-
-  const stagingDir = path.join(
-    tmpdir(),
-    `opentrons-publish-${name.replace('/', '-')}-${Date.now()}`
-  )
-  mkdirSync(stagingDir, { recursive: true })
-
+  const extractRoot = mkdtempSync(path.join(tmpdir(), 'opentrons-publish-'))
   try {
-    // Copy built artifacts listed in files[]
-    const filesToCopy = (patchedPkgJson.files as string[]) ?? ['lib/']
-    for (const entry of filesToCopy) {
-      // README.md and LICENSE are written by this script, not copied from source
-      if (entry === 'README.md' || entry === 'LICENSE') continue
-      const src = path.join(sourceRoot, entry)
-      const dest = path.join(stagingDir, entry)
-      try {
-        cpSync(src, dest, { recursive: true })
-      } catch {
-        console.warn(`  WARNING: could not copy ${entry} — skipping`)
-      }
-    }
+    run(`tar -xzf "${packedTarball}" -C "${extractRoot}"`, MONO_ROOT)
+    const stagingDir = path.join(extractRoot, 'package')
+    const pkg = withCanonicalRepository(readJson(packageJsonPath(stagingDir)))
+    const name = pkg.name as string
 
-    // Write generated README
+    writeJson(packageJsonPath(stagingDir), pkg)
     writeFileSync(
       path.join(stagingDir, 'README.md'),
       makeReadme(name, version),
       'utf8'
     )
-
-    // Copy LICENSE from monorepo root
     try {
       cpSync(ROOT_LICENSE, path.join(stagingDir, 'LICENSE'))
     } catch {
-      console.warn('  WARNING: could not copy root LICENSE — skipping')
+      console.warn('  WARNING: could not copy root LICENSE - skipping')
     }
 
-    // Write patched package.json
-    writeJson(path.join(stagingDir, 'package.json'), patchedPkgJson)
-
     if (args.dryRun) {
-      console.log(`  DRY RUN - would publish from ${stagingDir}`)
+      console.log(`\n=== DRY RUN ${name}@${version} ===`)
       console.log(`  Would publish with tag "${DIST_TAG}"`)
-      console.log('  Patched package.json:')
-      console.log(JSON.stringify(patchedPkgJson, null, 2))
+      console.log('  package.json:')
+      console.log(JSON.stringify(pkg, null, 2))
       console.log('\n  README.md:')
       console.log(makeReadme(name, version))
-      // Show what npm pack would include from the staging dir
       run('npm pack --dry-run', stagingDir)
       return
     }
 
-    // Pack to a tarball first, then publish the tarball.
-    // Publishing a tarball (not a directory) bypasses all files/npmignore
-    // heuristics and guarantees exactly what's in stagingDir gets shipped.
-    // In GitHub Actions, npm CLI >= 11.5.1 uses OIDC trusted publishing
-    // automatically when id-token: write is set (no NPM_TOKEN needed).
+    // Re-pack after README/LICENSE injection, then publish the tarball.
+    // npm CLI >= 11.5.1 uses OIDC trusted publishing in GHA when
+    // id-token: write is set (no NPM_TOKEN needed).
+    // TODO(pnpm-11): replace this npm publish with `pnpm publish` once the
+    // monorepo is on pnpm 11+ (native OIDC Trusted Publishing).
     run('npm pack', stagingDir)
-    const safeName = name.replace('@', '').replace('/', '-')
-    const tarball = path.join(stagingDir, `${safeName}-${version}.tgz`)
+    const tarball = path.join(stagingDir, tarballFileName(name, version))
     run(
-      `npm publish ${tarball} --registry ${args.registry} --tag ${DIST_TAG} --access public`,
+      `npm publish "${tarball}" --registry ${args.registry} --tag ${DIST_TAG} --access public`,
       stagingDir
     )
     console.log(`  Published ${name}@${version} with tag "${DIST_TAG}"`)
   } finally {
-    rmSync(stagingDir, { recursive: true, force: true })
+    rmSync(extractRoot, { recursive: true, force: true })
   }
 }
 
@@ -344,6 +398,10 @@ async function main(): Promise<void> {
   console.log(`  tag:      ${DIST_TAG}`)
   console.log(`  registry: ${args.registry}`)
   console.log(`  dry-run:  ${args.dryRun}`)
+  console.log(`  pack:     pnpm pack (catalog/workspace rewrite)`)
+  console.log(
+    `  publish:  npm publish (OIDC on pnpm 10; pnpm publish on pnpm 11+)`
+  )
 
   // Build order: shared-data first, then step-generation and components (Vite
   // aliases), then protocol-visualization (depends on published-style peers).
@@ -352,7 +410,6 @@ async function main(): Promise<void> {
   buildComponents(args.skipBuild)
   buildProtocolVisualization(args.skipBuild)
 
-  // Smoke-test ESM outputs before touching npm
   await smokeTestEsm(
     path.join(SHARED_DATA_ROOT, 'lib'),
     '@opentrons/shared-data'
@@ -367,46 +424,27 @@ async function main(): Promise<void> {
     '@opentrons/protocol-visualization'
   )
 
-  // Patch package.json files
-  const sharedDataPkg = withCanonicalRepository(
-    patchSharedDataPackageJson(
-      readJson(path.join(SHARED_DATA_ROOT, 'package.json')),
-      args.version
-    )
-  )
-  const stepGenerationPkg = withCanonicalRepository(
-    patchStepGenerationPackageJson(
-      readJson(path.join(STEP_GENERATION_ROOT, 'package.json')),
-      args.version
-    )
-  )
-  const componentsPkg = withCanonicalRepository(
-    patchComponentsPackageJson(
-      readJson(path.join(COMPONENTS_ROOT, 'package.json')),
-      args.version
-    )
-  )
-  const protocolVisualizationPkg = withCanonicalRepository(
-    patchProtocolVisualizationPackageJson(
-      readJson(path.join(PROTOCOL_VISUALIZATION_ROOT, 'package.json')),
-      args.version
-    )
-  )
+  const packDest = mkdtempSync(path.join(tmpdir(), 'opentrons-pnpm-pack-'))
+  try {
+    const tarballs = withPatchedPackageJsons(args.version, () => {
+      console.log('\n=== pnpm pack (rewrites catalog: / workspace:*) ===')
+      return PACKAGE_TARGETS.map(target => {
+        const name = readJson(packageJsonPath(target.root)).name as string
+        return pnpmPackPackage(target.root, name, args.version, packDest)
+      })
+    })
 
-  // Publish in dependency order, then protocol-visualization
-  publishPackage(SHARED_DATA_ROOT, sharedDataPkg, args.version, args)
-  publishPackage(STEP_GENERATION_ROOT, stepGenerationPkg, args.version, args)
-  publishPackage(COMPONENTS_ROOT, componentsPkg, args.version, args)
-  publishPackage(
-    PROTOCOL_VISUALIZATION_ROOT,
-    protocolVisualizationPkg,
-    args.version,
-    args
-  )
+    for (const tarball of tarballs) {
+      console.log(`\n=== Finalize and publish ${path.basename(tarball)} ===`)
+      finalizeAndPublishTarball(tarball, args.version, args)
+    }
+  } finally {
+    rmSync(packDest, { recursive: true, force: true })
+  }
 
   console.log('\nDone!')
   if (args.dryRun) {
-    console.log('(dry-run mode — nothing was actually published)')
+    console.log('(dry-run mode - nothing was actually published)')
   }
 }
 
