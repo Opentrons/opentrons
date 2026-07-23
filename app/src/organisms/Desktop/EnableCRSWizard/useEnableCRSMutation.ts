@@ -1,3 +1,5 @@
+/* eslint-disable opentrons/no-direct-mutating */
+
 import { useMutation, useQueryClient } from 'react-query'
 
 import { createUser, patchAccessControlEnabled } from '@opentrons/api-client'
@@ -47,7 +49,6 @@ export function useEnableCRSMutation(): UseMutationResult<
     // will fail because the users already exist. We might want to clear preexisting
     // users beforehand.
 
-    // eslint-disable-next-line opentrons/no-direct-mutating
     await createUser(hostConfig, {
       data: {
         accountType: 'admin',
@@ -56,7 +57,6 @@ export function useEnableCRSMutation(): UseMutationResult<
         fullName: params.adminAccount.fullName,
       },
     })
-    // eslint-disable-next-line opentrons/no-direct-mutating
     await createUser(hostConfig, {
       data: {
         accountType: 'admin',
@@ -65,7 +65,6 @@ export function useEnableCRSMutation(): UseMutationResult<
         fullName: params.recoveryAccount.fullName,
       },
     })
-    // eslint-disable-next-line opentrons/no-direct-mutating
     await createUser(hostConfig, {
       data: {
         accountType: 'service',
@@ -75,7 +74,6 @@ export function useEnableCRSMutation(): UseMutationResult<
       },
     })
 
-    // eslint-disable-next-line opentrons/no-direct-mutating
     const response = await patchAccessControlEnabled(hostConfig, {
       data: { accessControlEnabled: true },
     })
