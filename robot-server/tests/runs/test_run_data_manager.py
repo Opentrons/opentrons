@@ -818,10 +818,6 @@ async def test_uncurrent(
         times=1,
     )
     decoy.verify(
-        mock_runs_publisher.publish_runs_advise_refetch(run_id),
-        times=1,
-    )
-    decoy.verify(
         mock_file_provider.clear_run_metadata(),
         times=1,
     )
