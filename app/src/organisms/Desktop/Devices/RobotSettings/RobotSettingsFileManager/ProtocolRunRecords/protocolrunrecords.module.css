@@ -56,6 +56,7 @@
   display: flex;
   flex-direction: row;
   padding: 0 var(--spacing-12);
+  color: var(--grey-60);
   gap: var(--spacing-24);
 }
 

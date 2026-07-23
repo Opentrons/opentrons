@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import first from 'lodash/first'
 
-import { COLORS, ListItem, StyledText } from '@opentrons/components'
+import { ListItem, StyledText } from '@opentrons/components'
 import { useRunDataFileMetadata } from '@opentrons/react-api-client'
 
 import { useNotifyImageFileQuery } from '/app/resources/dataFiles/useNotifyImageFileQuery'
@@ -90,7 +90,7 @@ export function RunRecordDrawer(props: RunRecordDrawerProps): JSX.Element {
     (runDataFilesData?.data ?? []).filter(
       item => item.mimeType !== 'image/jpeg'
     ).length > 0
-  const protocolName = runProtocol?.metadata.protocolName
+  const protocolName = runProtocol?.metadata.protocolName ?? ''
   const runDateTime = run.createdAt
   const csvRtpFiles =
     'runTimeParameters' in run
@@ -100,7 +100,7 @@ export function RunRecordDrawer(props: RunRecordDrawerProps): JSX.Element {
       : []
   const csvRtpFileName = first(csvRtpFiles)?.file?.name ?? null
   const drawerFilesData = getRunRecordDrawerFiles({
-    protocolName: protocolName ?? '',
+    protocolName,
     runDateTime,
     hasImages,
     hasOutputFiles: hasNonImageOutputFiles,
@@ -110,10 +110,10 @@ export function RunRecordDrawer(props: RunRecordDrawerProps): JSX.Element {
   return (
     <div className={styles.run_record_drawer_container}>
       <div className={styles.run_record_drawer_header}>
-        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+        <StyledText desktopStyle="bodyDefaultRegular">
           {t('file_type')}
         </StyledText>
-        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+        <StyledText desktopStyle="bodyDefaultRegular">
           {t('file_name')}
         </StyledText>
       </div>
