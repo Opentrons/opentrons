@@ -40,10 +40,7 @@ export function DownloadProtocolRunRecordsWizard({
   const [errorSubText, setErrorSubText] = useState('')
 
   const documentationState = useDocumentationState()
-  const { downloadRuns } = useDownloadSelectedRuns(
-    robotName,
-    selectedPath ?? undefined
-  )
+  const { downloadRuns } = useDownloadSelectedRuns(robotName)
   const { deleteSelectedRuns } = useDeleteSelectedRuns(documentationState)
 
   const isActiveStep =
@@ -74,29 +71,32 @@ export function DownloadProtocolRunRecordsWizard({
   }
 
   const handleContinueFromConfirmDelete = (): void => {
-    setStep(STEP_TYPES.DOWNLOADING)
-    downloadRuns(allRuns)
-      .then(() => {
-        if (!deleteAfterDownload) {
-          setStep(STEP_TYPES.SUCCESS)
-          return
-        }
-        setStep(STEP_TYPES.DELETING)
-        deleteSelectedRuns(
-          allRuns,
-          () => {
+    // we should not be able to reach the selectedPath == null state
+    if (selectedPath != null) {
+      setStep(STEP_TYPES.DOWNLOADING)
+      downloadRuns(allRuns, selectedPath)
+        .then(() => {
+          if (!deleteAfterDownload) {
             setStep(STEP_TYPES.SUCCESS)
-          },
-          () => {
-            setErrorSubText(t('run_records_delete_failed') as string)
-            setStep(STEP_TYPES.ERROR)
+            return
           }
-        )
-      })
-      .catch(() => {
-        setErrorSubText(t('run_records_download_failed') as string)
-        setStep(STEP_TYPES.ERROR)
-      })
+          setStep(STEP_TYPES.DELETING)
+          deleteSelectedRuns(allRuns)
+            .then(() => {
+              setStep(STEP_TYPES.SUCCESS)
+            })
+            .catch(() => {
+              setErrorSubText(t('run_records_delete_failed') as string)
+              setStep(STEP_TYPES.ERROR)
+            })
+        })
+        .catch(() => {
+          setErrorSubText(t('run_records_download_failed') as string)
+          setStep(STEP_TYPES.ERROR)
+        })
+    } else {
+      setStep(STEP_TYPES.ERROR)
+    }
   }
 
   return createPortal(

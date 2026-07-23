@@ -49,11 +49,7 @@ describe('DownloadProtocolRunRecordsWizard', () => {
     } as any)
 
     mockDownloadRuns = vi.fn().mockResolvedValue(undefined)
-    mockDeleteSelectedRuns = vi
-      .fn()
-      .mockImplementation((_runs: unknown, onSuccess?: () => void) => {
-        onSuccess?.()
-      })
+    mockDeleteSelectedRuns = vi.fn().mockResolvedValue(undefined)
     vi.mocked(useDownloadSelectedRuns).mockReturnValue({
       downloadRuns: mockDownloadRuns,
       isDownloading: false,
@@ -82,7 +78,7 @@ describe('DownloadProtocolRunRecordsWizard', () => {
     await waitFor(() => {
       screen.getByText('All protocol files downloaded')
     })
-    expect(mockDownloadRuns).toHaveBeenCalledWith([mockRun])
+    expect(mockDownloadRuns).toHaveBeenCalledWith([mockRun], '/mnt/usb1')
     expect(mockDeleteSelectedRuns).not.toHaveBeenCalled()
   })
 
@@ -96,11 +92,7 @@ describe('DownloadProtocolRunRecordsWizard', () => {
     await waitFor(() => {
       screen.getByText('All protocol files downloaded')
     })
-    expect(mockDeleteSelectedRuns).toHaveBeenCalledWith(
-      [mockRun],
-      expect.any(Function),
-      expect.any(Function)
-    )
+    expect(mockDeleteSelectedRuns).toHaveBeenCalledWith([mockRun])
   })
 
   it('should show an error screen when the download fails', async () => {
@@ -119,11 +111,7 @@ describe('DownloadProtocolRunRecordsWizard', () => {
   })
 
   it('should show an error screen when the delete fails', async () => {
-    mockDeleteSelectedRuns.mockImplementation(
-      (_runs: unknown, _onSuccess?: () => void, onError?: () => void) => {
-        onError?.()
-      }
-    )
+    mockDeleteSelectedRuns.mockRejectedValue(new Error('nope'))
     render()
 
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))

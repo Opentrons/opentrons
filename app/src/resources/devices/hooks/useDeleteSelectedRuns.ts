@@ -17,11 +17,7 @@ import type { RunData } from '@opentrons/api-client'
 import type { DocumentationState } from '@opentrons/react-api-client'
 
 interface UseDeleteSelectedRunsResult {
-  deleteSelectedRuns: (
-    runs: readonly RunData[],
-    onSuccess?: () => void,
-    onError?: () => void
-  ) => void
+  deleteSelectedRuns: (runs: readonly RunData[]) => Promise<void>
   deletingIds: Set<string>
 }
 
@@ -64,24 +60,24 @@ export function useDeleteSelectedRuns(
     }
   )
 
-  const deleteSelectedRuns = (
-    runs: readonly RunData[],
-    onSuccess?: () => void,
-    onError?: () => void
-  ): void => {
+  const deleteSelectedRuns = (runs: readonly RunData[]): Promise<void> => {
     if (host == null || runs.length === 0 || deletingIds.size > 0) {
-      return
+      return Promise.reject(
+        new Error(
+          'Unable to delete: no host, nothing selected, or a delete is already in progress.'
+        )
+      )
     }
 
     setDeletingIds(new Set(runs.map(run => run.id)))
 
-    mutation.mutate([...runs], {
-      onSettled: () => {
-        setDeletingIds(new Set())
-      },
-      onSuccess,
-      onError,
-    })
+    return mutation
+      .mutateAsync([...runs], {
+        onSettled: () => {
+          setDeletingIds(new Set())
+        },
+      })
+      .then(() => {})
   }
 
   return { deleteSelectedRuns, deletingIds }

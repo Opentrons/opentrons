@@ -61,10 +61,10 @@ describe('useDownloadSelectedRuns', () => {
     vi.resetAllMocks()
   })
 
-  it('should no-op when given an empty array', async () => {
+  it('should reject and not fetch when given an empty array', async () => {
     const { result } = renderHook(() => useDownloadSelectedRuns(ROBOT_NAME))
 
-    await result.current.downloadRuns([])
+    await expect(result.current.downloadRuns([])).rejects.toThrow()
 
     expect(getRunRaw).not.toHaveBeenCalled()
   })
@@ -91,12 +91,10 @@ describe('useDownloadSelectedRuns', () => {
     expect(saveFileToUsb).not.toHaveBeenCalled()
   })
 
-  it('should save to the configured usbPath instead of the browser when provided', async () => {
-    const { result } = renderHook(() =>
-      useDownloadSelectedRuns(ROBOT_NAME, '/mnt/usb')
-    )
+  it('should save to the usbPath instead of the browser when provided', async () => {
+    const { result } = renderHook(() => useDownloadSelectedRuns(ROBOT_NAME))
 
-    await result.current.downloadRuns([mockRunOne])
+    await result.current.downloadRuns([mockRunOne], '/mnt/usb')
 
     expect(saveFileToUsb).toHaveBeenCalledWith(
       `/mnt/usb/${ROBOT_NAME}-run-records.zip`,
@@ -106,9 +104,7 @@ describe('useDownloadSelectedRuns', () => {
   })
 
   it('should prefer a call-time usbPath over the one passed to the hook', async () => {
-    const { result } = renderHook(() =>
-      useDownloadSelectedRuns(ROBOT_NAME, '/mnt/usb')
-    )
+    const { result } = renderHook(() => useDownloadSelectedRuns(ROBOT_NAME))
 
     await result.current.downloadRuns([mockRunOne], '/mnt/other-usb')
 
@@ -149,7 +145,7 @@ describe('useDownloadSelectedRuns', () => {
       expect(result.current.isDownloading).toEqual(true)
     })
 
-    await result.current.downloadRuns([mockRunTwo])
+    await result.current.downloadRuns([mockRunTwo]).catch(() => {})
 
     expect(getRunRaw).toHaveBeenCalledTimes(1)
     expect(getRunRaw).toHaveBeenCalledWith(HOST_CONFIG, 'run-1', 'blob')

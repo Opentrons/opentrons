@@ -19,8 +19,7 @@ interface UseDownloadSelectedRunsResult {
 }
 
 export function useDownloadSelectedRuns(
-  robotName: string,
-  usbPath?: string
+  robotName: string
 ): UseDownloadSelectedRunsResult {
   const host = useHost()
   const [isDownloading, setIsDownloading] = useState(false)
@@ -34,13 +33,16 @@ export function useDownloadSelectedRuns(
   ): Promise<void> => {
     const currentHost = host
     if (currentHost == null || runs.length === 0 || isDownloading) {
-      return Promise.resolve()
+      return Promise.reject(
+        new Error(
+          'Unable to download: no host, nothing selected, or a download is already in progress.'
+        )
+      )
     }
 
     setIsDownloading(true)
     setHasError(false)
 
-    const effectiveUsbPath = callTimeUsbPath ?? usbPath
     const zip = new JSZip()
     return Promise.all(
       runs.map(run => {
@@ -62,8 +64,8 @@ export function useDownloadSelectedRuns(
       .then(() => zip.generateAsync({ type: 'arraybuffer' }))
       .then(async buffer => {
         const filename = `${robotName}-run-records.zip`
-        if (effectiveUsbPath != null) {
-          await saveFileToUsb(`${effectiveUsbPath}/${filename}`, buffer)
+        if (callTimeUsbPath != null) {
+          await saveFileToUsb(`${callTimeUsbPath}/${filename}`, buffer)
         } else {
           saveAs(new Blob([buffer]), filename)
         }

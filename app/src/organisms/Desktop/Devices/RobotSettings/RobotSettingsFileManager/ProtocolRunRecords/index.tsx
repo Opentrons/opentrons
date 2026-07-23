@@ -87,7 +87,11 @@ export function ProtocolRunRecords({
             setShowDeleteRecordsModal(false)
           }}
           onConfirm={() => {
-            deleteSelectedRuns(runs.filter(run => selectedIds.has(run.id)))
+            void deleteSelectedRuns(
+              runs.filter(run => selectedIds.has(run.id))
+            ).catch(() => {
+              makeToast('Error deleting records', ERROR_TOAST)
+            })
             setShowDeleteRecordsModal(false)
           }}
           type="selectedRuns"
