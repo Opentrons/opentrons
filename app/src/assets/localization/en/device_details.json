@@ -195,6 +195,8 @@
   "no_protocols_found": "No protocols found",
   "no_recent_runs": "No recent runs",
   "no_recent_runs_description": "After you run some protocols, they will appear here.",
+  "no_recent_runs_to_delete": "No recent runs to delete.",
+  "no_recent_runs_to_download": "No recent runs to download.",
   "no_usb_connected": "No external memory drives detected",
   "no_user_action_logs": "No user action logs",
   "num_units": "{{num}} mm",

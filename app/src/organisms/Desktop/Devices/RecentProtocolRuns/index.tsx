@@ -54,7 +54,7 @@ export function RecentProtocolRuns({
     useDeleteSelectedRuns(documentationState)
 
   const handleNoRuns = (type: 'delete' | 'download'): void => {
-    makeToast(t(`select_entry_to_${type}`) as string, WARNING_TOAST, {
+    makeToast(t(`no_recent_runs_to_${type}`) as string, WARNING_TOAST, {
       closeButton: true,
     })
   }
