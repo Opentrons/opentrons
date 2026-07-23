@@ -8,8 +8,8 @@ import {
   MODULE_INFO_SUB_CONTAINER_STYLE,
 } from './constants'
 
-import type { ChipType } from '@opentrons/components'
 import type { FlexStackerModule } from '@opentrons/api-client'
+import type { ChipType } from '@opentrons/components'
 
 interface FlexStackerModuleProps {
   moduleData: FlexStackerModule['data']

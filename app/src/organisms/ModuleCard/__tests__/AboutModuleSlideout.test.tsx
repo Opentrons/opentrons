@@ -2,14 +2,14 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
-  RUN_STATUS_FINISHING,
-  RUN_STATUS_IDLE,
-  RUN_STATUS_RUNNING,
   mockMagneticModule,
   mockMagneticModuleGen2,
   mockTemperatureModule,
   mockTemperatureModuleGen2,
   mockThermocycler,
+  RUN_STATUS_FINISHING,
+  RUN_STATUS_IDLE,
+  RUN_STATUS_RUNNING,
 } from '@opentrons/api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'

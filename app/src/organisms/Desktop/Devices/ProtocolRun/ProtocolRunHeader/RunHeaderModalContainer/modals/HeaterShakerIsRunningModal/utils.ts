@@ -1,7 +1,4 @@
-import type {
-  AttachedModule,
-  HeaterShakerModule,
-} from '@opentrons/api-client'
+import type { AttachedModule, HeaterShakerModule } from '@opentrons/api-client'
 
 export function getActiveHeaterShaker(
   attachedModules: any[]

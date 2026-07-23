@@ -3,10 +3,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import {
-  RUN_STATUS_STOPPED,
-  mockHeaterShaker,
-} from '@opentrons/api-client'
+import { mockHeaterShaker, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   useAddCameraSettingsToRunMutation,
   useAllPipetteOffsetCalibrationsQuery,

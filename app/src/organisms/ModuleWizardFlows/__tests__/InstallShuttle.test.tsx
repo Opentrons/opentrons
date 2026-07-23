@@ -1,14 +1,14 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
-import { FLEX_STACKER_V1_FIXTURE } from '@opentrons/shared-data'
-
-import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
 import {
   mockFlexStacker,
   mockFlexStackerMissingShuttle,
 } from '@opentrons/api-client'
+import { FLEX_STACKER_V1_FIXTURE } from '@opentrons/shared-data'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 
 import { CloseDoor } from '../CloseStackerDoor'

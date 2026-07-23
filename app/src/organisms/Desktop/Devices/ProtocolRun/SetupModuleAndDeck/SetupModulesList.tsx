@@ -62,10 +62,7 @@ import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { getFixtureImage } from './utils'
 
 import type { TFunction } from 'i18next'
-import type {
-  CommandData,
-  AttachedModule,
-} from '@opentrons/api-client'
+import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type {
   CutoutConfigAndCompatibility,
   CutoutFixtureId,

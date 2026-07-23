@@ -12,12 +12,9 @@ import vacuumModule from '/app/assets/images/vacuum_module_v1.png'
 import { NO_CALIBRATION_TYPE } from './constants'
 
 import type { TFunction } from 'i18next'
+import type { AttachedModule, VacuumModuleStatus } from '@opentrons/api-client'
 import type { ChipType } from '@opentrons/components'
 import type { DeckConfiguration } from '@opentrons/shared-data'
-import type {
-  AttachedModule,
-  VacuumModuleStatus,
-} from '@opentrons/api-client'
 
 export function getModuleCardImage(attachedModule: AttachedModule): string {
   switch (attachedModule.moduleModel) {

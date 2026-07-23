@@ -79,12 +79,9 @@ import {
 import { VacuumModuleData } from './VacuumModule/VacuumModuleData'
 import { VacuumModuleSlideout } from './VacuumModule/VacuumModuleSlideout'
 
+import type { AttachedModule, HeaterShakerModule } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
 import type { ModuleType } from '@opentrons/shared-data'
-import type {
-  AttachedModule,
-  HeaterShakerModule,
-} from '@opentrons/api-client'
 
 const HAS_SETUP_INSTRUCTIONS_TYPE: ModuleType[] = [
   FLEX_STACKER_MODULE_TYPE,

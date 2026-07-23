@@ -5,6 +5,7 @@ import '@testing-library/jest-dom/vitest'
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { mockFlexStacker, mockHeaterShaker } from '@opentrons/api-client'
 import {
   useModulesQuery,
   useUpdateDeckConfigurationMutation,
@@ -19,10 +20,6 @@ import {
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
-import {
-  mockFlexStacker,
-  mockHeaterShaker,
-} from '@opentrons/api-client'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useCloseCurrentRun } from '/app/resources/runs'
 

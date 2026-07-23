@@ -3,6 +3,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import {
+  mockHeaterShaker,
+  mockMagneticModule,
+  mockTemperatureModuleGen2,
+  mockThermocycler,
+} from '@opentrons/api-client'
+import {
   useCurrentAllSubsystemUpdatesQuery,
   useUpdateModuleMutation,
 } from '@opentrons/react-api-client'
@@ -15,12 +21,6 @@ import { useIsFlex } from '/app/redux-resources/robots'
 import { getIsHeaterShakerAttached } from '/app/redux/config'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
-import {
-  mockHeaterShaker,
-  mockMagneticModule,
-  mockTemperatureModuleGen2,
-  mockThermocycler,
-} from '@opentrons/api-client'
 import { mockRobot } from '/app/redux/robot-api/__fixtures__'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
@@ -41,7 +41,6 @@ import { VacuumModuleData } from '../VacuumModule/VacuumModuleData'
 
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
-import type { DeckConfiguration } from '@opentrons/shared-data'
 import type {
   FlexStackerModule,
   HeaterShakerModule,
@@ -49,6 +48,7 @@ import type {
   ThermocyclerModule,
   VacuumModule,
 } from '@opentrons/api-client'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
 vi.mock('../ErrorInfo')
 vi.mock('../MagneticModuleData')

@@ -25,10 +25,7 @@ import { useAttachedModules } from '/app/resources/modules'
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 import { getActiveHeaterShaker } from './utils'
 
-import type {
-  AttachedModule,
-  HeaterShakerModule,
-} from '@opentrons/api-client'
+import type { AttachedModule, HeaterShakerModule } from '@opentrons/api-client'
 import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data'
 
 export type UseHeaterShakerIsRunningModalResult =

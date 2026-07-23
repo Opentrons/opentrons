@@ -2,6 +2,7 @@ import { renderHook } from '@testing-library/react'
 import omitBy from 'lodash/omitBy'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { mockHeaterShaker } from '@opentrons/api-client'
 import {
   useInstrumentsQuery,
   useModulesQuery,
@@ -14,7 +15,6 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
-import { mockHeaterShaker } from '@opentrons/api-client'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { useMissingProtocolHardware } from '../useMissingProtocolHardware'

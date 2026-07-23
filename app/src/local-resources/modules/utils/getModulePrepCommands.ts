@@ -4,6 +4,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import type { AttachedModule, FlexStackerModule } from '@opentrons/api-client'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateHeaterCreateCommand,
@@ -17,10 +18,6 @@ import type {
   UnsafeFlexStackerCloseLatchCreateCommand,
   UnsafeFlexStackerPrepareShuttleCreateCommand,
 } from '@opentrons/shared-data'
-import type {
-  AttachedModule,
-  FlexStackerModule,
-} from '@opentrons/api-client'
 
 export type ModulePrepCommandsType =
   | TemperatureModuleDeactivateCreateCommand

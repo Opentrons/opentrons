@@ -2,9 +2,10 @@ import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+import { mockTemperatureModule } from '@opentrons/api-client'
+
 import { useRobot } from '/app/redux-resources/robots'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
-import { mockTemperatureModule } from '@opentrons/api-client'
 import { useAttachedModules } from '/app/resources/modules'
 
 import {

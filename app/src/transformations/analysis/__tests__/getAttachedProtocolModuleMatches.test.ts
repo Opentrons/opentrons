@@ -1,11 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
+import { mockTemperatureModuleGen2 } from '@opentrons/api-client'
 import {
   getModuleDef,
   TEMPERATURE_MODULE_V2_FIXTURE,
 } from '@opentrons/shared-data'
-
-import { mockTemperatureModuleGen2 } from '@opentrons/api-client'
 
 import { getAttachedProtocolModuleMatches } from '../getAttachedProtocolModuleMatches'
 

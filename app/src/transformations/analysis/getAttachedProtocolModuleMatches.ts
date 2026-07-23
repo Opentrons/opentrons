@@ -7,8 +7,8 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import type { DeckConfiguration, RobotType } from '@opentrons/shared-data'
 import type { AttachedModule } from '@opentrons/api-client'
+import type { DeckConfiguration, RobotType } from '@opentrons/shared-data'
 import type { ProtocolModuleInfo } from '/app/transformations/analysis'
 
 export type AttachedProtocolModuleMatch = ProtocolModuleInfo & {

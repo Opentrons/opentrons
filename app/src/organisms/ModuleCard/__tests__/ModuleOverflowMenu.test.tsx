@@ -2,6 +2,13 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  mockHeaterShaker,
+  mockMagneticModule,
+  mockTemperatureModuleGen2,
+  mockThermocycler,
+  mockThermocyclerGen2,
+} from '@opentrons/api-client'
+import {
   FLEX_STACKER_MODULE_TYPE,
   FLEX_STACKER_MODULE_V1,
   VACUUM_MODULE_TYPE,
@@ -12,13 +19,6 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useIsFlex } from '/app/redux-resources/robots'
-import {
-  mockHeaterShaker,
-  mockMagneticModule,
-  mockTemperatureModuleGen2,
-  mockThermocycler,
-  mockThermocyclerGen2,
-} from '@opentrons/api-client'
 import { useIsLegacySessionInProgress } from '/app/resources/legacy_sessions'
 import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 

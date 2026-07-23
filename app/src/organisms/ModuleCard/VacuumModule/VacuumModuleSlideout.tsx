@@ -27,10 +27,7 @@ import { parseGaugePressureValue } from './utils/parseGaugePressureValue'
 import { sanitizeGaugePressureInput } from './utils/sanitizeGaugePressureInput'
 import styles from './vacuummodule.module.css'
 
-import type {
-  VacuumMode,
-  VacuumModule,
-} from '@opentrons/api-client'
+import type { VacuumMode, VacuumModule } from '@opentrons/api-client'
 
 interface VacuumModuleSlideoutProps {
   module: VacuumModule

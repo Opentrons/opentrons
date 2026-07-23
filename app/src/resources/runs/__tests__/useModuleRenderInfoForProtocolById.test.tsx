@@ -3,16 +3,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import {
+  mockTemperatureModuleGen2,
+  mockThermocycler,
+} from '@opentrons/api-client'
+import {
   heater_shaker_commands_with_results_key,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V2,
   TEMPERATURE_MODULE_V2_FIXTURE,
 } from '@opentrons/shared-data'
 
-import {
-  mockTemperatureModuleGen2,
-  mockThermocycler,
-} from '@opentrons/api-client'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useAttachedModules } from '/app/resources/modules'
@@ -22,6 +22,7 @@ import { useModuleRenderInfoForProtocolById } from '../useModuleRenderInfoForPro
 import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
 
 import type { UseQueryResult } from 'react-query'
+import type { AttachedModule } from '@opentrons/api-client'
 import type {
   CutoutConfig,
   DeckConfiguration,
@@ -29,7 +30,6 @@ import type {
   ModuleType,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { AttachedModule } from '@opentrons/api-client'
 
 vi.mock('/app/transformations/analysis')
 vi.mock('/app/resources/modules')
