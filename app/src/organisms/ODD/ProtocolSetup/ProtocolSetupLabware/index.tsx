@@ -33,8 +33,8 @@ import {
   getLabwareInfoByLiquidId,
   getLabwareLiquidRenderInfoFromStack,
   getModuleFromStack,
+  getSortedStartingDeckEntries,
   getStackedItemsOnStartingDeck,
-  getStacksWithLabware,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
@@ -105,13 +105,10 @@ export function ProtocolSetupLabware({
     () => getLabwareInfoByLiquidId(mostRecentAnalysis?.commands ?? []),
     [mostRecentAnalysis]
   )
-  const stacksWithLaware = useMemo(
-    () => getStacksWithLabware(startingDeck),
+  const sortedStartingDeckEntries = useMemo(
+    () => getSortedStartingDeckEntries(startingDeck),
     [startingDeck]
   )
-  const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .filter(([key, value]) => key !== 'offDeck')
   const offDeckItems = useMemo(
     () =>
       mostRecentAnalysis != null
@@ -287,8 +284,7 @@ function LabwareLatch({
   let icon: 'latch-open' | 'latch-closed' | null = null
 
   const latchCommand:
-    | HeaterShakerOpenLatchCreateCommand
-    | HeaterShakerCloseLatchCreateCommand = {
+    HeaterShakerOpenLatchCreateCommand | HeaterShakerCloseLatchCreateCommand = {
     commandType: isLatchClosed
       ? 'heaterShaker/openLabwareLatch'
       : 'heaterShaker/closeLabwareLatch',

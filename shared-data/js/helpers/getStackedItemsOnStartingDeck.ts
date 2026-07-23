@@ -563,3 +563,24 @@ export function getModuleFromStack(
   )
   return moduleInStack ?? null
 }
+
+export const getSortedStartingDeckEntries = (
+  startingDeck: StackedItemsOnDeck
+): Array<{
+  location: string
+  stack: StackItem[]
+}> => {
+  const entriesOnDeck = Object.entries(startingDeck).filter(
+    ([location]) => location !== 'offDeck'
+  )
+  const stacksWithLabware = entriesOnDeck.flatMap(([location, stacks]) => {
+    const labwareStacks = stacks.filter(stack =>
+      stack.some(item => 'labwareId' in item)
+    )
+    return labwareStacks.map(stack => ({ location, stack }))
+  })
+  const sortedStartingDeckEntries = stacksWithLabware.sort((a, b) =>
+    a.location.localeCompare(b.location)
+  )
+  return sortedStartingDeckEntries
+}
