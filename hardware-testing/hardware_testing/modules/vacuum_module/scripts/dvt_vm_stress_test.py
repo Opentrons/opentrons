@@ -274,7 +274,7 @@ async def _run_single_pump_api_cycle(
 ) -> None:
     """Run one pump cycle for RUN_SEC seconds using the driver's continuous reader."""
     target_to_pump = target_pressure - 1013.25
-    pump.open_vent()
+    pump.open_vent(equalize_timeout_s=10)
     # Start the water pump to fill the reservoir to the target liquid height
     await water_pump_fixture.open_solenoid()
     # Start the filling of the water pump while the vacuum is running
@@ -314,7 +314,7 @@ async def _run_single_pump_api_cycle(
     # Stop the pump
     pump.stop_vacuum_pump()
     # Vent the pump system to atmospheric pressure while pump is on
-    pump.open_vent()
+    pump.open_vent(equalize_timeout_s=1)
     await asyncio.sleep(VENT_SEC)
     try:
         await self.read_data(str(trial_csv), hw_vm, start_time, DECAY_SEC, ctx)  # type: ignore[attr-defined]
