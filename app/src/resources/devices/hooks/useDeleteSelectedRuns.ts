@@ -40,9 +40,9 @@ export function useDeleteSelectedRuns(
         for (const run of runs) {
           // deleteRun call is safe here within /app since we are wrapped in a useDocumentedMutation
           // eslint-disable-next-line opentrons/no-direct-mutating
-          await deleteRun(currentHost, run.id, userNotes).catch(
-            _ => (hasDeleteError = true)
-          )
+          await deleteRun(currentHost, run.id, userNotes).catch(_ => {
+            hasDeleteError = true
+          })
         }
 
         if (hasDeleteError) {
