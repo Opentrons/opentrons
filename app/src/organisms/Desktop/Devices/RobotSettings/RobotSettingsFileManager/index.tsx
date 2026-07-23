@@ -21,8 +21,10 @@ export function RobotSettingsFileManager({
     <div className={styles.container}>
       <RobotStorage />
       <DiagnosticsFiles robotName={robotName} />
-      {isComplianceReady ? <ComplianceReadySoftwareFiles /> : null}
-      <ProtocolRunRecords />
+      {isComplianceReady ? (
+        <ComplianceReadySoftwareFiles robotName={robotName} />
+      ) : null}
+      <ProtocolRunRecords robotName={robotName} />
     </div>
   )
 }

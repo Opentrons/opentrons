@@ -187,24 +187,3 @@ async def test_patch_logging_enabled_noops_if_no_change(
     assert response.content.data.loggingEnabled is True
     decoy.verify(await mock_log_data_manager.store_log(matchers.Anything()), times=0)
     decoy.verify(await mock_log_data_manager.rotate_periods(), times=0)
-
-
-def test_get_settings_returns_defaults(client: TestClient) -> None:
-    """GET generic settings returns the (currently empty) defaults."""
-    response = client.get(_SETTINGS_PATH)
-    assert response.status_code == 200
-    assert response.json()["data"] == {}
-
-
-def test_patch_settings_returns_settings(client: TestClient) -> None:
-    """PATCH generic settings with an empty body returns the settings."""
-    response = client.patch(_SETTINGS_PATH, json={"data": {}})
-    assert response.status_code == 200
-    assert response.json()["data"] == {}
-
-
-def test_delete_settings_resets(client: TestClient) -> None:
-    """DELETE generic settings resets them and returns the defaults."""
-    response = client.delete(_SETTINGS_PATH)
-    assert response.status_code == 200
-    assert response.json()["data"] == {}

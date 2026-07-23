@@ -348,3 +348,210 @@ stages:
       status_code: 200
       json:
         data: !force_original_structure '{regular_user_2_data}'
+
+---
+test_name: Updating self user profile
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+
+stages:
+  - name: Enable access control mode
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings/accessControlEnabled'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          accessControlEnabled: true
+    response:
+      status_code: 200
+      strict:
+        - json:off
+
+  - name: Create regular user 1 for self update tests
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: self_update_user_1
+          password: securepassword123
+          fullName: Self Update User 1
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 201
+      save:
+        json:
+          self_update_user_1_data: data
+
+  - name: Create regular user 2 for duplicate username tests
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: self_update_user_2
+          password: securepassword123
+          fullName: Self Update User 2
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 201
+
+  - name: Log in as regular user 1 for self update tests
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: self_update_user_1
+        password: securepassword123
+    response:
+      status_code: 200
+      save:
+        json:
+          self_update_user_1_access_token: access_token
+
+  - name: Empty self update is a no-op
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {self_update_user_1_access_token}'
+      json:
+        data: {}
+    response:
+      status_code: 200
+      json:
+        data: !force_original_structure '{self_update_user_1_data}'
+
+  - name: Self update with unchanged username is a no-op
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {self_update_user_1_access_token}'
+      json:
+        data:
+          username: self_update_user_1
+    response:
+      status_code: 200
+      json:
+        data: !force_original_structure '{self_update_user_1_data}'
+
+  - name: Self update can change full name
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {self_update_user_1_access_token}'
+      json:
+        data:
+          fullName: Self Update User 1 Renamed
+    response:
+      status_code: 200
+      json:
+        data:
+          username: self_update_user_1
+          fullName: Self Update User 1 Renamed
+          accountType: user
+          locked: false
+          resetPassword: false
+
+  - name: Reject self update with a duplicate username
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {self_update_user_1_access_token}'
+      json:
+        data:
+          username: self_update_user_2
+    response:
+      status_code: 400
+      json:
+        errors:
+          - id: userAlreadyExists
+
+  - name: Reject self update with an empty username
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {self_update_user_1_access_token}'
+      json:
+        data:
+          username: ''
+    response:
+      status_code: 400
+      json:
+        detail: username must not be empty
+
+  - name: Self update can change username
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {self_update_user_1_access_token}'
+      json:
+        data:
+          username: self_update_user_1_renamed
+    response:
+      status_code: 200
+      json:
+        data:
+          username: self_update_user_1_renamed
+          fullName: Self Update User 1 Renamed
+          accountType: user
+          locked: false
+          resetPassword: false
+
+---
+test_name: Creating a user with an existing username
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+
+stages:
+  - name: Create a user
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: duplicate_user_test
+          password: securepassword123!
+          fullName: Duplicate User Test
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 201
+
+  - name: Reject creating a user with an existing username
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: duplicate_user_test
+          password: securepassword123!
+          fullName: Another User
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 400
+      json:
+        errors:
+          - id: userAlreadyExists

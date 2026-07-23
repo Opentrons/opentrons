@@ -22,7 +22,6 @@ vi.mock('/app/transformations/analytics')
 vi.mock('/app/transformations/analysis')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/analytics')
-vi.mock('/app/redux/robot-settings')
 
 const PROTOCOL_PROPERTIES = { protocolType: 'python' } as ProtocolAnalyticsData
 

@@ -174,6 +174,7 @@ async def test_create_run(
             run_time_param_values=None,
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
+            access_control_status=False,
         )
     ).then_return(expected_response)
 
@@ -192,6 +193,7 @@ async def test_create_run(
         notify_publishers=mock_notify_publishers,
         protocol_store=mock_protocol_store,
         check_estop=True,
+        access_control_status=False,
     )
 
     assert result.content.data == expected_response
@@ -278,6 +280,7 @@ async def test_create_protocol_run(
             run_time_param_values={"foo": "bar"},
             run_time_param_paths={"my-csv-param": Path("/dev/null/file-id/abc.xyz")},
             notify_publishers=mock_notify_publishers,
+            access_control_status=False,
         )
     ).then_return(expected_response)
 
@@ -300,6 +303,7 @@ async def test_create_protocol_run(
         camera_provider=mock_camera_provider,
         notify_publishers=mock_notify_publishers,
         check_estop=True,
+        access_control_status=False,
     )
 
     assert result.content.data == expected_response
@@ -340,6 +344,7 @@ async def test_create_protocol_run_bad_protocol_id(
             run_auto_deleter=mock_run_auto_deleter,
             check_estop=True,
             notify_publishers=mock_notify_publishers,
+            access_control_status=False,
         )
 
     assert exc_info.value.status_code == 404
@@ -374,6 +379,7 @@ async def test_create_run_conflict(
             run_time_param_values=None,
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
+            access_control_status=False,
         )
     ).then_raise(RunConflictError("oh no"))
 
@@ -391,6 +397,7 @@ async def test_create_run_conflict(
             camera_provider=mock_camera_provider,
             notify_publishers=mock_notify_publishers,
             check_estop=True,
+            access_control_status=False,
         )
 
     assert exc_info.value.status_code == 409

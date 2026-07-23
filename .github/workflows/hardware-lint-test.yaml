@@ -6,26 +6,22 @@ name: 'hardware lint/test'
 on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   push:
-    paths:
+    paths: &paths
       - 'Makefile'
       - 'hardware/**'
       - 'scripts/**.mk'
       - 'scripts/**.py'
       - '.github/workflows/hardware-lint-test.yaml'
       - '.github/actions/python/**'
+      - 'shared-data/**'
+      - '!shared-data/js/**'
     branches:
       - 'edge'
       - 'release'
     tags-ignore:
       - '*'
   pull_request:
-    paths:
-      - 'Makefile'
-      - 'hardware/**'
-      - 'scripts/**.mk'
-      - 'scripts/**.py'
-      - '.github/workflows/hardware-lint-test.yaml'
-      - '.github/actions/python/**'
+    paths: *paths
 
   workflow_dispatch:
 

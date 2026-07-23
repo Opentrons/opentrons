@@ -24,3 +24,8 @@ export function isDocumentationProvided(state: DocumentationState): boolean {
   }
   return state.docreport != null && state.docreport.length > 0
 }
+
+export const ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE: DocumentationState = {
+  isLoading: false,
+  accessControlEnabled: false,
+}

@@ -13,6 +13,7 @@ from opentrons import __version__
 from opentrons.config import (
     feature_flags as ff,
 )
+from server_utils.audit.fastapi import build_audit_client, install_audit_client
 from server_utils.auth.resource_server.fastapi import (
     build_authorization_checker,
     install_authorization_checker,
@@ -120,6 +121,11 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         )
         install_authorization_checker(app.state, authorization_checker)
 
+        audit_client = await exit_stack.enter_async_context(
+            build_audit_client(audit_server_uds=None, audit_server_url=None)
+        )
+        install_audit_client(app.state, audit_client)
+
         exit_stack.enter_context(set_up_notification_client(app.state))
         initialize_pe_publisher_notifier(app.state)
 
@@ -140,7 +146,9 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
         # Start the run process pyro provider so a process is ready when a run starts
         await exit_stack.enter_async_context(
-            set_up_run_process_pyro_provider(app.state)
+            set_up_run_process_pyro_provider(
+                app.state, await authorization_checker.access_control_status()
+            )
         )
 
         yield  # Start handling HTTP requests.

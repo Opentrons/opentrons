@@ -21,6 +21,7 @@ import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach
 import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
 import zAxisAttach96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Zaxis_Attach_96.webm'
 import zAxisDetach96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Zaxis_Detach_96.webm'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils'
 
 import { FLOWS, SECTIONS } from './constants'
 
@@ -52,9 +53,16 @@ interface PipetteAnimationProps {
 export function startCalibrationOnClick(
   props: PipetteWizardStepProps,
   setShowUnableToDetect: Dispatch<SetStateAction<boolean>>,
-  pipetteId: string
+  pipetteId: string,
+  doorOpenHeader: string
 ): () => void {
-  const { chainRunCommands, proceed, setShowErrorMessage, mount } = props
+  const {
+    chainRunCommands,
+    proceed,
+    setShowErrorMessage,
+    setIsDoorOpenError,
+    mount,
+  } = props
   return () => {
     const axes: MotorAxes = mount === LEFT ? ['leftZ'] : ['rightZ']
     const verifyCommands: CreateCommand[] = [
@@ -93,11 +101,21 @@ export function startCalibrationOnClick(
             proceed()
           })
           .catch(error => {
-            setShowErrorMessage(error.message as string)
+            if (isMaintenanceDoorOpenError(error)) {
+              setIsDoorOpenError(true)
+              setShowErrorMessage(doorOpenHeader)
+            } else {
+              setShowErrorMessage(error.message as string)
+            }
           })
       })
-      .catch(() => {
-        setShowUnableToDetect?.(true)
+      .catch(error => {
+        if (isMaintenanceDoorOpenError(error)) {
+          setIsDoorOpenError(true)
+          setShowErrorMessage(doorOpenHeader)
+        } else {
+          setShowUnableToDetect?.(true)
+        }
       })
   }
 }

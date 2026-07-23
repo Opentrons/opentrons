@@ -3,6 +3,7 @@ import noop from 'lodash/noop'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { VACUUM_MODULE_TYPE } from '@opentrons/shared-data'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import type {
@@ -27,7 +28,8 @@ interface UseVacuumModuleControlsResult {
 export function useVacuumModuleControls(
   module: AttachedModule
 ): UseVacuumModuleControlsResult {
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const documentationState = useDocumentationState()
+  const { createLiveCommand } = useCreateLiveCommandMutation(documentationState)
   const { reportModuleCommand } = useModuleCommandAnalytics()
 
   if (module.moduleType !== VACUUM_MODULE_TYPE) {

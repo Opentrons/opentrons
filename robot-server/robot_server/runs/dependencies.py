@@ -11,6 +11,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import DeckType
 from opentrons.protocol_engine.resources.file_provider import FileProvider
 from opentrons_shared_data.robot.types import RobotType
+from server_utils.auth.resource_server.fastapi import get_access_control_status
 from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,
@@ -140,12 +141,13 @@ async def get_light_controller(
 @contextlib.asynccontextmanager
 async def set_up_run_process_pyro_provider(
     app_state: Annotated[AppState, Depends(get_app_state)],
+    access_control_status: Annotated[bool, Depends(get_access_control_status)],
 ) -> AsyncGenerator[None, None]:
     """Set up the server's singleton `RunProcessPyroProvider`."""
     run_process_pyro_provider = RunProcessPyroProvider()
     _run_process_pyro_provider_accessor.set_on(app_state, run_process_pyro_provider)
     # TODO(2026-04-21) We might want to wrap this into a try/except if this causes local issues
-    run_process_pyro_provider.initialize()
+    run_process_pyro_provider.initialize(access_control_mode=access_control_status)
 
     try:
         yield
@@ -175,6 +177,7 @@ async def get_run_orchestrator_store(
     run_process_pyro_provider: Annotated[
         RunProcessPyroProvider, Depends(get_run_process_pyro_provider)
     ],
+    access_control_status: Annotated[bool, Depends(get_access_control_status)],
 ) -> RunOrchestratorStore:
     """Get a singleton EngineStore to keep track of created engines / runners."""
     run_orchestrator_store = _run_orchestrator_store_accessor.get_from(app_state)
@@ -185,6 +188,7 @@ async def get_run_orchestrator_store(
             robot_type=robot_type,
             deck_type=deck_type,
             run_process_pyro_provider=run_process_pyro_provider,
+            access_control_status=access_control_status,
         )
         _run_orchestrator_store_accessor.set_on(app_state, run_orchestrator_store)
         # Handle remote hardware registry, if needed

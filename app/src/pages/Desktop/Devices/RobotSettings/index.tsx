@@ -86,7 +86,7 @@ export function RobotSettingsComponent({
       <RobotSettingsAdvanced robotName={robotName} isRobotBusy={isRobotBusy} />
     ),
     'compliance-ready': <RobotSettingsComplianceReady robotName={robotName} />,
-    'feature-flags': <RobotSettingsFeatureFlags robotName={robotName} />,
+    'feature-flags': <RobotSettingsFeatureFlags />,
   }
 
   const devToolsOn = useSelector(getDevtoolsEnabled)

@@ -12,6 +12,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import {
   useCloseCurrentRun,
   useIsRunCurrent,
@@ -92,7 +93,10 @@ export function TerminalRunBannerContainer(
 function ProtocolRunSuccessBanner(): JSX.Element {
   const { t } = useTranslation('run_details')
 
-  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
+  const documentationState = useDocumentationState()
+
+  const { closeCurrentRun, isClosingCurrentRun } =
+    useCloseCurrentRun(documentationState)
 
   const handleRunSuccessClick = (): void => {
     closeCurrentRun()
@@ -119,7 +123,9 @@ function ProtocolRunErrorBanner({
 }: RunHeaderBannerContainerProps): JSX.Element {
   const { t } = useTranslation('run_details')
 
-  const { closeCurrentRun } = useCloseCurrentRun()
+  const documentationState = useDocumentationState()
+
+  const { closeCurrentRun } = useCloseCurrentRun(documentationState)
 
   const { highestPriorityError } = runErrors
 

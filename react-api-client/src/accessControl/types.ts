@@ -78,14 +78,16 @@ export type DocumentedMutationFunction<TData = unknown, TVariables = void> = (
 export interface UseDocumentedMutation {
   <TData = unknown, TError = unknown, TVariables = void, TContext = unknown>(
     documentationState: DocumentationState,
-    actionsToDocument: DocumentedAction[],
+    actionsToDocument:
+      DocumentedAction[] | ((variables: TVariables) => DocumentedAction[]),
     mutationFn: DocumentedMutationFunction<TData, TVariables>,
     options?: UseMutationOptions<TData, TError, TVariables, TContext>
   ): UseMutationResult<TData, TError, TVariables, TContext>
 
   <TData = unknown, TError = unknown, TVariables = void, TContext = unknown>(
     documentationState: DocumentationState,
-    actionsToDocument: DocumentedAction[],
+    actionsToDocument:
+      DocumentedAction[] | ((variables: TVariables) => DocumentedAction[]),
     mutationKey: MutationKey,
     mutationFn: DocumentedMutationFunction<TData, TVariables>,
     options?: UseMutationOptions<TData, TError, TVariables, TContext>
@@ -119,12 +121,16 @@ export interface AttachingModuleAction {
  * These should match keys in audit_log.json
  */
 type AuditLogAction =
+  | 'acknowledge_estop'
   | 'stop_run'
   | 'play_run'
   | 'place_plate_reader_lid'
   | 'end_plate_reader_lid'
   | 'home_pipettes'
+  | 'home_robot'
   | 'end_home_pipettes'
+  | 'home_gantry'
+  | 'end_home_gantry'
   | 'attach_gripper'
   | 'detach_gripper'
   | 'recalibrate_gripper'
@@ -141,6 +147,38 @@ type AuditLogAction =
   | 'attach_pipette_left'
   | 'attach_pipette_right'
   | 'create_protocol'
+  | 'launching_error_recovery'
+  | 'resume_run_from_recovery'
+  | 'dismiss_run'
+  | 'retry_action'
+  | 'shutdown_robot'
+  | 'update_robot_name'
+  | 'update_self'
+  | 'update_error_recovery_policy'
+  | 'capture_preview_image'
+  | 'create_camera_image_settings'
+  | 'update_camera'
+  | 'update_camera_settings_for_run'
+  | 'update_error_recovery_settings'
+  | 'pause_run'
+  | 'disconnect_wifi'
+  | 'connect_wifi'
+  | 'delete_run'
+  | 'delete_run_images'
+  | 'delete_runs'
+  | 'update_deck_configuration'
+  | 'upload_csv'
+  | 'update_audit_settings'
+  | 'update_auth_settings'
+  | 'patch_robot_server_crs_settings'
+  | 'delete_offsets'
+  | 'create_offsets'
+  | 'set_lights'
+  | 'apply_offsets'
+  | 'update_subsystem'
+  | 'update_settings'
+  | 'create_user'
+  | 'delete_log_period'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.

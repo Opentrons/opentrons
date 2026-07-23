@@ -11,6 +11,7 @@ from typing import (
     Awaitable,
     Callable,
     Final,
+    Type,
     TypeAlias,
 )
 
@@ -28,6 +29,7 @@ from .authorization_checker import (
     InsufficientScopeResult,
     MissingTokenResult,
     NotAnActiveTokenResult,
+    UnableToContactAuthServerResult,
 )
 from .error_responses import build_response_for_error
 from server_utils.auth.scopes import Scope
@@ -147,7 +149,10 @@ def install_authorization_checker(
 
 @asynccontextmanager
 async def build_authorization_checker(
-    *, auth_server_uds: str | None = None, auth_server_url: str | None = None
+    *,
+    auth_server_uds: str | None = None,
+    auth_server_url: str | None = None,
+    fallback: Type[AuthorizationChecker] = AlwaysAllowedAuthorizationChecker,
 ) -> AsyncGenerator[AuthorizationChecker, None]:
     """Build an `AuthorizationChecker` appropriately configured for most servers.
 
@@ -163,7 +168,7 @@ async def build_authorization_checker(
             " Access control will be disabled."
             " (This is normal in dev mode and on OT-2s.)"
         )
-        yield AlwaysAllowedAuthorizationChecker()
+        yield fallback()
 
     else:
         async with LocalHTTPClient(
@@ -187,6 +192,17 @@ def get_authorization_checker(
     return authorization_checker
 
 
+async def get_access_control_status(
+    app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
+) -> bool:
+    """A FastAPI dependency to retrieve the access control mode status from the server's singleton `AuthorizationChecker`."""
+    authorization_checker = _authorization_checker_accessor.get_from(app_state)
+    assert authorization_checker is not None, (
+        "Forgot to initialize authorization checker as part of server startup?"
+    )
+    return await authorization_checker.access_control_status()
+
+
 class AuthorizationError(Exception):
     """Raised to signal that an HTTP authorization failure should be returned to the client.
 
@@ -196,9 +212,12 @@ class AuthorizationError(Exception):
 
     def __init__(
         self,
-        authorization_error: InsufficientScopeResult
-        | MissingTokenResult
-        | NotAnActiveTokenResult,
+        authorization_error: (
+            InsufficientScopeResult
+            | MissingTokenResult
+            | NotAnActiveTokenResult
+            | UnableToContactAuthServerResult
+        ),
         required_scopes: set[Scope],
     ) -> None:
         self.authorization_error: Final = authorization_error

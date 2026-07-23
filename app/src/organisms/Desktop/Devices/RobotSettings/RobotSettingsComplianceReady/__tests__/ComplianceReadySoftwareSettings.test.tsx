@@ -4,6 +4,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
 import {
+  useAuditSettingsMutation,
+  useAuditSettingsQuery,
   useAuthSettingsMutation,
   useAuthSettingsQuery,
   useGetRobotServerAccessControlSettingsQuery,
@@ -12,12 +14,14 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 
 import { UI_ONLY_FIELD_IDS } from '../complianceReadySettingsTypes'
 import { ComplianceReadySoftwareSettings } from '../ComplianceReadySoftwareSettings'
 
 import type { RenderResult } from '@testing-library/react'
 import type {
+  AuditSettingsResponse,
   AuthSettingsResponse,
   RobotServerAccessControlSettingsResponse,
 } from '@opentrons/api-client'
@@ -29,11 +33,16 @@ const MOCK_AUTH_SETTINGS: AuthSettingsResponse = {
     passwordComplexityMinimumLength: null,
     passwordComplexitySpecialCharacters: false,
     idleLogout: 180,
-    requireReasonForInteraction: true,
-    minLengthOfReasonForInteraction: null,
     requireAdminCredsWhenUpdatingRobotSoftware: true,
     requireAdminCredsWhenSendingProtocolToRobot: true,
     requireAdminCredsForSignoffProtocol: false,
+  },
+}
+
+const MOCK_AUDIT_SETTINGS: AuditSettingsResponse = {
+  data: {
+    requireReasonForInteraction: true,
+    minLengthOfReasonForInteraction: null,
   },
 }
 
@@ -47,6 +56,7 @@ const MOCK_ROBOT_SERVER_ACCESS_CONTROL_SETTINGS: RobotServerAccessControlSetting
   }
 
 const AUTH_SETTING_KEYS = Object.keys(MOCK_AUTH_SETTINGS.data)
+const AUDIT_SETTINGS_KEYS = Object.keys(MOCK_AUDIT_SETTINGS.data)
 const ROBOT_SERVER_ACCESS_CONTROL_SETTING_KEYS = Object.keys(
   MOCK_ROBOT_SERVER_ACCESS_CONTROL_SETTINGS.data
 )
@@ -69,8 +79,12 @@ const COMPLIANCE_READY_FIELD_IDS = [
 ]
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const mockPatchAuthSettings = vi.fn()
+const mockPatchAuditSettings = vi.fn()
 const mockPatchRobotServerAccessControlSettings = vi.fn()
 
 let unmountPreviousRender: (() => void) | undefined
@@ -99,14 +113,19 @@ describe('ComplianceReadySoftwareSettings', () => {
   beforeEach(() => {
     mockPatchAuthSettings.mockClear()
     mockPatchRobotServerAccessControlSettings.mockClear()
+    mockPatchAuditSettings.mockClear()
     mockPatchAuthSettings.mockResolvedValue(undefined)
     mockPatchRobotServerAccessControlSettings.mockResolvedValue(undefined)
+    mockPatchAuditSettings.mockResolvedValue(undefined)
     vi.mocked(useAuthSettingsQuery).mockReturnValue({
       data: MOCK_AUTH_SETTINGS,
     } as ReturnType<typeof useAuthSettingsQuery>)
     vi.mocked(useGetRobotServerAccessControlSettingsQuery).mockReturnValue({
       data: MOCK_ROBOT_SERVER_ACCESS_CONTROL_SETTINGS,
     } as ReturnType<typeof useGetRobotServerAccessControlSettingsQuery>)
+    vi.mocked(useAuditSettingsQuery).mockReturnValue({
+      data: MOCK_AUDIT_SETTINGS,
+    } as ReturnType<typeof useAuditSettingsQuery>)
     vi.mocked(useAuthSettingsMutation).mockReturnValue({
       mutate: mockPatchAuthSettings,
     } as any)
@@ -115,11 +134,15 @@ describe('ComplianceReadySoftwareSettings', () => {
         mutate: mockPatchRobotServerAccessControlSettings,
       } as any
     )
+    vi.mocked(useAuditSettingsMutation).mockReturnValue({
+      mutate: mockPatchAuditSettings,
+    } as any)
   })
 
-  it('should only use auth setting ids, robot server setting ids, or explicit UI-only ids', () => {
+  it('should only use auth setting ids, audit setting ids, robot server setting ids, or explicit UI-only ids', () => {
     const allowedIds = new Set<string>([
       ...AUTH_SETTING_KEYS,
+      ...AUDIT_SETTINGS_KEYS,
       ...ROBOT_SERVER_ACCESS_CONTROL_SETTING_KEYS,
       ...UI_ONLY_FIELD_IDS,
     ])
@@ -165,12 +188,14 @@ describe('ComplianceReadySoftwareSettings', () => {
 
     screen.getByText('Edit length of time')
     expect(mockPatchAuthSettings).not.toHaveBeenCalled()
+    expect(mockPatchAuditSettings).not.toHaveBeenCalled()
 
     const passwordResetTimeField = screen.getByLabelText('Edit length of time')
     fireEvent.change(passwordResetTimeField, {
       target: { value: '90' },
     })
     expect(mockPatchAuthSettings).not.toHaveBeenCalled()
+    expect(mockPatchAuditSettings).not.toHaveBeenCalled()
 
     fireEvent.blur(passwordResetTimeField)
 
@@ -181,7 +206,7 @@ describe('ComplianceReadySoftwareSettings', () => {
     })
   })
 
-  it('should populate fields from auth and robot server settings', () => {
+  it('should populate fields from auth, audit, and robot server settings', () => {
     render()
     expandAccordion()
 
@@ -225,9 +250,30 @@ describe('ComplianceReadySoftwareSettings', () => {
         data: { requireAdminCredsWhenUpdatingRobotSoftware: false },
       })
     })
+    expect(mockPatchAuditSettings).not.toHaveBeenCalled()
+    expect(mockPatchRobotServerAccessControlSettings).not.toHaveBeenCalled()
   })
 
-  it('should update input values without patching until blur', async () => {
+  it('should patch audit settings when toggling', async () => {
+    render()
+    expandAccordion()
+
+    fireEvent.click(
+      screen.getByRole('switch', {
+        name: 'Require documentation for robot actions',
+      })
+    )
+
+    await waitFor(() => {
+      expect(mockPatchAuditSettings).toHaveBeenCalledWith({
+        data: { requireReasonForInteraction: false },
+      })
+    })
+    expect(mockPatchAuthSettings).not.toHaveBeenCalled()
+    expect(mockPatchRobotServerAccessControlSettings).not.toHaveBeenCalled()
+  })
+
+  it('should update auth input values without patching until blur', async () => {
     render()
     expandAccordion()
 
@@ -243,6 +289,25 @@ describe('ComplianceReadySoftwareSettings', () => {
     await waitFor(() => {
       expect(mockPatchAuthSettings).toHaveBeenCalledWith({
         data: { maxNumberOfLoginAttempts: 3 },
+      })
+    })
+  })
+  it('should update audit input values without patching until blur', async () => {
+    render()
+    expandAccordion()
+
+    const minReasonLengthField = screen.getByLabelText(
+      'Edit minimum length for documentation for robot actions'
+    )
+    fireEvent.change(minReasonLengthField, { target: { value: '10' } })
+    expect(minReasonLengthField).toHaveValue(10)
+    expect(mockPatchAuditSettings).not.toHaveBeenCalled()
+
+    fireEvent.blur(minReasonLengthField)
+
+    await waitFor(() => {
+      expect(mockPatchAuditSettings).toHaveBeenCalledWith({
+        data: { minLengthOfReasonForInteraction: 10 },
       })
     })
   })

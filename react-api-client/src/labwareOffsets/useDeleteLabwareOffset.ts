@@ -1,11 +1,18 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { deleteLabwareOffset } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
-import type { UseMutateAsyncFunction, UseMutationResult } from 'react-query'
+import type {
+  UseMutateAsyncFunction,
+  UseMutationOptions,
+  UseMutationResult,
+} from 'react-query'
 import type { StoredLabwareOffset } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
+import type { DocumentedMutationParameters } from '../accessControl/types'
 
 export type UseDeleteLabwareOffsetMutationResult = UseMutationResult<
   StoredLabwareOffset,
@@ -19,14 +26,26 @@ export type UseDeleteLabwareOffsetMutationResult = UseMutationResult<
   >
 }
 
+export type UseDeleteLabwareOffsetMutationOptions = UseMutationOptions<
+  StoredLabwareOffset,
+  unknown,
+  string
+>
+
 // Delete a single labware offset using a given id.
-export function useDeleteLabwareOffsetMutation(): UseDeleteLabwareOffsetMutationResult {
+export function useDeleteLabwareOffsetMutation(
+  documentationState: DocumentationState,
+  options: UseDeleteLabwareOffsetMutationOptions = {}
+): UseDeleteLabwareOffsetMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<StoredLabwareOffset, unknown, string>(
-    (id: string) =>
-      deleteLabwareOffset(host!, id).then(response => {
+  const mutation = useDocumentedMutation<StoredLabwareOffset, unknown, string>(
+    documentationState,
+    ['delete_offsets'],
+    getQueryKey(host, 'labwareOffsets'),
+    ({ variables: id, userNotes }: DocumentedMutationParameters<string>) =>
+      deleteLabwareOffset(host!, id, userNotes).then(response => {
         queryClient
           .invalidateQueries(getQueryKey(host, 'labwareOffsets'))
           .catch((e: Error) => {
@@ -35,7 +54,8 @@ export function useDeleteLabwareOffsetMutation(): UseDeleteLabwareOffsetMutation
             )
           })
         return response.data.data
-      })
+      }),
+    options
   )
 
   return {

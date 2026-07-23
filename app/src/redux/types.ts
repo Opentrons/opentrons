@@ -4,6 +4,7 @@ import type { Dispatch as ReduxDispatch, Store as ReduxStore } from 'redux'
 import type { Observable } from 'rxjs'
 import type { AlertsAction, AlertsState } from './alerts/types'
 import type { AnalyticsTriggerAction } from './analytics/types'
+import type { AuditAction, AuditState } from './audit/slice'
 import type { CalibrationAction, CalibrationState } from './calibration/types'
 import type { ConfigAction, ConfigState } from './config/types'
 import type {
@@ -23,10 +24,6 @@ import type {
 import type { RobotAdminAction, RobotAdminState } from './robot-admin/types'
 import type { RobotApiAction, RobotApiState } from './robot-api/types'
 import type { RobotAuthAction, RobotAuthState } from './robot-auth'
-import type {
-  RobotSettingsAction,
-  RobotSettingsState,
-} from './robot-settings/types'
 import type { RobotUpdateAction, RobotUpdateState } from './robot-update/types'
 import type { SessionsAction, SessionState } from './sessions/types'
 import type {
@@ -37,10 +34,10 @@ import type {
 import type { SystemInfoAction, SystemInfoState } from './system-info/types'
 
 export interface State {
+  readonly audit: AuditState
   readonly robotApi: RobotApiState
   readonly robotAuth: RobotAuthState
   readonly robotAdmin: RobotAdminState
-  readonly robotSettings: RobotSettingsState
   readonly robotUpdate: RobotUpdateState
   readonly config: ConfigState
   readonly discovery: DiscoveryState
@@ -56,10 +53,10 @@ export interface State {
 }
 
 export type Action =
+  | AuditAction
   | RobotApiAction
   | RobotAdminAction
   | RobotAuthAction
-  | RobotSettingsAction
   | RobotUpdateAction
   | ModulesAction
   | ShellAction

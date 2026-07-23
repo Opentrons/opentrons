@@ -18,6 +18,8 @@ export function useDeleteAllLabwareOffsetsMutation(): UseDeleteAllLabwareOffsets
   const host = useHost()
   const queryClient = useQueryClient()
 
+  // Directly calling useMutation is deprecated in the codebase. Update this to useDocumentedMutation before using this hook.
+  // eslint-disable-next-line opentrons/no-direct-use-mutation
   const mutation = useMutation<null, unknown>(() =>
     deleteAllLabwareOffsets(host!).then(response => {
       queryClient

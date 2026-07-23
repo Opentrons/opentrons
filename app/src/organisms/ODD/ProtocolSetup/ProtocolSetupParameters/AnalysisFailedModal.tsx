@@ -12,6 +12,7 @@ import {
 import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { OddModal } from '/app/molecules/OddModal'
 
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
@@ -38,8 +39,9 @@ export function AnalysisFailedModal({
     hasExitIcon: true,
   }
 
+  const documentationState = useDocumentationState()
   const { isLoading: isDismissing, mutateAsync: dismissCurrentRunAsync } =
-    useDismissCurrentRunMutation()
+    useDismissCurrentRunMutation(documentationState)
 
   const handleRestartSetup = (): void => {
     dismissCurrentRunAsync(runId).then(() => {

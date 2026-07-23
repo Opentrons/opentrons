@@ -8,11 +8,9 @@ import {
   ListAccordion,
   StyledText,
   Tag,
-  WARNING_TOAST,
 } from '@opentrons/components'
 import { useLogPeriodSummariesQuery } from '@opentrons/react-api-client'
 
-import { useToaster } from '/app/organisms/ToasterOven'
 import { formatTimestamp } from '/app/transformations/runs'
 
 import { DeleteRecordsModal } from '../../../DeleteRecordsModal'
@@ -20,12 +18,23 @@ import { FileManagementSectionHeader } from '../FileManagementSectionHeader'
 import { useRecordSelection } from '../hooks/useRecordSelection'
 import fileManagerStyles from '../robotsettingsfilemanager.module.css'
 import styles from './compliancereadysoftwarefiles.module.css'
+import { useDeleteSelectedLogPeriods } from './hooks/useDeleteSelectedLogPeriods'
+import { useDownloadSelectedLogPeriods } from './hooks/useDownloadSelectedLogPeriods'
 import { LogPeriodRow } from './LogPeriodRow'
 
-export function ComplianceReadySoftwareFiles(): JSX.Element {
+interface ComplianceReadySoftwareFilesProps {
+  robotName: string
+}
+
+export function ComplianceReadySoftwareFiles({
+  robotName,
+}: ComplianceReadySoftwareFilesProps): JSX.Element {
   const { t } = useTranslation('device_details')
-  const { makeToast } = useToaster()
   const { data: logPeriodSummariesData } = useLogPeriodSummariesQuery()
+  const { downloadSelectedLogPeriods, isDownloading: isDownloadingLogPeriods } =
+    useDownloadSelectedLogPeriods(robotName)
+  const { deleteSelectedLogPeriods, deletingIds } =
+    useDeleteSelectedLogPeriods()
 
   // API returns periods oldest-to-newest; reverse for newest-first display.
   const periods = useMemo(
@@ -57,23 +66,17 @@ export function ComplianceReadySoftwareFiles(): JSX.Element {
       : t('na')
 
   const handleDownloadSelected = (): void => {
-    if (selectedIds.size > 0) {
-      // TODO: useDownloadLogPeriodMutation
-    } else {
-      makeToast(t('select_entry_to_download') as string, WARNING_TOAST, {
-        closeButton: true,
-      })
+    if (selectedIds.size > 0 && !isDownloadingLogPeriods) {
+      downloadSelectedLogPeriods(
+        periods.filter(period => selectedIds.has(period.id))
+      )
     }
   }
 
   const handleDeleteSelected = (): void => {
-    if (selectedIds.size === 0) {
-      makeToast(t('select_entry_to_delete') as string, WARNING_TOAST, {
-        closeButton: true,
-      })
-      return
+    if (selectedIds.size > 0) {
+      setShowDeleteRecordsModal(true)
     }
-    setShowDeleteRecordsModal(true)
   }
   const periodHeaderKeys: Array<'started' | 'ended' | 'status'> = [
     'started',
@@ -89,7 +92,9 @@ export function ComplianceReadySoftwareFiles(): JSX.Element {
             setShowDeleteRecordsModal(false)
           }}
           onConfirm={() => {
-            // TODO: delete all selected log periods
+            deleteSelectedLogPeriods(
+              periods.filter(period => selectedIds.has(period.id))
+            )
             setShowDeleteRecordsModal(false)
           }}
           type="selectedLogs"
@@ -98,6 +103,7 @@ export function ComplianceReadySoftwareFiles(): JSX.Element {
       <div className={fileManagerStyles.file_management_group}>
         <FileManagementSectionHeader
           titleText={t('compliance_ready_software_files')}
+          showButtons={isSomeSelected || isAllSelected}
           onDownloadSelected={handleDownloadSelected}
           onDeleteSelected={handleDeleteSelected}
         />
@@ -176,6 +182,7 @@ export function ComplianceReadySoftwareFiles(): JSX.Element {
                   key={period.id}
                   period={period}
                   isSelected={selectedIds.has(period.id)}
+                  isDeleting={deletingIds.has(period.id)}
                   onToggle={() => {
                     togglePeriod(period.id)
                   }}

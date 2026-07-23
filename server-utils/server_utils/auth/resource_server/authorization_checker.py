@@ -8,46 +8,14 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from datetime import datetime
-from typing import Generic, TypeAlias, TypeVar, override
+from typing import TypeAlias, override
 
 from ..scopes import Scope, parse_scopes
 from .auth_server import (
     Client as AuthServerClient,
 )
-from .auth_server import (
-    RequireReasonForInteractionSettingsResponse,
-    RequireReasonForInteractionSettingsResponseData,
-)
-from server_utils.fastapi_utils.models.json_api import RequestModel
 
 _log = logging.getLogger(__name__)
-
-RequestDataT = TypeVar("RequestDataT")
-
-
-@dataclass(frozen=True)
-class DocumentedInteraction(Generic[RequestDataT]):
-    """An interaction that may require audit user notes alongside request payload data."""
-
-    user_notes: str | None
-    request_data: RequestDataT
-
-    @staticmethod
-    def from_request_model(
-        request: RequestModel[RequestDataT],
-        *,
-        user_notes: str | None,
-    ) -> DocumentedInteraction[RequestDataT]:
-        """Build from request payload data and audit notes from the request header."""
-        return DocumentedInteraction(
-            user_notes=user_notes,
-            request_data=request.data,
-        )
-
-
-class MissingUserNotesError(Exception):
-    """Raised when user notes are required for an interaction but were not supplied."""
 
 
 class AuthorizationChecker(ABC):
@@ -67,74 +35,26 @@ class AuthorizationChecker(ABC):
         pass
 
     @abstractmethod
-    async def get_require_reason_for_interaction_settings(
-        self,
-    ) -> RequireReasonForInteractionSettingsResponse:
-        """Return require-reason-for-interaction settings."""
+    async def access_control_status(self) -> bool:
+        """Check whether access control mode is enabled on the auth-server."""
         pass
 
-    async def is_reason_for_interaction_required(self) -> bool:
-        """Return whether auth-server requires a reason for interaction."""
-        settings = await self.get_require_reason_for_interaction_settings()
-        return settings.data.requireReasonForInteraction
 
-    async def record_documented_interaction(
-        self,
-        interaction: DocumentedInteraction[RequestDataT],
-        *,
-        resource_id: str,
-        recorded_at: datetime,
-        require_reason_for_interaction: bool | None = None,
-    ) -> None:
-        """When required, validate ``user_notes`` and record the interaction for audit.
+class FailedClosedAuthorizationChecker(AuthorizationChecker):
+    """An `AuthorizationChecker` that always denies access.
 
-        Params:
-            require_reason_for_interaction: When ``None``, read from auth-server
-                settings via ``is_reason_for_interaction_required()``. Callers
-                that already resolved the setting locally may pass an explicit value.
-        """
-        if require_reason_for_interaction is None:
-            require_reason_for_interaction = (
-                await self.is_reason_for_interaction_required()
-            )
-        if not require_reason_for_interaction:
-            return
+    This is useful as a fail-closed fallback if configuration is missing.
+    """
 
-        if interaction.user_notes is None:
-            raise MissingUserNotesError(
-                "Opentrons-User-Notes is required when require-reason-for-interaction is enabled."
-            )
+    @override
+    async def check(self, token: str | None, required_scopes: set[Scope]) -> Result:
+        """See base class for documentation."""
+        return UnableToContactAuthServerResult()
 
-        self._log_documented_interaction(
-            interaction=interaction,
-            resource_id=resource_id,
-            recorded_at=recorded_at,
-        )
-
-    def _log_documented_interaction(
-        self,
-        *,
-        interaction: DocumentedInteraction[RequestDataT],
-        resource_id: str,
-        recorded_at: datetime,
-    ) -> None:
-        """Log (and later persist) a documented interaction."""
-        # TODO(TZ, 5-8-26): persist audit entry in auth-server.
-        request_data = interaction.request_data
-        if hasattr(request_data, "model_dump"):
-            request_data_summary = request_data.model_dump()
-        else:
-            request_data_summary = repr(request_data)
-
-        _log.info(
-            "Documented interaction "
-            "(persist audit entry TODO): resource_id=%s recorded_at=%s "
-            "note_len=%s request_data=%s",
-            resource_id,
-            recorded_at.isoformat(),
-            len(interaction.user_notes or ""),
-            request_data_summary,
-        )
+    @override
+    async def access_control_status(self) -> bool:
+        """See base class for documentation."""
+        return False
 
 
 class AlwaysAllowedAuthorizationChecker(AuthorizationChecker):
@@ -146,15 +66,9 @@ class AlwaysAllowedAuthorizationChecker(AuthorizationChecker):
         return AuthorizationNotRequiredResult()
 
     @override
-    async def get_require_reason_for_interaction_settings(
-        self,
-    ) -> RequireReasonForInteractionSettingsResponse:
-        """Require-reason is disabled when access control is not configured."""
-        return RequireReasonForInteractionSettingsResponse(
-            data=RequireReasonForInteractionSettingsResponseData(
-                requireReasonForInteraction=False
-            )
-        )
+    async def access_control_status(self) -> bool:
+        """See base class for documentation."""
+        return True
 
 
 class AuthServerAuthorizationChecker(AuthorizationChecker):
@@ -207,21 +121,9 @@ class AuthServerAuthorizationChecker(AuthorizationChecker):
                 )
 
     @override
-    async def is_reason_for_interaction_required(self) -> bool:
-        """Require reason only when access control (ACM) is on and the setting is enabled."""
-        access_control_enabled = (
-            await self._client.get_auth_settings()
-        ).data.accessControlEnabled
-        if not access_control_enabled:
-            return False
-        settings = await self.get_require_reason_for_interaction_settings()
-        return settings.data.requireReasonForInteraction
-
-    @override
-    async def get_require_reason_for_interaction_settings(
-        self,
-    ) -> RequireReasonForInteractionSettingsResponse:
-        return await self._client.get_require_reason_for_interaction_settings()
+    async def access_control_status(self) -> bool:
+        """Check the status of access control enablement."""
+        return (await self._client.get_auth_settings()).data.accessControlEnabled
 
 
 @dataclass
@@ -262,10 +164,18 @@ class NotAnActiveTokenResult:
     pass
 
 
+@dataclass
+class UnableToContactAuthServerResult:
+    """The authorization server couldn't be contacted."""
+
+    pass
+
+
 Result: TypeAlias = (
     AuthorizationNotRequiredResult
     | AuthorizedResult
     | InsufficientScopeResult
     | MissingTokenResult
     | NotAnActiveTokenResult
+    | UnableToContactAuthServerResult
 )
