@@ -45,7 +45,7 @@ export interface ModuleInStack {
 export type StackItem = LabwareInStack | ModuleInStack
 
 export interface StackedItemsOnDeck {
-  [location: string]: StackItem[]
+  [location: string]: StackItem[][]
 }
 
 interface LoadLidOnLabwareParams extends Omit<LoadLidParams, 'location'> {
