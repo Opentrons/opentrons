@@ -83,7 +83,7 @@ export function DeviceDetailsComponent({
         <RoundTab
           disabled={false}
           to={`/devices/${robotName}/run-history`}
-          tabName={t('recent_protocol_runs')}
+          tabName={t('run_history')}
         />
       </div>
       {/* Tab content */}

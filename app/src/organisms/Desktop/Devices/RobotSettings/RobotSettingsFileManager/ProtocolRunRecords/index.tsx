@@ -85,12 +85,21 @@ export function ProtocolRunRecords({
     }
   }
 
-  const handleDeleteSelected = (): void => {
+  const handleClickDeleteSelected = (): void => {
     if (selectedIds.size === 0) {
       handleNoRunsSelected('delete')
       return
     }
     setShowDeleteRecordsModal(true)
+  }
+
+  const handleConfirmDeleteSelected = (): void => {
+    void deleteSelectedRuns(runs.filter(run => selectedIds.has(run.id))).catch(
+      () => {
+        makeToast('Error deleting records', ERROR_TOAST)
+      }
+    )
+    setShowDeleteRecordsModal(false)
   }
 
   return (
@@ -100,14 +109,7 @@ export function ProtocolRunRecords({
           onClose={() => {
             setShowDeleteRecordsModal(false)
           }}
-          onConfirm={() => {
-            void deleteSelectedRuns(
-              runs.filter(run => selectedIds.has(run.id))
-            ).catch(() => {
-              makeToast('Error deleting records', ERROR_TOAST)
-            })
-            setShowDeleteRecordsModal(false)
-          }}
+          onConfirm={handleConfirmDeleteSelected}
           type="selectedRuns"
         />
       )}
@@ -116,7 +118,7 @@ export function ProtocolRunRecords({
           titleText={t('protocol_run_records')}
           showButtons={isSomeSelected || isAllSelected}
           onDownloadSelected={handleDownloadSelected}
-          onDeleteSelected={handleDeleteSelected}
+          onDeleteSelected={handleClickDeleteSelected}
         />
         {runs.length === 0 ? (
           <InfoScreen content={t('no_recent_runs')} />
