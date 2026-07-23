@@ -12,6 +12,8 @@ import serial.tools.list_ports  # type: ignore[import]
 from opentrons.drivers import vacuum_module
 # from opentrons.drivers.vacuum_module.types import VentState
 from opentrons.hardware_control.ot3api import OT3API  # type: ignore[import]
+from opentrons.hardware_control.adapters import SynchronousAdapter
+from opentrons.protocol_api.core.engine.module_core import VacuumModuleCore
 import dataclasses
 import time
 import traceback
@@ -123,7 +125,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="collar",
         display_name="Vacuum Collar",
         description="The kind of Collar(Opentrons or Millipore)",
-        default="opentrons_vacuum_manifold_collar_short",
+        default="millipore_vacuum_manifold_collar_short",
         choices=[
             {
                 "display_name": "Opentrons: Short",
@@ -337,6 +339,19 @@ def confirm_position(ctx: protocol_api.ProtocolContext) -> None:
     if ctx.params.enable_position_confirm:  # type: ignore[attr-defined]
         ctx.pause("Checking pipette position above well.")
 
+def enable_waste_detection(vm_mod: VacuumModuleContext, enable: bool = False) -> None:
+    """Hack: send M127 E0 via the driver. Not part of public PAPI."""
+    core = cast(VacuumModuleCore, vm_mod._core)
+    adapter = core._sync_module_hardware
+    vacuum_hw = object.__getattribute__(adapter, "_obj_to_adapt")
+    driver = vacuum_hw._driver
+
+    SynchronousAdapter.call_coroutine_sync(
+        vacuum_hw._loop,
+        driver.set_waste_configs,
+        enable_waste_full_detection=enable,
+    )
+
 def run(ctx: protocol_api.ProtocolContext) -> None:
     """Execute the vacuum manifold stress test protocol."""
     if not ctx.is_simulating():
@@ -390,8 +405,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         try:
             pump_fixture = ot3api.setup_devices()  # type: ignore[attr-defined]
             hw_vm = ot3api.attached_modules[0]
-            # vm_mod.set_waste_configs(False)
-            hw_vm._driver.set_waste_configs(False)  # type: ignore[attr-defined]
+            enable_waste_detection(vm_mod,False)  # type: ignore[attr-defined]
         except Exception as e:
             ctx.comment(f"Pump init failed: {e}")
             raise
