@@ -109,9 +109,7 @@ export function ProtocolSetupLabware({
     () =>
       Object.entries(getStacksWithLabware(startingDeck))
         .filter(([location]) => location !== 'offDeck')
-        .sort(([locationA], [locationB]) =>
-          locationA.localeCompare(locationB)
-        ),
+        .sort(([locationA], [locationB]) => locationA.localeCompare(locationB)),
     [startingDeck]
   )
   const offDeckItems = useMemo(
@@ -289,7 +287,8 @@ function LabwareLatch({
   let icon: 'latch-open' | 'latch-closed' | null = null
 
   const latchCommand:
-    HeaterShakerOpenLatchCreateCommand | HeaterShakerCloseLatchCreateCommand = {
+    | HeaterShakerOpenLatchCreateCommand
+    | HeaterShakerCloseLatchCreateCommand = {
     commandType: isLatchClosed
       ? 'heaterShaker/openLabwareLatch'
       : 'heaterShaker/closeLabwareLatch',
