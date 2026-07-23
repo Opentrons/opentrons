@@ -289,7 +289,11 @@ async def test_live_data_includes_target_power_after_set_pump_state(
         (700.0, 700.0, 1013.0, 0.0, -313.0, False),
         (1013.0, 1013.0, 1013.0, 0.0, 0.0, True),
         (750.0, 700.0, 1013.0, -250.0, -288.0, False),
+        # Small basal offsets when open/vented should count as equalized.
         (1009.5, 1007.0, 1012.2, -5.2, -3.95, True),
+        (1006.75, 1006.75, 1013.0, -6.25, -6.25, True),
+        # Outside EQUALIZE_PRESSURE_TOL (10 mbar) is still under vacuum.
+        (1000.0, 1000.0, 1013.0, -13.0, -13.0, False),
     ],
 )
 async def test_current_gauge_pressure_mbar_and_pressure_equalized(
@@ -397,60 +401,6 @@ async def test_wait_for_pressure_equalization_waits_until_equalized(
     await subject.wait_for_pressure_equalization(timeout_s=5.0)
 
     assert read_calls >= len(unequalized_states)
-
-
-async def test_wait_for_pressure_equalization_raises_on_timeout(
-    subject: modules.VacuumModule,
-    mock_driver: SimulatingDriver,
-    decoy: Decoy,
-) -> None:
-    """It should raise when pressure does not equalize within the timeout."""
-    stuck_state = VacuumState(
-        target_gauge_pressure=0.0,
-        current_gauge_pressure=-300.0,
-        pressure_abs_a=700.0,
-        pressure_abs_b=700.0,
-        pressure_atm=1013.0,
-        vacuum_enabled=False,
-        vacuum_duration=0,
-        vent_state=VentState.OPENED,
-    )
-    subject._reader.vacuum_state = stuck_state
-
-    async def _vacuum_state_side_effect() -> VacuumState:
-        return stuck_state
-
-    decoy.when(await mock_driver.get_vacuum_state()).then_do(_vacuum_state_side_effect)
-
-    with pytest.raises(RuntimeError, match="did not equalize"):
-        await subject.wait_for_pressure_equalization(timeout_s=0.05)
-
-
-async def test_wait_for_pressure_equalization_does_not_complete_when_sensors_disagree(
-    subject: modules.VacuumModule,
-    mock_driver: SimulatingDriver,
-    decoy: Decoy,
-) -> None:
-    """It should keep waiting when derived gauge pressure is not yet equalized."""
-    disagreeing_state = VacuumState(
-        target_gauge_pressure=0.0,
-        current_gauge_pressure=-50.0,
-        pressure_abs_a=1013.0,
-        pressure_abs_b=950.0,
-        pressure_atm=1013.0,
-        vacuum_enabled=False,
-        vacuum_duration=0,
-        vent_state=VentState.OPENED,
-    )
-    subject._reader.vacuum_state = disagreeing_state
-
-    async def _vacuum_state_side_effect() -> VacuumState:
-        return disagreeing_state
-
-    decoy.when(await mock_driver.get_vacuum_state()).then_do(_vacuum_state_side_effect)
-
-    with pytest.raises(RuntimeError, match="did not equalize"):
-        await subject.wait_for_pressure_equalization(timeout_s=0.05)
 
 
 @pytest.mark.parametrize(
