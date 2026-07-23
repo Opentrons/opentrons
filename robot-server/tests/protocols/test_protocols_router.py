@@ -535,6 +535,7 @@ async def test_create_existing_protocol(
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
         audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
+        access_control_status=False,
     )
 
     assert result.content.data == Protocol(
@@ -658,6 +659,7 @@ async def test_create_protocol(
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
         audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
+        access_control_status=False,
     )
 
     assert result.content.data == Protocol(
@@ -808,6 +810,7 @@ async def test_create_new_protocol_with_run_time_params(
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
         audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
+        access_control_status=False,
     )
 
     decoy.verify(
@@ -929,6 +932,7 @@ async def test_create_existing_protocol_with_no_previous_analysis(
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
         audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
+        access_control_status=False,
     )
 
     assert result.content.data == Protocol(
@@ -1084,6 +1088,7 @@ async def test_create_existing_protocol_with_different_run_time_params(
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
         audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
+        access_control_status=False,
     )
 
     assert result.content.data == Protocol(
@@ -1215,6 +1220,7 @@ async def test_create_existing_protocol_with_same_run_time_params(
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
         audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
+        access_control_status=False,
     )
 
     assert result.content.data == Protocol(
@@ -1350,6 +1356,7 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
             audit_logger=_test_audit_logger(
                 created_at=datetime(year=2021, month=1, day=1)
             ),
+            access_control_status=False,
         )
 
     assert exc_info.value.status_code == 503
@@ -1399,6 +1406,7 @@ async def test_create_protocol_not_readable(
             audit_logger=_test_audit_logger(
                 created_at=datetime(year=2021, month=1, day=1)
             ),
+            access_control_status=False,
         )
 
     assert exc_info.value.status_code == 422
@@ -1464,6 +1472,7 @@ async def test_create_protocol_different_robot_type(
             audit_logger=_test_audit_logger(
                 created_at=datetime(year=2021, month=1, day=1)
             ),
+            access_control_status=False,
         )
 
     assert exc_info.value.status_code == 422
@@ -1823,6 +1832,7 @@ async def test_create_protocol_analyses_with_same_rtp_values(
         analyses_manager=analyses_manager,
         analysis_id="analysis-id-2",
         audit_logger=_test_audit_logger(),
+        access_control_status=False,
     )
     assert result.content.data == analysis_summaries
     assert result.status_code == 200
@@ -1950,6 +1960,7 @@ async def test_update_protocol_analyses_with_new_rtp_values(
         data_files_directory=Path("/dev/null"),
         analysis_id="analysis-id-2",
         audit_logger=_test_audit_logger(),
+        access_control_status=False,
     )
     assert result.content.data == [
         AnalysisSummary(id="analysis-id", status=AnalysisStatus.COMPLETED),
@@ -2032,6 +2043,7 @@ async def test_update_protocol_analyses_with_forced_reanalysis(
         analyses_manager=analyses_manager,
         analysis_id="analysis-id-2",
         audit_logger=_test_audit_logger(),
+        access_control_status=False,
     )
     assert result.content.data == [
         AnalysisSummary(id="analysis-id", status=AnalysisStatus.COMPLETED),
@@ -2157,6 +2169,7 @@ async def test_create_protocol_kind_quick_transfer(
         created_at=datetime(year=2021, month=1, day=1),
         maximum_quick_transfer_protocols=20,
         audit_logger=_test_audit_logger(created_at=datetime(year=2021, month=1, day=1)),
+        access_control_status=False,
     )
 
     decoy.verify(
@@ -2245,6 +2258,7 @@ async def test_create_protocol_maximum_quick_transfer_protocols_exceeded(
             audit_logger=_test_audit_logger(
                 created_at=datetime(year=2021, month=1, day=1)
             ),
+            access_control_status=False,
         )
 
         assert exc_info.value.status_code == 409

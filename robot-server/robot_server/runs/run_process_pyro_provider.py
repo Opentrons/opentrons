@@ -18,6 +18,9 @@ from .run_process import DirectedRunProcess, register_process_types
 
 _log = logging.getLogger(__name__)
 
+_RESTRICTED_USER_NAME = "ot-protocol"
+_ROOT_USER_NAME = "root"
+
 _RUN_PROXY_NAME = "ot-protocol"
 _SIMULATING_RUN_PROXY_NAME = "ot-simulating-protocol"
 
@@ -32,13 +35,21 @@ class RunProcessPyroProvider:
         self._run_process: Optional[subprocess.Popen[bytes]] = None
         self._simulating_run_process: Optional[subprocess.Popen[bytes]] = None
 
-    def initialize(self) -> None:
+        # The protocol subprocess username defaults to root unless otherwise specified
+        self._protocol_username: str = "root"
+
+    def initialize(self, access_control_mode: bool) -> None:
         """Called when server first starts up.
 
         If feature flag is on for protocol subprocess, registers the process types
         for pyro serialization, then starts a run process in the background ready to
         be used by a run.
+
+        If feature flag is on for running as a user with limited permissions then
+        ensure the protocol user name is set.
         """
+        self._protocol_username = _ROOT_USER_NAME
+        self._update_user_subprocess(access_control_mode)
         if feature_flags.protocol_subprocess_enabled():
             register_process_types()
             self._start_run_process()
@@ -57,16 +68,18 @@ class RunProcessPyroProvider:
                 ns.remove(_RUN_PROXY_NAME)
                 ns.remove(_SIMULATING_RUN_PROXY_NAME)
 
-    async def refresh(self) -> None:
+    async def refresh(self, access_control_mode: bool) -> None:
         """Ends the currently running process and starts a new one."""
         await self._end_run_process()
+        self._update_user_subprocess(access_control_mode=access_control_mode)
         with Pyro5.api.locate_ns() as ns:
             ns.remove(_RUN_PROXY_NAME)
         self._start_run_process()
 
-    async def refresh_simulating(self) -> None:
+    async def refresh_simulating(self, access_control_mode: bool) -> None:
         """Ends the currently running simulating process and starts a new one."""
         await self._end_simulating_process()
+        self._update_user_subprocess(access_control_mode=access_control_mode)
         with Pyro5.api.locate_ns() as ns:
             ns.remove(_SIMULATING_RUN_PROXY_NAME)
         self._start_simulating_process()
@@ -117,7 +130,7 @@ class RunProcessPyroProvider:
         return simulating_proxy
 
     @staticmethod
-    def _open_process(process_name: str) -> subprocess.Popen[bytes]:
+    def _open_process(process_name: str, user_name: str) -> subprocess.Popen[bytes]:
         return subprocess.Popen(
             args=[
                 sys.executable,
@@ -127,8 +140,7 @@ class RunProcessPyroProvider:
                 process_name,
             ],
             env={k: v for k, v in os.environ.items()},
-            # todo(chb, 2026-07-16): The determination for what 'user' to boot under needs to be set outside of this logic and passed in here when the run is made.
-            # user="ot-protocol",
+            user=user_name,
         )
 
     @staticmethod
@@ -147,7 +159,9 @@ class RunProcessPyroProvider:
         if self._run_process is not None:
             return
 
-        self._run_process = self._open_process(_RUN_PROXY_NAME)
+        self._run_process = self._open_process(
+            process_name=_RUN_PROXY_NAME, user_name=self._protocol_username
+        )
 
     async def _end_run_process(self) -> None:
         if self._run_process is None:
@@ -160,7 +174,9 @@ class RunProcessPyroProvider:
         if self._simulating_run_process is not None:
             return
 
-        self._simulating_run_process = self._open_process(_SIMULATING_RUN_PROXY_NAME)
+        self._simulating_run_process = self._open_process(
+            process_name=_SIMULATING_RUN_PROXY_NAME, user_name=self._protocol_username
+        )
 
     async def _end_simulating_process(self) -> None:
         if self._simulating_run_process is None:
@@ -168,3 +184,10 @@ class RunProcessPyroProvider:
 
         await self._end_process(self._simulating_run_process)
         self._simulating_run_process = None
+
+    def _update_user_subprocess(self, access_control_mode: bool) -> None:
+        """Update which system user should execute the protocol subprocess."""
+        if feature_flags.run_protocol_as_restricted_user() or access_control_mode:
+            self._protocol_username = _RESTRICTED_USER_NAME
+        else:
+            self._protocol_username = _ROOT_USER_NAME

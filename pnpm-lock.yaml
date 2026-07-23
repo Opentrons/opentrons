@@ -870,9 +870,6 @@ importers:
       react-viewport-list:
         specifier: 6.3.0
         version: 6.3.0(react@18.2.0)
-      redux:
-        specifier: 5.0.1
-        version: 5.0.1
       styled-components:
         specifier: 5.3.6
         version: 5.3.6(react-dom@18.2.0(react@18.2.0))(react-is@18.3.1)(react@18.2.0)
@@ -880,6 +877,9 @@ importers:
       react-redux:
         specifier: 8.1.2
         version: 8.1.2(@types/react-dom@18.2.18)(@types/react@18.2.51)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(redux@5.0.1)
+      redux:
+        specifier: 5.0.1
+        version: 5.0.1
 
   discovery-client:
     dependencies:
