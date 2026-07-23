@@ -2155,17 +2155,16 @@ class VacuumModuleContext(ModuleContext):
         - ``vent_after``: whether to open the vent after that step completes
 
         Args:
-            steps: Ordered list of step dictionaries that make up one cycle.
-            repetitions: How many times to run the full list of steps. Defaults
-                to ``1``.
-            vent_after: Whether to open the vent after the entire profile
-                finishes. Defaults to ``False``.
-            equalize_timeout_s: Optional seconds to wait for chamber pressure to
-                return near atmospheric after the profile if ``vent_after`` is
-                ``True``. If omitted, the command does not wait for equalization.
-
-        Returns:
-            A task representing the concurrent profile run.
+            steps: List of step dictionaries defining the profile cycle. Each step dictionary supports:
+                * `enable_pump` (bool): whether to enable the pump motor.
+                * `hold_time_seconds` (float, optional): time in seconds to hold pressure/power for after target is reached.
+                * `hold_time_minutes` (float, optional): time in minutes to hold pressure/power for after target is reached.
+                * `ramp_rate` (float, optional): rate to increase the motor power at (get unit for this).
+                * `timeout_seconds` (int, optional): the time to wait for target pressure/power before throwing an error.
+                * `vent_after` (bool, optional): whether to open the vent after the step is complete.
+            repetitions: How many times to perform the entire profile.
+            vent_after: whether to open the vent after the profile is complete.
+            equalize_timeout_s: the time to wait for the module to equalize pressure after venting before throwing an error.
         """
         repetitions = validation.ensure_profile_repetition_count(repetitions)
         validated_steps = validation.ensure_vacuum_module_profile(
