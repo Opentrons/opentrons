@@ -164,7 +164,7 @@ function EnterServicePINPage({
     (candidateServicePIN: string): string | true => {
       if (serialNumber == null) {
         return t('setup_wizard_service_pin_internal_error')
-      } else if (candidateServicePIN !== `${serialNumber}-0000`) {
+      } else if (!isCorrectServicePIN(candidateServicePIN, serialNumber)) {
         return t('setup_wizard_service_pin_incorrect')
       } else {
         return true
@@ -653,4 +653,17 @@ function useSerialNumber(): string | null {
   const robot = useRobot(robotName)
   const serialNumber = robot != null ? getRobotSerialNumber(robot) : null
   return serialNumber
+}
+
+function isCorrectServicePIN(
+  candidateServicePIN: string,
+  serialNumber: string
+): boolean {
+  // Security through obscurity.
+  // This is sufficient to prevent people from enabling CRS accidentally or out of curiosity.
+  //
+  // This is insufficient to force users to pay us before enabling CRS.
+  // But, as long as we're open-source and the robots ship with open SSH access,
+  // that's an impossible goal to achieve, anyway.
+  return candidateServicePIN === `${serialNumber}-0000`
 }
