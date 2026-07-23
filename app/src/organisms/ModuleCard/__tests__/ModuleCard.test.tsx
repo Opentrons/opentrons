@@ -243,7 +243,7 @@ const mockVacuumModule = {
 const mockMakeSnackbar = vi.fn()
 const mockMakeToast = vi.fn()
 const mockEatToast = vi.fn()
-const mockUpdateModule = vi.fn()
+const mockUpdateModuleAsync = vi.fn()
 const mockResetUpdateModule = vi.fn()
 
 const render = (props: ComponentProps<typeof ModuleCard>) => {
@@ -256,9 +256,8 @@ const mockUpdateModuleMutation = (
   overrides: Record<string, unknown> = {}
 ): void => {
   vi.mocked(useUpdateModuleMutation).mockReturnValue({
-    updateModule: mockUpdateModule,
+    mutateAsync: mockUpdateModuleAsync,
     isLoading: false,
-    isSuccess: false,
     isError: false,
     error: null,
     reset: mockResetUpdateModule,
@@ -306,6 +305,7 @@ describe('ModuleCard', () => {
       makeToast: mockMakeToast,
       eatToast: mockEatToast,
     })
+    mockUpdateModuleAsync.mockResolvedValue({})
     mockUpdateModuleMutation()
     when(useRunStatuses)
       .calledWith()
@@ -429,13 +429,28 @@ describe('ModuleCard', () => {
     })
     screen.getByText(nestedTextMatcher('Module is hot to the touch'))
   })
-  it('renders information success toast when update has completed', () => {
-    mockUpdateModuleMutation({ isSuccess: true })
+  it('renders information success toast when update has completed', async () => {
+    mockUpdateModuleAsync.mockResolvedValue({})
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
+      data: [
+        {
+          cutoutId: 'cutoutB3',
+          cutoutFixtureId: 'thermocyclerModuleV1',
+          opentronsModuleSerialNumber: 'jkl123',
+        },
+      ],
+    } as unknown as UseQueryResult<DeckConfiguration>)
     render({
       ...props,
-      module: mockHotHeaterShaker,
+      module: mockHotThermo,
     })
-    expect(mockMakeToast).toBeCalled()
+    fireEvent.click(screen.getByText('Update now'))
+    expect(mockUpdateModuleAsync).toHaveBeenCalledWith(
+      mockHotThermo.serialNumber
+    )
+    await vi.waitFor(() => {
+      expect(mockMakeToast).toHaveBeenCalled()
+    })
   })
   it('renders information when calibration is required so calibration update banner renders', () => {
     render({
@@ -498,7 +513,7 @@ describe('ModuleCard', () => {
     screen.getByText('Firmware update available.')
     const button = screen.getByText('Update now')
     fireEvent.click(button)
-    expect(mockUpdateModule).toHaveBeenCalledWith('fs123')
+    expect(mockUpdateModuleAsync).toHaveBeenCalledWith('fs123')
   })
   it('renders information when a firmware update is available if it has already been calibrated', () => {
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
@@ -517,7 +532,9 @@ describe('ModuleCard', () => {
     screen.getByText('Firmware update available.')
     const button = screen.getByText('Update now')
     fireEvent.click(button)
-    expect(mockUpdateModule).toHaveBeenCalledWith(mockHotThermo.serialNumber)
+    expect(mockUpdateModuleAsync).toHaveBeenCalledWith(
+      mockHotThermo.serialNumber
+    )
   })
   it('renders information for update available and it fails rendering the fail modal', () => {
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({

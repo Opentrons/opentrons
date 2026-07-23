@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import {
@@ -142,9 +142,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { makeToast } = useToaster()
   const documentationState = useDocumentationState()
   const {
-    updateModule,
+    mutateAsync: updateModuleAsync,
     isLoading: isPending,
-    isSuccess,
     isError,
     error,
     reset: resetUpdateModule,
@@ -155,21 +154,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     !Boolean(calibratePipetteRequired) &&
     !Boolean(updatePipetteFWRequired)
 
-  useEffect(() => {
-    if (isSuccess && !module.hasAvailableUpdate) {
-      makeToast(t('firmware_updated_successfully') as string, SUCCESS_TOAST)
-      resetUpdateModule()
-    }
-  }, [isSuccess, makeToast, module.hasAvailableUpdate, resetUpdateModule, t])
-
-  useEffect(() => {
-    if (isError && error != null && isDocumentedMutationError(error)) {
-      resetUpdateModule()
-    }
-  }, [error, isError, resetUpdateModule])
-
   const handleFirmwareUpdateClick = (): void => {
-    updateModule(module.serialNumber)
+    void updateModuleAsync(module.serialNumber).then(() => {
+      makeToast(t('firmware_updated_successfully') as string, SUCCESS_TOAST)
+    })
   }
 
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
