@@ -297,7 +297,7 @@ class RunUpdate(BaseModel):
     """Update request data for an existing run."""
 
     current: Annotated[
-        bool | None,
+        Literal[False] | None,
         Field(
             description=(
                 "Whether this run is currently controlling the robot."

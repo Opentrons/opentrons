@@ -428,9 +428,10 @@ async def update_run(
         run_data_manager: Current and historical run data management.
     """
     try:
-        run_data = await run_data_manager.update(
-            runId, current=request_body.data.current
-        )
+        if request_body.data.current is False:
+            run_data = await run_data_manager.uncurrent(runId)
+        else:
+            run_data = run_data_manager.get(runId)
     except RunConflictError as e:
         raise RunNotIdle(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
     except RunNotCurrentError as e:
