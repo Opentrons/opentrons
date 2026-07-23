@@ -34,6 +34,7 @@ import {
   WRAP,
 } from '@opentrons/components'
 import {
+  useAccessControlEnabledQuery,
   useErrorRecoverySettings,
   useProtocolQuery,
   useRunCommandErrors,
@@ -75,6 +76,8 @@ import {
   useRunTimestamps,
 } from '/app/resources/runs'
 import { onDeviceDisplayFormatTimestamp } from '/app/transformations/runs'
+
+import { SignRun } from './SignRun'
 
 import type { IconName } from '@opentrons/components'
 import type { OnDeviceRouteParams } from '/app/App/types'
@@ -187,6 +190,11 @@ export function RunSummary(): JSX.Element {
     (hasCommandErrors && !cancelledWithoutRecovery) ||
     (runRecord?.data.errors != null && runRecord?.data.errors.length > 0)
   )
+
+  const accessControlQuery = useAccessControlEnabledQuery()
+  const isSigningRequired =
+    accessControlQuery.data?.data.accessControlEnabled ?? false
+  const isSigned = !isSigningRequired || !!runRecord?.data.signedBy
 
   let headerText: string | null = null
   if (runStatus === RUN_STATUS_SUCCEEDED) {
@@ -371,6 +379,10 @@ export function RunSummary(): JSX.Element {
       />
     </Flex>
   )
+
+  if (!isSigned && !showSplash) {
+    return <SignRun runId={runId} />
+  }
 
   return (
     <Btn

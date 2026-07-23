@@ -36,10 +36,15 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
 
   const isChoosingNewPassword = phase === 'chooseNewPassword'
 
-  const invalidateSelfQuery = useCallback((): void => {
-    if (host == null) return
-    void queryClient.invalidateQueries(getSelfQueryKey(host))
-  }, [host, queryClient])
+  // Seed /self from the login response. The query key omits the access token, so
+  // invalidateQueries here can refetch with a stale host.token and wipe good data.
+  const setSelfQueryData = useCallback(
+    (user: AuthUser): void => {
+      if (host == null) return
+      queryClient.setQueryData(getSelfQueryKey(host), { data: user })
+    },
+    [host, queryClient]
+  )
 
   const finishModal = useCallback(
     (username: string): void => {
@@ -53,7 +58,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
     (username: string, user: AuthUser, response: OAuth2TokenResponse): void => {
       setLoginError(null)
       storeLoginState(localRobotName, username, response)
-      invalidateSelfQuery()
+      setSelfQueryData(user)
 
       if (user.resetPassword) {
         setLoggedInUsername(username)
@@ -64,7 +69,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
 
       finishModal(username)
     },
-    [finishModal, invalidateSelfQuery, storeLoginState, localRobotName]
+    [finishModal, setSelfQueryData, storeLoginState, localRobotName]
   )
 
   const dismissModal = useCallback((): void => {
@@ -76,10 +81,14 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
     (username: string, response: OAuth2TokenResponse): void => {
       setLoginError(null)
       storeLoginState(localRobotName, username, response)
-      invalidateSelfQuery()
+      // Password-reset success does not include a user payload; invalidate so
+      // observers refetch once the new token is on the host config.
+      if (host != null) {
+        void queryClient.invalidateQueries(getSelfQueryKey(host))
+      }
       finishModal(username)
     },
-    [finishModal, invalidateSelfQuery, storeLoginState, localRobotName]
+    [finishModal, host, queryClient, storeLoginState, localRobotName]
   )
 
   const { submitPassword, isAuthLoading: isLoginAuthLoading } =

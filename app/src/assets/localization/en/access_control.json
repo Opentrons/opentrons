@@ -31,6 +31,11 @@
   "on_device_login_new_password": "New password",
   "on_device_login_password_mismatch": "Passwords do not match.",
   "set_new_password_error_update_failed": "Failed to update password. Try again.",
+  "sign": "Sign",
+  "sign_protocol_run": "Sign protocol run",
+  "sign_protocol_run_description": "Enter your legal name to verify that the protocol run has ended.",
+  "sign_protocol_run_name_mismatch": "Name doesn't match our records. Try again.",
+  "sign_protocol_run_permission_required": "Permission required to sign runs. Log in with an authorized account.",
   "username": "Username",
   "view_actions": "View actions"
 }

@@ -1,0 +1,41 @@
+.modal_container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--spacing-60);
+}
+
+.form_section {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+.button_row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.loading_container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-40);
+}
+
+.spinner {
+  width: 5.125rem;
+  height: 5.125rem;
+  color: var(--grey-60);
+}
+
+.keyboard_container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 5;
+  width: 100%;
+}
