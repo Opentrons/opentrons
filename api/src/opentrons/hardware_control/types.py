@@ -434,12 +434,48 @@ class HepaFanState:
     fan_on: bool
     duty_cycle: int
 
+    @staticmethod
+    def to_pyro_dict(obj: "HepaFanState") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "fan_on": obj.fan_on,
+            "duty_cycle": obj.duty_cycle,
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "HepaFanState":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return HepaFanState(
+            fan_on=data["fan_on"],
+            duty_cycle=data["duty_cycle"],
+        )
+
 
 @dataclass
 class HepaUVState:
     light_on: bool
     uv_duration_s: int
     remaining_time_s: int
+
+    @staticmethod
+    def to_pyro_dict(obj: "HepaUVState") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "light_on": obj.light_on,
+            "uv_duration_s": obj.uv_duration_s,
+            "remaining_time_s": obj.remaining_time_s,
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "HepaUVState":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return HepaUVState(
+            light_on=data["light_on"],
+            uv_duration_s=data["uv_duration_s"],
+            remaining_time_s=data["remaining_time_s"],
+        )
 
 
 @dataclass(frozen=True)
