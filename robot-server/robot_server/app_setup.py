@@ -13,7 +13,11 @@ from opentrons import __version__
 from opentrons.config import (
     feature_flags as ff,
 )
-from server_utils.audit.fastapi import build_audit_client, install_audit_client
+from server_utils.audit.fastapi import (
+    audit_logger_middleware,
+    build_audit_client,
+    install_audit_client,
+)
 from server_utils.auth.resource_server.fastapi import (
     build_authentication_checker,
     install_authentication_checker,
@@ -200,7 +204,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+app.middleware("http")(audit_logger_middleware)
 app.middleware("http")(server_timing_middleware())
 
 # main router

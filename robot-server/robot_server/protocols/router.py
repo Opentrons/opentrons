@@ -32,6 +32,8 @@ from opentrons.protocol_reader import (
 from opentrons.util.performance_helpers import TrackingFunctions
 from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons_shared_data.robot.types import RobotType
+from server_utils.audit.audit_logger import AuditLogger
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import (
     get_access_control_status,
     require_scopes,
@@ -84,7 +86,6 @@ from robot_server.data_files.dependencies import (
 )
 from robot_server.data_files.models import DataFile, FileIdNotFound, FileIdNotFoundError
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
-from robot_server.fastapi_dependencies import AuditLogger, get_audit_logger
 from robot_server.hardware import get_robot_type
 from robot_server.service.dependencies import get_current_time, get_unique_id
 
@@ -169,8 +170,7 @@ protocols_router = LightRouter()
     protocols_router.post,
     path="/protocols",
     summary="Upload a protocol",
-    description=dedent(
-        """
+    description=dedent("""
         Upload a protocol to your device. You may include the following files:
 
         - A single Python protocol file and 0 or more custom labware JSON files
@@ -200,8 +200,7 @@ protocols_router = LightRouter()
         Quick transfer protocols:
         - Do not store any run history
         - Do not get auto deleted, instead they have a fixed max count.
-        """
-    ),
+        """),
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[Protocol]},
@@ -238,7 +237,10 @@ async def create_protocol(  # noqa: C901
     maximum_quick_transfer_protocols: Annotated[
         int, Depends(get_maximum_quick_transfer_protocols)
     ],
-    audit_logger: Annotated[AuditLogger, Depends(get_audit_logger)],
+    audit_logger: Annotated[
+        AuditLogger,
+        Depends(get_audit_logger(action="protocol upload", message_style="auto-head")),
+    ],
     access_control_status: Annotated[bool, Depends(get_access_control_status)],
     files: List[UploadFile] = File(...),
     # use Form because request is multipart/form-data
@@ -314,15 +316,20 @@ async def create_protocol(  # noqa: C901
             ``Opentrons-User-Notes``.
         access_control_status: Status of the Auth-Server access control enablement.
     """
-    await audit_logger.log(
-        resource_id=protocol_id,
-        request_data={
-            "uploadedFileNames": [f.filename for f in files],
-            "key": key,
-            "protocolKind": protocol_kind,
-            "runTimeParameterValues": run_time_parameter_values,
-            "runTimeParameterFiles": run_time_parameter_files,
-        },
+    audit_logger.append_message_chunk(
+        "uploaded file names: " + ", ".join([str(f.filename) for f in files])
+    )
+    audit_logger.append_message_chunk(
+        f"key: {key}",
+    )
+    audit_logger.append_message_chunk(
+        f"protocol kind: {protocol_kind}",
+    )
+    audit_logger.append_message_chunk(
+        f"run time parameter values: {str(run_time_parameter_values)}",
+    )
+    audit_logger.append_message_chunk(
+        f"run time parameter files {str(run_time_parameter_files)}"
     )
 
     # TODO: check if we can make our own "RTP multipart-form field" Pydantic type
@@ -345,6 +352,9 @@ async def create_protocol(  # noqa: C901
             if protocol.protocol_kind == ProtocolKind.QUICK_TRANSFER
         ]
         if len(quick_transfer_protocols) >= maximum_quick_transfer_protocols:
+            audit_logger.append_message_chunk(
+                f"failed because this is a quick transfer protocol and there are {len(quick_transfer_protocols)} already (max: {maximum_quick_transfer_protocols})"
+            )
             raise HTTPException(
                 status_code=409, detail="Maximum quick transfer protocols exceeded"
             )
@@ -360,6 +370,9 @@ async def create_protocol(  # noqa: C901
             for name, file_id in parsed_rtp_files.items()
         }
     except FileIdNotFoundError as e:
+        audit_logger.append_message_chunk(
+            f"failed because runtime parameter file was not found: {e}"
+        )
         raise FileIdNotFound(detail=str(e)).as_error(
             status.HTTP_422_UNPROCESSABLE_ENTITY
         )
@@ -389,6 +402,9 @@ async def create_protocol(  # noqa: C901
                     access_control_status=access_control_status,
                 )
             except AnalysisIsPendingError as error:
+                audit_logger.append_message_chunk(
+                    f"failed because analysis is still pending: {error}"
+                )
                 raise LastAnalysisPending(detail=str(error)).as_error(
                     status.HTTP_503_SERVICE_UNAVAILABLE
                 ) from error
@@ -408,6 +424,9 @@ async def create_protocol(  # noqa: C901
                 ],
             )
 
+            audit_logger.append_message_chunk(
+                f"not storing new data because protocol with id {cached_protocol_id} with same contents already exists"
+            )
             log.info(
                 f'Protocol with id "{cached_protocol_id}" with same contents already exists.'
                 f" Returning existing protocol data in response payload."
@@ -430,6 +449,7 @@ async def create_protocol(  # noqa: C901
             content_hash=content_hash,
         )
     except ProtocolFilesInvalidError as e:
+        audit_logger.append_message_chunk(f"failed because a file was invalid: {e}")
         raise ProtocolFilesInvalid(detail=str(e)).as_error(
             status.HTTP_422_UNPROCESSABLE_ENTITY
         ) from e
@@ -437,6 +457,9 @@ async def create_protocol(  # noqa: C901
     if source.robot_type != robot_type:
         # fixme(mm, 2025-10-06): Since `source` has already been saved to the filesystem,
         # this will leave permanent stray files inside `protocol_directory`.
+        audit_logger.append_message_chunk(
+            f"failed because this is a {source.robot_type} protocol but this is a {robot_type} robot"
+        )
         raise ProtocolRobotTypeMismatch(
             detail=(
                 f"This protocol is for {user_facing_robot_type(source.robot_type)} robots."
@@ -714,7 +737,7 @@ async def get_protocol_by_id(
 async def delete_protocol_by_id(
     protocolId: str,
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
-    audit_logger: Annotated[AuditLogger, Depends(get_audit_logger)],
+    audit_logger: Annotated[AuditLogger, Depends(get_audit_logger())],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete an uploaded protocol by ID.
 
@@ -733,11 +756,6 @@ async def delete_protocol_by_id(
     except ProtocolUsedByRunError as e:
         raise ProtocolUsedByRun(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
 
-    await audit_logger.log(
-        resource_id=protocolId,
-        request_data={"protocolId": protocolId},
-    )
-
     return await PydanticResponse.create(
         content=SimpleEmptyBody.model_construct(),
         status_code=status.HTTP_200_OK,
@@ -748,11 +766,9 @@ async def delete_protocol_by_id(
     protocols_router.post,
     path="/protocols/{protocolId}/analyses",
     summary="Analyze the protocol",
-    description=dedent(
-        """
+    description=dedent("""
         Generate an analysis for the protocol, based on last analysis and current request data.
-        """
-    ),
+        """),
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_200_OK: {"model": SimpleMultiBody[AnalysisSummary]},
@@ -770,7 +786,7 @@ async def create_protocol_analysis(
     data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     analysis_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
-    audit_logger: Annotated[AuditLogger, Depends(get_audit_logger)],
+    audit_logger: Annotated[AuditLogger, Depends(get_audit_logger())],
     access_control_status: Annotated[bool, Depends(get_access_control_status)],
     request_body: Optional[RequestModel[AnalysisRequest]] = None,
 ) -> PydanticResponse[SimpleMultiBody[AnalysisSummary]]:
@@ -823,11 +839,6 @@ async def create_protocol_analysis(
         raise LastAnalysisPending(detail=str(error)).as_error(
             status.HTTP_503_SERVICE_UNAVAILABLE
         ) from error
-
-    await audit_logger.log(
-        resource_id=protocolId,
-        request_data=request_body.data if request_body is not None else {},
-    )
 
     return await PydanticResponse.create(
         content=SimpleMultiBody.model_construct(

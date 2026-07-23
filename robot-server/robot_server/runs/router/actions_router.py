@@ -6,6 +6,8 @@ from typing import Annotated, Literal, Union
 from fastapi import Depends, status
 
 from opentrons.protocol_engine.types import DeckConfigurationType
+from server_utils.audit.audit_logger import AuditLogger
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -27,7 +29,6 @@ from robot_server.deck_configuration.fastapi_dependencies import (
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
-from robot_server.fastapi_dependencies import AuditLogger, get_audit_logger
 from robot_server.maintenance_runs.dependencies import (
     get_maintenance_run_orchestrator_store,
 )
@@ -110,7 +111,9 @@ async def get_run_controller(
 async def create_run_action(
     runId: str,
     request_body: RequestModel[RunActionCreate],
-    audit_logger: Annotated[AuditLogger, Depends(get_audit_logger)],
+    audit_logger: Annotated[
+        AuditLogger, Depends(get_audit_logger(action="create run"))
+    ],
     run_controller: Annotated[RunController, Depends(get_run_controller)],
     action_id: Annotated[str, Depends(get_unique_id)],
     created_at: Annotated[datetime, Depends(get_current_time)],
@@ -144,7 +147,6 @@ async def create_run_action(
         audit_logger: Records the action for audit setting requires
             ``Opentrons-User-Notes``.
     """
-    await audit_logger.log(resource_id=runId, request_data=request_body.data)
     body = request_body.data
     action_type = body.actionType
     if (
