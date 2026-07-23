@@ -3,7 +3,10 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+import {
+  RUN_STATUS_IDLE,
+  mockApiHeaterShaker,
+} from '@opentrons/api-client'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
@@ -18,7 +21,6 @@ import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
-import { mockApiHeaterShaker } from '/app/redux/modules/__fixtures__'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useAttachedModules } from '/app/resources/modules'
 import {

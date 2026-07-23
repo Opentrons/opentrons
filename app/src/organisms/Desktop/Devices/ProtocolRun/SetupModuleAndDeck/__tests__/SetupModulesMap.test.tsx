@@ -11,7 +11,7 @@ import { ModuleInfo } from '/app/molecules/ModuleInfo'
 import {
   mockMagneticModule as mockMagneticModuleFixture,
   mockThermocycler as mockThermocyclerFixture,
-} from '/app/redux/modules/__fixtures__/index'
+} from '@opentrons/api-client'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getAttachedProtocolModuleMatches } from '/app/transformations/analysis'
 

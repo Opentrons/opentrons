@@ -17,7 +17,7 @@ import {
   mockMagneticModule,
   mockTemperatureModule,
   mockThermocycler,
-} from '/app/redux/modules/__fixtures__'
+} from '@opentrons/api-client'
 
 import { LabwareListItem } from '../LabwareListItem'
 import { SecureLabwareModal } from '../SecureLabwareModal'

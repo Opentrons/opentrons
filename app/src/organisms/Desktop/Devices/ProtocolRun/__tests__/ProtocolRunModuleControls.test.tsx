@@ -12,7 +12,7 @@ import {
   mockMagneticModuleGen2,
   mockTemperatureModuleGen2,
   mockThermocycler,
-} from '/app/redux/modules/__fixtures__'
+} from '@opentrons/api-client'
 import { useModuleRenderInfoForProtocolById } from '/app/resources/runs'
 
 import { ProtocolRunModuleControls } from '../ProtocolRunModuleControls'

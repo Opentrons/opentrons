@@ -13,7 +13,7 @@ import {
   HEALTH_STATUS_OK,
   ROBOT_MODEL_OT3,
 } from '/app/redux/discovery/constants'
-import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
+import { mockFetchModulesSuccessActionPayloadModules } from '@opentrons/api-client'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { useAttachedPipettes } from '/app/resources/instruments'
 import {

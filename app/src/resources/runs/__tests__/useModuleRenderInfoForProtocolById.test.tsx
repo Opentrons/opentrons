@@ -12,7 +12,7 @@ import {
 import {
   mockTemperatureModuleGen2,
   mockThermocycler,
-} from '/app/redux/modules/__fixtures__'
+} from '@opentrons/api-client'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useAttachedModules } from '/app/resources/modules'

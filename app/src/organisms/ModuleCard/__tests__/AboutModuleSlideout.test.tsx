@@ -5,18 +5,16 @@ import {
   RUN_STATUS_FINISHING,
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
-} from '@opentrons/api-client'
-
-import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
-import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
-import {
   mockMagneticModule,
   mockMagneticModuleGen2,
   mockTemperatureModule,
   mockTemperatureModuleGen2,
   mockThermocycler,
-} from '/app/redux/modules/__fixtures__'
+} from '@opentrons/api-client'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 
 import { AboutModuleSlideout } from '../AboutModuleSlideout'
 

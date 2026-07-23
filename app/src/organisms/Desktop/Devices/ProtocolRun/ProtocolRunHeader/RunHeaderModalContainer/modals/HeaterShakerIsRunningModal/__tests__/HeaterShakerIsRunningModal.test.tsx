@@ -6,7 +6,7 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
-import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
+import { mockHeaterShaker } from '@opentrons/api-client'
 import { useAttachedModules } from '/app/resources/modules'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 

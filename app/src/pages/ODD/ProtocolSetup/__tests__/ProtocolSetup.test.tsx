@@ -3,7 +3,10 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
+import {
+  RUN_STATUS_STOPPED,
+  mockHeaterShaker,
+} from '@opentrons/api-client'
 import {
   useAddCameraSettingsToRunMutation,
   useAllPipetteOffsetCalibrationsQuery,
@@ -61,7 +64,6 @@ import { useRobotType } from '/app/redux-resources/robots'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import {
   getCameraUsageState,
   selectAreOffsetsApplied,

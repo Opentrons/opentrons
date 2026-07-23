@@ -7,7 +7,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
-import { mockThermocycler } from '/app/redux/modules/__fixtures__'
+import { mockThermocycler } from '@opentrons/api-client'
 
 import { ThermocyclerModuleSlideout } from '../ThermocyclerModuleSlideout'
 

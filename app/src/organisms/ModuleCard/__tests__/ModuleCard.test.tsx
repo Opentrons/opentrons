@@ -20,7 +20,7 @@ import {
   mockMagneticModule,
   mockTemperatureModuleGen2,
   mockThermocycler,
-} from '/app/redux/modules/__fixtures__'
+} from '@opentrons/api-client'
 import { mockRobot } from '/app/redux/robot-api/__fixtures__'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'

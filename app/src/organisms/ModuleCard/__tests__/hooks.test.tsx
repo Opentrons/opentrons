@@ -18,7 +18,7 @@ import {
   mockTemperatureModuleGen2,
   mockThermocycler,
   mockThermocyclerGen2,
-} from '/app/redux/modules/__fixtures__'
+} from '@opentrons/api-client'
 import {
   useCurrentRunId,
   useMostRecentCompletedAnalysis,

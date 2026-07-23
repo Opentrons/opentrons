@@ -9,7 +9,7 @@ import { useIsFlex } from '/app/redux-resources/robots'
 import {
   mockMagneticModuleGen2,
   mockVacuumModule,
-} from '/app/redux/modules/__fixtures__'
+} from '@opentrons/api-client'
 
 import { useModuleCalibrationStatus } from '../useModuleCalibrationStatus'
 import { useModuleRenderInfoForProtocolById } from '../useModuleRenderInfoForProtocolById'

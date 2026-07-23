@@ -14,7 +14,7 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
-import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
+import { mockHeaterShaker } from '@opentrons/api-client'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { useMissingProtocolHardware } from '../useMissingProtocolHardware'

@@ -22,7 +22,7 @@ import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resource
 import {
   mockFlexStacker,
   mockHeaterShaker,
-} from '/app/redux/modules/__fixtures__'
+} from '@opentrons/api-client'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useCloseCurrentRun } from '/app/resources/runs'
 

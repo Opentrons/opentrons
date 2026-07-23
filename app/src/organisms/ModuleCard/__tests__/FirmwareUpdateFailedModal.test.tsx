@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockTemperatureModule } from '/app/redux/modules/__fixtures__'
+import { mockTemperatureModule } from '@opentrons/api-client'
 
 import { FirmwareUpdateFailedModal } from '../FirmwareUpdateFailedModal'
 

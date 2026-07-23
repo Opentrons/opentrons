@@ -10,7 +10,7 @@ import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import {
   mockTemperatureModule,
   mockTemperatureModuleGen2,
-} from '/app/redux/modules/__fixtures__'
+} from '@opentrons/api-client'
 
 import { TemperatureModuleSlideout } from '../TemperatureModuleSlideout'
 

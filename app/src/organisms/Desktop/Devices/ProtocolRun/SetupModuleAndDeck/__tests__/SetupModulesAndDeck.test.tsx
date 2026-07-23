@@ -5,7 +5,7 @@ import { when } from 'vitest-when'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useIsFlex } from '/app/redux-resources/robots'
-import { mockTemperatureModule } from '/app/redux/modules/__fixtures__'
+import { mockTemperatureModule } from '@opentrons/api-client'
 import {
   getIsFixtureMismatch,
   getRequiredDeckConfig,

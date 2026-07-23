@@ -5,7 +5,7 @@ import {
   TEMPERATURE_MODULE_V2_FIXTURE,
 } from '@opentrons/shared-data'
 
-import { mockTemperatureModuleGen2 } from '/app/redux/modules/__fixtures__'
+import { mockTemperatureModuleGen2 } from '@opentrons/api-client'
 
 import { getAttachedProtocolModuleMatches } from '../getAttachedProtocolModuleMatches'
 

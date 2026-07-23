@@ -3,7 +3,7 @@ import { beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
+import { mockFetchModulesSuccessActionPayloadModules } from '@opentrons/api-client'
 
 import { ModuleCalibrationItems } from '../CalibrationDetails/ModuleCalibrationItems'
 import { RobotSettingsModuleCalibration } from '../RobotSettingsModuleCalibration'

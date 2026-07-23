@@ -13,11 +13,9 @@ import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import {
   mockMagneticModuleGen2,
   mockThermocycler,
-} from '/app/redux/modules/__fixtures__'
-import {
   mockHeaterShaker,
   mockMagneticModule as mockMagneticModuleFixture,
-} from '/app/redux/modules/__fixtures__/index'
+} from '@opentrons/api-client'
 import {
   useChainLiveCommands,
   useModuleRenderInfoForProtocolById,

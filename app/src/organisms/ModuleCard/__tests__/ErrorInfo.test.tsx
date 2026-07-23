@@ -7,7 +7,7 @@ import {
   mockHeaterShaker,
   mockTemperatureModule,
   mockThermocycler,
-} from '/app/redux/modules/__fixtures__'
+} from '@opentrons/api-client'
 
 import { ErrorInfo } from '../ErrorInfo'
 

@@ -5,7 +5,7 @@ import { when } from 'vitest-when'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
-import { mockThermocyclerGen2 } from '/app/redux/modules/__fixtures__'
+import { mockThermocyclerGen2 } from '@opentrons/api-client'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { useRunStatuses } from '/app/resources/runs'
 

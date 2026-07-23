@@ -8,7 +8,7 @@ import { i18n } from '/app/i18n'
 import {
   mockFlexStacker,
   mockFlexStackerMissingShuttle,
-} from '/app/redux/modules/__fixtures__'
+} from '@opentrons/api-client'
 import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 
 import { CloseDoor } from '../CloseStackerDoor'
