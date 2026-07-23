@@ -5,9 +5,11 @@ import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
-import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
+import { getProtocol } from '@opentrons/api-client'
 import {
   useCreateRunMutation,
+  useDeleteProtocolMutation,
+  useDeleteRunMutation,
   useHost,
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
@@ -53,9 +55,20 @@ vi.mock('/app/local-resources/dom-utils')
 vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
   useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
 }))
+vi.mock(
+  '/app/local-resources/access-control/useLinkedDocumentationState',
+  () => ({
+    useLinkedDocumentationState: () => ({
+      documentationState: ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+      clearDocreport: vi.fn(),
+    }),
+  })
+)
 
 const MOCK_HOST_CONFIG = {} as HostConfig
 const mockCreateRun = vi.fn((id: string) => {})
+const mockDeleteProtocol = vi.fn()
+const mockDeleteRun = vi.fn()
 const MOCK_DATA = {
   data: {
     id: 'mockProtocol1',
@@ -94,6 +107,14 @@ describe('ODDProtocolDetails', () => {
     vi.mocked(useCreateRunMutation).mockReturnValue({
       createRun: mockCreateRun,
     } as any)
+    vi.mocked(useDeleteProtocolMutation).mockReturnValue({
+      deleteProtocol: mockDeleteProtocol,
+    } as any)
+    vi.mocked(useDeleteRunMutation).mockReturnValue({
+      deleteRun: mockDeleteRun,
+    } as any)
+    mockDeleteProtocol.mockResolvedValue(undefined)
+    mockDeleteRun.mockResolvedValue(undefined)
     vi.mocked(useHardwareStatusText).mockReturnValue(
       'mock missing hardware chip text'
     )
@@ -178,16 +199,13 @@ describe('ODDProtocolDetails', () => {
     const confirmDeleteButton = screen.getByText('Delete')
     fireEvent.click(confirmDeleteButton)
     await waitFor(() =>
-      expect(vi.mocked(deleteRun)).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')
+      expect(mockDeleteRun).toHaveBeenCalledWith({ runId: '1' })
     )
     await waitFor(() =>
-      expect(vi.mocked(deleteRun)).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '2')
+      expect(mockDeleteRun).toHaveBeenCalledWith({ runId: '2' })
     )
     await waitFor(() =>
-      expect(vi.mocked(deleteProtocol)).toHaveBeenCalledWith(
-        MOCK_HOST_CONFIG,
-        'fakeProtocolId'
-      )
+      expect(mockDeleteProtocol).toHaveBeenCalledWith('fakeProtocolId')
     )
   })
 

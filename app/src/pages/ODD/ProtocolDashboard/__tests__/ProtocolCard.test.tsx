@@ -3,6 +3,8 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  useDeleteProtocolMutation,
+  useDeleteRunMutation,
   useMostRecentSuccessfulAnalysisAsDocumentQuery,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
@@ -38,6 +40,15 @@ vi.mock('/app/redux/config')
 vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
   useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
 }))
+vi.mock(
+  '/app/local-resources/access-control/useLinkedDocumentationState',
+  () => ({
+    useLinkedDocumentationState: () => ({
+      documentationState: ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+      clearDocreport: vi.fn(),
+    }),
+  })
+)
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Chip>()
   return {
@@ -126,6 +137,12 @@ describe('ProtocolCard', () => {
     vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
       data: { result: 'ok' } as any,
     } as UseQueryResult<CompletedProtocolAnalysis>)
+    vi.mocked(useDeleteProtocolMutation).mockReturnValue({
+      deleteProtocol: vi.fn(),
+    } as any)
+    vi.mocked(useDeleteRunMutation).mockReturnValue({
+      deleteRun: vi.fn(),
+    } as any)
     vi.mocked(useFeatureFlag).mockReturnValue(false)
   })
 

@@ -163,6 +163,7 @@ type AuditLogAction =
   | 'pause_run'
   | 'disconnect_wifi'
   | 'connect_wifi'
+  | 'delete_protocol'
   | 'delete_run'
   | 'delete_run_images'
   | 'delete_runs'
