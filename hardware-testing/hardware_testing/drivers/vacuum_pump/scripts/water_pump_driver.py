@@ -35,6 +35,8 @@ COMMANDS = {
     "reference": "REFERENCE",
     "level": "LEVEL",
     "status": "STATUS",
+    "valve_on": "solenoid ON",
+    "valve_off": "solenoid OFF",
 }
 
 """Ready. Commands: ON, OFF, AUTO ON, AUTO OFF, CHECK, REFERENCE, LEVEL, STATUS"""
@@ -69,6 +71,10 @@ class AbstractWaterPump(Protocol):
 
     async def water_fill_timer(self, run_time: int) -> None:
         """Check the current water level."""
+        ...
+        
+    async def limit_water_fill(self, water_level: float) -> bool:
+        """Run the pump for the specified water level in millimeters."""
         ...
 
 
@@ -114,7 +120,7 @@ class WaterPump(AbstractWaterPump):
         try:
             command = f"{COMMANDS['pumpOn']}{V_ACK}"
             print(f"{COMMANDS['pumpOn']}{V_ACK}")
-            # await asyncio.to_thread(self.connection.reset_input_buffer)
+            await asyncio.to_thread(self.connection.reset_input_buffer)
             # await asyncio.to_thread(self.connection.reset_output_buffer)
             await self._write(command.encode())
             self._logger.debug("Motor turned on")
@@ -127,7 +133,7 @@ class WaterPump(AbstractWaterPump):
         try:
             command = f"{COMMANDS['pumpOff']}{V_ACK}"
             print(f"{COMMANDS['pumpOff']}{V_ACK}")
-            # await asyncio.to_thread(self.connection.reset_input_buffer)
+            await asyncio.to_thread(self.connection.reset_input_buffer)
             # await asyncio.to_thread(self.connection.reset_output_buffer)
             await self._write(command.encode())
             self._logger.debug("Motor turned off")
@@ -156,8 +162,6 @@ class WaterPump(AbstractWaterPump):
         )
 
         try:
-            await self.turn_motor_on()
-
             # Blocks until target level is reached
             state = await self.limit_water_fill(target)
 
@@ -203,6 +207,7 @@ class WaterPump(AbstractWaterPump):
     async def check_water_level(self) -> float:
         """Read and parse water level data."""
         command = f"{COMMANDS['level']}{V_ACK}"
+        await asyncio.to_thread(self.connection.reset_input_buffer)
         await self._write(command.encode())
 
         try:
@@ -210,17 +215,30 @@ class WaterPump(AbstractWaterPump):
                 line = (await self._readline()).strip().split(",")
                 if not line:
                     continue
-
+                
                 self._logger.info(f"Water level: {line}")
                 # Stop after all expected values are received
                 if len(line) >= 6:
                     break
+                await self._write(command.encode())
 
             return self.parse_water_level_data(line)[len(line)-1]
 
         except Exception as e:
             self._logger.error(f"Water level read error: {e}")
             raise
+
+    async def open_solenoid(self) -> None:
+        """Open the solenoid valve."""
+        command = f"{COMMANDS['valve_on']}{V_ACK}"
+        await self._write(command.encode())
+        self._logger.info("Solenoid opened")
+
+    async def close_solenoid(self) -> None:
+        """Close the solenoid valve."""
+        command = f"{COMMANDS['valve_off']}{V_ACK}"
+        await self._write(command.encode())
+        self._logger.info("Solenoid closed")
 
     async def _write(self, data: bytes) -> None:
         """Non-blocking write operation."""
@@ -265,19 +283,21 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     async def main():
-        logging.disable(logging.INFO)  # Disable debug logging for the main function
+        # logging.disable(logging.INFO)  # Disable debug logging for the main function
         pump = await WaterPump.create(args.port, args.baudrate, asyncio.get_event_loop())
         await pump.connect()
         start_time = time.perf_counter()
         condition = True
+        await pump.open_solenoid()  # Open the solenoid valve to allow water flow
         while condition:
             data = await pump.check_water_level()
             elasped_time = time.perf_counter() - start_time
             print(f"Time: {elasped_time} , {data}")
-            water_reached = await pump.water_fill_auto(18)  # Example target level in mm
+            water_reached = await pump.water_fill_auto(30)  # Example target level in mm
             print(f"Water reached: {water_reached}")
             if water_reached == True:
                 condition = False
+        await pump.close_solenoid()  # Close the solenoid valve to stop water flow
         # await pump.turn_motor_on()
         # await asyncio.sleep(1)  # Run the pump for 5 seconds
         # await pump.turn_motor_off()

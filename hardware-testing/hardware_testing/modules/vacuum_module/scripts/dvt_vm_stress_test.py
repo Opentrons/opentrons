@@ -31,7 +31,7 @@ DISPENSE_OFFSET_MM = 8
 OUTPUT_DIR = "/data/vacuum_manifold_life_test_dvt/"
 
 Ard_idVendor = 9025
-Ard_idProduct = 32858
+Ard_idProduct = 105
 
 VM_idVendor = 1155
 VM_idProduct = 61248
@@ -245,10 +245,6 @@ async def _setup_devices(
     from hardware_testing.drivers import vacuum_pump
 
     loop = asyncio.get_event_loop()
-    # Vacuum Manifold Driver
-    port = find_port_by_id(VM_idVendor, VM_idProduct)
-    pump = await vacuum_module.VacuumModuleDriver.create(port=port, loop=self._loop)
-    await pump.set_waste_configs(False)
     # Arduino Water pump Driver
     m_port = find_port_by_id(Ard_idVendor, Ard_idProduct)
 
@@ -256,7 +252,7 @@ async def _setup_devices(
         port=m_port, baudrate=115200, loop=loop
     )
 
-    return pump, pump_fixture
+    return pump_fixture
 
 
 async def _run_single_pump_api_cycle(
@@ -264,7 +260,7 @@ async def _run_single_pump_api_cycle(
     pump: VacuumModuleContext,
     water_pump_fixture: Any,
     target_pressure: int,
-    trough_fill_time: int,
+    target_liquid_height: int,
     cycle_index: int,
     output_dir: Path,
     SETTLE_SEC: int,
@@ -277,8 +273,12 @@ async def _run_single_pump_api_cycle(
     """Run one pump cycle for RUN_SEC seconds using the driver's continuous reader."""
     target_to_pump = target_pressure - 1013.25
     pump.open_vent()
+    # Start the water pump to fill the reservoir to the target liquid height
+    await water_pump_fixture.open_solenoid()
     # Start the filling of the water pump while the vacuum is running
-    await water_pump_fixture.water_fill_timer(trough_fill_time)
+    water_reached = await water_pump_fixture.water_fill(target_liquid_height)
+    print(f"[cycle {cycle_index}] water fill reached target: {water_reached}")
+    await water_pump_fixture.close_solenoid()
     pump.close_vent()
     await asyncio.sleep(1)
     # Set Pressure and Vacuum to target for x amount of time.
@@ -364,24 +364,24 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ctx.load_trash_bin("A1")
     # Load Vacuum Module
     vm_mod = cast(VacuumModuleContext, ctx.load_module("vacuumModuleV1", "A3"))
-
+    target_liquid_height = 30
     tip_rack = ctx.load_labware(
         "opentrons_flex_96_tiprack_1000uL",
         "B2",
         adapter="opentrons_flex_96_tiprack_adapter",
     )
-    tip_rack.set_offset({"x": 0, "y": 0, "z":0})
+    tip_rack.set_offset(x=0, y=0, z=0)
     pip = ctx.load_instrument("flex_96channel_1000", "left", tip_racks=[tip_rack])
     manifold_collar = vm_mod.load_adapter_to_dock(ctx.params.collar)  # type: ignore[attr-defined]
     filter_plate = manifold_collar.load_labware("invitroven_filter_plate")
-    source = ctx.load_labware("nest_1_reservoir_290ml", "B3")
+    source = ctx.load_labware("nest_1_reservoir_290ml", "C2")
 
-    filter_plate.set_offset({"x": 0, "y": 0, "z":0})
-    source.set_offset({"x": 0, "y": 0, "z":0})
+    # filter_plate.set_offset(x=0, y=0, z=0)
+    # manifold_collar.set_offset(x=0, y=0, z=0)
+    source.set_offset(x=0, y=0, z=13)
     # base = ctx.load_labware("millipore_vacuum_manifold_base", "C3")
     # manifold_collar = base.load_labware("millipore_vacuum_manifold_collar_standard")
     # filter_plate = manifold_collar.load_labware("attractspe_c18_filter_plate")
-
     
     pump_fixture = None
     hw_vm = None
@@ -390,12 +390,14 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         try:
             pump_fixture = ot3api.setup_devices()  # type: ignore[attr-defined]
             hw_vm = ot3api.attached_modules[0]
+            # vm_mod.set_waste_configs(False)
+            hw_vm._driver.set_waste_configs(False)  # type: ignore[attr-defined]
         except Exception as e:
             ctx.comment(f"Pump init failed: {e}")
             raise
-
+    ctx.delay(seconds=5)  # Allow time for the pump to initialize
+    ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
     pip.pick_up_tip()
-
     output_dir = Path(OUTPUT_DIR)
     if not ctx.is_simulating():
         for cycle in range(1, cycles + 1):
@@ -410,7 +412,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                     vm_mod,
                     pump_fixture,
                     pressure,
-                    perstaltic_time,
+                    target_liquid_height,
                     cycle,
                     output_dir,
                     SETTLE_SEC,
@@ -427,8 +429,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         pip.return_tip()
     if not ctx.is_simulating():
         try:
-            if pump is not None:
-                ot3api.pump_disconnect(pump)
             if pump_fixture is not None:
                 ot3api.pump_disconnect(pump_fixture)
         except Exception:
