@@ -30,9 +30,11 @@ from opentrons.drivers.vacuum_module.simulator import SimulatingDriver
 from opentrons.drivers.vacuum_module.types import (
     LEDColor,
     LEDPattern,
+    PressureControlTunings,
     PumpState,
     VacuumState,
     VentState,
+    WasteConfigParameters,
 )
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.modules import mod_abc, update
@@ -87,6 +89,33 @@ PRESSURE_COMPARISON_WINDOW_SIZE = 5
 POWER_COMPARISON_WINDOW_SIZE = 5
 PRESSURE_TOL = 5.0
 POWER_TOL = 1.0
+
+# Pressure-control PID defaults
+# See pressure_task.hpp and pressure_controller.hpp in opentrons-modules for details
+DEFAULT_PRESSURE_CONTROL_TUNINGS = PressureControlTunings(
+    kp=13.1,
+    ki=4.59,
+    kd=0.15,
+    overshoot_error=-2.0,
+    k_velocity=20.0,
+    k_holding=43.0,
+    tolerance_error=2.0,  # rel_tol_pct (%)
+)
+
+# Waste-full detection defaults
+# See waste_detector.hpp in opentrons-modules repo for details
+DEFAULT_WASTE_CONFIG = WasteConfigParameters(
+    waste_detection_enabled=False,
+    p_window_start=0.10,
+    p_window_end=0.95,
+    baseline_fast_factor=0.75,
+    max_delta_per_tick=250.0,
+    max_rise_per_tick=3.5,
+    max_cummulative_rise=11.5,
+    p_filter_alpha=0.5,
+    min_window_time=700.0,  # ms
+    max_window_time=20000.0,  # ms
+)
 
 
 class VacuumModule(mod_abc.AbstractModule):
@@ -148,10 +177,13 @@ class VacuumModule(mod_abc.AbstractModule):
             error_callback=error_callback,
         )
 
+        # Configure the default parameters
+        await module._configure_device()
+
         try:
             await poller.start()
         except Exception:
-            log.exception(f"First read of Flex-Stacker on port {port} failed")
+            log.exception(f"First read of Vacuum Module on port {port} failed")
 
         return module
 
@@ -237,6 +269,35 @@ class VacuumModule(mod_abc.AbstractModule):
         self._usb_port = usb_port
         await self._driver.move_port(port)
 
+    async def _configure_device(self) -> None:
+        """Apply firmware configuration defaults."""
+        # Waste detection parameters
+        waste = DEFAULT_WASTE_CONFIG
+        await self._driver.set_waste_configs(
+            waste.waste_detection_enabled,
+            waste.p_window_start,
+            waste.p_window_end,
+            waste.baseline_fast_factor,
+            waste.max_delta_per_tick,
+            waste.max_rise_per_tick,
+            waste.max_cummulative_rise,
+            waste.p_filter_alpha,
+            waste.min_window_time,
+            waste.max_window_time,
+        )
+
+        # Pressure control PID parameters
+        pid = DEFAULT_PRESSURE_CONTROL_TUNINGS
+        await self._driver.set_pressure_control_tunings(
+            pid.kp,
+            pid.ki,
+            pid.kd,
+            pid.overshoot_error,
+            pid.k_velocity,
+            pid.k_holding,
+            pid.tolerance_error,
+        )
+
     async def attempt_reconnect(self) -> None:
         """Reopen the serial connection and restart the poller after a brief disconnect."""
         if not IS_ROBOT:
@@ -248,6 +309,7 @@ class VacuumModule(mod_abc.AbstractModule):
                     port=self.port, loop=self.loop
                 )
                 self._reader._driver = self._driver
+            await self._configure_device()
             self._unsubscribe_init = self._reader.set_initialized_callback(
                 self._initialized_callback
             )

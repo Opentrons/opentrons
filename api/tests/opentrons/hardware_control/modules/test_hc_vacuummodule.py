@@ -975,6 +975,48 @@ async def test_execute_profile(
     )
 
 
+async def test_configure_device_applies_waste_and_pressure_defaults(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """Connect-time configuration should apply waste and PID defaults."""
+    from opentrons.hardware_control.modules.vacuum_module import (
+        DEFAULT_PRESSURE_CONTROL_TUNINGS,
+        DEFAULT_WASTE_CONFIG,
+    )
+
+    await subject._configure_device()
+
+    waste = DEFAULT_WASTE_CONFIG
+    decoy.verify(
+        await mock_driver.set_waste_configs(
+            enable_waste_full_detection=waste.waste_detection_enabled,
+            p_window_start=waste.p_window_start,
+            p_window_end=waste.p_window_end,
+            baseline_fast_factor=waste.baseline_fast_factor,
+            max_delta_per_tick=waste.max_delta_per_tick,
+            max_rise_per_tick=waste.max_rise_per_tick,
+            max_cummulative_rise=waste.max_cummulative_rise,
+            p_filter_alpha=waste.p_filter_alpha,
+            min_window_time=waste.min_window_time,
+            max_window_time=waste.max_window_time,
+        ),
+    )
+    pid = DEFAULT_PRESSURE_CONTROL_TUNINGS
+    decoy.verify(
+        await mock_driver.set_pressure_control_tunings(
+            kp=pid.kp,
+            ki=pid.ki,
+            kd=pid.kd,
+            overshoot=pid.overshoot_error,
+            k_velocity=pid.k_velocity,
+            k_holding=pid.k_holding,
+            tolerance=pid.tolerance_error,
+        ),
+    )
+
+
 async def test_move_port_updates_port_and_calls_driver(
     subject: modules.VacuumModule,
     mock_driver: SimulatingDriver,
