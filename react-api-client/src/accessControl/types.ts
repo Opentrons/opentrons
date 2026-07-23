@@ -176,6 +176,7 @@ type AuditLogAction =
   | 'set_lights'
   | 'apply_offsets'
   | 'update_subsystem'
+  | 'update_module'
   | 'update_settings'
   | 'create_user'
   | 'delete_log_period'

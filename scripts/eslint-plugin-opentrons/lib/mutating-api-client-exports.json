@@ -56,6 +56,7 @@
     "updateDeckConfiguration",
     "updateErrorRecoveryPolicy",
     "updateErrorRecoverySettings",
+    "updateModule",
     "updatePipetteSettings",
     "updateRobotName",
     "updateRobotSetting",

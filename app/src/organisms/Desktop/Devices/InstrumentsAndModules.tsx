@@ -21,7 +21,6 @@ import {
 import { getPipetteModelSpecs, LEFT, RIGHT } from '@opentrons/shared-data'
 
 import { ModuleCard } from '/app/organisms/ModuleCard'
-import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
@@ -55,7 +54,6 @@ export function InstrumentsAndModules({
   const currentRunId = useCurrentRunId()
   const { isRunTerminal, isRunRunning } = useRunStatuses()
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
-  const [getLatestRequestId, handleModuleApiRequests] = useModuleApiRequests()
 
   const { data: attachedInstruments } = useInstrumentsQuery({
     refetchInterval: EQUIPMENT_POLL_MS,
@@ -200,8 +198,6 @@ export function InstrumentsAndModules({
                   attachPipetteRequired={attachPipetteRequired}
                   calibratePipetteRequired={calibratePipetteRequired}
                   updatePipetteFWRequired={updatePipetteFWRequired}
-                  latestRequestId={getLatestRequestId(module.serialNumber)}
-                  handleModuleApiRequests={handleModuleApiRequests}
                 />
               ))}
             </Flex>
@@ -237,8 +233,6 @@ export function InstrumentsAndModules({
                   attachPipetteRequired={attachPipetteRequired}
                   calibratePipetteRequired={calibratePipetteRequired}
                   updatePipetteFWRequired={updatePipetteFWRequired}
-                  latestRequestId={getLatestRequestId(module.serialNumber)}
-                  handleModuleApiRequests={handleModuleApiRequests}
                 />
               ))}
             </Flex>

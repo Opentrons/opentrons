@@ -23,7 +23,7 @@ import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 import { useModuleOverflowMenu } from './hooks'
 import { getCanCalibrateModule, getIsModuleCalibrated } from './utils'
 
-import type { AttachedModule } from '/app/redux/modules/types'
+import type { AttachedModule } from '@opentrons/api-client'
 
 interface ModuleOverflowMenuProps {
   module: AttachedModule

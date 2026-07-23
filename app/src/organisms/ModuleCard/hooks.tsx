@@ -24,6 +24,7 @@ import {
 
 import { useVacuumModuleControls } from './VacuumModule/hooks/useVacuumModuleControls'
 
+import type { AttachedModule } from '@opentrons/api-client'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateHeaterCreateCommand,
@@ -37,7 +38,6 @@ import type {
   TemperatureModuleDeactivateCreateCommand,
   UnsafeFlexStackerPrepareShuttleCreateCommand,
 } from '@opentrons/shared-data'
-import type { AttachedModule } from '/app/redux/modules/types'
 
 export function useIsHeaterShakerInProtocol(): boolean {
   const currentRunId = useCurrentRunId()
