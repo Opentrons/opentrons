@@ -151,8 +151,8 @@ async def create_run_action(
         action_type == RunActionType.PLAY
         and maintenance_run_orchestrator_store.current_run_id is not None
     ):
-        await maintenance_run_orchestrator_store.clear()
         maintenance_runs_publisher.stop_publishing_for_maintenance_run()
+        await maintenance_run_orchestrator_store.clear()
     try:
         deck_configuration: DeckConfigurationType = []
         if action_type == RunActionType.PLAY:
