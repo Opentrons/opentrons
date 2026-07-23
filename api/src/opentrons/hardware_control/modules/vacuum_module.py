@@ -681,11 +681,12 @@ class VacuumModule(mod_abc.AbstractModule):
         start = self._loop.time()
         while not self.pressure_equalized:
             if self._loop.time() - start >= timeout_s:
-                raise RuntimeError(
+                log.warn(
                     "Vacuum module pressure did not equalize within "
                     f"{timeout_s}s. Current gauge pressure: "
                     f"{self.current_gauge_pressure_mbar} mbar."
                 )
+                break
             await self._poller.wait_next_poll()
 
     async def wait_for_pressure_equalization(

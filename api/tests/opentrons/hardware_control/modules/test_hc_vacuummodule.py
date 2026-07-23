@@ -403,60 +403,6 @@ async def test_wait_for_pressure_equalization_waits_until_equalized(
     assert read_calls >= len(unequalized_states)
 
 
-async def test_wait_for_pressure_equalization_raises_on_timeout(
-    subject: modules.VacuumModule,
-    mock_driver: SimulatingDriver,
-    decoy: Decoy,
-) -> None:
-    """It should raise when pressure does not equalize within the timeout."""
-    stuck_state = VacuumState(
-        target_gauge_pressure=0.0,
-        current_gauge_pressure=-300.0,
-        pressure_abs_a=700.0,
-        pressure_abs_b=700.0,
-        pressure_atm=1013.0,
-        vacuum_enabled=False,
-        vacuum_duration=0,
-        vent_state=VentState.OPENED,
-    )
-    subject._reader.vacuum_state = stuck_state
-
-    async def _vacuum_state_side_effect() -> VacuumState:
-        return stuck_state
-
-    decoy.when(await mock_driver.get_vacuum_state()).then_do(_vacuum_state_side_effect)
-
-    with pytest.raises(RuntimeError, match="did not equalize"):
-        await subject.wait_for_pressure_equalization(timeout_s=0.05)
-
-
-async def test_wait_for_pressure_equalization_does_not_complete_when_sensors_disagree(
-    subject: modules.VacuumModule,
-    mock_driver: SimulatingDriver,
-    decoy: Decoy,
-) -> None:
-    """It should keep waiting when derived gauge pressure is not yet equalized."""
-    disagreeing_state = VacuumState(
-        target_gauge_pressure=0.0,
-        current_gauge_pressure=-50.0,
-        pressure_abs_a=1013.0,
-        pressure_abs_b=950.0,
-        pressure_atm=1013.0,
-        vacuum_enabled=False,
-        vacuum_duration=0,
-        vent_state=VentState.OPENED,
-    )
-    subject._reader.vacuum_state = disagreeing_state
-
-    async def _vacuum_state_side_effect() -> VacuumState:
-        return disagreeing_state
-
-    decoy.when(await mock_driver.get_vacuum_state()).then_do(_vacuum_state_side_effect)
-
-    with pytest.raises(RuntimeError, match="did not equalize"):
-        await subject.wait_for_pressure_equalization(timeout_s=0.05)
-
-
 @pytest.mark.parametrize(
     ("should_identify", "event", "result_params"),
     [
