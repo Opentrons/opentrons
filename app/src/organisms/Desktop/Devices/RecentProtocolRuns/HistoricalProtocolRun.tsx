@@ -29,7 +29,7 @@ interface HistoricalProtocolRunProps {
   protocolName: string
   robotName: string
   robotIsBusy: boolean
-  isDeleting: boolean
+  isDeleting?: boolean
   protocolKey?: string
 }
 
@@ -38,8 +38,14 @@ interface HistoricalProtocolRunProps {
 export function HistoricalProtocolRun(
   props: HistoricalProtocolRunProps
 ): JSX.Element | null {
-  const { run, protocolName, robotIsBusy, robotName, isDeleting, protocolKey } =
-    props
+  const {
+    run,
+    protocolName,
+    robotIsBusy,
+    robotName,
+    isDeleting = false,
+    protocolKey,
+  } = props
   const outputFileIds = useRunGeneratedDataFiles(run.id)
   const imageFileCount = outputFileIds.jpeg.length > 0 ? 1 : 0
   const totalOutputFiles = outputFileIds.csv.length + imageFileCount

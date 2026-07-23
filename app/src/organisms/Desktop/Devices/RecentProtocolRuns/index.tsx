@@ -69,7 +69,7 @@ export function RecentProtocolRuns({
       const toastId = makeToast(
         t('downloading_run_records') as string,
         INFO_TOAST,
-        { disableTimeout: true, icon: toastIcon }
+        { icon: toastIcon }
       )
       void downloadRuns(runs)
         .catch((e: Error) => {
