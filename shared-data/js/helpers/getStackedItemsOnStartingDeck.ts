@@ -132,7 +132,7 @@ export function getStackedItemsOnStartingDeck(
         ) {
           command.result.labwareIds.forEach(labwareId => {
             const offDeckItem = {
-              labwareId: labwareId,
+              labwareId,
               definitionUri: getLabwareDefURI(command.result?.definition!),
               displayName:
                 command.result?.definition?.metadata.displayName ?? '',
@@ -562,4 +562,25 @@ export function getModuleFromStack(
     (stackedItem): stackedItem is ModuleInStack => 'moduleId' in stackedItem
   )
   return moduleInStack ?? null
+}
+
+export const getSortedStartingDeckEntries = (
+  startingDeck: StackedItemsOnDeck
+): Array<{
+  location: string
+  stack: StackItem[]
+}> => {
+  const entriesOnDeck = Object.entries(startingDeck).filter(
+    ([location]) => location !== 'offDeck'
+  )
+  const stacksWithLabware = entriesOnDeck.flatMap(([location, stacks]) => {
+    const labwareStacks = stacks.filter(stack =>
+      stack.some(item => 'labwareId' in item)
+    )
+    return labwareStacks.map(stack => ({ location, stack }))
+  })
+  const sortedStartingDeckEntries = stacksWithLabware.sort((a, b) =>
+    a.location.localeCompare(b.location)
+  )
+  return sortedStartingDeckEntries
 }

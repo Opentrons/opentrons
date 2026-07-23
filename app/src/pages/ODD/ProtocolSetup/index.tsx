@@ -197,7 +197,7 @@ function PrepareToRun({
   const { reportCameraEnablementSettings, reportPhotoAccessUsage } =
     useCameraAnalytics({
       source: SOURCE_RUN_RECORD,
-      robotType: robotType,
+      robotType,
     })
   useEffect(
     () => {
@@ -559,7 +559,7 @@ function PrepareToRun({
   // Labware information
   const { offDeckItems, onDeckItems } = useMemo(
     () => getLabwareSetupItemGroups(mostRecentAnalysis?.commands ?? []),
-    [mostRecentAnalysis]
+    [mostRecentAnalysis?.commands]
   )
 
   const onDeckLabwareCount = onDeckItems.length

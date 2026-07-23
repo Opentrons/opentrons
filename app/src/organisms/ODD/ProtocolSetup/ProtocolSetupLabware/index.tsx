@@ -33,6 +33,7 @@ import {
   getLabwareInfoByLiquidId,
   getLabwareLiquidRenderInfoFromStack,
   getModuleFromStack,
+  getSortedStartingDeckEntries,
   getStackedItemsOnStartingDeck,
   getStacksWithLabware,
   HEATERSHAKER_MODULE_TYPE,
@@ -103,15 +104,12 @@ export function ProtocolSetupLabware({
   )
   const labwareByLiquidId = useMemo(
     () => getLabwareInfoByLiquidId(mostRecentAnalysis?.commands ?? []),
-    [mostRecentAnalysis]
+    [mostRecentAnalysis?.commands]
   )
-  const stacksWithLaware = useMemo(
-    () => getStacksWithLabware(startingDeck),
+  const sortedStartingDeckEntries = useMemo(
+    () => getSortedStartingDeckEntries(startingDeck),
     [startingDeck]
   )
-  const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .filter(([key, value]) => key !== 'offDeck')
   const offDeckItems = useMemo(
     () =>
       mostRecentAnalysis != null
@@ -233,7 +231,7 @@ export function ProtocolSetupLabware({
                     key={index}
                     attachedProtocolModules={attachedProtocolModuleMatches}
                     refetchModules={moduleQuery.refetch}
-                    slotName={'offDeck'}
+                    slotName="offDeck"
                     offDeckQuantity={item.quantity}
                     stackedItems={item.stackedItems}
                     labwareByLiquidId={labwareByLiquidId}
@@ -287,8 +285,7 @@ function LabwareLatch({
   let icon: 'latch-open' | 'latch-closed' | null = null
 
   const latchCommand:
-    | HeaterShakerOpenLatchCreateCommand
-    | HeaterShakerCloseLatchCreateCommand = {
+    HeaterShakerOpenLatchCreateCommand | HeaterShakerCloseLatchCreateCommand = {
     commandType: isLatchClosed
       ? 'heaterShaker/openLabwareLatch'
       : 'heaterShaker/closeLabwareLatch',
