@@ -414,7 +414,18 @@ function CreateAdminAccountPage({
             <Controller
               name="adminUsername"
               control={control}
-              rules={{ required: t('setup_wizard_field_required') }}
+              rules={{
+                required: t('setup_wizard_field_required'),
+                validate: value => {
+                  const isReserved = [
+                    SERVICE_ACCOUNT_USERNAME,
+                    RECOVERY_ACCOUNT_USERNAME,
+                  ].includes(value)
+                  return isReserved
+                    ? t('setup_wizard_username_reserved')
+                    : true
+                },
+              }}
               render={({ field, fieldState }) => (
                 <InputField
                   title={t('username')}
