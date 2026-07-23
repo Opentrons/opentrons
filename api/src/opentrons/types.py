@@ -89,7 +89,7 @@ class Point(NamedTuple):
             "y": obj.y,
             "z": obj.z,
         }
-        
+
     @staticmethod
     def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "Point":
         """Consumed by Serpent, convert from a Pyro Dictionary."""

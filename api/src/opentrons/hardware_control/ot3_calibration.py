@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import datetime
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from enum import Enum
 from functools import lru_cache
 from logging import getLogger
@@ -1136,6 +1136,7 @@ class OT3Transforms(RobotCalibration):
             if obj.deck_calibration.last_modified is not None
             else None
         )
+
         def _point_to_dict(point: Point) -> Dict[str, float]:
             return {
                 "x": point.x,
@@ -1146,24 +1147,30 @@ class OT3Transforms(RobotCalibration):
         transform_dict["carriage_offset"] = _point_to_dict(obj.carriage_offset)
         transform_dict["left_mount_offset"] = _point_to_dict(obj.left_mount_offset)
         transform_dict["right_mount_offset"] = _point_to_dict(obj.right_mount_offset)
-        transform_dict["gripper_mount_offset"] = _point_to_dict(obj.gripper_mount_offset)
-        
+        transform_dict["gripper_mount_offset"] = _point_to_dict(
+            obj.gripper_mount_offset
+        )
+
         return transform_dict
-    
+
     @staticmethod
     def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "OT3Transforms":
         """Consumed by Serpent, convert from a Pyro Dictionary."""
         status_source = data["deck_calibration"]["status"]["source"]
         status_marked_at = data["deck_calibration"]["status"]["markedAt"]
         last_modified = data["deck_calibration"]["last_modified"]
+
         def _dict_to_point(point_dict: Dict[str, float]) -> Point:
-            return Point(x=float(point_dict["x"]), y=float(point_dict["y"]), z=float(point_dict["z"]))
+            return Point(
+                x=float(point_dict["x"]),
+                y=float(point_dict["y"]),
+                z=float(point_dict["z"]),
+            )
+
         return OT3Transforms(
             deck_calibration=DeckCalibration(
                 attitude=data["deck_calibration"]["attitude"],
-                source=types.SourceType(
-                    data["deck_calibration"]["source"]
-                ),
+                source=types.SourceType(data["deck_calibration"]["source"]),
                 status=types.CalibrationStatus(
                     markedBad=data["deck_calibration"]["status"]["markedBad"],
                     source=None
@@ -1179,7 +1186,9 @@ class OT3Transforms(RobotCalibration):
                 last_modified=datetime.datetime.fromisoformat(last_modified)
                 if last_modified is not None
                 else None,
-                pipette_calibrated_with=data["deck_calibration"]["pipette_calibrated_with"],
+                pipette_calibrated_with=data["deck_calibration"][
+                    "pipette_calibrated_with"
+                ],
                 tiprack=data["deck_calibration"]["tiprack"],
             ),
             carriage_offset=_dict_to_point(data["carriage_offset"]),

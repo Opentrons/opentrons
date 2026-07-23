@@ -1,9 +1,10 @@
 import enum
 import logging
 from asyncio import Queue
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
+    Any,
     Callable,
     Dict,
     List,
@@ -12,7 +13,7 @@ from typing import (
     TypeVar,
     Union,
     cast,
-    Any,
+    get_args,
 )
 
 from pydantic import BaseModel, ConfigDict
@@ -27,11 +28,28 @@ from opentrons.config import feature_flags
 # this is an explicit re-export that exists for backward compatibility - this type used
 # to live in this file
 from opentrons.config.types import OT3AxisKind as OT3AxisKind
+from opentrons.util.pyro.pyro_serialization import (
+    enumerated_error_class_to_dict,
+    enumerated_error_dict_to_class,
+)
 
 if TYPE_CHECKING:
     from .modules.types import ModuleModel
 
 MODULE_LOG = logging.getLogger(__name__)
+
+
+def _module_model_reconstructor(
+    module_str: str,
+) -> ModuleModel:
+    for model in get_args(ModuleModel):
+        try:
+            return model[module_str]  # type: ignore
+        except Exception:
+            pass
+    raise ValueError(
+        f"Cannot determine module model during deserialization for: {module_str}"
+    )
 
 
 class MotionChecks(enum.Enum):
@@ -441,16 +459,15 @@ class DoorStateNotification:
             "new_state": obj.new_state,
             "module_serial": obj.module_serial,
         }
-    
+
     @staticmethod
     def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "DoorStateNotification":
         """Consumed by Serpent, convert from a Pyro Dictionary."""
         return DoorStateNotification(
-            event=HardwareEventType(data["event"]["value"]),
+            event=HardwareEventType(data["event"]["value"]),  # type: ignore
             new_state=DoorState(data["new_state"]["value"]),
             module_serial=data["module_serial"],
         )
-
 
 
 @dataclass(frozen=True)
@@ -459,11 +476,51 @@ class EstopStateNotification:
     old_state: EstopState = EstopState.NOT_PRESENT
     new_state: EstopState = EstopState.NOT_PRESENT
 
+    @staticmethod
+    def to_pyro_dict(obj: "EstopStateNotification") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "event": obj.event,
+            "old_state": obj.old_state,
+            "new_state": obj.new_state,
+        }
+
+    @staticmethod
+    def from_pyro_dict(
+        classname: Any, data: Dict[str, Any]
+    ) -> "EstopStateNotification":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return EstopStateNotification(
+            event=HardwareEventType(data["event"]["value"]),  # type: ignore
+            old_state=EstopState(data["old_state"]["value"]),
+            new_state=EstopState(data["new_state"]["value"]),
+        )
+
 
 @dataclass(frozen=True)
 class ErrorMessageNotification:
     message: str
     event: Literal[HardwareEventType.ERROR_MESSAGE] = HardwareEventType.ERROR_MESSAGE
+
+    @staticmethod
+    def to_pyro_dict(obj: "ErrorMessageNotification") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "event": obj.event,
+            "message": obj.message,
+        }
+
+    @staticmethod
+    def from_pyro_dict(
+        classname: Any, data: Dict[str, Any]
+    ) -> "ErrorMessageNotification":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return ErrorMessageNotification(
+            event=HardwareEventType(data["event"]["value"]),  # type: ignore
+            message=data["message"],
+        )
 
 
 @dataclass(frozen=True)
@@ -476,6 +533,34 @@ class AsynchronousModuleErrorNotification:
         HardwareEventType.ASYNCHRONOUS_MODULE_ERROR
     )
 
+    @staticmethod
+    def to_pyro_dict(obj: "AsynchronousModuleErrorNotification") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "event": obj.event,
+            "exception": enumerated_error_class_to_dict(obj.exception),
+            "module_serial": obj.module_serial,
+            "module_model": obj.module_model.name,
+            "port": obj.port,
+        }
+
+    @staticmethod
+    def from_pyro_dict(
+        classname: Any, data: Dict[str, Any]
+    ) -> "AsynchronousModuleErrorNotification":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return AsynchronousModuleErrorNotification(
+            event=HardwareEventType(data["event"]["value"]),  # type: ignore
+            exception=enumerated_error_dict_to_class(
+                class_name="opentrons.hardware_control.types.EnumeratedError",
+                d=data["exception"],
+            ),
+            module_serial=data["module_serial"],
+            module_model=_module_model_reconstructor(data["module_model"]),
+            port=data["port"],
+        )
+
 
 @dataclass(frozen=True)
 class ModuleDisconnectedNotification:
@@ -485,6 +570,29 @@ class ModuleDisconnectedNotification:
     event: Literal[HardwareEventType.MODULE_DISCONNECTED] = (
         HardwareEventType.MODULE_DISCONNECTED
     )
+
+    @staticmethod
+    def to_pyro_dict(obj: "ModuleDisconnectedNotification") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "event": obj.event,
+            "module_serial": obj.module_serial,
+            "module_model": obj.module_model.name,
+            "port": obj.port,
+        }
+
+    @staticmethod
+    def from_pyro_dict(
+        classname: Any, data: Dict[str, Any]
+    ) -> "ModuleDisconnectedNotification":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return ModuleDisconnectedNotification(
+            event=HardwareEventType(data["event"]["value"]),  # type: ignore
+            module_serial=data["module_serial"],
+            module_model=_module_model_reconstructor(data["module_model"]),
+            port=data["port"],
+        )
 
 
 @dataclass(frozen=True)
@@ -496,12 +604,52 @@ class ModuleConnectedNotification:
         HardwareEventType.MODULE_CONNECTED
     )
 
+    @staticmethod
+    def to_pyro_dict(obj: "ModuleConnectedNotification") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "event": obj.event,
+            "module_serial": obj.module_serial,
+            "name": obj.name,
+            "port": obj.port,
+        }
+
+    @staticmethod
+    def from_pyro_dict(
+        classname: Any, data: Dict[str, Any]
+    ) -> "ModuleConnectedNotification":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return ModuleConnectedNotification(
+            event=HardwareEventType(data["event"]["value"]),  # type: ignore
+            module_serial=data["module_serial"],
+            name=data["name"],
+            port=data["port"],
+        )
+
 
 @dataclass(frozen=True)
 class SubsystemConnectionNotification:
     event: Literal[HardwareEventType.SUBSYSTEM_CONNECTION] = (
         HardwareEventType.SUBSYSTEM_CONNECTION
     )
+
+    @staticmethod
+    def to_pyro_dict(obj: "SubsystemConnectionNotification") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "event": obj.event,
+        }
+
+    @staticmethod
+    def from_pyro_dict(
+        classname: Any, data: Dict[str, Any]
+    ) -> "SubsystemConnectionNotification":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return SubsystemConnectionNotification(
+            event=HardwareEventType(data["event"]["value"]),  # type: ignore
+        )
 
 
 # new event types get new dataclasses
