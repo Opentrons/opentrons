@@ -211,7 +211,7 @@ function EnterServicePINPage({
               {t('setup_wizard_service_pin_title')}
             </StyledText>
             <StyledText desktopStyle="bodyDefaultRegular">
-              {t('setup_wizard_service_pin_description')}
+              {t('branded:setup_wizard_service_pin_description')}
             </StyledText>
           </div>
           <Controller
@@ -340,7 +340,7 @@ function CreateServiceAccountPage({
               {t('setup_wizard_create_service_account_title')}
             </StyledText>
             <StyledText desktopStyle="bodyDefaultRegular">
-              {t('setup_wizard_create_service_account_description')}
+              {t('branded:setup_wizard_create_service_account_description')}
             </StyledText>
           </div>
           <div className={styles.detail_list}>
