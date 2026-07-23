@@ -15,7 +15,6 @@ import type {
   VACUUM_MODULE_TYPE,
   VacuumModuleModel,
 } from '@opentrons/shared-data'
-import type { RobotApiRequestMeta } from '../robot-api/types'
 import type * as ApiTypes from './api-types'
 
 export * from './api-types'
@@ -87,56 +86,8 @@ export type AttachedModule =
   | AbsorbanceReaderModule
   | FlexStackerModule
   | VacuumModule
-// action object types
 
 export interface MatchedModule {
   slot: Slot
   module: AttachedModule
 }
-
-// update modules
-
-export interface UpdateModuleAction {
-  type: 'modules:UPDATE_MODULE'
-  payload: { robotName: string; moduleId: string }
-  meta: RobotApiRequestMeta | {}
-}
-
-export interface UpdateModuleSuccessAction {
-  type: 'modules:UPDATE_MODULE_SUCCESS'
-  payload: {
-    robotName: string
-    moduleId: string
-    message: string
-  }
-  meta: RobotApiRequestMeta
-}
-
-export interface UpdateModuleFailureAction {
-  type: 'modules:UPDATE_MODULE_FAILURE'
-  payload: {
-    robotName: string
-    moduleId: string
-    error: {}
-  }
-  meta: RobotApiRequestMeta
-}
-
-// action union
-
-export type ModulesAction =
-  UpdateModuleAction | UpdateModuleSuccessAction | UpdateModuleFailureAction
-
-// state types
-
-export type AttachedModulesById = Partial<{
-  readonly [moduleId: string]: AttachedModule
-}>
-
-export interface PerRobotModulesState {
-  readonly modulesById: AttachedModulesById | null
-}
-
-export type ModulesState = Partial<{
-  readonly [robotName: string]: undefined | PerRobotModulesState
-}>

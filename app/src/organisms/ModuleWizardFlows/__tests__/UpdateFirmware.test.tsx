@@ -1,21 +1,15 @@
 import { act, fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
-import { useModulesQuery } from '@opentrons/react-api-client'
+import {
+  useModulesQuery,
+  useUpdateModuleMutation,
+} from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
-import {
-  dismissRequest,
-  FAILURE,
-  getRequestById,
-  PENDING,
-  SUCCESS,
-  useDispatchApiRequest,
-} from '/app/redux/robot-api'
 import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 
 import { UpdateFirmware } from '../UpdateFirmware'
@@ -23,16 +17,11 @@ import { UpdateFirmware } from '../UpdateFirmware'
 import type { ComponentProps } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { IdentifyColor } from '@opentrons/shared-data'
-import type { DispatchApiRequestType } from '/app/redux/robot-api'
-import type { RequestState } from '/app/redux/robot-api/types'
-import type { State } from '/app/redux/types'
 
-vi.mock('/app/redux/robot-api')
-vi.mock('/app/organisms/ModuleCard/utils')
 vi.mock('@opentrons/react-api-client')
-
-const LAST_ID = 'lastRequestId'
-const ROBOT_NAME = 'mockRobotName'
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const render = (props: ComponentProps<typeof UpdateFirmware>) => {
   return renderWithProviders(<UpdateFirmware {...props} />, {
@@ -41,18 +30,31 @@ const render = (props: ComponentProps<typeof UpdateFirmware>) => {
 }
 
 describe('UpdateFirmware', () => {
-  let dispatchApiRequest: DispatchApiRequestType
-  let handleModuleApiRequests: (robotName: string, serial: string) => void
+  let updateModule: ReturnType<typeof vi.fn>
+  let reset: ReturnType<typeof vi.fn>
   let sendIdentifyModule: (
     module: AttachedModule,
     start: boolean,
     color?: IdentifyColor
   ) => void
   let props: React.ComponentProps<typeof UpdateFirmware>
+
+  const mockMutation = (overrides: Record<string, unknown> = {}): void => {
+    vi.mocked(useUpdateModuleMutation).mockReturnValue({
+      updateModule,
+      isLoading: false,
+      isSuccess: false,
+      isError: false,
+      error: null,
+      reset,
+      ...overrides,
+    } as any)
+  }
+
   beforeEach(() => {
     vi.useFakeTimers()
-    dispatchApiRequest = vi.fn()
-    handleModuleApiRequests = vi.fn()
+    updateModule = vi.fn()
+    reset = vi.fn()
     sendIdentifyModule = vi.fn()
     props = {
       proceed: vi.fn(),
@@ -70,22 +72,12 @@ describe('UpdateFirmware', () => {
       setIsDoorOpenError: vi.fn(),
       dismissDoorOpenError: vi.fn(),
       isOnDevice: false,
-      robotName: ROBOT_NAME,
       maintenanceRunId: '123',
       patchModuleAfterUpdate: vi.fn(),
       sendIdentifyModule,
     }
-    vi.mocked(useModuleApiRequests).mockReturnValue([
-      () => LAST_ID,
-      handleModuleApiRequests,
-    ])
-    when(getRequestById)
-      .calledWith({} as State, LAST_ID)
-      .thenReturn({} as RequestState)
-    vi.mocked(useDispatchApiRequest).mockReturnValue([
-      dispatchApiRequest,
-      [LAST_ID],
-    ])
+    mockMutation()
+    vi.mocked(useModulesQuery).mockReturnValue({ data: undefined } as any)
   })
 
   afterEach(() => {
@@ -121,23 +113,18 @@ describe('UpdateFirmware', () => {
     expect(props.proceed).toHaveBeenCalled()
   })
 
-  it('should call handleModuleApiRequests when update firmware button is clicked', () => {
+  it('should call updateModule when update firmware button is clicked', () => {
     render(props)
     act(() => {
       vi.advanceTimersByTime(1001)
     })
     const updateButton = screen.getByRole('button', { name: 'Install update' })
     fireEvent.click(updateButton)
-    expect(handleModuleApiRequests).toBeCalledWith(
-      ROBOT_NAME,
-      mockHeaterShaker.serialNumber
-    )
+    expect(updateModule).toBeCalledWith(mockHeaterShaker.serialNumber)
   })
 
-  it('should render in progress when request status is PENDING', () => {
-    when(getRequestById)
-      .calledWith({} as State, LAST_ID)
-      .thenReturn({ status: PENDING } as RequestState)
+  it('should render in progress when mutation is loading', () => {
+    mockMutation({ isLoading: true })
     render(props)
     act(() => {
       vi.advanceTimersByTime(1001)
@@ -145,19 +132,18 @@ describe('UpdateFirmware', () => {
     screen.getByText('Installing latest firmware')
   })
 
-  it('should call proceed when request status is SUCCESS', () => {
+  it('should call proceed when mutation succeeds and module has no available update', () => {
     vi.mocked(useModulesQuery).mockReturnValue({
       data: {
         data: [
           {
             serialNumber: mockHeaterShaker.serialNumber,
+            hasAvailableUpdate: false,
           } as any,
         ],
       } as any,
     } as any)
-    when(getRequestById)
-      .calledWith({} as State, LAST_ID)
-      .thenReturn({ status: SUCCESS } as RequestState)
+    mockMutation({ isSuccess: true })
     render(props)
     screen.getByText('Checking Heater-Shaker Module GEN1 firmware')
     expect(props.patchModuleAfterUpdate).toHaveBeenCalled()
@@ -167,14 +153,15 @@ describe('UpdateFirmware', () => {
     expect(props.proceed).toHaveBeenCalled()
   })
 
-  it('should call setErrorMessage and dismissRequest when request status is FAILURE', () => {
-    when(getRequestById)
-      .calledWith({} as State, LAST_ID)
-      .thenReturn({ status: FAILURE } as RequestState)
+  it('should call setErrorMessage when mutation fails', () => {
+    mockMutation({
+      isError: true,
+      error: { message: 'Unable to update firmware' },
+    })
     render(props)
     expect(props.setErrorMessage).toHaveBeenCalledWith(
       'Unable to update firmware'
     )
-    expect(dismissRequest).toHaveBeenCalledWith(LAST_ID)
+    expect(reset).toHaveBeenCalled()
   })
 })

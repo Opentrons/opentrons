@@ -13,7 +13,6 @@ import type {
   CustomLabwareState,
 } from './custom-labware/types'
 import type { DiscoveryAction, DiscoveryState } from './discovery/types'
-import type { ModulesAction } from './modules/types'
 import type { NetworkingAction, NetworkingState } from './networking/types'
 import type { ProtocolAnalysisAction } from './protocol-analysis'
 import type { ProtocolRunAction, ProtocolRunState } from './protocol-runs/types'
@@ -58,7 +57,6 @@ export type Action =
   | RobotAdminAction
   | RobotAuthAction
   | RobotUpdateAction
-  | ModulesAction
   | ShellAction
   | ConfigAction
   | RouterAction

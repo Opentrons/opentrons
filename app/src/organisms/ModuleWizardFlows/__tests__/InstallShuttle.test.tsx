@@ -1,17 +1,14 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { FLEX_STACKER_V1_FIXTURE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
 import {
   mockFlexStacker,
   mockFlexStackerMissingShuttle,
 } from '/app/redux/modules/__fixtures__'
-import { getRequestById, useDispatchApiRequest } from '/app/redux/robot-api'
 import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 
 import { CloseDoor } from '../CloseStackerDoor'
@@ -19,14 +16,6 @@ import { InstallShuttle } from '../InstallShuttle'
 
 import type { ComponentProps } from 'react'
 import type { CutoutConfig, DeckConfiguration } from '@opentrons/shared-data'
-import type { DispatchApiRequestType } from '/app/redux/robot-api'
-import type { RequestState } from '/app/redux/robot-api/types'
-import type { State } from '/app/redux/types'
-
-vi.mock('/app/redux/robot-api')
-vi.mock('/app/organisms/ModuleCard/utils')
-
-const LAST_ID = 'lastRequestId'
 
 const render = (props: ComponentProps<typeof CloseDoor>) => {
   return renderWithProviders(<CloseDoor {...props} />, {
@@ -47,13 +36,9 @@ const mockStacker: CutoutConfig = {
 const mockDeckConfig: DeckConfiguration = [mockStacker]
 
 describe('CloseDoorInstallShuttle', () => {
-  let dispatchApiRequest: DispatchApiRequestType
-  let handleModuleApiRequests: (robotName: string, serial: string) => void
   let props: React.ComponentProps<typeof CloseDoor>
   beforeEach(() => {
     vi.useFakeTimers()
-    dispatchApiRequest = vi.fn()
-    handleModuleApiRequests = vi.fn()
     props = {
       proceed: vi.fn(),
       goBack: vi.fn(),
@@ -74,17 +59,6 @@ describe('CloseDoorInstallShuttle', () => {
       deckConfig: mockDeckConfig,
       maintenanceRunId: null,
     }
-    vi.mocked(useModuleApiRequests).mockReturnValue([
-      () => LAST_ID,
-      handleModuleApiRequests,
-    ])
-    when(getRequestById)
-      .calledWith({} as State, LAST_ID)
-      .thenReturn({} as RequestState)
-    vi.mocked(useDispatchApiRequest).mockReturnValue([
-      dispatchApiRequest,
-      [LAST_ID],
-    ])
   })
 
   afterEach(() => {

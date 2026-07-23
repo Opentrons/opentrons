@@ -13,18 +13,3 @@ export {
   HEATERSHAKER_MODULE_TYPE,
   ABSORBANCE_READER_TYPE,
 } from '@opentrons/shared-data'
-
-// http paths
-
-export const MODULES_PATH: '/modules' = '/modules'
-export const MODULE_UPDATE_PATH_EXT: 'update' = 'update'
-
-// update module
-
-export const UPDATE_MODULE: 'modules:UPDATE_MODULE' = 'modules:UPDATE_MODULE'
-
-export const UPDATE_MODULE_SUCCESS: 'modules:UPDATE_MODULE_SUCCESS' =
-  'modules:UPDATE_MODULE_SUCCESS'
-
-export const UPDATE_MODULE_FAILURE: 'modules:UPDATE_MODULE_FAILURE' =
-  'modules:UPDATE_MODULE_FAILURE'
