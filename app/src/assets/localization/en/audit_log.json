@@ -54,6 +54,7 @@
   "right_mount": "right mount",
   "set_lights": "Toggling lights",
   "shutdown_robot": "Shutting down robot",
+  "sign_run": "Signing protocol run",
   "single_channel_and_8_channel": "single channel or 8 channel",
   "stop_run": "Stopping protocol run",
   "update_audit_settings": "Updating reason for interaction log settings",
