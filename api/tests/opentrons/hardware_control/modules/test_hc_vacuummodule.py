@@ -289,7 +289,11 @@ async def test_live_data_includes_target_power_after_set_pump_state(
         (700.0, 700.0, 1013.0, 0.0, -313.0, False),
         (1013.0, 1013.0, 1013.0, 0.0, 0.0, True),
         (750.0, 700.0, 1013.0, -250.0, -288.0, False),
+        # Small basal offsets when open/vented should count as equalized.
         (1009.5, 1007.0, 1012.2, -5.2, -3.95, True),
+        (1006.75, 1006.75, 1013.0, -6.25, -6.25, True),
+        # Outside EQUALIZE_PRESSURE_TOL (10 mbar) is still under vacuum.
+        (1000.0, 1000.0, 1013.0, -13.0, -13.0, False),
     ],
 )
 async def test_current_gauge_pressure_mbar_and_pressure_equalized(

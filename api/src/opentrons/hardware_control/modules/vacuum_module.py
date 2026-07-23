@@ -86,6 +86,9 @@ TARGET_REACHED_POLL_PERIOD = 0.5
 PRESSURE_COMPARISON_WINDOW_SIZE = 5
 POWER_COMPARISON_WINDOW_SIZE = 5
 PRESSURE_TOL = 5.0
+# Open-to-atmosphere / labware-move window. Wider than PRESSURE_TOL to absorb
+# sensor offset and noise when the chamber is vented but not at exact 0 mbar.
+EQUALIZE_PRESSURE_TOL = 10.0
 POWER_TOL = 1.0
 
 
@@ -366,7 +369,9 @@ class VacuumModule(mod_abc.AbstractModule):
     @property
     def pressure_equalized(self) -> bool:
         """True when derived gauge pressure indicates atmospheric pressure."""
-        return math.isclose(self.current_gauge_pressure_mbar, 0.0, abs_tol=PRESSURE_TOL)
+        return math.isclose(
+            self.current_gauge_pressure_mbar, 0.0, abs_tol=EQUALIZE_PRESSURE_TOL
+        )
 
     @property
     def total_cycle_count(self) -> Optional[int]:
