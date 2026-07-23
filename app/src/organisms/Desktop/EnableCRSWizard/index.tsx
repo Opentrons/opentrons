@@ -421,9 +421,7 @@ function CreateAdminAccountPage({
                     SERVICE_ACCOUNT_USERNAME,
                     RECOVERY_ACCOUNT_USERNAME,
                   ].includes(value)
-                  return isReserved
-                    ? t('setup_wizard_username_reserved')
-                    : true
+                  return isReserved ? t('setup_wizard_username_reserved') : true
                 },
               }}
               render={({ field, fieldState }) => (
