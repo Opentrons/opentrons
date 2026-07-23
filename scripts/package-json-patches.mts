@@ -6,9 +6,13 @@
  * Do not duplicate patch logic elsewhere; if published manifests change, edit
  * here so pack/ and npm stay aligned.
  *
- * Monorepo manifests use workspace:*, link:, and catalog: specifiers that are
+ * This is where catalog / workspace / peerDependency rewriting actually lives.
+ * publish.mts only imports these helpers; it does not reimplement them.
+ *
+ * Monorepo manifests use workspace, link, and catalog specifiers that are
  * invalid for external npm consumers. These helpers rewrite them to concrete
- * semver strings and apply other publish-time fixes.
+ * semver strings and apply other publish-time fixes (exports, files allowlists).
+ * README/LICENSE file contents are written by publish.mts, not here.
  */
 
 /** Matches pnpm-workspace.yaml catalog entries used by the four library packages. */

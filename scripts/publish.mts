@@ -10,7 +10,7 @@
  *   node --experimental-strip-types scripts/publish.mts [options]
  *
  * Options:
- *   --version <ver>    Semver string to publish as (required, e.g. 0.3.0-alpha.1)
+ *   --version <ver>    Semver string to publish as (required, e.g. 0.3.9-alpha.0)
  *   --registry <url>   npm registry URL (default: https://registry.npmjs.org)
  *   --dry-run          Build and patch everything but skip `npm publish`
  *   --skip-build       Skip make build steps (useful when lib/ is already fresh)
@@ -23,19 +23,24 @@
  *   - Local real publish: interactive `npm login` + 2FA OTP (these packages
  *     disallow automation tokens). Prefer the CI workflow for releases.
  *
- * What this script fixes vs raw monorepo package.json files:
- *  1. workspace:* / link: deps rewritten to real semver so published packages are usable.
- *  2. catalog: / catalog:react18 specifiers rewritten to concrete semver ranges.
+ * Manifest rewrites (items 1-8) live in ./package-json-patches.mts. This file
+ * imports those helpers, then builds, smoke-tests, stages tarballs, and publishes.
+ * Do not look only at this file for catalog / peerDependency rewriting.
+ *
+ * Via package-json-patches.mts:
+ *  1. workspace / link deps rewritten to real semver so published packages are usable.
+ *  2. catalog / catalog:react18 specifiers rewritten to concrete semver ranges.
  *  3. @types/* and unused runtime deps moved to devDependencies so consumers
  *     don't install them.
  *  4. peerDependencies rewritten to npm-compatible semver ranges.
  *  5. shared-data gets a proper `files` allowlist (lib/ only, no Makefile/Python).
- *  6. shared-data exports map verified to point at real CJS + ESM outputs.
- *  7. components exports map verified (require -> .js, import -> .mjs).
+ *  6. shared-data exports map points at real CJS + ESM outputs.
+ *  7. components exports map (require -> .js, import -> .mjs).
  *  8. protocol-visualization exports include ./styles -> lib/style.css.
+ *
+ * Done here in publish.mts:
  *  9. Smoke-tests the ESM output with Node's native dynamic import before publish.
- * 10. Each package ships a README (alpha disclaimer) and LICENSE (Apache-2.0
- *     inherited from the monorepo root).
+ * 10. Writes README (alpha disclaimer) and copies LICENSE into each staged tarball.
  *
  * To run from repo root:
  *   node --experimental-strip-types scripts/next-npm-version.mts
@@ -59,7 +64,7 @@ import {
 // CLI arg parsing
 // ---------------------------------------------------------------------------
 
-type Args = {
+interface Args {
   version: string
   registry: string
   dryRun: boolean
@@ -84,7 +89,7 @@ function parseArgs(): Args {
   }
 
   const version = get('--version')
-  if (!version) {
+  if (version == null || version === '') {
     console.error('Error: --version <semver> is required')
     process.exit(1)
   }

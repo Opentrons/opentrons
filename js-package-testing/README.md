@@ -155,14 +155,18 @@ specifiers that **do not work on npm**. Always publish with
 Shared patching logic lives in
 [`../scripts/package-json-patches.mts`](../scripts/package-json-patches.mts)
 (single source of truth for both `scripts/publish.mts` and
-`scripts/patch-packed-packages.mts`).
-It rewrites:
+`scripts/patch-packed-packages.mts`). Look there for the rewrites, not only in
+`publish.mts`. It rewrites:
 
 - `workspace:*` / `link:` → matching publish semver for `@opentrons/*` deps
 - `catalog:` / `catalog:react18` → concrete semver (from root `pnpm-workspace.yaml`)
 - `@types/*` from runtime `dependencies` → `devDependencies`
 - `peerDependencies` → npm-compatible ranges (`^18.2.0`, etc.)
-- `files` allowlists, `exports` maps, and README/LICENSE injection
+- `files` allowlists and `exports` maps (including `README.md` / `LICENSE` in
+  `files[]`)
+
+`publish.mts` additionally writes the README contents and copies `LICENSE` into
+each staged tarball before `npm publish`.
 
 ```bash
 # From monorepo root (always publishes dist-tag "latest")
