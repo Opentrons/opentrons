@@ -64,7 +64,7 @@ export function useEnableCRSMutation(): UseMutationResult<
     })
     await createUser(hostConfig, {
       data: {
-        accountType: 'admin',
+        accountType: 'service',
         username: params.serviceAccount.username,
         password: params.serviceAccount.password,
         fullName: params.serviceAccount.fullName,
