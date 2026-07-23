@@ -24,7 +24,7 @@ import { useDocumentationState } from '/app/local-resources/access-control/useDo
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/'
 
 import type { TemperatureModuleSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
-import type { TemperatureModule } from '/app/redux/modules/types'
+import type { TemperatureModule } from '@opentrons/api-client'
 
 interface TemperatureModuleSlideoutProps {
   module: TemperatureModule

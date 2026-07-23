@@ -33,7 +33,7 @@ import type {
   MagneticModuleEngageMagnetCreateCommand,
   MagneticModuleModel,
 } from '@opentrons/shared-data'
-import type { MagneticModule } from '/app/redux/modules/types'
+import type { MagneticModule } from '@opentrons/api-client'
 
 interface ModelContents {
   version: string

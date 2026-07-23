@@ -29,7 +29,7 @@ import type {
   ModuleType,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { AttachedModule } from '/app/redux/modules/types'
+import type { AttachedModule } from '@opentrons/api-client'
 
 vi.mock('/app/transformations/analysis')
 vi.mock('/app/resources/modules')

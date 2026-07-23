@@ -9,7 +9,7 @@ import {
 } from './constants'
 
 import type { ChipType } from '@opentrons/components'
-import type { FlexStackerModule } from '/app/redux/modules/types'
+import type { FlexStackerModule } from '@opentrons/api-client'
 
 interface FlexStackerModuleProps {
   moduleData: FlexStackerModule['data']

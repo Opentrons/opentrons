@@ -24,8 +24,8 @@ import type {
   LatchStatus,
   SpeedStatus,
   TemperatureStatus,
-} from '/app/redux/modules/api-types'
-import type { HeaterShakerModule } from '/app/redux/modules/types'
+  HeaterShakerModule,
+} from '@opentrons/api-client'
 
 interface HeaterShakerModuleDataProps {
   moduleData: HeaterShakerModule['data']

@@ -48,7 +48,7 @@ import type {
   MagneticModule,
   ThermocyclerModule,
   VacuumModule,
-} from '/app/redux/modules/types'
+} from '@opentrons/api-client'
 
 vi.mock('../ErrorInfo')
 vi.mock('../MagneticModuleData')

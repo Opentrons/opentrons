@@ -48,7 +48,7 @@ import type {
   HeaterShakerDeactivateShakerCreateCommand,
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
 } from '@opentrons/shared-data'
-import type { HeaterShakerModule, LatchStatus } from '/app/redux/modules/types'
+import type { HeaterShakerModule, LatchStatus } from '@opentrons/api-client'
 
 interface TestShakeSlideoutProps {
   module: HeaterShakerModule

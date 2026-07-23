@@ -24,7 +24,7 @@ import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import type { MouseEventHandler } from 'react'
 import type { HeaterShakerSetTargetTemperatureCreateCommand } from '@opentrons/shared-data'
-import type { HeaterShakerModule } from '/app/redux/modules/types'
+import type { HeaterShakerModule } from '@opentrons/api-client'
 
 interface HeaterShakerSlideoutProps {
   module: HeaterShakerModule

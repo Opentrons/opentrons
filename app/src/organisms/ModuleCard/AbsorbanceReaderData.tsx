@@ -8,7 +8,7 @@ import {
 } from './constants'
 
 import type { ChipType } from '@opentrons/components'
-import type { AbsorbanceReaderModule } from '/app/redux/modules/types'
+import type { AbsorbanceReaderModule } from '@opentrons/api-client'
 
 interface AbsorbanceReaderProps {
   moduleData: AbsorbanceReaderModule['data']

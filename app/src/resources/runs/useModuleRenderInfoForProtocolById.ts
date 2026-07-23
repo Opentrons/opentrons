@@ -15,7 +15,7 @@ import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis'
 
 import type { CutoutConfig } from '@opentrons/shared-data'
-import type { AttachedModule } from '/app/redux/modules/types'
+import type { AttachedModule } from '@opentrons/api-client'
 import type { ProtocolModuleInfo } from '/app/transformations/analysis'
 
 export interface ModuleRenderInfoForProtocol extends ProtocolModuleInfo {

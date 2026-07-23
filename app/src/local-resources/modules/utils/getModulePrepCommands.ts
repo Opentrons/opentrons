@@ -20,7 +20,7 @@ import type {
 import type {
   AttachedModule,
   FlexStackerModule,
-} from '/app/redux/modules/types'
+} from '@opentrons/api-client'
 
 export type ModulePrepCommandsType =
   | TemperatureModuleDeactivateCreateCommand

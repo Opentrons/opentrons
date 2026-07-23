@@ -17,7 +17,7 @@ import {
 } from './constants'
 
 import type { ChipType } from '@opentrons/components'
-import type { ThermocyclerData } from '/app/redux/modules/api-types'
+import type { ThermocyclerData } from '@opentrons/api-client'
 
 interface ThermocyclerModuleProps {
   data: ThermocyclerData

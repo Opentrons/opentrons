@@ -12,7 +12,7 @@ import { formatDisplayPressureMbar } from './utils/formatDisplayPressureMbar'
 import styles from './vacuummodule.module.css'
 
 import type { TFunction } from 'i18next'
-import type { VacuumModuleData as VacuumModuleDataType } from '/app/redux/modules/api-types'
+import type { VacuumModuleData as VacuumModuleDataType } from '@opentrons/api-client'
 
 interface VacuumModuleDataProps {
   moduleData: VacuumModuleDataType

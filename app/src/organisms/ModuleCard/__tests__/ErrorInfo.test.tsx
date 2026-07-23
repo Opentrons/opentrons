@@ -15,7 +15,7 @@ import type { ComponentProps } from 'react'
 import type {
   HeaterShakerModule,
   ThermocyclerModule,
-} from '/app/redux/modules/types'
+} from '@opentrons/api-client'
 
 const mockErrorThermocycler = {
   id: 'thermocycler_id',

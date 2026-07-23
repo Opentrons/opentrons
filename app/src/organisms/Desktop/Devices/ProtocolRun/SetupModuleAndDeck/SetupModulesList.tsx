@@ -62,7 +62,10 @@ import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { getFixtureImage } from './utils'
 
 import type { TFunction } from 'i18next'
-import type { CommandData } from '@opentrons/api-client'
+import type {
+  CommandData,
+  AttachedModule,
+} from '@opentrons/api-client'
 import type {
   CutoutConfigAndCompatibility,
   CutoutFixtureId,
@@ -71,7 +74,6 @@ import type {
   ModuleType,
 } from '@opentrons/shared-data'
 import type { ModulePrepCommandsType } from '/app/local-resources/modules'
-import type { AttachedModule } from '/app/redux/modules/types'
 import type {
   ModuleRenderInfoForProtocol,
   ProtocolCalibrationStatus,

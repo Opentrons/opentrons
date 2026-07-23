@@ -84,7 +84,7 @@ import type { ModuleType } from '@opentrons/shared-data'
 import type {
   AttachedModule,
   HeaterShakerModule,
-} from '/app/redux/modules/types'
+} from '@opentrons/api-client'
 
 const HAS_SETUP_INSTRUCTIONS_TYPE: ModuleType[] = [
   FLEX_STACKER_MODULE_TYPE,

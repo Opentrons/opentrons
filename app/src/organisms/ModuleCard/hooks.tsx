@@ -37,7 +37,7 @@ import type {
   TemperatureModuleDeactivateCreateCommand,
   UnsafeFlexStackerPrepareShuttleCreateCommand,
 } from '@opentrons/shared-data'
-import type { AttachedModule } from '/app/redux/modules/types'
+import type { AttachedModule } from '@opentrons/api-client'
 
 export function useIsHeaterShakerInProtocol(): boolean {
   const currentRunId = useCurrentRunId()

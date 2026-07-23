@@ -17,7 +17,7 @@ import type { DeckConfiguration } from '@opentrons/shared-data'
 import type {
   AttachedModule,
   VacuumModuleStatus,
-} from '/app/redux/modules/types'
+} from '@opentrons/api-client'
 
 export function getModuleCardImage(attachedModule: AttachedModule): string {
   switch (attachedModule.moduleModel) {
