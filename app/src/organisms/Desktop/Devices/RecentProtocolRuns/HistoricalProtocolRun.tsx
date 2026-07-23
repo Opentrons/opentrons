@@ -3,6 +3,7 @@ import {
   BORDERS,
   COLORS,
   Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   StyledText,
@@ -28,6 +29,7 @@ interface HistoricalProtocolRunProps {
   protocolName: string
   robotName: string
   robotIsBusy: boolean
+  isDeleting: boolean
   protocolKey?: string
 }
 
@@ -36,7 +38,8 @@ interface HistoricalProtocolRunProps {
 export function HistoricalProtocolRun(
   props: HistoricalProtocolRunProps
 ): JSX.Element | null {
-  const { run, protocolName, robotIsBusy, robotName, protocolKey } = props
+  const { run, protocolName, robotIsBusy, robotName, isDeleting, protocolKey } =
+    props
   const outputFileIds = useRunGeneratedDataFiles(run.id)
   const imageFileCount = outputFileIds.jpeg.length > 0 ? 1 : 0
   const totalOutputFiles = outputFileIds.csv.length + imageFileCount
@@ -105,12 +108,16 @@ export function HistoricalProtocolRun(
             <Tag type="default" text={duration} shrinkToContent />
           </Flex>
         </Flex>
-        <OverflowMenu
-          run={run}
-          robotName={robotName}
-          robotIsBusy={robotIsBusy}
-          runHasImages={imageFileCount > 0}
-        />
+        {isDeleting ? (
+          <Icon name="ot-spinner" spin size="1rem" color={COLORS.grey60} />
+        ) : (
+          <OverflowMenu
+            run={run}
+            robotName={robotName}
+            robotIsBusy={robotIsBusy}
+            runHasImages={imageFileCount > 0}
+          />
+        )}
       </Flex>
     </>
   )
