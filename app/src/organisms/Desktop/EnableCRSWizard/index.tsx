@@ -1,4 +1,4 @@
-import { useCallback, useId, useState } from 'react'
+import { useCallback, useEffect, useId, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
   Controller,
@@ -26,6 +26,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useRobot } from '/app/redux-resources/robots'
 import { getRobotSerialNumber } from '/app/redux/discovery'
+import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/encryptionKeys'
 
 import { useHandleRobotCertImport } from '../RobotCertImport/useHandleRobotCertImport'
 import styles from './enablecrswizard.module.css'
@@ -240,6 +241,21 @@ function VerifyRobotEncryptionKeyPage({
 }: CommonPageProps): JSX.Element {
   const { t } = useTranslation(['access_control', 'device_settings', 'shared'])
   const formId = useId()
+
+  // Ask the ODD to show the encryption key while this page is open.
+  const { requestKeyDisplay, clearKeyDisplay } =
+    useUpdateClientDataEncryptionKeys()
+  useEffect(
+    () => {
+      const requestKey = requestKeyDisplay()
+      return () => {
+        clearKeyDisplay(requestKey)
+      }
+    },
+    // Run on mount/unmount only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
 
   const {
     passwordValue,
