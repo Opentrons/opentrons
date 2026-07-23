@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { useImageFileQuery } from '@opentrons/react-api-client'
+import { useRunDataFileMetadata } from '@opentrons/react-api-client'
 
 import { useRunFileCount } from '../useRunFileCount'
 
@@ -30,36 +30,36 @@ const KNOWN_GOOD_RUN: KnownGoodRunData = {
   outputFileIds: [],
 }
 
-function mockImageFiles(count: number): void {
-  vi.mocked(useImageFileQuery).mockReturnValue({
+function mockOutputDataFiles(count: number): void {
+  vi.mocked(useRunDataFileMetadata).mockReturnValue({
     data: {
-      data: Array.from({ length: count }, (_, i) => ({ id: `img-${i}` })),
+      data: Array.from({ length: count }, (_, i) => ({ id: `file-${i}` })),
     },
   } as any)
 }
 
 describe('useRunFileCount', () => {
-  it('returns 3 for a legacy run with no images', () => {
-    mockImageFiles(0)
+  it('returns 3 for a legacy run with no output data files', () => {
+    mockOutputDataFiles(0)
     const { result } = renderHook(() => useRunFileCount(BASE_RUN))
     // protocol + labware offsets + run log
     expect(result.current).toBe(3)
   })
 
-  it('returns 3 for a KnownGoodRun with no RTPs, no output files, no images', () => {
-    mockImageFiles(0)
+  it('returns 3 for a KnownGoodRun with no RTPs and no output data files', () => {
+    mockOutputDataFiles(0)
     const { result } = renderHook(() => useRunFileCount(KNOWN_GOOD_RUN))
     expect(result.current).toBe(3)
   })
 
-  it('counts image files', () => {
-    mockImageFiles(2)
+  it('counts output data files', () => {
+    mockOutputDataFiles(2)
     const { result } = renderHook(() => useRunFileCount(KNOWN_GOOD_RUN))
     expect(result.current).toBe(5)
   })
 
   it('counts csv_file RTPs', () => {
-    mockImageFiles(0)
+    mockOutputDataFiles(0)
     const run: KnownGoodRunData = {
       ...KNOWN_GOOD_RUN,
       runTimeParameters: [
@@ -87,22 +87,10 @@ describe('useRunFileCount', () => {
     expect(result.current).toBe(4)
   })
 
-  it('counts output files', () => {
-    mockImageFiles(0)
+  it('sums output data files and RTPs together', () => {
+    mockOutputDataFiles(3)
     const run: KnownGoodRunData = {
       ...KNOWN_GOOD_RUN,
-      outputFileIds: ['out-1', 'out-2', 'out-3'],
-    }
-    const { result } = renderHook(() => useRunFileCount(run))
-    // 3 base + 3 output files
-    expect(result.current).toBe(6)
-  })
-
-  it('sums all variable file types together', () => {
-    mockImageFiles(2)
-    const run: KnownGoodRunData = {
-      ...KNOWN_GOOD_RUN,
-      outputFileIds: ['out-1'],
       runTimeParameters: [
         {
           type: 'csv_file',
@@ -121,12 +109,12 @@ describe('useRunFileCount', () => {
       ],
     } as any
     const { result } = renderHook(() => useRunFileCount(run))
-    // 3 base + 1 output + 2 images + 2 csv RTPs = 8
+    // 3 base + 3 output data files + 2 csv RTPs = 8
     expect(result.current).toBe(8)
   })
 
   it('does not count non-csv RTPs', () => {
-    mockImageFiles(0)
+    mockOutputDataFiles(0)
     const run: KnownGoodRunData = {
       ...KNOWN_GOOD_RUN,
       runTimeParameters: [
@@ -173,17 +161,19 @@ describe('useRunFileCount', () => {
     expect(result.current).toBe(3)
   })
 
-  it('handles undefined imageData gracefully (query loading)', () => {
-    vi.mocked(useImageFileQuery).mockReturnValue({ data: undefined } as any)
+  it('handles undefined runDataFilesData gracefully (query loading)', () => {
+    vi.mocked(useRunDataFileMetadata).mockReturnValue({
+      data: undefined,
+    } as any)
     const { result } = renderHook(() => useRunFileCount(KNOWN_GOOD_RUN))
     expect(result.current).toBe(3)
   })
 
-  it('does not count outputFileIds or RTPs for a LegacyGoodRunData (no ok field)', () => {
-    mockImageFiles(1)
-    // LegacyGoodRunData has no outputFileIds or runTimeParameters
+  it('does not count RTPs for a LegacyGoodRunData (no ok field)', () => {
+    mockOutputDataFiles(1)
+    // LegacyGoodRunData has no runTimeParameters
     const { result } = renderHook(() => useRunFileCount(BASE_RUN))
-    // 3 base + 1 image = 4
+    // 3 base + 1 output data file = 4
     expect(result.current).toBe(4)
   })
 })

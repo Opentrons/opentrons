@@ -153,7 +153,10 @@ export async function saveFileToUsb(
   filePath: string,
   buffer: ArrayBuffer
 ): Promise<void> {
-  await remote.ipcRenderer.invoke('usb:saveFile', { filePath, buffer })
+  await remote.ipcRenderer.invoke('usb:saveFile', {
+    filePath,
+    buffer: Array.from(new Uint8Array(buffer)),
+  })
 }
 
 export async function tryInstallEncryptedRobotCertificate(props: {
