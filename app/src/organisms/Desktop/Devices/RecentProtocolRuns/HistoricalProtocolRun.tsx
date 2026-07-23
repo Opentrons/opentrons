@@ -106,7 +106,7 @@ export function HistoricalProtocolRun(
           </Flex>
         </Flex>
         <OverflowMenu
-          runId={run.id}
+          run={run}
           robotName={robotName}
           robotIsBusy={robotIsBusy}
           runHasImages={imageFileCount > 0}
