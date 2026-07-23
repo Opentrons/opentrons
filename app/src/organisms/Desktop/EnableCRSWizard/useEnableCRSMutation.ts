@@ -46,6 +46,8 @@ export function useEnableCRSMutation(): UseMutationResult<
     // todo(mm, 2026-07-20): If the wizard was previously interrupted, these requests
     // will fail because the users already exist. We might want to clear preexisting
     // users beforehand.
+
+    // eslint-disable-next-line opentrons/no-direct-mutating
     await createUser(hostConfig, {
       data: {
         accountType: 'admin',
@@ -54,6 +56,7 @@ export function useEnableCRSMutation(): UseMutationResult<
         fullName: params.adminAccount.fullName,
       },
     })
+    // eslint-disable-next-line opentrons/no-direct-mutating
     await createUser(hostConfig, {
       data: {
         accountType: 'admin',
@@ -62,6 +65,7 @@ export function useEnableCRSMutation(): UseMutationResult<
         fullName: params.recoveryAccount.fullName,
       },
     })
+    // eslint-disable-next-line opentrons/no-direct-mutating
     await createUser(hostConfig, {
       data: {
         accountType: 'service',
@@ -71,6 +75,7 @@ export function useEnableCRSMutation(): UseMutationResult<
       },
     })
 
+    // eslint-disable-next-line opentrons/no-direct-mutating
     const response = await patchAccessControlEnabled(hostConfig, {
       data: { accessControlEnabled: true },
     })
@@ -88,6 +93,7 @@ export function useEnableCRSMutation(): UseMutationResult<
   // our usual wrapper around it, useDocumentedMutation(). The wrapper's extra stuff
   // to support Compliance Ready Software don't make sense here: we'll only ever run in
   // a context when Compliance Ready Software hasn't been enabled yet.
+  // eslint-disable-next-line opentrons/no-direct-use-mutation
   const mutation = useMutation(enableCRS)
 
   return mutation
