@@ -6,10 +6,18 @@ import '@testing-library/jest-dom/vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 
 import { GantryHoming } from '../GantryHoming'
 
-vi.mock('../../../hooks')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
+vi.mock('@opentrons/react-api-client', () => ({
+  useUpdateRobotSettingMutation: () => ({
+    updateRobotSetting: vi.fn(),
+  }),
+}))
 
 const mockSettings = {
   id: 'homing-test',

@@ -137,7 +137,7 @@ class MaintenanceRunDataManager:
         await camera.update_live_stream_status(
             self._run_orchestrator_store._robot_type,
             True,
-            camera_provider,
+            await camera_provider.get_camera_settings(),
             state_summary.cameraSettings,
         )
 
@@ -206,7 +206,7 @@ class MaintenanceRunDataManager:
                 await camera.update_live_stream_status(
                     self._run_orchestrator_store._robot_type,
                     True,
-                    camera_provider,
+                    await camera_provider.get_camera_settings(),
                     camera_settings,
                 )
 

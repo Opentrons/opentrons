@@ -9,6 +9,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 
 import { RobotSettingsFeatureFlags } from '../RobotSettingsFeatureFlags'
 
@@ -16,6 +17,9 @@ import type { UseQueryResult } from 'react-query'
 import type { RobotSettingsResponse } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const MOCK_FF_FIELD = {
   id: 'ff_1',

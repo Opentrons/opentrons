@@ -146,7 +146,9 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
         # Start the run process pyro provider so a process is ready when a run starts
         await exit_stack.enter_async_context(
-            set_up_run_process_pyro_provider(app.state)
+            set_up_run_process_pyro_provider(
+                app.state, await authorization_checker.access_control_status()
+            )
         )
 
         yield  # Start handling HTTP requests.

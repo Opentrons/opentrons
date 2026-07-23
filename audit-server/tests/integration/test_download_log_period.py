@@ -48,4 +48,8 @@ async def test_download_log_period(run_server: DevServer) -> None:
 
         with zipfile.ZipFile(io.BytesIO(log_zip), mode="r") as zf:
             file_list = zf.namelist()
-            assert file_list == ["log_period.json", "signing_key.pem"]
+            assert file_list == [
+                "log_period.json",
+                "signing_key.pem",
+                "robot_identity.json",
+            ]

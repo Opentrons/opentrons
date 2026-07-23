@@ -1,12 +1,13 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { patchAuthSettings } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../../accessControl'
 import { getQueryKey, useHost } from '../../api'
 
 import type { AxiosError } from 'axios'
 import type {
-  UseMutateAsyncFunction,
+  UseMutateFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
@@ -14,32 +15,46 @@ import type {
   AuthSettingsResponse,
   PatchAuthSettingsRequest,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../../accessControl'
+import type { DocumentedMutationParameters } from '../../accessControl/types'
 
 export type UseAuthSettingsMutationResult = UseMutationResult<
   AuthSettingsResponse,
   AxiosError,
   PatchAuthSettingsRequest
 > & {
-  patchAuthSettings: UseMutateAsyncFunction<
+  patchAuthSettings: UseMutateFunction<
     AuthSettingsResponse,
     AxiosError,
     PatchAuthSettingsRequest
   >
 }
 
+export type UseAuthSettingsMutationOptions = UseMutationOptions<
+  AuthSettingsResponse,
+  AxiosError,
+  PatchAuthSettingsRequest
+>
+
 export function useAuthSettingsMutation(
-  options: UseMutationOptions<
-    AuthSettingsResponse,
-    AxiosError,
-    PatchAuthSettingsRequest
-  > = {}
+  documentationState: DocumentationState,
+  options: UseAuthSettingsMutationOptions = {}
 ): UseAuthSettingsMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
-  const mutation = useMutation(
+  const mutation = useDocumentedMutation<
+    AuthSettingsResponse,
+    AxiosError,
+    PatchAuthSettingsRequest
+  >(
+    documentationState,
+    ['update_auth_settings'],
     getQueryKey(host, 'auth', 'settings'),
-    (body: PatchAuthSettingsRequest) =>
-      patchAuthSettings(host!, body)
+    ({
+      variables: body,
+      userNotes,
+    }: DocumentedMutationParameters<PatchAuthSettingsRequest>) =>
+      patchAuthSettings(host!, body, userNotes)
         .then(response => {
           queryClient
             .invalidateQueries(getQueryKey(host, 'auth', 'settings'))
@@ -58,6 +73,6 @@ export function useAuthSettingsMutation(
 
   return {
     ...mutation,
-    patchAuthSettings: mutation.mutateAsync,
+    patchAuthSettings: mutation.mutate,
   }
 }

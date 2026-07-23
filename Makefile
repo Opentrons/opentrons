@@ -255,7 +255,17 @@ $(SHARED_DATA_DIR)-py-lint:
 	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
 
 .PHONY: lint-js
-lint-js: lint-js-eslint lint-js-prettier
+lint-js: check-mutating-api-client-exports lint-js-eslint lint-js-prettier
+
+# Regenerate the denylist used by opentrons/no-direct-mutating.
+.PHONY: generate-mutating-api-client-exports
+generate-mutating-api-client-exports:
+	node scripts/eslint-plugin-opentrons/generate-mutating-api-client-exports.js
+
+# Fail if the committed denylist is stale vs api-client POST/PUT/PATCH/DELETE exports.
+.PHONY: check-mutating-api-client-exports
+check-mutating-api-client-exports:
+	node scripts/eslint-plugin-opentrons/generate-mutating-api-client-exports.js --check
 
 .PHONY: lint-js-eslint
 lint-js-eslint:
@@ -342,7 +352,7 @@ dev-backend:
 dev-backend-flex:
 	$(python) scripts/run_concurrently.py \
 		$(MAKE) -C auth-server dev OT_AUTH_SERVER_audit_server_url=http://localhost:33970 ';' \
-		$(MAKE) -C audit-server dev OT_AUDIT_SERVER_key_server_url=http://localhost:33960 OT_AUDIT_SERVER_auth_server_url=http://localhost:31950 ';' \
+		$(MAKE) -C audit-server dev OT_AUDIT_SERVER_key_server_url=http://localhost:33960 OT_AUDIT_SERVER_auth_server_url=http://localhost:31950 OT_AUDIT_SERVER_robot_server_url=http://localhost:31951 ';' \
 		$(MAKE) -C robot-server dev-flex OT_ROBOT_SERVER_auth_server_url=http://localhost:31950 OT_ROBOT_SERVER_audit_server_url=http://localhost:33970 BEHIND_DEV_PROXY=1 ';' \
 		$(MAKE) -C system-server dev OT_SYSTEM_SERVER_auth_server_url=http://localhost:31950 OT_SYSTEM_SERVER_audit_server_url=http://localhost:33970 ';' \
 		$(MAKE) -C key-server dev-mitmproxy ';' \

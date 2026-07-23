@@ -13,6 +13,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { ToggleButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
 import type { MouseEventHandler } from 'react'
 import type { RobotSettingsField } from '@opentrons/api-client'
@@ -51,7 +52,9 @@ interface FeatureFlagToggleProps {
 export function FeatureFlagToggle({
   settingField,
 }: FeatureFlagToggleProps): JSX.Element | null {
-  const { updateRobotSetting } = useUpdateRobotSettingMutation()
+  const documentationState = useDocumentationState()
+  const { updateRobotSetting } =
+    useUpdateRobotSettingMutation(documentationState)
   const { value, id, title, description } = settingField
 
   if (id == null) return null

@@ -5,14 +5,18 @@ import {
   useUpdateRobotSettingMutation,
 } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+
 // not releveant to the OT-2, this controls the front LED lights on the Flex
 export function useLEDLights(): {
   lightsEnabled: boolean
   toggleLights: () => void
 } {
   const [lightsEnabledCache, setLightsEnabledCache] = useState<boolean>(true)
+  const documentationState = useDocumentationState()
 
-  const { updateRobotSetting } = useUpdateRobotSettingMutation()
+  const { updateRobotSetting } =
+    useUpdateRobotSettingMutation(documentationState)
 
   const robotSettingsQuery = useRobotSettingsQuery()
   const settings = robotSettingsQuery.data?.settings ?? []
@@ -24,8 +28,16 @@ export function useLEDLights(): {
   }, [isStatusBarEnabled])
 
   const toggleLights = (): void => {
-    updateRobotSetting({ id: 'disableStatusBar', value: lightsEnabledCache })
-    setLightsEnabledCache(!lightsEnabledCache)
+    const newLightsEnabled = !lightsEnabledCache
+    setLightsEnabledCache(newLightsEnabled)
+    updateRobotSetting(
+      { id: 'disableStatusBar', value: lightsEnabledCache },
+      {
+        onError: () => {
+          setLightsEnabledCache(lightsEnabledCache)
+        },
+      }
+    )
   }
 
   return { lightsEnabled: lightsEnabledCache, toggleLights }

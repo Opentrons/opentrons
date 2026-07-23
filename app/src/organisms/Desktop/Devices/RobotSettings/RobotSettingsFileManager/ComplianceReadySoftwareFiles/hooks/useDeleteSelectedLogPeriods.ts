@@ -57,6 +57,8 @@ export function useDeleteSelectedLogPeriods(): UseDeleteSelectedLogPeriodsResult
     Promise.all(
       deletablePeriods.map(period => {
         const deletionKey = deletionKeysById[period.id]
+        // TODO(jj, 07-21-26): migrate to useDocumentedMutation
+        // eslint-disable-next-line opentrons/no-direct-mutating
         return deleteLogPeriod(host, period.id, { deletionKey })
           .then(() => {
             dispatch(logPeriodDeletionKeyConsumed({ logPeriodId: period.id }))

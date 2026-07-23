@@ -38,6 +38,10 @@ export function useAccessControlEnabledMutation(
   const host = useHost()
   const queryClient = useQueryClient()
   const queryKey = accessControlEnabledQueryKey(host)
+  // Fun case. When turning on CRS, no documentation is required, obviously.
+  // If we ever add a way to turn off CRS, this will need documentation.
+  // Until then, this is fine.
+  // eslint-disable-next-line opentrons/no-direct-use-mutation -- directly calling useMutation is deprecated in the codebase. Update this to useDocumentedMutation before using this function.
   const mutation = useMutation(
     queryKey,
     async (body: PatchAccessControlEnabledSettingsRequest) => {

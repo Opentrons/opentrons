@@ -21,6 +21,8 @@ export function useDeleteProtocolMutation(
   const host = useHost()
   const queryClient = useQueryClient()
 
+  // Directly calling useMutation is deprecated in the codebase. Update this to useDocumentedMutation before using this hook.
+  // eslint-disable-next-line opentrons/no-direct-use-mutation
   const mutation = useMutation<EmptyResponse, unknown>(() =>
     deleteProtocol(host!, protocolId).then(response => {
       queryClient.invalidateQueries(getQueryKey(host, 'protocols'))

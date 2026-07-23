@@ -32,7 +32,10 @@ from opentrons.protocol_reader import (
 from opentrons.util.performance_helpers import TrackingFunctions
 from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons_shared_data.robot.types import RobotType
-from server_utils.auth.resource_server.fastapi import require_scopes
+from server_utils.auth.resource_server.fastapi import (
+    get_access_control_status,
+    require_scopes,
+)
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
 from server_utils.fastapi_utils.models.json_api import (
@@ -236,6 +239,7 @@ async def create_protocol(  # noqa: C901
         int, Depends(get_maximum_quick_transfer_protocols)
     ],
     audit_logger: Annotated[AuditLogger, Depends(get_audit_logger)],
+    access_control_status: Annotated[bool, Depends(get_access_control_status)],
     files: List[UploadFile] = File(...),
     # use Form because request is multipart/form-data
     # https://fastapi.tiangolo.com/tutorial/request-forms-and-files/
@@ -308,6 +312,7 @@ async def create_protocol(  # noqa: C901
         maximum_quick_transfer_protocols: Robot setting value limiting stored quick transfers protocols.
         audit_logger: Records the upload for audit when auth-server requires
             ``Opentrons-User-Notes``.
+        access_control_status: Status of the Auth-Server access control enablement.
     """
     await audit_logger.log(
         resource_id=protocol_id,
@@ -381,6 +386,7 @@ async def create_protocol(  # noqa: C901
                     ),
                     analysis_store=analysis_store,
                     analyses_manager=analyses_manager,
+                    access_control_status=access_control_status,
                 )
             except AnalysisIsPendingError as error:
                 raise LastAnalysisPending(detail=str(error)).as_error(
@@ -462,6 +468,7 @@ async def create_protocol(  # noqa: C901
         protocol_resource=protocol_resource,
         analysis_store=analysis_store,
         analyses_manager=analyses_manager,
+        access_control_status=access_control_status,
     )
 
     data = Protocol(
@@ -493,6 +500,7 @@ async def _start_new_analysis_if_necessary(
     protocol_resource: ProtocolResource,
     analysis_store: AnalysisStore,
     analyses_manager: AnalysesManager,
+    access_control_status: bool,
 ) -> Tuple[List[AnalysisSummary], bool]:
     """Check RTP values and start a new analysis if necessary.
 
@@ -501,6 +509,8 @@ async def _start_new_analysis_if_necessary(
     """
     analyses = analysis_store.get_summaries_by_protocol(protocol_id=protocol_id)
     started_new_analysis = False
+    # Update the analysis store's access control status reference
+    analysis_store.set_access_control_status(access_control_mode=access_control_status)
 
     try:
         analyzer = await analyses_manager.initialize_analyzer(
@@ -761,6 +771,7 @@ async def create_protocol_analysis(
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     analysis_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
     audit_logger: Annotated[AuditLogger, Depends(get_audit_logger)],
+    access_control_status: Annotated[bool, Depends(get_access_control_status)],
     request_body: Optional[RequestModel[AnalysisRequest]] = None,
 ) -> PydanticResponse[SimpleMultiBody[AnalysisSummary]]:
     """Start a new analysis for the given existing protocol.
@@ -806,6 +817,7 @@ async def create_protocol_analysis(
             protocol_resource=protocol_store.get(protocol_id=protocolId),
             analysis_store=analysis_store,
             analyses_manager=analyses_manager,
+            access_control_status=access_control_status,
         )
     except AnalysisIsPendingError as error:
         raise LastAnalysisPending(detail=str(error)).as_error(

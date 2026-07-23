@@ -169,7 +169,9 @@ class ProtocolAnalyzer:
                 )
                 if feature_flags.protocol_subprocess_enabled():
                     asyncio.run_coroutine_threadsafe(
-                        self._run_process_pyro_provider.refresh_simulating(),
+                        self._run_process_pyro_provider.refresh_simulating(
+                            access_control_mode=self._analysis_store.get_access_control_status()
+                        ),
                         asyncio.get_running_loop(),
                     )
             else:

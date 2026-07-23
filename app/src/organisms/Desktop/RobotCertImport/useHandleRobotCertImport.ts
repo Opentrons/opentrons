@@ -44,6 +44,8 @@ export function useHandleRobotCertImport(
       }
     }
 
+  // Auth endpoint, does not require documentation.
+  // eslint-disable-next-line opentrons/no-direct-use-mutation
   const { status, mutate } = useMutation<boolean>({
     mutationFn: async () => {
       if (host == null) {
