@@ -13,7 +13,10 @@ import {
   Tag,
   WARNING_TOAST,
 } from '@opentrons/components'
-import { useLogPeriodSummariesQuery } from '@opentrons/react-api-client'
+import {
+  isDocumentedMutationError,
+  useLogPeriodSummariesQuery,
+} from '@opentrons/react-api-client'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -119,7 +122,15 @@ export function ComplianceReadySoftwareFiles({
     void deleteSelectedLogPeriods(
       periods.filter(period => selectedIds.has(period.id)),
       logPeriodDeletionKeysById
-    ).catch((e: Error) => makeToast(e.message, ERROR_TOAST))
+    ).catch((e: Error) => {
+      if (!isDocumentedMutationError(e)) {
+        makeToast(e.message, ERROR_TOAST)
+        setShowDeleteRecordsModal(false)
+      } else {
+        // repoen the delete modal if we fail; no flicker in practice
+        setShowDeleteRecordsModal(true)
+      }
+    })
     setShowDeleteRecordsModal(false)
   }
 

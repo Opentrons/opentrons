@@ -9,6 +9,7 @@ import {
   StyledText,
   WARNING_TOAST,
 } from '@opentrons/components'
+import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -95,8 +96,14 @@ export function ProtocolRunRecords({
 
   const handleConfirmDeleteSelected = (): void => {
     void deleteSelectedRuns(runs.filter(run => selectedIds.has(run.id))).catch(
-      () => {
-        makeToast('Error deleting records', ERROR_TOAST)
+      (error: Error) => {
+        if (!isDocumentedMutationError(error)) {
+          makeToast('Error deleting records', ERROR_TOAST)
+          setShowDeleteRecordsModal(false)
+        } else {
+          // repoen the delete modal if we fail; no flicker in practice
+          setShowDeleteRecordsModal(true)
+        }
       }
     )
     setShowDeleteRecordsModal(false)
