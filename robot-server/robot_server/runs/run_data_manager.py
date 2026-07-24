@@ -40,7 +40,6 @@ from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.notifications import RunsPublisher
-from robot_server.service.task_runner import TaskRunner
 
 _INITIAL_ERROR_RECOVERY_RULES: list[ErrorRecoveryRule] = []
 
@@ -165,7 +164,6 @@ class RunDataManager:
         run_store: RunStore,
         error_recovery_setting_store: ErrorRecoverySettingStore,
         camera_setting_store: CameraSettingStore,
-        task_runner: TaskRunner,
         runs_publisher: RunsPublisher,
         file_provider: FileProvider,
     ) -> None:
@@ -180,7 +178,6 @@ class RunDataManager:
         # This error recovery mapping stuff probably belongs in RunOrchestratorStore.
         self._current_run_error_recovery_rules: List[ErrorRecoveryRule] = []
 
-        self._task_runner = task_runner
         self._runs_publisher = runs_publisher
         self._file_provider = file_provider
 

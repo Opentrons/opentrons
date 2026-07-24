@@ -68,7 +68,6 @@ from robot_server.runs.run_store import (
     RunStore,
 )
 from robot_server.service.notifications import RunsPublisher
-from robot_server.service.task_runner import TaskRunner
 
 
 def mock_notify_publishers() -> None:
@@ -100,12 +99,6 @@ def mock_error_recovery_setting_store(decoy: Decoy) -> ErrorRecoverySettingStore
 def mock_camera_setting_store(decoy: Decoy) -> CameraSettingStore:
     """Get a mock CameraSettingStore."""
     return decoy.mock(cls=CameraSettingStore)
-
-
-@pytest.fixture()
-def mock_task_runner(decoy: Decoy) -> TaskRunner:
-    """Get a mock background TaskRunner."""
-    return decoy.mock(cls=TaskRunner)
 
 
 @pytest.fixture()
@@ -248,7 +241,6 @@ def subject(
     mock_run_store: RunStore,
     mock_error_recovery_setting_store: ErrorRecoverySettingStore,
     mock_camera_setting_store: CameraSettingStore,
-    mock_task_runner: TaskRunner,
     mock_runs_publisher: RunsPublisher,
     mock_file_provider: FileProvider,
 ) -> RunDataManager:
@@ -258,7 +250,6 @@ def subject(
         run_store=mock_run_store,
         error_recovery_setting_store=mock_error_recovery_setting_store,
         camera_setting_store=mock_camera_setting_store,
-        task_runner=mock_task_runner,
         runs_publisher=mock_runs_publisher,
         file_provider=mock_file_provider,
     )
