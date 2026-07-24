@@ -35,6 +35,8 @@ from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLoc
 from opentrons.protocol_api import labware
 from opentrons.types import Mount, Point
 from opentrons_shared_data.labware.types import LabwareDefinition
+from server_utils.audit.audit_server import Client as AuditClient
+from server_utils.audit.fastapi import get_audit_client, install_audit_client
 from server_utils.auth.resource_server.authentication_checker import (
     AlwaysAllowedAuthenticationChecker,
     AuthenticationChecker,
@@ -246,6 +248,22 @@ def _override_authentication_checker_with_always_allowed(
 
 
 @pytest.fixture
+def mock_audit_client(decoy: Decoy) -> AuditClient:
+    return decoy.mock(cls=AuditClient)
+
+
+@pytest.fixture
+def _override_audit_client_with_mock(mock_audit_client: AuditClient) -> Iterator[None]:
+    def get_audit_client_override() -> AuditClient:
+        return mock_audit_client
+
+    app.dependency_overrides[get_audit_client] = get_audit_client_override
+    install_audit_client(app.state, mock_audit_client)
+    yield
+    del app.dependency_overrides[get_audit_client]
+
+
+@pytest.fixture
 def api_client(
     _override_hardware_with_mock: None,
     _override_sql_engine_with_mock: None,
@@ -253,6 +271,7 @@ def api_client(
     _override_ot2_hardware_with_mock: None,
     _override_notification_client_with_mock: None,
     _override_authentication_checker_with_always_allowed: None,
+    _override_audit_client_with_mock: None,
 ) -> TestClient:
     client = TestClient(app)
     client.headers.update(
@@ -270,6 +289,7 @@ def api_client_camera_overrides(
     _override_run_data_manager_with_mock: None,
     _override_notification_client_with_mock: None,
     _override_authentication_checker_with_always_allowed: None,
+    _override_audit_client_with_mock: None,
 ) -> TestClient:
     client = TestClient(app)
     client.headers.update(

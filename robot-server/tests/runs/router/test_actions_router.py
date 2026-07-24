@@ -5,11 +5,11 @@ from datetime import datetime
 import pytest
 from decoy import Decoy
 
+from server_utils.audit.audit_logger import AuditLogger
 from server_utils.fastapi_utils.models.json_api import RequestModel
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ApiError
-from robot_server.fastapi_dependencies import AuditLogger
 from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
 )
@@ -85,10 +85,6 @@ async def test_create_run_action(
         check_estop=True,
     )
 
-    decoy.verify(
-        await mock_audit_logger.log(resource_id=run_id, request_data=request_body.data),
-        times=1,
-    )
     assert result.content.data == expected_result
     assert result.status_code == 201
 

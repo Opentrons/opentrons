@@ -13,7 +13,11 @@ from opentrons import __version__
 from opentrons.config import (
     feature_flags as ff,
 )
-from server_utils.audit.fastapi import build_audit_client, install_audit_client
+from server_utils.audit.fastapi import (
+    audit_logger_middleware,
+    build_audit_client,
+    install_audit_client,
+)
 from server_utils.auth.resource_server.fastapi import (
     build_authentication_checker,
     install_authentication_checker,
@@ -122,7 +126,10 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         install_authentication_checker(app.state, authentication_checker)
 
         audit_client = await exit_stack.enter_async_context(
-            build_audit_client(audit_server_uds=None, audit_server_url=None)
+            build_audit_client(
+                audit_server_uds=settings.audit_server_uds,
+                audit_server_url=settings.audit_server_url,
+            )
         )
         install_audit_client(app.state, audit_client)
 
@@ -200,7 +207,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+app.middleware("http")(audit_logger_middleware)
 app.middleware("http")(server_timing_middleware())
 
 # main router
