@@ -14,6 +14,7 @@ from typing_extensions import Literal
 
 from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_engine.types import EngineStatus
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -136,22 +137,23 @@ async def get_run_data_from_url(
     base_router.post,
     path="/maintenance_runs",
     summary="Create a maintenance run",
-    description=dedent(
-        """
+    description=dedent("""
         Create a new maintenance run to track robot interaction.
 
         If a maintenance run already exists, it will be cleared
         and a new one will be created.
 
         Will raise an error if a *protocol* run exists and is not idle.
-        """
-    ),
+        """),
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[MaintenanceRun]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[ProtocolRunIsActive]},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
+        Depends(get_audit_logger("create maintenance run")),
+    ],
 )
 async def create_run(
     run_data_manager: Annotated[
@@ -277,7 +279,10 @@ async def get_run(
         status.HTTP_200_OK: {"model": SimpleEmptyBody},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
+        Depends(get_audit_logger("delete maintenance run")),
+    ],
 )
 async def remove_run(
     runId: str,

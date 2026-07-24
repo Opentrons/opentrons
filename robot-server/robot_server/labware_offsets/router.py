@@ -7,7 +7,7 @@ from typing import Annotated, Literal
 import fastapi
 from pydantic.json_schema import SkipJsonSchema
 
-from server_utils.audit.fastapi import skip_audit_logger
+from server_utils.audit.fastapi import get_audit_logger, skip_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -54,7 +54,10 @@ router = LightRouter()
         depending on whether you provided a single offset or a list in the request body's `data`.
         """),
     status_code=201,
-    dependencies=[fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        fastapi.Depends(get_audit_logger("add labware offset")),
+    ],
 )
 async def post_labware_offsets(  # noqa: D103
     store: Annotated[LabwareOffsetStore, fastapi.Depends(get_labware_offset_store)],
@@ -195,7 +198,10 @@ async def search_labware_offsets(  # noqa: D103
     path="/labwareOffsets/{id}",
     summary="Delete a single labware offset",
     description="Delete a single labware offset. The deleted offset is returned.",
-    dependencies=[fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        fastapi.Depends(get_audit_logger("delete labware offset")),
+    ],
 )
 async def delete_labware_offset(  # noqa: D103
     store: Annotated[LabwareOffsetStore, fastapi.Depends(get_labware_offset_store)],
@@ -218,7 +224,10 @@ async def delete_labware_offset(  # noqa: D103
     router.delete,
     path="/labwareOffsets",
     summary="Delete all labware offsets",
-    dependencies=[fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        fastapi.Depends(get_audit_logger("delete all labware offsets")),
+    ],
 )
 async def delete_all_labware_offsets(  # noqa: D103
     store: Annotated[LabwareOffsetStore, fastapi.Depends(get_labware_offset_store)],

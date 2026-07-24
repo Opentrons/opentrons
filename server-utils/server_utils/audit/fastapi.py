@@ -127,17 +127,12 @@ async def audit_logger_middleware(
     """
     response, cached_exc = await _do_call(request, call_next)
 
-    # NOTE: This should be uncommented as soon as audit logging is implemented
-    # throughout robot server. That didn't happen in the commit in which it was
-    # added because that commit was to get this functionality in to parallelize
-    # further work. In the future, audit logger should only be added to a server
-    # when that server is ready for full integration.
-    # if not hasattr(request.state, "audit_logger"):
-    #     if request.method in MUTATING_HTTP_METHODS:
-    #         _log.error(
-    #             f"Request {request.method} {request.url.path} should add an audit log or explicitly skip audit logging but does not"
-    #         )
-    #     return await _return_or_raise(response, cached_exc)
+    if not hasattr(request.state, "audit_logger"):
+        if request.method in MUTATING_HTTP_METHODS:
+            _log.error(
+                f"Request {request.method} {request.url.path} should add an audit log or explicitly skip audit logging but does not"
+            )
+        return await _return_or_raise(response, cached_exc)
     if request.method not in MUTATING_HTTP_METHODS:
         return await _return_or_raise(response, cached_exc)
     audit_logger = getattr(request.state, "audit_logger", None)
