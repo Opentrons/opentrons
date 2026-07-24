@@ -185,8 +185,10 @@ async def test_get_attached_subsystem(
     thread_manager: ThreadManagedHardware,
     subsystem: SubSystem,
     decoy: Decoy,
+    mock_feature_flags: None,
 ) -> None:
     """It should return data for present subsystems."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
     subsystems_dict = _build_attached_subsystems({subsystem.to_hw()})
     status = subsystems_dict[subsystem.to_hw()]
     decoy.when(ot3_hardware_api.attached_subsystems).then_return(subsystems_dict)
