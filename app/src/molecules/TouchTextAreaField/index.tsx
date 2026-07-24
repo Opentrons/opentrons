@@ -74,7 +74,7 @@ export const TouchTextAreaField = forwardRef<
 
   const wrapperClasses = clsx(
     styles.wrapper,
-    error != null ? styles.warning_color : styles.default_color,
+    hasError ? styles.error_color : styles.default_color,
     rawDisabled === true && styles.disabled,
     multiline && styles.wrapper_multiline
   )
@@ -88,6 +88,7 @@ export const TouchTextAreaField = forwardRef<
 
   const labelClasses = clsx(
     styles.label_text,
+    hasError && styles.label_text_error,
     textAlign === 'center' ? styles.label_text_center : styles.label_text_left
   )
 

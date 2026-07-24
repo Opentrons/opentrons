@@ -9,6 +9,7 @@ export interface DocumentationRequiredModalContextType {
   showDocumentationRequiredModal: (
     username: string,
     actionsToDocument: DocumentedAction[],
+    minReportLength: number,
     onCancel?: () => void,
     initialDocreport?: DocumentationReport
   ) => Promise<DocumentationReport>
@@ -27,6 +28,7 @@ export const DocumentationRequiredModalContext =
     showDocumentationRequiredModal: (
       username: string,
       actionsToDocument: DocumentedAction[],
+      minReportLength: number,
       onCancel?: () => void,
       initialDocreport?: DocumentationReport
     ) => {

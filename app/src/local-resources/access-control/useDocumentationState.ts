@@ -51,9 +51,8 @@ export function useDocumentationState(
   const requireReasonForInteraction =
     auditSettingsQuery?.data?.data?.requireReasonForInteraction ?? false
 
-  // TODO(jj): add length check for documentation report
-  // const minLengthOfReasonForInteraction =
-  //   auditSettingsQuery?.data?.data?.minLengthOfReasonForInteraction ?? 0
+  const minLengthOfReasonForInteraction =
+    auditSettingsQuery?.data?.data?.minLengthOfReasonForInteraction ?? 0
 
   const reasonForInteractionLoading = useMemo(
     () => auditSettingsQuery?.isLoading || accessControlEnabledQuery?.isLoading,
@@ -93,6 +92,7 @@ export function useDocumentationState(
       const docResult = await requireDocumentation(
         username ?? '',
         providedActionsToDocument ?? actionsToDocument,
+        minLengthOfReasonForInteraction,
         handleCancel,
         initialDocreport
       )
@@ -103,6 +103,7 @@ export function useDocumentationState(
       currentRobotName,
       currentUsername,
       onPromptForDocumentation,
+      minLengthOfReasonForInteraction,
       providedActionsToDocument,
       requireDocumentation,
       requireLogin,

@@ -55,6 +55,7 @@ Notes:
 """
 
 import argparse
+import asyncio
 import re
 import subprocess
 import textwrap
@@ -266,7 +267,8 @@ def _get_property_from_barcode() -> Dict[PropId, Any]:
     return {PropId.SERIAL_NUMBER: robot_serial}
 
 
-def _main(args: argparse.Namespace, eeprom_api: EEPROMDriver) -> None:
+def main(args: argparse.Namespace, eeprom_api: EEPROMDriver) -> None:
+    """Provision the robot."""
     if eeprom_api.open() == -1:
         raise RuntimeError("Could not setup eeprom")
 
@@ -290,6 +292,19 @@ def _main(args: argparse.Namespace, eeprom_api: EEPROMDriver) -> None:
 
     # do something here
     print(f"Finished action ({args.action})")
+
+
+async def _main(args: argparse.Namespace) -> None:
+    eeprom_path = Path(f"/sys/bus/i2c/devices/{args.bus}-{args.address}/eeprom")
+    eeprom_api = await build_eeprom_driver(eeprom_path=eeprom_path)
+    try:
+        main(args, eeprom_api)
+    except Exception as e:
+        print(e)
+    finally:
+        eeprom_api._gpio.deactivate_eeprom_wp()
+        eeprom_api.close()
+        print("Exiting.")
 
 
 if __name__ == "__main__":
@@ -323,13 +338,4 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     stop_robot_server()
-    eeprom_path = Path(f"/sys/bus/i2c/devices/{args.bus}-{args.address}/eeprom")
-    eeprom_api = build_eeprom_driver(eeprom_path=eeprom_path)
-    try:
-        _main(args, eeprom_api)
-    except Exception as e:
-        print(e)
-    finally:
-        eeprom_api._gpio.deactivate_eeprom_wp()
-        eeprom_api.close()
-        print("Exiting.")
+    asyncio.run(_main(args))

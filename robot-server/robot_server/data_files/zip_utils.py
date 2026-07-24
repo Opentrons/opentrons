@@ -1,8 +1,6 @@
 """Shared helpers for building and streaming zip downloads."""
 
 import asyncio
-import logging
-import shutil
 import tempfile
 import zipfile
 from pathlib import Path
@@ -10,12 +8,13 @@ from typing import Callable, Final, List, Optional, Tuple, Union
 
 from opentrons import config
 from opentrons_shared_data.data_files import MimeType
+from server_utils.persistence.persistence_directory import (
+    ensure_persistence_temp_directory,
+)
 
 from .data_files_store import DataFilesStore
 from robot_server.protocols.protocol_store import ProtocolNotFoundError, ProtocolStore
 from robot_server.runs.run_store import BadRunResource, RunResource
-
-_log = logging.getLogger(__name__)
 
 _DOWNLOAD_STAGING_PREFIX: Final = "temp-download-staging-"
 _DOWNLOAD_ZIP_NAME: Final = "download.zip"
@@ -93,33 +92,14 @@ def collect_existing_run_output_csvs(
     return entries
 
 
-def create_download_staging_dir(staging_root: Path) -> tempfile.TemporaryDirectory[str]:
-    """Create a unique request-scoped staging directory under ``staging_root``."""
-    staging_root.mkdir(parents=True, exist_ok=True)
+def create_download_staging_dir(
+    persistence_root: Path,
+) -> tempfile.TemporaryDirectory[str]:
+    """Create a unique request-scoped staging directory under ``persistence_root/temp``."""
+    temp_directory = ensure_persistence_temp_directory(persistence_root)
     return tempfile.TemporaryDirectory(
-        prefix=_DOWNLOAD_STAGING_PREFIX, dir=str(staging_root)
+        prefix=_DOWNLOAD_STAGING_PREFIX, dir=str(temp_directory)
     )
-
-
-def cleanup_orphaned_download_staging_dirs(staging_root: Path) -> None:
-    """Delete abandoned ``temp-download-staging-*`` entries under ``staging_root``."""
-    if not staging_root.is_dir():
-        return
-
-    to_clean = (
-        entry
-        for entry in staging_root.iterdir()
-        if entry.name.startswith(_DOWNLOAD_STAGING_PREFIX)
-    )
-
-    for item in to_clean:
-        try:
-            if item.is_dir():
-                shutil.rmtree(item)
-            else:
-                item.unlink()
-        except Exception:
-            _log.warning(f"Error deleting {item.resolve()}.", exc_info=True)
 
 
 def _write_zip_file(entries: List[Tuple[Path, str]], zip_path: Path) -> None:
@@ -151,14 +131,14 @@ async def write_zip_for_download(
 
 async def create_zip_for_download(
     entries: List[Tuple[Path, str]],
-    staging_root: Path,
+    persistence_root: Path,
 ) -> Tuple[Path, Callable[[], None]]:
     """Create a staging directory, build a zip inside it, and return cleanup.
 
     Convenience wrapper for callers that do not need the scratch directory for
     anything other than the zip itself.
     """
-    temp_dir = create_download_staging_dir(staging_root)
+    temp_dir = create_download_staging_dir(persistence_root)
     try:
         zip_path = await write_zip_for_download(entries, Path(temp_dir.name))
     except Exception:

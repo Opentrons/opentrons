@@ -3,13 +3,12 @@ from typing import Annotated
 
 import fastapi
 
-from server_utils.auth.resource_server.authorization_checker import (
-    AuthorizationNotRequiredResult,
-)
 from server_utils.auth.resource_server.fastapi import (
-    RequireScopesResult,
+    RequireAuthenticationResult,
+    require_authentication,
     require_scopes,
 )
+from server_utils.auth.resource_server.types import AuthenticatedResult
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.models.json_api import (
     PydanticResponse,
@@ -178,9 +177,11 @@ async def update_user(
             user.username,
             now=now,
             new_username=update_data.username,
-            new_password=update_data.password.get_secret_value()
-            if update_data.password is not None
-            else None,
+            new_password=(
+                update_data.password.get_secret_value()
+                if update_data.password is not None
+                else None
+            ),
             new_full_name=update_data.fullName,
             new_account_type=update_data.accountType,
             new_locked=update_data.locked,
@@ -251,16 +252,17 @@ async def reset_user_password(
         " See the `/auth/oauth2` endpoints."
     ),
     responses={fastapi.status.HTTP_401_UNAUTHORIZED: {}},
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_READ_SELF))],
 )
 async def get_self(  # noqa: D103
-    authorization_details: Annotated[
-        RequireScopesResult, fastapi.Depends(require_scopes(Scope.USERS_READ_SELF))
+    authentication: Annotated[
+        RequireAuthenticationResult, fastapi.Depends(require_authentication)
     ],
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
-    if isinstance(authorization_details, AuthorizationNotRequiredResult):
+    if not isinstance(authentication, AuthenticatedResult):
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_401_UNAUTHORIZED,
             detail="This endpoint needs an access token to determine the current user.",
@@ -268,7 +270,7 @@ async def get_self(  # noqa: D103
 
     # Note: Does not use get_user_by_username. If the user passed require_scopes() but
     # we cannot find them here, that is a server bug and should surface as 500.
-    user = user_data_manager.get_user(authorization_details.username)
+    user = user_data_manager.get_user(authentication.username)
 
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
@@ -284,6 +286,7 @@ async def get_self(  # noqa: D103
         "Update the currently authenticated user, for example to set a new password "
         "when resetPassword is true."
     ),
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE_SELF))],
     responses={
         fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserResponse]},
         fastapi.status.HTTP_400_BAD_REQUEST: {
@@ -298,16 +301,15 @@ async def get_self(  # noqa: D103
 )
 async def update_self(
     request_body: RequestModel[UpdateSelf],
-    authorization_details: Annotated[
-        RequireScopesResult,
-        fastapi.Depends(require_scopes(Scope.USERS_WRITE_SELF)),
+    authentication: Annotated[
+        RequireAuthenticationResult, fastapi.Depends(require_authentication)
     ],
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Update the current user's profile and/or password."""
-    if isinstance(authorization_details, AuthorizationNotRequiredResult):
+    if not isinstance(authentication, AuthenticatedResult):
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_401_UNAUTHORIZED,
             detail="This endpoint needs an access token to determine the current user.",
@@ -322,17 +324,19 @@ async def update_self(
         return await PydanticResponse.create(
             status_code=fastapi.status.HTTP_200_OK,
             content=SimpleBody(
-                data=user_data_manager.get_user(authorization_details.username)
+                data=user_data_manager.get_user(authentication.username)
             ),
         )
 
     try:
         result = user_data_manager.update_user(
-            authorization_details.username,
+            authentication.username,
             new_username=update_data.username,
-            new_password=update_data.password.get_secret_value()
-            if update_data.password is not None
-            else None,
+            new_password=(
+                update_data.password.get_secret_value()
+                if update_data.password is not None
+                else None
+            ),
             new_full_name=update_data.fullName,
             now=datetime.datetime.now(tz=datetime.UTC),
         )

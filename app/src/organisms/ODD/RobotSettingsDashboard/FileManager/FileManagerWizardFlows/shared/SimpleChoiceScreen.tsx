@@ -6,26 +6,26 @@ import { SmallButton } from '/app/atoms/buttons'
 
 import styles from './shared.module.css'
 
-interface Choice {
-  value: string
+interface Choice<T> {
+  value: T
   label: string
 }
 
-interface SimpleChoiceScreenProps {
+interface SimpleChoiceScreenProps<T> {
   question: string
-  choices: Choice[]
-  selected: string | null
-  onSelect: (value: string) => void
+  choices: Array<Choice<T>>
+  selected: T | null
+  onSelect: (value: T) => void
   onContinue: () => void
 }
 
-export function SimpleChoiceScreen({
+export function SimpleChoiceScreen<T>({
   question,
   choices,
   selected,
   onSelect,
   onContinue,
-}: SimpleChoiceScreenProps): JSX.Element {
+}: SimpleChoiceScreenProps<T>): JSX.Element {
   const { t, i18n } = useTranslation('shared')
 
   return (
@@ -35,14 +35,14 @@ export function SimpleChoiceScreen({
           {question}
         </StyledText>
         <div className={styles.button_list}>
-          {choices.map(choice => (
+          {choices.map((choice, index) => (
             <RadioButton
-              key={choice.value}
+              key={index}
               buttonLabel={choice.label}
-              buttonValue={choice.value}
+              buttonValue={String(choice.value)}
               isSelected={selected === choice.value}
-              onChange={e => {
-                onSelect(e.target.value)
+              onChange={() => {
+                onSelect(choice.value)
               }}
             />
           ))}

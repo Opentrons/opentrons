@@ -85,13 +85,15 @@ export interface FlexStackerData {
   installDetected: boolean
   status: FlexStackerStatus
 }
+export type VacuumMode = 'pressure' | 'power'
+
 export interface VacuumModuleData {
   currentPressure: number | null
   targetPressure: number | null
   currentPower: number | null
   targetPower: number | null
   ventStatus: 'opened' | 'closed'
-  modeType: 'pressure' | 'power'
+  modeType: VacuumMode
   status: VacuumModuleStatus
 }
 export type TemperatureStatus =

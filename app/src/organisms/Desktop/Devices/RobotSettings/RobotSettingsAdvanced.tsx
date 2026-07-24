@@ -30,6 +30,7 @@ import {
   DeviceReset,
   DisableStackerSensors,
   DisplayRobotName,
+  EnableComplianceReadySoftware,
   EnableErrorRecoveryMode,
   EnableStatusLight,
   EnterRobotEncryptionKey,
@@ -170,6 +171,11 @@ export function RobotSettingsAdvanced({
         <RobotInformation robotName={robotName} />
         {featureFlags.accessControlMode ? (
           <>
+            <Divider marginY={SPACING.spacing16} />
+            <EnableComplianceReadySoftware
+              isRobotBusy={isRobotBusy}
+              robotName={robotName}
+            />
             <Divider marginY={SPACING.spacing16} />
             <EnterRobotEncryptionKey
             // Note: Unlike other buttons on this page,

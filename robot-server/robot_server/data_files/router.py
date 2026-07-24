@@ -52,7 +52,7 @@ from .zip_utils import (
 )
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
 from robot_server.persistence.fastapi_dependencies import (
-    get_active_persistence_directory,
+    get_persistence_directory_root,
 )
 from robot_server.protocols.protocol_store import ProtocolStore
 from robot_server.runs.dependencies import get_run_data_manager, get_run_store
@@ -576,7 +576,9 @@ async def download_run_images(
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     run_store: Annotated[RunStore, Depends(get_run_store)],
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
-    persistence_directory: Annotated[Path, Depends(get_active_persistence_directory)],
+    persistence_directory_root: Annotated[
+        Path, Depends(get_persistence_directory_root)
+    ],
 ) -> FileResponse:
     """Download all camera images for a run as a zip file.
 
@@ -585,7 +587,7 @@ async def download_run_images(
         data_files_store: Store for data files database access.
         run_store: Store for run data management.
         protocol_store: Store for protocol storage access.
-        persistence_directory: Persistence directory used for zip staging.
+        persistence_directory_root: Persistence directory used for zip staging.
     """
     existing_files = collect_existing_run_images(runId, data_files_store)
 
@@ -601,7 +603,7 @@ async def download_run_images(
         fallback_filename=f"{runId}_images.zip",
     )
     zip_path, cleanup = await create_zip_for_download(
-        existing_files, persistence_directory
+        existing_files, persistence_directory_root
     )
 
     return FileResponse(

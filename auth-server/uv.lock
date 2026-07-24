@@ -7,7 +7,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-05-12T02:44:52.590348Z"
+exclude-newer = "2026-07-16T20:59:26.606674Z"
 exclude-newer-span = "P1W"
 
 [manifest]
@@ -1723,6 +1723,7 @@ dev = [
     { name = "pytest-asyncio", specifier = ">=1,<2" },
     { name = "pytest-cov", specifier = "==4.1.0" },
     { name = "pytest-xdist", specifier = "~=2.5.0" },
+    { name = "python-multipart", specifier = "==0.0.28" },
     { name = "requests", specifier = "==2.31.0" },
     { name = "ruff", specifier = "==0.14.10" },
     { name = "setuptools", specifier = "==80.9.0" },
