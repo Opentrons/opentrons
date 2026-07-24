@@ -2,8 +2,8 @@ import last from 'lodash/last'
 
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 import {
-  getLabwareDefURI,
   getLabwareDefinitionsByURIForProtocol,
+  getLabwareDefURI,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
 
