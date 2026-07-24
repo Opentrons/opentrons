@@ -33,7 +33,7 @@ from opentrons.util.performance_helpers import TrackingFunctions
 from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons_shared_data.robot.types import RobotType
 from server_utils.audit.audit_logger import AuditLogger
-from server_utils.audit.fastapi import get_audit_logger
+from server_utils.audit.fastapi import get_audit_logger, skip_audit_logger
 from server_utils.auth.resource_server.fastapi import (
     get_access_control_status,
     require_scopes,
@@ -766,6 +766,7 @@ async def delete_protocol_by_id(
         status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorBody[FileIdNotFound]},
         status.HTTP_503_SERVICE_UNAVAILABLE: {"model": ErrorBody[LastAnalysisPending]},
     },
+    dependencies=[Depends(skip_audit_logger)],
 )
 async def create_protocol_analysis(
     protocolId: str,
@@ -775,7 +776,6 @@ async def create_protocol_analysis(
     data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     analysis_id: Annotated[str, Depends(get_unique_id, use_cache=False)],
-    audit_logger: Annotated[AuditLogger, Depends(get_audit_logger())],
     access_control_status: Annotated[bool, Depends(get_access_control_status)],
     request_body: Optional[RequestModel[AnalysisRequest]] = None,
 ) -> PydanticResponse[SimpleMultiBody[AnalysisSummary]]:

@@ -1740,7 +1740,6 @@ async def test_create_protocol_analyses_with_same_rtp_values(
     data_files_store: DataFilesStore,
     data_files_directory: Path,
     analyses_manager: AnalysesManager,
-    audit_logger: AuditLogger,
 ) -> None:
     """It should not start a new analysis for the new rtp values."""
     rtp_values: PrimitiveRunTimeParamValuesType = {
@@ -1822,7 +1821,6 @@ async def test_create_protocol_analyses_with_same_rtp_values(
         analyses_manager=analyses_manager,
         analysis_id="analysis-id-2",
         access_control_status=False,
-        audit_logger=audit_logger,
     )
     assert result.content.data == analysis_summaries
     assert result.status_code == 200
@@ -1834,7 +1832,6 @@ async def test_update_protocol_analyses_with_new_rtp_values(
     analysis_store: AnalysisStore,
     data_files_store: DataFilesStore,
     analyses_manager: AnalysesManager,
-    audit_logger: AuditLogger,
 ) -> None:
     """It should start a new analysis for the new rtp values."""
     rtp_values: PrimitiveRunTimeParamValuesType = {
@@ -1951,7 +1948,6 @@ async def test_update_protocol_analyses_with_new_rtp_values(
         data_files_directory=Path("/dev/null"),
         analysis_id="analysis-id-2",
         access_control_status=False,
-        audit_logger=audit_logger,
     )
     assert result.content.data == [
         AnalysisSummary(id="analysis-id", status=AnalysisStatus.COMPLETED),
@@ -1971,7 +1967,6 @@ async def test_update_protocol_analyses_with_forced_reanalysis(
     data_files_store: DataFilesStore,
     data_files_directory: Path,
     analyses_manager: AnalysesManager,
-    audit_logger: AuditLogger,
 ) -> None:
     """It should start a new analysis for the protocol, regardless of rtp values."""
     analysis_summaries = [
@@ -2035,7 +2030,6 @@ async def test_update_protocol_analyses_with_forced_reanalysis(
         analyses_manager=analyses_manager,
         analysis_id="analysis-id-2",
         access_control_status=False,
-        audit_logger=audit_logger,
     )
     assert result.content.data == [
         AnalysisSummary(id="analysis-id", status=AnalysisStatus.COMPLETED),
