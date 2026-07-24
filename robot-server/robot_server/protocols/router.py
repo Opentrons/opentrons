@@ -239,7 +239,9 @@ async def create_protocol(  # noqa: C901
     ],
     audit_logger: Annotated[
         AuditLogger,
-        Depends(get_audit_logger(action="protocol upload", message_style="auto-head")),
+        Depends(
+            get_audit_logger(action="protocol upload", auto_log_request_body=False)
+        ),
     ],
     access_control_status: Annotated[bool, Depends(get_access_control_status)],
     files: List[UploadFile] = File(...),
@@ -352,9 +354,6 @@ async def create_protocol(  # noqa: C901
             if protocol.protocol_kind == ProtocolKind.QUICK_TRANSFER
         ]
         if len(quick_transfer_protocols) >= maximum_quick_transfer_protocols:
-            audit_logger.append_message_chunk(
-                f"failed because this is a quick transfer protocol and there are {len(quick_transfer_protocols)} already (max: {maximum_quick_transfer_protocols})"
-            )
             raise HTTPException(
                 status_code=409, detail="Maximum quick transfer protocols exceeded"
             )
@@ -370,9 +369,6 @@ async def create_protocol(  # noqa: C901
             for name, file_id in parsed_rtp_files.items()
         }
     except FileIdNotFoundError as e:
-        audit_logger.append_message_chunk(
-            f"failed because runtime parameter file was not found: {e}"
-        )
         raise FileIdNotFound(detail=str(e)).as_error(
             status.HTTP_422_UNPROCESSABLE_ENTITY
         )
@@ -402,9 +398,6 @@ async def create_protocol(  # noqa: C901
                     access_control_status=access_control_status,
                 )
             except AnalysisIsPendingError as error:
-                audit_logger.append_message_chunk(
-                    f"failed because analysis is still pending: {error}"
-                )
                 raise LastAnalysisPending(detail=str(error)).as_error(
                     status.HTTP_503_SERVICE_UNAVAILABLE
                 ) from error
@@ -449,7 +442,6 @@ async def create_protocol(  # noqa: C901
             content_hash=content_hash,
         )
     except ProtocolFilesInvalidError as e:
-        audit_logger.append_message_chunk(f"failed because a file was invalid: {e}")
         raise ProtocolFilesInvalid(detail=str(e)).as_error(
             status.HTTP_422_UNPROCESSABLE_ENTITY
         ) from e
@@ -457,9 +449,6 @@ async def create_protocol(  # noqa: C901
     if source.robot_type != robot_type:
         # fixme(mm, 2025-10-06): Since `source` has already been saved to the filesystem,
         # this will leave permanent stray files inside `protocol_directory`.
-        audit_logger.append_message_chunk(
-            f"failed because this is a {source.robot_type} protocol but this is a {robot_type} robot"
-        )
         raise ProtocolRobotTypeMismatch(
             detail=(
                 f"This protocol is for {user_facing_robot_type(source.robot_type)} robots."

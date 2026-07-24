@@ -16,7 +16,7 @@ from fastapi import Depends
 from starlette.requests import Request
 from starlette.responses import Response
 
-from .audit_logger import AuditLogger, MessageStyle
+from .audit_logger import AuditLogger
 from .audit_server import Client, LocalHTTPClient, NoOpClient
 from server_utils.auth.resource_server.fastapi import (
     RequireAuthenticationResult,
@@ -101,8 +101,21 @@ async def _return_or_raise(
 ) -> Response:
     if exc is not None:
         raise exc
-    assert response is not None, "UNexpected lack of response in logging"
+    assert response is not None, "Unexpected lack of response in logging"
     return response
+
+
+async def _handle_autolog(
+    audit_logger: AuditLogger, request: Request, response: Response | None
+) -> None:
+    if audit_logger.auto_log_request_head:
+        audit_logger.append_request_head_to_message(request)
+    if audit_logger.auto_log_request_body:
+        await audit_logger.append_request_body_to_message(request)
+    if audit_logger.auto_log_response_head:
+        audit_logger.append_response_head_to_message(response)
+    if audit_logger.auto_log_response_body:
+        audit_logger.append_response_body_to_message(response)
 
 
 async def audit_logger_middleware(
@@ -130,10 +143,8 @@ async def audit_logger_middleware(
         )
         return await _return_or_raise(response, cached_exc)
 
-    if audit_logger.message_style == "auto":
-        await audit_logger.append_message_from_request_response(request, response)
-    elif audit_logger.message_style == "auto-head":
-        audit_logger.append_message_from_request_response_head(request, response)
+    await _handle_autolog(audit_logger, request, response)
+
     try:
         _log.debug("Sending audit log")
         await audit_logger.log()
@@ -149,9 +160,12 @@ async def audit_logger_middleware(
 
 
 def get_audit_logger(
-    *,
     action: str | None = None,
-    message_style: MessageStyle = "auto",
+    *,
+    auto_log_request_head: bool = True,
+    auto_log_request_body: bool = True,
+    auto_log_response_head: bool = True,
+    auto_log_response_body: bool = True,
 ) -> Callable[..., Awaitable[AuditLogger]]:
     """A FastAPI dependency to log actions to the audit log.
 
@@ -186,22 +200,21 @@ def get_audit_logger(
     If action is a string, that string is used; otherwise, the action is automatically
     generated from the route. If you write your own action, keep it short.
 
-    If message is 'auto', details of the route will be logged. This is probably the right
-    choice for simple routes that do not have large request or response bodies - robot
-    control endpoints, DELETE endpoints. If message is auto, the request handler does not
-    need to do anything further to have an acceptable audit record preserved. Note that
-    only the first 1MB of request and response body is logged; if you need more than this,
-    use auto-head or manual.
+    The other arguments control automatic logging of other parts of the request.
 
-    If message is 'auto-head', the head of the request and response (i.e. everything but
-    the bodies) will be logged. This is probably the right choice for most routes that
-    cannot use auto because their bodies are too big. The request handler should call
-    set_request_body_message_chunk and set_response_body_message_chunk while it is running.
-    Note that each of these functions will truncate input larger than 1MB.
+    You usually can keep auto_log_request_head and auto_log_response_head on; these
+    log headers, status codes, routes, paths, and anything that don't require bodies.
 
-    If message is 'manual', no element of the message will be automatically added. The
-    route handler should call append_message_chunk() in the body of the request (or other
-    AuditLogger methods).
+    You should turn off auto_log_request_body and do it yourself via append_message_chunk
+    if the route handles large request bodies for which there are better summaries than
+    the first 1K of the request body itself. You can leave it on if request bodies are
+    small or if there's never a request body (for instance, DELETE routes).
+
+    You should turn off auto_log_response_body and do it yourself via append_message_chunk
+    if the route handles large response bodies for which there are better summaries than
+    the first 1K.
+
+    In any case, use append_request_chunk to add more logging to a route.
     """
 
     async def dependency(
@@ -213,7 +226,11 @@ def get_audit_logger(
         ],
     ) -> AuditLogger:
         audit_logger = AuditLogger(
-            audit_client=audit_client, message_style=message_style
+            audit_client=audit_client,
+            auto_log_request_head=auto_log_request_head,
+            auto_log_response_head=auto_log_response_head,
+            auto_log_request_body=auto_log_request_body,
+            auto_log_response_body=auto_log_response_body,
         )
         if action is not None:
             audit_logger.set_action(action)

@@ -31,19 +31,31 @@ def mock_client(decoy: Decoy) -> Client:
     return decoy.mock(cls=Client)
 
 
-@pytest.fixture(params=["auto", "auto-head", "manual"])
+@pytest.fixture
 def subject(mock_client: Client, request: pytest.FixtureRequest) -> AuditLogger:
     """An audit logger."""
-    return AuditLogger(audit_client=mock_client, message_style=request.param or "auto")
+    return AuditLogger(
+        audit_client=mock_client,
+        auto_log_request_head=True,
+        auto_log_response_head=True,
+        auto_log_request_body=True,
+        auto_log_response_body=True,
+    )
 
 
-@pytest.fixture(params=["auto", "auto-head", "manual"])
+@pytest.fixture
 def parametrized_subject(
     mock_client: Client, request: pytest.FixtureRequest
 ) -> AuditLogger:
     """A subject with non-message fields prefilled."""
     return (
-        AuditLogger(audit_client=mock_client, message_style=request.param or "auto")
+        AuditLogger(
+            audit_client=mock_client,
+            auto_log_request_head=True,
+            auto_log_response_head=True,
+            auto_log_request_body=True,
+            auto_log_response_body=True,
+        )
         .set_action("a")
         .set_username("u")
         .set_fullname("f")

@@ -26,9 +26,12 @@ class AuditLogger:
 
     def __init__(
         self,
-        *,
         audit_client: AuditClient,
-        message_style: MessageStyle,
+        *,
+        auto_log_request_head: bool,
+        auto_log_response_head: bool,
+        auto_log_request_body: bool,
+        auto_log_response_body: bool,
     ) -> None:
         self._audit_client = audit_client
         self._action: str | None = None
@@ -36,7 +39,10 @@ class AuditLogger:
         self._username: str | None = None
         self._fullname: str | None = None
         self._user_note: str | None = None
-        self.message_style = message_style
+        self.auto_log_request_head = auto_log_request_head
+        self.auto_log_response_head = auto_log_response_head
+        self.auto_log_request_body = auto_log_request_body
+        self.auto_log_response_body = auto_log_response_body
         self.did_log = False
         self.should_log = True
 
@@ -225,31 +231,6 @@ class AuditLogger:
         self._message_chunks.append(
             f"Response body: {self._decode_body(response.body, response.headers['content-type'])}"
         )
-        return self
-
-    async def append_message_from_request_response(
-        self: Self, request: Request, response: Response | None
-    ) -> Self:
-        """Set the message to log based on the HTTP transaction.
-
-        This will be a stringification of the route's path params and body, and where
-        possible the result.
-
-        For more, see append_request_head_to_message, append_request_body_to_message,
-        append_response_head_to_message, and append_response_body_to_message.
-        """
-        self.append_message_from_request_response_head(request, response)
-        await self.append_request_body_to_message(request)
-        self.append_response_body_to_message(response)
-
-        return self
-
-    def append_message_from_request_response_head(
-        self: Self, request: Request, response: Response | None
-    ) -> Self:
-        """Set the message to log based on the non-body parts of the HTTP transaction."""
-        self.append_request_head_to_message(request)
-        self.append_response_head_to_message(response)
         return self
 
     def append_message_chunk(self: Self, chunk: str) -> Self:
