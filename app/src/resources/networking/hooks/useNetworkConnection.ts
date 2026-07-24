@@ -21,10 +21,7 @@ export function useNetworkConnection(robotName: string): NetworkConnection {
   let connectionStatus: string = ''
   let iconName: 'wifi' | 'usb' | 'ethernet' | null = null
   const list = useWifiList(robotName, CONNECTION_POLL_MS)
-  const { wifi, ethernet } = useNetworkInterfaces(
-    robotName,
-    CONNECTION_POLL_MS
-  )
+  const { wifi, ethernet } = useNetworkInterfaces(robotName, CONNECTION_POLL_MS)
   const activeSsid = list.find(nw => nw.active)?.ssid
 
   const isWifiConnected = wifi?.ipAddress != null

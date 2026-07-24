@@ -2,10 +2,7 @@ import find from 'lodash/find'
 import map from 'lodash/map'
 import { long2ip } from 'netmask'
 
-import {
-  INTERFACE_ETHERNET,
-  INTERFACE_WIFI,
-} from '@opentrons/api-client'
+import { INTERFACE_ETHERNET, INTERFACE_WIFI } from '@opentrons/api-client'
 import { useNetworkingStatusQuery } from '@opentrons/react-api-client'
 
 import { useRobot } from '/app/redux-resources/robots'

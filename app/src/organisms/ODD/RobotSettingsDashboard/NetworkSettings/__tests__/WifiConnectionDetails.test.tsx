@@ -60,12 +60,10 @@ describe('WifiConnectionDetails', () => {
     vi.mocked(getLocalRobot).mockReturnValue({
       name: ROBOT_NAME,
     } as any)
-    when(useNetworkInterfaces)
-      .calledWith(ROBOT_NAME)
-      .thenReturn({
-        wifi: initialMockWifi,
-        ethernet: null,
-      })
+    when(useNetworkInterfaces).calledWith(ROBOT_NAME).thenReturn({
+      wifi: initialMockWifi,
+      ethernet: null,
+    })
     when(useWifiList).calledWith(ROBOT_NAME, 5000).thenReturn([])
     vi.mocked(NetworkDetailsModal).mockReturnValue(
       <div>mock NetworkDetailsModal</div>

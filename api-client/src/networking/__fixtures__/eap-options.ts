@@ -1,8 +1,4 @@
-import {
-  AUTH_TYPE_FILE,
-  AUTH_TYPE_PASSWORD,
-  AUTH_TYPE_STRING,
-} from '../types'
+import { AUTH_TYPE_FILE, AUTH_TYPE_PASSWORD, AUTH_TYPE_STRING } from '../types'
 
 import type { EapOption, WifiAuthField } from '../types'
 

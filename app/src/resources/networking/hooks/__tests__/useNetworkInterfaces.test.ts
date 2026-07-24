@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  mockEthernetInterface,
-  mockWifiInterface,
-} from '@opentrons/api-client'
+import { mockEthernetInterface, mockWifiInterface } from '@opentrons/api-client'
 
 import { getInterfaceStatusByType } from '../useNetworkInterfaces'
 

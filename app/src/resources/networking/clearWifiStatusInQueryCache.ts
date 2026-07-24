@@ -2,7 +2,10 @@ import { INTERFACE_WIFI } from '@opentrons/api-client'
 import { networkingStatusQueryKey } from '@opentrons/react-api-client'
 
 import type { QueryClient } from 'react-query'
-import type { HostConfig, NetworkingStatusResponse } from '@opentrons/api-client'
+import type {
+  HostConfig,
+  NetworkingStatusResponse,
+} from '@opentrons/api-client'
 
 function getWifiInterfaceKey(
   networkingStatus: NetworkingStatusResponse | undefined

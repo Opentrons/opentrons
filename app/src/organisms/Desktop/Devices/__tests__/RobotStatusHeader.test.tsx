@@ -27,8 +27,8 @@ import { RobotStatusHeader } from '../RobotStatusHeader'
 
 import type { ComponentProps } from 'react'
 import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'
-import type { SimpleInterfaceStatus } from '/app/resources/networking/hooks'
 import type { State } from '/app/redux/types'
+import type { SimpleInterfaceStatus } from '/app/resources/networking/hooks'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/shell/remote', () => ({

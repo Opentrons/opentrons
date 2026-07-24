@@ -26,7 +26,10 @@ import { useDocumentationState } from '/app/local-resources/access-control/useDo
 import { useRobot } from '/app/redux-resources/robots'
 import { CONNECTABLE } from '/app/redux/discovery'
 import { clearWifiStatusInQueryCache } from '/app/resources/networking'
-import { useNetworkInterfaces, useWifiList } from '/app/resources/networking/hooks'
+import {
+  useNetworkInterfaces,
+  useWifiList,
+} from '/app/resources/networking/hooks'
 
 export interface DisconnectModalProps {
   onCancel: () => unknown

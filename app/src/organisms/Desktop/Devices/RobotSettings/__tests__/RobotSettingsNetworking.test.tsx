@@ -93,7 +93,9 @@ describe('RobotSettingsNetworking', () => {
 
   beforeEach(() => {
     vi.mocked(useWifiKeysQuery).mockReturnValue({ data: { keys: [] } } as any)
-    vi.mocked(useEapOptionsQuery).mockReturnValue({ data: { options: [] } } as any)
+    vi.mocked(useEapOptionsQuery).mockReturnValue({
+      data: { options: [] },
+    } as any)
     vi.mocked(usePostWifiConfigureMutation).mockReturnValue({
       postWifiConfigure: vi.fn(),
       mutate: vi.fn(),
@@ -116,12 +118,10 @@ describe('RobotSettingsNetworking', () => {
           healthStatus: HEALTH_STATUS_OK,
         } as DiscoveryClientRobotAddress,
       ])
-    when(useNetworkInterfaces)
-      .calledWith(ROBOT_NAME, 5000)
-      .thenReturn({
-        wifi: initialMockWifi,
-        ethernet: initialMockEthernet,
-      })
+    when(useNetworkInterfaces).calledWith(ROBOT_NAME, 5000).thenReturn({
+      wifi: initialMockWifi,
+      ethernet: initialMockEthernet,
+    })
 
     when(useWifiList).calledWith(ROBOT_NAME, 10000).thenReturn(mockWifiList)
 
@@ -261,12 +261,10 @@ describe('RobotSettingsNetworking', () => {
       macAddress: '00:00:00:00:00:00',
       type: INTERFACE_ETHERNET,
     }
-    when(useNetworkInterfaces)
-      .calledWith(ROBOT_NAME, 5000)
-      .thenReturn({
-        wifi: null,
-        ethernet: mockWiredUSB,
-      })
+    when(useNetworkInterfaces).calledWith(ROBOT_NAME, 5000).thenReturn({
+      wifi: null,
+      ethernet: mockWiredUSB,
+    })
     when(getRobotAddressesByName)
       .calledWith({} as State, ROBOT_NAME)
       .thenReturn([
@@ -298,12 +296,10 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should render Wi-Fi and Wired USB are not connected for OT-2', () => {
-    when(useNetworkInterfaces)
-      .calledWith(ROBOT_NAME, 5000)
-      .thenReturn({
-        wifi: null,
-        ethernet: null,
-      })
+    when(useNetworkInterfaces).calledWith(ROBOT_NAME, 5000).thenReturn({
+      wifi: null,
+      ethernet: null,
+    })
     when(useWifiList).calledWith(ROBOT_NAME).thenReturn([])
     render()
 

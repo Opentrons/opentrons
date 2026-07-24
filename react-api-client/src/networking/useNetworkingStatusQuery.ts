@@ -5,7 +5,10 @@ import { getNetworkingStatus } from '@opentrons/api-client'
 import { getQueryKey, useHost } from '../api'
 
 import type { QueryKey, UseQueryOptions, UseQueryResult } from 'react-query'
-import type { HostConfig, NetworkingStatusResponse } from '@opentrons/api-client'
+import type {
+  HostConfig,
+  NetworkingStatusResponse,
+} from '@opentrons/api-client'
 
 export type UseNetworkingStatusQueryOptions =
   UseQueryOptions<NetworkingStatusResponse>

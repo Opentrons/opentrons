@@ -49,12 +49,7 @@ export function WifiConnectStatus({
         selectedAuthType === 'none' ? 'SelectAuthType' : 'SetWifiCred'
       )
     }
-  }, [
-    isDocumentedCancel,
-    resetConfigure,
-    selectedAuthType,
-    setCurrentOption,
-  ])
+  }, [isDocumentedCancel, resetConfigure, selectedAuthType, setCurrentOption])
 
   if (isDocumentedCancel) {
     return null
