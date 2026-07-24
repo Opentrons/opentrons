@@ -1,5 +1,8 @@
+export { getEapOptions } from './getEapOptions'
+export { getNetworkingStatus } from './getNetworkingStatus'
 export { getWifiKeys } from './getWifiKeys'
 export { getWifiList } from './getWifiList'
+export { postWifiConfigure } from './postWifiConfigure'
 export { postWifiDisconnect } from './postWifiDisconnect'
 export { postWifiKeys } from './postWifiKeys'
 
