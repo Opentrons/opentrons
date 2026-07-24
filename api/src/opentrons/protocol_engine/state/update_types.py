@@ -406,7 +406,8 @@ class VacuumModuleStateUpdate:
 
     module_id: str
     pump_engaged: bool | NoChangeType = NO_CHANGE
-    target_pressure: float | NoChangeType = NO_CHANGE
+    residual_vacuum: bool | NoChangeType = NO_CHANGE
+    target_pressure: float | None | NoChangeType = NO_CHANGE
 
     @classmethod
     def create_or_override(
@@ -999,6 +1000,18 @@ class StateUpdate:
                 self.vacuum_module_state_update, module_id
             ),
             pump_engaged=pump_engaged,
+        )
+        return self
+
+    def update_vacuum_module_residual_vacuum(
+        self, module_id: str, residual_vacuum: bool
+    ) -> Self:
+        """Set whether the chamber is modeled as still under vacuum."""
+        self.vacuum_module_state_update = dataclasses.replace(
+            VacuumModuleStateUpdate.create_or_override(
+                self.vacuum_module_state_update, module_id
+            ),
+            residual_vacuum=residual_vacuum,
         )
         return self
 

@@ -359,7 +359,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 pool_height=0,
             ),
             ModuleModel.is_vacuum_module: VacuumModuleSubState(
-                module_id=VacuumModuleId(module_id), pump_engaged=False
+                module_id=VacuumModuleId(module_id),
+                pump_engaged=False,
+                residual_vacuum=False,
             ),
         }
 

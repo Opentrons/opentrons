@@ -80,9 +80,17 @@ async def test_open_vent_waits_to_equalize(
         vm_hardware
     )
 
-    await subject.execute(data)
+    result = await subject.execute(data)
 
     decoy.verify(
         await vm_hardware.set_vent_state(VentState.OPENED),
         await vm_hardware.wait_for_pressure_equalization(30),
+    )
+    expected_state_update = update_types.StateUpdate()
+    expected_state_update.update_vacuum_module_residual_vacuum(
+        "input-vacuum-id", residual_vacuum=False
+    )
+    assert result == SuccessData(
+        public=vm_commands.OpenVentResult(),
+        state_update=expected_state_update,
     )
