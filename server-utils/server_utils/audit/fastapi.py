@@ -52,9 +52,9 @@ def get_audit_client(
     Endpoints can take this as a dependency to submit audit log messages.
     """
     client = _audit_client_accessor.get_from(app_state)
-    assert client is not None, (
-        "Forgot to initialize audit client as part of server startup?"
-    )
+    assert (
+        client is not None
+    ), "Forgot to initialize audit client as part of server startup?"
     return client
 
 
@@ -131,12 +131,15 @@ async def audit_logger_middleware(
     if not hasattr(request.state, "audit_logger"):
         if request.method in MUTATING_HTTP_METHODS:
             _log.error(
-                f"Request {request.method} {request.url.path} should add an audit log but does not"
+                f"Request {request.method} {request.url.path} should add an audit log or explicitly skip audit logging but does not"
             )
         return await _return_or_raise(response, cached_exc)
     if request.method not in MUTATING_HTTP_METHODS:
         return await _return_or_raise(response, cached_exc)
-    audit_logger = cast(AuditLogger, request.state.audit_logger)
+    audit_logger = request.state.audit_logger
+    if not isinstance(audit_logger, AuditLogger):
+        _log.debug("not logging because request skipped with skip_audit_logger")
+        await _return_or_raise(response, cached_exc)
     if audit_logger.did_log or not audit_logger.should_log:
         _log.info(
             f"not logging: did_log={audit_logger.did_log}, should_log={audit_logger.should_log}"
@@ -157,6 +160,17 @@ async def audit_logger_middleware(
             raise
     assert response is not None, "Unexpected lack of response in logging"
     return response
+
+
+class SkipLoggingSentinel:
+    """If present as the audit_logger of a request causes logging to be skipped."""
+
+    pass
+
+
+def skip_audit_logger(request: Request) -> None:
+    """Take this as a FastAPI dependency in a route to mark the route as not requiring logging."""
+    request.state.audit_logger = SkipLoggingSentinel()
 
 
 def get_audit_logger(
