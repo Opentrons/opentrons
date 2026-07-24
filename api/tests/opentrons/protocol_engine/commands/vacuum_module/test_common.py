@@ -21,7 +21,6 @@ from opentrons.protocol_engine.commands.vacuum_module.common import (
     VacuumPressureNotReachedError,
     defined_error_data_from_task_error,
     handle_recoverable_vacuum_error,
-    will_equalize_after_operation,
 )
 from opentrons.protocol_engine.errors import ErrorOccurrence
 from opentrons.protocol_engine.resources import ModelUtils
@@ -191,25 +190,3 @@ def test_handle_recoverable_vacuum_error_populates_operation_error_info_from_hw_
         "target": -100.0,
         "current": -80.0,
     }
-
-
-def test_will_equalize_after_operation() -> None:
-    """It should only clear residual vacuum when equalize is explicitly requested."""
-    assert will_equalize_after_operation(
-        vent_after=True, equalize_timeout=30, duration=10
-    )
-    assert not will_equalize_after_operation(
-        vent_after=True, equalize_timeout=None, duration=10
-    )
-    assert not will_equalize_after_operation(
-        vent_after=False, equalize_timeout=30, duration=10
-    )
-    assert not will_equalize_after_operation(
-        vent_after=True, equalize_timeout=30, duration=None
-    )
-    assert will_equalize_after_operation(
-        vent_after=True, equalize_timeout=30, require_duration=False
-    )
-    assert not will_equalize_after_operation(
-        vent_after=True, equalize_timeout=0, duration=10
-    )

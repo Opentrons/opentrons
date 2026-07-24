@@ -122,6 +122,7 @@ export const RECOMMENDED_LABWARE_BY_MODULE: {
     'opentrons_flex_96_filtertiprack_1000ul',
     'opentrons_flex_96_filtertiprack_200ul',
     'opentrons_flex_96_filtertiprack_50ul',
+    'opentrons_flex_96_filtertiprack_20ul',
     'opentrons_flex_96_tiprack_1000ul',
     'opentrons_flex_96_tiprack_200ul',
     'opentrons_flex_96_tiprack_50ul',

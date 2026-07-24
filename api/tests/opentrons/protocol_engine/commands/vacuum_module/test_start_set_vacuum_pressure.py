@@ -100,10 +100,6 @@ async def test_start_set_vacuum_presure(
 
     expected_state_update = update_types.StateUpdate()
     expected_state_update.update_vacuum_module_pump_engaged("input-vacuum-id", False)
-    # No equalizeTimeout → residual vacuum remains (vent without wait)
-    expected_state_update.update_vacuum_module_residual_vacuum(
-        "input-vacuum-id", residual_vacuum=True
-    )
 
     assert result == SuccessData(
         public=expected_result,

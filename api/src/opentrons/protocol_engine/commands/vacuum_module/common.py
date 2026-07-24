@@ -272,23 +272,3 @@ def defined_error_data_from_enumerated_error(
         model_utils,
         state_update_if_false_positive=state_update_if_false_positive,
     )
-
-
-def will_equalize_after_operation(
-    *,
-    vent_after: bool,
-    equalize_timeout: int | None,
-    duration: int | None = None,
-    require_duration: bool = True,
-) -> bool:
-    """Whether the operation is expected to clear residual chamber vacuum.
-
-    Residual vacuum is cleared only when the command both vents and waits for
-    equalization (``equalize_timeout`` is not ``None``). Omitting the timeout
-    means do not wait.
-    """
-    if equalize_timeout is None or not vent_after:
-        return False
-    if require_duration and duration is None:
-        return False
-    return equalize_timeout > 0

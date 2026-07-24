@@ -96,11 +96,7 @@ async def test_ensure_vacuum_module_is_idle_raises_when_pump_engaged(
     decoy.when(
         state_store.modules.get_vacuum_module_substate(module_id="vacuum-id")
     ).then_return(
-        VacuumModuleSubState(
-            module_id=VacuumModuleId("vacuum-id"),
-            pump_engaged=True,
-            residual_vacuum=True,
-        )
+        VacuumModuleSubState(module_id=VacuumModuleId("vacuum-id"), pump_engaged=True)
     )
 
     with pytest.raises(VacuumModuleUnderVacuumError, match="pump engaged"):
@@ -126,11 +122,7 @@ async def test_ensure_vacuum_module_is_idle_raises_when_pressure_not_equalized(
     decoy.when(
         state_store.modules.get_vacuum_module_substate(module_id="vacuum-id")
     ).then_return(
-        VacuumModuleSubState(
-            module_id=VacuumModuleId("vacuum-id"),
-            pump_engaged=False,
-            residual_vacuum=False,
-        )
+        VacuumModuleSubState(module_id=VacuumModuleId("vacuum-id"), pump_engaged=False)
     )
     decoy.when(
         state_store.modules.get_serial_number(module_id="vacuum-id")
@@ -172,11 +164,7 @@ async def test_ensure_vacuum_module_is_idle_noops_when_pressure_equalized(
     decoy.when(
         state_store.modules.get_vacuum_module_substate(module_id="vacuum-id")
     ).then_return(
-        VacuumModuleSubState(
-            module_id=VacuumModuleId("vacuum-id"),
-            pump_engaged=False,
-            residual_vacuum=False,
-        )
+        VacuumModuleSubState(module_id=VacuumModuleId("vacuum-id"), pump_engaged=False)
     )
     decoy.when(
         state_store.modules.get_serial_number(module_id="vacuum-id")
@@ -200,7 +188,7 @@ async def test_ensure_vacuum_module_is_idle_skips_hardware_check_for_virtual_mod
     subject: VacuumModuleMovementFlagger,
     state_store: StateStore,
 ) -> None:
-    """It should not query hardware when using virtual modules and residual is clear."""
+    """It should not query hardware when using virtual modules."""
     decoy.when(state_store.config).then_return(
         Config(
             robot_type="OT-3 Standard",
@@ -211,42 +199,9 @@ async def test_ensure_vacuum_module_is_idle_skips_hardware_check_for_virtual_mod
     decoy.when(
         state_store.modules.get_vacuum_module_substate(module_id="vacuum-id")
     ).then_return(
-        VacuumModuleSubState(
-            module_id=VacuumModuleId("vacuum-id"),
-            pump_engaged=False,
-            residual_vacuum=False,
-        )
+        VacuumModuleSubState(module_id=VacuumModuleId("vacuum-id"), pump_engaged=False)
     )
 
     await subject.ensure_vacuum_module_is_idle(
         labware_parent=ModuleLocation(moduleId="vacuum-id")
     )
-
-
-async def test_ensure_vacuum_module_is_idle_raises_virtual_residual_vacuum(
-    decoy: Decoy,
-    subject: VacuumModuleMovementFlagger,
-    state_store: StateStore,
-) -> None:
-    """It should raise on residual vacuum for virtual modules (analysis)."""
-    decoy.when(state_store.config).then_return(
-        Config(
-            robot_type="OT-3 Standard",
-            deck_type=DeckType.OT3_STANDARD,
-            use_virtual_modules=True,
-        )
-    )
-    decoy.when(
-        state_store.modules.get_vacuum_module_substate(module_id="vacuum-id")
-    ).then_return(
-        VacuumModuleSubState(
-            module_id=VacuumModuleId("vacuum-id"),
-            pump_engaged=False,
-            residual_vacuum=True,
-        )
-    )
-
-    with pytest.raises(VacuumModuleStillUnderVacuumError, match="may still be under"):
-        await subject.ensure_vacuum_module_is_idle(
-            labware_parent=ModuleLocation(moduleId="vacuum-id")
-        )

@@ -10,8 +10,8 @@ from opentrons.drivers.utils import ParseError
 log = logging.getLogger(__name__)
 
 MODULE_BUILD_RETRIES = 5
-MODULE_BUILD_INITIAL_BACKOFF_S = 0.5
-MODULE_BUILD_MAX_BACKOFF_S = 2.0
+MODULE_BUILD_INITIAL_BACKOFF_S = 0.1
+MODULE_BUILD_MAX_BACKOFF_S = 1.0
 
 # Exceptions that indicate the module is not ready yet and a retry is worthwhile.
 MODULE_BUILD_RETRYABLE_ERRORS: Tuple[Type[BaseException], ...] = (

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -33,8 +33,8 @@ import {
   getLabwareInfoByLiquidId,
   getLabwareLiquidRenderInfoFromStack,
   getModuleFromStack,
-  getSortedStartingDeckEntries,
   getStackedItemsOnStartingDeck,
+  getStacksWithLabware,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
@@ -101,10 +101,17 @@ export function ProtocolSetupLabware({
       ),
     [mostRecentAnalysis]
   )
-  const labwareByLiquidId = getLabwareInfoByLiquidId(
-    mostRecentAnalysis?.commands ?? []
+  const labwareByLiquidId = useMemo(
+    () => getLabwareInfoByLiquidId(mostRecentAnalysis?.commands ?? []),
+    [mostRecentAnalysis?.commands]
   )
-  const sortedStartingDeckEntries = getSortedStartingDeckEntries(startingDeck)
+  const sortedStartingDeckEntries = useMemo(
+    () =>
+      Object.entries(getStacksWithLabware(startingDeck))
+        .filter(([location]) => location !== 'offDeck')
+        .sort(([locationA], [locationB]) => locationA.localeCompare(locationB)),
+    [startingDeck]
+  )
   const offDeckItems = useMemo(
     () =>
       mostRecentAnalysis != null
@@ -120,16 +127,26 @@ export function ProtocolSetupLabware({
   const moduleQuery = useModulesQuery({
     refetchInterval: MODULE_REFETCH_INTERVAL_MS,
   })
-  const attachedModules = moduleQuery?.data?.data ?? []
-  const protocolModulesInfo =
-    mostRecentAnalysis != null
-      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-      : []
+  const attachedModules = useMemo(
+    () => moduleQuery?.data?.data ?? [],
+    [moduleQuery?.data?.data]
+  )
+  const protocolModulesInfo = useMemo(
+    () =>
+      mostRecentAnalysis != null
+        ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+        : [],
+    [mostRecentAnalysis, deckDef]
+  )
 
-  const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
-    attachedModules,
-    protocolModulesInfo,
-    deckConfig
+  const attachedProtocolModuleMatches = useMemo(
+    () =>
+      getAttachedProtocolModuleMatches(
+        attachedModules,
+        protocolModulesInfo,
+        deckConfig
+      ),
+    [attachedModules, protocolModulesInfo, deckConfig]
   )
 
   return (
@@ -200,20 +217,20 @@ export function ProtocolSetupLabware({
                     </StyledText>
                   </Flex>
                 </Flex>
-                {sortedStartingDeckEntries.map(({ location, stack }, index) => (
+                {sortedStartingDeckEntries.map(([key, value]) => (
                   <RowLabware
-                    key={`${location}_${index}`}
+                    key={key}
                     attachedProtocolModules={attachedProtocolModuleMatches}
                     refetchModules={moduleQuery.refetch}
-                    slotName={location}
-                    stackedItems={stack}
+                    slotName={key}
+                    stackedItems={value}
                     labwareByLiquidId={labwareByLiquidId}
                     onClick={setSelectedLabwareStack}
                   />
                 ))}
-                {offDeckItems?.map((item, index) => (
+                {offDeckItems.map(item => (
                   <RowLabware
-                    key={index}
+                    key={item.representativeItem.labwareId}
                     attachedProtocolModules={attachedProtocolModuleMatches}
                     refetchModules={moduleQuery.refetch}
                     slotName={'offDeck'}
@@ -493,7 +510,7 @@ function RowLabware({
           {labwareLiquidRenderInfo.map((labware, index) => {
             const quantityTag = offDeckQuantity ?? labware.quantity
             return (
-              <>
+              <Fragment key={labware.labwareId}>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing4}
@@ -549,7 +566,7 @@ function RowLabware({
                     />
                   ) : null}
                 </Flex>
-              </>
+              </Fragment>
             )
           })}
         </Flex>
