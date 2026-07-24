@@ -1,5 +1,6 @@
 """Tests for /subsystems routes."""
 
+import inspect
 from datetime import datetime
 from typing import TYPE_CHECKING, Dict, Set
 
@@ -8,6 +9,7 @@ from decoy import Decoy
 from fastapi import Request, Response
 from starlette.datastructures import URL, MutableHeaders
 
+from opentrons.config import feature_flags
 from opentrons.hardware_control import ThreadManagedHardware
 from opentrons.hardware_control.types import (
     SubSystem as HWSubSystem,
@@ -18,6 +20,7 @@ from opentrons.hardware_control.types import (
 from opentrons.hardware_control.types import (
     UpdateState as HWUpdateState,
 )
+from opentrons_shared_data.robot.types import RobotTypeEnum
 
 from robot_server.errors.error_responses import ApiError
 from robot_server.subsystems.firmware_update_manager import (
@@ -91,6 +94,19 @@ def thread_manager(decoy: Decoy, ot3_hardware_api: "OT3API") -> ThreadManagedHar
     return manager
 
 
+@pytest.fixture
+def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Get a mocked feature flags."""
+    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
+        params = inspect.getfullargspec(func)
+        mock_get_ff = decoy.mock(func=func)
+        if any("robot_type" in p for p in params.args):
+            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
+        else:
+            decoy.when(mock_get_ff()).then_return(False)
+        monkeypatch.setattr(feature_flags, name, mock_get_ff)
+
+
 def _build_attached_subsystem(
     subsystem: HWSubSystem,
     ok: bool = True,
@@ -140,8 +156,10 @@ async def test_get_attached_subsystems(
     thread_manager: ThreadManagedHardware,
     subsystems: Set[HWSubSystem],
     decoy: Decoy,
+    mock_feature_flags: None,
 ) -> None:
     """It should return all subsystems the hardware says are present."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
     subsystem_state = _build_attached_subsystems(subsystems)
     decoy.when(ot3_hardware_api.attached_subsystems).then_return(subsystem_state)
     resp = await get_attached_subsystems(thread_manager)

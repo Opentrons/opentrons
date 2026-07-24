@@ -1,5 +1,6 @@
 """Tests for RunDataManager."""
 
+import inspect
 from datetime import datetime
 from typing import Dict, List, Optional
 from unittest.mock import Mock, sentinel
@@ -8,6 +9,7 @@ import pytest
 from decoy import Decoy, matchers
 
 from opentrons import config
+from opentrons.config import feature_flags
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import (
     CommandErrorSlice,
@@ -40,6 +42,7 @@ from opentrons.protocol_runner import RunResult
 from opentrons_shared_data.data_files import RunFileNameMetadata
 from opentrons_shared_data.errors.exceptions import InvalidStoredData
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
+from opentrons_shared_data.robot.types import RobotTypeEnum
 
 from robot_server.camera.provider import CameraProviderWrapper
 from robot_server.camera.settings.store import CameraSettingStore
@@ -243,6 +246,19 @@ def run_command() -> commands.Command:
 
 
 @pytest.fixture
+def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Get a mocked feature flags."""
+    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
+        params = inspect.getfullargspec(func)
+        mock_get_ff = decoy.mock(func=func)
+        if any("robot_type" in p for p in params.args):
+            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
+        else:
+            decoy.when(mock_get_ff()).then_return(False)
+        monkeypatch.setattr(feature_flags, name, mock_get_ff)
+
+
+@pytest.fixture
 def subject(
     mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
@@ -274,8 +290,11 @@ async def test_create(
     subject: RunDataManager,
     engine_state_summary: StateSummary,
     run_resource: RunResource,
+    mock_feature_flags: None,
 ) -> None:
     """It should create an engine and a persisted run resource."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
     protocol_source = ProtocolSource.model_construct(
@@ -397,8 +416,11 @@ async def test_create_engine_error(
     mock_file_provider: FileProvider,
     mock_camera_provider: CameraProvider,
     subject: RunDataManager,
+    mock_feature_flags: None,
 ) -> None:
     """It should not create a resource if engine creation fails."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
 
@@ -915,8 +937,11 @@ async def test_create_archives_existing(
     mock_file_provider: FileProvider,
     mock_camera_provider: CameraProvider,
     subject: RunDataManager,
+    mock_feature_flags: None,
 ) -> None:
     """It should persist the previously current run when a new run is created."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     run_id_old = "hello world"
     run_id_new = "hello is it me you're looking for"
 
