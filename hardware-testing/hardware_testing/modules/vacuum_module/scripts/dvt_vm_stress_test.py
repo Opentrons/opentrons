@@ -1,6 +1,5 @@
 """Vacuum manifold 400mbar stress test protocol for the Opentrons Flex."""
-import asyncio
-from typing import Any
+from typing import Any, Dict, cast
 from datetime import datetime
 from pathlib import Path
 from opentrons.protocol_api import(
@@ -9,35 +8,22 @@ from opentrons.protocol_api import(
 )# type: ignore[import]
 from opentrons import protocol_api  # type: ignore[import]
 import serial.tools.list_ports  # type: ignore[import]
-from opentrons.drivers import vacuum_module
-# from opentrons.drivers.vacuum_module.types import VentState
-from opentrons.hardware_control.ot3api import OT3API  # type: ignore[import]
 from opentrons.hardware_control.adapters import SynchronousAdapter
 from opentrons.protocol_api.core.engine.module_core import VacuumModuleCore
 import dataclasses
 import time
-import traceback
 import csv
-from typing import Dict, cast
 
 
 metadata = {"protocolName": "DVT VM 200mbar Life Test"}
 requirements = {"robotType": "Flex", "apiLevel": "2.30"}
 
-# Tunables (can move some to parameters)
 ASPIRATE_OFFSET_MM = 5
-# Dispense_offset_mm = 8 for the 96 deep well
-# -20 is acroprep
-DISPENSE_OFFSET_MM = 8
 
 OUTPUT_DIR = "/data/vacuum_manifold_life_test_dvt/"
 
 Ard_idVendor = 9025
 Ard_idProduct = 105
-
-VM_idVendor = 1155
-VM_idProduct = 61248
-
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Add runtime parameters for this protocol."""
@@ -52,9 +38,9 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_int(
         "pressure",
         "pressure",
-        default=200,
-        minimum=200,
-        maximum=800,
+        default=400,
+        minimum=0,
+        maximum=1000,
         description="Target absolute pressure (mbar).",
     )
     parameters.add_int(
@@ -84,7 +70,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_int(
         "vm_settle_sec",
         "vm_settle_sec",
-        default=21,
+        default=10,
         minimum=1,
         maximum=1000,
         description="Amount of time to ramp to target pressure.",
@@ -104,22 +90,6 @@ def add_parameters(parameters: ParameterContext) -> None:
         minimum=1,
         maximum=1000,
         description="Amount of time the vm vent is opened.",
-    )
-    parameters.add_int(
-        "perstaltic_target_volume",
-        "perstaltic_target_volume",
-        default=96000,
-        minimum=1,
-        maximum=96000,
-        description="Reservoir water fill time.",
-    )
-    parameters.add_int(
-        "perstaltic_flow_rate",
-        "perstaltic_flow_rate",
-        default=89,
-        minimum=1,
-        maximum=1000,
-        description="Reservoir water fill time.",
     )
     parameters.add_str(
         variable_name="collar",
@@ -151,9 +121,7 @@ def find_port_by_id(vendorId: int, productId: int) -> str:
     """Find a serial port by USB vendor and product ID."""
     ports = serial.tools.list_ports.comports()
     for port in ports:
-        # ctx.comment(f"port_vid: {port.vid}, port_pid: {port.pid}")
         if port.vid == vendorId and port.pid == productId:
-            # ctx.comment(f"port: {port.device}")
             return port.device
     return ""
 
@@ -193,13 +161,12 @@ def _write_to_csv(
                 f"{data['vent_state']}",
             ]
         )
-        f.close()
+    f.close()
 
 
-async def _read_continuous_data(
-    self: OT3API,
+def read_continuous_data(
     f_name: str,
-    pump: vacuum_module.VacuumModuleDriver,
+    pump: VacuumModuleContext,
     start_time: float,
     run_time: float,
     ctx: protocol_api.ProtocolContext,
@@ -207,59 +174,47 @@ async def _read_continuous_data(
     """Read and print continuous data from the vacuum pump for the specified timeout duration."""
     loop_st = time.perf_counter()
     head_writer = True
-    try:
-        while time.perf_counter() - loop_st < run_time:
-            line = await pump.get_vacuum_state()
-            await asyncio.sleep(0.1)
-            pressure_dict = dataclasses.asdict(line)
-            # Timestamp
-            ts = time.perf_counter() - start_time
-            # ctx.comment(f"Pump time: {time.perf_counter() - loop_st}")
-            # Record Pressure Data
-            _write_to_csv(f_name, head_writer, ts, pressure_dict)
-            head_writer = False
-    except Exception as e:
-        raise (e)
+    while time.perf_counter() - loop_st < run_time:
+        line = get_vacuum_read(pump)
+        ctx.delay(seconds=0.1)  # Adjust the delay as needed
+        pressure_dict = dataclasses.asdict(line)
+        # Timestamp
+        ts = time.perf_counter() - start_time
+        ctx.comment(f"Pump time: {time.perf_counter() - loop_st}")
+        # Record Pressure Data
+        _write_to_csv(f_name, head_writer, ts, pressure_dict)
+        head_writer = False
 
 
-async def _read_data(
-    self: OT3API,
+def read_data(
     f_name: str,
-    pump: vacuum_module.VacuumModuleDriver,
+    pump: VacuumModuleContext,
     start_time: float,
     duration: int,
     ctx: protocol_api.ProtocolContext,
 ) -> None:
     """Run continuous data read and handle expected timeout and errors."""
     try:
-        await self.read_continuous_data(f_name, pump, start_time, duration, ctx)  # type: ignore[attr-defined]
-    except asyncio.TimeoutError:
-        # Expected: we stop after RUN_SEC
-        ctx.comment(f"continuous read duration reached ({duration}s)")
+        read_continuous_data(f_name, pump, start_time, duration, ctx)
     except Exception as e:
         ctx.comment(f"continuous read error: {e}")
         raise
 
 
-async def _setup_devices(
-    self: OT3API,
-) -> tuple[vacuum_module.VacuumModuleDriver, Any]:
+def setup_devices() -> Any:
     from hardware_testing.drivers import vacuum_pump
-
-    loop = asyncio.get_event_loop()
     # Arduino Water pump Driver
     m_port = find_port_by_id(Ard_idVendor, Ard_idProduct)
 
-    pump_fixture = await vacuum_pump.WaterPump.create(
-        port=m_port, baudrate=115200, loop=loop
+    pump_fixture = vacuum_pump.WaterPump.create(
+        port=m_port, baudrate=115200
     )
 
     return pump_fixture
 
 
-async def _run_single_pump_api_cycle(
-    self: OT3API,
-    pump: VacuumModuleContext,
+def run_single_pump_api_cycle(
+    vm_mod: VacuumModuleContext,
     water_pump_fixture: Any,
     target_pressure: int,
     target_liquid_height: int,
@@ -270,74 +225,71 @@ async def _run_single_pump_api_cycle(
     DECAY_SEC: int,
     VENT_SEC: int,
     ctx: protocol_api.ProtocolContext,
-    hw_vm: Any
 ) -> None:
     """Run one pump cycle for RUN_SEC seconds using the driver's continuous reader."""
-    target_to_pump = target_pressure - 1013.25
-    pump.open_vent(equalize_timeout_s=10)
+    #------------------------Fill the water reservoirt---------------------------------
     # Start the water pump to fill the reservoir to the target liquid height
-    await water_pump_fixture.open_solenoid()
-    # Start the filling of the water pump while the vacuum is running
-    water_reached = await water_pump_fixture.water_fill(target_liquid_height)
-    print(f"[cycle {cycle_index}] water fill reached target: {water_reached}")
-    await water_pump_fixture.close_solenoid()
-    pump.close_vent()
-    await asyncio.sleep(1)
+    water_pump_fixture.open_solenoid()
+    try:
+        # Start the filling of the water pump while the vacuum is running
+        water_reached = water_pump_fixture.water_fill_auto(target_liquid_height)
+        ctx.comment(f"[cycle {cycle_index}] water fill reached target: {water_reached}")
+    except Exception as e:
+        ctx.comment(f"[cycle {cycle_index}] water fill error: {e}")
+        raise
+    water_pump_fixture.close_solenoid()
+    ctx.delay(seconds=1)
+    #------------------------Start the vacuum pump cycle---------------------------------
     # Set Pressure and Vacuum to target for x amount of time.
-    pump.start_set_vacuum_pressure(
-        gauge_pressure_mbar=target_to_pump,
+    vm_mod.start_set_vacuum_pressure(
+        gauge_pressure_mbar=target_pressure,
     )
     ctx.comment(f"[cycle {cycle_index}] pump started at target {target_pressure} mbar")
-
     # Dynamic CSV naming per trial (date + trial index + pressure)
     date_str = datetime.utcnow().strftime("%y_%m_%d_%H_%M_%S")
     output_dir.mkdir(parents=True, exist_ok=True)
-    # ctx.comment(f"output_dir: {output_dir}")
+    ctx.comment(f"output_dir: {output_dir}")
     trial_csv = (
-        output_dir / f"{date_str}_trial_{cycle_index:02d}_{target_pressure}mbar.csv"
+        output_dir / f"PressureData_{date_str}_trial_{cycle_index:02d}_{ctx.params.pressure}mbar.csv"
     )
     ctx.comment(f"[cycle {cycle_index}] logging to {trial_csv}")
     # Run the continuous data reader for RUN_SEC seconds.
     start_time = time.perf_counter()
     try:
-        await self.read_data(str(trial_csv), hw_vm, start_time, SETTLE_SEC + RUN_SEC, ctx)  # type: ignore[attr-defined]
-    except asyncio.TimeoutError:
-        ctx.comment(
-            f"[cycle {cycle_index}] continuous read duration reached ({SETTLE_SEC+RUN_SEC}s)"
-        )
+        read_data(str(trial_csv), vm_mod, start_time, SETTLE_SEC+RUN_SEC, ctx)
     except Exception as e:
-        ctx.comment(f"[cycle {cycle_index}] ERROR during data read: {e}")
+        ctx.comment(f"[cycle {cycle_index}] ERROR during continuous read: {e}")
         raise
     ctx.comment(
-        f"[cycle {cycle_index}] continuous read duration reached ({SETTLE_SEC+RUN_SEC}s)"
+        f"[cycle {cycle_index}] continuous read duration reached ({RUN_SEC}s)"
     )
     # Stop the pump
-    pump.stop_vacuum_pump()
+    vm_mod.stop_vacuum_pump()
     # Vent the pump system to atmospheric pressure while pump is on
-    pump.open_vent(equalize_timeout_s=1)
-    await asyncio.sleep(VENT_SEC)
+    vm_mod.open_vent(equalize_timeout_s=VENT_SEC)
     try:
-        await self.read_data(str(trial_csv), hw_vm, start_time, DECAY_SEC, ctx)  # type: ignore[attr-defined]
-    except asyncio.TimeoutError:
-        ctx.comment(
-            f"[cycle {cycle_index}] continuous read duration reached ({DECAY_SEC}s)"
-        )
+        read_data(str(trial_csv), vm_mod, start_time, DECAY_SEC, ctx)
     except Exception as e:
         ctx.comment(f"[cycle {cycle_index}] ERROR during decay read: {e}")
         raise
     # Close Vent
     ctx.comment(f"[cycle {cycle_index}] pump stopped; decaying for {DECAY_SEC}s")
-    await asyncio.sleep(DECAY_SEC)
-    pump.close_vent()
-
-
-async def _pump_disconnect(self: OT3API, pump: Any) -> None:
-    await pump.disconnect()
+    vm_mod.close_vent()
 
 def confirm_position(ctx: protocol_api.ProtocolContext) -> None:
     """Pause the protocol if enable_position_confirm is True."""
     if ctx.params.enable_position_confirm:  # type: ignore[attr-defined]
         ctx.pause("Checking pipette position above well.")
+
+def get_vacuum_read(vm_mod: VacuumModuleContext) -> Any:
+    """Hack: send M127 E0 via the driver. Not part of public PAPI."""
+    core = cast(VacuumModuleCore, vm_mod._core)
+    adapter = core._sync_module_hardware
+    vacuum_hw = object.__getattribute__(adapter, "_obj_to_adapt")
+
+    data = vacuum_hw.vacuum_state
+    return data
+
 
 def enable_waste_detection(vm_mod: VacuumModuleContext, enable: bool = False) -> None:
     """Hack: send M127 E0 via the driver. Not part of public PAPI."""
@@ -352,98 +304,74 @@ def enable_waste_detection(vm_mod: VacuumModuleContext, enable: bool = False) ->
         enable_waste_full_detection=enable,
     )
 
+
 def run(ctx: protocol_api.ProtocolContext) -> None:
     """Execute the vacuum manifold stress test protocol."""
-    if not ctx.is_simulating():
-        OT3API.read_continuous_data = _read_continuous_data  # type: ignore[attr-defined]
-        OT3API.read_data = _read_data  # type: ignore[attr-defined]
-        OT3API.run_single_pump_api_cycle = _run_single_pump_api_cycle  # type: ignore[attr-defined]
-        OT3API.setup_devices = _setup_devices  # type: ignore[attr-defined]
-        OT3API.pump_disconnect = _pump_disconnect  # type: ignore[attr-defined]
-
     z_offset = ctx.params.z_offset  # type: ignore[attr-defined]
     volume = ctx.params.volume  # type: ignore[attr-defined]
     cycles = ctx.params.cycles  # type: ignore[attr-defined]
-    pressure = ctx.params.pressure  # type: ignore[attr-defined]
+    pressure = -1*(ctx.params.pressure)  # type: ignore[attr-defined]
     SETTLE_SEC = ctx.params.vm_settle_sec  # type: ignore[attr-defined]
     RUN_SEC = ctx.params.vm_run_sec  # type: ignore[attr-defined]
     DECAY_SEC = ctx.params.vm_decay_sec  # type: ignore[attr-defined]
     VENT_SEC = ctx.params.vm_vent_sec  # type: ignore[attr-defined]
-    perstaltic_volume_target = ctx.params.perstaltic_target_volume  # type: ignore[attr-defined]
-    perstaltic_pump_flow_rate = ctx.params.perstaltic_flow_rate  # type: ignore[attr-defined]
-    conversion = (
-        (perstaltic_volume_target / 1000) / perstaltic_pump_flow_rate
-    ) * 60  # Convert uL volume to pump fill time (seconds)
-    perstaltic_time = int(conversion)
-
+    
+    # Load Trash Bin
     ctx.load_trash_bin("A1")
     # Load Vacuum Module
     vm_mod = cast(VacuumModuleContext, ctx.load_module("vacuumModuleV1", "A3"))
+    # Set the target liquid height for the water reservoir
     target_liquid_height = 30
+    # Load Labware
     tip_rack = ctx.load_labware(
         "opentrons_flex_96_tiprack_1000uL",
         "B2",
         adapter="opentrons_flex_96_tiprack_adapter",
     )
-    tip_rack.set_offset(x=0, y=0, z=0)
-    pip = ctx.load_instrument("flex_96channel_1000", "left", tip_racks=[tip_rack])
     manifold_collar = vm_mod.load_adapter_to_dock(ctx.params.collar)  # type: ignore[attr-defined]
     filter_plate = manifold_collar.load_labware("invitroven_filter_plate")
     source = ctx.load_labware("nest_1_reservoir_290ml", "C2")
-
-    # filter_plate.set_offset(x=0, y=0, z=0)
-    # manifold_collar.set_offset(x=0, y=0, z=0)
     source.set_offset(x=0, y=0, z=13)
-    # base = ctx.load_labware("millipore_vacuum_manifold_base", "C3")
-    # manifold_collar = base.load_labware("millipore_vacuum_manifold_collar_standard")
-    # filter_plate = manifold_collar.load_labware("attractspe_c18_filter_plate")
-    
+    tip_rack.set_offset(x=0, y=0, z=0)
+    # Load Pipette
+    pip = ctx.load_instrument("flex_96channel_1000", "left", tip_racks=[tip_rack])
     pump_fixture = None
-    hw_vm = None
+    # Setup the water pump fixture
     if not ctx.is_simulating():
-        ot3api = ctx._core.get_hardware()
         try:
-            pump_fixture = ot3api.setup_devices()  # type: ignore[attr-defined]
-            hw_vm = ot3api.attached_modules[0]
-            enable_waste_detection(vm_mod,False)  # type: ignore[attr-defined]
+            pump_fixture = setup_devices()
         except Exception as e:
             ctx.comment(f"Pump init failed: {e}")
             raise
-    ctx.delay(seconds=5)  # Allow time for the pump to initialize
-    ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
-    pip.pick_up_tip()
+    # Disable waste Detection to avoid false positives during the stress test
+    # enable_waste_detection(vm_mod, False)  # type: ignore[attr-defined]
+    # ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
+    # pip.pick_up_tip()
     output_dir = Path(OUTPUT_DIR)
-    if not ctx.is_simulating():
-        for cycle in range(1, cycles + 1):
-            ctx.comment(f"=== Cycle :{cycle}/{cycles}===")
-            pip.aspirate(volume, source["A1"].bottom(ASPIRATE_OFFSET_MM))
-            pip.dispense(volume, filter_plate["A1"].top(z_offset), push_out=50)
-            # pip.touch_tip(filter_plate["A1"], v_offset=z_offset)
-            pip.move_to(filter_plate["A1"].top(10))  # Move away again
-            ot3api = ctx._core.get_hardware()
-            try:
-                ot3api.run_single_pump_api_cycle(
-                    vm_mod,
-                    pump_fixture,
-                    pressure,
-                    target_liquid_height,
-                    cycle,
-                    output_dir,
-                    SETTLE_SEC,
-                    RUN_SEC,
-                    DECAY_SEC,
-                    VENT_SEC,
-                    ctx,
-                    hw_vm,
-                )
-            except Exception as e:
-                tb = traceback.format_exc()
-                ctx.comment(f"[cycle {cycle}] failed ({type(e).__name__}: {e})\n{tb}")
-                raise
-        pip.return_tip()
+    for cycle in range(1, cycles + 1):
+        ctx.comment(f"=== Cycle :{cycle}/{cycles}===")
+        # pip.aspirate(volume, source["A1"].bottom(ASPIRATE_OFFSET_MM))
+        # pip.dispense(volume, filter_plate["A1"].top(z_offset), push_out=50)
+        # pip.touch_tip(filter_plate["A1"], v_offset=z_offset)
+        # pip.move_to(filter_plate["A1"].top(10))  # Move away again
+        if not ctx.is_simulating():
+            run_single_pump_api_cycle(
+                vm_mod,
+                pump_fixture,
+                pressure,
+                target_liquid_height,
+                cycle,
+                output_dir,
+                SETTLE_SEC,
+                RUN_SEC,
+                DECAY_SEC,
+                VENT_SEC,
+                ctx,
+            )
+    # pip.return_tip()
     if not ctx.is_simulating():
         try:
             if pump_fixture is not None:
-                ot3api.pump_disconnect(pump_fixture)
+                pump_fixture.disconnect()
         except Exception:
             raise

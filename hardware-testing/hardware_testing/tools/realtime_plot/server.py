@@ -53,8 +53,8 @@ def get_testing_data_directory() -> Path:
     """Get testing_data directory."""
     if "TESTING_DATA_DIR" in os.environ:
         return Path(os.environ["TESTING_DATA_DIR"])
-    print(infer_config_base_dir() / "testing_data")
-    return infer_config_base_dir() / "testing_data"
+    print(infer_config_base_dir())
+    return infer_config_base_dir() 
 
 
 def _initialize_testing_data_base_dir() -> Path:
