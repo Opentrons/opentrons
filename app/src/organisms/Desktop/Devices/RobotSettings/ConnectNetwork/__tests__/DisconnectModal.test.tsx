@@ -5,6 +5,7 @@ import '@testing-library/jest-dom/vitest'
 
 import { when } from 'vitest-when'
 
+import { INTERFACE_WIFI, mockWifiNetwork } from '@opentrons/api-client'
 import {
   DocumentedMutationError,
   isDocumentedMutationError,
@@ -19,8 +20,6 @@ import {
   mockConnectableRobot,
   mockReachableRobot,
 } from '/app/redux/discovery/__fixtures__'
-import { INTERFACE_WIFI } from '/app/redux/networking'
-import { mockWifiNetwork } from '/app/redux/networking/__fixtures__'
 import { clearWifiStatusInQueryCache } from '/app/resources/networking'
 import {
   useNetworkInterfaces,

@@ -6,6 +6,11 @@ import { when } from 'vitest-when'
 import '@testing-library/jest-dom/vitest'
 
 import {
+  INTERFACE_ETHERNET,
+  INTERFACE_WIFI,
+  mockWifiNetwork,
+} from '@opentrons/api-client'
+import {
   useEapOptionsQuery,
   usePostWifiConfigureMutation,
   useWifiKeysQuery,
@@ -21,8 +26,6 @@ import {
   HEALTH_STATUS_OK,
   OPENTRONS_USB,
 } from '/app/redux/discovery'
-import * as Networking from '/app/redux/networking'
-import * as Fixtures from '/app/redux/networking/__fixtures__'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import {
   useCanDisconnect,
@@ -39,7 +42,6 @@ import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/discovery/selectors')
-vi.mock('/app/redux/networking')
 vi.mock('/app/redux/robot-api/selectors')
 vi.mock('/app/resources/networking/hooks')
 vi.mock('/app/redux-resources/robots')
@@ -71,19 +73,19 @@ const initialMockWifi = {
   ipAddress: '127.0.0.100',
   subnetMask: '255.255.255.230',
   macAddress: 'WI:FI:00:00:00:00',
-  type: Networking.INTERFACE_WIFI,
+  type: INTERFACE_WIFI,
 }
 
 const initialMockEthernet = {
   ipAddress: '127.0.0.101',
   subnetMask: '255.255.255.231',
   macAddress: 'US:B0:00:00:00:00',
-  type: Networking.INTERFACE_ETHERNET,
+  type: INTERFACE_ETHERNET,
 }
 
 const mockWifiList = [
-  { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },
-  { ...Fixtures.mockWifiNetwork, ssid: 'bar', active: false },
+  { ...mockWifiNetwork, ssid: 'foo', active: true },
+  { ...mockWifiNetwork, ssid: 'bar', active: false },
 ]
 
 describe('RobotSettingsNetworking', () => {
@@ -217,7 +219,7 @@ describe('RobotSettingsNetworking', () => {
       ipAddress: '1.2.3.4',
       subnetMask: '255.255.255.123',
       macAddress: '00:00:00:00:00:00',
-      type: Networking.INTERFACE_WIFI,
+      type: INTERFACE_WIFI,
     }
     when(useNetworkInterfaces)
       .calledWith(ROBOT_NAME, 5000)
@@ -257,7 +259,7 @@ describe('RobotSettingsNetworking', () => {
       ipAddress: '5.6.7.8',
       subnetMask: '255.255.255.124',
       macAddress: '00:00:00:00:00:00',
-      type: Networking.INTERFACE_ETHERNET,
+      type: INTERFACE_ETHERNET,
     }
     when(useNetworkInterfaces)
       .calledWith(ROBOT_NAME, 5000)

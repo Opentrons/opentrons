@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import * as Fixtures from '/app/redux/networking/__fixtures__'
+import {
+  mockEthernetInterface,
+  mockWifiInterface,
+} from '@opentrons/api-client'
 
 import { getInterfaceStatusByType } from '../useNetworkInterfaces'
 
@@ -19,21 +22,21 @@ describe('getInterfaceStatusByType', () => {
   it('parses IP and subnet mask from interface status', () => {
     expect(
       getInterfaceStatusByType({
-        wlan0: Fixtures.mockWifiInterface,
-        eth0: Fixtures.mockEthernetInterface,
+        wlan0: mockWifiInterface,
+        eth0: mockEthernetInterface,
       })
     ).toEqual({
       wifi: {
         ipAddress: '192.168.43.97',
         subnetMask: '255.255.255.0',
-        macAddress: Fixtures.mockWifiInterface.macAddress,
-        type: Fixtures.mockWifiInterface.type,
+        macAddress: mockWifiInterface.macAddress,
+        type: mockWifiInterface.type,
       },
       ethernet: {
         ipAddress: '169.254.229.173',
         subnetMask: '255.255.0.0',
-        macAddress: Fixtures.mockEthernetInterface.macAddress,
-        type: Fixtures.mockEthernetInterface.type,
+        macAddress: mockEthernetInterface.macAddress,
+        type: mockEthernetInterface.type,
       },
     })
   })
@@ -42,7 +45,7 @@ describe('getInterfaceStatusByType', () => {
     expect(
       getInterfaceStatusByType({
         eth0: {
-          ...Fixtures.mockEthernetInterface,
+          ...mockEthernetInterface,
           ipAddress: null,
         },
       })
@@ -51,8 +54,8 @@ describe('getInterfaceStatusByType', () => {
       ethernet: {
         ipAddress: null,
         subnetMask: null,
-        macAddress: Fixtures.mockEthernetInterface.macAddress,
-        type: Fixtures.mockEthernetInterface.type,
+        macAddress: mockEthernetInterface.macAddress,
+        type: mockEthernetInterface.type,
       },
     })
   })
@@ -61,7 +64,7 @@ describe('getInterfaceStatusByType', () => {
     expect(
       getInterfaceStatusByType({
         wlan0: {
-          ...Fixtures.mockWifiInterface,
+          ...mockWifiInterface,
           ipAddress: '192.168.1.1',
         },
       })
@@ -70,8 +73,8 @@ describe('getInterfaceStatusByType', () => {
       wifi: {
         ipAddress: '192.168.1.1',
         subnetMask: null,
-        macAddress: Fixtures.mockWifiInterface.macAddress,
-        type: Fixtures.mockWifiInterface.type,
+        macAddress: mockWifiInterface.macAddress,
+        type: mockWifiInterface.type,
       },
     })
   })

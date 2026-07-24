@@ -2,13 +2,12 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { INTERFACE_WIFI, mockWifiNetwork } from '@opentrons/api-client'
 import { usePostWifiConfigureMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
-import { INTERFACE_WIFI } from '/app/redux/networking'
-import * as Fixtures from '/app/redux/networking/__fixtures__'
 import {
   useNetworkInterfaces,
   useWifiList,
@@ -24,10 +23,10 @@ vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
 }))
 
 const mockWifiList = [
-  { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },
-  { ...Fixtures.mockWifiNetwork, ssid: 'bar' },
+  { ...mockWifiNetwork, ssid: 'foo', active: true },
+  { ...mockWifiNetwork, ssid: 'bar' },
   {
-    ...Fixtures.mockWifiNetwork,
+    ...mockWifiNetwork,
     ssid: 'baz',
   },
 ]

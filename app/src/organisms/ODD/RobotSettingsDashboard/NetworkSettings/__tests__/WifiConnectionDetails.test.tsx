@@ -4,10 +4,11 @@ import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
+import { INTERFACE_WIFI } from '@opentrons/api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getLocalRobot } from '/app/redux/discovery'
-import { INTERFACE_WIFI } from '/app/redux/networking'
 import {
   useNetworkInterfaces,
   useWifiList,

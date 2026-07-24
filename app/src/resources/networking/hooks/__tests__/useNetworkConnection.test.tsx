@@ -3,9 +3,14 @@ import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+import {
+  INTERFACE_ETHERNET,
+  INTERFACE_WIFI,
+  mockWifiNetwork,
+  SECURITY_NONE,
+} from '@opentrons/api-client'
+
 import { i18n } from '/app/i18n'
-import * as Networking from '/app/redux/networking'
-import * as Fixtures from '/app/redux/networking/__fixtures__'
 
 import { useNetworkConnection } from '../useNetworkConnection'
 import { useNetworkInterfaces } from '../useNetworkInterfaces'
@@ -18,12 +23,12 @@ vi.mock('../useWifiList')
 
 const mockRobotName = 'robot-name'
 const mockWifiList = [
-  { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },
-  { ...Fixtures.mockWifiNetwork, ssid: 'bar' },
+  { ...mockWifiNetwork, ssid: 'foo', active: true },
+  { ...mockWifiNetwork, ssid: 'bar' },
   {
-    ...Fixtures.mockWifiNetwork,
+    ...mockWifiNetwork,
     ssid: 'baz',
-    securityType: Networking.SECURITY_NONE,
+    securityType: SECURITY_NONE,
   },
 ]
 
@@ -31,14 +36,14 @@ const mockWifi = {
   ipAddress: '127.0.0.100',
   subnetMask: '255.255.255.230',
   macAddress: 'WI:FI:00:00:00:00',
-  type: Networking.INTERFACE_WIFI,
+  type: INTERFACE_WIFI,
 }
 
 const mockEthernet = {
   ipAddress: '127.0.0.101',
   subnetMask: '255.255.255.231',
   macAddress: 'US:B0:00:00:00:00',
-  type: Networking.INTERFACE_ETHERNET,
+  type: INTERFACE_ETHERNET,
 }
 
 // ToDo (kj:0202/2023) USB test cases will be added when USB is out

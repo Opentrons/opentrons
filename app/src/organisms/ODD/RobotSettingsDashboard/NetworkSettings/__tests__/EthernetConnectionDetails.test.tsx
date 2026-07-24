@@ -3,11 +3,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
+import { INTERFACE_ETHERNET } from '@opentrons/api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
-import { INTERFACE_ETHERNET } from '/app/redux/networking'
 import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 
 import { EthernetConnectionDetails } from '../EthernetConnectionDetails'

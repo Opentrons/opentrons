@@ -1,9 +1,10 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { mockWifiNetwork } from '@opentrons/api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import * as Fixtures from '/app/redux/networking/__fixtures__'
 
 import { DisplaySearchNetwork } from '../DisplaySearchNetwork'
 import { DisplayWifiList } from '../DisplayWifiList'
@@ -13,10 +14,10 @@ import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 const mockWifiList = [
-  { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },
-  { ...Fixtures.mockWifiNetwork, ssid: 'bar' },
+  { ...mockWifiNetwork, ssid: 'foo', active: true },
+  { ...mockWifiNetwork, ssid: 'bar' },
   {
-    ...Fixtures.mockWifiNetwork,
+    ...mockWifiNetwork,
     ssid: 'baz',
   },
 ]
