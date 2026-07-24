@@ -62,14 +62,12 @@ export function InputSetting({
             }
           }}
           onBlur={event => {
-            const nextValue = event.target.value
-            const validationError = validate?.(nextValue) ?? null
-            if (validationError != null) {
-              setError(validationError)
-              return
+            const value = event.target.value
+            const validationError = validate?.(value) ?? null
+            setError(validationError)
+            if (validationError == null) {
+              onBlur(value)
             }
-            setError(null)
-            onBlur(nextValue)
           }}
         />
       </div>
