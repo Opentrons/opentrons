@@ -10,7 +10,6 @@ import {
   useAuthSettingsQuery,
   useGetRobotServerAccessControlSettingsQuery,
   usePatchRobotServerAccessControlSettingsMutation,
-  useSelfQuery,
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -352,22 +351,8 @@ describe('ComplianceReadySoftwareSettings', () => {
 describe('RobotSettingsComplianceReady', () => {
   const renderPage = (
     username: string,
-    selfUsername: string,
     accountType: 'admin' | 'user'
   ): void => {
-    vi.mocked(useSelfQuery).mockReturnValue({
-      data: {
-        data: {
-          username: selfUsername,
-          fullName: 'Test User',
-          accountType,
-          scopes: [],
-          locked: false,
-          resetPassword: false,
-        },
-      },
-    } as any)
-
     renderWithProviders(
       <RobotSettingsComplianceReady robotName={ROBOT_NAME} />,
       {
@@ -376,7 +361,11 @@ describe('RobotSettingsComplianceReady', () => {
           robotAuth: {
             perRobotAuthStates: {
               [ROBOT_NAME]: {
-                username,
+                user: {
+                  username,
+                  fullName: 'Test User',
+                  accountType,
+                },
                 accessToken: 'access-token',
                 refreshToken: 'refresh-token',
                 expiresAt: null,
@@ -390,7 +379,7 @@ describe('RobotSettingsComplianceReady', () => {
   }
 
   it('hides admin sections for non-admin users', () => {
-    renderPage('regular-user', 'regular-user', 'user')
+    renderPage('regular-user', 'user')
 
     expect(screen.queryByText('User management')).not.toBeInTheDocument()
     expect(
@@ -400,14 +389,8 @@ describe('RobotSettingsComplianceReady', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('ignores stale admin self data for non-admin users', () => {
-    renderPage('regular-user', 'admin', 'admin')
-
-    expect(screen.queryByText('User management')).not.toBeInTheDocument()
-  })
-
   it('shows admin sections for admin users', () => {
-    renderPage('admin', 'admin', 'admin')
+    renderPage('admin', 'admin')
 
     screen.getByText('User management')
     screen.getByRole('button', { name: 'Compliance Ready Software settings' })

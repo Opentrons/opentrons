@@ -1,11 +1,16 @@
 import '@testing-library/jest-dom/vitest'
 
-import NiceModal from '@ebay/nice-modal-react'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
+import NiceModal from '@ebay/nice-modal-react'
 import { configureStore } from '@reduxjs/toolkit'
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { i18n } from '/app/i18n'
@@ -125,7 +130,6 @@ describe('LoginModal', () => {
   })
 
   afterEach(() => {
-    cleanup()
     vi.clearAllMocks()
   })
 

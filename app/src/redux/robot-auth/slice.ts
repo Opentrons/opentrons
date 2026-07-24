@@ -6,8 +6,8 @@ import isEqual from 'lodash/isEqual'
 import { type ActionTypesFromSlice } from '../ActionTypesFromSlice'
 import { getLocalRobot } from '../discovery'
 
-import type { AuthUserAccountType } from '@opentrons/api-client'
 import type { Draft, PayloadAction } from '@reduxjs/toolkit'
+import type { AuthUserAccountType } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 
 export interface RobotAuthState {
@@ -143,8 +143,13 @@ function logOutOrTimeOut(
 
 export const robotAuthReducer = robotAuthSlice.reducer
 
-export const { logIn, refreshLogin, logOut, timeOutLogin, updateLoggedInUserProfile } =
-  robotAuthSlice.actions
+export const {
+  logIn,
+  refreshLogin,
+  logOut,
+  timeOutLogin,
+  updateLoggedInUserProfile,
+} = robotAuthSlice.actions
 
 export type RobotAuthAction = ActionTypesFromSlice<
   typeof robotAuthSlice.actions

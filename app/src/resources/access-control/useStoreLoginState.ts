@@ -1,9 +1,10 @@
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { logIn, type LoggedInUserProfile } from '/app/redux/robot-auth'
+import { logIn } from '/app/redux/robot-auth'
 
 import type { OAuth2TokenResponse } from '@opentrons/api-client'
+import type { LoggedInUserProfile } from '/app/redux/robot-auth'
 
 /** Returns a function that updates client-side state to reflect a successful login. */
 export function useStoreLoginState(): (
