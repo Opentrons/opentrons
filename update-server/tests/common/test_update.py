@@ -16,7 +16,6 @@ from tests.openembedded.conftest import (
     mock_partition_manager_valid_switch_,
 )
 
-from otupdate.buildroot.update_actions import OT2UpdateActions
 from otupdate.common import config, file_actions, update
 from otupdate.common.session import SESSION_VARNAME, Stages, UpdateSession
 from otupdate.common.update_actions import UpdateActionsInterface
@@ -124,7 +123,6 @@ async def test_commit_fails_wrong_state(test_cli, update_session):
                 RootFSInterface(), mock_partition_manager_valid_switch_()
             ),
         ),
-        (1, lambda: OT2UpdateActions()),
     ]
 )
 def sys_handler(request):
@@ -209,7 +207,6 @@ async def test_update_happypath(
             root_FS_intf=RootFSInterface(),
             part_mngr=mock_partition_manager_valid_switch,
         ),
-        (OT2UpdateActions()),
     ]
 
     # Upload

@@ -23,10 +23,9 @@ from . import auth, config, update_actions
 from .constants import RESTART_LOCK_NAME
 from .handler_type import Handler
 from .session import Stages, UpdateSession, get_current_session, set_current_session
-from otupdate.buildroot.update_actions import UPDATE_PKG_BR
 from otupdate.openembedded.update_actions import UPDATE_PKG_OE
 
-VALID_UPDATE_PKG = UPDATE_PKG_OE + UPDATE_PKG_BR
+VALID_UPDATE_PKG = UPDATE_PKG_OE
 
 LOG = logging.getLogger(__name__)
 

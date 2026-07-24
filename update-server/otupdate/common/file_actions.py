@@ -1,6 +1,5 @@
 """
-common.file_actions - actions common to both buildroot and openembedded like
-handling hash and sig checking
+common.file_actions - platform-independent actions like hash and sig checking
 """
 
 import binascii

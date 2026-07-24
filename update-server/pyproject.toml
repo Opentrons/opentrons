@@ -139,9 +139,6 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = [
     "tests.conftest",
-    "tests.buildroot.conftest",
-    "tests.buildroot.test_control",
-    "tests.buildroot.test_update_actions",
     "tests.common.conftest",
     "tests.common.config",
     "tests.common.test_config",

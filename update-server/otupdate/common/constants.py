@@ -2,7 +2,7 @@
 
 from typing_extensions import Final
 
-APP_VARIABLE_PREFIX = "com.opentrons.otupdate.buildroot."
+APP_VARIABLE_PREFIX = "com.opentrons.otupdate."
 #: Prefix for variables in the aiohttp.web.Application dictlike
 
 RESTART_LOCK_NAME = APP_VARIABLE_PREFIX + "restartlock"
@@ -25,5 +25,4 @@ DEVICE_BOOT_ID_NAME = APP_VARIABLE_PREFIX + "boot_id"
 #: This ID only changes when the whole operating system reboots.
 #: It doesn't change if some internal process merely crashes and restarts.
 
-MODEL_OT2: Final[str] = "OT-2 Standard"
 MODEL_OT3: Final[str] = "OT-3 Standard"
