@@ -11,10 +11,6 @@ import sys
 import aiohttp
 
 
-# TODO (al, 2022-04-18): This separate script should be refactored. It and
-#  buildroot_upload.py should be merged into one script.
-
-
 async def poll_status(sess, token, root):
     await asyncio.sleep(1.0)
     resp = await sess.get(root + '/' + token + '/status')
