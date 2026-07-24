@@ -11,6 +11,8 @@ import {
   usePatchRobotServerAccessControlSettingsMutation,
 } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+
 import { Accordion } from './Accordion'
 import {
   getAuditInputPatch,
@@ -71,14 +73,17 @@ export function ComplianceReadySoftwareSettings({
   robotName: _robotName,
 }: ComplianceReadySoftwareSettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const documentationState = useDocumentationState()
   const authSettingsQuery = useAuthSettingsQuery()
   const auditSettingsQuery = useAuditSettingsQuery()
   const robotServerAccessControlSettingsQuery =
     useGetRobotServerAccessControlSettingsQuery()
-  const { mutate: patchAuthSettings } = useAuthSettingsMutation()
-  const { mutate: patchAuditSettings } = useAuditSettingsMutation()
+  const { mutate: patchAuthSettings } =
+    useAuthSettingsMutation(documentationState)
+  const { mutate: patchAuditSettings } =
+    useAuditSettingsMutation(documentationState)
   const { mutate: patchRobotServerAccessControlSettings } =
-    usePatchRobotServerAccessControlSettingsMutation()
+    usePatchRobotServerAccessControlSettingsMutation(documentationState)
 
   const fieldValues = useMemo(
     () =>

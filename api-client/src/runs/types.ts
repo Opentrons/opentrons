@@ -251,7 +251,3 @@ export interface FlexStackerState {
   count: number
   maxCount: number
 }
-
-export interface DeleteRunData {
-  shouldDeleteAllRunFiles?: boolean
-}

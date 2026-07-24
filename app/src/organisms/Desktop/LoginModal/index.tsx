@@ -147,12 +147,10 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
           kind: 'setNewPassword',
           formData: setNewPasswordStateForm(successfulUsername),
         })
-        return
+      } else {
+        modal.resolve({ username: successfulUsername })
+        modal.remove()
       }
-
-      storeLoginState(robotName, successfulUsername, response)
-      modal.resolve({ username: successfulUsername })
-      modal.remove()
     },
     onError: handleError,
   })

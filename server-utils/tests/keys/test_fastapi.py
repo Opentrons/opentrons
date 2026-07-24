@@ -14,6 +14,7 @@ from server_utils.keys.fastapi import (
 from server_utils.keys.key_server import (
     Client,
     LocalHTTPClient,
+    PublicKeyAndHash,
     SignedMessageData,
     SignMessageData,
 )
@@ -65,6 +66,9 @@ def test_install_and_get_key_client_via_dependency() -> None:
         async def sign_message(
             self, message: SignMessageData
         ) -> SignedMessageData:  # pragma: no cover - not exercised here
+            raise NotImplementedError
+
+        async def get_key_and_hash(self) -> PublicKeyAndHash:
             raise NotImplementedError
 
     stub_client = StubClient()

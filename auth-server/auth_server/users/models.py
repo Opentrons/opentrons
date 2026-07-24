@@ -83,12 +83,15 @@ class UpdateUser(BaseModel):
         ),
     ] = None
     resetPassword: Annotated[
-        bool,
+        Literal[True] | None,
         Field(
-            description="Set to true to require this user to change their password.",
-            default=False,
+            description=(
+                "Set to true to require this user to change their password"
+                " before doing anything else on the robot."
+                " Once set, this can only be cleared by a password change."
+            ),
         ),
-    ] = False
+    ] = None
 
 
 class UpdateSelf(BaseModel):
@@ -114,8 +117,23 @@ class UserResponse(BaseModel):
     username: str
     fullName: str
     accountType: AccountType
-    locked: bool
-    resetPassword: bool
+    locked: Annotated[
+        bool,
+        Field(
+            description="If true, this account is locked because of too many failed login attempts."
+        ),
+    ]
+    resetPassword: Annotated[
+        bool,
+        Field(
+            description=(
+                "If true, a new password must be set before this user is allowed to do anything else on the robot."
+                " This can happen if the password expired, or if an admin explicitly requested a password change."
+                " The server will enforce this with OAuth 2 scopes."
+                " A client can read this field to detect the need to set a new password."
+            )
+        ),
+    ]
 
 
 class ResetPasswordResponse(UserResponse):

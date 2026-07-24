@@ -2,10 +2,14 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Tabs } from '@opentrons/components'
+import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
+import { DiagnosticFiles } from './DiagnosticFiles'
 import styles from './filemanager.module.css'
+import { DownloadDiagnosticFilesWizard } from './FileManagerWizardFlows/DownloadDiagnosticFilesWizard'
+import { DownloadProtocolRunRecordsWizard } from './FileManagerWizardFlows/DownloadProtocolRunRecordsWizard'
 
 import type { ComponentProps } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
@@ -22,6 +26,12 @@ export function FileManager({
 }: FileManagerProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const [activeTab, setActiveTab] = useState<FileManagerTab>('diagnostic')
+  const [showDownloadModal, setShowDownloadModal] = useState(false)
+  const [showDownloadRecordsWizard, setShowDownloadRecordsWizard] =
+    useState(false)
+  const { data: accessControlData } = useAccessControlEnabledQuery()
+  const isComplianceReady =
+    accessControlData?.data?.accessControlEnabled ?? false
 
   const showDeleteAll = activeTab === 'compliance' || activeTab === 'records'
 
@@ -34,13 +44,17 @@ export function FileManager({
         },
         isActive: activeTab === 'diagnostic',
       },
-      {
-        text: t('compliance_ready_files'),
-        onClick: () => {
-          setActiveTab('compliance')
-        },
-        isActive: activeTab === 'compliance',
-      },
+      ...(isComplianceReady
+        ? [
+            {
+              text: t('compliance_ready_files'),
+              onClick: () => {
+                setActiveTab('compliance')
+              },
+              isActive: activeTab === 'compliance',
+            },
+          ]
+        : []),
       {
         text: t('protocol_run_records'),
         onClick: () => {
@@ -49,7 +63,7 @@ export function FileManager({
         isActive: activeTab === 'records',
       },
     ]
-  }, [activeTab, t])
+  }, [activeTab, t, isComplianceReady])
 
   const secondaryButtonProps: ComponentProps<typeof SmallButton> | null =
     showDeleteAll
@@ -57,14 +71,21 @@ export function FileManager({
           buttonType: 'primary',
           buttonCategory: 'rounded',
           buttonText: t('download_all'),
-          onClick: () => {},
+          onClick: () => {
+            if (activeTab === 'records') {
+              setShowDownloadRecordsWizard(true)
+            }
+          },
           iconName: 'download',
           iconPlacement: 'startIcon',
         }
       : null
-  const iconProps = showDeleteAll
-    ? { iconName: 'download', iconPlacement: 'startIcon' }
-    : null
+
+  const handleClickButton = (): void => {
+    if (activeTab === 'diagnostic') {
+      setShowDownloadModal(true)
+    }
+  }
 
   return (
     <div className={styles.container}>
@@ -76,15 +97,33 @@ export function FileManager({
         buttonText={showDeleteAll ? t('delete_all') : t('download_all')}
         buttonType={showDeleteAll ? 'alert' : 'primary'}
         buttonCategory="rounded"
-        onClickButton={() => {}}
+        iconName={showDeleteAll ? undefined : 'download'}
+        iconPlacement={showDeleteAll ? undefined : 'startIcon'}
+        onClickButton={handleClickButton}
         {...(secondaryButtonProps != null ? { secondaryButtonProps } : {})}
-        {...(iconProps != null ? { iconProps } : {})}
       />
       <div className={styles.content}>
-        <Tabs tabs={tabs} />
-        {/* TODO: add content for each tab */}
-        <div>{activeTab}</div>
+        <div className={styles.tabs_row}>
+          <Tabs tabs={tabs} />
+        </div>
+        <div className={styles.tab_content}>
+          {activeTab === 'diagnostic' ? <DiagnosticFiles /> : null}
+        </div>
       </div>
+      {showDownloadModal && activeTab === 'diagnostic' ? (
+        <DownloadDiagnosticFilesWizard
+          onClose={() => {
+            setShowDownloadModal(false)
+          }}
+        />
+      ) : null}
+      {showDownloadRecordsWizard && activeTab === 'records' ? (
+        <DownloadProtocolRunRecordsWizard
+          onClose={() => {
+            setShowDownloadRecordsWizard(false)
+          }}
+        />
+      ) : null}
     </div>
   )
 }

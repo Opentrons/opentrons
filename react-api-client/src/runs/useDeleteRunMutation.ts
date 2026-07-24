@@ -1,19 +1,21 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { deleteRun } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
 import type {
-  UseMutateFunction,
+  UseMutateAsyncFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type { DeleteRunData, EmptyResponse } from '@opentrons/api-client'
+import type { EmptyResponse } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
+import type { DocumentedMutationParameters } from '../accessControl/types'
 
 export interface DeleteRunParams {
   runId: string
-  settings?: DeleteRunData
 }
 
 export type UseDeleteRunMutationResult = UseMutationResult<
@@ -21,7 +23,7 @@ export type UseDeleteRunMutationResult = UseMutationResult<
   unknown,
   DeleteRunParams
 > & {
-  deleteRun: UseMutateFunction<EmptyResponse, unknown, DeleteRunParams>
+  deleteRun: UseMutateAsyncFunction<EmptyResponse, unknown, DeleteRunParams>
 }
 
 export type UseDeleteRunMutationOptions = UseMutationOptions<
@@ -31,14 +33,24 @@ export type UseDeleteRunMutationOptions = UseMutationOptions<
 >
 
 export function useDeleteRunMutation(
+  documentationState: DocumentationState,
   options: UseDeleteRunMutationOptions = {}
 ): UseDeleteRunMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<EmptyResponse, unknown, DeleteRunParams>(
-    ({ runId, settings }) =>
-      deleteRun(host!, runId, settings).then(response => {
+  const mutation = useDocumentedMutation<
+    EmptyResponse,
+    unknown,
+    DeleteRunParams
+  >(
+    documentationState,
+    ['delete_run'],
+    ({
+      variables: { runId },
+      userNotes,
+    }: DocumentedMutationParameters<DeleteRunParams>) =>
+      deleteRun(host!, runId, userNotes).then(response => {
         queryClient.removeQueries(getQueryKey(host, 'runs', runId))
         queryClient
           .invalidateQueries(getQueryKey(host, 'runs'))
@@ -52,6 +64,6 @@ export function useDeleteRunMutation(
 
   return {
     ...mutation,
-    deleteRun: mutation.mutate,
+    deleteRun: mutation.mutateAsync,
   }
 }

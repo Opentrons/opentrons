@@ -22,6 +22,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/utils'
 import { getIsOnDevice } from '/app/redux/config'
 import {
   useChainMaintenanceCommands,
@@ -223,7 +224,10 @@ export const LegacyLabwarePositionCheckComponent = (
     )
   }, [workingOffsets, protocolData, existingOffsets])
 
-  const { createLabwareOffset } = useAddLabwareOffsetToRunMutation()
+  // CRS is disabled on OT-2s.
+  const { createLabwareOffset } = useAddLabwareOffsetToRunMutation(
+    ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+  )
   const calculateAndApplyOffset = (
     initialPosition: Vector3D | null,
     finalPosition: Vector3D | null,

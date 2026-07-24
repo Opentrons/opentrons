@@ -149,6 +149,16 @@ remote.ipcRenderer.on(
   }
 )
 
+export async function saveFileToUsb(
+  filePath: string,
+  buffer: ArrayBuffer
+): Promise<void> {
+  await remote.ipcRenderer.invoke('usb:saveFile', {
+    filePath,
+    buffer: Array.from(new Uint8Array(buffer)),
+  })
+}
+
 export async function tryInstallEncryptedRobotCertificate(props: {
   certificateData: string
   password: string

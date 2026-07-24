@@ -116,6 +116,7 @@ class MaintenanceRunDataManager:
             The run resource.
         """
         if self._run_orchestrator_store.current_run_id is not None:
+            self._maintenance_runs_publisher.stop_publishing_for_maintenance_run()
             await self._run_orchestrator_store.clear()
 
         proxy_door_callback = None
@@ -137,7 +138,7 @@ class MaintenanceRunDataManager:
         await camera.update_live_stream_status(
             self._run_orchestrator_store._robot_type,
             True,
-            camera_provider,
+            await camera_provider.get_camera_settings(),
             state_summary.cameraSettings,
         )
 
@@ -196,17 +197,15 @@ class MaintenanceRunDataManager:
             RunNotFoundError: The given run identifier was not found.
         """
         if run_id == self._run_orchestrator_store.current_run_id:
+            self._maintenance_runs_publisher.stop_publishing_for_maintenance_run()
             await self._run_orchestrator_store.clear()
-            await (
-                self._maintenance_runs_publisher.publish_current_maintenance_run_async()
-            )
 
             if camera_settings is not None:
                 # Restart the live stream for the external run when the maintenance run has ended.
                 await camera.update_live_stream_status(
                     self._run_orchestrator_store._robot_type,
                     True,
-                    camera_provider,
+                    await camera_provider.get_camera_settings(),
                     camera_settings,
                 )
 

@@ -3,7 +3,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
+import { mockHeaterShaker, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   useAddCameraSettingsToRunMutation,
   useAllPipetteOffsetCalibrationsQuery,
@@ -22,6 +22,7 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
 import { mockRobotSideAnalysis } from '/app/molecules/Command/__fixtures__'
@@ -60,7 +61,6 @@ import { useRobotType } from '/app/redux-resources/robots'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 import {
   getCameraUsageState,
   selectAreOffsetsApplied,
@@ -144,6 +144,9 @@ vi.mock('/app/local-resources/instruments')
 vi.mock('/app/organisms/DoorOpenControl/useIsDoorOpen')
 vi.mock('/app/organisms/LabwarePositionCheck')
 vi.mock('/app/organisms/ODD/ProtocolSetup/ProtocolSetupCamera')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const render = (path = '/') => {
   return renderWithProviders(

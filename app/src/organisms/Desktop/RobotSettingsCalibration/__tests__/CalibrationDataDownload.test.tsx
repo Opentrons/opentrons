@@ -14,12 +14,12 @@ import '@testing-library/jest-dom/vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useDownloadCalibrationData } from '/app/organisms/Desktop/Devices/hooks'
+import { useDownloadCalibrationData } from '/app/resources/devices/hooks'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
 import { CalibrationDataDownload } from '../CalibrationDataDownload'
 
-vi.mock('/app/organisms/Desktop/Devices/hooks')
+vi.mock('/app/resources/devices/hooks')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
 const mockDownloadCalibration = vi.fn()
@@ -56,6 +56,7 @@ describe('CalibrationDataDownload', () => {
     mockDownloadCalibration.mockClear()
     when(useDownloadCalibrationData).calledWith(ROBOT_NAME).thenReturn({
       downloadCalibration: mockDownloadCalibration,
+      isLoading: false,
     })
     when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
   })

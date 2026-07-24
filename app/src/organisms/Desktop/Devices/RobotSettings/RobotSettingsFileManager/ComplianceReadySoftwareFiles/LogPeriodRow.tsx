@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { CheckboxBasic, Chip, COLORS, Tag } from '@opentrons/components'
+import { CheckboxBasic, Chip, COLORS, Icon, Tag } from '@opentrons/components'
 
 import { formatTimestamp } from '/app/transformations/runs'
 
@@ -11,12 +11,14 @@ import type { LogPeriodSummary } from '@opentrons/api-client'
 interface LogPeriodRowProps {
   period: LogPeriodSummary
   isSelected: boolean
+  isDeleting: boolean
   onToggle: () => void
 }
 
 export function LogPeriodRow({
   period,
   isSelected,
+  isDeleting,
   onToggle,
 }: LogPeriodRowProps): JSX.Element {
   const { t } = useTranslation('device_details')
@@ -24,11 +26,15 @@ export function LogPeriodRow({
 
   return (
     <div className={styles.compliance_period_row}>
-      <CheckboxBasic
-        checked={isSelected}
-        onChange={onToggle}
-        backgroundColor={COLORS.white}
-      />
+      {isDeleting ? (
+        <Icon name="ot-spinner" spin size="1rem" color={COLORS.grey60} />
+      ) : (
+        <CheckboxBasic
+          checked={isSelected}
+          onChange={onToggle}
+          backgroundColor={COLORS.white}
+        />
+      )}
       <div className={styles.compliance_period_card_outer}>
         <div className={styles.compliance_period_card_inner}>
           <div className={styles.log_date_col}>

@@ -60,6 +60,9 @@ describe('BeforeBeginning', () => {
       createMaintenanceRun: vi.fn(),
       errorMessage: null,
       setShowErrorMessage: vi.fn(),
+      isDoorOpenError: false,
+      setIsDoorOpenError: vi.fn(),
+      dismissDoorOpenError: vi.fn(),
       isCreateLoading: false,
       isRobotMoving: false,
       isOnDevice: false,
@@ -609,6 +612,23 @@ describe('BeforeBeginning', () => {
       await waitFor(() => {
         expect(props.proceed).toHaveBeenCalled()
       })
+    })
+  })
+
+  describe('door open error handling', () => {
+    it('renders the door-open modal when isDoorOpenError is true', () => {
+      props = {
+        ...props,
+        flowType: FLOWS.CALIBRATE,
+        errorMessage: 'Robot door is open',
+        isDoorOpenError: true,
+      }
+      render(props)
+      screen.getByText('Robot door is open')
+      screen.getByText('Close the door and try again.')
+      const tryAgainBtn = screen.getByRole('button', { name: 'Try again' })
+      fireEvent.click(tryAgainBtn)
+      expect(props.dismissDoorOpenError).toHaveBeenCalled()
     })
   })
 })

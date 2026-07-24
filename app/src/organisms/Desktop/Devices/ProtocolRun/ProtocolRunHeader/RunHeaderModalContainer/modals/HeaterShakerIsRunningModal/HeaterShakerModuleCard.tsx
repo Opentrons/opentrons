@@ -16,7 +16,7 @@ import heaterShakerModule from '/app/assets/images/heater_shaker_module_transpar
 import { useModuleUSBPort } from '/app/local-resources/modules'
 import { HeaterShakerModuleData } from '/app/organisms/ModuleCard/HeaterShakerModuleData'
 
-import type { HeaterShakerModule } from '/app/redux/modules/types'
+import type { HeaterShakerModule } from '@opentrons/api-client'
 
 interface HeaterShakerModuleCardProps {
   module: HeaterShakerModule

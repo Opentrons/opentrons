@@ -37,38 +37,6 @@ export const mockRestartFailureMeta = {
   status: 500,
 }
 
-export const mockShutdownSuccess = {
-  host: mockRobot,
-  method: 'POST' as Method,
-  path: '/server/shutdown',
-  ok: true,
-  status: 200,
-  body: { message: 'shutting down in 1s' },
-}
-
-export const mockShutdownSuccessMeta = {
-  method: 'POST' as Method,
-  path: '/server/shutdown',
-  ok: true,
-  status: 200,
-}
-
-export const mockShutdownFailure = {
-  host: mockRobot,
-  method: 'POST' as Method,
-  path: '/server/shutdown',
-  ok: false,
-  status: 500,
-  body: { message: 'AH' },
-}
-
-export const mockShutdownFailureMeta = {
-  method: 'POST' as Method,
-  path: '/server/shutdown',
-  ok: false,
-  status: 500,
-}
-
 export const mockResetOptions = [
   { id: 'foo', name: 'Foo', description: 'foobar' },
   { id: 'bar', name: 'Bar', description: 'barfoo' },

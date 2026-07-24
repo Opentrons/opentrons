@@ -27,8 +27,7 @@ import { parseGaugePressureValue } from './utils/parseGaugePressureValue'
 import { sanitizeGaugePressureInput } from './utils/sanitizeGaugePressureInput'
 import styles from './vacuummodule.module.css'
 
-import type { VacuumMode } from '/app/redux/modules/api-types'
-import type { VacuumModule } from '/app/redux/modules/types'
+import type { VacuumMode, VacuumModule } from '@opentrons/api-client'
 
 interface VacuumModuleSlideoutProps {
   module: VacuumModule
@@ -82,7 +81,6 @@ export function VacuumModuleSlideout(
       isExpanded={isExpanded}
       footer={
         <SubmitPrimaryButton
-          form="VacuumModuleSlideout_submitValue"
           value={t('confirm')}
           onClick={handleConfirm}
           data-testid={`VacuumModuleSlideout_btn_${module.serialNumber}`}

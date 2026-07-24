@@ -270,6 +270,7 @@ async def test_create(
     mock_run_store: RunStore,
     mock_error_recovery_setting_store: ErrorRecoverySettingStore,
     mock_file_provider: FileProvider,
+    mock_camera_provider: CameraProvider,
     subject: RunDataManager,
     engine_state_summary: StateSummary,
     run_resource: RunResource,
@@ -304,7 +305,7 @@ async def test_create(
             protocol=protocol,
             deck_configuration=sentinel.deck_configuration,
             file_provider=mock_file_provider,
-            camera_provider=sentinel.camera_provider,
+            camera_provider=mock_camera_provider,
             run_time_param_values=sentinel.run_time_param_values,
             run_time_param_paths=sentinel.run_time_param_paths,
             notify_publishers=mock_notify_publishers,
@@ -346,10 +347,11 @@ async def test_create(
         labware_offsets=sentinel.labware_offsets,
         protocol=protocol,
         deck_configuration=sentinel.deck_configuration,
-        camera_provider=sentinel.camera_provider,
+        camera_provider=mock_camera_provider,
         run_time_param_values=sentinel.run_time_param_values,
         run_time_param_paths=sentinel.run_time_param_paths,
         notify_publishers=mock_notify_publishers,
+        access_control_status=False,
     )
 
     assert result == Run(
@@ -439,6 +441,7 @@ async def test_create_engine_error(
             run_time_param_values=None,
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
+            access_control_status=False,
         )
 
     decoy.verify(
@@ -974,6 +977,7 @@ async def test_create_archives_existing(
         run_time_param_values=None,
         run_time_param_paths=None,
         notify_publishers=mock_notify_publishers,
+        access_control_status=False,
     )
 
     decoy.verify(

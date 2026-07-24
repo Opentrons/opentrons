@@ -1,14 +1,21 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
   CheckboxBasic,
+  ERROR_TOAST,
+  INFO_TOAST,
   InfoScreen,
   StyledText,
   WARNING_TOAST,
 } from '@opentrons/components'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
+import {
+  useDeleteSelectedRuns,
+  useDownloadSelectedRuns,
+} from '/app/resources/devices/hooks'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import { DeleteRecordsModal } from '../../../DeleteRecordsModal'
@@ -18,11 +25,27 @@ import fileManagerStyles from '../robotsettingsfilemanager.module.css'
 import protocolRunRecordsStyles from './protocolrunrecords.module.css'
 import { RunRecord } from './RunRecord'
 
-export function ProtocolRunRecords(): JSX.Element {
+import type { IconProps } from '@opentrons/components'
+
+interface ProtocolRunRecordsProps {
+  robotName: string
+}
+
+export function ProtocolRunRecords({
+  robotName,
+}: ProtocolRunRecordsProps): JSX.Element {
   const { t } = useTranslation('device_details')
-  const { makeToast } = useToaster()
+  const { makeToast, eatToast } = useToaster()
   const { data: runData } = useNotifyAllRunsQuery()
-  const runs = [...(runData?.data ?? [])]
+  const runs = useMemo(
+    () => [...(runData?.data ?? [])].reverse(),
+    [runData?.data]
+  )
+  const documentationState = useDocumentationState()
+  const { downloadRuns, isDownloading: isDownloadingRuns } =
+    useDownloadSelectedRuns(robotName)
+  const { deleteSelectedRuns, deletingIds } =
+    useDeleteSelectedRuns(documentationState)
 
   const {
     selectedIds,
@@ -40,10 +63,25 @@ export function ProtocolRunRecords(): JSX.Element {
     })
   }
 
-  // no-op: download not yet implemented
   const handleDownloadSelected = (): void => {
     if (selectedIds.size === 0) {
       handleNoRunsSelected('download')
+      return
+    }
+    if (!isDownloadingRuns) {
+      const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
+      const toastId = makeToast(
+        t('downloading_run_records') as string,
+        INFO_TOAST,
+        { disableTimeout: true, icon: toastIcon }
+      )
+      void downloadRuns(runs.filter(run => selectedIds.has(run.id)))
+        .catch((e: Error) => {
+          makeToast(e.message, ERROR_TOAST, { closeButton: true })
+        })
+        .finally(() => {
+          eatToast(toastId)
+        })
     }
   }
 
@@ -63,6 +101,11 @@ export function ProtocolRunRecords(): JSX.Element {
             setShowDeleteRecordsModal(false)
           }}
           onConfirm={() => {
+            void deleteSelectedRuns(
+              runs.filter(run => selectedIds.has(run.id))
+            ).catch(() => {
+              makeToast('Error deleting records', ERROR_TOAST)
+            })
             setShowDeleteRecordsModal(false)
           }}
           type="selectedRuns"
@@ -71,6 +114,7 @@ export function ProtocolRunRecords(): JSX.Element {
       <div className={fileManagerStyles.file_management_group}>
         <FileManagementSectionHeader
           titleText={t('protocol_run_records')}
+          showButtons={isSomeSelected || isAllSelected}
           onDownloadSelected={handleDownloadSelected}
           onDeleteSelected={handleDeleteSelected}
         />
@@ -113,6 +157,7 @@ export function ProtocolRunRecords(): JSX.Element {
                 key={run.id}
                 run={run}
                 isSelected={selectedIds.has(run.id)}
+                isDeleting={deletingIds.has(run.id)}
                 onToggle={() => {
                   handleToggleRun(run.id)
                 }}

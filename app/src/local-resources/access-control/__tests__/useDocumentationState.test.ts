@@ -220,6 +220,7 @@ describe('useDocumentationState', () => {
     expect(mockShowDocumentationRequiredModal).toHaveBeenCalledWith(
       'alice',
       ['play_run'],
+      10,
       undefined,
       initialDocreport
     )

@@ -1,12 +1,13 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { patchAuditSettings } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../../accessControl'
 import { getQueryKey, useHost } from '../../api'
 
 import type { AxiosError } from 'axios'
 import type {
-  UseMutateAsyncFunction,
+  UseMutateFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
@@ -14,32 +15,46 @@ import type {
   AuditSettingsResponse,
   PatchAuditSettingsRequest,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../../accessControl'
+import type { DocumentedMutationParameters } from '../../accessControl/types'
 
 export type UseAuditSettingsMutationResult = UseMutationResult<
   AuditSettingsResponse,
   AxiosError,
   PatchAuditSettingsRequest
 > & {
-  patchAuditSettings: UseMutateAsyncFunction<
+  patchAuditSettings: UseMutateFunction<
     AuditSettingsResponse,
     AxiosError,
     PatchAuditSettingsRequest
   >
 }
 
+export type UseAuditSettingsMutationOptions = UseMutationOptions<
+  AuditSettingsResponse,
+  AxiosError,
+  PatchAuditSettingsRequest
+>
+
 export function useAuditSettingsMutation(
-  options: UseMutationOptions<
-    AuditSettingsResponse,
-    AxiosError,
-    PatchAuditSettingsRequest
-  > = {}
+  documentationState: DocumentationState,
+  options: UseAuditSettingsMutationOptions = {}
 ): UseAuditSettingsMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
-  const mutation = useMutation(
+  const mutation = useDocumentedMutation<
+    AuditSettingsResponse,
+    AxiosError,
+    PatchAuditSettingsRequest
+  >(
+    documentationState,
+    ['update_audit_settings'],
     getQueryKey(host, 'audit', 'external', 'settings'),
-    (body: PatchAuditSettingsRequest) =>
-      patchAuditSettings(host!, body)
+    ({
+      variables: body,
+      userNotes,
+    }: DocumentedMutationParameters<PatchAuditSettingsRequest>) =>
+      patchAuditSettings(host!, body, userNotes)
         .then(response => {
           queryClient
             .invalidateQueries(
@@ -60,6 +75,6 @@ export function useAuditSettingsMutation(
 
   return {
     ...mutation,
-    patchAuditSettings: mutation.mutateAsync,
+    patchAuditSettings: mutation.mutate,
   }
 }

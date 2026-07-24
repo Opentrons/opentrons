@@ -6,11 +6,13 @@ import axios from 'axios'
 import { BasicButton, Divider, StyledText } from '@opentrons/components'
 import {
   getSelfQueryKey,
+  isDocumentedMutationError,
   useHost,
   useSelfQuery,
   useUpdateSelfMutation,
 } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useUsernameForRobot } from '/app/redux/robot-auth/hooks'
 
 import styles from './personalaccountsettings.module.css'
@@ -45,8 +47,10 @@ export function PersonalAccountSettings({
   const { t } = useTranslation(['device_settings', 'shared'])
   const queryClient = useQueryClient()
   const host = useHost()
+  const documentationState = useDocumentationState(undefined, robotName)
   const username = useUsernameForRobot(robotName)
-  const { updateSelf, isLoading: isSaving } = useUpdateSelfMutation()
+  const { updateSelf, isLoading: isSaving } =
+    useUpdateSelfMutation(documentationState)
   const { data: selfResponse } = useSelfQuery({ enabled: username != null })
 
   const [isEditing, setIsEditing] = useState(false)
@@ -70,6 +74,11 @@ export function PersonalAccountSettings({
         setIsEditing(false)
       })
       .catch((error: unknown) => {
+        // User cancelled the documentation/login modal — stay on the edit form.
+        if (isDocumentedMutationError(error)) {
+          return
+        }
+
         const errorId = axios.isAxiosError(error)
           ? error.response?.data?.errors?.[0]?.id
           : null

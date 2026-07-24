@@ -779,19 +779,18 @@ async def test_download_run_images_success(
         data_files_store=data_files_store,
         run_store=run_store,
         protocol_store=protocol_store,
+        persistence_directory_root=tmp_path,
     )
 
     assert result.media_type == "application/zip"
     assert "attachment" in result.headers["Content-Disposition"]
     assert ".zip" in result.headers["Content-Disposition"]
+    assert Path(result.path).exists()
+    assert Path(result.path).stat().st_size > 0
 
-    chunks = []
-    async for chunk in result.body_iterator:
-        chunks.append(chunk)
-
-    assert len(chunks) > 0
-    total_size = sum(len(chunk) for chunk in chunks)
-    assert total_size > 0
+    if result.background is not None:
+        await result.background()
+    assert not Path(result.path).exists()
 
 
 async def test_download_run_images_no_images_found(
@@ -799,6 +798,7 @@ async def test_download_run_images_no_images_found(
     data_files_store: DataFilesStore,
     run_store: RunStore,
     protocol_store: ProtocolStore,
+    tmp_path: Path,
 ) -> None:
     """It should raise an error when no images are found for the run."""
     decoy.when(
@@ -816,6 +816,7 @@ async def test_download_run_images_no_images_found(
             data_files_store=data_files_store,
             run_store=run_store,
             protocol_store=protocol_store,
+            persistence_directory_root=tmp_path,
         )
 
     assert exc_info.value.status_code == 404

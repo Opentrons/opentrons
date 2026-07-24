@@ -17,14 +17,6 @@ export const RESTART_SUCCESS: 'robotAdmin:RESTART_SUCCESS' =
 export const RESTART_FAILURE: 'robotAdmin:RESTART_FAILURE' =
   'robotAdmin:RESTART_FAILURE'
 
-export const SHUTDOWN: 'robotAdmin:SHUTDOWN' = 'robotAdmin:SHUTDOWN'
-
-export const SHUTDOWN_SUCCESS: 'robotAdmin:SHUTDOWN_SUCCESS' =
-  'robotAdmin:SHUTDOWN_SUCCESS'
-
-export const SHUTDOWN_FAILURE: 'robotAdmin:SHUTDOWN_FAILURE' =
-  'robotAdmin:SHUTDOWN_FAILURE'
-
 export const FETCH_RESET_CONFIG_OPTIONS: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS' =
   'robotAdmin:FETCH_RESET_CONFIG_OPTIONS'
 
@@ -53,8 +45,6 @@ export const SYNC_SYSTEM_TIME: 'robotAdmin:SYNC_SYSTEM_TIME' =
 export const LABWARE_OFFSETS_PATH: '/labwareOffsets' = '/labwareOffsets'
 
 export const RESTART_PATH: '/server/restart' = '/server/restart'
-
-export const SHUTDOWN_PATH: '/server/shutdown' = '/server/shutdown'
 
 export const SETTINGS_RESET_PATH: '/settings/reset' = '/settings/reset'
 

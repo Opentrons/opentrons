@@ -5,12 +5,13 @@ import type { EmptyResponse, HostConfig } from '../types'
 
 export function dismissCurrentRun(
   config: HostConfig,
-  runId: string
+  runId: string,
+  userNotes?: string
 ): ResponsePromise<EmptyResponse> {
   return request<EmptyResponse, { data: { current: false } }>(
     PATCH,
     `/runs/${runId}`,
     config,
-    { body: { data: { current: false } } }
+    { body: { data: { current: false } }, userNotes }
   )
 }

@@ -126,10 +126,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
           )}
         </>
       ) : null}
-      <PrimaryButton
-        onClick={handleClick}
-        id="UploadInput_protocolUploadButton"
-      >
+      <PrimaryButton onClick={handleClick}>
         {uploadButtonText ?? t('upload')}
       </PrimaryButton>
 
@@ -155,7 +152,6 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
         />
         {dragAndDropText}
         <StyledInput
-          id="file_input"
           data-testid="file_input"
           ref={fileInput}
           type="file"
