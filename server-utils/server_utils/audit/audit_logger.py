@@ -2,7 +2,7 @@
 
 from .audit_server import Client as AuditClient
 from .audit_server import SubmitAuditLogMessageData
-from server_utils.auth.resource_server.authorization_checker import (
+from server_utils.auth.resource_server.types import (
     AuthorizedResult,
 )
 

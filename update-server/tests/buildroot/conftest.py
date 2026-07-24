@@ -4,8 +4,8 @@ from unittest import mock
 
 import pytest
 
-from server_utils.auth.resource_server.authorization_checker import (
-    AlwaysAllowedAuthorizationChecker,
+from server_utils.auth.resource_server.authentication_checker import (
+    AlwaysAllowedAuthenticationChecker,
 )
 
 from otupdate import buildroot, common
@@ -29,7 +29,7 @@ async def test_cli(
         system_version_file=version_file_path,
         config_file_override=otupdate_config,
         boot_id_override="dummy-boot-id-abc123",
-        authorization_checker=AlwaysAllowedAuthorizationChecker(),
+        authentication_checker=AlwaysAllowedAuthenticationChecker(),
     )
     client = await aiohttp_client(app)
     return client

@@ -6,8 +6,8 @@ import asyncio
 import logging
 from typing import NoReturn
 
-from server_utils.auth.resource_server.authorization_checker import (
-    AlwaysAllowedAuthorizationChecker,
+from server_utils.auth.resource_server.authentication_checker import (
+    AlwaysAllowedAuthenticationChecker,
 )
 
 from . import get_app
@@ -36,7 +36,7 @@ async def main() -> NoReturn:
         app = await get_app(
             name_synchronizer=name_synchronizer,
             # We don't support access control on the OT-2.
-            authorization_checker=AlwaysAllowedAuthorizationChecker(),
+            authentication_checker=AlwaysAllowedAuthenticationChecker(),
             system_version_file=args.version_file,
             config_file_override=args.config_file,
         )

@@ -35,12 +35,12 @@ from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLoc
 from opentrons.protocol_api import labware
 from opentrons.types import Mount, Point
 from opentrons_shared_data.labware.types import LabwareDefinition
-from server_utils.auth.resource_server.authorization_checker import (
-    AlwaysAllowedAuthorizationChecker,
-    AuthorizationChecker,
+from server_utils.auth.resource_server.authentication_checker import (
+    AlwaysAllowedAuthenticationChecker,
+    AuthenticationChecker,
 )
 from server_utils.auth.resource_server.fastapi import (
-    get_authorization_checker,
+    get_authentication_checker,
 )
 
 from robot_server.app import app
@@ -230,17 +230,19 @@ def _override_notification_client_with_mock(decoy: Decoy) -> Iterator[None]:
 
 
 @pytest.fixture
-def _override_authorization_checker_with_always_allowed(decoy: Decoy) -> Iterator[None]:
-    authorization_checker = AlwaysAllowedAuthorizationChecker()
+def _override_authentication_checker_with_always_allowed(
+    decoy: Decoy,
+) -> Iterator[None]:
+    authentication_checker = AlwaysAllowedAuthenticationChecker()
 
-    async def get_authorization_checker_override() -> AuthorizationChecker:
-        return authorization_checker
+    async def get_authentication_checker_override() -> AuthenticationChecker:
+        return authentication_checker
 
-    app.dependency_overrides[get_authorization_checker] = (
-        get_authorization_checker_override
+    app.dependency_overrides[get_authentication_checker] = (
+        get_authentication_checker_override
     )
     yield
-    del app.dependency_overrides[get_authorization_checker]
+    del app.dependency_overrides[get_authentication_checker]
 
 
 @pytest.fixture
@@ -250,7 +252,7 @@ def api_client(
     _override_version_with_mock: None,
     _override_ot2_hardware_with_mock: None,
     _override_notification_client_with_mock: None,
-    _override_authorization_checker_with_always_allowed: None,
+    _override_authentication_checker_with_always_allowed: None,
 ) -> TestClient:
     client = TestClient(app)
     client.headers.update(
@@ -267,7 +269,7 @@ def api_client_camera_overrides(
     _override_ot2_hardware_with_mock: None,
     _override_run_data_manager_with_mock: None,
     _override_notification_client_with_mock: None,
-    _override_authorization_checker_with_always_allowed: None,
+    _override_authentication_checker_with_always_allowed: None,
 ) -> TestClient:
     client = TestClient(app)
     client.headers.update(

@@ -11,12 +11,12 @@ This module helps with the resource server part, not the authorization server pa
 For the authorization server part, see the `oauth2` directory.
 
 Other resource servers, like robot-server, implement access control with an
-`AuthorizationChecker` that queries the auth-server (us) over a local HTTP request.
+`AuthenticationChecker` that queries the auth-server (us) over a local HTTP request.
 (See the utilities in `server_utils`.) We want to share as much of that logic as
 possible, but we can't do it exactly the same way, because we *are* the auth server,
 and we don't have a clean way to connect to ourselves over HTTP. So, we use a special
-customized `AuthorizationChecker` that retrieves data directly from our internal stores
-instead of going over HTTP.
+customized `AuthenticationChecker` that retrieves data directly from our internal stores
+instead of going over HTTP. We get to use the same _authorization_ mechanics as everything else.
 """
 
 from typing import Annotated, override
@@ -25,14 +25,16 @@ import fastapi
 
 from server_utils.auth.resource_server.auth_server import (
     CLIENT_ID,
-    AuthSettingsResponse,
     Client,
+)
+from server_utils.auth.resource_server.authentication_checker import (
+    AuthenticationChecker,
+    AuthServerAuthenticationChecker,
+)
+from server_utils.auth.resource_server.types import (
+    AuthSettingsResponse,
     TokenIntrospectionRequestFormData,
     TokenIntrospectionResponse,
-)
-from server_utils.auth.resource_server.authorization_checker import (
-    AuthorizationChecker,
-    AuthServerAuthorizationChecker,
 )
 
 from auth_server.oauth2.backend import Backend as OAuth2Backend
@@ -43,12 +45,12 @@ from auth_server.settings.store import (
 )
 
 
-def build_authorization_checker(
+def build_authentication_checker(
     settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
     oauth2_backend: Annotated[OAuth2Backend, fastapi.Depends(get_oauth2_backend)],
-) -> AuthorizationChecker:
-    """Construct the server's singleton `AuthorizationChecker`."""
-    return AuthServerAuthorizationChecker(
+) -> AuthenticationChecker:
+    """Construct the server's singleton `AuthenticationChecker`."""
+    return AuthServerAuthenticationChecker(
         client=_SelfClient(settings_store, oauth2_backend)
     )
 
