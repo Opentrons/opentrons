@@ -11,9 +11,7 @@ from .audit_server import SubmitAuditLogMessageData
 from server_utils.auth.resource_server.fastapi import (
     RequireAuthenticationResult,
 )
-from server_utils.auth.resource_server.types import (
-    AuthorizedResult,
-)
+from server_utils.auth.resource_server.types import AuthenticatedResult
 
 MAX_LOG_CHUNK_SIZE_B = 1 * 1024
 TRUNCATION_MESSAGE = f"(truncated after {MAX_LOG_CHUNK_SIZE_B}B)"
