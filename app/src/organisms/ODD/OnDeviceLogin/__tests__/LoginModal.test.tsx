@@ -5,12 +5,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import NiceModal from '@ebay/nice-modal-react'
 import { configureStore } from '@reduxjs/toolkit'
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { i18n } from '/app/i18n'
@@ -24,8 +19,6 @@ import {
 import { showLoginModal } from '../LoginModal'
 
 import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
-
-const LOCAL_ROBOT_NAME = mockConnectableRobot.name
 
 vi.mock('/app/redux/discovery', async importOriginal => {
   const actual = (await importOriginal()) as Record<string, unknown>
