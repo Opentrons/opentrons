@@ -6,6 +6,7 @@ import isEqual from 'lodash/isEqual'
 import { type ActionTypesFromSlice } from '../ActionTypesFromSlice'
 import { getLocalRobot } from '../discovery'
 
+import type { AuthUserAccountType } from '@opentrons/api-client'
 import type { Draft, PayloadAction } from '@reduxjs/toolkit'
 import type { State } from '/app/redux/types'
 
@@ -18,10 +19,18 @@ export interface RobotAuthState {
   mostRecentRobotName: string | null
 }
 
-interface PerRobotAuthState {
+export interface LoggedInUserProfile {
   /** The username that we're currently logged in as. */
   username: string
 
+  /** The user's legal name returned from GET /auth/users/self at login. */
+  fullName: string
+
+  /** The account type returned from GET /auth/users/self at login. */
+  accountType: AuthUserAccountType
+}
+
+export interface PerRobotAuthState extends LoggedInUserProfile {
   /** The OAuth 2 access token, for making robot API requests. */
   accessToken: string
 
@@ -44,12 +53,17 @@ export const INITIAL_ROBOT_AUTH_STATE: RobotAuthState = {
 }
 
 /** Stores the result of logging in to a robot, of refreshing an existing login. */
-interface LogInOrRefreshPayload {
+interface LogInOrRefreshPayload extends LoggedInUserProfile {
   robotName: string
-  username: string
   accessToken: string
   refreshToken: string | null
   expiresAt: number | null
+}
+
+interface UpdateLoggedInUserProfilePayload {
+  robotName: string
+  username: string
+  fullName: string
 }
 
 /** Stores the result of logging out of a robot, or of a login naturally timing out. */
@@ -79,6 +93,21 @@ const robotAuthSlice = createSlice({
     ) => {
       logOutOrTimeOut(stateDraft, action.payload)
     },
+    updateLoggedInUserProfile: (
+      stateDraft,
+      action: PayloadAction<UpdateLoggedInUserProfilePayload>
+    ) => {
+      const { robotName, username, fullName } = action.payload
+      const existing = stateDraft.perRobotAuthStates[robotName]
+      if (existing == null) {
+        return
+      }
+      stateDraft.perRobotAuthStates[robotName] = {
+        ...existing,
+        username,
+        fullName,
+      }
+    },
   },
 })
 
@@ -102,7 +131,7 @@ function logOutOrTimeOut(
 
 export const robotAuthReducer = robotAuthSlice.reducer
 
-export const { logIn, refreshLogin, logOut, timeOutLogin } =
+export const { logIn, refreshLogin, logOut, timeOutLogin, updateLoggedInUserProfile } =
   robotAuthSlice.actions
 
 export type RobotAuthAction = ActionTypesFromSlice<
@@ -124,6 +153,10 @@ export function getUsernameForRobot(
     return null
   }
   return getAuthStateForRobot(state, robotName)?.username ?? null
+}
+
+export function getIsAdminForRobot(state: State, robotName: string): boolean {
+  return getAuthStateForRobot(state, robotName)?.accountType === 'admin'
 }
 
 /**

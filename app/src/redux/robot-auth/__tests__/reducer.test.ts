@@ -29,6 +29,8 @@ describe('robotAuthReducer', () => {
       logIn({
         robotName: 'testRobotNameA',
         username: 'testUserA',
+        fullName: 'Test User A',
+        accountType: 'user',
         accessToken: 'testAccessTokenA',
         refreshToken: 'testRefreshTokenA',
         expiresAt: 1234,
@@ -38,6 +40,8 @@ describe('robotAuthReducer', () => {
       perRobotAuthStates: {
         testRobotNameA: {
           username: 'testUserA',
+          fullName: 'Test User A',
+          accountType: 'user',
           accessToken: 'testAccessTokenA',
           refreshToken: 'testRefreshTokenA',
           expiresAt: 1234,
@@ -52,6 +56,8 @@ describe('robotAuthReducer', () => {
       logIn({
         robotName: 'testRobotNameB',
         username: 'testUserB',
+        fullName: 'Test User B',
+        accountType: 'user',
         accessToken: 'testAccessTokenB',
         refreshToken: null,
         expiresAt: 5678,
@@ -61,12 +67,16 @@ describe('robotAuthReducer', () => {
       perRobotAuthStates: {
         testRobotNameA: {
           username: 'testUserA',
+          fullName: 'Test User A',
+          accountType: 'user',
           accessToken: 'testAccessTokenA',
           refreshToken: 'testRefreshTokenA',
           expiresAt: 1234,
         },
         testRobotNameB: {
           username: 'testUserB',
+          fullName: 'Test User B',
+          accountType: 'user',
           accessToken: 'testAccessTokenB',
           refreshToken: null,
           expiresAt: 5678,
@@ -81,6 +91,8 @@ describe('robotAuthReducer', () => {
       refreshLogin({
         robotName: 'testRobotNameA',
         username: 'testUserARefreshed',
+        fullName: 'Test User A',
+        accountType: 'user',
         accessToken: 'testAccessTokenARefreshed',
         refreshToken: 'testRefreshTokenARefreshed',
         expiresAt: 4321,
@@ -90,12 +102,16 @@ describe('robotAuthReducer', () => {
       perRobotAuthStates: {
         testRobotNameA: {
           username: 'testUserARefreshed',
+          fullName: 'Test User A',
+          accountType: 'user',
           accessToken: 'testAccessTokenARefreshed',
           refreshToken: 'testRefreshTokenARefreshed',
           expiresAt: 4321,
         },
         testRobotNameB: {
           username: 'testUserB',
+          fullName: 'Test User B',
+          accountType: 'user',
           accessToken: 'testAccessTokenB',
           refreshToken: null,
           expiresAt: 5678,
@@ -110,12 +126,16 @@ describe('robotAuthReducer', () => {
       perRobotAuthStates: {
         testRobotNameA: {
           username: 'testUserA',
+          fullName: 'Test User A',
+          accountType: 'user',
           accessToken: 'testAccessTokenA',
           refreshToken: 'testRefreshTokenA',
           expiresAt: 1234,
         },
         testRobotNameB: {
           username: 'testUserB',
+          fullName: 'Test User B',
+          accountType: 'user',
           accessToken: 'testAccessTokenB',
           refreshToken: 'testRefreshTokenB',
           expiresAt: 5678,
