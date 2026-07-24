@@ -223,6 +223,7 @@ def run_resource() -> RunResource:
         protocol_id=None,
         created_at=datetime(year=2022, month=2, day=2),
         actions=[],
+        signed_by=None,
     )
 
 
@@ -660,6 +661,7 @@ async def test_get_all_runs(
         protocol_id=None,
         created_at=datetime(year=2022, month=2, day=2),
         actions=[],
+        signed_by=None,
     )
 
     historical_run_resource = RunResource(
@@ -668,6 +670,7 @@ async def test_get_all_runs(
         protocol_id=None,
         created_at=datetime(year=2023, month=3, day=3),
         actions=[],
+        signed_by=None,
     )
 
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("current-run")
