@@ -51,7 +51,8 @@ export function PersonalAccountSettings({
   const username = useUsernameForRobot(robotName)
   const { updateSelf, isLoading: isSaving } =
     useUpdateSelfMutation(documentationState)
-  const { data: selfResponse } = useSelfQuery({ enabled: username != null })
+  const { data: self } = useSelfQuery({ enabled: username != null })
+  const selfUser = self?.data
 
   const [isEditing, setIsEditing] = useState(false)
   const [usernameError, setUsernameError] = useState<string | null>(null)
@@ -98,7 +99,6 @@ export function PersonalAccountSettings({
         }
       })
   }
-  const fullName = selfResponse?.data.fullName ?? null
 
   return (
     <div className={styles.container}>
@@ -132,10 +132,10 @@ export function PersonalAccountSettings({
           ))}
       </div>
       <div className={styles.content}>
-        {isEditing ? (
+        {isEditing && selfUser != null ? (
           <PersonalAccountSettingsEditForm
-            username={username}
-            fullName={fullName}
+            username={selfUser.username}
+            fullName={selfUser.fullName}
             isSaving={isSaving}
             usernameError={usernameError}
             saveError={saveError}
@@ -152,7 +152,7 @@ export function PersonalAccountSettings({
                 desktopStyle="bodyDefaultRegular"
                 className={styles.field_value_text}
               >
-                {username}
+                {selfUser?.username}
               </StyledText>
             </FieldRow>
             <Divider />
@@ -161,7 +161,7 @@ export function PersonalAccountSettings({
                 desktopStyle="bodyDefaultRegular"
                 className={styles.field_value_text}
               >
-                {fullName}
+                {selfUser?.fullName}
               </StyledText>
             </FieldRow>
             <Divider />
