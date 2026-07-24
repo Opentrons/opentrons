@@ -26,9 +26,11 @@ describe('robot auth selectors', () => {
   const stateWithRobotA = makeTestState({
     perRobotAuthStates: {
       robotA: {
-        username: 'alice',
-        fullName: 'Alice',
-        accountType: 'user',
+        user: {
+          username: 'alice',
+          fullName: 'Alice',
+          accountType: 'user',
+        },
         accessToken: 'token-a',
         refreshToken: null,
         expiresAt: 1234,
@@ -49,9 +51,11 @@ describe('robot auth selectors', () => {
 
     it('returns per-robot auth when present', () => {
       expect(getAuthStateForRobot(stateWithRobotA, 'robotA')).toEqual({
-        username: 'alice',
-        fullName: 'Alice',
-        accountType: 'user',
+        user: {
+          username: 'alice',
+          fullName: 'Alice',
+          accountType: 'user',
+        },
         accessToken: 'token-a',
         refreshToken: null,
         expiresAt: 1234,
@@ -80,9 +84,11 @@ describe('robot auth selectors', () => {
           makeTestState({
             perRobotAuthStates: {
               robotA: {
-                username: 'admin',
-                fullName: 'Admin User',
-                accountType: 'admin',
+                user: {
+                  username: 'admin',
+                  fullName: 'Admin User',
+                  accountType: 'admin',
+                },
                 accessToken: 'token',
                 refreshToken: null,
                 expiresAt: null,
@@ -112,12 +118,14 @@ describe('robot auth selectors', () => {
       serverHealth: { robotModel: 'OT-3 Standard' } as any,
     }
     const authState = {
+      user: {
+        username: 'george_clooney',
+        fullName: 'George Clooney',
+        accountType: 'user' as const,
+      },
       accessToken: 'access-token',
-      accountType: 'user' as const,
-      fullName: 'George Clooney',
       refreshToken: 'refresh-token',
       expiresAt: 1234,
-      username: 'george_clooney',
     }
 
     it('returns data when the local robot has auth state', () => {

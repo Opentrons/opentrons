@@ -33,9 +33,7 @@ export function useStoreLoginState(): (
 
       dispatch(
         logIn({
-          username: user.username,
-          fullName: user.fullName,
-          accountType: user.accountType,
+          user,
           robotName,
           accessToken: successfulLoginResponse.access_token,
           refreshToken: successfulLoginResponse.refresh_token ?? null,

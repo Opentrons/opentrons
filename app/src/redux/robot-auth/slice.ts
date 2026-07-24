@@ -30,7 +30,10 @@ export interface LoggedInUserProfile {
   accountType: AuthUserAccountType
 }
 
-export interface PerRobotAuthState extends LoggedInUserProfile {
+export interface PerRobotAuthState {
+  /** Profile data returned from GET /auth/users/self at login. */
+  user: LoggedInUserProfile
+
   /** The OAuth 2 access token, for making robot API requests. */
   accessToken: string
 
@@ -53,8 +56,9 @@ export const INITIAL_ROBOT_AUTH_STATE: RobotAuthState = {
 }
 
 /** Stores the result of logging in to a robot, of refreshing an existing login. */
-interface LogInOrRefreshPayload extends LoggedInUserProfile {
+interface LogInOrRefreshPayload {
   robotName: string
+  user: LoggedInUserProfile
   accessToken: string
   refreshToken: string | null
   expiresAt: number | null
@@ -104,8 +108,11 @@ const robotAuthSlice = createSlice({
       }
       stateDraft.perRobotAuthStates[robotName] = {
         ...existing,
-        username,
-        fullName,
+        user: {
+          ...existing.user,
+          username,
+          fullName,
+        },
       }
     },
   },
@@ -115,8 +122,13 @@ function logInOrRefresh(
   stateDraft: Draft<RobotAuthState>,
   payload: LogInOrRefreshPayload
 ): void {
-  const { robotName, ...robotAuthState } = payload
-  stateDraft.perRobotAuthStates[robotName] = robotAuthState
+  const { robotName, user, accessToken, refreshToken, expiresAt } = payload
+  stateDraft.perRobotAuthStates[robotName] = {
+    user,
+    accessToken,
+    refreshToken,
+    expiresAt,
+  }
   stateDraft.mostRecentRobotName = robotName
 }
 
@@ -152,11 +164,18 @@ export function getUsernameForRobot(
   if (robotName == null) {
     return null
   }
-  return getAuthStateForRobot(state, robotName)?.username ?? null
+  return getAuthStateForRobot(state, robotName)?.user.username ?? null
+}
+
+export function getLoggedInUserForRobot(
+  state: State,
+  robotName: string
+): LoggedInUserProfile | null {
+  return getAuthStateForRobot(state, robotName)?.user ?? null
 }
 
 export function getIsAdminForRobot(state: State, robotName: string): boolean {
-  return getAuthStateForRobot(state, robotName)?.accountType === 'admin'
+  return getAuthStateForRobot(state, robotName)?.user.accountType === 'admin'
 }
 
 /**
@@ -213,7 +232,7 @@ export const getCurrentUsernameForLocalRobot = createSelector(
   (state: State) => getLocalRobot(state)?.name ?? null,
   (state: State, localRobotName: string | null): string | null => {
     if (localRobotName == null) return null
-    return getAuthStateForRobot(state, localRobotName)?.username ?? null
+    return getAuthStateForRobot(state, localRobotName)?.user.username ?? null
   }
 )
 

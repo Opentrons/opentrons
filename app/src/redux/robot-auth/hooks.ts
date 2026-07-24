@@ -7,6 +7,7 @@ import { getLocalRobot } from '../discovery'
 import {
   getAuthStateForRobot,
   getCurrentUsernameForLocalRobot,
+  getIsAdminForRobot,
   getUsernameForRobot,
 } from './slice'
 
@@ -33,6 +34,15 @@ export function useAccessTokenForRobot(
 export function useUsernameForRobot(robotName: string | null): string | null {
   const selector = useCallback(
     (state: State) => getUsernameForRobot(state, robotName),
+    [robotName]
+  )
+  return useSelector(selector)
+}
+
+/** Return whether the logged-in user for the given robot is an admin. */
+export function useIsAdminForRobot(robotName: string): boolean {
+  const selector = useCallback(
+    (state: State) => getIsAdminForRobot(state, robotName),
     [robotName]
   )
   return useSelector(selector)
