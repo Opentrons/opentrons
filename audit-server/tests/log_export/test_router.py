@@ -3,12 +3,20 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from pathlib import Path
 
-from decoy import Decoy
+from decoy import Decoy, matchers
 
-from audit_server.log_export.router import get_log_periods
+from server_utils.keys.key_server import Client as KeyClient
+from server_utils.keys.key_server import PublicKeyAndHash, SignedMessageData
+from server_utils.persistence.persistence_directory import PERSISTENCE_TEMP_SUBDIRECTORY
+from server_utils.robot.robot_server import Client as RobotServerClient
+from server_utils.robot.robot_server import RobotNameandSerial
+
+from audit_server.log_export.router import download_log_period, get_log_periods
 from audit_server.log_storage.log_data_manager import LogDataManager
-from audit_server.log_storage.models import LogPeriodSummary
+from audit_server.log_storage.models import LogPeriodSummary, UserLogForExport
+from audit_server.log_storage.types import LogPeriodEntries
 
 _OLDER_PERIOD = LogPeriodSummary(
     id=1,
@@ -63,3 +71,54 @@ async def test_get_log_periods_preserves_store_order(
     assert result.data[0].startedAt > result.data[1].startedAt
     assert result.data[0].endedAt is None
     assert result.data[1].endedAt is not None
+
+
+async def test_download_log_period_stages_under_persistence_temp(
+    decoy: Decoy,
+    mock_log_data_manager: LogDataManager,
+    mock_key_client: KeyClient,
+    tmp_path: Path,
+) -> None:
+    """It should stage the zip under persistence_root/temp/."""
+    mock_robot_server_client = decoy.mock(cls=RobotServerClient)
+    period_entries = LogPeriodEntries(
+        user_log=UserLogForExport(
+            userLogEntries=[],
+            startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
+            endedAt=None,
+        ),
+        robot_log_entries=[],
+    )
+    decoy.when(mock_log_data_manager.get_period_entries(period_id="1")).then_return(
+        period_entries
+    )
+    decoy.when(await mock_key_client.get_key_and_hash()).then_return(
+        PublicKeyAndHash(publicKey="public-key", publicHash="public-hash")
+    )
+    decoy.when(await mock_robot_server_client.get_name_and_serial()).then_return(
+        RobotNameandSerial(name="my robot", serial="123abc")
+    )
+    decoy.when(await mock_key_client.sign_message(matchers.Anything())).then_return(
+        SignedMessageData(
+            message="{}",
+            messageHash="hash",
+            messageSignature="sig",
+            signatureVersion=1,
+        )
+    )
+
+    result = await download_log_period(
+        periodId="1",
+        log_data_manager=mock_log_data_manager,
+        key_client=mock_key_client,
+        robot_server_client=mock_robot_server_client,
+        persistence_directory_root=tmp_path,
+    )
+
+    zip_path = Path(result.path)
+    assert zip_path.is_relative_to(tmp_path / PERSISTENCE_TEMP_SUBDIRECTORY)
+    assert zip_path.exists()
+
+    assert result.background is not None
+    await result.background()
+    assert not zip_path.exists()
