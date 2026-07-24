@@ -1,6 +1,7 @@
 """Protocol editor page object."""
 
 import re
+from pathlib import Path
 from typing import Sequence
 
 from playwright.sync_api import Page, TimeoutError, expect
@@ -313,6 +314,14 @@ class ProtocolEditorPage(BasePage):
         """Confirm the liquid setup and close the modal."""
         self.page.get_by_text("Done").click()
 
+    def export_protocol(self, destination: Path, *, timeout: int = 60000) -> Path:
+        """Click Export and save the downloaded protocol .py file."""
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        with self.page.expect_download(timeout=timeout) as download_info:
+            self.click_button("Export")
+        download_info.value.save_as(str(destination))
+        return destination
+
     def add_step(self, step_type: str = "Transfer") -> None:
         """Add a new protocol step.
 
@@ -388,9 +397,31 @@ class ProtocolEditorPage(BasePage):
         if new_location == "Off-deck":
             self.page.locator("#stepFormTools").get_by_role("button", name="Off-deck").click()
         else:
-            self.page.get_by_role("button", name=new_location).click()
+            # Slot names like "A1" also appear on the deck map — scope to the open listbox.
+            listbox = self.page.locator("div[role='listbox']").last
+            self.wait_for_visible(listbox)
+            option = listbox.get_by_role("button", name=new_location, exact=True)
+            if option.count() == 0:
+                option = listbox.get_by_role("button", name=re.compile(re.escape(new_location)))
+            if option.count() == 0:
+                option = listbox.get_by_text(new_location, exact=False)
+            if option.count() == 0:
+                available = listbox.locator("button").all_inner_texts()
+                raise AssertionError(f"Move destination '{new_location}' not found. Available: {available}")
+            option.first.click()
         self.page.get_by_role("button", name="Save").click()
-        self.page.locator("div").filter(has_text="Move has been saved").nth(3).click()
+        if "Waste Chute" in new_location:
+            confirm = self.page.get_by_role("button", name="Confirm")
+            if confirm.count() > 0 and confirm.first.is_visible():
+                confirm.first.click()
+        # Dismiss success toast if present; wait for the move form to close.
+        toast = self.page.get_by_text("Move has been saved", exact=False)
+        try:
+            expect(toast.first).to_be_visible(timeout=10000)
+            toast.first.click(timeout=2000)
+        except Exception:
+            self.page.keyboard.press("Escape")
+        expect(self.page.get_by_test_id("labware_dropdownMenu")).to_have_count(0, timeout=15000)
 
     def drag_and_drop(self, from_index: int, to_num: int) -> None:
         """Drag and drop a step from one position to another in the step list.
