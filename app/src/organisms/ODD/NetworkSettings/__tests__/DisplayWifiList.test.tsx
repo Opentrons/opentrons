@@ -21,7 +21,6 @@ const mockWifiList = [
   },
 ]
 
-vi.mock('/app/redux/networking/selectors')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('../DisplaySearchNetwork')
 vi.mock('react-router-dom', async importOriginal => {
