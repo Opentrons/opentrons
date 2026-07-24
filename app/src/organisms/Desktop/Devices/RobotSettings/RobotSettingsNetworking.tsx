@@ -127,68 +127,61 @@ export function RobotSettingsNetworking({
           </LegacyStyledText>
         </Flex>
         <Box paddingLeft="3.75rem">
-          {wifi?.ipAddress != null ? (
-            <>
-              <Flex marginBottom={SPACING.spacing24}>
-                <Flex marginRight={SPACING.spacing8}>
-                  <SelectNetwork
-                    robotName={robotName}
-                    isRobotBusy={isRobotBusy || isEstopNotDisengaged}
-                  />
-                </Flex>
-                {canDisconnect && !isRobotBusy ? (
-                  <SecondaryButton
-                    onClick={() => {
-                      setShowDisconnectModal(true)
-                    }}
-                    disabled={isEstopNotDisengaged}
-                  >
-                    {t('disconnect_from_wifi')}
-                  </SecondaryButton>
-                ) : null}
-              </Flex>
-              <Flex gridGap={SPACING.spacing16}>
-                <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing4}
-                >
-                  <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
-                    {t('wireless_ip')}
-                  </LegacyStyledText>
-                  <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
-                    {wifi?.ipAddress}
-                  </LegacyStyledText>
-                </Flex>
-                <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing4}
-                >
-                  <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
-                    {t('wireless_subnet_mask')}
-                  </LegacyStyledText>
-                  <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
-                    {wifi?.subnetMask}
-                  </LegacyStyledText>
-                </Flex>
-
-                <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing4}
-                >
-                  <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
-                    {t('wireless_mac_address')}
-                  </LegacyStyledText>
-                  <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
-                    {wifi?.macAddress}
-                  </LegacyStyledText>
-                </Flex>
-              </Flex>
-            </>
-          ) : (
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <SelectNetwork robotName={robotName} isRobotBusy={isRobotBusy} />
+          <Flex
+            marginBottom={
+              wifi?.ipAddress != null ? SPACING.spacing24 : undefined
+            }
+          >
+            <Flex
+              marginRight={
+                wifi?.ipAddress != null ? SPACING.spacing8 : undefined
+              }
+              flexDirection={DIRECTION_COLUMN}
+            >
+              <SelectNetwork
+                robotName={robotName}
+                isRobotBusy={isRobotBusy || isEstopNotDisengaged}
+              />
             </Flex>
-          )}
+            {wifi?.ipAddress != null && canDisconnect && !isRobotBusy ? (
+              <SecondaryButton
+                onClick={() => {
+                  setShowDisconnectModal(true)
+                }}
+                disabled={isEstopNotDisengaged}
+              >
+                {t('disconnect_from_wifi')}
+              </SecondaryButton>
+            ) : null}
+          </Flex>
+          {wifi?.ipAddress != null ? (
+            <Flex gridGap={SPACING.spacing16}>
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+                <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+                  {t('wireless_ip')}
+                </LegacyStyledText>
+                <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
+                  {wifi.ipAddress}
+                </LegacyStyledText>
+              </Flex>
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+                <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+                  {t('wireless_subnet_mask')}
+                </LegacyStyledText>
+                <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
+                  {wifi.subnetMask}
+                </LegacyStyledText>
+              </Flex>
+              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+                <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+                  {t('wireless_mac_address')}
+                </LegacyStyledText>
+                <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
+                  {wifi.macAddress}
+                </LegacyStyledText>
+              </Flex>
+            </Flex>
+          ) : null}
         </Box>
         <Divider />
         <Flex alignItems={ALIGN_CENTER}>
