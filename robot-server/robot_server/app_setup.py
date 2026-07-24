@@ -126,7 +126,10 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         install_authentication_checker(app.state, authentication_checker)
 
         audit_client = await exit_stack.enter_async_context(
-            build_audit_client(audit_server_uds=None, audit_server_url=None)
+            build_audit_client(
+                audit_server_uds=settings.audit_server_uds,
+                audit_server_url=settings.audit_server_url,
+            )
         )
         install_audit_client(app.state, audit_client)
 
