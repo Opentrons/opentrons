@@ -42,12 +42,13 @@ type LoginGate = 'idle' | 'prompting' | 'querying' | 'done'
 
 export function SignRun({ runId }: { runId: string }): JSX.Element {
   const { t, i18n } = useTranslation(['access_control', 'shared'])
-  const [legalName, setLegalName] = useState('')
-  const [hasNameMismatchError, setHasNameMismatchError] = useState(false)
+  const [name, setName] = useState('')
+  const [nameError, setNameError] = useState(false)
   const [loginGate, setLoginGate] = useState<LoginGate>('idle')
   const [keyboardExpanded, setKeyboardExpanded] = useState(true)
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const permissionToastIdRef = useRef<string | null>(null)
   const queryClient = useQueryClient()
   const host = useHost()
 
@@ -65,7 +66,7 @@ export function SignRun({ runId }: { runId: string }): JSX.Element {
     isFetching: isSelfFetching,
   } = useSelfQuery()
   const logout = useLogout()
-  const { makeToast } = useToaster()
+  const { makeToast, eatToast } = useToaster()
 
   const isLoading =
     isAuthSettingsLoading || isSelfLoading || documentationState.isLoading
@@ -78,18 +79,18 @@ export function SignRun({ runId }: { runId: string }): JSX.Element {
 
   const canSignProtocol = !requireAdmin || isAdmin
 
-  const trimmedLegalName = legalName.trim()
+  const trimmedName = name.trim()
 
   useEffect(() => {
     if (inputRef.current != null) {
       inputRef.current.focus()
     }
-    keyboardRef.current?.setInput(legalName)
-  }, [legalName])
+    keyboardRef.current?.setInput(name)
+  }, [name])
 
-  const handleLegalNameChange = (value: string): void => {
-    setLegalName(value)
-    setHasNameMismatchError(false)
+  const handleNameChange = (value: string): void => {
+    setName(value)
+    setNameError(false)
   }
 
   const handleKeyboardToggle = (): void => {
@@ -106,6 +107,10 @@ export function SignRun({ runId }: { runId: string }): JSX.Element {
 
     // if logged in and can sign, set login gate to done and return
     if (isLoggedIn && canSignProtocol) {
+      if (permissionToastIdRef.current != null) {
+        eatToast(permissionToastIdRef.current)
+        permissionToastIdRef.current = null
+      }
       if (loginGate !== 'done') {
         setLoginGate('done')
       }
@@ -131,15 +136,20 @@ export function SignRun({ runId }: { runId: string }): JSX.Element {
     // if user is not signed in and cannot sign, show permission toast and log out
     if (shouldShowPermissionToast) {
       logout()
+      // clear cached self query data to push through logout
       if (host != null) {
         queryClient.removeQueries(getSelfQueryKey(host))
       }
-      makeToast('' + t('sign_protocol_run_permission_required'), ERROR_TOAST, {
-        closeButton: true,
-        buttonText: i18n.format(t('shared:close'), 'capitalize'),
-        disableTimeout: true,
-        zIndex: TOAST_ABOVE_LOGIN_Z_INDEX,
-      })
+      permissionToastIdRef.current = makeToast(
+        '' + t('sign_protocol_run_permission_required'),
+        ERROR_TOAST,
+        {
+          closeButton: true,
+          buttonText: i18n.format(t('shared:close'), 'capitalize'),
+          disableTimeout: true,
+          zIndex: TOAST_ABOVE_LOGIN_Z_INDEX,
+        }
+      )
     }
 
     // if user is not signed in, prompt for login.
@@ -148,9 +158,9 @@ export function SignRun({ runId }: { runId: string }): JSX.Element {
     void showLoginModal().finally(() => {
       setLoginGate(current => (current === 'done' ? 'done' : 'querying'))
     })
-    // Omit makeToast/t/i18n/logout: makeToast is recreated when toasts change,
-    // which would re-run this effect when the permission toast is dismissed.
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- see above
+    // Omit makeToast/eatToast/t/i18n/logout: toaster fns are recreated when
+    // toasts change, which would re-run this effect when the toast is dismissed.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isLoading,
     isSelfFetching,
@@ -162,17 +172,17 @@ export function SignRun({ runId }: { runId: string }): JSX.Element {
   ])
 
   const handleSign = (): void => {
-    if (trimmedLegalName === '') {
+    if (trimmedName === '') {
       return
     }
 
-    if (trimmedLegalName !== self?.data?.fullName) {
-      setHasNameMismatchError(true)
+    if (trimmedName !== self?.data?.fullName) {
+      setNameError(true)
       return
     }
 
-    setHasNameMismatchError(false)
-    submitSignRun({ runId, name: trimmedLegalName })
+    setNameError(false)
+    submitSignRun({ runId, name: trimmedName })
   }
 
   return (
@@ -198,18 +208,11 @@ export function SignRun({ runId }: { runId: string }): JSX.Element {
                 autoFocus
                 type="text"
                 label={t('legal_name')}
-                value={legalName}
-                error={
-                  hasNameMismatchError
-                    ? t('sign_protocol_run_name_mismatch')
-                    : null
-                }
+                value={name}
+                error={nameError ? t('sign_protocol_run_name_mismatch') : null}
                 borderRadius="var(--border-radius-8)"
-                onBlur={event => {
-                  event.target.focus()
-                }}
                 onChange={event => {
-                  handleLegalNameChange(event.target.value)
+                  handleNameChange(event.target.value)
                 }}
               />
             </div>
@@ -219,9 +222,9 @@ export function SignRun({ runId }: { runId: string }): JSX.Element {
                 buttonType="primary"
                 buttonText={t('sign')}
                 disabled={
-                  trimmedLegalName === '' ||
+                  trimmedName === '' ||
                   isLoading ||
-                  hasNameMismatchError ||
+                  nameError ||
                   loginGate === 'prompting' ||
                   !canSignProtocol
                 }
@@ -239,7 +242,7 @@ export function SignRun({ runId }: { runId: string }): JSX.Element {
           >
             <FullKeyboard
               onChange={(input: string) => {
-                handleLegalNameChange(input)
+                handleNameChange(input)
                 inputRef.current?.focus()
               }}
               keyboardRef={keyboardRef}
