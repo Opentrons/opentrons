@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import {
@@ -15,7 +15,6 @@ import {
   SecondaryButton,
   SPACING,
   TYPOGRAPHY,
-  useInterval,
 } from '@opentrons/components'
 
 import { getModalPortalEl } from '/app/App/portal'
@@ -27,14 +26,17 @@ import {
   HEALTH_STATUS_OK,
   OPENTRONS_USB,
 } from '/app/redux/discovery'
-import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
-import { useCanDisconnect, useWifiList } from '/app/resources/networking/hooks'
+import {
+  useCanDisconnect,
+  useNetworkInterfaces,
+  useWifiList,
+} from '/app/resources/networking/hooks'
 
 import { DisconnectModal } from './ConnectNetwork/DisconnectModal'
 import { SelectNetwork } from './SelectNetwork'
 
-import type { Dispatch, State } from '/app/redux/types'
+import type { State } from '/app/redux/types'
 
 interface NetworkingProps {
   robotName: string
@@ -52,16 +54,13 @@ export function RobotSettingsNetworking({
 }: NetworkingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const wifiList = useWifiList(robotName, LIST_REFRESH_MS)
-  const dispatch = useDispatch<Dispatch>()
   const isFlex = useIsFlex(robotName)
 
   const [showDisconnectModal, setShowDisconnectModal] = useState<boolean>(false)
 
   const canDisconnect = useCanDisconnect(robotName)
 
-  const { wifi, ethernet } = useSelector((state: State) =>
-    getNetworkInterfaces(state, robotName)
-  )
+  const { wifi, ethernet } = useNetworkInterfaces(robotName, STATUS_REFRESH_MS)
   const activeNetwork = wifiList?.find(network => network.active)
 
   const ssid = activeNetwork?.ssid ?? null
@@ -84,8 +83,6 @@ export function RobotSettingsNetworking({
   const usbAddress = addresses.find(addr => addr.ip === OPENTRONS_USB)
   const isFlexConnectedViaUSB =
     usbAddress != null && usbAddress.healthStatus === HEALTH_STATUS_OK
-
-  useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
 
   return (
     <>

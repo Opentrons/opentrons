@@ -5,7 +5,8 @@ import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
-import { getNetworkInterfaces, INTERFACE_WIFI } from '/app/redux/networking'
+import { INTERFACE_WIFI } from '/app/redux/networking'
+import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 
 import { AlternativeSecurityTypeModal } from '../AlternativeSecurityTypeModal'
 import { SelectAuthenticationType } from '../SelectAuthenticationType'
@@ -18,7 +19,7 @@ const mockNavigate = vi.fn()
 const mockSetSelectedAuthType = vi.fn()
 
 vi.mock('../WifiPasswordInput')
-vi.mock('/app/redux/networking')
+vi.mock('/app/resources/networking/hooks')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('../AlternativeSecurityTypeModal')
 vi.mock('/app/redux-resources/config')
@@ -55,7 +56,7 @@ describe('SelectAuthenticationType', () => {
       selectedAuthType: 'wpa-psk',
       setSelectedAuthType: mockSetSelectedAuthType,
     }
-    vi.mocked(getNetworkInterfaces).mockReturnValue({
+    vi.mocked(useNetworkInterfaces).mockReturnValue({
       wifi: initialMockWifi,
       ethernet: null,
     })

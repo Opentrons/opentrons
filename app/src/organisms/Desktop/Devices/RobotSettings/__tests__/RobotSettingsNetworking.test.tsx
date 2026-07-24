@@ -17,7 +17,11 @@ import {
 import * as Networking from '/app/redux/networking'
 import * as Fixtures from '/app/redux/networking/__fixtures__'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
-import { useCanDisconnect, useWifiList } from '/app/resources/networking/hooks'
+import {
+  useCanDisconnect,
+  useNetworkInterfaces,
+  useWifiList,
+} from '/app/resources/networking/hooks'
 
 import { DisconnectModal } from '../ConnectNetwork/DisconnectModal'
 import { RobotSettingsNetworking } from '../RobotSettingsNetworking'
@@ -34,7 +38,6 @@ vi.mock('/app/redux-resources/robots')
 vi.mock('../ConnectNetwork/DisconnectModal')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
 
-const getNetworkInterfaces = Networking.getNetworkInterfaces
 const ROBOT_NAME = 'otie'
 
 const render = (
@@ -88,8 +91,8 @@ describe('RobotSettingsNetworking', () => {
           healthStatus: HEALTH_STATUS_OK,
         } as DiscoveryClientRobotAddress,
       ])
-    when(getNetworkInterfaces)
-      .calledWith({} as State, ROBOT_NAME)
+    when(useNetworkInterfaces)
+      .calledWith(ROBOT_NAME, 5000)
       .thenReturn({
         wifi: initialMockWifi,
         ethernet: initialMockEthernet,
@@ -193,8 +196,8 @@ describe('RobotSettingsNetworking', () => {
       macAddress: '00:00:00:00:00:00',
       type: Networking.INTERFACE_WIFI,
     }
-    when(getNetworkInterfaces)
-      .calledWith({} as State, ROBOT_NAME)
+    when(useNetworkInterfaces)
+      .calledWith(ROBOT_NAME, 5000)
       .thenReturn({ wifi: mockWiFi, ethernet: null })
     when(getRobotAddressesByName)
       .calledWith({} as State, ROBOT_NAME)
@@ -233,8 +236,8 @@ describe('RobotSettingsNetworking', () => {
       macAddress: '00:00:00:00:00:00',
       type: Networking.INTERFACE_ETHERNET,
     }
-    when(getNetworkInterfaces)
-      .calledWith({} as State, ROBOT_NAME)
+    when(useNetworkInterfaces)
+      .calledWith(ROBOT_NAME, 5000)
       .thenReturn({
         wifi: null,
         ethernet: mockWiredUSB,
@@ -270,8 +273,8 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should render Wi-Fi and Wired USB are not connected for OT-2', () => {
-    when(getNetworkInterfaces)
-      .calledWith({} as State, ROBOT_NAME)
+    when(useNetworkInterfaces)
+      .calledWith(ROBOT_NAME, 5000)
       .thenReturn({
         wifi: null,
         ethernet: null,

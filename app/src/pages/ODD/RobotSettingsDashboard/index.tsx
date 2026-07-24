@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
@@ -29,7 +29,7 @@ import {
   getRobotApiVersion,
   UNREACHABLE,
 } from '/app/redux/discovery'
-import { fetchStatus, postWifiConfigure } from '/app/redux/networking'
+import { postWifiConfigure } from '/app/redux/networking'
 import { getRequestById, useDispatchApiRequest } from '/app/redux/robot-api'
 import {
   getRobotUpdateAvailable,
@@ -98,10 +98,6 @@ export function RobotSettingsDashboard(): JSX.Element {
     setCurrentOption('RobotSettingsWifiConnect')
     setPassword('')
   }
-
-  useEffect(() => {
-    dispatch(fetchStatus(robotName))
-  }, [robotName, dispatch])
 
   // PAGE-LEVEL SWITCH MANAGEMENT
   const [currentOption, setCurrentOption] = useState<SettingOption | null>(null)

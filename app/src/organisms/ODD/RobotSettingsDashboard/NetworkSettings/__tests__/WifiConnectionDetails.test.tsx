@@ -7,17 +7,20 @@ import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getLocalRobot } from '/app/redux/discovery'
-import * as Networking from '/app/redux/networking'
+import { INTERFACE_WIFI } from '/app/redux/networking'
+import {
+  useNetworkInterfaces,
+  useWifiList,
+} from '/app/resources/networking/hooks'
 
 import { NetworkDetailsModal } from '../NetworkDetailsModal'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
 
 import type { ComponentProps } from 'react'
 import type * as Dom from 'react-router-dom'
-import type { State } from '/app/redux/types'
 
 vi.mock('/app/redux/discovery')
-vi.mock('/app/redux/networking')
+vi.mock('/app/resources/networking/hooks')
 vi.mock('../NetworkDetailsModal')
 
 const mockNavigate = vi.fn()
@@ -29,14 +32,13 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 
-const getNetworkInterfaces = Networking.getNetworkInterfaces
 const ROBOT_NAME = 'otie'
 
 const initialMockWifi = {
   ipAddress: '127.0.0.100',
   subnetMask: '255.255.255.230',
   macAddress: 'WI:FI:00:00:00:00',
-  type: Networking.INTERFACE_WIFI,
+  type: INTERFACE_WIFI,
 }
 
 const render = (props: ComponentProps<typeof WifiConnectionDetails>) => {
@@ -57,12 +59,13 @@ describe('WifiConnectionDetails', () => {
     vi.mocked(getLocalRobot).mockReturnValue({
       name: ROBOT_NAME,
     } as any)
-    when(getNetworkInterfaces)
-      .calledWith({} as State, ROBOT_NAME)
+    when(useNetworkInterfaces)
+      .calledWith(ROBOT_NAME)
       .thenReturn({
         wifi: initialMockWifi,
         ethernet: null,
       })
+    when(useWifiList).calledWith(ROBOT_NAME, 5000).thenReturn([])
     vi.mocked(NetworkDetailsModal).mockReturnValue(
       <div>mock NetworkDetailsModal</div>
     )

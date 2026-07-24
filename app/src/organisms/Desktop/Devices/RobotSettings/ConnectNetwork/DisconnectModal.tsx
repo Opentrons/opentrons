@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useQueryClient } from 'react-query'
 
 import {
   AlertPrimaryButton,
@@ -25,10 +25,8 @@ import {
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useRobot } from '/app/redux-resources/robots'
 import { CONNECTABLE } from '/app/redux/discovery'
-import { clearWifiStatus, getNetworkInterfaces } from '/app/redux/networking'
-import { useWifiList } from '/app/resources/networking/hooks'
-
-import type { Dispatch, State } from '/app/redux/types'
+import { clearWifiStatusInQueryCache } from '/app/resources/networking'
+import { useNetworkInterfaces, useWifiList } from '/app/resources/networking/hooks'
 
 export interface DisconnectModalProps {
   onCancel: () => unknown
@@ -40,14 +38,22 @@ export const DisconnectModal = ({
   robotName,
 }: DisconnectModalProps): JSX.Element => {
   const { t } = useTranslation(['device_settings', 'shared', 'branded'])
+  const queryClient = useQueryClient()
 
   const documentationState = useDocumentationState(undefined, robotName)
   const disconnectMutation = usePostWifiDisconnectMutation(documentationState)
 
   const wifiList = useWifiList(robotName)
-  const { wifi } = useSelector((state: State) =>
-    getNetworkInterfaces(state, robotName)
-  )
+  const { wifi } = useNetworkInterfaces(robotName)
+  const robot = useRobot(robotName)
+  const hostConfig =
+    robot?.ip != null
+      ? {
+          hostname: robot.ip,
+          port: robot.port,
+          robotName,
+        }
+      : null
 
   const activeNetwork = wifiList?.find(nw => nw.active)
   const ssid = activeNetwork?.ssid ?? null
@@ -68,15 +74,13 @@ export const DisconnectModal = ({
     }
   }
 
-  const dispatch = useDispatch<Dispatch>()
-
   const isDocumentedCancel =
     disconnectMutation.error != null &&
     isDocumentedMutationError(disconnectMutation.error)
 
   // if the disconnect request is sent when there is no wired connection, we will not receive a success response to the request once wi-fi has disconnected
   // check for connectable robot health status and presume successful disconnection if request pending and robot not connectable
-  const { status } = useRobot(robotName) ?? {}
+  const { status } = robot ?? {}
   const isDisconnected =
     disconnectMutation.status === 'success' ||
     ((disconnectMutation.status === 'loading' ||
@@ -100,7 +104,7 @@ export const DisconnectModal = ({
   useEffect(
     () => {
       if (isDisconnected) {
-        dispatch(clearWifiStatus(robotName))
+        clearWifiStatusInQueryCache(queryClient, hostConfig)
       }
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.

@@ -69,5 +69,6 @@
   "update_self": "Saving user settings",
   "update_settings": "Updating robot settings",
   "update_subsystem": "Updating subsystem firmware",
-  "upload_csv": "Uploading runtime parameters as CSV"
+  "upload_csv": "Uploading runtime parameters as CSV",
+  "wifi_config": "Configure wifi network"
 }

@@ -4,16 +4,18 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import * as Networking from '/app/redux/networking'
+import { INTERFACE_WIFI } from '/app/redux/networking'
 import * as Fixtures from '/app/redux/networking/__fixtures__'
 import * as RobotApi from '/app/redux/robot-api'
-import { useWifiList } from '/app/resources/networking/hooks'
+import {
+  useNetworkInterfaces,
+  useWifiList,
+} from '/app/resources/networking/hooks'
 
 import { ConnectViaWifi } from '../'
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/resources/networking/hooks')
-vi.mock('/app/redux/networking/selectors')
 vi.mock('/app/redux/robot-api/selectors')
 
 const mockWifiList = [
@@ -29,7 +31,7 @@ const initialMockWifi = {
   ipAddress: '127.0.0.100',
   subnetMask: '255.255.255.230',
   macAddress: 'WI:FI:00:00:00:00',
-  type: Networking.INTERFACE_WIFI,
+  type: INTERFACE_WIFI,
 }
 
 // const mockGetRequestById = RobotApi.getRequestById as vi.MockedFunction<
@@ -85,7 +87,7 @@ describe('ConnectViaWifi', () => {
 
   it('should render SelectAuthenticationType', () => {
     vi.mocked(useWifiList).mockReturnValue(mockWifiList)
-    vi.mocked(Networking.getNetworkInterfaces).mockReturnValue({
+    vi.mocked(useNetworkInterfaces).mockReturnValue({
       wifi: initialMockWifi,
       ethernet: null,
     })
@@ -96,7 +98,7 @@ describe('ConnectViaWifi', () => {
 
   it('should render SetWifiCred', () => {
     vi.mocked(useWifiList).mockReturnValue(mockWifiList)
-    vi.mocked(Networking.getNetworkInterfaces).mockReturnValue({
+    vi.mocked(useNetworkInterfaces).mockReturnValue({
       wifi: initialMockWifi,
       ethernet: null,
     })
@@ -108,7 +110,7 @@ describe('ConnectViaWifi', () => {
 
   it('should render ConnectingNetwork', () => {
     vi.mocked(useWifiList).mockReturnValue(mockWifiList)
-    vi.mocked(Networking.getNetworkInterfaces).mockReturnValue({
+    vi.mocked(useNetworkInterfaces).mockReturnValue({
       wifi: initialMockWifi,
       ethernet: null,
     })

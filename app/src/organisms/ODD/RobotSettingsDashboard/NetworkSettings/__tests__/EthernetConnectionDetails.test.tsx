@@ -8,7 +8,7 @@ import { i18n } from '/app/i18n'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { INTERFACE_ETHERNET } from '/app/redux/networking'
-import { getNetworkInterfaces } from '/app/redux/networking/selectors'
+import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 
 import { EthernetConnectionDetails } from '../EthernetConnectionDetails'
 
@@ -16,7 +16,7 @@ import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/discovery/selectors')
-vi.mock('/app/redux/networking/selectors')
+vi.mock('/app/resources/networking/hooks')
 
 const render = (props: ComponentProps<typeof EthernetConnectionDetails>) => {
   return renderWithProviders(<EthernetConnectionDetails {...props} />, {
@@ -38,7 +38,7 @@ describe('EthernetConnectionDetails', () => {
       handleGoBack: vi.fn(),
     }
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
-    vi.mocked(getNetworkInterfaces).mockReturnValue({
+    vi.mocked(useNetworkInterfaces).mockReturnValue({
       wifi: null,
       ethernet: mockEthernet,
     })
@@ -66,7 +66,7 @@ describe('EthernetConnectionDetails', () => {
       macAddress: 'ET:NT:00:00:00:11',
       type: INTERFACE_ETHERNET,
     }
-    vi.mocked(getNetworkInterfaces).mockReturnValue({
+    vi.mocked(useNetworkInterfaces).mockReturnValue({
       wifi: null,
       ethernet: notConnectedMockEthernet,
     })

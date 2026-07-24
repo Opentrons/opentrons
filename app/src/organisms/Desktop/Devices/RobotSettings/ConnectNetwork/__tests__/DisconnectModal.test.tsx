@@ -19,22 +19,22 @@ import {
   mockConnectableRobot,
   mockReachableRobot,
 } from '/app/redux/discovery/__fixtures__'
-import {
-  clearWifiStatus,
-  getNetworkInterfaces,
-  INTERFACE_WIFI,
-} from '/app/redux/networking'
+import { INTERFACE_WIFI } from '/app/redux/networking'
 import { mockWifiNetwork } from '/app/redux/networking/__fixtures__'
-import { useWifiList } from '/app/resources/networking/hooks'
+import { clearWifiStatusInQueryCache } from '/app/resources/networking'
+import {
+  useNetworkInterfaces,
+  useWifiList,
+} from '/app/resources/networking/hooks'
 
 import { DisconnectModal } from '../DisconnectModal'
 
-import type { State } from '/app/redux/types'
-
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/resources/networking', () => ({
+  clearWifiStatusInQueryCache: vi.fn(),
+}))
 vi.mock('/app/resources/networking/hooks')
 vi.mock('/app/redux-resources/robots')
-vi.mock('/app/redux/networking')
 
 vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
   useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
@@ -78,6 +78,7 @@ describe('DisconnectModal', () => {
     mockOnCancel.mockClear()
     mockMutate.mockClear()
     mockReset.mockClear()
+    vi.mocked(clearWifiStatusInQueryCache).mockClear()
     vi.mocked(isDocumentedMutationError).mockReturnValue(false)
     vi.mocked(usePostWifiDisconnectMutation).mockReturnValue(
       mockDisconnectMutation()
@@ -85,8 +86,8 @@ describe('DisconnectModal', () => {
     when(useWifiList)
       .calledWith(ROBOT_NAME)
       .thenReturn([{ ...mockWifiNetwork, ssid: 'foo', active: true }])
-    when(getNetworkInterfaces)
-      .calledWith({} as State, ROBOT_NAME)
+    when(useNetworkInterfaces)
+      .calledWith(ROBOT_NAME)
       .thenReturn({ wifi: MOCK_WIFI, ethernet: null })
     when(useRobot).calledWith(ROBOT_NAME).thenReturn(mockConnectableRobot)
   })
@@ -109,7 +110,7 @@ describe('DisconnectModal', () => {
     screen.getByText('Disconnect from foo')
     screen.getByText('Disconnecting from Wi-Fi network foo')
     screen.getByRole('button', { name: 'Cancel' })
-    expect(clearWifiStatus).not.toHaveBeenCalled()
+    expect(clearWifiStatusInQueryCache).not.toHaveBeenCalled()
   })
 
   it('renders success body when request is pending and robot is not connectable', () => {
@@ -124,7 +125,7 @@ describe('DisconnectModal', () => {
       'Your robot has successfully disconnected from the Wi-Fi network.'
     )
     screen.getByRole('button', { name: 'Done' })
-    expect(clearWifiStatus).toHaveBeenCalled()
+    expect(clearWifiStatusInQueryCache).toHaveBeenCalled()
   })
 
   it('renders success body when request is successful', () => {
@@ -138,15 +139,15 @@ describe('DisconnectModal', () => {
       'Your robot has successfully disconnected from the Wi-Fi network.'
     )
     screen.getByRole('button', { name: 'Done' })
-    expect(clearWifiStatus).toHaveBeenCalled()
+    expect(clearWifiStatusInQueryCache).toHaveBeenCalled()
   })
 
   it('renders success body when wifi is not connected during disconnect', () => {
     vi.mocked(usePostWifiDisconnectMutation).mockReturnValue(
       mockDisconnectMutation({ status: 'loading' })
     )
-    when(getNetworkInterfaces)
-      .calledWith({} as State, ROBOT_NAME)
+    when(useNetworkInterfaces)
+      .calledWith(ROBOT_NAME)
       .thenReturn({
         wifi: { ...MOCK_WIFI, ipAddress: null },
         ethernet: null,
@@ -158,7 +159,7 @@ describe('DisconnectModal', () => {
       'Your robot has successfully disconnected from the Wi-Fi network.'
     )
     screen.getByRole('button', { name: 'Done' })
-    expect(clearWifiStatus).toHaveBeenCalled()
+    expect(clearWifiStatusInQueryCache).toHaveBeenCalled()
   })
 
   it('renders error body when request is unsuccessful', () => {

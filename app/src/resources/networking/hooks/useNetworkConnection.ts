@@ -1,13 +1,9 @@
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
 
-import { useInterval } from '@opentrons/components'
-
-import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
-import { useWifiList } from '/app/resources/networking/hooks'
+import { useNetworkInterfaces } from './useNetworkInterfaces'
+import { useWifiList } from './useWifiList'
 
 import type { IconName } from '@opentrons/components'
-import type { Dispatch, State } from '/app/redux/types'
 
 export interface NetworkConnection {
   isWifiConnected: boolean
@@ -22,22 +18,14 @@ const CONNECTION_POLL_MS = 10000
 
 export function useNetworkConnection(robotName: string): NetworkConnection {
   const { t } = useTranslation('device_settings')
-  const dispatch = useDispatch<Dispatch>()
   let connectionStatus: string = ''
   let iconName: 'wifi' | 'usb' | 'ethernet' | null = null
   const list = useWifiList(robotName, CONNECTION_POLL_MS)
-  const { wifi, ethernet } = useSelector((state: State) =>
-    getNetworkInterfaces(state, robotName)
+  const { wifi, ethernet } = useNetworkInterfaces(
+    robotName,
+    CONNECTION_POLL_MS
   )
   const activeSsid = list.find(nw => nw.active)?.ssid
-
-  useInterval(
-    () => {
-      dispatch(fetchStatus(robotName))
-    },
-    CONNECTION_POLL_MS,
-    true
-  )
 
   const isWifiConnected = wifi?.ipAddress != null
   const isEthernetConnected = ethernet?.ipAddress != null
