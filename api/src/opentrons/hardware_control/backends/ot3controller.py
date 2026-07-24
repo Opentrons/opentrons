@@ -22,7 +22,6 @@ from typing import (
     Set,
     Tuple,
     TypeVar,
-    Union,
     cast,
 )
 
@@ -72,7 +71,7 @@ from opentrons_hardware.drivers.can_bus import CanMessenger, DriverSettings
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.drivers.eeprom import EEPROMData, EEPROMDriver
-from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
+from opentrons_hardware.drivers.gpio import RemoteOT3GPIO
 from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
 from opentrons_hardware.firmware_bindings.constants import (
     ErrorCode,
@@ -480,13 +479,11 @@ class OT3Controller(FlexBackend):
         usb_driver: SerialUsbDriver,
         eeprom_driver: Optional[EEPROMDriver],
     ) -> SystemDrivers:
-        gpio = OT3GPIO("hardware_control")
-        eeprom_driver = eeprom_driver or EEPROMDriver(gpio)
-        eeprom_driver.setup()
-        gpio_dev: Union[OT3GPIO, RemoteOT3GPIO] = gpio
         usb_messenger = BinaryMessenger(usb_driver)
         usb_messenger.start()
-        gpio_dev = RemoteOT3GPIO(usb_messenger)
+        gpio_dev = RemoteOT3GPIO(usb_messenger, "hardware_control")
+        eeprom_driver = eeprom_driver or EEPROMDriver(gpio_dev)
+        eeprom_driver.setup()
         return SystemDrivers(
             can_messenger,
             gpio_dev,
@@ -562,7 +559,7 @@ class OT3Controller(FlexBackend):
         return hold_currents
 
     @property
-    def gpio_chardev(self) -> Union[OT3GPIO, RemoteOT3GPIO]:
+    def gpio_chardev(self) -> RemoteOT3GPIO:
         """Get the GPIO device."""
         return self._gpio_dev
 
@@ -1660,37 +1657,29 @@ class OT3Controller(FlexBackend):
         if self._gpio_dev is None:
             log.error("no gpio control available")
             raise IOError("no gpio control")
-        elif isinstance(self._gpio_dev, RemoteOT3GPIO):
-            await self._gpio_dev.deactivate_estop()
         else:
-            self._gpio_dev.deactivate_estop()
+            await self._gpio_dev.deactivate_estop()
 
     async def engage_estop(self) -> None:
         if self._gpio_dev is None:
             log.error("no gpio control available")
             raise IOError("no gpio control")
-        elif isinstance(self._gpio_dev, RemoteOT3GPIO):
-            await self._gpio_dev.activate_estop()
         else:
-            self._gpio_dev.activate_estop()
+            await self._gpio_dev.activate_estop()
 
     async def release_sync(self) -> None:
         if self._gpio_dev is None:
             log.error("no gpio control available")
             raise IOError("no gpio control")
-        elif isinstance(self._gpio_dev, RemoteOT3GPIO):
-            await self._gpio_dev.deactivate_nsync_out()
         else:
-            self._gpio_dev.deactivate_nsync_out()
+            await self._gpio_dev.deactivate_nsync_out()
 
     async def engage_sync(self) -> None:
         if self._gpio_dev is None:
             log.error("no gpio control available")
             raise IOError("no gpio control")
-        elif isinstance(self._gpio_dev, RemoteOT3GPIO):
-            await self._gpio_dev.activate_nsync_out()
         else:
-            self._gpio_dev.activate_nsync_out()
+            await self._gpio_dev.activate_nsync_out()
 
     async def door_state(self) -> DoorState:
         door_open = await get_door_state(self._usb_messenger)

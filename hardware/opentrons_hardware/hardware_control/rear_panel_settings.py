@@ -2,7 +2,7 @@
 
 import logging
 from dataclasses import dataclass
-from typing import Optional, cast
+from typing import cast
 
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
 from opentrons_hardware.firmware_bindings import utils

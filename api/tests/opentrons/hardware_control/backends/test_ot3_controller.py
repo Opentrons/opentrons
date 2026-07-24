@@ -163,6 +163,7 @@ def mock_can_driver(mock_messenger: mock.AsyncMock) -> AbstractCanDriver:
 @pytest.fixture
 def mock_usb_driver() -> SerialUsbDriver:
     driver = mock.AsyncMock(spec=SerialUsbDriver)
+
     # ignoring this type error because this is a very weird function that will in fact
     # do nothing, but has to have the yield in there for the compiler to make it a
     # generator function
@@ -188,7 +189,7 @@ async def controller(
     mock_usb_driver: SerialUsbDriver,
     mock_eeprom_driver: EEPROMDriver,
 ) -> AsyncIterator[OT3Controller]:
-    with mock.patch("opentrons.hardware_control.backends.ot3controller.OT3GPIO"):
+    with mock.patch("opentrons.hardware_control.backends.ot3controller.RemoteOT3GPIO"):
         controller = OT3Controller(
             config=mock_config,
             driver=mock_can_driver,
