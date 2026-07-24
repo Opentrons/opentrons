@@ -69,7 +69,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="collar",
         display_name="Vacuum Collar",
         description="The kind of Collar (Opentrons or Millipore)",
-        default="millipore_vacuum_manifold_collar_short",
+        default="opentrons_vacuum_manifold_collar_short",
         choices=[
             {
                 "display_name": "Opentrons: Short",

@@ -925,6 +925,23 @@ async def test_execute_profile(
     )
 
 
+async def test_deactivate_stops_vacuum_and_opens_vent(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """Deactivate should stop vacuum control, open the vent, and clear targets."""
+    subject._reader.set_target_pressure(-100.0)
+    subject._reader.set_target_power(50.0)
+
+    await subject.deactivate(must_be_running=False)
+
+    decoy.verify(await mock_driver.set_vacuum_state(False))
+    decoy.verify(await mock_driver.set_vent_state(VentState.OPENED))
+    assert subject._reader.target_pressure is None
+    assert subject._reader.get_target_power() is None
+
+
 async def test_move_port_updates_port_and_calls_driver(
     subject: modules.VacuumModule,
     mock_driver: SimulatingDriver,
