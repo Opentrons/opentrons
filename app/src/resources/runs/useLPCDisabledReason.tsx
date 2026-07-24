@@ -4,7 +4,7 @@ import some from 'lodash/some'
 
 import {
   FLEX_ROBOT_TYPE,
-  getLoadedLabwareDefinitionsByUri,
+  getLabwareDefinitionsByURIForProtocol,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
@@ -60,7 +60,7 @@ export function useLPCDisabledReason(
     hasMissingModules && !isCalibrationComplete
   const labwareDefinitions =
     protocolData?.commands != null
-      ? getLoadedLabwareDefinitionsByUri(protocolData.commands)
+      ? getLabwareDefinitionsByURIForProtocol(protocolData.commands)
       : {}
 
   const tipRackLoadedInProtocol: boolean = some(

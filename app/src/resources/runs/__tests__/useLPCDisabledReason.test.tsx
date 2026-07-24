@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   simple_v6 as _uncastedSimpleV6Protocol,
-  getLoadedLabwareDefinitionsByUri,
+  getLabwareDefinitionsByURIForProtocol,
 } from '@opentrons/shared-data'
 
 import { i18n } from '/app/i18n'
@@ -40,7 +40,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
   return {
     ...actualSharedData,
-    getLoadedLabwareDefinitionsByUri: vi.fn(),
+    getLabwareDefinitionsByURIForProtocol: vi.fn(),
   }
 })
 
@@ -70,7 +70,7 @@ describe('useLPCDisabledReason', () => {
       missingModuleIds: [],
       remainingAttachedModules: [],
     })
-    vi.mocked(getLoadedLabwareDefinitionsByUri).mockReturnValue(
+    vi.mocked(getLabwareDefinitionsByURIForProtocol).mockReturnValue(
       _uncastedSimpleV6Protocol.labwareDefinitions as {}
     )
     vi.mocked(useIsFlex).mockReturnValue(false)
@@ -264,7 +264,7 @@ describe('useLPCDisabledReason', () => {
     )
   })
   it('renders disabled reason if no tipracks in protocols for odd', () => {
-    vi.mocked(getLoadedLabwareDefinitionsByUri).mockReturnValue({})
+    vi.mocked(getLabwareDefinitionsByURIForProtocol).mockReturnValue({})
 
     const { result } = renderHook(
       () =>
@@ -278,7 +278,7 @@ describe('useLPCDisabledReason', () => {
     expect(result.current).toStrictEqual('Protocol must load a tip rack')
   })
   it('renders disabled reason if no tipracks in protocols and the robot is an OT-2', () => {
-    vi.mocked(getLoadedLabwareDefinitionsByUri).mockReturnValue({})
+    vi.mocked(getLabwareDefinitionsByURIForProtocol).mockReturnValue({})
 
     const { result } = renderHook(
       () => useLPCDisabledReason({ robotName: 'otie', runId: RUN_ID_1 }),
@@ -289,7 +289,7 @@ describe('useLPCDisabledReason', () => {
     )
   })
   it('does not render a disabled reason if no tipracks are in the protocol and the robot is a Flex', () => {
-    vi.mocked(getLoadedLabwareDefinitionsByUri).mockReturnValue({})
+    vi.mocked(getLabwareDefinitionsByURIForProtocol).mockReturnValue({})
     vi.mocked(useIsFlex).mockReturnValue(true)
 
     const { result } = renderHook(

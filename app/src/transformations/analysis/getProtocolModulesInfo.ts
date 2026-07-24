@@ -1,5 +1,5 @@
 import {
-  getLoadedLabwareDefinitionsByUri,
+  getLabwareDefinitionsByURIForProtocol,
   getModuleDef,
   getPositionFromSlotId,
   SPAN7_8_10_11_SLOT,
@@ -35,9 +35,11 @@ export const getProtocolModulesInfo = (
 ): ProtocolModuleInfo[] => {
   if (protocolData != null && 'modules' in protocolData) {
     return protocolData.modules.reduce<ProtocolModuleInfo[]>((acc, module) => {
+      const { commands, labware } = protocolData
       const moduleDef = getModuleDef(module.model)
+
       const nestedLabwareId =
-        protocolData.commands
+        commands
           .filter(
             (command): command is LoadLabwareRunTimeCommand =>
               command.commandType === 'loadLabware'
@@ -48,24 +50,29 @@ export const getProtocolModulesInfo = (
               'moduleId' in command.params.location &&
               command.params.location.moduleId === module.id
           )?.result?.labwareId ?? null
-      const nestedLabware = protocolData.labware.find(
+
+      const nestedLabware = labware.find(
         item => nestedLabwareId != null && item.id === nestedLabwareId
       )
-      const labwareDefinitionsByUri = getLoadedLabwareDefinitionsByUri(
-        protocolData.commands
-      )
+
+      const labwareDefinitionsByUri =
+        getLabwareDefinitionsByURIForProtocol(commands)
 
       const nestedLabwareDef =
         nestedLabware != null
           ? labwareDefinitionsByUri[nestedLabware.definitionUri]
           : null
+
       const nestedLabwareDisplayName =
         nestedLabware?.displayName?.toString() ?? null
+
       const moduleInitialLoadInfo = getModuleInitialLoadInfo(
         module.id,
-        protocolData.commands
+        commands
       )
+
       let slotName = moduleInitialLoadInfo.location.slotName
+
       const { protocolLoadOrder } = moduleInitialLoadInfo
       // Note: this is because PD represents the slot the TC sits in as a made up slot. We want it to be rendered in slot 7
       if (slotName === SPAN7_8_10_11_SLOT) {
