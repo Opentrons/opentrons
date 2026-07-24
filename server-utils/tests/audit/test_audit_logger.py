@@ -17,7 +17,7 @@ from starlette.responses import (
 from starlette.routing import Route
 from starlette.testclient import TestClient
 
-from server_utils.audit.audit_logger import MAX_LOG_CHUNK_SIZE_B, AuditLogger
+from server_utils.audit.audit_logger import MAX_LOG_CHUNK_SIZE, AuditLogger
 from server_utils.audit.audit_server import Client, SubmitAuditLogMessageData
 from server_utils.auth.resource_server.types import (
     AuthenticatedResult,
@@ -477,7 +477,7 @@ async def test_response_body_handles_too_long_text_body(
     """It should handle a response with text in the body."""
     parametrized_subject.append_response_body_to_message(
         Response(
-            content="a" * (MAX_LOG_CHUNK_SIZE_B + 1),
+            content="a" * (MAX_LOG_CHUNK_SIZE + 1),
             status_code=200,
             headers=None,
             media_type=mediatype,
@@ -487,7 +487,7 @@ async def test_response_body_handles_too_long_text_body(
     decoy.verify(
         await mock_client.submit_log_message(
             parametrized_log(
-                f"Response body: {'a' * MAX_LOG_CHUNK_SIZE_B} (truncated after {MAX_LOG_CHUNK_SIZE_B}B)"
+                f"Response body: {'a' * MAX_LOG_CHUNK_SIZE} (truncated after {MAX_LOG_CHUNK_SIZE} elements)"
             )
         )
     )
@@ -525,7 +525,7 @@ async def test_response_body_handles_binary_body_too_long(
     """It should handle a response with a binary body by hexing it."""
     parametrized_subject.append_response_body_to_message(
         Response(
-            content=b"\x01\x02" * (MAX_LOG_CHUNK_SIZE_B // 2 + 1),
+            content=b"\x01\x02" * (MAX_LOG_CHUNK_SIZE // 2 + 1),
             status_code=200,
             headers=None,
             media_type=mediatype,
@@ -536,8 +536,8 @@ async def test_response_body_handles_binary_body_too_long(
         await mock_client.submit_log_message(
             parametrized_log(
                 "Response body: "
-                + "0102" * (MAX_LOG_CHUNK_SIZE_B // 4)
-                + f" (truncated after {MAX_LOG_CHUNK_SIZE_B}B)"
+                + "0102" * (MAX_LOG_CHUNK_SIZE // 4)
+                + f" (truncated after {MAX_LOG_CHUNK_SIZE} elements)"
             )
         )
     )
@@ -567,15 +567,15 @@ async def test_response_body_handles_too_long_json_response(
 ) -> None:
     """It should log a json response."""
     parametrized_subject.append_response_body_to_message(
-        JSONResponse(content={"hi": "a" * MAX_LOG_CHUNK_SIZE_B})
+        JSONResponse(content={"hi": "a" * MAX_LOG_CHUNK_SIZE})
     )
     await parametrized_subject.log()
     decoy.verify(
         await mock_client.submit_log_message(
             parametrized_log(
                 'Response body: {"hi":"'
-                + "a" * (MAX_LOG_CHUNK_SIZE_B - 7)
-                + f" (truncated after {MAX_LOG_CHUNK_SIZE_B}B)"
+                + "a" * (MAX_LOG_CHUNK_SIZE - 7)
+                + f" (truncated after {MAX_LOG_CHUNK_SIZE} elements)"
             )
         )
     )
@@ -834,17 +834,17 @@ async def test_log_handles_long_json(
 ) -> None:
     """It should log json text."""
     response = subject_client.request(
-        method.lower(), "/body", json={"hello": "a" * MAX_LOG_CHUNK_SIZE_B}
+        method.lower(), "/body", json={"hello": "a" * MAX_LOG_CHUNK_SIZE}
     )
     assert response.status_code == 200
-    as_remaining = "a" * (MAX_LOG_CHUNK_SIZE_B - 11)
+    as_remaining = "a" * (MAX_LOG_CHUNK_SIZE - 11)
     decoy.verify(
         await mock_client.submit_log_message(
             parametrized_log(
                 'Request body: {"hello": "'
                 + as_remaining
                 + " "
-                + f"(truncated after {MAX_LOG_CHUNK_SIZE_B}B)"
+                + f"(truncated after {MAX_LOG_CHUNK_SIZE} elements)"
             )
         )
     )

@@ -13,8 +13,8 @@ from server_utils.auth.resource_server.fastapi import (
 )
 from server_utils.auth.resource_server.types import AuthenticatedResult
 
-MAX_LOG_CHUNK_SIZE_B = 1 * 1024
-TRUNCATION_MESSAGE = f"(truncated after {MAX_LOG_CHUNK_SIZE_B}B)"
+MAX_LOG_CHUNK_SIZE = 1 * 1024
+TRUNCATION_MESSAGE = f"(truncated after {MAX_LOG_CHUNK_SIZE} elements)"
 
 _LOG = getLogger(__name__)
 
@@ -96,16 +96,22 @@ class AuditLogger:
         Specifically,
         - If the request has no body, note that
         - If the request has a Content-Type that is not multipart/form-data,
-          - append up to 1 MB of the body
-             - if the body is larger than 1 MB, note that it was truncated at 1MB
+          - append up to 1 kilo... units of the body
+             - if the body is larger than 1 K, note that it was truncated at 1K
         - If the request has a Content-Type that is multipart/form-data,
-          - append up to 1MB of the following
+          - append up to 1K of the following
              - The key and value of text fields
              - The key, filename, media-type, and size of file fields
 
         Note that this function will in many cases attempt to read the request body.
         It should probably not be called until after the route handler has run, and
         not be used for requests that are intended to handle large request bodies.
+
+        Kilo units is used because this is probably going to be truncating to unicode
+        codepoints, but in some cases it will be bytes. This is a choice for implementation
+        simplicity since this is meant to generate a summary and the exact limits aren't
+        important. If the exact content of the message is very important to you, use
+        appen_message_chunk.
         """
         if "form-data" in request.headers.get(
             "content-type", "application/octet-stream"
@@ -181,25 +187,25 @@ class AuditLogger:
             or "xml" in media_type
             or "yaml" in media_type
         ):
-            if len(body) > MAX_LOG_CHUNK_SIZE_B // 2:
-                body = body[: MAX_LOG_CHUNK_SIZE_B // 2]
+            if len(body) > MAX_LOG_CHUNK_SIZE // 2:
+                body = body[: MAX_LOG_CHUNK_SIZE // 2]
                 return body.hex() + " " + TRUNCATION_MESSAGE
             return body.hex()
         try:
             maybe_decoded = body.decode("utf-8", errors="surrogateescape")
         except UnicodeDecodeError:
-            if len(body) > MAX_LOG_CHUNK_SIZE_B // 2:
-                body = body[: MAX_LOG_CHUNK_SIZE_B // 2]
+            if len(body) > MAX_LOG_CHUNK_SIZE // 2:
+                body = body[: MAX_LOG_CHUNK_SIZE // 2]
             return body.hex() + " " + TRUNCATION_MESSAGE
 
-        if len(maybe_decoded) > MAX_LOG_CHUNK_SIZE_B:
-            return maybe_decoded[:MAX_LOG_CHUNK_SIZE_B] + " " + TRUNCATION_MESSAGE
+        if len(maybe_decoded) > MAX_LOG_CHUNK_SIZE:
+            return maybe_decoded[:MAX_LOG_CHUNK_SIZE] + " " + TRUNCATION_MESSAGE
         return maybe_decoded
 
     def append_response_body_to_message(self: Self, response: Response | None) -> Self:
         """Append the response body to the message.
 
-        The response body will be appended by text up to 1MB in size; if it's larger,
+        The response body will be appended by text up to 1K in size; if it's larger,
         it will be truncated and the truncation noted.
         """
         if response is None:
@@ -248,15 +254,15 @@ class AuditLogger:
 
     def append_message_chunk(self: Self, chunk: str) -> Self:
         """Append a message chunk."""
-        if len(chunk) > MAX_LOG_CHUNK_SIZE_B:
-            chunk = f"{chunk[:MAX_LOG_CHUNK_SIZE_B]} "
+        if len(chunk) > MAX_LOG_CHUNK_SIZE:
+            chunk = f"{chunk[:MAX_LOG_CHUNK_SIZE]} {TRUNCATION_MESSAGE}"
         self._message_chunks.append(chunk)
         return self
 
     def set_message(self: Self, message: str) -> Self:
         """Set the message to log directly. This will overwrite previous messages."""
-        if len(message) > MAX_LOG_CHUNK_SIZE_B:
-            message = f"{message[:MAX_LOG_CHUNK_SIZE_B]} {TRUNCATION_MESSAGE}"
+        if len(message) > MAX_LOG_CHUNK_SIZE:
+            message = f"{message[:MAX_LOG_CHUNK_SIZE]} {TRUNCATION_MESSAGE}"
         self._message_chunks = [message]
         return self
 
