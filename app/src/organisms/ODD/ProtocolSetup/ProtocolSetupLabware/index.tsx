@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -103,15 +103,15 @@ export function ProtocolSetupLabware({
   )
   const labwareByLiquidId = useMemo(
     () => getLabwareInfoByLiquidId(mostRecentAnalysis?.commands ?? []),
-    [mostRecentAnalysis]
+    [mostRecentAnalysis?.commands]
   )
-  const stacksWithLaware = useMemo(
-    () => getStacksWithLabware(startingDeck),
+  const sortedStartingDeckEntries = useMemo(
+    () =>
+      Object.entries(getStacksWithLabware(startingDeck))
+        .filter(([location]) => location !== 'offDeck')
+        .sort(([locationA], [locationB]) => locationA.localeCompare(locationB)),
     [startingDeck]
   )
-  const sortedStartingDeckEntries = Object.entries(stacksWithLaware)
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .filter(([key, value]) => key !== 'offDeck')
   const offDeckItems = useMemo(
     () =>
       mostRecentAnalysis != null
@@ -217,9 +217,9 @@ export function ProtocolSetupLabware({
                     </StyledText>
                   </Flex>
                 </Flex>
-                {sortedStartingDeckEntries.map(([key, value], index) => (
+                {sortedStartingDeckEntries.map(([key, value]) => (
                   <RowLabware
-                    key={index}
+                    key={key}
                     attachedProtocolModules={attachedProtocolModuleMatches}
                     refetchModules={moduleQuery.refetch}
                     slotName={key}
@@ -228,9 +228,9 @@ export function ProtocolSetupLabware({
                     onClick={setSelectedLabwareStack}
                   />
                 ))}
-                {offDeckItems?.map((item, index) => (
+                {offDeckItems.map(item => (
                   <RowLabware
-                    key={index}
+                    key={item.representativeItem.labwareId}
                     attachedProtocolModules={attachedProtocolModuleMatches}
                     refetchModules={moduleQuery.refetch}
                     slotName={'offDeck'}
@@ -510,7 +510,7 @@ function RowLabware({
           {labwareLiquidRenderInfo.map((labware, index) => {
             const quantityTag = offDeckQuantity ?? labware.quantity
             return (
-              <>
+              <Fragment key={labware.labwareId}>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing4}
@@ -566,7 +566,7 @@ function RowLabware({
                     />
                   ) : null}
                 </Flex>
-              </>
+              </Fragment>
             )
           })}
         </Flex>
