@@ -73,13 +73,26 @@ class VacuumModuleMovementFlagger:
                 "when moving labware to or from it."
             )
 
-        if not self._state_store.config.use_virtual_modules:
-            vacuum_module = await self._get_hardware_vacuum_module(module_id=module_id)
-            if not vacuum_module.pressure_equalized:
+        # Enforce residual vacuum at analysis
+        if self._state_store.config.use_virtual_modules:
+            if vm_substate.residual_vacuum:
                 raise VacuumModuleStillUnderVacuumError(
                     module_id=vm_substate.module_id,
-                    current_gauge_pressure_mbar=vacuum_module.current_gauge_pressure_mbar,
+                    current_gauge_pressure_mbar=0.0,
+                    message=(
+                        f"Vacuum Module {vm_substate.module_id} may still be under "
+                        "vacuum. Vent and wait for pressure equalization before moving "
+                        "labware to or from it."
+                    ),
                 )
+            return
+
+        vacuum_module = await self._get_hardware_vacuum_module(module_id=module_id)
+        if not vacuum_module.pressure_equalized:
+            raise VacuumModuleStillUnderVacuumError(
+                module_id=vm_substate.module_id,
+                current_gauge_pressure_mbar=vacuum_module.current_gauge_pressure_mbar,
+            )
 
     async def _get_hardware_vacuum_module(
         self,

@@ -21,6 +21,9 @@ from opentrons.drivers.vacuum_module.driver import (
     MAX_VAC_DURATION_S,
     MIN_GAUGE_PRESSURE_MBAR,
 )
+from opentrons.protocol_engine.commands.vacuum_module.common import (
+    will_equalize_after_operation,
+)
 from opentrons.protocol_engine.resources import ModelUtils
 
 if TYPE_CHECKING:
@@ -56,7 +59,10 @@ class StartSetVacuumPressureParams(BaseModel):
     )
     equalizeTimeout: int | SkipJsonSchema[None] = Field(
         None,
-        description="Time in seconds to wait for pressure equalization after opening the vent. Does not wait if None.",
+        description=(
+            "Time in seconds to wait for pressure equalization after opening the vent. "
+            "Does not wait if None."
+        ),
     )
     taskId: str | None = Field(None, description="The id of the task")
 
@@ -94,9 +100,18 @@ class StartSetVacuumPressureImpl(
         self, params: StartSetVacuumPressureParams
     ) -> SuccessData[StartSetVacuumPressureResult]:
         """Start the vacuum pump."""
+        clears_residual = will_equalize_after_operation(
+            vent_after=params.ventAfter,
+            equalize_timeout=params.equalizeTimeout,
+            duration=params.duration,
+        )
+
         state_update = update_types.StateUpdate()
         state_update.update_vacuum_module_pump_engaged(
             params.moduleId, params.duration is None
+        )
+        state_update.update_vacuum_module_residual_vacuum(
+            params.moduleId, not clears_residual
         )
         running_command_id = self._state_view.commands.get_running_command_id()
         if running_command_id is not None:
