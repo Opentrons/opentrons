@@ -1,17 +1,19 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import last from 'lodash/last'
+import { useDispatch } from 'react-redux'
 
+import { SECURITY_NONE } from '@opentrons/api-client'
 import {
+  isDocumentedMutationError,
   useEapOptionsQuery,
+  usePostWifiConfigureMutation,
   useWifiKeysQuery,
 } from '@opentrons/react-api-client'
 
 import { getModalPortalEl } from '/app/App/portal'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useRobot } from '/app/redux-resources/robots'
-import * as Networking from '/app/redux/networking'
-import * as RobotApi from '/app/redux/robot-api'
+import { startDiscovery } from '/app/redux/discovery'
 import { useWifiList } from '/app/resources/networking/hooks'
 
 import { ConnectModal } from './ConnectNetwork/ConnectModal'
@@ -20,7 +22,7 @@ import { ResultModal } from './ConnectNetwork/ResultModal'
 import { SelectSsid } from './ConnectNetwork/SelectSsid'
 
 import type { WifiNetwork } from '@opentrons/api-client'
-import type { Dispatch, State } from '/app/redux/types'
+import type { Dispatch } from '/app/redux/types'
 import type {
   NetworkChangeState,
   WifiConfigureRequest,
@@ -58,15 +60,41 @@ export const SelectNetwork = ({
   )
   const eapOptions = eapOptionsQuery.data?.options ?? []
   const dispatch = useDispatch<Dispatch>()
-  const [dispatchApi, requestIds] = RobotApi.useDispatchApiRequest()
-  const requestState = useSelector((state: State) => {
-    const lastId = last(requestIds)
-    return lastId != null ? RobotApi.getRequestById(state, lastId) : null
-  })
+  const documentationState = useDocumentationState(undefined, robotName)
+  const {
+    postWifiConfigure,
+    isLoading,
+    isError,
+    error,
+    reset: resetWifiConfigure,
+    status: configureStatus,
+  } = usePostWifiConfigureMutation(
+    documentationState,
+    {
+      onSuccess: () => {
+        dispatch(startDiscovery())
+      },
+    },
+    hostConfig
+  )
   const activeNetwork = list?.find(nw => nw.active)
 
+  const isDocumentedCancel =
+    isError && error != null && isDocumentedMutationError(error)
+
+  const showResultModal =
+    changeState.type != null &&
+    configureStatus !== 'idle' &&
+    !isDocumentedCancel
+
   const handleConnect = (options: WifiConfigureRequest): void => {
-    dispatchApi(Networking.postWifiConfigure(robotName, options))
+    postWifiConfigure(options, {
+      onError: configureError => {
+        if (isDocumentedMutationError(configureError)) {
+          resetWifiConfigure()
+        }
+      },
+    })
     if (changeState.type === JOIN_OTHER) {
       setChangeState({ ...changeState, ssid: options.ssid })
     }
@@ -78,7 +106,7 @@ export const SelectNetwork = ({
       if (network != null) {
         const { ssid, securityType } = network
 
-        if (securityType === Networking.SECURITY_NONE) {
+        if (securityType === SECURITY_NONE) {
           handleConnect({ ssid, securityType, hidden: false })
         }
         setChangeState({ type: CONNECT, ssid, network })
@@ -93,12 +121,14 @@ export const SelectNetwork = ({
   }
 
   const handleDone = (): void => {
-    const lastId = last(requestIds)
-    if (lastId != null) {
-      dispatch(RobotApi.dismissRequest(lastId))
-    }
+    resetWifiConfigure()
     setChangeState({ type: null })
   }
+
+  const configureErrorMessage =
+    error != null && 'message' in error && error.message != null
+      ? { message: error.message }
+      : null
 
   return (
     <>
@@ -111,18 +141,14 @@ export const SelectNetwork = ({
       />
       {changeState.type != null &&
         createPortal(
-          requestState != null ? (
+          showResultModal ? (
             <ResultModal
               type={changeState.type}
               ssid={changeState.ssid}
-              requestStatus={requestState.status}
+              isPending={isLoading}
+              isError={isError && !isDocumentedCancel}
               error={
-                'error' in requestState &&
-                requestState.error != null &&
-                'message' in requestState.error &&
-                requestState.error.message != null
-                  ? requestState.error
-                  : null
+                isError && !isDocumentedCancel ? configureErrorMessage : null
               }
               onClose={handleDone}
             />

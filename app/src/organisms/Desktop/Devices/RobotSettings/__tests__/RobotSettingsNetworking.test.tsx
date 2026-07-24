@@ -5,8 +5,15 @@ import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
+import {
+  useEapOptionsQuery,
+  usePostWifiConfigureMutation,
+  useWifiKeysQuery,
+} from '@opentrons/react-api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
 import {
   getRobotAddressesByName,
@@ -30,6 +37,7 @@ import type { ComponentProps } from 'react'
 import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'
 import type { State } from '/app/redux/types'
 
+vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/networking')
 vi.mock('/app/redux/robot-api/selectors')
@@ -37,6 +45,9 @@ vi.mock('/app/resources/networking/hooks')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../ConnectNetwork/DisconnectModal')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const ROBOT_NAME = 'otie'
 
@@ -79,6 +90,18 @@ describe('RobotSettingsNetworking', () => {
   vi.useFakeTimers()
 
   beforeEach(() => {
+    vi.mocked(useWifiKeysQuery).mockReturnValue({ data: { keys: [] } } as any)
+    vi.mocked(useEapOptionsQuery).mockReturnValue({ data: { options: [] } } as any)
+    vi.mocked(usePostWifiConfigureMutation).mockReturnValue({
+      postWifiConfigure: vi.fn(),
+      mutate: vi.fn(),
+      reset: vi.fn(),
+      isLoading: false,
+      isSuccess: false,
+      isError: false,
+      error: null,
+      status: 'idle',
+    } as any)
     when(getRobotAddressesByName)
       .calledWith({} as State, ROBOT_NAME)
       .thenReturn([
