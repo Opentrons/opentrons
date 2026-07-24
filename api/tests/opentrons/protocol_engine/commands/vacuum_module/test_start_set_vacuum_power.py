@@ -91,6 +91,10 @@ async def test_start_set_vacuum_power(
     )
     expected_state_update = update_types.StateUpdate()
     expected_state_update.update_vacuum_module_pump_engaged("input-vacuum-id", True)
+    # No duration hold → residual vacuum remains (pump holds indefinitely)
+    expected_state_update.update_vacuum_module_residual_vacuum(
+        "input-vacuum-id", residual_vacuum=True
+    )
 
     assert result == SuccessData(
         public=expected_result,

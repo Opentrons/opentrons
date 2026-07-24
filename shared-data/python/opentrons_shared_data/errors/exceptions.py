@@ -1355,6 +1355,22 @@ class MissingConfigurationData(GeneralError):
         )
 
 
+class AuditLoggingError(GeneralError):
+    """An error indicating an audit logging failure.
+
+    Raised when audit log storage or ingest operations fail.
+    """
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an AuditLoggingError."""
+        super().__init__(ErrorCodes.AUDIT_LOGGING_ERROR, message, detail, wrapping)
+
+
 class VacuumModuleUnknownError(RoboticsControlError):
     """An error indicating that some unknown issue has happened with the vacuum module."""
 

@@ -26,6 +26,9 @@ from opentrons.hardware_control.modules.types import (
 from opentrons.hardware_control.modules.types import (
     VacuumModuleProfileStep as hc_profile_step,
 )
+from opentrons.protocol_engine.commands.vacuum_module.common import (
+    will_equalize_after_operation,
+)
 from opentrons.protocol_engine.resources import ModelUtils
 
 if TYPE_CHECKING:
@@ -163,6 +166,12 @@ class StartRunProfileImpl(AbstractCommandImpl[StartRunProfileParams, _ExecuteRet
                 f"Equalize timeout {e_timeout} is invalid, must be between 0-{MAX_VAC_DURATION_S} seconds."
             )
 
+        clears_residual = will_equalize_after_operation(
+            vent_after=params.ventAfter,
+            equalize_timeout=params.equalizeTimeout,
+            require_duration=False,
+        )
+
         state_update = update_types.StateUpdate()
         profile: List[hc_profile_step] = []
         pump_engaged = False
@@ -172,6 +181,10 @@ class StartRunProfileImpl(AbstractCommandImpl[StartRunProfileParams, _ExecuteRet
                 pump_engaged = step.enablePump
 
         state_update.update_vacuum_module_pump_engaged(params.moduleId, pump_engaged)
+        # Profiles apply vacuum unless the whole profile equalizes at the end.
+        state_update.update_vacuum_module_residual_vacuum(
+            params.moduleId, not clears_residual
+        )
         running_command_id = self._state_view.commands.get_running_command_id()
         if running_command_id is not None:
             state_update.record_module_background_command(

@@ -119,7 +119,7 @@ def test_pydantic_serialization() -> None:
 )
 def test_enumerated_error_serialization(test_error: EnumeratedError) -> None:
     """It should serialize and deserialize enumerated errors for Pyro."""
-    test_dict = _enumerated_error_class_to_dict(test_error)
+    test_dict = enumerated_error_class_to_dict(test_error)
 
     assert test_dict.get("bytes") is not None
     assert (
