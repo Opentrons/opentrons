@@ -141,7 +141,8 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
     """Serves /update/:session/file
 
     Requires multipart (encoding doesn't matter) with a file field in the
-    body called 'system-update.zip'. NOTE: OT2 will also support 'ot2-system.zip'
+    body called 'system-update.zip'. NOTE: the OT-2 variant (no longer in
+    this repo) also supported 'ot2-system.zip'.
     """
     if session.stage != Stages.AWAITING_FILE:
         return web.json_response(

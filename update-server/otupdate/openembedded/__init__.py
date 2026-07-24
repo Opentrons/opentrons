@@ -107,7 +107,7 @@ async def get_app(
                 f"Device name: {await name_synchronizer.get_name()}",
                 "Openembedded version:         "
                 f"{version.get('openembedded_version', 'unknown')}",
-                f"\t(from git sha      {version.get('buildroot_sha', 'unknown')}",
+                f"\t(from git sha      {version.get('openembedded_sha', 'unknown')}",
                 "API version:               "
                 f"{version.get('opentrons_api_version', 'unknown')}",
                 f"\t(from git sha      {version.get('opentrons_api_sha', 'unknown')}",
