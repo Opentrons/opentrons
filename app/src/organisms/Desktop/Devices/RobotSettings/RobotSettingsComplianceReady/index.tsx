@@ -1,6 +1,4 @@
-import { useSelfQuery } from '@opentrons/react-api-client'
-
-import { useUsernameForRobot } from '/app/redux/robot-auth/hooks'
+import { useIsAdminForRobot } from '/app/redux/robot-auth/hooks'
 
 import { ComplianceReadySoftwareSettings } from './ComplianceReadySoftwareSettings'
 import { PersonalAccountSettings } from './PersonalAccountSettings'
@@ -16,12 +14,7 @@ export interface RobotSettingsComplianceReadyProps {
 export function RobotSettingsComplianceReady({
   robotName,
 }: RobotSettingsComplianceReadyProps): JSX.Element {
-  const username = useUsernameForRobot(robotName)
-  const selfQuery = useSelfQuery({ enabled: username != null })
-  const isAdmin =
-    username != null &&
-    selfQuery.data?.data.username === username &&
-    selfQuery.data?.data.accountType === 'admin'
+  const isAdmin = useIsAdminForRobot(robotName)
 
   return (
     <div className={styles.page}>
