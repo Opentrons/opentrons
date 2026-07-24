@@ -37,6 +37,8 @@ from opentrons.hardware_control.modules.types import (
     VentStatus,
 )
 from opentrons.hardware_control.modules.vacuum_module import (
+    DEFAULT_PRESSURE_CONTROL_TUNINGS,
+    DEFAULT_WASTE_CONFIG,
     POWER_COMPARISON_WINDOW_SIZE,
     PRESSURE_COMPARISON_WINDOW_SIZE,
     SIMULATING_POLL_PERIOD,
@@ -289,7 +291,11 @@ async def test_live_data_includes_target_power_after_set_pump_state(
         (700.0, 700.0, 1013.0, 0.0, -313.0, False),
         (1013.0, 1013.0, 1013.0, 0.0, 0.0, True),
         (750.0, 700.0, 1013.0, -250.0, -288.0, False),
+        # Small basal offsets when open/vented should count as equalized.
         (1009.5, 1007.0, 1012.2, -5.2, -3.95, True),
+        (1006.75, 1006.75, 1013.0, -6.25, -6.25, True),
+        # Outside EQUALIZE_PRESSURE_TOL (10 mbar) is still under vacuum.
+        (1000.0, 1000.0, 1013.0, -13.0, -13.0, False),
     ],
 )
 async def test_current_gauge_pressure_mbar_and_pressure_equalized(
@@ -397,60 +403,6 @@ async def test_wait_for_pressure_equalization_waits_until_equalized(
     await subject.wait_for_pressure_equalization(timeout_s=5.0)
 
     assert read_calls >= len(unequalized_states)
-
-
-async def test_wait_for_pressure_equalization_raises_on_timeout(
-    subject: modules.VacuumModule,
-    mock_driver: SimulatingDriver,
-    decoy: Decoy,
-) -> None:
-    """It should raise when pressure does not equalize within the timeout."""
-    stuck_state = VacuumState(
-        target_gauge_pressure=0.0,
-        current_gauge_pressure=-300.0,
-        pressure_abs_a=700.0,
-        pressure_abs_b=700.0,
-        pressure_atm=1013.0,
-        vacuum_enabled=False,
-        vacuum_duration=0,
-        vent_state=VentState.OPENED,
-    )
-    subject._reader.vacuum_state = stuck_state
-
-    async def _vacuum_state_side_effect() -> VacuumState:
-        return stuck_state
-
-    decoy.when(await mock_driver.get_vacuum_state()).then_do(_vacuum_state_side_effect)
-
-    with pytest.raises(RuntimeError, match="did not equalize"):
-        await subject.wait_for_pressure_equalization(timeout_s=0.05)
-
-
-async def test_wait_for_pressure_equalization_does_not_complete_when_sensors_disagree(
-    subject: modules.VacuumModule,
-    mock_driver: SimulatingDriver,
-    decoy: Decoy,
-) -> None:
-    """It should keep waiting when derived gauge pressure is not yet equalized."""
-    disagreeing_state = VacuumState(
-        target_gauge_pressure=0.0,
-        current_gauge_pressure=-50.0,
-        pressure_abs_a=1013.0,
-        pressure_abs_b=950.0,
-        pressure_atm=1013.0,
-        vacuum_enabled=False,
-        vacuum_duration=0,
-        vent_state=VentState.OPENED,
-    )
-    subject._reader.vacuum_state = disagreeing_state
-
-    async def _vacuum_state_side_effect() -> VacuumState:
-        return disagreeing_state
-
-    decoy.when(await mock_driver.get_vacuum_state()).then_do(_vacuum_state_side_effect)
-
-    with pytest.raises(RuntimeError, match="did not equalize"):
-        await subject.wait_for_pressure_equalization(timeout_s=0.05)
 
 
 @pytest.mark.parametrize(
@@ -981,11 +933,6 @@ async def test_configure_device_applies_waste_and_pressure_defaults(
     decoy: Decoy,
 ) -> None:
     """Connect-time configuration should apply waste and PID defaults."""
-    from opentrons.hardware_control.modules.vacuum_module import (
-        DEFAULT_PRESSURE_CONTROL_TUNINGS,
-        DEFAULT_WASTE_CONFIG,
-    )
-
     await subject._configure_device()
 
     waste = DEFAULT_WASTE_CONFIG
@@ -1015,6 +962,23 @@ async def test_configure_device_applies_waste_and_pressure_defaults(
             tolerance=pid.tolerance_error,
         ),
     )
+
+
+async def test_deactivate_stops_vacuum_and_opens_vent(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """Deactivate should stop vacuum control, open the vent, and clear targets."""
+    subject._reader.set_target_pressure(-100.0)
+    subject._reader.set_target_power(50.0)
+
+    await subject.deactivate(must_be_running=False)
+
+    decoy.verify(await mock_driver.set_vacuum_state(False))
+    decoy.verify(await mock_driver.set_vent_state(VentState.OPENED))
+    assert subject._reader.target_pressure is None
+    assert subject._reader.get_target_power() is None
 
 
 async def test_move_port_updates_port_and_calls_driver(

@@ -69,7 +69,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="collar",
         display_name="Vacuum Collar",
         description="The kind of Collar (Opentrons or Millipore)",
-        default="millipore_vacuum_manifold_collar_short",
+        default="opentrons_vacuum_manifold_collar_short",
         choices=[
             {
                 "display_name": "Opentrons: Short",
@@ -94,6 +94,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="target_pressure",
         description="The target gauge pressure in mbar.",
         default=-200,
+        minimum=-800,
         maximum=0,
     )
     parameters.add_int(
@@ -179,11 +180,6 @@ def run(ctx: ProtocolContext) -> None:
         "opentrons_flex_96_tiprack_50ul",
         "D2",
         adapter=adapter,
-    )
-    tiprack_50 = ctx.load_labware(
-        "opentrons_flex_96_tiprack_50ul",
-        "D2",
-        adapter="opentrons_flex_96_tiprack_adapter",
     )
 
     # Load Labware

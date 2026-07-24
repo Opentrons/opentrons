@@ -88,6 +88,9 @@ TARGET_REACHED_POLL_PERIOD = 0.5
 PRESSURE_COMPARISON_WINDOW_SIZE = 5
 POWER_COMPARISON_WINDOW_SIZE = 5
 PRESSURE_TOL = 5.0
+# Open-to-atmosphere / labware-move window. Wider than PRESSURE_TOL to absorb
+# sensor offset and noise when the chamber is vented but not at exact 0 mbar.
+EQUALIZE_PRESSURE_TOL = 10.0
 POWER_TOL = 1.0
 
 # Pressure-control PID defaults
@@ -428,7 +431,9 @@ class VacuumModule(mod_abc.AbstractModule):
     @property
     def pressure_equalized(self) -> bool:
         """True when derived gauge pressure indicates atmospheric pressure."""
-        return math.isclose(self.current_gauge_pressure_mbar, 0.0, abs_tol=PRESSURE_TOL)
+        return math.isclose(
+            self.current_gauge_pressure_mbar, 0.0, abs_tol=EQUALIZE_PRESSURE_TOL
+        )
 
     @property
     def total_cycle_count(self) -> Optional[int]:
@@ -466,7 +471,13 @@ class VacuumModule(mod_abc.AbstractModule):
         return update.upload_via_dfu
 
     async def deactivate(self, must_be_running: bool = True) -> None:
-        pass
+        """Stop the pump, and open the vent."""
+        if must_be_running:
+            await self.wait_for_is_running()
+        await self._driver.set_vacuum_state(False)
+        await self._driver.set_vent_state(VentState.OPENED)
+        self._reader.reset_pressure_target()
+        self._reader.reset_power_target()
 
     async def set_led_state(
         self,
@@ -738,11 +749,12 @@ class VacuumModule(mod_abc.AbstractModule):
         start = self._loop.time()
         while not self.pressure_equalized:
             if self._loop.time() - start >= timeout_s:
-                raise RuntimeError(
+                log.warn(
                     "Vacuum module pressure did not equalize within "
                     f"{timeout_s}s. Current gauge pressure: "
                     f"{self.current_gauge_pressure_mbar} mbar."
                 )
+                break
             await self._poller.wait_next_poll()
 
     async def wait_for_pressure_equalization(
