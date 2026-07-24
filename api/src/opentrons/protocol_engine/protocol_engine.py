@@ -423,7 +423,7 @@ class ProtocolEngine:
                 error=error,
             )
         ):
-            return False
+            return True
 
         self._stop_from_asynchronous_error()
         # like self.request_stop, and unlike self.estop(), we must explicitly request that the
