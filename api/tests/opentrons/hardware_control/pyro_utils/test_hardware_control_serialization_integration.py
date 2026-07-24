@@ -244,7 +244,7 @@ def _test_proxy_serialization_coverage(  # noqa: C901
     pyro_methods.append("get_pyro_attributes_with_proxy_result")
     # After grabing the inner proxies for all these safely wrapped results, we'll use these to troll through the metadata
 
-    def _validate_serialization_coverage(value: Any, attr: Any, key: str) -> None:
+    def _validate_serialization_coverage(value: Any, attr: Any) -> None:
         if value not in _TYPES_TO_SKIP:
             # Validate that we contain a to and from, with the from returning the type expected, in a given dataclass
             if hasattr(value, "to_pyro_dict") and hasattr(value, "from_pyro_dict"):
@@ -257,8 +257,25 @@ def _test_proxy_serialization_coverage(  # noqa: C901
                     )
             elif is_dataclass(value):
                 raise ValueError(
-                    f"Pyro Serialization missing for {value} of attribute call {attr} on parameter '{key}' in class {original_class}."
+                    f"Pyro Serialization missing for {value} of attribute call {attr} in class {original_class}."
                 )
+
+    def _inspect_value_status(value: Any, attr: Any) -> None:
+        inspectable_value = value
+        if _is_optional(value):
+            inspectable_value = get_args(value)
+        try:
+            iter(inspectable_value)
+            is_iterable = True
+        except TypeError:
+            is_iterable = False
+        if is_iterable:
+            for item in inspectable_value:
+                if is_dataclass(item):
+                    _validate_serialization_coverage(value=item, attr=attr)
+        else:
+            if is_dataclass(inspectable_value):
+                _validate_serialization_coverage(value=inspectable_value, attr=attr)
 
     # For each Method exposed by this pyro object, check the parameters and return values of the original class for dataclass usage
     for method in proxy._pyroMethods:
@@ -266,25 +283,7 @@ def _test_proxy_serialization_coverage(  # noqa: C901
         if method not in pyro_methods:
             original_class_method = getattr(original_class, method)
             for key, value in original_class_method.__annotations__.items():
-                testing_value = value
-                if _is_optional(value):
-                    testing_value = get_args(value)
-                try:
-                    iter(testing_value)
-                    is_iterable = True
-                except TypeError:
-                    is_iterable = False
-                if is_iterable:
-                    for item in testing_value:
-                        if is_dataclass(item):
-                            _validate_serialization_coverage(
-                                value=item, attr=method, key=key
-                            )
-                else:
-                    if is_dataclass(testing_value):
-                        _validate_serialization_coverage(
-                            value=testing_value, attr=method, key=key
-                        )
+                _inspect_value_status(value, method)
 
     for attribute in proxy._pyroAttrs:
         if attribute not in pyro_methods:
@@ -292,25 +291,7 @@ def _test_proxy_serialization_coverage(  # noqa: C901
             return_annotation = inspect.signature(
                 original_class_attribute.fget
             ).return_annotation
-            testing_value = return_annotation
-            if _is_optional(return_annotation):
-                testing_value = get_args(return_annotation)
-            try:
-                iter(testing_value)
-                is_iterable = True
-            except TypeError:
-                is_iterable = False
-            if is_iterable:
-                for item in testing_value:
-                    if is_dataclass(item):
-                        _validate_serialization_coverage(
-                            value=item, attr=method, key=key
-                        )
-            else:
-                if is_dataclass(testing_value):
-                    _validate_serialization_coverage(
-                        value=testing_value, attr=method, key=key
-                    )
+            _inspect_value_status(return_annotation, attribute)
 
 
 async def test_serialization_coverage(
@@ -362,7 +343,7 @@ async def test_serialization_coverage(
     )
 
     # Assert that there are as many testable proxy modules as there are actual modules for integration coverage
-    # DEVELOPER NOTE: if this part is failing, you need to add a missing module to `_setup_OT3API_pyro_resource`
+    # DEVELOPER NOTE: if this part is failing, you need to add a missing module to the module mocks above.
     modules_list_NO_MAG_BLOCK = tuple(
         arg for arg in get_args(ModuleModel) if arg != MagneticBlockModel
     )
