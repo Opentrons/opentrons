@@ -1,11 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
 
-import { useWifiKeysQuery } from '@opentrons/react-api-client'
+import {
+  useEapOptionsQuery,
+  useWifiKeysQuery,
+} from '@opentrons/react-api-client'
 
 import { getModalPortalEl } from '/app/App/portal'
+import { useRobot } from '/app/redux-resources/robots'
 import * as Networking from '/app/redux/networking'
 import * as RobotApi from '/app/redux/robot-api'
 import { useWifiList } from '/app/resources/networking/hooks'
@@ -15,7 +19,7 @@ import { CONNECT, JOIN_OTHER } from './ConnectNetwork/constants'
 import { ResultModal } from './ConnectNetwork/ResultModal'
 import { SelectSsid } from './ConnectNetwork/SelectSsid'
 
-import type { WifiNetwork } from '/app/redux/networking/types'
+import type { WifiNetwork } from '@opentrons/api-client'
 import type { Dispatch, State } from '/app/redux/types'
 import type {
   NetworkChangeState,
@@ -32,14 +36,27 @@ export const SelectNetwork = ({
   isRobotBusy,
 }: SelectNetworkProps): JSX.Element => {
   const list = useWifiList(robotName)
+  const robot = useRobot(robotName)
+  const hostConfig =
+    robot?.ip != null
+      ? {
+          hostname: robot.ip,
+          port: robot.port,
+          robotName,
+        }
+      : null
   const wifiKeysQuery = useWifiKeysQuery()
   const keys = wifiKeysQuery.data?.keys ?? []
-  const eapOptions = useSelector((state: State) =>
-    Networking.getEapOptions(state, robotName)
-  )
   const [changeState, setChangeState] = useState<NetworkChangeState>({
     type: null,
   })
+  const isConnecting =
+    changeState.type === CONNECT || changeState.type === JOIN_OTHER
+  const eapOptionsQuery = useEapOptionsQuery(
+    { enabled: isConnecting },
+    hostConfig
+  )
+  const eapOptions = eapOptionsQuery.data?.options ?? []
   const dispatch = useDispatch<Dispatch>()
   const [dispatchApi, requestIds] = RobotApi.useDispatchApiRequest()
   const requestState = useSelector((state: State) => {
@@ -54,14 +71,6 @@ export const SelectNetwork = ({
       setChangeState({ ...changeState, ssid: options.ssid })
     }
   }
-
-  useEffect(() => {
-    // if we're connecting to a network, ensure we get the info needed to
-    // populate the configuration forms
-    if (changeState.type === CONNECT || changeState.type === JOIN_OTHER) {
-      dispatch(Networking.fetchEapOptions(robotName))
-    }
-  }, [robotName, dispatch, changeState.type])
 
   const handleSelectConnect = (ssid: string): void => {
     if (!isRobotBusy) {
