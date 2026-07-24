@@ -7,3 +7,4 @@ export { postWifiDisconnect } from './postWifiDisconnect'
 export { postWifiKeys } from './postWifiKeys'
 
 export * from './types'
+export * from './__fixtures__'
