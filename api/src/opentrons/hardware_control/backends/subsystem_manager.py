@@ -50,7 +50,7 @@ class SubsystemManager:
     """
 
     _can_messenger: can_bus.CanMessenger
-    _usb_messenger: Optional[binary_usb.BinaryMessenger]
+    _usb_messenger: binary_usb.BinaryMessenger
     _tool_detector: tools.detector.ToolDetector
     _network_info: network.NetworkInfo
     _tool_detection_task: "Optional[asyncio.Task[None]]"
@@ -65,7 +65,7 @@ class SubsystemManager:
     def __init__(
         self,
         can_messenger: can_bus.CanMessenger,
-        usb_messenger: Optional[binary_usb.BinaryMessenger],
+        usb_messenger: binary_usb.BinaryMessenger,
         tool_detector: tools.detector.ToolDetector,
         network_info: network.NetworkInfo,
         update_bag: FirmwareUpdate,
@@ -79,14 +79,13 @@ class SubsystemManager:
             NodeId.gantry_x,
             NodeId.gantry_y,
             NodeId.head,
+            USBTarget.rear_panel,
         }
         self._tool_task_condition = asyncio.Condition()
         self._tool_task_state = False
         self._updates_required = {}
         self._updates_ongoing = {}
         self._update_bag = update_bag
-        if self._usb_messenger:
-            self._expected_core_targets.add(USBTarget.rear_panel)
         self._present_tools = tools.types.ToolSummary(
             left=None, right=None, gripper=None
         )
