@@ -192,6 +192,10 @@ async def test_start_run_profile(
     expected_state_update.update_vacuum_module_pump_engaged(
         "input-vacuum_module-id", False
     )
+    # ventAfter without equalizeTimeout → residual vacuum remains
+    expected_state_update.update_vacuum_module_residual_vacuum(
+        "input-vacuum_module-id", residual_vacuum=True
+    )
 
     assert result == SuccessData(
         public=expected_result,
