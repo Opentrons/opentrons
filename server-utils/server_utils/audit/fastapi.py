@@ -9,7 +9,6 @@ from typing import (
     AsyncGenerator,
     Awaitable,
     Callable,
-    cast,
 )
 
 from fastapi import Depends
@@ -52,9 +51,9 @@ def get_audit_client(
     Endpoints can take this as a dependency to submit audit log messages.
     """
     client = _audit_client_accessor.get_from(app_state)
-    assert (
-        client is not None
-    ), "Forgot to initialize audit client as part of server startup?"
+    assert client is not None, (
+        "Forgot to initialize audit client as part of server startup?"
+    )
     return client
 
 
@@ -141,10 +140,10 @@ async def audit_logger_middleware(
     #     return await _return_or_raise(response, cached_exc)
     if request.method not in MUTATING_HTTP_METHODS:
         return await _return_or_raise(response, cached_exc)
-    audit_logger = request.state.audit_logger
+    audit_logger = getattr(request.state, "audit_logger", None)
     if not isinstance(audit_logger, AuditLogger):
         _log.debug("not logging because request skipped with skip_audit_logger")
-        await _return_or_raise(response, cached_exc)
+        return await _return_or_raise(response, cached_exc)
     if audit_logger.did_log or not audit_logger.should_log:
         _log.info(
             f"not logging: did_log={audit_logger.did_log}, should_log={audit_logger.should_log}"
