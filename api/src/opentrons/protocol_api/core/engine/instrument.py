@@ -94,6 +94,7 @@ if TYPE_CHECKING:
     )
 
 _DISPENSE_VOLUME_VALIDATION_ADDED_IN = APIVersion(2, 17)
+_ASPIRATE_MENISCUS_AT_START_ALLOWED = APIVersion(2, 30)
 _RESIN_TIP_DEFAULT_VOLUME = 400
 _RESIN_TIP_DEFAULT_FLOW_RATE = 10.0
 
@@ -229,6 +230,14 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             in_place: whether this is a in-place command.
             meniscus_tracking: Optional data about where to aspirate from.
         """
+        if (
+            self._protocol_core.api_version < _ASPIRATE_MENISCUS_AT_START_ALLOWED
+            and meniscus_tracking == MeniscusTrackingTarget.START
+            and end_location is None
+        ):
+            raise ValueError(
+                f"Cannot aspirate at the starting liquid height in api versions less than {_ASPIRATE_MENISCUS_AT_START_ALLOWED}."
+            )
         final_location = location
         if well_core is None:
             if not in_place:
