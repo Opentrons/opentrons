@@ -117,6 +117,9 @@ async def create_run_action(
     maintenance_run_orchestrator_store: Annotated[
         MaintenanceRunOrchestratorStore, Depends(get_maintenance_run_orchestrator_store)
     ],
+    maintenance_runs_publisher: Annotated[
+        MaintenanceRunsPublisher, Depends(get_maintenance_runs_publisher)
+    ],
     deck_configuration_store: Annotated[
         DeckConfigurationStore, Depends(get_deck_configuration_store)
     ],
@@ -135,6 +138,7 @@ async def create_run_action(
         action_id: Generated ID to assign to the control action.
         created_at: Timestamp to attach to the control action.
         maintenance_run_orchestrator_store: Maintenance run orchestrator store.
+        maintenance_runs_publisher: Publisher for maintenance run notification topics.
         deck_configuration_store: Deck configuration store.
         check_estop: Dependency to verify the estop is in a valid state.
         audit_logger: Records the action for audit setting requires
@@ -147,6 +151,7 @@ async def create_run_action(
         action_type == RunActionType.PLAY
         and maintenance_run_orchestrator_store.current_run_id is not None
     ):
+        maintenance_runs_publisher.stop_publishing_for_maintenance_run()
         await maintenance_run_orchestrator_store.clear()
     try:
         deck_configuration: DeckConfigurationType = []
