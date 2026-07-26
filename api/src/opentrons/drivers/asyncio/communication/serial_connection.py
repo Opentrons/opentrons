@@ -11,6 +11,7 @@ from .errors import (
     BaseErrorCode,
     DefaultErrorCodes,
     ErrorResponse,
+    FailedCommand,
     GCodeCacheFull,
     NoResponse,
     UnhandledGcode,
@@ -646,6 +647,17 @@ class AsyncResponseSerialConnection(SerialConnection):
             ackless_responses.append(str_response)
         return ackless_responses
 
+    @staticmethod
+    def _is_retryable_send_error(error: BaseException) -> bool:
+        """Return whether a send failure should be retried.
+
+        Device-reported failures (error/alarm responses, including async module
+        errors such as ``async ERR401:...``) are permanent or one-shot. Retrying
+        them can consume the only notification and leave higher layers thinking
+        the command succeeded.
+        """
+        return not isinstance(error, FailedCommand)
+
     async def _send_data_multiack(
         self, data: str, retries: int, acks: int
     ) -> list[str]:
@@ -665,6 +677,10 @@ class AsyncResponseSerialConnection(SerialConnection):
         This function will detect async error messages if they were sent before it
         sent the command or if they are sent before the final ack for the command is
         sent. It will not catch async errors otherwise.
+
+        Device-reported error and alarm responses (including async module errors)
+        are raised immediately and are not retried. Only transport-style failures
+        such as missing responses are retried.
 
         This function will always try and consume all the acknowledgements specified for
         its command if it sends the command, even if an async error happens in between.
@@ -686,9 +702,13 @@ class AsyncResponseSerialConnection(SerialConnection):
                     return responses
                 log.info(f"{self._name}: retry number {retry}/{retries}")
 
-            except Exception:
+            except Exception as error:
                 log.exception("Got an error during send")
-                if retry < retries and not self._closed_on_purpose:
+                if (
+                    retry < retries
+                    and not self._closed_on_purpose
+                    and self._is_retryable_send_error(error)
+                ):
                     pass
                 else:
                     raise

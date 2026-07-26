@@ -402,6 +402,57 @@ async def test_send_data_multiple_ack_ok_with_async_error(
     )
 
 
+async def test_send_data_does_not_retry_async_error(
+    mock_serial_port: AsyncMock,
+    async_subject: AsyncResponseSerialConnection,
+    ack: str,
+) -> None:
+    """Async/device error responses must not be retried or they can be lost.
+
+    Mirrors vacuum-module waste-full behavior: a one-shot async error arrives
+    while waiting for a polled command response. With retries enabled, a later
+    successful retry would otherwise swallow the only notification.
+    """
+    data = "M121 "
+    error_response = "async ERR401:vacuum:waste is full"
+    # Combined firmware-style read: async line (no OK) + command response with OK.
+    combined_response = f"{error_response}\nM121 T:0.0 C:-4.7 V:1 {ack}".encode()
+    # If the send path incorrectly retries after the device error, these would be used.
+    successful_response = f"M121 T:0.0 C:-4.7 V:1 {ack}".encode()
+    mock_serial_port.read_until.side_effect = [
+        combined_response,
+        b"",  # leftover wait for a missing second ack on the first attempt
+        successful_response,
+        successful_response,
+    ]
+
+    with pytest.raises(ErrorResponse, match="ERR401"):
+        await async_subject._send_data_multiack(data=data, retries=2, acks=1)
+
+    # Only the original attempt should write; device errors must not be retried.
+    assert mock_serial_port.write.await_count == 1
+    mock_serial_port.write.assert_awaited_once_with(data=data.encode())
+
+
+async def test_send_data_still_retries_missing_response(
+    mock_serial_port: AsyncMock,
+    async_subject: AsyncResponseSerialConnection,
+    ack: str,
+) -> None:
+    """Transport-style missing responses should still be retried."""
+    data = "M121 "
+    successful_response = f"M121 T:0.0 C:-4.7 V:1 {ack}".encode()
+    mock_serial_port.read_until.side_effect = [
+        b"",  # first attempt times out
+        successful_response,  # retry succeeds
+    ]
+
+    responses = await async_subject._send_data_multiack(data=data, retries=2, acks=1)
+
+    assert responses == ["M121 T:0.0 C:-4.7 V:1"]
+    assert mock_serial_port.write.await_count == 2
+
+
 def test_default_error_code_raise_exception() -> None:
     """Test that error codes can raise appropriate exceptions."""
     with pytest.raises(UnhandledGcode) as error:
