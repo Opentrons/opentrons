@@ -20,6 +20,9 @@ from opentrons.drivers.command_builder import CommandBuilder
 
 log = logging.getLogger(__name__)
 
+SerialResponseKind = Literal["response", "error", "empty-unknown"]
+SerialResponse = tuple[SerialResponseKind, bytes]
+
 
 class SerialConnection:
     @classmethod
@@ -577,20 +580,89 @@ class AsyncResponseSerialConnection(SerialConnection):
                 retries=retries if retries is not None else self._number_of_retries,
             )
 
-    async def _consume_responses(
-        self, acks: int
-    ) -> AsyncIterator[tuple[Literal["response", "error", "empty-unknown"], bytes]]:
+    def _partition_serial_read(self, data: bytes) -> list[SerialResponse]:
+        """Split one serial read into async-error and/or command-response chunks.
+
+        ``read_until(ack)`` can return an interleaved buffer when firmware emits an
+        async notification without its own trailing ack, then a command response:
+
+            b'async ERR401:...\\nM121 ... OK\\n'
+
+        Treating the whole buffer as a single async error consumes the command
+        ack and forces an unnecessary timeout wait for another one.
+        """
+        async_marker = self._async_error_ack.encode()
+        has_async = async_marker in data
+        has_ack = self._ack in data
+
+        if not has_async and not has_ack:
+            return [("empty-unknown", data)]
+        if not has_async:
+            return [("response", data)]
+        return self._split_async_and_command_responses(data)
+
+    def _split_async_and_command_responses(self, data: bytes) -> list[SerialResponse]:
+        """Partition a buffer that contains one or more async markers and acks."""
+        async_marker = self._async_error_ack.encode()
+        parts: list[SerialResponse] = []
+        remaining = data
+
+        while remaining:
+            async_idx = remaining.find(async_marker)
+
+            if async_idx == -1:
+                if remaining.strip():
+                    kind: SerialResponseKind = (
+                        "response" if self._ack in remaining else "empty-unknown"
+                    )
+                    parts.append((kind, remaining))
+                break
+
+            if async_idx > 0:
+                before = remaining[:async_idx]
+                if self._ack in before:
+                    parts.append(("response", before))
+                remaining = remaining[async_idx:]
+                continue
+
+            # `remaining` starts with an async marker.
+            ack_idx = remaining.find(self._ack)
+            if ack_idx == -1:
+                parts.append(("error", remaining))
+                break
+
+            # If a newline appears before the terminating ack, the async message
+            # does not carry its own ack and the trailing frame is a command
+            # response.
+            newline_idx = remaining.find(b"\n")
+            if newline_idx != -1 and newline_idx < ack_idx:
+                parts.append(("error", remaining[: newline_idx + 1]))
+                remaining = remaining[newline_idx + 1 :]
+                continue
+
+            # Async frame includes the terminating ack (older modules / tests).
+            async_end = ack_idx + len(self._ack)
+            parts.append(("error", remaining[:async_end]))
+            remaining = remaining[async_end:]
+
+        return parts
+
+    async def _consume_responses(self, acks: int) -> AsyncIterator[SerialResponse]:
         while acks > 0:
             data = await self._serial.read_until(match=self._ack)
             log.debug(f"{self._name}: Read <- {data!r}")
-            if self._async_error_ack.encode() in data:
-                yield "error", data
-            elif self._ack in data:
-                yield "response", data
-                acks -= 1
-            else:
-                # A read timeout, end
-                yield "empty-unknown", data
+            for kind, chunk in self._partition_serial_read(data):
+                if kind == "error":
+                    yield "error", chunk
+                elif kind == "response":
+                    yield "response", chunk
+                    acks -= 1
+                    if acks <= 0:
+                        return
+                else:
+                    # A read timeout, end
+                    yield "empty-unknown", chunk
+                    return
 
     def _raise_on_parser_error(self, data: str, response: bytes) -> None:
         """Raise an exception if this response contains an error from the gcode parser on the module.
