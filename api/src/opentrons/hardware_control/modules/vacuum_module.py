@@ -227,6 +227,7 @@ class VacuumModule(mod_abc.AbstractModule):
         self._current_cycle_index: Optional[int] = None
         self._total_step_count: Optional[int] = None
         self._current_step_index: Optional[int] = None
+        self._profile_stop_requested = False
         self._error: Optional[str] = None
 
     async def _initialized_callback(self) -> None:
@@ -472,6 +473,7 @@ class VacuumModule(mod_abc.AbstractModule):
 
     async def stop_vacuum(self) -> None:
         """Stop pressure control and the pump; clear software targets."""
+        self._profile_stop_requested = True
         await self._driver.set_vacuum_state(False)
         await self._driver.set_pump_state(False)
         self._reader.reset_pressure_target()
@@ -650,15 +652,6 @@ class VacuumModule(mod_abc.AbstractModule):
                 vent_after=vent_after,
             )
 
-    def _operation_was_stopped(self) -> bool:
-        """Return whether vacuum/pump operation was stopped externally."""
-        vacuum_state = self._reader.vacuum_state
-        pump_state = self._reader.pump_state
-        return not (
-            (vacuum_state.vacuum_enabled if vacuum_state is not None else False)
-            or (pump_state.pump_running if pump_state is not None else False)
-        )
-
     async def _wait_for_step_completion(self, step: VacuumModuleStep) -> bool:
         """Wait for a profile step to complete.
 
@@ -671,7 +664,7 @@ class VacuumModule(mod_abc.AbstractModule):
             await self.wait_for_command_duration()
         else:
             await self.wait_for_target()
-        return step["enable_pump"] and self._operation_was_stopped()
+        return self._profile_stop_requested
 
     async def _execute_profile(
         self,
@@ -708,6 +701,7 @@ class VacuumModule(mod_abc.AbstractModule):
         vent_after: bool = True,
     ) -> None:
         await self.wait_for_is_running()
+        self._profile_stop_requested = False
         self._total_cycle_count = 0
         self._total_step_count = 0
         self._current_cycle_index = 0
