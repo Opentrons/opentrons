@@ -964,6 +964,23 @@ async def test_configure_device_applies_waste_and_pressure_defaults(
     )
 
 
+async def test_stop_vacuum_stops_pressure_and_pump_and_clears_targets(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """stop_vacuum should disable pressure control, stop the pump, and clear targets."""
+    subject._reader.set_target_pressure(-100.0)
+    subject._reader.set_target_power(50.0)
+
+    await subject.stop_vacuum()
+
+    decoy.verify(await mock_driver.set_vacuum_state(enable_vacuum=False))
+    decoy.verify(await mock_driver.set_pump_state(start_pump=False))
+    assert subject._reader.target_pressure is None
+    assert subject._reader.get_target_power() is None
+
+
 async def test_deactivate_stops_vacuum_and_opens_vent(
     subject: modules.VacuumModule,
     mock_driver: SimulatingDriver,
@@ -975,7 +992,8 @@ async def test_deactivate_stops_vacuum_and_opens_vent(
 
     await subject.deactivate(must_be_running=False)
 
-    decoy.verify(await mock_driver.set_vacuum_state(False))
+    decoy.verify(await mock_driver.set_vacuum_state(enable_vacuum=False))
+    decoy.verify(await mock_driver.set_pump_state(start_pump=False))
     decoy.verify(await mock_driver.set_vent_state(VentState.OPENED))
     assert subject._reader.target_pressure is None
     assert subject._reader.get_target_power() is None
