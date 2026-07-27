@@ -5,7 +5,12 @@ export function isEditableKeyboardTarget(target: EventTarget | null): boolean {
 
   const tag = target.tagName
   // textarea, input, select are editable keyboard targets
-  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
+  if (
+    tag === 'INPUT' ||
+    tag === 'TEXTAREA' ||
+    tag === 'SELECT' ||
+    tag === 'BUTTON'
+  ) {
     return true
   }
 
