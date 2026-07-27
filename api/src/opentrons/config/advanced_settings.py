@@ -251,6 +251,15 @@ settings = [
         robot_type=[RobotTypeEnum.FLEX],
         internal_only=True,
     ),
+    SettingDefinition(
+        _id="easy96chAttach",
+        title="Easier 96-channel pipette attachment",
+        description=(
+            "Lower the right mount to easily attach mount without detaching z axis"
+            " 96-channel pipette attach, reducing the Z margin from 20 mm to 1.85 mm."
+        ),
+        robot_type=[RobotTypeEnum.FLEX],
+    ),
 ]
 
 
@@ -825,6 +834,16 @@ def _migrate42to43(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate43to44(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 44 of the feature flags file.
+
+    - Adds the easy96chAttach config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["easy96chAttach"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -869,6 +888,7 @@ _MIGRATIONS = [
     _migrate40to41,
     _migrate41to42,
     _migrate42to43,
+    _migrate43to44,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

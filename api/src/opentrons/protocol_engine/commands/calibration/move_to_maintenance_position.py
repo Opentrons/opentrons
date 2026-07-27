@@ -10,6 +10,7 @@ from typing_extensions import Literal
 
 from ...errors.error_occurrence import ErrorOccurrence
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from opentrons.config import feature_flags
 from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 from opentrons.types import Mount, MountType, Point
@@ -26,6 +27,13 @@ _INSTRUMENT_ATTACH_Z_POINT = 400.0
 _LEFT_MOUNT_Z_MARGIN = 5
 # Move the right mount a bit higher than the left so the user won't forget to unscrew
 _RIGHT_MOUNT_Z_MARGIN = 20
+_RIGHT_MOUNT_Z_MARGIN_EASY_96CH = 1.85
+
+
+def _right_mount_z_margin() -> float:
+    if feature_flags.easy_96ch_attach():
+        return _RIGHT_MOUNT_Z_MARGIN_EASY_96CH
+    return _RIGHT_MOUNT_Z_MARGIN
 
 MoveToMaintenancePositionCommandType = Literal["calibration/moveToMaintenancePosition"]
 
@@ -104,7 +112,7 @@ class MoveToMaintenancePositionImplementation(
                 await ot3_api.disengage_axes([Axis.Z_L])
                 await ot3_api.move_axes(
                     {
-                        Axis.Z_R: max_motion_range + _RIGHT_MOUNT_Z_MARGIN,
+                        Axis.Z_R: max_motion_range + _right_mount_z_margin(),
                     }
                 )
                 await ot3_api.disengage_axes([Axis.Z_R])

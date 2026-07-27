@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 import pytest
 from decoy import Decoy
 
+from opentrons.config import feature_flags
 from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.protocol_engine.commands.calibration.move_to_maintenance_position import (
     MotionModifier,
@@ -77,18 +78,31 @@ async def test_calibration_move_to_location_implementation_for_attach_instrument
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize("mount_type", [MountType.LEFT, MountType.RIGHT])
+@pytest.mark.parametrize(
+    "easy_96ch_attach, expected_right_z",
+    [
+        (False, 105),
+        (True, 86.85),
+    ],
+)
 async def test_calibration_move_to_location_implementation_for_attach_plate(
     decoy: Decoy,
     subject: MoveToMaintenancePositionImplementation,
     state_view: StateView,
     ot3_hardware_api: OT3API,
     mount_type: MountType,
+    easy_96ch_attach: bool,
+    expected_right_z: float,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Command should get a move to target location and critical point and should verify move_to call."""
     params = MoveToMaintenancePositionParams(
         mount=mount_type, motionModifier=MotionModifier.LOWER_Z_AXES_SEQUENTIALLY
     )
 
+    mock_easy_96ch_attach = decoy.mock(func=feature_flags.easy_96ch_attach)
+    monkeypatch.setattr(feature_flags, "easy_96ch_attach", mock_easy_96ch_attach)
+    decoy.when(mock_easy_96ch_attach()).then_return(easy_96ch_attach)
     decoy.when(
         await ot3_hardware_api.gantry_position(
             Mount.LEFT, critical_point=CriticalPoint.MOUNT
@@ -120,7 +134,7 @@ async def test_calibration_move_to_location_implementation_for_attach_plate(
         ),
         await ot3_hardware_api.move_axes(
             position={
-                Axis.Z_R: 105,
+                Axis.Z_R: expected_right_z,
             }
         ),
         await ot3_hardware_api.disengage_axes(

@@ -9,7 +9,7 @@ from opentrons.config.advanced_settings import _ensure, _migrate
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 43
+    return 44
 
 
 # make sure to set a boolean value in default_file_settings only if
@@ -35,6 +35,7 @@ def default_file_settings() -> Dict[str, Any]:
         "enableProtocolSubprocess": True,
         "enableHardwareSubprocess": True,
         "alwaysRunProtocolAsUser": False,
+        "easy96chAttach": False,
     }
 
 
@@ -512,6 +513,18 @@ def v43_config(v42_config: Dict[str, Any]) -> Dict[str, Any]:
     return r
 
 
+@pytest.fixture
+def v44_config(v43_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v43_config.copy()
+    r.update(
+        {
+            "_version": 44,
+            "easy96chAttach": None,
+        }
+    )
+    return r
+
+
 @pytest.fixture(
     params=[
         lazy_fixture("empty_settings"),
@@ -559,6 +572,7 @@ def v43_config(v42_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v41_config"),
         lazy_fixture("v42_config"),
         lazy_fixture("v43_config"),
+        lazy_fixture("v44_config"),
     ],
 )
 def old_settings(request: SubRequest) -> Dict[str, Any]:
@@ -653,4 +667,5 @@ def test_ensures_config() -> None:
         "enableProtocolSubprocess": None,
         "enableHardwareSubprocess": None,
         "alwaysRunProtocolAsUser": None,
+        "easy96chAttach": None,
     }
