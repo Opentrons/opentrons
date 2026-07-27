@@ -2,8 +2,10 @@ import { useEffect } from 'react'
 import { useDispatch, useStore } from 'react-redux'
 
 import { getDiscoveredRobots } from '/app/redux/discovery'
-import { restartStatusChanged } from '/app/redux/robot-admin'
-import { getNextRestartStatus } from '/app/redux/robot-admin/selectors'
+import {
+  getNextRestartStatus,
+  restartStatusChanged,
+} from '/app/redux/robot-admin'
 
 import type { Dispatch, State } from '/app/redux/types'
 

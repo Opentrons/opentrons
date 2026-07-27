@@ -1,4 +1,4 @@
-// common types
+// restart status tracking types
 
 export type RobotRestartStatus =
   | 'restart-pending'
@@ -6,30 +6,6 @@ export type RobotRestartStatus =
   | 'restart-succeeded'
   | 'restart-timed-out'
   | 'restart-failed'
-
-export type RobotAdminStatus =
-  'up' | 'down' | 'restart-pending' | 'restarting' | 'restart-failed'
-
-export interface ResetConfigOption {
-  id: string
-  name: string
-  description: string
-}
-
-export interface ResetConfigRequest {
-  resetLabwareOffsets: boolean
-
-  /**
-   * Options to pass as-is to `POST /settings/reset`.
-   * The possible keys are theoretically dynamic,
-   * coming from `GET /settings/reset/options`.
-   */
-  settingsResets: {
-    [optionId: string]: boolean | undefined
-  }
-}
-
-// action types
 
 export interface RestartStatusChangedAction {
   type: 'robotAdmin:RESTART_STATUS_CHANGED'
@@ -43,8 +19,6 @@ export interface RestartStatusChangedAction {
 
 export type RobotAdminAction = RestartStatusChangedAction
 
-// state types
-
 export interface RestartState {
   bootId: string | null
   startTime: Date | null
@@ -52,7 +26,6 @@ export interface RestartState {
 }
 
 export type PerRobotAdminState = Partial<{
-  status: RobotAdminStatus
   restart: RestartState
 }>
 

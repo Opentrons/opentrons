@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 import { useRestartMutation } from '@opentrons/react-api-client'
 
 import { useRobot } from '/app/redux-resources/robots'
-import { beginRobotRestartTracking } from '/app/redux/robot-admin/utils'
+import { beginRobotRestartTracking } from '/app/redux/robot-admin'
 
 import type {
   DocumentationState,

@@ -12,9 +12,3 @@ export const RESTART_SUCCEEDED_STATUS: 'restart-succeeded' = 'restart-succeeded'
 
 export const RESTART_STATUS_CHANGED: 'robotAdmin:RESTART_STATUS_CHANGED' =
   'robotAdmin:RESTART_STATUS_CHANGED'
-
-// http paths still referenced by robot-update / fixtures
-
-export const RESTART_PATH: '/server/restart' = '/server/restart'
-
-export const SYSTEM_TIME_PATH: '/system/time' = '/system/time'
