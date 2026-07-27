@@ -116,6 +116,29 @@ const expandAccordion = (): void => {
   )
 }
 
+const renderPage = (username: string, accountType: 'admin' | 'user'): void => {
+  renderWithProviders(<RobotSettingsComplianceReady robotName={ROBOT_NAME} />, {
+    i18nInstance: i18n,
+    initialState: {
+      robotAuth: {
+        perRobotAuthStates: {
+          [ROBOT_NAME]: {
+            user: {
+              username,
+              fullName: 'Test User',
+              accountType,
+            },
+            accessToken: 'access-token',
+            refreshToken: 'refresh-token',
+            expiresAt: null,
+          },
+        },
+        mostRecentRobotName: ROBOT_NAME,
+      },
+    } as any,
+  })
+}
+
 describe('ComplianceReadySoftwareSettings', () => {
   beforeEach(() => {
     mockPatchAuthSettings.mockClear()
@@ -349,35 +372,6 @@ describe('ComplianceReadySoftwareSettings', () => {
 })
 
 describe('RobotSettingsComplianceReady', () => {
-  const renderPage = (
-    username: string,
-    accountType: 'admin' | 'user'
-  ): void => {
-    renderWithProviders(
-      <RobotSettingsComplianceReady robotName={ROBOT_NAME} />,
-      {
-        i18nInstance: i18n,
-        initialState: {
-          robotAuth: {
-            perRobotAuthStates: {
-              [ROBOT_NAME]: {
-                user: {
-                  username,
-                  fullName: 'Test User',
-                  accountType,
-                },
-                accessToken: 'access-token',
-                refreshToken: 'refresh-token',
-                expiresAt: null,
-              },
-            },
-            mostRecentRobotName: ROBOT_NAME,
-          },
-        } as any,
-      }
-    )
-  }
-
   it('hides admin sections for non-admin users', () => {
     renderPage('regular-user', 'user')
 

@@ -102,18 +102,9 @@ const robotAuthSlice = createSlice({
       action: PayloadAction<UpdateLoggedInUserProfilePayload>
     ) => {
       const { robotName, username, fullName } = action.payload
-      const existing = stateDraft.perRobotAuthStates[robotName]
-      if (existing == null) {
-        return
-      }
-      stateDraft.perRobotAuthStates[robotName] = {
-        ...existing,
-        user: {
-          ...existing.user,
-          username,
-          fullName,
-        },
-      }
+      const authState = stateDraft.perRobotAuthStates[robotName]!
+      authState.user.username = username
+      authState.user.fullName = fullName
     },
   },
 })

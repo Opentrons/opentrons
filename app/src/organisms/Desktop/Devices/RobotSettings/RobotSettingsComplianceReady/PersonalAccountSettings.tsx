@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import axios from 'axios'
 
 import { BasicButton, Divider, StyledText } from '@opentrons/components'
@@ -11,8 +11,8 @@ import {
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import {
-  getLoggedInUserForRobot,
   updateLoggedInUserProfile,
+  useLoggedInUserForRobot,
 } from '/app/redux/robot-auth'
 
 import styles from './personalaccountsettings.module.css'
@@ -20,7 +20,6 @@ import { PersonalAccountSettingsEditForm } from './PersonalAccountSettingsEditFo
 
 import type { JSX, ReactNode } from 'react'
 import type { UpdateSelfRequest } from '@opentrons/api-client'
-import type { State } from '/app/redux/types'
 
 export interface PersonalAccountSettingsProps {
   robotName: string
@@ -48,9 +47,7 @@ export function PersonalAccountSettings({
   const { t } = useTranslation(['device_settings', 'shared'])
   const dispatch = useDispatch()
   const documentationState = useDocumentationState(undefined, robotName)
-  const loggedInUser = useSelector((state: State) =>
-    getLoggedInUserForRobot(state, robotName)
-  )
+  const loggedInUser = useLoggedInUserForRobot(robotName)
   const { updateSelf, isLoading: isSaving } =
     useUpdateSelfMutation(documentationState)
 
@@ -77,24 +74,27 @@ export function PersonalAccountSettings({
         setIsEditing(false)
       })
       .catch((error: unknown) => {
-        if (!isDocumentedMutationError(error)) {
-          const errorId = axios.isAxiosError(error)
-            ? error.response?.data?.errors?.[0]?.id
-            : null
+        // User cancelled the documentation/login modal — stay on the edit form.
+        if (isDocumentedMutationError(error)) {
+          return
+        }
 
-          if (errorId === 'userAlreadyExists') {
-            setUsernameError(
-              t(
-                'desktop_personal_account_settings_username_exists_error'
-              ) as string
-            )
-            setSaveError(null)
-          } else {
-            setUsernameError(null)
-            setSaveError(
-              t('desktop_personal_account_settings_save_error') as string
-            )
-          }
+        const errorId = axios.isAxiosError(error)
+          ? error.response?.data?.errors?.[0]?.id
+          : null
+
+        if (errorId === 'userAlreadyExists') {
+          setUsernameError(
+            t(
+              'desktop_personal_account_settings_username_exists_error'
+            ) as string
+          )
+          setSaveError(null)
+        } else {
+          setUsernameError(null)
+          setSaveError(
+            t('desktop_personal_account_settings_save_error') as string
+          )
         }
       })
   }
