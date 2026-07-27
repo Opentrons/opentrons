@@ -243,6 +243,8 @@ def test_start_execute_profile(
             cmd.vacuum_module.StartRunProfileParams(
                 moduleId="1234",
                 profile=expected_pe_profile_steps * repetitions,
+                ventAfter=False,
+                equalizeTimeout=None,
             ),
             command_annotations=[],
         )
@@ -264,6 +266,23 @@ def test_open_vent(
         mock_engine_client.execute_command(
             cmd.vacuum_module.OpenVentParams(
                 moduleId="1234",
+                equalizeTimeout=None,
+            ),
+            command_annotations=[],
+        )
+    )
+
+
+def test_open_vent_with_equalize_timeout(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: VacuumModuleCore
+) -> None:
+    """It should pass equalizeTimeout to the protocol engine command."""
+    subject.open_vent(equalize_timeout_s=30)
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.vacuum_module.OpenVentParams(
+                moduleId="1234",
+                equalizeTimeout=30,
             ),
             command_annotations=[],
         )

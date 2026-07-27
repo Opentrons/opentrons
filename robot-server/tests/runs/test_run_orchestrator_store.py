@@ -572,6 +572,7 @@ async def test_async_module_callback_noops_if_engine_says_no(decoy: Decoy) -> No
         await run_orchestrator_store.run_coordinator.asynchronous_module_error(
             module_model=TemperatureModuleModel.TEMPERATURE_V2,
             module_serial="some-serial",
+            error=exc,
         )
     ).then_return(False)
     await handle_hardware_event(run_orchestrator_store, error_event)
@@ -603,6 +604,7 @@ async def test_async_module_callback_finishes_if_engine_says_so(decoy: Decoy) ->
         await run_orchestrator_store.run_coordinator.asynchronous_module_error(
             module_model=TemperatureModuleModel.TEMPERATURE_V2,
             module_serial="some-serial",
+            error=exc,
         )
     ).then_return(True)
     await handle_hardware_event(run_orchestrator_store, error_event)
