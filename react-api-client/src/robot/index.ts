@@ -10,3 +10,7 @@ export {
   useResetConfigOptionsQuery,
 } from './useResetConfigOptionsQuery'
 export { usePostResetConfigMutation } from './usePostResetConfigMutation'
+export type {
+  UsePostResetConfigMutationOptions,
+  UsePostResetConfigMutationResult,
+} from './usePostResetConfigMutation'
