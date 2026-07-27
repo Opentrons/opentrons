@@ -1,7 +1,7 @@
 """Request and response models for run resources."""
 
 from datetime import datetime
-from typing import Dict, List, Literal, Optional
+from typing import Annotated, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -296,13 +296,15 @@ class RunCreate(BaseModel):
 class RunUpdate(BaseModel):
     """Update request data for an existing run."""
 
-    current: Optional[bool] = Field(
-        None,
-        description=(
-            "Whether this run is currently controlling the robot."
-            " Setting `current` to `false` will deactivate the run."
+    current: Annotated[
+        Literal[False] | None,
+        Field(
+            description=(
+                "Whether this run is currently controlling the robot."
+                " Setting `current` to `false` will deactivate the run."
+            ),
         ),
-    )
+    ] = None
 
 
 class LabwareDefinitionSummary(BaseModel):

@@ -7,7 +7,16 @@ import logging
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
-from typing import Annotated, Callable, Dict, Final, Literal, Optional, Union
+from typing import (
+    Annotated,
+    Callable,
+    Dict,
+    Final,
+    Literal,
+    Optional,
+    Union,
+    assert_type,
+)
 
 from fastapi import Depends, Query, status
 from pydantic import BaseModel, Field
@@ -428,9 +437,12 @@ async def update_run(
         run_data_manager: Current and historical run data management.
     """
     try:
-        run_data = await run_data_manager.update(
-            runId, current=request_body.data.current
-        )
+        if request_body.data.current is not None:
+            # `current` can either be set to false or not be set at all.
+            assert_type(request_body.data.current, Literal[False])
+            run_data = await run_data_manager.uncurrent(runId)
+        else:
+            run_data = run_data_manager.get(runId)
     except RunConflictError as e:
         raise RunNotIdle(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
     except RunNotCurrentError as e:
