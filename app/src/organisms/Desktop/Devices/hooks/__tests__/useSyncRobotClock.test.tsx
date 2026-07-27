@@ -1,44 +1,101 @@
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { Provider } from 'react-redux'
-import { renderHook } from '@testing-library/react'
-import { legacy_createStore } from 'redux'
+import { I18nextProvider } from 'react-i18next'
+import { renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { syncSystemTime } from '/app/redux/robot-admin'
+import { getSystemTime, putSystemTime } from '@opentrons/api-client'
+
+import { i18n } from '/app/i18n'
+import { useRobot } from '/app/redux-resources/robots'
+import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 
 import { useSyncRobotClock } from '..'
 
-import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'
+import type { Response, SystemTimeResponse } from '@opentrons/api-client'
 
-vi.mock('/app/redux/discovery')
-
-const store: Store<any> = legacy_createStore(vi.fn(), {})
+vi.mock('@opentrons/api-client', async importOriginal => {
+  const actual = await importOriginal<typeof import('@opentrons/api-client')>()
+  return {
+    ...actual,
+    getSystemTime: vi.fn(),
+    putSystemTime: vi.fn(),
+  }
+})
+vi.mock('/app/redux-resources/robots')
+vi.mock('/app/redux/robot-auth/hooks', () => ({
+  useAccessTokenForRobot: () => null,
+}))
 
 describe('useSyncRobotClock hook', () => {
   let wrapper: FunctionComponent<{ children: ReactNode }>
+
   beforeEach(() => {
-    store.dispatch = vi.fn()
-    const queryClient = new QueryClient()
     wrapper = ({ children }) => (
-      <Provider store={store}>
-        <QueryClientProvider client={queryClient}>
-          {children}
-        </QueryClientProvider>
-      </Provider>
+      <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
     )
+    vi.mocked(useRobot).mockReturnValue(mockConnectableRobot as any)
+    vi.mocked(putSystemTime).mockResolvedValue({} as any)
   })
+
   afterEach(() => {
     vi.resetAllMocks()
   })
 
-  it('dispatches action to sync robot system time on mount and then not again on subsequent renders', () => {
-    const { rerender } = renderHook(() => useSyncRobotClock('otie'), {
-      wrapper,
-    })
+  it('does not put system time when drift is within threshold', async () => {
+    vi.mocked(getSystemTime).mockResolvedValue({
+      data: {
+        data: {
+          id: 'time',
+          systemTime: new Date().toISOString(),
+        },
+      },
+    } as Response<SystemTimeResponse>)
 
-    expect(store.dispatch).toHaveBeenCalledWith(syncSystemTime('otie'))
-    rerender()
-    expect(store.dispatch).toHaveBeenCalledTimes(1)
+    renderHook(() => useSyncRobotClock('otie'), { wrapper })
+
+    await waitFor(() => {
+      expect(getSystemTime).toHaveBeenCalledWith(
+        expect.objectContaining({ hostname: mockConnectableRobot.ip })
+      )
+    })
+    expect(putSystemTime).not.toHaveBeenCalled()
+  })
+
+  it('puts system time with audit_log user notes when drift exceeds threshold', async () => {
+    const drifted = new Date(Date.now() - 120_000).toISOString()
+    vi.mocked(getSystemTime).mockResolvedValue({
+      data: {
+        data: {
+          id: 'time',
+          systemTime: drifted,
+        },
+      },
+    } as Response<SystemTimeResponse>)
+
+    renderHook(() => useSyncRobotClock('otie'), { wrapper })
+
+    await waitFor(() => {
+      expect(putSystemTime).toHaveBeenCalledWith(
+        expect.objectContaining({ hostname: mockConnectableRobot.ip }),
+        expect.any(String),
+        'Syncing robot system time'
+      )
+    })
+  })
+
+  it('swallows errors from get or put', async () => {
+    vi.mocked(getSystemTime).mockRejectedValue(new Error('network'))
+
+    renderHook(() => useSyncRobotClock('otie'), { wrapper })
+
+    await waitFor(() => {
+      expect(getSystemTime).toHaveBeenCalled()
+    })
+    expect(putSystemTime).not.toHaveBeenCalled()
+  })
+
+  it('does nothing when robotName is null', () => {
+    renderHook(() => useSyncRobotClock(null), { wrapper })
+    expect(getSystemTime).not.toHaveBeenCalled()
   })
 })
