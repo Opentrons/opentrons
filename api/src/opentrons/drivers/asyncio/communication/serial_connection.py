@@ -313,6 +313,7 @@ class SerialConnection:
 
         if await self._serial.is_open():
             await self._serial.close()
+        self._name = new_port
         self._serial = await self._build_serial(
             port=new_port,
             baud_rate=self._serial._baud_rate,
@@ -683,18 +684,17 @@ class AsyncResponseSerialConnection(SerialConnection):
                 responses = await self._send_one_retry(data, acks)
                 if responses:
                     return responses
-                log.info(f"{self._name}: retry number {retry}/{retries}")
-
             except Exception:
                 log.exception("Got an error during send")
                 if retry < retries and not self._closed_on_purpose:
                     pass
                 else:
+                    log.warning(f"Already used {retry} {retries} and raising error")
                     raise
             except asyncio.CancelledError:
                 log.exception("Asyncio canceled")
                 raise
-
+            log.info(f"{self._name}: retry number {retry}/{retries}")
             await self.on_retry()
         raise NoResponse(port=self._port, command=data)
 
