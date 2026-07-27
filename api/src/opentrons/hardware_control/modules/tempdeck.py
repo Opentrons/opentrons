@@ -345,7 +345,9 @@ class TempDeckReader(Reader):
         self._debounce_count = DEFAULT_COMMAND_RETRIES
 
     async def read(self) -> None:
-        """Read the module's current and target temperatures."""
+        """Read the module's current and target temperatures.
+
+        Do not call directly, for the poller only."""
         self.temperature = await self._driver.get_temperature()
         # reset on success
         self._debounce_count = DEFAULT_COMMAND_RETRIES

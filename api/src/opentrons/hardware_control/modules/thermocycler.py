@@ -808,6 +808,7 @@ class ThermocyclerReader(Reader):
         await self._read_errors()
 
     async def _read_errors(self) -> None:
+        """Do not call directly, for the poller only."""
         try:
             await self._driver.get_error_state()
         except UnhandledGcode:
@@ -818,12 +819,15 @@ class ThermocyclerReader(Reader):
         # error handler can take it.
 
     async def read_lid_status(self) -> None:
+        """Do not call directly, for the poller only."""
         self.lid_status = await self._driver.get_lid_status()
 
     async def read_block_temperature(self) -> None:
+        """Do not call directly, for the poller only."""
         self.block_temperature = await self._driver.get_plate_temperature()
         self._block_temperature_status.update(self.block_temperature)
 
     async def read_lid_temperature(self) -> None:
+        """Do not call directly, for the poller only."""
         self.lid_temperature = await self._driver.get_lid_temperature()
         self._lid_temperature_status.update(self.lid_temperature)

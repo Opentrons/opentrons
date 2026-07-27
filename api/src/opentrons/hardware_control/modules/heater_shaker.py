@@ -486,12 +486,15 @@ class HeaterShakerReader(Reader):
         self._set_error(exception)
 
     async def read_temperature(self) -> None:
+        """Do not call directly, for the poller only."""
         self.temperature = await self._driver.get_temperature()
 
     async def read_rpm(self) -> None:
+        """Do not call directly, for the poller only."""
         self.rpm = await self._driver.get_rpm()
 
     async def read_labware_latch(self) -> None:
+        """Do not call directly, for the poller only."""
         self.labware_latch = await self._driver.get_labware_latch_status()
 
     def _set_error(self, exception: Optional[Exception]) -> None:
@@ -512,6 +515,7 @@ class HeaterShakerReader(Reader):
                 self.error = repr(exception)
 
     async def _read_errors(self) -> None:
+        """Do not call directly, for the poller only."""
         try:
             await self._driver.get_error_state()
         except UnhandledGcode:
