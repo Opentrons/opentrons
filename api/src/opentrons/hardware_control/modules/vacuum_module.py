@@ -470,14 +470,19 @@ class VacuumModule(mod_abc.AbstractModule):
     def bootloader(self) -> UploadFunction:
         return update.upload_via_dfu
 
+    async def stop_vacuum(self) -> None:
+        """Stop pressure control and the pump; clear software targets."""
+        await self._driver.set_vacuum_state(False)
+        await self._driver.set_pump_state(False)
+        self._reader.reset_pressure_target()
+        self._reader.reset_power_target()
+
     async def deactivate(self, must_be_running: bool = True) -> None:
         """Stop the pump, and open the vent."""
         if must_be_running:
             await self.wait_for_is_running()
-        await self._driver.set_vacuum_state(False)
+        await self.stop_vacuum()
         await self._driver.set_vent_state(VentState.OPENED)
-        self._reader.reset_pressure_target()
-        self._reader.reset_power_target()
 
     async def set_led_state(
         self,
@@ -595,12 +600,8 @@ class VacuumModule(mod_abc.AbstractModule):
         """Control the pump agnostically to the internal pressure"""
         self._reader.set_operation_mode(VacuumOperationMode.POWER)
         self._reader.reset_pressure_target()
-        if duty_cycle is not None:
-            self._reader.set_target_power(float(duty_cycle))
-        elif not start_pump:
-            self._reader.reset_power_target()
-
-        await self._driver.set_vacuum_state(enable_vacuum=False)
+        self._reader.set_target_power(duty_cycle)
+        await self._driver.set_vacuum_state(False)
         await self._driver.set_pump_state(
             start_pump=start_pump,
             target_rpm=target_rpm,
