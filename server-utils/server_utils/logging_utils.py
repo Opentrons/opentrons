@@ -27,6 +27,7 @@ def get_dict_config(log_level: str | int, syslog_id: str) -> dict[str, object]:
     root_formatter, root_handler = _get_root_formatter_and_handler_for_system(syslog_id)
     return {
         "version": 1,
+        "disable_existing_loggers": False,
         # Fix up 3rd-party packages to make sure their logs propagate up to our root
         # handler. Most packages don't need this.
         "loggers": {
