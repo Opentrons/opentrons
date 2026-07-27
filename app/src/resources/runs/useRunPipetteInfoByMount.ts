@@ -2,8 +2,8 @@ import last from 'lodash/last'
 
 import { useAllTipLengthCalibrationsQuery } from '@opentrons/react-api-client'
 import {
-  getLabwareDefinitionsByURIForProtocol,
   getLabwareDefURI,
+  getLoadedLabwareDefinitionsByUri,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
 
@@ -46,7 +46,7 @@ export function useRunPipetteInfoByMount(runId: string): {
     return EMPTY_MOUNTS
   }
   const { pipettes, labware, commands } = protocolData
-  const labwareDefinitions = getLabwareDefinitionsByURIForProtocol(commands)
+  const labwareDefinitions = getLoadedLabwareDefinitionsByUri(commands)
   const loadPipetteCommands = commands.filter(
     (command): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette'
