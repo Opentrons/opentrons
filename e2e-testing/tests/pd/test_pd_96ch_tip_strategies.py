@@ -28,6 +28,7 @@ _SINGLE: TransferPage.NozzleConfig = "Single nozzle"
 _COLUMN: TransferPage.NozzleConfig = "Single column of nozzles"
 _ALL: TransferPage.NozzleConfig = "All nozzles (recommended)"
 _MANUAL: TransferPage.TipTrackingMode = "Manual tip tracking"
+_AUTO: TransferPage.TipTrackingMode = "Automatic tip tracking (recommended)"
 
 # (nozzle_config, primary_nozzle, path) -> (source_wells, dest_wells) on a 384 plate.
 _WELLS_384: dict[tuple[str, str, str], tuple[Union[str, List[str]], Union[str, List[str]]]] = {
@@ -40,18 +41,12 @@ _WELLS_384: dict[tuple[str, str, str], tuple[Union[str, List[str]], Union[str, L
 }
 
 
-def _wells_for_partial_384(
+def _wells(
     nozzle_config: TransferPage.NozzleConfig,
-    primary_nozzle: str,
+    primary: str,
     path: str = "Single transfer",
 ) -> tuple[Union[str, List[str]], Union[str, List[str]]]:
-    key = (nozzle_config, primary_nozzle, path)
-    try:
-        return _WELLS_384[key]
-    except KeyError as err:
-        raise KeyError(
-            f"No 384 well map for nozzle={nozzle_config!r} primary={primary_nozzle!r} path={path!r}"
-        ) from err
+    return _WELLS_384[(nozzle_config, primary, path)]
 
 
 def _move_1000ul_tiprack_away_from_stacker(editor: ProtocolEditorPage) -> None:
@@ -78,6 +73,16 @@ def _replace_depleted_200ul_tiprack(editor: ProtocolEditorPage, stacker: FlexSta
     editor.move_labware(_TIPRACK_200_FRESH, "D2")
 
 
+def _run_transfers(
+    editor: ProtocolEditorPage,
+    transfer: TransferPage,
+    steps: list[tuple[str, TransferStepConfig]],
+) -> None:
+    for label, config in steps:
+        print(f"  - {label}")
+        add_transfer_step(editor, transfer, config)
+
+
 @pytest.mark.pdE2E
 @pytest.mark.slow
 @pytest.mark.timeout(600)
@@ -92,219 +97,115 @@ def test_pd_96ch_tip_strategies_sequential(page: Page, pd_exports_dir: Path) -> 
     print("1) Move B3 tiprack to B2 once")
     _move_1000ul_tiprack_away_from_stacker(editor)
 
+    # label, primary, path, change_tip, drop_location, tip_tracking, manual_tips
     print("2) Single-nozzle strategy phase")
-    src_a12, dst_a12 = _wells_for_partial_384(_SINGLE, "A12")
-    src_h12, dst_h12 = _wells_for_partial_384(_SINGLE, "H12")
-    src_h1, dst_h1 = _wells_for_partial_384(_SINGLE, "H1")
-    src_h1_dist, dst_h1_dist = _wells_for_partial_384(_SINGLE, "H1", "Distribute")
-    src_a1, dst_a1 = _wells_for_partial_384(_SINGLE, "A1")
-
-    single_steps = [
-        TransferStepConfig(
-            tip_rack=TIPRACK_1000,
-            source_labware=PLATE_384,
-            dest_labware=PLATE_384,
-            source_wells=src_a12,
-            dest_wells=dst_a12,
-            path="Single transfer",
-            volume="30",
-            change_tip="Once",
-            nozzle_config=_SINGLE,
-            primary_nozzle="A12",
+    single_specs = [
+        ("single A12 Once auto return", "A12", "Single transfer", "Once", "Tip rack", _AUTO, None),
+        ("single H12 Once manual A1", "H12", "Single transfer", "Once", "Tip rack", _MANUAL, ["A1"]),
+        ("single H1 Once auto return", "H1", "Single transfer", "Once", "Tip rack", _AUTO, None),
+        ("single H1 Distribute Once manual A12", "H1", "Distribute", "Once", "Tip rack", _MANUAL, ["A12"]),
+        ("single A1 Always auto", "A1", "Single transfer", "Always", "Tip rack", _AUTO, None),
+        (
+            "single H1 Once manual A12 waste (Never setup)",
+            "H1",
+            "Single transfer",
+            "Once",
+            "Waste Chute",
+            _MANUAL,
+            ["A12"],
         ),
-        TransferStepConfig(
-            tip_rack=TIPRACK_1000,
-            source_labware=PLATE_384,
-            dest_labware=PLATE_384,
-            source_wells=src_h12,
-            dest_wells=dst_h12,
-            path="Single transfer",
-            volume="30",
-            change_tip="Once",
-            tip_tracking=_MANUAL,
-            manual_tips=["A1"],
-            nozzle_config=_SINGLE,
-            primary_nozzle="H12",
-        ),
-        TransferStepConfig(
-            tip_rack=TIPRACK_1000,
-            source_labware=PLATE_384,
-            dest_labware=PLATE_384,
-            source_wells=src_h1,
-            dest_wells=dst_h1,
-            path="Single transfer",
-            volume="30",
-            change_tip="Once",
-            nozzle_config=_SINGLE,
-            primary_nozzle="H1",
-        ),
-        TransferStepConfig(
-            tip_rack=TIPRACK_1000,
-            source_labware=PLATE_384,
-            dest_labware=PLATE_384,
-            source_wells=src_h1_dist,
-            dest_wells=dst_h1_dist,
-            path="Distribute",
-            volume="30",
-            change_tip="Once",
-            tip_tracking=_MANUAL,
-            manual_tips=["A12"],
-            nozzle_config=_SINGLE,
-            primary_nozzle="H1",
-        ),
-        TransferStepConfig(
-            tip_rack=TIPRACK_1000,
-            source_labware=PLATE_384,
-            dest_labware=PLATE_384,
-            source_wells=src_a1,
-            dest_wells=dst_a1,
-            path="Single transfer",
-            volume="30",
-            change_tip="Always",
-            nozzle_config=_SINGLE,
-            primary_nozzle="A1",
-        ),
-        TransferStepConfig(
-            tip_rack=TIPRACK_1000,
-            source_labware=PLATE_384,
-            dest_labware=PLATE_384,
-            source_wells=src_h1,
-            dest_wells=dst_h1,
-            path="Single transfer",
-            volume="30",
-            change_tip="Once",
-            drop_location="Waste Chute",
-            tip_tracking=_MANUAL,
-            manual_tips=["A12"],
-            nozzle_config=_SINGLE,
-            primary_nozzle="H1",
-        ),
-        TransferStepConfig(
-            tip_rack=TIPRACK_1000,
-            source_labware=PLATE_384,
-            dest_labware=PLATE_384,
-            source_wells="P1",
-            dest_wells="P3",
-            path="Single transfer",
-            volume="30",
-            change_tip="Never",
-            drop_location="Waste Chute",
-            nozzle_config=_SINGLE,
-            primary_nozzle="H1",
-        ),
+        ("single H1 Never waste", "H1", "Single transfer", "Never", "Waste Chute", _AUTO, None),
     ]
-    for config in single_steps:
-        add_transfer_step(editor, transfer, config)
+    single_steps = []
+    for label, primary, path, change_tip, drop, tip_tracking, manual_tips in single_specs:
+        src, dst = _wells(_SINGLE, primary, path)
+        single_steps.append(
+            (
+                label,
+                TransferStepConfig(
+                    tip_rack=TIPRACK_1000,
+                    source_labware=PLATE_384,
+                    dest_labware=PLATE_384,
+                    source_wells=src,
+                    dest_wells=dst,
+                    path=path,
+                    volume="30",
+                    change_tip=change_tip,
+                    drop_location=drop,
+                    tip_tracking=tip_tracking,
+                    manual_tips=manual_tips,
+                    nozzle_config=_SINGLE,
+                    primary_nozzle=primary,
+                ),
+            )
+        )
+    _run_transfers(editor, transfer, single_steps)
 
+    # label, change_tip, drop_location, tip_tracking, manual_tips
     print("3) Column-nozzle strategy phase")
-    src_column, dst_column = _wells_for_partial_384(_COLUMN, "A1")
+    src_column, dst_column = _wells(_COLUMN, "A1")
+    column_specs = [
+        ("column A1 Once auto return", "Once", "Tip rack", _AUTO, None),
+        ("column A1 Once manual A12 return", "Once", "Tip rack", _MANUAL, ["A12"]),
+        ("column A1 Always manual A12 waste", "Always", "Waste Chute", _MANUAL, ["A12"]),
+    ]
     column_steps = [
-        TransferStepConfig(
-            tip_rack=TIPRACK_1000,
-            source_labware=PLATE_384,
-            dest_labware=PLATE_384,
-            source_wells=src_column,
-            dest_wells=dst_column,
-            path="Single transfer",
-            volume="30",
-            change_tip="Once",
-            nozzle_config=_COLUMN,
-            primary_nozzle="A1",
-        ),
-        TransferStepConfig(
-            tip_rack=TIPRACK_1000,
-            source_labware=PLATE_384,
-            dest_labware=PLATE_384,
-            source_wells=src_column,
-            dest_wells=dst_column,
-            path="Single transfer",
-            volume="30",
-            change_tip="Once",
-            tip_tracking=_MANUAL,
-            manual_tips=["A12"],
-            nozzle_config=_COLUMN,
-            primary_nozzle="A1",
-        ),
-        TransferStepConfig(
-            tip_rack=TIPRACK_1000,
-            source_labware=PLATE_384,
-            dest_labware=PLATE_384,
-            source_wells=src_column,
-            dest_wells=dst_column,
-            path="Single transfer",
-            volume="30",
-            change_tip="Always",
-            drop_location="Waste Chute",
-            tip_tracking=_MANUAL,
-            manual_tips=["A12"],
-            nozzle_config=_COLUMN,
-            primary_nozzle="A1",
-        ),
+        (
+            label,
+            TransferStepConfig(
+                tip_rack=TIPRACK_1000,
+                source_labware=PLATE_384,
+                dest_labware=PLATE_384,
+                source_wells=src_column,
+                dest_wells=dst_column,
+                path="Single transfer",
+                volume="30",
+                change_tip=change_tip,
+                drop_location=drop,
+                tip_tracking=tip_tracking,
+                manual_tips=manual_tips,
+                nozzle_config=_COLUMN,
+                primary_nozzle="A1",
+            ),
+        )
+        for label, change_tip, drop, tip_tracking, manual_tips in column_specs
     ]
-    for config in column_steps:
-        add_transfer_step(editor, transfer, config)
+    _run_transfers(editor, transfer, column_steps)
 
+    # label, source, dest, change_tip, drop_location, tip_tracking, manual_tips
     print("4) Full-rack strategy phase")
-    full_rack_before_swap = [
-        TransferStepConfig(
-            tip_rack=TIPRACK_200,
-            source_labware=PLATE_96,
-            dest_labware=PLATE_96,
-            source_wells="A1",
-            dest_wells="B1",
-            path="Single transfer",
-            volume="50",
-            change_tip="Once",
-            nozzle_config=_ALL,
-        ),
-        TransferStepConfig(
-            tip_rack=TIPRACK_200,
-            source_labware=PLATE_96,
-            dest_labware=PLATE_96,
-            source_wells="A2",
-            dest_wells="B2",
-            path="Single transfer",
-            volume="50",
-            change_tip="Always",
-            drop_location="Waste Chute",
-            tip_tracking=_MANUAL,
-            manual_tips=["A1"],
-            nozzle_config=_ALL,
-        ),
+    full_rack_specs = [
+        ("full A1->B1 Once auto return", "A1", "B1", "Once", "Tip rack", _AUTO, None),
+        ("full A2->B2 Always manual A1 waste", "A2", "B2", "Always", "Waste Chute", _MANUAL, ["A1"]),
+        ("full A3->B3 Once manual A1 waste (Never setup)", "A3", "B3", "Once", "Waste Chute", _MANUAL, ["A1"]),
+        ("full A4->B4 Never", "A4", "B4", "Never", "Tip rack", _AUTO, None),
     ]
-    full_rack_after_swap = [
-        TransferStepConfig(
-            tip_rack=TIPRACK_200,
-            source_labware=PLATE_96,
-            dest_labware=PLATE_96,
-            source_wells="A3",
-            dest_wells="B3",
-            path="Single transfer",
-            volume="50",
-            change_tip="Once",
-            drop_location="Waste Chute",
-            tip_tracking=_MANUAL,
-            manual_tips=["A1"],
-            nozzle_config=_ALL,
-        ),
-        TransferStepConfig(
-            tip_rack=TIPRACK_200,
-            source_labware=PLATE_96,
-            dest_labware=PLATE_96,
-            source_wells="A4",
-            dest_wells="B4",
-            path="Single transfer",
-            volume="50",
-            change_tip="Never",
-            nozzle_config=_ALL,
-        ),
-    ]
-    for config in full_rack_before_swap:
-        add_transfer_step(editor, transfer, config)
-    _replace_depleted_200ul_tiprack(editor, stacker)
-    for config in full_rack_after_swap:
-        add_transfer_step(editor, transfer, config)
 
+    def _full_rack_steps(specs: list) -> list[tuple[str, TransferStepConfig]]:
+        return [
+            (
+                label,
+                TransferStepConfig(
+                    tip_rack=TIPRACK_200,
+                    source_labware=PLATE_96,
+                    dest_labware=PLATE_96,
+                    source_wells=src,
+                    dest_wells=dst,
+                    path="Single transfer",
+                    volume="50",
+                    change_tip=change_tip,
+                    drop_location=drop,
+                    tip_tracking=tip_tracking,
+                    manual_tips=manual_tips,
+                    nozzle_config=_ALL,
+                ),
+            )
+            for label, src, dst, change_tip, drop, tip_tracking, manual_tips in specs
+        ]
+
+    _run_transfers(editor, transfer, _full_rack_steps(full_rack_specs[:2]))
+    _replace_depleted_200ul_tiprack(editor, stacker)
+    _run_transfers(editor, transfer, _full_rack_steps(full_rack_specs[2:]))
     print("5) Timeline + export validation")
     timeline = Timeline(page)
     timeline.wait_for_timeline_steps(min_steps=18)

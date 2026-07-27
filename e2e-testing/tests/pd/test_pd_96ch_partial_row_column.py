@@ -10,12 +10,21 @@ from automation.pd_pages.transfer_form import TransferStepConfig, add_transfer_s
 from utility import assert_export_downloads_clean_protocol, import_protocol_and_open_editor
 
 _ROW: TransferPage.NozzleConfig = "Single row of nozzles"
+_MANUAL: TransferPage.TipTrackingMode = "Manual tip tracking"
+_AUTO: TransferPage.TipTrackingMode = "Automatic tip tracking (recommended)"
+
 PROTOCOL_PATH = "fixtures/protocol/9/96_channel_setup.py"
 PLATE_384 = "Applied Biosystems MicroAmp 384 Well Plate 40 µL"
 TIPRACK_1000 = "Opentrons Flex 96 Filter Tip Rack 1000 µL"
 ROW_NOZZLE_SAMPLE_STEP_INDICES = [1, 2, 3]
 _TIPRACK_1000_B3 = "B3 Opentrons Flex 96 Filter Tip Rack 1000 µL"
 _TIPRACK_1000_SAFE_SLOT = "B2"
+
+# primary_nozzle -> (source_wells, dest_wells) on a 384 plate.
+_WELLS_384 = {
+    "A1": ("A1", "A3"),
+    "H1": ("P1", "P3"),
+}
 
 _ROW_LIQUID_CLASS_CONTINUE_REASON = (
     "96ch single-row transfers hang on liquid-class Continue in this fixture "
@@ -44,70 +53,39 @@ def test_pd_96ch_partial_row_nozzle_tip_strategies(page: Page, pd_exports_dir: P
 
     _move_1000ul_tiprack_away_from_stacker(editor)
 
-    src_a1, dst_a1 = ("A1", "A3")
-    src_h1, dst_h1 = ("P1", "P3")
-
-    steps = [
-        TransferStepConfig(
-            tip_rack=TIPRACK_1000,
-            source_labware=PLATE_384,
-            dest_labware=PLATE_384,
-            source_wells=src_a1,
-            dest_wells=dst_a1,
-            path="Single transfer",
-            volume="30",
-            change_tip="Once",
-            drop_location="Waste Chute",
-            nozzle_config=_ROW,
-            primary_nozzle="A1",
-        ),
-        TransferStepConfig(
-            tip_rack=TIPRACK_1000,
-            source_labware=PLATE_384,
-            dest_labware=PLATE_384,
-            source_wells=src_h1,
-            dest_wells=dst_h1,
-            path="Single transfer",
-            volume="30",
-            change_tip="Once",
-            drop_location="Waste Chute",
-            nozzle_config=_ROW,
-            primary_nozzle="H1",
-        ),
-        TransferStepConfig(
-            tip_rack=TIPRACK_1000,
-            source_labware=PLATE_384,
-            dest_labware=PLATE_384,
-            source_wells=src_a1,
-            dest_wells=dst_a1,
-            path="Single transfer",
-            volume="30",
-            change_tip="Always",
-            drop_location="Waste Chute",
-            nozzle_config=_ROW,
-            primary_nozzle="A1",
-        ),
-        TransferStepConfig(
-            tip_rack=TIPRACK_1000,
-            source_labware=PLATE_384,
-            dest_labware=PLATE_384,
-            source_wells=src_a1,
-            dest_wells=dst_a1,
-            path="Single transfer",
-            volume="30",
-            change_tip="Once",
-            tip_tracking="Manual tip tracking",
-            manual_tips=["H1"],
-            nozzle_config=_ROW,
-            primary_nozzle="A1",
-        ),
+    # label, primary, change_tip, drop_location, tip_tracking, manual_tips
+    print("Row-nozzle strategy phase")
+    row_specs = [
+        ("row A1 Once auto waste", "A1", "Once", "Waste Chute", _AUTO, None),
+        ("row H1 Once auto waste", "H1", "Once", "Waste Chute", _AUTO, None),
+        ("row A1 Always auto waste", "A1", "Always", "Waste Chute", _AUTO, None),
+        ("row A1 Once manual H1 return", "A1", "Once", "Tip rack", _MANUAL, ["H1"]),
     ]
-
-    for config in steps:
-        add_transfer_step(editor, transfer, config)
+    for label, primary, change_tip, drop, tip_tracking, manual_tips in row_specs:
+        src, dst = _WELLS_384[primary]
+        print(f"  - {label}")
+        add_transfer_step(
+            editor,
+            transfer,
+            TransferStepConfig(
+                tip_rack=TIPRACK_1000,
+                source_labware=PLATE_384,
+                dest_labware=PLATE_384,
+                source_wells=src,
+                dest_wells=dst,
+                path="Single transfer",
+                volume="30",
+                change_tip=change_tip,
+                drop_location=drop,
+                tip_tracking=tip_tracking,
+                manual_tips=manual_tips,
+                nozzle_config=_ROW,
+                primary_nozzle=primary,
+            ),
+        )
 
     timeline = Timeline(page)
-    timeline.wait_for_timeline_steps(min_steps=1 + len(steps))
+    timeline.wait_for_timeline_steps(min_steps=1 + len(row_specs))
     timeline.expect_no_known_regression_errors()
     timeline.select_transfer_steps_sample(ROW_NOZZLE_SAMPLE_STEP_INDICES, expect_no_errors=True)
     assert_export_downloads_clean_protocol(
