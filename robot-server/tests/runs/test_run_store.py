@@ -380,6 +380,7 @@ async def test_update_run_state(
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         actions=[action],
+        signed_by=None,
     )
     assert run_summary_result == state_summary
     assert parameters_result == run_time_parameters
@@ -501,6 +502,7 @@ def test_add_run(subject: RunStore) -> None:
         protocol_id=None,
         created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
         actions=[],
+        signed_by=None,
     )
 
 
@@ -514,6 +516,43 @@ def test_insert_actions_missing_run_id(subject: RunStore) -> None:
 
     with pytest.raises(RunNotFoundError, match="missing-run-id"):
         subject.insert_action(run_id="missing-run-id", action=action)
+
+
+def test_set_signed_by(subject: RunStore) -> None:
+    """It should store the signed_by value for a run."""
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+    )
+
+    subject.set_signed_by(run_id="run-id", signed_by="Alice Example")
+
+    assert subject.get(run_id="run-id") == RunResource(
+        ok=True,
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        actions=[],
+        signed_by="Alice Example",
+    )
+
+    subject.set_signed_by(run_id="run-id", signed_by="Bob Example")
+
+    assert subject.get(run_id="run-id") == RunResource(
+        ok=True,
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        actions=[],
+        signed_by="Bob Example",
+    )
+
+
+def test_set_signed_by_missing_run_id(subject: RunStore) -> None:
+    """It should raise if the run does not exist."""
+    with pytest.raises(RunNotFoundError, match="missing-run-id"):
+        subject.set_signed_by(run_id="missing-run-id", signed_by="Alice Example")
 
 
 def test_insert_run_missing_protocol_id(subject: RunStore) -> None:
@@ -542,6 +581,7 @@ def test_get_run_no_actions(subject: RunStore) -> None:
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         actions=[],
+        signed_by=None,
     )
 
 
@@ -569,6 +609,7 @@ def test_get_run(subject: RunStore) -> None:
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         actions=[action],
+        signed_by=None,
     )
 
 
@@ -591,6 +632,7 @@ def test_get_run_missing(subject: RunStore) -> None:
                     protocol_id=None,
                     created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
                     actions=[],
+                    signed_by=None,
                 )
             ],
         ),
@@ -603,6 +645,7 @@ def test_get_run_missing(subject: RunStore) -> None:
                     protocol_id=None,
                     created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
                     actions=[],
+                    signed_by=None,
                 ),
                 RunResource(
                     ok=True,
@@ -610,6 +653,7 @@ def test_get_run_missing(subject: RunStore) -> None:
                     protocol_id=None,
                     created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
                     actions=[],
+                    signed_by=None,
                 ),
             ],
         ),
@@ -622,6 +666,7 @@ def test_get_run_missing(subject: RunStore) -> None:
                     protocol_id=None,
                     created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
                     actions=[],
+                    signed_by=None,
                 ),
                 RunResource(
                     ok=True,
@@ -629,6 +674,7 @@ def test_get_run_missing(subject: RunStore) -> None:
                     protocol_id=None,
                     created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
                     actions=[],
+                    signed_by=None,
                 ),
             ],
         ),
