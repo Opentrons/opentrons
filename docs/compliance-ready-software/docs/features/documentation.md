@@ -17,6 +17,7 @@ TODO:
 - link relevant sections
 - some text here re: it's up to each lab to determine what sufficient and appropriate documentation looks like? 
 - "other robot actions" above is a bit clunky; work on this
+- TODO: check list at end of features notes (Google doc; the list of actions that require documentation) against my current list in this file
 -------------->
 
 ## Setting up a protocol
