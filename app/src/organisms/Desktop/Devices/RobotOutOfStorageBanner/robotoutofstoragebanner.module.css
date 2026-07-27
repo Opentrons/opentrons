@@ -1,0 +1,18 @@
+.container {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: var(--spacing-8);
+}
+
+.link_body {
+  display: flex;
+  min-width: max-content;
+  align-items: center;
+}
+
+.text_body {
+  display: flex;
+  flex-direction: column;
+}
