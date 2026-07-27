@@ -71,7 +71,7 @@ export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
   )
 }
 
-function LPCWizardContent(props: LPCWizardContentProps): JSX.Element {
+export function LPCWizardContent(props: LPCWizardContentProps): JSX.Element {
   const { t } = useTranslation('shared')
   const currentStep = useSelector(selectCurrentStep(props.runId))
   const { isRobotMoving, errorMessage, unableToDetect } = props.commandUtils

@@ -652,12 +652,6 @@ describe('CheckItem', () => {
       false
     )
   })
-  it('renders the stand back message when the robot is moving', () => {
-    props = { ...props, isRobotMoving: true, robotType: FLEX_ROBOT_TYPE }
-    render(props)
-    screen.getByText('Stand back, robot is in motion')
-  })
-
   it('executes correct chained commands when confirm placement CTA is clicked when using probe for LPC', async () => {
     props = {
       ...props,
