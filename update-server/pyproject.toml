@@ -68,7 +68,6 @@ known-local-folder = ["otupdate"]
 known-first-party = ["server_utils"]
 [tool.ruff.lint.per-file-ignores]
 "otupdate/_version.py" = ["I"]
-"buildroot_upload.py" = ["T201"]
 "oe_upload.py" = ["T201"]
 
 [tool.ruff.format]
@@ -139,15 +138,12 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = [
     "tests.conftest",
-    "tests.buildroot.conftest",
-    "tests.buildroot.test_control",
-    "tests.buildroot.test_ssh_key_management",
-    "tests.buildroot.test_update_actions",
     "tests.common.conftest",
     "tests.common.config",
     "tests.common.test_config",
     "tests.common.test_control",
     "tests.common.test_file_actions",
+    "tests.common.test_ssh_key_management",
     "tests.common.test_update",
     "tests.openembedded.conftest",
     "tests.openembedded.test_control",

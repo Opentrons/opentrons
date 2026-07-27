@@ -23,10 +23,9 @@ from . import auth, config, update_actions
 from .constants import RESTART_LOCK_NAME
 from .handler_type import Handler
 from .session import Stages, UpdateSession, get_current_session, set_current_session
-from otupdate.buildroot.update_actions import UPDATE_PKG_BR
 from otupdate.openembedded.update_actions import UPDATE_PKG_OE
 
-VALID_UPDATE_PKG = UPDATE_PKG_OE + UPDATE_PKG_BR
+VALID_UPDATE_PKG = UPDATE_PKG_OE
 
 LOG = logging.getLogger(__name__)
 
@@ -141,7 +140,8 @@ async def file_upload(request: web.Request, session: UpdateSession) -> web.Respo
     """Serves /update/:session/file
 
     Requires multipart (encoding doesn't matter) with a file field in the
-    body called 'system-update.zip'. NOTE: OT2 will also support 'ot2-system.zip'
+    body called 'system-update.zip'. NOTE: the OT-2 variant (no longer in
+    this repo) also supported 'ot2-system.zip'.
     """
     if session.stage != Stages.AWAITING_FILE:
         return web.json_response(

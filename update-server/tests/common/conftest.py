@@ -19,7 +19,7 @@ from server_utils.auth.resource_server.authentication_checker import (
 )
 from tests.common.config import FakeRootPartElem
 
-from otupdate import buildroot, common, openembedded
+from otupdate import common, openembedded
 from otupdate.common.update_actions import Partition
 from otupdate.openembedded import PartitionManager
 
@@ -33,7 +33,7 @@ def mock_authentication_checker(decoy: Decoy) -> AuthenticationChecker:
     return decoy.mock(cls=AuthenticationChecker)
 
 
-@pytest.fixture(params=[openembedded, buildroot])
+@pytest.fixture(params=[openembedded])
 async def test_cli(
     aiohttp_client, otupdate_config, request, version_file_path, mock_name_synchronizer
 ) -> Tuple[HTTPTestClient, str]:
@@ -61,8 +61,7 @@ async def auth_test_cli(
     mock_authentication_checker: AuthenticationChecker,
 ) -> Tuple[HTTPTestClient, AuthenticationChecker]:
     """Build an app with a mock AuthenticationChecker, for authentication-related tests."""
-    # buildroot vs. openembedded shouldn't matter here because everything is mocked, anyway.
-    app = await buildroot.get_app(
+    app = await openembedded.get_app(
         name_synchronizer=mock_name_synchronizer,
         system_version_file=version_file_path,
         config_file_override=otupdate_config,
