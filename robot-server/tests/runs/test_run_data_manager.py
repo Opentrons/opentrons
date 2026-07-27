@@ -2,7 +2,7 @@
 
 import inspect
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List
 from unittest.mock import Mock, sentinel
 
 import pytest
@@ -223,7 +223,7 @@ def run_resource() -> RunResource:
         protocol_id=None,
         created_at=datetime(year=2022, month=2, day=2),
         actions=[],
-        signed_by=None,
+        signed_by="Alice Example",
     )
 
 
@@ -382,6 +382,7 @@ async def test_create(
         liquidClasses=engine_state_summary.liquidClasses,
         runTimeParameters=[bool_parameter, file_parameter],
         outputFileIds=engine_state_summary.files,
+        signedBy=run_resource.signed_by,
     )
     decoy.verify(
         mock_file_provider.set_run_metadata(
@@ -508,6 +509,7 @@ async def test_get_current_run(
         liquidClasses=engine_state_summary.liquidClasses,
         runTimeParameters=run_time_parameters,
         outputFileIds=engine_state_summary.files,
+        signedBy=run_resource.signed_by,
     )
     assert subject.current_run_id == run_id
 
@@ -552,6 +554,7 @@ async def test_get_historical_run(
         liquidClasses=engine_state_summary.liquidClasses,
         runTimeParameters=run_time_parameters,
         outputFileIds=engine_state_summary.files,
+        signedBy=run_resource.signed_by,
     )
 
 
@@ -597,6 +600,7 @@ async def test_get_historical_run_no_data(
         liquidClasses=[],
         runTimeParameters=run_time_parameters,
         outputFileIds=[],
+        signedBy=run_resource.signed_by,
     )
 
 
@@ -766,7 +770,7 @@ async def test_delete_historical_run(
     decoy.verify(mock_run_store.remove(run_id=run_id), times=1)
 
 
-async def test_update_current(
+async def test_uncurrent(
     decoy: Decoy,
     engine_state_summary: StateSummary,
     run_time_parameters: List[pe_types.RunTimeParameter],
@@ -780,7 +784,7 @@ async def test_update_current(
     mock_file_provider: FileProvider,
     subject: RunDataManager,
 ) -> None:
-    """It should persist the current run and clear the engine on current=false."""
+    """It should persist the current run and clear the engine."""
     run_id = "hello world"
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
     decoy.when(await mock_run_orchestrator_store.clear()).then_return(
@@ -803,7 +807,7 @@ async def test_update_current(
         )
     ).then_return(run_resource)
 
-    result = await subject.update(run_id=run_id, current=False)
+    result = await subject.uncurrent(run_id=run_id)
 
     decoy.verify(
         mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
@@ -838,69 +842,11 @@ async def test_update_current(
         liquidClasses=engine_state_summary.liquidClasses,
         runTimeParameters=run_time_parameters,
         outputFileIds=engine_state_summary.files,
+        signedBy=run_resource.signed_by,
     )
 
 
-@pytest.mark.parametrize("current", [None, True])
-async def test_update_current_noop(
-    decoy: Decoy,
-    engine_state_summary: StateSummary,
-    run_time_parameters: List[pe_types.RunTimeParameter],
-    run_resource: RunResource,
-    run_command: commands.Command,
-    mock_run_orchestrator_store: RunOrchestratorStore,
-    mock_run_store: RunStore,
-    mock_runs_publisher: RunsPublisher,
-    subject: RunDataManager,
-    current: Optional[bool],
-) -> None:
-    """It should noop on current=None and current=True."""
-    run_id = "hello world"
-    decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
-    decoy.when(mock_run_orchestrator_store.get_state_summary()).then_return(
-        engine_state_summary
-    )
-    decoy.when(mock_run_orchestrator_store.get_run_time_parameters()).then_return(
-        run_time_parameters
-    )
-    decoy.when(mock_run_store.get(run_id=run_id)).then_return(run_resource)
-
-    result = await subject.update(run_id=run_id, current=current)
-
-    decoy.verify(await mock_run_orchestrator_store.clear(), times=0)
-    decoy.verify(
-        mock_run_store.update_run_state(
-            run_id=run_id,
-            summary=matchers.Anything(),
-            commands=matchers.Anything(),
-            command_annotations=matchers.Anything(),
-            run_time_parameters=matchers.Anything(),
-        ),
-        mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
-        times=0,
-    )
-
-    assert result == Run(
-        current=True,
-        id=run_resource.run_id,
-        protocolId=run_resource.protocol_id,
-        createdAt=run_resource.created_at,
-        actions=run_resource.actions,
-        status=engine_state_summary.status,
-        errors=engine_state_summary.errors,
-        hasEverEnteredErrorRecovery=engine_state_summary.hasEverEnteredErrorRecovery,
-        labware=engine_state_summary.labware,
-        labwareOffsets=engine_state_summary.labwareOffsets,
-        pipettes=engine_state_summary.pipettes,
-        modules=engine_state_summary.modules,
-        liquids=engine_state_summary.liquids,
-        liquidClasses=engine_state_summary.liquidClasses,
-        runTimeParameters=run_time_parameters,
-        outputFileIds=engine_state_summary.files,
-    )
-
-
-async def test_update_current_not_allowed(
+async def test_uncurrent_not_allowed(
     decoy: Decoy,
     engine_state_summary: StateSummary,
     run_resource: RunResource,
@@ -909,12 +855,12 @@ async def test_update_current_not_allowed(
     mock_run_store: RunStore,
     subject: RunDataManager,
 ) -> None:
-    """It should noop on current=None."""
+    """It should raise if the run is not current."""
     run_id = "hello world"
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("some other id")
 
     with pytest.raises(RunNotCurrentError):
-        await subject.update(run_id=run_id, current=False)
+        await subject.uncurrent(run_id=run_id)
 
 
 async def test_create_archives_existing(

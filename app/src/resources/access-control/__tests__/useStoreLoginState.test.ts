@@ -30,16 +30,28 @@ describe('useStoreLoginState', () => {
 
   it('dispatches a login action for the given robot, with a computed expiresAt', () => {
     const { result } = renderHook(() => useStoreLoginState())
-    result.current('remote-robot', 'test-user', {
-      token_type: 'Bearer',
-      access_token: 'access-token',
-      refresh_token: 'refresh-token',
-      expires_in: 3600,
-    })
+    result.current(
+      'remote-robot',
+      {
+        username: 'test-user',
+        fullName: 'Test User',
+        accountType: 'user',
+      },
+      {
+        token_type: 'Bearer',
+        access_token: 'access-token',
+        refresh_token: 'refresh-token',
+        expires_in: 3600,
+      }
+    )
 
     expect(mockDispatch).toHaveBeenCalledWith(
       logIn({
-        username: 'test-user',
+        user: {
+          username: 'test-user',
+          fullName: 'Test User',
+          accountType: 'user',
+        },
         robotName: 'remote-robot',
         accessToken: 'access-token',
         refreshToken: 'refresh-token',
@@ -52,20 +64,36 @@ describe('useStoreLoginState', () => {
 
   it('does not dispatch when the robot name is null', () => {
     const { result } = renderHook(() => useStoreLoginState())
-    result.current(null, 'test-user', {
-      token_type: 'Bearer',
-      access_token: 'access-token',
-    })
+    result.current(
+      null,
+      {
+        username: 'test-user',
+        fullName: 'Test User',
+        accountType: 'user',
+      },
+      {
+        token_type: 'Bearer',
+        access_token: 'access-token',
+      }
+    )
 
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
   it('does not dispatch when token type is not Bearer', () => {
     const { result } = renderHook(() => useStoreLoginState())
-    result.current('remote-robot', 'test-user', {
-      token_type: 'Basic',
-      access_token: 'access-token',
-    })
+    result.current(
+      'remote-robot',
+      {
+        username: 'test-user',
+        fullName: 'Test User',
+        accountType: 'user',
+      },
+      {
+        token_type: 'Basic',
+        access_token: 'access-token',
+      }
+    )
 
     expect(mockDispatch).not.toHaveBeenCalled()
   })
