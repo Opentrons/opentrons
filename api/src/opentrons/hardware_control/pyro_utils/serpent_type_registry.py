@@ -28,6 +28,7 @@ import opentrons.hardware_control.types
 import opentrons.types
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
+    find_dataclasses_in_packages,
     find_enums_in_packages,
     find_pydantic_classes_in_packages,
     find_typed_dict_classes_in_packages,
@@ -264,34 +265,21 @@ def register_hardware_types() -> None:
     )
 
     # Dataclass generic registration
-    # todo(chb, 07-08-2026): This should probably be changed to automatically detect our pyro compatible dataclasses once the cross-layer classes all have `to_pyro` and `from_pyro` methods
-    opentrons_dataclass_types = [
-        opentrons.drivers.vacuum_module.types.VacuumState,
-        opentrons.drivers.vacuum_module.types.PumpState,
-        opentrons.drivers.types.ABSMeasurementConfig,
-        opentrons.hardware_control.modules.module_calibration.ModuleCalibrationOffset,
-        opentrons.hardware_control.modules.types.BundledFirmware,
-        opentrons.drivers.rpi_drivers.types.USBPort,
-        opentrons.hardware_control.types.SubsystemConnectionNotification,
-        opentrons.hardware_control.types.ModuleConnectedNotification,
-        opentrons.hardware_control.types.ModuleDisconnectedNotification,
-        opentrons.hardware_control.types.AsynchronousModuleErrorNotification,
-        opentrons.hardware_control.types.ErrorMessageNotification,
-        opentrons.hardware_control.types.EstopStateNotification,
-        opentrons.hardware_control.types.DoorStateNotification,
-        opentrons.types.Point,
-        opentrons.hardware_control.ot3_calibration.OT3Transforms,
-        opentrons.hardware_control.instruments.ot3.instrument_calibration.PipetteOffsetSummary,
-        opentrons.hardware_control.instruments.ot3.instrument_calibration.GripperCalibrationOffset,
-        opentrons.hardware_control.types.EstopOverallStatus,
-    ]
-
+    opentrons_dataclass_types = find_dataclasses_in_packages(
+        [
+            opentrons.drivers.vacuum_module.types,
+            opentrons.drivers.types,
+            opentrons.hardware_control.modules.module_calibration,
+            opentrons.hardware_control.modules.types,
+            opentrons.drivers.rpi_drivers.types,
+            opentrons.hardware_control.types,
+            opentrons.types,
+            opentrons.hardware_control.ot3_calibration,
+            opentrons.hardware_control.instruments.ot3.instrument_calibration,
+        ]
+    )
     for dataclass_type in opentrons_dataclass_types:
-        register_type_to_serpent(
-            class_type=dataclass_type,
-            dict_to_class=dataclass_type.from_pyro_dict,  # type: ignore
-            class_to_dict=dataclass_type.to_pyro_dict,  # type: ignore
-        )
+        OpentronsPyroSerializer.register_dataclass(dataclass_type)
 
     # handle Typed Dicts for the hardware controller
     OpentronsPyroSerializer.register_opentrons_typed_dicts(_typed_dict_dict_to_class)

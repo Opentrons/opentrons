@@ -5,6 +5,7 @@ import enum
 import inspect
 import pickle
 from contextlib import contextmanager
+from dataclasses import is_dataclass
 from types import ModuleType
 from typing import Any, Callable, Iterator
 
@@ -61,6 +62,20 @@ def find_pydantic_classes_in_packages(
             if issubclass(obj, BaseModel) and obj is not BaseModel:
                 pydantic_classes.append(obj)
     return pydantic_classes
+
+
+def find_dataclasses_in_packages(modules: list[ModuleType]) -> list[type]:
+    """Returns a list of dataclasses that contain `to_pyro_dict` and `from_pyro_dict` staticmethods in the given list of moduels."""
+    dataclasses = []
+    for module in modules:
+        for name, obj in inspect.getmembers(module, inspect.isclass):
+            if (
+                is_dataclass(obj)
+                and hasattr(obj, "to_pyro_dict")
+                and hasattr(obj, "from_pyro_dict")
+            ):
+                dataclasses.append(obj)
+    return dataclasses
 
 
 def find_typed_dict_classes_in_packages(
@@ -144,6 +159,7 @@ class OpentronsPyroSerializer:
     _enum_class_name_to_type: dict[str, type[enum.Enum]] = {}
     _typed_dict_class_name_to_type: dict[str, type[TypedDict]] = {}  # type: ignore
     _generic_error_class_name_to_error: dict[str, type[BaseException]] = {}
+    _dataclass_class_name_to_type: dict[str, type] = {}
 
     @classmethod
     def register_enum(cls, enum_type: type[enum.Enum]) -> None:
@@ -219,6 +235,28 @@ class OpentronsPyroSerializer:
         return model.model_validate(d)
 
     @classmethod
+    def register_dataclass(cls, dataclass_type: type) -> None:
+        """Registers a dataclass type to be sent and received via pyro proxies."""
+        if is_dataclass(dataclass_type):
+            if hasattr(dataclass_type, "to_pyro_dict") and hasattr(
+                dataclass_type, "from_pyro_dict"
+            ):
+                class_name = register_type_to_serpent(
+                    class_type=dataclass_type,
+                    dict_to_class=dataclass_type.from_pyro_dict,
+                    class_to_dict=dataclass_type.to_pyro_dict,
+                )
+                cls._dataclass_class_name_to_type[class_name] = dataclass_type
+            else:
+                raise TypeError(
+                    f"Dataclass {dataclass_type} does not satisfy `to_pyro_dict` and `from_pyro_dict` attribute requirements."
+                )
+        else:
+            raise TypeError(
+                f"Type {dataclass_type} is not a dataclass and could not be registered."
+            )
+
+    @classmethod
     def register_basic_error(cls, error_type: type[BaseException]) -> None:
         """Registers a basic error with no specially handled args to be handled via pyro proxies."""
         class_name = register_type_to_serpent(
@@ -283,6 +321,7 @@ class OpentronsPyroSerializer:
             cls._pydantic_class_name_to_model,
             cls._enum_class_name_to_type,
             cls._typed_dict_class_name_to_type,
+            cls._dataclass_class_name_to_type,
             # Sometimes the hardware API sends floats in the form of numpy float 64s. If they happen
             # to be in a non-builtin dict wrapper, they won't get handled by the normal pyro serialization
             # so we need to handle it here by adding it to the list of registries.
