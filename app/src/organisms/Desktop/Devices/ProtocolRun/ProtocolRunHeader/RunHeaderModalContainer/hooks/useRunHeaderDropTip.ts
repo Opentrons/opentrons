@@ -144,25 +144,23 @@ export function useRunHeaderDropTip({
 
   // If the run terminates with a "stopped" status, close the run if no tips are attached after running tip check at least once.
   // This marks the robot as "not busy" if drop tip CTAs are unnecessary.
-  useEffect(
-    () => {
-      if (
-        isRunTerminatingOrTerminal &&
-        isRunCurrent &&
-        (initialPipettesWithTipsCount === 0 || robotType === OT2_ROBOT_TYPE)
-      ) {
-        closeCurrentRun()
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      isRunTerminatingOrTerminal,
-      isRunCurrent,
-      enteredER,
-      initialPipettesWithTipsCount,
-    ]
-  )
+  // Include closeCurrentRun so a gated close (e.g. waiting on SignRun) retries after the gate opens.
+  useEffect(() => {
+    if (
+      isRunTerminatingOrTerminal &&
+      isRunCurrent &&
+      (initialPipettesWithTipsCount === 0 || robotType === OT2_ROBOT_TYPE)
+    ) {
+      closeCurrentRun()
+    }
+  }, [
+    isRunTerminatingOrTerminal,
+    isRunCurrent,
+    enteredER,
+    initialPipettesWithTipsCount,
+    robotType,
+    closeCurrentRun,
+  ])
 
   return {
     dropTipModalUtils,

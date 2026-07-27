@@ -1,6 +1,7 @@
-import { useId, useState } from 'react'
+import { useCallback, useId, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+import { useQueryClient } from 'react-query'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import {
@@ -12,7 +13,7 @@ import {
   SecondaryButton,
   StyledText,
 } from '@opentrons/components'
-import { useHost } from '@opentrons/react-api-client'
+import { getSelfQueryKey, useHost } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
@@ -27,6 +28,7 @@ import { RobotCertImportModal } from '../RobotCertImport'
 import styles from './loginmodal.module.css'
 
 import type { ComponentProps, Dispatch, SetStateAction } from 'react'
+import type { AuthUser } from '@opentrons/api-client'
 
 interface LoginFormState {
   username: string
@@ -114,6 +116,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const { robotName } = props
   const modal = useModal()
   const host = useHost()
+  const queryClient = useQueryClient()
   const { t } = useTranslation()
   const [screen, setScreen] = useState<LoginModalScreen>({
     kind: 'login',
@@ -124,6 +127,18 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const loginFormId = useId()
   const [showRobotCertImportModal, setShowRobotCertImportModal] =
     useState<boolean>(false)
+
+  // Seed /self from the login response. The query key omits the access token, so
+  // invalidateQueries here can refetch with a stale host.token and wipe good data.
+  const setSelfQueryData = useCallback(
+    (user: AuthUser): void => {
+      if (host == null) {
+        return
+      }
+      queryClient.setQueryData(getSelfQueryKey(host), { data: user })
+    },
+    [host, queryClient]
+  )
 
   const handleClose = (): void => {
     modal.resolve(null)
@@ -141,6 +156,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
     onSuccess: (successfulUsername, user, response) => {
       storeLoginState(robotName, successfulUsername, response)
+      setSelfQueryData(user)
 
       if (user.resetPassword) {
         setScreen({
@@ -256,6 +272,9 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
     <Modal
       title={t('access_control:desktop_login_modal_header')}
       onClose={handleClose}
+      // Above SignRun and other run-header modals (zIndexOverlay: 1000); below
+      // permission toasts that use TOAST_ABOVE_LOGIN_Z_INDEX (10002).
+      zIndexOverlay={10001}
       footer={<div className={styles.modal_footer_container}>{footer}</div>}
     >
       <div className={styles.content_container}>

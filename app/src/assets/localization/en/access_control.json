@@ -36,6 +36,7 @@
   "sign_protocol_run_description": "Enter your legal name to verify that the protocol run has ended.",
   "sign_protocol_run_name_mismatch": "Name doesn't match our records. Try again.",
   "sign_protocol_run_permission_required": "Permission required to sign runs. Log in with an authorized account.",
+  "tap_to_sign": "Tap to sign",
   "username": "Username",
   "view_actions": "View actions"
 }

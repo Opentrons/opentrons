@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
 
@@ -10,11 +10,15 @@ import {
   Flex,
   SPACING,
 } from '@opentrons/components'
-import { useModulesQuery } from '@opentrons/react-api-client'
+import {
+  useAccessControlEnabledQuery,
+  useModulesQuery,
+} from '@opentrons/react-api-client'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useInitializeCameraState } from '/app/local-resources/images/hooks/useInitializeCameraState'
 import { isCancellableStatus } from '/app/local-resources/runs/utils'
+import { SignRunModal } from '/app/organisms/Desktop/SignRunModal'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import {
@@ -73,6 +77,45 @@ export function ProtocolRunHeader(
   const documentationState = useDocumentationState()
   const { closeCurrentRun, isClosingCurrentRun } =
     useCloseCurrentRun(documentationState)
+  const { data: accessControlSettings, isLoading: isAccessControlLoading } =
+    useAccessControlEnabledQuery()
+  const isSigningRequired =
+    accessControlSettings?.data.accessControlEnabled ?? false
+  // TODO(jj, 2026-07-27): Remove hasLocallySigned once the sign endpoint sets
+  // run.signedBy and the modal dismisses from that server state.
+  const [hasLocallySigned, setHasLocallySigned] = useState(false)
+  useEffect(() => {
+    setHasLocallySigned(false)
+  }, [runId])
+  const hasSignedBy =
+    (runRecord?.data.signedBy != null && runRecord.data.signedBy !== '') ||
+    hasLocallySigned
+  const isSigned = !isSigningRequired || hasSignedBy
+  // Set when close is requested before signing; cleared after a successful sign.
+  const [isSignRunPending, setIsSignRunPending] = useState(false)
+  const showSignRunModal =
+    isSignRunPending &&
+    !isAccessControlLoading &&
+    isSigningRequired &&
+    !hasSignedBy
+
+  // Keep the run current until the user signs when access control requires it.
+  // Showing SignRun only after a close attempt also avoids covering drop-tip flows.
+  const closeCurrentRunIfSigned = useCallback(() => {
+    if (isAccessControlLoading || !isSigned) {
+      setIsSignRunPending(true)
+      return
+    }
+    setIsSignRunPending(false)
+    closeCurrentRun()
+  }, [closeCurrentRun, isAccessControlLoading, isSigned])
+
+  useEffect(() => {
+    if (isSigned && isSignRunPending && !isAccessControlLoading) {
+      setIsSignRunPending(false)
+      closeCurrentRun()
+    }
+  }, [isSigned, isSignRunPending, isAccessControlLoading, closeCurrentRun])
 
   const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
   const protocolRunControls = useRunHeaderRunControls(runId, robotName)
@@ -83,7 +126,7 @@ export function ProtocolRunHeader(
     protocolRunControls,
     runRecord: runRecord ?? null,
     runErrors,
-    closeCurrentRun,
+    closeCurrentRun: closeCurrentRunIfSigned,
   })
 
   useEffect(() => {
@@ -112,6 +155,15 @@ export function ProtocolRunHeader(
         protocolRunControls={protocolRunControls}
         {...props}
       />
+      {showSignRunModal ? (
+        <SignRunModal
+          runId={runId}
+          robotName={robotName}
+          onSigned={() => {
+            setHasLocallySigned(true)
+          }}
+        />
+      ) : null}
       <Flex ref={protocolRunHeaderRef} css={CONTAINER_STYLE}>
         <RunHeaderProtocolName runId={runId} />
         <RunHeaderBannerContainer
@@ -122,6 +174,8 @@ export function ProtocolRunHeader(
           runHeaderModalContainerUtils={runHeaderModalContainerUtils}
           hasImages={outputFileIds.jpeg.length > 0}
           hasCsvFiles={outputFileIds.csv.length > 0}
+          closeCurrentRun={closeCurrentRunIfSigned}
+          isClosingCurrentRun={isClosingCurrentRun}
           {...props}
         />
         <RunHeaderContent
