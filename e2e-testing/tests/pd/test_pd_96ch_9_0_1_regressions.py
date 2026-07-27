@@ -10,22 +10,25 @@ from pathlib import Path
 import pytest
 from playwright.sync_api import Page
 
-from automation.pd_pages import (
-    ProtocolEditorPage,
-    Timeline,
-    TransferPage,
-    TransferStepConfig,
-    add_transfer_step,
-)
-from automation.pd_pages.partial_96ch import (
-    PLATE_96,
-    PROTOCOL_PATH,
-    RESERVOIR_8,
-    TIPRACK_1000,
-    move_1000ul_tiprack_away_from_stacker,
-    print_suite_plan,
-)
+from automation.pd_pages import ProtocolEditorPage, Timeline, TransferPage
+from automation.pd_pages.transfer_form import TransferStepConfig, add_transfer_step
 from utility import assert_export_downloads_clean_protocol, import_protocol_and_open_editor
+
+_ROW: TransferPage.NozzleConfig = "Single row of nozzles"
+PROTOCOL_PATH = "fixtures/protocol/9/96_channel_setup.py"
+PLATE_96 = "NEST 96 Deep Well Plate 2 mL"
+RESERVOIR_8 = "NEST 8 Well Reservoir 22 mL"
+TIPRACK_1000 = "Opentrons Flex 96 Filter Tip Rack 1000 µL"
+_TIPRACK_1000_B3 = "B3 Opentrons Flex 96 Filter Tip Rack 1000 µL"
+_TIPRACK_1000_SAFE_SLOT = "B2"
+
+
+def _move_1000ul_tiprack_away_from_stacker(editor: ProtocolEditorPage) -> None:
+    print("96ch partial - move 1000uL tiprack from B3 to B2")
+    editor.add_step("Move")
+    editor.expect_move_labware_form()
+    editor.toggle_checkbox("Use gripper")
+    editor.move_labware(_TIPRACK_1000_B3, _TIPRACK_1000_SAFE_SLOT)
 
 
 @pytest.mark.pdE2E
@@ -33,17 +36,6 @@ from utility import assert_export_downloads_clean_protocol, import_protocol_and_
 @pytest.mark.timeout(600)
 def test_pd_96ch_nest_8_reservoir_row_transfer(page: Page, pd_exports_dir: Path) -> None:
     """AUTH-3066: 96ch row transfer on NEST 8 Well Reservoir 22 mL (x-axis centering)."""
-    print_suite_plan(
-        "96ch NEST 8 reservoir row transfer (AUTH-3066)",
-        [
-            "Import 96_channel_setup",
-            "Add NEST 8 Well Reservoir 22 mL to C2",
-            "Move 1000µL tiprack B3→B2 (partial tip needs rack without adapter; clear stacker)",
-            "Row A1 transfer reservoir A1 → 96 deep-well A1 (12 tips centered on trough)",
-            "Assert no timeline errors + export",
-        ],
-    )
-
     import_protocol_and_open_editor(page, PROTOCOL_PATH, migration=True)
     editor = ProtocolEditorPage(page)
     transfer = TransferPage(page)
@@ -52,9 +44,8 @@ def test_pd_96ch_nest_8_reservoir_row_transfer(page: Page, pd_exports_dir: Path)
     editor.select_labware_category_by_name("Reservoirs")
     editor.select_labware_by_name(RESERVOIR_8)
 
-    move_1000ul_tiprack_away_from_stacker(editor)
+    _move_1000ul_tiprack_away_from_stacker(editor)
 
-    print("96ch row A1 — NEST 8 A1 → 96 plate A1")
     add_transfer_step(
         editor,
         transfer,
@@ -68,7 +59,7 @@ def test_pd_96ch_nest_8_reservoir_row_transfer(page: Page, pd_exports_dir: Path)
             volume="50",
             change_tip="Once",
             drop_location="Waste Chute",
-            nozzle_config="Single row of nozzles",
+            nozzle_config=_ROW,
             primary_nozzle="A1",
         ),
     )
@@ -76,6 +67,7 @@ def test_pd_96ch_nest_8_reservoir_row_transfer(page: Page, pd_exports_dir: Path)
     timeline = Timeline(page)
     timeline.wait_for_timeline_steps(min_steps=2)
     timeline.expect_no_known_regression_errors()
+    timeline.select_transfer_steps_sample([1], expect_no_errors=True)
     assert_export_downloads_clean_protocol(
         page,
         editor,
