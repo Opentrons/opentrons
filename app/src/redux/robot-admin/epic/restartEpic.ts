@@ -14,8 +14,6 @@ import type {
 import type { Action, Epic } from '../../types'
 import type { RestartRobotAction } from '../types'
 
-const RESTART_DISCOVERY_TIMEOUT_MS = 60000
-
 const mapActionToRequest: ActionToRequestMapper<RestartRobotAction> = (
   action,
   state
@@ -55,6 +53,6 @@ export const restartEpic: Epic = (action$, state$) => {
 export const startDiscoveryOnRestartEpic: Epic = action$ => {
   return action$.pipe(
     ofType(Constants.RESTART_SUCCESS),
-    mapTo(startDiscovery(RESTART_DISCOVERY_TIMEOUT_MS))
+    mapTo(startDiscovery(Constants.RESTART_DISCOVERY_TIMEOUT_MS))
   )
 }

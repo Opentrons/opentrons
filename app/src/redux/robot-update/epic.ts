@@ -20,9 +20,10 @@ import {
 } from '../discovery/actions'
 import {
   RESTART_PATH,
+  RESTART_PENDING_STATUS,
   RESTART_STATUS_CHANGED,
   RESTART_SUCCEEDED_STATUS,
-  restartRobotSuccess,
+  restartStatusChanged,
 } from '../robot-admin'
 import { fetchRobotApi, GET, POST } from '../robot-api'
 import {
@@ -365,7 +366,12 @@ export const restartAfterCommitEpic: Epic = (_, state$) => {
           return resp.ok
             ? of(
                 startDiscovery(REDISCOVERY_TIME_MS),
-                restartRobotSuccess(host.name, {})
+                restartStatusChanged(
+                  host.name,
+                  RESTART_PENDING_STATUS,
+                  host.serverHealth?.bootId ?? null,
+                  new Date()
+                )
               )
             : of(
                 unexpectedRobotUpdateError(

@@ -1,18 +1,21 @@
-import { combineEpics, ofType } from 'redux-observable'
-import { of } from 'rxjs'
-import { filter, map, switchMap, withLatestFrom } from 'rxjs/operators'
+import { ofType } from 'redux-observable'
+import { filter, map, withLatestFrom } from 'rxjs/operators'
 
-import { getDiscoveredRobots, getRobotByName } from '../../discovery'
+import { getRobotByName } from '../../discovery'
 import { restartStatusChanged } from '../actions'
 import * as Constants from '../constants'
-import { getNextRestartStatus } from '../selectors'
 
 import type { ReachableRobot, Robot } from '../../discovery/types'
 import type { Action, Epic } from '../../types'
 import type { RestartRobotSuccessAction } from '../types'
 
-// mark robot as restart-pending if HTTP restart request succeeds
-const trackRestartBeginEpic: Epic = (action$, state$) => {
+/**
+ * Mark robot as restart-pending if HTTP restart request succeeds.
+ * Progress tracking (pending → in-progress → succeeded) lives in
+ * useTrackRobotRestarts. Kept for resetConfig / restartEpic until those
+ * paths move off Redux.
+ */
+export const trackRestartBeginEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType<Action, RestartRobotSuccessAction>(Constants.RESTART_SUCCESS),
     withLatestFrom(state$, (a, s) => getRobotByName(s, a.payload.robotName)),
@@ -30,34 +33,3 @@ const trackRestartBeginEpic: Epic = (action$, state$) => {
     })
   )
 }
-
-// mark robot as restart-succeeded if discovery info indicates restart is done
-const trackRestartProgressEpic: Epic = (action$, state$) => {
-  return state$.pipe(
-    switchMap(state => {
-      const now = new Date()
-      const statusChanges = getDiscoveredRobots(state).flatMap(robot => {
-        const { name: robotName, status: connectivityStatus } = robot
-        const bootId = robot.serverHealth?.bootId ?? null
-        const restartStatus = getNextRestartStatus(
-          state,
-          robotName,
-          connectivityStatus,
-          bootId,
-          now
-        )
-
-        return restartStatus !== null
-          ? [restartStatusChanged(robotName, restartStatus)]
-          : []
-      })
-
-      return of(...statusChanges)
-    })
-  )
-}
-
-export const trackRestartsEpic = combineEpics<Epic>(
-  trackRestartBeginEpic,
-  trackRestartProgressEpic
-)

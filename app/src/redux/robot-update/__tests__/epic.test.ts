@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as Fixtures from '../__fixtures__'
 import { startDiscovery } from '../../discovery'
-import { restartRobotSuccess } from '../../robot-admin'
+import { RESTART_PENDING_STATUS, restartStatusChanged } from '../../robot-admin'
 import { mockRobot as robot } from '../../robot-api/__fixtures__'
 import * as RobotApiHttp from '../../robot-api/http'
 import * as actions from '../actions'
@@ -672,7 +672,12 @@ describe('robot update epics', () => {
         expectObservable(output$).toBe('-a(bc)', {
           a: actions.setRobotUpdateSessionStep('restart'),
           b: startDiscovery(1200000),
-          c: restartRobotSuccess(robot.name, {} as any),
+          c: restartStatusChanged(
+            robot.name,
+            RESTART_PENDING_STATUS,
+            null,
+            expect.any(Date) as any
+          ),
         })
 
         flush()

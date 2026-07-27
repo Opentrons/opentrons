@@ -1,4 +1,5 @@
-// general constants
+/** How long discovery should keep scanning after a restart is requested. */
+export const RESTART_DISCOVERY_TIMEOUT_MS = 60000
 
 // restart statuses
 export const RESTART_PENDING_STATUS: 'restart-pending' = 'restart-pending'
