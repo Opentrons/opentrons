@@ -12,6 +12,14 @@ export interface AuthUserResponse {
   data: AuthUser
 }
 
+export interface AuthUsersResponse {
+  data: AuthUser[]
+  meta: {
+    cursor: number
+    totalLength: number
+  }
+}
+
 export interface CreateUserRequest {
   data: {
     username: string

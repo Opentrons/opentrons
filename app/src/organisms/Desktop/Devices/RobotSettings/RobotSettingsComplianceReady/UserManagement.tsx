@@ -1,6 +1,9 @@
 import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
+import { useUsersQuery } from '@opentrons/react-api-client'
+
+import { useUsernameForRobot } from '/app/redux/robot-auth'
 
 import { Accordion } from './Accordion'
 import styles from './usermanagement.module.css'
@@ -13,6 +16,10 @@ const ROLE_LABEL_KEYS: Record<AuthUserAccountType, string> = {
   user: 'desktop_user_role_user',
   auditor: 'desktop_user_role_auditor',
   service: 'desktop_user_role_service',
+}
+
+export interface UserManagementProps {
+  robotName: string
 }
 
 interface UserManagementTableProps {
@@ -92,11 +99,13 @@ function UserManagementTable({ users }: UserManagementTableProps): JSX.Element {
   )
 }
 
-export function UserManagement(): JSX.Element {
+export function UserManagement({
+  robotName,
+}: UserManagementProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-
-  // TODO(EXEC-2802): Wire to GET /auth/users when list endpoint is available.
-  const users: AuthUser[] = []
+  const username = useUsernameForRobot(robotName)
+  const usersQuery = useUsersQuery({ enabled: username != null })
+  const users = usersQuery.data?.data ?? []
 
   return (
     <Accordion id="user-management" title={t('desktop_user_management')}>

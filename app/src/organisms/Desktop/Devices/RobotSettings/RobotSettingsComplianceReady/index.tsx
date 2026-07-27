@@ -18,7 +18,7 @@ export function RobotSettingsComplianceReady({
         <PersonalAccountSettings robotName={robotName} />
       </div>
       <div className={`${styles.section} ${styles.section_accordion}`}>
-        <UserManagement />
+        <UserManagement robotName={robotName} />
       </div>
       <div className={`${styles.section} ${styles.section_accordion}`}>
         <ComplianceReadySoftwareSettings robotName={robotName} />
