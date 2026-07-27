@@ -1,3 +1,4 @@
 export * from './useCanDisconnect'
-export * from './useWifiList'
 export * from './useNetworkConnection'
+export * from './useNetworkInterfaces'
+export * from './useWifiList'
