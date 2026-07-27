@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useQueryClient } from 'react-query'
 import { useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
@@ -6,6 +6,7 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { getSelfQueryKey, useHost } from '@opentrons/react-api-client'
 
 import { getLocalRobot } from '/app/redux/discovery'
+import { useUsernameForRobot } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
@@ -29,10 +30,10 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const [step, setStep] = useState<LoginStep>('username')
   const [loginError, setLoginError] = useState<string | null>(null)
   const storeLoginState = useStoreLoginState()
-  const loggedInUsernameRef = useRef<string | null>(null)
   const localRobotName = useSelector(
     (state: State) => getLocalRobot(state)?.name ?? null
   )
+  const loggedInUsername = useUsernameForRobot(localRobotName)
 
   const isChoosingNewPassword = phase === 'chooseNewPassword'
 
@@ -65,7 +66,6 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
       invalidateSelfQuery()
 
       if (user.resetPassword) {
-        loggedInUsernameRef.current = username
         setPhase('chooseNewPassword')
         setStep('password')
       } else {
@@ -110,9 +110,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   }
 
   const initialUsername =
-    phase === 'chooseNewPassword'
-      ? (loggedInUsernameRef.current ?? undefined)
-      : undefined
+    phase === 'chooseNewPassword' ? (loggedInUsername ?? undefined) : undefined
 
   return (
     <div className={styles.overlay}>
