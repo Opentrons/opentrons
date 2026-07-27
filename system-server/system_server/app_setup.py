@@ -8,6 +8,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse
 
+from server_utils.audit.fastapi import (
+    audit_logger_middleware,
+    build_audit_client,
+    install_audit_client,
+)
 from server_utils.auth.resource_server.fastapi import (
     AuthorizationError,
     build_authentication_checker,
@@ -35,6 +40,13 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             )
         )
         install_authentication_checker(app.state, authentication_checker)
+        audit_client = await exit_stack.enter_async_context(
+            build_audit_client(
+                audit_server_uds=settings.audit_server_uds,
+                audit_server_url=settings.audit_server_url,
+            )
+        )
+        install_audit_client(app.state, audit_client)
 
         # Start serving requests.
         yield
@@ -60,7 +72,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+app.middleware("http")(audit_logger_middleware)
 app.middleware("http")(server_timing_middleware())
 
 app.exception_handler(AuthorizationError)(handle_authorization_error)
