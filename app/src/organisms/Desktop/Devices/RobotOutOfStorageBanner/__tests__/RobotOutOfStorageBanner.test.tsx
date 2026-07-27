@@ -37,7 +37,7 @@ describe('RobotOutOfStorageBanner', () => {
 
   it('navigates to robot file manager', () => {
     render()
-    const manageFilesLink = screen.getByRole('button', { name: 'Manage files' })
+    const manageFilesLink = screen.getByText('Manage files')
     fireEvent.click(manageFilesLink)
     expect(navigate).toHaveBeenCalledWith(
       '/devices/otie/robot-settings/file-manager'
