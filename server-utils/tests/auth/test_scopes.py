@@ -46,3 +46,8 @@ def test_serialize() -> None:
         serialize_scopes({Scope.USERS_WRITE, Scope.ROBOT_CONTROL_WRITE})
         == "robot_control.write users.write"
     )
+
+
+def test_system_time_write_scope() -> None:
+    assert Scope.SYSTEM_TIME_WRITE.api_name == "system_time.write"
+    assert parse_scopes("system_time.write") == {Scope.SYSTEM_TIME_WRITE}

@@ -52,6 +52,11 @@ class Scope(enum.Enum):
         "Edit robot settings for which there is no more specific scope.",
     )
 
+    SYSTEM_TIME_WRITE = (
+        "system_time.write",
+        "Set the robot's system clock.",
+    )
+
     RUN_DATA_WRITE = (
         "run_data.write",
         (
