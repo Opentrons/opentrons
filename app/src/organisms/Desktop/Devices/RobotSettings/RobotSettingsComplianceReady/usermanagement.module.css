@@ -1,0 +1,21 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.header_cell {
+  padding-bottom: var(--spacing-8);
+  color: var(--grey-60);
+  font-weight: normal;
+  text-align: left;
+}
+
+.body_cell {
+  padding: var(--spacing-12) 0;
+  border-top: 1px solid var(--grey-30);
+  vertical-align: top;
+}
+
+.body_cell_text {
+  color: var(--grey-60);
+}
