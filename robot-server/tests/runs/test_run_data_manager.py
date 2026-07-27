@@ -223,7 +223,7 @@ def run_resource() -> RunResource:
         protocol_id=None,
         created_at=datetime(year=2022, month=2, day=2),
         actions=[],
-        signed_by=None,
+        signed_by="Alice Example",
     )
 
 
@@ -382,6 +382,7 @@ async def test_create(
         liquidClasses=engine_state_summary.liquidClasses,
         runTimeParameters=[bool_parameter, file_parameter],
         outputFileIds=engine_state_summary.files,
+        signedBy=run_resource.signed_by,
     )
     decoy.verify(
         mock_file_provider.set_run_metadata(
@@ -508,6 +509,7 @@ async def test_get_current_run(
         liquidClasses=engine_state_summary.liquidClasses,
         runTimeParameters=run_time_parameters,
         outputFileIds=engine_state_summary.files,
+        signedBy=run_resource.signed_by,
     )
     assert subject.current_run_id == run_id
 
@@ -552,6 +554,7 @@ async def test_get_historical_run(
         liquidClasses=engine_state_summary.liquidClasses,
         runTimeParameters=run_time_parameters,
         outputFileIds=engine_state_summary.files,
+        signedBy=run_resource.signed_by,
     )
 
 
@@ -597,6 +600,7 @@ async def test_get_historical_run_no_data(
         liquidClasses=[],
         runTimeParameters=run_time_parameters,
         outputFileIds=[],
+        signedBy=run_resource.signed_by,
     )
 
 
@@ -838,6 +842,7 @@ async def test_uncurrent(
         liquidClasses=engine_state_summary.liquidClasses,
         runTimeParameters=run_time_parameters,
         outputFileIds=engine_state_summary.files,
+        signedBy=run_resource.signed_by,
     )
 
 
