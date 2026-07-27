@@ -992,7 +992,7 @@
       {
         "id": "vacuumModuleV1DockA4",
         "areaType": "lidDock",
-        "offsetFromCutoutFixture": [164.0, 0.0, 20.0],
+        "offsetFromCutoutFixture": [159.5, 0.0, 20.0],
         "boundingBox": {
           "xDimension": 128.5,
           "yDimension": 86.5,
