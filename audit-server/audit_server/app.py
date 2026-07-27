@@ -35,6 +35,10 @@ from server_utils.robot.fastapi import build_robot_client, install_robot_server_
 from server_utils.robot.robot_server import Client as RobotClientABC
 from server_utils.robot.robot_server import RobotNameandSerial
 
+from audit_server.deletion_keys.store import (
+    DeletionKeyStore,
+    install_deletion_key_store,
+)
 from audit_server.log_export.router import router as log_export_router
 from audit_server.log_ingest.router import router as ingest_router
 from audit_server.log_storage.dependency import build_log_data_manager, build_log_store
@@ -106,6 +110,7 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         set_sql_engine(app.state, engine)
         settings_store = SettingsStore(sql_engine=engine)
         install_settings_store(app.state, settings_store)
+        install_deletion_key_store(app.state, DeletionKeyStore(sql_engine=engine))
 
         if (
             configuration.key_server_uds is not None

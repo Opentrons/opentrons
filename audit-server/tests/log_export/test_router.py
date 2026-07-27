@@ -13,6 +13,7 @@ from server_utils.persistence.persistence_directory import PERSISTENCE_TEMP_SUBD
 from server_utils.robot.robot_server import Client as RobotServerClient
 from server_utils.robot.robot_server import RobotNameandSerial
 
+from audit_server.deletion_keys.store import DeletionKeyStore
 from audit_server.log_export.router import download_log_period, get_log_periods
 from audit_server.log_storage.log_data_manager import LogDataManager
 from audit_server.log_storage.models import LogPeriodSummary, UserLogForExport
@@ -81,6 +82,7 @@ async def test_download_log_period_stages_under_persistence_temp(
 ) -> None:
     """It should stage the zip under persistence_root/temp/."""
     mock_robot_server_client = decoy.mock(cls=RobotServerClient)
+    mock_deletion_key_store = decoy.mock(cls=DeletionKeyStore)
     period_entries = LogPeriodEntries(
         user_log=UserLogForExport(
             userLogEntries=[],
@@ -106,6 +108,11 @@ async def test_download_log_period_stages_under_persistence_temp(
             signatureVersion=1,
         )
     )
+    decoy.when(
+        mock_deletion_key_store.create_deletion_key(
+            foreign_id=1, foreign_type="logPeriod"
+        )
+    ).then_return("a-deletion-key")
 
     result = await download_log_period(
         periodId="1",
@@ -113,7 +120,10 @@ async def test_download_log_period_stages_under_persistence_temp(
         key_client=mock_key_client,
         robot_server_client=mock_robot_server_client,
         persistence_directory_root=tmp_path,
+        deletion_key_store=mock_deletion_key_store,
     )
+
+    assert result.headers["opentrons-log-period-deletion-key"] == "a-deletion-key"
 
     zip_path = Path(result.path)
     assert zip_path.is_relative_to(tmp_path / PERSISTENCE_TEMP_SUBDIRECTORY)
