@@ -18,6 +18,16 @@ interface UsbSelectionScreenProps {
   onContinue: (selectedPath: string) => void
 }
 
+// mirrors FLEX_USB_MOUNT_FILTER in app-shell-odd/src/usb/usb.ts: mount dirs are
+// named `<VOLUME_LABEL>-sdX#`, or just `sdX#` when the drive has no label
+const USB_VOLUME_LABEL_REGEX = /^(.+)-sd[a-z]+\d*$/
+
+const getVolumeLabel = (path: string): string | null => {
+  const dirName = path.split('/').filter(Boolean).pop() ?? ''
+  const match = dirName.match(USB_VOLUME_LABEL_REGEX)
+  return match != null ? match[1] : null
+}
+
 export function UsbSelectionScreen({
   question,
   onContinue,
@@ -38,11 +48,6 @@ export function UsbSelectionScreen({
       setSelectedPath(usbMountPaths.length > 0 ? usbMountPaths[0] : null)
     }
   }, [usbMountPaths, selectedPath])
-
-  const getUsbLabel = (index: number): string =>
-    usbMountPaths.length > 1
-      ? t('device_details:usb_drive_number', { number: index + 1 })
-      : t('device_details:usb_drive')
 
   if (usbMountPaths.length === 0) {
     return (
@@ -65,17 +70,23 @@ export function UsbSelectionScreen({
           {question}
         </StyledText>
         <div className={styles.button_list}>
-          {usbMountPaths.map((path, idx) => (
-            <RadioButton
-              key={path}
-              buttonLabel={getUsbLabel(idx)}
-              buttonValue={path}
-              isSelected={selectedPath === path}
-              onChange={e => {
-                setSelectedPath(e.target.value)
-              }}
-            />
-          ))}
+          {usbMountPaths.map((path, idx) => {
+            const volumeLabel = getVolumeLabel(path)
+            const usbLabel =
+              volumeLabel ??
+              t('device_details:usb_drive_number', { number: idx + 1 })
+            return (
+              <RadioButton
+                key={path}
+                buttonLabel={usbLabel}
+                buttonValue={path}
+                isSelected={selectedPath === path}
+                onChange={e => {
+                  setSelectedPath(e.target.value)
+                }}
+              />
+            )
+          })}
         </div>
       </div>
       <div className={styles.buttons}>

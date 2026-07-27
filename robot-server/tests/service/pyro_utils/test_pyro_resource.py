@@ -176,6 +176,7 @@ async def test_run_hardware_event_callback(
         robot_type="OT-3 Standard",
         deck_type=DeckType("ot3_standard"),
         run_process_pyro_provider=mock_run_process_pyro_provider,
+        access_control_status=False,
     )
 
     resource_utilities.register_run_orchestrator_store_to_pyro_resource(
@@ -381,6 +382,7 @@ async def test_run_hardware_state_update_callback(
         robot_type="OT-3 Standard",
         deck_type=DeckType("ot3_standard"),
         run_process_pyro_provider=mock_run_process_pyro_provider,
+        access_control_status=False,
     )
 
     resource_utilities.register_run_orchestrator_store_to_pyro_resource(

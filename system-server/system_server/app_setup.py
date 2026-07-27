@@ -10,9 +10,9 @@ from fastapi.responses import HTMLResponse
 
 from server_utils.auth.resource_server.fastapi import (
     AuthorizationError,
-    build_authorization_checker,
+    build_authentication_checker,
     handle_authorization_error,
-    install_authorization_checker,
+    install_authentication_checker,
 )
 from server_utils.fastapi_utils.server_timing_middleware import server_timing_middleware
 
@@ -28,13 +28,13 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     async with AsyncExitStack() as exit_stack:
         settings = get_settings()
 
-        authorization_checker = await exit_stack.enter_async_context(
-            build_authorization_checker(
+        authentication_checker = await exit_stack.enter_async_context(
+            build_authentication_checker(
                 auth_server_uds=settings.auth_server_uds,
                 auth_server_url=settings.auth_server_url,
             )
         )
-        install_authorization_checker(app.state, authorization_checker)
+        install_authentication_checker(app.state, authentication_checker)
 
         # Start serving requests.
         yield

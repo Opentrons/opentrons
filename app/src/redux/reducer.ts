@@ -12,8 +12,6 @@ import { configReducer } from './config/reducer'
 import { customLabwareReducer } from './custom-labware/reducer'
 // discovery state
 import { discoveryReducer } from './discovery/reducer'
-// networking state
-import { networkingReducer } from './networking/reducer'
 // local protocol run state
 import { protocolRunReducer } from './protocol-runs/reducer'
 // local protocol storage from file system state
@@ -46,7 +44,6 @@ export const rootReducer: Reducer<State, Action> = (
     robotApi: robotApiReducer,
     robotAuth: robotAuthReducer,
     robotUpdate: robotUpdateReducer,
-    networking: networkingReducer,
     config: configReducer,
     discovery: discoveryReducer,
     labware: customLabwareReducer,

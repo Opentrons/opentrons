@@ -13,6 +13,9 @@ from opentrons_shared_data.data_files import (
     DataFileInfoWithCommands,
     MimeType,
 )
+from server_utils.persistence.persistence_directory import (
+    PERSISTENCE_TEMP_SUBDIRECTORY,
+)
 
 from robot_server.data_files.data_files_store import (
     DataFilesByRunInfo,
@@ -21,7 +24,6 @@ from robot_server.data_files.data_files_store import (
 )
 from robot_server.data_files.zip_utils import (
     build_run_zip_filename,
-    cleanup_orphaned_download_staging_dirs,
     collect_existing_run_images,
     collect_existing_run_output_csvs,
     create_download_staging_dir,
@@ -185,17 +187,17 @@ async def test_create_zip_for_download_preserves_archive_paths(tmp_path: Path) -
     """It should put files under the provided archive paths on disk staging."""
     image = tmp_path / "photo.jpeg"
     protocol = tmp_path / "protocol.py"
-    staging_root = tmp_path / "persistence"
+    persistence_root = tmp_path / "persistence"
     image.write_bytes(b"image-bytes")
     protocol.write_text("print('hi')")
 
     zip_path, cleanup = await create_zip_for_download(
         [(image, "images/photo.jpeg"), (protocol, "protocol.py")],
-        staging_root,
+        persistence_root,
     )
 
     try:
-        assert zip_path.is_relative_to(staging_root)
+        assert zip_path.is_relative_to(persistence_root / PERSISTENCE_TEMP_SUBDIRECTORY)
         with zipfile.ZipFile(zip_path) as zf:
             names = set(zf.namelist())
             assert "images/photo.jpeg" in names
@@ -212,11 +214,13 @@ async def test_write_zip_for_download_uses_existing_scratch_dir(tmp_path: Path) 
     """It should write the zip into a caller-owned scratch directory."""
     image = tmp_path / "photo.jpeg"
     image.write_bytes(b"image-bytes")
-    staging_root = tmp_path / "persistence"
-    staging_dir = create_download_staging_dir(staging_root)
+    persistence_root = tmp_path / "persistence"
+    staging_dir = create_download_staging_dir(persistence_root)
     staging_path = Path(staging_dir.name)
     scratch_file = staging_path / "notes.json"
     scratch_file.write_text('{"ok": true}')
+
+    assert staging_path.parent == persistence_root / PERSISTENCE_TEMP_SUBDIRECTORY
 
     try:
         zip_path = await write_zip_for_download(
@@ -238,10 +242,10 @@ async def test_create_zip_for_download_raises_for_missing_file(
 ) -> None:
     """It should let filesystem errors from zip creation propagate."""
     missing = tmp_path / "missing.jpeg"
-    staging_root = tmp_path / "persistence"
+    persistence_root = tmp_path / "persistence"
 
     with pytest.raises(FileNotFoundError):
-        await create_zip_for_download([(missing, "missing.jpeg")], staging_root)
+        await create_zip_for_download([(missing, "missing.jpeg")], persistence_root)
 
 
 def test_build_run_zip_filename_with_protocol(decoy: Decoy) -> None:
@@ -290,36 +294,3 @@ def test_build_run_zip_filename_missing_protocol_uses_fallback(
 def test_sanitize_filename_component() -> None:
     """It should replace unsafe characters."""
     assert sanitize_filename_component("Test Protocol!") == "Test_Protocol_"
-
-
-def test_cleanup_orphaned_download_staging_dirs(tmp_path: Path) -> None:
-    """It should remove only abandoned download staging entries."""
-    staging_root = tmp_path / "persistence"
-    staging_root.mkdir()
-
-    orphan_dir = staging_root / "temp-download-staging-abc123"
-    orphan_dir.mkdir()
-    (orphan_dir / "download.zip").write_bytes(b"zip")
-
-    orphan_file = staging_root / "temp-download-staging-orphan.file"
-    orphan_file.write_text("leftover")
-
-    keep_dir = staging_root / "protocols"
-    keep_dir.mkdir()
-    (keep_dir / "protocol.py").write_text("print('hi')")
-
-    keep_file = staging_root / "robot_server.db"
-    keep_file.write_bytes(b"db")
-
-    cleanup_orphaned_download_staging_dirs(staging_root)
-
-    assert not orphan_dir.exists()
-    assert not orphan_file.exists()
-    assert keep_dir.exists()
-    assert (keep_dir / "protocol.py").exists()
-    assert keep_file.exists()
-
-
-def test_cleanup_orphaned_download_staging_dirs_missing_root(tmp_path: Path) -> None:
-    """It should no-op when the staging root does not exist."""
-    cleanup_orphaned_download_staging_dirs(tmp_path / "does-not-exist")

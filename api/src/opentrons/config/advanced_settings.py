@@ -244,6 +244,13 @@ settings = [
         robot_type=[RobotTypeEnum.FLEX],
         internal_only=True,
     ),
+    SettingDefinition(
+        _id="alwaysRunProtocolAsUser",
+        title="Run protocols under the 'ot-protocol' user account",
+        description="Always set the protocol subprocess to execute under the 'ot-protocol' user on the Flex with limited permissions.",
+        robot_type=[RobotTypeEnum.FLEX],
+        internal_only=True,
+    ),
 ]
 
 
@@ -795,6 +802,29 @@ def _migrate40to41(previous: SettingsMap) -> SettingsMap:
     return {k: v for k, v in previous.items() if "allowStepGrouping" != k}
 
 
+def _migrate41to42(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 42 of the feature flags file.
+
+    -  Adds the alwaysRunProtocolAsUser config element.
+    -  Ensure element begins as false.
+
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["alwaysRunProtocolAsUser"] = False
+    return newmap
+
+
+def _migrate42to43(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 43 of the feature flags file.
+
+    -  Ensure the subprocess flags default to True ensuring the hardware always runs with Pyro.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enableProtocolSubprocess"] = True
+    newmap["enableHardwareSubprocess"] = True
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -837,6 +867,8 @@ _MIGRATIONS = [
     _migrate38to39,
     _migrate39to40,
     _migrate40to41,
+    _migrate41to42,
+    _migrate42to43,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

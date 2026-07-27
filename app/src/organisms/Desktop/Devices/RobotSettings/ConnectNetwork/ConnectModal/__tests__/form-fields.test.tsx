@@ -2,14 +2,16 @@ import { useTranslation } from 'react-i18next'
 import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
 import {
+  mockEapOption,
+  mockWifiNetwork,
   SECURITY_NONE,
   SECURITY_WPA_EAP,
   SECURITY_WPA_PSK,
-} from '/app/redux/networking'
-import * as Fixtures from '/app/redux/networking/__fixtures__'
+} from '@opentrons/api-client'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 
 import {
   connectFormToConfigureRequest,
@@ -74,7 +76,7 @@ describe('getConnectFormFields', () => {
     const props = {
       network: null,
       robotName: 'robot-name',
-      eapOptions: [Fixtures.mockEapOption],
+      eapOptions: [mockEapOption],
       wifiKeys: [],
       values: {},
     }
@@ -86,13 +88,13 @@ describe('getConnectFormFields', () => {
 
   it('should add a security dropdown field if known network has EAP security', () => {
     const network = {
-      ...Fixtures.mockWifiNetwork,
+      ...mockWifiNetwork,
       securityType: SECURITY_WPA_EAP,
     }
     const props = {
       network: network,
       robotName: 'robot-name',
-      eapOptions: [Fixtures.mockEapOption],
+      eapOptions: [mockEapOption],
       wifiKeys: [],
       values: {},
     }
@@ -109,7 +111,7 @@ describe('getConnectFormFields', () => {
 
   it('should add a password field for PSK if known network as PSK security', () => {
     const network = {
-      ...Fixtures.mockWifiNetwork,
+      ...mockWifiNetwork,
       securityType: SECURITY_WPA_PSK,
     }
     const props = {
@@ -141,8 +143,8 @@ describe('getConnectFormFields', () => {
 
   it('should add EAP options based on the selected eapType if network is unknown', () => {
     const eapOptions = [
-      { ...Fixtures.mockEapOption, name: 'someEapType', options: [] },
-      { ...Fixtures.mockEapOption, name: 'someOtherEapType' },
+      { ...mockEapOption, name: 'someEapType', options: [] },
+      { ...mockEapOption, name: 'someOtherEapType' },
     ]
     const wifiKeys = [
       {
@@ -172,12 +174,12 @@ describe('getConnectFormFields', () => {
 
   it('should add EAP options based on the selected eapType if network is EAP', () => {
     const network = {
-      ...Fixtures.mockWifiNetwork,
+      ...mockWifiNetwork,
       securityType: SECURITY_WPA_EAP,
     }
     const eapOptions = [
-      { ...Fixtures.mockEapOption, name: 'someEapType' },
-      { ...Fixtures.mockEapOption, name: 'someOtherEapType', options: [] },
+      { ...mockEapOption, name: 'someEapType' },
+      { ...mockEapOption, name: 'someOtherEapType', options: [] },
     ]
     const wifiKeys = [
       {
@@ -264,7 +266,7 @@ describe('validateConnectFormFields', () => {
 
   it('should error if network is PSK and psk is blank', () => {
     const network = {
-      ...Fixtures.mockWifiNetwork,
+      ...mockWifiNetwork,
       securityType: SECURITY_WPA_PSK,
     }
     const props = {
@@ -297,7 +299,7 @@ describe('validateConnectFormFields', () => {
 
   it('should error if network is EAP and securityType is blank', () => {
     const network = {
-      ...Fixtures.mockWifiNetwork,
+      ...mockWifiNetwork,
       securityType: SECURITY_WPA_EAP,
     }
     const props = {
@@ -315,12 +317,12 @@ describe('validateConnectFormFields', () => {
 
   it('should error if any required EAP fields are missing', () => {
     const network = {
-      ...Fixtures.mockWifiNetwork,
+      ...mockWifiNetwork,
       securityType: SECURITY_WPA_EAP,
     }
     const eapOptions = [
-      { ...Fixtures.mockEapOption, name: 'someEapType', options: [] },
-      { ...Fixtures.mockEapOption, name: 'someOtherEapType' },
+      { ...mockEapOption, name: 'someEapType', options: [] },
+      { ...mockEapOption, name: 'someOtherEapType' },
     ]
     const values = {
       securityType: 'someOtherEapType',
@@ -361,7 +363,7 @@ describe('connectFormToConfigureRequest', () => {
 
   it('should set ssid from network if known', () => {
     const network = {
-      ...Fixtures.mockWifiNetwork,
+      ...mockWifiNetwork,
       ssid: 'foobar',
       securityType: SECURITY_NONE,
     }
@@ -377,7 +379,7 @@ describe('connectFormToConfigureRequest', () => {
 
   it('should set psk from values', () => {
     const network = {
-      ...Fixtures.mockWifiNetwork,
+      ...mockWifiNetwork,
       ssid: 'foobar',
       securityType: SECURITY_WPA_PSK,
     }
@@ -394,7 +396,7 @@ describe('connectFormToConfigureRequest', () => {
 
   it('should set eapConfig from values with known network', () => {
     const network = {
-      ...Fixtures.mockWifiNetwork,
+      ...mockWifiNetwork,
       ssid: 'foobar',
       securityType: SECURITY_WPA_EAP,
     }

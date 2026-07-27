@@ -130,6 +130,10 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
     const inputId = id ?? generatedId
 
     const hasError = error != null
+    // todo(mm, 2026-07-17): The way we're defaulting `value` here means that this
+    // input can never be uncontrolled (value=undefined), which has performance
+    // implications and can make this inconvenient to integrate with react-hook-form.
+    // Do we need this?
     const value = (isIndeterminate ?? false) ? '' : (rawValue ?? '')
     const placeHolder = (isIndeterminate ?? false) ? '-' : rawPlaceholder
 

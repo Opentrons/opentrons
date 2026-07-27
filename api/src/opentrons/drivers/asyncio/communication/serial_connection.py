@@ -321,6 +321,7 @@ class SerialConnection:
             reset_buffer_before_write=self._serial._reset_buffer_before_write,
         )
         self._port = new_port
+        self._name = new_port
 
     async def on_retry(self) -> None:
         """

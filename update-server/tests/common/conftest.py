@@ -13,13 +13,13 @@ import pytest
 from aiohttp.test_utils import TestClient as HTTPTestClient
 from decoy import Decoy
 
-from server_utils.auth.resource_server.authorization_checker import (
-    AlwaysAllowedAuthorizationChecker,
-    AuthorizationChecker,
+from server_utils.auth.resource_server.authentication_checker import (
+    AlwaysAllowedAuthenticationChecker,
+    AuthenticationChecker,
 )
 from tests.common.config import FakeRootPartElem
 
-from otupdate import buildroot, common, openembedded
+from otupdate import common, openembedded
 from otupdate.common.update_actions import Partition
 from otupdate.openembedded import PartitionManager
 
@@ -28,12 +28,12 @@ one_up = os.path.abspath(os.path.join(__file__, "../../"))
 
 
 @pytest.fixture
-def mock_authorization_checker(decoy: Decoy) -> AuthorizationChecker:
-    """Return a Decoy mock in the shape of an AuthorizationChecker."""
-    return decoy.mock(cls=AuthorizationChecker)
+def mock_authentication_checker(decoy: Decoy) -> AuthenticationChecker:
+    """Return a Decoy mock in the shape of an AuthenticationChecker."""
+    return decoy.mock(cls=AuthenticationChecker)
 
 
-@pytest.fixture(params=[openembedded, buildroot])
+@pytest.fixture(params=[openembedded])
 async def test_cli(
     aiohttp_client, otupdate_config, request, version_file_path, mock_name_synchronizer
 ) -> Tuple[HTTPTestClient, str]:
@@ -46,7 +46,7 @@ async def test_cli(
         system_version_file=version_file_path,
         config_file_override=otupdate_config,
         boot_id_override="dummy-boot-id-abc123",
-        authorization_checker=AlwaysAllowedAuthorizationChecker(),
+        authentication_checker=AlwaysAllowedAuthenticationChecker(),
     )
     client = await aiohttp_client(app)
     return client, cli_client_pkg.__name__
@@ -58,19 +58,18 @@ async def auth_test_cli(
     otupdate_config,
     version_file_path,
     mock_name_synchronizer,
-    mock_authorization_checker: AuthorizationChecker,
-) -> Tuple[HTTPTestClient, AuthorizationChecker]:
-    """Build an app with a mock AuthorizationChecker, for authorization-related tests."""
-    # buildroot vs. openembedded shouldn't matter here because everything is mocked, anyway.
-    app = await buildroot.get_app(
+    mock_authentication_checker: AuthenticationChecker,
+) -> Tuple[HTTPTestClient, AuthenticationChecker]:
+    """Build an app with a mock AuthenticationChecker, for authentication-related tests."""
+    app = await openembedded.get_app(
         name_synchronizer=mock_name_synchronizer,
         system_version_file=version_file_path,
         config_file_override=otupdate_config,
         boot_id_override="dummy-boot-id-abc123",
-        authorization_checker=mock_authorization_checker,
+        authentication_checker=mock_authentication_checker,
     )
     client = await aiohttp_client(app)
-    return client, mock_authorization_checker
+    return client, mock_authentication_checker
 
 
 @pytest.fixture

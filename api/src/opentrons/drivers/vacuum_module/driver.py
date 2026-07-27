@@ -200,6 +200,10 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         """Check connection to vacuum module."""
         return await self._connection.is_open()
 
+    async def move_port(self, new_port: str) -> None:
+        """Try to change the port of the underlying connection."""
+        await self._connection.update_port(new_port)
+
     def reset_serial_buffers(self) -> None:
         """Reset the input and output serial buffers."""
         self._connection._serial.reset_input_buffer()

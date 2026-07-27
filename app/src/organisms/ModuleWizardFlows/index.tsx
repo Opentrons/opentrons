@@ -436,7 +436,6 @@ export function ModuleWizardFlows(
             {...wizardFlowBaseProps}
             attachedModule={wizardFlowBaseProps.attachedModule}
             attachedPipette={wizardFlowBaseProps.attachedPipette}
-            robotName={robotName}
             patchModuleAfterUpdate={patchModuleAfterUpdate}
           />
         </ModuleWizardScreen>

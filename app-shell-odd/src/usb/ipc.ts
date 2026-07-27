@@ -10,10 +10,7 @@ export function registerUsbDeviceHandlers(): void {
 
   ipcMain.handle(
     'usb:saveFile',
-    async (
-      _,
-      { filePath, buffer }: { filePath: string; buffer: ArrayBuffer }
-    ) => {
+    async (_, { filePath, buffer }: { filePath: string; buffer: number[] }) => {
       await writeFile(filePath, Buffer.from(buffer))
     }
   )

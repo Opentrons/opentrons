@@ -42,13 +42,13 @@ import { ConfirmAttachmentModal } from './ConfirmAttachmentModal'
 import { useLatchControls } from './hooks'
 import { ModuleSetupModal } from './ModuleSetupModal'
 
+import type { HeaterShakerModule, LatchStatus } from '@opentrons/api-client'
 import type {
   CreateCommand,
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
 } from '@opentrons/shared-data'
-import type { HeaterShakerModule, LatchStatus } from '/app/redux/modules/types'
 
 interface TestShakeSlideoutProps {
   module: HeaterShakerModule
