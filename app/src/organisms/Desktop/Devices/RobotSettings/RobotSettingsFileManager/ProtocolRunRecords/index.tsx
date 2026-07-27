@@ -9,6 +9,7 @@ import {
   StyledText,
   WARNING_TOAST,
 } from '@opentrons/components'
+import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -85,12 +86,27 @@ export function ProtocolRunRecords({
     }
   }
 
-  const handleDeleteSelected = (): void => {
+  const handleClickDeleteSelected = (): void => {
     if (selectedIds.size === 0) {
       handleNoRunsSelected('delete')
       return
     }
     setShowDeleteRecordsModal(true)
+  }
+
+  const handleConfirmDeleteSelected = (): void => {
+    void deleteSelectedRuns(runs.filter(run => selectedIds.has(run.id))).catch(
+      (error: Error) => {
+        if (!isDocumentedMutationError(error)) {
+          makeToast('Error deleting records', ERROR_TOAST)
+          setShowDeleteRecordsModal(false)
+        } else {
+          // repoen the delete modal if we fail; no flicker in practice
+          setShowDeleteRecordsModal(true)
+        }
+      }
+    )
+    setShowDeleteRecordsModal(false)
   }
 
   return (
@@ -100,14 +116,7 @@ export function ProtocolRunRecords({
           onClose={() => {
             setShowDeleteRecordsModal(false)
           }}
-          onConfirm={() => {
-            void deleteSelectedRuns(
-              runs.filter(run => selectedIds.has(run.id))
-            ).catch(() => {
-              makeToast('Error deleting records', ERROR_TOAST)
-            })
-            setShowDeleteRecordsModal(false)
-          }}
+          onConfirm={handleConfirmDeleteSelected}
           type="selectedRuns"
         />
       )}
@@ -116,7 +125,7 @@ export function ProtocolRunRecords({
           titleText={t('protocol_run_records')}
           showButtons={isSomeSelected || isAllSelected}
           onDownloadSelected={handleDownloadSelected}
-          onDeleteSelected={handleDeleteSelected}
+          onDeleteSelected={handleClickDeleteSelected}
         />
         {runs.length === 0 ? (
           <InfoScreen content={t('no_recent_runs')} />

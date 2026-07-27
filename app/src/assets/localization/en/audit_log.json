@@ -16,6 +16,7 @@
   "create_protocol": "Creating protocol",
   "create_user": "Creating user",
   "delete_log_period": "Deleting log period",
+  "delete_log_periods": "Deleting log periods",
   "delete_offsets": "Deleting old labware offsets",
   "delete_protocol": "Deleting protocol",
   "delete_run": "Deleting protocol run record",

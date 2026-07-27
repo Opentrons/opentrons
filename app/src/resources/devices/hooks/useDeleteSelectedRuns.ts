@@ -2,15 +2,11 @@ import { useState } from 'react'
 import { useQueryClient } from 'react-query'
 
 import { deleteRun } from '@opentrons/api-client'
-import { ERROR_TOAST } from '@opentrons/components'
 import {
   getQueryKey,
   useDocumentedMutation,
   useHost,
 } from '@opentrons/react-api-client'
-
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { useToaster } from '/app/organisms/ToasterOven'
 
 import type { QueryKey } from 'react-query'
 import type { RunData } from '@opentrons/api-client'
@@ -26,7 +22,6 @@ export function useDeleteSelectedRuns(
 ): UseDeleteSelectedRunsResult {
   const host = useHost()
   const queryClient = useQueryClient()
-  const { makeToast } = useToaster()
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set())
 
   const mutation = useDocumentedMutation<unknown, unknown, RunData[]>(
@@ -45,8 +40,7 @@ export function useDeleteSelectedRuns(
         for (const run of runs) {
           // deleteRun call is safe here within /app since we are wrapped in a useDocumentedMutation
           // eslint-disable-next-line opentrons/no-direct-mutating
-          await deleteRun(currentHost, run.id, userNotes).catch((e: Error) => {
-            makeToast(e.message, ERROR_TOAST, { closeButton: true })
+          await deleteRun(currentHost, run.id, userNotes).catch(_ => {
             hasDeleteError = true
           })
         }

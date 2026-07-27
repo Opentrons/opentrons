@@ -76,7 +76,7 @@ describe('DeviceDetailsComponent', () => {
     render()
     screen.getByText('Hardware')
     screen.getByText('Deck Configuration')
-    screen.getByText('Recent Protocol Runs')
+    screen.getByText('Run History')
   })
 
   it('renders InstrumentsAndModules', () => {
