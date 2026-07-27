@@ -27,12 +27,20 @@ class AuditLogger:
     def __init__(
         self,
         audit_client: AuditClient,
+        request: Request,
         *,
         auto_log_request_head: bool,
         auto_log_response_head: bool,
         auto_log_request_body: bool,
         auto_log_response_body: bool,
     ) -> None:
+        """Build an audit logger object.
+
+        The audit logger has little logic of its own; the audit client argument
+        is captured and used internally, but the rest of the initializer arguments
+        are just stashed as instance attributes for the audit_logger_middleware
+        to read and do different things with.
+        """
         self._audit_client = audit_client
         self._action: str | None = None
         self._message_chunks: list[str] = []
@@ -45,6 +53,7 @@ class AuditLogger:
         self.auto_log_response_body = auto_log_response_body
         self.did_log = False
         self.should_log = True
+        self.request = request
 
     def set_action_from_request(self: Self, request: Request) -> Self:
         """Set the action to log based on the request.

@@ -36,6 +36,7 @@ def subject(mock_client: Client, request: pytest.FixtureRequest) -> AuditLogger:
     """An audit logger."""
     return AuditLogger(
         audit_client=mock_client,
+        request=None,  # type: ignore[arg-type]
         auto_log_request_head=True,
         auto_log_response_head=True,
         auto_log_request_body=True,
@@ -51,6 +52,10 @@ def parametrized_subject(
     return (
         AuditLogger(
             audit_client=mock_client,
+            # gross: AuditLogger isn't meant to be built ahead of time like this,
+            # but since all the weirdnesses we encounter by doing it are handled
+            # in fixtures we can get away with it
+            request=None,  # type: ignore[arg-type]
             auto_log_request_head=True,
             auto_log_response_head=True,
             auto_log_request_body=True,
@@ -81,21 +86,28 @@ def subject_client(parametrized_subject: AuditLogger) -> Iterator[TestClient]:
     """A fastapi test client for making requests."""
 
     async def body_handler(request: Request) -> Response:
+        # a typical route handler will use the request body if it exists, so
+        # this test handler should too
+        await request.body()
+        parametrized_subject.request = request
         await parametrized_subject.append_request_body_to_message(request)
         await parametrized_subject.log()
         return Response(content="body")
 
     async def method_path_handler(request: Request) -> Response:
+        parametrized_subject.request = request
         parametrized_subject.append_request_method_path_to_message(request)
         await parametrized_subject.log()
         return Response(content="method")
 
     async def query_param_handler(request: Request) -> Response:
+        parametrized_subject.request = request
         parametrized_subject.append_request_query_params_to_message(request)
         await parametrized_subject.log()
         return Response(content="queryparams")
 
     async def headers_handler(request: Request) -> Response:
+        parametrized_subject.request = request
         parametrized_subject.append_request_headers_to_message(request)
         await parametrized_subject.log()
         return Response(content="headers")
