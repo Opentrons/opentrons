@@ -194,7 +194,16 @@ export function RunSummary(): JSX.Element {
   const accessControlQuery = useAccessControlEnabledQuery()
   const isSigningRequired =
     accessControlQuery.data?.data.accessControlEnabled ?? false
-  const isSigned = !isSigningRequired || !!runRecord?.data.signedBy
+  // TODO(jj, 2026-07-27): Remove hasLocallySigned once the sign endpoint sets
+  // run.signedBy and SignRun dismisses from that server state.
+  const [hasLocallySigned, setHasLocallySigned] = useState(false)
+  useEffect(() => {
+    setHasLocallySigned(false)
+  }, [runId])
+  const isSigned =
+    !isSigningRequired ||
+    (runRecord?.data.signedBy != null && runRecord.data.signedBy !== '') ||
+    hasLocallySigned
 
   let headerText: string | null = null
   if (runStatus === RUN_STATUS_SUCCEEDED) {
@@ -381,7 +390,14 @@ export function RunSummary(): JSX.Element {
   )
 
   if (!isSigned && !showSplash) {
-    return <SignRun runId={runId} />
+    return (
+      <SignRun
+        runId={runId}
+        onSigned={() => {
+          setHasLocallySigned(true)
+        }}
+      />
+    )
   }
 
   return (

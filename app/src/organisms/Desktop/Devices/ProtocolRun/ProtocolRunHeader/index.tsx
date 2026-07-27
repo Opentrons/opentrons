@@ -18,7 +18,6 @@ import {
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useInitializeCameraState } from '/app/local-resources/images/hooks/useInitializeCameraState'
 import { isCancellableStatus } from '/app/local-resources/runs/utils'
-import { SignRunModal } from '/app/organisms/Desktop/SignRunModal'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import {
@@ -30,6 +29,7 @@ import {
 
 import { EQUIPMENT_POLL_MS } from '../../../../DoorOpenControl/constants'
 import { RunProgressMeter } from '../../../RunProgressMeter'
+import { SignRunModal } from '../../../SignRunModal/SignRun'
 import { useRunAnalytics, useRunErrors, useRunHeaderRunControls } from './hooks'
 import { RunHeaderBannerContainer } from './RunHeaderBannerContainer'
 import { RunHeaderContent } from './RunHeaderContent'

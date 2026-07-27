@@ -13,13 +13,11 @@ import {
   useAuthSettingsQuery,
   useHost,
   useSelfQuery,
-  useSignRunMutation,
 } from '@opentrons/react-api-client'
 
 import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { SmallButton } from '/app/atoms/buttons'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { OddModal } from '/app/molecules/OddModal'
 import { showLoginModal } from '/app/organisms/ODD/OnDeviceLogin/LoginModal'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -40,15 +38,25 @@ const TOAST_ABOVE_LOGIN_Z_INDEX = 10002
 // done: login finished and self settled, and this account can sign
 type LoginGate = 'idle' | 'prompting' | 'querying' | 'done'
 
-export function SignRun({ runId }: { runId: string }): JSX.Element {
+export function SignRun({
+  runId: _runId,
+  onSigned,
+}: {
+  runId: string
+  /** Called after client-side validation succeeds. Temporary until the sign endpoint ships. */
+  onSigned: () => void
+}): JSX.Element {
   const { t, i18n } = useTranslation(['access_control', 'shared'])
+
   const [name, setName] = useState('')
   const [nameError, setNameError] = useState(false)
   const [loginGate, setLoginGate] = useState<LoginGate>('idle')
   const [keyboardExpanded, setKeyboardExpanded] = useState(true)
+
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const permissionToastIdRef = useRef<string | null>(null)
+
   const queryClient = useQueryClient()
   const host = useHost()
 
@@ -56,8 +64,6 @@ export function SignRun({ runId }: { runId: string }): JSX.Element {
     title: t('sign_protocol_run'),
   }
 
-  const documentationState = useDocumentationState()
-  const { mutate: submitSignRun } = useSignRunMutation(documentationState)
   const { data: authSettings, isLoading: isAuthSettingsLoading } =
     useAuthSettingsQuery()
   const {
@@ -65,11 +71,11 @@ export function SignRun({ runId }: { runId: string }): JSX.Element {
     isLoading: isSelfLoading,
     isFetching: isSelfFetching,
   } = useSelfQuery()
+
   const logout = useLogout()
   const { makeToast, eatToast } = useToaster()
 
-  const isLoading =
-    isAuthSettingsLoading || isSelfLoading || documentationState.isLoading
+  const isLoading = isAuthSettingsLoading || isSelfLoading
 
   const isLoggedIn = !!self?.data?.username
 
@@ -182,7 +188,10 @@ export function SignRun({ runId }: { runId: string }): JSX.Element {
     }
 
     setNameError(false)
-    submitSignRun({ runId, name: trimmedName })
+    // TODO(jj, 2026-07-27): Restore submitSignRun({ runId, name: trimmedName })
+    // with onSuccess: onSigned once POST /runs/{id}/sign is implemented.
+    // Dismiss after FE validation only so the ODD post-run flow can be tested.
+    onSigned()
   }
 
   return (

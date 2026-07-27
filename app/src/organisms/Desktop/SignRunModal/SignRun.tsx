@@ -48,11 +48,14 @@ export function SignRunModal({
   onSigned,
 }: SignRunModalProps): JSX.Element {
   const { t, i18n } = useTranslation(['access_control', 'shared'])
+
   const [name, setName] = useState('')
   const [nameError, setNameError] = useState(false)
   const [loginGate, setLoginGate] = useState<LoginGate>('idle')
+
   const inputRef = useRef<HTMLInputElement>(null)
   const permissionToastIdRef = useRef<string | null>(null)
+
   const queryClient = useQueryClient()
   const host = useHost()
 
