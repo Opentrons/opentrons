@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom'
 
 import { InlineNotification } from '@opentrons/components'
 
-interface RobotOutOfStorageBannerProps {
+interface RobotOutOfStorageNotificationProps {
   robotName: string
 }
 
-export function RobotOutOfStorageBanner(
-  props: RobotOutOfStorageBannerProps
+export function RobotOutOfStorageNotification(
+  props: RobotOutOfStorageNotificationProps
 ): JSX.Element {
   const { robotName } = props
   const { t } = useTranslation('device_details')

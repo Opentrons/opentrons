@@ -36,7 +36,7 @@ import {
 } from './ErrorRecoveryBanner'
 import { useUSBRegistration } from './hooks'
 import { ReachableBanner } from './ReachableBanner'
-import { RobotOutOfStorageBanner } from './RobotOutOfStorageBanner'
+import { RobotOutOfStorageNotification } from './RobotOutOfStorageNotification'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
 
@@ -109,7 +109,7 @@ export function RobotOverview({
               />
             ) : null}
             {isRobotOutOfMemory ? (
-              <RobotOutOfStorageBanner robotName={robotName} />
+              <RobotOutOfStorageNotification robotName={robotName} />
             ) : null}
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
               <RobotStatusHeader

@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
-import { RobotOutOfStorageBanner } from '..'
+import { RobotOutOfStorageNotification } from '..'
 
 vi.mock('/app/resources/devices')
 vi.mock('react-router-dom')
@@ -16,14 +16,14 @@ const navigate = vi.fn()
 
 const render = () => {
   return renderWithProviders(
-    <RobotOutOfStorageBanner robotName={ROBOT_NAME} />,
+    <RobotOutOfStorageNotification robotName={ROBOT_NAME} />,
     {
       i18nInstance: i18n,
     }
   )
 }
 
-describe('RobotOutOfStorageBanner', () => {
+describe('RobotOutOfStorageNotification', () => {
   beforeEach(() => {
     vi.mocked(useNavigate).mockReturnValue(navigate)
   })
