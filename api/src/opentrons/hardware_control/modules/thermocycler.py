@@ -259,7 +259,7 @@ class Thermocycler(mod_abc.AbstractModule):
         if must_be_running:
             await self.wait_for_is_running()
         await self._driver.deactivate_lid()
-        await self._reader.read_lid_temperature()
+        await self._poller.wait_next_poll()
 
     async def deactivate_block(self, must_be_running: bool = True) -> None:
         """Deactivate the block peltiers"""
@@ -267,7 +267,7 @@ class Thermocycler(mod_abc.AbstractModule):
             await self.wait_for_is_running()
         self._clear_cycle_counters()
         await self._driver.deactivate_block()
-        await self._reader.read_block_temperature()
+        await self._poller.wait_next_poll()
 
     async def deactivate(self, must_be_running: bool = True) -> None:
         """Deactivate the block peltiers and lid heating pad"""
@@ -275,7 +275,7 @@ class Thermocycler(mod_abc.AbstractModule):
             await self.wait_for_is_running()
         self._clear_cycle_counters()
         await self._driver.deactivate_all()
-        await self._reader.read()
+        await self._poller.wait_next_poll()
 
     async def open(self) -> str:
         """Open the lid if it is closed"""
@@ -513,7 +513,7 @@ class Thermocycler(mod_abc.AbstractModule):
             volume=volume,
             ramp_rate=ramp_rate,
         )
-        await self._reader.read_block_temperature()
+        await self._poller.wait_next_poll()
 
     # TODO(mc, 2022-04-26): de-duplicate with `set_lid_temperature`
     async def set_target_lid_temperature(self, celsius: float) -> None:
@@ -526,7 +526,7 @@ class Thermocycler(mod_abc.AbstractModule):
         """
         await self.wait_for_is_running()
         await self._driver.set_lid_temperature(temp=celsius)
-        await self._reader.read_lid_temperature()
+        await self._poller.wait_next_poll()
 
     async def _wait_for_lid_target(self) -> None:
         """
@@ -534,7 +534,7 @@ class Thermocycler(mod_abc.AbstractModule):
 
         Subject to change without a version bump.
         """
-        await self._reader.read_lid_temperature()
+        await self._poller.wait_next_poll()
 
         while not _temperature_is_holding(self.lid_temp_status):
             await self._poller.wait_next_poll()
@@ -545,7 +545,7 @@ class Thermocycler(mod_abc.AbstractModule):
 
         Subject to change without a version bump.
         """
-        await self._reader.read_block_temperature()
+        await self._poller.wait_next_poll()
 
         while not _temperature_is_holding(self.status):
             await self._poller.wait_next_poll()
@@ -555,7 +555,7 @@ class Thermocycler(mod_abc.AbstractModule):
 
     async def _wait_for_lid_status(self, status: ThermocyclerLidStatus) -> None:
         """Wait for lid status to be status."""
-        await self._reader.read_lid_status()
+        await self._poller.wait_next_poll()
 
         while self.lid_status != status:
             await self._poller.wait_next_poll()

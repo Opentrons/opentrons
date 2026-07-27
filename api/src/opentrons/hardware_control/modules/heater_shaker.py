@@ -325,7 +325,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         """
         await self.wait_for_is_running()
         await self._driver.set_temperature(celsius)
-        await self._reader.read_temperature()
+        await self._poller.wait_next_poll()
 
     # TODO(mc, 2022-10-10): remove `awaiting_temperature` argument,
     # and instead, wait until status is holding
@@ -341,7 +341,7 @@ class HeaterShaker(mod_abc.AbstractModule):
             return
 
         await self.wait_for_is_running()
-        await self._reader.read_temperature()
+        await self._poller.wait_next_poll()
 
         async def _await_temperature() -> None:
             if self.temperature_status == TemperatureStatus.HEATING:
@@ -386,7 +386,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         """
         await self.wait_for_is_running()
         await self._driver.set_rpm(rpm)
-        await self._reader.read_rpm()
+        await self._poller.wait_next_poll()
 
         async def _wait() -> None:
             # Wait until we reach the target speed.
@@ -425,7 +425,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         if must_be_running:
             await self.wait_for_is_running()
         await self._driver.deactivate_heater()
-        await self._reader.read_temperature()
+        await self._poller.wait_next_poll()
 
     async def deactivate_shaker(self, must_be_running: bool = True) -> None:
         """Stop shaking and home the plate"""
