@@ -33,6 +33,13 @@ export function UserAccountIdentityFormFields<T extends FieldValues>({
           <Controller
             control={control}
             name={'username' as Path<T>}
+            rules={{
+              validate: value =>
+                (value as string).trim() !== '' ||
+                (t(
+                  'desktop_personal_account_settings_username_required_error'
+                ) as string),
+            }}
             render={({ field, fieldState }) => (
               <InputField
                 value={field.value}
@@ -52,6 +59,11 @@ export function UserAccountIdentityFormFields<T extends FieldValues>({
           <Controller
             control={control}
             name={'fullName' as Path<T>}
+            rules={{
+              validate: value =>
+                (value as string).trim() !== '' ||
+                (t('desktop_add_user_legal_name_required_error') as string),
+            }}
             render={({ field, fieldState }) => (
               <InputField
                 value={field.value}
