@@ -94,7 +94,7 @@ async def _do_call(
         if None is response:
             _log.error(f"Endpoint function returned {response} but did not raise")
             raise RuntimeError(
-                f"Endpoint function for {request.method} {request.url.path} did not response"
+                f"Endpoint function for {request.method} {request.url.path} did not return response"
             )
         return response, None
     except BaseException as exc:
