@@ -1,22 +1,22 @@
 .footer {
   display: flex;
+  justify-content: flex-end;
   padding: 0 var(--spacing-24) var(--spacing-24);
   gap: var(--spacing-8);
-  justify-content: flex-end;
 }
 
 .modal_content {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-24);
-  padding: var(--spacing-40);
   align-items: center;
+  padding: var(--spacing-40);
+  gap: var(--spacing-24);
 }
 
 .text_container {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-8);
   align-items: center;
+  gap: var(--spacing-8);
   text-align: center;
 }
