@@ -49,6 +49,9 @@ vi.mock('/app/redux/config')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../hooks/useSoftwareUpdatePoll')
 vi.mock('/app/pages/Desktop/Protocols/ProtocolVisualization')
+vi.mock('/app/resources/devices/hooks/useTrackRobotRestarts', () => ({
+  useTrackRobotRestarts: vi.fn(),
+}))
 
 const render = (path = '/') => {
   return renderWithProviders<State>(

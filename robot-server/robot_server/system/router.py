@@ -55,7 +55,7 @@ async def get_time() -> SystemTimeResponse:
     summary="Set robot time",
     response_model=SystemTimeResponse,
     dependencies=[
-        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(require_scopes(Scope.SYSTEM_TIME_WRITE)),
         Depends(get_audit_logger("update system time")),
     ],
 )

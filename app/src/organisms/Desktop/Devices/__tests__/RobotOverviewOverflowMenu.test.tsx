@@ -17,9 +17,9 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '/app/redux/discovery/__fixtures__'
-import { restartRobot } from '/app/redux/robot-admin'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useRestartRobotMutation } from '/app/resources/devices/hooks/useRestartRobotMutation'
 import { useCanDisconnect } from '/app/resources/networking/hooks'
 import { useCurrentRunId } from '/app/resources/runs'
 
@@ -31,7 +31,6 @@ import type { ComponentProps } from 'react'
 
 vi.mock('/app/local-resources/instruments')
 vi.mock('/app/organisms/ToasterOven')
-vi.mock('/app/redux/robot-admin')
 vi.mock('../hooks')
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/resources/networking/hooks')
@@ -40,10 +39,16 @@ vi.mock('/app/organisms/Desktop/ChooseProtocolSlideout')
 vi.mock('/app/resources/runs')
 vi.mock('../RobotSettings/UpdateBuildroot')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/resources/devices/hooks/useRestartRobotMutation')
+vi.mock('/app/resources/devices/hooks/useFullShutdownMutation', () => ({
+  useFullShutdownMutation: () => ({ mutate: vi.fn() }),
+}))
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
   useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
 }))
+
+const mockRestart = vi.fn()
 
 const render = (props: ComponentProps<typeof RobotOverviewOverflowMenu>) => {
   return renderWithProviders(
@@ -69,6 +74,7 @@ describe('RobotOverviewOverflowMenu', () => {
 
   beforeEach(() => {
     mockHomeGantry.mockResolvedValue(undefined)
+    mockRestart.mockReset()
     capturedHomeGantryProps = {}
     vi.mocked(useHomeGantry).mockImplementation((props: any) => {
       capturedHomeGantryProps = props
@@ -77,6 +83,9 @@ describe('RobotOverviewOverflowMenu', () => {
         isHoming: false,
       } as any
     })
+    vi.mocked(useRestartRobotMutation).mockReturnValue({
+      restart: mockRestart,
+    } as any)
     vi.mocked(useToaster).mockReturnValue({
       makeSnackbar: mockMakeSnackbar,
     } as any)
@@ -283,7 +292,7 @@ describe('RobotOverviewOverflowMenu', () => {
     const restartBtn = screen.getByRole('button', { name: 'Restart robot' })
     fireEvent.click(restartBtn)
 
-    expect(restartRobot).toBeCalled()
+    expect(mockRestart).toBeCalled()
   })
   it('render overflow menu buttons without the update robot software button', () => {
     render(props)
