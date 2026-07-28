@@ -158,6 +158,29 @@ describe('useTipAttachmentStatus', () => {
     expect(result.current.initialPipettesWithTipsCount).toEqual(null)
   })
 
+  it('should resolve all tips without resetting the settled tip-check count', async () => {
+    const { result } = renderTipAttachmentStatus()
+
+    await waitFor(() => {
+      expect(result.current).toBeDefined()
+    })
+
+    await act(async () => {
+      await result.current.determineTipStatus()
+    })
+
+    expect(result.current.areTipsAttached).toBe(true)
+    expect(result.current.initialPipettesWithTipsCount).toBe(2)
+
+    act(() => {
+      result.current.resolveAllTips()
+    })
+
+    expect(result.current.areTipsAttached).toBe(false)
+    expect(result.current.aPipetteWithTip).toEqual(null)
+    expect(result.current.initialPipettesWithTipsCount).toBe(2)
+  })
+
   it('should set tip status resolved and a  state', async () => {
     const { result } = renderTipAttachmentStatus()
 

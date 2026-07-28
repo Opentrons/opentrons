@@ -52,6 +52,9 @@ export interface TipAttachmentStatusResult {
     onEmptyCache?: () => void,
     onTipsDetected?: () => void
   ) => Promise<PipetteWithTip>
+  /** Clears all pipettes from the tip-attached cache without resetting the
+   * settled tip-check count. Used when the user skips tip handling for the run. */
+  resolveAllTips: () => void
   /* Relevant pipette information for a pipette with a tip attached. If both pipettes have tips attached, return the left pipette. */
   aPipetteWithTip: PipetteWithTip | null
   /* The initial number of pipettes with tips. Null if there has been no tip check yet. */
@@ -121,6 +124,10 @@ export function useTipAttachmentStatus(
     setInitialPipettesCount(null)
   }
 
+  const resolveAllTips = (): void => {
+    setPipettesWithTip([])
+  }
+
   const setTipStatusResolved = (
     onEmptyCache?: () => void,
     onTipsDetected?: () => void
@@ -144,6 +151,7 @@ export function useTipAttachmentStatus(
     areTipsAttached,
     determineTipStatus,
     resetTipStatus,
+    resolveAllTips,
     aPipetteWithTip,
     setTipStatusResolved,
     initialPipettesWithTipsCount: initialPipettesCount,

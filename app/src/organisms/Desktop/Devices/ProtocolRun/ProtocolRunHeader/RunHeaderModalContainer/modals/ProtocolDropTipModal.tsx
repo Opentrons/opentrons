@@ -51,10 +51,15 @@ export function useProtocolDropTipModal({
   pipetteInfo,
 }: UseProtocolDropTipModalProps): UseProtocolDropTipModalResult {
   const [showModal, setShowModal] = useState(areTipsAttached)
+  // After skip-and-home, keep the modal closed even if tip state / run
+  // currentness briefly lag (e.g. close gated behind SignRun).
+  const [hasSkipped, setHasSkipped] = useState(false)
 
   const { homePipettes, isHoming } = useHomePipettes({
     pipetteInfo,
     onSuccess: () => {
+      setHasSkipped(true)
+      setShowModal(false)
       onSkipAndHome()
     },
   })
@@ -62,6 +67,10 @@ export function useProtocolDropTipModal({
   // Close the modal if a different app closes the run context.
   useEffect(
     () => {
+      if (hasSkipped) {
+        setShowModal(false)
+        return
+      }
       if (isRunCurrent && !isHoming) {
         setShowModal(areTipsAttached)
       } else if (!isRunCurrent) {
@@ -70,7 +79,7 @@ export function useProtocolDropTipModal({
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isRunCurrent, areTipsAttached, showModal]
+    [isRunCurrent, areTipsAttached, showModal, hasSkipped]
   ) // Continue to show the modal if a client dismisses the maintenance run on a different app.
 
   const onSkip = (): void => {

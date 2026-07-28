@@ -65,6 +65,7 @@ export function useRunHeaderDropTip({
     areTipsAttached,
     determineTipStatus,
     resetTipStatus,
+    resolveAllTips,
     setTipStatusResolved,
     aPipetteWithTip,
     initialPipettesWithTipsCount,
@@ -80,6 +81,11 @@ export function useRunHeaderDropTip({
     currentRunId: runId,
     pipetteInfo: buildPipetteDetails(aPipetteWithTip),
     onSkipAndHome: () => {
+      // Clear tip state so the modal dismisses even when close is gated
+      // behind SignRun (run stays current, so !isRunCurrent never fires).
+      // Do not resetTipStatus — that nulls the settled tip-check count and
+      // can re-trigger tip check on a terminating run.
+      resolveAllTips()
       closeCurrentRun()
     },
   })
