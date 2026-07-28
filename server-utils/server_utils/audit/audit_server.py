@@ -66,8 +66,10 @@ class LocalHTTPClient(Client):
                 # https://github.com/aio-libs/aiohttp/issues/11324.
                 base_url="http://localhost",
             )
+            _log.info(f"Built audit client to connect to socket at {audit_server_uds}")
         elif audit_server_url is not None:
             session = aiohttp.ClientSession(base_url=audit_server_url)
+            _log.info(f"Built audit client to connect to url at {audit_server_url}")
         else:
             raise ValueError("Specify audit_server_uds or audit_server_url.")
 
