@@ -20,11 +20,6 @@ from server_utils.persistence.persistence_directory import (
 from server_utils.robot.fastapi import get_robot_client
 from server_utils.robot.robot_server import Client as RobotServerClient
 
-from audit_server.deletion_keys.store import (
-    DeletionKeyStore,
-    get_deletion_key_store,
-)
-from audit_server.deletion_keys.types import LOG_PERIOD_FOREIGN_TYPE
 from audit_server.log_storage.dependency import get_log_data_manager
 from audit_server.log_storage.log_data_manager import LogDataManager
 from audit_server.log_storage.models import LogPeriodSummary
@@ -77,9 +72,6 @@ async def download_log_period(
     persistence_directory_root: Annotated[
         Path, fastapi.Depends(get_persistence_directory_root)
     ],
-    deletion_key_store: Annotated[
-        DeletionKeyStore, fastapi.Depends(get_deletion_key_store)
-    ],
 ) -> FileResponse:
     """Download a zipped verifiable audit log period."""
     try:
@@ -93,10 +85,7 @@ async def download_log_period(
     # The period exists, so mint a deletion key linked to it and hand it back in
     # a response header. The app stores this key and presents it to later delete
     # the period.
-    deletion_key = deletion_key_store.create_deletion_key(
-        foreign_id=int(periodId),
-        foreign_type=LOG_PERIOD_FOREIGN_TYPE,
-    )
+    deletion_key = log_data_manager.create_deletion_key(period_id=periodId)
 
     signing_key = await key_client.get_key_and_hash()
     robot_info = await robot_server_client.get_name_and_serial()

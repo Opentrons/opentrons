@@ -109,38 +109,6 @@ class RobotLog(Base):
     file_sig_version: Mapped[str]
 
 
-class DeletionKey(Base):
-    """A one-time key authorizing deletion of a persisted record.
-
-    A deletion key is minted when a record is exported (for example, when a log
-    period is downloaded) and must be presented to later delete that record.
-
-    The linked record is modeled generically: ``foreign_id`` points at the
-    record and ``foreign_type`` names what kind of record it is. Today the only
-    kind is a log period (see ``DeletionKeyForeignType``), so ``foreign_id`` is
-    a foreign key into ``logperiod``; the naming leaves room to generalize to
-    other record types later.
-
-    Keys accumulate: each export mints a new key, and previously issued keys
-    for the same record remain valid to support multiple potential clients
-    interacting with the same log periods.
-    """
-
-    __tablename__ = "deletion_key"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    deletion_key: Mapped[str] = mapped_column(unique=True, index=True)
-    foreign_id: Mapped[int] = mapped_column(
-        ForeignKey(
-            "logperiod.id",
-            name="fk_log_period_for_deletion_key",
-            ondelete="CASCADE",
-        )
-    )
-    foreign_type: Mapped[str]
-    created_at: Mapped[datetime]
-
-
 class Setting(Base):
     """ORM model for a single generic setting, stored as a JSON-encoded value.
 
