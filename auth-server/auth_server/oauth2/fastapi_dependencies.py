@@ -24,23 +24,12 @@ def install_oauth2_backend(app_state: AppState, backend: Backend) -> None:
     _app_state_accessor.set_on(app_state, backend)
 
 
-def install_oath2_sql_engine(app_state: AppState, sql_engine: SQLEngine) -> None:
-    """Initialize the server's singleton OAuth 2 backend and store it for later retrieval.
-
-    This should be called once at server startup.
-    """
-    user_store = UserStore(sql_engine=sql_engine)
-    settings_store = SettingsStore(sql_engine=sql_engine)
-    backend = Backend(user_store, settings_store)
-    _app_state_accessor.set_on(app_state, backend)
-
-
 def get_oauth2_backend(
     app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> Backend:
     """Return the server's singleton OAuth 2 backend."""
     backend = _app_state_accessor.get_from(app_state)
-    assert backend is not None, (
-        "Forgot to initialize OAuth 2 backend at server startup?"
-    )
+    assert (
+        backend is not None
+    ), "Forgot to initialize OAuth 2 backend at server startup?"
     return backend
