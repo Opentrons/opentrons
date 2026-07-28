@@ -35,7 +35,7 @@ export function useRestartMutation(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
 
-  const mutation = useDocumentedMutation<RestartResponse, AxiosError, void>(
+  const mutation = useDocumentedMutation<RestartResponse, AxiosError>(
     documentationState,
     ['restart_robot'],
     ({ userNotes }) =>

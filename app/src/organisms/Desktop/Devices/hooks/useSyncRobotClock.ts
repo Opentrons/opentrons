@@ -1,3 +1,4 @@
+/* eslint-disable opentrons/no-direct-mutating */
 import { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { differenceInSeconds, parseISO } from 'date-fns'
@@ -37,7 +38,7 @@ export function useSyncRobotClock(robotName: string | null): void {
   const { t } = useTranslation('audit_log')
   const robot = useRobot(robotName)
   const token = useAccessTokenForRobot(robotName)
-  const userNotes = t('sync_system_time')
+  const userNotes = t('sync_system_time') as string
 
   const host = useMemo<HostConfig | null>(() => {
     if (robotName == null || robot?.ip == null) {

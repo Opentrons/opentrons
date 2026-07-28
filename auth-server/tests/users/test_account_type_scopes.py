@@ -1,7 +1,8 @@
 """Tests for account-type → scope mapping."""
 
-from auth_server.users.models import ACCOUNT_TYPE_TO_SCOPES, AccountType
 from server_utils.auth.scopes import Scope
+
+from auth_server.users.models import ACCOUNT_TYPE_TO_SCOPES, AccountType
 
 
 def test_system_time_write_is_admin_only() -> None:

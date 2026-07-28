@@ -12,9 +12,10 @@ import { useIsFlex } from '/app/redux-resources/robots'
 
 import { DeviceResetSlideout } from '../DeviceResetSlideout'
 
+import type * as ReactApiClient from '@opentrons/react-api-client'
+
 vi.mock('@opentrons/react-api-client', async importOriginal => {
-  const actual =
-    await importOriginal<typeof import('@opentrons/react-api-client')>()
+  const actual = await importOriginal<typeof ReactApiClient>()
   return {
     ...actual,
     useResetConfigOptionsQuery: vi.fn(),

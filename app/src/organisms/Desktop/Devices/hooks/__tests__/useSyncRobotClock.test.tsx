@@ -11,10 +11,10 @@ import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { useSyncRobotClock } from '..'
 
 import type { FunctionComponent, ReactNode } from 'react'
-import type { Response, SystemTimeResponse } from '@opentrons/api-client'
+import type * as ApiClient from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client', async importOriginal => {
-  const actual = await importOriginal<typeof import('@opentrons/api-client')>()
+  const actual = await importOriginal<typeof ApiClient>()
   return {
     ...actual,
     getSystemTime: vi.fn(),
@@ -49,7 +49,7 @@ describe('useSyncRobotClock hook', () => {
           systemTime: new Date().toISOString(),
         },
       },
-    } as Response<SystemTimeResponse>)
+    } as ApiClient.Response<ApiClient.SystemTimeResponse>)
 
     renderHook(() => useSyncRobotClock('otie'), { wrapper })
 
@@ -70,7 +70,7 @@ describe('useSyncRobotClock hook', () => {
           systemTime: drifted,
         },
       },
-    } as Response<SystemTimeResponse>)
+    } as ApiClient.Response<ApiClient.SystemTimeResponse>)
 
     renderHook(() => useSyncRobotClock('otie'), { wrapper })
 
