@@ -24,6 +24,7 @@ import { getAllWellContentsAtFrame } from '../../utils/getAllWellContentsAtFrame
 import { WellTooltip } from '../../WellTooltip'
 import styles from './labwareslot.module.css'
 
+import type { ReactNode } from 'react'
 import type { WellGroup } from '@opentrons/components'
 import type {
   Liquid,
@@ -47,7 +48,7 @@ interface LabwareSlotContainerProps {
   // when set, the header block is rendered into this element via portal
   headerPortalEl?: HTMLElement | null
 }
-export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
+export function LabwareSlot(props: LabwareSlotContainerProps): ReactNode {
   const {
     topLabwareOnSlotId,
     labwareEntities,

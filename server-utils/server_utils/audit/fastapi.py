@@ -127,17 +127,12 @@ async def audit_logger_middleware(
     """
     response, cached_exc = await _do_call(request, call_next)
 
-    # NOTE: This should be uncommented as soon as audit logging is implemented
-    # throughout robot server. That didn't happen in the commit in which it was
-    # added because that commit was to get this functionality in to parallelize
-    # further work. In the future, audit logger should only be added to a server
-    # when that server is ready for full integration.
-    # if not hasattr(request.state, "audit_logger"):
-    #     if request.method in MUTATING_HTTP_METHODS:
-    #         _log.error(
-    #             f"Request {request.method} {request.url.path} should add an audit log or explicitly skip audit logging but does not"
-    #         )
-    #     return await _return_or_raise(response, cached_exc)
+    if not hasattr(request.state, "audit_logger"):
+        if request.method in MUTATING_HTTP_METHODS:
+            _log.error(
+                f"Request {request.method} {request.url.path} should add an audit log or explicitly skip audit logging but does not"
+            )
+        return await _return_or_raise(response, cached_exc)
     if request.method not in MUTATING_HTTP_METHODS:
         return await _return_or_raise(response, cached_exc)
     audit_logger = getattr(request.state, "audit_logger", None)
@@ -150,6 +145,29 @@ async def audit_logger_middleware(
         )
         return await _return_or_raise(response, cached_exc)
 
+    # the way an ASGI application stack works is that each ASGI application gets a
+    # "scope", which is a map of data, and a send and receive callback. Each application
+    # then parses messages and sends responses. This is pretty inconvenient, so when
+    # you're using Starlette or FastAPI, those frameworks wrap the scope and callbacks
+    # into an object like Request, which capture a bunch of the data from the scope
+    # and give it nice names, and add nice methods with nice caching logic.
+    #
+    # The problem is that they do this Request() wrapping process separately for each
+    # ASGI application, and a middleware is a separate ASGI application from the
+    # endpoint stack. That means that the Request() object we get in this middleware
+    # is different from the Request() object that the endpoint function and its FastAPI
+    # dependencies get, and that's an issue because the request body caching that
+    # Request() offers is just done as an instance attribute of the Request object. So
+    # if we try to get request.body() here, this Request doesn't have a cached body
+    # and tries to get it from uvicorn... which doesn't do any request caching.
+    #
+    # To fix this, we stash the request object from the endpoint function ASGI application
+    # on the audit logger object in the get_audit_logger dependency, and then use _that_
+    # Request object instead of the one that was passed into the middleware. This is maybe
+    # a little gross, since the applications are logically separate, but since this is
+    # ASGI and the separation is "different asyncio task" it's fine.
+    new_request = audit_logger.request
+    request = new_request
     await _handle_autolog(audit_logger, request, response)
 
     try:
@@ -249,6 +267,7 @@ def get_audit_logger(
             auto_log_response_head=auto_log_response_head,
             auto_log_request_body=auto_log_request_body,
             auto_log_response_body=auto_log_response_body,
+            request=request,
         )
         if action is not None:
             audit_logger.set_action(action)

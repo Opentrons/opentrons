@@ -2,6 +2,8 @@ import { MenuItem, MenuList, useOnClickOutside } from '@opentrons/components'
 
 import styles from './perstepoverflowmenu.module.css'
 
+import type { ReactNode } from 'react'
+
 interface PerStepOverflowMenuProps {
   setShowPerStepOverflowMenu: (showPerStepOverflowMenu: boolean) => void
   setMilliSecondsPerFrame: (secondsPerFrame: number) => void
@@ -17,7 +19,7 @@ const PLAYBACK_SPEED_OPTIONS = [
 
 export function PerStepOverflowMenu(
   props: PerStepOverflowMenuProps
-): JSX.Element {
+): ReactNode {
   const { setShowPerStepOverflowMenu, setMilliSecondsPerFrame } = props
   const perStepOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {

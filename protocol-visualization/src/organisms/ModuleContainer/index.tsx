@@ -16,6 +16,7 @@ import {
 import { ModuleStatusContainer } from '../ModuleStatusContainer'
 import styles from './modulecontainer.module.css'
 
+import type { ReactNode } from 'react'
 import type { ModuleEntities, RobotState } from '@opentrons/step-generation'
 
 interface ModuleContainerProps {
@@ -32,7 +33,7 @@ export function ModuleContainer({
   moduleRobotState,
   slotId,
   headerPortalEl,
-}: ModuleContainerProps): JSX.Element {
+}: ModuleContainerProps): ReactNode {
   const { t } = useTranslation('protocol_visualization')
   const { model } = moduleEntities[moduleId]
   const { moduleState } = moduleRobotState[moduleId]

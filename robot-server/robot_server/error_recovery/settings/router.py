@@ -4,6 +4,7 @@ from typing import Annotated
 
 import fastapi
 
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -37,7 +38,10 @@ async def get_error_recovery_settings(  # noqa: D103
     router.patch,
     path=_PATH,
     summary="Set error recovery settings",
-    dependencies=[fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        fastapi.Depends(get_audit_logger("change error recovery settings")),
+    ],
 )
 async def patch_error_recovery_settings(  # noqa: D103
     request_body: RequestModel[RequestData],
@@ -54,7 +58,10 @@ async def patch_error_recovery_settings(  # noqa: D103
     router.delete,
     path=_PATH,
     summary="Reset error recovery settings to defaults",
-    dependencies=[fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        fastapi.Depends(get_audit_logger("reset error recovery settings")),
+    ],
 )
 async def delete_error_recovery_settings(  # noqa: D103
     store: Annotated[
