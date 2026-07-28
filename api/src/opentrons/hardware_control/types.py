@@ -1100,7 +1100,7 @@ class PipetteSensorData:
             "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
             "sensor_type": obj.sensor_type.value,
             "_as_int": obj._as_int,
-            "_as_float": obj._as_float,
+            "_as_float": float(obj._as_float),
         }
 
     @staticmethod

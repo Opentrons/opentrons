@@ -85,9 +85,9 @@ class Point(NamedTuple):
         """Consumed by Serpent, convert type to a Pyro Dictionary."""
         return {
             "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
-            "x": obj.x,
-            "y": obj.y,
-            "z": obj.z,
+            "x": float(obj.x),  # Types are constructed to float to avoid numpy.float64
+            "y": float(obj.y),
+            "z": float(obj.z),
         }
 
     @staticmethod
