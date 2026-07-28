@@ -133,7 +133,9 @@ describe('PersonalAccountSettingsEditForm', () => {
   it('shows a server save error on the confirm password field', () => {
     render({
       ...props,
-      saveError: 'Unable to save account settings. Try again.',
+      fieldErrors: {
+        confirmPasswordError: 'Unable to save account settings. Try again.',
+      },
     })
     screen.getByText('Unable to save account settings. Try again.')
   })
@@ -141,8 +143,10 @@ describe('PersonalAccountSettingsEditForm', () => {
   it('shows a username error on the username field', () => {
     render({
       ...props,
-      usernameError:
-        'This username is already taken. Choose a different username.',
+      fieldErrors: {
+        usernameError:
+          'This username is already taken. Choose a different username.',
+      },
     })
     screen.getByText(
       'This username is already taken. Choose a different username.'

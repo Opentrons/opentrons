@@ -1,12 +1,10 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
-import axios from 'axios'
 
 import { BasicButton, Divider, StyledText } from '@opentrons/components'
 import {
   getSelfQueryKey,
-  isDocumentedMutationError,
   useHost,
   useSelfQuery,
   useUpdateSelfMutation,
@@ -17,6 +15,7 @@ import { useUsernameForRobot } from '/app/redux/robot-auth'
 
 import styles from './personalaccountsettings.module.css'
 import { PersonalAccountSettingsEditForm } from './PersonalAccountSettingsEditForm'
+import { useAuthUserMutationErrors } from './userAccount/useAuthUserMutationErrors'
 
 import type { JSX, ReactNode } from 'react'
 import type { UpdateSelfRequest } from '@opentrons/api-client'
@@ -56,45 +55,22 @@ export function PersonalAccountSettings({
   const fullName = selfQuery.data?.data.fullName ?? ''
 
   const [isEditing, setIsEditing] = useState(false)
-  const [usernameError, setUsernameError] = useState<string | null>(null)
-  const [saveError, setSaveError] = useState<string | null>(null)
-
-  const clearSaveErrors = (): void => {
-    setUsernameError(null)
-    setSaveError(null)
-  }
+  const { fieldErrors, clearFieldErrors, handleMutationError } =
+    useAuthUserMutationErrors(t)
 
   const handleSave = (request: UpdateSelfRequest): void => {
     void updateSelf(request)
       .then(updatedSelf => {
         queryClient.setQueryData(getSelfQueryKey(host), updatedSelf)
-        clearSaveErrors()
+        clearFieldErrors()
         setIsEditing(false)
       })
-      .catch((error: unknown) => {
-        // User cancelled the documentation/login modal — stay on the edit form.
-        if (isDocumentedMutationError(error)) {
-          return
-        }
+      .catch(handleMutationError)
+  }
 
-        const errorId = axios.isAxiosError(error)
-          ? error.response?.data?.errors?.[0]?.id
-          : null
-
-        if (errorId === 'userAlreadyExists') {
-          setUsernameError(
-            t(
-              'desktop_personal_account_settings_username_exists_error'
-            ) as string
-          )
-          setSaveError(null)
-        } else {
-          setUsernameError(null)
-          setSaveError(
-            t('desktop_personal_account_settings_save_error') as string
-          )
-        }
-      })
+  const handleCancelEdit = (): void => {
+    clearFieldErrors()
+    setIsEditing(false)
   }
 
   return (
@@ -105,14 +81,7 @@ export function PersonalAccountSettings({
         </StyledText>
         {loggedInUsername != null &&
           (isEditing ? (
-            <BasicButton
-              type="button"
-              underLine
-              onClick={() => {
-                clearSaveErrors()
-                setIsEditing(false)
-              }}
-            >
+            <BasicButton type="button" underLine onClick={handleCancelEdit}>
               {t('shared:cancel')}
             </BasicButton>
           ) : (
@@ -120,7 +89,7 @@ export function PersonalAccountSettings({
               type="button"
               underLine
               onClick={() => {
-                clearSaveErrors()
+                clearFieldErrors()
                 setIsEditing(true)
               }}
             >
@@ -134,13 +103,9 @@ export function PersonalAccountSettings({
             username={username}
             fullName={fullName}
             isSaving={isSaving}
-            usernameError={usernameError}
-            saveError={saveError}
+            fieldErrors={fieldErrors}
             onSave={handleSave}
-            onCancel={() => {
-              clearSaveErrors()
-              setIsEditing(false)
-            }}
+            onCancel={handleCancelEdit}
           />
         ) : (
           <>

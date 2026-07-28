@@ -1,26 +1,22 @@
-import { Controller, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
-import {
-  InputField,
-  PrimaryButton,
-  SecondaryButton,
-  StyledText,
-} from '@opentrons/components'
+import { PrimaryButton, SecondaryButton } from '@opentrons/components'
 
-import { PasswordInputField } from './PasswordInputField'
-import styles from './personalaccountsettings.module.css'
+import styles from './userAccount/userAccountForm.module.css'
+import { UserAccountIdentityFormFields } from './userAccount/UserAccountIdentityFormFields'
+import { UserAccountPasswordFormFields } from './userAccount/UserAccountPasswordFormFields'
 
-import type { JSX, ReactNode } from 'react'
+import type { JSX } from 'react'
 import type { FieldError, Resolver } from 'react-hook-form'
 import type { UpdateSelfRequest } from '@opentrons/api-client'
+import type { AuthUserFieldErrors } from './userAccount/useAuthUserMutationErrors'
 
 export interface PersonalAccountSettingsEditFormProps {
   username: string
   fullName: string
   isSaving: boolean
-  usernameError?: string | null
-  saveError?: string | null
+  fieldErrors?: Partial<AuthUserFieldErrors>
   onSave: (data: UpdateSelfRequest) => void
   onCancel: () => void
 }
@@ -32,26 +28,11 @@ interface FormValues {
   confirmPassword: string
 }
 
-interface FieldGroupProps {
-  label: string
-  children: ReactNode
-}
-
-function FieldGroup({ label, children }: FieldGroupProps): JSX.Element {
-  return (
-    <div className={styles.field_group}>
-      <StyledText desktopStyle="bodyDefaultRegular">{label}</StyledText>
-      <div className={styles.field_group_value}>{children}</div>
-    </div>
-  )
-}
-
 export function PersonalAccountSettingsEditForm({
   username,
   fullName,
   isSaving,
-  usernameError = null,
-  saveError = null,
+  fieldErrors = {},
   onSave,
   onCancel,
 }: PersonalAccountSettingsEditFormProps): JSX.Element {
@@ -120,73 +101,25 @@ export function PersonalAccountSettingsEditForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className={styles.fields_row}>
-        <FieldGroup label={t('desktop_username')}>
-          <Controller
-            control={control}
-            name="username"
-            render={({ field, fieldState }) => (
-              <InputField
-                value={field.value}
-                error={fieldState.error?.message ?? usernameError}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-              />
-            )}
-          />
-        </FieldGroup>
-        <FieldGroup label={t('desktop_legal_name')}>
-          <Controller
-            control={control}
-            name="fullName"
-            render={({ field }) => (
-              <InputField
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-              />
-            )}
-          />
-        </FieldGroup>
-      </div>
-      <div className={styles.fields_row}>
-        <FieldGroup label={t('desktop_password')}>
-          <Controller
-            control={control}
-            name="password"
-            render={({ field }) => (
-              <PasswordInputField
-                value={field.value}
-                placeholder={t('desktop_password_placeholder')}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-              />
-            )}
-          />
-        </FieldGroup>
-        <FieldGroup label={t('desktop_confirm_password')}>
-          <Controller
-            control={control}
-            name="confirmPassword"
-            render={({ field, fieldState }) => (
-              <PasswordInputField
-                value={field.value}
-                placeholder={t('desktop_password_placeholder')}
-                error={fieldState.error?.message ?? saveError}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-              />
-            )}
-          />
-        </FieldGroup>
-      </div>
-      <div className={styles.actions}>
-        <SecondaryButton type="button" onClick={onCancel}>
-          {t('shared:cancel')}
-        </SecondaryButton>
-        <PrimaryButton type="submit" disabled={isSaveDisabled}>
-          {t('shared:save')}
-        </PrimaryButton>
+      <div className={styles.form_fields}>
+        <UserAccountIdentityFormFields
+          control={control}
+          fieldErrors={{ usernameError: fieldErrors.usernameError }}
+        />
+        <UserAccountPasswordFormFields
+          control={control}
+          fieldErrors={{
+            confirmPasswordError: fieldErrors.confirmPasswordError ?? null,
+          }}
+        />
+        <div className={styles.actions}>
+          <SecondaryButton type="button" onClick={onCancel}>
+            {t('shared:cancel')}
+          </SecondaryButton>
+          <PrimaryButton type="submit" disabled={isSaveDisabled}>
+            {t('shared:save')}
+          </PrimaryButton>
+        </div>
       </div>
     </form>
   )
