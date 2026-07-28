@@ -40,7 +40,7 @@ import {
   useDeleteRunMutation,
 } from '@opentrons/react-api-client'
 
-import { getModalPortalEl } from '/app/App/portal'
+import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useRunControls } from '/app/organisms/RunTimeControl'
@@ -60,9 +60,12 @@ import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import {
   useDownloadRunRecord,
   useIsEstopNotDisengaged,
+  useIsRobotOutOfStorage,
 } from '/app/resources/devices'
 
-import type { MouseEventHandler } from 'react'
+import { RobotOutOfStorageModal } from '../RobotOutOfStorageModal.tsx'
+
+import type { Dispatch, MouseEventHandler, SetStateAction } from 'react'
 import type { Run, RunData } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
 
@@ -96,35 +99,56 @@ export function HistoricalProtocolRunOverflowMenu(
     }
   )
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
+  const [showRobotOutOfStorageModal, setShowRobotOutOfStorageModal] =
+    useState<boolean>(false)
+  const navigate = useNavigate()
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      position={POSITION_RELATIVE}
-      data-testid="HistoricalProtocolRunOverflowMenu_OverflowMenu"
-    >
-      <OverflowBtn
-        alignSelf={ALIGN_FLEX_END}
-        onClick={handleOverflowClick}
-        disabled={isEstopNotDisengaged}
-      />
-      {showOverflowMenu ? (
-        <>
-          <Box
-            ref={protocolRunOverflowWrapperRef}
-            data-testid={`HistoricalProtocolRunOverflowMenu_${run.id}`}
-          >
-            <MenuDropdown
-              {...props}
-              downloadRunRecord={downloadRunRecord}
-              isDownloading={isDownloading}
-              closeOverflowMenu={handleOverflowClick}
-            />
-          </Box>
-          {menuOverlay}
-        </>
-      ) : null}
-    </Flex>
+    <>
+      {showRobotOutOfStorageModal
+        ? createPortal(
+            <RobotOutOfStorageModal
+              onConfirm={() => {
+                navigate(`/devices/${robotName}/robot-settings/file-manager`)
+              }}
+              onClose={() => {
+                setShowRobotOutOfStorageModal(false)
+              }}
+            />,
+            getTopPortalEl()
+          )
+        : null}
+
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        position={POSITION_RELATIVE}
+        data-testid="HistoricalProtocolRunOverflowMenu_OverflowMenu"
+      >
+        <OverflowBtn
+          alignSelf={ALIGN_FLEX_END}
+          onClick={handleOverflowClick}
+          disabled={isEstopNotDisengaged}
+        />
+        {showOverflowMenu ? (
+          <>
+            <Box
+              ref={protocolRunOverflowWrapperRef}
+              data-testid={`HistoricalProtocolRunOverflowMenu_${run.id}`}
+            >
+              <MenuDropdown
+                {...props}
+                downloadRunRecord={downloadRunRecord}
+                isDownloading={isDownloading}
+                closeOverflowMenu={handleOverflowClick}
+                setShowRobotOutOfStorageModal={setShowRobotOutOfStorageModal}
+                setShowOverflowMenu={setShowOverflowMenu}
+              />
+            </Box>
+            {menuOverlay}
+          </>
+        ) : null}
+      </Flex>
+    </>
   )
 }
 
@@ -132,6 +156,8 @@ interface MenuDropdownProps extends HistoricalProtocolRunOverflowMenuProps {
   closeOverflowMenu: MouseEventHandler<HTMLButtonElement>
   downloadRunRecord: () => void
   isDownloading: boolean
+  setShowRobotOutOfStorageModal: Dispatch<SetStateAction<boolean>>
+  setShowOverflowMenu: Dispatch<SetStateAction<boolean>>
 }
 function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const { t } = useTranslation('device_details')
@@ -145,6 +171,8 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     downloadRunRecord,
     isDownloading,
     runHasImages,
+    setShowRobotOutOfStorageModal,
+    setShowOverflowMenu,
   } = props
 
   const { id: runId } = run
@@ -180,7 +208,16 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
 
   const robotSerialNumber =
     robot?.health?.robot_serial ?? robot?.serverHealth?.serialNumber ?? null
+
+  const isRobotOutOfStorage = useIsRobotOutOfStorage()
+
   const handleResetClick: MouseEventHandler<HTMLButtonElement> = (e): void => {
+    if (isRobotOutOfStorage) {
+      setShowRobotOutOfStorageModal(true)
+      setShowOverflowMenu(false)
+      return
+    }
+
     e.preventDefault()
     e.stopPropagation()
 

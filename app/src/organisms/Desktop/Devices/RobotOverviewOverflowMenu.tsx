@@ -33,11 +33,13 @@ import { CONNECTABLE, REACHABLE, UNREACHABLE } from '/app/redux/discovery'
 import { restartRobot } from '/app/redux/robot-admin'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { checkShellUpdate } from '/app/redux/shell'
+import { useIsRobotOutOfStorage } from '/app/resources/devices'
 import { useFullShutdownMutation } from '/app/resources/devices/hooks/useFullShutdownMutation'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { useCanDisconnect } from '/app/resources/networking/hooks'
 import { useCurrentRunId } from '/app/resources/runs'
 
+import { RobotOutOfStorageModal } from './RobotOutOfStorageModal.tsx'
 import { DisconnectModal } from './RobotSettings/ConnectNetwork/DisconnectModal'
 import { handleUpdateBuildroot } from './RobotSettings/UpdateBuildroot'
 
@@ -60,7 +62,6 @@ export const RobotOverviewOverflowMenu = (
     showOverflowMenu,
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
-  const navigate = useNavigate()
   const isRobotBusy = useIsRobotBusy()
   const runId = useCurrentRunId()
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -80,6 +81,11 @@ export const RobotOverviewOverflowMenu = (
       }
     },
   })
+
+  const isRobotOutOfStorage = useIsRobotOutOfStorage()
+  const [showRobotOutOfStorageModal, setShowRobotOutOfStorageModal] =
+    useState<boolean>(false)
+  const navigate = useNavigate()
 
   const handleClickRestart: MouseEventHandler<HTMLButtonElement> = () => {
     dispatch(restartRobot(robot.name))
@@ -108,6 +114,10 @@ export const RobotOverviewOverflowMenu = (
   })
 
   const handleClickRun: MouseEventHandler<HTMLButtonElement> = () => {
+    if (isRobotOutOfStorage) {
+      setShowRobotOutOfStorageModal(true)
+      return
+    }
     setShowChooseProtocolSlideout(true)
   }
 
@@ -122,6 +132,19 @@ export const RobotOverviewOverflowMenu = (
 
   return (
     <Flex data-testid="RobotOverview_overflowMenu" position={POSITION_RELATIVE}>
+      {showRobotOutOfStorageModal
+        ? createPortal(
+            <RobotOutOfStorageModal
+              onConfirm={() => {
+                navigate(`/devices/${robot.name}/robot-settings/file-manager`)
+              }}
+              onClose={() => {
+                setShowChooseProtocolSlideout(false)
+              }}
+            />,
+            getTopPortalEl()
+          )
+        : null}
       {showDisconnectModal
         ? createPortal(
             <DisconnectModal

@@ -26,7 +26,15 @@ import {
   useRobot,
 } from '/app/redux-resources/robots'
 import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'
+<<<<<<< Updated upstream
 import { useIsRobotOutOfMemory, useLights } from '/app/resources/devices'
+=======
+<<<<<<< Updated upstream
+import { useLights } from '/app/resources/devices'
+=======
+import { useIsRobotOutOfStorage, useLights } from '/app/resources/devices'
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { CalibrationStatusBanner } from './CalibrationStatusBanner'
@@ -68,8 +76,16 @@ export function RobotOverview({
 
   useUSBRegistration(robot)
 
+<<<<<<< Updated upstream
   const isRobotOutOfMemory = useIsRobotOutOfMemory()
 
+=======
+<<<<<<< Updated upstream
+=======
+  const isRobotOutOfStorage = useIsRobotOutOfStorage()
+
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
   return robot != null ? (
     <>
       <Flex
@@ -108,9 +124,18 @@ export function RobotOverview({
                 marginBottom={SPACING.spacing8}
               />
             ) : null}
+<<<<<<< Updated upstream
             {isRobotOutOfMemory ? (
               <RobotOutOfStorageNotification robotName={robotName} />
             ) : null}
+=======
+<<<<<<< Updated upstream
+=======
+            {isRobotOutOfStorage ? (
+              <RobotOutOfStorageNotification robotName={robotName} />
+            ) : null}
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
               <RobotStatusHeader
                 name={robot.name}
