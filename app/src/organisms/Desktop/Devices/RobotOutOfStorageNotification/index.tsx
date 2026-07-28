@@ -17,7 +17,7 @@ export function RobotOutOfStorageNotification(
 
   return (
     <InlineNotification
-      type="error"
+      type="alert"
       heading={t('robot_storage_almost_full')}
       message={t('downlad_and_delete_to_run')}
       linkText={t('manage_files')}
