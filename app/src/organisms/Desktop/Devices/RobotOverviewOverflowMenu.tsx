@@ -139,7 +139,7 @@ export const RobotOverviewOverflowMenu = (
                 navigate(`/devices/${robot.name}/robot-settings/file-manager`)
               }}
               onClose={() => {
-                setShowChooseProtocolSlideout(false)
+                setShowRobotOutOfStorageModal(false)
               }}
             />,
             getTopPortalEl()
