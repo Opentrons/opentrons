@@ -94,6 +94,11 @@ class Scope(enum.Enum):
         "Create, update, and delete users.",
     )
 
+    AUDIT_LOG_WRITE = (
+        "audit_log.write",
+        "Write arbitrary audit logs to the audit server.",
+    )
+
     _description: str
 
     def __new__(cls, api_name: str, description: str) -> Self:  # noqa: D102
