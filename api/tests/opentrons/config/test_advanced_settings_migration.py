@@ -519,7 +519,7 @@ def v44_config(v43_config: Dict[str, Any]) -> Dict[str, Any]:
     r.update(
         {
             "_version": 44,
-            "easy96chAttach": None,
+            "easy96chAttach": False ,
         }
     )
     return r

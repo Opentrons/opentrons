@@ -840,7 +840,7 @@ def _migrate43to44(previous: SettingsMap) -> SettingsMap:
     - Adds the easy96chAttach config element.
     """
     newmap = {k: v for k, v in previous.items()}
-    newmap["easy96chAttach"] = None
+    newmap["easy96chAttach"] = False
     return newmap
 
 
