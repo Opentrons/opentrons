@@ -29,8 +29,8 @@
 
 .tabs_row {
   display: flex;
-  gap: var(--spacing-4);
   overflow: scroll;
+  gap: var(--spacing-4);
 }
 
 .content_section {
