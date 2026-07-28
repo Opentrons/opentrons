@@ -4,6 +4,7 @@ Based on Asair sensor driver architecture.
 """
 
 import abc
+import os
 import time
 import logging
 from abc import ABC
@@ -20,6 +21,23 @@ log = logging.getLogger(__name__)
 
 USB_VID = None  # 如果有固定 VID / PID 可填写
 USB_PID = None
+
+
+def _port_is_open_in_this_process(device: str) -> bool:
+    """Return whether this process already has the serial device open."""
+    fd_dir = "/proc/self/fd"
+    try:
+        device_path = os.path.realpath(device)
+        for fd_name in os.listdir(fd_dir):
+            try:
+                if os.path.realpath(os.path.join(fd_dir, fd_name)) == device_path:
+                    return True
+            except OSError:
+                continue
+    except OSError:
+        # Non-Linux development environments do not expose /proc/self/fd.
+        return False
+    return False
 
 
 # =========================
@@ -104,6 +122,9 @@ class ImpactProtectionSerial(ImpactProtectionBase):
             if port and port not in p.device:
                 continue
             elif skip_port and skip_port in p.device:
+                continue
+            elif _port_is_open_in_this_process(p.device):
+                log.info("Skipping serial port already in use: %s", p.device)
                 continue
 
             try:
