@@ -11,7 +11,7 @@ import {
 
 import styles from './robotoutofstoragemodal.module.css'
 
-import type React from 'react'
+import type { ReactNode } from 'react'
 
 interface RobotOutOfStorageModalProps {
   onConfirm: () => void
@@ -20,7 +20,7 @@ interface RobotOutOfStorageModalProps {
 
 export function RobotOutOfStorageModal(
   props: RobotOutOfStorageModalProps
-): React.ReactNode {
+): ReactNode {
   const { onConfirm, onClose } = props
   const { t } = useTranslation('device_details')
   return (

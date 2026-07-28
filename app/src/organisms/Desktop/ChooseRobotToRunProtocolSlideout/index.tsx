@@ -198,6 +198,22 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       })
   }
 
+  const handleProceedToRTP = (): void => {
+    if (isRobotOutOfStorage) {
+      setShowRobotOutOfStorageModal(true)
+      return
+    }
+    setCurrentPage(2)
+  }
+
+  const handleClickManageFiles = (): void => {
+    if (selectedRobot != null) {
+      navigate(`/devices/${selectedRobot.name}/robot-settings/file-manager`)
+      return
+    }
+    setShowRobotOutOfStorageModal(false)
+  }
+
   const isSelectedRobotOnDifferentSoftwareVersion =
     useIsRobotOnWrongVersionOfSoftware(selectedRobot?.name ?? '')
 
@@ -263,13 +279,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
           <>
             {offsetsComponent}
             <PrimaryButton
-              onClick={() => {
-                if (isRobotOutOfStorage) {
-                  setShowRobotOutOfStorageModal(true)
-                  return
-                }
-                setCurrentPage(2)
-              }}
+              onClick={handleProceedToRTP}
               width="100%"
               disabled={
                 isCreatingRun ||
@@ -344,15 +354,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       {showRobotOutOfStorageModal
         ? createPortal(
             <RobotOutOfStorageModal
-              onConfirm={() => {
-                if (selectedRobot != null) {
-                  navigate(
-                    `/devices/${selectedRobot?.name}/robot-settings/file-manager`
-                  )
-                  return
-                }
-                setShowRobotOutOfStorageModal(false)
-              }}
+              onConfirm={handleClickManageFiles}
               onClose={() => {
                 setShowRobotOutOfStorageModal(false)
               }}

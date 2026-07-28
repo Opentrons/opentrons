@@ -125,7 +125,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
             }
           />
         ) : null}
-        <StyledText as="pSemiBold" whiteSpace={NO_WRAP}>
+        <StyledText desktopStyle="bodyDefaultSemiBold" whiteSpace={NO_WRAP}>
           {buttonText}
         </StyledText>
       </PrimaryButton>
