@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   useAccessControlEnabledQuery,
+  useGetRobotServerAccessControlSettingsQuery,
   useModulesQuery,
 } from '@opentrons/react-api-client'
 
@@ -98,6 +99,10 @@ describe('ProtocolRunHeader', () => {
     } as any)
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
       data: { data: { accessControlEnabled: false } },
+      isLoading: false,
+    } as any)
+    vi.mocked(useGetRobotServerAccessControlSettingsQuery).mockReturnValue({
+      data: { data: { requireSignoffForProtocolLog: false } },
       isLoading: false,
     } as any)
     vi.mocked(useIsRunCurrent).mockReturnValue(true)

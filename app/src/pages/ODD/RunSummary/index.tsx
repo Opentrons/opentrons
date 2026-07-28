@@ -36,6 +36,7 @@ import {
 import {
   useAccessControlEnabledQuery,
   useErrorRecoverySettings,
+  useGetRobotServerAccessControlSettingsQuery,
   useProtocolQuery,
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
@@ -191,19 +192,30 @@ export function RunSummary(): JSX.Element {
     (runRecord?.data.errors != null && runRecord?.data.errors.length > 0)
   )
 
-  const accessControlQuery = useAccessControlEnabledQuery()
+  const {
+    data: accessControlEnabled,
+    isLoading: isAccessControlEnabledLoading,
+  } = useAccessControlEnabledQuery()
+  const {
+    data: accessControlSettings,
+    isLoading: isAccessControlSettingsLoading,
+  } = useGetRobotServerAccessControlSettingsQuery()
+  const isSigningSettingsLoading =
+    isAccessControlEnabledLoading || isAccessControlSettingsLoading
   const isSigningRequired =
-    accessControlQuery.data?.data.accessControlEnabled ?? false
+    (accessControlEnabled?.data.accessControlEnabled ?? false) &&
+    (accessControlSettings?.data.requireSignoffForProtocolLog ?? false)
   // TODO(jj, 2026-07-27): Remove hasLocallySigned once the sign endpoint sets
   // run.signedBy and SignRun dismisses from that server state.
   const [hasLocallySigned, setHasLocallySigned] = useState(false)
   useEffect(() => {
     setHasLocallySigned(false)
   }, [runId])
-  const isSigned =
-    !isSigningRequired ||
+  const hasSignedBy =
     (runRecord?.data.signedBy != null && runRecord.data.signedBy !== '') ||
     hasLocallySigned
+  const shouldPromptSignRun =
+    !isSigningSettingsLoading && isSigningRequired && !hasSignedBy
 
   let headerText: string | null = null
   if (runStatus === RUN_STATUS_SUCCEEDED) {
@@ -389,7 +401,7 @@ export function RunSummary(): JSX.Element {
     </Flex>
   )
 
-  if (!isSigned && !showSplash) {
+  if (shouldPromptSignRun && !showSplash) {
     return (
       <SignRun
         runId={runId}

@@ -12,6 +12,7 @@ import {
 } from '@opentrons/components'
 import {
   useAccessControlEnabledQuery,
+  useGetRobotServerAccessControlSettingsQuery,
   useModulesQuery,
 } from '@opentrons/react-api-client'
 
@@ -81,10 +82,19 @@ export function ProtocolRunHeader(
   const documentationState = useDocumentationState()
   const { closeCurrentRun, isClosingCurrentRun } =
     useCloseCurrentRun(documentationState)
-  const { data: accessControlSettings, isLoading: isAccessControlLoading } =
-    useAccessControlEnabledQuery()
+  const {
+    data: accessControlEnabled,
+    isLoading: isAccessControlEnabledLoading,
+  } = useAccessControlEnabledQuery()
+  const {
+    data: accessControlSettings,
+    isLoading: isAccessControlSettingsLoading,
+  } = useGetRobotServerAccessControlSettingsQuery()
+  const isSigningSettingsLoading =
+    isAccessControlEnabledLoading || isAccessControlSettingsLoading
   const isSigningRequired =
-    accessControlSettings?.data.accessControlEnabled ?? false
+    (accessControlEnabled?.data.accessControlEnabled ?? false) &&
+    (accessControlSettings?.data.requireSignoffForProtocolLog ?? false)
   // TODO(jj, 2026-07-27): Remove hasLocallySigned once the sign endpoint sets
   // run.signedBy and the modal dismisses from that server state.
   const [hasLocallySigned, setHasLocallySigned] = useState(false)
@@ -100,15 +110,15 @@ export function ProtocolRunHeader(
   // cleared after a successful sign.
   const [isSignRunPending, setIsSignRunPending] = useState(false)
 
-  // Keep the run current until the user signs when access control requires it.
+  // Keep the run current until the user signs when signoff is required.
   const closeCurrentRunIfSigned = useCallback(() => {
-    if (isAccessControlLoading || !isSigned) {
+    if (isSigningSettingsLoading || !isSigned) {
       setIsSignRunPending(true)
       return
     }
     setIsSignRunPending(false)
     closeCurrentRun()
-  }, [closeCurrentRun, isAccessControlLoading, isSigned])
+  }, [closeCurrentRun, isSigningSettingsLoading, isSigned])
 
   // Canceled runs often have no terminal banner close button, so arm SignRun
   // when the run itself becomes terminal — not only on an explicit close click.
@@ -117,7 +127,7 @@ export function ProtocolRunHeader(
       isTerminatingOrTerminal(runStatus) &&
       isRunCurrent &&
       !hasSignedBy &&
-      (isAccessControlLoading || isSigningRequired)
+      (isSigningSettingsLoading || isSigningRequired)
     ) {
       setIsSignRunPending(true)
     }
@@ -125,15 +135,15 @@ export function ProtocolRunHeader(
     runStatus,
     isRunCurrent,
     hasSignedBy,
-    isAccessControlLoading,
+    isSigningSettingsLoading,
     isSigningRequired,
   ])
 
   useEffect(() => {
-    if (!isSignRunPending || isAccessControlLoading) {
+    if (!isSignRunPending || isSigningSettingsLoading) {
       return
     }
-    // Access control off after load — clear pending; tip auto-close dismisses.
+    // Signoff not required after load — clear pending; tip auto-close dismisses.
     if (!isSigningRequired) {
       setIsSignRunPending(false)
       return
@@ -145,7 +155,7 @@ export function ProtocolRunHeader(
   }, [
     isSigned,
     isSignRunPending,
-    isAccessControlLoading,
+    isSigningSettingsLoading,
     isSigningRequired,
     closeCurrentRun,
   ])
@@ -168,7 +178,7 @@ export function ProtocolRunHeader(
   // Wait for tip status so SignRun does not flash ahead of drop-tip CTAs.
   const showSignRunModal =
     isSignRunPending &&
-    !isAccessControlLoading &&
+    !isSigningSettingsLoading &&
     isSigningRequired &&
     !hasSignedBy &&
     dropTipUtils.isPostRunTipStatusSettled &&
