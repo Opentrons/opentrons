@@ -882,6 +882,25 @@ class StatusBarUpdateEvent:
     state: StatusBarState
     enabled: bool
 
+    @staticmethod
+    def to_pyro_dict(obj: "StatusBarUpdateEvent") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "state": obj.state.value,
+            "enabled": obj.enabled
+        }
+
+    @staticmethod
+    def from_pyro_dict(
+        classname: Any, data: Dict[str, Any]
+    ) -> "StatusBarUpdateEvent":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return StatusBarUpdateEvent(
+            state=StatusBarState(data["state"]),
+            enabled=data["enabled"]
+        )
+
 
 StatusBarUpdateListener = Callable[[StatusBarUpdateEvent], None]
 StatusBarUpdateUnsubscriber = Callable[[], None]
@@ -981,7 +1000,7 @@ class HardwareFeatureFlags:
             stall_detection_enabled=feature_flags.stall_detection_enabled(),
             overpressure_detection_enabled=feature_flags.overpressure_detection_enabled(),
         )
-    
+
     @staticmethod
     def to_pyro_dict(obj: "HardwareFeatureFlags") -> Dict[str, Any]:
         """Consumed by Serpent, convert type to a Pyro Dictionary."""
@@ -1076,6 +1095,25 @@ class PipetteSensorData:
     @property
     def to_int(self) -> int:
         return self._as_int
+
+    @staticmethod
+    def to_pyro_dict(obj: "PipetteSensorData") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "sensor_type": obj.sensor_type.value,
+            "_as_int": obj._as_int,
+            "_as_float": obj._as_float,
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "PipetteSensorData":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return PipetteSensorData(
+            sensor_type=PipetteSensorType(data["sensor_type"]),
+            _as_int=data["_as_int"],
+            _as_float=data["_as_float"],
+        )
 
 
 PipetteSensorResponseQueue = Queue[Dict[PipetteSensorId, List[PipetteSensorData]]]

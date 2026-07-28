@@ -151,12 +151,14 @@ def register_enumerated_errors() -> None:
         class_to_dict=enumerated_error_class_to_dict,
     )
 
+
 def _is_namedtuple_instance(cls: Any) -> bool:
     """Validate if an object is a NamedTuple instance."""
     try:
-        return issubclass(cls, tuple) and hasattr(cls, '_fields')
+        return issubclass(cls, tuple) and hasattr(cls, "_fields")
     except TypeError:
         return False
+
 
 class OpentronsPyroSerializer:
     """A pyro serializer for custom Opentrons classes."""

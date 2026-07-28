@@ -28,8 +28,8 @@ import opentrons.hardware_control.types
 import opentrons.types
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
-    find_opentrons_classes_in_packages,
     find_enums_in_packages,
+    find_opentrons_classes_in_packages,
     find_pydantic_classes_in_packages,
     find_typed_dict_classes_in_packages,
     register_enumerated_errors,
@@ -79,9 +79,11 @@ HARDWARE_CLASS_PACKAGES = [
     opentrons.types,
     opentrons.hardware_control.ot3_calibration,
     opentrons.hardware_control.instruments.ot3.instrument_calibration,
+    opentrons.drivers.flex_stacker.types,
 ]
 
 # Type Dict registration handlers
+
 
 def _pipetted_dict_dict_to_class(  # type: ignore
     classname, d
@@ -244,7 +246,9 @@ def register_hardware_types() -> None:
         for enum_type in opentrons_types:
             OpentronsPyroSerializer.register_enum(enum_type)
 
-    opentrons_pydantic_types = find_pydantic_classes_in_packages(HARDWARE_PYDANTIC_PACKAGES)
+    opentrons_pydantic_types = find_pydantic_classes_in_packages(
+        HARDWARE_PYDANTIC_PACKAGES
+    )
     for pydantic_type in opentrons_pydantic_types:
         OpentronsPyroSerializer.register_pydantic_model(pydantic_type)
 
