@@ -1,3 +1,7 @@
+.form_fields > .field_group {
+  flex: unset;
+}
+
 .fields_row {
   display: flex;
   align-items: flex-start;

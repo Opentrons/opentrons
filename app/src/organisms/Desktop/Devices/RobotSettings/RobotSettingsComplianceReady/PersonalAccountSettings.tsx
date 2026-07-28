@@ -72,14 +72,13 @@ export function PersonalAccountSettings({
     clearFieldErrors()
     setIsEditing(false)
   }
-
+  // TODO: refresh fields when user is logged out
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <StyledText desktopStyle="bodyLargeSemiBold">
           {t('desktop_personal_account_settings')}
         </StyledText>
-        // TODO: refresh fields when user is logged out
         {loggedInUsername != null &&
           (isEditing ? (
             <BasicButton type="button" underLine onClick={handleCancelEdit}>

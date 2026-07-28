@@ -1,11 +1,13 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { StyledText } from '@opentrons/components'
+import { EmptySelectorButton, StyledText } from '@opentrons/components'
 import { useUsersQuery } from '@opentrons/react-api-client'
 
 import { useUsernameForRobot } from '/app/redux/robot-auth'
 
 import { Accordion } from './Accordion'
+import { AddUserModal } from './AddUserModal'
 import styles from './usermanagement.module.css'
 
 import type { JSX } from 'react'
@@ -106,10 +108,29 @@ export function UserManagement({
   const username = useUsernameForRobot(robotName)
   const usersQuery = useUsersQuery({ enabled: username != null })
   const users = usersQuery.data?.data ?? []
+  const [showAddUserModal, setShowAddUserModal] = useState(false)
 
   return (
     <Accordion id="user-management" title={t('desktop_user_management')}>
       <UserManagementTable users={users} />
+      <div className={styles.add_user_button}>
+        <EmptySelectorButton
+          iconName="plus"
+          onClick={() => {
+            setShowAddUserModal(true)
+          }}
+          text={t('desktop_add_user')}
+          textAlignment="left"
+        />
+      </div>
+      {showAddUserModal ? (
+        <AddUserModal
+          robotName={robotName}
+          onClose={() => {
+            setShowAddUserModal(false)
+          }}
+        />
+      ) : null}
     </Accordion>
   )
 }

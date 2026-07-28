@@ -19,3 +19,7 @@
 .body_cell_text {
   color: var(--grey-60);
 }
+
+.add_user_button {
+  width: 108px;
+}

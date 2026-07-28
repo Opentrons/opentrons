@@ -14,6 +14,17 @@ import type { RenderResult } from '@testing-library/react'
 import type { AuthUsersResponse } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 
+vi.mock('../AddUserModal', () => ({
+  AddUserModal: ({ onClose }: { onClose: () => void }) => (
+    <div>
+      <span>mock AddUserModal</span>
+      <button type="button" onClick={onClose}>
+        Close mock modal
+      </button>
+    </div>
+  ),
+}))
+
 const ROBOT_NAME = 'flex-1'
 
 const MOCK_AUTH_STATE = {
@@ -111,5 +122,12 @@ describe('UserManagement', () => {
     expect(useUsersQuery).toHaveBeenCalledWith({ enabled: false })
     expandAccordion()
     expect(screen.queryByText('alice')).not.toBeInTheDocument()
+  })
+
+  it('opens the add user modal when Add User is clicked', () => {
+    render()
+    expandAccordion()
+    fireEvent.click(screen.getByRole('button', { name: 'Add User' }))
+    screen.getByText('mock AddUserModal')
   })
 })

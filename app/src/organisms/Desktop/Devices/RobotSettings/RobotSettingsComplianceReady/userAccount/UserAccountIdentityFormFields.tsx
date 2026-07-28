@@ -14,67 +14,86 @@ export interface UserAccountIdentityFormFieldsProps<T extends FieldValues> {
   fieldErrors?: Partial<
     Pick<AuthUserFieldErrors, 'usernameError' | 'fullNameError'>
   >
+  stacked?: boolean
 }
 
 export function UserAccountIdentityFormFields<T extends FieldValues>({
   control,
   fieldErrors = {},
+  stacked = false,
 }: UserAccountIdentityFormFieldsProps<T>): JSX.Element {
   const { t } = useTranslation('device_settings')
   const { usernameError = null, fullNameError = null } = fieldErrors
 
+  const usernameField = (
+    <div className={styles.field_group}>
+      <StyledText desktopStyle="bodyDefaultRegular">
+        {t('desktop_username')}
+      </StyledText>
+      <div className={styles.field_group_value}>
+        <Controller
+          control={control}
+          name={'username' as Path<T>}
+          rules={{
+            validate: value =>
+              (value as string).trim() !== '' ||
+              (t(
+                'desktop_personal_account_settings_username_required_error'
+              ) as string),
+          }}
+          render={({ field, fieldState }) => (
+            <InputField
+              value={field.value}
+              error={fieldState.error?.message ?? usernameError}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+            />
+          )}
+        />
+      </div>
+    </div>
+  )
+
+  const fullNameField = (
+    <div className={styles.field_group}>
+      <StyledText desktopStyle="bodyDefaultRegular">
+        {t('desktop_legal_name')}
+      </StyledText>
+      <div className={styles.field_group_value}>
+        <Controller
+          control={control}
+          name={'fullName' as Path<T>}
+          rules={{
+            validate: value =>
+              (value as string).trim() !== '' ||
+              (t('desktop_add_user_legal_name_required_error') as string),
+          }}
+          render={({ field, fieldState }) => (
+            <InputField
+              value={field.value}
+              error={fieldState.error?.message ?? fullNameError}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+            />
+          )}
+        />
+      </div>
+    </div>
+  )
+
+  if (stacked) {
+    return (
+      <>
+        {usernameField}
+        {fullNameField}
+      </>
+    )
+  }
+
   return (
     <div className={styles.fields_row}>
-      <div className={styles.field_group}>
-        <StyledText desktopStyle="bodyDefaultRegular">
-          {t('desktop_username')}
-        </StyledText>
-        <div className={styles.field_group_value}>
-          <Controller
-            control={control}
-            name={'username' as Path<T>}
-            rules={{
-              validate: value =>
-                (value as string).trim() !== '' ||
-                (t(
-                  'desktop_personal_account_settings_username_required_error'
-                ) as string),
-            }}
-            render={({ field, fieldState }) => (
-              <InputField
-                value={field.value}
-                error={fieldState.error?.message ?? usernameError}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-              />
-            )}
-          />
-        </div>
-      </div>
-      <div className={styles.field_group}>
-        <StyledText desktopStyle="bodyDefaultRegular">
-          {t('desktop_legal_name')}
-        </StyledText>
-        <div className={styles.field_group_value}>
-          <Controller
-            control={control}
-            name={'fullName' as Path<T>}
-            rules={{
-              validate: value =>
-                (value as string).trim() !== '' ||
-                (t('desktop_add_user_legal_name_required_error') as string),
-            }}
-            render={({ field, fieldState }) => (
-              <InputField
-                value={field.value}
-                error={fieldState.error?.message ?? fullNameError}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-              />
-            )}
-          />
-        </div>
-      </div>
+      {usernameField}
+      {fullNameField}
     </div>
   )
 }
