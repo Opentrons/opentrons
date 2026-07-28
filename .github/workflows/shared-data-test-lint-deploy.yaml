@@ -67,6 +67,7 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
+          # The `make dist-py` call below consults Git history for the version number.
           fetch-depth: 0
       - name: 'install udev for usb-detection'
         if: startsWith(matrix.os, 'ubuntu')
@@ -137,6 +138,7 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
+          # The `make dist-py` call below consults Git history for the version number.
           fetch-depth: 0
       # https://github.com/actions/checkout/issues/290
       - name: 'Fix actions/checkout odd handling of tags'
