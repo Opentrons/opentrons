@@ -18,6 +18,7 @@ from opentrons.protocol_engine import (
     errors as pe_errors,
 )
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -98,16 +99,14 @@ async def get_current_run_from_url(
     commands_router.post,
     path="/maintenance_runs/{runId}/commands",
     summary="Enqueue a command",
-    description=textwrap.dedent(
-        """
+    description=textwrap.dedent("""
         Add a single command to the maintenance run.
 
         These commands will execute immediately and in the order they are
         enqueued. The execution of these commands cannot be paused,
         but a maintenance run can be deleted at any point, as long as there
         are no commands running.
-        """
-    ),
+        """),
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[pe_commands.Command]},
@@ -119,7 +118,10 @@ async def get_current_run_from_url(
             ]
         },
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
+        Depends(get_audit_logger("execute command in maintenance run")),
+    ],
 )
 async def create_run_command(
     request_body: RequestModel[pe_commands.CommandCreate],
