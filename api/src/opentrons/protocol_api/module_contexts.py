@@ -1880,21 +1880,23 @@ class VacuumModuleContext(ModuleContext):
     @property
     @requires_version(2, 30)
     def max_gauge_pressure_mbar(self) -> int:
-        """The deepest vacuum pressure supported by the module, currently -800 mbar.
+        """The maximum (deepest) vacuum pressure supported by the module (-800 mbar).
 
         Values are gauge pressure in mbar relative to atmospheric pressure (0 mbar).
         Lower (more negative) values represent deeper vacuum. Pass this value to
-        [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure] to set the target vacuum pressure.
+        [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure] to set the maximum supported target vacuum pressure.
         """
         return self._core.get_max_gauge_pressure_mbar()
 
     @property
     @requires_version(2, 30)
     def min_gauge_pressure_mbar(self) -> int:
-        """The minimum vacuum pressure supported by the module, currently 0 mbar.
+        """The minimum vacuum pressure supported by the module (0 mbar, or atmospheric pressure).
 
-        Values are gauge pressure in mbar relative to atmospheric pressure (0 mbar).
-        Lower (more negative) values represent deeper vacuum.
+        Values are gauge pressure in mbar relative to atmospheric pressure.
+        Lower (more negative) values represent deeper vacuum. Pass this value to
+        [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure]
+        to set the minimum supported target vacuum pressure.
         """
         return self._core.get_min_gauge_pressure_mbar()
 
@@ -1933,10 +1935,8 @@ class VacuumModuleContext(ModuleContext):
 
         Args:
             name: The load name of the adapter labware definition.
-            namespace: The namespace of the labware definition. If omitted, the default
-                Opentrons namespace is used.
-            version: The version of the labware definition. If omitted, the latest
-                compatible version is used.
+            namespace: An optional namespace for the labware definition. If omitted, the default Opentrons namespace is used.
+            version: An optional version of the labware definition. If omitted, the latest compatible version is used.
 
         Returns:
             The initialized and loaded adapter object.
@@ -1982,12 +1982,12 @@ class VacuumModuleContext(ModuleContext):
 
         Args:
             labware: The labware to move.
-            use_gripper: Whether to use the Flex Gripper. If ``False``, the protocol
+            use_gripper: Whether to use the Flex Gripper. If `False`, the protocol
                 pauses for a manual move.
-            pick_up_offset: Optional offset applied when picking up the labware.
-                Keys are axis names (``"x"``, ``"y"``, ``"z"``) in mm.
-            drop_offset: Optional offset applied when dropping the labware.
-                Keys are axis names (``"x"``, ``"y"``, ``"z"``) in mm.
+            pick_up_offset: An optional offset applied when picking up the labware.
+                Keys are axis names (`"x"`, `"y"`, `"z"`) in mm.
+            drop_offset: An optional offset applied when dropping the labware.
+                Keys are axis names (`"x"`, `"y"`, `"z"`) in mm.
         """
         _pick_up_offset = (
             validation.ensure_valid_labware_offset_vector(pick_up_offset)
@@ -2031,18 +2031,11 @@ class VacuumModuleContext(ModuleContext):
 
         Args:
             gauge_pressure_mbar: Target gauge pressure in mbar, from `0` to `-800` inclusive (defined by [`min_gauge_pressure_mbar`][opentrons.protocol_api.VacuumModuleContext.min_gauge_pressure_mbar] and [`max_gauge_pressure_mbar`][opentrons.protocol_api.VacuumModuleContext.max_gauge_pressure_mbar]). A value of `0` is atmospheric pressure; lower (more negative) values represent deeper vacuum.
-            duration_s: The time, in seconds, to hold the target pressure after reaching it.
-                If omitted, the module holds the target pressure until stopped.
-            ramp_rate: Rate of pressure change in mbar/s while approaching
-                the target pressure.
-            timeout_s: The maximum time, in seconds, allowed to reach the target before
-                a timeout error is raised.
-            vent_after: Whether to open the vent after the hold duration completes.
-                Only applies when ``duration_s`` is set.
-            equalize_timeout_s: The maximum time, in seconds, to wait for system pressure to
-                return near atmospheric after venting. Only applies when
-                ``duration_s`` is set and ``vent_after`` is ``True``. If omitted,
-                the command does not wait for equalization.
+            duration_s: An optional argument that sets the time, in seconds, to hold the target pressure after reaching it. If omitted, the module holds the target pressure until stopped.
+            ramp_rate: An optional argument that sets the rate of pressure change in mbar/s while approaching the target pressure.
+            timeout_s: An optional argument that sets the maximum time, in seconds, allowed to reach the target before a timeout error is raised.
+            vent_after: An optional argument that specifies whether to open the vent after the hold duration completes. Only applies when `duration_s` is set.
+            equalize_timeout_s: An optional argument that sets the maximum time, in seconds, to wait for system pressure to return near atmospheric after venting. Only applies when `duration_s` is set and `vent_after` is `True`. If omitted, the command does not wait for equalization.
 
         Returns:
             A task representing the concurrent vacuum operation.
@@ -2083,14 +2076,14 @@ class VacuumModuleContext(ModuleContext):
 
         Args:
             percent_power: Pump duty cycle as a percentage, from `1` to `100` inclusive.
-            duration_s: Time, in seconds, to hold the target power after reaching it.
+            duration_s: (Optional) Time, in seconds, to hold the target power after reaching it.
                 If omitted, the module holds the target until stopped.
-            ramp_rate: Rate of power change while approaching the target.
-            timeout_s: The maximum time, in seconds, allowed to reach the target power
+            ramp_rate: (Optional) Rate of power change while approaching the target.
+            timeout_s: (Optional) The maximum time, in seconds, allowed to reach the target power
                 before a timeout error is raised.
-            vent_after: Whether to open the vent after the hold duration completes.
+            vent_after: (Optional) Whether to open the vent after the hold duration completes.
                 Only applies when `duration_s` is set.
-            equalize_timeout_s: The maximum time, in seconds, to wait for chamber pressure to
+            equalize_timeout_s: (Optional)The maximum time, in seconds, to wait for chamber pressure to
                 return near atmospheric after venting. Only applies when
                 `duration_s` is set and `vent_after` is `True`. If omitted,
                 the command does not wait for equalization.
@@ -2156,9 +2149,9 @@ class VacuumModuleContext(ModuleContext):
                 * `ramp_rate` (float, optional): rate to increase the motor power at (get unit for this).
                 * `timeout_seconds` (int, optional): the time to wait for target pressure/power before throwing an error.
                 * `vent_after` (bool, optional): whether to open the vent after the step is complete.
-            repetitions: How many times to perform the entire profile.
-            vent_after: whether to open the vent after the profile is complete.
-            equalize_timeout_s: the time to wait for the module to equalize pressure after venting before throwing an error.
+            repetitions: (Optional) How many times to perform the entire profile.
+            vent_after: (Optional) Whether to open the vent after the profile is complete.
+            equalize_timeout_s: (Optional) The time, in seconds, to wait for the module to equalize pressure after venting before throwing an error.
 
         Returns:
             A task representing the concurrent vacuum profile execution.
@@ -2180,19 +2173,17 @@ class VacuumModuleContext(ModuleContext):
     @requires_version(2, 30)
     @publish(command=cmds.vacuum_module_open_vent)
     def open_vent(self, equalize_timeout_s: Optional[int] = None) -> None:
-        """Open the vent to atmosphere.
+        """Open the vent valve to bring the system to atmospheric pressure.
+
+        Opens the vent valve to release vacuum inside the manifold and return system pressure to atmospheric. The module will not hold vacuum while the vent is open.
 
         Args:
-            equalize_timeout_s: Optional seconds to wait for chamber gauge
-                pressure to return near atmospheric after the vent opens. If
-                omitted, the command opens the vent and returns without waiting
-                for equalization. Waiting is recommended before moving labware
-                to or from the module.
+            equalize_timeout_s: (Optional) The maximum time, in seconds, to wait for the system to return to atmospheric pressure after opening the vent. If omitted, the command opens the vent and returns without waiting for equalization. Waiting is recommended before moving labware to or from the module.
         """
         self._core.open_vent(equalize_timeout_s=equalize_timeout_s)
 
     @requires_version(2, 30)
     @publish(command=cmds.vacuum_module_close_vent)
     def close_vent(self) -> None:
-        """Close the vent so the chamber can hold vacuum."""
+        """Close the vent so the system can hold vacuum."""
         self._core.close_vent()
