@@ -12,6 +12,7 @@ import { TipDisposalSlot } from '../SlotSpotlight/TipDisposalSlot'
 import { TipPickupSlot } from '../SlotSpotlight/TipPickupSlot'
 import styles from './slotdetails.module.css'
 
+import type { ReactNode } from 'react'
 import type {
   Liquid,
   LoadLabwareRunTimeCommand,
@@ -32,7 +33,7 @@ interface SlotDetailsProps {
   liquids: Liquid[]
   headerPortalEl?: HTMLElement | null
 }
-export function SlotDetails(props: SlotDetailsProps): JSX.Element {
+export function SlotDetails(props: SlotDetailsProps): ReactNode {
   const {
     slotId,
     robotState,
@@ -110,7 +111,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
     return 'labware'
   }
 
-  const renderLabwareContent = (): JSX.Element | null => {
+  const renderLabwareContent = (): ReactNode | null => {
     const labwareType = getLabwareType()
     if (topMostLabwareOnSlot == null) {
       return null

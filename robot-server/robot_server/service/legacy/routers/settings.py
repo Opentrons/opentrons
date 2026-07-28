@@ -37,6 +37,7 @@ from opentrons_shared_data.pipette import (
     types as pip_types,
 )
 from opentrons_shared_data.robot.types import RobotTypeEnum
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.app_state import (
@@ -140,7 +141,10 @@ async def _hardware_subprocess_transition(enable: bool, app_state: AppState) -> 
         status.HTTP_400_BAD_REQUEST: {"model": LegacyErrorResponse},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": LegacyErrorResponse},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("change feature flag")),
+    ],
 )
 async def post_settings(
     update: AdvancedSettingRequest,
@@ -236,7 +240,10 @@ def _create_settings_response(robot_type: RobotTypeEnum) -> AdvancedSettingsResp
     responses={
         status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": LegacyErrorResponse},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("change log level")),
+    ],
 )
 async def post_log_level_local(
     log_level: LogLevel, hardware: Annotated[HardwareControlAPI, Depends(get_hardware)]
@@ -270,7 +277,10 @@ async def post_log_level_local(
     ),
     response_model=LegacyErrorResponse,
     deprecated=True,
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("change legacy log upstreaming")),
+    ],
 )
 async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
     raise LegacyErrorResponse(
@@ -312,7 +322,10 @@ async def get_settings_reset_options(
         status.HTTP_403_FORBIDDEN: {"model": LegacyErrorResponse},
         status.HTTP_503_SERVICE_UNAVAILABLE: {"model": LegacyErrorResponse},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("reset settings")),
+    ],
 )
 async def post_settings_reset_options(
     factory_reset_commands: Dict[reset_util.ResetOptionId, bool],
@@ -456,7 +469,10 @@ async def get_pipette_setting(
     responses={
         status.HTTP_412_PRECONDITION_FAILED: {"model": LegacyErrorResponse},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("change OT-2 pipette settings")),
+    ],
 )
 async def patch_pipette_setting(
     pipette_id: str,
