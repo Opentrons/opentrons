@@ -1,6 +1,6 @@
 """The server's ASGI app object."""
 
-from contextlib import asynccontextmanager
+from contextlib import AsyncExitStack, asynccontextmanager
 from pathlib import Path
 from typing import AsyncGenerator, Optional
 
@@ -9,6 +9,11 @@ from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse
 
 from server_utils import systemd_utils
+from server_utils.audit.fastapi import (
+    audit_logger_middleware,
+    build_audit_client,
+    install_audit_client,
+)
 from server_utils.auth.resource_server.fastapi import (
     AuthorizationError,
     handle_authorization_error,
@@ -59,7 +64,8 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     active_subdirectory = await prepare_active_subdirectory(prepared_root)
     db_path = active_subdirectory / DB_FILE
 
-    with sql_engine_ctx(db_path) as engine:
+    async with AsyncExitStack() as exit_stack:
+        engine = exit_stack.enter_context(sql_engine_ctx(db_path))
         set_sql_engine(app.state, engine)
 
         user_store = UserStore(sql_engine=engine)
@@ -75,7 +81,13 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             settings_store, oauth2_backend
         )
         install_authentication_checker(app.state, authentication_checker)
-
+        audit_client = await exit_stack.enter_async_context(
+            build_audit_client(
+                audit_server_uds=settings.audit_server_uds,
+                audit_server_url=settings.audit_server_url,
+            )
+        )
+        install_audit_client(app.state, audit_client)
         systemd_utils.notify_up()
         yield
 
@@ -102,6 +114,7 @@ app = FastAPI(
     openapi_tags=_TAGS,
 )
 
+app.middleware("http")(audit_logger_middleware)
 
 app.exception_handler(APIError)(handle_api_error)
 app.exception_handler(AuthorizationError)(handle_authorization_error)
