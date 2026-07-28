@@ -6,6 +6,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  Icon,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
   ModalHeader,
@@ -161,6 +162,7 @@ export function ProtocolDropTipModal({
           />
         </StyledText>
         <Flex gridGap={SPACING.spacing24} justifyContent={JUSTIFY_END}>
+          {isDisabled ? <Icon name="ot-spinner" spin /> : null}
           <TextOnlyButton
             onClick={onSkip}
             buttonText={t('skip_and_home_pipette')}

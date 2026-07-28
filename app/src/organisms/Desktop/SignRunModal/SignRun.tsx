@@ -81,11 +81,13 @@ export function SignRunModal({
 
   const trimmedName = name.trim()
 
+  // Focus only once login is settled — not while Login is layered above and
+  // would lose keystrokes to this input.
   useEffect(() => {
-    if (!isLoading && inputRef.current != null) {
+    if (!isLoading && loginGate === 'done' && inputRef.current != null) {
       inputRef.current.focus()
     }
-  }, [isLoading])
+  }, [isLoading, loginGate])
 
   const handleNameChange = (value: string): void => {
     setName(value)
@@ -234,7 +236,6 @@ export function SignRunModal({
                   ref={inputRef}
                   className={styles.signature_input}
                   type="text"
-                  autoFocus
                   value={name}
                   placeholder={t('tap_to_sign')}
                   aria-label={t('legal_name')}

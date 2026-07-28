@@ -70,7 +70,7 @@ export function DocumentationRequired({
       title={t('documentation_required')}
       onClose={onClose}
       closeOnOutsideClick={false}
-      zIndexOverlay={1000}
+      zIndexOverlay={10000}
       width="47rem"
       height="30rem"
       overflowY="hidden"
