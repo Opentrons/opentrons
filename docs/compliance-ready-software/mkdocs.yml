@@ -53,4 +53,3 @@ nav:
   - Using Compliance Ready Software: using.md #includes logging in, setting up and running a protocol, etc.
   - Log Files: 
       - Log types: files.md
-      - Viewing logs: viewer.md # includes exporting and viewing logs (in the dedicated viewer or without)

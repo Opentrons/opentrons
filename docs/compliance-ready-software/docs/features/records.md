@@ -18,7 +18,7 @@ On the Flex's touchscreen, click [insert here] to view all protocols loaded on t
 
 **image ** 
 
-Run history includes complted, canceled, or failed protocol runs, and a date for each. 
+Run history includes completed, canceled, or failed protocol runs, and a date for each. 
 
 Read more about [log files] in this manual, including downloading, exporting, and viewing logs from the Flex. 
 
