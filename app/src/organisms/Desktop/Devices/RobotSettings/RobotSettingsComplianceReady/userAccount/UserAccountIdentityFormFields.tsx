@@ -1,0 +1,68 @@
+import { Controller } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+
+import { InputField, StyledText } from '@opentrons/components'
+
+import styles from './userAccountForm.module.css'
+
+import type { JSX } from 'react'
+import type { Control, FieldValues, Path } from 'react-hook-form'
+import type { AuthUserFieldErrors } from './useAuthUserMutationErrors'
+
+export interface UserAccountIdentityFormFieldsProps<T extends FieldValues> {
+  control: Control<T>
+  fieldErrors?: Partial<
+    Pick<AuthUserFieldErrors, 'usernameError' | 'fullNameError'>
+  >
+}
+
+export function UserAccountIdentityFormFields<T extends FieldValues>({
+  control,
+  fieldErrors = {},
+}: UserAccountIdentityFormFieldsProps<T>): JSX.Element {
+  const { t } = useTranslation('device_settings')
+  const { usernameError = null, fullNameError = null } = fieldErrors
+
+  return (
+    <div className={styles.fields_row}>
+      <div className={styles.field_group}>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('desktop_username')}
+        </StyledText>
+        <div className={styles.field_group_value}>
+          <Controller
+            control={control}
+            name={'username' as Path<T>}
+            render={({ field, fieldState }) => (
+              <InputField
+                value={field.value}
+                error={fieldState.error?.message ?? usernameError}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+              />
+            )}
+          />
+        </div>
+      </div>
+      <div className={styles.field_group}>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('desktop_legal_name')}
+        </StyledText>
+        <div className={styles.field_group_value}>
+          <Controller
+            control={control}
+            name={'fullName' as Path<T>}
+            render={({ field, fieldState }) => (
+              <InputField
+                value={field.value}
+                error={fieldState.error?.message ?? fullNameError}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+              />
+            )}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
