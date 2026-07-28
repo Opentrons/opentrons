@@ -90,7 +90,13 @@ async def _do_call(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> tuple[Response, None] | tuple[None, BaseException]:
     try:
-        return (await call_next(request)), None
+        response = await call_next(request)
+        if None is response:
+            _log.error(f"Endpoint function returned {response} but did not raise")
+            raise RuntimeError(
+                f"Endpoint function for {request.method} {request.url.path} did not response"
+            )
+        return response, None
     except BaseException as exc:
         return None, exc
 
@@ -171,16 +177,19 @@ async def audit_logger_middleware(
     await _handle_autolog(audit_logger, request, response)
 
     try:
-        _log.debug("Sending audit log")
+        _log.info("Sending audit log")
         await audit_logger.log()
     except BaseException as audit_exc:
+        _log.exception("Failure in audit logging")
         if cached_exc:
             raise BaseExceptionGroup(
                 "Failure in route and failure in audit log", [cached_exc, audit_exc]
             )
         else:
             raise
-    assert response is not None, "Unexpected lack of response in logging"
+    if cached_exc:
+        raise cached_exc
+    assert response is not None, "Unexpected lack of response in audit logging"
     return response
 
 
