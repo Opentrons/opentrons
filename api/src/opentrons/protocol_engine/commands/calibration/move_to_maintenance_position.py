@@ -35,6 +35,7 @@ def _right_mount_z_margin() -> float:
         return _RIGHT_MOUNT_Z_MARGIN_EASY_96CH
     return _RIGHT_MOUNT_Z_MARGIN
 
+
 MoveToMaintenancePositionCommandType = Literal["calibration/moveToMaintenancePosition"]
 
 
