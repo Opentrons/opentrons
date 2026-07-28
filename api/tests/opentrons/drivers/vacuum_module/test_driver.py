@@ -344,3 +344,9 @@ async def test_get_pressure_control_tunings(
     connection.reset_mock()
 
     assert pressure_state == types.PressureControlTunings(1, 0, 0, -2, 20, 43, 0.2)
+
+
+async def test_move_port(subject: VacuumModuleDriver, connection: AsyncMock) -> None:
+    """It should forward port moves to the serial connection."""
+    await subject.move_port("/dev/ot_module_vacuummodule6")
+    connection.update_port.assert_awaited_once_with("/dev/ot_module_vacuummodule6")

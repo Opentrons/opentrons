@@ -7,11 +7,14 @@ import { getLocalRobot } from '../discovery'
 import {
   getAuthStateForRobot,
   getCurrentUsernameForLocalRobot,
+  getIsAdminForRobot,
+  getLoggedInUserForRobot,
   getUsernameForRobot,
   logOut,
 } from './slice'
 
 import type { State } from '../types'
+import type { LoggedInUserProfile } from './slice'
 
 /** Return the OAuth 2 access token to make requests to the given robot, if we have one. */
 export function useAccessTokenForRobot(
@@ -34,6 +37,26 @@ export function useAccessTokenForRobot(
 export function useUsernameForRobot(robotName: string | null): string | null {
   const selector = useCallback(
     (state: State) => getUsernameForRobot(state, robotName),
+    [robotName]
+  )
+  return useSelector(selector)
+}
+
+/** Return whether the logged-in user for the given robot is an admin. */
+export function useIsAdminForRobot(robotName: string): boolean {
+  const selector = useCallback(
+    (state: State) => getIsAdminForRobot(state, robotName),
+    [robotName]
+  )
+  return useSelector(selector)
+}
+
+/** Return the logged-in user profile for the given robot, if we are logged in to it. */
+export function useLoggedInUserForRobot(
+  robotName: string
+): LoggedInUserProfile | null {
+  const selector = useCallback(
+    (state: State) => getLoggedInUserForRobot(state, robotName),
     [robotName]
   )
   return useSelector(selector)

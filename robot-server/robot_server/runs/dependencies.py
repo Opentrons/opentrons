@@ -54,7 +54,7 @@ from robot_server.service.pyro_utils.resource_utilities import (
     get_pyro_resource,
     register_run_orchestrator_store_to_pyro_resource,
 )
-from robot_server.service.task_runner import TaskRunner, get_task_runner
+from robot_server.service.task_runner import get_task_runner
 from robot_server.settings import get_settings
 
 _run_store_accessor = AppStateAccessor[RunStore]("run_store")
@@ -224,7 +224,6 @@ async def get_is_okay_to_create_maintenance_run(
 
 async def get_run_data_manager(
     app_state: Annotated[AppState, Depends(get_app_state)],
-    task_runner: Annotated[TaskRunner, Depends(get_task_runner)],
     run_orchestrator_store: Annotated[
         RunOrchestratorStore, Depends(get_run_orchestrator_store)
     ],
@@ -247,7 +246,6 @@ async def get_run_data_manager(
             run_store=run_store,
             error_recovery_setting_store=error_recovery_setting_store,
             camera_setting_store=camera_setting_store,
-            task_runner=task_runner,
             runs_publisher=runs_publisher,
             file_provider=file_provider,
         )

@@ -27,7 +27,7 @@ export interface RobotUpdateFileInfo {
 }
 
 // stage response from API
-// update-server/otupdate/buildroot/update_session.py
+// update-server/otupdate/common/session.py
 export type UpdateSessionStage =
   | 'awaiting-file'
   | 'validating'

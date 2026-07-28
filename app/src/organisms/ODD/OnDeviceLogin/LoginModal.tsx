@@ -6,6 +6,7 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { getSelfQueryKey, useHost } from '@opentrons/react-api-client'
 
 import { getLocalRobot } from '/app/redux/discovery'
+import { useUsernameForRobot } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
@@ -28,11 +29,11 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const [phase, setPhase] = useState<LoginModalPhase>('login')
   const [step, setStep] = useState<LoginStep>('username')
   const [loginError, setLoginError] = useState<string | null>(null)
-  const [loggedInUsername, setLoggedInUsername] = useState<string | null>(null)
   const storeLoginState = useStoreLoginState()
   const localRobotName = useSelector(
     (state: State) => getLocalRobot(state)?.name ?? null
   )
+  const loggedInUsername = useUsernameForRobot(localRobotName)
 
   const isChoosingNewPassword = phase === 'chooseNewPassword'
 
@@ -57,17 +58,23 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const handleLoginSuccess = useCallback(
     (username: string, user: AuthUser, response: OAuth2TokenResponse): void => {
       setLoginError(null)
-      storeLoginState(localRobotName, username, response)
+      storeLoginState(
+        localRobotName,
+        {
+          username,
+          fullName: user.fullName,
+          accountType: user.accountType,
+        },
+        response
+      )
       setSelfQueryData(user)
 
       if (user.resetPassword) {
-        setLoggedInUsername(username)
         setPhase('chooseNewPassword')
         setStep('password')
-        return
+      } else {
+        finishModal(username)
       }
-
-      finishModal(username)
     },
     [finishModal, setSelfQueryData, storeLoginState, localRobotName]
   )
@@ -78,9 +85,8 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   }, [modal])
 
   const handleNewPasswordSuccess = useCallback(
-    (username: string, response: OAuth2TokenResponse): void => {
+    (username: string) => {
       setLoginError(null)
-      storeLoginState(localRobotName, username, response)
       // Password-reset success does not include a user payload; invalidate so
       // observers refetch once the new token is on the host config.
       if (host != null) {
@@ -88,7 +94,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
       }
       finishModal(username)
     },
-    [finishModal, host, queryClient, storeLoginState, localRobotName]
+    [finishModal, host, queryClient]
   )
 
   const { submitPassword, isAuthLoading: isLoginAuthLoading } =

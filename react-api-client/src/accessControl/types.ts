@@ -163,6 +163,8 @@ type AuditLogAction =
   | 'pause_run'
   | 'disconnect_wifi'
   | 'connect_wifi'
+  | 'wifi_config'
+  | 'delete_protocol'
   | 'delete_run'
   | 'delete_run_images'
   | 'delete_runs'
@@ -176,10 +178,12 @@ type AuditLogAction =
   | 'set_lights'
   | 'apply_offsets'
   | 'update_subsystem'
+  | 'update_module'
   | 'update_settings'
   | 'create_user'
   | 'delete_log_period'
   | 'sign_run'
+  | 'delete_log_periods'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.

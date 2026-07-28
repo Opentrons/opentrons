@@ -157,7 +157,15 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
 
   const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
     onSuccess: (successfulUsername, user, response) => {
-      storeLoginState(robotName, successfulUsername, response)
+      storeLoginState(
+        robotName,
+        {
+          username: successfulUsername,
+          fullName: user.fullName,
+          accountType: user.accountType,
+        },
+        response
+      )
       setSelfQueryData(user)
 
       if (user.resetPassword) {
@@ -175,8 +183,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
 
   const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
     useSetNewPasswordAndSignIn({
-      onSuccess: (successfulUsername, response) => {
-        storeLoginState(robotName, successfulUsername, response)
+      onSuccess: successfulUsername => {
         modal.resolve({ username: successfulUsername })
         modal.remove()
       },

@@ -6,6 +6,7 @@ import { VACUUM_MODULE_TYPE } from '@opentrons/shared-data'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
+import type { AttachedModule } from '@opentrons/api-client'
 import type {
   CreateCommand,
   ModuleCreateCommand,
@@ -15,7 +16,6 @@ import type {
   VacuumModuleSetTargetPressureCreateCommand,
   VacuumModuleStopPumpCreateCommand,
 } from '@opentrons/shared-data'
-import type { AttachedModule } from '/app/redux/modules/types'
 
 interface UseVacuumModuleControlsResult {
   setVacuumPressure: (pressure: number) => void

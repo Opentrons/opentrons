@@ -7,6 +7,7 @@ from fastapi import Depends, status
 from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -72,7 +73,10 @@ async def get_estop_status(
         status.HTTP_200_OK: {"model": SimpleBody[EstopStatusModel]},
         status.HTTP_403_FORBIDDEN: {"model": ErrorBody[NotSupportedOnOT2]},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
+        Depends(get_audit_logger("clear estop")),
+    ],
 )
 async def put_acknowledge_estop_disengage(
     estop_handler: Annotated[EstopHandler, Depends(get_estop_handler)],

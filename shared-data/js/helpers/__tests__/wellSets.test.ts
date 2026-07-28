@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { get96Channel384WellPlateWells, orderWells } from '..'
-import { ALL, SINGLE } from '../../../command/types'
+import { ALL, COLUMN, ROW, SINGLE } from '../../../command/types'
+import nest_8_reservoir_22ml from '../../../labware/definitions/2/nest_8_reservoir_22ml/2.json'
 import fixture_12_trough from '../../../labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '../../../labware/fixtures/2/fixture_96_plate.json'
 import fixture_384_plate from '../../../labware/fixtures/2/fixture_384_plate.json'
@@ -22,6 +23,7 @@ const fixture96Plate = fixture_96_plate as LabwareDefinition
 const fixture384Plate = fixture_384_plate as LabwareDefinition
 const fixtureOverlappyWellplate =
   fixture_overlappy_wellplate as LabwareDefinition
+const nest8Reservoir = nest_8_reservoir_22ml as LabwareDefinition
 const EIGHT_CHANNEL = 8
 const NINETY_SIX_CHANNEL = 96
 const wellsForReservoir = [
@@ -222,6 +224,30 @@ describe('canPipetteUseLabware', () => {
     const pipette = fixtureP10MultiV2Specs
     const nozzles = SINGLE
     expect(canPipetteUseLabware(pipette, nozzles, labwareDef)).toBe(true)
+  })
+
+  it('allows 96-channel ROW on row trough reservoirs with centerMultichannelOnWells', () => {
+    const pipette96 = fixtureP100096V2Specs
+
+    // y-axis column probe fails for this def because the quirk centers tips on
+    // narrow row troughs, but X-axis row geometry succeeds.
+    expect(canPipetteUseLabware(pipette96, ALL, nest8Reservoir)).toBe(false)
+    expect(canPipetteUseLabware(pipette96, COLUMN, nest8Reservoir)).toBe(false)
+    expect(canPipetteUseLabware(pipette96, ROW, nest8Reservoir)).toBe(true)
+  })
+
+  it('allows 96-channel ROW on standard 96 plates and 12-trough reservoirs', () => {
+    const pipette96 = fixtureP100096V2Specs
+
+    expect(canPipetteUseLabware(pipette96, ROW, fixture96Plate)).toBe(true)
+    expect(canPipetteUseLabware(pipette96, ROW, fixture12Trough)).toBe(true)
+  })
+
+  it('returns false for 96-channel ROW when wells are too close together', () => {
+    const pipette96 = fixtureP100096V2Specs
+    expect(
+      canPipetteUseLabware(pipette96, ROW, fixtureOverlappyWellplate)
+    ).toBe(false)
   })
 })
 

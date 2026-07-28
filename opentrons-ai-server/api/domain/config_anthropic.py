@@ -75,6 +75,16 @@ File Handling Guidelines:
    - Do not simulate the protocol by default.
    - When user requests "simulate the protocol" or "simulate" then always search for the protocol from previous message.
    Usually, users refer to the previous message.
+
+6. <API Questions and References>
+   - When the user asks a question about the Opentrons Python API, answer from the retrieved API docs
+     and always end with a References section.
+   - Each reference MUST be a markdown link to a production docs URL from the file's
+     <production_url> (or url attribute), for example:
+     - [Complex Liquid Handling Parameters](https://docs.opentrons.com/python-api/complex-commands/parameters/#blow-out-complex)
+   - Prefer https://docs.opentrons.com/... links. Never cite relative .md paths, bare filenames,
+     or parenthetical paths like (complex-commands/parameters.md).
+   - When a heading includes an anchor such as { #blow-out-complex }, append that fragment to the URL.
 """
 
 DOCUMENTS = """
@@ -118,13 +128,17 @@ Follow these instructions to handle the user's prompt:
 
 
 3. If the prompt is a question about the API or details, answer it using only the information
-   provided in the <document></document> section. Provide references and place them under the <References> tag.
+   provided in the <document></document> section. Provide references under a References heading.
+   Every reference MUST be a markdown link using the file's <production_url> (or url attribute).
+   Use https://docs.opentrons.com/... URLs only. Never cite relative .md paths, bare filenames,
+   or parenthetical paths like (complex-commands/parameters.md).
+   When a heading includes an anchor such as {{ #blow-out-complex }}, append that fragment to the URL.
    Format your response like this:
    API answer:
    [Your answer here, based solely on the provided API documentation]
 
    References
-   [References]
+   - [Complex Liquid Handling Parameters](https://docs.opentrons.com/python-api/complex-commands/parameters/#blow-out-complex)
 
 
 4. If the prompt is a request to generate a protocol, follow these steps:

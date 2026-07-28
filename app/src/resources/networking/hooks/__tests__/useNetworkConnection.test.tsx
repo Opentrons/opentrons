@@ -1,32 +1,34 @@
 import { I18nextProvider } from 'react-i18next'
-import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
-import { legacy_createStore } from 'redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+import {
+  INTERFACE_ETHERNET,
+  INTERFACE_WIFI,
+  mockWifiNetwork,
+  SECURITY_NONE,
+} from '@opentrons/api-client'
+
 import { i18n } from '/app/i18n'
-import * as Networking from '/app/redux/networking'
-import { getNetworkInterfaces } from '/app/redux/networking'
-import * as Fixtures from '/app/redux/networking/__fixtures__'
-import { useWifiList } from '/app/resources/networking/hooks'
 
 import { useNetworkConnection } from '../useNetworkConnection'
+import { useNetworkInterfaces } from '../useNetworkInterfaces'
+import { useWifiList } from '../useWifiList'
 
-import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'
 
-vi.mock('/app/redux/networking/selectors')
+vi.mock('../useNetworkInterfaces')
 vi.mock('../useWifiList')
 
 const mockRobotName = 'robot-name'
 const mockWifiList = [
-  { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },
-  { ...Fixtures.mockWifiNetwork, ssid: 'bar' },
+  { ...mockWifiNetwork, ssid: 'foo', active: true },
+  { ...mockWifiNetwork, ssid: 'bar' },
   {
-    ...Fixtures.mockWifiNetwork,
+    ...mockWifiNetwork,
     ssid: 'baz',
-    securityType: Networking.SECURITY_NONE,
+    securityType: SECURITY_NONE,
   },
 ]
 
@@ -34,17 +36,15 @@ const mockWifi = {
   ipAddress: '127.0.0.100',
   subnetMask: '255.255.255.230',
   macAddress: 'WI:FI:00:00:00:00',
-  type: Networking.INTERFACE_WIFI,
+  type: INTERFACE_WIFI,
 }
 
 const mockEthernet = {
   ipAddress: '127.0.0.101',
   subnetMask: '255.255.255.231',
   macAddress: 'US:B0:00:00:00:00',
-  type: Networking.INTERFACE_ETHERNET,
+  type: INTERFACE_ETHERNET,
 }
-
-const store: Store<any> = legacy_createStore(vi.fn(), {})
 
 // ToDo (kj:0202/2023) USB test cases will be added when USB is out
 describe('useNetworkConnection', () => {
@@ -52,14 +52,12 @@ describe('useNetworkConnection', () => {
 
   beforeEach(() => {
     wrapper = ({ children }) => (
-      <I18nextProvider i18n={i18n}>
-        <Provider store={store}>{children}</Provider>
-      </I18nextProvider>
+      <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
     )
 
     when(useWifiList).calledWith(mockRobotName, 10000).thenReturn(mockWifiList)
-    when(getNetworkInterfaces)
-      .calledWith(undefined as any, mockRobotName)
+    when(useNetworkInterfaces)
+      .calledWith(mockRobotName, 10000)
       .thenReturn({ wifi: mockWifi, ethernet: mockEthernet })
   })
 
@@ -76,8 +74,8 @@ describe('useNetworkConnection', () => {
   })
 
   it('should return network connection information - only wifi is connected and ethernet is connected', () => {
-    when(getNetworkInterfaces)
-      .calledWith(undefined as any, mockRobotName)
+    when(useNetworkInterfaces)
+      .calledWith(mockRobotName, 10000)
       .thenReturn({ wifi: mockWifi, ethernet: null })
     const { result } = renderHook(() => useNetworkConnection(mockRobotName), {
       wrapper,
@@ -89,8 +87,8 @@ describe('useNetworkConnection', () => {
   })
 
   it('should return network connection information - only ethernet is connected', () => {
-    when(getNetworkInterfaces)
-      .calledWith(undefined as any, mockRobotName)
+    when(useNetworkInterfaces)
+      .calledWith(mockRobotName, 10000)
       .thenReturn({ wifi: null, ethernet: mockEthernet })
     const { result } = renderHook(() => useNetworkConnection(mockRobotName), {
       wrapper,
@@ -101,8 +99,8 @@ describe('useNetworkConnection', () => {
   })
 
   it('should return network connection information - wifi and ethernet are not connected', () => {
-    when(getNetworkInterfaces)
-      .calledWith(undefined as any, mockRobotName)
+    when(useNetworkInterfaces)
+      .calledWith(mockRobotName, 10000)
       .thenReturn({ wifi: null, ethernet: null })
     const { result } = renderHook(() => useNetworkConnection(mockRobotName), {
       wrapper,

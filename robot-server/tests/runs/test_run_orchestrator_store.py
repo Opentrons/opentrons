@@ -1,5 +1,6 @@
 """Tests for the EngineStore interface."""
 
+import inspect
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
@@ -7,6 +8,7 @@ from textwrap import dedent
 import pytest
 from decoy import Decoy, matchers
 
+from opentrons.config import feature_flags
 from opentrons.hardware_control import API, HardwareControlAPI
 from opentrons.hardware_control.modules.types import TemperatureModuleModel
 from opentrons.hardware_control.types import (
@@ -27,7 +29,7 @@ from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import RunOrchestrator, RunResult
 from opentrons.types import DeckSlotName
 from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
-from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource
@@ -97,8 +99,24 @@ async def bad_python_protocol_source(tmp_path: Path) -> ProtocolResource:
     )
 
 
-async def test_create_engine(decoy: Decoy, subject: RunOrchestratorStore) -> None:
+@pytest.fixture
+def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Get a mocked feature flags."""
+    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
+        params = inspect.getfullargspec(func)
+        mock_get_ff = decoy.mock(func=func)
+        if any("robot_type" in p for p in params.args):
+            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
+        else:
+            decoy.when(mock_get_ff()).then_return(False)
+        monkeypatch.setattr(feature_flags, name, mock_get_ff)
+
+
+async def test_create_engine(
+    decoy: Decoy, subject: RunOrchestratorStore, mock_feature_flags: None
+) -> None:
     """It should create an engine for a run."""
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     result = await subject.create(
         run_id="run-id",
         labware_offsets=[],
@@ -125,8 +143,10 @@ async def test_create_engine_uses_robot_type(
     robot_type: RobotType,
     deck_type: pe_types.DeckType,
     mock_run_process_pyro_provider: RunProcessPyroProvider,
+    mock_feature_flags: None,
 ) -> None:
     """It should create ProtocolEngines with the given robot and deck type."""
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
     hardware_api = decoy.mock(cls=API)
@@ -155,9 +175,12 @@ async def test_create_engine_uses_robot_type(
 
 
 async def test_create_engine_with_labware_offsets(
+    decoy: Decoy,
     subject: RunOrchestratorStore,
+    mock_feature_flags: None,
 ) -> None:
     """It should create an engine for a run with labware offsets."""
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     labware_offset = pe_types.LegacyLabwareOffsetCreate(
         definitionUri="namespace/load_name/version",
         location=pe_types.LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_5),
@@ -194,9 +217,12 @@ async def test_create_engine_with_labware_offsets(
 
 
 async def test_archives_state_if_engine_already_exists(
+    decoy: Decoy,
     subject: RunOrchestratorStore,
+    mock_feature_flags: None,
 ) -> None:
     """It should not create more than one engine / runner pair."""
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     await subject.create(
         run_id="run-id-1",
         labware_offsets=[],
@@ -228,9 +254,13 @@ async def test_archives_state_if_engine_already_exists(
 
 
 async def test_create_does_not_store_orchestrator_on_load_failure(
-    subject: RunOrchestratorStore, bad_python_protocol_source: ProtocolResource
+    decoy: Decoy,
+    subject: RunOrchestratorStore,
+    bad_python_protocol_source: ProtocolResource,
+    mock_feature_flags: None,
 ) -> None:
     """It should not store an orchestrator unless it could be loaded."""
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     with pytest.raises(ZeroDivisionError):
         await subject.create(
             run_id="run-id",
@@ -247,8 +277,13 @@ async def test_create_does_not_store_orchestrator_on_load_failure(
     assert subject.current_run_id is None
 
 
-async def test_clear_engine(subject: RunOrchestratorStore) -> None:
+async def test_clear_engine(
+    decoy: Decoy,
+    subject: RunOrchestratorStore,
+    mock_feature_flags: None,
+) -> None:
     """It should clear a stored engine entry."""
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     await subject.create(
         run_id="run-id",
         labware_offsets=[],
@@ -276,8 +311,13 @@ async def test_clear_engine(subject: RunOrchestratorStore) -> None:
         subject.run_coordinator
 
 
-async def test_clear_engine_not_stopped_or_idle(subject: RunOrchestratorStore) -> None:
+async def test_clear_engine_not_stopped_or_idle(
+    decoy: Decoy,
+    subject: RunOrchestratorStore,
+    mock_feature_flags: None,
+) -> None:
     """It should raise a conflict if the engine is not stopped."""
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     await subject.create(
         run_id="run-id",
         labware_offsets=[],
@@ -296,8 +336,13 @@ async def test_clear_engine_not_stopped_or_idle(subject: RunOrchestratorStore) -
         await subject.clear()
 
 
-async def test_clear_idle_engine(subject: RunOrchestratorStore) -> None:
+async def test_clear_idle_engine(
+    decoy: Decoy,
+    subject: RunOrchestratorStore,
+    mock_feature_flags: None,
+) -> None:
     """It should successfully clear engine if idle (not started)."""
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     await subject.create(
         run_id="run-id",
         labware_offsets=[],
@@ -320,9 +365,12 @@ async def test_clear_idle_engine(subject: RunOrchestratorStore) -> None:
 
 
 async def test_get_default_orchestrator_idempotent(
+    decoy: Decoy,
     subject: RunOrchestratorStore,
+    mock_feature_flags: None,
 ) -> None:
     """It should create and retrieve the same default ProtocolEngine."""
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     result = await subject.get_default_orchestrator()
     repeated_result = await subject.get_default_orchestrator()
 
@@ -337,8 +385,10 @@ async def test_get_default_orchestrator_robot_type(
     robot_type: RobotType,
     deck_type: pe_types.DeckType,
     mock_run_process_pyro_provider: RunProcessPyroProvider,
+    mock_feature_flags: None,
 ) -> None:
     """It should create default ProtocolEngines with the given robot and deck type."""
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
     hardware_api = decoy.mock(cls=API)
@@ -356,9 +406,12 @@ async def test_get_default_orchestrator_robot_type(
 
 
 async def test_get_default_orchestrator_current_unstarted(
+    decoy: Decoy,
     subject: RunOrchestratorStore,
+    mock_feature_flags: None,
 ) -> None:
     """It should allow a default engine if another engine current but unstarted."""
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     await subject.create(
         run_id="run-id",
         labware_offsets=[],
@@ -376,8 +429,13 @@ async def test_get_default_orchestrator_current_unstarted(
     assert isinstance(result, RunOrchestrator)
 
 
-async def test_get_default_orchestrator_conflict(subject: RunOrchestratorStore) -> None:
+async def test_get_default_orchestrator_conflict(
+    decoy: Decoy,
+    subject: RunOrchestratorStore,
+    mock_feature_flags: None,
+) -> None:
     """It should not allow a default engine if another engine is executing commands."""
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     await subject.create(
         run_id="run-id",
         labware_offsets=[],
@@ -397,9 +455,12 @@ async def test_get_default_orchestrator_conflict(subject: RunOrchestratorStore) 
 
 
 async def test_get_default_orchestrator_run_stopped(
+    decoy: Decoy,
     subject: RunOrchestratorStore,
+    mock_feature_flags: None,
 ) -> None:
     """It allow a default engine if another engine is terminal."""
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     await subject.create(
         run_id="run-id",
         labware_offsets=[],
@@ -511,6 +572,7 @@ async def test_async_module_callback_noops_if_engine_says_no(decoy: Decoy) -> No
         await run_orchestrator_store.run_coordinator.asynchronous_module_error(
             module_model=TemperatureModuleModel.TEMPERATURE_V2,
             module_serial="some-serial",
+            error=exc,
         )
     ).then_return(False)
     await handle_hardware_event(run_orchestrator_store, error_event)
@@ -542,6 +604,7 @@ async def test_async_module_callback_finishes_if_engine_says_so(decoy: Decoy) ->
         await run_orchestrator_store.run_coordinator.asynchronous_module_error(
             module_model=TemperatureModuleModel.TEMPERATURE_V2,
             module_serial="some-serial",
+            error=exc,
         )
     ).then_return(True)
     await handle_hardware_event(run_orchestrator_store, error_event)

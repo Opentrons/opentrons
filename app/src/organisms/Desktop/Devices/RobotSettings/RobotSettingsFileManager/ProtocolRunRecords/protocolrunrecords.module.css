@@ -39,3 +39,33 @@
   min-width: 0;
   flex: 1;
 }
+
+.run_record_file_item {
+  display: flex;
+  padding: var(--spacing-12);
+  gap: var(--spacing-24);
+}
+
+.run_record_drawer_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.run_record_drawer_header {
+  display: flex;
+  flex-direction: row;
+  padding: 0 var(--spacing-12);
+  color: var(--grey-60);
+  gap: var(--spacing-24);
+}
+
+.run_record_drawer_header > *:nth-child(1),
+.run_record_file_item > *:nth-child(1) {
+  width: 28.5%;
+}
+
+.run_record_drawer_header > *:nth-child(2),
+.run_record_file_item > *:nth-child(2) {
+  width: 71.5%;
+}

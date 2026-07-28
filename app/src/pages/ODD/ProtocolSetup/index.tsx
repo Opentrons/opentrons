@@ -551,8 +551,9 @@ function PrepareToRun({
   // Labware information
   const { offDeckItems, onDeckItems } = useMemo(
     () => getLabwareSetupItemGroups(mostRecentAnalysis?.commands ?? []),
-    [mostRecentAnalysis]
+    [mostRecentAnalysis?.commands]
   )
+
   const onDeckLabwareCount = onDeckItems.length
   const additionalLabwareCount = offDeckItems.length
 

@@ -16,7 +16,9 @@
   "create_protocol": "Creating protocol",
   "create_user": "Creating user",
   "delete_log_period": "Deleting log period",
+  "delete_log_periods": "Deleting log periods",
   "delete_offsets": "Deleting old labware offsets",
+  "delete_protocol": "Deleting protocol",
   "delete_run": "Deleting protocol run record",
   "delete_run_images": "Deleting run images",
   "delete_runs": "Deleting protocol run records",
@@ -64,9 +66,11 @@
   "update_deck_configuration": "Updating deck configuration",
   "update_error_recovery_policy": "Updating error recovery policy",
   "update_error_recovery_settings": "Updating error recovery settings",
+  "update_module": "Updating module firmware",
   "update_robot_name": "Updating robot name",
   "update_self": "Saving user settings",
   "update_settings": "Updating robot settings",
   "update_subsystem": "Updating subsystem firmware",
-  "upload_csv": "Uploading runtime parameters as CSV"
+  "upload_csv": "Uploading runtime parameters as CSV",
+  "wifi_config": "Configure wifi network"
 }

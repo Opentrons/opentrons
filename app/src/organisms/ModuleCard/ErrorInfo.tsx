@@ -24,7 +24,7 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 
-import type { AttachedModule } from '/app/redux/modules/types'
+import type { AttachedModule } from '@opentrons/api-client'
 
 interface ErrorInfoProps {
   attachedModule: AttachedModule

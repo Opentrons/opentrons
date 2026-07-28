@@ -65,6 +65,24 @@ class RobotServerSettings(BaseSettings):
         ),
     )
 
+    audit_server_uds: str | None = Field(
+        default=None,
+        description=(
+            "The path to the Unix domain socket where audit-server is listening."
+            " This is mutually exclusive with audit_server_url."
+            " If both are unset, access control is not enforced."
+        ),
+    )
+
+    audit_server_url: str | None = Field(
+        default=None,
+        description=(
+            "The base URL (e.g. `http://localhost:1234`) where audit-server is listening."
+            " This is mutually exclusive with audit_server_uds."
+            " If both are unset, access control is not enforced."
+        ),
+    )
+
     # Literal must come first to avoid Pydantic parsing it as a relative Path
     # with the filename "automatically_make_temporary".
     persistence_directory: (
