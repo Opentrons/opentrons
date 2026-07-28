@@ -150,7 +150,7 @@ export function SignRunModal({
     // if user is not signed in, prompt for login.
     // Do not overwrite 'done' — login success can seed /self and move the gate
     // to done before this finally runs.
-    void showLoginModal({ robotName }).finally(() => {
+    void showLoginModal({ robotName, uncloseable: true }).finally(() => {
       setLoginGate(current => (current === 'done' ? 'done' : 'querying'))
     })
     // Omit makeToast/eatToast/t/i18n/logout: toaster fns are recreated when

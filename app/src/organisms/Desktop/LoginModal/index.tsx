@@ -90,6 +90,7 @@ function updateSetNewPasswordFormData(
 
 interface LoginModalProps {
   robotName: string /** Which robot to log in to. */
+  uncloseable?: boolean
 }
 
 /** Open the desktop login modal in the appropriate React portal. */
@@ -100,20 +101,21 @@ export const showLoginModal = async (
 }
 
 const LoginModal = NiceModal.create((props: LoginModalProps) => {
-  const { robotName } = props
+  const { robotName, uncloseable } = props
   return (
     <ApiHostProvider robotName={robotName}>
-      <LoginModalImpl robotName={robotName} />
+      <LoginModalImpl robotName={robotName} uncloseable={uncloseable} />
     </ApiHostProvider>
   )
 })
 
 interface LoginModalImplProps {
   robotName: string
+  uncloseable?: boolean
 }
 
 function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
-  const { robotName } = props
+  const { robotName, uncloseable } = props
   const modal = useModal()
   const host = useHost()
   const queryClient = useQueryClient()
@@ -271,7 +273,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   return createPortal(
     <Modal
       title={t('access_control:desktop_login_modal_header')}
-      onClose={handleClose}
+      onClose={uncloseable ? undefined : handleClose}
       // Above SignRun and other run-header modals (zIndexOverlay: 1000); below
       // permission toasts that use TOAST_ABOVE_LOGIN_Z_INDEX (10002).
       zIndexOverlay={10001}
