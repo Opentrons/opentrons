@@ -46,4 +46,5 @@
   left: 0;
   z-index: 5;
   width: 100%;
+  pointer-events: none;
 }
