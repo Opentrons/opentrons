@@ -1000,7 +1000,8 @@
         },
         "displayName": "Vacuum Module Dock in A4",
         "features": {},
-        "orientation": "right"
+        "orientation": "right",
+        "$comment": "This value is an eye-test estimate and needs hardware validation."
       }
     ],
     "cutouts": [
