@@ -108,6 +108,10 @@ export function useTipAttachmentStatus(
       })
       .catch(e => {
         console.error(`Error during tip status check: ${e.message}`)
+        // Unblock post-run flows (auto-close / SignRun) that wait on a settled tip check.
+        if (initialPipettesCount === null) {
+          setInitialPipettesCount(0)
+        }
         return Promise.resolve([])
       })
   }, [host, initialPipettesCount, runId, runRecord])

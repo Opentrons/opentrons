@@ -29,7 +29,10 @@ import {
 } from '../hooks'
 import { RunHeaderBannerContainer } from '../RunHeaderBannerContainer'
 import { RunHeaderContent } from '../RunHeaderContent'
-import { RunHeaderModalContainer } from '../RunHeaderModalContainer'
+import {
+  RunHeaderModalContainer,
+  useRunHeaderModalContainer,
+} from '../RunHeaderModalContainer'
 import { RunHeaderProtocolName } from '../RunHeaderProtocolName'
 
 import type { ComponentProps } from 'react'
@@ -54,6 +57,15 @@ vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
 const MOCK_PROTOCOL = 'MOCK_PROTOCOL'
 const MOCK_RUN_ID = 'MOCK_RUN_ID'
 const MOCK_ROBOT = 'MOCK_ROBOT'
+
+const MOCK_RUN_HEADER_MODAL_CONTAINER_UTILS = {
+  dropTipUtils: {
+    dropTipModalUtils: { showModal: false, modalProps: null },
+    dropTipWizardUtils: { showDTWiz: false, dtWizProps: null },
+    resetTipStatus: vi.fn(),
+    isPostRunTipStatusSettled: true,
+  },
+}
 
 describe('ProtocolRunHeader', () => {
   let props: ComponentProps<typeof ProtocolRunHeader>
@@ -97,6 +109,9 @@ describe('ProtocolRunHeader', () => {
     vi.mocked(useRunAnalytics).mockImplementation(() => {})
     vi.mocked(useRunErrors).mockReturnValue([] as any)
     vi.mocked(useRunHeaderRunControls).mockReturnValue({} as any)
+    vi.mocked(useRunHeaderModalContainer).mockReturnValue(
+      MOCK_RUN_HEADER_MODAL_CONTAINER_UTILS as any
+    )
 
     vi.mocked(RunHeaderModalContainer).mockReturnValue(
       <div>MOCK_RUN_HEADER_MODAL_CONTAINER</div>

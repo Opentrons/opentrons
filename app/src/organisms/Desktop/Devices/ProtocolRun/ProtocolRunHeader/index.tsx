@@ -17,12 +17,16 @@ import {
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useInitializeCameraState } from '/app/local-resources/images/hooks/useInitializeCameraState'
-import { isCancellableStatus } from '/app/local-resources/runs/utils'
+import {
+  isCancellableStatus,
+  isTerminatingOrTerminal,
+} from '/app/local-resources/runs/utils'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import {
   DEFAULT_STATUS_REFETCH_INTERVAL,
   useCloseCurrentRun,
+  useIsRunCurrent,
   useNotifyRunQuery,
   useProtocolDetailsForRun,
 } from '/app/resources/runs'
@@ -91,16 +95,12 @@ export function ProtocolRunHeader(
     (runRecord?.data.signedBy != null && runRecord.data.signedBy !== '') ||
     hasLocallySigned
   const isSigned = !isSigningRequired || hasSignedBy
-  // Set when close is requested before signing; cleared after a successful sign.
+  const isRunCurrent = useIsRunCurrent(runId)
+  // Set when the run becomes terminal or close is requested before signing;
+  // cleared after a successful sign.
   const [isSignRunPending, setIsSignRunPending] = useState(false)
-  const showSignRunModal =
-    isSignRunPending &&
-    !isAccessControlLoading &&
-    isSigningRequired &&
-    !hasSignedBy
 
   // Keep the run current until the user signs when access control requires it.
-  // Showing SignRun only after a close attempt also avoids covering drop-tip flows.
   const closeCurrentRunIfSigned = useCallback(() => {
     if (isAccessControlLoading || !isSigned) {
       setIsSignRunPending(true)
@@ -110,12 +110,45 @@ export function ProtocolRunHeader(
     closeCurrentRun()
   }, [closeCurrentRun, isAccessControlLoading, isSigned])
 
+  // Canceled runs often have no terminal banner close button, so arm SignRun
+  // when the run itself becomes terminal — not only on an explicit close click.
   useEffect(() => {
-    if (isSigned && isSignRunPending && !isAccessControlLoading) {
+    if (
+      isTerminatingOrTerminal(runStatus) &&
+      isRunCurrent &&
+      !hasSignedBy &&
+      (isAccessControlLoading || isSigningRequired)
+    ) {
+      setIsSignRunPending(true)
+    }
+  }, [
+    runStatus,
+    isRunCurrent,
+    hasSignedBy,
+    isAccessControlLoading,
+    isSigningRequired,
+  ])
+
+  useEffect(() => {
+    if (!isSignRunPending || isAccessControlLoading) {
+      return
+    }
+    // Access control off after load — clear pending; tip auto-close dismisses.
+    if (!isSigningRequired) {
+      setIsSignRunPending(false)
+      return
+    }
+    if (isSigned) {
       setIsSignRunPending(false)
       closeCurrentRun()
     }
-  }, [isSigned, isSignRunPending, isAccessControlLoading, closeCurrentRun])
+  }, [
+    isSigned,
+    isSignRunPending,
+    isAccessControlLoading,
+    isSigningRequired,
+    closeCurrentRun,
+  ])
 
   const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
   const protocolRunControls = useRunHeaderRunControls(runId, robotName)
@@ -128,6 +161,18 @@ export function ProtocolRunHeader(
     runErrors,
     closeCurrentRun: closeCurrentRunIfSigned,
   })
+  const { dropTipUtils } = runHeaderModalContainerUtils
+  const isDropTipBlocking =
+    dropTipUtils.dropTipModalUtils.showModal ||
+    dropTipUtils.dropTipWizardUtils.showDTWiz
+  // Wait for tip status so SignRun does not flash ahead of drop-tip CTAs.
+  const showSignRunModal =
+    isSignRunPending &&
+    !isAccessControlLoading &&
+    isSigningRequired &&
+    !hasSignedBy &&
+    dropTipUtils.isPostRunTipStatusSettled &&
+    !isDropTipBlocking
 
   useEffect(() => {
     if (protocolData != null && !isRobotViewable) {

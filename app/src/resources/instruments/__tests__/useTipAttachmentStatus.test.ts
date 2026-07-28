@@ -135,6 +135,7 @@ describe('useTipAttachmentStatus', () => {
 
     expect(result.current.areTipsAttached).toBe(false)
     expect(result.current.aPipetteWithTip).toBeNull()
+    expect(result.current.initialPipettesWithTipsCount).toBe(0)
   })
 
   it('should reset tip status', async () => {
