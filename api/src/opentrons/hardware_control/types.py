@@ -981,6 +981,27 @@ class HardwareFeatureFlags:
             stall_detection_enabled=feature_flags.stall_detection_enabled(),
             overpressure_detection_enabled=feature_flags.overpressure_detection_enabled(),
         )
+    
+    @staticmethod
+    def to_pyro_dict(obj: "HardwareFeatureFlags") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "use_old_aspiration_functions": obj.use_old_aspiration_functions,
+            "require_estop": obj.require_estop,
+            "stall_detection_enabled": obj.stall_detection_enabled,
+            "overpressure_detection_enabled": obj.overpressure_detection_enabled,
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "HardwareFeatureFlags":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return HardwareFeatureFlags(
+            use_old_aspiration_functions=data["use_old_aspiration_functions"],
+            require_estop=data["require_estop"],
+            stall_detection_enabled=data["stall_detection_enabled"],
+            overpressure_detection_enabled=data["overpressure_detection_enabled"],
+        )
 
 
 class EarlyLiquidSenseTrigger(RuntimeError):

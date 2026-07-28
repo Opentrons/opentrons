@@ -28,7 +28,7 @@ import opentrons.hardware_control.types
 import opentrons.types
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
-    find_dataclasses_in_packages,
+    find_opentrons_classes_in_packages,
     find_enums_in_packages,
     find_pydantic_classes_in_packages,
     find_typed_dict_classes_in_packages,
@@ -39,8 +39,49 @@ from opentrons.util.pyro.pyro_serialization import (
 
 Pyro5.config.SERPENT_BYTES_REPR = True  # type: ignore
 
-# Type Dict registration handlers
+# Hardware package lists
 
+HARDWARE_ENUM_PACKAGES = [
+    opentrons.types,
+    opentrons.config.types,
+    opentrons.hardware_control.types,
+    opentrons.hardware_control.dev_types,
+    opentrons_shared_data.pipette.pipette_definition,
+    opentrons_shared_data.pipette.types,
+    opentrons_shared_data.errors.codes,
+    opentrons.hardware_control.peripherals.types,
+    opentrons_shared_data.gripper.gripper_definition,
+    opentrons.calibration_storage.types,
+    opentrons.drivers.types,
+    opentrons.hardware_control.modules.types,
+    opentrons.drivers.vacuum_module.types,
+]
+
+HARDWARE_PYDANTIC_PACKAGES = [
+    opentrons.types,
+    opentrons.config.types,
+    opentrons.hardware_control.types,
+    opentrons.hardware_control.protocols.types,
+    opentrons_shared_data.pipette.pipette_definition,
+    opentrons.hardware_control.nozzle_manager,
+    opentrons_shared_data.gripper.gripper_definition,
+    opentrons.calibration_storage.ot3.models.v1,
+    opentrons.hardware_control.nozzle_manager,
+]
+
+HARDWARE_CLASS_PACKAGES = [
+    opentrons.drivers.vacuum_module.types,
+    opentrons.drivers.types,
+    opentrons.hardware_control.modules.module_calibration,
+    opentrons.hardware_control.modules.types,
+    opentrons.drivers.rpi_drivers.types,
+    opentrons.hardware_control.types,
+    opentrons.types,
+    opentrons.hardware_control.ot3_calibration,
+    opentrons.hardware_control.instruments.ot3.instrument_calibration,
+]
+
+# Type Dict registration handlers
 
 def _pipetted_dict_dict_to_class(  # type: ignore
     classname, d
@@ -197,41 +238,13 @@ def register_hardware_types() -> None:
     """Registers serialize and deserialize behavior for Opentrons Hardware types and classes.
     Pyro serializes our dataclasses into dicts, but doesn't convert them back to their native types automatically.
     """
-    opentrons_types = find_enums_in_packages(
-        [
-            opentrons.types,
-            opentrons.config.types,
-            opentrons.hardware_control.types,
-            opentrons.hardware_control.dev_types,
-            opentrons_shared_data.pipette.pipette_definition,
-            opentrons_shared_data.pipette.types,
-            opentrons_shared_data.errors.codes,
-            opentrons.hardware_control.peripherals.types,
-            opentrons_shared_data.gripper.gripper_definition,
-            opentrons.calibration_storage.types,
-            opentrons.drivers.types,
-            opentrons.hardware_control.modules.types,
-            opentrons.drivers.vacuum_module.types,
-        ]
-    )
+    opentrons_types = find_enums_in_packages(HARDWARE_ENUM_PACKAGES)
 
     with serpent_enum_registration():
         for enum_type in opentrons_types:
             OpentronsPyroSerializer.register_enum(enum_type)
 
-    opentrons_pydantic_types = find_pydantic_classes_in_packages(
-        [
-            opentrons.types,
-            opentrons.config.types,
-            opentrons.hardware_control.types,
-            opentrons.hardware_control.protocols.types,
-            opentrons_shared_data.pipette.pipette_definition,
-            opentrons.hardware_control.nozzle_manager,
-            opentrons_shared_data.gripper.gripper_definition,
-            opentrons.calibration_storage.ot3.models.v1,
-            opentrons.hardware_control.nozzle_manager,
-        ]
-    )
+    opentrons_pydantic_types = find_pydantic_classes_in_packages(HARDWARE_PYDANTIC_PACKAGES)
     for pydantic_type in opentrons_pydantic_types:
         OpentronsPyroSerializer.register_pydantic_model(pydantic_type)
 
@@ -265,21 +278,9 @@ def register_hardware_types() -> None:
     )
 
     # Dataclass generic registration
-    opentrons_dataclass_types = find_dataclasses_in_packages(
-        [
-            opentrons.drivers.vacuum_module.types,
-            opentrons.drivers.types,
-            opentrons.hardware_control.modules.module_calibration,
-            opentrons.hardware_control.modules.types,
-            opentrons.drivers.rpi_drivers.types,
-            opentrons.hardware_control.types,
-            opentrons.types,
-            opentrons.hardware_control.ot3_calibration,
-            opentrons.hardware_control.instruments.ot3.instrument_calibration,
-        ]
-    )
-    for dataclass_type in opentrons_dataclass_types:
-        OpentronsPyroSerializer.register_dataclass(dataclass_type)
+    opentrons_class_types = find_opentrons_classes_in_packages(HARDWARE_CLASS_PACKAGES)
+    for class_type in opentrons_class_types:
+        OpentronsPyroSerializer.register_class(class_type)
 
     # handle Typed Dicts for the hardware controller
     OpentronsPyroSerializer.register_opentrons_typed_dicts(_typed_dict_dict_to_class)

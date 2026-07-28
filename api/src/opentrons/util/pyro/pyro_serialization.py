@@ -64,13 +64,13 @@ def find_pydantic_classes_in_packages(
     return pydantic_classes
 
 
-def find_dataclasses_in_packages(modules: list[ModuleType]) -> list[type]:
-    """Returns a list of dataclasses that contain `to_pyro_dict` and `from_pyro_dict` staticmethods in the given list of moduels."""
+def find_opentrons_classes_in_packages(modules: list[ModuleType]) -> list[type]:
+    """Returns a list of dataclasses and NamedTuples that contain `to_pyro_dict` and `from_pyro_dict` staticmethods in the given list of moduels."""
     dataclasses = []
     for module in modules:
         for name, obj in inspect.getmembers(module, inspect.isclass):
             if (
-                is_dataclass(obj)
+                (is_dataclass(obj) or _is_namedtuple_instance(obj))
                 and hasattr(obj, "to_pyro_dict")
                 and hasattr(obj, "from_pyro_dict")
             ):
@@ -151,6 +151,12 @@ def register_enumerated_errors() -> None:
         class_to_dict=enumerated_error_class_to_dict,
     )
 
+def _is_namedtuple_instance(cls: Any) -> bool:
+    """Validate if an object is a NamedTuple instance."""
+    try:
+        return issubclass(cls, tuple) and hasattr(cls, '_fields')
+    except TypeError:
+        return False
 
 class OpentronsPyroSerializer:
     """A pyro serializer for custom Opentrons classes."""
@@ -235,25 +241,25 @@ class OpentronsPyroSerializer:
         return model.model_validate(d)
 
     @classmethod
-    def register_dataclass(cls, dataclass_type: type) -> None:
-        """Registers a dataclass type to be sent and received via pyro proxies."""
-        if is_dataclass(dataclass_type):
-            if hasattr(dataclass_type, "to_pyro_dict") and hasattr(
-                dataclass_type, "from_pyro_dict"
+    def register_class(cls, class_type: type) -> None:
+        """Registers a dataclass or NamedTuple type to be sent and received via pyro proxies."""
+        if is_dataclass(class_type) or _is_namedtuple_instance(class_type):
+            if hasattr(class_type, "to_pyro_dict") and hasattr(
+                class_type, "from_pyro_dict"
             ):
                 class_name = register_type_to_serpent(
-                    class_type=dataclass_type,
-                    dict_to_class=dataclass_type.from_pyro_dict,
-                    class_to_dict=dataclass_type.to_pyro_dict,
+                    class_type=class_type,
+                    dict_to_class=class_type.from_pyro_dict,
+                    class_to_dict=class_type.to_pyro_dict,
                 )
-                cls._dataclass_class_name_to_type[class_name] = dataclass_type
+                cls._dataclass_class_name_to_type[class_name] = class_type
             else:
                 raise TypeError(
-                    f"Dataclass {dataclass_type} does not satisfy `to_pyro_dict` and `from_pyro_dict` attribute requirements."
+                    f"Class {class_type} does not satisfy `to_pyro_dict` and `from_pyro_dict` attribute requirements."
                 )
         else:
             raise TypeError(
-                f"Type {dataclass_type} is not a dataclass and could not be registered."
+                f"Type {class_type} is not a dataclass or NamedTuple and could not be registered."
             )
 
     @classmethod

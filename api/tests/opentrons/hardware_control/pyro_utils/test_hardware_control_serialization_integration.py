@@ -39,16 +39,17 @@ from opentrons.hardware_control.modules.types import MagneticBlockModel
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.poller import Poller
 from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
-    register_hardware_types,
+    register_hardware_types, HARDWARE_CLASS_PACKAGES
 )
-from opentrons.hardware_control.types import DoorState, HardwareFeatureFlags
+from opentrons.hardware_control.types import DoorState
 from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
+from opentrons.util.pyro.pyro_serialization import find_opentrons_classes_in_packages
 
 TEST_PYRO_TIMEOUT = 5
 
-# List of types to not validate, ususally these are OT-2 Types that are in a union or something thats handled through a special pyro-behavior decorator
-_TYPES_TO_SKIP = [RobotConfig, HardwareFeatureFlags]
+# List of types to not validate, ususally these are OT-2 Types
+_TYPES_TO_SKIP = [RobotConfig]
 
 
 @pytest.fixture
@@ -232,6 +233,11 @@ def _is_optional(hint: Any) -> bool:
 
     return False
 
+def _is_namedtuple_instance(cls: Any) -> bool:
+    try:
+        return issubclass(cls, tuple) and hasattr(cls, '_fields')
+    except TypeError:
+        return False
 
 def _test_proxy_serialization_coverage(  # noqa: C901
     original_class: type, acpo_instance: Any
@@ -255,7 +261,7 @@ def _test_proxy_serialization_coverage(  # noqa: C901
                     raise ValueError(
                         f"Exception: {e} - type missmatch for 'from_pyro_dict' of attribute {attr}, expected value: {value} return value: {return_type}"
                     )
-            elif is_dataclass(value):
+            elif is_dataclass(value) or _is_namedtuple_instance(value):
                 raise ValueError(
                     f"Pyro Serialization missing for {value} of attribute call {attr} in class {original_class}."
                 )
@@ -271,10 +277,10 @@ def _test_proxy_serialization_coverage(  # noqa: C901
             is_iterable = False
         if is_iterable:
             for item in inspectable_value:
-                if is_dataclass(item):
+                if is_dataclass(item) or _is_namedtuple_instance(item):
                     _validate_serialization_coverage(value=item, attr=attr)
         else:
-            if is_dataclass(inspectable_value):
+            if is_dataclass(inspectable_value) or _is_namedtuple_instance(inspectable_value):
                 _validate_serialization_coverage(value=inspectable_value, attr=attr)
 
     # For each Method exposed by this pyro object, check the parameters and return values of the original class for dataclass usage
@@ -362,3 +368,125 @@ async def test_serialization_coverage(
             acpo_instance=ot3api_async_instance.attached_modules[mod_counter],
         )
         mod_counter += 1
+
+
+def _test_proxy_class_module_finder_coverage(  # noqa: C901
+    original_class: type, acpo_instance: Any
+) -> list[type]:
+    """Scrape over the provided proxy to gather as much information on parameters, mock errors and serialization as possible."""
+    class_list = []
+    proxy: pyro.Proxy = acpo_instance._proxy
+    proxy._pyroBind()  # type: ignore
+    pyro_methods: list[str] = getattr(proxy, "get_pyro_attributes_with_proxy_result")
+    pyro_methods.append("get_pyro_async_methods")
+    pyro_methods.append("get_pyro_attributes_with_proxy_result")
+    def _inspect_value_status_in_module(value: Any) -> None:
+        inspectable_value = value
+        if _is_optional(value):
+            inspectable_value = get_args(value)
+        try:
+            iter(inspectable_value)
+            is_iterable = True
+        except TypeError:
+            is_iterable = False
+        if is_iterable:
+            for item in inspectable_value:
+                if (is_dataclass(item) or _is_namedtuple_instance(item)) and hasattr(item, "to_pyro_dict") and hasattr(item, "from_pyro_dict"):
+                    class_list.append(item)
+        else:
+            if (is_dataclass(inspectable_value) or _is_namedtuple_instance(inspectable_value)) and hasattr(inspectable_value, "to_pyro_dict") and hasattr(inspectable_value, "from_pyro_dict"):
+                class_list.append(inspectable_value)
+                
+
+    # For each Method exposed by this pyro object, check the parameters and return values of the original class for dataclass usage
+    for method in proxy._pyroMethods:
+        # Check all methods that are not decorated to expose proxies
+        if method not in pyro_methods:
+            original_class_method = getattr(original_class, method)
+            for key, value in original_class_method.__annotations__.items():
+                _inspect_value_status_in_module(value)
+
+    for attribute in proxy._pyroAttrs:
+        if attribute not in pyro_methods:
+            original_class_attribute = getattr(original_class, attribute)
+            return_annotation = inspect.signature(
+                original_class_attribute.fget
+            ).return_annotation
+            _inspect_value_status_in_module(return_annotation)
+
+    return class_list
+
+async def test_module_registration_coverage(
+    decoy: Decoy,
+    ot3_hardware: ThreadManager[OT3API],
+    mock_driver: SimulatingDriver,
+    tc_reader_mocked_driver: modules.thermocycler.ThermocyclerReader,
+    hs_reader_mocked_driver: modules.heater_shaker.HeaterShakerReader,
+    td_reader_mocked_driver: modules.tempdeck.TempDeckReader,
+    vm_reader_mocked_driver: modules.vacuum_module.VacuumModuleReader,
+    ar_reader_mocked_driver: modules.absorbance_reader.AbsorbanceReaderReader,
+    st_reader_mocked_driver: modules.flex_stacker.FlexStackerReader,
+    mock_feature_flags: None,
+) -> None:
+    """Test will check for to see if serializable values are all covered in the class module registry."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(True)
+
+    wrapped_api = ot3_hardware.wrapped()
+    wrapped_api._backend.module_controls = decoy.mock(cls=AttachedModulesControl)
+    tc = decoy.mock(cls=Thermocycler)
+    hs = decoy.mock(cls=HeaterShaker)
+    td = decoy.mock(cls=TempDeck)
+    td_2 = decoy.mock(cls=TempDeck)
+    vm = decoy.mock(cls=VacuumModule)
+    st = decoy.mock(cls=FlexStacker)
+    ar = decoy.mock(cls=AbsorbanceReader)
+    decoy.when(wrapped_api._backend.module_controls.available_modules).then_return(
+        [tc, hs, td, td_2, vm, st, ar]
+    )
+    for mod in wrapped_api._backend.module_controls.available_modules:
+        decoy.when(mod._driver).then_return(mock_driver)  # type: ignore
+
+    # Mock out the pollers for these modules that will be stopped
+    decoy.when(tc._poller).then_return(Poller(tc_reader_mocked_driver, interval=0.01))
+    decoy.when(hs._poller).then_return(Poller(hs_reader_mocked_driver, interval=0.01))
+    decoy.when(td._poller).then_return(Poller(td_reader_mocked_driver, interval=0.01))
+    decoy.when(td_2._poller).then_return(Poller(td_reader_mocked_driver, interval=0.01))
+    decoy.when(vm._poller).then_return(Poller(vm_reader_mocked_driver, interval=0.01))
+    decoy.when(st._poller).then_return(Poller(st_reader_mocked_driver, interval=0.01))
+    decoy.when(ar._poller).then_return(Poller(ar_reader_mocked_driver, interval=0.01))
+
+    name_server_ready = threading.Event()
+
+    await _setup_namerserver(name_server_ready=name_server_ready)
+    ot3api_async_instance = await _setup_OT3API_pyro_resource(
+        ot3_hardware,
+        name_server_ready,
+    )
+
+    # Assert that there are as many testable proxy modules as there are actual modules for integration coverage
+    # DEVELOPER NOTE: if this part is failing, you need to add a missing module to the module mocks above.
+    modules_list_NO_MAG_BLOCK = tuple(
+        arg for arg in get_args(ModuleModel) if arg != MagneticBlockModel
+    )
+    assert len(ot3api_async_instance.attached_modules) == len(modules_list_NO_MAG_BLOCK)
+
+    # Run tests for the OT3API
+    class_cover_list = _test_proxy_class_module_finder_coverage(
+        original_class=OT3API, acpo_instance=ot3api_async_instance
+    )
+
+    hardware_registry_class_list = find_opentrons_classes_in_packages(HARDWARE_CLASS_PACKAGES)
+    hardware_registry_class_list = list(set(hardware_registry_class_list))
+
+    # Run tests for the Module APIs
+    mod_counter = 0
+    for module in wrapped_api.attached_modules:
+        class_cover_list = class_cover_list + _test_proxy_class_module_finder_coverage(
+            original_class=module.__class__,
+            acpo_instance=ot3api_async_instance.attached_modules[mod_counter],
+        )
+        class_cover_list = list(set(class_cover_list))
+        mod_counter += 1
+
+    assert set(class_cover_list) == set(hardware_registry_class_list)
