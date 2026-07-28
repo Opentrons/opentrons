@@ -30,6 +30,7 @@
 .tabs_row {
   display: flex;
   gap: var(--spacing-4);
+  overflow: scroll;
 }
 
 .content_section {
