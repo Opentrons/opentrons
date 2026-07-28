@@ -16,7 +16,7 @@ import { SlotSpotlightViewer } from '../SlotSpotlightViewer'
 import { StepDetailContainer } from '../StepDetailContainer'
 import styles from './visualizercontainer.module.css'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { AppType, GroupedCommands } from '../../types'
 
@@ -39,7 +39,7 @@ interface ProtocolVisualizationProps {
 
 export function ProtocolVisualization(
   props: ProtocolVisualizationProps
-): JSX.Element {
+): ReactNode {
   const { groupedCommands, analysis, appType } = props
   const createdDate = new Date(analysis.createdAt)
   const { commands, robotType, liquids } = analysis

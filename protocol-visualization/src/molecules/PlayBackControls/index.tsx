@@ -14,7 +14,7 @@ import { formatTime } from './utils/formatTime'
 import { getSpeedMultiplierText } from './utils/getSpeedMultiplierText'
 import { isEditableKeyboardTarget } from './utils/isEditableKeyboardTarget'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 
 interface PlayBackControlsProps {
@@ -29,7 +29,7 @@ interface PlayBackControlsProps {
   onClickStepDetail?: () => void
 }
 
-export function PlayBackControls(props: PlayBackControlsProps): JSX.Element {
+export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
   const {
     isPlaying,
     handlePlayPause,
