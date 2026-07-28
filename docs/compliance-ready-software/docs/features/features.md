@@ -3,14 +3,22 @@ title: "Compliance-Ready Features"
 description: "An overview of the Flex's compliance-ready features."
 ---
 
-Opentrons Flex Compliance-Ready software introduces several new features once installed on your Flex. This section covers: 
+Opentrons Flex Compliance-Ready software introduces several new, irreversible features when installed on your Flex. This section covers: 
 
-* The different user [roles] that can access your compliance-ready Flex and Opentrons App. 
-* When and where [documentation] is required while using your Flex. 
-* Available [settings] to further customize your compliance-ready Flex.
-* The types of [protocol run records] the Flex generates.
+* The different user [roles](../features/features.md#roles) that can access your compliance-ready Flex and Opentrons App. 
+* When and where [documentation](../features/documentation.md) is required while using your Flex. 
+* Available [settings](../features/settings.md) to further customize your compliance-ready Flex.
+* The types of [protocol run records](../features/records.md) a compliance-ready Flex generates.
 
 On this page, read about roles and additional features like the Flex's encryption key, optional devices, and the additional data protection compliance-ready software enables.
+
+<!--------
+
+TODO and comments: 
+- happy to hear feedback on this section's organization. I've been back and forth several times at this point.
+- differentiate between protocol RUN RECORDS and protocol LOG FILES. we use both and we need to be crystal clear about what the intended difference is. is a protocol run record contained in the APP or ODD and the log file is the larger .zip file that is downloaded and exported?? 
+
+----->
 
 ## Roles
 
