@@ -1,8 +1,16 @@
-.modal_container {
+.modal_content {
   display: flex;
   width: 100%;
   flex-direction: column;
   gap: var(--spacing-60);
+}
+
+.modal_container {
+  transition: transform 0.2s ease-out;
+}
+
+.modal_container_keyboard_expanded {
+  transform: translateY(-6rem);
 }
 
 .form_section {

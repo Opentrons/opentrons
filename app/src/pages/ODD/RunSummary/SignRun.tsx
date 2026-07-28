@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
+import cx from 'classnames'
 
 import {
   ERROR_TOAST,
@@ -196,7 +197,13 @@ export function SignRun({
 
   return (
     <>
-      <OddModal header={modalHeader} className={styles.modal_container}>
+      <OddModal
+        header={modalHeader}
+        className={styles.modal_content}
+        modalClassName={cx(styles.modal_container, {
+          [styles.modal_container_keyboard_expanded]: keyboardExpanded,
+        })}
+      >
         {isLoading ? (
           <div className={styles.loading_container}>
             <Icon
