@@ -26,7 +26,7 @@ import {
   useRobot,
 } from '/app/redux-resources/robots'
 import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'
-import { useIsRobotOutOfMemory, useLights } from '/app/resources/devices'
+import { useIsRobotOutOfStorage, useLights } from '/app/resources/devices'
 
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { CalibrationStatusBanner } from './CalibrationStatusBanner'
@@ -68,7 +68,7 @@ export function RobotOverview({
 
   useUSBRegistration(robot)
 
-  const isRobotOutOfMemory = useIsRobotOutOfMemory()
+  const isRobotOutOfStorage = useIsRobotOutOfStorage()
 
   return robot != null ? (
     <>
@@ -108,7 +108,7 @@ export function RobotOverview({
                 marginBottom={SPACING.spacing8}
               />
             ) : null}
-            {isRobotOutOfMemory ? (
+            {isRobotOutOfStorage ? (
               <RobotOutOfStorageNotification robotName={robotName} />
             ) : null}
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
