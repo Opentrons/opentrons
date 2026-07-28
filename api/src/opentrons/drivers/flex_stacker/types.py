@@ -1,6 +1,6 @@
 from dataclasses import dataclass, fields
 from enum import Enum
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 from opentrons_shared_data.util import StrEnum
 
@@ -356,14 +356,12 @@ class TOFMeasurementResult:
         }
 
     @staticmethod
-    def from_pyro_dict(
-        classname: Any, data: Dict[str, Any]
-    ) -> "TOFMeasurementResult":
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "TOFMeasurementResult":
         """Consumed by Serpent, convert from a Pyro Dictionary."""
         return TOFMeasurementResult(
             sensor=TOFSensor(data["sensor"]),
             kind=MeasurementKind(data["kind"]),
-            bins=data["bins"]
+            bins=data["bins"],
         )
 
 

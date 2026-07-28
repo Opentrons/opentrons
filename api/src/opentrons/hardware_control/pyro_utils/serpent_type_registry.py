@@ -14,6 +14,7 @@ import opentrons_shared_data.pipette.types
 import opentrons.calibration_storage.ot3.models.v1
 import opentrons.calibration_storage.types
 import opentrons.config.types
+import opentrons.drivers.flex_stacker.types
 import opentrons.drivers.rpi_drivers.types
 import opentrons.drivers.types
 import opentrons.drivers.vacuum_module.types

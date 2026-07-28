@@ -888,17 +888,14 @@ class StatusBarUpdateEvent:
         return {
             "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
             "state": obj.state.value,
-            "enabled": obj.enabled
+            "enabled": obj.enabled,
         }
 
     @staticmethod
-    def from_pyro_dict(
-        classname: Any, data: Dict[str, Any]
-    ) -> "StatusBarUpdateEvent":
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "StatusBarUpdateEvent":
         """Consumed by Serpent, convert from a Pyro Dictionary."""
         return StatusBarUpdateEvent(
-            state=StatusBarState(data["state"]),
-            enabled=data["enabled"]
+            state=StatusBarState(data["state"]), enabled=data["enabled"]
         )
 
 
