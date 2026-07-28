@@ -70,7 +70,7 @@ export interface ResetConfigOptionsResponse {
  * The possible keys are theoretically dynamic,
  * coming from `GET /settings/reset/options`.
  */
-export interface SettingsResets  {
+export interface SettingsResets {
   [optionId: string]: boolean | undefined
 }
 
