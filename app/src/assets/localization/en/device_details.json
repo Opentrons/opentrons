@@ -267,14 +267,7 @@
   "robot_logs": "Robot Logs",
   "robot_out_of_memory": "Robot out of memory",
   "robot_storage": "Robot Storage",
-<<<<<<< Updated upstream
-  "robot_storage_almost_full": "Robot storage is almost full",
-=======
-<<<<<<< Updated upstream
-=======
   "robot_storage_almost_full": "Robot’s file storage is full",
->>>>>>> Stashed changes
->>>>>>> Stashed changes
   "run": "Run",
   "run_a_protocol": "Run a protocol",
   "run_again": "Run again",
