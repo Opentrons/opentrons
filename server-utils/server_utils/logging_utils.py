@@ -1,6 +1,6 @@
 """Utilities for servers to log stuff."""
 
-from typing import TypeAlias
+from typing import Any, TypeAlias
 
 _FormatterConfig: TypeAlias = dict[str, object]
 _HandlerConfig: TypeAlias = dict[str, object]
