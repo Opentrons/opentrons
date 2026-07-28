@@ -23,6 +23,7 @@ import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistor
 import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
 import { ProtocolSetupParameters } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
+import { useIsRobotOutOfStorage } from '/app/resources/devices'
 import { useRunTimeParameters } from '/app/resources/protocols'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
@@ -32,6 +33,7 @@ import { Deck } from '../Deck'
 import { Hardware } from '../Hardware'
 import { Labware } from '../Labware'
 import { Parameters } from '../Parameters'
+import { RobotOutOfStorageModal } from '../RobotOutOfStorageModal'
 
 import type { HostConfig } from '@opentrons/api-client'
 
@@ -64,6 +66,8 @@ vi.mock(
     }),
   })
 )
+vi.mock('../RobotOutOfStorageModal')
+vi.mock('/app/resources/devices')
 
 const MOCK_HOST_CONFIG = {} as HostConfig
 const mockCreateRun = vi.fn((id: string) => {})
@@ -273,5 +277,16 @@ describe('ODDProtocolDetails', () => {
     } as any)
     render()
     screen.getByText('mock missing hardware chip text & requires CSV')
+  })
+
+  it('renders RobotOutOfStorageModal on Start Setup click if robot storage is full', () => {
+    vi.mocked(useIsRobotOutOfStorage).mockReturnValue(true)
+    vi.mocked(RobotOutOfStorageModal).mockReturnValue(
+      <div>mockRobotOutOfStorageModal</div>
+    )
+    render()
+    const startSetupButton = screen.getByRole('button', { name: 'Start setup' })
+    fireEvent.click(startSetupButton)
+    screen.getByText('mockRobotOutOfStorageModal')
   })
 })
