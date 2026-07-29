@@ -27,7 +27,7 @@ export const DefaultPrimaryButton: StyledComponent<any, any> = styled(Btn)`
 
   &:focus-visible {
     outline: 2px solid ${COLORS.blue50};
-    outline-offset: 0.25rem;
+    outline-offset: 0.125rem;
   }
 
   &:active {

@@ -11,9 +11,9 @@
   line-height: var(--line-height-20);
 }
 
-.alt_primary_button:focus {
-  background-color: var(--grey-35);
-  box-shadow: none;
+.alt_primary_button:focus-visible {
+  outline: 2px solid var(--blue-50);
+  outline-offset: 0.125rem;
 }
 
 .alt_primary_button:active {
