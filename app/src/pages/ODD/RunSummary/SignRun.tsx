@@ -25,14 +25,7 @@ import type { KeyboardReactInterface } from 'react-simple-keyboard'
 // Above OnDeviceLogin overlay (z-index: 10001) so the toast is visible on login.
 const TOAST_ABOVE_LOGIN_Z_INDEX = 10002
 
-export function SignRun({
-  runId,
-  onSigned,
-}: {
-  runId: string
-  /** Called after client-side validation succeeds. Temporary until the sign endpoint ships. */
-  onSigned: () => void
-}): JSX.Element {
+export function SignRun({ runId }: { runId: string }): JSX.Element {
   const { t, i18n } = useTranslation(['access_control', 'shared'])
 
   const [name, setName] = useState('')
@@ -69,7 +62,6 @@ export function SignRun({
   const { signRun, isLoading, loginGate, correctName } = useSignRunFlow(
     runId,
     robotName,
-    onSigned,
     async () => await showLoginModal(),
     popToast,
     eatToast

@@ -95,15 +95,7 @@ export function ProtocolRunHeader(
   const isSigningRequired =
     (accessControlEnabled?.data.accessControlEnabled ?? false) &&
     (accessControlSettings?.data.requireSignoffForProtocolLog ?? false)
-  // TODO(jj, 2026-07-27): Remove hasLocallySigned once the sign endpoint sets
-  // run.signedBy and the modal dismisses from that server state.
-  const [hasLocallySigned, setHasLocallySigned] = useState(false)
-  useEffect(() => {
-    setHasLocallySigned(false)
-  }, [runId])
-  const hasSignedBy =
-    (runRecord?.data.signedBy != null && runRecord.data.signedBy !== '') ||
-    hasLocallySigned
+  const hasSignedBy = !!runRecord?.data.signedBy
   const isSigned = !isSigningRequired || hasSignedBy
   const isRunCurrent = useIsRunCurrent(runId)
   // Set when the run becomes terminal or close is requested before signing;
@@ -211,13 +203,7 @@ export function ProtocolRunHeader(
         {...props}
       />
       {showSignRunModal ? (
-        <SignRunModal
-          runId={runId}
-          robotName={robotName}
-          onSigned={() => {
-            setHasLocallySigned(true)
-          }}
-        />
+        <SignRunModal runId={runId} robotName={robotName} />
       ) : null}
       <Flex ref={protocolRunHeaderRef} css={CONTAINER_STYLE}>
         <RunHeaderProtocolName runId={runId} />

@@ -24,14 +24,11 @@ const TOAST_ABOVE_LOGIN_Z_INDEX = 10002
 export interface SignRunModalProps {
   runId: string
   robotName: string
-  /** Called after client-side validation succeeds. Temporary until the sign endpoint ships. */
-  onSigned: () => void
 }
 
 export function SignRunModal({
   runId,
   robotName,
-  onSigned,
 }: SignRunModalProps): JSX.Element {
   const { t, i18n } = useTranslation(['access_control', 'shared'])
 
@@ -66,7 +63,6 @@ export function SignRunModal({
   const { signRun, isLoading, loginGate, correctName } = useSignRunFlow(
     runId,
     robotName,
-    onSigned,
     showLoginModal,
     popToast,
     eatToast

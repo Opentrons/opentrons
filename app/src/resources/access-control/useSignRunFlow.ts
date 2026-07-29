@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useQueryClient } from 'react-query'
 
 import {
@@ -7,8 +7,10 @@ import {
   useAuthSettingsQuery,
   useHost,
   useSelfQuery,
+  useSignRunMutation,
 } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useLogout } from '/app/redux/robot-auth'
 
 // login gate states to control login prompting
@@ -28,7 +30,6 @@ export interface SignRunFlowResult {
 export function useSignRunFlow(
   runId: string,
   robotName: string,
-  onSigned: () => void,
   showLoginModal: (props: {
     robotName: string
     uncloseable: boolean
@@ -39,6 +40,9 @@ export function useSignRunFlow(
   const queryClient = useQueryClient()
   const host = useHost()
   const logout = useLogout()
+  const documentationState = useDocumentationState()
+  const { signRun: signRunMutation, isLoading: isSignRunLoading } =
+    useSignRunMutation(documentationState)
 
   const { data: authSettings, isLoading: isAuthSettingsLoading } =
     useAuthSettingsQuery()
@@ -48,7 +52,8 @@ export function useSignRunFlow(
     isFetching: isSelfFetching,
   } = useSelfQuery()
 
-  const isLoading = isAuthSettingsLoading || isSelfLoading
+  const isAuthLoading = isAuthSettingsLoading || isSelfLoading
+  const isLoading = isAuthLoading || isSignRunLoading
 
   const isLoggedIn = !!self?.data?.username
 
@@ -96,7 +101,7 @@ export function useSignRunFlow(
   }, [refetchSelf, eatToast, queryClient, host])
 
   useEffect(() => {
-    if (isLoading || isSelfFetching) {
+    if (isAuthLoading || isSelfFetching) {
       return
     }
     switch (loginGate) {
@@ -132,7 +137,7 @@ export function useSignRunFlow(
   }, [
     eatToast,
     host,
-    isLoading,
+    isAuthLoading,
     isSelfFetching,
     loginGate,
     logout,
@@ -142,10 +147,19 @@ export function useSignRunFlow(
     showLoginModal,
   ])
 
-  return {
-    signRun: (name: string) => {
-      onSigned()
+  const signRun = useCallback(
+    (name: string) => {
+      const trimmedName = name.trim()
+      if (!trimmedName || trimmedName !== self?.data?.fullName) {
+        return
+      }
+      signRunMutation({ runId, name })
     },
+    [self?.data?.fullName, signRunMutation, runId]
+  )
+
+  return {
+    signRun,
     isLoading,
     loginGate,
     correctName: self?.data?.fullName,
