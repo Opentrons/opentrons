@@ -3,7 +3,6 @@ ssh_key_management: Endpoints for managing SSH keys on the robot
 """
 
 import contextlib
-import functools
 import hashlib
 import ipaddress
 import logging
@@ -11,51 +10,55 @@ import os
 from pathlib import Path
 from typing import IO, Any, Generator, List, Tuple
 
-from aiohttp import web
+import fastapi
+from pydantic import BaseModel
 
 from server_utils.auth.scopes import Scope
 
-from . import auth
-from .handler_type import Handler
+from .api_error import APIError, ErrorBody
+from .auth import require_scopes
 
 LOG = logging.getLogger(__name__)
 SSH_DIR = Path(os.path.expanduser("~/.ssh"))
 AUTHORIZED_KEYS = SSH_DIR / "authorized_keys"
 
+router = fastapi.APIRouter()
 
-def require_linklocal(handler: Handler) -> Handler:
-    """Ensure the decorated is only called if the request is linklocal.
+
+def require_linklocal(request: fastapi.Request) -> None:
+    """A FastAPI dependency that rejects requests from non-linklocal connections.
 
     The host ip address should be in the X-Host-IP header (provided by nginx)
     """
-
-    @functools.wraps(handler)
-    async def decorated(request: web.Request) -> web.StreamResponse:
-        ipaddr_str = request.headers.get("x-host-ip")
-        invalid_req_data = {
-            "error": "bad-interface",
-            "message": (
-                f"The endpoint {request.rel_url}"
+    ipaddr_str = request.headers.get("x-host-ip")
+    invalid_req_error = APIError(
+        403,
+        ErrorBody(
+            error="bad-interface",
+            message=(
+                f"The endpoint {_relative_url(request)}"
                 f" can only be used from link-local connections."
                 f" Make sure you're connected to this robot directly by cable"
                 f" and using this robot's wired IP address"
                 f" (not its wireless IP address)."
             ),
-        }
-        if not ipaddr_str:
-            return web.json_response(data=invalid_req_data, status=403)
-        try:
-            addr = ipaddress.ip_address(ipaddr_str)
-        except ValueError:
-            LOG.exception(f"Couldn't parse host ip address {ipaddr_str}")
-            raise
+        ),
+    )
+    if not ipaddr_str:
+        raise invalid_req_error
+    try:
+        addr = ipaddress.ip_address(ipaddr_str)
+    except ValueError:
+        LOG.exception(f"Couldn't parse host ip address {ipaddr_str}")
+        raise
 
-        if not addr.is_link_local:
-            return web.json_response(data=invalid_req_data, status=403)
+    if not addr.is_link_local:
+        raise invalid_req_error
 
-        return await handler(request)
 
-    return decorated
+def _relative_url(request: fastapi.Request) -> str:
+    url = request.url
+    return url.path if not url.query else f"{url.path}?{url.query}"
 
 
 @contextlib.contextmanager
@@ -105,12 +108,50 @@ def key_present(hashval: str) -> bool:
     return hashval in [keyhash for keyhash, _ in get_keys()]
 
 
-def key_error(error: str, message: str, status: int = 400) -> web.Response:
-    return web.json_response(data={"error": error, "message": message}, status=status)
+def key_error(error: str, message: str, status: int = 400) -> APIError:
+    return APIError(status, ErrorBody(error=error, message=message))
 
 
-@require_linklocal
-async def list_keys(request: web.Request) -> web.Response:
+class PublicKey(BaseModel):
+    """One entry in the robot's authorized_keys file."""
+
+    key_md5: str
+    key: str
+
+
+class ListKeysResponse(BaseModel):
+    """The public keys currently authorized to ssh into the robot."""
+
+    public_keys: List[PublicKey]
+
+
+class AddKeyResponse(BaseModel):
+    """The result of adding a single public key."""
+
+    message: str
+    key_md5: str
+
+
+class AddLocalKeysResponse(BaseModel):
+    """The result of adding public keys found on attached storage."""
+
+    message: str
+    key_md5: List[str]
+
+
+class ModifyKeysResponse(BaseModel):
+    """The result of removing one or all public keys."""
+
+    message: str
+    restart_url: str
+
+
+@router.get(
+    "/server/ssh_keys",
+    summary="List the keys authorized to ssh into the robot.",
+    dependencies=[fastapi.Depends(require_linklocal)],
+)
+async def list_keys() -> ListKeysResponse:
     """List keys in the authorized_keys file.
 
     GET /server/ssh_keys
@@ -118,19 +159,23 @@ async def list_keys(request: web.Request) -> web.Response:
 
     (or 403 if not from the link-local connection)
     """
-    return web.json_response(
-        {
-            "public_keys": [
-                {"key_md5": details[0], "key": details[1]} for details in get_keys()
-            ]
-        },
-        status=200,
+    return ListKeysResponse(
+        public_keys=[
+            PublicKey(key_md5=details[0], key=details[1]) for details in get_keys()
+        ]
     )
 
 
-@auth.require_scopes(Scope.SSH_KEYS_WRITE)
-@require_linklocal
-async def add(request: web.Request) -> web.Response:
+@router.post(
+    "/server/ssh_keys",
+    status_code=201,
+    summary="Authorize a public key to ssh into the robot.",
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.SSH_KEYS_WRITE)),
+        fastapi.Depends(require_linklocal),
+    ],
+)
+async def add(request: fastapi.Request) -> AddKeyResponse:
     """Add a public key to the authorized_keys file.
 
     POST /server/ssh_keys {"key": key string}
@@ -142,7 +187,7 @@ async def add(request: web.Request) -> web.Response:
     body = await request.json()
 
     if "key" not in body or not isinstance(body["key"], str):
-        return key_error("no-key", 'No "key" element in body')
+        raise key_error("no-key", 'No "key" element in body')
     pubkey = body["key"]
 
     # Do some fairly minor sanitization; dropbear will ignore invalid keys but
@@ -150,7 +195,7 @@ async def add(request: web.Request) -> web.Response:
 
     pubkey_parts = pubkey.split()
     if len(pubkey_parts) == 0:
-        return key_error("bad-key", "Key is empty")
+        raise key_error("bad-key", "Key is empty")
 
     alg = pubkey_parts[0]
 
@@ -158,11 +203,11 @@ async def add(request: web.Request) -> web.Response:
     # with restrictions
     if alg != "ssh-rsa" and not alg.startswith("ecdsa"):
         LOG.warning(f"weird keyfile uploaded: starts with {alg}")
-        return key_error("bad-key", f"Key starts with invalid algorithm {alg}")
+        raise key_error("bad-key", f"Key starts with invalid algorithm {alg}")
 
     if "\n" in pubkey[:-1]:
         LOG.warning("Newlines in keyfile that shouldn't be there")
-        return key_error("bad-key", "Key has a newline")
+        raise key_error("bad-key", "Key has a newline")
 
     # This is a more or less correct key we can write
     if "\n" == pubkey[-1]:
@@ -172,14 +217,18 @@ async def add(request: web.Request) -> web.Response:
         with authorized_keys("a") as ak:
             ak.write(f"{pubkey}\n")
 
-    return web.json_response(
-        data={"message": f"Added key {hashval}", "key_md5": hashval}, status=201
-    )
+    return AddKeyResponse(message=f"Added key {hashval}", key_md5=hashval)
 
 
-@auth.require_scopes(Scope.SSH_KEYS_WRITE)
-@require_linklocal
-async def clear(request: web.Request) -> web.Response:
+@router.delete(
+    "/server/ssh_keys",
+    summary="Deauthorize every public key.",
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.SSH_KEYS_WRITE)),
+        fastapi.Depends(require_linklocal),
+    ],
+)
+async def clear() -> ModifyKeysResponse:
     """Clear all public keys from authorized_keys
 
     DELETE /server/ssh_keys
@@ -190,56 +239,54 @@ async def clear(request: web.Request) -> web.Response:
     with authorized_keys("w") as ak:
         ak.write("\n".join([]) + "\n")
 
-    return web.json_response(
-        data={
-            "message": "Keys cleared. Restart robot to take effect",
-            "restart_url": "/server/restart",
-        },
-        status=200,
+    return ModifyKeysResponse(
+        message="Keys cleared. Restart robot to take effect",
+        restart_url="/server/restart",
     )
 
 
-@auth.require_scopes(Scope.SSH_KEYS_WRITE)
-@require_linklocal
-async def remove(request: web.Request) -> web.Response:
+@router.delete(
+    "/server/ssh_keys/{key_md5}",
+    summary="Deauthorize a single public key.",
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.SSH_KEYS_WRITE)),
+        fastapi.Depends(require_linklocal),
+    ],
+)
+async def remove(key_md5: str) -> ModifyKeysResponse:
     """Remove a public key from authorized_keys
 
     DELETE /server/ssh_keys/:key_md5_hexdigest
     -> 200 OK if the key was found
     -> 404 Not Found otherwise
     """
-    requested_hash = request.match_info["key_md5"]
     new_keys: List[str] = []
     found = False
     for keyhash, key in get_keys():
-        if keyhash == requested_hash:
+        if keyhash == key_md5:
             found = True
         else:
             new_keys.append(key)
 
     if not found:
-        return web.json_response(
-            data={
-                "error": "invalid-key-hash",
-                "message": f"No such key md5 {requested_hash}",
-            },
-            status=404,
-        )
+        raise key_error("invalid-key-hash", f"No such key md5 {key_md5}", 404)
 
     with authorized_keys("w") as ak:
         ak.write("\n".join(new_keys) + "\n")
 
-    return web.json_response(
-        data={
-            "message": f"Key {requested_hash} deleted. Restart robot to take effect",
-            "restart_url": "/server/restart",
-        },
-        status=200,
+    return ModifyKeysResponse(
+        message=f"Key {key_md5} deleted. Restart robot to take effect",
+        restart_url="/server/restart",
     )
 
 
-@auth.require_scopes(Scope.SSH_KEYS_WRITE)
-async def add_from_local(request: web.Request) -> web.Response:
+@router.post(
+    "/server/ssh_keys/from_local",
+    status_code=201,
+    summary="Authorize public keys found on attached storage.",
+    dependencies=[fastapi.Depends(require_scopes(Scope.SSH_KEYS_WRITE))],
+)
+async def add_from_local() -> AddLocalKeysResponse:
     """Add a public keys from usb device to the authorized_keys file.
 
     POST /server/ssh_keys/from_local
@@ -258,7 +305,7 @@ async def add_from_local(request: web.Request) -> web.Response:
     ]
     if not pub_keys:
         LOG.warning("No keys found")
-        return key_error("no-key", "No valid keys found", 404)
+        raise key_error("no-key", "No valid keys found", 404)
 
     # Create the .ssh folder if it does not exist
     if not os.path.exists(SSH_DIR):
@@ -283,7 +330,6 @@ async def add_from_local(request: web.Request) -> web.Response:
                 LOG.error(f"Could not process ssh public key: {key} {e}")
                 continue
 
-    return web.json_response(
-        data={"message": f"Added {len(new_keys)} new keys", "key_md5": new_keys},
-        status=201,
+    return AddLocalKeysResponse(
+        message=f"Added {len(new_keys)} new keys", key_md5=new_keys
     )
