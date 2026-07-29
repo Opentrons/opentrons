@@ -101,7 +101,9 @@ async def test_calibration_move_to_location_implementation_for_attach_plate(
     )
 
     mock_internal_96ch_attach = decoy.mock(func=feature_flags.internal_96ch_attach)
-    monkeypatch.setattr(feature_flags, "internal_96ch_attach", mock_internal_96ch_attach)
+    monkeypatch.setattr(
+        feature_flags, "internal_96ch_attach", mock_internal_96ch_attach
+    )
     decoy.when(mock_internal_96ch_attach()).then_return(internal_96ch_attach)
     decoy.when(
         await ot3_hardware_api.gantry_position(

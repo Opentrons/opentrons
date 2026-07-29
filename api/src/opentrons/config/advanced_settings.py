@@ -255,7 +255,7 @@ settings = [
         _id="internal96chAttach",
         title="Modified 96-channel pipette attachment",
         description=(
-            "Lower the right mount to easily attach mount without detaching z axis"
+            "Lower the right mount to attach mount without detaching z axis during"
             " 96-channel pipette attach, reducing the Z margin from 20 mm to 1.85 mm."
             "This can and will ruin the right z axis, do not use."
         ),
