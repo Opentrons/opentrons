@@ -47,6 +47,7 @@
     "patchAuditSettings",
     "patchAuthSettings",
     "patchRobotServerAccessControlSettings",
+    "postLogMessage",
     "postResetConfig",
     "postWifiConfigure",
     "postWifiDisconnect",
