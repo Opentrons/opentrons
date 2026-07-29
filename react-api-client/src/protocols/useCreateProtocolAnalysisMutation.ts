@@ -59,30 +59,24 @@ export function useCreateProtocolAnalysisMutation(
     CreateProtocolAnalysisVariables
   >(
     getQueryKey(host, 'protocols', protocolId, 'analyses'),
-    ({
+    async ({
       protocolKey,
       runTimeParameterValues,
       runTimeParameterFiles,
       forceReAnalyze,
-    }) =>
-      createProtocolAnalysis(
+    }) => {
+      const response = await createProtocolAnalysis(
         host!,
         protocolKey,
         runTimeParameterValues,
         runTimeParameterFiles,
         forceReAnalyze
       )
-        .then(response => {
-          queryClient
-            .invalidateQueries(getQueryKey(host, 'protocols'))
-            .catch((e: Error) => {
-              throw e
-            })
-          return response.data
-        })
-        .catch((e: Error) => {
-          throw e
-        }),
+      // Note: Not awaiting invalidateQueries() to preserve prior behavior.
+      // Not sure this is what we actually want.
+      void queryClient.invalidateQueries(getQueryKey(host, 'protocols'))
+      return response.data
+    },
     options
   )
   return {
