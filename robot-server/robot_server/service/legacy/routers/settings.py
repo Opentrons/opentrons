@@ -44,6 +44,7 @@ from server_utils.fastapi_utils.app_state import (
     AppState,
     get_app_state,
 )
+from server_utils.fastapi_utils.documented_interaction import get_supplied_user_notes
 from server_utils.persistence.persistence_directory import PersistenceResetter
 
 from robot_server.deck_configuration.fastapi_dependencies import (
@@ -91,13 +92,15 @@ log = logging.getLogger(__name__)
 router = APIRouter()
 
 
-async def _set_oem_mode_request(enable: bool, authorization_header: str | None) -> int:
+async def _set_oem_mode_request(
+    enable: bool, authorization_header: str | None, user_notes_header: str | None
+) -> int:
     """PUT request to set the OEM Mode for the system server."""
-    headers = (
-        {"Authorization": authorization_header}
-        if authorization_header is not None
-        else None
-    )
+    headers: dict[str, str] = {}
+    if authorization_header is not None:
+        headers["Authorization"] = authorization_header
+    if user_notes_header is not None:
+        headers["Opentrons-User-Notes"] = user_notes_header
 
     async with aiohttp.ClientSession() as session:
         async with session.put(
@@ -151,6 +154,7 @@ async def post_settings(
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
     app_state: Annotated[AppState, Depends(get_app_state)],
     robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
+    user_notes: Annotated[str | None, Depends(get_supplied_user_notes)],
     authorization: Annotated[str | None, Header()] = None,
 ) -> AdvancedSettingsResponse:
     """Update advanced setting (feature flag)"""
@@ -162,8 +166,9 @@ async def post_settings(
                 # `None`/`null` to restore to default. Storing `False` instead is close
                 # enough.
                 update.value if update.value is not None else False,
-                # Forward along the client's authorization, if it has authorization.
+                # Forward along the client's authorization and reason, if it has them
                 authorization_header=authorization,
+                user_notes_header=user_notes,
             )
             if resp != 200:
                 # TODO: raise correct error here
