@@ -6,7 +6,6 @@ import {
   Modal,
   PrimaryButton,
   SecondaryButton,
-  StyledText,
 } from '@opentrons/components'
 import { useCreateUserMutation } from '@opentrons/react-api-client'
 
@@ -60,7 +59,7 @@ export function AddUserModal({
     defaultValues: {
       username: '',
       fullName: '',
-      accountType: 'user',
+      accountType: 'admin',
     },
     mode: 'onBlur',
     reValidateMode: 'onChange',
@@ -108,7 +107,7 @@ export function AddUserModal({
       title={t('desktop_add_user')}
       onClose={handleClose}
       closeOnOutsideClick={false}
-      width="47rem"
+      width="31.25rem"
     >
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className={styles.form_fields}>
@@ -122,6 +121,7 @@ export function AddUserModal({
               <DropdownMenu
                 filterOptions={accountTypeOptions}
                 currentOption={selectedAccountTypeOption}
+                dropdownType="neutral"
                 onClick={value => {
                   setValue('accountType', value as AuthUserAccountType, {
                     shouldValidate: true,
@@ -134,10 +134,10 @@ export function AddUserModal({
           </div>
           <div className={styles.actions}>
             <SecondaryButton type="button" onClick={handleClose}>
-              {t('shared:cancel')}
+              {t('shared:back')}
             </SecondaryButton>
             <PrimaryButton type="submit" disabled={isSaveDisabled}>
-              {t('shared:save')}
+              {t('shared:next')}
             </PrimaryButton>
           </div>
         </div>
