@@ -1,3 +1,4 @@
+import { useQueryClient } from 'react-query'
 import { useDispatch } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -13,6 +14,11 @@ vi.mock('react-redux', async importOriginal => {
     useDispatch: vi.fn(),
   }
 })
+
+vi.mock('react-query')
+vi.mocked(useQueryClient).mockReturnValue({
+  setQueryData: vi.fn(),
+} as any)
 
 describe('useStoreLoginState', () => {
   const mockDispatch = vi.fn()
