@@ -52,6 +52,7 @@ import { ProtocolSetupParameters } from '/app/organisms/ODD/ProtocolSetup/Protoc
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '/app/redux/config'
+import { useIsRobotOutOfStorage } from '/app/resources/devices'
 import { useRunTimeParameters } from '/app/resources/protocols'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
@@ -61,6 +62,7 @@ import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 import { Liquids } from './Liquids'
 import { Parameters } from './Parameters'
+import { RobotOutOfStorageModal } from './RobotOutOfStorageModal'
 
 import type { Protocol } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '/app/App/types'
@@ -73,6 +75,7 @@ interface ProtocolHeaderProps {
   chipText: string
   isScrolled: boolean
   isProtocolFetching: boolean
+  startSetup: boolean
 }
 
 const ProtocolHeader = ({
@@ -81,11 +84,11 @@ const ProtocolHeader = ({
   chipText,
   isScrolled,
   isProtocolFetching,
+  startSetup,
 }: ProtocolHeaderProps): JSX.Element => {
   const navigate = useNavigate()
   const { t } = useTranslation(['protocol_info, protocol_details', 'shared'])
   const [truncate, setTruncate] = useState<boolean>(true)
-  const [startSetup, setStartSetup] = useState<boolean>(false)
   const toggleTruncate = (): void => {
     setTruncate(value => !value)
   }
@@ -154,10 +157,7 @@ const ProtocolHeader = ({
       </Flex>
       <SmallButton
         buttonCategory="rounded"
-        onClick={() => {
-          setStartSetup(true)
-          handleRunProtocol()
-        }}
+        onClick={handleRunProtocol}
         buttonText={t('protocol_details:start_setup')}
         disabled={isProtocolFetching}
         iconName={startSetup ? 'ot-spinner' : undefined}
@@ -364,6 +364,11 @@ export function ProtocolDetails(): JSX.Element | null {
     },
   })
 
+  const isRobotOutOfStorage = useIsRobotOutOfStorage()
+  const [showRobotOutOfStorageModal, setShowRobotOutOfStorageModal] =
+    useState<boolean>(false)
+  const [startSetup, setStartSetup] = useState<boolean>(false)
+
   const isRequiredCsv =
     mostRecentAnalysis?.result === 'parameter-value-required'
   if (isRequiredCsv) {
@@ -391,6 +396,11 @@ export function ProtocolDetails(): JSX.Element | null {
     )
   }
   const handleRunProtocol = (): void => {
+    if (isRobotOutOfStorage) {
+      setShowRobotOutOfStorageModal(true)
+      return
+    }
+    setStartSetup(true)
     runTimeParameters.length > 0
       ? setShowParameters(true)
       : createRun({ protocolId })
@@ -449,6 +459,16 @@ export function ProtocolDetails(): JSX.Element | null {
     />
   ) : (
     <>
+      {showRobotOutOfStorageModal ? (
+        <RobotOutOfStorageModal
+          onConfirm={() => {
+            navigate('/robot-settings')
+          }}
+          onClose={() => {
+            setShowRobotOutOfStorageModal(false)
+          }}
+        />
+      ) : null}
       {showConfirmDeleteProtocol ? (
         <Flex alignItems={ALIGN_CENTER}>
           {!isProtocolFetching ? (
@@ -510,6 +530,7 @@ export function ProtocolDetails(): JSX.Element | null {
           chipText={chipText}
           isScrolled={isScrolled}
           isProtocolFetching={isProtocolFetching}
+          startSetup={startSetup}
         />
         <Flex
           flexDirection={DIRECTION_COLUMN}

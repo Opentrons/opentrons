@@ -153,6 +153,10 @@ class RunNotCurrentError(ValueError):
     """Error raised when a requested run is not the current run."""
 
 
+class RunNotCompleteError(ValueError):
+    """Error raised when trying to sign a run that has not completed."""
+
+
 class PreSerializedCommandsNotAvailableError(LookupError):
     """Error raised when a run's commands are not available as pre-serialized list of commands."""
 
@@ -443,6 +447,34 @@ class RunDataManager:
             current=False,
             run_time_parameters=run_result.parameters,
         )
+
+    def set_signed_by(self, run_id: str, signed_by: str) -> Union[Run, BadRun]:
+        """Record that a human has reviewed the current completed run.
+
+        Args:
+            run_id: The run to sign.
+            signed_by: Signature of the user who reviewed the run.
+
+        Returns:
+            The run after the signature has been stored.
+
+        Raises:
+            RunNotCurrentError: The run is not the current run.
+            RunNotCompleteError: The run has not reached a terminal status.
+        """
+        if run_id != self._run_orchestrator_store.current_run_id:
+            raise RunNotCurrentError(
+                f"Cannot sign {run_id} because it is not the current run."
+            )
+
+        if not self._run_orchestrator_store.get_is_run_terminal():
+            raise RunNotCompleteError(
+                f"Cannot sign {run_id} because it has not completed."
+            )
+
+        self._run_store.set_signed_by(run_id=run_id, signed_by=signed_by)
+        self._runs_publisher.publish_runs_advise_refetch(run_id)
+        return self.get(run_id=run_id)
 
     def get_commands_slice(
         self,
