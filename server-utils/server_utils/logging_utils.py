@@ -1,6 +1,6 @@
 """Utilities for servers to log stuff."""
 
-from typing import TypeAlias
+from typing import Any, TypeAlias
 
 _FormatterConfig: TypeAlias = dict[str, object]
 _HandlerConfig: TypeAlias = dict[str, object]
@@ -10,7 +10,27 @@ _ROOT_HANDLER_KEY = "root_handler"
 _ROOT_FORMATTER_KEY = "root_formatter"
 
 
-def get_dict_config(log_level: str | int, syslog_id: str) -> dict[str, object]:
+def _get_logger_config(
+    log_level: str | int, include_sqlalchemy_echo: bool
+) -> dict[str, Any]:
+    if include_sqlalchemy_echo:
+        return {
+            "uvicorn": {"propagate": True},
+            "uvicorn.access": {"propagate": True},
+            # sqlalchemy by default only propagates logs of level WARN and above.
+            # This changes it to follow the same level filtering as everything else.
+            "sqlalchemy": {"level": log_level},
+        }
+    else:
+        return {
+            "uvicorn": {"propagate": True},
+            "uvicorn.access": {"propagate": True},
+        }
+
+
+def get_dict_config(
+    log_level: str | int, syslog_id: str, include_sqlalchemy_echo: bool = False
+) -> dict[str, object]:
     """Return a logging configuration suitable for most Opentrons servers.
 
     On robots, this will send logs to systemd. On dev machines, this will send logs
@@ -25,6 +45,7 @@ def get_dict_config(log_level: str | int, syslog_id: str) -> dict[str, object]:
         A logging configuration that can be passed to `logging.config.dictConfig()`.
     """
     root_formatter, root_handler = _get_root_formatter_and_handler_for_system(syslog_id)
+
     return {
         "version": 1,
         # Many modules will already have been imported and will have created their
@@ -32,13 +53,7 @@ def get_dict_config(log_level: str | int, syslog_id: str) -> dict[str, object]:
         "disable_existing_loggers": False,
         # Fix up 3rd-party packages to make sure their logs propagate up to our root
         # handler. Most packages don't need this.
-        "loggers": {
-            "uvicorn": {"propagate": True},
-            "uvicorn.access": {"propagate": True},
-            # sqlalchemy by default only propagates logs of level WARN and above.
-            # This changes it to follow the same level filtering as everything else.
-            "sqlalchemy": {"level": log_level},
-        },
+        "loggers": _get_logger_config(log_level, include_sqlalchemy_echo),
         "root": {
             "handlers": [_ROOT_HANDLER_KEY],
             "level": log_level,

@@ -30,12 +30,12 @@ import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSli
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
 import { CONNECTABLE, REACHABLE, UNREACHABLE } from '/app/redux/discovery'
-import { restartRobot } from '/app/redux/robot-admin'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { checkShellUpdate } from '/app/redux/shell'
 import { useIsRobotOutOfStorage } from '/app/resources/devices'
 import { useFullShutdownMutation } from '/app/resources/devices/hooks/useFullShutdownMutation'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useRestartRobotMutation } from '/app/resources/devices/hooks/useRestartRobotMutation'
 import { useCanDisconnect } from '/app/resources/networking/hooks'
 import { useCurrentRunId } from '/app/resources/runs'
 
@@ -72,6 +72,7 @@ export const RobotOverviewOverflowMenu = (
 
   const documentationState = useDocumentationState()
   const fullShutdownMutation = useFullShutdownMutation(documentationState)
+  const { restart } = useRestartRobotMutation(documentationState, robot.name)
 
   const { makeSnackbar } = useToaster()
   const { homeGantry } = useHomeGantry({
@@ -88,7 +89,7 @@ export const RobotOverviewOverflowMenu = (
   const navigate = useNavigate()
 
   const handleClickRestart: MouseEventHandler<HTMLButtonElement> = () => {
-    dispatch(restartRobot(robot.name))
+    restart()
   }
 
   const handleClickShutdown: MouseEventHandler<HTMLButtonElement> = () => {

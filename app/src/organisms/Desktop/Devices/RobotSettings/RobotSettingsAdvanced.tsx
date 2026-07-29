@@ -53,8 +53,10 @@ import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRo
 import { handleUpdateBuildroot } from './UpdateBuildroot'
 
 import type { MouseEventHandler } from 'react'
-import type { RobotSettingsField } from '@opentrons/api-client'
-import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
+import type {
+  ResetConfigRequest,
+  RobotSettingsField,
+} from '@opentrons/api-client'
 
 interface RobotSettingsAdvancedProps {
   robotName: string

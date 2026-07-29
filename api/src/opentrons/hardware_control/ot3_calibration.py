@@ -1139,9 +1139,9 @@ class OT3Transforms(RobotCalibration):
 
         def _point_to_dict(point: Point) -> Dict[str, float]:
             return {
-                "x": point.x,
-                "y": point.y,
-                "z": point.z,
+                "x": float(point.x),
+                "y": float(point.y),
+                "z": float(point.z),
             }
 
         transform_dict["carriage_offset"] = _point_to_dict(obj.carriage_offset)

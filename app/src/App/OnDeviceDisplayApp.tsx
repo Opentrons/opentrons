@@ -59,6 +59,7 @@ import {
 } from '/app/redux/config'
 import { getLocalRobot } from '/app/redux/discovery'
 import { getIsShellReady, updateBrightness } from '/app/redux/shell'
+import { useTrackRobotRestarts } from '/app/resources/devices/hooks/useTrackRobotRestarts'
 
 import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { LocalizationProvider } from '../LocalizationProvider'
@@ -175,6 +176,8 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   const [showModuleSetupModal, setShowModuleSetupModal] = useState(false)
 
   useSoftwareUpdatePoll()
+  // TODO(jh,2026-07-28): Refactor hook usage alongside robot system update epic.
+  useTrackRobotRestarts()
 
   // Normally, our hooks get the HostConfig from the nearest ApiHostProvider context.
   // But here at the app root, that doesn't exist. So we need to make sure we pass this

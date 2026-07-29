@@ -89,6 +89,9 @@ vi.mock('../hooks/useProtocolReceiptToast')
 vi.mock('../hooks/useSoftwareUpdatePoll')
 vi.mock('../ODDTopLevelRedirects')
 vi.mock('../../molecules/LoggedOutOverlay')
+vi.mock('/app/resources/devices/hooks/useTrackRobotRestarts', () => ({
+  useTrackRobotRestarts: vi.fn(),
+}))
 
 const mockSettings = {
   sleepMs: 60 * 1000 * 60 * 24 * 7,
