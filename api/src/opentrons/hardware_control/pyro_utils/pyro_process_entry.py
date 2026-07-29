@@ -102,7 +102,7 @@ async def build_and_run_hwc_pyro(simulate: bool) -> None:
 
     # Handle firmware updates on the hardware api
     async def _do_update() -> None:
-        async for update in ot3api.update_firmware():
+        async for update in thread_managed_ot3api.update_firmware():
             log.info(f"Update: {update.subsystem.name}: {update.progress}%")
 
     await _do_update()
