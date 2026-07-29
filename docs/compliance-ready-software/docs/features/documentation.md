@@ -30,22 +30,24 @@ Your compliance-ready Flex will prompt all users to document their actions when 
 
 You'll see the same screen every time you need to add documentation, no matter which step you're on. During protocol setup, you'll need to document a reason for:
 
-* Attaching, or detaching pipettes or the Flex Gripper. 
-* Calibrating pipettes and modules.
-* Changing the deck slot locations of modules or labware. 
+* Attaching or detaching pipettes or the Flex Gripper. 
+* Calibrating pipettes or modules.
+* Changing the deck slot locations of modules or labware, including resolving deck location conflicts. 
 * Changing a module's state, like opening a labware latch or setting temperature.
-* Applying [labware offsets](../../../flex/docs/) or starting a labware position check.
-* After confirming labware and liquids on the Flex deck.
-* When updating settings for the protocol run, like camera preferences.
-
-* TODO: side by side images of app and touchscreen; with protocol setup in the background * 
+* Applying [labware offsets](../../../flex/docs/touchscreen/protocol-setup#labware-offsets) or starting a labware position check.
+* Confirming labware and liquid placements on the Flex deck.
+* Updating settings for the protocol run, like camera preferences. Choose whether to enable the Flex's camera, live video, and automatic image capture for errors.
 
 <!---------
 
 TODO: 
-- not included here for now: intervention modals (what kind of modals pop up during setup?)
+- not included here for now: intervention modals (what kind of modals pop up during setup, if any?)
 - sample image can be updated. should we ever include some text in the documentation field, or is this dangerous territory? 
+- in general: confirm that users are prompted to enter documentation AFTER completing any action
 - any other Flex settings for the last bullet point; camera and? 
+- "deck location conflicts" is kind of jargon-y. can I link somewhere for this? add more links to other parts of the Flex manual, too. 
+- these sections will all be light on the images to start. How do we feel about this? 
+- for every section...how much to emphasize the differences between the app and ODD? many (most) of this can be completed in either. show a representative example (screenshot) of each?
 -------------->
 
 ## Running a protocol
@@ -53,82 +55,92 @@ TODO:
 During a protocol run, the Flex touchscreen or Opentrons App will prompt all users to document: 
 
 * Starting, pausing or canceling a protocol run.
-* [Taking an image] during a run.
-* Completing [error recovery]. 
+* [Taking an image](../../../flex/docs/opentrons-app/camera.md) during a run.
+* Using [error recovery](../../../flex/docs/touchscreen/protocol-run#error-recovery):
+    * Beginning or completing error recovery.
+    * Skipping or rerunning the protocol step causing the error.
 * Signing for and completing the protocol run.
 
-* TODO: side by side images of app and touchscreen; different for each (maybe error recovery and signing for a protocol?)*
+When the protocol run is complete, you'll need to [sign for and complete](../using.md#completing-a-protocol-run) the run in the Opentrons App.
 
 <!---------
 
 TODO: 
-- link relevant sections
-- confirm the flow when the protocol ends: 1) document the run, 2) sign for the run, 3) export the log file?
+- link out to Flex manual when relevant
+- is it true that all users are prompted to enter the same level of documentation? 99.9% sure but check this
+- this syntax is probably wrong (list within a list; revisit)
+- confirm the run is signed for in the app and not the ODD? think I'm wrong on this one, go back to designs
 -------------->
 
 ## Updating robot settings
 
-Users with permission to update robot settings will need to document the reason for their changes:
+Users will need to document the reason for their changes when updating robot settings, like:
 
-* When changing the Flex's network connection (Ethernet or WiFi) or robot name.
-* After updating the robot software.
-* After updating Flex touchscreen language, LED light, camera, privacy, recovery mode, Flex Stacker sensor, or other settings. 
-* After completing a device reset.
-* After homing the Flex gantry. 
+* Changing the Flex's network connection (Ethernet or WiFi) or robot name.
+* Updating the robot software.
+* Changing Flex touchscreen language, LED light, camera, privacy, recovery mode, Flex Stacker sensor, or other settings.
+* Making changes to error recovery mode settings. 
+* Resetting the Flex.
+* Homing the Flex gantry. 
 
-* TODO: side by side images of app and touchscreen; choose different example of each with robot settings tab in the background *
-
-Users without permission to update Flex settings will...
+By default, administrator credentials are required to update robot software. Adminstrators can update those permissions in [settings](../features/settings.md).
 
 <!---------
 
-TODO: 
+TODO and comments: 
 - confirm network connection info
-- in general, I should confirm whether documentation is before/after... like you update the robot first, then when complete, the documentation field appears?
-- need to check the settings in general. Maybe it's silly to list these if users need to enter documentation for doing ANYTHING from the settings tab, and should frame these as examples instead
-- if I frame them as examples here, maybe I should do the same in other sections?
+- check whether the following advanced settings are disabled in CRS: update the channel to stable/beta/alpha releases; turning on dev tools
+- do you need to enter documentation for an incorrect wifi password? this is a lingering old note I had written down from who knows where, but check this
+- maybe this section should go first? it feels like a strong start to begin with protocol setup, but does this then make sense here? 
 - add some text here about what happens (incl. screenshot) about what it looks like when users don't have the relevant credentials to complete an action (and, is this applicable in other sections?)
 - be sure to link to the admin settings... read more about admin settings and customizing users permissions [here]
 -------------->
 
 ## Other Flex actions
 
-From the [insert here] tab on the Flex touchscreen or in the Opentrons App, any user can make changes to the Flex deck or attached hardware outside of a protocol run. They'll need to add documentation when: 
+From the Instruments tab on the Flex [touchscreen](../../../flex/docs/touchscreen/instruments.md) or in the [Opentrons App], any user can make changes to the Flex deck or attached hardware outside of a protocol run. They'll need to add documentation when: 
 
 * Attaching, detaching, or calibrating pipettes or the Flex Gripper.
 * Dropping attached tips.
 * Changing module states, like updating temperature, labware latch or lid state, or deactivating the module.
 * Updating deck slot locations on the Flex.
 
-* TODO: add side by side images for ODD and Opentrons App; include two different things as examples (one module state and one pipette action) *
-
 <!---------
 
 TODO: 
 - link relevant sections of Flex manual so users can read more
+- is this just on the devices page in the app? confirm
+- can add side by side images here as is relevant (app and ODD)
 -------------->
 
 ## Adding documentation
 
-Your compliance-ready Flex will prompt users to document the actions covered above. Each time, they'll have the option to use a keyboard on-screen (on the Flex touchscreen or in the Opentrons App). You can also attach an [external keyboard] to the Flex.
+Installing compliance-ready software on your Flex slows down your lab's workflows on purpose. It adds checkpoints to document nearly every robot and protocol action. 
 
-* TODO: insert side by side images for App and touchscree * 
+Your compliance-ready Flex prompts users to document every action covered in the sections above. Each time, they'll have the option to use an on-screen, collapsible keyboard, or attach an [external keyboard](../features/features.md#devices) to the Flex.
 
-Users have the option to add documentation later [by clicking what? anything?]. Click **View Actions** in the upper right to open a list of actions still requiring documentation. 
+Users have the option to add documentation later. Click **View Actions** in the upper right to open a list of actions still requiring documentation. 
 
-* TODO add image* 
+When you're finished, click [x].
 
-Here, click each action to add documentation. When you're finished, click [insert here if relevant] to save your text and move to the next action.
+<figure class="screenshot" markdown>
+  ![View the list of actions still requiring documentation.](../../images/view-actions-list.png)
+  <figcaption>View the list of actions you'll need to enter documentation for.</figcaption>
+</figure>
 
-Administrators can customize documentation [settings] like minimum character requirements...
+Here, click each action to add documentation. When you're finished, click **Confirm** to save your text and move to the next action.
+
+Administrators can customize documentation [settings](../features/settings.md) like minimum character requirements.
 
 <!---------
 
-TODO: 
-- confirm WHEN users are asked to document their action. Is it always before? after? a mix?
-- how do users delay adding documentation? 
-- what screen(s) is View Actions available from? 
-- not included: double click to cut/copy/past text selections? is this included in the feature?
+TODO and comments: 
+- the explainer for the "view actions" > list shown in the image was that users can add documentation for every action they've completed "since the last time they entered documentation. how do users delay adding documentation? what can they click to move on from the documentation required screen? a swipe? 
+- what screen(s) is View Actions available from? looks like "documentation required"?
+- not included for now: double click to cut/copy/past text selections? is this included in the feature?
 - need to view the flow inside the view actions list
-- any other documentation-related settings admins can customize? 
+- any other documentation-related settings admins can customize, besides character limits (covered in settings) 
+- minimum character requirements might be the only docs setting admins have control over. 
+- need to confirm how this list works app vs ODD
+- might be relevant to add something here at the end about signing for the run, but leaving that to using.md and the log files page for now.
 -------------->

@@ -46,11 +46,10 @@ nav:
       - Introduction: introduction.md
       - Activation: activation.md
   - Compliance Ready Features: 
-      - Features: features.md # includes roles, encryption key, devices, and data protection.
-      - Documentation: documentation.md
-      - Settings: settings.md # administrator and any other settings
+      - Features: features/features.md # includes roles, encryption key, devices, and data protection.
+      - Documentation: features/documentation.md
+      - Settings: features/settings.md # administrator and any other settings
   - Using Compliance Ready Software: using.md #includes logging in, setting up and running a protocol, etc.
   - Records and Files: 
-      - Types: files.md
-      - Viewing and managing files: view-manage.md
-      - Downloading files: downloading.md
+      - Types: records_files/types.md
+      - Managing files: records_files/manage.md
