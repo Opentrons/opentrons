@@ -97,7 +97,24 @@ export function postFile(
       return new Promise<Response>(resolve => {
         const body = new FormData()
         body.append(name, readStream)
-        resolve(fetch(input, { ...init, body, method: 'POST' }))
+        const formHeaders =
+          typeof body.getHeaders === 'function' ? body.getHeaders() : {}
+        const initHeaders =
+          init?.headers != null && !Array.isArray(init.headers)
+            ? (init.headers as Record<string, string>)
+            : {}
+
+        resolve(
+          fetch(input, {
+            ...init,
+            body,
+            method: 'POST',
+            headers: {
+              ...formHeaders,
+              ...initHeaders,
+            },
+          })
+        )
       }).then(resolve)
     })
   })

@@ -10,6 +10,8 @@ import { FLEX_MANIFEST_URL, SYSTEM_FILENAME } from './constants'
 import { getSystemUpdateDir } from './directories'
 import { getProvider as getUsbUpdateProvider } from './from-usb'
 import { getProvider as getWebUpdateProvider } from './from-web'
+import { buildRobotHttpUrl } from './httpUrl'
+import { registerRobotUpdateUpload } from './upload'
 
 import type { Action, Dispatch } from '../types'
 import type { USBUpdateSource } from './from-usb'
@@ -287,7 +289,9 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
         case 'robotUpdate:UPLOAD_FILE': {
           const { host, path, systemFile } = action.payload
           return postFile(
-            `http://${host.ip}:${host.port}${path}`,
+            buildRobotHttpUrl({ ip: host.ip, port: host.port }, path, {
+              forceHttp: true,
+            }),
             SYSTEM_FILENAME,
             systemFile
           )
@@ -472,6 +476,8 @@ export function manageDriver(dispatch: Dispatch): UpdatableDriver {
 }
 
 export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
+  registerRobotUpdateUpload()
+
   return manageDriver(dispatch).handleAction
 }
 

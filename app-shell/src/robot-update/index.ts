@@ -22,6 +22,7 @@ import {
   getReleaseSet,
 } from './release-manifest'
 import { startPremigration, uploadSystemFile } from './update'
+import { registerRobotUpdateUpload } from './upload'
 
 import type {
   RobotUpdateAction,
@@ -31,6 +32,9 @@ import type {
 import type { DownloadProgress } from '../http'
 import type { Action, Dispatch } from '../types'
 import type { ReleaseSetFilepaths, ReleaseSetUrls } from './types'
+
+export { registerRobotUpdateUpload as registerRobotUpdateUploadIpc } from './upload'
+export type { RobotUpdateUploadPayload } from './upload'
 
 const log = createLogger('robot-update/index')
 
@@ -63,6 +67,8 @@ const readFileAndDispatchInfo = (
     .then(dispatch)
 
 export function registerRobotUpdate(dispatch: Dispatch): Dispatch {
+  registerRobotUpdateUpload()
+
   return function handleAction(action: Action) {
     switch (action.type) {
       case UI_INITIALIZED:
