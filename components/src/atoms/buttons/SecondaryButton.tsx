@@ -35,12 +35,6 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   line-height: ${TYPOGRAPHY.lineHeight20};
 
-  &:hover,
-  &:focus {
-    box-shadow: ${props =>
-      props['aria-disabled'] ? 'none' : '0px 3px 6px 0px rgba(0, 0, 0, 0.23)'};
-  }
-
   &:hover {
     color: ${props => {
       if (props['aria-disabled']) return COLORS.grey40
