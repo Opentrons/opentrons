@@ -10,6 +10,7 @@ from opentrons_shared_data.errors.exceptions import (
     KeyStorageUnavailableError,
 )
 
+from server_utils.audit.fastapi import skip_audit_logger
 from server_utils.auth.resource_server.fastapi import (
     RequireAuthenticationResult,
     require_authentication,
@@ -56,6 +57,7 @@ router = fastapi.APIRouter()
             "description": "The audit log request failed for an unknown reason."
         },
     },
+    dependencies=[fastapi.Depends(skip_audit_logger)],
 )
 async def post_log_message(
     request_body: RequestModel[SubmitAuditLogMessageData],
@@ -110,7 +112,10 @@ async def post_log_message(
             "description": "The audit log request failed for an unknown reason."
         },
     },
-    dependencies=[fastapi.Depends(require_scopes(Scope.AUDIT_LOG_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.AUDIT_LOG_WRITE)),
+        fastapi.Depends(skip_audit_logger),
+    ],
 )
 async def post_external_log_message(
     request_body: RequestModel[SubmitExternalAuditLogMessageData],

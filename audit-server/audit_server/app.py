@@ -10,6 +10,7 @@ from fastapi import FastAPI, Request, Response
 from opentrons_shared_data.errors.exceptions import AuditLoggingError
 
 from server_utils import systemd_utils
+from server_utils.audit.fastapi import audit_logger_middleware, install_audit_client
 from server_utils.auth.resource_server.authentication_checker import (
     FailedClosedAuthenticationChecker,
 )
@@ -37,6 +38,7 @@ from server_utils.robot.robot_server import RobotNameandSerial
 
 from audit_server.log_export.router import router as log_export_router
 from audit_server.log_ingest.router import router as ingest_router
+from audit_server.log_self_client import LocalClient
 from audit_server.log_storage.dependency import build_log_data_manager, build_log_store
 from audit_server.persistence.database import sql_engine_ctx
 from audit_server.persistence.fastapi_dependencies import (
@@ -157,6 +159,8 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             )
         )
         install_authentication_checker(app.state, authentication_checker)
+        local_log_client = LocalClient(log_data_manager)
+        install_audit_client(app.state, local_log_client)
         await log_data_manager.rotate_periods()
         systemd_utils.notify_up()
         yield
@@ -180,3 +184,5 @@ app = FastAPI(
 app.include_router(ingest_router)
 app.include_router(log_export_router)
 app.include_router(settings_router)
+
+app.middleware("http")(audit_logger_middleware)
