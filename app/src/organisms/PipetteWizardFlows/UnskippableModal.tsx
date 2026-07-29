@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  AlertPrimaryButton,
   COLORS,
+  PrimaryButton,
   SecondaryButton,
   SPACING,
   TYPOGRAPHY,
@@ -53,13 +53,14 @@ export function UnskippableModal(props: UnskippableModalProps): JSX.Element {
           >
             {t('shared:go_back')}
           </SecondaryButton>
-          <AlertPrimaryButton
+          <PrimaryButton
+            variant="warning"
             disabled={isRobotMoving}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             onClick={proceed}
           >
             {t('shared:exit')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </>
       )}
     </SimpleWizardBody>

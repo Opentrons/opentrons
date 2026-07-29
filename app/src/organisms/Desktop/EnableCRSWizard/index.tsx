@@ -10,7 +10,6 @@ import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import {
-  AlertPrimaryButton,
   Icon,
   InlineNotification,
   InputField,
@@ -183,9 +182,9 @@ function EnterServicePINPage({
           <SecondaryButton onClick={onBack}>
             {t('shared:cancel')}
           </SecondaryButton>
-          <AlertPrimaryButton type="submit" form={formId}>
+          <PrimaryButton variant="warning" type="submit" form={formId}>
             {t('setup_wizard_confirm_enable')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </div>
       }
     >

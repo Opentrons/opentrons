@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
@@ -156,7 +155,11 @@ export const DisconnectModal = ({
               >
                 {t('shared:cancel')}
               </Link>
-              <AlertPrimaryButton onClick={handleDisconnect} width="8rem">
+              <PrimaryButton
+                variant="warning"
+                onClick={handleDisconnect}
+                width="8rem"
+              >
                 {disconnectMutation.status === 'loading' ? (
                   <Flex
                     alignItems={ALIGN_CENTER}
@@ -172,7 +175,7 @@ export const DisconnectModal = ({
                 ) : (
                   t('disconnect')
                 )}
-              </AlertPrimaryButton>
+              </PrimaryButton>
             </>
           )}
         </Flex>

@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
@@ -12,6 +11,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
   LegacyStyledText,
+  PrimaryButton,
   RESPONSIVENESS,
   SecondaryButton,
   SIZE_3,
@@ -106,14 +106,15 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
             <SecondaryButton onClick={onGoBack}>
               {t('shared:go_back')}
             </SecondaryButton>
-            <AlertPrimaryButton
+            <PrimaryButton
+              variant="warning"
               onClick={onConfirmExit}
               textTransform={TYPOGRAPHY.textTransformCapitalize}
             >
               {shouldUseMetalProbe
                 ? t('remove_calibration_probe')
                 : i18n.format(t('shared:exit'), 'capitalize')}
-            </AlertPrimaryButton>
+            </PrimaryButton>
           </Flex>
         </Flex>
       )}

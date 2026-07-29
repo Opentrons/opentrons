@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
 import {
-  AlertPrimaryButton,
   ALIGN_FLEX_END,
   COLORS,
   Flex,
   Icon,
   Modal,
+  PrimaryButton,
   SecondaryButton,
   SPACING,
   StyledText,
@@ -82,7 +82,8 @@ export function ConfirmDeleteModal(props: Props): JSX.Element {
               {cancelCopy}
             </StyledText>
           </SecondaryButton>
-          <AlertPrimaryButton
+          <PrimaryButton
+            variant="warning"
             onClick={(e: MouseEvent) => {
               handleContinueClick(e)
             }}
@@ -90,7 +91,7 @@ export function ConfirmDeleteModal(props: Props): JSX.Element {
             <StyledText desktopStyle="bodyDefaultSemiBold">
               {continueCopy}
             </StyledText>
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </Flex>
       }
     >
