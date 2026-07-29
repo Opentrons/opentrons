@@ -51,7 +51,7 @@ class AuthServerSettings(BaseSettings):
         description=(
             "The path to the Unix domain socket where audit-server is listening."
             " This is mutually exclusive with audit_server_url."
-            " If both are unset, access control is not enforced."
+            " If both are unset, audit logging cannot happen."
         ),
     )
 
@@ -60,6 +60,6 @@ class AuthServerSettings(BaseSettings):
         description=(
             "The base URL (e.g. `http://localhost:1234`) where audit-server is listening."
             " This is mutually exclusive with audit_server_uds."
-            " If both are unset, access control is not enforced."
+            " If both are unset, audit logging cannot happen."
         ),
     )
