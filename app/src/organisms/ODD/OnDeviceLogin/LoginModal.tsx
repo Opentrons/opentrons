@@ -37,16 +37,6 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
 
   const isChoosingNewPassword = phase === 'chooseNewPassword'
 
-  // Seed /self from the login response. The query key omits the access token, so
-  // invalidateQueries here can refetch with a stale host.token and wipe good data.
-  const setSelfQueryData = useCallback(
-    (user: AuthUser): void => {
-      if (host == null) return
-      queryClient.setQueryData(getSelfQueryKey(host), { data: user })
-    },
-    [host, queryClient]
-  )
-
   const finishModal = useCallback(
     (username: string): void => {
       modal.resolve({ username })
@@ -58,16 +48,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const handleLoginSuccess = useCallback(
     (username: string, user: AuthUser, response: OAuth2TokenResponse): void => {
       setLoginError(null)
-      storeLoginState(
-        localRobotName,
-        {
-          username,
-          fullName: user.fullName,
-          accountType: user.accountType,
-        },
-        response
-      )
-      setSelfQueryData(user)
+      storeLoginState(localRobotName, user, response)
 
       if (user.resetPassword) {
         setPhase('chooseNewPassword')
@@ -76,7 +57,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
         finishModal(username)
       }
     },
-    [finishModal, setSelfQueryData, storeLoginState, localRobotName]
+    [finishModal, storeLoginState, localRobotName]
   )
 
   const dismissModal = useCallback((): void => {
