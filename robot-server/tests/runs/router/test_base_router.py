@@ -560,9 +560,16 @@ async def test_delete_run_by_id(
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should be able to remove a run by ID."""
-    result = await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
+    result = await remove_run(
+        runId="run-id",
+        run_data_manager=mock_run_data_manager,
+        access_control_status=False,
+    )
 
-    decoy.verify(await mock_run_data_manager.delete("run-id"), times=1)
+    decoy.verify(
+        await mock_run_data_manager.delete("run-id", access_control_status=False),
+        times=1,
+    )
 
     assert result.content == SimpleEmptyBody()
     assert result.status_code == 200
@@ -575,10 +582,16 @@ async def test_delete_run_with_bad_id(
     """It should 404 if the run ID does not exist."""
     key_error = RunNotFoundError(run_id="run-id")
 
-    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(key_error)  # type: ignore[func-returns-value]
+    decoy.when(
+        await mock_run_data_manager.delete("run-id", access_control_status=False)  # type: ignore[func-returns-value]
+    ).then_raise(key_error)
 
     with pytest.raises(ApiError) as exc_info:
-        await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
+        await remove_run(
+            runId="run-id",
+            run_data_manager=mock_run_data_manager,
+            access_control_status=False,
+        )
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
@@ -589,12 +602,16 @@ async def test_delete_active_run(
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should 409 if the run is not finished."""
-    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(  # type: ignore[func-returns-value]
-        RunConflictError("oh no")
-    )
+    decoy.when(
+        await mock_run_data_manager.delete("run-id", access_control_status=False)  # type: ignore[func-returns-value]
+    ).then_raise(RunConflictError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
-        await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
+        await remove_run(
+            runId="run-id",
+            run_data_manager=mock_run_data_manager,
+            access_control_status=False,
+        )
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunNotIdle"
@@ -623,14 +640,15 @@ async def test_update_run_to_not_current(
         hasEverEnteredErrorRecovery=False,
     )
 
-    decoy.when(await mock_run_data_manager.uncurrent("run-id")).then_return(
-        expected_response
-    )
+    decoy.when(
+        await mock_run_data_manager.uncurrent("run-id", access_control_status=False)
+    ).then_return(expected_response)
 
     result = await update_run(
         runId="run-id",
         request_body=RequestModel(data=RunUpdate(current=False)),
         run_data_manager=mock_run_data_manager,
+        access_control_status=False,
     )
 
     assert result.content == SimpleBody(data=expected_response)
@@ -666,6 +684,7 @@ async def test_update_current_none_noop(
         runId="run-id",
         request_body=RequestModel(data=RunUpdate()),
         run_data_manager=mock_run_data_manager,
+        access_control_status=False,
     )
 
     assert result.content == SimpleBody(data=expected_response)
@@ -677,15 +696,18 @@ async def test_update_to_current_not_current(
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should 409 if attempting to update a not current run."""
-    decoy.when(await mock_run_data_manager.uncurrent(run_id="run-id")).then_raise(
-        RunNotCurrentError("oh no")
-    )
+    decoy.when(
+        await mock_run_data_manager.uncurrent(
+            run_id="run-id", access_control_status=False
+        )
+    ).then_raise(RunNotCurrentError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
         await update_run(
             runId="run-id",
             request_body=RequestModel(data=RunUpdate(current=False)),
             run_data_manager=mock_run_data_manager,
+            access_control_status=False,
         )
 
     assert exc_info.value.status_code == 409
@@ -697,15 +719,18 @@ async def test_update_to_current_conflict(
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should 409 if attempting to un-current a run that is not idle."""
-    decoy.when(await mock_run_data_manager.uncurrent(run_id="run-id")).then_raise(
-        RunConflictError("oh no")
-    )
+    decoy.when(
+        await mock_run_data_manager.uncurrent(
+            run_id="run-id", access_control_status=False
+        )
+    ).then_raise(RunConflictError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
         await update_run(
             runId="run-id",
             request_body=RequestModel(data=RunUpdate(current=False)),
             run_data_manager=mock_run_data_manager,
+            access_control_status=False,
         )
 
     assert exc_info.value.status_code == 409
@@ -717,15 +742,18 @@ async def test_update_to_current_missing(
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should 404 if attempting to update a missing run."""
-    decoy.when(await mock_run_data_manager.uncurrent(run_id="run-id")).then_raise(
-        RunNotFoundError(run_id="run-id")
-    )
+    decoy.when(
+        await mock_run_data_manager.uncurrent(
+            run_id="run-id", access_control_status=False
+        )
+    ).then_raise(RunNotFoundError(run_id="run-id"))
 
     with pytest.raises(ApiError) as exc_info:
         await update_run(
             runId="run-id",
             request_body=RequestModel(data=RunUpdate(current=False)),
             run_data_manager=mock_run_data_manager,
+            access_control_status=False,
         )
 
     assert exc_info.value.status_code == 404

@@ -388,11 +388,13 @@ class RunDataManager:
             for run_resource in self._run_store.get_all(length)
         ]
 
-    async def delete(self, run_id: str) -> None:
+    async def delete(self, run_id: str, access_control_status: bool) -> None:
         """Delete a current or historical run.
 
         Args:
             run_id: The identifier of the run to remove.
+            access_control_status: Whether access control (Compliance Ready Software)
+                is currently enabled for the robot.
 
         Raises:
             RunConflictError: If deleting the current run, the current run
@@ -406,11 +408,15 @@ class RunDataManager:
 
         self._run_store.remove(run_id=run_id)
 
-    async def uncurrent(self, run_id: str) -> Union[Run, BadRun]:
+    async def uncurrent(
+        self, run_id: str, access_control_status: bool
+    ) -> Union[Run, BadRun]:
         """Archive the current run.
 
         Args:
             run_id: The run to un-current.
+            access_control_status: Whether access control (Compliance Ready Software)
+                is currently enabled for the robot.
 
         Returns:
             The run after it has been un-currented.

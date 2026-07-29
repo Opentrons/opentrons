@@ -746,7 +746,7 @@ async def test_delete_current_run(
     run_id = "hello world"
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
 
-    await subject.delete(run_id=run_id)
+    await subject.delete(run_id=run_id, access_control_status=False)
 
     decoy.verify(
         await mock_run_orchestrator_store.clear(),
@@ -764,7 +764,7 @@ async def test_delete_historical_run(
     run_id = "hello world"
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("some other id")
 
-    await subject.delete(run_id=run_id)
+    await subject.delete(run_id=run_id, access_control_status=False)
 
     decoy.verify(await mock_run_orchestrator_store.clear(), times=0)
     decoy.verify(mock_run_store.remove(run_id=run_id), times=1)
@@ -807,7 +807,7 @@ async def test_uncurrent(
         )
     ).then_return(run_resource)
 
-    result = await subject.uncurrent(run_id=run_id)
+    result = await subject.uncurrent(run_id=run_id, access_control_status=False)
 
     decoy.verify(
         mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
@@ -856,7 +856,7 @@ async def test_uncurrent_not_allowed(
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("some other id")
 
     with pytest.raises(RunNotCurrentError):
-        await subject.uncurrent(run_id=run_id)
+        await subject.uncurrent(run_id=run_id, access_control_status=False)
 
 
 async def test_create_archives_existing(
