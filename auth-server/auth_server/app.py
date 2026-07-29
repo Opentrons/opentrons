@@ -1,16 +1,22 @@
 """The server's ASGI app object."""
 
+import asyncio
+import logging
 from contextlib import AsyncExitStack, asynccontextmanager
 from pathlib import Path
 from typing import AsyncGenerator, Optional
-import asyncio
-import logging
 
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse
 
 from server_utils import systemd_utils
+from server_utils.audit.audit_server import (
+    Client as AuditClient,
+)
+from server_utils.audit.audit_server import (
+    SubmitAuditLogMessageData,
+)
 from server_utils.audit.fastapi import (
     audit_logger_middleware,
     build_audit_client,
@@ -20,10 +26,6 @@ from server_utils.auth.resource_server.fastapi import (
     AuthorizationError,
     handle_authorization_error,
     install_authentication_checker,
-)
-from server_utils.audit.audit_server import (
-    Client as AuditClient,
-    SubmitAuditLogMessageData,
 )
 
 from auth_server.api_error import APIError, handle_api_error
@@ -61,6 +63,10 @@ def _get_persistence_directory_root(settings: AuthServerSettings) -> Optional[Pa
     if settings.persistence_directory == "automatically_make_temporary":
         return None
     return settings.persistence_directory
+
+
+def _oauth_audit_log(audit_client: AuditClient, action: str, message: str) -> None:
+    asyncio.create_task(_do_oauth_audit_log(audit_client, action, message))
 
 
 async def _do_oauth_audit_log(
@@ -107,9 +113,7 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         oauth2_backend = OAuth2Backend(
             user_store,
             settings_store,
-            lambda action, message: asyncio.create_task(
-                _do_oauth_audit_log(audit_client, action, message)
-            ),
+            lambda action, message: _oauth_audit_log(audit_client, action, message),
         )
         install_oauth2_backend(app.state, oauth2_backend)
         user_service = UserDataManager(

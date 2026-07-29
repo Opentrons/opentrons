@@ -8,11 +8,11 @@ from typing import (
     Any,
     Callable,
     NotRequired,
+    Protocol,
     TypedDict,
     TypeGuard,
     cast,
     override,
-    Protocol,
 )
 
 import fastapi
@@ -41,7 +41,11 @@ _CLIENT_ID = "opentrons_app"
 
 
 class SendAuditLog(Protocol):
-    def __call__(self, action: str, message: str) -> None: ...
+    """Callback function to send an audit log out-of-band. Doesn't block."""
+
+    def __call__(self, action: str, message: str) -> None:
+        """See class docstring."""
+        ...
 
 
 class Backend:
@@ -339,7 +343,9 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         # This server only supports username+password grants.
         grant_ok = grant_type in ("password", "refresh_token")
         if not grant_ok:
-            self.__send_audit_log(f"login failed: unacceptable grant type {grant_type}")
+            self.__send_audit_log(
+                "login failed", f"unacceptable grant type {grant_type}"
+            )
         return grant_ok
 
     @override
