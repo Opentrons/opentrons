@@ -60,10 +60,13 @@ export function ProtocolRunHeader(
 
   const navigate = useNavigate()
 
-  const { data: runRecord } = useNotifyRunQuery(runId, {
-    staleTime: Infinity,
-    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
-  })
+  const { data: runRecord, isLoading: isRunRecordLoading } = useNotifyRunQuery(
+    runId,
+    {
+      staleTime: Infinity,
+      refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+    }
+  )
   const { protocolData } = useProtocolDetailsForRun(runId)
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = runRecord?.data.status ?? null
@@ -168,8 +171,11 @@ export function ProtocolRunHeader(
     dropTipUtils.dropTipModalUtils.showModal ||
     dropTipUtils.dropTipWizardUtils.showDTWiz
   // Wait for tip status so SignRun does not flash ahead of drop-tip CTAs.
+  // Also wait for runRecord after sign (cache cleared) so we don't re-prompt
+  // while signedBy is still missing from the refetch.
   const showSignRunModal =
     isSignRunPending &&
+    !isRunRecordLoading &&
     !isSigningSettingsLoading &&
     isSigningRequired &&
     !hasSignedBy &&
