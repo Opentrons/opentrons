@@ -1,9 +1,9 @@
-import { withStyleProps } from '../../hocs/withStyleProps'
-import { Btn } from '../../primitives'
+import { withStyleProps } from '../../../hocs/withStyleProps'
+import { Btn } from '../../../primitives'
 import styles from './altprimarybutton.module.css'
 
 import type { ComponentProps, FC } from 'react'
-import type { StyleProps } from '../../primitives/types'
+import type { StyleProps } from '../../../primitives/types'
 
 const AltPrimaryButtonComponent: FC<ComponentProps<'button'> & StyleProps> = ({
   className,
