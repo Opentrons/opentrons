@@ -1,14 +1,17 @@
+import { createPortal } from 'react-dom'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import {
   DropdownMenu,
-  Modal,
+  ModalShell,
   PrimaryButton,
   SecondaryButton,
+  WizardHeader,
 } from '@opentrons/components'
 import { useCreateUserMutation } from '@opentrons/react-api-client'
 
+import { getTopPortalEl } from '/app/App/portal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
 import { useAuthUserMutationErrors } from './userAccount/useAuthUserMutationErrors'
@@ -96,46 +99,54 @@ export function AddUserModal({
       .catch(handleMutationError)
   }
 
-  return (
-    <Modal
-      title={t('desktop_add_user')}
-      onClose={handleClose}
-      closeOnOutsideClick={false}
+  return createPortal(
+    <ModalShell
       width="31.25rem"
+      header={
+        <WizardHeader
+          title={t('desktop_add_user')}
+          onExit={handleClose}
+          hideStepText
+          exitButtonCopy={t('shared:exit')}
+        />
+      }
     >
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className={styles.form_fields}>
-          <UserAccountIdentityFormFields
-            control={control}
-            fieldErrors={fieldErrors}
-            stacked
-          />
-          <div className={styles.field_group}>
-            <div className={styles.field_group_value}>
-              <DropdownMenu
-                filterOptions={accountTypeOptions}
-                currentOption={selectedAccountTypeOption}
-                dropdownType="neutral"
-                onClick={value => {
-                  setValue('accountType', value as AuthUserAccountType, {
-                    shouldValidate: true,
-                  })
-                }}
-                title={t('desktop_role')}
-                width="100%"
-              />
+      <div className={styles.modal_content}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className={styles.form_fields}>
+            <UserAccountIdentityFormFields
+              control={control}
+              fieldErrors={fieldErrors}
+              stacked
+            />
+            <div className={styles.field_group}>
+              <div className={styles.field_group_value}>
+                <DropdownMenu
+                  filterOptions={accountTypeOptions}
+                  currentOption={selectedAccountTypeOption}
+                  dropdownType="neutral"
+                  onClick={value => {
+                    setValue('accountType', value as AuthUserAccountType, {
+                      shouldValidate: true,
+                    })
+                  }}
+                  title={t('desktop_role')}
+                  width="100%"
+                />
+              </div>
+            </div>
+            <div className={styles.actions}>
+              <SecondaryButton type="button" onClick={handleClose}>
+                {t('shared:back')}
+              </SecondaryButton>
+              <PrimaryButton type="submit" disabled={isSaveDisabled}>
+                {t('shared:next')}
+              </PrimaryButton>
             </div>
           </div>
-          <div className={styles.actions}>
-            <SecondaryButton type="button" onClick={handleClose}>
-              {t('shared:back')}
-            </SecondaryButton>
-            <PrimaryButton type="submit" disabled={isSaveDisabled}>
-              {t('shared:next')}
-            </PrimaryButton>
-          </div>
-        </div>
-      </form>
-    </Modal>
+        </form>
+      </div>
+    </ModalShell>,
+    getTopPortalEl()
   )
 }

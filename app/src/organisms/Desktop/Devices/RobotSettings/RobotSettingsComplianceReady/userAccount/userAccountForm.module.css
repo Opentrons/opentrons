@@ -1,3 +1,7 @@
+.modal_content {
+  padding: var(--spacing-16) var(--spacing-24) var(--spacing-24);
+}
+
 .form_fields > .field_group {
   flex: unset;
 }
