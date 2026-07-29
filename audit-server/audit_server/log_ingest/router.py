@@ -25,6 +25,7 @@ from server_utils.fastapi_utils.models.json_api import (
     SimpleBody,
 )
 
+from .dependency import get_robot_logs_directory
 from .models import (
     AuditLogMessage,
     StoreRobotLogResponseData,
@@ -34,7 +35,6 @@ from .models import (
 )
 from audit_server.log_storage.dependency import get_log_data_manager
 from audit_server.log_storage.log_data_manager import LogDataManager
-from audit_server.persistence.fastapi_dependencies import get_persistence_directory_root
 
 LOG = getLogger(__name__)
 
@@ -170,21 +170,18 @@ async def post_external_log_message(
     router.post,
     path="/audit/internal/storeRobotLog",
     summary="Store a robot's run record and associate it with the"
-    " current log period, if logging is enabled."
+    " current log period, if logging is enabled.",
 )
 async def store_robot_log(
     log_data_manager: Annotated[LogDataManager, fastapi.Depends(get_log_data_manager)],
-    persistence_directory_root: Annotated[
-        Path, fastapi.Depends(get_persistence_directory_root)
-    ],
+    robot_logs_directory: Annotated[Path, fastapi.Depends(get_robot_logs_directory)],
     file: Annotated[
         fastapi.UploadFile, fastapi.File(description="Data file to upload")
     ],
 ) -> PydanticResponse[SimpleBody[StoreRobotLogResponseData]]:
     """Store a robot log with the current log period."""
-    # TODO make this the actual path
-    stored_robot_log = log_data_manager.store_robot_log(
-        robot_log=file, robot_log_path=persistence_directory_root
+    stored_robot_log = await log_data_manager.store_robot_log(
+        robot_log=file, robot_log_path=robot_logs_directory
     )
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_201_CREATED,

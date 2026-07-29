@@ -100,7 +100,7 @@ class LogStore:
             file_path=str(file_path),
             file_hash=robot_log.message_hash,
             file_sig=robot_log.message_sig,
-            file_isg_version=robot_log.sig_version,
+            file_sig_version=robot_log.sig_version,
         )
 
         session.add(entry)

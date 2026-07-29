@@ -136,12 +136,19 @@ class LogDataManager:
                 message="Unable to store log", wrapping=[PythonException(stored)]
             )
 
-    async def _do_store_robot_log(self, robot_log: UploadFile, path: Path) -> str:
+    async def _do_store_robot_log(
+        self, robot_log: UploadFile, robot_log_dir_path: Path
+    ) -> str:
         contents_bytes = await robot_log.read()
         contents = contents_bytes.decode("utf-8")
         signed_contents, signing_exec = await self._sign_log(contents, None)
 
-        robot_log_hash = self._store.store_robot_log(signed_contents, path)
+        assert robot_log.filename is not None
+        robot_log_path = robot_log_dir_path / Path(robot_log.filename).name
+        with open(robot_log_path, "w") as fh:
+            fh.write(contents)
+
+        robot_log_hash = self._store.store_robot_log(signed_contents, robot_log_path)
 
         return robot_log_hash
 
