@@ -96,7 +96,7 @@ Unnamed box 2 includes the Control Box (vacuum pump and electronics), a deck ada
 
 ### Box 3: waste collection components
 
-Box 3 includes the waste collection jar and cap, a jar holder (to help prevent tip-overs), vacuum hoses, hose clamps, and extra barbed quick connect/disconnect fittings.
+Box 3 includes the waste collection jar and cap, a jar holder (to help prevent tip-overs), vacuum hoses, hose clamps, along with extra quick connect/disconnect fittings and clamps.
 
 * The jar, cap, and hoses ship with quick connector fittings already installed at the factory.
 * The hoses are wrapped around the shaped foam padding in the bottom of the box.
@@ -119,18 +119,13 @@ Box 3 includes the waste collection jar and cap, a jar holder (to help prevent t
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Vacuum hoses hoses](images/vacuum-module-hoses.png "6 mm and 9.5 mm inner diameter (ID) vacuum hoses")
-<figcaption>(2) Vacuum hoses</figcaption>
+![6 mm vacuum hose](images/hose-6mm.svg "6 mm vacuum hose")
+<figcaption>(1) 6 mm ID hose</figcaption>
 </figure>
 
 <figure markdown>
-![Placeholder for missing image](images/parts_placeholder.png)
-<figcaption>(2) Spare hose clamps</figcaption>
-</figure>
-
-<figure markdown>
-![Placeholder for missing image](images/parts_placeholder.png)
-<figcaption>(2) Spare hose fittings</figcaption>
+![9 mm vacuum hose](images/hose-9mm.svg)
+<figcaption>(1) 9 mm ID hose</figcaption>
 </figure>
 
 </div>

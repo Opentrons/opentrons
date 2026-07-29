@@ -41,21 +41,15 @@ The Vacuum Module ships in three separate boxes. One contains the vacuum pump an
 8. Place the vacuum base in the recessed slot of the deck adapter.
 
     <figure markdown>
-    ![Image placeholder](images/parts_placeholder.png)
-    <figcaption>show base in deck plate adapter</figcaption>
+    ![Arrow showing vacuum base placement in deck adapter](images/base-in-adapter.png)
     </figure>
 
 9. Insert 4 manifold screws from the bottom of the deck adapter to the vacuum base.
 
-    <figure markdown>
-    ![Image placeholder](images/parts_placeholder.png)
-    <figcaption>Need to show manifold, plate, and screws going in from underneath</figcaption>
-    </figure>
-
     !!! note
         The deck adapter holes are unthreaded. The screws pass through these openings from underneath the adapter to engage with threaded holes in the vacuum base. Complete this step off-deck before mounting the assembled unit to the robot.
 
-10.  Using the supplied screwdriver, hand tighten the fasteners to secure the vacuum base to the deck adapter.
+10.  Using the supplied screwdriver, hand tighten the fasteners to secure the vacuum base to the deck adapter.  Complete this step off-deck before mounting the assembled unit to the robot.
 
     !!! warning "Important: non-Metric components"
         The vacuum base uses Imperial fasteners (#6 cap screws and a 7/64" hex driver). Use the provided screws and driver to avoid stripping or damaging the threads. All other module and Flex deck fasteners are Metric.
