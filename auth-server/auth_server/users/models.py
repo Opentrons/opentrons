@@ -146,15 +146,18 @@ class UserResponse(BaseModel):
     ]
 
 
-class ResetPasswordResponse(UserResponse):
-    """Response body for a password reset, including the new temporary password."""
+class TemporaryPasswordResponse(UserResponse):
+    """Response body for a user, optionally including a newly generated temporary password."""
 
     temporaryPassword: Annotated[
-        str,
+        str | None,
         Field(
-            description="The newly generated temporary password for the user.",
+            default=None,
+            description=(
+                "The newly generated temporary password for the user, if one was created."
+            ),
         ),
-    ]
+    ] = None
 
 
 # todo(mm, 2026-06-23): Deduplicate with robot-server's ErrorBody, via server-utils.

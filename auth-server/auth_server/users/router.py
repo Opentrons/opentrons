@@ -23,7 +23,7 @@ from auth_server.users.models import (
     ErrorBody,
     PasswordMissingSpecialCharactersErrorDetails,
     PasswordTooShortErrorDetails,
-    ResetPasswordResponse,
+    TemporaryPasswordResponse,
     UpdateSelf,
     UpdateUser,
     UserAlreadyExistsErrorDetails,
@@ -47,7 +47,9 @@ router = fastapi.APIRouter()
     summary="Create a user",
     description="Create a new user.",
     responses={
-        fastapi.status.HTTP_201_CREATED: {"model": SimpleBody[UserResponse]},
+        fastapi.status.HTTP_201_CREATED: {
+            "model": SimpleBody[TemporaryPasswordResponse]
+        },
         fastapi.status.HTTP_400_BAD_REQUEST: {
             "model": ErrorBody[
                 PasswordTooShortErrorDetails
@@ -63,7 +65,7 @@ async def post_users(
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
-) -> PydanticResponse[SimpleBody[UserResponse]]:
+) -> PydanticResponse[SimpleBody[TemporaryPasswordResponse]]:
     """Create a user."""
     user_create = request_body.data
     now = datetime.datetime.now(tz=datetime.UTC)
@@ -224,7 +226,7 @@ async def update_user(
         "The user must change their password upon next login."
     ),
     responses={
-        fastapi.status.HTTP_200_OK: {"model": SimpleBody[ResetPasswordResponse]},
+        fastapi.status.HTTP_200_OK: {"model": SimpleBody[TemporaryPasswordResponse]},
         fastapi.status.HTTP_404_NOT_FOUND: {"userNotFound": None},
     },
     dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
@@ -234,7 +236,7 @@ async def reset_user_password(
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
-) -> PydanticResponse[SimpleBody[ResetPasswordResponse]]:
+) -> PydanticResponse[SimpleBody[TemporaryPasswordResponse]]:
     """Reset a user's password to a random temporary password."""
     result = user_data_manager.reset_user_password(
         user.username,

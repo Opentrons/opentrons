@@ -9,6 +9,7 @@ from auth_server.settings.models import SettingsResponseData
 from auth_server.settings.store import SettingsStore
 from auth_server.users.models import (
     AccountType,
+    TemporaryPasswordResponse,
     UserResponse,
 )
 from auth_server.users.store import UserStore
@@ -113,12 +114,13 @@ def test_create_user_success(
         account_type=AccountType.USER,
         now=_NOW,
     )
-    assert result == UserResponse(
+    assert result == TemporaryPasswordResponse(
         username="new_user",
         fullName="New User",
         accountType=AccountType.USER,
         locked=False,
         resetPassword=False,
+        temporaryPassword=None,
     )
 
 
@@ -149,12 +151,13 @@ def test_create_user_hashes_password(
         account_type=AccountType.USER,
         now=_NOW,
     )
-    assert result == UserResponse(
+    assert result == TemporaryPasswordResponse(
         username="hash_check",
         fullName="X",
         accountType=AccountType.USER,
         locked=False,
         resetPassword=False,
+        temporaryPassword=None,
     )
 
 
@@ -228,12 +231,15 @@ def test_create_user_without_password_sets_reset_password(
         account_type=AccountType.USER,
         now=_NOW,
     )
-    assert result == UserResponse(
-        username="temp_pw_user",
-        fullName="Temp PW User",
-        accountType=AccountType.USER,
-        locked=False,
-        resetPassword=True,
+    assert result.username == "temp_pw_user"
+    assert result.fullName == "Temp PW User"
+    assert result.accountType == AccountType.USER
+    assert result.locked is False
+    assert result.resetPassword is True
+    assert result.temporaryPassword is not None
+    assert len(result.temporaryPassword) == 8
+    assert all(
+        c in string.ascii_letters + string.digits for c in result.temporaryPassword
     )
 
 

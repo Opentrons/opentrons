@@ -578,6 +578,9 @@ stages:
         Authorization: '{admin_access_token}'
     response:
       status_code: 201
+      save:
+        json:
+          temporary_password: data.temporaryPassword
       json:
         data:
           username: no_password_user
@@ -585,6 +588,7 @@ stages:
           accountType: user
           locked: false
           resetPassword: true
+          temporaryPassword: !anystr
 
   - name: Get the user and confirm resetPassword is true
     request:
@@ -601,26 +605,6 @@ stages:
           accountType: user
           locked: false
           resetPassword: true
-
-  - name: Admin resets the password to retrieve a temporary password
-    request:
-      method: POST
-      url: '{run_server.base_url}/auth/users/byUsername/no_password_user/resetPassword'
-      headers:
-        Authorization: '{admin_access_token}'
-    response:
-      status_code: 200
-      save:
-        json:
-          temporary_password: data.temporaryPassword
-      json:
-        data:
-          username: no_password_user
-          fullName: No Password User
-          accountType: user
-          locked: false
-          resetPassword: true
-          temporaryPassword: !anystr
 
   - name: User can log in with the temporary password but only gets self-write scopes
     request:
