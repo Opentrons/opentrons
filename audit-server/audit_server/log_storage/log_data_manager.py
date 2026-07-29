@@ -5,7 +5,9 @@ from asyncio import Lock
 from datetime import datetime, timezone
 from logging import getLogger
 from typing import Final
+from pathlib import Path
 
+from fastapi import UploadFile
 from opentrons_shared_data.errors.exceptions import (
     AuditLoggingError,
     KeyStorageUnavailableError,
@@ -77,6 +79,16 @@ class LogDataManager:
         async with self._lock:
             return await self._do_store_log(log_message)
 
+    # TODO, make the input for this one new type with contents and a new path
+    async def store_robot_log(
+        self, robot_log: UploadFile, robot_log_path: Path
+    ) -> str | None:
+        """Store a robot log to the active period."""
+        if not self._settings.get_logging_enabled():
+            return None
+        async with self._lock:
+            return await self._do_store_robot_log(robot_log, robot_log_path)
+
     def get_log_periods(self) -> list[LogPeriodSummary]:
         """Get a list of log periods, active or inactive."""
         return self._store.list_periods()
@@ -123,6 +135,15 @@ class LogDataManager:
             raise AuditLoggingError(
                 message="Unable to store log", wrapping=[PythonException(stored)]
             )
+
+    async def _do_store_robot_log(self, robot_log: UploadFile, path: Path) -> str:
+        contents_bytes = await robot_log.read()
+        contents = contents_bytes.decode("utf-8")
+        signed_contents, signing_exec = await self._sign_log(contents, None)
+
+        robot_log_hash = self._store.store_robot_log(signed_contents, path)
+
+        return robot_log_hash
 
     def _build_system_message(self, action: str, message: str) -> str:
         """Build an audit log message originated by the system.

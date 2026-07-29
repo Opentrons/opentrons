@@ -1,6 +1,7 @@
 """Code for managing log storage and export."""
 
 from datetime import datetime, timezone
+from pathlib import Path
 
 from sqlalchemy import select
 from sqlalchemy.engine import Engine as SQLEngine
@@ -12,7 +13,7 @@ from .models import (
     UserLogForExport,
 )
 from .types import LogPeriodEntries, RobotLogPaths, StoredLog
-from audit_server.persistence.orm_models import LogEntry, LogPeriod
+from audit_server.persistence.orm_models import LogEntry, LogPeriod, RobotLog
 
 
 class NoLogInPeriodError(Exception):
@@ -75,6 +76,37 @@ class LogStore:
         session.add(entry)
         session.add(log_period)
         return log.message_hash
+
+    def store_robot_log(self, robot_log: StoredLog, file_path: Path) -> str:
+        """Store a log period."""
+        with self._session() as session:
+            with session.begin():
+                current_period = self._current_period(session)
+                if not isinstance(current_period, LogPeriod):
+                    raise current_period
+                return self._do_store_robot_log(
+                    session, robot_log, file_path, current_period
+                )
+
+    def _do_store_robot_log(
+        self,
+        session: Session,
+        robot_log: StoredLog,
+        file_path: Path,
+        log_period: LogPeriod,
+    ) -> str:
+        entry = RobotLog(
+            log_period=log_period,
+            file_path=str(file_path),
+            file_hash=robot_log.message_hash,
+            file_sig=robot_log.message_sig,
+            file_isg_version=robot_log.sig_version,
+        )
+
+        session.add(entry)
+        session.add(log_period)
+
+        return robot_log.message_hash
 
     def end_period(self, end_period_logs: list[StoredLog]) -> str | NoActivePeriodError:
         """End a period, with the required end message and some previous supplemental messages.
