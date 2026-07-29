@@ -555,3 +555,104 @@ stages:
       json:
         errors:
           - id: userAlreadyExists
+
+---
+test_name: Creating a user without a password requires password reset
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+
+stages:
+  - name: Create a user without a password
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: no_password_user
+          fullName: No Password User
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 201
+      json:
+        data:
+          username: no_password_user
+          fullName: No Password User
+          accountType: user
+          locked: false
+          resetPassword: true
+
+  - name: Get the user and confirm resetPassword is true
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/byUsername/no_password_user'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          username: no_password_user
+          fullName: No Password User
+          accountType: user
+          locked: false
+          resetPassword: true
+
+  - name: Admin resets the password to retrieve a temporary password
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users/byUsername/no_password_user/resetPassword'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      save:
+        json:
+          temporary_password: data.temporaryPassword
+      json:
+        data:
+          username: no_password_user
+          fullName: No Password User
+          accountType: user
+          locked: false
+          resetPassword: true
+          temporaryPassword: !anystr
+
+  - name: User can log in with the temporary password but only gets self-write scopes
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: no_password_user
+        password: '{temporary_password}'
+    response:
+      status_code: 200
+      json:
+        access_token: !anystr
+        refresh_token: !anystr
+        token_type: Bearer
+        expires_in: !anyint
+        scope: users.read.self users.write.self
+
+  - name: Reject creating a user with an empty password
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: empty_password_user
+          password: ''
+          fullName: Empty Password User
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 400
+      json:
+        detail: password must not be empty

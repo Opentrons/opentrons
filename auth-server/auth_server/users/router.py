@@ -70,7 +70,11 @@ async def post_users(
     try:
         new_user = user_data_manager.create_user(
             username=user_create.username,
-            password=user_create.password.get_secret_value(),
+            password=(
+                user_create.password.get_secret_value()
+                if user_create.password is not None
+                else None
+            ),
             full_name=user_create.fullName,
             account_type=user_create.accountType,
             now=now,

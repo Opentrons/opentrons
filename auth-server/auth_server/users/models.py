@@ -50,7 +50,17 @@ class UserCreate(BaseModel):
     """Request body for creating a user."""
 
     username: Annotated[str, Field(..., description="The username of the user.")]
-    password: Annotated[SecretStr, Field(..., description="The password for the user.")]
+    password: Annotated[
+        SecretStr | None,
+        Field(
+            default=None,
+            description=(
+                "The password for the user. If omitted, the server generates a "
+                "temporary password and requires the user to set a new password "
+                "before full robot access."
+            ),
+        ),
+    ] = None
     fullName: Annotated[str, Field(..., description="The full name of the user.")]
     accountType: Annotated[
         AccountType, Field(..., description="The type of account for the user.")

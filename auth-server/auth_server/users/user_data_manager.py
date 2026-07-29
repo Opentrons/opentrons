@@ -185,7 +185,7 @@ class UserDataManager:
     def create_user(
         self,
         username: str,
-        password: str,
+        password: str | None,
         full_name: str,
         account_type: str,
         now: datetime.datetime,
@@ -197,7 +197,14 @@ class UserDataManager:
             full_name=full_name,
             account_type=account_type,
         )
-        _validate_password_complexity(password, self._settings_store.get_settings())
+        settings = self._settings_store.get_settings()
+        reset_password = False
+        if password is None:
+            min_length, require_special = _password_complexity_requirements(settings)
+            password = _generate_temporary_password(min_length, require_special)
+            reset_password = True
+        else:
+            _validate_password_complexity(password, settings)
         if self._user_store.get(username) is not None:
             raise UserAlreadyExistsError(f"User {username!r} already exists")
         new_user = self._user_store.add(
@@ -206,6 +213,7 @@ class UserDataManager:
             full_name=full_name,
             account_type=account_type,
             now=now,
+            reset_password=reset_password,
         )
         return self._to_response(new_user)
 

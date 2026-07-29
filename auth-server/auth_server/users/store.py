@@ -50,6 +50,7 @@ class UserStore:
         full_name: str,
         account_type: str,
         now: datetime.datetime,
+        reset_password: bool,
     ) -> User:
         """Create a user, persist it, and return it."""
         new_user = User(
@@ -58,6 +59,7 @@ class UserStore:
             full_name=full_name,
             account_type=AccountType(account_type),
             password_set_at=now,
+            reset_password=reset_password,
         )
         with self._session() as session:
             session.add(new_user)

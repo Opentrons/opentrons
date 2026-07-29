@@ -102,6 +102,7 @@ def test_create_user_success(
             full_name="New User",
             account_type=AccountType.USER,
             now=matchers.IsA(datetime.datetime),
+            reset_password=False,
         )
     ).then_return(expected)
 
@@ -138,6 +139,7 @@ def test_create_user_hashes_password(
             "X",
             AccountType.USER,
             now=matchers.IsA(datetime.datetime),
+            reset_password=False,
         )
     ).then_return(created)
     result = manager.create_user(
@@ -194,6 +196,47 @@ def test_create_user_empty_password_raises(manager: UserDataManager) -> None:
         )
 
 
+def test_create_user_without_password_sets_reset_password(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    decoy.when(mock_store.get("temp_pw_user")).then_return(None)
+    expected = _make_orm_user(
+        username="temp_pw_user",
+        full_name="Temp PW User",
+        account_type=AccountType.USER,
+        reset_password=True,
+    )
+    decoy.when(
+        mock_store.add(
+            username="temp_pw_user",
+            hashed_password=matchers.IsA(str),
+            full_name="Temp PW User",
+            account_type=AccountType.USER,
+            now=matchers.IsA(datetime.datetime),
+            reset_password=True,
+        )
+    ).then_return(expected)
+
+    result = manager.create_user(
+        username="temp_pw_user",
+        password=None,
+        full_name="Temp PW User",
+        account_type=AccountType.USER,
+        now=_NOW,
+    )
+    assert result == UserResponse(
+        username="temp_pw_user",
+        fullName="Temp PW User",
+        accountType=AccountType.USER,
+        locked=False,
+        resetPassword=True,
+    )
+
+
 def test_create_user_short_password_raises(manager: UserDataManager) -> None:
     with pytest.raises(PasswordTooShortError) as exc_info:
         manager.create_user(
@@ -227,6 +270,7 @@ def test_create_user_enforces_password_length(
             full_name="Test User",
             account_type=AccountType.USER,
             now=matchers.IsA(datetime.datetime),
+            reset_password=False,
         )
     ).then_return(_make_orm_user(username="test_user"))
     with pytest.raises(PasswordTooShortError) as exc_info:
@@ -266,6 +310,7 @@ def test_create_user_enforces_password_special_characters(
             full_name="Test User",
             account_type=AccountType.USER,
             now=matchers.IsA(datetime.datetime),
+            reset_password=False,
         )
     ).then_return(_make_orm_user(username="test_user"))
     with pytest.raises(PasswordMissingSpecialCharactersError):
