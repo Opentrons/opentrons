@@ -29,8 +29,6 @@ The Vacuum Module ships in three separate boxes. One contains the vacuum pump an
 
 6. Remove the deck adapter and the small bag of manifold screws from their packaging. You will use the included screwdriver and screws to fasten the vacuum base to the deck adapter before placing it on the robot.
 
-<font color="red">Image: show base and screws</font>
-
 7. Remove the vacuum base from its packaging.
 
     <figure markdown>
