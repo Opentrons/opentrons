@@ -32,15 +32,16 @@ During installation, your Opentrons representative will create service and admin
 After software activation, a "Compliance Ready" badge appears next to your Flex in the app.
 
 <figure class="screenshot" markdown>
-![Image showing a compliance-ready Flex in the app.](../../images/compliance-ready-badge.png)
+  ![Image showing a compliance-ready Flex in the app.](../../images/compliance-ready-badge.png)
+  <figcaption>Your Opentrons App can control multiple robots, including a mix of Flex, compliance-ready Flex, and OT-2 robots.</figcaption>
 </figure>
-<figcaption>Your Opentrons App can control multiple robots, including a mix of Flex, compliance-ready Flex, and OT-2 robots.</figcaption>
 
 <!--------
 
 TODO and comments: 
 - add ticket for service PIN mention in service manual? does the lab retain this, or we retain this after setup? is it ever used again? 
 - not mentioning the encryption key here (in general, not detailing the setup process because I don't want to imply anything/leave an impression about what users are paying for)
+- is the recovery account a separate account, or is it a designated administrator account?
 
 ----->
 

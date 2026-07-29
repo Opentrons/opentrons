@@ -6,51 +6,56 @@ description: "An overview of the Flex's compliance-ready features."
 Opentrons Flex Compliance-Ready software introduces several new, irreversible features when installed on your Flex. This section covers: 
 
 * The different user [roles](../features/features.md#roles) that can access your compliance-ready Flex and Opentrons App. 
+* The types of [protocol run records](../features/records.md) a compliance-ready Flex generates.
 * When and where [documentation](../features/documentation.md) is required while using your Flex. 
 * Available [settings](../features/settings.md) to further customize your compliance-ready Flex.
-* The types of [protocol run records](../features/records.md) a compliance-ready Flex generates.
 
-On this page, read about roles and additional features like the Flex's encryption key, optional devices, and the additional data protection compliance-ready software enables.
+On this page, read about roles, protocol run records, and additional features like the Flex's encryption key, optional devices, and the additional data protection compliance-ready software enables.
 
 <!--------
 
 TODO and comments: 
-- happy to hear feedback on this section's organization. I've been back and forth several times at this point.
 - differentiate between protocol RUN RECORDS and protocol LOG FILES. we use both and we need to be crystal clear about what the intended difference is. is a protocol run record contained in the APP or ODD and the log file is the larger .zip file that is downloaded and exported?? 
+- organization note: I added the run records section to this larger page - even if these are totally separate from log files; I (so far) don't have enough to say to give this its own page.
 
 ----->
 
 ## Roles
 
-Three kinds of users can use your compliance-ready Flex. During software installation and activation, an Opentrons-trained representative will create accounts that fit into each role. 
+Three kinds of users can operate your compliance-ready Flex. During software installation and activation, an Opentrons-trained representative will create accounts that fit into each role. 
 
 | **Role** | **Permissions** | 
 | :--------|---------------- |
-| **Service** | <ul><li>Required for software activation</li><li>Can be used for service or to restore locked accounts</li></ul> |
+| **Service** | <ul><li>Required for software activation</li><li>Used for maintenance, service, or to restore locked accounts</li></ul> |
 | **Administrator** | <ul><li>Full system access</li><li>Can configure Flex settings and protocols</li><li>Day-to-day operation of the Flex</li></ul> |
 | **User** | <ul><li>Day-to-day operation of the Flex</li></ul> |
  
+During software installation, you'll be able to create multiple administrator accounts that will have full access to the Flex. These accounts can configure [settings](../features/settings.md) and the day-to-day user's experience, send verified protocols to the Flex, and view and export audit logs. 
 
-During software installation, you'll be able to create multiple administrator accounts that will have full access to the Flex. These accounts can configure [settings] and the day-to-day user's experience, send verified protocols to the Flex, and view and export audit logs. 
-
-User accounts can run verified protocols and view audit logs. They won't be able to add protocols to the Flex, export audit logs, or change settings. In addition, users are blocked from completing actions that require admin credentials. 
+User accounts can run verified protocols and view audit logs. By default, they won't be able to add protocols to the Flex, export audit logs, or change settings. In addition, users are blocked from completing actions that require admin credentials. 
 
 <figure class="screenshot" markdown>
-  ![Image showing a locked user account where admin credentials are required.](../images/)
-  <figcaption>User accounts lock during a login attempt for any action requiring an administrator.</figcaption>
+  ![Image showing a locked user account where admin credentials are required.](../../images/admin-credentials-required.png)
+  <figcaption>Users can't log in to the Flex touchscreen when administrator credentials are required.</figcaption>
 </figure>
+
+One administrator account should be designated as a recovery account during software installation. Be sure to write and save these account details in a safe place in case you're ever locked out of the system. 
 
 If your lab loses access to all administrator accounts, Opentrons offers an on-site recovery service. An Opentrons-trained representative will use a service account to restore access and preserve existing audit logs via a physical serial port.
 
 <!--------
 
 TODO: 
-- link relevant sections
-- how would all admin account access be lost? forgot password and locked after a certain amount of attempts?
-- insert image if I can get one. is the message that shows up for users customizable? 
+- how would all admin account access be lost? forgot password and locked after a certain amount of attempts? do we have a default number of attempts and is it customizable? 
 - how many admin accounts can a lab set up? any limits anywhere? 
+- confirm the differences between users and administrators, and which of these can be customized by admins (for example, the designs show actions requiring admin credentials: to update robots, to send protocols to the robot, and to SIGN protocol run records)...can they always export audit logs? is this admins only? 
+- confirm whether the recovery account is a separate account or a designated admin account
 
 ----->
+
+## Run records and files
+
+
 
 ## Encryption key
 
