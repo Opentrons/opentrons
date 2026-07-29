@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useQueryClient } from 'react-query'
 import clsx from 'clsx'
 
 import {
@@ -11,29 +10,16 @@ import {
   PrimaryButton,
   StyledText,
 } from '@opentrons/components'
-import {
-  getSelfQueryKey,
-  useAuthSettingsQuery,
-  useHost,
-  useSelfQuery,
-} from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { showLoginModal } from '/app/organisms/Desktop/LoginModal'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { useLogout } from '/app/redux/robot-auth'
+import { useSignRunFlow } from '/app/resources/access-control/useSignRunFlow'
 
 import styles from './signrunmodal.module.css'
 
 // Above typical desktop modal overlays so the toast remains visible on login.
 const TOAST_ABOVE_LOGIN_Z_INDEX = 10002
-
-// login gate states to control login prompting
-// idle: not prompting for login
-// prompting: login prompting in flight
-// querying: waiting for login to finish and self to settle
-// done: login finished and self settled, and this account can sign
-type LoginGate = 'idle' | 'prompting' | 'querying' | 'done'
 
 export interface SignRunModalProps {
   runId: string
@@ -43,7 +29,7 @@ export interface SignRunModalProps {
 }
 
 export function SignRunModal({
-  runId: _runId,
+  runId,
   robotName,
   onSigned,
 }: SignRunModalProps): JSX.Element {
@@ -51,33 +37,40 @@ export function SignRunModal({
 
   const [name, setName] = useState('')
   const [nameError, setNameError] = useState(false)
-  const [loginGate, setLoginGate] = useState<LoginGate>('idle')
 
   const inputRef = useRef<HTMLInputElement>(null)
   const permissionToastIdRef = useRef<string | null>(null)
 
-  const queryClient = useQueryClient()
-  const host = useHost()
+  const { makeToast, eatToast: eatToasterToast } = useToaster()
 
-  const { data: authSettings, isLoading: isAuthSettingsLoading } =
-    useAuthSettingsQuery()
-  const {
-    data: self,
-    isLoading: isSelfLoading,
-    isFetching: isSelfFetching,
-  } = useSelfQuery()
-  const logout = useLogout()
-  const { makeToast, eatToast } = useToaster()
+  const popToast = (): void => {
+    permissionToastIdRef.current = makeToast(
+      '' + t('sign_protocol_run_permission_required'),
+      ERROR_TOAST,
+      {
+        closeButton: true,
+        buttonText: i18n.format(t('shared:close'), 'capitalize'),
+        disableTimeout: true,
+        zIndex: TOAST_ABOVE_LOGIN_Z_INDEX,
+      }
+    )
+  }
 
-  const isLoading = isAuthSettingsLoading || isSelfLoading
+  const eatToast = (): void => {
+    if (permissionToastIdRef.current != null) {
+      eatToasterToast(permissionToastIdRef.current)
+      permissionToastIdRef.current = null
+    }
+  }
 
-  const isLoggedIn = self?.data?.username != null && self.data.username !== ''
-
-  const requireAdmin =
-    authSettings?.data.requireAdminCredsForSignoffProtocol === true
-  const isAdmin = self?.data.accountType === 'admin'
-
-  const canSignProtocol = !requireAdmin || isAdmin
+  const { signRun, isLoading, loginGate, correctName } = useSignRunFlow(
+    runId,
+    robotName,
+    onSigned,
+    showLoginModal,
+    popToast,
+    eatToast
+  )
 
   const trimmedName = name.trim()
 
@@ -94,96 +87,18 @@ export function SignRunModal({
     setNameError(false)
   }
 
-  useEffect(() => {
-    // The self query key omits the access token, so after login the previous
-    // user can remain cached until refetch finishes. Wait for that settle
-    // before deciding to prompt again — otherwise we log the new admin out.
-    if (isLoading || isSelfFetching) {
-      return
-    }
-
-    // if logged in and can sign, set login gate to done and return
-    if (isLoggedIn && canSignProtocol) {
-      if (permissionToastIdRef.current != null) {
-        eatToast(permissionToastIdRef.current)
-        permissionToastIdRef.current = null
-      }
-      if (loginGate !== 'done') {
-        setLoginGate('done')
-      }
-      return
-    }
-
-    // if prompting is in flight, or login is done, return
-    if (loginGate === 'prompting' || loginGate === 'done') {
-      return
-    }
-
-    // if querying has settled, check if user is all set
-    // if user is signed in and can sign, set login gate to done
-    // if user is signed in and cannot sign, set login gate to idle
-    if (loginGate === 'querying') {
-      setLoginGate(isLoggedIn && !canSignProtocol ? 'idle' : 'done')
-      return
-    }
-
-    const shouldShowPermissionToast = isLoggedIn && !canSignProtocol
-
-    setLoginGate('prompting')
-    // if user is signed in and cannot sign, show permission toast and log out
-    if (shouldShowPermissionToast) {
-      logout()
-      // clear cached self query data to push through logout
-      if (host != null) {
-        queryClient.removeQueries(getSelfQueryKey(host))
-      }
-      permissionToastIdRef.current = makeToast(
-        '' + t('sign_protocol_run_permission_required'),
-        ERROR_TOAST,
-        {
-          closeButton: true,
-          buttonText: i18n.format(t('shared:close'), 'capitalize'),
-          disableTimeout: true,
-          zIndex: TOAST_ABOVE_LOGIN_Z_INDEX,
-        }
-      )
-    }
-
-    // if user is not signed in, prompt for login.
-    // Do not overwrite 'done' — login success can seed /self and move the gate
-    // to done before this finally runs.
-    void showLoginModal({ robotName, uncloseable: true }).finally(() => {
-      setLoginGate(current => (current === 'done' ? 'done' : 'querying'))
-    })
-    // Omit makeToast/eatToast/t/i18n/logout: toaster fns are recreated when
-    // toasts change, which would re-run this effect when the toast is dismissed.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    isLoading,
-    isSelfFetching,
-    isLoggedIn,
-    canSignProtocol,
-    loginGate,
-    host,
-    queryClient,
-    robotName,
-  ])
-
   const handleSign = (): void => {
     if (trimmedName === '') {
       return
     }
 
-    if (trimmedName !== self?.data?.fullName) {
+    if (trimmedName !== correctName) {
       setNameError(true)
       return
     }
 
     setNameError(false)
-    // TODO(jj, 2026-07-27): Restore submitSignRun({ runId, name: trimmedName })
-    // with onSuccess: onSigned once POST /runs/{id}/sign is implemented.
-    // Dismiss after FE validation only so the desktop post-run flow can be tested.
-    onSigned()
+    signRun(trimmedName)
   }
 
   const footer = (
@@ -191,11 +106,7 @@ export function SignRunModal({
       <PrimaryButton
         onClick={handleSign}
         disabled={
-          trimmedName === '' ||
-          isLoading ||
-          nameError ||
-          loginGate === 'prompting' ||
-          !canSignProtocol
+          trimmedName === '' || isLoading || nameError || loginGate !== 'done'
         }
       >
         {t('sign')}
