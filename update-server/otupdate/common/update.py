@@ -6,22 +6,22 @@ This has endpoints like update session management, validation, and execution
 
 import asyncio
 import dataclasses
-import functools
 import json
 import logging
 import os
-from pathlib import Path
 from subprocess import CalledProcessError
-from typing import Optional, Self
+from typing import Annotated, Optional, Self
 
-from aiohttp import BodyPartReader, MultipartReader, web
-from typing_extensions import Protocol
+import fastapi
+from fastapi.responses import JSONResponse
 
 from server_utils.auth.scopes import Scope
+from server_utils.fastapi_utils.app_state import AppState, get_app_state
 
-from . import auth, config, update_actions
-from .constants import RESTART_LOCK_NAME
-from .handler_type import Handler
+from . import config, multipart, update_actions
+from .api_error import APIError, ErrorBody
+from .auth import require_scopes
+from .control import get_restart_lock, no_actions_set_error
 from .session import Stages, UpdateSession, get_current_session, set_current_session
 from otupdate.openembedded.update_actions import UPDATE_PKG_OE
 
@@ -110,33 +110,48 @@ async def begin(request: web.Request) -> web.Response:
     try:
         options = await _BeginSessionOptions.parse_from_request(request)
     except _BeginSessionOptions.ParseError as e:
-        return web.json_response(
-            data={"error": "invalid-request", "message": e.message_for_response},
-            status=400,
-        )
+        raise APIError(
+            400,
+            ErrorBody(error="invalid-request", message=e.message_for_response),
+        ) from e
 
     session = UpdateSession(
-        storage_path=config.config_from_request(request).download_storage_path,
+        storage_path=server_config.download_storage_path,
         auto_commit_and_restart=options.auto_commit_and_restart,
     )
-    set_current_session(request, session)
-    return web.json_response(
-        data={
+    set_current_session(app_state, session)
+    return JSONResponse(
+        status_code=201,
+        content={
             "token": session.token,
             "auto_commit_and_restart": session.auto_commit_and_restart,
         },
-        status=201,
     )
 
 
-@_require_session
-async def status(request: web.Request, session: UpdateSession) -> web.Response:
-    return web.json_response(data=session.state, status=200)
+@router.get("/server/update/{session}/status", summary="Report an update's progress.")
+async def status(
+    session: Annotated[UpdateSession, fastapi.Depends(require_session)],
+) -> JSONResponse:
+    return JSONResponse(status_code=200, content=dict(session.state))
 
 
-@auth.require_scopes(Scope.UPDATES_WRITE)
-@_require_session
-async def file_upload(request: web.Request, session: UpdateSession) -> web.Response:
+@router.post(
+    "/server/update/{session}/file",
+    status_code=201,
+    summary="Upload a system update file.",
+    dependencies=[fastapi.Depends(require_scopes(Scope.UPDATES_WRITE))],
+)
+async def file_upload(
+    request: fastapi.Request,
+    session: Annotated[UpdateSession, fastapi.Depends(require_session)],
+    server_config: Annotated[config.Config, fastapi.Depends(config.get_config)],
+    actions: Annotated[
+        Optional[update_actions.UpdateActionsInterface],
+        fastapi.Depends(update_actions.get_update_actions),
+    ],
+    restart_lock: Annotated[asyncio.Lock, fastapi.Depends(get_restart_lock)],
+) -> JSONResponse:
     """Serves /update/:session/file
 
     Requires multipart (encoding doesn't matter) with a file field in the
@@ -270,23 +285,6 @@ class _BeginSessionOptions:
             self.message_for_response = message_for_response
 
 
-async def _save_file(part: BodyPartReader, path: str) -> None:
-    # making sure directory exists first
-    Path(path).mkdir(parents=True, exist_ok=True)
-    if not part.name:
-        raise Exception("Cannot save file with no name")
-    with open(os.path.join(path, part.name), "wb") as write:
-        while not part.at_eof():
-            chunk = await part.read_chunk()
-            decoded = part.decode(chunk)
-            write.write(decoded)
-    try:
-        for file in os.listdir(path):
-            LOG.info(f"file written, {file} to path, {path}")
-    except Exception:
-        LOG.exception("File not written")
-
-
 def _begin_validate_and_write(
     session: UpdateSession,
     config: config.Config,
@@ -358,28 +356,3 @@ async def _commit(
         actions.clean_up(session.download_path)
 
         session.set_stage(Stages.READY_FOR_RESTART)
-
-
-async def _extract_and_save_update_file(
-    reader: MultipartReader, session: UpdateSession
-) -> Optional[str]:
-    """Extract an update file from a request.
-
-    Saves to the session's storage directory, and returns the new file name within
-    that directory.
-    """
-    found: Optional[str] = None
-    async for part in reader:
-        if part is None:
-            return None
-        elif isinstance(part, MultipartReader):
-            LOG.info("Incorrect nested multipart in file_upload, ignoring")
-            await part.release()
-        elif part.name not in VALID_UPDATE_PKG:
-            LOG.info(f"Unknown field name {part.name} in file_upload, ignoring")
-            await part.release()
-        else:
-            LOG.info(f"Writing {part.name}")
-            await _save_file(part, session.download_path)
-            found = part.name
-    return found
