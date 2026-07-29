@@ -60,6 +60,7 @@ from ..run_data_manager import (
     RunDataManager,
     RunNotCompleteError,
     RunNotCurrentError,
+    RunSignoffRequiredError,
 )
 from ..run_models import (
     ActiveNozzleLayout,
@@ -155,6 +156,14 @@ class RunNotComplete(ErrorDetails):
     errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
 
 
+class RunSignoffRequired(ErrorDetails):
+    """An error if an action requires the run to be signed off first."""
+
+    id: Literal["RunSignoffRequired"] = "RunSignoffRequired"
+    title: str = "Run Signoff Required"
+    errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
+
+
 class AllRunsLinks(BaseModel):
     """Links returned along with a collection of runs."""
 
@@ -206,7 +215,9 @@ async def get_run_data_from_url(
         status.HTTP_201_CREATED: {"model": SimpleBody[Run]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorBody[FileIdNotFound]},
-        status.HTTP_409_CONFLICT: {"model": ErrorBody[RunAlreadyActive]},
+        status.HTTP_409_CONFLICT: {
+            "model": ErrorBody[Union[RunAlreadyActive, RunSignoffRequired]]
+        },
     },
     dependencies=[
         Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
@@ -305,6 +316,10 @@ async def create_run(  # noqa: C901
         )
     except RunConflictError as e:
         raise RunAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
+    except RunSignoffRequiredError as e:
+        raise RunSignoffRequired(detail=str(e)).as_error(
+            status.HTTP_409_CONFLICT
+        ) from e
     except ProtocolNotFoundError as e:
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
@@ -396,6 +411,9 @@ async def get_run(
     responses={
         status.HTTP_200_OK: {"model": SimpleEmptyBody},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
+        status.HTTP_409_CONFLICT: {
+            "model": ErrorBody[Union[RunNotIdle, RunSignoffRequired]]
+        },
     },
     dependencies=[
         Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
@@ -422,7 +440,10 @@ async def remove_run(
 
     except RunConflictError as e:
         raise RunNotIdle().as_error(status.HTTP_409_CONFLICT) from e
-
+    except RunSignoffRequiredError as e:
+        raise RunSignoffRequired(detail=str(e)).as_error(
+            status.HTTP_409_CONFLICT
+        ) from e
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
@@ -441,7 +462,9 @@ async def remove_run(
         status.HTTP_200_OK: {"model": SimpleBody[Run]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {
-            "model": ErrorBody[RunStopped | RunNotIdle | RunNotComplete]
+            "model": ErrorBody[
+                RunStopped | RunNotIdle | RunNotComplete | RunSignoffRequired
+            ]
         },
     },
     dependencies=[
@@ -486,6 +509,10 @@ async def update_run(
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
     except RunNotCompleteError as e:
         raise RunNotComplete(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
+    except RunSignoffRequiredError as e:
+        raise RunSignoffRequired(detail=str(e)).as_error(
+            status.HTTP_409_CONFLICT
+        ) from e
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
