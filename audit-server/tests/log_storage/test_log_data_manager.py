@@ -692,3 +692,18 @@ async def test_rotate_no_previous_log_handles_no_key_server(
         )
     ).then_return("")
     assert await subject.rotate_periods() == ""
+
+
+def test_create_deletion_key_mints_a_key(subject: LogDataManager) -> None:
+    """It should mint a non-empty deletion key for a log period."""
+    key = subject.create_deletion_key(period_id="1")
+
+    assert key
+
+
+def test_create_deletion_key_mints_distinct_keys(subject: LogDataManager) -> None:
+    """Each call should mint a new, distinct key for the same period."""
+    first = subject.create_deletion_key(period_id="1")
+    second = subject.create_deletion_key(period_id="1")
+
+    assert first != second
