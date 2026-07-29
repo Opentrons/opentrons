@@ -7,6 +7,7 @@ from ..commands.command import DefinedErrorData
 from ..error_recovery_policy import ErrorRecoveryType
 from .actions import (
     Action,
+    BeginAwaitingRecoveryAction,
     FailCommandAction,
     ResumeFromRecoveryAction,
     SucceedCommandAction,
@@ -20,6 +21,11 @@ def get_state_updates(action: Action) -> list[StateUpdate]:
     """Extract all the StateUpdates that the StateStores should apply when they apply an action."""
     if isinstance(action, SucceedCommandAction):
         return [action.state_update]
+
+    elif isinstance(action, BeginAwaitingRecoveryAction) and isinstance(
+        action.error, DefinedErrorData
+    ):
+        return [action.error.state_update]
 
     elif isinstance(action, FailCommandAction) and isinstance(
         action.error, DefinedErrorData

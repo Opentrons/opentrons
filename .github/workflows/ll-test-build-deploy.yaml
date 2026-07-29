@@ -49,7 +49,7 @@ jobs:
       relative_artifact_dir: ${{ steps.deploy-config.outputs.RELATIVE_ARTIFACT_DIR }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ./.github/actions/git/resolve-tag
       - name: Setup UV
         uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
@@ -70,7 +70,7 @@ jobs:
     runs-on: 'ubuntu-24.04'
     if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ./.github/actions/js/setup
       - name: 'run labware library unit tests'
         run: make -C labware-library test-cov
@@ -80,8 +80,9 @@ jobs:
     timeout-minutes: 10
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
+          # So the build can extract the version number from Git history.
           fetch-depth: 0
       - uses: ./.github/actions/js/setup
       - name: 'build LL'
@@ -107,9 +108,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ./.github/actions/git/resolve-tag
       - name: Setup UV
         uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
@@ -149,7 +148,7 @@ jobs:
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.js-unit-test.result == 'success' || needs.js-unit-test.result == 'skipped') && needs.build-ll.result == 'success' && needs.deploy-ll.result == 'success'
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'Send success alert'
         uses: ./.github/actions/simple-build-alert
         with:
@@ -164,7 +163,7 @@ jobs:
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.js-unit-test.result == 'failure' || needs.build-ll.result == 'failure' || needs.deploy-ll.result == 'failure')
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'Determine failed jobs'
         id: failed-jobs
         shell: bash
@@ -198,7 +197,7 @@ jobs:
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.js-unit-test.result == 'cancelled' || needs.build-ll.result == 'cancelled' || needs.deploy-ll.result == 'cancelled')
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'Send cancelled alert'
         uses: ./.github/actions/simple-build-alert
         with:

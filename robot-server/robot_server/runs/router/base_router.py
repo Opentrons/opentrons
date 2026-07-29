@@ -7,7 +7,16 @@ import logging
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
-from typing import Annotated, Callable, Dict, Final, Literal, Optional, Union
+from typing import (
+    Annotated,
+    Callable,
+    Dict,
+    Final,
+    Literal,
+    Optional,
+    Union,
+    assert_type,
+)
 
 from fastapi import Depends, Query, status
 from pydantic import BaseModel, Field
@@ -23,7 +32,11 @@ from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_engine.types import CSVRuntimeParamPaths, DeckSlotLocation
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.robot.types import RobotTypeEnum
-from server_utils.auth.resource_server.fastapi import require_scopes
+from server_utils.audit.fastapi import get_audit_logger
+from server_utils.auth.resource_server.fastapi import (
+    get_access_control_status,
+    require_scopes,
+)
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
 from server_utils.fastapi_utils.models.json_api import (
@@ -173,14 +186,12 @@ async def get_run_data_from_url(
     base_router.post,
     path="/runs",
     summary="Create a run",
-    description=dedent(
-        """
+    description=dedent("""
         Create a new run to track robot interaction.
 
         When too many runs already exist, old ones will be automatically deleted
         to make room for the new one.
-        """
-    ),
+        """),
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[Run]},
@@ -188,7 +199,10 @@ async def get_run_data_from_url(
         status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorBody[FileIdNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunAlreadyActive]},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
+        Depends(get_audit_logger("create protocol run")),
+    ],
 )
 async def create_run(  # noqa: C901
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
@@ -204,6 +218,7 @@ async def create_run(  # noqa: C901
     ],
     camera_provider: Annotated[CameraProvider, Depends(get_camera_provider)],
     notify_publishers: Annotated[Callable[[], None], Depends(get_pe_notify_publishers)],
+    access_control_status: Annotated[bool, Depends(get_access_control_status)],
     request_body: Optional[RequestModel[RunCreate]] = None,
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Create a new run.
@@ -223,6 +238,7 @@ async def create_run(  # noqa: C901
         deck_configuration_store: Dependency to fetch the deck configuration.
         camera_provider: Dependency to provide access to the Camera Settings to the run.
         notify_publishers: Utilized by the engine to notify publishers of state changes.
+        access_control_status: Status of the Auth-Server access control enablement.
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None
     offsets = request_body.data.labwareOffsets if request_body is not None else []
@@ -275,6 +291,7 @@ async def create_run(  # noqa: C901
             run_time_param_paths=rtp_paths,
             protocol=protocol_resource,
             notify_publishers=notify_publishers,
+            access_control_status=access_control_status,
         )
     except RunConflictError as e:
         raise RunAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
@@ -370,7 +387,10 @@ async def get_run(
         status.HTTP_200_OK: {"model": SimpleEmptyBody},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
+        Depends(get_audit_logger("delete protocol run")),
+    ],
 )
 async def remove_run(
     runId: str,
@@ -407,7 +427,10 @@ async def remove_run(
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
+        Depends(get_audit_logger("update protocol run")),
+    ],
 )
 async def update_run(
     runId: str,
@@ -422,9 +445,12 @@ async def update_run(
         run_data_manager: Current and historical run data management.
     """
     try:
-        run_data = await run_data_manager.update(
-            runId, current=request_body.data.current
-        )
+        if request_body.data.current is not None:
+            # `current` can either be set to false or not be set at all.
+            assert_type(request_body.data.current, Literal[False])
+            run_data = await run_data_manager.uncurrent(runId)
+        else:
+            run_data = run_data_manager.get(runId)
     except RunConflictError as e:
         raise RunNotIdle(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
     except RunNotCurrentError as e:
@@ -519,13 +545,11 @@ async def get_run_commands_error(
     base_router.get,
     path="/runs/{runId}/currentState",
     summary="Get a run's current state.",
-    description=dedent(
-        """
+    description=dedent("""
         Get current state associated with a run if the run is current.
         "\n\n"
         Note that this endpoint is experimental and subject to change.
-        """
-    ),
+        """),
     responses={
         status.HTTP_200_OK: {"model": Body[RunCurrentState, CurrentStateLinks]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},

@@ -4,6 +4,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  usePostWifiConfigureMutation,
   useRobotSettingsQuery,
   useUpdateRobotSettingMutation,
 } from '@opentrons/react-api-client'
@@ -93,6 +94,8 @@ const mockToggleLights = vi.fn()
 const mockToggleER = vi.fn()
 const mockToggleStackerSensors = vi.fn()
 const mockUpdateRobotSetting = vi.fn()
+const mockPostWifiConfigure = vi.fn()
+const mockResetWifiConfigure = vi.fn()
 
 const render = () => {
   return renderWithProviders(
@@ -139,6 +142,16 @@ describe('RobotSettingsDashboard', () => {
     })
     vi.mocked(useNetworkConnection).mockReturnValue({} as any)
     vi.mocked(useWifiList).mockReturnValue([])
+    vi.mocked(usePostWifiConfigureMutation).mockReturnValue({
+      postWifiConfigure: mockPostWifiConfigure,
+      mutate: mockPostWifiConfigure,
+      reset: mockResetWifiConfigure,
+      isLoading: false,
+      isSuccess: false,
+      isError: false,
+      error: null,
+      status: 'idle',
+    } as any)
     vi.mocked(useErrorRecoverySettingsToggle).mockReturnValue({
       isEREnabled: true,
       toggleERSettings: mockToggleER,

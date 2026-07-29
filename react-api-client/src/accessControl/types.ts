@@ -152,6 +152,9 @@ type AuditLogAction =
   | 'dismiss_run'
   | 'retry_action'
   | 'shutdown_robot'
+  | 'restart_robot'
+  | 'reset_robot_config'
+  | 'sync_system_time'
   | 'update_robot_name'
   | 'update_self'
   | 'update_error_recovery_policy'
@@ -163,6 +166,8 @@ type AuditLogAction =
   | 'pause_run'
   | 'disconnect_wifi'
   | 'connect_wifi'
+  | 'wifi_config'
+  | 'delete_protocol'
   | 'delete_run'
   | 'delete_run_images'
   | 'delete_runs'
@@ -176,9 +181,11 @@ type AuditLogAction =
   | 'set_lights'
   | 'apply_offsets'
   | 'update_subsystem'
+  | 'update_module'
   | 'update_settings'
   | 'create_user'
   | 'delete_log_period'
+  | 'delete_log_periods'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.

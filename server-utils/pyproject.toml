@@ -1,7 +1,7 @@
 [project]
 name = 'server_utils'
 
-requires-python = '>=3.10'
+requires-python = '>=3.11'
 license = 'Apache-2.0'
 authors = [{name = "Opentrons", email = "engineering@opentrons.com"}]
 classifiers = [
@@ -48,6 +48,7 @@ dev = [
     "sqlalchemy2-stubs==0.0.2a38",
     "build~=1.2.0",
     "setuptools==80.9.0",
+    "python-multipart==0.0.28",
 ]
 
 [tool.ruff.lint]

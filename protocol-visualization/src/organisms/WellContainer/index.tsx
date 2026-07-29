@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import round from 'lodash/round'
 
@@ -15,6 +15,7 @@ import { getWellVolume } from '../utils/getWellVolume'
 import { WELL_GEOMETRY, WELL_VIEWBOX, WellSvg } from '../WellSvg'
 import styles from './wellcontainer.module.css'
 
+import type { ReactNode } from 'react'
 import type {
   LabwareWellMap,
   Liquid,
@@ -34,7 +35,7 @@ interface WellContainerProps {
   liquids: Liquid[]
   tipMaxVolume: number
 }
-export function WellContainer(props: WellContainerProps): JSX.Element {
+export function WellContainer(props: WellContainerProps): ReactNode {
   const {
     params,
     selectedWellName,
@@ -48,8 +49,6 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
   const { t } = useTranslation('protocol_visualization')
   const [isWellHovered, setIsWellHovered] = useState<boolean>(false)
   const [isTipHovered, setIsTipHovered] = useState<boolean>(false)
-  const lastTipBottomYRef = useRef<number>(WELL_GEOMETRY.bottomY)
-  const lastXPositionSvgRef = useRef<number>(0)
 
   const labwareDepth = wells.A1.depth ?? 0
   const xLabwareWellWidth = wells.A1.x ?? 0
@@ -74,19 +73,23 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
   const wellHeightSvg = WELL_GEOMETRY.bottomY - WELL_GEOMETRY.topY
   const wellWidthSvg = WELL_GEOMETRY.rightX - WELL_GEOMETRY.leftX
 
-  if (labwareDepth != null && labwareDepth > 0 && mmFromBottom != null) {
-    const fractionOfWellHeight = mmFromBottom / labwareDepth
-    const tipBottomY =
-      WELL_GEOMETRY.bottomY - fractionOfWellHeight * wellHeightSvg
-    lastTipBottomYRef.current = round(tipBottomY, SVG_DECIMALS)
-  }
-  const roundedTipBottomY = lastTipBottomYRef.current
+  const roundedTipBottomY = useMemo(() => {
+    if (labwareDepth != null && labwareDepth > 0 && mmFromBottom != null) {
+      const fractionOfWellHeight = mmFromBottom / labwareDepth
+      const tipBottomY =
+        WELL_GEOMETRY.bottomY - fractionOfWellHeight * wellHeightSvg
+      return round(tipBottomY, SVG_DECIMALS)
+    }
+    return WELL_GEOMETRY.bottomY
+  }, [labwareDepth, mmFromBottom, wellHeightSvg])
 
-  if (hasWellLocation && xLabwareWellWidth != null && xLabwareWellWidth > 0) {
-    const xPositionSvg = (wellWidthSvg / xLabwareWellWidth) * xOffset
-    lastXPositionSvgRef.current = round(xPositionSvg, SVG_DECIMALS)
-  }
-  const roundedXPositionSvg = lastXPositionSvgRef.current
+  const roundedXPositionSvg = useMemo(() => {
+    if (hasWellLocation && xLabwareWellWidth != null && xLabwareWellWidth > 0) {
+      const xPositionSvg = (wellWidthSvg / xLabwareWellWidth) * xOffset
+      return round(xPositionSvg, SVG_DECIMALS)
+    }
+    return 0
+  }, [hasWellLocation, xLabwareWellWidth, wellWidthSvg, xOffset])
 
   const { tipColor, tipCurrentVolume, airGapVolume } =
     pipetteLocationLiquidState != null

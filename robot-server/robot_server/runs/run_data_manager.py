@@ -1,7 +1,15 @@
 """Manage current and historical run data."""
 
 from datetime import datetime
-from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
+from typing import (
+    Callable,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Union,
+)
 
 from opentrons import config
 from opentrons.protocol_engine import (
@@ -40,7 +48,6 @@ from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.notifications import RunsPublisher
-from robot_server.service.task_runner import TaskRunner
 
 _INITIAL_ERROR_RECOVERY_RULES: list[ErrorRecoveryRule] = []
 
@@ -68,6 +75,7 @@ def _build_run(
             pipettes=state_summary.pipettes,
             modules=state_summary.modules,
             current=current,
+            signedBy=run_resource.signed_by,
             completedAt=state_summary.completedAt,
             startedAt=state_summary.startedAt,
             liquids=state_summary.liquids,
@@ -130,6 +138,7 @@ def _build_run(
         pipettes=state.pipettes,
         modules=state.modules,
         current=current,
+        signedBy=run_resource.signed_by,
         completedAt=state.completedAt,
         startedAt=state.startedAt,
         liquids=state.liquids,
@@ -165,7 +174,6 @@ class RunDataManager:
         run_store: RunStore,
         error_recovery_setting_store: ErrorRecoverySettingStore,
         camera_setting_store: CameraSettingStore,
-        task_runner: TaskRunner,
         runs_publisher: RunsPublisher,
         file_provider: FileProvider,
     ) -> None:
@@ -180,7 +188,6 @@ class RunDataManager:
         # This error recovery mapping stuff probably belongs in RunOrchestratorStore.
         self._current_run_error_recovery_rules: List[ErrorRecoveryRule] = []
 
-        self._task_runner = task_runner
         self._runs_publisher = runs_publisher
         self._file_provider = file_provider
 
@@ -200,6 +207,7 @@ class RunDataManager:
         run_time_param_paths: Optional[CSVRuntimeParamPaths],
         notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
+        access_control_status: bool,
     ) -> Union[Run, BadRun]:
         """Create a new, current run.
 
@@ -213,6 +221,7 @@ class RunDataManager:
             run_time_param_values: Any runtime parameter values to set.
             run_time_param_paths: Any runtime filepath to set.
             protocol: The protocol to load the runner with, if any.
+            access_control_status: Status of the Auth-Server access control enablement.
 
         Returns:
             The run resource.
@@ -221,6 +230,9 @@ class RunDataManager:
             RunConflictError: There is a currently active run that cannot
                 be superceded by this new run.
         """
+        self._run_orchestrator_store.set_access_control_status(
+            access_control_mode=access_control_status
+        )
         prev_run_id = self._run_orchestrator_store.current_run_id
         if prev_run_id is not None:
             # Allow clear() to propagate RunConflictError.
@@ -390,60 +402,46 @@ class RunDataManager:
 
         self._run_store.remove(run_id=run_id)
 
-    async def update(self, run_id: str, current: Optional[bool]) -> Union[Run, BadRun]:
-        """Get and potentially archive the current run.
+    async def uncurrent(self, run_id: str) -> Union[Run, BadRun]:
+        """Archive the current run.
 
         Args:
-            run_id: The run to get and maybe archive.
-            current: Whether to mark the run as current or not.
-                     If `current` set to False, then the run is 'un-current'ed by
-                     stopping the run, saving the final run data to the run store,
-                     and clearing the engine and runner.
-                     If 'current' is True or not specified, we simply fetch the run's
-                     data from memory and database.
+            run_id: The run to un-current.
 
         Returns:
-            The updated run.
+            The run after it has been un-currented.
 
         Raises:
             RunNotFoundError: The run identifier was not found in the database.
             RunNotCurrentError: The run is not the current run.
-            RunConflictError: The run cannot be updated because it is not idle.
+            RunConflictError: The run cannot be un-currented because it is not idle.
         """
         if run_id != self._run_orchestrator_store.current_run_id:
             raise RunNotCurrentError(
-                f"Cannot update {run_id} because it is not the current run."
+                f"Cannot un-current {run_id} because it is not the current run."
             )
 
-        next_current = current if current is False else True
+        run_result = await self._run_orchestrator_store.clear()
+        self._file_provider.clear_run_metadata()
 
-        if next_current is False:
-            run_result = await self._run_orchestrator_store.clear()
-            state_summary = run_result.state_summary
-            parameters = run_result.parameters
-            run_resource: Union[RunResource, BadRunResource] = (
-                self._run_store.update_run_state(
-                    run_id=run_id,
-                    summary=run_result.state_summary,
-                    commands=run_result.commands,
-                    command_annotations=run_result.command_annotations,
-                    run_time_parameters=run_result.parameters,
-                )
+        run_resource: Union[RunResource, BadRunResource] = (
+            self._run_store.update_run_state(
+                run_id=run_id,
+                summary=run_result.state_summary,
+                commands=run_result.commands,
+                command_annotations=run_result.command_annotations,
+                run_time_parameters=run_result.parameters,
             )
-            self._runs_publisher.publish_pre_serialized_commands_notification(run_id)
-            self._file_provider.clear_run_metadata()
-        else:
-            state_summary = self._run_orchestrator_store.get_state_summary()
-            parameters = self._run_orchestrator_store.get_run_time_parameters()
-            run_resource = self._run_store.get(run_id=run_id)
+        )
+        self._runs_publisher.publish_pre_serialized_commands_notification(run_id)
 
         self._runs_publisher.publish_runs_advise_refetch(run_id)
 
         return _build_run(
             run_resource=run_resource,
-            state_summary=state_summary,
-            current=next_current,
-            run_time_parameters=parameters,
+            state_summary=run_result.state_summary,
+            current=False,
+            run_time_parameters=run_result.parameters,
         )
 
     def get_commands_slice(

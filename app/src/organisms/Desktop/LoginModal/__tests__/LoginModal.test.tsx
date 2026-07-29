@@ -1,3 +1,5 @@
+import '@testing-library/jest-dom/vitest'
+
 import NiceModal from '@ebay/nice-modal-react'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -48,6 +50,12 @@ const AUTH_USER: AuthUser = {
   accountType: 'user',
   locked: false,
   resetPassword: false,
+}
+
+const LOGGED_IN_USER = {
+  username: 'alice',
+  fullName: 'Alice',
+  accountType: 'user' as const,
 }
 
 function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
@@ -147,14 +155,7 @@ describe('LoginModal', () => {
   >['submitNewPassword']
 
   beforeEach(() => {
-    storeLoginState =
-      vi.fn<
-        (
-          robotName: string | null,
-          username: string,
-          successfulLoginResponse: OAuth2TokenResponse
-        ) => void
-      >()
+    storeLoginState = vi.fn()
     submitPassword = vi.fn<(username: string, password: string) => void>()
     submitNewPassword = vi.fn<(username: string, password: string) => void>()
     vi.mocked(useStoreLoginState).mockReturnValue(storeLoginState)
@@ -222,7 +223,7 @@ describe('LoginModal', () => {
     expect(submitPassword).toHaveBeenCalledWith('alice', 'secret-password')
     expect(storeLoginState).toHaveBeenCalledWith(
       ROBOT_NAME,
-      'alice',
+      LOGGED_IN_USER,
       TOKEN_RESPONSE
     )
     expect(screen.queryByText('Compliance Ready Software Login')).toBeNull()
@@ -253,7 +254,7 @@ describe('LoginModal', () => {
 
     expect(storeLoginState).toHaveBeenCalledWith(
       ROBOT_NAME,
-      'alice',
+      LOGGED_IN_USER,
       TOKEN_RESPONSE
     )
     screen.getByText('Your password has expired')
@@ -279,11 +280,7 @@ describe('LoginModal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
 
     expect(submitNewPassword).toHaveBeenCalledWith('alice', 'new-password')
-    expect(storeLoginState).toHaveBeenLastCalledWith(
-      ROBOT_NAME,
-      'alice',
-      TOKEN_RESPONSE
-    )
+    expect(storeLoginState).toHaveBeenCalledTimes(1)
     expect(screen.queryByText('Compliance Ready Software Login')).toBeNull()
   })
 

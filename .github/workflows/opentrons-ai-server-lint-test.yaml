@@ -23,7 +23,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
       - name: Checkout opentrons repo
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 1
 
@@ -40,6 +40,10 @@ jobs:
         id: install
         working-directory: ./opentrons-ai-server
         run: make setup
+      - name: Sync Python API docs
+        if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
+        working-directory: ./opentrons-ai-server
+        run: make sync-api-docs
       - name: ruff
         if: always() && steps.install.outcome == 'success' || steps.install.outcome == 'skipped'
         working-directory: ./opentrons-ai-server

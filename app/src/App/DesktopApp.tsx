@@ -30,6 +30,7 @@ import { Labware } from '/app/pages/Desktop/Labware'
 import { ProtocolDetails } from '/app/pages/Desktop/Protocols/ProtocolDetails'
 import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
 import { useIsFlex } from '/app/redux-resources/robots'
+import { useTrackRobotRestarts } from '/app/resources/devices/hooks/useTrackRobotRestarts'
 
 import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { ApiHostProvider } from '../local-resources/api-host-provider/ApiHostProvider'
@@ -48,6 +49,8 @@ import type { RouteProps } from './types'
 export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()
   useRefreshAccessTokenOnActivity()
+  // TODO(jh,2026-07-28): Refactor hook usage alongside robot system update epic.
+  useTrackRobotRestarts()
   const [isEmergencyStopModalDismissed, setIsEmergencyStopModalDismissed] =
     useState<boolean>(false)
 

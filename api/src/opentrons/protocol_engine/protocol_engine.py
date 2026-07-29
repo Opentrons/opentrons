@@ -45,6 +45,9 @@ from .execution import (
     QueueWorker,
     create_queue_worker,
 )
+from .execution.associated_command_error_recovery import (
+    AssociatedCommandErrorRecoveryOrchestrator,
+)
 from .plugins import AbstractPlugin, PluginStarter
 from .resources import CameraProvider, FileProvider, ModelUtils, ModuleDataProvider
 from .resources.camera_provider import CameraSettings
@@ -100,6 +103,9 @@ class ProtocolEngine:
         file_provider: FileProvider,
         camera_provider: CameraProvider,
         queue_worker: Optional[QueueWorker] = None,
+        associated_command_error_recovery: Optional[
+            AssociatedCommandErrorRecoveryOrchestrator
+        ] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
 
@@ -118,6 +124,7 @@ class ProtocolEngine:
         self._hardware_stopper = hardware_stopper
         self._door_watcher = door_watcher
         self._module_data_provider = module_data_provider
+        self._associated_command_error_recovery = associated_command_error_recovery
         self._queue_worker = queue_worker
         if self._queue_worker:
             self._queue_worker.start()
@@ -370,7 +377,10 @@ class ProtocolEngine:
         self._stop_from_asynchronous_error()
 
     async def async_module_error(
-        self, module_model: ModuleModel, serial: str | None
+        self,
+        module_model: ModuleModel,
+        serial: str | None,
+        error: EnumeratedError | None = None,
     ) -> bool:
         """Signal to the engine that an asynchronous module error occured.
 
@@ -401,6 +411,17 @@ class ProtocolEngine:
             # Do not stop multiple times; it will be common for this action to fire
             # many times when a module enters an error state, and we don't want to do
             # the stop behavior over and over
+            return False
+
+        if (
+            error is not None
+            and self._associated_command_error_recovery is not None
+            and self._associated_command_error_recovery.try_recover_from_module_error(
+                module_model=module_model,
+                module_serial=serial,
+                error=error,
+            )
+        ):
             return False
 
         self._stop_from_asynchronous_error()

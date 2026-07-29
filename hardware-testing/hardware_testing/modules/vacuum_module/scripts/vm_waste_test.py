@@ -7,6 +7,7 @@ from opentrons.drivers import vacuum_module
 from opentrons.drivers.vacuum_module.types import VentState
 from typing import Dict
 from hardware_testing.drivers.flowrate_sensor import driver
+from hardware_testing.modules.common.utils import resolve_ot_module_symlink
 import dataclasses
 import argparse
 import csv
@@ -49,8 +50,9 @@ async def find_port_by_id(vendorId: int, productId: int) -> str:
     for port in ports:
         print(f"port_vid: {port.vid}, port_pid: {port.pid}")
         if port.vid == vendorId and port.pid == productId:
-            print(f"port: {port.device}")
-            return port.device
+            resolved = resolve_ot_module_symlink(port.device)
+            print(f"port: {resolved}")
+            return resolved
     return ""
 
 

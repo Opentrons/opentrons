@@ -7,6 +7,7 @@ from fastapi import Depends, Request, Response, status
 from typing_extensions import Literal
 
 from opentrons.hardware_control import HardwareControlAPI, ThreadManagedHardware
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -346,7 +347,10 @@ async def get_update_process(
             "model": ErrorBody[FirmwareUpdateFailed]
         },
     },
-    dependencies=[Depends(require_scopes(Scope.UPDATES_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.UPDATES_WRITE)),
+        Depends(get_audit_logger("start subsystem update")),
+    ],
 )
 async def begin_subsystem_update(
     subsystem: SubSystem,

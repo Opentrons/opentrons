@@ -4,6 +4,7 @@ from asyncio import Queue
 from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
+    Any,
     Callable,
     Dict,
     List,
@@ -12,6 +13,7 @@ from typing import (
     TypeVar,
     Union,
     cast,
+    get_args,
 )
 
 from pydantic import BaseModel, ConfigDict
@@ -26,9 +28,26 @@ from opentrons.config import feature_flags
 # this is an explicit re-export that exists for backward compatibility - this type used
 # to live in this file
 from opentrons.config.types import OT3AxisKind as OT3AxisKind
+from opentrons.util.pyro.pyro_serialization import (
+    enumerated_error_class_to_dict,
+    enumerated_error_dict_to_class,
+)
 
 if TYPE_CHECKING:
     from .modules.types import ModuleModel
+
+    def _module_model_reconstructor(
+        module_str: str,
+    ) -> ModuleModel:
+        for model in get_args(ModuleModel):
+            try:
+                return model[module_str]  # type: ignore
+            except Exception:
+                pass
+        raise ValueError(
+            f"Cannot determine module model during deserialization for: {module_str}"
+        )
+
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -389,11 +408,48 @@ class EstopOverallStatus:
     left_physical_state: EstopPhysicalStatus
     right_physical_state: EstopPhysicalStatus
 
+    @staticmethod
+    def to_pyro_dict(obj: "EstopOverallStatus") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        pyro_dict = {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "state": obj.state.value,
+            "left_physical_state": obj.left_physical_state.value,
+            "right_physical_state": obj.right_physical_state.value,
+        }
+        return pyro_dict
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "EstopOverallStatus":
+        """Consumed by Serpent, Convert from a Pyro Dictionary."""
+        return EstopOverallStatus(
+            state=EstopState(data["state"]),
+            left_physical_state=EstopPhysicalStatus(data["left_physical_state"]),
+            right_physical_state=EstopPhysicalStatus(data["right_physical_state"]),
+        )
+
 
 @dataclass
 class HepaFanState:
     fan_on: bool
     duty_cycle: int
+
+    @staticmethod
+    def to_pyro_dict(obj: "HepaFanState") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "fan_on": obj.fan_on,
+            "duty_cycle": obj.duty_cycle,
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "HepaFanState":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return HepaFanState(
+            fan_on=data["fan_on"],
+            duty_cycle=data["duty_cycle"],
+        )
 
 
 @dataclass
@@ -401,6 +457,25 @@ class HepaUVState:
     light_on: bool
     uv_duration_s: int
     remaining_time_s: int
+
+    @staticmethod
+    def to_pyro_dict(obj: "HepaUVState") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "light_on": obj.light_on,
+            "uv_duration_s": obj.uv_duration_s,
+            "remaining_time_s": obj.remaining_time_s,
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "HepaUVState":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return HepaUVState(
+            light_on=data["light_on"],
+            uv_duration_s=data["uv_duration_s"],
+            remaining_time_s=data["remaining_time_s"],
+        )
 
 
 @dataclass(frozen=True)
@@ -411,6 +486,25 @@ class DoorStateNotification:
     new_state: DoorState = DoorState.CLOSED
     module_serial: str | None = None
 
+    @staticmethod
+    def to_pyro_dict(obj: "DoorStateNotification") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "event": obj.event,
+            "new_state": obj.new_state,
+            "module_serial": obj.module_serial,
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "DoorStateNotification":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return DoorStateNotification(
+            event=HardwareEventType(data["event"]["value"]),  # type: ignore
+            new_state=DoorState(data["new_state"]["value"]),
+            module_serial=data["module_serial"],
+        )
+
 
 @dataclass(frozen=True)
 class EstopStateNotification:
@@ -418,11 +512,51 @@ class EstopStateNotification:
     old_state: EstopState = EstopState.NOT_PRESENT
     new_state: EstopState = EstopState.NOT_PRESENT
 
+    @staticmethod
+    def to_pyro_dict(obj: "EstopStateNotification") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "event": obj.event,
+            "old_state": obj.old_state,
+            "new_state": obj.new_state,
+        }
+
+    @staticmethod
+    def from_pyro_dict(
+        classname: Any, data: Dict[str, Any]
+    ) -> "EstopStateNotification":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return EstopStateNotification(
+            event=HardwareEventType(data["event"]["value"]),  # type: ignore
+            old_state=EstopState(data["old_state"]["value"]),
+            new_state=EstopState(data["new_state"]["value"]),
+        )
+
 
 @dataclass(frozen=True)
 class ErrorMessageNotification:
     message: str
     event: Literal[HardwareEventType.ERROR_MESSAGE] = HardwareEventType.ERROR_MESSAGE
+
+    @staticmethod
+    def to_pyro_dict(obj: "ErrorMessageNotification") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "event": obj.event,
+            "message": obj.message,
+        }
+
+    @staticmethod
+    def from_pyro_dict(
+        classname: Any, data: Dict[str, Any]
+    ) -> "ErrorMessageNotification":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return ErrorMessageNotification(
+            event=HardwareEventType(data["event"]["value"]),  # type: ignore
+            message=data["message"],
+        )
 
 
 @dataclass(frozen=True)
@@ -435,6 +569,34 @@ class AsynchronousModuleErrorNotification:
         HardwareEventType.ASYNCHRONOUS_MODULE_ERROR
     )
 
+    @staticmethod
+    def to_pyro_dict(obj: "AsynchronousModuleErrorNotification") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "event": obj.event,
+            "exception": enumerated_error_class_to_dict(obj.exception),
+            "module_serial": obj.module_serial,
+            "module_model": obj.module_model.name,
+            "port": obj.port,
+        }
+
+    @staticmethod
+    def from_pyro_dict(
+        classname: Any, data: Dict[str, Any]
+    ) -> "AsynchronousModuleErrorNotification":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return AsynchronousModuleErrorNotification(
+            event=HardwareEventType(data["event"]["value"]),  # type: ignore
+            exception=enumerated_error_dict_to_class(
+                class_name="opentrons.hardware_control.types.EnumeratedError",
+                d=data["exception"],
+            ),
+            module_serial=data["module_serial"],
+            module_model=_module_model_reconstructor(data["module_model"]),
+            port=data["port"],
+        )
+
 
 @dataclass(frozen=True)
 class ModuleDisconnectedNotification:
@@ -444,6 +606,29 @@ class ModuleDisconnectedNotification:
     event: Literal[HardwareEventType.MODULE_DISCONNECTED] = (
         HardwareEventType.MODULE_DISCONNECTED
     )
+
+    @staticmethod
+    def to_pyro_dict(obj: "ModuleDisconnectedNotification") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "event": obj.event,
+            "module_serial": obj.module_serial,
+            "module_model": obj.module_model.name,
+            "port": obj.port,
+        }
+
+    @staticmethod
+    def from_pyro_dict(
+        classname: Any, data: Dict[str, Any]
+    ) -> "ModuleDisconnectedNotification":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return ModuleDisconnectedNotification(
+            event=HardwareEventType(data["event"]["value"]),  # type: ignore
+            module_serial=data["module_serial"],
+            module_model=_module_model_reconstructor(data["module_model"]),
+            port=data["port"],
+        )
 
 
 @dataclass(frozen=True)
@@ -455,12 +640,52 @@ class ModuleConnectedNotification:
         HardwareEventType.MODULE_CONNECTED
     )
 
+    @staticmethod
+    def to_pyro_dict(obj: "ModuleConnectedNotification") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "event": obj.event,
+            "module_serial": obj.module_serial,
+            "name": obj.name,
+            "port": obj.port,
+        }
+
+    @staticmethod
+    def from_pyro_dict(
+        classname: Any, data: Dict[str, Any]
+    ) -> "ModuleConnectedNotification":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return ModuleConnectedNotification(
+            event=HardwareEventType(data["event"]["value"]),  # type: ignore
+            module_serial=data["module_serial"],
+            name=data["name"],
+            port=data["port"],
+        )
+
 
 @dataclass(frozen=True)
 class SubsystemConnectionNotification:
     event: Literal[HardwareEventType.SUBSYSTEM_CONNECTION] = (
         HardwareEventType.SUBSYSTEM_CONNECTION
     )
+
+    @staticmethod
+    def to_pyro_dict(obj: "SubsystemConnectionNotification") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "event": obj.event,
+        }
+
+    @staticmethod
+    def from_pyro_dict(
+        classname: Any, data: Dict[str, Any]
+    ) -> "SubsystemConnectionNotification":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return SubsystemConnectionNotification(
+            event=HardwareEventType(data["event"]["value"]),  # type: ignore
+        )
 
 
 # new event types get new dataclasses
@@ -657,6 +882,22 @@ class StatusBarUpdateEvent:
     state: StatusBarState
     enabled: bool
 
+    @staticmethod
+    def to_pyro_dict(obj: "StatusBarUpdateEvent") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "state": obj.state.value,
+            "enabled": obj.enabled,
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "StatusBarUpdateEvent":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return StatusBarUpdateEvent(
+            state=StatusBarState(data["state"]), enabled=data["enabled"]
+        )
+
 
 StatusBarUpdateListener = Callable[[StatusBarUpdateEvent], None]
 StatusBarUpdateUnsubscriber = Callable[[], None]
@@ -757,6 +998,27 @@ class HardwareFeatureFlags:
             overpressure_detection_enabled=feature_flags.overpressure_detection_enabled(),
         )
 
+    @staticmethod
+    def to_pyro_dict(obj: "HardwareFeatureFlags") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "use_old_aspiration_functions": obj.use_old_aspiration_functions,
+            "require_estop": obj.require_estop,
+            "stall_detection_enabled": obj.stall_detection_enabled,
+            "overpressure_detection_enabled": obj.overpressure_detection_enabled,
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "HardwareFeatureFlags":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return HardwareFeatureFlags(
+            use_old_aspiration_functions=data["use_old_aspiration_functions"],
+            require_estop=data["require_estop"],
+            stall_detection_enabled=data["stall_detection_enabled"],
+            overpressure_detection_enabled=data["overpressure_detection_enabled"],
+        )
+
 
 class EarlyLiquidSenseTrigger(RuntimeError):
     """Error raised if sensor threshold reached before minimum probing distance."""
@@ -830,6 +1092,25 @@ class PipetteSensorData:
     @property
     def to_int(self) -> int:
         return self._as_int
+
+    @staticmethod
+    def to_pyro_dict(obj: "PipetteSensorData") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "sensor_type": obj.sensor_type.value,
+            "_as_int": obj._as_int,
+            "_as_float": float(obj._as_float),
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "PipetteSensorData":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return PipetteSensorData(
+            sensor_type=PipetteSensorType(data["sensor_type"]),
+            _as_int=data["_as_int"],
+            _as_float=data["_as_float"],
+        )
 
 
 PipetteSensorResponseQueue = Queue[Dict[PipetteSensorId, List[PipetteSensorData]]]

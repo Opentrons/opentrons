@@ -238,7 +238,7 @@ async def test_download_run_files_with_images_protocol_run_log_and_offsets(
         run_data_manager=mock_run_data_manager,
         data_files_store=data_files_store,
         protocol_store=mock_protocol_store,
-        persistence_directory=tmp_path,
+        persistence_directory_root=tmp_path,
     )
 
     assert result.media_type == "application/zip"
@@ -338,7 +338,7 @@ async def test_download_run_files_protocol_json_keeps_extension(
         run_data_manager=mock_run_data_manager,
         data_files_store=data_files_store,
         protocol_store=mock_protocol_store,
-        persistence_directory=tmp_path,
+        persistence_directory_root=tmp_path,
     )
 
     with await _read_and_cleanup_zip(result) as zf:
@@ -402,7 +402,7 @@ async def test_download_run_files_skips_missing_protocol_silently(
         run_data_manager=mock_run_data_manager,
         data_files_store=data_files_store,
         protocol_store=mock_protocol_store,
-        persistence_directory=tmp_path,
+        persistence_directory_root=tmp_path,
     )
 
     with await _read_and_cleanup_zip(result) as zf:
@@ -466,7 +466,7 @@ async def test_download_run_files_skips_missing_run_log_and_offsets_silently(
         run_data_manager=mock_run_data_manager,
         data_files_store=data_files_store,
         protocol_store=mock_protocol_store,
-        persistence_directory=tmp_path,
+        persistence_directory_root=tmp_path,
     )
 
     with await _read_and_cleanup_zip(result) as zf:
@@ -494,7 +494,7 @@ async def test_download_run_files_run_not_found(
             run_data_manager=mock_run_data_manager,
             data_files_store=data_files_store,
             protocol_store=mock_protocol_store,
-            persistence_directory=tmp_path,
+            persistence_directory_root=tmp_path,
         )
 
     assert exc_info.value.status_code == 404
@@ -537,7 +537,7 @@ async def test_download_run_files_no_content(
             run_data_manager=mock_run_data_manager,
             data_files_store=data_files_store,
             protocol_store=mock_protocol_store,
-            persistence_directory=tmp_path,
+            persistence_directory_root=tmp_path,
         )
 
     assert exc_info.value.status_code == 404

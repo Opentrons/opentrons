@@ -55,7 +55,7 @@ jobs:
     timeout-minutes: 15 # if tests take longer than this, add more shards
     continue-on-error: true # We want to see all test failures, so keep running all shards even after one fails.
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ./.github/actions/js/setup
       - name: 'Test frontend packages ${{matrix.shard}}/${{env.SHARD_TOTAL}}'
         # The run produces a vitest report in .vitest-reports/ that we'll upload to temporary storage on Github.
@@ -75,7 +75,7 @@ jobs:
     runs-on: 'ubuntu-22.04'
     name: 'app frontend unit test merge shard results'
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ./.github/actions/js/setup
       - name: 'Download frontend test result shards'
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -98,9 +98,7 @@ jobs:
     timeout-minutes: 60
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ./.github/actions/js/setup
       - uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4.9.1
         with:
@@ -120,7 +118,7 @@ jobs:
       variants: ${{ steps.determine-build-type.outputs.variants }}
       type: ${{ steps.determine-build-type.outputs.type }}
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ./.github/actions/app/determine-build-type
         id: determine-build-type
         with:
@@ -161,8 +159,9 @@ jobs:
              echo "bucket=${{env._APP_DEPLOY_BUCKET_OT3}}" >> $GITHUB_OUTPUT
              echo "folder=${{env._APP_DEPLOY_FOLDER_OT3}}" >> $GITHUB_OUTPUT
           fi
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
+          # So the build can extract the version number from Git history.
           fetch-depth: 0
       - uses: ./.github/actions/js/setup
       - uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4.9.1
@@ -375,7 +374,7 @@ jobs:
           mkdir -p ${{ runner.temp }}/upload_backup
           mv to_upload_* ${{ runner.temp }}/upload_backup/ 2>/dev/null || true
       - name: 'pull repo for scripts'
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'restore upload folders after checkout'
         run: |
           # Restore upload folders from temp location
@@ -415,7 +414,7 @@ jobs:
     if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && needs.js-unit-test.result == 'success' && needs.backend-unit-test.result == 'success' && needs.build-app.result == 'success' && needs.deploy-release-app.result == 'success'
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'Send success alert'
         uses: ./.github/actions/simple-build-alert
         continue-on-error: true
@@ -438,7 +437,7 @@ jobs:
     if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && (needs.js-unit-test.result == 'failure' || needs.backend-unit-test.result == 'failure' || needs.build-app.result == 'failure' || needs.deploy-release-app.result == 'failure')
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'Determine failed jobs'
         id: failed-jobs
         shell: bash
@@ -483,7 +482,7 @@ jobs:
     if: always() && github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/ot3')) && (needs.js-unit-test.result == 'cancelled' || needs.backend-unit-test.result == 'cancelled' || needs.build-app.result == 'cancelled' || needs.deploy-release-app.result == 'cancelled')
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'Send cancelled alert'
         uses: ./.github/actions/simple-build-alert
         continue-on-error: true

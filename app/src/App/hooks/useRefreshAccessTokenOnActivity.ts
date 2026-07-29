@@ -71,7 +71,7 @@ export function useRefreshAccessTokenOnActivity(): void {
       dispatch(
         refreshLogin({
           robotName,
-          username: authState.username,
+          user: authState.user,
           accessToken: response.data.access_token,
           refreshToken: response.data.refresh_token ?? null,
           expiresAt,

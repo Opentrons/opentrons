@@ -6,6 +6,7 @@ from starlette import status
 from opentrons import types as ot_types
 from opentrons.calibration_storage.ot2 import models, pipette_offset
 from opentrons.hardware_control import API
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 
@@ -79,7 +80,10 @@ async def get_all_pipette_offset_calibrations(
     summary="Delete a pipette offset calibration",
     description="Delete one specific pipette calibration by pipette serial and mount.",
     responses={status.HTTP_404_NOT_FOUND: {"model": ErrorBody}},
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("delete pipette offset")),
+    ],
 )
 async def delete_specific_pipette_offset_calibration(
     pipette_id: str,

@@ -30,6 +30,7 @@ import {
   DeviceReset,
   DisableStackerSensors,
   DisplayRobotName,
+  EnableComplianceReadySoftware,
   EnableErrorRecoveryMode,
   EnableStatusLight,
   EnterRobotEncryptionKey,
@@ -52,8 +53,10 @@ import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRo
 import { handleUpdateBuildroot } from './UpdateBuildroot'
 
 import type { MouseEventHandler } from 'react'
-import type { RobotSettingsField } from '@opentrons/api-client'
-import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
+import type {
+  ResetConfigRequest,
+  RobotSettingsField,
+} from '@opentrons/api-client'
 
 interface RobotSettingsAdvancedProps {
   robotName: string
@@ -170,6 +173,11 @@ export function RobotSettingsAdvanced({
         <RobotInformation robotName={robotName} />
         {featureFlags.accessControlMode ? (
           <>
+            <Divider marginY={SPACING.spacing16} />
+            <EnableComplianceReadySoftware
+              isRobotBusy={isRobotBusy}
+              robotName={robotName}
+            />
             <Divider marginY={SPACING.spacing16} />
             <EnterRobotEncryptionKey
             // Note: Unlike other buttons on this page,

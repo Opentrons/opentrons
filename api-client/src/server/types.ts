@@ -5,3 +5,7 @@ export interface UpdatedRobotName {
 export interface ShutdownResponse {
   message: string
 }
+
+export interface RestartResponse {
+  message: string
+}

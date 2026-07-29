@@ -26,6 +26,7 @@ describe('DocumentationRequired', () => {
       actionsToDocument: [],
       onConfirm: vi.fn(),
       onClose: vi.fn(),
+      minReportLength: 10,
     }
   })
 
@@ -71,6 +72,28 @@ describe('DocumentationRequired', () => {
     render(props)
     fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
     expect(props.onConfirm).not.toHaveBeenCalled()
+  })
+
+  it('shows a min-length error and does not confirm when the note is too short', () => {
+    render(props)
+    editNote('too short')
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+
+    expect(props.onConfirm).not.toHaveBeenCalled()
+    screen.getByText('Must be at least 10 characters long')
+  })
+
+  it('clears the min-length error when the user edits the note', () => {
+    render(props)
+    editNote('too short')
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    screen.getByText('Must be at least 10 characters long')
+
+    editNote('long enough note')
+
+    expect(
+      screen.queryByText('Must be at least 10 characters long')
+    ).not.toBeInTheDocument()
   })
 
   it('calls onClose when the cancel button is clicked', () => {

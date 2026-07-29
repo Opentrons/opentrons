@@ -25,7 +25,7 @@ from robot_server.data_files.zip_utils import (
 )
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
 from robot_server.persistence.fastapi_dependencies import (
-    get_active_persistence_directory,
+    get_persistence_directory_root,
 )
 from robot_server.protocols.dependencies import get_protocol_store
 from robot_server.protocols.protocol_store import ProtocolNotFoundError, ProtocolStore
@@ -77,7 +77,9 @@ async def download_run_files(
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
-    persistence_directory: Annotated[Path, Depends(get_active_persistence_directory)],
+    persistence_directory_root: Annotated[
+        Path, Depends(get_persistence_directory_root)
+    ],
 ) -> FileResponse:
     """Download files associated with a run as a zip archive.
 
@@ -87,14 +89,14 @@ async def download_run_files(
         run_data_manager: Run data retrieval interface.
         data_files_store: Store for data files database access.
         protocol_store: Store for protocol storage access.
-        persistence_directory: Persistence directory used for download staging.
+        persistence_directory_root: Persistence directory used for download staging.
     """
     try:
         run = run_store.get(runId)
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
-    staging_dir = create_download_staging_dir(persistence_directory)
+    staging_dir = create_download_staging_dir(persistence_directory_root)
     staging_path = Path(staging_dir.name)
 
     try:

@@ -1,13 +1,13 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { mockHeaterShaker } from '@opentrons/api-client'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { getIsHeaterShakerAttached } from '/app/redux/config'
-import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
 
 import { useLatchControls } from '../hooks'
 import { ModuleSetupModal } from '../ModuleSetupModal'
