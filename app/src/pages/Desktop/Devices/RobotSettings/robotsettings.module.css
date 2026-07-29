@@ -29,7 +29,7 @@
 
 .tabs_row {
   display: flex;
-  overflow: scroll;
+  overflow: auto;
   gap: var(--spacing-4);
 }
 
