@@ -24,7 +24,7 @@ export interface CreateUserRequest {
   data: {
     username: string
     fullName: string
-    password: string
+    password?: string
     accountType: AuthUserAccountType
   }
 }

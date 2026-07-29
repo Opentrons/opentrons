@@ -28,11 +28,6 @@ const ADD_USER_ACCOUNT_TYPES: AuthUserAccountType[] = [
   'auditor',
 ]
 
-function generatePlaceholderPassword(): string {
-  // TODO: replace with a placeholder password from the server
-  return '12345678'
-}
-
 interface FormValues {
   username: string
   fullName: string
@@ -90,7 +85,6 @@ export function AddUserModal({
       data: {
         username: trimmedUsername,
         fullName: fullName.trim(),
-        password: generatePlaceholderPassword(),
         accountType,
       },
     }
