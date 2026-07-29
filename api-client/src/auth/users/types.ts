@@ -12,6 +12,16 @@ export interface AuthUserResponse {
   data: AuthUser
 }
 
+export interface TemporaryPasswordAuthUser extends AuthUser {
+  temporaryPassword?: string
+}
+
+export interface TemporaryPasswordAuthUserResponse {
+  data: TemporaryPasswordAuthUser
+}
+
+export type CreateUserResponse = TemporaryPasswordAuthUserResponse
+
 export interface AuthUsersResponse {
   data: AuthUser[]
   meta: {

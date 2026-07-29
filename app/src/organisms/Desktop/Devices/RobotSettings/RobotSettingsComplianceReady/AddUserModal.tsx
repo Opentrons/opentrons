@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -7,6 +8,7 @@ import {
   ModalShell,
   PrimaryButton,
   SecondaryButton,
+  StyledText,
   WizardHeader,
 } from '@opentrons/components'
 import { useCreateUserMutation } from '@opentrons/react-api-client'
@@ -47,6 +49,9 @@ export function AddUserModal({
   onClose,
 }: AddUserModalProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
+  const [generatedPassword, setGeneratedPassword] = useState<string | null>(
+    null
+  )
   const documentationState = useDocumentationState(undefined, robotName)
   const { createUser, isLoading: isSaving } =
     useCreateUserMutation(documentationState)
@@ -79,6 +84,7 @@ export function AddUserModal({
 
   const handleClose = (): void => {
     clearFieldErrors()
+    setGeneratedPassword(null)
     onClose()
   }
 
@@ -93,8 +99,14 @@ export function AddUserModal({
     }
 
     void createUser(request)
-      .then(() => {
-        handleClose()
+      .then(response => {
+        const { temporaryPassword } = response.data
+        if (temporaryPassword != null) {
+          setGeneratedPassword(temporaryPassword)
+          clearFieldErrors()
+        } else {
+          handleClose()
+        }
       })
       .catch(handleMutationError)
   }
@@ -111,41 +123,71 @@ export function AddUserModal({
         />
       }
     >
-      <div className={styles.modal_content}>
-        <form onSubmit={handleSubmit(onSubmit)}>
+      {generatedPassword != null ? (
+        <div className={styles.modal_content}>
           <div className={styles.form_fields}>
-            <UserAccountIdentityFormFields
-              control={control}
-              fieldErrors={fieldErrors}
-              stacked
-            />
+            <div className={styles.success_intro}>
+              <StyledText desktopStyle="headingSmallBold">
+                {t('desktop_one_time_password')}
+              </StyledText>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('desktop_add_user_success_message')}
+              </StyledText>
+            </div>
             <div className={styles.field_group}>
-              <div className={styles.field_group_value}>
-                <DropdownMenu
-                  filterOptions={accountTypeOptions}
-                  currentOption={selectedAccountTypeOption}
-                  dropdownType="neutral"
-                  onClick={value => {
-                    setValue('accountType', value as AuthUserAccountType, {
-                      shouldValidate: true,
-                    })
-                  }}
-                  title={t('desktop_role')}
-                  width="100%"
-                />
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('desktop_one_time_password')}
+              </StyledText>
+              <div className={styles.one_time_password_value}>
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {generatedPassword}
+                </StyledText>
               </div>
             </div>
             <div className={styles.actions}>
-              <SecondaryButton type="button" onClick={handleClose}>
-                {t('shared:back')}
-              </SecondaryButton>
-              <PrimaryButton type="submit" disabled={isSaveDisabled}>
-                {t('shared:next')}
+              <PrimaryButton type="button" onClick={handleClose}>
+                {t('done')}
               </PrimaryButton>
             </div>
           </div>
-        </form>
-      </div>
+        </div>
+      ) : (
+        <div className={styles.modal_content}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className={styles.form_fields}>
+              <UserAccountIdentityFormFields
+                control={control}
+                fieldErrors={fieldErrors}
+                stacked
+              />
+              <div className={styles.field_group}>
+                <div className={styles.field_group_value}>
+                  <DropdownMenu
+                    filterOptions={accountTypeOptions}
+                    currentOption={selectedAccountTypeOption}
+                    dropdownType="neutral"
+                    onClick={value => {
+                      setValue('accountType', value as AuthUserAccountType, {
+                        shouldValidate: true,
+                      })
+                    }}
+                    title={t('desktop_role')}
+                    width="100%"
+                  />
+                </div>
+              </div>
+              <div className={styles.actions}>
+                <SecondaryButton type="button" onClick={handleClose}>
+                  {t('shared:back')}
+                </SecondaryButton>
+                <PrimaryButton type="submit" disabled={isSaveDisabled}>
+                  {t('shared:next')}
+                </PrimaryButton>
+              </div>
+            </div>
+          </form>
+        </div>
+      )}
     </ModalShell>,
     getTopPortalEl()
   )
