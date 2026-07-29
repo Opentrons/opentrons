@@ -96,7 +96,7 @@ class Scope(enum.Enum):
 
     AUDIT_LOG_WRITE = (
         "audit_log.write",
-        "Write arbitrary audit logs to the audit server.",
+        "Write arbitrary audit logs.",
     )
 
     _description: str
