@@ -58,6 +58,7 @@ from ..dependencies import (
 from ..run_auto_deleter import RunAutoDeleter
 from ..run_data_manager import (
     RunDataManager,
+    RunNotCompleteError,
     RunNotCurrentError,
 )
 from ..run_models import (
@@ -143,6 +144,14 @@ class RunStopped(ErrorDetails):
 
     id: Literal["RunStopped"] = "RunStopped"
     title: str = "Run Stopped"
+    errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
+
+
+class RunNotComplete(ErrorDetails):
+    """An error if one tries to sign a run that has not completed."""
+
+    id: Literal["RunNotComplete"] = "RunNotComplete"
+    title: str = "Run Not Complete"
     errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
 
 
@@ -425,7 +434,9 @@ async def remove_run(
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[Run]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
-        status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
+        status.HTTP_409_CONFLICT: {
+            "model": ErrorBody[RunStopped | RunNotIdle | RunNotComplete]
+        },
     },
     dependencies=[
         Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
@@ -445,16 +456,26 @@ async def update_run(
         run_data_manager: Current and historical run data management.
     """
     try:
+        run_data: Run | BadRun | None = None
+        if request_body.data.signedBy is not None:
+            # Depending on settings, updating `current` may require `signedBy`
+            # to have already been set, so we need to process `signedBy` first.
+            run_data = run_data_manager.set_signed_by(
+                run_id=runId, signed_by=request_body.data.signedBy
+            )
         if request_body.data.current is not None:
             # `current` can either be set to false or not be set at all.
             assert_type(request_body.data.current, Literal[False])
             run_data = await run_data_manager.uncurrent(runId)
-        else:
+
+        if run_data is None:
             run_data = run_data_manager.get(runId)
     except RunConflictError as e:
         raise RunNotIdle(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
     except RunNotCurrentError as e:
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
+    except RunNotCompleteError as e:
+        raise RunNotComplete(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 

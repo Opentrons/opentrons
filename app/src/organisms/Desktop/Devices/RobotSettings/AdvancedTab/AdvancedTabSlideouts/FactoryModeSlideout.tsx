@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Trans, useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -27,12 +26,11 @@ import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { FileUpload } from '/app/molecules/FileUpload'
 import { UploadInput } from '/app/molecules/UploadInput'
-import { restartRobot } from '/app/redux/robot-admin'
+import { useRestartRobotMutation } from '/app/resources/devices/hooks/useRestartRobotMutation'
 
 import type { ChangeEvent, MouseEventHandler } from 'react'
 import type { FieldError, Resolver } from 'react-hook-form'
 import type { RobotSettingsField } from '@opentrons/api-client'
-import type { Dispatch } from '/app/redux/types'
 
 interface FactoryModeSlideoutProps {
   isExpanded: boolean
@@ -55,8 +53,6 @@ export function FactoryModeSlideout({
 }: FactoryModeSlideoutProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared', 'branded'])
 
-  const dispatch = useDispatch<Dispatch>()
-
   const { settings } = useRobotSettingsQuery().data ?? {}
   const oemModeSetting = (settings ?? []).find(
     (setting: RobotSettingsField) => setting?.id === 'enableOEMMode'
@@ -71,8 +67,11 @@ export function FactoryModeSlideout({
   const [fileError, setFileError] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState<boolean>(false)
 
+  const documentationState = useDocumentationState()
+  const { restart } = useRestartRobotMutation(documentationState, robotName)
+
   const onFinishCompleteClick = (): void => {
-    dispatch(restartRobot(robotName))
+    restart()
     onCloseClick()
     setIsUploading(false)
   }
@@ -83,7 +82,6 @@ export function FactoryModeSlideout({
     },
   })
 
-  const documentationState = useDocumentationState()
   const { updateRobotSetting } = useUpdateRobotSettingMutation(
     documentationState,
     {

@@ -4,6 +4,7 @@ import i18n from 'i18next'
 
 import { Modal, PrimaryButton, StyledText } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { AnalysisError } from '@opentrons/shared-data'
 
 interface ProtocolAnalysisErrorModalProps {
@@ -16,7 +17,7 @@ export function ProtocolAnalysisErrorModal({
   errors,
   onClose,
   portalRoot,
-}: ProtocolAnalysisErrorModalProps): JSX.Element {
+}: ProtocolAnalysisErrorModalProps): ReactNode {
   const { t } = useTranslation('protocol_visualization')
   return createPortal(
     <Modal

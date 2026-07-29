@@ -29,7 +29,7 @@ describe('RobotOutOfStorageNotification', () => {
   })
   it('renders body text', () => {
     render()
-    screen.getByText('Robot storage is almost full')
+    screen.getByText('Robot’s file storage is full')
     screen.getByText(
       'Download and delete old protocol run records and associated files to free up space before starting a run.'
     )
