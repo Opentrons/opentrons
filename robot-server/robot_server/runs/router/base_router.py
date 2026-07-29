@@ -434,7 +434,9 @@ async def remove_run(
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[Run]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
-        status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
+        status.HTTP_409_CONFLICT: {
+            "model": ErrorBody[RunStopped | RunNotIdle | RunNotComplete]
+        },
     },
     dependencies=[
         Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
