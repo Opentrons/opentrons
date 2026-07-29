@@ -17,8 +17,6 @@ IGNORED_ENDPOINTS: set[tuple[str, str]] = {
     ("delete", "/clientData/{key}"),
     # This is spiritually a GET endpoint. It doesn't actually control or modify anything.
     ("post", "/labwareOffsets/searches"),
-    # Protocol analyses are just disposable simulations.
-    ("post", "/protocols/{protocolId}/analyses"),
 }
 
 
