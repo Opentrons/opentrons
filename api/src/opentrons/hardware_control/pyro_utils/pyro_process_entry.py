@@ -71,7 +71,7 @@ async def build_and_run_hwc_pyro(simulate: bool) -> None:
     log.info("Building OT-3 API Instance")
 
     # todo(chb: 2026-02-18): Make this support simulated hardware controller - important for unit tests
-    ot3api = await _build_api(use_simulator=simulate)
+    thread_managed_ot3api = await _build_api(use_simulator=simulate)
 
     def _daemon_request_loop(pyroname: str, resource: Any, registry: Any) -> None:
         # todo(chb: 2026-02-18): For the PYRONAMEs registered with the nameserver, do we want them to live in a centralized location (shared-data)?
@@ -80,7 +80,7 @@ async def build_and_run_hwc_pyro(simulate: bool) -> None:
 
     daemon_request_thread = threading.Thread(
         target=_daemon_request_loop,
-        args=("OT3API", ot3api, register_hardware_types),
+        args=("OT3API", thread_managed_ot3api.managed_obj, register_hardware_types),
         daemon=True,
     )
 
