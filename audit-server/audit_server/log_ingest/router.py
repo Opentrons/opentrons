@@ -10,6 +10,14 @@ from opentrons_shared_data.errors.exceptions import (
     KeyStorageUnavailableError,
 )
 
+from server_utils.auth.resource_server.fastapi import (
+    RequireAuthenticationResult,
+    require_authentication,
+    require_scopes,
+)
+from server_utils.auth.resource_server.types import AuthenticationNotRequiredResult
+from server_utils.auth.scopes import Scope
+from server_utils.fastapi_utils.documented_interaction import get_supplied_user_notes
 from server_utils.fastapi_utils.models.json_api import (
     PydanticResponse,
     RequestModel,
@@ -20,6 +28,7 @@ from .models import (
     AuditLogMessage,
     SubmitAuditLogMessageData,
     SubmitAuditLogSuccessData,
+    SubmitExternalAuditLogMessageData,
 )
 from audit_server.log_storage.dependency import get_log_data_manager
 from audit_server.log_storage.log_data_manager import LogDataManager
@@ -60,6 +69,72 @@ async def post_log_message(
         legalName=request_body.data.legalName,
         message=request_body.data.message,
         reason=request_body.data.reason,
+        loggedAt=ingest_time,
+    )
+    message_str = message.model_dump_json(indent=None)
+    try:
+        await log_data_manager.store_log(message_str)
+    except KeyStorageUnavailableError as exc:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=(
+                "Audit log message could not be signed: key-server is unavailable."
+            ),
+        ) from exc
+    except AuditLoggingError as exc:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Audit log could not be stored.",
+        ) from exc
+    return await PydanticResponse.create(
+        status_code=fastapi.status.HTTP_201_CREATED,
+        content=SimpleBody(data=SubmitAuditLogSuccessData(loggedAt=ingest_time)),
+    )
+
+
+@PydanticResponse.wrap_route(
+    router.post,
+    path="/audit/external/logMessage",
+    summary="Log an external audit message to the robot database. Use this endpoint to log messages not associated with robot actions.",
+    responses={
+        fastapi.status.HTTP_201_CREATED: {
+            "model": SimpleBody[SubmitAuditLogSuccessData]
+        },
+        fastapi.status.HTTP_503_SERVICE_UNAVAILABLE: {
+            "description": (
+                "Key-server could not be reached, so the audit log message"
+                " could not be signed."
+            ),
+        },
+        fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR: {
+            "description": "The audit log request failed for an unknown reason."
+        },
+    },
+    dependencies=[fastapi.Depends(require_scopes(Scope.AUDIT_LOG_WRITE))],
+)
+async def post_external_log_message(
+    request_body: RequestModel[SubmitExternalAuditLogMessageData],
+    log_data_manager: Annotated[LogDataManager, fastapi.Depends(get_log_data_manager)],
+    user_notes: Annotated[str | None, fastapi.Depends(get_supplied_user_notes)],
+    authentication: Annotated[
+        RequireAuthenticationResult, fastapi.Depends(require_authentication)
+    ],
+) -> PydanticResponse[SimpleBody[SubmitAuditLogSuccessData]]:
+    """Log an external audit message."""
+    ingest_time = datetime.datetime.now(datetime.timezone.utc)
+    if isinstance(authentication, AuthenticationNotRequiredResult):
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_418_IM_A_TEAPOT,
+            detail=(
+                "Audit log is not available while Compliance Ready Software is inactive."
+            ),
+        )
+    message = AuditLogMessage(
+        action=f"External-{request_body.data.action}",
+        accountName=authentication.username,
+        legalName=authentication.fullname,
+        message=request_body.data.message,
+        reason=user_notes,
         loggedAt=ingest_time,
     )
     message_str = message.model_dump_json(indent=None)
