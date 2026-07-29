@@ -96,7 +96,7 @@ Unnamed box 2 includes the Control Box (vacuum pump and electronics), a deck ada
 
 ### Box 3: waste collection components
 
-Box 3 includes the waste collection jar and cap, a jar holder (to help prevent tip-overs), vacuum hoses, hose clamps, along with extra quick connect/disconnect fittings and clamps.
+Box 3 includes the waste collection jar and cap, a jar holder (to help prevent tip-overs), vacuum hoses, hose clamps, along with extra quick connect/disconnect fittings and clamps (not shown here).
 
 * The jar, cap, and hoses ship with quick connector fittings already installed at the factory.
 * The hoses are wrapped around the shaped foam padding in the bottom of the box.
@@ -120,12 +120,12 @@ Box 3 includes the waste collection jar and cap, a jar holder (to help prevent t
 
 <figure markdown>
 ![6 mm vacuum hose](images/hose-6mm.svg "6 mm vacuum hose")
-<figcaption>(1) 6 mm ID hose</figcaption>
+<figcaption>(1) 6 mm diameter hose</figcaption>
 </figure>
 
 <figure markdown>
 ![9 mm vacuum hose](images/hose-9mm.svg)
-<figcaption>(1) 9 mm ID hose</figcaption>
+<figcaption>(1) 9 mm diameter hose</figcaption>
 </figure>
 
 </div>
@@ -185,7 +185,7 @@ The Vacuum Module ships with two vacuum hoses and factory installed quick connec
     </tr>
     <tr>
       <td><strong>Material composition</strong></td>
-      <td><font color="red">TBD</font></td>
+      <td>Tygon® 2375</td>
     </tr>
   </tbody>
 </table>
