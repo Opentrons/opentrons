@@ -3,33 +3,38 @@ title: "Documentation"
 description: "An overview of documentation in Opentrons Flex Compliance-Ready Software."
 ---
 
-Required documentation is an important part of the Flex's compliance-ready software.  Whenever administrators and users make changes to modules, set up a protocol, detach a pipette, or run a protocol, or complete other robot actions, they'll need to document their reason for doing so. 
+Required documentation is an important part of the Flex's compliance-ready software.  Whenever administrators and users make changes to modules, set up a protocol, detach a pipette, run a protocol, or complete other robot actions, they'll need to document their reason for doing so. 
 
-Their documentation, along with their name and user ID, become a part of the protocol [log files] your compliance-ready Flex generates.
+Their documentation, along with their name and user ID, become a part of the [files](../files.md) your compliance-ready Flex generates.
 
-This section covers when and where documentation is required, on the Flex touchscreen and in the Opentrons App, and how users will document their actions on the Flex. For a closer look at day-to-day operation, see [Using Compliance-Ready Software].
+This section covers when and where documentation is required, on the Flex touchscreen and in the Opentrons App, and how users will document their actions on the Flex. For a closer look at day-to-day operation, see [Using Compliance-Ready Software](../using.md).
+
+!!! note
+    Opentrons Flex Compliance-Ready software adds documentation checkpoints while you interact with the Flex. It's up to your lab to decide what suffient documentation looks like for you.
 
 <!---------
 
 TODO: 
-- maybe need to mention name and user ID elsewhere (like earlier, under roles) too
-- maybe documentation should go after settings? documentation is so so important but I wonder if settings gives a clearer view of what CRS encapsulates (through describing all the ways it can be customized)
-- link relevant sections
-- some text here re: it's up to each lab to determine what sufficient and appropriate documentation looks like? 
-- "other robot actions" above is a bit clunky; work on this
-- TODO: check list at end of features notes (Google doc; the list of actions that require documentation) against my current list in this file
+- "other robot actions" above is a bit clunky; can work on this
+- check list at end of features notes (Google doc; the list of actions that require documentation) against my current list in this file
 -------------->
 
 ## Setting up a protocol
 
-Your compliance-ready Flex will prompt all users to document their actions when setting up a protocol: 
+Your compliance-ready Flex will prompt all users to document their actions when setting up a protocol. You'll add documentation for the first time before protocol setup, after choosing the protocol and any runtime parameters.
 
-* After choosing runtime parameters in protocol setup.
-* When attaching, or detaching pipettes or the Flex Gripper. 
-* When calibrating pipettes and modules.
-* After changing the deck slot locations of modules or labware. 
-* When changing a module's state, like opening a labware latch or setting temperature.
-* When applying [labware offsets] or starting a labware position check.
+<figure class="screenshot" markdown>
+  ![Users should add documentation bfeore beginning protocol setup.](../../images/documentation-setup.png)
+  <figcaption>Add documentation before beginning protocol setup.</figcaption>
+</figure>
+
+You'll see the same screen every time you need to add documentation, no matter which step you're on. During protocol setup, you'll need to document a reason for:
+
+* Attaching, or detaching pipettes or the Flex Gripper. 
+* Calibrating pipettes and modules.
+* Changing the deck slot locations of modules or labware. 
+* Changing a module's state, like opening a labware latch or setting temperature.
+* Applying [labware offsets](../../../flex/docs/) or starting a labware position check.
 * After confirming labware and liquids on the Flex deck.
 * When updating settings for the protocol run, like camera preferences.
 
@@ -39,6 +44,7 @@ Your compliance-ready Flex will prompt all users to document their actions when 
 
 TODO: 
 - not included here for now: intervention modals (what kind of modals pop up during setup?)
+- sample image can be updated. should we ever include some text in the documentation field, or is this dangerous territory? 
 - any other Flex settings for the last bullet point; camera and? 
 -------------->
 

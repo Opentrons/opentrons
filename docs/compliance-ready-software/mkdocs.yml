@@ -49,7 +49,8 @@ nav:
       - Features: features.md # includes roles, encryption key, devices, and data protection.
       - Documentation: documentation.md
       - Settings: settings.md # administrator and any other settings
-      - Protocol run records: records.md #here, link to the larger run log article
   - Using Compliance Ready Software: using.md #includes logging in, setting up and running a protocol, etc.
-  - Log Files: 
-      - Log types: files.md
+  - Records and Files: 
+      - Types: files.md
+      - Viewing and managing files: view-manage.md
+      - Downloading files: downloading.md
