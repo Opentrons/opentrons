@@ -97,5 +97,5 @@ def run_protocol_as_restricted_user() -> bool:
     )
 
 
-def easy_96ch_attach() -> bool:
-    return advs.get_setting_with_env_overload("easy96chAttach", RobotTypeEnum.FLEX)
+def internal_96ch_attach() -> bool:
+    return advs.get_setting_with_env_overload("internal96chAttach", RobotTypeEnum.FLEX)

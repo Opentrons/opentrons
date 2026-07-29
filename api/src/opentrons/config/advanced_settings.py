@@ -252,11 +252,12 @@ settings = [
         internal_only=True,
     ),
     SettingDefinition(
-        _id="easy96chAttach",
-        title="Easier 96-channel pipette attachment",
+        _id="internal96chAttach",
+        title="Modified 96-channel pipette attachment",
         description=(
             "Lower the right mount to easily attach mount without detaching z axis"
             " 96-channel pipette attach, reducing the Z margin from 20 mm to 1.85 mm."
+            "This can and will ruin the right z axis, do not use."
         ),
         robot_type=[RobotTypeEnum.FLEX],
     ),
@@ -837,10 +838,10 @@ def _migrate42to43(previous: SettingsMap) -> SettingsMap:
 def _migrate43to44(previous: SettingsMap) -> SettingsMap:
     """Migrate to version 44 of the feature flags file.
 
-    - Adds the easy96chAttach config element.
+    - Adds the internal96chAttach config element.
     """
     newmap = {k: v for k, v in previous.items()}
-    newmap["easy96chAttach"] = False
+    newmap["internal96chAttach"] = False
     return newmap
 
 

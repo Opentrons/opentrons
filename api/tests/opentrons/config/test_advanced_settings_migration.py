@@ -35,7 +35,7 @@ def default_file_settings() -> Dict[str, Any]:
         "enableProtocolSubprocess": True,
         "enableHardwareSubprocess": True,
         "alwaysRunProtocolAsUser": False,
-        "easy96chAttach": False,
+        "internal96chAttach": False,
     }
 
 
@@ -519,7 +519,7 @@ def v44_config(v43_config: Dict[str, Any]) -> Dict[str, Any]:
     r.update(
         {
             "_version": 44,
-            "easy96chAttach": False,
+            "internal96chAttach": False,
         }
     )
     return r
@@ -667,5 +667,5 @@ def test_ensures_config() -> None:
         "enableProtocolSubprocess": None,
         "enableHardwareSubprocess": None,
         "alwaysRunProtocolAsUser": None,
-        "easy96chAttach": None,
+        "internal96chAttach": None,
     }
