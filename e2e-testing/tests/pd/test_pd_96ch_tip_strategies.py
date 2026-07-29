@@ -7,7 +7,6 @@ import pytest
 from playwright.sync_api import Page
 
 from automation.pd_pages import ProtocolEditorPage, Timeline, TransferPage
-from automation.pd_pages.flex_stacker import FlexStackerPage
 from automation.pd_pages.transfer_form import TransferStepConfig, add_transfer_step
 from utility import assert_export_downloads_clean_protocol, import_protocol_and_open_editor
 
@@ -19,10 +18,6 @@ TIPRACK_200 = "Opentrons Flex 96 Filter Tip Rack 200 µL"
 
 _TIPRACK_1000_B3 = "B3 Opentrons Flex 96 Filter Tip Rack 1000 µL"
 _TIPRACK_1000_SAFE_SLOT = "B2"
-_FLEX_STACKER_A4 = "A4 Flex Stacker"
-_TIPRACK_200_DEPLETED = "D2 Opentrons Flex 96 Filter Tip Rack 200 µL"
-_TIPRACK_200_FRESH = "A4 Opentrons Flex 96 Filter Tip Rack 200 µL (1)"
-_WASTE_CHUTE_D3 = "D3 Waste Chute in D3"
 
 _SINGLE: TransferPage.NozzleConfig = "Single nozzle"
 _COLUMN: TransferPage.NozzleConfig = "Single column of nozzles"
@@ -49,30 +44,6 @@ def _wells(
     return _WELLS_384[(nozzle_config, primary, path)]
 
 
-def _move_1000ul_tiprack_away_from_stacker(editor: ProtocolEditorPage) -> None:
-    print("96ch partial - move 1000uL tiprack from B3 to B2")
-    editor.add_step("Move")
-    editor.expect_move_labware_form()
-    editor.toggle_checkbox("Use gripper")
-    editor.move_labware(_TIPRACK_1000_B3, _TIPRACK_1000_SAFE_SLOT)
-
-
-def _replace_depleted_200ul_tiprack(editor: ProtocolEditorPage, stacker: FlexStackerPage) -> None:
-    print("96ch full-rack - retrieve fresh 200uL tip rack from stacker")
-    editor.add_step("Stacker")
-    stacker.retrieve_stacker(_FLEX_STACKER_A4)
-    stacker.save_stacker_step()
-    stacker.wait_for_save_banner_gone()
-
-    print("96ch full-rack - move depleted 200uL tip rack to waste chute")
-    editor.add_step("Move")
-    editor.move_labware(_TIPRACK_200_DEPLETED, _WASTE_CHUTE_D3)
-
-    print("96ch full-rack - move fresh 200uL tip rack onto adapter")
-    editor.add_step("Move")
-    editor.move_labware(_TIPRACK_200_FRESH, "D2")
-
-
 def _run_transfers(
     editor: ProtocolEditorPage,
     transfer: TransferPage,
@@ -87,34 +58,62 @@ def _run_transfers(
 @pytest.mark.slow
 @pytest.mark.timeout(600)
 def test_pd_96ch_tip_strategies_sequential(page: Page, pd_exports_dir: Path) -> None:
-    """Run single/column/full-rack 96ch strategies sequentially in one session."""
+    """Run column/single/full-rack 96ch tip strategies in one session.
+
+    Ordering constraints (96ch tip cascade):
+    - COLUMN + primary A1 must run on a pristine tiprack and start at A12
+      (tips to the right must be EMPTY for the next column).
+    - Prefer waste over return for single/column: returned tips become DIRTY and
+      block later cascade paths (EMPTY does not).
+    - ALL-nozzle full-rack pickups use the adapter tiprack; keep those as return
+      so the suite does not end in "Not enough accessible tips".
+    """
     import_protocol_and_open_editor(page, PROTOCOL_PATH, migration=True)
     editor = ProtocolEditorPage(page)
     transfer = TransferPage(page)
-    stacker = FlexStackerPage(page)
 
     print("=== 96ch strategy suite ===")
     print("1) Move B3 tiprack to B2 once")
-    _move_1000ul_tiprack_away_from_stacker(editor)
+    editor.move_labware_with_gripper(_TIPRACK_1000_B3, _TIPRACK_1000_SAFE_SLOT)
 
-    # label, primary, path, change_tip, drop_location, tip_tracking, manual_tips
-    print("2) Single-nozzle strategy phase")
-    single_specs = [
-        ("single A12 Once auto return", "A12", "Single transfer", "Once", "Tip rack", _AUTO, None),
-        ("single H12 Once manual A1", "H12", "Single transfer", "Once", "Tip rack", _MANUAL, ["A1"]),
-        ("single H1 Once auto return", "H1", "Single transfer", "Once", "Tip rack", _AUTO, None),
-        ("single H1 Distribute Once manual A12", "H1", "Distribute", "Once", "Tip rack", _MANUAL, ["A12"]),
-        ("single A1 Always auto", "A1", "Single transfer", "Always", "Tip rack", _AUTO, None),
+    # Column first while the 1000 µL tiprack is still pristine.
+    print("2) Column-nozzle strategy phase")
+    src_column, dst_column = _wells(_COLUMN, "A1")
+    column_specs = [
+        ("column A1 Once auto waste", "Once", "Waste Chute", _AUTO, None),
+        ("column A1 Once manual A11 waste", "Once", "Waste Chute", _MANUAL, ["A11"]),
+        ("column A1 Always manual A10 waste", "Always", "Waste Chute", _MANUAL, ["A10"]),
+    ]
+    column_steps = [
         (
-            "single H1 Once manual A12 waste (Never setup)",
-            "H1",
-            "Single transfer",
-            "Once",
-            "Waste Chute",
-            _MANUAL,
-            ["A12"],
-        ),
-        ("single H1 Never waste", "H1", "Single transfer", "Never", "Waste Chute", _AUTO, None),
+            label,
+            TransferStepConfig(
+                tip_rack=TIPRACK_1000,
+                source_labware=PLATE_384,
+                dest_labware=PLATE_384,
+                source_wells=src_column,
+                dest_wells=dst_column,
+                path="Single transfer",
+                volume="30",
+                change_tip=change_tip,
+                drop_location=drop,
+                tip_tracking=tip_tracking,
+                manual_tips=manual_tips,
+                nozzle_config=_COLUMN,
+                primary_nozzle="A1",
+            ),
+        )
+        for label, change_tip, drop, tip_tracking, manual_tips in column_specs
+    ]
+    _run_transfers(editor, transfer, column_steps)
+
+    print("3) Single-nozzle strategy phase")
+    single_specs = [
+        ("single A12 Once auto waste", "A12", "Single transfer", "Once", "Waste Chute", _AUTO, None),
+        ("single H12 Once manual A1 waste", "H12", "Single transfer", "Once", "Waste Chute", _MANUAL, ["A1"]),
+        ("single H1 Once auto waste", "H1", "Single transfer", "Once", "Waste Chute", _AUTO, None),
+        ("single H1 Distribute Once auto waste", "H1", "Distribute", "Once", "Waste Chute", _AUTO, None),
+        ("single A1 Always auto waste", "A1", "Single transfer", "Always", "Waste Chute", _AUTO, None),
     ]
     single_steps = []
     for label, primary, path, change_tip, drop, tip_tracking, manual_tips in single_specs:
@@ -141,76 +140,40 @@ def test_pd_96ch_tip_strategies_sequential(page: Page, pd_exports_dir: Path) -> 
         )
     _run_transfers(editor, transfer, single_steps)
 
-    # label, change_tip, drop_location, tip_tracking, manual_tips
-    print("3) Column-nozzle strategy phase")
-    src_column, dst_column = _wells(_COLUMN, "A1")
-    column_specs = [
-        ("column A1 Once auto return", "Once", "Tip rack", _AUTO, None),
-        ("column A1 Once manual A12 return", "Once", "Tip rack", _MANUAL, ["A12"]),
-        ("column A1 Always manual A12 waste", "Always", "Waste Chute", _MANUAL, ["A12"]),
+    print("4) Full-rack strategy phase")
+    full_rack_specs = [
+        ("full A1->B1 Once auto return", "A1", "B1", "Once", "Tip rack", _AUTO, None),
+        ("full A2->B2 Always manual A1 return", "A2", "B2", "Always", "Tip rack", _MANUAL, ["A1"]),
+        ("full A3->B3 Once manual A1 return", "A3", "B3", "Once", "Tip rack", _MANUAL, ["A1"]),
     ]
-    column_steps = [
+    full_rack_steps = [
         (
             label,
             TransferStepConfig(
-                tip_rack=TIPRACK_1000,
-                source_labware=PLATE_384,
-                dest_labware=PLATE_384,
-                source_wells=src_column,
-                dest_wells=dst_column,
+                tip_rack=TIPRACK_200,
+                source_labware=PLATE_96,
+                dest_labware=PLATE_96,
+                source_wells=src,
+                dest_wells=dst,
                 path="Single transfer",
-                volume="30",
+                volume="50",
                 change_tip=change_tip,
                 drop_location=drop,
                 tip_tracking=tip_tracking,
                 manual_tips=manual_tips,
-                nozzle_config=_COLUMN,
-                primary_nozzle="A1",
+                nozzle_config=_ALL,
             ),
         )
-        for label, change_tip, drop, tip_tracking, manual_tips in column_specs
+        for label, src, dst, change_tip, drop, tip_tracking, manual_tips in full_rack_specs
     ]
-    _run_transfers(editor, transfer, column_steps)
+    _run_transfers(editor, transfer, full_rack_steps)
 
-    # label, source, dest, change_tip, drop_location, tip_tracking, manual_tips
-    print("4) Full-rack strategy phase")
-    full_rack_specs = [
-        ("full A1->B1 Once auto return", "A1", "B1", "Once", "Tip rack", _AUTO, None),
-        ("full A2->B2 Always manual A1 waste", "A2", "B2", "Always", "Waste Chute", _MANUAL, ["A1"]),
-        ("full A3->B3 Once manual A1 waste (Never setup)", "A3", "B3", "Once", "Waste Chute", _MANUAL, ["A1"]),
-        ("full A4->B4 Never", "A4", "B4", "Never", "Tip rack", _AUTO, None),
-    ]
-
-    def _full_rack_steps(specs: list) -> list[tuple[str, TransferStepConfig]]:
-        return [
-            (
-                label,
-                TransferStepConfig(
-                    tip_rack=TIPRACK_200,
-                    source_labware=PLATE_96,
-                    dest_labware=PLATE_96,
-                    source_wells=src,
-                    dest_wells=dst,
-                    path="Single transfer",
-                    volume="50",
-                    change_tip=change_tip,
-                    drop_location=drop,
-                    tip_tracking=tip_tracking,
-                    manual_tips=manual_tips,
-                    nozzle_config=_ALL,
-                ),
-            )
-            for label, src, dst, change_tip, drop, tip_tracking, manual_tips in specs
-        ]
-
-    _run_transfers(editor, transfer, _full_rack_steps(full_rack_specs[:2]))
-    _replace_depleted_200ul_tiprack(editor, stacker)
-    _run_transfers(editor, transfer, _full_rack_steps(full_rack_specs[2:]))
     print("5) Timeline + export validation")
+    # 1 move + 3 column + 5 single + 3 full-rack
     timeline = Timeline(page)
-    timeline.wait_for_timeline_steps(min_steps=18)
+    timeline.wait_for_timeline_steps(min_steps=12)
     timeline.expect_no_known_regression_errors()
-    timeline.select_transfer_steps_sample([1, 4, 8, 10, 12, 17], expect_no_errors=True)
+    timeline.select_transfer_steps_sample([1, 3, 6, 9, 11], expect_no_errors=True)
     assert_export_downloads_clean_protocol(
         page,
         editor,

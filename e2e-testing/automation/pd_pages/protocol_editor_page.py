@@ -371,6 +371,21 @@ class ProtocolEditorPage(BasePage):
         ]:
             self.wait_for_visible(self.page.get_by_text(text, exact=False).first)
 
+    def move_labware_with_gripper(self, labware: str, new_location: str) -> None:
+        """Add a Move step that relocates labware using the gripper.
+
+        Useful for moving tip racks off a Flex Stacker shuttle onto the deck
+        (or any other gripper-enabled move).
+
+        Args:
+            labware: Labware option label, e.g. "B3 Opentrons Flex 96 Filter Tip Rack 1000 µL"
+            new_location: Destination slot or location label, e.g. "B2"
+        """
+        self.add_step("Move")
+        self.expect_move_labware_form()
+        self.toggle_checkbox("Use gripper")
+        self.move_labware(labware, new_location)
+
     def toggle_checkbox(self, field_name: str) -> None:
         """Toggle a checkbox-like control by its field name.
 
@@ -410,6 +425,7 @@ class ProtocolEditorPage(BasePage):
                 raise AssertionError(f"Move destination '{new_location}' not found. Available: {available}")
             option.first.click()
         self.page.get_by_role("button", name="Save").click()
+        # Confirm appears only for some waste chute moves (e.g. lids) — treat as optional.
         if "Waste Chute" in new_location:
             confirm = self.page.get_by_role("button", name="Confirm")
             if confirm.count() > 0 and confirm.first.is_visible():

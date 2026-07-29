@@ -6,6 +6,15 @@ from automation.base_page import BasePage
 class FlexStackerPage(BasePage):
     """Page object for configuring Flex Stacker protocol steps."""
 
+    CHOOSE_OPTION = "Choose option"
+    MODULE_CONTROLS = "Module controls"
+    FLEX_STACKER = "Flex Stacker"
+    REFILL_ACTION = "Manually fill the stacker with more labware"
+    EMPTY_ACTION = "Manually empty all labware from the stacker"
+    RETRIEVE_ACTION = "Retrieve labware from the stacker onto the shuttle"
+    STORE_ACTION = "Store labware currently on the shuttle into the stacker"
+    SAVE_BANNER = "Stacker has been saved"
+
     def __init__(self, page: Page) -> None:
         super().__init__(page)
 
@@ -16,14 +25,14 @@ class FlexStackerPage(BasePage):
         Single-stacker forms auto-select the module, so "Module controls" appears.
         """
         self.dismiss_release_notes_toast()
-        choose_option = self.page.get_by_text("Choose option", exact=True)
-        module_controls = self.page.get_by_text("Module controls", exact=False)
+        choose_option = self.page.get_by_text(self.CHOOSE_OPTION, exact=True)
+        module_controls = self.page.get_by_text(self.MODULE_CONTROLS, exact=False)
         self.wait_for_visible(choose_option.or_(module_controls).first, timeout=10000)
 
     def _wait_for_module_controls(self) -> None:
         """Wait until Module controls render after a stacker module is selected."""
         self.wait_for_visible(
-            self.page.get_by_text("Module controls", exact=False).first,
+            self.page.get_by_text(self.MODULE_CONTROLS, exact=False).first,
             timeout=10000,
         )
 
@@ -43,7 +52,7 @@ class FlexStackerPage(BasePage):
 
         # Single stacker: moduleId is auto-selected (no dropdown). Verify the module field.
         slot = stacker.split()[0]
-        self.wait_for_visible(self.page.get_by_text("Flex Stacker", exact=False).first, timeout=10000)
+        self.wait_for_visible(self.page.get_by_text(self.FLEX_STACKER, exact=False).first, timeout=10000)
         if slot:
             self.wait_for_visible(self.page.get_by_text(slot, exact=True).first, timeout=10000)
         self._wait_for_module_controls()
@@ -65,7 +74,7 @@ class FlexStackerPage(BasePage):
             message: optionally write a message to display
         """
         self._stacker_select(stacker)
-        self._select_stacker_action("Manually fill the stacker with more labware")
+        self._select_stacker_action(self.REFILL_ACTION)
         spinbutton = self.page.get_by_role("spinbutton")
         spinbutton.fill(str(refill_num))
         self._message_box(message)
@@ -77,7 +86,7 @@ class FlexStackerPage(BasePage):
             message: optionally write a message to display
         """
         self._stacker_select(stacker)
-        self._select_stacker_action("Manually empty all labware from the stacker")
+        self._select_stacker_action(self.EMPTY_ACTION)
         self._message_box(message)
 
     def retrieve_stacker(self, stacker: str) -> None:
@@ -86,7 +95,7 @@ class FlexStackerPage(BasePage):
             stacker: select stacker from available list. e.g.,  "D4 Flex Stacker"
         """
         self._stacker_select(stacker)
-        self._select_stacker_action("Retrieve labware from the stacker onto the shuttle")
+        self._select_stacker_action(self.RETRIEVE_ACTION)
 
     def store_stacker(self, stacker: str) -> None:
         """
@@ -94,7 +103,7 @@ class FlexStackerPage(BasePage):
             stacker: select stacker from available list. e.g.,  "D4 Flex Stacker"
         """
         self._stacker_select(stacker)
-        self._select_stacker_action("Store labware currently on the shuttle into the stacker")
+        self._select_stacker_action(self.STORE_ACTION)
 
     def save_stacker_step(self) -> None:
         """Save the current flex stacker step."""
@@ -104,7 +113,6 @@ class FlexStackerPage(BasePage):
     ##TODO: move to utility page, and update plate reader page as well
     def wait_for_save_banner_gone(self) -> None:
         """Wait for the save banner to disappear."""
-        banner_message = "Stacker has been saved"
-        banner = self.page.get_by_test_id("Snackbar").get_by_text(banner_message, exact=True).first
+        banner = self.page.get_by_test_id("Snackbar").get_by_text(self.SAVE_BANNER, exact=True).first
         banner.wait_for(state="visible")
         banner.wait_for(state="detached")

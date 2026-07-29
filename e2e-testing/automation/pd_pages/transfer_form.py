@@ -46,12 +46,21 @@ class TransferPage(BasePage):
         listbox = self.page.locator("div[role='listbox']").last
         self.wait_for_visible(listbox)
         buttons = listbox.locator("button")
+        exact_match = None
+        partial_match = None
         for index in range(buttons.count()):
             button = buttons.nth(index)
             normalized = " ".join(button.inner_text().split())
-            if tiprack in normalized:
-                button.click()
-                return
+            if tiprack == normalized:
+                exact_match = button
+                break
+            if tiprack in normalized and partial_match is None:
+                partial_match = button
+
+        target = exact_match if exact_match is not None else partial_match
+        if target is not None:
+            target.click()
+            return
 
         available = buttons.all_inner_texts()
         raise AssertionError(f"Tip rack option '{tiprack}' not found. Available options: {available}")

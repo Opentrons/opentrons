@@ -33,14 +33,6 @@ _ROW_LIQUID_CLASS_CONTINUE_REASON = (
 )
 
 
-def _move_1000ul_tiprack_away_from_stacker(editor: ProtocolEditorPage) -> None:
-    print("96ch partial - move 1000uL tiprack from B3 to B2")
-    editor.add_step("Move")
-    editor.expect_move_labware_form()
-    editor.toggle_checkbox("Use gripper")
-    editor.move_labware(_TIPRACK_1000_B3, _TIPRACK_1000_SAFE_SLOT)
-
-
 @pytest.mark.pdE2E
 @pytest.mark.slow
 @pytest.mark.timeout(600)
@@ -51,7 +43,7 @@ def test_pd_96ch_partial_row_nozzle_tip_strategies(page: Page, pd_exports_dir: P
     editor = ProtocolEditorPage(page)
     transfer = TransferPage(page)
 
-    _move_1000ul_tiprack_away_from_stacker(editor)
+    editor.move_labware_with_gripper(_TIPRACK_1000_B3, _TIPRACK_1000_SAFE_SLOT)
 
     # label, primary, change_tip, drop_location, tip_tracking, manual_tips
     print("Row-nozzle strategy phase")
