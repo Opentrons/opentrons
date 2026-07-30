@@ -5,7 +5,28 @@ import inspect
 import socket
 import threading
 from dataclasses import is_dataclass
-from typing import Any, get_args, get_type_hints
+from typing import Any, get_args, get_type_hints, Union, Dict
+from pathlib import Path
+
+from datetime import datetime
+
+import opentrons.hardware_control.types as hw_types
+import opentrons.hardware_control.dev_types as dev_types
+import opentrons.hardware_control.modules.mod_abc as mod_abc
+import opentrons.hardware_control.modules.types as module_types
+import opentrons.hardware_control.peripherals.types as peripheral_types
+import opentrons_shared_data.pipette.types as pipette_types
+import opentrons.types as ot_types
+import opentrons.config.types as config_types
+from opentrons_shared_data.pipette import (
+    load_data as load_pipette_data,
+)
+from opentrons.hardware_control.ot3_calibration import OT3Transforms
+from opentrons.hardware_control.robot_calibration import DeckCalibration
+import opentrons.calibration_storage.types as calibration_types
+from opentrons.config import gripper_config as gc
+import opentrons.drivers.types as driver_types
+import opentrons.drivers.vacuum_module.types as vac_types
 
 import pytest
 from decoy import Decoy
@@ -48,6 +69,7 @@ from opentrons.hardware_control.types import DoorState
 from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 from opentrons.util.pyro.pyro_serialization import find_opentrons_classes_in_packages
+from opentrons_shared_data.gripper import GripperModel
 
 TEST_PYRO_TIMEOUT = 5
 
@@ -466,3 +488,106 @@ async def test_module_registration_coverage(
         mod_counter += 1
 
     assert set(class_cover_list) == set(hardware_registry_class_list)
+
+CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
+    hw_types.Axis: hw_types.Axis.X,
+    hw_types.OT3Mount: hw_types.OT3Mount.LEFT,
+    ot_types.Mount: ot_types.Mount.LEFT,
+    hw_types.CriticalPoint: hw_types.CriticalPoint.MOUNT,
+    ot_types.Point: ot_types.Point(1, 2, 3),
+    hw_types.InstrumentProbeType: hw_types.InstrumentProbeType.PRIMARY,
+    dev_types.AttachedGripper: dev_types.AttachedGripper(config=gc.load(GripperModel.v1), id="test"),
+    dev_types.AttachedPipette: dev_types.AttachedPipette(
+        config=load_pipette_data.load_definition(
+            pipette_types.PipetteModelType("p1000"),
+            pipette_types.PipetteChannelType(1),
+            pipette_types.PipetteVersionType(major=3, minor=3),
+            pipette_types.PipetteOEMType(pipette_types.PipetteOEMType.OT),
+        ),
+        id="fakepip",
+    ),
+    hw_types.SubSystem: hw_types.SubSystem.gantry_x,
+    hw_types.StatusBarState: hw_types.StatusBarState.IDLE,
+    hw_types.TipScrapeType: hw_types.TipScrapeType.LEFT_ONE_COL,
+    hw_types.TipStateType: hw_types.TipStateType.ABSENT,
+    Union[
+            module_types.MagneticModuleModel,
+            module_types.TemperatureModuleModel,
+            module_types.ThermocyclerModuleModel,
+            module_types.HeaterShakerModuleModel,
+            module_types.MagneticBlockModel,
+            module_types.AbsorbanceReaderModel,
+            module_types.FlexStackerModuleModel,
+            module_types.VacuumModuleModel,
+        ]: module_types.ThermocyclerModuleModel.THERMOCYCLER_V2,
+    peripheral_types.BarcodeScannerModel: peripheral_types.BarcodeScannerModel.BARCODE_SCANNER_V1,
+    hw_types.GripperProbe: hw_types.GripperProbe.FRONT,
+    hw_types.InstrumentProbeType: None,
+    hw_types.PauseType: hw_types.PauseType.PAUSE,
+    config_types.GantryLoad: config_types.GantryLoad.HIGH_THROUGHPUT_1000,
+    config_types.CapacitivePassSettings: config_types.CapacitivePassSettings(
+        prep_distance_mm=1.0,
+        max_overrun_distance_mm=2.0,
+        speed_mm_per_s=3.0,
+        sensor_threshold_pf=5.0
+    ),
+    hw_types.CriticalPoint: hw_types.CriticalPoint.MOUNT,
+    OT3Transforms: OT3Transforms(
+        deck_calibration=DeckCalibration(
+            attitude= [[0.0, 1.0]],
+            source= calibration_types.SourceType.default,
+            status= calibration_types.CalibrationStatus(
+                markedBad=False,
+                source=calibration_types.SourceType.default,
+                markedAt=datetime.now(),
+            ),
+            belt_attitude = None,
+            last_modified = datetime.now(),
+            pipette_calibrated_with = None,
+            tiprack = None,
+        ),
+        carriage_offset=ot_types.Point(1,1,1),
+        left_mount_offset=ot_types.Point(1,1,1),
+        right_mount_offset=ot_types.Point(1,1,1),
+        gripper_mount_offset=ot_types.Point(1,1,1),
+    ),
+    config_types.LiquidProbeSettings: config_types.LiquidProbeSettings(
+        mount_speed=1.0,
+        plunger_speed=2.0,
+        plunger_impulse_time=3.0,
+        sensor_threshold_pascals=4.0,
+        aspirate_while_sensing=False,
+        z_overlap_between_passes_mm=5.0,
+        plunger_reset_offset=6.0,
+        samples_for_baselining=1,
+        sample_time_sec=7.0,
+    ),
+    hw_types.PipetteSensorId: hw_types.PipetteSensorId.S1,
+    hw_types.PipetteSensorData: hw_types.PipetteSensorData(sensor_type=hw_types.PipetteSensorType.capacitive, _as_int=0x01, _as_float=0x01),
+    hw_types.MotionChecks: hw_types.MotionChecks.HIGH,
+    driver_types.ABSMeasurementConfig: driver_types.ABSMeasurementConfig(measure_mode=driver_types.ABSMeasurementMode.SINGLE, sample_wavelengths=[100, 200], reference_wavelength=100),
+    module_types.BundledFirmware: module_types.BundledFirmware(version="v1", path=Path("coolpath")),
+    vac_types.PumpState: vac_types.PumpState(target_rpm=0.1, current_rpm=0.2, target_pwm=1.5, current_pwm=2.5, pump_running=False, manual_control=True),
+    hw_types.ModuleConnectedNotification: hw_types.ModuleConnectedNotification(module_serial="123", name="coolmod", port="456", event=hw_types.HardwareEventType.MODULE_CONNECTED)
+}
+
+ # ERROR COLLECTION LISTS
+
+
+
+def test_serialization_validation() -> None:
+    """Test to check if types registered in the hardware class package properly serialize and deserialize."""
+
+    hardware_registry_class_list = find_opentrons_classes_in_packages(
+            HARDWARE_CLASS_PACKAGES
+        )
+    hardware_registry_class_list = list(set(hardware_registry_class_list))
+
+    for clazz in hardware_registry_class_list:
+        try:
+            serializable_dict = clazz.to_pyro_dict(CLASS_TYPE_MOCK_TABLE[clazz])
+        except KeyError as e:
+            raise KeyError(f"{e} - Mock data missing for type {clazz}")
+
+        deserialized_output = clazz.from_pyro_dict("dummy_classname", serializable_dict)
+        assert deserialized_output == CLASS_TYPE_MOCK_TABLE[clazz]
