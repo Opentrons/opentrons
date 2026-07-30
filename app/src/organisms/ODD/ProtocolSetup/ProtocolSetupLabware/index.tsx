@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useMemo, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -26,7 +26,6 @@ import {
 import {
   useCreateLiveCommandMutation,
   useModulesQuery,
-  usePostLogMessageMutation,
 } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
@@ -43,6 +42,7 @@ import { SmallButton, TouchFloatingActionButton } from '/app/atoms/buttons'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
+import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { getOffDeckRenderGroups } from '/app/resources/protocols/utils/getOffDeckRenderGroups'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
@@ -151,32 +151,18 @@ export function ProtocolSetupLabware({
     [attachedModules, protocolModulesInfo, deckConfig]
   )
 
-  const documentationState = useDocumentationState()
-  const { postLogMessage } = usePostLogMessageMutation(
-    documentationState,
-    'confirm_placements'
-  )
-  const handleProceed = useCallback(() => {
-    if (documentationState.isLoading) return
-    if (documentationState.accessControlEnabled) {
-      postLogMessage(
-        {
-          action: 'confirm liquid and labware placements',
-          message:
-            'user confirmed liquid and labware placements before running protocol',
-        },
-        {
-          onSuccess: () => {
-            setIsConfirmed(true)
-            setSetupScreen('prepare to run')
-          },
-        }
-      )
-    } else {
+  const handleProceed = useHandleAndLog(
+    () => {
       setIsConfirmed(true)
       setSetupScreen('prepare to run')
+    },
+    'confirm_placements',
+    {
+      action: 'confirmed liquid and labware placements',
+      message:
+        'user confirmed liquid and labware placements before running protocol',
     }
-  }, [documentationState, postLogMessage, setIsConfirmed, setSetupScreen])
+  )
 
   return (
     <>
