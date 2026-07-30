@@ -15,7 +15,7 @@ from Pyro5 import api as pyro
 from Pyro5 import nameserver
 
 import opentrons_shared_data.pipette.types as pipette_types
-from opentrons_shared_data.errors.exceptions import VacuumModuleWasteFullError
+from opentrons_shared_data.errors.exceptions import CommunicationError, ErrorCodes
 from opentrons_shared_data.gripper import GripperModel
 from opentrons_shared_data.pipette import (
     load_data as load_pipette_data,
@@ -516,16 +516,6 @@ CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
     hw_types.StatusBarState: hw_types.StatusBarState.IDLE,
     hw_types.TipScrapeType: hw_types.TipScrapeType.LEFT_ONE_COL,
     hw_types.TipStateType: hw_types.TipStateType.ABSENT,
-    Union[
-        module_types.MagneticModuleModel,
-        module_types.TemperatureModuleModel,
-        module_types.ThermocyclerModuleModel,
-        module_types.HeaterShakerModuleModel,
-        module_types.MagneticBlockModel,
-        module_types.AbsorbanceReaderModel,
-        module_types.FlexStackerModuleModel,
-        module_types.VacuumModuleModel,
-    ]: module_types.ThermocyclerModuleModel.THERMOCYCLER_V2,
     peripheral_types.BarcodeScannerModel: peripheral_types.BarcodeScannerModel.BARCODE_SCANNER_V1,
     hw_types.GripperProbe: hw_types.GripperProbe.FRONT,
     hw_types.InstrumentProbeType: None,
@@ -619,7 +609,7 @@ CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
     ),
     hw_types.ModuleDisconnectedNotification: hw_types.ModuleDisconnectedNotification(
         event=hw_types.HardwareEventType.MODULE_DISCONNECTED,
-        module_model=module_types.ThermocyclerModuleModel,
+        module_model=module_types.ThermocyclerModuleModel.THERMOCYCLER_V2,
         port="123",
         module_serial="ABCDF4",
     ),
@@ -627,17 +617,14 @@ CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
         event=hw_types.HardwareEventType.SUBSYSTEM_CONNECTION
     ),
     hw_types.AsynchronousModuleErrorNotification: hw_types.AsynchronousModuleErrorNotification(
-        exception=VacuumModuleWasteFullError(
-            serial="1234ABC",
-            mode="coolmode",
-            target=10.1,
-            current=11.3,
-            message="coolmsg",
-            detail=None,  # CASEY TODO
-            wrapping=None,  # CASEY TODO
+        exception=CommunicationError(
+            code=ErrorCodes.COMMUNICATION_ERROR,
+            message="BIG_ERRORS",
+            detail={"apple": "pie", "cheese": "cake"},
+            wrapping=None # CASEY TODO
         ),
         module_serial="1234ABC",
-        module_model=module_types.VacuumModuleModel,
+        module_model=module_types.VacuumModuleModel.VACUUM_MODULE_V1,
         port="1",
         event=hw_types.HardwareEventType.ASYNCHRONOUS_MODULE_ERROR,
     ),
@@ -682,7 +669,7 @@ CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
     mod_cal.ModuleCalibrationOffset: mod_cal.ModuleCalibrationOffset(
         offset=ot_types.Point(0.1, 0.2, 0.3),
         module_id="id",
-        module=module_types.ThermocyclerModuleModel,
+        module=module_types.ModuleType.THERMOCYCLER,
         source=mod_cal.SourceType.factory,
         status=mod_cal.CalibrationStatus(
             markedBad=False,
@@ -788,12 +775,5 @@ async def test_serialization_validation() -> None:
         except KeyError as e:
             raise KeyError(f"{e} - Mock data missing for type {clazz}")
 
-        try:
-            deserialized_output = tester_proxy.data_in_data_out(mock_data)
-        except Exception as e:
-            print(f"Failed serialization on: {mock_data} - {e}")
-        try:
-            assert deserialized_output == mock_data
-        except:
-            print("failed assert")
-    raise ValueError("done")
+        deserialized_output = tester_proxy.data_in_data_out(mock_data)
+        assert deserialized_output == mock_data
