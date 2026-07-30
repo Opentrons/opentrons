@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { useAtom } from 'jotai'
 
 import {
-  AlertPrimaryButton,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_END,
   Modal,
+  PrimaryButton,
   SecondaryButton,
   SPACING,
   StyledText,
@@ -47,9 +47,9 @@ export function ExitConfirmModal(): JSX.Element {
           <SecondaryButton onClick={handleContinueClick}>
             {t('exit_confirmation_cancel')}
           </SecondaryButton>
-          <AlertPrimaryButton onClick={handleExitClick}>
+          <PrimaryButton variant="warning" onClick={handleExitClick}>
             {t('exit_confirmation_exit')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </Flex>
       </Flex>
     </Modal>
