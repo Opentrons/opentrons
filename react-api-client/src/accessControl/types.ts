@@ -188,6 +188,7 @@ type AuditLogAction =
   | 'sign_run'
   | 'delete_log_periods'
   | 'confirm_parameters'
+  | 'confirm_placements'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.
