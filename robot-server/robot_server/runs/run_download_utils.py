@@ -1,26 +1,28 @@
+"""Utility functions to collect and save run information to file system."""
+
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-
 from typing import Optional, Tuple, Union
 
 from robot_server.data_files.data_files_store import DataFilesStore
-from robot_server.protocols.protocol_store import ProtocolNotFoundError, ProtocolStore
 from robot_server.data_files.zip_utils import sanitize_filename_component
-from robot_server.runs.run_models import BadRun, Run, RunCommandSummary
+from robot_server.protocols.protocol_store import ProtocolNotFoundError, ProtocolStore
 from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.run_models import RunCommandSummary
+from robot_server.runs.run_store import BadRunResource, RunResource
 
 
 def collect_protocol_file(
-    run: Union[Run, BadRun],
+    run: Union[RunResource, BadRunResource],
     protocol_store: ProtocolStore,
 ) -> Optional[Tuple[Path, str]]:
     """Return the protocol main file for the zip, or None if unavailable."""
-    if run.protocolId is None:
+    if run.protocol_id is None:
         return None
 
     try:
-        protocol = protocol_store.get(run.protocolId)
+        protocol = protocol_store.get(run.protocol_id)
     except ProtocolNotFoundError:
         return None
 
@@ -53,6 +55,7 @@ def collect_rtp_csv(
 
 def collect_run_log(
     run_id: str,
+    run: Union[RunResource, BadRunResource],
     run_data_manager: RunDataManager,
     protocol_store: ProtocolStore,
     staging_dir: Path,
@@ -104,9 +107,7 @@ def collect_run_log(
             },
         }
 
-        archive_name = _build_run_log_filename(
-            run=run_record, protocol_store=protocol_store
-        )
+        archive_name = _build_run_log_filename(run=run, protocol_store=protocol_store)
         return _write_staging_json(run_details, archive_name, staging_dir)
     except Exception:
         return None
@@ -114,6 +115,7 @@ def collect_run_log(
 
 def collect_labware_offsets(
     run_id: str,
+    run: Union[RunResource, BadRunResource],
     run_data_manager: RunDataManager,
     protocol_store: ProtocolStore,
     staging_dir: Path,
@@ -126,7 +128,7 @@ def collect_labware_offsets(
             for offset in run_record.labwareOffsets
         ]
         archive_name = _build_labware_offsets_filename(
-            run=run_record, protocol_store=protocol_store
+            run=run, protocol_store=protocol_store
         )
         return _write_staging_json(offsets_payload, archive_name, staging_dir)
     except Exception:
@@ -141,23 +143,23 @@ def _write_staging_json(
     file_path.parent.mkdir(parents=True, exist_ok=True)
     with file_path.open(mode="w", encoding="utf-8") as json_file:
         json.dump(payload, json_file)
-    return file_path, archive_name
+    return (file_path, archive_name)
 
 
 def build_download_artifact_name(
-    run: Union[Run, BadRun],
+    run: Union[RunResource, BadRunResource],
     protocol_store: ProtocolStore,
     *,
     suffix: str,
 ) -> str:
     """Build `{protocolName}_{ISO-timestamp}{suffix}` for zip entries/directories."""
-    created_at = _format_download_timestamp(run.createdAt)
+    created_at = _format_download_timestamp(run.created_at)
     name_stem = _protocol_download_name_stem(run=run, protocol_store=protocol_store)
     return f"{name_stem}_{created_at}{suffix}"
 
 
 def _build_run_log_filename(
-    run: Union[Run, BadRun],
+    run: Union[RunResource, BadRunResource],
     protocol_store: ProtocolStore,
 ) -> str:
     """Build `{protocolName}_{ISO-timestamp}.json`."""
@@ -167,7 +169,7 @@ def _build_run_log_filename(
 
 
 def _build_labware_offsets_filename(
-    run: Union[Run, BadRun],
+    run: Union[RunResource, BadRunResource],
     protocol_store: ProtocolStore,
 ) -> str:
     """Build `{protocolName}_{ISO-timestamp}_offsetdata.json`."""
@@ -177,13 +179,13 @@ def _build_labware_offsets_filename(
 
 
 def _protocol_download_name_stem(
-    run: Union[Run, BadRun],
+    run: Union[RunResource, BadRunResource],
     protocol_store: ProtocolStore,
 ) -> str:
     """Prefer protocolName metadata, then protocol file name, then ids."""
-    if run.protocolId is not None:
+    if run.protocol_id is not None:
         try:
-            protocol = protocol_store.get(run.protocolId)
+            protocol = protocol_store.get(run.protocol_id)
         except ProtocolNotFoundError:
             protocol = None
 
@@ -193,9 +195,9 @@ def _protocol_download_name_stem(
                 protocol_name = protocol.source.main_file.stem
             return sanitize_filename_component(str(protocol_name))
 
-        return sanitize_filename_component(run.protocolId)
+        return sanitize_filename_component(run.protocol_id)
 
-    return sanitize_filename_component(run.id)
+    return sanitize_filename_component(run.run_id)
 
 
 def _format_download_timestamp(created_at: datetime) -> str:

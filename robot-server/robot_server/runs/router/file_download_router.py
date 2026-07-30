@@ -26,16 +26,17 @@ from robot_server.persistence.fastapi_dependencies import (
 )
 from robot_server.protocols.dependencies import get_protocol_store
 from robot_server.protocols.protocol_store import ProtocolStore
-from robot_server.runs.dependencies import get_run_data_manager
+from robot_server.runs.dependencies import get_run_data_manager, get_run_store
 from robot_server.runs.run_data_manager import RunDataManager
-from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.run_download_utils import (
     build_download_artifact_name,
+    collect_labware_offsets,
     collect_protocol_file,
     collect_rtp_csv,
-    collect_labware_offsets,
     collect_run_log,
 )
+from robot_server.runs.run_models import RunNotFoundError
+from robot_server.runs.run_store import RunStore
 
 file_download_router = LightRouter()
 
@@ -76,6 +77,7 @@ class NoDownloadContent(ErrorDetails):
 )
 async def download_run_files(
     runId: str,
+    run_store: Annotated[RunStore, Depends(get_run_store)],
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
@@ -94,7 +96,7 @@ async def download_run_files(
         persistence_directory_root: Persistence directory used for download staging.
     """
     try:
-        run = run_data_manager.get(runId)
+        run = run_store.get(runId)
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
@@ -128,6 +130,7 @@ async def download_run_files(
 
         run_log_entry = collect_run_log(
             run_id=runId,
+            run=run,
             run_data_manager=run_data_manager,
             protocol_store=protocol_store,
             staging_dir=staging_path,
@@ -137,6 +140,7 @@ async def download_run_files(
 
         offsets_entry = collect_labware_offsets(
             run_id=runId,
+            run=run,
             run_data_manager=run_data_manager,
             protocol_store=protocol_store,
             staging_dir=staging_path,
@@ -175,4 +179,3 @@ async def download_run_files(
         filename=zip_filename,
         background=BackgroundTask(staging_dir.cleanup),
     )
-

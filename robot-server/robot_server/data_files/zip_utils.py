@@ -14,7 +14,7 @@ from server_utils.persistence.persistence_directory import (
 
 from .data_files_store import DataFilesStore
 from robot_server.protocols.protocol_store import ProtocolNotFoundError, ProtocolStore
-from robot_server.runs.run_models import BadRun, Run
+from robot_server.runs.run_store import BadRunResource, RunResource
 
 _DOWNLOAD_STAGING_PREFIX: Final = "temp-download-staging-"
 _DOWNLOAD_ZIP_NAME: Final = "download.zip"
@@ -148,7 +148,7 @@ async def create_zip_for_download(
 
 
 def build_run_zip_filename(
-    run: Union[Run, BadRun],
+    run: Union[RunResource, BadRunResource],
     protocol_store: ProtocolStore,
     *,
     fallback_filename: str,
@@ -158,7 +158,7 @@ def build_run_zip_filename(
     Prefers ``{robot}_{protocolName}_{timestamp}.zip`` when a protocol
     name is available; otherwise returns ``fallback_filename``.
     """
-    protocol_id = run.protocolId
+    protocol_id = run.protocol_id
 
     if protocol_id is not None:
         try:
@@ -174,7 +174,7 @@ def build_run_zip_filename(
 
         if protocol_name is not None:
             robot_name = config.name()
-            timestamp = run.createdAt.strftime("%Y%m%d_%H%M%S")
+            timestamp = run.created_at.strftime("%Y%m%d_%H%M%S")
             return (
                 f"{robot_name}_{sanitize_filename_component(str(protocol_name))}"
                 f"_{timestamp}.zip"

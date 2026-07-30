@@ -65,6 +65,7 @@ from server_utils.fastapi_utils.models.json_api import (
 from ..dependencies import (
     get_run_auto_deleter,
     get_run_data_manager,
+    get_run_store,
 )
 from ..run_auto_deleter import RunAutoDeleter
 from ..run_data_manager import (
@@ -73,6 +74,7 @@ from ..run_data_manager import (
     RunNotCurrentError,
     RunSignoffRequiredError,
 )
+from ..run_download_utils import collect_run_log
 from ..run_models import (
     ActiveNozzleLayout,
     BadRun,
@@ -87,8 +89,8 @@ from ..run_models import (
     RunUpdate,
     TipState,
 )
-from ..run_download_utils import collect_run_log
 from ..run_orchestrator_store import RunConflictError
+from ..run_store import RunStore
 from robot_server.camera.fastapi_dependencies import (
     get_camera_provider,
 )
@@ -502,6 +504,7 @@ async def update_run(  # noqa: C901
     runId: str,
     request_body: RequestModel[RunUpdate],
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    run_store: Annotated[RunStore, Depends(get_run_store)],
     audit_client: Annotated[AuditClient, Depends(get_audit_client)],
     persistence_directory_root: Annotated[
         Path, Depends(get_persistence_directory_root)
@@ -518,6 +521,10 @@ async def update_run(  # noqa: C901
         runId: Run ID pulled from URL.
         request_body: Update data from request body.
         run_data_manager: Current and historical run data management.
+        run_store: Store for run data management.
+        audit_client: Client to send run log data to audit server.
+        persistence_directory_root: Persistence directory used for download staging.
+        protocol_store: Store for protocol storage access.
         access_control_status: Whether access control (Compliance Ready Software) is
             currently enabled on the robot.
         authentication: The authenticated user, if any.
@@ -547,6 +554,7 @@ async def update_run(  # noqa: C901
 
             run_log_entry = collect_run_log(
                 run_id=runId,
+                run=run_store.get(runId),
                 run_data_manager=run_data_manager,
                 protocol_store=protocol_store,
                 staging_dir=staging_path,
