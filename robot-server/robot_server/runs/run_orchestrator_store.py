@@ -188,8 +188,10 @@ class RunOrchestratorStore:
         )
         self._default_run_orchestrator: Optional[RunOrchestrator] = None
         self._run_process_pyro_provider = run_process_pyro_provider
-        if not feature_flags.hardware_subprocess_enabled():
-            hardware_api.register_callback(_get_hardware_listener(self))
+        # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
+        # this patch should be REMOVED for releases >= 10.0.0
+        # if not feature_flags.hardware_subprocess_enabled():
+        hardware_api.register_callback(_get_hardware_listener(self))
 
     @property
     def run_coordinator(self) -> Union[RunOrchestrator, DirectedRunProcess]:
@@ -281,7 +283,9 @@ class RunOrchestratorStore:
             RunConflictError: The current run orchestrator is not idle, so
             a new one may not be created.
         """
-        if feature_flags.protocol_subprocess_enabled():
+        if False:  # feature_flags.protocol_subprocess_enabled():
+            # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
+            # this patch should be REMOVED for releases >= 10.0.0
             return await self.create_pyro(
                 run_id=run_id,
                 labware_offsets=labware_offsets,
@@ -352,7 +356,9 @@ class RunOrchestratorStore:
             RunConflictError: The current run orchestrator is not idle, so it cannot
                 be cleared.
         """
-        if feature_flags.protocol_subprocess_enabled():
+        if False:  # feature_flags.protocol_subprocess_enabled():
+            # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
+            # this patch should be REMOVED for releases >= 10.0.0
             return await self.clear_pyro()
 
         if self.run_coordinator.get_is_okay_to_clear():

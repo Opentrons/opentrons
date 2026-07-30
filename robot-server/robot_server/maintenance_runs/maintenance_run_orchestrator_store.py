@@ -121,8 +121,11 @@ class MaintenanceRunOrchestratorStore:
         self._hardware_api = hardware_api
         self._robot_type = robot_type
         self._deck_type = deck_type
-        if not feature_flags.hardware_subprocess_enabled():
-            hardware_api.register_callback(_get_estop_listener(self))
+
+        # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
+        # this patch should be REMOVED for releases >= 10.0.0
+        # if not feature_flags.hardware_subprocess_enabled():
+        hardware_api.register_callback(_get_estop_listener(self))
 
     @property
     def run_orchestrator(self) -> RunOrchestrator:

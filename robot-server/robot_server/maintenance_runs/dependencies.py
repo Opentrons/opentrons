@@ -4,7 +4,7 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from opentrons.config import feature_flags
+# from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import DeckType
 from opentrons_shared_data.robot.types import RobotType
@@ -48,7 +48,9 @@ async def get_maintenance_run_orchestrator_store(
         )
         _run_orchestrator_store_accessor.set_on(app_state, run_orchestrator_store)
         # Handle remote hardware registry, if needed
-        if feature_flags.hardware_subprocess_enabled():
+        # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
+        # this patch should be REMOVED for releases >= 10.0.0
+        if False:  # feature_flags.hardware_subprocess_enabled():
             register_maintenance_run_orchestrator_store_to_pyro_resource(
                 app_state=app_state,
                 maintenance_run_orchestrator_store=run_orchestrator_store,

@@ -6,7 +6,8 @@ from typing import List, Optional, Union
 
 import opentrons.protocol_runner.create_simulating_orchestrator as simulating_runner
 import opentrons.util.helpers as datetime_helper
-from opentrons.config import feature_flags
+
+# from opentrons.config import feature_flags
 from opentrons.protocol_engine.errors import ErrorOccurrence
 from opentrons.protocol_engine.types import (
     CSVRuntimeParamPaths,
@@ -63,7 +64,9 @@ class ProtocolAnalyzer:
 
         Returns: The RunOrchestrator instance.
         """
-        if feature_flags.protocol_subprocess_enabled():
+        if False:  # feature_flags.protocol_subprocess_enabled():
+            # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
+            # this patch should be REMOVED for releases >= 10.0.0
             run_coordinator = (
                 await self._run_process_pyro_provider.wait_for_simulating_run_proxy()
             )
@@ -167,7 +170,9 @@ class ProtocolAnalyzer:
                 asyncio.run_coroutine_threadsafe(
                     self._coordinator.stop(), asyncio.get_running_loop()
                 )
-                if feature_flags.protocol_subprocess_enabled():
+                # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
+                # this patch should be REMOVED for releases >= 10.0.0
+                if False:  # feature_flags.protocol_subprocess_enabled():
                     asyncio.run_coroutine_threadsafe(
                         self._run_process_pyro_provider.refresh_simulating(),
                         asyncio.get_running_loop(),

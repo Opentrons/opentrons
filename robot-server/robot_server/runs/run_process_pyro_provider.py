@@ -10,7 +10,7 @@ from typing import Optional, cast
 
 import Pyro5.api
 
-from opentrons.config import feature_flags
+# from opentrons.config import feature_flags
 from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
 
 from . import run_process_entry_point
@@ -39,7 +39,9 @@ class RunProcessPyroProvider:
         for pyro serialization, then starts a run process in the background ready to
         be used by a run.
         """
-        if feature_flags.protocol_subprocess_enabled():
+        if False:  # feature_flags.protocol_subprocess_enabled():
+            # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
+            # this patch should be REMOVED for releases >= 10.0.0
             register_process_types()
             self._start_run_process()
             self._start_simulating_process()
@@ -50,7 +52,9 @@ class RunProcessPyroProvider:
         If feature flag is on for protocol subprocess, ends the process and removes
         the run process proxy name from the nameserver.
         """
-        if feature_flags.protocol_subprocess_enabled():
+        if False:  # feature_flags.protocol_subprocess_enabled():
+            # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
+            # this patch should be REMOVED for releases >= 10.0.0
             await self._end_run_process()
             await self._end_simulating_process()
             with Pyro5.api.locate_ns() as ns:
