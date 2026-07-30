@@ -39,9 +39,18 @@ const disabledRoundTabStyling = css`
   }
 `
 
-const RoundNavLink = styled(NavLink)`
+interface RoundNavLinkProps {
+  minWidth?: string
+}
+
+const RoundNavLink = styled(NavLink)<RoundNavLinkProps>`
   ${baseRoundTabStyling}
   color: ${COLORS.black90};
+  ${({ minWidth }) =>
+    minWidth != null &&
+    css`
+      min-width: ${minWidth};
+    `}
 
   &:hover {
     background-color: ${COLORS.purple35};
@@ -63,6 +72,7 @@ interface RoundTabProps {
   to: string
   tabName: string
   end?: boolean
+  minWidth?: string
 }
 
 export function RoundTab({
@@ -71,6 +81,7 @@ export function RoundTab({
   to,
   tabName,
   end,
+  minWidth,
 }: RoundTabProps): JSX.Element {
   const [targetProps, tooltipProps] = useHoverTooltip()
   return disabled ? (
@@ -83,7 +94,7 @@ export function RoundTab({
       ) : null}
     </>
   ) : (
-    <RoundNavLink to={to} replace end={end}>
+    <RoundNavLink to={to} replace end={end} minWidth={minWidth}>
       {tabName}
     </RoundNavLink>
   )
