@@ -38,16 +38,26 @@ OE_BUILTIN_VERSION_FILE = "/etc/VERSION.json"
 LOG = logging.getLogger(__name__)
 
 
-@web.middleware
-async def log_error_middleware(
-    request: web.Request, handler: Handler
-) -> web.StreamResponse:
-    try:
-        resp = await handler(request)
-    except Exception:
-        LOG.exception(f"Exception serving {request.method} {request.path}")
-        raise
-    return resp
+class LogErrorMiddleware:
+    """Log a traceback for any exception that escapes a request handler.
+
+    This is raw ASGI rather than a Starlette `BaseHTTPMiddleware` so that it
+    doesn't interpose on the request body stream, which system update uploads
+    read incrementally.
+    """
+
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        try:
+            await self.app(scope, receive, send)
+        except Exception:
+            LOG.exception(f"Exception serving {scope['method']} {scope['path']}")
+            raise
 
 
 async def get_app(
