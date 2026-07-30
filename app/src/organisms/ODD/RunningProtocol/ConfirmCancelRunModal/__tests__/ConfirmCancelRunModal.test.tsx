@@ -91,6 +91,9 @@ describe('ConfirmCancelRunModal', () => {
       dismissCurrentRun: mockDismissCurrentRun,
       isLoading: false,
     } as any)
+    mockDismissCurrentRun.mockImplementation((_id: string, options?: any) => {
+      options?.onSuccess?.()
+    })
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
@@ -150,7 +153,7 @@ describe('ConfirmCancelRunModal', () => {
 
   it('when tapping cancel run with error, should remain in canceling state', () => {
     mockStopRun.mockImplementation((_id: string, options: any) => {
-      options.onSettled()
+      options.onError()
     })
 
     render(props)
@@ -168,7 +171,6 @@ describe('ConfirmCancelRunModal', () => {
 
     mockStopRun.mockImplementation((_id: string, options: any) => {
       options.onSuccess()
-      options.onSettled()
     })
 
     render(props)
@@ -178,7 +180,13 @@ describe('ConfirmCancelRunModal', () => {
     expect(mockTrackProtocolRunEvent).toHaveBeenCalledWith({
       name: 'runCancel',
     })
-    expect(mockDismissCurrentRun).toHaveBeenCalledWith(RUN_ID)
+    expect(mockDismissCurrentRun).toHaveBeenCalledWith(
+      RUN_ID,
+      expect.objectContaining({
+        onSuccess: expect.any(Function),
+        onError: expect.any(Function),
+      })
+    )
     expect(mockNavigate).toHaveBeenCalledWith('/protocols')
   })
 
@@ -191,14 +199,19 @@ describe('ConfirmCancelRunModal', () => {
 
     mockStopRun.mockImplementation((_id: string, options: any) => {
       options.onSuccess()
-      options.onSettled()
     })
 
     render(props)
     const button = screen.getByText('Cancel run')
     fireEvent.click(button)
 
-    expect(mockDismissCurrentRun).toHaveBeenCalledWith(RUN_ID)
+    expect(mockDismissCurrentRun).toHaveBeenCalledWith(
+      RUN_ID,
+      expect.objectContaining({
+        onSuccess: expect.any(Function),
+        onError: expect.any(Function),
+      })
+    )
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith('/protocols/test-protocol-id')
   })
@@ -206,7 +219,6 @@ describe('ConfirmCancelRunModal', () => {
   it('when run is active, stop run does not dismiss or navigate', () => {
     mockStopRun.mockImplementation((_id: string, options: any) => {
       options.onSuccess()
-      options.onSettled()
     })
 
     render(props)
@@ -225,14 +237,20 @@ describe('ConfirmCancelRunModal', () => {
     }
 
     mockStopRun.mockImplementation((_id: string, options: any) => {
-      options.onSettled()
+      options.onError()
     })
 
     render(props)
     const button = screen.getByText('Cancel run')
     fireEvent.click(button)
 
-    expect(mockDismissCurrentRun).toHaveBeenCalledWith(RUN_ID)
+    expect(mockDismissCurrentRun).toHaveBeenCalledWith(
+      RUN_ID,
+      expect.objectContaining({
+        onSuccess: expect.any(Function),
+        onError: expect.any(Function),
+      })
+    )
     expect(mockNavigate).toHaveBeenCalledWith('/protocols')
     expect(mockTrackProtocolRunEvent).not.toHaveBeenCalled()
   })

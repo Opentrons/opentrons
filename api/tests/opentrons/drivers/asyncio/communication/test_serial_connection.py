@@ -444,3 +444,34 @@ async def test_send_data_multiple_raises_unhandled(
     with pytest.raises(UnhandledGcode):
         await async_subject._send_data_multiack(data="M411", retries=0, acks=3)
     mock_serial_port.read_until.assert_called_once()
+
+
+async def test_update_port_updates_port_and_name(
+    mock_serial_port: AsyncMock, async_subject: AsyncResponseSerialConnection
+) -> None:
+    """update_port should rebind serial and keep log name aligned with the path."""
+    mock_serial_port.is_open = AsyncMock(return_value=True)
+    mock_serial_port._baud_rate = 115200
+    mock_serial_port.get_timeout = mock.Mock(return_value=5.0)
+    mock_serial_port._loop = mock.sentinel.loop
+    mock_serial_port._reset_buffer_before_write = True
+
+    new_serial = AsyncMock(spec=AsyncSerial)
+    with patch.object(
+        AsyncResponseSerialConnection,
+        "_build_serial",
+        new=AsyncMock(return_value=new_serial),
+    ) as build_serial:
+        await async_subject.update_port("/dev/ot_module_vacuummodule5")
+
+    mock_serial_port.close.assert_awaited_once()
+    build_serial.assert_awaited_once_with(
+        port="/dev/ot_module_vacuummodule5",
+        baud_rate=115200,
+        timeout=5.0,
+        loop=mock.sentinel.loop,
+        reset_buffer_before_write=True,
+    )
+    assert async_subject.port == "/dev/ot_module_vacuummodule5"
+    assert async_subject.name == "/dev/ot_module_vacuummodule5"
+    assert async_subject._serial is new_serial

@@ -33,8 +33,17 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
-from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
+from opentrons.protocol_engine.state.commands import (
+    CommandAnnotationsSlice,
+    CurrentCommandNotification,
+    FinalizedCommandNotification,
+)
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
+from opentrons.protocol_engine.state.modules import FlexStackerSubstateNotification
+from opentrons.protocol_engine.state.pipettes import (
+    NozzleMapNotification,
+    TipAttachedNotification,
+)
 from opentrons.protocol_engine.types import (
     CommandAnnotation,
     CommandPreconditions,
@@ -56,15 +65,16 @@ from opentrons.protocol_runner.protocol_runner import RunResult
 from opentrons.protocol_runner.run_coordinator import AbstractRunCoordinator, ParseMode
 from opentrons.protocol_runner.run_orchestrator import RunOrchestrator
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
-from opentrons.types import NozzleMapInterface
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
     serpent_enum_registration,
 )
 from opentrons.util.pyro.pyro_synchronous_adapter import (
     convert_result_to_proxy,
+    convert_result_to_wrapped_dict,
     pyro_behavior,
 )
+from opentrons_shared_data.errors import EnumeratedError
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     LabwareDefinition2,
@@ -120,6 +130,12 @@ def register_process_types() -> None:
         ProtocolResource,
         RunResult,
         StateSummary,
+        FlexStackerSubState,
+        NozzleMapNotification,
+        TipAttachedNotification,
+        FlexStackerSubstateNotification,
+        CurrentCommandNotification,
+        FinalizedCommandNotification,
     ]:
         OpentronsPyroSerializer.register_pydantic_model(pydantic_model)  # type: ignore[arg-type]
     for rtp in get_args(RunTimeParameter):
@@ -225,6 +241,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
             file_provider=self._robot_server_resource.get_file_provider(),
             camera_provider=self._robot_server_resource.get_camera_provider(),
             notify_publishers=self._robot_server_resource.get_notify_publishers(),
+            updates_callback=self._robot_server_resource.get_engine_updates_callback,
             proxy_of_callback_for_handling_door_events=proxy_of_callback_for_handling_door_events,
         )
 
@@ -489,7 +506,10 @@ class DirectedRunProcess(AbstractRunCoordinator):
         self._guaranteed_run_orchestrator.estop()
 
     async def asynchronous_module_error(
-        self, module_model: HardwareModuleModel, module_serial: str | None
+        self,
+        module_model: HardwareModuleModel,
+        module_serial: str | None,
+        error: EnumeratedError | None = None,
     ) -> bool:
         """Handle an asynchronous module error reported by hardware.
 
@@ -497,7 +517,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
         False, the caller should not call finish() until it otherwise would.
         """
         return await self._guaranteed_run_orchestrator.asynchronous_module_error(
-            module_model, module_serial
+            module_model, module_serial, error
         )
 
     async def module_disconnected(
@@ -548,9 +568,11 @@ class DirectedRunProcess(AbstractRunCoordinator):
         """Get engine deck type."""
         return self._deck_type
 
-    def get_nozzle_maps(self) -> Mapping[str, NozzleMapInterface]:
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
+    def get_nozzle_maps(self) -> Mapping[str, NozzleMap]:
         """Get current nozzle maps keyed by pipette id."""
-        return self._guaranteed_run_orchestrator.get_nozzle_maps()
+        # NOTE: For the sake of Pyro compatibility this method returns NozzleMap, a serializable type
+        return self._guaranteed_run_orchestrator.get_nozzle_maps()  # type: ignore
 
     def get_tip_attached(self) -> Dict[str, bool]:
         """Get current tip state keyed by pipette id."""
@@ -567,6 +589,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
         )
         self._guaranteed_run_orchestrator.set_error_recovery_policy(policy)
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
     def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
         """Get current (if any) Flex Stacker Substates keyed by module id."""
         return self._guaranteed_run_orchestrator.get_flex_stacker_substate()

@@ -10,6 +10,8 @@ import {
   SPACING,
 } from '@opentrons/components'
 import {
+  getQueryKey,
+  isDocumentedMutationError,
   useCreateProtocolAnalysisMutation,
   useCreateRunMutation,
   useHost,
@@ -20,7 +22,8 @@ import {
   sortRuntimeParameters,
 } from '@opentrons/shared-data'
 
-import { useScrollRef } from '/app/App/hooks'
+import { useScrollRef } from '/app/App/hooks/useModuleAttachedToast'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useToaster } from '/app/organisms/ToasterOven'
 import {
@@ -172,15 +175,26 @@ export function ProtocolSetupParameters({
   const { createProtocolAnalysis, isLoading: isAnalysisLoading } =
     useCreateProtocolAnalysisMutation(protocolId, host)
 
-  const { uploadCsvFile } = useUploadCsvFileMutation({}, host)
+  const documentationState = useDocumentationState()
 
-  const { createRun, isLoading: isRunLoading } = useCreateRunMutation({
-    onSuccess: data => {
-      queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
-        console.error(`could not invalidate runs cache: ${e.message}`)
-      })
-    },
-  })
+  const { uploadCsvFile } = useUploadCsvFileMutation(
+    documentationState,
+    {},
+    host
+  )
+
+  const { createRun, isLoading: isRunLoading } = useCreateRunMutation(
+    documentationState,
+    {
+      onSuccess: data => {
+        queryClient
+          .invalidateQueries(getQueryKey(host, 'runs'))
+          .catch((e: Error) => {
+            console.error(`could not invalidate runs cache: ${e.message}`)
+          })
+      },
+    }
+  )
   const handleConfirmValues = (): void => {
     if (hasMissingFileParam) {
       makeSnackbar(t('protocol_requires_csv') as string)
@@ -210,37 +224,43 @@ export function ProtocolSetupParameters({
           const varName = Promise.resolve(key)
           return Promise.all([fileResponse, varName])
         })
-      ).then(responseTuples => {
-        const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
-          Record<string, string>
-        >((acc, [uploadedFileResponse, variableName]) => {
-          return { ...acc, [variableName]: uploadedFileResponse.data.id }
-        }, {})
-        const runTimeParameterValues = getRunTimeParameterValuesForRun(
-          runTimeParametersOverrides
-        )
-        const runTimeParameterFiles = getRunTimeParameterFilesForRun(
-          runTimeParametersOverrides,
-          mappedResolvedCsvVariableToFileId
-        )
-        setStartSetup(true)
-        createProtocolAnalysis(
-          {
-            protocolKey: protocolId,
-            runTimeParameterValues,
-            runTimeParameterFiles,
-          },
-          {
-            onSuccess: () => {
-              createRun({
-                protocolId,
-                runTimeParameterValues,
-                runTimeParameterFiles,
-              })
+      )
+        .then(responseTuples => {
+          const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
+            Record<string, string>
+          >((acc, [uploadedFileResponse, variableName]) => {
+            return { ...acc, [variableName]: uploadedFileResponse.data.id }
+          }, {})
+          const runTimeParameterValues = getRunTimeParameterValuesForRun(
+            runTimeParametersOverrides
+          )
+          const runTimeParameterFiles = getRunTimeParameterFilesForRun(
+            runTimeParametersOverrides,
+            mappedResolvedCsvVariableToFileId
+          )
+          setStartSetup(true)
+          createProtocolAnalysis(
+            {
+              protocolKey: protocolId,
+              runTimeParameterValues,
+              runTimeParameterFiles,
             },
+            {
+              onSuccess: () => {
+                createRun({
+                  protocolId,
+                  runTimeParameterValues,
+                  runTimeParameterFiles,
+                })
+              },
+            }
+          )
+        })
+        .catch((error: unknown) => {
+          if (!isDocumentedMutationError(error)) {
+            throw error
           }
-        )
-      })
+        })
     }
   }
 

@@ -34,6 +34,7 @@ import {
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { useInitializeCameraState } from '/app/local-resources/images/hooks/useInitializeCameraState'
 import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
@@ -47,7 +48,6 @@ import {
   useLPCFlows,
 } from '/app/organisms/LabwarePositionCheck'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
-import { useGuardedAction } from '/app/organisms/ODD/AccessControl'
 import {
   AnalysisFailedModal,
   getUnmatchedModulesForProtocol,
@@ -262,10 +262,13 @@ function PrepareToRun({
 
   const deckDef = getDeckDefFromRobotType(robotType)
 
-  const protocolModulesInfo =
-    mostRecentAnalysis != null
-      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-      : []
+  const protocolModulesInfo = useMemo(
+    () =>
+      mostRecentAnalysis != null
+        ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+        : [],
+    [mostRecentAnalysis, deckDef]
+  )
 
   const { missingModuleIds } = getUnmatchedModulesForProtocol(
     attachedModules,
@@ -406,15 +409,7 @@ function PrepareToRun({
     !isAnyNecessaryDefaultOffsetMissing &&
     isCameraReadyToRun
 
-  const actionsToDocument = useMemo(
-    () => [{ kind: 'PROTOCOL_PLAY' as const }],
-    []
-  )
-  const checkAccessControl = useGuardedAction(actionsToDocument)
-
   const onPlay = async (): Promise<void> => {
-    if (!(await checkAccessControl())) return
-
     if (doorStatus.isDoorOpen) {
       if (
         doorStatus.moduleDoorLocation !== null &&
@@ -554,9 +549,11 @@ function PrepareToRun({
   }
 
   // Labware information
-  const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(
-    mostRecentAnalysis?.commands ?? []
+  const { offDeckItems, onDeckItems } = useMemo(
+    () => getLabwareSetupItemGroups(mostRecentAnalysis?.commands ?? []),
+    [mostRecentAnalysis?.commands]
   )
+
   const onDeckLabwareCount = onDeckItems.length
   const additionalLabwareCount = offDeckItems.length
 
@@ -785,7 +782,9 @@ export function ProtocolSetup(): JSX.Element {
     localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const trackEvent = useTrackEvent()
   const { play } = useRunControls(runId)
-  const { addCameraSettingsToRun } = useAddCameraSettingsToRunMutation()
+  const documentationState = useDocumentationState()
+  const { addCameraSettingsToRun } =
+    useAddCameraSettingsToRunMutation(documentationState)
   const [showAnalysisFailedModal, setShowAnalysisFailedModal] =
     useState<boolean>(true)
   const robotType = useRobotType(robotName)
@@ -829,10 +828,13 @@ export function ProtocolSetup(): JSX.Element {
   }, [mostRecentAnalysis?.status])
   const deckDef = getDeckDefFromRobotType(robotType)
 
-  const protocolModulesInfo =
-    mostRecentAnalysis != null
-      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-      : []
+  const protocolModulesInfo = useMemo(
+    () =>
+      mostRecentAnalysis != null
+        ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+        : [],
+    [mostRecentAnalysis, deckDef]
+  )
 
   const { missingModuleIds } = getUnmatchedModulesForProtocol(
     attachedModules,
@@ -860,7 +862,10 @@ export function ProtocolSetup(): JSX.Element {
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
 
   const offsetsConfirmed = useSelector(selectAreOffsetsApplied(runId))
-  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(runId)
+  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(
+    runId,
+    documentationState
+  )
 
   const [cameraSettingsConfirmed, setCameraSettingsConfirmed] = useState(false)
   const { data: initialRobotCameraSettings } = useNotifyCamera({

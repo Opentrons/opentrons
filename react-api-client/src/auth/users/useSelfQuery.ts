@@ -2,11 +2,33 @@ import { useQuery } from 'react-query'
 
 import { getSelf } from '@opentrons/api-client'
 
-import { useHost } from '../../api'
+import { getQueryKey, useHost } from '../../api'
 
 import type { AxiosError } from 'axios'
-import type { UseQueryOptions, UseQueryResult } from 'react-query'
+import type {
+  QueryClient,
+  QueryKey,
+  UseQueryOptions,
+  UseQueryResult,
+} from 'react-query'
 import type { AuthUserResponse, HostConfig } from '@opentrons/api-client'
+
+export function getSelfQueryKey(hostConfig: HostConfig | null): QueryKey {
+  return getQueryKey(hostConfig, 'auth', 'users', 'self')
+}
+
+export function fetchSelf(hostConfig: HostConfig): Promise<AuthUserResponse> {
+  return getSelf(hostConfig).then(response => response.data)
+}
+
+export function fetchSelfQuery(
+  queryClient: QueryClient,
+  hostConfig: HostConfig
+): Promise<AuthUserResponse> {
+  return queryClient.fetchQuery(getSelfQueryKey(hostConfig), () =>
+    fetchSelf(hostConfig)
+  )
+}
 
 export function useSelfQuery(
   options?: UseQueryOptions<AuthUserResponse, AxiosError>,
@@ -16,8 +38,8 @@ export function useSelfQuery(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const query = useQuery<AuthUserResponse, AxiosError>(
-    [host, 'auth', 'users', 'self'],
-    () => getSelf(host!).then(response => response.data),
+    getSelfQueryKey(host),
+    () => fetchSelf(host!),
     { enabled: host != null, ...options }
   )
 

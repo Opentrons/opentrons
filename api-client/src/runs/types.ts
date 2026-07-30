@@ -71,6 +71,7 @@ export interface LegacyGoodRunData {
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
   cameraSettings?: CameraData
+  signedBy?: string
 }
 
 export interface KnownGoodRunData extends LegacyGoodRunData {
@@ -222,6 +223,8 @@ export interface UpdateErrorRecoveryPolicyRequest {
 
 export type UpdateErrorRecoveryPolicyResponse = Record<string, never>
 export type ErrorRecoveryPolicyResponse = UpdateErrorRecoveryPolicyRequest
+
+export type DownloadedRunResponse = Blob | string
 
 /**
  * Current Run State Data

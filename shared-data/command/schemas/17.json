@@ -4792,6 +4792,12 @@
     "OpenVentParams": {
       "description": "Input parameters to open the vent.",
       "properties": {
+        "equalizeTimeout": {
+          "default": null,
+          "description": "Time in seconds to wait for pressure equalization after opening the vent. Does not wait if None.",
+          "title": "Equalizetimeout",
+          "type": "integer"
+        },
         "moduleId": {
           "description": "Unique ID of the vacuum module.",
           "title": "Moduleid",
@@ -6658,6 +6664,12 @@
     "StartRunProfileParams": {
       "description": "Input parameters to run a vacuum profile.",
       "properties": {
+        "equalizeTimeout": {
+          "default": null,
+          "description": "Time in seconds to wait for pressure equalization after the profile completes if ventAfter is True. Does not wait if None.",
+          "title": "Equalizetimeout",
+          "type": "integer"
+        },
         "moduleId": {
           "description": "Unique ID of the vacuum module.",
           "title": "Moduleid",
@@ -6693,6 +6705,12 @@
           "default": null,
           "description": "The id of the profile task",
           "title": "Taskid"
+        },
+        "ventAfter": {
+          "default": false,
+          "description": "Whether to open the vent after the profile is complete.",
+          "title": "Ventafter",
+          "type": "boolean"
         }
       },
       "required": ["moduleId", "profile"],
@@ -6743,6 +6761,12 @@
           "title": "Duration",
           "type": "integer"
         },
+        "equalizeTimeout": {
+          "default": null,
+          "description": "Time in seconds to wait for pressure equalization after opening the vent. Does not wait if None.",
+          "title": "Equalizetimeout",
+          "type": "integer"
+        },
         "moduleId": {
           "description": "Unique ID of the vacuum module.",
           "title": "Moduleid",
@@ -6758,6 +6782,19 @@
           "description": "Target rate of power change in mbar/sec",
           "title": "Rate",
           "type": "number"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The id of the task",
+          "title": "Taskid"
         },
         "timeout": {
           "default": null,
@@ -6820,6 +6857,12 @@
           "title": "Duration",
           "type": "integer"
         },
+        "equalizeTimeout": {
+          "default": null,
+          "description": "Time in seconds to wait for pressure equalization after opening the vent. Does not wait if None.",
+          "title": "Equalizetimeout",
+          "type": "integer"
+        },
         "gaugePressure": {
           "description": "Target gauge pressure in mBar.",
           "title": "Gaugepressure",
@@ -6835,6 +6878,19 @@
           "description": "Target rate of pressure change in mbar/sec",
           "title": "Rate",
           "type": "number"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The id of the task",
+          "title": "Taskid"
         },
         "timeout": {
           "default": null,

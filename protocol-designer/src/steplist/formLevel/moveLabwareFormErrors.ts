@@ -1,7 +1,9 @@
 import {
+  getIsDeckSlotCompatible,
   getLabwareDefIsStandard,
   locationIsOffDeck,
 } from '@opentrons/shared-data'
+import { getIsVacuumSpacer } from '@opentrons/step-generation'
 
 import { getLabwareCompatibleWithModule } from '../../utils/labwareModuleCompatibility'
 
@@ -33,12 +35,35 @@ const getMoveLabwareError = (
     errorString = !getLabwareCompatibleWithModule(labware.def, moduleType)
       ? 'Labware incompatible with this module'
       : null
+  } else if ('slotName' in newLocation) {
+    errorString = !getIsDeckSlotCompatible(labware.def)
+      ? 'Labware cannot be loaded onto a deck slot'
+      : null
   } else if ('labwareId' in newLocation) {
-    const adapterLoadName =
-      invariantContext.labwareEntities[newLocation.labwareId].def.parameters
-        .loadName
+    const adapterDef =
+      invariantContext.labwareEntities[newLocation.labwareId].def
+    const adapterLoadName = adapterDef.parameters.loadName
+    const adapterProvidesStackingDefault =
+      adapterDef.parameters.quirks?.includes('providesStackingDefault') ?? false
+    const adapterIsVacuumSpacer = getIsVacuumSpacer(adapterDef)
+    const movingLabwareIsFilterPlate =
+      labware?.def.parameters.quirks?.includes('filterPlate') ?? false
+    const movingLabwareIsCollar =
+      labware?.def.parameters.quirks?.includes('vacuumModuleDock') ?? false
+    const adapterIsLid = adapterDef.allowedRoles?.includes('lid') ?? false
+    const adapterIsTiprack = adapterDef.parameters.isTiprack
+    const adapterIsFilterPlate =
+      adapterDef.parameters.quirks?.includes('filterPlate') ?? false
 
-    if (labware?.def.parameters.loadName === 'opentrons_tough_universal_lid') {
+    if (
+      (movingLabwareIsFilterPlate &&
+        !adapterIsLid &&
+        !adapterIsTiprack &&
+        !adapterIsFilterPlate) ||
+      (adapterIsVacuumSpacer && movingLabwareIsCollar) ||
+      (adapterProvidesStackingDefault && !adapterIsVacuumSpacer) ||
+      labware?.def.parameters.loadName === 'opentrons_tough_universal_lid'
+    ) {
       errorString = null
     } else if (
       labware?.def.compatibleParentLabware?.some(

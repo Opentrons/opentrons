@@ -10,7 +10,7 @@ on:
       - '!chore_release-pd*'
     tags:
       - ot3@*
-      - v*
+      - v[0-9]*.[0-9]*
   pull_request:
     types:
       - opened
@@ -21,7 +21,7 @@ jobs:
   handle-push:
     runs-on: 'ubuntu-latest'
     if: github.event_name == 'push'
-    name: "Start a Flex build for a branch/tag push"
+    name: 'Start a Flex build for a branch/tag push'
     steps:
       - name: 'start build'
         uses: octokit/request-action@02f5e7c637a73a3b12ed81015fa7fb5f11cc5d7d # v2.x
@@ -40,11 +40,10 @@ jobs:
               "infra-stage": "stage-prod"
             }
 
-
   handle-pr:
     runs-on: 'ubuntu-latest'
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'Opentrons/opentrons' && contains(github.event.pull_request.labels.*.name, 'ot3-build')
-    name: "Start a Flex build for a requested PR"
+    name: 'Start a Flex build for a requested PR'
     steps:
       - name: 'start build'
         uses: octokit/request-action@02f5e7c637a73a3b12ed81015fa7fb5f11cc5d7d # v2.x

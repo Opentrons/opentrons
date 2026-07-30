@@ -46,15 +46,13 @@ export const vacuumSetPumpPressure: CommandCreator<VacuumPumpPressureArgs> = (
       }
     : null
 
-  const taskPython = taskId == null ? '' : `${taskId} = `
-
   const gaugePressureArg = `gauge_pressure_mbar=${formatPyValue(gaugePressure)}`
   const holdArgsPython = isTimedHold
     ? getVacuumPumpHoldArgsPython(duration, ventAfter)
     : []
   const allArgsPython = [gaugePressureArg, ...holdArgsPython]
+  const taskPython = isTimedHold ? `${taskId} = ` : ''
   const python = `${taskPython}${module.pythonName}.start_set_vacuum_pressure(\n${indentPyLines(allArgsPython.join(',\n'))}\n)`
-
   return {
     commands: [
       {

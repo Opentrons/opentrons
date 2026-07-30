@@ -6,8 +6,8 @@ from typing import Any, Mapping, Optional
 
 from aiohttp import web
 
-from server_utils.auth.resource_server.authorization_checker import (
-    AuthorizationChecker,
+from server_utils.auth.resource_server.authentication_checker import (
+    AuthenticationChecker,
 )
 
 from otupdate.common import (
@@ -20,6 +20,7 @@ from otupdate.common import (
     update,
 )
 from otupdate.common.file_actions import load_version_file
+from otupdate.common.handler_type import Handler
 from otupdate.common.update_actions import FILE_ACTIONS_VARNAME
 from otupdate.openembedded.update_actions import (
     OT3UpdateActions,
@@ -34,7 +35,9 @@ LOG = logging.getLogger(__name__)
 
 
 @web.middleware
-async def log_error_middleware(request, handler):
+async def log_error_middleware(
+    request: web.Request, handler: Handler
+) -> web.StreamResponse:
     try:
         resp = await handler(request)
     except Exception:
@@ -45,7 +48,7 @@ async def log_error_middleware(request, handler):
 
 async def get_app(
     name_synchronizer: name_management.NameSynchronizer,
-    authorization_checker: AuthorizationChecker,
+    authentication_checker: AuthenticationChecker,
     system_version_file: Optional[str] = None,
     config_file_override: Optional[str] = None,
     name_override: Optional[str] = None,
@@ -72,7 +75,7 @@ async def get_app(
     app[FILE_ACTIONS_VARNAME] = updater
 
     name_management.install_name_synchronizer(name_synchronizer, app)
-    auth.install_authorization_checker(app, authorization_checker)
+    auth.install_authentication_checker(app, authentication_checker)
 
     app.router.add_routes(
         [
@@ -104,7 +107,7 @@ async def get_app(
                 f"Device name: {await name_synchronizer.get_name()}",
                 "Openembedded version:         "
                 f"{version.get('openembedded_version', 'unknown')}",
-                f"\t(from git sha      {version.get('buildroot_sha', 'unknown')}",
+                f"\t(from git sha      {version.get('openembedded_sha', 'unknown')}",
                 "API version:               "
                 f"{version.get('opentrons_api_version', 'unknown')}",
                 f"\t(from git sha      {version.get('opentrons_api_sha', 'unknown')}",

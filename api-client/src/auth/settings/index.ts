@@ -1,3 +1,5 @@
 export * from './getAccessControlEnabled'
 export * from './patchAccessControlEnabled'
+export * from './patchAuthSettings'
 export * from './types'
+export * from './getAuthSettings'

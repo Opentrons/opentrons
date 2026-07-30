@@ -18,7 +18,7 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 import {
   useGetModulesNeedingSetup,
   useGetModulesNeedingSetupThatCanCurrentlyBeSetUp,
-} from '/app/App/hooks'
+} from '/app/App/hooks/useGetModulesNeedingSetup'
 import { SmallButton } from '/app/atoms/buttons'
 import { i18n } from '/app/i18n'
 import { useModuleUSBPort } from '/app/local-resources/modules'
@@ -28,9 +28,8 @@ import {
   SimpleWizardBodyContainer,
 } from '/app/molecules/SimpleWizardBody'
 
-import { useSendIdentifyStacker } from './hooks'
-
 import type { AttachedModule } from '@opentrons/api-client'
+import type { SendIdentifyModule } from './types'
 
 interface SelectModuleProps {
   buildFlowForSelectedModule: (module: AttachedModule) => void
@@ -39,6 +38,7 @@ interface SelectModuleProps {
   setSelectedModule: (module: AttachedModule | null) => void
   setShowLaunchSetup: (show: boolean) => void
   attachedModuleOnLaunch?: AttachedModule | null
+  sendIdentifyModule: SendIdentifyModule
 }
 
 interface ModuleNameAndPort {
@@ -54,6 +54,7 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
     setSelectedModule,
     setShowLaunchSetup,
     attachedModuleOnLaunch = null,
+    sendIdentifyModule,
   } = props
   const { t } = useTranslation('module_wizard_flows')
 
@@ -75,7 +76,6 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
   const isSingleModule = newModules.length === 1 && !hasUnsetupabbleModules
   // Unless, of course, we're being invoked by a caller giving us a specific module
   const shortCircuitFlow = attachedModuleOnLaunch != null || isSingleModule
-  const sendIdentifyStacker = useSendIdentifyStacker()
 
   const getModuleNameAndPort = (module: AttachedModule): ModuleNameAndPort => {
     const name = getModuleDisplayName(module.moduleModel)
@@ -88,7 +88,7 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
     () => {
       if (shortCircuitFlow) {
         setSelectedModule(newModules[0])
-        sendIdentifyStacker(newModules[0], true)
+        sendIdentifyModule(newModules[0], true)
       }
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
@@ -100,12 +100,12 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
   const handleModuleSelected = (serialNumber: string): void => {
     // stop blinking previous module
     if (selectedModule != null) {
-      sendIdentifyStacker(selectedModule, false)
+      sendIdentifyModule(selectedModule, false)
     }
     // set module
     for (const mod of newModules) {
       if (mod.serialNumber === serialNumber) {
-        sendIdentifyStacker(mod, true)
+        sendIdentifyModule(mod, true)
         setSelectedModule(mod)
         break
       }

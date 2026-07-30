@@ -6,29 +6,34 @@ from typing import Callable
 
 from aiohttp import web
 
+from server_utils.auth.resource_server.authentication_checker import (
+    AuthenticationChecker,
+)
 from server_utils.auth.resource_server.authorization_checker import (
-    AuthorizationChecker,
+    check as check_authorization,
+)
+from server_utils.auth.resource_server.error_responses import build_response_for_error
+from server_utils.auth.resource_server.types import (
     AuthorizationNotRequiredResult,
     AuthorizedResult,
 )
-from server_utils.auth.resource_server.error_responses import build_response_for_error
 from server_utils.auth.scopes import Scope
 
 from .constants import APP_VARIABLE_PREFIX
 from .handler_type import Handler
 
-_AUTHORIZATION_CHECKER_APP_KEY = APP_VARIABLE_PREFIX + "authorization_checker"
+_AUTHENTICATION_CHECKER_APP_KEY = APP_VARIABLE_PREFIX + "authentication_checker"
 
 
-def install_authorization_checker(
-    app: web.Application, authorization_checker: AuthorizationChecker
+def install_authentication_checker(
+    app: web.Application, authentication_checker: AuthenticationChecker
 ) -> None:
-    """Configure how the server will check authorization, behind the scenes.
+    """Configure how the server will check authentication, behind the scenes.
 
-    The `AuthorizationChecker` defines how authorization will work. This function
+    The `AuthenticationChecker` defines how authentication will work. This function
     installs it on global app state, where it will be used by `require_scopes()`.
     """
-    app[_AUTHORIZATION_CHECKER_APP_KEY] = authorization_checker
+    app[_AUTHENTICATION_CHECKER_APP_KEY] = authentication_checker
 
 
 def require_scopes(*required_scopes: Scope) -> Callable[[Handler], Handler]:
@@ -48,22 +53,24 @@ def require_scopes(*required_scopes: Scope) -> Callable[[Handler], Handler]:
 
     def decorator(handler: Handler) -> Handler:
         @functools.wraps(handler)
-        async def wrapped(request: web.Request) -> web.Response:
-            authorization_checker = request.app[_AUTHORIZATION_CHECKER_APP_KEY]
-            assert isinstance(authorization_checker, AuthorizationChecker), (
-                "The app is missing its AuthorizationChecker. Forgot to initialize it during server startup?"
+        async def wrapped(request: web.Request) -> web.StreamResponse:
+            authentication_checker = request.app[_AUTHENTICATION_CHECKER_APP_KEY]
+            assert isinstance(authentication_checker, AuthenticationChecker), (
+                "The app is missing its AuthenticationChecker. Forgot to initialize it during server startup?"
             )
+
             token = _extract_bearer_token(request)
-            result = await authorization_checker.check(
-                token=token, required_scopes=required_scopes_set
-            )
-            if isinstance(result, (AuthorizationNotRequiredResult, AuthorizedResult)):
+            authentication = await authentication_checker.check(token)
+            authorization = check_authorization(authentication, required_scopes_set)
+            if isinstance(
+                authorization, (AuthorizationNotRequiredResult, AuthorizedResult)
+            ):
                 # The request is authorized.
                 return await handler(request)
             else:
                 # The request is not authorized.
                 status_code, headers, body = build_response_for_error(
-                    result, required_scopes_set
+                    authorization, required_scopes_set
                 )
                 return web.json_response(
                     status=status_code,

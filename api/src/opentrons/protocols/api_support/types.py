@@ -1,6 +1,14 @@
 from __future__ import annotations
 
-from typing import Callable, Literal, NamedTuple, Optional, Tuple, TypedDict
+from typing import (
+    Callable,
+    Literal,
+    NamedTuple,
+    Optional,
+    Tuple,
+    TypedDict,
+    Union,
+)
 
 
 class APIVersion(NamedTuple):
@@ -52,3 +60,25 @@ class ThermocyclerStep(ThermocyclerStepBase, total=False):
     hold_time_seconds: float
     hold_time_minutes: float
     ramp_rate: Optional[float]
+
+
+class VacuumModuleStepBase(TypedDict, total=False):
+    """Required elements of a vacuum module step."""
+
+    enable_pump: bool
+    hold_time_seconds: int | None
+    hold_time_minutes: int | None
+    ramp_rate: float | None
+    timeout_seconds: int | None
+    vent_after: bool | None
+
+
+class VacuumModulePowerStep(VacuumModuleStepBase):
+    percent_power: int | None
+
+
+class VacuumModulePressureStep(VacuumModuleStepBase):
+    gauge_pressure_mbar: int | None
+
+
+VacuumModuleStep = Union[VacuumModulePowerStep, VacuumModulePressureStep]

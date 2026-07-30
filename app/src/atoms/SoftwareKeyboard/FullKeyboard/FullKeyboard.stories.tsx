@@ -35,7 +35,7 @@ const store: Store<any> = legacy_createStore(
 const meta: Meta<typeof FullKeyboard> = {
   title: 'ODD/Atoms/SoftwareKeyboard/FullKeyboard',
   component: FullKeyboard,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   decorators: [
     Story => (
       <Provider store={store}>

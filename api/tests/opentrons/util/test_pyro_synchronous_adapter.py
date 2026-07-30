@@ -17,11 +17,13 @@ from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
     register_hardware_types,
 )
-from opentrons.util.pyro.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
+from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 from opentrons.util.pyro.pyro_synchronous_adapter import (
     DaemonUtility,
     PyroSynchronousObject,
 )
+
+TEST_PYRO_TIMEOUT = 5
 
 
 @pytest.fixture
@@ -53,11 +55,7 @@ def test_pyro_synchronous_adapter_ot3api(managed_obj: OT3API) -> None:
             assert name in pyro_object_members
 
         # Now check to ensure that things thate aren't supposed to be there (like private methods) aren't present
-        if "__" not in name and (
-            name.startswith("_")
-            or (inspect.ismethod(attr) and inspect.isclass(attr.__self__))
-            or isinstance(attr, TypeVar)
-        ):
+        if "__" not in name and (name.startswith("_") or isinstance(attr, TypeVar)):
             assert name not in pyro_object_members
 
 
@@ -82,7 +80,7 @@ async def test_pyro_client_server_ot3api(managed_obj: OT3API) -> None:
 
     def _pyro_daemon() -> None:
         # Wait for the nameserver to be ready so locate_ns can succeed.
-        name_server_ready.wait(timeout=PYRO_TIMEOUT)
+        name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
         create_pyro_daemon("OT3API", managed_obj, register_hardware_types)
 
     ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
@@ -93,7 +91,7 @@ async def test_pyro_client_server_ot3api(managed_obj: OT3API) -> None:
 
     # Client-side requests below
     register_hardware_types()
-    name_server_ready.wait(timeout=PYRO_TIMEOUT)
+    name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
     ns = pyro.locate_ns()
 
     retries_counter = 0

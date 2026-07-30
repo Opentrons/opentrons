@@ -6,7 +6,7 @@ name: 'G-Code Testing Lint & Test'
 on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   push:
-    paths:
+    paths: &paths
       - 'Makefile'
       - 'api/**'
       - 'g-code-testing/**'
@@ -19,14 +19,7 @@ on:
       - 'release'
       - '*hotfix*'
   pull_request:
-    paths:
-      - 'Makefile'
-      - 'g-code-testing/**'
-      - 'api/**'
-      - 'scripts/**.mk'
-      - 'scripts/**.py'
-      - '.github/workflows/g-code-testing-lint-test.yaml'
-      - '.github/actions/python/**'
+    paths: *paths
   workflow_dispatch:
 
 concurrency:
@@ -42,9 +35,7 @@ jobs:
     name: 'g-code-testing package linting and tests'
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: 'pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320' # v4.4.0
         with:
           version: 10.32.1
@@ -84,8 +75,3 @@ jobs:
         run: make -C g-code-testing lint
       - name: Test
         run: make -C g-code-testing test
-      - name: 'Upload coverage report'
-        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
-        with:
-          files: ./g-code-testing/coverage.xml
-          flags: g-code-testing

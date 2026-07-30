@@ -20,7 +20,7 @@ all: clean build
 
 .PHONY: clean
 clean:
-  pnpm shx rm -rf dist
+	pnpm shx rm -rf dist
 
 .PHONY: build
 build: export NODE_ENV := production
@@ -33,4 +33,4 @@ test:
 
 .PHONY: test-cov
 test-cov:
-	make -C .. test-js-react-api-client tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
+	$(MAKE) -C .. test-js-react-api-client tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"

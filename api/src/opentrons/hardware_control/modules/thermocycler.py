@@ -19,6 +19,7 @@ from opentrons.drivers.thermocycler import (
 from opentrons.drivers.types import PlateTemperature, Temperature, ThermocyclerLidStatus
 from opentrons.hardware_control.modules.lid_temp_status import LidTemperatureStatus
 from opentrons.hardware_control.modules.plate_temp_status import PlateTemperatureStatus
+from opentrons.hardware_control.modules.retry import retry_module_init
 from opentrons.hardware_control.modules.types import (
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
@@ -26,6 +27,7 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.util.pyro.pyro_synchronous_adapter import (
+    convert_result_to_proxy,
     pyro_behavior,
     remove_pyro_synchronous_object,
 )
@@ -98,13 +100,26 @@ class Thermocycler(mod_abc.AbstractModule):
         """
         driver: AbstractThermocyclerDriver
         if not simulating:
-            driver = await ThermocyclerDriverFactory.create(
-                port=port, loop=hw_control_loop
-            )
             poll_interval_seconds = poll_interval_seconds or POLLING_FREQUENCY_SEC
+
+            async def _init_driver() -> tuple[
+                AbstractThermocyclerDriver, Dict[str, str]
+            ]:
+                d = await ThermocyclerDriverFactory.create(
+                    port=port, loop=hw_control_loop
+                )
+                try:
+                    info = await d.get_device_info()
+                    return d, info
+                except BaseException:
+                    await d.disconnect()
+                    raise
+
+            driver, device_info = await retry_module_init(_init_driver, port=port)
         else:
             driver = SimulatingDriver(model=sim_model, serial_number=sim_serial_number)
             poll_interval_seconds = poll_interval_seconds or SIM_POLLING_FREQUENCY_SEC
+            device_info = await driver.get_device_info()
 
         reader = ThermocyclerReader(driver=driver)
         poller = Poller(reader=reader, interval=poll_interval_seconds)
@@ -114,7 +129,7 @@ class Thermocycler(mod_abc.AbstractModule):
             driver=driver,
             reader=reader,
             poller=poller,
-            device_info=await driver.get_device_info(),
+            device_info=device_info,
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
             disconnected_callback=disconnected_callback,
@@ -227,6 +242,7 @@ class Thermocycler(mod_abc.AbstractModule):
             # Real module that is not a V2
             return V1_MODULE_STRING
 
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def bootloader(self) -> types.UploadFunction:
         if self.model() == V2_MODULE_STRING:
             return update.upload_via_dfu

@@ -1,0 +1,80 @@
+{
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": []
+  },
+  "wells": {
+    "A1": {
+      "x": 63.88,
+      "y": 42.74,
+      "z": 4.85,
+      "depth": 66.83,
+      "shape": "rectangular",
+      "xDimension": 106.8,
+      "yDimension": 71.2,
+      "totalLiquidVolume": 500000
+    }
+  },
+  "groups": [
+    {
+      "wells": ["A1"],
+      "metadata": {}
+    }
+  ],
+  "version": 1,
+  "metadata": {
+    "tags": [],
+    "displayName": "Opentrons Vacuum Manifold Collar Tall",
+    "displayCategory": "adapter",
+    "displayVolumeUnits": "µL"
+  },
+  "ordering": [["A1"]],
+  "namespace": "opentrons",
+  "dimensions": {
+    "xDimension": 150.5,
+    "yDimension": 108.6,
+    "zDimension": 71.68
+  },
+  "parameters": {
+    "format": "96Standard",
+    "quirks": ["vacuumModuleDock", "providesStackingDefault"],
+    "isTiprack": false,
+    "isDeckSlotCompatible": false,
+    "isMagneticModuleCompatible": false,
+    "isMovableAdapter": true,
+    "loadName": "opentrons_vacuum_manifold_collar_tall"
+  },
+  "stackLimit": 1,
+  "allowedRoles": ["adapter"],
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "stackingOffsetWithLabware": {
+    "default": {
+      "x": 0,
+      "y": 0,
+      "z": 2
+    }
+  },
+  "stackingOffsetWithModule": {
+    "vacuumModuleV1": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "gripForce": 17,
+  "gripHeightFromLabwareBottom": 64.2,
+  "containedSpace": {
+    "shape": "rectangular",
+    "origin": { "x": 0, "y": 0, "z": 0 },
+    "dimensions": {
+      "xDimension": 134,
+      "yDimension": 92,
+      "zDimension": 60
+    }
+  }
+}

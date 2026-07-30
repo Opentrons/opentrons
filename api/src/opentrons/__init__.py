@@ -127,7 +127,6 @@ async def _create_thread_manager() -> ThreadManagedHardware:
 
         thread_manager = ThreadManager(
             ThreadManager.nonblocking_builder(OT3API.build_hardware_controller),
-            use_usb_bus=ff.rear_panel_integration(),
             status_bar_enabled=ff.status_bar_enabled(),
             feature_flags=hw_types.HardwareFeatureFlags.build_from_ff(),
         )
@@ -167,7 +166,6 @@ def identify_hardware_process() -> HardwareControlAPI:
     """
     robot_conf = robot_configs.load()
     logging_config.log_init(robot_conf.log_level)
-    pyro.config.COMMTIMEOUT = 100
     try:
         # Find the OT3API on the nameserver
         # todo(chb, 03-31-2026): for now this is using the same methodology as the DirectedRunProcess work, consolidate

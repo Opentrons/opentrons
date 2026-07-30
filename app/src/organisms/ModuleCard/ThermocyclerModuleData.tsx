@@ -16,8 +16,8 @@ import {
   MODULE_INFO_SUB_CONTAINER_STYLE,
 } from './constants'
 
+import type { ThermocyclerData } from '@opentrons/api-client'
 import type { ChipType } from '@opentrons/components'
-import type { ThermocyclerData } from '/app/redux/modules/api-types'
 
 interface ThermocyclerModuleProps {
   data: ThermocyclerData

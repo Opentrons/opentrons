@@ -50,6 +50,7 @@ from robot_server.data_files.data_files_store import (
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ApiError
 from robot_server.file_provider.provider import FileProviderExecutor
+from robot_server.hardware import HardwareStateStore
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import (
     ProtocolNotFoundError,
@@ -173,6 +174,7 @@ async def test_create_run(
             run_time_param_values=None,
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
+            access_control_status=False,
         )
     ).then_return(expected_response)
 
@@ -191,6 +193,7 @@ async def test_create_run(
         notify_publishers=mock_notify_publishers,
         protocol_store=mock_protocol_store,
         check_estop=True,
+        access_control_status=False,
     )
 
     assert result.content.data == expected_response
@@ -277,6 +280,7 @@ async def test_create_protocol_run(
             run_time_param_values={"foo": "bar"},
             run_time_param_paths={"my-csv-param": Path("/dev/null/file-id/abc.xyz")},
             notify_publishers=mock_notify_publishers,
+            access_control_status=False,
         )
     ).then_return(expected_response)
 
@@ -299,6 +303,7 @@ async def test_create_protocol_run(
         camera_provider=mock_camera_provider,
         notify_publishers=mock_notify_publishers,
         check_estop=True,
+        access_control_status=False,
     )
 
     assert result.content.data == expected_response
@@ -339,6 +344,7 @@ async def test_create_protocol_run_bad_protocol_id(
             run_auto_deleter=mock_run_auto_deleter,
             check_estop=True,
             notify_publishers=mock_notify_publishers,
+            access_control_status=False,
         )
 
     assert exc_info.value.status_code == 404
@@ -373,6 +379,7 @@ async def test_create_run_conflict(
             run_time_param_values=None,
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
+            access_control_status=False,
         )
     ).then_raise(RunConflictError("oh no"))
 
@@ -390,6 +397,7 @@ async def test_create_run_conflict(
             camera_provider=mock_camera_provider,
             notify_publishers=mock_notify_publishers,
             check_estop=True,
+            access_control_status=False,
         )
 
     assert exc_info.value.status_code == 409
@@ -615,7 +623,7 @@ async def test_update_run_to_not_current(
         hasEverEnteredErrorRecovery=False,
     )
 
-    decoy.when(await mock_run_data_manager.update("run-id", current=False)).then_return(
+    decoy.when(await mock_run_data_manager.uncurrent("run-id")).then_return(
         expected_response
     )
 
@@ -652,9 +660,7 @@ async def test_update_current_none_noop(
         hasEverEnteredErrorRecovery=False,
     )
 
-    decoy.when(await mock_run_data_manager.update("run-id", current=None)).then_return(
-        expected_response
-    )
+    decoy.when(mock_run_data_manager.get("run-id")).then_return(expected_response)
 
     result = await update_run(
         runId="run-id",
@@ -671,9 +677,9 @@ async def test_update_to_current_not_current(
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should 409 if attempting to update a not current run."""
-    decoy.when(
-        await mock_run_data_manager.update(run_id="run-id", current=False)
-    ).then_raise(RunNotCurrentError("oh no"))
+    decoy.when(await mock_run_data_manager.uncurrent(run_id="run-id")).then_raise(
+        RunNotCurrentError("oh no")
+    )
 
     with pytest.raises(ApiError) as exc_info:
         await update_run(
@@ -691,9 +697,9 @@ async def test_update_to_current_conflict(
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should 409 if attempting to un-current a run that is not idle."""
-    decoy.when(
-        await mock_run_data_manager.update(run_id="run-id", current=False)
-    ).then_raise(RunConflictError("oh no"))
+    decoy.when(await mock_run_data_manager.uncurrent(run_id="run-id")).then_raise(
+        RunConflictError("oh no")
+    )
 
     with pytest.raises(ApiError) as exc_info:
         await update_run(
@@ -711,9 +717,9 @@ async def test_update_to_current_missing(
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should 404 if attempting to update a missing run."""
-    decoy.when(
-        await mock_run_data_manager.update(run_id="run-id", current=False)
-    ).then_raise(RunNotFoundError(run_id="run-id"))
+    decoy.when(await mock_run_data_manager.uncurrent(run_id="run-id")).then_raise(
+        RunNotFoundError(run_id="run-id")
+    )
 
     with pytest.raises(ApiError) as exc_info:
         await update_run(
@@ -896,10 +902,12 @@ async def test_get_current_state_success(
         mock_run_data_manager.get_flex_stacker_substate(run_id=run_id)
     ).then_return(stacker_substates)
 
+    hardware_store = HardwareStateStore(hardware_resource=mock_hardware_api)
+
     result = await get_current_state(
         runId=run_id,
         run_data_manager=mock_run_data_manager,
-        hardware=mock_hardware_api,
+        hardware_store=hardware_store,
         robot_type=RobotTypeEnum.FLEX,
     )
 
@@ -949,11 +957,13 @@ async def test_get_current_state_run_not_current(
         RunNotCurrentError("Run is not current")
     )
 
+    hardware_store = HardwareStateStore(hardware_resource=mock_hardware_api)
+
     with pytest.raises(ApiError) as exc_info:
         await get_current_state(
             runId=run_id,
             run_data_manager=mock_run_data_manager,
-            hardware=mock_hardware_api,
+            hardware_store=hardware_store,
             robot_type=RobotTypeEnum.FLEX,
         )
 

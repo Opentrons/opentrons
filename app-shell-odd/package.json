@@ -29,7 +29,7 @@
     ]
   },
   "devDependencies": {
-    "@opentrons/app": "link:../app",
+    "@opentrons/app": "workspace:*",
     "@types/node-fetch": "2.6.11",
     "@types/yargs-parser": "^21.0.3",
     "is-ip": "5.0.1",
@@ -39,12 +39,12 @@
     "postcss-preset-env": "9.3.0"
   },
   "dependencies": {
-    "@opentrons/discovery-client": "link:../discovery-client",
-    "@opentrons/shared-data": "link:../shared-data",
+    "@opentrons/discovery-client": "workspace:*",
+    "@opentrons/shared-data": "workspace:*",
     "@sentry/electron": "7.5.0",
     "@types/dateformat": "^3.0.1",
     "@types/fs-extra": "9.0.13",
-    "@types/lodash": "4.17.24",
+    "@types/lodash": "catalog:",
     "@types/pump": "^1.1.0",
     "ajv": "6.12.3",
     "axios": "^0.21.1",
@@ -53,10 +53,10 @@
     "electron-store": "5.1.1",
     "electron-updater": "6.3.9",
     "execa": "4.0.0",
-    "form-data": "2.5.4",
+    "form-data": "2.5.6",
     "fs-extra": "10.0.0",
     "get-stream": "5.1.0",
-    "lodash": "4.18.1",
+    "lodash": "catalog:",
     "merge-options": "1.0.1",
     "mqtt": "4.3.8",
     "node-fetch": "2.6.7",

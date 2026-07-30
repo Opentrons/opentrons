@@ -6,12 +6,13 @@ import type { CameraData, CameraResponse } from './types'
 
 export function createCamera(
   config: HostConfig,
-  data: CameraData
+  data: CameraData,
+  userNotes: string
 ): ResponsePromise<CameraResponse> {
   return request<CameraResponse, { data: CameraData }>(
     POST,
     `/camera`,
-    { data },
-    config
+    config,
+    { body: { data }, userNotes }
   )
 }

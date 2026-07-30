@@ -14,6 +14,8 @@ import {
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
+  VACUUM_MODULE_TYPE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
@@ -25,7 +27,7 @@ import {
   getTopLocationInStack,
 } from '@opentrons/step-generation'
 
-import { OFFDECK } from '../../constants'
+import { OFFDECK, VACUUM_DOCK_DISPLAY_LOCATION } from '../../constants'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { getRobotType } from '../../file-data/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
@@ -292,6 +294,21 @@ export const getUnoccupiedLabwareLocationOptions: Selector<Option[] | null> =
           )
       )
 
+      const isVacuumModuleOnDeck = Object.values(modules).some(
+        ({ moduleState }) => moduleState.type === VACUUM_MODULE_TYPE
+      )
+      const isDockOpen = !Object.values(labware).some(({ stack }) =>
+        stack.includes(VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA)
+      )
+      const vacuumDockOption =
+        isVacuumModuleOnDeck && isDockOpen
+          ? {
+              name: 'Vacuum Module Dock A4',
+              value: VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
+              deckLabel: VACUUM_DOCK_DISPLAY_LOCATION,
+            }
+          : null
+
       const unoccupiedSlotOptions = allSlotIds.reduce<Option[]>(
         (acc, slotId) => {
           const isTrashSlot =
@@ -338,6 +355,7 @@ export const getUnoccupiedLabwareLocationOptions: Selector<Option[] | null> =
         ...unoccupiedAdapterOptions,
         ...unoccupiedModuleOptions,
         ...unoccupiedSlotOptions,
+        ...(vacuumDockOption != null ? [vacuumDockOption] : []),
         offDeck,
       ]
     }

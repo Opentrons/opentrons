@@ -12,6 +12,7 @@ from auth_server.users.user_data_manager import (
 )
 
 HASHED_PW = password_hash.hash("securepassword123")
+_NOW = datetime.datetime(2026, 1, 1, tzinfo=datetime.UTC)
 
 
 @pytest.fixture()
@@ -36,6 +37,7 @@ def test_add_and_get_user(user_store: UserStore) -> None:
         hashed_password=HASHED_PW,
         full_name="Add Test",
         account_type=AccountType.USER,
+        now=_NOW,
     )
     fetched = user_store.get("add_test_user")
     assert fetched is not None
@@ -52,6 +54,7 @@ def test_remove_and_get_user(user_store: UserStore) -> None:
         hashed_password=HASHED_PW,
         full_name="Remove Test",
         account_type=AccountType.USER,
+        now=_NOW,
     )
     user_store.remove("remove_test_user")
     assert user_store.get("remove_test_user") is None
@@ -70,8 +73,9 @@ def test_update_username(user_store: UserStore) -> None:
         hashed_password=HASHED_PW,
         full_name="Original",
         account_type="user",
+        now=_NOW,
     )
-    updated = user_store.update("orig_name", new_username="new_name")
+    updated = user_store.update("orig_name", new_username="new_name", now=_NOW)
     assert updated.username == "new_name"
     assert updated.full_name == "Original"
     assert updated.account_type == AccountType.USER
@@ -86,9 +90,34 @@ def test_update_preserves_password_when_none(user_store: UserStore) -> None:
         hashed_password=HASHED_PW,
         full_name="Keep Pwd",
         account_type=AccountType.USER,
+        now=_NOW,
     )
-    updated = user_store.update("keep_pwd", full_name="Updated Name")
+    updated = user_store.update("keep_pwd", full_name="Updated Name", now=_NOW)
     assert updated.hashed_password == added_user.hashed_password
+
+
+def test_update_password_sets_password_set_at(user_store: UserStore) -> None:
+    """update should refresh password_set_at when hashed_password changes."""
+    user_store.add(
+        username="username",
+        hashed_password=HASHED_PW,
+        full_name="Full Name",
+        account_type=AccountType.USER,
+        now=_NOW,
+    )
+    new_hash = password_hash.hash("anotherpassword456")
+    later = datetime.datetime(2026, 6, 1, tzinfo=datetime.UTC)
+    assert later != _NOW
+    updated = user_store.update(
+        "username",
+        hashed_password=new_hash,
+        now=later,
+    )
+    assert updated.password_set_at == later
+
+    fetched = user_store.get("username")
+    assert fetched is not None
+    assert fetched.password_set_at == later
 
 
 def test_update_persists(user_store: UserStore) -> None:
@@ -98,14 +127,15 @@ def test_update_persists(user_store: UserStore) -> None:
         hashed_password=HASHED_PW,
         full_name="Before",
         account_type=AccountType.USER,
+        now=_NOW,
     )
-    user_store.update("persist_test", full_name="After", reset_password=True)
+    user_store.update("persist_test", full_name="After", reset_password=True, now=_NOW)
     fetched = user_store.get("persist_test")
     assert fetched is not None
     assert fetched.full_name == "After"
     assert fetched.reset_password
 
-    user_store.update("persist_test", reset_password=False)
+    user_store.update("persist_test", reset_password=False, now=_NOW)
     fetched = user_store.get("persist_test")
     assert fetched is not None
     assert not fetched.reset_password
@@ -126,12 +156,14 @@ def test_failed_login_counter(user_store: UserStore) -> None:
         hashed_password=HASHED_PW,
         full_name="User A",
         account_type=AccountType.USER,
+        now=_NOW,
     )
     user_store.add(
         username="user_b",
         hashed_password=HASHED_PW,
         full_name="User B",
         account_type=AccountType.USER,
+        now=_NOW,
     )
     assert user_store.get_failed_login_count("user_a") == 0
     assert user_store.get_failed_login_count("user_b") == 0

@@ -7,6 +7,11 @@ from .close_vent import (
     CloseVentParams,
     CloseVentResult,
 )
+from .common import (
+    VacuumModuleCarboyFullError,
+    VacuumModuleError,
+    VacuumPressureNotReachedError,
+)
 from .open_vent import (
     OpenVent,
     OpenVentCommandType,
@@ -15,11 +20,16 @@ from .open_vent import (
     OpenVentResult,
 )
 from .start_run_profile import (
+    ProfileType,
     StartRunProfile,
     StartRunProfileCommandType,
     StartRunProfileCreate,
     StartRunProfileParams,
     StartRunProfileResult,
+    StartRunProfileStepParams,
+    VacuumModuleProfileCycle,
+    VacuumModuleProfilePowerStep,
+    VacuumModuleProfilePressureStep,
 )
 from .start_set_vacuum_power import (
     StartSetVacuumPower,
@@ -44,6 +54,10 @@ from .stop_vacuum import (
 )
 
 __all__ = [
+    # Vacuum module defined errors
+    "VacuumModuleCarboyFullError",
+    "VacuumModuleError",
+    "VacuumPressureNotReachedError",
     # Stop vacuum command models
     "StopVacuum",
     "StopVacuumCommandType",
@@ -80,4 +94,9 @@ __all__ = [
     "StartRunProfileCreate",
     "StartRunProfileParams",
     "StartRunProfileResult",
+    "VacuumModuleProfileCycle",
+    "VacuumModuleProfilePowerStep",
+    "VacuumModuleProfilePressureStep",
+    "ProfileType",
+    "StartRunProfileStepParams",
 ]

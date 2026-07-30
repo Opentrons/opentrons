@@ -8,9 +8,15 @@ import pytest
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.labware.labware_definition import (
+    ContainedSpace,
+    ContainmentShape,
+    Dimensions,
+    LabwareDefinition2,
     LabwareDefinition3,
+    Parameters2,
     Parameters3,
     RectangularWellDefinition3,
+    Vector3D,
 )
 
 from opentrons.protocol_engine import actions, commands, errors
@@ -19,7 +25,11 @@ from opentrons.protocol_engine.state.labware import (
     LabwareStore,
     LabwareView,
 )
-from opentrons.protocol_engine.types import DeckSlotLocation, LoadedLabware
+from opentrons.protocol_engine.types import (
+    OFF_DECK_LOCATION,
+    DeckSlotLocation,
+    LoadedLabware,
+)
 from opentrons.types import DeckSlotName
 
 
@@ -152,3 +162,201 @@ def test_raise_if_wells_are_invalid(ot3_standard_deck_def: DeckDefinitionV5) -> 
         )
     with pytest.raises(errors.WellDoesNotExistError):
         subject_view.raise_if_wells_are_invalid("labware-id", ["well-5"])
+
+
+def test_raise_if_labware_is_contained_ignores_off_deck_labware(
+    ot3_standard_deck_def: DeckDefinitionV5,
+) -> None:
+    """Unrelated labware staged off-deck should not block each other's moves."""
+    subject = LabwareStore(deck_definition=ot3_standard_deck_def, deck_fixed_labware=[])
+    subject_view = LabwareView(subject.state)
+
+    collar_definition = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        namespace="opentrons",
+        version=1,
+        schemaVersion=2,
+        parameters=Parameters2.model_construct(loadName="vacuum_collar"),  # type: ignore[call-arg]
+        containedSpace=ContainedSpace(
+            shape=ContainmentShape.rectangular,
+            origin=Vector3D(x=0, y=0, z=0),
+            dimensions=Dimensions(xDimension=127.76, yDimension=85.48, zDimension=45.0),
+        ),
+    )
+    plate_definition = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        namespace="opentrons",
+        version=5,
+        schemaVersion=2,
+        parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+            loadName="corning_96_wellplate_360ul_flat"
+        ),
+        dimensions=Dimensions(xDimension=127.76, yDimension=85.48, zDimension=14.22),
+    )
+
+    for labware_id, definition in (
+        ("collar-id", collar_definition),
+        ("plate-id", plate_definition),
+    ):
+        subject.handle_action(
+            actions.SucceedCommandAction(
+                state_update=update_types.StateUpdate(
+                    loaded_labware=update_types.LoadedLabwareUpdate(
+                        labware_id=labware_id,
+                        new_location=OFF_DECK_LOCATION,
+                        offset_id=None,
+                        display_name=None,
+                        definition=definition,
+                    )
+                ),
+                command=_dummy_command(),
+            )
+        )
+
+    assert subject_view.raise_if_labware_is_contained("plate-id") is True
+
+
+def test_get_is_column_labware(ot3_standard_deck_def: DeckDefinitionV5) -> None:
+    """It should return True if the labware is made up of multiple column wide wells, and False otherwise."""
+    subject = LabwareStore(deck_definition=ot3_standard_deck_def, deck_fixed_labware=[])
+    subject_view = LabwareView(subject.state)
+
+    def _load_labware(labware_id: str, definition: LabwareDefinition3) -> None:
+        load_labware_update = update_types.LoadedLabwareUpdate(
+            labware_id=labware_id,
+            new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A1),
+            offset_id=None,
+            display_name="Display Name",
+            definition=definition,
+        )
+        subject.handle_action(
+            actions.SucceedCommandAction(
+                state_update=update_types.StateUpdate(
+                    loaded_labware=load_labware_update
+                ),
+                command=_dummy_command(),
+            )
+        )
+
+    column_labware_def = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+        namespace="foo",
+        parameters=Parameters3.model_construct(loadName="load_name"),  # type: ignore[call-arg]
+        version=123,
+        wells={
+            "well-1": RectangularWellDefinition3.model_construct(),  # type: ignore[call-arg]
+            "well-2": RectangularWellDefinition3.model_construct(),  # type: ignore[call-arg]
+        },
+        ordering=[["123"], ["456"]],
+    )
+    _load_labware("column-id", column_labware_def)
+    assert subject_view.get_is_column_labware("column-id")
+
+    row_labware_def = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+        namespace="foo",
+        parameters=Parameters3.model_construct(loadName="load_name"),  # type: ignore[call-arg]
+        version=123,
+        wells={
+            "well-1": RectangularWellDefinition3.model_construct(),  # type: ignore[call-arg]
+            "well-2": RectangularWellDefinition3.model_construct(),  # type: ignore[call-arg]
+        },
+        ordering=[["123", "456"]],
+    )
+    _load_labware("row-id", row_labware_def)
+    assert not subject_view.get_is_column_labware("row-id")
+
+    reservoir_labware_def = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+        namespace="foo",
+        parameters=Parameters3.model_construct(loadName="load_name"),  # type: ignore[call-arg]
+        version=123,
+        wells={
+            "well-1": RectangularWellDefinition3.model_construct(),  # type: ignore[call-arg]
+        },
+        ordering=[["123"]],
+    )
+    _load_labware("reservoir-id", reservoir_labware_def)
+    assert not subject_view.get_is_column_labware("reservoir-id")
+
+    multi_well_labware_def = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+        namespace="foo",
+        parameters=Parameters3.model_construct(loadName="load_name"),  # type: ignore[call-arg]
+        version=123,
+        wells={
+            "well-1": RectangularWellDefinition3.model_construct(),  # type: ignore[call-arg]
+            "well-2": RectangularWellDefinition3.model_construct(),  # type: ignore[call-arg]
+        },
+        ordering=[["123", "456"], ["654", "321"]],
+    )
+    _load_labware("multi-well-id", multi_well_labware_def)
+    assert not subject_view.get_is_column_labware("multi-well-id")
+
+
+def test_get_is_row_labware(ot3_standard_deck_def: DeckDefinitionV5) -> None:
+    """It should return True if the labware is made up of multiple row wide wells, and False otherwise."""
+    subject = LabwareStore(deck_definition=ot3_standard_deck_def, deck_fixed_labware=[])
+    subject_view = LabwareView(subject.state)
+
+    def _load_labware(labware_id: str, definition: LabwareDefinition3) -> None:
+        load_labware_update = update_types.LoadedLabwareUpdate(
+            labware_id=labware_id,
+            new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A1),
+            offset_id=None,
+            display_name="Display Name",
+            definition=definition,
+        )
+        subject.handle_action(
+            actions.SucceedCommandAction(
+                state_update=update_types.StateUpdate(
+                    loaded_labware=load_labware_update
+                ),
+                command=_dummy_command(),
+            )
+        )
+
+    row_labware_def = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+        namespace="foo",
+        parameters=Parameters3.model_construct(loadName="load_name"),  # type: ignore[call-arg]
+        version=123,
+        wells={
+            "well-1": RectangularWellDefinition3.model_construct(),  # type: ignore[call-arg]
+            "well-2": RectangularWellDefinition3.model_construct(),  # type: ignore[call-arg]
+        },
+        ordering=[["123", "456"]],
+    )
+    _load_labware("row-id", row_labware_def)
+    assert subject_view.get_is_row_labware("row-id")
+
+    column_labware_def = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+        namespace="foo",
+        parameters=Parameters3.model_construct(loadName="load_name"),  # type: ignore[call-arg]
+        version=123,
+        wells={
+            "well-1": RectangularWellDefinition3.model_construct(),  # type: ignore[call-arg]
+            "well-2": RectangularWellDefinition3.model_construct(),  # type: ignore[call-arg]
+        },
+        ordering=[["123"], ["456"]],
+    )
+    _load_labware("column-id", column_labware_def)
+    assert not subject_view.get_is_row_labware("column-id")
+
+    reservoir_labware_def = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+        namespace="foo",
+        parameters=Parameters3.model_construct(loadName="load_name"),  # type: ignore[call-arg]
+        version=123,
+        wells={
+            "well-1": RectangularWellDefinition3.model_construct(),  # type: ignore[call-arg]
+        },
+        ordering=[["123"]],
+    )
+    _load_labware("reservoir-id", reservoir_labware_def)
+    assert not subject_view.get_is_row_labware("reservoir-id")
+
+    multi_well_labware_def = LabwareDefinition3.model_construct(  # type: ignore[call-arg]
+        namespace="foo",
+        parameters=Parameters3.model_construct(loadName="load_name"),  # type: ignore[call-arg]
+        version=123,
+        wells={
+            "well-1": RectangularWellDefinition3.model_construct(),  # type: ignore[call-arg]
+            "well-2": RectangularWellDefinition3.model_construct(),  # type: ignore[call-arg]
+        },
+        ordering=[["123", "456"], ["654", "321"]],
+    )
+    _load_labware("multi-well-id", multi_well_labware_def)
+    assert not subject_view.get_is_row_labware("multi-well-id")

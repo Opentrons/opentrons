@@ -6,6 +6,7 @@ import { createMaintenanceRun } from '@opentrons/api-client'
 
 import { useCreateMaintenanceRunMutation } from '..'
 import { mockMaintenanceRunResponse } from '../__fixtures__'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
@@ -38,9 +39,16 @@ describe('useCreateMaintenanceRunMutation hook', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(createMaintenanceRun).mockRejectedValue('oh no')
 
-    const { result } = renderHook(() => useCreateMaintenanceRunMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCreateMaintenanceRunMutation(
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+          ['lpc_flow']
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
 
@@ -61,9 +69,16 @@ describe('useCreateMaintenanceRunMutation hook', () => {
       data: mockMaintenanceRunResponse,
     } as Response<MaintenanceRun>)
 
-    const { result } = renderHook(() => useCreateMaintenanceRunMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCreateMaintenanceRunMutation(
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+          ['lpc_flow']
+        ),
+      {
+        wrapper,
+      }
+    )
     act(() => {
       result.current.createMaintenanceRun({ labwareOffsets: [mockOffset] })
     })

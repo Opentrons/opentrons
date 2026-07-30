@@ -1,11 +1,24 @@
 import { mockRobot } from '../../robot-api/__fixtures__'
 
-import type { RobotApiResponse } from '../../robot-api/types'
+import type { Method, RobotApiResponse } from '../../robot-api/types'
 
-export {
-  mockRestartSuccess,
-  mockRestartFailure,
-} from '../../robot-admin/__fixtures__'
+export const mockRestartSuccess = {
+  host: mockRobot,
+  method: 'POST' as Method,
+  path: '/server/restart',
+  ok: true,
+  status: 200,
+  body: { message: 'restarting in 1 second' },
+}
+
+export const mockRestartFailure = {
+  host: mockRobot,
+  method: 'POST' as Method,
+  path: '/server/restart',
+  ok: false,
+  status: 500,
+  body: { message: 'AH' },
+}
 
 // POST /server/update/begin
 

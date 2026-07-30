@@ -8,9 +8,9 @@ import { COLORS, Icon, truncateString } from '@opentrons/components'
 
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { getLocalRobot } from '/app/redux/discovery'
+import { useAccountIconInitial } from '/app/resources/access-control/useAccountIconInitial'
 import { useNetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
 
-import { useAccountIconInitial } from './hooks/useAccountIconInitial'
 import styles from './navigation.module.css'
 import { NavigationMenu } from './NavigationMenu'
 
@@ -38,9 +38,9 @@ export function Navigation(props: NavigationProps): JSX.Element {
   const { t } = useTranslation('top_navigation')
 
   const location = useLocation()
-  const accountIcon = useAccountIconInitial()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+  const accountIcon = useAccountIconInitial(robotName)
 
   const [showNavMenu, setShowNavMenu] = useState<boolean>(false)
 

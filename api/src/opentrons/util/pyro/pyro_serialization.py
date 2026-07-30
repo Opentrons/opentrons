@@ -3,14 +3,21 @@
 import builtins
 import enum
 import inspect
+import pickle
 from contextlib import contextmanager
+from dataclasses import is_dataclass
 from types import ModuleType
 from typing import Any, Callable, Iterator
 
+import numpy
 import serpent
 from pydantic import BaseModel
 from Pyro5 import api as pyro
 from typing_extensions import TypedDict, is_typeddict
+
+from opentrons_shared_data.errors.exceptions import EnumeratedError
+
+PYRO_PROXY = "PYRO_PROXY"
 
 
 class TypedDictWrapper(BaseModel):
@@ -55,6 +62,20 @@ def find_pydantic_classes_in_packages(
             if issubclass(obj, BaseModel) and obj is not BaseModel:
                 pydantic_classes.append(obj)
     return pydantic_classes
+
+
+def find_opentrons_classes_in_packages(modules: list[ModuleType]) -> list[type]:
+    """Returns a list of dataclasses and NamedTuples that contain `to_pyro_dict` and `from_pyro_dict` staticmethods in the given list of moduels."""
+    dataclasses = []
+    for module in modules:
+        for name, obj in inspect.getmembers(module, inspect.isclass):
+            if (
+                (is_dataclass(obj) or _is_namedtuple_instance(obj))
+                and hasattr(obj, "to_pyro_dict")
+                and hasattr(obj, "from_pyro_dict")
+            ):
+                dataclasses.append(obj)
+    return dataclasses
 
 
 def find_typed_dict_classes_in_packages(
@@ -102,6 +123,43 @@ def register_type_to_serpent(
     return class_path
 
 
+def enumerated_error_class_to_dict(obj: EnumeratedError) -> dict[str, Any]:
+    """Serializes enumerated errors to a bytes dictionary."""
+    return {
+        "__class__": "opentrons_shared_data.errors.exceptions.EnumeratedError",
+        "bytes": pickle.dumps(obj),
+    }
+
+
+def enumerated_error_dict_to_class(
+    class_name: str, d: dict[str, Any]
+) -> EnumeratedError:
+    """Deserializes errors via pickle."""
+    error = pickle.loads(d["bytes"])
+    if not isinstance(error, EnumeratedError):
+        raise ValueError(
+            f"Class '{class_name}' labeled as enumerated error is a {type(error)}"
+        )
+    return error
+
+
+def register_enumerated_errors() -> None:
+    """Registers serializer and deserializer for enumerated errors."""
+    register_type_to_serpent(
+        class_type=EnumeratedError,
+        dict_to_class=enumerated_error_dict_to_class,
+        class_to_dict=enumerated_error_class_to_dict,
+    )
+
+
+def _is_namedtuple_instance(cls: Any) -> bool:
+    """Validate if an object is a NamedTuple instance."""
+    try:
+        return issubclass(cls, tuple) and hasattr(cls, "_fields")
+    except TypeError:
+        return False
+
+
 class OpentronsPyroSerializer:
     """A pyro serializer for custom Opentrons classes."""
 
@@ -109,6 +167,7 @@ class OpentronsPyroSerializer:
     _enum_class_name_to_type: dict[str, type[enum.Enum]] = {}
     _typed_dict_class_name_to_type: dict[str, type[TypedDict]] = {}  # type: ignore
     _generic_error_class_name_to_error: dict[str, type[BaseException]] = {}
+    _dataclass_class_name_to_type: dict[str, type] = {}
 
     @classmethod
     def register_enum(cls, enum_type: type[enum.Enum]) -> None:
@@ -149,8 +208,27 @@ class OpentronsPyroSerializer:
 
     @classmethod
     def _pydantic_class_to_dict(cls, model: BaseModel) -> dict[str, Any]:
-        model_dict = model.model_dump(mode="json", by_alias=True)
-        model_dict["__class__"] = ".".join((model.__module__, model.__class__.__name__))
+        # Handle dictionaries of proxies
+        if (
+            isinstance(model, NonBuiltinKeyDictWrapper)
+            and model.value_type == PYRO_PROXY
+        ):
+            # A dictionary of proxies requires specialized serializaiton
+            model_dict = model.model_dump(mode="python", by_alias=True)
+            model_dict["dictionary"] = {
+                key if type(key).__module__ == "builtins" else key.value: value
+                for key, value in model_dict["dictionary"].items()
+            }
+            model_dict["__class__"] = ".".join(
+                (model.__module__, model.__class__.__name__)
+            )
+
+        # Handle standard pydantic models
+        else:
+            model_dict = model.model_dump(mode="json", by_alias=True)
+            model_dict["__class__"] = ".".join(
+                (model.__module__, model.__class__.__name__)
+            )
         return model_dict
 
     @classmethod
@@ -163,6 +241,28 @@ class OpentronsPyroSerializer:
                 f"Could not convert {class_name} to an object, unregistered with pyro."
             )
         return model.model_validate(d)
+
+    @classmethod
+    def register_class(cls, class_type: type) -> None:
+        """Registers a dataclass or NamedTuple type to be sent and received via pyro proxies."""
+        if is_dataclass(class_type) or _is_namedtuple_instance(class_type):
+            if hasattr(class_type, "to_pyro_dict") and hasattr(
+                class_type, "from_pyro_dict"
+            ):
+                class_name = register_type_to_serpent(
+                    class_type=class_type,
+                    dict_to_class=class_type.from_pyro_dict,
+                    class_to_dict=class_type.to_pyro_dict,
+                )
+                cls._dataclass_class_name_to_type[class_name] = class_type
+            else:
+                raise TypeError(
+                    f"Class {class_type} does not satisfy `to_pyro_dict` and `from_pyro_dict` attribute requirements."
+                )
+        else:
+            raise TypeError(
+                f"Type {class_type} is not a dataclass or NamedTuple and could not be registered."
+            )
 
     @classmethod
     def register_basic_error(cls, error_type: type[BaseException]) -> None:
@@ -216,19 +316,24 @@ class OpentronsPyroSerializer:
         """Registers the specialty handler for dicts with non builtin keys using NonBuiltinKeyDictWrapper."""
         class_name = register_type_to_serpent(
             NonBuiltinKeyDictWrapper,
-            cls._unhashable_dict_wrapper_dict_to_class,
+            cls._non_builtin_key_dict_wrapper_dict_to_class,
             cls._pydantic_class_to_dict,
         )
         cls._pydantic_class_name_to_model[class_name] = NonBuiltinKeyDictWrapper
 
     @classmethod
-    def _unhashable_dict_wrapper_dict_to_class(  # noqa: C901
+    def _non_builtin_key_dict_wrapper_dict_to_class(  # noqa: C901
         cls, classname: str, d: dict[str, Any]
     ) -> dict[Any, Any]:
         registries: list[dict[str, Any]] = [
             cls._pydantic_class_name_to_model,
             cls._enum_class_name_to_type,
             cls._typed_dict_class_name_to_type,
+            cls._dataclass_class_name_to_type,
+            # Sometimes the hardware API sends floats in the form of numpy float 64s. If they happen
+            # to be in a non-builtin dict wrapper, they won't get handled by the normal pyro serialization
+            # so we need to handle it here by adding it to the list of registries.
+            {"numpy.float64": numpy.float64},
         ]
         # Identify the types for the key and values, if available. Check for builtin types first.
         key_type = (
@@ -244,7 +349,10 @@ class OpentronsPyroSerializer:
         for registry in registries:
             if d["key_type"] in registry:
                 key_type = registry[d["key_type"]]
-            if d["value_type"] in registry:
+            if d["value_type"] in PYRO_PROXY:
+                # Specialized overload for dictionaries of proxies
+                value_type = pyro.Proxy
+            elif d["value_type"] in registry:
                 value_type = registry[d["value_type"]]
 
         if key_type is None or value_type is None:
@@ -269,6 +377,9 @@ class OpentronsPyroSerializer:
             if d["dictionary"][key] is None:
                 # Catching values that may have been `typing.Optional`
                 unwrapped_value = d["dictionary"][key]
+            elif issubclass(value_type, pyro.Proxy):
+                pyro_uri = d["dictionary"][key]["state"][0]
+                unwrapped_value = value_type(pyro_uri)
             elif issubclass(value_type, enum.Enum):
                 try:
                     unwrapped_value = value_type(int(d["dictionary"][key]))

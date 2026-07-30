@@ -114,13 +114,17 @@ export function Chip(props: ChipProps): JSX.Element {
       flexDirection={DIRECTION_ROW}
       height={FLEX_MAX_CONTENT}
       css={css`
-        background-color: ${background === false
-          ? COLORS.transparent
-          : chipProps.backgroundColor30};
+        background-color: ${
+          background === false
+            ? COLORS.transparent
+            : chipProps.backgroundColor30
+        };
 
-        ${chipSize === 'medium'
-          ? MEDIUM_CONTAINER_STYLE(background)
-          : SMALL_CONTAINER_STYLE(background)}
+        ${
+          chipSize === 'medium'
+            ? MEDIUM_CONTAINER_STYLE(background)
+            : SMALL_CONTAINER_STYLE(background)
+        }
 
         /* touchscreen */
         ${background !== false ? BACKGROUND_COLOR_STYLE(type) : ''}
@@ -183,9 +187,11 @@ const TEXT_STYLE = (chipSize: ChipSize): FlattenSimpleInterpolation => css`
   ${chipSize === 'medium' ? WEB_MEDIUM_TEXT_STYLE : WEB_SMALL_TEXT_STYLE}
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    ${chipSize === 'medium'
-      ? TYPOGRAPHY.bodyTextSemiBold
-      : TYPOGRAPHY.smallBodyTextSemiBold}
+    ${
+      chipSize === 'medium'
+        ? TYPOGRAPHY.bodyTextSemiBold
+        : TYPOGRAPHY.smallBodyTextSemiBold
+    }
   }
 `
 

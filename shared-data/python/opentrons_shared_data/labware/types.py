@@ -249,6 +249,7 @@ class LabwareDefinition2(TypedDict):
     # TypedDict-based bindings. The only code that cares about them
     # currentlyuses our Pydantic-based bindings instead.
     innerLabwareGeometry: NotRequired[dict[str, object] | None]
+    containedSpace: NotRequired[dict[str, object] | None]
 
 
 # Class to mix in the "$otSharedSchema" key. This cannot be defined with the normal

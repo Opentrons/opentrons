@@ -212,8 +212,7 @@ class ModuleDataValidator:
     def is_vacuum_module_data(
         cls, data: ModuleData | None
     ) -> TypeGuard[VacuumModuleData]:
-        # TODO(nd: 2026-02-12): Add appropriate data key check when VacuumModuleData is defined
-        return data is not None
+        return data is not None and "pumpEngaged" in data.keys()
 
 
 class LiveData(TypedDict):
@@ -353,6 +352,20 @@ class BundledFirmware(NamedTuple):
 
     def __repr__(self) -> str:
         return f"<BundledFirmware {self.version}, path={self.path}>"
+
+    @staticmethod
+    def to_pyro_dict(obj: "BundledFirmware") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "version": obj.version,
+            "path_str": str(obj.path),
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "BundledFirmware":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return BundledFirmware(version=data["version"], path=Path(data["path_str"]))
 
 
 class ModuleInfo(NamedTuple):
@@ -494,6 +507,11 @@ class VacuumModuleStatus(StrEnum):
     RUNNING = "running"  # General use- the pump is turned on
 
 
-class VacuumModuleOperationMode(StrEnum):
+class VacuumOperationMode(StrEnum):
     POWER = "power"
     PRESSURE = "pressure"
+
+
+class VentStatus(StrEnum):
+    CLOSED = "closed"
+    OPENED = "opened"

@@ -11,7 +11,6 @@ export function getSubsystemUpdate(
   return request<SubsystemUpdateProgressData>(
     GET,
     `/subsystems/updates/all/${updateId}`,
-    null,
     config
   )
 }

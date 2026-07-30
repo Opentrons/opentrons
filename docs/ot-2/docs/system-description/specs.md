@@ -72,7 +72,7 @@ description: "Dimensions, weight, deck slots, connectivity, and power specificat
     </tr>
     <tr>
         <td><strong>Connected PC requirements</strong></td>
-        <td><p>The Opentrons App runs on:</p>
+        <td><p>The Opentrons OT-2 App runs on:</p>
             <ul>
                 <li>Windows 10 or later</li>
                 <li>macOS 11 (Big Sur) or later</li>

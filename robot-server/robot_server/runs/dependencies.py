@@ -11,6 +11,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import DeckType
 from opentrons.protocol_engine.resources.file_provider import FileProvider
 from opentrons_shared_data.robot.types import RobotType
+from server_utils.auth.resource_server.fastapi import get_access_control_status
 from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,
@@ -39,6 +40,7 @@ from robot_server.errors.robot_errors import (
 )
 from robot_server.file_provider.fastapi_dependencies import get_file_provider
 from robot_server.hardware import (
+    HardwareStateStore,
     get_deck_type,
     get_hardware,
     get_robot_type,
@@ -52,7 +54,7 @@ from robot_server.service.pyro_utils.resource_utilities import (
     get_pyro_resource,
     register_run_orchestrator_store_to_pyro_resource,
 )
-from robot_server.service.task_runner import TaskRunner, get_task_runner
+from robot_server.service.task_runner import get_task_runner
 from robot_server.settings import get_settings
 
 _run_store_accessor = AppStateAccessor[RunStore]("run_store")
@@ -83,6 +85,7 @@ async def get_run_store(
 async def start_light_control_task(
     app_state: AppState,
     hardware_api: HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
 ) -> None:
     """Should be called once to start the light control task during server initialization.
 
@@ -94,7 +97,9 @@ async def start_light_control_task(
 
     if light_controller is None:
         light_controller = LightController(
-            api=hardware_api, run_orchestrator_store=None
+            api=hardware_api,
+            run_orchestrator_store=None,
+            hardware_state_store=hardware_state_store,
         )
         get_task_runner(app_state=app_state).run(
             run_light_task, driver=light_controller
@@ -107,6 +112,7 @@ async def start_light_control_task(
 async def mark_light_control_startup_finished(
     app_state: AppState,
     hardware_api: HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
 ) -> None:
     """Should be called once the hardware initialization finishes.
 
@@ -135,12 +141,13 @@ async def get_light_controller(
 @contextlib.asynccontextmanager
 async def set_up_run_process_pyro_provider(
     app_state: Annotated[AppState, Depends(get_app_state)],
+    access_control_status: Annotated[bool, Depends(get_access_control_status)],
 ) -> AsyncGenerator[None, None]:
     """Set up the server's singleton `RunProcessPyroProvider`."""
     run_process_pyro_provider = RunProcessPyroProvider()
     _run_process_pyro_provider_accessor.set_on(app_state, run_process_pyro_provider)
     # TODO(2026-04-21) We might want to wrap this into a try/except if this causes local issues
-    run_process_pyro_provider.initialize()
+    run_process_pyro_provider.initialize(access_control_mode=access_control_status)
 
     try:
         yield
@@ -170,6 +177,7 @@ async def get_run_orchestrator_store(
     run_process_pyro_provider: Annotated[
         RunProcessPyroProvider, Depends(get_run_process_pyro_provider)
     ],
+    access_control_status: Annotated[bool, Depends(get_access_control_status)],
 ) -> RunOrchestratorStore:
     """Get a singleton EngineStore to keep track of created engines / runners."""
     run_orchestrator_store = _run_orchestrator_store_accessor.get_from(app_state)
@@ -180,6 +188,7 @@ async def get_run_orchestrator_store(
             robot_type=robot_type,
             deck_type=deck_type,
             run_process_pyro_provider=run_process_pyro_provider,
+            access_control_status=access_control_status,
         )
         _run_orchestrator_store_accessor.set_on(app_state, run_orchestrator_store)
         # Handle remote hardware registry, if needed
@@ -215,7 +224,6 @@ async def get_is_okay_to_create_maintenance_run(
 
 async def get_run_data_manager(
     app_state: Annotated[AppState, Depends(get_app_state)],
-    task_runner: Annotated[TaskRunner, Depends(get_task_runner)],
     run_orchestrator_store: Annotated[
         RunOrchestratorStore, Depends(get_run_orchestrator_store)
     ],
@@ -238,7 +246,6 @@ async def get_run_data_manager(
             run_store=run_store,
             error_recovery_setting_store=error_recovery_setting_store,
             camera_setting_store=camera_setting_store,
-            task_runner=task_runner,
             runs_publisher=runs_publisher,
             file_provider=file_provider,
         )

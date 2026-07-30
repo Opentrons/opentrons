@@ -3,11 +3,13 @@ import { useQueryClient } from 'react-query'
 import { useSelector } from 'react-redux'
 
 import {
+  getQueryKey,
   useCreateProtocolMutation,
   useCreateRunMutation,
   useHost,
 } from '@opentrons/react-api-client'
 
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { getValidCustomLabwareFiles } from '/app/redux/custom-labware/selectors'
 
 import type { UseMutateFunction } from 'react-query'
@@ -48,19 +50,33 @@ export function useCreateRunFromProtocol(
     getValidCustomLabwareFiles(state)
   )
 
+  const { documentationState, clearDocreport } = useLinkedDocumentationState(
+    ['create_protocol', 'play_run'],
+    host?.robotName ?? null,
+    host?.robotName,
+    host
+  )
+
   const {
     createRun,
     isLoading: isCreatingRun,
     reset: resetRunMutation,
     error: runError,
   } = useCreateRunMutation(
+    documentationState,
     {
       ...options,
       onSuccess: (...args) => {
-        queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
-          console.error(`error invalidating runs query: ${e.message}`)
-        })
+        queryClient
+          .invalidateQueries(getQueryKey(host, 'runs'))
+          .catch((e: Error) => {
+            console.error(`error invalidating runs query: ${e.message}`)
+          })
         options.onSuccess?.(...args)
+      },
+      onError: (error, variables, context) => {
+        clearDocreport()
+        options.onError?.(error, variables, context)
       },
     },
     host
@@ -71,6 +87,7 @@ export function useCreateRunFromProtocol(
     error: protocolError,
     reset: resetProtocolMutation,
   } = useCreateProtocolMutation(
+    documentationState,
     {
       onSuccess: (data, { runTimeParameterValues, runTimeParameterFiles }) => {
         createRun({
@@ -79,6 +96,9 @@ export function useCreateRunFromProtocol(
           runTimeParameterValues,
           runTimeParameterFiles,
         })
+      },
+      onError: () => {
+        clearDocreport()
       },
     },
     host
@@ -108,6 +128,7 @@ export function useCreateRunFromProtocol(
       },
       ...args
     ) => {
+      clearDocreport()
       resetRunMutation()
       createProtocolRun(
         {
@@ -123,6 +144,7 @@ export function useCreateRunFromProtocol(
     runCreationError: error,
     runCreationErrorCode: errorCode,
     reset: () => {
+      clearDocreport()
       resetProtocolMutation()
       resetRunMutation()
     },

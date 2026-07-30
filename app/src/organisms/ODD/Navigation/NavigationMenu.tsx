@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -17,15 +16,16 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { useHomeGantry } from '/app/local-resources/instruments'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsFlex } from '/app/redux-resources/robots'
-import { home, ROBOT } from '/app/redux/robot-controls'
 import { useLights } from '/app/resources/devices'
 
 import { RestartRobotConfirmationModal } from './RestartRobotConfirmationModal'
 import { ShutdownRobotConfirmationModal } from './ShutdownRobotConfirmationModal'
 
 import type { MouseEventHandler } from 'react'
-import type { Dispatch } from '/app/redux/types'
 
 interface NavigationMenuProps {
   onClick: MouseEventHandler
@@ -37,7 +37,18 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
   const { onClick, robotName, setShowNavMenu } = props
   const { t, i18n } = useTranslation(['devices_landing', 'robot_controls'])
   const { lightsOn, toggleLights } = useLights()
-  const dispatch = useDispatch<Dispatch>()
+  const { makeSnackbar } = useToaster()
+  const { homeGantry, isHoming } = useHomeGantry({
+    onError: error => {
+      if (isMaintenanceDoorOpenError(error)) {
+        makeSnackbar(t('close_door_to_home') as string)
+      }
+      setShowNavMenu(false)
+    },
+    onSuccess: () => {
+      setShowNavMenu(false)
+    },
+  })
   const [
     showRestartRobotConfirmationModal,
     setShowRestartRobotConfirmationModal,
@@ -59,8 +70,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
   }
 
   const handleHomeGantry = (): void => {
-    dispatch(home(robotName, ROBOT))
-    setShowNavMenu(false)
+    void homeGantry()
   }
 
   return createPortal(
@@ -82,13 +92,21 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
         />
       ) : null}
       <MenuList onClick={onClick} isOnDevice={true}>
-        <MenuItem key="reset-position" onClick={handleHomeGantry}>
+        <MenuItem
+          key="reset-position"
+          onClick={handleHomeGantry}
+          disabled={isHoming}
+        >
           <Flex alignItems={ALIGN_CENTER}>
-            <Icon
-              name="reset-position"
-              aria-label="reset-position_icon"
-              size="2.5rem"
-            />
+            {isHoming ? (
+              <Icon name="ot-spinner" aria-label="spinner" size="2.5rem" spin />
+            ) : (
+              <Icon
+                name="reset-position"
+                aria-label="reset-position_icon"
+                size="2.5rem"
+              />
+            )}
             <LegacyStyledText
               forwardedAs="h4"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}

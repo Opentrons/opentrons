@@ -10,7 +10,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import * as PipetteConstants from '/app/redux/pipettes/constants'
+import { PIPETTE_MOUNTS } from '/app/resources/instruments/constants'
 import { useRunPipetteInfoByMount } from '/app/resources/runs'
 
 import { SetupCalibrationItem } from './SetupCalibrationItem'
@@ -30,14 +30,10 @@ export function SetupTipLengthCalibration({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-      <LegacyStyledText
-        color={COLORS.black90}
-        css={TYPOGRAPHY.pSemiBold}
-        id="TipRackCalibration_requiredTipLengthTitle"
-      >
+      <LegacyStyledText color={COLORS.black90} css={TYPOGRAPHY.pSemiBold}>
         {t('required_tip_racks_title')}
       </LegacyStyledText>
-      {PipetteConstants.PIPETTE_MOUNTS.map(mount => {
+      {PIPETTE_MOUNTS.map(mount => {
         const pipetteInfo = runPipetteInfoByMount[mount]
         if (pipetteInfo == null) {
           return null

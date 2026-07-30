@@ -1,9 +1,15 @@
 """Tests for Protocol API Vacuum Module contexts."""
 
+from typing import List
+
 import pytest
 from decoy import Decoy
 
 from . import versions_at_or_above
+from opentrons.drivers.vacuum_module.driver import (
+    MAX_GAUGE_PRESSURE_MBAR,
+    MIN_GAUGE_PRESSURE_MBAR,
+)
 from opentrons.hardware_control.modules.types import VacuumModuleModel
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import Labware, VacuumModuleContext
@@ -13,7 +19,12 @@ from opentrons.protocol_api.core.common import (
     VacuumModuleCore,
 )
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.types import (
+    APIVersion,
+    VacuumModulePowerStep,
+    VacuumModulePressureStep,
+    VacuumModuleStep,
+)
 from opentrons.types import DeckSlotName, ModuleFixtureLocation
 
 
@@ -245,6 +256,7 @@ def test_vacuum_module_start_set_vacuum_pressure(
             ramp_rate=ramp_rate,
             timeout_s=timeout_s,
             vent_after=vent_after,
+            equalize_timeout_s=None,
         )
     )
 
@@ -279,6 +291,7 @@ def test_vacuum_module_start_set_vacuum_power(
             ramp_rate=ramp_rate,
             timeout_s=timeout_s,
             vent_after=vent_after,
+            equalize_timeout_s=None,
         )
     )
 
@@ -295,3 +308,102 @@ def test_vacuum_module_stop_vacuum(
     subject.stop_vacuum_pump()
 
     decoy.verify(mock_core.stop_vacuum())
+
+
+@pytest.mark.parametrize(
+    "api_version", versions_at_or_above(from_version=APIVersion(2, 30))
+)
+def test_vacuum_module_start_execute_profile(
+    decoy: Decoy,
+    subject: VacuumModuleContext,
+    mock_core: VacuumModuleCore,
+) -> None:
+    """Ensure that the module_core function is called with the same steps and minutes are converted to seconds."""
+    profile_steps: List[VacuumModuleStep] = [
+        VacuumModulePressureStep(
+            enable_pump=True,
+            hold_time_seconds=23,
+            hold_time_minutes=2,
+            ramp_rate=2.2,
+            timeout_seconds=200,
+            vent_after=True,
+            gauge_pressure_mbar=-99,
+        ),
+        VacuumModulePowerStep(
+            enable_pump=True,
+            hold_time_seconds=23,
+            ramp_rate=20.9,
+            timeout_seconds=300,
+            percent_power=40,
+        ),
+        VacuumModulePressureStep(
+            enable_pump=False,
+            hold_time_seconds=24,
+            hold_time_minutes=5,
+            ramp_rate=2.2,
+            timeout_seconds=200,
+            vent_after=True,
+            gauge_pressure_mbar=None,
+        ),
+        VacuumModulePowerStep(
+            enable_pump=True,
+            hold_time_minutes=2,
+            ramp_rate=100,
+            timeout_seconds=18,
+            vent_after=False,
+            percent_power=50,
+        ),
+    ]
+
+    expected_core_steps: List[VacuumModuleStep] = [
+        VacuumModulePressureStep(
+            enable_pump=True,
+            hold_time_seconds=143,
+            ramp_rate=2.2,
+            timeout_seconds=200,
+            vent_after=True,
+            gauge_pressure_mbar=-99,
+        ),
+        VacuumModulePowerStep(
+            enable_pump=True,
+            hold_time_seconds=23,
+            ramp_rate=20.9,
+            timeout_seconds=300,
+            vent_after=None,
+            percent_power=40,
+        ),
+        VacuumModulePressureStep(
+            enable_pump=False,
+            hold_time_seconds=324,
+            ramp_rate=2.2,
+            timeout_seconds=200,
+            vent_after=True,
+            gauge_pressure_mbar=None,
+        ),
+        VacuumModulePowerStep(
+            enable_pump=True,
+            hold_time_seconds=120,
+            ramp_rate=100,
+            timeout_seconds=18,
+            vent_after=False,
+            percent_power=50,
+        ),
+    ]
+    repetitions = 2
+    decoy.when(mock_core.get_max_gauge_pressure_mbar()).then_return(
+        MAX_GAUGE_PRESSURE_MBAR
+    )
+    decoy.when(mock_core.get_min_gauge_pressure_mbar()).then_return(
+        MIN_GAUGE_PRESSURE_MBAR
+    )
+
+    subject.start_execute_profile(steps=profile_steps, repetitions=repetitions)
+
+    decoy.verify(
+        mock_core.start_execute_profile(
+            steps=expected_core_steps,
+            repetitions=repetitions,
+            vent_after=False,
+            equalize_timeout_s=None,
+        )
+    )

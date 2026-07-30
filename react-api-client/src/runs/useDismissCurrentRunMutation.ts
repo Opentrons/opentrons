@@ -1,8 +1,9 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { dismissCurrentRun } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { useDocumentedMutation } from '../accessControl'
+import { getQueryKey, useHost } from '../api'
 
 import type {
   UseMutateFunction,
@@ -10,6 +11,8 @@ import type {
   UseMutationResult,
 } from 'react-query'
 import type { EmptyResponse } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
+import type { DocumentedMutationParameters } from '../accessControl/types'
 
 export type UseDismissCurrentRunMutationResult = UseMutationResult<
   EmptyResponse,
@@ -26,18 +29,23 @@ export type UseDismissCurrentRunMutationOptions = UseMutationOptions<
 >
 
 export function useDismissCurrentRunMutation(
+  documentationState: DocumentationState,
   options: UseDismissCurrentRunMutationOptions = {}
 ): UseDismissCurrentRunMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<EmptyResponse, unknown, string>(
-    (runId: string) =>
-      dismissCurrentRun(host!, runId).then(response => {
-        queryClient.removeQueries([host, 'runs', runId])
-        queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
-          console.error(`error invalidating runs query: ${e.message}`)
-        })
+  const mutation = useDocumentedMutation<EmptyResponse, unknown, string>(
+    documentationState,
+    ['dismiss_run'],
+    ({ userNotes, variables: runId }: DocumentedMutationParameters<string>) =>
+      dismissCurrentRun(host!, runId, userNotes).then(response => {
+        queryClient.removeQueries(getQueryKey(host, 'runs', runId))
+        queryClient
+          .invalidateQueries(getQueryKey(host, 'runs'))
+          .catch((e: Error) => {
+            console.error(`error invalidating runs query: ${e.message}`)
+          })
         return response.data
       }),
     options

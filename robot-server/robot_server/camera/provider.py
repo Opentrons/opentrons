@@ -47,3 +47,17 @@ class CameraProviderWrapper:
     ) -> bytes | CameraError:
         """Process and image capture request for a Camera utilizing a given set of parameters. Returns None if an error occurred."""
         return await camera.image_capture(robot_type=robot_type, parameters=parameters)
+
+    async def update_live_stream_status(
+        self,
+        robot_type: RobotType,
+        stream_status: bool,
+        enablement_settings: CameraSettings | None = None,
+    ) -> None:
+        """Update the Opentrons Live Stream status to toggle the live stream or adjust camera settings."""
+        await camera.update_live_stream_status(
+            robot_type=robot_type,
+            stream_status=stream_status,
+            camera_settings=self.get_camera_settings(),
+            override_settings=enablement_settings,
+        )

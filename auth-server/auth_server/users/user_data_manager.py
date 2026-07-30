@@ -1,16 +1,70 @@
 """User data manager – business logic between the router and the store."""
 
+import datetime
+import secrets
+import string
 from typing import Literal
 
 from pwdlib import PasswordHash
 
+from server_utils.auth.scopes import Scope
+
 from auth_server.persistence.orm_models import User
+from auth_server.settings.models import SettingsResponseData
 from auth_server.settings.store import SettingsStore
 from auth_server.users.is_account_locked import is_account_locked
-from auth_server.users.models import ACCOUNT_TYPE_TO_SCOPES, AccountType, UserResponse
+from auth_server.users.models import (
+    ACCOUNT_TYPE_TO_SCOPES,
+    RESET_PASSWORD_SCOPES,
+    AccountType,
+    ResetPasswordResponse,
+    UserResponse,
+)
 from auth_server.users.store import UserStore
 
 password_hash = PasswordHash.recommended()
+
+_DEFAULT_MIN_PASSWORD_LENGTH = 8
+_ALPHANUMERIC = string.ascii_letters + string.digits
+_PASSWORD_SPECIAL_CHARACTERS = string.punctuation
+
+
+def _generate_temporary_password(
+    min_length: int, require_special_characters: bool
+) -> str:
+    """Generate a random password that satisfies the given complexity rules."""
+    if not require_special_characters:
+        return "".join(secrets.choice(_ALPHANUMERIC) for _ in range(min_length))
+
+    return "".join(
+        secrets.choice(_ALPHANUMERIC + _PASSWORD_SPECIAL_CHARACTERS)
+        for _ in range(min_length)
+    )
+
+
+def _password_complexity_requirements(
+    settings: SettingsResponseData,
+) -> tuple[int, bool]:
+    """Return (min_length, require_special_characters) from auth settings."""
+    min_length = (
+        settings.passwordComplexityMinimumLength or _DEFAULT_MIN_PASSWORD_LENGTH
+    )
+    require_special = settings.passwordComplexitySpecialCharacters is True
+    return min_length, require_special
+
+
+def _validate_password_complexity(
+    password: str, settings: SettingsResponseData
+) -> None:
+    """Validate that a user-chosen password meets configured complexity rules."""
+    min_length, require_special = _password_complexity_requirements(settings)
+    actual_length = len(password)
+    if actual_length < min_length:
+        raise PasswordTooShortError(
+            actual_length=actual_length, required_length=min_length
+        )
+    if require_special and not any(c in _PASSWORD_SPECIAL_CHARACTERS for c in password):
+        raise PasswordMissingSpecialCharactersError()
 
 
 class UserNotFoundError(ValueError):
@@ -25,15 +79,30 @@ class InvalidInputError(ValueError):
     """Raised when user input fails validation."""
 
 
-def _validate_fields(
-    user_name: str | None = None,
+class PasswordTooShortError(InvalidInputError):
+    """Raised when a password does not meet the configured length requirements."""
+
+    def __init__(self, *, actual_length: int, required_length: int) -> None:
+        super().__init__(
+            f"Required password length of {required_length} but got {actual_length}."
+        )
+        self.actual_length = actual_length
+        self.required_length = required_length
+
+
+class PasswordMissingSpecialCharactersError(InvalidInputError):
+    """Raised when a password does not meet the configured requirements on special chars."""
+
+
+def _validate_fields_non_empty(
+    username: str | None = None,
     password: str | None = None,
     full_name: str | None = None,
     account_type: str | None = None,
 ) -> None:
-    """Validate that provided fields are non-empty and passwords meet length requirements."""
+    """Validate that provided fields are non-empty."""
     for field_name, value in [
-        ("userName", user_name),
+        ("username", username),
         ("password", password),
         ("fullName", full_name),
         ("accountType", account_type),
@@ -41,8 +110,30 @@ def _validate_fields(
         if value is not None and value == "":
             raise InvalidInputError(f"{field_name} must not be empty")
 
-    if password is not None and len(password) < 8:
-        raise InvalidInputError("Password must be at least 8 characters long")
+
+def must_reset_password(
+    user: User, now: datetime.datetime, password_reset_time_sec: float | None
+) -> bool:
+    """Return whether the user must reset their password before full robot access."""
+    password_is_expired = (
+        password_reset_time_sec is not None
+        and now
+        > user.password_set_at + datetime.timedelta(seconds=password_reset_time_sec)
+    )
+    return password_is_expired or user.reset_password
+
+
+def get_scope_set_of_user(
+    user: User, now: datetime.datetime, password_reset_time_sec: float | None
+) -> set[Scope]:
+    """Return the scopes that a user is authorized for.
+
+    A user who must reset their password is restricted to reading and writing their
+    own account, so they can change their password but nothing else until they do.
+    """
+    if must_reset_password(user, now, password_reset_time_sec):
+        return set(RESET_PASSWORD_SCOPES)
+    return set(ACCOUNT_TYPE_TO_SCOPES[AccountType(user.account_type)])
 
 
 class UserDataManager:
@@ -53,38 +144,40 @@ class UserDataManager:
         self._settings_store = settings_store
 
     def _to_response(self, user: User) -> UserResponse:
+        settings = self._settings_store.get_settings()
         is_currently_locked, _ = is_account_locked(
             failed_login_count=self._user_store.get_failed_login_count(user.username),
-            max_attempts=self._settings_store.get_settings().maxNumberOfLoginAttempts,
+            max_attempts=settings.maxNumberOfLoginAttempts,
         )
 
         account_type = AccountType(user.account_type)
+        now = datetime.datetime.now(tz=datetime.UTC)
 
         return UserResponse(
-            userName=user.username,
+            username=user.username,
             fullName=user.full_name,
             accountType=account_type,
-            scopes=sorted(
-                scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[account_type]
-            ),
             locked=is_currently_locked,
-            resetPassword=user.reset_password,
+            resetPassword=must_reset_password(user, now, settings.passwordResetTime),
         )
 
     def seed_initial_users(self) -> None:
         """Insert default placeholder users if they don't already exist."""
+        now = datetime.datetime.now(tz=datetime.UTC)
         defaults = [
             User(
                 username="testadmin",
                 hashed_password=password_hash.hash("testadminpassword"),
                 full_name="Test Admin",
                 account_type=AccountType.ADMIN,
+                password_set_at=now,
             ),
             User(
                 username="testuser",
                 hashed_password=password_hash.hash("testuserpassword"),
                 full_name="Test User",
                 account_type=AccountType.USER,
+                password_set_at=now,
             ),
         ]
         self._user_store.seed(defaults)
@@ -95,14 +188,16 @@ class UserDataManager:
         password: str,
         full_name: str,
         account_type: str,
+        now: datetime.datetime,
     ) -> UserResponse:
         """Validate inputs, check for duplicates, and create a new user."""
-        _validate_fields(
-            user_name=username,
+        _validate_fields_non_empty(
+            username=username,
             password=password,
             full_name=full_name,
             account_type=account_type,
         )
+        _validate_password_complexity(password, self._settings_store.get_settings())
         if self._user_store.get(username) is not None:
             raise UserAlreadyExistsError(f"User {username!r} already exists")
         new_user = self._user_store.add(
@@ -110,6 +205,7 @@ class UserDataManager:
             hashed_password=password_hash.hash(password),
             full_name=full_name,
             account_type=account_type,
+            now=now,
         )
         return self._to_response(new_user)
 
@@ -136,14 +232,20 @@ class UserDataManager:
         new_account_type: str | None = None,
         new_locked: Literal[False] | None = None,
         reset_password: bool = False,
+        *,
+        now: datetime.datetime,
     ) -> UserResponse:
         """Validate inputs, then update a user or raise UserNotFoundError."""
-        _validate_fields(
-            user_name=new_username,
+        _validate_fields_non_empty(
+            username=new_username,
             password=new_password,
             full_name=new_full_name,
             account_type=new_account_type,
         )
+        if new_password is not None:
+            _validate_password_complexity(
+                new_password, self._settings_store.get_settings()
+            )
         if (
             new_username is not None
             and new_username != username_to_update
@@ -154,6 +256,8 @@ class UserDataManager:
             if new_locked is not None and not new_locked:
                 # Note: do this BEFORE the username is potentially changed
                 self._user_store.clear_failed_logins(username_to_update)
+            if new_password is not None:
+                reset_password = False
             updated_user = self._user_store.update(
                 username_to_update,
                 new_username=new_username,
@@ -163,7 +267,37 @@ class UserDataManager:
                 full_name=new_full_name,
                 account_type=new_account_type,
                 reset_password=reset_password,
+                now=now,
             )
             return self._to_response(updated_user)
         except ValueError as e:
             raise UserNotFoundError(e) from e
+
+    def reset_user_password(
+        self,
+        username: str,
+        now: datetime.datetime,
+    ) -> ResetPasswordResponse:
+        """Reset a user's password to a random temporary password.
+
+        Flag the account so the user is required to set a real password before
+        doing anything else with the robot.
+        """
+        min_length, require_special = _password_complexity_requirements(
+            self._settings_store.get_settings()
+        )
+        temporary_password = _generate_temporary_password(min_length, require_special)
+        try:
+            updated_user = self._user_store.update(
+                username,
+                hashed_password=password_hash.hash(temporary_password),
+                reset_password=True,
+                now=now,
+            )
+        except ValueError as e:
+            raise UserNotFoundError(e) from e
+        user_response = self._to_response(updated_user)
+        return ResetPasswordResponse(
+            **user_response.model_dump(),
+            temporaryPassword=temporary_password,
+        )

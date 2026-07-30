@@ -9,7 +9,6 @@ from typing import Any
 
 import Pyro5.api as pyro
 
-from opentrons.config import feature_flags as ff
 from opentrons.config import robot_configs
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
@@ -51,7 +50,6 @@ def _build_thread_manager(use_simulator: bool) -> ThreadManager[OT3API]:
     else:
         return ThreadManager(
             OT3API.build_hardware_controller,
-            use_usb_bus=ff.rear_panel_integration(),
             feature_flags=HardwareFeatureFlags.build_from_ff(),
         )
 
@@ -73,7 +71,7 @@ async def build_and_run_hwc_pyro(simulate: bool) -> None:
     log.info("Building OT-3 API Instance")
 
     # todo(chb: 2026-02-18): Make this support simulated hardware controller - important for unit tests
-    ot3api = await _build_api(use_simulator=simulate)
+    thread_managed_ot3api = await _build_api(use_simulator=simulate)
 
     def _daemon_request_loop(pyroname: str, resource: Any, registry: Any) -> None:
         # todo(chb: 2026-02-18): For the PYRONAMEs registered with the nameserver, do we want them to live in a centralized location (shared-data)?
@@ -82,7 +80,7 @@ async def build_and_run_hwc_pyro(simulate: bool) -> None:
 
     daemon_request_thread = threading.Thread(
         target=_daemon_request_loop,
-        args=("OT3API", ot3api, register_hardware_types),
+        args=("OT3API", thread_managed_ot3api.managed_obj, register_hardware_types),
         daemon=True,
     )
 
@@ -104,7 +102,7 @@ async def build_and_run_hwc_pyro(simulate: bool) -> None:
 
     # Handle firmware updates on the hardware api
     async def _do_update() -> None:
-        async for update in ot3api.update_firmware():
+        async for update in thread_managed_ot3api.update_firmware():
             log.info(f"Update: {update.subsystem.name}: {update.progress}%")
 
     await _do_update()

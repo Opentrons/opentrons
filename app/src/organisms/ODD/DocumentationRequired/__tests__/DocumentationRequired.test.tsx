@@ -1,3 +1,4 @@
+import NiceModal from '@ebay/nice-modal-react'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -9,9 +10,14 @@ import { DocumentationRequired } from '../DocumentationRequired'
 import type { ComponentProps } from 'react'
 
 const render = (props: ComponentProps<typeof DocumentationRequired>) =>
-  renderWithProviders(<DocumentationRequired {...props} />, {
-    i18nInstance: i18n,
-  })
+  renderWithProviders(
+    <NiceModal.Provider>
+      <DocumentationRequired {...props} />
+    </NiceModal.Provider>,
+    {
+      i18nInstance: i18n,
+    }
+  )
 
 const editNote = (value: string): void => {
   fireEvent.change(screen.getByRole('textbox'), { target: { value } })
@@ -23,8 +29,10 @@ describe('DocumentationRequired', () => {
   beforeEach(() => {
     props = {
       username: 'alice',
+      actionsToDocument: [],
       onConfirm: vi.fn(),
       onBack: vi.fn(),
+      minReportLength: 10,
     }
   })
 
@@ -71,11 +79,39 @@ describe('DocumentationRequired', () => {
     expect(props.onConfirm).not.toHaveBeenCalled()
   })
 
+  it('shows a min-length error and does not confirm when the note is too short', () => {
+    render(props)
+    editNote('too short')
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+
+    expect(props.onConfirm).not.toHaveBeenCalled()
+    screen.getByText('Must be at least 10 characters long')
+  })
+
+  it('clears the min-length error when the user edits the note', () => {
+    render(props)
+    editNote('too short')
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    screen.getByText('Must be at least 10 characters long')
+
+    editNote('long enough note')
+
+    expect(
+      screen.queryByText('Must be at least 10 characters long')
+    ).not.toBeInTheDocument()
+  })
+
   it('calls onBack when the back button is clicked', () => {
     render(props)
     fireEvent.click(
       screen.getByRole('button', { name: 'Back to previous page' })
     )
     expect(props.onBack).toHaveBeenCalledOnce()
+  })
+
+  it('shows the actions view when the view actions button is clicked', () => {
+    render(props)
+    fireEvent.click(screen.getByTestId('ChildNavigation_Secondary_Button'))
+    screen.getByText('Actions requiring documentation')
   })
 })

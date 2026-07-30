@@ -190,7 +190,6 @@ async def test_get_vacuum_state(
     get_pressure = types.GCODE.GET_PRESSURE_STATE.build_command()
     connection.send_command.assert_any_call(get_pressure)
     connection.reset_mock()
-
     assert pressure_state == types.VacuumState(
         400, 988, 989.3, 988.6, 992.5, True, 10, types.VentState.CLOSED
     )
@@ -239,6 +238,26 @@ async def test_set_pump_state(
     await subject.set_pump_state(False)
 
     set_pump = types.GCODE.SET_PUMP_STATE.build_command().add_int("S", 0)
+    connection.send_command.assert_any_call(set_pump)
+    connection.reset_mock()
+
+    # With duration, timeout, rate, and vent_after
+    connection.send_command.return_value = "M122"
+
+    await subject.set_pump_state(
+        True, duty_cycle=30, duration_s=60, timeout_s=20, rate=1, vent_after=True
+    )
+
+    set_pump = (
+        types.GCODE.SET_PUMP_STATE.build_command()
+        .add_int("S", 1)
+        .add_int("D", 30)
+        .add_int("E", 60)
+        .add_int("T", 20)
+        .add_float("A", 1)
+        .add_int("V", 1)
+    )
+
     connection.send_command.assert_any_call(set_pump)
     connection.reset_mock()
 
@@ -325,3 +344,9 @@ async def test_get_pressure_control_tunings(
     connection.reset_mock()
 
     assert pressure_state == types.PressureControlTunings(1, 0, 0, -2, 20, 43, 0.2)
+
+
+async def test_move_port(subject: VacuumModuleDriver, connection: AsyncMock) -> None:
+    """It should forward port moves to the serial connection."""
+    await subject.move_port("/dev/ot_module_vacuummodule6")
+    connection.update_port.assert_awaited_once_with("/dev/ot_module_vacuummodule6")

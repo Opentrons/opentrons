@@ -8,10 +8,5 @@ export function getRunCurrentState(
   config: HostConfig,
   runId: string
 ): ResponsePromise<RunCurrentState> {
-  return request<RunCurrentState>(
-    GET,
-    `/runs/${runId}/currentState`,
-    null,
-    config
-  )
+  return request<RunCurrentState>(GET, `/runs/${runId}/currentState`, config)
 }

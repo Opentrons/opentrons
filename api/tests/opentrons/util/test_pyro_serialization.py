@@ -5,10 +5,23 @@ import enum
 import pytest
 from pydantic import BaseModel
 
+from opentrons_shared_data.errors.exceptions import (
+    EnumeratedError,
+    PythonException,
+    RobotInUseError,
+    VacuumModulePressureNotReachedError,
+    VacuumModuleUnknownError,
+    VacuumModuleWasteFullError,
+)
+
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_engine.types.module import ModuleModel
 from opentrons.types import DeckSlotName
-from opentrons.util.pyro.pyro_serialization import OpentronsPyroSerializer
+from opentrons.util.pyro.pyro_serialization import (
+    OpentronsPyroSerializer,
+    enumerated_error_class_to_dict,
+    enumerated_error_dict_to_class,
+)
 
 
 class NestedTest(BaseModel):
@@ -89,3 +102,31 @@ def test_pydantic_serialization() -> None:
         test_dict,
     )
     assert result == test_model
+
+
+@pytest.mark.parametrize(
+    "test_error",
+    [
+        RobotInUseError(
+            message="Uh oh",
+            detail={"ruh": "roh"},
+            wrapping=[PythonException(exc=RuntimeError("foo"))],
+        ),
+        VacuumModuleUnknownError("VM123", "pressure", -100.0, -75.0),
+        VacuumModulePressureNotReachedError("VM123", "pressure", -100.0, -75.0),
+        VacuumModuleWasteFullError("VM123", "pressure", 0.0, 0.0),
+    ],
+)
+def test_enumerated_error_serialization(test_error: EnumeratedError) -> None:
+    """It should serialize and deserialize enumerated errors for Pyro."""
+    test_dict = enumerated_error_class_to_dict(test_error)
+
+    assert test_dict.get("bytes") is not None
+    assert (
+        test_dict["__class__"]
+        == "opentrons_shared_data.errors.exceptions.EnumeratedError"
+    )
+
+    result = enumerated_error_dict_to_class("", test_dict)
+
+    assert result == test_error

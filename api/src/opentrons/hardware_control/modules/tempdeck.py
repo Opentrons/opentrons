@@ -17,6 +17,7 @@ from opentrons.drivers.temp_deck import (
 from opentrons.drivers.types import Temperature
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.modules import errors, mod_abc, types, update
+from opentrons.hardware_control.modules.retry import retry_module_init
 from opentrons.hardware_control.modules.types import (
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
@@ -24,6 +25,7 @@ from opentrons.hardware_control.modules.types import (
 )
 from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.util.pyro.pyro_synchronous_adapter import (
+    convert_result_to_proxy,
     pyro_behavior,
     remove_pyro_synchronous_object,
 )
@@ -72,13 +74,24 @@ class TempDeck(mod_abc.AbstractModule):
         """
         driver: AbstractTempDeckDriver
         if not simulating:
-            driver = await TempDeckDriver.create(port=port, loop=hw_control_loop)
             poll_interval_seconds = poll_interval_seconds or TEMP_POLL_INTERVAL_SECS
+
+            async def _init_driver() -> tuple[AbstractTempDeckDriver, Dict[str, str]]:
+                d = await TempDeckDriver.create(port=port, loop=hw_control_loop)
+                try:
+                    info = await d.get_device_info()
+                    return d, info
+                except BaseException:
+                    await d.disconnect()
+                    raise
+
+            driver, device_info = await retry_module_init(_init_driver, port=port)
         else:
             driver = SimulatingDriver(
                 sim_model=sim_model, serial_number=sim_serial_number
             )
             poll_interval_seconds = poll_interval_seconds or SIM_TEMP_POLL_INTERVAL_SECS
+            device_info = await driver.get_device_info()
 
         reader = TempDeckReader(driver=driver)
         poller = Poller(reader=reader, interval=poll_interval_seconds)
@@ -89,7 +102,7 @@ class TempDeck(mod_abc.AbstractModule):
             driver=driver,
             reader=reader,
             poller=poller,
-            device_info=await driver.get_device_info(),
+            device_info=device_info,
             hw_control_loop=hw_control_loop,
             disconnected_callback=disconnected_callback,
             error_callback=error_callback,
@@ -151,6 +164,7 @@ class TempDeck(mod_abc.AbstractModule):
     def model(self) -> str:
         return self._model_from_revision(self._device_info.get("model"))
 
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def bootloader(self) -> types.UploadFunction:
         return update.upload_via_avrdude
 
@@ -350,9 +364,10 @@ class TempDeckReader(Reader):
     def on_error(self, exception: Exception) -> None:
         self._debounce_count -= 1
         if self._error_callback:
-            if self._debounce_count != 0:
+            if self._debounce_count > 0:
                 log.error(
                     f"Reader encountered error {exception} but has {self._debounce_count} tries left"
                 )
             else:
                 self._error_callback(exception)
+                self._debounce_count = DEFAULT_COMMAND_RETRIES

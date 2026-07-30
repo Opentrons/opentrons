@@ -23,7 +23,7 @@ from opentrons.protocol_engine.resources.camera_provider import (
 )
 from opentrons.protocol_engine.resources.file_provider import FileProvider
 from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
-from opentrons.util.pyro.pyro_daemon_utility import PYRO_TIMEOUT, create_pyro_daemon
+from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 from opentrons_shared_data.robot.types import RobotTypeEnum
 from server_utils.fastapi_utils.app_state import AppState
 
@@ -39,6 +39,8 @@ from robot_server.runs.run_process import (
 from robot_server.runs.run_process_entry_point import initialize_run_process
 from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.service.pyro_utils import pyro_resource, resource_utilities
+
+TEST_PYRO_TIMEOUT = 5
 
 
 @pytest.fixture
@@ -125,7 +127,7 @@ async def _host_pyro_nameserver_and_ot3api(
 
     def _ot3api_pyro_daemon() -> None:
         # Wait for the nameserver to be ready so locate_ns can succeed.
-        name_server_ready.wait(timeout=PYRO_TIMEOUT)
+        name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
         create_pyro_daemon("OT3API", hw_api, register_hardware_types)
 
     ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
@@ -136,7 +138,7 @@ async def _host_pyro_nameserver_and_ot3api(
 
     # Client-side requests below
     register_hardware_types()
-    name_server_ready.wait(timeout=PYRO_TIMEOUT)
+    name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
     # Initialize the RobotServerPyroResource
     pyro_resource.start_initializing_pyro_resource(app_state)
     ns = pyro.locate_ns()
@@ -241,7 +243,7 @@ async def test_run_process_create(
 
     ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
     ns_thread.start()
-    name_server_ready.wait(timeout=PYRO_TIMEOUT)
+    name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
     ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
         ot3_hardware_api, mock_app_state
     )
@@ -251,6 +253,7 @@ async def test_run_process_create(
         robot_type="OT-3 Standard",
         deck_type=DeckType("ot3_standard"),
         run_process_pyro_provider=mock_run_process_pyro_provider,
+        access_control_status=False,
     )
     resource_utilities.register_run_orchestrator_store_to_pyro_resource(
         mock_app_state, run_store

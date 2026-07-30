@@ -2739,6 +2739,62 @@ def test_get_ancestor_slot_for_labware_stack_in_staging_area_slot(
     assert subject.get_ancestor_slot_name("labware-2") == StagingSlotName.SLOT_D4
 
 
+def test_get_ancestor_slot_for_addressable_area(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    subject: GeometryView,
+) -> None:
+    """It should get name of ancestor slot of a stack of labware in an addressable area."""
+    decoy.when(mock_labware_view.get("labware-1")).then_return(
+        LoadedLabware(
+            id="labware-1",
+            loadName="load-name",
+            definitionUri="1234",
+            location=AddressableAreaLocation(
+                addressableAreaName="vacuumModuleV1DockA4"
+            ),
+        )
+    )
+    decoy.when(mock_labware_view.get("labware-2")).then_return(
+        LoadedLabware(
+            id="labware-2",
+            loadName="load-name",
+            definitionUri="1234",
+            location=OnLabwareLocation(labwareId="labware-1"),
+        )
+    )
+    assert subject.get_ancestor_slot_name("labware-2") == StagingSlotName.SLOT_A4
+
+
+def test_get_ancestor_slot_raise_for_invalid_addressable_area(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    subject: GeometryView,
+) -> None:
+    """It should raise if the addressable area cannot be DeckSlotName or StagingSlotName."""
+    decoy.when(mock_labware_view.get("labware-1")).then_return(
+        LoadedLabware(
+            id="labware-1",
+            loadName="load-name",
+            definitionUri="1234",
+            location=AddressableAreaLocation(
+                addressableAreaName="InvalidAddressableArea"
+            ),
+        )
+    )
+    decoy.when(mock_labware_view.get("labware-2")).then_return(
+        LoadedLabware(
+            id="labware-2",
+            loadName="load-name",
+            definitionUri="1234",
+            location=OnLabwareLocation(labwareId="labware-1"),
+        )
+    )
+
+    with pytest.raises(ValueError):
+        subject.get_ancestor_slot_name("labware-2")
+
+
 def test_get_ancestor_addressable_area_name(
     decoy: Decoy,
     mock_labware_view: LabwareView,

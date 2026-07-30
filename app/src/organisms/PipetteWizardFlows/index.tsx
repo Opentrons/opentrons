@@ -6,19 +6,29 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
   COLORS,
+  Flex,
+  JUSTIFY_FLEX_END,
   ModalShell,
+  PrimaryButton,
+  SPACING,
   useConditionalConfirm,
   WizardHeader,
 } from '@opentrons/components'
 import {
-  ApiHostProvider,
+  isDocumentedMutationError,
   useDeleteMaintenanceRunMutation,
   useHost,
 } from '@opentrons/react-api-client'
 import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { SmallButton } from '/app/atoms/buttons'
+import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { getIsOnDevice } from '/app/redux/config'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -47,7 +57,11 @@ import { RemoveWasteChute } from './RemoveWasteChute'
 import { Results } from './Results'
 import { UnskippableModal } from './UnskippableModal'
 
-import type { CommandData, HostConfig } from '@opentrons/api-client'
+import type { CommandData } from '@opentrons/api-client'
+import type {
+  DocumentationState,
+  DocumentedAction,
+} from '@opentrons/react-api-client'
 import type {
   CreateCommand,
   LoadedPipette,
@@ -64,12 +78,20 @@ interface PipetteWizardFlowsProps {
   closeFlow: () => void
   onComplete?: () => void
   pipetteInfo?: LoadedPipette[]
+  initialDocstate?: DocumentationState
 }
 
 export const PipetteWizardFlows = (
   props: PipetteWizardFlowsProps
 ): JSX.Element | null => {
-  const { flowType, mount, closeFlow, selectedPipette, onComplete } = props
+  const {
+    flowType,
+    mount,
+    closeFlow,
+    selectedPipette,
+    onComplete,
+    initialDocstate,
+  } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
   const deckConfig = useNotifyDeckConfigurationQuery()
@@ -136,6 +158,11 @@ export const PipetteWizardFlows = (
     string | null
   >(null)
   const [errorMessage, setShowErrorMessage] = useState<null | string>(null)
+  const [isDoorOpenError, setIsDoorOpenError] = useState<boolean>(false)
+  const dismissDoorOpenError = (): void => {
+    setShowErrorMessage(null)
+    setIsDoorOpenError(false)
+  }
   // we should start checking for run deletion only after the maintenance run is created
   // and the useCurrentRun poll has returned that created id
   const [
@@ -174,17 +201,61 @@ export const PipetteWizardFlows = (
     enabled: createdMaintenanceRunId != null,
   })
 
+  const maintenanceRunAction: DocumentedAction = useMemo(() => {
+    return {
+      type: 'pipette_wizard_flow',
+      mount,
+      flowType,
+      pipette: selectedPipette,
+      pipetteInfo: attachedPipettes[mount] ?? null,
+      step: 'start',
+    }
+  }, [mount, flowType, selectedPipette, attachedPipettes])
+
+  const deleteRunAction: DocumentedAction = useMemo(() => {
+    return {
+      type: 'pipette_wizard_flow',
+      mount,
+      flowType,
+      pipette: selectedPipette,
+      pipetteInfo: attachedPipettes[mount] ?? null,
+      step: 'end',
+    }
+  }, [mount, flowType, selectedPipette, attachedPipettes])
+
+  const {
+    commandDocState,
+    deletionDocState,
+    actionsToDocument,
+    addActionToDocument,
+  } = useMaintenanceRunDocumentation(
+    maintenanceRunAction,
+    closeFlow,
+    initialDocstate
+  )
+
   const { chainRunCommands, isCommandMutationLoading } =
-    useChainMaintenanceCommands()
+    useChainMaintenanceCommands(
+      commandDocState,
+      actionsToDocument,
+      addActionToDocument
+    )
 
   const { createTargetedMaintenanceRun, isLoading: isCreateLoading } =
     useCreateTargetedMaintenanceRunMutation(
+      commandDocState,
+      actionsToDocument,
       {
         onSuccess: response => {
           setCreatedMaintenanceRunId(response.data.id)
         },
-        onError: error => {
-          setShowErrorMessage(error.message)
+        onError: (error: unknown) => {
+          if (isDocumentedMutationError(error)) {
+            return
+          }
+          setShowErrorMessage(
+            error instanceof Error ? error.message : String(error)
+          )
         },
       },
       host
@@ -223,29 +294,31 @@ export const PipetteWizardFlows = (
     }
   }
   const handleClose = (): void => {
-    if (onComplete != null) {
-      onComplete()
-    }
     if (maintenanceRunData != null) {
-      deleteMaintenanceRun(maintenanceRunData?.data.id, {
-        onSettled: closeFlow,
-      })
+      deleteMaintenanceRun(maintenanceRunData?.data.id)
     } else {
+      onComplete?.()
       closeFlow()
     }
   }
 
   const { deleteMaintenanceRun, isLoading: isDeleteLoading } =
-    useDeleteMaintenanceRunMutation({
-      onSuccess: () => {
-        closeFlow()
-      },
-      onError: () => {
-        closeFlow()
-      },
-    })
+    useDeleteMaintenanceRunMutation(
+      deletionDocState,
+      [...actionsToDocument, deleteRunAction],
+      {
+        onSuccess: () => {
+          onComplete?.()
+          closeFlow()
+        },
+        onError: () => {
+          setIsExiting(false)
+        },
+      }
+    )
 
   const handleCleanUpAndClose = (): void => {
+    setIsExiting(true)
     if (maintenanceRunData?.data.id == null) handleClose()
     else {
       chainRunCommands(
@@ -254,8 +327,13 @@ export const PipetteWizardFlows = (
         false
       )
         .catch(error => {
-          setIsExiting(true)
-          setShowErrorMessage(error.message as string)
+          if (isMaintenanceDoorOpenError(error)) {
+            setIsDoorOpenError(true)
+            setShowErrorMessage(t('door_is_open') as string)
+          } else {
+            setIsExiting(true)
+            setShowErrorMessage(error.message as string)
+          }
         })
         .finally(() => {
           handleClose()
@@ -295,6 +373,9 @@ export const PipetteWizardFlows = (
     attachedPipettes,
     setShowErrorMessage,
     errorMessage,
+    isDoorOpenError,
+    setIsDoorOpenError,
+    dismissDoorOpenError,
     selectedPipette,
     isOnDevice,
   }
@@ -326,9 +407,10 @@ export const PipetteWizardFlows = (
   }
 
   const isFatalError =
-    (isExiting && errorMessage != null) ||
-    maintenanceRunData?.data.status === RUN_STATUS_FAILED ||
-    (errorMessage != null && createdMaintenanceRunId == null)
+    !isDoorOpenError &&
+    ((isExiting && errorMessage != null) ||
+      maintenanceRunData?.data.status === RUN_STATUS_FAILED ||
+      (errorMessage != null && createdMaintenanceRunId == null))
 
   let onExit: () => void
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
@@ -342,6 +424,33 @@ export const PipetteWizardFlows = (
         subHeader={errorMessage ?? undefined}
       />
     )
+  } else if (isDoorOpenError) {
+    modalContent = (
+      <SimpleWizardBody
+        isSuccess={false}
+        iconColor={COLORS.red50}
+        header={t('door_is_open')}
+        subHeader={t('close_door_and_try_again')}
+      >
+        <Flex
+          width="100%"
+          justifyContent={JUSTIFY_FLEX_END}
+          alignItems={Boolean(isOnDevice) ? ALIGN_CENTER : ALIGN_FLEX_END}
+          gridGap={SPACING.spacing8}
+        >
+          {Boolean(isOnDevice) ? (
+            <SmallButton
+              buttonText={t('try_again')}
+              onClick={dismissDoorOpenError}
+            />
+          ) : (
+            <PrimaryButton onClick={dismissDoorOpenError}>
+              {t('try_again')}
+            </PrimaryButton>
+          )}
+        </Flex>
+      </SimpleWizardBody>
+    )
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     onExit = handleCleanUpAndClose
     modalContent = (
@@ -353,6 +462,7 @@ export const PipetteWizardFlows = (
         isCreateLoading={isCreateLoading}
         deckConfig={deckConfig}
         requiredPipette={requiredPipette}
+        documentationState={commandDocState}
       />
     )
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {
@@ -510,18 +620,19 @@ export const PipetteWizardFlows = (
   )
 }
 
-type PipetteWizardFlowsPropsWithHost = PipetteWizardFlowsProps & {
-  host: HostConfig
+type PipetteWizardFlowsModalProps = PipetteWizardFlowsProps & {
+  robotName: string | null
 }
 
 export const handlePipetteWizardFlows = (
-  props: PipetteWizardFlowsPropsWithHost
+  props: PipetteWizardFlowsModalProps
 ): void => {
   NiceModal.show(NiceModalPipetteWizardFlows, props)
 }
 
 const NiceModalPipetteWizardFlows = NiceModal.create(
-  (props: PipetteWizardFlowsPropsWithHost): JSX.Element => {
+  (props: PipetteWizardFlowsModalProps): JSX.Element => {
+    const { robotName, ...pipetteWizardFlowsProps } = props
     const modal = useModal()
     const closeFlowAndModal = (): void => {
       props.closeFlow()
@@ -529,8 +640,11 @@ const NiceModalPipetteWizardFlows = NiceModal.create(
     }
 
     return (
-      <ApiHostProvider {...props.host}>
-        <PipetteWizardFlows {...props} closeFlow={closeFlowAndModal} />
+      <ApiHostProvider robotName={robotName}>
+        <PipetteWizardFlows
+          {...pipetteWizardFlowsProps}
+          closeFlow={closeFlowAndModal}
+        />
       </ApiHostProvider>
     )
   }

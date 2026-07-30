@@ -11,13 +11,13 @@ import {
   isAddressableAreaStandardSlot,
   makeWellSetHelpers,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   FAKE_HOPPER_LOCATION_MAP,
   getSlotInLocationStack,
   HOPPER_STACKER_LOCATION,
   PROTOCOL_CONTEXT_NAME,
-  VACUUM_DOCK_FAKE_LOCATION,
   VACUUM_DOCK_LOCATION,
 } from '@opentrons/step-generation'
 
@@ -37,6 +37,7 @@ import type {
   AdditionalEquipmentEntity,
   HopperLocationMapKey,
   LabwareEntities,
+  ModuleEntity,
   PipetteEntities,
 } from '@opentrons/step-generation'
 import type { BoundingRect, GenericRect } from '../collision-types'
@@ -373,6 +374,7 @@ export function getLocationStackTopToBottom(
   const stack: string[] = []
   const visited = new Set<string>()
   let current: string | undefined = labwareId
+
   while (current != null) {
     // Cycle detection: if we've seen this node before, break to prevent infinite loop
     if (visited.has(current)) {
@@ -390,9 +392,24 @@ export function getLocationStackTopToBottom(
       // So when the node is on the hopper, insert the hopper marker once
       stack.push(HOPPER_STACKER_LOCATION)
     }
-    const isOnVacuumDock = slot === VACUUM_DOCK_FAKE_LOCATION
+    const isOnVacuumDock = slot === 'vacuumModuleV1DockA4'
     if (isOnVacuumDock) {
+      // Vacuum dock stack shape: [labware1, labware2, vacuumDock, moduleId, slot]
+      // So when the node is on the vacuum dock, insert the vacuumDock marker once
       stack.push(VACUUM_DOCK_LOCATION)
+      // Find the vacuum module in A3 (dock is always associated with module in A3)
+      // Check both by slot 'A3' and by looking through all modules for safety
+      let vacuumModuleInA3: ModuleEntity | null = moduleEntities.A3
+      if (vacuumModuleInA3 == null) {
+        // moduleEntities might be keyed by ID instead of slot, search through all
+        vacuumModuleInA3 =
+          Object.values(moduleEntities).find(
+            module => module.type === VACUUM_MODULE_TYPE
+          ) ?? null
+      }
+      if (vacuumModuleInA3 != null) {
+        stack.push(vacuumModuleInA3.id)
+      }
     }
     current = parent
   }
@@ -408,7 +425,7 @@ export const getLabwaresOnModuleFromStack = (
   hopperTopMostId: string | null
   vacuumDockTopMostId: string | null
 } => {
-  // all stacks involving this module and not on the hopper if its a flex stacker and not on the vacuum dock
+  // all stacks involving this module and not on the hopper or vacuum dock
   const allStacks = labware.filter(
     ({ stack }) =>
       stack.includes(moduleId) &&
@@ -449,17 +466,24 @@ export const getLabwaresOnModuleFromStack = (
 export const getFullStackFromLabwaresOnDeck = (
   labwareOnDeck: LabwareOnDeck[],
   slot: DeckSlotId,
-  onHopper: boolean
+  onHopper: boolean,
+  onVacuumDock: boolean = false
 ): string[] => {
-  const slotInStack = onHopper
-    ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
-    : slot
+  let slotInStack: AddressableAreaName | string
+  if (onHopper) {
+    slotInStack = FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+  } else if (onVacuumDock) {
+    slotInStack = slot
+  } else {
+    slotInStack = slot
+  }
   return (
     labwareOnDeck
       .filter(
         ({ stack }) =>
           stack.includes(slotInStack as string) &&
-          onHopper === stack.includes(HOPPER_STACKER_LOCATION)
+          onHopper === stack.includes(HOPPER_STACKER_LOCATION) &&
+          onVacuumDock === stack.includes(VACUUM_DOCK_LOCATION)
       )
       .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack ?? []
   )

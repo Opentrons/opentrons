@@ -7,7 +7,7 @@ import logging
 from typing import NoReturn
 
 from server_utils.auth.resource_server.fastapi import (
-    build_authorization_checker,
+    build_authentication_checker,
 )
 
 from . import get_app
@@ -34,9 +34,9 @@ async def main() -> NoReturn:
     LOG.info(f"Set static hostname to {static_hostname}")
 
     async with (
-        build_authorization_checker(
+        build_authentication_checker(
             auth_server_uds=_AUTH_SERVER_UDS, auth_server_url=None
-        ) as authorization_checker,
+        ) as authentication_checker,
         name_management.NameSynchronizer.start(
             constants.MODEL_OT3
         ) as name_synchronizer,
@@ -44,7 +44,7 @@ async def main() -> NoReturn:
         LOG.info("Building openembedded update server")
         app = await get_app(
             name_synchronizer=name_synchronizer,
-            authorization_checker=authorization_checker,
+            authentication_checker=authentication_checker,
             system_version_file=args.version_file,
             config_file_override=args.config_file,
         )
