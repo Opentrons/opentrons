@@ -3,6 +3,7 @@
 
 import path from 'path'
 
+import { createRobotHttpsAgent } from '../certs'
 import { OPENTRONS_USB } from '../constants'
 import { fetch, postFile } from '../http'
 import { getSerialPortHttpAgent } from '../usb'
@@ -96,9 +97,12 @@ export function uploadSystemFile(
     headers['Opentrons-User-Notes'] = encodeURI(httpOptions.userNotes)
   }
 
+  const isHttps = url.startsWith('https:')
   const init: RequestInit = isUsbUpload
     ? { agent: serialPortHttpAgent, headers }
-    : { headers }
+    : isHttps
+      ? { agent: createRobotHttpsAgent(), headers }
+      : { headers }
 
   return postFile(
     url,

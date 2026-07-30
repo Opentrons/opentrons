@@ -1,5 +1,6 @@
 import { pbkdf2, subtle, X509Certificate } from 'crypto'
 import { mkdir, open, readdir, rm, stat } from 'fs/promises'
+import { Agent as HttpsAgent } from 'https'
 import { join } from 'path'
 import { promisify } from 'util'
 import { app, ipcMain } from 'electron'
@@ -152,6 +153,24 @@ function addCertificateToMap(certificate: X509Certificate): void {
   const sha256Fingerprint = certificate.fingerprint256
   knownCertificates.set(sha256Fingerprint, certificate)
   log.info(`added certificate at ${sha256Fingerprint}`)
+}
+
+/**
+ * HTTPS agent for main-process requests to robots (e.g. update zip upload).
+ *
+ * Renderer/Chromium traffic is covered by the `certificate-error` handler below.
+ * Node `fetch` in the shell does not use that path, so HTTPS uploads must
+ * trust the same installed robot CAs explicitly. Hostname verification is
+ * skipped because robots are often addressed by IP while certs use a name.
+ */
+export function createRobotHttpsAgent(): HttpsAgent {
+  const ca = Array.from(knownCertificates.values()).map(cert => cert.toString())
+
+  return new HttpsAgent({
+    ca,
+    rejectUnauthorized: true,
+    checkServerIdentity: () => undefined,
+  })
 }
 
 /**
