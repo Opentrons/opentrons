@@ -21,7 +21,7 @@ import {
   downloadNotes,
   getReleaseSet,
 } from './release-manifest'
-import { startPremigration, uploadSystemFile } from './update'
+import { startPremigration } from './update'
 import { registerRobotUpdateUpload } from './upload'
 
 import type {
@@ -32,9 +32,6 @@ import type {
 import type { DownloadProgress } from '../http'
 import type { Action, Dispatch } from '../types'
 import type { ReleaseSetFilepaths, ReleaseSetUrls } from './types'
-
-export { registerRobotUpdateUpload as registerRobotUpdateUploadIpc } from './upload'
-export type { RobotUpdateUploadPayload } from './upload'
 
 const log = createLogger('robot-update/index')
 
@@ -114,47 +111,6 @@ export function registerRobotUpdate(dispatch: Dispatch): Dispatch {
             type: 'robotUpdate:PREMIGRATION_ERROR',
             payload: { message: error.message },
           }))
-          .then(dispatch)
-
-        break
-      }
-
-      case 'robotUpdate:UPLOAD_FILE': {
-        const { host, path, systemFile } = action.payload
-
-        if (systemFile == null) {
-          dispatch({
-            type: 'robotUpdate:UNEXPECTED_ERROR',
-            payload: { message: 'Robot update file missing' },
-          })
-          return
-        }
-
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        uploadSystemFile(host, path, systemFile, progress => {
-          dispatch({
-            type: 'robotUpdate:FILE_UPLOAD_PROGRESS',
-            payload: progress,
-          })
-        })
-          .then(() => ({
-            type: 'robotUpdate:FILE_UPLOAD_DONE' as const,
-            payload: host.name,
-          }))
-          .catch((error: Error) => {
-            log.warn('Error uploading update to robot', {
-              path,
-              systemFile,
-              error,
-            })
-
-            return {
-              type: 'robotUpdate:UNEXPECTED_ERROR' as const,
-              payload: {
-                message: `Error uploading update to robot: ${error.message}`,
-              },
-            }
-          })
           .then(dispatch)
 
         break
