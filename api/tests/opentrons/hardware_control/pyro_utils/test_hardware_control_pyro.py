@@ -64,6 +64,7 @@ from opentrons.hardware_control.types import (
     DoorStateNotification,
     HardwareEvent,
     HardwareEventHandler,
+    HardwareFeatureFlags,
     OT3Mount,
 )
 from opentrons.types import Mount, Point
@@ -436,7 +437,7 @@ async def test_pyro_module_properties(
     def _pyro_daemon() -> None:
         # Wait for the nameserver to be ready so locate_ns can succeed.
         name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
-        create_pyro_daemon("OT3API", ot3_hardware, register_hardware_types)
+        create_pyro_daemon("OT3API", ot3_hardware.managed_obj, register_hardware_types)
 
     ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
     server_thread = threading.Thread(target=_pyro_daemon, daemon=True)
@@ -532,7 +533,7 @@ async def test_pyro_vacuum_module_serialization(
     def _pyro_daemon() -> None:
         # Wait for the nameserver to be ready so locate_ns can succeed.
         name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
-        create_pyro_daemon("OT3API", ot3_hardware, register_hardware_types)
+        create_pyro_daemon("OT3API", ot3_hardware.managed_obj, register_hardware_types)
 
     ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
     server_thread = threading.Thread(target=_pyro_daemon, daemon=True)
@@ -609,7 +610,7 @@ async def test_pyro_async_wrapped_calls(  # noqa: C901
     def _pyro_daemon() -> None:
         # Wait for the nameserver to be ready so locate_ns can succeed.
         name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
-        create_pyro_daemon("OT3API", ot3_hardware, register_hardware_types)
+        create_pyro_daemon("OT3API", ot3_hardware.managed_obj, register_hardware_types)
 
     class cool_door_class:
         def __init__(self, loop: asyncio.AbstractEventLoop):
@@ -699,6 +700,24 @@ async def test_pyro_async_wrapped_calls(  # noqa: C901
         ot3api.build_temporary_identity_calibration().deck_calibration.status.source
         is None
     )
+
+    old_flags = HardwareFeatureFlags(
+        use_old_aspiration_functions=False,
+        require_estop=True,
+        overpressure_detection_enabled=True,
+        stall_detection_enabled=True,
+    )
+    new_flags = HardwareFeatureFlags(
+        use_old_aspiration_functions=True,
+        require_estop=True,
+        overpressure_detection_enabled=True,
+        stall_detection_enabled=True,
+    )
+
+    ot3api.hardware_feature_flags = new_flags
+    assert ot3api.hardware_feature_flags == new_flags
+    ot3api.hardware_feature_flags = old_flags
+    assert ot3api.hardware_feature_flags == old_flags
 
     ot3_proxy._pyroRelease()  # type: ignore
 
