@@ -10,12 +10,26 @@ The Vacuum Module ships in 3 separate boxes.
 
 ### Box 1: deck components
 
-Unnamed box 1 includes deck pieces like the manifold base along with collars and spacers that hold well plates used in vacuum-rated protocols.
+Box 1 includes support grids, collars and spacers, and the vacuum manifold base. These pieces stack and hold well plates used in vacuum-rated protocols.
 
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Short vacuum collar](images/collar-short.svg "Short vacuum collar")  
+![Support grid for 96 well filter plate](images/support-grid-96-wells.svg)
+<figcaption>(1) Support grid, 96 well filter plate</figcaption>
+</figure>
+
+<figure markdown>
+![Support grid for 384 well filter plate](images/support-grid-384-wells.svg)
+<figcaption>(1) Support grid, 384 well filter plate</figcaption>
+</figure>
+
+</div>
+
+<div class="parts-list" markdown>
+
+<figure markdown>
+![Short vacuum collar](images/collar-short.svg "Short vacuum collar")
 <figcaption>(1) Short collar, 42 mm </figcaption>
 </figure>
 
@@ -51,7 +65,7 @@ Unnamed box 1 includes deck pieces like the manifold base along with collars and
 
 ### Box 2: pump components
 
-Unnamed box 2 includes the Control Box (vacuum pump and electronics), a deck adapter (and screws), an IEC power cable, a USB A-B data cable, and assorted fasteners.
+Box 2 includes the Control Box (vacuum pump and electronics), a deck adapter (and screws), an IEC power cable, a USB A-B data cable, and assorted fasteners.
 
 <div class="parts-list" markdown>
 
@@ -84,13 +98,14 @@ Unnamed box 2 includes the Control Box (vacuum pump and electronics), a deck ada
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Spare deck plate screws, M4 x 10](images/deck-screws.png "Spare deck plate screws"){ width="50%" }
-<figcaption>(2) Deck plate screws, M4x10</figcaption>
+![Spare deck plate screws, M4 x 10](images/fasteners-deck.png "Spare deck plate screws"){ width="70%" }
+<figcaption>(2) Deck plate screws, M4x10 metric thread</figcaption>
 </figure>
 
 <figure markdown>
-![Placeholder for manifold screws](images/parts_placeholder.png)
-<figcaption>(6) Manifold screws, M x X</figcaption>
+![Manifold screws, 4 and 2 extra](images/fasteners-manifold.png){ width="80%" }
+<figcaption>(6) Manifold screws, 7/64" Imperial thread</figcaption>
+</figure>
 
 </div>
 
