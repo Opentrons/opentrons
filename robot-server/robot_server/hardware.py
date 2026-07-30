@@ -333,7 +333,6 @@ def get_ot3_hardware(
         raise NotSupportedOnOT2(detail=str(exception)).as_error(
             status.HTTP_403_FORBIDDEN
         ) from exception
-
     if ff.hardware_subprocess_enabled():
         return cast(OT3API, hardware_resource)
 
