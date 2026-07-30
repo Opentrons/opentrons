@@ -73,18 +73,18 @@ describe('RobotEncryptionKey modal', () => {
       clearClientData: mockClearClientData,
     } as any as ReturnType<typeof useUpdateClientDataEncryptionKeys>)
   })
-  it('should close the modal when clicking ok', () => {
+  it('should close the modal when clicking dismiss', () => {
     renderWithModal()
-    const okButton = screen.getByText('Ok')
-    fireEvent.click(okButton)
+    const dismissButton = screen.getByText('Dismiss')
+    fireEvent.click(dismissButton)
     expect(
       screen.queryByText(/enter this key into the opentrons app/i)
     ).toBeNull()
   })
-  it('should clear client data when clicking ok', () => {
+  it('should clear client data when clicking dismiss', () => {
     renderWithModal()
-    const okButton = screen.getByText('Ok')
-    fireEvent.click(okButton)
+    const dismissButton = screen.getByText('Dismiss')
+    fireEvent.click(dismissButton)
     expect(mockClearClientData).toHaveBeenCalled()
   })
   it('should render the password', () => {
