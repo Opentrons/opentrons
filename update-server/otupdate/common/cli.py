@@ -47,4 +47,25 @@ def build_root_parser() -> argparse.ArgumentParser:
         f"to {config.PATH_ENVIRONMENT_VARIABLE} env var and "
         f"then default path {config.DEFAULT_PATH}",
     )
+    # auth-server can be reached over either a Unix domain socket or TCP, but not
+    # both, so these mirror the mutually exclusive options that other servers take
+    # as settings.
+    auth_server_location = parser.add_mutually_exclusive_group()
+    auth_server_location.add_argument(
+        "--auth-server-uds",
+        dest="auth_server_uds",
+        type=str,
+        default=None,
+        help="The path to the Unix domain socket where auth-server is listening."
+        " Mutually exclusive with --auth-server-url."
+        " If neither is given, this robot's default socket path is used.",
+    )
+    auth_server_location.add_argument(
+        "--auth-server-url",
+        dest="auth_server_url",
+        type=str,
+        default=None,
+        help="The base URL (e.g. http://localhost:1234) where auth-server is"
+        " listening. Mutually exclusive with --auth-server-uds.",
+    )
     return parser
