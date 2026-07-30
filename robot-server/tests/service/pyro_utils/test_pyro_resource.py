@@ -149,6 +149,9 @@ async def _host_pyro_nameserver_and_ot3api(
     return (ot3_async, rs_async)
 
 
+# NOTE: This is here to handle test failures for a feature flag migration bug on versions < 10.0.0
+# this patch should be REMOVED for releases >= 10.0.0
+@pytest.mark.xfail
 async def test_run_hardware_event_callback(
     ot3_hardware_api: OT3API,
     mock_app_state: AppState,
@@ -160,35 +163,35 @@ async def test_run_hardware_event_callback(
 
     It should be provided to the hardware event handler, and recieves a callback proxy in response.
     """
-    if False:
-        # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
-        # this patch should be REMOVED for releases >= 10.0.0
-        decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
-        ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
-            hw_api=ot3_hardware_api, app_state=mock_app_state
-        )
-        # Cast the two Async proxies on the nameserver as a locally useful type
-        ot3api = cast(OT3API, ot3_async)
-        robot_server_resource = cast(pyro_resource.RobotServerPyroResource, rs_async)
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
+    ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
+        hw_api=ot3_hardware_api, app_state=mock_app_state
+    )
+    # Cast the two Async proxies on the nameserver as a locally useful type
+    ot3api = cast(OT3API, ot3_async)
+    robot_server_resource = cast(pyro_resource.RobotServerPyroResource, rs_async)
 
-        run_store = RunOrchestratorStore(
-            hardware_api=ot3api,
-            robot_type="OT-3 Standard",
-            deck_type=DeckType("ot3_standard"),
-            run_process_pyro_provider=mock_run_process_pyro_provider,
-        )
+    run_store = RunOrchestratorStore(
+        hardware_api=ot3api,
+        robot_type="OT-3 Standard",
+        deck_type=DeckType("ot3_standard"),
+        run_process_pyro_provider=mock_run_process_pyro_provider,
+    )
 
-        resource_utilities.register_run_orchestrator_store_to_pyro_resource(
-            mock_app_state, run_store
-        )
+    resource_utilities.register_run_orchestrator_store_to_pyro_resource(
+        mock_app_state, run_store
+    )
 
-        result = ot3api.register_callback(
-            robot_server_resource.create_run_hardware_event_callback()
-        )
+    result = ot3api.register_callback(
+        robot_server_resource.create_run_hardware_event_callback()
+    )
 
-        assert isinstance(result, AsyncPyroFunctionWrapper)
+    assert isinstance(result, AsyncPyroFunctionWrapper)
 
 
+# NOTE: This is here to handle test failures for a feature flag migration bug on versions < 10.0.0
+# this patch should be REMOVED for releases >= 10.0.0
+@pytest.mark.xfail
 async def test_maintenance_run_hardware_event_callback(
     ot3_hardware_api: OT3API,
     mock_app_state: AppState,
@@ -199,34 +202,34 @@ async def test_maintenance_run_hardware_event_callback(
 
     It should be provided to the hardware event handler, and recieves a callback proxy in response.
     """
-    if False:
-        # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
-        # this patch should be REMOVED for releases >= 10.0.0
-        decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
-        ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
-            hw_api=ot3_hardware_api, app_state=mock_app_state
-        )
-        # Cast the two Async proxies on the nameserver as a locally useful type
-        ot3api = cast(OT3API, ot3_async)
-        robot_server_resource = cast(pyro_resource.RobotServerPyroResource, rs_async)
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
+    ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
+        hw_api=ot3_hardware_api, app_state=mock_app_state
+    )
+    # Cast the two Async proxies on the nameserver as a locally useful type
+    ot3api = cast(OT3API, ot3_async)
+    robot_server_resource = cast(pyro_resource.RobotServerPyroResource, rs_async)
 
-        maintenance_run_store = MaintenanceRunOrchestratorStore(
-            hardware_api=ot3api,
-            robot_type="OT-3 Standard",
-            deck_type=DeckType("ot3_standard"),
-        )
+    maintenance_run_store = MaintenanceRunOrchestratorStore(
+        hardware_api=ot3api,
+        robot_type="OT-3 Standard",
+        deck_type=DeckType("ot3_standard"),
+    )
 
-        resource_utilities.register_maintenance_run_orchestrator_store_to_pyro_resource(
-            mock_app_state, maintenance_run_store
-        )
+    resource_utilities.register_maintenance_run_orchestrator_store_to_pyro_resource(
+        mock_app_state, maintenance_run_store
+    )
 
-        result = ot3api.register_callback(
-            robot_server_resource.create_maintenance_run_hardware_event_callback()
-        )
+    result = ot3api.register_callback(
+        robot_server_resource.create_maintenance_run_hardware_event_callback()
+    )
 
-        assert isinstance(result, AsyncPyroFunctionWrapper)
+    assert isinstance(result, AsyncPyroFunctionWrapper)
 
 
+# NOTE: This is here to handle test failures for a feature flag migration bug on versions < 10.0.0
+# this patch should be REMOVED for releases >= 10.0.0
+@pytest.mark.xfail
 async def test_camera_provider(
     ot3_hardware_api: OT3API,
     mock_app_state: AppState,
@@ -234,33 +237,33 @@ async def test_camera_provider(
     decoy: Decoy,
 ) -> None:
     """Enforce that the RobotServerPyroResource provides a Proxy of the CameraProvider."""
-    if False:
-        # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
-        # this patch should be REMOVED for releases >= 10.0.0
-        decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
-        ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
-            hw_api=ot3_hardware_api, app_state=mock_app_state
-        )
-        # Cast the two Async proxies on the nameserver as a locally useful type
-        robot_server_resource = cast(pyro_resource.RobotServerPyroResource, rs_async)
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
+    ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
+        hw_api=ot3_hardware_api, app_state=mock_app_state
+    )
+    # Cast the two Async proxies on the nameserver as a locally useful type
+    robot_server_resource = cast(pyro_resource.RobotServerPyroResource, rs_async)
 
-        empty_cam_provider = CameraProvider()
-        resource_utilities.register_camera_provider_to_pyro_resource(
-            mock_app_state, empty_cam_provider
-        )
+    empty_cam_provider = CameraProvider()
+    resource_utilities.register_camera_provider_to_pyro_resource(
+        mock_app_state, empty_cam_provider
+    )
 
-        # NOTE: The camera proxy should comeback already wrapped as an AsyncClientPyroObject
-        camera_proxy_async = robot_server_resource.get_camera_provider()
+    # NOTE: The camera proxy should comeback already wrapped as an AsyncClientPyroObject
+    camera_proxy_async = robot_server_resource.get_camera_provider()
 
-        cam_provider = cast(CameraProvider, camera_proxy_async)
-        settings = await cam_provider.get_camera_settings()
+    cam_provider = cast(CameraProvider, camera_proxy_async)
+    settings = await cam_provider.get_camera_settings()
 
-        # Empty Camera settings defaults all to True, assert the proxy gave us that
-        assert settings.cameraEnabled
-        assert settings.liveStreamEnabled
-        assert settings.errorRecoveryCameraEnabled
+    # Empty Camera settings defaults all to True, assert the proxy gave us that
+    assert settings.cameraEnabled
+    assert settings.liveStreamEnabled
+    assert settings.errorRecoveryCameraEnabled
 
 
+# NOTE: This is here to handle test failures for a feature flag migration bug on versions < 10.0.0
+# this patch should be REMOVED for releases >= 10.0.0
+@pytest.mark.xfail
 async def test_file_provider(
     ot3_hardware_api: OT3API,
     mock_app_state: AppState,
@@ -268,45 +271,45 @@ async def test_file_provider(
     decoy: Decoy,
 ) -> None:
     """Enforce that the RobotServerPyroResource provides a Proxy of the FileProvider."""
-    if False:
-        # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
-        # this patch should be REMOVED for releases >= 10.0.0
-        decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
-        ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
-            hw_api=ot3_hardware_api, app_state=mock_app_state
-        )
-        # Cast the two Async proxies on the nameserver as a locally useful type
-        robot_server_resource = cast(pyro_resource.RobotServerPyroResource, rs_async)
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
+    ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
+        hw_api=ot3_hardware_api, app_state=mock_app_state
+    )
+    # Cast the two Async proxies on the nameserver as a locally useful type
+    robot_server_resource = cast(pyro_resource.RobotServerPyroResource, rs_async)
 
-        empty_file_provider = FileProvider()
-        resource_utilities.register_file_provider_to_pyro_resource(
-            mock_app_state, empty_file_provider
-        )
+    empty_file_provider = FileProvider()
+    resource_utilities.register_file_provider_to_pyro_resource(
+        mock_app_state, empty_file_provider
+    )
 
-        # NOTE: The camera proxy should comeback already wrapped as an AsyncClientPyroObject
-        file_proxy_async = robot_server_resource.get_file_provider()
+    # NOTE: The camera proxy should comeback already wrapped as an AsyncClientPyroObject
+    file_proxy_async = robot_server_resource.get_file_provider()
 
-        file_provider = cast(FileProvider, file_proxy_async)
-        results = await file_provider.write_file(
-            data=bytes([1, 2, 3]),
-            mime_type=MimeType("text/csv"),
-            command_metadata=UserDefinedCSVCmdFileNameMetadata(
-                command_id="1", prev_command_id="0", file_id=None, filename="hi"
-            ),
-        )
+    file_provider = cast(FileProvider, file_proxy_async)
+    results = await file_provider.write_file(
+        data=bytes([1, 2, 3]),
+        mime_type=MimeType("text/csv"),
+        command_metadata=UserDefinedCSVCmdFileNameMetadata(
+            command_id="1", prev_command_id="0", file_id=None, filename="hi"
+        ),
+    )
 
-        assert results == DataFileInfo(
-            id="",
-            name="",
-            file_hash="",
-            created_at=results.created_at,
-            generated=True,
-            stored=False,
-            path="",
-            mime_type=MimeType("text/csv"),
-        )
+    assert results == DataFileInfo(
+        id="",
+        name="",
+        file_hash="",
+        created_at=results.created_at,
+        generated=True,
+        stored=False,
+        path="",
+        mime_type=MimeType("text/csv"),
+    )
 
 
+# NOTE: This is here to handle test failures for a feature flag migration bug on versions < 10.0.0
+# this patch should be REMOVED for releases >= 10.0.0
+@pytest.mark.xfail
 async def test_deck_config(
     ot3_hardware_api: OT3API,
     mock_app_state: AppState,
@@ -315,27 +318,26 @@ async def test_deck_config(
     decoy: Decoy,
 ) -> None:
     """Enforce that the RobotServerPyroResource provides the DeckConfigurationType."""
-    if False:
-        # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
-        # this patch should be REMOVED for releases >= 10.0.0
-        decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
-        ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
-            hw_api=ot3_hardware_api, app_state=mock_app_state
-        )
-        # Cast the two Async proxies on the nameserver as a locally useful type
-        robot_server_resource = cast(pyro_resource.RobotServerPyroResource, rs_async)
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
+    ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
+        hw_api=ot3_hardware_api, app_state=mock_app_state
+    )
+    # Cast the two Async proxies on the nameserver as a locally useful type
+    robot_server_resource = cast(pyro_resource.RobotServerPyroResource, rs_async)
 
-        resource_utilities.register_deck_configuration_store_to_pyro_resource(
-            mock_app_state, mock_deck_configuration_store
-        )
+    resource_utilities.register_deck_configuration_store_to_pyro_resource(
+        mock_app_state, mock_deck_configuration_store
+    )
 
-        deck_config_data = await robot_server_resource.get_deck_configuration()
-        assert (
-            deck_config_data
-            == await mock_deck_configuration_store.get_deck_configuration()
-        )
+    deck_config_data = await robot_server_resource.get_deck_configuration()
+    assert (
+        deck_config_data == await mock_deck_configuration_store.get_deck_configuration()
+    )
 
 
+# NOTE: This is here to handle test failures for a feature flag migration bug on versions < 10.0.0
+# this patch should be REMOVED for releases >= 10.0.0
+@pytest.mark.xfail
 async def test_notify_publisher(
     ot3_hardware_api: OT3API,
     mock_app_state: AppState,
@@ -343,21 +345,18 @@ async def test_notify_publisher(
     decoy: Decoy,
 ) -> None:
     """Enforce that the RobotServerPyroResource provides a Proxy of the Notify Publisher."""
-    if False:
-        # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
-        # this patch should be REMOVED for releases >= 10.0.0
-        decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
-        ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
-            hw_api=ot3_hardware_api, app_state=mock_app_state
-        )
-        # Cast the two Async proxies on the nameserver as a locally useful type
-        robot_server_resource = cast(pyro_resource.RobotServerPyroResource, rs_async)
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
+    ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
+        hw_api=ot3_hardware_api, app_state=mock_app_state
+    )
+    # Cast the two Async proxies on the nameserver as a locally useful type
+    robot_server_resource = cast(pyro_resource.RobotServerPyroResource, rs_async)
 
-        resource_utilities.register_notify_publishers_to_pyro_resource(
-            mock_app_state,
-            lambda: [],
-        )
+    resource_utilities.register_notify_publishers_to_pyro_resource(
+        mock_app_state,
+        lambda: [],  # type: ignore
+    )
 
-        result = robot_server_resource.get_notify_publishers()
+    result = robot_server_resource.get_notify_publishers()
 
-        assert isinstance(result, AsyncPyroFunctionWrapper)
+    assert isinstance(result, AsyncPyroFunctionWrapper)

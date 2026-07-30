@@ -165,6 +165,9 @@ async def _host_pyro_nameserver_and_ot3api(
     return (ot3_async, rs_async)
 
 
+# NOTE: This is here to handle test failures for a feature flag migration bug on versions < 10.0.0
+# this patch should be REMOVED for releases >= 10.0.0
+@pytest.mark.xfail
 async def test_run_process_proxy(
     mock_app_state: AppState,
     ot3_hardware_api: OT3API,
@@ -172,48 +175,48 @@ async def test_run_process_proxy(
     decoy: Decoy,
 ) -> None:
     """Test the run process pyro creation and a proxy can be created that returns data and async commands can be called."""
-    if False:
-        # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
-        # this patch should be REMOVED for releases >= 10.0.0
-        decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
-        ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
-            ot3_hardware_api, mock_app_state
-        )
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
+    ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
+        ot3_hardware_api, mock_app_state
+    )
 
-        pyro_thread = initialize_run_process("ot-protocol")
-        pyro_thread.start()
+    pyro_thread = initialize_run_process("ot-protocol")
+    pyro_thread.start()
 
-        # Client-side requests below
-        register_process_types()
-        ns = pyro.locate_ns()
+    # Client-side requests below
+    register_process_types()
+    ns = pyro.locate_ns()
 
-        retries_counter = 0
-        uri = None
-        while retries_counter <= 10:
-            # Wait and try again, the resource isnt registered yet
-            try:
-                uri = ns.lookup("ot-protocol")
-                break
-            except Exception:
-                await asyncio.sleep(0.01)
-                retries_counter += 1
+    retries_counter = 0
+    uri = None
+    while retries_counter <= 10:
+        # Wait and try again, the resource isnt registered yet
+        try:
+            uri = ns.lookup("ot-protocol")
+            break
+        except Exception:
+            await asyncio.sleep(0.01)
+            retries_counter += 1
 
-        # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-        if uri is None:
-            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
+    # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
+    if uri is None:
+        raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
 
-        # uri = pyro.resolve(uri="PYRONAME:ot-protocol")
-        protocol_proxy = pyro.Proxy(uri)
-        protocol_async = AsyncClientPyroObject(protocol_proxy)
-        run_process = cast(DirectedRunProcess, cast(object, protocol_async))
+    # uri = pyro.resolve(uri="PYRONAME:ot-protocol")
+    protocol_proxy = pyro.Proxy(uri)  # type: ignore
+    protocol_async = AsyncClientPyroObject(protocol_proxy)
+    run_process = cast(DirectedRunProcess, cast(object, protocol_async))
 
-        result = run_process.get_robot_type()
-        assert result == "OT-3 Standard"
+    result = run_process.get_robot_type()
+    assert result == "OT-3 Standard"
 
-        # Clean up client resources.
-        protocol_proxy._pyroRelease()
+    # Clean up client resources.
+    protocol_proxy._pyroRelease()  # type: ignore
 
 
+# NOTE: This is here to handle test failures for a feature flag migration bug on versions < 10.0.0
+# this patch should be REMOVED for releases >= 10.0.0
+@pytest.mark.xfail
 async def test_run_process_create(
     decoy: Decoy,
     mock_app_state: AppState,
@@ -223,106 +226,103 @@ async def test_run_process_create(
     mock_feature_flags: None,
 ) -> None:
     """Test the run process pyro proxy `create` method can be called to create the run."""
-    if False:
-        # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
-        # this patch should be REMOVED for releases >= 10.0.0
-        decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
 
-        sock = socket.socket()
-        sock.bind(("localhost", 0))
-        host, port = sock.getsockname()
-        sock.close()
+    sock = socket.socket()
+    sock.bind(("localhost", 0))
+    host, port = sock.getsockname()
+    sock.close()
 
-        pyro.config.NS_HOST = host
-        pyro.config.NS_PORT = port
+    pyro.config.NS_HOST = host
+    pyro.config.NS_PORT = port
 
-        name_server_ready = threading.Event()
+    name_server_ready = threading.Event()
 
-        def _nameserver_loop() -> None:
-            # start_ns returns (nameserver, daemon, uri)
-            _, ns_daemon, _ = nameserver.start_ns(host=host, port=port)
-            name_server_ready.set()
-            # Run until the test process exits; thread is marked daemon=True.
-            ns_daemon.requestLoop()
+    def _nameserver_loop() -> None:
+        # start_ns returns (nameserver, daemon, uri)
+        _, ns_daemon, _ = nameserver.start_ns(host=host, port=port)  # type: ignore
+        name_server_ready.set()
+        # Run until the test process exits; thread is marked daemon=True.
+        ns_daemon.requestLoop()
 
-        ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
-        ns_thread.start()
-        name_server_ready.wait(timeout=PYRO_TIMEOUT)
-        ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
-            ot3_hardware_api, mock_app_state
-        )
+    ns_thread = threading.Thread(target=_nameserver_loop, daemon=True)
+    ns_thread.start()
+    name_server_ready.wait(timeout=PYRO_TIMEOUT)
+    ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
+        ot3_hardware_api, mock_app_state
+    )
 
-        run_store = RunOrchestratorStore(
-            hardware_api=ot3_async,
-            robot_type="OT-3 Standard",
-            deck_type=DeckType("ot3_standard"),
-            run_process_pyro_provider=mock_run_process_pyro_provider,
-        )
-        resource_utilities.register_run_orchestrator_store_to_pyro_resource(
-            mock_app_state, run_store
-        )
+    run_store = RunOrchestratorStore(
+        hardware_api=ot3_async,
+        robot_type="OT-3 Standard",
+        deck_type=DeckType("ot3_standard"),
+        run_process_pyro_provider=mock_run_process_pyro_provider,
+    )
+    resource_utilities.register_run_orchestrator_store_to_pyro_resource(
+        mock_app_state, run_store
+    )
 
-        # Get the necessary things registered with the "robot server"
-        empty_file_provider = FileProvider()
-        resource_utilities.register_file_provider_to_pyro_resource(
-            mock_app_state, empty_file_provider
-        )
-        empty_cam_provider = CameraProvider()
-        resource_utilities.register_camera_provider_to_pyro_resource(
-            mock_app_state, empty_cam_provider
-        )
-        resource_utilities.register_deck_configuration_store_to_pyro_resource(
-            mock_app_state, mock_deck_configuration_store
-        )
-        resource_utilities.register_notify_publishers_to_pyro_resource(
-            mock_app_state,
-            lambda: [],
-        )
+    # Get the necessary things registered with the "robot server"
+    empty_file_provider = FileProvider()
+    resource_utilities.register_file_provider_to_pyro_resource(
+        mock_app_state, empty_file_provider
+    )
+    empty_cam_provider = CameraProvider()
+    resource_utilities.register_camera_provider_to_pyro_resource(
+        mock_app_state, empty_cam_provider
+    )
+    resource_utilities.register_deck_configuration_store_to_pyro_resource(
+        mock_app_state, mock_deck_configuration_store
+    )
+    resource_utilities.register_notify_publishers_to_pyro_resource(
+        mock_app_state,
+        lambda: [],  # type: ignore
+    )
 
-        # Proceed with Pyro process testing
-        pyro_thread = initialize_run_process("ot-protocol")
-        pyro_thread.start()
+    # Proceed with Pyro process testing
+    pyro_thread = initialize_run_process("ot-protocol")
+    pyro_thread.start()
 
-        # Client-side requests below
-        register_all_needed_types()
-        ns = pyro.locate_ns()
+    # Client-side requests below
+    register_all_needed_types()
+    ns = pyro.locate_ns()
 
-        retries_counter = 0
-        uri = None
-        while retries_counter <= 10:
-            # Wait and try again, the resource isnt registered yet
-            try:
-                uri = ns.lookup("ot-protocol")
-                break
-            except Exception:
-                await asyncio.sleep(0.01)
-                retries_counter += 1
+    retries_counter = 0
+    uri = None
+    while retries_counter <= 10:
+        # Wait and try again, the resource isnt registered yet
+        try:
+            uri = ns.lookup("ot-protocol")
+            break
+        except Exception:
+            await asyncio.sleep(0.01)
+            retries_counter += 1
 
-        # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-        if uri is None:
-            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
+    # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
+    if uri is None:
+        raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
 
-        protocol_proxy = pyro.Proxy(uri)
-        protocol_async = AsyncClientPyroObject(protocol_proxy)
-        run_process = cast(DirectedRunProcess, cast(object, protocol_async))
+    protocol_proxy = pyro.Proxy(uri)  # type: ignore
+    protocol_async = AsyncClientPyroObject(protocol_proxy)
+    run_process = cast(DirectedRunProcess, cast(object, protocol_async))
 
-        result = run_process.get_robot_type()
-        assert result == "OT-3 Standard"
+    result = run_process.get_robot_type()
+    assert result == "OT-3 Standard"
 
-        # Ensure that we can run the create action on a proxy run
+    # Ensure that we can run the create action on a proxy run
 
-        await run_process.create(
-            run_id="cool-proxy-run",
-            labware_offsets=[],
-            error_recovery_rules=[],
-            error_recovery_is_enabled=False,
-            protocol=None,
-            run_time_param_values=None,
-            run_time_param_paths=None,
-            proxy_of_callback_for_handling_door_events=run_process.register_hardware_door_event(),
-        )
+    await run_process.create(
+        run_id="cool-proxy-run",
+        labware_offsets=[],
+        error_recovery_rules=[],
+        error_recovery_is_enabled=False,
+        protocol=None,
+        run_time_param_values=None,
+        run_time_param_paths=None,
+        proxy_of_callback_for_handling_door_events=run_process.register_hardware_door_event(),
+    )
 
-        await run_process.finish()
+    await run_process.finish()
 
-        # Clean up client resources.
-        protocol_proxy._pyroRelease()
+    # Clean up client resources.
+    protocol_proxy._pyroRelease()  # type: ignore
