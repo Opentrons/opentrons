@@ -4,13 +4,15 @@ from typing import Annotated
 
 import fastapi
 
+from server_utils.audit.fastapi import skip_audit_logger
+
 from .backend import Backend
 from .fastapi_dependencies import get_oauth2_backend
 
 router = fastapi.APIRouter(prefix="/auth")
 
 
-@router.post("/oauth2/token")
+@router.post("/oauth2/token", dependencies=[fastapi.Depends(skip_audit_logger)])
 async def token_endpoint(
     request: fastapi.Request,
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
@@ -23,7 +25,7 @@ async def token_endpoint(
     )
 
 
-@router.post("/oauth2/introspect")
+@router.post("/oauth2/introspect", dependencies=[fastapi.Depends(skip_audit_logger)])
 async def introspection_endpoint(
     request: fastapi.Request,
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
