@@ -379,6 +379,18 @@ def _build_classdict(  # noqa: C901
                     execute_inbound_call_on_event_loop(core_obj, attr)  # type: ignore
                 )
                 yield (name, exposed)
+                if attr.fset:
+                    bound_method = MethodType(pyro.expose(attr.fset), core_obj)
+                    exposed_fset = execute_inbound_call_on_event_loop(
+                        core_obj, bound_method
+                    )
+                    yield (name + "__fset", parameter_validation_wrapper(exposed_fset))
+                if attr.fdel:
+                    bound_method = MethodType(pyro.expose(attr.fdel), core_obj)
+                    exposed_fdel = execute_inbound_call_on_event_loop(
+                        core_obj, bound_method
+                    )
+                    yield (name + "__fdel", parameter_validation_wrapper(exposed_fdel))
 
     # Attach the known async methods list to the PSO as a private member and expose a getter method
     yield ("_pyro_async_methods", async_methods)
@@ -618,11 +630,6 @@ def convert_result_to_proxy(  # noqa: C901
         try:
             proxy_list = []
             for r in result:
-                if hasattr(r, "__weakref__"):
-                    # If the resulting object contains a weakref then utilize the inner instance
-                    # Example - CallBridger wrapping an AbstractModule
-                    r = r.__weakref__()
-
                 pyro_synchronous_obj = utility.find_PSO(r)
                 if pyro_synchronous_obj is None:
                     if not hasattr(r, "_loop"):

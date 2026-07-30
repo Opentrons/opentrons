@@ -6,6 +6,7 @@ import { ModelessModal } from '@opentrons/components'
 import { SlotDetails } from '../SlotDetails'
 import styles from './slotspotlightviewer.module.css'
 
+import type { ReactNode } from 'react'
 import type { Liquid, ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 import type { AppType } from '../../types'
@@ -28,7 +29,7 @@ interface SlotSpotlightViewerProps {
 
 export function SlotSpotlightViewer(
   props: SlotSpotlightViewerProps
-): JSX.Element | null {
+): ReactNode | null {
   const {
     appType,
     slotId,

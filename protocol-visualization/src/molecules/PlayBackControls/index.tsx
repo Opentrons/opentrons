@@ -12,8 +12,9 @@ import { PerStepOverflowMenu } from '../PerStepOverflowMenu'
 import styles from './playbackcontrols.module.css'
 import { formatTime } from './utils/formatTime'
 import { getSpeedMultiplierText } from './utils/getSpeedMultiplierText'
+import { isEditableKeyboardTarget } from './utils/isEditableKeyboardTarget'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 
 interface PlayBackControlsProps {
@@ -28,7 +29,7 @@ interface PlayBackControlsProps {
   onClickStepDetail?: () => void
 }
 
-export function PlayBackControls(props: PlayBackControlsProps): JSX.Element {
+export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
   const {
     isPlaying,
     handlePlayPause,
@@ -84,10 +85,16 @@ export function PlayBackControls(props: PlayBackControlsProps): JSX.Element {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent): void => {
-      if (event.key === ' ') {
-        event.preventDefault()
-        handlePlayPause()
+      if (event.key !== ' ') {
+        return
       }
+
+      if (isEditableKeyboardTarget(event.target)) {
+        return
+      }
+
+      event.preventDefault()
+      handlePlayPause()
     }
 
     document.addEventListener('keydown', handleKeyDown)

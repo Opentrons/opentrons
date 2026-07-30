@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   Check,
   COLORS,
@@ -79,9 +78,9 @@ export function BlockingHintModal(props: HintProps): JSX.Element {
               {t('shared:cancel')}
             </SecondaryButton>
             {hintKey === 'has_errors' || hintKey === 'no_commands' ? (
-              <AlertPrimaryButton onClick={onContinueClick}>
+              <PrimaryButton variant="warning" onClick={onContinueClick}>
                 {i18n.format(t(`shared:continue_with_export`), 'capitalize')}
-              </AlertPrimaryButton>
+              </PrimaryButton>
             ) : (
               <PrimaryButton onClick={onContinueClick}>
                 {i18n.format(t(`shared:confirm`), 'capitalize')}

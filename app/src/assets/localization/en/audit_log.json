@@ -51,13 +51,17 @@
   "place_plate_reader_lid": "Placing plate reader lid",
   "play_run": "Playing protocol",
   "recalibrate_gripper": "Recalibrating gripper",
+  "reset_robot_config": "Resetting robot configuration",
+  "restart_robot": "Restarting robot",
   "resume_run_from_recovery": "Resuming protocol run from recovery mode",
   "retry_action": "Retrying step",
   "right_mount": "right mount",
   "set_lights": "Toggling lights",
   "shutdown_robot": "Shutting down robot",
+  "sign_run": "Signing protocol run",
   "single_channel_and_8_channel": "single channel or 8 channel",
   "stop_run": "Stopping protocol run",
+  "sync_system_time": "Syncing robot system time",
   "update_audit_settings": "Updating reason for interaction log settings",
   "update_auth_settings": "Updating authentication settings",
   "update_camera": "Updating camera settings",
@@ -70,5 +74,6 @@
   "update_self": "Saving user settings",
   "update_settings": "Updating robot settings",
   "update_subsystem": "Updating subsystem firmware",
-  "upload_csv": "Uploading runtime parameters as CSV"
+  "upload_csv": "Uploading runtime parameters as CSV",
+  "wifi_config": "Configure wifi network"
 }

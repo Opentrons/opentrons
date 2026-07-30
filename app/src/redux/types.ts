@@ -13,7 +13,6 @@ import type {
   CustomLabwareState,
 } from './custom-labware/types'
 import type { DiscoveryAction, DiscoveryState } from './discovery/types'
-import type { NetworkingAction, NetworkingState } from './networking/types'
 import type { ProtocolAnalysisAction } from './protocol-analysis'
 import type { ProtocolRunAction, ProtocolRunState } from './protocol-runs/types'
 import type {
@@ -40,7 +39,6 @@ export interface State {
   readonly robotUpdate: RobotUpdateState
   readonly config: ConfigState
   readonly discovery: DiscoveryState
-  readonly networking: NetworkingState
   readonly labware: CustomLabwareState
   readonly shell: ShellState
   readonly systemInfo: SystemInfoState
@@ -64,7 +62,6 @@ export type Action =
   | ProtocolAnalysisAction
   | ProtocolStorageAction
   | CustomLabwareAction
-  | NetworkingAction
   | SystemInfoAction
   | AlertsAction
   | SessionsAction

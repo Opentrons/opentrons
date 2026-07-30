@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  AlertPrimaryButton,
   COLORS,
   Flex,
   Icon,
+  PrimaryButton,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -136,12 +136,13 @@ export function RecoveryTakeoverDesktop({
           </StyledText>
         </Flex>
         <Flex marginLeft="auto">
-          <AlertPrimaryButton
+          <PrimaryButton
+            variant="warning"
             onClick={clearClientData}
             disabled={isRunStatusAwaitingRecovery}
           >
             {t('terminate_remote_activity')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </Flex>
       </Flex>
     </RecoveryInterventionModal>

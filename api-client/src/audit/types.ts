@@ -14,3 +14,14 @@ export type DownloadedLogPeriodResponse = Blob | string
 export interface DeleteLogPeriodQueryParams {
   deletionKey: string
 }
+
+export interface PostLogMessageData {
+  action: string
+  message: string
+}
+
+export interface PostLogMessageResponse {
+  data: {
+    loggedAt: string
+  }
+}

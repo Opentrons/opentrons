@@ -38,9 +38,9 @@ class ModuleCalibrationOffset:
             modified = None
         return {
             "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
-            "offset_x": obj.offset.x,
-            "offset_y": obj.offset.y,
-            "offset_z": obj.offset.z,
+            "offset_x": float(obj.offset.x),
+            "offset_y": float(obj.offset.y),
+            "offset_z": float(obj.offset.z),
             "module_id": obj.module_id,
             "module": obj.module.value,
             "source": obj.source.value,

@@ -3,12 +3,12 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import {
-  AlertPrimaryButton,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   Flex,
   LegacyStyledText,
   Modal,
+  PrimaryButton,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -45,12 +45,13 @@ export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
             {error.message}
           </LegacyStyledText>
         </Flex>
-        <AlertPrimaryButton
+        <PrimaryButton
+          variant="warning"
           alignSelf={ALIGN_FLEX_END}
           onClick={handleReloadClick}
         >
           {t('reload_app')}
-        </AlertPrimaryButton>
+        </PrimaryButton>
       </Flex>
     </Modal>
   )

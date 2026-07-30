@@ -88,6 +88,7 @@ function updateSetNewPasswordFormData(
 
 interface LoginModalProps {
   robotName: string /** Which robot to log in to. */
+  uncloseable?: boolean
 }
 
 /** Open the desktop login modal in the appropriate React portal. */
@@ -98,20 +99,21 @@ export const showLoginModal = async (
 }
 
 const LoginModal = NiceModal.create((props: LoginModalProps) => {
-  const { robotName } = props
+  const { robotName, uncloseable } = props
   return (
     <ApiHostProvider robotName={robotName}>
-      <LoginModalImpl robotName={robotName} />
+      <LoginModalImpl robotName={robotName} uncloseable={uncloseable} />
     </ApiHostProvider>
   )
 })
 
 interface LoginModalImplProps {
   robotName: string
+  uncloseable?: boolean
 }
 
 function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
-  const { robotName } = props
+  const { robotName, uncloseable } = props
   const modal = useModal()
   const host = useHost()
   const { t } = useTranslation()
@@ -140,7 +142,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
 
   const { submitPassword, isAuthLoading } = useOAuth2PasswordLogin({
     onSuccess: (successfulUsername, user, response) => {
-      storeLoginState(robotName, successfulUsername, response)
+      storeLoginState(robotName, user, response)
 
       if (user.resetPassword) {
         setScreen({
@@ -157,8 +159,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
 
   const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
     useSetNewPasswordAndSignIn({
-      onSuccess: (successfulUsername, response) => {
-        storeLoginState(robotName, successfulUsername, response)
+      onSuccess: successfulUsername => {
         modal.resolve({ username: successfulUsername })
         modal.remove()
       },
@@ -255,7 +256,10 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   return createPortal(
     <Modal
       title={t('access_control:desktop_login_modal_header')}
-      onClose={handleClose}
+      onClose={uncloseable ? undefined : handleClose}
+      // Above SignRun and other run-header modals (zIndexOverlay: 1000); below
+      // permission toasts that use TOAST_ABOVE_LOGIN_Z_INDEX (10002).
+      zIndexOverlay={10001}
       footer={<div className={styles.modal_footer_container}>{footer}</div>}
     >
       <div className={styles.content_container}>

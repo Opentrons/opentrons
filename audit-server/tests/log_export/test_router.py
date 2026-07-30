@@ -106,6 +106,9 @@ async def test_download_log_period_stages_under_persistence_temp(
             signatureVersion=1,
         )
     )
+    decoy.when(mock_log_data_manager.create_deletion_key(period_id="1")).then_return(
+        "a-deletion-key"
+    )
 
     result = await download_log_period(
         periodId="1",
@@ -114,6 +117,8 @@ async def test_download_log_period_stages_under_persistence_temp(
         robot_server_client=mock_robot_server_client,
         persistence_directory_root=tmp_path,
     )
+
+    assert result.headers["opentrons-log-period-deletion-key"] == "a-deletion-key"
 
     zip_path = Path(result.path)
     assert zip_path.is_relative_to(tmp_path / PERSISTENCE_TEMP_SUBDIRECTORY)

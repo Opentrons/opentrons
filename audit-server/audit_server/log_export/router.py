@@ -30,6 +30,10 @@ router = fastapi.APIRouter()
 
 _DOWNLOAD_STAGING_PREFIX: Final = "temp-download-staging-"
 
+# Response header carrying the one-time deletion key for a downloaded log period.
+# Must match ``LOG_PERIOD_DELETION_KEY_HEADER`` in api-client/src/audit/constants.ts.
+_DELETION_KEY_HEADER: Final = "opentrons-log-period-deletion-key"
+
 
 @router.get(
     "/audit/external/logPeriods",
@@ -78,6 +82,11 @@ async def download_log_period(
             detail=f"No log period found with ID {periodId}",
         ) from exc
 
+    # The period exists, so mint a deletion key linked to it and hand it back in
+    # a response header. The app stores this key and presents it to later delete
+    # the period.
+    deletion_key = log_data_manager.create_deletion_key(period_id=periodId)
+
     signing_key = await key_client.get_key_and_hash()
     robot_info = await robot_server_client.get_name_and_serial()
 
@@ -115,5 +124,6 @@ async def download_log_period(
     return FileResponse(
         zip_file_path,
         media_type="application/zip",
+        headers={_DELETION_KEY_HEADER: deletion_key},
         background=BackgroundTask(cleanup_files),
     )

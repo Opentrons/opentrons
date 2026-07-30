@@ -152,6 +152,9 @@ type AuditLogAction =
   | 'dismiss_run'
   | 'retry_action'
   | 'shutdown_robot'
+  | 'restart_robot'
+  | 'reset_robot_config'
+  | 'sync_system_time'
   | 'update_robot_name'
   | 'update_self'
   | 'update_error_recovery_policy'
@@ -163,6 +166,7 @@ type AuditLogAction =
   | 'pause_run'
   | 'disconnect_wifi'
   | 'connect_wifi'
+  | 'wifi_config'
   | 'delete_protocol'
   | 'delete_run'
   | 'delete_run_images'
@@ -181,6 +185,7 @@ type AuditLogAction =
   | 'update_settings'
   | 'create_user'
   | 'delete_log_period'
+  | 'sign_run'
   | 'delete_log_periods'
 
 /**

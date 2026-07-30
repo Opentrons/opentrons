@@ -3,6 +3,8 @@ from typing import Annotated
 
 import fastapi
 
+from server_utils.audit.audit_logger import AuditLogger
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import (
     RequireAuthenticationResult,
     require_authentication,
@@ -22,6 +24,7 @@ from server_utils.fastapi_utils.models.json_api import (
 from auth_server.api_error import APIError
 from auth_server.users.dependencies import get_user_by_username, get_user_data_manager
 from auth_server.users.models import (
+    AccountType,
     ErrorBody,
     PasswordMissingSpecialCharactersErrorDetails,
     PasswordTooShortErrorDetails,
@@ -71,6 +74,9 @@ async def post_users(
     """Create a user."""
     user_create = request_body.data
     now = datetime.datetime.now(tz=datetime.UTC)
+    audit_logger.append_message_chunk(
+        f"New user with username={user_create.username}, fullName={user_create.fullName}, accountType={user_create.accountType}"
+    )
     try:
         new_user = user_data_manager.create_user(
             username=user_create.username,
@@ -163,7 +169,10 @@ async def get_user(
     responses={
         fastapi.status.HTTP_204_NO_CONTENT: {"description": "User deleted"},
     },
-    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.USERS_WRITE)),
+        fastapi.Depends(get_audit_logger("delete user")),
+    ],
 )
 async def delete_user(
     user: Annotated[UserResponse, fastapi.Depends(get_user_by_username)],
@@ -202,10 +211,32 @@ async def update_user(
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
+    audit_logger: Annotated[
+        AuditLogger,
+        fastapi.Depends(get_audit_logger("update user", auto_log_request_body=False)),
+    ],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Update a user by its unique identifier."""
     update_data = request_body.data
     now = datetime.datetime.now(tz=datetime.UTC)
+
+    def _field_or_empty(field_name: str, field: str | AccountType | bool | None) -> str:
+        if field is None:
+            return ""
+        return f"{field_name}={str(field)}"
+
+    audit_logger.append_message_chunk(
+        "Update user: "
+        + ", ".join(
+            [
+                _field_or_empty("username", update_data.username),
+                _field_or_empty("fullName", update_data.fullName),
+                _field_or_empty("accountType", update_data.accountType),
+                _field_or_empty("resetPassword", update_data.resetPassword),
+                _field_or_empty("locked", update_data.locked),
+            ]
+        )
+    )
     try:
         updated_user = user_data_manager.update_user(
             user.username,
@@ -257,7 +288,12 @@ async def update_user(
         fastapi.status.HTTP_200_OK: {"model": SimpleBody[TemporaryPasswordResponse]},
         fastapi.status.HTTP_404_NOT_FOUND: {"userNotFound": None},
     },
-    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.USERS_WRITE)),
+        fastapi.Depends(
+            get_audit_logger("reset password", auto_log_response_body=False)
+        ),
+    ],
 )
 async def reset_user_password(
     user: Annotated[UserResponse, fastapi.Depends(get_user_by_username)],
@@ -341,6 +377,16 @@ async def update_self(
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
+    audit_logger: Annotated[
+        AuditLogger,
+        fastapi.Depends(
+            get_audit_logger(
+                "update own user",
+                # Custom logs of request body to avoid logging passwords
+                auto_log_request_body=False,
+            ),
+        ),
+    ],
 ) -> PydanticResponse[SimpleBody[UserResponse]]:
     """Update the current user's profile and/or password."""
     if not isinstance(authentication, AuthenticatedResult):
@@ -349,7 +395,22 @@ async def update_self(
             detail="This endpoint needs an access token to determine the current user.",
         )
 
+    def _field_or_empty(field_name: str, field: str | AccountType | bool | None) -> str:
+        if field is None:
+            return ""
+        return f"{field_name}={str(field)}"
+
     update_data = request_body.data
+    audit_logger.append_message_chunk(
+        "Update self: "
+        + ", ".join(
+            [
+                _field_or_empty("username", update_data.username),
+                _field_or_empty("fullName", update_data.fullName),
+            ]
+        )
+    )
+
     if (
         update_data.username is None
         and update_data.fullName is None
