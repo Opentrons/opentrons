@@ -1,5 +1,6 @@
 ---
 title: "Vacuum Module: Product Specifications"
+description: "Box contents and summary of physical specifications for the Vacuum Module."
 ---
 
 ![Vacuum Module illustration showing main parts with brief labels](images/vacuum-module-labels.png)
@@ -104,29 +105,29 @@ Box 2 includes the Control Box (vacuum pump and electronics), a deck adapter (an
 
 <figure markdown>
 ![Manifold screws, 4 and 2 extra](images/fasteners-manifold.png){ width="80%" }
-<figcaption>(6) Manifold screws, 7/64" Imperial thread</figcaption>
+<figcaption>(6) Manifold screws,<br>7/64" Imperial thread</figcaption>
 </figure>
 
 </div>
 
 ### Box 3: waste collection components
 
-Box 3 includes the waste collection jar and cap, a jar holder (to help prevent tip-overs), vacuum hoses, hose clamps, along with extra quick connect/disconnect fittings and clamps (not shown here).
+Box 3 includes the waste collection carboy and cap, a carboy holder (to help prevent tip-overs), vacuum hoses, hose clamps, along with extra quick connect/disconnect fittings and clamps (not shown here).
 
-* The jar, cap, and hoses ship with quick connector fittings already installed at the factory.
+* The carboy, cap, and hoses ship with quick connector fittings already installed at the factory.
 * The hoses are wrapped around the shaped foam padding in the bottom of the box.
 * You can use extra hardware (fittings and clamps) to create your own, customized set of vacuum hoses.
 
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Glass 2 liter waste jar and cap](images/waste-jar.png "2 liter glass waste jar and cap"){ width="70%" }
-<figcaption>(1) Waste jar and cap</figcaption>
+![Glass 2 liter carboy and cap](images/carboy.png "2 liter glass carboy and cap"){ width="70%" }
+<figcaption>(1) Waste carboy and cap</figcaption>
 </figure>
 
 <figure markdown>
-![Carboy cradle](images/waste-jar-cradle.png "Waste jar cradle")
-<figcaption>(1) Waste jar cradle</figcaption>
+![Carboy cradle](images/carboy-holder.png "Waste carboy holder")
+<figcaption>(1) Carboy holder</figcaption>
 </figure>
 
 </div>
@@ -205,9 +206,9 @@ The Vacuum Module ships with two vacuum hoses and factory installed quick connec
   </tbody>
 </table>
 
-### Waste collection jar
+### Carboy
 
-The Vacuum Module ships with glass waste collection jar (carboy) and a safety cradle. The cradle helps keep the jar upright and prevents tip-overs.
+The Vacuum Module ships with glass waste collection carboy, cap, cap wrench, and holder. The holder helps keep the carboy upright and prevents tip-overs. The wrench helps you remove the cap after returning the module system to atmospheric pressure.
 
 <table>
   <thead>
@@ -232,8 +233,8 @@ The Vacuum Module ships with glass waste collection jar (carboy) and a safety cr
         <ul>
           <li>Type: GL80 (blue)</li>
           <li>Insert: Stainless steel, ported and threaded for hose connectors</li>
-          <li>Seal: integral lip seal (polypropylene)</li>
-          <li>Backflow preventer: float ball and valve (polypropylene)</li>
+          <li>Seal: integral lip seal</li>
+          <li>Backflow preventer: float ball and valve</li>
       </td>
     </tr>
   </tbody>

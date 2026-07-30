@@ -5,6 +5,8 @@ nav:
   - Safety and Compliance: compliance.md
   - Product Specifications: specifications.md
   - Vacuum Base, Collars, and Spacers: base-collars-spacers.md
+  - Carboy: carboy.md
+  - Use Cases and Stack Configurations: use-cases.md
   - Installing the Vacuum Module: installation.md
   - Maintenance and Cleaning: maintenance.md
   - Vacuum Module G-Codes:
