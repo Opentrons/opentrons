@@ -76,7 +76,11 @@ export function ProtocolRunRecords({
         INFO_TOAST,
         { disableTimeout: true, icon: toastIcon }
       )
-      void downloadRuns(runs.filter(run => selectedIds.has(run.id)))
+      void downloadRuns(
+        runs.filter(run => {
+          return selectedIds.has(run.id)
+        })
+      )
         .catch((e: Error) => {
           makeToast(e.message, ERROR_TOAST, { closeButton: true })
         })
@@ -95,18 +99,28 @@ export function ProtocolRunRecords({
   }
 
   const handleConfirmDeleteSelected = (): void => {
-    void deleteSelectedRuns(runs.filter(run => selectedIds.has(run.id))).catch(
-      (error: Error) => {
-        if (!isDocumentedMutationError(error)) {
-          makeToast('Error deleting records', ERROR_TOAST)
-          setShowDeleteRecordsModal(false)
-        } else {
-          // repoen the delete modal if we fail; no flicker in practice
-          setShowDeleteRecordsModal(true)
-        }
-      }
-    )
     setShowDeleteRecordsModal(false)
+    const selectedRuns = runs.filter(run => selectedIds.has(run.id))
+    void downloadRuns(selectedRuns)
+      .then(successfullyDownloadedRuns => {
+        if (successfullyDownloadedRuns.length < selectedRuns.length) {
+          makeToast(t('some_runs_not_deleted') as string, WARNING_TOAST, {
+            closeButton: true,
+          })
+        }
+        if (successfullyDownloadedRuns.length === 0) {
+          return
+        }
+        return deleteSelectedRuns(successfullyDownloadedRuns)
+      })
+      .catch((error: Error) => {
+        if (isDocumentedMutationError(error)) {
+          // Re-open delete modal if it was a documented mutation error
+          setShowDeleteRecordsModal(true)
+        } else {
+          makeToast(error.message || 'Error processing records', ERROR_TOAST)
+        }
+      })
   }
 
   return (

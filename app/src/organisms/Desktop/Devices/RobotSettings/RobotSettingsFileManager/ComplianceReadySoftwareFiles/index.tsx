@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 
 import {
   CheckboxBasic,
@@ -20,7 +19,6 @@ import {
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { getLogPeriodDeletionKeysById } from '/app/redux/audit'
 import { useDeleteSelectedLogPeriods } from '/app/resources/devices/hooks/useDeleteSelectedLogPeriods'
 import { useDownloadSelectedLogPeriods } from '/app/resources/devices/hooks/useDownloadSelectedLogPeriods'
 import { formatTimestamp } from '/app/transformations/runs'
@@ -33,6 +31,7 @@ import styles from './compliancereadysoftwarefiles.module.css'
 import { LogPeriodRow } from './LogPeriodRow'
 
 import type { IconProps } from '@opentrons/components'
+import type { DownloadedLogPeriod } from '/app/resources/devices/hooks/useDownloadSelectedLogPeriods'
 
 interface ComplianceReadySoftwareFilesProps {
   robotName: string
@@ -48,7 +47,6 @@ export function ComplianceReadySoftwareFiles({
     useDownloadSelectedLogPeriods(robotName)
   const { deleteSelectedLogPeriods, deletingIds } =
     useDeleteSelectedLogPeriods(documentationState)
-  const logPeriodDeletionKeysById = useSelector(getLogPeriodDeletionKeysById)
   const { makeToast, eatToast } = useToaster()
 
   // API returns periods oldest-to-newest; reverse for newest-first display.
@@ -119,19 +117,46 @@ export function ComplianceReadySoftwareFiles({
   }
 
   const handleConfirmDeleteSelected = (): void => {
-    void deleteSelectedLogPeriods(
-      periods.filter(period => selectedIds.has(period.id)),
-      logPeriodDeletionKeysById
-    ).catch((e: Error) => {
-      if (!isDocumentedMutationError(e)) {
-        makeToast(e.message, ERROR_TOAST)
-        setShowDeleteRecordsModal(false)
-      } else {
-        // repoen the delete modal if we fail; no flicker in practice
-        setShowDeleteRecordsModal(true)
-      }
-    })
     setShowDeleteRecordsModal(false)
+    const selectedPeriods = periods.filter(period => selectedIds.has(period.id))
+    void downloadLogPeriods(selectedPeriods)
+      .then(downloadedPeriods => {
+        // only chain a delete for periods that actually came back with a
+        // deletion key; a period downloaded without one can't be deleted yet
+        const deletableDownloads = downloadedPeriods.filter(
+          (
+            downloaded
+            // enforcing that deletionKey is non-null
+          ): downloaded is DownloadedLogPeriod & { deletionKey: string } =>
+            downloaded.deletionKey != null
+        )
+        if (deletableDownloads.length < selectedPeriods.length) {
+          makeToast(t('some_logs_not_deleted') as string, WARNING_TOAST, {
+            closeButton: true,
+          })
+        }
+        if (deletableDownloads.length === 0) {
+          return
+        }
+        const deletionKeysByLogPeriodId = deletableDownloads.reduce<
+          Record<string, string>
+        >((acc, { logPeriod, deletionKey }) => {
+          acc[logPeriod.id] = deletionKey
+          return acc
+        }, {})
+        return deleteSelectedLogPeriods(
+          deletableDownloads.map(({ logPeriod }) => logPeriod),
+          deletionKeysByLogPeriodId
+        )
+      })
+      .catch((e: Error) => {
+        if (!isDocumentedMutationError(e)) {
+          makeToast(e.message, ERROR_TOAST)
+        } else {
+          // reopen the delete modal if we fail; no flicker in practice
+          setShowDeleteRecordsModal(true)
+        }
+      })
   }
 
   const periodHeaderKeys: Array<'started' | 'ended' | 'status'> = [
