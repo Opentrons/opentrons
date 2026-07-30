@@ -2140,7 +2140,7 @@ class VacuumModuleContext(ModuleContext):
     def open_vent(self, equalize_timeout_s: Optional[int] = None) -> None:
         """Open the vent valve to bring the system to atmospheric pressure (0 mbar).
 
-        Opens the vent to release vacuum and return system pressure to atmospheric. The module will not hold vacuum while the vent is open.
+        The module will not hold vacuum while the vent is open.
 
         Args:
             equalize_timeout_s: An optional maximum wait time, in seconds, to wait for system pressure to return near atmospheric after venting. If omitted, the command opens the vent and returns without waiting for equalization. Waiting is recommended before moving labware to or from the module.
@@ -2150,5 +2150,8 @@ class VacuumModuleContext(ModuleContext):
     @requires_version(2, 30)
     @publish(command=cmds.vacuum_module_close_vent)
     def close_vent(self) -> None:
-        """Close the vent so the system can hold vacuum."""
+        """Close the vent so the system can hold vacuum.
+        
+        The module will not hold vacuum while the vent is open.
+        """
         self._core.close_vent()
