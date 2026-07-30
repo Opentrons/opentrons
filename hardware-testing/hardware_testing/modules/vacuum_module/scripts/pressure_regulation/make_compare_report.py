@@ -2,8 +2,8 @@
 """Build multi-run comparison HTML from saved sweep JSON files."""
 from __future__ import annotations
 
+import argparse
 import json
-import sys
 from pathlib import Path
 
 
@@ -16,9 +16,9 @@ def load_runs(runs_dir: Path) -> list[dict]:
     return runs
 
 
-def main() -> int:
-    runs_dir = Path(sys.argv[1] if len(sys.argv) > 1 else "runs")
-    out = Path(sys.argv[2] if len(sys.argv) > 2 else "compare.html")
+def main(args) -> int:
+    runs_dir = args.runs_dir
+    out = args.output
     runs = load_runs(runs_dir)
     if not runs:
         out.write_text("<html><body><h1>No runs yet</h1><meta http-equiv='refresh' content='5'></body></html>")
@@ -180,4 +180,20 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    parser = argparse.ArgumentParser(
+        description="Build multi-run comparison HTML from saved sweep JSON files"
+    )
+    parser.add_argument(
+        "--runs-dir",
+        type=Path,
+        default=Path("runs"),
+        help="Directory of run folders with results.json (default: runs)",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path("compare.html"),
+        help="Output HTML path (default: compare.html)",
+    )
+    args = parser.parse_args()
+    raise SystemExit(main(args))

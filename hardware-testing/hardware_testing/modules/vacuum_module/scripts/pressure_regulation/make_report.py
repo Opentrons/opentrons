@@ -2,14 +2,31 @@
 """Build an interactive HTML report from vacuum pressure hold JSON results."""
 from __future__ import annotations
 
+import argparse
 import json
-import sys
 from pathlib import Path
 
 
 def main() -> int:
-    src = Path(sys.argv[1] if len(sys.argv) > 1 else "vacuum_pressure_hold_results.json")
-    out = Path(sys.argv[2] if len(sys.argv) > 2 else "index.html")
+    parser = argparse.ArgumentParser(
+        description="Build an interactive HTML report from vacuum pressure hold JSON results"
+    )
+    parser.add_argument(
+        "--input",
+        type=Path,
+        default=Path("resulrs.json"),
+        help="Input JSON results path (default: results.json)",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path("index.html"),
+        help="Output HTML path (default: index.html)",
+    )
+    args = parser.parse_args()
+
+    src = args.input
+    out = args.output
     if not src.exists():
         out.write_text(
             "<!DOCTYPE html><html><body style='background:#0f1419;color:#e7ecf3;"
@@ -234,3 +251,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

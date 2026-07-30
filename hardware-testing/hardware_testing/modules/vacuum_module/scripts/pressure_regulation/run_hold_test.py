@@ -7,77 +7,34 @@ so a host-side report can update live.
 """
 from __future__ import annotations
 
+import argparse
+import asyncio
 import json
-import re
+import os
 import statistics
 import sys
 import time
 from typing import Any
 
-import serial
+from opentrons.drivers import vacuum_module
+from opentrons.drivers.vacuum_module.types import VentState
 
 from hardware_testing.modules.common.utils import find_module_port
 
 VACUUM_VID = 0x0483
 VACUUM_PID = 0xEF40
-PORT = "/dev/ot_module_vacuummodule1"
-BAUD = 115200
 OUT_JSON = "/tmp/vacuum_pressure_hold_results.json"
 
-# 0, -50, ..., -800 mbar
-TARGETS = [float(p) for p in range(0, -801, -50)]
-DURATION_S = 120  # 2 minutes each
+DEFAULT_TARGETS = [float(p) for p in range(0, -801, -50)]  # 0, -50, ..., -800 mbar
+DEFAULT_DURATION_S = 120  # 2 minutes each
 SAMPLE_PERIOD_S = 0.5
 TIMEOUT_S = 180
-
-
-def xcmd(ser: serial.Serial, cmd: str, wait: float = 0.12) -> str:
-    ser.reset_input_buffer()
-    ser.write((cmd.strip() + "\n").encode())
-    ser.flush()
-    time.sleep(wait)
-    data = b""
-    t0 = time.time()
-    while time.time() - t0 < 1.0:
-        chunk = ser.read(ser.in_waiting or 1)
-        if chunk:
-            data += chunk
-            if b"OK" in data or b"ERR" in data:
-                time.sleep(0.03)
-                data += ser.read(ser.in_waiting or 0)
-                break
-        else:
-            time.sleep(0.02)
-    return data.decode(errors="replace").strip()
-
-
-def parse_m121(resp: str) -> dict[str, Any] | None:
-    m = re.search(
-        r"M121 T:([-\d.]+) C:([-\d.]+) A:([-\d.]+) B:([-\d.]+) H:([-\d.]+) "
-        r"E:(\d+) D:(\d+) V:(\d+)",
-        resp,
-    )
-    if not m:
-        return None
-    return {
-        "target": float(m.group(1)),
-        "current": float(m.group(2)),
-        "abs_a": float(m.group(3)),
-        "abs_b": float(m.group(4)),
-        "atm": float(m.group(5)),
-        "enabled": int(m.group(6)),
-        "duration": int(m.group(7)),
-        "vent": int(m.group(8)),
-    }
 
 
 def write_results(result: dict[str, Any]) -> None:
     tmp = OUT_JSON + ".tmp"
     with open(tmp, "w") as f:
         json.dump(result, f)
-    # atomic-ish replace
-    import os
-
     os.replace(tmp, OUT_JSON)
 
 
@@ -104,19 +61,30 @@ def steady_stats(samples: list[dict[str, Any]], duration_s: int) -> dict[str, An
     }
 
 
-def run_target(
-    ser: serial.Serial,
+async def run_target(
+    pump: vacuum_module.VacuumModuleDriver,
     target_gauge: float,
     duration_s: int,
     sample_period: float,
     result: dict[str, Any],
 ) -> dict[str, Any]:
     print(f"\n=== Target {target_gauge} mbar for {duration_s}s ===", flush=True)
-    print("close vent:", xcmd(ser, "M124 S0"), flush=True)
-    print("stop pump:", xcmd(ser, "M120 S0"), flush=True)
-    time.sleep(0.4)
-    start_cmd = f"M120 S1 P{target_gauge} D{duration_s} T{TIMEOUT_S} V1"
-    print("start:", start_cmd, "->", xcmd(ser, start_cmd), flush=True)
+    await pump.set_vent_state(VentState.CLOSED)
+    print("close vent: CLOSED", flush=True)
+    await pump.set_vacuum_state(enable_vacuum=False)
+    print("stop pump", flush=True)
+    await asyncio.sleep(0.4)
+    await pump.set_vacuum_state(
+        enable_vacuum=True,
+        gauge_pressure_mbar=target_gauge,
+        duration_s=duration_s,
+        timeout_s=TIMEOUT_S,
+        vent_after=True,
+    )
+    print(
+        f"start: P={target_gauge} D={duration_s} T={TIMEOUT_S} V=1",
+        flush=True,
+    )
 
     samples: list[dict[str, Any]] = []
     run: dict[str, Any] = {
@@ -133,31 +101,35 @@ def run_target(
     t0 = time.time()
     last_write = 0.0
     while time.time() - t0 < duration_s + 1.5:
-        resp = xcmd(ser, "M121", wait=0.06)
-        st = parse_m121(resp)
-        elapsed = round(time.time() - t0, 3)
-        if not st:
-            print(f"t={elapsed:6.2f}s BAD_RESP {resp!r}", flush=True)
-            time.sleep(sample_period)
+        try:
+            st = await pump.get_vacuum_state()
+        except Exception as e:
+            elapsed = round(time.time() - t0, 3)
+            print(f"t={elapsed:6.2f}s BAD_RESP {e!r}", flush=True)
+            await asyncio.sleep(sample_period)
             continue
-        err = st["current"] - target_gauge
+        elapsed = round(time.time() - t0, 3)
+        err = st.current_gauge_pressure - target_gauge
         sample = {
             "t_s": elapsed,
-            "current_mbar": st["current"],
-            "target_mbar": st["target"],
+            "current_mbar": st.current_gauge_pressure,
+            "target_mbar": st.target_gauge_pressure,
             "error_mbar": round(err, 3),
-            "enabled": st["enabled"],
-            "duration_remaining_s": st["duration"],
-            "abs_a": st["abs_a"],
-            "abs_b": st["abs_b"],
-            "atm": st["atm"],
-            "vent": st["vent"],
+            "enabled": int(st.vacuum_enabled),
+            "duration_remaining_s": st.vacuum_duration,
+            "abs_a": st.pressure_abs_a,
+            "abs_b": st.pressure_abs_b,
+            "atm": st.pressure_atm,
+            "vent": st.vent_state.value,
         }
         samples.append(sample)
         print(
-            f"t={elapsed:6.2f}s  C={st['current']:8.2f}  T={st['target']:8.2f}  "
-            f"err={err:7.2f}  E={st['enabled']}  D={st['duration']:3d}  "
-            f"A={st['abs_a']:.1f} B={st['abs_b']:.1f} H={st['atm']:.1f}",
+            f"t={elapsed:6.2f}s  C={st.current_gauge_pressure:8.2f}  "
+            f"T={st.target_gauge_pressure:8.2f}  "
+            f"err={err:7.2f}  E={int(st.vacuum_enabled)}  "
+            f"D={st.vacuum_duration:3d}  "
+            f"A={st.pressure_abs_a:.1f} B={st.pressure_abs_b:.1f} "
+            f"H={st.pressure_atm:.1f}",
             flush=True,
         )
         # Incremental write ~every 2s for live graph
@@ -165,7 +137,7 @@ def run_target(
             run["stats"] = steady_stats(samples, duration_s)
             write_results(result)
             last_write = elapsed
-        time.sleep(sample_period)
+        await asyncio.sleep(sample_period)
 
     stats = steady_stats(samples, duration_s)
     run["stats"] = stats
@@ -181,72 +153,126 @@ def run_target(
     else:
         print("STEADY empty", flush=True)
 
-    print("stop:", xcmd(ser, "M120 S0"), flush=True)
-    print("open vent:", xcmd(ser, "M124 S1"), flush=True)
+    await pump.set_vacuum_state(enable_vacuum=False)
+    print("stop", flush=True)
+    await pump.set_vent_state(VentState.OPENED)
+    print("open vent: OPENED", flush=True)
     write_results(result)
-    time.sleep(2)
+    await asyncio.sleep(2)
     return run
 
 
-def main() -> int:
+async def main(args: argparse.Namespace) -> int:
+    targets = args.targets
+    duration_s = args.duration_s
+    run_name = args.run_name
+
     print(
-        f"Targets: {TARGETS[0]} .. {TARGETS[-1]} step -50 "
-        f"({len(TARGETS)} points, {DURATION_S}s each, "
-        f"~{len(TARGETS) * DURATION_S / 60:.0f} min hold time)",
+        f"Run: {run_name}  Targets: {targets[0]} .. {targets[-1]} "
+        f"({len(targets)} points, {duration_s}s each, "
+        f"~{len(targets) * duration_s / 60:.0f} min hold time)",
         flush=True,
     )
 
     port = find_module_port(VACUUM_VID, VACUUM_PID)
-    ser = serial.Serial(port, BAUD, timeout=0.2)
-    ser.reset_input_buffer()
-    fw = xcmd(ser, "M115", wait=0.3)
-    print("M115:", fw, flush=True)
-    print("disable waste:", xcmd(ser, "M127 E0"), flush=True)
-    print("M128:", xcmd(ser, "M128"), flush=True)
-    print("M121:", xcmd(ser, "M121", wait=0.2), flush=True)
-    print("M126:", xcmd(ser, "M126", wait=0.2), flush=True)
+    loop = asyncio.get_running_loop()
+    pump = await vacuum_module.VacuumModuleDriver.create(port=port, loop=loop)
 
-    result: dict[str, Any] = {
-        "firmware": fw,
-        "targets": TARGETS,
-        "duration_s": DURATION_S,
-        "sample_period_s": SAMPLE_PERIOD_S,
-        "waste_detection": "disabled (M127 E0)",
-        "runs": [],
-        "status": "running",
-        "current_target_mbar": None,
-        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-    }
-    write_results(result)
-
-    for tgt in TARGETS:
-        run_target(ser, tgt, DURATION_S, SAMPLE_PERIOD_S, result)
-
-    result["status"] = "complete"
-    result["current_target_mbar"] = None
-    result["firmware"] = xcmd(ser, "M115", wait=0.3)
-    write_results(result)
-    print(f"\nWrote {OUT_JSON}", flush=True)
-
-    print("\n======== STEADY-STATE SUMMARY (last ~30s) ========", flush=True)
-    for run in result["runs"]:
-        st = run["stats"]
-        if st.get("n", 0) == 0:
-            print(f"target={run['target_mbar']:+.0f} NO_STEADY_DATA", flush=True)
-            continue
-        passed = st["mean_abs_err"] <= 2.0 and st["p95_abs_err"] <= 4.0
-        print(
-            f"target={run['target_mbar']:+.0f} mean_abs={st['mean_abs_err']:.2f} "
-            f"mean_err={st['mean_err']:.2f} stdev={st['stdev_err']:.2f} "
-            f"p95_abs={st['p95_abs_err']:.2f} max_abs={st['max_abs_err']:.2f} "
-            f"PASS={passed}",
-            flush=True,
+    try:
+        info = await pump.get_device_info()
+        fw = (
+            f"FW:{info['version']} HW:Opentrons-vacuum-module-{info['model']} "
+            f"SerialNo:{info['serial']}"
         )
+        print("M115:", fw, flush=True)
+        await pump.set_waste_configs(
+            enable_waste_full_detection=args.waste_detection
+        )
+        waste_label = (
+            "enabled (M127 E1)" if args.waste_detection else "disabled (M127 E0)"
+        )
+        print(f"waste detection: {waste_label}", flush=True)
+        waste = await pump.get_waste_configs()
+        print("M128:", waste, flush=True)
+        print("M121:", await pump.get_vacuum_state(), flush=True)
+        print("M126:", await pump.get_pressure_control_tunings(), flush=True)
 
-    ser.close()
+        result: dict[str, Any] = {
+            "run_name": run_name,
+            "firmware": fw,
+            "targets": targets,
+            "duration_s": duration_s,
+            "sample_period_s": SAMPLE_PERIOD_S,
+            "waste_detection": waste_label,
+            "runs": [],
+            "status": "running",
+            "current_target_mbar": None,
+            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        }
+        write_results(result)
+
+        for tgt in targets:
+            await run_target(pump, tgt, duration_s, SAMPLE_PERIOD_S, result)
+
+        result["status"] = "complete"
+        result["current_target_mbar"] = None
+        info = await pump.get_device_info()
+        result["firmware"] = (
+            f"FW:{info['version']} HW:Opentrons-vacuum-module-{info['model']} "
+            f"SerialNo:{info['serial']}"
+        )
+        write_results(result)
+        print(f"\nWrote {OUT_JSON}", flush=True)
+
+        print("\n======== STEADY-STATE SUMMARY (last ~30s) ========", flush=True)
+        for run in result["runs"]:
+            st = run["stats"]
+            if st.get("n", 0) == 0:
+                print(f"target={run['target_mbar']:+.0f} NO_STEADY_DATA", flush=True)
+                continue
+            passed = st["mean_abs_err"] <= 2.0 and st["p95_abs_err"] <= 4.0
+            print(
+                f"target={run['target_mbar']:+.0f} mean_abs={st['mean_abs_err']:.2f} "
+                f"mean_err={st['mean_err']:.2f} stdev={st['stdev_err']:.2f} "
+                f"p95_abs={st['p95_abs_err']:.2f} max_abs={st['max_abs_err']:.2f} "
+                f"PASS={passed}",
+                flush=True,
+            )
+    finally:
+        await pump.disconnect()
+
     print("DONE", flush=True)
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    parser = argparse.ArgumentParser(
+        description="Vacuum module pressure hold regulation test"
+    )
+    parser.add_argument(
+        "--targets",
+        type=float,
+        nargs="+",
+        default=DEFAULT_TARGETS,
+        help="Target gauge pressures in mbar (default: 0 -50 ... -800)",
+    )
+    parser.add_argument(
+        "--duration_s",
+        type=int,
+        default=DEFAULT_DURATION_S,
+        help="Hold duration per target in seconds (default: 120)",
+    )
+    parser.add_argument(
+        "--run-name",
+        type=str,
+        default="unnamed",
+        help="Label for this run (stored in results JSON; default: unnamed)",
+    )
+    parser.add_argument(
+        "--waste-detection",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Enable waste full detection (default: disabled)",
+    )
+    args = parser.parse_args()
+    sys.exit(asyncio.run(main(args)))
