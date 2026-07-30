@@ -43,6 +43,14 @@ class UserStore:
                 session.expunge(user)
             return user
 
+    def get_all(self) -> list[User]:
+        """Return all users, ordered by username."""
+        with self._session() as session:
+            users = session.scalars(select(User).order_by(User.username)).all()
+            for user in users:
+                session.expunge(user)
+            return list(users)
+
     def add(
         self,
         username: str,

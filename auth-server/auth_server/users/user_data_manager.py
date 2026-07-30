@@ -202,8 +202,9 @@ class UserDataManager:
         if reset_password:
             min_length, require_special = _password_complexity_requirements(settings)
             password = _generate_temporary_password(min_length, require_special)
-        else:
+        elif password is not None:
             _validate_password_complexity(password, settings)
+        assert password is not None
         if self._user_store.get(username) is not None:
             raise UserAlreadyExistsError(f"User {username!r} already exists")
         new_user = self._user_store.add(
@@ -225,6 +226,10 @@ class UserDataManager:
         if user is None:
             raise UserNotFoundError(f"User {username!r} not found")
         return self._to_response(user)
+
+    def get_users_list(self) -> list[UserResponse]:
+        """Return all users."""
+        return [self._to_response(user) for user in self._user_store.get_all()]
 
     def delete_user(self, username: str) -> None:
         """Delete a user or raise UserNotFoundError."""

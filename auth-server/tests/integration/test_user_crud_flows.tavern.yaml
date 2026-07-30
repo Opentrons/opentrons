@@ -6,6 +6,20 @@ marks:
       - admin_access_token
 
 stages:
+  - name: List users as admin
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      json:
+        meta:
+          cursor: 0
+          totalLength: !anyint
+        data: !anylist
+
   - name: Create a new user
     request:
       method: POST

@@ -49,6 +49,29 @@ def test_add_and_get_user(user_store: UserStore) -> None:
     assert fetched.reset_password is False
 
 
+def test_list_all_returns_users_ordered_by_username(user_store: UserStore) -> None:
+    user_store.add(
+        username="zebra",
+        hashed_password=HASHED_PW,
+        full_name="Zebra",
+        account_type=AccountType.USER,
+        now=_NOW,
+        reset_password=False,
+    )
+    user_store.add(
+        username="alpha",
+        hashed_password=HASHED_PW,
+        full_name="Alpha",
+        account_type=AccountType.ADMIN,
+        now=_NOW,
+        reset_password=False,
+    )
+
+    usernames = [user.username for user in user_store.get_all()]
+
+    assert usernames == ["alpha", "zebra"]
+
+
 def test_add_user_with_reset_password_flag(user_store: UserStore) -> None:
     user_store.add(
         username="reset_on_create_user",

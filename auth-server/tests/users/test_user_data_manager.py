@@ -369,6 +369,42 @@ def test_get_user_returns_existing(
     )
 
 
+def test_list_users_returns_all_users(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    decoy.when(mock_store.get_all()).then_return(
+        [
+            _make_orm_user(username="alice", full_name="Alice"),
+            _make_orm_user(
+                username="bob", full_name="Bob", account_type=AccountType.ADMIN
+            ),
+        ]
+    )
+
+    result = manager.get_users_list()
+
+    assert result == [
+        UserResponse(
+            username="alice",
+            fullName="Alice",
+            accountType=AccountType.USER,
+            locked=False,
+            resetPassword=False,
+        ),
+        UserResponse(
+            username="bob",
+            fullName="Bob",
+            accountType=AccountType.ADMIN,
+            locked=False,
+            resetPassword=False,
+        ),
+    ]
+
+
 def test_get_user_locked_when_failed_logins_reach_limit(
     decoy: Decoy,
     mock_store: UserStore,
@@ -645,9 +681,10 @@ def test_reset_user_password(
 
     assert result.username == "reset_me"
     assert result.resetPassword is True
-    assert len(result.temporaryPassword) == 8
+    assert len(result.temporaryPassword or "") == 8
     assert all(
-        c in string.ascii_letters + string.digits for c in result.temporaryPassword
+        c in string.ascii_letters + string.digits
+        for c in result.temporaryPassword or ""
     )
     decoy.verify(
         mock_store.update(
@@ -683,8 +720,8 @@ def test_reset_user_password_uses_password_complexity_settings(
 
     result = manager.reset_user_password("reset_me", now=_NOW)
 
-    assert len(result.temporaryPassword) == 12
-    assert any(c in string.punctuation for c in result.temporaryPassword)
+    assert len(result.temporaryPassword or "") == 12
+    assert any(c in string.punctuation for c in result.temporaryPassword or "")
 
 
 def test_reset_user_password_not_found_raises(

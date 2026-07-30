@@ -11,10 +11,12 @@ from server_utils.auth.resource_server.fastapi import (
 from server_utils.auth.resource_server.types import AuthenticatedResult
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.models.json_api import (
+    MultiBodyMeta,
     PydanticResponse,
     RequestModel,
     SimpleBody,
     SimpleEmptyBody,
+    SimpleMultiBody,
 )
 
 from auth_server.api_error import APIError
@@ -103,6 +105,32 @@ async def post_users(
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_201_CREATED,
         content=SimpleBody(data=new_user),
+    )
+
+
+@PydanticResponse.wrap_route(
+    router.get,
+    path="/auth/users",
+    summary="List users",
+    description="List all users. Requires admin credentials.",
+    responses={
+        fastapi.status.HTTP_200_OK: {"model": SimpleMultiBody[UserResponse]},
+    },
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
+)
+async def get_users(
+    user_data_manager: Annotated[
+        UserDataManager, fastapi.Depends(get_user_data_manager)
+    ],
+) -> PydanticResponse[SimpleMultiBody[UserResponse]]:
+    """List all users."""
+    users = user_data_manager.get_users_list()
+    return await PydanticResponse.create(
+        status_code=fastapi.status.HTTP_200_OK,
+        content=SimpleMultiBody.model_construct(
+            data=users,
+            meta=MultiBodyMeta(cursor=0, totalLength=len(users)),
+        ),
     )
 
 
