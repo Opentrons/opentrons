@@ -102,7 +102,7 @@ function RobotEncryptionKeyModalElement({
       </div>
       <SmallButton
         flex="1"
-        buttonText={i18n.format(t('shared:ok'), 'capitalize')}
+        buttonText={i18n.format(t('shared:dismiss'))}
         onClick={close}
       />
     </OddModal>
