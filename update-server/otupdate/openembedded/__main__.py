@@ -5,6 +5,9 @@ Entrypoint for the openembedded update server
 import asyncio
 import logging
 
+from server_utils.audit.fastapi import (
+    build_audit_client,
+)
 from server_utils.auth.resource_server.fastapi import (
     build_authentication_checker,
 )
@@ -16,6 +19,10 @@ from otupdate.common.run_application import run_and_notify_up
 # The Unix domain socket where opentrons-auth-server is configured to listen,
 # on this type of robot. Used unless the command line overrides it.
 _DEFAULT_AUTH_SERVER_UDS = "/run/opentrons-auth-server.sock"
+
+# The Unix domain socket where opentrons-audit-server is configured to listen,
+# on this type of robot. Used unless the command line overrides it.
+_DEFAULT_AUDIT_SERVER_UDS = "/run/opentrons-audit-server.sock"
 
 LOG = logging.getLogger(__name__)
 
@@ -31,6 +38,11 @@ async def main() -> None:
     if auth_server_uds is None and auth_server_url is None:
         auth_server_uds = _DEFAULT_AUTH_SERVER_UDS
 
+    audit_server_uds = args.audit_server_uds
+    audit_server_url = args.audit_server_url
+    if audit_server_uds is None and audit_server_url is None:
+        audit_server_uds = _DEFAULT_AUDIT_SERVER_UDS
+
     # Because this involves restarting Avahi, this must happen early,
     # before the NameSynchronizer starts up and connects to Avahi.
     LOG.info("Setting static hostname")
@@ -45,6 +57,9 @@ async def main() -> None:
         name_management.NameSynchronizer.start(
             constants.MODEL_OT3
         ) as name_synchronizer,
+        build_audit_client(
+            audit_server_uds=audit_server_uds, audit_server_url=audit_server_url
+        ) as audit_client,
     ):
         LOG.info("Building openembedded update server")
         app = await get_app(
@@ -52,6 +67,7 @@ async def main() -> None:
             authentication_checker=authentication_checker,
             system_version_file=args.version_file,
             config_file_override=args.config_file,
+            audit_client=audit_client,
         )
 
         LOG.info(
