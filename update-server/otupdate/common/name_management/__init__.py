@@ -47,6 +47,7 @@ import json
 
 from aiohttp import web
 
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 
 from .. import auth

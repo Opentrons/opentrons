@@ -3,21 +3,17 @@ import os
 import re
 import subprocess
 import zipfile
-from typing import Tuple
+from typing import AsyncGenerator, Tuple
 from unittest import mock
 from unittest.mock import MagicMock
 
 import pytest
 
-# Avoid pytest trying to collect TestClient because it begins with "Test".
-from aiohttp.test_utils import TestClient as HTTPTestClient
-from decoy import Decoy
-
 from server_utils.auth.resource_server.authentication_checker import (
     AlwaysAllowedAuthenticationChecker,
-    AuthenticationChecker,
 )
 from tests.common.config import FakeRootPartElem
+from tests.http_client import UpdateServerClient
 
 from otupdate import common, openembedded
 from otupdate.common.update_actions import Partition
@@ -27,16 +23,10 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 one_up = os.path.abspath(os.path.join(__file__, "../../"))
 
 
-@pytest.fixture
-def mock_authentication_checker(decoy: Decoy) -> AuthenticationChecker:
-    """Return a Decoy mock in the shape of an AuthenticationChecker."""
-    return decoy.mock(cls=AuthenticationChecker)
-
-
 @pytest.fixture(params=[openembedded])
 async def test_cli(
-    aiohttp_client, otupdate_config, request, version_file_path, mock_name_synchronizer
-) -> Tuple[HTTPTestClient, str]:
+    otupdate_config, request, version_file_path, mock_name_synchronizer
+) -> AsyncGenerator[Tuple[UpdateServerClient, str], None]:
     """
     Build an app using dummy versions, then build a test client and return it
     """
@@ -48,28 +38,8 @@ async def test_cli(
         boot_id_override="dummy-boot-id-abc123",
         authentication_checker=AlwaysAllowedAuthenticationChecker(),
     )
-    client = await aiohttp_client(app)
-    return client, cli_client_pkg.__name__
-
-
-@pytest.fixture
-async def auth_test_cli(
-    aiohttp_client,
-    otupdate_config,
-    version_file_path,
-    mock_name_synchronizer,
-    mock_authentication_checker: AuthenticationChecker,
-) -> Tuple[HTTPTestClient, AuthenticationChecker]:
-    """Build an app with a mock AuthenticationChecker, for authentication-related tests."""
-    app = await openembedded.get_app(
-        name_synchronizer=mock_name_synchronizer,
-        system_version_file=version_file_path,
-        config_file_override=otupdate_config,
-        boot_id_override="dummy-boot-id-abc123",
-        authentication_checker=mock_authentication_checker,
-    )
-    client = await aiohttp_client(app)
-    return client, mock_authentication_checker
+    async with UpdateServerClient(app) as client:
+        yield client, cli_client_pkg.__name__
 
 
 @pytest.fixture

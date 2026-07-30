@@ -9,9 +9,13 @@ from aiohttp import web
 from server_utils.auth.resource_server.authentication_checker import (
     AuthenticationChecker,
 )
+from server_utils.auth.resource_server.fastapi import (
+    AuthorizationError,
+    handle_authorization_error,
+    install_authentication_checker,
+)
 
 from otupdate.common import (
-    auth,
     config,
     constants,
     control,

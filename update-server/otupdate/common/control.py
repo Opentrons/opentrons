@@ -12,6 +12,7 @@ from typing import Any, Callable, Coroutine, Mapping
 
 from aiohttp import web
 
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 
 from . import auth, update_actions

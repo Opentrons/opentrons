@@ -13,10 +13,10 @@ from typing import IO, Any, Generator, List, Tuple
 import fastapi
 from pydantic import BaseModel
 
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 
 from .api_error import APIError, ErrorBody
-from .auth import require_scopes
 
 LOG = logging.getLogger(__name__)
 SSH_DIR = Path(os.path.expanduser("~/.ssh"))

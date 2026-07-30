@@ -15,12 +15,12 @@ from typing import Annotated, Optional, Self
 import fastapi
 from fastapi.responses import JSONResponse
 
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.app_state import AppState, get_app_state
 
 from . import config, multipart, update_actions
 from .api_error import APIError, ErrorBody
-from .auth import require_scopes
 from .control import get_restart_lock, no_actions_set_error
 from .session import Stages, UpdateSession, get_current_session, set_current_session
 from otupdate.openembedded.update_actions import UPDATE_PKG_OE
