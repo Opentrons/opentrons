@@ -92,6 +92,7 @@ export function AlphanumericKeyboard({
       buttonAttributes={softwareKeyboardButtonAttributes}
       width="100%"
       debug={debug} // If true, <ENTER> will input a \n
+      preventMouseDownDefault
     />
   )
 }

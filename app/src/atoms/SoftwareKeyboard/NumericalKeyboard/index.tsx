@@ -51,6 +51,7 @@ export function NumericalKeyboard({
       layoutName={layoutName}
       layout={numericalKeyboardLayout}
       debug={debug} // If true, <ENTER> will input a \n
+      preventMouseDownDefault
     />
   )
 }

@@ -62,6 +62,7 @@ export function StatelessNumericalKeyboard({
       layoutName={layoutName}
       layout={numericalKeyboardLayout}
       debug={debug}
+      preventMouseDownDefault
     />
   )
 }
