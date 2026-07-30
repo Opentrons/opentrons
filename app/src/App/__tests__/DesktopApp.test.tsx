@@ -52,6 +52,9 @@ vi.mock('/app/pages/Desktop/Protocols/ProtocolVisualization')
 vi.mock('/app/resources/devices/hooks/useTrackRobotRestarts', () => ({
   useTrackRobotRestarts: vi.fn(),
 }))
+vi.mock('/app/resources/robot-update/RobotUpdateProvider', () => ({
+  RobotUpdateProvider: ({ children }: { children: JSX.Element }) => children,
+}))
 
 const render = (path = '/') => {
   return renderWithProviders<State>(
