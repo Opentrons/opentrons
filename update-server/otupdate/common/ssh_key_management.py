@@ -13,6 +13,7 @@ from typing import IO, Any, Generator, List, Tuple
 import fastapi
 from pydantic import BaseModel
 
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 
@@ -173,6 +174,7 @@ async def list_keys() -> ListKeysResponse:
     dependencies=[
         fastapi.Depends(require_scopes(Scope.SSH_KEYS_WRITE)),
         fastapi.Depends(require_linklocal),
+        fastapi.Depends(get_audit_logger("add ssh key")),
     ],
 )
 async def add(request: fastapi.Request) -> AddKeyResponse:
@@ -226,6 +228,7 @@ async def add(request: fastapi.Request) -> AddKeyResponse:
     dependencies=[
         fastapi.Depends(require_scopes(Scope.SSH_KEYS_WRITE)),
         fastapi.Depends(require_linklocal),
+        fastapi.Depends(get_audit_logger("remove ssh public keys")),
     ],
 )
 async def clear() -> ModifyKeysResponse:
@@ -251,6 +254,7 @@ async def clear() -> ModifyKeysResponse:
     dependencies=[
         fastapi.Depends(require_scopes(Scope.SSH_KEYS_WRITE)),
         fastapi.Depends(require_linklocal),
+        fastapi.Depends(get_audit_logger("remove one ssh public key")),
     ],
 )
 async def remove(key_md5: str) -> ModifyKeysResponse:
@@ -284,7 +288,10 @@ async def remove(key_md5: str) -> ModifyKeysResponse:
     "/server/ssh_keys/from_local",
     status_code=201,
     summary="Authorize public keys found on attached storage.",
-    dependencies=[fastapi.Depends(require_scopes(Scope.SSH_KEYS_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.SSH_KEYS_WRITE)),
+        fastapi.Depends(get_audit_logger("load ssh key from usb")),
+    ],
 )
 async def add_from_local() -> AddLocalKeysResponse:
     """Add a public keys from usb device to the authorized_keys file.
