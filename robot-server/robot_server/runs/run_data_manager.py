@@ -158,6 +158,10 @@ class RunNotCompleteError(ValueError):
     """Error raised when trying to sign a run that has not completed."""
 
 
+class RunSignoffRequiredError(ValueError):
+    """Error raised when an action requires the run to be signed off first."""
+
+
 class PreSerializedCommandsNotAvailableError(LookupError):
     """Error raised when a run's commands are not available as pre-serialized list of commands."""
 
@@ -236,12 +240,15 @@ class RunDataManager:
         Raise:
             RunConflictError: There is a currently active run that cannot
                 be superceded by this new run.
+            RunSignoffRequiredError: The previous current run must be signed
+                off before it can be replaced.
         """
         self._run_orchestrator_store.set_access_control_status(
             access_control_mode=access_control_status
         )
         prev_run_id = self._run_orchestrator_store.current_run_id
         if prev_run_id is not None:
+            self._raise_if_run_requires_signoff(prev_run_id, access_control_status)
             # Allow clear() to propagate RunConflictError.
             prev_run_result = await self._run_orchestrator_store.clear()
             self._run_store.update_run_state(
@@ -402,8 +409,12 @@ class RunDataManager:
         Raises:
             RunConflictError: If deleting the current run, the current run
                 is not idle and cannot be deleted.
+            RunSignoffRequiredError: The run must be signed off before it can
+                be deleted.
             RunNotFoundError: The given run identifier was not found in the database.
         """
+        self._raise_if_run_requires_signoff(run_id, access_control_status)
+
         if run_id == self._run_orchestrator_store.current_run_id:
             await self._run_orchestrator_store.clear()
 
@@ -428,11 +439,15 @@ class RunDataManager:
             RunNotFoundError: The run identifier was not found in the database.
             RunNotCurrentError: The run is not the current run.
             RunConflictError: The run cannot be un-currented because it is not idle.
+            RunSignoffRequiredError: The run must be signed off before it can
+                be un-currented.
         """
         if run_id != self._run_orchestrator_store.current_run_id:
             raise RunNotCurrentError(
                 f"Cannot un-current {run_id} because it is not the current run."
             )
+
+        self._raise_if_run_requires_signoff(run_id, access_control_status)
 
         run_result = await self._run_orchestrator_store.clear()
         self._file_provider.clear_run_metadata()
@@ -699,6 +714,21 @@ class RunDataManager:
                 f"Cannot get the error recovery policy of {run_id} because it is not the current run."
             )
         return self._current_run_error_recovery_rules
+
+    def _raise_if_run_requires_signoff(
+        self, run_id: str, access_control_enabled: bool
+    ) -> None:
+        """Raise if the run must be signed off before leaving or deleting it."""
+        signoff_required = (
+            access_control_enabled
+            and self._access_control_setting_store.get_all().requireSignoffForProtocolLog
+        )
+        if signoff_required:
+            is_signed_off = self._run_store.get(run_id=run_id).signed_by is not None
+            if not is_signed_off:
+                raise RunSignoffRequiredError(
+                    f"Run {run_id} must be signed off before this action."
+                )
 
     def _get_state_summary(self, run_id: str) -> Union[StateSummary, BadStateSummary]:
         if run_id == self._run_orchestrator_store.current_run_id:
