@@ -19,8 +19,8 @@ from opentrons.protocol_engine.types.module import ModuleModel
 from opentrons.types import DeckSlotName
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
-    _enumerated_error_class_to_dict,
-    _enumerated_error_dict_to_class,
+    enumerated_error_class_to_dict,
+    enumerated_error_dict_to_class,
 )
 
 
@@ -119,7 +119,7 @@ def test_pydantic_serialization() -> None:
 )
 def test_enumerated_error_serialization(test_error: EnumeratedError) -> None:
     """It should serialize and deserialize enumerated errors for Pyro."""
-    test_dict = _enumerated_error_class_to_dict(test_error)
+    test_dict = enumerated_error_class_to_dict(test_error)
 
     assert test_dict.get("bytes") is not None
     assert (
@@ -127,6 +127,6 @@ def test_enumerated_error_serialization(test_error: EnumeratedError) -> None:
         == "opentrons_shared_data.errors.exceptions.EnumeratedError"
     )
 
-    result = _enumerated_error_dict_to_class("", test_dict)
+    result = enumerated_error_dict_to_class("", test_dict)
 
     assert result == test_error

@@ -353,6 +353,20 @@ class BundledFirmware(NamedTuple):
     def __repr__(self) -> str:
         return f"<BundledFirmware {self.version}, path={self.path}>"
 
+    @staticmethod
+    def to_pyro_dict(obj: "BundledFirmware") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "version": obj.version,
+            "path_str": str(obj.path),
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "BundledFirmware":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return BundledFirmware(version=data["version"], path=Path(data["path_str"]))
+
 
 class ModuleInfo(NamedTuple):
     model: str  # A module model such as "magneticModuleV2"
