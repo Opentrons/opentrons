@@ -4,7 +4,6 @@ Entrypoint for the openembedded update server
 
 import asyncio
 import logging
-from typing import NoReturn
 
 from server_utils.auth.resource_server.fastapi import (
     build_authentication_checker,
@@ -21,7 +20,7 @@ _AUTH_SERVER_UDS = "/run/opentrons-auth-server.sock"
 LOG = logging.getLogger(__name__)
 
 
-async def main() -> NoReturn:
+async def main() -> None:
     parser = cli.build_root_parser()
     args = parser.parse_args()
 

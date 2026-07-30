@@ -1,14 +1,15 @@
 import collections
 import os
+from typing import AsyncGenerator
 from unittest import mock
 from unittest.mock import MagicMock
 
 import pytest
-from aiohttp.test_utils import TestClient
 
 from server_utils.auth.resource_server.authentication_checker import (
     AlwaysAllowedAuthenticationChecker,
 )
+from tests.http_client import UpdateServerClient
 
 from otupdate import openembedded
 from otupdate.common.update_actions import Partition, UpdateActionsInterface
@@ -31,13 +32,13 @@ def mock_update_actions_interface(
         part_mngr=mock_partition_manager_invalid_switch,
     )
     mock = MagicMock(spec=UpdateActionsInterface)
-    mock.from_request.return_value = updater
+    mock.from_app_state.return_value = updater
 
 
 @pytest.fixture
 async def test_cli(
-    aiohttp_client, otupdate_config, version_file_path, mock_name_synchronizer
-) -> TestClient:
+    otupdate_config, version_file_path, mock_name_synchronizer
+) -> AsyncGenerator[UpdateServerClient, None]:
     """
     Build an app using dummy versions, then build a test client and return it
     """
@@ -48,8 +49,8 @@ async def test_cli(
         boot_id_override="dummy-boot-id-abc123",
         authentication_checker=AlwaysAllowedAuthenticationChecker(),
     )
-    client = await aiohttp_client(app)
-    return client
+    async with UpdateServerClient(app) as client:
+        yield client
 
 
 @pytest.fixture

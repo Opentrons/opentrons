@@ -15,14 +15,14 @@ def build_root_parser() -> argparse.ArgumentParser:
         "--port",
         dest="port",
         type=int,
-        help="Port to listen on. Passed to aiohttp",
+        help="Port to listen on. Passed to uvicorn",
     )
     parser.add_argument(
         "--host",
         dest="host",
         type=str,
         default="127.0.0.1",
-        help="Host to listen on. Passed to aiohttp",
+        help="Host to listen on. Passed to uvicorn",
     )
     parser.add_argument(
         "--version-file",
