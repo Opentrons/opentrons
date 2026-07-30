@@ -2077,7 +2077,7 @@ class VacuumModuleContext(ModuleContext):
     def stop_vacuum_pump(self) -> None:
         """Stop the vacuum pump and disable active pressure and power control.
 
-        Shuts off the pump motor and cancels any target pressure or power limits. To release vacuum and return the chamber to atmospheric pressure, call [`open_vent()`][opentrons.protocol_api.VacuumModuleContext.open_vent] separately.
+        Shuts off the pump motor and cancels any target pressure or power limits. To release vacuum and return the system to atmospheric pressure, call [`open_vent()`][opentrons.protocol_api.VacuumModuleContext.open_vent] separately.
         """
         self._core.stop_vacuum()
 
