@@ -7,7 +7,7 @@ import threading
 from dataclasses import is_dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Union, get_args, get_type_hints
+from typing import Any, Dict, get_args, get_type_hints
 
 import pytest
 from decoy import Decoy
@@ -15,7 +15,8 @@ from Pyro5 import api as pyro
 from Pyro5 import nameserver
 
 import opentrons_shared_data.pipette.types as pipette_types
-from opentrons_shared_data.errors.exceptions import CommunicationError, ErrorCodes
+from opentrons_shared_data.errors import ErrorCodes
+from opentrons_shared_data.errors.exceptions import CommunicationError
 from opentrons_shared_data.gripper import GripperModel
 from opentrons_shared_data.pipette import (
     load_data as load_pipette_data,
@@ -30,12 +31,12 @@ import opentrons.drivers.types as driver_types
 import opentrons.drivers.vacuum_module.types as vac_types
 import opentrons.hardware_control.dev_types as dev_types
 import opentrons.hardware_control.instruments.ot3.instrument_calibration as instr_calibration_types
-import opentrons.hardware_control.modules.mod_abc as mod_abc
 import opentrons.hardware_control.modules.module_calibration as mod_cal
 import opentrons.hardware_control.modules.types as module_types
 import opentrons.hardware_control.peripherals.types as peripheral_types
 import opentrons.hardware_control.types as hw_types
 import opentrons.types as ot_types
+from opentrons.calibration_storage.ot3.models.v1 import CalibrationStatus
 from opentrons.config import feature_flags
 from opentrons.config import gripper_config as gc
 from opentrons.config.types import RobotConfig
@@ -622,7 +623,7 @@ CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
             code=ErrorCodes.COMMUNICATION_ERROR,
             message="BIG_ERRORS",
             detail={"apple": "pie", "cheese": "cake"},
-            wrapping=None # CASEY TODO
+            wrapping=None,  # CASEY TODO
         ),
         module_serial="1234ABC",
         module_model=module_types.VacuumModuleModel.VACUUM_MODULE_V1,
@@ -643,19 +644,19 @@ CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
     instr_calibration_types.GripperCalibrationOffset: instr_calibration_types.GripperCalibrationOffset(
         status=instr_calibration_types.CalibrationStatus(
             markedBad=False,
-            source=instr_calibration_types.SourceType.factory,
+            source=calibration_types.SourceType.factory,
             markedAt=datetime.now(),
         ),
         offset=ot_types.Point(0.1, 0.2, 0.3),
-        source=instr_calibration_types.SourceType.calibration_check,
+        source=calibration_types.SourceType.calibration_check,
         last_modified=datetime.now(),
     ),
     instr_calibration_types.PipetteOffsetSummary: instr_calibration_types.PipetteOffsetSummary(
         offset=ot_types.Point(0.1, 0.2, 0.3),
-        source=instr_calibration_types.SourceType.calibration_check,
-        status=instr_calibration_types.CalibrationStatus(
+        source=calibration_types.SourceType.calibration_check,
+        status=calibration_types.CalibrationStatus(
             markedBad=False,
-            source=instr_calibration_types.SourceType.factory,
+            source=calibration_types.SourceType.factory,
             markedAt=datetime.now(),
         ),
         last_modified=datetime.now(),
@@ -671,10 +672,10 @@ CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
         offset=ot_types.Point(0.1, 0.2, 0.3),
         module_id="id",
         module=module_types.ModuleType.THERMOCYCLER,
-        source=mod_cal.SourceType.factory,
-        status=mod_cal.CalibrationStatus(
+        source=calibration_types.SourceType.factory,
+        status=CalibrationStatus(
             markedBad=False,
-            source=mod_cal.SourceType.calibration_check,
+            source=calibration_types.SourceType.calibration_check,
             markedAt=datetime.now(),
         ),
         mount=hw_types.OT3Mount.LEFT,
@@ -697,8 +698,11 @@ CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
         kind=stacker_types.MeasurementKind.HISTOGRAM,
         bins={1: [1.0, 2.1]},
     ),
-    hw_types.HardwareFeatureFlags: hw_types.HardwareFeatureFlags(False, True, True, True)
+    hw_types.HardwareFeatureFlags: hw_types.HardwareFeatureFlags(
+        False, True, True, True
+    ),
 }
+
 
 async def test_serialization_validation() -> None:
     """Test to check if types registered in the hardware class package properly serialize and deserialize."""
@@ -733,7 +737,7 @@ async def test_serialization_validation() -> None:
                     finally:
                         ns.remove(name="TEST_PROXY")
             except Exception as e:
-                raise ValueError("Test Nameserver not found.")
+                raise ValueError(f"Test Nameserver not found - {e}")
             finally:
                 daemon.close()
 
@@ -759,7 +763,6 @@ async def test_serialization_validation() -> None:
     uri = pyro.resolve(uri="PYRONAME:TEST_PROXY")
     tester_proxy = pyro.Proxy(uri)  # type: ignore
 
-
     # Get the hardware registry
     hardware_registry_class_list = find_opentrons_classes_in_packages(
         HARDWARE_CLASS_PACKAGES
@@ -776,4 +779,5 @@ async def test_serialization_validation() -> None:
         deserialized_output = tester_proxy.data_in_data_out(mock_data)
         assert deserialized_output == mock_data
 
-#todo(chb, 7-30-26): Expand this test to test the enum serialization and the pydantic serialization as well
+
+# todo(chb, 7-30-26): Expand this test to test the enum serialization and the pydantic serialization as well
