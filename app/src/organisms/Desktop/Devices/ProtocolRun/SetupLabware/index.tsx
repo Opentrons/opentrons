@@ -1,4 +1,3 @@
-import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import map from 'lodash/map'
 
@@ -11,11 +10,10 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { usePostLogMessageMutation } from '@opentrons/react-api-client'
 
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useToggleGroup } from '/app/molecules/ToggleGroup/useToggleGroup'
 import { useIsFlex } from '/app/redux-resources/robots'
+import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import {
   useModuleRenderInfoForProtocolById,
@@ -36,7 +34,7 @@ interface SetupLabwareProps {
 
 export function SetupLabware(props: SetupLabwareProps): JSX.Element {
   const { robotName, runId, labwareConfirmed, setLabwareConfirmed } = props
-  const { t } = useTranslation(['protocol_setup', 'audit_log'])
+  const { t } = useTranslation('protocol_setup')
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolAnalysis = robotProtocolAnalysis ?? storedProtocolAnalysis
@@ -56,36 +54,22 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
   const moduleTypesThatRequireExtraAttention =
     getModuleTypesThatRequireExtraAttention(moduleModels)
 
-  const documentationState = useDocumentationState()
-  const { postLogMessage } = usePostLogMessageMutation(
-    documentationState,
-    'confirm_placements'
-  )
-
   // TODO(jh, 11-13-24): These disabled tooltips are used throughout setup flows. Let's consolidate them.
   const [targetProps, tooltipProps] = useHoverTooltip()
   const runHasStarted = useRunHasStarted(runId)
   const tooltipText = runHasStarted ? t('protocol_run_started') : null
 
-  const handleProceed = useCallback(() => {
-    if (documentationState.isLoading) return
-    if (documentationState.accessControlEnabled) {
-      postLogMessage(
-        {
-          action: 'confirm liquid and labware placements',
-          message:
-            'user confirmed liquid and labware placements before running protocol',
-        },
-        {
-          onSuccess: () => {
-            setLabwareConfirmed(true)
-          },
-        }
-      )
-    } else {
+  const handleProceed = useHandleAndLog(
+    () => {
       setLabwareConfirmed(true)
+    },
+    'confirm_placements',
+    {
+      action: 'confirm liquid and labware placements',
+      message:
+        'user confirmed liquid and labware placements before running protocol',
     }
-  }, [documentationState, postLogMessage, setLabwareConfirmed])
+  )
 
   return (
     <>

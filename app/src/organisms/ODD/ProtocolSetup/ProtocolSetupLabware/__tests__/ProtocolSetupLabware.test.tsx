@@ -273,7 +273,7 @@ describe('ProtocolSetupLabware', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Confirm placements' }))
     expect(mockPostLogMessage).toHaveBeenCalledWith(
       {
-        action: 'confirm liquid and labware placements',
+        action: 'confirmed liquid and labware placements',
         message:
           'user confirmed liquid and labware placements before running protocol',
       },
