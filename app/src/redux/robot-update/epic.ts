@@ -1,7 +1,7 @@
 // epics to control the buildroot migration / update flow
 import every from 'lodash/every'
 import { combineEpics, ofType } from 'redux-observable'
-import { concat, EMPTY, interval, of } from 'rxjs'
+import { concat, interval, of } from 'rxjs'
 import {
   filter,
   map,
@@ -12,12 +12,8 @@ import {
 } from 'rxjs/operators'
 
 // imported directly to avoid circular dependencies between discovery and shell
-import { getAllRobots, getRobotApiVersion } from '../discovery'
-import {
-  finishDiscovery,
-  removeRobot,
-  startDiscovery,
-} from '../discovery/actions'
+import { getRobotApiVersion } from '../discovery'
+import { finishDiscovery, startDiscovery } from '../discovery/actions'
 import {
   RESTART_PENDING_STATUS,
   RESTART_STATUS_CHANGED,
@@ -33,7 +29,6 @@ import {
   robotUpdateStatus,
   setRobotUpdateSessionStep,
   startBuildrootPremigration,
-  startRobotUpdate,
   unexpectedRobotUpdateError,
   uploadRobotUpdateFile,
 } from './actions'
@@ -41,10 +36,8 @@ import {
   AWAITING_FILE,
   COMMIT_UPDATE,
   DONE,
-  DOWNLOAD_FILE,
   FINISHED,
   GET_TOKEN,
-  PREMIGRATION_RESTART,
   PROCESS_FILE,
   READY_FOR_RESTART,
   RESTART,
@@ -57,7 +50,6 @@ import {
 import {
   getRobotUpdateRobot,
   getRobotUpdateSession,
-  getRobotUpdateSessionRobotName,
   getRobotUpdateTargetVersion,
 } from './selectors'
 
@@ -140,35 +132,6 @@ export const startUpdateEpic: Epic = (action$, state$) =>
       }
     })
   )
-
-export const startUpdateAfterFileDownload: Epic = (_, state$) => {
-  return state$.pipe(
-    filter(passActiveSession({ step: DOWNLOAD_FILE, stage: DONE })),
-    switchMap(stateWithSession => {
-      const host: ViewableRobot = getRobotUpdateRobot(stateWithSession) as any
-      const robotModel =
-        host?.serverHealth?.robotModel === 'OT-3 Standard' ? 'flex' : 'ot2'
-
-      return of(readSystemRobotUpdateFile(robotModel))
-    })
-  )
-}
-
-// listen for a the active robot to come back with capabilities after premigration
-export const retryAfterPremigrationEpic: Epic = (_, state$) => {
-  return state$.pipe(
-    switchMap(state => {
-      const session = getRobotUpdateSession(state)
-      const robot = getRobotUpdateRobot(state)
-
-      return robot !== null &&
-        session?.step === PREMIGRATION_RESTART &&
-        robot.serverHealth?.capabilities != null
-        ? of(startRobotUpdate(robot.name))
-        : EMPTY
-    })
-  )
-}
 
 export const startSessionAfterFileInfoEpic: Epic = (action$, state$) => {
   return action$.pipe(
@@ -435,43 +398,13 @@ export const finishAfterRestartEpic: Epic = (action$, state$) => {
   )
 }
 
-// if robot was renamed as part of migration, remove old robot name, balena
-// robots have name opentrons-robot-name, BR robots have robot-name
-// getRobotUpdateRobot will handle that logic, so we can compare name in state
-// vs the actual robot we're interacting with
-export const removeMigratedRobotsEpic: Epic = (_, state$) => {
-  return state$.pipe(
-    filter(state => {
-      const robotName = getRobotUpdateSessionRobotName(state)
-      const robot = getRobotUpdateRobot(state)
-      const allRobots = getAllRobots(state)
-
-      return (
-        robot !== null &&
-        robotName !== null &&
-        robot.name !== robotName &&
-        allRobots.some(r => r.name === robotName)
-      )
-    }),
-    map<State, ReturnType<typeof removeRobot>>(stateWithRobotName => {
-      const robotName: string = getRobotUpdateSessionRobotName(
-        stateWithRobotName
-      ) as any
-      return removeRobot(robotName)
-    })
-  )
-}
-
 export const robotUpdateEpic = combineEpics<Epic>(
   startUpdateEpic,
-  startUpdateAfterFileDownload,
-  retryAfterPremigrationEpic,
   startSessionAfterFileInfoEpic,
   createSessionEpic,
   statusPollEpic,
   uploadFileEpic,
   commitUpdateEpic,
   restartAfterCommitEpic,
-  finishAfterRestartEpic,
-  removeMigratedRobotsEpic
+  finishAfterRestartEpic
 )

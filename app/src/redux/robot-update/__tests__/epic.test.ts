@@ -387,66 +387,6 @@ describe('robot update epics', () => {
     })
   })
 
-  describe('startUpdateAfterFileDownload', () => {
-    it('should start the update after file download if the robot is a flex', () => {
-      testScheduler.run(({ hot, cold, expectObservable }) => {
-        const session: ReturnType<typeof selectors.getRobotUpdateSession> = {
-          stage: 'done',
-          step: 'downloadFile',
-        } as any
-
-        vi.mocked(selectors.getRobotUpdateRobot).mockReturnValue(brRobotFlex)
-        vi.mocked(selectors.getRobotUpdateSession).mockReturnValue(session)
-
-        const state$ = hot<State>('-a', { a: state })
-        const output$ = epics.startUpdateAfterFileDownload(null as any, state$)
-
-        expectObservable(output$).toBe('-a', {
-          a: actions.readSystemRobotUpdateFile('flex'),
-        })
-      })
-    })
-
-    it('should start the update after file download if the robot is a ot-2', () => {
-      testScheduler.run(({ hot, cold, expectObservable }) => {
-        const session: ReturnType<typeof selectors.getRobotUpdateSession> = {
-          stage: 'done',
-          step: 'downloadFile',
-        } as any
-
-        vi.mocked(selectors.getRobotUpdateRobot).mockReturnValue(brRobotOt2)
-        vi.mocked(selectors.getRobotUpdateSession).mockReturnValue(session)
-
-        const state$ = hot<State>('-a', { a: state })
-        const output$ = epics.startUpdateAfterFileDownload(null as any, state$)
-
-        expectObservable(output$).toBe('-a', {
-          a: actions.readSystemRobotUpdateFile('ot2'),
-        })
-      })
-    })
-  })
-
-  it('retryAfterPremigrationEpic', () => {
-    testScheduler.run(({ hot, expectObservable }) => {
-      vi.mocked(selectors.getRobotUpdateRobot).mockReturnValueOnce(brReadyRobot)
-      vi.mocked(selectors.getRobotUpdateSessionRobotName).mockReturnValueOnce(
-        brReadyRobot.name
-      )
-      vi.mocked(selectors.getRobotUpdateSession).mockReturnValueOnce({
-        robot: brReadyRobot.name,
-        step: 'premigrationRestart',
-      } as any)
-
-      const state$ = hot<State>('-a', { a: state })
-      const output$ = epics.retryAfterPremigrationEpic(null as any, state$)
-
-      expectObservable(output$).toBe('-a', {
-        a: actions.startRobotUpdate(brReadyRobot.name),
-      })
-    })
-  })
-
   it('statusPollEpic', () => {
     testScheduler.run(
       ({ hot, cold, expectObservable, expectSubscriptions, flush }) => {
