@@ -2,8 +2,8 @@ import { createListenerMiddleware } from '@reduxjs/toolkit'
 
 import { getAllRobots } from '../discovery'
 import { removeRobot } from '../discovery/actions'
-import { readSystemRobotUpdateFile, startRobotUpdate } from './actions'
-import { DONE, DOWNLOAD_FILE, PREMIGRATION_RESTART } from './constants'
+import { readSystemRobotUpdateFile } from './actions'
+import { DONE, DOWNLOAD_FILE } from './constants'
 import {
   getRobotUpdateRobot,
   getRobotUpdateSession,
@@ -13,9 +13,7 @@ import {
 import type { Dispatch, State } from '../types'
 
 /**
- * Non-HTTP robot-update side effects:
- * resume update after download completes, retry after premigration, and
- * remove a Balena robot name after migration rename.
+ * Non-HTTP robot-update side effects that are not part of the apply pipeline.
  */
 export const robotUpdateMiddleware = createListenerMiddleware()
 
@@ -48,26 +46,6 @@ startListening({
     const robotModel =
       host?.serverHealth?.robotModel === 'OT-3 Standard' ? 'flex' : 'ot2'
     listenerApi.dispatch(readSystemRobotUpdateFile(robotModel))
-  },
-})
-
-// After premigration restart, once capabilities appear, restart the update.
-startListening({
-  predicate: (_action, currentState) => {
-    const session = getRobotUpdateSession(currentState)
-    const robot = getRobotUpdateRobot(currentState)
-    return (
-      robot != null &&
-      session?.step === PREMIGRATION_RESTART &&
-      session.error == null &&
-      robot.serverHealth?.capabilities != null
-    )
-  },
-  effect: (_action, listenerApi) => {
-    const robot = getRobotUpdateRobot(listenerApi.getState())
-    if (robot != null) {
-      listenerApi.dispatch(startRobotUpdate(robot.name))
-    }
   },
 })
 

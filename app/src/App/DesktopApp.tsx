@@ -31,6 +31,7 @@ import { ProtocolDetails } from '/app/pages/Desktop/Protocols/ProtocolDetails'
 import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useTrackRobotRestarts } from '/app/resources/devices/hooks/useTrackRobotRestarts'
+import { RobotUpdateProvider } from '/app/resources/robot-update/RobotUpdateProvider'
 
 import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { ApiHostProvider } from '../local-resources/api-host-provider/ApiHostProvider'
@@ -49,7 +50,6 @@ import type { RouteProps } from './types'
 export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()
   useRefreshAccessTokenOnActivity()
-  // TODO(jh,2026-07-28): Refactor hook usage alongside robot system update epic.
   useTrackRobotRestarts()
   const [isEmergencyStopModalDismissed, setIsEmergencyStopModalDismissed] =
     useState<boolean>(false)
@@ -120,64 +120,71 @@ export const DesktopApp = (): JSX.Element => {
       <DocumentationRequiredModalContext.Provider
         value={{ showDocumentationRequiredModal, showLoginModal }}
       >
-        <NiceModal.Provider>
-          <ErrorBoundary FallbackComponent={DesktopAppFallback}>
-            <ReactQueryDevtools />
-            <SystemLanguagePreferenceModal />
-            <Navbar routes={desktopRoutes} />
-            <ToasterOven>
-              <EmergencyStopContext.Provider
-                value={{
-                  isEmergencyStopModalDismissed,
-                  setIsEmergencyStopModalDismissed,
-                }}
-              >
-                <Box width="100%" height="100vh">
-                  <Alerts>
-                    <Routes>
-                      {desktopRoutes.map(({ Component, path }: RouteProps) => {
-                        return (
-                          <Route
-                            key={path}
-                            element={
-                              <Box
-                                key={Component.name}
-                                display="flex"
-                                flexDirection="column"
-                                height="100%"
-                              >
-                                <Breadcrumbs />
-                                <Box
-                                  position={POSITION_RELATIVE}
-                                  width="100%"
-                                  flex="1"
-                                  minHeight="0"
-                                >
+        <RobotUpdateProvider>
+          <NiceModal.Provider>
+            <ErrorBoundary FallbackComponent={DesktopAppFallback}>
+              <ReactQueryDevtools />
+              <SystemLanguagePreferenceModal />
+              <Navbar routes={desktopRoutes} />
+              <ToasterOven>
+                <EmergencyStopContext.Provider
+                  value={{
+                    isEmergencyStopModalDismissed,
+                    setIsEmergencyStopModalDismissed,
+                  }}
+                >
+                  <Box width="100%" height="100vh">
+                    <Alerts>
+                      <Routes>
+                        {desktopRoutes.map(
+                          ({ Component, path }: RouteProps) => {
+                            return (
+                              <Route
+                                key={path}
+                                element={
                                   <Box
-                                    width="100%"
+                                    key={Component.name}
+                                    display="flex"
+                                    flexDirection="column"
                                     height="100%"
-                                    backgroundColor={COLORS.grey10}
-                                    overflow={OVERFLOW_AUTO}
                                   >
-                                    <ModalPortalRoot />
-                                    <Component />
+                                    <Breadcrumbs />
+                                    <Box
+                                      position={POSITION_RELATIVE}
+                                      width="100%"
+                                      flex="1"
+                                      minHeight="0"
+                                    >
+                                      <Box
+                                        width="100%"
+                                        height="100%"
+                                        backgroundColor={COLORS.grey10}
+                                        overflow={OVERFLOW_AUTO}
+                                      >
+                                        <ModalPortalRoot />
+                                        <Component />
+                                      </Box>
+                                    </Box>
                                   </Box>
-                                </Box>
-                              </Box>
-                            }
-                            path={path}
-                          />
-                        )
-                      })}
-                      <Route path="*" element={<Navigate to="/protocols" />} />
-                    </Routes>
-                    <RobotControlTakeover />
-                  </Alerts>
-                </Box>
-              </EmergencyStopContext.Provider>
-            </ToasterOven>
-          </ErrorBoundary>
-        </NiceModal.Provider>
+                                }
+                                path={path}
+                              />
+                            )
+                          }
+                        )}
+                        <Route
+                          path="*"
+                          element={<Navigate to="/protocols" />}
+                        />
+                      </Routes>
+                      <RobotControlTakeover />
+                    </Alerts>
+                  </Box>
+                </EmergencyStopContext.Provider>
+              </ToasterOven>
+            </ErrorBoundary>
+          </NiceModal.Provider>
+        </RobotUpdateProvider>
       </DocumentationRequiredModalContext.Provider>
     </LocalizationProvider>
   )

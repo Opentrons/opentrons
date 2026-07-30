@@ -186,8 +186,8 @@ interface RobotUpdateUploadPayload {
   secure?: boolean
 }
 
-export async function uploadRobotUpdateFileViaShell(
+export function uploadRobotUpdateFileViaShell(
   payload: RobotUpdateUploadPayload
 ): Promise<{ ok: true }> {
-  return await remote.ipcRenderer.invoke('robot-update:upload', payload)
+  return remote.ipcRenderer.invoke('robot-update:upload', payload)
 }

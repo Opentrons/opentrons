@@ -1,9 +1,10 @@
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
-import { clearRobotUpdateSession, startRobotUpdate } from './actions'
+import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
+
 import { getRobotUpdateDisplayInfo } from './selectors'
 
-import type { Dispatch, State } from '../types'
+import type { State } from '../types'
 
 type DispatchStartRobotUpdate = (
   robotName: string,
@@ -12,17 +13,9 @@ type DispatchStartRobotUpdate = (
 
 // Safely start a robot update.
 export function useDispatchStartRobotUpdate(): DispatchStartRobotUpdate {
-  const dispatch = useDispatch<Dispatch>()
+  const { startUpdate } = useRobotUpdateContext()
 
-  function dispatchStartRobotUpdate(
-    robotName: string,
-    systemFile?: string
-  ): void {
-    dispatch(clearRobotUpdateSession())
-    dispatch(startRobotUpdate(robotName, systemFile))
-  }
-
-  return dispatchStartRobotUpdate
+  return startUpdate
 }
 
 // Whether the robot is on a different version of software than the current app.
