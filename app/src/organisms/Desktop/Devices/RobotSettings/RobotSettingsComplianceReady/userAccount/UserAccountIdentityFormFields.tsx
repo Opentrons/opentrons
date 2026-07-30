@@ -1,7 +1,7 @@
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
-import { InputField, StyledText } from '@opentrons/components'
+import { COLORS, InputField, StyledText } from '@opentrons/components'
 
 import styles from './userAccountForm.module.css'
 
@@ -15,12 +15,14 @@ export interface UserAccountIdentityFormFieldsProps<T extends FieldValues> {
     Pick<AuthUserFieldErrors, 'usernameError' | 'fullNameError'>
   >
   stacked?: boolean
+  usernameMaxLength?: number
 }
 
 export function UserAccountIdentityFormFields<T extends FieldValues>({
   control,
   fieldErrors = {},
   stacked = false,
+  usernameMaxLength,
 }: UserAccountIdentityFormFieldsProps<T>): JSX.Element {
   const { t } = useTranslation('device_settings')
   const { usernameError = null, fullNameError = null } = fieldErrors
@@ -41,14 +43,32 @@ export function UserAccountIdentityFormFields<T extends FieldValues>({
                 'desktop_personal_account_settings_username_required_error'
               ) as string),
           }}
-          render={({ field, fieldState }) => (
-            <InputField
-              value={field.value}
-              error={fieldState.error?.message ?? usernameError}
-              onChange={field.onChange}
-              onBlur={field.onBlur}
-            />
-          )}
+          render={({ field, fieldState }) => {
+            const isUsernameTooLong =
+              usernameMaxLength != null &&
+              (field.value as string).length > usernameMaxLength
+
+            return (
+              <>
+                <InputField
+                  value={field.value}
+                  error={fieldState.error?.message ?? usernameError}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                />
+                {usernameMaxLength != null ? (
+                  <StyledText
+                    desktopStyle="bodyDefaultRegular"
+                    color={isUsernameTooLong ? COLORS.red50 : COLORS.grey60}
+                  >
+                    {t('desktop_username_characters_max', {
+                      maxLength: usernameMaxLength,
+                    })}
+                  </StyledText>
+                ) : null}
+              </>
+            )
+          }}
         />
       </div>
     </div>

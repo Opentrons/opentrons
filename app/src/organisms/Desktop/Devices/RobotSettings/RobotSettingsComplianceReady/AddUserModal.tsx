@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Banner,
   DropdownMenu,
   ModalShell,
   PrimaryButton,
@@ -28,6 +27,8 @@ import type {
 } from '@opentrons/api-client'
 import type { DropdownOption } from '@opentrons/components'
 
+const USERNAME_MAX_LENGTH = 20
+
 const ADD_USER_ACCOUNT_TYPES: AuthUserAccountType[] = [
   'admin',
   'user',
@@ -43,11 +44,13 @@ interface FormValues {
 export interface AddUserModalProps {
   robotName: string
   onClose: () => void
+  onUserCreated?: () => void
 }
 
 export function AddUserModal({
   robotName,
   onClose,
+  onUserCreated,
 }: AddUserModalProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const [generatedPassword, setGeneratedPassword] = useState<string | null>(
@@ -81,12 +84,20 @@ export function AddUserModal({
     accountTypeOptions[0]!
 
   const isSaveDisabled =
-    isSaving || username.trim() === '' || fullName.trim() === ''
+    isSaving ||
+    username.trim() === '' ||
+    fullName.trim() === '' ||
+    username.length > USERNAME_MAX_LENGTH
 
   const handleClose = (): void => {
     clearFieldErrors()
     setGeneratedPassword(null)
     onClose()
+  }
+
+  const handleConfirm = (): void => {
+    onUserCreated?.()
+    handleClose()
   }
 
   const onSubmit = (): void => {
@@ -127,9 +138,6 @@ export function AddUserModal({
       {generatedPassword != null ? (
         <div className={styles.modal_content}>
           <div className={styles.form_fields}>
-            <Banner type="success" width="100%">
-              {t('desktop_add_user_created_banner')}
-            </Banner>
             <div className={styles.success_intro}>
               <StyledText desktopStyle="headingSmallBold">
                 {t('desktop_one_time_password')}
@@ -149,10 +157,7 @@ export function AddUserModal({
               </div>
             </div>
             <div className={styles.actions}>
-              <SecondaryButton type="button" onClick={handleClose}>
-                {t('shared:back')}
-              </SecondaryButton>
-              <PrimaryButton type="button" onClick={handleClose}>
+              <PrimaryButton type="button" onClick={handleConfirm}>
                 {t('shared:confirm')}
               </PrimaryButton>
             </div>
@@ -166,6 +171,7 @@ export function AddUserModal({
                 control={control}
                 fieldErrors={fieldErrors}
                 stacked
+                usernameMaxLength={USERNAME_MAX_LENGTH}
               />
               <div className={styles.field_group}>
                 <div className={styles.field_group_value}>
@@ -185,10 +191,10 @@ export function AddUserModal({
               </div>
               <div className={styles.actions}>
                 <SecondaryButton type="button" onClick={handleClose}>
-                  {t('shared:back')}
+                  {t('shared:cancel')}
                 </SecondaryButton>
                 <PrimaryButton type="submit" disabled={isSaveDisabled}>
-                  {t('shared:next')}
+                  {t('desktop_create_account')}
                 </PrimaryButton>
               </div>
             </div>

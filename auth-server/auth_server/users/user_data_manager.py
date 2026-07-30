@@ -16,6 +16,7 @@ from auth_server.users.is_account_locked import is_account_locked
 from auth_server.users.models import (
     ACCOUNT_TYPE_TO_SCOPES,
     RESET_PASSWORD_SCOPES,
+    USERNAME_MAX_LENGTH,
     AccountType,
     TemporaryPasswordResponse,
     UserResponse,
@@ -111,6 +112,14 @@ def _validate_fields_non_empty(
             raise InvalidInputError(f"{field_name} must not be empty")
 
 
+def _validate_username(username: str) -> None:
+    """Validate that a username meets length requirements."""
+    if len(username) > USERNAME_MAX_LENGTH:
+        raise InvalidInputError(
+            f"username must be at most {USERNAME_MAX_LENGTH} characters"
+        )
+
+
 def must_reset_password(
     user: User, now: datetime.datetime, password_reset_time_sec: float | None
 ) -> bool:
@@ -197,6 +206,7 @@ class UserDataManager:
             full_name=full_name,
             account_type=account_type,
         )
+        _validate_username(username)
         settings = self._settings_store.get_settings()
         reset_password = password is None
         if reset_password:
@@ -257,6 +267,8 @@ class UserDataManager:
             full_name=new_full_name,
             account_type=new_account_type,
         )
+        if new_username is not None:
+            _validate_username(new_username)
         if new_password is not None:
             _validate_password_complexity(
                 new_password, self._settings_store.get_settings()

@@ -1,9 +1,14 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { EmptySelectorButton, StyledText } from '@opentrons/components'
+import {
+  EmptySelectorButton,
+  StyledText,
+  SUCCESS_TOAST,
+} from '@opentrons/components'
 import { useUsersQuery } from '@opentrons/react-api-client'
 
+import { useToaster } from '/app/organisms/ToasterOven'
 import { useUsernameForRobot } from '/app/redux/robot-auth'
 
 import { Accordion } from './Accordion'
@@ -109,6 +114,7 @@ export function UserManagement({
   const usersQuery = useUsersQuery({ enabled: username != null })
   const users = usersQuery.data?.data ?? []
   const [showAddUserModal, setShowAddUserModal] = useState(false)
+  const { makeToast } = useToaster()
 
   return (
     <Accordion id="user-management" title={t('desktop_user_management')}>
@@ -126,6 +132,13 @@ export function UserManagement({
       {showAddUserModal ? (
         <AddUserModal
           robotName={robotName}
+          onUserCreated={() => {
+            makeToast(
+              t('desktop_add_user_created_banner') as string,
+              SUCCESS_TOAST,
+              { closeButton: true }
+            )
+          }}
           onClose={() => {
             setShowAddUserModal(false)
           }}

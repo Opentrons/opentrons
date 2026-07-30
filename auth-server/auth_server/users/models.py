@@ -45,6 +45,8 @@ RESET_PASSWORD_SCOPES: set[Scope] = {
     Scope.USERS_WRITE_SELF,
 }
 
+USERNAME_MAX_LENGTH = 20
+
 
 class UserCreate(BaseModel):
     """Request body for creating a user."""

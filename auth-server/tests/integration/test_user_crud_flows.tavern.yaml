@@ -654,3 +654,29 @@ stages:
       status_code: 400
       json:
         detail: password must not be empty
+
+---
+test_name: Creating a user with a username that is too long
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+
+stages:
+  - name: Reject creating a user with a username longer than 20 characters
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: aaaaaaaaaaaaaaaaaaaaa
+          password: securepassword123!
+          fullName: Too Long Username User
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 400
+      json:
+        detail: username must be at most 20 characters

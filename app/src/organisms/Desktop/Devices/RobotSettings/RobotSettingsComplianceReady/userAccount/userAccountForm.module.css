@@ -46,7 +46,10 @@
 }
 
 .field_group_value {
+  display: flex;
   width: 100%;
+  flex-direction: column;
+  gap: var(--spacing-4);
 }
 
 .actions {
