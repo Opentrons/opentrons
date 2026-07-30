@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState } from 'react'
+import { Fragment, useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -26,6 +26,7 @@ import {
 import {
   useCreateLiveCommandMutation,
   useModulesQuery,
+  usePostLogMessageMutation,
 } from '@opentrons/react-api-client'
 import {
   FLEX_ROBOT_TYPE,
@@ -150,6 +151,33 @@ export function ProtocolSetupLabware({
     [attachedModules, protocolModulesInfo, deckConfig]
   )
 
+  const documentationState = useDocumentationState()
+  const { postLogMessage } = usePostLogMessageMutation(
+    documentationState,
+    'confirm_placements'
+  )
+  const handleProceed = useCallback(() => {
+    if (documentationState.isLoading) return
+    if (documentationState.accessControlEnabled) {
+      postLogMessage(
+        {
+          action: 'confirm liquid and labware placements',
+          message:
+            'user confirmed liquid and labware placements before running protocol',
+        },
+        {
+          onSuccess: () => {
+            setIsConfirmed(true)
+            setSetupScreen('prepare to run')
+          },
+        }
+      )
+    } else {
+      setIsConfirmed(true)
+      setSetupScreen('prepare to run')
+    }
+  }, [documentationState, postLogMessage, setIsConfirmed, setSetupScreen])
+
   return (
     <>
       {selectedLabwareStack != null && mostRecentAnalysis != null ? (
@@ -184,10 +212,7 @@ export function ProtocolSetupLabware({
             ) : (
               <SmallButton
                 buttonText={t('confirm_placements')}
-                onClick={() => {
-                  setIsConfirmed(true)
-                  setSetupScreen('prepare to run')
-                }}
+                onClick={handleProceed}
                 buttonCategory="rounded"
               />
             )}
