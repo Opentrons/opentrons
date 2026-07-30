@@ -245,9 +245,7 @@ async def get_hardware_resource(
     hardware_api = _hw_api_accessor.get_from(app_state)
     hardware_api_subprocess = _hw_subprocess_accessor.get_from(app_state)
 
-    # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
-    # this patch should be REMOVED for releases >= 10.0.0
-    if False:  # ff.hardware_subprocess_enabled():
+    if ff.hardware_subprocess_enabled():
         if (
             hardware_api_subprocess is None
             or initialize_task is None
@@ -259,12 +257,11 @@ async def get_hardware_resource(
 
     else:
         if (
-            # (
-            #     not ff.hardware_subprocess_enabled()
-            #     and hardware_api_subprocess is not None
-            # )
-            # or hardware_api is None
-            hardware_api is None
+            (
+                not ff.hardware_subprocess_enabled()
+                and hardware_api_subprocess is not None
+            )
+            or hardware_api is None
             or initialize_task is None
             or not initialize_task.done()
         ):
@@ -321,10 +318,8 @@ async def get_hardware(
     Raises:
         ApiError: The Hardware API is still initializing or failed to initialize.
     """
-    if False:  # ff.hardware_subprocess_enabled():
+    if ff.hardware_subprocess_enabled():
         return hardware_resource
-    # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
-    # this patch should be REMOVED for releases >= 10.0.0
     return hardware_resource.wrapped()  # type: ignore
 
 
@@ -339,9 +334,7 @@ def get_ot3_hardware(
             status.HTTP_403_FORBIDDEN
         ) from exception
 
-    # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
-    # this patch should be REMOVED for releases >= 10.0.0
-    if False:  # ff.hardware_subprocess_enabled():
+    if ff.hardware_subprocess_enabled():
         return cast(OT3API, hardware_resource)
 
     assert isinstance(hardware_resource, ThreadManager)
@@ -500,9 +493,7 @@ async def _postinit_ot3_tasks(
         await hardware.set_status_bar_state(StatusBarState.ACTIVATION)
         for callback in callbacks:
             if not callback[1]:
-                # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
-                # this patch should be REMOVED for releases >= 10.0.0
-                if False:  # ff.hardware_subprocess_enabled():
+                if ff.hardware_subprocess_enabled():
                     # In subprocess mode, hardware resource is a direct HardwareControlAPI
                     await callback[0](app_state, hardware_resource)
                 else:
@@ -619,9 +610,7 @@ async def _initialize_hardware_api(
     systemd_available = IS_ROBOT and ARCHITECTURE != SystemArchitecture.HOST
     try:
         if should_use_ot3():
-            # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
-            # this patch should be REMOVED for releases >= 10.0.0
-            if False:  # f.hardware_subprocess_enabled():
+            if ff.hardware_subprocess_enabled():
                 hardware = identify_hardware_process()
                 _hw_subprocess_accessor.set_on(app_state, hardware)
             else:
@@ -637,9 +626,7 @@ async def _initialize_hardware_api(
 
         for callback in callbacks:
             if callback[1]:
-                # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
-                # this patch should be REMOVED for releases >= 10.0.0
-                if False:  # ff.hardware_subprocess_enabled():
+                if ff.hardware_subprocess_enabled():
                     await callback[0](app_state, hardware)
                 else:
                     assert isinstance(hardware, ThreadManager)

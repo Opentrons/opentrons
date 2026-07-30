@@ -7,9 +7,9 @@ import logging
 import threading
 from typing import TYPE_CHECKING, Any, Callable, Optional
 
-# from opentrons.config import (
-#     feature_flags as ff,
-# )
+from opentrons.config import (
+    feature_flags as ff,
+)
 from opentrons.hardware_control.types import HardwareEvent, HardwareEventHandler
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
@@ -233,9 +233,7 @@ def start_initializing_pyro_resource(app_state: AppState) -> None:
     robot_server_pyro_resource_accessor.set_on(app_state, resource)
 
     # Only spin up a request handling daemon if subprocess mode is enabled
-    # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
-    # this patch should be REMOVED for releases >= 10.0.0
-    if False:  # ff.hardware_subprocess_enabled():
+    if ff.hardware_subprocess_enabled():
         pyro_daemon_thread = threading.Thread(
             target=_start_and_run_pyro_daemon,
             name="RobotServerResourceThread",

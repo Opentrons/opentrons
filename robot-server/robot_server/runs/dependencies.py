@@ -6,7 +6,7 @@ from typing import Annotated, AsyncGenerator
 from fastapi import Depends, status
 from sqlalchemy.engine import Engine as SQLEngine
 
-# from opentrons.config import feature_flags
+from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import DeckType
 from opentrons.protocol_engine.resources.file_provider import FileProvider
@@ -183,9 +183,7 @@ async def get_run_orchestrator_store(
         )
         _run_orchestrator_store_accessor.set_on(app_state, run_orchestrator_store)
         # Handle remote hardware registry, if needed
-        # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
-        # this patch should be REMOVED for releases >= 10.0.0
-        if False:  # feature_flags.hardware_subprocess_enabled():
+        if feature_flags.hardware_subprocess_enabled():
             register_run_orchestrator_store_to_pyro_resource(
                 app_state=app_state, run_orchestrator_store=run_orchestrator_store
             )
