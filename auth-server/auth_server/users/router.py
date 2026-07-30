@@ -70,6 +70,16 @@ async def post_users(
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
+    audit_logger: Annotated[
+        AuditLogger,
+        fastapi.Depends(
+            get_audit_logger(
+                "create user",
+                # Custom logs of request body to avoid logging passwords
+                auto_log_request_body=False,
+            ),
+        ),
+    ],
 ) -> PydanticResponse[SimpleBody[TemporaryPasswordResponse]]:
     """Create a user."""
     user_create = request_body.data

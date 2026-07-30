@@ -7,6 +7,7 @@ import { useUsersQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useToaster } from '/app/organisms/ToasterOven'
 
 import { UserManagement } from '../UserManagement'
 
@@ -24,11 +25,16 @@ vi.mock('../AddUserModal', () => ({
     </div>
   ),
 }))
+vi.mock('/app/organisms/ToasterOven')
 
 const ROBOT_NAME = 'flex-1'
 
 const MOCK_AUTH_STATE = {
-  username: 'alice',
+  user: {
+    username: 'alice',
+    fullName: 'Alice Example',
+    accountType: 'admin' as const,
+  },
   accessToken: 'access-token',
   refreshToken: 'refresh-token',
   expiresAt: null,
@@ -80,6 +86,11 @@ function expandAccordion(): void {
 
 describe('UserManagement', () => {
   beforeEach(() => {
+    vi.mocked(useToaster).mockReturnValue({
+      makeToast: vi.fn(),
+      eatToast: vi.fn(),
+      makeSnackbar: vi.fn(),
+    })
     vi.mocked(useUsersQuery).mockImplementation(
       options =>
         ({
