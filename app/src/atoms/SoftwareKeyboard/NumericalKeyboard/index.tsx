@@ -46,12 +46,12 @@ export function NumericalKeyboard({
       }}
       onChange={onChange}
       display={numericalCustom}
-      useButtonTag={false}
+      useButtonTag={false} // Exclude from the tab order.
       buttonAttributes={softwareKeyboardButtonAttributes}
       layoutName={layoutName}
       layout={numericalKeyboardLayout}
       debug={debug} // If true, <ENTER> will input a \n
-      preventMouseDownDefault
+      preventMouseDownDefault // Don't steal focus from inputs.
     />
   )
 }

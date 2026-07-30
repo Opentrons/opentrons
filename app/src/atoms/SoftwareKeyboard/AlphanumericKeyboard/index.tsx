@@ -88,11 +88,11 @@ export function AlphanumericKeyboard({
       }
       display={customDisplay}
       mergeDisplay={true}
-      useButtonTag={false}
+      useButtonTag={false} // Exclude from the tab order.
       buttonAttributes={softwareKeyboardButtonAttributes}
       width="100%"
       debug={debug} // If true, <ENTER> will input a \n
-      preventMouseDownDefault
+      preventMouseDownDefault // Don't steal focus from inputs.
     />
   )
 }
