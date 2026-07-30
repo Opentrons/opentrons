@@ -6,6 +6,7 @@ import socket
 import threading
 from dataclasses import is_dataclass
 from datetime import datetime
+from enum import StrEnum
 from pathlib import Path
 from typing import Any, Dict, get_args, get_type_hints
 
@@ -16,6 +17,7 @@ from Pyro5 import nameserver
 
 import opentrons_shared_data.pipette.types as pipette_types
 from opentrons_shared_data.errors import ErrorCodes
+from opentrons_shared_data.errors.categories import ErrorCategories
 from opentrons_shared_data.errors.exceptions import CommunicationError
 from opentrons_shared_data.gripper import GripperModel
 from opentrons_shared_data.pipette import (
@@ -67,13 +69,17 @@ from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.poller import Poller
 from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
     HARDWARE_CLASS_PACKAGES,
+    HARDWARE_ENUM_PACKAGES,
     register_hardware_types,
 )
 from opentrons.hardware_control.robot_calibration import DeckCalibration
 from opentrons.hardware_control.types import DoorState
 from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
-from opentrons.util.pyro.pyro_serialization import find_opentrons_classes_in_packages
+from opentrons.util.pyro.pyro_serialization import (
+    find_enums_in_packages,
+    find_opentrons_classes_in_packages,
+)
 
 TEST_PYRO_TIMEOUT = 5
 
@@ -701,10 +707,83 @@ CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
     hw_types.HardwareFeatureFlags: hw_types.HardwareFeatureFlags(
         False, True, True, True
     ),
+    stacker_types.LEDPattern: stacker_types.LEDPattern.PULSE,
+    vac_types.LEDPattern: vac_types.LEDPattern.STATIC,
+    module_types.AbsorbanceReaderModel: module_types.AbsorbanceReaderModel.ABSORBANCE_READER_V1,
+    hw_types.GripperJawState: hw_types.GripperJawState.UNHOMED,
+    stacker_types.StackerAxis: stacker_types.StackerAxis.X,
+    module_types.ModuleType: module_types.ModuleType.THERMOCYCLER,
+    module_types.HeaterShakerModuleModel: module_types.HeaterShakerModuleModel.HEATER_SHAKER_V1,
+    vac_types.VentState: vac_types.VentState.CLOSED,
+    module_types.LidStatus: module_types.LidStatus.ON,
+    hw_types.HardwareEventType: hw_types.HardwareEventType.DOOR_SWITCH_CHANGE,
+    calibration_types.SourceType: calibration_types.SourceType.default,
+    module_types.StackerAxisState: module_types.StackerAxisState.UNKNOWN,
+    ot_types.PipetteMountType: ot_types.PipetteMountType.LEFT,
+    hw_types.UpdateState: hw_types.UpdateState.queued,
+    ot_types.TransferTipPolicy: ot_types.TransferTipPolicy.ONCE,
+    module_types.VacuumModuleStatus: module_types.VacuumModuleStatus.IDLE,
+    driver_types.AbsorbanceReaderDeviceState: driver_types.AbsorbanceReaderDeviceState.OK,
+    pipette_types.Quirks: pipette_types.Quirks.pickupTipShake,
+    GripperModel: GripperModel.v1,
+    vac_types.HardwareRevision: vac_types.HardwareRevision.NFF,
+    config_types.OT3AxisKind: config_types.OT3AxisKind.X,
+    ot_types.DeckSlotName: ot_types.DeckSlotName.SLOT_1,
+    pipette_types.PipetteChannelType: pipette_types.PipetteChannelType.SINGLE_CHANNEL,
+    hw_types.ExecutionState: hw_types.ExecutionState.RUNNING,
+    hw_types.EstopAttachLocation: hw_types.EstopAttachLocation.LEFT,
+    ot_types.OT3MountType: ot_types.OT3MountType.LEFT,
+    driver_types.HeaterShakerLabwareLatchStatus: driver_types.HeaterShakerLabwareLatchStatus.IDLE_CLOSED,
+    module_types.SpeedStatus: module_types.SpeedStatus.IDLE,
+    module_types.VacuumModuleModel: module_types.VacuumModuleModel.VACUUM_MODULE_V1,
+    module_types.LatchState: module_types.LatchState.CLOSED,
+    pipette_types.LiquidClasses: pipette_types.LiquidClasses.default,
+    module_types.MagneticBlockModel: module_types.MagneticBlockModel.MAGNETIC_BLOCK_V1,
+    module_types.FlexStackerStatus: module_types.FlexStackerStatus.IDLE,
+    driver_types.AbsorbanceReaderLidStatus: driver_types.AbsorbanceReaderLidStatus.ON,
+    module_types.VacuumOperationMode: module_types.VacuumOperationMode.POWER,
+    ot_types.NozzleConfigurationType: ot_types.NozzleConfigurationType.FULL,
+    driver_types.ABSMeasurementMode: driver_types.ABSMeasurementMode.SINGLE,
+    module_types.TemperatureModuleModel: module_types.TemperatureModuleModel.TEMPERATURE_V1,
+    module_types.MagneticStatus: module_types.MagneticStatus.DISENGAGED,
+    pipette_types.PipetteOEMType: pipette_types.PipetteOEMType.OT,
+    peripheral_types.PeripheralType: peripheral_types.PeripheralType.BARCODE_SCANNER,
+    pipette_types.PipetteModelType: pipette_types.PipetteModelType.p1000,
+    hw_types.HardwareAction: hw_types.HardwareAction.ASPIRATE,
+    hw_types.BoardRevision: hw_types.BoardRevision.UNKNOWN,
+    module_types.VentStatus: module_types.VentStatus.CLOSED,
+    module_types.HeaterShakerStatus: module_types.HeaterShakerStatus.IDLE,
+    hw_types.EstopPhysicalStatus: hw_types.EstopPhysicalStatus.ENGAGED,
+    vac_types.LEDColor: vac_types.LEDColor.RED,
+    DoorState: DoorState.CLOSED,
+    module_types.HopperDoorState: module_types.HopperDoorState.CLOSED,
+    hw_types.PipetteSensorType: hw_types.PipetteSensorType.capacitive,
+    ot_types.StagingSlotName: ot_types.StagingSlotName.SLOT_A4,
+    module_types.PlatformState: module_types.PlatformState.RETRACTED,
+    ot_types.MeniscusTrackingTarget: ot_types.MeniscusTrackingTarget.START,
+    module_types.ThermocyclerModuleModel: module_types.ThermocyclerModuleModel.THERMOCYCLER_V2,
+    module_types.TemperatureStatus: module_types.TemperatureStatus.IDLE,
+    pipette_types.AvailableUnits: pipette_types.AvailableUnits.mm,
+    module_types.AbsorbanceReaderStatus: module_types.AbsorbanceReaderStatus.IDLE,
+    ot_types.AxisType: ot_types.AxisType.X,
+    ot_types.MountType: ot_types.MountType.LEFT,
+    hw_types.PipetteSubType: hw_types.PipetteSubType.pipette_single,
+    driver_types.AbsorbanceReaderPlatePresence: driver_types.AbsorbanceReaderPlatePresence.PRESENT,
+    pipette_types.PipetteGenerationType: pipette_types.PipetteGenerationType.GEN2,
+    module_types.MagneticModuleModel: module_types.MagneticModuleModel.MAGNETIC_V2,
+    pipette_types.PipetteNameType: pipette_types.PipetteNameType.P1000_SINGLE,
+    vac_types.GCODE: vac_types.GCODE.GET_DEVICE_INFO,
+    pipette_types.PipetteTipType: pipette_types.PipetteTipType.t1000,
+    driver_types.ThermocyclerLidStatus: driver_types.ThermocyclerLidStatus.CLOSED,
+    hw_types.EstopState: hw_types.EstopState.DISENGAGED,
+    module_types.FlexStackerModuleModel: module_types.FlexStackerModuleModel.FLEX_STACKER_V1,
 }
 
+# This list should only include types that are either builtins that we work around or error related content thats delt with via pickle
+TYPES_TO_SKIP = [ErrorCodes, ErrorCategories, StrEnum]
 
-async def test_serialization_validation() -> None:
+
+async def test_serialization_validation_with_mock_data() -> None:  # noqa: C901
     """Test to check if types registered in the hardware class package properly serialize and deserialize."""
 
     class DataTester:
@@ -768,16 +847,21 @@ async def test_serialization_validation() -> None:
         HARDWARE_CLASS_PACKAGES
     )
     hardware_registry_class_list = list(set(hardware_registry_class_list))
+    enum_registry_class_list = find_enums_in_packages(HARDWARE_ENUM_PACKAGES)
+    enum_registry_class_list = list(set(enum_registry_class_list))
+    # todo(chb, 7-30-26): Expand this test to test the pydantic serialization as well - will require new mocks
+    # pydantic_registry_class_list = find_pydantic_classes_in_packages(HARDWARE_PYDANTIC_PACKAGES)
+    # pydantic_registry_class_list = list(set(pydantic_registry_class_list))
+
+    exposed_class_list = hardware_registry_class_list + enum_registry_class_list
 
     # Validate each class can be sent over pyro and come back deserialized in the expected format
-    for clazz in hardware_registry_class_list:
-        try:
-            mock_data = CLASS_TYPE_MOCK_TABLE[clazz]
-        except KeyError as e:
-            raise KeyError(f"{e} - Mock data missing for type {clazz}")
+    for clazz in exposed_class_list:
+        if clazz not in TYPES_TO_SKIP:
+            try:
+                mock_data = CLASS_TYPE_MOCK_TABLE[clazz]
+            except KeyError as e:
+                raise KeyError(f"{e} - Mock data missing for type {clazz}")
 
-        deserialized_output = tester_proxy.data_in_data_out(mock_data)
-        assert deserialized_output == mock_data
-
-
-# todo(chb, 7-30-26): Expand this test to test the enum serialization and the pydantic serialization as well
+            deserialized_output = tester_proxy.data_in_data_out(mock_data)
+            assert deserialized_output == mock_data
