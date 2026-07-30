@@ -44,6 +44,7 @@ from opentrons_shared_data.errors.exceptions import InvalidStoredData
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 from opentrons_shared_data.robot.types import RobotTypeEnum
 
+from robot_server.access_control.settings.store import AccessControlSettingStore
 from robot_server.camera.provider import CameraProviderWrapper
 from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
@@ -102,6 +103,12 @@ def mock_error_recovery_setting_store(decoy: Decoy) -> ErrorRecoverySettingStore
 def mock_camera_setting_store(decoy: Decoy) -> CameraSettingStore:
     """Get a mock CameraSettingStore."""
     return decoy.mock(cls=CameraSettingStore)
+
+
+@pytest.fixture
+def mock_access_control_setting_store(decoy: Decoy) -> AccessControlSettingStore:
+    """Get a mock AccessControlSettingStore."""
+    return decoy.mock(cls=AccessControlSettingStore)
 
 
 @pytest.fixture()
@@ -258,6 +265,7 @@ def subject(
     mock_run_store: RunStore,
     mock_error_recovery_setting_store: ErrorRecoverySettingStore,
     mock_camera_setting_store: CameraSettingStore,
+    mock_access_control_setting_store: AccessControlSettingStore,
     mock_runs_publisher: RunsPublisher,
     mock_file_provider: FileProvider,
 ) -> RunDataManager:
@@ -267,6 +275,7 @@ def subject(
         run_store=mock_run_store,
         error_recovery_setting_store=mock_error_recovery_setting_store,
         camera_setting_store=mock_camera_setting_store,
+        access_control_setting_store=mock_access_control_setting_store,
         runs_publisher=mock_runs_publisher,
         file_provider=mock_file_provider,
     )

@@ -44,6 +44,7 @@ from .error_recovery_models import ErrorRecoveryRule
 from .run_models import BadRun, Run, RunDataError
 from .run_orchestrator_store import RunOrchestratorStore
 from .run_store import BadRunResource, BadStateSummary, RunResource, RunStore
+from robot_server.access_control.settings.store import AccessControlSettingStore
 from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
 from robot_server.protocols.protocol_store import ProtocolResource
@@ -178,6 +179,7 @@ class RunDataManager:
         run_store: RunStore,
         error_recovery_setting_store: ErrorRecoverySettingStore,
         camera_setting_store: CameraSettingStore,
+        access_control_setting_store: AccessControlSettingStore,
         runs_publisher: RunsPublisher,
         file_provider: FileProvider,
     ) -> None:
@@ -186,6 +188,7 @@ class RunDataManager:
 
         self._error_recovery_setting_store = error_recovery_setting_store
         self._camera_setting_store = camera_setting_store
+        self._access_control_setting_store = access_control_setting_store
         # todo(mm, 2024-11-22): Storing the list of error recovery rules is outside the
         # responsibilities of this class. It's also clunky for us to store it like this
         # because we need to remember to clear it whenever the current run changes.
