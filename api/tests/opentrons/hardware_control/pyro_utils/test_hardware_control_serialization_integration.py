@@ -203,7 +203,7 @@ async def _setup_OT3API_pyro_resource(
     def _ot3api_pyro_daemon() -> None:
         # Wait for the nameserver to be ready so locate_ns can succeed.
         name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
-        create_pyro_daemon("OT3API", hw_api, register_hardware_types)
+        create_pyro_daemon("OT3API", hw_api.managed_obj, register_hardware_types)
 
     ot3api_thread = threading.Thread(target=_ot3api_pyro_daemon, daemon=True)
     ot3api_thread.start()
