@@ -36,10 +36,11 @@ The Vacuum Module ships in three separate boxes. One contains the vacuum pump an
     <figcaption>Vacuum Module base piece</figcaption>
     </figure>
 
-8. Place the vacuum base in the recessed slot of the deck adapter.
+8. Place the vacuum base in the recessed slot of the deck adapter with the quick-connect fitting facing toward the back of the deck. This keeps the vacuum hose clear of the main working area.
 
     <figure markdown>
-    ![Arrow showing vacuum base placement in deck adapter](images/base-in-adapter.png)
+    ![Vacuum base positioned inside the deck adapter with the quick-connect fitting at the rear](images/base-in-adapter.png)
+    <figcaption>Deck adapter and vacuum base. Quick-connect fitting faces rear of robot.</figcaption>
     </figure>
 
 9. Insert 4 manifold screws from the bottom of the deck adapter to the vacuum base.
