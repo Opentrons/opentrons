@@ -29,41 +29,46 @@ VALID_UPDATE_PKG = UPDATE_PKG_OE
 
 LOG = logging.getLogger(__name__)
 
+router = fastapi.APIRouter()
 
-class _HandlerWithSession(Protocol):
-    """The type signature of an aiohttp request handler that also has a session arg.
 
-    See require_session().
+def get_session(
+    app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
+) -> Optional[UpdateSession]:
+    """A FastAPI dependency for the active update session, if there is one.
+
+    Use this in endpoints that tolerate there being no session. Endpoints that
+    name a session in their path should use `require_session()` instead.
     """
-
-    async def __call__(
-        self, request: web.Request, session: UpdateSession
-    ) -> web.Response: ...
+    return get_current_session(app_state)
 
 
-def _require_session(handler: _HandlerWithSession) -> Handler:
-    """Decorator to ensure a session is properly in the request"""
-
-    @functools.wraps(handler)
-    async def decorated(request: web.Request) -> web.Response:
-        request_session_token = request.match_info["session"]
-        session = get_current_session(request)
-        if not session or request_session_token != session.token:
-            LOG.warning(f"request for invalid session {request_session_token}")
-            return web.json_response(
-                data={
-                    "error": "bad-token",
-                    "message": f"No such session {request_session_token}",
-                },
-                status=404,
-            )
-        return await handler(request, session)
-
-    return decorated
+def require_session(
+    session: str,
+    current_session: Annotated[Optional[UpdateSession], fastapi.Depends(get_session)],
+) -> UpdateSession:
+    """A FastAPI dependency to look up the session named by the request's path."""
+    if not current_session or session != current_session.token:
+        LOG.warning(f"request for invalid session {session}")
+        raise APIError(
+            404,
+            ErrorBody(error="bad-token", message=f"No such session {session}"),
+        )
+    return current_session
 
 
-@auth.require_scopes(Scope.UPDATES_WRITE)
-async def begin(request: web.Request) -> web.Response:
+@router.post(
+    "/server/update/begin",
+    status_code=201,
+    summary="Create an update session.",
+    dependencies=[fastapi.Depends(require_scopes(Scope.UPDATES_WRITE))],
+)
+async def begin(
+    request: fastapi.Request,
+    app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
+    current_session: Annotated[Optional[UpdateSession], fastapi.Depends(get_session)],
+    server_config: Annotated[config.Config, fastapi.Depends(config.get_config)],
+) -> JSONResponse:
     """Begin (create) a session.
 
     The request body may be empty, or it may be a JSON object like:
@@ -94,14 +99,14 @@ async def begin(request: web.Request) -> web.Response:
       auto_commit_and_restart?: boolean
     }
     """
-    if None is not get_current_session(request):
+    if current_session is not None:
         LOG.warning("begin: requested with active session")
-        return web.json_response(
-            data={
-                "message": "An update session is already active on this robot",
-                "error": "session-already-active",
-            },
-            status=409,
+        raise APIError(
+            409,
+            ErrorBody(
+                error="session-already-active",
+                message="An update session is already active on this robot",
+            ),
         )
         # fixme(mm, 2026-07-06): There's a concurrency hazard here because we're checking
         # for a preexisting session and setting the new session non-atomically. Two
@@ -159,82 +164,90 @@ async def file_upload(
     this repo) also supported 'ot2-system.zip'.
     """
     if session.stage != Stages.AWAITING_FILE:
-        return web.json_response(
-            data={
-                "error": "file-already-uploaded",
-                "message": "A file has already been sent for this update",
-            },
-            status=409,
-        )
-    reader = await request.multipart()
-    found_name = await _extract_and_save_update_file(reader, session)
-
-    maybe_actions = update_actions.UpdateActionsInterface.from_request(request)
-    if not maybe_actions:
-        return web.json_response(
-            data={
-                "error": "no-actions-set",
-                "message": "Internal error: no actions object for hardware",
-            },
-            status=500,
+        raise APIError(
+            409,
+            ErrorBody(
+                error="file-already-uploaded",
+                message="A file has already been sent for this update",
+            ),
         )
 
-    if not found_name:
-        return web.json_response(
-            data={
-                "error": "no-file-name",
-                "message": "Request error: no field name for system zip",
-            },
-            status=400,
-        )
-
-    _begin_validate_and_write(
-        session,
-        config.config_from_request(request),
-        os.path.join(session.download_path, found_name),
-        maybe_actions,
-        request.app[RESTART_LOCK_NAME],
+    found_names = await multipart.save_parts_to_directory(
+        request,
+        accepted_field_names=VALID_UPDATE_PKG,
+        destination_directory=session.download_path,
     )
 
-    return web.json_response(data=session.state, status=201)
+    if not actions:
+        raise no_actions_set_error()
+
+    if not found_names:
+        raise APIError(
+            400,
+            ErrorBody(
+                error="no-file-name",
+                message="Request error: no field name for system zip",
+            ),
+        )
+
+    # Only one file can be validated and written. If the request carried several
+    # acceptable parts, the last one is the one left on disk.
+    _begin_validate_and_write(
+        session,
+        server_config,
+        os.path.join(session.download_path, found_names[-1]),
+        actions,
+        restart_lock,
+    )
+
+    return JSONResponse(status_code=201, content=dict(session.state))
 
 
-@auth.require_scopes(Scope.UPDATES_WRITE)
-@_require_session
-async def commit(request: web.Request, session: UpdateSession) -> web.Response:
+@router.post(
+    "/server/update/{session}/commit",
+    summary="Commit a validated update.",
+    dependencies=[fastapi.Depends(require_scopes(Scope.UPDATES_WRITE))],
+)
+async def commit(
+    session: Annotated[UpdateSession, fastapi.Depends(require_session)],
+    actions: Annotated[
+        Optional[update_actions.UpdateActionsInterface],
+        fastapi.Depends(update_actions.get_update_actions),
+    ],
+    restart_lock: Annotated[asyncio.Lock, fastapi.Depends(get_restart_lock)],
+) -> JSONResponse:
     """Serves /update/:session/commit"""
     if session.stage != Stages.DONE:
         # fixme(mm, 2026-07-07): This stage check is insufficient; it can allow
         # multiple commits to run concurrently on a single session, because we
         # non-atomically enforce Stages.DONE, do commit process, and then set
         # Stages.READY_FOR_RESTART.
-        return web.json_response(
-            data={
-                "error": "not-ready",
-                "message": f"System is not ready to commit the update "
+        raise APIError(
+            409,
+            ErrorBody(
+                error="not-ready",
+                message=f"System is not ready to commit the update "
                 f"(currently {session.stage.value.short})",
-            },
-            status=409,
+            ),
         )
 
-    actions = update_actions.UpdateActionsInterface.from_request(request)
     if not actions:
-        return web.json_response(
-            data={
-                "error": "no-actions-set",
-                "message": "Internal error: no actions object for hardware",
-            },
-            status=500,
-        )
+        raise no_actions_set_error()
 
-    await _commit(request.app[RESTART_LOCK_NAME], actions, session)
+    await _commit(restart_lock, actions, session)
 
-    return web.json_response(data=session.state, status=200)
+    return JSONResponse(status_code=200, content=dict(session.state))
 
 
-@auth.require_scopes(Scope.UPDATES_WRITE)
-async def cancel(request: web.Request) -> web.Response:
-    session = get_current_session(request)
+@router.post(
+    "/server/update/cancel",
+    summary="Cancel the active update session.",
+    dependencies=[fastapi.Depends(require_scopes(Scope.UPDATES_WRITE))],
+)
+async def cancel(
+    app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
+    session: Annotated[Optional[UpdateSession], fastapi.Depends(get_session)],
+) -> JSONResponse:
     if session is not None:
         # fixme(mm, 2026-07-06):
         #   * This is a concurrency hazard: it might close a session and delete its
@@ -242,8 +255,8 @@ async def cancel(request: web.Request) -> web.Response:
         #   * session.close() currently only cleans up storage. We also need to clean
         #     up background tasks.
         session.close()
-        set_current_session(request, None)
-    return web.json_response(data={"message": "Session cancelled"}, status=200)
+        set_current_session(app_state, None)
+    return JSONResponse(status_code=200, content={"message": "Session cancelled"})
 
 
 @dataclasses.dataclass
@@ -253,8 +266,8 @@ class _BeginSessionOptions:
     auto_commit_and_restart: bool
 
     @classmethod
-    async def parse_from_request(cls, request: web.Request) -> Self:
-        text = await request.text()
+    async def parse_from_request(cls, request: fastapi.Request) -> Self:
+        text = (await request.body()).decode()
 
         if text.strip() == "":
             return cls(auto_commit_and_restart=False)
