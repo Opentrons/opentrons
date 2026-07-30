@@ -1,18 +1,12 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
+import { useDispatch } from 'react-redux'
 
 import { BasicButton, Divider, StyledText } from '@opentrons/components'
 import {
   getSelfQueryKey,
   useHost,
-  useSelfQuery,
-import { useDispatch } from 'react-redux'
-import axios from 'axios'
-
-import { BasicButton, Divider, StyledText } from '@opentrons/components'
-import {
-  isDocumentedMutationError,
   useUpdateSelfMutation,
 } from '@opentrons/react-api-client'
 
@@ -54,6 +48,8 @@ export function PersonalAccountSettings({
 }: PersonalAccountSettingsProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const dispatch = useDispatch()
+  const queryClient = useQueryClient()
+  const host = useHost()
   const documentationState = useDocumentationState(undefined, robotName)
   const loggedInUser = useLoggedInUserForRobot(robotName)
   const { updateSelf, isLoading: isSaving } =
@@ -66,7 +62,9 @@ export function PersonalAccountSettings({
   const handleSave = (request: UpdateSelfRequest): void => {
     void updateSelf(request)
       .then(updatedSelf => {
-        queryClient.setQueryData(getSelfQueryKey(host), updatedSelf)
+        if (host != null) {
+          queryClient.setQueryData(getSelfQueryKey(host), updatedSelf)
+        }
         clearFieldErrors()
         dispatch(
           updateLoggedInUserProfile({
@@ -75,7 +73,6 @@ export function PersonalAccountSettings({
             fullName: updatedSelf.data.fullName,
           })
         )
-        clearSaveErrors()
         setIsEditing(false)
       })
       .catch(handleMutationError)
