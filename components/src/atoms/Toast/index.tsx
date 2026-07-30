@@ -70,6 +70,7 @@ export function Toast(props: ToastProps): JSX.Element {
     exitNow = false,
     linkText,
     onLinkClick = () => null,
+    zIndex,
     ...styleProps
   } = props
   const [isClosed, setIsClosed] = useState<boolean>(exitNow)

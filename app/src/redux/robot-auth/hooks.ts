@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useMatch } from 'react-router-dom'
 
 import { getIsOnDevice } from '../config'
@@ -10,6 +10,7 @@ import {
   getIsAdminForRobot,
   getLoggedInUserForRobot,
   getUsernameForRobot,
+  logOut,
 } from './slice'
 
 import type { State } from '../types'
@@ -81,4 +82,18 @@ export function useCurrentRobotName(): string | null {
   const localRobotName = useSelector(getLocalRobot)?.name ?? null
   const desktopRobotName = deviceRouteMatch?.params?.robotName ?? null
   return isOnDevice ? localRobotName : desktopRobotName
+}
+
+/** Log out of the robot the user is currently acting on. */
+export function useLogout(): () => void {
+  const dispatch = useDispatch()
+  const robotName = useCurrentRobotName()
+
+  return useCallback(() => {
+    if (robotName == null) {
+      console.warn("Couldn't identify the robot to log out of.")
+    } else {
+      dispatch(logOut({ robotName }))
+    }
+  }, [dispatch, robotName])
 }

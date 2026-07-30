@@ -176,6 +176,7 @@ export function FullKeyboard({
           buttons: '{shift}',
         },
       ]}
+      preventMouseDownDefault
     />
   )
 }

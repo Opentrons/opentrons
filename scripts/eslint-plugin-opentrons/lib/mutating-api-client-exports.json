@@ -57,6 +57,7 @@
     "searchLabwareOffsets",
     "setLights",
     "shutdown",
+    "signRun",
     "updateClientData",
     "updateDeckConfiguration",
     "updateErrorRecoveryPolicy",

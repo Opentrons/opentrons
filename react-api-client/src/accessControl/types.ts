@@ -185,6 +185,7 @@ type AuditLogAction =
   | 'update_settings'
   | 'create_user'
   | 'delete_log_period'
+  | 'sign_run'
   | 'delete_log_periods'
 
 /**

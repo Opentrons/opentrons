@@ -52,12 +52,6 @@ const AUTH_USER: AuthUser = {
   resetPassword: false,
 }
 
-const LOGGED_IN_USER = {
-  username: 'alice',
-  fullName: 'Alice',
-  accountType: 'user' as const,
-}
-
 function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
   return { ...AUTH_USER, ...overrides }
 }
@@ -223,7 +217,7 @@ describe('LoginModal', () => {
     expect(submitPassword).toHaveBeenCalledWith('alice', 'secret-password')
     expect(storeLoginState).toHaveBeenCalledWith(
       ROBOT_NAME,
-      LOGGED_IN_USER,
+      AUTH_USER,
       TOKEN_RESPONSE
     )
     expect(screen.queryByText('Compliance Ready Software Login')).toBeNull()
@@ -254,7 +248,7 @@ describe('LoginModal', () => {
 
     expect(storeLoginState).toHaveBeenCalledWith(
       ROBOT_NAME,
-      LOGGED_IN_USER,
+      mockAuthUser({ resetPassword: true }),
       TOKEN_RESPONSE
     )
     screen.getByText('Your password has expired')
