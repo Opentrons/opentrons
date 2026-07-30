@@ -187,6 +187,7 @@ type AuditLogAction =
   | 'delete_log_period'
   | 'sign_run'
   | 'delete_log_periods'
+  | 'confirm_parameters'
   | 'confirm_placements'
   | 'change_update_channel'
   | 'toggle_devtools'
