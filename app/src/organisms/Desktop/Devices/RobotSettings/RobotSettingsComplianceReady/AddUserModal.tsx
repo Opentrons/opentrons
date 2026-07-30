@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import {
+  Banner,
   DropdownMenu,
   ModalShell,
   PrimaryButton,
@@ -126,6 +127,9 @@ export function AddUserModal({
       {generatedPassword != null ? (
         <div className={styles.modal_content}>
           <div className={styles.form_fields}>
+            <Banner type="success" width="100%">
+              {t('desktop_add_user_created_banner')}
+            </Banner>
             <div className={styles.success_intro}>
               <StyledText desktopStyle="headingSmallBold">
                 {t('desktop_one_time_password')}
@@ -145,8 +149,11 @@ export function AddUserModal({
               </div>
             </div>
             <div className={styles.actions}>
+              <SecondaryButton type="button" onClick={handleClose}>
+                {t('shared:back')}
+              </SecondaryButton>
               <PrimaryButton type="button" onClick={handleClose}>
-                {t('done')}
+                {t('shared:confirm')}
               </PrimaryButton>
             </div>
           </div>
