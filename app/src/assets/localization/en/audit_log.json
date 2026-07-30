@@ -10,6 +10,7 @@
   "attach_pipette_right": "Launching attach pipette on right mount flow",
   "calibrate": "Calibrating",
   "capture_preview_image": "Capturing preview image",
+  "confirm_placements": "Confirming liquids and labware placements",
   "connect_wifi": "Connect to wifi network",
   "create_camera_image_settings": "Updating camera image settings",
   "create_offsets": "Saving new labware offsets",
