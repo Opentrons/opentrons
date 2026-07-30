@@ -16,6 +16,10 @@ from typing import Any
 
 import serial
 
+from hardware_testing.modules.common.utils import find_module_port
+
+VACUUM_VID = 0x0483
+VACUUM_PID = 0xEF40
 PORT = "/dev/ot_module_vacuummodule1"
 BAUD = 115200
 OUT_JSON = "/tmp/vacuum_pressure_hold_results.json"
@@ -191,7 +195,9 @@ def main() -> int:
         f"~{len(TARGETS) * DURATION_S / 60:.0f} min hold time)",
         flush=True,
     )
-    ser = serial.Serial(PORT, BAUD, timeout=0.2)
+
+    port = find_module_port(VACUUM_VID, VACUUM_PID)
+    ser = serial.Serial(port, BAUD, timeout=0.2)
     ser.reset_input_buffer()
     fw = xcmd(ser, "M115", wait=0.3)
     print("M115:", fw, flush=True)
