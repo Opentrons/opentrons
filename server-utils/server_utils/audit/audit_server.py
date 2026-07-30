@@ -17,12 +17,13 @@ import pydantic
 
 LOG_MESSAGE_ENDPOINT_PATH: typing.Final = "audit/internal/logMessage"
 SETTINGS_ENDPOINT_PATH: typing.Final = "audit/external/settings"
+STORE_ROBOT_LOG_ENDPOINT_PATH = "/audit/internal/storeRobotLog"
 
 _log = logging.getLogger(__name__)
 
 
 class Client(ABC):
-    """An interface for a dependent server to submit audit log messages to audit-server."""
+    """An interface for a dependent server to submit audit log messages and robot logs to audit-server."""
 
     @abstractmethod
     async def submit_log_message(
@@ -38,6 +39,17 @@ class Client(ABC):
     @abstractmethod
     async def get_settings(self) -> AuditSettingsResponseData:
         """Get the currently-configured audit settings."""
+        pass
+
+    @abstractmethod
+    async def store_robot_log(
+        self, robot_log_file: typing.TextIO
+    ) -> StoreRobotLogSuccessData:
+        """Store a robot log file and rotate the log period.
+
+        If there's an internal error (e.g. the audit server is unconnectable),
+        the implementation should raise it as an exception.
+        """
         pass
 
 
@@ -118,6 +130,19 @@ class LocalHTTPClient(Client):
         parsed_response = AuditSettingsResponseBody.model_validate_json(response_bytes)
         return parsed_response.data
 
+    @typing.override
+    async def store_robot_log(
+        self, robot_log_file: typing.TextIO
+    ) -> StoreRobotLogSuccessData:
+        async with self._session.post(
+            STORE_ROBOT_LOG_ENDPOINT_PATH,
+            data={'file': robot_log_file}
+        ) as response:
+            response_bytes = await response.read()
+        response.raise_for_status()
+        parsed_response = StoreRobotLogResponseBody.model_validate_json(response_bytes)
+        return parsed_response.data
+
 
 class NoOpClient(Client):
     """A client implementation that doesn't actually contact audit-server.
@@ -146,6 +171,15 @@ class NoOpClient(Client):
         return AuditSettingsResponseData(
             requireReasonForInteraction=False, minLengthOfReasonForInteraction=0
         )
+
+    @typing.override
+    async def store_robot_log(
+        self, robot_log_file: typing.TextIO
+    ) -> StoreRobotLogSuccessData:
+        _log.info(
+            f"Store robot log (audit-server not configured): {robot_log_file.name}"
+        )
+        return StoreRobotLogSuccessData(loggingEnabled=False)
 
 
 class _StrictBaseModel(pydantic.BaseModel):
@@ -191,3 +225,15 @@ class AuditSettingsResponseBody(_StrictBaseModel):
     """Response envelope for audit settings."""
 
     data: AuditSettingsResponseData
+
+
+class StoreRobotLogSuccessData(_StrictBaseModel):
+    """The payload of a store robot log success response."""
+
+    loggingEnabled: bool
+
+
+class StoreRobotLogResponseBody(_StrictBaseModel):
+    """Response envelope for store robot log."""
+
+    data: StoreRobotLogSuccessData
