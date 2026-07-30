@@ -493,6 +493,7 @@ async def test_module_registration_coverage(
     assert set(class_cover_list) == set(hardware_registry_class_list)
 
 
+# Mock out of a bunch of the data types that we know leave this layer to be tested elsewhere
 CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
     hw_types.Axis: hw_types.Axis.X,
     hw_types.OT3Mount: hw_types.OT3Mount.LEFT,
@@ -699,9 +700,6 @@ CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
     hw_types.HardwareFeatureFlags: hw_types.HardwareFeatureFlags(False, True, True, True)
 }
 
-# ERROR COLLECTION LISTS
-
-
 async def test_serialization_validation() -> None:
     """Test to check if types registered in the hardware class package properly serialize and deserialize."""
 
@@ -777,3 +775,5 @@ async def test_serialization_validation() -> None:
 
         deserialized_output = tester_proxy.data_in_data_out(mock_data)
         assert deserialized_output == mock_data
+
+#todo(chb, 7-30-26): Expand this test to test the enum serialization and the pydantic serialization as well
