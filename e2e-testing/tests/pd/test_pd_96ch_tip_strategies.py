@@ -6,8 +6,13 @@ from typing import List, Union
 import pytest
 from playwright.sync_api import Page
 
-from automation.pd_pages import ProtocolEditorPage, Timeline, TransferPage
-from automation.pd_pages.transfer_form import TransferStepConfig, add_transfer_step
+from automation.pd_pages import (
+    ProtocolEditorPage,
+    Timeline,
+    TransferPage,
+    TransferStepConfig,
+    add_transfer_steps,
+)
 from utility import assert_export_downloads_clean_protocol, import_protocol_and_open_editor
 
 PROTOCOL_PATH = "fixtures/protocol/9/96_channel_setup.py"
@@ -42,16 +47,6 @@ def _wells(
     path: str = "Single transfer",
 ) -> tuple[Union[str, List[str]], Union[str, List[str]]]:
     return _WELLS_384[(nozzle_config, primary, path)]
-
-
-def _run_transfers(
-    editor: ProtocolEditorPage,
-    transfer: TransferPage,
-    steps: list[tuple[str, TransferStepConfig]],
-) -> None:
-    for label, config in steps:
-        print(f"  - {label}")
-        add_transfer_step(editor, transfer, config)
 
 
 @pytest.mark.pdE2E
@@ -105,7 +100,7 @@ def test_pd_96ch_tip_strategies_sequential(page: Page, pd_exports_dir: Path) -> 
         )
         for label, change_tip, drop, tip_tracking, manual_tips in column_specs
     ]
-    _run_transfers(editor, transfer, column_steps)
+    add_transfer_steps(editor, transfer, column_steps)
 
     print("3) Single-nozzle strategy phase")
     single_specs = [
@@ -138,7 +133,7 @@ def test_pd_96ch_tip_strategies_sequential(page: Page, pd_exports_dir: Path) -> 
                 ),
             )
         )
-    _run_transfers(editor, transfer, single_steps)
+    add_transfer_steps(editor, transfer, single_steps)
 
     print("4) Full-rack strategy phase")
     full_rack_specs = [
@@ -166,7 +161,7 @@ def test_pd_96ch_tip_strategies_sequential(page: Page, pd_exports_dir: Path) -> 
         )
         for label, src, dst, change_tip, drop, tip_tracking, manual_tips in full_rack_specs
     ]
-    _run_transfers(editor, transfer, full_rack_steps)
+    add_transfer_steps(editor, transfer, full_rack_steps)
 
     print("5) Timeline + export validation")
     # 1 move + 3 column + 5 single + 3 full-rack

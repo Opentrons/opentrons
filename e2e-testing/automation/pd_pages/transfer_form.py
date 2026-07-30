@@ -2,7 +2,7 @@
 
 import re
 from dataclasses import dataclass
-from typing import List, Literal, Optional, Union
+from typing import List, Literal, Optional, Sequence, Union
 
 from playwright.sync_api import Locator, Page, expect
 
@@ -717,7 +717,7 @@ class TransferPage(BasePage):
         self.page.get_by_role("button", name="Save", exact=True).last.click()
 
 
-@dataclass
+@dataclass(frozen=True)
 class TransferStepConfig:
     """Configuration for a single transfer step in the wizard."""
 
@@ -736,6 +736,44 @@ class TransferStepConfig:
     nozzle_config: TransferPage.NozzleConfig = "All nozzles (recommended)"
     partial_count: Optional[int] = None
     primary_nozzle: Optional[str] = None
+
+    @classmethod
+    def partial_nozzles(
+        cls,
+        *,
+        tip_rack: str,
+        source_labware: str,
+        dest_labware: str,
+        source_wells: Union[str, List[str]],
+        dest_wells: Union[str, List[str]],
+        path: str,
+        volume: str,
+        change_tip: str,
+        partial_count: int,
+        primary_nozzle: str,
+        pipette: Optional[str] = None,
+        drop_location: str = "Tip rack",
+        tip_tracking: TransferPage.TipTrackingMode = "Automatic tip tracking (recommended)",
+        manual_tips: Optional[List[str]] = None,
+    ) -> "TransferStepConfig":
+        """Build a transfer configured for a partial-nozzle pipette layout."""
+        return cls(
+            tip_rack=tip_rack,
+            source_labware=source_labware,
+            dest_labware=dest_labware,
+            source_wells=source_wells,
+            dest_wells=dest_wells,
+            path=path,
+            volume=volume,
+            change_tip=change_tip,
+            pipette=pipette,
+            drop_location=drop_location,
+            tip_tracking=tip_tracking,
+            manual_tips=manual_tips,
+            nozzle_config="Partial nozzles",
+            partial_count=partial_count,
+            primary_nozzle=primary_nozzle,
+        )
 
 
 def add_transfer_step(
@@ -771,3 +809,14 @@ def add_transfer_step(
         tip_tracking=config.tip_tracking,
         manual_tips=config.manual_tips,
     )
+
+
+def add_transfer_steps(
+    editor: ProtocolEditorPage,
+    transfer: TransferPage,
+    steps: Sequence[tuple[str, TransferStepConfig]],
+) -> None:
+    """Add labeled transfer steps and report each scenario in test output."""
+    for label, config in steps:
+        print(f"  - {label}")
+        add_transfer_step(editor, transfer, config)

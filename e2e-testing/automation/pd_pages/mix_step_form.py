@@ -7,6 +7,7 @@ from typing import Iterable, Literal, Optional, Sequence
 from playwright.sync_api import Locator, Page
 
 from automation.base_page import BasePage
+from automation.pd_pages.protocol_editor_page import ProtocolEditorPage
 
 
 class MixStepForm(BasePage):
@@ -508,3 +509,38 @@ class MixStepForm(BasePage):
 
         texts = [" ".join(text.split()) for text in list_item.locator("p").all_inner_texts()]
         return any(option_text in text for text in texts)
+
+
+def add_mix_step(
+    editor: ProtocolEditorPage,
+    mix_form: MixStepForm,
+    *,
+    pipette: str,
+    tip_rack: str,
+    labware: str,
+    wells: Sequence[str],
+    volume: str,
+    repetitions: str,
+    nozzle_config: MixStepForm.NozzleConfig = "All nozzles (recommended)",
+    partial_count: Optional[int] = None,
+    primary_nozzle: Optional[str] = None,
+) -> None:
+    """Add and save a basic mix step through the four-part wizard."""
+    editor.add_step("Mix")
+    mix_form.select_pipette(pipette)
+    mix_form.select_tiprack(tip_rack)
+    mix_form.select_labware(labware)
+    mix_form.open_nozzle_and_well_selector()
+    mix_form.select_nozzle_configuration(
+        nozzle_config,
+        partial_count=partial_count,
+        primary_nozzle=primary_nozzle,
+    )
+    mix_form.expect_mix_well_modal(labware)
+    mix_form.select_wells(wells)
+    mix_form.enter_volume(volume)
+    mix_form.enter_mix_repetitions(repetitions)
+    mix_form.click_continue()
+    mix_form.click_continue()
+    mix_form.click_continue()
+    mix_form.save_step()
