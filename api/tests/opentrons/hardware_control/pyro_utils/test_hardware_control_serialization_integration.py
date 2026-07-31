@@ -768,7 +768,14 @@ CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
             code=ErrorCodes.COMMUNICATION_ERROR,
             message="BIG_ERRORS",
             detail={"apple": "pie", "cheese": "cake"},
-            wrapping=None,  # CASEY TODO
+            wrapping=[
+                CommunicationError(
+                    code=ErrorCodes.COMMUNICATION_ERROR,
+                    message="BIG_ERRORS_INNER",
+                    detail={"apple_inner": "pie_inner", "cheese_inner": "cake_inner"},
+                    wrapping=None,
+                ),
+            ],
         ),
         module_serial="1234ABC",
         module_model=module_types.VacuumModuleModel.VACUUM_MODULE_V1,
