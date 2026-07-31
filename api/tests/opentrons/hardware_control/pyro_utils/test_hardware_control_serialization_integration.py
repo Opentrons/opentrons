@@ -827,7 +827,7 @@ async def test_serialization_validation_with_mock_data() -> None:  # noqa: C901
 
     ns = pyro.locate_ns()
     retries_counter = 0
-    while ns.count() < 1:
+    while ns.count() < 2:
         # Wait and try again, the resource isnt registered yet
         await asyncio.sleep(0.01)
         retries_counter += 1
