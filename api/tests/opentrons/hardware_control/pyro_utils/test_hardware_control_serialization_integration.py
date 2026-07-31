@@ -264,6 +264,64 @@ async def _setup_OT3API_pyro_resource(
     return ot3_async  # type: ignore
 
 
+async def _setup_and_validate_modules_on_OT3API_and_nameserver(
+    decoy: Decoy,
+    ot3_hardware: ThreadManager[OT3API],
+    mock_driver: SimulatingDriver,
+    tc_reader_mocked_driver: modules.thermocycler.ThermocyclerReader,
+    hs_reader_mocked_driver: modules.heater_shaker.HeaterShakerReader,
+    td_reader_mocked_driver: modules.tempdeck.TempDeckReader,
+    vm_reader_mocked_driver: modules.vacuum_module.VacuumModuleReader,
+    ar_reader_mocked_driver: modules.absorbance_reader.AbsorbanceReaderReader,
+    st_reader_mocked_driver: modules.flex_stacker.FlexStackerReader,
+    mock_feature_flags: None,
+) -> OT3API:
+    """This sets up a nameserver, an OT3API and modules for testing suites to crawl over."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(True)
+
+    wrapped_api = ot3_hardware.wrapped()
+    wrapped_api._backend.module_controls = decoy.mock(cls=AttachedModulesControl)
+    tc = decoy.mock(cls=Thermocycler)
+    hs = decoy.mock(cls=HeaterShaker)
+    td = decoy.mock(cls=TempDeck)
+    td_2 = decoy.mock(cls=TempDeck)
+    vm = decoy.mock(cls=VacuumModule)
+    st = decoy.mock(cls=FlexStacker)
+    ar = decoy.mock(cls=AbsorbanceReader)
+    decoy.when(wrapped_api._backend.module_controls.available_modules).then_return(
+        [tc, hs, td, td_2, vm, st, ar]
+    )
+    for mod in wrapped_api._backend.module_controls.available_modules:
+        decoy.when(mod._driver).then_return(mock_driver)  # type: ignore
+
+    # Mock out the pollers for these modules that will be stopped
+    decoy.when(tc._poller).then_return(Poller(tc_reader_mocked_driver, interval=0.01))
+    decoy.when(hs._poller).then_return(Poller(hs_reader_mocked_driver, interval=0.01))
+    decoy.when(td._poller).then_return(Poller(td_reader_mocked_driver, interval=0.01))
+    decoy.when(td_2._poller).then_return(Poller(td_reader_mocked_driver, interval=0.01))
+    decoy.when(vm._poller).then_return(Poller(vm_reader_mocked_driver, interval=0.01))
+    decoy.when(st._poller).then_return(Poller(st_reader_mocked_driver, interval=0.01))
+    decoy.when(ar._poller).then_return(Poller(ar_reader_mocked_driver, interval=0.01))
+
+    name_server_ready = threading.Event()
+
+    await _setup_namerserver(name_server_ready=name_server_ready)
+    ot3api_async_instance = await _setup_OT3API_pyro_resource(
+        ot3_hardware,
+        name_server_ready,
+    )
+
+    # Assert that there are as many testable proxy modules as there are actual modules for integration coverage
+    # DEVELOPER NOTE: if this part is failing, you need to add a missing module to the module mocks above.
+    modules_list_NO_MAG_BLOCK = tuple(
+        arg for arg in get_args(ModuleModel) if arg != MagneticBlockModel
+    )
+    assert len(ot3api_async_instance.attached_modules) == len(modules_list_NO_MAG_BLOCK)
+
+    return ot3api_async_instance
+
+
 def _is_namedtuple_instance(cls: Any) -> bool:
     try:
         return issubclass(cls, tuple) and hasattr(cls, "_fields")
@@ -358,47 +416,19 @@ async def test_serialization_coverage(
     mock_feature_flags: None,
 ) -> None:
     """Test will check for serialization coverage of dataclasses and named tuples exposed by the OT3API and subsequent Module APIs."""
-    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
-    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(True)
-
     wrapped_api = ot3_hardware.wrapped()
-    wrapped_api._backend.module_controls = decoy.mock(cls=AttachedModulesControl)
-    tc = decoy.mock(cls=Thermocycler)
-    hs = decoy.mock(cls=HeaterShaker)
-    td = decoy.mock(cls=TempDeck)
-    td_2 = decoy.mock(cls=TempDeck)
-    vm = decoy.mock(cls=VacuumModule)
-    st = decoy.mock(cls=FlexStacker)
-    ar = decoy.mock(cls=AbsorbanceReader)
-    decoy.when(wrapped_api._backend.module_controls.available_modules).then_return(
-        [tc, hs, td, td_2, vm, st, ar]
-    )
-    for mod in wrapped_api._backend.module_controls.available_modules:
-        decoy.when(mod._driver).then_return(mock_driver)  # type: ignore
-
-    # Mock out the pollers for these modules that will be stopped
-    decoy.when(tc._poller).then_return(Poller(tc_reader_mocked_driver, interval=0.01))
-    decoy.when(hs._poller).then_return(Poller(hs_reader_mocked_driver, interval=0.01))
-    decoy.when(td._poller).then_return(Poller(td_reader_mocked_driver, interval=0.01))
-    decoy.when(td_2._poller).then_return(Poller(td_reader_mocked_driver, interval=0.01))
-    decoy.when(vm._poller).then_return(Poller(vm_reader_mocked_driver, interval=0.01))
-    decoy.when(st._poller).then_return(Poller(st_reader_mocked_driver, interval=0.01))
-    decoy.when(ar._poller).then_return(Poller(ar_reader_mocked_driver, interval=0.01))
-
-    name_server_ready = threading.Event()
-
-    await _setup_namerserver(name_server_ready=name_server_ready)
-    ot3api_async_instance = await _setup_OT3API_pyro_resource(
+    ot3api_async_instance = await _setup_and_validate_modules_on_OT3API_and_nameserver(
+        decoy,
         ot3_hardware,
-        name_server_ready,
+        mock_driver,
+        tc_reader_mocked_driver,
+        hs_reader_mocked_driver,
+        td_reader_mocked_driver,
+        vm_reader_mocked_driver,
+        ar_reader_mocked_driver,
+        st_reader_mocked_driver,
+        mock_feature_flags,
     )
-
-    # Assert that there are as many testable proxy modules as there are actual modules for integration coverage
-    # DEVELOPER NOTE: if this part is failing, you need to add a missing module to the module mocks above.
-    modules_list_NO_MAG_BLOCK = tuple(
-        arg for arg in get_args(ModuleModel) if arg != MagneticBlockModel
-    )
-    assert len(ot3api_async_instance.attached_modules) == len(modules_list_NO_MAG_BLOCK)
 
     # Collect classes from the OT3API
     class_cover_list = _collect_exposed_types(
@@ -449,47 +479,19 @@ async def test_module_registration_coverage(
     mock_feature_flags: None,
 ) -> None:
     """Test will check for to see if the hardware class package used in registration covers exposed dataclasses and namedtuples."""
-    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
-    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(True)
-
     wrapped_api = ot3_hardware.wrapped()
-    wrapped_api._backend.module_controls = decoy.mock(cls=AttachedModulesControl)
-    tc = decoy.mock(cls=Thermocycler)
-    hs = decoy.mock(cls=HeaterShaker)
-    td = decoy.mock(cls=TempDeck)
-    td_2 = decoy.mock(cls=TempDeck)
-    vm = decoy.mock(cls=VacuumModule)
-    st = decoy.mock(cls=FlexStacker)
-    ar = decoy.mock(cls=AbsorbanceReader)
-    decoy.when(wrapped_api._backend.module_controls.available_modules).then_return(
-        [tc, hs, td, td_2, vm, st, ar]
-    )
-    for mod in wrapped_api._backend.module_controls.available_modules:
-        decoy.when(mod._driver).then_return(mock_driver)  # type: ignore
-
-    # Mock out the pollers for these modules that will be stopped
-    decoy.when(tc._poller).then_return(Poller(tc_reader_mocked_driver, interval=0.01))
-    decoy.when(hs._poller).then_return(Poller(hs_reader_mocked_driver, interval=0.01))
-    decoy.when(td._poller).then_return(Poller(td_reader_mocked_driver, interval=0.01))
-    decoy.when(td_2._poller).then_return(Poller(td_reader_mocked_driver, interval=0.01))
-    decoy.when(vm._poller).then_return(Poller(vm_reader_mocked_driver, interval=0.01))
-    decoy.when(st._poller).then_return(Poller(st_reader_mocked_driver, interval=0.01))
-    decoy.when(ar._poller).then_return(Poller(ar_reader_mocked_driver, interval=0.01))
-
-    name_server_ready = threading.Event()
-
-    await _setup_namerserver(name_server_ready=name_server_ready)
-    ot3api_async_instance = await _setup_OT3API_pyro_resource(
+    ot3api_async_instance = await _setup_and_validate_modules_on_OT3API_and_nameserver(
+        decoy,
         ot3_hardware,
-        name_server_ready,
+        mock_driver,
+        tc_reader_mocked_driver,
+        hs_reader_mocked_driver,
+        td_reader_mocked_driver,
+        vm_reader_mocked_driver,
+        ar_reader_mocked_driver,
+        st_reader_mocked_driver,
+        mock_feature_flags,
     )
-
-    # Assert that there are as many testable proxy modules as there are actual modules for integration coverage
-    # DEVELOPER NOTE: if this part is failing, you need to add a missing module to the module mocks above.
-    modules_list_NO_MAG_BLOCK = tuple(
-        arg for arg in get_args(ModuleModel) if arg != MagneticBlockModel
-    )
-    assert len(ot3api_async_instance.attached_modules) == len(modules_list_NO_MAG_BLOCK)
 
     # Collect classes from the OT3API
     class_cover_list = _collect_exposed_types(
@@ -532,47 +534,19 @@ async def test_enum_registration_coverage(
     mock_feature_flags: None,
 ) -> None:
     """Test will check for to see if the hardware class package used in registration covers all exposed enums."""
-    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
-    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(True)
-
     wrapped_api = ot3_hardware.wrapped()
-    wrapped_api._backend.module_controls = decoy.mock(cls=AttachedModulesControl)
-    tc = decoy.mock(cls=Thermocycler)
-    hs = decoy.mock(cls=HeaterShaker)
-    td = decoy.mock(cls=TempDeck)
-    td_2 = decoy.mock(cls=TempDeck)
-    vm = decoy.mock(cls=VacuumModule)
-    st = decoy.mock(cls=FlexStacker)
-    ar = decoy.mock(cls=AbsorbanceReader)
-    decoy.when(wrapped_api._backend.module_controls.available_modules).then_return(
-        [tc, hs, td, td_2, vm, st, ar]
-    )
-    for mod in wrapped_api._backend.module_controls.available_modules:
-        decoy.when(mod._driver).then_return(mock_driver)  # type: ignore
-
-    # Mock out the pollers for these modules that will be stopped
-    decoy.when(tc._poller).then_return(Poller(tc_reader_mocked_driver, interval=0.01))
-    decoy.when(hs._poller).then_return(Poller(hs_reader_mocked_driver, interval=0.01))
-    decoy.when(td._poller).then_return(Poller(td_reader_mocked_driver, interval=0.01))
-    decoy.when(td_2._poller).then_return(Poller(td_reader_mocked_driver, interval=0.01))
-    decoy.when(vm._poller).then_return(Poller(vm_reader_mocked_driver, interval=0.01))
-    decoy.when(st._poller).then_return(Poller(st_reader_mocked_driver, interval=0.01))
-    decoy.when(ar._poller).then_return(Poller(ar_reader_mocked_driver, interval=0.01))
-
-    name_server_ready = threading.Event()
-
-    await _setup_namerserver(name_server_ready=name_server_ready)
-    ot3api_async_instance = await _setup_OT3API_pyro_resource(
+    ot3api_async_instance = await _setup_and_validate_modules_on_OT3API_and_nameserver(
+        decoy,
         ot3_hardware,
-        name_server_ready,
+        mock_driver,
+        tc_reader_mocked_driver,
+        hs_reader_mocked_driver,
+        td_reader_mocked_driver,
+        vm_reader_mocked_driver,
+        ar_reader_mocked_driver,
+        st_reader_mocked_driver,
+        mock_feature_flags,
     )
-
-    # Assert that there are as many testable proxy modules as there are actual modules for integration coverage
-    # DEVELOPER NOTE: if this part is failing, you need to add a missing module to the module mocks above.
-    modules_list_NO_MAG_BLOCK = tuple(
-        arg for arg in get_args(ModuleModel) if arg != MagneticBlockModel
-    )
-    assert len(ot3api_async_instance.attached_modules) == len(modules_list_NO_MAG_BLOCK)
 
     # Collect classes from the OT3API
     class_cover_list = _collect_exposed_types(
