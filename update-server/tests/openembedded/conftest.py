@@ -5,7 +5,9 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 import pytest
+from decoy import Decoy
 
+from server_utils.audit.audit_server import Client as AuditClient
 from server_utils.auth.resource_server.authentication_checker import (
     AlwaysAllowedAuthenticationChecker,
 )
@@ -23,6 +25,11 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 
 
 @pytest.fixture
+def mock_audit_logger(decoy: Decoy) -> AuditClient:
+    return decoy.mock(cls=AuditClient)
+
+
+@pytest.fixture
 def mock_update_actions_interface(
     mock_root_fs_interface: MagicMock, mock_partition_manager_invalid_switch: MagicMock
 ) -> MagicMock:
@@ -37,7 +44,10 @@ def mock_update_actions_interface(
 
 @pytest.fixture
 async def test_cli(
-    otupdate_config, version_file_path, mock_name_synchronizer
+    otupdate_config,
+    version_file_path,
+    mock_name_synchronizer,
+    mock_audit_logger: AuditClient,
 ) -> AsyncGenerator[UpdateServerClient, None]:
     """
     Build an app using dummy versions, then build a test client and return it
@@ -48,6 +58,7 @@ async def test_cli(
         config_file_override=otupdate_config,
         boot_id_override="dummy-boot-id-abc123",
         authentication_checker=AlwaysAllowedAuthenticationChecker(),
+        audit_client=mock_audit_logger,
     )
     async with UpdateServerClient(app) as client:
         yield client

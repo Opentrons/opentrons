@@ -8,6 +8,8 @@ from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse
 from starlette.types import ASGIApp, Receive, Scope, Send
 
+from server_utils.audit.audit_server import Client as AuditClient
+from server_utils.audit.fastapi import audit_logger_middleware, install_audit_client
 from server_utils.auth.resource_server.authentication_checker import (
     AuthenticationChecker,
 )
@@ -68,6 +70,7 @@ class LogErrorMiddleware:
 async def get_app(
     name_synchronizer: name_management.NameSynchronizer,
     authentication_checker: AuthenticationChecker,
+    audit_client: AuditClient,
     system_version_file: Optional[str] = None,
     config_file_override: Optional[str] = None,
     name_override: Optional[str] = None,
@@ -97,6 +100,7 @@ async def get_app(
     app.add_middleware(LogErrorMiddleware)
     app.exception_handler(APIError)(handle_api_error)
     app.exception_handler(AuthorizationError)(handle_authorization_error)
+    app.middleware("http")(audit_logger_middleware)
 
     config.install_config(app.state, config_obj)
     control.install_control(
@@ -109,6 +113,7 @@ async def get_app(
     )
     name_management.install_name_synchronizer(name_synchronizer, app.state)
     install_authentication_checker(app.state, authentication_checker)
+    install_audit_client(app.state, audit_client)
 
     app.include_router(control.router)
     app.include_router(update.router)

@@ -15,7 +15,19 @@ from typing import Annotated, Optional, Self
 import fastapi
 from fastapi.responses import JSONResponse
 
-from server_utils.auth.resource_server.fastapi import require_scopes
+from server_utils.audit.audit_server import (
+    Client as AuditClient,
+)
+from server_utils.audit.audit_server import (
+    SubmitAuditLogMessageData,
+)
+from server_utils.audit.fastapi import get_audit_client, get_audit_logger
+from server_utils.auth.resource_server.fastapi import (
+    RequireAuthenticationResult,
+    require_authentication,
+    require_scopes,
+)
+from server_utils.auth.resource_server.types import AuthenticatedResult
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.app_state import AppState, get_app_state
 
@@ -26,6 +38,8 @@ from .session import Stages, UpdateSession, get_current_session, set_current_ses
 from otupdate.openembedded.update_actions import UPDATE_PKG_OE
 
 VALID_UPDATE_PKG = UPDATE_PKG_OE
+_UPDATE_SERVER_SYSTEM_NAME = "system"
+_UPDATE_SERVER_SYSTEM_FULLNAME = "authentication subsystem"
 
 LOG = logging.getLogger(__name__)
 
@@ -61,7 +75,10 @@ def require_session(
     "/server/update/begin",
     status_code=201,
     summary="Create an update session.",
-    dependencies=[fastapi.Depends(require_scopes(Scope.UPDATES_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.UPDATES_WRITE)),
+        fastapi.Depends(get_audit_logger("start update session")),
+    ],
 )
 async def begin(
     request: fastapi.Request,
@@ -145,7 +162,10 @@ async def status(
     "/server/update/{session}/file",
     status_code=201,
     summary="Upload a system update file.",
-    dependencies=[fastapi.Depends(require_scopes(Scope.UPDATES_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.UPDATES_WRITE)),
+        fastapi.Depends(get_audit_logger("upload update file")),
+    ],
 )
 async def file_upload(
     request: fastapi.Request,
@@ -156,6 +176,10 @@ async def file_upload(
         fastapi.Depends(update_actions.get_update_actions),
     ],
     restart_lock: Annotated[asyncio.Lock, fastapi.Depends(get_restart_lock)],
+    authentication: Annotated[
+        RequireAuthenticationResult, fastapi.Depends(require_authentication)
+    ],
+    audit_client: Annotated[AuditClient, fastapi.Depends(get_audit_client)],
 ) -> JSONResponse:
     """Serves /update/:session/file
 
@@ -198,6 +222,8 @@ async def file_upload(
         os.path.join(session.download_path, found_names[-1]),
         actions,
         restart_lock,
+        audit_client,
+        authentication,
     )
 
     return JSONResponse(status_code=201, content=dict(session.state))
@@ -206,7 +232,10 @@ async def file_upload(
 @router.post(
     "/server/update/{session}/commit",
     summary="Commit a validated update.",
-    dependencies=[fastapi.Depends(require_scopes(Scope.UPDATES_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.UPDATES_WRITE)),
+        fastapi.Depends(get_audit_logger("commit update")),
+    ],
 )
 async def commit(
     session: Annotated[UpdateSession, fastapi.Depends(require_session)],
@@ -242,7 +271,10 @@ async def commit(
 @router.post(
     "/server/update/cancel",
     summary="Cancel the active update session.",
-    dependencies=[fastapi.Depends(require_scopes(Scope.UPDATES_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.UPDATES_WRITE)),
+        fastapi.Depends(get_audit_logger("cancel update")),
+    ],
 )
 async def cancel(
     app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
@@ -304,6 +336,8 @@ def _begin_validate_and_write(
     downloaded_update_path: str,
     actions: update_actions.UpdateActionsInterface,
     restart_lock: asyncio.Lock,
+    audit_client: AuditClient,
+    authentication: RequireAuthenticationResult,
 ) -> None:
     """Start validating and writing the file in the background.
 
@@ -335,6 +369,19 @@ def _begin_validate_and_write(
             restart_lock,
             actions,
             session,
+        )
+        if isinstance(authentication, AuthenticatedResult):
+            auth_string = f", update started by user={authentication.username} name={authentication.fullname}"
+        else:
+            auth_string = ""
+        await audit_client.submit_log_message(
+            SubmitAuditLogMessageData(
+                action="autocommit update",
+                accountName=_UPDATE_SERVER_SYSTEM_NAME,
+                legalName=_UPDATE_SERVER_SYSTEM_FULLNAME,
+                message="Committing update file and rebooting" + auth_string,
+                reason=None,
+            )
         )
         actions.restart()
 

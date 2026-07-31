@@ -8,7 +8,9 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 import pytest
+from decoy import Decoy
 
+from server_utils.audit.audit_server import Client as AuditClient
 from server_utils.auth.resource_server.authentication_checker import (
     AlwaysAllowedAuthenticationChecker,
 )
@@ -23,9 +25,18 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 one_up = os.path.abspath(os.path.join(__file__, "../../"))
 
 
+@pytest.fixture
+def mock_audit_logger(decoy: Decoy) -> AuditClient:
+    return decoy.mock(cls=AuditClient)
+
+
 @pytest.fixture(params=[openembedded])
 async def test_cli(
-    otupdate_config, request, version_file_path, mock_name_synchronizer
+    otupdate_config,
+    request,
+    version_file_path,
+    mock_name_synchronizer,
+    mock_audit_logger: AuditClient,
 ) -> AsyncGenerator[Tuple[UpdateServerClient, str], None]:
     """
     Build an app using dummy versions, then build a test client and return it
@@ -37,6 +48,7 @@ async def test_cli(
         config_file_override=otupdate_config,
         boot_id_override="dummy-boot-id-abc123",
         authentication_checker=AlwaysAllowedAuthenticationChecker(),
+        audit_client=mock_audit_logger,
     )
     async with UpdateServerClient(app) as client:
         yield client, cli_client_pkg.__name__

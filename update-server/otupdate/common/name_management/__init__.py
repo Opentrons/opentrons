@@ -49,6 +49,7 @@ from typing import Annotated
 import fastapi
 from pydantic import BaseModel
 
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 
@@ -76,7 +77,10 @@ def _bad_request(message: str) -> APIError:
 @router.post(
     "/server/name",
     summary="Set the robot's name.",
-    dependencies=[fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        fastapi.Depends(get_audit_logger("change robot name")),
+    ],
 )
 async def set_name_endpoint(
     request: fastapi.Request,

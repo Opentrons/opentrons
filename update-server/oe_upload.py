@@ -8,7 +8,7 @@ import asyncio
 import getpass
 import json
 import sys
-from typing import Optional
+from typing import Any, BinaryIO, Literal
 
 import aiohttp
 
@@ -16,13 +16,15 @@ import aiohttp
 CLIENT_ID = "opentrons_app"
 
 
-async def poll_status(sess, token, root):
+async def poll_status(sess: aiohttp.ClientSession, token: str, root: str) -> Any:
     await asyncio.sleep(1.0)
     resp = await sess.get(root + "/" + token + "/status")
     return await resp.json()
 
 
-async def log_in(session, host: str, username: str, password: str) -> str:
+async def log_in(
+    session: aiohttp.ClientSession, host: str, username: str, password: str
+) -> str:
     """Exchange a username and password for an access token.
 
     The token is issued with whatever scopes the account has; the update flow
@@ -42,21 +44,23 @@ async def log_in(session, host: str, username: str, password: str) -> str:
     if resp.status != 200:
         try:
             error = json.loads(body)
-            message = f'{error["error"]}: {error["error_description"]}'
+            message = f"{error['error']}: {error['error_description']}"
         except (json.JSONDecodeError, KeyError):
             message = body
         sys.stderr.write(f"Error logging in: {resp.status}: {message}\n")
         sys.exit(-1)
-    return json.loads(body)["access_token"]
+    token = json.loads(body)["access_token"]
+    assert isinstance(token, str), "Invalid return from OAuth2 token route"
+    return token
 
 
-async def do_update(
-    update_file: str,
+async def do_update(  # noqa: C901
+    update_file: BinaryIO,
     host: str,
-    pause_between_steps: bool = False,
-    username: Optional[str] = None,
-    password: Optional[str] = None,
-):
+    mode: Literal["auto", "sbs", "normal"],
+    username: str | None = None,
+    password: str | None = None,
+) -> None:
     timeout = aiohttp.ClientTimeout(total=7200)
 
     headers = {}
@@ -69,7 +73,8 @@ async def do_update(
         root = host + "/server/update"
         filename = "system-update.zip"
         print(f"Starting update of {update_file.name} to {host}")
-        begin_resp = await session.post(root + "/begin")
+        begin_data = {"auto_commit_and_restart": mode == "auto"}
+        begin_resp = await session.post(root + "/begin", json=begin_data)
         if begin_resp.status == 409:
             should_cancel = input("Another update is in process! Cancel [yN]? ")
             if should_cancel.lower()[0] == "y":
@@ -81,7 +86,7 @@ async def do_update(
                         f"{cancel_resp.status}: {body}\n"
                     )
                     sys.exit(-1)
-                begin_resp = await session.post(root + "/begin")
+                begin_resp = await session.post(root + "/begin", json=begin_data)
 
         if begin_resp.status != 201:
             body = await begin_resp.text()
@@ -92,12 +97,12 @@ async def do_update(
         token = begin_body["token"]
 
         msg = f"Session created at {root}/{token}"
-        if pause_between_steps:
+        if mode == "sbs":
             input(f"{msg}. Press enter to continue to upload and validation")
         else:
             print(msg)
 
-        print(f"Uploading file...")
+        print("Uploading file...")
         file_resp = await session.post(
             root + "/" + token + "/file", data={filename: update_file}
         )
@@ -108,29 +113,29 @@ async def do_update(
             except json.JSONDecodeError:
                 message = body
             else:
-                message = f'{json_resp["error"]}: {json_resp["message"]}'
+                message = f"{json_resp['error']}: {json_resp['message']}"
             print(f"Error uploading file: {message}")
             sys.exit(-1)
 
         status = await file_resp.json()
         while status["stage"] == "validating":
-            sys.stdout.write(f'{status["message"]}: {status["progress"] * 100:.0f}%\r')
+            sys.stdout.write(f"{status['message']}: {status['progress'] * 100:.0f}%\r")
             status = await poll_status(session, token, root)
         print(msg)
         if status["stage"] == "error":
-            print(f'Error validating: {status["error"]}: {status["message"]}')
+            print(f"Error validating: {status['error']}: {status['message']}")
             sys.exit(-1)
 
         while status["stage"] == "writing":
-            sys.stdout.write(f'{status["message"]}: {status["progress"] * 100:.0f}%\r')
+            sys.stdout.write(f"{status['message']}: {status['progress'] * 100:.0f}%\r")
             status = await poll_status(session, token, root)
 
         if status["stage"] == "error":
-            print(f'Error writing: {status["error"]}: {status["message"]}')
+            print(f"Error writing: {status['error']}: {status['message']}")
             sys.exit(-1)
 
         msg = "File written and validated"
-        if pause_between_steps:
+        if mode == "sbs":
             input(f"{msg}. Press enter to continue to commit")
         else:
             print(msg)
@@ -139,11 +144,11 @@ async def do_update(
             print("Committing update...")
             resp = await session.post(root + "/" + token + "/commit")
             if resp.status != 200:
-                print(f'Error committing: {status["error"]}: ' f'{status["message"]}')
+                print(f"Error committing: {status['error']}: {status['message']}")
                 sys.exit(-1)
 
         msg = "Update committed"
-        if pause_between_steps:
+        if mode == "sbs":
             input(f"{msg}. Press enter to continue to restart")
         else:
             print(msg)
@@ -154,8 +159,7 @@ async def do_update(
             try:
                 body = await resp.json()
                 print(
-                    f"Error restarting: {resp.status}: "
-                    f'{body["error"]: body["message"]}'
+                    f'Error restarting: {resp.status}: {body["error"]: body["message"]}'
                 )
             except (
                 json.JSONDecodeError,
@@ -169,7 +173,7 @@ async def do_update(
         print("Done!")
 
 
-def assure_host(host_arg):
+def assure_host(host_arg: str) -> str:
     if not host_arg.startswith("http"):
         host_arg = "http://" + host_arg
     if not host_arg.endswith(":31950"):
@@ -177,7 +181,7 @@ def assure_host(host_arg):
     return host_arg
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="update OE systems")
     parser.add_argument(
         "update",
@@ -228,11 +232,18 @@ def main():
     if args.username is not None and password is None:
         password = getpass.getpass(f"Password for {args.username}: ")
 
+    def _mode_from_args(auto: bool, sbs: bool) -> Literal["auto", "sbs", "normal"]:
+        if auto:
+            return "auto"
+        if sbs:
+            return "sbs"
+        return "normal"
+
     asyncio.get_event_loop().run_until_complete(
         do_update(
             args.update,
             assure_host(args.host),
-            pause_between_steps=args.step_by_step,
+            mode=_mode_from_args(args.auto, args.step_by_step),
             username=args.username,
             password=password,
         )

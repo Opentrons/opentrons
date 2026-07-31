@@ -14,7 +14,22 @@ import fastapi
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from server_utils.auth.resource_server.fastapi import require_scopes
+from server_utils.audit.audit_server import (
+    Client as AuditClient,
+)
+from server_utils.audit.audit_server import (
+    SubmitAuditLogMessageData,
+)
+from server_utils.audit.fastapi import (
+    get_audit_client,
+    skip_audit_logger,
+)
+from server_utils.auth.resource_server.fastapi import (
+    RequireAuthenticationResult,
+    require_authentication,
+    require_scopes,
+)
+from server_utils.auth.resource_server.types import AuthenticatedResult
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.app_state import (
     AppState,
@@ -92,21 +107,62 @@ def no_actions_set_error() -> APIError:
 @router.post(
     "/server/restart",
     summary="Restart the robot.",
-    dependencies=[fastapi.Depends(require_scopes(Scope.RESTART_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.RESTART_WRITE)),
+        fastapi.Depends(skip_audit_logger),
+    ],
 )
 async def restart(
     actions: Annotated[
         Optional[UpdateActionsInterface], fastapi.Depends(get_update_actions)
     ],
     restart_lock: Annotated[asyncio.Lock, fastapi.Depends(get_restart_lock)],
+    authentication: Annotated[
+        RequireAuthenticationResult, fastapi.Depends(require_authentication)
+    ],
+    audit_client: Annotated[AuditClient, fastapi.Depends(get_audit_client)],
 ) -> ControlMessageResponse:
     """Restart the robot.
 
     Blocks while the restart lock is held.
     """
     if not actions:
+        await audit_client.submit_log_message(
+            SubmitAuditLogMessageData(
+                action="restart robot failed",
+                accountName=(
+                    authentication.username
+                    if isinstance(authentication, AuthenticatedResult)
+                    else "unknown"
+                ),
+                legalName=(
+                    authentication.fullname
+                    if isinstance(authentication, AuthenticatedResult)
+                    else "unknown"
+                ),
+                message="Rebooting machine failed because no actions are set (server error)",
+                reason=None,
+            )
+        )
         raise no_actions_set_error()
 
+    await audit_client.submit_log_message(
+        SubmitAuditLogMessageData(
+            action="restart robot",
+            accountName=(
+                authentication.username
+                if isinstance(authentication, AuthenticatedResult)
+                else "unknown"
+            ),
+            legalName=(
+                authentication.fullname
+                if isinstance(authentication, AuthenticatedResult)
+                else "unknown"
+            ),
+            message="Rebooting machine",
+            reason=None,
+        )
+    )
     async with restart_lock:
         asyncio.get_event_loop().call_later(1, actions.restart)
     return ControlMessageResponse(message="Restarting in 1s")
@@ -115,21 +171,62 @@ async def restart(
 @router.post(
     "/server/shutdown",
     summary="Shut down the robot.",
-    dependencies=[fastapi.Depends(require_scopes(Scope.SHUTDOWN_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.SHUTDOWN_WRITE)),
+        fastapi.Depends(skip_audit_logger),
+    ],
 )
 async def shutdown(
     actions: Annotated[
         Optional[UpdateActionsInterface], fastapi.Depends(get_update_actions)
     ],
     shutdown_lock: Annotated[asyncio.Lock, fastapi.Depends(get_shutdown_lock)],
+    authentication: Annotated[
+        RequireAuthenticationResult, fastapi.Depends(require_authentication)
+    ],
+    audit_client: Annotated[AuditClient, fastapi.Depends(get_audit_client)],
 ) -> ControlMessageResponse:
     """Shut down the robot.
 
     Blocks while the shutdown lock is held.
     """
     if not actions:
+        await audit_client.submit_log_message(
+            SubmitAuditLogMessageData(
+                action="shutdown failed",
+                accountName=(
+                    authentication.username
+                    if isinstance(authentication, AuthenticatedResult)
+                    else "unknown"
+                ),
+                legalName=(
+                    authentication.fullname
+                    if isinstance(authentication, AuthenticatedResult)
+                    else "unknown"
+                ),
+                message="Rebooting machine failed because no actions are set (server error)",
+                reason=None,
+            )
+        )
         raise no_actions_set_error()
 
+    await audit_client.submit_log_message(
+        SubmitAuditLogMessageData(
+            action="shutdown robot",
+            accountName=(
+                authentication.username
+                if isinstance(authentication, AuthenticatedResult)
+                else "unknown"
+            ),
+            legalName=(
+                authentication.fullname
+                if isinstance(authentication, AuthenticatedResult)
+                else "unknown"
+            ),
+            message="Shutting down robot",
+            reason=None,
+        )
+    )
     async with shutdown_lock:
         asyncio.get_event_loop().call_later(1, actions.shutdown)
     return ControlMessageResponse(message="Shutting down in 1s")
