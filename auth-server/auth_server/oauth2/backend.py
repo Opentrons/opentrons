@@ -221,6 +221,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             s.api_name
             for s in get_scope_set_of_user(
                 user,
+                self.__settings_store.get_settings(),
                 must_reset_password(
                     user,
                     self.__get_now(),
@@ -249,6 +250,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         user: ORMUser = request.user
         scopes = get_scope_set_of_user(
             user,
+            self.__settings_store.get_settings(),
             must_reset_password(
                 user,
                 self.__get_now(),
