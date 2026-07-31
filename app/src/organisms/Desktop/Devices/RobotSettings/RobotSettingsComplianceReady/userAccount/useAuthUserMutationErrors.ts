@@ -32,7 +32,7 @@ function mapAuthUserMutationError(
       ...EMPTY_FIELD_ERRORS,
       usernameError: t(
         'desktop_personal_account_settings_username_exists_error'
-      ),
+      ) as string,
     }
   }
 
@@ -45,21 +45,25 @@ function mapAuthUserMutationError(
       ...EMPTY_FIELD_ERRORS,
       passwordError:
         requiredLength != null
-          ? t('desktop_password_too_short', { minLength: requiredLength })
-          : t('desktop_personal_account_settings_save_error'),
+          ? (t('desktop_password_too_short', {
+              minLength: requiredLength,
+            }) as string)
+          : (t('desktop_personal_account_settings_save_error') as string),
     }
   }
 
   if (errorId === 'passwordMissingSpecialCharacters') {
     return {
       ...EMPTY_FIELD_ERRORS,
-      passwordError: t('desktop_password_missing_special_characters'),
+      passwordError: t('desktop_password_missing_special_characters') as string,
     }
   }
 
   return {
     ...EMPTY_FIELD_ERRORS,
-    confirmPasswordError: t('desktop_personal_account_settings_save_error'),
+    confirmPasswordError: t(
+      'desktop_personal_account_settings_save_error'
+    ) as string,
   }
 }
 

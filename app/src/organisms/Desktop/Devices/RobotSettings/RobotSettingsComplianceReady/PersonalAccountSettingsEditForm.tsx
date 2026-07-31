@@ -41,6 +41,22 @@ export function PersonalAccountSettingsEditForm({
   const resolver: Resolver<FormValues> = values => {
     const errors: Partial<Record<keyof FormValues, FieldError>> = {}
 
+    if (values.username.trim() === '') {
+      errors.username = {
+        type: 'validate',
+        message: t(
+          'desktop_personal_account_settings_username_required_error'
+        ) as string,
+      }
+    }
+
+    if (values.fullName.trim() === '') {
+      errors.fullName = {
+        type: 'validate',
+        message: t('desktop_add_user_legal_name_required_error') as string,
+      }
+    }
+
     if (values.password !== '' && values.password !== values.confirmPassword) {
       errors.confirmPassword = {
         type: 'validate',

@@ -20,6 +20,7 @@ import styles from './personalaccountsettings.module.css'
 import { PersonalAccountSettingsEditForm } from './PersonalAccountSettingsEditForm'
 import { useAuthUserMutationErrors } from './userAccount/useAuthUserMutationErrors'
 
+import type { TFunction } from 'i18next'
 import type { JSX, ReactNode } from 'react'
 import type { UpdateSelfRequest } from '@opentrons/api-client'
 
@@ -46,7 +47,7 @@ function FieldRow({ label, children }: FieldRowProps): JSX.Element {
 export function PersonalAccountSettings({
   robotName,
 }: PersonalAccountSettingsProps): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'shared'])
+  const { t }: { t: TFunction } = useTranslation(['device_settings', 'shared'])
   const dispatch = useDispatch()
   const queryClient = useQueryClient()
   const host = useHost()

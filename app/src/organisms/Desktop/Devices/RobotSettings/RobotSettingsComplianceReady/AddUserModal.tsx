@@ -20,6 +20,7 @@ import { useAuthUserMutationErrors } from './userAccount/useAuthUserMutationErro
 import styles from './userAccount/userAccountForm.module.css'
 import { UserAccountIdentityFormFields } from './userAccount/UserAccountIdentityFormFields'
 
+import type { TFunction } from 'i18next'
 import type { JSX } from 'react'
 import type {
   AuthUserAccountType,
@@ -52,7 +53,7 @@ export function AddUserModal({
   onClose,
   onUserCreated,
 }: AddUserModalProps): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'shared'])
+  const { t }: { t: TFunction } = useTranslation(['device_settings', 'shared'])
   const [generatedPassword, setGeneratedPassword] = useState<string | null>(
     null
   )
