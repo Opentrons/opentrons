@@ -795,70 +795,43 @@ async def test_serialization_validation_with_mock_data() -> None:  # noqa: C901
 
     tester = DataTester()
 
-    name_server_ready = threading.Event()
-    await _setup_namerserver(name_server_ready=name_server_ready)
-
-    def _data_tester_pyro_daemon() -> None:
-        # Wait for the nameserver to be ready so locate_ns can succeed.
-        name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
+    with pyro.Daemon() as daemon:  # type: ignore
+        # Create a pyro daemon hosting the resource
         register_hardware_types()
-        with pyro.Daemon() as daemon:  # type: ignore
-            # Create a guaranteed synchronous adapted alias to the resource
-            daemon.register(tester)
-            try:
-                with pyro.locate_ns() as ns:
-                    # Register our objects URI with the system nameserver
-                    try:
-                        ns.register("TEST_PROXY", daemon.uriFor(tester))
+        daemon.register(tester)
 
-                        # Maintain a request loop to handle requests on our resource instance from remote processes
-                        daemon.requestLoop()
-                    finally:
-                        ns.remove(name="TEST_PROXY")
-            except Exception as e:
-                raise ValueError(f"Test Nameserver not found - {e}")
+        def _tester_request_daemon_request_loop() -> None:
+            try:
+                # Maintain a request loop to handle requests on our resource instance from "remote" portion of the test
+                daemon.requestLoop()
             finally:
                 daemon.close()
 
-    tester_resource_thread = threading.Thread(
-        target=_data_tester_pyro_daemon, daemon=True
-    )
-    tester_resource_thread.start()
+        tester_request_loop = threading.Thread(
+            target=_tester_request_daemon_request_loop, daemon=True
+        )
+        tester_request_loop.start()
 
-    ns = pyro.locate_ns()
-    retries_counter = 0
-    while ns.count() < 2:
-        # Wait and try again, the resource isnt registered yet
-        await asyncio.sleep(0.01)
-        retries_counter += 1
-        if retries_counter > 10:
-            # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
+        tester_proxy = pyro.Proxy(daemon.uriFor(tester))  # type: ignore
 
-    tester_proxy = pyro.Proxy(pyro.resolve(uri="PYRONAME:TEST_PROXY"))  # type: ignore
+        # Get the hardware registry
+        hardware_registry_class_list = find_opentrons_classes_in_packages(
+            HARDWARE_CLASS_PACKAGES
+        )
+        hardware_registry_class_list = list(set(hardware_registry_class_list))
+        enum_registry_class_list = find_enums_in_packages(HARDWARE_ENUM_PACKAGES)
+        enum_registry_class_list = list(set(enum_registry_class_list))
+        exposed_class_list = hardware_registry_class_list + enum_registry_class_list
 
-    # Get the hardware registry
-    hardware_registry_class_list = find_opentrons_classes_in_packages(
-        HARDWARE_CLASS_PACKAGES
-    )
-    hardware_registry_class_list = list(set(hardware_registry_class_list))
-    enum_registry_class_list = find_enums_in_packages(HARDWARE_ENUM_PACKAGES)
-    enum_registry_class_list = list(set(enum_registry_class_list))
-    # todo(chb, 7-30-26): Expand this test to test the pydantic serialization as well - will require new mocks
-    # pydantic_registry_class_list = find_pydantic_classes_in_packages(HARDWARE_PYDANTIC_PACKAGES)
-    # pydantic_registry_class_list = list(set(pydantic_registry_class_list))
+        # Validate each class can be sent over pyro and come back deserialized in the expected format
+        for clazz in exposed_class_list:
+            if clazz not in TYPES_TO_SKIP:
+                try:
+                    mock_data = CLASS_TYPE_MOCK_TABLE[clazz]
+                except KeyError as e:
+                    raise KeyError(f"{e} - Mock data missing for type {clazz}")
 
-    exposed_class_list = (
-        hardware_registry_class_list + enum_registry_class_list
-    )  # + pydantic_registry_class_list
+                deserialized_output = tester_proxy.data_in_data_out(mock_data)
+                assert deserialized_output == mock_data
 
-    # Validate each class can be sent over pyro and come back deserialized in the expected format
-    for clazz in exposed_class_list:
-        if clazz not in TYPES_TO_SKIP:
-            try:
-                mock_data = CLASS_TYPE_MOCK_TABLE[clazz]
-            except KeyError as e:
-                raise KeyError(f"{e} - Mock data missing for type {clazz}")
-
-            deserialized_output = tester_proxy.data_in_data_out(mock_data)
-            assert deserialized_output == mock_data
+        daemon.close()
