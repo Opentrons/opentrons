@@ -24,8 +24,10 @@ ACCOUNT_TYPE_TO_SCOPES: dict[AccountType, set[Scope]] = {
     AccountType.SERVICE: set(Scope),  # all scopes
     AccountType.USER: {
         Scope.RESTART_WRITE,
+        Scope.SHUTDOWN_WRITE,
         Scope.ROBOT_CONTROL_WRITE,
         Scope.ROBOT_SETTINGS_WRITE,
+        Scope.RUN_DATA_WRITE,
         # todo(mm, 2026-03-17): Updates should be togglable to admin-only by an auth setting.
         Scope.UPDATES_WRITE,
         Scope.USERS_READ_SELF,
