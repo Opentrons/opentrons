@@ -1,6 +1,7 @@
 """Tests to enforce serialization for dataclasses from the hardware api layer."""
 
 import asyncio
+import enum
 import inspect
 import socket
 import threading
@@ -37,6 +38,7 @@ import opentrons.hardware_control.modules.module_calibration as mod_cal
 import opentrons.hardware_control.modules.types as module_types
 import opentrons.hardware_control.peripherals.types as peripheral_types
 import opentrons.hardware_control.types as hw_types
+import opentrons.hardware_control.util as hw_util
 import opentrons.types as ot_types
 from opentrons.calibration_storage.ot3.models.v1 import CalibrationStatus
 from opentrons.config import feature_flags
@@ -269,8 +271,39 @@ def _is_namedtuple_instance(cls: Any) -> bool:
         return False
 
 
-def _collect_exposed_dataclasses_and_namedtuples(  # noqa: C901
-    original_class: type, acpo_instance: Any
+def _collect_serializable_types(
+    hint: Any, collected: list[type], seen: set[int], type_qualifier: str
+) -> None:
+    if id(hint) in seen:
+        return
+    seen.add(id(hint))
+    if type_qualifier == "dataclass_namedtuple":
+        if (
+            isinstance(hint, type)
+            and (is_dataclass(hint) or _is_namedtuple_instance(hint))
+            and hint not in _TYPES_TO_SKIP
+        ):
+            collected.append(hint)
+    elif type_qualifier == "enum":
+        try:
+            if (
+                issubclass(hint, enum.Enum)
+                and hint is not enum.Enum
+                and hint not in _TYPES_TO_SKIP
+            ):
+                collected.append(hint)
+        except TypeError:
+            # wrapped arguments can be capture on recursive checks
+            pass
+    else:
+        raise ValueError(f"Invalid type qualifier for test: {type_qualifier}")
+    for arg in get_args(hint):
+        for inner in arg if isinstance(arg, list) else [arg]:
+            _collect_serializable_types(inner, collected, seen, type_qualifier)
+
+
+def _collect_exposed_types(  # noqa: C901
+    original_class: type, acpo_instance: Any, type_qualifier: str
 ) -> list[type]:
     """Scrape over the provided proxy to gather as much information on exposed dataclasses and named tuples"""
     class_list: list[type] = []
@@ -289,22 +322,6 @@ def _collect_exposed_dataclasses_and_namedtuples(  # noqa: C901
                 f"Could not resolve type hints for {original_class.__name__}.{attr_name}: {e}"
             ) from e
 
-    def _collect_serializable_types(
-        hint: Any, collected: list[type], seen: set[int]
-    ) -> None:
-        if id(hint) in seen:
-            return
-        seen.add(id(hint))
-        if (
-            isinstance(hint, type)
-            and (is_dataclass(hint) or _is_namedtuple_instance(hint))
-            and hint not in _TYPES_TO_SKIP
-        ):
-            collected.append(hint)
-        for arg in get_args(hint):
-            for inner in arg if isinstance(arg, list) else [arg]:
-                _collect_serializable_types(inner, collected, seen)
-
     # Scrape the exposed methods
     for method in proxy._pyroMethods:
         if not hasattr(original_class, method):
@@ -314,7 +331,7 @@ def _collect_exposed_dataclasses_and_namedtuples(  # noqa: C901
         if method in pyro_methods:
             hints.pop("return", None)
         for value in hints.values():
-            _collect_serializable_types(value, class_list, seen)
+            _collect_serializable_types(value, class_list, seen, type_qualifier)
 
     # Scrape the exposed properties
     for attribute in proxy._pyroAttrs:
@@ -323,7 +340,7 @@ def _collect_exposed_dataclasses_and_namedtuples(  # noqa: C901
         original_class_attribute = getattr(original_class, attribute)
         hints = _resolve_type_hints(original_class_attribute.fget, attribute)
         for value in hints.values():
-            _collect_serializable_types(value, class_list, seen)
+            _collect_serializable_types(value, class_list, seen, type_qualifier)
 
     return class_list
 
@@ -384,8 +401,10 @@ async def test_serialization_coverage(
     assert len(ot3api_async_instance.attached_modules) == len(modules_list_NO_MAG_BLOCK)
 
     # Collect classes from the OT3API
-    class_cover_list = _collect_exposed_dataclasses_and_namedtuples(
-        original_class=OT3API, acpo_instance=ot3api_async_instance
+    class_cover_list = _collect_exposed_types(
+        original_class=OT3API,
+        acpo_instance=ot3api_async_instance,
+        type_qualifier="dataclass_namedtuple",
     )
 
     hardware_registry_class_list = find_opentrons_classes_in_packages(
@@ -396,12 +415,10 @@ async def test_serialization_coverage(
     # Collect classes from the Module APIs
     mod_counter = 0
     for module in wrapped_api.attached_modules:
-        class_cover_list = (
-            class_cover_list
-            + _collect_exposed_dataclasses_and_namedtuples(
-                original_class=module.__class__,
-                acpo_instance=ot3api_async_instance.attached_modules[mod_counter],
-            )
+        class_cover_list = class_cover_list + _collect_exposed_types(
+            original_class=module.__class__,
+            acpo_instance=ot3api_async_instance.attached_modules[mod_counter],
+            type_qualifier="dataclass_namedtuple",
         )
         class_cover_list = list(set(class_cover_list))
         mod_counter += 1
@@ -475,8 +492,10 @@ async def test_module_registration_coverage(
     assert len(ot3api_async_instance.attached_modules) == len(modules_list_NO_MAG_BLOCK)
 
     # Collect classes from the OT3API
-    class_cover_list = _collect_exposed_dataclasses_and_namedtuples(
-        original_class=OT3API, acpo_instance=ot3api_async_instance
+    class_cover_list = _collect_exposed_types(
+        original_class=OT3API,
+        acpo_instance=ot3api_async_instance,
+        type_qualifier="dataclass_namedtuple",
     )
 
     hardware_registry_class_list = find_opentrons_classes_in_packages(
@@ -487,12 +506,10 @@ async def test_module_registration_coverage(
     # Collect classes from the Module APIs
     mod_counter = 0
     for module in wrapped_api.attached_modules:
-        class_cover_list = (
-            class_cover_list
-            + _collect_exposed_dataclasses_and_namedtuples(
-                original_class=module.__class__,
-                acpo_instance=ot3api_async_instance.attached_modules[mod_counter],
-            )
+        class_cover_list = class_cover_list + _collect_exposed_types(
+            original_class=module.__class__,
+            acpo_instance=ot3api_async_instance.attached_modules[mod_counter],
+            type_qualifier="dataclass_namedtuple",
         )
         class_cover_list = list(set(class_cover_list))
         mod_counter += 1
@@ -500,7 +517,86 @@ async def test_module_registration_coverage(
     assert set(class_cover_list) == set(hardware_registry_class_list)
 
 
-# Mock out of a bunch of the data types that we know leave this layer to be tested elsewhere
+async def test_enum_registration_coverage(
+    decoy: Decoy,
+    ot3_hardware: ThreadManager[OT3API],
+    mock_driver: SimulatingDriver,
+    tc_reader_mocked_driver: modules.thermocycler.ThermocyclerReader,
+    hs_reader_mocked_driver: modules.heater_shaker.HeaterShakerReader,
+    td_reader_mocked_driver: modules.tempdeck.TempDeckReader,
+    vm_reader_mocked_driver: modules.vacuum_module.VacuumModuleReader,
+    ar_reader_mocked_driver: modules.absorbance_reader.AbsorbanceReaderReader,
+    st_reader_mocked_driver: modules.flex_stacker.FlexStackerReader,
+    mock_feature_flags: None,
+) -> None:
+    """Test will check for to see if the hardware class package used in registration covers all exposed enums."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(True)
+
+    wrapped_api = ot3_hardware.wrapped()
+    wrapped_api._backend.module_controls = decoy.mock(cls=AttachedModulesControl)
+    tc = decoy.mock(cls=Thermocycler)
+    hs = decoy.mock(cls=HeaterShaker)
+    td = decoy.mock(cls=TempDeck)
+    td_2 = decoy.mock(cls=TempDeck)
+    vm = decoy.mock(cls=VacuumModule)
+    st = decoy.mock(cls=FlexStacker)
+    ar = decoy.mock(cls=AbsorbanceReader)
+    decoy.when(wrapped_api._backend.module_controls.available_modules).then_return(
+        [tc, hs, td, td_2, vm, st, ar]
+    )
+    for mod in wrapped_api._backend.module_controls.available_modules:
+        decoy.when(mod._driver).then_return(mock_driver)  # type: ignore
+
+    # Mock out the pollers for these modules that will be stopped
+    decoy.when(tc._poller).then_return(Poller(tc_reader_mocked_driver, interval=0.01))
+    decoy.when(hs._poller).then_return(Poller(hs_reader_mocked_driver, interval=0.01))
+    decoy.when(td._poller).then_return(Poller(td_reader_mocked_driver, interval=0.01))
+    decoy.when(td_2._poller).then_return(Poller(td_reader_mocked_driver, interval=0.01))
+    decoy.when(vm._poller).then_return(Poller(vm_reader_mocked_driver, interval=0.01))
+    decoy.when(st._poller).then_return(Poller(st_reader_mocked_driver, interval=0.01))
+    decoy.when(ar._poller).then_return(Poller(ar_reader_mocked_driver, interval=0.01))
+
+    name_server_ready = threading.Event()
+
+    await _setup_namerserver(name_server_ready=name_server_ready)
+    ot3api_async_instance = await _setup_OT3API_pyro_resource(
+        ot3_hardware,
+        name_server_ready,
+    )
+
+    # Assert that there are as many testable proxy modules as there are actual modules for integration coverage
+    # DEVELOPER NOTE: if this part is failing, you need to add a missing module to the module mocks above.
+    modules_list_NO_MAG_BLOCK = tuple(
+        arg for arg in get_args(ModuleModel) if arg != MagneticBlockModel
+    )
+    assert len(ot3api_async_instance.attached_modules) == len(modules_list_NO_MAG_BLOCK)
+
+    # Collect classes from the OT3API
+    class_cover_list = _collect_exposed_types(
+        original_class=OT3API,
+        acpo_instance=ot3api_async_instance,
+        type_qualifier="enum",
+    )
+
+    hardware_registry_class_list = find_enums_in_packages(HARDWARE_ENUM_PACKAGES)
+    hardware_registry_class_list = list(set(hardware_registry_class_list))
+
+    # Collect classes from the Module APIs
+    mod_counter = 0
+    for module in wrapped_api.attached_modules:
+        class_cover_list = class_cover_list + _collect_exposed_types(
+            original_class=module.__class__,
+            acpo_instance=ot3api_async_instance.attached_modules[mod_counter],
+            type_qualifier="enum",
+        )
+        class_cover_list = list(set(class_cover_list))
+        mod_counter += 1
+
+    assert set(class_cover_list) <= set(hardware_registry_class_list)
+
+
+# Mock out the data types that are known to leave the hardware layer
 CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
     hw_types.Axis: hw_types.Axis.X,
     hw_types.OT3Mount: hw_types.OT3Mount.LEFT,
@@ -777,6 +873,18 @@ CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
     driver_types.ThermocyclerLidStatus: driver_types.ThermocyclerLidStatus.CLOSED,
     hw_types.EstopState: hw_types.EstopState.DISENGAGED,
     module_types.FlexStackerModuleModel: module_types.FlexStackerModuleModel.FLEX_STACKER_V1,
+    stacker_types.TOFSensorState: stacker_types.TOFSensorState.MEASURING,
+    stacker_types.MeasurementKind: stacker_types.MeasurementKind.HISTOGRAM,
+    stacker_types.HardwareRevision: stacker_types.HardwareRevision.PVT,
+    stacker_types.Direction: stacker_types.Direction.RETRACT,
+    stacker_types.TOFSensor: stacker_types.TOFSensor.Z,
+    stacker_types.LEDColor: stacker_types.LEDColor.YELLOW,
+    stacker_types.TOFSensorMode: stacker_types.TOFSensorMode.MEASURE,
+    stacker_types.ActiveRange: stacker_types.ActiveRange.SHORT_RANGE,
+    stacker_types.GCODE: stacker_types.GCODE.SET_LED,
+    stacker_types.SpadMapID: stacker_types.SpadMapID.SPAD_MAP_ID_3,
+    stacker_types.MoveResult: stacker_types.MoveResult.NO_ERROR,
+    hw_util.DeckTransformState: hw_util.DeckTransformState.SINGULARITY,
 }
 
 # This list should only include types that are either builtins that we work around or error related content thats delt with via pickle
@@ -784,7 +892,11 @@ TYPES_TO_SKIP = [ErrorCodes, ErrorCategories, StrEnum]
 
 
 async def test_serialization_validation_with_mock_data() -> None:  # noqa: C901
-    """Test to check if types registered in the hardware class package properly serialize and deserialize."""
+    """Test to check if types registered in the hardware class package properly serialize and deserialize.
+
+    A big part of the reason why this test works is because of the above tests verifying the surface of the proxy interface
+    only exposes types included in the hardware packages used by the hardware serpent registry.
+    """
 
     class DataTester:
         """Class for testing data serializaiton over pyro"""
@@ -814,7 +926,7 @@ async def test_serialization_validation_with_mock_data() -> None:  # noqa: C901
 
         tester_proxy = pyro.Proxy(daemon.uriFor(tester))  # type: ignore
 
-        # Get the hardware registry
+        # Get the hardware types covered by the registry
         hardware_registry_class_list = find_opentrons_classes_in_packages(
             HARDWARE_CLASS_PACKAGES
         )
@@ -829,6 +941,13 @@ async def test_serialization_validation_with_mock_data() -> None:  # noqa: C901
                 try:
                     mock_data = CLASS_TYPE_MOCK_TABLE[clazz]
                 except KeyError as e:
+                    # DEVELOPER NOTE: If you get a type here that you didn't expect to be exposed via pyro, there are two cases to consider:
+                    # 1. It was exposed unintentionally, like through a module's driver layer. Public facing functions on module definitions
+                    # get automatically exposed, even if nothing in the Protocol Engine or Robot-Server use them. If it's a callable api attribute
+                    # then it's types are exposed!
+                    # 2. The type was collected by our registration packages even though nothing exposes it. This can happen because we crawl a package
+                    # for types like Enums and Pydantic models, in the event that those types need serializing over pyro. If it's an easy type to mock out
+                    # then please mock it anyways, something might expose it some day causing other tests to fail!
                     raise KeyError(f"{e} - Mock data missing for type {clazz}")
 
                 deserialized_output = tester_proxy.data_in_data_out(mock_data)
