@@ -41,7 +41,7 @@ export function Privacy({
     'toggle_analytics',
     (optedIn: boolean) => ({
       action: 'toggled analytics',
-      message: `user ${optedIn ? 'opted in' : 'opted out'} of analytics`,
+      message: `user ${optedIn ? 'opted in to' : 'opted out of'} analytics`,
     })
   )
 
