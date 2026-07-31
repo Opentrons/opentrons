@@ -28,9 +28,9 @@ ACCOUNT_TYPE_TO_SCOPES: dict[AccountType, set[Scope]] = {
         Scope.ROBOT_SETTINGS_WRITE,
         # todo(mm, 2026-03-17): Updates should be togglable to admin-only by an auth setting.
         Scope.UPDATES_WRITE,
-        # todo(mm, 2026-03-17): Protocol uploads should be togglable to admin-only by an auth setting.
         Scope.USERS_READ_SELF,
         Scope.USERS_WRITE_SELF,
+        # todo(mm, 2026-03-17): Protocol uploads should be togglable to admin-only by an auth setting.
         Scope.PROTOCOLS_WRITE,
         Scope.AUDIT_LOG_WRITE,
     },
