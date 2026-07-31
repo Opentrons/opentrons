@@ -13,6 +13,7 @@ import {
   useUsersQuery,
 } from '@opentrons/react-api-client'
 
+import { mockSuccessQueryResults } from '/app/__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
@@ -170,9 +171,12 @@ describe('ComplianceReadySoftwareSettings', () => {
     vi.mocked(useAuditSettingsMutation).mockReturnValue({
       mutate: mockPatchAuditSettings,
     } as any)
-    vi.mocked(useUsersQuery).mockReturnValue({
-      data: { data: [], meta: { cursor: 0, totalLength: 0 } },
-    } as ReturnType<typeof useUsersQuery>)
+    vi.mocked(useUsersQuery).mockReturnValue(
+      mockSuccessQueryResults({
+        data: [],
+        meta: { cursor: 0, totalLength: 0 },
+      })
+    )
     vi.mocked(useToaster).mockReturnValue({
       makeToast: vi.fn(),
       eatToast: vi.fn(),

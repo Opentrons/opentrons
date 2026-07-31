@@ -141,15 +141,15 @@ export function AddUserModal({
           <div className={styles.form_fields}>
             <div className={styles.success_intro}>
               <StyledText desktopStyle="headingSmallBold">
-                {t('desktop_one_time_password')}
+                {t('desktop_one_time_password') as string}
               </StyledText>
               <StyledText desktopStyle="bodyDefaultRegular">
-                {t('desktop_add_user_success_message')}
+                {t('desktop_add_user_success_message') as string}
               </StyledText>
             </div>
             <div className={styles.field_group}>
               <StyledText desktopStyle="bodyDefaultRegular">
-                {t('desktop_one_time_password')}
+                {t('desktop_one_time_password') as string}
               </StyledText>
               <div className={styles.one_time_password_value}>
                 <StyledText desktopStyle="bodyDefaultRegular">
@@ -192,7 +192,7 @@ export function AddUserModal({
               </div>
               <div className={styles.actions}>
                 <SecondaryButton type="button" onClick={handleClose}>
-                  {t('shared:cancel')}
+                  {t('shared:cancel') as string}
                 </SecondaryButton>
                 <PrimaryButton type="submit" disabled={isSaveDisabled}>
                   {t('desktop_create_account')}

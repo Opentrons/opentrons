@@ -88,7 +88,7 @@ export function PersonalAccountSettings({
     <div className={styles.container}>
       <div className={styles.header}>
         <StyledText desktopStyle="bodyLargeSemiBold">
-          {t('desktop_personal_account_settings')}
+          {t('desktop_personal_account_settings') as string}
         </StyledText>
         {loggedInUser != null &&
           (isEditing ? (
@@ -143,7 +143,7 @@ export function PersonalAccountSettings({
                 desktopStyle="bodyDefaultRegular"
                 className={styles.field_value_text}
               >
-                {t('desktop_password_placeholder')}
+                {t('desktop_password_placeholder') as string}
               </StyledText>
             </FieldRow>
           </>
