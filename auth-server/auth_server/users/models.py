@@ -48,11 +48,28 @@ RESET_PASSWORD_SCOPES: set[Scope] = {
 
 USERNAME_MAX_LENGTH = 20
 
+Username = Annotated[
+    str,
+    Field(
+        max_length=USERNAME_MAX_LENGTH,
+        description="The username of the user.",
+    ),
+]
+
+OptionalUsername = Annotated[
+    str | None,
+    Field(
+        default=None,
+        max_length=USERNAME_MAX_LENGTH,
+        description="The username of the user.",
+    ),
+]
+
 
 class UserCreate(BaseModel):
     """Request body for creating a user."""
 
-    username: Annotated[str, Field(..., description="The username of the user.")]
+    username: Username
     password: Annotated[
         SecretStr | None,
         Field(
@@ -73,10 +90,7 @@ class UserCreate(BaseModel):
 class UpdateUser(BaseModel):
     """Request body for updating a user."""
 
-    username: Annotated[
-        str | None,
-        Field(description="The username of the user."),
-    ] = None
+    username: OptionalUsername
     password: Annotated[
         SecretStr | None,
         Field(description="The password for the user."),
@@ -110,10 +124,7 @@ class UpdateUser(BaseModel):
 class UpdateSelf(BaseModel):
     """Request body for updating the logged-in user."""
 
-    username: Annotated[
-        str | None,
-        Field(default=None, description="The username of the user."),
-    ] = None
+    username: OptionalUsername
     fullName: Annotated[
         str | None,
         Field(default=None, description="The full name of the user."),

@@ -1,14 +1,9 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useQueryClient } from 'react-query'
 import { useDispatch } from 'react-redux'
 
 import { BasicButton, Divider, StyledText } from '@opentrons/components'
-import {
-  getSelfQueryKey,
-  useHost,
-  useUpdateSelfMutation,
-} from '@opentrons/react-api-client'
+import { useUpdateSelfMutation } from '@opentrons/react-api-client'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import {
@@ -48,8 +43,6 @@ export function PersonalAccountSettings({
 }: PersonalAccountSettingsProps): JSX.Element {
   const { t }: { t: TFunction } = useTranslation(['device_settings', 'shared'])
   const dispatch = useDispatch()
-  const queryClient = useQueryClient()
-  const host = useHost()
   const documentationState = useDocumentationState(undefined, robotName)
   const loggedInUser = useLoggedInUserForRobot(robotName)
   const { updateSelf, isLoading: isSaving } =
@@ -59,9 +52,6 @@ export function PersonalAccountSettings({
 
   const handleSave = (request: UpdateSelfRequest): Promise<void> => {
     return updateSelf(request).then(updatedSelf => {
-      if (host != null) {
-        queryClient.setQueryData(getSelfQueryKey(host), updatedSelf)
-      }
       dispatch(
         updateLoggedInUserProfile({
           robotName,

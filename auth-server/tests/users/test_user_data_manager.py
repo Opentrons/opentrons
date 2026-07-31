@@ -188,19 +188,6 @@ def test_create_user_empty_username_raises(manager: UserDataManager) -> None:
         )
 
 
-def test_create_user_username_too_long_raises(manager: UserDataManager) -> None:
-    with pytest.raises(
-        InvalidInputError, match="username must be at most 20 characters"
-    ):
-        manager.create_user(
-            username="a" * 21,
-            password="validpass123",
-            full_name="X",
-            account_type=AccountType.USER,
-            now=matchers.IsA(datetime.datetime),
-        )
-
-
 def test_create_user_empty_password_raises(manager: UserDataManager) -> None:
     with pytest.raises(InvalidInputError, match="password"):
         manager.create_user(
@@ -797,13 +784,6 @@ def test_generate_temporary_password_meets_complexity_rules() -> None:
 def test_update_user_empty_username_raises(manager: UserDataManager) -> None:
     with pytest.raises(InvalidInputError, match="username"):
         manager.update_user("testadmin", new_username="", now=_NOW)
-
-
-def test_update_user_username_too_long_raises(manager: UserDataManager) -> None:
-    with pytest.raises(
-        InvalidInputError, match="username must be at most 20 characters"
-    ):
-        manager.update_user("testadmin", new_username="a" * 21, now=_NOW)
 
 
 def test_update_user_short_password_raises(manager: UserDataManager) -> None:
