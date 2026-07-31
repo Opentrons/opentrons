@@ -83,7 +83,7 @@ export interface RobotUpdateFlowDeps {
   systemFile: string | null
   getAccessToken: () => string | null | undefined
   getDocumentationState: () => DocumentationState
-  mutations: RobotUpdateFlowMutations
+  getMutations: () => RobotUpdateFlowMutations
   signal: AbortSignal
 }
 
@@ -122,17 +122,19 @@ export function runRobotUpdateFlow(deps: RobotUpdateFlowDeps): Promise<void> {
         return Promise.reject(new Error(UNABLE_TO_FIND_SYSTEM_FILE))
       }
 
-      const hostConfig = buildHostConfig(robot, deps.getAccessToken())
-
       return createUpdateSession(deps, robot, sessionPath, pathPrefix).then(
-        autoCommitAndRestart => ({
-          robot,
-          hostConfig,
-          pathPrefix,
-          systemFilePath,
-          autoCommitAndRestart,
-          token: getRobotUpdateSession(store.getState())?.token,
-        })
+        autoCommitAndRestart => {
+          // Build HostConfig only afterward so upload/poll see the post-login token.
+          const currentRobot = getRobotUpdateRobot(store.getState()) ?? robot
+          return {
+            robot: currentRobot,
+            hostConfig: buildHostConfig(currentRobot, deps.getAccessToken()),
+            pathPrefix,
+            systemFilePath,
+            autoCommitAndRestart,
+            token: getRobotUpdateSession(store.getState())?.token,
+          }
+        }
       )
     })
     .then(ctx => {
@@ -140,10 +142,13 @@ export function runRobotUpdateFlow(deps: RobotUpdateFlowDeps): Promise<void> {
         return Promise.reject(new Error(UNABLE_TO_START_UPDATE_SESSION))
       }
 
-      const { robot, hostConfig, pathPrefix, systemFilePath, token } = ctx
+      const { robot, pathPrefix, systemFilePath, token } = ctx
+      // Prefer a live token at each step — login can complete mid-flow.
+      const hostConfigFor = (): HostConfig =>
+        buildHostConfig(robot, deps.getAccessToken())
 
       return pollRobotUpdateStatus(
-        hostConfig,
+        hostConfigFor(),
         pathPrefix,
         token,
         dispatch,
@@ -154,7 +159,7 @@ export function runRobotUpdateFlow(deps: RobotUpdateFlowDeps): Promise<void> {
           uploadUpdateFile(
             deps,
             robot,
-            hostConfig,
+            hostConfigFor(),
             pathPrefix,
             token,
             systemFilePath
@@ -162,7 +167,7 @@ export function runRobotUpdateFlow(deps: RobotUpdateFlowDeps): Promise<void> {
         )
         .then(() =>
           pollRobotUpdateStatus(
-            hostConfig,
+            hostConfigFor(),
             pathPrefix,
             token,
             dispatch,
@@ -176,7 +181,7 @@ export function runRobotUpdateFlow(deps: RobotUpdateFlowDeps): Promise<void> {
           if (status.stage === DONE && !ctx.autoCommitAndRestart) {
             return commitIfNeeded(deps, false, pathPrefix, token).then(() =>
               pollRobotUpdateStatus(
-                hostConfig,
+                hostConfigFor(),
                 pathPrefix,
                 token,
                 dispatch,
@@ -216,7 +221,7 @@ function createUpdateSession(
   sessionPath: string,
   pathPrefix: string
 ): Promise<boolean> {
-  const { dispatch, mutations, getDocumentationState } = deps
+  const { dispatch, getMutations, getDocumentationState } = deps
   const robotHost = {
     name: robot.name,
     ip: robot.ip,
@@ -226,7 +231,7 @@ function createUpdateSession(
   dispatch(createSession(robotHost, sessionPath))
 
   const createOnce = (): Promise<boolean> =>
-    mutations
+    getMutations()
       .createSession({
         sessionPath,
         autoCommitAndRestart: true,
@@ -243,7 +248,7 @@ function createUpdateSession(
       return Promise.reject(error)
     }
 
-    return mutations
+    return getMutations()
       .cancelSession({
         pathPrefix,
         userNotes: getUserNotesFromDocumentationState(getDocumentationState()),
@@ -267,6 +272,8 @@ function uploadUpdateFile(
 
   dispatch(setRobotUpdateSessionStep(UPLOAD_FILE))
 
+  const accessToken = deps.getAccessToken() ?? hostConfig.token
+
   return uploadRobotUpdateFileViaShell({
     ip: robot.ip,
     port: robot.port,
@@ -275,7 +282,7 @@ function uploadUpdateFile(
     path,
     systemFile,
     userNotes: getUserNotesFromDocumentationState(getDocumentationState()),
-    token: hostConfig.token,
+    token: accessToken,
   })
 }
 
@@ -289,10 +296,10 @@ function commitIfNeeded(
     return Promise.resolve()
   }
 
-  const { dispatch, mutations, getDocumentationState } = deps
+  const { dispatch, getMutations, getDocumentationState } = deps
   dispatch(setRobotUpdateSessionStep(COMMIT_UPDATE))
 
-  return mutations
+  return getMutations()
     .commitSession({
       pathPrefix,
       token,
@@ -312,7 +319,7 @@ function beginRestartPhase(
   robot: ViewableRobot,
   autoCommitAndRestart: boolean
 ): Promise<void> {
-  const { dispatch, mutations } = deps
+  const { dispatch, getMutations } = deps
   dispatch(setRobotUpdateSessionStep(RESTART))
 
   const track = (): void => {
@@ -332,7 +339,7 @@ function beginRestartPhase(
     return Promise.resolve()
   }
 
-  return mutations
+  return getMutations()
     .restartRobot()
     .then(() => {
       track()

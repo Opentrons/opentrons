@@ -96,7 +96,7 @@ export function useRobotUpdateOrchestrator(): {
         systemFile: systemFile ?? null,
         getAccessToken: () => accessTokenRef.current,
         getDocumentationState: () => docsStateRef.current,
-        mutations: mutationsRef.current,
+        getMutations: () => mutationsRef.current,
         signal: abortController.signal,
       })
     },
