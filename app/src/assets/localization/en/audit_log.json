@@ -10,6 +10,7 @@
   "attach_pipette_right": "Launching attach pipette on right mount flow",
   "calibrate": "Calibrating",
   "capture_preview_image": "Capturing preview image",
+  "change_language": "Changing language",
   "change_update_channel": "Changing update channel",
   "confirm_parameters": "Confirming runtime parameters",
   "confirm_placements": "Confirming liquids and labware placements",
