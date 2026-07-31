@@ -81,7 +81,7 @@ from opentrons.util.pyro.pyro_serialization import (
     find_opentrons_classes_in_packages,
 )
 
-TEST_PYRO_TIMEOUT = 10
+TEST_PYRO_TIMEOUT = 5
 
 # List of types to not validate, always list a reason
 _TYPES_TO_SKIP = [
@@ -827,19 +827,13 @@ async def test_serialization_validation_with_mock_data() -> None:  # noqa: C901
 
     ns = pyro.locate_ns()
     retries_counter = 0
-    uri = None
-    while retries_counter <= 10:
+    while ns.count() < 1:
         # Wait and try again, the resource isnt registered yet
-        try:
-            uri = ns.lookup("TEST_PROXY")
-            break
-        except Exception:
-            await asyncio.sleep(0.01)
-            retries_counter += 1
-
-    # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-    if uri is None:
-        raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER IN SERIALIZER TEST SETUP.")
+        await asyncio.sleep(0.01)
+        retries_counter += 1
+        if retries_counter > 10:
+            # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
+            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
 
     tester_proxy = pyro.Proxy(pyro.resolve(uri="PYRONAME:TEST_PROXY"))  # type: ignore
 
@@ -854,7 +848,9 @@ async def test_serialization_validation_with_mock_data() -> None:  # noqa: C901
     # pydantic_registry_class_list = find_pydantic_classes_in_packages(HARDWARE_PYDANTIC_PACKAGES)
     # pydantic_registry_class_list = list(set(pydantic_registry_class_list))
 
-    exposed_class_list = hardware_registry_class_list + enum_registry_class_list
+    exposed_class_list = (
+        hardware_registry_class_list + enum_registry_class_list
+    )  # + pydantic_registry_class_list
 
     # Validate each class can be sent over pyro and come back deserialized in the expected format
     for clazz in exposed_class_list:
