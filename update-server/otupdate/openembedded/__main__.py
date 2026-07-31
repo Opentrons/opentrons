@@ -4,6 +4,9 @@ Entrypoint for the openembedded update server
 
 import asyncio
 import logging
+import sys
+import traceback
+from logging.config import dictConfig
 
 from server_utils.audit.fastapi import (
     build_audit_client,
@@ -11,9 +14,10 @@ from server_utils.audit.fastapi import (
 from server_utils.auth.resource_server.fastapi import (
     build_authentication_checker,
 )
+from server_utils.logging_utils import get_dict_config
 
 from . import get_app
-from otupdate.common import cli, constants, name_management, systemd
+from otupdate.common import cli, constants, name_management
 from otupdate.common.run_application import run_and_notify_up
 
 # The Unix domain socket where opentrons-auth-server is configured to listen,
@@ -31,7 +35,13 @@ async def main() -> None:
     parser = cli.build_root_parser()
     args = parser.parse_args()
 
-    systemd.configure_logging(getattr(logging, args.log_level.upper()))
+    try:
+        log_config = get_dict_config(args.log_level.upper(), "opentrons-update")
+        dictConfig(log_config)
+    except Exception as e:
+        # needs to be a print because logging doesn't work yet!
+        print("Error: Couldn't configure logging!", file=sys.stderr)  # noqa: T201
+        traceback.print_exception(e, file=sys.stderr)
 
     auth_server_uds = args.auth_server_uds
     auth_server_url = args.auth_server_url
