@@ -80,15 +80,23 @@ def flex_stacker_tof_sensors_disabled() -> bool:
 
 
 def protocol_subprocess_enabled() -> bool:
-    return advs.get_setting_with_env_overload(
-        "enableProtocolSubprocess", RobotTypeEnum.FLEX
-    )
+    # return advs.get_setting_with_env_overload(
+    #     "enableProtocolSubprocess", RobotTypeEnum.FLEX
+    # )
+    # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
+    # this patch should be REMOVED for releases >= 10.0.0
+    # See: https://opentrons.atlassian.net/browse/EXEC-2897
+    return False
 
 
 def hardware_subprocess_enabled() -> bool:
-    return advs.get_setting_with_env_overload(
-        "enableHardwareSubprocess", RobotTypeEnum.FLEX
-    )
+    # return advs.get_setting_with_env_overload(
+    #     "enableHardwareSubprocess", RobotTypeEnum.FLEX
+    # )
+    # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
+    # this patch should be REMOVED for releases >= 10.0.0
+    # See: https://opentrons.atlassian.net/browse/EXEC-2897
+    return False
 
 
 def run_protocol_as_restricted_user() -> bool:

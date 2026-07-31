@@ -101,7 +101,11 @@ export function ProtocolSetupLabware({
         mostRecentAnalysis?.labware ?? [],
         mostRecentAnalysis?.modules ?? []
       ),
-    [mostRecentAnalysis]
+    [
+      mostRecentAnalysis?.commands,
+      mostRecentAnalysis?.labware,
+      mostRecentAnalysis?.modules,
+    ]
   )
   const labwareByLiquidId = useMemo(
     () => getLabwareInfoByLiquidId(mostRecentAnalysis?.commands ?? []),
@@ -245,7 +249,7 @@ export function ProtocolSetupLabware({
                     key={item.representativeItem.labwareId}
                     attachedProtocolModules={attachedProtocolModuleMatches}
                     refetchModules={moduleQuery.refetch}
-                    slotName={'offDeck'}
+                    slotName="offDeck"
                     offDeckQuantity={item.quantity}
                     stackedItems={item.stackedItems}
                     labwareByLiquidId={labwareByLiquidId}
