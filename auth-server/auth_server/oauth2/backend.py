@@ -198,8 +198,8 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         **kwargs: object,
     ) -> bool:
         """Is the client allowed to access the requested scopes?"""
-        assert isinstance(request.user, ORMUser)
-        user: ORMUser = request.user
+        user = cast(object, request.user)
+        assert isinstance(user, ORMUser)
 
         try:
             for scope in scopes:
@@ -246,8 +246,9 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         self, client_id: str, request: oauthlib.common.Request
     ) -> list[str]:
         """Scopes that we'll authorize a client for, if it doesn't ask for any explicitly."""
-        assert isinstance(request.user, ORMUser)
-        user: ORMUser = request.user
+        user = cast(object, request.user)
+        assert isinstance(user, ORMUser)
+
         scopes = get_scope_set_of_user(
             user,
             self.__settings_store.get_settings(),
@@ -257,6 +258,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
                 self.__settings_store.get_settings().passwordResetTime,
             ),
         )
+
         return sorted(s.api_name for s in scopes)
 
     @override
