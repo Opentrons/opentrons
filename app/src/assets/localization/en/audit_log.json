@@ -66,6 +66,7 @@
   "single_channel_and_8_channel": "single channel or 8 channel",
   "stop_run": "Stopping protocol run",
   "sync_system_time": "Syncing robot system time",
+  "toggle_analytics": "Toggling analytics",
   "toggle_devtools": "Toggling devtools",
   "update_audit_settings": "Updating reason for interaction log settings",
   "update_auth_settings": "Updating authentication settings",

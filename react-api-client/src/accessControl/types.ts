@@ -192,6 +192,7 @@ type AuditLogAction =
   | 'change_update_channel'
   | 'toggle_devtools'
   | 'change_language'
+  | 'toggle_analytics'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.
