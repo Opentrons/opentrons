@@ -17,6 +17,7 @@ import {
   getUpdateChannelOptions,
   updateConfigValue,
 } from '/app/redux/config'
+import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 
 import type { ComponentProps } from 'react'
 import type { SelectOption } from '/app/atoms/SelectField/Select'
@@ -27,8 +28,18 @@ export function UpdatedChannel(): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const channel = useSelector(getUpdateChannel)
   const channelOptions: SelectOption[] = useSelector(getUpdateChannelOptions)
+  const handleChannelAndLog = useHandleAndLog<string>(
+    (value: string) => {
+      dispatch(updateConfigValue('update.channel', value))
+    },
+    'change_update_channel',
+    (value: string) => ({
+      action: 'change update channel',
+      message: `User changed update channel to ${value}`,
+    })
+  )
   const handleChannel = (_: string, value: string): void => {
-    dispatch(updateConfigValue('update.channel', value))
+    handleChannelAndLog(value)
   }
 
   const formatOptionLabel: ComponentProps<

@@ -17,6 +17,7 @@ import {
   getDevtoolsEnabled,
   toggleDevtools,
 } from '/app/redux/config'
+import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 
 import type { Dispatch } from '/app/redux/types'
 
@@ -24,12 +25,19 @@ export function EnableDevTools(): JSX.Element {
   const { t } = useTranslation('app_settings')
   const devToolsOn = useSelector(getDevtoolsEnabled)
   const dispatch = useDispatch<Dispatch>()
-  const toggleDevTools = (): void => {
-    if (devToolsOn) {
-      dispatch(clearDevInternalFlags())
-    }
-    dispatch(toggleDevtools())
-  }
+  const handleToggleDevtools = useHandleAndLog<boolean>(
+    (newDevToolsOn: boolean) => {
+      if (!newDevToolsOn) {
+        dispatch(clearDevInternalFlags())
+      }
+      dispatch(toggleDevtools())
+    },
+    'toggle_devtools',
+    (newDevToolsOn: boolean) => ({
+      action: 'toggle devtools',
+      message: `User toggled devtools to ${newDevToolsOn ? 'on' : 'off'}`,
+    })
+  )
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -47,7 +55,9 @@ export function EnableDevTools(): JSX.Element {
       <ToggleButton
         label="enable_dev_tools"
         toggledOn={devToolsOn}
-        onClick={toggleDevTools}
+        onClick={() => {
+          handleToggleDevtools(!devToolsOn)
+        }}
       />
     </Flex>
   )
