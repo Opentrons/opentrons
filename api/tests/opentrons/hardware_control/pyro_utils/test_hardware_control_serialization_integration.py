@@ -13,6 +13,7 @@ from typing import Any, Dict, get_args, get_type_hints
 
 import pytest
 from decoy import Decoy
+from pydantic import BaseModel
 from Pyro5 import api as pyro
 from Pyro5 import nameserver
 
@@ -72,6 +73,7 @@ from opentrons.hardware_control.poller import Poller
 from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
     HARDWARE_CLASS_PACKAGES,
     HARDWARE_ENUM_PACKAGES,
+    HARDWARE_PYDANTIC_PACKAGES,
     register_hardware_types,
 )
 from opentrons.hardware_control.robot_calibration import DeckCalibration
@@ -81,6 +83,7 @@ from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 from opentrons.util.pyro.pyro_serialization import (
     find_enums_in_packages,
     find_opentrons_classes_in_packages,
+    find_pydantic_classes_in_packages,
 )
 
 TEST_PYRO_TIMEOUT = 5
@@ -329,7 +332,7 @@ def _is_namedtuple_instance(cls: Any) -> bool:
         return False
 
 
-def _collect_serializable_types(
+def _collect_serializable_types(  # noqa: C901
     hint: Any, collected: list[type], seen: set[int], type_qualifier: str
 ) -> None:
     if id(hint) in seen:
@@ -353,6 +356,13 @@ def _collect_serializable_types(
         except TypeError:
             # wrapped arguments can be capture on recursive checks
             pass
+    elif type_qualifier == "pydantic":
+        if (
+            issubclass(hint, BaseModel)
+            and hint is not BaseModel
+            and hint not in _TYPES_TO_SKIP
+        ):
+            collected.append(hint)
     else:
         raise ValueError(f"Invalid type qualifier for test: {type_qualifier}")
     for arg in get_args(hint):
@@ -571,6 +581,61 @@ async def test_enum_registration_coverage(
 
     # This test uses <= because the `find_enums_in_packages` crawler is actually finding more enums than there are
     # exposed via the Pyro interface. We just want to make sure all the exposed ones are in that registry.
+    assert set(class_cover_list) <= set(hardware_registry_class_list)
+
+
+async def test_pydantic_registration_coverage(
+    decoy: Decoy,
+    ot3_hardware: ThreadManager[OT3API],
+    mock_driver: SimulatingDriver,
+    tc_reader_mocked_driver: modules.thermocycler.ThermocyclerReader,
+    hs_reader_mocked_driver: modules.heater_shaker.HeaterShakerReader,
+    td_reader_mocked_driver: modules.tempdeck.TempDeckReader,
+    vm_reader_mocked_driver: modules.vacuum_module.VacuumModuleReader,
+    ar_reader_mocked_driver: modules.absorbance_reader.AbsorbanceReaderReader,
+    st_reader_mocked_driver: modules.flex_stacker.FlexStackerReader,
+    mock_feature_flags: None,
+) -> None:
+    """Test will check for to see if the hardware class package used in registration covers all exposed pydantic models."""
+    wrapped_api = ot3_hardware.wrapped()
+    ot3api_async_instance = await _setup_and_validate_modules_on_OT3API_and_nameserver(
+        decoy,
+        ot3_hardware,
+        mock_driver,
+        tc_reader_mocked_driver,
+        hs_reader_mocked_driver,
+        td_reader_mocked_driver,
+        vm_reader_mocked_driver,
+        ar_reader_mocked_driver,
+        st_reader_mocked_driver,
+        mock_feature_flags,
+    )
+
+    # Collect classes from the OT3API
+    class_cover_list = _collect_exposed_types(
+        original_class=OT3API,
+        acpo_instance=ot3api_async_instance,
+        type_qualifier="pydantic",
+    )
+
+    hardware_registry_class_list = find_pydantic_classes_in_packages(
+        HARDWARE_PYDANTIC_PACKAGES
+    )
+    hardware_registry_class_list = list(set(hardware_registry_class_list))
+
+    # Collect classes from the Module APIs
+    mod_counter = 0
+    for module in wrapped_api.attached_modules:
+        class_cover_list = class_cover_list + _collect_exposed_types(
+            original_class=module.__class__,
+            acpo_instance=ot3api_async_instance.attached_modules[mod_counter],
+            type_qualifier="pydantic",
+        )
+        class_cover_list = list(set(class_cover_list))
+        mod_counter += 1
+
+    # This test uses <= because the `find_pydantic_classes_in_packages` crawler is actually finding more pydantic models than
+    # there are exposed via the Pyro interface. We just want to make sure all the exposed ones are in that registry.
     assert set(class_cover_list) <= set(hardware_registry_class_list)
 
 
