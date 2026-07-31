@@ -83,8 +83,6 @@ export interface InputFieldProps {
   leftElement?: ReactNode
   /** optional element to display aligned to the right of the input field */
   rightElement?: ReactNode
-  /** if true, style the background of input field to error state */
-  hasBackgroundError?: boolean
   /** optional prop to override input field border radius */
   borderRadius?: string
   /** optional prop to override input field padding */
@@ -117,7 +115,6 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       size = 'small',
       leftElement,
       rightElement,
-      hasBackgroundError = false,
       borderRadius,
       padding,
       testId,
@@ -138,17 +135,13 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
     const placeHolder = (isIndeterminate ?? false) ? '-' : rawPlaceholder
 
     const INPUT_FIELD = css`
-      background-color: ${hasBackgroundError ? COLORS.red30 : COLORS.white};
+      background-color: ${COLORS.white};
       border-radius: ${
         borderRadius != null ? borderRadius : BORDERS.borderRadius4
       };
       padding: ${padding ?? SPACING.spacing8};
-      border: ${
-        hasBackgroundError
-          ? 'none'
-          : `1px ${BORDERS.styleSolid}
-        ${hasError ? COLORS.red50 : COLORS.grey50}`
-      };
+      border: 1px ${BORDERS.styleSolid}
+        ${hasError ? COLORS.red50 : COLORS.grey50};
       font-size: ${TYPOGRAPHY.fontSizeP};
       width: 100%;
       height: ${size === 'small' ? '2rem' : '2.75rem'};
