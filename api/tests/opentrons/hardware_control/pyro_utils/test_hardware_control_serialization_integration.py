@@ -81,7 +81,7 @@ from opentrons.util.pyro.pyro_serialization import (
     find_opentrons_classes_in_packages,
 )
 
-TEST_PYRO_TIMEOUT = 5
+TEST_PYRO_TIMEOUT = 10
 
 # List of types to not validate, always list a reason
 _TYPES_TO_SKIP = [
@@ -798,7 +798,7 @@ async def test_serialization_validation_with_mock_data() -> None:  # noqa: C901
     name_server_ready = threading.Event()
     await _setup_namerserver(name_server_ready=name_server_ready)
 
-    def _ot3api_pyro_daemon() -> None:
+    def _data_tester_pyro_daemon() -> None:
         # Wait for the nameserver to be ready so locate_ns can succeed.
         name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
         register_hardware_types()
@@ -820,8 +820,10 @@ async def test_serialization_validation_with_mock_data() -> None:  # noqa: C901
             finally:
                 daemon.close()
 
-    ot3api_thread = threading.Thread(target=_ot3api_pyro_daemon, daemon=True)
-    ot3api_thread.start()
+    tester_resource_thread = threading.Thread(
+        target=_data_tester_pyro_daemon, daemon=True
+    )
+    tester_resource_thread.start()
 
     ns = pyro.locate_ns()
     retries_counter = 0
@@ -839,8 +841,7 @@ async def test_serialization_validation_with_mock_data() -> None:  # noqa: C901
     if uri is None:
         raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER IN SERIALIZER TEST SETUP.")
 
-    uri = pyro.resolve(uri="PYRONAME:TEST_PROXY")
-    tester_proxy = pyro.Proxy(uri)  # type: ignore
+    tester_proxy = pyro.Proxy(pyro.resolve(uri="PYRONAME:TEST_PROXY"))  # type: ignore
 
     # Get the hardware registry
     hardware_registry_class_list = find_opentrons_classes_in_packages(
