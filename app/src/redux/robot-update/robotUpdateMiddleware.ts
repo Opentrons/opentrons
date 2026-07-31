@@ -2,8 +2,11 @@ import { createListenerMiddleware } from '@reduxjs/toolkit'
 
 import { getAllRobots } from '../discovery'
 import { removeRobot } from '../discovery/actions'
-import { readSystemRobotUpdateFile } from './actions'
-import { DONE, DOWNLOAD_FILE } from './constants'
+import {
+  readSystemRobotUpdateFile,
+  unexpectedRobotUpdateError,
+} from './actions'
+import { DONE, DOWNLOAD_FILE, ROBOTUPDATE_DOWNLOAD_ERROR } from './constants'
 import {
   getRobotUpdateRobot,
   getRobotUpdateSession,
@@ -11,6 +14,7 @@ import {
 } from './selectors'
 
 import type { Dispatch, State } from '../types'
+import type { RobotUpdateAction } from './types'
 
 /**
  * Non-HTTP robot-update side effects that are not part of the apply pipeline.
@@ -46,6 +50,25 @@ startListening({
     const robotModel =
       host?.serverHealth?.robotModel === 'OT-3 Standard' ? 'flex' : 'ot2'
     listenerApi.dispatch(readSystemRobotUpdateFile(robotModel))
+  },
+})
+
+// Surface shell download failures on the active update session so the UI
+// does not hang when downloading an update.
+startListening({
+  predicate: action => action.type === ROBOTUPDATE_DOWNLOAD_ERROR,
+  effect: (action, listenerApi) => {
+    const session = getRobotUpdateSession(listenerApi.getState())
+    if (session?.step !== DOWNLOAD_FILE || session.error != null) {
+      return
+    }
+    const { error } = (
+      action as unknown as Extract<
+        RobotUpdateAction,
+        { type: typeof ROBOTUPDATE_DOWNLOAD_ERROR }
+      >
+    ).payload
+    listenerApi.dispatch(unexpectedRobotUpdateError(error))
   },
 })
 

@@ -36,11 +36,25 @@ import type { ReleaseSetFilepaths, ReleaseSetUrls } from './types'
 const log = createLogger('robot-update/index')
 
 let checkingForUpdates = false
+let downloadingUpdate = false
 // note: this is a container whose records are reassigned and is a global cache, don't
 // be fooled by the const
 const updateSet: Record<RobotUpdateTarget, ReleaseSetFilepaths | null> = {
   ot2: null,
   flex: null,
+}
+
+function startRobotUpdateDownload(dispatch: Dispatch): void {
+  if (downloadingUpdate) {
+    return
+  }
+  downloadingUpdate = true
+  checkingForUpdates = true
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  downloadRobotUpdate(dispatch).finally(() => {
+    downloadingUpdate = false
+    checkingForUpdates = false
+  })
 }
 
 const readFileAndDispatchInfo = (
@@ -70,12 +84,15 @@ export function registerRobotUpdate(dispatch: Dispatch): Dispatch {
     switch (action.type) {
       case UI_INITIALIZED:
       case 'shell:CHECK_UPDATE':
-        if (!checkingForUpdates) {
+        if (!checkingForUpdates && !downloadingUpdate) {
           checkingForUpdates = true
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
           checkForRobotUpdate(dispatch)
             .finally(() => {
-              checkingForUpdates = false
+              // A concurrent download owns these flags until it finishes.
+              if (!downloadingUpdate) {
+                checkingForUpdates = false
+              }
             })
             .then(() => {
               if (getConfig('update').automaticallyDownloadUpdates) {
@@ -88,12 +105,7 @@ export function registerRobotUpdate(dispatch: Dispatch): Dispatch {
         }
         break
       case 'robotUpdate:DOWNLOAD_UPDATE':
-        if (!checkingForUpdates) {
-          checkingForUpdates = true
-          downloadRobotUpdate(dispatch).finally(() => {
-            checkingForUpdates = false
-          })
-        }
+        startRobotUpdateDownload(dispatch)
         break
 
       case 'robotUpdate:START_PREMIGRATION': {
@@ -126,18 +138,11 @@ export function registerRobotUpdate(dispatch: Dispatch): Dispatch {
         const filename = updateSet[target]?.system
 
         if (filename == null) {
-          if (checkingForUpdates) {
-            dispatch({
-              type: 'robotUpdate:CHECKING_FOR_UPDATE',
-              payload: target,
-            })
-          } else {
-            // If the file was downloaded but deleted from robot-update-cache.
-            dispatch({
-              type: 'robotUpdate:UNEXPECTED_ERROR',
-              payload: { message: 'Robot update file not downloaded' },
-            })
-          }
+          dispatch({
+            type: 'robotUpdate:CHECKING_FOR_UPDATE',
+            payload: target,
+          })
+          startRobotUpdateDownload(dispatch)
         } else {
           return readFileAndDispatchInfo(dispatch, filename)
         }
@@ -268,6 +273,7 @@ export function downloadRobotUpdate(dispatch: Dispatch): Promise<void> {
     .then(filepaths => cacheUpdateSet(filepaths, 'flex'))
     .then(updateInfo => {
       dispatch({ type: 'robotUpdate:UPDATE_INFO', payload: updateInfo })
+      dispatch({ type: 'robotUpdate:DOWNLOAD_DONE', payload: 'flex' })
     })
     .catch((error: Error) => {
       dispatch({
