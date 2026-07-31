@@ -514,6 +514,8 @@ async def test_module_registration_coverage(
         class_cover_list = list(set(class_cover_list))
         mod_counter += 1
 
+    # Because dataclasses/named tuples use bespoke `to_pyro_dict` and `from_pyro_dict` serialization
+    # the types exposed by the Pyro interface should always be the same as the types registered.
     assert set(class_cover_list) == set(hardware_registry_class_list)
 
 
@@ -593,6 +595,8 @@ async def test_enum_registration_coverage(
         class_cover_list = list(set(class_cover_list))
         mod_counter += 1
 
+    # This test uses <= because the `find_enums_in_packages` crawler is actually finding more enums than there are
+    # exposed via the Pyro interface. We just want to make sure all the exposed ones are in that registry.
     assert set(class_cover_list) <= set(hardware_registry_class_list)
 
 
