@@ -8,80 +8,154 @@ import asyncio
 import logging
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, Coroutine, Mapping
+from typing import Annotated, Any, Mapping, Optional
 
-from aiohttp import web
+import fastapi
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    AppStateAccessor,
+    get_app_state,
+)
 
-from . import auth, update_actions
-from .constants import DEVICE_BOOT_ID_NAME, RESTART_LOCK_NAME, SHUTDOWN_LOCK_NAME
-from .name_management import get_name_synchronizer
+from .api_error import APIError, ErrorBody
+from .name_management import NameSynchronizer, get_name_synchronizer
+from .update_actions import UpdateActionsInterface, get_update_actions
 
 LOG = logging.getLogger(__name__)
 
+router = fastapi.APIRouter()
 
-@auth.require_scopes(Scope.RESTART_WRITE)
-async def restart(request: web.Request) -> web.Response:
+_restart_lock_accessor = AppStateAccessor[asyncio.Lock]("otupdate_restart_lock")
+_shutdown_lock_accessor = AppStateAccessor[asyncio.Lock]("otupdate_shutdown_lock")
+_boot_id_accessor = AppStateAccessor[str]("otupdate_boot_id")
+_health_response_accessor = AppStateAccessor[Mapping[str, Any]](
+    "otupdate_health_response"
+)
+
+
+def install_control(
+    app_state: AppState,
+    *,
+    boot_id: str,
+    health_response: Mapping[str, Any],
+) -> None:
+    """Set up the state that this module's endpoints need.
+
+    This should be done as part of server startup.
+    """
+    _restart_lock_accessor.set_on(app_state, asyncio.Lock())
+    _shutdown_lock_accessor.set_on(app_state, asyncio.Lock())
+    _boot_id_accessor.set_on(app_state, boot_id)
+    _health_response_accessor.set_on(app_state, health_response)
+
+
+def get_restart_lock(
+    app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
+) -> asyncio.Lock:
+    """A FastAPI dependency to retrieve the server's restart lock."""
+    restart_lock = _restart_lock_accessor.get_from(app_state)
+    assert restart_lock is not None, "Forgot to install_control() during startup?"
+    return restart_lock
+
+
+def get_shutdown_lock(
+    app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
+) -> asyncio.Lock:
+    """A FastAPI dependency to retrieve the server's shutdown lock."""
+    shutdown_lock = _shutdown_lock_accessor.get_from(app_state)
+    assert shutdown_lock is not None, "Forgot to install_control() during startup?"
+    return shutdown_lock
+
+
+class ControlMessageResponse(BaseModel):
+    """The response to a successful restart or shutdown request."""
+
+    message: str
+
+
+def no_actions_set_error() -> APIError:
+    """Build the error returned when the hardware update actions are missing."""
+    return APIError(
+        500,
+        ErrorBody(
+            error="no-actions-set",
+            message="Internal error: no actions object for hardware",
+        ),
+    )
+
+
+@router.post(
+    "/server/restart",
+    summary="Restart the robot.",
+    dependencies=[fastapi.Depends(require_scopes(Scope.RESTART_WRITE))],
+)
+async def restart(
+    actions: Annotated[
+        Optional[UpdateActionsInterface], fastapi.Depends(get_update_actions)
+    ],
+    restart_lock: Annotated[asyncio.Lock, fastapi.Depends(get_restart_lock)],
+) -> ControlMessageResponse:
     """Restart the robot.
 
     Blocks while the restart lock is held.
     """
-    actions = update_actions.UpdateActionsInterface.from_request(request)
     if not actions:
-        return web.json_response(
-            data={
-                "error": "no-actions-set",
-                "message": "Internal error: no actions object for hardware",
-            },
-            status=500,
-        )
+        raise no_actions_set_error()
 
-    async with request.app[RESTART_LOCK_NAME]:
+    async with restart_lock:
         asyncio.get_event_loop().call_later(1, actions.restart)
-    return web.json_response({"message": "Restarting in 1s"}, status=200)
+    return ControlMessageResponse(message="Restarting in 1s")
 
 
-@auth.require_scopes(Scope.SHUTDOWN_WRITE)
-async def shutdown(request: web.Request) -> web.Response:
+@router.post(
+    "/server/shutdown",
+    summary="Shut down the robot.",
+    dependencies=[fastapi.Depends(require_scopes(Scope.SHUTDOWN_WRITE))],
+)
+async def shutdown(
+    actions: Annotated[
+        Optional[UpdateActionsInterface], fastapi.Depends(get_update_actions)
+    ],
+    shutdown_lock: Annotated[asyncio.Lock, fastapi.Depends(get_shutdown_lock)],
+) -> ControlMessageResponse:
     """Shut down the robot.
 
     Blocks while the shutdown lock is held.
     """
-    actions = update_actions.UpdateActionsInterface.from_request(request)
     if not actions:
-        return web.json_response(
-            data={
-                "error": "no-actions-set",
-                "message": "Internal error: no actions object for hardware",
-            },
-            status=500,
-        )
+        raise no_actions_set_error()
 
-    async with request.app[SHUTDOWN_LOCK_NAME]:
+    async with shutdown_lock:
         asyncio.get_event_loop().call_later(1, actions.shutdown)
-    return web.json_response({"message": "Shutting down in 1s"}, status=200)
+    return ControlMessageResponse(message="Shutting down in 1s")
 
 
-def build_health_endpoint(
-    health_response: Mapping[str, Any],
-) -> Callable[[web.Request], Coroutine[None, None, web.Response]]:
-    """Build a coroutine to serve /health that captures version info"""
-
-    async def health(request: web.Request) -> web.Response:
-        return web.json_response(
-            {
-                **health_response,
-                **{
-                    "name": await get_name_synchronizer(request).get_name(),
-                    "serialNumber": get_serial(),
-                    "bootId": request.app[DEVICE_BOOT_ID_NAME],
-                },
-            },
-            headers={"Access-Control-Allow-Origin": "*"},
-        )
-
-    return health
+@router.get(
+    "/server/update/health", summary="Report the robot's identity and versions."
+)
+async def health(
+    app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
+    name_synchronizer: Annotated[
+        NameSynchronizer, fastapi.Depends(get_name_synchronizer)
+    ],
+) -> JSONResponse:
+    """Report version info that clients use to discover and identify the robot."""
+    health_response = _health_response_accessor.get_from(app_state)
+    assert health_response is not None, "Forgot to install_control() during startup?"
+    return JSONResponse(
+        content={
+            **health_response,
+            "name": await name_synchronizer.get_name(),
+            "serialNumber": get_serial(),
+            "bootId": _boot_id_accessor.get_from(app_state),
+        },
+        headers={"Access-Control-Allow-Origin": "*"},
+    )
 
 
 def get_serial() -> str:

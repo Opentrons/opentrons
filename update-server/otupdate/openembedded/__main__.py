@@ -4,7 +4,6 @@ Entrypoint for the openembedded update server
 
 import asyncio
 import logging
-from typing import NoReturn
 
 from server_utils.auth.resource_server.fastapi import (
     build_authentication_checker,
@@ -15,17 +14,22 @@ from otupdate.common import cli, constants, name_management, systemd
 from otupdate.common.run_application import run_and_notify_up
 
 # The Unix domain socket where opentrons-auth-server is configured to listen,
-# on this type of robot.
-_AUTH_SERVER_UDS = "/run/opentrons-auth-server.sock"
+# on this type of robot. Used unless the command line overrides it.
+_DEFAULT_AUTH_SERVER_UDS = "/run/opentrons-auth-server.sock"
 
 LOG = logging.getLogger(__name__)
 
 
-async def main() -> NoReturn:
+async def main() -> None:
     parser = cli.build_root_parser()
     args = parser.parse_args()
 
     systemd.configure_logging(getattr(logging, args.log_level.upper()))
+
+    auth_server_uds = args.auth_server_uds
+    auth_server_url = args.auth_server_url
+    if auth_server_uds is None and auth_server_url is None:
+        auth_server_uds = _DEFAULT_AUTH_SERVER_UDS
 
     # Because this involves restarting Avahi, this must happen early,
     # before the NameSynchronizer starts up and connects to Avahi.
@@ -35,7 +39,8 @@ async def main() -> NoReturn:
 
     async with (
         build_authentication_checker(
-            auth_server_uds=_AUTH_SERVER_UDS, auth_server_url=None
+            auth_server_uds=auth_server_uds,
+            auth_server_url=auth_server_url,
         ) as authentication_checker,
         name_management.NameSynchronizer.start(
             constants.MODEL_OT3

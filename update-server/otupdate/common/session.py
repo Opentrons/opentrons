@@ -10,11 +10,8 @@ import shutil
 import uuid
 from typing import Mapping, NamedTuple, Optional, Union
 
-from aiohttp import web
+from server_utils.fastapi_utils.app_state import AppState, AppStateAccessor
 
-from . import constants
-
-SESSION_VARNAME = constants.APP_VARIABLE_PREFIX + "session"
 LOG = logging.getLogger(__name__)
 
 
@@ -141,9 +138,14 @@ class UpdateSession:
             }
 
 
-def get_current_session(request: web.Request) -> UpdateSession | None:
-    return request.app.get(SESSION_VARNAME, None)  # type: ignore[no-any-return]
+_session_accessor = AppStateAccessor[UpdateSession]("otupdate_session")
 
 
-def set_current_session(request: web.Request, session: UpdateSession | None) -> None:
-    request.app[SESSION_VARNAME] = session
+def get_current_session(app_state: AppState) -> UpdateSession | None:
+    """Return the update session currently active on this server, if there is one."""
+    return _session_accessor.get_from(app_state)
+
+
+def set_current_session(app_state: AppState, session: UpdateSession | None) -> None:
+    """Set (or, with `None`, clear) the update session active on this server."""
+    _session_accessor.set_on(app_state, session)
