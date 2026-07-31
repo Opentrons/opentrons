@@ -7,25 +7,19 @@ import styles from './userAccountForm.module.css'
 
 import type { JSX } from 'react'
 import type { Control, FieldValues, Path } from 'react-hook-form'
-import type { AuthUserFieldErrors } from './useAuthUserMutationErrors'
 
 export interface UserAccountIdentityFormFieldsProps<T extends FieldValues> {
   control: Control<T>
-  fieldErrors?: Partial<
-    Pick<AuthUserFieldErrors, 'usernameError' | 'fullNameError'>
-  >
   stacked?: boolean
   usernameMaxLength?: number
 }
 
 export function UserAccountIdentityFormFields<T extends FieldValues>({
   control,
-  fieldErrors = {},
   stacked = false,
   usernameMaxLength,
 }: UserAccountIdentityFormFieldsProps<T>): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const { usernameError = null, fullNameError = null } = fieldErrors
 
   const usernameField = (
     <div className={styles.field_group}>
@@ -52,7 +46,7 @@ export function UserAccountIdentityFormFields<T extends FieldValues>({
               <>
                 <InputField
                   value={field.value}
-                  error={fieldState.error?.message ?? usernameError}
+                  error={fieldState.error?.message}
                   onChange={field.onChange}
                   onBlur={field.onBlur}
                 />
@@ -91,7 +85,7 @@ export function UserAccountIdentityFormFields<T extends FieldValues>({
           render={({ field, fieldState }) => (
             <InputField
               value={field.value}
-              error={fieldState.error?.message ?? fullNameError}
+              error={fieldState.error?.message}
               onChange={field.onChange}
               onBlur={field.onBlur}
             />

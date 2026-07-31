@@ -1,11 +1,11 @@
-import { useCallback, useState } from 'react'
 import axios from 'axios'
 
 import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
 import type { TFunction } from 'i18next'
+import type { FieldValues, Path, UseFormSetError } from 'react-hook-form'
 
-export interface AuthUserFieldErrors {
+interface AuthUserFieldErrors {
   usernameError: string | null
   fullNameError: string | null
   passwordError: string | null
@@ -19,7 +19,7 @@ const EMPTY_FIELD_ERRORS: AuthUserFieldErrors = {
   confirmPasswordError: null,
 }
 
-function mapAuthUserMutationError(
+export function mapAuthUserMutationError(
   error: unknown,
   t: TFunction
 ): AuthUserFieldErrors {
@@ -67,32 +67,42 @@ function mapAuthUserMutationError(
   }
 }
 
-export function useAuthUserMutationErrors(t: TFunction): {
-  fieldErrors: AuthUserFieldErrors
-  clearFieldErrors: () => void
-  handleMutationError: (error: unknown) => void
-} {
-  const [fieldErrors, setFieldErrors] =
-    useState<AuthUserFieldErrors>(EMPTY_FIELD_ERRORS)
+export function applyAuthUserMutationError<T extends FieldValues>(
+  setError: UseFormSetError<T>,
+  error: unknown,
+  t: TFunction
+): void {
+  if (isDocumentedMutationError(error)) {
+    return
+  }
 
-  const clearFieldErrors = useCallback((): void => {
-    setFieldErrors(EMPTY_FIELD_ERRORS)
-  }, [])
+  const fieldErrors = mapAuthUserMutationError(error, t)
 
-  const handleMutationError = useCallback(
-    (error: unknown): void => {
-      if (isDocumentedMutationError(error)) {
-        return
-      }
+  if (fieldErrors.usernameError != null) {
+    setError('username' as Path<T>, {
+      type: 'server',
+      message: fieldErrors.usernameError,
+    })
+  }
 
-      setFieldErrors(mapAuthUserMutationError(error, t))
-    },
-    [t]
-  )
+  if (fieldErrors.fullNameError != null) {
+    setError('fullName' as Path<T>, {
+      type: 'server',
+      message: fieldErrors.fullNameError,
+    })
+  }
 
-  return {
-    fieldErrors,
-    clearFieldErrors,
-    handleMutationError,
+  if (fieldErrors.passwordError != null) {
+    setError('password' as Path<T>, {
+      type: 'server',
+      message: fieldErrors.passwordError,
+    })
+  }
+
+  if (fieldErrors.confirmPasswordError != null) {
+    setError('confirmPassword' as Path<T>, {
+      type: 'server',
+      message: fieldErrors.confirmPasswordError,
+    })
   }
 }

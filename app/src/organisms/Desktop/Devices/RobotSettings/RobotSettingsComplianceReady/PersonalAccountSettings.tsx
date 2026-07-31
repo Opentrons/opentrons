@@ -18,7 +18,6 @@ import {
 
 import styles from './personalaccountsettings.module.css'
 import { PersonalAccountSettingsEditForm } from './PersonalAccountSettingsEditForm'
-import { useAuthUserMutationErrors } from './userAccount/useAuthUserMutationErrors'
 
 import type { TFunction } from 'i18next'
 import type { JSX, ReactNode } from 'react'
@@ -57,30 +56,24 @@ export function PersonalAccountSettings({
     useUpdateSelfMutation(documentationState)
 
   const [isEditing, setIsEditing] = useState(false)
-  const { fieldErrors, clearFieldErrors, handleMutationError } =
-    useAuthUserMutationErrors(t)
 
-  const handleSave = (request: UpdateSelfRequest): void => {
-    void updateSelf(request)
-      .then(updatedSelf => {
-        if (host != null) {
-          queryClient.setQueryData(getSelfQueryKey(host), updatedSelf)
-        }
-        clearFieldErrors()
-        dispatch(
-          updateLoggedInUserProfile({
-            robotName,
-            username: updatedSelf.data.username,
-            fullName: updatedSelf.data.fullName,
-          })
-        )
-        setIsEditing(false)
-      })
-      .catch(handleMutationError)
+  const handleSave = (request: UpdateSelfRequest): Promise<void> => {
+    return updateSelf(request).then(updatedSelf => {
+      if (host != null) {
+        queryClient.setQueryData(getSelfQueryKey(host), updatedSelf)
+      }
+      dispatch(
+        updateLoggedInUserProfile({
+          robotName,
+          username: updatedSelf.data.username,
+          fullName: updatedSelf.data.fullName,
+        })
+      )
+      setIsEditing(false)
+    })
   }
 
   const handleCancelEdit = (): void => {
-    clearFieldErrors()
     setIsEditing(false)
   }
   // TODO: refresh fields when user is logged out
@@ -100,7 +93,6 @@ export function PersonalAccountSettings({
               type="button"
               underLine
               onClick={() => {
-                clearFieldErrors()
                 setIsEditing(true)
               }}
             >
@@ -114,7 +106,6 @@ export function PersonalAccountSettings({
             username={loggedInUser.username}
             fullName={loggedInUser.fullName}
             isSaving={isSaving}
-            fieldErrors={fieldErrors}
             onSave={handleSave}
             onCancel={handleCancelEdit}
           />

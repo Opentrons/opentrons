@@ -32,7 +32,7 @@ describe('PersonalAccountSettingsEditForm', () => {
       username: 'alice',
       fullName: 'Alice Example',
       isSaving: false,
-      onSave: vi.fn(),
+      onSave: vi.fn().mockResolvedValue(undefined),
       onCancel: vi.fn(),
     }
   })
@@ -130,26 +130,18 @@ describe('PersonalAccountSettingsEditForm', () => {
     expect(props.onCancel).toHaveBeenCalled()
   })
 
-  it('shows a server save error on the confirm password field', () => {
+  it('shows a server save error on the confirm password field', async () => {
     render({
       ...props,
-      fieldErrors: {
-        confirmPasswordError: 'Unable to save account settings. Try again.',
-      },
+      onSave: vi.fn().mockRejectedValue(new Error('save failed')),
     })
-    screen.getByText('Unable to save account settings. Try again.')
-  })
+    fireEvent.change(screen.getByDisplayValue('alice'), {
+      target: { value: 'alice2' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'save' }))
 
-  it('shows a username error on the username field', () => {
-    render({
-      ...props,
-      fieldErrors: {
-        usernameError:
-          'This username is already taken. Choose a different username.',
-      },
+    await waitFor(() => {
+      screen.getByText('Unable to save account settings. Try again.')
     })
-    screen.getByText(
-      'This username is already taken. Choose a different username.'
-    )
   })
 })

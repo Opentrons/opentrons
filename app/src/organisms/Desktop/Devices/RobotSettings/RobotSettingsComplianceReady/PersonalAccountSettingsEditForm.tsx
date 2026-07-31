@@ -3,21 +3,21 @@ import { useTranslation } from 'react-i18next'
 
 import { PrimaryButton, SecondaryButton } from '@opentrons/components'
 
+import { applyAuthUserMutationError } from './userAccount/mapAuthUserMutationError'
 import styles from './userAccount/userAccountForm.module.css'
 import { UserAccountIdentityFormFields } from './userAccount/UserAccountIdentityFormFields'
 import { UserAccountPasswordFormFields } from './userAccount/UserAccountPasswordFormFields'
 
+import type { TFunction } from 'i18next'
 import type { JSX } from 'react'
 import type { FieldError, Resolver } from 'react-hook-form'
 import type { UpdateSelfRequest } from '@opentrons/api-client'
-import type { AuthUserFieldErrors } from './userAccount/useAuthUserMutationErrors'
 
 export interface PersonalAccountSettingsEditFormProps {
   username: string
   fullName: string
   isSaving: boolean
-  fieldErrors?: Partial<AuthUserFieldErrors>
-  onSave: (data: UpdateSelfRequest) => void
+  onSave: (data: UpdateSelfRequest) => Promise<void>
   onCancel: () => void
 }
 
@@ -32,11 +32,10 @@ export function PersonalAccountSettingsEditForm({
   username,
   fullName,
   isSaving,
-  fieldErrors = {},
   onSave,
   onCancel,
 }: PersonalAccountSettingsEditFormProps): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'shared'])
+  const { t }: { t: TFunction } = useTranslation(['device_settings', 'shared'])
 
   const resolver: Resolver<FormValues> = values => {
     const errors: Partial<Record<keyof FormValues, FieldError>> = {}
@@ -67,7 +66,7 @@ export function PersonalAccountSettingsEditForm({
     return { values, errors }
   }
 
-  const { control, handleSubmit, watch } = useForm<FormValues>({
+  const { control, handleSubmit, watch, setError } = useForm<FormValues>({
     defaultValues: {
       username,
       fullName,
@@ -97,34 +96,28 @@ export function PersonalAccountSettingsEditForm({
     (hasPasswordChange && (password === '' || confirmPassword === ''))
 
   const onSubmit = (): void => {
-    onSave({
+    void onSave({
       data: {
         ...(trimmedUsername !== username ? { username: trimmedUsername } : {}),
         ...(trimmedFullName !== fullName ? { fullName: trimmedFullName } : {}),
         ...(hasPasswordChange ? { password } : {}),
       },
+    }).catch(error => {
+      applyAuthUserMutationError(setError, error, t)
     })
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className={styles.form_fields}>
-        <UserAccountIdentityFormFields
-          control={control}
-          fieldErrors={{ usernameError: fieldErrors.usernameError }}
-        />
-        <UserAccountPasswordFormFields
-          control={control}
-          fieldErrors={{
-            confirmPasswordError: fieldErrors.confirmPasswordError ?? null,
-          }}
-        />
+        <UserAccountIdentityFormFields control={control} />
+        <UserAccountPasswordFormFields control={control} />
         <div className={styles.actions}>
           <SecondaryButton type="button" onClick={onCancel}>
-            {t('shared:cancel')}
+            {t('shared:cancel') as string}
           </SecondaryButton>
           <PrimaryButton type="submit" disabled={isSaveDisabled}>
-            {t('shared:save')}
+            {t('shared:save') as string}
           </PrimaryButton>
         </div>
       </div>

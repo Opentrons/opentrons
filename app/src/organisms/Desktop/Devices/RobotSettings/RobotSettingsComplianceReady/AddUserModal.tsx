@@ -16,7 +16,7 @@ import { useCreateUserMutation } from '@opentrons/react-api-client'
 import { getTopPortalEl } from '/app/App/portal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
-import { useAuthUserMutationErrors } from './userAccount/useAuthUserMutationErrors'
+import { applyAuthUserMutationError } from './userAccount/mapAuthUserMutationError'
 import styles from './userAccount/userAccountForm.module.css'
 import { UserAccountIdentityFormFields } from './userAccount/UserAccountIdentityFormFields'
 
@@ -60,18 +60,16 @@ export function AddUserModal({
   const documentationState = useDocumentationState(undefined, robotName)
   const { createUser, isLoading: isSaving } =
     useCreateUserMutation(documentationState)
-  const { fieldErrors, clearFieldErrors, handleMutationError } =
-    useAuthUserMutationErrors(t)
-
-  const { control, handleSubmit, watch, setValue } = useForm<FormValues>({
-    defaultValues: {
-      username: '',
-      fullName: '',
-      accountType: 'admin',
-    },
-    mode: 'onBlur',
-    reValidateMode: 'onChange',
-  })
+  const { control, handleSubmit, watch, setValue, setError, clearErrors } =
+    useForm<FormValues>({
+      defaultValues: {
+        username: '',
+        fullName: '',
+        accountType: 'admin',
+      },
+      mode: 'onBlur',
+      reValidateMode: 'onChange',
+    })
 
   const { username, fullName, accountType } = watch()
   const accountTypeOptions: DropdownOption[] = ADD_USER_ACCOUNT_TYPES.map(
@@ -91,7 +89,7 @@ export function AddUserModal({
     username.length > USERNAME_MAX_LENGTH
 
   const handleClose = (): void => {
-    clearFieldErrors()
+    clearErrors()
     setGeneratedPassword(null)
     onClose()
   }
@@ -116,12 +114,14 @@ export function AddUserModal({
         const { temporaryPassword } = response.data
         if (temporaryPassword != null) {
           setGeneratedPassword(temporaryPassword)
-          clearFieldErrors()
+          clearErrors()
         } else {
           handleClose()
         }
       })
-      .catch(handleMutationError)
+      .catch(error => {
+        applyAuthUserMutationError(setError, error, t)
+      })
   }
 
   return createPortal(
@@ -170,7 +170,6 @@ export function AddUserModal({
             <div className={styles.form_fields}>
               <UserAccountIdentityFormFields
                 control={control}
-                fieldErrors={fieldErrors}
                 stacked
                 usernameMaxLength={USERNAME_MAX_LENGTH}
               />
