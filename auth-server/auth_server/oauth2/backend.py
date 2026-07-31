@@ -25,8 +25,9 @@ from server_utils.auth.scopes import Scope, UnrecognizedScopeError, serialize_sc
 from auth_server.persistence.orm_models import User as ORMUser
 from auth_server.settings.store import SettingsStore
 from auth_server.users.is_account_locked import is_account_locked
+from auth_server.users.scopes import get_scope_set_of_user
 from auth_server.users.store import UserStore
-from auth_server.users.user_data_manager import get_scope_set_of_user, password_hash
+from auth_server.users.user_data_manager import must_reset_password, password_hash
 
 _log = logging.getLogger(__name__)
 
@@ -220,8 +221,11 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             s.api_name
             for s in get_scope_set_of_user(
                 user,
-                self.__get_now(),
-                self.__settings_store.get_settings().passwordResetTime,
+                must_reset_password(
+                    user,
+                    self.__get_now(),
+                    self.__settings_store.get_settings().passwordResetTime,
+                ),
             )
         )
         if not scopes_ok:
@@ -245,8 +249,11 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         user: ORMUser = request.user
         scopes = get_scope_set_of_user(
             user,
-            self.__get_now(),
-            self.__settings_store.get_settings().passwordResetTime,
+            must_reset_password(
+                user,
+                self.__get_now(),
+                self.__settings_store.get_settings().passwordResetTime,
+            ),
         )
         return sorted(s.api_name for s in scopes)
 

@@ -8,9 +8,9 @@ from server_utils.auth.scopes import serialize_scopes
 from tests.dev_server import DevServer
 
 from auth_server.users.models import (
-    ACCOUNT_TYPE_TO_SCOPES,
     AccountType,
 )
+from auth_server.users.scopes import ACCOUNT_TYPE_TO_SCOPES
 
 _INTEGRATION_SERVER_STARTUP_TIMEOUT_S = 30
 
