@@ -93,6 +93,7 @@ def protocol_subprocess_enabled() -> bool:
     # )
     # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
     # this patch should be REMOVED for releases >= 10.0.0
+    # See: https://opentrons.atlassian.net/browse/EXEC-2897
     return False
 
 
@@ -102,4 +103,5 @@ def hardware_subprocess_enabled() -> bool:
     # )
     # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
     # this patch should be REMOVED for releases >= 10.0.0
+    # See: https://opentrons.atlassian.net/browse/EXEC-2897
     return False

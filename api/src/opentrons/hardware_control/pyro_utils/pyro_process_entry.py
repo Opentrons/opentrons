@@ -116,6 +116,7 @@ async def build_and_run_hwc_pyro(simulate: bool) -> None:
 if __name__ == "__main__":
     # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
     # this patch should be REMOVED for releases >= 10.0.0
+    # See: https://opentrons.atlassian.net/browse/EXEC-2897
     if False:
         parser = argparse.ArgumentParser(
             description="Starts and runs the hardware subprocess and a Pyro daemon to handle requests."

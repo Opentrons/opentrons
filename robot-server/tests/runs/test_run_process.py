@@ -167,6 +167,7 @@ async def _host_pyro_nameserver_and_ot3api(
 
 # NOTE: This is here to handle test failures for a feature flag migration bug on versions < 10.0.0
 # this patch should be REMOVED for releases >= 10.0.0
+# See: https://opentrons.atlassian.net/browse/EXEC-2897
 @pytest.mark.xfail
 async def test_run_process_proxy(
     mock_app_state: AppState,
@@ -216,6 +217,7 @@ async def test_run_process_proxy(
 
 # NOTE: This is here to handle test failures for a feature flag migration bug on versions < 10.0.0
 # this patch should be REMOVED for releases >= 10.0.0
+# See: https://opentrons.atlassian.net/browse/EXEC-2897
 @pytest.mark.xfail
 async def test_run_process_create(
     decoy: Decoy,
