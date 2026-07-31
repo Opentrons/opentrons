@@ -8,7 +8,6 @@ import '@testing-library/jest-dom/vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
-import { getFeatureFlags } from '/app/redux/config'
 import { getShellUpdateState } from '/app/redux/shell'
 import { useCurrentRun } from '/app/resources/runs'
 
@@ -16,6 +15,7 @@ import {
   DeviceReset,
   DisableStackerSensors,
   DisplayRobotName,
+  EnableComplianceReadySoftware,
   EnableStatusLight,
   EnterRobotEncryptionKey,
   GantryHoming,
@@ -31,20 +31,11 @@ import {
 } from '../AdvancedTab'
 import { RobotSettingsAdvanced } from '../RobotSettingsAdvanced'
 
-import type * as Config from '/app/redux/config'
 import type { ShellUpdateState } from '/app/redux/shell/types'
 import type * as ShellUpdate from '/app/redux/shell/update'
 
 vi.mock('/app/redux-resources/robots')
-vi.mock('/app/redux/robot-settings/selectors')
 vi.mock('/app/redux/discovery/selectors')
-vi.mock('/app/redux/config', async importOriginal => {
-  const actual = await importOriginal<typeof Config>()
-  return {
-    ...actual,
-    getFeatureFlags: vi.fn(),
-  }
-})
 vi.mock('/app/redux/shell/update', async importOriginal => {
   const actual = await importOriginal<typeof ShellUpdate>()
   return {
@@ -54,6 +45,7 @@ vi.mock('/app/redux/shell/update', async importOriginal => {
 })
 vi.mock('../AdvancedTab/DeviceReset')
 vi.mock('../AdvancedTab/DisplayRobotName')
+vi.mock('../AdvancedTab/EnableComplianceReadySoftware')
 vi.mock('../AdvancedTab/EnableStatusLight')
 vi.mock('../AdvancedTab/EnterRobotEncryptionKey')
 vi.mock('../AdvancedTab/GantryHoming')
@@ -132,7 +124,9 @@ describe('RobotSettings Advanced tab', () => {
     vi.mocked(EnterRobotEncryptionKey).mockReturnValue(
       <div>Mock EnterRobotEncryptionKey Section</div>
     )
-    vi.mocked(getFeatureFlags).mockReturnValue({})
+    vi.mocked(EnableComplianceReadySoftware).mockReturnValue(
+      <div>Mock EnableComplianceReadySoftware Section</div>
+    )
     vi.mocked(useIsRobotBusy).mockReturnValue(false)
     vi.mocked(useCurrentRun).mockReturnValue(null)
   })
@@ -146,15 +140,12 @@ describe('RobotSettings Advanced tab', () => {
     screen.getByText('Mock AboutRobotName Section')
   })
 
-  it('should not render EnterRobotEncryptionKey when accessControlMode is off', () => {
+  it('should render EnableComplianceReadySoftware section', () => {
     render()
-    expect(
-      screen.queryByText('Mock EnterRobotEncryptionKey Section')
-    ).toBeNull()
+    screen.getByText('Mock EnableComplianceReadySoftware Section')
   })
 
-  it('should render EnterRobotEncryptionKey when accessControlMode is on', () => {
-    vi.mocked(getFeatureFlags).mockReturnValue({ accessControlMode: true })
+  it('should render EnterRobotEncryptionKey section', () => {
     render()
     screen.getByText('Mock EnterRobotEncryptionKey Section')
   })

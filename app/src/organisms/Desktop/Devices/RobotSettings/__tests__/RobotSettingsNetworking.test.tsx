@@ -5,8 +5,20 @@ import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
+import {
+  INTERFACE_ETHERNET,
+  INTERFACE_WIFI,
+  mockWifiNetwork,
+} from '@opentrons/api-client'
+import {
+  useEapOptionsQuery,
+  usePostWifiConfigureMutation,
+  useWifiKeysQuery,
+} from '@opentrons/react-api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
 import {
   getRobotAddressesByName,
@@ -14,10 +26,12 @@ import {
   HEALTH_STATUS_OK,
   OPENTRONS_USB,
 } from '/app/redux/discovery'
-import * as Networking from '/app/redux/networking'
-import * as Fixtures from '/app/redux/networking/__fixtures__'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
-import { useCanDisconnect, useWifiList } from '/app/resources/networking/hooks'
+import {
+  useCanDisconnect,
+  useNetworkInterfaces,
+  useWifiList,
+} from '/app/resources/networking/hooks'
 
 import { DisconnectModal } from '../ConnectNetwork/DisconnectModal'
 import { RobotSettingsNetworking } from '../RobotSettingsNetworking'
@@ -26,15 +40,17 @@ import type { ComponentProps } from 'react'
 import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'
 import type { State } from '/app/redux/types'
 
+vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/discovery/selectors')
-vi.mock('/app/redux/networking')
 vi.mock('/app/redux/robot-api/selectors')
 vi.mock('/app/resources/networking/hooks')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../ConnectNetwork/DisconnectModal')
 vi.mock('/app/resources/devices/hooks/useIsEstopNotDisengaged')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
-const getNetworkInterfaces = Networking.getNetworkInterfaces
 const ROBOT_NAME = 'otie'
 
 const render = (
@@ -57,25 +73,39 @@ const initialMockWifi = {
   ipAddress: '127.0.0.100',
   subnetMask: '255.255.255.230',
   macAddress: 'WI:FI:00:00:00:00',
-  type: Networking.INTERFACE_WIFI,
+  type: INTERFACE_WIFI,
 }
 
 const initialMockEthernet = {
   ipAddress: '127.0.0.101',
   subnetMask: '255.255.255.231',
   macAddress: 'US:B0:00:00:00:00',
-  type: Networking.INTERFACE_ETHERNET,
+  type: INTERFACE_ETHERNET,
 }
 
 const mockWifiList = [
-  { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },
-  { ...Fixtures.mockWifiNetwork, ssid: 'bar', active: false },
+  { ...mockWifiNetwork, ssid: 'foo', active: true },
+  { ...mockWifiNetwork, ssid: 'bar', active: false },
 ]
 
 describe('RobotSettingsNetworking', () => {
   vi.useFakeTimers()
 
   beforeEach(() => {
+    vi.mocked(useWifiKeysQuery).mockReturnValue({ data: { keys: [] } } as any)
+    vi.mocked(useEapOptionsQuery).mockReturnValue({
+      data: { options: [] },
+    } as any)
+    vi.mocked(usePostWifiConfigureMutation).mockReturnValue({
+      postWifiConfigure: vi.fn(),
+      mutate: vi.fn(),
+      reset: vi.fn(),
+      isLoading: false,
+      isSuccess: false,
+      isError: false,
+      error: null,
+      status: 'idle',
+    } as any)
     when(getRobotAddressesByName)
       .calledWith({} as State, ROBOT_NAME)
       .thenReturn([
@@ -88,12 +118,10 @@ describe('RobotSettingsNetworking', () => {
           healthStatus: HEALTH_STATUS_OK,
         } as DiscoveryClientRobotAddress,
       ])
-    when(getNetworkInterfaces)
-      .calledWith({} as State, ROBOT_NAME)
-      .thenReturn({
-        wifi: initialMockWifi,
-        ethernet: initialMockEthernet,
-      })
+    when(useNetworkInterfaces).calledWith(ROBOT_NAME, 5000).thenReturn({
+      wifi: initialMockWifi,
+      ethernet: initialMockEthernet,
+    })
 
     when(useWifiList).calledWith(ROBOT_NAME, 10000).thenReturn(mockWifiList)
 
@@ -191,10 +219,10 @@ describe('RobotSettingsNetworking', () => {
       ipAddress: '1.2.3.4',
       subnetMask: '255.255.255.123',
       macAddress: '00:00:00:00:00:00',
-      type: Networking.INTERFACE_WIFI,
+      type: INTERFACE_WIFI,
     }
-    when(getNetworkInterfaces)
-      .calledWith({} as State, ROBOT_NAME)
+    when(useNetworkInterfaces)
+      .calledWith(ROBOT_NAME, 5000)
       .thenReturn({ wifi: mockWiFi, ethernet: null })
     when(getRobotAddressesByName)
       .calledWith({} as State, ROBOT_NAME)
@@ -231,14 +259,12 @@ describe('RobotSettingsNetworking', () => {
       ipAddress: '5.6.7.8',
       subnetMask: '255.255.255.124',
       macAddress: '00:00:00:00:00:00',
-      type: Networking.INTERFACE_ETHERNET,
+      type: INTERFACE_ETHERNET,
     }
-    when(getNetworkInterfaces)
-      .calledWith({} as State, ROBOT_NAME)
-      .thenReturn({
-        wifi: null,
-        ethernet: mockWiredUSB,
-      })
+    when(useNetworkInterfaces).calledWith(ROBOT_NAME, 5000).thenReturn({
+      wifi: null,
+      ethernet: mockWiredUSB,
+    })
     when(getRobotAddressesByName)
       .calledWith({} as State, ROBOT_NAME)
       .thenReturn([
@@ -270,12 +296,10 @@ describe('RobotSettingsNetworking', () => {
   })
 
   it('should render Wi-Fi and Wired USB are not connected for OT-2', () => {
-    when(getNetworkInterfaces)
-      .calledWith({} as State, ROBOT_NAME)
-      .thenReturn({
-        wifi: null,
-        ethernet: null,
-      })
+    when(useNetworkInterfaces).calledWith(ROBOT_NAME, 5000).thenReturn({
+      wifi: null,
+      ethernet: null,
+    })
     when(useWifiList).calledWith(ROBOT_NAME).thenReturn([])
     render()
 

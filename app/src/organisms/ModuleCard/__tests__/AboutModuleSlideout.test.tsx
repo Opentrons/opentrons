@@ -2,6 +2,11 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  mockMagneticModule,
+  mockMagneticModuleGen2,
+  mockTemperatureModule,
+  mockTemperatureModuleGen2,
+  mockThermocycler,
   RUN_STATUS_FINISHING,
   RUN_STATUS_IDLE,
   RUN_STATUS_RUNNING,
@@ -10,13 +15,6 @@ import {
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
-import {
-  mockMagneticModule,
-  mockMagneticModuleGen2,
-  mockTemperatureModule,
-  mockTemperatureModuleGen2,
-  mockThermocycler,
-} from '/app/redux/modules/__fixtures__'
 
 import { AboutModuleSlideout } from '../AboutModuleSlideout'
 

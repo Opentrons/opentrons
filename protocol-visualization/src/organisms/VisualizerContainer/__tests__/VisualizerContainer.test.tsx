@@ -77,6 +77,7 @@ describe('ProtocolVisualization', () => {
     props = {
       analysis: mockAnalysis,
       groupedCommands: [],
+      appType: 'web',
     }
     vi.mocked(PlayBackControls).mockReturnValue(
       <div>mock PlayBackControls</div>

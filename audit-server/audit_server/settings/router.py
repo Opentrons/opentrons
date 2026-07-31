@@ -11,6 +11,7 @@ from typing import Annotated
 
 import fastapi
 
+from server_utils.audit.fastapi import get_audit_logger, skip_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.models.json_api import (
@@ -66,6 +67,7 @@ async def get_logging_enabled_settings(  # noqa: D103
     path="/audit/internal/loggingEnabled",
     summary="Change the logging-enabled setting",
     description="Enable or disable audit logging.",
+    dependencies=[fastapi.Depends(skip_audit_logger)],
 )
 async def patch_logging_enabled_settings(  # noqa: D103
     request_body: RequestModel[PatchLoggingEnabledRequestData],
@@ -132,7 +134,10 @@ async def get_settings(  # noqa: D103
         Only fields present in the request body are updated. The new settings
         are returned.
         """),
-    dependencies=[fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE)),
+        fastapi.Depends(get_audit_logger("update audit settings")),
+    ],
 )
 async def patch_settings(  # noqa: D103
     request_body: RequestModel[PatchSettingsRequestData],
@@ -154,7 +159,10 @@ async def patch_settings(  # noqa: D103
 
         The new settings are returned.
         """),
-    dependencies=[fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE)),
+        fastapi.Depends(get_audit_logger("reset audit settings")),
+    ],
 )
 async def delete_settings(  # noqa: D103
     settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],

@@ -29,11 +29,11 @@ import { SubmitPrimaryButton } from '/app/atoms/buttons'
 import { Slideout } from '/app/atoms/Slideout'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
+import type { MagneticModule } from '@opentrons/api-client'
 import type {
   MagneticModuleEngageMagnetCreateCommand,
   MagneticModuleModel,
 } from '@opentrons/shared-data'
-import type { MagneticModule } from '/app/redux/modules/types'
 
 interface ModelContents {
   version: string

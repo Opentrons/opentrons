@@ -10,7 +10,7 @@ import { ModuleIcon } from './index'
 
 import type { Meta, Story } from '@storybook/react'
 import type * as React from 'react'
-import type { AttachedModule } from '/app/redux/modules/types'
+import type { AttachedModule } from '@opentrons/api-client'
 
 export default {
   title: 'App/Molecules/ModuleIcon',

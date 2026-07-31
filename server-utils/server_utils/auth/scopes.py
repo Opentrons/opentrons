@@ -52,6 +52,11 @@ class Scope(enum.Enum):
         "Edit robot settings for which there is no more specific scope.",
     )
 
+    SYSTEM_TIME_WRITE = (
+        "system_time.write",
+        "Set the robot's system clock.",
+    )
+
     RUN_DATA_WRITE = (
         "run_data.write",
         (
@@ -92,6 +97,11 @@ class Scope(enum.Enum):
     USERS_WRITE = (
         "users.write",
         "Create, update, and delete users.",
+    )
+
+    AUDIT_LOG_WRITE = (
+        "audit_log.write",
+        "Write arbitrary audit logs.",
     )
 
     _description: str

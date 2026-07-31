@@ -1,8 +1,10 @@
 """Code for managing log period rotation and storage."""
 
+import secrets
 from asyncio import Lock
 from datetime import datetime, timezone
 from logging import getLogger
+from typing import Final
 
 from opentrons_shared_data.errors.exceptions import (
     AuditLoggingError,
@@ -16,13 +18,17 @@ from server_utils.keys.key_server import SignMessageData
 from . import constants
 from .models import LogPeriodSummary
 from .store import LogStore, NoActivePeriodError, NoLogInPeriodError
-from .types import StoredLog
+from .types import LogPeriodEntries, StoredLog
 from audit_server.log_ingest.models import AuditLogMessage
 from audit_server.settings.store import (
     SettingsStore,
 )
 
 LOG = getLogger(__name__)
+
+# Number of random bytes behind each deletion key. urlsafe encoding produces a
+# longer string than this byte count.
+_DELETION_KEY_BYTES: Final = 32
 
 
 class _GetTime:
@@ -45,6 +51,10 @@ class LogDataManager:
         self._settings = settings_store
         self._time = time_getter or _GetTime()
         self._lock = Lock()
+        # One-time deletion keys, mapping a minted key to the id of the log
+        # period it authorizes deleting. Held in memory only: keys are not
+        # persisted and do not survive a process restart.
+        self._deletion_keys: dict[str, str] = {}
 
     async def rotate_periods(self) -> str:
         """End the previous log period and start a new one.
@@ -70,6 +80,21 @@ class LogDataManager:
     def get_log_periods(self) -> list[LogPeriodSummary]:
         """Get a list of log periods, active or inactive."""
         return self._store.list_periods()
+
+    def get_period_entries(self, period_id: str) -> LogPeriodEntries:
+        """Get the given log period's user and robot log entries."""
+        return self._store.get_period_entries(period_id)
+
+    def create_deletion_key(self, period_id: str) -> str:
+        """Mint a new one-time deletion key linked to a log period.
+
+        Keys are held in memory only and accumulate: each call mints a new
+        distinct key, and previously issued keys for the same period remain
+        valid.
+        """
+        key = secrets.token_urlsafe(_DELETION_KEY_BYTES)
+        self._deletion_keys[key] = period_id
+        return key
 
     async def _do_store_log(self, log_message: str) -> str:
         previous_hash = self._store.tail_hash()

@@ -19,6 +19,7 @@ from enum import Enum, auto
 from logging.config import dictConfig
 from typing import AsyncGenerator, Optional, Set, TextIO, Tuple, Type, Union
 
+from opentrons_hardware.drivers.binary_usb import BinaryMessenger, SerialUsbDriver
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
@@ -243,7 +244,9 @@ async def _do_test(
     messenger = CanMessenger(driver)
     messenger.start()
     warner = WarningsWithCooldown()
-    network_info = NetworkInfo(messenger)
+    usb_driver = SerialUsbDriver(asyncio.get_running_loop())
+    usb_messenger = BinaryMessenger(usb_driver)
+    network_info = NetworkInfo(messenger, usb_messenger)
     present = set(await network_info.probe(None, 1))
     if not present and mode != StimulusMode.ONE_TO_NONE:
         raise RuntimeError(

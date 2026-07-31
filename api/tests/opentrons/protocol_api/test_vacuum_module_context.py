@@ -256,6 +256,7 @@ def test_vacuum_module_start_set_vacuum_pressure(
             ramp_rate=ramp_rate,
             timeout_s=timeout_s,
             vent_after=vent_after,
+            equalize_timeout_s=None,
         )
     )
 
@@ -290,6 +291,7 @@ def test_vacuum_module_start_set_vacuum_power(
             ramp_rate=ramp_rate,
             timeout_s=timeout_s,
             vent_after=vent_after,
+            equalize_timeout_s=None,
         )
     )
 
@@ -399,6 +401,9 @@ def test_vacuum_module_start_execute_profile(
 
     decoy.verify(
         mock_core.start_execute_profile(
-            steps=expected_core_steps, repetitions=repetitions, vent_after=False
+            steps=expected_core_steps,
+            repetitions=repetitions,
+            vent_after=False,
+            equalize_timeout_s=None,
         )
     )

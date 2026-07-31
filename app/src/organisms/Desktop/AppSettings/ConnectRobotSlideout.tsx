@@ -55,7 +55,6 @@ export function ConnectRobotSlideout({
         role="button"
         css={TYPOGRAPHY.linkPSemiBold}
         onClick={refreshDiscovery}
-        id="AppSettings_Connection_Button"
         textTransform={TYPOGRAPHY.textTransformCapitalize}
       >
         {buttonLabel}
@@ -88,7 +87,6 @@ export function ConnectRobotSlideout({
         <ExternalLink
           href={SUPPORT_PAGE_LINK}
           css={TYPOGRAPHY.pSemiBold}
-          id="ConnectIPAddressSupportPage"
           marginTop={SPACING.spacing16}
         >
           {t('connect_ip_link')}

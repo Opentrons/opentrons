@@ -8,6 +8,10 @@ import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
+import {
+  useDeleteSelectedRuns,
+  useDownloadSelectedRuns,
+} from '/app/resources/devices'
 import { useNotifyAllRunsQuery, useRunStatuses } from '/app/resources/runs'
 
 import { RecentProtocolRuns } from '../../RecentProtocolRuns'
@@ -18,7 +22,9 @@ import type { UseQueryResult } from 'react-query'
 import type { Protocols, Runs } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/local-resources/access-control/useDocumentationState')
 vi.mock('/app/redux-resources/robots')
+vi.mock('/app/resources/devices')
 vi.mock('/app/resources/runs')
 vi.mock('../HistoricalProtocolRun')
 
@@ -27,6 +33,8 @@ const render = () => {
     i18nInstance: i18n,
   })
 }
+const mockDownloadRuns = vi.fn()
+const mockDeleteRuns = vi.fn()
 
 describe('RecentProtocolRuns', () => {
   beforeEach(() => {
@@ -39,6 +47,15 @@ describe('RecentProtocolRuns', () => {
     vi.mocked(HistoricalProtocolRun).mockReturnValue(
       <div>mock HistoricalProtocolRun</div>
     )
+    vi.mocked(useDownloadSelectedRuns).mockReturnValue({
+      downloadRuns: mockDownloadRuns,
+      isDownloading: false,
+      hasError: false,
+    })
+    vi.mocked(useDeleteSelectedRuns).mockReturnValue({
+      deleteSelectedRuns: mockDeleteRuns,
+      deletingIds: new Set(),
+    })
   })
 
   it('renders an empty state message when robot is not on the network', () => {

@@ -1,6 +1,8 @@
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
 import {
   ConnectingNetwork,
@@ -8,15 +10,18 @@ import {
   WifiConnectionDetails,
 } from '/app/organisms/ODD/NetworkSettings'
 import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
-import * as RobotApi from '/app/redux/robot-api'
 
+import type { AxiosError } from 'axios'
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { RequestState } from '/app/redux/robot-api/types'
 import type { WifiScreenOption } from './'
 
 interface WifiConnectStatusProps {
   handleConnect: () => void
-  requestState: RequestState | null
+  isPending: boolean
+  isSuccess: boolean
+  isError: boolean
+  error: AxiosError | null
+  resetConfigure: () => void
   selectedSsid: string
   setCurrentOption: (option: WifiScreenOption) => void
   selectedAuthType: WifiSecurityType
@@ -24,23 +29,40 @@ interface WifiConnectStatusProps {
 
 export function WifiConnectStatus({
   handleConnect,
-  requestState,
+  isPending,
+  isSuccess,
+  isError,
+  error,
+  resetConfigure,
   setCurrentOption,
   selectedSsid,
   selectedAuthType,
 }: WifiConnectStatusProps): JSX.Element | null {
   const { t } = useTranslation('device_settings')
+  const isDocumentedCancel =
+    isError && error != null && isDocumentedMutationError(error)
 
-  if (requestState == null) {
+  useEffect(() => {
+    if (isDocumentedCancel) {
+      resetConfigure()
+      setCurrentOption(
+        selectedAuthType === 'none' ? 'SelectAuthType' : 'SetWifiCred'
+      )
+    }
+  }, [isDocumentedCancel, resetConfigure, selectedAuthType, setCurrentOption])
+
+  if (isDocumentedCancel) {
     return null
-  } else if (requestState.status === RobotApi.PENDING) {
+  } else if (isPending) {
     return (
       <Flex padding={SPACING.spacing40} flex="1">
         <ConnectingNetwork ssid={selectedSsid} />
       </Flex>
     )
-  } else if (requestState.status === RobotApi.FAILURE) {
-    const isInvalidPassword = requestState.response.status === 401
+  } else if (isError && error != null) {
+    const isInvalidPassword = error.response?.status === 401
+    const errorMessage =
+      error.message != null && error.message.length > 0 ? error.message : null
     return (
       <>
         <RobotSetupHeader header={t('wifi')} />
@@ -51,7 +73,7 @@ export function WifiConnectStatus({
           paddingTop={SPACING.spacing32}
         >
           <FailedToConnect
-            requestState={requestState}
+            errorMessage={errorMessage}
             selectedSsid={selectedSsid}
             handleTryAgain={() => {
               isInvalidPassword
@@ -66,7 +88,7 @@ export function WifiConnectStatus({
         </Flex>
       </>
     )
-  } else if (requestState.status === RobotApi.SUCCESS) {
+  } else if (isSuccess) {
     return (
       <WifiConnectionDetails ssid={selectedSsid} authType={selectedAuthType} />
     )

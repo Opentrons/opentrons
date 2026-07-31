@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import { css } from 'styled-components'
 
@@ -20,15 +20,15 @@ import FLEX_PNG from '/app/assets/images/FLEX.png'
 import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 import { MiniCard } from '/app/molecules/MiniCard'
 import { getRobotModelByName, OPENTRONS_USB } from '/app/redux/discovery'
-import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
+import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
 import type { Dispatch as ReactDispatch } from 'react'
 import type { Runs } from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
 import type { Robot } from '/app/redux/discovery/types'
-import type { Dispatch, State } from '/app/redux/types'
+import type { State } from '/app/redux/types'
 import type { RobotBusyStatusAction } from '.'
 
 interface AvailableRobotOptionProps {
@@ -55,7 +55,6 @@ export function AvailableRobotOption(
   } = props
   const { ip, local, name: robotName } = robot ?? {}
   const { t } = useTranslation(['protocol_list', 'branded'])
-  const dispatch = useDispatch<Dispatch>()
   const robotModel = useSelector((state: State) =>
     getRobotModelByName(state, robotName)
   )
@@ -100,9 +99,7 @@ export function AvailableRobotOption(
     }
   )
 
-  const { ethernet, wifi } = useSelector((state: State) =>
-    getNetworkInterfaces(state, robotName)
-  )
+  const { ethernet, wifi } = useNetworkInterfaces(robotName)
 
   let iconName: IconName | null = null
   if (ethernet?.ipAddress != null) {
@@ -112,15 +109,6 @@ export function AvailableRobotOption(
   } else if (local != null && local) {
     iconName = 'usb'
   }
-
-  useEffect(
-    () => {
-      dispatch(fetchStatus(robotName))
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
 
   return showIdleOnly && isBusy ? null : (
     <>

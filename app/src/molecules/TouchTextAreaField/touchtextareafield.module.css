@@ -4,8 +4,8 @@
   align-items: center;
 }
 
-.warning_color {
-  color: var(--yellow-60);
+.error_color {
+  color: var(--red-50);
 }
 
 .default_color {
@@ -83,6 +83,10 @@
   font-size: var(--font-size-h3);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-20);
+}
+
+.label_text_error {
+  color: var(--red-50);
 }
 
 .label_text_left {

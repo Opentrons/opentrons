@@ -43,7 +43,10 @@ async def test_start_run_profile(
 ) -> None:
     """It should be able to execute the specified module's profile run."""
     subject = StartRunProfileImpl(
-        state_view=state_view, equipment=equipment, task_handler=real_task_handler
+        state_view=state_view,
+        equipment=equipment,
+        task_handler=real_task_handler,
+        model_utils=model_utils,
     )
 
     cycle_power_step = VacuumModuleProfilePowerStep(
@@ -189,8 +192,81 @@ async def test_start_run_profile(
     expected_state_update.update_vacuum_module_pump_engaged(
         "input-vacuum_module-id", False
     )
+    # ventAfter without equalizeTimeout → residual vacuum remains
+    expected_state_update.update_vacuum_module_residual_vacuum(
+        "input-vacuum_module-id", residual_vacuum=True
+    )
 
     assert result == SuccessData(
         public=expected_result,
         state_update=expected_state_update,
     )
+
+
+async def test_start_run_profile_waits_to_equalize(
+    decoy: Decoy,
+    state_view: StateView,
+    equipment: EquipmentHandler,
+    real_task_handler: TaskHandler,
+    action_dispatcher: ActionDispatcher,
+    model_utils: ModelUtils,
+) -> None:
+    """It should wait for pressure equalization after the profile when configured."""
+    subject = StartRunProfileImpl(
+        state_view=state_view,
+        equipment=equipment,
+        task_handler=real_task_handler,
+        model_utils=model_utils,
+    )
+
+    step_data: ProfileType = [
+        VacuumModuleProfilePressureStep(
+            enablePump=True,
+            holdTimeSeconds=10,
+            gaugePressureMbar=-200,
+        ),
+    ]
+
+    data = StartRunProfileParams(
+        moduleId="input-vacuum_module-id",
+        profile=step_data,
+        ventAfter=True,
+        equalizeTimeout=30,
+        taskId="task-id",
+    )
+
+    vm_module_substate = decoy.mock(cls=VacuumModuleSubState)
+    vm_hardware = decoy.mock(cls=VacuumModule)
+
+    decoy.when(
+        state_view.modules.get_vacuum_module_substate("input-vacuum_module-id")
+    ).then_return(vm_module_substate)
+    decoy.when(vm_module_substate.module_id).then_return(
+        VacuumModuleId("vacuum-module-id")
+    )
+    decoy.when(model_utils.ensure_id("task-id")).then_return("task-id")
+    decoy.when(
+        equipment.get_module_hardware_api(VacuumModuleId("vacuum-module-id"))
+    ).then_return(vm_hardware)
+    decoy.when(vm_hardware.pump_running).then_return(False)
+
+    task: Task | None = None
+
+    def _capture_task(action: Action) -> None:
+        nonlocal task
+        assert isinstance(action, StartTaskAction)
+        task = action.task
+
+    decoy.when(
+        action_dispatcher.dispatch(StartTaskAction(task=matchers.Anything()))  # type: ignore[func-returns-value]
+    ).then_do(_capture_task)
+
+    result = await subject.execute(data)
+    assert task is not None
+    await task.asyncioTask
+
+    decoy.verify(
+        await vm_hardware.wait_for_pressure_equalization(30),
+        times=1,
+    )
+    assert result.public.taskId == "task-id"

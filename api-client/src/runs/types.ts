@@ -71,6 +71,7 @@ export interface LegacyGoodRunData {
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
   cameraSettings?: CameraData
+  signedBy?: string
 }
 
 export interface KnownGoodRunData extends LegacyGoodRunData {
@@ -250,8 +251,4 @@ export interface FlexStackerState {
   lidLabwareURI?: string
   count: number
   maxCount: number
-}
-
-export interface DeleteRunData {
-  shouldDeleteAllRunFiles?: boolean
 }

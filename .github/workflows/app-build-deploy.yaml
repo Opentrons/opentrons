@@ -25,7 +25,7 @@ jobs:
       variants: ${{ steps.determine-build-type.outputs.variants }}
       type: ${{ steps.determine-build-type.outputs.type }}
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ./.github/actions/app/determine-build-type
         id: determine-build-type
         with:
@@ -65,8 +65,9 @@ jobs:
              echo "bucket=${{env._APP_DEPLOY_BUCKET_OT3}}" >> $GITHUB_OUTPUT
              echo "folder=${{env._APP_DEPLOY_FOLDER_OT3}}" >> $GITHUB_OUTPUT
           fi
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
+          # So the build can extract the version number from Git history.
           fetch-depth: 0
       - uses: ./.github/actions/js/setup
       - uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4.9.1
@@ -274,7 +275,7 @@ jobs:
           mkdir -p ${{ runner.temp }}/upload_backup
           mv to_upload_* ${{ runner.temp }}/upload_backup/ 2>/dev/null || true
       - name: 'pull repo for scripts'
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'restore upload folders after checkout'
         run: |
           mv ${{ runner.temp }}/upload_backup/to_upload_* ./ 2>/dev/null || true

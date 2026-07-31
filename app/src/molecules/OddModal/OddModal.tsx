@@ -26,6 +26,8 @@ interface OddModalProps extends StyleProps {
   header?: OddModalHeaderBaseProps
   /** optional zIndex for the modal */
   modalZIndex?: number
+  /** optional className for the modal */
+  modalClassName?: string
 }
 /**
  * For ODD use only.
@@ -37,6 +39,7 @@ export function OddModal(props: OddModalProps): JSX.Element {
     children,
     header,
     modalZIndex,
+    modalClassName,
     ...styleProps
   } = props
 
@@ -76,6 +79,7 @@ export function OddModal(props: OddModalProps): JSX.Element {
         onClick={(e: MouseEvent) => {
           e.stopPropagation()
         }}
+        className={modalClassName}
       >
         {header != null ? (
           <OddModalHeader {...header} onClick={onOutsideClick} />

@@ -8,7 +8,7 @@ from pathlib import Path
 from types import TracebackType
 from typing import Any, Optional, Set, Tuple, Type
 
-from ..gpio import OT3GPIO
+from ..gpio import RemoteOT3GPIO
 from .types import (
     EEPROMData,
     Property,
@@ -36,7 +36,7 @@ class EEPROMDriver:
 
     def __init__(
         self,
-        gpio: OT3GPIO,
+        gpio: RemoteOT3GPIO,
         bus: Optional[int] = DEFAULT_BUS,
         address: Optional[str] = DEFAULT_ADDRESS,
         eeprom_path: Optional[Path] = None,

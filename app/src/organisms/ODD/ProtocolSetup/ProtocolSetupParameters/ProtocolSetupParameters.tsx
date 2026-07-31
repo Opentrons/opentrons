@@ -11,6 +11,7 @@ import {
 } from '@opentrons/components'
 import {
   getQueryKey,
+  isDocumentedMutationError,
   useCreateProtocolAnalysisMutation,
   useCreateRunMutation,
   useHost,
@@ -174,9 +175,13 @@ export function ProtocolSetupParameters({
   const { createProtocolAnalysis, isLoading: isAnalysisLoading } =
     useCreateProtocolAnalysisMutation(protocolId, host)
 
-  const { uploadCsvFile } = useUploadCsvFileMutation({}, host)
-
   const documentationState = useDocumentationState()
+
+  const { uploadCsvFile } = useUploadCsvFileMutation(
+    documentationState,
+    {},
+    host
+  )
 
   const { createRun, isLoading: isRunLoading } = useCreateRunMutation(
     documentationState,
@@ -188,7 +193,14 @@ export function ProtocolSetupParameters({
             console.error(`could not invalidate runs cache: ${e.message}`)
           })
       },
-    }
+      onError: error => {
+        if (isDocumentedMutationError(error)) {
+          setStartSetup(false)
+        }
+      },
+    },
+    undefined,
+    ['confirm_parameters']
   )
   const handleConfirmValues = (): void => {
     if (hasMissingFileParam) {
@@ -219,37 +231,44 @@ export function ProtocolSetupParameters({
           const varName = Promise.resolve(key)
           return Promise.all([fileResponse, varName])
         })
-      ).then(responseTuples => {
-        const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
-          Record<string, string>
-        >((acc, [uploadedFileResponse, variableName]) => {
-          return { ...acc, [variableName]: uploadedFileResponse.data.id }
-        }, {})
-        const runTimeParameterValues = getRunTimeParameterValuesForRun(
-          runTimeParametersOverrides
-        )
-        const runTimeParameterFiles = getRunTimeParameterFilesForRun(
-          runTimeParametersOverrides,
-          mappedResolvedCsvVariableToFileId
-        )
-        setStartSetup(true)
-        createProtocolAnalysis(
-          {
-            protocolKey: protocolId,
-            runTimeParameterValues,
-            runTimeParameterFiles,
-          },
-          {
-            onSuccess: () => {
-              createRun({
-                protocolId,
-                runTimeParameterValues,
-                runTimeParameterFiles,
-              })
+      )
+        .then(responseTuples => {
+          const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
+            Record<string, string>
+          >((acc, [uploadedFileResponse, variableName]) => {
+            return { ...acc, [variableName]: uploadedFileResponse.data.id }
+          }, {})
+          const runTimeParameterValues = getRunTimeParameterValuesForRun(
+            runTimeParametersOverrides
+          )
+          const runTimeParameterFiles = getRunTimeParameterFilesForRun(
+            runTimeParametersOverrides,
+            mappedResolvedCsvVariableToFileId
+          )
+          setStartSetup(true)
+          createProtocolAnalysis(
+            {
+              protocolKey: protocolId,
+              runTimeParameterValues,
+              runTimeParameterFiles,
             },
+            {
+              onSuccess: () => {
+                createRun({
+                  protocolId,
+                  runTimeParameterValues,
+                  runTimeParameterFiles,
+                })
+              },
+            }
+          )
+        })
+        .catch((error: unknown) => {
+          setStartSetup(false)
+          if (!isDocumentedMutationError(error)) {
+            throw error
           }
-        )
-      })
+        })
     }
   }
 

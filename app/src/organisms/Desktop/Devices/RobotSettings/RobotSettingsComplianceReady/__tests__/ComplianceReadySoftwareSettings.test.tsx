@@ -14,9 +14,11 @@ import {
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 
 import { UI_ONLY_FIELD_IDS } from '../complianceReadySettingsTypes'
 import { ComplianceReadySoftwareSettings } from '../ComplianceReadySoftwareSettings'
+import { RobotSettingsComplianceReady } from '../index'
 
 import type { RenderResult } from '@testing-library/react'
 import type {
@@ -24,6 +26,8 @@ import type {
   AuthSettingsResponse,
   RobotServerAccessControlSettingsResponse,
 } from '@opentrons/api-client'
+
+const ROBOT_NAME = 'flex-1'
 
 const MOCK_AUTH_SETTINGS: AuthSettingsResponse = {
   data: {
@@ -78,6 +82,13 @@ const COMPLIANCE_READY_FIELD_IDS = [
 ]
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
+
+vi.mock('../PersonalAccountSettings', () => ({
+  PersonalAccountSettings: () => null,
+}))
 
 const mockPatchAuthSettings = vi.fn()
 const mockPatchAuditSettings = vi.fn()
@@ -88,7 +99,7 @@ let unmountPreviousRender: (() => void) | undefined
 const render = (): RenderResult => {
   unmountPreviousRender?.()
   const [view] = renderWithProviders(
-    <ComplianceReadySoftwareSettings robotName="flex-1" />,
+    <ComplianceReadySoftwareSettings robotName={ROBOT_NAME} />,
     {
       i18nInstance: i18n,
     }
@@ -103,6 +114,29 @@ const expandAccordion = (): void => {
       name: 'Compliance Ready Software settings',
     })
   )
+}
+
+const renderPage = (username: string, accountType: 'admin' | 'user'): void => {
+  renderWithProviders(<RobotSettingsComplianceReady robotName={ROBOT_NAME} />, {
+    i18nInstance: i18n,
+    initialState: {
+      robotAuth: {
+        perRobotAuthStates: {
+          [ROBOT_NAME]: {
+            user: {
+              username,
+              fullName: 'Test User',
+              accountType,
+            },
+            accessToken: 'access-token',
+            refreshToken: 'refresh-token',
+            expiresAt: null,
+          },
+        },
+        mostRecentRobotName: ROBOT_NAME,
+      },
+    } as any,
+  })
 }
 
 describe('ComplianceReadySoftwareSettings', () => {
@@ -306,5 +340,53 @@ describe('ComplianceReadySoftwareSettings', () => {
         data: { minLengthOfReasonForInteraction: 10 },
       })
     })
+  })
+  it('should not patch idleLogout when blurred value is not greater than zero', async () => {
+    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+      data: {
+        data: {
+          ...MOCK_AUTH_SETTINGS.data,
+          idleLogout: 300,
+        },
+      },
+    } as ReturnType<typeof useAuthSettingsQuery>)
+
+    render()
+    expandAccordion()
+
+    const idleLogoutField = screen.getByLabelText(
+      'Length of time for auto-logout due to inactivity'
+    )
+    expect(idleLogoutField).toHaveValue(5)
+
+    fireEvent.change(idleLogoutField, { target: { value: '0' } })
+    fireEvent.blur(idleLogoutField)
+
+    await waitFor(() => {
+      screen.getByText('Must be greater than 0 minutes')
+    })
+
+    expect(mockPatchAuthSettings).not.toHaveBeenCalled()
+    expect(idleLogoutField).toHaveValue(0)
+  })
+})
+
+describe('RobotSettingsComplianceReady', () => {
+  it('hides admin sections for non-admin users', () => {
+    renderPage('regular-user', 'user')
+
+    expect(screen.queryByText('User management')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', {
+        name: 'Compliance Ready Software settings',
+      })
+    ).not.toBeInTheDocument()
+  })
+
+  it('shows admin sections for admin users', () => {
+    renderPage('admin', 'admin')
+
+    screen.getByText('User management')
+    screen.getByRole('button', { name: 'Compliance Ready Software settings' })
   })
 })

@@ -47,5 +47,7 @@ export const DocumentationRequired: Story = {
     username: 'John Doe',
     onBack: action('onBack'),
     onConfirm: action('onConfirm'),
+    minReportLength: 10,
+    actionsToDocument: [],
   },
 }

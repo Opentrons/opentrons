@@ -6,8 +6,12 @@ import pytest
 from pydantic import BaseModel
 
 from opentrons_shared_data.errors.exceptions import (
+    EnumeratedError,
     PythonException,
     RobotInUseError,
+    VacuumModulePressureNotReachedError,
+    VacuumModuleUnknownError,
+    VacuumModuleWasteFullError,
 )
 
 from opentrons.hardware_control.types import CriticalPoint
@@ -15,8 +19,8 @@ from opentrons.protocol_engine.types.module import ModuleModel
 from opentrons.types import DeckSlotName
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
-    _enumerated_error_class_to_dict,
-    _enumerated_error_dict_to_class,
+    enumerated_error_class_to_dict,
+    enumerated_error_dict_to_class,
 )
 
 
@@ -100,15 +104,22 @@ def test_pydantic_serialization() -> None:
     assert result == test_model
 
 
-def test_enumerated_error_serialization() -> None:
-    """It should serialize and deserialize the error."""
-    test_error = RobotInUseError(
-        message="Uh oh",
-        detail={"ruh": "roh"},
-        wrapping=[PythonException(exc=RuntimeError("foo"))],
-    )
-
-    test_dict = _enumerated_error_class_to_dict(test_error)
+@pytest.mark.parametrize(
+    "test_error",
+    [
+        RobotInUseError(
+            message="Uh oh",
+            detail={"ruh": "roh"},
+            wrapping=[PythonException(exc=RuntimeError("foo"))],
+        ),
+        VacuumModuleUnknownError("VM123", "pressure", -100.0, -75.0),
+        VacuumModulePressureNotReachedError("VM123", "pressure", -100.0, -75.0),
+        VacuumModuleWasteFullError("VM123", "pressure", 0.0, 0.0),
+    ],
+)
+def test_enumerated_error_serialization(test_error: EnumeratedError) -> None:
+    """It should serialize and deserialize enumerated errors for Pyro."""
+    test_dict = enumerated_error_class_to_dict(test_error)
 
     assert test_dict.get("bytes") is not None
     assert (
@@ -116,6 +127,6 @@ def test_enumerated_error_serialization() -> None:
         == "opentrons_shared_data.errors.exceptions.EnumeratedError"
     )
 
-    result = _enumerated_error_dict_to_class("", test_dict)
+    result = enumerated_error_dict_to_class("", test_dict)
 
     assert result == test_error

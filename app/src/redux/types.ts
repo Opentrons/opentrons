@@ -13,8 +13,6 @@ import type {
   CustomLabwareState,
 } from './custom-labware/types'
 import type { DiscoveryAction, DiscoveryState } from './discovery/types'
-import type { ModulesAction } from './modules/types'
-import type { NetworkingAction, NetworkingState } from './networking/types'
 import type { ProtocolAnalysisAction } from './protocol-analysis'
 import type { ProtocolRunAction, ProtocolRunState } from './protocol-runs/types'
 import type {
@@ -24,10 +22,6 @@ import type {
 import type { RobotAdminAction, RobotAdminState } from './robot-admin/types'
 import type { RobotApiAction, RobotApiState } from './robot-api/types'
 import type { RobotAuthAction, RobotAuthState } from './robot-auth'
-import type {
-  RobotSettingsAction,
-  RobotSettingsState,
-} from './robot-settings/types'
 import type { RobotUpdateAction, RobotUpdateState } from './robot-update/types'
 import type { SessionsAction, SessionState } from './sessions/types'
 import type {
@@ -42,11 +36,9 @@ export interface State {
   readonly robotApi: RobotApiState
   readonly robotAuth: RobotAuthState
   readonly robotAdmin: RobotAdminState
-  readonly robotSettings: RobotSettingsState
   readonly robotUpdate: RobotUpdateState
   readonly config: ConfigState
   readonly discovery: DiscoveryState
-  readonly networking: NetworkingState
   readonly labware: CustomLabwareState
   readonly shell: ShellState
   readonly systemInfo: SystemInfoState
@@ -62,9 +54,7 @@ export type Action =
   | RobotApiAction
   | RobotAdminAction
   | RobotAuthAction
-  | RobotSettingsAction
   | RobotUpdateAction
-  | ModulesAction
   | ShellAction
   | ConfigAction
   | RouterAction
@@ -72,7 +62,6 @@ export type Action =
   | ProtocolAnalysisAction
   | ProtocolStorageAction
   | CustomLabwareAction
-  | NetworkingAction
   | SystemInfoAction
   | AlertsAction
   | SessionsAction

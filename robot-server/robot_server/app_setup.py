@@ -13,10 +13,14 @@ from opentrons import __version__
 from opentrons.config import (
     feature_flags as ff,
 )
-from server_utils.audit.fastapi import build_audit_client, install_audit_client
+from server_utils.audit.fastapi import (
+    audit_logger_middleware,
+    build_audit_client,
+    install_audit_client,
+)
 from server_utils.auth.resource_server.fastapi import (
-    build_authorization_checker,
-    install_authorization_checker,
+    build_authentication_checker,
+    install_authentication_checker,
 )
 from server_utils.fastapi_utils.server_timing_middleware import server_timing_middleware
 
@@ -113,16 +117,19 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         )
         exit_stack.push_async_callback(clean_up_persistence, app.state)
 
-        authorization_checker = await exit_stack.enter_async_context(
-            build_authorization_checker(
+        authentication_checker = await exit_stack.enter_async_context(
+            build_authentication_checker(
                 auth_server_uds=settings.auth_server_uds,
                 auth_server_url=settings.auth_server_url,
             )
         )
-        install_authorization_checker(app.state, authorization_checker)
+        install_authentication_checker(app.state, authentication_checker)
 
         audit_client = await exit_stack.enter_async_context(
-            build_audit_client(audit_server_uds=None, audit_server_url=None)
+            build_audit_client(
+                audit_server_uds=settings.audit_server_uds,
+                audit_server_url=settings.audit_server_url,
+            )
         )
         install_audit_client(app.state, audit_client)
 
@@ -146,7 +153,9 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
         # Start the run process pyro provider so a process is ready when a run starts
         await exit_stack.enter_async_context(
-            set_up_run_process_pyro_provider(app.state)
+            set_up_run_process_pyro_provider(
+                app.state, await authentication_checker.access_control_status()
+            )
         )
 
         yield  # Start handling HTTP requests.
@@ -198,7 +207,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+app.middleware("http")(audit_logger_middleware)
 app.middleware("http")(server_timing_middleware())
 
 # main router

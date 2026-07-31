@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { Modal } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -13,13 +12,13 @@ import {
 import { PlayBackControls } from '../../molecules/PlayBackControls'
 import { CommandSteps } from '../CommandSteps'
 import { DeckView } from '../DeckView'
-import { SlotDetails } from '../SlotDetails'
+import { SlotSpotlightViewer } from '../SlotSpotlightViewer'
 import { StepDetailContainer } from '../StepDetailContainer'
 import styles from './visualizercontainer.module.css'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
-import type { GroupedCommands } from '../../types'
+import type { AppType, GroupedCommands } from '../../types'
 
 const INITIAL_MILLISECONDS_PER_FRAME = 1000
 const INITIAL_WIDTH_PX = 230
@@ -35,13 +34,13 @@ interface ProtocolVisualizationProps {
   analysis: ProtocolAnalysisOutput
   groupedCommands: GroupedCommands | null
   protocolDisplayName?: string
+  appType: AppType
 }
 
 export function ProtocolVisualization(
   props: ProtocolVisualizationProps
-): JSX.Element {
-  const groupedCommands = props.groupedCommands
-  const analysis = props.analysis
+): ReactNode {
+  const { groupedCommands, analysis, appType } = props
   const createdDate = new Date(analysis.createdAt)
   const { commands, robotType, liquids } = analysis
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
@@ -132,40 +131,6 @@ export function ProtocolVisualization(
       clearInterval(intervalId)
     }
   }, [isPlaying, filteredCommands, milliSecondsPerFrame])
-
-  //  update the data for the spotlight window
-  //  whenever the command index changes
-  useEffect(
-    () => {
-      // if (selectedCommandId == null) return
-      //
-      // const nextIndex = commands.findIndex(c => c.id === selectedCommandId)
-      // if (nextIndex < 0) return
-      // const nextSpotlight = {
-      //   slot: selectedSlot,
-      //   command: commands[nextIndex],
-      //   robotState,
-      //   invariantContext,
-      //   analysis,
-      //   liquids,
-      // }
-      // if (nextSpotlight.slot != null && nextSpotlight.command != null) {
-      //   setShowModal(null)
-      //   // dispatch(stepDetailViewerUpdateAction(nextSpotlight))
-      // }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-
-    [
-      selectedCommandId,
-      selectedSlot,
-      robotState,
-      invariantContext,
-      analysis,
-      liquids,
-      commands,
-    ]
-  )
 
   const isThermocyclerAttached = Object.keys(robotState.modules).some(
     id => invariantContext.moduleEntities[id].type === THERMOCYCLER_MODULE_TYPE
@@ -279,36 +244,21 @@ export function ProtocolVisualization(
       window.removeEventListener('mouseup', handleMouseUpRef.current)
     }
   }, [])
-  const [showModal, setShowModal] = useState<boolean>(false)
-  useEffect(() => {
-    if (selectedSlot != null) {
-      setShowModal(true)
-    }
-  }, [selectedSlot])
-  // useEffect(() => {
-  //   return () => {
-  //     dispatch(stepDetailViewerCloseAction({ protocolKey }))
-  //   }
-  // }, [dispatch, protocolKey])
 
   return (
     <>
-      {showModal ? (
-        <Modal
-          type="info"
-          title={'slot details'}
+      {selectedSlot != null ? (
+        <SlotSpotlightViewer
+          appType={appType}
+          slotId={selectedSlot}
+          robotState={robotState}
+          invariantContext={invariantContext}
+          analysis={analysis}
+          liquids={liquids}
           onClose={() => {
-            setShowModal(false)
+            setSelectedSlot(null)
           }}
-        >
-          <SlotDetails
-            slotId={selectedSlot ?? ''}
-            robotState={robotState}
-            invariantContext={invariantContext}
-            analysis={analysis}
-            liquids={liquids}
-          />
-        </Modal>
+        />
       ) : null}
       <div ref={containerRef} className={styles.layout_container}>
         {/* Left Column is resizable */}

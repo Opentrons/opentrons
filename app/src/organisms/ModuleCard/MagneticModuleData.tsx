@@ -8,8 +8,8 @@ import {
   MODULE_INFO_DETAIL_TEXT_STYLE,
 } from './constants'
 
+import type { MagneticStatus } from '@opentrons/api-client'
 import type { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
-import type { MagneticStatus } from '/app/redux/modules/api-types'
 
 interface MagModuleProps {
   moduleStatus: MagneticStatus

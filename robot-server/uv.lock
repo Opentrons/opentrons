@@ -2,13 +2,13 @@ version = 1
 revision = 3
 requires-python = ">=3.11"
 resolution-markers = [
-    "python_full_version >= '3.11' and sys_platform == 'win32'",
-    "python_full_version >= '3.11' and sys_platform != 'win32'",
-    "python_full_version < '3.11'",
+    "sys_platform == 'win32'",
+    "sys_platform != 'win32'",
+    "python_version < '0'",
 ]
 
 [options]
-exclude-newer = "2026-06-17T21:42:30.638302Z"
+exclude-newer = "2026-07-16T17:43:11.888549Z"
 exclude-newer-span = "P1W"
 
 [manifest]
@@ -1978,6 +1978,7 @@ dev = [
     { name = "pytest-asyncio", specifier = ">=1,<2" },
     { name = "pytest-cov", specifier = "==4.1.0" },
     { name = "pytest-xdist", specifier = "~=2.5.0" },
+    { name = "python-multipart", specifier = "==0.0.28" },
     { name = "requests", specifier = "==2.31.0" },
     { name = "ruff", specifier = "==0.14.10" },
     { name = "setuptools", specifier = "==80.9.0" },

@@ -80,6 +80,21 @@ class Point(NamedTuple):
         """Construct a `Point` from another object that has .x/.y/.z attributes."""
         return cls(has_xyz.x, has_xyz.y, has_xyz.z)
 
+    @staticmethod
+    def to_pyro_dict(obj: "Point") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "x": float(obj.x),  # Types are constructed to float to avoid numpy.float64
+            "y": float(obj.y),
+            "z": float(obj.z),
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "Point":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return Point(x=float(data["x"]), y=float(data["y"]), z=float(data["z"]))
+
 
 class _HasXYZ(Protocol):
     @property

@@ -5,6 +5,8 @@ import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+import { useRobotSettingsQuery } from '@opentrons/react-api-client'
+
 import { useRobot } from '/app/redux-resources/robots'
 import {
   getRobotApiVersion,
@@ -12,12 +14,13 @@ import {
   getRobotSerialNumber,
 } from '/app/redux/discovery'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import { getRobotSettings } from '/app/redux/robot-settings'
 
 import { useRobotAnalyticsData } from '../useRobotAnalyticsData'
 
 import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'
+import type { UseQueryResult } from 'react-query'
+import type { RobotSettingsResponse } from '@opentrons/api-client'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 
 vi.mock('@opentrons/react-api-client')
@@ -25,6 +28,7 @@ vi.mock('../../hooks')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-settings')
+vi.mock('/app/redux/pipettes')
 
 const ROBOT_SETTINGS = [
   { id: `setting1`, value: true, title: '', description: '' },
@@ -51,7 +55,9 @@ describe('useRobotAnalyticsData hook', () => {
     )
     when(vi.mocked(useRobot)).calledWith('noRobot').thenReturn(null)
     vi.mocked(getRobotApiVersion).mockReturnValue(ROBOT_VERSION)
-    vi.mocked(getRobotSettings).mockReturnValue(ROBOT_SETTINGS)
+    vi.mocked(useRobotSettingsQuery).mockReturnValue({
+      data: { settings: ROBOT_SETTINGS },
+    } as unknown as UseQueryResult<RobotSettingsResponse>)
     vi.mocked(getRobotFirmwareVersion).mockReturnValue(ROBOT_FIRMWARE_VERSION)
     vi.mocked(getRobotSerialNumber).mockReturnValue(ROBOT_SERIAL_NUMBER)
   })

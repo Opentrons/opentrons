@@ -179,7 +179,7 @@ class TempDeck(mod_abc.AbstractModule):
         """
         await self.wait_for_is_running()
         await self._driver.set_temperature(celsius)
-        await self._reader.read()
+        await self._poller.wait_next_good_poll()
 
     async def await_temperature(self, awaiting_temperature: Optional[float]) -> None:
         """Await a target temperature in degrees Celsius.
@@ -197,7 +197,7 @@ class TempDeck(mod_abc.AbstractModule):
             return
 
         await self.wait_for_is_running()
-        await self._reader.read()
+        await self._poller.wait_next_good_poll()
 
         async def _await_temperature() -> None:
             if awaiting_temperature is None:
@@ -217,7 +217,7 @@ class TempDeck(mod_abc.AbstractModule):
         if must_be_running:
             await self.wait_for_is_running()
         await self._driver.deactivate()
-        await self._reader.read()
+        await self._poller.wait_next_good_poll()
 
     @property
     def device_info(self) -> Dict[str, str]:
@@ -347,7 +347,9 @@ class TempDeckReader(Reader):
         self._debounce_count = DEFAULT_COMMAND_RETRIES
 
     async def read(self) -> None:
-        """Read the module's current and target temperatures."""
+        """Read the module's current and target temperatures.
+
+        Do not call directly, for the poller only."""
         self.temperature = await self._driver.get_temperature()
         # reset on success
         self._debounce_count = DEFAULT_COMMAND_RETRIES

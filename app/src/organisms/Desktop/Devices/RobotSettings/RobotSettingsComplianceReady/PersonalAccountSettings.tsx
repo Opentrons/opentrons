@@ -1,17 +1,19 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useQueryClient } from 'react-query'
+import { useDispatch } from 'react-redux'
 import axios from 'axios'
 
 import { BasicButton, Divider, StyledText } from '@opentrons/components'
 import {
-  getSelfQueryKey,
-  useHost,
-  useSelfQuery,
+  isDocumentedMutationError,
   useUpdateSelfMutation,
 } from '@opentrons/react-api-client'
 
-import { useUsernameForRobot } from '/app/redux/robot-auth'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import {
+  updateLoggedInUserProfile,
+  useLoggedInUserForRobot,
+} from '/app/redux/robot-auth'
 
 import styles from './personalaccountsettings.module.css'
 import { PersonalAccountSettingsEditForm } from './PersonalAccountSettingsEditForm'
@@ -43,13 +45,11 @@ export function PersonalAccountSettings({
   robotName,
 }: PersonalAccountSettingsProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
-  const queryClient = useQueryClient()
-  const host = useHost()
-  const loggedInUsername = useUsernameForRobot(robotName)
-  const selfQuery = useSelfQuery({ enabled: loggedInUsername != null })
-  const { updateSelf, isLoading: isSaving } = useUpdateSelfMutation()
-  const username = selfQuery.data?.data.username ?? loggedInUsername ?? ''
-  const fullName = selfQuery.data?.data.fullName ?? ''
+  const dispatch = useDispatch()
+  const documentationState = useDocumentationState(undefined, robotName)
+  const loggedInUser = useLoggedInUserForRobot(robotName)
+  const { updateSelf, isLoading: isSaving } =
+    useUpdateSelfMutation(documentationState)
 
   const [isEditing, setIsEditing] = useState(false)
   const [usernameError, setUsernameError] = useState<string | null>(null)
@@ -63,11 +63,22 @@ export function PersonalAccountSettings({
   const handleSave = (request: UpdateSelfRequest): void => {
     void updateSelf(request)
       .then(updatedSelf => {
-        queryClient.setQueryData(getSelfQueryKey(host), updatedSelf)
+        dispatch(
+          updateLoggedInUserProfile({
+            robotName,
+            username: updatedSelf.data.username,
+            fullName: updatedSelf.data.fullName,
+          })
+        )
         clearSaveErrors()
         setIsEditing(false)
       })
       .catch((error: unknown) => {
+        // User cancelled the documentation/login modal — stay on the edit form.
+        if (isDocumentedMutationError(error)) {
+          return
+        }
+
         const errorId = axios.isAxiosError(error)
           ? error.response?.data?.errors?.[0]?.id
           : null
@@ -94,7 +105,7 @@ export function PersonalAccountSettings({
         <StyledText desktopStyle="bodyLargeSemiBold">
           {t('desktop_personal_account_settings')}
         </StyledText>
-        {loggedInUsername != null &&
+        {loggedInUser != null &&
           (isEditing ? (
             <BasicButton
               type="button"
@@ -120,10 +131,10 @@ export function PersonalAccountSettings({
           ))}
       </div>
       <div className={styles.content}>
-        {isEditing ? (
+        {isEditing && loggedInUser != null ? (
           <PersonalAccountSettingsEditForm
-            username={username}
-            fullName={fullName}
+            username={loggedInUser.username}
+            fullName={loggedInUser.fullName}
             isSaving={isSaving}
             usernameError={usernameError}
             saveError={saveError}
@@ -140,7 +151,7 @@ export function PersonalAccountSettings({
                 desktopStyle="bodyDefaultRegular"
                 className={styles.field_value_text}
               >
-                {username}
+                {loggedInUser?.username}
               </StyledText>
             </FieldRow>
             <Divider />
@@ -149,7 +160,7 @@ export function PersonalAccountSettings({
                 desktopStyle="bodyDefaultRegular"
                 className={styles.field_value_text}
               >
-                {fullName}
+                {loggedInUser?.fullName}
               </StyledText>
             </FieldRow>
             <Divider />

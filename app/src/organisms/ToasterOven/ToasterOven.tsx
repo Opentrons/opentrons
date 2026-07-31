@@ -30,6 +30,8 @@ interface ToasterOvenProps {
   children: ReactNode
 }
 
+const DEFAULT_TOAST_CONTAINER_Z_INDEX = 1000
+
 /**
  * A toaster oven that renders up to 5 toasts in an app-level display container
  * @param children passes through and renders children
@@ -69,15 +71,25 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
         id,
         message,
         type,
-        ...options,
         zIndex: 2,
         position: POSITION_FIXED,
+        // Allow callers to override stacking
+        ...options,
       },
       ...toastsForRemoval,
     ])
 
     return id
   }
+
+  const toastContainerZIndex = Math.max(
+    DEFAULT_TOAST_CONTAINER_Z_INDEX,
+    ...toasts.map(toast =>
+      typeof toast.zIndex === 'number'
+        ? toast.zIndex
+        : DEFAULT_TOAST_CONTAINER_Z_INDEX
+    )
+  )
 
   function makeSnackbar(
     message: string,
@@ -112,7 +124,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
           position={POSITION_FIXED}
           right={SPACING.spacing32}
           bottom={SPACING.spacing32}
-          zIndex={1000}
+          zIndex={toastContainerZIndex}
           width="100%"
         >
           {toasts.map(toast => (

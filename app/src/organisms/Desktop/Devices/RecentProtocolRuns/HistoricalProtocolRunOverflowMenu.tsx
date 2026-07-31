@@ -11,6 +11,7 @@ import {
   Box,
   COLORS,
   DIRECTION_COLUMN,
+  ERROR_TOAST,
   Flex,
   FLEX_MAX_CONTENT,
   Icon,
@@ -34,13 +35,16 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 import {
+  isDocumentedMutationError,
   useDeleteRunImages,
   useDeleteRunMutation,
 } from '@opentrons/react-api-client'
 
-import { getModalPortalEl } from '/app/App/portal'
+import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useRunControls } from '/app/organisms/RunTimeControl'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import {
   SOURCE_RUN_RECORD,
@@ -53,16 +57,20 @@ import {
   useTrackEvent,
 } from '/app/redux/analytics'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
-import { useIsEstopNotDisengaged } from '/app/resources/devices'
+import {
+  useDownloadRunRecord,
+  useIsEstopNotDisengaged,
+  useIsRobotOutOfStorage,
+} from '/app/resources/devices'
 
-import { useDownloadRunLog } from '../hooks'
+import { RobotOutOfStorageModal } from '../RobotOutOfStorageModal.tsx'
 
-import type { MouseEventHandler } from 'react'
-import type { Run } from '@opentrons/api-client'
+import type { Dispatch, MouseEventHandler, SetStateAction } from 'react'
+import type { Run, RunData } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
 
 export interface HistoricalProtocolRunOverflowMenuProps {
-  runId: string
+  run: RunData
   robotName: string
   robotIsBusy: boolean
   runHasImages: boolean
@@ -71,7 +79,7 @@ export interface HistoricalProtocolRunOverflowMenuProps {
 export function HistoricalProtocolRunOverflowMenu(
   props: HistoricalProtocolRunOverflowMenuProps
 ): JSX.Element {
-  const { runId, robotName } = props
+  const { run, robotName } = props
   const {
     menuOverlay,
     handleOverflowClick,
@@ -83,65 +91,97 @@ export function HistoricalProtocolRunOverflowMenu(
       setShowOverflowMenu(false)
     },
   })
-  const { downloadRunLog, isRunLogLoading } = useDownloadRunLog(
-    robotName,
-    runId
+  const { makeToast } = useToaster()
+  const { downloadRunRecord, isDownloading } = useDownloadRunRecord(
+    run,
+    (e: Error) => {
+      makeToast(e.message, ERROR_TOAST)
+    }
   )
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
+  const [showRobotOutOfStorageModal, setShowRobotOutOfStorageModal] =
+    useState<boolean>(false)
+  const navigate = useNavigate()
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      position={POSITION_RELATIVE}
-      data-testid="HistoricalProtocolRunOverflowMenu_OverflowMenu"
-    >
-      <OverflowBtn
-        alignSelf={ALIGN_FLEX_END}
-        onClick={handleOverflowClick}
-        disabled={isEstopNotDisengaged}
-      />
-      {showOverflowMenu ? (
-        <>
-          <Box
-            ref={protocolRunOverflowWrapperRef}
-            data-testid={`HistoricalProtocolRunOverflowMenu_${runId}`}
-          >
-            <MenuDropdown
-              {...props}
-              downloadRunLog={downloadRunLog}
-              isRunLogLoading={isRunLogLoading}
-              closeOverflowMenu={handleOverflowClick}
-            />
-          </Box>
-          {menuOverlay}
-        </>
-      ) : null}
-    </Flex>
+    <>
+      {showRobotOutOfStorageModal
+        ? createPortal(
+            <RobotOutOfStorageModal
+              onConfirm={() => {
+                navigate(`/devices/${robotName}/robot-settings/file-manager`)
+              }}
+              onClose={() => {
+                setShowRobotOutOfStorageModal(false)
+              }}
+            />,
+            getTopPortalEl()
+          )
+        : null}
+
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        position={POSITION_RELATIVE}
+        data-testid="HistoricalProtocolRunOverflowMenu_OverflowMenu"
+      >
+        <OverflowBtn
+          alignSelf={ALIGN_FLEX_END}
+          onClick={handleOverflowClick}
+          disabled={isEstopNotDisengaged}
+        />
+        {showOverflowMenu ? (
+          <>
+            <Box
+              ref={protocolRunOverflowWrapperRef}
+              data-testid={`HistoricalProtocolRunOverflowMenu_${run.id}`}
+            >
+              <MenuDropdown
+                {...props}
+                downloadRunRecord={downloadRunRecord}
+                isDownloading={isDownloading}
+                closeOverflowMenu={handleOverflowClick}
+                setShowRobotOutOfStorageModal={setShowRobotOutOfStorageModal}
+                setShowOverflowMenu={setShowOverflowMenu}
+              />
+            </Box>
+            {menuOverlay}
+          </>
+        ) : null}
+      </Flex>
+    </>
   )
 }
 
 interface MenuDropdownProps extends HistoricalProtocolRunOverflowMenuProps {
   closeOverflowMenu: MouseEventHandler<HTMLButtonElement>
-  downloadRunLog: () => void
-  isRunLogLoading: boolean
+  downloadRunRecord: () => void
+  isDownloading: boolean
+  setShowRobotOutOfStorageModal: Dispatch<SetStateAction<boolean>>
+  setShowOverflowMenu: Dispatch<SetStateAction<boolean>>
 }
 function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const navigate = useNavigate()
 
   const {
-    runId,
+    run,
     robotName,
     robotIsBusy,
     closeOverflowMenu,
-    downloadRunLog,
-    isRunLogLoading,
+    downloadRunRecord,
+    isDownloading,
     runHasImages,
+    setShowRobotOutOfStorageModal,
+    setShowOverflowMenu,
   } = props
+
+  const { id: runId } = run
 
   const isRobotOnWrongVersionOfSoftware =
     useIsRobotOnWrongVersionOfSoftware(robotName)
-  const { mutateAsync: deleteRunImages } = useDeleteRunImages()
+  const documentationState = useDocumentationState()
+  const { mutateAsync: deleteRunImages, isLoading: isDeletingImages } =
+    useDeleteRunImages(documentationState)
 
   const [targetProps, tooltipProps] = useHoverTooltip()
   const onResetSuccess = (createRunResponse: Run): void => {
@@ -152,7 +192,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const onDownloadClick: MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    downloadRunLog()
+    downloadRunRecord()
     closeOverflowMenu(e)
   }
   const trackEvent = useTrackEvent()
@@ -161,13 +201,23 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     runId,
     onResetSuccess
   )
-  const { deleteRun, isLoading: isDeletingImages } = useDeleteRunMutation()
+  const { deleteRun, isLoading: isDeletingRun } =
+    useDeleteRunMutation(documentationState)
   const robot = useRobot(robotName)
   const robotType = useRobotType(robotName)
 
   const robotSerialNumber =
     robot?.health?.robot_serial ?? robot?.serverHealth?.serialNumber ?? null
+
+  const isRobotOutOfStorage = useIsRobotOutOfStorage()
+
   const handleResetClick: MouseEventHandler<HTMLButtonElement> = (e): void => {
+    if (isRobotOutOfStorage) {
+      setShowRobotOutOfStorageModal(true)
+      setShowOverflowMenu(false)
+      return
+    }
+
     e.preventDefault()
     e.stopPropagation()
 
@@ -185,14 +235,12 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const handleDeleteClick: MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    deleteRun({ runId })
+    void deleteRun({ runId })
     closeOverflowMenu(e)
   }
 
-  const onDeleteRunImages = (onClose: () => void): void => {
-    void deleteRunImages(runId).finally(() => {
-      onClose()
-    })
+  const onDeleteRunImages = (): ReturnType<typeof deleteRunImages> => {
+    return deleteRunImages(runId)
   }
   const { reportPhotoAccessUsage } = useCameraAnalytics({
     source: SOURCE_RUN_RECORD,
@@ -260,12 +308,12 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       )}
       <MenuItem
         data-testid="RecentProtocolRun_OverflowMenu_downloadRunLog"
-        disabled={isRunLogLoading}
+        disabled={isDownloading}
         onClick={onDownloadClick}
       >
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-          {t('download_run_log')}
-          {isRunLogLoading ? (
+          {t('download_protocol_files')}
+          {isDownloading ? (
             <Icon
               name="ot-spinner"
               size={SIZE_1}
@@ -288,6 +336,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       <Divider marginY="0" />
       <MenuItem
         onClick={handleDeleteClick}
+        disabled={isDeletingRun}
         data-testid="RecentProtocolRun_OverflowMenu_deleteRun"
       >
         {t('delete_run')}
@@ -297,7 +346,9 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
 }
 
 interface DeleteRunImagesModalProps {
-  onDeleteRunImages: (onClose: () => void) => void
+  onDeleteRunImages: () => ReturnType<
+    ReturnType<typeof useDeleteRunImages>['mutateAsync']
+  >
 }
 
 const handleDeleteRunImagesModal = (props: DeleteRunImagesModalProps): void => {
@@ -317,7 +368,17 @@ const DeleteRunImagesModal = NiceModal.create(
     const onDelete = (): void => {
       if (!isDeleting) {
         setIsDeleting(true)
-        onDeleteRunImages(modal.remove)
+        void onDeleteRunImages()
+          .then(() => {
+            modal.remove()
+          })
+          .catch((error: unknown) => {
+            if (isDocumentedMutationError(error)) {
+              setIsDeleting(false)
+            } else {
+              modal.remove()
+            }
+          })
       }
     }
 

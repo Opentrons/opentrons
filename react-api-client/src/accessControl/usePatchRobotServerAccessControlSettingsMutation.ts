@@ -1,12 +1,13 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { patchRobotServerAccessControlSettings } from '@opentrons/api-client'
 
 import { getQueryKey, useHost } from '../api'
+import { useDocumentedMutation } from './useDocumentedMutation'
 
 import type { AxiosError } from 'axios'
 import type {
-  UseMutateAsyncFunction,
+  UseMutateFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
@@ -14,6 +15,7 @@ import type {
   PatchRobotServerAccessControlSettingsRequest,
   RobotServerAccessControlSettingsResponse,
 } from '@opentrons/api-client'
+import type { DocumentationState, DocumentedMutationParameters } from './types'
 
 export type UsePatchRobotServerAccessControlSettingsMutationResult =
   UseMutationResult<
@@ -21,31 +23,40 @@ export type UsePatchRobotServerAccessControlSettingsMutationResult =
     AxiosError,
     PatchRobotServerAccessControlSettingsRequest
   > & {
-    patchRobotServerAccessControlSettings: UseMutateAsyncFunction<
+    patchRobotServerAccessControlSettings: UseMutateFunction<
       RobotServerAccessControlSettingsResponse,
       AxiosError,
       PatchRobotServerAccessControlSettingsRequest
     >
   }
 
-export function usePatchRobotServerAccessControlSettingsMutation(
-  options: UseMutationOptions<
+export type UsePatchRobotServerAccessControlSettingsMutationOptions =
+  UseMutationOptions<
     RobotServerAccessControlSettingsResponse,
     AxiosError,
     PatchRobotServerAccessControlSettingsRequest
-  > = {}
+  >
+
+export function usePatchRobotServerAccessControlSettingsMutation(
+  documentationState: DocumentationState,
+  options: UsePatchRobotServerAccessControlSettingsMutationOptions = {}
 ): UsePatchRobotServerAccessControlSettingsMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     RobotServerAccessControlSettingsResponse,
     AxiosError,
     PatchRobotServerAccessControlSettingsRequest
   >(
+    documentationState,
+    ['patch_robot_server_crs_settings'],
     getQueryKey(host, 'accessControl', 'settings', 'patch'),
-    (body: PatchRobotServerAccessControlSettingsRequest) =>
-      patchRobotServerAccessControlSettings(host!, body)
+    ({
+      variables: body,
+      userNotes,
+    }: DocumentedMutationParameters<PatchRobotServerAccessControlSettingsRequest>) =>
+      patchRobotServerAccessControlSettings(host!, body, userNotes)
         .then(response => {
           queryClient
             .invalidateQueries(getQueryKey(host, 'accessControl', 'settings'))
@@ -64,6 +75,6 @@ export function usePatchRobotServerAccessControlSettingsMutation(
 
   return {
     ...mutation,
-    patchRobotServerAccessControlSettings: mutation.mutateAsync,
+    patchRobotServerAccessControlSettings: mutation.mutate,
   }
 }

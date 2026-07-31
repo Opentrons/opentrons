@@ -51,6 +51,14 @@ describe('getFieldValuesFromSettings', () => {
     })
   })
 
+  it('should map idleLogout seconds to fractional minutes', () => {
+    expect(
+      getFieldValuesFromSettings({ ...AUTH_SETTINGS, idleLogout: 90 })
+    ).toMatchObject({
+      idleLogout: '1.5',
+    })
+  })
+
   it('should map robot server settings with false defaults', () => {
     expect(
       getFieldValuesFromSettings(
@@ -83,10 +91,19 @@ describe('getAuthInputPatch', () => {
     expect(getAuthInputPatch('idleLogout', '5', BASE_FIELD_VALUES)).toEqual({
       data: { idleLogout: 300 },
     })
+    expect(getAuthInputPatch('idleLogout', '1.5', BASE_FIELD_VALUES)).toEqual({
+      data: { idleLogout: 90 },
+    })
+  })
+
+  it('should not patch idleLogout when value is not greater than zero', () => {
+    expect(getAuthInputPatch('idleLogout', '', BASE_FIELD_VALUES)).toBeNull()
+    expect(getAuthInputPatch('idleLogout', '0', BASE_FIELD_VALUES)).toBeNull()
+    expect(getAuthInputPatch('idleLogout', '-1', BASE_FIELD_VALUES)).toBeNull()
+    expect(getAuthInputPatch('idleLogout', 'abc', BASE_FIELD_VALUES)).toBeNull()
   })
 
   it('should return null when input value is empty', () => {
-    expect(getAuthInputPatch('idleLogout', '', BASE_FIELD_VALUES)).toBeNull()
     expect(
       getAuthInputPatch('passwordResetTime', '', BASE_FIELD_VALUES)
     ).toBeNull()
@@ -96,6 +113,53 @@ describe('getAuthInputPatch', () => {
     expect(
       getAuthInputPatch('passwordResetTime', '30', BASE_FIELD_VALUES)
     ).toEqual({ data: { passwordResetTime: 30 * 24 * 60 * 60 } })
+  })
+  it('should patch passwordComplexityMinimumLength when value is valid', () => {
+    expect(
+      getAuthInputPatch(
+        'passwordComplexityMinimumLength',
+        '12',
+        BASE_FIELD_VALUES
+      )
+    ).toEqual({ data: { passwordComplexityMinimumLength: 12 } })
+    expect(
+      getAuthInputPatch(
+        'passwordComplexityMinimumLength',
+        '256',
+        BASE_FIELD_VALUES
+      )
+    ).toEqual({ data: { passwordComplexityMinimumLength: 256 } })
+  })
+
+  it('should not patch passwordComplexityMinimumLength when value is invalid', () => {
+    expect(
+      getAuthInputPatch(
+        'passwordComplexityMinimumLength',
+        '',
+        BASE_FIELD_VALUES
+      )
+    ).toBeNull()
+    expect(
+      getAuthInputPatch(
+        'passwordComplexityMinimumLength',
+        '0',
+        BASE_FIELD_VALUES
+      )
+    ).toBeNull()
+    expect(
+      getAuthInputPatch(
+        'passwordComplexityMinimumLength',
+        '257',
+        BASE_FIELD_VALUES
+      )
+    ).toBeNull()
+    expect(
+      getAuthInputPatch(
+        'passwordComplexityMinimumLength',
+        '8.5',
+        BASE_FIELD_VALUES
+      )
+    ).toBeNull()
   })
 })
 

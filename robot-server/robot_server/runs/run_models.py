@@ -1,7 +1,7 @@
 """Request and response models for run resources."""
 
 from datetime import datetime
-from typing import Dict, List, Literal, Optional
+from typing import Annotated, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -113,6 +113,15 @@ class Run(ResourceModel):
             " There can be, at most, one current run."
         ),
     )
+    signedBy: Annotated[
+        str | None,
+        Field(
+            description=(
+                'The "signature" of the user who reviewed this run,'
+                " as set by `PATCH /runs/{id}`."
+            )
+        ),
+    ] = None
     actions: List[RunAction] = Field(
         ...,
         description="Client-initiated run control actions, ordered oldest to newest.",
@@ -202,6 +211,15 @@ class BadRun(ResourceModel):
             " There can be, at most, one current run."
         ),
     )
+    signedBy: Annotated[
+        str | None,
+        Field(
+            description=(
+                'The "signature" of the user who reviewed this run,'
+                " as set by `PATCH /runs/{id}`."
+            )
+        ),
+    ] = None
     actions: List[RunAction] = Field(
         ...,
         description="Client-initiated run control actions, ordered oldest to newest. If these could not be loaded for this bad run, this will be null.",
@@ -296,13 +314,27 @@ class RunCreate(BaseModel):
 class RunUpdate(BaseModel):
     """Update request data for an existing run."""
 
-    current: Optional[bool] = Field(
-        None,
-        description=(
-            "Whether this run is currently controlling the robot."
-            " Setting `current` to `false` will deactivate the run."
+    current: Annotated[
+        Literal[False] | None,
+        Field(
+            description=(
+                "Whether this run is currently controlling the robot."
+                " Setting `current` to `false` will deactivate the run."
+            ),
         ),
-    )
+    ] = None
+
+    signedBy: Annotated[
+        str | None,
+        Field(
+            description=(
+                "Set this to a string to mark that the run has been reviewed by a human."
+                " Depending on robot settings, this may be required before anything else can be run."
+                ' The string is the "signature," and so should probably be something like the user\'s full name.'
+                " This can be changed any number of times as long as the run is current; the last write wins."
+            )
+        ),
+    ] = None
 
 
 class LabwareDefinitionSummary(BaseModel):

@@ -10,14 +10,14 @@ import { getLocalRobot } from '/app/redux/discovery'
 import { useDownloadCalibrationData } from '/app/resources/devices/hooks/useDownloadCalibrationData'
 import { useDownloadRobotLogs } from '/app/resources/devices/hooks/useDownloadRobotLogs'
 
+import { STEP_TYPES } from '../shared/constants'
 import { ErrorScreen } from '../shared/ErrorScreen'
 import styles from '../shared/shared.module.css'
 import { SpinnerScreen } from '../shared/SpinnerScreen'
 import { SuccessScreen } from '../shared/SuccessScreen'
 import { UsbSelectionScreen } from '../shared/UsbSelectionScreen'
-import { STEP_TYPES } from './types'
 
-import type { StepType } from './types'
+import type { StepType } from '../shared/types'
 
 interface DownloadDiagnosticFilesWizardProps {
   onClose: () => void

@@ -24,6 +24,7 @@ import {
 
 import { useVacuumModuleControls } from './VacuumModule/hooks/useVacuumModuleControls'
 
+import type { AttachedModule } from '@opentrons/api-client'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateHeaterCreateCommand,
@@ -37,7 +38,6 @@ import type {
   TemperatureModuleDeactivateCreateCommand,
   UnsafeFlexStackerPrepareShuttleCreateCommand,
 } from '@opentrons/shared-data'
-import type { AttachedModule } from '/app/redux/modules/types'
 
 export function useIsHeaterShakerInProtocol(): boolean {
   const currentRunId = useCurrentRunId()
@@ -174,7 +174,6 @@ export function useModuleOverflowMenu(
   const aboutModuleBtn = (
     <MenuItem
       key={`about_module_${String(module.moduleModel)}`}
-      id={`about_module_${String(module.moduleModel)}`}
       data-testid={`about_module_${String(module.moduleModel)}`}
       disabled={isIncompatibleWithOT3}
       onClick={() => {
@@ -214,7 +213,6 @@ export function useModuleOverflowMenu(
     module.data.speedStatus !== 'idle' ? (
       <MenuItem
         key={`test_shake_${String(module.moduleModel)}`}
-        id={`test_shake_${String(module.moduleModel)}`}
         data-testid={`test_shake_${String(module.moduleModel)}`}
         disabled={isDisabled}
         onClick={() => {

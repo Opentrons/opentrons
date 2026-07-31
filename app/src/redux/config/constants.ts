@@ -9,7 +9,6 @@ export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
   'reactQueryDevtools',
   'reactScan',
   'quickTransferProtocolContentsLog',
-  'accessControlMode',
   'robotSearchBar',
   'showGitDetails',
 ]

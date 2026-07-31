@@ -32,6 +32,7 @@ ACCOUNT_TYPE_TO_SCOPES: dict[AccountType, set[Scope]] = {
         Scope.USERS_READ_SELF,
         Scope.USERS_WRITE_SELF,
         Scope.PROTOCOLS_WRITE,
+        Scope.AUDIT_LOG_WRITE,
     },
     # Auditors should have read-only access to everything. Our read-only endpoints are
     # mostly accessible without authentication, but there are some exceptions. This

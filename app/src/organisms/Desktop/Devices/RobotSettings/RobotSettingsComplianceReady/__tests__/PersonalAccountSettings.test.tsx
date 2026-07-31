@@ -1,27 +1,32 @@
 import '@testing-library/jest-dom/vitest'
 
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { I18nextProvider } from 'react-i18next'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { Provider } from 'react-redux'
+import { configureStore } from '@reduxjs/toolkit'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  useHost,
-  useSelfQuery,
-  useUpdateSelfMutation,
-} from '@opentrons/react-api-client'
+import { useUpdateSelfMutation } from '@opentrons/react-api-client'
 
-import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
+import { robotAuthReducer } from '/app/redux/robot-auth'
 
 import { PersonalAccountSettings } from '../PersonalAccountSettings'
 
 import type { RenderResult } from '@testing-library/react'
 import type { AuthUserResponse, UpdateSelfRequest } from '@opentrons/api-client'
-import type { State } from '/app/redux/types'
+import type { RobotAuthState } from '/app/redux/robot-auth/slice'
 
 const ROBOT_NAME = 'flex-1'
 
 const MOCK_AUTH_STATE = {
-  username: 'alice',
+  user: {
+    username: 'alice',
+    fullName: 'Alice Example',
+    accountType: 'user' as const,
+  },
   accessToken: 'access-token',
   refreshToken: 'refresh-token',
   expiresAt: null,
@@ -39,26 +44,34 @@ const MOCK_SELF_RESPONSE = {
 } as AuthUserResponse
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const mockUpdateSelf = vi.fn()
-let selfResponse = MOCK_SELF_RESPONSE
 
-const render = (initialState: Partial<State> = {}): RenderResult => {
-  return renderWithProviders(
-    <PersonalAccountSettings robotName={ROBOT_NAME} />,
-    {
-      i18nInstance: i18n,
-      initialState: {
-        robotAuth: {
-          perRobotAuthStates: {
-            [ROBOT_NAME]: MOCK_AUTH_STATE,
-          },
-          mostRecentRobotName: ROBOT_NAME,
+const renderComponent = (robotAuth?: RobotAuthState): RenderResult => {
+  const store = configureStore({
+    reducer: { robotAuth: robotAuthReducer },
+    preloadedState: {
+      robotAuth: robotAuth ?? {
+        perRobotAuthStates: {
+          [ROBOT_NAME]: MOCK_AUTH_STATE,
         },
-        ...initialState,
-      } as State,
-    }
-  )[0]
+        mostRecentRobotName: ROBOT_NAME,
+      },
+    },
+  })
+
+  return render(
+    <QueryClientProvider client={new QueryClient()}>
+      <I18nextProvider i18n={i18n}>
+        <Provider store={store}>
+          <PersonalAccountSettings robotName={ROBOT_NAME} />
+        </Provider>
+      </I18nextProvider>
+    </QueryClientProvider>
+  )
 }
 
 function openEditForm(): void {
@@ -84,12 +97,11 @@ function createUsernameExistsError(): any {
 
 describe('PersonalAccountSettings', () => {
   beforeEach(() => {
-    selfResponse = MOCK_SELF_RESPONSE
     mockUpdateSelf.mockReset()
     mockUpdateSelf.mockImplementation(async (request: UpdateSelfRequest) => {
-      selfResponse = {
+      return {
         data: {
-          ...selfResponse.data,
+          ...MOCK_SELF_RESPONSE.data,
           ...(request.data.username != null
             ? { username: request.data.username }
             : {}),
@@ -97,19 +109,8 @@ describe('PersonalAccountSettings', () => {
             ? { fullName: request.data.fullName }
             : {}),
         },
-      }
-      return selfResponse
+      } satisfies AuthUserResponse
     })
-    vi.mocked(useHost).mockReturnValue({
-      hostname: '10.0.0.1',
-      port: 31950,
-    } as ReturnType<typeof useHost>)
-    vi.mocked(useSelfQuery).mockImplementation(
-      options =>
-        ({
-          data: options?.enabled === false ? undefined : selfResponse,
-        }) as ReturnType<typeof useSelfQuery>
-    )
     vi.mocked(useUpdateSelfMutation).mockReturnValue({
       updateSelf: mockUpdateSelf,
       isLoading: false,
@@ -117,7 +118,7 @@ describe('PersonalAccountSettings', () => {
   })
 
   it('renders view mode and toggles between view and edit', () => {
-    render()
+    renderComponent()
     screen.getByText('Personal account settings')
     screen.getByText('alice')
     screen.getByText('Alice Example')
@@ -137,11 +138,9 @@ describe('PersonalAccountSettings', () => {
   })
 
   it('does not show the edit button when the user is not logged in', () => {
-    render({
-      robotAuth: {
-        perRobotAuthStates: {},
-        mostRecentRobotName: null,
-      },
+    renderComponent({
+      perRobotAuthStates: {},
+      mostRecentRobotName: null,
     })
     screen.getByText('Personal account settings')
     expect(
@@ -150,7 +149,7 @@ describe('PersonalAccountSettings', () => {
   })
 
   it('calls updateSelf and returns to view mode with updated fields on successful save', async () => {
-    render()
+    renderComponent()
     openEditForm()
     fireEvent.change(screen.getByDisplayValue('Alice Example'), {
       target: { value: 'Alice Updated' },
@@ -201,7 +200,7 @@ describe('PersonalAccountSettings', () => {
   ])(
     'calls updateSelf with $description when password fields are otherwise empty',
     async ({ applyChange, expectedData }) => {
-      render()
+      renderComponent()
       openEditForm()
       applyChange()
       fireEvent.click(screen.getByRole('button', { name: 'save' }))
@@ -214,7 +213,7 @@ describe('PersonalAccountSettings', () => {
 
   it('shows a save error when updateSelf fails', async () => {
     mockUpdateSelf.mockRejectedValue(new Error('save failed'))
-    render()
+    renderComponent()
     openEditForm()
     fireEvent.change(screen.getByDisplayValue('alice'), {
       target: { value: 'alice2' },
@@ -229,7 +228,7 @@ describe('PersonalAccountSettings', () => {
 
   it('shows a username error when updateSelf returns username already exists', async () => {
     mockUpdateSelf.mockRejectedValue(createUsernameExistsError())
-    render()
+    renderComponent()
     openEditForm()
     fireEvent.change(screen.getByDisplayValue('alice'), {
       target: { value: 'bob' },
