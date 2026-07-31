@@ -112,7 +112,7 @@ export function UserManagement({
   const { t } = useTranslation('device_settings')
   const username = useUsernameForRobot(robotName)
   const usersQuery = useUsersQuery({ enabled: username != null })
-  const users = usersQuery.data?.data ?? []
+  const users = usersQuery?.data?.data ?? []
   const [showAddUserModal, setShowAddUserModal] = useState(false)
   const { makeToast } = useToaster()
 
