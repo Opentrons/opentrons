@@ -3,15 +3,12 @@
 from __future__ import annotations
 
 import logging
+import urllib
 from contextlib import asynccontextmanager
-from typing import (
-    Annotated,
-    AsyncGenerator,
-    Awaitable,
-    Callable,
-)
+from textwrap import dedent
+from typing import Annotated, AsyncGenerator, Awaitable, Callable, Final
 
-from fastapi import Depends
+import fastapi
 from starlette.requests import Request
 from starlette.responses import Response
 
@@ -26,13 +23,81 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
     get_app_state,
 )
-from server_utils.fastapi_utils.documented_interaction import get_supplied_user_notes
 
 _log = logging.getLogger(__name__)
 
 _audit_client_accessor = AppStateAccessor[Client]("audit_client")
 
 MUTATING_HTTP_METHODS = frozenset({"POST", "PUT", "PATCH", "DELETE"})
+USER_NOTES_HEADER: Final[str] = "Opentrons-User-Notes"
+
+
+async def get_supplied_user_notes(
+    audit_client: Annotated[Client, fastapi.Depends(get_audit_client)],
+    request: fastapi.Request,
+    # for reasons unknown to me, the annotated version of this declaration
+    # fails with AttributeError: 'FieldInfo' object has no attribute 'in_'.
+    # check this again next time we update fastapi.
+    opentrons_user_notes: bytes | None = fastapi.Header(
+        title="Audit Logging User Notes",
+        description=dedent("""
+                   Notes about the commanded action written by the user or on behalf of the user.
+
+                   If Compliance-Ready Software is enabled, these notes are written into the audit log
+                   when an audited action occurs. They are free text, and must be percent-escaped UTF-8.
+                   The robot has settings that cause these to be required, or to have a minimum length;
+                   if the user notes that come along with an action do not match these settings, the
+                   HTTP request will fail with 451 UNAVAILABLE FOR LEGAL REASONS.
+                   """),
+        default=None,
+    ),
+) -> str | None:
+    """Extract the value of the `Opentrons-User-Notes` request header.
+
+    When `requireReasonForInteraction` is enabled, this header carries the user-provided
+    reason for interaction.
+
+    HTTP headers have strict charset limits; this header should be percent-encoded UTF-8
+    (see: https://www.rfc-editor.org/rfc/rfc3986.html#section-2.1).
+
+    If the value only contains whitespace (after decoding), it's treated the same
+    as if it's not present.
+    """
+    if request.method not in MUTATING_HTTP_METHODS:
+        return None
+    try:
+        settings = await audit_client.get_settings()
+    except Exception as base_e:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS,
+            detail=f"The audit log server could not be contacted: {str(base_e)}",
+        ) from base_e
+
+    if opentrons_user_notes is None:
+        if settings.requireReasonForInteraction:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS,
+                detail="A user-originated documentation string in the header Opentrons-User-Notes is required.",
+            )
+        return None
+    try:
+        decoded = urllib.parse.unquote(opentrons_user_notes)
+    except Exception as base_e:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"The user documentation could not be parsed: {str(base_e)}",
+        ) from base_e
+    stripped = decoded.strip()
+    if (
+        settings.minLengthOfReasonForInteraction is not None
+        and len(stripped) < settings.minLengthOfReasonForInteraction
+    ):
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS,
+            detail=f"The user documentation must be at least {settings.minLengthOfReasonForInteraction} code points but is {len(stripped)}",
+        )
+
+    return stripped if stripped else None
 
 
 def install_audit_client(app_state: AppState, client: Client) -> None:
@@ -44,7 +109,7 @@ def install_audit_client(app_state: AppState, client: Client) -> None:
 
 
 def get_audit_client(
-    app_state: Annotated[AppState, Depends(get_app_state)],
+    app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
 ) -> Client:
     """A FastAPI dependency to retrieve the server's singleton audit `Client`.
 
@@ -226,14 +291,14 @@ def get_audit_logger(
              # this endpoint must be protected by authentication
              # since the auto logger pulls identity information from
              # auth tokens
-             Depends(require_scopes(Scope.READ_FOO, Scope.WRITE_FOO)),
+             fastapi.Depends(require_scopes(Scope.READ_FOO, Scope.WRITE_FOO)),
              # action and message may be omitted; if they are, then
              # - action will be METHOD route, aka POST /some/thing
              # - message will be a string format of the request's URL parameters
              #   (if any) and, from the body,
              #   - if the body is JSON, it will be serialized into the message
              #   - if the body is anything else, this will error
-             Depends(get_audit_logger())]
+             fastapi.Depends(get_audit_logger())]
     )
     ```
 
@@ -264,10 +329,10 @@ def get_audit_logger(
 
     async def dependency(
         request: Request,
-        user_notes: Annotated[str | None, Depends(get_supplied_user_notes)],
-        audit_client: Annotated[Client, Depends(get_audit_client)],
+        user_notes: Annotated[str | None, fastapi.Depends(get_supplied_user_notes)],
+        audit_client: Annotated[Client, fastapi.Depends(get_audit_client)],
         authentication: Annotated[
-            RequireAuthenticationResult, Depends(require_authentication)
+            RequireAuthenticationResult, fastapi.Depends(require_authentication)
         ],
     ) -> AuditLogger:
         audit_logger = AuditLogger(
