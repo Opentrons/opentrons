@@ -13,11 +13,14 @@ class Scope(enum.Enum):
 
     # Example:
     #
-    # PYTHON_NAME = ("api_name", "description")
+    #   PYTHON_NAME = ("api_name", "description")
     #
     # "PYTHON_NAME" is arbitrary.
     # "api_name" is exposed as part of the HTTP API, and may be stored persistently.
     # "description" is developer-readable documentation for the OpenAPI spec.
+    #
+    # If you add a scope here, remember that you probably also need to add it to
+    # auth-server's ACCOUNT_TYPE_TO_SCOPES.
 
     AUTH_SETTINGS_WRITE = (
         "auth_settings.write",
