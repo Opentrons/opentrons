@@ -99,9 +99,9 @@ describe('computeLabwareOrigin()', () => {
       deckDefinition: OT3_DECK_DEF,
     })
 
-    // cutoutA3 [328, 321, 0] + vacuumModuleV1DockA4 offset [164, 0, 20]
+    // cutoutA3 [328, 321, 0] + vacuumModuleV1DockA4 offset [159.5, 0, 20]
     expect(result).toStrictEqual({
-      x: 492,
+      x: 487.5,
       y: 321,
       z: 20,
     })
@@ -118,7 +118,7 @@ describe('getPositionFromSlotId()', () => {
   it('returns coordinates for vacuum module dock addressable area', () => {
     expect(
       getPositionFromSlotId('vacuumModuleV1DockA4', OT3_DECK_DEF)
-    ).toStrictEqual([492, 321, 20])
+    ).toStrictEqual([487.5, 321, 20])
   })
 
   it('returns coordinates for vacuum module main addressable area', () => {

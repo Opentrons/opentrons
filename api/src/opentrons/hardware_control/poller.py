@@ -72,6 +72,24 @@ class Poller:
         self._poll_waiters.append(poll_future)
         await poll_future
 
+    async def wait_next_good_poll(self, retries: int = 4) -> None:
+        """Wait for the next good poll to complete.
+
+        If called in the middle of a read, it will not return until
+        the next complete read. If a read raises an exception,
+        it will retry retries number of time before the exception is
+        passed through to `wait_next_good_poll`.
+        """
+        for r in range(retries):
+            try:
+                await self.wait_next_poll()
+                return
+            except BaseException:
+                if r < (retries - 1):
+                    pass
+                else:
+                    raise
+
     @contextlib.asynccontextmanager
     async def _use_read_lock(self) -> AsyncGenerator[None, None]:
         self._read_lock = self._read_lock or asyncio.Lock()
