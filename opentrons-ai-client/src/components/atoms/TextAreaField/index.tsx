@@ -129,8 +129,7 @@ export const TextAreaField = forwardRef<
     background-color: ${COLORS.white};
     border-radius: ${borderRadius ?? BORDERS.borderRadius4};
     padding: ${padding ?? SPACING.spacing8};
-    border: 1px ${BORDERS.styleSolid}
-      ${hasError ? COLORS.red50 : COLORS.grey50};
+    border: 1px ${BORDERS.styleSolid} ${hasError ? COLORS.red50 : COLORS.grey50};
     font-size: ${TYPOGRAPHY.fontSizeP};
     width: 100%;
     height: ${height};
