@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { act, fireEvent, renderHook, screen } from '@testing-library/react'
+import { renderHook, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -257,9 +257,9 @@ describe('FullKeyboard', () => {
     ).toBeGreaterThan(0)
   })
 
-  it('should update labels when toggling keyboard language', () => {
-    vi.useFakeTimers()
+  it('should update labels when toggling keyboard language', async () => {
     vi.mocked(getAppLanguage).mockReturnValue('zh-CN')
+    const user = userEvent.setup()
     const { result } = renderHook(() => useRef(null))
     const props = {
       onChange: vi.fn(),
@@ -273,20 +273,19 @@ describe('FullKeyboard', () => {
       .find(button => button.className.includes('hg-globe'))
 
     expect(globeKey).toBeDefined()
-    fireEvent.click(globeKey!)
+    await user.click(globeKey!)
 
     expect(screen.getByRole('button', { name: 'English (US)' })).toBeDefined()
     expect(
       screen.getAllByRole('button', { name: 'return' }).length
     ).toBeGreaterThan(0)
 
-    act(() => {
-      vi.advanceTimersByTime(800)
+    await waitFor(() => {
+      expect(
+        screen.getAllByRole('button', { name: 'space' }).length
+      ).toBeGreaterThan(0)
     })
 
-    expect(
-      screen.getAllByRole('button', { name: 'space' }).length
-    ).toBeGreaterThan(0)
     expect(
       screen.getAllByRole('button', { name: 'return' }).length
     ).toBeGreaterThan(0)
