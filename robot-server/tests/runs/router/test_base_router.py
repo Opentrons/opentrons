@@ -788,9 +788,7 @@ async def test_update_run_signed_by(
     )
 
     decoy.when(
-        mock_run_data_manager.set_signed_by(
-            run_id="run-id", signed_by="Alice Example"
-        )
+        mock_run_data_manager.set_signed_by(run_id="run-id", signed_by="Alice Example")
     ).then_return(expected_response)
 
     result = await update_run(
