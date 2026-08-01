@@ -18,7 +18,9 @@ import csv
 metadata = {"protocolName": "DVT VM 200mbar Life Test"}
 requirements = {"robotType": "Flex", "apiLevel": "2.30"}
 
-ASPIRATE_OFFSET_MM = 5
+FIXTURE_OFFSET_MM = 1
+LABWARE_OFFSET_MM = 0
+ASPIRATE_OFFSET_MM = 5 + LABWARE_OFFSET_MM + FIXTURE_OFFSET_MM
 
 OUTPUT_DIR = "/data/vacuum_manifold_life_test_dvt/"
 
@@ -38,7 +40,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_int(
         "pressure",
         "pressure",
-        default=400,
+        default=800,
         minimum=0,
         maximum=1000,
         description="Target absolute pressure (mbar).",
@@ -54,7 +56,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_int(
         "z_offset",
         "z_offset",
-        default=8,
+        default=30,
         minimum=-100,
         maximum=100,
         description="Z offset for the acroprep or labware.",
@@ -90,6 +92,14 @@ def add_parameters(parameters: ParameterContext) -> None:
         minimum=1,
         maximum=1000,
         description="Amount of time the vm vent is opened.",
+    )
+    parameters.add_int(
+        "target_liquid_height",
+        "target_liquid_height",
+        default=34,
+        minimum=1,
+        maximum=60,
+        description="Height of the liquid column in mm.",
     )
     parameters.add_str(
         variable_name="collar",
@@ -176,11 +186,11 @@ def read_continuous_data(
     head_writer = True
     while time.perf_counter() - loop_st < run_time:
         line = get_vacuum_read(pump)
-        ctx.delay(seconds=0.1)  # Adjust the delay as needed
+        # ctx.delay(seconds=0.1)  # Adjust the delay as needed
         pressure_dict = dataclasses.asdict(line)
         # Timestamp
         ts = time.perf_counter() - start_time
-        ctx.comment(f"Pump time: {time.perf_counter() - loop_st}")
+        # ctx.comment(f"Pump time: {time.perf_counter() - loop_st}")
         # Record Pressure Data
         _write_to_csv(f_name, head_writer, ts, pressure_dict)
         head_writer = False
@@ -230,7 +240,10 @@ def run_single_pump_api_cycle(
     #------------------------Fill the water reservoirt---------------------------------
     # Start the water pump to fill the reservoir to the target liquid height
     water_pump_fixture.open_solenoid()
+    water_pump_fixture.reset_sensor()  # Reset the capacitive sensor before starting
+    water_pump_fixture.flush_buffer(20)  # Flush the serial input buffer before starting
     try:
+        # ctx.delay(0.1) # Short delay to ensure the sensor is reset
         # Start the filling of the water pump while the vacuum is running
         water_reached = water_pump_fixture.water_fill_auto(target_liquid_height)
         ctx.comment(f"[cycle {cycle_index}] water fill reached target: {water_reached}")
@@ -288,6 +301,7 @@ def get_vacuum_read(vm_mod: VacuumModuleContext) -> Any:
     vacuum_hw = object.__getattribute__(adapter, "_obj_to_adapt")
 
     data = vacuum_hw.vacuum_state
+    time.sleep(0.1)
     return data
 
 
@@ -315,13 +329,13 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     RUN_SEC = ctx.params.vm_run_sec  # type: ignore[attr-defined]
     DECAY_SEC = ctx.params.vm_decay_sec  # type: ignore[attr-defined]
     VENT_SEC = ctx.params.vm_vent_sec  # type: ignore[attr-defined]
+    target_liquid_height = ctx.params.target_liquid_height  # type: ignore[attr-defined]
     
     # Load Trash Bin
     ctx.load_trash_bin("A1")
     # Load Vacuum Module
     vm_mod = cast(VacuumModuleContext, ctx.load_module("vacuumModuleV1", "A3"))
     # Set the target liquid height for the water reservoir
-    target_liquid_height = 30
     # Load Labware
     tip_rack = ctx.load_labware(
         "opentrons_flex_96_tiprack_1000uL",
@@ -330,7 +344,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     )
     manifold_collar = vm_mod.load_adapter_to_dock(ctx.params.collar)  # type: ignore[attr-defined]
     filter_plate = manifold_collar.load_labware("invitroven_filter_plate")
-    source = ctx.load_labware("nest_1_reservoir_290ml", "C2")
+    source = ctx.load_labware("nest_1_reservoir_290ml", "C1")
     source.set_offset(x=0, y=0, z=13)
     tip_rack.set_offset(x=0, y=0, z=0)
     # Load Pipette
@@ -344,16 +358,16 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             ctx.comment(f"Pump init failed: {e}")
             raise
     # Disable waste Detection to avoid false positives during the stress test
-    # enable_waste_detection(vm_mod, False)  # type: ignore[attr-defined]
-    # ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
-    # pip.pick_up_tip()
+    enable_waste_detection(vm_mod, False)  # type: ignore[attr-defined]
+    ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
+    pip.pick_up_tip()
     output_dir = Path(OUTPUT_DIR)
     for cycle in range(1, cycles + 1):
         ctx.comment(f"=== Cycle :{cycle}/{cycles}===")
-        # pip.aspirate(volume, source["A1"].bottom(ASPIRATE_OFFSET_MM))
-        # pip.dispense(volume, filter_plate["A1"].top(z_offset), push_out=50)
+        pip.aspirate(volume, source["A1"].bottom(ASPIRATE_OFFSET_MM))
+        pip.dispense(volume, filter_plate["A1"].top(z_offset), push_out=50)
         # pip.touch_tip(filter_plate["A1"], v_offset=z_offset)
-        # pip.move_to(filter_plate["A1"].top(10))  # Move away again
+        pip.move_to(filter_plate["A1"].top(30))  # Move away again
         if not ctx.is_simulating():
             run_single_pump_api_cycle(
                 vm_mod,
@@ -368,7 +382,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                 VENT_SEC,
                 ctx,
             )
-    # pip.return_tip()
+    pip.return_tip()
     if not ctx.is_simulating():
         try:
             if pump_fixture is not None:

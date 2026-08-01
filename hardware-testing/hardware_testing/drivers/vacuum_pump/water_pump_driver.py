@@ -36,6 +36,7 @@ COMMANDS = {
     "status": "STATUS",
     "valve_on": "solenoid ON",
     "valve_off": "solenoid OFF",
+    "reset": "RESET SENSOR"
 }
 
 """Ready. Commands: ON, OFF, AUTO ON, AUTO OFF, CHECK, REFERENCE, LEVEL, STATUS"""
@@ -62,6 +63,10 @@ class AbstractWaterPump(Protocol):
 
     def turn_motor_off(self) -> None:
         """Change the state of the Pump to off."""
+        ...
+
+    def reset_sensor(self) -> None:
+        """Reset the sensor."""
         ...
 
     def check_water_level(self) -> float:
@@ -120,7 +125,7 @@ class WaterPump(AbstractWaterPump):
             command = f"{COMMANDS['pumpOn']}{V_ACK}"
             print(f"{COMMANDS['pumpOn']}{V_ACK}")
             self.connection.reset_input_buffer()
-            # self.connection.reset_output_buffer()
+            self.connection.reset_output_buffer()
             self._write(command.encode())
             self._logger.debug("Motor turned on")
         except Exception as e:
@@ -133,11 +138,24 @@ class WaterPump(AbstractWaterPump):
             command = f"{COMMANDS['pumpOff']}{V_ACK}"
             print(f"{COMMANDS['pumpOff']}{V_ACK}")
             self.connection.reset_input_buffer()
-            # self.connection.reset_output_buffer()
+            self.connection.reset_output_buffer()
             self._write(command.encode())
             self._logger.debug("Motor turned off")
         except Exception as e:
             self._logger.error(f"Failed to turn motor off: {e}")
+            raise
+    
+    def reset_sensor(self) -> None:
+        """Reset the capacitive sensor."""
+        try:
+            command = f"{COMMANDS['reset']}{V_ACK}"
+            print(f"{COMMANDS['reset']}{V_ACK}")
+            self.connection.reset_input_buffer()
+            self.connection.reset_output_buffer()
+            self._write(command.encode())
+            self._logger.debug("Sensor reset")
+        except Exception as e:
+            self._logger.error(f"Failed to reset sensor: {e}")
             raise
 
     def water_fill_timer(self, run_time: int) -> None:
@@ -155,14 +173,15 @@ class WaterPump(AbstractWaterPump):
         finally:
             self.turn_motor_off()
 
-    def water_fill_auto(self, target: float) -> bool:
+    def water_fill_auto(self, water_level: float) -> bool:
         self._logger.info(
-            f"Starting water fill for target level {target} mm"
+            f"Starting water fill for target level {water_level} mm"
         )
         try:
-            self.turn_motor_on()
+            if self.check_water_level() < water_level:
+                self.turn_motor_on()
             # Blocks until target level is reached
-            state = self.limit_water_fill(target)
+            state = self.limit_water_fill(water_level)
 
             self._logger.info("Target water level reached")
             
@@ -178,14 +197,21 @@ class WaterPump(AbstractWaterPump):
         """Run the pump for the specified water level in millimeters."""
         current_water_level = self.check_water_level()
         tolerance = 2  # Allowable tolerance in mm
+        start_time = time.perf_counter()
         try:
             print(abs(current_water_level - water_level))
             while abs(current_water_level - water_level) > tolerance:
                 current_water_level = self.check_water_level()
-                print(f"Current water level: {current_water_level} mm")
-                print(abs(current_water_level - water_level))
+                water_level_diff = abs(current_water_level - water_level)
+                # print(f"Current water level: {current_water_level} mm")
+                # print(f"Water level difference: {water_level_diff} mm")
+                self._logger.info(f"Current water level: {current_water_level} mm")
+                self._logger.info(f"Water level difference: {water_level_diff} mm")
                 if current_water_level > water_level:
                     return True
+                if time.perf_counter() - start_time > 12:  # Timeout after 60 seconds
+                    self._logger.error("Water fill timed out")
+                    return False
 
         except Exception as e:
             self._logger.error(f"Water level read error: {e}")
@@ -227,6 +253,21 @@ class WaterPump(AbstractWaterPump):
             self._logger.error(f"Water level read error: {e}")
             raise
 
+    def flush_buffer(self, duration) -> None:
+        """Flush the serial input buffer."""
+        try:
+            self.connection.reset_input_buffer()
+            self._logger.debug("Input buffer flushed")
+            start_time = time.perf_counter()
+            while time.perf_counter() - start_time < duration:  # Flush for up to 5 seconds
+                data = self.check_water_level()
+                elapsed_time = time.perf_counter() - start_time
+                print(f"Time: {elapsed_time} , {data}")
+                self._logger.info(f"Time: {elapsed_time} , {data}")
+        except Exception as e:
+            self._logger.error(f"Failed to flush input buffer: {e}")
+            raise
+
     def open_solenoid(self) -> None:
         """Open the solenoid valve."""
         command = f"{COMMANDS['valve_on']}{V_ACK}"
@@ -242,7 +283,7 @@ class WaterPump(AbstractWaterPump):
     def _write(self, data: bytes) -> None:
         """Write to serial connection."""
         try:
-            print(f"Writing data: {data}")
+            # print(f"Writing data: {data}")
             self.connection.write(data)
         except Exception:
             raise
@@ -285,17 +326,19 @@ if __name__ == "__main__":
     start_time = time.perf_counter()
     condition = True
     pump.open_solenoid()  # Open the solenoid valve to allow water flow
-    while condition:
-        data = pump.check_water_level()
-        elasped_time = time.perf_counter() - start_time
-        print(f"Time: {elasped_time} , {data}")
-        # water_reached = pump.water_fill_auto(30)  # Example target level in mm
-        print(f"Water reached: {water_reached}")
-        if water_reached == True:
-            condition = False
-    pump.close_solenoid()  # Close the solenoid valve to stop water flow
-    # pump.turn_motor_on()
-    # time.sleep(1)  # Run the pump for 5 seconds
-    # pump.turn_motor_off()
+    pump.reset_sensor()  # Reset the capacitive sensor before starting
+    pump.flush_buffer(duration=10)  # Flush the buffer for 5 seconds to stabilize readings
+    try:
+        while condition:
+            data = pump.check_water_level()
+            elasped_time = time.perf_counter() - start_time
+            print(f"Time: {elasped_time} , {data}")
+            water_reached = pump.water_fill_auto(30)  # Example target level in mm
+            print(f"Water reached: {water_reached}")
+            if water_reached == True:
+                condition = False
+    finally:
+        pump.close_solenoid()  # Close the solenoid valve to stop water flow
+        pump.turn_motor_off()
 
-    # pump.disconnect()
+    pump.disconnect()
