@@ -127,3 +127,66 @@ test-compare:
 		  --browser chromium \
 		  tests/pd $(PYTEST_ARGS) -s; \
 	fi
+
+# Load persisted robot settings when present (from `make configure-robot`).
+ifneq (,$(wildcard .env))
+include .env
+export
+endif
+
+HEADED ?=
+PYTEST_HEADED := $(if $(HEADED),HEADED=1,)
+
+.PHONY: configure-robot check-robot test-app test-app-headed test-app-nav test-app-nav-headed \
+	test-app-device-cards test-app-device-cards-headed _app-report-banner
+
+configure-robot:
+	uv run python configure_robot.py
+
+check-robot:
+	uv run python -m automation.app_helpers.robot_connection
+
+test-app:
+	@status=0; \
+	$(PYTEST_HEADED) uv run pytest tests/app/ $(PYTEST_ARGS) || status=$$?; \
+	$(MAKE) --no-print-directory _app-report-banner; \
+	exit $$status
+
+test-app-headed:
+	@status=0; \
+	HEADED=1 uv run pytest tests/app/ $(PYTEST_ARGS) || status=$$?; \
+	$(MAKE) --no-print-directory _app-report-banner; \
+	exit $$status
+
+test-app-nav:
+	@status=0; \
+	$(PYTEST_HEADED) uv run pytest tests/app/nav/ $(PYTEST_ARGS) || status=$$?; \
+	$(MAKE) --no-print-directory _app-report-banner; \
+	exit $$status
+
+test-app-nav-headed:
+	@status=0; \
+	HEADED=1 uv run pytest tests/app/nav/ $(PYTEST_ARGS) || status=$$?; \
+	$(MAKE) --no-print-directory _app-report-banner; \
+	exit $$status
+
+test-app-device-cards:
+	@status=0; \
+	$(PYTEST_HEADED) uv run pytest tests/app/device_cards/ $(PYTEST_ARGS) || status=$$?; \
+	$(MAKE) --no-print-directory _app-report-banner; \
+	exit $$status
+
+test-app-device-cards-headed:
+	@status=0; \
+	HEADED=1 uv run pytest tests/app/device_cards/ $(PYTEST_ARGS) || status=$$?; \
+	$(MAKE) --no-print-directory _app-report-banner; \
+	exit $$status
+
+_app-report-banner:
+	@echo ""
+	@echo "---------------------------------------------------------"
+	@echo "App tests finished."
+	@echo "Open test-results/report.html for the HTML report."
+	@echo "Videos: test-results/videos/ (headed runs)"
+	@echo "Traces: test-results/traces/"
+	@echo "---------------------------------------------------------"
