@@ -9,8 +9,8 @@ import { swatchColors } from '@opentrons/step-generation'
 
 import { formatPercentage } from '../utils/formatPercentage'
 import { formatVolume } from '../utils/formatVolume'
-import styles from './welltooltip.module.css'
 import { useWellTooltipPopper } from './useWellTooltipPopper'
+import styles from './welltooltip.module.css'
 
 import type { MouseEvent, ReactNode } from 'react'
 import type { LocationLiquidState } from '@opentrons/step-generation'
