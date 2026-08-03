@@ -33,9 +33,19 @@ from opentrons.protocol_engine.types import CSVRuntimeParamPaths, DeckSlotLocati
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.robot.types import RobotTypeEnum
 from server_utils.audit.fastapi import get_audit_logger
+from server_utils.auth.resource_server.authorization_checker import (
+    check as check_authorization,
+)
 from server_utils.auth.resource_server.fastapi import (
+    AuthorizationError,
+    RequireAuthenticationResult,
     get_access_control_status,
+    require_authentication,
     require_scopes,
+)
+from server_utils.auth.resource_server.types import (
+    AuthorizationNotRequiredResult,
+    AuthorizedResult,
 )
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -426,6 +436,18 @@ async def remove_run(
     )
 
 
+def _require_signoff_scope(
+    authentication: RequireAuthenticationResult,
+) -> None:
+    authorization_result = check_authorization(
+        authentication, {Scope.RUN_SIGNOFF_WRITE}
+    )
+    if not isinstance(
+        authorization_result, (AuthorizationNotRequiredResult, AuthorizedResult)
+    ):
+        raise AuthorizationError(authorization_result, {Scope.RUN_SIGNOFF_WRITE})
+
+
 @PydanticResponse.wrap_route(
     base_router.patch,
     path="/runs/{runId}",
@@ -447,6 +469,9 @@ async def update_run(
     runId: str,
     request_body: RequestModel[RunUpdate],
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    authentication: Annotated[
+        RequireAuthenticationResult, Depends(require_authentication)
+    ],
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Update a run by its ID.
 
@@ -454,7 +479,11 @@ async def update_run(
         runId: Run ID pulled from URL.
         request_body: Update data from request body.
         run_data_manager: Current and historical run data management.
+        authentication: The authenticated user, if any.
     """
+    if request_body.data.signedBy is not None:
+        _require_signoff_scope(authentication)
+
     try:
         run_data: Run | BadRun | None = None
         if request_body.data.signedBy is not None:

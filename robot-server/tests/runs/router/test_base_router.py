@@ -36,6 +36,12 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.robot.types import RobotTypeEnum
+from server_utils.auth.resource_server.fastapi import AuthorizationError
+from server_utils.auth.resource_server.types import (
+    AuthenticatedResult,
+    AuthenticationNotRequiredResult,
+)
+from server_utils.auth.scopes import Scope, serialize_scopes
 from server_utils.fastapi_utils.models.json_api import (
     MultiBodyMeta,
     RequestModel,
@@ -631,6 +637,7 @@ async def test_update_run_to_not_current(
         runId="run-id",
         request_body=RequestModel(data=RunUpdate(current=False)),
         run_data_manager=mock_run_data_manager,
+        authentication=AuthenticationNotRequiredResult(),
     )
 
     assert result.content == SimpleBody(data=expected_response)
@@ -666,6 +673,7 @@ async def test_update_current_none_noop(
         runId="run-id",
         request_body=RequestModel(data=RunUpdate()),
         run_data_manager=mock_run_data_manager,
+        authentication=AuthenticationNotRequiredResult(),
     )
 
     assert result.content == SimpleBody(data=expected_response)
@@ -686,6 +694,7 @@ async def test_update_to_current_not_current(
             runId="run-id",
             request_body=RequestModel(data=RunUpdate(current=False)),
             run_data_manager=mock_run_data_manager,
+            authentication=AuthenticationNotRequiredResult(),
         )
 
     assert exc_info.value.status_code == 409
@@ -706,6 +715,7 @@ async def test_update_to_current_conflict(
             runId="run-id",
             request_body=RequestModel(data=RunUpdate(current=False)),
             run_data_manager=mock_run_data_manager,
+            authentication=AuthenticationNotRequiredResult(),
         )
 
     assert exc_info.value.status_code == 409
@@ -726,10 +736,70 @@ async def test_update_to_current_missing(
             runId="run-id",
             request_body=RequestModel(data=RunUpdate(current=False)),
             run_data_manager=mock_run_data_manager,
+            authentication=AuthenticationNotRequiredResult(),
         )
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
+
+
+async def test_update_run_signed_by_requires_run_signoff_write_scope(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+) -> None:
+    """It should reject signedBy updates when the token lacks run_signoff.write."""
+    with pytest.raises(AuthorizationError) as exc_info:
+        await update_run(
+            runId="run-id",
+            request_body=RequestModel(data=RunUpdate(signedBy="Alice Example")),
+            run_data_manager=mock_run_data_manager,
+            authentication=AuthenticatedResult(
+                scope=serialize_scopes({Scope.ROBOT_CONTROL_WRITE}),
+                username="testuser",
+                fullname="Test User",
+            ),
+        )
+
+    assert exc_info.value.required_scopes == {Scope.RUN_SIGNOFF_WRITE}
+
+
+async def test_update_run_signed_by(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+) -> None:
+    """It should update signedBy when the request is authorized."""
+    expected_response = Run(
+        id="run-id",
+        protocolId=None,
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=pe_types.EngineStatus.SUCCEEDED,
+        current=True,
+        actions=[],
+        errors=[],
+        pipettes=[],
+        modules=[],
+        labware=[],
+        labwareOffsets=[],
+        liquids=[],
+        liquidClasses=[],
+        outputFileIds=[],
+        hasEverEnteredErrorRecovery=False,
+        signedBy="Alice Example",
+    )
+
+    decoy.when(
+        mock_run_data_manager.set_signed_by(run_id="run-id", signed_by="Alice Example")
+    ).then_return(expected_response)
+
+    result = await update_run(
+        runId="run-id",
+        request_body=RequestModel(data=RunUpdate(signedBy="Alice Example")),
+        run_data_manager=mock_run_data_manager,
+        authentication=AuthenticationNotRequiredResult(),
+    )
+
+    assert result.content == SimpleBody(data=expected_response)
+    assert result.status_code == 200
 
 
 async def test_get_run_commands_errors(

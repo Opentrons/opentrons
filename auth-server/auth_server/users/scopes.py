@@ -48,6 +48,8 @@ def get_scope_set_of_account_type(
                 result.add(Scope.UPDATES_WRITE)
             if not settings.requireAdminCredsWhenSendingProtocolToRobot:
                 result.add(Scope.PROTOCOLS_WRITE)
+            if not settings.requireAdminCredsForSignoffProtocol:
+                result.add(Scope.RUN_SIGNOFF_WRITE)
             return result
 
         else:
