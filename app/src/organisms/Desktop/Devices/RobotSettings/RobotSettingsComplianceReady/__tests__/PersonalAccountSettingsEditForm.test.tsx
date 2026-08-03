@@ -87,14 +87,15 @@ describe('PersonalAccountSettingsEditForm', () => {
 
   it('shows a required username error when the username is cleared', async () => {
     render(props)
-    const usernameInput = screen.getByDisplayValue('alice')
-    fireEvent.change(usernameInput, {
+    fireEvent.change(screen.getByDisplayValue('alice'), {
       target: { value: '' },
     })
-    fireEvent.blur(usernameInput)
+    fireEvent.click(screen.getByRole('button', { name: 'save' }))
+
     await waitFor(() => {
       expect(screen.getByText('Username is required.')).toBeInTheDocument()
     })
+    expect(props.onSave).not.toHaveBeenCalled()
   })
 
   it('calls onSave with password when both password fields match', async () => {
