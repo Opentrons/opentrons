@@ -90,9 +90,12 @@ describe('useDownloadSelectedLogPeriods', () => {
   })
 
   it('should reject and not fetch when given an empty array', async () => {
-    const { result } = renderHook(() => useDownloadSelectedLogPeriods(ROBOT_NAME), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useDownloadSelectedLogPeriods(ROBOT_NAME),
+      {
+        wrapper,
+      }
+    )
 
     await expect(
       result.current.mutateAsync({ logPeriods: [] })
@@ -102,9 +105,12 @@ describe('useDownloadSelectedLogPeriods', () => {
   })
 
   it('should fetch every log period, zip them, and save via the browser when no usbPath is given', async () => {
-    const { result } = renderHook(() => useDownloadSelectedLogPeriods(ROBOT_NAME), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useDownloadSelectedLogPeriods(ROBOT_NAME),
+      {
+        wrapper,
+      }
+    )
 
     await result.current.mutateAsync({
       logPeriods: [mockPeriodOne, mockPeriodTwo],
@@ -128,9 +134,12 @@ describe('useDownloadSelectedLogPeriods', () => {
   })
 
   it('should save to the usbPath instead of the browser when provided', async () => {
-    const { result } = renderHook(() => useDownloadSelectedLogPeriods(ROBOT_NAME), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useDownloadSelectedLogPeriods(ROBOT_NAME),
+      {
+        wrapper,
+      }
+    )
 
     await result.current.mutateAsync({
       logPeriods: [mockPeriodOne],
@@ -145,9 +154,12 @@ describe('useDownloadSelectedLogPeriods', () => {
   })
 
   it('should dispatch the deletion key from the response header for every period', async () => {
-    const { result } = renderHook(() => useDownloadSelectedLogPeriods(ROBOT_NAME), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useDownloadSelectedLogPeriods(ROBOT_NAME),
+      {
+        wrapper,
+      }
+    )
 
     await result.current.mutateAsync({
       logPeriods: [mockPeriodOne, mockPeriodTwo],
@@ -172,9 +184,12 @@ describe('useDownloadSelectedLogPeriods', () => {
       data: { arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)) },
       headers: {},
     } as any)
-    const { result } = renderHook(() => useDownloadSelectedLogPeriods(ROBOT_NAME), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useDownloadSelectedLogPeriods(ROBOT_NAME),
+      {
+        wrapper,
+      }
+    )
 
     await result.current.mutateAsync({ logPeriods: [mockPeriodOne] })
 
@@ -183,11 +198,16 @@ describe('useDownloadSelectedLogPeriods', () => {
 
   it('should report an error status and stop loading when a log period fails to fetch', async () => {
     vi.mocked(getLogPeriodRaw).mockRejectedValue(new Error('nope'))
-    const { result } = renderHook(() => useDownloadSelectedLogPeriods(ROBOT_NAME), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useDownloadSelectedLogPeriods(ROBOT_NAME),
+      {
+        wrapper,
+      }
+    )
 
-    await result.current.mutateAsync({ logPeriods: [mockPeriodOne] }).catch(() => {})
+    await result.current
+      .mutateAsync({ logPeriods: [mockPeriodOne] })
+      .catch(() => {})
 
     await waitFor(() => {
       expect(result.current.status).toEqual('error')
@@ -208,9 +228,12 @@ describe('useDownloadSelectedLogPeriods', () => {
           }
         }) as any
     )
-    const { result } = renderHook(() => useDownloadSelectedLogPeriods(ROBOT_NAME), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () => useDownloadSelectedLogPeriods(ROBOT_NAME),
+      {
+        wrapper,
+      }
+    )
 
     const firstCall = result.current.mutateAsync({
       logPeriods: [mockPeriodOne],
