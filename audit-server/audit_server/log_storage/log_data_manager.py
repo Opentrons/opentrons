@@ -4,8 +4,8 @@ import secrets
 from asyncio import Lock
 from datetime import datetime, timezone
 from logging import getLogger
-from typing import Final
 from pathlib import Path
+from typing import Final
 
 from fastapi import UploadFile
 from opentrons_shared_data.errors.exceptions import (
