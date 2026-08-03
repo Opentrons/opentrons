@@ -6,7 +6,7 @@ name: 'API test/lint/deploy'
 on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   pull_request:
-    paths:
+    paths: &paths
       - 'api/**'
       - 'Makefile'
       - 'shared-data/**'
@@ -19,23 +19,13 @@ on:
       - '.github/workflows/utils.js'
       - 'package-testing/**'
   push:
-    paths:
-      - 'api/**'
-      - 'Makefile'
-      - 'shared-data/**'
-      - '!shared-data/js/**'
-      - 'hardware/**'
-      - 'scripts/**.mk'
-      - 'scripts/**.py'
-      - '.github/workflows/api-test-lint-deploy.yaml'
-      - '.github/actions/python/**'
-      - '.github/workflows/utils.js'
+    paths: *paths
     branches:
       - 'edge'
       - 'release'
       - '*hotfix*'
     tags:
-      - 'v*'
+      - 'v[0-9]*.[0-9]*'
   workflow_dispatch:
 
 concurrency:
@@ -52,9 +42,7 @@ jobs:
     timeout-minutes: 10
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: '22.22.0'
@@ -80,8 +68,9 @@ jobs:
             with-ot-hardware: 'true'
     runs-on: '${{ matrix.os }}'
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
+          # The `make sdist wheel` call below consults Git history for the version number.
           fetch-depth: 0
       # https://github.com/actions/checkout/issues/290
       - name: 'Fix actions/checkout odd handling of tags'
@@ -113,11 +102,6 @@ jobs:
         run: make -C api test-cov
       - name: Ensure assets build
         run: make -C api sdist wheel
-      - name: Upload coverage report
-        uses: codecov/codecov-action@ab904c41d6ece82784817410c45d8b8c02684457 # v3.1.6
-        with:
-          files: ./api/coverage.xml
-          flags: api
 
   test-package:
     name: 'installed package tests on ${{ matrix.os }}'
@@ -133,7 +117,7 @@ jobs:
             python: '3.13'
     runs-on: '${{ matrix.os }}'
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'Fix actions/checkout odd handling of tags'
         if: startsWith(github.ref, 'refs/tags')
         run: |
@@ -179,8 +163,9 @@ jobs:
       id-token: write # Required for OIDC
       contents: read # Required for checkout
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
+          # The `make sdist wheel` call below consults Git history for the version number.
           fetch-depth: 0
       # https://github.com/actions/checkout/issues/290
       - name: 'Fix actions/checkout odd handling of tags'

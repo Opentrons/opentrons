@@ -5,7 +5,6 @@
   "confirm_import": "Are you sure you want to import this file? You will lose any current unsaved changes.",
   "confirm_leave": "Are you sure you want to leave? You will lose any unsaved changes.",
   "continue_with_export": "Continue with export",
-  "create_new": "Create New",
   "crash": {
     "eight_channel": "8-Channel",
     "labware_east_west": "can be placed to the left or right of a",
@@ -18,6 +17,7 @@
     "read_more_here": "Read more here",
     "slot_has_tiprack": "if that slot contains a tip rack."
   },
+  "create_new": "Create New",
   "deck_config_placement": {
     "SLOT_OCCUPIED": {
       "staging_area": "Cannot place staging area",
@@ -179,13 +179,13 @@
       "body": "Slot {{selectedSlot}} is occupied by a Heater-Shaker. Other modules cannot be placed in front of or behind a Heater-Shaker.",
       "title": "Cannot place module"
     },
-    "SLOT_OCCUPIED": {
-      "body": "Slot {{selectedSlot}} is occupied. Navigate to the design tab and remove the labware or remove the additional item to continue.",
-      "title": "Cannot place module"
-    },
     "SLOTS_OCCUPIED": {
       "multi": "Multiple slots are occupied",
       "single": "Slot {{slotName}} is occupied",
+      "title": "Cannot place module"
+    },
+    "SLOT_OCCUPIED": {
+      "body": "Slot {{selectedSlot}} is occupied. Navigate to the design tab and remove the labware or remove the additional item to continue.",
       "title": "Cannot place module"
     }
   },
@@ -248,25 +248,25 @@
         "title": "8-Channel unable to access slot"
       },
       "HOPPER_EMPTY": {
-        "title": "Cannot retrieve labware from empty stacker",
-        "body": "Refill the stacker."
+        "body": "Refill the stacker.",
+        "title": "Cannot retrieve labware from empty stacker"
+      },
+      "HOPPER_FULL": {
+        "body": "Edit labware quantities to store or refill more labware into the stacker.",
+        "title": "Stacker capacity reached"
       },
       "INCOMPLETE_PICKUP": {
         "body": "Add another tip rack to your deck, change your nozzle configuration, or change your tip management during transfer and mix steps.",
         "title": "Not enough tips arranged correctly to complete action"
       },
       "INSUFFICIENT_TIPS": {
-        "body": "Add another tip rack to your deck or change your tip management during transfer and mix steps.",
+        "body": "Add or move a tip rack on your deck to avoid collisions, or change your tip pickup settings for this action.",
         "link": "Edit starting deck",
-        "title": "Not enough tips to complete action"
+        "title": "Not enough accessible tips"
       },
       "LABWARE_DISCARDED_IN_TRASH": {
         "body": "This step uses labware that has previously been discarded into a trash.",
         "title": "Labware not available"
-      },
-      "MOVE_LOCATION_NOT_SPECIFIED": {
-        "body": "This step is missing a move location.",
-        "title": "Move location not defined."
       },
       "LABWARE_OFF_DECK": {
         "body": "The robot can only perform steps on labware that is on the deck. Add or change a Move Labware step to put it on the deck before this step.",
@@ -277,29 +277,25 @@
         "title": "Attempting to move labware on top of another entity"
       },
       "LABWARE_ON_HOPPER": {
-        "title": "Labware on Flex Stacker hopper",
-        "body": "Retrieve the labware before moving it"
+        "body": "Retrieve the labware before moving it",
+        "title": "Labware on Flex Stacker hopper"
       },
       "MISMATCHED_STACKER_LABWARE_TYPE": {
-        "title": "Cannot store or refill multiple labware types in the stacker",
-        "body": "The stacker can only store a single labware at a time."
+        "body": "The stacker can only store a single labware at a time.",
+        "title": "Cannot store or refill multiple labware types in the stacker"
       },
       "MISSING_96_CHANNEL_TIPRACK_ADAPTER": {
         "body": "The 96-channel pipette uses a tip rack adapter to pick up a full rack of tips. Add one to your starting deck or use partial tip pickup.",
         "link": "Edit starting deck",
         "title": "Tip rack adapter required"
       },
-      "THERMOCYCLER_BUSY_WITH_PROFILE": {
-        "title": "Thermocycler is busy running a profile",
-        "body": "This step cannot run while the Thermocycler is running a profile. Move the step outside the profile."
-      },
       "MISSING_MODULE": {
         "body": "This step tries to use a module not in the protocol. Add the module to your protocol or remove this step.",
         "title": "Module not in protocol"
       },
       "MISSING_STACKER_LABWARE_TYPE": {
-        "title": "Stacker labware not defined",
-        "body": "Add labware to the stacker in the starting deck so that you can refill it later."
+        "body": "Add labware to the stacker in the starting deck so that you can refill it later.",
+        "title": "Stacker labware not defined"
       },
       "MISSING_TEMPERATURE_STEP": {
         "body": "The protocol can't proceed beyond this pause step, because the module is not changing temperature. Add or modify a temperature step before this step.",
@@ -308,6 +304,10 @@
       "MODULE_PIPETTE_COLLISION_DANGER": {
         "body": "Move labware and modules or use a different pipette.",
         "title": "GEN1 8-Channel Pipettes can't move adjacent to modules"
+      },
+      "MOVE_LOCATION_NOT_SPECIFIED": {
+        "body": "This step is missing a move location.",
+        "title": "Move location not defined."
       },
       "NEXT_TIPRACK_HAS_LID": {
         "body": "The next available tip rack has a lid. Remove the lid from the tip rack to pick up tips.",
@@ -325,8 +325,16 @@
         "body": "Picking up labware with the gripper while tips are on an adjacent pipette can cause collisions. Drop tips from all pipettes before this step.",
         "title": "Gripper movement with tips attached"
       },
-      "POSSIBLE_PIPETTE_COLLISION": {
-        "body": "There is a possibility that the pipette will collide with the adjacent labware, modules, or trash fixtures for partial tip pick up.",
+      "POSSIBLE_PIPETTE_COLLISION_ADJACENT_ADDRESSABLE_AREA": {
+        "body": "There is a possibility that the pipette will collide with adjacent items in {{addressableAreaCausingCollisionDisplayName}}.",
+        "title": "Pipette collisions likely"
+      },
+      "POSSIBLE_PIPETTE_COLLISION_OUTSIDE_DECK_EXTENTS": {
+        "body": "There is a possibility that the pipette will move outside the deck extents.",
+        "title": "Pipette collisions likely"
+      },
+      "POSSIBLE_PIPETTE_COLLISION_THERMOCYCLER_LID": {
+        "body": "There is a possibility that the pipette will collide with the Thermocycler lid.",
         "title": "Pipette collisions likely"
       },
       "REMOVE_96_CHANNEL_TIPRACK_ADAPTER": {
@@ -339,20 +347,23 @@
         "title": "Return tip unavailable"
       },
       "SHUTTLE_EMPTY": {
-        "title": "Cannot store labware when shuttle is empty",
-        "body": "There is no labware on the shuttle to store into the stacker."
+        "body": "There is no labware on the shuttle to store into the stacker.",
+        "title": "Cannot store labware when shuttle is empty"
       },
       "SHUTTLE_FULL": {
-        "title": "Cannot retrieve labware when shuttle is occupied",
-        "body": "Shuttle must be empty in order to retrieve labware from the stacker."
+        "body": "Shuttle must be empty in order to retrieve labware from the stacker.",
+        "title": "Cannot retrieve labware when shuttle is occupied"
+      },
+      "TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER": {
+        "body": "The Heater-Shaker labware latch will collide with labware over 53 mm. Move labware to a different slot."
+      },
+      "THERMOCYCLER_BUSY_WITH_PROFILE": {
+        "body": "This step cannot run while the Thermocycler is running a profile. Move the step outside the profile.",
+        "title": "Thermocycler is busy running a profile"
       },
       "THERMOCYCLER_LID_CLOSED": {
         "body": "This step tries to use labware in the Thermocycler. Open the lid before this step.",
         "title": "Thermocycler lid closed"
-      },
-      "HOPPER_FULL": {
-        "title": "Stacker capacity reached",
-        "body": "Edit labware quantities to store or refill more labware into the stacker."
       },
       "TIPRACK_LID_NOT_ALLOWED_ON_DECK": {
         "body": "The tip rack lid is not allowed directly on a deck slot.",
@@ -362,8 +373,9 @@
         "body": "Add another tip rack to your deck, change your nozzle configuration, or change your tip management during transfer and mix steps.",
         "title": "Action will pick up too many tips"
       },
-      "TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER": {
-        "body": "The Heater-Shaker labware latch will collide with labware over 53 mm. Move labware to a different slot."
+      "VACUUM_UNDER_PRESSURE": {
+        "body": "Deactivate the pump to move labware to or from it.",
+        "title": "The vacuum module is under pressure."
       }
     },
     "warning": {

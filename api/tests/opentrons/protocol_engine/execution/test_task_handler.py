@@ -42,7 +42,9 @@ def subject(
 @pytest.fixture
 def state_store(decoy: Decoy) -> StateStore:
     """Get a mock in the shape of a StateStore."""
-    return decoy.mock(cls=StateStore)
+    mock = decoy.mock(cls=StateStore)
+    decoy.when(mock.commands.get_running_command_id()).then_return(None)
+    return mock
 
 
 @pytest.fixture
@@ -79,7 +81,9 @@ async def test_create_task(
     await asyncio.sleep(0.25)
     assert task.createdAt == created_timestamp
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task=task)),
+        action_dispatcher.dispatch(
+            StartTaskAction(task=task, originating_command_id=None)
+        ),
         action_dispatcher.dispatch(
             FinishTaskAction(
                 task_id=matchers.Anything(), finished_at=matchers.Anything(), error=None
@@ -106,7 +110,7 @@ async def test_uses_passed_id(
     task = await subject.create_task(_task, id="testid1")
     assert task.id == "checked testid1"
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task)),
+        action_dispatcher.dispatch(StartTaskAction(task, originating_command_id=None)),
         times=1,
     )
     await task.asyncioTask
@@ -137,7 +141,7 @@ async def test_generates_id(
     task = await subject.create_task(_task)
     assert task.id == "testid2"
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task)),
+        action_dispatcher.dispatch(StartTaskAction(task, originating_command_id=None)),
         times=1,
     )
     await task.asyncioTask
@@ -166,7 +170,7 @@ async def test_generates_error(
     decoy.when(model_utils.ensure_id(None)).then_return("testid2")
     task = await subject.create_task(_task)
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task)),
+        action_dispatcher.dispatch(StartTaskAction(task, originating_command_id=None)),
         times=1,
     )
     task.asyncioTask.cancel(msg="hello")
@@ -212,7 +216,7 @@ async def test_generates_enumerated_error(
     decoy.when(model_utils.ensure_id(None)).then_return("testid2")
     task = await subject.create_task(_task)
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task)),
+        action_dispatcher.dispatch(StartTaskAction(task, originating_command_id=None)),
         times=1,
     )
     try:
@@ -257,7 +261,7 @@ async def test_generates_cancelled_error(
     decoy.when(model_utils.ensure_id(None)).then_return("testid2")
     task = await subject.create_task(_task)
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task)),
+        action_dispatcher.dispatch(StartTaskAction(task, originating_command_id=None)),
         times=1,
     )
     task.asyncioTask.cancel(msg="Cancel task")
@@ -311,12 +315,12 @@ async def test_synchronization_cancel_latest(
 
     task1 = await subject.create_task(task_1_method)
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task1)),
+        action_dispatcher.dispatch(StartTaskAction(task1, originating_command_id=None)),
         times=1,
     )
     task2 = await subject.create_task(task_2_method)
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task2)),
+        action_dispatcher.dispatch(StartTaskAction(task2, originating_command_id=None)),
         times=1,
     )
     await asyncio.wait_for(
@@ -365,12 +369,12 @@ async def test_synchronization_cancel_latest_only_cancels_one_group_id(
 
     task1 = await subject.create_task(task_1_method)
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task1)),
+        action_dispatcher.dispatch(StartTaskAction(task1, originating_command_id=None)),
         times=1,
     )
     task3 = await subject.create_task(task_3_method)
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task3)),
+        action_dispatcher.dispatch(StartTaskAction(task3, originating_command_id=None)),
         times=1,
     )
     await task1_started.wait()
@@ -378,7 +382,7 @@ async def test_synchronization_cancel_latest_only_cancels_one_group_id(
 
     task2 = await subject.create_task(task_2_method)
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task2)),
+        action_dispatcher.dispatch(StartTaskAction(task2, originating_command_id=None)),
         times=1,
     )
     await task2_started.wait()
@@ -410,12 +414,12 @@ async def test_synchronization_cancel_previous(
 
     task1 = await subject.create_task(task_1_method)
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task1)),
+        action_dispatcher.dispatch(StartTaskAction(task1, originating_command_id=None)),
         times=1,
     )
     task2 = await subject.create_task(task_2_method)
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task2)),
+        action_dispatcher.dispatch(StartTaskAction(task2, originating_command_id=None)),
         times=1,
     )
     await asyncio.wait_for(
@@ -461,12 +465,12 @@ async def test_synchronization_cancel_previous_only_cancels_one_group_id(
 
     task1 = await subject.create_task(task_1_method)
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task1)),
+        action_dispatcher.dispatch(StartTaskAction(task1, originating_command_id=None)),
         times=1,
     )
     task3 = await subject.create_task(task_3_method)
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task3)),
+        action_dispatcher.dispatch(StartTaskAction(task3, originating_command_id=None)),
         times=1,
     )
     await task1_started.wait()
@@ -510,12 +514,12 @@ async def test_synchronization_sequential(
 
     task1 = await subject.create_task(task_1_method)
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task1)),
+        action_dispatcher.dispatch(StartTaskAction(task1, originating_command_id=None)),
         times=1,
     )
     task2 = await subject.create_task(task_2_method)
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task2)),
+        action_dispatcher.dispatch(StartTaskAction(task2, originating_command_id=None)),
         times=1,
     )
     await asyncio.wait((task1.asyncioTask, task2.asyncioTask), timeout=0.25)
@@ -558,12 +562,12 @@ async def test_synchronize_concurrent(
 
     task1 = await subject.create_task(task_1_method)
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task1)),
+        action_dispatcher.dispatch(StartTaskAction(task1, originating_command_id=None)),
         times=1,
     )
     task2 = await subject.create_task(task_2_method)
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task2)),
+        action_dispatcher.dispatch(StartTaskAction(task2, originating_command_id=None)),
         times=1,
     )
     await asyncio.wait((task1.asyncioTask, task2.asyncioTask), timeout=0.25)

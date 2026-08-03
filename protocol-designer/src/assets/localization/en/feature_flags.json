@@ -1,50 +1,42 @@
 {
-  "PRERELEASE_MODE": {
-    "title": "Use prerelease mode",
-    "description": "Show in-progress features for testing & internal use"
-  },
   "OT_PD_DISABLE_MODULE_RESTRICTIONS": {
-    "title": "Disable module placement restrictions",
-    "description": "Turn off all restrictions on module placement and related pipette crash guidance."
-  },
-  "OT_PD_ENABLE_COMMENT": {
-    "title": "Enable comment step",
-    "description": "You can add comments anywhere between timeline steps."
-  },
-  "OT_PD_ENABLE_TIP_PICKUP_LOCATION": {
-    "title": "Enable tip pickup location",
-    "description": "You can choose which tip to pick up."
-  },
-  "OT_PD_ENABLE_RETURN_TIP": {
-    "title": "Enable return tip",
-    "description": "You can choose where to drop tip."
-  },
-  "OT_PD_ENABLE_HOT_KEYS_DISPLAY": {
-    "title": "Timeline editing guidance",
-    "description": "Show information about working with steps next to the protocol timeline"
-  },
-  "OT_PD_ENABLE_MULTIPLE_TEMPS_OT2": {
-    "title": "Allow two temperature modules on OT-2",
-    "description": "This experimental setting may cause collisions, and Opentrons will not be responsible for any damage resulting from its use."
-  },
-  "OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS": {
-    "title": "Enable experimental concurrent module actions",
-    "description": "Features and design changes related to doing stuff with modules while other steps run at the same time"
-  },
-  "OT_PD_ENABLE_BY_VOLUME_BUILDER": {
-    "title": "Enable by-volume builder",
-    "description": "Enables the ability to build by-volume curves"
+    "description": "Turn off all restrictions on module placement and related pipette crash guidance.",
+    "title": "Disable module placement restrictions"
   },
   "OT_PD_ENABLE_ADDITIONAL_PARTIAL_TIP_SELECTION": {
-    "title": "Enable additional partial tip selection",
-    "description": "Enables use of other pipette nozzles and return"
+    "description": "Enables use of other pipette nozzles and return",
+    "title": "Enable additional partial tip selection"
+  },
+  "OT_PD_ENABLE_BY_VOLUME_BUILDER": {
+    "description": "Enables the ability to build by-volume curves",
+    "title": "Enable by-volume builder"
+  },
+  "OT_PD_ENABLE_COMMENT": {
+    "description": "You can add comments anywhere between timeline steps.",
+    "title": "Enable comment step"
+  },
+  "OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS": {
+    "description": "Features and design changes related to doing stuff with modules while other steps run at the same time",
+    "title": "Enable experimental concurrent module actions"
+  },
+  "OT_PD_ENABLE_HOT_KEYS_DISPLAY": {
+    "description": "Show information about working with steps next to the protocol timeline",
+    "title": "Timeline editing guidance"
+  },
+  "OT_PD_ENABLE_RETURN_TIP": {
+    "description": "You can choose where to drop tip.",
+    "title": "Enable return tip"
+  },
+  "OT_PD_ENABLE_TIP_PICKUP_LOCATION": {
+    "description": "You can choose which tip to pick up.",
+    "title": "Enable tip pickup location"
   },
   "OT_PD_ENABLE_VACUUM_MODULE": {
-    "title": "Enable vacuum module use",
-    "description": "Enables use of vacuum modules in Protocol Designer protocols"
+    "description": "Enables use of vacuum modules in Protocol Designer protocols",
+    "title": "Enable vacuum module use"
   },
-  "OT_PD_ENABLE_FORK": {
-    "title": "Enable pd fork mode",
-    "description": "Enables the fork mode in Protocol Designer protocols"
+  "PRERELEASE_MODE": {
+    "description": "Show in-progress features for testing & internal use",
+    "title": "Use prerelease mode"
   }
 }

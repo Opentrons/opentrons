@@ -54,8 +54,8 @@ describe('protocol storage directory utilities', () => {
       )
     })
 
-    it('uses protocols-10.0-plus as NOT_OT2_PROTOCOLS_DIRECTORY_NAME', () => {
-      expect(NOT_OT2_PROTOCOLS_DIRECTORY_NAME).toBe('protocols-10.0-plus')
+    it('uses protocols-9.1-plus as NOT_OT2_PROTOCOLS_DIRECTORY_NAME', () => {
+      expect(NOT_OT2_PROTOCOLS_DIRECTORY_NAME).toBe('protocols-9.1-plus')
     })
   })
 

@@ -25,7 +25,7 @@ export const vacuumOpenVent: CommandCreator<
       errors: [errorCreators.liveTaskError()],
     }
   }
-  const dummyPython = `${module.pythonName}.open_vent()`
+  const python = `${module.pythonName}.open_vent()`
   return {
     commands: [
       {
@@ -36,6 +36,6 @@ export const vacuumOpenVent: CommandCreator<
         },
       },
     ],
-    python: dummyPython,
+    python,
   }
 }

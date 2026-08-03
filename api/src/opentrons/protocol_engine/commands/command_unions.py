@@ -255,6 +255,7 @@ from .move_labware import (
     MoveLabwareCreate,
     MoveLabwareParams,
     MoveLabwareResult,
+    VacuumModuleUnderVacuumMovementError,
 )
 from .move_relative import (
     MoveRelative,
@@ -506,6 +507,7 @@ Command = Annotated[
         vacuum_module.StartSetVacuumPower,
         vacuum_module.OpenVent,
         vacuum_module.CloseVent,
+        vacuum_module.StartRunProfile,
         calibration.CalibrateGripper,
         calibration.CalibratePipette,
         calibration.CalibrateModule,
@@ -622,6 +624,7 @@ CommandParams = Union[
     vacuum_module.StartSetVacuumPowerParams,
     vacuum_module.OpenVentParams,
     vacuum_module.CloseVentParams,
+    vacuum_module.StartRunProfileParams,
     calibration.CalibrateGripperParams,
     calibration.CalibratePipetteParams,
     calibration.CalibrateModuleParams,
@@ -736,6 +739,7 @@ CommandType = Union[
     vacuum_module.StartSetVacuumPowerCommandType,
     vacuum_module.OpenVentCommandType,
     vacuum_module.CloseVentCommandType,
+    vacuum_module.StartRunProfileCommandType,
     calibration.CalibrateGripperCommandType,
     calibration.CalibratePipetteCommandType,
     calibration.CalibrateModuleCommandType,
@@ -851,6 +855,7 @@ CommandCreate = Annotated[
         vacuum_module.StartSetVacuumPowerCreate,
         vacuum_module.OpenVentCreate,
         vacuum_module.CloseVentCreate,
+        vacuum_module.StartRunProfileCreate,
         calibration.CalibrateGripperCreate,
         calibration.CalibratePipetteCreate,
         calibration.CalibrateModuleCreate,
@@ -974,6 +979,7 @@ CommandResult = Union[
     vacuum_module.StartSetVacuumPowerResult,
     vacuum_module.OpenVentResult,
     vacuum_module.CloseVentResult,
+    vacuum_module.StartRunProfileResult,
     calibration.CalibrateGripperResult,
     calibration.CalibratePipetteResult,
     calibration.CalibrateModuleResult,
@@ -1003,6 +1009,7 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[OverpressureError],
     DefinedErrorData[LiquidNotFoundError],
     DefinedErrorData[GripperMovementError],
+    DefinedErrorData[VacuumModuleUnderVacuumMovementError],
     DefinedErrorData[StallOrCollisionError],
     DefinedErrorData[FlexStackerStallOrCollisionError],
     DefinedErrorData[FlexStackerShuttleError],
@@ -1010,6 +1017,9 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[FlexStackerLabwareRetrieveError],
     DefinedErrorData[FlexStackerShuttleOccupiedError],
     DefinedErrorData[FlexStackerLabwareStoreError],
+    DefinedErrorData[vacuum_module.VacuumPressureNotReachedError],
+    DefinedErrorData[vacuum_module.VacuumModuleCarboyFullError],
+    DefinedErrorData[vacuum_module.VacuumModuleError],
 ]
 
 

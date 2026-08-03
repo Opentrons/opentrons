@@ -42,6 +42,10 @@ class AbstractVacuumModuleDriver(Protocol):
         """Reset the input and output serial buffers."""
         ...
 
+    async def move_port(self, new_port: str) -> None:
+        """Try to change the port of the underlying connection."""
+        ...
+
     async def set_led(
         self,
         power: float,
@@ -75,6 +79,10 @@ class AbstractVacuumModuleDriver(Protocol):
         start_pump: bool,
         target_rpm: Optional[int] = None,
         duty_cycle: Optional[int] = None,
+        duration_s: Optional[int] = None,
+        timeout_s: Optional[int] = None,
+        rate: Optional[float] = None,
+        vent_after: Optional[bool] = None,
     ) -> None:
         """Start or the stop the pump at a given rpm or duty cycle."""
         ...

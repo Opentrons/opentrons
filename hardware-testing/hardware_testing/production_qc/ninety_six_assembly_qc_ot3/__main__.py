@@ -5,7 +5,7 @@ from pathlib import Path
 
 from hardware_testing.data import ui
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Mount, Axis
+from opentrons.hardware_control.types import OT3Mount, Axis
 
 from .config import TestSection, TestConfig, build_report, TESTS
 
@@ -24,7 +24,8 @@ async def _main(cfg: TestConfig) -> None:
     # CSV REPORT
     report = build_report(test_name.replace("_", "-"))
     dut = helpers_ot3.DeviceUnderTest.PIPETTE_LEFT
-    helpers_ot3.set_csv_report_meta_data_ot3(api, report, dut=dut)
+    operator = "simulating" if api.is_simulator else input("enter OPERATOR name: ")
+    helpers_ot3.set_csv_report_meta_data_ot3(api, report, operator=operator, dut=dut)
 
     # HOME and ATTACH
     mount = OT3Mount.LEFT

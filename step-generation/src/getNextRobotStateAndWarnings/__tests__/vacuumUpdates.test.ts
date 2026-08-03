@@ -585,7 +585,7 @@ describe('forVacuumStopPump', () => {
     const updated = result.robotState.modules[vacuumModuleId]
       .moduleState as VacuumModuleState
     expect(updated.currentPumpActivity).toEqual(pumpDeactivated)
-    expect(updated.ventStatus).toBe(VACUUM_VENT_OPEN)
+    expect(updated.ventStatus).toBe(VACUUM_VENT_CLOSED)
   })
 
   it('is idempotent for pumpDeactivated activity and still opens vent', () => {
@@ -604,7 +604,7 @@ describe('forVacuumStopPump', () => {
     expect(result.robotState.modules[vacuumModuleId].moduleState).toEqual({
       type: VACUUM_MODULE_TYPE,
       currentPumpActivity: pumpDeactivated,
-      ventStatus: VACUUM_VENT_OPEN,
+      ventStatus: VACUUM_VENT_CLOSED,
       numPumpActivitiesStarted: 0,
     })
   })
@@ -631,8 +631,15 @@ describe('forVacuumStopPump', () => {
   })
 })
 
-const sampleVacuumProfile: VacuumModuleStartRunProfileCreateCommand['params']['profile'] =
-  [{ holdSeconds: 2, pressureMbar: 150 }]
+const sampleVacuumProfile: VacuumModuleStartRunProfileCreateCommand['params']['steps'] =
+  [
+    {
+      enablePump: true,
+      holdSeconds: 2,
+      gaugePressureMbar: 150,
+      ventAfter: false,
+    },
+  ]
 
 describe('forVacuumStartRunProfile', () => {
   it('sets profile activity and increments numPumpActivitiesStarted when module and taskId are present', () => {
@@ -646,9 +653,8 @@ describe('forVacuumStartRunProfile', () => {
     const result = forVacuumStartRunProfile(
       {
         moduleId: vacuumModuleId,
-        profile: sampleVacuumProfile,
+        steps: sampleVacuumProfile,
         taskId: vacuumTaskId,
-        ventAfter: false,
       },
       invariantContext,
       robot
@@ -660,7 +666,7 @@ describe('forVacuumStartRunProfile', () => {
       type: 'profile',
       profileElements: sampleVacuumProfile,
       taskId: vacuumTaskId,
-      ventAfter: false,
+      ventAfter: true,
     })
     expect(updated.numPumpActivitiesStarted).toBe(1)
     expect(updated.ventStatus).toBe(VACUUM_VENT_CLOSED)
@@ -677,7 +683,7 @@ describe('forVacuumStartRunProfile', () => {
       forVacuumStartRunProfile(
         {
           moduleId: missingModuleId,
-          profile: sampleVacuumProfile,
+          steps: sampleVacuumProfile,
           taskId: vacuumTaskId,
         },
         invariantContext,

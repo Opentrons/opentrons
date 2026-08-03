@@ -37,6 +37,8 @@ interface TouchTextAreaFieldProps extends NativeTextareaProps {
   resize?: CSSProperties['resize']
   /** if true, clear out value and add '-' placeholder */
   isIndeterminate?: boolean
+  /** if true, stretch the textarea to fill available height in a flex column parent */
+  multiline?: boolean
 }
 
 export const TouchTextAreaField = forwardRef<
@@ -55,6 +57,7 @@ export const TouchTextAreaField = forwardRef<
     height,
     resize = 'none',
     isIndeterminate,
+    multiline = false,
     ...textareaProps
   } = props
   const {
@@ -71,24 +74,32 @@ export const TouchTextAreaField = forwardRef<
 
   const wrapperClasses = clsx(
     styles.wrapper,
-    error != null ? styles.warning_color : styles.default_color,
-    rawDisabled === true && styles.disabled
+    hasError ? styles.error_color : styles.default_color,
+    rawDisabled === true && styles.disabled,
+    multiline && styles.wrapper_multiline
   )
 
   const textareaClasses = clsx(
     styles.textarea,
     hasError && styles.textarea_error,
-    hasBackgroundError && styles.textarea_background_error
+    hasBackgroundError && styles.textarea_background_error,
+    multiline && styles.textarea_multiline
   )
 
   const labelClasses = clsx(
     styles.label_text,
+    hasError && styles.label_text_error,
     textAlign === 'center' ? styles.label_text_center : styles.label_text_left
   )
 
   return (
     <div className={wrapperClasses}>
-      <div className={styles.column_container}>
+      <div
+        className={clsx(
+          styles.column_container,
+          multiline && styles.column_container_multiline
+        )}
+      >
         {label != null && (
           <div className={styles.label_row}>
             <label htmlFor={textareaId}>
@@ -99,10 +110,18 @@ export const TouchTextAreaField = forwardRef<
           </div>
         )}
         <div
-          className={styles.clickable_column}
+          className={clsx(
+            styles.clickable_column,
+            multiline && styles.clickable_column_multiline
+          )}
           onClick={!rawDisabled ? onWrapperClick : undefined}
         >
-          <div className={styles.textarea_row}>
+          <div
+            className={clsx(
+              styles.textarea_row,
+              multiline && styles.textarea_row_multiline
+            )}
+          >
             <textarea
               id={textareaId}
               className={textareaClasses}

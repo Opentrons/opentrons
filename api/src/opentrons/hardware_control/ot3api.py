@@ -112,6 +112,7 @@ from .types import (
     HepaFanState,
     HepaUVState,
     InstrumentProbeType,
+    ModuleConnectedNotification,
     ModuleDisconnectedNotification,
     MotionChecks,
     OT3AxisKind,
@@ -123,6 +124,7 @@ from .types import (
     StatusBarUpdateListener,
     StatusBarUpdateUnsubscriber,
     SubSystem,
+    SubsystemConnectionNotification,
     SubSystemState,
     TipScrapeType,
     TipStateType,
@@ -143,6 +145,7 @@ from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
 )
 from opentrons.util.pyro.pyro_synchronous_adapter import (
+    convert_result_to_dict_of_proxies,
     convert_result_to_proxy,
     convert_result_to_wrapped_dict,
     convert_result_to_wrapped_typed_dict,
@@ -380,17 +383,27 @@ class OT3API(
             (
                 AsynchronousModuleErrorNotification,
                 ModuleDisconnectedNotification,
+                ModuleConnectedNotification,
             ),
         ):
             return
         mod_log.info(
-            f"Forwarding module event {event.event} for {event.module_model} {event.module_serial} at {event.port}"
+            f"Forwarding module event {event.event} for {event.name if isinstance(event, ModuleConnectedNotification) else event.module_model} {event.module_serial} at {event.port}"
         )
         for cb in self._callbacks:
             try:
                 cb(event)
             except Exception:
                 mod_log.exception("Errored during module asynchronous callback")
+
+    def _send_subsystem_notification(self) -> None:
+        subsystem_event = SubsystemConnectionNotification()
+        mod_log.info("Forwarding subsystem event.")
+        for cb in self._callbacks:
+            try:
+                cb(subsystem_event)
+            except Exception:
+                mod_log.exception("Errored during subsystem asynchronous callback")
 
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
@@ -416,7 +429,6 @@ class OT3API(
         config: Union[OT3Config, RobotConfig, None] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         strict_attached_instruments: bool = True,
-        use_usb_bus: bool = False,
         update_firmware: bool = True,
         status_bar_enabled: bool = True,
         feature_flags: Optional[HardwareFeatureFlags] = None,
@@ -434,7 +446,6 @@ class OT3API(
 
         backend = await OT3Controller.build(
             checked_config,
-            use_usb_bus,
             check_updates=update_firmware,
             feature_flags=feature_flags,
         )
@@ -445,6 +456,8 @@ class OT3API(
             config=checked_config,
             feature_flags=feature_flags,
         )
+
+        backend.set_subsystem_event_callback(api_instance._send_subsystem_notification)
 
         await api_instance.set_status_bar_enabled(status_bar_enabled)
         module_controls = await AttachedModulesControl.build(
@@ -677,6 +690,7 @@ class OT3API(
     async def create_simulating_peripheral(
         self,
         model: peripherals.types.PeripheralModel,
+        sim_serial: Optional[str] = None,
     ) -> peripherals.AbstractPeripheral:
         """Create a simulating peripheral hardware interface."""
         assert self.is_simulator, (
@@ -689,6 +703,7 @@ class OT3API(
             ),
             type=peripherals.PeripheralType.from_model(model),
             sim_model=model.value,
+            sim_serial=sim_serial,
         )
         assert isinstance(peripheral, peripherals.AbstractPeripheral)
         return peripheral
@@ -2375,6 +2390,11 @@ class OT3API(
         follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
         real_mount = OT3Mount.from_mount(mount)
+        if isinstance(self._backend, OT3Simulator) and expected == TipStateType.PRESENT:
+            # The simulator has no physical tip/probe sensors. LPC and other
+            # calibration flows call verify_tip_presence after the user attaches
+            # a probe; simulate that attachment here.
+            self._backend._update_tip_state(real_mount, True)
         status = await self.get_tip_presence_status(real_mount, follow_singular_sensor)
         if status != expected:
             raise FailedTipStateCheck(
@@ -2551,6 +2571,7 @@ class OT3API(
             )
 
     @property
+    @pyro_behavior(specialty_func=convert_result_to_dict_of_proxies, apply_local=False)
     def hardware_pipettes(self) -> InstrumentsByMount[top_types.Mount]:
         # TODO (lc 12-5-2022) We should have ONE entry point into knowing
         # what pipettes are attached from the hardware controller.
@@ -2567,6 +2588,7 @@ class OT3API(
         return self._gripper_handler.get_gripper()
 
     @property
+    @pyro_behavior(specialty_func=convert_result_to_dict_of_proxies, apply_local=False)
     def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:  # type: ignore
         # see comment in `protocols.instrument_configurer`
         # override required for type matching
@@ -3358,12 +3380,15 @@ class OT3API(
         s_data = await self._backend.read_pressure_sensor(realmount, primary)
         return s_data if s_data else 0.0
 
-    async def read_stem_capacitance(
-        self, mount: Union[top_types.Mount, OT3Mount], primary: bool = True
+    async def read_instrument_capacitance(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        primary: bool = True,
+        timeout: int = 1,
     ) -> float:
         """Read and return the current primary stem capacitance."""
         realmount = OT3Mount.from_mount(mount)
-        s_data = await self._backend.read_capacitive_sensor(realmount, primary)
+        s_data = await self._backend.read_capacitive_sensor(realmount, primary, timeout)
         return s_data if s_data else 0.0
 
     async def touch_probe(

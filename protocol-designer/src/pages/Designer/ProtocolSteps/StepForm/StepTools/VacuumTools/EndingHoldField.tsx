@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next'
 
-import { Check, COLORS, StyledText } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 import { VACUUM_PROGRAM_STATE } from '@opentrons/step-generation'
+
+import { ToggleStepFormField } from '/protocol-designer/components/molecules'
 
 import styles from './vacuumtools.module.css'
 
@@ -27,27 +29,19 @@ export function EndingHoldField(
   }
 
   return (
-    <div className={styles.ending_hold_section}>
+    <div className={styles.ending_hold_field}>
       <StyledText desktopStyle="bodyDefaultSemiBold">
         {t('vacuum.controls.ending_hold_vent.title')}
       </StyledText>
-      <button
-        type="button"
-        className={styles.ending_hold_row}
-        onClick={() => {
-          propsForFields.endingHoldVentCheckbox.updateValue(
-            formData.endingHoldVentCheckbox !== true
-          )
-        }}
-      >
-        <StyledText desktopStyle="bodyDefaultRegular">
-          {t('vacuum.controls.ending_hold_vent.label')}
-        </StyledText>
-        <Check
-          color={COLORS.blue50}
-          isChecked={formData.endingHoldVentCheckbox === true}
-        />
-      </button>
+      <ToggleStepFormField
+        title={t('vacuum.controls.ending_hold_vent.label')}
+        isSelected={formData.endingHoldVentCheckbox === true}
+        onLabel={t('vacuum.previous_state.vent.opened')}
+        offLabel={t('vacuum.previous_state.vent.closed')}
+        toggleUpdateValue={propsForFields.endingHoldVentCheckbox.updateValue}
+        toggleValue={formData.endingHoldVentCheckbox}
+        tooltipContent={null}
+      />
     </div>
   )
 }

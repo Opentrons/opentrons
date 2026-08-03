@@ -1,5 +1,6 @@
 """Equipment command side-effect logic."""
 
+import logging
 from dataclasses import dataclass
 from typing import List, Optional, overload
 
@@ -10,14 +11,18 @@ from ..errors import (
     FailedToLoadPipetteError,
     LabwareDefinitionDoesNotExistError,
     ModuleNotAttachedError,
+    PeripheralNotAttachedError,
 )
 from ..resources import (
     LabwareDataProvider,
     ModelUtils,
     ModuleDataProvider,
+    PeripheralDataProvider,
+    labware_validation,
     pipette_data_provider,
 )
 from ..state.modules import HardwareModule
+from ..state.peripherals import HardwarePeripheral
 from ..state.state import StateStore
 from ..types import (
     AddressableAreaLocation,
@@ -28,6 +33,8 @@ from ..types import (
     ModuleDefinition,
     ModuleModel,
     OnLabwareLocation,
+    PeripheralDefinition,
+    PeripheralModel,
 )
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.hardware_control import HardwareControlAPI
@@ -42,6 +49,10 @@ from opentrons.hardware_control.modules import (
     VacuumModule,
 )
 from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.hardware_control.peripherals import (
+    AbstractPeripheral,
+    BarcodeScanner,
+)
 from opentrons.protocol_engine.state.module_substates import (
     AbsorbanceReaderId,
     FlexStackerId,
@@ -51,7 +62,12 @@ from opentrons.protocol_engine.state.module_substates import (
     ThermocyclerModuleId,
     VacuumModuleId,
 )
+from opentrons.protocol_engine.state.peripheral_substates import (
+    BarcodeScannerPeripheralId,
+)
 from opentrons.types import MountType
+
+log = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -90,6 +106,15 @@ class LoadedModuleData:
 
 
 @dataclass(frozen=True)
+class LoadedPeripheralData:
+    """The result of a load module procedure."""
+
+    peripheral_id: str
+    serial_number: Optional[str]
+    definition: PeripheralDefinition
+
+
+@dataclass(frozen=True)
 class LoadedConfigureForVolumeData:
     """The result of a load liquid class procedure."""
 
@@ -124,6 +149,7 @@ class EquipmentHandler:
         state_store: StateStore,
         labware_data_provider: Optional[LabwareDataProvider] = None,
         module_data_provider: Optional[ModuleDataProvider] = None,
+        peripheral_data_provider: Optional[PeripheralDataProvider] = None,
         model_utils: Optional[ModelUtils] = None,
         virtual_pipette_data_provider: Optional[
             pipette_data_provider.VirtualPipetteDataProvider
@@ -134,6 +160,9 @@ class EquipmentHandler:
         self._state_store = state_store
         self._labware_data_provider = labware_data_provider or LabwareDataProvider()
         self._module_data_provider = module_data_provider or ModuleDataProvider()
+        self._peripheral_data_provider = (
+            peripheral_data_provider or PeripheralDataProvider()
+        )
         self._model_utils = model_utils or ModelUtils()
         self._virtual_pipette_data_provider = (
             virtual_pipette_data_provider
@@ -543,6 +572,60 @@ class EquipmentHandler:
             definition=attached_module.definition,
         )
 
+    async def load_peripheral(
+        self,
+        model: PeripheralModel,
+        peripheral_id: Optional[str],
+    ) -> LoadedPeripheralData:
+        """Ensure the required Peripheral is attached.
+
+        Args:
+            model: The model name of the Peripheral.
+            peripheral_id: Optional ID assigned to the Peripheral.
+                       If None, an ID will be generated.
+
+        Returns:
+            A LoadedPeripheralData object.
+
+        Raises:
+            PeripheralNotAttachedError: A not-yet-assigned peripheral matching the requested
+                parameters could not be found in the attached peripheral list.
+        """
+        # TODO(mc, 2022-02-09): validate module location given deck definition
+        use_virtual_peripherals = self._state_store.config.use_virtual_peripherals
+
+        if not use_virtual_peripherals:
+            attached_peripherals = [
+                HardwarePeripheral(
+                    serial_number=hw_mod.device_info["serial"],
+                    definition=self._peripheral_data_provider.get_definition(
+                        PeripheralModel(hw_mod.model())
+                    ),
+                )
+                for hw_mod in self._hardware_api.attached_peripherals
+            ]
+
+            attached_peripheral = (
+                self._state_store.peripherals.select_hardware_peripheral_to_load(
+                    model=model,
+                    attached_peripherals=attached_peripherals,
+                )
+            )
+
+        else:
+            attached_peripheral = HardwarePeripheral(
+                serial_number=self._model_utils.generate_id(
+                    prefix="fake-serial-number-"
+                ),
+                definition=self._peripheral_data_provider.get_definition(model),
+            )
+
+        return LoadedPeripheralData(
+            peripheral_id=self._model_utils.ensure_id(peripheral_id),
+            serial_number=attached_peripheral.serial_number,
+            definition=attached_peripheral.definition,
+        )
+
     async def load_lids(
         self,
         load_name: str,
@@ -591,13 +674,11 @@ class EquipmentHandler:
                 f"Requested quantity {quantity} is greater than the stack limit of {stack_limit} provided by definition for {load_name}."
             )
 
-        is_deck_slot_compatible = (
-            True
-            if definition.parameters.isDeckSlotCompatible is None
-            else definition.parameters.isDeckSlotCompatible
-        )
-
-        if isinstance(location, DeckSlotLocation) and not is_deck_slot_compatible:
+        if isinstance(location, DeckSlotLocation) and (
+            not labware_validation.validate_definition_is_deck_slot_compatible(
+                definition
+            )
+        ):
             raise ValueError(
                 f"Lid Labware {load_name} cannot be loaded onto a Deck Slot."
             )
@@ -774,13 +855,61 @@ class EquipmentHandler:
 
         attached_modules = self._hardware_api.attached_modules
         serial_number = self._state_store.modules.get_serial_number(module_id)
+        duplicates = []
         for mod in attached_modules:
             if mod.device_info["serial"] == serial_number:
-                return mod
+                duplicates.append(mod)
+
+        if len(duplicates):
+            if len(duplicates) > 1:
+                log.warn(f"found {len(duplicates)} modules with {serial_number}")
+            # Return the last one, because that should be the recently disconnected one
+            # the recently disconnected one will be the one that doesn't get deleted
+            return duplicates[-1]
 
         raise ModuleNotAttachedError(
             f'No module attached with serial number "{serial_number}"'
             f' for module ID "{module_id}".'
+        )
+
+    """
+    This method doesn't work right now because @overload requires multiple functions with @overload
+    Once we add a second peripheral use the get_peripheral_hardware_api with overloads like modules
+    and delete get_barcode_hardware_api
+
+    @overload
+    def get_peripheral_hardware_api(
+        self,
+        peripheral_id: BarcodeScannerPeripheralId,
+    ) -> Optional[BarcodeScanner]: ...
+
+    """
+
+    def get_barcode_hardware_api(
+        self, peripheral_id: BarcodeScannerPeripheralId
+    ) -> Optional[BarcodeScanner]:
+        """Get the hardware API for a barcode scanenr."""
+        scanner = self.get_peripheral_hardware_api(peripheral_id)
+        assert isinstance(scanner, BarcodeScanner)
+        return scanner
+
+    def get_peripheral_hardware_api(
+        self, peripheral_id: str
+    ) -> Optional[AbstractPeripheral]:
+        """Get the hardware API for a given module."""
+        use_virtual_peripheral = self._state_store.config.use_virtual_peripherals
+        if use_virtual_peripheral:
+            return None
+
+        attached_peripherals = self._hardware_api.attached_peripherals
+        serial_number = self._state_store.peripherals.get_serial_number(peripheral_id)
+        for perf in attached_peripherals:
+            if perf.device_info["serial"] == serial_number:
+                return perf
+
+        raise PeripheralNotAttachedError(
+            f'No peripheral attached with serial number "{serial_number}"'
+            f' for peripheral ID "{peripheral_id}".'
         )
 
     def find_applicable_labware_offset_id(

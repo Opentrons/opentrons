@@ -17,6 +17,8 @@ from weave.trace.context.call_context import set_tracing_enabled
 from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_FIND_RELEVANT_DOCS, SYSTEM_PROMPT
 from api.domain.config_pd import DOCUMENTS_PD, PROMPT_PD, SYSTEM_PROMPT_PD
 from api.settings import Settings, get_settings
+from api.utils.api_docs_metadata import get_default_api_level
+from api.utils.docs_links import synced_doc_path_to_production_url
 
 MessageType = Literal["create", "update"]
 
@@ -51,7 +53,9 @@ def get_tracing_context(enable_analytics: bool) -> ContextManager[None]:
 settings: Settings = get_settings()
 logger = structlog.stdlib.get_logger(settings.logger_name)
 ROOT_PATH: Path = Path(Path(__file__)).parent.parent.parent
-REPO_ROOT: Path = Path(Path(__file__)).parent.parent.parent.parent
+API_DOCS_ROOT: Path = ROOT_PATH / "api" / "storage" / "api_docs"
+API_DOCS_CONTENT_ROOT: Path = API_DOCS_ROOT / "docs" / "v2"
+API_DOCS_STRUCT_PATH: Path = API_DOCS_ROOT / "api_docs_struct.md"
 
 
 class AnthropicPredict:
@@ -62,19 +66,14 @@ class AnthropicPredict:
         self._sync_client: Anthropic = Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
         self.model_name: str = settings.anthropic_model_name
         self.model_helper: str = settings.model_helper
-        self.system_prompt: str = SYSTEM_PROMPT
+        default_api_level = get_default_api_level()
+        self.system_prompt: str = SYSTEM_PROMPT.replace("__DEFAULT_API_LEVEL__", default_api_level)
+        self.prompt: str = PROMPT.replace("__DEFAULT_API_LEVEL__", default_api_level)
         self.PROMPT_PD = PROMPT_PD
         self.path_docs: Path = ROOT_PATH / "api" / "storage" / "docs"
         self.path_docs_pd: Path = ROOT_PATH / "api" / "storage" / "docs" / "pd"
-        self.path_api_docs: Path = ROOT_PATH / "api" / "storage" / "api_docs" / "api_docs_struct_v2.25.md"
-
-        docker_api_docs_path = ROOT_PATH / "api" / "storage" / "api_docs"
-        python_api_docs_path = REPO_ROOT / "docs" / "python-api" / "docs"
-        # Real API docs live in docs/python-api/docs (md, kebab-case). In Docker they are copied to api_docs/docs/v2.
-        if (docker_api_docs_path / "docs" / "v2").exists():
-            self._api_docs_content_root: Path = docker_api_docs_path / "docs" / "v2"
-        else:
-            self._api_docs_content_root = python_api_docs_path
+        self.path_api_docs: Path = API_DOCS_STRUCT_PATH
+        self._api_docs_content_root: Path = API_DOCS_CONTENT_ROOT
         self.system_prompt_pd = self.get_system_prompt_pd()
 
         self.cached_docs: List[MessageParam] = [
@@ -200,23 +199,17 @@ class AnthropicPredict:
         return f"<python_v2_api_doc>\n{v2_doc_content}\n</python_v2_api_doc>"
 
     def _api_doc_resolve_path(self, filename: str) -> Optional[Path]:
-        """
-        Resolve a structure path (e.g. docs/v2/adapting_ot2_flex.rst) to the real file path.
-        API docs now live in docs/python-api/docs as .md with kebab-case names.
-        """
-        if not filename.startswith("docs/v2/"):
+        """Resolve a structure path to a synced markdown file under api/storage/api_docs/docs/v2."""
+        normalized = filename.strip().strip(",")
+        if not normalized or not normalized.endswith(".md"):
             return None
-        rel = filename[8:]  # strip "docs/v2/"
-        p = Path(rel)
-        # .rst or .md -> always use .md; underscores -> hyphens
-        base_name = p.stem.replace("_", "-") + ".md"
-        rel_path = p.parent / base_name
-        return self._api_docs_content_root / rel_path
+
+        return self._api_docs_content_root / normalized
 
     def parse_relevant_files_and_get_content(self, api_info_output: str) -> str:
         """
         Parse the output of get_api_info and construct XML content with file contents.
-        Reads from docs/python-api/docs (md, kebab-case); structure still references docs/v2/... .rst.
+        Reads from synced markdown docs under api/storage/api_docs/docs/v2.
         """
         match = re.search(r"<relevant_files>(.*?)</relevant_files>", api_info_output, re.DOTALL)
         if not match:
@@ -240,7 +233,9 @@ class AnthropicPredict:
             except Exception as e:
                 logger.warning("Error reading API doc file", extra={"path": str(filepath), "error": str(e)})
                 continue
-            xml_content += f"<file name='{filename}'>\n"
+            production_url = synced_doc_path_to_production_url(filename)
+            xml_content += f"<file name='{filename}' url='{production_url}'>\n"
+            xml_content += f"<production_url>{production_url}</production_url>\n"
             xml_content += "<content>\n"
             xml_content += content
             xml_content += "\n</content>\n"
@@ -441,7 +436,7 @@ class AnthropicPredict:
 
     def _create_current_user_message(self, prompt: str, current_msg_files: Optional[List[Dict[str, str]]], user_id: str) -> MessageParam:
         """Create the current user message with file attachments."""
-        current_user_content: List[ContentBlockParam] = [TextBlockParam(type="text", text=PROMPT.format(USER_PROMPT=prompt))]
+        current_user_content: List[ContentBlockParam] = [TextBlockParam(type="text", text=self.prompt.format(USER_PROMPT=prompt))]
 
         # Add NEW file attachments to current message
         if current_msg_files:
@@ -560,7 +555,7 @@ class AnthropicPredict:
             if history:
                 messages += history
 
-            user_content: List[ContentBlockParam] = [TextBlockParam(type="text", text=PROMPT.format(USER_PROMPT=prompt))]
+            user_content: List[ContentBlockParam] = [TextBlockParam(type="text", text=self.prompt.format(USER_PROMPT=prompt))]
 
             # Add file attachments with actual content
             if file_references:

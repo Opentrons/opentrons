@@ -22,7 +22,10 @@ export async function openOT2AppExternal(payload?: {
       ? `${PROTOCOL_NAME}://open?${params.toString()}`
       : `${PROTOCOL_NAME}://open`
 
-  if (app.getApplicationNameForProtocol(url) === '') {
+  const appName = app.getApplicationNameForProtocol(url)
+
+  // "Electron" means a stale dev-mode registration, not the actual Flex app
+  if (appName === '' || appName === 'Electron') {
     try {
       await shell.openExternal(OT2_APP_DOWNLOAD_PAGE)
     } catch (error) {

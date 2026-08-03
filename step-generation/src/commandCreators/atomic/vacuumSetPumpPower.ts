@@ -16,7 +16,7 @@ export const vacuumSetPumpPower: CommandCreator<VacuumPumpPowerArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { moduleId, powerPercent, duration, ventAfter } = args
+  const { moduleId, percentPower, duration, ventAfter } = args
   const module = invariantContext.moduleEntities[moduleId]
 
   const moduleState = vacuumModuleStateGetter(prevRobotState, moduleId)
@@ -46,14 +46,13 @@ export const vacuumSetPumpPower: CommandCreator<VacuumPumpPowerArgs> = (
       }
     : null
 
-  const taskPython = taskId == null ? '' : `${taskId} = `
-
-  const powerPercentArg = `power_percent=${formatPyValue(powerPercent)}`
+  const percentPowerArg = `percent_power=${formatPyValue(percentPower)}`
   const holdArgsPython = isTimedHold
     ? getVacuumPumpHoldArgsPython(duration, ventAfter)
     : []
-  const allArgsPython = [powerPercentArg, ...holdArgsPython]
-  const python = `${taskPython}${module.pythonName}.set_power(\n${indentPyLines(allArgsPython.join(',\n'))}\n)`
+  const allArgsPython = [percentPowerArg, ...holdArgsPython]
+  const taskPython = isTimedHold ? `${taskId} = ` : ''
+  const python = `${taskPython}${module.pythonName}.start_set_vacuum_power(\n${indentPyLines(allArgsPython.join(',\n'))}\n)`
   return {
     commands: [
       {
@@ -61,7 +60,7 @@ export const vacuumSetPumpPower: CommandCreator<VacuumPumpPowerArgs> = (
         key: uuid(),
         params: {
           moduleId,
-          percentPower: powerPercent,
+          percentPower,
           ...(holdArgs != null ? holdArgs : {}),
         },
       },

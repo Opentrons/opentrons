@@ -1,10 +1,12 @@
 """Tests for RunDataManager."""
 
+import inspect
 from datetime import datetime
 
 import pytest
 from decoy import Decoy
 
+from opentrons.config import feature_flags
 from opentrons.protocol_engine import (
     CommandSlice,
     EngineStatus,
@@ -13,6 +15,7 @@ from opentrons.protocol_engine import (
     Liquid,
     LoadedLabware,
     LoadedModule,
+    LoadedPeripheral,
     LoadedPipette,
     StateSummary,
     commands,
@@ -22,6 +25,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.resources import CameraProvider
 from opentrons.types import DeckSlotName
+from opentrons_shared_data.robot.types import RobotTypeEnum
 
 from robot_server.camera.provider import CameraProviderWrapper
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
@@ -73,6 +77,7 @@ def engine_state_summary() -> StateSummary:
         labwareOffsets=[LabwareOffset.model_construct(id="some-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.model_construct(id="some-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.model_construct(id="some-module-id")],  # type: ignore[call-arg]
+        peripherals=[LoadedPeripheral.model_construct(id="some-module-id")],  # type: ignore[call-arg]
         liquids=[
             Liquid.model_construct(
                 id="some-liquid-id", displayName="liquid", description="desc"
@@ -121,14 +126,30 @@ def mock_camera_provider(
     return decoy.mock(cls=CameraProvider)
 
 
+@pytest.fixture
+def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Get a mocked feature flags."""
+    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
+        params = inspect.getfullargspec(func)
+        mock_get_ff = decoy.mock(func=func)
+        if any("robot_type" in p for p in params.args):
+            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
+        else:
+            decoy.when(mock_get_ff()).then_return(False)
+        monkeypatch.setattr(feature_flags, name, mock_get_ff)
+
+
 async def test_create(
     decoy: Decoy,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     subject: MaintenanceRunDataManager,
     engine_state_summary: StateSummary,
     mock_camera_provider: CameraProvider,
+    mock_feature_flags: None,
 ) -> None:
     """It should create an engine and a persisted run resource."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
 
@@ -139,6 +160,7 @@ async def test_create(
             created_at=created_at,
             deck_configuration=[],
             notify_publishers=mock_notify_publishers,
+            proxy_of_callback_for_handling_door_events=None,
         )
     ).then_return(engine_state_summary)
     decoy.when(
@@ -176,8 +198,11 @@ async def test_create_with_options(
     subject: MaintenanceRunDataManager,
     engine_state_summary: StateSummary,
     mock_camera_provider: CameraProvider,
+    mock_feature_flags: None,
 ) -> None:
     """It should handle creation with labware offsets."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
 
@@ -194,6 +219,7 @@ async def test_create_with_options(
             created_at=created_at,
             deck_configuration=[],
             notify_publishers=mock_notify_publishers,
+            proxy_of_callback_for_handling_door_events=None,
         )
     ).then_return(engine_state_summary)
     decoy.when(
@@ -231,8 +257,11 @@ async def test_create_engine_error(
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     subject: MaintenanceRunDataManager,
     mock_camera_provider: CameraProvider,
+    mock_feature_flags: None,
 ) -> None:
     """It should not create a resource if engine creation fails."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
 
@@ -243,6 +272,7 @@ async def test_create_engine_error(
             created_at=created_at,
             deck_configuration=[],
             notify_publishers=mock_notify_publishers,
+            proxy_of_callback_for_handling_door_events=None,
         )
     ).then_raise(RunConflictError("oh no"))
     decoy.when(
@@ -265,8 +295,11 @@ async def test_get_current_run(
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     subject: MaintenanceRunDataManager,
     engine_state_summary: StateSummary,
+    mock_feature_flags: None,
 ) -> None:
     """It should get the current run from the engine."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     run_id = "hello world"
 
     decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(
@@ -304,8 +337,11 @@ async def test_get_run_not_current(
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     subject: MaintenanceRunDataManager,
     engine_state_summary: StateSummary,
+    mock_feature_flags: None,
 ) -> None:
     """It should raise a MaintenanceRunNotFoundError."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     run_id = "hello world"
 
     decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(
@@ -320,8 +356,11 @@ async def test_delete_current_run(
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     mock_camera_provider: CameraProvider,
     subject: MaintenanceRunDataManager,
+    mock_feature_flags: None,
 ) -> None:
     """It should delete the current run from the engine."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     run_id = "hello world"
     decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(
         run_id
@@ -341,8 +380,11 @@ def test_get_commands_slice_current_run(
     subject: MaintenanceRunDataManager,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     run_command: commands.Command,
+    mock_feature_flags: None,
 ) -> None:
     """Should get a sliced command list from engine store."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     expected_commands_result = [
         commands.WaitForResume(
             id="command-id-2",

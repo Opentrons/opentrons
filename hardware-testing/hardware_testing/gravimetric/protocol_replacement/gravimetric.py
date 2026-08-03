@@ -2,10 +2,7 @@
 
 from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass, asdict
-import os
-import sys
 from time import time
-import importlib
 import copy
 import json
 import traceback
@@ -19,7 +16,6 @@ from opentrons.protocol_api import (
     LiquidClass,
     OFF_DECK,
 )
-from opentrons import version
 from opentrons.protocol_api._liquid_properties import TransferProperties
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     Coordinate,
@@ -29,15 +25,42 @@ from opentrons.protocol_api.core.engine import (
     transfer_components_executor as tx_comps_executor,
     pipette_movement_conflict,
 )
-from opentrons.config import infer_config_base_dir, IS_ROBOT
+from opentrons.config import IS_ROBOT
 from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
 from opentrons.hardware_control.types import OT3AxisKind, OT3Mount, Axis
 from opentrons.types import Point, DeckSlotName, Location
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
 
+from hardware_testing.data import create_run_id, get_git_description
+from hardware_testing.data.ui import (  # noqa: F401
+    set_output_file,
+    print_info,
+    print_title,
+    print_header,
+    print_warning,
+    print_error,
+)
+
+from hardware_testing.drivers import asair_sensor as AsairDriver
+from hardware_testing.drivers import ImpactProtectionV2
+from hardware_testing.opentrons_api.helpers_ot3 import (
+    clear_pipette_ul_per_mm,
+)
+
+from hardware_testing.drivers.data_center_client import (
+    upload_data_to_google_drive,
+)
+
+# ------ TODO remove and move necessary libraries into a standard release library. ----
+import importlib
+import os
+from opentrons.config import infer_config_base_dir
+from opentrons import version
+import sys
+
 metadata = {"protocolName": "Gravimetric QC V3"}
-requirements = {"robotType": "Flex", "apiLevel": "2.29"}
+requirements = {"robotType": "Flex", "apiLevel": "2.30"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
 
@@ -65,7 +88,7 @@ def _download_and_extract(version_str: str, base_dir: str) -> None:
         ver_file.write(version_str)
 
 
-if not IS_ROBOT or importlib.util.find_spec("hardware_testing") is None:
+if not IS_ROBOT and importlib.util.find_spec("hardware_testing") is None:
     # we're simulating or there is not a vaild hardware-testing yet
     base_dir = str(infer_config_base_dir())
     release = f"{version.replace('a', '-alpha.').replace('b', '-beta.')}"
@@ -78,18 +101,10 @@ if not IS_ROBOT or importlib.util.find_spec("hardware_testing") is None:
         _download_and_extract(release, base_dir)
     sys.path.append(base_dir)
 
-from hardware_testing.scripts.data_center_client import (  # noqa: E402
-    upload_data_to_google_drive,
-)
-from hardware_testing.data import create_run_id, get_git_description  # noqa: E402
-from hardware_testing.data.ui import (  # noqa: F401, E402
-    set_output_file,
-    print_info,
-    print_title,
-    print_header,
-    print_warning,
-    print_error,
-)
+
+# ----- END: TODO ------
+
+
 from hardware_testing.gravimetric.measurement import (  # noqa: E402
     create_measurement_tag,
     record_measurement_data,
@@ -108,13 +123,8 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
     GravimetricRecorder,
     GravimetricRecorderConfig,
 )
-from hardware_testing.drivers import asair_sensor as AsairDriver  # noqa: E402
-from hardware_testing.drivers import ImpactProtectionV2  # noqa: E402
 
 from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
-from hardware_testing.opentrons_api.helpers_ot3 import (  # noqa: E402
-    clear_pipette_ul_per_mm,
-)  # noqa: E402
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -468,6 +478,7 @@ class FixtureSettings(CSVSettings):
             trials=csv_settings.trials,
             name=csv_settings.name,
             run_id=run_id,
+            blank_trials=csv_settings.blank_trials,
             runtime_parameters=csv_params,
             dont_write_to_disk=fast_simulate,
         )
@@ -1081,7 +1092,9 @@ def retract_and_wait(
                 return_val.grams_average += volume * 0.001
         return return_val
 
-    m_tag = create_measurement_tag(mode, None if blank else volume, channel, trial)
+    m_tag = create_measurement_tag(
+        mode.value, None if blank else volume, channel, trial
+    )
     fixture_settings.pipette._retract()
     if fixture_settings.recorder and not blank and fixture_settings.ctx.is_simulating():
         if mode == MeasurementType.ASPIRATE:
@@ -1191,6 +1204,7 @@ def aspirate_with_liquid_class(
                 air_gap=0,
             )
         ],
+        max_pipette_and_tip_volume=tip,
         volume_for_pipette_mode_configuration=None,
     )
     fixture_settings.recorder.clear_sample_tag()

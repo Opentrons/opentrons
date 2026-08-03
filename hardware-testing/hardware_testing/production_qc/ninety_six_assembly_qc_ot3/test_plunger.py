@@ -11,7 +11,7 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import Axis, OT3Mount
+from opentrons.hardware_control.types import OT3Mount, Axis
 
 PLUNGER_MAX_SKIP_MM = 0.1
 SPEEDS_TO_TEST: List[float] = [5, 15, 22]

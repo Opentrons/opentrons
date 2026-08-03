@@ -123,7 +123,7 @@ All tokens are defined in `components/src/styles/global.css`. **Always use these
 
 ### Border Radius
 
-`--border-radius-2`, `--border-radius-4`, `--border-radius-8`, `--border-radius-12`, `--border-radius-16`, `--border-radius-40`, `--border-radius-200` (pill/circle)
+`--border-radius-2`, `--border-radius-4`, `--border-radius-8`, `--border-radius-12`, `--border-radius-16`, `--border-radius-40`, `--border-radius-full` (pill/circle)
 
 ### Typography
 

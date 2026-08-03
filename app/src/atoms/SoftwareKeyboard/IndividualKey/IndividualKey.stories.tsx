@@ -16,7 +16,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 const meta: Meta<typeof IndividualKey> = {
   title: 'ODD/Atoms/SoftwareKeyboard/IndividualKey',
   component: IndividualKey,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 }
 
 export default meta

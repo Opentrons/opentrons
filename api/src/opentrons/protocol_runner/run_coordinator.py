@@ -4,7 +4,7 @@ import enum
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Mapping, Optional, Tuple
 
-from opentrons_shared_data.errors import GeneralError
+from opentrons_shared_data.errors import EnumeratedError, GeneralError
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType
@@ -308,7 +308,10 @@ class AbstractRunCoordinator(ABC):
 
     @abstractmethod
     async def asynchronous_module_error(
-        self, module_model: HardwareModuleModel, module_serial: str | None
+        self,
+        module_model: HardwareModuleModel,
+        module_serial: str | None,
+        error: EnumeratedError | None = None,
     ) -> bool:
         """Handle an asynchronous module error reported by hardware.
 

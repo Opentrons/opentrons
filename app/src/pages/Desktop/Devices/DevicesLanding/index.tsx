@@ -21,9 +21,9 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { Divider } from '/app/atoms/structure'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { CollapsibleSection } from '/app/molecules/CollapsibleSection'
 import { DevicesEmptyState } from '/app/organisms/Desktop/Devices/DevicesEmptyState'
 import { RobotCard } from '/app/organisms/Desktop/Devices/RobotCard'
@@ -34,12 +34,11 @@ import {
   getReachableRobots,
   getScanning,
   getUnreachableRobots,
-  OPENTRONS_USB,
 } from '/app/redux/discovery'
-import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
 import { NewRobotSetupHelp } from './NewRobotSetupHelp'
 
+import type { ReactNode } from 'react'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { State } from '/app/redux/types'
 
@@ -75,15 +74,10 @@ export function DevicesLanding(): JSX.Element {
         return robots
       } else {
         return robots.filter(robot => {
-          const displayName = robot.displayName.toLowerCase()
           const name = robot.name.toLowerCase()
           const model = robot.robotModel.toLowerCase()
 
-          return (
-            displayName.includes(query) ||
-            name.includes(query) ||
-            model.includes(query)
-          )
+          return name.includes(query) || model.includes(query)
         })
       }
     },
@@ -111,9 +105,7 @@ export function DevicesLanding(): JSX.Element {
         marginTop={SPACING.spacing8}
         height="2.25rem"
       >
-        <LegacyStyledText forwardedAs="h1" id="DevicesLanding_title">
-          {t('devices')}
-        </LegacyStyledText>
+        <LegacyStyledText forwardedAs="h1">{t('devices')}</LegacyStyledText>
         <NewRobotSetupHelp />
       </Flex>
       {showSearchBar ? (
@@ -148,28 +140,16 @@ export function DevicesLanding(): JSX.Element {
             })}
           >
             {filteredHealthy.map(robot => (
-              <ApiHostProvider
-                key={robot.name}
-                hostname={robot.ip ?? null}
-                requestor={
-                  robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined
-                }
-              >
+              <ApiHostProviderForRobot key={robot.name} robot={robot}>
                 <RobotCertRotator>
                   <RobotCard robot={robot} />
                 </RobotCertRotator>
-              </ApiHostProvider>
+              </ApiHostProviderForRobot>
             ))}
             {filteredUnhealthy.map(robot => (
-              <ApiHostProvider
-                key={robot.name}
-                hostname={robot.ip ?? null}
-                requestor={
-                  robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined
-                }
-              >
+              <ApiHostProviderForRobot key={robot.name} robot={robot}>
                 <RobotCard robot={robot} />
-              </ApiHostProvider>
+              </ApiHostProviderForRobot>
             ))}
           </CollapsibleSection>
           <Divider />
@@ -232,7 +212,6 @@ function DevicesLoadingState(): JSX.Element {
           href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
           display={DISPLAY_FLEX}
           alignItems={ALIGN_CENTER}
-          id="DevicesEmptyState_troubleshootingConnectionProblems"
         >
           {t('troubleshooting_connection_problems')}
           <Icon
@@ -244,4 +223,12 @@ function DevicesLoadingState(): JSX.Element {
       </Flex>
     </Flex>
   )
+}
+
+function ApiHostProviderForRobot(props: {
+  robot: DiscoveredRobot
+  children: ReactNode
+}): JSX.Element {
+  const { robot, children } = props
+  return <ApiHostProvider robotName={robot.name}>{children}</ApiHostProvider>
 }

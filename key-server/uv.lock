@@ -3,7 +3,7 @@ revision = 3
 requires-python = ">=3.12"
 
 [options]
-exclude-newer = "2026-04-02T18:59:16.44328Z"
+exclude-newer = "2026-07-16T20:59:26.60118Z"
 exclude-newer-span = "P1W"
 
 [manifest]
@@ -742,6 +742,7 @@ dev = [
     { name = "pytest-cov" },
     { name = "pytest-lazy-fixtures" },
     { name = "pytest-xdist" },
+    { name = "requests" },
     { name = "ruff" },
     { name = "tavern" },
     { name = "types-requests" },
@@ -779,9 +780,10 @@ dev = [
     { name = "pytest-cov", marker = "python_full_version >= '3.11'", specifier = "==4.1.0" },
     { name = "pytest-lazy-fixtures", marker = "python_full_version >= '3.11'", specifier = ">=1.1.4,<2" },
     { name = "pytest-xdist", marker = "python_full_version >= '3.11'", specifier = "~=2.5.0" },
+    { name = "requests", marker = "python_full_version >= '3.11'", specifier = "==2.33.*" },
     { name = "ruff", marker = "python_full_version >= '3.11'", specifier = "==0.14.10" },
     { name = "tavern", marker = "python_full_version >= '3.11'", specifier = ">=3.0.2" },
-    { name = "types-requests", marker = "python_full_version >= '3.11'", specifier = "==2.27.1" },
+    { name = "types-requests", marker = "python_full_version >= '3.11'", specifier = "==2.33.*" },
 ]
 robot = [
     { name = "cryptography", specifier = "==42.0.5" },
@@ -1358,15 +1360,6 @@ wheels = [
 ]
 
 [[package]]
-name = "python-multipart"
-version = "0.0.6"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/2d/23/abcfad10c3348cb6358400f8adbc21b523bbc6c954494fd0974428068672/python_multipart-0.0.6.tar.gz", hash = "sha256:e9925a80bb668529f1b67c7fdb0a5dacdd7cbfc6fb0bff3ea443fe22bdd62132", size = 31024, upload-time = "2023-02-27T16:40:10.091Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b4/ff/b1e11d8bffb5e0e1b6d27f402eeedbeb9be6df2cdbc09356a1ae49806dbf/python_multipart-0.0.6-py3-none-any.whl", hash = "sha256:ee698bab5ef148b0a760751c261902cd096e57e10558e11aca17646b74ee1c18", size = 45711, upload-time = "2023-02-27T16:40:14.113Z" },
-]
-
-[[package]]
 name = "pyyaml"
 version = "6.0.3"
 source = { registry = "https://pypi.org/simple" }
@@ -1568,7 +1561,6 @@ dependencies = [
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "python-dotenv" },
-    { name = "python-multipart" },
     { name = "sqlalchemy" },
     { name = "systemd-python", marker = "sys_platform == 'linux'" },
     { name = "typing-extensions" },
@@ -1585,7 +1577,6 @@ requires-dist = [
     { name = "pydantic", specifier = ">2.0.0,<3" },
     { name = "pydantic-settings", specifier = ">=2.0.0,<3" },
     { name = "python-dotenv", specifier = "==1.0.1" },
-    { name = "python-multipart", specifier = "==0.0.6" },
     { name = "sqlalchemy", specifier = ">=1.4.51,<3" },
     { name = "systemd-python", marker = "sys_platform == 'linux'", specifier = "==234" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
@@ -1604,6 +1595,7 @@ dev = [
     { name = "pytest-asyncio", specifier = ">=1,<2" },
     { name = "pytest-cov", specifier = "==4.1.0" },
     { name = "pytest-xdist", specifier = "~=2.5.0" },
+    { name = "python-multipart", specifier = "==0.0.28" },
     { name = "requests", specifier = "==2.31.0" },
     { name = "ruff", specifier = "==0.14.10" },
     { name = "setuptools", specifier = "==80.9.0" },
@@ -1757,11 +1749,14 @@ wheels = [
 
 [[package]]
 name = "types-requests"
-version = "2.27.1"
+version = "2.33.0.20260508"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/3a/12/f17ed7841bbc299cc4f6b9e2b0c23b93fa006716f9a3b2021dea9094a43f/types-requests-2.27.1.tar.gz", hash = "sha256:59ae7a60ed4b61ece7ff6f0ccff394e4d65a6df9b2970cfeb7a0015cb0c91b7e", size = 14395, upload-time = "2022-01-07T11:32:15.382Z" }
+dependencies = [
+    { name = "urllib3" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c7/6b/eb226bdd61a982c9a03e02c657fb4ab001733506e6423906ac142331f2e3/types_requests-2.33.0.20260508.tar.gz", hash = "sha256:81b2ae5f0d20967714a6aa5ef9284c05570d7cb06b7de8f2a77b918b63ddd411", size = 23991, upload-time = "2026-05-08T04:50:56.818Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/69/9d/2119ebfc8c3cc849b61712c2b2fba5ac6e42c7406acb9423d1452400253f/types_requests-2.27.1-py3-none-any.whl", hash = "sha256:d03823054e34cb683ffcc4a05035482224c264096b20e1e14adb99f2b1775f09", size = 22722, upload-time = "2022-01-07T11:32:14.481Z" },
+    { url = "https://files.pythonhosted.org/packages/cb/96/080db0afdf2c5cc5fe512b41354e8d114fe8f65e9510c56ff8dfd40216ce/types_requests-2.33.0.20260508-py3-none-any.whl", hash = "sha256:fa01459cca184229713df03709db46a905325906d27e042cd4fd7ea3d15d3400", size = 20722, upload-time = "2026-05-08T04:50:55.548Z" },
 ]
 
 [[package]]

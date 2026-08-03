@@ -19,24 +19,10 @@ jobs:
       # git fetch origin ${{ github.ref_name }}:${{ github.ref_name }}
       # git checkout ${{ github.ref_name }}
       # This would pull history for only the tag in question.
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
-          fetch-depth: 0
-      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-        with:
-          node-version: '22.22.0'
-      - name: 'cache pnpm cache'
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: |
-            ${{ github.workspace }}/.npm-cache/_prebuild
-            ${{ github.workspace }}/.pnpm-cache
-          key: js-${{ hashFiles('pnpm-lock.yaml') }}
-      - name: 'setup-js'
-        run: |
-          npm config set cache ${{ github.workspace }}/.npm-cache
-          pnpm config set cache ${{ github.workspace }}/.pnpm-cache
-          pnpm install
+          fetch-depth: 0 # Full history.
+      - uses: ./.github/actions/js/setup
 
       - name: 'create release'
         run: |

@@ -1,5 +1,5 @@
 import type { SVGProps } from 'react'
 
 export function SlotBase(props: SVGProps<SVGPathElement>): JSX.Element {
-  return <path {...props} />
+  return <path data-testid={'slot-base'} {...props} />
 }

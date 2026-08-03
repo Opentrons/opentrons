@@ -8,6 +8,7 @@ import '@testing-library/jest-dom/vitest'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import {
   getRobotSessionIsManualFile,
   getRobotUpdateDownloadError,
@@ -97,7 +98,9 @@ describe('DownloadUpdateModal', () => {
       commandType: 'setStatusBar',
       params: { animation: 'updating' },
     }
-    expect(useCreateLiveCommandMutation).toBeCalledWith()
+    expect(useCreateLiveCommandMutation).toBeCalledWith(
+      ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+    )
     expect(mockCreateLiveCommand).toBeCalledWith({
       command: updatingCommand,
       waitUntilComplete: false,
@@ -171,7 +174,9 @@ describe('DownloadUpdateModal', () => {
     fireEvent.click(exitButton)
     expect(props.closeUpdateBuildroot).toHaveBeenCalled()
 
-    expect(useCreateLiveCommandMutation).toBeCalledWith()
+    expect(useCreateLiveCommandMutation).toBeCalledWith(
+      ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+    )
     expect(mockCreateLiveCommand).toHaveBeenCalled()
     expect(mockCreateLiveCommand).toBeCalledWith({
       command: idleCommand,

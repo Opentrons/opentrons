@@ -113,6 +113,7 @@ class AnalysisStore:
     def __init__(
         self,
         sql_engine: sqlalchemy.engine.Engine,
+        access_control_status: bool,
         completed_store: Optional[CompletedAnalysisStore] = None,
     ) -> None:
         """Initialize the `AnalysisStore`."""
@@ -122,6 +123,7 @@ class AnalysisStore:
             memory_cache=MemoryCache(_CACHE_MAX_SIZE, str, CompletedAnalysisResource),
             current_analyzer_version=_CURRENT_ANALYZER_VERSION,
         )
+        self._access_control_status = access_control_status
 
     def add_pending(
         self,
@@ -443,6 +445,14 @@ class AnalysisStore:
             elif primitive_rtps_in_last_analysis[param.variableName] != param.value:
                 return False
         return True
+
+    def get_access_control_status(self) -> bool:
+        """Return the current status of access control enablement from the Analysis Store."""
+        return self._access_control_status
+
+    def set_access_control_status(self, access_control_mode: bool) -> None:
+        """Set the current status of access control enablement for the Analysis Store."""
+        self._access_control_status = access_control_mode
 
 
 class _PendingAnalysisStore:

@@ -29,6 +29,12 @@ test.describe('ProtocolVisualization', () => {
     )
     await page.getByText('100% complete').waitFor({ state: 'visible' })
 
+    await page.waitForFunction(() =>
+      document
+        .getAnimations()
+        .every(a => a.playState === 'finished' || a.playState === 'idle')
+    )
+
     await eyes.check('ProtocolVisualization last step', {
       region: container,
       matchLevel: 'Strict',

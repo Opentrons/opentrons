@@ -40,13 +40,23 @@ export function prefixForProject(project) {
   }
 }
 
+/** Git tag glob for listing/describing versions of a project. */
+export function tagGlobForProject(project) {
+  const prefix = prefixForProject(project)
+  if (project === 'robot-stack') {
+    // Require major.minor shape; excludes mistagged names like vacuum-module-qc-*.
+    return `${prefix}[0-9]*.[0-9]*`
+  }
+  return `${prefix}*`
+}
+
 export async function latestTagForProject(project) {
   return (
     await monorepoGit().raw([
       'describe',
       '--tags',
       '--abbrev=0',
-      `--match=${prefixForProject(project)}*`,
+      `--match=${tagGlobForProject(project)}`,
     ])
   ).trim()
 }
@@ -95,4 +105,30 @@ export async function latestLabwareVersions(appVersion) {
     }
     return acc
   }, {})
+}
+
+async function gitRaw(args) {
+  try {
+    return (await monorepoGit().raw(args)).trim()
+  } catch (error) {
+    console.error(
+      `Could not get git build details: git ${args.join(' ')} failed:`,
+      error
+    )
+    return undefined
+  }
+}
+
+/** Short hash and branch name for tracking in the ODD */
+export async function getGitBuildDetails() {
+  const commitHash = (await gitRaw(['rev-parse', '--short', 'HEAD'])) ?? ''
+
+  // Backup environment variables set by CI
+  const branchName =
+    (await gitRaw(['branch', '--show-current'])) ??
+    process.env.GITHUB_HEAD_REF ??
+    process.env.GITHUB_REF_NAME ??
+    ''
+
+  return { commitHash, branchName }
 }

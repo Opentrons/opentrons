@@ -14,7 +14,7 @@ const render = (props: ComponentProps<typeof PrimaryButton>) => {
   return renderWithProviders(<PrimaryButton {...props} />)[0]
 }
 
-describe('PrimaryButton', () => {
+describe('default variant', () => {
   let props: ComponentProps<typeof PrimaryButton>
 
   beforeEach(() => {
@@ -64,4 +64,66 @@ describe('PrimaryButton', () => {
     expect(button).toHaveStyle(`background-color: ${COLORS.red50}`)
     expect(button).toHaveStyle(`color: ${COLORS.white}`)
   })
+})
+
+describe('warning variant', () => {
+  let props: ComponentProps<typeof PrimaryButton>
+
+  beforeEach(() => {
+    props = {
+      variant: 'warning',
+      children: 'warning primary button',
+    }
+  })
+
+  it.skip('renders warning primary button with text', () => {
+    render(props)
+    const button = screen.getByText('warning primary button')
+    expect(button).toHaveStyle(
+      `text-transform: ${TYPOGRAPHY.textTransformNone}`
+    )
+    expect(button).toHaveStyle('box-shadow: 0 0 0')
+  })
+
+  it('renders warning primary button with text and disabled', () => {
+    props.disabled = true
+    render(props)
+    const button = screen.getByText('warning primary button')
+    expect(button).toBeDisabled()
+  })
+})
+
+describe('alt variant', () => {
+  let props: ComponentProps<typeof PrimaryButton>
+
+  beforeEach(() => {
+    props = {
+      variant: 'alt',
+      children: 'alt primary button',
+    }
+  })
+
+  it('renders alt primary button with text', () => {
+    render(props)
+    const button = screen.getByText('alt primary button')
+    expect(button).toHaveStyle(
+      `text-transform: ${TYPOGRAPHY.textTransformNone}`
+    )
+    // expect(button).toHaveStyle(`box-shadow: none`)
+  })
+
+  it('renders alt primary button with text and disabled', () => {
+    props.disabled = true
+    render(props)
+    const button = screen.getByText('alt primary button')
+    expect(button).toBeDisabled()
+  })
+
+  // (kk: 09/23/2024) hover test needs jsdom update so this will be activated later
+  //   it('applies the correct states to the button - hover', () => {
+  //     render(props)
+  //     const button = screen.getByText('alt primary button')
+  //     fireEvent.mouseOver(button)
+  //     expect(button).toHaveStyle(`background-color: ${COLORS.grey35}`)
+  //   })
 })

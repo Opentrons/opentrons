@@ -17,14 +17,14 @@ import {
   ROW,
   SINGLE,
 } from '@opentrons/shared-data'
-import { getIsSafePipetteMovement } from '@opentrons/step-generation'
+import { getPipetteMovementSafetyStatus } from '@opentrons/step-generation'
 
 import { getAllWellsSafetyStatus } from '../getAllWellsSafetyStatus'
 
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
 vi.mock('@opentrons/step-generation', () => ({
-  getIsSafePipetteMovement: vi.fn(),
+  getPipetteMovementSafetyStatus: vi.fn(),
 }))
 
 describe('getAllWellsSafetyStatus', () => {
@@ -68,7 +68,7 @@ describe('getAllWellsSafetyStatus', () => {
 
   describe('ROW mode', () => {
     it('marks entire row safe when first well is safe', () => {
-      ;(getIsSafePipetteMovement as any).mockReturnValue(true)
+      ;(getPipetteMovementSafetyStatus as any).mockReturnValue({ isSafe: true })
 
       const result = getAllWellsSafetyStatus({
         allWells,
@@ -90,18 +90,24 @@ describe('getAllWellsSafetyStatus', () => {
       })
 
       // Should be called once per row (3 rows)
-      expect(getIsSafePipetteMovement).toHaveBeenCalledTimes(3)
-      expect(getIsSafePipetteMovement).toHaveBeenNthCalledWith(
+      expect(getPipetteMovementSafetyStatus).toHaveBeenCalledTimes(3)
+      expect(getPipetteMovementSafetyStatus).toHaveBeenNthCalledWith(
         1,
         expect.objectContaining({ wellTargetName: 'A1' })
       )
     })
 
     it('marks entire row unsafe when first well is unsafe', () => {
-      ;(getIsSafePipetteMovement as any)
-        .mockReturnValueOnce(false) // row A
-        .mockReturnValueOnce(true) // row B
-        .mockReturnValueOnce(false) // row C
+      ;(getPipetteMovementSafetyStatus as any)
+        .mockReturnValueOnce({
+          isSafe: false,
+          reason: { type: 'outsidePipetteExtents' },
+        }) // row A
+        .mockReturnValueOnce({ isSafe: true }) // row B
+        .mockReturnValueOnce({
+          isSafe: false,
+          reason: { type: 'outsidePipetteExtents' },
+        }) // row C
 
       const result = getAllWellsSafetyStatus({
         allWells,
@@ -126,9 +132,12 @@ describe('getAllWellsSafetyStatus', () => {
 
   describe('COLUMN mode', () => {
     it('marks entire column based on first well safety', () => {
-      ;(getIsSafePipetteMovement as any)
-        .mockReturnValueOnce(true) // column 1
-        .mockReturnValueOnce(false) // column 2
+      ;(getPipetteMovementSafetyStatus as any)
+        .mockReturnValueOnce({ isSafe: true }) // column 1
+        .mockReturnValueOnce({
+          isSafe: false,
+          reason: { type: 'outsidePipetteExtents' },
+        }) // column 2
 
       const result = getAllWellsSafetyStatus({
         allWells,
@@ -149,12 +158,12 @@ describe('getAllWellsSafetyStatus', () => {
         C2: 1,
       })
 
-      expect(getIsSafePipetteMovement).toHaveBeenCalledTimes(2)
-      expect(getIsSafePipetteMovement).toHaveBeenNthCalledWith(
+      expect(getPipetteMovementSafetyStatus).toHaveBeenCalledTimes(2)
+      expect(getPipetteMovementSafetyStatus).toHaveBeenNthCalledWith(
         1,
         expect.objectContaining({ wellTargetName: 'A1' })
       )
-      expect(getIsSafePipetteMovement).toHaveBeenNthCalledWith(
+      expect(getPipetteMovementSafetyStatus).toHaveBeenNthCalledWith(
         2,
         expect.objectContaining({ wellTargetName: 'A2' })
       )
@@ -163,13 +172,24 @@ describe('getAllWellsSafetyStatus', () => {
 
   describe('SINGLE nozzle mode', () => {
     it('checks each well individually', () => {
-      ;(getIsSafePipetteMovement as any)
-        .mockReturnValueOnce(true)
-        .mockReturnValueOnce(false)
-        .mockReturnValueOnce(true)
-        .mockReturnValueOnce(false)
-        .mockReturnValueOnce(true)
-        .mockReturnValueOnce(false)
+      ;(getPipetteMovementSafetyStatus as any)
+        .mockReturnValueOnce({ isSafe: true })
+        .mockReturnValueOnce({
+          isSafe: false,
+          reason: { type: 'outsidePipetteExtents' },
+        })
+        .mockReturnValueOnce({ isSafe: true })
+        .mockReturnValueOnce({
+          isSafe: false,
+          reason: { type: 'adjacentAdressableAreaCollision' },
+          addressableAreaCausingCollision: 'A1',
+        })
+        .mockReturnValueOnce({ isSafe: true })
+        .mockReturnValueOnce({
+          isSafe: false,
+          reason: { type: 'adjacentAdressableAreaCollision' },
+          addressableAreaCausingCollision: 'A2',
+        })
 
       const result = getAllWellsSafetyStatus({
         allWells,
@@ -190,7 +210,7 @@ describe('getAllWellsSafetyStatus', () => {
         C2: 1,
       })
 
-      expect(getIsSafePipetteMovement).toHaveBeenCalledTimes(6)
+      expect(getPipetteMovementSafetyStatus).toHaveBeenCalledTimes(6)
     })
   })
   describe('PARTIAL COLUMN mode', () => {
@@ -208,7 +228,9 @@ describe('getAllWellsSafetyStatus', () => {
     it.each(cases)(
       'handles partial column mode with $tipCount tips ($nozzle)',
       ({ nozzle, tipCount }) => {
-        ;(getIsSafePipetteMovement as any).mockReturnValue(true)
+        ;(getPipetteMovementSafetyStatus as any).mockReturnValue({
+          isSafe: true,
+        })
 
         const result = getAllWellsSafetyStatus({
           allWells: [column],

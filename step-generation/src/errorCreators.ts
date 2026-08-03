@@ -1,5 +1,5 @@
 /** Utility fns to create reusable CommandCreatorErrors */
-import type { CommandCreatorError } from './types'
+import type { CommandCreatorError, UnsafePipetteMovementReason } from './types'
 
 // NOTE: in PD UI, the `message` key here is finally handled by ErrorContents component.
 // To support step-generation as an independent library (someday), messages should also exist here
@@ -274,11 +274,34 @@ export const tallLabwareEastWestOfHeaterShaker = (
   }
 }
 
-export const possiblePipetteCollision = (): CommandCreatorError => {
-  return {
-    type: 'POSSIBLE_PIPETTE_COLLISION',
-    message:
-      'There is a possibility that the Pipette will collide with the a labware or module on the deck',
+export const possiblePipetteCollision = (args: {
+  unsafePipetteMovementReason: UnsafePipetteMovementReason
+}): CommandCreatorError => {
+  const { unsafePipetteMovementReason } = args
+
+  switch (unsafePipetteMovementReason.type) {
+    case 'thermocyclerLidCollision':
+      return {
+        type: 'POSSIBLE_PIPETTE_COLLISION_THERMOCYCLER_LID',
+        message:
+          'There is a possibility that the Pipette will collide with the Thermocycler lid',
+      }
+    case 'outsidePipetteExtents':
+      return {
+        type: 'POSSIBLE_PIPETTE_COLLISION_OUTSIDE_DECK_EXTENTS',
+        message:
+          'There is a possibility that the pipette will move outside the deck extents.',
+      }
+    case 'adjacentAdressableAreaCollision':
+      return {
+        type: 'POSSIBLE_PIPETTE_COLLISION_ADJACENT_ADDRESSABLE_AREA',
+        message: `There is a possibility that the pipette will collide with adjacent items in ${unsafePipetteMovementReason.addressableAreaCausingCollision.displayName}`,
+        translationParams: {
+          addressableAreaCausingCollisionDisplayName:
+            unsafePipetteMovementReason.addressableAreaCausingCollision
+              .displayName,
+        },
+      }
   }
 }
 
@@ -502,5 +525,13 @@ export const liveTaskError = (): CommandCreatorError => {
     type: 'LIVE_TASK_ERROR',
     message:
       'This module is currently running a live task. Please wait for it to complete before performing this action.',
+  }
+}
+
+export const vacuumUnderPressure = (): CommandCreatorError => {
+  return {
+    type: 'VACUUM_UNDER_PRESSURE',
+    message:
+      'The vacuum module is under pressure. Deactivate the pump to move labware to or from it.',
   }
 }

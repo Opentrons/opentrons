@@ -9,11 +9,11 @@ import {
 import { getVacuumProfileStepString } from '../../utils/vacuumPythonArgs/getVacuumProfileStepString'
 
 import type { VacuumModuleStartRunProfileCreateCommand } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+import type { CommandCreator, VacuumStartRunProfileArgs } from '../../types'
 
 // TODO: (nd, 2026-04-20) command creator implementation
 export const vacuumStartRunProfile: CommandCreator<
-  VacuumModuleStartRunProfileCreateCommand['params']
+  VacuumStartRunProfileArgs
 > = (args, invariantContext, prevRobotState) => {
   const { moduleId, profile, ventAfter } = args
 
@@ -36,16 +36,20 @@ export const vacuumStartRunProfile: CommandCreator<
 
   // 1-indexed profile task ID
   const taskId = `${vacuumPythonName}_task_${vacuumState.numPumpActivitiesStarted + 1}`
-  const profileArgs = getVacuumProfileStepString(profile)
-  const ventAfterArg = ventAfter
-    ? `vent_after=${formatPyValue(ventAfter)}`
-    : null
-  const allArgs = [
-    ...profileArgs,
-    ...(ventAfterArg != null ? [ventAfterArg] : []),
-  ]
+  const profilePythonArgs = getVacuumProfileStepString(profile)
+  const ventAfterPythonArg = `vent_after=${formatPyValue(ventAfter)}`
 
-  const dummyPython = `${taskId} = ${vacuumPythonName}.start_execute_profile(\n${indentPyLines(allArgs.join(',\n'))}\n)`
+  // explicitly attach the ventAfter param to the final step of the profile in accordance with PE command shape
+  // there is no direct ventAfter param at the startRunProfile command params top level
+  const profileWithVentOnFinal: VacuumModuleStartRunProfileCreateCommand['params']['steps'] =
+    profile.map((step, index) => {
+      if (index === profile.length - 1) {
+        return { ...step, ventAfter }
+      }
+      return step
+    })
+
+  const python = `${taskId} = ${vacuumPythonName}.start_execute_profile(\n${indentPyLines([...profilePythonArgs, ventAfterPythonArg].join(',\n'))}\n)`
 
   return {
     commands: [
@@ -54,13 +58,12 @@ export const vacuumStartRunProfile: CommandCreator<
         key: uuid(),
         params: {
           moduleId,
-          profile,
+          steps: profileWithVentOnFinal,
           ventAfter,
           taskId,
         },
       },
     ],
-    // TODO: (nd, 2026-04-23) implement Python
-    python: dummyPython,
+    python,
   }
 }

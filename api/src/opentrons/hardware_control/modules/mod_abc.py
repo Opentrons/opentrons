@@ -2,7 +2,7 @@ import abc
 import asyncio
 import logging
 import re
-from typing import ClassVar, Optional, TypeVar
+from typing import Any, Callable, ClassVar, Coroutine, Optional, TypeVar
 
 from packaging.version import InvalidVersion, Version, parse
 
@@ -113,6 +113,16 @@ class AbstractModule(AbstractDevice):
         """Called from within the module object when an asynchronous hardware error occurrs."""
         self._error_callback(exc, self.model(), self.port, self.serial_number)
 
+    def inject_async_gcode_response(
+        self,
+        gcode_response: str,
+        command: str,
+    ) -> None:
+        """Inject a firmware-style async G-code error for module testing."""
+        raise NotImplementedError(
+            f"inject_async_gcode_response is not supported by {self.model()}"
+        )
+
     def get_bundled_fw(self) -> Optional[BundledFirmware]:
         """Get absolute path to bundled version of module fw if available."""
         if not IS_ROBOT:
@@ -196,3 +206,36 @@ class AbstractModule(AbstractDevice):
     def bootloader(self) -> UploadFunction:
         """Method used to upload file to this module's bootloader."""
         pass
+
+    async def move_port(self, port: str, usb_port: USBPort) -> None:
+        pass
+
+    async def attempt_reconnect(self) -> None:
+        """Attempt to reestablish connections."""
+        pass
+
+    async def run_task_fault_tolerant(
+        self,
+        task_function: Callable[[], Coroutine[Any, Any, None]],
+        debounce_count: int = 4,
+    ) -> None:
+        """Convenience function for module actions where we have to wait for some action to happen.
+        This will end up calling the task function multiple times in the event of a failure.
+        """
+        while debounce_count > 0:
+            try:
+                t = self._loop.create_task(task_function())
+                self.make_cancellable(t)
+                await t
+            except BaseException:
+                mod_log.exception(
+                    f"error in fault tolerant module call debounce {debounce_count}"
+                )
+                debounce_count -= 1
+                await asyncio.sleep(1)
+                if debounce_count == 0:
+                    # out of retries
+                    raise
+            else:
+                # success
+                return

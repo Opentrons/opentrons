@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
-import last from 'lodash/last'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   DIRECTION_COLUMN,
@@ -8,20 +7,20 @@ import {
   SPACING,
   StepMeter,
 } from '@opentrons/components'
+import { usePostWifiConfigureMutation } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { DisplayWifiList } from '/app/organisms/ODD/NetworkSettings'
-import { getLocalRobot } from '/app/redux/discovery'
-import * as Networking from '/app/redux/networking'
-import * as RobotApi from '/app/redux/robot-api'
+import { getLocalRobot, startDiscovery } from '/app/redux/discovery'
 import { useWifiList } from '/app/resources/networking/hooks'
 
 import { JoinOtherNetwork } from './JoinOtherNetwork'
-import { SelectAuthenticationType } from './SelectAuthenticationType'
-import { SetWifiCred } from './SetWifiCred'
+import { WifiAuthenticationSelector } from './WifiAuthenticationSelector'
 import { WifiConnectStatus } from './WifiConnectStatus'
+import { WifiCredentialForm } from './WifiCredentialForm'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { State } from '/app/redux/types'
+import type { Dispatch } from '/app/redux/types'
 
 const WIFI_LIST_POLL_MS = 5000
 export type WifiScreenOption =
@@ -42,10 +41,19 @@ export function ConnectViaWifi(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const list = useWifiList(robotName, WIFI_LIST_POLL_MS)
-  const [dispatchApiRequest, requestIds] = RobotApi.useDispatchApiRequest()
-  const requestState = useSelector((state: State) => {
-    const lastId = last(requestIds)
-    return lastId != null ? RobotApi.getRequestById(state, lastId) : null
+  const dispatch = useDispatch<Dispatch>()
+  const documentationState = useDocumentationState()
+  const {
+    postWifiConfigure,
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+    reset: resetWifiConfigure,
+  } = usePostWifiConfigureMutation(documentationState, {
+    onSuccess: () => {
+      dispatch(startDiscovery())
+    },
   })
 
   const handleConnect = (): void => {
@@ -55,7 +63,7 @@ export function ConnectViaWifi(): JSX.Element {
       hidden: false,
       psk: password,
     }
-    dispatchApiRequest(Networking.postWifiConfigure(robotName, options))
+    postWifiConfigure(options)
     setCurrentOption('WifiConnectStatus')
     setPassword('')
   }
@@ -65,7 +73,11 @@ export function ConnectViaWifi(): JSX.Element {
     currentScreen = (
       <WifiConnectStatus
         handleConnect={handleConnect}
-        requestState={requestState}
+        isPending={isLoading}
+        isSuccess={isSuccess}
+        isError={isError}
+        error={error}
+        resetConfigure={resetWifiConfigure}
         setCurrentOption={setCurrentOption}
         selectedSsid={selectedSsid}
         selectedAuthType={selectedAuthType}
@@ -94,7 +106,7 @@ export function ConnectViaWifi(): JSX.Element {
     )
   } else if (currentOption === 'SelectAuthType') {
     currentScreen = (
-      <SelectAuthenticationType
+      <WifiAuthenticationSelector
         selectedAuthType={selectedAuthType}
         setSelectedAuthType={setSelectedAuthType}
         handleWifiConnect={handleConnect}
@@ -103,7 +115,7 @@ export function ConnectViaWifi(): JSX.Element {
     )
   } else if (currentOption === 'SetWifiCred') {
     currentScreen = (
-      <SetWifiCred
+      <WifiCredentialForm
         password={password}
         setPassword={setPassword}
         setCurrentOption={setCurrentOption}

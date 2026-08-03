@@ -50,7 +50,7 @@ class SubsystemManager:
     """
 
     _can_messenger: can_bus.CanMessenger
-    _usb_messenger: Optional[binary_usb.BinaryMessenger]
+    _usb_messenger: binary_usb.BinaryMessenger
     _tool_detector: tools.detector.ToolDetector
     _network_info: network.NetworkInfo
     _tool_detection_task: "Optional[asyncio.Task[None]]"
@@ -65,7 +65,7 @@ class SubsystemManager:
     def __init__(
         self,
         can_messenger: can_bus.CanMessenger,
-        usb_messenger: Optional[binary_usb.BinaryMessenger],
+        usb_messenger: binary_usb.BinaryMessenger,
         tool_detector: tools.detector.ToolDetector,
         network_info: network.NetworkInfo,
         update_bag: FirmwareUpdate,
@@ -79,19 +79,19 @@ class SubsystemManager:
             NodeId.gantry_x,
             NodeId.gantry_y,
             NodeId.head,
+            USBTarget.rear_panel,
         }
         self._tool_task_condition = asyncio.Condition()
         self._tool_task_state = False
         self._updates_required = {}
         self._updates_ongoing = {}
         self._update_bag = update_bag
-        if self._usb_messenger:
-            self._expected_core_targets.add(USBTarget.rear_panel)
         self._present_tools = tools.types.ToolSummary(
             left=None, right=None, gripper=None
         )
         # This is intended to be an internal variable but is modified in unit tests to avoid long timeouts
         self._check_device_update_timeout = 10.0
+        self._event_callback: Optional[Callable[[], None]] = None
 
     @property
     def ok(self) -> bool:
@@ -337,11 +337,15 @@ class SubsystemManager:
     async def _probe_network_and_cache_fw_updates(
         self, targets: Set[FirmwareTarget], broadcast: bool = True
     ) -> None:
-        checked_targets = {
-            target
-            for target in targets
-            if target_to_subsystem(target) not in self._updates_ongoing
-        }
+        def _ok_to_check(target: FirmwareTarget) -> bool:
+            # the tool detection notification can happen before the updater removes it from ongoing, but it will be marked as done.
+            subsystem = target_to_subsystem(target)
+            return not (
+                subsystem in self._updates_ongoing
+                and self._updates_ongoing[subsystem].state != UpdateState.done
+            )
+
+        checked_targets = {target for target in targets if _ok_to_check(target)}
         if broadcast:
             await self._network_info.probe(checked_targets)
         else:
@@ -422,6 +426,10 @@ class SubsystemManager:
                 self._tool_task_state = True
                 self._tool_task_condition.notify_all()
 
+            if self._event_callback is not None:
+                # Notify the subsystem event callback
+                self._event_callback()
+
     def _tool_if_ok(self, tool: ToolType, node: NodeId) -> ToolType:
         if tool is ToolType.nothing_attached:
             return tool
@@ -431,3 +439,6 @@ class SubsystemManager:
         if not device_info[node].ok:
             return ToolType.nothing_attached
         return tool
+
+    def set_event_callback(self, callback: Callable[[], None]) -> None:
+        self._event_callback = callback

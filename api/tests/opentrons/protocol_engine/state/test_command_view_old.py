@@ -120,6 +120,7 @@ def get_command_view(  # noqa: C901
         stopped_by_async_error=False,
         is_stopping_because_of_async_error=False,
         has_entered_error_recovery=has_entered_error_recovery,
+        protocol_pause_deferred=False,
         error_recovery_policy=_placeholder_error_recovery_policy,
         command_annotations={},
     )

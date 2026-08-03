@@ -76,8 +76,8 @@ describe('vacuumSetPumpPressure', () => {
         },
       ],
       python: `
-mock_vacuum_module.set_pressure(
-    gauge_pressure=150
+mock_vacuum_module.start_set_vacuum_pressure(
+    gauge_pressure_mbar=150
 )`.trim(),
     })
   })
@@ -119,11 +119,12 @@ mock_vacuum_module.set_pressure(
         },
       ],
       python: `
-mock_vacuum_module_task_3 = mock_vacuum_module.set_pressure(
-    gauge_pressure=100,
-    duration=45,
+mock_vacuum_module_task_3 = mock_vacuum_module.start_set_vacuum_pressure(
+    gauge_pressure_mbar=100,
+    duration_s=45,
     vent_after=True
-)`.trim(),
+)
+`.trim(),
     })
   })
 

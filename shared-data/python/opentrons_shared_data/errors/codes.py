@@ -43,6 +43,7 @@ class ErrorCodes(Enum):
     INTERNAL_MESSAGE_FORMAT_ERROR = _code_from_dict_entry("1006")
     CANBUS_CONFIGURATION_ERROR = _code_from_dict_entry("1007")
     CANBUS_BUS_ERROR = _code_from_dict_entry("1008")
+    KEY_STORAGE_UNAVAILABLE = _code_from_dict_entry("1009")
     ROBOTICS_CONTROL_ERROR = _code_from_dict_entry("2000")
     MOTION_FAILED = _code_from_dict_entry("2001")
     HOMING_FAILED = _code_from_dict_entry("2002")
@@ -86,6 +87,9 @@ class ErrorCodes(Enum):
     STACKER_SHUTTLE_LABWARE_FAILED = _code_from_dict_entry("3021")
     STACKER_HOPPER_LABWARE_FAILED = _code_from_dict_entry("3022")
     STACKER_SHUTTLE_OCCUPIED = _code_from_dict_entry("3023")
+    BARCODE_SCANNER_FAILURE = _code_from_dict_entry("3024")
+    VACUUM_PRESSURE_NOT_REACHED = _code_from_dict_entry("3040")
+    VACUUM_WASTE_CONTAINER_FULL = _code_from_dict_entry("3041")
     GENERAL_ERROR = _code_from_dict_entry("4000")
     ROBOT_IN_USE = _code_from_dict_entry("4001")
     API_REMOVED = _code_from_dict_entry("4002")
@@ -100,6 +104,7 @@ class ErrorCodes(Enum):
     INCORRECT_API_VERSION = _code_from_dict_entry("4011")
     LABWARE_LOCATING_FEATURE_ERROR = _code_from_dict_entry("4012")
     CAMERA_ERROR = _code_from_dict_entry("4013")
+    AUDIT_LOGGING_ERROR = _code_from_dict_entry("4014")
 
     @classmethod
     @lru_cache(25)

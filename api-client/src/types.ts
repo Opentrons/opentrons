@@ -2,12 +2,21 @@ import type { AxiosRequestConfig } from 'axios'
 import type { AddressableAreaName, ModuleModel } from '@opentrons/shared-data'
 import type { ResponsePromise } from './request'
 
+/** Information required to access a robot's API. */
 export interface HostConfig {
   hostname: string
+
   requestor?: <ResData>(config: AxiosRequestConfig) => ResponsePromise<ResData>
+
   port?: number | null
+
+  // todo(mm, 2026-05-08): robotName is not required to access a robot's API,
+  // so it probably doesn't belong in this type.
   robotName?: string | null
-  token?: string
+
+  /** An OAuth 2 access token. */
+  token?: string | null
+
   secure?: boolean
 }
 

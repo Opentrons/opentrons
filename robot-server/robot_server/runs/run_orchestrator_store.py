@@ -5,6 +5,9 @@ import logging
 from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
 
 from opentrons.config import feature_flags
+from opentrons.config import (
+    feature_flags as ff,
+)
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
     AsynchronousModuleErrorNotification,
@@ -38,8 +41,18 @@ from opentrons.protocol_engine.resources.camera_provider import (
     CameraSettings,
 )
 from opentrons.protocol_engine.resources.file_provider import FileProvider
-from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
+from opentrons.protocol_engine.state.commands import (
+    CommandAnnotationsSlice,
+    CurrentCommandNotification,
+    FinalizedCommandNotification,
+)
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
+from opentrons.protocol_engine.state.modules import FlexStackerSubstateNotification
+from opentrons.protocol_engine.state.pipettes import (
+    NozzleMapNotification,
+    TipAttachedNotification,
+)
+from opentrons.protocol_engine.state.state import EngineEventNotification
 from opentrons.protocol_engine.types import (
     CommandAnnotation,
     CSVRuntimeParamPaths,
@@ -66,6 +79,7 @@ from .run_process import DirectedRunProcess
 from .run_process_pyro_provider import RunProcessPyroProvider
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
+from robot_server.service.pyro_utils.resource_utilities import get_pyro_resource
 
 _log = logging.getLogger(__name__)
 
@@ -98,7 +112,9 @@ async def _do_handle_hardware_event(  # noqa: C901
             return
         should_finish = (
             await run_orchestrator_store.run_coordinator.asynchronous_module_error(
-                module_model=event.module_model, module_serial=event.module_serial
+                module_model=event.module_model,
+                module_serial=event.module_serial,
+                error=event.exception,
             )
         )
         if should_finish:
@@ -169,6 +185,7 @@ class RunOrchestratorStore:
         robot_type: RobotType,
         deck_type: DeckType,
         run_process_pyro_provider: RunProcessPyroProvider,
+        access_control_status: bool,
     ) -> None:
         """Initialize a run orchestrator storage interface.
 
@@ -179,6 +196,7 @@ class RunOrchestratorStore:
             deck_type: Passed along to `opentrons.protocol_engine.Config`.
             run_process_pyro_provider: If in protocol subprocess mode, provides
                 the run process proxy when running a protocol.
+            access_control_status: Status of the Auth-Server access control enablement.
         """
         self._hardware_api = hardware_api
         self._robot_type = robot_type
@@ -190,6 +208,14 @@ class RunOrchestratorStore:
         self._run_process_pyro_provider = run_process_pyro_provider
         if not feature_flags.hardware_subprocess_enabled():
             hardware_api.register_callback(_get_hardware_listener(self))
+
+        # Locally stored engine state, updated via notifications
+        self._nozzle_maps: Optional[Mapping[str, NozzleMapInterface]] = None
+        self._tip_attached: Optional[Dict[str, bool]] = None
+        self._current_command: Optional[CommandPointer] = None
+        self._most_recent_finalized_command: Optional[CommandPointer] = None
+        self._flex_stacker_substate: Optional[Mapping[str, FlexStackerSubState]] = None
+        self._access_control_mode = access_control_status
 
     @property
     def run_coordinator(self) -> Union[RunOrchestrator, DirectedRunProcess]:
@@ -203,6 +229,15 @@ class RunOrchestratorStore:
         """Get the run identifier associated with the current run orchestrator."""
         return (
             self.run_coordinator.run_id if self._run_coordinator is not None else None
+        )
+
+    def default_run_orchestrator_door_watcher_callback_route_for_proxy(
+        self, event: HardwareEvent
+    ) -> None:
+        """Callback to expose the default run orchestrator door watcher callback to a remote processes."""
+        assert self._default_run_orchestrator is not None
+        self._default_run_orchestrator._protocol_engine._door_watcher._handle_proxy_hardware_door_event(
+            event
         )
 
     # TODO(mc, 2022-03-21): this resource locking is insufficient;
@@ -220,6 +255,13 @@ class RunOrchestratorStore:
         ):
             raise RunConflictError("A run is currently active")
 
+        proxy_door_callback = None
+        if ff.hardware_subprocess_enabled():
+            pyro_resource = get_pyro_resource()
+            proxy_door_callback = (
+                pyro_resource.get_default_run_orchestrator_door_watcher_callback()
+            )
+
         default_orchestrator = self._default_run_orchestrator
         if default_orchestrator is None:
             engine = await create_protocol_engine(
@@ -233,9 +275,23 @@ class RunOrchestratorStore:
                 # for example, there would be no equivalent to the `POST /runs/{id}/actions`
                 # endpoint to resume normal operation.
                 error_recovery_policy=error_recovery_policy.never_recover,
+                updates_callback=self.update_engine_status_callback,
+                proxy_of_callback_for_handling_door_events=proxy_door_callback,
             )
             self._default_run_orchestrator = RunOrchestrator.build_orchestrator(
                 protocol_engine=engine, hardware_api=self._hardware_api
+            )
+
+            # Initialize values for the default run orchestrator
+            self._clear_stored_engine_state()
+            self._nozzle_maps = self._default_run_orchestrator.get_nozzle_maps()
+            self._tip_attached = self._default_run_orchestrator.get_tip_attached()
+            self._current_command = self._default_run_orchestrator.get_current_command()
+            self._most_recent_finalized_command = (
+                self._default_run_orchestrator.get_most_recently_finalized_command()
+            )
+            self._flex_stacker_substate = (
+                self._default_run_orchestrator.get_flex_stacker_substate()
             )
             return self._default_run_orchestrator
         return default_orchestrator
@@ -299,6 +355,7 @@ class RunOrchestratorStore:
 
         if self._run_coordinator is not None:
             raise RunConflictError("Another run is currently active.")
+
         engine = await create_protocol_engine(
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
@@ -314,6 +371,7 @@ class RunOrchestratorStore:
             file_provider=file_provider,
             camera_provider=camera_provider,
             notify_publishers=notify_publishers,
+            updates_callback=self.update_engine_status_callback,
         )
 
         orchestrator = RunOrchestrator.build_orchestrator(
@@ -342,7 +400,11 @@ class RunOrchestratorStore:
             orchestrator.add_labware_offset(offset)
 
         summary = orchestrator.get_state_summary()
+        self._clear_stored_engine_state()
         self._run_coordinator = orchestrator
+
+        self._initialize_stored_engine_state()
+
         return summary
 
     async def clear(self) -> RunResult:
@@ -409,7 +471,9 @@ class RunOrchestratorStore:
         )
 
         summary = run_process.get_state_summary()
+        self._clear_stored_engine_state()
         self._run_coordinator = run_process
+        self._initialize_stored_engine_state()
         return summary
 
     async def clear_pyro(self) -> RunResult:
@@ -425,7 +489,9 @@ class RunOrchestratorStore:
 
         run_data = self.run_coordinator.get_state_summary()
 
-        await self._run_process_pyro_provider.refresh()
+        await self._run_process_pyro_provider.refresh(
+            access_control_mode=self._access_control_mode
+        )
 
         self._run_coordinator = None
 
@@ -474,11 +540,13 @@ class RunOrchestratorStore:
 
     def get_nozzle_maps(self) -> Mapping[str, NozzleMapInterface]:
         """Get the current nozzle map keyed by pipette id."""
-        return self.run_coordinator.get_nozzle_maps()
+        assert self._nozzle_maps is not None
+        return self._nozzle_maps
 
     def get_tip_attached(self) -> Dict[str, bool]:
         """Get current tip state keyed by pipette id."""
-        return self.run_coordinator.get_tip_attached()
+        assert self._tip_attached is not None
+        return self._tip_attached
 
     def get_run_time_parameters(self) -> List[RunTimeParameter]:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
@@ -486,15 +554,16 @@ class RunOrchestratorStore:
 
     def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
         """Get the current (if any) Flex Stacker Substates keyed by modile id."""
-        return self.run_coordinator.get_flex_stacker_substate()
+        assert self._flex_stacker_substate is not None
+        return self._flex_stacker_substate
 
     def get_current_command(self) -> Optional[CommandPointer]:
         """Get the current running command, if any."""
-        return self.run_coordinator.get_current_command()
+        return self._current_command
 
     def get_most_recently_finalized_command(self) -> Optional[CommandPointer]:
         """Get the most recently finalized command, if any."""
-        return self.run_coordinator.get_most_recently_finalized_command()
+        return self._most_recent_finalized_command
 
     def get_command_slice(
         self, cursor: Optional[int], length: int, include_fixit_commands: bool
@@ -613,6 +682,10 @@ class RunOrchestratorStore:
                 error_recovery_rules, error_recovery_is_enabled
             )
 
+    def set_access_control_status(self, access_control_mode: bool) -> None:
+        """Set the access control policy for the Run Orchestrator Store."""
+        self._access_control_mode = access_control_mode
+
     def add_camera_enablement_settings(
         self, enablement_settings: CameraSettings
     ) -> CameraSettings:
@@ -647,3 +720,62 @@ class RunOrchestratorStore:
             wait_until_complete=wait_until_complete,
             timeout=timeout,
         )
+
+    async def handle_proxy_hardware_event(self, event: HardwareEvent) -> None:
+        """Handle an E-stop event from the hardware API.
+
+        When in subprocess mode this will run on the RobotServerPyroResource's event loop.
+
+        This will not be called otherwise, as it is only for proxy callback events.
+
+        Implementation is in _do_handle_hardware_event, so this can just catch exceptions.
+        """
+        try:
+            await _do_handle_hardware_event(self, event)
+        except Exception:
+            # This is a background task kicked off by a hardware event,
+            # so there's no one to propagate this exception to.
+            _log.exception("Exception handling E-stop event.")
+
+    def update_engine_status_callback(
+        self, events: list[EngineEventNotification]
+    ) -> None:
+        """Handle protocol engine status updates for the run orchestrator store."""
+        for event in events:
+            if isinstance(event, NozzleMapNotification):
+                self._nozzle_maps = event.nozzle_maps
+
+            if isinstance(event, TipAttachedNotification):
+                self._tip_attached = event.tip_attached_dict
+
+            if isinstance(event, CurrentCommandNotification):
+                self._current_command = event.running_command_pointer
+
+            if isinstance(event, FinalizedCommandNotification):
+                self._most_recent_finalized_command = event.finalized_command_pointer
+                self._current_command = (
+                    event.running_command_pointer
+                    if event.running_command_pointer is not None
+                    else event.finalized_command_pointer
+                )
+
+            if isinstance(event, FlexStackerSubstateNotification):
+                self._flex_stacker_substate = event.stacker_substate_map
+
+    def _initialize_stored_engine_state(self) -> None:
+        """Initialize the orchestrator store local engine state."""
+        self._nozzle_maps = self.run_coordinator.get_nozzle_maps()
+        self._tip_attached = self.run_coordinator.get_tip_attached()
+        self._current_command = self.run_coordinator.get_current_command()
+        self._most_recent_finalized_command = (
+            self.run_coordinator.get_most_recently_finalized_command()
+        )
+        self._flex_stacker_substate = self.run_coordinator.get_flex_stacker_substate()
+
+    def _clear_stored_engine_state(self) -> None:
+        """Clear the stored engine state, called when creating a new run orchestrator so no state persists between runs."""
+        self._nozzle_maps = None
+        self._tip_attached = None
+        self._current_command = None
+        self._most_recent_finalized_command = None
+        self._flex_stacker_substate = None

@@ -90,4 +90,15 @@ describe('StepGroup', () => {
 
     expect(props.handleClick).not.toHaveBeenCalled()
   })
+
+  it('does not trigger handleClick when clicking headerPrefixIcon (stopPropagation)', () => {
+    render({
+      ...props,
+      headerPrefixIcon: <button type="button">prefix action</button>,
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: 'prefix action' }))
+
+    expect(props.handleClick).not.toHaveBeenCalled()
+  })
 })

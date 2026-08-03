@@ -33,5 +33,6 @@ export * from './pythonFormat'
 export * from './safePipetteMovements'
 export * from './thermocyclerProfileConversions'
 export * from './traversals'
+export * from './getCommandCreatorFromStepArgs'
 
 export const uuid: () => string = uuidv4

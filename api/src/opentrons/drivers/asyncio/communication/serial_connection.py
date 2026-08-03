@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 from typing import AsyncIterator, Literal, Type
 
 from .async_serial import AsyncSerial
@@ -10,6 +11,7 @@ from .errors import (
     BaseErrorCode,
     DefaultErrorCodes,
     ErrorResponse,
+    FailedCommand,
     GCodeCacheFull,
     NoResponse,
     UnhandledGcode,
@@ -17,6 +19,9 @@ from .errors import (
 from opentrons.drivers.command_builder import CommandBuilder
 
 log = logging.getLogger(__name__)
+
+SerialResponseKind = Literal["response", "error", "empty-unknown"]
+SerialResponse = tuple[SerialResponseKind, bytes]
 
 
 class SerialConnection:
@@ -132,6 +137,7 @@ class SerialConnection:
         self._error_keyword = error_keyword.lower()
         self._alarm_keyword = alarm_keyword.lower()
         self._error_codes = error_codes
+        self._closed_on_purpose = False
 
     async def send_command(
         self, command: CommandBuilder, retries: int = 0, timeout: float | None = None
@@ -227,10 +233,12 @@ class SerialConnection:
 
     async def open(self) -> None:
         """Open the connection."""
+        self._closed_on_purpose = False
         await self._serial.open()
 
     async def close(self) -> None:
         """Close the connection."""
+        self._closed_on_purpose = True
         await self._serial.close()
 
     async def is_open(self) -> bool:
@@ -295,6 +303,31 @@ class SerialConnection:
             # If no specific error code was found, raise a generic ErrorResponse
             raise ErrorResponse(port=self._port, response=response)
 
+    async def update_port(self, new_port: str) -> None:
+        """Try to change the underling port path.
+
+        This should only be used temporarily, it is triggered during the reconnect patch in module_control
+        to allow the on_retry method to connect to the new port so it has a chance at successfully retrying
+        to send a command. Module control can't clean up this instance until that retry loop has succeeded or
+        hit its limit. Module Control then tears down this instance on success or failure and rebuilds a new
+        driver."""
+        log.info(
+            f"Changing port from {self._port} to {new_port} while open({await self._serial.is_open()})"
+        )
+
+        if await self._serial.is_open():
+            await self._serial.close()
+        self._name = new_port
+        self._serial = await self._build_serial(
+            port=new_port,
+            baud_rate=self._serial._baud_rate,
+            timeout=self._serial.get_timeout("timeout"),
+            loop=self._serial._loop,
+            reset_buffer_before_write=self._serial._reset_buffer_before_write,
+        )
+        self._port = new_port
+        self._name = new_port
+
     async def on_retry(self) -> None:
         """
         Opportunity for derived classes to perform action between retries. Default
@@ -303,8 +336,12 @@ class SerialConnection:
         Returns: None
         """
         await asyncio.sleep(self._retry_wait_time_seconds)
-        await self._serial.close()
-        await self._serial.open()
+        if os.path.exists(self._port):
+            try:
+                await asyncio.wait_for(self._serial.close(), timeout=1)
+                await asyncio.wait_for(self._serial.open(), timeout=1)
+            except BaseException:
+                log.exception("Got an error during reconnect.")
 
     def process_raw_response(self, command: str, response: str) -> str:
         """
@@ -544,20 +581,89 @@ class AsyncResponseSerialConnection(SerialConnection):
                 retries=retries if retries is not None else self._number_of_retries,
             )
 
-    async def _consume_responses(
-        self, acks: int
-    ) -> AsyncIterator[tuple[Literal["response", "error", "empty-unknown"], bytes]]:
+    def _partition_serial_read(self, data: bytes) -> list[SerialResponse]:
+        """Split one serial read into async-error and/or command-response chunks.
+
+        ``read_until(ack)`` can return an interleaved buffer when firmware emits an
+        async notification without its own trailing ack, then a command response:
+
+            b'async ERR401:...\\nM121 ... OK\\n'
+
+        Treating the whole buffer as a single async error consumes the command
+        ack and forces an unnecessary timeout wait for another one.
+        """
+        async_marker = self._async_error_ack.encode()
+        has_async = async_marker in data
+        has_ack = self._ack in data
+
+        if not has_async and not has_ack:
+            return [("empty-unknown", data)]
+        if not has_async:
+            return [("response", data)]
+        return self._split_async_and_command_responses(data)
+
+    def _split_async_and_command_responses(self, data: bytes) -> list[SerialResponse]:
+        """Partition a buffer that contains one or more async markers and acks."""
+        async_marker = self._async_error_ack.encode()
+        parts: list[SerialResponse] = []
+        remaining = data
+
+        while remaining:
+            async_idx = remaining.find(async_marker)
+
+            if async_idx == -1:
+                if remaining.strip():
+                    kind: SerialResponseKind = (
+                        "response" if self._ack in remaining else "empty-unknown"
+                    )
+                    parts.append((kind, remaining))
+                break
+
+            if async_idx > 0:
+                before = remaining[:async_idx]
+                if self._ack in before:
+                    parts.append(("response", before))
+                remaining = remaining[async_idx:]
+                continue
+
+            # `remaining` starts with an async marker.
+            ack_idx = remaining.find(self._ack)
+            if ack_idx == -1:
+                parts.append(("error", remaining))
+                break
+
+            # If a newline appears before the terminating ack, the async message
+            # does not carry its own ack and the trailing frame is a command
+            # response.
+            newline_idx = remaining.find(b"\n")
+            if newline_idx != -1 and newline_idx < ack_idx:
+                parts.append(("error", remaining[: newline_idx + 1]))
+                remaining = remaining[newline_idx + 1 :]
+                continue
+
+            # Async frame includes the terminating ack (older modules / tests).
+            async_end = ack_idx + len(self._ack)
+            parts.append(("error", remaining[:async_end]))
+            remaining = remaining[async_end:]
+
+        return parts
+
+    async def _consume_responses(self, acks: int) -> AsyncIterator[SerialResponse]:
         while acks > 0:
             data = await self._serial.read_until(match=self._ack)
             log.debug(f"{self._name}: Read <- {data!r}")
-            if self._async_error_ack.encode() in data:
-                yield "error", data
-            elif self._ack in data:
-                yield "response", data
-                acks -= 1
-            else:
-                # A read timeout, end
-                yield "empty-unknown", data
+            for kind, chunk in self._partition_serial_read(data):
+                if kind == "error":
+                    yield "error", chunk
+                elif kind == "response":
+                    yield "response", chunk
+                    acks -= 1
+                    if acks <= 0:
+                        return
+                else:
+                    # A read timeout, end
+                    yield "empty-unknown", chunk
+                    return
 
     def _raise_on_parser_error(self, data: str, response: bytes) -> None:
         """Raise an exception if this response contains an error from the gcode parser on the module.
@@ -614,6 +720,17 @@ class AsyncResponseSerialConnection(SerialConnection):
             ackless_responses.append(str_response)
         return ackless_responses
 
+    @staticmethod
+    def _is_retryable_send_error(error: BaseException) -> bool:
+        """Return whether a send failure should be retried.
+
+        Device-reported failures (error/alarm responses, including async module
+        errors such as ``async ERR401:...``) are permanent or one-shot. Retrying
+        them can consume the only notification and leave higher layers thinking
+        the command succeeded.
+        """
+        return not isinstance(error, FailedCommand)
+
     async def _send_data_multiack(
         self, data: str, retries: int, acks: int
     ) -> list[str]:
@@ -634,6 +751,10 @@ class AsyncResponseSerialConnection(SerialConnection):
         sent the command or if they are sent before the final ack for the command is
         sent. It will not catch async errors otherwise.
 
+        Device-reported error and alarm responses (including async module errors)
+        are raised immediately and are not retried. Only transport-style failures
+        such as missing responses are retried.
+
         This function will always try and consume all the acknowledgements specified for
         its command if it sends the command, even if an async error happens in between.
 
@@ -648,12 +769,26 @@ class AsyncResponseSerialConnection(SerialConnection):
         responses: list[str] = []
 
         for retry in range(retries + 1):
-            responses = await self._send_one_retry(data, acks)
-            if responses:
-                return responses
+            try:
+                responses = await self._send_one_retry(data, acks)
+                if responses:
+                    return responses
+            except Exception as error:
+                log.exception("Got an error during send")
+                if (
+                    retry < retries
+                    and not self._closed_on_purpose
+                    and self._is_retryable_send_error(error)
+                ):
+                    pass
+                else:
+                    log.warning(f"Already used {retry} {retries} and raising error")
+                    raise
+            except asyncio.CancelledError:
+                log.exception("Asyncio canceled")
+                raise
             log.info(f"{self._name}: retry number {retry}/{retries}")
             await self.on_retry()
-
         raise NoResponse(port=self._port, command=data)
 
     async def _send_data(self, data: str, retries: int) -> str:

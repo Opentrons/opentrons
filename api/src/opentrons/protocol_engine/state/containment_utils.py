@@ -37,7 +37,7 @@ def is_fully_contained(
         res_max_x <= bound_max_x
         and res_max_y <= bound_max_y
         and res_max_z <= bound_max_z
-        and res_max_x > 0  # basic sanity
+        and res_max_x > 0
         and res_max_y > 0
         and res_max_z > 0
     )

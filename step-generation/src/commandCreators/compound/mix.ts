@@ -16,7 +16,7 @@ import {
   curryWithoutPython,
   formatPyStr,
   formatPyWellLocation,
-  getIsSafePipetteMovement,
+  getPipetteMovementSafetyStatus,
   getSlotInLocationStack,
   getTargetTipsFromWellSets,
   indentPyLines,
@@ -370,7 +370,7 @@ export const mix: CommandCreator<MixArgs> = (
   }
 
   if (isMultiChannelPipette) {
-    const isAspirateSafePipetteMovement = getIsSafePipetteMovement({
+    const aspiratePipetteMovementSafetyStatus = getPipetteMovementSafetyStatus({
       robotState: prevRobotState,
       invariantContext,
       pipetteId: pipette,
@@ -380,19 +380,34 @@ export const mix: CommandCreator<MixArgs> = (
       primaryNozzle,
       nozzleConfiguration: nozzles,
     })
-    const isDispenseSafePipetteMovement = getIsSafePipetteMovement({
-      robotState: prevRobotState,
-      invariantContext,
-      pipetteId: pipette,
-      labwareId: labware,
-      wellLocationOffset: { x: xOffset, y: yOffset },
-      wellTargetName: wells[0],
-      primaryNozzle,
-      nozzleConfiguration: nozzles,
-    })
-    if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
+    if (!aspiratePipetteMovementSafetyStatus.isSafe) {
       return {
-        errors: [errorCreators.possiblePipetteCollision()],
+        errors: [
+          errorCreators.possiblePipetteCollision({
+            unsafePipetteMovementReason:
+              aspiratePipetteMovementSafetyStatus.reason,
+          }),
+        ],
+      }
+    }
+    const dispensePipetteMovementSafetyStatus = getPipetteMovementSafetyStatus({
+      robotState: prevRobotState,
+      invariantContext,
+      pipetteId: pipette,
+      labwareId: labware,
+      wellLocationOffset: { x: xOffset, y: yOffset },
+      wellTargetName: wells[0],
+      primaryNozzle,
+      nozzleConfiguration: nozzles,
+    })
+    if (!dispensePipetteMovementSafetyStatus.isSafe) {
+      return {
+        errors: [
+          errorCreators.possiblePipetteCollision({
+            unsafePipetteMovementReason:
+              dispensePipetteMovementSafetyStatus.reason,
+          }),
+        ],
       }
     }
   }

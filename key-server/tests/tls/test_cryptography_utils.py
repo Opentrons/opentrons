@@ -227,10 +227,31 @@ def test_tls_certs_verify_ip(tmp_path: Path) -> None:
 def test_make_password_makes_password(length: int) -> None:
     """It should make a password of the specified length."""
     password = cryptography_utils.make_password(length)
+    # one of the possible words is yo-yo
     words = password.split("-")
-    assert len(words) == length
+    deyoyoed: list[str] = []
+    word_iter = iter(words)
+    while True:
+        try:
+            word = next(word_iter)
+        except StopIteration:
+            break
+        if word == "yo":
+            try:
+                next_word = next(word_iter)
+            except StopIteration:
+                deyoyoed.append(word)
+                break
+            if next_word == "yo":
+                deyoyoed.append("yo-yo")
+            else:
+                deyoyoed.extend([word, next_word])
+        else:
+            deyoyoed.append(word)
+
+    assert len(deyoyoed) == length
     wordlist = file_utils.load_wordlist()
-    for word in words:
+    for word in deyoyoed:
         assert word in wordlist
 
 

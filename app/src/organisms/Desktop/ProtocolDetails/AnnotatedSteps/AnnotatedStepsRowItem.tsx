@@ -1,14 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { COLORS, Icon, StyledText } from '@opentrons/components'
+import { COLORS, Icon } from '@opentrons/components'
 
 import { AnnotatedGroup } from './AnnotatedGroup'
 import styles from './annotatedsteps.module.css'
 import { IndividualCommand } from './IndividualCommand'
+import { ProtocolAnalysisErrorsContent } from './ProtocolAnalysisErrorsContent'
+import { ProtocolAnalysisPastStepsMessage } from './ProtocolAnalysisPastStepsMessage'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { RowComponentProps } from 'react-window'
 import type {
+  AnalysisError,
   CompletedProtocolAnalysis,
   LabwareDefinition,
   ProtocolAnalysisOutput,
@@ -19,6 +22,7 @@ import type { ItemData } from './index'
 interface GroupAnnotatedStepRowProps {
   scrollTargetId: string | null
   listElement: HTMLElement | null
+  listViewportHeight: number
   annotationType: string
   subCommands: LeafNode[]
   analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
@@ -29,8 +33,10 @@ interface GroupAnnotatedStepRowProps {
   milliSecondsPerFrame: number
   isGlobalPlaying: boolean
   tI18n: (key: string) => string
+  onShowErrorDetails: () => void
   setSelectedCommand?: Dispatch<SetStateAction<string | null>>
   handlePause?: () => void
+  trailingErrors?: AnalysisError[]
 }
 
 function GroupAnnotatedStepRow(props: GroupAnnotatedStepRowProps): JSX.Element {
@@ -41,6 +47,8 @@ function GroupAnnotatedStepRow(props: GroupAnnotatedStepRowProps): JSX.Element {
     setSelectedCommand,
     handlePause,
     tI18n,
+    trailingErrors,
+    onShowErrorDetails,
     ...annotatedGroupProps
   } = props
 
@@ -117,6 +125,17 @@ function GroupAnnotatedStepRow(props: GroupAnnotatedStepRowProps): JSX.Element {
       subCommands={subCommands}
       setSelectedCommand={setSelectedCommand}
       handlePause={handlePause}
+      trailingErrorsFooter={
+        trailingErrors != null && trailingErrors.length > 0 ? (
+          <ProtocolAnalysisErrorsContent
+            errors={trailingErrors}
+            onShowErrorDetails={onShowErrorDetails}
+            t={tI18n}
+            inGroup
+            showPastStepsMessage={false}
+          />
+        ) : null
+      }
       headerLeading={
         showPlayControl ? (
           <button
@@ -150,6 +169,7 @@ export function AnnotatedStepsRowItem(
           <GroupAnnotatedStepRow
             scrollTargetId={data.scrollTargetId}
             listElement={data.listElement}
+            listViewportHeight={data.listViewportHeight}
             analysis={data.analysis}
             annotationType={row.annotationType}
             subCommands={row.group.subCommands}
@@ -161,6 +181,8 @@ export function AnnotatedStepsRowItem(
             milliSecondsPerFrame={data.milliSecondsPerFrame}
             isGlobalPlaying={data.isGlobalPlaying}
             tI18n={data.t}
+            trailingErrors={row.trailingErrors}
+            onShowErrorDetails={data.onShowErrorDetails}
           />
         ) : row.type === 'command' ? (
           <IndividualCommand
@@ -174,36 +196,14 @@ export function AnnotatedStepsRowItem(
             setSelectedCommand={data.setSelectedCommand}
             commandNumber={row.commandNumber}
           />
+        ) : row.type === 'errors_past_steps_message' ? (
+          <ProtocolAnalysisPastStepsMessage t={data.t} />
         ) : (
-          <div className={styles.annotated_steps_error_wrapper}>
-            {row.errors.map(error => (
-              <div
-                className={styles.annotated_steps_error_container}
-                key={error.id}
-                onClick={() => {
-                  data.onShowErrorDetails()
-                }}
-              >
-                <div className={styles.annotated_steps_header}>
-                  <Icon name="ot-alert" size="1rem" color={COLORS.red60} />
-                  <StyledText
-                    desktopStyle="captionSemiBold"
-                    color={COLORS.red60}
-                  >
-                    {data.t('step_error')}
-                  </StyledText>
-                </div>
-                <StyledText desktopStyle="bodyDefaultRegular">
-                  {error.detail}
-                </StyledText>
-              </div>
-            ))}
-            <div className={styles.annotated_steps_final_command}>
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {data.t('unable_to_show_steps_past_errors')}
-              </StyledText>
-            </div>
-          </div>
+          <ProtocolAnalysisErrorsContent
+            errors={row.errors}
+            onShowErrorDetails={data.onShowErrorDetails}
+            t={data.t}
+          />
         )}
       </div>
     </div>

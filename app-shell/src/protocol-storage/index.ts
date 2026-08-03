@@ -2,7 +2,6 @@ import path from 'path'
 import { shell } from 'electron'
 import fse from 'fs-extra'
 
-import { getConfig } from '../config'
 import {
   analyzeProtocol,
   analyzeProtocolFailure,
@@ -31,20 +30,12 @@ import type { Action, Dispatch } from '../types'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 
-function getIgnoreOT2App(): boolean {
-  const devInternal = getConfig('devInternal') ?? {}
-  return devInternal.ignoreOT2App ?? false
-}
-
 let protocolsDirectoryPath: string | null = null
 
-// Returns the protocols directory path. Set once at initialization based on
-// `ignoreOT2App` feature flag. Does not change during app lifecycle.
+// Returns the protocols directory path. Set once at initialization. Does not change during app lifecycle.
 function getProtocolsDirectoryPath(): string {
   if (protocolsDirectoryPath == null) {
-    protocolsDirectoryPath = getIgnoreOT2App()
-      ? FileSystem.NOT_OT2_PROTOCOLS_DIRECTORY_PATH
-      : FileSystem.PROTOCOLS_DIRECTORY_PATH
+    protocolsDirectoryPath = FileSystem.NOT_OT2_PROTOCOLS_DIRECTORY_PATH
   }
 
   return protocolsDirectoryPath
@@ -130,15 +121,15 @@ export function preParityMigrateProtocolsFrom(
   }
 }
 
-// If ignoreOT2App is enabled and the not-OT-2 directory does not exist,
-// copy protocols from protocols to protocols-10.0-plus. Exclude only
+// If the not-OT-2 directory does not exist,
+// copy protocols from protocols to protocols-9.1-plus. Exclude only
 // protocols that explicitly are OT-2 protocols.
 async function migrateProtocolsToNotOt2Directory(): Promise<void> {
-  if (!getIgnoreOT2App()) return
-
   try {
     const destStat = await fse.stat(FileSystem.NOT_OT2_PROTOCOLS_DIRECTORY_PATH)
-    if (destStat.isDirectory()) return
+    if (destStat.isDirectory()) {
+      return
+    }
   } catch {
     // the "not-OT-2 directory" doesn't exist, proceed with migration
   }

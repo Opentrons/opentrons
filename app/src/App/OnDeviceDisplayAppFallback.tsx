@@ -12,7 +12,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { useSentryReport } from '/app/App/hooks'
+import { useSentryReport } from '/app/App/hooks/useSentryReport'
 import { MediumButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { appRestart, sendLog } from '/app/redux/shell'

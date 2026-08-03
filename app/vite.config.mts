@@ -8,7 +8,10 @@ import postCssImport from 'postcss-import'
 import postCssPresetEnv from 'postcss-preset-env'
 import { defineConfig } from 'vite'
 
-import { versionForProject } from '../scripts/git-version.mjs'
+import {
+  getGitBuildDetails,
+  versionForProject,
+} from '../scripts/git-version.mjs'
 import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 import type { UserConfig } from 'vite'
@@ -18,6 +21,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
   const version = await versionForProject(project)
   const mode = process.env.NODE_ENV ?? 'development'
   const buildTarget = process.env.OT_BUILD_TARGET ?? 'desktop'
+  const gitDetails = await getGitBuildDetails()
 
   return {
     // this makes imports relative rather than absolute
@@ -73,10 +77,13 @@ export default defineConfig(async (): Promise<UserConfig> => {
       // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
       global: 'globalThis',
       _PKG_VERSION_: JSON.stringify(version),
+      _GIT_COMMIT_HASH_: JSON.stringify(gitDetails?.commitHash),
+      _GIT_BRANCH_NAME_: JSON.stringify(gitDetails?.branchName),
       _OPENTRONS_PROJECT_: JSON.stringify(project),
       _OT_SENTRY_DSN_: JSON.stringify(process.env.OT_SENTRY_DSN),
       _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
       _OT_APP_MIXPANEL_ID_: JSON.stringify(process.env.OT_APP_MIXPANEL_ID),
+      _ODD_IP_: JSON.stringify(process.env.ODD_IP ?? 'localhost'),
       // _OT_LL_ variables because app/ imports files directly from labware-library/,
       // causing them to be processed in the context of this Vite config instead of
       // labware-library's Vite config.

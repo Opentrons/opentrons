@@ -27,7 +27,7 @@ export const vacuumCloseVent: CommandCreator<VacuumCloseVentArgs> = (
     }
   }
 
-  const dummyPython = `${module.pythonName}.close_vent()`
+  const python = `${module.pythonName}.close_vent()`
   return {
     commands: [
       {
@@ -38,6 +38,6 @@ export const vacuumCloseVent: CommandCreator<VacuumCloseVentArgs> = (
         },
       },
     ],
-    python: dummyPython,
+    python,
   }
 }

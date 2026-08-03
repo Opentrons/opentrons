@@ -42,7 +42,10 @@ export const getActiveSlotForLabwareDetails = (
   )?.entityId
   let slot = null
 
-  if ('labwareId' in currentCommand.params) {
+  if (
+    'labwareId' in currentCommand.params &&
+    currentCommand.params.labwareId !== 'fixedTrash'
+  ) {
     const isTiprack =
       labwareEntities[currentCommand.params.labwareId].def.parameters.isTiprack
     if (!isTiprack) {

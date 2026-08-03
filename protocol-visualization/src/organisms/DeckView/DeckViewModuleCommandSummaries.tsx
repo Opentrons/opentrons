@@ -6,6 +6,7 @@ import {
 
 import { ModuleCommandSummary } from './ModuleCommandSummary'
 
+import type { ReactNode } from 'react'
 import type {
   DeckDefinition,
   RobotType,
@@ -23,7 +24,7 @@ interface DeckViewModuleCommandSummariesProps {
 
 export function DeckViewModuleCommandSummaries(
   props: DeckViewModuleCommandSummariesProps
-): JSX.Element {
+): ReactNode {
   const {
     robotState,
     invariantContext,
@@ -42,10 +43,15 @@ export function DeckViewModuleCommandSummaries(
           console.warn(`no slot ${slot} for module ${id}`)
           return null
         }
-        const isStepAssociatedWithModule =
+        const hasModuleIdParam =
           selectedRunTimeCommand != null &&
-          'moduleId' in selectedRunTimeCommand.params &&
-          selectedRunTimeCommand.params.moduleId === id
+          'params' in selectedRunTimeCommand &&
+          'moduleId' in selectedRunTimeCommand.params
+        const moduleIdInParams = hasModuleIdParam
+          ? (selectedRunTimeCommand.params as { moduleId: string }).moduleId
+          : null
+        const isStepAssociatedWithModule =
+          hasModuleIdParam && moduleIdInParams === id
         const showModuleCommandSummary =
           isStepAssociatedWithModule && selectedRunTimeCommand != null
 

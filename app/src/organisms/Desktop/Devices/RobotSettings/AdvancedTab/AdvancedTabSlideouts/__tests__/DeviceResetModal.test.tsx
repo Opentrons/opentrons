@@ -6,20 +6,21 @@ import '@testing-library/jest-dom/vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { resetConfig } from '/app/redux/robot-admin'
-import { useDispatchApiRequest } from '/app/redux/robot-api'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
+import { useResetRobotConfigMutation } from '/app/resources/devices/hooks/useResetRobotConfigMutation'
 
 import { DeviceResetModal } from '../DeviceResetModal'
 
 import type { ComponentProps } from 'react'
-import type { DispatchApiRequestType } from '/app/redux/robot-api'
 
-vi.mock('/app/redux-resources/robots')
-vi.mock('/app/redux/robot-admin')
-vi.mock('/app/redux/robot-api')
+vi.mock('/app/resources/devices/hooks/useResetRobotConfigMutation')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const mockResetOptions = { resetLabwareOffsets: false, settingsResets: {} }
 const mockCloseModal = vi.fn()
+const mockPostResetConfig = vi.fn()
 const ROBOT_NAME = 'otie'
 const render = (props: ComponentProps<typeof DeviceResetModal>) => {
   return renderWithProviders(
@@ -31,10 +32,13 @@ const render = (props: ComponentProps<typeof DeviceResetModal>) => {
 }
 
 describe('RobotSettings DeviceResetModal', () => {
-  let dispatchApiRequest: DispatchApiRequestType
   beforeEach(() => {
-    dispatchApiRequest = vi.fn()
-    vi.mocked(useDispatchApiRequest).mockReturnValue([dispatchApiRequest, []])
+    mockPostResetConfig.mockReset()
+    vi.mocked(useResetRobotConfigMutation).mockReturnValue({
+      postResetConfig: mockPostResetConfig,
+      isLoading: false,
+      reset: vi.fn(),
+    } as any)
   })
 
   it('should render title, description, and buttons', () => {
@@ -48,11 +52,11 @@ describe('RobotSettings DeviceResetModal', () => {
     screen.getByText(
       'Resetting will erase all saved data and restart the robot. This action is permanent and cannot be undone.'
     )
-    screen.getByRole('button', { name: 'cancel' })
+    screen.getByRole('button', { name: 'Cancel' })
     screen.getByRole('button', { name: 'Confirm' })
   })
 
-  it('should close the modal when the user clicks the Yes button', () => {
+  it('should call postResetConfig when the user clicks Confirm', () => {
     const clearMockResetOptions = {
       resetLabwareOffsets: false,
       settingsResets: {
@@ -70,9 +74,7 @@ describe('RobotSettings DeviceResetModal', () => {
       name: 'Confirm',
     })
     fireEvent.click(clearDataAndRestartRobotButton)
-    expect(dispatchApiRequest).toBeCalledWith(
-      resetConfig(ROBOT_NAME, clearMockResetOptions)
-    )
+    expect(mockPostResetConfig).toBeCalledWith(clearMockResetOptions)
   })
 
   it('should close the modal when clicking the Cancel button', () => {
@@ -82,7 +84,7 @@ describe('RobotSettings DeviceResetModal', () => {
       robotName: ROBOT_NAME,
       resetOptions: mockResetOptions,
     })
-    const cancelButton = screen.getByRole('button', { name: 'cancel' })
+    const cancelButton = screen.getByRole('button', { name: 'Cancel' })
     fireEvent.click(cancelButton)
     expect(mockCloseModal).toHaveBeenCalled()
   })

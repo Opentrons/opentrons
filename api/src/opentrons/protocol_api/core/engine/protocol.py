@@ -410,6 +410,7 @@ class ProtocolCore(
             StagingSlotName,
             LabwareCore,
             ModuleCore,
+            ModuleFixtureLocation,
             NonConnectedModuleCore,
             OffDeckType,
             WasteChute,

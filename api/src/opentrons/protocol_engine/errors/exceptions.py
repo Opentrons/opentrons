@@ -489,6 +489,26 @@ class ModuleNotConnectedError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class PeripheralNotLoadedError(ProtocolEngineError):
+    """Raised when referencing a peripherals that has not been loaded."""
+
+    def __init__(self, *, peripheral_id: str) -> None:
+        super().__init__(ErrorCodes.GENERAL_ERROR, f"Module {peripheral_id} not found.")
+
+
+class PeripheralNotConnectedError(ProtocolEngineError):
+    """Raised when trying to use a peripheral that is not connected to the robot electrically."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a PeripheralNotConnectedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class OffsetLocationInvalidError(ProtocolEngineError):
     """Raised when encountering an invalid labware offset location sequence."""
 
@@ -751,6 +771,32 @@ class WrongModuleTypeError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class WrongPeripheralTypeError(ProtocolEngineError):
+    """Raised when performing a peripheral action on the wrong kind of peripheral."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a WrongModuleTypeError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class PeripheralNotAttachedError(ProtocolEngineError):
+    """Raised when a requested peripheral is not attached."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a PeripheralNotAttachedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class ThermocyclerNotOpenError(ProtocolEngineError):
     """Raised when trying to move to a labware that's in a closed Thermocycler."""
 
@@ -814,6 +860,51 @@ class HeaterShakerLabwareLatchStatusUnknown(ProtocolEngineError):
     ) -> None:
         """Build a HeaterShakerLabwareLatchStatusUnknown."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class VacuumModuleUnderVacuumError(ProtocolEngineError):
+    """Raised when trying to move labware while a Vacuum Module pump is engaged."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a VacuumModuleUnderVacuumError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class VacuumModuleStillUnderVacuumError(ProtocolEngineError):
+    """Raised when trying to move labware while a Vacuum Module is still under vacuum.
+
+    Unlike VacuumModuleUnderVacuumError, this is raised when the pump is not engaged
+    but the chamber has not yet returned to atmospheric pressure. This condition is
+    recoverable at runtime by waiting for pressure to equalize.
+    """
+
+    def __init__(
+        self,
+        module_id: str,
+        current_gauge_pressure_mbar: float,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a VacuumModuleStillUnderVacuumError."""
+        self.module_id = module_id
+        self.current_gauge_pressure_mbar = current_gauge_pressure_mbar
+        super().__init__(
+            ErrorCodes.GENERAL_ERROR,
+            message
+            or (
+                f"Vacuum Module {module_id} is still under vacuum at "
+                f"{current_gauge_pressure_mbar} mbar. Wait for pressure to equalize "
+                "before moving labware to or from it."
+            ),
+            details,
+            wrapping,
+        )
 
 
 class EngageHeightOutOfRangeError(ProtocolEngineError):
@@ -1026,6 +1117,19 @@ class LocationIsOccupiedError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class LabwareIsContainedError(ProtocolEngineError):
+    """Raised when attempting to move a contained labware."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareIsContainedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class LocationNotAccessibleByPipetteError(ProtocolEngineError):
     """Raised when attempting to move pipette to an inaccessible location."""
 
@@ -1141,6 +1245,19 @@ class InvalidPushOutVolumeError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a InvalidPushOutVolumeError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class VolumeModeDoesNotExistError(ProtocolEngineError):
+    """Raised when a volume mode does not exist for the given pipette."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a VolumeModeDoesNotExistError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 

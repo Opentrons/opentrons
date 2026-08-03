@@ -1,8 +1,9 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { createCamera } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { useDocumentedMutation } from '../accessControl'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -15,6 +16,7 @@ import type {
   CameraResponse,
   ErrorResponse,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
 
 export type UseUpdateCameraMutationResult = UseMutationResult<
   CameraResponse,
@@ -29,6 +31,7 @@ export type UseUpdateCameraMutationResult = UseMutationResult<
 }
 
 export function useUpdateCamera(
+  documentationState: DocumentationState,
   options: UseMutationOptions<
     CameraResponse,
     AxiosError<ErrorResponse>,
@@ -38,17 +41,21 @@ export function useUpdateCamera(
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     CameraResponse,
     AxiosError<ErrorResponse>,
     CameraData
   >(
-    [host, 'camera'],
-    (data: CameraData) =>
-      createCamera(host!, data).then(response => {
-        queryClient.invalidateQueries([host, 'camera']).catch((e: Error) => {
-          throw e
-        })
+    documentationState,
+    ['update_camera'],
+    getQueryKey(host, 'camera'),
+    ({ variables: data, userNotes }) =>
+      createCamera(host!, data, userNotes).then(response => {
+        queryClient
+          .invalidateQueries(getQueryKey(host, 'camera'))
+          .catch((e: Error) => {
+            throw e
+          })
         return response.data
       }),
     options

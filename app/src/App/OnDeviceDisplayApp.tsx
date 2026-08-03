@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import NiceModal from '@ebay/nice-modal-react'
@@ -12,7 +13,7 @@ import {
   POSITION_RELATIVE,
 } from '@opentrons/components'
 import {
-  ApiHostProvider,
+  ApiHostContext,
   useAccessControlEnabledQuery,
   useRobotSettingsQuery,
 } from '@opentrons/react-api-client'
@@ -24,8 +25,9 @@ import { EstopTakeover } from '/app/organisms/EmergencyStop'
 import { FirmwareUpdateTakeover } from '/app/organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'
 import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
 import { ModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
-import { OnDeviceLoginOverlayProvider } from '/app/organisms/ODD/OnDeviceLogin'
+import { LoggedOutOverlayMount } from '/app/organisms/ODD/OnDeviceLogin/LoggedOutOverlayMount'
 import { QuickTransferFlow } from '/app/organisms/ODD/QuickTransferFlow'
+import { RobotEncryptionKeyTakeover } from '/app/organisms/ODD/RobotSettingsDashboard/RobotEncryptionKey/RobotEncryptionKeyTakeover'
 import { MaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 import { ToasterOven } from '/app/organisms/ToasterOven'
 import { Account } from '/app/pages/ODD/Account'
@@ -38,13 +40,13 @@ import { EmergencyStop } from '/app/pages/ODD/EmergencyStop'
 import { InitialLoadingScreen } from '/app/pages/ODD/InitialLoadingScreen'
 import { InstrumentDetail } from '/app/pages/ODD/InstrumentDetail'
 import { InstrumentsDashboard } from '/app/pages/ODD/InstrumentsDashboard'
-import { NameRobot } from '/app/pages/ODD/NameRobot'
 import { NetworkSetupMenu } from '/app/pages/ODD/NetworkSetupMenu'
 import { ProtocolDashboard } from '/app/pages/ODD/ProtocolDashboard'
 import { ProtocolDetails } from '/app/pages/ODD/ProtocolDetails'
 import { ProtocolSetup } from '/app/pages/ODD/ProtocolSetup'
 import { QuickTransferDetails } from '/app/pages/ODD/QuickTransferDetails'
 import { RobotDashboard } from '/app/pages/ODD/RobotDashboard'
+import { RobotNameEditor } from '/app/pages/ODD/RobotNameEditor'
 import { RobotSettingsDashboard } from '/app/pages/ODD/RobotSettingsDashboard'
 import { RunningProtocol } from '/app/pages/ODD/RunningProtocol'
 import { RunSummary } from '/app/pages/ODD/RunSummary'
@@ -57,15 +59,21 @@ import {
 } from '/app/redux/config'
 import { getLocalRobot } from '/app/redux/discovery'
 import { getIsShellReady, updateBrightness } from '/app/redux/shell'
+import { useTrackRobotRestarts } from '/app/resources/devices/hooks/useTrackRobotRestarts'
 
+import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { LocalizationProvider } from '../LocalizationProvider'
+import { requireDocumentation } from '../organisms/ODD/DocumentationRequired/requireDocumentation'
+import { showLoginModal } from '../organisms/ODD/OnDeviceLogin/LoginModal'
+import { getLocalRobotAccessToken } from '../redux/robot-auth'
 import { hackWindowNavigatorOnLine } from './hacks'
 import {
   useModuleAttachedToast,
-  useProtocolReceiptToast,
   useScrollRef,
-  useSoftwareUpdatePoll,
-} from './hooks'
+} from './hooks/useModuleAttachedToast'
+import { useProtocolReceiptToast } from './hooks/useProtocolReceiptToast'
+import { useRefreshAccessTokenOnActivity } from './hooks/useRefreshAccessTokenOnActivity'
+import { useSoftwareUpdatePoll } from './hooks/useSoftwareUpdatePoll'
 import { SharedScrollRefProvider } from './ODDProviders/ScrollRefProvider'
 import { ODDTopLevelRedirects } from './ODDTopLevelRedirects'
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
@@ -141,7 +149,7 @@ function getPathComponent(
     case '/robot-settings':
       return <RobotSettingsDashboard />
     case '/robot-settings/rename-robot':
-      return <NameRobot />
+      return <RobotNameEditor />
     case '/robot-settings/update-robot':
       return <UpdateRobot />
     case '/robot-settings/update-robot-during-onboarding':
@@ -162,22 +170,28 @@ const TURN_OFF_BACKLIGHT = '7'
 const RETRY_DELAY_MS = 1000
 
 export const OnDeviceDisplayApp = (): JSX.Element => {
+  const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
 
   const [showModuleSetupModal, setShowModuleSetupModal] = useState(false)
 
   useSoftwareUpdatePoll()
+  // TODO(jh,2026-07-28): Refactor hook usage alongside robot system update epic.
+  useTrackRobotRestarts()
 
   // Normally, our hooks get the HostConfig from the nearest ApiHostProvider context.
   // But here at the app root, that doesn't exist. So we need to make sure we pass this
   // override into all the hooks in this component that will try to use the robot API.
+  const localRobot = useSelector(getLocalRobot)
+  const accessToken = useSelector(getLocalRobotAccessToken)
   const hostConfig = useMemo<HostConfig>(
     () => ({
-      hostname: '127.0.0.1',
+      hostname: _ODD_IP_ ?? 'localhost',
+      token: accessToken,
+      port: localRobot?.port ?? null,
     }),
-    []
+    [accessToken, localRobot?.port]
   )
-  const localRobot = useSelector(getLocalRobot)
 
   const { brightness: userSetBrightness, sleepMs } = useSelector(
     getOnDeviceDisplaySettings
@@ -196,6 +210,8 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
       )
     }
   }, [dispatch, isIdle, userSetBrightness])
+
+  useRefreshAccessTokenOnActivity()
 
   const isShellReady = useSelector(getIsShellReady)
 
@@ -223,51 +239,61 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     // ensure we know whether access control is enabled or not,
     // so on first render we can immediately show the LoggedOutOverlay, if appropriate.
     accessControlEnabledQuery.isSuccess
-
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
-    <ApiHostProvider hostname={hostConfig.hostname}>
+    // to make sure that the host config stays stable and in step with the initial queries,
+    // we use an ApiHostContext.Provider here instead of an ApiHostProvider.
+    <ApiHostContext.Provider value={hostConfig}>
       <ReactQueryDevtools />
       {isReady ? (
         <LocalizationProvider>
           <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
             <Box width="100%" css="user-select: none;">
               {isIdle ? (
-                <SleepScreen />
+                <SleepScreen aria-label={t('exit_sleep_mode')} />
               ) : (
                 <>
                   <IncompatibleModuleTakeover isOnDevice={true} />
-                  <MaintenanceRunTakeover>
-                    <EstopTakeover />
-                    <FirmwareUpdateTakeover />
-                    {showModuleSetupModal && localRobot?.name != null ? (
-                      <ModuleWizardFlows
-                        showSetupLauncher={true}
-                        closeFlow={() => {
-                          setShowModuleSetupModal(false)
-                        }}
-                        robotName={localRobot.name}
-                      />
-                    ) : null}
-                    <NiceModal.Provider>
-                      <ToasterOven>
-                        <ProtocolReceiptToasts />
-                        {!showModuleSetupModal ? (
-                          <ModuleAttachedToasts
-                            openFlow={(open: boolean) => {
-                              setShowModuleSetupModal(open)
-                            }}
-                          />
-                        ) : null}
+                  <DocumentationRequiredModalContext.Provider
+                    value={{
+                      showDocumentationRequiredModal: requireDocumentation,
+                      showLoginModal,
+                    }}
+                  >
+                    <MaintenanceRunTakeover>
+                      <EstopTakeover />
+                      <FirmwareUpdateTakeover />
+                      {showModuleSetupModal && localRobot?.name != null ? (
+                        <ModuleWizardFlows
+                          showSetupLauncher={true}
+                          closeFlow={() => {
+                            setShowModuleSetupModal(false)
+                          }}
+                          robotName={localRobot.name}
+                        />
+                      ) : null}
 
-                        <OnDeviceLoginOverlayProvider>
-                          <SharedScrollRefProvider>
-                            <OnDeviceDisplayAppRoutes />
-                          </SharedScrollRefProvider>
-                        </OnDeviceLoginOverlayProvider>
-                      </ToasterOven>
-                    </NiceModal.Provider>
-                  </MaintenanceRunTakeover>
+                      <NiceModal.Provider>
+                        <RobotEncryptionKeyTakeover>
+                          <ToasterOven>
+                            <ProtocolReceiptToasts />
+                            {!showModuleSetupModal ? (
+                              <ModuleAttachedToasts
+                                openFlow={(open: boolean) => {
+                                  setShowModuleSetupModal(open)
+                                }}
+                              />
+                            ) : null}
+
+                            <SharedScrollRefProvider>
+                              <OnDeviceDisplayAppRoutes />
+                            </SharedScrollRefProvider>
+                            <LoggedOutOverlayMount />
+                          </ToasterOven>
+                        </RobotEncryptionKeyTakeover>
+                      </NiceModal.Provider>
+                    </MaintenanceRunTakeover>
+                  </DocumentationRequiredModalContext.Provider>
                 </>
               )}
             </Box>
@@ -277,7 +303,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
       ) : (
         <InitialLoadingScreen />
       )}
-    </ApiHostProvider>
+    </ApiHostContext.Provider>
   )
 }
 

@@ -257,7 +257,7 @@ async def test_liquid_probe(
     assert position[motor_node].positions_only()[0] == 14
     assert mock_sensor_threshold.call_args_list[0][0][0] == SensorThresholdInformation(
         sensor=sensor_info,
-        data=SensorDataType.build(threshold_pascals * 65536, sensor_info.sensor_type),
+        data=SensorDataType.build(threshold_pascals, sensor_info.sensor_type),
         mode=SensorThresholdMode.absolute,
     )
 

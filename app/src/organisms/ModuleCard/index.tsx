@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -25,8 +24,9 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 import {
+  isDocumentedMutationError,
   useCurrentAllSubsystemUpdatesQuery,
-  useHost,
+  useUpdateModuleMutation,
 } from '@opentrons/react-api-client'
 import {
   ABSORBANCE_READER_TYPE,
@@ -39,19 +39,12 @@ import {
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useModuleUSBPort } from '/app/local-resources/modules'
 import { UpdateBanner } from '/app/molecules/UpdateBanner'
 import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsFlex } from '/app/redux-resources/robots'
-import {
-  dismissRequest,
-  FAILURE,
-  getErrorResponseMessage,
-  getRequestById,
-  PENDING,
-  SUCCESS,
-} from '/app/redux/robot-api'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useIsEstopNotDisengaged } from '/app/resources/devices'
 import { useRunStatuses } from '/app/resources/runs'
@@ -86,19 +79,17 @@ import {
 import { VacuumModuleData } from './VacuumModule/VacuumModuleData'
 import { VacuumModuleSlideout } from './VacuumModule/VacuumModuleSlideout'
 
+import type { AttachedModule, HeaterShakerModule } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
 import type { ModuleType } from '@opentrons/shared-data'
-import type {
-  AttachedModule,
-  HeaterShakerModule,
-} from '/app/redux/modules/types'
-import type { RequestState } from '/app/redux/robot-api/types'
-import type { Dispatch, State } from '/app/redux/types'
 
 const HAS_SETUP_INSTRUCTIONS_TYPE: ModuleType[] = [
   FLEX_STACKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   VACUUM_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  ABSORBANCE_READER_TYPE,
 ]
 
 const POLL_INTERVAL_MS = 5000
@@ -110,15 +101,12 @@ interface ModuleCardProps {
   attachPipetteRequired: boolean
   calibratePipetteRequired: boolean
   updatePipetteFWRequired: boolean
-  latestRequestId: string | null
-  handleModuleApiRequests: (robotName: string, serialNumber: string) => void
   runId?: string
   slotName?: string
 }
 
 export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { t } = useTranslation('device_details')
-  const host = useHost()!
 
   const {
     module,
@@ -129,10 +117,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     attachPipetteRequired,
     calibratePipetteRequired,
     updatePipetteFWRequired,
-    latestRequestId,
-    handleModuleApiRequests,
   } = props
-  const dispatch = useDispatch<Dispatch>()
   const {
     menuOverlay,
     handleOverflowClick,
@@ -154,35 +139,31 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
   const { isRunRunning } = useRunStatuses()
   const { parseModuleUSBPort } = useModuleUSBPort()
+  const { makeToast } = useToaster()
+  const documentationState = useDocumentationState()
+  const {
+    mutateAsync: updateModuleAsync,
+    isLoading: isPending,
+    isError,
+    error,
+    reset: resetUpdateModule,
+  } = useUpdateModuleMutation(documentationState)
 
   const isPipetteReady =
     !Boolean(attachPipetteRequired) &&
     !Boolean(calibratePipetteRequired) &&
     !Boolean(updatePipetteFWRequired)
 
-  const latestRequest = useSelector<State, RequestState | null>(state =>
-    latestRequestId != null ? getRequestById(state, latestRequestId) : null
-  )
-
-  const hasUpdated =
-    !module.hasAvailableUpdate && latestRequest?.status === SUCCESS
-  const [showFirmwareToast, setShowFirmwareToast] = useState(hasUpdated)
-  const { makeToast } = useToaster()
-  if (showFirmwareToast) {
-    makeToast(t('firmware_updated_successfully') as string, SUCCESS_TOAST)
-    setShowFirmwareToast(false)
-  }
-
   const handleFirmwareUpdateClick = (): void => {
-    robotName != null && handleModuleApiRequests(robotName, module.serialNumber)
+    void updateModuleAsync(module.serialNumber).then(() => {
+      makeToast(t('firmware_updated_successfully') as string, SUCCESS_TOAST)
+    })
   }
 
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
 
   const handleCloseErrorModal = (): void => {
-    if (latestRequestId != null) {
-      dispatch(dismissRequest(latestRequestId))
-    }
+    resetUpdateModule()
   }
 
   const { data: currentSubsystemsUpdatesData } =
@@ -194,7 +175,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       update.updateStatus === 'queued' || update.updateStatus === 'updating'
   )
 
-  const isPending = latestRequest?.status === PENDING
+  const showFirmwareUpdateFailed =
+    isError && error != null && !isDocumentedMutationError(error)
 
   const hideBanners =
     isPending || isRunRunning || ongoingSubsystemUpdate != null
@@ -288,7 +270,6 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
       showSetupLauncher: true,
       isLoadedInRun,
       robotName,
-      host,
     })
   }
 
@@ -358,11 +339,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             gridGap={SPACING.spacing8}
           >
             <ErrorInfo attachedModule={module} />
-            {latestRequest != null && latestRequest.status === FAILURE && (
+            {showFirmwareUpdateFailed && (
               <FirmwareUpdateFailedModal
                 module={module}
                 onCloseClick={handleCloseErrorModal}
-                errorMessage={getErrorResponseMessage(latestRequest.error)}
+                errorMessage={error?.response?.data?.message ?? error?.message}
               />
             )}
             {!hideBanners &&

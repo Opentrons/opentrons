@@ -17,7 +17,10 @@ import {
   FLEX_STACKER_MODULE_TYPE,
   getCutoutIdFromAddressableArea,
 } from '@opentrons/shared-data'
-import { getIsSlotAHopper } from '@opentrons/step-generation'
+import {
+  getIsSlotAHopper,
+  getIsSlotAVacuumDock,
+} from '@opentrons/step-generation'
 
 import { DND_TYPES } from '/protocol-designer/constants'
 import { selectors as labwareDefSelectors } from '/protocol-designer/labware-defs'
@@ -73,11 +76,13 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
   const customLabwareDefs = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
   )
+  const isSlotAVacuumDock = getIsSlotAVacuumDock(itemId)
   const isSlotAHopper = getIsSlotAHopper(itemId)
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
-  const cutoutId = isSlotAHopper
-    ? null
-    : getCutoutIdFromAddressableArea(itemId, deckDef)
+  const cutoutId =
+    isSlotAHopper || isSlotAVacuumDock
+      ? null
+      : getCutoutIdFromAddressableArea(itemId, deckDef)
   const trashSlots = Object.values(additionalEquipment)
     .filter(ae => ae.name === 'trashBin' || ae.name === 'wasteChute')
     ?.map(ae => ae.location as CutoutId)

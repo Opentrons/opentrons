@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
 import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 
@@ -34,15 +35,21 @@ describe('BeforeBeginning', () => {
       setErrorMessage: vi.fn(),
       errorMessage: null,
       createdMaintenanceRunId: null,
+      documentationState: ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
     }
     vi.mocked(InProgressModal).mockReturnValue(<div>mock in progress</div>)
   })
   it('returns the correct information for attach flow', async () => {
     render(props)
     screen.getByText('Before you begin')
-    screen.getByText(
-      'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
-    )
+    expect(
+      screen.getByText(
+        (_, element) =>
+          element?.tagName === 'P' &&
+          element?.textContent ===
+            'To get started, remove all labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
+      )
+    ).toBeInTheDocument()
     screen.getByText(
       'The calibration pin is included with the gripper and should be stored on its right side above the jaws.'
     )
@@ -78,9 +85,14 @@ describe('BeforeBeginning', () => {
     props = { ...props, flowType: GRIPPER_FLOW_TYPES.DETACH }
     render(props)
     screen.getByText('Before you begin')
-    screen.getByText(
-      'To get started, remove labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
-    )
+    expect(
+      screen.getByText(
+        (_, element) =>
+          element?.tagName === 'P' &&
+          element?.textContent ===
+            'To get started, remove all labware from the deck and clean up the working area to make detachment easier. Also gather the needed equipment shown to the right.'
+      )
+    ).toBeInTheDocument()
     screen.getByText('You will need:')
     screen.getByText('2.5 mm Hex Screwdriver')
     screen.getByText(
@@ -108,9 +120,14 @@ describe('BeforeBeginning', () => {
     props = { ...props, flowType: GRIPPER_FLOW_TYPES.RECALIBRATE }
     render(props)
     screen.getByText('Before you begin')
-    screen.getByText(
-      'To get started, remove labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
-    )
+    expect(
+      screen.getByText(
+        (_, element) =>
+          element?.tagName === 'P' &&
+          element?.textContent ===
+            'To get started, remove all labware from the deck and clean up the working area to make calibration easier. Also gather the needed equipment shown to the right.'
+      )
+    ).toBeInTheDocument()
     screen.getByText(
       'The calibration pin is included with the gripper and should be stored on its right side above the jaws.'
     )

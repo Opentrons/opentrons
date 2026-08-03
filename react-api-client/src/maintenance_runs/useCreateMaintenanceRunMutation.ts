@@ -1,8 +1,9 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { createMaintenanceRun } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { useDocumentedMutation } from '../accessControl'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -15,6 +16,7 @@ import type {
   HostConfig,
   MaintenanceRun,
 } from '@opentrons/api-client'
+import type { DocumentationState, DocumentedAction } from '../accessControl'
 
 export type CreateMaintenanceRunType = UseMutateAsyncFunction<
   MaintenanceRun,
@@ -37,6 +39,8 @@ export type UseCreateMaintenanceRunMutationOptions = UseMutationOptions<
 >
 
 export function useCreateMaintenanceRunMutation(
+  documentationState: DocumentationState,
+  actionsToDocument: DocumentedAction[],
   options: UseCreateMaintenanceRunMutationOptions = {},
   hostOverride?: HostConfig | null
 ): UseCreateMaintenanceRunMutationResult {
@@ -44,17 +48,20 @@ export function useCreateMaintenanceRunMutation(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const queryClient = useQueryClient()
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     MaintenanceRun,
     AxiosError,
     CreateMaintenanceRunData
   >(
-    [host, 'maintenance_runs'],
-    (createMaintenanceRunData = {}) =>
-      createMaintenanceRun(host!, createMaintenanceRunData)
+    documentationState,
+    actionsToDocument,
+    ({ variables: createMaintenanceRunData, userNotes }) =>
+      createMaintenanceRun(host!, createMaintenanceRunData, userNotes)
         .then(response => response.data)
         .catch(e => {
-          queryClient.invalidateQueries([host, 'robot/control/estopStatus'])
+          queryClient.invalidateQueries(
+            getQueryKey(host, 'robot/control/estopStatus')
+          )
           throw e
         }),
     options

@@ -3,14 +3,22 @@ import { useTranslation } from 'react-i18next'
 
 import {
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   Icon,
   InputField,
+  ListButton,
   ListItem,
   Slider,
+  SPACING,
+  StyledText,
+  ToggleButton,
 } from '@opentrons/components'
 import {
   VACUUM_MAX_PRESSURE_MBAR,
   VACUUM_MIN_PRESSURE_MBAR,
+} from '@opentrons/shared-data'
+import {
   VACUUM_MODE_POWER,
   VACUUM_MODE_PRESSURE,
 } from '@opentrons/step-generation'
@@ -52,11 +60,11 @@ export function PresavedVacuumStep(
   const [showErrors, setShowErrors] = useState<boolean>(false)
   const { t } = useTranslation('protocol_steps')
 
-  const { title, pumpData, time } = stepData
+  const { title, pumpData, time, ventAfter } = stepData
 
   const updateField = (
-    field: 'title' | 'time' | 'pumpData',
-    value: string | Partial<VacuumPumpData>
+    field: 'title' | 'time' | 'pumpData' | 'ventAfter',
+    value: string | Partial<VacuumPumpData> | boolean
   ): void => {
     if (field === 'pumpData') {
       const patch = value as Partial<VacuumPumpData>
@@ -71,10 +79,10 @@ export function PresavedVacuumStep(
             }
           : {
               mode: VACUUM_MODE_POWER,
-              powerPercent:
-                'powerPercent' in patch && patch.powerPercent !== undefined
-                  ? patch.powerPercent
-                  : stepData.pumpData.powerPercent,
+              percentPower:
+                'percentPower' in patch && patch.percentPower !== undefined
+                  ? patch.percentPower
+                  : stepData.pumpData.percentPower,
             }
       onStepChange(stepData.id, { pumpData: nextPumpData })
     } else {
@@ -110,82 +118,121 @@ export function PresavedVacuumStep(
           />
         )}
         <div className={styles.presaved_content}>
-          <div className={styles.presaved_vacuum_step_form_row}>
-            <div className={styles.flex_fill}>
-              <InputField
-                title={t('vacuum.controls.profile.step_title')}
-                value={title}
-                onChange={e => {
-                  updateField('title', e.currentTarget.value)
-                }}
-                error={
-                  showValidationErrors && errors.title
-                    ? t('vacuum.controls.profile.errors.title')
-                    : null
-                }
-              />
-            </div>
-            <div className={styles.flex_fill}>
-              {pumpData.mode === VACUUM_MODE_PRESSURE ? (
+          <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing8}>
+            <div className={styles.presaved_vacuum_step_form_row}>
+              <div className={styles.flex_fill}>
                 <InputField
-                  title={t('vacuum.controls.profile.gauge_pressure')}
-                  value={pumpData.pressureMbar}
-                  caption={t('vacuum.controls.mode.pressure.caption', {
-                    min: VACUUM_MIN_PRESSURE_MBAR,
-                    max: VACUUM_MAX_PRESSURE_MBAR,
-                  })}
+                  title={t('vacuum.controls.profile.step_title')}
+                  value={title}
                   onChange={e => {
-                    const maskedPressure = maskToSignedDecimal(
-                      e.currentTarget.value
-                    )
-                    updateField('pumpData', { pressureMbar: maskedPressure })
+                    updateField('title', e.currentTarget.value)
                   }}
-                  units={t('application:units.millibar')}
                   error={
-                    showValidationErrors && errors.pumpData
-                      ? t('vacuum.controls.profile.errors.pumpData')
+                    showValidationErrors && errors.title
+                      ? t('vacuum.controls.profile.errors.title')
                       : null
                   }
                 />
-              ) : (
-                <Slider
-                  value={pumpData.powerPercent}
-                  label={t('vacuum.controls.profile.pump_power')}
-                  adjustValue={value => {
-                    updateField('pumpData', { powerPercent: value })
-                  }}
-                  backgroundColor={COLORS.grey35}
-                  type="small"
-                />
-              )}
-            </div>
-            <div className={styles.flex_fill}>
-              <InputField
-                title={t('vacuum.controls.profile.time')}
-                value={time}
-                onChange={e => {
-                  const maskedTime = maskToTimeWithPlaceholders(
-                    e.currentTarget.value,
-                    'mmss'
-                  )
-                  updateField('time', maskedTime)
-                }}
-                units={t('application:units.time')}
-                error={
-                  showValidationErrors && errors.time
-                    ? t('vacuum.controls.profile.errors.time')
-                    : null
-                }
-              />
-            </div>
-            {isNested && allowDelete ? (
-              <div className={styles.delete_button} onClick={onDelete}>
-                <Icon name="close" size="1.5rem" />
               </div>
-            ) : null}
-          </div>
+              <div className={styles.flex_fill}>
+                {pumpData.mode === VACUUM_MODE_PRESSURE ? (
+                  <InputField
+                    title={t('vacuum.controls.profile.gauge_pressure')}
+                    value={pumpData.pressureMbar}
+                    caption={t('vacuum.controls.mode.pressure.caption', {
+                      min: VACUUM_MIN_PRESSURE_MBAR,
+                      max: VACUUM_MAX_PRESSURE_MBAR,
+                    })}
+                    onChange={e => {
+                      const maskedPressure = maskToSignedDecimal(
+                        e.currentTarget.value
+                      )
+                      updateField('pumpData', { pressureMbar: maskedPressure })
+                    }}
+                    units={t('application:units.millibar')}
+                    error={
+                      showValidationErrors && errors.pumpData
+                        ? t('vacuum.controls.profile.errors.pumpData')
+                        : null
+                    }
+                  />
+                ) : (
+                  <Slider
+                    value={pumpData.percentPower}
+                    label={t('vacuum.controls.profile.pump_power')}
+                    adjustValue={value => {
+                      updateField('pumpData', { percentPower: value })
+                    }}
+                    backgroundColor={COLORS.grey35}
+                    type="small"
+                  />
+                )}
+              </div>
+              <div className={styles.flex_fill}>
+                <InputField
+                  title={t('vacuum.controls.profile.time')}
+                  value={time}
+                  onChange={e => {
+                    const maskedTime = maskToTimeWithPlaceholders(
+                      e.currentTarget.value,
+                      'mmss'
+                    )
+                    updateField('time', maskedTime)
+                  }}
+                  units={t('application:units.time')}
+                  error={
+                    showValidationErrors && errors.time
+                      ? t('vacuum.controls.profile.errors.time')
+                      : null
+                  }
+                />
+              </div>
+              {isNested && allowDelete ? (
+                <div className={styles.delete_button} onClick={onDelete}>
+                  <Icon name="close" size="1.5rem" />
+                </div>
+              ) : null}
+            </div>
+            <StepEndingHoldField
+              toggledOn={ventAfter}
+              onChange={() => {
+                updateField('ventAfter', !ventAfter)
+              }}
+            />
+          </Flex>
         </div>
       </div>
     </ListItem>
+  )
+}
+
+function StepEndingHoldField(props: {
+  toggledOn: boolean
+  onChange: () => void
+}): JSX.Element {
+  const { toggledOn, onChange } = props
+  const { t } = useTranslation('protocol_steps')
+  const label = toggledOn
+    ? t('vacuum.previous_state.vent.opened')
+    : t('vacuum.previous_state.vent.closed')
+
+  return (
+    <ListButton
+      type="noActive"
+      padding={SPACING.spacing12}
+      width="100%"
+      justifyContent="space-between"
+      onClick={onChange}
+      backgroundColor={COLORS.white}
+      alignItems="center"
+    >
+      <StyledText desktopStyle="bodyDefaultRegular">
+        {t('vacuum.controls.ending_hold_vent.label')}
+      </StyledText>
+      <div className={styles.ending_hold_toggle_row}>
+        <StyledText desktopStyle="bodyDefaultRegular">{label}</StyledText>
+        <ToggleButton label={label} toggledOn={toggledOn} />
+      </div>
+    </ListButton>
   )
 }

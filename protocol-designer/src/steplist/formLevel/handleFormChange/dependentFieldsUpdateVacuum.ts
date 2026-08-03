@@ -23,7 +23,7 @@ const updatePatchOnVacuumProgramType = (
         'stateType',
         'modeType',
         'pressureMbar',
-        'powerPercent',
+        'percentPower',
         'pumpDurationCheckbox',
         'pumpDurationTime',
         'endingHoldVentCheckbox',
@@ -48,7 +48,7 @@ const updatePatchOnVacuumStateType = (
       ...getDefaultFields(
         'modeType',
         'pressureMbar',
-        'powerPercent',
+        'percentPower',
         'pumpDurationCheckbox',
         'pumpDurationTime',
         'endingHoldVentCheckbox'
@@ -67,7 +67,7 @@ const updatePatchOnVacuumModeType = (
       ...patch,
       ...getDefaultFields(
         'pressureMbar',
-        'powerPercent',
+        'percentPower',
         'pumpDurationCheckbox',
         'pumpDurationTime'
       ),

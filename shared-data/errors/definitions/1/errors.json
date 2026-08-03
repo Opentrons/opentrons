@@ -54,6 +54,10 @@
       "detail": "CANBus Bus Error",
       "category": "hardwareCommunicationError"
     },
+    "1009": {
+      "detail": "Key Storage Unavailable",
+      "category": "hardwareCommunicationError"
+    },
     "2000": {
       "detail": "Robotics Control Error",
       "category": "roboticsControlError"
@@ -226,6 +230,18 @@
       "detail": "Flex Stacker Shuttle Occupied",
       "category": "roboticsInteractionError"
     },
+    "3024": {
+      "detail": "Barcode scanner failed to find barcode.",
+      "category": "roboticsInteractionError"
+    },
+    "3040": {
+      "detail": "Vacuum Module Pressure Not Reached",
+      "category": "roboticsInteractionError"
+    },
+    "3041": {
+      "detail": "Vacuum Module Waste Container Full",
+      "category": "roboticsInteractionError"
+    },
     "4000": {
       "detail": "Unknown or Uncategorized Error",
       "category": "generalError"
@@ -280,6 +296,10 @@
     },
     "4013": {
       "detail": "Camera Related Error",
+      "category": "generalError"
+    },
+    "4014": {
+      "detail": "Audit logging error",
       "category": "generalError"
     }
   }

@@ -10,6 +10,7 @@ from typing_extensions import Literal
 
 from ...errors.error_occurrence import ErrorOccurrence
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from opentrons.config import feature_flags
 from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 from opentrons.types import Mount, MountType, Point
@@ -21,18 +22,28 @@ if TYPE_CHECKING:
 # These offsets supplied from HW
 _ATTACH_POINT = Point(x=0, y=110)
 _MAX_Z_AXIS_MOTION_RANGE = 215
+# These offsets are estimated by eyeballing
+_INSTRUMENT_ATTACH_Z_POINT = 400.0
 _LEFT_MOUNT_Z_MARGIN = 5
 # Move the right mount a bit higher than the left so the user won't forget to unscrew
 _RIGHT_MOUNT_Z_MARGIN = 20
+_RIGHT_MOUNT_Z_MARGIN_INTERNAL_96CH = 1.85
+
+
+def _right_mount_z_margin() -> float:
+    if feature_flags.internal_96ch_attach():
+        return _RIGHT_MOUNT_Z_MARGIN_INTERNAL_96CH
+    return _RIGHT_MOUNT_Z_MARGIN
+
 
 MoveToMaintenancePositionCommandType = Literal["calibration/moveToMaintenancePosition"]
 
 
-class MaintenancePosition(enum.Enum):
-    """Maintenance position options."""
+class MotionModifier(enum.Enum):
+    """Motion modifier options for maintenance position moves."""
 
-    ATTACH_PLATE = "attachPlate"
-    ATTACH_INSTRUMENT = "attachInstrument"
+    LOWER_Z_AXES_SEQUENTIALLY = "lowerZAxesSequentially"
+    LOWER_MOUNT_Z_AXIS = "lowerMountZAxis"
 
 
 class MoveToMaintenancePositionParams(BaseModel):
@@ -43,8 +54,8 @@ class MoveToMaintenancePositionParams(BaseModel):
         description="Gantry mount to move maintenance position.",
     )
 
-    maintenancePosition: MaintenancePosition = Field(
-        MaintenancePosition.ATTACH_INSTRUMENT,
+    motionModifier: Optional[MotionModifier] = Field(
+        None,
         description="The position the gantry mount needs to move to.",
     )
 
@@ -92,12 +103,7 @@ class MoveToMaintenancePositionImplementation(
         )
 
         if params.mount != MountType.EXTENSION:
-            if params.maintenancePosition == MaintenancePosition.ATTACH_INSTRUMENT:
-                mount = params.mount.to_hw_mount()
-                mount_to_axis = Axis.by_mount(mount)
-                await ot3_api.prepare_for_mount_movement(mount)
-                await ot3_api.disengage_axes([mount_to_axis])
-            else:
+            if params.motionModifier == MotionModifier.LOWER_Z_AXES_SEQUENTIALLY:
                 max_motion_range = max_height_z_tip - _MAX_Z_AXIS_MOTION_RANGE
                 await ot3_api.move_axes(
                     {
@@ -107,10 +113,23 @@ class MoveToMaintenancePositionImplementation(
                 await ot3_api.disengage_axes([Axis.Z_L])
                 await ot3_api.move_axes(
                     {
-                        Axis.Z_R: max_motion_range + _RIGHT_MOUNT_Z_MARGIN,
+                        Axis.Z_R: max_motion_range + _right_mount_z_margin(),
                     }
                 )
                 await ot3_api.disengage_axes([Axis.Z_R])
+            else:
+                mount = params.mount.to_hw_mount()
+                mount_to_axis = Axis.by_mount(mount)
+                await ot3_api.prepare_for_mount_movement(mount)
+
+                if params.motionModifier == MotionModifier.LOWER_MOUNT_Z_AXIS:
+                    await ot3_api.move_axes(
+                        {
+                            mount_to_axis: _INSTRUMENT_ATTACH_Z_POINT,
+                        }
+                    )
+
+                await ot3_api.disengage_axes([mount_to_axis])
 
         return SuccessData(
             public=MoveToMaintenancePositionResult(),

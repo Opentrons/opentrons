@@ -21,7 +21,7 @@ export function VacuumSummary(props: {
     programType,
     stateType,
     modeType,
-    powerPercent,
+    percentPower,
     pressureMbar,
     pumpDurationCheckbox,
     pumpDurationTime,
@@ -58,7 +58,7 @@ export function VacuumSummary(props: {
               text: t(
                 `vacuum.previous_state.pump.${modeType}`,
                 ...(modeType === VACUUM_MODE_POWER
-                  ? [{ power: powerPercent }]
+                  ? [{ power: percentPower }]
                   : [{ pressure: pressureMbar }])
               ),
             },
@@ -84,7 +84,7 @@ export function VacuumSummary(props: {
             text: t(
               `vacuum.previous_state.pump.${modeType}`,
               ...(modeType === VACUUM_MODE_POWER
-                ? [{ power: powerPercent }]
+                ? [{ power: percentPower }]
                 : [{ pressure: pressureMbar }])
             ),
           },

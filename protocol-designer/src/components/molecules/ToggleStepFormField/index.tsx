@@ -52,6 +52,7 @@ export function ToggleStepFormField(
           }
         }}
         disabled={isDisabled}
+        width="100%"
       >
         <Flex width="100%" flexDirection={DIRECTION_COLUMN}>
           <Flex

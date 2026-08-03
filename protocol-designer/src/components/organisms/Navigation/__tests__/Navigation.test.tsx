@@ -29,18 +29,7 @@ const render = () => {
     <MemoryRouter>
       <Navigation />
     </MemoryRouter>,
-    // { i18nInstance: i18n }
-    // ToDo switch back to the above code when removing the ff
-    {
-      i18nInstance: i18n,
-      initialState: {
-        featureFlags: {
-          flags: {
-            OT_PD_ENABLE_FORK: false,
-          },
-        },
-      },
-    }
+    { i18nInstance: i18n }
   )
 }
 

@@ -9,7 +9,7 @@ import {
 describe('ProtocolSetupSkeleton', () => {
   it('renders Skeletons to replace the title section', () => {
     render(<ProtocolSetupTitleSkeleton />)
-    const titleSkeletons = screen.getAllByTestId('Skeleton')
+    const titleSkeletons = screen.getAllByRole('status')
     expect(titleSkeletons.length).toBe(2)
 
     titleSkeletons.forEach(titleSkeleton => {
@@ -19,7 +19,7 @@ describe('ProtocolSetupSkeleton', () => {
 
   it('renders Skeletons to replace the SetupStep components', () => {
     render(<ProtocolSetupStepSkeleton />)
-    const titleSkeletons = screen.getAllByTestId('Skeleton')
+    const titleSkeletons = screen.getAllByRole('status')
     expect(titleSkeletons.length).toBe(4)
 
     titleSkeletons.forEach(titleSkeleton => {

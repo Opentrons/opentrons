@@ -3,6 +3,9 @@
 from datetime import datetime
 from typing import Callable, Optional, Sequence
 
+from opentrons.config import (
+    feature_flags as ff,
+)
 from opentrons.protocol_engine import (
     Command,
     CommandPointer,
@@ -22,6 +25,7 @@ from opentrons.system import camera
 from .maintenance_run_models import MaintenanceRun, MaintenanceRunNotFoundError
 from .maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
 from robot_server.service.notifications import MaintenanceRunsPublisher
+from robot_server.service.pyro_utils.resource_utilities import get_pyro_resource
 
 
 def _build_run(
@@ -36,6 +40,7 @@ def _build_run(
         labwareOffsets=[],
         pipettes=[],
         modules=[],
+        peripherals=[],
         liquids=[],
         wells=[],
         files=[],
@@ -111,7 +116,15 @@ class MaintenanceRunDataManager:
             The run resource.
         """
         if self._run_orchestrator_store.current_run_id is not None:
+            self._maintenance_runs_publisher.stop_publishing_for_maintenance_run()
             await self._run_orchestrator_store.clear()
+
+        proxy_door_callback = None
+        if ff.hardware_subprocess_enabled():
+            pyro_resource = get_pyro_resource()
+            proxy_door_callback = (
+                pyro_resource.get_maintenance_run_door_watcher_callback()
+            )
 
         state_summary = await self._run_orchestrator_store.create(
             run_id=run_id,
@@ -119,12 +132,13 @@ class MaintenanceRunDataManager:
             labware_offsets=labware_offsets,
             deck_configuration=deck_configuration,
             notify_publishers=notify_publishers,
+            proxy_of_callback_for_handling_door_events=proxy_door_callback,
         )
 
         await camera.update_live_stream_status(
             self._run_orchestrator_store._robot_type,
             True,
-            camera_provider,
+            await camera_provider.get_camera_settings(),
             state_summary.cameraSettings,
         )
 
@@ -183,17 +197,15 @@ class MaintenanceRunDataManager:
             RunNotFoundError: The given run identifier was not found.
         """
         if run_id == self._run_orchestrator_store.current_run_id:
+            self._maintenance_runs_publisher.stop_publishing_for_maintenance_run()
             await self._run_orchestrator_store.clear()
-            await (
-                self._maintenance_runs_publisher.publish_current_maintenance_run_async()
-            )
 
             if camera_settings is not None:
                 # Restart the live stream for the external run when the maintenance run has ended.
                 await camera.update_live_stream_status(
                     self._run_orchestrator_store._robot_type,
                     True,
-                    camera_provider,
+                    await camera_provider.get_camera_settings(),
                     camera_settings,
                 )
 

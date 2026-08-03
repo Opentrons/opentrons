@@ -27,7 +27,7 @@ export interface RobotUpdateFileInfo {
 }
 
 // stage response from API
-// update-server/otupdate/buildroot/update_session.py
+// update-server/otupdate/common/session.py
 export type UpdateSessionStage =
   | 'awaiting-file'
   | 'validating'
@@ -186,3 +186,4 @@ export type RobotUpdateAction =
   | { type: 'robotUpdate:FILE_UPLOAD_PROGRESS'; payload: number }
   | { type: 'robotUpdate:CHECKING_FOR_UPDATE'; payload: RobotUpdateTarget }
   | { type: 'robotUpdate:DOWNLOAD_DONE'; payload: RobotUpdateTarget }
+  | { type: 'robotUpdate:DOWNLOAD_UPDATE'; meta: { shell: true } }

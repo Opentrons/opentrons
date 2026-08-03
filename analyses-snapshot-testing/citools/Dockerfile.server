@@ -1,4 +1,4 @@
-ARG BASE_IMAGE_NAME=opentrons-python-base:3.10
+ARG BASE_IMAGE_NAME=opentrons-python-base:3.12
 
 FROM ${BASE_IMAGE_NAME}
 

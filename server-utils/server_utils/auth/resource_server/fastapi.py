@@ -11,6 +11,8 @@ from typing import (
     Awaitable,
     Callable,
     Final,
+    Type,
+    TypeAlias,
 )
 
 import fastapi
@@ -18,16 +20,23 @@ import fastapi.responses
 import fastapi.security
 
 from .auth_server import TOKEN_ENDPOINT_PATH, LocalHTTPClient
-from .authorization_checker import (
-    AlwaysAllowedAuthorizationChecker,
-    AuthorizationChecker,
+from .authentication_checker import (
+    AlwaysAllowedAuthenticationChecker,
+    AuthenticationChecker,
+    AuthServerAuthenticationChecker,
+)
+from .authorization_checker import check as check_authorization
+from .error_responses import build_response_for_error
+from .types import (
+    AuthenticatedResult,
+    AuthenticationNotRequiredResult,
+    AuthorizationNotRequiredResult,
     AuthorizedResult,
-    AuthServerAuthorizationChecker,
     InsufficientScopeResult,
     MissingTokenResult,
     NotAnActiveTokenResult,
+    UnableToContactAuthServerResult,
 )
-from .error_responses import build_response_for_error
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.app_state import (
     AppState,
@@ -47,87 +56,36 @@ _oauth_2_scheme = fastapi.security.OAuth2PasswordBearer(
     auto_error=False,
 )
 
-_authorization_checker_accessor = AppStateAccessor[AuthorizationChecker](
-    "authorization_checker"
+_authentication_checker_accessor = AppStateAccessor[AuthenticationChecker](
+    "authentication_checker"
 )
 
 
-def require_scopes(*required_scopes: Scope) -> Callable[..., Awaitable[None]]:
-    """A FastAPI dependency to make sure the client is authorized with the given scopes.
-
-    Usage example:
-
-    ```
-    @router.post(
-        "/foo",
-        # The client must have READ_FOO and WRITE_FOO permissions.
-        dependencies=[require_scopes(Scope.READ_FOO, Scope.WRITE_FOO)],
-    )
-    def get_foo(...) -> None:
-        ...
-    ```
-
-    If the client lacks authorization, this will return an HTTP error response,
-    and the endpoint function will not run.
-
-    This also documents the list of required scopes in the OpenAPI spec.
-    """
-    required_scopes_set = set(required_scopes)
-
-    async def dependency(
-        # This retrieves the request's bearer token, by depending on `_oauth_2_scheme`;
-        # and it adds OpenAPI docs to list which scopes the endpoint requires,
-        # by supplying the `scopes` argument.
-        #
-        # This will break if this file has `from __future__ import annotations`. FastAPI
-        # will not understand the lazily-evaluated type annotation. This may or may not
-        # become a problem by the time we get to Python 3.14, which changes the way
-        # annotations work to something similar (but different) to the `__future__`
-        # thing.
-        bearer_token: Annotated[
-            str | None,
-            fastapi.Security(
-                _oauth_2_scheme,
-                scopes=sorted(scope.api_name for scope in required_scopes_set),
-            ),
-        ],
-        authorization_checker: Annotated[
-            AuthorizationChecker, fastapi.Depends(get_authorization_checker)
-        ],
-    ) -> None:
-        authorization_result = await authorization_checker.check(
-            token=bearer_token, required_scopes=required_scopes_set
-        )
-        if isinstance(authorization_result, AuthorizedResult):
-            # The request is authorized, yay.
-            pass
-        else:
-            raise AuthorizationError(authorization_result, required_scopes_set)
-
-    return dependency
-
-
-def install_authorization_checker(
+def install_authentication_checker(
     app_state: AppState,
-    authorization_checker: AuthorizationChecker,
+    authentication_checker: AuthenticationChecker,
 ) -> None:
-    """Store a singleton `AuthorizationChecker` in global server state for later retrieval.
+    """Store a singleton `AuthenticationChecker` in global server state for later retrieval.
 
     This should be called once during server initialization.
     """
-    _authorization_checker_accessor.set_on(app_state, authorization_checker)
+    _authentication_checker_accessor.set_on(app_state, authentication_checker)
 
 
 @asynccontextmanager
-async def build_authorization_checker(
-    *, auth_server_uds: str | None = None, auth_server_url: str | None = None
-) -> AsyncGenerator[AuthorizationChecker, None]:
-    """Build an `AuthorizationChecker` appropriately configured for most servers.
+async def build_authentication_checker(
+    *,
+    auth_server_uds: str | None = None,
+    auth_server_url: str | None = None,
+    fallback: Type[AuthenticationChecker] = AlwaysAllowedAuthenticationChecker,
+) -> AsyncGenerator[AuthenticationChecker, None]:
+    """Build an `AuthenticationChecker` appropriately configured for most servers.
 
-    `auth_server_uds` (a path to a Unix domain socket) or `auth_server_url` (a URL like
+    `auth_server_
+    uds` (a path to a Unix domain socket) or `auth_server_url` (a URL like
     http://localhost:1234) describes how to connect to the auth-server. These should
     typically be taken from CLI options or environment variables. If neither are
-    specified, a dummy `AuthorizationChecker` is returned that allows unauthenticated
+    specified, a dummy `AuthenticationChecker` is returned that allows unauthenticated
     access to everything.
     """
     if auth_server_uds is None and auth_server_url is None:
@@ -136,28 +94,142 @@ async def build_authorization_checker(
             " Access control will be disabled."
             " (This is normal in dev mode and on OT-2s.)"
         )
-        yield AlwaysAllowedAuthorizationChecker()
+        yield fallback()
 
     else:
         async with LocalHTTPClient(
             auth_server_uds=auth_server_uds, auth_server_url=auth_server_url
         ) as client:
-            yield AuthServerAuthorizationChecker(client)
+            yield AuthServerAuthenticationChecker(client)
 
 
-def get_authorization_checker(
+def get_authentication_checker(
     app_state: Annotated[AppState, fastapi.Depends(get_app_state)],
-) -> AuthorizationChecker:
-    """A FastAPI dependency to retrieve the server's singleton `AuthorizationChecker`.
+) -> AuthenticationChecker:
+    """A FastAPI dependency to retrieve the server's singleton `AuthenticationChecker`.
 
-    Endpoints should not normally need to use this directly. Use `require_scopes()`,
+    Endpoints should not normally need to use this directly. Use `require_authentication`,
     which is higher-level, instead. This is exposed for testing.
     """
-    authorization_checker = _authorization_checker_accessor.get_from(app_state)
-    assert authorization_checker is not None, (
-        "Forgot to initialize authorization checker as part of server startup?"
+    authentication_checker = _authentication_checker_accessor.get_from(app_state)
+    assert authentication_checker is not None, (
+        "Forgot to initialize authentication checker as part of server startup?"
     )
-    return authorization_checker
+    return authentication_checker
+
+
+RequireAuthenticationResult: TypeAlias = (
+    AuthenticationNotRequiredResult | AuthenticatedResult
+)
+RequireScopesResult: TypeAlias = AuthorizationNotRequiredResult | AuthorizedResult
+
+
+async def require_authentication(
+    # This retrieves the request's bearer token, by depending on `_oauth_2_scheme`;
+    # and it adds OpenAPI docs to list which scopes the endpoint requires,
+    # by supplying the `scopes` argument.
+    #
+    # This will break if this file has `from __future__ import annotations`. FastAPI
+    # will not understand the lazily-evaluated type annotation. This may or may not
+    # become a problem by the time we get to Python 3.14, which changes the way
+    # annotations work to something similar (but different) to the `__future__`
+    # thing.
+    bearer_token: Annotated[
+        str | None,
+        fastapi.Security(
+            _oauth_2_scheme,
+            scopes=[],
+        ),
+    ],
+    authentication_checker: Annotated[
+        AuthenticationChecker, fastapi.Depends(get_authentication_checker)
+    ],
+) -> RequireAuthenticationResult:
+    """A FastAPI dependency to enforce access control.
+
+    This should never be used on its own, only in conjunction with `require_scopes()`
+    to share the identification information with other code.
+    """
+    authentication_result = await authentication_checker.check(token=bearer_token)
+    if isinstance(
+        authentication_result,
+        (AuthenticationNotRequiredResult, AuthenticatedResult),
+    ):
+        # The request is authenticated, yay.
+        return authentication_result
+    else:
+        # The request is not authenticated.
+        raise AuthorizationError(authentication_result, set())
+
+
+def require_scopes(
+    *required_scopes: Scope,
+) -> Callable[..., Awaitable[RequireScopesResult]]:
+    """A FastAPI dependency to enforce access control.
+
+    Use like so:
+
+    ```
+    @router.post(
+        "/foo",
+        # The client must have READ_FOO and WRITE_FOO permissions.
+        dependencies=[Depends(require_scopes(Scope.READ_FOO, Scope.WRITE_FOO))],
+    )
+    def get_foo(...) -> None:
+        ...
+    ```
+
+    Or, for more advanced cases where you need more authorization details:
+
+    ```
+    @router.post("/foo")
+    def get_foo(
+        # The client must have READ_FOO and WRITE_FOO permissions.
+        authorization_details: Annotated[
+            RequireScopesResult,
+            Depends(require_scopes(Scope.READ_FOO, Scope.WRITE_FOO))
+        ]
+    ) -> None:
+        # Here you can check authorization_details.
+        ...
+    ```
+
+    In either case, this dependency checks to see if the request is authorized for
+    all of the `required_scopes`. If so, it lets your endpoint function run.
+    Otherwise, it rejects the request with an appropriate HTTP error.
+
+    This also automatically adds documentation to the OpenAPI document to say
+    that the endpoint requires these scopes.
+    """
+    required_scopes_set = set(required_scopes)
+
+    async def dependency(
+        authentication: Annotated[
+            RequireAuthenticationResult, fastapi.Depends(require_authentication)
+        ],
+        bearer_token: Annotated[
+            str | None,
+            fastapi.Security(
+                _oauth_2_scheme,
+                scopes=sorted(scope.api_name for scope in required_scopes_set),
+            ),
+        ],
+    ) -> RequireScopesResult:
+        authorized = check_authorization(authentication, required_scopes_set)
+        if isinstance(authorized, (AuthorizationNotRequiredResult, AuthorizedResult)):
+            return authorized
+        raise AuthorizationError(authorized, required_scopes_set)
+
+    return dependency
+
+
+async def get_access_control_status(
+    authentication_checker: Annotated[
+        AuthenticationChecker, fastapi.Depends(get_authentication_checker)
+    ],
+) -> bool:
+    """A FastAPI dependency to retrieve the access control mode status from the server's singleton `AuthenticationChecker`."""
+    return await authentication_checker.access_control_status()
 
 
 class AuthorizationError(Exception):
@@ -169,9 +241,12 @@ class AuthorizationError(Exception):
 
     def __init__(
         self,
-        authorization_error: InsufficientScopeResult
-        | MissingTokenResult
-        | NotAnActiveTokenResult,
+        authorization_error: (
+            InsufficientScopeResult
+            | MissingTokenResult
+            | NotAnActiveTokenResult
+            | UnableToContactAuthServerResult
+        ),
         required_scopes: set[Scope],
     ) -> None:
         self.authorization_error: Final = authorization_error

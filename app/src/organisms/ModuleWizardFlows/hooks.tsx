@@ -2,47 +2,49 @@ import { useCallback } from 'react'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+
 import type { AttachedModule } from '@opentrons/api-client'
+import type {
+  DocumentationState,
+  DocumentedAction,
+} from '@opentrons/react-api-client'
 import type { IdentifyColor } from '@opentrons/shared-data'
+import type { SendIdentifyModule } from './types'
 
-type sendIdentifyModuleType = (
-  module: AttachedModule,
-  start: boolean,
-  color?: IdentifyColor
-) => void
+export function useSendIdentifyModule(
+  documentationState?: DocumentationState,
+  actionsToDocument?: DocumentedAction[],
+  addActionToDocument?: (action: DocumentedAction) => void
+): SendIdentifyModule {
+  const newDocState = useDocumentationState()
+  const { createLiveCommand } = useCreateLiveCommandMutation(
+    documentationState ?? newDocState,
+    actionsToDocument,
+    addActionToDocument
+  )
 
-export function useSendIdentifyStacker(): sendIdentifyModuleType {
-  const { createLiveCommand } = useCreateLiveCommandMutation()
-
-  const sendIdentifyStacker = useCallback(
+  const sendIdentifyModule = useCallback(
     (
       module: AttachedModule,
       start: boolean,
       color: IdentifyColor | null = null
     ) => {
-      // Only send identify command for flex stacker modules,
-      // other module types are not currently supported
-      if (module.moduleType === 'flexStackerModuleType') {
-        createLiveCommand({
-          command: {
-            commandType: 'identifyModule',
-            params: {
-              model: module.moduleModel,
-              moduleId: module.id,
-              start,
-              ...(color != null ? { color } : {}),
-            },
+      createLiveCommand({
+        command: {
+          commandType: 'identifyModule',
+          params: {
+            model: module.moduleModel,
+            moduleId: module.id,
+            start,
+            ...(color != null ? { color } : {}),
           },
-        }).catch(error => {
-          console.log(error.message)
-        })
-      } else {
-        console.warn(
-          `Module type ${module.moduleType} does not support identify command`
-        )
-      }
+        },
+      }).catch(error => {
+        console.log(error.message)
+      })
     },
     [createLiveCommand]
   )
-  return sendIdentifyStacker
+  return sendIdentifyModule
 }

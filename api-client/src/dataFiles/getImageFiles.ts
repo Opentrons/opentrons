@@ -11,7 +11,6 @@ export function getImageFiles(
   return request<ImageFilesDataResponse>(
     GET,
     `/dataFiles/${runId}/images`,
-    null,
     config
   )
 }

@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 
 import { getErrorRecoverySettings } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
@@ -13,7 +13,7 @@ export function useErrorRecoverySettings(
 ): UseQueryResult<ErrorRecoverySettingsResponse, AxiosError> {
   const host = useHost()
   const query = useQuery<ErrorRecoverySettingsResponse, AxiosError>(
-    [host, 'errorRecovery', 'settings'],
+    getQueryKey(host, 'errorRecovery', 'settings'),
     () =>
       getErrorRecoverySettings(host!)
         .then(response => response.data)

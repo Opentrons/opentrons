@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -6,6 +7,8 @@ import {
   PrimaryButton,
   StyledText,
 } from '@opentrons/components'
+
+import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/encryptionKeys'
 
 import styles from './robot_cert_import.module.css'
 import { useHandleRobotCertImport } from './useHandleRobotCertImport'
@@ -18,8 +21,23 @@ export function RobotCertImportModal(
   props: RobotCertImportModalProps
 ): JSX.Element {
   const { t } = useTranslation(['device_settings'])
+  const { requestKeyDisplay, clearKeyDisplay } =
+    useUpdateClientDataEncryptionKeys()
+  const [requestKey, setRequestKey] = useState<string | null>(null)
+  useEffect(
+    (): void => {
+      setRequestKey(requestKeyDisplay())
+    },
+    // this hook should run on mount only, and requestKey is not read in its callback
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
+  const handleClose = (): void => {
+    requestKey != null && clearKeyDisplay(requestKey)
+    props.onClose()
+  }
   const handleImport = useHandleRobotCertImport({
-    onSuccessfulImport: props.onClose,
+    onSuccessfulImport: handleClose,
   })
   const footer = (
     <div className={styles.modal_footer_container}>
@@ -28,12 +46,14 @@ export function RobotCertImportModal(
       </PrimaryButton>
     </div>
   )
+  // TODO(jj): fix z-index
   return (
     <Modal
       title={t('robot_encryption_key_verification')}
       closeOnOutsideClick={true}
       footer={footer}
-      onClose={props.onClose}
+      onClose={handleClose}
+      zIndexOverlay={10000}
     >
       <div className={styles.robot_cert_import_container}>
         <div>

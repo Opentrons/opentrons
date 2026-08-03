@@ -1,5 +1,6 @@
 import { VIEWPORT } from '@opentrons/components'
 
+import { customViewports } from '../../../../.storybook/preview'
 import { MediaContainerContent } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
@@ -7,7 +8,9 @@ import type { Meta, StoryObj } from '@storybook/react'
 const meta: Meta<typeof MediaContainerContent> = {
   title: 'App/Molecules/MediaContainer',
   component: MediaContainerContent,
-  parameters: VIEWPORT.touchScreenViewport,
+  viewport: {
+    options: [VIEWPORT.touchScreenViewport, customViewports],
+  },
   argTypes: {
     state: {
       control: {

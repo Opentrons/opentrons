@@ -3,23 +3,9 @@
 name: 'JS package testing'
 
 on:
-  pull_request:
-    paths:
-      - 'components/**'
-      - 'js-package-testing/**'
-      - 'protocol-visualization/**'
-      - 'shared-data/**'
-      - 'step-generation/**'
-      - '.github/workflows/js-package-testing.yaml'
-  push:
-    branches:
-      - 'edge'
-      - 'chore_release*'
+  schedule:
+    - cron: '0 15 * * *' # 10:00 AM EST (15:00 UTC)
   workflow_dispatch: {}
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
-  cancel-in-progress: true
 
 defaults:
   run:
@@ -34,9 +20,9 @@ jobs:
     timeout-minutes: 30
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
-          fetch-depth: 0
+          ref: edge
       - uses: ./.github/actions/js/setup
       - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
         with:
@@ -48,7 +34,7 @@ jobs:
         working-directory: js-package-testing
         env:
           # Eyes baseline branch = PR merge target (pull_request). workflow_dispatch falls back to ref_name.
-          APPLITOOLS_BRANCH: ${{ github.base_ref || github.ref_name }}
+          APPLITOOLS_BRANCH: edge
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
         run: make test
       - name: 'upload playwright report'

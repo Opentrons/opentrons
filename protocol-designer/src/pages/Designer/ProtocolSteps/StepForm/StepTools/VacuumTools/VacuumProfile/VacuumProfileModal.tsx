@@ -94,7 +94,6 @@ export function VacuumProfileModal(
       maxHeight="45rem"
       childrenPadding={SPACING.spacing24}
       onClose={onClose}
-      marginLeft="0"
       footer={footer}
     >
       <div className={styles.vacuum_profile_modal_body}>
@@ -188,6 +187,7 @@ export function VacuumProfileModal(
                     onDelete={() => {
                       handleDeleteStep(id)
                     }}
+                    repetitions={cycleItem.repetitions}
                   />
                 )
               }

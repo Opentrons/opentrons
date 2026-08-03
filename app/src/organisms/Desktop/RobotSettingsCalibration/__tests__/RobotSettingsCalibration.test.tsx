@@ -17,15 +17,15 @@ import {
 } from '/app/redux/calibration/pipette-offset/__fixtures__'
 import { useFeatureFlag } from '/app/redux/config'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
-import {
-  mockAttachedPipette,
-  mockAttachedPipetteInformation,
-} from '/app/redux/pipettes/__fixtures__'
 import * as RobotApi from '/app/redux/robot-api'
 import {
   useAttachedPipettes,
   useAttachedPipettesFromInstrumentsQuery,
 } from '/app/resources/instruments'
+import {
+  mockAttachedPipette,
+  mockAttachedPipetteInformation,
+} from '/app/resources/instruments/__fixtures__'
 import { useRunStatuses } from '/app/resources/runs'
 
 import { RobotSettingsCalibration } from '..'
@@ -38,8 +38,8 @@ import { RobotSettingsModuleCalibration } from '../RobotSettingsModuleCalibratio
 import { RobotSettingsPipetteOffsetCalibration } from '../RobotSettingsPipetteOffsetCalibration'
 import { RobotSettingsTipLengthCalibration } from '../RobotSettingsTipLengthCalibration'
 
+import type { AttachedPipettesByMount } from '@opentrons/api-client'
 import type * as ReactApiClient from '@opentrons/react-api-client'
-import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 
 vi.mock('@opentrons/react-api-client', async importOriginal => {
   const actual = await importOriginal<typeof ReactApiClient>()

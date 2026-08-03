@@ -24,7 +24,10 @@ from .deck_configuration import (
     DeckType,
     PotentialCutoutFixture,
 )
-from .execution import EngineStatus, PostRunHardwareState
+from .execution import (
+    EngineStatus,
+    PostRunHardwareState,
+)
 from .hardware_passthrough import MotorAxis, MovementAxis
 from .instrument import (
     CurrentAddressableArea,
@@ -126,6 +129,11 @@ from .partial_tip_configuration import (
     RowNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
 )
+from .peripheral import (
+    LoadedPeripheral,
+    PeripheralDefinition,
+    PeripheralModel,
+)
 from .run_time_parameters import (
     BooleanParameter,
     CSVParameter,
@@ -154,6 +162,7 @@ from .well_position import (
     WellOrigin,
 )
 from opentrons.hardware_control.modules import ModuleType
+from opentrons.hardware_control.peripherals import PeripheralType
 
 __all__ = [
     # Runtime parameters
@@ -225,6 +234,11 @@ __all__ = [
     "StackerFillEmptyStrategy",
     "StackerStoredLabwareGroup",
     "StackerLabwareMovementStrategy",
+    # Peripherals
+    "LoadedPeripheral",
+    "PeripheralDefinition",
+    "PeripheralModel",
+    "PeripheralType",
     # Locations of things on deck
     "DeckSlotLocation",
     "StagingSlotLocation",

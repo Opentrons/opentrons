@@ -3,10 +3,11 @@ import { renderHook } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getLocalRobot } from '/app/redux/discovery'
-import { getLocalRobotAuthState, logOutOrTimeOut } from '/app/redux/robot-auth'
+import { useSelfQuery } from '@opentrons/react-api-client'
 
-import { useAccountInfo, useLogOut } from '../hooks'
+import { getLocalRobotAuthState } from '/app/redux/robot-auth'
+
+import { useAccountInfo } from '../hooks'
 
 import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'
@@ -28,6 +29,10 @@ vi.mock('/app/redux/robot-auth', async importOriginal => {
   }
 })
 
+vi.mock('@opentrons/react-api-client', () => ({
+  useSelfQuery: vi.fn(),
+}))
+
 const store: Store<State> = legacy_createStore(state => state, {} as State)
 
 describe('useAccountInfo', () => {
@@ -35,13 +40,18 @@ describe('useAccountInfo', () => {
 
   beforeEach(() => {
     wrapper = ({ children }) => <Provider store={store}>{children}</Provider>
+    vi.mocked(useSelfQuery).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: false,
+    } as any)
   })
 
   afterEach(() => {
     vi.resetAllMocks()
   })
 
-  it('returns logged-out fields when there is no local robot auth state', () => {
+  it('returns logged-out values for all fields when there is no local robot auth state', () => {
     vi.mocked(getLocalRobotAuthState).mockReturnValue(null)
 
     const { result } = renderHook(() => useAccountInfo(), { wrapper })
@@ -49,64 +59,85 @@ describe('useAccountInfo', () => {
     expect(result.current).toStrictEqual({
       isLoggedIn: false,
       username: null,
-      legalName: null,
+      fullName: null,
     })
   })
 
-  it('returns username and legalName when logged in', () => {
+  it('returns username and fullName when logged in', () => {
     vi.mocked(getLocalRobotAuthState).mockReturnValue({
-      username: 'test-user',
+      user: {
+        username: 'test-user',
+        fullName: 'Test User Name',
+        accountType: 'user',
+      },
       accessToken: 'token',
       refreshToken: null,
       expiresAt: null,
     })
+    vi.mocked(useSelfQuery).mockReturnValue({
+      data: {
+        data: {
+          username: 'test-user',
+          fullName: 'Test User Name',
+          accountType: 'user',
+          locked: false,
+          resetPassword: false,
+        },
+      },
+      isLoading: false,
+      isError: false,
+    } as any)
 
     const { result } = renderHook(() => useAccountInfo(), { wrapper })
 
     expect(result.current).toStrictEqual({
       isLoggedIn: true,
       username: 'test-user',
-      // todo(mm, 2026-05-01): This is a placeholder. Get the actual legal name once
-      // https://opentrons.atlassian.net/browse/EXEC-2610 is resolved and react-api-client
-      // can send requests with auth tokens.
-      legalName: 'test-user',
+      fullName: 'Test User Name',
     })
   })
-})
 
-describe('useLogOut', () => {
-  let wrapper: FunctionComponent<{ children: ReactNode }>
+  it('returns null fullName while profile is loading', () => {
+    vi.mocked(getLocalRobotAuthState).mockReturnValue({
+      user: {
+        username: 'test-user',
+        fullName: 'Test User Name',
+        accountType: 'user',
+      },
+      accessToken: 'token',
+      refreshToken: null,
+      expiresAt: null,
+    })
+    vi.mocked(useSelfQuery).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      isError: false,
+    } as any)
 
-  beforeEach(() => {
-    store.dispatch = vi.fn()
-    wrapper = ({ children }) => <Provider store={store}>{children}</Provider>
+    const { result } = renderHook(() => useAccountInfo(), { wrapper })
+
+    expect(result.current.fullName).toBeNull()
   })
 
-  afterEach(() => {
-    vi.resetAllMocks()
-  })
+  it('returns null fullName when profile request errors', () => {
+    vi.mocked(getLocalRobotAuthState).mockReturnValue({
+      user: {
+        username: 'test-user',
+        fullName: 'Test User Name',
+        accountType: 'user',
+      },
+      accessToken: 'token',
+      refreshToken: null,
+      expiresAt: null,
+    })
+    vi.mocked(useSelfQuery).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+    } as any)
 
-  it('dispatches logOutOrTimeOut when the local robot name is known', () => {
-    vi.mocked(getLocalRobot).mockReturnValue({
-      name: 'my-robot',
-    } as ReturnType<typeof getLocalRobot>)
+    const { result } = renderHook(() => useAccountInfo(), { wrapper })
 
-    const { result } = renderHook(() => useLogOut(), { wrapper })
-
-    result.current()
-
-    expect(store.dispatch).toHaveBeenCalledWith(
-      logOutOrTimeOut({ robotName: 'my-robot' })
-    )
-  })
-
-  it('does not dispatch when the local robot cannot be resolved', () => {
-    vi.mocked(getLocalRobot).mockReturnValue(null)
-
-    const { result } = renderHook(() => useLogOut(), { wrapper })
-
-    result.current()
-
-    expect(store.dispatch).not.toHaveBeenCalled()
+    expect(result.current.fullName).toBeNull()
   })
 })

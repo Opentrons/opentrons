@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 
 import { getProtocolAnalysisAsDocument } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
@@ -14,7 +14,7 @@ export function useProtocolAnalysisAsDocumentQuery(
 ): UseQueryResult<CompletedProtocolAnalysis | null> {
   const host = useHost()
   const query = useQuery<CompletedProtocolAnalysis>(
-    [host, 'protocols', protocolId, 'analyses', analysisId],
+    getQueryKey(host, 'protocols', protocolId, 'analyses', analysisId),
     () =>
       getProtocolAnalysisAsDocument(host!, protocolId!, analysisId!).then(
         response => response.data

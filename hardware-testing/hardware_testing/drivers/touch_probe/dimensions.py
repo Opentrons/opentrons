@@ -1,5 +1,5 @@
 """Data and configuration ."""
-from hardware_testing.opentrons_api.types import Point
+from opentrons.types import Point
 from typing import Optional
 from dataclasses import dataclass
 

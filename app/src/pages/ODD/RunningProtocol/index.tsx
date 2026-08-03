@@ -19,6 +19,7 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useToastOnErrorImage } from '/app/local-resources/images/hooks/useToastOnErrorImage'
 import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import {
@@ -107,10 +108,12 @@ export function RunningProtocol(): JSX.Element {
     staleTime: Infinity,
   })
 
+  const docstate = useDocumentationState()
+
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
-  const { playRun, pauseRun } = useRunActionMutations(runId)
+  const { playRun, pauseRun } = useRunActionMutations(runId, docstate)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot != null ? localRobot.name : 'no name'
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)

@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_FIXTURES,
   FLEX_STACKER_MODULE_TYPE,
   getDeckDefFromRobotType,
   getModuleDef,
@@ -48,7 +49,6 @@ import { WasteChuteStagingAreaFixture } from './WasteChuteStagingAreaFixture'
 
 import type { ComponentProps, ReactNode } from 'react'
 import type {
-  CutoutFixtureId,
   DeckConfiguration,
   LabwareDefinition,
   LabwareLocation,
@@ -152,25 +152,31 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
   } = props
   const deckDef = getDeckDefFromRobotType(robotType)
 
-  const singleSlotFixtures = deckConfig.filter(
-    fixture =>
-      fixture.cutoutFixtureId != null &&
-      (SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId) ||
-        // If module fixture is loaded, still visualize singleSlotFixture underneath for consistency
-        Object.entries(MODULE_FIXTURES_BY_MODEL)
-          .reduce<CutoutFixtureId[]>(
-            (acc, [_model, fixtures]) => [...acc, ...fixtures],
-            []
-          )
-          .includes(fixture.cutoutFixtureId))
-  )
+  const singleSlotFixtures = deckConfig.filter(fixture => {
+    if (fixture.cutoutFixtureId == null) return false
+
+    const isSingleSlotLike =
+      SINGLE_SLOT_FIXTURES.includes(fixture.cutoutFixtureId) ||
+      Object.values(MODULE_FIXTURES_BY_MODEL)
+        .flat()
+        .includes(fixture.cutoutFixtureId)
+
+    const isFlexStacker = FLEX_STACKER_FIXTURES.includes(
+      fixture.cutoutFixtureId
+    )
+
+    return isSingleSlotLike && !isFlexStacker
+  })
+
   const stagingAreaFixtures = deckConfig.filter(
     fixture =>
-      (fixture.cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE ||
+      ((fixture.cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE ||
         fixture.cutoutFixtureId ===
           STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE) &&
-      STAGING_AREA_CUTOUTS.includes(fixture.cutoutId)
+        STAGING_AREA_CUTOUTS.includes(fixture.cutoutId)) ||
+      FLEX_STACKER_FIXTURES.includes(fixture.cutoutFixtureId)
   )
+
   const trashBinFixtures = deckConfig.filter(
     fixture =>
       fixture.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE &&
@@ -632,8 +638,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           ({ moduleModel, moduleLocation, stacked = false }) => {
             const moduleDef = getModuleDef(moduleModel)
             const parentSlotName =
-              moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE ||
-              moduleDef.moduleType === VACUUM_MODULE_TYPE
+              moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE
                 ? getStagingColumnSlotName(moduleLocation.slotName)
                 : moduleLocation.slotName
             const parentSlotPosition = getPositionFromSlotId(

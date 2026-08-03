@@ -12,6 +12,7 @@ from typing import (
     Sequence,
     Tuple,
     Union,
+    cast,
 )
 
 from typing_extensions import TypeGuard
@@ -35,7 +36,13 @@ from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel,
     VacuumModuleModel,
 )
-from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
+from opentrons.protocols.api_support.types import (
+    APIVersion,
+    ThermocyclerStep,
+    VacuumModulePowerStep,
+    VacuumModulePressureStep,
+    VacuumModuleStep,
+)
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import (
     AxisMapType,
@@ -101,6 +108,10 @@ class InvalidTrashBinLocationError(ValueError):
 
 class InvalidFixtureLocationError(ValueError):
     """An error raised when attempting to load a fixture in an invalid cutout."""
+
+
+class IsNegativeValueError(ValueError):
+    """An error raised when a negative number is encountered when expecting only positive ones."""
 
 
 def is_pipette_96_channel(pipette: Optional[PipetteNameType]) -> bool:
@@ -488,8 +499,8 @@ def ensure_hold_time_seconds(
     return seconds
 
 
-def ensure_thermocycler_repetition_count(repetitions: int) -> int:
-    """Ensure thermocycler repetitions is a positive integer."""
+def ensure_profile_repetition_count(repetitions: int) -> int:
+    """Ensure module cycle repetitions is a positive integer."""
     if repetitions <= 0:
         raise ValueError("repetitions must be a positive integer")
     return repetitions
@@ -523,6 +534,107 @@ def ensure_thermocycler_profile_steps(
             )
         )
     return validated_steps
+
+
+def _check_vm_step_base_values(step: VacuumModuleStep) -> None:
+    ramp_rate = step.get("ramp_rate")
+    timeout_s = step.get("timeout_seconds")
+
+    if timeout_s is not None and timeout_s <= 0:
+        raise ValueError("timeout_s must be greater than 0")
+    if ramp_rate is not None and (ramp_rate <= 0 or ramp_rate > 400):
+        raise ValueError("ramp rate must be between 0 and 400 mbar/sec")
+
+
+def _ensure_vacuum_module_step(
+    step: VacuumModuleStep, max_pressure: int, min_pressure: int
+) -> VacuumModuleStep:
+    unverified_enable_pump = step.get("enable_pump")
+    ramp_rate = step.get("ramp_rate")
+    timeout_s = step.get("timeout_seconds")
+    hold_time_minutes = step.get("hold_time_minutes")
+    hold_time_seconds = step.get("hold_time_seconds")
+    vent_after = step.get("vent_after")
+    unverified_percent_power = step.get("percent_power")
+    unverified_gauge_pressure_mbar = step.get("gauge_pressure_mbar")
+
+    enable_pump = (
+        unverified_enable_pump if unverified_enable_pump is not None else False
+    )
+
+    _check_vm_step_base_values(step=step)
+    if not enable_pump:
+        if (
+            unverified_percent_power is not None
+            or unverified_gauge_pressure_mbar is not None
+        ):
+            raise ValueError("cannot disable pump and issue power/pressure command")
+
+    if hold_time_minutes is None and hold_time_seconds is None:
+        validated_seconds = None
+    else:
+        validated_seconds = int(
+            ensure_hold_time_seconds(hold_time_seconds, hold_time_minutes)
+        )
+
+    if (
+        unverified_percent_power is not None
+        and unverified_gauge_pressure_mbar is not None
+    ):
+        raise ValueError(
+            "steps can have only one of percent_power or gauge_pressure_mbar"
+        )
+    if unverified_percent_power is not None:
+        percent_power = cast(VacuumModulePowerStep, step).get("percent_power")
+        assert percent_power is not None
+        if percent_power < 0 or percent_power > 100:
+            raise ValueError("percent_power must be between 0 and 100")
+        return VacuumModulePowerStep(
+            enable_pump=enable_pump,
+            hold_time_seconds=validated_seconds,
+            ramp_rate=ramp_rate,
+            timeout_seconds=timeout_s,
+            vent_after=vent_after,
+            percent_power=percent_power,
+        )
+    else:
+        # default to pressure step in case neither pressure nor power is present
+        if unverified_gauge_pressure_mbar is not None:
+            gauge_pressure_mbar = cast(VacuumModulePressureStep, step).get(
+                "gauge_pressure_mbar"
+            )
+            assert gauge_pressure_mbar is not None
+            if gauge_pressure_mbar > min_pressure or gauge_pressure_mbar < max_pressure:
+                raise ValueError(
+                    f"Gauge pressure {gauge_pressure_mbar} invalid must be between {max_pressure} and {min_pressure} mbar."
+                )
+        else:
+            gauge_pressure_mbar = unverified_gauge_pressure_mbar
+        return VacuumModulePressureStep(
+            enable_pump=enable_pump,
+            hold_time_seconds=validated_seconds,
+            ramp_rate=ramp_rate,
+            timeout_seconds=timeout_s,
+            vent_after=vent_after,
+            gauge_pressure_mbar=gauge_pressure_mbar,
+        )
+
+
+def ensure_vacuum_module_profile(
+    steps: List[VacuumModuleStep], max_pressure: int, min_pressure: int
+) -> List[VacuumModuleStep]:
+    """Ensure vacuum module steps are valid and hold time is expressed in seconds only."""
+    # HAVE TO HAVE PE COMMAND TAKE IN ONLY SECONDS
+    validated_profile: List[VacuumModuleStep] = []
+    for step in steps:
+        validated_profile.append(
+            _ensure_vacuum_module_step(
+                step=step,
+                max_pressure=max_pressure,
+                min_pressure=min_pressure,
+            )
+        )
+    return validated_profile
 
 
 def is_all_integers(items: Sequence[Any]) -> TypeGuard[Sequence[int]]:
@@ -671,14 +783,14 @@ def validate_location(
 def ensure_boolean(value: bool) -> bool:
     """Ensure value is a boolean."""
     if not isinstance(value, bool):
-        raise ValueError("Value must be a boolean.")
+        raise ValueError(f"Value must be a boolean but it is {value}.")
     return value
 
 
 def ensure_float(value: Union[int, float]) -> float:
     """Ensure value is a float (or an integer) and return it as a float."""
     if not isinstance(value, (int, float)):
-        raise ValueError("Value must be a floating point number.")
+        raise ValueError(f"Value must be a floating point number but it is {value}.")
     return float(value)
 
 
@@ -688,7 +800,7 @@ def ensure_positive_float(value: Union[int, float]) -> float:
     if isnan(float_value) or isinf(float_value):
         raise ValueError("Value must be a defined, non-infinite number.")
     if float_value < 0:
-        raise ValueError("Value must be a positive float.")
+        raise IsNegativeValueError(f"Value must be a positive float but it is {value}.")
     return float_value
 
 
@@ -698,25 +810,31 @@ def ensure_greater_than_zero_float(value: Union[int, float]) -> float:
     if isnan(float_value) or isinf(float_value):
         raise ValueError("Value must be a defined, non-infinite number.")
     if float_value <= 0:
-        raise ValueError("Value must be a positive float greater than 0.")
+        raise ValueError(
+            f"Value must be a positive float greater than 0, but it is {value}."
+        )
     return float_value
 
 
 def ensure_positive_int(value: int) -> int:
     """Ensure value is a positive integer."""
     if not isinstance(value, int):
-        raise ValueError("Value must be an integer.")
+        raise ValueError(f"Value must be an integer but it is {value}.")
     if value < 0:
-        raise ValueError("Value must be a positive integer.")
+        raise ValueError(f"Value must be a positive integer but it is {value}.")
     return value
 
 
 def validate_coordinates(value: Sequence[float]) -> Tuple[float, float, float]:
     """Ensure value is a valid sequence of 3 floats and return a tuple of 3 floats."""
     if len(value) != 3:
-        raise ValueError("Coordinates must be a sequence of exactly three numbers")
+        raise ValueError(
+            f"Coordinates must be a sequence of exactly three numbers but received: {value}"
+        )
     if not all(isinstance(v, (float, int)) for v in value):
-        raise ValueError("All values in coordinates must be floats.")
+        raise ValueError(
+            f"All values in coordinates must be floats but they are: {value}."
+        )
     return float(value[0]), float(value[1]), float(value[2])
 
 

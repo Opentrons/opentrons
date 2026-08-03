@@ -32,14 +32,16 @@
 
 .annotated_group_expanded {
   display: flex;
-
-  /* TODO: make max height dynamic based on amount of space left */
-  max-height: 18.75rem;
   flex-direction: column;
   padding: var(--spacing-8);
   border-bottom: 1px solid var(--grey-30);
   gap: var(--spacing-4);
   overflow-y: auto;
+}
+
+.annotated_group_expanded_natural_height {
+  max-height: none;
+  overflow-y: visible;
 }
 
 .annotated_group_expanded::-webkit-scrollbar {
@@ -130,6 +132,7 @@
 .annotated_steps_list {
   width: 100%;
   height: 100%;
+  scrollbar-gutter: stable;
 }
 
 .annotated_steps_row {
@@ -141,6 +144,14 @@
   display: flex;
   flex-direction: column;
   padding: var(--spacing-8) var(--spacing-12);
+  gap: var(--spacing-4);
+}
+
+.annotated_steps_error_wrapper_in_group {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  padding: 0 var(--spacing-4);
   gap: var(--spacing-4);
 }
 
@@ -166,13 +177,15 @@
   gap: var(--spacing-4);
 }
 
-.annotated_steps_final_command {
+.annotated_steps_error_footer_message {
   display: flex;
   width: 100%;
-  padding: var(--spacing-8);
-  border-radius: var(--border-radius-4);
-  background-color: var(--grey-20);
-  transition:
-    background-color 500ms ease-out,
-    border-color 500ms ease-out;
+  flex-direction: column;
+  align-items: center;
+  padding-top: var(--spacing-4);
+  text-align: center;
+}
+
+.annotated_steps_past_steps_row {
+  padding: var(--spacing-8) var(--spacing-12);
 }

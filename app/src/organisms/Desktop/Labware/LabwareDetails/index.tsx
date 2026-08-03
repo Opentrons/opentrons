@@ -3,20 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 
 import {
-  ALIGN_CENTER,
-  BORDERS,
-  Box,
   COLORS,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  Flex,
   Icon,
-  JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   Link,
-  OVERFLOW_WRAP_ANYWHERE,
-  SIZE_1,
-  SPACING,
   Tooltip,
   TOOLTIP_TOP_START,
   TYPOGRAPHY,
@@ -35,7 +25,7 @@ import { Dimensions } from './Dimensions'
 import { Gallery } from './Gallery'
 import { getWellLabel } from './helpers/labels'
 import { InsertDetails } from './InsertDetails'
-import styles from './LabwareDetails.module.css'
+import styles from './labwaredetails.module.css'
 import { ManufacturerDetails } from './ManufacturerDetails'
 import { WellCount } from './WellCount'
 import { WellDimensions } from './WellDimensions'
@@ -69,9 +59,10 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
     placement: TOOLTIP_TOP_START,
   })
 
-  const handleCopy = async (): Promise<void> => {
-    await navigator.clipboard.writeText(apiName)
-    setShowToolTip(true)
+  const handleCopy = (): void => {
+    void navigator.clipboard.writeText(apiName).then(() => {
+      setShowToolTip(true)
+    })
   }
 
   useEffect(() => {
@@ -84,16 +75,8 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   }, [showToolTip])
 
   const slideoutHeader = (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing4}
-      paddingX={SPACING.spacing16}
-      marginBottom={SPACING.spacing16}
-    >
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-      >
+    <div className={styles.slideout_header_container}>
+      <div className={styles.slideout_header_content}>
         <LegacyStyledText css={TYPOGRAPHY.h2SemiBold}>
           {displayName}
         </LegacyStyledText>
@@ -102,85 +85,61 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           role="button"
           data-testid="labwareDetails_slideout_close_button"
         >
-          <Icon
-            name="close"
-            height={SPACING.spacing24}
-            className={styles.close_icon}
-          />
+          <Icon name="close" height="1.5rem" className={styles.close_icon} />
         </Link>
-      </Flex>
+      </div>
       {!isCustomDefinition && (
-        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+        <div className={styles.brand_def_container}>
           <Icon color={COLORS.blue50} name="check-decagram" height=".7rem" />{' '}
           <LegacyStyledText
             forwardedAs="label"
-            id="LabwareDetails_opentronsDef"
-            marginLeft={SPACING.spacing4}
+            className={styles.brand_def_text}
           >
             {t('branded:opentrons_def')}
           </LegacyStyledText>
-        </Flex>
+        </div>
       )}
       {modified != null && filename != null && (
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          paddingRight={SPACING.spacing2}
-          alignItems={ALIGN_CENTER}
-        >
-          <LegacyStyledText
-            forwardedAs="label"
-            color={COLORS.grey50}
-            id="LabwareDetails_dateAdded"
-          >
+        <div className={styles.last_updated_container}>
+          <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
             {t('last_updated')} {format(new Date(modified), 'MM/dd/yyyy')}
           </LegacyStyledText>
           <CustomLabwareOverflowMenu
             filename={filename}
             onDelete={props.onClose}
           />
-        </Flex>
+        </div>
       )}
-    </Flex>
+    </div>
   )
 
   return (
     <Slideout onCloseClick={props.onClose} title={slideoutHeader} isExpanded>
       <Gallery definition={definition} />
-      <Box
-        backgroundColor={COLORS.grey20}
-        padding={SPACING.spacing16}
-        marginBottom={SPACING.spacing24}
-        borderRadius={BORDERS.borderRadius4}
-      >
+      <div className={styles.api_name_container}>
         <LegacyStyledText forwardedAs="h6">{t('api_name')}</LegacyStyledText>
         <Link
-          css={TYPOGRAPHY.pRegular}
+          className={styles.api_name_link}
           onClick={handleCopy}
           role="button"
           aria-label="copy"
         >
-          <Flex overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
-            <Box fontSize={TYPOGRAPHY.fontSizeP} color={COLORS.black90}>
-              {apiName}
-              <span {...targetProps}>
-                <Icon
-                  size={SIZE_1}
-                  name="copy-text"
-                  className={styles.copy_icon}
-                />
-              </span>
-            </Box>
-          </Flex>
+          <div className={styles.api_name_content}>
+            {apiName}
+            <span {...targetProps} className={styles.copy_icon_container}>
+              <Icon size="1rem" name="copy-text" className={styles.copy_icon} />
+            </span>
+          </div>
+
           {showToolTip && (
             <Tooltip width="3.25rem" tooltipProps={tooltipProps}>
               {t('copied')}
             </Tooltip>
           )}
         </Link>
-      </Box>
-      <Box border={BORDERS.lineBorder} borderRadius={BORDERS.borderRadius4}>
-        <Box padding={SPACING.spacing16}>
+      </div>
+      <div className={styles.table_contaienr}>
+        <div className={styles.table_content}>
           <WellCount
             wellLabel={getWellLabel(definition)}
             count={Object.keys(wells).length}
@@ -238,9 +197,9 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
               </Fragment>
             )
           })}
-        </Box>
+        </div>
         <ManufacturerDetails brand={brand} />
-      </Box>
+      </div>
       {hasInserts && <InsertDetails definition={definition} />}
     </Slideout>
   )

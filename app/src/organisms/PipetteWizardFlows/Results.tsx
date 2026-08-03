@@ -3,9 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
+  ALIGN_CENTER,
   ALIGN_FLEX_END,
   Btn,
   COLORS,
+  Flex,
+  JUSTIFY_FLEX_END,
   LegacyStyledText,
   PrimaryButton,
   RESPONSIVENESS,
@@ -17,6 +20,7 @@ import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { usePipetteNameSpecs } from '/app/local-resources/instruments'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
@@ -60,6 +64,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
     requiredPipette,
     errorMessage,
     setShowErrorMessage,
+    isDoorOpenError,
+    setIsDoorOpenError,
+    dismissDoorOpenError,
     nextMount,
   } = props
   const { t, i18n } = useTranslation([
@@ -67,6 +74,15 @@ export const Results = (props: ResultsProps): JSX.Element => {
     'shared',
     'branded',
   ])
+
+  const handleCommandError = (error: Error): void => {
+    if (isMaintenanceDoorOpenError(error)) {
+      setIsDoorOpenError(true)
+      setShowErrorMessage(t('door_is_open') as string)
+    } else {
+      setShowErrorMessage(error.message)
+    }
+  }
   const pipetteName =
     attachedPipettes[mount] != null ? attachedPipettes[mount]?.displayName : ''
 
@@ -163,8 +179,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
             commandType: 'calibration/moveToMaintenancePosition' as const,
             params: {
               mount: nextMount === 'right' ? RIGHT : 'left',
-              maintenancePosition:
-                nextMount === 'both' ? 'attachPlate' : 'attachInstrument',
+              ...(nextMount === 'both'
+                ? { motionModifier: 'lowerZAxesSequentially' as const }
+                : {}),
             },
           },
         ],
@@ -173,9 +190,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
         .then(() => {
           proceed()
         })
-        .catch(error => {
-          setShowErrorMessage(error.message as string)
-        })
+        .catch(handleCommandError)
     } else if (
       isSuccess &&
       flowType === FLOWS.ATTACH &&
@@ -206,9 +221,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
         .then(() => {
           proceed()
         })
-        .catch(error => {
-          setShowErrorMessage(error.message as string)
-        })
+        .catch(handleCommandError)
     } else {
       proceed()
     }
@@ -297,7 +310,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
           proceed={() => {
             setNumberOfTryAgains(numberOfTryAgains + 1)
           }}
-          proceedButtonText={i18n.format(t('try_again'), 'capitalize')}
+          proceedButtonText={t('try_again')}
           setFetching={setFetching}
           isFetching={isFetching}
           isOnDevice={isOnDevice}
@@ -309,7 +322,32 @@ export const Results = (props: ResultsProps): JSX.Element => {
     return <SimpleWizardInProgressBody description={t('stand_back')} />
   }
   if (errorMessage != null) {
-    return (
+    return isDoorOpenError ? (
+      <SimpleWizardBody
+        isSuccess={false}
+        iconColor={COLORS.red50}
+        header={t('door_is_open')}
+        subHeader={t('close_door_and_try_again')}
+      >
+        <Flex
+          width="100%"
+          justifyContent={JUSTIFY_FLEX_END}
+          alignItems={Boolean(isOnDevice) ? ALIGN_CENTER : ALIGN_FLEX_END}
+          gridGap={SPACING.spacing8}
+        >
+          {Boolean(isOnDevice) ? (
+            <SmallButton
+              buttonText={t('try_again')}
+              onClick={dismissDoorOpenError}
+            />
+          ) : (
+            <PrimaryButton onClick={dismissDoorOpenError}>
+              {t('try_again')}
+            </PrimaryButton>
+          )}
+        </Flex>
+      </SimpleWizardBody>
+    ) : (
       <SimpleWizardBody
         isSuccess={false}
         iconColor={COLORS.red50}

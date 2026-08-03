@@ -1,5 +1,4 @@
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
@@ -9,6 +8,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   Overlay,
   POSITION_ABSOLUTE,
+  PrimaryButton,
   SecondaryButton,
   SPACING,
   StyledText,
@@ -79,9 +79,12 @@ export function OverlayModal(props: OverlayModalProps): JSX.Element {
             </SecondaryButton>
           )}
           {primaryButtonProps && (
-            <AlertPrimaryButton onClick={primaryButtonProps?.onClick}>
+            <PrimaryButton
+              variant="warning"
+              onClick={primaryButtonProps?.onClick}
+            >
               {primaryButtonProps?.text}
-            </AlertPrimaryButton>
+            </PrimaryButton>
           )}
         </Flex>
       </Flex>

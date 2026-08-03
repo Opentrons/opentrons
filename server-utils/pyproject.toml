@@ -1,7 +1,7 @@
 [project]
 name = 'server_utils'
 
-requires-python = '>=3.10'
+requires-python = '>=3.11'
 license = 'Apache-2.0'
 authors = [{name = "Opentrons", email = "engineering@opentrons.com"}]
 classifiers = [
@@ -14,7 +14,6 @@ dependencies = [
     "anyio==4.9.0",
     "fastapi==0.100.0",
     "python-dotenv==1.0.1",
-    "python-multipart==0.0.6",
     "pydantic>2.0.0,<3",
     "pydantic-settings>=2.0.0,<3",
     "typing-extensions>=4.0.0,<5",
@@ -49,6 +48,7 @@ dev = [
     "sqlalchemy2-stubs==0.0.2a38",
     "build~=1.2.0",
     "setuptools==80.9.0",
+    "python-multipart==0.0.28",
 ]
 
 [tool.ruff.lint]
@@ -97,7 +97,7 @@ source = 'vcs-tunable'
 
 [tool.hatch.version.raw-options]
 root = '..'
-git_describe_command = 'git describe --dirty --tags --long --match=v*'
+git_describe_command = 'git describe --dirty --tags --long --match=v[0-9]*.[0-9]*'
 fallback_version='0.0.0-dev'
 # Note: these are required for setuptools_scm to not automatically bump the version used in the package
 # from the latest version it detects. This would actually be kind of useful, but we can only do it if
@@ -119,6 +119,9 @@ addopts = ["--color=yes", "--strict-markers"]
 asyncio_mode = "auto"
 filterwarnings = [
     "error::pydantic.PydanticDeprecatedSince20",
+    # FastAPI 0.100.0 calls pydantic_core's deprecated `general_plain_validator_function`
+    # internally. Ignore until we upgrade FastAPI.
+    "ignore:`general_plain_validator_function` is deprecated:DeprecationWarning",
 ]
 
 [tool.mypy]

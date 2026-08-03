@@ -3,56 +3,56 @@
   "moduleType": "vacuumModuleType",
   "model": "vacuumModuleV1",
   "labwareOffset": {
-    "x": 999999,
-    "y": 999999,
-    "z": 999999
+    "x": 0,
+    "y": 0,
+    "z": 19
   },
   "features": {},
   "dimensions": {
-    "bareOverallHeight": 999999,
-    "overLabwareHeight": 999999,
-    "xDimension": 999999,
-    "yDimension": 999999,
-    "footprintXDimension": 128,
-    "footprintYDimension": 86,
+    "bareOverallHeight": 37,
+    "overLabwareHeight": 0,
+    "xDimension": 143,
+    "yDimension": 101.5,
+    "footprintXDimension": 143,
+    "footprintYDimension": 101.5,
     "labwareInterfaceXDimension": 128,
     "labwareInterfaceYDimension": 86
   },
   "extents": {
     "total": {
       "backLeftBottom": {
-        "x": 999999,
-        "y": 999999,
-        "z": 999999
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
       "frontRightTop": {
-        "x": 999999,
-        "y": 999999,
-        "z": 999999
+        "x": 143,
+        "y": 101.5,
+        "z": 37
       }
     }
   },
   "cornerOffsetFromSlot": {
-    "x": 999999,
-    "y": 999999,
-    "z": 999999
+    "x": 0,
+    "y": 0,
+    "z": 0
   },
   "calibrationPoint": {
-    "x": 999999,
-    "y": 999999,
-    "z": 999999
+    "x": 0,
+    "y": 0,
+    "z": 0
   },
   "gripperOffsets": {
     "default": {
       "pickUpOffset": {
-        "x": 999999,
-        "y": 999999,
-        "z": 999999
+        "x": 0,
+        "y": 0,
+        "z": 1
       },
       "dropOffset": {
-        "x": 999999,
-        "y": 999999,
-        "z": 999999
+        "x": 0,
+        "y": 0,
+        "z": 2
       }
     }
   },
@@ -60,10 +60,7 @@
   "quirks": [],
   "slotTransforms": {},
   "orientation": {
-    "A3": "right",
-    "A4": "right",
-    "D3": "right",
-    "D4": "right"
+    "A3": "right"
   },
   "compatibleWith": [],
   "incompatibleWithDecks": ["ot2_standard", "ot2_short_trash"]

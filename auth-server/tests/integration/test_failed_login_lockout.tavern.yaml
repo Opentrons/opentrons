@@ -47,7 +47,7 @@ stages:
       data: &wrong_credentials
         client_id: opentrons_app
         grant_type: password
-        username: test_user
+        username: testuser
         password: not_the_right_password
     response:
       status_code: 400
@@ -87,8 +87,8 @@ stages:
       data: &correct_credentials
         client_id: opentrons_app
         grant_type: password
-        username: test_user
-        password: test_user_password
+        username: testuser
+        password: testuserpassword
     response:
       status_code: 400
       json: &locked_out_response
@@ -112,15 +112,15 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: password
-        username: test_admin
-        password: test_admin_password
+        username: testadmin
+        password: testadminpassword
     response:
       status_code: 200
 
   - name: Use admin credentials to see the lockout
     request:
       method: GET
-      url: '{run_server.base_url}/auth/users/test_user'
+      url: '{run_server.base_url}/auth/users/byUsername/testuser'
       headers:
         Authorization: '{admin_access_token}'
     response:
@@ -134,7 +134,7 @@ stages:
   - name: Use admin credentials to clear the lockout
     request:
       method: PATCH
-      url: '{run_server.base_url}/auth/users/test_user'
+      url: '{run_server.base_url}/auth/users/byUsername/testuser'
       headers:
         Authorization: '{admin_access_token}'
       json:
@@ -230,8 +230,8 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: password
-        username: test_admin
-        password: test_admin_password
+        username: testadmin
+        password: testadminpassword
     response:
       status_code: 200
 
@@ -254,8 +254,8 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: password
-        username: test_user
-        password: test_user_password
+        username: testuser
+        password: testuserpassword
     response:
       status_code: 200
 
@@ -351,7 +351,6 @@ stages:
       status_code: 200
       json:
         data:
-
           maxNumberOfLoginAttempts: 4
       strict:
         - json:off

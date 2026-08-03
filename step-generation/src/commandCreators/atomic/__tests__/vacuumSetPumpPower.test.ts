@@ -56,7 +56,7 @@ describe('vacuumSetPumpPower', () => {
       {
         moduleId: vacuumModuleId,
         commandCreatorFnName: 'vacuumSetPumpPower',
-        powerPercent: 75,
+        percentPower: 75,
       },
       invariantContext,
       robotState
@@ -73,8 +73,8 @@ describe('vacuumSetPumpPower', () => {
         },
       ],
       python: `
-mock_vacuum_module.set_power(
-    power_percent=75
+mock_vacuum_module.start_set_vacuum_power(
+    percent_power=75
 )`.trim(),
     })
   })
@@ -84,7 +84,7 @@ mock_vacuum_module.set_power(
       {
         moduleId: vacuumModuleId,
         commandCreatorFnName: 'vacuumSetPumpPower',
-        powerPercent: 40,
+        percentPower: 40,
         duration: 120,
         ventAfter: false,
       },
@@ -106,9 +106,9 @@ mock_vacuum_module.set_power(
         },
       ],
       python: `
-mock_vacuum_module_task_1 = mock_vacuum_module.set_power(
-    power_percent=40,
-    duration=120,
+mock_vacuum_module_task_1 = mock_vacuum_module.start_set_vacuum_power(
+    percent_power=40,
+    duration_s=120,
     vent_after=False
 )`.trim(),
     })
@@ -119,7 +119,7 @@ mock_vacuum_module_task_1 = mock_vacuum_module.set_power(
       {
         moduleId: 'missingVacuum',
         commandCreatorFnName: 'vacuumSetPumpPower',
-        powerPercent: 50,
+        percentPower: 50,
       },
       invariantContext,
       robotState
@@ -135,7 +135,7 @@ mock_vacuum_module_task_1 = mock_vacuum_module.set_power(
             ...VACUUM_MODULE_INITIAL_STATE,
             currentPumpActivity: {
               type: 'profile',
-              profileElements: [{ holdSeconds: 2, powerPercent: 20 }],
+              profileElements: [{ holdSeconds: 2, percentPower: 20 }],
               taskId: 'p-1',
               ventAfter: true,
             },
@@ -147,7 +147,7 @@ mock_vacuum_module_task_1 = mock_vacuum_module.set_power(
       {
         moduleId: vacuumModuleId,
         commandCreatorFnName: 'vacuumSetPumpPower',
-        powerPercent: 10,
+        percentPower: 10,
       },
       invariantContext,
       busyRobot

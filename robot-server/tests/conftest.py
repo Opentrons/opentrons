@@ -5,7 +5,7 @@ import tempfile
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable, Generator, Iterator, cast
+from typing import AsyncIterator, Callable, Generator, Iterator, cast
 
 import pytest
 from _pytest.mark import deselect_by_mark
@@ -35,12 +35,19 @@ from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLoc
 from opentrons.protocol_api import labware
 from opentrons.types import Mount, Point
 from opentrons_shared_data.labware.types import LabwareDefinition
-from server_utils.auth.resource_server.authorization_checker import (
-    AlwaysAllowedAuthorizationChecker,
-    AuthorizationChecker,
+from server_utils.audit.audit_server import (
+    AuditSettingsResponseData,
+)
+from server_utils.audit.audit_server import (
+    Client as AuditClient,
+)
+from server_utils.audit.fastapi import get_audit_client, install_audit_client
+from server_utils.auth.resource_server.authentication_checker import (
+    AlwaysAllowedAuthenticationChecker,
+    AuthenticationChecker,
 )
 from server_utils.auth.resource_server.fastapi import (
-    get_authorization_checker,
+    get_authentication_checker,
 )
 
 from robot_server.app import app
@@ -230,17 +237,43 @@ def _override_notification_client_with_mock(decoy: Decoy) -> Iterator[None]:
 
 
 @pytest.fixture
-def _override_authorization_checker_with_always_allowed(decoy: Decoy) -> Iterator[None]:
-    authorization_checker = AlwaysAllowedAuthorizationChecker()
+def _override_authentication_checker_with_always_allowed(
+    decoy: Decoy,
+) -> Iterator[None]:
+    authentication_checker = AlwaysAllowedAuthenticationChecker()
 
-    async def get_authorization_checker_override() -> AuthorizationChecker:
-        return authorization_checker
+    async def get_authentication_checker_override() -> AuthenticationChecker:
+        return authentication_checker
 
-    app.dependency_overrides[get_authorization_checker] = (
-        get_authorization_checker_override
+    app.dependency_overrides[get_authentication_checker] = (
+        get_authentication_checker_override
     )
     yield
-    del app.dependency_overrides[get_authorization_checker]
+    del app.dependency_overrides[get_authentication_checker]
+
+
+@pytest.fixture
+def mock_audit_client(decoy: Decoy) -> AuditClient:
+    return decoy.mock(cls=AuditClient)
+
+
+@pytest.fixture
+async def _override_audit_client_with_mock(
+    mock_audit_client: AuditClient,
+    decoy: Decoy,
+) -> AsyncIterator[None]:
+    def get_audit_client_override() -> AuditClient:
+        return mock_audit_client
+
+    decoy.when(await mock_audit_client.get_settings()).then_return(
+        AuditSettingsResponseData(
+            requireReasonForInteraction=False, minLengthOfReasonForInteraction=None
+        )
+    )
+    app.dependency_overrides[get_audit_client] = get_audit_client_override
+    install_audit_client(app.state, mock_audit_client)
+    yield
+    del app.dependency_overrides[get_audit_client]
 
 
 @pytest.fixture
@@ -250,7 +283,8 @@ def api_client(
     _override_version_with_mock: None,
     _override_ot2_hardware_with_mock: None,
     _override_notification_client_with_mock: None,
-    _override_authorization_checker_with_always_allowed: None,
+    _override_authentication_checker_with_always_allowed: None,
+    _override_audit_client_with_mock: None,
 ) -> TestClient:
     client = TestClient(app)
     client.headers.update(
@@ -267,7 +301,8 @@ def api_client_camera_overrides(
     _override_ot2_hardware_with_mock: None,
     _override_run_data_manager_with_mock: None,
     _override_notification_client_with_mock: None,
-    _override_authorization_checker_with_always_allowed: None,
+    _override_authentication_checker_with_always_allowed: None,
+    _override_audit_client_with_mock: None,
 ) -> TestClient:
     client = TestClient(app)
     client.headers.update(

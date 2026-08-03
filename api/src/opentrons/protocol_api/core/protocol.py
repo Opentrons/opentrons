@@ -129,6 +129,7 @@ class AbstractProtocol(
             StagingSlotName,
             LabwareCoreType,
             ModuleCoreType,
+            ModuleFixtureLocation,
             OffDeckType,
             WasteChute,
             TrashBin,

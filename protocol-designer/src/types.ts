@@ -1,12 +1,14 @@
-import type { FC } from 'react'
+import type { FC, LazyExoticComponent } from 'react'
 import type {
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
+  ModuleType,
   NozzleConfigurationStyle,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import type { RootState as Analytics } from './analytics'
+import type { VACUUM_MODULE_TYPE_WITH_LABWARE } from './constants'
 import type { RootState as Dismiss } from './dismiss'
 import type { RootState as FeatureFlags } from './feature-flags'
 import type { RootState as FileData } from './file-data'
@@ -58,7 +60,7 @@ export interface RouteProps {
   /** the component rendered by a route match
    * drop developed components into slots held by placeholder div components
    * */
-  Component: FC
+  Component: FC | LazyExoticComponent<FC>
   /** a route/page name to render in the nav bar
    */
   name: string
@@ -73,3 +75,6 @@ export type OT2ModuleType =
   | typeof TEMPERATURE_MODULE_TYPE
   | typeof THERMOCYCLER_MODULE_TYPE
   | typeof HEATERSHAKER_MODULE_TYPE
+
+export type ModuleLabwareCompatibilityKey =
+  ModuleType | typeof VACUUM_MODULE_TYPE_WITH_LABWARE

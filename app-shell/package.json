@@ -24,9 +24,7 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "workspaces": {
-    "nohoist": [
-      "**"
-    ]
+    "nohoist": ["**"]
   },
   "devDependencies": {
     "@types/node-fetch": "2.6.11",
@@ -35,15 +33,15 @@
     "electron-publisher-s3": "^20.17.2"
   },
   "dependencies": {
-    "@opentrons/app": "link:../app",
-    "@opentrons/discovery-client": "link:../discovery-client",
-    "@opentrons/shared-data": "link:../shared-data",
-    "@opentrons/step-generation": "link:../step-generation",
+    "@opentrons/app": "workspace:*",
+    "@opentrons/discovery-client": "workspace:*",
+    "@opentrons/shared-data": "workspace:*",
+    "@opentrons/step-generation": "workspace:*",
     "@opentrons/usb-bridge/node-client": "link:../usb-bridge/node-client",
     "@sentry/electron": "7.5.0",
     "@types/dateformat": "^3.0.1",
     "@types/fs-extra": "9.0.13",
-    "@types/lodash": "4.17.24",
+    "@types/lodash": "catalog:",
     "@types/pump": "^1.1.0",
     "agent-base": "6.0.2",
     "ajv": "6.12.3",
@@ -56,14 +54,13 @@
     "electron-localshortcut": "3.2.1",
     "electron-store": "5.1.1",
     "electron-updater": "6.3.9",
-    "escape-string-regexp": "1.0.5",
     "execa": "4.0.0",
-    "form-data": "2.5.4",
+    "form-data": "2.5.6",
     "fs-extra": "10.0.0",
     "get-stream": "5.1.0",
-    "lodash": "4.18.1",
-    "merge-options": "1.0.1",
+    "lodash": "catalog:",
     "mdns-js": "1.0.1",
+    "merge-options": "1.0.1",
     "mqtt": "4.3.8",
     "node-fetch": "2.6.7",
     "node-stream-zip": "1.8.2",
@@ -72,9 +69,7 @@
     "reselect": "4.0.0",
     "semver": "5.7.2",
     "serialport": "10.5.0",
-    "stable": "0.1.8",
     "tempy": "1.0.1",
-    "to-regex": "3.0.2",
     "usb": "^2.11.0",
     "uuid": "14.0.0",
     "winston": "3.15.0",

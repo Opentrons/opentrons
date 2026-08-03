@@ -36,7 +36,7 @@ export const PROTOCOLS_DIRECTORY_PATH = path.join(
   PROTOCOLS_DIRECTORY_NAME
 )
 
-export const NOT_OT2_PROTOCOLS_DIRECTORY_NAME = 'protocols-10.0-plus'
+export const NOT_OT2_PROTOCOLS_DIRECTORY_NAME = 'protocols-9.1-plus'
 export const NOT_OT2_PROTOCOLS_DIRECTORY_PATH = path.join(
   app.getPath('userData'),
   NOT_OT2_PROTOCOLS_DIRECTORY_NAME

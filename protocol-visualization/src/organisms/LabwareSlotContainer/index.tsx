@@ -21,6 +21,7 @@ import { WellContainer } from '../WellContainer'
 import { WellTooltip } from '../WellTooltip'
 import styles from './labwareslotcontainer.module.css'
 
+import type { ReactNode } from 'react'
 import type { WellGroup } from '@opentrons/components'
 import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
 import type {
@@ -55,7 +56,7 @@ const HIDE_WELL_CONTAINER_COMMAND_TYPES = [
 
 export function LabwareSlotContainer(
   props: LabwareSlotContainerProps
-): JSX.Element {
+): ReactNode {
   const {
     commands,
     liquids,
@@ -71,6 +72,7 @@ export function LabwareSlotContainer(
   const { labware, pipettes, liquidState } = robotState
   const labwareLoadCommand = commands.find(
     command =>
+      command.result != null &&
       'labwareId' in command.result &&
       command.result.labwareId === topLabwareOnSlotId
   )

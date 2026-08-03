@@ -35,7 +35,7 @@ const store: Store<any> = legacy_createStore(
 const meta: Meta<typeof AlphanumericKeyboard> = {
   title: 'ODD/Atoms/SoftwareKeyboard/AlphanumericKeyboard',
   component: AlphanumericKeyboard,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   decorators: [
     Story => (
       <Provider store={store}>

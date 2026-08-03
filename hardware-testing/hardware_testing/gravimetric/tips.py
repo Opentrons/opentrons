@@ -5,7 +5,6 @@ from opentrons.protocol_api import (
     ProtocolContext,
     Well,
     Labware,
-    InstrumentContext,
 )
 
 # Rows by Channel:
@@ -38,7 +37,6 @@ from opentrons.protocol_api import (
 #      - 3x volumes
 #      - 12x trials
 
-MULTI_CHANNEL_TEST_ORDER = [0, 1, 2, 3, 7, 6, 5, 4]  # zero indexed
 CHANNEL_TO_TIP_ROW_LOOKUP = {  # zero indexed
     0: "G",
     1: "F",
@@ -131,11 +129,6 @@ def get_unused_tips(ctx: ProtocolContext, tip_volume: int) -> List[Well]:
     return _unused_tips_for_racks(ctx, racks)
 
 
-def get_tips_for_single(ctx: ProtocolContext, tip_volume: int) -> List[Well]:
-    """Get tips for single channel."""
-    return get_unused_tips(ctx, tip_volume)
-
-
 def get_tips_for_individual_channel_on_multi(
     ctx: ProtocolContext,
     channel: int,
@@ -172,43 +165,3 @@ def get_tips_for_all_channels_on_multi(ctx: ProtocolContext, tip: int) -> List[W
     racks = [rack for _, rack in _get_racks(ctx).items() if f"{tip}ul" in rack.name]
     assert racks, f"no {tip}ul racks found"
     return [rack[f"A{col + 1}"] for rack in racks for col in range(12)]
-
-
-def get_tips_for_96_channel(ctx: ProtocolContext) -> List[Well]:
-    """Get tips for all the multi's channels."""
-    racks = _get_racks(ctx)
-    return [rack["A1"] for _, rack in racks.items()]
-
-
-def get_tips(
-    ctx: ProtocolContext,
-    pipette: InstrumentContext,
-    tip_volume: int,
-    all_channels: bool = True,
-) -> Dict[int, List[Well]]:
-    """Get tips."""
-    if pipette.channels == 1:
-        return {0: get_tips_for_single(ctx, tip_volume)}
-    elif pipette.channels == 8:
-        if all_channels:
-            return {0: get_tips_for_all_channels_on_multi(ctx, tip_volume)}
-        else:
-            return {
-                channel: get_tips_for_individual_channel_on_multi(
-                    ctx, channel, tip_volume, int(pipette.max_volume)
-                )
-                for channel in range(pipette.channels)
-            }
-    elif pipette.channels == 96:
-        if all_channels:
-            return {0: get_tips_for_96_channel(ctx)}
-        else:
-            raise NotImplementedError(
-                "no support for individual channel testing on the 96ch pipette"
-            )
-    else:
-        raise ValueError(
-            f"unexpected state when getting tips: "
-            f"pipette.channels={pipette.channels}, "
-            f"all_channels={all_channels}"
-        )

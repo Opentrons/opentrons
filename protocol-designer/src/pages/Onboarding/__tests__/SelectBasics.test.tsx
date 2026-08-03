@@ -4,7 +4,7 @@ import '@testing-library/jest-dom/vitest'
 
 import { fireEvent, screen } from '@testing-library/react'
 
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
@@ -17,22 +17,12 @@ import { getTiprackOptions } from '../utils'
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
 import type { WizardFormState } from '/protocol-designer/components/organisms'
-import type * as FeatureFlagSelectors from '/protocol-designer/feature-flags/selectors'
 import type { BaseState } from '/protocol-designer/types'
 import type { WizardTileProps } from '../types'
 
 vi.mock('/protocol-designer/labware-defs/selectors')
 vi.mock('/protocol-designer/components/organisms')
 vi.mock('/protocol-designer/labware-defs/actions')
-vi.mock('/protocol-designer/feature-flags/selectors', async importOriginal => {
-  const actual = await importOriginal<typeof FeatureFlagSelectors>()
-
-  return {
-    ...actual,
-    getEnableFork: (state: BaseState) =>
-      state.featureFlags.flags.OT_PD_ENABLE_FORK ?? false,
-  }
-})
 vi.mock('../utils')
 const mockLocation = vi.fn()
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
@@ -45,21 +35,8 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 
-interface RenderOptions {
-  enableFork?: boolean
-}
-
-const render = (
-  props: ComponentProps<typeof SelectBasics>,
-  options: RenderOptions = {}
-) => {
-  const initialState = {
-    featureFlags: {
-      flags: {
-        OT_PD_ENABLE_FORK: options.enableFork ?? false,
-      },
-    },
-  } as Partial<BaseState> as BaseState
+const render = (props: ComponentProps<typeof SelectBasics>) => {
+  const initialState = {} as Partial<BaseState> as BaseState
 
   return renderWithProviders(<SelectBasics {...props} />, {
     i18nInstance: i18n,
@@ -131,13 +108,17 @@ describe('SelectBasics', () => {
     render(props)
     screen.getByText('Step 1')
     screen.getByText('Let’s start with the basics')
-    // add robot
-    screen.getByText('What kind of robot do you have?')
-    fireEvent.click(screen.getByRole('label', { name: 'Opentrons OT-2' }))
-    expect(props.setValue).toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('label', { name: 'Opentrons Flex' }))
-    expect(props.setValue).toHaveBeenCalled()
+    expect(
+      screen.queryByText('What kind of robot do you have?')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('label', { name: 'Opentrons OT-2' })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('label', { name: 'Opentrons Flex' })
+    ).not.toBeInTheDocument()
     //  pipette
+    screen.getByText('Your pipettes')
     fireEvent.click(screen.getByText('Add a pipette'))
 
     // gripper
@@ -150,55 +131,7 @@ describe('SelectBasics', () => {
     fireEvent.click(screen.getAllByRole('label', { name: 'No' })[0])
     expect(props.setValue).toHaveBeenCalled()
 
-    // thermocycler
-    screen.getByText('Are you using a Thermocycler in your protocol?')
-    fireEvent.click(screen.getAllByRole('label', { name: 'Yes' })[1])
-    expect(props.setValue).toHaveBeenCalled()
-    fireEvent.click(screen.getAllByRole('label', { name: 'No' })[1])
-    expect(props.setValue).toHaveBeenCalled()
-
-    // wasteChute
-    screen.getByText('Are you using a waste chute in your protocol?')
-    fireEvent.click(screen.getAllByRole('label', { name: 'Yes' })[2])
-    expect(props.setValue).toHaveBeenCalled()
-    fireEvent.click(screen.getAllByRole('label', { name: 'No' })[2])
-    expect(props.setValue).toHaveBeenCalled()
-
     //  confirm
     screen.getByRole('button', { name: 'Confirm' })
-  })
-
-  it('hides the robot type question and keeps Flex options when fork is enabled', () => {
-    const forkValues: WizardFormState = {
-      ...values,
-      fields: {
-        ...values.fields,
-        robotType: OT2_ROBOT_TYPE,
-      },
-    }
-    props = {
-      ...props,
-      watch: makeWatchMock(forkValues),
-    }
-
-    render(props, { enableFork: true })
-
-    expect(
-      screen.queryByText('What kind of robot do you have?')
-    ).not.toBeInTheDocument()
-    expect(
-      screen.queryByRole('label', { name: 'Opentrons OT-2' })
-    ).not.toBeInTheDocument()
-    expect(
-      screen.queryByRole('label', { name: 'Opentrons Flex' })
-    ).not.toBeInTheDocument()
-    screen.getByText('Your pipettes')
-    screen.getByText(
-      'Do you want to move labware automatically with the gripper?'
-    )
-    expect(props.setValue).toHaveBeenCalledWith(
-      'fields.robotType',
-      FLEX_ROBOT_TYPE
-    )
   })
 })

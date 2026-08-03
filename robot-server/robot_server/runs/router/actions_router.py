@@ -1,12 +1,13 @@
 """Router for /runs actions endpoints."""
 
-import logging
 from datetime import datetime
 from typing import Annotated, Literal, Union
 
 from fastapi import Depends, status
 
 from opentrons.protocol_engine.types import DeckConfigurationType
+from server_utils.audit.audit_logger import AuditLogger
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -44,7 +45,6 @@ from robot_server.service.notifications import (
 )
 from robot_server.service.task_runner import TaskRunner, get_task_runner
 
-log = logging.getLogger(__name__)
 actions_router = LightRouter()
 
 
@@ -111,11 +111,17 @@ async def get_run_controller(
 async def create_run_action(
     runId: str,
     request_body: RequestModel[RunActionCreate],
+    audit_logger: Annotated[
+        AuditLogger, Depends(get_audit_logger(action="create run"))
+    ],
     run_controller: Annotated[RunController, Depends(get_run_controller)],
     action_id: Annotated[str, Depends(get_unique_id)],
     created_at: Annotated[datetime, Depends(get_current_time)],
     maintenance_run_orchestrator_store: Annotated[
         MaintenanceRunOrchestratorStore, Depends(get_maintenance_run_orchestrator_store)
+    ],
+    maintenance_runs_publisher: Annotated[
+        MaintenanceRunsPublisher, Depends(get_maintenance_runs_publisher)
     ],
     deck_configuration_store: Annotated[
         DeckConfigurationStore, Depends(get_deck_configuration_store)
@@ -131,25 +137,29 @@ async def create_run_action(
     Arguments:
         runId: Run ID pulled from the URL.
         request_body: Input payload from the request body.
-        run_orchestrator_store: Dependency to fetch the engine store.
         run_controller: Run controller bound to the given run ID.
         action_id: Generated ID to assign to the control action.
         created_at: Timestamp to attach to the control action.
-        maintenance_run_orchestrator_store: The maintenance run's EngineStore
-        deck_configuration_store: The deck configuration store
+        maintenance_run_orchestrator_store: Maintenance run orchestrator store.
+        maintenance_runs_publisher: Publisher for maintenance run notification topics.
+        deck_configuration_store: Deck configuration store.
         check_estop: Dependency to verify the estop is in a valid state.
-        deck_configuration_store: Dependency to fetch the deck configuration.
+        audit_logger: Records the action for audit setting requires
+            ``Opentrons-User-Notes``.
     """
-    action_type = request_body.data.actionType
+    body = request_body.data
+    action_type = body.actionType
     if (
         action_type == RunActionType.PLAY
         and maintenance_run_orchestrator_store.current_run_id is not None
     ):
+        maintenance_runs_publisher.stop_publishing_for_maintenance_run()
         await maintenance_run_orchestrator_store.clear()
     try:
         deck_configuration: DeckConfigurationType = []
         if action_type == RunActionType.PLAY:
             deck_configuration = await deck_configuration_store.get_deck_configuration()
+
         action = run_controller.create_action(
             action_id=action_id,
             action_type=action_type,

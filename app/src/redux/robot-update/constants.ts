@@ -45,6 +45,9 @@ export const ROBOTUPDATE_UPDATE_INFO: 'robotUpdate:UPDATE_INFO' =
 export const ROBOTUPDATE_FILE_INFO: 'robotUpdate:FILE_INFO' =
   'robotUpdate:FILE_INFO'
 
+export const ROBOTUPDATE_DOWNLOAD_UPDATE: 'robotUpdate:DOWNLOAD_UPDATE' =
+  'robotUpdate:DOWNLOAD_UPDATE'
+
 export const ROBOTUPDATE_DOWNLOAD_PROGRESS: 'robotUpdate:DOWNLOAD_PROGRESS' =
   'robotUpdate:DOWNLOAD_PROGRESS'
 
@@ -106,3 +109,6 @@ export const ROBOTUPDATE_SET_SESSION_STEP: 'robotUpdate:SET_SESSION_STEP' =
 
 export const ROBOTUPDATE_FILE_UPLOAD_PROGRESS: 'robotUpdate:FILE_UPLOAD_PROGRESS' =
   'robotUpdate:FILE_UPLOAD_PROGRESS'
+
+/** Fallback path when server health does not advertise a restart capability. */
+export const RESTART_PATH: '/server/restart' = '/server/restart'

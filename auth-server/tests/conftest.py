@@ -7,7 +7,11 @@ import requests
 from server_utils.auth.scopes import serialize_scopes
 from tests.dev_server import DevServer
 
-from auth_server.users.models import ACCOUNT_TYPE_TO_SCOPES, AccountType
+from auth_server.settings.models import SettingsResponseData
+from auth_server.users.models import (
+    AccountType,
+)
+from auth_server.users.scopes import get_scope_set_of_account_type
 
 _INTEGRATION_SERVER_STARTUP_TIMEOUT_S = 30
 
@@ -15,25 +19,21 @@ _INTEGRATION_SERVER_STARTUP_TIMEOUT_S = 30
 @pytest.fixture
 def admin_scopes_str() -> str:
     """All the OAuth 2 scopes that an admin should have, as a space-separated string."""
-    return serialize_scopes(set(ACCOUNT_TYPE_TO_SCOPES[AccountType.ADMIN]))
+    return serialize_scopes(
+        get_scope_set_of_account_type(
+            AccountType.ADMIN, SettingsResponseData(), must_reset_password=False
+        )
+    )
 
 
 @pytest.fixture
 def user_scopes_str() -> str:
     """All the OAuth 2 scopes that a regular user should have, as a space-separated string."""
-    return serialize_scopes(set(ACCOUNT_TYPE_TO_SCOPES[AccountType.USER]))
-
-
-@pytest.fixture
-def admin_scopes_list() -> list[str]:
-    """All the OAuth 2 scopes that an admin should have, as a list."""
-    return sorted(scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.ADMIN])
-
-
-@pytest.fixture
-def user_scopes_list() -> list[str]:
-    """All the OAuth 2 scopes that a regular user should have, as a list."""
-    return sorted(scope.api_name for scope in ACCOUNT_TYPE_TO_SCOPES[AccountType.USER])
+    return serialize_scopes(
+        get_scope_set_of_account_type(
+            AccountType.USER, SettingsResponseData(), must_reset_password=False
+        )
+    )
 
 
 @pytest.fixture

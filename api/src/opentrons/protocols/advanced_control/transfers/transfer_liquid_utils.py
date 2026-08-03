@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, List, Literal, Optional, Sequence, Union
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     PositionReference,
 )
+from opentrons_shared_data.pipette.constants import VOLUME_ROUNDING_ERROR_TOLERANCE
 
 from opentrons.protocol_api._liquid_properties import TipPosition
 from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
@@ -230,7 +231,8 @@ def check_current_volume_before_dispensing(
     dispense_volume: float,
 ) -> None:
     """Check if the current volume is valid for dispensing the dispense volume."""
-    if current_volume < dispense_volume:
+
+    if current_volume + VOLUME_ROUNDING_ERROR_TOLERANCE < dispense_volume:
         # Although this should never happen, we can get into an unexpected state
         # following error recovery and not have the expected amount of liquid in the tip.
         # If this happens, we want to raise a useful error so the user can understand

@@ -3,7 +3,6 @@ import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import * as Alerts from '../alerts'
 import * as CustomLabware from '../custom-labware'
-import * as RobotAdmin from '../robot-admin'
 import * as RobotUpdate from '../robot-update/constants'
 import * as Sessions from '../sessions'
 import { sharedCalCommands } from '../sessions/common-calibration/constants'
@@ -258,14 +257,6 @@ export function makeEvent(
         properties: {
           ...action.payload,
         },
-      })
-    }
-
-    case RobotAdmin.RESET_CONFIG: {
-      const { resets } = action.payload
-      return Promise.resolve({
-        name: 'resetRobotConfig',
-        properties: { ...resets },
       })
     }
   }

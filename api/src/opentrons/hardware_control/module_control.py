@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import re
 from glob import glob
-from typing import TYPE_CHECKING, Callable, List, Optional, Union
+from typing import TYPE_CHECKING, AsyncGenerator, Callable, List, Optional, Union
 
 from opentrons_shared_data.errors.exceptions import EnumeratedError
 
@@ -20,6 +21,7 @@ from .types import (
     AsynchronousModuleErrorNotification,
     BoardRevision,
     HardwareEvent,
+    ModuleConnectedNotification,
     ModuleDisconnectedNotification,
     OT3Mount,
     StatusBarUpdateEvent,
@@ -43,6 +45,7 @@ if TYPE_CHECKING:
     from .api import API
     from .ot3api import OT3API
 
+CLEANUP_DELAY_S = 3.0
 
 log = logging.getLogger(__name__)
 
@@ -86,9 +89,11 @@ class AttachedModulesControl:
     ) -> None:
         self._available_modules: List[modules.AbstractModule] = []
         self._available_peripherals: List[peripherals.AbstractPeripheral] = []
+        self._recently_removed_modules: List[modules.AbstractModule] = []
         self._api = api
         self._usb = usb
         self._event_callback = event_callback
+        self._reconnect_lock: Optional["asyncio.Lock"] = None
         if not IS_ROBOT and not api.is_simulator:
             # Start task that registers emulated modules.
             self._emulation_listen_task: asyncio.Task[None] | None = (
@@ -124,11 +129,29 @@ class AttachedModulesControl:
 
     @property
     def available_modules(self) -> List[modules.AbstractModule]:
-        return self._available_modules
+        # return both available and recently removed, in case we attempt to grab the device at the same
+        # time it experiences an EMI disconnect
+        return self._available_modules + self._recently_removed_modules
 
     @property
     def available_peripherals(self) -> List[peripherals.AbstractPeripheral]:
         return self._available_peripherals
+
+    def _dedupe_available_modules(self, new_mod: modules.AbstractModule) -> None:
+        """
+        Remove any existing entry in _available_modules that shares new_mod's
+        serial, then append new_mod and re-sort.
+        """
+        if not self._api.is_simulator:
+            serial = new_mod.serial_number
+            if serial is not None:
+                self._available_modules = [
+                    m for m in self._available_modules if m.serial_number != serial
+                ]
+        self._available_modules.append(new_mod)
+        self._available_modules = sorted(
+            self._available_modules, key=modules.AbstractModule.sort_key
+        )
 
     async def clean_up(self) -> None:
         """Clean up all registered modules and emulator scanning tasks (if any)."""
@@ -157,10 +180,7 @@ class AttachedModulesControl:
         )
         if isinstance(type, modules.ModuleType):
             assert isinstance(device, modules.AbstractModule)
-            self._available_modules.append(device)
-            self._available_modules = sorted(
-                self._available_modules, key=modules.AbstractModule.sort_key
-            )
+            self._dedupe_available_modules(device)
         else:
             assert isinstance(device, peripherals.AbstractPeripheral)
             self._available_peripherals.append(device)
@@ -242,7 +262,55 @@ class AttachedModulesControl:
                 f"Async error callback for module {model} {serial} at {port} for exc {exc} failed"
             )
 
-    async def unregister_devices(
+    @contextlib.asynccontextmanager
+    async def _use_reconnect_lock(self) -> AsyncGenerator[None, None]:
+        self._reconnect_lock = self._reconnect_lock or asyncio.Lock()
+
+        async with self._reconnect_lock:
+            yield
+
+    async def _clear_old_modules(self) -> None:
+        async with self._use_reconnect_lock():
+            for old_mod in list(self._recently_removed_modules):
+                # Important: this wants to be after the remove because this may trigger
+                # recursion back to here; we therefore want the module to already be
+                # removed so that the recursion terminates next loop
+                old_mod.disconnected_callback()
+                log.info(f"did not find {old_mod.serial_number}")
+                if old_mod in self._recently_removed_modules:
+                    self._recently_removed_modules.remove(old_mod)
+                await old_mod.cleanup()
+
+    async def _reconnect_single_module(self, old_mod: modules.AbstractModule) -> None:
+        """Find an attached module matching old_mod's serial and swap it in."""
+        for attached_mod in list(self._available_modules):
+            if attached_mod.serial_number != old_mod.serial_number:
+                continue
+            log.info(f"Found {old_mod.serial_number} was reconnected")
+            # Stop the new instance's poller/connection before reopening on old_mod.
+            await attached_mod.soft_cleanup()
+            # Stop the parked instance on the old path before rebinding.
+            await old_mod.soft_cleanup()
+            if attached_mod.port != old_mod.port:
+                log.info(f"module moved from {old_mod.port} to {attached_mod.port}")
+                await old_mod.move_port(attached_mod.port, attached_mod.usb_port)
+                log.info("Module port migration complete.")
+            await old_mod.attempt_reconnect()
+            log.info("Module reconnection complete.")
+            if old_mod in self._recently_removed_modules:
+                self._recently_removed_modules.remove(old_mod)
+            self._dedupe_available_modules(old_mod)
+            break
+
+    async def _reconnect_patch(self) -> None:
+        try:
+            for old_mod in list(self._recently_removed_modules):
+                log.info(f"Attempting to find and reconect {old_mod.serial_number}")
+                await self._reconnect_single_module(old_mod)
+        except BaseException:
+            log.exception("Encountered an error during reconnect attempt.")
+
+    async def unregister_devices(  # noqa: C901
         self,
         devices_at_ports: Union[
             List[modules.ModuleAtPort], List[modules.SimulatingModuleAtPort]
@@ -254,8 +322,9 @@ class AttachedModulesControl:
         Remove any modules that are no longer found by aionotify.
         """
         removed_devices = []
+        start_cleanup_task = False
         for dev in devices_at_ports:
-            for attached_dev in self.available_modules + self.available_peripherals:
+            for attached_dev in self._available_modules + self.available_peripherals:
                 if (
                     attached_dev.serial_number == dev.serial
                     or attached_dev.port == dev.port
@@ -266,30 +335,37 @@ class AttachedModulesControl:
                 if removed_dev in self._available_modules and isinstance(
                     removed_dev, modules.AbstractModule
                 ):
+                    self._recently_removed_modules.append(removed_dev)
                     self._available_modules.remove(removed_dev)
+                    start_cleanup_task = True
                 if removed_dev in self._available_peripherals and isinstance(
                     removed_dev, peripherals.AbstractPeripheral
                 ):
                     self._available_peripherals.remove(removed_dev)
-                # Important: this wants to be after the remove because this may trigger
-                # recursion back to here; we therefore want the module to already be
-                # removed so that the recursion terminates next loop
-                removed_dev.disconnected_callback()
+                    # Important: this wants to be after the remove because this may trigger
+                    # recursion back to here; we therefore want the module to already be
+                    # removed so that the recursion terminates next loop
+                    removed_dev.disconnected_callback()
+                    log.info(
+                        f"Device {removed_dev.name()} detached from port {removed_dev.port}"
+                    )
+                    await removed_dev.cleanup()
+
             except ValueError:
                 log.warning(
                     f"Removed Device {removed_dev} not found in attached device"
                 )
-        for removed_dev in removed_devices:
-            log.info(
-                f"Device {removed_dev.name()} detached from port {removed_dev.port}"
-            )
-            await removed_dev.cleanup()
         self._available_modules = sorted(
             self._available_modules, key=modules.AbstractModule.sort_key
         )
         self._available_peripherals = sorted(
             self._available_peripherals, key=peripherals.AbstractPeripheral.sort_key
         )
+        if start_cleanup_task:
+            delay = 0.1 if self._api.is_simulator else CLEANUP_DELAY_S
+            self._api.loop.call_later(
+                delay, lambda: asyncio.create_task(self._clear_old_modules())
+            )
 
     async def register_devices(
         self,
@@ -330,15 +406,31 @@ class AttachedModulesControl:
                     )
                 else:
                     assert isinstance(new_instance, modules.AbstractModule)
-                    self._available_modules.append(new_instance)
+                    self._dedupe_available_modules(new_instance)
                     log.info(
                         f"Module {device.name} discovered and attached"
                         f" at port {device.port}, new_instance: {new_instance}"
                     )
+                    try:
+                        self._api.loop.call_soon(
+                            self._event_callback,
+                            ModuleConnectedNotification(
+                                module_serial=device.serial,
+                                name=device.name,
+                                port=device.port,
+                            ),
+                        )
+                    except Exception:
+                        log.exception(
+                            f"Module connection callback for module {device.name} {device.serial} at {device.port} failed"
+                        )
             except Exception as e:
                 log.exception(
                     f"Failed to build device {device.name} at port {device.port}: {e}"
                 )
+        if len(new_devices_at_ports) > 0:
+            async with self._use_reconnect_lock():
+                await self._reconnect_patch()
         self._available_peripherals = sorted(
             self._available_peripherals, key=peripherals.AbstractPeripheral.sort_key
         )

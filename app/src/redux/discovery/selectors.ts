@@ -7,7 +7,6 @@ import orderBy from 'lodash/orderBy'
 import { createSelector, lruMemoize } from 'reselect'
 import semver from 'semver'
 
-import { getFeatureFlags } from '../config/selectors'
 import {
   CONNECTABLE,
   HEALTH_STATUS_OK,
@@ -42,8 +41,6 @@ type GetUnreachableRobots = (state: State) => UnreachableRobot[]
 type GetAllRobots = (state: State) => DiscoveredRobot[]
 type GetViewableRobots = (state: State) => ViewableRobot[]
 type GetLocalRobot = (state: State) => DiscoveredRobot | null
-
-const makeDisplayName = (name: string): string => name.replace('opentrons-', '')
 
 const isLocal = (ip: string): boolean => {
   return (
@@ -97,8 +94,7 @@ const isNotOT2Robot = (robot: DiscoveredRobot): boolean => {
 export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
   createSelector(
     (state: State) => state.discovery.robotsByName,
-    (state: State) => getFeatureFlags(state).ignoreOT2App ?? false,
-    (robotsMap, ignoreOT2App) => {
+    robotsMap => {
       const robots = Object.keys(robotsMap).map((robotName: string) => {
         const robot = robotsMap[robotName]
         const { addresses, ...robotState } = robot
@@ -111,7 +107,6 @@ export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
         const serverHealthStatus = addr?.serverHealthStatus ?? null
         const baseRobot = {
           ...robotState,
-          displayName: makeDisplayName(robotName),
           local: ip !== null ? isLocal(ip) : null,
           seen: addr?.seen === true,
           robotModel: makeRobotModel(
@@ -161,9 +156,7 @@ export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
         }
       })
 
-      return ignoreOT2App
-        ? robots.filter(robot => isNotOT2Robot(robot))
-        : robots
+      return robots.filter(robot => isNotOT2Robot(robot))
     }
   )
 
@@ -172,7 +165,7 @@ export const getConnectableRobots: GetConnectableRobots = createSelector(
   robots =>
     orderBy(
       robots.flatMap(r => (r.status === CONNECTABLE ? [r] : [])),
-      [robot => robot.displayName.toLowerCase()],
+      [robot => robot.name.toLowerCase()],
       ['asc']
     )
 )
@@ -182,7 +175,7 @@ export const getReachableRobots: GetReachableRobots = createSelector(
   robots =>
     orderBy(
       robots.flatMap(r => (r.status === REACHABLE ? [r] : [])),
-      [robot => robot.displayName.toLowerCase()],
+      [robot => robot.name.toLowerCase()],
       ['asc']
     )
 )
@@ -192,7 +185,7 @@ export const getUnreachableRobots: GetUnreachableRobots = createSelector(
   robots =>
     orderBy(
       robots.flatMap(r => (r.status === UNREACHABLE ? [r] : [])),
-      [robot => robot.displayName.toLowerCase()],
+      [robot => robot.name.toLowerCase()],
       ['asc']
     )
 )
@@ -204,7 +197,7 @@ export const getAllRobots: GetAllRobots = createSelector(
   (cr: DiscoveredRobot[], rr: DiscoveredRobot[], ur: DiscoveredRobot[]) =>
     orderBy(
       concat<DiscoveredRobot>(cr, rr, ur),
-      [robot => robot.displayName.toLowerCase()],
+      [robot => robot.name.toLowerCase()],
       ['asc']
     )
 )
@@ -215,15 +208,14 @@ export const getViewableRobots: GetViewableRobots = createSelector(
   (cr: ViewableRobot[], rr: ViewableRobot[]) =>
     orderBy(
       concat<ViewableRobot>(cr, rr),
-      [robot => robot.displayName.toLowerCase()],
+      [robot => robot.name.toLowerCase()],
       ['asc']
     )
 )
 
-// todo(mm, 2026-04-15): This looks fragile--ip might be 127.0.0.1 or ::1?
 export const getLocalRobot: GetLocalRobot = createSelector(
   getAllRobots,
-  robots => find(robots, { ip: 'localhost' }) ?? null
+  robots => find(robots, { ip: _ODD_IP_ ?? 'localhost' }) ?? null
 )
 
 export const getRobotByName = (
