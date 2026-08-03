@@ -547,23 +547,24 @@ async def update_run(  # noqa: C901
                 run_id=runId, access_control_status=access_control_status
             )
 
-            # Send run log to audit server
-            # TODO should we check if logging is enabled before doing this whole rigamarole?
-            staging_dir = create_download_staging_dir(persistence_directory_root)
-            staging_path = Path(staging_dir.name)
+            # Send run log to audit server if logging enabled
+            logging_enabled_response = await audit_client.get_logging_enabled()
+            if logging_enabled_response.loggingEnabled:
+                staging_dir = create_download_staging_dir(persistence_directory_root)
+                staging_path = Path(staging_dir.name)
 
-            run_log_entry = collect_run_log(
-                run_id=runId,
-                run=run_store.get(runId),
-                run_data_manager=run_data_manager,
-                protocol_store=protocol_store,
-                staging_dir=staging_path,
-            )
-            if run_log_entry is not None:
-                file_path, _ = run_log_entry
-                with open(file_path, "r") as fh:
-                    await audit_client.store_robot_log(robot_log_file=fh)
-            staging_dir.cleanup()
+                run_log_entry = collect_run_log(
+                    run_id=runId,
+                    run=run_store.get(runId),
+                    run_data_manager=run_data_manager,
+                    protocol_store=protocol_store,
+                    staging_dir=staging_path,
+                )
+                if run_log_entry is not None:
+                    file_path, _ = run_log_entry
+                    with open(file_path, "r") as fh:
+                        await audit_client.store_robot_log(robot_log_file=fh)
+                staging_dir.cleanup()
 
         if run_data is None:
             run_data = run_data_manager.get(runId)
