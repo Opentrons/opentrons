@@ -16,7 +16,7 @@ This directory contains:
 ## Development setup
 
 1. Install `make`, if necessary.
-2. [Install `uv`](https://docs.astral.sh/uv/getting-started/installation/).
+2. Install the pinned [`uv`](https://docs.astral.sh/uv/getting-started/installation/) version from the repo-root [`uv.toml`](../uv.toml) (`curl -LsSf https://astral.sh/uv/0.12.1/install.sh | sh`).
 3. In this directory, run `make setup` to install dependencies.
 
 ## Building and serving
