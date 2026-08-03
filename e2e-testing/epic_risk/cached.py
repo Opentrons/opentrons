@@ -32,9 +32,7 @@ def count_commits_touching_path(
 
 
 @st.cache_data(show_spinner=False)
-def fetch_code_metrics(
-    repo: str, file_path: str, domain: str, *, _revision: int = 1
-) -> tuple[str, int | None]:
+def fetch_code_metrics(repo: str, file_path: str, domain: str, *, _revision: int = 1) -> tuple[str, int | None]:
     _ = _revision
     raw = fetch_raw_file(repo, file_path)
     return met.code_metrics_from_raw(file_path, domain, raw)

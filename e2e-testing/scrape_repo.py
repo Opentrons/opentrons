@@ -82,9 +82,7 @@ if st.button("Analyze Risk", type="primary"):
             repos_input,
             tickets,
             discovery_floor,
-            on_repo_complete=lambda cur, tot, repo: my_bar.progress(
-                cur / tot, text=f"Finished scanning {repo}"
-            ),
+            on_repo_complete=lambda cur, tot, repo: my_bar.progress(cur / tot, text=f"Finished scanning {repo}"),
         )
     my_bar.empty()
 
