@@ -2151,7 +2151,7 @@ class VacuumModuleContext(ModuleContext):
     @publish(command=cmds.vacuum_module_close_vent)
     def close_vent(self) -> None:
         """Close the vent so the system can hold vacuum.
-        
+
         The module will not hold vacuum while the vent is open.
         """
         self._core.close_vent()
