@@ -792,6 +792,9 @@ async def test_update_run_signed_by_and_uncurrent(
     decoy.when(
         await mock_run_data_manager.uncurrent("run-id", access_control_status=False)
     ).then_return(uncurrent_response)
+    decoy.when(await mock_audit_client.get_logging_enabled()).then_return(
+        GetLoggingEnabledData(loggingEnabled=False)
+    )
 
     result = await update_run(
         runId="run-id",
