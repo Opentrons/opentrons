@@ -6,7 +6,6 @@ from pathlib import Path
 
 import pytest
 
-# from anyio import NamedTemporaryFile, TemporaryDirectory
 from decoy import Decoy, matchers
 from fastapi import UploadFile
 from opentrons_shared_data.errors.exceptions import KeyStorageUnavailableError
