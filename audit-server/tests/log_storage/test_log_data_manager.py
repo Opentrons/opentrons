@@ -200,6 +200,31 @@ async def test_store_robot_log_stores_file(
             assert temp_path.is_file()
 
 
+async def test_store_robot_log_raises_keyserver_unavailable(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+    mock_key_client: KeyClient,
+) -> None:
+    """It should raise if the key server is unavailable."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file.write("it's a secret to everyone".encode("utf-8"))
+            temp_file.seek(0)
+            decoy.when(
+                await mock_key_client.sign_message(
+                    SignMessageData(
+                        message="it's a secret to everyone", previousHash=None
+                    )
+                )
+            ).then_raise(Exception("ain't a secret no more"))
+            with pytest.raises(KeyStorageUnavailableError):
+                await subject.store_robot_log(
+                    UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
+                    Path(temp_dir),
+                )
+
+
 async def test_store_log_rotates_if_cannot_get_tail_hash(
     subject: LogDataManager,
     mock_store: LogStore,

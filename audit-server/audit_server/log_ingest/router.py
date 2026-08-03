@@ -171,6 +171,17 @@ async def post_external_log_message(
     path="/audit/internal/storeRobotLog",
     summary="Store a robot's run record and associate it with the"
     " current log period, if logging is enabled.",
+    responses={
+        fastapi.status.HTTP_201_CREATED: {
+            "model": SimpleBody[StoreRobotLogResponseData]
+        },
+        fastapi.status.HTTP_503_SERVICE_UNAVAILABLE: {
+            "description": (
+                "Key-server could not be reached, so the robot log contents"
+                " could not be signed."
+            ),
+        },
+    },
 )
 async def store_robot_log(
     log_data_manager: Annotated[LogDataManager, fastapi.Depends(get_log_data_manager)],
@@ -180,9 +191,17 @@ async def store_robot_log(
     ],
 ) -> PydanticResponse[SimpleBody[StoreRobotLogResponseData]]:
     """Store a robot log with the current log period."""
-    stored_robot_log = await log_data_manager.store_robot_log(
-        robot_log=file, robot_log_path=robot_logs_directory
-    )
+    try:
+        stored_robot_log = await log_data_manager.store_robot_log(
+            robot_log=file, robot_log_path=robot_logs_directory
+        )
+    except KeyStorageUnavailableError as exc:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=(
+                "Audit log message could not be signed: key-server is unavailable."
+            ),
+        ) from exc
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_201_CREATED,
         content=SimpleBody(

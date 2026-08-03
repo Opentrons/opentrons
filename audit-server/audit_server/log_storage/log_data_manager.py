@@ -141,6 +141,11 @@ class LogDataManager:
         contents_bytes = await robot_log.read()
         contents = contents_bytes.decode("utf-8")
         signed_contents, signing_exec = await self._sign_log(contents, None)
+        if signing_exec:
+            raise KeyStorageUnavailableError(
+                message="Unable to communicate with key server",
+                wrapping=[PythonException(signing_exec)],
+            )
 
         assert robot_log.filename is not None
         robot_log_path = robot_log_dir_path / Path(robot_log.filename).name
