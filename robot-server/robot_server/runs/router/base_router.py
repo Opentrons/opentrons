@@ -70,6 +70,7 @@ from ..run_data_manager import (
     RunDataManager,
     RunNotCompleteError,
     RunNotCurrentError,
+    RunSignoffRequiredError,
 )
 from ..run_models import (
     ActiveNozzleLayout,
@@ -165,6 +166,14 @@ class RunNotComplete(ErrorDetails):
     errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
 
 
+class RunSignoffRequired(ErrorDetails):
+    """An error if an action requires the run to be signed off first."""
+
+    id: Literal["RunSignoffRequired"] = "RunSignoffRequired"
+    title: str = "Run Signoff Required"
+    errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
+
+
 class AllRunsLinks(BaseModel):
     """Links returned along with a collection of runs."""
 
@@ -216,7 +225,9 @@ async def get_run_data_from_url(
         status.HTTP_201_CREATED: {"model": SimpleBody[Run]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorBody[FileIdNotFound]},
-        status.HTTP_409_CONFLICT: {"model": ErrorBody[RunAlreadyActive]},
+        status.HTTP_409_CONFLICT: {
+            "model": ErrorBody[Union[RunAlreadyActive, RunSignoffRequired]]
+        },
     },
     dependencies=[
         Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
@@ -257,7 +268,8 @@ async def create_run(  # noqa: C901
         deck_configuration_store: Dependency to fetch the deck configuration.
         camera_provider: Dependency to provide access to the Camera Settings to the run.
         notify_publishers: Utilized by the engine to notify publishers of state changes.
-        access_control_status: Status of the Auth-Server access control enablement.
+        access_control_status: Whether access control (Compliance Ready Software) is
+            currently enabled on the robot.
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None
     offsets = request_body.data.labwareOffsets if request_body is not None else []
@@ -314,6 +326,10 @@ async def create_run(  # noqa: C901
         )
     except RunConflictError as e:
         raise RunAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
+    except RunSignoffRequiredError as e:
+        raise RunSignoffRequired(detail=str(e)).as_error(
+            status.HTTP_409_CONFLICT
+        ) from e
     except ProtocolNotFoundError as e:
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
@@ -405,6 +421,9 @@ async def get_run(
     responses={
         status.HTTP_200_OK: {"model": SimpleEmptyBody},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
+        status.HTTP_409_CONFLICT: {
+            "model": ErrorBody[Union[RunNotIdle, RunSignoffRequired]]
+        },
     },
     dependencies=[
         Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
@@ -414,19 +433,27 @@ async def get_run(
 async def remove_run(
     runId: str,
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    access_control_status: Annotated[bool, Depends(get_access_control_status)],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete a run by its ID.
 
     Arguments:
         runId: Run ID pulled from URL.
         run_data_manager: Current and historical run data management.
+        access_control_status: Whether access control (Compliance Ready Software) is
+            currently enabled on the robot.
     """
     try:
-        await run_data_manager.delete(runId)
+        await run_data_manager.delete(
+            run_id=runId, access_control_status=access_control_status
+        )
 
     except RunConflictError as e:
         raise RunNotIdle().as_error(status.HTTP_409_CONFLICT) from e
-
+    except RunSignoffRequiredError as e:
+        raise RunSignoffRequired(detail=str(e)).as_error(
+            status.HTTP_409_CONFLICT
+        ) from e
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
@@ -457,7 +484,9 @@ def _require_signoff_scope(
         status.HTTP_200_OK: {"model": SimpleBody[Run]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {
-            "model": ErrorBody[RunStopped | RunNotIdle | RunNotComplete]
+            "model": ErrorBody[
+                RunStopped | RunNotIdle | RunNotComplete | RunSignoffRequired
+            ]
         },
     },
     dependencies=[
@@ -465,10 +494,11 @@ def _require_signoff_scope(
         Depends(get_audit_logger("update protocol run")),
     ],
 )
-async def update_run(
+async def update_run(  # noqa: C901
     runId: str,
     request_body: RequestModel[RunUpdate],
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    access_control_status: Annotated[bool, Depends(get_access_control_status)],
     authentication: Annotated[
         RequireAuthenticationResult, Depends(require_authentication)
     ],
@@ -479,6 +509,8 @@ async def update_run(
         runId: Run ID pulled from URL.
         request_body: Update data from request body.
         run_data_manager: Current and historical run data management.
+        access_control_status: Whether access control (Compliance Ready Software) is
+            currently enabled on the robot.
         authentication: The authenticated user, if any.
     """
     if request_body.data.signedBy is not None:
@@ -495,8 +527,9 @@ async def update_run(
         if request_body.data.current is not None:
             # `current` can either be set to false or not be set at all.
             assert_type(request_body.data.current, Literal[False])
-            run_data = await run_data_manager.uncurrent(runId)
-
+            run_data = await run_data_manager.uncurrent(
+                run_id=runId, access_control_status=access_control_status
+            )
         if run_data is None:
             run_data = run_data_manager.get(runId)
     except RunConflictError as e:
@@ -505,6 +538,10 @@ async def update_run(
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
     except RunNotCompleteError as e:
         raise RunNotComplete(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
+    except RunSignoffRequiredError as e:
+        raise RunSignoffRequired(detail=str(e)).as_error(
+            status.HTTP_409_CONFLICT
+        ) from e
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 

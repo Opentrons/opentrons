@@ -24,6 +24,10 @@ from .run_data_manager import RunDataManager
 from .run_orchestrator_store import NoRunCoordinator, RunOrchestratorStore
 from .run_process_pyro_provider import RunProcessPyroProvider
 from .run_store import RunStore
+from robot_server.access_control.settings.store import (
+    AccessControlSettingStore,
+    get_access_control_setting_store,
+)
 from robot_server.camera.settings.store import (
     CameraSettingStore,
     get_camera_setting_store,
@@ -235,6 +239,9 @@ async def get_run_data_manager(
     camera_setting_store: Annotated[
         CameraSettingStore, Depends(get_camera_setting_store)
     ],
+    access_control_setting_store: Annotated[
+        AccessControlSettingStore, Depends(get_access_control_setting_store)
+    ],
     file_provider: Annotated[FileProvider, Depends(get_file_provider)],
 ) -> RunDataManager:
     """Get a singleton run data manager to keep track of current/historical run data."""
@@ -246,6 +253,7 @@ async def get_run_data_manager(
             run_store=run_store,
             error_recovery_setting_store=error_recovery_setting_store,
             camera_setting_store=camera_setting_store,
+            access_control_setting_store=access_control_setting_store,
             runs_publisher=runs_publisher,
             file_provider=file_provider,
         )
