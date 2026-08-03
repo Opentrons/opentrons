@@ -1,4 +1,5 @@
 export * from './createUser'
 export * from './getSelf'
+export * from './getUsers'
 export * from './types'
 export * from './updateSelf'

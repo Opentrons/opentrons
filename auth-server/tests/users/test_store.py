@@ -38,6 +38,7 @@ def test_add_and_get_user(user_store: UserStore) -> None:
         full_name="Add Test",
         account_type=AccountType.USER,
         now=_NOW,
+        reset_password=False,
     )
     fetched = user_store.get("add_test_user")
     assert fetched is not None
@@ -45,6 +46,44 @@ def test_add_and_get_user(user_store: UserStore) -> None:
     assert fetched.hashed_password == HASHED_PW
     assert fetched.full_name == "Add Test"
     assert fetched.account_type == AccountType.USER
+    assert fetched.reset_password is False
+
+
+def test_list_all_returns_users_ordered_by_username(user_store: UserStore) -> None:
+    user_store.add(
+        username="zebra",
+        hashed_password=HASHED_PW,
+        full_name="Zebra",
+        account_type=AccountType.USER,
+        now=_NOW,
+        reset_password=False,
+    )
+    user_store.add(
+        username="alpha",
+        hashed_password=HASHED_PW,
+        full_name="Alpha",
+        account_type=AccountType.ADMIN,
+        now=_NOW,
+        reset_password=False,
+    )
+
+    usernames = [user.username for user in user_store.get_all()]
+
+    assert usernames == ["alpha", "zebra"]
+
+
+def test_add_user_with_reset_password_flag(user_store: UserStore) -> None:
+    user_store.add(
+        username="reset_on_create_user",
+        hashed_password=HASHED_PW,
+        full_name="Reset On Create",
+        account_type=AccountType.USER,
+        now=_NOW,
+        reset_password=True,
+    )
+    fetched = user_store.get("reset_on_create_user")
+    assert fetched is not None
+    assert fetched.reset_password is True
 
 
 def test_remove_and_get_user(user_store: UserStore) -> None:
@@ -55,6 +94,7 @@ def test_remove_and_get_user(user_store: UserStore) -> None:
         full_name="Remove Test",
         account_type=AccountType.USER,
         now=_NOW,
+        reset_password=False,
     )
     user_store.remove("remove_test_user")
     assert user_store.get("remove_test_user") is None
@@ -74,6 +114,7 @@ def test_update_username(user_store: UserStore) -> None:
         full_name="Original",
         account_type="user",
         now=_NOW,
+        reset_password=False,
     )
     updated = user_store.update("orig_name", new_username="new_name", now=_NOW)
     assert updated.username == "new_name"
@@ -91,6 +132,7 @@ def test_update_preserves_password_when_none(user_store: UserStore) -> None:
         full_name="Keep Pwd",
         account_type=AccountType.USER,
         now=_NOW,
+        reset_password=False,
     )
     updated = user_store.update("keep_pwd", full_name="Updated Name", now=_NOW)
     assert updated.hashed_password == added_user.hashed_password
@@ -104,6 +146,7 @@ def test_update_password_sets_password_set_at(user_store: UserStore) -> None:
         full_name="Full Name",
         account_type=AccountType.USER,
         now=_NOW,
+        reset_password=False,
     )
     new_hash = password_hash.hash("anotherpassword456")
     later = datetime.datetime(2026, 6, 1, tzinfo=datetime.UTC)
@@ -128,6 +171,7 @@ def test_update_persists(user_store: UserStore) -> None:
         full_name="Before",
         account_type=AccountType.USER,
         now=_NOW,
+        reset_password=False,
     )
     user_store.update("persist_test", full_name="After", reset_password=True, now=_NOW)
     fetched = user_store.get("persist_test")
@@ -157,6 +201,7 @@ def test_failed_login_counter(user_store: UserStore) -> None:
         full_name="User A",
         account_type=AccountType.USER,
         now=_NOW,
+        reset_password=False,
     )
     user_store.add(
         username="user_b",
@@ -164,6 +209,7 @@ def test_failed_login_counter(user_store: UserStore) -> None:
         full_name="User B",
         account_type=AccountType.USER,
         now=_NOW,
+        reset_password=False,
     )
     assert user_store.get_failed_login_count("user_a") == 0
     assert user_store.get_failed_login_count("user_b") == 0

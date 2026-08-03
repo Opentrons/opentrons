@@ -13,7 +13,7 @@ from auth_server.settings.store import SettingsStore
 from auth_server.users.is_account_locked import is_account_locked
 from auth_server.users.models import (
     AccountType,
-    ResetPasswordResponse,
+    TemporaryPasswordResponse,
     UserResponse,
 )
 from auth_server.users.store import UserStore
@@ -168,11 +168,11 @@ class UserDataManager:
     def create_user(
         self,
         username: str,
-        password: str,
+        password: str | None,
         full_name: str,
         account_type: str,
         now: datetime.datetime,
-    ) -> UserResponse:
+    ) -> TemporaryPasswordResponse:
         """Validate inputs, check for duplicates, and create a new user."""
         _validate_fields_non_empty(
             username=username,
@@ -180,7 +180,14 @@ class UserDataManager:
             full_name=full_name,
             account_type=account_type,
         )
-        _validate_password_complexity(password, self._settings_store.get_settings())
+        settings = self._settings_store.get_settings()
+        reset_password = password is None
+        if reset_password:
+            min_length, require_special = _password_complexity_requirements(settings)
+            password = _generate_temporary_password(min_length, require_special)
+        elif password is not None:
+            _validate_password_complexity(password, settings)
+        assert password is not None
         if self._user_store.get(username) is not None:
             raise UserAlreadyExistsError(f"User {username!r} already exists")
         new_user = self._user_store.add(
@@ -189,8 +196,12 @@ class UserDataManager:
             full_name=full_name,
             account_type=account_type,
             now=now,
+            reset_password=reset_password,
         )
-        return self._to_response(new_user)
+        return TemporaryPasswordResponse(
+            **self._to_response(new_user).model_dump(),
+            temporaryPassword=password if reset_password else None,
+        )
 
     def get_user(self, username: str) -> UserResponse:
         """Return the user or raise UserNotFoundError."""
@@ -198,6 +209,10 @@ class UserDataManager:
         if user is None:
             raise UserNotFoundError(f"User {username!r} not found")
         return self._to_response(user)
+
+    def get_users_list(self) -> list[UserResponse]:
+        """Return all users."""
+        return [self._to_response(user) for user in self._user_store.get_all()]
 
     def delete_user(self, username: str) -> None:
         """Delete a user or raise UserNotFoundError."""
@@ -260,7 +275,7 @@ class UserDataManager:
         self,
         username: str,
         now: datetime.datetime,
-    ) -> ResetPasswordResponse:
+    ) -> TemporaryPasswordResponse:
         """Reset a user's password to a random temporary password.
 
         Flag the account so the user is required to set a real password before
@@ -279,8 +294,7 @@ class UserDataManager:
             )
         except ValueError as e:
             raise UserNotFoundError(e) from e
-        user_response = self._to_response(updated_user)
-        return ResetPasswordResponse(
-            **user_response.model_dump(),
+        return TemporaryPasswordResponse(
+            **self._to_response(updated_user).model_dump(),
             temporaryPassword=temporary_password,
         )
