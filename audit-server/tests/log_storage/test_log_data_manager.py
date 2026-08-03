@@ -11,6 +11,7 @@ from server_utils.keys.key_server import SignedMessageData, SignMessageData
 
 from audit_server.log_storage import constants
 from audit_server.log_storage.log_data_manager import LogDataManager, _GetTime
+from audit_server.log_storage.models import LogPeriodDetails
 from audit_server.log_storage.store import (
     LogStore,
     NoActivePeriodError,
@@ -67,6 +68,27 @@ def subject(
 def disable_logging(mock_settings: SettingsStore, decoy: Decoy) -> None:
     """Force logging off."""
     decoy.when(mock_settings.get_logging_enabled()).then_return(False)
+
+
+def test_get_log_period_details(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+) -> None:
+    """It should get aggregate period details from the store."""
+    details = LogPeriodDetails(
+        id=1,
+        startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
+        endedAt=None,
+        recordCount=10,
+        totalSizeBytes=100,
+        attachedFilenames=[],
+    )
+    decoy.when(mock_store.get_period_details("1")).then_return(details)
+
+    result = subject.get_log_period_details("1")
+
+    assert result == details
 
 
 async def test_store_log_stores_nothing_if_logging_disabled(

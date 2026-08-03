@@ -153,33 +153,11 @@ async def get_log_period_summary(
 ) -> SimpleBody[LogPeriodDetails]:
     """Get a summary of a log period."""
     try:
-        period_entries = log_data_manager.get_period_entries(period_id=periodId)
+        period_details = log_data_manager.get_log_period_details(period_id=periodId)
     except NoPeriodById as exc:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
             detail=f"No log period found with ID {periodId}",
         ) from exc
 
-    user_log_entries = period_entries.user_log.userLogEntries
-    attached_filenames: list[str] = []
-    total_size_bytes = sum(
-        len(entry.message.encode("utf-8")) for entry in user_log_entries
-    )
-    for robot_log in period_entries.robot_log_entries:
-        robot_log_path = Path(robot_log.file_path)
-        attached_filenames.append(robot_log_path.name)
-        try:
-            total_size_bytes += robot_log_path.stat().st_size
-        except OSError:
-            pass
-
-    return SimpleBody.model_construct(
-        data=LogPeriodDetails(
-            id=int(periodId),
-            startedAt=period_entries.user_log.startedAt,
-            endedAt=period_entries.user_log.endedAt,
-            recordCount=len(user_log_entries),
-            totalSizeBytes=total_size_bytes,
-            attachedFilenames=attached_filenames,
-        )
-    )
+    return SimpleBody.model_construct(data=period_details)

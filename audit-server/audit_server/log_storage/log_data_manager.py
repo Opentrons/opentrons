@@ -16,7 +16,7 @@ from server_utils.keys.key_server import Client as KeyClient
 from server_utils.keys.key_server import SignMessageData
 
 from . import constants
-from .models import LogPeriodSummary
+from .models import LogPeriodDetails, LogPeriodSummary
 from .store import LogStore, NoActivePeriodError, NoLogInPeriodError
 from .types import LogPeriodEntries, StoredLog
 from audit_server.log_ingest.models import AuditLogMessage
@@ -84,6 +84,10 @@ class LogDataManager:
     def get_period_entries(self, period_id: str) -> LogPeriodEntries:
         """Get the given log period's user and robot log entries."""
         return self._store.get_period_entries(period_id)
+
+    def get_log_period_details(self, period_id: str) -> LogPeriodDetails:
+        """Get aggregate details for a log period."""
+        return self._store.get_period_details(period_id)
 
     def create_deletion_key(self, period_id: str) -> str:
         """Mint a new one-time deletion key linked to a log period.
