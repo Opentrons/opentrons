@@ -2016,8 +2016,8 @@ class VacuumModuleContext(ModuleContext):
             duration_s: An optional time, in seconds, to hold the target pressure after reaching it. If omitted, the module holds the target pressure until stopped.
             ramp_rate: An optional rate of pressure change, in mbar/s, while approaching the target pressure.
             timeout_s: An optional maximum duration, in seconds, allowed to reach the target before raising a timeout error.
-            vent_after: Optionally specifies whether to open the vent after the hold duration completes. Only applies when `duration_s` is set.
-            equalize_timeout_s: An optional maximum wait time, in seconds, to wait for system pressure to return near atmospheric after venting. Only applies when `duration_s` is set and `vent_after` is `True`. If omitted, the command does not wait for equalization. Waiting is recommended before moving labware to or from the module.
+            vent_after: Set to `True` to open the vent and return system pressure to atmospheric after the hold duration completes. Only applies when `duration_s` is set.
+            equalize_timeout_s: Sets the optional maximum wait time, in seconds, to wait for system pressure to return near atmospheric after venting. Only applies when `duration_s` is set and `vent_after` is `True`. If omitted, the command does not wait for equalization. Waiting is recommended before moving labware to or from the module.
 
         Returns:
             A task representing the concurrent vacuum operation.
@@ -2053,10 +2053,10 @@ class VacuumModuleContext(ModuleContext):
         Args:
             percent_power: % pump duty cycle, from `1` to `100` inclusive.
             duration_s: An optional time, in seconds, to hold the target power after reaching it. If omitted, the module holds the target until stopped.
-            ramp_rate: An optional rate of power change while approaching the target.
+            ramp_rate: An optional rate of power change, in percentage points per second (%/s), while approaching the target power.
             timeout_s: An optional maximum duration, in seconds, allowed to reach the target power before raising a timeout error.
-            vent_after: Optionally specifies whether to open the vent after the hold duration completes. Only applies when `duration_s` is set.
-            equalize_timeout_s: An optional maximum wait time, in seconds, to wait for system pressure to return near atmospheric after venting. Only applies when `duration_s` is set and `vent_after` is `True`. If omitted, the command does not wait for equalization. Waiting is recommended before moving labware to or from the module.
+            vent_after: Set to `True` to open the vent and return system pressure to atmospheric after the hold duration completes. Only applies when `duration_s` is set.
+            equalize_timeout_s: Sets the optional maximum wait time, in seconds, to wait for system pressure to return near atmospheric after venting. Only applies when `duration_s` is set and `vent_after` is `True`. If omitted, the command does not wait for equalization. Waiting is recommended before moving labware to or from the module.
 
         Returns:
             A task representing the concurrent vacuum operation.
@@ -2107,16 +2107,16 @@ class VacuumModuleContext(ModuleContext):
         Args:
             steps: List of step dictionaries defining the profile cycle. Each step dictionary supports:
 
-                * `enable_pump` (bool): whether to enable the pump motor.
-                * `hold_time_seconds` (float, optional): time in seconds to hold pressure/power for after target is reached.
-                * `hold_time_minutes` (float, optional): time in minutes to hold pressure/power for after target is reached.
-                * `ramp_rate` (float, optional): rate of pressure or power change while approaching setpoint.
-                * `timeout_seconds` (int, optional): maximum wait time, in seconds, to reach target setpoint before timing out.
-                * `vent_after` (bool, optional): whether to open the vent after the step is complete.
+                * `enable_pump` (bool): Whether to enable the pump motor.
+                * `hold_time_seconds` (float, optional): The number of seconds to hold pressure/power for after target is reached. If `hold_time_minutes` is also specified, the times are added together.
+                * `hold_time_minutes` (float, optional): The number of minutes to hold pressure/power for after target is reached. If `hold_time_seconds` is also specified, the times are added together.
+                * `ramp_rate` (float, optional): The rate of pressure or power change while approaching setpoint.
+                * `timeout_seconds` (int, optional): The maximum wait time, in seconds, to reach target setpoint before timing out.
+                * `vent_after` (bool, optional): Set to `True` to open the vent and return system pressure to atmospheric after all profile repetitions complete.
 
             repetitions: An optional cycle count specifying how many times to repeat the profile sequence.
-            vent_after: Optionally specifies whether to open the vent after all profile repetitions complete.
-            equalize_timeout_s: An optional maximum wait time, in seconds, to wait for system pressure to return near atmospheric after venting. Only applies when `vent_after` is `True`. If omitted, the command does not wait for equalization. Waiting is recommended before moving labware to or from the module.
+            vent_after: Set to `true` to open the vent and return to atmospheric pressure after all profile repetitions complete.
+            equalize_timeout_s: Sets the optional maximum wait time, in seconds, to wait for system pressure to return near atmospheric after venting. Only applies when `vent_after` is `True`. If omitted, the command does not wait for equalization. Waiting is recommended before moving labware to or from the module.
 
         Returns:
             A task representing the concurrent vacuum profile execution.
@@ -2143,7 +2143,7 @@ class VacuumModuleContext(ModuleContext):
         The module will not hold vacuum while the vent is open.
 
         Args:
-            equalize_timeout_s: An optional maximum wait time, in seconds, to wait for system pressure to return near atmospheric after venting. If omitted, the command opens the vent and returns without waiting for equalization. Waiting is recommended before moving labware to or from the module.
+            equalize_timeout_s: Sets the optional maximum wait time, in seconds, to wait for system pressure to return near atmospheric after venting. If omitted, the command opens the vent and returns without waiting for equalization. Waiting is recommended before moving labware to or from the module.
         """
         self._core.open_vent(equalize_timeout_s=equalize_timeout_s)
 
