@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Locator, Page, expect
 
 from automation.app_helpers.app_readiness import (
     GEAR_NAV_DEBOUNCE_MS,
@@ -13,9 +13,10 @@ from automation.app_helpers.app_readiness import (
 )
 from automation.app_helpers.page_helpers import require_helper
 from automation.app_helpers.screenshot_helper import ScreenshotHelper
+from automation.app_pages.app_base_page import AppBasePage
 
 
-class AppSettingsPage:
+class AppSettingsPage(AppBasePage):
     """App Settings gear menu — General, Privacy, Advanced, and optional Feature Flags."""
 
     CONNECT_IP_HEADING = "Connect to a Robot via IP Address"
@@ -34,42 +35,27 @@ class AppSettingsPage:
         (FEATURE_FLAGS_TAB, "feature-flags"),
     )
 
-    def __init__(self, page: Page, shots: ScreenshotHelper | None = None):
+    def __init__(self, page: Page, shots: ScreenshotHelper | None = None) -> None:
         """Bind the Playwright page and optional screenshot helper."""
-        self.page = page
+        super().__init__(page)
         self.shots = shots
 
     @property
-    def nav_link(self):
+    def nav_link(self) -> Locator:
         """Navbar gear icon that opens App Settings."""
         return self.page.get_by_test_id("Navbar_settingsLink")
 
-    def tab_link(self, name: str):
+    def tab_link(self, name: str) -> Locator:
         """Return the sidebar link for an App Settings tab by visible name."""
         return self.page.locator('a[href*="/app-settings/"]').get_by_text(name, exact=True)
 
-    def navigate(self):
+    def navigate(self) -> None:
         """Open App Settings from the navbar."""
         click_when_ui_ready(self.page, self.nav_link)
         expect(self.page).to_have_url(re.compile(r"#/app-settings"))
         self.page.wait_for_timeout(GEAR_NAV_DEBOUNCE_MS)
 
-    def _close_connect_robot_slideout(self) -> None:
-        """Dismiss the Connect via IP slideout if it is open."""
-        slideout_title = self.page.get_by_test_id(f"Slideout_title_{self.CONNECT_IP_HEADING}")
-        done = self.page.get_by_text("Done", exact=True)
-        if done.count() > 0 and done.is_visible():
-            done.click()
-        else:
-            close = self.page.get_by_test_id(f"Slideout_icon_close_{self.CONNECT_IP_HEADING}")
-            if close.count() > 0 and close.is_visible():
-                try:
-                    close.click(force=True, timeout=2_000)
-                except Exception:
-                    self.page.keyboard.press("Escape")
-        expect(slideout_title).to_have_count(0)
-
-    def _open_tab(self, name: str, slug: str):
+    def _open_tab(self, name: str, slug: str) -> bool:
         """Click a settings tab and wait for its URL slug to become active."""
         tab = self.tab_link(name)
         if tab.count() == 0:
@@ -80,7 +66,7 @@ class AppSettingsPage:
         expect(tab).to_have_class(re.compile("active"))
         return True
 
-    def validate_general(self):
+    def validate_general(self) -> None:
         """Validate General tab: connect via IP, software version, and update alerts."""
         expect(self.page.get_by_text("App Software Version", exact=True)).to_be_visible()
         expect(self.page.get_by_test_id("GeneralSettings_currentVersion")).to_be_visible()
@@ -98,17 +84,17 @@ class AppSettingsPage:
         try:
             expect(slideout_title).to_be_visible()
         finally:
-            self._close_connect_robot_slideout()
+            self.close_slideout_by_title(self.CONNECT_IP_HEADING)
         dismiss_blocking_ui(self.page)
 
-    def validate_privacy(self):
+    def validate_privacy(self) -> None:
         """Open Privacy and assert the app analytics heading, copy, and toggle."""
         self._open_tab("Privacy", "privacy")
         expect(self.page.get_by_text(self.PRIVACY_HEADING, exact=True)).to_be_visible()
         expect(self.page.get_by_text(self.PRIVACY_DESCRIPTION, exact=True)).to_be_visible()
         expect(self.page.get_by_test_id("PrivacySettings_analytics")).to_be_visible()
 
-    def validate_advanced(self):
+    def validate_advanced(self) -> None:
         """Open Advanced and validate every settings section."""
         self._open_tab("Advanced", "advanced")
         expect(self.page.get_by_text(self.ADVANCED_HEADING, exact=True)).to_be_visible()
@@ -122,13 +108,13 @@ class AppSettingsPage:
         expect(self.page.get_by_test_id("AdvancedSettings_devTools")).to_be_visible()
         expect(self.page.get_by_test_id("AdvancedSettings_devTooltoggle")).to_be_visible()
 
-    def validate_feature_flags(self):
+    def validate_feature_flags(self) -> None:
         """Open Feature Flags when present and assert the tab heading is visible."""
         if not self._open_tab(self.FEATURE_FLAGS_TAB, "feature-flags"):
             return
         expect(self.page.get_by_text(self.FEATURE_FLAGS_TAB, exact=True)).to_be_visible()
 
-    def validate_all_tabs(self):
+    def validate_all_tabs(self) -> None:
         """Navigate to App Settings and validate every available tab."""
         self.navigate()
         self.validate_general()
@@ -136,7 +122,7 @@ class AppSettingsPage:
         self.validate_advanced()
         self.validate_feature_flags()
 
-    def capture_all_tabs(self):
+    def capture_all_tabs(self) -> None:
         """Validate each App Settings tab and save a screenshot per tab."""
         shots = require_helper(self.shots, "ScreenshotHelper", owner="AppSettingsPage", method="capture_all_tabs")
 

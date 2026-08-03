@@ -15,7 +15,7 @@ import pytest
 from playwright.sync_api import Page
 
 from automation.app_helpers.test_progress import log_done, log_step
-from automation.app_pages.robot_settings_page import RobotSettingsPage
+from automation.app_pages import RobotSettingsPage
 
 
 @pytest.fixture(scope="session")

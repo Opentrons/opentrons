@@ -10,17 +10,18 @@ from automation.app_helpers.app_readiness import dismiss_blocking_ui
 from automation.app_helpers.left_nav import link, navigate_to
 from automation.app_helpers.list_scroll import scroll_until_visible
 from automation.app_helpers.locator_helpers import first_resolved
+from automation.app_pages.app_base_page import AppBasePage
 
 
-class DevicesPage:
+class DevicesPage(AppBasePage):
     """Navigate from Devices landing to a robot detail page."""
 
     # Electron serves the SPA from file://…/index.html with hash routing (#/devices/…).
     DEVICES_LANDING_URL = re.compile(r"#/devices/?$")
 
-    def __init__(self, page: Page, *, robot_name: str = "QA1Potato"):
+    def __init__(self, page: Page, *, robot_name: str = "QA1Potato") -> None:
         """Bind the page and target robot display name."""
-        self.page = page
+        super().__init__(page)
         self.robot_name = robot_name
 
     @property

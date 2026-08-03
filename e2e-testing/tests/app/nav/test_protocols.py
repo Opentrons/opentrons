@@ -7,7 +7,7 @@ from playwright.sync_api import Page, expect
 
 from automation.app_helpers.screenshot_helper import ScreenshotHelper
 from automation.app_helpers.test_progress import log_done, log_step
-from automation.app_pages.protocols_page import ProtocolsPage
+from automation.app_pages import ProtocolsPage
 
 
 def test_protocol_opens_from_landing(run_local_app: Page, protocol_name: str) -> None:

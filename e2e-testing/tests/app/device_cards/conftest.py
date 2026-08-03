@@ -14,8 +14,7 @@ from automation.app_helpers.app_readiness import dismiss_blocking_ui
 from automation.app_helpers.reporting import VIDEOS_DIR, ensure_test_results_dir, unique_artifact_path
 from automation.app_helpers.screencast_recorder import ScreencastRecorder
 from automation.app_helpers.test_progress import log_done, log_step, make_suite_logstart
-from automation.app_pages.device_cards_page import DeviceCardHelper
-from automation.app_pages.devices_page import DevicesPage
+from automation.app_pages import DeviceCardsPage, DevicesPage
 from run_config import is_headed_run
 
 pytestmark = pytest.mark.device_cards
@@ -80,10 +79,10 @@ def device_cards(
     _device_cards_continuous_video: None,
     run_local_app: Page,
     robot_name: str,
-) -> Generator[DeviceCardHelper, None, None]:
+) -> Generator[DeviceCardsPage, None, None]:
     """Shared helper: navigate once, cache module inventory for all tests in this session."""
     log_step(f"Navigating to robot detail for '{robot_name}'")
-    helper = DeviceCardHelper(run_local_app)
+    helper = DeviceCardsPage(run_local_app)
     DevicesPage(run_local_app, robot_name=robot_name).navigate()
     dismiss_blocking_ui(run_local_app)
     log_done(f"On robot detail page ({robot_name})")

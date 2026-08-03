@@ -21,7 +21,7 @@ from playwright.sync_api import Page
 
 from automation.app_helpers.screenshot_helper import ScreenshotHelper
 from automation.app_helpers.test_progress import log_done, log_step
-from automation.app_pages.app_settings_page import AppSettingsPage
+from automation.app_pages import AppSettingsPage
 
 
 def test_general_tab(run_local_app: Page, screenshot_helper: ScreenshotHelper) -> None:

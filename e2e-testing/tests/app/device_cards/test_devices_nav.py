@@ -22,7 +22,7 @@ from __future__ import annotations
 from playwright.sync_api import Page
 
 from automation.app_helpers.test_progress import log_done, log_step
-from automation.app_pages.devices_page import DevicesPage
+from automation.app_pages import DevicesPage
 
 
 def test_robot_detail_from_devices_list(run_local_app: Page, robot_name: str) -> None:

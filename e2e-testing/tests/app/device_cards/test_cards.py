@@ -10,10 +10,11 @@ from __future__ import annotations
 import pytest
 
 from automation.app_helpers.test_progress import log_done, log_step
-from automation.app_pages.device_cards_page import HEATER_SHAKER, TEMPERATURE, THERMOCYCLER, DeviceCardHelper
+from automation.app_pages import DeviceCardsPage
+from automation.app_pages.device_cards_page import HEATER_SHAKER, TEMPERATURE, THERMOCYCLER
 
 
-def test_left_pipette_card(device_cards: DeviceCardHelper) -> None:
+def test_left_pipette_card(device_cards: DeviceCardsPage) -> None:
     """Exercise the left or combined left+right pipette card when present.
 
     Not mapped to a Robot Settings T case (T69745–T69756).
@@ -34,7 +35,7 @@ def test_left_pipette_card(device_cards: DeviceCardHelper) -> None:
     log_done("Left pipette card OK")
 
 
-def test_right_pipette_card(device_cards: DeviceCardHelper) -> None:
+def test_right_pipette_card(device_cards: DeviceCardsPage) -> None:
     """Exercise the right pipette card when a separate right mount exists.
 
     Not mapped to a Robot Settings T case (T69745–T69756).
@@ -52,7 +53,7 @@ def test_right_pipette_card(device_cards: DeviceCardHelper) -> None:
     log_done("Right pipette card OK")
 
 
-def test_gripper_card(device_cards: DeviceCardHelper) -> None:
+def test_gripper_card(device_cards: DeviceCardsPage) -> None:
     """Exercise the Flex gripper card when the extension mount is present.
 
     Not mapped to a Robot Settings T case (T69745–T69756).
@@ -66,12 +67,12 @@ def test_gripper_card(device_cards: DeviceCardHelper) -> None:
     log_done("Gripper card OK")
 
 
-def test_thermocycler_module_card(device_cards: DeviceCardHelper) -> None:
+def test_thermocycler_module_card(device_cards: DeviceCardsPage) -> None:
     """Exercise thermocycler controls when a matching module card is present.
 
     Not mapped to a Robot Settings T case (T69745–T69756).
     """
-    prefix = DeviceCardHelper.module_prefix(THERMOCYCLER)
+    prefix = DeviceCardsPage.module_prefix(THERMOCYCLER)
     log_step(f"Check thermocycler module card (prefix '{prefix}')")
     if not device_cards.has_module_card(prefix):
         log_step(f"Thermocycler card with prefix '{prefix}' not found or disabled — skipping")
@@ -81,12 +82,12 @@ def test_thermocycler_module_card(device_cards: DeviceCardHelper) -> None:
     log_done("Thermocycler card OK")
 
 
-def test_heater_shaker_module_card(device_cards: DeviceCardHelper) -> None:
+def test_heater_shaker_module_card(device_cards: DeviceCardsPage) -> None:
     """Exercise heater-shaker controls when a matching module card is present.
 
     Not mapped to a Robot Settings T case (T69745–T69756).
     """
-    prefix = DeviceCardHelper.module_prefix(HEATER_SHAKER)
+    prefix = DeviceCardsPage.module_prefix(HEATER_SHAKER)
     log_step(f"Check heater-shaker module card (prefix '{prefix}')")
     if not device_cards.has_module_card(prefix):
         log_step(f"Heater-Shaker card with prefix '{prefix}' not found or disabled — skipping")
@@ -96,12 +97,12 @@ def test_heater_shaker_module_card(device_cards: DeviceCardHelper) -> None:
     log_done("Heater-Shaker card OK")
 
 
-def test_temperature_module_card(device_cards: DeviceCardHelper) -> None:
+def test_temperature_module_card(device_cards: DeviceCardsPage) -> None:
     """Exercise temperature module controls when a matching module card is present.
 
     Not mapped to a Robot Settings T case (T69745–T69756).
     """
-    prefix = DeviceCardHelper.module_prefix(TEMPERATURE)
+    prefix = DeviceCardsPage.module_prefix(TEMPERATURE)
     log_step(f"Check temperature module card (prefix '{prefix}')")
     if not device_cards.has_module_card(prefix):
         log_step(f"Temperature module card with prefix '{prefix}' not found or disabled — skipping")
@@ -111,7 +112,7 @@ def test_temperature_module_card(device_cards: DeviceCardHelper) -> None:
     log_done("Temperature module card OK")
 
 
-def test_robot_lights(device_cards: DeviceCardHelper) -> None:
+def test_robot_lights(device_cards: DeviceCardsPage) -> None:
     """Toggle robot lights from the robot overview page.
 
     Not mapped to a Robot Settings T case (T69745–T69756).

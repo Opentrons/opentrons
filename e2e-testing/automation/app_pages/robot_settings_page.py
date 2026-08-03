@@ -8,10 +8,11 @@ from playwright.sync_api import Locator, Page, expect
 
 from automation.app_helpers.app_readiness import dismiss_blocking_ui
 from automation.app_helpers.screenshot_helper import ScreenshotHelper
+from automation.app_pages.app_base_page import AppBasePage
 from automation.app_pages.devices_page import DevicesPage
 
 
-class RobotSettingsPage:
+class RobotSettingsPage(AppBasePage):
     """Robot Settings tabs — Calibration, Networking, Camera, and Advanced."""
 
     PAGE_HEADING = "Robot Settings"
@@ -46,7 +47,7 @@ class RobotSettingsPage:
 
     def __init__(self, page: Page, *, robot_name: str) -> None:
         """Bind the Playwright page and target robot display name."""
-        self.page = page
+        super().__init__(page)
         self.robot_name = robot_name
 
     @property
@@ -55,13 +56,11 @@ class RobotSettingsPage:
         return re.compile(rf"#/devices/{re.escape(self.robot_name)}/robot-settings")
 
     @property
-    def page_heading(self):
+    def page_heading(self) -> Locator:
         """Page title — scoped to Robot Settings content, not the breadcrumb."""
-        return self.page.locator('[class*="RobotSettings"]').get_by_text(
-            self.PAGE_HEADING, exact=True
-        )
+        return self.page.locator('[class*="RobotSettings"]').get_by_text(self.PAGE_HEADING, exact=True)
 
-    def tab_link(self, name: str, slug: str):
+    def tab_link(self, name: str, slug: str) -> Locator:
         """Return the RoundTab link for a Robot Settings tab."""
         return self.page.locator(f'a[href*="robot-settings/{slug}"]').get_by_text(name, exact=True)
 
@@ -74,9 +73,7 @@ class RobotSettingsPage:
         overflow = self.page.get_by_test_id("RobotOverview_overflowMenu")
         expect(overflow).to_be_visible()
         overflow.click()
-        settings_item = self.page.get_by_test_id(
-            f"RobotOverviewOverflowMenu_robotSettings_{self.robot_name}"
-        )
+        settings_item = self.page.get_by_test_id(f"RobotOverviewOverflowMenu_robotSettings_{self.robot_name}")
         expect(settings_item).to_be_visible()
         settings_item.click()
         expect(self.page).to_have_url(self.robot_settings_url)
@@ -109,16 +106,6 @@ class RobotSettingsPage:
         switch.click()
         if not switch.is_checked():
             switch.click()
-
-    def _close_slideout(self, title: str) -> None:
-        """Dismiss a slideout by title."""
-        slideout_title = self.page.get_by_test_id(f"Slideout_title_{title}")
-        close = self.page.get_by_test_id(f"Slideout_icon_close_{title}")
-        if close.count() > 0 and close.is_visible():
-            close.click()
-        else:
-            self.page.keyboard.press("Escape")
-        expect(slideout_title).to_have_count(0)
 
     def validate_calibration_about(self) -> None:
         """T69745: Calibration > About Calibration. Manual inspection required."""
@@ -161,7 +148,7 @@ class RobotSettingsPage:
         expect(rename).to_be_visible()
         rename.click()
         expect(self.page.get_by_test_id(f"Slideout_title_{self.RENAME_ROBOT_SLIDEOUT}")).to_be_visible()
-        self._close_slideout(self.RENAME_ROBOT_SLIDEOUT)
+        self.close_slideout_by_title(self.RENAME_ROBOT_SLIDEOUT)
 
     def validate_advanced_robot_server_version(self) -> None:
         """T69750: Advanced > Robot server Version."""
@@ -201,7 +188,7 @@ class RobotSettingsPage:
         expect(reset).to_be_visible()
         reset.click()
         expect(self.page.get_by_test_id(f"Slideout_title_{self.DEVICE_RESET_SLIDEOUT}")).to_be_visible()
-        self._close_slideout(self.DEVICE_RESET_SLIDEOUT)
+        self.close_slideout_by_title(self.DEVICE_RESET_SLIDEOUT)
 
     def validate_advanced_robot_server_reinstall(self) -> None:
         """T69756: Advanced > Robot Server Reinstall."""

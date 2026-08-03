@@ -10,7 +10,9 @@ from dataclasses import dataclass
 from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import Locator, Page, expect
 
+from automation.app_helpers.app_readiness import click_visible_overlays, close_visible_slideouts
 from automation.app_helpers.locator_helpers import menu_item
+from automation.app_pages.app_base_page import AppBasePage
 
 TC_INPUT = re.compile(r"^ThermocyclerSlideout_input_field_")
 TC_SUBMIT = re.compile(r"^ThermocyclerSlideout_btn_")
@@ -82,12 +84,12 @@ MODULE_CARD_SPECS: tuple[ModuleCardSpec, ...] = (
 )
 
 
-class DeviceCardHelper:
+class DeviceCardsPage(AppBasePage):
     """Page object for exercising pipette, gripper, and module cards on a robot detail page."""
 
-    def __init__(self, page: Page):
+    def __init__(self, page: Page) -> None:
         """Bind the robot detail page and initialize empty module inventory cache."""
-        self.page = page
+        super().__init__(page)
         self._module_inventory: ModuleInventory = {}
 
     @staticmethod
@@ -98,15 +100,7 @@ class DeviceCardHelper:
     def _dismiss_blocking_overlays(self) -> None:
         """Close slideouts and overflow-menu overlays that block later card clicks."""
         for _ in range(4):
-            had_blocking_ui = False
-            for index in range(self.page.locator('[data-testid^="Slideout_icon_close_"]').count()):
-                close = self.page.locator('[data-testid^="Slideout_icon_close_"]').nth(index)
-                if close.is_visible():
-                    had_blocking_ui = True
-                    try:
-                        close.click(force=True, timeout=1_000)
-                    except Exception:
-                        pass
+            had_blocking_ui = close_visible_slideouts(self.page, deadline_s=1.0, pause_ms=0)
             about_close = self.page.get_by_test_id(ABOUT_MODULE_CLOSE)
             if about_close.count() > 0 and about_close.first.is_visible():
                 had_blocking_ui = True
@@ -121,15 +115,8 @@ class DeviceCardHelper:
                     pipette_close.first.click(force=True, timeout=1_000)
                 except Exception:
                     pass
-            overlays = self.page.locator('[data-sentry-component="Overlay"]')
-            for index in range(overlays.count()):
-                overlay = overlays.nth(index)
-                if overlay.is_visible():
-                    had_blocking_ui = True
-                    try:
-                        overlay.click(force=True, position={"x": 8, "y": 8}, timeout=1_000)
-                    except Exception:
-                        pass
+            if click_visible_overlays(self.page):
+                had_blocking_ui = True
             if not had_blocking_ui:
                 break
             self.page.wait_for_timeout(250)
