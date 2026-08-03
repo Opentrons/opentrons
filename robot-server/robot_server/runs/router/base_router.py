@@ -494,7 +494,7 @@ def _require_signoff_scope(
         Depends(get_audit_logger("update protocol run")),
     ],
 )
-async def update_run(
+async def update_run(  # noqa: C901
     runId: str,
     request_body: RequestModel[RunUpdate],
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],

@@ -721,45 +721,6 @@ async def test_update_current_none_noop(
     assert result.status_code == 200
 
 
-async def test_update_run_signed_by(
-    decoy: Decoy,
-    mock_run_data_manager: RunDataManager,
-) -> None:
-    """It should set signedBy on the run."""
-    expected_response = Run(
-        id="run-id",
-        protocolId=None,
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=pe_types.EngineStatus.SUCCEEDED,
-        current=True,
-        actions=[],
-        errors=[],
-        pipettes=[],
-        modules=[],
-        labware=[],
-        labwareOffsets=[],
-        liquids=[],
-        liquidClasses=[],
-        outputFileIds=[],
-        hasEverEnteredErrorRecovery=False,
-        signedBy="Alice Example",
-    )
-
-    decoy.when(
-        mock_run_data_manager.set_signed_by(run_id="run-id", signed_by="Alice Example")
-    ).then_return(expected_response)
-
-    result = await update_run(
-        runId="run-id",
-        request_body=RequestModel(data=RunUpdate(signedBy="Alice Example")),
-        run_data_manager=mock_run_data_manager,
-        access_control_status=False,
-    )
-
-    assert result.content == SimpleBody(data=expected_response)
-    assert result.status_code == 200
-
-
 async def test_update_run_signed_by_and_uncurrent(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
@@ -799,6 +760,7 @@ async def test_update_run_signed_by_and_uncurrent(
         ),
         run_data_manager=mock_run_data_manager,
         access_control_status=False,
+        authentication=AuthenticationNotRequiredResult(),
     )
 
     assert result.content == SimpleBody(data=uncurrent_response)
@@ -820,6 +782,7 @@ async def test_update_run_not_complete(
             request_body=RequestModel(data=RunUpdate(signedBy="Alice Example")),
             run_data_manager=mock_run_data_manager,
             access_control_status=False,
+            authentication=AuthenticationNotRequiredResult(),
         )
 
     assert exc_info.value.status_code == 409
@@ -843,6 +806,7 @@ async def test_update_run_signoff_required(
             request_body=RequestModel(data=RunUpdate(current=False)),
             run_data_manager=mock_run_data_manager,
             access_control_status=False,
+            authentication=AuthenticationNotRequiredResult(),
         )
 
     assert exc_info.value.status_code == 409
@@ -931,6 +895,7 @@ async def test_update_run_signed_by_requires_run_signoff_write_scope(
             runId="run-id",
             request_body=RequestModel(data=RunUpdate(signedBy="Alice Example")),
             run_data_manager=mock_run_data_manager,
+            access_control_status=False,
             authentication=AuthenticatedResult(
                 scope=serialize_scopes({Scope.ROBOT_CONTROL_WRITE}),
                 username="testuser",
@@ -973,6 +938,7 @@ async def test_update_run_signed_by(
         runId="run-id",
         request_body=RequestModel(data=RunUpdate(signedBy="Alice Example")),
         run_data_manager=mock_run_data_manager,
+        access_control_status=False,
         authentication=AuthenticationNotRequiredResult(),
     )
 
