@@ -123,4 +123,3 @@ if __name__ == "__main__":
         help="Flag to determine if the process should run with a hardware simulator or active hardware.",
     )
     asyncio.run(build_and_run_hwc_pyro(parser.parse_args().simulate))
-
