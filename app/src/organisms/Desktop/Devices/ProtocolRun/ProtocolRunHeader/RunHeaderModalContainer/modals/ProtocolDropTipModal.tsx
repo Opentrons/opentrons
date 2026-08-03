@@ -53,7 +53,7 @@ export function useProtocolDropTipModal({
 }: UseProtocolDropTipModalProps): UseProtocolDropTipModalResult {
   const [showModal, setShowModal] = useState(areTipsAttached)
   // After skip-and-home, keep the modal closed even if tip state / run
-  // currentness briefly lag (e.g. close gated behind SignRun).
+  // currentness briefly lag after close is requested.
   const [hasSkipped, setHasSkipped] = useState(false)
 
   const { homePipettes, isHoming } = useHomePipettes({

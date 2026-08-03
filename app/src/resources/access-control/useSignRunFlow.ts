@@ -35,7 +35,8 @@ export function useSignRunFlow(
     uncloseable: boolean
   }) => Promise<{ username: string } | null>,
   popToast: () => void,
-  eatToast: () => void
+  eatToast: () => void,
+  onSigned?: () => void
 ): SignRunFlowResult {
   const queryClient = useQueryClient()
   const host = useHost()
@@ -153,9 +154,16 @@ export function useSignRunFlow(
       if (!trimmedName || trimmedName !== self?.data?.fullName) {
         return
       }
-      signRunMutation({ runId, name })
+      signRunMutation(
+        { runId, name },
+        {
+          onSuccess: () => {
+            onSigned?.()
+          },
+        }
+      )
     },
-    [self?.data?.fullName, signRunMutation, runId]
+    [self?.data?.fullName, signRunMutation, runId, onSigned]
   )
 
   return {
