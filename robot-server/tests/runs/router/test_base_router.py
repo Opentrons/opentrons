@@ -36,6 +36,8 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.robot.types import RobotTypeEnum
+from server_utils.audit.audit_server import Client as AuditClient
+from server_utils.audit.audit_server import GetLoggingEnabledData
 from server_utils.auth.resource_server.fastapi import AuthorizationError
 from server_utils.auth.resource_server.types import (
     AuthenticatedResult,
@@ -95,6 +97,7 @@ from robot_server.runs.run_models import (
     TipState,
 )
 from robot_server.runs.run_orchestrator_store import RunConflictError
+from robot_server.runs.run_store import RunStore
 
 
 def mock_notify_publishers() -> None:
@@ -116,6 +119,21 @@ def mock_data_files_directory(decoy: Decoy) -> Path:
     try to use it as an actual path and then we'll get confusing errors on Windows.
     """
     return decoy.mock(cls=Path)
+
+
+@pytest.fixture
+def mock_persistence_directory_root(decoy: Decoy) -> Path:
+    """Get a mocked out persistence directory root.
+
+    Mocks Path for the same reasons described above.
+    """
+    return decoy.mock(cls=Path)
+
+
+@pytest.fixture
+def mock_audit_client(decoy: Decoy) -> AuditClient:
+    """Get a mock AuditClient."""
+    return decoy.mock(cls=AuditClient)
 
 
 @pytest.fixture
@@ -648,6 +666,9 @@ async def test_delete_run_signoff_required(
 async def test_update_run_to_not_current(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    mock_run_store: RunStore,
+    mock_audit_client: AuditClient,
+    mock_protocol_store: ProtocolStore,
 ) -> None:
     """It should update a run to no longer be current."""
     expected_response = Run(
@@ -671,11 +692,18 @@ async def test_update_run_to_not_current(
     decoy.when(
         await mock_run_data_manager.uncurrent("run-id", access_control_status=False)
     ).then_return(expected_response)
+    decoy.when(await mock_audit_client.get_logging_enabled()).then_return(
+        GetLoggingEnabledData(loggingEnabled=False)
+    )
 
     result = await update_run(
         runId="run-id",
         request_body=RequestModel(data=RunUpdate(current=False)),
         run_data_manager=mock_run_data_manager,
+        run_store=mock_run_store,
+        audit_client=mock_audit_client,
+        persistence_directory_root=Path(),
+        protocol_store=mock_protocol_store,
         access_control_status=False,
         authentication=AuthenticationNotRequiredResult(),
     )
@@ -687,6 +715,10 @@ async def test_update_run_to_not_current(
 async def test_update_current_none_noop(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    mock_run_store: RunStore,
+    mock_audit_client: AuditClient,
+    mock_persistence_directory_root: Path,
+    mock_protocol_store: ProtocolStore,
 ) -> None:
     """It should noop if the update does not request any change to current."""
     expected_response = Run(
@@ -713,6 +745,10 @@ async def test_update_current_none_noop(
         runId="run-id",
         request_body=RequestModel(data=RunUpdate()),
         run_data_manager=mock_run_data_manager,
+        run_store=mock_run_store,
+        audit_client=mock_audit_client,
+        persistence_directory_root=Path(),
+        protocol_store=mock_protocol_store,
         access_control_status=False,
         authentication=AuthenticationNotRequiredResult(),
     )
@@ -724,6 +760,10 @@ async def test_update_current_none_noop(
 async def test_update_run_signed_by_and_uncurrent(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    mock_run_store: RunStore,
+    mock_audit_client: AuditClient,
+    mock_persistence_directory_root: Path,
+    mock_protocol_store: ProtocolStore,
 ) -> None:
     """It should sign then un-current in a single PATCH."""
     signed_response = Run(
@@ -752,6 +792,9 @@ async def test_update_run_signed_by_and_uncurrent(
     decoy.when(
         await mock_run_data_manager.uncurrent("run-id", access_control_status=False)
     ).then_return(uncurrent_response)
+    decoy.when(await mock_audit_client.get_logging_enabled()).then_return(
+        GetLoggingEnabledData(loggingEnabled=False)
+    )
 
     result = await update_run(
         runId="run-id",
@@ -759,6 +802,10 @@ async def test_update_run_signed_by_and_uncurrent(
             data=RunUpdate(signedBy="Alice Example", current=False)
         ),
         run_data_manager=mock_run_data_manager,
+        run_store=mock_run_store,
+        audit_client=mock_audit_client,
+        persistence_directory_root=Path(),
+        protocol_store=mock_protocol_store,
         access_control_status=False,
         authentication=AuthenticationNotRequiredResult(),
     )
@@ -770,6 +817,10 @@ async def test_update_run_signed_by_and_uncurrent(
 async def test_update_run_not_complete(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    mock_run_store: RunStore,
+    mock_audit_client: AuditClient,
+    mock_persistence_directory_root: Path,
+    mock_protocol_store: ProtocolStore,
 ) -> None:
     """It should 409 if signing a run that has not completed."""
     decoy.when(
@@ -781,6 +832,10 @@ async def test_update_run_not_complete(
             runId="run-id",
             request_body=RequestModel(data=RunUpdate(signedBy="Alice Example")),
             run_data_manager=mock_run_data_manager,
+            run_store=mock_run_store,
+            audit_client=mock_audit_client,
+            persistence_directory_root=Path(),
+            protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticationNotRequiredResult(),
         )
@@ -792,6 +847,10 @@ async def test_update_run_not_complete(
 async def test_update_run_signoff_required(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    mock_run_store: RunStore,
+    mock_audit_client: AuditClient,
+    mock_persistence_directory_root: Path,
+    mock_protocol_store: ProtocolStore,
 ) -> None:
     """It should 409 if un-currenting requires signoff."""
     decoy.when(
@@ -805,6 +864,10 @@ async def test_update_run_signoff_required(
             runId="run-id",
             request_body=RequestModel(data=RunUpdate(current=False)),
             run_data_manager=mock_run_data_manager,
+            run_store=mock_run_store,
+            audit_client=mock_audit_client,
+            persistence_directory_root=Path(),
+            protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticationNotRequiredResult(),
         )
@@ -816,6 +879,10 @@ async def test_update_run_signoff_required(
 async def test_update_to_current_not_current(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    mock_run_store: RunStore,
+    mock_audit_client: AuditClient,
+    mock_persistence_directory_root: Path,
+    mock_protocol_store: ProtocolStore,
 ) -> None:
     """It should 409 if attempting to update a not current run."""
     decoy.when(
@@ -829,6 +896,10 @@ async def test_update_to_current_not_current(
             runId="run-id",
             request_body=RequestModel(data=RunUpdate(current=False)),
             run_data_manager=mock_run_data_manager,
+            run_store=mock_run_store,
+            audit_client=mock_audit_client,
+            persistence_directory_root=Path(),
+            protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticationNotRequiredResult(),
         )
@@ -840,6 +911,10 @@ async def test_update_to_current_not_current(
 async def test_update_to_current_conflict(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    mock_run_store: RunStore,
+    mock_audit_client: AuditClient,
+    mock_persistence_directory_root: Path,
+    mock_protocol_store: ProtocolStore,
 ) -> None:
     """It should 409 if attempting to un-current a run that is not idle."""
     decoy.when(
@@ -853,6 +928,10 @@ async def test_update_to_current_conflict(
             runId="run-id",
             request_body=RequestModel(data=RunUpdate(current=False)),
             run_data_manager=mock_run_data_manager,
+            run_store=mock_run_store,
+            audit_client=mock_audit_client,
+            persistence_directory_root=Path(),
+            protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticationNotRequiredResult(),
         )
@@ -864,6 +943,10 @@ async def test_update_to_current_conflict(
 async def test_update_to_current_missing(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    mock_run_store: RunStore,
+    mock_audit_client: AuditClient,
+    mock_persistence_directory_root: Path,
+    mock_protocol_store: ProtocolStore,
 ) -> None:
     """It should 404 if attempting to update a missing run."""
     decoy.when(
@@ -877,6 +960,10 @@ async def test_update_to_current_missing(
             runId="run-id",
             request_body=RequestModel(data=RunUpdate(current=False)),
             run_data_manager=mock_run_data_manager,
+            run_store=mock_run_store,
+            audit_client=mock_audit_client,
+            persistence_directory_root=Path(),
+            protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticationNotRequiredResult(),
         )
@@ -886,8 +973,11 @@ async def test_update_to_current_missing(
 
 
 async def test_update_run_signed_by_requires_run_signoff_write_scope(
-    decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    mock_run_store: RunStore,
+    mock_audit_client: AuditClient,
+    mock_persistence_directory_root: Path,
+    mock_protocol_store: ProtocolStore,
 ) -> None:
     """It should reject signedBy updates when the token lacks run_signoff.write."""
     with pytest.raises(AuthorizationError) as exc_info:
@@ -895,6 +985,10 @@ async def test_update_run_signed_by_requires_run_signoff_write_scope(
             runId="run-id",
             request_body=RequestModel(data=RunUpdate(signedBy="Alice Example")),
             run_data_manager=mock_run_data_manager,
+            run_store=mock_run_store,
+            audit_client=mock_audit_client,
+            persistence_directory_root=Path(),
+            protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticatedResult(
                 scope=serialize_scopes({Scope.ROBOT_CONTROL_WRITE}),
@@ -909,6 +1003,10 @@ async def test_update_run_signed_by_requires_run_signoff_write_scope(
 async def test_update_run_signed_by(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    mock_run_store: RunStore,
+    mock_audit_client: AuditClient,
+    mock_persistence_directory_root: Path,
+    mock_protocol_store: ProtocolStore,
 ) -> None:
     """It should update signedBy when the request is authorized."""
     expected_response = Run(
@@ -938,6 +1036,10 @@ async def test_update_run_signed_by(
         runId="run-id",
         request_body=RequestModel(data=RunUpdate(signedBy="Alice Example")),
         run_data_manager=mock_run_data_manager,
+        run_store=mock_run_store,
+        audit_client=mock_audit_client,
+        persistence_directory_root=Path(),
+        protocol_store=mock_protocol_store,
         access_control_status=False,
         authentication=AuthenticationNotRequiredResult(),
     )

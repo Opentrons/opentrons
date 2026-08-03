@@ -1,13 +1,17 @@
 """server_utils.audit.audit_server.Client implementation for local log storage."""
 
 import datetime
-from typing import override
+from typing import TextIO, override
 
 from server_utils.audit.audit_server import (
     AuditSettingsResponseData as SUSettingsData,
 )
 from server_utils.audit.audit_server import (
     Client as SUClient,
+)
+from server_utils.audit.audit_server import (
+    GetLoggingEnabledData,
+    StoreRobotLogSuccessData,
 )
 from server_utils.audit.audit_server import (
     SubmitAuditLogMessageData as SUSubmitData,
@@ -53,4 +57,16 @@ class LocalClient(SUClient):
         return SUSettingsData(
             requireReasonForInteraction=settings.requireReasonForInteraction,
             minLengthOfReasonForInteraction=settings.minLengthOfReasonForInteraction,
+        )
+
+    @override
+    async def store_robot_log(self, robot_log_file: TextIO) -> StoreRobotLogSuccessData:
+        raise RuntimeError(
+            "Should not be calling store robot log from audit server directly"
+        )
+
+    @override
+    async def get_logging_enabled(self) -> GetLoggingEnabledData:
+        return GetLoggingEnabledData(
+            loggingEnabled=self._settings_store.get_logging_enabled()
         )
