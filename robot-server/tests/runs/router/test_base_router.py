@@ -37,6 +37,7 @@ from opentrons_shared_data.labware.labware_definition import (
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.robot.types import RobotTypeEnum
 from server_utils.audit.audit_server import Client as AuditClient
+from server_utils.audit.audit_server import GetLoggingEnabledData
 from server_utils.auth.resource_server.fastapi import AuthorizationError
 from server_utils.auth.resource_server.types import (
     AuthenticatedResult,
@@ -691,6 +692,9 @@ async def test_update_run_to_not_current(
     decoy.when(
         await mock_run_data_manager.uncurrent("run-id", access_control_status=False)
     ).then_return(expected_response)
+    decoy.when(await mock_audit_client.get_logging_enabled()).then_return(
+        GetLoggingEnabledData(loggingEnabled=False)
+    )
 
     result = await update_run(
         runId="run-id",
@@ -966,8 +970,11 @@ async def test_update_to_current_missing(
 
 
 async def test_update_run_signed_by_requires_run_signoff_write_scope(
-    decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    mock_run_store: RunStore,
+    mock_audit_client: AuditClient,
+    mock_persistence_directory_root: Path,
+    mock_protocol_store: ProtocolStore,
 ) -> None:
     """It should reject signedBy updates when the token lacks run_signoff.write."""
     with pytest.raises(AuthorizationError) as exc_info:
@@ -975,6 +982,10 @@ async def test_update_run_signed_by_requires_run_signoff_write_scope(
             runId="run-id",
             request_body=RequestModel(data=RunUpdate(signedBy="Alice Example")),
             run_data_manager=mock_run_data_manager,
+            run_store=mock_run_store,
+            audit_client=mock_audit_client,
+            persistence_directory_root=Path(),
+            protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticatedResult(
                 scope=serialize_scopes({Scope.ROBOT_CONTROL_WRITE}),
@@ -989,6 +1000,10 @@ async def test_update_run_signed_by_requires_run_signoff_write_scope(
 async def test_update_run_signed_by(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
+    mock_run_store: RunStore,
+    mock_audit_client: AuditClient,
+    mock_persistence_directory_root: Path,
+    mock_protocol_store: ProtocolStore,
 ) -> None:
     """It should update signedBy when the request is authorized."""
     expected_response = Run(
@@ -1018,6 +1033,10 @@ async def test_update_run_signed_by(
         runId="run-id",
         request_body=RequestModel(data=RunUpdate(signedBy="Alice Example")),
         run_data_manager=mock_run_data_manager,
+        run_store=mock_run_store,
+        audit_client=mock_audit_client,
+        persistence_directory_root=Path(),
+        protocol_store=mock_protocol_store,
         access_control_status=False,
         authentication=AuthenticationNotRequiredResult(),
     )
