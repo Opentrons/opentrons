@@ -5,6 +5,8 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from pathlib import Path
 
+import fastapi
+import pytest
 from decoy import Decoy, matchers
 
 from server_utils.keys.key_server import Client as KeyClient
@@ -13,10 +15,19 @@ from server_utils.persistence.persistence_directory import PERSISTENCE_TEMP_SUBD
 from server_utils.robot.robot_server import Client as RobotServerClient
 from server_utils.robot.robot_server import RobotNameandSerial
 
-from audit_server.log_export.router import download_log_period, get_log_periods
+from audit_server.log_export.router import (
+    download_log_period,
+    get_log_period_summary,
+    get_log_periods,
+)
 from audit_server.log_storage.log_data_manager import LogDataManager
-from audit_server.log_storage.models import LogPeriodSummary, UserLogForExport
-from audit_server.log_storage.types import LogPeriodEntries
+from audit_server.log_storage.models import (
+    LogPeriodSummary,
+    UserLogEntry,
+    UserLogForExport,
+)
+from audit_server.log_storage.store import NoPeriodById
+from audit_server.log_storage.types import LogPeriodEntries, RobotLogPaths
 
 _OLDER_PERIOD = LogPeriodSummary(
     id=1,
@@ -71,6 +82,79 @@ async def test_get_log_periods_preserves_store_order(
     assert result.data[0].startedAt > result.data[1].startedAt
     assert result.data[0].endedAt is None
     assert result.data[1].endedAt is not None
+
+
+async def test_get_log_period_summary(
+    decoy: Decoy,
+    mock_log_data_manager: LogDataManager,
+    tmp_path: Path,
+) -> None:
+    """It should return period details including size and attached filenames."""
+    robot_log_path = tmp_path / "robot.log"
+    robot_log_path.write_bytes(b"robot-log-bytes")
+    period_entries = LogPeriodEntries(
+        user_log=UserLogForExport(
+            userLogEntries=[
+                UserLogEntry(
+                    message="hello",
+                    message_hash="h1",
+                    message_sig="s1",
+                    sig_version="1",
+                ),
+                UserLogEntry(
+                    message="world",
+                    message_hash="h2",
+                    message_sig="s2",
+                    sig_version="1",
+                ),
+            ],
+            startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
+            endedAt=datetime(2024, 1, 2, tzinfo=timezone.utc),
+        ),
+        robot_log_entries=[
+            RobotLogPaths(
+                file_path=str(robot_log_path),
+                file_hash="fh",
+                file_sig="fs",
+                file_sig_version="1",
+            )
+        ],
+    )
+    decoy.when(mock_log_data_manager.get_period_entries(period_id="1")).then_return(
+        period_entries
+    )
+
+    result = await get_log_period_summary(
+        periodId="1",
+        log_data_manager=mock_log_data_manager,
+    )
+
+    assert result.data.id == 1
+    assert result.data.startedAt == datetime(2024, 1, 1, tzinfo=timezone.utc)
+    assert result.data.endedAt == datetime(2024, 1, 2, tzinfo=timezone.utc)
+    assert result.data.recordCount == 2
+    assert result.data.attachedFilenames == ["robot.log"]
+    assert result.data.totalSizeBytes == len(b"hello") + len(b"world") + len(
+        b"robot-log-bytes"
+    )
+
+
+async def test_get_log_period_summary_not_found(
+    decoy: Decoy,
+    mock_log_data_manager: LogDataManager,
+) -> None:
+    """It should raise 404 when the period does not exist."""
+    decoy.when(mock_log_data_manager.get_period_entries(period_id="999")).then_raise(
+        NoPeriodById()
+    )
+
+    with pytest.raises(fastapi.HTTPException) as exc_info:
+        await get_log_period_summary(
+            periodId="999",
+            log_data_manager=mock_log_data_manager,
+        )
+
+    assert exc_info.value.status_code == fastapi.status.HTTP_404_NOT_FOUND
 
 
 async def test_download_log_period_stages_under_persistence_temp(
