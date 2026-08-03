@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 import { useDispatch, useSelector, useStore } from 'react-redux'
 
 import {
@@ -19,6 +19,8 @@ import { getRobotUpdateSessionRobotName } from '/app/redux/robot-update/selector
 import { runRobotUpdateFlow } from './runRobotUpdateFlow'
 import { useRobotUpdateHostConfig } from './useRobotUpdateHostConfig'
 
+import type { HostConfig } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type { Dispatch, State } from '/app/redux/types'
 
 /**
@@ -30,41 +32,61 @@ export function useRobotUpdateOrchestrator(): {
   const dispatch = useDispatch<Dispatch>()
   const store = useStore<State>()
   const sessionRobotName = useSelector(getRobotUpdateSessionRobotName)
-  const hostConfig = useRobotUpdateHostConfig()
+  const baseHostConfig = useRobotUpdateHostConfig()
   const accessToken = useAccessTokenForRobot(sessionRobotName)
 
   const abortRef = useRef<AbortController | null>(null)
 
-  // There are serveral values that may change while the update is in flight,
-  // so we store the latest values in refs and read them via getters inside the
-  // promise pipeline.
+  // Values that may change mid-flow. Read via getters.
   const accessTokenRef = useRef(accessToken)
   accessTokenRef.current = accessToken
+
+  const unauthenticatedHostConfig = useMemo(
+    () => (baseHostConfig == null ? null : withoutAccessToken(baseHostConfig)),
+    [baseHostConfig]
+  )
 
   const { documentationState, clearDocreport } = useLinkedDocumentationState(
     ['update_robot_software', 'restart_robot'],
     sessionRobotName,
     sessionRobotName,
-    hostConfig
+    unauthenticatedHostConfig
   )
 
   const docsStateRef = useRef(documentationState)
   docsStateRef.current = documentationState
 
+  const hostConfigReadyRef = useRef(false)
+  hostConfigReadyRef.current = unauthenticatedHostConfig != null
+
+  // Only attach the bearer token when access control is actually enabled.
+  const mutationHostConfig = useMemo(() => {
+    if (baseHostConfig == null) {
+      return null
+    }
+    return shouldUseAccessToken(documentationState)
+      ? baseHostConfig
+      : withoutAccessToken(baseHostConfig)
+  }, [baseHostConfig, documentationState])
+
   const createSessionMutation = useCreateRobotUpdateSessionMutation(
     documentationState,
     {},
-    hostConfig
+    mutationHostConfig
   )
   const cancelSessionMutation = useCancelRobotUpdateSessionMutation(
     {},
-    hostConfig
+    mutationHostConfig
   )
   const commitSessionMutation = useCommitRobotUpdateSessionMutation(
     {},
-    hostConfig
+    mutationHostConfig
   )
-  const restartMutation = useRestartMutation(documentationState, {}, hostConfig)
+  const restartMutation = useRestartMutation(
+    documentationState,
+    {},
+    mutationHostConfig
+  )
 
   const mutationsRef = useRef({
     createSession: createSessionMutation.mutateAsync,
@@ -94,8 +116,14 @@ export function useRobotUpdateOrchestrator(): {
         dispatch,
         robotName,
         systemFile: systemFile ?? null,
-        getAccessToken: () => accessTokenRef.current,
+        getAccessToken: () => {
+          if (!shouldUseAccessToken(docsStateRef.current)) {
+            return null
+          }
+          return accessTokenRef.current
+        },
         getDocumentationState: () => docsStateRef.current,
+        isHostConfigReady: () => hostConfigReadyRef.current,
         getMutations: () => mutationsRef.current,
         signal: abortController.signal,
       })
@@ -104,4 +132,14 @@ export function useRobotUpdateOrchestrator(): {
   )
 
   return { startUpdate }
+}
+
+function withoutAccessToken(hostConfig: HostConfig): HostConfig {
+  return { ...hostConfig, token: null }
+}
+
+function shouldUseAccessToken(documentationState: DocumentationState): boolean {
+  return (
+    !documentationState.isLoading && documentationState.accessControlEnabled
+  )
 }

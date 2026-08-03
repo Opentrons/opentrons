@@ -83,6 +83,7 @@ export interface RobotUpdateFlowDeps {
   systemFile: string | null
   getAccessToken: () => string | null | undefined
   getDocumentationState: () => DocumentationState
+  isHostConfigReady: () => boolean
   getMutations: () => RobotUpdateFlowMutations
   signal: AbortSignal
 }
@@ -94,6 +95,10 @@ export function runRobotUpdateFlow(deps: RobotUpdateFlowDeps): Promise<void> {
   const { store, dispatch, robotName, systemFile, signal } = deps
 
   return ensureUpdateFileReady(store, dispatch, robotName, systemFile, signal)
+    .then(session =>
+      // Avoid createSession while AC settings are still loading.
+      waitForDocumentationReady(deps, signal).then(() => session)
+    )
     .then(session => {
       const robot = getRobotUpdateRobot(store.getState())
       if (robot == null) {
@@ -202,6 +207,45 @@ export function runRobotUpdateFlow(deps: RobotUpdateFlowDeps): Promise<void> {
 
 function isAbortError(error: unknown): boolean {
   return error instanceof DOMException && error.name === 'AbortError'
+}
+
+function waitForDocumentationReady(
+  deps: RobotUpdateFlowDeps,
+  signal: AbortSignal
+): Promise<DocumentationState> {
+  return new Promise((resolve, reject) => {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null
+
+    const cleanup = (): void => {
+      if (timeoutId != null) clearTimeout(timeoutId)
+      signal.removeEventListener('abort', onAbort)
+    }
+
+    const onAbort = (): void => {
+      cleanup()
+      reject(new DOMException('Aborted', 'AbortError'))
+    }
+
+    signal.addEventListener('abort', onAbort, { once: true })
+
+    const tick = (): void => {
+      if (signal.aborted) {
+        onAbort()
+        return
+      }
+      // Host must be ready so AC queries are enabled. Otherwise docstate looks
+      // settled as "AC off" while queries have not run yet.
+      const documentationState = deps.getDocumentationState()
+      if (deps.isHostConfigReady() && !documentationState.isLoading) {
+        cleanup()
+        resolve(documentationState)
+        return
+      }
+      timeoutId = setTimeout(tick, 50)
+    }
+
+    tick()
+  })
 }
 
 function reportFlowError(dispatch: Dispatch, error: unknown): void {
