@@ -2,10 +2,11 @@
 
 from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass, asdict
-from time import time
+from time import sleep, time
 import copy
 import json
 import traceback
+from uuid import uuid4
 
 from opentrons.protocol_api import (
     ProtocolContext,
@@ -126,6 +127,14 @@ metadata = {"protocolName": "Gravimetric QC V3"}
 requirements = {"robotType": "Flex", "apiLevel": "2.29"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
+
+MANUAL_LLD_STATE_FILE = os.environ.get(
+    "MANUAL_LLD_STATE_FILE", "/data/testing_data/manual_lld.json"
+)
+MANUAL_LLD_START_OFFSET_MM = 3.0
+MANUAL_LLD_POLL_INTERVAL_SECONDS = 0.1
+MANUAL_LLD_MIN_HEIGHT_MM = 0.5
+MANUAL_LLD_DEFAULT_JOG_STEP_MM = 0.1
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -436,7 +445,9 @@ class FixtureSettings(CSVSettings):
     isolate_volumes: bool
     fast_simulate: bool
     use_impact_protection: bool
+    use_lld: bool
     ImpactSerial_U: Optional[ImpactProtectionV2.ImpactProtectionBase]
+    manual_lld_completed: bool = False
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -517,6 +528,7 @@ class FixtureSettings(CSVSettings):
         env_sensor, link_port = AsairDriver.BuildAsairSensorWithPort(simulating)
         env_serial = env_sensor.get_serial()
         use_impact_protection = ctx.params.use_impact_protection  # type: ignore [attr-defined]
+        use_lld = ctx.params.use_lld  # type: ignore [attr-defined]
         # 链接防撞工装
         ImpactSerial = None
         if use_impact_protection:
@@ -596,6 +608,7 @@ class FixtureSettings(CSVSettings):
             isolate_volumes=False,
             fast_simulate=fast_simulate,
             use_impact_protection=use_impact_protection,
+            use_lld=use_lld,
             ImpactSerial_U=ImpactSerial,
             **asdict(csv_settings),
         )
@@ -852,6 +865,16 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="use_impact_protection",
         default=True,
         description="Whether to use impact protection device during testing.",
+    )
+
+    parameters.add_bool(
+        display_name="Use LLD",
+        variable_name="use_lld",
+        default=True,
+        description=(
+            "Use pressure LLD. Disable to wait for manual Z jog confirmation "
+            "from the HTTP service."
+        ),
     )
 
     parameters.add_bool(
@@ -1451,7 +1474,7 @@ def run_one_test(
         fixture_settings, MeasurementType.INIT, tip, volume, trial, channel=channel
     )
     liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
-    if fixture_settings.lld_every_tip:
+    if fixture_settings.lld_every_tip and fixture_settings.use_lld:
         fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
     elif last_measurement:
         volume_lost_since_last_trial = calculate_change_in_volume(
@@ -1514,6 +1537,149 @@ def _configure_tip_count(fixture_settings: FixtureSettings, channel: int) -> Non
         print_info(f"Configuring for single tip with {primary}")
 
 
+def _write_manual_lld_state(state: Dict[str, object]) -> None:
+    """Atomically write the shared manual LLD state file."""
+    state_directory = os.path.dirname(MANUAL_LLD_STATE_FILE)
+    if state_directory:
+        os.makedirs(state_directory, exist_ok=True)
+    temporary_path = f"{MANUAL_LLD_STATE_FILE}.{uuid4().hex}.tmp"
+    with open(temporary_path, "w", encoding="utf-8") as state_file:
+        json.dump(state, state_file, indent=2, sort_keys=True)
+        state_file.flush()
+        os.fsync(state_file.fileno())
+    os.replace(temporary_path, MANUAL_LLD_STATE_FILE)
+
+
+def _read_manual_lld_state() -> Dict[str, object]:
+    """Read the shared manual LLD state file."""
+    with open(MANUAL_LLD_STATE_FILE, encoding="utf-8") as state_file:
+        state = json.load(state_file)
+    if not isinstance(state, dict):
+        raise RuntimeError("manual_lld.json must contain a JSON object.")
+    return state
+
+
+def _manually_set_liquid_height(fixture_settings: FixtureSettings) -> None:
+    """Wait for HTTP-driven Z jog confirmation and update liquid tracking."""
+    if fixture_settings.manual_lld_completed:
+        print_info("Reusing the manually calibrated liquid height.")
+        return
+    if fixture_settings.ctx.is_simulating():
+        fixture_settings.manual_lld_completed = True
+        print_info("Simulating manual LLD with the configured source liquid volume.")
+        return
+    if not os.path.exists(MANUAL_LLD_STATE_FILE):
+        raise RuntimeError(
+            f"Manual LLD state file does not exist at {MANUAL_LLD_STATE_FILE}. "
+            "Start manual_lld_http_server.py on the robot before starting the run."
+        )
+
+    source_well = fixture_settings.liquid_source
+    source_well_depth = float(source_well.depth)
+    start_height = source_well_depth + MANUAL_LLD_START_OFFSET_MM
+    session_id = f"{fixture_settings.run_id}-{uuid4().hex}"
+    pipette_id = fixture_settings.pipette._core.pipette_id  # type: ignore[attr-defined]
+    existing_state = _read_manual_lld_state()
+    existing_jog_step = existing_state.get("jog_step_mm")
+    jog_step = (
+        float(existing_jog_step)
+        if isinstance(existing_jog_step, (int, float))
+        and not isinstance(existing_jog_step, bool)
+        and existing_jog_step > 0
+        else MANUAL_LLD_DEFAULT_JOG_STEP_MM
+    )
+
+    fixture_settings.pipette.move_to(source_well.top(z=MANUAL_LLD_START_OFFSET_MM))
+    waiting_state: Dict[str, object] = {
+        "version": 1,
+        "session_id": session_id,
+        "status": "waiting",
+        "confirmed": False,
+        "created_at": time(),
+        "pipette_id": pipette_id,
+        "pipette_mount": fixture_settings.mount,
+        "source_labware_uri": source_well.parent.uri,
+        "source_well": source_well.well_name,
+        "start_height_from_bottom_mm": start_height,
+        "source_well_depth_mm": source_well_depth,
+        "height_from_bottom_mm": start_height,
+        "cumulative_z_mm": 0.0,
+        "jog_step_mm": jog_step,
+        "minimum_height_from_bottom_mm": MANUAL_LLD_MIN_HEIGHT_MM,
+        "maximum_height_from_bottom_mm": start_height,
+    }
+    _write_manual_lld_state(waiting_state)
+    print_info(
+        "Manual LLD is waiting for Z jog and confirmation. "
+        f"Session: {session_id}; state file: {MANUAL_LLD_STATE_FILE}"
+    )
+
+    while True:
+        try:
+            state = _read_manual_lld_state()
+        except (FileNotFoundError, json.JSONDecodeError):
+            sleep(MANUAL_LLD_POLL_INTERVAL_SECONDS)
+            continue
+
+        state_session_id = state.get("session_id")
+        status = state.get("status")
+        if state_session_id != session_id:
+            raise RuntimeError(
+                "The manual LLD service reset or replaced the active calibration "
+                f"session. Expected {session_id}, found {state_session_id}."
+            )
+        if status == "cancelled":
+            raise RuntimeError("Manual liquid-height calibration was cancelled.")
+        if status == "confirmed" and state.get("confirmed") is True:
+            cumulative_z = state.get("cumulative_z_mm")
+            if not isinstance(cumulative_z, (int, float)):
+                raise RuntimeError(
+                    "manual_lld.json confirmed without a numeric cumulative_z_mm."
+                )
+            height_from_bottom = start_height + float(cumulative_z)
+            if not MANUAL_LLD_MIN_HEIGHT_MM <= height_from_bottom <= source_well_depth:
+                raise RuntimeError(
+                    "Confirmed manual liquid height is outside the source well: "
+                    f"{height_from_bottom:.3f} mm from bottom; expected "
+                    f"{MANUAL_LLD_MIN_HEIGHT_MM:.3f} to {source_well_depth:.3f} mm."
+                )
+            break
+        sleep(MANUAL_LLD_POLL_INTERVAL_SECONDS)
+
+    consumed_state = dict(state)
+    consumed_state.update(
+        {
+            "status": "consumed",
+            "confirmed": False,
+            "consumed_at": time(),
+            "height_from_bottom_mm": height_from_bottom,
+        }
+    )
+    _write_manual_lld_state(consumed_state)
+
+    fixture_settings.pipette.move_to(source_well.top(z=MANUAL_LLD_START_OFFSET_MM))
+    liquid_volume = source_well.volume_from_height(height_from_bottom)
+    if not isinstance(liquid_volume, (int, float)):
+        raise RuntimeError(
+            "Could not convert the confirmed manual liquid height to a volume."
+        )
+    source_well.load_liquid(fixture_settings.liquid, float(liquid_volume))
+    fixture_settings.manual_lld_completed = True
+    print_info(
+        "Manual liquid height confirmed: "
+        f"{height_from_bottom:.3f} mm from well bottom "
+        f"({float(liquid_volume):.3f} uL)."
+    )
+
+
+def _initialize_liquid_height(fixture_settings: FixtureSettings) -> None:
+    """Initialize the source liquid height using LLD or manual calibration."""
+    if fixture_settings.use_lld:
+        fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
+    else:
+        _manually_set_liquid_height(fixture_settings)
+
+
 def calculate_evaporation(
     ctx: ProtocolContext,
     fixture_settings: FixtureSettings,
@@ -1527,7 +1693,7 @@ def calculate_evaporation(
     fixture_settings.pipette._retract()
     maybe_switch_mode(fixture_settings, fixture_settings.tip_sizes[0])
 
-    fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
+    _initialize_liquid_height(fixture_settings)
     print_info(
         f"Test source has {fixture_settings.liquid_source.current_liquid_volume()}"
     )
@@ -1615,14 +1781,15 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     tip_sizes_done = []
     for tip in fixture_settings.tip_sizes:
         if tip != last_probed_tip_size:
-            _configure_tip_count(fixture_settings, 0)
-            probe_tip = _get_tips_for_test(fixture_settings, tip, False)[0]
-            pick_up_tip_for_channel(fixture_settings, probe_tip, 0)
-            fixture_settings.pipette.require_liquid_presence(
-                fixture_settings.liquid_source
-            )
+            if fixture_settings.use_lld:
+                _configure_tip_count(fixture_settings, 0)
+                probe_tip = _get_tips_for_test(fixture_settings, tip, False)[0]
+                pick_up_tip_for_channel(fixture_settings, probe_tip, 0)
+                fixture_settings.pipette.require_liquid_presence(
+                    fixture_settings.liquid_source
+                )
+                remove_tip(fixture_settings)
             last_probed_tip_size = tip
-            remove_tip(fixture_settings)
 
         volumes_to_tests = fixture_settings.volumes[tip]
         if tip in tip_sizes_done or len(fixture_settings.volumes[tip]) == 0:
@@ -1642,7 +1809,7 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 # override pipette movement conflict checking 'cause we specially lay out our tipracks
                 tips = _get_tips_for_test(fixture_settings, tip, False, channel)
                 print_info(str(tips))
-                if channel == 7:
+                if channel == 7 and fixture_settings.use_lld:
                     # we're doing an 8 channel test and just swapped over to the front channel.
                     print_info(
                         "Switching to channel 7, running LLD again and skipping evap loss application."
