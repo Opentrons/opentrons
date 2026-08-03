@@ -93,7 +93,7 @@ describe('PersonalAccountSettingsEditForm', () => {
     })
     fireEvent.blur(usernameInput)
     await waitFor(() => {
-      screen.getByText('Username is required.')
+      expect(screen.getByText('Username is required.')).toBeInTheDocument()
     })
   })
 

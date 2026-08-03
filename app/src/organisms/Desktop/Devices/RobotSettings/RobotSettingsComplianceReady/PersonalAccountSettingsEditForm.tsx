@@ -10,7 +10,6 @@ import { UserAccountPasswordFormFields } from './userAccount/UserAccountPassword
 
 import type { TFunction } from 'i18next'
 import type { JSX } from 'react'
-import type { FieldError, Resolver } from 'react-hook-form'
 import type { UpdateSelfRequest } from '@opentrons/api-client'
 
 export interface PersonalAccountSettingsEditFormProps {
@@ -35,35 +34,8 @@ export function PersonalAccountSettingsEditForm({
   onSave,
   onCancel,
 }: PersonalAccountSettingsEditFormProps): JSX.Element {
-  const { t }: { t: TFunction } = useTranslation(['device_settings', 'shared'])
-
-  const resolver: Resolver<FormValues> = values => {
-    const errors: Partial<Record<keyof FormValues, FieldError>> = {}
-
-    if (values.username.trim() === '') {
-      errors.username = {
-        type: 'validate',
-        message: t(
-          'desktop_personal_account_settings_username_required_error'
-        ) as string,
-      }
-    }
-
-    if (values.fullName.trim() === '') {
-      errors.fullName = {
-        type: 'validate',
-        message: t('desktop_add_user_legal_name_required_error') as string,
-      }
-    }
-
-    if (values.password !== '' && values.password !== values.confirmPassword) {
-      errors.confirmPassword = {
-        type: 'validate',
-        message: t('desktop_password_mismatch') as string,
-      }
-    }
-
-    return { values, errors }
+  const { t } = useTranslation(['device_settings', 'shared']) as {
+    t: TFunction
   }
 
   const { control, handleSubmit, watch, setError } = useForm<FormValues>({
@@ -73,7 +45,6 @@ export function PersonalAccountSettingsEditForm({
       password: '',
       confirmPassword: '',
     },
-    resolver,
     mode: 'onBlur',
     reValidateMode: 'onChange',
   })

@@ -53,7 +53,9 @@ export function AddUserModal({
   onClose,
   onUserCreated,
 }: AddUserModalProps): JSX.Element {
-  const { t }: { t: TFunction } = useTranslation(['device_settings', 'shared'])
+  const { t } = useTranslation(['device_settings', 'shared']) as {
+    t: TFunction
+  }
   const [generatedPassword, setGeneratedPassword] = useState<string | null>(
     null
   )

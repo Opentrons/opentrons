@@ -41,7 +41,9 @@ function FieldRow({ label, children }: FieldRowProps): JSX.Element {
 export function PersonalAccountSettings({
   robotName,
 }: PersonalAccountSettingsProps): JSX.Element {
-  const { t }: { t: TFunction } = useTranslation(['device_settings', 'shared'])
+  const { t } = useTranslation(['device_settings', 'shared']) as {
+    t: TFunction
+  }
   const dispatch = useDispatch()
   const documentationState = useDocumentationState(undefined, robotName)
   const loggedInUser = useLoggedInUserForRobot(robotName)

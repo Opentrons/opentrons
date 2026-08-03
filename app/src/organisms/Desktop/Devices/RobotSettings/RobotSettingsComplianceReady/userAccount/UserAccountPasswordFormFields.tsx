@@ -1,4 +1,4 @@
-import { Controller } from 'react-hook-form'
+import { Controller, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
@@ -17,6 +17,10 @@ export function UserAccountPasswordFormFields<T extends FieldValues>({
   control,
 }: UserAccountPasswordFormFieldsProps<T>): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const password = useWatch({
+    control,
+    name: 'password' as Path<T>,
+  })
 
   return (
     <div className={styles.fields_row}>
@@ -48,6 +52,13 @@ export function UserAccountPasswordFormFields<T extends FieldValues>({
           <Controller
             control={control}
             name={'confirmPassword' as Path<T>}
+            rules={{
+              validate: value =>
+                (password as string) === '' ||
+                (value as string) === '' ||
+                (value as string) === (password as string) ||
+                (t('desktop_password_mismatch') as string),
+            }}
             render={({ field, fieldState }) => (
               <PasswordInputField
                 value={field.value}
