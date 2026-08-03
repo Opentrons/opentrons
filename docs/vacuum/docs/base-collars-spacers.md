@@ -1,9 +1,9 @@
 ---
-title: "Vacuum Module: Vacuum Base, Collars, and Spacers"
-description: "General use and specifications for Vacuum Module deck components."
+title: "Vacuum Module: Deck Components"
+description: "General descriptions of Vacuum Module deck pieces."
 ---
 
-Module deck components consist of a vacuum base, interchangeable collars, and internal spacers. The vacuum base forms the foundation of this on-deck hardware stack. Collars and spacers rest sequentially on the base to control labware stacking heights across various automated filtration protocols, ensuring an airtight seal whether capturing an eluate or discarding waste.
+Module deck components consist of a vacuum base, interchangeable collars, internal spacers, and well plate support grids. The vacuum base forms the foundation of this on-deck hardware stack. Collars and spacers rest sequentially on the base to control labware stacking heights between well plates and help ensure an airtight seal. At the top of the stack, a wide or narrow metal grid provides extra support for a filter plate when placed under vacuum.
 
 ## Vacuum base
 
@@ -31,6 +31,21 @@ Both collars accommodate standard ANSI/SLAS compliant filter plates across a spa
 ![Illustration of short collar, 42 mm](images/collar-short.svg)
 ![Illustration of tall collar, 72 mm](images/collar-tall.svg)
 <figcaption>Short collar (42 mm) and tall collar (72 mm)</figcaption>
+</figure>
+
+## Support grids
+
+Support grids hold filter plates on top of the short or tall collars. These grids are made of metal and provide a rigid foundation that supports filter plates when placed under strong vacuum pressure.
+
+The Vacuum Module includes two support grids to match different well plate profiles:
+
+- **Wide grid:** Features large openings and is designed for vacuum protocols that use 96-well filter plates.
+- **Narrow grid:** Features small openings and is designed for vacuum protocols that use 384-well filter plates.
+
+<figure class="side-by-side" markdown>
+![Wide support grid](images/support-grid-96-wells.svg)
+![Narrow support grid](images/support-grid-384-wells.svg)
+<figcaption>Wide and narrow support grids</figcaption>
 </figure>
 
 ## Spacers
