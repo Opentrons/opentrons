@@ -26,7 +26,7 @@ from epic_risk.constants import (
     GH_COMMIT_CAP,
     PR_SEARCH_MERGED_SINCE_YEARS,
 )
-from epic_risk.domains import domain_kind_icon, syntax_tree_hint
+from epic_risk.domains import domain_kind_icon
 from epic_risk.import_graph import build_fan_metrics_df
 from epic_risk.pr_discovery import scan_merged_prs_for_epic_files
 from epic_risk.risk import calculate_risk, generate_reasoning
@@ -138,7 +138,6 @@ if st.button("Analyze Risk", type="primary"):
 
         summary_df["Risk Score"] = summary_df.apply(calculate_risk, axis=1)
         summary_df["Risk Reasoning"] = summary_df.apply(generate_reasoning, axis=1)
-        summary_df["Syntax tree"] = summary_df["Domain"].map(syntax_tree_hint)
         summary_df["Kind"] = summary_df["Domain"].map(domain_kind_icon)
 
         summary_df = sort_epic_summary(summary_df, bug_epic_mode=bug_epic_mode)
@@ -156,4 +155,4 @@ if st.button("Analyze Risk", type="primary"):
 
 
 if st.session_state.get("display_df") is not None and not st.session_state["display_df"].empty:
-    render_epic_results_table(fetch_raw_file)
+    render_epic_results_table()

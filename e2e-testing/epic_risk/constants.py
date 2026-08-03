@@ -11,7 +11,7 @@ PR_SEARCH_MERGED_SINCE_YEARS = 15
 
 IGNORED_DOMAINS = frozenset({"🎨 Styling/Assets", "📝 Config/Docs"})
 
-# Compact table column: icon only (full Domain kept for logic / AST)
+# Compact table column: icon only (full Domain kept for logic)
 DOMAIN_KIND_ICON: dict[str, str] = {
     "🖥️ UI / React": "⚛️",
     "⚙️ API / Python": "🐍",

@@ -20,11 +20,5 @@ def categorize_domain(file_path: str) -> str:
     return "📁 Other"
 
 
-def syntax_tree_hint(domain: str) -> str:
-    if domain in ["⚙️ API / Python", "🖥️ UI / React"]:
-        return "↓ Panel below"
-    return "—"
-
-
 def domain_kind_icon(domain: str) -> str:
     return DOMAIN_KIND_ICON.get(domain, "📁")

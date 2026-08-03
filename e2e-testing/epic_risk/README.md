@@ -1,87 +1,32 @@
 # Epic risk analyzer (`epic_risk`)
 
-Small library + Streamlit UI that maps **Jira-style ticket tokens** to **merged GitHub PRs**, rolls up **per-file churn** across those PRs, and surfaces **heuristic risk**, **complexity**, optional **commit counts** in the PR merge window, and **epic-local import fan-out / fan-in** so QA can prioritize integration-heavy paths.
+Maps **Jira ticket tokens** to **merged GitHub PRs**, rolls up **per-file churn**, and
+surfaces **heuristic risk**, **complexity** (Python via Radon; TS/JS and C/C++ via Lizard),
+optional **bug-epic commit counts**, **coverage hints** from PR comments, **import
+fan-out / fan-in** (Python + TS), and **Risk Reasoning** prose for QA triage.
 
-The numeric score is for **triage and conversation**, not a quality judgment. Narrative text in **Risk Reasoning** stays blameless and signal-based.
-
----
+The numeric score is for prioritization, not a pass/fail grade.
 
 ## Setup
 
-**Prerequisites**
-
-- **GitHub CLI** (`gh`) with access to the repos you select; must be logged in.
-- **Python 3.12+** and **`uv`** (or another env manager) for dependencies.
-- **Node.js** + **`npm`** if you want the **syntax tree** panel for TypeScript/TSX (Babel parser via `npx tsx`). Python AST uses `astpretty` only.
-
-**Install (from the parent `e2e-testing/` directory)**
-
-The Makefile targets assume your shell is `e2e-testing/` (one level up from this folder):
+Prerequisites: GitHub CLI (`gh`) logged in, Python 3.12+, `uv`.
 
 ```bash
 cd e2e-testing
-make setup    # uv venv + pip packages + npm deps for AST
-make auth     # gh auth login if needed
+make -C epic_risk setup
+make -C epic_risk auth
 ```
 
-Minimum Python packages for the app (if you skip `make setup`): `pandas`, `streamlit`, `radon`, `lizard`, `astpretty`, plus dev tooling like `ruff` as you prefer.
-
----
-
-## Run the UI
-
-Still from **`e2e-testing/`**:
+## Run
 
 ```bash
-make run
-# same as:
-uv run streamlit run scrape_repo.py
+make -C epic_risk run
 ```
 
-Paste tickets, pick repos, click **Analyze Risk**. Optional **Bug epic mode** counts default-branch commits per file between the earliest and latest **merged PR** dates among matched PRs (capped; see `constants.py`).
+Paste tickets, pick repos, click **Analyze Risk**. Enable **Bug epic mode** to count
+default-branch commits per file between the earliest and latest matched PR merge dates.
 
----
-
-## Repo layout (high level)
-
-| Piece | Role |
-| --- | --- |
-| `scrape_repo.py` (sibling in `e2e-testing/`) | Streamlit entry: inputs, orchestration, session state |
-| `constants.py` | GitHub pagination caps, PR search lookback, ignored domains, defaults |
-| `github.py` | Uncached `gh api` helpers (raw file contents, commit lists) |
-| `cached.py` | Streamlit-cached wrappers around GitHub + metrics |
-| `metrics.py` | Cyclomatic complexity + line count from fetched source |
-| `domains.py` | File extension → stack label; table “Kind” icons |
-| `coverage.py` | Pull a coverage % hint from PR **issue comments + reviews** (Codecov-style text); **Cov n/a** if nothing parsed |
-| `pr_discovery.py` | Search merged PRs by ticket text → expand with `gh pr view` → file rows (**Jira tickets** parsed from PR title/body/comments) |
-| `import_graph.py` | Epic-scoped **Fan-out** / **Fan-in** (Python `ast` + TS import regex heuristics) |
-| `risk.py` | **Risk Score** math + **Risk Reasoning** prose |
-| `aggregation.py` | Group PR rows → one row per file; sort keys; display column order |
-| `views.py` | Results table styling, column help text, optional AST inspector panel |
-| `ast_tools.py` | Shell out to `../test_ast_parser.ts` for TS/TSX AST JSON |
-
-Import **without** pulling Streamlit:
-
-```python
-from epic_risk.risk import calculate_risk, generate_reasoning
-```
-
-Caching / UI deps: `from epic_risk import cached` (loads Streamlit).
-
----
-
-## The maths (Risk Score)
-
-All terms are non-negative; result is **rounded to 2 decimals**. There is **no fixed maximum** — large PR counts or hub-like import graphs can push scores well past 100 (e.g. 200+); use scores to **rank rows within an epic**, not as an absolute pass/fail scale.
-
-Let:
-
-- \(P\) = distinct merged PRs touching the path in the epic (**PR_Count**).
-- \(C\) = **Total Churn** = additions + deletions summed across those PRs.
-- \(F_o\) = **Fan-out**: distinct *other* epic-scoped files (same repo, same analysis table) that this file **statically imports** (Python + TS heuristics only).
-- \(F_i\) = **Fan-in**: distinct epic-scoped files that **import** this file (reverse index over the same set).
-
-Then:
+## Risk score
 
 \[
 \textbf{Risk Score}
@@ -90,25 +35,36 @@ Then:
 + 3 F_o + 4 F_i
 \]
 
-**Not in the formula:** **Contributors (epic)** (distinct PR authors). That count appears in the table and in **Risk Reasoning** only, so coordination context does not move the number.
+- \(P\) = distinct merged PRs touching the path
+- \(C\) = total churn (adds + dels)
+- \(F_o\), \(F_i\) = epic-local import fan-out / fan-in (Python + TS heuristics)
 
-**Elsewhere in the table:** **Complexity Grade** (Radon on Python, Lizard on TS/C++/etc.) and **Lines** inform reasoning text but are not added into Risk Score either.
+Complexity, coverage, contributors, and commit traffic inform **Risk Reasoning** and
+the table; they are not all folded into the numeric score.
 
----
+## Language coverage
 
-## Practical limits (good to know)
+| Signal | Python | TypeScript / JS | C / C++ |
+| --- | --- | --- | --- |
+| Complexity | Radon | Lizard | Lizard |
+| Import fan-in/out | yes | yes (heuristic) | no |
+| Churn / PR overlap | yes | yes | yes |
 
-- **Fan-out / Fan-in** only connect files that already appear in the epic’s blast-radius table for that repo—this is intentional (“lite” integration view, not a full repo graph).
-- **Import parsing** is heuristic (package paths, relative imports, TS path aliases are best-effort).
-- **Commits (PR span)** uses the GitHub commits API with encoded queries; failures show as `-1` in bug mode.
-- **AST panel** needs network/file fetch success and, for TSX, `npx tsx` + `test_ast_parser.ts` next to `scrape_repo.py`.
+## Layout
 
----
+| Piece | Role |
+| --- | --- |
+| `../scrape_repo.py` | Streamlit UI |
+| `pr_discovery.py` | Ticket → merged PRs → file rows |
+| `aggregation.py` | Per-file rollup |
+| `import_graph.py` | Fan-out / fan-in |
+| `metrics.py` | Complexity + line counts |
+| `coverage.py` | Cov % from PR comments/reviews |
+| `risk.py` | Score + reasoning |
+| `views.py` | Results table |
 
 ## Lint
 
-From `e2e-testing/`:
-
 ```bash
-uv run ruff check epic_risk scrape_repo.py
+uv run --extra epic-risk ruff check epic_risk scrape_repo.py
 ```

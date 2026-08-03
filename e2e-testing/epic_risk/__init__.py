@@ -5,7 +5,7 @@ Run the Streamlit app from the `e2e-testing/` directory::
 
     streamlit run scrape_repo.py
 
-Or ``make run`` from ``e2e-testing/`` (see Makefile).
+Or ``make -C epic_risk run`` from ``e2e-testing/``.
 
 Import submodules (e.g. ``epic_risk.github``) directly; ``epic_risk.cached`` pulls in Streamlit.
 """

@@ -85,7 +85,6 @@ def base_display_columns(*, bug_epic_mode: bool, has_commit_span: bool) -> list[
         "Contributors (epic)",
         "Complexity Grade",
         "Risk Reasoning",
-        "Syntax tree",
         "PR_Numbers",
         "Jira tickets",
         "Adds",

@@ -1,20 +1,10 @@
-"""Streamlit layout: results table, column config, and optional AST inspector panel."""
+"""Streamlit layout: results table and column config."""
 
 from __future__ import annotations
 
-import ast
-from collections.abc import Callable
-from pathlib import Path
-
-import astpretty
-import pandas as pd
 import streamlit as st
 
-from epic_risk.ast_tools import run_ts_ast_to_json
 from epic_risk.constants import GH_COMMIT_CAP
-
-_E2E_ROOT = Path(__file__).resolve().parent.parent
-_TS_PARSER = _E2E_ROOT / "test_ast_parser.ts"
 
 
 def _column_config_for_table(epic_window: str, *, include_commit_col: bool) -> dict:
@@ -64,10 +54,6 @@ def _column_config_for_table(epic_window: str, *, include_commit_col: bool) -> d
             width="large",
             help="Blameless, signal-based ideas for where to focus validation — not a quality judgment.",
         ),
-        "Syntax tree": st.column_config.TextColumn(
-            width="small",
-            help="Rows marked ↓ can be parsed in the panel directly under this table.",
-        ),
         "PR_Numbers": st.column_config.TextColumn(
             "Linked PRs & Coverage",
             width="medium",
@@ -98,60 +84,7 @@ def _column_config_for_table(epic_window: str, *, include_commit_col: bool) -> d
     return col_cfg
 
 
-def render_ast_inspector_below(
-    display_df: pd.DataFrame,
-    fetch_raw_file: Callable[[str, str], str | None],
-) -> None:
-    st.divider()
-    st.subheader("Syntax tree (Python / TS / TSX)")
-    st.caption(
-        "Use the selector for any row where the table shows **↓ Panel below**. "
-        "Fetches default-branch file contents via `gh` and parses locally."
-    )
-    parsable_files = display_df[display_df["Domain"].isin(["⚙️ API / Python", "🖥️ UI / React"])]
-    if parsable_files.empty:
-        st.info("No parsable Python or TS/TSX files in this epic’s blast radius.")
-        return
-
-    def _file_option_label(row: pd.Series) -> str:
-        return f"{row['RepoFullName']}::{row['File']} ({row['Domain']})"
-
-    file_options = parsable_files.apply(_file_option_label, axis=1).tolist()
-    selected_option = st.selectbox(
-        "Select a file to parse:",
-        ["-- Select a file --"] + file_options,
-    )
-    if selected_option == "-- Select a file --":
-        return
-
-    repo_name, file_path_and_domain = selected_option.split("::")
-    file_path = file_path_and_domain.split(" (")[0]
-    domain = file_path_and_domain.split(" (")[1].replace(")", "")
-    with st.spinner("Downloading and parsing…"):
-        raw_code = fetch_raw_file(repo_name, file_path)
-        if raw_code is None:
-            st.error("Could not fetch the file from GitHub.")
-            return
-        if domain == "⚙️ API / Python":
-            try:
-                tree = ast.parse(raw_code)
-                pretty_tree = astpretty.pformat(tree, indent="  ", show_offsets=True)
-                st.caption(f"Python AST for `{file_path}` (astpretty)")
-                st.code(pretty_tree, language="python", line_numbers=True)
-            except SyntaxError:
-                st.error("Could not parse file: invalid Python syntax.")
-        elif domain == "🖥️ UI / React":
-            ok, out, err = run_ts_ast_to_json(raw_code, parser_script=_TS_PARSER, cwd=_E2E_ROOT)
-            if ok:
-                st.caption(f"Babel AST for `{file_path}`")
-                st.code(out, language="json", line_numbers=True)
-            else:
-                st.error(f"TS/TSX parser failed: {err or out or 'no output'}")
-
-
-def render_epic_results_table(
-    fetch_raw_file: Callable[[str, str], str | None],
-) -> None:
+def render_epic_results_table() -> None:
     display_df = st.session_state.get("display_df")
     if display_df is None or display_df.empty:
         return
@@ -197,14 +130,12 @@ def render_epic_results_table(
 
         table_df = display_df.drop(columns=["Domain"], errors="ignore")
         styled = table_df.style.map(_commit_cell_style, subset=["Commits (PR span)"])
-        st.dataframe(styled, use_container_width=True, hide_index=True, column_config=col_cfg)
+        st.dataframe(styled, width="stretch", hide_index=True, column_config=col_cfg)
     else:
         table_df = display_df.drop(columns=["Domain"], errors="ignore")
         st.dataframe(
             table_df,
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
             column_config=col_cfg,
         )
-
-    render_ast_inspector_below(display_df, fetch_raw_file)

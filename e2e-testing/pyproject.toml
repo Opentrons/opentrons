@@ -9,7 +9,6 @@ description = "E2E tests for Opentrons Protocol Designer"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "astpretty>=2.0.0",
     "eyes-playwright>=6.4.20",
     "mypy>=1.13.0",
     "playwright>=1.55.0",
@@ -19,6 +18,14 @@ dependencies = [
     "pytest-timeout>=2.3.1",
     "python-dotenv>=1.2.1",
     "ruff>=0.14.2",
+]
+
+[project.optional-dependencies]
+epic-risk = [
+    "lizard>=1.17.0",
+    "pandas>=2.2.0",
+    "radon>=6.0.0",
+    "streamlit>=1.40.0",
 ]
 
 [tool.hatch.build.targets.wheel]
