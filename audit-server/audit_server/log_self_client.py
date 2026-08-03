@@ -35,7 +35,6 @@ class LocalClient(SUClient):
         self._log_data_manager = log_data_manager
         self._settings_store = settings_store
 
-
     @override
     async def submit_log_message(self, message: SUSubmitData) -> SUSuccessData:
         """Submit a log locally."""
