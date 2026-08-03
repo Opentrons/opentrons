@@ -1,9 +1,14 @@
 """Tests for the log data manager."""
 
+import tempfile
 from datetime import datetime, timezone
+from pathlib import Path
 
 import pytest
+
+# from anyio import NamedTemporaryFile, TemporaryDirectory
 from decoy import Decoy, matchers
+from fastapi import UploadFile
 from opentrons_shared_data.errors.exceptions import KeyStorageUnavailableError
 
 from server_utils.keys.key_server import Client as KeyClient
@@ -91,6 +96,20 @@ async def test_rotate_periods_does_nothing_if_logging_disabled(
     decoy.verify(mock_store.end_period(matchers.Anything()), times=0)
 
 
+async def test_store_robot_log_does_nothing_if_logging_disabled(
+    subject: LogDataManager,
+    disable_logging: None,
+    mock_store: LogStore,
+    decoy: Decoy,
+) -> None:
+    """It should store no robot log if logging is disabled."""
+    mock_file = decoy.mock(cls=UploadFile)
+    await subject.store_robot_log(mock_file, Path())
+    decoy.verify(
+        mock_store.store_robot_log(matchers.Anything(), matchers.Anything()), times=0
+    )
+
+
 async def test_store_log_stores_log(
     subject: LogDataManager,
     mock_store: LogStore,
@@ -137,6 +156,48 @@ async def test_store_log_raises_keyserver_unavailable(
     ).then_raise(Exception("nope im broken"))
     with pytest.raises(KeyStorageUnavailableError):
         await subject.store_log("mymessage")
+
+
+async def test_store_robot_log_stores_file(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+    mock_key_client: KeyClient,
+) -> None:
+    """It should save the file to memory and save the hashed robot log to the store."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file.write("beep boop".encode("utf-8"))
+            temp_file.seek(0)
+            robot_log = StoredLog(
+                message="beep",
+                message_hash="bzzzt",
+                message_sig="boop",
+                sig_version="3",
+            )
+            decoy.when(
+                await mock_key_client.sign_message(
+                    SignMessageData(message="beep boop", previousHash=None)
+                )
+            ).then_return(
+                SignedMessageData(
+                    message="beep",
+                    messageHash="bzzzt",
+                    messageSignature="boop",
+                    signatureVersion=3,
+                )
+            )
+            temp_path = Path(temp_dir) / Path(temp_file.name).name
+            decoy.when(mock_store.store_robot_log(robot_log, temp_path)).then_return(
+                "eeeeee"
+            )
+            assert not temp_path.is_file()
+            stored_hash = await subject.store_robot_log(
+                UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
+                Path(temp_dir),
+            )
+            assert stored_hash == "eeeeee"
+            assert temp_path.is_file()
 
 
 async def test_store_log_rotates_if_cannot_get_tail_hash(

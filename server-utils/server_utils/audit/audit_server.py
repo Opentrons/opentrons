@@ -135,8 +135,7 @@ class LocalHTTPClient(Client):
         self, robot_log_file: typing.TextIO
     ) -> StoreRobotLogSuccessData:
         async with self._session.post(
-            STORE_ROBOT_LOG_ENDPOINT_PATH,
-            data={'file': robot_log_file}
+            STORE_ROBOT_LOG_ENDPOINT_PATH, data={"file": robot_log_file}
         ) as response:
             response_bytes = await response.read()
         response.raise_for_status()

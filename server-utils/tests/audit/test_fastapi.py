@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import typing
+
 import fastapi
 import pytest
 from starlette.testclient import TestClient
@@ -11,6 +13,7 @@ from server_utils.audit.audit_server import (
     Client,
     LocalHTTPClient,
     NoOpClient,
+    StoreRobotLogSuccessData,
     SubmitAuditLogMessageData,
     SubmitAuditLogSuccessData,
 )
@@ -66,6 +69,11 @@ def test_install_and_get_audit_client_via_dependency() -> None:
 
         async def get_settings(self) -> AuditSettingsResponseData:
             raise NotImplementedError()
+
+        async def store_robot_log(
+            self, robot_log_file: typing.TextIO
+        ) -> StoreRobotLogSuccessData:
+            raise NotImplementedError
 
     stub_client = StubClient()
 

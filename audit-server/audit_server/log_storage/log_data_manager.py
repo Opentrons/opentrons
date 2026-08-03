@@ -79,7 +79,6 @@ class LogDataManager:
         async with self._lock:
             return await self._do_store_log(log_message)
 
-    # TODO, make the input for this one new type with contents and a new path
     async def store_robot_log(
         self, robot_log: UploadFile, robot_log_path: Path
     ) -> str | None:
