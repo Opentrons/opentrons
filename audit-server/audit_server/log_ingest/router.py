@@ -25,7 +25,6 @@ from server_utils.fastapi_utils.models.json_api import (
     SimpleBody,
 )
 
-from .dependency import get_robot_logs_directory
 from .models import (
     AuditLogMessage,
     StoreRobotLogResponseData,
@@ -35,6 +34,7 @@ from .models import (
 )
 from audit_server.log_storage.dependency import get_log_data_manager
 from audit_server.log_storage.log_data_manager import LogDataManager
+from audit_server.persistence.fastapi_dependencies import get_robot_logs_directory
 
 LOG = getLogger(__name__)
 
