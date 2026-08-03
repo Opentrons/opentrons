@@ -15,7 +15,8 @@ from datetime import datetime, timezone
 import aiohttp
 import pydantic
 
-LOG_MESSAGE_ENDPOINT_PATH = "audit/internal/logMessage"
+LOG_MESSAGE_ENDPOINT_PATH: typing.Final = "audit/internal/logMessage"
+SETTINGS_ENDPOINT_PATH: typing.Final = "audit/external/settings"
 
 _log = logging.getLogger(__name__)
 
@@ -32,6 +33,11 @@ class Client(ABC):
         If there's an internal error (e.g. the audit server is unconnectable),
         the implementation should raise it as an exception.
         """
+        pass
+
+    @abstractmethod
+    async def get_settings(self) -> AuditSettingsResponseData:
+        """Get the currently-configured audit settings."""
         pass
 
 
@@ -104,6 +110,14 @@ class LocalHTTPClient(Client):
         )
         return parsed_response.data
 
+    @typing.override
+    async def get_settings(self) -> AuditSettingsResponseData:
+        async with self._session.get(SETTINGS_ENDPOINT_PATH) as response:
+            response_bytes = await response.read()
+        response.raise_for_status()
+        parsed_response = AuditSettingsResponseBody.model_validate_json(response_bytes)
+        return parsed_response.data
+
 
 class NoOpClient(Client):
     """A client implementation that doesn't actually contact audit-server.
@@ -126,6 +140,12 @@ class NoOpClient(Client):
             message.message,
         )
         return SubmitAuditLogSuccessData(loggedAt=datetime.now(timezone.utc))
+
+    @typing.override
+    async def get_settings(self) -> AuditSettingsResponseData:
+        return AuditSettingsResponseData(
+            requireReasonForInteraction=False, minLengthOfReasonForInteraction=0
+        )
 
 
 class _StrictBaseModel(pydantic.BaseModel):
@@ -158,3 +178,16 @@ class SubmitAuditLogMessageResponseBody(_StrictBaseModel):
     """Response envelope for log-message."""
 
     data: SubmitAuditLogSuccessData
+
+
+class AuditSettingsResponseData(_StrictBaseModel):
+    """Audit settings payload."""
+
+    requireReasonForInteraction: bool
+    minLengthOfReasonForInteraction: int | None
+
+
+class AuditSettingsResponseBody(_StrictBaseModel):
+    """Response envelope for audit settings."""
+
+    data: AuditSettingsResponseData

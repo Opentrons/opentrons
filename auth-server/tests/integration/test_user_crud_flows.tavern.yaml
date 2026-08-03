@@ -27,6 +27,21 @@ stages:
           accountType: user
           locked: false
           resetPassword: false
+
+  - name: List users as admin
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      json:
+        meta:
+          cursor: 0
+          totalLength: !anyint
+        data: !anylist
+
   - name: Get a user information
     request:
       method: GET
@@ -67,7 +82,7 @@ stages:
       url: '{run_server.base_url}/auth/users/byUsername/test_new_user'
       json:
         data:
-          username: test_new_user_updated
+          username: test_new_user_upd
           password: securepassword123
       headers:
         Authorization: '{admin_access_token}'
@@ -77,13 +92,13 @@ stages:
         data:
           accountType: admin
           fullName: Test New User Updated
-          username: test_new_user_updated
+          username: test_new_user_upd
           locked: false
           resetPassword: false
   - name: Update the reset password flag
     request:
       method: PATCH
-      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_updated'
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_upd'
       json:
         data:
           resetPassword: true
@@ -95,13 +110,13 @@ stages:
         data:
           accountType: admin
           fullName: Test New User Updated
-          username: test_new_user_updated
+          username: test_new_user_upd
           locked: false
           resetPassword: true
   - name: Get the user information
     request:
       method: GET
-      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_updated'
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_upd'
       headers:
         Authorization: '{admin_access_token}'
     response:
@@ -110,13 +125,13 @@ stages:
         data:
           accountType: admin
           fullName: Test New User Updated
-          username: test_new_user_updated
+          username: test_new_user_upd
           locked: false
           resetPassword: true
   - name: Reset the user's password to a temporary password
     request:
       method: POST
-      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_updated/resetPassword'
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_upd/resetPassword'
       headers:
         Authorization: '{admin_access_token}'
     response:
@@ -128,7 +143,7 @@ stages:
         data:
           accountType: admin
           fullName: Test New User Updated
-          username: test_new_user_updated
+          username: test_new_user_upd
           locked: false
           resetPassword: true
           temporaryPassword: !anystr
@@ -140,7 +155,7 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: password
-        username: test_new_user_updated
+        username: test_new_user_upd
         password: '{temporary_password}'
     response:
       status_code: 200
@@ -158,7 +173,7 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: password
-        username: test_new_user_updated
+        username: test_new_user_upd
         password: securepassword123
     response:
       status_code: 400
@@ -170,7 +185,7 @@ stages:
   - name: Admin sets a new password for the user
     request:
       method: PATCH
-      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_updated'
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_upd'
       headers:
         Authorization: '{admin_access_token}'
       json:
@@ -182,7 +197,7 @@ stages:
         data:
           accountType: admin
           fullName: Test New User Updated
-          username: test_new_user_updated
+          username: test_new_user_upd
           locked: false
           resetPassword: false
 
@@ -193,7 +208,7 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: password
-        username: test_new_user_updated
+        username: test_new_user_upd
         password: securepassword123
     response:
       status_code: 200
@@ -205,7 +220,7 @@ stages:
   - name: Delete the user
     request:
       method: DELETE
-      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_updated'
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_upd'
       headers:
         Authorization: '{admin_access_token}'
     response:
@@ -214,7 +229,7 @@ stages:
   - name: Try to get the deleted user
     request:
       method: GET
-      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_updated'
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_upd'
       headers:
         Authorization: '{admin_access_token}'
     response:
@@ -503,12 +518,12 @@ stages:
         authorization: 'Bearer {self_update_user_1_access_token}'
       json:
         data:
-          username: self_update_user_1_renamed
+          username: self_upd_user_1_ren
     response:
       status_code: 200
       json:
         data:
-          username: self_update_user_1_renamed
+          username: self_upd_user_1_ren
           fullName: Self Update User 1 Renamed
           accountType: user
           locked: false
@@ -555,3 +570,112 @@ stages:
       json:
         errors:
           - id: userAlreadyExists
+
+---
+test_name: Creating a user without a password requires password reset
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+
+stages:
+  - name: Create a user without a password
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: no_password_user
+          fullName: No Password User
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 201
+      save:
+        json:
+          temporary_password: data.temporaryPassword
+      json:
+        data:
+          username: no_password_user
+          fullName: No Password User
+          accountType: user
+          locked: false
+          resetPassword: true
+          temporaryPassword: !anystr
+
+  - name: Get the user and confirm resetPassword is true
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/byUsername/no_password_user'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          username: no_password_user
+          fullName: No Password User
+          accountType: user
+          locked: false
+          resetPassword: true
+
+  - name: User can log in with the temporary password but only gets self-write scopes
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: no_password_user
+        password: '{temporary_password}'
+    response:
+      status_code: 200
+      json:
+        access_token: !anystr
+        refresh_token: !anystr
+        token_type: Bearer
+        expires_in: !anyint
+        scope: users.read.self users.write.self
+
+  - name: Reject creating a user with an empty password
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: empty_password_user
+          password: ''
+          fullName: Empty Password User
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 400
+      json:
+        detail: password must not be empty
+
+---
+test_name: Creating a user with a username that is too long
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+
+stages:
+  - name: Reject creating a user with a username longer than 20 characters
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: aaaaaaaaaaaaaaaaaaaaa
+          password: securepassword123!
+          fullName: Too Long Username User
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 422

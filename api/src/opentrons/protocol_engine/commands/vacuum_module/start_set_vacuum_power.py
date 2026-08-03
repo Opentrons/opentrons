@@ -58,7 +58,10 @@ class StartSetVacuumPowerParams(BaseModel):
     )
     equalizeTimeout: int | SkipJsonSchema[None] = Field(
         None,
-        description="Time in seconds to wait for pressure equalization after opening the vent. Does not wait if None.",
+        description=(
+            "Time in seconds to wait for pressure equalization after opening the vent. "
+            "Does not wait if None."
+        ),
     )
     taskId: str | None = Field(None, description="The id of the task")
 

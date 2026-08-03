@@ -1,4 +1,4 @@
-test_name: logMessage endpoint
+test_name: internal logMessage endpoint
 
 marks:
   - usefixtures:
@@ -40,3 +40,40 @@ stages:
       json:
         data:
           loggedAt: !anystr
+---
+test_name: external logMessage endpoint
+
+marks:
+  - usefixtures:
+      - run_server
+      - enable_logging
+
+stages:
+  - name: POST /audit/external/logMessage accepts reason and auth
+    request:
+      method: POST
+      url: '{run_server.base_url}/audit/external/logMessage'
+      headers:
+        authorization: 'bearer asdasdasd'
+        opentrons-user-notes: 'checkitout'
+      json:
+        data:
+          action: 'my action'
+          message: 'heres my message'
+    response:
+      status_code: 201
+      json:
+        data:
+          loggedAt: !anystr
+  - name: POST /audit/external/logMessage fails without reason
+    request:
+      method: POST
+      url: '{run_server.base_url}/audit/external/logMessage'
+      headers:
+        authorization: 'bearer asdasdasd'
+      json:
+        data:
+          action: 'my action'
+          message: 'heres my message'
+    response:
+      status_code: 451
