@@ -156,9 +156,9 @@ function addCertificateToMap(certificate: X509Certificate): void {
 }
 
 /**
- * HTTPS agent for main-process requests to robots (e.g. update zip upload).
+ * HTTPS agent for main-process requests to robots.
  *
- * Renderer/Chromium traffic is covered by the `certificate-error` handler below.
+ * Renderer/Chromium traffic is covered by `certificate-error`.
  * Node `fetch` in the shell does not use that path, so HTTPS uploads must
  * trust the same installed robot CAs explicitly. Hostname verification is
  * skipped because robots are often addressed by IP while certs use a name.

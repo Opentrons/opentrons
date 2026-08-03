@@ -7,7 +7,7 @@ export interface RobotHttpHost {
 }
 
 /**
- * Build a robot HTTP(S) URL using the same rules as api-client/request.ts.
+ * Build a robot HTTP(S) URL.
  */
 export function buildRobotHttpUrl(
   robot: RobotHttpHost,

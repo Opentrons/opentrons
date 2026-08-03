@@ -63,11 +63,7 @@ export function UpdateRobotSoftware(
     afterError(sessionError)
   }
   let updateType:
-    | 'downloading'
-    | 'validating'
-    | 'sendingFile'
-    | 'installing'
-    | null = null
+    'downloading' | 'validating' | 'sendingFile' | 'installing' | null = null
   if (step === 'finished') {
     return <CompleteUpdateSoftware robotName={robotName} />
   } else {

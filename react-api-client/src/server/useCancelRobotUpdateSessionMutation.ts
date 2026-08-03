@@ -1,7 +1,6 @@
-import { useMutation } from 'react-query'
-
 import { cancelRobotUpdateSession } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../accessControl'
 import { useHost } from '../api'
 
 import type { AxiosError } from 'axios'
@@ -14,10 +13,11 @@ import type {
   CancelRobotUpdateSessionData,
   HostConfig,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
+import type { DocumentedMutationParameters } from '../accessControl/types'
 
 export interface CancelRobotUpdateSessionVariables {
   pathPrefix: string
-  userNotes?: string
 }
 
 export type UseCancelRobotUpdateSessionMutationResult = UseMutationResult<
@@ -39,6 +39,7 @@ export type UseCancelRobotUpdateSessionMutationOptions = UseMutationOptions<
 >
 
 export function useCancelRobotUpdateSessionMutation(
+  documentationState: DocumentationState,
   options: UseCancelRobotUpdateSessionMutationOptions = {},
   hostOverride?: HostConfig | null
 ): UseCancelRobotUpdateSessionMutationResult {
@@ -46,17 +47,20 @@ export function useCancelRobotUpdateSessionMutation(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
 
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     CancelRobotUpdateSessionData,
     AxiosError,
     CancelRobotUpdateSessionVariables
   >(
-    variables =>
-      cancelRobotUpdateSession(
-        host!,
-        variables.pathPrefix,
-        variables.userNotes
-      ).then(response => response.data),
+    documentationState,
+    ['update_robot_software'],
+    ({
+      variables,
+      userNotes,
+    }: DocumentedMutationParameters<CancelRobotUpdateSessionVariables>) =>
+      cancelRobotUpdateSession(host!, variables.pathPrefix, userNotes).then(
+        response => response.data
+      ),
     options
   )
 

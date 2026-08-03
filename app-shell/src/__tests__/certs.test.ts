@@ -44,7 +44,9 @@ describe('createRobotHttpsAgent', () => {
   it('returns an https.Agent that trusts installed robot CAs', () => {
     const agent = createRobotHttpsAgent()
     expect(agent.options.rejectUnauthorized).toBe(true)
-    expect(agent.options.checkServerIdentity?.('10.0.0.1', {} as any)).toBeUndefined()
+    expect(
+      agent.options.checkServerIdentity?.('10.0.0.1', {} as any)
+    ).toBeUndefined()
   })
 })
 

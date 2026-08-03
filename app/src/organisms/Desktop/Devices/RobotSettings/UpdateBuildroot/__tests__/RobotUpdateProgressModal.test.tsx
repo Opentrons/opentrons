@@ -9,9 +9,7 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
-import {
-  getRobotUpdateDownloadError,
-} from '/app/redux/robot-update'
+import { getRobotUpdateDownloadError } from '/app/redux/robot-update'
 import {
   INIT_STATUS,
   useRobotInitializationStatus,

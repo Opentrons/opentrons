@@ -1,7 +1,6 @@
-import { useMutation } from 'react-query'
-
 import { commitRobotUpdateSession } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../accessControl'
 import { useHost } from '../api'
 
 import type { AxiosError } from 'axios'
@@ -14,11 +13,12 @@ import type {
   CommitRobotUpdateSessionData,
   HostConfig,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
+import type { DocumentedMutationParameters } from '../accessControl/types'
 
 export interface CommitRobotUpdateSessionVariables {
   pathPrefix: string
   token: string
-  userNotes?: string
 }
 
 export type UseCommitRobotUpdateSessionMutationResult = UseMutationResult<
@@ -44,6 +44,7 @@ export type UseCommitRobotUpdateSessionMutationOptions = UseMutationOptions<
  * Prefer the fire-and-forget begin-session path when the handshake succeeds.
  */
 export function useCommitRobotUpdateSessionMutation(
+  documentationState: DocumentationState,
   options: UseCommitRobotUpdateSessionMutationOptions = {},
   hostOverride?: HostConfig | null
 ): UseCommitRobotUpdateSessionMutationResult {
@@ -51,17 +52,22 @@ export function useCommitRobotUpdateSessionMutation(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
 
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     CommitRobotUpdateSessionData,
     AxiosError,
     CommitRobotUpdateSessionVariables
   >(
-    variables =>
+    documentationState,
+    ['update_robot_software'],
+    ({
+      variables,
+      userNotes,
+    }: DocumentedMutationParameters<CommitRobotUpdateSessionVariables>) =>
       commitRobotUpdateSession(
         host!,
         variables.pathPrefix,
         variables.token,
-        variables.userNotes
+        userNotes
       ).then(response => response.data),
     options
   )

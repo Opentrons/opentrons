@@ -75,10 +75,12 @@ export function useRobotUpdateOrchestrator(): {
     mutationHostConfig
   )
   const cancelSessionMutation = useCancelRobotUpdateSessionMutation(
+    documentationState,
     {},
     mutationHostConfig
   )
   const commitSessionMutation = useCommitRobotUpdateSessionMutation(
+    documentationState,
     {},
     mutationHostConfig
   )

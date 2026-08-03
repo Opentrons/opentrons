@@ -64,14 +64,10 @@ export interface RobotUpdateFlowMutations {
     token: string
     auto_commit_and_restart?: boolean
   }>
-  cancelSession: (variables: {
-    pathPrefix: string
-    userNotes?: string
-  }) => Promise<unknown>
+  cancelSession: (variables: { pathPrefix: string }) => Promise<unknown>
   commitSession: (variables: {
     pathPrefix: string
     token: string
-    userNotes?: string
   }) => Promise<unknown>
   restartRobot: () => Promise<unknown>
 }
@@ -265,7 +261,7 @@ function createUpdateSession(
   sessionPath: string,
   pathPrefix: string
 ): Promise<boolean> {
-  const { dispatch, getMutations, getDocumentationState } = deps
+  const { dispatch, getMutations } = deps
   const robotHost = {
     name: robot.name,
     ip: robot.ip,
@@ -293,10 +289,7 @@ function createUpdateSession(
     }
 
     return getMutations()
-      .cancelSession({
-        pathPrefix,
-        userNotes: getUserNotesFromDocumentationState(getDocumentationState()),
-      })
+      .cancelSession({ pathPrefix })
       .catch(() => Promise.reject(new Error(UNABLE_TO_CANCEL_UPDATE_SESSION)))
       .then(() => createOnce())
       .catch(() => Promise.reject(new Error(UNABLE_TO_START_UPDATE_SESSION)))
@@ -340,14 +333,13 @@ function commitIfNeeded(
     return Promise.resolve()
   }
 
-  const { dispatch, getMutations, getDocumentationState } = deps
+  const { dispatch, getMutations } = deps
   dispatch(setRobotUpdateSessionStep(COMMIT_UPDATE))
 
   return getMutations()
     .commitSession({
       pathPrefix,
       token,
-      userNotes: getUserNotesFromDocumentationState(getDocumentationState()),
     })
     .then(() => undefined)
     .catch((error: AxiosError) => {
