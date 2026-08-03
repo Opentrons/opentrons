@@ -94,6 +94,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       .calledWith(
         expect.any(Object),
         { hostname: expect.any(String) },
+        expect.any(Array),
         expect.any(Array)
       )
       .thenReturn({
@@ -101,7 +102,12 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         reset: mockResetCreateRun,
       } as any)
     when(vi.mocked(useCreateRunFromProtocol))
-      .calledWith(expect.any(Object), null, expect.any(Array))
+      .calledWith(
+        expect.any(Object),
+        null,
+        expect.any(Array),
+        expect.any(Array)
+      )
       .thenReturn({
         createRunFromProtocolSource: mockCreateRunFromProtocolSource,
         reset: mockResetCreateRun,

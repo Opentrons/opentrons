@@ -146,7 +146,8 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
           location,
           definitionUri,
         }))
-      : []
+      : [],
+    runTimeParameters?.length > 0 ? ['confirm_parameters'] : []
   )
   const handleProceed: MouseEventHandler<HTMLButtonElement> = () => {
     if (isRobotOutOfStorage) {
