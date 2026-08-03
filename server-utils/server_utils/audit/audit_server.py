@@ -184,7 +184,7 @@ class AuditSettingsResponseData(_StrictBaseModel):
     """Audit settings payload."""
 
     requireReasonForInteraction: bool
-    minLengthOfReasonForInteraction: int | None
+    minLengthOfReasonForInteraction: int | None = None
 
 
 class AuditSettingsResponseBody(_StrictBaseModel):
