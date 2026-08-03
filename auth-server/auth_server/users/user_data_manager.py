@@ -7,15 +7,11 @@ from typing import Literal
 
 from pwdlib import PasswordHash
 
-from server_utils.auth.scopes import Scope
-
 from auth_server.persistence.orm_models import User
 from auth_server.settings.models import SettingsResponseData
 from auth_server.settings.store import SettingsStore
 from auth_server.users.is_account_locked import is_account_locked
 from auth_server.users.models import (
-    ACCOUNT_TYPE_TO_SCOPES,
-    RESET_PASSWORD_SCOPES,
     AccountType,
     ResetPasswordResponse,
     UserResponse,
@@ -121,19 +117,6 @@ def must_reset_password(
         > user.password_set_at + datetime.timedelta(seconds=password_reset_time_sec)
     )
     return password_is_expired or user.reset_password
-
-
-def get_scope_set_of_user(
-    user: User, now: datetime.datetime, password_reset_time_sec: float | None
-) -> set[Scope]:
-    """Return the scopes that a user is authorized for.
-
-    A user who must reset their password is restricted to reading and writing their
-    own account, so they can change their password but nothing else until they do.
-    """
-    if must_reset_password(user, now, password_reset_time_sec):
-        return set(RESET_PASSWORD_SCOPES)
-    return set(ACCOUNT_TYPE_TO_SCOPES[AccountType(user.account_type)])
 
 
 class UserDataManager:
