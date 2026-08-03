@@ -28,40 +28,37 @@ default-branch commits per file between the earliest and latest matched PR merge
 
 ## Risk score
 
-\[
-\textbf{Risk Score}
-= 15P
-+ 10 \cdot \log_{10}(C + 1)
-+ 3 F_o + 4 F_i
-\]
+```text
+Risk Score = 15P + 10·log10(C + 1) + 3 Fo + 4 Fi
+```
 
-- \(P\) = distinct merged PRs touching the path
-- \(C\) = total churn (adds + dels)
-- \(F_o\), \(F_i\) = epic-local import fan-out / fan-in (Python + TS heuristics)
+- `P` = distinct merged PRs touching the path
+- `C` = total churn (adds + dels)
+- `Fo`, `Fi` = epic-local import fan-out / fan-in (Python + TS heuristics)
 
 Complexity, coverage, contributors, and commit traffic inform **Risk Reasoning** and
 the table; they are not all folded into the numeric score.
 
 ## Language coverage
 
-| Signal | Python | TypeScript / JS | C / C++ |
-| --- | --- | --- | --- |
-| Complexity | Radon | Lizard | Lizard |
-| Import fan-in/out | yes | yes (heuristic) | no |
-| Churn / PR overlap | yes | yes | yes |
+| Signal             | Python | TypeScript / JS | C / C++ |
+| ------------------ | ------ | --------------- | ------- |
+| Complexity         | Radon  | Lizard          | Lizard  |
+| Import fan-in/out  | yes    | yes (heuristic) | no      |
+| Churn / PR overlap | yes    | yes             | yes     |
 
 ## Layout
 
-| Piece | Role |
-| --- | --- |
-| `../scrape_repo.py` | Streamlit UI |
-| `pr_discovery.py` | Ticket → merged PRs → file rows |
-| `aggregation.py` | Per-file rollup |
-| `import_graph.py` | Fan-out / fan-in |
-| `metrics.py` | Complexity + line counts |
-| `coverage.py` | Cov % from PR comments/reviews |
-| `risk.py` | Score + reasoning |
-| `views.py` | Results table |
+| Piece               | Role                            |
+| ------------------- | ------------------------------- |
+| `../scrape_repo.py` | Streamlit UI                    |
+| `pr_discovery.py`   | Ticket → merged PRs → file rows |
+| `aggregation.py`    | Per-file rollup                 |
+| `import_graph.py`   | Fan-out / fan-in                |
+| `metrics.py`        | Complexity + line counts        |
+| `coverage.py`       | Cov % from PR comments/reviews  |
+| `risk.py`           | Score + reasoning               |
+| `views.py`          | Results table                   |
 
 ## Lint
 
