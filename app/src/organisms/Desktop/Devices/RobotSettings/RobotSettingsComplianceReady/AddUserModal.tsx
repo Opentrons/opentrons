@@ -16,7 +16,7 @@ import { useCreateUserMutation } from '@opentrons/react-api-client'
 import { getTopPortalEl } from '/app/App/portal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
-import { applyAuthUserMutationError } from './userAccount/mapAuthUserMutationError'
+import { mapAuthUserMutationError } from './userAccount/mapAuthUserMutationError'
 import styles from './userAccount/userAccountForm.module.css'
 import { UserAccountIdentityFormFields } from './userAccount/UserAccountIdentityFormFields'
 
@@ -122,7 +122,10 @@ export function AddUserModal({
         }
       })
       .catch(error => {
-        applyAuthUserMutationError(setError, error, t)
+        const formError = mapAuthUserMutationError<FormValues>(error, t)
+        if (formError != null) {
+          setError(formError.field, formError.error)
+        }
       })
   }
 

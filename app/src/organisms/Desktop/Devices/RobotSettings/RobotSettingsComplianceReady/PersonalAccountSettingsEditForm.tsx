@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { PrimaryButton, SecondaryButton } from '@opentrons/components'
 
-import { applyAuthUserMutationError } from './userAccount/mapAuthUserMutationError'
+import { mapAuthUserMutationError } from './userAccount/mapAuthUserMutationError'
 import styles from './userAccount/userAccountForm.module.css'
 import { UserAccountIdentityFormFields } from './userAccount/UserAccountIdentityFormFields'
 import { UserAccountPasswordFormFields } from './userAccount/UserAccountPasswordFormFields'
@@ -74,7 +74,10 @@ export function PersonalAccountSettingsEditForm({
         ...(hasPasswordChange ? { password } : {}),
       },
     }).catch(error => {
-      applyAuthUserMutationError(setError, error, t)
+      const formError = mapAuthUserMutationError<FormValues>(error, t)
+      if (formError != null) {
+        setError(formError.field, formError.error)
+      }
     })
   }
 
