@@ -43,8 +43,7 @@ export function ComplianceReadySoftwareFiles({
   const { t } = useTranslation('device_details')
   const { data: logPeriodSummariesData } = useLogPeriodSummariesQuery()
   const documentationState = useDocumentationState()
-  const { downloadLogPeriods, isDownloading: isDownloadingLogPeriods } =
-    useDownloadSelectedLogPeriods(robotName)
+  const downloadLogPeriodsMutation = useDownloadSelectedLogPeriods(robotName)
   const { deleteSelectedLogPeriods, deletingIds } =
     useDeleteSelectedLogPeriods(documentationState)
   const { makeToast, eatToast } = useToaster()
@@ -89,14 +88,17 @@ export function ComplianceReadySoftwareFiles({
       handleNoLogsSelected('download')
       return
     }
-    if (!isDownloadingLogPeriods) {
+    if (downloadLogPeriodsMutation.status !== 'loading') {
       const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
       const toastId = makeToast(
         t('downloading_run_records') as string,
         INFO_TOAST,
         { disableTimeout: true, icon: toastIcon }
       )
-      downloadLogPeriods(periods.filter(period => selectedIds.has(period.id)))
+      downloadLogPeriodsMutation
+        .mutateAsync({
+          logPeriods: periods.filter(period => selectedIds.has(period.id)),
+        })
         .catch((error: Error) => {
           makeToast(error.message, ERROR_TOAST, {
             closeButton: true,
@@ -119,7 +121,8 @@ export function ComplianceReadySoftwareFiles({
   const handleConfirmDeleteSelected = (): void => {
     setShowDeleteRecordsModal(false)
     const selectedPeriods = periods.filter(period => selectedIds.has(period.id))
-    void downloadLogPeriods(selectedPeriods)
+    void downloadLogPeriodsMutation
+      .mutateAsync({ logPeriods: selectedPeriods })
       .then(downloadedPeriods => {
         // only chain a delete for periods that actually came back with a
         // deletion key; a period downloaded without one can't be deleted yet

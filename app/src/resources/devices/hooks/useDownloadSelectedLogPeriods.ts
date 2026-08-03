@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMutation } from 'react-query'
 import { useDispatch } from 'react-redux'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
@@ -12,6 +12,7 @@ import { useHost } from '@opentrons/react-api-client'
 import { logPeriodDeletionKeyReceived } from '/app/redux/audit'
 import { saveFileToUsb } from '/app/redux/shell/remote'
 
+import type { UseMutationResult } from 'react-query'
 import type { LogPeriodSummary } from '@opentrons/api-client'
 import type { Dispatch } from '/app/redux/types'
 
@@ -23,36 +24,29 @@ export interface DownloadedLogPeriod {
   deletionKey: string | null
 }
 
-interface UseDownloadSelectedLogPeriodsResult {
-  downloadLogPeriods: (
-    logPeriods: readonly LogPeriodSummary[],
-    callTimeUsbPath?: string
-  ) => Promise<readonly DownloadedLogPeriod[]>
-  isDownloading: boolean
-  hasError: boolean
+export interface DownloadLogPeriodsVariables {
+  logPeriods: readonly LogPeriodSummary[]
+  callTimeUsbPath?: string
 }
 
 export function useDownloadSelectedLogPeriods(
   robotName: string
-): UseDownloadSelectedLogPeriodsResult {
+): UseMutationResult<
+  readonly DownloadedLogPeriod[],
+  unknown,
+  DownloadLogPeriodsVariables
+> {
   const host = useHost()
   const dispatch = useDispatch<Dispatch>()
-  const [isDownloading, setIsDownloading] = useState(false)
-  const [hasError, setHasError] = useState(false)
 
-  const downloadLogPeriods = async (
-    logPeriods: readonly LogPeriodSummary[],
-    callTimeUsbPath?: string
-  ): Promise<readonly DownloadedLogPeriod[]> => {
+  const downloadLogPeriods = async ({
+    logPeriods,
+    callTimeUsbPath,
+  }: DownloadLogPeriodsVariables): Promise<readonly DownloadedLogPeriod[]> => {
     const currentHost = host
-    if (currentHost == null || logPeriods.length === 0 || isDownloading) {
-      throw new Error(
-        'Unable to download: no host, nothing selected, or a download is already in progress.'
-      )
+    if (currentHost == null || logPeriods.length === 0) {
+      throw new Error('Unable to download: no host, or nothing selected.')
     }
-
-    setIsDownloading(true)
-    setHasError(false)
 
     const zip = new JSZip()
 
@@ -82,7 +76,7 @@ export function useDownloadSelectedLogPeriods(
           )
         }
 
-        const buf = await (res.data as Blob).arrayBuffer()
+        const buf = await res.data.arrayBuffer()
         zip.file(`logperiod_${logPeriodDateTransformed}.zip`, buf)
 
         return { logPeriod, deletionKey }
@@ -99,29 +93,23 @@ export function useDownloadSelectedLogPeriods(
 
     // If every single logPeriod failed, abort early without generating an empty zip file
     if (successfulDownloads.length === 0) {
-      setHasError(true)
-      setIsDownloading(false)
       throw new Error('Failed to download any of the selected log periods.')
     }
 
-    try {
-      const buffer = await zip.generateAsync({ type: 'arraybuffer' })
-      const filename = `${robotName}-log-periods.zip`
+    const buffer = await zip.generateAsync({ type: 'arraybuffer' })
+    const filename = `${robotName}-log-periods.zip`
 
-      if (callTimeUsbPath != null) {
-        await saveFileToUsb(`${callTimeUsbPath}/${filename}`, buffer)
-      } else {
-        saveAs(new Blob([buffer]), filename)
-      }
-
-      setIsDownloading(false)
-      return successfulDownloads
-    } catch (e) {
-      setHasError(true)
-      setIsDownloading(false)
-      throw e
+    if (callTimeUsbPath != null) {
+      await saveFileToUsb(`${callTimeUsbPath}/${filename}`, buffer)
+    } else {
+      saveAs(new Blob([buffer]), filename)
     }
+
+    return successfulDownloads
   }
 
-  return { downloadLogPeriods, isDownloading, hasError }
+  // Downloading log periods doesn't mutate robot state, so it doesn't need
+  // to go through useDocumentedMutation.
+  // eslint-disable-next-line opentrons/no-direct-use-mutation
+  return useMutation(downloadLogPeriods)
 }
