@@ -16,6 +16,26 @@ class AccountType(StrEnum):
     SERVICE = "service"
 
 
+USERNAME_MAX_LENGTH = 20
+
+Username = Annotated[
+    str,
+    Field(
+        max_length=USERNAME_MAX_LENGTH,
+        description="The username of the user.",
+    ),
+]
+
+OptionalUsername = Annotated[
+    str | None,
+    Field(
+        default=None,
+        max_length=USERNAME_MAX_LENGTH,
+        description="The username of the user.",
+    ),
+]
+
+
 class UserCreate(BaseModel):
     """Request body for creating a user."""
 
