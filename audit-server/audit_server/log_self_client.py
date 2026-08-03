@@ -10,6 +10,7 @@ from server_utils.audit.audit_server import (
     Client as SUClient,
 )
 from server_utils.audit.audit_server import (
+    GetLoggingEnabledData,
     StoreRobotLogSuccessData,
 )
 from server_utils.audit.audit_server import (
@@ -33,6 +34,7 @@ class LocalClient(SUClient):
         """Build the LocalClient and provide the log data manager."""
         self._log_data_manager = log_data_manager
         self._settings_store = settings_store
+
 
     @override
     async def submit_log_message(self, message: SUSubmitData) -> SUSuccessData:
@@ -62,4 +64,10 @@ class LocalClient(SUClient):
     async def store_robot_log(self, robot_log_file: TextIO) -> StoreRobotLogSuccessData:
         raise RuntimeError(
             "Should not be calling store robot log from audit server directly"
+        )
+
+    @override
+    async def get_logging_enabled(self) -> GetLoggingEnabledData:
+        return GetLoggingEnabledData(
+            loggingEnabled=self._settings_store.get_logging_enabled()
         )

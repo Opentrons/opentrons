@@ -11,6 +11,7 @@ from starlette.testclient import TestClient
 from server_utils.audit.audit_server import (
     AuditSettingsResponseData,
     Client,
+    GetLoggingEnabledData,
     LocalHTTPClient,
     NoOpClient,
     StoreRobotLogSuccessData,
@@ -73,6 +74,9 @@ def test_install_and_get_audit_client_via_dependency() -> None:
         async def store_robot_log(
             self, robot_log_file: typing.TextIO
         ) -> StoreRobotLogSuccessData:
+            raise NotImplementedError
+
+        async def get_logging_enabled(self) -> GetLoggingEnabledData:
             raise NotImplementedError
 
     stub_client = StubClient()
