@@ -3,11 +3,12 @@
 from datetime import datetime, timezone
 from pathlib import Path
 
-from sqlalchemy import select
+from sqlalchemy import LargeBinary, cast, func, select
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session, sessionmaker
 
 from .models import (
+    LogPeriodDetails,
     LogPeriodSummary,
     UserLogEntry,
     UserLogForExport,
@@ -224,6 +225,56 @@ class LogStore:
                     endedAt=log_period.ended_at,
                 ),
                 robot_log_entries=robot_log_entries,
+            )
+
+    def get_period_details(self, period_id: str) -> LogPeriodDetails:
+        """Get aggregate details for a log period without loading its log entries."""
+        try:
+            parsed_period_id = int(period_id)
+        except ValueError as exc:
+            raise NoPeriodById() from exc
+
+        with self._session() as session:
+            details = session.execute(
+                select(
+                    LogPeriod.id,
+                    LogPeriod.started_at,
+                    LogPeriod.ended_at,
+                    func.count(LogEntry.id),
+                    func.coalesce(
+                        func.sum(func.length(cast(LogEntry.message, LargeBinary))), 0
+                    ),
+                )
+                .outerjoin(LogEntry, LogEntry.log_period_id == LogPeriod.id)
+                .where(LogPeriod.id == parsed_period_id)
+                .group_by(
+                    LogPeriod.id,
+                    LogPeriod.started_at,
+                    LogPeriod.ended_at,
+                )
+            ).one_or_none()
+            if details is None:
+                raise NoPeriodById()
+
+            robot_log_paths = session.scalars(
+                select(RobotLog.file_path).where(
+                    RobotLog.log_period_id == parsed_period_id
+                )
+            ).all()
+            total_size_bytes = details[4]
+            for robot_log_path in robot_log_paths:
+                try:
+                    total_size_bytes += Path(robot_log_path).stat().st_size
+                except OSError:
+                    pass
+
+            return LogPeriodDetails(
+                id=details[0],
+                startedAt=details[1],
+                endedAt=details[2],
+                recordCount=details[3],
+                totalSizeBytes=total_size_bytes,
+                attachedFilenames=[Path(path).name for path in robot_log_paths],
             )
 
     def list_periods(self) -> list[LogPeriodSummary]:
