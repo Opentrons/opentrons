@@ -64,11 +64,5 @@ export function useWellTooltipPopper(
     return () => {
       popperInstance.destroy()
     }
-  }, [
-    tooltipEl,
-    referenceRect?.left,
-    referenceRect?.top,
-    referenceRect?.width,
-    referenceRect?.height,
-  ])
+  }, [tooltipEl, referenceRect])
 }
