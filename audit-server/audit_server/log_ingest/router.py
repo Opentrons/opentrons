@@ -10,7 +10,7 @@ from opentrons_shared_data.errors.exceptions import (
     KeyStorageUnavailableError,
 )
 
-from server_utils.audit.fastapi import skip_audit_logger
+from server_utils.audit.fastapi import get_supplied_user_notes, skip_audit_logger
 from server_utils.auth.resource_server.fastapi import (
     RequireAuthenticationResult,
     require_authentication,
@@ -18,7 +18,6 @@ from server_utils.auth.resource_server.fastapi import (
 )
 from server_utils.auth.resource_server.types import AuthenticationNotRequiredResult
 from server_utils.auth.scopes import Scope
-from server_utils.fastapi_utils.documented_interaction import get_supplied_user_notes
 from server_utils.fastapi_utils.models.json_api import (
     PydanticResponse,
     RequestModel,
@@ -134,6 +133,7 @@ async def post_external_log_message(
                 "Audit log is not available while Compliance Ready Software is inactive."
             ),
         )
+
     message = AuditLogMessage(
         action=f"External-{request_body.data.action}",
         accountName=authentication.username,

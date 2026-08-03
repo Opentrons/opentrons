@@ -5,7 +5,7 @@ import tempfile
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable, Generator, Iterator, cast
+from typing import AsyncIterator, Callable, Generator, Iterator, cast
 
 import pytest
 from _pytest.mark import deselect_by_mark
@@ -35,7 +35,12 @@ from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLoc
 from opentrons.protocol_api import labware
 from opentrons.types import Mount, Point
 from opentrons_shared_data.labware.types import LabwareDefinition
-from server_utils.audit.audit_server import Client as AuditClient
+from server_utils.audit.audit_server import (
+    AuditSettingsResponseData,
+)
+from server_utils.audit.audit_server import (
+    Client as AuditClient,
+)
 from server_utils.audit.fastapi import get_audit_client, install_audit_client
 from server_utils.auth.resource_server.authentication_checker import (
     AlwaysAllowedAuthenticationChecker,
@@ -253,10 +258,18 @@ def mock_audit_client(decoy: Decoy) -> AuditClient:
 
 
 @pytest.fixture
-def _override_audit_client_with_mock(mock_audit_client: AuditClient) -> Iterator[None]:
+async def _override_audit_client_with_mock(
+    mock_audit_client: AuditClient,
+    decoy: Decoy,
+) -> AsyncIterator[None]:
     def get_audit_client_override() -> AuditClient:
         return mock_audit_client
 
+    decoy.when(await mock_audit_client.get_settings()).then_return(
+        AuditSettingsResponseData(
+            requireReasonForInteraction=False, minLengthOfReasonForInteraction=None
+        )
+    )
     app.dependency_overrides[get_audit_client] = get_audit_client_override
     install_audit_client(app.state, mock_audit_client)
     yield
