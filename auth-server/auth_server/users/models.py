@@ -16,11 +16,41 @@ class AccountType(StrEnum):
     SERVICE = "service"
 
 
+USERNAME_MAX_LENGTH = 20
+
+Username = Annotated[
+    str,
+    Field(
+        max_length=USERNAME_MAX_LENGTH,
+        description="The username of the user.",
+    ),
+]
+
+OptionalUsername = Annotated[
+    str | None,
+    Field(
+        default=None,
+        max_length=USERNAME_MAX_LENGTH,
+        description="The username of the user.",
+    ),
+]
+
+
 class UserCreate(BaseModel):
     """Request body for creating a user."""
 
-    username: Annotated[str, Field(..., description="The username of the user.")]
-    password: Annotated[SecretStr, Field(..., description="The password for the user.")]
+    username: Username
+    password: Annotated[
+        SecretStr | None,
+        Field(
+            default=None,
+            description=(
+                "The password for the user. If omitted, the server generates a "
+                "temporary password and requires the user to set a new password "
+                "before full robot access."
+            ),
+        ),
+    ] = None
     fullName: Annotated[str, Field(..., description="The full name of the user.")]
     accountType: Annotated[
         AccountType, Field(..., description="The type of account for the user.")
@@ -30,10 +60,7 @@ class UserCreate(BaseModel):
 class UpdateUser(BaseModel):
     """Request body for updating a user."""
 
-    username: Annotated[
-        str | None,
-        Field(description="The username of the user."),
-    ] = None
+    username: OptionalUsername
     password: Annotated[
         SecretStr | None,
         Field(description="The password for the user."),
@@ -67,10 +94,7 @@ class UpdateUser(BaseModel):
 class UpdateSelf(BaseModel):
     """Request body for updating the logged-in user."""
 
-    username: Annotated[
-        str | None,
-        Field(default=None, description="The username of the user."),
-    ] = None
+    username: OptionalUsername
     fullName: Annotated[
         str | None,
         Field(default=None, description="The full name of the user."),
@@ -106,15 +130,18 @@ class UserResponse(BaseModel):
     ]
 
 
-class ResetPasswordResponse(UserResponse):
-    """Response body for a password reset, including the new temporary password."""
+class TemporaryPasswordResponse(UserResponse):
+    """Response body for a user, optionally including a newly generated temporary password."""
 
     temporaryPassword: Annotated[
-        str,
+        str | None,
         Field(
-            description="The newly generated temporary password for the user.",
+            default=None,
+            description=(
+                "The newly generated temporary password for the user, if one was created."
+            ),
         ),
-    ]
+    ] = None
 
 
 # todo(mm, 2026-06-23): Deduplicate with robot-server's ErrorBody, via server-utils.

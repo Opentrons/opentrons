@@ -36,18 +36,21 @@ def get_scope_set_of_account_type(
             return {Scope.USERS_READ_OTHERS}
 
         elif account_type == AccountType.USER:
-            return {
+            result = {
                 Scope.RESTART_WRITE,
                 Scope.ROBOT_CONTROL_WRITE,
                 Scope.ROBOT_SETTINGS_WRITE,
-                # todo(mm, 2026-03-17): Updates should be togglable to admin-only by an auth setting.
-                Scope.UPDATES_WRITE,
                 Scope.USERS_READ_SELF,
                 Scope.USERS_WRITE_SELF,
-                # todo(mm, 2026-03-17): Protocol uploads should be togglable to admin-only by an auth setting.
-                Scope.PROTOCOLS_WRITE,
                 Scope.AUDIT_LOG_WRITE,
             }
+            if not settings.requireAdminCredsWhenUpdatingRobotSoftware:
+                result.add(Scope.UPDATES_WRITE)
+            if not settings.requireAdminCredsWhenSendingProtocolToRobot:
+                result.add(Scope.PROTOCOLS_WRITE)
+            if not settings.requireAdminCredsForSignoffProtocol:
+                result.add(Scope.RUN_SIGNOFF_WRITE)
+            return result
 
         else:
             assert_never(account_type)

@@ -36,6 +36,12 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.robot.types import RobotTypeEnum
+from server_utils.auth.resource_server.fastapi import AuthorizationError
+from server_utils.auth.resource_server.types import (
+    AuthenticatedResult,
+    AuthenticationNotRequiredResult,
+)
+from server_utils.auth.scopes import Scope, serialize_scopes
 from server_utils.fastapi_utils.models.json_api import (
     MultiBodyMeta,
     RequestModel,
@@ -72,7 +78,9 @@ from robot_server.runs.router.base_router import (
 from robot_server.runs.run_auto_deleter import RunAutoDeleter
 from robot_server.runs.run_data_manager import (
     RunDataManager,
+    RunNotCompleteError,
     RunNotCurrentError,
+    RunSignoffRequiredError,
 )
 from robot_server.runs.run_models import (
     ActiveNozzleLayout,
@@ -560,9 +568,16 @@ async def test_delete_run_by_id(
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should be able to remove a run by ID."""
-    result = await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
+    result = await remove_run(
+        runId="run-id",
+        run_data_manager=mock_run_data_manager,
+        access_control_status=False,
+    )
 
-    decoy.verify(await mock_run_data_manager.delete("run-id"), times=1)
+    decoy.verify(
+        await mock_run_data_manager.delete("run-id", access_control_status=False),
+        times=1,
+    )
 
     assert result.content == SimpleEmptyBody()
     assert result.status_code == 200
@@ -575,10 +590,16 @@ async def test_delete_run_with_bad_id(
     """It should 404 if the run ID does not exist."""
     key_error = RunNotFoundError(run_id="run-id")
 
-    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(key_error)  # type: ignore[func-returns-value]
+    decoy.when(
+        await mock_run_data_manager.delete("run-id", access_control_status=False)  # type: ignore[func-returns-value]
+    ).then_raise(key_error)
 
     with pytest.raises(ApiError) as exc_info:
-        await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
+        await remove_run(
+            runId="run-id",
+            run_data_manager=mock_run_data_manager,
+            access_control_status=False,
+        )
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
@@ -589,15 +610,39 @@ async def test_delete_active_run(
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should 409 if the run is not finished."""
-    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(  # type: ignore[func-returns-value]
-        RunConflictError("oh no")
-    )
+    decoy.when(
+        await mock_run_data_manager.delete("run-id", access_control_status=False)  # type: ignore[func-returns-value]
+    ).then_raise(RunConflictError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
-        await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
+        await remove_run(
+            runId="run-id",
+            run_data_manager=mock_run_data_manager,
+            access_control_status=False,
+        )
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunNotIdle"
+
+
+async def test_delete_run_signoff_required(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+) -> None:
+    """It should 409 if the run has not been signed off."""
+    decoy.when(
+        await mock_run_data_manager.delete("run-id", access_control_status=False)  # type: ignore[func-returns-value]
+    ).then_raise(RunSignoffRequiredError("oh no"))
+
+    with pytest.raises(ApiError) as exc_info:
+        await remove_run(
+            runId="run-id",
+            run_data_manager=mock_run_data_manager,
+            access_control_status=False,
+        )
+
+    assert exc_info.value.status_code == 409
+    assert exc_info.value.content["errors"][0]["id"] == "RunSignoffRequired"
 
 
 async def test_update_run_to_not_current(
@@ -623,14 +668,16 @@ async def test_update_run_to_not_current(
         hasEverEnteredErrorRecovery=False,
     )
 
-    decoy.when(await mock_run_data_manager.uncurrent("run-id")).then_return(
-        expected_response
-    )
+    decoy.when(
+        await mock_run_data_manager.uncurrent("run-id", access_control_status=False)
+    ).then_return(expected_response)
 
     result = await update_run(
         runId="run-id",
         request_body=RequestModel(data=RunUpdate(current=False)),
         run_data_manager=mock_run_data_manager,
+        access_control_status=False,
+        authentication=AuthenticationNotRequiredResult(),
     )
 
     assert result.content == SimpleBody(data=expected_response)
@@ -666,10 +713,104 @@ async def test_update_current_none_noop(
         runId="run-id",
         request_body=RequestModel(data=RunUpdate()),
         run_data_manager=mock_run_data_manager,
+        access_control_status=False,
+        authentication=AuthenticationNotRequiredResult(),
     )
 
     assert result.content == SimpleBody(data=expected_response)
     assert result.status_code == 200
+
+
+async def test_update_run_signed_by_and_uncurrent(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+) -> None:
+    """It should sign then un-current in a single PATCH."""
+    signed_response = Run(
+        id="run-id",
+        protocolId=None,
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=pe_types.EngineStatus.SUCCEEDED,
+        current=True,
+        actions=[],
+        errors=[],
+        pipettes=[],
+        modules=[],
+        labware=[],
+        labwareOffsets=[],
+        liquids=[],
+        liquidClasses=[],
+        outputFileIds=[],
+        hasEverEnteredErrorRecovery=False,
+        signedBy="Alice Example",
+    )
+    uncurrent_response = signed_response.model_copy(update={"current": False})
+
+    decoy.when(
+        mock_run_data_manager.set_signed_by(run_id="run-id", signed_by="Alice Example")
+    ).then_return(signed_response)
+    decoy.when(
+        await mock_run_data_manager.uncurrent("run-id", access_control_status=False)
+    ).then_return(uncurrent_response)
+
+    result = await update_run(
+        runId="run-id",
+        request_body=RequestModel(
+            data=RunUpdate(signedBy="Alice Example", current=False)
+        ),
+        run_data_manager=mock_run_data_manager,
+        access_control_status=False,
+        authentication=AuthenticationNotRequiredResult(),
+    )
+
+    assert result.content == SimpleBody(data=uncurrent_response)
+    assert result.status_code == 200
+
+
+async def test_update_run_not_complete(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+) -> None:
+    """It should 409 if signing a run that has not completed."""
+    decoy.when(
+        mock_run_data_manager.set_signed_by(run_id="run-id", signed_by="Alice Example")
+    ).then_raise(RunNotCompleteError("oh no"))
+
+    with pytest.raises(ApiError) as exc_info:
+        await update_run(
+            runId="run-id",
+            request_body=RequestModel(data=RunUpdate(signedBy="Alice Example")),
+            run_data_manager=mock_run_data_manager,
+            access_control_status=False,
+            authentication=AuthenticationNotRequiredResult(),
+        )
+
+    assert exc_info.value.status_code == 409
+    assert exc_info.value.content["errors"][0]["id"] == "RunNotComplete"
+
+
+async def test_update_run_signoff_required(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+) -> None:
+    """It should 409 if un-currenting requires signoff."""
+    decoy.when(
+        await mock_run_data_manager.uncurrent(
+            run_id="run-id", access_control_status=False
+        )
+    ).then_raise(RunSignoffRequiredError("oh no"))
+
+    with pytest.raises(ApiError) as exc_info:
+        await update_run(
+            runId="run-id",
+            request_body=RequestModel(data=RunUpdate(current=False)),
+            run_data_manager=mock_run_data_manager,
+            access_control_status=False,
+            authentication=AuthenticationNotRequiredResult(),
+        )
+
+    assert exc_info.value.status_code == 409
+    assert exc_info.value.content["errors"][0]["id"] == "RunSignoffRequired"
 
 
 async def test_update_to_current_not_current(
@@ -677,15 +818,19 @@ async def test_update_to_current_not_current(
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should 409 if attempting to update a not current run."""
-    decoy.when(await mock_run_data_manager.uncurrent(run_id="run-id")).then_raise(
-        RunNotCurrentError("oh no")
-    )
+    decoy.when(
+        await mock_run_data_manager.uncurrent(
+            run_id="run-id", access_control_status=False
+        )
+    ).then_raise(RunNotCurrentError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
         await update_run(
             runId="run-id",
             request_body=RequestModel(data=RunUpdate(current=False)),
             run_data_manager=mock_run_data_manager,
+            access_control_status=False,
+            authentication=AuthenticationNotRequiredResult(),
         )
 
     assert exc_info.value.status_code == 409
@@ -697,15 +842,19 @@ async def test_update_to_current_conflict(
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should 409 if attempting to un-current a run that is not idle."""
-    decoy.when(await mock_run_data_manager.uncurrent(run_id="run-id")).then_raise(
-        RunConflictError("oh no")
-    )
+    decoy.when(
+        await mock_run_data_manager.uncurrent(
+            run_id="run-id", access_control_status=False
+        )
+    ).then_raise(RunConflictError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
         await update_run(
             runId="run-id",
             request_body=RequestModel(data=RunUpdate(current=False)),
             run_data_manager=mock_run_data_manager,
+            access_control_status=False,
+            authentication=AuthenticationNotRequiredResult(),
         )
 
     assert exc_info.value.status_code == 409
@@ -717,19 +866,84 @@ async def test_update_to_current_missing(
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should 404 if attempting to update a missing run."""
-    decoy.when(await mock_run_data_manager.uncurrent(run_id="run-id")).then_raise(
-        RunNotFoundError(run_id="run-id")
-    )
+    decoy.when(
+        await mock_run_data_manager.uncurrent(
+            run_id="run-id", access_control_status=False
+        )
+    ).then_raise(RunNotFoundError(run_id="run-id"))
 
     with pytest.raises(ApiError) as exc_info:
         await update_run(
             runId="run-id",
             request_body=RequestModel(data=RunUpdate(current=False)),
             run_data_manager=mock_run_data_manager,
+            access_control_status=False,
+            authentication=AuthenticationNotRequiredResult(),
         )
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
+
+
+async def test_update_run_signed_by_requires_run_signoff_write_scope(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+) -> None:
+    """It should reject signedBy updates when the token lacks run_signoff.write."""
+    with pytest.raises(AuthorizationError) as exc_info:
+        await update_run(
+            runId="run-id",
+            request_body=RequestModel(data=RunUpdate(signedBy="Alice Example")),
+            run_data_manager=mock_run_data_manager,
+            access_control_status=False,
+            authentication=AuthenticatedResult(
+                scope=serialize_scopes({Scope.ROBOT_CONTROL_WRITE}),
+                username="testuser",
+                fullname="Test User",
+            ),
+        )
+
+    assert exc_info.value.required_scopes == {Scope.RUN_SIGNOFF_WRITE}
+
+
+async def test_update_run_signed_by(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+) -> None:
+    """It should update signedBy when the request is authorized."""
+    expected_response = Run(
+        id="run-id",
+        protocolId=None,
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=pe_types.EngineStatus.SUCCEEDED,
+        current=True,
+        actions=[],
+        errors=[],
+        pipettes=[],
+        modules=[],
+        labware=[],
+        labwareOffsets=[],
+        liquids=[],
+        liquidClasses=[],
+        outputFileIds=[],
+        hasEverEnteredErrorRecovery=False,
+        signedBy="Alice Example",
+    )
+
+    decoy.when(
+        mock_run_data_manager.set_signed_by(run_id="run-id", signed_by="Alice Example")
+    ).then_return(expected_response)
+
+    result = await update_run(
+        runId="run-id",
+        request_body=RequestModel(data=RunUpdate(signedBy="Alice Example")),
+        run_data_manager=mock_run_data_manager,
+        access_control_status=False,
+        authentication=AuthenticationNotRequiredResult(),
+    )
+
+    assert result.content == SimpleBody(data=expected_response)
+    assert result.status_code == 200
 
 
 async def test_get_run_commands_errors(

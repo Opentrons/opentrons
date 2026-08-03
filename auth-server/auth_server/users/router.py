@@ -13,10 +13,12 @@ from server_utils.auth.resource_server.fastapi import (
 from server_utils.auth.resource_server.types import AuthenticatedResult
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.models.json_api import (
+    MultiBodyMeta,
     PydanticResponse,
     RequestModel,
     SimpleBody,
     SimpleEmptyBody,
+    SimpleMultiBody,
 )
 
 from auth_server.api_error import APIError
@@ -26,7 +28,7 @@ from auth_server.users.models import (
     ErrorBody,
     PasswordMissingSpecialCharactersErrorDetails,
     PasswordTooShortErrorDetails,
-    ResetPasswordResponse,
+    TemporaryPasswordResponse,
     UpdateSelf,
     UpdateUser,
     UserAlreadyExistsErrorDetails,
@@ -50,7 +52,9 @@ router = fastapi.APIRouter()
     summary="Create a user",
     description="Create a new user.",
     responses={
-        fastapi.status.HTTP_201_CREATED: {"model": SimpleBody[UserResponse]},
+        fastapi.status.HTTP_201_CREATED: {
+            "model": SimpleBody[TemporaryPasswordResponse]
+        },
         fastapi.status.HTTP_400_BAD_REQUEST: {
             "model": ErrorBody[
                 PasswordTooShortErrorDetails
@@ -76,7 +80,7 @@ async def post_users(
             ),
         ),
     ],
-) -> PydanticResponse[SimpleBody[UserResponse]]:
+) -> PydanticResponse[SimpleBody[TemporaryPasswordResponse]]:
     """Create a user."""
     user_create = request_body.data
     now = datetime.datetime.now(tz=datetime.UTC)
@@ -86,7 +90,11 @@ async def post_users(
     try:
         new_user = user_data_manager.create_user(
             username=user_create.username,
-            password=user_create.password.get_secret_value(),
+            password=(
+                user_create.password.get_secret_value()
+                if user_create.password is not None
+                else None
+            ),
             full_name=user_create.fullName,
             account_type=user_create.accountType,
             now=now,
@@ -113,6 +121,32 @@ async def post_users(
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_201_CREATED,
         content=SimpleBody(data=new_user),
+    )
+
+
+@PydanticResponse.wrap_route(
+    router.get,
+    path="/auth/users",
+    summary="List users",
+    description="List all users. Requires admin credentials.",
+    responses={
+        fastapi.status.HTTP_200_OK: {"model": SimpleMultiBody[UserResponse]},
+    },
+    dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
+)
+async def get_users(
+    user_data_manager: Annotated[
+        UserDataManager, fastapi.Depends(get_user_data_manager)
+    ],
+) -> PydanticResponse[SimpleMultiBody[UserResponse]]:
+    """List all users."""
+    users = user_data_manager.get_users_list()
+    return await PydanticResponse.create(
+        status_code=fastapi.status.HTTP_200_OK,
+        content=SimpleMultiBody.model_construct(
+            data=users,
+            meta=MultiBodyMeta(cursor=0, totalLength=len(users)),
+        ),
     )
 
 
@@ -261,7 +295,7 @@ async def update_user(
         "The user must change their password upon next login."
     ),
     responses={
-        fastapi.status.HTTP_200_OK: {"model": SimpleBody[ResetPasswordResponse]},
+        fastapi.status.HTTP_200_OK: {"model": SimpleBody[TemporaryPasswordResponse]},
         fastapi.status.HTTP_404_NOT_FOUND: {"userNotFound": None},
     },
     dependencies=[
@@ -276,7 +310,7 @@ async def reset_user_password(
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
-) -> PydanticResponse[SimpleBody[ResetPasswordResponse]]:
+) -> PydanticResponse[SimpleBody[TemporaryPasswordResponse]]:
     """Reset a user's password to a random temporary password."""
     result = user_data_manager.reset_user_password(
         user.username,

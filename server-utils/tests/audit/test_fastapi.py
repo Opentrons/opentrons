@@ -7,6 +7,7 @@ import pytest
 from starlette.testclient import TestClient
 
 from server_utils.audit.audit_server import (
+    AuditSettingsResponseData,
     Client,
     LocalHTTPClient,
     NoOpClient,
@@ -60,8 +61,11 @@ def test_install_and_get_audit_client_via_dependency() -> None:
     class StubClient(Client):
         async def submit_log_message(
             self, message: SubmitAuditLogMessageData
-        ) -> SubmitAuditLogSuccessData:  # pragma: no cover - not exercised here
-            raise NotImplementedError
+        ) -> SubmitAuditLogSuccessData:
+            raise NotImplementedError()
+
+        async def get_settings(self) -> AuditSettingsResponseData:
+            raise NotImplementedError()
 
     stub_client = StubClient()
 
