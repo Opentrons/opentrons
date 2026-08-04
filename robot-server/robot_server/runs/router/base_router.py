@@ -277,6 +277,7 @@ async def create_run(  # noqa: C901
         notify_publishers: Utilized by the engine to notify publishers of state changes.
         access_control_status: Whether access control (Compliance Ready Software) is
             currently enabled on the robot.
+        audit_client: Client to get log period info from
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None
     offsets = request_body.data.labwareOffsets if request_body is not None else []
@@ -305,6 +306,8 @@ async def create_run(  # noqa: C901
 
     deck_configuration = await deck_configuration_store.get_deck_configuration()
 
+    log_period = await audit_client.get_current_log_period()
+
     # TODO (tz, 5-16-22): same error raised twice.
     #  Check if we can consolidate to one place.
     if protocol_id is not None:
@@ -330,6 +333,7 @@ async def create_run(  # noqa: C901
             protocol=protocol_resource,
             notify_publishers=notify_publishers,
             access_control_status=access_control_status,
+            log_period_id=str(log_period.id) if log_period is not None else None,
         )
     except RunConflictError as e:
         raise RunAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e

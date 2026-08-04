@@ -72,6 +72,7 @@ class RunResource:
     created_at: datetime
     actions: List[RunAction]
     signed_by: Optional[str]
+    log_period_id: Optional[str]
 
 
 @dataclass(frozen=True)
@@ -93,6 +94,7 @@ class BadRunResource:
     created_at: datetime
     actions: List[RunAction]
     signed_by: Optional[str]
+    log_period_id: Optional[str]
     error: EnumeratedError
 
 
@@ -332,6 +334,7 @@ class RunStore:
         run_id: str,
         created_at: datetime,
         protocol_id: Optional[str],
+        log_period_id: Optional[str],
     ) -> RunResource:
         """Insert run resource in the db.
 
@@ -339,6 +342,7 @@ class RunStore:
             run_id: Unique identifier to use for the run.
             created_at: Run creation timestamp.
             protocol_id: Protocol resource used by the run, if any.
+            log_period_id: The log period this run is associated with, if any
 
         Returns:
             The resource that was added to the store.
@@ -354,6 +358,7 @@ class RunStore:
             protocol_id=protocol_id,
             actions=[],
             signed_by=None,
+            log_period_id=log_period_id,
         )
         insert = sqlalchemy.insert(run_table).values(
             _convert_run_to_sql_values(run=run)
@@ -911,6 +916,7 @@ _run_columns = [
     run_table.c.protocol_id,
     run_table.c.created_at,
     run_table.c.signed_by,
+    run_table.c.log_period_id,
 ]
 
 
@@ -938,6 +944,7 @@ def _convert_row_to_run(
     protocol_id = row.protocol_id
     created_at = row.created_at
     signed_by = row.signed_by
+    log_period_id = row.log_period_id
     # Checking the fundamental data types here are not covered by the error handling
     # because if they fire, the only thing we can do to address the issue is immediately
     # delete the row while we still have a handle on it from sql - we won't have any
@@ -949,6 +956,9 @@ def _convert_row_to_run(
     )
     assert signed_by is None or isinstance(signed_by, str), (
         f"signed_by {signed_by} is not a string or None"
+    )
+    assert log_period_id is None or isinstance(log_period_id, str), (
+        f"log_period_id {log_period_id} is not a string or None"
     )
     try:
         actions = [
@@ -973,6 +983,7 @@ def _convert_row_to_run(
                 detail={"kind": "bad-actions"},
                 wrapping=[PythonException(be)],
             ),
+            log_period_id=log_period_id,
         )
 
     return RunResource(
@@ -982,6 +993,7 @@ def _convert_row_to_run(
         protocol_id=protocol_id,
         actions=actions,
         signed_by=signed_by,
+        log_period_id=log_period_id,
     )
 
 
@@ -991,6 +1003,7 @@ def _convert_run_to_sql_values(run: RunResource) -> Dict[str, object]:
         "created_at": run.created_at,
         "protocol_id": run.protocol_id,
         "signed_by": run.signed_by,
+        "log_period_id": run.log_period_id,
     }
 
 
