@@ -20,9 +20,11 @@ jobs:
     timeout-minutes: 30
     runs-on: 'ubuntu-24.04'
     steps:
+      # schedule: pin to edge. workflow_dispatch: use the branch selected in the Actions UI.
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
-          ref: edge
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'schedule' && 'edge' || github.ref }}
       - uses: ./.github/actions/js/setup
       - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
         with:
@@ -33,8 +35,8 @@ jobs:
       - name: 'run js-package-testing tests'
         working-directory: js-package-testing
         env:
-          # Eyes baseline branch = PR merge target (pull_request). workflow_dispatch falls back to ref_name.
-          APPLITOOLS_BRANCH: edge
+          # Eyes baseline: edge for cron; selected branch for workflow_dispatch.
+          APPLITOOLS_BRANCH: ${{ github.event_name == 'schedule' && 'edge' || github.ref_name }}
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
         run: make test
       - name: 'upload playwright report'

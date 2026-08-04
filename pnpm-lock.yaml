@@ -955,9 +955,6 @@ importers:
       dotenv:
         specifier: ^16.6.1
         version: 16.6.1
-      styled-components:
-        specifier: 5.3.6
-        version: 5.3.6(react-dom@18.2.0(react@18.2.0))(react-is@18.3.1)(react@18.2.0)
       typescript:
         specifier: 5.3.3
         version: 5.3.3
