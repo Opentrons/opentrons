@@ -31,7 +31,7 @@ export function ComplianceReadyToggleField({
   onToggleChange,
   children,
 }: ComplianceReadyToggleFieldProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'branded'])
   const serverToggledOn = Boolean(values[id])
   const [expanded, setExpanded] = useState(false)
   const toggledOn =

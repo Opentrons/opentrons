@@ -79,6 +79,7 @@ const COMPLIANCE_READY_FIELD_IDS = [
   'requireAdminCredsWhenSendingProtocolToRobot',
   'requireAdminCredsForSignoffProtocol',
   'requireSignoffForProtocolLog',
+  'requireLogsToBeSavedInApp',
   'deleteOverMaxOnDiskProtocols',
   'requireReasonForInteraction',
   'minLengthOfReasonForInteraction',
@@ -203,8 +204,8 @@ describe('ComplianceReadySoftwareSettings', () => {
 
     screen.getByText('Login and security')
     screen.getByText('Actions requiring admin credentials')
-    screen.getByText('Protocol logs')
     screen.getByText('Audit log requirements')
+    screen.getByText('Robot storage')
     screen.getByText('Maximum login attempts before account deactivation')
   })
 
@@ -270,9 +271,14 @@ describe('ComplianceReadySoftwareSettings', () => {
     ).toHaveAttribute('aria-checked', 'true')
     expect(
       screen.getByRole('switch', {
-        name: 'Require signoff for protocol logs',
+        name: 'Require signature upon completing a protocol run',
       })
     ).toHaveAttribute('aria-checked', 'true')
+    expect(
+      screen.getByRole('switch', {
+        name: 'Require downloading audit logs in the Opentrons App at the end of a protocol run',
+      })
+    ).toHaveAttribute('aria-checked', 'false')
     expect(
       screen.getByRole('switch', {
         name: 'Automatically delete protocol run logs on the robot when there are 20 protocol run records',

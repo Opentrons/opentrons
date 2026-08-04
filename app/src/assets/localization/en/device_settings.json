@@ -147,7 +147,6 @@
   "desktop_require_admin_credentials_to_sign_protocol_run_records": "Require admin credentials for signature upon completing a protocol run",
   "desktop_require_admin_credentials_to_update_robots": "Require admin credentials to update robots",
   "desktop_require_documentation_for_robot_actions": "Require documentation for robot actions",
-  "desktop_require_logs_to_be_saved_in_app": "Require downloading audit logs in the Opentrons App at the end of a protocol run",
   "desktop_require_logs_to_be_saved_in_app_description": "When enabled, audit logs will not be saved to the robot",
   "desktop_require_password_change_after_time": "Require password to be changed after a certain amount of time",
   "desktop_require_password_complexity_requirements": "Require password complexity requirements",

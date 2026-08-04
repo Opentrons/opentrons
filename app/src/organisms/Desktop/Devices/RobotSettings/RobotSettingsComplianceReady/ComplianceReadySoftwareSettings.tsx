@@ -331,7 +331,7 @@ export function ComplianceReadySoftwareSettings({
           <Divider />
           <ComplianceReadyToggleField
             id="requireLogsToBeSavedInApp"
-            labelKey="desktop_require_logs_to_be_saved_in_app"
+            labelKey="branded:require_logs_to_be_saved_in_app"
             detailKey="desktop_require_logs_to_be_saved_in_app_description"
             values={fieldValues}
             onToggleChange={toggledOn => {

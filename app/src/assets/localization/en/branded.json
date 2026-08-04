@@ -76,6 +76,7 @@
   "ot2_protocol_detected_description": "OT-2 now has its own app. Run OT-2 protocols there.",
   "previous_releases": "View previous Opentrons releases",
   "receive_alert": "Receive an alert when an Opentrons software update is available.",
+  "require_logs_to_be_saved_in_app": "Require downloading audit logs in the Opentrons App at the end of a protocol run",
   "restore_description": "Opentrons does not recommend reverting to previous software versions, but you can access previous releases below. For best results, uninstall the existing app and remove its configuration files before installing the previous version.",
   "retrieve_labware_from_stacker_to": "Retrieve {{primaryDefinitionDisplayName}} from Flex Stacker to {{slotName}}",
   "robot_server_version_ot3_description": "The Opentrons Flex software includes the robot server and the touchscreen display interface.",
