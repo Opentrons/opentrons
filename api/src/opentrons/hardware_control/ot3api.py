@@ -620,7 +620,6 @@ class OT3API(
         update_iterator = self.update_firmware(subsystems, force)
 
         async def _get_latest_update_status() -> UpdateStatus | None:
-            mod_log.info("FETCH BASED CALL WAS CALLED")
             try:
                 return await anext(update_iterator)
             except StopAsyncIteration:
