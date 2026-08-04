@@ -255,6 +255,7 @@ async def create_run(  # noqa: C901
     camera_provider: Annotated[CameraProvider, Depends(get_camera_provider)],
     notify_publishers: Annotated[Callable[[], None], Depends(get_pe_notify_publishers)],
     access_control_status: Annotated[bool, Depends(get_access_control_status)],
+    audit_client: Annotated[AuditClient, Depends(get_audit_client)],
     request_body: Optional[RequestModel[RunCreate]] = None,
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Create a new run.
