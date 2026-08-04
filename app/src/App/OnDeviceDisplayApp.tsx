@@ -260,6 +260,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                       showDocumentationRequiredModal: requireDocumentation,
                       showLoginModal,
                       showSignRunModal,
+                      showDownloadLogsModal: () => Promise.resolve(false),
                     }}
                   >
                     <MaintenanceRunTakeover>
