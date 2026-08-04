@@ -66,6 +66,7 @@ from opentrons.hardware_control.types import (
     HardwareEventHandler,
     HardwareFeatureFlags,
     OT3Mount,
+    SubSystem,
 )
 from opentrons.types import Mount, Point
 from opentrons.util.pyro.pyro_client_async_adapter import (
@@ -718,6 +719,13 @@ async def test_pyro_async_wrapped_calls(  # noqa: C901
     assert ot3api.hardware_feature_flags == new_flags
     ot3api.hardware_feature_flags = old_flags
     assert ot3api.hardware_feature_flags == old_flags
+
+    # Test the firmware update fetching route
+    fetching_callback = ot3api.update_firmware_with_fetching(
+        {SubSystem.gantry_x, SubSystem.gantry_y}
+    )
+    fetch_result = await fetching_callback()
+    assert isinstance(fetch_result, hw_types.UpdateStatus)
 
     ot3_proxy._pyroRelease()  # type: ignore
 

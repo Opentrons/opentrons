@@ -18,6 +18,7 @@ export interface DocumentationRequiredModalContextType {
   }: {
     robotName: string
   }) => Promise<{ username: string } | null>
+  showSignRunModal: () => Promise<boolean>
 }
 
 /**
@@ -35,4 +36,5 @@ export const DocumentationRequiredModalContext =
       return Promise.resolve('' as DocumentationReport)
     },
     showLoginModal: () => Promise.resolve(null),
+    showSignRunModal: () => Promise.resolve(false),
   })

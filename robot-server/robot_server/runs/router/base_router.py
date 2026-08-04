@@ -32,7 +32,8 @@ from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_engine.types import CSVRuntimeParamPaths, DeckSlotLocation
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.robot.types import RobotTypeEnum
-from server_utils.audit.fastapi import get_audit_logger
+from server_utils.audit.audit_server import Client as AuditClient
+from server_utils.audit.fastapi import get_audit_client, get_audit_logger
 from server_utils.auth.resource_server.authorization_checker import (
     check as check_authorization,
 )
@@ -64,6 +65,7 @@ from server_utils.fastapi_utils.models.json_api import (
 from ..dependencies import (
     get_run_auto_deleter,
     get_run_data_manager,
+    get_run_store,
 )
 from ..run_auto_deleter import RunAutoDeleter
 from ..run_data_manager import (
@@ -72,6 +74,7 @@ from ..run_data_manager import (
     RunNotCurrentError,
     RunSignoffRequiredError,
 )
+from ..run_download_utils import collect_run_log
 from ..run_models import (
     ActiveNozzleLayout,
     BadRun,
@@ -87,6 +90,7 @@ from ..run_models import (
     TipState,
 )
 from ..run_orchestrator_store import RunConflictError
+from ..run_store import RunStore
 from robot_server.camera.fastapi_dependencies import (
     get_camera_provider,
 )
@@ -96,6 +100,7 @@ from robot_server.data_files.dependencies import (
     get_data_files_store,
 )
 from robot_server.data_files.models import FileIdNotFound, FileIdNotFoundError
+from robot_server.data_files.zip_utils import create_download_staging_dir
 from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store,
 )
@@ -106,6 +111,7 @@ from robot_server.hardware import (
     get_hardware_state_store,
     get_robot_type_enum,
 )
+from robot_server.persistence.fastapi_dependencies import get_persistence_directory_root
 from robot_server.protocols.dependencies import get_protocol_store
 from robot_server.protocols.protocol_store import (
     ProtocolNotFoundError,
@@ -498,6 +504,12 @@ async def update_run(  # noqa: C901
     runId: str,
     request_body: RequestModel[RunUpdate],
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    run_store: Annotated[RunStore, Depends(get_run_store)],
+    audit_client: Annotated[AuditClient, Depends(get_audit_client)],
+    persistence_directory_root: Annotated[
+        Path, Depends(get_persistence_directory_root)
+    ],
+    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
     access_control_status: Annotated[bool, Depends(get_access_control_status)],
     authentication: Annotated[
         RequireAuthenticationResult, Depends(require_authentication)
@@ -509,6 +521,10 @@ async def update_run(  # noqa: C901
         runId: Run ID pulled from URL.
         request_body: Update data from request body.
         run_data_manager: Current and historical run data management.
+        run_store: Store for run data management.
+        audit_client: Client to send run log data to audit server.
+        persistence_directory_root: Persistence directory used for download staging.
+        protocol_store: Store for protocol storage access.
         access_control_status: Whether access control (Compliance Ready Software) is
             currently enabled on the robot.
         authentication: The authenticated user, if any.
@@ -530,6 +546,26 @@ async def update_run(  # noqa: C901
             run_data = await run_data_manager.uncurrent(
                 run_id=runId, access_control_status=access_control_status
             )
+
+            # Send run log to audit server if logging enabled
+            logging_enabled_response = await audit_client.get_logging_enabled()
+            if logging_enabled_response.loggingEnabled:
+                staging_dir = create_download_staging_dir(persistence_directory_root)
+                staging_path = Path(staging_dir.name)
+
+                run_log_entry = collect_run_log(
+                    run_id=runId,
+                    run=run_store.get(runId),
+                    run_data_manager=run_data_manager,
+                    protocol_store=protocol_store,
+                    staging_dir=staging_path,
+                )
+                if run_log_entry is not None:
+                    file_path, _ = run_log_entry
+                    with open(file_path, "r") as fh:
+                        await audit_client.store_robot_log(robot_log_file=fh)
+                staging_dir.cleanup()
+
         if run_data is None:
             run_data = run_data_manager.get(runId)
     except RunConflictError as e:
