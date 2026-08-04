@@ -11,8 +11,7 @@ import {
   getRobotUpdateSession,
 } from '/app/redux/robot-update/selectors'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
-
-import { waitForStoreCondition } from './waitForStoreCondition'
+import { waitForStoreCondition } from '/app/redux/waitForStoreCondition'
 
 import type { Store } from 'redux'
 import type { HostConfig } from '@opentrons/api-client'

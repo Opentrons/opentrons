@@ -1,5 +1,5 @@
 import type { Store } from 'redux'
-import type { State } from '/app/redux/types'
+import type { State } from './types'
 
 export interface WaitForStoreOptions {
   signal?: AbortSignal

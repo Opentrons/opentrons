@@ -30,12 +30,12 @@ import {
   getRobotUpdateTargetVersion,
 } from '/app/redux/robot-update/selectors'
 import { uploadRobotUpdateFileViaShell } from '/app/redux/shell/remote'
+import { waitForStoreCondition } from '/app/redux/waitForStoreCondition'
 
 import { REDISCOVERY_TIME_MS } from './constants'
 import { buildHostConfig, ensureUpdateFileReady } from './ensureUpdateFileReady'
 import { getUserNotesFromDocumentationState } from './getUserNotesFromDocumentationState'
 import { pollRobotUpdateStatus } from './pollRobotUpdateStatus'
-import { waitForStoreCondition } from './waitForStoreCondition'
 
 import type { AxiosError } from 'axios'
 import type { Store } from 'redux'
@@ -298,7 +298,9 @@ function createUpdateSession(
       .cancelSession({ pathPrefix })
       .catch(() =>
         Promise.reject(
-          new Error(i18n.t('unable_to_cancel_update', { ns: 'device_settings' }))
+          new Error(
+            i18n.t('unable_to_cancel_update', { ns: 'device_settings' })
+          )
         )
       )
       .then(() => createOnce())
