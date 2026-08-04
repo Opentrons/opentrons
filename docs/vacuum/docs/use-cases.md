@@ -1,22 +1,24 @@
 ---
-title: "Vacuum Module: Typical Use Cases"
+title: "Vacuum Module: Use Cases"
 description: "Stacking deck pieces for filtrate collection and filter-to-waste applications."
 ---
 
-Common use cases for an automated, vacuum-based protocol include collecting filtered material and direct, filter-to-waste requirements. Deck pieces provided with the Vacuum Manifold let you configure a component stack to match these filtrate collection or disposal applications.
+The Vacuum Module uses a modular deck stack to support different filtration protocols. For example, combining specific deck components allows you to adjust stack height to either collect or discard filtrate. Selecting the appropriate collar, spacer, and support grid ensures an airtight seal during vacuum filtration.
 
-## Elution and filtrate collection
+## Stacking configurations
 
-These are typical deck component stacks used when a protocol requires capturing liquid (the eluate or a target filtrate) extracted from a filter plate into a collection plate nested inside the vacuum base. One method uses the short or tall spacers to vary the gap between a filter plate and collection plate. Another method simply stacks the filter plate on top of the collection plate, without spacers.
+Different pieces of the module's hardware stack control the vertical distance between the top (sample) filter plate and the bottom (collection) well plate. Adjusting this gap is critical for maintaining droplet control and preventing cross-contamination.
 
 ### With spacers
 
-This configuration inserts a short or tall spacer between the sample filter plate and collection plate. The spacers give you a consistent, uniform gap between the well plates. Spacers are commonly used when a protocol requires capturing liquid pulled through a filter plate into another well plate by vacuum pressure.
+This stack inserts a short or tall spacer between the vacuum base and collection plate to maintain a uniform gap between the filter and collection well plates. Reducing the vertical distance between the two well plates ensures fluid droplets fall cleanly into the receiving wells. A narrower gap between the plates also prevents negative vacuum pressure from pulling liquid sideways, eliminating cross-contamination between adjacent wells. The short and tall spacers can be paired with either collar.
 
-* **Internal Hardware:** Placing a short or tall spacer inside the vacuum base properly positions the collection labware directly beneath the source filter plate.
-* **Fluid Routing:** Minimizing the gap between the plates ensures that liquid flows vertically through the filter plate and drips straight into the corresponding collection wells.
+Typical spacer and well plate combinations include the following. Always check and test your stack to ensure that a selected combination of pieces is appropriate for a particular protocol.
 
-From top to bottom a filtrate collection stack uses the pieces shown below.
+* **Short spacer (27 mm):** Elevates deep-well collection plates to match standard filter plate heights.
+* **Tall spacer (34 mm):** Elevates standard microliter collection plates to bring shallow wells directly under the filter plate nozzles.
+
+From top to bottom, a filtrate collection stack uses the pieces shown below.
 
 <figure markdown>
   ![Waste collection stack showing labeled parts](images/stack-filter-to-plate.svg){ width="60%" }
@@ -25,14 +27,13 @@ From top to bottom a filtrate collection stack uses the pieces shown below.
 
 ### Without spacers
 
+This stack omits spacers altogether to seat a sample filter plate directly on top of a collection well plate. Both plates rest on the vacuum base and are capped by a short or tall collar, which creates a vacuum seal among the stacked components. Stacking well plates without spacers also helps minimize the potential for sample loss or aerosol contamination.
 
+<font color="red">IMAGE PLACEHOLDER</font>
 
-## Direct waste disposal
+### Direct to waste
 
-This configuration is used when a protocol does not require capturing liquid from a filter plate. Instead, the fluid drawn through the filter plate is unwanted waste and can be discarded directly.
-
-* **Internal Hardware:** Neither an internal spacer nor a collection plate is required inside the vacuum base. The interior of the base remains completely empty, capped by a short or tall collar and the fluid source well plate.
-* **Fluid Routing:** Vacuum pressure draws liquid straight through the filter plate into the vacuum base. From there, the material flows out via the connected vacuum hose to the off-deck waste collection jar.
+This stack omits both the the spacers and the collection well plate. Instead, the filter plate rests directly on a short or tall collar, which sits on the vacuum base. When under vacuum, this configuration draws liquid through the filter plate and into the waste collection carboy.
 
 <figure markdown>
   ![Waste disposal stack showing labeled parts](images/stack-filter-to-waste.svg){ width="80%" }
