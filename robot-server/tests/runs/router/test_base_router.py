@@ -36,8 +36,13 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data.robot.types import RobotTypeEnum
-from server_utils.audit.audit_server import Client as AuditClient
-from server_utils.audit.audit_server import GetLoggingEnabledData
+from server_utils.audit.audit_server import (
+    Client as AuditClient,
+)
+from server_utils.audit.audit_server import (
+    GetLoggingEnabledData,
+    GetLogPeriodsData,
+)
 from server_utils.auth.resource_server.fastapi import AuthorizationError
 from server_utils.auth.resource_server.types import (
     AuthenticatedResult,
@@ -163,6 +168,7 @@ async def test_create_run(
     mock_data_files_store: DataFilesStore,
     mock_file_provider: FileProvider,
     mock_camera_provider: CameraProvider,
+    mock_audit_client: AuditClient,
 ) -> None:
     """It should be able to create a basic run."""
     run_id = "run-id"
@@ -189,6 +195,14 @@ async def test_create_run(
         await mock_deck_configuration_store.get_deck_configuration()
     ).then_return([])
 
+    decoy.when(await mock_audit_client.get_current_log_period()).then_return(
+        GetLogPeriodsData(
+            id=123,
+            startedAt=datetime(year=2021, month=1, day=1),
+            endedAt=None,
+        )
+    )
+
     decoy.when(
         await mock_run_data_manager.create(
             run_id=run_id,
@@ -201,6 +215,7 @@ async def test_create_run(
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
             access_control_status=False,
+            log_period_id="123",
         )
     ).then_return(expected_response)
 
@@ -218,6 +233,7 @@ async def test_create_run(
         camera_provider=mock_camera_provider,
         notify_publishers=mock_notify_publishers,
         protocol_store=mock_protocol_store,
+        audit_client=mock_audit_client,
         check_estop=True,
         access_control_status=False,
     )
@@ -237,6 +253,7 @@ async def test_create_protocol_run(
     mock_data_files_store: DataFilesStore,
     mock_file_provider: FileProvider,
     mock_camera_provider: CameraProvider,
+    mock_audit_client: AuditClient,
 ) -> None:
     """It should be able to create a protocol run."""
     run_id = "run-id"
@@ -294,6 +311,13 @@ async def test_create_protocol_run(
     decoy.when(mock_protocol_store.get(protocol_id=protocol_id)).then_return(
         protocol_resource
     )
+    decoy.when(await mock_audit_client.get_current_log_period()).then_return(
+        GetLogPeriodsData(
+            id=123,
+            startedAt=datetime(year=2021, month=1, day=1),
+            endedAt=None,
+        )
+    )
 
     decoy.when(
         await mock_run_data_manager.create(
@@ -307,6 +331,7 @@ async def test_create_protocol_run(
             run_time_param_paths={"my-csv-param": Path("/dev/null/file-id/abc.xyz")},
             notify_publishers=mock_notify_publishers,
             access_control_status=False,
+            log_period_id="123",
         )
     ).then_return(expected_response)
 
@@ -328,6 +353,7 @@ async def test_create_protocol_run(
         deck_configuration_store=mock_deck_configuration_store,
         camera_provider=mock_camera_provider,
         notify_publishers=mock_notify_publishers,
+        audit_client=mock_audit_client,
         check_estop=True,
         access_control_status=False,
     )
@@ -348,6 +374,7 @@ async def test_create_protocol_run_bad_protocol_id(
     mock_data_files_directory: Path,
     mock_file_provider: FileProvider,
     mock_camera_provider: CameraProvider,
+    mock_audit_client: AuditClient,
 ) -> None:
     """It should 404 if a protocol for a run does not exist."""
     error = ProtocolNotFoundError("protocol-id")
@@ -365,6 +392,7 @@ async def test_create_protocol_run_bad_protocol_id(
             data_files_store=mock_data_files_store,
             data_files_directory=mock_data_files_directory,
             camera_provider=mock_camera_provider,
+            audit_client=mock_audit_client,
             run_id="run-id",
             created_at=datetime.now(),
             run_auto_deleter=mock_run_auto_deleter,
@@ -387,6 +415,7 @@ async def test_create_run_conflict(
     mock_data_files_directory: Path,
     mock_file_provider: FileProvider,
     mock_camera_provider: CameraProvider,
+    mock_audit_client: AuditClient,
 ) -> None:
     """It should respond with a conflict error if multiple engines are created."""
     created_at = datetime(year=2021, month=1, day=1)
@@ -406,6 +435,7 @@ async def test_create_run_conflict(
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
             access_control_status=False,
+            log_period_id=None,
         )
     ).then_raise(RunConflictError("oh no"))
 
@@ -422,6 +452,7 @@ async def test_create_run_conflict(
             data_files_directory=mock_data_files_directory,
             camera_provider=mock_camera_provider,
             notify_publishers=mock_notify_publishers,
+            audit_client=mock_audit_client,
             check_estop=True,
             access_control_status=False,
         )

@@ -233,6 +233,7 @@ def run_resource() -> RunResource:
         created_at=datetime(year=2022, month=2, day=2),
         actions=[],
         signed_by="Alice Example",
+        log_period_id="123",
     )
 
 
@@ -341,6 +342,7 @@ async def test_create(
             run_id=run_id,
             protocol_id=protocol.protocol_id,
             created_at=created_at,
+            log_period_id="123",
         )
     ).then_return(run_resource)
 
@@ -374,6 +376,7 @@ async def test_create(
         run_time_param_paths=sentinel.run_time_param_paths,
         notify_publishers=mock_notify_publishers,
         access_control_status=False,
+        log_period_id="123",
     )
 
     assert result == Run(
@@ -468,6 +471,7 @@ async def test_create_engine_error(
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
             access_control_status=False,
+            log_period_id=None,
         )
 
     decoy.verify(
@@ -475,6 +479,7 @@ async def test_create_engine_error(
             run_id=run_id,
             created_at=matchers.Anything(),
             protocol_id=matchers.Anything(),
+            log_period_id=matchers.Anything(),
         ),
         times=0,
     )
@@ -677,6 +682,7 @@ async def test_get_all_runs(
         created_at=datetime(year=2022, month=2, day=2),
         actions=[],
         signed_by=None,
+        log_period_id=None,
     )
 
     historical_run_resource = RunResource(
@@ -686,6 +692,7 @@ async def test_get_all_runs(
         created_at=datetime(year=2023, month=3, day=3),
         actions=[],
         signed_by=None,
+        log_period_id=None,
     )
 
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("current-run")
@@ -812,6 +819,7 @@ async def test_delete_signoff_enforcement(
             created_at=datetime(year=2022, month=2, day=2),
             actions=[],
             signed_by=signed_by,
+            log_period_id=None,
         )
     )
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
@@ -962,6 +970,7 @@ async def test_uncurrent_signoff_enforcement(
             created_at=datetime(year=2022, month=2, day=2),
             actions=[],
             signed_by=signed_by,
+            log_period_id=None,
         )
     )
 
@@ -1076,6 +1085,7 @@ async def test_create_archives_existing(
             run_id=run_id_new,
             created_at=datetime(year=2021, month=1, day=1),
             protocol_id=None,
+            log_period_id=None,
         )
     ).then_return(run_resource)
 
@@ -1090,6 +1100,7 @@ async def test_create_archives_existing(
         run_time_param_paths=None,
         notify_publishers=mock_notify_publishers,
         access_control_status=False,
+        log_period_id=None,
     )
 
     decoy.verify(
@@ -1148,6 +1159,7 @@ async def test_create_replacement_signoff_enforcement(
             created_at=datetime(year=2022, month=2, day=2),
             actions=[],
             signed_by=signed_by,
+            log_period_id=None,
         )
     )
 
@@ -1164,6 +1176,7 @@ async def test_create_replacement_signoff_enforcement(
                 run_time_param_paths=None,
                 notify_publishers=mock_notify_publishers,
                 access_control_status=access_control_status,
+                log_period_id=None,
             )
 
         decoy.verify(await mock_run_orchestrator_store.clear(), times=0)
@@ -1172,6 +1185,7 @@ async def test_create_replacement_signoff_enforcement(
                 run_id=run_id_new,
                 created_at=matchers.Anything(),
                 protocol_id=matchers.Anything(),
+                log_period_id=matchers.Anything(),
             ),
             times=0,
         )
@@ -1219,6 +1233,7 @@ async def test_create_replacement_signoff_enforcement(
                 run_id=run_id_new,
                 created_at=datetime(year=2021, month=1, day=1),
                 protocol_id=None,
+                log_period_id=None,
             )
         ).then_return(run_resource)
 
@@ -1233,6 +1248,7 @@ async def test_create_replacement_signoff_enforcement(
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
             access_control_status=access_control_status,
+            log_period_id=None,
         )
 
         decoy.verify(
