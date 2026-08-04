@@ -32,8 +32,8 @@ import {
   robotUpdateChangelogSeen,
   UPGRADE,
 } from '/app/redux/robot-update'
-import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 import { useIsOEMMode } from '/app/resources/robot-settings'
+import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
 import type { RobotSystemType } from '/app/redux/robot-update/types'
 import type { Dispatch, State } from '/app/redux/types'
