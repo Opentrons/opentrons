@@ -111,17 +111,20 @@ function expandAccordion(): void {
   fireEvent.click(screen.getByRole('button', { name: 'User management' }))
 }
 
+const mockDeleteUser = vi.fn()
+
 describe('UserManagement', () => {
   beforeEach(() => {
+    mockDeleteUser.mockReset()
+    mockDeleteUser.mockResolvedValue(undefined)
     vi.mocked(useToaster).mockReturnValue({
       makeToast: vi.fn(),
       eatToast: vi.fn(),
       makeSnackbar: vi.fn(),
     })
     vi.mocked(useDeleteUserMutation).mockReturnValue({
-      deleteUser: vi.fn().mockResolvedValue(undefined),
-      isLoading: false,
-    } as ReturnType<typeof useDeleteUserMutation>)
+      deleteUser: mockDeleteUser,
+    } as any)
     vi.mocked(useUsersQuery).mockImplementation(
       options =>
         ({
