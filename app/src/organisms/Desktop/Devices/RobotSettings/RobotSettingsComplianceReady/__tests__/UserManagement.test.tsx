@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom/vitest'
 
-import { fireEvent, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { fireEvent, screen, cleanup } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useUsersQuery } from '@opentrons/react-api-client'
 
@@ -21,6 +21,16 @@ vi.mock('../AddUserModal', () => ({
       <span>mock AddUserModal</span>
       <button type="button" onClick={onClose}>
         Close mock modal
+      </button>
+    </div>
+  ),
+}))
+vi.mock('../EditUserModal', () => ({
+  EditUserModal: ({ onClose }: { onClose: () => void }) => (
+    <div>
+      <span>mock EditUserModal</span>
+      <button type="button" onClick={onClose}>
+        Close mock edit modal
       </button>
     </div>
   ),
@@ -85,6 +95,10 @@ function expandAccordion(): void {
 }
 
 describe('UserManagement', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
     vi.mocked(useToaster).mockReturnValue({
       makeToast: vi.fn(),
@@ -140,5 +154,15 @@ describe('UserManagement', () => {
     expandAccordion()
     fireEvent.click(screen.getByRole('button', { name: 'Add User' }))
     screen.getByText('mock AddUserModal')
+  })
+
+  it('opens the edit user modal when Edit user is selected from the overflow menu', () => {
+    render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Edit user' }))
+    screen.getByText('mock EditUserModal')
   })
 })

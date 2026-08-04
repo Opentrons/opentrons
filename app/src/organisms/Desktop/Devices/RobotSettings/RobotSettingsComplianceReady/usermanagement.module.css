@@ -20,6 +20,13 @@
   color: var(--grey-60);
 }
 
+.overflow_cell {
+  position: relative;
+  padding: var(--spacing-12) 0;
+  border-top: 1px solid var(--grey-30);
+  vertical-align: top;
+}
+
 .add_user_button {
   width: fit-content;
 }

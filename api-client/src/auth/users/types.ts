@@ -46,3 +46,16 @@ export interface UpdateSelfRequest {
     password?: string
   }
 }
+
+export interface UpdateUserRequest {
+  data: {
+    username?: string
+    fullName?: string
+    accountType?: AuthUserAccountType
+  }
+}
+
+export interface UpdateUserParams {
+  username: string
+  request: UpdateUserRequest
+}

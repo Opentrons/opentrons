@@ -13,17 +13,12 @@ import { useUsernameForRobot } from '/app/redux/robot-auth'
 
 import { Accordion } from './Accordion'
 import { AddUserModal } from './AddUserModal'
+import { EditUserModal } from './EditUserModal'
 import styles from './usermanagement.module.css'
+import { UserManagementTableRow } from './UserManagementTableRow'
 
 import type { JSX } from 'react'
-import type { AuthUser, AuthUserAccountType } from '@opentrons/api-client'
-
-const ROLE_LABEL_KEYS: Record<AuthUserAccountType, string> = {
-  admin: 'desktop_user_role_admin',
-  user: 'desktop_user_role_user',
-  auditor: 'desktop_user_role_auditor',
-  service: 'desktop_user_role_service',
-}
+import type { AuthUser } from '@opentrons/api-client'
 
 export interface UserManagementProps {
   robotName: string
@@ -31,9 +26,13 @@ export interface UserManagementProps {
 
 interface UserManagementTableProps {
   users: AuthUser[]
+  onEdit: (user: AuthUser) => void
 }
 
-function UserManagementTable({ users }: UserManagementTableProps): JSX.Element {
+function UserManagementTable({
+  users,
+  onEdit,
+}: UserManagementTableProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
   return (
@@ -60,46 +59,16 @@ function UserManagementTable({ users }: UserManagementTableProps): JSX.Element {
               {t('desktop_status')}
             </StyledText>
           </th>
+          <th className={styles.header_cell} aria-hidden />
         </tr>
       </thead>
       <tbody>
         {users.map(user => (
-          <tr key={user.username}>
-            <td className={styles.body_cell}>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                className={styles.body_cell_text}
-              >
-                {user.username}
-              </StyledText>
-            </td>
-            <td className={styles.body_cell}>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                className={styles.body_cell_text}
-              >
-                {user.fullName}
-              </StyledText>
-            </td>
-            <td className={styles.body_cell}>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                className={styles.body_cell_text}
-              >
-                {t(ROLE_LABEL_KEYS[user.accountType])}
-              </StyledText>
-            </td>
-            <td className={styles.body_cell}>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                className={styles.body_cell_text}
-              >
-                {user.locked
-                  ? t('desktop_user_status_locked')
-                  : t('desktop_user_status_active')}
-              </StyledText>
-            </td>
-          </tr>
+          <UserManagementTableRow
+            key={user.username}
+            user={user}
+            onEdit={onEdit}
+          />
         ))}
       </tbody>
     </table>
@@ -114,11 +83,12 @@ export function UserManagement({
   const usersQuery = useUsersQuery({ enabled: username != null })
   const users = usersQuery?.data?.data ?? []
   const [showAddUserModal, setShowAddUserModal] = useState(false)
+  const [userToEdit, setUserToEdit] = useState<AuthUser | null>(null)
   const { makeToast } = useToaster()
 
   return (
     <Accordion id="user-management" title={t('desktop_user_management')}>
-      <UserManagementTable users={users} />
+      <UserManagementTable users={users} onEdit={setUserToEdit} />
       <div className={styles.add_user_button}>
         <EmptySelectorButton
           iconName="plus"
@@ -141,6 +111,22 @@ export function UserManagement({
           }}
           onClose={() => {
             setShowAddUserModal(false)
+          }}
+        />
+      ) : null}
+      {userToEdit != null ? (
+        <EditUserModal
+          robotName={robotName}
+          user={userToEdit}
+          onUserUpdated={() => {
+            makeToast(
+              t('desktop_edit_user_success_banner') as string,
+              SUCCESS_TOAST,
+              { closeButton: true }
+            )
+          }}
+          onClose={() => {
+            setUserToEdit(null)
           }}
         />
       ) : null}
