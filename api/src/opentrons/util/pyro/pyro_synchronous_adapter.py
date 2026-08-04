@@ -463,6 +463,7 @@ def _validated_parameters(*args: P.args, **kwargs: P.kwargs) -> tuple[tuple, dic
     def _validations(arg: Any) -> Any:
         # NOTE: Extend this as further validations are needed
         arg = _validate_inbound_proxy(arg)
+        arg = _validate_inbound_iterable(arg)
         return arg
 
     validated_args = tuple()  # type: ignore
@@ -491,6 +492,19 @@ def _validate_inbound_proxy(arg: Any) -> Any:
                 arg = validated_arg
             except AttributeError:
                 arg = AsyncClientPyroObject(arg)
+    return arg
+
+
+def _validate_inbound_iterable(arg: Any) -> Any:
+    """Handle an argument which is an iterable that has been made safe for transport."""
+    if isinstance(arg, dict) and "_pyro_safe_translation" in arg:
+        # This dictionary is a pyro safe translation of a type, use that type to convert here
+        if arg["_pyro_safe_translation"] == "set":
+            arg = set(arg["data"])
+        else:
+            ValueError(
+                f"Inbound validation does not support format: {arg['_pyro_safe_translation']}"
+            )
     return arg
 
 
