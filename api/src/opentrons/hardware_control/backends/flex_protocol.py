@@ -13,6 +13,9 @@ from typing import (
     TypeVar,
 )
 
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    GetMotorUsageResponse,
+)
 from opentrons_shared_data.pipette.types import (
     PipetteName,
 )
@@ -461,4 +464,10 @@ class FlexBackend(Protocol):
         self, mount: OT3Mount, primary: bool, timeout: int = 1
     ) -> Optional[float]:
         """Read and return the current sensor information."""
+        ...
+
+    async def get_motor_usage_data(
+        self, expected_axes: Optional[List[Axis]] = None
+    ) -> Dict[Axis, GetMotorUsageResponse]:
+        """Request and return motor usage data."""
         ...

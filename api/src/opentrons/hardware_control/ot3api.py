@@ -24,6 +24,9 @@ from typing import (
     cast,
 )
 
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    GetMotorUsageResponse,
+)
 from opentrons_shared_data.errors.exceptions import (
     EnumeratedError,
     FirmwareUpdateFailedError,
@@ -3432,3 +3435,9 @@ class OT3API(
         )
         cp = self.critical_point_for(realmount, None)
         return end_point + offset + cp
+
+    async def get_motor_usage_data(
+        self,
+        expected_nodes: Optional[List[Axis]] = None,
+    ) -> Dict[Axis, GetMotorUsageResponse]:
+        return await self._backend.get_motor_usage_data(expected_nodes)

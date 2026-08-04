@@ -86,6 +86,7 @@ from opentrons_hardware.firmware_bindings.messages.binary_message_definitions im
     DoorSwitchStateInfo,
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    GetMotorUsageResponse,
     StopRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import EmptyPayload
@@ -498,6 +499,16 @@ class OT3Controller(FlexBackend):
     def _motor_nodes(self) -> Set[NodeId]:
         """Get a list of the motor controller nodes of all attached and ok devices."""
         return motor_nodes(self._subsystem_manager.targets)
+
+    async def get_motor_usage_data(
+        self, expected_axes: Optional[List[Axis]] = None
+    ) -> Dict[Axis, GetMotorUsageResponse]:
+        """Request and return motor usage data."""
+        expected = None
+        if expected_axes:
+            expected = set([axis_to_node(axis) for axis in expected_axes])
+        usage_data = await self._subsystem_manager.get_motor_usage_data(expected)
+        return {node_to_axis(node): usage_data[node] for node in usage_data}
 
     async def update_firmware(
         self,
