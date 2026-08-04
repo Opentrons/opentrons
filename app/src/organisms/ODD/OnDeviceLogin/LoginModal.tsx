@@ -37,12 +37,6 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
 
   const isChoosingNewPassword = phase === 'chooseNewPassword'
 
-  const invalidateSelfQuery = useCallback((): void => {
-    if (host != null) {
-      void queryClient.invalidateQueries(getSelfQueryKey(host))
-    }
-  }, [host, queryClient])
-
   const finishModal = useCallback(
     (username: string): void => {
       modal.resolve({ username })
@@ -54,16 +48,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const handleLoginSuccess = useCallback(
     (username: string, user: AuthUser, response: OAuth2TokenResponse): void => {
       setLoginError(null)
-      storeLoginState(
-        localRobotName,
-        {
-          username,
-          fullName: user.fullName,
-          accountType: user.accountType,
-        },
-        response
-      )
-      invalidateSelfQuery()
+      storeLoginState(localRobotName, user, response)
 
       if (user.resetPassword) {
         setPhase('chooseNewPassword')
@@ -72,7 +57,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
         finishModal(username)
       }
     },
-    [finishModal, invalidateSelfQuery, storeLoginState, localRobotName]
+    [finishModal, storeLoginState, localRobotName]
   )
 
   const dismissModal = useCallback((): void => {
@@ -83,10 +68,14 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const handleNewPasswordSuccess = useCallback(
     (username: string) => {
       setLoginError(null)
-      invalidateSelfQuery()
+      // Password-reset success does not include a user payload; invalidate so
+      // observers refetch once the new token is on the host config.
+      if (host != null) {
+        void queryClient.invalidateQueries(getSelfQueryKey(host))
+      }
       finishModal(username)
     },
-    [finishModal, invalidateSelfQuery]
+    [finishModal, host, queryClient]
   )
 
   const { submitPassword, isAuthLoading: isLoginAuthLoading } =

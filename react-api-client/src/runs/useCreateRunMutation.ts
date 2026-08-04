@@ -12,6 +12,7 @@ import type {
 import type { CreateRunData, HostConfig, Run } from '@opentrons/api-client'
 import type {
   DocumentationState,
+  DocumentedAction,
   DocumentedMutationParameters,
 } from '../accessControl/types'
 
@@ -32,14 +33,15 @@ export type UseCreateRunMutationOptions = UseMutationOptions<
 export function useCreateRunMutation(
   documentationState: DocumentationState,
   options: UseCreateRunMutationOptions = {},
-  hostOverride?: HostConfig | null
+  hostOverride?: HostConfig | null,
+  actionsToDocument?: DocumentedAction[]
 ): UseCreateRunMutationResult {
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const mutation = useDocumentedMutation<Run, AxiosError, CreateRunData>(
     documentationState,
-    ['play_run'],
+    [...(actionsToDocument ?? []), 'play_run'],
     getQueryKey(host, 'runs'),
     ({
       variables: createRunData,

@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  AlertPrimaryButton,
   Modal,
+  PrimaryButton,
   SecondaryButton,
   StyledText,
 } from '@opentrons/components'
@@ -72,9 +72,9 @@ export function DeleteRecordsModal(
           <SecondaryButton onClick={onClose}>
             {t('shared:cancel')}
           </SecondaryButton>
-          <AlertPrimaryButton onClick={onConfirm}>
+          <PrimaryButton variant="warning" onClick={onConfirm}>
             {t('delete_all')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </div>
       </div>
     </Modal>

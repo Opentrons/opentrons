@@ -35,12 +35,6 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   line-height: ${TYPOGRAPHY.lineHeight20};
 
-  &:hover,
-  &:focus {
-    box-shadow: ${props =>
-      props['aria-disabled'] ? 'none' : '0px 3px 6px 0px rgba(0, 0, 0, 0.23)'};
-  }
-
   &:hover {
     color: ${props => {
       if (props['aria-disabled']) return COLORS.grey40
@@ -54,19 +48,8 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   }
 
   &:focus-visible {
-    color: ${props => {
-      if (props['aria-disabled']) return COLORS.grey40
-      return props.isDangerous ? COLORS.red60 : COLORS.blue60
-    }};
-    border-color: ${props => {
-      if (props['aria-disabled']) return COLORS.grey30
-      return props.isDangerous ? COLORS.red50 : COLORS.blue60
-    }};
-    box-shadow: ${props =>
-      props['aria-disabled']
-        ? 'none'
-        : `outline: 2px solid ${COLORS.blue50};
-    outline-offset: 0.25rem;`};
+    outline: 2px solid ${COLORS.blue50};
+    outline-offset: 0.125rem;
   }
 
   &:active {

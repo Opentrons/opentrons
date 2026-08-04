@@ -10,7 +10,11 @@ import fastapi
 from fastapi.responses import FileResponse
 from starlette.background import BackgroundTask
 
-from server_utils.fastapi_utils.models.json_api import MultiBodyMeta, SimpleMultiBody
+from server_utils.fastapi_utils.models.json_api import (
+    MultiBodyMeta,
+    SimpleBody,
+    SimpleMultiBody,
+)
 from server_utils.keys.fastapi import get_key_client
 from server_utils.keys.key_server import Client as KeyClient
 from server_utils.keys.key_server import SignMessageData
@@ -22,13 +26,17 @@ from server_utils.robot.robot_server import Client as RobotServerClient
 
 from audit_server.log_storage.dependency import get_log_data_manager
 from audit_server.log_storage.log_data_manager import LogDataManager
-from audit_server.log_storage.models import LogPeriodSummary
+from audit_server.log_storage.models import LogPeriodDetails, LogPeriodSummary
 from audit_server.log_storage.store import NoPeriodById
 from audit_server.persistence.fastapi_dependencies import get_persistence_directory_root
 
 router = fastapi.APIRouter()
 
 _DOWNLOAD_STAGING_PREFIX: Final = "temp-download-staging-"
+
+# Response header carrying the one-time deletion key for a downloaded log period.
+# Must match ``LOG_PERIOD_DELETION_KEY_HEADER`` in api-client/src/audit/constants.ts.
+_DELETION_KEY_HEADER: Final = "opentrons-log-period-deletion-key"
 
 
 @router.get(
@@ -78,6 +86,11 @@ async def download_log_period(
             detail=f"No log period found with ID {periodId}",
         ) from exc
 
+    # The period exists, so mint a deletion key linked to it and hand it back in
+    # a response header. The app stores this key and presents it to later delete
+    # the period.
+    deletion_key = log_data_manager.create_deletion_key(period_id=periodId)
+
     signing_key = await key_client.get_key_and_hash()
     robot_info = await robot_server_client.get_name_and_serial()
 
@@ -115,5 +128,36 @@ async def download_log_period(
     return FileResponse(
         zip_file_path,
         media_type="application/zip",
+        headers={_DELETION_KEY_HEADER: deletion_key},
         background=BackgroundTask(cleanup_files),
     )
+
+
+@router.get(
+    "/audit/external/logPeriods/{periodId}",
+    summary="Get a summary of a log period",
+    description=(
+        "Returns a summary of a log period, including the start and end timestamps,"
+        " the number of included records, the total size of the period, and filenames"
+        " of any attached files."
+    ),
+    responses={
+        fastapi.status.HTTP_404_NOT_FOUND: {
+            "description": "No log period could be found for the period ID."
+        }
+    },
+)
+async def get_log_period_summary(
+    periodId: str,
+    log_data_manager: Annotated[LogDataManager, fastapi.Depends(get_log_data_manager)],
+) -> SimpleBody[LogPeriodDetails]:
+    """Get a summary of a log period."""
+    try:
+        period_details = log_data_manager.get_log_period_details(period_id=periodId)
+    except NoPeriodById as exc:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail=f"No log period found with ID {periodId}",
+        ) from exc
+
+    return SimpleBody.model_construct(data=period_details)

@@ -3,7 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { Navigate, useParams } from 'react-router-dom'
 
-import { Banner, LegacyStyledText, SPACING } from '@opentrons/components'
+import {
+  Banner,
+  FLEX_MAX_CONTENT,
+  LegacyStyledText,
+  SPACING,
+} from '@opentrons/components'
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
@@ -160,32 +165,38 @@ export function RobotSettingsComponent({
             to={`/devices/${robotName}/robot-settings/calibration`}
             tabName={t('calibration')}
             disabled={isCalibrationDisabled}
+            minWidth={FLEX_MAX_CONTENT}
           />
           <RoundTab
             to={`/devices/${robotName}/robot-settings/networking`}
             tabName={t('networking')}
             disabled={isNetworkingDisabled}
+            minWidth={FLEX_MAX_CONTENT}
           />
           <RoundTab
             to={`/devices/${robotName}/robot-settings/camera`}
             tabName={t('camera')}
             disabled={false}
+            minWidth={FLEX_MAX_CONTENT}
           />
           <RoundTab
             to={`/devices/${robotName}/robot-settings/file-manager`}
             tabName={t('file_manager')}
             disabled={false}
+            minWidth={FLEX_MAX_CONTENT}
           />
           <RoundTab
             to={`/devices/${robotName}/robot-settings/advanced`}
             tabName={t('advanced')}
             disabled={false}
+            minWidth={FLEX_MAX_CONTENT}
           />
           {showComplianceReadyTab ? (
             <RoundTab
               to={`/devices/${robotName}/robot-settings/compliance-ready`}
               tabName={t('compliance_ready')}
               disabled={false}
+              minWidth={FLEX_MAX_CONTENT}
             />
           ) : null}
           {devToolsOn ? (
@@ -193,6 +204,7 @@ export function RobotSettingsComponent({
               to={`/devices/${robotName}/robot-settings/feature-flags`}
               tabName={t('feature_flags')}
               disabled={false}
+              minWidth={FLEX_MAX_CONTENT}
             />
           ) : null}
         </div>

@@ -1,9 +1,12 @@
 """Tests for the log data manager."""
 
+import tempfile
 from datetime import datetime, timezone
+from pathlib import Path
 
 import pytest
 from decoy import Decoy, matchers
+from fastapi import UploadFile
 from opentrons_shared_data.errors.exceptions import KeyStorageUnavailableError
 
 from server_utils.keys.key_server import Client as KeyClient
@@ -11,6 +14,7 @@ from server_utils.keys.key_server import SignedMessageData, SignMessageData
 
 from audit_server.log_storage import constants
 from audit_server.log_storage.log_data_manager import LogDataManager, _GetTime
+from audit_server.log_storage.models import LogPeriodDetails
 from audit_server.log_storage.store import (
     LogStore,
     NoActivePeriodError,
@@ -69,6 +73,27 @@ def disable_logging(mock_settings: SettingsStore, decoy: Decoy) -> None:
     decoy.when(mock_settings.get_logging_enabled()).then_return(False)
 
 
+def test_get_log_period_details(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+) -> None:
+    """It should get aggregate period details from the store."""
+    details = LogPeriodDetails(
+        id=1,
+        startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
+        endedAt=None,
+        recordCount=10,
+        totalSizeBytes=100,
+        attachedFilenames=[],
+    )
+    decoy.when(mock_store.get_period_details("1")).then_return(details)
+
+    result = subject.get_log_period_details("1")
+
+    assert result == details
+
+
 async def test_store_log_stores_nothing_if_logging_disabled(
     subject: LogDataManager, disable_logging: None, mock_store: LogStore, decoy: Decoy
 ) -> None:
@@ -89,6 +114,20 @@ async def test_rotate_periods_does_nothing_if_logging_disabled(
     decoy.verify(mock_store.store_log(matchers.Anything()), times=0)
     decoy.verify(mock_store.start_period(matchers.Anything()), times=0)
     decoy.verify(mock_store.end_period(matchers.Anything()), times=0)
+
+
+async def test_store_robot_log_does_nothing_if_logging_disabled(
+    subject: LogDataManager,
+    disable_logging: None,
+    mock_store: LogStore,
+    decoy: Decoy,
+) -> None:
+    """It should store no robot log if logging is disabled."""
+    mock_file = decoy.mock(cls=UploadFile)
+    await subject.store_robot_log(mock_file, Path())
+    decoy.verify(
+        mock_store.store_robot_log(matchers.Anything(), matchers.Anything()), times=0
+    )
 
 
 async def test_store_log_stores_log(
@@ -137,6 +176,73 @@ async def test_store_log_raises_keyserver_unavailable(
     ).then_raise(Exception("nope im broken"))
     with pytest.raises(KeyStorageUnavailableError):
         await subject.store_log("mymessage")
+
+
+async def test_store_robot_log_stores_file(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+    mock_key_client: KeyClient,
+) -> None:
+    """It should save the file to memory and save the hashed robot log to the store."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file.write("beep boop".encode("utf-8"))
+            temp_file.seek(0)
+            robot_log = StoredLog(
+                message="beep",
+                message_hash="bzzzt",
+                message_sig="boop",
+                sig_version="3",
+            )
+            decoy.when(
+                await mock_key_client.sign_message(
+                    SignMessageData(message="beep boop", previousHash=None)
+                )
+            ).then_return(
+                SignedMessageData(
+                    message="beep",
+                    messageHash="bzzzt",
+                    messageSignature="boop",
+                    signatureVersion=3,
+                )
+            )
+            temp_path = Path(temp_dir) / Path(temp_file.name).name
+            decoy.when(mock_store.store_robot_log(robot_log, temp_path)).then_return(
+                "eeeeee"
+            )
+            assert not temp_path.is_file()
+            stored_hash = await subject.store_robot_log(
+                UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
+                Path(temp_dir),
+            )
+            assert stored_hash == "eeeeee"
+            assert temp_path.is_file()
+
+
+async def test_store_robot_log_raises_keyserver_unavailable(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+    mock_key_client: KeyClient,
+) -> None:
+    """It should raise if the key server is unavailable."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file.write("it's a secret to everyone".encode("utf-8"))
+            temp_file.seek(0)
+            decoy.when(
+                await mock_key_client.sign_message(
+                    SignMessageData(
+                        message="it's a secret to everyone", previousHash=None
+                    )
+                )
+            ).then_raise(Exception("ain't a secret no more"))
+            with pytest.raises(KeyStorageUnavailableError):
+                await subject.store_robot_log(
+                    UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
+                    Path(temp_dir),
+                )
 
 
 async def test_store_log_rotates_if_cannot_get_tail_hash(
@@ -692,3 +798,18 @@ async def test_rotate_no_previous_log_handles_no_key_server(
         )
     ).then_return("")
     assert await subject.rotate_periods() == ""
+
+
+def test_create_deletion_key_mints_a_key(subject: LogDataManager) -> None:
+    """It should mint a non-empty deletion key for a log period."""
+    key = subject.create_deletion_key(period_id="1")
+
+    assert key
+
+
+def test_create_deletion_key_mints_distinct_keys(subject: LogDataManager) -> None:
+    """Each call should mint a new, distinct key for the same period."""
+    first = subject.create_deletion_key(period_id="1")
+    second = subject.create_deletion_key(period_id="1")
+
+    assert first != second

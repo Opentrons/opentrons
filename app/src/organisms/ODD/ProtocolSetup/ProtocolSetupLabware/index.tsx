@@ -42,6 +42,7 @@ import { SmallButton, TouchFloatingActionButton } from '/app/atoms/buttons'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
+import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { getOffDeckRenderGroups } from '/app/resources/protocols/utils/getOffDeckRenderGroups'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
@@ -100,7 +101,11 @@ export function ProtocolSetupLabware({
         mostRecentAnalysis?.labware ?? [],
         mostRecentAnalysis?.modules ?? []
       ),
-    [mostRecentAnalysis]
+    [
+      mostRecentAnalysis?.commands,
+      mostRecentAnalysis?.labware,
+      mostRecentAnalysis?.modules,
+    ]
   )
   const labwareByLiquidId = useMemo(
     () => getLabwareInfoByLiquidId(mostRecentAnalysis?.commands ?? []),
@@ -150,6 +155,19 @@ export function ProtocolSetupLabware({
     [attachedModules, protocolModulesInfo, deckConfig]
   )
 
+  const handleProceed = useHandleAndLog(
+    () => {
+      setIsConfirmed(true)
+      setSetupScreen('prepare to run')
+    },
+    'confirm_placements',
+    {
+      action: 'confirmed liquid and labware placements',
+      message:
+        'user confirmed liquid and labware placements before running protocol',
+    }
+  )
+
   return (
     <>
       {selectedLabwareStack != null && mostRecentAnalysis != null ? (
@@ -184,10 +202,7 @@ export function ProtocolSetupLabware({
             ) : (
               <SmallButton
                 buttonText={t('confirm_placements')}
-                onClick={() => {
-                  setIsConfirmed(true)
-                  setSetupScreen('prepare to run')
-                }}
+                onClick={handleProceed}
                 buttonCategory="rounded"
               />
             )}
@@ -234,7 +249,7 @@ export function ProtocolSetupLabware({
                     key={item.representativeItem.labwareId}
                     attachedProtocolModules={attachedProtocolModuleMatches}
                     refetchModules={moduleQuery.refetch}
-                    slotName={'offDeck'}
+                    slotName="offDeck"
                     offDeckQuantity={item.quantity}
                     stackedItems={item.stackedItems}
                     labwareByLiquidId={labwareByLiquidId}

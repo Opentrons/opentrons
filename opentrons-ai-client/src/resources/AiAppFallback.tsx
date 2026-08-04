@@ -1,11 +1,11 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  AlertPrimaryButton,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   Flex,
   Modal,
+  PrimaryButton,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -34,9 +34,9 @@ export function AiAppFallback({
           </StyledText>
         </Flex>
         <Flex alignSelf={ALIGN_FLEX_END} gridGap={SPACING.spacing8}>
-          <AlertPrimaryButton onClick={handleReloadClick}>
+          <PrimaryButton variant="warning" onClick={handleReloadClick}>
             {t('reload_app')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </Flex>
       </Flex>
     </Modal>

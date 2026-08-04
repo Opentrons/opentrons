@@ -36,17 +36,21 @@ from opentrons.util.pyro.pyro_serialization import (
 if TYPE_CHECKING:
     from .modules.types import ModuleModel
 
-    def _module_model_reconstructor(
-        module_str: str,
-    ) -> ModuleModel:
-        for model in get_args(ModuleModel):
-            try:
-                return model[module_str]  # type: ignore
-            except Exception:
-                pass
-        raise ValueError(
-            f"Cannot determine module model during deserialization for: {module_str}"
-        )
+
+def _module_model_reconstructor(
+    module_str: str,
+) -> "ModuleModel":
+    # Import the class here for references during deserialization
+    from opentrons.hardware_control.modules.types import ModuleModel
+
+    for model in get_args(ModuleModel):
+        try:
+            return model[module_str]  # type: ignore
+        except Exception:
+            pass
+    raise ValueError(
+        f"Cannot determine module model during deserialization for: {module_str}"
+    )
 
 
 MODULE_LOG = logging.getLogger(__name__)

@@ -24,26 +24,26 @@ def dummy_authorized_keys(tmpdir, monkeypatch):
 
 async def test_interface_restriction(test_cli, dummy_authorized_keys):
     resp = await test_cli[0].get("/server/ssh_keys")
-    assert resp.status == 403
-    body = await resp.json()
+    assert resp.status_code == 403
+    body = resp.json()
     assert body["error"] == "bad-interface"
     assert "message" in body
 
     for ok_ip in ["169.254.0.1", "fe80::e6a5:c57d:7659:266d"]:
         resp = await test_cli[0].get("/server/ssh_keys", headers={"X-Host-IP": ok_ip})
-        assert resp.status == 200
+        assert resp.status_code == 200
 
     for bad_ip in ["192.168.0.1", "10.2.6.1"]:
         resp = await test_cli[0].get("/server/ssh_keys", headers={"X-Host-IP": bad_ip})
-        assert resp.status == 403
+        assert resp.status_code == 403
 
 
 async def test_list_keys(test_cli, dummy_authorized_keys):
     resp = await test_cli[0].get(
         "/server/ssh_keys", headers={"X-Host-IP": "169.254.1.1"}
     )
-    assert resp.status == 200
-    body = await resp.json()
+    assert resp.status_code == 200
+    body = resp.json()
     assert body["public_keys"] == []
 
     dummy_key = "ssh-rsa ahaubsfalsijdbalsjdhbfajsdbfafasdk test@opentrons.com"
@@ -53,8 +53,8 @@ async def test_list_keys(test_cli, dummy_authorized_keys):
     resp = await test_cli[0].get(
         "/server/ssh_keys", headers={"X-Host-IP": "169.254.1.1"}
     )
-    assert resp.status == 200
-    body = await resp.json()
+    assert resp.status_code == 200
+    body = resp.json()
     assert body["public_keys"] == [
         {
             "key_md5": hashlib.new("md5", dummy_key.encode()).hexdigest(),
@@ -70,8 +70,8 @@ async def test_add_key_successes(test_cli, dummy_authorized_keys):
         json={"key": dummy_key},
         headers={"X-Host-IP": "169.254.1.1"},
     )
-    assert resp.status == 201
-    body = await resp.json()
+    assert resp.status_code == 201
+    body = resp.json()
     assert "message" in body
     assert body["key_md5"] == hashlib.new("md5", dummy_key.encode()).hexdigest()
     assert open(dummy_authorized_keys).read() == dummy_key + "\n"
@@ -83,8 +83,8 @@ async def test_add_key_successes(test_cli, dummy_authorized_keys):
         json={"key": dummy_key},
         headers={"X-Host-IP": "169.254.1.1"},
     )
-    assert resp.status == 201
-    body = await resp.json()
+    assert resp.status_code == 201
+    body = resp.json()
     assert "message" in body
     assert body["key_md5"] == hashlib.new("md5", dummy_key.encode()).hexdigest()
     assert open(dummy_authorized_keys).read() == dummy_key + "\n"
@@ -105,8 +105,8 @@ async def test_add_key_errors(test_cli, dummy_authorized_keys, expected_error, b
     resp = await test_cli[0].post(
         "/server/ssh_keys", json=body, headers={"X-Host-IP": "169.254.1.1"}
     )
-    assert resp.status == 400
-    body = await resp.json()
+    assert resp.status_code == 400
+    body = resp.json()
     assert body["error"] == expected_error
     assert "message" in body
 
@@ -118,21 +118,21 @@ async def test_delete_key(test_cli, dummy_authorized_keys):
         json={"key": dummy_key},
         headers={"X-Host-IP": "169.254.1.1"},
     )
-    assert resp.status == 201
+    assert resp.status_code == 201
 
     hashval = hashlib.new("md5", dummy_key.encode()).hexdigest()
     resp = await test_cli[0].delete(
         f"/server/ssh_keys/{hashval}", headers={"X-Host-IP": "169.254.1.1"}
     )
-    assert resp.status == 200
-    body = await resp.json()
+    assert resp.status_code == 200
+    body = resp.json()
     assert "message" in body
 
     resp = await test_cli[0].delete(
         f"/server/ssh_keys/{hashval}", headers={"X-Host-IP": "169.254.1.1"}
     )
-    assert resp.status == 404
-    body = await resp.json()
+    assert resp.status_code == 404
+    body = resp.json()
     assert body["error"] == "invalid-key-hash"
     assert "message" in body
 
@@ -146,13 +146,13 @@ async def test_clear_keys(test_cli, dummy_authorized_keys):
         resp = await test_cli[0].post(
             "/server/ssh_keys", json={"key": key}, headers={"X-Host-IP": "169.254.1.1"}
         )
-        assert resp.status == 201
+        assert resp.status_code == 201
     assert open(dummy_authorized_keys).read() == "\n".join(dummy_keys) + "\n"
     resp = await test_cli[0].delete(
         "/server/ssh_keys", headers={"X-Host-IP": "169.254.1.1"}
     )
-    assert resp.status == 200
-    body = await resp.json()
+    assert resp.status_code == 200
+    body = resp.json()
     assert "message" in body
     assert "restart_url" in body
 

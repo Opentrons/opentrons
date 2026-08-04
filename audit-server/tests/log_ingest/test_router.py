@@ -10,11 +10,18 @@ import pytest
 from decoy import Decoy
 from opentrons_shared_data.errors.exceptions import KeyStorageUnavailableError
 
+from server_utils.auth.resource_server.types import (
+    AuthenticatedResult,
+    AuthenticationNotRequiredResult,
+)
 from server_utils.fastapi_utils.models.json_api import RequestModel
 
 from .. import LogPayloadMatcher, RecentTimestampMatcher
-from audit_server.log_ingest.models import SubmitAuditLogMessageData
-from audit_server.log_ingest.router import post_log_message
+from audit_server.log_ingest.models import (
+    SubmitAuditLogMessageData,
+    SubmitExternalAuditLogMessageData,
+)
+from audit_server.log_ingest.router import post_external_log_message, post_log_message
 from audit_server.log_storage.log_data_manager import LogDataManager
 
 
@@ -161,3 +168,59 @@ async def test_returns_503_when_key_server_unavailable(
         await post_log_message(
             RequestModel(data=log_data), log_data_manager=mock_log_data_manager
         )
+
+
+async def test_raises_if_authentication_is_not_required(
+    mock_log_data_manager: LogDataManager,
+) -> None:
+    """If CRS mode is disabled, the endpoint must raise a 418."""
+    with pytest.raises(fastapi.HTTPException) as exc_info:
+        await post_external_log_message(
+            RequestModel(
+                data=SubmitExternalAuditLogMessageData(action="test", message="test")
+            ),
+            log_data_manager=mock_log_data_manager,
+            user_notes="test",
+            authentication=AuthenticationNotRequiredResult(),
+        )
+    assert exc_info.value.status_code == 418
+    assert (
+        exc_info.value.detail
+        == "Audit log is not available while Compliance Ready Software is inactive."
+    )
+
+
+async def test_forwards_data_if_authentication_is_required(
+    mock_log_data_manager: LogDataManager, decoy: Decoy
+) -> None:
+    """If CRS mode is enabled, the endpoint must forward the data to the log data manager."""
+    decoy.when(
+        await mock_log_data_manager.store_log(
+            cast(
+                Any,
+                LogPayloadMatcher(
+                    message=SubmitAuditLogMessageData(
+                        action="External-test-action",
+                        message="our message",
+                        reason="our reason",
+                        accountName="testusername",
+                        legalName="Test User",
+                    ),
+                    loggedAt=RecentTimestampMatcher(),
+                ),
+            )
+        )
+    ).then_return("")
+    response = await post_external_log_message(
+        RequestModel(
+            data=SubmitExternalAuditLogMessageData(
+                action="test-action", message="our message"
+            )
+        ),
+        log_data_manager=mock_log_data_manager,
+        user_notes="our reason",
+        authentication=AuthenticatedResult(
+            username="testusername", fullname="Test User", scope="audit_log.write"
+        ),
+    )
+    assert response.status_code == 201
