@@ -36,6 +36,7 @@ import { RobotUpdateProvider } from '/app/resources/robot-update/RobotUpdateProv
 import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { ApiHostProvider } from '../local-resources/api-host-provider/ApiHostProvider'
 import { showDocumentationRequiredModal } from '../organisms/Desktop/DocumentationRequired/DocumentationRequiredModal'
+import { showDownloadLogsModal } from '../organisms/Desktop/DownloadAuditLogsModal'
 import { showLoginModal } from '../organisms/Desktop/LoginModal'
 import { showSignRunModal } from '../organisms/Desktop/SignRunModal/SignRun'
 import { ProtocolVisualization } from '../pages/Desktop/Protocols/ProtocolVisualization'
@@ -123,6 +124,7 @@ export const DesktopApp = (): JSX.Element => {
           showDocumentationRequiredModal,
           showLoginModal,
           showSignRunModal,
+          showDownloadLogsModal,
         }}
       >
         <RobotUpdateProvider>
