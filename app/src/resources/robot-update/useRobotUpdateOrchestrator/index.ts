@@ -14,7 +14,10 @@ import {
   clearRobotUpdateSession,
   startRobotUpdate,
 } from '/app/redux/robot-update'
-import { getRobotUpdateSessionRobotName } from '/app/redux/robot-update/selectors'
+import {
+  getRobotUpdateSession,
+  getRobotUpdateSessionRobotName,
+} from '/app/redux/robot-update/selectors'
 
 import { runRobotUpdateFlow } from './runRobotUpdateFlow'
 import { useRobotUpdateHostConfig } from './useRobotUpdateHostConfig'
@@ -105,9 +108,21 @@ export function useRobotUpdateOrchestrator(): {
 
   const startUpdate = useCallback(
     (robotName: string, systemFile?: string) => {
+      const previousPathPrefix = getRobotUpdateSession(
+        store.getState()
+      )?.pathPrefix
+
       abortRef.current?.abort()
       const abortController = new AbortController()
       abortRef.current = abortController
+
+      // Cancel before clearing so host + documentation still match
+      // the in-flight robot. Upload ignores AbortSignal, so this must be eager.
+      if (previousPathPrefix != null) {
+        void mutationsRef.current
+          .cancelSession({ pathPrefix: previousPathPrefix })
+          .catch(() => {})
+      }
 
       clearDocreport()
       dispatch(clearRobotUpdateSession())
