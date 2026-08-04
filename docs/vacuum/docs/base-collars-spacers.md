@@ -37,10 +37,10 @@ Both collars accommodate standard ANSI/SLAS compliant filter plates across a spa
 
 Support grids hold filter plates on top of the short or tall collars. These grids are made of metal and provide a rigid foundation that supports filter plates when placed under strong vacuum pressure.
 
-The Vacuum Module includes two support grids to match different well plate profiles:
+The Vacuum Module includes two support grids with perforations that match different well plate profiles:
 
-- **Wide grid:** Features large openings and is designed for vacuum protocols that use 96-well filter plates.
-- **Narrow grid:** Features small openings and is designed for vacuum protocols that use 384-well filter plates.
+- **Wide grid:** Features large apertures to support 96-well filter plates.
+- **Narrow grid:** Features small apertures to support 384-well filter plates.
 
 <figure class="side-by-side" markdown>
 ![Wide support grid](images/support-grid-96-wells.svg)
@@ -61,30 +61,4 @@ The Vacuum Module includes two spacers to match different labware profiles:
 ![Illustration of short spacer, 27 mm](images/spacer-short.svg)
 ![Illustration of tall spacer, 34 mm](images/spacer-tall.svg)
 <figcaption>Short and tall spacers</figcaption>
-</figure>
-
-## Typical use cases
-
-### Elution and filtrate collection
-
-This configuration is used when a protocol requires capturing liquid (the eluate or a target filtrate) into a user-supplied collection plate nested inside the vacuum base.
-
-* **Internal Hardware:** Placing a short or tall spacer inside the vacuum base properly positions the collection labware directly beneath the source filter plate.
-* **Fluid Routing:** Minimizing the gap between the plates ensures that liquid flows vertically through the filter plate and drips straight into the corresponding collection wells.
-
-<figure markdown>
-  ![Waste collection stack showing labeled parts](images/stack-filter-to-plate.svg){ width="60%" }
-  <figcaption>Elution and filtrate collection stack</figcaption>
-</figure>
-
-### Filter to waste disposal
-
-This configuration is used when a protocol does not require capturing liquid from a filter plate. Instead, the fluid drawn through the filter plate is unwanted waste and can be discarded directly.
-
-* **Internal Hardware:** Neither an internal spacer nor a collection plate is required inside the vacuum base. The interior of the base remains completely empty, capped by a short or tall collar and the fluid source well plate.
-* **Fluid Routing:** Vacuum pressure draws liquid straight through the filter plate into the vacuum base. From there, the material flows out via the connected vacuum hose to the off-deck waste collection jar.
-
-<figure markdown>
-  ![Waste disposal stack showing labeled parts](images/stack-filter-to-waste.svg){ width="80%" }
-  <figcaption>Waste disposal stack</figcaption>
 </figure>
