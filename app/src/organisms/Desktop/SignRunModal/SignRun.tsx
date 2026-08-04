@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import clsx from 'clsx'
 
 import {
@@ -12,9 +13,12 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { showLoginModal } from '/app/organisms/Desktop/LoginModal'
 import { useToaster } from '/app/organisms/ToasterOven'
+import { useCurrentRobotName } from '/app/redux/robot-auth'
 import { useSignRunFlow } from '/app/resources/access-control/useSignRunFlow'
+import { useCurrentRunId, useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import styles from './signrunmodal.module.css'
 
@@ -24,11 +28,13 @@ const TOAST_ABOVE_LOGIN_Z_INDEX = 10002
 export interface SignRunModalProps {
   runId: string
   robotName: string
+  onSigned?: () => void
 }
 
 export function SignRunModal({
   runId,
   robotName,
+  onSigned,
 }: SignRunModalProps): JSX.Element {
   const { t, i18n } = useTranslation(['access_control', 'shared'])
 
@@ -65,7 +71,8 @@ export function SignRunModal({
     robotName,
     showLoginModal,
     popToast,
-    eatToast
+    eatToast,
+    onSigned
   )
 
   const trimmedName = name.trim()
@@ -170,3 +177,62 @@ export function SignRunModal({
     getTopPortalEl()
   )
 }
+
+const SignRunModalImpl = NiceModal.create((): JSX.Element | null => {
+  const modal = useModal()
+  const robotName = useCurrentRobotName()
+
+  useEffect(() => {
+    if (robotName == null) {
+      modal.resolve(false)
+      modal.remove()
+    }
+  }, [modal, robotName])
+
+  if (robotName == null) {
+    return null
+  }
+
+  return (
+    <ApiHostProvider robotName={robotName}>
+      <SignRunModalCurrentRun
+        robotName={robotName}
+        onSigned={() => {
+          modal.resolve(true)
+          modal.remove()
+        }}
+      />
+    </ApiHostProvider>
+  )
+})
+
+function SignRunModalCurrentRun({
+  robotName,
+  onSigned,
+}: {
+  robotName: string
+  onSigned: () => void
+}): JSX.Element | null {
+  const modal = useModal()
+  const runId = useCurrentRunId()
+  const { isFetched } = useNotifyAllRunsQuery({ pageLength: 0 })
+
+  useEffect(() => {
+    if (isFetched && runId == null) {
+      modal.resolve(false)
+      modal.remove()
+    }
+  }, [isFetched, modal, runId])
+
+  if (runId == null) {
+    return null
+  }
+
+  return (
+    <SignRunModal runId={runId} robotName={robotName} onSigned={onSigned} />
+  )
+}
+
+/** Open the desktop sign-run modal and await whether the run was signed. */
+export const showSignRunModal = (): Promise<boolean> =>
+  NiceModal.show(SignRunModalImpl)

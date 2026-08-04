@@ -7,7 +7,6 @@ import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import { COLORS, LegacyStyledText } from '@opentrons/components'
 import {
   isDocumentedMutationError,
-  useDismissCurrentRunMutation,
   useStopRunMutation,
 } from '@opentrons/react-api-client'
 
@@ -17,7 +16,7 @@ import { OddModal } from '/app/molecules/OddModal'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
-import { useNotifyRunQuery } from '/app/resources/runs'
+import { useCloseCurrentRun, useNotifyRunQuery } from '/app/resources/runs'
 
 import { CancelingRunModal } from '../CancelingRunModal'
 import styles from './confirmcancelmodal.module.css'
@@ -59,8 +58,8 @@ export function ConfirmCancelRunModal({
     runId
   )
   const { stopRun } = useStopRunMutation(documentationState)
-  const { dismissCurrentRun, isLoading: isDismissing } =
-    useDismissCurrentRunMutation(documentationState)
+  const { closeCurrentRun, isClosingCurrentRun } =
+    useCloseCurrentRun(documentationState)
 
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('cancel_run_modal_heading'),
@@ -83,7 +82,7 @@ export function ConfirmCancelRunModal({
     }
     dismissStartedRef.current = true
     setIsCanceling(true)
-    dismissCurrentRun(runId, {
+    closeCurrentRun({
       onSuccess: () => {
         navigateAway()
       },
@@ -97,7 +96,7 @@ export function ConfirmCancelRunModal({
         }
       },
     })
-  }, [isActiveRun, dismissCurrentRun, runId, navigateAway, clearDocreport])
+  }, [isActiveRun, closeCurrentRun, navigateAway, clearDocreport])
 
   const handleCancelRun = (): void => {
     setIsCanceling(true)
@@ -127,7 +126,7 @@ export function ConfirmCancelRunModal({
     }
   }, [runStatus, isRunCurrent, isRunFetchError, dismissAndNavigate])
 
-  return isCanceling || isDismissing ? (
+  return isCanceling || isClosingCurrentRun ? (
     <CancelingRunModal />
   ) : (
     <OddModal

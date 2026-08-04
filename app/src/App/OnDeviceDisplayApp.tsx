@@ -65,6 +65,7 @@ import { DocumentationRequiredModalContext } from '../local-resources/access-con
 import { LocalizationProvider } from '../LocalizationProvider'
 import { requireDocumentation } from '../organisms/ODD/DocumentationRequired/requireDocumentation'
 import { showLoginModal } from '../organisms/ODD/OnDeviceLogin/LoginModal'
+import { showSignRunModal } from '../pages/ODD/RunSummary/SignRun'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
 import { hackWindowNavigatorOnLine } from './hacks'
 import {
@@ -258,6 +259,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                     value={{
                       showDocumentationRequiredModal: requireDocumentation,
                       showLoginModal,
+                      showSignRunModal,
                     }}
                   >
                     <MaintenanceRunTakeover>
