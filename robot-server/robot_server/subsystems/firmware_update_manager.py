@@ -1,5 +1,6 @@
 """Class to monitor firmware update status."""
 
+import asyncio
 import logging
 from asyncio import Lock, Queue, QueueEmpty
 from dataclasses import dataclass
@@ -13,12 +14,10 @@ from typing import (
     List,
     Optional,
 )
+
 from opentrons.config import (
     feature_flags as ff,
 )
-import asyncio
-
-
 from opentrons.hardware_control.errors import UpdateOngoingError
 from opentrons.hardware_control.types import (
     SubSystem as HWSubSystem,
@@ -187,7 +186,10 @@ class _UpdateProcess:
         last_progress = 0
         try:
             if ff.hardware_subprocess_enabled():
-                fetch_progress_callback = self._hw_handle.update_firmware_with_fetching({self.subsystem})
+                # In subprocess mode update progress is tracked via polling
+                fetch_progress_callback = self._hw_handle.update_firmware_with_fetching(
+                    {self.subsystem}
+                )
                 update = await fetch_progress_callback()
                 while update is not None:
                     last_progress = update.progress
@@ -199,6 +201,7 @@ class _UpdateProcess:
                     await asyncio.sleep(0.1)  # Wait, then poll again.
                     update = await fetch_progress_callback()
             else:
+                # Otherwise the traditional AsyncIterator method is utilized
                 async for update in self._hw_handle.update_firmware({self.subsystem}):
                     last_progress = update.progress
                     await self._status_queue.put(
