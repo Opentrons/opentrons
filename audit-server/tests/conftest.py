@@ -67,11 +67,24 @@ def fake_auth_server(
     """
     port = unused_tcp_port_factory()
 
-    async def fake_auth_off(request: aiohttp.web.Request) -> aiohttp.web.Response:
-        return aiohttp.web.json_response(data={"data": {"accessControlEnabled": False}})
+    async def fake_auth_on(request: aiohttp.web.Request) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(data={"data": {"accessControlEnabled": True}})
+
+    async def fake_token_introspect(
+        request: aiohttp.web.Request,
+    ) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(
+            data={
+                "active": True,
+                "scope": "auth_settings.write audit_log.write",
+                "username": "test",
+                "ot_fullname": "Test",
+            },
+        )
 
     app = aiohttp.web.Application()
-    app.router.add_get("/auth/settings/accessControlEnabled", fake_auth_off)
+    app.router.add_get("/auth/settings/accessControlEnabled", fake_auth_on)
+    app.router.add_post("/auth/oauth2/introspect", fake_token_introspect)
     loop = asyncio.new_event_loop()
     runner = aiohttp.web.AppRunner(app)
 

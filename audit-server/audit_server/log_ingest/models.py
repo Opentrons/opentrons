@@ -45,3 +45,9 @@ class SubmitAuditLogSuccessData(_StrictBaseModel):
     """The response to a successful audit log submission."""
 
     loggedAt: datetime.datetime
+
+
+class StoreRobotLogResponseData(_StrictBaseModel):
+    """The response to storing a robot log."""
+
+    loggingEnabled: bool

@@ -13,11 +13,14 @@ class Scope(enum.Enum):
 
     # Example:
     #
-    # PYTHON_NAME = ("api_name", "description")
+    #   PYTHON_NAME = ("api_name", "description")
     #
     # "PYTHON_NAME" is arbitrary.
     # "api_name" is exposed as part of the HTTP API, and may be stored persistently.
     # "description" is developer-readable documentation for the OpenAPI spec.
+    #
+    # If you add a scope here, remember that you may also need to add it to
+    # auth-server's get_scope_set_of_account_type().
 
     AUTH_SETTINGS_WRITE = (
         "auth_settings.write",
@@ -63,6 +66,11 @@ class Scope(enum.Enum):
             "Create, update, or delete data that's the input or output of a run,"
             " such as images and CSV files."
         ),
+    )
+
+    RUN_SIGNOFF_WRITE = (
+        "run_signoff.write",
+        "Sign off on a completed protocol run.",
     )
 
     # We actually want access control mode to totally disable SSH, so this scope is

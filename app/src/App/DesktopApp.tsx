@@ -36,6 +36,7 @@ import { DocumentationRequiredModalContext } from '../local-resources/access-con
 import { ApiHostProvider } from '../local-resources/api-host-provider/ApiHostProvider'
 import { showDocumentationRequiredModal } from '../organisms/Desktop/DocumentationRequired/DocumentationRequiredModal'
 import { showLoginModal } from '../organisms/Desktop/LoginModal'
+import { showSignRunModal } from '../organisms/Desktop/SignRunModal/SignRun'
 import { ProtocolVisualization } from '../pages/Desktop/Protocols/ProtocolVisualization'
 import { DesktopAppFallback } from './DesktopAppFallback'
 import { useRefreshAccessTokenOnActivity } from './hooks/useRefreshAccessTokenOnActivity'
@@ -118,7 +119,11 @@ export const DesktopApp = (): JSX.Element => {
   return (
     <LocalizationProvider>
       <DocumentationRequiredModalContext.Provider
-        value={{ showDocumentationRequiredModal, showLoginModal }}
+        value={{
+          showDocumentationRequiredModal,
+          showLoginModal,
+          showSignRunModal,
+        }}
       >
         <NiceModal.Provider>
           <ErrorBoundary FallbackComponent={DesktopAppFallback}>

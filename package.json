@@ -104,7 +104,7 @@
     "graphviz": "^0.0.9",
     "i18next": "^19.8.3",
     "identity-obj-proxy": "^3.0.0",
-    "jsdom": "26.1.0",
+    "jsdom": "29.1.1",
     "lost": "^8.3.1",
     "madge": "^3.6.0",
     "mime": "^2.4.4",

@@ -13,6 +13,9 @@ export const mockShowDocumentationRequiredModal: (
 export const mockShowLoginModal: () => Promise<{ username: string } | null> =
   vi.fn<() => Promise<{ username: string } | null>>()
 
+export const mockShowSignRunModal: () => Promise<boolean> =
+  vi.fn<() => Promise<boolean>>()
+
 export const DocumentationRequiredModalTestProvider: FunctionComponent<{
   children: ReactNode
 }> = ({ children }) => (
@@ -20,6 +23,7 @@ export const DocumentationRequiredModalTestProvider: FunctionComponent<{
     value={{
       showDocumentationRequiredModal: mockShowDocumentationRequiredModal,
       showLoginModal: mockShowLoginModal,
+      showSignRunModal: mockShowSignRunModal,
     }}
   >
     {children}

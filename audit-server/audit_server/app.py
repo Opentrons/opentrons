@@ -159,7 +159,7 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             )
         )
         install_authentication_checker(app.state, authentication_checker)
-        local_log_client = LocalClient(log_data_manager)
+        local_log_client = LocalClient(log_data_manager, settings_store)
         install_audit_client(app.state, local_log_client)
         await log_data_manager.rotate_periods()
         systemd_utils.notify_up()
