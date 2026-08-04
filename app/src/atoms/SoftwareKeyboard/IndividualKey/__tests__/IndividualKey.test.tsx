@@ -1,5 +1,6 @@
 import { useRef } from 'react'
-import { fireEvent, renderHook, screen } from '@testing-library/react'
+import { renderHook, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -24,7 +25,8 @@ describe('IndividualKey', () => {
     screen.getByRole('button', { name: 'mockKey' })
   })
 
-  it('should call mock function when clicking text key', () => {
+  it('should call mock function when clicking text key', async () => {
+    const user = userEvent.setup()
     const { result } = renderHook(() => useRef(null))
     const props = {
       onChange: vi.fn(),
@@ -33,7 +35,7 @@ describe('IndividualKey', () => {
     }
     render(props)
     const textKey = screen.getByRole('button', { name: 'mockKey' })
-    fireEvent.click(textKey)
+    await user.click(textKey)
     expect(props.onChange).toHaveBeenCalled()
   })
 })

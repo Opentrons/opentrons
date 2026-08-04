@@ -13,7 +13,7 @@ port ?= 34000
 tests ?= tests
 test_opts ?=
 
-files_to_check := otupdate tests
+files_to_check := otupdate tests oe_upload.py
 
 wheel_file = $(call python_get_wheelname,update-server,$(project_rs_default),otupdate)
 # Find the branch, sha, version that will be used to update the VERSION.json file

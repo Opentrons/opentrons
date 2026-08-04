@@ -1,7 +1,7 @@
 """Test the pump basic."""
 
 import asyncio
-from typing import List, Union
+from typing import List, Union, Dict
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import (
     CSVReport,
@@ -18,10 +18,26 @@ from opentrons.drivers.vacuum_module.types import VentState
 DUTY_TEST = [0, 10, 20, 30, 40, 50, 80, 100, 0, 100, 0, 100]
 
 
+def format_duty_cycles(cycles: List[int]) -> List[str]:
+    """Format duty cycles for csv reporting."""
+    """This is necessary because by default CSVReport will overwrite
+    lines that have the same first index but are not CSVLineRepeating objects."""
+    duty_test_str = []
+    val_freq: Dict[int, int] = {v: 0 for v in cycles}
+    for duty in DUTY_TEST:
+        val_freq[duty] += 1
+        repeat_str = f"-{val_freq[duty]}" if val_freq[duty] > 1 else ""
+        duty_test_str.append(f"pump-duty-cycle-{duty}{repeat_str}")
+    return duty_test_str
+
+
+DUTY_CYCLES_FORMAT = format_duty_cycles(DUTY_TEST)
+
+
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
     lines: List[Union[CSVLine, CSVLineRepeating]] = [
-        CSVLine(f"pump-duty-cycle-{duty}", [CSVResult, int, int]) for duty in DUTY_TEST
+        CSVLine(pwm_str, [CSVResult, int, int]) for pwm_str in DUTY_CYCLES_FORMAT
     ]
     return lines
 
@@ -31,6 +47,7 @@ async def test_pump_motor(
     duty_cycle: int,
     report: CSVReport,
     section: str,
+    duty_cycle_str: str,
 ) -> None:
     """Test setting the pump state."""
     ui.print_header(f"Pump Motor Duty Cycle={duty_cycle}")
@@ -57,7 +74,7 @@ async def test_pump_motor(
     passed = rpm > 0 if duty_cycle > 0 else pwm == 0
     report(
         section,
-        f"pump-duty-cycle-{duty_cycle}",
+        duty_cycle_str,
         [CSVResult.from_bool(passed), pwm, rpm],
     )
 
@@ -68,8 +85,8 @@ async def run(vacuum: VacuumModule, report: CSVReport, section: str) -> None:
     # Turn off pump
     await vacuum.set_pump_state(False)
     try:
-        for duty in DUTY_TEST:
-            await test_pump_motor(vacuum, duty, report, section)
+        for duty, duty_str in zip(DUTY_TEST, DUTY_CYCLES_FORMAT):
+            await test_pump_motor(vacuum, duty, report, section, duty_str)
     finally:
         # Always Turn off pump
         await vacuum.set_pump_state(False)

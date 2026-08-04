@@ -18,6 +18,7 @@ import type {
   LegacyLabwareOffsetCreateData,
   Protocol,
 } from '@opentrons/api-client'
+import type { DocumentedAction } from '@opentrons/react-api-client'
 import type { CreateProtocolVariables } from '@opentrons/react-api-client/src/protocols/useCreateProtocolMutation'
 import type { UseCreateRunMutationOptions } from '@opentrons/react-api-client/src/runs/useCreateRunMutation'
 import type { State } from '/app/redux/types'
@@ -38,7 +39,8 @@ export interface UseCreateRun {
 export function useCreateRunFromProtocol(
   options: UseCreateRunMutationOptions,
   hostOverride?: HostConfig | null,
-  labwareOffsets?: LegacyLabwareOffsetCreateData[]
+  labwareOffsets?: LegacyLabwareOffsetCreateData[],
+  actionsToDocument?: DocumentedAction[]
 ): UseCreateRun {
   const contextHost = useHost()
   const host =
@@ -51,7 +53,7 @@ export function useCreateRunFromProtocol(
   )
 
   const { documentationState, clearDocreport } = useLinkedDocumentationState(
-    ['create_protocol', 'play_run'],
+    [...(actionsToDocument ?? []), 'create_protocol', 'play_run'],
     host?.robotName ?? null,
     host?.robotName,
     host

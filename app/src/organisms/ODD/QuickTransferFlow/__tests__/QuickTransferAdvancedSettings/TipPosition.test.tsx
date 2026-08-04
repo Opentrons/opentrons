@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { TouchInputField } from '@opentrons/components'
@@ -85,8 +86,9 @@ describe('TipPosition', () => {
     vi.resetAllMocks()
   })
 
-  it('renders the tip position aspirate screen, continue, and back buttons', () => {
+  it('renders the tip position aspirate screen, continue, and back buttons', async () => {
     render(props)
+    const user = userEvent.setup()
     screen.getByText('Aspirate tip position')
     screen.getByTestId('ChildNavigation_Primary_Button')
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
@@ -102,7 +104,7 @@ describe('TipPosition', () => {
       {}
     )
     const exitBtn = screen.getByTestId('ChildNavigation_Back_Button')
-    fireEvent.click(exitBtn)
+    await user.click(exitBtn)
     expect(props.onBack).toHaveBeenCalled()
   })
 
@@ -127,11 +129,12 @@ describe('TipPosition', () => {
     )
   })
 
-  it('renders correct range if you enter incorrect value for aspirate', () => {
+  it('renders correct range if you enter incorrect value for aspirate', async () => {
     render(props)
+    const user = userEvent.setup()
     const deleteBtn = screen.getByText('del')
-    fireEvent.click(deleteBtn)
-    fireEvent.click(deleteBtn)
+    await user.click(deleteBtn)
+    await user.click(deleteBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
         autoFocus: true,
@@ -148,15 +151,16 @@ describe('TipPosition', () => {
     expect(saveBtn).toBeDisabled()
   })
 
-  it('renders correct range if you enter incorrect value for dispense', () => {
+  it('renders correct range if you enter incorrect value for dispense', async () => {
+    const user = userEvent.setup()
     props = {
       ...props,
       kind: 'dispense',
     }
     render(props)
     const deleteBtn = screen.getByText('del')
-    fireEvent.click(deleteBtn)
-    fireEvent.click(deleteBtn)
+    await user.click(deleteBtn)
+    await user.click(deleteBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
         autoFocus: true,
@@ -173,14 +177,15 @@ describe('TipPosition', () => {
     expect(saveBtn).toBeDisabled()
   })
 
-  it('calls dispatch when an in range value is entered and saved', () => {
+  it('calls dispatch when an in range value is entered and saved', async () => {
     render(props)
+    const user = userEvent.setup()
     const deleteBtn = screen.getByText('del')
-    fireEvent.click(deleteBtn)
+    await user.click(deleteBtn)
     const numButton = screen.getByText('1')
-    fireEvent.click(numButton)
+    await user.click(numButton)
     const saveBtn = screen.getByText('Save')
-    fireEvent.click(saveBtn)
+    await user.click(saveBtn)
     expect(props.dispatch).toHaveBeenCalled()
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalled()
   })

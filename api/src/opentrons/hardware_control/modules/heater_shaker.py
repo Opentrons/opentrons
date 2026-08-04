@@ -327,7 +327,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         """
         await self.wait_for_is_running()
         await self._driver.set_temperature(celsius)
-        await self._reader.read_temperature()
+        await self._poller.wait_next_good_poll()
 
     # TODO(mc, 2022-10-10): remove `awaiting_temperature` argument,
     # and instead, wait until status is holding
@@ -343,7 +343,7 @@ class HeaterShaker(mod_abc.AbstractModule):
             return
 
         await self.wait_for_is_running()
-        await self._reader.read_temperature()
+        await self._poller.wait_next_good_poll()
 
         async def _await_temperature() -> None:
             if self.temperature_status == TemperatureStatus.HEATING:
@@ -388,7 +388,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         """
         await self.wait_for_is_running()
         await self._driver.set_rpm(rpm)
-        await self._reader.read_rpm()
+        await self._poller.wait_next_good_poll()
 
         async def _wait() -> None:
             # Wait until we reach the target speed.
@@ -427,7 +427,7 @@ class HeaterShaker(mod_abc.AbstractModule):
         if must_be_running:
             await self.wait_for_is_running()
         await self._driver.deactivate_heater()
-        await self._reader.read_temperature()
+        await self._poller.wait_next_good_poll()
 
     async def deactivate_shaker(self, must_be_running: bool = True) -> None:
         """Stop shaking and home the plate"""
@@ -488,12 +488,15 @@ class HeaterShakerReader(Reader):
         self._set_error(exception)
 
     async def read_temperature(self) -> None:
+        """Do not call directly, for the poller only."""
         self.temperature = await self._driver.get_temperature()
 
     async def read_rpm(self) -> None:
+        """Do not call directly, for the poller only."""
         self.rpm = await self._driver.get_rpm()
 
     async def read_labware_latch(self) -> None:
+        """Do not call directly, for the poller only."""
         self.labware_latch = await self._driver.get_labware_latch_status()
 
     def _set_error(self, exception: Optional[Exception]) -> None:
@@ -514,6 +517,7 @@ class HeaterShakerReader(Reader):
                 self.error = repr(exception)
 
     async def _read_errors(self) -> None:
+        """Do not call directly, for the poller only."""
         try:
             await self._driver.get_error_state()
         except UnhandledGcode:

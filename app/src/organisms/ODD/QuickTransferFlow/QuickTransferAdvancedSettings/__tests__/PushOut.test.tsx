@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -41,21 +42,23 @@ describe('PushOut', () => {
     vi.resetAllMocks()
   })
 
-  it('renders text, buttons for push out', () => {
+  it('renders text, buttons for push out', async () => {
     render(props)
+    const user = userEvent.setup()
     screen.getByText('Push out after dispensing')
     screen.getByText('Save')
     screen.getByText('Helps ensure all liquid leaves the tip')
     screen.getByText('Enabled')
     screen.getByText('Disabled')
-    fireEvent.click(screen.getByText('Disabled'))
+    await user.click(screen.getByText('Disabled'))
     screen.getByText('Save')
   })
 
-  it('renders text, button, and keyboard for push out volume', () => {
+  it('renders text, button, and keyboard for push out volume', async () => {
     render(props)
-    fireEvent.click(screen.getByText('Enabled'))
-    fireEvent.click(screen.getByText('Continue'))
+    const user = userEvent.setup()
+    await user.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Push out volume (µL)')
     screen.getByText('Save')
     screen.getByRole('button', { name: '1' })
@@ -65,13 +68,14 @@ describe('PushOut', () => {
     screen.getByRole('button', { name: '.' })
   })
 
-  it('should call dispatch when clicking save button', () => {
+  it('should call dispatch when clicking save button', async () => {
     render(props)
-    fireEvent.click(screen.getByText('Enabled'))
-    fireEvent.click(screen.getByText('Continue'))
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByRole('button', { name: '0' }))
-    fireEvent.click(screen.getByText('Save'))
+    const user = userEvent.setup()
+    await user.click(screen.getByText('Enabled'))
+    await user.click(screen.getByText('Continue'))
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByRole('button', { name: '0' }))
+    await user.click(screen.getByText('Save'))
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_PUSH_OUT',
       pushOutSettings: {
@@ -85,9 +89,10 @@ describe('PushOut', () => {
       },
     })
   })
-  it('should call mock function when clicking back button', () => {
+  it('should call mock function when clicking back button', async () => {
     render(props)
-    fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
+    const user = userEvent.setup()
+    await user.click(screen.getByTestId('ChildNavigation_Back_Button'))
     expect(props.onBack).toHaveBeenCalled()
   })
 })

@@ -26,6 +26,7 @@ import opentrons.hardware_control.nozzle_manager
 import opentrons.hardware_control.peripherals.types
 import opentrons.hardware_control.protocols.types
 import opentrons.hardware_control.types
+import opentrons.hardware_control.util
 import opentrons.types
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
@@ -56,6 +57,8 @@ HARDWARE_ENUM_PACKAGES = [
     opentrons.drivers.types,
     opentrons.hardware_control.modules.types,
     opentrons.drivers.vacuum_module.types,
+    opentrons.drivers.flex_stacker.types,
+    opentrons.hardware_control.util,
 ]
 
 HARDWARE_PYDANTIC_PACKAGES = [

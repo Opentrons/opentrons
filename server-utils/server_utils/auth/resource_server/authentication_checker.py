@@ -67,7 +67,7 @@ class AlwaysAllowedAuthenticationChecker(AuthenticationChecker):
 
     @override
     async def access_control_status(self) -> bool:
-        return True
+        return False
 
 
 class AuthServerAuthenticationChecker(AuthenticationChecker):

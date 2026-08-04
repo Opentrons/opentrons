@@ -193,7 +193,14 @@ export function ProtocolSetupParameters({
             console.error(`could not invalidate runs cache: ${e.message}`)
           })
       },
-    }
+      onError: error => {
+        if (isDocumentedMutationError(error)) {
+          setStartSetup(false)
+        }
+      },
+    },
+    undefined,
+    ['confirm_parameters']
   )
   const handleConfirmValues = (): void => {
     if (hasMissingFileParam) {
@@ -257,6 +264,7 @@ export function ProtocolSetupParameters({
           )
         })
         .catch((error: unknown) => {
+          setStartSetup(false)
           if (!isDocumentedMutationError(error)) {
             throw error
           }

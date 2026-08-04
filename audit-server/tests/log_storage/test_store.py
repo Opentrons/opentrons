@@ -1,5 +1,7 @@
 """Tests for the audit log store."""
 
+from pathlib import Path
+
 import pytest
 from sqlalchemy import select
 from sqlalchemy.engine import Engine as SQLEngine
@@ -11,7 +13,7 @@ from audit_server.log_storage.store import (
     NoActivePeriodError,
 )
 from audit_server.log_storage.types import LogPeriodEntries, StoredLog
-from audit_server.persistence.orm_models import LogPeriod
+from audit_server.persistence.orm_models import LogPeriod, RobotLog
 
 
 @pytest.fixture
@@ -358,3 +360,44 @@ def test_get_period_entries(
     assert log_period_entry.user_log.endedAt is None
 
     assert log_period_entry.robot_log_entries == []
+
+
+def test_get_period_details_aggregates_entries_in_database(
+    subject_with_period: LogStore,
+    db_engine: SQLEngine,
+    tmp_path: Path,
+) -> None:
+    """It should aggregate entry count and byte size without loading entries."""
+    subject_with_period.store_log(
+        StoredLog(
+            message="héllo",
+            message_hash="hash",
+            message_sig="signature",
+            sig_version="1",
+        )
+    )
+    period_id = subject_with_period.list_periods()[0].id
+    robot_log_path = tmp_path / "robot.log"
+    robot_log_path.write_bytes(b"robot log")
+    with Session(db_engine) as session:
+        with session.begin():
+            session.add(
+                RobotLog(
+                    log_period_id=period_id,
+                    file_path=str(robot_log_path),
+                    file_hash="file hash",
+                    file_sig="file signature",
+                    file_sig_version="1",
+                )
+            )
+
+    details = subject_with_period.get_period_details(str(period_id))
+
+    assert details.id == period_id
+    assert details.recordCount == 2
+    assert details.totalSizeBytes == (
+        len("starting tests".encode())
+        + len("héllo".encode())
+        + robot_log_path.stat().st_size
+    )
+    assert details.attachedFilenames == ["robot.log"]
