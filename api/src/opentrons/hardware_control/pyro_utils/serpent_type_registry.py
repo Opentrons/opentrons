@@ -14,9 +14,12 @@ import opentrons_shared_data.pipette.types
 import opentrons.calibration_storage.ot3.models.v1
 import opentrons.calibration_storage.types
 import opentrons.config.types
+import opentrons.drivers.asyncio.communication.errors
+import opentrons.drivers.flex_stacker.errors
 import opentrons.drivers.flex_stacker.types
 import opentrons.drivers.rpi_drivers.types
 import opentrons.drivers.types
+import opentrons.drivers.vacuum_module.errors
 import opentrons.drivers.vacuum_module.types
 import opentrons.hardware_control.dev_types
 import opentrons.hardware_control.instruments.ot3.instrument_calibration
@@ -29,6 +32,7 @@ import opentrons.hardware_control.types
 import opentrons.types
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
+    find_basic_errors_in_packages,
     find_enums_in_packages,
     find_opentrons_classes_in_packages,
     find_pydantic_classes_in_packages,
@@ -81,6 +85,14 @@ HARDWARE_CLASS_PACKAGES = [
     opentrons.hardware_control.ot3_calibration,
     opentrons.hardware_control.instruments.ot3.instrument_calibration,
     opentrons.drivers.flex_stacker.types,
+]
+
+# Packages that define non-EnumeratedError exceptions crossing the hardware Pyro boundary.
+HARDWARE_ERROR_PACKAGES = [
+    opentrons.hardware_control.types,
+    opentrons.drivers.asyncio.communication.errors,
+    opentrons.drivers.flex_stacker.errors,
+    opentrons.drivers.vacuum_module.errors,
 ]
 
 # Type Dict registration handlers
@@ -271,7 +283,7 @@ def register_hardware_types() -> None:
     OpentronsPyroSerializer.register_opentrons_typed_dicts(_typed_dict_dict_to_class)
 
     # Error serialization
-    OpentronsPyroSerializer.register_basic_error(
-        opentrons.hardware_control.types.FailedTipStateCheck
-    )
+    opentrons_error_types = find_basic_errors_in_packages(HARDWARE_ERROR_PACKAGES)
+    for error_type in opentrons_error_types:
+        OpentronsPyroSerializer.register_basic_error(error_type)
     register_enumerated_errors()

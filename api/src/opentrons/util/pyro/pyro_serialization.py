@@ -51,6 +51,16 @@ def find_enums_in_packages(modules: list[ModuleType]) -> list[type[enum.Enum]]:
                 enums.append(obj)
     return enums
 
+def find_basic_errors_in_packages(
+    modules: list[ModuleType],
+) -> list[type[Exception]]:
+    """Return non-EnumeratedError exceptions defined in the given modules."""
+    exceptions: list[type[Exception]] = []
+    for module in modules:
+        for name, obj in inspect.getmembers(module, inspect.isclass):
+            if issubclass(obj, Exception) and obj is not Exception:
+                exceptions.append(obj)
+    return exceptions
 
 def find_pydantic_classes_in_packages(
     modules: list[ModuleType],
@@ -266,7 +276,7 @@ class OpentronsPyroSerializer:
 
     @classmethod
     def register_basic_error(cls, error_type: type[BaseException]) -> None:
-        """Registers a basic error with no specially handled args to be handled via pyro proxies."""
+        """Registers a non-enumerated error for Pyro via pickle (args + instance state)."""
         class_name = register_type_to_serpent(
             error_type,
             cls._generic_error_dict_to_class,
@@ -278,7 +288,8 @@ class OpentronsPyroSerializer:
     def _generic_error_class_to_dict(cls, obj: BaseException) -> dict[str, Any]:
         return {
             "__class__": ".".join((obj.__module__, obj.__class__.__name__)),
-            "args": obj.args,
+            #TODO: Casey, please confirm that this is how this should be formatted
+            "bytes": pickle.dumps({"args": obj.args, "dict": dict(obj.__dict__)}),
         }
 
     @classmethod
@@ -291,7 +302,11 @@ class OpentronsPyroSerializer:
             raise TypeError(
                 f"Could not convert {class_name} to an error, unregistered with pyro."
             )
-        return error_type(*d["args"])
+        payload = pickle.loads(d["bytes"])
+        error = error_type.__new__(error_type)
+        error.__dict__.update(payload["dict"])
+        BaseException.__init__(error, *payload["args"])
+        return error
 
     @classmethod
     def register_typed_dict(cls, typed_dict: type) -> None:

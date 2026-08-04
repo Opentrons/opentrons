@@ -14,13 +14,21 @@ from opentrons_shared_data.errors.exceptions import (
     VacuumModuleWasteFullError,
 )
 
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.drivers.asyncio.communication.errors import (
+    ErrorResponse,
+    NoResponse,
+    SerialException,
+)
+from opentrons.drivers.flex_stacker import errors as flex_stacker_errors
+from opentrons.drivers.flex_stacker.errors import EStopTriggered, MotorStallDetected
+from opentrons.hardware_control.types import CriticalPoint, FailedTipStateCheck
 from opentrons.protocol_engine.types.module import ModuleModel
 from opentrons.types import DeckSlotName
 from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
     enumerated_error_class_to_dict,
     enumerated_error_dict_to_class,
+    find_basic_errors_in_packages,
 )
 
 
@@ -130,3 +138,45 @@ def test_enumerated_error_serialization(test_error: EnumeratedError) -> None:
     result = enumerated_error_dict_to_class("", test_dict)
 
     assert result == test_error
+
+
+@pytest.mark.parametrize(
+    "error_type, test_error",
+    [
+        (FailedTipStateCheck, FailedTipStateCheck("tip state mismatch")),
+        (SerialException, SerialException("COM1", "connection lost")),
+        (NoResponse, NoResponse("COM1", "G28")),
+        (ErrorResponse, ErrorResponse("COM1", "ERR001", "G28")),
+        (EStopTriggered, EStopTriggered("COM1", "ERR006:estop", "G28")),
+        (MotorStallDetected, MotorStallDetected("COM1", "ERR403:stall", "G28")),
+    ],
+)
+def test_basic_error_serialization(
+    error_type: type[BaseException], test_error: BaseException
+) -> None:
+    """It should serialize and deserialize non-enumerated errors for Pyro via pickle."""
+    OpentronsPyroSerializer.register_basic_error(error_type)
+
+    class_name = ".".join((test_error.__module__, test_error.__class__.__name__))
+    test_dict = OpentronsPyroSerializer._generic_error_class_to_dict(test_error)
+
+    assert test_dict.get("bytes") is not None
+    assert test_dict["__class__"] == class_name
+
+    result = OpentronsPyroSerializer._generic_error_dict_to_class(class_name, test_dict)
+
+    assert type(result) is type(test_error)
+    assert result.args == test_error.args
+    assert result.__dict__ == test_error.__dict__
+    assert str(result) == str(test_error)
+
+
+def test_find_basic_errors_in_packages() -> None:
+    """It should find non-enumerated errors defined in the given packages."""
+    found = find_basic_errors_in_packages([flex_stacker_errors])
+
+    assert EStopTriggered in found
+    assert MotorStallDetected in found
+    # Re-exported shared driver errors should not be attributed to this package.
+    assert ErrorResponse not in found
+    assert SerialException not in found
