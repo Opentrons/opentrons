@@ -87,10 +87,12 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           package-manager-cache: false
 
-      # Trusted publishing requires npm CLI >= 11.5.1
+      # Trusted publishing requires npm CLI >= 11.5.1.
+      # Pin npm 11.x: npm@latest (12+) requires Node ^22.22.2, but the monorepo
+      # pins 22.22.0. Stay on npm 11 until the repo Node pin moves.
       - name: 'Upgrade npm for OIDC trusted publishing'
         run: |
-          npm install -g npm@latest
+          npm install -g npm@11.19.0
           node --version
           npm --version
 
