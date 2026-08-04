@@ -10,6 +10,7 @@ from typing import (
     AsyncIterator,
     Awaitable,
     Callable,
+    Coroutine,
     Dict,
     List,
     Mapping,
@@ -607,6 +608,25 @@ class OT3API(
                 ) from e
             finally:
                 self._configured_since_update = False
+
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def update_firmware_with_fetching(
+        self, subsystems: Optional[Set[SubSystem]] = None, force: bool = False
+    ) -> Callable[[], Coroutine[Any, Any, UpdateStatus | None]]:
+        """Start the firmware update for one or more subsystems and return a callback for fetching progress.
+
+        This approach is more friendly to synchronous-dependent implementations for firmware updating, such as subprocess mode.
+        """
+        update_iterator = self.update_firmware(subsystems, force)
+
+        async def _get_latest_update_status() -> UpdateStatus | None:
+            mod_log.info("FETCH BASED CALL WAS CALLED")
+            try:
+                return await anext(update_iterator)
+            except StopAsyncIteration:
+                return None
+
+        return _get_latest_update_status
 
     # Incidentals (i.e. not motion) API
 

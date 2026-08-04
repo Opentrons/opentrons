@@ -13,6 +13,11 @@ from typing import (
     List,
     Optional,
 )
+from opentrons.config import (
+    feature_flags as ff,
+)
+import asyncio
+
 
 from opentrons.hardware_control.errors import UpdateOngoingError
 from opentrons.hardware_control.types import (
@@ -181,13 +186,26 @@ class _UpdateProcess:
     async def _update_task(self) -> None:
         last_progress = 0
         try:
-            async for update in self._hw_handle.update_firmware({self.subsystem}):
-                last_progress = update.progress
-                await self._status_queue.put(
-                    UpdateProgress(
-                        UpdateState.from_hw(update.state), last_progress, None
+            if ff.hardware_subprocess_enabled():
+                fetch_progress_callback = self._hw_handle.update_firmware_with_fetching({self.subsystem})
+                update = await fetch_progress_callback()
+                while update is not None:
+                    last_progress = update.progress
+                    await self._status_queue.put(
+                        UpdateProgress(
+                            UpdateState.from_hw(update.state), last_progress, None
+                        )
                     )
-                )
+                    await asyncio.sleep(0.1)  # Wait, then poll again.
+                    update = await fetch_progress_callback()
+            else:
+                async for update in self._hw_handle.update_firmware({self.subsystem}):
+                    last_progress = update.progress
+                    await self._status_queue.put(
+                        UpdateProgress(
+                            UpdateState.from_hw(update.state), last_progress, None
+                        )
+                    )
             last_progress = 100
             await self._status_queue.put(UpdateProgress(UpdateState.done, 100, None))
         except UpdateOngoingError:
@@ -200,7 +218,6 @@ class _UpdateProcess:
                 )
             )
         except BaseException as be:
-            log.exception("Failed to update firmware")
             await self._status_queue.put(
                 UpdateProgress(UpdateState.failed, last_progress, be)
             )
