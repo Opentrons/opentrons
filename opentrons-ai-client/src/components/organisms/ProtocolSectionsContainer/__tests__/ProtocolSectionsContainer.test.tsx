@@ -46,9 +46,10 @@ describe('ProtocolSectionsContainer', () => {
   it('should render the Application section opened by default', () => {
     render()
 
-    expect(
-      screen.getByRole('button', { name: 'Application' })
-    ).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByRole('button', { name: 'Application' })).toHaveAttribute(
+      'aria-expanded',
+      'true'
+    )
   })
 
   it('should render all the other sections closed by default', () => {

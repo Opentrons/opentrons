@@ -33,9 +33,12 @@ const TestFormProviderComponent = ({
 
 describe('RuntimeParametersSection', () => {
   it('should render the input field when robot type is Flex', () => {
-    renderWithProviders(<TestFormProviderComponent robotType={OPENTRONS_FLEX} />, {
-      i18nInstance: i18n,
-    })
+    renderWithProviders(
+      <TestFormProviderComponent robotType={OPENTRONS_FLEX} />,
+      {
+        i18nInstance: i18n,
+      }
+    )
 
     expect(
       screen.getByTestId('RuntimeParametersSection_inputArea')
@@ -45,9 +48,12 @@ describe('RuntimeParametersSection', () => {
   })
 
   it('should not render the input field when robot type is OT2', async () => {
-    renderWithProviders(<TestFormProviderComponent robotType={OPENTRONS_OT2} />, {
-      i18nInstance: i18n,
-    })
+    renderWithProviders(
+      <TestFormProviderComponent robotType={OPENTRONS_OT2} />,
+      {
+        i18nInstance: i18n,
+      }
+    )
 
     await waitFor(() => {
       expect(
