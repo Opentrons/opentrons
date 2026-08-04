@@ -1,5 +1,6 @@
 import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
+import { i18n } from '/app/i18n'
 import { getRobotApiVersion } from '/app/redux/discovery'
 import { finishDiscovery, startDiscovery } from '/app/redux/discovery/actions'
 import {
@@ -30,20 +31,7 @@ import {
 } from '/app/redux/robot-update/selectors'
 import { uploadRobotUpdateFileViaShell } from '/app/redux/shell/remote'
 
-import {
-  BUT_WE_EXPECTED,
-  CHECK_TO_VERIFY_UPDATE,
-  REDISCOVERY_TIME_MS,
-  ROBOT_HAS_BAD_CAPABILITIES,
-  ROBOT_RECONNECTED_WITH_VERSION,
-  UNABLE_TO_CANCEL_UPDATE_SESSION,
-  UNABLE_TO_COMMIT_UPDATE,
-  UNABLE_TO_FIND_ROBOT_WITH_NAME,
-  UNABLE_TO_FIND_SYSTEM_FILE,
-  UNABLE_TO_RESTART_ROBOT,
-  UNABLE_TO_START_UPDATE_SESSION,
-  UNKNOWN,
-} from './constants'
+import { REDISCOVERY_TIME_MS } from './constants'
 import { buildHostConfig, ensureUpdateFileReady } from './ensureUpdateFileReady'
 import { getUserNotesFromDocumentationState } from './getUserNotesFromDocumentationState'
 import { pollRobotUpdateStatus } from './pollRobotUpdateStatus'
@@ -99,7 +87,12 @@ export function runRobotUpdateFlow(deps: RobotUpdateFlowDeps): Promise<void> {
       const robot = getRobotUpdateRobot(store.getState())
       if (robot == null) {
         return Promise.reject(
-          new Error(`${UNABLE_TO_FIND_ROBOT_WITH_NAME} ${robotName}`)
+          new Error(
+            i18n.t('unable_to_find_robot_with_name', {
+              ns: 'device_settings',
+              robotName,
+            })
+          )
         )
       }
 
@@ -112,7 +105,10 @@ export function runRobotUpdateFlow(deps: RobotUpdateFlowDeps): Promise<void> {
       if (sessionPath == null) {
         return Promise.reject(
           new Error(
-            `${ROBOT_HAS_BAD_CAPABILITIES}: ${JSON.stringify(capabilities)}`
+            i18n.t('robot_has_bad_capabilities', {
+              ns: 'device_settings',
+              capabilities: JSON.stringify(capabilities),
+            })
           )
         )
       }
@@ -120,7 +116,11 @@ export function runRobotUpdateFlow(deps: RobotUpdateFlowDeps): Promise<void> {
       const pathPrefix = sessionPath.replace('/begin', '')
       const systemFilePath = session.fileInfo?.systemFile
       if (systemFilePath == null) {
-        return Promise.reject(new Error(UNABLE_TO_FIND_SYSTEM_FILE))
+        return Promise.reject(
+          new Error(
+            i18n.t('unable_to_find_system_file', { ns: 'device_settings' })
+          )
+        )
       }
 
       return createUpdateSession(deps, robot, sessionPath, pathPrefix).then(
@@ -140,7 +140,11 @@ export function runRobotUpdateFlow(deps: RobotUpdateFlowDeps): Promise<void> {
     })
     .then(ctx => {
       if (ctx.token == null) {
-        return Promise.reject(new Error(UNABLE_TO_START_UPDATE_SESSION))
+        return Promise.reject(
+          new Error(
+            i18n.t('unable_to_start_update_session', { ns: 'device_settings' })
+          )
+        )
       }
 
       const { robot, pathPrefix, systemFilePath, token } = ctx
@@ -251,7 +255,9 @@ function reportFlowError(dispatch: Dispatch, error: unknown): void {
     return
   }
   const message =
-    error instanceof Error ? error.message : UNABLE_TO_START_UPDATE_SESSION
+    error instanceof Error
+      ? error.message
+      : i18n.t('unable_to_start_update_session', { ns: 'device_settings' })
   dispatch(unexpectedRobotUpdateError(message))
 }
 
@@ -290,9 +296,19 @@ function createUpdateSession(
 
     return getMutations()
       .cancelSession({ pathPrefix })
-      .catch(() => Promise.reject(new Error(UNABLE_TO_CANCEL_UPDATE_SESSION)))
+      .catch(() =>
+        Promise.reject(
+          new Error(i18n.t('unable_to_cancel_update', { ns: 'device_settings' }))
+        )
+      )
       .then(() => createOnce())
-      .catch(() => Promise.reject(new Error(UNABLE_TO_START_UPDATE_SESSION)))
+      .catch(() =>
+        Promise.reject(
+          new Error(
+            i18n.t('unable_to_start_update_session', { ns: 'device_settings' })
+          )
+        )
+      )
   })
 }
 
@@ -346,7 +362,14 @@ function commitIfNeeded(
       const message =
         (error.response?.data as { message?: string } | undefined)?.message ??
         error.message
-      return Promise.reject(new Error(`${UNABLE_TO_COMMIT_UPDATE}: ${message}`))
+      return Promise.reject(
+        new Error(
+          i18n.t('unable_to_commit_update', {
+            ns: 'device_settings',
+            message,
+          })
+        )
+      )
     })
 }
 
@@ -384,7 +407,14 @@ function beginRestartPhase(
       const message =
         (error.response?.data as { message?: string } | undefined)?.message ??
         error.message
-      return Promise.reject(new Error(`${UNABLE_TO_RESTART_ROBOT}: ${message}`))
+      return Promise.reject(
+        new Error(
+          i18n.t('unable_to_restart', {
+            ns: 'device_settings',
+            message,
+          })
+        )
+      )
     })
 }
 
@@ -410,8 +440,8 @@ function finishAfterRestart(
       currentRobot.name
     )
     const robotVersion = getRobotApiVersion(currentRobot)
-    const actual = robotVersion ?? UNKNOWN
-    const expected = targetVersion ?? UNKNOWN
+    const actual = robotVersion ?? i18n.t('unknown', { ns: 'shared' })
+    const expected = targetVersion ?? i18n.t('unknown', { ns: 'shared' })
 
     if (
       targetVersion != null &&
@@ -422,7 +452,11 @@ function finishAfterRestart(
     } else {
       dispatch(
         unexpectedRobotUpdateError(
-          `${ROBOT_RECONNECTED_WITH_VERSION} ${actual}, ${BUT_WE_EXPECTED} ${expected}. ${CHECK_TO_VERIFY_UPDATE}.`
+          i18n.t('robot_update_version_mismatch', {
+            ns: 'device_settings',
+            actual,
+            expected,
+          })
         )
       )
     }

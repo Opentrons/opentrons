@@ -1,3 +1,4 @@
+import { i18n } from '/app/i18n'
 import { OPENTRONS_USB } from '/app/redux/discovery/constants'
 import {
   readSystemRobotUpdateFile,
@@ -11,10 +12,6 @@ import {
 } from '/app/redux/robot-update/selectors'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
 
-import {
-  ROBOT_REQUIRES_PREMIGRATION,
-  UNABLE_TO_FIND_ROBOT_WITH_NAME,
-} from './constants'
 import { waitForStoreCondition } from './waitForStoreCondition'
 
 import type { Store } from 'redux'
@@ -52,7 +49,10 @@ export function ensureUpdateFileReady(
   const serverHealth = host?.serverHealth ?? null
 
   if (host == null || serverHealth == null) {
-    const message = `${UNABLE_TO_FIND_ROBOT_WITH_NAME} ${robotName}`
+    const message = i18n.t('unable_to_find_robot_with_name', {
+      ns: 'device_settings',
+      robotName,
+    })
     dispatch(unexpectedRobotUpdateError(message))
     return Promise.reject(new Error(message))
   }
@@ -61,8 +61,11 @@ export function ensureUpdateFileReady(
 
   if (systemFile != null) {
     if (capabilities == null) {
-      dispatch(unexpectedRobotUpdateError(ROBOT_REQUIRES_PREMIGRATION))
-      return Promise.reject(new Error(ROBOT_REQUIRES_PREMIGRATION))
+      const message = i18n.t('robot_requires_premigration', {
+        ns: 'device_settings',
+      })
+      dispatch(unexpectedRobotUpdateError(message))
+      return Promise.reject(new Error(message))
     }
     dispatch(readUserRobotUpdateFile(systemFile))
   } else if (capabilities == null) {
