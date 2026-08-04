@@ -178,6 +178,7 @@ async def test_create_run(
         id=run_id,
         createdAt=run_created_at,
         protocolId=None,
+        logPeriodId="123",
         current=True,
         actions=[],
         errors=[],
@@ -280,6 +281,7 @@ async def test_create_protocol_run(
         id=run_id,
         createdAt=run_created_at,
         protocolId=protocol_id,
+        logPeriodId="123",
         current=True,
         actions=[],
         errors=[],
@@ -469,6 +471,7 @@ async def test_get_run_data_from_url(
     expected_response = Run(
         id="run-id",
         protocolId=None,
+        logPeriodId=None,
         createdAt=datetime(year=2021, month=1, day=1),
         status=pe_types.EngineStatus.IDLE,
         current=False,
@@ -518,6 +521,7 @@ async def test_get_run() -> None:
     run_data = Run(
         id="run-id",
         protocolId=None,
+        logPeriodId=None,
         createdAt=datetime(year=2021, month=1, day=1),
         status=pe_types.EngineStatus.IDLE,
         current=False,
@@ -566,6 +570,7 @@ async def test_get_runs_not_empty(
     response_1 = Run(
         id="unique-id-1",
         protocolId=None,
+        logPeriodId=None,
         createdAt=created_at_1,
         status=pe_types.EngineStatus.SUCCEEDED,
         current=False,
@@ -584,6 +589,7 @@ async def test_get_runs_not_empty(
     response_2 = Run(
         id="unique-id-2",
         protocolId=None,
+        logPeriodId=None,
         createdAt=created_at_2,
         status=pe_types.EngineStatus.IDLE,
         current=True,
@@ -705,6 +711,7 @@ async def test_update_run_to_not_current(
     expected_response = Run(
         id="run-id",
         protocolId=None,
+        logPeriodId=None,
         createdAt=datetime(year=2021, month=1, day=1),
         status=pe_types.EngineStatus.SUCCEEDED,
         current=False,
@@ -755,6 +762,7 @@ async def test_update_current_none_noop(
     expected_response = Run(
         id="run-id",
         protocolId=None,
+        logPeriodId=None,
         createdAt=datetime(year=2021, month=1, day=1),
         status=pe_types.EngineStatus.SUCCEEDED,
         current=True,
@@ -800,6 +808,7 @@ async def test_update_run_signed_by_and_uncurrent(
     signed_response = Run(
         id="run-id",
         protocolId=None,
+        logPeriodId=None,
         createdAt=datetime(year=2021, month=1, day=1),
         status=pe_types.EngineStatus.SUCCEEDED,
         current=True,
@@ -1043,6 +1052,7 @@ async def test_update_run_signed_by(
     expected_response = Run(
         id="run-id",
         protocolId=None,
+        logPeriodId=None,
         createdAt=datetime(year=2021, month=1, day=1),
         status=pe_types.EngineStatus.SUCCEEDED,
         current=True,

@@ -66,6 +66,7 @@ def _build_run(
         return Run.model_construct(
             id=run_resource.run_id,
             protocolId=run_resource.protocol_id,
+            logPeriodId=run_resource.log_period_id,
             createdAt=run_resource.created_at,
             actions=run_resource.actions,
             status=state_summary.status,
@@ -130,6 +131,7 @@ def _build_run(
         dataError=run_loading_error,
         id=run_resource.run_id,
         protocolId=run_resource.protocol_id,
+        logPeriodId=run_resource.log_period_id,
         createdAt=run_resource.created_at,
         actions=run_resource.actions,
         status=state.status,
