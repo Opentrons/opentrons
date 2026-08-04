@@ -18,7 +18,7 @@ import {
   downloadRobotUpdate,
   getRobotUpdateAvailable,
 } from '/app/redux/robot-update'
-import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
+import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
 import type { Dispatch, State } from '/app/redux/types'
 
@@ -32,7 +32,7 @@ export function UpdateRobot(): JSX.Element {
       : null
   })
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
+  const { startUpdate } = useRobotUpdateContext()
   const dispatch = useDispatch<Dispatch>()
 
   const [errorString, setErrorString] = useState<string | null>(null)
@@ -56,7 +56,7 @@ export function UpdateRobot(): JSX.Element {
               onClick={() => {
                 setErrorString(null)
                 dispatch(downloadRobotUpdate())
-                dispatchStartRobotUpdate(robotName)
+                startUpdate(robotName)
               }}
               buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
             />

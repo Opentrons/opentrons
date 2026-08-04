@@ -16,11 +16,11 @@ import { RELEASE_NOTES_URL_BASE, UpdateRobotModal } from '../UpdateRobotModal'
 
 import type { ComponentProps } from 'react'
 
-const mockDispatchStartRobotUpdate = vi.hoisted(() => vi.fn())
+const mockStartUpdate = vi.hoisted(() => vi.fn())
 
 vi.mock('/app/redux/robot-update')
-vi.mock('/app/redux/robot-update/hooks', () => ({
-  useDispatchStartRobotUpdate: () => mockDispatchStartRobotUpdate,
+vi.mock('/app/resources/robot-update/RobotUpdateContext', () => ({
+  useRobotUpdateContext: () => ({ startUpdate: mockStartUpdate }),
 }))
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux-resources/robots')
@@ -34,7 +34,7 @@ const render = (props: ComponentProps<typeof UpdateRobotModal>) => {
 describe('UpdateRobotModal', () => {
   let props: ComponentProps<typeof UpdateRobotModal>
   beforeEach(() => {
-    mockDispatchStartRobotUpdate.mockClear()
+    mockStartUpdate.mockClear()
     props = {
       robotName: 'test robot',
       releaseNotes: 'test notes',

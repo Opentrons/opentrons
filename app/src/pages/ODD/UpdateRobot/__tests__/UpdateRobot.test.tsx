@@ -13,12 +13,12 @@ import { UpdateRobot } from '../UpdateRobot'
 import type { RobotUpdateSession } from '/app/redux/robot-update/types'
 import type { State } from '/app/redux/types'
 
-const mockDispatchStartRobotUpdate = vi.hoisted(() => vi.fn())
+const mockStartUpdate = vi.hoisted(() => vi.fn())
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
-vi.mock('/app/redux/robot-update/hooks', () => ({
-  useDispatchStartRobotUpdate: () => mockDispatchStartRobotUpdate,
+vi.mock('/app/resources/robot-update/RobotUpdateContext', () => ({
+  useRobotUpdateContext: () => ({ startUpdate: mockStartUpdate }),
 }))
 
 const MOCK_STATE: State = {

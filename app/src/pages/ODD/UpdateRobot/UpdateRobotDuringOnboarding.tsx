@@ -23,7 +23,7 @@ import {
   downloadRobotUpdate,
   getRobotUpdateAvailable,
 } from '/app/redux/robot-update'
-import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
+import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
 import type { Dispatch, State } from '/app/redux/types'
 
@@ -34,7 +34,7 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
     useState<boolean>(true)
   const navigate = useNavigate()
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
-  const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
+  const { startUpdate } = useRobotUpdateContext()
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
   const robotUpdateType = useSelector((state: State) => {
@@ -96,7 +96,7 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
               flex="1"
               onClick={() => {
                 dispatch(downloadRobotUpdate())
-                dispatchStartRobotUpdate(robotName)
+                startUpdate(robotName)
               }}
               buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
             />
