@@ -18,12 +18,18 @@ export const useSwipe = (): UseSwipeResult => {
   const [isEnabled, setIsEnabled] = useState<boolean>(true)
   const interactiveRef = useRef(null)
   const THRESHOLD = 50
-  let startX = 0
-  let startY = 0
 
-  const enable = (): void => {
-    if (interactiveRef.current != null) {
-      interact(interactiveRef.current).draggable({
+  useEffect(
+    () => {
+      const element = interactiveRef.current
+      if (element == null || !isEnabled) {
+        return
+      }
+
+      let startX = 0
+      let startY = 0
+
+      const interactable = interact(element).draggable({
         inertia: false,
         modifiers: [],
         autoScroll: false,
@@ -50,23 +56,10 @@ export const useSwipe = (): UseSwipeResult => {
           },
         },
       })
-    }
-  }
 
-  const disable = (): void => {
-    if (interactiveRef.current != null) {
-      interact(interactiveRef.current as unknown as HTMLElement).unset()
-    }
-  }
-
-  useEffect(
-    () => {
-      if (isEnabled) {
-        enable()
-      } else {
-        disable()
+      return () => {
+        interactable.unset()
       }
-      return disable
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
