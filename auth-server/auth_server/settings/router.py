@@ -3,6 +3,7 @@ from typing import Annotated
 
 import fastapi
 
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.models.json_api import (
@@ -50,7 +51,10 @@ async def get_access_control_enabled_settings(  # noqa: D103
     "/auth/settings/accessControlEnabled",
     summary="Change access control enabled settings",
     description="Change the access control enabled settings.",
-    dependencies=[fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE)),
+        fastapi.Depends(get_audit_logger("update CRS enabled")),
+    ],
 )
 async def patch_access_control_settings(  # noqa: D103
     request_body: RequestModel[PatchAccessControlRequestData],
@@ -72,14 +76,15 @@ async def patch_access_control_settings(  # noqa: D103
 @router.patch(
     "/auth/settings",
     summary="Change auth settings",
-    description=dedent(
-        """\
+    description=dedent("""\
         Change authorization and authentication settings.
 
         The new settings are returned.
-        """
-    ),
-    dependencies=[fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE))],
+        """),
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE)),
+        fastapi.Depends(get_audit_logger("edit CRS settings")),
+    ],
 )
 async def patch_settings(  # noqa: D103
     request_body: RequestModel[PatchSettingsRequestData],
@@ -92,14 +97,15 @@ async def patch_settings(  # noqa: D103
 @router.delete(
     "/auth/settings",
     summary="Reset auth settings",
-    description=dedent(
-        """\
+    description=dedent("""\
         Reset authorization and authentication settings to their defaults.
 
         The new settings are returned.
-        """
-    ),
-    dependencies=[fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE))],
+        """),
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.AUTH_SETTINGS_WRITE)),
+        fastapi.Depends(get_audit_logger("reset CRS settings")),
+    ],
 )
 async def delete_settings(  # noqa: D103
     settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],

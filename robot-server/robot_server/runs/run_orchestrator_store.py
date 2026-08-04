@@ -112,7 +112,9 @@ async def _do_handle_hardware_event(  # noqa: C901
             return
         should_finish = (
             await run_orchestrator_store.run_coordinator.asynchronous_module_error(
-                module_model=event.module_model, module_serial=event.module_serial
+                module_model=event.module_model,
+                module_serial=event.module_serial,
+                error=event.exception,
             )
         )
         if should_finish:

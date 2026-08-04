@@ -52,9 +52,5 @@
     "react-select": "5.4.0",
     "react-viewport-list": "6.3.0",
     "styled-components": "5.3.6"
-  },
-  "devDependencies": {
-    "redux": "5.0.1",
-    "react-redux": "8.1.2"
   }
 }

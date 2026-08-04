@@ -33,14 +33,6 @@ def enable_ot3_hardware_controller() -> bool:
     )
 
 
-def rear_panel_integration() -> bool:
-    """Whether to enable usb connected rear_panel for the OT-3."""
-
-    return advs.get_setting_with_env_overload(
-        "rearPanelIntegration", RobotTypeEnum.FLEX
-    )
-
-
 def stall_detection_enabled() -> bool:
     return not advs.get_setting_with_env_overload(
         "disableStallDetection", RobotTypeEnum.FLEX
@@ -103,3 +95,7 @@ def run_protocol_as_restricted_user() -> bool:
     return advs.get_setting_with_env_overload(
         "alwaysRunProtocolAsUser", RobotTypeEnum.FLEX
     )
+
+
+def internal_96ch_attach() -> bool:
+    return advs.get_setting_with_env_overload("internal96chAttach", RobotTypeEnum.FLEX)

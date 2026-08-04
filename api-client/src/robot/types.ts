@@ -54,3 +54,31 @@ export interface RobotSettingsResponse {
   settings: RobotSettings
   links?: { restart?: string }
 }
+
+export interface ResetConfigOption {
+  id: string
+  name: string
+  description: string
+}
+
+export interface ResetConfigOptionsResponse {
+  options: ResetConfigOption[]
+}
+
+/**
+ * Options to pass as-is to `POST /settings/reset`.
+ * The possible keys are theoretically dynamic,
+ * coming from `GET /settings/reset/options`.
+ */
+export interface SettingsResets {
+  [optionId: string]: boolean | undefined
+}
+
+export interface ResetConfigRequest {
+  resetLabwareOffsets: boolean
+  settingsResets: SettingsResets
+}
+
+export interface ResetConfigResponse {
+  message?: string
+}

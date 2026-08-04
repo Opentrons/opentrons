@@ -15,7 +15,7 @@ import {
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import type { AttachedModule } from '/app/redux/modules/types'
+import type { AttachedModule } from '@opentrons/api-client'
 
 interface FirmwareUpdateFailedModalProps {
   onCloseClick: () => void

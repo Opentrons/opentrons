@@ -4,13 +4,23 @@ import { useTranslation } from 'react-i18next'
 import {
   CheckboxBasic,
   COLORS,
+  ERROR_TOAST,
+  INFO_TOAST,
   InfoScreen,
   ListAccordion,
   StyledText,
   Tag,
+  WARNING_TOAST,
 } from '@opentrons/components'
-import { useLogPeriodSummariesQuery } from '@opentrons/react-api-client'
+import {
+  isDocumentedMutationError,
+  useLogPeriodSummariesQuery,
+} from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { useDeleteSelectedLogPeriods } from '/app/resources/devices/hooks/useDeleteSelectedLogPeriods'
+import { useDownloadSelectedLogPeriods } from '/app/resources/devices/hooks/useDownloadSelectedLogPeriods'
 import { formatTimestamp } from '/app/transformations/runs'
 
 import { DeleteRecordsModal } from '../../../DeleteRecordsModal'
@@ -18,9 +28,10 @@ import { FileManagementSectionHeader } from '../FileManagementSectionHeader'
 import { useRecordSelection } from '../hooks/useRecordSelection'
 import fileManagerStyles from '../robotsettingsfilemanager.module.css'
 import styles from './compliancereadysoftwarefiles.module.css'
-import { useDeleteSelectedLogPeriods } from './hooks/useDeleteSelectedLogPeriods'
-import { useDownloadSelectedLogPeriods } from './hooks/useDownloadSelectedLogPeriods'
 import { LogPeriodRow } from './LogPeriodRow'
+
+import type { IconProps } from '@opentrons/components'
+import type { DownloadedLogPeriod } from '/app/resources/devices/hooks/useDownloadSelectedLogPeriods'
 
 interface ComplianceReadySoftwareFilesProps {
   robotName: string
@@ -31,10 +42,11 @@ export function ComplianceReadySoftwareFiles({
 }: ComplianceReadySoftwareFilesProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const { data: logPeriodSummariesData } = useLogPeriodSummariesQuery()
-  const { downloadSelectedLogPeriods, isDownloading: isDownloadingLogPeriods } =
-    useDownloadSelectedLogPeriods(robotName)
+  const documentationState = useDocumentationState()
+  const downloadLogPeriodsMutation = useDownloadSelectedLogPeriods(robotName)
   const { deleteSelectedLogPeriods, deletingIds } =
-    useDeleteSelectedLogPeriods()
+    useDeleteSelectedLogPeriods(documentationState)
+  const { makeToast, eatToast } = useToaster()
 
   // API returns periods oldest-to-newest; reverse for newest-first display.
   const periods = useMemo(
@@ -65,19 +77,91 @@ export function ComplianceReadySoftwareFiles({
       ? formatTimestamp(newestPeriod.endedAt ?? newestPeriod.startedAt)
       : t('na')
 
+  const handleNoLogsSelected = (type: 'delete' | 'download'): void => {
+    makeToast(t(`select_entry_to_${type}`) as string, WARNING_TOAST, {
+      closeButton: true,
+    })
+  }
+
   const handleDownloadSelected = (): void => {
-    if (selectedIds.size > 0 && !isDownloadingLogPeriods) {
-      downloadSelectedLogPeriods(
-        periods.filter(period => selectedIds.has(period.id))
+    if (selectedIds.size === 0) {
+      handleNoLogsSelected('download')
+      return
+    }
+    if (downloadLogPeriodsMutation.status !== 'loading') {
+      const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
+      const toastId = makeToast(
+        t('downloading_run_records') as string,
+        INFO_TOAST,
+        { disableTimeout: true, icon: toastIcon }
       )
+      downloadLogPeriodsMutation
+        .mutateAsync({
+          logPeriods: periods.filter(period => selectedIds.has(period.id)),
+        })
+        .catch((error: Error) => {
+          makeToast(error.message, ERROR_TOAST, {
+            closeButton: true,
+          })
+        })
+        .finally(() => {
+          eatToast(toastId)
+        })
     }
   }
 
-  const handleDeleteSelected = (): void => {
-    if (selectedIds.size > 0) {
-      setShowDeleteRecordsModal(true)
+  const handleClickDeleteSelected = (): void => {
+    if (selectedIds.size === 0) {
+      handleNoLogsSelected('delete')
+      return
     }
+    setShowDeleteRecordsModal(true)
   }
+
+  const handleConfirmDeleteSelected = (): void => {
+    setShowDeleteRecordsModal(false)
+    const selectedPeriods = periods.filter(period => selectedIds.has(period.id))
+    void downloadLogPeriodsMutation
+      .mutateAsync({ logPeriods: selectedPeriods })
+      .then(downloadedPeriods => {
+        // only chain a delete for periods that actually came back with a
+        // deletion key; a period downloaded without one can't be deleted yet
+        const deletableDownloads = downloadedPeriods.filter(
+          (
+            downloaded
+            // enforcing that deletionKey is non-null
+          ): downloaded is DownloadedLogPeriod & { deletionKey: string } =>
+            downloaded.deletionKey != null
+        )
+        if (deletableDownloads.length < selectedPeriods.length) {
+          makeToast(t('some_logs_not_deleted') as string, WARNING_TOAST, {
+            closeButton: true,
+          })
+        }
+        if (deletableDownloads.length === 0) {
+          return
+        }
+        const deletionKeysByLogPeriodId = deletableDownloads.reduce<
+          Record<string, string>
+        >((acc, { logPeriod, deletionKey }) => {
+          acc[logPeriod.id] = deletionKey
+          return acc
+        }, {})
+        return deleteSelectedLogPeriods(
+          deletableDownloads.map(({ logPeriod }) => logPeriod),
+          deletionKeysByLogPeriodId
+        )
+      })
+      .catch((e: Error) => {
+        if (!isDocumentedMutationError(e)) {
+          makeToast(e.message, ERROR_TOAST)
+        } else {
+          // reopen the delete modal if we fail; no flicker in practice
+          setShowDeleteRecordsModal(true)
+        }
+      })
+  }
+
   const periodHeaderKeys: Array<'started' | 'ended' | 'status'> = [
     'started',
     'ended',
@@ -91,12 +175,7 @@ export function ComplianceReadySoftwareFiles({
           onClose={() => {
             setShowDeleteRecordsModal(false)
           }}
-          onConfirm={() => {
-            deleteSelectedLogPeriods(
-              periods.filter(period => selectedIds.has(period.id))
-            )
-            setShowDeleteRecordsModal(false)
-          }}
+          onConfirm={handleConfirmDeleteSelected}
           type="selectedLogs"
         />
       )}
@@ -105,7 +184,7 @@ export function ComplianceReadySoftwareFiles({
           titleText={t('compliance_ready_software_files')}
           showButtons={isSomeSelected || isAllSelected}
           onDownloadSelected={handleDownloadSelected}
-          onDeleteSelected={handleDeleteSelected}
+          onDeleteSelected={handleClickDeleteSelected}
         />
         {periods.length === 0 ? (
           <InfoScreen content={t('no_user_action_logs')} />

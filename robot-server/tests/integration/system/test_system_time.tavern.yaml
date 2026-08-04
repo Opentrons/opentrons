@@ -50,3 +50,26 @@ stages:
             title: 'Not implemented'
             detail: 'Method not implemented. Not supported on dev server.'
             errorCode: '4000'
+
+---
+test_name: PUT /system/time requires system_time.write
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+stages:
+  - name: OpenAPI declares system_time.write for PUT /system/time
+    request:
+      url: '{ot2_server_base_url}/openapi.json'
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        paths:
+          /system/time:
+            put:
+              security:
+                - oauth2: []
+                - oauth2:
+                    - system_time.write

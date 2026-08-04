@@ -1,7 +1,6 @@
 import type { ChangeEventHandler, FocusEventHandler } from 'react'
 import type { FieldError } from 'react-hook-form'
-import type { WifiKey } from '@opentrons/api-client'
-import type { EapOption, WifiNetwork } from '/app/redux/networking/types'
+import type { EapOption, WifiKey, WifiNetwork } from '@opentrons/api-client'
 import type {
   CONNECT,
   DISCONNECT,
@@ -12,13 +11,13 @@ import type {
 } from './constants'
 
 export type {
+  EapOption,
+  WifiAuthField,
+  WifiConfigureRequest,
+  WifiEapConfig,
   WifiNetwork,
   WifiSecurityType,
-  WifiAuthField,
-  WifiEapConfig,
-  WifiConfigureRequest,
-  EapOption,
-} from '/app/redux/networking/types'
+} from '@opentrons/api-client'
 
 export type NetworkChangeType =
   typeof CONNECT | typeof DISCONNECT | typeof JOIN_OTHER

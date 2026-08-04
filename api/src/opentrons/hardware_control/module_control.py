@@ -287,12 +287,16 @@ class AttachedModulesControl:
             if attached_mod.serial_number != old_mod.serial_number:
                 continue
             log.info(f"Found {old_mod.serial_number} was reconnected")
+            # Stop the new instance's poller/connection before reopening on old_mod.
+            await attached_mod.soft_cleanup()
+            # Stop the parked instance on the old path before rebinding.
+            await old_mod.soft_cleanup()
             if attached_mod.port != old_mod.port:
                 log.info(f"module moved from {old_mod.port} to {attached_mod.port}")
                 await old_mod.move_port(attached_mod.port, attached_mod.usb_port)
-            await attached_mod.soft_cleanup()
-            await old_mod.soft_cleanup()
+                log.info("Module port migration complete.")
             await old_mod.attempt_reconnect()
+            log.info("Module reconnection complete.")
             if old_mod in self._recently_removed_modules:
                 self._recently_removed_modules.remove(old_mod)
             self._dedupe_available_modules(old_mod)

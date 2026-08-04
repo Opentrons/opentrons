@@ -1,13 +1,15 @@
 """Tests for RunDataManager."""
 
+import inspect
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List
 from unittest.mock import Mock, sentinel
 
 import pytest
 from decoy import Decoy, matchers
 
 from opentrons import config
+from opentrons.config import feature_flags
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import (
     CommandErrorSlice,
@@ -40,7 +42,10 @@ from opentrons.protocol_runner import RunResult
 from opentrons_shared_data.data_files import RunFileNameMetadata
 from opentrons_shared_data.errors.exceptions import InvalidStoredData
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
+from opentrons_shared_data.robot.types import RobotTypeEnum
 
+from robot_server.access_control.settings.models import ResponseData
+from robot_server.access_control.settings.store import AccessControlSettingStore
 from robot_server.camera.provider import CameraProviderWrapper
 from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
@@ -55,6 +60,7 @@ from robot_server.runs.run_data_manager import (
     PreSerializedCommandsNotAvailableError,
     RunDataManager,
     RunNotCurrentError,
+    RunSignoffRequiredError,
 )
 from robot_server.runs.run_models import BadRun, Run, RunDataError, RunNotFoundError
 from robot_server.runs.run_orchestrator_store import (
@@ -68,7 +74,6 @@ from robot_server.runs.run_store import (
     RunStore,
 )
 from robot_server.service.notifications import RunsPublisher
-from robot_server.service.task_runner import TaskRunner
 
 
 def mock_notify_publishers() -> None:
@@ -102,10 +107,10 @@ def mock_camera_setting_store(decoy: Decoy) -> CameraSettingStore:
     return decoy.mock(cls=CameraSettingStore)
 
 
-@pytest.fixture()
-def mock_task_runner(decoy: Decoy) -> TaskRunner:
-    """Get a mock background TaskRunner."""
-    return decoy.mock(cls=TaskRunner)
+@pytest.fixture
+def mock_access_control_setting_store(decoy: Decoy) -> AccessControlSettingStore:
+    """Get a mock AccessControlSettingStore."""
+    return decoy.mock(cls=AccessControlSettingStore)
 
 
 @pytest.fixture()
@@ -227,6 +232,7 @@ def run_resource() -> RunResource:
         protocol_id=None,
         created_at=datetime(year=2022, month=2, day=2),
         actions=[],
+        signed_by="Alice Example",
     )
 
 
@@ -243,12 +249,25 @@ def run_command() -> commands.Command:
 
 
 @pytest.fixture
+def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Get a mocked feature flags."""
+    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
+        params = inspect.getfullargspec(func)
+        mock_get_ff = decoy.mock(func=func)
+        if any("robot_type" in p for p in params.args):
+            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
+        else:
+            decoy.when(mock_get_ff()).then_return(False)
+        monkeypatch.setattr(feature_flags, name, mock_get_ff)
+
+
+@pytest.fixture
 def subject(
     mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
     mock_error_recovery_setting_store: ErrorRecoverySettingStore,
     mock_camera_setting_store: CameraSettingStore,
-    mock_task_runner: TaskRunner,
+    mock_access_control_setting_store: AccessControlSettingStore,
     mock_runs_publisher: RunsPublisher,
     mock_file_provider: FileProvider,
 ) -> RunDataManager:
@@ -258,7 +277,7 @@ def subject(
         run_store=mock_run_store,
         error_recovery_setting_store=mock_error_recovery_setting_store,
         camera_setting_store=mock_camera_setting_store,
-        task_runner=mock_task_runner,
+        access_control_setting_store=mock_access_control_setting_store,
         runs_publisher=mock_runs_publisher,
         file_provider=mock_file_provider,
     )
@@ -274,8 +293,11 @@ async def test_create(
     subject: RunDataManager,
     engine_state_summary: StateSummary,
     run_resource: RunResource,
+    mock_feature_flags: None,
 ) -> None:
     """It should create an engine and a persisted run resource."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
     protocol_source = ProtocolSource.model_construct(
@@ -371,6 +393,7 @@ async def test_create(
         liquidClasses=engine_state_summary.liquidClasses,
         runTimeParameters=[bool_parameter, file_parameter],
         outputFileIds=engine_state_summary.files,
+        signedBy=run_resource.signed_by,
     )
     decoy.verify(
         mock_file_provider.set_run_metadata(
@@ -397,8 +420,11 @@ async def test_create_engine_error(
     mock_file_provider: FileProvider,
     mock_camera_provider: CameraProvider,
     subject: RunDataManager,
+    mock_feature_flags: None,
 ) -> None:
     """It should not create a resource if engine creation fails."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
 
@@ -494,6 +520,7 @@ async def test_get_current_run(
         liquidClasses=engine_state_summary.liquidClasses,
         runTimeParameters=run_time_parameters,
         outputFileIds=engine_state_summary.files,
+        signedBy=run_resource.signed_by,
     )
     assert subject.current_run_id == run_id
 
@@ -538,6 +565,7 @@ async def test_get_historical_run(
         liquidClasses=engine_state_summary.liquidClasses,
         runTimeParameters=run_time_parameters,
         outputFileIds=engine_state_summary.files,
+        signedBy=run_resource.signed_by,
     )
 
 
@@ -583,6 +611,7 @@ async def test_get_historical_run_no_data(
         liquidClasses=[],
         runTimeParameters=run_time_parameters,
         outputFileIds=[],
+        signedBy=run_resource.signed_by,
     )
 
 
@@ -647,6 +676,7 @@ async def test_get_all_runs(
         protocol_id=None,
         created_at=datetime(year=2022, month=2, day=2),
         actions=[],
+        signed_by=None,
     )
 
     historical_run_resource = RunResource(
@@ -655,6 +685,7 @@ async def test_get_all_runs(
         protocol_id=None,
         created_at=datetime(year=2023, month=3, day=3),
         actions=[],
+        signed_by=None,
     )
 
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("current-run")
@@ -726,7 +757,7 @@ async def test_delete_current_run(
     run_id = "hello world"
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
 
-    await subject.delete(run_id=run_id)
+    await subject.delete(run_id=run_id, access_control_status=False)
 
     decoy.verify(
         await mock_run_orchestrator_store.clear(),
@@ -744,13 +775,65 @@ async def test_delete_historical_run(
     run_id = "hello world"
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("some other id")
 
-    await subject.delete(run_id=run_id)
+    await subject.delete(run_id=run_id, access_control_status=False)
 
     decoy.verify(await mock_run_orchestrator_store.clear(), times=0)
     decoy.verify(mock_run_store.remove(run_id=run_id), times=1)
 
 
-async def test_update_current(
+@pytest.mark.parametrize(
+    ("signed_by", "access_control_status", "expect_signoff_required"),
+    [
+        pytest.param(None, True, True, id="signoff_required"),
+        pytest.param("Alice Example", True, False, id="already_signed"),
+        pytest.param(None, False, False, id="access_control_disabled"),
+    ],
+)
+async def test_delete_signoff_enforcement(
+    decoy: Decoy,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+    mock_run_store: RunStore,
+    mock_access_control_setting_store: AccessControlSettingStore,
+    subject: RunDataManager,
+    signed_by: str | None,
+    access_control_status: bool,
+    expect_signoff_required: bool,
+) -> None:
+    """It should enforce signoff before deleting a run when required."""
+    run_id = "test-run-id"
+    decoy.when(mock_access_control_setting_store.get_all()).then_return(
+        ResponseData(requireSignoffForProtocolLog=True)
+    )
+    decoy.when(mock_run_store.get(run_id=run_id)).then_return(
+        RunResource(
+            ok=True,
+            run_id=run_id,
+            protocol_id=None,
+            created_at=datetime(year=2022, month=2, day=2),
+            actions=[],
+            signed_by=signed_by,
+        )
+    )
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
+
+    if expect_signoff_required:
+        with pytest.raises(RunSignoffRequiredError, match=run_id):
+            await subject.delete(
+                run_id=run_id, access_control_status=access_control_status
+            )
+
+        decoy.verify(await mock_run_orchestrator_store.clear(), times=0)
+        decoy.verify(mock_run_store.remove(run_id=run_id), times=0)
+    else:
+        await subject.delete(run_id=run_id, access_control_status=access_control_status)
+
+        decoy.verify(
+            await mock_run_orchestrator_store.clear(),
+            mock_run_store.remove(run_id=run_id),
+        )
+
+
+async def test_uncurrent(
     decoy: Decoy,
     engine_state_summary: StateSummary,
     run_time_parameters: List[pe_types.RunTimeParameter],
@@ -764,7 +847,7 @@ async def test_update_current(
     mock_file_provider: FileProvider,
     subject: RunDataManager,
 ) -> None:
-    """It should persist the current run and clear the engine on current=false."""
+    """It should persist the current run and clear the engine."""
     run_id = "hello world"
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
     decoy.when(await mock_run_orchestrator_store.clear()).then_return(
@@ -787,14 +870,10 @@ async def test_update_current(
         )
     ).then_return(run_resource)
 
-    result = await subject.update(run_id=run_id, current=False)
+    result = await subject.uncurrent(run_id=run_id, access_control_status=False)
 
     decoy.verify(
         mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
-        times=1,
-    )
-    decoy.verify(
-        mock_runs_publisher.publish_runs_advise_refetch(run_id),
         times=1,
     )
     decoy.verify(
@@ -822,69 +901,11 @@ async def test_update_current(
         liquidClasses=engine_state_summary.liquidClasses,
         runTimeParameters=run_time_parameters,
         outputFileIds=engine_state_summary.files,
+        signedBy=run_resource.signed_by,
     )
 
 
-@pytest.mark.parametrize("current", [None, True])
-async def test_update_current_noop(
-    decoy: Decoy,
-    engine_state_summary: StateSummary,
-    run_time_parameters: List[pe_types.RunTimeParameter],
-    run_resource: RunResource,
-    run_command: commands.Command,
-    mock_run_orchestrator_store: RunOrchestratorStore,
-    mock_run_store: RunStore,
-    mock_runs_publisher: RunsPublisher,
-    subject: RunDataManager,
-    current: Optional[bool],
-) -> None:
-    """It should noop on current=None and current=True."""
-    run_id = "hello world"
-    decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
-    decoy.when(mock_run_orchestrator_store.get_state_summary()).then_return(
-        engine_state_summary
-    )
-    decoy.when(mock_run_orchestrator_store.get_run_time_parameters()).then_return(
-        run_time_parameters
-    )
-    decoy.when(mock_run_store.get(run_id=run_id)).then_return(run_resource)
-
-    result = await subject.update(run_id=run_id, current=current)
-
-    decoy.verify(await mock_run_orchestrator_store.clear(), times=0)
-    decoy.verify(
-        mock_run_store.update_run_state(
-            run_id=run_id,
-            summary=matchers.Anything(),
-            commands=matchers.Anything(),
-            command_annotations=matchers.Anything(),
-            run_time_parameters=matchers.Anything(),
-        ),
-        mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
-        times=0,
-    )
-
-    assert result == Run(
-        current=True,
-        id=run_resource.run_id,
-        protocolId=run_resource.protocol_id,
-        createdAt=run_resource.created_at,
-        actions=run_resource.actions,
-        status=engine_state_summary.status,
-        errors=engine_state_summary.errors,
-        hasEverEnteredErrorRecovery=engine_state_summary.hasEverEnteredErrorRecovery,
-        labware=engine_state_summary.labware,
-        labwareOffsets=engine_state_summary.labwareOffsets,
-        pipettes=engine_state_summary.pipettes,
-        modules=engine_state_summary.modules,
-        liquids=engine_state_summary.liquids,
-        liquidClasses=engine_state_summary.liquidClasses,
-        runTimeParameters=run_time_parameters,
-        outputFileIds=engine_state_summary.files,
-    )
-
-
-async def test_update_current_not_allowed(
+async def test_uncurrent_not_allowed(
     decoy: Decoy,
     engine_state_summary: StateSummary,
     run_resource: RunResource,
@@ -893,12 +914,100 @@ async def test_update_current_not_allowed(
     mock_run_store: RunStore,
     subject: RunDataManager,
 ) -> None:
-    """It should noop on current=None."""
+    """It should raise if the run is not current."""
     run_id = "hello world"
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("some other id")
 
     with pytest.raises(RunNotCurrentError):
-        await subject.update(run_id=run_id, current=False)
+        await subject.uncurrent(run_id=run_id, access_control_status=False)
+
+
+@pytest.mark.parametrize(
+    ("signed_by", "access_control_status", "expect_signoff_required"),
+    [
+        pytest.param(None, True, True, id="signoff_required"),
+        pytest.param("Alice Example", True, False, id="already_signed"),
+        pytest.param(None, False, False, id="access_control_disabled"),
+    ],
+)
+async def test_uncurrent_signoff_enforcement(
+    decoy: Decoy,
+    engine_state_summary: StateSummary,
+    run_time_parameters: List[pe_types.RunTimeParameter],
+    command_annotations: List[pe_types.CommandAnnotation],
+    command_preconditions: CommandPreconditions,
+    run_resource: RunResource,
+    run_command: commands.Command,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+    mock_run_store: RunStore,
+    mock_access_control_setting_store: AccessControlSettingStore,
+    mock_runs_publisher: RunsPublisher,
+    mock_file_provider: FileProvider,
+    subject: RunDataManager,
+    signed_by: str | None,
+    access_control_status: bool,
+    expect_signoff_required: bool,
+) -> None:
+    """It should enforce signoff before un-currenting a run when required."""
+    run_id = "test-run-id"
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
+    decoy.when(mock_access_control_setting_store.get_all()).then_return(
+        ResponseData(requireSignoffForProtocolLog=True)
+    )
+    decoy.when(mock_run_store.get(run_id=run_id)).then_return(
+        RunResource(
+            ok=True,
+            run_id=run_id,
+            protocol_id=None,
+            created_at=datetime(year=2022, month=2, day=2),
+            actions=[],
+            signed_by=signed_by,
+        )
+    )
+
+    if expect_signoff_required:
+        with pytest.raises(RunSignoffRequiredError, match=run_id):
+            await subject.uncurrent(
+                run_id=run_id, access_control_status=access_control_status
+            )
+
+        decoy.verify(await mock_run_orchestrator_store.clear(), times=0)
+    else:
+        decoy.when(await mock_run_orchestrator_store.clear()).then_return(
+            RunResult(
+                commands=[run_command],
+                state_summary=engine_state_summary,
+                parameters=run_time_parameters,
+                command_annotations=command_annotations,
+                command_preconditions=command_preconditions,
+            )
+        )
+        decoy.when(
+            mock_run_store.update_run_state(
+                run_id=run_id,
+                summary=engine_state_summary,
+                commands=[run_command],
+                command_annotations=command_annotations,
+                run_time_parameters=run_time_parameters,
+            )
+        ).then_return(run_resource)
+
+        await subject.uncurrent(
+            run_id=run_id, access_control_status=access_control_status
+        )
+
+        decoy.verify(
+            mock_runs_publisher.publish_pre_serialized_commands_notification(run_id),
+            times=1,
+        )
+        decoy.verify(
+            mock_runs_publisher.publish_runs_advise_refetch(run_id),
+            times=1,
+        )
+        decoy.verify(
+            mock_file_provider.clear_run_metadata(),
+            times=1,
+        )
 
 
 async def test_create_archives_existing(
@@ -915,8 +1024,11 @@ async def test_create_archives_existing(
     mock_file_provider: FileProvider,
     mock_camera_provider: CameraProvider,
     subject: RunDataManager,
+    mock_feature_flags: None,
 ) -> None:
     """It should persist the previously current run when a new run is created."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     run_id_old = "hello world"
     run_id_new = "hello is it me you're looking for"
 
@@ -989,6 +1101,149 @@ async def test_create_archives_existing(
             run_time_parameters=run_time_parameters,
         )
     )
+
+
+@pytest.mark.parametrize(
+    ("signed_by", "access_control_status", "expect_signoff_required"),
+    [
+        pytest.param(None, True, True, id="signoff_required"),
+        pytest.param("Alice Example", True, False, id="already_signed"),
+        pytest.param(None, False, False, id="access_control_disabled"),
+    ],
+)
+async def test_create_replacement_signoff_enforcement(
+    decoy: Decoy,
+    engine_state_summary: StateSummary,
+    run_time_parameters: List[pe_types.RunTimeParameter],
+    command_annotations: List[pe_types.CommandAnnotation],
+    command_preconditions: CommandPreconditions,
+    run_resource: RunResource,
+    run_command: commands.Command,
+    mock_run_orchestrator_store: RunOrchestratorStore,
+    mock_run_store: RunStore,
+    mock_error_recovery_setting_store: ErrorRecoverySettingStore,
+    mock_access_control_setting_store: AccessControlSettingStore,
+    mock_file_provider: FileProvider,
+    mock_camera_provider: CameraProvider,
+    subject: RunDataManager,
+    mock_feature_flags: None,
+    signed_by: str | None,
+    access_control_status: bool,
+    expect_signoff_required: bool,
+) -> None:
+    """It should enforce signoff before replacing the current run when required."""
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
+    run_id_old = "test-run-id"
+    run_id_new = "other-test-run-id"
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id_old)
+    decoy.when(mock_access_control_setting_store.get_all()).then_return(
+        ResponseData(requireSignoffForProtocolLog=True)
+    )
+    decoy.when(mock_run_store.get(run_id=run_id_old)).then_return(
+        RunResource(
+            ok=True,
+            run_id=run_id_old,
+            protocol_id=None,
+            created_at=datetime(year=2022, month=2, day=2),
+            actions=[],
+            signed_by=signed_by,
+        )
+    )
+
+    if expect_signoff_required:
+        with pytest.raises(RunSignoffRequiredError, match=run_id_old):
+            await subject.create(
+                run_id=run_id_new,
+                created_at=datetime(year=2021, month=1, day=1),
+                labware_offsets=[],
+                protocol=None,
+                deck_configuration=[],
+                camera_provider=mock_camera_provider,
+                run_time_param_values=None,
+                run_time_param_paths=None,
+                notify_publishers=mock_notify_publishers,
+                access_control_status=access_control_status,
+            )
+
+        decoy.verify(await mock_run_orchestrator_store.clear(), times=0)
+        decoy.verify(
+            mock_run_store.insert(
+                run_id=run_id_new,
+                created_at=matchers.Anything(),
+                protocol_id=matchers.Anything(),
+            ),
+            times=0,
+        )
+    else:
+        decoy.when(await mock_run_orchestrator_store.clear()).then_return(
+            RunResult(
+                commands=[run_command],
+                state_summary=engine_state_summary,
+                parameters=run_time_parameters,
+                command_annotations=command_annotations,
+                command_preconditions=command_preconditions,
+            )
+        )
+
+        expected_initial_error_recovery_rules: list[ErrorRecoveryRule] = []
+        decoy.when(mock_error_recovery_setting_store.get_is_enabled()).then_return(
+            sentinel.error_recovery_enabled
+        )
+        decoy.when(
+            error_recovery_mapping.create_error_recovery_policy_from_rules(
+                rules=expected_initial_error_recovery_rules,
+                enabled=sentinel.error_recovery_enabled,
+            )
+        ).then_return(sentinel.initial_error_recovery_policy)
+
+        decoy.when(
+            await mock_run_orchestrator_store.create(
+                run_id=run_id_new,
+                labware_offsets=[],
+                protocol=None,
+                initial_error_recovery_policy=sentinel.initial_error_recovery_policy,
+                error_recovery_rules=[],
+                error_recovery_is_enabled=sentinel.error_recovery_enabled,
+                deck_configuration=[],
+                file_provider=mock_file_provider,
+                camera_provider=mock_camera_provider,
+                run_time_param_values=None,
+                run_time_param_paths=None,
+                notify_publishers=mock_notify_publishers,
+            )
+        ).then_return(engine_state_summary)
+
+        decoy.when(
+            mock_run_store.insert(
+                run_id=run_id_new,
+                created_at=datetime(year=2021, month=1, day=1),
+                protocol_id=None,
+            )
+        ).then_return(run_resource)
+
+        await subject.create(
+            run_id=run_id_new,
+            created_at=datetime(year=2021, month=1, day=1),
+            labware_offsets=[],
+            protocol=None,
+            deck_configuration=[],
+            camera_provider=mock_camera_provider,
+            run_time_param_values=None,
+            run_time_param_paths=None,
+            notify_publishers=mock_notify_publishers,
+            access_control_status=access_control_status,
+        )
+
+        decoy.verify(
+            mock_run_store.update_run_state(
+                run_id=run_id_old,
+                summary=engine_state_summary,
+                commands=[run_command],
+                command_annotations=command_annotations,
+                run_time_parameters=run_time_parameters,
+            )
+        )
 
 
 def test_get_commands_slice_from_db(

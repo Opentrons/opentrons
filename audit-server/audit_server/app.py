@@ -5,18 +5,20 @@ from contextlib import AsyncExitStack, asynccontextmanager
 from pathlib import Path
 from typing import AsyncGenerator, Optional, override
 
+from anyio import to_thread
 from fastapi import FastAPI, Request, Response
 from opentrons_shared_data.errors.exceptions import AuditLoggingError
 
 from server_utils import systemd_utils
-from server_utils.auth.resource_server.authorization_checker import (
-    FailedClosedAuthorizationChecker,
+from server_utils.audit.fastapi import audit_logger_middleware, install_audit_client
+from server_utils.auth.resource_server.authentication_checker import (
+    FailedClosedAuthenticationChecker,
 )
 from server_utils.auth.resource_server.fastapi import (
     AuthorizationError,
-    build_authorization_checker,
+    build_authentication_checker,
     handle_authorization_error,
-    install_authorization_checker,
+    install_authentication_checker,
 )
 from server_utils.keys.fastapi import build_key_client, install_key_client
 from server_utils.keys.key_server import (
@@ -27,12 +29,16 @@ from server_utils.keys.key_server import (
     SignedMessageData,
     SignMessageData,
 )
+from server_utils.persistence.persistence_directory import (
+    cleanup_persistence_temp_directory,
+)
 from server_utils.robot.fastapi import build_robot_client, install_robot_server_client
 from server_utils.robot.robot_server import Client as RobotClientABC
 from server_utils.robot.robot_server import RobotNameandSerial
 
 from audit_server.log_export.router import router as log_export_router
 from audit_server.log_ingest.router import router as ingest_router
+from audit_server.log_self_client import LocalClient
 from audit_server.log_storage.dependency import build_log_data_manager, build_log_store
 from audit_server.persistence.database import sql_engine_ctx
 from audit_server.persistence.fastapi_dependencies import (
@@ -91,6 +97,7 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     configuration = get_configuration()
     persistence_directory_root = _get_persistence_directory_root(configuration)
     prepared_root = await prepare_root(persistence_directory_root)
+    await to_thread.run_sync(cleanup_persistence_temp_directory, prepared_root)
     set_persistence_directory(app.state, prepared_root)
 
     active_subdirectory = await prepare_active_subdirectory(prepared_root)
@@ -144,14 +151,16 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         log_data_manager = build_log_data_manager(
             app.state, log_store, settings_store, key_client
         )
-        authorization_checker = await exit_stack.enter_async_context(
-            build_authorization_checker(
+        authentication_checker = await exit_stack.enter_async_context(
+            build_authentication_checker(
                 auth_server_uds=configuration.auth_server_uds,
                 auth_server_url=configuration.auth_server_url,
-                fallback=FailedClosedAuthorizationChecker,
+                fallback=FailedClosedAuthenticationChecker,
             )
         )
-        install_authorization_checker(app.state, authorization_checker)
+        install_authentication_checker(app.state, authentication_checker)
+        local_log_client = LocalClient(log_data_manager, settings_store)
+        install_audit_client(app.state, local_log_client)
         await log_data_manager.rotate_periods()
         systemd_utils.notify_up()
         yield
@@ -175,3 +184,5 @@ app = FastAPI(
 app.include_router(ingest_router)
 app.include_router(log_export_router)
 app.include_router(settings_router)
+
+app.middleware("http")(audit_logger_middleware)

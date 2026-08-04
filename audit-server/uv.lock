@@ -3,7 +3,7 @@ revision = 3
 requires-python = ">=3.12"
 
 [options]
-exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.
+exclude-newer = "2026-07-22T15:13:43.479975Z"
 exclude-newer-span = "P1W"
 
 [manifest]
@@ -176,6 +176,7 @@ dependencies = [
     { name = "opentrons-shared-data" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
+    { name = "python-multipart" },
     { name = "server-utils" },
     { name = "sqlalchemy" },
     { name = "typing-extensions" },
@@ -207,6 +208,7 @@ robot = [
     { name = "opentrons-shared-data" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
+    { name = "python-multipart" },
     { name = "server-utils" },
     { name = "sqlalchemy" },
     { name = "typing-extensions" },
@@ -221,6 +223,7 @@ requires-dist = [
     { name = "opentrons-shared-data", editable = "../shared-data" },
     { name = "pydantic", specifier = "==2.11.7" },
     { name = "pydantic-settings", specifier = "==2.4.0" },
+    { name = "python-multipart", specifier = "==0.0.28" },
     { name = "server-utils", editable = "../server-utils" },
     { name = "sqlalchemy", specifier = "==2.0.48" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
@@ -252,6 +255,7 @@ robot = [
     { name = "opentrons-shared-data", editable = "../shared-data" },
     { name = "pydantic", specifier = "==2.11.7" },
     { name = "pydantic-settings", specifier = "==2.4.0" },
+    { name = "python-multipart", specifier = "==0.0.28" },
     { name = "server-utils", editable = "../server-utils" },
     { name = "sqlalchemy", specifier = "==2.0.48" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
@@ -1552,6 +1556,15 @@ wheels = [
 ]
 
 [[package]]
+name = "python-multipart"
+version = "0.0.28"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/82/54/a85eb421fbdd5007bc5af39d0f4ed9fa609e0fedbfdc2adcf0b34526870e/python_multipart-0.0.28.tar.gz", hash = "sha256:8550da197eac0f7ab748961fc9509b999fa2662ea25cef857f05249f6893c0f8", size = 45314, upload-time = "2026-05-10T11:05:16.596Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f3/a2/43bbc5860b5034e2af4ef99a0e04d726ff329c43e192ef3abaa8d7ecfce5/python_multipart-0.0.28-py3-none-any.whl", hash = "sha256:10faac07eb966c3f48dc415f9dee46c04cb10d58d30a35677db8027c825ed9b6", size = 29438, upload-time = "2026-05-10T11:05:15.052Z" },
+]
+
+[[package]]
 name = "pyyaml"
 version = "6.0.3"
 source = { registry = "https://pypi.org/simple" }
@@ -1692,6 +1705,7 @@ dev = [
     { name = "pytest-asyncio", specifier = ">=1,<2" },
     { name = "pytest-cov", specifier = "==4.1.0" },
     { name = "pytest-xdist", specifier = "~=2.5.0" },
+    { name = "python-multipart", specifier = "==0.0.28" },
     { name = "requests", specifier = "==2.31.0" },
     { name = "ruff", specifier = "==0.14.10" },
     { name = "setuptools", specifier = "==80.9.0" },

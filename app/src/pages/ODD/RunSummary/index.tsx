@@ -34,7 +34,9 @@ import {
   WRAP,
 } from '@opentrons/components'
 import {
+  useAccessControlEnabledQuery,
   useErrorRecoverySettings,
+  useGetRobotServerAccessControlSettingsQuery,
   useProtocolQuery,
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
@@ -76,6 +78,8 @@ import {
 } from '/app/resources/runs'
 import { onDeviceDisplayFormatTimestamp } from '/app/transformations/runs'
 
+import { SignRun } from './SignRun'
+
 import type { IconName } from '@opentrons/components'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type { PipetteWithTip } from '/app/resources/instruments'
@@ -86,13 +90,16 @@ export function RunSummary(): JSX.Element {
   >() as OnDeviceRouteParams
   const { t } = useTranslation('run_details')
   const navigate = useNavigate()
-  const { data: runRecord } = useNotifyRunQuery(runId, {
-    staleTime: Infinity,
-    onError: () => {
-      // in case the run is remotely deleted by a desktop app, navigate to the dash
-      navigate('/dashboard')
-    },
-  })
+  const { data: runRecord, isLoading: isRunRecordLoading } = useNotifyRunQuery(
+    runId,
+    {
+      staleTime: Infinity,
+      onError: () => {
+        // in case the run is remotely deleted by a desktop app, navigate to the dash
+        navigate('/dashboard')
+      },
+    }
+  )
   const isRunCurrent = useIsRunCurrent(runId)
   const runStatus = runRecord?.data.status ?? null
   const didRunSucceed = runStatus === RUN_STATUS_SUCCEEDED
@@ -187,6 +194,29 @@ export function RunSummary(): JSX.Element {
     (hasCommandErrors && !cancelledWithoutRecovery) ||
     (runRecord?.data.errors != null && runRecord?.data.errors.length > 0)
   )
+
+  const {
+    data: accessControlEnabled,
+    isLoading: isAccessControlEnabledLoading,
+  } = useAccessControlEnabledQuery()
+  const {
+    data: accessControlSettings,
+    isLoading: isAccessControlSettingsLoading,
+  } = useGetRobotServerAccessControlSettingsQuery()
+  const isSigningSettingsLoading =
+    isAccessControlEnabledLoading || isAccessControlSettingsLoading
+  const isSigningRequired =
+    (accessControlEnabled?.data.accessControlEnabled ?? false) &&
+    (accessControlSettings?.data.requireSignoffForProtocolLog ?? false)
+  const hasSignedBy =
+    runRecord?.data.signedBy != null && runRecord.data.signedBy !== ''
+  // Wait for runRecord after sign (cache cleared) so we don't re-prompt
+  // while signedBy is still missing from the refetch.
+  const shouldPromptSignRun =
+    !isRunRecordLoading &&
+    !isSigningSettingsLoading &&
+    isSigningRequired &&
+    !hasSignedBy
 
   let headerText: string | null = null
   if (runStatus === RUN_STATUS_SUCCEEDED) {
@@ -371,6 +401,10 @@ export function RunSummary(): JSX.Element {
       />
     </Flex>
   )
+
+  if (shouldPromptSignRun && !showSplash) {
+    return <SignRun runId={runId} />
+  }
 
   return (
     <Btn

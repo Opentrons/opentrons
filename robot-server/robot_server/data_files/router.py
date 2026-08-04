@@ -11,6 +11,7 @@ from starlette.background import BackgroundTask
 
 from opentrons.protocol_reader import FileHasher, FileReaderWriter
 from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -52,7 +53,7 @@ from .zip_utils import (
 )
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
 from robot_server.persistence.fastapi_dependencies import (
-    get_active_persistence_directory,
+    get_persistence_directory_root,
 )
 from robot_server.protocols.protocol_store import ProtocolStore
 from robot_server.runs.dependencies import get_run_data_manager, get_run_store
@@ -104,11 +105,9 @@ class DataFileInUse(ErrorDetails):
     datafiles_router.post,
     path="/dataFiles",
     summary="Upload a data file",
-    description=dedent(
-        """
+    description=dedent("""
         Upload data file(s) to your device.
-        """
-    ),
+        """),
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[DataFile]},
@@ -124,7 +123,10 @@ class DataFileInUse(ErrorDetails):
         },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileNotFound]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUN_DATA_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.RUN_DATA_WRITE)),
+        Depends(get_audit_logger("upload data file")),
+    ],
 )
 async def upload_data_file(
     data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
@@ -316,9 +318,11 @@ async def get_all_data_files(
                     id=data_file_info.id,
                     name=data_file_info.name,
                     createdAt=data_file_info.created_at,
-                    source=DataFileSource.GENERATED
-                    if data_file_info.generated
-                    else DataFileSource.UPLOADED,
+                    source=(
+                        DataFileSource.GENERATED
+                        if data_file_info.generated
+                        else DataFileSource.UPLOADED
+                    ),
                 )
                 for data_file_info in data_files
             ],
@@ -336,7 +340,10 @@ async def get_all_data_files(
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileIdNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[DataFileInUse]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUN_DATA_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.RUN_DATA_WRITE)),
+        Depends(get_audit_logger("delete data file")),
+    ],
 )
 async def delete_file_by_id(
     dataFileId: str,
@@ -430,8 +437,7 @@ async def get_data_files_by_run_id(
     datafiles_router.get,
     path="/dataFiles/{runId}/images",
     summary="Get a list of image-specific metadata for all camera image files associated with a given run.",
-    description=dedent(
-        """
+    description=dedent("""
         Get a list of image-specific metadata for camera image files associated with a given run.
         "\n\n"
         The camera image file metadata are returned in order from newest to oldest.
@@ -441,8 +447,7 @@ async def get_data_files_by_run_id(
         "\n\n"
         This endpoint returns camera image file metadata. Use `GET /runs/{runId}/images/{fileName}`
          to get a specific camera image file.
-        """
-    ),
+        """),
     responses={
         status.HTTP_200_OK: {"model": SimpleMultiBody[ImageFileMetadata]},
     },
@@ -511,19 +516,20 @@ async def get_run_image_metadata(
     datafiles_router.delete,
     path="/dataFiles/{runId}/images",
     summary="Delete all camera images for a run",
-    description=dedent(
-        """
+    description=dedent("""
         Delete all camera image files associated with a run from both the database
         and filesystem storage.
 
         This operation cannot be undone.
-        """
-    ),
+        """),
     responses={
         status.HTTP_200_OK: {"model": SimpleEmptyBody},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
     },
-    dependencies=[Depends(require_scopes(Scope.RUN_DATA_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.RUN_DATA_WRITE)),
+        Depends(get_audit_logger("delete images for run")),
+    ],
 )
 async def delete_run_images(
     runId: str,
@@ -556,13 +562,11 @@ async def delete_run_images(
 @datafiles_router.get(
     path="/dataFiles/{runId}/images/download",
     summary="Download all camera images for a run as a zip file",
-    description=dedent(
-        """
+    description=dedent("""
         Download all camera image files associated with a run as a single zip archive.
 
         The zip file will contain all JPEG images captured during the protocol run.
-        """
-    ),
+        """),
     responses={
         status.HTTP_200_OK: {
             "content": {"application/zip": {}},
@@ -576,7 +580,9 @@ async def download_run_images(
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
     run_store: Annotated[RunStore, Depends(get_run_store)],
     protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
-    persistence_directory: Annotated[Path, Depends(get_active_persistence_directory)],
+    persistence_directory_root: Annotated[
+        Path, Depends(get_persistence_directory_root)
+    ],
 ) -> FileResponse:
     """Download all camera images for a run as a zip file.
 
@@ -585,7 +591,7 @@ async def download_run_images(
         data_files_store: Store for data files database access.
         run_store: Store for run data management.
         protocol_store: Store for protocol storage access.
-        persistence_directory: Persistence directory used for zip staging.
+        persistence_directory_root: Persistence directory used for zip staging.
     """
     existing_files = collect_existing_run_images(runId, data_files_store)
 
@@ -601,7 +607,7 @@ async def download_run_images(
         fallback_filename=f"{runId}_images.zip",
     )
     zip_path, cleanup = await create_zip_for_download(
-        existing_files, persistence_directory
+        existing_files, persistence_directory_root
     )
 
     return FileResponse(

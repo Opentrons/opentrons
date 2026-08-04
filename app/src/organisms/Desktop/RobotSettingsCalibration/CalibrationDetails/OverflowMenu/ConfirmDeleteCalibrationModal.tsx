@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
-  AlertPrimaryButton,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -12,6 +11,7 @@ import {
   LegacyStyledText,
   ModalHeader,
   ModalShell,
+  PrimaryButton,
   SPACING,
 } from '@opentrons/components'
 
@@ -63,9 +63,9 @@ export function ConfirmDeleteCalibrationModal({
         </LegacyStyledText>
         <Flex gridGap={SPACING.spacing24} justifyContent={JUSTIFY_END}>
           <TextOnlyButton onClick={toggleModal} buttonText={t('cancel')} />
-          <AlertPrimaryButton onClick={onDelete}>
+          <PrimaryButton variant="warning" onClick={onDelete}>
             {t('delete_calibration_data')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </Flex>
       </Flex>
     </ModalShell>,

@@ -18,6 +18,9 @@ import {
   getAuditInputPatch,
   getAuthInputPatch,
   getFieldValuesFromSettings,
+  isValidLogoutIdleTime,
+  isValidPasswordComplexityMinimumLength,
+  MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
 } from './complianceReadySettingsHelper'
 import {
   isAuditServerSettingKey,
@@ -214,6 +217,15 @@ export function ComplianceReadySoftwareSettings({
               label={t('desktop_minimum_password_length')}
               value={String(fieldValues.passwordComplexityMinimumLength)}
               units={t('desktop_characters')}
+              min={1}
+              max={MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH}
+              validate={value =>
+                isValidPasswordComplexityMinimumLength(value)
+                  ? null
+                  : t('desktop_minimum_password_length_invalid', {
+                      max: MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
+                    })
+              }
               onBlur={value => {
                 handleAuthSettingInputBlur(
                   'passwordComplexityMinimumLength',
@@ -228,6 +240,11 @@ export function ComplianceReadySoftwareSettings({
             label={t('desktop_auto_logout_inactivity_length')}
             value={String(fieldValues.idleLogout)}
             units={t('desktop_minutes')}
+            validate={value =>
+              isValidLogoutIdleTime(value)
+                ? null
+                : t('desktop_idle_logout_must_be_greater_than_zero')
+            }
             onBlur={value => {
               handleAuthSettingInputBlur('idleLogout', value)
             }}

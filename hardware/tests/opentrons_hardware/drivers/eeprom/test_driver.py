@@ -9,7 +9,7 @@ from typing import Generator
 import mock
 import pytest
 
-from opentrons_hardware.drivers import OT3GPIO
+from opentrons_hardware.drivers import RemoteOT3GPIO
 from opentrons_hardware.drivers.eeprom import (
     EEPROMDriver,
     PropId,
@@ -26,7 +26,7 @@ def eeprom_api() -> Generator[EEPROMDriver, None, None]:
         with open(eeprom_path, "wb"), open(eeprom_name_path, "w") as fh:
             # write we can get the name and size of the eeprom
             fh.write("24c128")
-        gpio = mock.Mock(spec=OT3GPIO)
+        gpio = mock.Mock(spec=RemoteOT3GPIO)
         yield EEPROMDriver(gpio, eeprom_path=eeprom_path)
 
 

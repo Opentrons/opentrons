@@ -1,23 +1,20 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useQueryClient } from 'react-query'
-import axios from 'axios'
+import { useDispatch } from 'react-redux'
 
 import { BasicButton, Divider, StyledText } from '@opentrons/components'
-import {
-  getSelfQueryKey,
-  isDocumentedMutationError,
-  useHost,
-  useSelfQuery,
-  useUpdateSelfMutation,
-} from '@opentrons/react-api-client'
+import { useUpdateSelfMutation } from '@opentrons/react-api-client'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { useUsernameForRobot } from '/app/redux/robot-auth'
+import {
+  updateLoggedInUserProfile,
+  useLoggedInUserForRobot,
+} from '/app/redux/robot-auth'
 
 import styles from './personalaccountsettings.module.css'
 import { PersonalAccountSettingsEditForm } from './PersonalAccountSettingsEditForm'
 
+import type { TFunction } from 'i18next'
 import type { JSX, ReactNode } from 'react'
 import type { UpdateSelfRequest } from '@opentrons/api-client'
 
@@ -44,75 +41,43 @@ function FieldRow({ label, children }: FieldRowProps): JSX.Element {
 export function PersonalAccountSettings({
   robotName,
 }: PersonalAccountSettingsProps): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'shared'])
-  const queryClient = useQueryClient()
-  const host = useHost()
+  const { t } = useTranslation(['device_settings', 'shared']) as {
+    t: TFunction
+  }
+  const dispatch = useDispatch()
   const documentationState = useDocumentationState(undefined, robotName)
-  const loggedInUsername = useUsernameForRobot(robotName)
-  const selfQuery = useSelfQuery({ enabled: loggedInUsername != null })
+  const loggedInUser = useLoggedInUserForRobot(robotName)
   const { updateSelf, isLoading: isSaving } =
     useUpdateSelfMutation(documentationState)
-  const username = selfQuery.data?.data.username ?? loggedInUsername ?? ''
-  const fullName = selfQuery.data?.data.fullName ?? ''
 
   const [isEditing, setIsEditing] = useState(false)
-  const [usernameError, setUsernameError] = useState<string | null>(null)
-  const [saveError, setSaveError] = useState<string | null>(null)
 
-  const clearSaveErrors = (): void => {
-    setUsernameError(null)
-    setSaveError(null)
+  const handleSave = (request: UpdateSelfRequest): Promise<void> => {
+    return updateSelf(request).then(updatedSelf => {
+      dispatch(
+        updateLoggedInUserProfile({
+          robotName,
+          username: updatedSelf.data.username,
+          fullName: updatedSelf.data.fullName,
+        })
+      )
+      setIsEditing(false)
+    })
   }
 
-  const handleSave = (request: UpdateSelfRequest): void => {
-    void updateSelf(request)
-      .then(updatedSelf => {
-        queryClient.setQueryData(getSelfQueryKey(host), updatedSelf)
-        clearSaveErrors()
-        setIsEditing(false)
-      })
-      .catch((error: unknown) => {
-        // User cancelled the documentation/login modal — stay on the edit form.
-        if (isDocumentedMutationError(error)) {
-          return
-        }
-
-        const errorId = axios.isAxiosError(error)
-          ? error.response?.data?.errors?.[0]?.id
-          : null
-
-        if (errorId === 'userAlreadyExists') {
-          setUsernameError(
-            t(
-              'desktop_personal_account_settings_username_exists_error'
-            ) as string
-          )
-          setSaveError(null)
-        } else {
-          setUsernameError(null)
-          setSaveError(
-            t('desktop_personal_account_settings_save_error') as string
-          )
-        }
-      })
+  const handleCancelEdit = (): void => {
+    setIsEditing(false)
   }
-
+  // TODO: refresh fields when user is logged out
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <StyledText desktopStyle="bodyLargeSemiBold">
-          {t('desktop_personal_account_settings')}
+          {t('desktop_personal_account_settings') as string}
         </StyledText>
-        {loggedInUsername != null &&
+        {loggedInUser != null &&
           (isEditing ? (
-            <BasicButton
-              type="button"
-              underLine
-              onClick={() => {
-                clearSaveErrors()
-                setIsEditing(false)
-              }}
-            >
+            <BasicButton type="button" underLine onClick={handleCancelEdit}>
               {t('shared:cancel')}
             </BasicButton>
           ) : (
@@ -120,7 +85,6 @@ export function PersonalAccountSettings({
               type="button"
               underLine
               onClick={() => {
-                clearSaveErrors()
                 setIsEditing(true)
               }}
             >
@@ -129,18 +93,13 @@ export function PersonalAccountSettings({
           ))}
       </div>
       <div className={styles.content}>
-        {isEditing ? (
+        {isEditing && loggedInUser != null ? (
           <PersonalAccountSettingsEditForm
-            username={username}
-            fullName={fullName}
+            username={loggedInUser.username}
+            fullName={loggedInUser.fullName}
             isSaving={isSaving}
-            usernameError={usernameError}
-            saveError={saveError}
             onSave={handleSave}
-            onCancel={() => {
-              clearSaveErrors()
-              setIsEditing(false)
-            }}
+            onCancel={handleCancelEdit}
           />
         ) : (
           <>
@@ -149,7 +108,7 @@ export function PersonalAccountSettings({
                 desktopStyle="bodyDefaultRegular"
                 className={styles.field_value_text}
               >
-                {username}
+                {loggedInUser?.username}
               </StyledText>
             </FieldRow>
             <Divider />
@@ -158,7 +117,7 @@ export function PersonalAccountSettings({
                 desktopStyle="bodyDefaultRegular"
                 className={styles.field_value_text}
               >
-                {fullName}
+                {loggedInUser?.fullName}
               </StyledText>
             </FieldRow>
             <Divider />
@@ -167,7 +126,7 @@ export function PersonalAccountSettings({
                 desktopStyle="bodyDefaultRegular"
                 className={styles.field_value_text}
               >
-                {t('desktop_password_placeholder')}
+                {t('desktop_password_placeholder') as string}
               </StyledText>
             </FieldRow>
           </>

@@ -251,6 +251,16 @@ settings = [
         robot_type=[RobotTypeEnum.FLEX],
         internal_only=True,
     ),
+    SettingDefinition(
+        _id="internal96chAttach",
+        title="Modified 96-channel pipette attachment",
+        description=(
+            "Lower the right mount to attach mount without detaching z axis during"
+            " 96-channel pipette attach, reducing the Z margin from 20 mm to 1.85 mm."
+            "This can and will ruin the right z axis, do not use."
+        ),
+        robot_type=[RobotTypeEnum.FLEX],
+    ),
 ]
 
 
@@ -814,6 +824,27 @@ def _migrate41to42(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate42to43(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 43 of the feature flags file.
+
+    -  Ensure the subprocess flags default to True ensuring the hardware always runs with Pyro.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enableProtocolSubprocess"] = True
+    newmap["enableHardwareSubprocess"] = True
+    return newmap
+
+
+def _migrate43to44(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 44 of the feature flags file.
+
+    - Adds the internal96chAttach config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["internal96chAttach"] = False
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -857,6 +888,8 @@ _MIGRATIONS = [
     _migrate39to40,
     _migrate40to41,
     _migrate41to42,
+    _migrate42to43,
+    _migrate43to44,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

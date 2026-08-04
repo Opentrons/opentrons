@@ -20,12 +20,12 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '/app/redux/discovery/__fixtures__'
-import { getNetworkInterfaces } from '/app/redux/networking'
 import {
   storedProtocolData as storedProtocolDataFixture,
   storedProtocolDataWithCsvRunTimeParameter,
 } from '/app/redux/protocol-storage/__fixtures__'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 import { useCloseCurrentRun, useCurrentRunId } from '/app/resources/runs'
 import { useNotifyDataReady } from '/app/resources/useNotifyDataReady'
 
@@ -33,7 +33,6 @@ import { ChooseRobotToRunProtocolSlideout } from '../'
 import { useCreateRunFromProtocol } from '../useCreateRunFromProtocol'
 
 import type { ComponentProps } from 'react'
-import type { State } from '/app/redux/types'
 
 vi.mock('/app/organisms/Desktop/Devices/hooks')
 vi.mock('/app/organisms/ProtocolUpload/hooks')
@@ -41,7 +40,7 @@ vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
-vi.mock('/app/redux/networking')
+vi.mock('/app/resources/networking/hooks')
 vi.mock('../useCreateRunFromProtocol')
 vi.mock(
   '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
@@ -95,6 +94,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       .calledWith(
         expect.any(Object),
         { hostname: expect.any(String) },
+        expect.any(Array),
         expect.any(Array)
       )
       .thenReturn({
@@ -102,7 +102,12 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         reset: mockResetCreateRun,
       } as any)
     when(vi.mocked(useCreateRunFromProtocol))
-      .calledWith(expect.any(Object), null, expect.any(Array))
+      .calledWith(
+        expect.any(Object),
+        null,
+        expect.any(Array),
+        expect.any(Array)
+      )
       .thenReturn({
         createRunFromProtocolSource: mockCreateRunFromProtocolSource,
         reset: mockResetCreateRun,
@@ -132,9 +137,10 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         expect.any(String)
       )
       .thenReturn([])
-    when(vi.mocked(getNetworkInterfaces))
-      .calledWith({} as State, expect.any(String))
-      .thenReturn({ wifi: null, ethernet: null })
+    vi.mocked(useNetworkInterfaces).mockReturnValue({
+      wifi: null,
+      ethernet: null,
+    })
     vi.mocked(useNotifyDataReady).mockReturnValue({} as any)
   })
   afterEach(() => {

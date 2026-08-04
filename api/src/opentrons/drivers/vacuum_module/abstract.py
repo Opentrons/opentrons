@@ -42,6 +42,10 @@ class AbstractVacuumModuleDriver(Protocol):
         """Reset the input and output serial buffers."""
         ...
 
+    async def move_port(self, new_port: str) -> None:
+        """Try to change the port of the underlying connection."""
+        ...
+
     async def set_led(
         self,
         power: float,

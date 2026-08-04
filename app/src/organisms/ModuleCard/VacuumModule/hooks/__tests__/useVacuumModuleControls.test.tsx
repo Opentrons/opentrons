@@ -8,7 +8,7 @@ import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import { useVacuumModuleControls } from '../useVacuumModuleControls'
 
-import type { AttachedModule } from '/app/redux/modules/types'
+import type { AttachedModule } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/analytics')

@@ -39,11 +39,12 @@ export function IndividualKey({
       onChange={onChange}
       layoutName="default"
       display={customDisplayForIndividual}
-      useButtonTag={false}
+      useButtonTag={false} // Exclude from the tab order.
       buttonAttributes={softwareKeyboardButtonAttributes}
       {...numericalKeyboard}
       width="100%"
       debug={debug} // If true, <ENTER> will input a \n
+      preventMouseDownDefault // Don't steal focus from inputs.
     />
   )
 }

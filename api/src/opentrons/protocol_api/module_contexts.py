@@ -1858,8 +1858,16 @@ class VacuumModuleContext(ModuleContext):
     """An object representing a connected Vacuum Module.
 
     It should not be instantiated directly; instead, it should be
-    created through :py:meth:`.ProtocolContext.load_module`.
+    created through [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module].
 
+    Vacuum operations that start the pump return a
+    [`Task`][opentrons.protocol_api.Task] and run concurrently. Pass those tasks to
+    [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
+    when the protocol must wait for vacuum control to finish.
+
+    Moving labware to or from the Vacuum Module is blocked while the pump is engaged
+    or while the chamber is still under vacuum (gauge pressure outside atmospheric
+    tolerance). Open the vent and wait for pressure to equalize before moving labware.
     """
 
     _core: VacuumModuleCore
@@ -1873,18 +1881,33 @@ class VacuumModuleContext(ModuleContext):
     @property
     @requires_version(2, 30)
     def max_gauge_pressure_mbar(self) -> int:
-        """Get the max allowed gauge pressure in mbar."""
+        """Strongest allowed vacuum setpoint as gauge pressure in mbar.
+
+        This is the most negative permitted value (currently -800 mbar).
+        Gauge pressure of 0 mbar is atmospheric; more negative values are deeper vacuum.
+        """
         return self._core.get_max_gauge_pressure_mbar()
 
     @property
     @requires_version(2, 30)
     def min_gauge_pressure_mbar(self) -> int:
-        """Get the min allowed gauge pressure in mbar."""
+        """Weakest allowed vacuum setpoint as gauge pressure in mbar.
+
+        This is the least negative permitted value (currently 0 mbar, atmospheric).
+        """
         return self._core.get_min_gauge_pressure_mbar()
 
     @property
     @requires_version(2, 30)
     def manifold_dock(self) -> ModuleFixtureLocation:
+        """Deck location for the Vacuum Module manifold dock / staging area.
+
+        Use this with
+        [`load_adapter_to_dock()`][opentrons.protocol_api.VacuumModuleContext.load_adapter_to_dock]
+        or
+        [`move_to_dock()`][opentrons.protocol_api.VacuumModuleContext.move_to_dock]
+        to place adapters or labware on the dock next to the module.
+        """
         base_slot = self._core.get_deck_slot().id
         area_name = f"{self.model}Dock{base_slot[0]}4"
         return ModuleFixtureLocation(addressable_area_name=area_name)
@@ -1896,7 +1919,25 @@ class VacuumModuleContext(ModuleContext):
         namespace: Optional[str] = None,
         version: Optional[int] = None,
     ) -> Labware:
-        """Load a collar adapter to the vacuum module dock."""
+        """Load a collar or other adapter onto the Vacuum Module dock.
+
+        The parameters of this function behave like those of
+        [`ProtocolContext.load_adapter()`][opentrons.protocol_api.ProtocolContext.load_adapter],
+        except the adapter is loaded onto
+        [`manifold_dock`][opentrons.protocol_api.VacuumModuleContext.manifold_dock]
+        instead of a deck slot. Note that the parameter `name` here corresponds to
+        `load_name` on the `ProtocolContext` function.
+
+        Args:
+            name: The load name of the adapter labware definition.
+            namespace: The namespace of the labware definition. If omitted, the default
+                Opentrons namespace is used.
+            version: The version of the labware definition. If omitted, the latest
+                compatible version is used.
+
+        Returns:
+            The initialized and loaded adapter object.
+        """
 
         labware_core = self._protocol_core.load_adapter(
             load_name=name,
@@ -1929,6 +1970,22 @@ class VacuumModuleContext(ModuleContext):
         pick_up_offset: Optional[Mapping[str, float]] = None,
         drop_offset: Optional[Mapping[str, float]] = None,
     ) -> None:
+        """Move labware onto the Vacuum Module dock.
+
+        This is a convenience wrapper around
+        [`ProtocolContext.move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware]
+        with the destination set to
+        [`manifold_dock`][opentrons.protocol_api.VacuumModuleContext.manifold_dock].
+
+        Args:
+            labware: The labware to move.
+            use_gripper: Whether to use the Flex Gripper. If ``False``, the protocol
+                pauses for a manual move.
+            pick_up_offset: Optional offset applied when picking up the labware.
+                Keys are axis names (``"x"``, ``"y"``, ``"z"``) in mm.
+            drop_offset: Optional offset applied when dropping the labware.
+                Keys are axis names (``"x"``, ``"y"``, ``"z"``) in mm.
+        """
         _pick_up_offset = (
             validation.ensure_valid_labware_offset_vector(pick_up_offset)
             if pick_up_offset
@@ -1957,13 +2014,47 @@ class VacuumModuleContext(ModuleContext):
         ramp_rate: Optional[float] = None,
         timeout_s: Optional[int] = None,
         vent_after: Optional[bool] = None,
+        equalize_timeout_s: Optional[int] = None,
     ) -> Task:
+        """Start closed-loop vacuum control to a gauge pressure and return immediately.
+
+        Starts the Vacuum Module pump under pressure control and returns a
+        [`Task`][opentrons.protocol_api.Task] representing concurrent execution.
+        The protocol continues while the module ramps to and holds the target.
+
+        Pass the task to
+        [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
+        to wait for the vacuum operation to finish.
+
+        Args:
+            gauge_pressure_mbar: Target gauge pressure in mbar. Must be between
+                [`max_gauge_pressure_mbar`][opentrons.protocol_api.VacuumModuleContext.max_gauge_pressure_mbar]
+                and
+                [`min_gauge_pressure_mbar`][opentrons.protocol_api.VacuumModuleContext.min_gauge_pressure_mbar]
+                (inclusive). ``0`` is atmospheric; more negative is stronger vacuum.
+            duration_s: Seconds to hold the target pressure after it is reached.
+                If omitted, the module holds the target until stopped.
+            ramp_rate: Optional rate of pressure change in mbar/s while approaching
+                the target.
+            timeout_s: Optional maximum seconds allowed to reach the target before
+                a timeout error is raised.
+            vent_after: Whether to open the vent after the hold duration completes.
+                Only applies when ``duration_s`` is set.
+            equalize_timeout_s: Optional seconds to wait for chamber pressure to
+                return near atmospheric after venting. Only applies when
+                ``duration_s`` is set and ``vent_after`` is ``True``. If omitted,
+                the command does not wait for equalization.
+
+        Returns:
+            A task representing the concurrent vacuum operation.
+        """
         task = self._core.start_set_vacuum_pressure(
             gauge_pressure_mbar=gauge_pressure_mbar,
             duration=duration_s,
             ramp_rate=ramp_rate,
             timeout_s=timeout_s,
             vent_after=vent_after,
+            equalize_timeout_s=equalize_timeout_s,
         )
 
         return Task(api_version=self._api_version, core=task)
@@ -1977,13 +2068,44 @@ class VacuumModuleContext(ModuleContext):
         ramp_rate: Optional[float] = None,
         timeout_s: Optional[int] = None,
         vent_after: Optional[bool] = None,
+        equalize_timeout_s: Optional[int] = None,
     ) -> Task:
+        """Start open-loop vacuum pump power control and return immediately.
+
+        Sets the pump duty cycle as a percentage and returns a
+        [`Task`][opentrons.protocol_api.Task] representing concurrent execution.
+        Use this when you want fixed pump power instead of closed-loop pressure
+        control via
+        [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure].
+
+        Pass the task to
+        [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
+        to wait for the operation to finish.
+
+        Args:
+            percent_power: Pump duty cycle as a percentage from 1 to 100.
+            duration_s: Seconds to hold the target power after it is reached.
+                If omitted, the module holds the target until stopped.
+            ramp_rate: Optional rate of power change while approaching the target.
+            timeout_s: Optional maximum seconds allowed to reach the target power
+                before a timeout error is raised.
+            vent_after: Whether to open the vent after the hold duration completes.
+                Only applies when ``duration_s`` is set.
+            equalize_timeout_s: Optional seconds to wait for chamber pressure to
+                return near atmospheric after venting. Only applies when
+                ``duration_s`` is set and ``vent_after`` is ``True``. If omitted,
+                the command does not wait for equalization.
+
+        Returns:
+            A task representing the concurrent vacuum operation.
+        """
         task = self._core.start_set_vacuum_power(
             percent_power=percent_power,
             duration=duration_s,
             ramp_rate=ramp_rate,
             timeout_s=timeout_s,
             vent_after=vent_after,
+            equalize_timeout_s=equalize_timeout_s,
         )
 
         return Task(api_version=self._api_version, core=task)
@@ -1991,6 +2113,12 @@ class VacuumModuleContext(ModuleContext):
     @requires_version(2, 30)
     @publish(command=cmds.vacuum_module_stop_vacuum)
     def stop_vacuum_pump(self) -> None:
+        """Stop the vacuum pump and pressure/power control.
+
+        Disables active vacuum control. Open the vent separately with
+        [`open_vent()`][opentrons.protocol_api.VacuumModuleContext.open_vent]
+        if the chamber should equalize to atmosphere.
+        """
         self._core.stop_vacuum()
 
     @requires_version(2, 30)
@@ -2000,25 +2128,44 @@ class VacuumModuleContext(ModuleContext):
         steps: List[VacuumModuleStep],
         repetitions: int = 1,
         vent_after: bool = False,
+        equalize_timeout_s: Optional[int] = None,
     ) -> Task:
-        """
-        Starts a defined Vacuum Module profile and returns a [`Task`][opentrons.protocol_api.Task] representing its concurrent execution.
-        Profile is defined as a cycle of `steps`, for a given number of `repetitions`.
+        """Start a Vacuum Module profile and return immediately.
 
-        Pass the task object to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
+        Runs a cycle of ``steps`` for the given number of ``repetitions`` and
+        returns a [`Task`][opentrons.protocol_api.Task] representing concurrent
+        execution. Pass the task to
+        [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
         to wait for the profile to complete.
 
+        Each step is a dictionary with a required ``enable_pump`` key and either
+        a pressure or power setpoint:
+
+        - **Pressure step:** ``gauge_pressure_mbar`` (int, mbar gauge)
+        - **Power step:** ``percent_power`` (int, 0–100)
+
+        A step must not set both ``gauge_pressure_mbar`` and ``percent_power``.
+
+        Optional step keys:
+
+        - ``hold_time_seconds`` / ``hold_time_minutes``: hold time after the
+          target is reached (combined if both are set)
+        - ``ramp_rate``: ramp rate toward the target (mbar/s for pressure steps)
+        - ``timeout_seconds``: max seconds to reach the target before erroring
+        - ``vent_after``: whether to open the vent after that step completes
+
         Args:
-            steps: List of steps that make up a single cycle.
-            repetitions: How many times to perform the entire profile.
-                The dictionary's keys must be
-            enable_pump: whether to enable the pump motor
-                Optional arguments are:
-            hold_time_seconds: time in seconds to hold pressure/power for after target is reached
-            hold_time_minutes: time in minutes to hold pressure/power for after target is reached
-            ramp_rate: rate to increase the motor power at (get unit for this)
-            timeout_seconds: the time to wait for target pressure/power before throwing an error
-            vent_after: wheter to open the vent after the step is complete
+            steps: Ordered list of step dictionaries that make up one cycle.
+            repetitions: How many times to run the full list of steps. Defaults
+                to ``1``.
+            vent_after: Whether to open the vent after the entire profile
+                finishes. Defaults to ``False``.
+            equalize_timeout_s: Optional seconds to wait for chamber pressure to
+                return near atmospheric after the profile if ``vent_after`` is
+                ``True``. If omitted, the command does not wait for equalization.
+
+        Returns:
+            A task representing the concurrent profile run.
         """
         repetitions = validation.ensure_profile_repetition_count(repetitions)
         validated_steps = validation.ensure_vacuum_module_profile(
@@ -2027,18 +2174,29 @@ class VacuumModuleContext(ModuleContext):
             min_pressure=self.min_gauge_pressure_mbar,
         )
         task = self._core.start_execute_profile(
-            steps=validated_steps, repetitions=repetitions, vent_after=vent_after
+            steps=validated_steps,
+            repetitions=repetitions,
+            vent_after=vent_after,
+            equalize_timeout_s=equalize_timeout_s,
         )
         return Task(api_version=self._api_version, core=task)
 
     @requires_version(2, 30)
     @publish(command=cmds.vacuum_module_open_vent)
-    def open_vent(self) -> None:
-        """Opens the vent."""
-        self._core.open_vent()
+    def open_vent(self, equalize_timeout_s: Optional[int] = None) -> None:
+        """Open the vent to atmosphere.
+
+        Args:
+            equalize_timeout_s: Optional seconds to wait for chamber gauge
+                pressure to return near atmospheric after the vent opens. If
+                omitted, the command opens the vent and returns without waiting
+                for equalization. Waiting is recommended before moving labware
+                to or from the module.
+        """
+        self._core.open_vent(equalize_timeout_s=equalize_timeout_s)
 
     @requires_version(2, 30)
     @publish(command=cmds.vacuum_module_close_vent)
     def close_vent(self) -> None:
-        """Closes the vent."""
+        """Close the vent so the chamber can hold vacuum."""
         self._core.close_vent()

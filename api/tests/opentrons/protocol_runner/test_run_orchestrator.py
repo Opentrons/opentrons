@@ -570,6 +570,7 @@ async def test_transform_module_model_in_ame(
         await mock_protocol_engine.async_module_error(
             module_model=EngineModuleModel.TEMPERATURE_MODULE_V2,
             serial="whatever",
+            error=None,
         )
     ).then_return(True)
     assert (

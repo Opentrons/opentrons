@@ -1,6 +1,7 @@
 export * from './DeviceReset'
 export * from './DisplayRobotName'
 export * from './DisableStackerSensors'
+export * from './EnableComplianceReadySoftware'
 export * from './EnableStatusLight'
 export * from './EnterRobotEncryptionKey'
 export * from './FactoryMode'

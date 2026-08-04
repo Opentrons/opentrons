@@ -5,6 +5,13 @@ import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+import {
+  mockHeaterShaker,
+  mockMagneticModuleGen2,
+  mockTemperatureModuleGen2,
+  mockThermocycler,
+  mockThermocyclerGen2,
+} from '@opentrons/api-client'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { heater_shaker_commands_with_results_key } from '@opentrons/shared-data'
 
@@ -12,13 +19,6 @@ import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import { useIsRobotBusy } from '/app/redux-resources/robots'
-import {
-  mockHeaterShaker,
-  mockMagneticModuleGen2,
-  mockTemperatureModuleGen2,
-  mockThermocycler,
-  mockThermocyclerGen2,
-} from '/app/redux/modules/__fixtures__'
 import {
   useCurrentRunId,
   useMostRecentCompletedAnalysis,

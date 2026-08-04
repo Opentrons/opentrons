@@ -1,6 +1,6 @@
 import sum from 'lodash/sum'
 
-import { useNotifyImageFileQuery } from '/app/resources/dataFiles/useNotifyImageFileQuery'
+import { useRunDataFileMetadata } from '@opentrons/react-api-client'
 
 import type { RunData } from '@opentrons/api-client'
 
@@ -13,9 +13,9 @@ export function useRunFileCount(run: RunData): number {
   const { id: runId } = run
 
   // variable
-  const numOutputFiles = 'outputFileIds' in run ? run.outputFileIds.length : 0
-  const { data: imageData } = useNotifyImageFileQuery(runId)
-  const numImageFiles = imageData?.data.length ?? 0
+  const { data: runDataFilesData } = useRunDataFileMetadata(runId)
+  const numOutputDataFiles = (runDataFilesData?.data ?? []).length
+
   const numRtpFiles =
     'runTimeParameters' in run
       ? run.runTimeParameters.filter(rtp => rtp.type === 'csv_file').length
@@ -25,8 +25,7 @@ export function useRunFileCount(run: RunData): number {
     NUM_PROTOCOL_FILES_PER_RUN,
     NUM_LABWARE_OFFSETS_FILES_PER_RUN,
     NUM_RUN_LOG_FILES_PER_RUN,
-    numOutputFiles,
-    numImageFiles,
+    numOutputDataFiles,
     numRtpFiles,
   ])
 }

@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
@@ -9,6 +8,7 @@ import {
   LegacyStyledText,
   Link,
   Modal,
+  PrimaryButton,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -44,9 +44,9 @@ export function ConfirmDeleteProtocolModal(
           >
             {t('shared:cancel')}
           </Link>
-          <AlertPrimaryButton onClick={props.handleClickDelete}>
+          <PrimaryButton variant="warning" onClick={props.handleClickDelete}>
             {t('yes_delete_this_protocol')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </Flex>
       </Flex>
     </Modal>
