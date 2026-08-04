@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom/vitest'
 
-import { cleanup, fireEvent, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   useDeleteUserMutation,
@@ -112,10 +112,6 @@ function expandAccordion(): void {
 }
 
 describe('UserManagement', () => {
-  afterEach(() => {
-    cleanup()
-  })
-
   beforeEach(() => {
     vi.mocked(useToaster).mockReturnValue({
       makeToast: vi.fn(),

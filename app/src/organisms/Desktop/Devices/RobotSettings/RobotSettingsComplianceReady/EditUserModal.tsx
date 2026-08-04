@@ -7,7 +7,6 @@ import {
   ModalShell,
   PrimaryButton,
   SecondaryButton,
-  StyledText,
   WizardHeader,
 } from '@opentrons/components'
 import { useUpdateUserMutation } from '@opentrons/react-api-client'

@@ -32,24 +32,11 @@ export function UserManagementTableRow({
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
 
-  const closeMenu = (): void => {
-    setShowOverflowMenu(false)
-  }
-
   const handleMenuAction =
     (action: (selectedUser: AuthUser) => void): MouseEventHandler =>
-    event => {
-      event.preventDefault()
-      event.stopPropagation()
+    () => {
       action(user)
-      closeMenu()
     }
-
-  const handlePlaceholderAction: MouseEventHandler = event => {
-    event.preventDefault()
-    event.stopPropagation()
-    closeMenu()
-  }
 
   return (
     <tr>
@@ -108,12 +95,12 @@ export function UserManagementTableRow({
                   },
                   {
                     label: t('desktop_activate_user'),
-                    onClick: handlePlaceholderAction,
+                    onClick: () => {},
                     disabled: true,
                   },
                   {
                     label: t('desktop_reset_password'),
-                    onClick: handlePlaceholderAction,
+                    onClick: () => {},
                     disabled: true,
                   },
                 ]}
