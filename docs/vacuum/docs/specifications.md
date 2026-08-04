@@ -122,7 +122,7 @@ Box 3 includes the waste collection carboy and cap, a carboy holder (to help pre
 
 <figure markdown>
 ![Glass 2 liter carboy and cap](images/carboy.png "2 liter glass carboy and cap"){ width="70%" }
-<figcaption>(1) Waste carboy and cap</figcaption>
+<figcaption>(1) Waste carboy and cap, 2 L<br></figcaption>
 </figure>
 
 <figure markdown>
@@ -136,12 +136,12 @@ Box 3 includes the waste collection carboy and cap, a carboy holder (to help pre
 
 <figure markdown>
 ![6 mm vacuum hose](images/hose-6mm.svg "6 mm vacuum hose")
-<figcaption>(1) 6 mm diameter hose</figcaption>
+<figcaption>(1) 6 mm diameter hose,<br>2 m</figcaption>
 </figure>
 
 <figure markdown>
 ![9 mm vacuum hose](images/hose-9mm.svg)
-<figcaption>(1) 9 mm diameter hose</figcaption>
+<figcaption>(1) 9 mm diameter hose,<br>2 m</figcaption>
 </figure>
 
 </div>
