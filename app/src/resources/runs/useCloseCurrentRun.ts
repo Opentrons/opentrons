@@ -7,6 +7,7 @@ import { useCurrentRunId } from '/app/resources/runs'
 
 import { useIsSigningRequired } from './useIsSigningRequired'
 
+import type { RunData } from '@opentrons/api-client'
 import type { DocumentationState } from '@opentrons/react-api-client'
 import type { UseDismissCurrentRunMutationOptions } from '@opentrons/react-api-client/src/runs/useDismissCurrentRunMutation'
 
@@ -21,7 +22,9 @@ export function useCloseCurrentRun(documentationState: DocumentationState): {
   const { dismissCurrentRun, isLoading: isDismissing } =
     useDismissCurrentRunMutation(documentationState)
 
-  const { showSignRunModal } = useContext(DocumentationRequiredModalContext)
+  const { showSignRunModal, showDownloadLogsModal } = useContext(
+    DocumentationRequiredModalContext
+  )
 
   const { isSigningRequired, isLoading: isSigningRequiredLoading } =
     useIsSigningRequired()
@@ -53,8 +56,19 @@ export function useCloseCurrentRun(documentationState: DocumentationState): {
       const callerOptions = closeOptions.current ?? {}
       dismissCurrentRun(currentRunId, {
         ...callerOptions,
+        onSuccess: async (response: RunData) => {
+          if (!response.logPeriodId) {
+            console.warn('no log period id found')
+            return
+          }
+          await showDownloadLogsModal(response.logPeriodId).then(downloaded => {
+            if (!downloaded) {
+              console.warn('failed to download logs')
+            }
+          })
+        },
         onError: (error, ...args) => {
-          console.warn('failed to dismiss current')
+          console.warn('failed to dismiss current run')
           callerOptions.onError?.(error, ...args)
         },
         onSettled: (...args) => {
@@ -63,7 +77,12 @@ export function useCloseCurrentRun(documentationState: DocumentationState): {
         },
       })
     }
-  }, [currentRunId, dismissCurrentRun, resetClosePending])
+  }, [
+    currentRunId,
+    dismissCurrentRun,
+    resetClosePending,
+    showDownloadLogsModal,
+  ])
 
   useEffect(() => {
     if (isSigningRequiredLoading || !isClosePending) {
