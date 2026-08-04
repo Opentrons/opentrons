@@ -1,12 +1,16 @@
 import '@testing-library/jest-dom/vitest'
 
-import { fireEvent, screen, cleanup } from '@testing-library/react'
+import { cleanup, fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useUsersQuery } from '@opentrons/react-api-client'
+import {
+  useDeleteUserMutation,
+  useUsersQuery,
+} from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
 
 import { UserManagement } from '../UserManagement'
@@ -35,7 +39,20 @@ vi.mock('../EditUserModal', () => ({
     </div>
   ),
 }))
+vi.mock('../DeleteUserConfirmModal', () => ({
+  DeleteUserConfirmModal: ({ onCancel }: { onCancel: () => void }) => (
+    <div>
+      <span>mock DeleteUserConfirmModal</span>
+      <button type="button" onClick={onCancel}>
+        Close mock delete modal
+      </button>
+    </div>
+  ),
+}))
 vi.mock('/app/organisms/ToasterOven')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const ROBOT_NAME = 'flex-1'
 
@@ -105,6 +122,10 @@ describe('UserManagement', () => {
       eatToast: vi.fn(),
       makeSnackbar: vi.fn(),
     })
+    vi.mocked(useDeleteUserMutation).mockReturnValue({
+      deleteUser: vi.fn().mockResolvedValue(undefined),
+      isLoading: false,
+    } as ReturnType<typeof useDeleteUserMutation>)
     vi.mocked(useUsersQuery).mockImplementation(
       options =>
         ({
@@ -164,5 +185,15 @@ describe('UserManagement', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: 'Edit user' }))
     screen.getByText('mock EditUserModal')
+  })
+
+  it('opens the delete user modal when Delete user is selected from the overflow menu', () => {
+    render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Delete user' }))
+    screen.getByText('mock DeleteUserConfirmModal')
   })
 })

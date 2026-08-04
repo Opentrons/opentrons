@@ -1,6 +1,6 @@
 import { useQueryClient } from 'react-query'
 
-import { updateUser } from '@opentrons/api-client'
+import { deleteUser } from '@opentrons/api-client'
 
 import { useDocumentedMutation } from '../../accessControl'
 import { useHost } from '../../api'
@@ -12,37 +12,29 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type { AuthUserResponse, UpdateUserParams } from '@opentrons/api-client'
+import type { EmptyResponse } from '@opentrons/api-client'
 import type { DocumentationState } from '../../accessControl'
 
-export type UseUpdateUserMutationResult = UseMutationResult<
-  AuthUserResponse,
+export type UseDeleteUserMutationResult = UseMutationResult<
+  EmptyResponse,
   AxiosError,
-  UpdateUserParams
+  string
 > & {
-  updateUser: UseMutateAsyncFunction<
-    AuthUserResponse,
-    AxiosError,
-    UpdateUserParams
-  >
+  deleteUser: UseMutateAsyncFunction<EmptyResponse, AxiosError, string>
 }
 
-export function useUpdateUserMutation(
+export function useDeleteUserMutation(
   documentationState: DocumentationState,
-  options: UseMutationOptions<
-    AuthUserResponse,
-    AxiosError,
-    UpdateUserParams
-  > = {}
-): UseUpdateUserMutationResult {
+  options: UseMutationOptions<EmptyResponse, AxiosError, string> = {}
+): UseDeleteUserMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
   const mutation = useDocumentedMutation(
     documentationState,
-    ['update_user'],
-    ({ variables: params, userNotes }) =>
-      updateUser(host!, params, userNotes).then(response => {
+    ['delete_user'],
+    ({ variables: username, userNotes }) =>
+      deleteUser(host!, username, userNotes).then(response => {
         void queryClient.invalidateQueries(getUsersQueryKey(host))
         return response.data
       }),
@@ -51,6 +43,6 @@ export function useUpdateUserMutation(
 
   return {
     ...mutation,
-    updateUser: mutation.mutateAsync,
+    deleteUser: mutation.mutateAsync,
   }
 }

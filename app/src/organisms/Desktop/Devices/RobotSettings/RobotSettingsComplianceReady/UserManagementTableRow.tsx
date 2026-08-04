@@ -1,9 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
   OverflowBtn,
-  POSITION_RELATIVE,
   StyledText,
   useMenuHandleClickOutside,
 } from '@opentrons/components'
@@ -12,18 +10,19 @@ import { MenuOverlay } from '/app/molecules/InstrumentCard/MenuOverlay'
 
 import styles from './usermanagement.module.css'
 
-import type { MouseEventHandler } from 'react'
-import type { JSX } from 'react'
+import type { JSX, MouseEventHandler } from 'react'
 import type { AuthUser } from '@opentrons/api-client'
 
 export interface UserManagementTableRowProps {
   user: AuthUser
   onEdit: (user: AuthUser) => void
+  onDelete: (user: AuthUser) => void
 }
 
 export function UserManagementTableRow({
   user,
   onEdit,
+  onDelete,
 }: UserManagementTableRowProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const {
@@ -89,40 +88,41 @@ export function UserManagementTableRow({
         </StyledText>
       </td>
       <td className={styles.overflow_cell}>
-        <OverflowBtn
-          onClick={handleOverflowClick}
-          aria-label={`UserManagement_overflowMenu_${user.username}`}
-        />
-        {showOverflowMenu ? (
-          <Flex position={POSITION_RELATIVE}>
-            <MenuOverlay
-              hasDivider={false}
-              menuOverlayItems={[
-                {
-                  label: t('desktop_edit_user'),
-                  onClick: handleMenuAction(onEdit),
-                },
-                {
-                  label: t('desktop_delete_user'),
-                  onClick: handlePlaceholderAction,
-                  disabled: true,
-                },
-                {
-                  label: t('desktop_activate_user'),
-                  onClick: handlePlaceholderAction,
-                  disabled: true,
-                },
-                {
-                  label: t('desktop_reset_password'),
-                  onClick: handlePlaceholderAction,
-                  disabled: true,
-                },
-              ]}
-              setShowMenuOverlay={setShowOverflowMenu}
-            />
-            {menuOverlay}
-          </Flex>
-        ) : null}
+        <div className={styles.overflow_cell_inner}>
+          <OverflowBtn
+            onClick={handleOverflowClick}
+            aria-label={`UserManagement_overflowMenu_${user.username}`}
+          />
+          {showOverflowMenu ? (
+            <div className={styles.overflow_menu_container}>
+              <MenuOverlay
+                hasDivider={false}
+                menuOverlayItems={[
+                  {
+                    label: t('desktop_edit_user'),
+                    onClick: handleMenuAction(onEdit),
+                  },
+                  {
+                    label: t('desktop_delete_user'),
+                    onClick: handleMenuAction(onDelete),
+                  },
+                  {
+                    label: t('desktop_activate_user'),
+                    onClick: handlePlaceholderAction,
+                    disabled: true,
+                  },
+                  {
+                    label: t('desktop_reset_password'),
+                    onClick: handlePlaceholderAction,
+                    disabled: true,
+                  },
+                ]}
+                setShowMenuOverlay={setShowOverflowMenu}
+              />
+              {menuOverlay}
+            </div>
+          ) : null}
+        </div>
       </td>
     </tr>
   )

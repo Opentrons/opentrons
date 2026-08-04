@@ -21,10 +21,27 @@
 }
 
 .overflow_cell {
-  position: relative;
   padding: var(--spacing-12) 0;
   border-top: 1px solid var(--grey-30);
   vertical-align: top;
+}
+
+.overflow_cell_inner {
+  position: relative;
+  width: fit-content;
+  margin-left: auto;
+}
+
+.overflow_menu_container {
+  position: absolute;
+  top: 0;
+  right: var(--spacing-2);
+  z-index: 1;
+}
+
+.overflow_menu_container > * {
+  top: 0;
+  right: 0;
 }
 
 .add_user_button {

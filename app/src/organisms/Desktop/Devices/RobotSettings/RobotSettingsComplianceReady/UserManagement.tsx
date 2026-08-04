@@ -6,13 +6,18 @@ import {
   StyledText,
   SUCCESS_TOAST,
 } from '@opentrons/components'
-import { useUsersQuery } from '@opentrons/react-api-client'
+import {
+  useDeleteUserMutation,
+  useUsersQuery,
+} from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useUsernameForRobot } from '/app/redux/robot-auth'
 
 import { Accordion } from './Accordion'
 import { AddUserModal } from './AddUserModal'
+import { DeleteUserConfirmModal } from './DeleteUserConfirmModal'
 import { EditUserModal } from './EditUserModal'
 import styles from './usermanagement.module.css'
 import { UserManagementTableRow } from './UserManagementTableRow'
@@ -27,11 +32,13 @@ export interface UserManagementProps {
 interface UserManagementTableProps {
   users: AuthUser[]
   onEdit: (user: AuthUser) => void
+  onDelete: (user: AuthUser) => void
 }
 
 function UserManagementTable({
   users,
   onEdit,
+  onDelete,
 }: UserManagementTableProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -68,6 +75,7 @@ function UserManagementTable({
             key={user.username}
             user={user}
             onEdit={onEdit}
+            onDelete={onDelete}
           />
         ))}
       </tbody>
@@ -82,13 +90,39 @@ export function UserManagement({
   const username = useUsernameForRobot(robotName)
   const usersQuery = useUsersQuery({ enabled: username != null })
   const users = usersQuery?.data?.data ?? []
+  const documentationState = useDocumentationState(undefined, robotName)
+  const { deleteUser } = useDeleteUserMutation(documentationState)
   const [showAddUserModal, setShowAddUserModal] = useState(false)
   const [userToEdit, setUserToEdit] = useState<AuthUser | null>(null)
+  const [userToDelete, setUserToDelete] = useState<AuthUser | null>(null)
   const { makeToast } = useToaster()
+
+  const handleDeleteConfirm = (): void => {
+    if (userToDelete == null) {
+      return
+    }
+
+    void deleteUser(userToDelete.username)
+      .then(() => {
+        makeToast(
+          t('desktop_delete_user_success_banner') as string,
+          SUCCESS_TOAST,
+          { closeButton: true }
+        )
+        setUserToDelete(null)
+      })
+      .catch(() => {
+        setUserToDelete(null)
+      })
+  }
 
   return (
     <Accordion id="user-management" title={t('desktop_user_management')}>
-      <UserManagementTable users={users} onEdit={setUserToEdit} />
+      <UserManagementTable
+        users={users}
+        onEdit={setUserToEdit}
+        onDelete={setUserToDelete}
+      />
       <div className={styles.add_user_button}>
         <EmptySelectorButton
           iconName="plus"
@@ -127,6 +161,14 @@ export function UserManagement({
           }}
           onClose={() => {
             setUserToEdit(null)
+          }}
+        />
+      ) : null}
+      {userToDelete != null ? (
+        <DeleteUserConfirmModal
+          onConfirm={handleDeleteConfirm}
+          onCancel={() => {
+            setUserToDelete(null)
           }}
         />
       ) : null}
