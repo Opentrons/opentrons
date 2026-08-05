@@ -4,6 +4,8 @@ import { Icon, MenuItem, MenuList, StyledText } from '@opentrons/components'
 
 import styles from './confirmlogperiodmodal.module.css'
 
+import type { ReactNode } from 'react'
+
 interface ConfirmLogPeriodModalProps {
   onDownload: () => void
   onDelete: () => void
@@ -14,7 +16,7 @@ export function ConfirmLogPeriodModal({
   onDownload,
   onDelete,
   onClose,
-}: ConfirmLogPeriodModalProps): JSX.Element {
+}: ConfirmLogPeriodModalProps): ReactNode {
   const { t } = useTranslation('device_details')
 
   return (

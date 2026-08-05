@@ -11,6 +11,7 @@ import { useDownloadSelectedLogPeriods } from '/app/resources/devices/hooks/useD
 import { DownloadDeleteRecordFlow } from './shared/DownloadDeleteRecordFlow'
 import { getDeletableLogPeriods } from './shared/getDeletableLogPeriods'
 
+import type { ComponentProps, ReactNode } from 'react'
 import type { DownloadedLogPeriod } from '/app/resources/devices/hooks/useDownloadSelectedLogPeriods'
 
 interface DeleteLogPeriodsWizardProps {
@@ -19,7 +20,7 @@ interface DeleteLogPeriodsWizardProps {
 
 export function DeleteLogPeriodsWizard({
   onClose,
-}: DeleteLogPeriodsWizardProps): JSX.Element {
+}: DeleteLogPeriodsWizardProps): ReactNode {
   const { t } = useTranslation('device_details')
   const robotName = useSelector(getLocalRobot)?.name ?? ''
   const { data: logPeriodData } = useLogPeriodSummariesQuery()
@@ -30,18 +31,20 @@ export function DeleteLogPeriodsWizard({
   const { deleteSelectedLogPeriods } =
     useDeleteSelectedLogPeriods(documentationState)
 
+  const copyProps: ComponentProps<typeof DownloadDeleteRecordFlow>['copy'] = {
+    title: t('delete_all_log_periods_title'),
+    usbQuestion: t('which_usb_for_log_periods'),
+    downloadingText: t('downloading_all_log_periods'),
+    deletingText: t('deleting_all_log_periods'),
+    successMessage: t('all_log_periods_deleted'),
+    downloadFailedText: t('log_periods_download_failed'),
+    deleteFailedText: t('log_periods_delete_failed'),
+    deletionKeyMissingText: t('log_period_deletion_key_missing'),
+  }
+
   return (
     <DownloadDeleteRecordFlow<readonly DownloadedLogPeriod[]>
-      copy={{
-        title: t('delete_all_log_periods_title'),
-        usbQuestion: t('which_usb_for_log_periods'),
-        downloadingText: t('downloading_all_log_periods'),
-        deletingText: t('deleting_all_log_periods'),
-        successMessage: t('all_log_periods_deleted'),
-        downloadFailedText: t('log_periods_download_failed'),
-        deleteFailedText: t('log_periods_delete_failed'),
-        deletionKeyMissingText: t('log_period_deletion_key_missing'),
-      }}
+      copy={copyProps}
       showChoiceScreen={false}
       initialDeleteAfterDownload
       onDownload={path =>

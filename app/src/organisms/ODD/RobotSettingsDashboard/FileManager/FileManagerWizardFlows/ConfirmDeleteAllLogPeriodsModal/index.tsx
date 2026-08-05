@@ -7,6 +7,8 @@ import { OddModal } from '/app/molecules/OddModal'
 
 import styles from './confirmdeletealllogperiodsmodal.module.css'
 
+import type { ReactNode } from 'react'
+
 interface ConfirmDeleteAllLogPeriodsModalProps {
   onDownloadAll: () => void
   onConfirmDelete: () => void
@@ -17,7 +19,7 @@ export function ConfirmDeleteAllLogPeriodsModal({
   onDownloadAll,
   onConfirmDelete,
   onClose,
-}: ConfirmDeleteAllLogPeriodsModalProps): JSX.Element {
+}: ConfirmDeleteAllLogPeriodsModalProps): ReactNode {
   const { t } = useTranslation('device_details')
 
   return (

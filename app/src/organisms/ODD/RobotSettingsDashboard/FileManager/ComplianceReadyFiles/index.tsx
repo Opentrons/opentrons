@@ -5,7 +5,6 @@ import {
   ALIGN_FLEX_END,
   ListItem,
   OverflowBtn,
-  SPACING,
   StyledText,
   Tag,
 } from '@opentrons/components'
@@ -82,7 +81,6 @@ export function ComplianceReadyFiles(): ReactNode {
           <ListItem
             key={logPeriodSummary.id}
             type="default"
-            padding={SPACING.spacing24}
             className={styles.record_container}
           >
             <div className={styles.record_content}>

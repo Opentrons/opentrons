@@ -11,6 +11,7 @@ import { useDownloadSelectedLogPeriods } from '/app/resources/devices/hooks/useD
 import { DownloadDeleteRecordFlow } from './shared/DownloadDeleteRecordFlow'
 import { getDeletableLogPeriods } from './shared/getDeletableLogPeriods'
 
+import type { ComponentProps, ReactNode } from 'react'
 import type { DownloadedLogPeriod } from '/app/resources/devices/hooks/useDownloadSelectedLogPeriods'
 
 interface DownloadLogPeriodsWizardProps {
@@ -19,7 +20,7 @@ interface DownloadLogPeriodsWizardProps {
 
 export function DownloadLogPeriodsWizard({
   onClose,
-}: DownloadLogPeriodsWizardProps): JSX.Element {
+}: DownloadLogPeriodsWizardProps): ReactNode {
   const { t } = useTranslation('device_details')
   const robotName = useSelector(getLocalRobot)?.name ?? ''
   const { data: logPeriodData } = useLogPeriodSummariesQuery()
@@ -30,19 +31,21 @@ export function DownloadLogPeriodsWizard({
   const { deleteSelectedLogPeriods } =
     useDeleteSelectedLogPeriods(documentationState)
 
+  const copyProps: ComponentProps<typeof DownloadDeleteRecordFlow>['copy'] = {
+    title: t('download_all_log_periods'),
+    usbQuestion: t('which_usb_for_log_periods'),
+    choiceQuestion: t('delete_log_periods_after_download'),
+    downloadingText: t('downloading_all_log_periods'),
+    deletingText: t('deleting_all_log_periods'),
+    successMessage: t('all_log_periods_downloaded'),
+    downloadFailedText: t('log_periods_download_failed'),
+    deleteFailedText: t('log_periods_delete_failed'),
+    deletionKeyMissingText: t('log_period_deletion_key_missing'),
+  }
+
   return (
     <DownloadDeleteRecordFlow<readonly DownloadedLogPeriod[]>
-      copy={{
-        title: t('download_all_log_periods'),
-        usbQuestion: t('which_usb_for_log_periods'),
-        choiceQuestion: t('delete_log_periods_after_download'),
-        downloadingText: t('downloading_all_log_periods'),
-        deletingText: t('deleting_all_log_periods'),
-        successMessage: t('all_log_periods_downloaded'),
-        downloadFailedText: t('log_periods_download_failed'),
-        deleteFailedText: t('log_periods_delete_failed'),
-        deletionKeyMissingText: t('log_period_deletion_key_missing'),
-      }}
+      copy={copyProps}
       showChoiceScreen
       initialDeleteAfterDownload
       onDownload={path =>
