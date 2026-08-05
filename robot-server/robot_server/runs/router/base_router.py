@@ -32,7 +32,12 @@ from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_engine.types import CSVRuntimeParamPaths, DeckSlotLocation
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.robot.types import RobotTypeEnum
-from server_utils.audit.audit_server import Client as AuditClient
+from server_utils.audit.audit_server import (
+    Client as AuditClient,
+)
+from server_utils.audit.audit_server import (
+    NoCurrentLogPeriodError,
+)
 from server_utils.audit.fastapi import get_audit_client, get_audit_logger
 from server_utils.auth.resource_server.authorization_checker import (
     check as check_authorization,
@@ -180,6 +185,14 @@ class RunSignoffRequired(ErrorDetails):
     errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
 
 
+class NoCurrentAuditLogFound(ErrorDetails):
+    """An error if audit logging is enabled but no current log period could be found."""
+
+    id: Literal["NoCurrentAuditLogFound"] = "NoCurrentAuditLogFound"
+    title: str = "No Current Audit Log Found"
+    errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
+
+
 class AllRunsLinks(BaseModel):
     """Links returned along with a collection of runs."""
 
@@ -232,7 +245,9 @@ async def get_run_data_from_url(
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorBody[FileIdNotFound]},
         status.HTTP_409_CONFLICT: {
-            "model": ErrorBody[Union[RunAlreadyActive, RunSignoffRequired]]
+            "model": ErrorBody[
+                Union[RunAlreadyActive, RunSignoffRequired, NoCurrentAuditLogFound]
+            ]
         },
     },
     dependencies=[
@@ -306,7 +321,16 @@ async def create_run(  # noqa: C901
 
     deck_configuration = await deck_configuration_store.get_deck_configuration()
 
-    log_period = await audit_client.get_current_log_period()
+    logging_enabled = await audit_client.get_logging_enabled()
+    if logging_enabled.loggingEnabled:
+        try:
+            log_period = await audit_client.get_current_log_period()
+        except NoCurrentLogPeriodError as e:
+            raise NoCurrentAuditLogFound(detail=str(e)).as_error(
+                status.HTTP_409_CONFLICT
+            )
+    else:
+        log_period = None
 
     # TODO (tz, 5-16-22): same error raised twice.
     #  Check if we can consolidate to one place.

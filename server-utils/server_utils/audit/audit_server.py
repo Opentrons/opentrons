@@ -67,7 +67,7 @@ class Client(ABC):
         """Enable or disable logging."""
 
     @abstractmethod
-    async def get_current_log_period(self) -> GetLogPeriodsData | None:
+    async def get_current_log_period(self) -> GetLogPeriodsData:
         """Get the current log period, if any."""
         pass
 
@@ -189,7 +189,7 @@ class LocalHTTPClient(Client):
         return parsed_response.data
 
     @typing.override
-    async def get_current_log_period(self) -> GetLogPeriodsData | None:
+    async def get_current_log_period(self) -> GetLogPeriodsData:
         async with self._session.get(GET_LOG_PERIODS) as response:
             response_bytes = await response.read()
         response.raise_for_status()
@@ -197,7 +197,7 @@ class LocalHTTPClient(Client):
         for log_period in parsed_response.data:
             if log_period.endedAt is None:
                 return log_period
-        return None
+        raise NoCurrentLogPeriodError("Could not find a current log period.")
 
 
 class NoOpClient(Client):
@@ -250,11 +250,15 @@ class NoOpClient(Client):
         return PatchLoggingEnabledResponseData(loggingEnabled=False)
 
     @typing.override
-    async def get_current_log_period(self) -> GetLogPeriodsData | None:
+    async def get_current_log_period(self) -> GetLogPeriodsData:
         _log.info(
-            "Get current log period (audit-server not configured): Returning None"
+            "Get current log period (audit-server not configured): Returning log period 0"
         )
-        return None
+        return GetLogPeriodsData(
+            id=0,
+            startedAt=datetime.now(timezone.utc),
+            endedAt=None,
+        )
 
 
 class _StrictBaseModel(pydantic.BaseModel):
@@ -351,6 +355,10 @@ class PatchLoggingEnabledResponseBody(_StrictBaseModel):
     """Response envelope for logging-enabled."""
 
     data: PatchLoggingEnabledResponseData
+
+
+class NoCurrentLogPeriodError(BaseException):
+    """Error to be raised if no current log period can be found."""
 
 
 class GetLogPeriodsData(_StrictBaseModel):

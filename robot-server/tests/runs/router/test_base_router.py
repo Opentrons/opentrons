@@ -196,6 +196,9 @@ async def test_create_run(
         await mock_deck_configuration_store.get_deck_configuration()
     ).then_return([])
 
+    decoy.when(await mock_audit_client.get_logging_enabled()).then_return(
+        GetLoggingEnabledData(loggingEnabled=True)
+    )
     decoy.when(await mock_audit_client.get_current_log_period()).then_return(
         GetLogPeriodsData(
             id=123,
@@ -313,6 +316,9 @@ async def test_create_protocol_run(
     decoy.when(mock_protocol_store.get(protocol_id=protocol_id)).then_return(
         protocol_resource
     )
+    decoy.when(await mock_audit_client.get_logging_enabled()).then_return(
+        GetLoggingEnabledData(loggingEnabled=True)
+    )
     decoy.when(await mock_audit_client.get_current_log_period()).then_return(
         GetLogPeriodsData(
             id=123,
@@ -383,6 +389,9 @@ async def test_create_protocol_run_bad_protocol_id(
     decoy.when(
         await mock_deck_configuration_store.get_deck_configuration()
     ).then_return([])
+    decoy.when(await mock_audit_client.get_logging_enabled()).then_return(
+        GetLoggingEnabledData(loggingEnabled=False)
+    )
     decoy.when(mock_protocol_store.get(protocol_id="protocol-id")).then_raise(error)
 
     with pytest.raises(ApiError) as exc_info:
@@ -425,6 +434,9 @@ async def test_create_run_conflict(
     decoy.when(
         await mock_deck_configuration_store.get_deck_configuration()
     ).then_return([])
+    decoy.when(await mock_audit_client.get_logging_enabled()).then_return(
+        GetLoggingEnabledData(loggingEnabled=False)
+    )
     decoy.when(
         await mock_run_data_manager.create(
             run_id="run-id",

@@ -87,7 +87,7 @@ def test_install_and_get_audit_client_via_dependency() -> None:
         ) -> PatchLoggingEnabledResponseData:
             raise NotImplementedError()
 
-        async def get_current_log_period(self) -> GetLogPeriodsData | None:
+        async def get_current_log_period(self) -> GetLogPeriodsData:
             raise NotImplementedError
 
     stub_client = StubClient()

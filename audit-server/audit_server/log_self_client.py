@@ -88,13 +88,5 @@ class LocalClient(SUClient):
         raise NotImplementedError("Do not use the self client for this")
 
     @override
-    async def get_current_log_period(self) -> SULogPeriodsData | None:
-        log_periods = self._log_data_manager.get_log_periods()
-        for log_period in log_periods:
-            if log_period.endedAt is None:
-                return SULogPeriodsData(
-                    id=log_period.id,
-                    startedAt=log_period.startedAt,
-                    endedAt=log_period.endedAt,
-                )
-        return None
+    async def get_current_log_period(self) -> SULogPeriodsData:
+        raise NotImplementedError("Do not use the self client for this")
