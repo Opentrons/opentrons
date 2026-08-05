@@ -24,9 +24,7 @@ from typing import (
     cast,
 )
 
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    GetMotorUsageResponse,
-)
+from opentrons_hardware.firmware_bindings.constants import MotorUsageValueType
 from opentrons_shared_data.errors.exceptions import (
     EnumeratedError,
     FirmwareUpdateFailedError,
@@ -3440,5 +3438,13 @@ class OT3API(
     async def get_motor_usage_data(
         self,
         expected_nodes: Optional[List[Axis]] = None,
-    ) -> Dict[Axis, GetMotorUsageResponse]:
-        return await self._backend.get_motor_usage_data(expected_nodes)
+    ) -> Dict[Axis, Dict[str, int]]:
+        parsed_responses: Dict[Axis, Dict[str, int]] = {}
+        motor_usage_payload = await self._backend.get_motor_usage_data(expected_nodes)
+        for ax in motor_usage_payload.keys():
+            usage_elements = motor_usage_payload[ax].payload.usage_elements
+            parsed_responses[ax] = {
+                MotorUsageValueType(el.key).name: el.usage_value
+                for el in usage_elements
+            }
+        return parsed_responses

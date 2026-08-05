@@ -478,10 +478,9 @@ class CanNetworkInfo:
         responses: Dict[NodeId, GetMotorUsageResponse] = dict()
 
         def listener(message: MessageDefinition, arbitration_id: ArbitrationId) -> None:
-            breakpoint()
             if not isinstance(message, GetMotorUsageResponse):
                 return
-            responses[arbitration_id.originating_node] = message
+            responses[arbitration_id.parts.originating_node_id] = message
             if expected_nodes and expected_nodes.issubset(set(responses.keys())):
                 event.set()
 
@@ -489,7 +488,6 @@ class CanNetworkInfo:
         await can_messenger.send(
             node_id=NodeId.broadcast, message=GetMotorUsageRequest()
         )
-        breakpoint()
         try:
             await asyncio.wait_for(event.wait(), timeout)
         except asyncio.TimeoutError:
