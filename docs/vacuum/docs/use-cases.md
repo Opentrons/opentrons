@@ -21,7 +21,7 @@ Typical spacer and well plate combinations include the following. Always check a
 From top to bottom, a filtrate collection stack uses the pieces shown below.
 
 <figure markdown>
-  ![Waste collection stack showing labeled parts](images/stack-filter-to-plate.svg){ width="60%" }
+  ![Waste collection stack showing labeled parts](images/stack-filter-to-plate.svg){ width="70%" }
   <figcaption>Elution and filtrate collection stack</figcaption>
 </figure>
 
@@ -29,7 +29,10 @@ From top to bottom, a filtrate collection stack uses the pieces shown below.
 
 This stack omits spacers altogether to seat a sample filter plate directly on top of a collection well plate. Both plates rest on the vacuum base and are capped by a short or tall collar, which creates a vacuum seal among the stacked components. Stacking well plates without spacers also helps minimize the potential for sample loss or aerosol contamination.
 
-<font color="red">IMAGE PLACEHOLDER</font>
+<figure markdown>
+  ![Waste collection stack with well plates only, no spacers](images/stack-plate-to-plate.svg){ width="80%" }
+  <figcaption>Elution and filtrate collection stack, without spacers</figcaption>
+</figure>
 
 ### Direct to waste
 

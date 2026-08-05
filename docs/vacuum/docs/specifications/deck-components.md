@@ -10,7 +10,7 @@ Module deck components consist of a vacuum base, interchangeable collars, intern
 The vacuum base sits directly on its own deck plate. The vacuum base serves as the foundation of the module's hardware stack, supporting all internal spacers, collars, and protocol labware.
 
 <figure markdown>
-  ![Vacuum base](images/vacuum-module-base.svg){ width="90%" }
+  ![Vacuum base](../images/vacuum-module-base.svg){ width="90%" }
   <figcaption>Vacuum base with quick-connect manifold</figcaption>
 </figure>
 
@@ -28,8 +28,8 @@ The Vacuum Module includes two collars to match different labware profiles:
 Both collars accommodate standard ANSI/SLAS compliant filter plates across a span of different membrane pore sizes, ranging from very fine (0.22 μm) to coarse (100.0 μm).
 
 <figure class="side-by-side" markdown>
-![Illustration of short collar, 42 mm](images/collar-short.svg)
-![Illustration of tall collar, 72 mm](images/collar-tall.svg)
+![Illustration of short collar, 42 mm](../images/collar-short.svg)
+![Illustration of tall collar, 72 mm](../images/collar-tall.svg)
 <figcaption>Short collar (42 mm) and tall collar (72 mm)</figcaption>
 </figure>
 
@@ -43,8 +43,8 @@ The Vacuum Module includes two support grids with perforations that match differ
 - **Narrow grid:** Features small apertures to support 384-well filter plates.
 
 <figure class="side-by-side" markdown>
-![Wide support grid](images/support-grid-96-wells.svg)
-![Narrow support grid](images/support-grid-384-wells.svg)
+![Wide support grid](../images/support-grid-96-wells.svg)
+![Narrow support grid](../images/support-grid-384-wells.svg)
 <figcaption>Wide and narrow support grids</figcaption>
 </figure>
 
@@ -58,7 +58,7 @@ The Vacuum Module includes two spacers to match different labware profiles:
 * **Tall Spacer:** 34 mm
 
 <figure class="side-by-side" markdown>
-![Illustration of short spacer, 27 mm](images/spacer-short.svg)
-![Illustration of tall spacer, 34 mm](images/spacer-tall.svg)
+![Illustration of short spacer, 27 mm](../images/spacer-short.svg)
+![Illustration of tall spacer, 34 mm](../images/spacer-tall.svg)
 <figcaption>Short and tall spacers</figcaption>
 </figure>
