@@ -7,6 +7,8 @@ import { OddModal } from '/app/molecules/OddModal'
 
 import styles from './confirmdeleteallrunrecordsmodal.module.css'
 
+import type { ReactNode } from 'react'
+
 interface ConfirmDeleteAllRunRecordsModalProps {
   onDownloadAll: () => void
   onConfirmDelete: () => void
@@ -17,7 +19,7 @@ export function ConfirmDeleteAllRunRecordsModal({
   onDownloadAll,
   onConfirmDelete,
   onClose,
-}: ConfirmDeleteAllRunRecordsModalProps): JSX.Element {
+}: ConfirmDeleteAllRunRecordsModalProps): ReactNode {
   const { t } = useTranslation('device_details')
 
   return (

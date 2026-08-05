@@ -4,6 +4,8 @@ import { Icon, MenuItem, MenuList, StyledText } from '@opentrons/components'
 
 import styles from './confirmrunrecordmodal.module.css'
 
+import type { ReactNode } from 'react'
+
 interface ConfirmRunRecordModalProps {
   onDownload: () => void
   onDelete: () => void
@@ -14,7 +16,7 @@ export function ConfirmRunRecordModal({
   onDownload,
   onDelete,
   onClose,
-}: ConfirmRunRecordModalProps): JSX.Element {
+}: ConfirmRunRecordModalProps): ReactNode {
   const { t } = useTranslation('device_details')
 
   return (

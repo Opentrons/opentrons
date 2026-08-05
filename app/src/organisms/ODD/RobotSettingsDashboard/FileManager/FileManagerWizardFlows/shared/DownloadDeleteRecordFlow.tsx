@@ -58,7 +58,7 @@ export function DownloadDeleteRecordFlow<TDownloadResult>({
   onDownload,
   onDelete,
   onClose,
-}: DownloadDeleteRecordFlowProps<TDownloadResult>): JSX.Element {
+}: DownloadDeleteRecordFlowProps<TDownloadResult>): ReactNode {
   const { t } = useTranslation('device_details')
 
   const [step, setStep] = useState<StepType>(STEP_TYPES.USB)
@@ -91,6 +91,18 @@ export function DownloadDeleteRecordFlow<TDownloadResult>({
     { value: false, label: t('no') },
   ]
 
+  const {
+    choiceQuestion,
+    deleteFailedText,
+    deletingText,
+    deletionKeyMissingText,
+    downloadFailedText,
+    downloadingText,
+    successMessage,
+    title,
+    usbQuestion,
+  } = copy
+
   const downloadAndOptionallyDelete = (
     path: string,
     shouldDelete: boolean
@@ -106,21 +118,19 @@ export function DownloadDeleteRecordFlow<TDownloadResult>({
         onDelete(result)
           .then(outcome => {
             if (outcome === 'deletion_key_missing') {
-              setErrorSubText(
-                copy.deletionKeyMissingText ?? copy.deleteFailedText
-              )
+              setErrorSubText(deletionKeyMissingText ?? deleteFailedText)
               setStep(STEP_TYPES.ERROR)
               return
             }
             setStep(STEP_TYPES.SUCCESS)
           })
           .catch(() => {
-            setErrorSubText(copy.deleteFailedText)
+            setErrorSubText(deleteFailedText)
             setStep(STEP_TYPES.ERROR)
           })
       })
       .catch(() => {
-        setErrorSubText(copy.downloadFailedText)
+        setErrorSubText(downloadFailedText)
         setStep(STEP_TYPES.ERROR)
       })
   }
@@ -146,26 +156,24 @@ export function DownloadDeleteRecordFlow<TDownloadResult>({
   const screens: Record<StepType, ReactNode | null> = {
     [STEP_TYPES.USB]: (
       <UsbSelectionScreen
-        question={copy.usbQuestion}
+        question={usbQuestion}
         onContinue={handleContinueFromUsb}
       />
     ),
     [STEP_TYPES.CONFIRM_DELETE]:
-      copy.choiceQuestion != null ? (
+      choiceQuestion != null ? (
         <SimpleChoiceScreen
-          question={copy.choiceQuestion}
+          question={choiceQuestion}
           choices={deleteChoices}
           selected={deleteAfterDownload}
           onSelect={setDeleteAfterDownload}
           onContinue={handleContinueFromConfirmDelete}
         />
       ) : null,
-    [STEP_TYPES.DOWNLOADING]: (
-      <SpinnerScreen statusText={copy.downloadingText} />
-    ),
-    [STEP_TYPES.DELETING]: <SpinnerScreen statusText={copy.deletingText} />,
+    [STEP_TYPES.DOWNLOADING]: <SpinnerScreen statusText={downloadingText} />,
+    [STEP_TYPES.DELETING]: <SpinnerScreen statusText={deletingText} />,
     [STEP_TYPES.SUCCESS]: (
-      <SuccessScreen message={copy.successMessage} onFinish={onClose} />
+      <SuccessScreen message={successMessage} onFinish={onClose} />
     ),
     [STEP_TYPES.ERROR]: <ErrorScreen subText={errorSubText} onExit={onClose} />,
   }
@@ -174,7 +182,7 @@ export function DownloadDeleteRecordFlow<TDownloadResult>({
     <div className={styles.overlay} aria-modal="true" role="dialog">
       <div className={styles.modal}>
         <WizardHeader
-          title={copy.title}
+          title={title}
           onExit={onClose}
           totalSteps={totalSteps}
           currentStep={currentStep}
