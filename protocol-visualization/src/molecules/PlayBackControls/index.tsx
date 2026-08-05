@@ -89,7 +89,10 @@ export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
         return
       }
 
-      if (isEditableKeyboardTarget(event.target)) {
+      if (
+        isEditableKeyboardTarget(event.target) ||
+        isEditableKeyboardTarget(document.activeElement)
+      ) {
         return
       }
 
