@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   useDeleteUserMutation,
+  useResetUserPasswordMutation,
   useUsersQuery,
 } from '@opentrons/react-api-client'
 
@@ -35,16 +36,6 @@ vi.mock('../EditUserModal', () => ({
       <span>mock EditUserModal</span>
       <button type="button" onClick={onClose}>
         Close mock edit modal
-      </button>
-    </div>
-  ),
-}))
-vi.mock('../DeleteUserConfirmModal', () => ({
-  DeleteUserConfirmModal: ({ onCancel }: { onCancel: () => void }) => (
-    <div>
-      <span>mock DeleteUserConfirmModal</span>
-      <button type="button" onClick={onCancel}>
-        Close mock delete modal
       </button>
     </div>
   ),
@@ -112,11 +103,14 @@ function expandAccordion(): void {
 }
 
 const mockDeleteUser = vi.fn()
+const mockResetUserPassword = vi.fn()
 
 describe('UserManagement', () => {
   beforeEach(() => {
     mockDeleteUser.mockReset()
     mockDeleteUser.mockResolvedValue(undefined)
+    mockResetUserPassword.mockReset()
+    mockResetUserPassword.mockResolvedValue(undefined)
     vi.mocked(useToaster).mockReturnValue({
       makeToast: vi.fn(),
       eatToast: vi.fn(),
@@ -124,6 +118,10 @@ describe('UserManagement', () => {
     })
     vi.mocked(useDeleteUserMutation).mockReturnValue({
       deleteUser: mockDeleteUser,
+    } as any)
+    vi.mocked(useResetUserPasswordMutation).mockReturnValue({
+      resetUserPassword: mockResetUserPassword,
+      isLoading: false,
     } as any)
     vi.mocked(useUsersQuery).mockImplementation(
       options =>
@@ -186,13 +184,23 @@ describe('UserManagement', () => {
     screen.getByText('mock EditUserModal')
   })
 
-  it('opens the delete user modal when Delete user is selected from the overflow menu', () => {
+  it('opens the delete user confirm modal when Delete user is selected from the overflow menu', () => {
     render()
     expandAccordion()
     fireEvent.click(
       screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
     )
     fireEvent.click(screen.getByRole('button', { name: 'Delete user' }))
-    screen.getByText('mock DeleteUserConfirmModal')
+    screen.getByText('Delete this account?')
+  })
+
+  it('opens the reset password confirm modal when Reset password is selected from the overflow menu', () => {
+    render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Reset password' }))
+    screen.getByText("Reset this user's password?")
   })
 })

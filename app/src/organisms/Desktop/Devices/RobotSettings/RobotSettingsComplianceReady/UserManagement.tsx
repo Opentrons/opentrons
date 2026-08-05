@@ -8,6 +8,7 @@ import {
 } from '@opentrons/components'
 import {
   useDeleteUserMutation,
+  useResetUserPasswordMutation,
   useUsersQuery,
 } from '@opentrons/react-api-client'
 
@@ -17,8 +18,9 @@ import { useUsernameForRobot } from '/app/redux/robot-auth'
 
 import { Accordion } from './Accordion'
 import { AddUserModal } from './AddUserModal'
-import { DeleteUserConfirmModal } from './DeleteUserConfirmModal'
 import { EditUserModal } from './EditUserModal'
+import { OneTimePasswordModal } from './userAccount/OneTimePasswordModal'
+import { UserAccountConfirmModal } from './userAccount/UserAccountConfirmModal'
 import styles from './usermanagement.module.css'
 import { UserManagementTableRow } from './UserManagementTableRow'
 
@@ -33,12 +35,14 @@ interface UserManagementTableProps {
   users: AuthUser[]
   onEdit: (user: AuthUser) => void
   onDelete: (user: AuthUser) => void
+  onResetPassword: (user: AuthUser) => void
 }
 
 function UserManagementTable({
   users,
   onEdit,
   onDelete,
+  onResetPassword,
 }: UserManagementTableProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -76,6 +80,7 @@ function UserManagementTable({
             user={user}
             onEdit={onEdit}
             onDelete={onDelete}
+            onResetPassword={onResetPassword}
           />
         ))}
       </tbody>
@@ -86,15 +91,21 @@ function UserManagementTable({
 export function UserManagement({
   robotName,
 }: UserManagementProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'shared'])
   const username = useUsernameForRobot(robotName)
   const usersQuery = useUsersQuery({ enabled: username != null })
   const users = usersQuery?.data?.data ?? []
   const documentationState = useDocumentationState(undefined, robotName)
   const { deleteUser } = useDeleteUserMutation(documentationState)
+  const { resetUserPassword, isLoading: isResettingPassword } =
+    useResetUserPasswordMutation(documentationState)
   const [showAddUserModal, setShowAddUserModal] = useState(false)
   const [userToEdit, setUserToEdit] = useState<AuthUser | null>(null)
   const [userToDelete, setUserToDelete] = useState<AuthUser | null>(null)
+  const [userToResetPassword, setUserToResetPassword] =
+    useState<AuthUser | null>(null)
+  const [resetPasswordTemporaryPassword, setResetPasswordTemporaryPassword] =
+    useState<string | null>(null)
   const { makeToast } = useToaster()
 
   const handleDeleteConfirm = (): void => {
@@ -116,12 +127,47 @@ export function UserManagement({
       })
   }
 
+  const handleResetPasswordConfirm = (): void => {
+    if (userToResetPassword == null) {
+      return
+    }
+
+    void resetUserPassword(userToResetPassword.username)
+      .then(response => {
+        const { temporaryPassword } = response.data
+        if (temporaryPassword != null) {
+          setResetPasswordTemporaryPassword(temporaryPassword)
+        } else {
+          setUserToResetPassword(null)
+        }
+      })
+      .catch(() => {
+        setUserToResetPassword(null)
+      })
+  }
+
+  const handleResetPasswordDone = (): void => {
+    makeToast(
+      t('desktop_reset_password_success_banner') as string,
+      SUCCESS_TOAST,
+      { closeButton: true }
+    )
+    setResetPasswordTemporaryPassword(null)
+    setUserToResetPassword(null)
+  }
+
+  const handleResetPasswordCancel = (): void => {
+    setResetPasswordTemporaryPassword(null)
+    setUserToResetPassword(null)
+  }
+
   return (
     <Accordion id="user-management" title={t('desktop_user_management')}>
       <UserManagementTable
         users={users}
         onEdit={setUserToEdit}
         onDelete={setUserToDelete}
+        onResetPassword={setUserToResetPassword}
       />
       <div className={styles.add_user_button}>
         <EmptySelectorButton
@@ -165,11 +211,34 @@ export function UserManagement({
         />
       ) : null}
       {userToDelete != null ? (
-        <DeleteUserConfirmModal
+        <UserAccountConfirmModal
+          title={t('desktop_delete_user_modal_title') as string}
+          heading={t('desktop_delete_user_modal_heading') as string}
+          description={t('desktop_delete_user_modal_description') as string}
+          confirmLabel={t('shared:delete') as string}
           onConfirm={handleDeleteConfirm}
           onCancel={() => {
             setUserToDelete(null)
           }}
+        />
+      ) : null}
+      {userToResetPassword != null && resetPasswordTemporaryPassword == null ? (
+        <UserAccountConfirmModal
+          title={t('desktop_reset_password') as string}
+          heading={t('desktop_reset_password_modal_heading') as string}
+          description={t('desktop_reset_password_modal_description') as string}
+          confirmLabel={t('desktop_reset_password') as string}
+          isConfirmDisabled={isResettingPassword}
+          onConfirm={handleResetPasswordConfirm}
+          onCancel={handleResetPasswordCancel}
+        />
+      ) : null}
+      {resetPasswordTemporaryPassword != null ? (
+        <OneTimePasswordModal
+          password={resetPasswordTemporaryPassword}
+          message={t('desktop_add_user_success_message') as string}
+          onConfirm={handleResetPasswordDone}
+          onClose={handleResetPasswordCancel}
         />
       ) : null}
     </Accordion>

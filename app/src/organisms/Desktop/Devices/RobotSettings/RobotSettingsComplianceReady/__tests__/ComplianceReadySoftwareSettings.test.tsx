@@ -11,6 +11,7 @@ import {
   useDeleteUserMutation,
   useGetRobotServerAccessControlSettingsQuery,
   usePatchRobotServerAccessControlSettingsMutation,
+  useResetUserPasswordMutation,
   useUsersQuery,
 } from '@opentrons/react-api-client'
 
@@ -397,6 +398,9 @@ describe('RobotSettingsComplianceReady', () => {
   beforeEach(() => {
     vi.mocked(useDeleteUserMutation).mockReturnValue({
       deleteUser: vi.fn(),
+    } as any)
+    vi.mocked(useResetUserPasswordMutation).mockReturnValue({
+      resetUserPassword: vi.fn(),
     } as any)
     vi.mocked(useUsersQuery).mockReturnValue(
       mockSuccessQueryResults({
