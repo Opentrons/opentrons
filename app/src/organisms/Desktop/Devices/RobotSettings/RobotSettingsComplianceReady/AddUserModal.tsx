@@ -16,6 +16,10 @@ import { useCreateUserMutation } from '@opentrons/react-api-client'
 import { getTopPortalEl } from '/app/App/portal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
+import {
+  MANAGEABLE_USER_ACCOUNT_TYPES,
+  USERNAME_MAX_LENGTH,
+} from './userAccount/constants'
 import { mapAuthUserMutationError } from './userAccount/mapAuthUserMutationError'
 import styles from './userAccount/userAccountForm.module.css'
 import { UserAccountIdentityFormFields } from './userAccount/UserAccountIdentityFormFields'
@@ -27,14 +31,6 @@ import type {
   CreateUserRequest,
 } from '@opentrons/api-client'
 import type { DropdownOption } from '@opentrons/components'
-
-const USERNAME_MAX_LENGTH = 20
-
-const ADD_USER_ACCOUNT_TYPES: AuthUserAccountType[] = [
-  'admin',
-  'user',
-  'auditor',
-]
 
 interface FormValues {
   username: string
@@ -74,12 +70,11 @@ export function AddUserModal({
     })
 
   const { username, fullName, accountType } = watch()
-  const accountTypeOptions: DropdownOption[] = ADD_USER_ACCOUNT_TYPES.map(
-    accountType => ({
+  const accountTypeOptions: DropdownOption[] =
+    MANAGEABLE_USER_ACCOUNT_TYPES.map(accountType => ({
       name: t(`desktop_user_role_${accountType}`),
       value: accountType,
-    })
-  )
+    }))
   const selectedAccountTypeOption =
     accountTypeOptions.find(option => option.value === accountType) ??
     accountTypeOptions[0]!

@@ -40,6 +40,7 @@
     "deleteRun",
     "deleteRunImages",
     "deleteSession",
+    "deleteUser",
     "dismissCurrentRun",
     "getOAuth2Token",
     "home",
@@ -68,6 +69,7 @@
     "updateRobotSetting",
     "updateSelf",
     "updateSubsystem",
+    "updateUser",
     "uploadCsvFile"
   ]
 }

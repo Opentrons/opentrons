@@ -26,6 +26,7 @@
   "delete_run": "Deleting protocol run record",
   "delete_run_images": "Deleting run images",
   "delete_runs": "Deleting protocol run records",
+  "delete_user": "Deleting user",
   "detach": "Detaching",
   "detach_gripper": "Detaching gripper",
   "disconnect_wifi": "Disconnecting robot from wifi",
@@ -80,6 +81,7 @@
   "update_self": "Saving user settings",
   "update_settings": "Updating robot settings",
   "update_subsystem": "Updating subsystem firmware",
+  "update_user": "Updating user",
   "upload_csv": "Uploading runtime parameters as CSV",
   "wifi_config": "Configure wifi network"
 }
