@@ -87,12 +87,12 @@ HARDWARE_CLASS_PACKAGES = [
     opentrons.drivers.flex_stacker.types,
 ]
 
-# Packages that define non-EnumeratedError exceptions crossing the hardware Pyro boundary.
 HARDWARE_ERROR_PACKAGES = [
     opentrons.hardware_control.types,
     opentrons.drivers.asyncio.communication.errors,
     opentrons.drivers.flex_stacker.errors,
     opentrons.drivers.vacuum_module.errors,
+    # todo(NBS, 2026-8-5): check for missed error types
 ]
 
 # Type Dict registration handlers

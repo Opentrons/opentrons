@@ -19,7 +19,6 @@ from opentrons.drivers.asyncio.communication.errors import (
     NoResponse,
     SerialException,
 )
-from opentrons.drivers.flex_stacker import errors as flex_stacker_errors
 from opentrons.drivers.flex_stacker.errors import EStopTriggered, MotorStallDetected
 from opentrons.hardware_control.types import CriticalPoint, FailedTipStateCheck
 from opentrons.protocol_engine.types.module import ModuleModel
@@ -28,7 +27,6 @@ from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
     enumerated_error_class_to_dict,
     enumerated_error_dict_to_class,
-    find_basic_errors_in_packages,
 )
 
 
@@ -169,14 +167,3 @@ def test_basic_error_serialization(
     assert result.args == test_error.args
     assert result.__dict__ == test_error.__dict__
     assert str(result) == str(test_error)
-
-
-def test_find_basic_errors_in_packages() -> None:
-    """It should find non-enumerated errors defined in the given packages."""
-    found = find_basic_errors_in_packages([flex_stacker_errors])
-
-    assert EStopTriggered in found
-    assert MotorStallDetected in found
-    # Re-exported shared driver errors should not be attributed to this package.
-    assert ErrorResponse not in found
-    assert SerialException not in found

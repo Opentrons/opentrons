@@ -51,16 +51,16 @@ def find_enums_in_packages(modules: list[ModuleType]) -> list[type[enum.Enum]]:
                 enums.append(obj)
     return enums
 
-def find_basic_errors_in_packages(
-    modules: list[ModuleType],
-) -> list[type[Exception]]:
-    """Return non-EnumeratedError exceptions defined in the given modules."""
-    exceptions: list[type[Exception]] = []
+
+def find_basic_errors_in_packages(modules: list[ModuleType]) -> list[type[Exception]]:
+    """Return non-enumerated errors defined in the given modules."""
+    exceptions = []
     for module in modules:
         for name, obj in inspect.getmembers(module, inspect.isclass):
             if issubclass(obj, Exception) and obj is not Exception:
                 exceptions.append(obj)
     return exceptions
+
 
 def find_pydantic_classes_in_packages(
     modules: list[ModuleType],
@@ -288,8 +288,7 @@ class OpentronsPyroSerializer:
     def _generic_error_class_to_dict(cls, obj: BaseException) -> dict[str, Any]:
         return {
             "__class__": ".".join((obj.__module__, obj.__class__.__name__)),
-            #TODO: Casey, please confirm that this is how this should be formatted
-            "bytes": pickle.dumps({"args": obj.args, "dict": dict(obj.__dict__)}),
+            "bytes": obj.args
         }
 
     @classmethod
