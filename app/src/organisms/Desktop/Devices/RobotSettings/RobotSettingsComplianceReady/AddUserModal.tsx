@@ -159,7 +159,7 @@ export function AddUserModal({
             </div>
             <div className={styles.actions}>
               <PrimaryButton type="button" onClick={handleConfirm}>
-                {t('shared:confirm')}
+                {t('shared:confirm') as string}
               </PrimaryButton>
             </div>
           </div>
@@ -194,7 +194,7 @@ export function AddUserModal({
                   {t('shared:cancel') as string}
                 </SecondaryButton>
                 <PrimaryButton type="submit" disabled={isSaveDisabled}>
-                  {t('desktop_create_account')}
+                  {t('desktop_create_account') as string}
                 </PrimaryButton>
               </div>
             </div>
