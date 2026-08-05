@@ -27,13 +27,18 @@ export function DownloadAuditLogsModal(): JSX.Element {
 const DownloadAuditLogsModalImpl = NiceModal.create(
   ({ logPeriodId }: { logPeriodId: string }): JSX.Element => {
     const modal = useModal()
-    const { isLoading, isDeleted } = useIsLogDeleted(logPeriodId)
+    const { isLoading, isDeleted, isError } = useIsLogDeleted(logPeriodId)
 
     useEffect(() => {
-      if (!isLoading && isDeleted) {
-        modal.resolve(true)
+      if (isLoading) {
+        return
       }
-    }, [isDeleted, isLoading, modal])
+      if (isDeleted) {
+        modal.resolve(true)
+      } else if (isError) {
+        modal.reject(new Error('Failed to delete logs'))
+      }
+    }, [isDeleted, isError, isLoading, modal])
 
     return <DownloadAuditLogsModal />
   }
