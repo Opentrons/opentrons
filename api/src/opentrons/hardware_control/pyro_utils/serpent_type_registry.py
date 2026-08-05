@@ -19,11 +19,14 @@ import opentrons.drivers.flex_stacker.errors
 import opentrons.drivers.flex_stacker.types
 import opentrons.drivers.rpi_drivers.types
 import opentrons.drivers.types
+import opentrons.drivers.utils
 import opentrons.drivers.vacuum_module.errors
 import opentrons.drivers.vacuum_module.types
 import opentrons.hardware_control.dev_types
 import opentrons.hardware_control.instruments.ot3.instrument_calibration
+import opentrons.hardware_control.modules.errors
 import opentrons.hardware_control.modules.module_calibration
+import opentrons.hardware_control.modules.thermocycler  # ThermocyclerError lives here
 import opentrons.hardware_control.modules.types
 import opentrons.hardware_control.nozzle_manager
 import opentrons.hardware_control.peripherals.types
@@ -89,10 +92,12 @@ HARDWARE_CLASS_PACKAGES = [
 
 HARDWARE_ERROR_PACKAGES = [
     opentrons.hardware_control.types,
+    opentrons.hardware_control.modules.errors,
+    opentrons.hardware_control.modules.thermocycler,
     opentrons.drivers.asyncio.communication.errors,
     opentrons.drivers.flex_stacker.errors,
     opentrons.drivers.vacuum_module.errors,
-    # todo(NBS, 2026-8-5): check for missed error types
+    opentrons.drivers.utils,
 ]
 
 # Type Dict registration handlers

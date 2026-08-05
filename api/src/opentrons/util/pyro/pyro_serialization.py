@@ -289,7 +289,7 @@ class OpentronsPyroSerializer:
         return {
             "__class__": ".".join((obj.__module__, obj.__class__.__name__)),
             "args": obj.args,
-            "state": dict[str, Any](obj.__dict__), # grab all additional information
+            "state": dict[str, Any](obj.__dict__),
         }
 
     @classmethod
