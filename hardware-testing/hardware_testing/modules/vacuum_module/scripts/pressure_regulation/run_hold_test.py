@@ -202,6 +202,7 @@ async def main(args: argparse.Namespace) -> int:
         print("M128:", waste, flush=True)
         print("M121:", await pump.get_vacuum_state(), flush=True)
         await pump.set_pressure_control_tunings(kp=kp, ki=ki, kd=kd)
+        control_tunings = await pump.get_pressure_control_tunings()
         print("M126:", await pump.get_pressure_control_tunings(), flush=True)
 
         result: dict[str, Any] = {
