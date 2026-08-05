@@ -7,7 +7,7 @@ import { useDeleteSelectedRuns } from '/app/resources/devices/hooks/useDeleteSel
 import { useDownloadSelectedRuns } from '/app/resources/devices/hooks/useDownloadSelectedRuns'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
-import { DownloadDeleteFlow } from './shared/DownloadDeleteFlow'
+import { DownloadDeleteRecordFlow } from './shared/DownloadDeleteRecordFlow'
 
 import type { RunData } from '@opentrons/api-client'
 
@@ -28,7 +28,7 @@ export function DeleteProtocolRunRecordsWizard({
   const { deleteSelectedRuns } = useDeleteSelectedRuns(documentationState)
 
   return (
-    <DownloadDeleteFlow<readonly RunData[]>
+    <DownloadDeleteRecordFlow<readonly RunData[]>
       copy={{
         title: t('delete_all_protocol_run_records'),
         usbQuestion: t('which_usb_for_protocol_files'),

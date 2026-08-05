@@ -14,11 +14,12 @@ import { SpinnerScreen } from './SpinnerScreen'
 import { SuccessScreen } from './SuccessScreen'
 import { UsbSelectionScreen } from './UsbSelectionScreen'
 
+import type { ReactNode } from 'react'
 import type { StepType } from './types'
 
 export type DeleteOutcome = 'deleted' | 'deletion_key_missing'
 
-export interface DownloadDeleteFlowCopy {
+export interface DownloadDeleteRecordFlowCopy {
   title: string
   usbQuestion: string
   // only shown (and only required) when showChoiceScreen is true
@@ -33,8 +34,8 @@ export interface DownloadDeleteFlowCopy {
   deletionKeyMissingText?: string
 }
 
-export interface DownloadDeleteFlowProps<TDownloadResult> {
-  copy: DownloadDeleteFlowCopy
+export interface DownloadDeleteRecordFlowProps<TDownloadResult> {
+  copy: DownloadDeleteRecordFlowCopy
   // whether to ask the user whether to delete after downloading, or skip
   // straight to downloadAndOptionallyDelete using initialDeleteAfterDownload
   showChoiceScreen: boolean
@@ -47,17 +48,17 @@ export interface DownloadDeleteFlowProps<TDownloadResult> {
 /**
  * Shared USB -> (delete after download?) -> downloading -> (deleting) -> success/error
  * wizard shell for the various download/delete-record flows in FileManagerWizardFlows.
- * Callers own their own data hooks and copy; this component owns only the step
- * machine and the WizardHeader/portal/screen chrome around it.
+ * Callers own their own data hooks and copy; this component owns only the step machine
+ * and the WizardHeader/portal/screen
  */
-export function DownloadDeleteFlow<TDownloadResult>({
+export function DownloadDeleteRecordFlow<TDownloadResult>({
   copy,
   showChoiceScreen,
   initialDeleteAfterDownload,
   onDownload,
   onDelete,
   onClose,
-}: DownloadDeleteFlowProps<TDownloadResult>): JSX.Element {
+}: DownloadDeleteRecordFlowProps<TDownloadResult>): JSX.Element {
   const { t } = useTranslation('device_details')
 
   const [step, setStep] = useState<StepType>(STEP_TYPES.USB)
@@ -142,6 +143,33 @@ export function DownloadDeleteFlow<TDownloadResult>({
     }
   }
 
+  const screens: Record<StepType, ReactNode | null> = {
+    [STEP_TYPES.USB]: (
+      <UsbSelectionScreen
+        question={copy.usbQuestion}
+        onContinue={handleContinueFromUsb}
+      />
+    ),
+    [STEP_TYPES.CONFIRM_DELETE]:
+      copy.choiceQuestion != null ? (
+        <SimpleChoiceScreen
+          question={copy.choiceQuestion}
+          choices={deleteChoices}
+          selected={deleteAfterDownload}
+          onSelect={setDeleteAfterDownload}
+          onContinue={handleContinueFromConfirmDelete}
+        />
+      ) : null,
+    [STEP_TYPES.DOWNLOADING]: (
+      <SpinnerScreen statusText={copy.downloadingText} />
+    ),
+    [STEP_TYPES.DELETING]: <SpinnerScreen statusText={copy.deletingText} />,
+    [STEP_TYPES.SUCCESS]: (
+      <SuccessScreen message={copy.successMessage} onFinish={onClose} />
+    ),
+    [STEP_TYPES.ERROR]: <ErrorScreen subText={errorSubText} onExit={onClose} />,
+  }
+
   return createPortal(
     <div className={styles.overlay} aria-modal="true" role="dialog">
       <div className={styles.modal}>
@@ -152,40 +180,7 @@ export function DownloadDeleteFlow<TDownloadResult>({
           currentStep={currentStep}
           hideStepText={isSuccessStep}
         />
-        <div className={styles.body}>
-          {step === STEP_TYPES.USB ? (
-            <UsbSelectionScreen
-              question={copy.usbQuestion}
-              onContinue={handleContinueFromUsb}
-            />
-          ) : null}
-
-          {step === STEP_TYPES.CONFIRM_DELETE && copy.choiceQuestion != null ? (
-            <SimpleChoiceScreen
-              question={copy.choiceQuestion}
-              choices={deleteChoices}
-              selected={deleteAfterDownload}
-              onSelect={setDeleteAfterDownload}
-              onContinue={handleContinueFromConfirmDelete}
-            />
-          ) : null}
-
-          {step === STEP_TYPES.DOWNLOADING ? (
-            <SpinnerScreen statusText={copy.downloadingText} />
-          ) : null}
-
-          {step === STEP_TYPES.DELETING ? (
-            <SpinnerScreen statusText={copy.deletingText} />
-          ) : null}
-
-          {step === STEP_TYPES.SUCCESS ? (
-            <SuccessScreen message={copy.successMessage} onFinish={onClose} />
-          ) : null}
-
-          {step === STEP_TYPES.ERROR ? (
-            <ErrorScreen subText={errorSubText} onExit={onClose} />
-          ) : null}
-        </div>
+        <div className={styles.body}>{screens[step]}</div>
       </div>
     </div>,
     getTopPortalEl()

@@ -5,7 +5,7 @@ import { useDeleteRunMutation } from '@opentrons/react-api-client'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useDownloadRunRecord } from '/app/resources/devices/hooks/useDownloadRunRecord'
 
-import { DownloadDeleteFlow } from './shared/DownloadDeleteFlow'
+import { DownloadDeleteRecordFlow } from './shared/DownloadDeleteRecordFlow'
 
 import type { RunData } from '@opentrons/api-client'
 
@@ -27,7 +27,7 @@ export function DownloadDeleteRunRecordWizard({
   const { deleteRun } = useDeleteRunMutation(documentationState)
 
   return (
-    <DownloadDeleteFlow<void>
+    <DownloadDeleteRecordFlow<void>
       copy={{
         title: t('download_run_record'),
         usbQuestion: t('which_usb_for_run_record'),
