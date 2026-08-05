@@ -34,8 +34,8 @@
 
 .overflow_menu_container {
   position: absolute;
-  top: 0;
   z-index: 1;
+  top: 0;
   right: var(--spacing-2);
 }
 
