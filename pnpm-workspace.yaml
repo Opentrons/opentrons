@@ -16,15 +16,6 @@ packages:
   - 'usb-bridge/node-client'
   - 'js-package-testing'
 
-onlyBuiltDependencies:
-  - electron
-  - electron-winstaller
-  - esbuild
-  - '@serialport/bindings-cpp'
-  - usb
-  - '@sentry/cli'
-  - sharp
-
 minimumReleaseAge: 10080 # 1 week
 
 catalog:
@@ -38,3 +29,20 @@ catalogs:
     react: 18.2.0
     react-dom: 18.2.0
     '@types/react-dom': 18.2.0
+allowBuilds:
+  electron: true
+  electron-winstaller: true
+  esbuild: true
+  '@serialport/bindings-cpp': true
+  usb: true
+  '@sentry/cli': true
+  sharp: true
+  aws-sdk: true
+  browser-tabs-lock: true
+  core-js: true
+  core-js-pure: true
+  es5-ext: true
+  styled-components: true
+
+overrides:
+  '@electron/node-gyp': 10.2.0-electron.1

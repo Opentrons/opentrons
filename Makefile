@@ -60,17 +60,17 @@ usb_host=$(shell pnpm -s discovery find -i 169.254)
 setup: setup-js setup-py
 
 # front-end dependencies handled by pnpm
+# network-timeout -> fetch-timeout and the default is 60000
 .PHONY: setup-js
 setup-js:
-	pnpm config set network-timeout 60000
 	pnpm install
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
 
 # front-end dependencies install for CI
+# network-timeout -> fetch-timeout and the default is 60000
 .PHONY: setup-js-ci
 setup-js-ci:
-	pnpm config set network-timeout 60000
 	pnpm install --frozen-lockfile
 	$(MAKE) -C $(APP_SHELL_DIR) setup
 	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup

@@ -37,7 +37,7 @@
     "@opentrons/discovery-client": "workspace:*",
     "@opentrons/shared-data": "workspace:*",
     "@opentrons/step-generation": "workspace:*",
-    "@opentrons/usb-bridge/node-client": "link:../usb-bridge/node-client",
+    "@opentrons/node-usb-bridge-client": "link:../usb-bridge/node-client",
     "@sentry/electron": "7.5.0",
     "@types/dateformat": "^3.0.1",
     "@types/fs-extra": "9.0.13",
