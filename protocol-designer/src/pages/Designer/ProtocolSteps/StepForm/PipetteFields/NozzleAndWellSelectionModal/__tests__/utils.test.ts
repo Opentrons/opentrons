@@ -33,6 +33,18 @@ const primaryNozzle = A1_NOZZLE
 const wellName = 'A1'
 
 describe('getEntireWellSelection', () => {
+  it('returns an empty array when wellName is not in wellOrdering', () => {
+    expect(
+      getEntireWellSelection(
+        'Z9',
+        labwareDef.ordering,
+        COLUMN,
+        primaryNozzle,
+        96
+      )
+    ).toStrictEqual([])
+  })
+
   it('returns the entire row of wells when the pipette configuration is ROW', () => {
     const nozzleConfiguration = ROW
     expect(
