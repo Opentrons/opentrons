@@ -173,3 +173,21 @@ export async function tryInstallPlaintextRobotCertificate(props: {
 }): Promise<boolean> {
   return await remote.ipcRenderer.invoke('robot-cert:install-plaintext', props)
 }
+
+interface RobotUpdateUploadPayload {
+  ip: string
+  port: number | null
+  name: string
+  robotModel?: string | null
+  path: string
+  systemFile: string
+  userNotes?: string
+  token?: string | null
+  secure?: boolean
+}
+
+export function uploadRobotUpdateFileViaShell(
+  payload: RobotUpdateUploadPayload
+): Promise<{ ok: true }> {
+  return remote.ipcRenderer.invoke('robot-update:upload', payload)
+}

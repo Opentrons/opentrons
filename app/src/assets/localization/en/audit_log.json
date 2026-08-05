@@ -78,6 +78,7 @@
   "update_error_recovery_settings": "Updating error recovery settings",
   "update_module": "Updating module firmware",
   "update_robot_name": "Updating robot name",
+  "update_robot_software": "Updating robot software",
   "update_self": "Saving user settings",
   "update_settings": "Updating robot settings",
   "update_subsystem": "Updating subsystem firmware",

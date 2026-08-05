@@ -182,6 +182,7 @@ type AuditLogAction =
   | 'apply_offsets'
   | 'update_subsystem'
   | 'update_module'
+  | 'update_robot_software'
   | 'update_settings'
   | 'create_user'
   | 'update_user'
