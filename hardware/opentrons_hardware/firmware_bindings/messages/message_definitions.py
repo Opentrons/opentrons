@@ -979,27 +979,6 @@ class GetMotorUsageResponse(BaseMessage):
         MessageId.get_motor_usage_response
     )
 
-    @staticmethod
-    def to_pyro_dict(obj: "GetMotorUsageResponse") -> Dict[str, Any]:
-        """Consumed by Serpent, convert type to a Pyro Dictionary."""
-        return {
-            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
-            "payload_num_elements": obj.payload.num_elements.value,
-            "payload_usage_elements": [item.value for item in obj.payload.usage_elements],
-        }
-    @staticmethod
-    def from_pyro_dict(
-        classname: Any, data: Dict[str, Any]
-    ) -> "GetMotorUsageResponse":
-        """Consumed by Serpent, convert from a Pyro Dictionary."""
-        return GetMotorUsageResponse(
-            payload=payloads.GetMotorUsageResponsePayload(
-                num_elements=utils.UInt8Field(data["payload_num_elements"]),
-                usage_elements=[MotorUsageTypeField.build(item) for item in data["payload_usage_elements"]]
-            ),
-        )
-
-
 @dataclass
 class HepaUVInfoResponse(BaseMessage):  # noqa: D101
     payload: payloads.HepaUVInfoResponsePayload

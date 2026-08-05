@@ -508,7 +508,6 @@ class OT3Controller(FlexBackend):
         if expected_axes:
             expected = set([axis_to_node(axis) for axis in expected_axes])
         usage_data = await self._subsystem_manager.get_motor_usage_data(expected)
-        #breakpoint()
         return {node_to_axis(node): usage_data[node] for node in usage_data}
 
     async def update_firmware(
