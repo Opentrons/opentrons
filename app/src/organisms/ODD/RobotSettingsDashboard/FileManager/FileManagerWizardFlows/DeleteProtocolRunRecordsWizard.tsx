@@ -7,17 +7,17 @@ import { useDeleteSelectedRuns } from '/app/resources/devices/hooks/useDeleteSel
 import { useDownloadSelectedRuns } from '/app/resources/devices/hooks/useDownloadSelectedRuns'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
-import { DownloadDeleteFlow } from '../shared/DownloadDeleteFlow'
+import { DownloadDeleteFlow } from './shared/DownloadDeleteFlow'
 
 import type { RunData } from '@opentrons/api-client'
 
-interface DownloadProtocolRunRecordsWizardProps {
+interface DeleteProtocolRunRecordsWizardProps {
   onClose: () => void
 }
 
-export function DownloadProtocolRunRecordsWizard({
+export function DeleteProtocolRunRecordsWizard({
   onClose,
-}: DownloadProtocolRunRecordsWizardProps): JSX.Element {
+}: DeleteProtocolRunRecordsWizardProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const robotName = useSelector(getLocalRobot)?.name ?? ''
   const { data: runData } = useNotifyAllRunsQuery()
@@ -30,16 +30,15 @@ export function DownloadProtocolRunRecordsWizard({
   return (
     <DownloadDeleteFlow<readonly RunData[]>
       copy={{
-        title: t('download_all_protocol_run_records'),
+        title: t('delete_all_protocol_run_records'),
         usbQuestion: t('which_usb_for_protocol_files'),
-        choiceQuestion: t('delete_records_after_download'),
         downloadingText: t('downloading_all_protocol_files'),
         deletingText: t('deleting_all_run_records'),
-        successMessage: t('all_protocol_files_downloaded'),
+        successMessage: t('all_protocol_run_records_deleted'),
         downloadFailedText: t('run_records_download_failed'),
         deleteFailedText: t('run_records_delete_failed'),
       }}
-      showChoiceScreen
+      showChoiceScreen={false}
       initialDeleteAfterDownload
       onDownload={path => downloadRuns(allRuns, path)}
       onDelete={downloadedRuns =>
