@@ -6,32 +6,32 @@
 
 .header {
   display: grid;
+  width: 100%;
+  padding: 0 var(--spacing-48) 0 var(--spacing-24);
+  color: var(--grey-60);
   gap: var(--spacing-24);
   grid-template-columns: 33% 33% 33%;
-  width: 100%;
-  color: var(--grey-60);
-  padding: 0 var(--spacing-48) 0 var(--spacing-24);
 }
 
 .record_container {
   display: grid;
-  padding: var(--spacing-24);
   width: 100%;
   align-items: center;
+  padding: var(--spacing-24);
 }
 
 .record_content {
   display: grid;
+  width: 100%;
   flex-direction: row;
+  align-items: center;
   gap: var(--spacing-24);
   grid-template-columns: 33% 33% 33%;
-  width: 100%;
-  align-items: center;
 }
 
 .protocol_name {
   overflow: hidden;
   min-width: 0;
-  white-space: nowrap;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }

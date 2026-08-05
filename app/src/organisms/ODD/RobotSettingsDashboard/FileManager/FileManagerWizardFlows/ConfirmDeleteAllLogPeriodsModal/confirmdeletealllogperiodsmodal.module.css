@@ -12,7 +12,7 @@
 
 .buttons {
   display: flex;
-  flex-direction: row;
   width: 100%;
+  flex-direction: row;
   gap: var(--spacing-8);
 }

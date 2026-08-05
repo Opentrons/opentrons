@@ -1,7 +1,7 @@
 .buttons {
   display: flex;
-  flex-direction: column;
   width: 100%;
+  flex-direction: column;
 }
 
 .menu_item {
