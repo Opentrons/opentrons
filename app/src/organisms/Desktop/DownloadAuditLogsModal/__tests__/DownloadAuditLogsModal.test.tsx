@@ -25,6 +25,7 @@ describe('DownloadAuditLogsModal', () => {
     props = {
       logPeriodId: 'log-period-1',
       onDownload: vi.fn(),
+      isLoading: false,
     }
   })
 
