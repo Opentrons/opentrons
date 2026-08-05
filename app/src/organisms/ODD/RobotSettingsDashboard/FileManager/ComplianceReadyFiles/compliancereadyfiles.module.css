@@ -1,0 +1,37 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.header {
+  display: grid;
+  gap: var(--spacing-24);
+  grid-template-columns: 33% 33% 33%;
+  width: 100%;
+  color: var(--grey-60);
+  padding: 0 var(--spacing-48) 0 var(--spacing-24);
+}
+
+.record_container {
+  display: grid;
+  padding: var(--spacing-24);
+  width: 100%;
+  align-items: center;
+}
+
+.record_content {
+  display: grid;
+  flex-direction: row;
+  gap: var(--spacing-24);
+  grid-template-columns: 33% 33% 33%;
+  width: 100%;
+  align-items: center;
+}
+
+.protocol_name {
+  overflow: hidden;
+  min-width: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

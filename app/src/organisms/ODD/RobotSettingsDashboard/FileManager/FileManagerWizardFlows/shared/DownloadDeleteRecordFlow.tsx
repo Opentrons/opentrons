@@ -49,7 +49,7 @@ export interface DownloadDeleteRecordFlowProps<TDownloadResult> {
  * Shared USB -> (delete after download?) -> downloading -> (deleting) -> success/error
  * wizard shell for the various download/delete-record flows in FileManagerWizardFlows.
  * Callers own their own data hooks and copy; this component owns only the step machine
- * and the WizardHeader/portal/screen
+ * and the WizardHeader/portal/screen chrome around it.
  */
 export function DownloadDeleteRecordFlow<TDownloadResult>({
   copy,
