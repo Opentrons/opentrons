@@ -11,25 +11,28 @@ import { useHost } from '@opentrons/react-api-client'
 import { logPeriodDeletionKeyReceived } from '/app/redux/audit'
 import { saveFileToUsb } from '/app/redux/shell/remote'
 
-import type { LogPeriodSummary } from '@opentrons/api-client'
+import type { LogPeriodDetails, LogPeriodSummary } from '@opentrons/api-client'
 import type { Dispatch } from '/app/redux/types'
 
 export function useDownloadLogPeriod(
-  logPeriod: LogPeriodSummary,
+  logPeriod: LogPeriodSummary | LogPeriodDetails | undefined,
   onError?: (error: Error) => void
 ): {
-  downloadLogPeriod: (usbPath?: string) => Promise<void>
+  downloadLogPeriod: (usbPath?: string) => Promise<string | null>
   isDownloading: boolean
 } {
   const host = useHost()
   const dispatch = useDispatch<Dispatch>()
   const [isDownloading, setIsDownloading] = useState(false)
 
-  const logPeriodStartDateTransformed = logPeriod.startedAt.replaceAll(':', '_')
+  const logPeriodStartDateTransformed = logPeriod?.startedAt.replaceAll(
+    ':',
+    '_'
+  )
 
-  const downloadLogPeriod = (usbPath?: string): Promise<void> => {
-    if (host == null) {
-      return Promise.resolve()
+  const downloadLogPeriod = (usbPath?: string): Promise<string | null> => {
+    if (host == null || logPeriod == null) {
+      return Promise.resolve(null)
     }
     setIsDownloading(true)
     const filename = `logperiod_${logPeriodStartDateTransformed}.zip`
@@ -53,6 +56,7 @@ export function useDownloadLogPeriod(
           saveAs(res.data as Blob, filename)
         }
         setIsDownloading(false)
+        return deletionKey
       })
       .catch((e: Error) => {
         setIsDownloading(false)

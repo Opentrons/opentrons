@@ -34,7 +34,3 @@ export interface LogPeriodDetails {
   totalSizeBytes: number
   attachedFilenames: string[]
 }
-
-export interface LogPeriodDetailsResponse {
-  data: LogPeriodDetails
-}
