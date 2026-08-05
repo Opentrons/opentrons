@@ -14,7 +14,10 @@ from opentrons_shared_data.errors.exceptions import (
     VacuumModuleWasteFullError,
 )
 
-from opentrons.hardware_control.types import CriticalPoint, FailedTipStateCheck
+from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
+    HARDWARE_ERROR_PACKAGES,
+)
+from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_engine.types.module import ModuleModel
 from opentrons.types import DeckSlotName
 from opentrons.util.pyro.pyro_serialization import (
@@ -23,9 +26,7 @@ from opentrons.util.pyro.pyro_serialization import (
     enumerated_error_dict_to_class,
     find_basic_errors_in_packages,
 )
-from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
-    HARDWARE_ERROR_PACKAGES,
-)
+
 
 class NestedTest(BaseModel):
     """A basic pydantic model that is nested in another model."""
@@ -137,7 +138,6 @@ def test_enumerated_error_serialization(test_error: EnumeratedError) -> None:
 
 def test_basic_error_serialization() -> None:
     """It should serialize and deserialize non-enumerated errors for Pyro via args."""
-    
     for error_type in find_basic_errors_in_packages(HARDWARE_ERROR_PACKAGES):
         test_error = error_type("example")
         # todo(NBS, 3036-8-5) this "example" might not work
@@ -151,7 +151,9 @@ def test_basic_error_serialization() -> None:
             "args": test_error.args,
         }
 
-        result = OpentronsPyroSerializer._generic_error_dict_to_class(class_name, test_dict)
+        result = OpentronsPyroSerializer._generic_error_dict_to_class(
+            class_name, test_dict
+        )
 
         assert type(result) is error_type
         assert result.args == test_error.args
