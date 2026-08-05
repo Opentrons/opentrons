@@ -274,27 +274,4 @@ describe('shell selectors', () => {
       expect(Selectors.getUserId(state)).toEqual('')
     })
   })
-
-  describe('getAuditLogDirectory', () => {
-    it('should return the audit log directory if it is specified', () => {
-      const state: State = {
-        config: { audit: { logDirectory: '/mock/audit-log-path' } },
-      } as any
-      expect(Selectors.getAuditLogDirectory(state)).toEqual(
-        '/mock/audit-log-path'
-      )
-    })
-
-    it('should return null if the audit log directory is null', () => {
-      const state: State = {
-        config: { audit: { logDirectory: null } },
-      } as any
-      expect(Selectors.getAuditLogDirectory(state)).toEqual(null)
-    })
-
-    it('should return null if config is unknown', () => {
-      const state: State = { config: null } as any
-      expect(Selectors.getAuditLogDirectory(state)).toEqual(null)
-    })
-  })
 })

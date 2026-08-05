@@ -23,6 +23,8 @@ export type CONFIG_TOGGLE_VALUE_TYPE = 'config:TOGGLE_VALUE'
 export type CONFIG_ADD_UNIQUE_VALUE_TYPE = 'config:ADD_UNIQUE_VALUE'
 export type CONFIG_SUBTRACT_VALUE_TYPE = 'config:SUBTRACT_VALUE'
 export type CONFIG_VALUE_UPDATED_TYPE = 'config:VALUE_UPDATED'
+export type CHANGE_AUDIT_LOG_DIRECTORY_TYPE =
+  'log-location:CHANGE_AUDIT_LOG_DIRECTORY'
 
 export type POLL_TYPE = 'poll'
 export type INITIAL_TYPE = 'initial'

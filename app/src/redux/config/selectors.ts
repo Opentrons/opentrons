@@ -148,6 +148,3 @@ export const getAppLanguage: (state: State) => Language | null = createSelector(
 
 export const getStoredSystemLanguage: (state: State) => string | null =
   createSelector(getConfig, config => config?.language.systemLanguage ?? null)
-
-export const getAuditLogDirectory: (state: State) => string | null =
-  createSelector(getConfig, config => config?.audit.logDirectory ?? null)
