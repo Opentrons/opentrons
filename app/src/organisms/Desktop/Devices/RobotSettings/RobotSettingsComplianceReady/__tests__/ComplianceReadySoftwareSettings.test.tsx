@@ -8,6 +8,7 @@ import {
   useAuditSettingsQuery,
   useAuthSettingsMutation,
   useAuthSettingsQuery,
+  useDeleteUserMutation,
   useGetRobotServerAccessControlSettingsQuery,
   usePatchRobotServerAccessControlSettingsMutation,
   useUsersQuery,
@@ -393,6 +394,18 @@ describe('ComplianceReadySoftwareSettings', () => {
 })
 
 describe('RobotSettingsComplianceReady', () => {
+  beforeEach(() => {
+    vi.mocked(useDeleteUserMutation).mockReturnValue({
+      deleteUser: vi.fn(),
+    } as any)
+    vi.mocked(useUsersQuery).mockReturnValue(
+      mockSuccessQueryResults({
+        data: [],
+        meta: { cursor: 0, totalLength: 0 },
+      })
+    )
+  })
+
   it('hides admin sections for non-admin users', () => {
     renderPage('regular-user', 'user')
 
