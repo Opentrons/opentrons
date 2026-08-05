@@ -1,4 +1,5 @@
 import { useQuery } from 'react-query'
+import { type AxiosError } from 'axios'
 
 import { getLogPeriodDetails } from '@opentrons/api-client'
 
@@ -9,10 +10,10 @@ import type { LogPeriodDetails } from '@opentrons/api-client'
 
 export function useLogPeriodDetailsQuery(
   logPeriodId: string,
-  options: UseQueryOptions<LogPeriodDetails> = {}
-): UseQueryResult<LogPeriodDetails> {
+  options: UseQueryOptions<LogPeriodDetails, AxiosError> = {}
+): UseQueryResult<LogPeriodDetails, AxiosError> {
   const host = useHost()
-  const query = useQuery<LogPeriodDetails>(
+  const query = useQuery<LogPeriodDetails, AxiosError>(
     getQueryKey(host, 'audit', 'logPeriods', logPeriodId),
     () =>
       getLogPeriodDetails(host!, logPeriodId).then(response => response.data),
