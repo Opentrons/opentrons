@@ -32,7 +32,12 @@ from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_engine.types import CSVRuntimeParamPaths, DeckSlotLocation
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.robot.types import RobotTypeEnum
-from server_utils.audit.audit_server import Client as AuditClient
+from server_utils.audit.audit_server import (
+    Client as AuditClient,
+)
+from server_utils.audit.audit_server import (
+    NoCurrentLogPeriodError,
+)
 from server_utils.audit.fastapi import get_audit_client, get_audit_logger
 from server_utils.auth.resource_server.authorization_checker import (
     check as check_authorization,
@@ -180,6 +185,14 @@ class RunSignoffRequired(ErrorDetails):
     errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
 
 
+class NoCurrentAuditLogFound(ErrorDetails):
+    """An error if audit logging is enabled but no current log period could be found."""
+
+    id: Literal["NoCurrentAuditLogFound"] = "NoCurrentAuditLogFound"
+    title: str = "No Current Audit Log Found"
+    errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
+
+
 class AllRunsLinks(BaseModel):
     """Links returned along with a collection of runs."""
 
@@ -232,7 +245,9 @@ async def get_run_data_from_url(
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorBody[FileIdNotFound]},
         status.HTTP_409_CONFLICT: {
-            "model": ErrorBody[Union[RunAlreadyActive, RunSignoffRequired]]
+            "model": ErrorBody[
+                Union[RunAlreadyActive, RunSignoffRequired, NoCurrentAuditLogFound]
+            ]
         },
     },
     dependencies=[
@@ -255,6 +270,7 @@ async def create_run(  # noqa: C901
     camera_provider: Annotated[CameraProvider, Depends(get_camera_provider)],
     notify_publishers: Annotated[Callable[[], None], Depends(get_pe_notify_publishers)],
     access_control_status: Annotated[bool, Depends(get_access_control_status)],
+    audit_client: Annotated[AuditClient, Depends(get_audit_client)],
     request_body: Optional[RequestModel[RunCreate]] = None,
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Create a new run.
@@ -276,6 +292,7 @@ async def create_run(  # noqa: C901
         notify_publishers: Utilized by the engine to notify publishers of state changes.
         access_control_status: Whether access control (Compliance Ready Software) is
             currently enabled on the robot.
+        audit_client: Client to get log period info from
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None
     offsets = request_body.data.labwareOffsets if request_body is not None else []
@@ -304,6 +321,17 @@ async def create_run(  # noqa: C901
 
     deck_configuration = await deck_configuration_store.get_deck_configuration()
 
+    logging_enabled = await audit_client.get_logging_enabled()
+    if logging_enabled.loggingEnabled:
+        try:
+            log_period = await audit_client.get_current_log_period()
+        except NoCurrentLogPeriodError as e:
+            raise NoCurrentAuditLogFound(detail=str(e)).as_error(
+                status.HTTP_409_CONFLICT
+            )
+    else:
+        log_period = None
+
     # TODO (tz, 5-16-22): same error raised twice.
     #  Check if we can consolidate to one place.
     if protocol_id is not None:
@@ -329,6 +357,7 @@ async def create_run(  # noqa: C901
             protocol=protocol_resource,
             notify_publishers=notify_publishers,
             access_control_status=access_control_status,
+            log_period_id=str(log_period.id) if log_period is not None else None,
         )
     except RunConflictError as e:
         raise RunAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e

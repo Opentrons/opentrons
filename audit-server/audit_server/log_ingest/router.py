@@ -202,6 +202,7 @@ async def store_robot_log(
                 "Audit log message could not be signed: key-server is unavailable."
             ),
         ) from exc
+    await log_data_manager.rotate_periods()
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_201_CREATED,
         content=SimpleBody(

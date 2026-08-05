@@ -66,6 +66,7 @@ def _build_run(
         return Run.model_construct(
             id=run_resource.run_id,
             protocolId=run_resource.protocol_id,
+            logPeriodId=run_resource.log_period_id,
             createdAt=run_resource.created_at,
             actions=run_resource.actions,
             status=state_summary.status,
@@ -130,6 +131,7 @@ def _build_run(
         dataError=run_loading_error,
         id=run_resource.run_id,
         protocolId=run_resource.protocol_id,
+        logPeriodId=run_resource.log_period_id,
         createdAt=run_resource.created_at,
         actions=run_resource.actions,
         status=state.status,
@@ -219,6 +221,7 @@ class RunDataManager:
         notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
         access_control_status: bool,
+        log_period_id: Optional[str],
     ) -> Union[Run, BadRun]:
         """Create a new, current run.
 
@@ -233,6 +236,7 @@ class RunDataManager:
             run_time_param_paths: Any runtime filepath to set.
             protocol: The protocol to load the runner with, if any.
             access_control_status: Status of the Auth-Server access control enablement.
+            log_period_id: The log period this run exists in, if audit logging is enabled
 
         Returns:
             The run resource.
@@ -301,6 +305,7 @@ class RunDataManager:
             run_id=run_id,
             created_at=created_at,
             protocol_id=protocol.protocol_id if protocol is not None else None,
+            log_period_id=log_period_id,
         )
         run_time_parameters = self._run_orchestrator_store.get_run_time_parameters()
         self._run_store.insert_csv_rtp(

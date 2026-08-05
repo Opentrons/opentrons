@@ -36,6 +36,7 @@ def run() -> Run:
         modules=[],
         labwareOffsets=[],
         protocolId=None,
+        logPeriodId=None,
         liquids=[],
         liquidClasses=[],
         outputFileIds=[],
