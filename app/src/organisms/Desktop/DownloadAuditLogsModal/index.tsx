@@ -5,17 +5,20 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { Icon, Modal, PrimaryButton, StyledText } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { useDownloadAndDeleteAuditLog } from '/app/resources/audit/useDownloadAndDeleteAuditLog'
 
 import styles from './downloadauditlogsmodal.module.css'
 
 export interface DownloadAuditLogsModalProps {
   logPeriodId: string
   onDownload: () => void
+  isLoading: boolean
 }
 
 export function DownloadAuditLogsModal({
   logPeriodId: _logPeriodId,
   onDownload,
+  isLoading,
 }: DownloadAuditLogsModalProps): JSX.Element {
   const { t } = useTranslation('access_control')
 
@@ -31,9 +34,14 @@ export function DownloadAuditLogsModal({
           {t('download_audit_logs_description')}
         </StyledText>
         <div className={styles.button_row}>
-          <PrimaryButton onClick={onDownload}>
+          <PrimaryButton onClick={onDownload} disabled={isLoading}>
             <span className={styles.download_button_content}>
-              <Icon name="download" size="1rem" aria-hidden />
+              <Icon
+                name={isLoading ? 'ot-spinner' : 'download'}
+                size="1rem"
+                aria-hidden
+                spin={isLoading}
+              />
               {t('download_audit_logs')}
             </span>
           </PrimaryButton>
@@ -48,16 +56,27 @@ const DownloadAuditLogsModalImpl = NiceModal.create(
   ({ logPeriodId }: { logPeriodId: string }): JSX.Element => {
     const modal = useModal()
 
+    const { downloadAndDeleteAuditLog, isLoading } =
+      useDownloadAndDeleteAuditLog(logPeriodId, '')
+
     const handleDownload = (): void => {
-      // TODO(jj, 2026-08-04): implement audit log period download
-      modal.resolve(true)
-      modal.remove()
+      downloadAndDeleteAuditLog()
+        .then(() => {
+          modal.resolve(true)
+        })
+        .catch(error => {
+          modal.reject(error)
+        })
+        .finally(() => {
+          modal.remove()
+        })
     }
 
     return (
       <DownloadAuditLogsModal
         logPeriodId={logPeriodId}
         onDownload={handleDownload}
+        isLoading={isLoading}
       />
     )
   }
