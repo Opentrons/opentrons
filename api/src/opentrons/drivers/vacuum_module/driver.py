@@ -157,7 +157,11 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             loop=loop,
             error_keyword=VM_ERROR_KEYWORD,
             async_error_ack=VM_ASYNC_ERROR_ACK,
-            reset_buffer_before_write=True,
+            # Do not reset the input buffer before writes. Waste-full (and other async
+            # module errors) are one-shot UART notifications that can arrive between
+            # commands. Clearing the buffer on every write drops them before the
+            # next read can partition and raise them.
+            reset_buffer_before_write=False,
             error_codes=VacuumModuleErrorCodes,
         )
         return cls(connection)
