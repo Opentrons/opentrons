@@ -11,6 +11,7 @@ The Vacuum Module ships in three separate boxes containing all the components re
     - ![Pinch hazard warning](images/warning-triangle-pinch.svg){: style="vertical-align: middle; height: 1.75em;"} **Pinch hazard:** Keep fingers clear of deck slot edges when removing deck plates or seating the deck adapter.
     - ![Vacuum hose routing and placement warning](images/warning-triangle-exclamation.svg){: style="vertical-align: middle; height: 1.75em;"} **Hose placement:** When connecting vacuum hoses, avoid sharp bends, kinks, or low dips that allow fluid to accumulate and impede airflow. Maintain a continuous downward slope from the deck module to the waste carboy.
     - ![Vacuum hose trip hazard warning](images/warning-triangle-exclamation.svg){: style="vertical-align: middle; height: 1.75em;"} **Tripping hazard:** Keep hoses secure and clear of walkways to help prevent trip hazards.
+    - ![Pump and carboy placement warning](images/warning-triangle-exclamation.svg){: style="vertical-align: middle; height: 1.75em;"} **Accessory placement:** When choosing a location for the carboy and pump control box, follow all health, safety, and environmental guidelines established by your facility.
 
 
 <div class="instruction-list" markdown>
@@ -81,12 +82,12 @@ The Vacuum Module ships in three separate boxes containing all the components re
 
 ## Part 3: Carboy and vacuum hose connections
 
-15. Place the Control Box in a safe, stable, and well ventilated location. When choosing a location, be sure to follow any applicable guidelines set by your facility's health/safety or other regulatory teams.
+15. Place the Control Box in a safe, stable, and well ventilated location.
 
-16. Put the carboy in its holder and place it a safe, stable, and well ventilated location. When choosing a location, be sure to follow any applicable guidelines set by your facility's health/safety or other regulatory teams.
+16. Put the carboy in its holder.
 
     !!! tip
-        Opentrons also recommends putting the carboy and holder in a larger, secondary container for added spill containment safety.
+        Opentrons recommends putting the carboy and holder in a larger, secondary tray or basin for added spill containment safety.
 
 17. Place the cap on the waste jar and hand tighten it. Do not over-tighten the cap; this is not a trial of strength.
 
