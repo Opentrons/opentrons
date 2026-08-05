@@ -3,7 +3,7 @@ title: "Vacuum Module: Product Specifications"
 description: "Box contents and summary of physical specifications for the Vacuum Module."
 ---
 
-![Vacuum Module illustration showing main parts with brief labels](images/vacuum-module-labels.png)
+![Vacuum Module illustration showing main parts with brief labels](../images/vacuum-module-labels.png)
 
 ## Vacuum Module parts
 
@@ -16,12 +16,12 @@ Box 1 includes support grids, collars and spacers, and the vacuum manifold base.
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Support grid for 96 well filter plate](images/support-grid-96-wells.svg)
+![Support grid for 96 well filter plate](../images/support-grid-96-wells.svg)
 <figcaption>(1) Support grid, 96 well filter plate</figcaption>
 </figure>
 
 <figure markdown>
-![Support grid for 384 well filter plate](images/support-grid-384-wells.svg)
+![Support grid for 384 well filter plate](../images/support-grid-384-wells.svg)
 <figcaption>(1) Support grid, 384 well filter plate</figcaption>
 </figure>
 
@@ -30,12 +30,12 @@ Box 1 includes support grids, collars and spacers, and the vacuum manifold base.
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Short vacuum collar](images/collar-short.svg "Short vacuum collar")
+![Short vacuum collar](../images/collar-short.svg "Short vacuum collar")
 <figcaption>(1) Short collar, 42 mm </figcaption>
 </figure>
 
 <figure markdown>
-![Tall vacuum collar](images/collar-tall.svg "Tall vacuum collar")
+![Tall vacuum collar](../images/collar-tall.svg "Tall vacuum collar")
 <figcaption>(1) Tall collar, 72 mm</figcaption>
 </figure>
 
@@ -44,12 +44,12 @@ Box 1 includes support grids, collars and spacers, and the vacuum manifold base.
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Short spacer, 27 mm](images/spacer-short.svg "Short spacer, 27 mm")
+![Short spacer, 27 mm](../images/spacer-short.svg "Short spacer, 27 mm")
 <figcaption>(1) Short spacer, 27 mm</figcaption>
 </figure>
 
 <figure markdown>
-![Tall spacer, 34 mm](images/spacer-tall.svg "Tall spacer, 34 mm")
+![Tall spacer, 34 mm](../images/spacer-tall.svg "Tall spacer, 34 mm")
 <figcaption>(1) Tall spacer, 34 mm</figcaption>
 </figure>
 
@@ -58,7 +58,7 @@ Box 1 includes support grids, collars and spacers, and the vacuum manifold base.
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Vacuum manifold base](images/vacuum-module-base.svg "Manifold base")
+![Vacuum manifold base](../images/vacuum-module-base.svg "Manifold base")
 <figcaption>(1) Vacuum manifold base</figcaption>
 </figure>
 
@@ -71,12 +71,12 @@ Box 2 includes the Control Box (vacuum pump and electronics), a deck adapter (an
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Control Box, vacuum pump and electronics](images/control-box.png "Control Box includes pump and electronics")
+![Control Box, vacuum pump and electronics](../images/control-box.png "Control Box includes pump and electronics")
 <figcaption>(1) Control Box</figcaption>
 </figure>
 
 <figure markdown>
-![Deck plate adapter](images/deck-plate.png" Deck plate")
+![Deck plate adapter](../images/deck-plate.png" Deck plate")
 <figcaption>(1) Deck plate</figcaption>
 </figure>
 
@@ -85,12 +85,12 @@ Box 2 includes the Control Box (vacuum pump and electronics), a deck adapter (an
 <div class="parts-list" markdown>
 
 <figure markdown>
-![USB A-to-B cable](images/usb-ab-cable.png "USB A-to-B cable")
+![USB A-to-B cable](../images/usb-ab-cable.png "USB A-to-B cable")
 <figcaption>(1) USB A-B cable</figcaption>
 </figure>
 
 <figure markdown>
-![IEC power cable, region specific](images/iec-plugs.png "IEC power cable")
+![IEC power cable, region specific](../images/iec-plugs.png "IEC power cable")
 <figcaption>(1) Region-specific IEC power cable</figcaption>
 </figure>
 
@@ -99,12 +99,12 @@ Box 2 includes the Control Box (vacuum pump and electronics), a deck adapter (an
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Spare deck plate screws, M4 x 10](images/fasteners-deck.png "Spare deck plate screws"){ width="70%" }
+![Spare deck plate screws, M4 x 10](../images/fasteners-deck.png "Spare deck plate screws"){ width="70%" }
 <figcaption>(2) Deck plate screws, M4x10 metric thread</figcaption>
 </figure>
 
 <figure markdown>
-![Manifold screws, 4 and 2 extra](images/fasteners-manifold.png){ width="80%" }
+![Manifold screws, 4 and 2 extra](../images/fasteners-manifold.png){ width="80%" }
 <figcaption>(6) Manifold screws,<br>7/64" Imperial thread</figcaption>
 </figure>
 
@@ -121,12 +121,12 @@ Box 3 includes the waste collection carboy and cap, a carboy holder (to help pre
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Glass 2 liter carboy and cap](images/carboy.png "2 liter glass carboy and cap"){ width="70%" }
+![Glass 2 liter carboy and cap](../images/carboy.png "2 liter glass carboy and cap"){ width="70%" }
 <figcaption>(1) Waste carboy and cap, 2 L<br></figcaption>
 </figure>
 
 <figure markdown>
-![Carboy cradle](images/carboy-holder.png "Waste carboy holder")
+![Carboy cradle](../images/carboy-holder.png "Waste carboy holder")
 <figcaption>(1) Carboy holder</figcaption>
 </figure>
 
@@ -135,12 +135,12 @@ Box 3 includes the waste collection carboy and cap, a carboy holder (to help pre
 <div class="parts-list" markdown>
 
 <figure markdown>
-![6 mm vacuum hose](images/hose-6mm.svg "6 mm vacuum hose")
+![6 mm vacuum hose](../images/hose-6mm.svg "6 mm vacuum hose")
 <figcaption>(1) 6 mm diameter hose,<br>2 m</figcaption>
 </figure>
 
 <figure markdown>
-![9 mm vacuum hose](images/hose-9mm.svg)
+![9 mm vacuum hose](../images/hose-9mm.svg)
 <figcaption>(1) 9 mm diameter hose,<br>2 m</figcaption>
 </figure>
 

@@ -3,9 +3,10 @@ site_name: vacuum
 nav:
   - Opentrons Vacuum Module GEN1 Instruction Manual: index.md
   - Safety and Compliance: compliance.md
-  - Product Specifications: specifications.md
-  - Vacuum Base, Collars, and Spacers: base-collars-spacers.md
-  - Carboy: carboy.md
+  - Product Specifications:
+      - Product Specifications: specifications/index.md
+      - Deck Components: specifications/deck-components.md
+      - Carboy: specifications/carboy.md
   - Use Cases and Stack Configurations: use-cases.md
   - Installing the Vacuum Module: installation.md
   - Maintenance and Cleaning: maintenance.md
