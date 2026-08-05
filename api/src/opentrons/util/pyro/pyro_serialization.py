@@ -276,7 +276,7 @@ class OpentronsPyroSerializer:
 
     @classmethod
     def register_basic_error(cls, error_type: type[BaseException]) -> None:
-        """Registers a non-enumerated error for Pyro via pickle (args + instance state)."""
+        """Registers a basic error with no specially handled args to be handled via pyro proxies."""
         class_name = register_type_to_serpent(
             error_type,
             cls._generic_error_dict_to_class,
@@ -288,7 +288,7 @@ class OpentronsPyroSerializer:
     def _generic_error_class_to_dict(cls, obj: BaseException) -> dict[str, Any]:
         return {
             "__class__": ".".join((obj.__module__, obj.__class__.__name__)),
-            "bytes": obj.args
+            "args": obj.args,
         }
 
     @classmethod
@@ -301,11 +301,7 @@ class OpentronsPyroSerializer:
             raise TypeError(
                 f"Could not convert {class_name} to an error, unregistered with pyro."
             )
-        payload = pickle.loads(d["bytes"])
-        error = error_type.__new__(error_type)
-        error.__dict__.update(payload["dict"])
-        BaseException.__init__(error, *payload["args"])
-        return error
+        return error_type(*d["args"])
 
     @classmethod
     def register_typed_dict(cls, typed_dict: type) -> None:
