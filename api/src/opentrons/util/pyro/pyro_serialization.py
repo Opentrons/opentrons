@@ -370,8 +370,6 @@ class OpentronsPyroSerializer:
                     unwrapped_key = key_type(key)
             elif issubclass(key_type, BaseModel):
                 unwrapped_key = key_type.model_validate(key)
-            elif is_dataclass(key_type):
-                unwrapped_key = key_type(**key)
             else:
                 unwrapped_key = key_type(key)
 
@@ -390,7 +388,9 @@ class OpentronsPyroSerializer:
             elif issubclass(value_type, BaseModel):
                 unwrapped_value = value_type.model_validate(d["dictionary"][key])
             elif is_dataclass(value_type):
-                unwrapped_value = value_type(**d["dictionary"][key])
+                unwrapped_value = value_type.from_pyro_dict(  # type: ignore
+                    classname=d["value_type"], data=d["dictionary"][key]
+                )
             else:
                 unwrapped_value = value_type(d["dictionary"][key])
 
