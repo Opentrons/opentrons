@@ -2,10 +2,10 @@ import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 
 import { useRobot } from '/app/redux-resources/robots'
-import { OPENTRONS_USB } from '/app/redux/discovery/constants'
 import { useAccessTokenForRobot } from '/app/redux/robot-auth/hooks'
 import { getRobotUpdateSessionRobotName } from '/app/redux/robot-update'
-import { appShellUSBRequestor } from '/app/redux/shell/remote'
+
+import { buildHostConfig } from './buildHostConfig'
 
 import type { HostConfig } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
@@ -24,12 +24,9 @@ export function useRobotUpdateHostConfig(): HostConfig | null {
     if (robotName == null || robot?.ip == null) {
       return null
     }
-    return {
-      hostname: robot.ip,
-      port: robot.port,
-      robotName,
-      token,
-      requestor: robot.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined,
-    }
+    return buildHostConfig(
+      { ip: robot.ip, port: robot.port, name: robotName },
+      token
+    )
   }, [robot?.ip, robot?.port, robotName, token])
 }

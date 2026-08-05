@@ -32,8 +32,9 @@ import {
 import { uploadRobotUpdateFileViaShell } from '/app/redux/shell/remote'
 import { waitForStoreCondition } from '/app/redux/waitForStoreCondition'
 
+import { buildHostConfig } from './buildHostConfig'
 import { REDISCOVERY_TIME_MS } from './constants'
-import { buildHostConfig, ensureUpdateFileReady } from './ensureUpdateFileReady'
+import { ensureUpdateFileReady } from './ensureUpdateFileReady'
 import { getUserNotesFromDocumentationState } from './getUserNotesFromDocumentationState'
 import { pollRobotUpdateStatus } from './pollRobotUpdateStatus'
 

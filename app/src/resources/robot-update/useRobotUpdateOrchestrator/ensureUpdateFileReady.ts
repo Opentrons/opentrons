@@ -1,5 +1,4 @@
 import { i18n } from '/app/i18n'
-import { OPENTRONS_USB } from '/app/redux/discovery/constants'
 import {
   readSystemRobotUpdateFile,
   readUserRobotUpdateFile,
@@ -10,27 +9,11 @@ import {
   getRobotUpdateRobot,
   getRobotUpdateSession,
 } from '/app/redux/robot-update/selectors'
-import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import { waitForStoreCondition } from '/app/redux/waitForStoreCondition'
 
 import type { Store } from 'redux'
-import type { HostConfig } from '@opentrons/api-client'
-import type { ViewableRobot } from '/app/redux/discovery/types'
 import type { RobotUpdateSession } from '/app/redux/robot-update/types'
 import type { Dispatch, State } from '/app/redux/types'
-
-export function buildHostConfig(
-  robot: ViewableRobot,
-  token: string | null | undefined
-): HostConfig {
-  return {
-    hostname: robot.ip,
-    port: robot.port,
-    robotName: robot.name,
-    token,
-    requestor: robot.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined,
-  }
-}
 
 /**
  * Resolve the system file on disk (user file, cached download, or after
