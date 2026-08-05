@@ -30,7 +30,7 @@ Summary:
 
 ## Monorepo workflow
 
-- **Node:** `>=22.22.0` (see [`.nvmrc`](../.nvmrc)); Pnpm 10.32.1.
+- **Node:** `>=22.22.0` (see [`.nvmrc`](../.nvmrc)); Pnpm 11.20.0.
 - From repo root: `make setup-js` if needed; **`make -C protocol-visualization lint`** (same as **`make lint-js lint-css lint-json`** from the repo root) and **`make -C protocol-visualization check-ts`**; scoped tests via `make test-js-protocol-visualization` or `make -C protocol-visualization test`.
 - This package’s [`Makefile`](./Makefile) defines `lint` (delegates to the root Makefile) and `check-ts`.
 

@@ -9,7 +9,7 @@ All commands run from the **monorepo root** unless noted otherwise.
 
 ## Node.js Version Management
 
-**Required:** Node.js >= 22.22.0 (`.nvmrc`: `22.22.0`), pnpm 10.32.1.
+**Required:** Node.js >= 22.22.0 (`.nvmrc`: `22.22.0`), pnpm 11.20.0.
 
 Before running any `node`, `pnpm`, or `make` command, ensure the correct Node version is active. The user may use **nvm**, **nvs**, or **asdf**:
 
@@ -38,27 +38,27 @@ Standalone Python projects (`opentrons-ai-server/`, `e2e-testing/`, `analyses-sn
 
 ### Setup (install dependencies)
 
-| Target | Description |
-| --- | --- |
-| `make setup` | Install all JS and Python dependencies |
-| `make setup-js` | Setup all JS projects (pnpm install) |
+| Target          | Description                                             |
+| --------------- | ------------------------------------------------------- |
+| `make setup`    | Install all JS and Python dependencies                  |
+| `make setup-js` | Setup all JS projects (pnpm install)                    |
 | `make setup-py` | Setup all robot Python packages (pipenv/uv per project) |
 
 ### Teardown (uninstall dependencies)
 
-| Target | Description |
-| --- | --- |
-| `make teardown` | Teardown Python then JS (order matters) |
+| Target             | Description                                      |
+| ------------------ | ------------------------------------------------ |
+| `make teardown`    | Teardown Python then JS (order matters)          |
 | `make teardown-js` | Clean JS build output, remove all `node_modules` |
-| `make teardown-py` | Teardown all robot Python packages |
+| `make teardown-py` | Teardown all robot Python packages               |
 
 ### Clean (remove build artifacts only)
 
-| Target | Description |
-| --- | --- |
-| `make clean` | Clean JS and Python build output |
-| `make clean-js` | Clean JS build output (includes `clean-ts`) |
-| `make clean-py` | Clean Python build output |
+| Target          | Description                                                  |
+| --------------- | ------------------------------------------------------------ |
+| `make clean`    | Clean JS and Python build output                             |
+| `make clean-js` | Clean JS build output (includes `clean-ts`)                  |
+| `make clean-py` | Clean Python build output                                    |
 | `make clean-ts` | Remove TypeScript declaration output (`tsc --build --clean`) |
 
 ### Test
@@ -76,12 +76,12 @@ cd api && make test  # or: make -C api test
 
 **Full-repo targets** (use only when changes span multiple packages):
 
-| Target | Description |
-| --- | --- |
-| `make test` | Run all JS and Python tests |
-| `make test-js` | Run all JS tests (Vitest) |
+| Target                   | Description                                                           |
+| ------------------------ | --------------------------------------------------------------------- |
+| `make test`              | Run all JS and Python tests                                           |
+| `make test-js`           | Run all JS tests (Vitest)                                             |
 | `make test-js-<project>` | Run tests for one JS project (e.g., `make test-js-protocol-designer`) |
-| `make test-py` | Run all robot Python tests (pytest) |
+| `make test-py`           | Run all robot Python tests (pytest)                                   |
 
 Pass options: `make test-js-<project> tests="src/path" test_opts="--reporter=verbose"`
 
@@ -99,24 +99,24 @@ Run `format-js` first to auto-fix, then `lint-js` and `lint-css` to verify nothi
 
 ### Lint & Type-Check (full reference)
 
-| Target | Description |
-| --- | --- |
-| `make lint-js` | ESLint + Prettier check |
-| `make lint-js-eslint` | ESLint only |
-| `make lint-js-prettier` | Prettier only |
-| `make lint-css` | Stylelint all CSS |
-| `make lint-json` | ESLint for JSON files |
-| `make lint-py` | Lint all robot Python projects (ruff + mypy) |
-| `make check-js` / `make build-ts` | TypeScript type-check (`tsc --build`) |
-| `make circular-dependencies-js` | Check for circular imports (madge) |
+| Target                            | Description                                  |
+| --------------------------------- | -------------------------------------------- |
+| `make lint-js`                    | ESLint + Prettier check                      |
+| `make lint-js-eslint`             | ESLint only                                  |
+| `make lint-js-prettier`           | Prettier only                                |
+| `make lint-css`                   | Stylelint all CSS                            |
+| `make lint-json`                  | ESLint for JSON files                        |
+| `make lint-py`                    | Lint all robot Python projects (ruff + mypy) |
+| `make check-js` / `make build-ts` | TypeScript type-check (`tsc --build`)        |
+| `make circular-dependencies-js`   | Check for circular imports (madge)           |
 
 ### Format (auto-fix, full reference)
 
-| Target | Description |
-| --- | --- |
-| `make format-js` | Prettier auto-format |
-| `make format-py` | ruff format for all robot Python projects |
-| `make format-css` | Stylelint auto-fix |
+| Target            | Description                               |
+| ----------------- | ----------------------------------------- |
+| `make format-js`  | Prettier auto-format                      |
+| `make format-py`  | ruff format for all robot Python projects |
+| `make format-css` | Stylelint auto-fix                        |
 
 ### opentrons-ai-server Lint & Format
 
@@ -131,12 +131,12 @@ make lint     # ruff format --check + ruff check + mypy
 
 These projects have their **own** `Makefile` and use **uv** (not pipenv). They are NOT covered by root `make setup-py` / `make teardown-py`:
 
-| Project | Directory | Setup Command |
-| --- | --- | --- |
-| AI Server | `opentrons-ai-server/` | `make setup` (runs `uv sync`) |
-| E2E Testing | `e2e-testing/` | `make setup` (runs `uv sync`) |
+| Project                   | Directory                    | Setup Command                                     |
+| ------------------------- | ---------------------------- | ------------------------------------------------- |
+| AI Server                 | `opentrons-ai-server/`       | `make setup` (runs `uv sync`)                     |
+| E2E Testing               | `e2e-testing/`               | `make setup` (runs `uv sync`)                     |
 | Analyses Snapshot Testing | `analyses-snapshot-testing/` | `make setup` (runs bootstrap script; Python 3.12) |
-| Static Deploy | `scripts/static-deploy/` | `make setup` (runs `uv sync`) |
+| Static Deploy             | `scripts/static-deploy/`     | `make setup` (runs `uv sync`)                     |
 
 Run their setup from within their own directory.
 

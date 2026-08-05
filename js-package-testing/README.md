@@ -235,7 +235,7 @@ Use the Applitools UI to accept or reject visual changes when baselines need upd
 ### Requirements
 
 - Node 22 (see monorepo `.nvmrc`)
-- pnpm 10.x: this project pins **`pnpm@10.32.1`** in [`package.json`](package.json) `packageManager` (Corepack: `corepack enable`)
+- pnpm 10.x: this project pins **`pnpm@11.20.0`** in [`package.json`](package.json) `packageManager` (Corepack: `corepack enable`)
 
 ### Clean rebuild and dev server
 
