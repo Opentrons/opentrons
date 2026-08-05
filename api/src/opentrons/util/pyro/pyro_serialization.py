@@ -289,6 +289,7 @@ class OpentronsPyroSerializer:
         return {
             "__class__": ".".join((obj.__module__, obj.__class__.__name__)),
             "args": obj.args,
+            "state": dict[str, Any](obj.__dict__),
         }
 
     @classmethod
@@ -301,7 +302,11 @@ class OpentronsPyroSerializer:
             raise TypeError(
                 f"Could not convert {class_name} to an error, unregistered with pyro."
             )
-        return error_type(*d["args"])
+        # Rebuild error object without calling subclass __init__
+        obj = error_type.__new__(error_type)
+        BaseException.__init__(obj, *d["args"])
+        obj.__dict__.update(d.get("state", {}))
+        return obj
 
     @classmethod
     def register_typed_dict(cls, typed_dict: type) -> None:

@@ -17,7 +17,7 @@ from opentrons_shared_data.errors.exceptions import (
 from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
     HARDWARE_ERROR_PACKAGES,
 )
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.protocol_engine.types.module import ModuleModel
 from opentrons.types import DeckSlotName
 from opentrons.util.pyro.pyro_serialization import (
@@ -136,11 +136,32 @@ def test_enumerated_error_serialization(test_error: EnumeratedError) -> None:
     assert result == test_error
 
 
+_DUMMY_ARGS = [
+    ({Axis.Z_L: 150.2}, {Axis.Z_L: 140.0}),
+    ("example",),
+    ("example", "example"),
+    ("example", "example", "example"),
+    ("example", "example", None),
+    (0.0, 0.0),
+]
+
+
+def _add_error_args(error_type: type[BaseException]) -> BaseException:
+    last_error: TypeError | None = None
+    for args in _DUMMY_ARGS:
+        try:
+            return error_type(*args)
+        except TypeError as e:
+            last_error = e
+    raise AssertionError(f"Could not construct {error_type.__name__}") from last_error
+
+
 def test_basic_error_serialization() -> None:
-    """It should serialize and deserialize non-enumerated errors for Pyro via args."""
+    """It should serialize and deserialize non-enumerated errors for Pyro via args and state."""
     for error_type in find_basic_errors_in_packages(HARDWARE_ERROR_PACKAGES):
-        test_error = error_type("example")
-        # todo(NBS, 3036-8-5) this "example" might not work
+        if issubclass(error_type, EnumeratedError):
+            continue
+        test_error = _add_error_args(error_type)
         OpentronsPyroSerializer.register_basic_error(error_type)
 
         class_name = ".".join((test_error.__module__, test_error.__class__.__name__))
@@ -149,6 +170,7 @@ def test_basic_error_serialization() -> None:
         assert test_dict == {
             "__class__": class_name,
             "args": test_error.args,
+            "state": dict(test_error.__dict__),
         }
 
         result = OpentronsPyroSerializer._generic_error_dict_to_class(
@@ -157,4 +179,5 @@ def test_basic_error_serialization() -> None:
 
         assert type(result) is error_type
         assert result.args == test_error.args
+        assert result.__dict__ == test_error.__dict__
         assert str(result) == str(test_error)
