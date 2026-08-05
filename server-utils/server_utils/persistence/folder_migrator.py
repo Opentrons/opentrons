@@ -24,9 +24,6 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Final, List, Union
 
-PROTOCOL_FILE_PERMISSIONS = 0o640
-PROTOCOL_DIR_PERMISSIONS = 0o750
-
 _log = logging.getLogger(__name__)
 
 
@@ -133,7 +130,6 @@ class MigrationOrchestrator:
                 # Atomically move the filled directory into place.
                 final_output_dir = self._root / migration.subdirectory
                 os.replace(src=step_output_dir, dst=final_output_dir)
-                os.chmod(final_output_dir, PROTOCOL_DIR_PERMISSIONS)
                 latest_dir_so_far = final_output_dir
 
         _log.info("All migrations complete.")
