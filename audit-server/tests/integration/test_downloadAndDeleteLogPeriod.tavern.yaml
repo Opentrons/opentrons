@@ -1,4 +1,4 @@
-test_name: download logPeriod endpoint
+test_name: download logPeriod endpoint and delete it afterward
 
 marks:
   - usefixtures:
@@ -40,3 +40,37 @@ stages:
       status_code: 200
       headers:
         content-type: application/zip
+      save:
+        $ext:
+          function: tests:save_deletion_key
+
+  - name: DELETE /audit/external/logPeriods/periodId
+    request:
+      method: DELETE
+      url: '{run_server.base_url}/audit/external/logPeriods/{period_id}?deletionKey={log_period_deletion_key}'
+      headers:
+        authorization: 'bearer asdasdasd'
+        opentrons-user-notes: 'hoist on my own petard'
+    response:
+      status_code: 200
+      headers:
+        content-type: application/json
+
+      json:
+        data:
+          deletedPeriodId: '1'
+
+  - name: GET /audit/external/logPeriods sees newly-rotated period
+    request:
+      method: GET
+      url: '{run_server.base_url}/audit/external/logPeriods'
+    response:
+      status_code: 200
+      json:
+        data:
+          - id: 2
+            endedAt: null
+            startedAt: !anystr
+        meta:
+          cursor: 0
+          totalLength: 1

@@ -3,7 +3,7 @@
 from datetime import datetime, timezone
 from pathlib import Path
 
-from sqlalchemy import LargeBinary, cast, func, select
+from sqlalchemy import LargeBinary, cast, delete, func, select
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -27,6 +27,10 @@ class NoPeriodById(Exception):
 
 class NoActivePeriodError(Exception):
     """There is no currently-active log period."""
+
+
+class PeriodIsActiveError(Exception):
+    """The log period is active and may not be deleted."""
 
 
 class LogStore:
@@ -108,6 +112,41 @@ class LogStore:
         session.add(log_period)
 
         return robot_log.message_hash
+
+    def delete_period(
+        self, period_id: str
+    ) -> list[str] | NoPeriodById | PeriodIsActiveError:
+        """Delete a period. May not be active and must exist."""
+        try:
+            findable_id = int(period_id)
+        except Exception:
+            return NoPeriodById()
+        with self._session() as session:
+            with session.begin():
+                found_period = session.scalar(
+                    select(LogPeriod).where(LogPeriod.id == findable_id)
+                )
+                if found_period is None:
+                    return NoPeriodById()
+                if found_period.ended_at is None:
+                    return PeriodIsActiveError()
+
+                logs_delete_query = delete(LogEntry).where(
+                    LogEntry.log_period_id == findable_id
+                )
+                robot_log_paths = [
+                    robot_log.file_path for robot_log in found_period.robot_logs
+                ]
+                robot_logs_delete_query = delete(RobotLog).where(
+                    RobotLog.log_period_id == findable_id
+                )
+                log_period_delete_query = delete(LogPeriod).where(
+                    LogPeriod.id == findable_id
+                )
+                session.execute(logs_delete_query)
+                session.execute(robot_logs_delete_query)
+                session.execute(log_period_delete_query)
+                return robot_log_paths
 
     def end_period(self, end_period_logs: list[StoredLog]) -> str | NoActivePeriodError:
         """End a period, with the required end message and some previous supplemental messages.

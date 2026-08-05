@@ -19,7 +19,12 @@ from server_utils.keys.key_server import SignMessageData
 
 from . import constants
 from .models import LogPeriodDetails, LogPeriodSummary
-from .store import LogStore, NoActivePeriodError, NoLogInPeriodError
+from .store import (
+    LogStore,
+    NoActivePeriodError,
+    NoLogInPeriodError,
+    PeriodIsActiveError,
+)
 from .types import LogPeriodEntries, StoredLog
 from audit_server.log_ingest.models import AuditLogMessage
 from audit_server.settings.store import (
@@ -31,6 +36,10 @@ LOG = getLogger(__name__)
 # Number of random bytes behind each deletion key. urlsafe encoding produces a
 # longer string than this byte count.
 _DELETION_KEY_BYTES: Final = 32
+
+
+class InvalidDeletionKeyError(Exception):
+    """The specified deletion key does not correspond to the specified period id."""
 
 
 class _GetTime:
@@ -110,6 +119,31 @@ class LogDataManager:
         key = secrets.token_urlsafe(_DELETION_KEY_BYTES)
         self._deletion_keys[key] = period_id
         return key
+
+    async def delete_log_period(self, period_id: str, deletion_key: str) -> str:
+        """Delete a log period, rotating if necessary, and return the deleted period."""
+        try:
+            deletable_period = self._deletion_keys[deletion_key]
+        except KeyError:
+            raise InvalidDeletionKeyError()
+        if deletable_period != period_id:
+            raise InvalidDeletionKeyError()
+
+        async with self._lock:
+            robot_logs_to_delete = self._store.delete_period(period_id)
+            if isinstance(robot_logs_to_delete, PeriodIsActiveError):
+                await self._do_rotate_periods()
+                robot_logs_to_delete = self._store.delete_period(period_id)
+        if isinstance(robot_logs_to_delete, Exception):
+            raise robot_logs_to_delete
+
+        for log_path in robot_logs_to_delete:
+            try:
+                Path(log_path).unlink()
+            except BaseException:
+                LOG.exception(f"Could not delete {log_path}")
+
+        return period_id
 
     async def _do_store_log(self, log_message: str) -> str:
         previous_hash = self._store.tail_hash()

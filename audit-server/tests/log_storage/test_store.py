@@ -3,7 +3,7 @@
 from pathlib import Path
 
 import pytest
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session
 
@@ -11,6 +11,8 @@ from audit_server.log_storage.models import UserLogEntry
 from audit_server.log_storage.store import (
     LogStore,
     NoActivePeriodError,
+    NoPeriodById,
+    PeriodIsActiveError,
 )
 from audit_server.log_storage.types import LogPeriodEntries, StoredLog
 from audit_server.persistence.orm_models import LogPeriod, RobotLog
@@ -401,3 +403,49 @@ def test_get_period_details_aggregates_entries_in_database(
         + robot_log_path.stat().st_size
     )
     assert details.attachedFilenames == ["robot.log"]
+
+
+def test_delete_period_fails_if_no_period_exists(subject_with_period: LogStore) -> None:
+    """It should not delete the period if it does not exist."""
+    result = subject_with_period.delete_period("33123123123")
+    assert isinstance(result, NoPeriodById)
+    assert len(subject_with_period.list_periods()) == 1
+
+
+def test_delete_period_fails_if_period_is_active(subject_with_period: LogStore) -> None:
+    """It should not delete the period if it is active."""
+    period_id = str(subject_with_period.list_periods()[0].id)
+    result = subject_with_period.delete_period(period_id)
+    assert isinstance(result, PeriodIsActiveError)
+
+
+def test_delete_period_deletes_period(
+    subject_with_period: LogStore, db_engine: SQLEngine
+) -> None:
+    """It should delete a period and all its collateral."""
+    period_id = str(subject_with_period.list_periods()[0].id)
+    subject_with_period.store_robot_log(
+        StoredLog(
+            message="asasda",
+            message_hash="asfasdas",
+            message_sig="sdsasd",
+            sig_version="gggg",
+        ),
+        file_path=Path("some/path"),
+    )
+    subject_with_period.end_period(
+        [
+            StoredLog(
+                message="asdasd",
+                message_hash="asdasd",
+                message_sig="sdasd",
+                sig_version="55",
+            )
+        ]
+    )
+    result = subject_with_period.delete_period(period_id)
+    assert result == ["some/path"]
+    with db_engine.connect() as connection:
+        assert connection.execute(text("select * from logperiod")).all() == []
+        assert connection.execute(text("select * from logentry")).all() == []
+        assert connection.execute(text("select * from robotlog")).all() == []
