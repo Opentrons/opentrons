@@ -26,7 +26,7 @@ import opentrons.hardware_control.dev_types
 import opentrons.hardware_control.instruments.ot3.instrument_calibration
 import opentrons.hardware_control.modules.errors
 import opentrons.hardware_control.modules.module_calibration
-import opentrons.hardware_control.modules.thermocycler  # ThermocyclerError lives here
+import opentrons.hardware_control.modules.thermocycler
 import opentrons.hardware_control.modules.types
 import opentrons.hardware_control.nozzle_manager
 import opentrons.hardware_control.peripherals.types
