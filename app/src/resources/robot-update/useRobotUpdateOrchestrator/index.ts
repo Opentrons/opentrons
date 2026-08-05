@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useRef } from 'react'
+import { useQueryClient } from 'react-query'
 import { useDispatch, useSelector, useStore } from 'react-redux'
 
 import {
@@ -34,11 +35,15 @@ export function useRobotUpdateOrchestrator(): {
 } {
   const dispatch = useDispatch<Dispatch>()
   const store = useStore<State>()
+  const queryClient = useQueryClient()
   const sessionRobotName = useSelector(getRobotUpdateSessionRobotName)
   const baseHostConfig = useRobotUpdateHostConfig()
   const accessToken = useAccessTokenForRobot(sessionRobotName)
 
   const abortRef = useRef<AbortController | null>(null)
+  // After AC cache reset, ignore settled docs until host is ready and queries
+  // have loaded again, otherwise create can use a stale CRS-enabled snapshot.
+  const acGateRef = useRef(false)
 
   // Values that may change mid-flow. Read via getters.
   const accessTokenRef = useRef(accessToken)
@@ -68,7 +73,7 @@ export function useRobotUpdateOrchestrator(): {
       return null
     }
     return shouldUseAccessToken(documentationState)
-      ? baseHostConfig
+      ? withAccessToken(baseHostConfig)
       : withoutAccessToken(baseHostConfig)
   }, [baseHostConfig, documentationState])
 
@@ -128,31 +133,65 @@ export function useRobotUpdateOrchestrator(): {
       dispatch(clearRobotUpdateSession())
       dispatch(startRobotUpdate(robotName, systemFile ?? null))
 
-      void runRobotUpdateFlow({
-        store,
-        dispatch,
-        robotName,
-        systemFile: systemFile ?? null,
-        getAccessToken: () => {
-          if (!shouldUseAccessToken(docsStateRef.current)) {
-            return null
+      acGateRef.current = true
+
+      void queryClient
+        .resetQueries({
+          predicate: query => {
+            const key = query.queryKey
+            return (
+              Array.isArray(key) &&
+              (key.includes('accessControlEnabled') || key.includes('audit'))
+            )
+          },
+        })
+        .then(() => {
+          if (abortController.signal.aborted) {
+            return
           }
-          return accessTokenRef.current
-        },
-        getDocumentationState: () => docsStateRef.current,
-        isHostConfigReady: () => hostConfigReadyRef.current,
-        getMutations: () => mutationsRef.current,
-        signal: abortController.signal,
-      })
+          return runRobotUpdateFlow({
+            store,
+            dispatch,
+            robotName,
+            systemFile: systemFile ?? null,
+            getAccessToken: () => {
+              if (!shouldUseAccessToken(readDocumentationState())) {
+                return null
+              }
+              return accessTokenRef.current
+            },
+            getDocumentationState: readDocumentationState,
+            isHostConfigReady: () => hostConfigReadyRef.current,
+            getMutations: () => mutationsRef.current,
+            signal: abortController.signal,
+          })
+        })
+
+      function readDocumentationState(): DocumentationState {
+        const state = docsStateRef.current
+        if (!acGateRef.current) {
+          return state
+        }
+        // Hold the gate until the post-reset host/queries have settled.
+        if (!hostConfigReadyRef.current || state.isLoading) {
+          return { isLoading: true }
+        }
+        acGateRef.current = false
+        return state
+      }
     },
-    [clearDocreport, dispatch, store]
+    [clearDocreport, dispatch, queryClient, store]
   )
 
   return { startUpdate }
 }
 
 function withoutAccessToken(hostConfig: HostConfig): HostConfig {
-  return { ...hostConfig, token: null }
+  return { ...hostConfig, token: null, secure: false }
+}
+
+function withAccessToken(hostConfig: HostConfig): HostConfig {
+  return { ...hostConfig, secure: true }
 }
 
 function shouldUseAccessToken(documentationState: DocumentationState): boolean {

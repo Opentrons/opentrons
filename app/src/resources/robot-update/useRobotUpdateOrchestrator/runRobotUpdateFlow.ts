@@ -251,6 +251,16 @@ function waitForDocumentationReady(
 function reportFlowError(dispatch: Dispatch, error: unknown): void {
   if (isAbortError(error)) return
   if (isDocumentedMutationError(error)) {
+    // access_control_loading is retried in createUpdateSession; if it still
+    // surfaces here, keep the session so the UI does not silently disappear.
+    if (error.type === 'access_control_loading') {
+      dispatch(
+        unexpectedRobotUpdateError(
+          i18n.t('unable_to_start_update_session', { ns: 'device_settings' })
+        )
+      )
+      return
+    }
     dispatch(clearRobotUpdateSession())
     return
   }
@@ -267,7 +277,7 @@ function createUpdateSession(
   sessionPath: string,
   pathPrefix: string
 ): Promise<boolean> {
-  const { dispatch, getMutations } = deps
+  const { dispatch, getMutations, signal } = deps
   const robotHost = {
     name: robot.name,
     ip: robot.ip,
@@ -289,6 +299,13 @@ function createUpdateSession(
       })
 
   return createOnce().catch((error: unknown) => {
+    if (
+      isDocumentedMutationError(error) &&
+      error.type === 'access_control_loading'
+    ) {
+      return waitForDocumentationReady(deps, signal).then(() => createOnce())
+    }
+
     const axiosError = error as AxiosError
     if (axiosError.response?.status !== 409) {
       return Promise.reject(error)
