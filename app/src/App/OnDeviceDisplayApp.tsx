@@ -65,6 +65,7 @@ import { RobotUpdateProvider } from '/app/resources/robot-update/RobotUpdateProv
 import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { LocalizationProvider } from '../LocalizationProvider'
 import { requireDocumentation } from '../organisms/ODD/DocumentationRequired/requireDocumentation'
+import { showDownloadLogsModal } from '../organisms/ODD/DownloadAuditLogsModal'
 import { showLoginModal } from '../organisms/ODD/OnDeviceLogin/LoginModal'
 import { showSignRunModal } from '../pages/ODD/RunSummary/SignRun'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
@@ -260,7 +261,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                       showDocumentationRequiredModal: requireDocumentation,
                       showLoginModal,
                       showSignRunModal,
-                      showDownloadLogsModal: () => Promise.resolve(false),
+                      showDownloadLogsModal,
                     }}
                   >
                     <RobotUpdateProvider>
