@@ -118,6 +118,10 @@ async def do_update(  # noqa: C901
             sys.exit(-1)
 
         status = await file_resp.json()
+        while status["stage"] == "awaiting-file":
+            sys.stdout.write("waiting for validation to begin\r\n")
+            status = await poll_status(session, token, root)
+
         while status["stage"] == "validating":
             sys.stdout.write(f"{status['message']}: {status['progress'] * 100:.0f}%\r")
             status = await poll_status(session, token, root)
