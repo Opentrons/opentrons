@@ -70,7 +70,7 @@ export function ProtocolRunRecords(): ReactNode {
     return (
       <OddInfoScreen
         type="neutral"
-        header={t('no_recent_runs')}
+        header={t('no_run_records_found')}
         height="100%"
       />
     )
