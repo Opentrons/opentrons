@@ -46,7 +46,10 @@ describe('log location module dispatches', () => {
 
     expect(vi.mocked(Dialogs.showOpenDirectoryDialog)).toHaveBeenCalledWith(
       mockMainWindow,
-      { defaultPath: '/existing/audit-logs' }
+      {
+        defaultPath: '/existing/audit-logs',
+        properties: ['openDirectory', 'createDirectory'],
+      }
     )
   })
 
