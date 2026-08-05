@@ -5,14 +5,14 @@ import { getLogPeriodDetails } from '@opentrons/api-client'
 import { getQueryKey, useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type { LogPeriodDetailsResponse } from '@opentrons/api-client'
+import type { LogPeriodDetails } from '@opentrons/api-client'
 
 export function useLogPeriodDetailsQuery(
   logPeriodId: string,
-  options: UseQueryOptions<LogPeriodDetailsResponse> = {}
-): UseQueryResult<LogPeriodDetailsResponse> {
+  options: UseQueryOptions<LogPeriodDetails> = {}
+): UseQueryResult<LogPeriodDetails> {
   const host = useHost()
-  const query = useQuery<LogPeriodDetailsResponse>(
+  const query = useQuery<LogPeriodDetails>(
     getQueryKey(host, 'audit', 'logPeriods', logPeriodId),
     () =>
       getLogPeriodDetails(host!, logPeriodId).then(response => response.data),

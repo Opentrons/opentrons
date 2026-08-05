@@ -30,6 +30,7 @@
   "detach_gripper": "Detaching gripper",
   "disconnect_wifi": "Disconnecting robot from wifi",
   "dismiss_run": "Dismissing protocol run",
+  "download_log_period": "Downloading audit logs",
   "drop_tips": "Dropping tips",
   "end": "Finishing",
   "end_calibration": "Finishing calibration",
