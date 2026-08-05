@@ -21,8 +21,11 @@ from opentrons.util.pyro.pyro_serialization import (
     OpentronsPyroSerializer,
     enumerated_error_class_to_dict,
     enumerated_error_dict_to_class,
+    find_basic_errors_in_packages,
 )
-
+from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
+    HARDWARE_ERROR_PACKAGES,
+)
 
 class NestedTest(BaseModel):
     """A basic pydantic model that is nested in another model."""
@@ -134,19 +137,22 @@ def test_enumerated_error_serialization(test_error: EnumeratedError) -> None:
 
 def test_basic_error_serialization() -> None:
     """It should serialize and deserialize non-enumerated errors for Pyro via args."""
-    test_error = FailedTipStateCheck("tip state mismatch")
-    OpentronsPyroSerializer.register_basic_error(FailedTipStateCheck)
+    
+    for error_type in find_basic_errors_in_packages(HARDWARE_ERROR_PACKAGES):
+        test_error = error_type("example")
+        # todo(NBS, 3036-8-5) this "example" might not work
+        OpentronsPyroSerializer.register_basic_error(error_type)
 
-    class_name = ".".join((test_error.__module__, test_error.__class__.__name__))
-    test_dict = OpentronsPyroSerializer._generic_error_class_to_dict(test_error)
+        class_name = ".".join((test_error.__module__, test_error.__class__.__name__))
+        test_dict = OpentronsPyroSerializer._generic_error_class_to_dict(test_error)
 
-    assert test_dict == {
-        "__class__": class_name,
-        "args": test_error.args,
-    }
+        assert test_dict == {
+            "__class__": class_name,
+            "args": test_error.args,
+        }
 
-    result = OpentronsPyroSerializer._generic_error_dict_to_class(class_name, test_dict)
+        result = OpentronsPyroSerializer._generic_error_dict_to_class(class_name, test_dict)
 
-    assert type(result) is FailedTipStateCheck
-    assert result.args == test_error.args
-    assert str(result) == str(test_error)
+        assert type(result) is error_type
+        assert result.args == test_error.args
+        assert str(result) == str(test_error)
