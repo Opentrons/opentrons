@@ -29,6 +29,9 @@ DEFAULT_TARGETS = [float(p) for p in range(0, -801, -50)]  # 0, -50, ..., -800 m
 DEFAULT_DURATION_S = 120  # 2 minutes each
 SAMPLE_PERIOD_S = 0.5
 TIMEOUT_S = 180
+DEFAULT_KP = 13.1
+DEFAULT_KI = 4.59
+DEFAULT_KD = 0.15
 
 
 def write_results(result: dict[str, Any]) -> None:
@@ -166,6 +169,9 @@ async def main(args: argparse.Namespace) -> int:
     targets = args.targets
     duration_s = args.duration_s
     run_name = args.run_name
+    kp = args.kp
+    ki = args.ki
+    kd = args.kd
 
     print(
         f"Run: {run_name}  Targets: {targets[0]} .. {targets[-1]} "
@@ -195,12 +201,16 @@ async def main(args: argparse.Namespace) -> int:
         waste = await pump.get_waste_configs()
         print("M128:", waste, flush=True)
         print("M121:", await pump.get_vacuum_state(), flush=True)
+        await pump.set_pressure_control_tunings(kp=kp, ki=ki, kd=kd)
         print("M126:", await pump.get_pressure_control_tunings(), flush=True)
 
         result: dict[str, Any] = {
             "run_name": run_name,
             "firmware": fw,
             "targets": targets,
+            "kp": control_tunings.kp,
+            "ki": control_tunings.ki,
+            "kd": control_tunings.kd,
             "duration_s": duration_s,
             "sample_period_s": SAMPLE_PERIOD_S,
             "waste_detection": waste_label,
@@ -273,6 +283,24 @@ if __name__ == "__main__":
         action=argparse.BooleanOptionalAction,
         default=False,
         help="Enable waste full detection (default: disabled)",
+    )
+    parser.add_argument(
+        "--kp",
+        type=float,
+        default=DEFAULT_KP,
+        help="Proportional gain",
+    )
+    parser.add_argument(
+        "--ki",
+        type=float,
+        default=DEFAULT_KI,
+        help="Integral gain",
+    )
+    parser.add_argument(
+        "--kd",
+        type=float,
+        default=DEFAULT_KD,
+        help="Derivative gain",
     )
     args = parser.parse_args()
     sys.exit(asyncio.run(main(args)))
