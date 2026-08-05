@@ -1961,7 +1961,7 @@ class VacuumModuleContext(ModuleContext):
     def move_to_dock(
         self,
         labware: Labware,
-        use_gripper: bool = False,
+        use_gripper: bool = True,
         pick_up_offset: Optional[Mapping[str, float]] = None,
         drop_offset: Optional[Mapping[str, float]] = None,
     ) -> None:
