@@ -68,6 +68,7 @@ async def do_update(  # noqa: C901
         async with aiohttp.ClientSession(timeout=timeout) as login_session:
             access_token = await log_in(login_session, host, username, password)
         headers["Authorization"] = f"Bearer {access_token}"
+        headers["Opentrons-User-Notes"] = "a" * 128
 
     async with aiohttp.ClientSession(timeout=timeout, headers=headers) as session:
         root = host + "/server/update"
