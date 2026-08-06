@@ -201,41 +201,7 @@ The Vacuum Module ships with two vacuum hoses and factory installed quick connec
     </tr>
     <tr>
       <td><strong>Material composition</strong></td>
-      <td>Tygon® 2375</td>
-    </tr>
-  </tbody>
-</table>
-
-### Carboy
-
-The Vacuum Module ships with glass waste collection carboy, cap, cap wrench, and holder. The holder helps keep the carboy upright and prevents tip-overs. The wrench helps you remove the cap after returning the module system to atmospheric pressure.
-
-<table>
-  <thead>
-    <tr>
-      <th>Specification</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>Waste jar</strong></td>
-      <td> <ul>
-          <li>Composition: clear glass</li>
-          <li>Capacity: 2 liters</li>
-          <li>Opening: wide-mouth, screw top</li>
-        </ul>
-      </td>
-    </tr>
-    <tr>
-      <td><strong>Cap</strong></td>
-      <td>
-        <ul>
-          <li>Type: GL80 (blue)</li>
-          <li>Insert: Stainless steel, ported and threaded for hose connectors</li>
-          <li>Seal: integral lip seal</li>
-          <li>Backflow preventer: float ball and valve</li>
-      </td>
+      <td>Vacuum hoses are made from Tygon® 2375. This material is compatible with a wide range of chemicals. See <a href="compatibility/">Chemical Compatibility</a> for details.</td>
     </tr>
   </tbody>
 </table>
