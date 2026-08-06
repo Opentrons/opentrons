@@ -130,7 +130,7 @@ function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
           registerLabware(dispatch, window),
           registerLogLocation(dispatch, window),
           registerSystemInfo(dispatch),
-          registerProtocolStorage(dispatch),
+          registerProtocolStorage(dispatch, window),
           registerUsb(dispatch),
           registerNotify(dispatch, window),
           registerReloadUi(window),

@@ -53,6 +53,16 @@ describe('protocol storage actions', () => {
       },
     },
     {
+      name: 'exportProtocol',
+      creator: actions.exportProtocol,
+      args: ['protocol-key'],
+      expected: {
+        type: 'protocolStorage:EXPORT_PROTOCOL',
+        payload: { protocolKey: 'protocol-key' },
+        meta: { shell: true },
+      },
+    },
+    {
       name: 'addProtocolFailure with failed protocol',
       creator: actions.addProtocolFailure,
       args: [Fixtures.storedProtocolDir, 'BADDD'],

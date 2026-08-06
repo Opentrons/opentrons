@@ -16,6 +16,7 @@ module.exports = {
   dialog: {
     // https://electronjs.org/docs/api/dialog#dialogshowopendialogbrowserwindow-options
     showOpenDialog: vi.fn(),
+    showSaveDialog: vi.fn(),
   },
 
   shell: {

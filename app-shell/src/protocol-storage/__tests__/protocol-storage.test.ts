@@ -9,11 +9,17 @@ import {
   fetchProtocols,
   getParsedAnalysisFromPath,
   getUnixTimeFromAnalysisPath,
+  registerProtocolStorage,
 } from '../'
+import { showSaveDialog } from '../../dialogs'
 import { NOT_OT2_PROTOCOLS_DIRECTORY_PATH } from '../file-system'
+
+import type { BrowserWindow } from 'electron'
 
 vi.mock('electron-store')
 vi.mock('../../log')
+vi.mock('../../dialogs')
+vi.mock('../../protocol-analysis')
 vi.mock('../../config', () => ({
   getConfig: vi.fn((path?: string) => {
     if (path === 'devInternal') {
@@ -92,6 +98,66 @@ describe('protocol storage directory utilities', () => {
             meta: { source: 'initial' },
           })
         )
+    })
+  })
+
+  describe('registerProtocolStorage EXPORT_PROTOCOL', () => {
+    const mockMainWindow = {} as unknown as BrowserWindow
+
+    beforeEach(() => {
+      vi.mocked(showSaveDialog).mockClear()
+    })
+
+    it('copies the protocol source file to the chosen destination', async () => {
+      const destDir = tempy.directory()
+      const destFilePath = path.join(destDir, 'exported.py')
+      await fs.emptyDir(path.join(protocolsDir, 'abc123', 'src'))
+      await fs.writeFile(
+        path.join(protocolsDir, 'abc123', 'src', 'main.py'),
+        'metadata = {}'
+      )
+      vi.mocked(showSaveDialog).mockResolvedValue(destFilePath)
+
+      const handleAction = registerProtocolStorage(mockDispatch, mockMainWindow)
+      handleAction({
+        type: 'protocolStorage:EXPORT_PROTOCOL',
+        payload: { protocolKey: 'abc123' },
+        meta: { shell: true },
+      } as any)
+
+      await vi.waitFor(async () => {
+        expect(await fs.readFile(destFilePath, 'utf8')).toBe('metadata = {}')
+      })
+      expect(vi.mocked(showSaveDialog)).toHaveBeenCalledWith(
+        mockMainWindow,
+        expect.objectContaining({
+          defaultPath: expect.stringContaining('main.py'),
+        })
+      )
+      await fs.rm(destDir, { recursive: true, force: true })
+    })
+
+    it('exports nothing when the save dialog is canceled', async () => {
+      const destDir = tempy.directory()
+      await fs.emptyDir(path.join(protocolsDir, 'abc123', 'src'))
+      await fs.writeFile(
+        path.join(protocolsDir, 'abc123', 'src', 'main.py'),
+        'metadata = {}'
+      )
+      vi.mocked(showSaveDialog).mockResolvedValue(null)
+
+      const handleAction = registerProtocolStorage(mockDispatch, mockMainWindow)
+      handleAction({
+        type: 'protocolStorage:EXPORT_PROTOCOL',
+        payload: { protocolKey: 'abc123' },
+        meta: { shell: true },
+      } as any)
+
+      await vi.waitFor(() => {
+        expect(vi.mocked(showSaveDialog)).toHaveBeenCalled()
+      })
+      expect(await fs.readdir(destDir)).toEqual([])
+      await fs.rm(destDir, { recursive: true, force: true })
     })
   })
 

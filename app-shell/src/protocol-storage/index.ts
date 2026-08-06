@@ -1,5 +1,5 @@
 import path from 'path'
-import { shell } from 'electron'
+import { app, shell } from 'electron'
 import fse from 'fs-extra'
 
 import {
@@ -12,6 +12,7 @@ import {
 import {
   ADD_PROTOCOL,
   ANALYZE_PROTOCOL,
+  EXPORT_PROTOCOL,
   FETCH_PROTOCOLS,
   INITIAL,
   OPEN_PROTOCOL_DIRECTORY,
@@ -21,9 +22,11 @@ import {
   UI_INITIALIZED,
   VIEW_PROTOCOL_SOURCE_FOLDER,
 } from '../constants'
+import { showSaveDialog } from '../dialogs'
 import { createFailedAnalysis } from '../protocol-analysis/writeFailedAnalysis'
 import * as FileSystem from './file-system'
 
+import type { BrowserWindow } from 'electron'
 import type { ProtocolListActionSource as ListSource } from '@opentrons/app/src/redux/protocol-storage/types'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { Action, Dispatch } from '../types'
@@ -230,7 +233,10 @@ export const fetchProtocols = (
     })
 }
 
-export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
+export function registerProtocolStorage(
+  dispatch: Dispatch,
+  mainWindow: BrowserWindow
+): Dispatch {
   return function handleActionForProtocolStorage(action: Action) {
     switch (action.type) {
       case FETCH_PROTOCOLS:
@@ -283,6 +289,31 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
           action.payload.protocolKey,
           protocolsDir
         )
+        break
+      }
+
+      case EXPORT_PROTOCOL: {
+        const protocolsDir = getProtocolsDirectoryPath()
+        void FileSystem.getProtocolSrcFilePaths(
+          action.payload.protocolKey,
+          protocolsDir
+        ).then(srcFilePaths => {
+          const srcFilePath = srcFilePaths[0]
+          if (srcFilePath == null) return
+          return showSaveDialog(mainWindow, {
+            defaultPath: path.join(
+              app.getPath('documents'),
+              path.basename(srcFilePath)
+            ),
+            filters: [
+              { name: 'Opentrons Protocol', extensions: ['py', 'json', 'zip'] },
+            ],
+          }).then(destFilePath => {
+            if (destFilePath != null) {
+              return fse.copy(srcFilePath, destFilePath, { overwrite: true })
+            }
+          })
+        })
         break
       }
 

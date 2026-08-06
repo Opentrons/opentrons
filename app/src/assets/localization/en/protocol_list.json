@@ -3,6 +3,7 @@
   "delete_protocol_message": " and its run history will be permanently deleted.",
   "delete_this_protocol": "Delete this protocol?",
   "edit": "edit",
+  "export_protocol_file": "Export protocol file",
   "go_to_timeline": "Go to timeline",
   "last_updated_at": "Updated {{date}}",
   "left_mount": "left mount",

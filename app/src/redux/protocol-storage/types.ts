@@ -122,6 +122,12 @@ export interface ViewProtocolSourceFolder {
   meta: { shell: true }
 }
 
+export interface ExportProtocolAction {
+  type: 'protocolStorage:EXPORT_PROTOCOL'
+  payload: { protocolKey: string }
+  meta: { shell: true }
+}
+
 export type ProtocolStorageAction =
   | FetchProtocolsAction
   | UpdateProtocolListAction
@@ -135,3 +141,4 @@ export type ProtocolStorageAction =
   | AnalyzeProtocolSuccessAction
   | AnalyzeProtocolFailureAction
   | ViewProtocolSourceFolder
+  | ExportProtocolAction

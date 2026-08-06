@@ -27,6 +27,7 @@ import {
 } from '/app/redux/analytics'
 import {
   analyzeProtocol,
+  exportProtocol,
   removeProtocol,
   viewProtocolSourceFolder,
 } from '/app/redux/protocol-storage'
@@ -80,6 +81,12 @@ export function ProtocolOverflowMenu(
     e.preventDefault()
     e.stopPropagation()
     dispatch(viewProtocolSourceFolder(protocolKey))
+    setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
+  }
+  const handleClickExport: MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    dispatch(exportProtocol(protocolKey))
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
   const handleClickRun: MouseEventHandler<HTMLButtonElement> = e => {
@@ -170,6 +177,12 @@ export function ProtocolOverflowMenu(
             data-testid="ProtocolOverflowMenu_showInFolder"
           >
             {t('show_in_folder')}
+          </MenuItem>
+          <MenuItem
+            onClick={handleClickExport}
+            data-testid="ProtocolOverflowMenu_exportProtocol"
+          >
+            {t('export_protocol_file')}
           </MenuItem>
           <MenuItem
             onClick={handleClickDelete}

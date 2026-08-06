@@ -80,6 +80,7 @@ export type ANALYZE_PROTOCOL_FAILURE_TYPE =
   'protocolStorage:ANALYZE_PROTOCOL_FAILURE'
 export type VIEW_PROTOCOL_SOURCE_FOLDER_TYPE =
   'protocolStorage:VIEW_PROTOCOL_SOURCE_FOLDER'
+export type EXPORT_PROTOCOL_TYPE = 'protocolStorage:EXPORT_PROTOCOL'
 
 export type PROTOCOL_ADDITION_TYPE = 'protocolAddition'
 

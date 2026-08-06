@@ -4,6 +4,8 @@ import type {
   BrowserWindow,
   OpenDialogOptions,
   OpenDialogReturnValue,
+  SaveDialogOptions,
+  SaveDialogReturnValue,
 } from 'electron'
 
 interface BaseDialogOptions {
@@ -78,6 +80,30 @@ export function showOpenFileDialog(
     .showOpenDialog(browserWindow, openDialogOpts)
     .then((result: OpenDialogReturnValue) => {
       return result.canceled ? [] : (result.filePaths as string[])
+    })
+}
+
+export function showSaveDialog(
+  browserWindow: BrowserWindow,
+  options: Partial<Omit<FileDialogOptions, 'properties'>> = {}
+): Promise<string | null> {
+  let saveDialogOpts: SaveDialogOptions = {}
+
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+  if (options.defaultPath) {
+    saveDialogOpts = { ...saveDialogOpts, defaultPath: options.defaultPath }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+  if (options.filters) {
+    saveDialogOpts = { ...saveDialogOpts, filters: options.filters }
+  }
+
+  return dialog
+    .showSaveDialog(browserWindow, saveDialogOpts)
+    .then((result: SaveDialogReturnValue) => {
+      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+      return result.canceled || !result.filePath ? null : result.filePath
     })
 }
 

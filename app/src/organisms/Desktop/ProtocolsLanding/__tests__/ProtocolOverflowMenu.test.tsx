@@ -10,6 +10,7 @@ import {
 } from '/app/redux/analytics'
 import {
   analyzeProtocol,
+  exportProtocol,
   removeProtocol,
   viewProtocolSourceFolder,
 } from '/app/redux/protocol-storage'
@@ -81,6 +82,17 @@ describe('ProtocolOverflowMenu', () => {
 
     expect(store.dispatch).toHaveBeenCalledWith(
       analyzeProtocol(storedProtocolData.protocolKey)
+    )
+  })
+
+  it('should dispatch exportProtocol when clicking Export protocol file', () => {
+    render()
+    const button = screen.getByTestId('ProtocolOverflowMenu_overflowBtn')
+    fireEvent.click(button)
+    const exportButton = screen.getByText('Export protocol file')
+    fireEvent.click(exportButton)
+    expect(vi.mocked(exportProtocol)).toHaveBeenCalledWith(
+      storedProtocolData.protocolKey
     )
   })
 

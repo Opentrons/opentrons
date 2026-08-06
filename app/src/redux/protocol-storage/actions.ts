@@ -38,6 +38,9 @@ export const ANALYZE_PROTOCOL_FAILURE: 'protocolStorage:ANALYZE_PROTOCOL_FAILURE
 export const VIEW_PROTOCOL_SOURCE_FOLDER: 'protocolStorage:VIEW_PROTOCOL_SOURCE_FOLDER' =
   'protocolStorage:VIEW_PROTOCOL_SOURCE_FOLDER'
 
+export const EXPORT_PROTOCOL: 'protocolStorage:EXPORT_PROTOCOL' =
+  'protocolStorage:EXPORT_PROTOCOL'
+
 // action meta literals
 
 export const POLL = 'poll' as const
@@ -132,6 +135,14 @@ export const viewProtocolSourceFolder = (
   protocolKey: string
 ): Types.ViewProtocolSourceFolder => ({
   type: VIEW_PROTOCOL_SOURCE_FOLDER,
+  payload: { protocolKey },
+  meta: { shell: true },
+})
+
+export const exportProtocol = (
+  protocolKey: string
+): Types.ExportProtocolAction => ({
+  type: EXPORT_PROTOCOL,
   payload: { protocolKey },
   meta: { shell: true },
 })

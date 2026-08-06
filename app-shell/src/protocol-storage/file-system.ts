@@ -212,6 +212,18 @@ export function analyzeProtocolByKey(
   return analyzeProtocolSource(srcDirPath, destFilePath)
 }
 
+export function getProtocolSrcFilePaths(
+  protocolKey: string,
+  protocolsDirPath: string
+): Promise<string[]> {
+  const srcDirPath = path.join(
+    protocolsDirPath,
+    protocolKey,
+    PROTOCOL_SRC_DIRECTORY_NAME
+  )
+  return readFilesWithinDirectory(srcDirPath)
+}
+
 export function viewProtocolSourceFolder(
   protocolKey: string,
   protocolsDirPath: string
