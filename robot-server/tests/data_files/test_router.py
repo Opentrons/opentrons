@@ -1,6 +1,7 @@
 """Tests for data_files router."""
 
 import io
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import List
@@ -1000,10 +1001,26 @@ def test_sanitize_path_blocks_paths(path: str) -> None:
 @pytest.mark.parametrize(
     "path",
     [
-        "/var/lib/opentrons-robot-server/some/path",
+        pytest.param(
+            "/var/lib/opentrons-robot-server/some/path",
+            marks=[
+                pytest.mark.skipif(
+                    os.path.realpath("/var") != "/var",
+                    reason="/var symlinked to /private/var (likely macos)",
+                ),
+            ],
+        ),
         "/media/ENFAINT-sda1/something",
         "/data/some/random/path",
-        "/var/lib/jupyter/data/some/path",
+        pytest.param(
+            "/var/lib/jupyter/data/some/path",
+            marks=[
+                pytest.mark.skipif(
+                    os.path.realpath("/var") != "/var",
+                    reason="/var symlinked to /private/var (likely macos)",
+                )
+            ],
+        ),
         "/run/media/efasda-sdc",
         "/data",
         "/userfs/media/afffsd",

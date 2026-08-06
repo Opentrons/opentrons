@@ -77,14 +77,16 @@ _DEFAULT_IMAGE_METADATA_LIST_LENGTH: Final = 99
 _DEFAULT_IMAGE_METADATA_CURSOR: Final = 0
 
 _FILE_PATH_ROOT_ALLOWLISTS = [
-    "/data/",
-    "/var/lib/opentrons-robot-server/",
-    "/var/lib/jupyter/data/",
-    "/home/",
-    "/var/user-packages/",
-    "/media/",
-    "/run/media/",
-    "/userfs/media/",
+    "/data",
+    "/var/lib/opentrons-robot-server",
+    "/var/lib/jupyter/data",
+    "/home",
+    "/var/user-packages",
+    "/media",
+    "/run/media",
+    "/userfs/media",
+    "/dev/null",
+    "/Users",
 ]
 _FILE_PATH_COMPONENT_DENYLISTS = [
     "BOOT-mmcblk0p1",
