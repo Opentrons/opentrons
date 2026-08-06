@@ -1,8 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
-import { changeAuditLogDirectory, downloadAuditLog } from '../actions'
+import {
+  changeAuditLogDirectory,
+  downloadAuditLog,
+  downloadAuditLogs,
+} from '../actions'
 
-import type { DownloadAuditLogPayload } from '../types'
+import type {
+  DownloadAuditLogPayload,
+  DownloadAuditLogsPayload,
+} from '../types'
 
 describe('audit actions', () => {
   it('creates an action to request an audit log directory change', () => {
@@ -25,6 +32,31 @@ describe('audit actions', () => {
 
     expect(downloadAuditLog(payload)).toEqual({
       type: 'audit:DOWNLOAD_AUDIT_LOG',
+      payload,
+      meta: { shell: true },
+    })
+  })
+
+  it('creates an action to download multiple audit logs', () => {
+    const payload: DownloadAuditLogsPayload = {
+      logPeriodSummaries: [
+        {
+          id: 'log-period-1',
+          startedAt: '2024-01-01T10:00:00.000Z',
+          endedAt: null,
+        },
+      ],
+      host: {
+        hostname: '192.168.1.100',
+        port: 31950,
+        token: 'mock-token',
+      },
+      robotName: 'otie',
+      destination: '/mnt/usb',
+    }
+
+    expect(downloadAuditLogs(payload)).toEqual({
+      type: 'audit:DOWNLOAD_AUDIT_LOGS',
       payload,
       meta: { shell: true },
     })

@@ -1,15 +1,28 @@
+import { mkdir, rmdir } from 'fs/promises'
 import path from 'path'
 
-import { logPeriodDeletionKeyReceived } from '@opentrons/app/src/redux/audit'
+import {
+  logPeriodDownloadCanceled,
+  logPeriodDownloadFailed,
+  logPeriodDownloadSucceeded,
+} from '@opentrons/app/src/redux/audit/slice'
 
 import { getFullConfig } from '../config'
 import { updateConfigValue } from '../config/actions'
-import { CHANGE_AUDIT_LOG_DIRECTORY, DOWNLOAD_AUDIT_LOG } from '../constants'
+import {
+  CHANGE_AUDIT_LOG_DIRECTORY,
+  DOWNLOAD_AUDIT_LOG,
+  DOWNLOAD_AUDIT_LOGS,
+} from '../constants'
 import { showOpenDirectoryDialog } from '../dialogs'
 import { fetchToFile } from '../http'
+import { buildRobotHttpUrl } from '../robot-update/httpUrl'
 
 import type { BrowserWindow } from 'electron'
-import type { DownloadAuditLogPayload } from '@opentrons/app/src/redux/audit'
+import type {
+  DownloadAuditLogPayload,
+  DownloadAuditLogsPayload,
+} from '@opentrons/app/src/redux/audit/types'
 import type { Action, Dispatch } from '../types'
 
 export const AUDIT_LOG_DIRECTORY_CONFIG_PATH = 'audit.logDirectory'
@@ -38,6 +51,9 @@ export function registerAudit(
     if (action.type === DOWNLOAD_AUDIT_LOG) {
       void downloadAuditLog(action.payload, mainWindow, dispatch)
     }
+    if (action.type === DOWNLOAD_AUDIT_LOGS) {
+      void downloadAuditLogs(action.payload, mainWindow, dispatch)
+    }
   }
 }
 
@@ -45,39 +61,118 @@ async function downloadAuditLog(
   payload: DownloadAuditLogPayload,
   mainWindow: BrowserWindow,
   dispatch: Dispatch
-): Promise<void> {
-  const { logPeriodId, fileName, host } = payload
+): Promise<boolean> {
+  const { logPeriodId, fileName, host, destination } = payload
   const { hostname, port } = host
-  const url = `http://${hostname}:${port}/logs/${logPeriodId}/download`
-
+  const url = buildRobotHttpUrl(
+    { ip: hostname, port },
+    `/audit/external/logPeriods/${logPeriodId}/download`
+  )
   const config = getFullConfig()
-  let directory = config.audit.logDirectory
 
-  const dialogOptions = {
-    defaultPath: directory ?? '',
-    properties: ['openDirectory', 'createDirectory'],
+  let directory = destination
+
+  if (!directory) {
+    const defaultDirectory = config.audit.logDirectory
+    const dialogOptions = {
+      defaultPath: defaultDirectory ?? '',
+      properties: ['openDirectory', 'createDirectory'],
+    }
+    const filePaths = await showOpenDirectoryDialog(mainWindow, dialogOptions)
+    directory = filePaths[0]?.toString()
+    if (!directory) {
+      dispatch(logPeriodDownloadCanceled({ logPeriodId }) as Action)
+      return false
+    }
   }
 
-  await showOpenDirectoryDialog(mainWindow, dialogOptions).then(
-    async filePaths => {
-      directory = filePaths[0].toString()
-      if (!directory) {
-        return
-      }
-      const filePath = path.join(directory, fileName)
+  try {
+    const filePath = path.join(directory, fileName)
+    let deletionKey: string | null = null
 
-      await fetchToFile(url, filePath, {
-        onResponse: response => {
-          const deletionKey = response.headers.get(
-            'opentrons-log-period-deletion-key'
-          )
-          if (deletionKey != null) {
-            dispatch(logPeriodDeletionKeyReceived({ logPeriodId, deletionKey }))
-          }
-        },
-      })
+    await fetchToFile(url, filePath, {
+      onResponse: response => {
+        deletionKey = response.headers.get('opentrons-log-period-deletion-key')
+      },
+    })
 
-      return true
+    if (deletionKey == null) {
+      dispatch(
+        logPeriodDownloadFailed({
+          logPeriodId,
+          error: 'Missing deletion key in download response',
+        }) as Action
+      )
+      return false
     }
+
+    dispatch(logPeriodDownloadSucceeded({ logPeriodId, deletionKey }) as Action)
+    return true
+  } catch (error) {
+    dispatch(
+      logPeriodDownloadFailed({
+        logPeriodId,
+        error: error instanceof Error ? error.message : String(error),
+      }) as Action
+    )
+    return false
+  }
+}
+
+async function downloadAuditLogs(
+  payload: DownloadAuditLogsPayload,
+  mainWindow: BrowserWindow,
+  dispatch: Dispatch
+): Promise<void> {
+  const { logPeriodSummaries, host, destination, robotName } = payload
+
+  const config = getFullConfig()
+
+  let directory = destination
+
+  if (!directory) {
+    const defaultDirectory = config.audit.logDirectory
+    const dialogOptions = {
+      defaultPath: defaultDirectory ?? '',
+      properties: ['openDirectory', 'createDirectory'],
+    }
+    const filePaths = await showOpenDirectoryDialog(mainWindow, dialogOptions)
+    directory = filePaths[0]?.toString()
+  }
+
+  const folderName =
+    `${robotName}-audit-logs-${new Date().toISOString()}`.replace(
+      /[^a-zA-Z0-9._-]/g,
+      '_'
+    )
+  const outputDirectory = !directory ? null : path.join(directory, folderName)
+  if (outputDirectory != null) {
+    await mkdir(outputDirectory, { recursive: true })
+  }
+
+  const results = await Promise.all(
+    logPeriodSummaries.map(logPeriodSummary => {
+      if (!outputDirectory) {
+        dispatch(
+          logPeriodDownloadCanceled({ logPeriodId: logPeriodSummary.id })
+        )
+        return Promise.resolve()
+      }
+
+      return downloadAuditLog(
+        {
+          logPeriodId: logPeriodSummary.id,
+          fileName: `logperiod_${logPeriodSummary.startedAt.replaceAll(':', '_')}.zip`,
+          host,
+          destination: outputDirectory,
+        },
+        mainWindow,
+        dispatch
+      )
+    })
   )
+
+  if (!!outputDirectory && results.every(succeeded => !succeeded)) {
+    await rmdir(outputDirectory)
+  }
 }

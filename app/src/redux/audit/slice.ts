@@ -1,75 +1,190 @@
-/** The Redux slice for audit log period deletion keys. */
+/** The Redux slice for audit log period download and delete status. */
 
 import { createSlice } from '@reduxjs/toolkit'
 
 import { type ActionTypesFromSlice } from '../ActionTypesFromSlice'
+import { DOWNLOAD_AUDIT_LOG, DOWNLOAD_AUDIT_LOGS } from './constants'
 
 import type { PayloadAction } from '@reduxjs/toolkit'
+import type { LogPeriodSummary } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
+
+export type LogPeriodDownloadDeleteStatus =
+  | { status: 'download-pending' }
+  | { status: 'download-success'; deletionKey: string }
+  | { status: 'download-failure'; error: string }
+  | { status: 'delete-pending' }
+  | { status: 'delete-success' }
+  | { status: 'delete-failure'; error: string }
 
 export interface AuditState {
   /**
-   * The server hands back a one-time deletion key when a log period is
-   * downloaded; that key must be sent along with the delete request. Keyed
-   * by logPeriodId. Intentionally not persisted: a stale tab shouldn't be
-   * able to replay an old deletion key after a reload.
+   * Download/delete lifecycle for a log period, keyed by logPeriodId.
    */
-  logPeriodDeletionKeysById: {
-    [logPeriodId: string]: string
+  logPeriodDownloadDeleteStatusById: {
+    [logPeriodId: string]: LogPeriodDownloadDeleteStatus
   }
 }
 
 export const INITIAL_AUDIT_STATE: AuditState = {
-  logPeriodDeletionKeysById: {},
+  logPeriodDownloadDeleteStatusById: {},
 }
 
-interface LogPeriodDeletionKeyReceivedPayload {
+interface LogPeriodIdPayload {
+  logPeriodId: string
+}
+
+interface LogPeriodDownloadSucceededPayload {
   logPeriodId: string
   deletionKey: string
 }
 
-interface LogPeriodDeletionKeyConsumedPayload {
+interface LogPeriodFailedPayload {
   logPeriodId: string
+  error: string
 }
 
 const auditSlice = createSlice({
   name: 'audit',
   initialState: INITIAL_AUDIT_STATE,
   reducers: {
-    logPeriodDeletionKeyReceived: (
+    logPeriodDownloadSucceeded: (
       stateDraft,
-      action: PayloadAction<LogPeriodDeletionKeyReceivedPayload>
+      action: PayloadAction<LogPeriodDownloadSucceededPayload>
     ) => {
       const { logPeriodId, deletionKey } = action.payload
-      stateDraft.logPeriodDeletionKeysById[logPeriodId] = deletionKey
+      stateDraft.logPeriodDownloadDeleteStatusById[logPeriodId] = {
+        status: 'download-success',
+        deletionKey,
+      }
     },
-    logPeriodDeletionKeyConsumed: (
+    logPeriodDownloadFailed: (
       stateDraft,
-      action: PayloadAction<LogPeriodDeletionKeyConsumedPayload>
+      action: PayloadAction<LogPeriodFailedPayload>
     ) => {
-      // dynamic-delete is fine here
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete stateDraft.logPeriodDeletionKeysById[action.payload.logPeriodId]
+      const { logPeriodId, error } = action.payload
+      stateDraft.logPeriodDownloadDeleteStatusById[logPeriodId] = {
+        status: 'download-failure',
+        error,
+      }
     },
+    logPeriodDownloadCanceled: (
+      stateDraft,
+      action: PayloadAction<LogPeriodIdPayload>
+    ) => {
+      const { logPeriodId } = action.payload
+      stateDraft.logPeriodDownloadDeleteStatusById[logPeriodId] = {
+        status: 'download-failure',
+        error: 'download canceled by user',
+      }
+    },
+    logPeriodDeletePending: (
+      stateDraft,
+      action: PayloadAction<LogPeriodIdPayload>
+    ) => {
+      stateDraft.logPeriodDownloadDeleteStatusById[action.payload.logPeriodId] =
+        {
+          status: 'delete-pending',
+        }
+    },
+    logPeriodDeleteSucceeded: (
+      stateDraft,
+      action: PayloadAction<LogPeriodIdPayload>
+    ) => {
+      stateDraft.logPeriodDownloadDeleteStatusById[action.payload.logPeriodId] =
+        {
+          status: 'delete-success',
+        }
+    },
+    logPeriodDeleteFailed: (
+      stateDraft,
+      action: PayloadAction<LogPeriodFailedPayload>
+    ) => {
+      const { logPeriodId, error } = action.payload
+      stateDraft.logPeriodDownloadDeleteStatusById[logPeriodId] = {
+        status: 'delete-failure',
+        error,
+      }
+    },
+  },
+  extraReducers: builder => {
+    builder.addMatcher(
+      (
+        action
+      ): action is {
+        type: typeof DOWNLOAD_AUDIT_LOG
+        payload: { logPeriodId: string }
+      } => action.type === DOWNLOAD_AUDIT_LOG,
+      (stateDraft, action) => {
+        stateDraft.logPeriodDownloadDeleteStatusById[
+          action.payload.logPeriodId
+        ] = {
+          status: 'download-pending',
+        }
+      }
+    )
+    builder.addMatcher(
+      (
+        action
+      ): action is {
+        type: typeof DOWNLOAD_AUDIT_LOGS
+        payload: { logPeriodSummaries: LogPeriodSummary[] }
+      } => action.type === DOWNLOAD_AUDIT_LOGS,
+      (stateDraft, action) => {
+        action.payload.logPeriodSummaries.forEach(logPeriodSummary => {
+          stateDraft.logPeriodDownloadDeleteStatusById[logPeriodSummary.id] = {
+            status: 'download-pending',
+          }
+        })
+      }
+    )
   },
 })
 
 export const auditReducer = auditSlice.reducer
 
-export const { logPeriodDeletionKeyReceived, logPeriodDeletionKeyConsumed } =
-  auditSlice.actions
+export const {
+  logPeriodDownloadSucceeded,
+  logPeriodDownloadFailed,
+  logPeriodDownloadCanceled,
+  logPeriodDeletePending,
+  logPeriodDeleteSucceeded,
+  logPeriodDeleteFailed,
+} = auditSlice.actions
 
 export type AuditSliceAction = ActionTypesFromSlice<typeof auditSlice.actions>
 
-export function getLogPeriodDeletionKeysById(
+export function getLogPeriodDownloadDeleteStatusById(
   state: State
-): AuditState['logPeriodDeletionKeysById'] {
-  return state.audit.logPeriodDeletionKeysById
+): AuditState['logPeriodDownloadDeleteStatusById'] {
+  return state.audit.logPeriodDownloadDeleteStatusById
 }
 
+export function getLogPeriodDownloadDeleteStatus(
+  state: State,
+  logPeriodId: string
+): LogPeriodDownloadDeleteStatus | null {
+  return state.audit.logPeriodDownloadDeleteStatusById[logPeriodId] ?? null
+}
+
+/**
+ * Returns the one-time deletion key from a successful download, if present.
+ */
 export function getLogPeriodDeletionKey(
   state: State,
   logPeriodId: string
 ): string | null {
-  return state.audit.logPeriodDeletionKeysById[logPeriodId] ?? null
+  const status = getLogPeriodDownloadDeleteStatus(state, logPeriodId)
+  return status?.status === 'download-success' ? status.deletionKey : null
+}
+
+export function getLogPeriodDownloadDeleteError(
+  state: State,
+  logPeriodId: string
+): string | null {
+  const status = getLogPeriodDownloadDeleteStatus(state, logPeriodId)
+  return status?.status === 'download-failure' ||
+    status?.status === 'delete-failure'
+    ? status.error
+    : null
 }

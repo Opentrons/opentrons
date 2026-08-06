@@ -9,7 +9,7 @@ import {
 } from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
 
-import { logPeriodDeletionKeyReceived } from '/app/redux/audit'
+import { logPeriodDownloadSucceeded } from '/app/redux/audit'
 import { saveFileToUsb } from '/app/redux/shell/remote'
 
 import { useDownloadLogPeriod } from '../useDownloadLogPeriod'
@@ -100,7 +100,7 @@ describe('useDownloadLogPeriod', () => {
     await result.current.downloadLogPeriod()
 
     expect(mockDispatch).toHaveBeenCalledWith(
-      logPeriodDeletionKeyReceived({
+      logPeriodDownloadSucceeded({
         logPeriodId: 'lp-1',
         deletionKey: 'key-for-lp',
       })
