@@ -9,7 +9,6 @@ import {
 import {
   useDeleteUserMutation,
   useResetUserPasswordMutation,
-  useUpdateUserMutation,
   useUsersQuery,
 } from '@opentrons/react-api-client'
 
@@ -101,8 +100,6 @@ export function UserManagement({
   const users = usersQuery?.data?.data ?? []
   const documentationState = useDocumentationState(undefined, robotName)
   const { deleteUser } = useDeleteUserMutation(documentationState)
-  const { updateUser, isLoading: isActivatingUser } =
-    useUpdateUserMutation(documentationState)
   const { resetUserPassword, isLoading: isResettingPassword } =
     useResetUserPasswordMutation(documentationState)
   const [showAddUserModal, setShowAddUserModal] = useState(false)
@@ -139,17 +136,13 @@ export function UserManagement({
       return
     }
 
-    void updateUser({
-      username: userToActivate.username,
-      request: { data: { locked: false } },
-    })
-      .then(() => {
-        makeToast(
-          t('desktop_activate_user_success_banner') as string,
-          SUCCESS_TOAST,
-          { closeButton: true }
-        )
+    void resetUserPassword(userToActivate.username)
+      .then(response => {
         setUserToActivate(null)
+        const { temporaryPassword } = response.data
+        if (temporaryPassword != null) {
+          setResetPasswordTemporaryPassword(temporaryPassword)
+        }
       })
       .catch(() => {
         setUserToActivate(null)
@@ -257,8 +250,8 @@ export function UserManagement({
           title={t('desktop_activate_user_modal_title') as string}
           heading={t('desktop_activate_user_modal_heading') as string}
           description={t('desktop_activate_user_modal_description') as string}
-          confirmLabel={t('desktop_activate_user') as string}
-          isConfirmDisabled={isActivatingUser}
+          confirmLabel={t('desktop_unlock_user') as string}
+          isConfirmDisabled={isResettingPassword}
           onConfirm={handleActivateConfirm}
           onCancel={() => {
             setUserToActivate(null)

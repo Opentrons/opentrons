@@ -687,6 +687,10 @@ def test_reset_user_password(
         for c in result.temporaryPassword or ""
     )
     decoy.verify(
+        mock_store.clear_failed_logins("reset_me"),
+        times=1,
+    )
+    decoy.verify(
         mock_store.update(
             "reset_me",
             hashed_password=matchers.IsA(str),
@@ -694,6 +698,32 @@ def test_reset_user_password(
             now=matchers.IsA(datetime.datetime),
         )
     )
+
+
+def test_reset_user_password_clears_failed_logins(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(
+        SettingsResponseData(maxNumberOfLoginAttempts=3)
+    )
+    decoy.when(mock_store.get_failed_login_count("reset_me")).then_return(0)
+    updated = _make_orm_user(username="reset_me", reset_password=True)
+    decoy.when(
+        mock_store.update(
+            "reset_me",
+            hashed_password=matchers.IsA(str),
+            reset_password=True,
+            now=matchers.IsA(datetime.datetime),
+        )
+    ).then_return(updated)
+
+    result = manager.reset_user_password("reset_me", now=_NOW)
+
+    assert result.locked is False
+    decoy.verify(mock_store.clear_failed_logins("reset_me"), times=1)
 
 
 def test_reset_user_password_uses_password_complexity_settings(

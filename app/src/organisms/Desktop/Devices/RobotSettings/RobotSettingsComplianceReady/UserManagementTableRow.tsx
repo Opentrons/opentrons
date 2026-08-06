@@ -93,11 +93,9 @@ export function UserManagementTableRow({
                 <MenuItem onClick={handleMenuAction(onDelete)}>
                   {t('desktop_delete_user')}
                 </MenuItem>
-                {user.locked ? (
-                  <MenuItem onClick={handleMenuAction(onActivate)}>
-                    {t('desktop_activate_user')}
-                  </MenuItem>
-                ) : null}
+                <MenuItem onClick={handleMenuAction(onActivate)}>
+                  {t('desktop_unlock_user')}
+                </MenuItem>
                 <MenuItem onClick={handleMenuAction(onResetPassword)}>
                   {t('desktop_reset_password')}
                 </MenuItem>

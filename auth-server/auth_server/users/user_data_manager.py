@@ -278,6 +278,7 @@ class UserDataManager:
     ) -> TemporaryPasswordResponse:
         """Reset a user's password to a random temporary password.
 
+        Clears failed login attempts so locked accounts become active again.
         Flag the account so the user is required to set a real password before
         doing anything else with the robot.
         """
@@ -286,6 +287,7 @@ class UserDataManager:
         )
         temporary_password = _generate_temporary_password(min_length, require_special)
         try:
+            self._user_store.clear_failed_logins(username)
             updated_user = self._user_store.update(
                 username,
                 hashed_password=password_hash.hash(temporary_password),
