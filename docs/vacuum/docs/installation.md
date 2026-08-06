@@ -6,13 +6,13 @@ description: "Installing the Vacuum Module on a Flex robot."
 The Vacuum Module ships in three separate boxes containing all the components required for assembly and operation. Read the safety precautions below before following the step-by-step setup instructions.
 
 !!! warning "Installation Safety Precautions"
-    - ![Electrical shock warning](images/warning-triangle-shock.svg){: style="vertical-align: middle; height: 1.75em;"} **Electrical hazard:** Turn off the power to the Flex before beginning the installation process. This prevents the robot from operating unexpectedly during setup and allows the gantry to move freely.
-    - ![Electrical cable routing warning](images/warning-triangle-exclamation.svg){: style="vertical-align: middle; height: 1.75em;"} **Cable routing:** Route electrical and data cables carefully to avoid extreme bending/kinking and damp or wet locations.
-    - ![Pinch hazard warning](images/warning-triangle-pinch.svg){: style="vertical-align: middle; height: 1.75em;"} **Pinch hazard:** Keep fingers clear of deck slot edges when removing deck plates or seating the deck adapter.
-    - ![Vacuum hose routing and placement warning](images/warning-triangle-exclamation.svg){: style="vertical-align: middle; height: 1.75em;"} **Hose placement:** When connecting vacuum hoses, avoid sharp bends, kinks, or low dips that allow fluid to accumulate and impede airflow. Maintain a continuous downward slope from the deck module to the waste carboy.
-    - ![Vacuum hose trip hazard warning](images/warning-triangle-exclamation.svg){: style="vertical-align: middle; height: 1.75em;"} **Tripping hazard:** Keep hoses secure and clear of walkways to help prevent trip hazards.
-    - ![Pump and carboy placement warning](images/warning-triangle-exclamation.svg){: style="vertical-align: middle; height: 1.75em;"} **Accessory placement:** When choosing a location for the carboy and pump control box, follow all health, safety, and environmental guidelines established by your facility.
-
+    - ![Pump and carboy placement warning](images/warning-triangle-exclamation.svg){: style="vertical-align: middle; height: 2.0em;"} **Accessory placement:** When choosing a location for the carboy and pump control box, follow all health, safety, and environmental guidelines established by your facility.
+    - ![Electrical cable routing warning](images/warning-triangle-exclamation.svg){: style="vertical-align: middle; height: 2.0em;"} **Cable routing:** Route electrical and data cables carefully to avoid extreme bending/kinking and damp or wet locations.
+    - ![Electrical shock warning](images/warning-triangle-shock.svg){: style="vertical-align: middle; height: 2.0em;"} **Electrical hazard:** Turn off the power to the Flex before beginning the installation process. This prevents the robot from operating unexpectedly during setup and allows the gantry to move freely.
+    - ![Glass carboy fragile warning](images/warning-triangle-fragile.svg){: style="vertical-align: middle; height: 2.0em;"} **Fragile items:** Inspect the glass carboy for damage before installation. Replace if chipped or cracked.
+    - ![Vacuum hose routing and placement warning](images/warning-triangle-exclamation.svg){: style="vertical-align: middle; height: 2.0em;"} **Hose placement:** When connecting vacuum hoses, maintain a continuous downward slope from the deck module to the waste carboy. Avoid sharp bends, kinks, or low dips that allow fluid to accumulate and impede airflow.
+    - ![Pinch hazard warning](images/warning-triangle-pinch.svg){: style="vertical-align: middle; height: 2.0em;"} **Pinch hazard:** Keep fingers clear of deck slot edges when removing deck plates or seating the deck adapter.
+    - ![Vacuum hose trip hazard warning](images/warning-triangle-exclamation.svg){: style="vertical-align: middle; height: 2.0em;"} **Tripping hazard:** Keep hoses secure and clear of walkways to help prevent trip hazards.
 
 <div class="instruction-list" markdown>
 
@@ -87,7 +87,7 @@ The Vacuum Module ships in three separate boxes containing all the components re
 16. Put the carboy in its holder.
 
     !!! tip
-        Opentrons recommends putting the carboy and holder in a larger, secondary tray or basin for added spill containment safety.
+        Opentrons recommends putting the carboy and holder in a larger, secondary basin for added spill containment safety.
 
 17. Place the cap on the waste jar and hand tighten it. Do not over-tighten the cap; this is not a trial of strength.
 
