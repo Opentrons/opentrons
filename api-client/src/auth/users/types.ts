@@ -52,6 +52,7 @@ export interface UpdateUserRequest {
     username?: string
     fullName?: string
     accountType?: AuthUserAccountType
+    locked?: false
   }
 }
 

@@ -9,6 +9,7 @@ import {
 import {
   useDeleteUserMutation,
   useResetUserPasswordMutation,
+  useUpdateUserMutation,
   useUsersQuery,
 } from '@opentrons/react-api-client'
 
@@ -35,6 +36,7 @@ interface UserManagementTableProps {
   users: AuthUser[]
   onEdit: (user: AuthUser) => void
   onDelete: (user: AuthUser) => void
+  onActivate: (user: AuthUser) => void
   onResetPassword: (user: AuthUser) => void
 }
 
@@ -42,6 +44,7 @@ function UserManagementTable({
   users,
   onEdit,
   onDelete,
+  onActivate,
   onResetPassword,
 }: UserManagementTableProps): JSX.Element {
   const { t } = useTranslation('device_settings')
@@ -80,6 +83,7 @@ function UserManagementTable({
             user={user}
             onEdit={onEdit}
             onDelete={onDelete}
+            onActivate={onActivate}
             onResetPassword={onResetPassword}
           />
         ))}
@@ -97,11 +101,14 @@ export function UserManagement({
   const users = usersQuery?.data?.data ?? []
   const documentationState = useDocumentationState(undefined, robotName)
   const { deleteUser } = useDeleteUserMutation(documentationState)
+  const { updateUser, isLoading: isActivatingUser } =
+    useUpdateUserMutation(documentationState)
   const { resetUserPassword, isLoading: isResettingPassword } =
     useResetUserPasswordMutation(documentationState)
   const [showAddUserModal, setShowAddUserModal] = useState(false)
   const [userToEdit, setUserToEdit] = useState<AuthUser | null>(null)
   const [userToDelete, setUserToDelete] = useState<AuthUser | null>(null)
+  const [userToActivate, setUserToActivate] = useState<AuthUser | null>(null)
   const [userToResetPassword, setUserToResetPassword] =
     useState<AuthUser | null>(null)
   const [resetPasswordTemporaryPassword, setResetPasswordTemporaryPassword] =
@@ -124,6 +131,28 @@ export function UserManagement({
       })
       .catch(() => {
         setUserToDelete(null)
+      })
+  }
+
+  const handleActivateConfirm = (): void => {
+    if (userToActivate == null) {
+      return
+    }
+
+    void updateUser({
+      username: userToActivate.username,
+      request: { data: { locked: false } },
+    })
+      .then(() => {
+        makeToast(
+          t('desktop_activate_user_success_banner') as string,
+          SUCCESS_TOAST,
+          { closeButton: true }
+        )
+        setUserToActivate(null)
+      })
+      .catch(() => {
+        setUserToActivate(null)
       })
   }
 
@@ -167,6 +196,7 @@ export function UserManagement({
         users={users}
         onEdit={setUserToEdit}
         onDelete={setUserToDelete}
+        onActivate={setUserToActivate}
         onResetPassword={setUserToResetPassword}
       />
       <div className={styles.add_user_button}>
@@ -219,6 +249,19 @@ export function UserManagement({
           onConfirm={handleDeleteConfirm}
           onCancel={() => {
             setUserToDelete(null)
+          }}
+        />
+      ) : null}
+      {userToActivate != null ? (
+        <UserAccountConfirmModal
+          title={t('desktop_activate_user_modal_title') as string}
+          heading={t('desktop_activate_user_modal_heading') as string}
+          description={t('desktop_activate_user_modal_description') as string}
+          confirmLabel={t('desktop_activate_user') as string}
+          isConfirmDisabled={isActivatingUser}
+          onConfirm={handleActivateConfirm}
+          onCancel={() => {
+            setUserToActivate(null)
           }}
         />
       ) : null}

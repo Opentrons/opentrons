@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   useDeleteUserMutation,
   useResetUserPasswordMutation,
+  useUpdateUserMutation,
   useUsersQuery,
 } from '@opentrons/react-api-client'
 
@@ -103,12 +104,15 @@ function expandAccordion(): void {
 }
 
 const mockDeleteUser = vi.fn()
+const mockUpdateUser = vi.fn()
 const mockResetUserPassword = vi.fn()
 
 describe('UserManagement', () => {
   beforeEach(() => {
     mockDeleteUser.mockReset()
     mockDeleteUser.mockResolvedValue(undefined)
+    mockUpdateUser.mockReset()
+    mockUpdateUser.mockResolvedValue(undefined)
     mockResetUserPassword.mockReset()
     mockResetUserPassword.mockResolvedValue(undefined)
     vi.mocked(useToaster).mockReturnValue({
@@ -118,6 +122,10 @@ describe('UserManagement', () => {
     })
     vi.mocked(useDeleteUserMutation).mockReturnValue({
       deleteUser: mockDeleteUser,
+    } as any)
+    vi.mocked(useUpdateUserMutation).mockReturnValue({
+      updateUser: mockUpdateUser,
+      isLoading: false,
     } as any)
     vi.mocked(useResetUserPasswordMutation).mockReturnValue({
       resetUserPassword: mockResetUserPassword,
@@ -202,5 +210,20 @@ describe('UserManagement', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: 'Reset password' }))
     screen.getByText("Reset this user's password?")
+  })
+
+  it('shows Activate only for locked users and opens the confirm modal', () => {
+    render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
+    )
+    expect(screen.queryByRole('button', { name: 'Activate' })).not.toBeInTheDocument()
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_bob' })
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Activate' }))
+    screen.getByText('Activate this account?')
   })
 })
