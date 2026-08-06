@@ -303,6 +303,8 @@
   "setup_module_for_use": "Set up module for use.",
   "shake_speed": "shake speed",
   "shaker": "Shaker",
+  "some_logs_not_deleted": "Some selected logs could not be downloaded and were not deleted.",
+  "some_runs_not_deleted": "Some selected runs could not be downloaded and were not deleted.",
   "stacker": "Stacker",
   "staging_area_slot": "Staging area slot",
   "started": "Started",

@@ -58,8 +58,6 @@ interface TextAreaFieldProps extends NativeTextareaProps {
   leftElement?: ReactNode
   /** optional element to display aligned to the right of the input field */
   rightElement?: ReactNode
-  /** if true, style the background of textarea field to error state */
-  hasBackgroundError?: boolean
   /** optional prop to support focus when tapping text area */
   onWrapperClick?: MouseEventHandler<HTMLDivElement>
   /** optional prop to override textarea field border radius */
@@ -88,7 +86,6 @@ export const TextAreaField = forwardRef<
     textAlign = 'left',
     leftElement,
     rightElement,
-    hasBackgroundError = false,
     onWrapperClick,
     borderRadius,
     padding,
@@ -123,7 +120,6 @@ export const TextAreaField = forwardRef<
   const textareaClasses = clsx(
     styles.textarea,
     hasError && styles.textarea_error,
-    hasBackgroundError && styles.textarea_background_error,
     isKeyboardFocus && styles.textarea_keyboard_focus,
     multiline && styles.textarea_multiline
   )

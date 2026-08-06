@@ -8,13 +8,17 @@ import {
   useAuditSettingsQuery,
   useAuthSettingsMutation,
   useAuthSettingsQuery,
+  useDeleteUserMutation,
   useGetRobotServerAccessControlSettingsQuery,
   usePatchRobotServerAccessControlSettingsMutation,
+  useUsersQuery,
 } from '@opentrons/react-api-client'
 
+import { mockSuccessQueryResults } from '/app/__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
+import { useToaster } from '/app/organisms/ToasterOven'
 
 import { UI_ONLY_FIELD_IDS } from '../complianceReadySettingsTypes'
 import { ComplianceReadySoftwareSettings } from '../ComplianceReadySoftwareSettings'
@@ -76,6 +80,7 @@ const COMPLIANCE_READY_FIELD_IDS = [
   'requireAdminCredsWhenSendingProtocolToRobot',
   'requireAdminCredsForSignoffProtocol',
   'requireSignoffForProtocolLog',
+  'requireLogsToBeSavedInApp',
   'deleteOverMaxOnDiskProtocols',
   'requireReasonForInteraction',
   'minLengthOfReasonForInteraction',
@@ -85,6 +90,7 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
   useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
 }))
+vi.mock('/app/organisms/ToasterOven')
 
 vi.mock('../PersonalAccountSettings', () => ({
   PersonalAccountSettings: () => null,
@@ -167,6 +173,17 @@ describe('ComplianceReadySoftwareSettings', () => {
     vi.mocked(useAuditSettingsMutation).mockReturnValue({
       mutate: mockPatchAuditSettings,
     } as any)
+    vi.mocked(useUsersQuery).mockReturnValue(
+      mockSuccessQueryResults({
+        data: [],
+        meta: { cursor: 0, totalLength: 0 },
+      })
+    )
+    vi.mocked(useToaster).mockReturnValue({
+      makeToast: vi.fn(),
+      eatToast: vi.fn(),
+      makeSnackbar: vi.fn(),
+    })
   })
 
   it('should only use auth setting ids, audit setting ids, robot server setting ids, or explicit UI-only ids', () => {
@@ -188,8 +205,8 @@ describe('ComplianceReadySoftwareSettings', () => {
 
     screen.getByText('Login and security')
     screen.getByText('Actions requiring admin credentials')
-    screen.getByText('Protocol logs')
     screen.getByText('Audit log requirements')
+    screen.getByText('Robot storage')
     screen.getByText('Maximum login attempts before account deactivation')
   })
 
@@ -255,9 +272,14 @@ describe('ComplianceReadySoftwareSettings', () => {
     ).toHaveAttribute('aria-checked', 'true')
     expect(
       screen.getByRole('switch', {
-        name: 'Require signoff for protocol logs',
+        name: 'Require signature upon completing a protocol run',
       })
     ).toHaveAttribute('aria-checked', 'true')
+    expect(
+      screen.getByRole('switch', {
+        name: 'Require downloading audit logs in the Opentrons App at the end of a protocol run',
+      })
+    ).toHaveAttribute('aria-checked', 'false')
     expect(
       screen.getByRole('switch', {
         name: 'Automatically delete protocol run logs on the robot when there are 20 protocol run records',
@@ -372,6 +394,18 @@ describe('ComplianceReadySoftwareSettings', () => {
 })
 
 describe('RobotSettingsComplianceReady', () => {
+  beforeEach(() => {
+    vi.mocked(useDeleteUserMutation).mockReturnValue({
+      deleteUser: vi.fn(),
+    } as any)
+    vi.mocked(useUsersQuery).mockReturnValue(
+      mockSuccessQueryResults({
+        data: [],
+        meta: { cursor: 0, totalLength: 0 },
+      })
+    )
+  })
+
   it('hides admin sections for non-admin users', () => {
     renderPage('regular-user', 'user')
 

@@ -9,16 +9,19 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type { AuthUserResponse, CreateUserRequest } from '@opentrons/api-client'
+import type {
+  CreateUserRequest,
+  CreateUserResponse,
+} from '@opentrons/api-client'
 import type { DocumentationState } from '../../accessControl'
 
 export type UseCreateUserMutationResult = UseMutationResult<
-  AuthUserResponse,
+  CreateUserResponse,
   AxiosError,
   CreateUserRequest
 > & {
   createUser: UseMutateAsyncFunction<
-    AuthUserResponse,
+    CreateUserResponse,
     AxiosError,
     CreateUserRequest
   >
@@ -27,7 +30,7 @@ export type UseCreateUserMutationResult = UseMutationResult<
 export function useCreateUserMutation(
   documentationState: DocumentationState,
   options: UseMutationOptions<
-    AuthUserResponse,
+    CreateUserResponse,
     AxiosError,
     CreateUserRequest
   > = {}

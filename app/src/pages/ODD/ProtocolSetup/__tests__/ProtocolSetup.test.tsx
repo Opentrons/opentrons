@@ -616,6 +616,14 @@ describe('ProtocolSetup', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/protocols')
   })
 
+  it('should not redirect when cancel modal is open and run is stopped', () => {
+    render(`/runs/${RUN_ID}/setup/`)
+    mockNavigate.mockClear()
+    fireEvent.click(screen.getByRole('button', { name: 'close' }))
+    expect(vi.mocked(ConfirmCancelRunModal)).toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalledWith('/protocols')
+  })
+
   it('should show action needed when modules are not calibrated', () => {
     vi.mocked(useModuleCalibrationStatus).mockReturnValue({ complete: false })
     render(`/runs/${RUN_ID}/setup/`)

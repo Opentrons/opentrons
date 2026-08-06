@@ -6,7 +6,6 @@ import { when } from 'vitest-when'
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   useDeleteRunMutation,
-  useDismissCurrentRunMutation,
   useStopRunMutation,
 } from '@opentrons/react-api-client'
 
@@ -16,7 +15,7 @@ import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useTrackEvent } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
-import { useNotifyRunQuery } from '/app/resources/runs'
+import { useCloseCurrentRun, useNotifyRunQuery } from '/app/resources/runs'
 
 import { CancelingRunModal } from '../../CancelingRunModal'
 import { ConfirmCancelRunModal } from '../../ConfirmCancelRunModal'
@@ -33,7 +32,7 @@ vi.mock('/app/redux/discovery')
 const mockNavigate = vi.fn()
 const mockStopRun = vi.fn()
 const mockDeleteRun = vi.fn()
-const mockDismissCurrentRun = vi.fn()
+const mockCloseCurrentRun = vi.fn()
 const mockTrackEvent = vi.fn()
 const mockTrackProtocolRunEvent = vi.fn(
   () => new Promise(resolve => resolve({}))
@@ -70,7 +69,7 @@ describe('ConfirmCancelRunModal', () => {
     mockNavigate.mockClear()
     mockStopRun.mockClear()
     mockDeleteRun.mockClear()
-    mockDismissCurrentRun.mockClear()
+    mockCloseCurrentRun.mockClear()
     mockTrackEvent.mockClear()
     mockTrackProtocolRunEvent.mockClear()
     mockFn.mockClear()
@@ -87,11 +86,11 @@ describe('ConfirmCancelRunModal', () => {
     vi.mocked(useDeleteRunMutation).mockReturnValue({
       deleteRun: mockDeleteRun,
     } as any)
-    vi.mocked(useDismissCurrentRunMutation).mockReturnValue({
-      dismissCurrentRun: mockDismissCurrentRun,
-      isLoading: false,
-    } as any)
-    mockDismissCurrentRun.mockImplementation((_id: string, options?: any) => {
+    vi.mocked(useCloseCurrentRun).mockReturnValue({
+      closeCurrentRun: mockCloseCurrentRun,
+      isClosingCurrentRun: false,
+    })
+    mockCloseCurrentRun.mockImplementation((options?: any) => {
       options?.onSuccess?.()
     })
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
@@ -128,11 +127,11 @@ describe('ConfirmCancelRunModal', () => {
     screen.getByText('Cancel run')
   })
 
-  it('should render the canceling run modal when run is dismissing', () => {
-    vi.mocked(useDismissCurrentRunMutation).mockReturnValue({
-      dismissCurrentRun: mockDismissCurrentRun,
-      isLoading: true,
-    } as any)
+  it('should render the canceling run modal when run is closing', () => {
+    vi.mocked(useCloseCurrentRun).mockReturnValue({
+      closeCurrentRun: mockCloseCurrentRun,
+      isClosingCurrentRun: true,
+    })
     render(props)
     screen.getByText('mock CancelingRunModal')
   })
@@ -163,7 +162,7 @@ describe('ConfirmCancelRunModal', () => {
     screen.getByText('mock CancelingRunModal')
   })
 
-  it('when stop run succeeds and run is not active, run is dismissed and navigates to /protocols', () => {
+  it('when stop run succeeds and run is not active, run is closed and navigates to /protocols', () => {
     props = {
       ...props,
       isActiveRun: false,
@@ -180,8 +179,7 @@ describe('ConfirmCancelRunModal', () => {
     expect(mockTrackProtocolRunEvent).toHaveBeenCalledWith({
       name: 'runCancel',
     })
-    expect(mockDismissCurrentRun).toHaveBeenCalledWith(
-      RUN_ID,
+    expect(mockCloseCurrentRun).toHaveBeenCalledWith(
       expect.objectContaining({
         onSuccess: expect.any(Function),
         onError: expect.any(Function),
@@ -205,8 +203,7 @@ describe('ConfirmCancelRunModal', () => {
     const button = screen.getByText('Cancel run')
     fireEvent.click(button)
 
-    expect(mockDismissCurrentRun).toHaveBeenCalledWith(
-      RUN_ID,
+    expect(mockCloseCurrentRun).toHaveBeenCalledWith(
       expect.objectContaining({
         onSuccess: expect.any(Function),
         onError: expect.any(Function),
@@ -216,7 +213,7 @@ describe('ConfirmCancelRunModal', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/protocols/test-protocol-id')
   })
 
-  it('when run is active, stop run does not dismiss or navigate', () => {
+  it('when run is active, stop run does not close or navigate', () => {
     mockStopRun.mockImplementation((_id: string, options: any) => {
       options.onSuccess()
     })
@@ -225,12 +222,12 @@ describe('ConfirmCancelRunModal', () => {
     const button = screen.getByText('Cancel run')
     fireEvent.click(button)
 
-    expect(mockDismissCurrentRun).not.toHaveBeenCalled()
+    expect(mockCloseCurrentRun).not.toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it('when stop run errors and run is not active, still dismisses and navigates', () => {
+  it('when stop run errors and run is not active, still closes and navigates', () => {
     props = {
       ...props,
       isActiveRun: false,
@@ -244,8 +241,7 @@ describe('ConfirmCancelRunModal', () => {
     const button = screen.getByText('Cancel run')
     fireEvent.click(button)
 
-    expect(mockDismissCurrentRun).toHaveBeenCalledWith(
-      RUN_ID,
+    expect(mockCloseCurrentRun).toHaveBeenCalledWith(
       expect.objectContaining({
         onSuccess: expect.any(Function),
         onError: expect.any(Function),
@@ -255,7 +251,7 @@ describe('ConfirmCancelRunModal', () => {
     expect(mockTrackProtocolRunEvent).not.toHaveBeenCalled()
   })
 
-  it('when run status becomes stopped via polling, run is dismissed and navigates to /protocols', () => {
+  it('when run status becomes stopped via polling, run is closed and navigates to /protocols', () => {
     props = {
       ...props,
       isActiveRun: false,
@@ -271,7 +267,7 @@ describe('ConfirmCancelRunModal', () => {
 
     render(props)
 
-    expect(mockDismissCurrentRun).toHaveBeenCalled()
+    expect(mockCloseCurrentRun).toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith('/protocols')
   })
 
@@ -292,11 +288,11 @@ describe('ConfirmCancelRunModal', () => {
 
     render(props)
 
-    expect(mockDismissCurrentRun).toHaveBeenCalled()
+    expect(mockCloseCurrentRun).toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith('/protocols/test-protocol-id')
   })
 
-  it('when run status becomes stopped via polling and run is active, run is not dismissed', () => {
+  it('when run status becomes stopped via polling and run is active, run is not closed', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue({
       data: {
         data: {
@@ -307,6 +303,6 @@ describe('ConfirmCancelRunModal', () => {
 
     render(props)
 
-    expect(mockDismissCurrentRun).not.toHaveBeenCalled()
+    expect(mockCloseCurrentRun).not.toHaveBeenCalled()
   })
 })

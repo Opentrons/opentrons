@@ -56,3 +56,10 @@
   bottom: 0;
   left: 0;
 }
+
+.overlay {
+  position: fixed;
+  z-index: 1000;
+  background-color: var(--white);
+  inset: 0;
+}

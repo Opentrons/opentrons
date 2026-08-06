@@ -23,7 +23,7 @@ export function RobotSettingsComplianceReady({
       </div>
       {isAdmin ? (
         <div className={`${styles.section} ${styles.section_accordion}`}>
-          <UserManagement />
+          <UserManagement robotName={robotName} />
         </div>
       ) : null}
       {isAdmin ? (

@@ -44,6 +44,7 @@ from .error_recovery_models import ErrorRecoveryRule
 from .run_models import BadRun, Run, RunDataError
 from .run_orchestrator_store import RunOrchestratorStore
 from .run_store import BadRunResource, BadStateSummary, RunResource, RunStore
+from robot_server.access_control.settings.store import AccessControlSettingStore
 from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
 from robot_server.protocols.protocol_store import ProtocolResource
@@ -65,6 +66,7 @@ def _build_run(
         return Run.model_construct(
             id=run_resource.run_id,
             protocolId=run_resource.protocol_id,
+            logPeriodId=run_resource.log_period_id,
             createdAt=run_resource.created_at,
             actions=run_resource.actions,
             status=state_summary.status,
@@ -129,6 +131,7 @@ def _build_run(
         dataError=run_loading_error,
         id=run_resource.run_id,
         protocolId=run_resource.protocol_id,
+        logPeriodId=run_resource.log_period_id,
         createdAt=run_resource.created_at,
         actions=run_resource.actions,
         status=state.status,
@@ -157,6 +160,10 @@ class RunNotCompleteError(ValueError):
     """Error raised when trying to sign a run that has not completed."""
 
 
+class RunSignoffRequiredError(ValueError):
+    """Error raised when an action requires the run to be signed off first."""
+
+
 class PreSerializedCommandsNotAvailableError(LookupError):
     """Error raised when a run's commands are not available as pre-serialized list of commands."""
 
@@ -178,6 +185,7 @@ class RunDataManager:
         run_store: RunStore,
         error_recovery_setting_store: ErrorRecoverySettingStore,
         camera_setting_store: CameraSettingStore,
+        access_control_setting_store: AccessControlSettingStore,
         runs_publisher: RunsPublisher,
         file_provider: FileProvider,
     ) -> None:
@@ -186,6 +194,7 @@ class RunDataManager:
 
         self._error_recovery_setting_store = error_recovery_setting_store
         self._camera_setting_store = camera_setting_store
+        self._access_control_setting_store = access_control_setting_store
         # todo(mm, 2024-11-22): Storing the list of error recovery rules is outside the
         # responsibilities of this class. It's also clunky for us to store it like this
         # because we need to remember to clear it whenever the current run changes.
@@ -212,6 +221,7 @@ class RunDataManager:
         notify_publishers: Callable[[], None],
         protocol: Optional[ProtocolResource],
         access_control_status: bool,
+        log_period_id: Optional[str],
     ) -> Union[Run, BadRun]:
         """Create a new, current run.
 
@@ -226,6 +236,7 @@ class RunDataManager:
             run_time_param_paths: Any runtime filepath to set.
             protocol: The protocol to load the runner with, if any.
             access_control_status: Status of the Auth-Server access control enablement.
+            log_period_id: The log period this run exists in, if audit logging is enabled
 
         Returns:
             The run resource.
@@ -233,12 +244,15 @@ class RunDataManager:
         Raise:
             RunConflictError: There is a currently active run that cannot
                 be superceded by this new run.
+            RunSignoffRequiredError: The previous current run must be signed
+                off before it can be replaced.
         """
         self._run_orchestrator_store.set_access_control_status(
             access_control_mode=access_control_status
         )
         prev_run_id = self._run_orchestrator_store.current_run_id
         if prev_run_id is not None:
+            self._raise_if_run_requires_signoff(prev_run_id, access_control_status)
             # Allow clear() to propagate RunConflictError.
             prev_run_result = await self._run_orchestrator_store.clear()
             self._run_store.update_run_state(
@@ -291,6 +305,7 @@ class RunDataManager:
             run_id=run_id,
             created_at=created_at,
             protocol_id=protocol.protocol_id if protocol is not None else None,
+            log_period_id=log_period_id,
         )
         run_time_parameters = self._run_orchestrator_store.get_run_time_parameters()
         self._run_store.insert_csv_rtp(
@@ -388,17 +403,23 @@ class RunDataManager:
             for run_resource in self._run_store.get_all(length)
         ]
 
-    async def delete(self, run_id: str) -> None:
+    async def delete(self, run_id: str, access_control_status: bool) -> None:
         """Delete a current or historical run.
 
         Args:
             run_id: The identifier of the run to remove.
+            access_control_status: Whether access control (Compliance Ready Software)
+                is currently enabled for the robot.
 
         Raises:
             RunConflictError: If deleting the current run, the current run
                 is not idle and cannot be deleted.
+            RunSignoffRequiredError: The run must be signed off before it can
+                be deleted.
             RunNotFoundError: The given run identifier was not found in the database.
         """
+        self._raise_if_run_requires_signoff(run_id, access_control_status)
+
         if run_id == self._run_orchestrator_store.current_run_id:
             await self._run_orchestrator_store.clear()
 
@@ -406,11 +427,15 @@ class RunDataManager:
 
         self._run_store.remove(run_id=run_id)
 
-    async def uncurrent(self, run_id: str) -> Union[Run, BadRun]:
+    async def uncurrent(
+        self, run_id: str, access_control_status: bool
+    ) -> Union[Run, BadRun]:
         """Archive the current run.
 
         Args:
             run_id: The run to un-current.
+            access_control_status: Whether access control (Compliance Ready Software)
+                is currently enabled for the robot.
 
         Returns:
             The run after it has been un-currented.
@@ -419,11 +444,15 @@ class RunDataManager:
             RunNotFoundError: The run identifier was not found in the database.
             RunNotCurrentError: The run is not the current run.
             RunConflictError: The run cannot be un-currented because it is not idle.
+            RunSignoffRequiredError: The run must be signed off before it can
+                be un-currented.
         """
         if run_id != self._run_orchestrator_store.current_run_id:
             raise RunNotCurrentError(
                 f"Cannot un-current {run_id} because it is not the current run."
             )
+
+        self._raise_if_run_requires_signoff(run_id, access_control_status)
 
         run_result = await self._run_orchestrator_store.clear()
         self._file_provider.clear_run_metadata()
@@ -690,6 +719,21 @@ class RunDataManager:
                 f"Cannot get the error recovery policy of {run_id} because it is not the current run."
             )
         return self._current_run_error_recovery_rules
+
+    def _raise_if_run_requires_signoff(
+        self, run_id: str, access_control_enabled: bool
+    ) -> None:
+        """Raise if the run must be signed off before leaving or deleting it."""
+        signoff_required = (
+            access_control_enabled
+            and self._access_control_setting_store.get_all().requireSignoffForProtocolLog
+        )
+        if signoff_required:
+            is_signed_off = self._run_store.get(run_id=run_id).signed_by is not None
+            if not is_signed_off:
+                raise RunSignoffRequiredError(
+                    f"Run {run_id} must be signed off before this action."
+                )
 
     def _get_state_summary(self, run_id: str) -> Union[StateSummary, BadStateSummary]:
         if run_id == self._run_orchestrator_store.current_run_id:

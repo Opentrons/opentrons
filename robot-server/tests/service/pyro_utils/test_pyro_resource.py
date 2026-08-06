@@ -152,10 +152,6 @@ async def _host_pyro_nameserver_and_ot3api(
     return (ot3_async, rs_async)
 
 
-# NOTE: This is here to handle test failures for a feature flag migration bug on versions < 10.0.0
-# this patch should be REMOVED for releases >= 10.0.0
-# See: https://opentrons.atlassian.net/browse/EXEC-2897
-@pytest.mark.xfail
 async def test_run_hardware_event_callback(
     ot3_hardware_api: OT3API,
     mock_app_state: AppState,
@@ -200,10 +196,6 @@ async def test_run_hardware_event_callback(
     assert isinstance(default_run_door_watcher_result, ClientPyroFunctionWrapper)
 
 
-# NOTE: This is here to handle test failures for a feature flag migration bug on versions < 10.0.0
-# this patch should be REMOVED for releases >= 10.0.0
-# See: https://opentrons.atlassian.net/browse/EXEC-2897
-@pytest.mark.xfail
 async def test_maintenance_run_hardware_event_callback(
     ot3_hardware_api: OT3API,
     mock_app_state: AppState,
@@ -245,10 +237,6 @@ async def test_maintenance_run_hardware_event_callback(
     assert isinstance(door_watcher_result, ClientPyroFunctionWrapper)
 
 
-# NOTE: This is here to handle test failures for a feature flag migration bug on versions < 10.0.0
-# this patch should be REMOVED for releases >= 10.0.0
-# See: https://opentrons.atlassian.net/browse/EXEC-2897
-@pytest.mark.xfail
 async def test_camera_provider(
     ot3_hardware_api: OT3API,
     mock_app_state: AppState,
@@ -279,10 +267,6 @@ async def test_camera_provider(
     assert settings.errorRecoveryCameraEnabled
 
 
-# NOTE: This is here to handle test failures for a feature flag migration bug on versions < 10.0.0
-# this patch should be REMOVED for releases >= 10.0.0
-# See: https://opentrons.atlassian.net/browse/EXEC-2897
-@pytest.mark.xfail
 async def test_file_provider(
     ot3_hardware_api: OT3API,
     mock_app_state: AppState,
@@ -325,10 +309,6 @@ async def test_file_provider(
     )
 
 
-# NOTE: This is here to handle test failures for a feature flag migration bug on versions < 10.0.0
-# this patch should be REMOVED for releases >= 10.0.0
-# See: https://opentrons.atlassian.net/browse/EXEC-2897
-@pytest.mark.xfail
 async def test_deck_config(
     ot3_hardware_api: OT3API,
     mock_app_state: AppState,
@@ -354,10 +334,6 @@ async def test_deck_config(
     )
 
 
-# NOTE: This is here to handle test failures for a feature flag migration bug on versions < 10.0.0
-# this patch should be REMOVED for releases >= 10.0.0
-# See: https://opentrons.atlassian.net/browse/EXEC-2897
-@pytest.mark.xfail
 async def test_notify_publisher(
     ot3_hardware_api: OT3API,
     mock_app_state: AppState,

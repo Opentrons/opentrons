@@ -1,8 +1,8 @@
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
@@ -135,7 +135,8 @@ describe('StatelessNumericalKeyboard', () => {
     })
   })
 
-  it('should emit the next value when clicking a number key', () => {
+  it('should emit the next value when clicking a number key', async () => {
+    const user = userEvent.setup()
     const props = {
       value: '1',
       onChange: vi.fn(),
@@ -143,12 +144,13 @@ describe('StatelessNumericalKeyboard', () => {
       hasHyphen: false,
     }
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: '2' }))
+    await user.click(screen.getByRole('button', { name: '2' }))
 
     expect(props.onChange).toHaveBeenCalledWith('12')
   })
 
-  it('should emit the next value when clicking a decimal point key', () => {
+  it('should emit the next value when clicking a decimal point key', async () => {
+    const user = userEvent.setup()
     const props = {
       value: '1',
       onChange: vi.fn(),
@@ -157,12 +159,13 @@ describe('StatelessNumericalKeyboard', () => {
     }
     render(props)
 
-    fireEvent.click(screen.getByRole('button', { name: '.' }))
+    await user.click(screen.getByRole('button', { name: '.' }))
 
     expect(props.onChange).toHaveBeenCalledWith('1.')
   })
 
-  it('should not accumulate duplicate decimal points', () => {
+  it('should not accumulate duplicate decimal points', async () => {
+    const user = userEvent.setup()
     const props = {
       value: '1.',
       onChange: vi.fn(),
@@ -171,12 +174,13 @@ describe('StatelessNumericalKeyboard', () => {
     }
     render(props)
 
-    fireEvent.click(screen.getByRole('button', { name: '.' }))
+    await user.click(screen.getByRole('button', { name: '.' }))
 
     expect(props.onChange).toHaveBeenCalledWith('1.')
   })
 
-  it('should emit the next value when clicking a hyphen key at the start', () => {
+  it('should emit the next value when clicking a hyphen key at the start', async () => {
+    const user = userEvent.setup()
     const props = {
       value: '',
       onChange: vi.fn(),
@@ -185,12 +189,13 @@ describe('StatelessNumericalKeyboard', () => {
     }
     render(props)
 
-    fireEvent.click(screen.getByRole('button', { name: '-' }))
+    await user.click(screen.getByRole('button', { name: '-' }))
 
     expect(props.onChange).toHaveBeenCalledWith('-')
   })
 
-  it('should ignore a hyphen key when the value is not empty', () => {
+  it('should ignore a hyphen key when the value is not empty', async () => {
+    const user = userEvent.setup()
     const props = {
       value: '1',
       onChange: vi.fn(),
@@ -199,12 +204,13 @@ describe('StatelessNumericalKeyboard', () => {
     }
     render(props)
 
-    fireEvent.click(screen.getByRole('button', { name: '-' }))
+    await user.click(screen.getByRole('button', { name: '-' }))
 
     expect(props.onChange).toHaveBeenCalledWith('1')
   })
 
-  it('should delete the last character when clicking del', () => {
+  it('should delete the last character when clicking del', async () => {
+    const user = userEvent.setup()
     const props = {
       value: '12',
       onChange: vi.fn(),
@@ -213,12 +219,13 @@ describe('StatelessNumericalKeyboard', () => {
     }
     render(props)
 
-    fireEvent.click(screen.getByRole('button', { name: 'del' }))
+    await user.click(screen.getByRole('button', { name: 'del' }))
 
     expect(props.onChange).toHaveBeenCalledWith('1')
   })
 
-  it('should call onKeyPress with the normalized key', () => {
+  it('should call onKeyPress with the normalized key', async () => {
+    const user = userEvent.setup()
     const props = {
       value: '12',
       onChange: vi.fn(),
@@ -228,7 +235,7 @@ describe('StatelessNumericalKeyboard', () => {
     }
     render(props)
 
-    fireEvent.click(screen.getByRole('button', { name: 'del' }))
+    await user.click(screen.getByRole('button', { name: 'del' }))
 
     expect(props.onKeyPress).toHaveBeenCalledWith('del')
   })

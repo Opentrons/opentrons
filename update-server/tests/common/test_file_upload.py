@@ -75,7 +75,8 @@ async def test_upload_starts_validation_in_the_background(
         files={"system-update.zip": ("system-update.zip", b"pretend this is a zip")},
     )
     assert response.status_code == 201
-    assert response.json()["stage"] == "awaiting-file"
+    # the response should eagerly change the stage
+    assert response.json()["stage"] == "validating"
 
     await asyncio.sleep(0.05)
 

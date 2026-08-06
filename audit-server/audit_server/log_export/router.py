@@ -10,7 +10,11 @@ import fastapi
 from fastapi.responses import FileResponse
 from starlette.background import BackgroundTask
 
-from server_utils.fastapi_utils.models.json_api import MultiBodyMeta, SimpleMultiBody
+from server_utils.fastapi_utils.models.json_api import (
+    MultiBodyMeta,
+    SimpleBody,
+    SimpleMultiBody,
+)
 from server_utils.keys.fastapi import get_key_client
 from server_utils.keys.key_server import Client as KeyClient
 from server_utils.keys.key_server import SignMessageData
@@ -22,7 +26,7 @@ from server_utils.robot.robot_server import Client as RobotServerClient
 
 from audit_server.log_storage.dependency import get_log_data_manager
 from audit_server.log_storage.log_data_manager import LogDataManager
-from audit_server.log_storage.models import LogPeriodSummary
+from audit_server.log_storage.models import LogPeriodDetails, LogPeriodSummary
 from audit_server.log_storage.store import NoPeriodById
 from audit_server.persistence.fastapi_dependencies import get_persistence_directory_root
 
@@ -127,3 +131,33 @@ async def download_log_period(
         headers={_DELETION_KEY_HEADER: deletion_key},
         background=BackgroundTask(cleanup_files),
     )
+
+
+@router.get(
+    "/audit/external/logPeriods/{periodId}",
+    summary="Get a summary of a log period",
+    description=(
+        "Returns a summary of a log period, including the start and end timestamps,"
+        " the number of included records, the total size of the period, and filenames"
+        " of any attached files."
+    ),
+    responses={
+        fastapi.status.HTTP_404_NOT_FOUND: {
+            "description": "No log period could be found for the period ID."
+        }
+    },
+)
+async def get_log_period_summary(
+    periodId: str,
+    log_data_manager: Annotated[LogDataManager, fastapi.Depends(get_log_data_manager)],
+) -> SimpleBody[LogPeriodDetails]:
+    """Get a summary of a log period."""
+    try:
+        period_details = log_data_manager.get_log_period_details(period_id=periodId)
+    except NoPeriodById as exc:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail=f"No log period found with ID {periodId}",
+        ) from exc
+
+    return SimpleBody.model_construct(data=period_details)

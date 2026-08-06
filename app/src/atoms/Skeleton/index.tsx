@@ -14,7 +14,7 @@ export const Skeleton = (props: SkeletonProps): JSX.Element => {
   const SKELETON_STYLE = css`
     border-radius: ${borderRadius ?? BORDERS.borderRadius8};
     animation: shimmer 2s infinite linear;
-    background: linear-gradient(
+    background-image: linear-gradient(
       to right,
       ${COLORS.grey30} 1%,
       #e3e3e366 25%,

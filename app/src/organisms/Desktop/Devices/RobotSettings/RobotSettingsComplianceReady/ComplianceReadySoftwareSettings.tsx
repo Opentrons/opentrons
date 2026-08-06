@@ -293,31 +293,8 @@ export function ComplianceReadySoftwareSettings({
         </ComplianceReadySettingsSection>
 
         <ComplianceReadySettingsSection
-          titleKey="desktop_protocol_logs"
-          isLastSection={false}
-        >
-          <ComplianceReadyToggleField
-            id="requireSignoffForProtocolLog"
-            labelKey="desktop_require_signoff_for_protocol_log"
-            values={fieldValues}
-            onToggleChange={toggledOn => {
-              handleToggleChange('requireSignoffForProtocolLog', toggledOn)
-            }}
-          />
-          <Divider />
-          <ComplianceReadyToggleField
-            id="deleteOverMaxOnDiskProtocols"
-            labelKey="desktop_automatically_delete_protocol_run_logs"
-            values={fieldValues}
-            onToggleChange={toggledOn => {
-              handleToggleChange('deleteOverMaxOnDiskProtocols', toggledOn)
-            }}
-          />
-        </ComplianceReadySettingsSection>
-
-        <ComplianceReadySettingsSection
           titleKey="desktop_audit_log_requirements"
-          isLastSection
+          isLastSection={false}
         >
           <ComplianceReadyToggleField
             id="requireReasonForInteraction"
@@ -342,6 +319,38 @@ export function ComplianceReadySoftwareSettings({
               }}
             />
           </ComplianceReadyToggleField>
+          <Divider />
+          <ComplianceReadyToggleField
+            id="requireSignoffForProtocolLog"
+            labelKey="desktop_require_signoff_for_protocol_log"
+            values={fieldValues}
+            onToggleChange={toggledOn => {
+              handleToggleChange('requireSignoffForProtocolLog', toggledOn)
+            }}
+          />
+          <Divider />
+          <ComplianceReadyToggleField
+            id="requireLogsToBeSavedInApp"
+            labelKey="branded:require_logs_to_be_saved_in_app"
+            detailKey="desktop_require_logs_to_be_saved_in_app_description"
+            values={fieldValues}
+            onToggleChange={toggledOn => {
+              handleToggleChange('requireLogsToBeSavedInApp', toggledOn)
+            }}
+          />
+        </ComplianceReadySettingsSection>
+        <ComplianceReadySettingsSection
+          titleKey="desktop_robot_storage"
+          isLastSection
+        >
+          <ComplianceReadyToggleField
+            id="deleteOverMaxOnDiskProtocols"
+            labelKey="desktop_automatically_delete_protocol_run_logs"
+            values={fieldValues}
+            onToggleChange={toggledOn => {
+              handleToggleChange('deleteOverMaxOnDiskProtocols', toggledOn)
+            }}
+          />
         </ComplianceReadySettingsSection>
       </div>
     </Accordion>

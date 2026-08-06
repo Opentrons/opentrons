@@ -9,6 +9,7 @@ from auth_server.settings.models import SettingsResponseData
 from auth_server.settings.store import SettingsStore
 from auth_server.users.models import (
     AccountType,
+    TemporaryPasswordResponse,
     UserResponse,
 )
 from auth_server.users.store import UserStore
@@ -102,6 +103,7 @@ def test_create_user_success(
             full_name="New User",
             account_type=AccountType.USER,
             now=matchers.IsA(datetime.datetime),
+            reset_password=False,
         )
     ).then_return(expected)
 
@@ -112,12 +114,13 @@ def test_create_user_success(
         account_type=AccountType.USER,
         now=_NOW,
     )
-    assert result == UserResponse(
+    assert result == TemporaryPasswordResponse(
         username="new_user",
         fullName="New User",
         accountType=AccountType.USER,
         locked=False,
         resetPassword=False,
+        temporaryPassword=None,
     )
 
 
@@ -138,6 +141,7 @@ def test_create_user_hashes_password(
             "X",
             AccountType.USER,
             now=matchers.IsA(datetime.datetime),
+            reset_password=False,
         )
     ).then_return(created)
     result = manager.create_user(
@@ -147,12 +151,13 @@ def test_create_user_hashes_password(
         account_type=AccountType.USER,
         now=_NOW,
     )
-    assert result == UserResponse(
+    assert result == TemporaryPasswordResponse(
         username="hash_check",
         fullName="X",
         accountType=AccountType.USER,
         locked=False,
         resetPassword=False,
+        temporaryPassword=None,
     )
 
 
@@ -194,6 +199,50 @@ def test_create_user_empty_password_raises(manager: UserDataManager) -> None:
         )
 
 
+def test_create_user_without_password_sets_reset_password(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    decoy.when(mock_store.get("temp_pw_user")).then_return(None)
+    expected = _make_orm_user(
+        username="temp_pw_user",
+        full_name="Temp PW User",
+        account_type=AccountType.USER,
+        reset_password=True,
+    )
+    decoy.when(
+        mock_store.add(
+            username="temp_pw_user",
+            hashed_password=matchers.IsA(str),
+            full_name="Temp PW User",
+            account_type=AccountType.USER,
+            now=matchers.IsA(datetime.datetime),
+            reset_password=True,
+        )
+    ).then_return(expected)
+
+    result = manager.create_user(
+        username="temp_pw_user",
+        password=None,
+        full_name="Temp PW User",
+        account_type=AccountType.USER,
+        now=_NOW,
+    )
+    assert result.username == "temp_pw_user"
+    assert result.fullName == "Temp PW User"
+    assert result.accountType == AccountType.USER
+    assert result.locked is False
+    assert result.resetPassword is True
+    assert result.temporaryPassword is not None
+    assert len(result.temporaryPassword) == 8
+    assert all(
+        c in string.ascii_letters + string.digits for c in result.temporaryPassword
+    )
+
+
 def test_create_user_short_password_raises(manager: UserDataManager) -> None:
     with pytest.raises(PasswordTooShortError) as exc_info:
         manager.create_user(
@@ -227,6 +276,7 @@ def test_create_user_enforces_password_length(
             full_name="Test User",
             account_type=AccountType.USER,
             now=matchers.IsA(datetime.datetime),
+            reset_password=False,
         )
     ).then_return(_make_orm_user(username="test_user"))
     with pytest.raises(PasswordTooShortError) as exc_info:
@@ -266,6 +316,7 @@ def test_create_user_enforces_password_special_characters(
             full_name="Test User",
             account_type=AccountType.USER,
             now=matchers.IsA(datetime.datetime),
+            reset_password=False,
         )
     ).then_return(_make_orm_user(username="test_user"))
     with pytest.raises(PasswordMissingSpecialCharactersError):
@@ -316,6 +367,42 @@ def test_get_user_returns_existing(
         locked=False,
         resetPassword=False,
     )
+
+
+def test_list_users_returns_all_users(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    decoy.when(mock_store.get_all()).then_return(
+        [
+            _make_orm_user(username="alice", full_name="Alice"),
+            _make_orm_user(
+                username="bob", full_name="Bob", account_type=AccountType.ADMIN
+            ),
+        ]
+    )
+
+    result = manager.get_users_list()
+
+    assert result == [
+        UserResponse(
+            username="alice",
+            fullName="Alice",
+            accountType=AccountType.USER,
+            locked=False,
+            resetPassword=False,
+        ),
+        UserResponse(
+            username="bob",
+            fullName="Bob",
+            accountType=AccountType.ADMIN,
+            locked=False,
+            resetPassword=False,
+        ),
+    ]
 
 
 def test_get_user_locked_when_failed_logins_reach_limit(
@@ -594,9 +681,10 @@ def test_reset_user_password(
 
     assert result.username == "reset_me"
     assert result.resetPassword is True
-    assert len(result.temporaryPassword) == 8
+    assert len(result.temporaryPassword or "") == 8
     assert all(
-        c in string.ascii_letters + string.digits for c in result.temporaryPassword
+        c in string.ascii_letters + string.digits
+        for c in result.temporaryPassword or ""
     )
     decoy.verify(
         mock_store.update(
@@ -632,8 +720,8 @@ def test_reset_user_password_uses_password_complexity_settings(
 
     result = manager.reset_user_password("reset_me", now=_NOW)
 
-    assert len(result.temporaryPassword) == 12
-    assert any(c in string.punctuation for c in result.temporaryPassword)
+    assert len(result.temporaryPassword or "") == 12
+    assert any(c in string.punctuation for c in result.temporaryPassword or "")
 
 
 def test_reset_user_password_not_found_raises(

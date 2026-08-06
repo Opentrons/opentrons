@@ -1,0 +1,134 @@
+# Publish @opentrons/{shared-data,step-generation,components,protocol-visualization}
+# via scripts/publish.mts using npm Trusted Publishing (OIDC).
+#
+# Pack/publish split (pnpm 10.x):
+#   - pnpm pack rewrites catalog: / workspace:*
+#   - npm publish performs OIDC Trusted Publishing
+# Follow-up when the monorepo moves to pnpm 11+: switch publish.mts to
+# `pnpm publish` (native OIDC) and keep pnpm for protocol rewriting.
+#
+# Follows https://docs.npmjs.com/trusted-publishers
+#   - GitHub-hosted runner (required; self-hosted not supported)
+#   - Node >= 22.14.0, npm CLI >= 11.5.1
+#   - permissions: id-token: write (OIDC) + contents: read
+#   - setup-node registry-url + package-manager-cache: false (no cache on release)
+#   - no NPM_TOKEN / NODE_AUTH_TOKEN on publish (OIDC only)
+#   - GitHub Environment for approval (npm-publish)
+#
+# Manual run only. Always:
+#   - reads npm "latest"
+#   - patch-bumps to the next *-alpha.0 (e.g. 0.3.8-alpha.0 -> 0.3.9-alpha.0)
+#   - publishes with dist-tag "latest"
+#
+# npmjs Trusted Publisher setup (required once per package before first run):
+#   Package Settings -> Trusted Publisher -> GitHub Actions
+#   Organization: Opentrons
+#   Repository:   opentrons
+#   Workflow:     npm-publish-alpha.yaml
+#   Environment:  npm-publish
+#   Allowed:      npm publish
+# Do this for each of:
+#   @opentrons/shared-data
+#   @opentrons/step-generation
+#   @opentrons/components
+#   @opentrons/protocol-visualization
+
+name: 'Publish JS packages to npm (alpha)'
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Build and pack only; skip npm publish'
+        required: false
+        type: boolean
+        default: false
+
+# Default deny; job grants only what trusted publishing needs.
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CI: 'true'
+
+jobs:
+  publish:
+    name: 'publish alpha packages to npm'
+    # GitHub-hosted runner required for npm OIDC (self-hosted not supported)
+    runs-on: 'ubuntu-24.04'
+    timeout-minutes: 45
+    # Must match the Environment name configured on npm Trusted Publisher
+    environment: npm-publish
+    permissions:
+      id-token: write # Required for OIDC
+      contents: read
+    steps:
+      - name: 'Checkout repository'
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      # pnpm must be installed before setup-node when using pnpm
+      - name: 'Install pnpm'
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+        with:
+          version: 10.32.1
+
+      # Per npm trusted-publishers docs: set registry-url and never cache
+      # package-manager state in release/publish builds.
+      - name: 'Setup Node'
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          # Trusted publishing requires Node >= 22.14.0; monorepo pins 22.22.0
+          node-version: '22.22.0'
+          registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false
+
+      # Trusted publishing requires npm CLI >= 11.5.1.
+      # Pin npm 11.x: npm@latest (12+) requires Node ^22.22.2, but the monorepo
+      # pins 22.22.0. Stay on npm 11 until the repo Node pin moves.
+      - name: 'Upgrade npm for OIDC trusted publishing'
+        run: |
+          npm install -g npm@11.19.0
+          node --version
+          npm --version
+
+      - name: 'Install udev for USB-detection'
+        run: sudo apt-get update && sudo apt-get install libudev-dev
+
+      - name: 'Install JS dependencies'
+        run: make setup-js-ci
+
+      - name: 'Resolve next patch version from npm latest'
+        id: version
+        env:
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          VERSION="$(node --experimental-strip-types scripts/next-npm-version.mts)"
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+          echo "Publishing version: ${VERSION} (dist-tag latest)"
+          {
+            echo "## npm alpha publish"
+            echo ""
+            echo "- **version**: \`${VERSION}\`"
+            echo "- **dist-tag**: \`latest\`"
+            echo "- **bump**: \`patch\` (hardcoded)"
+            echo "- **dry_run**: \`${INPUT_DRY_RUN}\`"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: 'Publish packages'
+        # Do not set NODE_AUTH_TOKEN / NPM_TOKEN. npm uses OIDC when
+        # id-token: write is present and Trusted Publisher is configured.
+        # Provenance attestations are generated automatically for public repos.
+        env:
+          PUBLISH_VERSION: ${{ steps.version.outputs.version }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          ARGS=(--version "${PUBLISH_VERSION}")
+          if [[ "${INPUT_DRY_RUN}" == "true" ]]; then
+            ARGS+=(--dry-run)
+          fi
+          node --experimental-strip-types scripts/publish.mts "${ARGS[@]}"

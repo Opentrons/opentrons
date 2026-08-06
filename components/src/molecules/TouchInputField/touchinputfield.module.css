@@ -54,11 +54,6 @@
   background-color: var(--white);
 }
 
-.background_error {
-  border: none;
-  background-color: var(--red-30);
-}
-
 .error {
   border-color: var(--red-50);
 }
