@@ -227,7 +227,7 @@ class LogStore:
                 return latest_record
             return latest_record.message_hash
 
-    def get_period_entries(self, period_id: str) -> LogPeriodEntries:
+    def get_period_entries(self, period_id: str) -> LogPeriodEntries | NoPeriodById:
         """Get the given log period's user and robot log entries."""
         with self._session() as session:
             try:
@@ -236,9 +236,9 @@ class LogStore:
                 )
             # This will raise if `period_id` is not an int
             except ValueError:
-                log_period = None
+                return NoPeriodById()
             if log_period is None:
-                raise NoPeriodById()
+                return NoPeriodById()
             user_log_entries = [
                 UserLogEntry(
                     message=user_log.message,
@@ -266,12 +266,12 @@ class LogStore:
                 robot_log_entries=robot_log_entries,
             )
 
-    def get_period_details(self, period_id: str) -> LogPeriodDetails:
+    def get_period_details(self, period_id: str) -> LogPeriodDetails | NoPeriodById:
         """Get aggregate details for a log period without loading its log entries."""
         try:
             parsed_period_id = int(period_id)
-        except ValueError as exc:
-            raise NoPeriodById() from exc
+        except ValueError:
+            return NoPeriodById()
 
         with self._session() as session:
             details = session.execute(
@@ -293,7 +293,7 @@ class LogStore:
                 )
             ).one_or_none()
             if details is None:
-                raise NoPeriodById()
+                return NoPeriodById()
 
             robot_log_paths = session.scalars(
                 select(RobotLog.file_path).where(

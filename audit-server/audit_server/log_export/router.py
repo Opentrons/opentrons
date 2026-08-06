@@ -37,7 +37,7 @@ from audit_server.log_storage.models import (
     LogPeriodDetails,
     LogPeriodSummary,
 )
-from audit_server.log_storage.store import NoPeriodById
+from audit_server.log_storage.store import NoPeriodById, PeriodIsActiveError
 from audit_server.persistence.fastapi_dependencies import get_persistence_directory_root
 
 router = fastapi.APIRouter()
@@ -96,10 +96,17 @@ async def download_log_period(
             detail=f"No log period found with ID {periodId}",
         ) from exc
 
+    headers: dict[str, str] = {}
+
     # The period exists, so mint a deletion key linked to it and hand it back in
     # a response header. The app stores this key and presents it to later delete
     # the period.
-    deletion_key = log_data_manager.create_deletion_key(period_id=periodId)
+    try:
+        headers[_DELETION_KEY_HEADER] = log_data_manager.create_deletion_key(
+            period_id=periodId
+        )
+    except PeriodIsActiveError:
+        pass
 
     signing_key = await key_client.get_key_and_hash()
     robot_info = await robot_server_client.get_name_and_serial()
@@ -138,7 +145,7 @@ async def download_log_period(
     return FileResponse(
         zip_file_path,
         media_type="application/zip",
-        headers={_DELETION_KEY_HEADER: deletion_key},
+        headers=headers,
         background=BackgroundTask(cleanup_files),
     )
 
@@ -214,6 +221,11 @@ async def delete_log_period(
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
             detail=f"No such log period {periodId}",
+        )
+    except PeriodIsActiveError:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_409_CONFLICT,
+            detail="Active log periods cannot be deleted",
         )
 
     return SimpleBody.model_construct(

@@ -38,6 +38,13 @@ async def test_download_log_period(run_server: DevServer) -> None:
         )
         response.raise_for_status()
 
+        # post a "robot log" to force log period rotation
+        response = await client.post(
+            f"{run_server.base_url}/audit/internal/storeRobotLog",
+            files={"file": ("robotlog.json", io.BytesIO(b"hi"), "application/json")},
+        )
+        response.raise_for_status()
+
         response = await client.get(f"{run_server.base_url}/audit/external/logPeriods")
         period_id = response.json()["data"][0]["id"]
 
@@ -56,4 +63,5 @@ async def test_download_log_period(run_server: DevServer) -> None:
                 "log_period.json",
                 "signing_key.pem",
                 "robot_identity.json",
+                "robotlog.json",
             ]

@@ -103,11 +103,17 @@ class LogDataManager:
 
     def get_period_entries(self, period_id: str) -> LogPeriodEntries:
         """Get the given log period's user and robot log entries."""
-        return self._store.get_period_entries(period_id)
+        entries = self._store.get_period_entries(period_id)
+        if isinstance(entries, Exception):
+            raise entries
+        return entries
 
     def get_log_period_details(self, period_id: str) -> LogPeriodDetails:
         """Get aggregate details for a log period."""
-        return self._store.get_period_details(period_id)
+        details = self._store.get_period_details(period_id)
+        if isinstance(details, Exception):
+            raise details
+        return details
 
     def create_deletion_key(self, period_id: str) -> str:
         """Mint a new one-time deletion key linked to a log period.
@@ -116,6 +122,11 @@ class LogDataManager:
         distinct key, and previously issued keys for the same period remain
         valid.
         """
+        period = self._store.get_period_details(period_id)
+        if isinstance(period, Exception):
+            raise period
+        if period.endedAt is None:
+            raise PeriodIsActiveError()
         key = secrets.token_urlsafe(_DELETION_KEY_BYTES)
         self._deletion_keys[key] = period_id
         return key
@@ -131,9 +142,6 @@ class LogDataManager:
 
         async with self._lock:
             robot_logs_to_delete = self._store.delete_period(period_id)
-            if isinstance(robot_logs_to_delete, PeriodIsActiveError):
-                await self._do_rotate_periods()
-                robot_logs_to_delete = self._store.delete_period(period_id)
         if isinstance(robot_logs_to_delete, Exception):
             raise robot_logs_to_delete
 

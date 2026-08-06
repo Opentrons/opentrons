@@ -23,6 +23,7 @@ from audit_server.log_storage.store import (
     LogStore,
     NoActivePeriodError,
     NoLogInPeriodError,
+    NoPeriodById,
     PeriodIsActiveError,
 )
 from audit_server.log_storage.types import StoredLog
@@ -97,6 +98,19 @@ def test_get_log_period_details(
     result = subject.get_log_period_details("1")
 
     assert result == details
+
+
+def test_get_log_period_details_handles_failure(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+) -> None:
+    """It should raise failures from the store."""
+
+    decoy.when(mock_store.get_period_details("1")).then_return(NoPeriodById())
+
+    with pytest.raises(NoPeriodById):
+        subject.get_log_period_details("1")
 
 
 async def test_store_log_stores_nothing_if_logging_disabled(
@@ -805,19 +819,70 @@ async def test_rotate_no_previous_log_handles_no_key_server(
     assert await subject.rotate_periods() == ""
 
 
-def test_create_deletion_key_mints_a_key(subject: LogDataManager) -> None:
-    """It should mint a non-empty deletion key for a log period."""
+def test_create_deletion_key_mints_a_key(
+    subject: LogDataManager, mock_store: LogStore, decoy: Decoy
+) -> None:
+    """It should mint a non-empty deletion key for a completed log period."""
+    decoy.when(mock_store.get_period_details("1")).then_return(
+        LogPeriodDetails(
+            id=1,
+            startedAt=datetime.now(),
+            endedAt=datetime.now(),
+            recordCount=10,
+            totalSizeBytes=100,
+            attachedFilenames=[],
+        )
+    )
     key = subject.create_deletion_key(period_id="1")
 
     assert key
 
 
-def test_create_deletion_key_mints_distinct_keys(subject: LogDataManager) -> None:
+def test_create_deletion_key_mints_distinct_keys(
+    subject: LogDataManager, mock_store: LogStore, decoy: Decoy
+) -> None:
     """Each call should mint a new, distinct key for the same period."""
+    decoy.when(mock_store.get_period_details("1")).then_return(
+        LogPeriodDetails(
+            id=1,
+            startedAt=datetime.now(),
+            endedAt=datetime.now(),
+            recordCount=10,
+            totalSizeBytes=100,
+            attachedFilenames=[],
+        )
+    )
     first = subject.create_deletion_key(period_id="1")
     second = subject.create_deletion_key(period_id="1")
 
     assert first != second
+
+
+def test_create_deletion_key_fails_if_period_is_active(
+    subject: LogDataManager, mock_store: LogStore, decoy: Decoy
+) -> None:
+    """Deletion keys cannot be created for active periods."""
+    decoy.when(mock_store.get_period_details("1")).then_return(
+        LogPeriodDetails(
+            id=1,
+            startedAt=datetime.now(),
+            endedAt=None,
+            recordCount=10,
+            totalSizeBytes=100,
+            attachedFilenames=[],
+        )
+    )
+    with pytest.raises(PeriodIsActiveError):
+        subject.create_deletion_key("1")
+
+
+def test_create_deletion_key_fails_if_period_does_not_exist(
+    subject: LogDataManager, mock_store: LogStore, decoy: Decoy
+) -> None:
+    """Deletion keys cannot be created for non-existent periods."""
+    decoy.when(mock_store.get_period_details("1")).then_return(NoPeriodById())
+    with pytest.raises(NoPeriodById):
+        subject.create_deletion_key("1")
 
 
 async def test_delete_log_period_requires_deletion_key(
@@ -825,81 +890,42 @@ async def test_delete_log_period_requires_deletion_key(
 ) -> None:
     """It should refuse to delete a log period without a valid key."""
     period_id = "2"
+    decoy.when(mock_store.get_period_details(period_id)).then_return(
+        LogPeriodDetails(
+            id=1,
+            startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
+            endedAt=datetime(2025, 1, 1, tzinfo=timezone.utc),
+            recordCount=10,
+            totalSizeBytes=100,
+            attachedFilenames=[],
+        )
+    )
     valid_key = subject.create_deletion_key(period_id)
     with pytest.raises(InvalidDeletionKeyError):
-        await subject.delete_log_period(period_id="2", deletion_key="asdasdasdasd////")
+        await subject.delete_log_period(
+            period_id=period_id, deletion_key="asdasdasdasd////"
+        )
     with pytest.raises(InvalidDeletionKeyError):
         await subject.delete_log_period(period_id="1", deletion_key=valid_key)
     decoy.verify(mock_store.delete_period(matchers.Anything()), times=0)
 
 
-async def test_delete_log_period_rotates_if_needed(
+async def test_delete_log_period_fails_if_period_is_active(
     subject: LogDataManager,
     mock_store: LogStore,
     decoy: Decoy,
     mock_key_client: KeyClient,
 ) -> None:
-    """It should rotate the log before deleting if necessary."""
+    """It should refuse to delete active periods even if there's somehow a valid deletion key."""
     period_id = "1"
-    valid_key = subject.create_deletion_key(period_id)
+    valid_key = "gabbagool"
+    subject._deletion_keys[valid_key] = "1"
 
     decoy.when(mock_store.delete_period(period_id)).then_return(
         PeriodIsActiveError(), []
     )
-    decoy.when(mock_store.tail_hash()).then_return("gg")
-    decoy.when(
-        await mock_key_client.sign_message(
-            SignMessageData.model_construct(
-                message=matchers.StringMatching(
-                    f".*{constants.ACTION_LOG_PERIOD_END}.*"
-                ),
-                previousHash="gg",
-            )
-        )
-    ).then_return(
-        SignedMessageData(
-            message="end-log-period",
-            messageHash="ff",
-            messageSignature="s1",
-            signatureVersion=1,
-        )
-    )
-    decoy.when(
-        mock_store.end_period(
-            [
-                StoredLog(
-                    message="end-log-period",
-                    message_hash="ff",
-                    message_sig="s1",
-                    sig_version="1",
-                )
-            ]
-        )
-    ).then_return("ff")
-    decoy.when(
-        await mock_key_client.sign_message(
-            SignMessageData.model_construct(
-                message=matchers.StringMatching(
-                    f".*{constants.ACTION_LOG_PERIOD_START}.*"
-                ),
-                previousHash="ff",
-            )
-        )
-    ).then_return(
-        SignedMessageData(
-            message="start-log-period",
-            messageHash="ee",
-            messageSignature="s2",
-            signatureVersion=2,
-        )
-    )
-    decoy.when(
-        mock_store.start_period([StoredLog("start-log-period", "ee", "s2", "2")])
-    ).then_return("ee")
-    result = await subject.delete_log_period(
-        period_id=period_id, deletion_key=valid_key
-    )
-    assert result == "1"
+    with pytest.raises(PeriodIsActiveError):
+        await subject.delete_log_period(period_id=period_id, deletion_key=valid_key)
 
 
 async def test_delete_log_period_deletes_log_collateral(
@@ -910,6 +936,16 @@ async def test_delete_log_period_deletes_log_collateral(
     for file_to_write in files:
         file_to_write.write_text("hello")
     period_id = "1"
+    decoy.when(mock_store.get_period_details(period_id)).then_return(
+        LogPeriodDetails(
+            id=1,
+            startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
+            endedAt=datetime(2025, 1, 1, tzinfo=timezone.utc),
+            recordCount=10,
+            totalSizeBytes=100,
+            attachedFilenames=[],
+        )
+    )
     valid_key = subject.create_deletion_key(period_id)
     decoy.when(mock_store.delete_period("1")).then_return([str(f) for f in files])
     result = await subject.delete_log_period(period_id, valid_key)
