@@ -106,7 +106,7 @@ export function UserManagement({
   const { deleteUser } = useDeleteUserMutation(documentationState)
   const { resetUserPassword, isLoading: isResettingPassword } =
     useResetUserPasswordMutation(documentationState)
-  const { updateUser, isLoading: isDeactivatingUser } =
+  const { updateUser, isLoading: isUpdatingUser } =
     useUpdateUserMutation(documentationState)
   const [showAddUserModal, setShowAddUserModal] = useState(false)
   const [userToEdit, setUserToEdit] = useState<AuthUser | null>(null)
@@ -145,9 +145,20 @@ export function UserManagement({
       return
     }
 
-    void resetUserPassword(userToActivate.username)
+    const { username } = userToActivate
+
+    void updateUser({
+      username,
+      request: { data: { locked: false } },
+    })
+      .then(() => resetUserPassword(username))
       .then(response => {
         setUserToActivate(null)
+        makeToast(
+          t('desktop_activate_user_success_banner') as string,
+          SUCCESS_TOAST,
+          { closeButton: true }
+        )
         const { temporaryPassword } = response.data
         if (temporaryPassword != null) {
           setResetPasswordTemporaryPassword(temporaryPassword)
@@ -165,6 +176,11 @@ export function UserManagement({
 
     void resetUserPassword(userToResetPassword.username)
       .then(response => {
+        makeToast(
+          t('desktop_reset_password_success_banner') as string,
+          SUCCESS_TOAST,
+          { closeButton: true }
+        )
         const { temporaryPassword } = response.data
         if (temporaryPassword != null) {
           setResetPasswordTemporaryPassword(temporaryPassword)
@@ -175,16 +191,6 @@ export function UserManagement({
       .catch(() => {
         setUserToResetPassword(null)
       })
-  }
-
-  const handleResetPasswordDone = (): void => {
-    makeToast(
-      t('desktop_reset_password_success_banner') as string,
-      SUCCESS_TOAST,
-      { closeButton: true }
-    )
-    setResetPasswordTemporaryPassword(null)
-    setUserToResetPassword(null)
   }
 
   const handleResetPasswordCancel = (): void => {
@@ -283,7 +289,7 @@ export function UserManagement({
           heading={t('desktop_activate_user_modal_heading') as string}
           description={t('desktop_activate_user_modal_description') as string}
           confirmLabel={t('desktop_unlock_user') as string}
-          isConfirmDisabled={isResettingPassword}
+          isConfirmDisabled={isUpdatingUser || isResettingPassword}
           onConfirm={handleActivateConfirm}
           onCancel={() => {
             setUserToActivate(null)
@@ -296,7 +302,7 @@ export function UserManagement({
           heading={t('desktop_lock_user_modal_heading') as string}
           description={t('desktop_lock_user_modal_description') as string}
           confirmLabel={t('desktop_lock_user') as string}
-          isConfirmDisabled={isDeactivatingUser}
+          isConfirmDisabled={isUpdatingUser}
           onConfirm={handleDeactivateConfirm}
           onCancel={() => {
             setUserToDeactivate(null)
@@ -318,7 +324,7 @@ export function UserManagement({
         <OneTimePasswordModal
           password={resetPasswordTemporaryPassword}
           message={t('desktop_add_user_success_message') as string}
-          onConfirm={handleResetPasswordDone}
+          onConfirm={handleResetPasswordCancel}
           onClose={handleResetPasswordCancel}
         />
       ) : null}

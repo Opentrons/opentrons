@@ -313,9 +313,17 @@ describe('UserManagement', () => {
     )
 
     await vi.waitFor(() => {
+      expect(mockUpdateUser).toHaveBeenCalledWith({
+        username: 'bob',
+        request: { data: { locked: false } },
+      })
       expect(mockResetUserPassword).toHaveBeenCalledWith('bob')
       screen.getByText('temp-password-123')
     })
+    expect(mockUpdateUser).toHaveBeenCalledTimes(1)
     expect(mockResetUserPassword).toHaveBeenCalledTimes(1)
+    expect(mockUpdateUser.mock.invocationCallOrder[0]).toBeLessThan(
+      mockResetUserPassword.mock.invocationCallOrder[0]!
+    )
   })
 })
