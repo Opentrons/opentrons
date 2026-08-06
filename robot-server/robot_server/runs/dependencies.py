@@ -151,7 +151,9 @@ async def set_up_run_process_pyro_provider(
     run_process_pyro_provider = RunProcessPyroProvider()
     _run_process_pyro_provider_accessor.set_on(app_state, run_process_pyro_provider)
     # TODO(2026-04-21) We might want to wrap this into a try/except if this causes local issues
-    run_process_pyro_provider.initialize(access_control_mode=access_control_status)
+    await run_process_pyro_provider.initialize(
+        access_control_mode=access_control_status
+    )
 
     try:
         yield

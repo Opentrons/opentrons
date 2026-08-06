@@ -64,8 +64,8 @@ class ProtocolAnalyzer:
         Returns: The RunOrchestrator instance.
         """
         if feature_flags.protocol_subprocess_enabled():
-            run_coordinator = (
-                await self._run_process_pyro_provider.wait_for_simulating_run_proxy()
+            run_coordinator = await self._run_process_pyro_provider.wait_for_run_proxy(
+                simulator=True
             )
             await run_coordinator.create_simulating(self._protocol_resource)
             self._coordinator = run_coordinator
@@ -168,11 +168,8 @@ class ProtocolAnalyzer:
                     self._coordinator.stop(), asyncio.get_running_loop()
                 )
                 if feature_flags.protocol_subprocess_enabled():
-                    asyncio.run_coroutine_threadsafe(
-                        self._run_process_pyro_provider.refresh_simulating(
-                            access_control_mode=self._analysis_store.get_access_control_status()
-                        ),
-                        asyncio.get_running_loop(),
+                    self._run_process_pyro_provider.set_active_process_as_used(
+                        simulator=True
                     )
             else:
                 log.warning(
