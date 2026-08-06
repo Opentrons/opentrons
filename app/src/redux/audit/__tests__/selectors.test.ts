@@ -4,7 +4,7 @@ import { getAuditLogDirectory } from '../selectors'
 
 import type { State } from '/app/redux/types'
 
-describe('log location selectors', () => {
+describe('audit selectors', () => {
   it('returns the configured audit log directory', () => {
     const state: State = {
       config: { audit: { logDirectory: '/mock/audit-log-path' } },

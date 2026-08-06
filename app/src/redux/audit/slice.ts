@@ -59,7 +59,7 @@ export const auditReducer = auditSlice.reducer
 export const { logPeriodDeletionKeyReceived, logPeriodDeletionKeyConsumed } =
   auditSlice.actions
 
-export type AuditAction = ActionTypesFromSlice<typeof auditSlice.actions>
+export type AuditSliceAction = ActionTypesFromSlice<typeof auditSlice.actions>
 
 export function getLogPeriodDeletionKeysById(
   state: State

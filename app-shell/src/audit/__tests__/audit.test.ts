@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { changeAuditLogDirectory } from '@opentrons/app/src/redux/log-location'
+import { changeAuditLogDirectory } from '@opentrons/app/src/redux/audit'
 
-import { AUDIT_LOG_DIRECTORY_CONFIG_PATH, registerLogLocation } from '..'
+import { AUDIT_LOG_DIRECTORY_CONFIG_PATH, registerAudit } from '..'
 import * as Cfg from '../../config'
 import * as Dialogs from '../../dialogs'
 
@@ -21,7 +21,7 @@ vi.mock('../../dialogs', () => ({
 const flush = (): Promise<void> =>
   new Promise(resolve => setTimeout(resolve, 0))
 
-describe('log location module dispatches', () => {
+describe('audit module dispatches', () => {
   const mockMainWindow = {
     browserWindow: true,
   } as unknown as BrowserWindow
@@ -34,7 +34,7 @@ describe('log location module dispatches', () => {
     } as Config)
     vi.mocked(Dialogs.showOpenDirectoryDialog).mockResolvedValue([])
     dispatch = vi.fn()
-    handleAction = registerLogLocation(dispatch, mockMainWindow)
+    handleAction = registerAudit(dispatch, mockMainWindow)
   })
 
   afterEach(() => {

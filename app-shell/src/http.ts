@@ -45,9 +45,13 @@ export function fetchText(input: Request): Promise<string> {
 export function fetchToFile(
   input: RequestInput,
   destination: string,
-  options?: Partial<{ onProgress: (progress: DownloadProgress) => unknown }>
+  options?: Partial<{
+    onProgress: (progress: DownloadProgress) => unknown
+    onResponse: (response: Response) => unknown
+  }>
 ): Promise<string> {
   return fetch(input).then(response => {
+    options?.onResponse?.(response)
     let downloaded = 0
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     const size = Number(response.headers.get('Content-Length')) || null
