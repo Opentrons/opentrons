@@ -7,6 +7,7 @@ nav:
       - Product Specifications: specifications/index.md
       - Deck Components: specifications/deck-components.md
       - Carboy: specifications/carboy.md
+      - Chemical Compatibility: specifications/compatibility.md
   - Use Cases and Stack Configurations: use-cases.md
   - Installing the Vacuum Module: installation.md
   - Maintenance and Cleaning: maintenance.md

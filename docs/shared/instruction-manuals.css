@@ -137,3 +137,24 @@ figure.side-by-side img {
   align-items: center;
   gap: 5px;
 }
+
+/* Status colors for chemical compatibility table */
+.md-typeset .dark-green {
+  color: #006400;
+}
+
+.md-typeset .light-green {
+  color: #00a300;
+}
+
+.md-typeset .red {
+  color: red;
+}
+
+.md-typeset .yellow {
+  color: #F09D20;
+}
+
+.md-typeset .gray {
+  color: #818589;
+}
