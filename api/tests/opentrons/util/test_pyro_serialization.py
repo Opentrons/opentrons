@@ -1,6 +1,8 @@
 """Test for the Pyro Serialization."""
 
 import enum
+from dataclasses import is_dataclass
+from typing import Any, Dict
 
 import pytest
 from pydantic import BaseModel
@@ -14,10 +16,17 @@ from opentrons_shared_data.errors.exceptions import (
     VacuumModuleWasteFullError,
 )
 
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.types import (
+    Axis,
+    CriticalPoint,
+    EstopOverallStatus,
+    EstopPhysicalStatus,
+    EstopState,
+)
 from opentrons.protocol_engine.types.module import ModuleModel
 from opentrons.types import DeckSlotName
 from opentrons.util.pyro.pyro_serialization import (
+    NonBuiltinKeyDictWrapper,
     OpentronsPyroSerializer,
     enumerated_error_class_to_dict,
     enumerated_error_dict_to_class,
@@ -130,3 +139,56 @@ def test_enumerated_error_serialization(test_error: EnumeratedError) -> None:
     result = enumerated_error_dict_to_class("", test_dict)
 
     assert result == test_error
+
+
+def test_non_builtin_keys_with_dataclasses() -> None:
+    """It should serialize and deserialize a non-builtin keys dictionary that includes dataclasses."""
+    serializer = OpentronsPyroSerializer()
+    serializer.register_class(EstopOverallStatus)
+    serializer.register_enum(Axis)
+
+    def _fake_func() -> Dict[Axis, EstopOverallStatus]:
+        return {
+            Axis.X: EstopOverallStatus(
+                state=EstopState.PHYSICALLY_ENGAGED,
+                left_physical_state=EstopPhysicalStatus.DISENGAGED,
+                right_physical_state=EstopPhysicalStatus.ENGAGED,
+            ),
+            Axis.Y: EstopOverallStatus(
+                state=EstopState.DISENGAGED,
+                left_physical_state=EstopPhysicalStatus.ENGAGED,
+                right_physical_state=EstopPhysicalStatus.DISENGAGED,
+            ),
+        }
+
+    def _get_non_builtin_key_dict(attr: Any) -> NonBuiltinKeyDictWrapper:
+        # This mirrors the logic used to build NonBuiltinKeyDictWrappers in pyro
+        return_types = attr.__annotations__["return"]
+        key_type, value_type = return_types.__args__
+        result = attr()
+
+        if is_dataclass(value_type):
+            result = {key: value.to_pyro_dict(value) for key, value in result.items()}
+        try:
+            key_type = next(a for a in key_type.__args__ if a is not type(None))
+        except AttributeError:
+            pass
+        try:
+            value_type = next(a for a in value_type.__args__ if a is not type(None))
+        except AttributeError:
+            pass
+        wrapped_dict = NonBuiltinKeyDictWrapper(
+            dictionary=result,
+            key_type=".".join((key_type.__module__, key_type.__qualname__)),
+            value_type=".".join((value_type.__module__, value_type.__qualname__)),
+        )
+        return wrapped_dict
+
+    # Test serialization
+    result = _fake_func()
+    wrapped_result = _get_non_builtin_key_dict(_fake_func)
+    serialized_result = serializer._pydantic_class_to_dict(wrapped_result)
+    deserialized_result = serializer._non_builtin_key_dict_wrapper_dict_to_class(
+        classname="cookie", d=serialized_result
+    )
+    assert result == deserialized_result
