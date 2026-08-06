@@ -118,11 +118,13 @@ templates_dir := $(CURDIR)/templates
 # Seed Errors/ with templates without clobbering existing user files.
 define seed-errors-templates
 	@mkdir -p "$(errors_dir)"
-	@if [ ! -f "$(errors_dir)/jiraCredentials.json" ]; then \
-		cp "$(templates_dir)/jiraCredentials.example.json" "$(errors_dir)/jiraCredentials.json"; \
-		echo "Seeded: $(errors_dir)/jiraCredentials.json (fill in email + API token)"; \
-	else \
+	@if [ ! -f "$(errors_dir)/jiraCredentials.json" ] && [ ! -f "$(errors_dir)/jiraCredentials.example.json" ]; then \
+		cp "$(templates_dir)/jiraCredentials.example.json" "$(errors_dir)/jiraCredentials.example.json"; \
+		echo "Seeded: $(errors_dir)/jiraCredentials.example.json (fill in, then rename to jiraCredentials.json)"; \
+	elif [ -f "$(errors_dir)/jiraCredentials.json" ]; then \
 		echo "Keeping existing: $(errors_dir)/jiraCredentials.json"; \
+	else \
+		echo "Keeping existing: $(errors_dir)/jiraCredentials.example.json"; \
 	fi
 	@if [ ! -f "$(errors_dir)/robot_key" ]; then \
 		echo "Missing: $(errors_dir)/robot_key — add your robot SSH private key here"; \

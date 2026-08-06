@@ -6,6 +6,8 @@ Most of the code here is intended to run on a computer that is running the testi
 
 ## Robot fleet error setup
 
+This is currently only functional on macOS.
+
 1. Open a new terminal.
 
 2. Pull the latest version of the opentrons repo.
@@ -18,20 +20,19 @@ cd ~/Desktop/opentrons/abr-testing && make setup-robot-fleet-error
 
 (Adjust the path if your clone is not on the Desktop.)
 
-4. There will be a newly created folder on the same directory level as your opentrons repo called `Errors`. Open that folder. You will find a file called `jiraCredentials.json`.
+4. There will be a newly created folder on the same directory level as your opentrons repo called `Errors`. Open that folder. You will find a file called `jiraCredentials.example.json`.
 
-5. Add your Jira account email and associated Jira API key to `jiraCredentials.json` in `Errors`.
+5. Add your Jira account email and associated Jira API key to `jiraCredentials.example.json` in `Errors`, then rename the file to `jiraCredentials.json`.
 
    - Create a new Jira API token here: [https://id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens)
    - **Do not share this key publicly.**
-   - Open the `.json` file and add your email and token.
+   - Open `jiraCredentials.example.json`, add your information, then rename it to `jiraCredentials.json`.
 
-6. Add your SSH keys to the `Errors` folder (`robot_key` and `robot_key.pub`). **Do not share these.**
+6. Add your SSH private key to the `Errors` folder as `robot_key`. **Do not share this.**
 
-7. Once you confirm you have these three files in the `Errors` folder, you have completed file organization:
+7. Once you confirm you have these two files in the `Errors` folder, you have completed file organization:
 
    - `robot_key`
-   - `robot_key.pub`
    - `jiraCredentials.json`
 
 Day to day, double-click the `robotFleet_error` shortcut created next to the repo. Ticket artifacts (logs, images, protocols) are written into subfolders named after the Jira issue key (for example `RABR-123`).
