@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   Box,
   Btn,
@@ -15,6 +14,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   Modal,
+  PrimaryButton,
   SPACING,
   SPACING_AUTO,
   SUCCESS_TOAST,
@@ -96,9 +96,12 @@ export function ClearUnavailableRobots(): JSX.Element {
                   </Btn>
                 </Flex>
                 <Flex data-testid="AdvancedSettings_ConfirmClear_Proceed">
-                  <AlertPrimaryButton onClick={confirmDeleteUnavailRobots}>
+                  <PrimaryButton
+                    variant="warning"
+                    onClick={confirmDeleteUnavailRobots}
+                  >
                     {t('clear_confirm')}
-                  </AlertPrimaryButton>
+                  </PrimaryButton>
                 </Flex>
               </Flex>
             </Modal>,

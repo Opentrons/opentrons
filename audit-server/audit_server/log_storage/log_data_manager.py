@@ -4,8 +4,10 @@ import secrets
 from asyncio import Lock
 from datetime import datetime, timezone
 from logging import getLogger
+from pathlib import Path
 from typing import Final
 
+from fastapi import UploadFile
 from opentrons_shared_data.errors.exceptions import (
     AuditLoggingError,
     KeyStorageUnavailableError,
@@ -16,7 +18,7 @@ from server_utils.keys.key_server import Client as KeyClient
 from server_utils.keys.key_server import SignMessageData
 
 from . import constants
-from .models import LogPeriodSummary
+from .models import LogPeriodDetails, LogPeriodSummary
 from .store import LogStore, NoActivePeriodError, NoLogInPeriodError
 from .types import LogPeriodEntries, StoredLog
 from audit_server.log_ingest.models import AuditLogMessage
@@ -77,6 +79,15 @@ class LogDataManager:
         async with self._lock:
             return await self._do_store_log(log_message)
 
+    async def store_robot_log(
+        self, robot_log: UploadFile, robot_log_path: Path
+    ) -> str | None:
+        """Store a robot log to the active period."""
+        if not self._settings.get_logging_enabled():
+            return None
+        async with self._lock:
+            return await self._do_store_robot_log(robot_log, robot_log_path)
+
     def get_log_periods(self) -> list[LogPeriodSummary]:
         """Get a list of log periods, active or inactive."""
         return self._store.list_periods()
@@ -84,6 +95,10 @@ class LogDataManager:
     def get_period_entries(self, period_id: str) -> LogPeriodEntries:
         """Get the given log period's user and robot log entries."""
         return self._store.get_period_entries(period_id)
+
+    def get_log_period_details(self, period_id: str) -> LogPeriodDetails:
+        """Get aggregate details for a log period."""
+        return self._store.get_period_details(period_id)
 
     def create_deletion_key(self, period_id: str) -> str:
         """Mint a new one-time deletion key linked to a log period.
@@ -123,6 +138,27 @@ class LogDataManager:
             raise AuditLoggingError(
                 message="Unable to store log", wrapping=[PythonException(stored)]
             )
+
+    async def _do_store_robot_log(
+        self, robot_log: UploadFile, robot_log_dir_path: Path
+    ) -> str:
+        contents_bytes = await robot_log.read()
+        contents = contents_bytes.decode("utf-8")
+        signed_contents, signing_exec = await self._sign_log(contents, None)
+        if signing_exec:
+            raise KeyStorageUnavailableError(
+                message="Unable to communicate with key server",
+                wrapping=[PythonException(signing_exec)],
+            )
+
+        assert robot_log.filename is not None
+        robot_log_path = robot_log_dir_path / Path(robot_log.filename).name
+        with open(robot_log_path, "w") as fh:
+            fh.write(contents)
+
+        robot_log_hash = self._store.store_robot_log(signed_contents, robot_log_path)
+
+        return robot_log_hash
 
     def _build_system_message(self, action: str, message: str) -> str:
         """Build an audit log message originated by the system.

@@ -155,6 +155,8 @@ interface PrepareToRunProps {
   isCameraRequired: boolean
   appCameraSettings: CameraState
   storageInfo: RobotStorageInfo
+  showConfirmCancelModal: boolean
+  setShowConfirmCancelModal: Dispatch<SetStateAction<boolean>>
 }
 
 function PrepareToRun({
@@ -173,6 +175,8 @@ function PrepareToRun({
   isCameraRequired,
   appCameraSettings,
   storageInfo,
+  showConfirmCancelModal,
+  setShowConfirmCancelModal,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation([
     'protocol_setup',
@@ -289,9 +293,6 @@ function PrepareToRun({
     parameter =>
       parameter.type === 'csv_file' || parameter.value !== parameter.default
   )
-
-  const [showConfirmCancelModal, setShowConfirmCancelModal] =
-    useState<boolean>(false)
 
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
@@ -804,8 +805,10 @@ export function ProtocolSetup(): JSX.Element {
       .data?.data.id != null
 
   const navigate = useNavigate()
+  const [showConfirmCancelModal, setShowConfirmCancelModal] =
+    useState<boolean>(false)
 
-  if (runStatus === RUN_STATUS_STOPPED) {
+  if (runStatus === RUN_STATUS_STOPPED && !showConfirmCancelModal) {
     navigate('/protocols')
   }
 
@@ -1000,6 +1003,8 @@ export function ProtocolSetup(): JSX.Element {
         isCameraRequired={isCameraRequired}
         appCameraSettings={appCameraSettings}
         storageInfo={storageInfo}
+        showConfirmCancelModal={showConfirmCancelModal}
+        setShowConfirmCancelModal={setShowConfirmCancelModal}
       />
     ),
     instruments: (

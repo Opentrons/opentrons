@@ -12,6 +12,8 @@
     "addCameraSettingsToRun",
     "addCapturePreviewImageToRun",
     "addLabwareOffsetToRun",
+    "cancelRobotUpdateSession",
+    "commitRobotUpdateSession",
     "createAuthorization",
     "createCamera",
     "createCameraImageSettings",
@@ -26,6 +28,7 @@
     "createProtocol",
     "createProtocolAnalysis",
     "createRegistration",
+    "createRobotUpdateSession",
     "createRun",
     "createRunAction",
     "createSession",
@@ -40,6 +43,7 @@
     "deleteRun",
     "deleteRunImages",
     "deleteSession",
+    "deleteUser",
     "dismissCurrentRun",
     "getOAuth2Token",
     "home",
@@ -47,6 +51,7 @@
     "patchAuditSettings",
     "patchAuthSettings",
     "patchRobotServerAccessControlSettings",
+    "postLogMessage",
     "postResetConfig",
     "postWifiConfigure",
     "postWifiDisconnect",
@@ -56,6 +61,7 @@
     "searchLabwareOffsets",
     "setLights",
     "shutdown",
+    "signRun",
     "updateClientData",
     "updateDeckConfiguration",
     "updateErrorRecoveryPolicy",
@@ -66,6 +72,7 @@
     "updateRobotSetting",
     "updateSelf",
     "updateSubsystem",
+    "updateUser",
     "uploadCsvFile"
   ]
 }

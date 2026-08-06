@@ -1,4 +1,3 @@
-import asyncio
 from typing import Any, AsyncGenerator, Awaitable, Callable
 
 import pytest
@@ -88,7 +87,6 @@ async def started_up_subject(
     monkeypatch_persist_pretty_hostname: None,
     mock_avahi_client: AvahiClient,
     decoy: Decoy,
-    loop: asyncio.AbstractEventLoop,  # Required by aiohttp for async fixtures.
 ) -> AsyncGenerator[NameSynchronizer, None]:
     """Return a subject NameSynchronizer that's set up with mock dependencies,
     and that's already started up and running.

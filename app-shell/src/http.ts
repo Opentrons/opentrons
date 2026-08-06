@@ -93,13 +93,32 @@ export function postFile(
   progress?: (progress: number) => void
 ): Promise<Response> {
   return new Promise<Response>((resolve, reject) => {
-    createReadStream(source, progress ?? null, reject).then(readStream => {
-      return new Promise<Response>(resolve => {
+    // Pass reject as the stream onError so mid-upload read failures settle this
+    // promise (node-fetch cannot always surface those). Also .catch(reject) so
+    // fetch/TLS failures reject instead of leaving ipcMain.handle hanging.
+    createReadStream(source, progress ?? null, reject)
+      .then(readStream => {
         const body = new FormData()
         body.append(name, readStream)
-        resolve(fetch(input, { ...init, body, method: 'POST' }))
-      }).then(resolve)
-    })
+        const formHeaders =
+          typeof body.getHeaders === 'function' ? body.getHeaders() : {}
+        const initHeaders =
+          init?.headers != null && !Array.isArray(init.headers)
+            ? (init.headers as Record<string, string>)
+            : {}
+
+        return fetch(input, {
+          ...init,
+          body,
+          method: 'POST',
+          headers: {
+            ...formHeaders,
+            ...initHeaders,
+          },
+        })
+      })
+      .then(resolve)
+      .catch(reject)
   })
 }
 

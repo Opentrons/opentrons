@@ -72,11 +72,6 @@
   border: 1px solid var(--red-50);
 }
 
-.textarea_background_error {
-  border: none;
-  background-color: var(--red-30);
-}
-
 .label_text {
   padding-bottom: var(--spacing-4);
   color: var(--grey-60);

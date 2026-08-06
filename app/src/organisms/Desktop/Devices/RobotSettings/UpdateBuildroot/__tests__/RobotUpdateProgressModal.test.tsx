@@ -9,11 +9,7 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
-import {
-  getRobotSessionIsManualFile,
-  getRobotUpdateDownloadError,
-} from '/app/redux/robot-update'
-import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
+import { getRobotUpdateDownloadError } from '/app/redux/robot-update'
 import {
   INIT_STATUS,
   useRobotInitializationStatus,
@@ -33,7 +29,6 @@ import type { RobotUpdateSession } from '/app/redux/robot-update/types'
 vi.mock('@opentrons/react-api-client')
 vi.mock('../useRobotUpdateInfo')
 vi.mock('/app/redux/robot-update')
-vi.mock('/app/redux/robot-update/hooks')
 vi.mock('/app/resources/health/useRobotInitializationStatus')
 
 const render = (props: ComponentProps<typeof RobotUpdateProgressModal>) => {
@@ -56,7 +51,6 @@ describe('DownloadUpdateModal', () => {
 
   let props: ComponentProps<typeof RobotUpdateProgressModal>
   const mockCreateLiveCommand = vi.fn()
-  const mockDispatchStartRobotUpdate = vi.fn()
 
   beforeEach(() => {
     mockCreateLiveCommand.mockResolvedValue(null)
@@ -72,10 +66,6 @@ describe('DownloadUpdateModal', () => {
       updateStep: 'install',
       progressPercent: 50,
     })
-    vi.mocked(getRobotSessionIsManualFile).mockReturnValue(false)
-    vi.mocked(useDispatchStartRobotUpdate).mockReturnValue(
-      mockDispatchStartRobotUpdate
-    )
     vi.mocked(getRobotUpdateDownloadError).mockReturnValue(null)
   })
 

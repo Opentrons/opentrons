@@ -122,6 +122,8 @@ export function ProtocolRunHeader(
           runHeaderModalContainerUtils={runHeaderModalContainerUtils}
           hasImages={outputFileIds.jpeg.length > 0}
           hasCsvFiles={outputFileIds.csv.length > 0}
+          closeCurrentRun={closeCurrentRun}
+          isClosingCurrentRun={isClosingCurrentRun}
           {...props}
         />
         <RunHeaderContent

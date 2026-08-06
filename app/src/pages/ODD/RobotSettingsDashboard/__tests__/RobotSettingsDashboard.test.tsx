@@ -4,6 +4,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  usePostLogMessageMutation,
   usePostWifiConfigureMutation,
   useRobotSettingsQuery,
   useUpdateRobotSettingMutation,
@@ -30,7 +31,6 @@ import { FileManager } from '/app/organisms/ODD/RobotSettingsDashboard/FileManag
 import {
   getAppLanguage,
   getConfig,
-  getFeatureFlags,
   toggleConfigValue,
   toggleDevtools,
 } from '/app/redux/config'
@@ -96,6 +96,7 @@ const mockToggleStackerSensors = vi.fn()
 const mockUpdateRobotSetting = vi.fn()
 const mockPostWifiConfigure = vi.fn()
 const mockResetWifiConfigure = vi.fn()
+const mockPostLogMessage = vi.fn()
 
 const render = () => {
   return renderWithProviders(
@@ -119,6 +120,9 @@ describe('RobotSettingsDashboard', () => {
     vi.mocked(useUpdateRobotSettingMutation).mockReturnValue({
       updateRobotSetting: mockUpdateRobotSetting,
     } as unknown as ReturnType<typeof useUpdateRobotSettingMutation>)
+    vi.mocked(usePostLogMessageMutation).mockReturnValue({
+      postLogMessage: mockPostLogMessage,
+    } as any)
     vi.mocked(useRobotSettingsQuery).mockReturnValue({
       data: {
         settings: [
@@ -157,7 +161,6 @@ describe('RobotSettingsDashboard', () => {
       toggleERSettings: mockToggleER,
     })
     vi.mocked(getAppLanguage).mockReturnValue(MOCK_DEFAULT_LANGUAGE)
-    vi.mocked(getFeatureFlags).mockReturnValue({ accessControlMode: false })
     vi.mocked(getConfig).mockReturnValue({
       update: { automaticallyDownloadUpdates: false },
     } as Config)
@@ -413,7 +416,6 @@ describe('RobotSettingsDashboard', () => {
   })
 
   it('should render the component when tapping show encryption key', () => {
-    vi.mocked(getFeatureFlags).mockReturnValue({ accessControlMode: true })
     render()
     const button = screen.getByText('Robot encryption key')
     fireEvent.click(button)

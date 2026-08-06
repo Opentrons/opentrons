@@ -154,7 +154,7 @@ export function FullKeyboard({
       }
       display={display}
       mergeDisplay={true}
-      useButtonTag={false}
+      useButtonTag={false} // Exclude from the tab order.
       buttonAttributes={softwareKeyboardButtonAttributes}
       debug={debug} // If true, <ENTER> will input a \n
       baseClass="fullKeyboard"
@@ -176,6 +176,7 @@ export function FullKeyboard({
           buttons: '{shift}',
         },
       ]}
+      preventMouseDownDefault // Don't steal focus from inputs.
     />
   )
 }

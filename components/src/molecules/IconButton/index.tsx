@@ -80,6 +80,8 @@ interface IconButtonProps extends ComponentPropsWithoutRef<'button'> {
    * in the future, we will need to add a style for this
    */
   focusableDisabled?: boolean
+  /** improve extensibility of styling */
+  className?: string
 }
 
 /**
@@ -98,6 +100,7 @@ export function NewIconButton({
   'aria-label': ariaLabel,
   focusableDisabled = false,
   onClick,
+  className,
   ...restProps
 }: IconButtonProps): JSX.Element {
   const colors = COLOR_VARIANTS[variant]
@@ -106,7 +109,8 @@ export function NewIconButton({
   const buttonClassName = clsx(
     styles.icon_button,
     styles[`variant_${variant}`],
-    styles[`size_${size}`]
+    styles[`size_${size}`],
+    className
   )
 
   const buttonStyle: CSSProperties = {

@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
@@ -82,9 +81,13 @@ export function DeviceResetModal({
               >
                 {t('shared:cancel')}
               </Link>
-              <AlertPrimaryButton onClick={triggerReset} disabled={isLoading}>
+              <PrimaryButton
+                variant="warning"
+                onClick={triggerReset}
+                disabled={isLoading}
+              >
                 {t('shared:confirm')}
-              </AlertPrimaryButton>
+              </PrimaryButton>
             </Flex>
           </Flex>
         </Modal>

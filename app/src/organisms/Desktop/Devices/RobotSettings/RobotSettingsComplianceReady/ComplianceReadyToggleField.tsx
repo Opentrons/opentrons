@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { StyledText } from '@opentrons/components'
+import { COLORS, StyledText } from '@opentrons/components'
 
 import { ToggleButton } from '/app/atoms/buttons'
 
@@ -17,6 +17,7 @@ import type {
 export interface ComplianceReadyToggleFieldProps {
   id: SettingFieldId
   labelKey: string
+  detailKey?: string
   values: FieldValues
   onToggleChange: (toggledOn: boolean) => void
   children?: ReactNode
@@ -25,11 +26,12 @@ export interface ComplianceReadyToggleFieldProps {
 export function ComplianceReadyToggleField({
   id,
   labelKey,
+  detailKey,
   values,
   onToggleChange,
   children,
 }: ComplianceReadyToggleFieldProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'branded'])
   const serverToggledOn = Boolean(values[id])
   const [expanded, setExpanded] = useState(false)
   const toggledOn =
@@ -63,13 +65,25 @@ export function ComplianceReadyToggleField({
     </div>
   )
 
+  const toggleContent =
+    detailKey != null ? (
+      <div className={styles.toggle_with_detail}>
+        {toggleRow}
+        <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
+          {t(detailKey)}
+        </StyledText>
+      </div>
+    ) : (
+      toggleRow
+    )
+
   if (children == null) {
-    return toggleRow
+    return toggleContent
   }
 
   return (
     <div className={styles.toggle_setting}>
-      {toggleRow}
+      {toggleContent}
       {toggledOn ? <div className={styles.sub_fields}>{children}</div> : null}
     </div>
   )

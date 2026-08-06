@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { AlertPrimaryButton, SPACING } from '@opentrons/components'
+import { PrimaryButton, SPACING } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
@@ -118,9 +118,9 @@ export function useDropTipErrorComponents({
           marginRight={SPACING.spacing4}
         />
       ) : (
-        <AlertPrimaryButton onClick={handleOnClick}>
+        <PrimaryButton variant="warning" onClick={handleOnClick}>
           {t('confirm_removal_and_home')}
-        </AlertPrimaryButton>
+        </PrimaryButton>
       ),
       subHeader: <>{errorDetails?.message}</>,
     }
@@ -135,9 +135,9 @@ export function useDropTipErrorComponents({
           marginRight={SPACING.spacing4}
         />
       ) : (
-        <AlertPrimaryButton onClick={handleClearError}>
+        <PrimaryButton variant="warning" onClick={handleClearError}>
           {t('try_again')}
-        </AlertPrimaryButton>
+        </PrimaryButton>
       ),
       subHeader: <>{errorDetails?.message}</>,
     }

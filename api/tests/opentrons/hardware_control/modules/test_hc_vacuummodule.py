@@ -964,6 +964,25 @@ async def test_configure_device_applies_waste_and_pressure_defaults(
     )
 
 
+async def test_stop_vacuum_stops_pressure_and_pump_and_clears_targets(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """stop_vacuum should disable pressure control, stop the pump, and clear targets."""
+    subject._reader.set_target_pressure(-100.0)
+    subject._reader.set_target_power(50.0)
+    assert subject._profile_stop_requested is False
+
+    await subject.stop_vacuum()
+
+    decoy.verify(await mock_driver.set_vacuum_state(enable_vacuum=False))
+    decoy.verify(await mock_driver.set_pump_state(start_pump=False))
+    assert subject._reader.target_pressure is None
+    assert subject._reader.get_target_power() is None
+    assert subject._profile_stop_requested is True
+
+
 async def test_deactivate_stops_vacuum_and_opens_vent(
     subject: modules.VacuumModule,
     mock_driver: SimulatingDriver,
@@ -975,7 +994,8 @@ async def test_deactivate_stops_vacuum_and_opens_vent(
 
     await subject.deactivate(must_be_running=False)
 
-    decoy.verify(await mock_driver.set_vacuum_state(False))
+    decoy.verify(await mock_driver.set_vacuum_state(enable_vacuum=False))
+    decoy.verify(await mock_driver.set_pump_state(start_pump=False))
     decoy.verify(await mock_driver.set_vent_state(VentState.OPENED))
     assert subject._reader.target_pressure is None
     assert subject._reader.get_target_power() is None
@@ -1165,17 +1185,8 @@ async def test_execute_profile_aborts_when_stopped(
         await original_execute_cycle_step(step)
 
     async def stop_on_first_wait() -> None:
-        await subject.set_vacuum_state(enable_vacuum=False)
-        subject._reader.vacuum_state = VacuumState(
-            target_gauge_pressure=0,
-            current_gauge_pressure=0,
-            pressure_abs_a=0,
-            pressure_abs_b=0,
-            pressure_atm=0,
-            vacuum_enabled=False,
-            vacuum_duration=0,
-            vent_state=VentState.CLOSED,
-        )
+        # Host-requested stop (not firmware natural duration end).
+        await subject.stop_vacuum()
 
     subject._execute_cycle_step = counting_execute_cycle_step  # type: ignore[method-assign]
     subject.wait_for_command_duration = stop_on_first_wait  # type: ignore[method-assign]
@@ -1183,6 +1194,7 @@ async def test_execute_profile_aborts_when_stopped(
     await subject.execute_profile(profile, vent_after=True)
 
     assert execute_step_count == 1
+    assert subject._profile_stop_requested is True
     decoy.verify(
         await mock_driver.set_vacuum_state(
             enable_vacuum=True,
@@ -1194,6 +1206,196 @@ async def test_execute_profile_aborts_when_stopped(
         ),
     )
     decoy.verify(await mock_driver.set_vent_state(state=VentState.OPENED), times=0)
+
+
+async def test_execute_profile_aborts_on_stop_during_pump_disabled_step(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """stop_vacuum during enable_pump=False must still abort remaining steps.
+
+    Abort is driven only by _profile_stop_requested, not the current step's
+    enable_pump value.
+    """
+    profile: List[
+        Union[VacuumModuleCycle, VacuumModulePowerStep, VacuumModulePressureStep]
+    ] = [
+        {
+            "enable_pump": False,
+            "hold_time_seconds": 10,
+            "hold_time_minutes": None,
+            "ramp_rate": None,
+            "timeout_seconds": None,
+            "vent_after": None,
+            "gauge_pressure_mbar": None,
+        },
+        {
+            "enable_pump": True,
+            "hold_time_seconds": 10,
+            "hold_time_minutes": None,
+            "ramp_rate": None,
+            "timeout_seconds": None,
+            "vent_after": None,
+            "gauge_pressure_mbar": -200,
+        },
+    ]
+
+    execute_step_count = 0
+    original_execute_cycle_step = subject._execute_cycle_step
+
+    async def counting_execute_cycle_step(step: VacuumModuleStep) -> None:
+        nonlocal execute_step_count
+        execute_step_count += 1
+        await original_execute_cycle_step(step)
+
+    async def stop_on_first_wait() -> None:
+        await subject.stop_vacuum()
+
+    subject._execute_cycle_step = counting_execute_cycle_step  # type: ignore[method-assign]
+    subject.wait_for_command_duration = stop_on_first_wait  # type: ignore[method-assign]
+
+    await subject.execute_profile(profile, vent_after=True)
+
+    assert execute_step_count == 1
+    assert subject._profile_stop_requested is True
+    decoy.verify(await mock_driver.set_vent_state(state=VentState.OPENED), times=0)
+
+
+async def test_execute_profile_continues_after_natural_duration_end(
+    subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """Firmware clears running flags when duration ends; profile must continue.
+
+    Mirrors vacuum firmware vacuum_timer_end_callback, which sets
+    enable_vacuum=false and then stop_vacuum() (pump stopped). Without an
+    explicit host stop_vacuum, remaining pressure/power steps must still run.
+    """
+    profile: List[
+        Union[VacuumModuleCycle, VacuumModulePowerStep, VacuumModulePressureStep]
+    ] = [
+        {
+            "enable_pump": True,
+            "hold_time_seconds": 5,
+            "hold_time_minutes": None,
+            "ramp_rate": None,
+            "timeout_seconds": None,
+            "vent_after": False,
+            "gauge_pressure_mbar": -200,
+        },
+        {
+            "enable_pump": True,
+            "hold_time_seconds": 5,
+            "hold_time_minutes": None,
+            "ramp_rate": None,
+            "timeout_seconds": None,
+            "vent_after": False,
+            "gauge_pressure_mbar": -400,
+        },
+        {
+            "enable_pump": True,
+            "hold_time_seconds": 5,
+            "hold_time_minutes": None,
+            "ramp_rate": None,
+            "timeout_seconds": None,
+            "vent_after": False,
+            "percent_power": 30,
+        },
+    ]
+
+    # After each timed step, firmware reports duration complete and idle.
+    decoy.when(await mock_driver.get_vacuum_state()).then_return(
+        VacuumState(
+            target_gauge_pressure=0,
+            current_gauge_pressure=-200,
+            pressure_abs_a=0,
+            pressure_abs_b=0,
+            pressure_atm=0,
+            vacuum_enabled=False,
+            vacuum_duration=0,
+            vent_state=VentState.CLOSED,
+        )
+    )
+    decoy.when(await mock_driver.get_pump_state()).then_return(
+        PumpState(
+            target_rpm=0,
+            current_rpm=0,
+            target_pwm=0,
+            current_pwm=0,
+            pump_running=False,
+            manual_control=False,
+        )
+    )
+
+    execute_step_count = 0
+    original_execute_cycle_step = subject._execute_cycle_step
+
+    async def counting_execute_cycle_step(step: VacuumModuleStep) -> None:
+        nonlocal execute_step_count
+        execute_step_count += 1
+        await original_execute_cycle_step(step)
+
+    async def _fake_wait_for_command_duration() -> None:
+        # Simulate natural duration end without host stop_vacuum.
+        subject._reader.vacuum_state = VacuumState(
+            target_gauge_pressure=0,
+            current_gauge_pressure=-200,
+            pressure_abs_a=0,
+            pressure_abs_b=0,
+            pressure_atm=0,
+            vacuum_enabled=False,
+            vacuum_duration=0,
+            vent_state=VentState.CLOSED,
+        )
+        subject._reader.pump_state = PumpState(
+            target_rpm=0,
+            current_rpm=0,
+            target_pwm=0,
+            current_pwm=0,
+            pump_running=False,
+            manual_control=False,
+        )
+
+    subject._execute_cycle_step = counting_execute_cycle_step  # type: ignore[method-assign]
+    subject.wait_for_command_duration = (  # type: ignore[method-assign]
+        _fake_wait_for_command_duration
+    )
+
+    await subject.execute_profile(profile, vent_after=False)
+
+    assert execute_step_count == 3
+    # Natural duration end leaves hardware idle, but does not set the host flag.
+    assert subject._profile_stop_requested is False
+    decoy.verify(
+        await mock_driver.set_vacuum_state(
+            enable_vacuum=True,
+            gauge_pressure_mbar=-200,
+            duration_s=5,
+            timeout_s=None,
+            rate=None,
+            vent_after=False,
+        ),
+        await mock_driver.set_vacuum_state(
+            enable_vacuum=True,
+            gauge_pressure_mbar=-400,
+            duration_s=5,
+            timeout_s=None,
+            rate=None,
+            vent_after=False,
+        ),
+        await mock_driver.set_vacuum_state(False),
+        await mock_driver.set_pump_state(
+            start_pump=True,
+            target_rpm=None,
+            duty_cycle=30,
+            duration_s=5,
+            timeout_s=None,
+            rate=None,
+            vent_after=False,
+        ),
+    )
 
 
 @pytest.mark.parametrize(

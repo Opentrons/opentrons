@@ -45,3 +45,21 @@ class AuthServerSettings(BaseSettings):
         description="Path to Alembic config file.",
         validation_alias="ALEMBIC_CONFIG",  # read ALEMBIC_CONFIG from env (no OT_ prefix)
     )
+
+    audit_server_uds: str | None = Field(
+        default=None,
+        description=(
+            "The path to the Unix domain socket where audit-server is listening."
+            " This is mutually exclusive with audit_server_url."
+            " If both are unset, audit logging cannot happen."
+        ),
+    )
+
+    audit_server_url: str | None = Field(
+        default=None,
+        description=(
+            "The base URL (e.g. `http://localhost:1234`) where audit-server is listening."
+            " This is mutually exclusive with audit_server_uds."
+            " If both are unset, audit logging cannot happen."
+        ),
+    )

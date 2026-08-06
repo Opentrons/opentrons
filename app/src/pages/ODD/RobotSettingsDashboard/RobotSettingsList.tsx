@@ -32,6 +32,7 @@ import {
 import { getLocalRobot, getRobotApiVersion } from '/app/redux/discovery'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
 import { getRobotUpdateAvailable } from '/app/redux/robot-update'
+import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 import { useNetworkConnection } from '/app/resources/networking'
 import {
@@ -89,7 +90,16 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const appLanguage = useSelector(getAppLanguage)
   const currentLanguageOption = LANGUAGES.find(lng => lng.value === appLanguage)
 
-  const devInternalFlags = useSelector(getFeatureFlags)
+  const handleToggleDevtools = useHandleAndLog<boolean>(
+    () => {
+      dispatch(toggleDevtools())
+    },
+    'toggle_devtools',
+    (newDevToolsOn: boolean) => ({
+      action: 'toggle devtools',
+      message: `User toggled devtools to ${newDevToolsOn ? 'on' : 'off'}`,
+    })
+  )
 
   return (
     <div className={styles.main_content}>
@@ -226,16 +236,14 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           }}
           iconName="privacy"
         />
-        {devInternalFlags?.accessControlMode ? (
-          <RobotSettingButton
-            settingName={t('robot_encryption_key')}
-            dataTestId="RobotSettingButton_encryption"
-            onClick={() => {
-              setCurrentOption('RobotEncryptionKey')
-            }}
-            iconName="verified"
-          />
-        ) : null}
+        <RobotSettingButton
+          settingName={t('robot_encryption_key')}
+          dataTestId="RobotSettingButton_encryption"
+          onClick={() => {
+            setCurrentOption('RobotEncryptionKey')
+          }}
+          iconName="verified"
+        />
         <RobotSettingButton
           settingName={i18n.format(
             t('app_settings:error_recovery_mode'),
@@ -290,7 +298,9 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           settingInfo={t('dev_tools_description')}
           iconName="build"
           rightElement={<OnOffToggle isOn={devToolsOn} />}
-          onClick={() => dispatch(toggleDevtools())}
+          onClick={() => {
+            handleToggleDevtools(!devToolsOn)
+          }}
         />
         {devToolsOn ? <FeatureFlags /> : null}
       </div>

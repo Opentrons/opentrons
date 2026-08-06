@@ -12,8 +12,12 @@ import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import { getMaxDisposalVolumeForMultiDispense } from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
 import { selectors as uiLabwareSelectors } from '/protocol-designer/ui/labware'
 
-import { getBlowoutLocationOptionsForForm } from '../utils'
+import {
+  getBlowoutLabwareDetails,
+  getBlowoutLocationOptionsForForm,
+} from '../utils'
 import { FlowRateField } from './FlowRateField'
+import { PositionField } from './PositionField'
 
 import type {
   FormData,
@@ -77,6 +81,9 @@ export function DisposalField(props: DisposalFieldProps): JSX.Element {
         })
       : ''
 
+  const { isBlowoutLocationLabware, blowOutLabwareId } =
+    getBlowoutLabwareDetails(propsForFields)
+
   const { value } = propsForFields.disposalVolume_checkbox
   return (
     <CheckboxExpandStepFormField
@@ -109,6 +116,20 @@ export function DisposalField(props: DisposalFieldProps): JSX.Element {
             tiprack={propsForFields.tipRack.value}
             formData={formData}
           />
+          {isBlowoutLocationLabware && blowOutLabwareId ? (
+            <PositionField
+              formData={formData}
+              padding="0"
+              prefix="blowout"
+              propsForFields={propsForFields}
+              zField="blowout_mmFromBottom"
+              xField="blowout_x_position"
+              yField="blowout_y_position"
+              labwareId={blowOutLabwareId}
+              referenceField="blowout_position_reference"
+              isNested={true}
+            />
+          ) : null}
         </Flex>
       ) : null}
     </CheckboxExpandStepFormField>

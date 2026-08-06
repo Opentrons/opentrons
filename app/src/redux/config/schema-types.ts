@@ -17,7 +17,6 @@ export type DevInternalFlag =
   | 'reactQueryDevtools'
   | 'reactScan'
   | 'quickTransferProtocolContentsLog'
-  | 'accessControlMode'
   | 'robotSearchBar'
   | 'showGitDetails'
 
@@ -307,4 +306,11 @@ export type ConfigV29 = Omit<ConfigV28, 'version' | 'update'> & {
   }
 }
 
-export type Config = ConfigV29
+export type ConfigV30 = Omit<ConfigV29, 'version'> & {
+  version: 30
+  audit: {
+    logDirectory: string | null
+  }
+}
+
+export type Config = ConfigV30

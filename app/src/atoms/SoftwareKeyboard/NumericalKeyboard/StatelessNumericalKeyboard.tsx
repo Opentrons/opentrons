@@ -57,11 +57,12 @@ export function StatelessNumericalKeyboard({
         )
       }}
       display={numericalCustom}
-      useButtonTag={false}
+      useButtonTag={false} // Exclude from the tab order.
       buttonAttributes={softwareKeyboardButtonAttributes}
       layoutName={layoutName}
       layout={numericalKeyboardLayout}
       debug={debug}
+      preventMouseDownDefault // Don't steal focus from inputs.
     />
   )
 }

@@ -92,7 +92,10 @@ def _build_classdict(
     async_method_names = [method["__name__"] for method in async_methods.values()]
     # Attach PSO exposed methods to the AsyncClientPyroObject
     for method in pso._pyroMethods:
-        if method in async_method_names and not force_synchronous:
+        if "__fset" in method or "__fdel" in method:
+            # Ignore exposed property attributes
+            pass
+        elif method in async_method_names and not force_synchronous:
             # For methods that are awaitable wrap them as an async reference that forwards the call to the PSO Proxy.
             method_metadata: dict[str, Any] = async_methods[method]
             async_method = wrap_as_async(method_metadata)
@@ -103,10 +106,23 @@ def _build_classdict(
     # Attach PSO exposed attributes to the AsyncClientPyroObject
     for attr in pso._pyroAttrs:
         # For property attributes we use to attach a wrapped `getattr` call for that attribute.
+        # If setter and deleter functions exist on the server-side alias they are reconstructed client-side here.
         # This is set as a new property of the AsyncClientPyroObject that forwards calls to the PSO Proxy.
+
+        fset = None
+        fdel = None
+        if attr + "__fset" in pso._pyroMethods:
+            fset = wrap_parameter_validation(pso, attr + "__fset")
+        if attr + "__fdel" in pso._pyroMethods:
+            fdel = wrap_parameter_validation(pso, attr + "__fdel")
+        prop = property(
+            fget=wrap_property(pso, attr),
+            fset=fset,
+            fdel=fdel,
+        )
         yield (
             attr,
-            property(wrap_property(pso, attr)),
+            prop,
         )
     yield "_proxy", pso
 
@@ -189,6 +205,7 @@ def wrap_parameter_validation(proxy: Pyro5.api.Proxy, func_name: str) -> Any:
             arg = _validate_keys_builtins(arg)
             arg = _validate_outbound_proxy(arg)
             arg = _validate_outbound_nested_proxy(arg)
+            arg = _validate_outbound_iterable(arg)
             return arg
 
         validated_args = tuple()  # type: ignore
@@ -232,6 +249,19 @@ def _validate_keys_builtins(arg: Any) -> Any:
                 key_type=".".join((key_type.__module__, key_type.__qualname__)),
                 value_type=".".join((value_type.__module__, value_type.__qualname__)),
             )
+    return arg
+
+
+def _validate_outbound_iterable(arg: Any) -> Any:
+    """Handle an argument which is an iterable object that may need pyro-safe reformating.
+
+    This function will handle those by creating a pyro-safe dictionary containing `_pyro_safe_translation`
+    and `data` fields, which will be used in a PyroSynchronousObject counterpart to reformat the data.
+    """
+    if isinstance(arg, set):
+        arg = {"_pyro_safe_translation": "set", "data": list(arg)}
+    # NOTE: Expand iterable type coverage as needed matching this pattern with it's PyroSynchronousObject counterpart
+
     return arg
 
 
