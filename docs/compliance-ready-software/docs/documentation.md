@@ -7,7 +7,7 @@ Required **documentation** is an important part of the Flex's Compliance Ready S
 
 Their documentation, along with their name and user ID, become a part of the [files](../records.md) your compliance ready Flex generates.
 
-This section covers *how* users will add documentation and includes examples of when it's required. For a full list of user actions that require documentation, see the [Documented Actions](../docs/actions.md) appendix.
+This section covers *how* users will add documentation. For a full list of user actions that require documentation, see the [Documented Actions](../docs/actions.md) appendix.
 
 !!! note
     Opentrons Flex Compliance Ready Software adds required documentation checkpoints when you use and interact with the Flex. It's up to your lab to decide what suffient, audit-ready documentation looks like for you.
@@ -20,7 +20,7 @@ link to glossary
 
 Installing Opentrons Compliance Ready Software on your Flex slows down your lab's workflows on purpose. It adds checkpoints to document nearly every robot and protocol action. 
 
-Your compliance ready Flex prompts users to document nearly every action they complete on the robot. They'll see a "Documentation required" screen, shown below.
+Your compliance ready Flex will prompt all users to document nearly every action they complete on the robot. The "Documentation required" screen, shown below, will appear on both the Flex touchscreen and in the Opentrons App.
 
 <figure class="screenshot" markdown>
   ![Users should add documentation bfeore beginning protocol setup.](../../images/documentation-setup.png)
@@ -35,7 +35,7 @@ Each time, you'll have the option to use an on-screen, collapsible keyboard, or 
 
 When you're finished, click **Confirm** to save your text and move on.
 
-## View actions
+## Viewing actions
 
 While working on the bench, your compliance ready Flex will prompt you many times to add documentation. In case you've stepped away, forgot which action you started, or simply want to view a list of every user action during your session, you can click **View Actions** in the upper right to open a list of actions.
 
@@ -48,7 +48,7 @@ Click each action to view its documentation. When you're finished, click **Confi
 
 ## Documentation Settings
 
-Administrators can customize documentation [settings](../features/settings.md) like minimum character requirements.
+Administrators can customize documentation [settings](../docs/admin.md) like minimum character requirements.
 
 <!---------
 
@@ -58,4 +58,7 @@ TODO and comments:
 - any other documentation-related settings admins can customize, besides character limits (covered in settings) 
 - minimum character requirements might be the only docs setting admins have control over. 
 - view actions list different app vs odd? 
+- make sure documentation required screen pops up for both app and ODD
+- check as far as where you can edit documentation
+- add some language about how users are prompted to enter documentation AFTER each action
 -------------->

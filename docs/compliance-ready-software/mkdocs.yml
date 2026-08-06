@@ -51,8 +51,9 @@ nav:
       - Document actions: documentation.md
       - Running a protocol: running.md 
       - Completing a protocol: complete.md
-      - Accessing records: records.md
+      - Accessing files: files.md
   - Additional Features: 
+      - Additional Features: features.md 
       - Devices: devices.md
       - Administrator settings: admin.md
   - Appendices: 
