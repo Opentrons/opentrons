@@ -273,9 +273,9 @@ class AnthropicPredict:
             model=self.model_helper,
             messages=msg,
             max_tokens=1024,
-            temperature=0.1,
             system="You are a helpful assistant that analyzes documentation structure to find relevant files.",
             metadata={"user_id": user_id},
+            thinking={"type": "disabled"},
         )
 
         files_content = response.content[0].text.strip()
@@ -298,7 +298,7 @@ class AnthropicPredict:
             system=self.system_prompt,
             tools=self.tools,
             metadata={"user_id": user_id},
-            temperature=0.0,
+            thinking={"type": "disabled"},
         ) as stream:
             response: Message = await stream.get_final_message()
 
@@ -634,7 +634,7 @@ class AnthropicPredict:
                 model=self.model_name,
                 system=self.system_prompt_pd,
                 metadata={"user_id": user_id},
-                temperature=0.0,
+                thinking={"type": "disabled"},
             ) as stream:
                 response: Message = await stream.get_final_message()
             if response.content and response.content[0].type == "text":
