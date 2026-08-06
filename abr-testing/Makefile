@@ -119,7 +119,7 @@ templates_dir := $(CURDIR)/templates
 define seed-errors-templates
 	@mkdir -p "$(errors_dir)"
 	@if [ ! -f "$(errors_dir)/jiraCredentials.json" ]; then \
-		cp "$(templates_dir)/jiraCredentials.json" "$(errors_dir)/jiraCredentials.json"; \
+		cp "$(templates_dir)/jiraCredentials.example.json" "$(errors_dir)/jiraCredentials.json"; \
 		echo "Seeded: $(errors_dir)/jiraCredentials.json (fill in email + API token)"; \
 	else \
 		echo "Keeping existing: $(errors_dir)/jiraCredentials.json"; \
