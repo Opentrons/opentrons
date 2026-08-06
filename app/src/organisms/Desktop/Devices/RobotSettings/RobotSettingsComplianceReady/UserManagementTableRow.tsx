@@ -18,6 +18,7 @@ export interface UserManagementTableRowProps {
   onDelete: (user: AuthUser) => void
   onActivate: (user: AuthUser) => void
   onResetPassword: (user: AuthUser) => void
+  onDeactivate: (user: AuthUser) => void
 }
 
 export function UserManagementTableRow({
@@ -26,6 +27,7 @@ export function UserManagementTableRow({
   onDelete,
   onActivate,
   onResetPassword,
+  onDeactivate,
 }: UserManagementTableRowProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const {
@@ -93,12 +95,21 @@ export function UserManagementTableRow({
                 <MenuItem onClick={handleMenuAction(onDelete)}>
                   {t('desktop_delete_user')}
                 </MenuItem>
-                <MenuItem onClick={handleMenuAction(onActivate)}>
-                  {t('desktop_unlock_user')}
-                </MenuItem>
-                <MenuItem onClick={handleMenuAction(onResetPassword)}>
-                  {t('desktop_reset_password')}
-                </MenuItem>
+                {user.locked ? (
+                  <MenuItem onClick={handleMenuAction(onActivate)}>
+                    {t('desktop_unlock_user')}
+                  </MenuItem>
+                ) : null}
+                {!user.locked ? (
+                  <MenuItem onClick={handleMenuAction(onResetPassword)}>
+                    {t('desktop_reset_password')}
+                  </MenuItem>
+                ) : null}
+                {!user.locked ? (
+                  <MenuItem onClick={handleMenuAction(onDeactivate)}>
+                    {t('desktop_lock_user')}
+                  </MenuItem>
+                ) : null}
               </div>
               {menuOverlay}
             </>

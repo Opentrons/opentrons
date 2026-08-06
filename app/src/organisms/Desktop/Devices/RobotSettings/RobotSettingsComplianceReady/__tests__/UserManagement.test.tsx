@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   useDeleteUserMutation,
   useResetUserPasswordMutation,
+  useUpdateUserMutation,
   useUsersQuery,
 } from '@opentrons/react-api-client'
 
@@ -104,6 +105,7 @@ function expandAccordion(): void {
 
 const mockDeleteUser = vi.fn()
 const mockResetUserPassword = vi.fn()
+const mockUpdateUser = vi.fn()
 
 describe('UserManagement', () => {
   beforeEach(() => {
@@ -111,6 +113,8 @@ describe('UserManagement', () => {
     mockDeleteUser.mockResolvedValue(undefined)
     mockResetUserPassword.mockReset()
     mockResetUserPassword.mockResolvedValue(undefined)
+    mockUpdateUser.mockReset()
+    mockUpdateUser.mockResolvedValue(undefined)
     vi.mocked(useToaster).mockReturnValue({
       makeToast: vi.fn(),
       eatToast: vi.fn(),
@@ -121,6 +125,10 @@ describe('UserManagement', () => {
     } as any)
     vi.mocked(useResetUserPasswordMutation).mockReturnValue({
       resetUserPassword: mockResetUserPassword,
+      isLoading: false,
+    } as any)
+    vi.mocked(useUpdateUserMutation).mockReturnValue({
+      updateUser: mockUpdateUser,
       isLoading: false,
     } as any)
     vi.mocked(useUsersQuery).mockImplementation(
@@ -204,20 +212,24 @@ describe('UserManagement', () => {
     screen.getByText("Reset this user's password?")
   })
 
-  it('shows Unlock in the overflow menu for all users', () => {
+  it('shows Unlock in the overflow menu only for locked users', () => {
     render()
     expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
+    )
+    expect(
+      screen.queryByRole('button', {
+        name: 'Unlock account and reset password',
+      })
+    ).not.toBeInTheDocument()
     fireEvent.click(
       screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
     )
     fireEvent.click(
       screen.getByRole('button', { name: 'UserManagement_overflowMenu_bob' })
     )
-    expect(
-      screen.getAllByRole('button', {
-        name: 'Unlock account and reset password',
-      })
-    ).toHaveLength(2)
+    screen.getByRole('button', { name: 'Unlock account and reset password' })
   })
 
   it('opens the activate modal with unlock and cancel actions', () => {
@@ -236,6 +248,52 @@ describe('UserManagement', () => {
       })
     ).toHaveLength(1)
     screen.getByRole('button', { name: 'Cancel' })
+  })
+
+  it('shows Lock account only for active users in the overflow menu', () => {
+    render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
+    )
+    screen.getByRole('button', { name: 'Lock account' })
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
+    )
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_bob' })
+    )
+    expect(
+      screen.queryByRole('button', { name: 'Lock account' })
+    ).not.toBeInTheDocument()
+  })
+
+  it('opens the lock confirm modal when Lock account is selected', () => {
+    render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Lock account' }))
+    screen.getByText('Lock this account?')
+  })
+
+  it('locks the user when confirmed in the lock modal', async () => {
+    render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Lock account' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Lock account' }))
+
+    await vi.waitFor(() => {
+      expect(mockUpdateUser).toHaveBeenCalledWith({
+        username: 'alice',
+        request: { data: { locked: true } },
+      })
+    })
+    expect(mockUpdateUser).toHaveBeenCalledTimes(1)
   })
 
   it('unlocks and resets password when confirmed in the activate modal', async () => {

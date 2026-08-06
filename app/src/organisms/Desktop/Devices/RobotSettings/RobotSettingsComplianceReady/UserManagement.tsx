@@ -9,6 +9,7 @@ import {
 import {
   useDeleteUserMutation,
   useResetUserPasswordMutation,
+  useUpdateUserMutation,
   useUsersQuery,
 } from '@opentrons/react-api-client'
 
@@ -37,6 +38,7 @@ interface UserManagementTableProps {
   onDelete: (user: AuthUser) => void
   onActivate: (user: AuthUser) => void
   onResetPassword: (user: AuthUser) => void
+  onDeactivate: (user: AuthUser) => void
 }
 
 function UserManagementTable({
@@ -45,6 +47,7 @@ function UserManagementTable({
   onDelete,
   onActivate,
   onResetPassword,
+  onDeactivate,
 }: UserManagementTableProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -84,6 +87,7 @@ function UserManagementTable({
             onDelete={onDelete}
             onActivate={onActivate}
             onResetPassword={onResetPassword}
+            onDeactivate={onDeactivate}
           />
         ))}
       </tbody>
@@ -102,12 +106,17 @@ export function UserManagement({
   const { deleteUser } = useDeleteUserMutation(documentationState)
   const { resetUserPassword, isLoading: isResettingPassword } =
     useResetUserPasswordMutation(documentationState)
+  const { updateUser, isLoading: isDeactivatingUser } =
+    useUpdateUserMutation(documentationState)
   const [showAddUserModal, setShowAddUserModal] = useState(false)
   const [userToEdit, setUserToEdit] = useState<AuthUser | null>(null)
   const [userToDelete, setUserToDelete] = useState<AuthUser | null>(null)
   const [userToActivate, setUserToActivate] = useState<AuthUser | null>(null)
   const [userToResetPassword, setUserToResetPassword] =
     useState<AuthUser | null>(null)
+  const [userToDeactivate, setUserToDeactivate] = useState<AuthUser | null>(
+    null
+  )
   const [resetPasswordTemporaryPassword, setResetPasswordTemporaryPassword] =
     useState<string | null>(null)
   const { makeToast } = useToaster()
@@ -183,6 +192,28 @@ export function UserManagement({
     setUserToResetPassword(null)
   }
 
+  const handleDeactivateConfirm = (): void => {
+    if (userToDeactivate == null) {
+      return
+    }
+
+    void updateUser({
+      username: userToDeactivate.username,
+      request: { data: { locked: true } },
+    })
+      .then(() => {
+        makeToast(
+          t('desktop_lock_user_success_banner') as string,
+          SUCCESS_TOAST,
+          { closeButton: true }
+        )
+        setUserToDeactivate(null)
+      })
+      .catch(() => {
+        setUserToDeactivate(null)
+      })
+  }
+
   return (
     <Accordion id="user-management" title={t('desktop_user_management')}>
       <UserManagementTable
@@ -191,6 +222,7 @@ export function UserManagement({
         onDelete={setUserToDelete}
         onActivate={setUserToActivate}
         onResetPassword={setUserToResetPassword}
+        onDeactivate={setUserToDeactivate}
       />
       <div className={styles.add_user_button}>
         <EmptySelectorButton
@@ -255,6 +287,19 @@ export function UserManagement({
           onConfirm={handleActivateConfirm}
           onCancel={() => {
             setUserToActivate(null)
+          }}
+        />
+      ) : null}
+      {userToDeactivate != null ? (
+        <UserAccountConfirmModal
+          title={t('desktop_lock_user_modal_title') as string}
+          heading={t('desktop_lock_user_modal_heading') as string}
+          description={t('desktop_lock_user_modal_description') as string}
+          confirmLabel={t('desktop_lock_user') as string}
+          isConfirmDisabled={isDeactivatingUser}
+          onConfirm={handleDeactivateConfirm}
+          onCancel={() => {
+            setUserToDeactivate(null)
           }}
         />
       ) : null}
