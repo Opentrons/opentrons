@@ -1,0 +1,20 @@
+Activation Compliance Ready Software on your Flex is permanent and irreversible. The software changes the way you interact with your Flex on a daily basis. You'll also lose access to some Flex features: 
+
+* [**Jupyter Notebook**](../../../flex/docs/advanced-operation/jupyter-notebook.md) and [**Secure Shell (SSH)**](../../../flex/docs/advanced-operation/command-line.md) connections: You won't be able to control your Flex through web server or terminal connections.
+* **Run any valid Python file**: Before installation, your Flex can run any valid Python file developed using the Opentrons Python Protocol API. A compliance-ready Flex can only run verified Python protocols approved and added by an administrator.
+* **Factory resets**: A reset of your Flex will delete calibrations, run history, and protocols, but cannot remove compliance-ready software. 
+
+Compliance-ready software makes changes to both the Flex touchscreen and the Opentrons App on your computer.
+
+
+
+    During installation, your Opentrons representative will create service and administrator [accounts](../features/features.md#roles), including a recovery account in case you're ever locked out of your Flex.
+
+
+<!--------
+
+TODO: 
+- confirm factory reset language + "valid Python" language with Nick and anyone else
+
+----->
+

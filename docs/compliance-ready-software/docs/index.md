@@ -7,6 +7,21 @@ description: "Permanent, compliance-ready software to enable 21 CFR part 11-read
 
 # Compliance Ready Software Instruction Manual
 
-Opentrons Compliance Ready software is permanently installed on your Opentrons Flex liquid handling robot to enable 21 CFR part 11-ready operation, including verified user access and capturing, time-stamping, and documenting  user actions.
+[Opentrons Flex Compliance Ready Software](https://opentrons.com/compliance-ready-software) permanently enables features on your Opentrons Flex liquid handling robot for 21 CFR part 11–ready operation. The software: 
 
-This instruction manual covers the use of Opentrons Flex Compliance Ready software, from the irreversible changes to your Flex upon activation to daily use in the lab.  
+* Captures every user action with timestamps, documentation, and robot-generated records and files.
+* Verifies user access, including required logins and different permissions for administrators and users.
+* Changes how your interact with your Flex across the Opentrons App and Flex touchscreen. 
+
+This instruction manual covers the use of Opentrons Flex Compliance Ready Software, from the irreversible changes to your Flex upon activation to daily use in the lab.
+
+This manual describes Opentrons Flex Compliance Ready Software's key features, like [user roles](../docs/roles.md), [documenting user actions](..documentation.md), [documentation](../features/documentation.md), and [records](../docs/records.md), and shows you what you'll experience when using the software at the lab bench.
+
+Have questions about software controls or compliance? Get in touch with Opentrons. 
+
+<!-----
+
+check on last sentence (connect with us for questions about compliance)
+
+----->
+

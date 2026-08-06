@@ -42,14 +42,19 @@ plugins:
 nav:
   
   - Comliance Ready Software Instruction Manual: index.md
-  - About Compliance Ready Software: 
-      - Introduction: introduction.md
+  - Introduction: 
       - Activation: activation.md
-  - Compliance Ready Features: 
-      - Features: features/features.md # includes roles, encryption key, devices, and data protection.
-      - Documentation: features/documentation.md
-      - Settings: features/settings.md # administrator and any other settings
-  - Using Compliance Ready Software: using.md #includes logging in, setting up and running a protocol, etc.
-  - Records and Files: 
-      - Types: records_files/types.md
-      - Managing files: records_files/manage.md
+      - Roles: roles.md
+      - Settings: settings.md
+  - Using Compliance Ready Software: 
+      - Logging in: login.md
+      - Document actions: documentation.md
+      - Running a protocol: running.md 
+      - Completing a protocol: complete.md
+      - Accessing records: records.md
+  - Additional Features: 
+      - Devices: devices.md
+      - Administrator settings: admin.md
+  - Appendices: 
+      - Documented Actions: actions.md
+      - Glossary: glossary.md
