@@ -37,7 +37,8 @@ export function useDownloadLogPeriod(
       downloadAuditLog({
         logPeriodId: logPeriod.id,
         fileName: filename,
-        host,
+        hostname: host.hostname,
+        port: host.port,
         destination: usbPath,
       })
     )

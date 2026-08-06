@@ -48,7 +48,8 @@ export function useDownloadSelectedLogPeriods(
     dispatch(
       downloadAuditLogs({
         logPeriodSummaries: [...logPeriods],
-        host,
+        hostname: host.hostname,
+        port: host.port,
         robotName,
         destination: callTimeUsbPath,
       })

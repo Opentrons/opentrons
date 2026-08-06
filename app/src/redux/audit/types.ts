@@ -1,4 +1,4 @@
-import type { HostConfig, LogPeriodSummary } from '@opentrons/api-client'
+import type { LogPeriodSummary } from '@opentrons/api-client'
 import type {
   CHANGE_AUDIT_LOG_DIRECTORY,
   DOWNLOAD_AUDIT_LOG,
@@ -14,14 +14,16 @@ export interface ChangeAuditLogDirectoryAction {
 export interface DownloadAuditLogPayload {
   logPeriodId: string
   fileName: string
-  host: HostConfig
+  hostname: string
+  port?: number | null
   destination?: string
 }
 
 export interface DownloadAuditLogsPayload {
   logPeriodSummaries: LogPeriodSummary[]
-  host: HostConfig
   robotName: string
+  hostname: string
+  port?: number | null
   destination?: string
 }
 

@@ -23,11 +23,8 @@ describe('audit actions', () => {
     const payload: DownloadAuditLogPayload = {
       logPeriodId: 'log-period-1',
       fileName: 'logperiod.zip',
-      host: {
-        hostname: '192.168.1.100',
-        port: 31950,
-        token: 'mock-token',
-      },
+      hostname: '192.168.1.100',
+      port: 31950,
     }
 
     expect(downloadAuditLog(payload)).toEqual({
@@ -46,11 +43,8 @@ describe('audit actions', () => {
           endedAt: null,
         },
       ],
-      host: {
-        hostname: '192.168.1.100',
-        port: 31950,
-        token: 'mock-token',
-      },
+      hostname: '192.168.1.100',
+      port: 31950,
       robotName: 'otie',
       destination: '/mnt/usb',
     }

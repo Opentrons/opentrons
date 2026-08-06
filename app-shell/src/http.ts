@@ -48,9 +48,10 @@ export function fetchToFile(
   options?: Partial<{
     onProgress: (progress: DownloadProgress) => unknown
     onResponse: (response: Response) => unknown
+    requestInit: RequestInit
   }>
 ): Promise<string> {
-  return fetch(input).then(response => {
+  return fetch(input, options?.requestInit).then(response => {
     options?.onResponse?.(response)
     let downloaded = 0
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions

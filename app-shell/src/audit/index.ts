@@ -13,10 +13,12 @@ import {
   CHANGE_AUDIT_LOG_DIRECTORY,
   DOWNLOAD_AUDIT_LOG,
   DOWNLOAD_AUDIT_LOGS,
+  OPENTRONS_USB,
 } from '../constants'
 import { showOpenDirectoryDialog } from '../dialogs'
 import { fetchToFile } from '../http'
 import { buildRobotHttpUrl } from '../robot-update/httpUrl'
+import { getSerialPortHttpAgent } from '../usb'
 
 import type { BrowserWindow } from 'electron'
 import type {
@@ -62,12 +64,17 @@ async function downloadAuditLog(
   mainWindow: BrowserWindow,
   dispatch: Dispatch
 ): Promise<boolean> {
-  const { logPeriodId, fileName, host, destination } = payload
-  const { hostname, port } = host
+  const { logPeriodId, fileName, hostname, port, destination } = payload
+
+  const usb = hostname === OPENTRONS_USB
   const url = buildRobotHttpUrl(
     { ip: hostname, port },
-    `/audit/external/logPeriods/${logPeriodId}/download`
+    `/audit/external/logPeriods/${logPeriodId}/download`,
+    { forceHttp: usb }
   )
+  const agent = usb ? getSerialPortHttpAgent() : undefined
+  const requestInit = !!agent ? { agent } : undefined
+
   const config = getFullConfig()
 
   let directory = destination
@@ -94,6 +101,7 @@ async function downloadAuditLog(
       onResponse: response => {
         deletionKey = response.headers.get('opentrons-log-period-deletion-key')
       },
+      requestInit,
     })
 
     if (deletionKey == null) {
@@ -124,7 +132,7 @@ async function downloadAuditLogs(
   mainWindow: BrowserWindow,
   dispatch: Dispatch
 ): Promise<void> {
-  const { logPeriodSummaries, host, destination, robotName } = payload
+  const { logPeriodSummaries, hostname, port, destination, robotName } = payload
 
   const config = getFullConfig()
 
@@ -163,7 +171,8 @@ async function downloadAuditLogs(
         {
           logPeriodId: logPeriodSummary.id,
           fileName: `logperiod_${logPeriodSummary.startedAt.replaceAll(':', '_')}.zip`,
-          host,
+          hostname,
+          port,
           destination: outputDirectory,
         },
         mainWindow,

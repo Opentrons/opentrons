@@ -10,8 +10,10 @@ import {
 
 import { AUDIT_LOG_DIRECTORY_CONFIG_PATH, registerAudit } from '..'
 import * as Cfg from '../../config'
+import { OPENTRONS_USB } from '../../constants'
 import * as Dialogs from '../../dialogs'
 import * as Http from '../../http'
+import { getSerialPortHttpAgent } from '../../usb'
 
 import type { BrowserWindow } from 'electron'
 import type { Response } from 'node-fetch'
@@ -28,6 +30,10 @@ vi.mock('../../dialogs', () => ({
 vi.mock('../../http', () => ({
   fetchToFile: vi.fn(),
 }))
+// factory mock so the real module (and its serialport dependency) never loads
+vi.mock('../../usb', () => ({
+  getSerialPortHttpAgent: vi.fn(),
+}))
 
 const flush = (): Promise<void> =>
   new Promise(resolve => setTimeout(resolve, 0))
@@ -35,10 +41,8 @@ const flush = (): Promise<void> =>
 const downloadPayload = {
   logPeriodId: 'lp-1',
   fileName: 'logperiod.zip',
-  host: {
-    hostname: '192.168.1.100',
-    port: 31950,
-  },
+  hostname: '192.168.1.100',
+  port: 31950,
 }
 
 describe('audit module dispatches', () => {
@@ -133,7 +137,7 @@ describe('audit module dispatches', () => {
     await flush()
 
     expect(Http.fetchToFile).toHaveBeenCalledWith(
-      'http://192.168.1.100:31950/logs/lp-1/download',
+      'http://192.168.1.100:31950/audit/external/logPeriods/lp-1/download',
       '/existing/audit-logs/logperiod.zip',
       expect.objectContaining({ onResponse: expect.any(Function) })
     )
@@ -142,6 +146,25 @@ describe('audit module dispatches', () => {
         logPeriodId: 'lp-1',
         deletionKey: 'deletion-key-1',
       })
+    )
+  })
+
+  it('routes over the serial port agent for a USB host', async () => {
+    const mockAgent = { usbAgent: true }
+    vi.mocked(getSerialPortHttpAgent).mockReturnValue(mockAgent as any)
+    vi.mocked(Dialogs.showOpenDirectoryDialog).mockResolvedValue([
+      '/existing/audit-logs',
+    ])
+
+    handleAction(
+      downloadAuditLog({ ...downloadPayload, hostname: OPENTRONS_USB })
+    )
+    await flush()
+
+    expect(Http.fetchToFile).toHaveBeenCalledWith(
+      `http://${OPENTRONS_USB}:31950/audit/external/logPeriods/lp-1/download`,
+      '/existing/audit-logs/logperiod.zip',
+      expect.objectContaining({ requestInit: { agent: mockAgent } })
     )
   })
 

@@ -110,7 +110,8 @@ describe('useDownloadSelectedLogPeriods', () => {
     expect(mockDispatch).toHaveBeenCalledWith(
       downloadAuditLogs({
         logPeriodSummaries: [mockPeriodOne, mockPeriodTwo],
-        host: HOST_CONFIG,
+        hostname: HOST_CONFIG.hostname,
+        port: HOST_CONFIG.port,
         robotName: ROBOT_NAME,
         destination: undefined,
       })
@@ -143,7 +144,8 @@ describe('useDownloadSelectedLogPeriods', () => {
     expect(mockDispatch).toHaveBeenCalledWith(
       downloadAuditLogs({
         logPeriodSummaries: [mockPeriodOne],
-        host: HOST_CONFIG,
+        hostname: HOST_CONFIG.hostname,
+        port: HOST_CONFIG.port,
         robotName: ROBOT_NAME,
         destination: '/mnt/usb',
       })

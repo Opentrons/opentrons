@@ -80,7 +80,8 @@ describe('useDownloadLogPeriod', () => {
       downloadAuditLog({
         logPeriodId: 'lp-1',
         fileName: 'logperiod_2024-01-01T10_00_00.000Z.zip',
-        host: HOST_CONFIG,
+        hostname: HOST_CONFIG.hostname,
+        port: HOST_CONFIG.port,
         destination: undefined,
       })
     )
@@ -97,7 +98,8 @@ describe('useDownloadLogPeriod', () => {
       downloadAuditLog({
         logPeriodId: 'lp-1',
         fileName: 'logperiod_2024-01-01T10_00_00.000Z.zip',
-        host: HOST_CONFIG,
+        hostname: HOST_CONFIG.hostname,
+        port: HOST_CONFIG.port,
         destination: '/mnt/usb',
       })
     )
