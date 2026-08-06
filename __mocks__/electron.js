@@ -21,5 +21,6 @@ module.exports = {
   shell: {
     trashItem: vi.fn(),
     openPath: vi.fn(),
+    showItemInFolder: vi.fn(),
   },
 }

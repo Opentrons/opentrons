@@ -215,8 +215,18 @@ export function analyzeProtocolByKey(
 export function viewProtocolSourceFolder(
   protocolKey: string,
   protocolsDirPath: string
-): void {
+): Promise<void> {
   const protocolDirPath = path.join(protocolsDirPath, protocolKey)
   const srcDirPath = path.join(protocolDirPath, PROTOCOL_SRC_DIRECTORY_NAME)
-  shell.openPath(srcDirPath)
+  return readFilesWithinDirectory(srcDirPath)
+    .then(srcFilePaths => {
+      if (srcFilePaths.length > 0) {
+        shell.showItemInFolder(srcFilePaths[0])
+      } else {
+        void shell.openPath(srcDirPath)
+      }
+    })
+    .catch(() => {
+      void shell.openPath(srcDirPath)
+    })
 }

@@ -279,7 +279,7 @@ export function registerProtocolStorage(dispatch: Dispatch): Dispatch {
 
       case VIEW_PROTOCOL_SOURCE_FOLDER: {
         const protocolsDir = getProtocolsDirectoryPath()
-        FileSystem.viewProtocolSourceFolder(
+        void FileSystem.viewProtocolSourceFolder(
           action.payload.protocolKey,
           protocolsDir
         )

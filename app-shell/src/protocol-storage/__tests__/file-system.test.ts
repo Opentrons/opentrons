@@ -17,6 +17,7 @@ import {
   readFilesWithinDirectory,
   removeProtocolByKey,
   shouldMigrateToNotOt2Directory,
+  viewProtocolSourceFolder,
 } from '../file-system'
 
 vi.mock('uuid', () => ({
@@ -248,6 +249,38 @@ describe('protocol storage directory utilities', () => {
           modified: expect.any(Number),
         },
       ])
+    })
+  })
+
+  describe('viewProtocolSourceFolder', () => {
+    beforeEach(() => {
+      vi.mocked(Electron.shell.showItemInFolder).mockClear()
+      vi.mocked(Electron.shell.openPath).mockClear()
+    })
+
+    it('highlights the protocol source file in the file manager', async () => {
+      const protocolsDir = makeEmptyDir()
+      const srcDirPath = path.join(protocolsDir, 'abc123', 'src')
+      await fs.emptyDir(srcDirPath)
+      await fs.createFile(path.join(srcDirPath, 'serialDilution.py'))
+
+      await viewProtocolSourceFolder('abc123', protocolsDir)
+
+      expect(Electron.shell.showItemInFolder).toHaveBeenCalledWith(
+        path.join(srcDirPath, 'serialDilution.py')
+      )
+      expect(Electron.shell.openPath).not.toHaveBeenCalled()
+    })
+
+    it('falls back to opening the src folder when it holds no files', async () => {
+      const protocolsDir = makeEmptyDir()
+      const srcDirPath = path.join(protocolsDir, 'abc123', 'src')
+      await fs.emptyDir(srcDirPath)
+
+      await viewProtocolSourceFolder('abc123', protocolsDir)
+
+      expect(Electron.shell.openPath).toHaveBeenCalledWith(srcDirPath)
+      expect(Electron.shell.showItemInFolder).not.toHaveBeenCalled()
     })
   })
 
