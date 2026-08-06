@@ -40,6 +40,10 @@ setup:
 	$(pipenv) sync $(pipenv_opts)
 	$(pipenv) run pip freeze
 
+# One-shot: install deps, create desktop shortcut, seed Errors/ templates.
+.PHONY: setup-robot-fleet-error
+setup-robot-fleet-error: setup desktop-shortcut
+
 .PHONY: teardown
 teardown:
 	-$(pipenv) --rm
@@ -101,11 +105,29 @@ simulate:
 # their own folder at runtime, which must sit next to the opentrons repo (so the
 # repo and the Errors folder are siblings of the shortcut). Generation relies on
 # a POSIX shell (Git Bash on Windows), matching the rest of the monorepo.
+#
+# Also seeds the Errors folder with setup templates (copy-if-missing so re-running
+# make does not overwrite filled-in credentials).
 opentrons_dir := $(abspath $(CURDIR)/..)
 parent_dir := $(abspath $(CURDIR)/../..)
 repo_name := $(notdir $(opentrons_dir))
 errors_dir ?= $(parent_dir)/Errors
 shortcut_base ?= robotFleet_error
+templates_dir := $(CURDIR)/templates
+
+# Seed Errors/ with templates without clobbering existing user files.
+define seed-errors-templates
+	@mkdir -p "$(errors_dir)"
+	@if [ ! -f "$(errors_dir)/jiraCredentials.json" ]; then \
+		cp "$(templates_dir)/jiraCredentials.json" "$(errors_dir)/jiraCredentials.json"; \
+		echo "Seeded: $(errors_dir)/jiraCredentials.json (fill in email + API token)"; \
+	else \
+		echo "Keeping existing: $(errors_dir)/jiraCredentials.json"; \
+	fi
+	@if [ ! -f "$(errors_dir)/robot_key" ]; then \
+		echo "Missing: $(errors_dir)/robot_key — add your robot SSH private key here"; \
+	fi
+endef
 
 .PHONY: desktop-shortcut
 ifeq ($(OS),Windows_NT)
@@ -123,7 +145,7 @@ desktop-shortcut:
 		'echo.' \
 		'pause' \
 		> "$(shortcut_path)"
-	@mkdir -p "$(errors_dir)"
+	$(seed-errors-templates)
 	@echo "Created shortcut: $(shortcut_path)"
 	@echo "Errors folder: $(errors_dir)"
 else
@@ -138,14 +160,14 @@ desktop-shortcut:
 		'' \
 		'# Run inside the project pipenv environment so all deps are available' \
 		'cd "$$ABR"' \
-		'pipenv run python "$$ABR/abr_testing/data_collection/robotFleet_error.py" "$$HERE/Errors"' \
+		'pipenv run python "$$ABR/abr_testing/data_collection/robot_fleet_error.py" "$$HERE/Errors"' \
 		'' \
 		'# Keep the terminal window open so you can see the results' \
 		'echo ""' \
 		'read -k 1 "?Press any key to close..."' \
 		> "$(shortcut_path)"
 	@chmod +x "$(shortcut_path)"
-	@mkdir -p "$(errors_dir)"
+	$(seed-errors-templates)
 	@echo "Created shortcut: $(shortcut_path)"
 	@echo "Errors folder: $(errors_dir)"
 endif
