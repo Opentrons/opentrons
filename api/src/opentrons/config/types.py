@@ -1,7 +1,8 @@
-from dataclasses import asdict, dataclass, fields
+from dataclasses import asdict, dataclass
 from enum import Enum
-from typing import Dict, Generic, List, Tuple, TypeVar, cast
+from typing import Any, Dict, Generic, List, Mapping, Tuple, TypeVar, cast
 
+from pydantic import BaseModel, ConfigDict, ValidationInfo, field_validator
 from typing_extensions import Literal, TypedDict
 
 
@@ -104,8 +105,47 @@ class RobotConfig:
 OT3Transform = List[List[float]]
 
 
-@dataclass(frozen=True)
-class OT3MotionSettings:
+def _coerce_ot3_axis_kind(key: Any) -> OT3AxisKind:
+    if isinstance(key, OT3AxisKind):
+        return key
+    if isinstance(key, int):
+        return OT3AxisKind(key)
+    if isinstance(key, str):
+        try:
+            return OT3AxisKind[key]
+        except KeyError:
+            pass
+        return OT3AxisKind(int(key))
+    raise TypeError(f"Unsupported OT3 axis key type: {type(key)} ({key!r})")
+
+
+def _coerce_axis_map(raw: Any) -> Dict[OT3AxisKind, float]:
+    if not isinstance(raw, Mapping):
+        raise TypeError(f"Expected mapping for axis settings, got {type(raw)}")
+    return {_coerce_ot3_axis_kind(k): float(v) for k, v in raw.items()}
+
+
+def _coerce_by_gantry_load_axis_maps(
+    raw: Any,
+) -> ByGantryLoad[Dict[OT3AxisKind, float]]:
+    if isinstance(raw, ByGantryLoad):
+        return ByGantryLoad(
+            high_throughput_1000=_coerce_axis_map(raw.high_throughput_1000),
+            high_throughput_200=_coerce_axis_map(raw.high_throughput_200),
+            low_throughput=_coerce_axis_map(raw.low_throughput),
+        )
+    if not isinstance(raw, Mapping):
+        raise TypeError(f"Expected mapping/ByGantryLoad, got {type(raw)}")
+    return ByGantryLoad(
+        high_throughput_1000=_coerce_axis_map(raw["high_throughput_1000"]),
+        high_throughput_200=_coerce_axis_map(raw["high_throughput_200"]),
+        low_throughput=_coerce_axis_map(raw["low_throughput"]),
+    )
+
+
+class OT3MotionSettings(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
     default_max_speed: PerPipetteAxisSettings
     acceleration: PerPipetteAxisSettings
     max_speed_discontinuity: PerPipetteAxisSettings
@@ -114,41 +154,59 @@ class OT3MotionSettings:
     def by_gantry_load(
         self, gantry_load: GantryLoad
     ) -> Dict[str, Dict[OT3AxisKind, float]]:
-        return dict(
-            (field.name, getattr(self, field.name)[gantry_load])
-            for field in fields(self)
-        )
+        return {
+            name: getattr(self, name)[gantry_load]
+            for name in OT3MotionSettings.model_fields
+        }
+
+    @field_validator(
+        "default_max_speed",
+        "acceleration",
+        "max_speed_discontinuity",
+        "direction_change_speed_discontinuity",
+        mode="before",
+    )
+    @classmethod
+    def _coerce_axis_keyed_maps(cls, v: Any) -> ByGantryLoad[Dict[OT3AxisKind, float]]:
+        return _coerce_by_gantry_load_axis_maps(v)
 
 
-@dataclass(frozen=True)
-class OT3CurrentSettings:
+class OT3CurrentSettings(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
     hold_current: PerPipetteAxisSettings
     run_current: PerPipetteAxisSettings
 
     def by_gantry_load(
         self, gantry_load: GantryLoad
     ) -> Dict[str, Dict[OT3AxisKind, float]]:
-        return dict(
-            (field.name, getattr(self, field.name)[gantry_load])
-            for field in fields(self)
-        )
+        return {
+            name: getattr(self, name)[gantry_load]
+            for name in OT3CurrentSettings.model_fields
+        }
+
+    @field_validator("hold_current", "run_current", mode="before")
+    @classmethod
+    def _coerce_axis_keyed_maps(cls, v: Any) -> ByGantryLoad[Dict[OT3AxisKind, float]]:
+        return _coerce_by_gantry_load_axis_maps(v)
 
 
-@dataclass(frozen=True)
-class CapacitivePassSettings:
+class CapacitivePassSettings(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
     prep_distance_mm: float
     max_overrun_distance_mm: float
     speed_mm_per_s: float
     sensor_threshold_pf: float
 
 
-@dataclass(frozen=True)
-class ZSenseSettings:
+class ZSenseSettings(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
     pass_settings: CapacitivePassSettings
 
 
-@dataclass
-class LiquidProbeSettings:
+class LiquidProbeSettings(BaseModel):
     mount_speed: float
     plunger_speed: float
     plunger_impulse_time: float
@@ -160,42 +218,36 @@ class LiquidProbeSettings:
     sample_time_sec: float
 
 
-@dataclass(frozen=True)
-class EdgeSenseSettings:
+class EdgeSenseSettings(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
     overrun_tolerance_mm: float
     early_sense_tolerance_mm: float
     pass_settings: CapacitivePassSettings
     search_initial_tolerance_mm: float
     search_iteration_limit: int
 
-    def __init__(
-        self,
-        overrun_tolerance_mm: float,
-        early_sense_tolerance_mm: float,
-        pass_settings: CapacitivePassSettings,
-        search_initial_tolerance_mm: float,
-        search_iteration_limit: int,
-    ) -> None:
-        if overrun_tolerance_mm > pass_settings.max_overrun_distance_mm:
+    @field_validator("pass_settings")
+    @classmethod
+    def _validate_pass_settings(
+        cls, v: CapacitivePassSettings, info: ValidationInfo
+    ) -> CapacitivePassSettings:
+        overrun_tolerance_mm = info.data.get("overrun_tolerance_mm")
+        assert isinstance(overrun_tolerance_mm, float)
+        if overrun_tolerance_mm > v.max_overrun_distance_mm:
             raise ValueError("Overrun tolerance and pass setting distance do not match")
-        object.__setattr__(self, "overrun_tolerance_mm", overrun_tolerance_mm)
-        object.__setattr__(self, "early_sense_tolerance_mm", early_sense_tolerance_mm)
-        object.__setattr__(self, "pass_settings", pass_settings)
-        object.__setattr__(
-            self, "search_initial_tolerance_mm", search_initial_tolerance_mm
-        )
-        object.__setattr__(self, "search_iteration_limit", search_iteration_limit)
+        return v
 
 
-@dataclass(frozen=True)
-class OT3CalibrationSettings:
+class OT3CalibrationSettings(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
     z_offset: ZSenseSettings
     edge_sense: EdgeSenseSettings
     probe_length: float
 
 
-@dataclass
-class OT3Config:
+class OT3Config(BaseModel):
     model: Literal["OT-3 Standard"]
     name: str
     version: int

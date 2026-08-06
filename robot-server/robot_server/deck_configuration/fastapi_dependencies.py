@@ -23,6 +23,9 @@ from robot_server.service.notifications import (
     DeckConfigurationPublisher,
     get_deck_configuration_publisher,
 )
+from robot_server.service.pyro_utils.resource_utilities import (
+    register_deck_configuration_store_to_pyro_resource,
+)
 
 _accessor = AppStateAccessor[DeckConfigurationStore]("deck_configuration_store")
 
@@ -49,6 +52,10 @@ async def get_deck_configuration_store(
             deck_configuration_publisher=deck_configuration_publisher,
         )
         _accessor.set_on(app_state, deck_configuration_store)
+    # Register the DeckConfigurationStore with the robot-server's Pyro Resource
+    register_deck_configuration_store_to_pyro_resource(
+        app_state, deck_configuration_store
+    )
     return deck_configuration_store
 
 

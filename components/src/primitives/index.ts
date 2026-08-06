@@ -6,7 +6,6 @@ export * from './ForeignObject'
 export * from './Link'
 export * from './Svg'
 export * from './Text'
-export * from './Buttons/NewSecondaryBtn'
 export * from './Buttons/NewPrimaryBtn'
 
 export * from './types'

@@ -14,8 +14,8 @@ import { EthernetConnectionDetails } from '../EthernetConnectionDetails'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
 
 import type { ComponentProps } from 'react'
+import type { WifiNetwork } from '@opentrons/api-client'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
-import type { WifiNetwork } from '/app/redux/networking/types'
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/resources/networking/hooks')

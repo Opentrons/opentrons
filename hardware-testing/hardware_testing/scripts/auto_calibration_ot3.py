@@ -1,5 +1,6 @@
 """OT-3 Auto Calibration."""
-from hardware_testing.opentrons_api.types import OT3Mount, GripperProbe, Point
+from opentrons.hardware_control.types import OT3Mount, GripperProbe
+from opentrons.types import Point
 from hardware_testing.opentrons_api import helpers_ot3
 
 import os

@@ -40,9 +40,9 @@ jobs:
       matrix_json: ${{ steps.set-matrix.outputs.json }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Setup UV
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
         with:
           python-version: '3.12'
           enable-cache: true
@@ -54,7 +54,7 @@ jobs:
         working-directory: ./analyses-snapshot-testing
         run: make gen-chunks
       - name: Save Chunks
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: chunks
           path: analyses-snapshot-testing/chunks/
@@ -67,7 +67,7 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Are the analyses snapshots in my PR branch in sync with the target branch?
         if: github.event_name == 'pull_request'
         run: |
@@ -95,9 +95,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Setup UV
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
         with:
           python-version: '3.12'
           enable-cache: true
@@ -105,7 +105,7 @@ jobs:
       - name: Setup the project
         working-directory: ./analyses-snapshot-testing
         run: make setup
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: chunks
           path: analyses-snapshot-testing/chunks/
@@ -113,7 +113,7 @@ jobs:
         working-directory: ./analyses-snapshot-testing
         run: make analyze-chunk CHUNK=${{ matrix.chunk.chunk_id }}
       - name: Upload Analysis Results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           # Each chunk uploads its files as one artifact named after the chunk
           name: analysis-results-${{ matrix.chunk.chunk_id }}.zip
@@ -132,9 +132,9 @@ jobs:
       PR_TARGET_BRANCH: ${{ github.event.pull_request.base.ref || 'edge'}}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Setup UV
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
         with:
           python-version: '3.12'
           enable-cache: true
@@ -143,7 +143,7 @@ jobs:
         working-directory: ./analyses-snapshot-testing
         run: make setup
       - name: Download All Analysis Results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           pattern: analysis-results-*
           path: all_analysis_results
@@ -157,14 +157,19 @@ jobs:
         working-directory: analyses-snapshot-testing
         run: make snapshot-test
 
-      - name: Run Audit
+      - name: Run snapshot audit
         id: run_audit
         working-directory: analyses-snapshot-testing
         run: make snapshot-audit-test
 
+      - name: Run OT-2 compatibility test
+        id: run_ot2_compatibility
+        working-directory: analyses-snapshot-testing
+        run: make ot2-compatibility-test
+
       - name: Upload Report
         if: '!cancelled()'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: test-report
           path: analyses-snapshot-testing/results/
@@ -178,7 +183,7 @@ jobs:
       - name: Create Snapshot update Request
         id: create_pull_request
         if: always() && steps.handle_failure.outcome == 'success' && env.OPEN_PR_ON_FAILURE == 'true' && github.event_name == 'pull_request'
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7.0.11
         with:
           commit-message: 'fix(analyses-snapshot-testing): heal analyses snapshots'
           title: 'fix(analyses-snapshot-testing): heal ${{ github.event.pull_request.head.ref }} snapshots'
@@ -190,7 +195,7 @@ jobs:
 
       - name: Comment on feature PR
         if: always() && steps.create_pull_request.outcome == 'success' && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         with:
           script: |
             const message = 'A PR has been opened to address analyses snapshot changes. Please review the changes here: https://github.com/${{ github.repository }}/pull/${{ steps.create_pull_request.outputs.pull-request-number }}';
@@ -203,7 +208,7 @@ jobs:
 
       - name: Create Snapshot update Request on edge overnight failure
         if: always() && steps.handle_failure.outcome == 'success' && github.event_name == 'schedule'
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7.0.11
         with:
           commit-message: 'fix(analyses-snapshot-testing): heal edge snapshots'
           title: 'fix(analyses-snapshot-testing): heal edge snapshots'

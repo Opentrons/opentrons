@@ -8,7 +8,6 @@ import type {
 
 export type { RobotState, HostState, HealthStatus, Address }
 
-// TODO(mc, 2018-10-03): figure out what to do with duplicate type in app
 export interface HealthResponse {
   name: string
   api_version: string
@@ -20,7 +19,25 @@ export interface HealthResponse {
   maximum_protocol_api_version?: [number, number]
   robot_model?: string
   robot_serial?: string | null
+  // Note: To avoid unnecessary client updates, this should omit fields that change over
+  // time and aren't helpful for robot discovery, such as filesystem usage. The client
+  // can always do its own fetch outside of discovery-client, if it cares about those
+  // fields.
 }
+
+// This should contain all the keys in the HealthResponse type above.
+export const HEALTH_RESPONSE_KEYS = [
+  'name',
+  'api_version',
+  'fw_version',
+  'system_version',
+  'logs',
+  'protocol_api_version',
+  'minimum_protocol_api_version',
+  'maximum_protocol_api_version',
+  'robot_model',
+  'robot_serial',
+] as const satisfies Array<keyof HealthResponse>
 
 export type Capability =
   | 'bootstrap'
@@ -44,22 +61,32 @@ export interface ServerHealthResponse {
   capabilities?: CapabilityMap
   bootId?: string
   robotModel?: string
+  // Note: To avoid unnecessary client updates, this should omit fields that change over
+  // time and aren't helpful for robot discovery, such as filesystem usage. The client
+  // can always do its own fetch outside of discovery-client, if it cares about those
+  // fields.
 }
+
+// This should contain all the keys in the ServerHealthResponse type above.
+export const SERVER_HEALTH_RESPONSE_KEYS = [
+  'name',
+  'apiServerVersion',
+  'updateServerVersion',
+  'serialNumber',
+  'smoothieVersion',
+  'systemVersion',
+  'capabilities',
+  'bootId',
+  'robotModel',
+] as const satisfies Array<keyof ServerHealthResponse>
 
 export interface HealthErrorResponse {
   status: number
   body: string | { [property: string]: unknown }
 }
 
-// TODO(mc, 2018-07-26): grab common logger type from app and app-shell
 export type LogLevel =
-  | 'error'
-  | 'warn'
-  | 'info'
-  | 'http'
-  | 'verbose'
-  | 'debug'
-  | 'silly'
+  'error' | 'warn' | 'info' | 'http' | 'verbose' | 'debug' | 'silly'
 
 export type Logger = Record<LogLevel, (message: string, meta?: unknown) => void>
 

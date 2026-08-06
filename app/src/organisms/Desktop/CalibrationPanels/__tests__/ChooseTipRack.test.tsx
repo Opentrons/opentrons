@@ -14,16 +14,15 @@ import {
 } from '/app/redux/calibration'
 import { getCustomTipRackDefinitions } from '/app/redux/custom-labware'
 import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
-import { mockAttachedPipette } from '/app/redux/pipettes/__fixtures__'
 import { mockDeckCalTipRack } from '/app/redux/sessions/__fixtures__'
+import { mockAttachedPipette } from '/app/resources/instruments/__fixtures__'
 
 import { ChooseTipRack } from '../ChooseTipRack'
 
 import type { ComponentProps } from 'react'
-import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
+import type { AttachedPipettesByMount } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('/app/redux/pipettes/selectors')
 vi.mock('/app/redux/calibration')
 vi.mock('/app/redux/custom-labware/selectors')
 vi.mock('/app/atoms/SelectField/Select')
@@ -87,7 +86,7 @@ describe('ChooseTipRack', () => {
   it('renders the buttons and they work as expected', () => {
     render(props)
     screen.getByRole('link', { name: 'Need help?' })
-    const cancel = screen.getByRole('button', { name: 'cancel' })
+    const cancel = screen.getByRole('button', { name: 'Cancel' })
     const confirm = screen.getByRole('button', { name: 'Confirm tip rack' })
     fireEvent.click(cancel)
     expect(props.closeModal).toHaveBeenCalled()

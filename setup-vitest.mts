@@ -25,6 +25,7 @@ global._PKG_VERSION_ = 'test environment'
 global._OPENTRONS_PROJECT_ = 'robotics'
 global._PKG_PRODUCT_NAME_ = 'test product'
 global._PKG_BUGS_URL_ = 'http://bugs.contoso.com'
+global._OT_PD_LATEST_LABWARE_VERSIONS_ = {}
 
 afterEach(() => {
   cleanup()

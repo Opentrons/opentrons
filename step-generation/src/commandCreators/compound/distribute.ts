@@ -12,6 +12,7 @@ import {
   isFlexPipette,
   LOW_VOLUME_PIPETTES,
   NONE_LIQUID_CLASS_NAME,
+  PARTIAL_COLUMN,
   POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN,
   SAFE_MOVE_TO_WELL_LOCATION,
   WATER_LIQUID_CLASS_NAME,
@@ -31,7 +32,7 @@ import {
   formatChangeTipArg,
   formatPyStr,
   getIsRetractSafeForAirGap,
-  getIsSafePipetteMovement,
+  getPipetteMovementSafetyStatus,
   getSlotInLocationStack,
   getTargetTipsFromWellSets,
   getTransferPlanAndReferenceVolumes,
@@ -40,6 +41,7 @@ import {
   reduceCommandCreators,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../../utils'
+import { getTransformedWellsForPartialColumn } from '../../utils/getTransformedWellsForPartialColumn'
 import {
   getCustomLiquidClassProperties,
   getLiquidClassName,
@@ -61,7 +63,10 @@ import {
 import { mixInPlaceUtil } from './mix'
 import { replaceTip } from './replaceTip'
 
-import type { WellLocation } from '@opentrons/shared-data'
+import type {
+  PartialPrimaryNozzles,
+  WellLocation,
+} from '@opentrons/shared-data'
 import type {
   CommandCreator,
   CommandCreatorError,
@@ -323,7 +328,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
   }
 
   if (isMultiChannelPipette && nozzles !== ALL) {
-    const isAspirateSafePipetteMovement = getIsSafePipetteMovement({
+    const aspiratePipetteMovementSafetyStatus = getPipetteMovementSafetyStatus({
       robotState: prevRobotState,
       invariantContext,
       pipetteId: pipette,
@@ -333,7 +338,15 @@ export const distribute: CommandCreator<DistributeArgs> = (
       primaryNozzle,
       nozzleConfiguration: nozzles,
     })
-    const isDispenseSafePipetteMovement = getIsSafePipetteMovement({
+    if (!aspiratePipetteMovementSafetyStatus.isSafe) {
+      errors.push(
+        errorCreators.possiblePipetteCollision({
+          unsafePipetteMovementReason:
+            aspiratePipetteMovementSafetyStatus.reason,
+        })
+      )
+    }
+    const dispensePipetteMovementSafetyStatus = getPipetteMovementSafetyStatus({
       robotState: prevRobotState,
       invariantContext,
       pipetteId: pipette,
@@ -343,8 +356,13 @@ export const distribute: CommandCreator<DistributeArgs> = (
       primaryNozzle,
       nozzleConfiguration: nozzles,
     })
-    if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
-      errors.push(errorCreators.possiblePipetteCollision())
+    if (!dispensePipetteMovementSafetyStatus.isSafe) {
+      errors.push(
+        errorCreators.possiblePipetteCollision({
+          unsafePipetteMovementReason:
+            dispensePipetteMovementSafetyStatus.reason,
+        })
+      )
     }
   }
 
@@ -405,10 +423,11 @@ export const distribute: CommandCreator<DistributeArgs> = (
       })
     )
   }
-  if (errors.length > 0)
+  if (errors.length > 0) {
     return {
       errors,
     }
+  }
   const { tipracks } = getNextTiprack(
     pipette,
     tiprackURI,
@@ -443,10 +462,31 @@ export const distribute: CommandCreator<DistributeArgs> = (
         wasteChuteEntities[blowoutLocation]?.pythonName)
   const sourceLabwarePythonName = labwareEntities[sourceLabware].pythonName
   const destLabwarePythonName = labwareEntities[destLabware]?.pythonName
+
+  const transformedSourceWell = (
+    nozzles === PARTIAL_COLUMN
+      ? getTransformedWellsForPartialColumn({
+          labwareDef: labwareEntities[sourceLabware].def,
+          wells: [sourceWell],
+          primaryNozzle: primaryNozzle as PartialPrimaryNozzles,
+        })
+      : [sourceWell]
+  )[0]
+  const transformedDestWells =
+    nozzles === PARTIAL_COLUMN &&
+    destWells != null &&
+    labwareEntities[destLabware] != null
+      ? getTransformedWellsForPartialColumn({
+          labwareDef: labwareEntities[destLabware].def,
+          wells: destWells,
+          primaryNozzle: primaryNozzle as PartialPrimaryNozzles,
+        })
+      : destWells
+
   const pythonSourceWells = `${sourceLabwarePythonName}[${formatPyStr(
-    args.sourceWell
+    transformedSourceWell
   )}]`
-  const pythonDestWells = args.destWells
+  const pythonDestWells = transformedDestWells
     .map(well => `${destLabwarePythonName}[${formatPyStr(well)}]`)
     .join(', ')
 
@@ -486,7 +526,15 @@ export const distribute: CommandCreator<DistributeArgs> = (
     tiprackSelected != null
       ? labwareEntities[tiprackSelected]?.pythonName
       : null
-  const fullTipWellsToPickupString = targetTips
+  const transformedTargetTips =
+    targetTips != null && tiprackEntity != null && nozzles === PARTIAL_COLUMN
+      ? getTransformedWellsForPartialColumn({
+          labwareDef: tiprackEntity?.def,
+          wells: targetTips,
+          primaryNozzle: primaryNozzle as PartialPrimaryNozzles,
+        })
+      : targetTips
+  const fullTipWellsToPickupString = transformedTargetTips
     ?.map(targetTip => `${tiprackName}[${formatPyStr(targetTip)}]`)
     .join(', ')
 

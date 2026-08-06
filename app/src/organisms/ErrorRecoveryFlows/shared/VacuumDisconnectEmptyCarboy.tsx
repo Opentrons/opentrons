@@ -2,6 +2,7 @@ import { Trans, useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
 
+import DetachCarboyCap from '/app/assets/videos/error-recovery/Vacuum_DetachCarboyCap.webm'
 import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
 
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
@@ -40,8 +41,7 @@ export function VacuumDisconnectEmptyCarboy(
           headline={t('disconnect_and_empty_carboy')}
           message={messageElement}
         />
-        {/* TODO(nd, 02-24-26): Add animation */}
-        <RightColumnAnimation animationSrc={''} />
+        <RightColumnAnimation animationSrc={DetachCarboyCap} />
       </TwoColumn>
       <RecoveryFooterButtons
         primaryBtnOnClick={proceedNextStep}

@@ -120,12 +120,7 @@ function useFindProgressPercentFrom(
 }
 
 export type UpdateStep =
-  | 'initial'
-  | 'download'
-  | 'install'
-  | 'restart'
-  | 'finished'
-  | 'error'
+  'initial' | 'download' | 'install' | 'restart' | 'finished' | 'error'
 
 function determineUpdateStepFrom(
   session: RobotUpdateSession | null
@@ -144,7 +139,6 @@ function determineUpdateStepFrom(
     reportedUpdateStep = 'finished'
   } else if (
     sessionStep === 'restart' ||
-    sessionStep === 'restarting' ||
     sessionStage === 'ready-for-restart'
   ) {
     reportedUpdateStep = 'restart'

@@ -1,9 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import { COLORS, LegacyStyledText } from '@opentrons/components'
 import { EXTENSION } from '@opentrons/shared-data'
 
+import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
@@ -26,6 +27,7 @@ import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 
@@ -63,6 +65,7 @@ interface BeforeBeginningProps extends GripperWizardStepProps {
   >
   isCreateLoading: boolean
   createdMaintenanceRunId: string | null
+  documentationState: DocumentationState
 }
 
 export const BeforeBeginning = (
@@ -79,18 +82,27 @@ export const BeforeBeginning = (
     maintenanceRunId,
     setErrorMessage,
     createdMaintenanceRunId,
+    documentationState,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared', 'branded'])
-  useEffect(
-    () => {
-      if (createdMaintenanceRunId == null) {
-        createMaintenanceRun({})
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+  const hasSentCreateMaintenanceRun = useRef(false)
+  useEffect(() => {
+    if (
+      createdMaintenanceRunId != null ||
+      isCreateLoading ||
+      hasSentCreateMaintenanceRun.current ||
+      !isDocumentationProvided(documentationState)
+    ) {
+      return
+    }
+    hasSentCreateMaintenanceRun.current = true
+    createMaintenanceRun({})
+  }, [
+    createMaintenanceRun,
+    createdMaintenanceRunId,
+    documentationState,
+    isCreateLoading,
+  ])
 
   const commandsOnProceed: CreateCommand[] = [
     { commandType: 'home' as const, params: {} },
@@ -129,12 +141,13 @@ export const BeforeBeginning = (
     return { loadName, displayName, subtitle }
   })
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
+  }
   return errorMessage != null ? (
     <SimpleWizardBody
       isSuccess={false}

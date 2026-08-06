@@ -4,6 +4,7 @@ from typing import Annotated
 
 from fastapi import Depends
 
+from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import DeckType
 from opentrons_shared_data.robot.types import RobotType
@@ -19,6 +20,10 @@ from robot_server.hardware import get_deck_type, get_hardware, get_robot_type
 from robot_server.service.notifications import (
     MaintenanceRunsPublisher,
     get_maintenance_runs_publisher,
+)
+from robot_server.service.pyro_utils.resource_utilities import (
+    get_pyro_resource,
+    register_maintenance_run_orchestrator_store_to_pyro_resource,
 )
 
 _run_orchestrator_store_accessor = AppStateAccessor[MaintenanceRunOrchestratorStore](
@@ -37,9 +42,21 @@ async def get_maintenance_run_orchestrator_store(
 
     if run_orchestrator_store is None:
         run_orchestrator_store = MaintenanceRunOrchestratorStore(
-            hardware_api=hardware_api, robot_type=robot_type, deck_type=deck_type
+            hardware_api=hardware_api,
+            robot_type=robot_type,
+            deck_type=deck_type,
         )
         _run_orchestrator_store_accessor.set_on(app_state, run_orchestrator_store)
+        # Handle remote hardware registry, if needed
+        if feature_flags.hardware_subprocess_enabled():
+            register_maintenance_run_orchestrator_store_to_pyro_resource(
+                app_state=app_state,
+                maintenance_run_orchestrator_store=run_orchestrator_store,
+            )
+            pyro_resource = get_pyro_resource()
+            hardware_api.register_callback(
+                pyro_resource.create_maintenance_run_hardware_event_callback()
+            )
 
     return run_orchestrator_store
 

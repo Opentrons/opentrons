@@ -177,6 +177,11 @@ export const getPipetteWizardSteps = (
               flowType,
             },
             { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
+            {
+              section: SECTIONS.ATTACH_PROBE,
+              mount: LEFT,
+              flowType,
+            },
             ...(is96ChannelCalibrateAndWasteChute
               ? [
                   {
@@ -186,11 +191,6 @@ export const getPipetteWizardSteps = (
                   },
                 ]
               : []),
-            {
-              section: SECTIONS.ATTACH_PROBE,
-              mount: LEFT,
-              flowType,
-            },
             {
               section: SECTIONS.DETACH_PROBE,
               mount: LEFT,

@@ -59,6 +59,10 @@ export const PAUSE_UNTIL_TIME: 'untilTime' = 'untilTime'
 export const PAUSE_UNTIL_TEMP: 'untilTemperature' = 'untilTemperature'
 export const PAUSE_UNTIL_TC_PROFILE_COMPLETE: 'untilThermocyclerProfileComplete' =
   'untilThermocyclerProfileComplete'
+export const PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE: 'untilVacuumProfileComplete' =
+  'untilVacuumProfileComplete'
+export const PAUSE_UNTIL_VACUUM_STATE_COMPLETE: 'untilVacuumStateComplete' =
+  'untilVacuumStateComplete'
 
 export const DND_TYPES = {
   LABWARE: 'LABWARE',
@@ -171,3 +175,14 @@ export const ACCEPTED_PROTOCOL_FILE_TYPES = '.json,.py'
 
 export const HOPPER_LABWARE_X_OFFSET = 178
 export const HOPPER_ZOOM_OFFSET_POSTITION = 230
+
+// Vacuum dock is in the addressable area vacuumModuleV1DockA4, adjacent to module in A3
+// Module footprint is 143mm, dock starts at that offset
+export const VACUUM_DOCK_LABWARE_X_OFFSET = 143
+export const VACUUM_DOCK_ZOOM_OFFSET_POSITION = VACUUM_DOCK_LABWARE_X_OFFSET
+
+export const VACUUM_DOCK_DISPLAY_LOCATION: 'A4' = 'A4'
+export const VACUUM_MODULE_SLOT = 'A3'
+
+export const VACUUM_MODULE_TYPE_WITH_LABWARE: 'vacuumModuleTypeWithLabware' =
+  'vacuumModuleTypeWithLabware'

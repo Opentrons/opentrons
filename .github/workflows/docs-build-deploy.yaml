@@ -45,9 +45,9 @@ jobs:
       artifacts-path: ${{ steps.upload-artifacts.outputs.path }}
     steps:
       - name: 'Checkout Repository'
-        uses: actions/checkout@v5
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Setup UV
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
           python-version: '3.12'
           enable-cache: true
@@ -60,7 +60,7 @@ jobs:
         run: make build
       - name: Upload Artifacts
         id: upload-artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: docs-artifacts
           path: |
@@ -80,10 +80,10 @@ jobs:
       url: ${{ steps.config.outputs.url }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ./.github/actions/git/resolve-tag
       - name: Setup UV
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
           python-version: '3.12'
           enable-cache: true
@@ -112,11 +112,11 @@ jobs:
       URL: ${{ needs.determine-deploy-config.outputs.url }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - id: resolve-tag
         uses: ./.github/actions/git/resolve-tag
       - name: Setup UV
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
           python-version: '3.12'
           enable-cache: true
@@ -124,12 +124,12 @@ jobs:
         working-directory: scripts/static-deploy
         run: make setup
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
         with:
-          role-to-assume: ${{ secrets.STATIC_DEPLOYMENT_ROLE }}
+          role-to-assume: ${{ vars.STATIC_DEPLOY_ROLE }}
           aws-region: us-east-2
       - name: Download Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: docs-artifacts
           path: ./dist # in the default workspace

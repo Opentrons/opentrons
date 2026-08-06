@@ -4,7 +4,7 @@ import some from 'lodash/some'
 
 import { getRun } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { HostConfig, Run, RunError } from '@opentrons/api-client'
@@ -19,7 +19,7 @@ export function useRunQuery<TError = Error>(
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const queryClient = useQueryClient()
   const query = useQuery<Run, TError>(
-    [host, 'runs', runId, 'details'],
+    getQueryKey(host, 'runs', runId, 'details'),
     () => getRun(host!, runId!).then(response => response.data),
     {
       enabled: host !== null && runId != null && options.enabled !== false,
@@ -45,7 +45,9 @@ export function useRunQuery<TError = Error>(
           ((query.data?.data?.errors ?? []) as RunError[]).map(estopInErrorTree)
         )
       ) {
-        queryClient.invalidateQueries([host, '/robot/control'])
+        queryClient.invalidateQueries(
+          getQueryKey(host, 'robot/control/estopStatus')
+        )
       }
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.

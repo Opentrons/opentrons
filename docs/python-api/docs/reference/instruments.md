@@ -8,3 +8,4 @@ description: "Instrument and pipette API reference for the Python Protocol API."
       filters:
         - "!^__"
         - "!delay"
+        - "!^resin"

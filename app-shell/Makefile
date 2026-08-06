@@ -6,7 +6,7 @@ include ../scripts/push.mk
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd .. && yarn bin):$(PATH)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 # dev server port
 PORT ?= 3000
@@ -57,7 +57,7 @@ OPENTRONS_PROJECT ?= $(if $(filter ot3@%,$(publish_update)),ot3,robot-stack)
 # make dist no_python_bundle=true or =1 or whatever
 no_python_bundle ?=
 
-builder := yarn electron-builder \
+builder := pnpm electron-builder \
 	--config electron-builder.config.js \
 	--config.electronVersion=39.1.2 \
 	--publish never
@@ -67,7 +67,7 @@ builder := yarn electron-builder \
 # parse time. The $$() command substitution runs when the recipe executes.
 PYTHON_OVERRIDE_COMMAND = cd ../api && uv run --python 3.12 python -c "import sys, pathlib; print(pathlib.Path(sys.executable))"
 
-electron = yarn electron . \
+electron = pnpm electron . \
 	--devtools \
 	--log.level.console="debug" \
 	--disable_ui.webPreferences.webSecurity \
@@ -75,7 +75,7 @@ electron = yarn electron . \
 	--ui.url.path="localhost:$(PORT)" \
 	--python.pathToPythonOverride=$$($(PYTHON_OVERRIDE_COMMAND))
 
-electron-dist = yarn electron . \
+electron-dist = pnpm electron . \
 	--devtools \
 	--log.level.console="debug" \
 	--disable_ui.webPreferences.webSecurity \
@@ -95,18 +95,18 @@ branch-suffix:
 all: package
 
 .PHONY: setup
-# must be wrapped in yarn run otherwise `prebuild-install` will fail silently
+# must be wrapped in pnpm run otherwise `prebuild-install` will fail silently
 # due to how `electron-rebuild` calls `prebuild-install`
 setup:
-	yarn rebuild
+	pnpm rebuild
 
 .PHONY: clean
 clean:
-	yarn shx rm -rf lib dist python/install
+	pnpm shx rm -rf lib dist python/install
 
 .PHONY: cleanall
 cleanall: clean
-	yarn shx rm -rf python
+	pnpm shx rm -rf python
 
 # artifacts
 #####################################################################
@@ -168,8 +168,8 @@ dist-macos-latest: dist-osx
 .PHONY: dist-ubuntu-latest
 dist-ubuntu-latest: dist-linux
 
-.PHONY: dist-ubuntu-24.04
-dist-ubuntu-24.04: dist-linux
+.PHONY: dist-ubuntu-22.04
+dist-ubuntu-22.04: dist-linux
 
 .PHONY: dist-windows-2019
 dist-windows-2019: dist-win

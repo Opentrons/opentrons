@@ -18,6 +18,13 @@ class DevServer:
         self.port: int = port
         self._base_dir = tempfile.TemporaryDirectory()
         self._mount_dir = tempfile.TemporaryDirectory()
+        signing_key_dir = Path(self._mount_dir.name) / "signing_keys"
+        signing_key_dir.mkdir(parents=True)
+        (signing_key_dir / "audit-signing-key.private").write_bytes(
+            (
+                Path(__file__).parent / "integration" / "audit-signing-key-test.private"
+            ).read_bytes()
+        )
 
     def __enter__(self) -> DevServer:
         return self
@@ -36,6 +43,7 @@ class DevServer:
         env["OT_KEY_SERVER_secure_storage_implementation"] = "dev"
         env["OT_KEY_SERVER_base_directory"] = self._base_dir.name
         env["OT_KEY_SERVER_image_mount_point"] = self._mount_dir.name
+        env["OT_KEY_SERVER_tls_server_integration"] = "dev-none"
         # In order to collect coverage we run using `coverage`.
         # `-a` is to append to existing `.coverage` file.
         # `--source` is the source code folder to collect coverage stats on.

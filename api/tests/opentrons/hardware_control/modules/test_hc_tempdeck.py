@@ -2,11 +2,12 @@ import asyncio
 from typing import AsyncGenerator
 
 import pytest
-from decoy import Decoy
+from decoy import Decoy, matchers
 
 from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.temp_deck import DEFAULT_COMMAND_RETRIES
 from opentrons.hardware_control import ExecutionManager, modules
-from opentrons.hardware_control.modules.tempdeck import TempDeck
+from opentrons.hardware_control.modules.tempdeck import TempDeck, TempDeckReader
 from opentrons.hardware_control.modules.types import (
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
@@ -109,6 +110,31 @@ async def test_error_callback(
     exc = Exception("oh no!")
     decoy.when(await mock_get_temp()).then_raise(exc)
     monkeypatch.setattr(subject._driver, "get_temperature", mock_get_temp)
+    # TODO(sf,rh): this is EXEC-2757. wait_next_poll() doesn't handle disconnects
+    # well and will raise before any HC-module-level error handling happens, aka
+    # reconnect logic (driver-level error handling is fine, though)
+    with pytest.raises(Exception, match="oh no!"):
+        await subject._poller.wait_next_poll()
+    decoy.verify(
+        module_error_callback(
+            matchers.Anything(),
+            "temperatureModuleV1",
+            "/dev/ot_module_sim_tempdeck0",
+            "dummySerialTD",
+        ),
+        times=0,
+    )
+    with pytest.raises(Exception, match="oh no!"):
+        await subject._poller.wait_next_poll()
+    decoy.verify(
+        module_error_callback(
+            matchers.Anything(),
+            "temperatureModuleV1",
+            "/dev/ot_module_sim_tempdeck0",
+            "dummySerialTD",
+        ),
+        times=0,
+    )
     with pytest.raises(Exception, match="oh no!"):
         await subject._poller.wait_next_poll()
     decoy.verify(
@@ -116,3 +142,60 @@ async def test_error_callback(
             exc, "temperatureModuleV1", "/dev/ot_module_sim_tempdeck0", "dummySerialTD"
         )
     )
+
+
+def test_tempdeck_reader_on_error_fires_callback_after_retries_exhausted(
+    decoy: Decoy,
+) -> None:
+    """TempDeckReader.on_error should invoke the error callback exactly once
+    after DEFAULT_COMMAND_RETRIES consecutive errors."""
+    driver = decoy.mock(name="driver")
+    reader = TempDeckReader(driver=driver)
+    cb = decoy.mock(name="error_callback")
+    reader.set_error_callback(cb)
+
+    exc = Exception("boom")
+    for _ in range(DEFAULT_COMMAND_RETRIES):
+        reader.on_error(exc)
+
+    decoy.verify(cb(exc), times=1)
+
+
+def test_tempdeck_reader_on_error_recovers_after_firing(decoy: Decoy) -> None:
+    """After the callback fires and resets the debounce counter, a fresh burst
+    of errors should fire the callback again rather than running the counter
+    negative and never recovering.
+    """
+    driver = decoy.mock(name="driver")
+    reader = TempDeckReader(driver=driver)
+    cb = decoy.mock(name="error_callback")
+    reader.set_error_callback(cb)
+
+    exc = Exception("boom")
+    for _ in range(DEFAULT_COMMAND_RETRIES):
+        reader.on_error(exc)
+    for _ in range(DEFAULT_COMMAND_RETRIES):
+        reader.on_error(exc)
+
+    decoy.verify(cb(exc), times=2)
+
+
+def test_tempdeck_reader_on_error_resets_on_successful_read(decoy: Decoy) -> None:
+    """A successful read resets the debounce counter, so the next error burst
+    must again exhaust all retries before firing."""
+    driver = decoy.mock(name="driver")
+    reader = TempDeckReader(driver=driver)
+    cb = decoy.mock(name="error_callback")
+    reader.set_error_callback(cb)
+
+    exc = Exception("boom")
+    # One error short of firing.
+    for _ in range(DEFAULT_COMMAND_RETRIES - 1):
+        reader.on_error(exc)
+    decoy.verify(cb(matchers.Anything()), times=0)
+
+    reader._debounce_count = DEFAULT_COMMAND_RETRIES
+
+    for _ in range(DEFAULT_COMMAND_RETRIES - 1):
+        reader.on_error(exc)
+    decoy.verify(cb(matchers.Anything()), times=0)

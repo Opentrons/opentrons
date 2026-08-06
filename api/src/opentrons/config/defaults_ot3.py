@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import asdict
-from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Optional, Tuple, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, cast
 
 from typing_extensions import Final
 
@@ -489,20 +488,19 @@ def serialize(config: OT3Config) -> Dict[str, Any]:
     # inline import prevents circular import error from hardware_control.types
     from opentrons.hardware_control.types import InstrumentProbeType
 
-    def _build_dict(pairs: Iterable[Tuple[Any, Any]]) -> Dict[str, Any]:
-        def _normalize_key(key: Any) -> Any:
-            if isinstance(key, OT3AxisKind) or isinstance(key, InstrumentProbeType):
-                return key.name
-            return key
+    def _scrub_key_types(obj: Any, target_type: Any) -> Any:
+        if isinstance(obj, dict):
+            new = {}
+            for k, v in obj.items():
+                new_key = k.name if isinstance(k, target_type) else k
+                new[new_key] = _scrub_key_types(v, target_type)
+            return new
+        if isinstance(obj, list):
+            return [_scrub_key_types(i, target_type) for i in obj]
+        return obj
 
-        def _normalize_value(value: Any) -> Any:
-            if isinstance(value, dict):
-                return {
-                    _normalize_key(k): _normalize_value(v) for k, v in value.items()
-                }
-            else:
-                return value
+    raw = config.model_dump()
+    clean_axis: Dict[str, Any] = _scrub_key_types(raw, OT3AxisKind)
+    clean_probe: Dict[str, Any] = _scrub_key_types(clean_axis, InstrumentProbeType)
 
-        return dict((_normalize_key(key), _normalize_value(val)) for key, val in pairs)
-
-    return asdict(config, dict_factory=_build_dict)
+    return clean_probe

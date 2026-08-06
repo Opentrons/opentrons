@@ -2,6 +2,8 @@ import last from 'lodash/last'
 import uniq from 'lodash/uniq'
 import { createSelector } from 'reselect'
 
+import { COMMAND_CREATOR_ARGS_FOR_OAI } from '@opentrons/shared-data'
+
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType'
 import { getLabwareOnModule } from '../modules/utils'
@@ -46,14 +48,16 @@ const getSelectedItem: Selector<SelectableItem> = createSelector(
       // (or the initial selected item, if there are no more saved steps).
       // Ideally this would happen in the selectedItem reducer itself,
       // but it's not easy to feed orderedStepIds into that reducer.
-      if (orderedStepIds.length > 0)
+      if (orderedStepIds.length > 0) {
         return {
           selectionType: SINGLE_STEP_SELECTION_TYPE,
           // This non-null assertion is safe because the length is checked above.
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           id: last(orderedStepIds)!,
         }
-      else return initialSelectedItemState
+      } else {
+        return initialSelectedItemState
+      }
     }
   }
 )
@@ -165,10 +169,10 @@ export const getHoveredStepLabware = createSelector(
     if (
       !(stepArgs.commandCreatorFnName === 'delay') &&
       !(stepArgs.commandCreatorFnName === 'comment') &&
-      !(stepArgs.commandCreatorFnName === 'captureImage')
+      !(stepArgs.commandCreatorFnName === 'captureImage') &&
+      !COMMAND_CREATOR_ARGS_FOR_OAI.includes(stepArgs.commandCreatorFnName)
     ) {
       console.warn(
-        //  @ts-expect-error: should only reach this warning when new step is added and
         //  highlighted wells is not yet implemented
         `getHoveredStepLabware does not support step type "${stepArgs.commandCreatorFnName}"`
       )

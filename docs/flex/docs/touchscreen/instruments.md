@@ -6,7 +6,7 @@ description: "View and manage pipettes and modules from the touchscreen."
 The Instruments screen is an interactive list of all instruments that you've connected to your Flex. The list is organized by mount: left pipette mount, right pipette mount, and extension mount.
 
 <figure class="screenshot" markdown>
-![Instruments screen showing a Flex 8-Channel 50 µL pipette on the left mount. The right mount and extension mount are empty.](../images/touchscreen-instruments.png "Instruments list")
+![Instruments screen showing a Flex 8-Channel 50 µL pipette on the left mount. The right mount and extension mount are empty.](../images/touchscreen_instruments.png "Instruments list")
 </figure>
 
 For an empty mount, tap anywhere on the row to begin the process of attaching an instrument.

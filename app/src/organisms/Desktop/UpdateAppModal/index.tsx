@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -88,6 +89,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const isOEMMode = useIsOEMMode()
   const updateState = useSelector(getShellUpdateState)
+  const [doUpdateWhenReady, setDoUpdateWhenReady] = useState<boolean>(false)
   const {
     downloaded,
     downloading,
@@ -108,8 +110,11 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
   const { removeActiveAppUpdateToast } = useRemoveActiveAppUpdateToast()
   const availableAppUpdateVersion = useSelector(getAvailableShellUpdate) ?? ''
 
-  if (downloaded)
-    setTimeout(() => dispatch(applyShellUpdate()), RESTART_APP_AFTER_TIME)
+  useEffect(() => {
+    if (downloaded && doUpdateWhenReady) {
+      setTimeout(() => dispatch(applyShellUpdate()), RESTART_APP_AFTER_TIME)
+    }
+  }, [downloaded, doUpdateWhenReady, dispatch])
 
   const handleRemindMeLaterClick = (): void => {
     navigate('/app-settings/general')
@@ -131,7 +136,6 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
         css={css`
           font-size: 0.875rem;
         `}
-        id="SoftwareUpdateReleaseNotesLink"
         marginLeft={SPACING.spacing32}
       >
         {t('release_notes')}
@@ -144,10 +148,13 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
           {t('remind_later')}
         </SecondaryButton>
         <PrimaryButton
-          onClick={() => dispatch(downloadShellUpdate())}
+          onClick={() => {
+            dispatch(downloadShellUpdate())
+            setDoUpdateWhenReady(true)
+          }}
           marginRight={SPACING.spacing12}
         >
-          {t('update_app_now')}
+          {t('update_and_restart')}
         </PrimaryButton>
       </Flex>
     </Flex>
@@ -166,7 +173,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
           <PlaceholderError errorMessage={error.message} />
         </Modal>
       ) : null}
-      {(downloading || downloaded) && error == null ? (
+      {doUpdateWhenReady && error == null ? (
         <Modal
           title={t('branded:opentrons_app_update')}
           css={LEGACY_MODAL_STYLE}
@@ -186,7 +193,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
           </Flex>
         </Modal>
       ) : null}
-      {!downloading && !downloaded && error == null ? (
+      {!doUpdateWhenReady && error == null ? (
         <Modal
           title={t('branded:opentrons_app_update_available')}
           onClose={() => {

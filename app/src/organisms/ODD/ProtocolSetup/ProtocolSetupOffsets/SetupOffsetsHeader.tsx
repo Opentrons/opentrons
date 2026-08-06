@@ -1,15 +1,10 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { css } from 'styled-components'
 
-import {
-  Chip,
-  Flex,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-} from '@opentrons/components'
+import { Chip, SPACING } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { useApplyOffsets } from '/app/organisms/LabwarePositionCheck'
 import {
@@ -17,6 +12,8 @@ import {
   selectIsAnyNecessaryDefaultOffsetMissing,
 } from '/app/redux/protocol-runs'
 import { useUpdateClientLPC } from '/app/resources/client_data'
+
+import styles from './setupoffsetsheader.module.css'
 
 import type { ProtocolSetupOffsetsProps } from '/app/organisms/ODD/ProtocolSetup'
 
@@ -31,8 +28,12 @@ export function SetupOffsetsHeader({
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
   const { updateWithRunId } = useUpdateClientLPC()
+  const documentationState = useDocumentationState()
 
-  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(runId)
+  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(
+    runId,
+    documentationState
+  )
   const onApplyOffsets = (): void => {
     void applyOffsets().then(() => {
       dispatch(appliedOffsetsToRun(runId))
@@ -42,7 +43,7 @@ export function SetupOffsetsHeader({
   }
 
   return (
-    <Flex css={CONTAINER_STYLE}>
+    <div className={styles.header_container}>
       <ODDBackButton
         label={t('labware_offsets')}
         onClick={() => {
@@ -67,11 +68,6 @@ export function SetupOffsetsHeader({
           padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
         />
       )}
-    </Flex>
+    </div>
   )
 }
-
-const CONTAINER_STYLE = css`
-  justify-content: ${JUSTIFY_SPACE_BETWEEN};
-  padding: ${SPACING.spacing32} ${SPACING.spacing40};
-`

@@ -23,6 +23,8 @@ export type CONFIG_TOGGLE_VALUE_TYPE = 'config:TOGGLE_VALUE'
 export type CONFIG_ADD_UNIQUE_VALUE_TYPE = 'config:ADD_UNIQUE_VALUE'
 export type CONFIG_SUBTRACT_VALUE_TYPE = 'config:SUBTRACT_VALUE'
 export type CONFIG_VALUE_UPDATED_TYPE = 'config:VALUE_UPDATED'
+export type CHANGE_AUDIT_LOG_DIRECTORY_TYPE =
+  'log-location:CHANGE_AUDIT_LOG_DIRECTORY'
 
 export type POLL_TYPE = 'poll'
 export type INITIAL_TYPE = 'initial'
@@ -95,6 +97,7 @@ export type USB_HTTP_REQUESTS_START_TYPE = 'shell:USB_HTTP_REQUESTS_START'
 export type USB_HTTP_REQUESTS_STOP_TYPE = 'shell:USB_HTTP_REQUESTS_STOP'
 export type APP_RESTART_TYPE = 'shell:APP_RESTART'
 export type RELOAD_UI_TYPE = 'shell:RELOAD_UI'
+export type OT2_APP_OPEN_TYPE = 'shell:OT2_APP_OPEN'
 export type SEND_LOG_TYPE = 'shell:SEND_LOG'
 export type CAMERA_STREAM_OPEN_TYPE = 'shell:CAMERA_STREAM_OPEN'
 

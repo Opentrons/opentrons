@@ -27,16 +27,11 @@ def _wait_until_ready(base_url: str) -> None:
             if now - started > _INTEGRATION_SERVER_STARTUP_TIMEOUT_S:
                 raise RuntimeError("Could not start dev server")
             try:
-                health_response = requests_session.get(f"{base_url}/health")
+                requests_session.get(f"{base_url}/external/settings")
             except requests.ConnectionError:
                 # The server isn't up yet to accept requests. Keep polling.
                 pass
             else:
-                if health_response.status_code == 503:
-                    # The server is accepting requests but reporting not ready. Keep polling.
-                    pass
-                else:
-                    # The server's replied with something other than a busy indicator. Stop polling.
-                    return
+                return
 
             time.sleep(0.1)

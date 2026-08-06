@@ -4,8 +4,8 @@
   align-items: center;
 }
 
-.warning_color {
-  color: var(--yellow-60);
+.error_color {
+  color: var(--red-50);
 }
 
 .default_color {
@@ -72,17 +72,16 @@
   border: 1px solid var(--red-50);
 }
 
-.textarea_background_error {
-  border: none;
-  background-color: var(--red-30);
-}
-
 .label_text {
   padding-bottom: var(--spacing-4);
   color: var(--grey-60);
   font-size: var(--font-size-h3);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-20);
+}
+
+.label_text_error {
+  color: var(--red-50);
 }
 
 .label_text_left {
@@ -101,4 +100,35 @@
 .error_text {
   padding-top: var(--spacing-4);
   color: var(--red-50);
+}
+
+/* Stretch label + textarea to fill a flex column parent. */
+.wrapper_multiline {
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.column_container_multiline {
+  min-height: 0;
+  flex: 1;
+}
+
+.clickable_column_multiline {
+  min-height: 0;
+  flex: 1;
+}
+
+.textarea_row_multiline {
+  min-height: 0;
+  flex: 1;
+  align-items: stretch;
+}
+
+.textarea_multiline {
+  height: 100%;
+  min-height: 0;
+  flex: 1;
 }

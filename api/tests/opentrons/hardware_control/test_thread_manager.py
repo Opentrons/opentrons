@@ -70,14 +70,16 @@ async def test_module_cache_remove_entry() -> None:
 
     # The coroutine must be called using the threadmanager's loop.
     future = asyncio.run_coroutine_threadsafe(
-        thread_manager._backend.module_controls.register_modules(
-            removed_mods_at_ports=[
+        thread_manager._backend.module_controls.register_devices(
+            removed_devices_at_ports=[
                 ModuleAtPort(port="/dev/ot_module_sim_tempdeck111", name="tempdeck")
             ]
         ),
         loop,
     )
     future.result()
+    # give the cleanup task time
+    await asyncio.sleep(0.2)
     mods_after = thread_manager.attached_modules
     assert len(mods_after) == 1
 

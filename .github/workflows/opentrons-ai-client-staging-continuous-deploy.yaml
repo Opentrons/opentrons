@@ -31,7 +31,7 @@ jobs:
     name: 'OpentronsAI client edge continuous deployment to staging'
     timeout-minutes: 10
     steps:
-      - uses: 'actions/checkout@v6'
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.ref }}
       - uses: ./.github/actions/js/setup
@@ -42,10 +42,10 @@ jobs:
         run: |
           make -C opentrons-ai-client build-staging
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v6
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
         with:
-          role-to-assume: ${{ secrets.STAGING_AI_ROLE_ARN }}
-          aws-region: ${{ secrets.STAGING_AI_REGION }}
+          role-to-assume: ${{ vars.STAGING_AI_ROLE_ARN }}
+          aws-region: ${{ vars.STAGING_AI_REGION }}
       - name: 'deploy to staging'
         run: |
           make -C opentrons-ai-client staging-deploy

@@ -1,0 +1,54 @@
+.container {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
+.content_container {
+  display: flex;
+  width: 100%;
+  max-width: 59rem;
+  flex: 1;
+  flex-direction: column;
+  padding: 0 var(--spacing-60) var(--spacing-120);
+  margin-top: 7.75rem;
+  gap: var(--spacing-24);
+}
+
+.text_area_container {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.text_area_container_keyboard_expanded {
+  height: 13.5625rem;
+}
+
+.text_area_container_keyboard_collapsed {
+  height: 24.75rem;
+}
+
+.text_area_field_fill {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.keyboard_container {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.overlay {
+  position: fixed;
+  z-index: 1000;
+  background-color: var(--white);
+  inset: 0;
+}

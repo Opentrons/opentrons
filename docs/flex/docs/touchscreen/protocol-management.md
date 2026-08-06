@@ -12,7 +12,7 @@ There are two sections of the All Protocols screen:
 - Other protocols: A vertical list at the bottom of the screen.
 
 <figure class="screenshot" markdown>
-![The All Protocols screen, showing pinned protocols at the top and other protocols at the bottom.](../images/touchscreen-all-protocols.png "All Protocols screen")
+![The All Protocols screen, showing pinned protocols at the top and other protocols at the bottom.](../images/touchscreen_all_protocols.png "All Protocols screen")
 </figure>
 
 Regardless of which section a protocol is in, its card or list entry includes information about when it was last run and when it was added to this robot.

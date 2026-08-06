@@ -38,6 +38,8 @@ async def subject(mock_serial: MagicMock) -> AsyncSerial:
         executor=ThreadPoolExecutor(),
         loop=asyncio.get_running_loop(),
         reset_buffer_before_write=False,
+        baud_rate=115200,
+        timeout=10,
     )
 
 

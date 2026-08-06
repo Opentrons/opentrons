@@ -6,7 +6,7 @@ name: 'G-Code Testing Lint & Test'
 on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   push:
-    paths:
+    paths: &paths
       - 'Makefile'
       - 'api/**'
       - 'g-code-testing/**'
@@ -19,14 +19,7 @@ on:
       - 'release'
       - '*hotfix*'
   pull_request:
-    paths:
-      - 'Makefile'
-      - 'g-code-testing/**'
-      - 'api/**'
-      - 'scripts/**.mk'
-      - 'scripts/**.py'
-      - '.github/workflows/g-code-testing-lint-test.yaml'
-      - '.github/actions/python/**'
+    paths: *paths
   workflow_dispatch:
 
 concurrency:
@@ -42,20 +35,21 @@ jobs:
     name: 'g-code-testing package linting and tests'
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: 'actions/checkout@v4'
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: 'pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320' # v4.4.0
         with:
-          fetch-depth: 0
+          version: 10.32.1
       - name: 'install udev'
         run: |
           # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update && sudo apt-get install libudev-dev
-      - uses: 'actions/setup-node@v6'
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: '22.22.0'
       - name: 'set complex environment variables'
         id: 'set-vars'
-        uses: actions/github-script@v6
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
         with:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
@@ -63,24 +57,21 @@ jobs:
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'g-code-testing'
-      - name: 'cache yarn cache'
-        uses: actions/cache@v4
+      - name: 'cache pnpm cache'
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
             ${{ github.workspace }}/.npm-cache/_prebuild
-            ${{ github.workspace }}/.yarn-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-      - name: 'setup-js'
+            ${{ github.workspace }}/.pnpm-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-
+      - name: 'setup-js-ci'
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
-          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
-          make setup-js
+          pnpm config set cache ${{ github.workspace }}/.pnpm-cache
+          make setup-js-ci
       - name: Lint
         run: make -C g-code-testing lint
       - name: Test
         run: make -C g-code-testing test
-      - name: 'Upload coverage report'
-        uses: 'codecov/codecov-action@v3'
-        with:
-          files: ./g-code-testing/coverage.xml
-          flags: g-code-testing

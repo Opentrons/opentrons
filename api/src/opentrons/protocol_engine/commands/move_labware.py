@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 from typing_extensions import (
     Literal,
+    NotRequired,
     TypedDict,
     assert_type,
 )  # note: need this instead of typing for py<3.12
@@ -25,9 +26,11 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 
 from ..errors import (
+    LabwareIsNotAllowedInLocationError,
     LabwareMovementNotAllowedError,
     LabwareOffsetDoesNotExistError,
     NotSupportedOnRobotType,
+    VacuumModuleStillUnderVacuumError,
 )
 from ..errors.error_occurrence import ErrorOccurrence
 from ..resources import fixture_validation, labware_validation
@@ -142,6 +145,27 @@ class ErrorDetails(TypedDict):
     eventualDestinationLocationSequence: LabwareLocationSequence
 
 
+class VacuumModuleUnderVacuumMovementErrorInfo(TypedDict):
+    """Details for a failed moveLabware due to residual vacuum."""
+
+    moduleId: str
+    currentGaugePressureMbar: NotRequired[float]
+
+
+class VacuumModuleUnderVacuumMovementError(ErrorOccurrence):
+    """Returned when trying to move labware while a Vacuum Module is still under vacuum.
+
+    The pump is not engaged, but the chamber has not yet returned to atmospheric
+    pressure. This error is recoverable by waiting and retrying the move.
+    """
+
+    isDefined: bool = True
+
+    errorType: Literal["vacuumModuleUnderVacuum"] = "vacuumModuleUnderVacuum"
+
+    errorInfo: VacuumModuleUnderVacuumMovementErrorInfo
+
+
 class GripperMovementError(ErrorOccurrence):
     """Returned when something physically goes wrong when the gripper moves labware.
 
@@ -155,7 +179,11 @@ class GripperMovementError(ErrorOccurrence):
     errorInfo: ErrorDetails
 
 
-_ExecuteReturn = SuccessData[MoveLabwareResult] | DefinedErrorData[GripperMovementError]
+_ExecuteReturn = (
+    SuccessData[MoveLabwareResult]
+    | DefinedErrorData[GripperMovementError]
+    | DefinedErrorData[VacuumModuleUnderVacuumMovementError]
+)
 
 
 class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteReturn]):
@@ -205,6 +233,7 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 not fixture_validation.is_gripper_waste_chute(area_name)
                 and not fixture_validation.is_deck_slot(area_name)
                 and not fixture_validation.is_trash(area_name)
+                and not fixture_validation.is_vac_dock(area_name)
             ):
                 raise LabwareMovementNotAllowedError(
                     f"Cannot move {current_labware.loadName} to addressable area {area_name}"
@@ -212,6 +241,17 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
                 area_name
             )
+
+            # If this is an addressable area check if this is a modulefixture
+            module = self._state_view.modules.get_by_addressable_area(
+                area_name, self._state_view.addressable_areas.deck_definition
+            )
+            # If this is the vacuum module dock, check labware compatability
+            if module is not None and module.model == ModuleModel.VACUUM_MODULE_V1:
+                self._state_view.labware.raise_if_labware_incompatible_with_vacuum_module_dock(
+                    params.newLocation, current_labware_definition
+                )
+
             state_update.set_addressable_area_used(addressable_area_name=area_name)
 
             if fixture_validation.is_gripper_waste_chute(area_name):
@@ -271,12 +311,40 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 addressable_area_name=params.newLocation.slotName.id
             )
 
+        if isinstance(params.newLocation, DeckSlotLocation):
+            if not labware_validation.validate_definition_is_deck_slot_compatible(
+                current_labware_definition
+            ):
+                raise LabwareIsNotAllowedInLocationError(
+                    f'Labware "{current_labware.loadName}" cannot be moved onto a deck slot.'
+                )
+        elif isinstance(params.newLocation, AddressableAreaLocation):
+            area_name = params.newLocation.addressableAreaName
+            if fixture_validation.is_deck_slot(
+                area_name
+            ) and not labware_validation.validate_definition_is_deck_slot_compatible(
+                current_labware_definition
+            ):
+                raise LabwareIsNotAllowedInLocationError(
+                    f'Labware "{current_labware.loadName}" cannot be moved onto a deck slot.'
+                )
+
         available_new_location = self._state_view.geometry.ensure_location_not_occupied(
-            location=params.newLocation
+            params.newLocation, None, current_labware_definition
         )
 
-        # Check that labware and destination do not have labware on top
-        self._state_view.labware.raise_if_labware_has_non_lid_labware_on_top(
+        # Only allow moving if the labware has nothing on top, unless it's a movable adapter.
+        # Movable adapters (e.g. manifold collar) are permitted to carry labware.
+        if (
+            current_labware_definition is not None
+            and not current_labware_definition.parameters.isMovableAdapter
+        ):
+            self._state_view.labware.raise_if_labware_has_non_lid_labware_on_top(
+                labware_id=params.labwareId
+            )
+
+        # Block move if this labware is contained inside another labware
+        self._state_view.labware.raise_if_labware_is_contained(
             labware_id=params.labwareId
         )
 
@@ -315,9 +383,23 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             labware_definition_uri=definition_uri,
             labware_location=available_new_location,
         )
-        await self._labware_movement.ensure_movement_not_obstructed_by_module(
-            labware_id=params.labwareId, new_location=available_new_location
-        )
+        try:
+            await self._labware_movement.ensure_movement_not_obstructed_by_module(
+                labware_id=params.labwareId, new_location=available_new_location
+            )
+        except VacuumModuleStillUnderVacuumError as error:
+            return DefinedErrorData(
+                public=VacuumModuleUnderVacuumMovementError(
+                    id=self._model_utils.generate_id(),
+                    createdAt=self._model_utils.get_timestamp(),
+                    detail=error.message,
+                    errorInfo={
+                        "moduleId": error.module_id,
+                        "currentGaugePressureMbar": error.current_gauge_pressure_mbar,
+                    },
+                ),
+                state_update=state_update,
+            )
 
         if params.strategy == LabwareMovementStrategy.USING_GRIPPER:
             if self._state_view.config.robot_type == "OT-2 Standard":
@@ -333,8 +415,11 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     f" If trying to move a labware on an adapter, load the adapter separately to allow"
                     f" gripper movement."
                 )
-            if labware_validation.validate_definition_is_adapter(
-                current_labware_definition
+            if (
+                labware_validation.validate_definition_is_adapter(
+                    current_labware_definition
+                )
+                and not current_labware_definition.parameters.isMovableAdapter
             ):
                 raise LabwareMovementNotAllowedError(
                     f"Cannot move adapter '{current_labware_definition.parameters.loadName}' with gripper."
@@ -516,7 +601,7 @@ class MoveLabware(
     BaseCommand[
         MoveLabwareParams,
         MoveLabwareResult,
-        GripperMovementError,
+        GripperMovementError | VacuumModuleUnderVacuumMovementError,
     ]
 ):
     """A ``moveLabware`` command."""

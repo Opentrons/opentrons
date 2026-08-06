@@ -22,10 +22,10 @@ on:
     branches:
       - 'edge'
       - 'chore_release*'
-      - 'pd-test*'
     tags:
       - 'protocol-designer*'
       - 'staging-protocol-designer*'
+      - 'pd-test*'
   workflow_dispatch: {}
 
 concurrency:
@@ -54,10 +54,10 @@ jobs:
       relative_artifact_dir: ${{ steps.deploy-config.outputs.RELATIVE_ARTIFACT_DIR }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ./.github/actions/git/resolve-tag
       - name: Setup UV
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
           python-version: '3.12'
       - name: Setup Deploy Dependencies
@@ -76,15 +76,10 @@ jobs:
     if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     steps:
       - name: 'Checkout Repository'
-        uses: actions/checkout@v5
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ./.github/actions/js/setup
       - name: 'run unit tests'
         run: make -C protocol-designer test-cov
-      - name: 'Upload coverage report'
-        uses: codecov/codecov-action@v5
-        with:
-          flags: protocol-designer
-          token: ${{ secrets.CODECOV_TOKEN }}
 
   build-pd:
     timeout-minutes: 20
@@ -93,7 +88,7 @@ jobs:
       - determine-deploy-config
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0 # Unlimited fetch depth. Required for getsentry/action-release.
       - id: resolve-tag
@@ -108,12 +103,12 @@ jobs:
           NODE_OPTIONS: '--max-old-space-size=5120'
           OT_PD_MIXPANEL_ID: ${{ secrets.OT_PD_MIXPANEL_ID }}
           OT_PD_MIXPANEL_DEV_ID: ${{ secrets.OT_PD_MIXPANEL_DEV_ID }}
-          OT_PD_SENTRY_DSN: ${{ secrets.OT_PD_SENTRY_DSN }}
+          OT_PD_SENTRY_DSN: ${{ vars.OT_PD_SENTRY_DSN }}
           OT_PD_SENTRY_DEV_DSN: ${{ secrets.OT_PD_SENTRY_DEV_DSN }}
           # Used by @sentry/vite-plugin (sourcemap upload is gated by OT_PD_SENTRY_PLUGIN_UPLOAD).
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
           # Only meaningful for tagged releases; empty string is treated as absent.
           SENTRY_RELEASE: ${{ github.ref_type == 'tag' && steps.version.outputs.number || '' }}
           # Opt-in CI sourcemap upload via the Vite plugin (staging/prod tagged releases only).
@@ -123,11 +118,11 @@ jobs:
       - name: 'update the release in Sentry with build metadata'
         # Only on production or staging releases (protocol-designer* or staging-protocol-designer*)
         if: github.ref_type == 'tag' && (startsWith(github.ref, 'refs/tags/protocol-designer') || startsWith(github.ref, 'refs/tags/staging-protocol-designer')) && (needs.determine-deploy-config.outputs.environment == 'production' || needs.determine-deploy-config.outputs.environment == 'staging')
-        uses: getsentry/action-release@v3
+        uses: getsentry/action-release@5657c9e888b4e2cc85f4d29143ea4131fde4a73a # v3.6.0
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
         with:
           release: ${{ steps.version.outputs.number }}
           set_commits: auto
@@ -135,7 +130,7 @@ jobs:
           finalize: false
           environment: ${{ needs.determine-deploy-config.outputs.environment }}
       - name: 'upload github artifact'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: 'pd-artifact'
           path: protocol-designer/dist
@@ -161,21 +156,19 @@ jobs:
       contents: read
     steps:
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
         with:
-          role-to-assume: ${{ secrets.STATIC_DEPLOYMENT_ROLE }}
+          role-to-assume: ${{ vars.STATIC_DEPLOY_ROLE }}
           aws-region: us-east-2
       - name: Checkout Repository
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - id: resolve-tag
         uses: ./.github/actions/git/resolve-tag
       - name: 'extract version from tag'
         id: version
         run: echo "number=${GITHUB_REF_NAME##*@}" >> $GITHUB_OUTPUT
       - name: Setup UV
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
           python-version: '3.12'
       - name: Setup Deploy Dependencies
@@ -184,7 +177,7 @@ jobs:
           make setup
 
       - name: 'download PD build'
-        uses: 'actions/download-artifact@v4'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: pd-artifact
           path: ./dist # in the default workspace
@@ -201,11 +194,11 @@ jobs:
       - name: 'finalize the production release in Sentry'
         # Only on production or staging releases (protocol-designer* or staging-protocol-designer*)
         if: github.ref_type == 'tag' && (startsWith(github.ref, 'refs/tags/protocol-designer') || startsWith(github.ref, 'refs/tags/staging-protocol-designer'))
-        uses: getsentry/action-release@v3
+        uses: getsentry/action-release@5657c9e888b4e2cc85f4d29143ea4131fde4a73a # v3.6.0
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
         with:
           release: ${{ steps.version.outputs.number }}
           finalize: true
@@ -218,7 +211,7 @@ jobs:
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.unit-test.result == 'success' || needs.unit-test.result == 'skipped') && needs.build-pd.result == 'success' && needs.deploy-pd.result == 'success'
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'Send success alert'
         uses: ./.github/actions/simple-build-alert
         with:
@@ -233,7 +226,7 @@ jobs:
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.unit-test.result == 'failure' || needs.build-pd.result == 'failure' || needs.deploy-pd.result == 'failure')
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'Determine failed jobs'
         id: failed-jobs
         shell: bash
@@ -267,7 +260,7 @@ jobs:
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.unit-test.result == 'cancelled' || needs.build-pd.result == 'cancelled' || needs.deploy-pd.result == 'cancelled')
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'Send cancelled alert'
         uses: ./.github/actions/simple-build-alert
         with:

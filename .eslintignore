@@ -6,15 +6,18 @@
 **/venv/**
 .opentrons_config
 **/tsconfig*.json
-# prettier
 **/package.json
+**/pnpm-lock.yaml
 **/CHANGELOG.md
 !api/release-notes.md
 !app-shell/build/release-notes.md
-**/.yarn-cache/**
 
 # components library
 storybook-static
+
+# js-package-testing
+js-package-testing/pack/**
+js-package-testing/test-results/**
 
 # python projects and tools
 **/.mypy_cache/**
@@ -40,6 +43,9 @@ analyses-snapshot-testing/chunks
 
 opentrons-ai-server/package
 opentrons-ai-server/api/storage/
+
+# MkDocs build output (generated; may exist locally after `mkdocs build`, gitignored)
+docs/**/site/**
 
 # Leave Markdown formatting alone because some of it is load-bearing for MkDocs.
 # Note that this is a Prettier thing, not an ESLint thing. Prettier shares this config file.

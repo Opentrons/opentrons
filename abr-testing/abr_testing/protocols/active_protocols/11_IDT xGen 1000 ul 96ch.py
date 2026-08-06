@@ -18,7 +18,7 @@ metadata = {
 }
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.27",
+    "apiLevel": "2.28",
 }
 
 
@@ -155,14 +155,14 @@ def run(protocol: ProtocolContext) -> None:
     )
 
     reagent_plate_2 = protocol.load_labware(
-        "greiner_384_wellplate_240ul", "B3", "Reagent Plate 2"
+        "opentrons_96_wellplate_200ul_pcr_full_skirt", "B3", "Reagent Plate 2"
     )
     # ========== THIRD ROW ===========
     temp_block: TemperatureModuleContext = protocol.load_module(
         run_helpers.temp_str, "C1"
     )  # type: ignore[assignment]
     reagent_plate_1 = temp_block.load_labware(
-        "greiner_384_wellplate_240ul", "Reagent Plate 1"
+        "opentrons_96_wellplate_200ul_pcr_full_skirt", "Reagent Plate 1"
     )
     ETOH_Reservoir = protocol.load_labware(
         "nest_96_wellplate_2ml_deep", "C2", "EtOH Reservoir"
@@ -202,38 +202,8 @@ def run(protocol: ProtocolContext) -> None:
     Reagent_Vol_Adapter = 5
     Reagent_Vol_LIG = 25
 
-    Row_Quadrant12 = ["A", "C", "E", "G", "I", "K", "M", "O"]
-    Row_Quadrant34 = ["B", "D", "F", "H", "J", "L", "N", "P"]
     Row_96 = ["A", "B", "C", "D", "E", "F", "G", "H"]
 
-    Column_Quadrant13 = [
-        "1",
-        "3",
-        "5",
-        "7",
-        "9",
-        "11",
-        "13",
-        "15",
-        "17",
-        "19",
-        "21",
-        "23",
-    ]
-    Column_Quadrant24 = [
-        "2",
-        "4",
-        "6",
-        "8",
-        "10",
-        "12",
-        "14",
-        "16",
-        "18",
-        "20",
-        "22",
-        "24",
-    ]
     Column_96 = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
 
     # ======== DEFINING LIQUIDS =======
@@ -307,43 +277,43 @@ def run(protocol: ProtocolContext) -> None:
     Barcodes = reagent_plate_2["B1"]
 
     # Reagent Plate 1
-    for row in Row_Quadrant12:
+    for row in Row_96:
         if FRAG_MODE == "EZ":
-            for col in Column_Quadrant13:
+            for col in Column_96:
                 reagent_plate_1.wells_by_name()[row + col].load_liquid(
                     liquid=Reagent_FRERAT, volume=Reagent_Vol_FRERAT
                 )
-            for col in Column_Quadrant13:
+            for col in Column_96:
                 reagent_plate_1.wells_by_name()[row + col].load_liquid(
                     liquid=Reagent_ERAT, volume=Reagent_Vol_ERAT
                 )
-        for col in Column_Quadrant24:
+        for col in Column_96:
             reagent_plate_1.wells_by_name()[row + col].load_liquid(
                 liquid=Reagent_LIG, volume=Reagent_Vol_LIG
             )
-    for row in Row_Quadrant34:
-        for col in Column_Quadrant13:
+    for row in Row_96:
+        for col in Column_96:
             reagent_plate_1.wells_by_name()[row + col].load_liquid(
                 liquid=Reagent_PCR, volume=Reagent_Vol_PCR * (1 / 12)
             )
-        for col in Column_Quadrant24:
+        for col in Column_96:
             reagent_plate_1.wells_by_name()[row + col].load_liquid(
                 liquid=Reagent_RSB, volume=Reagent_Vol_RSB * (1 / 12)
             )
 
-    # Reagent Plate 1
-    for row in Row_Quadrant12:
-        for col in Column_Quadrant13:
+    # Reagent Plate 2
+    for row in Row_96:
+        for col in Column_96:
             reagent_plate_2.wells_by_name()[row + col].load_liquid(
                 liquid=Reagent_CleanupBead,
                 volume=Reagent_Vol_CleanupBead_Volume,
             )
-        for col in Column_Quadrant24:
+        for col in Column_96:
             reagent_plate_2.wells_by_name()[row + col].load_liquid(
                 liquid=Reagent_Adapter, volume=Reagent_Vol_Adapter
             )
-    for row in Row_Quadrant34:
-        for col in Column_Quadrant13:
+    for row in Row_96:
+        for col in Column_96:
             reagent_plate_2.wells_by_name()[row + col].load_liquid(
                 liquid=Reagent_Barcodes, volume=5
             )
@@ -405,20 +375,10 @@ def run(protocol: ProtocolContext) -> None:
                 FRERATMixVol + 1,
                 FRERAT.bottom(z=dot_bottom),
             )
-            p1000.aspirate(
-                FRERATVol + 1,
-                location=FRERAT.meniscus(z=-1, target="start"),
-                end_location=FRERAT.meniscus(z=-1, target="end"),
-            )
+            p1000.aspirate(FRERATVol + 1, location=FRERAT.bottom(1))
             p1000.dispense(1, FRERAT.bottom(z=dot_bottom))
             p1000.dispense(
-                FRERATVol,
-                location=sample_plate_1.wells_by_name()["A1"].meniscus(
-                    z=-1, target="start"
-                ),
-                end_location=sample_plate_1.wells_by_name()["A1"].meniscus(
-                    z=-1, target="end"
-                ),
+                FRERATVol, location=sample_plate_1.wells_by_name()["A1"].bottom(1)
             )
             p1000.mix(FRERATMixRep, FRERATMixVol)
             p1000.move_to(sample_plate_1["A1"].top(z=-3))
@@ -477,13 +437,7 @@ def run(protocol: ProtocolContext) -> None:
             p1000.pick_up_tip(tiprack_50_1["A1"])
             p1000.aspirate(ERATVol, ERAT.bottom(z=0.5))
             p1000.dispense(
-                ERATVol,
-                location=sample_plate_1.wells_by_name()["A1"].meniscus(
-                    z=-1, target="start"
-                ),
-                end_location=sample_plate_1.wells_by_name()["A1"].meniscus(
-                    z=-1, target="end"
-                ),
+                ERATVol, location=sample_plate_1.wells_by_name()["A1"].bottom(1)
             )
             p1000.mix(ERATMixRep, ERATMixVol, rate=0.5)
             p1000.move_to(sample_plate_1["A1"].top(z=-3))
@@ -543,19 +497,9 @@ def run(protocol: ProtocolContext) -> None:
             p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
             # ===============================================
             p1000.pick_up_tip(tiprack_50_2["A1"])
-            p1000.aspirate(
-                AdapterVol + 1,
-                location=Adapter.meniscus(z=-1, target="start"),
-                end_location=Adapter.meniscus(z=-1, target="end"),
-            )
+            p1000.aspirate(AdapterVol + 1, location=Adapter.bottom(1))
             p1000.dispense(
-                AdapterVol,
-                location=sample_plate_1.wells_by_name()["A1"].meniscus(
-                    z=-1, target="start"
-                ),
-                end_location=sample_plate_1.wells_by_name()["A1"].meniscus(
-                    z=-1, target="end"
-                ),
+                AdapterVol, location=sample_plate_1.wells_by_name()["A1"].bottom(1)
             )
             p1000.move_to(sample_plate_1["A1"].bottom(z=dot_bottom))
             p1000.move_to(sample_plate_1["A1"].top(z=-3))
@@ -569,20 +513,12 @@ def run(protocol: ProtocolContext) -> None:
             p1000.flow_rate.dispense = p96x_50_flow_rate_dispense_default * 0.5
             p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
             # ===============================================
-            p1000.aspirate(
-                LIGVol,
-                location=LIG.meniscus(z=-1, target="start"),
-                end_location=LIG.meniscus(z=-1, target="end"),
-            )
+            p1000.aspirate(LIGVol, location=LIG.bottom(1))
             p1000.default_speed = 100
             p1000.move_to(LIG.top(z=3))
             protocol.delay(seconds=1)
             p1000.default_speed = 400
-            p1000.dispense(
-                LIGVol,
-                location=sample_plate_1["A1"].meniscus(z=-1, target="start"),
-                end_location=sample_plate_1["A1"].meniscus(z=-1, target="end"),
-            )
+            p1000.dispense(LIGVol, location=sample_plate_1["A1"].bottom(1))
             p1000.move_to(sample_plate_1["A1"].bottom(z=dot_bottom))
             p1000.mix(LIGMixRep, LIGMixVol, rate=0.5)
             p1000.default_speed = 100
@@ -765,11 +701,7 @@ def run(protocol: ProtocolContext) -> None:
             p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
             # ===============================================
             p1000.pick_up_tip(tiprack_200_X["A1"])
-            p1000.aspirate(
-                ETOHMaxVol + 10,
-                location=ETOH_Reservoir["A1"].meniscus(z=-1, target="start"),
-                end_location=ETOH_Reservoir["A1"].meniscus(z=-1, target="end"),
-            )
+            p1000.aspirate(ETOHMaxVol + 10, location=ETOH_Reservoir["A1"].bottom(1))
             p1000.move_to(ETOH_Reservoir["A1"].top(z=0))
             p1000.move_to(ETOH_Reservoir["A1"].top(z=-5))
             p1000.move_to(CleanupPlate_1["A1"].top(z=2))
@@ -833,11 +765,7 @@ def run(protocol: ProtocolContext) -> None:
             p1000.flow_rate.blow_out = p96x_200_flow_rate_blow_out_default
             # ===============================================
             p1000.pick_up_tip(tiprack_200_X["A1"])
-            p1000.aspirate(
-                ETOHMaxVol + 10,
-                location=ETOH_Reservoir["A1"].meniscus(z=-1, target="start"),
-                end_location=ETOH_Reservoir["A1"].meniscus(z=-1, target="end"),
-            )
+            p1000.aspirate(ETOHMaxVol + 10, location=ETOH_Reservoir["A1"].bottom(1))
             p1000.move_to(ETOH_Reservoir["A1"].top(z=0))
             p1000.move_to(ETOH_Reservoir["A1"].top(z=-5))
             p1000.move_to(CleanupPlate_1["A1"].top(z=2))
@@ -956,11 +884,7 @@ def run(protocol: ProtocolContext) -> None:
             p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
             # ===============================================
             p1000.pick_up_tip(tiprack_50_3["A1"])
-            p1000.aspirate(
-                RSBVol,
-                location=RSB.meniscus(z=-1, target="start"),
-                end_location=RSB.meniscus(z=-1, target="end"),
-            )
+            p1000.aspirate(RSBVol, location=RSB.bottom(1))
             p1000.move_to(CleanupPlate_1.wells_by_name()["A1"].bottom(z=dot_bottom))
             p1000.dispense(
                 RSBVol,
@@ -1036,16 +960,8 @@ def run(protocol: ProtocolContext) -> None:
             p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
             # ===============================================
             p1000.prepare_to_aspirate()
-            p1000.aspirate(
-                PCRVol,
-                location=PCR.meniscus(z=-1, target="start"),
-                end_location=PCR.meniscus(z=-1, target="end"),
-            )
-            p1000.dispense(
-                PCRVol,
-                location=sample_plate_2["A1"].meniscus(z=-1, target="start"),
-                end_location=sample_plate_2["A1"].meniscus(z=-1, target="end"),
-            )
+            p1000.aspirate(PCRVol, location=PCR.bottom(1))
+            p1000.dispense(PCRVol, location=sample_plate_2["A1"].bottom(1))
             p1000.mix(PCRMixRep, PCRMixVol)
             p1000.move_to(sample_plate_2["A1"].top(z=-3))
             protocol.delay(seconds=3)
@@ -1060,13 +976,11 @@ def run(protocol: ProtocolContext) -> None:
             p1000.prepare_to_aspirate()
             p1000.aspirate(
                 BarcodeVol,
-                location=Barcodes.meniscus(z=-1, target="start"),
-                end_location=Barcodes.meniscus(z=-1, target="end"),
+                location=Barcodes.bottom(1),
             )
             p1000.dispense(
                 BarcodeVol,
-                location=sample_plate_2["A1"].meniscus(z=-1, target="start"),
-                end_location=sample_plate_2["A1"].meniscus(z=-1, target="end"),
+                location=sample_plate_2["A1"].bottom(1),
             )
             p1000.mix(BarcodeMixRep, BarcodeMixVol)
             p1000.move_to(sample_plate_2["A1"].top(z=-3))
@@ -1179,7 +1093,7 @@ def run(protocol: ProtocolContext) -> None:
                 location=CleanupBead.meniscus(z=-1, target="start"),
                 end_location=CleanupBead.meniscus(z=-1, target="end"),
             )
-            p1000.move_to(CleanupBead.top(z=-3))
+            p1000.move_to(CleanupBead.top(z=1))
             p1000.dispense(CleanupBeadVol, CleanupPlate_2["A1"].bottom(z=0.5))
             p1000.move_to(CleanupPlate_2["A1"].bottom(z=2.5))
             p1000.flow_rate.aspirate = p96x_50_flow_rate_aspirate_default * 0.5
@@ -1409,11 +1323,7 @@ def run(protocol: ProtocolContext) -> None:
             p1000.flow_rate.blow_out = p96x_50_flow_rate_blow_out_default * 0.5
             # ===============================================
             p1000.pick_up_tip(tiprack_50_6["A1"].top(z=2))
-            p1000.aspirate(
-                RSBVol,
-                location=RSB.meniscus(z=-1, target="start"),
-                end_location=RSB.meniscus(z=-1, target="end"),
-            )
+            p1000.aspirate(RSBVol, location=RSB.bottom(1))
             p1000.move_to(CleanupPlate_2.wells_by_name()["A1"].bottom(z=dot_bottom))
             p1000.dispense(
                 RSBVol,

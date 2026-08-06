@@ -16,7 +16,7 @@ const USB_PORT_LOCATIONS = [
   ['1.3.3', 'USB-6'],
   ['1.3.2', 'USB-7'],
   ['1.3.1', 'USB-8'],
-  ['1.7', 'FrontPort'],
+  ['1.7', 'FRONTPORT'],
 ] as const
 
 const readFileSafe = async (filePath: string): Promise<string | null> => {
@@ -137,7 +137,7 @@ const compareUsbSysfsNames = (
 }
 
 export const getUsbDevices = async (): Promise<AppShellUsbDevice[]> => {
-  log.info(`Reading USB devices from ${USB_SYS_PATH}`)
+  log.debug(`Reading USB devices from ${USB_SYS_PATH}`)
 
   try {
     const entries = await fsPromises.readdir(USB_SYS_PATH, {
@@ -158,7 +158,7 @@ export const getUsbDevices = async (): Promise<AppShellUsbDevice[]> => {
       .filter((device): device is AppShellUsbDevice => device != null)
       .sort(compareUsbSysfsNames)
 
-    log.info(`Found ${result.length} USB devices`)
+    log.debug(`Found ${result.length} USB devices`)
     log.debug(`USB devices: ${JSON.stringify(result)}`)
 
     return result

@@ -64,6 +64,7 @@
     "millimeterPerSec": "mm/s",
     "minutes": "m",
     "nanometer": "nm",
+    "repetitions": "repetitions",
     "rpm": "rpm",
     "seconds": "s",
     "seconds_long": "seconds",

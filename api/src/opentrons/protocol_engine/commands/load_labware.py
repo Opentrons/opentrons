@@ -18,7 +18,6 @@ from ..types import (
     AddressableAreaLocation,
     DeckSlotLocation,
     LoadableLabwareLocation,
-    LoadedModule,
     ModuleLocation,
     ModuleModel,
     OnLabwareLocation,
@@ -97,13 +96,19 @@ class LoadLabwareImplementation(
     def _is_loading_to_module(
         self, location: LoadableLabwareLocation, module_model: ModuleModel
     ) -> TypeGuard[ModuleLocation]:
-        if not isinstance(location, ModuleLocation):
+        if not isinstance(location, (ModuleLocation, AddressableAreaLocation)):
             return False
 
-        module: LoadedModule = self._state_view.modules.get(location.moduleId)
-        return module.model == module_model
+        if isinstance(location, AddressableAreaLocation):
+            slot = self._state_view.addressable_areas.get_addressable_area_base_slot(
+                location.addressableAreaName
+            )
+            module = self._state_view.modules.get_by_slot(slot)
+        else:
+            module = self._state_view.modules.get(location.moduleId)
+        return module is not None and module.model == module_model
 
-    async def execute(
+    async def execute(  # noqa: C901
         self, params: LoadLabwareParams
     ) -> SuccessData[LoadLabwareResult]:
         """Load definition and calibration data necessary for a labware."""
@@ -126,6 +131,7 @@ class LoadLabwareImplementation(
             if not (
                 fixture_validation.is_deck_slot(params.location.addressableAreaName)
                 or fixture_validation.is_abs_reader(params.location.addressableAreaName)
+                or fixture_validation.is_vac_dock(params.location.addressableAreaName)
             ):
                 raise LabwareIsNotAllowedInLocationError(
                     f"Cannot load {params.loadName} onto addressable area {area_name}"
@@ -140,24 +146,35 @@ class LoadLabwareImplementation(
             )
             state_update.set_addressable_area_used(params.location.slotName.id)
 
-        verified_location = self._state_view.geometry.ensure_location_not_occupied(
-            params.location
-        )
-
-        loaded_labware = await self._equipment.load_labware(
+        definition, definition_uri = await self._equipment.load_definition_for_details(
             load_name=params.loadName,
             namespace=params.namespace,
             version=params.version,
-            location=verified_location,
-            labware_id=params.labwareId,
         )
 
-        state_update.set_loaded_labware(
-            labware_id=loaded_labware.labware_id,
-            offset_id=loaded_labware.offsetId,
-            definition=loaded_labware.definition,
-            location=verified_location,
-            display_name=params.displayName,
+        if isinstance(params.location, DeckSlotLocation):
+            if not labware_validation.validate_definition_is_deck_slot_compatible(
+                definition
+            ):
+                raise LabwareIsNotAllowedInLocationError(
+                    f'Labware "{params.loadName}" cannot be loaded onto a deck slot.'
+                )
+        elif isinstance(params.location, AddressableAreaLocation):
+            if fixture_validation.is_deck_slot(
+                params.location.addressableAreaName
+            ) and not labware_validation.validate_definition_is_deck_slot_compatible(
+                definition
+            ):
+                raise LabwareIsNotAllowedInLocationError(
+                    f'Labware "{params.loadName}" cannot be loaded onto a deck slot.'
+                )
+
+        verified_location = self._state_view.geometry.ensure_location_not_occupied(
+            params.location, None, definition
+        )
+
+        loaded_labware = await self._equipment._load_labware_from_def_and_uri(
+            definition, definition_uri, verified_location, params.labwareId, None
         )
 
         if isinstance(verified_location, OnLabwareLocation):
@@ -166,7 +183,7 @@ class LoadLabwareImplementation(
                 bottom_labware_id=verified_location.labwareId,
             )
 
-        # Validate labware for the absorbance reader
+        # Validate labware for different modules
         if self._is_loading_to_module(
             params.location, ModuleModel.ABSORBANCE_READER_V1
         ):
@@ -174,8 +191,21 @@ class LoadLabwareImplementation(
                 loaded_labware.definition
             )
 
+        elif self._is_loading_to_module(params.location, ModuleModel.VACUUM_MODULE_V1):
+            self._state_view.labware.raise_if_labware_incompatible_with_vacuum_module_dock(
+                verified_location, loaded_labware.definition
+            )
+
         self._state_view.labware.raise_if_labware_cannot_be_ondeck(
             location=params.location, labware_definition=loaded_labware.definition
+        )
+
+        state_update.set_loaded_labware(
+            labware_id=loaded_labware.labware_id,
+            offset_id=loaded_labware.offsetId,
+            definition=loaded_labware.definition,
+            location=verified_location,
+            display_name=params.displayName,
         )
 
         return SuccessData(

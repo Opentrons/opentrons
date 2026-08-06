@@ -3,23 +3,20 @@ name: 'hardware-testing testing protocols'
 on:
   # Run on any change to the api directory
   pull_request:
-    paths:
-      - 'api/**'
-      - 'hardware-testing/**'
-      - 'Makefile'
-  push:
-    paths:
+    paths: &paths
       - 'api/**'
       - 'hardware-testing/**'
       - 'Makefile'
       - '.github/workflows/hardware-testing-protocols.yaml'
+  push:
+    paths: *paths
     branches:
       - 'edge'
       - 'release'
       - '*hotfix*'
   create:
     tags:
-      - 'v*'
+      - 'v[0-9]*.[0-9]*'
 
   workflow_dispatch:
 
@@ -38,12 +35,12 @@ jobs:
     runs-on: 'ubuntu-24.04'
     steps:
       - name: Checkout opentrons repo
-        uses: 'actions/checkout@v4'
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # Full history. These tests need it for `git describe`.
 
       - name: Setup Node
-        uses: 'actions/setup-node@v6'
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: '22.22.0'
 

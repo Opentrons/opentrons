@@ -74,6 +74,17 @@ wheel:
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
+.PHONY: wheel-full
+wheel-full: export OPENTRONS_PROJECT=$(PROJECT)
+wheel-full: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
+wheel-full: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
+wheel-full:
+	rm -rf dist/*.whl
+	$(clean_wheel_cmd)
+	$(python) scripts/build_wheel.py --full
+	$(SHX) rm -rf build
+	$(SHX) ls dist
+
 .PHONY: sdist
 sdist: export OPENTRONS_PROJECT=$(PROJECT)
 sdist: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
@@ -122,10 +133,6 @@ test-examples:
 test-scripts:
 	$(python) -m hardware_testing.scripts.bowtie_ot3 --simulate
 
-.PHONY: test-liquid-sense
-test-liquid-sense:
-	$(python) -m hardware_testing.liquid_sense --simulate --pipette 1000 --channels 1
-	$(python) -m hardware_testing.liquid_sense --simulate --pipette 50 --channels 1
 
 .PHONY: test-integration
 test-integration: test-production-qc test-examples test-scripts test-gravimetric
@@ -177,7 +184,9 @@ push-labware-ot3:
 
 .PHONY: restart
 restart:
-	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
+	$(call stop-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-pyro-nameserver opentrons-hardware-api")
+	$(call start-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: push-no-restart
 push-no-restart: wheel
@@ -191,7 +200,7 @@ restart-ot3:
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: push-no-restart-ot3
-push-no-restart-ot3: wheel
+push-no-restart-ot3: wheel-full
 	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-robot-server/)
 
 .PHONY: push-ot3
@@ -281,24 +290,6 @@ sync-fw-ot3:
 
 .PHONY: sync-ot3
 sync-ot3: push-ot3-factory sync-fw-ot3
-
-.PHONY: apply-patches-gravimetric
-apply-patches-gravimetric:
-	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --allow-empty || true
-
-.PHONY: remove-patches-gravimetric
-remove-patches-gravimetric:
-	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --reverse --allow-empty || true
-
-upstream ?= origin/edge
-.PHONY: update-patches-gravimetric
-update-patches-gravimetric:
-	rm ./hardware_testing/gravimetric/overrides/*.patch
-	cd ../ && git diff $(upstream) ./hardware/** > ./hardware-testing/hardware_testing/gravimetric/overrides/hardware.patch
-	cd ../ && git diff $(upstream) ./api/** > ./hardware-testing/hardware_testing/gravimetric/overrides/api.patch
-	cd ../ && git diff $(upstream) ./shared-data/** > ./hardware-testing/hardware_testing/gravimetric/overrides/shared-data.patch
-	cd ../ && git diff $(upstream) ./robot-server/** > ./hardware-testing/hardware_testing/gravimetric/overrides/robot-server.patch
-	$(MAKE) remove-patches-gravimetric
 
 .PHONY: push-photometric-ot2
 push-photometric-ot2:

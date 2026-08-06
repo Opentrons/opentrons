@@ -19,6 +19,8 @@ from opentrons_shared_data.labware import load_definition as load_labware_defini
 from opentrons_shared_data.labware.labware_definition import (
     AxisAlignedBoundingBox3D,
     ConicalFrustum,
+    ContainedSpace,
+    ContainmentShape,
     CuboidalFrustum,
     Extents,
     InnerWellGeometry,
@@ -2737,6 +2739,62 @@ def test_get_ancestor_slot_for_labware_stack_in_staging_area_slot(
     assert subject.get_ancestor_slot_name("labware-2") == StagingSlotName.SLOT_D4
 
 
+def test_get_ancestor_slot_for_addressable_area(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    subject: GeometryView,
+) -> None:
+    """It should get name of ancestor slot of a stack of labware in an addressable area."""
+    decoy.when(mock_labware_view.get("labware-1")).then_return(
+        LoadedLabware(
+            id="labware-1",
+            loadName="load-name",
+            definitionUri="1234",
+            location=AddressableAreaLocation(
+                addressableAreaName="vacuumModuleV1DockA4"
+            ),
+        )
+    )
+    decoy.when(mock_labware_view.get("labware-2")).then_return(
+        LoadedLabware(
+            id="labware-2",
+            loadName="load-name",
+            definitionUri="1234",
+            location=OnLabwareLocation(labwareId="labware-1"),
+        )
+    )
+    assert subject.get_ancestor_slot_name("labware-2") == StagingSlotName.SLOT_A4
+
+
+def test_get_ancestor_slot_raise_for_invalid_addressable_area(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    subject: GeometryView,
+) -> None:
+    """It should raise if the addressable area cannot be DeckSlotName or StagingSlotName."""
+    decoy.when(mock_labware_view.get("labware-1")).then_return(
+        LoadedLabware(
+            id="labware-1",
+            loadName="load-name",
+            definitionUri="1234",
+            location=AddressableAreaLocation(
+                addressableAreaName="InvalidAddressableArea"
+            ),
+        )
+    )
+    decoy.when(mock_labware_view.get("labware-2")).then_return(
+        LoadedLabware(
+            id="labware-2",
+            loadName="load-name",
+            definitionUri="1234",
+            location=OnLabwareLocation(labwareId="labware-1"),
+        )
+    )
+
+    with pytest.raises(ValueError):
+        subject.get_ancestor_slot_name("labware-2")
+
+
 def test_get_ancestor_addressable_area_name(
     decoy: Decoy,
     mock_labware_view: LabwareView,
@@ -2839,9 +2897,20 @@ def test_ensure_location_not_occupied_raises(
     """It should raise error when labware is present in given location."""
     slot_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
     # Shouldn't raise if neither labware nor module in location
+    decoy.when(mock_labware_view.get_all()).then_return([])
     assert subject.ensure_location_not_occupied(location=slot_location) == slot_location
 
     # Raise if labware in location
+    decoy.when(mock_labware_view.get_all()).then_return(
+        [
+            LoadedLabware(
+                id="some-id",
+                loadName="some-name",
+                definitionUri="1234",
+                location=slot_location,
+            )
+        ]
+    )
     decoy.when(
         mock_labware_view.raise_if_labware_in_location(slot_location)
     ).then_raise(errors.LocationIsOccupiedError("Woops!"))
@@ -3531,7 +3600,7 @@ def test_get_next_drop_tip_location(
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
             volume_mode=VolumeModes.default,
-            available_volume_modes_min_vol={},
+            available_volume_modes_min_and_max_vol={},
         )
     )
     decoy.when(mock_pipette_view.get_mount("pip-123")).then_return(pipette_mount)
@@ -4820,3 +4889,833 @@ def test_raise_if_labware_in_stacker_hopper(
         errors.LocationNotAccessibleByPipetteError, match="in a stacker hopper"
     ):
         subject.raise_if_labware_inaccessible_by_pipette("labware-id")
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_get_ancestor_addressable_area_name_simple_deck_slot(
+    labware_store: LabwareStore,
+    subject: GeometryView,
+    nice_labware_definition: LabwareDefinition,
+) -> None:
+    """Directly loaded labware on a deck slot returns the slot name."""
+    action = load_labware_action(
+        labware_id="lw-1",
+        labware_def=nice_labware_definition,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
+    )
+    labware_store.handle_action(action)
+
+    assert subject.get_ancestor_addressable_area_name("lw-1") == "C2"
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_get_ancestor_addressable_area_name_on_module(
+    labware_store: LabwareStore,
+    module_store: ModuleStore,
+    addressable_area_store: AddressableAreaStore,
+    subject: GeometryView,
+    nice_labware_definition: LabwareDefinition,
+    vacuum_module_v1_def: ModuleDefinition,
+) -> None:
+    """Labware on a module returns the module's provided addressable area."""
+    load_module = load_module_action(
+        module_id="mod-1",
+        module_def=vacuum_module_v1_def,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+        used_addressable_area="vacuumModuleV1A3",
+    )
+    load_labware = load_labware_action(
+        labware_id="lw-1",
+        labware_def=nice_labware_definition,
+        location=ModuleLocation(moduleId="mod-1"),
+    )
+
+    module_store.handle_action(load_module)
+    addressable_area_store.handle_action(load_module)
+    labware_store.handle_action(load_labware)
+
+    assert subject.get_ancestor_addressable_area_name("lw-1") == "vacuumModuleV1A3"
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_get_ancestor_addressable_area_name_stacked_labware(
+    labware_store: LabwareStore,
+    subject: GeometryView,
+    nice_labware_definition: LabwareDefinition,
+) -> None:
+    """Deeply nested labware resolves to the root deck slot."""
+    load_bottom = load_labware_action(
+        labware_id="bottom",
+        labware_def=nice_labware_definition,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
+    )
+    load_middle = load_labware_action(
+        labware_id="middle",
+        labware_def=nice_labware_definition,
+        location=OnLabwareLocation(labwareId="bottom"),
+    )
+    load_top = load_labware_action(
+        labware_id="top",
+        labware_def=nice_labware_definition,
+        location=OnLabwareLocation(labwareId="middle"),
+    )
+
+    labware_store.handle_action(load_bottom)
+    labware_store.handle_action(load_middle)
+    labware_store.handle_action(load_top)
+
+    assert subject.get_ancestor_addressable_area_name("top") == "D3"
+
+
+def test_get_ancestor_addressable_area_name_raises_on_cycle(
+    decoy: Decoy, mock_labware_view: LabwareView, subject: GeometryView
+) -> None:
+    """Cycle in nesting chain raises InvalidLabwarePositionError."""
+    decoy.when(mock_labware_view.get("lw-a")).then_return(
+        LoadedLabware(
+            id="lw-a",
+            loadName="a",
+            definitionUri="a",
+            location=OnLabwareLocation(labwareId="lw-b"),
+        )
+    )
+    decoy.when(mock_labware_view.get("lw-b")).then_return(
+        LoadedLabware(
+            id="lw-b",
+            loadName="b",
+            definitionUri="b",
+            location=OnLabwareLocation(labwareId="lw-c"),
+        )
+    )
+    decoy.when(mock_labware_view.get("lw-c")).then_return(
+        LoadedLabware(
+            id="lw-c",
+            loadName="c",
+            definitionUri="c",
+            location=OnLabwareLocation(labwareId="lw-a"),  # cycle
+        )
+    )
+
+    with pytest.raises(errors.InvalidLabwarePositionError, match="Cycle detected"):
+        subject.get_ancestor_addressable_area_name("lw-a")
+
+
+def test_get_parent_from_location_addressable_area(
+    decoy: Decoy, mock_labware_view: LabwareView, subject: GeometryView
+) -> None:
+    """AddressableAreaLocation returns the area name."""
+    location = AddressableAreaLocation(addressableAreaName="D4")
+    assert subject.get_parent_from_location(location) == "D4"
+
+
+def test_get_parent_from_location_module(
+    decoy: Decoy, mock_module_view: ModuleView, subject: GeometryView
+) -> None:
+    """ModuleLocation resolves to the module's provided addressable area."""
+    decoy.when(mock_module_view.get_provided_addressable_area("mod-123")).then_return(
+        "vacuumModuleV1A3"
+    )
+
+    location = ModuleLocation(moduleId="mod-123")
+    assert subject.get_parent_from_location(location) == "vacuumModuleV1A3"
+
+
+def test_get_parent_from_location_on_labware_chain(
+    decoy: Decoy, mock_labware_view: LabwareView, subject: GeometryView
+) -> None:
+    """get_parent_from_location walks up OnLabwareLocation until it hits a root."""
+    decoy.when(mock_labware_view.get("adapter")).then_return(
+        LoadedLabware(
+            id="adapter",
+            loadName="adapter",
+            definitionUri="adapter",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
+        )
+    )
+
+    location = OnLabwareLocation(labwareId="adapter")
+    assert subject.get_parent_from_location(location) == "C2"
+
+
+def test_get_parent_from_location_raises_on_cycle(
+    decoy: Decoy, mock_labware_view: LabwareView, subject: GeometryView
+) -> None:
+    """Cycle while resolving location raises InvalidLabwarePositionError."""
+    decoy.when(mock_labware_view.get("a")).then_return(
+        LoadedLabware(
+            id="a",
+            loadName="a",
+            definitionUri="a",
+            location=OnLabwareLocation(labwareId="b"),
+        )
+    )
+    decoy.when(mock_labware_view.get("b")).then_return(
+        LoadedLabware(
+            id="b",
+            loadName="b",
+            definitionUri="b",
+            location=OnLabwareLocation(labwareId="c"),
+        )
+    )
+    decoy.when(mock_labware_view.get("c")).then_return(
+        LoadedLabware(
+            id="c",
+            loadName="c",
+            definitionUri="c",
+            location=OnLabwareLocation(labwareId="a"),
+        )
+    )
+
+    with pytest.raises(errors.InvalidLabwarePositionError, match="Cycle detected"):
+        subject.get_parent_from_location(OnLabwareLocation(labwareId="a"))
+
+
+def test_get_parent_from_location_raises_when_not_on_deck(
+    decoy: Decoy, mock_labware_view: LabwareView, subject: GeometryView
+) -> None:
+    """OFF_DECK_LOCATION or other unsupported terminal locations raise LabwareNotOnDeckError."""
+    with pytest.raises(errors.LabwareNotOnDeckError):
+        subject.get_parent_from_location(OFF_DECK_LOCATION)
+
+    with pytest.raises(errors.LabwareNotOnDeckError):
+        subject.get_parent_from_location(SYSTEM_LOCATION)
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_ensure_location_not_occupied_containment_success_collar_and_plate_on_module(
+    labware_store: LabwareStore,
+    module_store: ModuleStore,
+    addressable_area_store: AddressableAreaStore,
+    subject: GeometryView,
+    vacuum_module_v1_def: ModuleDefinition,
+    nice_labware_definition: LabwareDefinition,
+) -> None:
+    """Plate fits inside collar's containedSpace when both are on the same vacuum module."""
+    load_module = load_module_action(
+        module_id="mod-1",
+        module_def=vacuum_module_v1_def,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+        used_addressable_area="vacuumModuleV1A3",
+    )
+
+    collar_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "millipore_vacuum_manifold_collar_tall"}
+            ),
+            "containedSpace": ContainedSpace(
+                shape=ContainmentShape.rectangular,
+                origin=Vector3D(x=0, y=0, z=0),
+                dimensions=LabwareDimensions(
+                    xDimension=90, yDimension=60, zDimension=20
+                ),
+            ),
+        }
+    )
+
+    load_collar = load_labware_action(
+        labware_id="collar-id",
+        labware_def=collar_def,
+        location=ModuleLocation(moduleId="mod-1"),
+    )
+
+    plate_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "corning_96_wellplate_360ul_flat"}
+            ),
+            "dimensions": LabwareDimensions(
+                xDimension=85, yDimension=55, zDimension=15
+            ),
+        }
+    )
+
+    module_store.handle_action(load_module)
+    addressable_area_store.handle_action(load_module)
+    labware_store.handle_action(load_collar)
+
+    # Should succeed because plate fits inside collar's containedSpace
+    result = subject.ensure_location_not_occupied(
+        location=ModuleLocation(moduleId="mod-1"),
+        labware_definition=plate_def,
+    )
+
+    assert result == ModuleLocation(moduleId="mod-1")
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_ensure_location_not_occupied_containment_failure_plate_too_big(
+    labware_store: LabwareStore,
+    module_store: ModuleStore,
+    addressable_area_store: AddressableAreaStore,
+    subject: GeometryView,
+    vacuum_module_v1_def: ModuleDefinition,
+    nice_labware_definition: LabwareDefinition,
+) -> None:
+    """Raise if plate does not fit inside collar's containedSpace on the same module."""
+    load_module = load_module_action(
+        module_id="mod-1",
+        module_def=vacuum_module_v1_def,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+        used_addressable_area="vacuumModuleV1A3",
+    )
+
+    collar_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "millipore_vacuum_manifold_collar_tall"}
+            ),
+            "containedSpace": ContainedSpace(
+                shape=ContainmentShape.rectangular,
+                origin=Vector3D(x=0, y=0, z=0),
+                dimensions=LabwareDimensions(
+                    xDimension=80, yDimension=50, zDimension=10
+                ),
+            ),
+        }
+    )
+
+    load_collar = load_labware_action(
+        labware_id="collar-id",
+        labware_def=collar_def,
+        location=ModuleLocation(moduleId="mod-1"),
+    )
+
+    big_plate_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "corning_96_wellplate_360ul_flat"}
+            ),
+            "dimensions": LabwareDimensions(
+                xDimension=85, yDimension=55, zDimension=15
+            ),
+        }
+    )
+
+    module_store.handle_action(load_module)
+    addressable_area_store.handle_action(load_module)
+    labware_store.handle_action(load_collar)
+
+    with pytest.raises(errors.LabwareIsNotAllowedInLocationError, match="does not fit"):
+        subject.ensure_location_not_occupied(
+            location=ModuleLocation(moduleId="mod-1"),
+            labware_definition=big_plate_def,
+        )
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_ensure_location_not_occupied_containment_no_siblings(
+    labware_store: LabwareStore,
+    module_store: ModuleStore,
+    addressable_area_store: AddressableAreaStore,
+    subject: GeometryView,
+    vacuum_module_v1_def: ModuleDefinition,
+    nice_labware_definition: LabwareDefinition,
+) -> None:
+    """No error when loading on module with no siblings (standard case)."""
+    load_module = load_module_action(
+        module_id="mod-1",
+        module_def=vacuum_module_v1_def,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+        used_addressable_area="vacuumModuleV1A3",
+    )
+
+    plate_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "test-plate"}
+            )
+        }
+    )
+
+    module_store.handle_action(load_module)
+    addressable_area_store.handle_action(load_module)
+
+    result = subject.ensure_location_not_occupied(
+        location=ModuleLocation(moduleId="mod-1"),
+        labware_definition=plate_def,
+    )
+
+    assert result == ModuleLocation(moduleId="mod-1")
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_ensure_location_not_occupied_containment_stacked_success_plate_inside_collar(
+    labware_store: LabwareStore,
+    module_store: ModuleStore,
+    addressable_area_store: AddressableAreaStore,
+    subject: GeometryView,
+    vacuum_module_v1_def: ModuleDefinition,
+    nice_labware_definition: LabwareDefinition,
+) -> None:
+    """Plate is loaded directly on the same bottom labware as a collar (stacked siblings).
+
+    The plate fits inside the collar's containedSpace → success.
+    """
+    load_module = load_module_action(
+        module_id="mod-1",
+        module_def=vacuum_module_v1_def,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+        used_addressable_area="vacuumModuleV1A3",
+    )
+
+    collar_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "millipore_vacuum_manifold_collar_tall"}
+            ),
+            "containedSpace": ContainedSpace(
+                shape=ContainmentShape.rectangular,
+                origin=Vector3D(x=0, y=0, z=0),
+                dimensions=LabwareDimensions(
+                    xDimension=90, yDimension=60, zDimension=20
+                ),
+            ),
+        }
+    )
+
+    # Bottom labware that both collar and plate will stack on
+    bottom_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "bottom-plate"}
+            )
+        }
+    )
+    load_bottom = load_labware_action(
+        labware_id="bottom-id",
+        labware_def=bottom_def,
+        location=ModuleLocation(moduleId="mod-1"),
+    )
+
+    load_collar = load_labware_action(
+        labware_id="collar-id",
+        labware_def=collar_def,
+        location=OnLabwareLocation(labwareId="bottom-id"),
+    )
+
+    plate_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "corning_96_wellplate_360ul_flat"}
+            ),
+            "dimensions": LabwareDimensions(
+                xDimension=85, yDimension=55, zDimension=15
+            ),
+        }
+    )
+
+    module_store.handle_action(load_module)
+    addressable_area_store.handle_action(load_module)
+    labware_store.handle_action(load_bottom)
+    labware_store.handle_action(load_collar)
+
+    # Plate loaded on same parent as collar → sibling containment check
+    result = subject.ensure_location_not_occupied(
+        location=OnLabwareLocation(labwareId="bottom-id"),
+        labware_definition=plate_def,
+    )
+
+    assert result == OnLabwareLocation(labwareId="bottom-id")
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_ensure_location_not_occupied_containment_stacked_failure_plate_too_big_for_collar(
+    labware_store: LabwareStore,
+    module_store: ModuleStore,
+    addressable_area_store: AddressableAreaStore,
+    subject: GeometryView,
+    vacuum_module_v1_def: ModuleDefinition,
+    nice_labware_definition: LabwareDefinition,
+) -> None:
+    """Plate is too big for the collar's containedSpace when both are stacked on the same bottom labware."""
+    load_module = load_module_action(
+        module_id="mod-1",
+        module_def=vacuum_module_v1_def,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+        used_addressable_area="vacuumModuleV1A3",
+    )
+
+    collar_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "millipore_vacuum_manifold_collar_tall"}
+            ),
+            "containedSpace": ContainedSpace(
+                shape=ContainmentShape.rectangular,
+                origin=Vector3D(x=0, y=0, z=0),
+                dimensions=LabwareDimensions(
+                    xDimension=80, yDimension=50, zDimension=10
+                ),
+            ),
+        }
+    )
+
+    bottom_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "bottom-plate"}
+            )
+        }
+    )
+    load_bottom = load_labware_action(
+        labware_id="bottom-id",
+        labware_def=bottom_def,
+        location=ModuleLocation(moduleId="mod-1"),
+    )
+
+    load_collar = load_labware_action(
+        labware_id="collar-id",
+        labware_def=collar_def,
+        location=OnLabwareLocation(labwareId="bottom-id"),
+    )
+
+    big_plate_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "corning_96_wellplate_360ul_flat"}
+            ),
+            "dimensions": LabwareDimensions(
+                xDimension=85, yDimension=55, zDimension=15
+            ),
+        }
+    )
+
+    module_store.handle_action(load_module)
+    addressable_area_store.handle_action(load_module)
+    labware_store.handle_action(load_bottom)
+    labware_store.handle_action(load_collar)
+
+    with pytest.raises(errors.LabwareIsNotAllowedInLocationError, match="does not fit"):
+        subject.ensure_location_not_occupied(
+            location=OnLabwareLocation(labwareId="bottom-id"),
+            labware_definition=big_plate_def,
+        )
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_ensure_location_not_occupied_containment_stacked_no_siblings(
+    labware_store: LabwareStore,
+    subject: GeometryView,
+    nice_labware_definition: LabwareDefinition,
+) -> None:
+    """Standard stacking case with no siblings — no containment check needed."""
+    bottom_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "bottom-plate"}
+            )
+        }
+    )
+    load_bottom = load_labware_action(
+        labware_id="bottom-id",
+        labware_def=bottom_def,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
+    )
+
+    plate_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "test-plate"}
+            )
+        }
+    )
+
+    labware_store.handle_action(load_bottom)
+
+    result = subject.ensure_location_not_occupied(
+        location=OnLabwareLocation(labwareId="bottom-id"),
+        labware_definition=plate_def,
+    )
+
+    assert result == OnLabwareLocation(labwareId="bottom-id")
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_ensure_location_not_occupied_containment_true_stacking_plate_on_collar(
+    labware_store: LabwareStore,
+    module_store: ModuleStore,
+    addressable_area_store: AddressableAreaStore,
+    subject: GeometryView,
+    vacuum_module_v1_def: ModuleDefinition,
+    nice_labware_definition: LabwareDefinition,
+) -> None:
+    """Plate is stacked directly ON the collar (true OnLabwareLocation stacking).
+
+    The plate fits inside the collar's containedSpace → success.
+    """
+    load_module = load_module_action(
+        module_id="mod-1",
+        module_def=vacuum_module_v1_def,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+        used_addressable_area="vacuumModuleV1A3",
+    )
+
+    collar_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "millipore_vacuum_manifold_collar_tall"}
+            ),
+            "containedSpace": ContainedSpace(
+                shape=ContainmentShape.rectangular,
+                origin=Vector3D(x=0, y=0, z=0),
+                dimensions=LabwareDimensions(
+                    xDimension=90, yDimension=60, zDimension=20
+                ),
+            ),
+        }
+    )
+
+    load_collar = load_labware_action(
+        labware_id="collar-id",
+        labware_def=collar_def,
+        location=ModuleLocation(moduleId="mod-1"),
+    )
+
+    plate_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "corning_96_wellplate_360ul_flat"}
+            ),
+            "dimensions": LabwareDimensions(
+                xDimension=85, yDimension=55, zDimension=15
+            ),
+        }
+    )
+
+    module_store.handle_action(load_module)
+    addressable_area_store.handle_action(load_module)
+    labware_store.handle_action(load_collar)
+
+    # Plate is now stacked directly on the collar
+    result = subject.ensure_location_not_occupied(
+        location=OnLabwareLocation(labwareId="collar-id"),
+        labware_definition=plate_def,
+    )
+
+    assert result == OnLabwareLocation(labwareId="collar-id")
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_ensure_location_not_occupied_containment_container_over_resident(
+    labware_store: LabwareStore,
+    module_store: ModuleStore,
+    addressable_area_store: AddressableAreaStore,
+    subject: GeometryView,
+    vacuum_module_v1_def: ModuleDefinition,
+    nice_labware_definition: LabwareDefinition,
+) -> None:
+    """Loading a collar (container) over an existing plate (resident) on the same module.
+
+    The resident must fit inside the new container's containedSpace.
+    """
+    load_module = load_module_action(
+        module_id="mod-1",
+        module_def=vacuum_module_v1_def,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+        used_addressable_area="vacuumModuleV1A3",
+    )
+
+    plate_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "corning_96_wellplate_360ul_flat"}
+            ),
+            "dimensions": LabwareDimensions(
+                xDimension=85, yDimension=55, zDimension=15
+            ),
+        }
+    )
+    load_plate = load_labware_action(
+        labware_id="plate-id",
+        labware_def=plate_def,
+        location=ModuleLocation(moduleId="mod-1"),
+    )
+
+    collar_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "millipore_vacuum_manifold_collar_tall"}
+            ),
+            "containedSpace": ContainedSpace(
+                shape=ContainmentShape.rectangular,
+                origin=Vector3D(x=0, y=0, z=0),
+                dimensions=LabwareDimensions(
+                    xDimension=90, yDimension=60, zDimension=20
+                ),
+            ),
+        }
+    )
+
+    module_store.handle_action(load_module)
+    addressable_area_store.handle_action(load_module)
+    labware_store.handle_action(load_plate)
+
+    # Collar is the new container being loaded over the existing resident plate
+    result = subject.ensure_location_not_occupied(
+        location=ModuleLocation(moduleId="mod-1"),
+        labware_definition=collar_def,
+    )
+
+    assert result == ModuleLocation(moduleId="mod-1")
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_ensure_location_not_occupied_containment_no_contained_space_fallback(
+    labware_store: LabwareStore,
+    subject: GeometryView,
+    nice_labware_definition: LabwareDefinition,
+) -> None:
+    """Standard stacking on deck slot with no containedSpace involved (falls back to normal occupancy check)."""
+    bottom_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "bottom-plate"}
+            )
+        }
+    )
+    load_bottom = load_labware_action(
+        labware_id="bottom-id",
+        labware_def=bottom_def,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_C2),
+    )
+
+    plate_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "test-plate"}
+            )
+        }
+    )
+
+    labware_store.handle_action(load_bottom)
+
+    result = subject.ensure_location_not_occupied(
+        location=OnLabwareLocation(labwareId="bottom-id"),
+        labware_definition=plate_def,
+    )
+
+    assert result == OnLabwareLocation(labwareId="bottom-id")
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_ensure_location_not_occupied_containment_non_zero_origin_success(
+    labware_store: LabwareStore,
+    module_store: ModuleStore,
+    addressable_area_store: AddressableAreaStore,
+    subject: GeometryView,
+    vacuum_module_v1_def: ModuleDefinition,
+    nice_labware_definition: LabwareDefinition,
+) -> None:
+    """ContainedSpace can have a non-zero origin. The resident must fit inside the offset box."""
+    load_module = load_module_action(
+        module_id="mod-1",
+        module_def=vacuum_module_v1_def,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+        used_addressable_area="vacuumModuleV1A3",
+    )
+
+    # Collar with containedSpace offset from local (0,0,0)
+    collar_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "millipore_vacuum_manifold_collar_tall"}
+            ),
+            "containedSpace": ContainedSpace(
+                shape=ContainmentShape.rectangular,
+                origin=Vector3D(x=5.0, y=8.0, z=2.0),  # non-zero origin
+                dimensions=LabwareDimensions(
+                    xDimension=85, yDimension=55, zDimension=18
+                ),
+            ),
+        }
+    )
+
+    load_collar = load_labware_action(
+        labware_id="collar-id",
+        labware_def=collar_def,
+        location=ModuleLocation(moduleId="mod-1"),
+    )
+
+    # Plate that fits inside the *offset* contained space
+    plate_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "corning_96_wellplate_360ul_flat"}
+            ),
+            "dimensions": LabwareDimensions(
+                xDimension=78, yDimension=48, zDimension=14
+            ),
+        }
+    )
+
+    module_store.handle_action(load_module)
+    addressable_area_store.handle_action(load_module)
+    labware_store.handle_action(load_collar)
+
+    result = subject.ensure_location_not_occupied(
+        location=ModuleLocation(moduleId="mod-1"),
+        labware_definition=plate_def,
+    )
+
+    assert result == ModuleLocation(moduleId="mod-1")
+
+
+@pytest.mark.parametrize("use_mocks", [False])
+def test_ensure_location_not_occupied_containment_non_zero_origin_failure(
+    labware_store: LabwareStore,
+    module_store: ModuleStore,
+    addressable_area_store: AddressableAreaStore,
+    subject: GeometryView,
+    vacuum_module_v1_def: ModuleDefinition,
+    nice_labware_definition: LabwareDefinition,
+) -> None:
+    """Plate does not fit inside containedSpace when origin is non-zero."""
+    load_module = load_module_action(
+        module_id="mod-1",
+        module_def=vacuum_module_v1_def,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+        used_addressable_area="vacuumModuleV1A3",
+    )
+
+    collar_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "millipore_vacuum_manifold_collar_tall"}
+            ),
+            "containedSpace": ContainedSpace(
+                shape=ContainmentShape.rectangular,
+                origin=Vector3D(x=5.0, y=8.0, z=2.0),  # non-zero origin
+                dimensions=LabwareDimensions(
+                    xDimension=80, yDimension=50, zDimension=10
+                ),
+            ),
+        }
+    )
+
+    load_collar = load_labware_action(
+        labware_id="collar-id",
+        labware_def=collar_def,
+        location=ModuleLocation(moduleId="mod-1"),
+    )
+
+    big_plate_def = nice_labware_definition.model_copy(
+        update={
+            "parameters": nice_labware_definition.parameters.model_copy(
+                update={"loadName": "corning_96_wellplate_360ul_flat"}
+            ),
+            "dimensions": LabwareDimensions(
+                xDimension=85, yDimension=55, zDimension=15
+            ),
+        }
+    )
+
+    module_store.handle_action(load_module)
+    addressable_area_store.handle_action(load_module)
+    labware_store.handle_action(load_collar)
+
+    with pytest.raises(errors.LabwareIsNotAllowedInLocationError, match="does not fit"):
+        subject.ensure_location_not_occupied(
+            location=ModuleLocation(moduleId="mod-1"),
+            labware_definition=big_plate_def,
+        )

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -55,27 +55,54 @@ export function RobotDashboard(): JSX.Element {
     return result
   }, [allRunsQueryData?.data])
 
+  const [standardRunIds, setStandardRunIds] = useState<Set<string>>(
+    () => new Set()
+  )
+  const [resolvedRunIds, setResolvedRunIds] = useState<Set<string>>(
+    () => new Set()
+  )
+
+  const handleCardResolved = useCallback(
+    (runId: string, isStandard: boolean) => {
+      setResolvedRunIds(prev => new Set(prev).add(runId))
+      if (isStandard) {
+        setStandardRunIds(prev => new Set(prev).add(runId))
+      }
+    },
+    []
+  )
+
+  const totalCards = recentRunsOfUniqueProtocols.length
+  const allResolved = resolvedRunIds.size === totalCards
+  const hasStandardProtocols = standardRunIds.size > 0
+
   let contents: JSX.Element = <EmptyRecentRun />
   // GET runs query will error with 503 if database is initializing
   // this should be momentary, and the type of error to come from this endpoint
   // so, all errors will be mapped to an initializing spinner
   if (allRunsQueryError?.code === '503') {
     contents = <ServerInitializing />
-  } else if (recentRunsOfUniqueProtocols.length > 0) {
-    contents = (
-      <>
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.grey60}
-        >
-          {t('run_again')}
-        </LegacyStyledText>
-        <RecentRunProtocolCarousel
-          recentRunsOfUniqueProtocols={recentRunsOfUniqueProtocols}
-        />
-      </>
-    )
+  } else if (totalCards > 0) {
+    // When cards are still loading or at least one is standard, show the carousel
+    if (!allResolved || hasStandardProtocols) {
+      contents = (
+        <>
+          {hasStandardProtocols ? (
+            <LegacyStyledText
+              forwardedAs="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              color={COLORS.grey60}
+            >
+              {t('run_again')}
+            </LegacyStyledText>
+          ) : null}
+          <RecentRunProtocolCarousel
+            recentRunsOfUniqueProtocols={recentRunsOfUniqueProtocols}
+            onCardResolved={handleCardResolved}
+          />
+        </>
+      )
+    }
   }
 
   return (

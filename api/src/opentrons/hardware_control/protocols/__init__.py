@@ -17,6 +17,7 @@ from .instrument_configurer import InstrumentConfigurer
 from .liquid_handler import LiquidHandler
 from .module_provider import ModuleProvider
 from .motion_controller import MotionController
+from .peripheral_provider import PeripheralProvider
 from .position_estimator import PositionEstimator
 from .simulatable import Simulatable
 from .stoppable import Stoppable
@@ -31,6 +32,7 @@ from .types import (
 
 class HardwareControlInterface(
     ModuleProvider,
+    PeripheralProvider,
     ExecutionControllable,
     LiquidHandler[CalibrationType, MountArgType, ConfigType],
     ChassisAccessoryManager,
@@ -62,6 +64,7 @@ class HardwareControlInterface(
 class FlexHardwareControlInterface(
     PositionEstimator,
     ModuleProvider,
+    PeripheralProvider,
     ExecutionControllable,
     LiquidHandler[CalibrationType, MountArgType, ConfigType],
     ChassisAccessoryManager,
@@ -80,9 +83,6 @@ class FlexHardwareControlInterface(
     The interface for the Flex controller is mostly in-line with the OT-2 interface,
     with some additional functionality and parameterization not supported on the OT-2.
     """
-
-    def get_robot_type(self) -> Type[FlexRobotType]:
-        return FlexRobotType
 
 
 __all__ = [

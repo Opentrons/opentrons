@@ -1,10 +1,12 @@
 import { produce } from 'immer'
 
+import { isConcurrentGroup } from './stepHierarchy'
+
 import type { StepIdType } from '/protocol-designer/form-types'
 import type {
+  ConcurrentGroup,
   StandaloneStep,
   StepHierarchy,
-  ThermocyclerProfileGroup,
 } from './stepHierarchy'
 
 /**
@@ -15,7 +17,7 @@ import type {
  * - The new steps are inserted at some point after `stepIdToInsertAfter`.
  *   - Ideally, they will be inserted DIRECTLY after `stepIdToInsertAfter`.
  *     However, we'll compromise on that if it would do something invalid,
- *     like put a Thermocycler profile group inside another Thermocycler profile group.
+ *     like put a concurrent profile group inside another concurrent profile group.
  */
 export function getStepHierarchyAfterDuplication(
   originalStepHierarchy: StepHierarchy,
@@ -60,6 +62,57 @@ export function getStepHierarchyAfterDuplication(
   })
 }
 
+interface ProfileLikeGroupIds {
+  startStepId: StepIdType
+  waitStepId: StepIdType
+  concurrentSteps: StandaloneStep[]
+}
+
+type ProfileLikeConcurrentGroupKind = ConcurrentGroup['type']
+
+function buildDuplicatedProfileLikeGroup(
+  groupKind: ProfileLikeConcurrentGroupKind,
+  newStart: StepIdType,
+  newWait: StepIdType,
+  concurrentSteps: StandaloneStep[]
+): ConcurrentGroup {
+  return {
+    type: groupKind,
+    startStepId: newStart,
+    waitStepId: newWait,
+    concurrentSteps,
+  }
+}
+
+/**
+ * Thermocycler profile, vacuum profile, and timed vacuum-state groups share duplication rules:
+ * if both the root step and the paired wait are duplicated, emit a new group whose concurrent
+ * list only includes steps that were duplicated; otherwise flatten any duplicated concurrent steps.
+ */
+function reduceDuplicateOfProfileLikeGroup(
+  acc: Array<StandaloneStep | ConcurrentGroup>,
+  group: ProfileLikeGroupIds,
+  idMap: Record<StepIdType, StepIdType | undefined>,
+  duplicateConcurrentSteps: (steps: StandaloneStep[]) => StandaloneStep[],
+  groupKind: ProfileLikeConcurrentGroupKind
+): Array<StandaloneStep | ConcurrentGroup> {
+  const newStart = idMap[group.startStepId]
+  const newWait = idMap[group.waitStepId]
+  const concurrentDuplicated = duplicateConcurrentSteps(group.concurrentSteps)
+  if (newStart != null && newWait != null) {
+    return [
+      ...acc,
+      buildDuplicatedProfileLikeGroup(
+        groupKind,
+        newStart,
+        newWait,
+        concurrentDuplicated
+      ),
+    ]
+  }
+  return [...acc, ...concurrentDuplicated]
+}
+
 /**
  * Get the new, duplicated steps that we should insert.
  *
@@ -69,7 +122,7 @@ export function getStepHierarchyAfterDuplication(
 function getNewSteps(
   stepHierarchy: StepHierarchy,
   originalIdsToDuplicateIds: Record<StepIdType, StepIdType | undefined>
-): Array<StandaloneStep | ThermocyclerProfileGroup> {
+): Array<StandaloneStep | ConcurrentGroup> {
   const reduceStandaloneSteps = <T>(
     acc: T[],
     next: StandaloneStep
@@ -86,52 +139,107 @@ function getNewSteps(
       : acc
   }
 
+  const duplicateConcurrentSteps = (
+    steps: StandaloneStep[]
+  ): StandaloneStep[] =>
+    steps.reduce<StandaloneStep[]>(reduceStandaloneSteps, [])
+
   const reduceGroupsAndStandaloneSteps = (
-    acc: Array<StandaloneStep | ThermocyclerProfileGroup>,
-    next: StandaloneStep | ThermocyclerProfileGroup
-  ): Array<StandaloneStep | ThermocyclerProfileGroup> => {
+    acc: Array<StandaloneStep | ConcurrentGroup>,
+    next: StandaloneStep | ConcurrentGroup
+  ): Array<StandaloneStep | ConcurrentGroup> => {
     if (next.type === 'standaloneStep') {
       return reduceStandaloneSteps(acc, next)
-    } else {
-      next.type satisfies 'thermocyclerProfileGroup'
-      const newProfileStepId =
-        originalIdsToDuplicateIds[next.thermocyclerProfileStepId]
-      const newWaitForProfileStepId =
-        originalIdsToDuplicateIds[next.waitForThermocyclerProfileStepId]
-      if (newProfileStepId != null && newWaitForProfileStepId != null) {
-        // Duplicating the group itself, and possibly also some of the steps inside of it.
-        const newGroup: ThermocyclerProfileGroup = {
-          type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: newProfileStepId,
-          waitForThermocyclerProfileStepId: newWaitForProfileStepId,
-          // When duplicating a group, the new group should only contain steps
-          // that were themselves duplicated.
-          concurrentSteps: next.concurrentSteps.reduce<StandaloneStep[]>(
-            reduceStandaloneSteps,
-            []
-          ),
-        }
-        return [...acc, newGroup]
-      } else {
-        // Not duplicating the group itself, but possibly duplicating some of the steps inside of it.
-        return [
-          ...acc,
-          ...next.concurrentSteps.reduce<StandaloneStep[]>(
-            reduceStandaloneSteps,
-            []
-          ),
-        ]
-      }
     }
+    if (isConcurrentGroup(next)) {
+      return reduceDuplicateOfProfileLikeGroup(
+        acc,
+        {
+          startStepId: next.startStepId,
+          waitStepId: next.waitStepId,
+          concurrentSteps: next.concurrentSteps,
+        },
+        originalIdsToDuplicateIds,
+        duplicateConcurrentSteps,
+        next.type
+      )
+    }
+    throw new Error(
+      'getNewSteps: unexpected top-level step hierarchy item (not standalone or concurrent group)'
+    )
   }
 
   return stepHierarchy.topLevelItems.reduce(reduceGroupsAndStandaloneSteps, [])
 }
 
 function everyStepIsStandalone(
-  steps: Array<StandaloneStep | ThermocyclerProfileGroup>
+  steps: Array<StandaloneStep | ConcurrentGroup>
 ): steps is StandaloneStep[] {
   return steps.every(({ type }) => type === 'standaloneStep')
+}
+
+interface InsertionPoints {
+  insertionPointInsideGroup?: {
+    parentArray: StandaloneStep[]
+    insertionIndex: number
+  }
+  insertionPointOutsideGroup: {
+    parentArray: Array<StandaloneStep | ConcurrentGroup>
+    insertionIndex: number
+  }
+}
+
+/**
+ * Thermocycler profile, vacuum profile, and timed vacuum-state groups all share the same
+ * shape: a root step, concurrent steps, and a hidden wait step. Duplication insertion uses
+ * the same rules for each.
+ *
+ * @returns insertion points when `stepIdToInsertAfter` belongs to this group; `undefined`
+ *   when it does not (caller should keep scanning top-level items).
+ */
+function tryInsertionPointsForConcurrentGroup(
+  topLevelItems: StepHierarchy['topLevelItems'],
+  topLevelItemIndex: number,
+  stepIdToInsertAfter: StepIdType,
+  group: {
+    startStepId: StepIdType
+    waitStepId: StepIdType
+    concurrentSteps: StandaloneStep[]
+  }
+): InsertionPoints | undefined {
+  const insertionPointOutsideGroup = {
+    parentArray: topLevelItems,
+    insertionIndex: topLevelItemIndex + 1,
+  }
+
+  if (group.startStepId === stepIdToInsertAfter) {
+    // After the step that opens the group: prefer first slot inside the group, with a
+    // fallback of inserting after the whole group.
+    return {
+      insertionPointOutsideGroup,
+      insertionPointInsideGroup: {
+        parentArray: group.concurrentSteps,
+        insertionIndex: 0,
+      },
+    }
+  }
+  if (group.waitStepId === stepIdToInsertAfter) {
+    // After the hidden wait that closes the group: only after the whole group.
+    return { insertionPointOutsideGroup }
+  }
+  for (let i = 0; i < group.concurrentSteps.length; i++) {
+    if (group.concurrentSteps[i].stepId === stepIdToInsertAfter) {
+      // After a concurrent step: prefer still inside the group, with fallback after the group.
+      return {
+        insertionPointOutsideGroup,
+        insertionPointInsideGroup: {
+          parentArray: group.concurrentSteps,
+          insertionIndex: i + 1,
+        },
+      }
+    }
+  }
+  return undefined
 }
 
 /**
@@ -142,7 +250,7 @@ function everyStepIsStandalone(
  *
  * 1. An insertion point outside of any group. Any step can be inserted here.
  * 2. Possibly, an insertion point inside a group. This is a better user experience
- *    (if the user duplicates a step that's inside a Thermocycler profile, they'd expect the
+ *    (if the user duplicates a step that's inside a concurrent profile group, they'd expect the
  *    new step to be placed inside the profile, too), but not every step can be inserted here.
  *
  * The caller can then pick which one to use depending on what kind of steps it's inserting.
@@ -151,86 +259,40 @@ function findInsertionPoints(
   originalStepHierarchy: StepHierarchy,
   stepIdToInsertAfter: StepIdType
 ): InsertionPoints | null {
+  const { topLevelItems } = originalStepHierarchy
   for (
     let topLevelItemIndex = 0;
-    topLevelItemIndex < originalStepHierarchy.topLevelItems.length;
+    topLevelItemIndex < topLevelItems.length;
     topLevelItemIndex++
   ) {
-    const topLevelItem = originalStepHierarchy.topLevelItems[topLevelItemIndex]
+    const topLevelItem = topLevelItems[topLevelItemIndex]
     if (topLevelItem.type === 'standaloneStep') {
       if (topLevelItem.stepId === stepIdToInsertAfter) {
         // Inserting after a top-level step.
         return {
           insertionPointOutsideGroup: {
-            parentArray: originalStepHierarchy.topLevelItems,
+            parentArray: topLevelItems,
             insertionIndex: topLevelItemIndex + 1,
           },
         }
       }
-    } else if (topLevelItem.type === 'thermocyclerProfileGroup') {
-      if (topLevelItem.thermocyclerProfileStepId === stepIdToInsertAfter) {
-        // Trying to insert after a step that's the beginning of a group.
-        // Ideally, insert to become the first element inside that group;
-        // but in case that wouldn't be valid, also allow inserting after the whole group.
-        return {
-          insertionPointOutsideGroup: {
-            parentArray: originalStepHierarchy.topLevelItems,
-            insertionIndex: topLevelItemIndex + 1,
-          },
-          insertionPointInsideGroup: {
-            parentArray: topLevelItem.concurrentSteps,
-            insertionIndex: 0,
-          },
+    } else if (isConcurrentGroup(topLevelItem)) {
+      const found = tryInsertionPointsForConcurrentGroup(
+        topLevelItems,
+        topLevelItemIndex,
+        stepIdToInsertAfter,
+        {
+          startStepId: topLevelItem.startStepId,
+          waitStepId: topLevelItem.waitStepId,
+          concurrentSteps: topLevelItem.concurrentSteps,
         }
-      } else if (
-        topLevelItem.waitForThermocyclerProfileStepId === stepIdToInsertAfter
-      ) {
-        // Trying to insert after a step that's the end of a group.
-        // So, insert after the whole group.
-        return {
-          insertionPointOutsideGroup: {
-            parentArray: originalStepHierarchy.topLevelItems,
-            insertionIndex: topLevelItemIndex + 1,
-          },
-        }
-      } else {
-        for (
-          let innerIndex = 0;
-          innerIndex < topLevelItem.concurrentSteps.length;
-          innerIndex++
-        ) {
-          const innerItem = topLevelItem.concurrentSteps[innerIndex]
-          if (innerItem.stepId === stepIdToInsertAfter) {
-            // Trying to insert after a step that's inside a group.
-            // Ideally, insert directly after that step (still inside the group);
-            // but in case that wouldn't be valid, also allow inserting after the whole group.
-            return {
-              insertionPointOutsideGroup: {
-                parentArray: originalStepHierarchy.topLevelItems,
-                insertionIndex: topLevelItemIndex + 1,
-              },
-              insertionPointInsideGroup: {
-                parentArray: topLevelItem.concurrentSteps,
-                insertionIndex: innerIndex + 1,
-              },
-            }
-          }
-        }
+      )
+      if (found != null) {
+        return found
       }
     } else {
       topLevelItem satisfies never
     }
   }
   return null
-}
-
-interface InsertionPoints {
-  insertionPointInsideGroup?: {
-    parentArray: StandaloneStep[]
-    insertionIndex: number
-  }
-  insertionPointOutsideGroup: {
-    parentArray: Array<StandaloneStep | ThermocyclerProfileGroup>
-    insertionIndex: number
-  }
 }

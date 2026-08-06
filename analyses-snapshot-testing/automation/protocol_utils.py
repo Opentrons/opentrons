@@ -90,10 +90,7 @@ def create_protocol_from_file_path(file_path: Path) -> Protocol:
     Returns:
         Protocol object.
     """
-    # Determine robot type based on filename or content
-    robot_type = "OT2"  # Default
-    if "flex" in file_path.name.lower() or "Flex" in file_path.name:
-        robot_type = "Flex"
+    robot_type = "Flex"
 
     # Get file extension without the dot and validate it
     file_ext = file_path.suffix[1:]  # Remove the dot

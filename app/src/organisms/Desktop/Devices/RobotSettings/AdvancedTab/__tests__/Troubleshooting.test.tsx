@@ -28,6 +28,12 @@ const mockJSZip = vi.hoisted(() => ({
 }))
 
 const mockSaveAs = vi.hoisted(() => vi.fn())
+const MockJSZip = vi.hoisted(
+  () =>
+    function MockJSZip(): typeof mockJSZip {
+      return mockJSZip
+    }
+)
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ToasterOven')
@@ -38,7 +44,7 @@ vi.mock('file-saver', () => ({
 }))
 vi.mock('jszip', () => {
   return {
-    default: vi.fn(() => mockJSZip),
+    default: MockJSZip,
   }
 })
 

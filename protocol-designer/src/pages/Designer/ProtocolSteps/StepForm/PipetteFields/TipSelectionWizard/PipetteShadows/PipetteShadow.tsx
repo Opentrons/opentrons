@@ -49,7 +49,7 @@ const SHADOW_BY_ROBOT_TYPE_AND_CHANNELS: Record<
 
 export function PipetteShadow(props: {
   pipetteSpec: PipetteV2Specs
-  slotPosition: CoordinateTuple
+  slotPosition?: CoordinateTuple
   hoveredWell: string
   selectedLabwareId: string
   labwareState: AllTemporalPropertiesForTimelineFrame['labware']
@@ -79,7 +79,7 @@ export function PipetteShadow(props: {
     nozzles,
     rotate,
   } = props
-  const [slotX, slotY] = slotPosition
+  const [slotX, slotY] = slotPosition ?? [0, 0]
   const isTiprack = labwareState[selectedLabwareId].def.parameters.isTiprack
   const translationFile = isTiprack ? 'tip_selection' : 'well_selection'
   const { t } = useTranslation(translationFile)
@@ -112,15 +112,13 @@ export function PipetteShadow(props: {
       setLabelHeight(labelRef.current.offsetHeight)
     }
   }, [hoveredWell, labelText])
-  if (isHoveredWellSelected && !isTiprack) {
-    return <></>
-  }
   const { x: xOffset, y: yOffset } = getHoveredOffsetFromWell({
     selectedLabwareId,
     labwareState,
     wellName: hoveredWell,
     pipetteSpec,
     primaryNozzle,
+    nozzleConfiguration: nozzles,
   })
 
   const { channels, pipetteBoundingBoxOffsets } = pipetteSpec

@@ -15,9 +15,13 @@ import { UpdateRobotSoftware } from '../UpdateRobotSoftware'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('/app/redux/robot-settings/selectors')
+const mockStartUpdate = vi.hoisted(() => vi.fn())
+
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update/selectors')
+vi.mock('/app/resources/robot-update/RobotUpdateContext', () => ({
+  useRobotUpdateContext: () => ({ startUpdate: mockStartUpdate }),
+}))
 vi.mock('../../../hooks')
 
 const mockOnUpdateStart = vi.fn()
@@ -58,7 +62,7 @@ describe('RobotSettings UpdateRobotSoftware', () => {
 
   it('should the link has the correct attribute', () => {
     render()
-    const targetLink = 'https://opentrons.com/ot-app/'
+    const targetLink = 'https://opentrons.com/app'
     const link = screen.getByText('Launch Opentrons software update page')
     expect(link.closest('a')).toHaveAttribute('href', targetLink)
   })

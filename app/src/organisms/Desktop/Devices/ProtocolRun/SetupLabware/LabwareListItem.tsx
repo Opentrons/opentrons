@@ -38,6 +38,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { ToggleButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
 import { SecureLabwareModal } from './SecureLabwareModal'
 
@@ -66,6 +67,7 @@ interface LabwareListItemProps {
   labwareByLiquidId?: LabwareByLiquidId
   showLabwareSVG?: boolean
   definitionsByURI?: LabwareDefinitionsByURI
+  moduleTypeOverride?: ModuleType
 }
 
 export function LabwareListItem(
@@ -81,6 +83,7 @@ export function LabwareListItem(
     labwareByLiquidId,
     showLabwareSVG,
     definitionsByURI,
+    moduleTypeOverride,
     onClick,
   } = props
   const moduleInStack = getModuleFromStack(stackedItems)
@@ -100,9 +103,11 @@ export function LabwareListItem(
   const { i18n, t } = useTranslation('protocol_setup')
   const [secureLabwareModalType, setSecureLabwareModalType] =
     useState<ModuleType | null>(null)
-  const { createLiveCommand } = useCreateLiveCommandMutation()
   const [isLatchLoading, setIsLatchLoading] = useState<boolean>(false)
   const [isLatchClosed, setIsLatchClosed] = useState<boolean>(false)
+
+  const documentationState = useDocumentationState()
+  const { createLiveCommand } = useCreateLiveCommandMutation(documentationState)
 
   let slotInfo: string | null = slotName
   if (slotName === 'offDeck') {
@@ -114,8 +119,7 @@ export function LabwareListItem(
   let isCorrectHeaterShakerAttached: boolean = false
   let isHeaterShakerInProtocol: boolean = false
   let latchCommand:
-    | HeaterShakerOpenLatchCreateCommand
-    | HeaterShakerCloseLatchCreateCommand
+    HeaterShakerOpenLatchCreateCommand | HeaterShakerCloseLatchCreateCommand
 
   if (moduleInStack != null) {
     moduleType = getModuleType(moduleInStack.moduleModel)
@@ -223,6 +227,8 @@ export function LabwareListItem(
     hsLatchText = t('opening')
   }
 
+  const moduleComputedWithPotentialOverride = moduleType ?? moduleTypeOverride
+
   return (
     <ListButton
       onClick={onClick}
@@ -242,8 +248,12 @@ export function LabwareListItem(
             {slotInfo}
           </StyledText>
         )}
-        {moduleType != null ? (
-          <RobotInfoLabel iconName={MODULE_ICON_NAME_BY_TYPE[moduleType]} />
+        {moduleComputedWithPotentialOverride != null ? (
+          <RobotInfoLabel
+            iconName={
+              MODULE_ICON_NAME_BY_TYPE[moduleComputedWithPotentialOverride]
+            }
+          />
         ) : null}
         {isStacked ? <RobotInfoLabel iconName="stacked" /> : null}
       </Flex>

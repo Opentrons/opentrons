@@ -6,26 +6,22 @@ name: 'hardware lint/test'
 on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   push:
-    paths:
+    paths: &paths
       - 'Makefile'
       - 'hardware/**'
       - 'scripts/**.mk'
       - 'scripts/**.py'
       - '.github/workflows/hardware-lint-test.yaml'
       - '.github/actions/python/**'
+      - 'shared-data/**'
+      - '!shared-data/js/**'
     branches:
       - 'edge'
       - 'release'
     tags-ignore:
       - '*'
   pull_request:
-    paths:
-      - 'Makefile'
-      - 'hardware/**'
-      - 'scripts/**.mk'
-      - 'scripts/**.py'
-      - '.github/workflows/hardware-lint-test.yaml'
-      - '.github/actions/python/**'
+    paths: *paths
 
   workflow_dispatch:
 
@@ -44,11 +40,9 @@ jobs:
     runs-on: 'ubuntu-24.04'
     steps:
       - name: Checkout opentrons repo
-        uses: 'actions/checkout@v4'
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Setup Node
-        uses: 'actions/setup-node@v6'
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: '12'
 
@@ -79,9 +73,3 @@ jobs:
       #        env:
       #          CAN_CHANNEL: vcan0
       #        run: make -C hardware test-with-emulator
-
-      - name: Code Coverage
-        uses: 'codecov/codecov-action@v3'
-        with:
-          files: ./hardware/coverage.xml
-          flags: hardware

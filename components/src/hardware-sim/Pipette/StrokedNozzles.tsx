@@ -40,14 +40,14 @@ export function StrokedNozzlesComponent(
 
   return (
     <>
-      {Object.entries(nozzleStatus).map(([key, wellType]) => {
+      {Object.entries(nozzleStatus).map(([wellName, wellType]) => {
         return (
           <svg
-            key={key}
-            x={wells[key].x - NOZZLE_POSITION_IN_RENDER}
-            y={wells[key].y - NOZZLE_POSITION_IN_RENDER}
+            key={wellName}
+            x={wells[wellName].x - NOZZLE_POSITION_IN_RENDER}
+            y={wells[wellName].y - NOZZLE_POSITION_IN_RENDER}
             onClick={() => {
-              handleClickNozzle(key)
+              handleClickNozzle(wellName)
             }}
           >
             <WellStatus
@@ -56,6 +56,7 @@ export function StrokedNozzlesComponent(
               wellMap={wells}
               showStroke
               parentType={PIPETTE}
+              wellName={wellName}
             />
           </svg>
         )

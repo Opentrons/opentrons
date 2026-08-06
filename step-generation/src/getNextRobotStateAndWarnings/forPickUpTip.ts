@@ -1,5 +1,3 @@
-import assert from 'assert'
-
 import {
   ALL,
   COLUMN,
@@ -27,10 +25,9 @@ export function forPickUpTip(
   const { pipetteId, labwareId, wellName } = params
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
   const tiprackDef = invariantContext.labwareEntities[labwareId].def
-  assert(
-    getIsTiprack(tiprackDef),
-    `forPickUpTip expected ${labwareId} to be a tiprack`
-  )
+  if (!getIsTiprack(tiprackDef)) {
+    throw new Error(`forPickUpTip expected ${labwareId} to be a tiprack`)
+  }
   const tipState = robotStateAndWarnings.robotState.tipState
   const nozzles = robotStateAndWarnings.robotState.pipettes[pipetteId].nozzles
   const primaryNozzle =

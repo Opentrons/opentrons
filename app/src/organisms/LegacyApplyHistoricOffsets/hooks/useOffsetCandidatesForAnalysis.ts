@@ -29,8 +29,9 @@ export function useOffsetCandidatesForAnalysis(
     { enabled: !isFlex }
   )
   // don't attempt to scrape offsets on the Flex ever.
-  if (allHistoricOffsets.length === 0 || analysisOutput == null || isFlex)
+  if (allHistoricOffsets.length === 0 || analysisOutput == null || isFlex) {
     return []
+  }
   const { commands, labware, modules = [] } = analysisOutput
   const labwareLocationCombos = getLegacyLabwareLocationCombos(
     commands,

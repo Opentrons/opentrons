@@ -1,7 +1,7 @@
 """SQL database schemas."""
 
 # Re-export the latest schema.
-from .schema_15 import (
+from .schema_19 import (
     BooleanSettingKey,
     CommandStatusSQLEnum,
     PrimitiveParamSQLEnum,

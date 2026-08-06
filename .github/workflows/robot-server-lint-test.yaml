@@ -6,9 +6,10 @@ name: 'Robot server lint/test'
 on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   push:
-    paths:
+    paths: &paths
       - 'api/**/*'
       - 'hardware/**/*'
+      - 'hardware-testing/**/*'
       - 'Makefile'
       - 'shared-data/**/*'
       - 'server-utils/**/*'
@@ -25,18 +26,7 @@ on:
     tags-ignore:
       - '*'
   pull_request:
-    paths:
-      - 'api/**/*'
-      - 'hardware/**/*'
-      - 'Makefile'
-      - 'shared-data/**/*'
-      - 'server-utils/**/*'
-      - '!shared-data/js/**/*'
-      - 'robot-server/**/*'
-      - 'scripts/**/*.mk'
-      - 'scripts/**/*.py'
-      - '.github/workflows/robot-server-lint-test.yaml'
-      - '.github/actions/python/**'
+    paths: *paths
   workflow_dispatch:
 
 concurrency:
@@ -56,10 +46,8 @@ jobs:
       matrix:
         with-ot-hardware: ['true', 'false']
     steps:
-      - uses: 'actions/checkout@v4'
-        with:
-          fetch-depth: 0
-      - uses: 'actions/setup-node@v6'
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: '22.22.0'
       - uses: './.github/actions/python/setup-uv'
@@ -78,10 +66,8 @@ jobs:
       matrix:
         with-ot-hardware: ['true', 'false']
     steps:
-      - uses: 'actions/checkout@v4'
-        with:
-          fetch-depth: 0
-      - uses: 'actions/setup-node@v6'
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: '22.22.0'
       - uses: './.github/actions/python/setup-uv'
@@ -96,11 +82,6 @@ jobs:
       - if: ${{ matrix.with-ot-hardware == 'true' }}
         name: Test with opentrons_hardware
         run: make -C robot-server test-unit-cov
-      - name: Upload coverage report
-        uses: 'codecov/codecov-action@v3'
-        with:
-          files: ./robot-server/coverage.xml
-          flags: robot-server
 
   test-integration:
     name: 'robot server package integration testing (ot_hardware: ${{matrix.with-ot-hardware}})'
@@ -110,10 +91,8 @@ jobs:
       matrix:
         with-ot-hardware: ['true', 'false']
     steps:
-      - uses: 'actions/checkout@v4'
-        with:
-          fetch-depth: 0
-      - uses: 'actions/setup-node@v6'
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: '22.22.0'
       - uses: './.github/actions/python/setup-uv'
@@ -128,8 +107,3 @@ jobs:
       - if: ${{ matrix.with-ot-hardware == 'true' }}
         name: Test with opentrons_hardware
         run: make -C robot-server test-integration-cov
-      - name: Upload coverage report
-        uses: 'codecov/codecov-action@v3'
-        with:
-          files: ./robot-server/coverage.xml
-          flags: robot-server

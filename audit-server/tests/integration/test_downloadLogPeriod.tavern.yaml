@@ -1,0 +1,42 @@
+test_name: download logPeriod endpoint
+
+marks:
+  - usefixtures:
+      - run_server
+      - enable_logging
+
+stages:
+  - name: POST /audit/internal/logMessage logs valid message with reason
+    request:
+      method: POST
+      url: '{run_server.base_url}/audit/internal/logMessage'
+      json:
+        data:
+          action: 'test action'
+          accountName: 'testAccountName'
+          legalName: 'testLegalName'
+          message: 'testMessage'
+          reason: 'testReason'
+
+    response:
+      status_code: 201
+      json:
+        data:
+          loggedAt: !anystr
+  - name: GET /audit/external/logPeriods gets newly-rotated period
+    request:
+      method: GET
+      url: '{run_server.base_url}/audit/external/logPeriods'
+    response:
+      status_code: 200
+      save:
+        json:
+          period_id: data[0].id
+  - name: GET audit/external/logPeriods/periodID/download get log period zip download
+    request:
+      method: GET
+      url: '{run_server.base_url}/audit/external/logPeriods/{period_id}/download'
+    response:
+      status_code: 200
+      headers:
+        content-type: application/zip

@@ -142,9 +142,7 @@ Beginning with API version 2.28, you can return tips with a pipette that's confi
 
 When you return tips to their original position in the tip rack, you'll need to consider which tips, if any, you plan to pick up and use again. For example, a 96-channel pipette in column configuration can't reach column 2 unless column 1 is completely empty. When you call [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip] again, the robot won't be able to access unused tips in column 2.
 
-You can still pick up the used tips again from their original location by explictly specifying their location in the tip rack. See below for details.
-
-<!--------
+You can still pick up the used tips again from their original location by explictly specifying their location in the tip rack. See [Working with Used Tips](#working-with-used-tips) for more.
 
 To avoid these tip use conflicts, you can use [`set_empty()`][opentrons.protocol_api.labware.Labware.set_empty] to return used tips to an empty tip rack on the deck.
 
@@ -165,7 +163,6 @@ pipette.drop_tip(tiprack_1["A1"])
 
 In the example above, the pipette uses automatic tip tracking to pick up the next available tip in its assigned tip rack. Then, it drops the attached tip in well A1 of the empty `tiprack_1`.
 
------>
 ## Working with used tips
 
 Currently, the API considers tips as "used" after being picked up. For example, if the robot picked up a tip from rack location A1 and then returned it to the same location, it will not attempt to pick up this tip again, unless explicitly specified. Instead, the robot will pick up a tip starting from rack location B1. For example:

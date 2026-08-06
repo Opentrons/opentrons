@@ -1,14 +1,21 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { createLabwareOffsets } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { useDocumentedMutation } from '../accessControl'
+import { getQueryKey, useHost } from '../api'
 
-import type { UseMutateAsyncFunction, UseMutationResult } from 'react-query'
+import type {
+  UseMutateAsyncFunction,
+  UseMutationOptions,
+  UseMutationResult,
+} from 'react-query'
 import type {
   CreateLabwareOffsetData,
   StoredLabwareOffset,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
+import type { DocumentedMutationParameters } from '../accessControl/types'
 
 export type UseCreateLabwareOffsetsMutationResult = UseMutationResult<
   StoredLabwareOffset | StoredLabwareOffset[],
@@ -22,23 +29,42 @@ export type UseCreateLabwareOffsetsMutationResult = UseMutationResult<
   >
 }
 
-export function useCreateLabwareOffsetsMutation(): UseCreateLabwareOffsetsMutationResult {
+export type UseCreateLabwareOffsetsMutationOptions = UseMutationOptions<
+  StoredLabwareOffset | StoredLabwareOffset[],
+  unknown,
+  CreateLabwareOffsetData
+>
+
+export function useCreateLabwareOffsetsMutation(
+  documentationState: DocumentationState,
+  options: UseCreateLabwareOffsetsMutationOptions = {}
+): UseCreateLabwareOffsetsMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     StoredLabwareOffset | StoredLabwareOffset[],
     unknown,
     CreateLabwareOffsetData
-  >(data =>
-    createLabwareOffsets(host!, data).then(response => {
-      queryClient
-        .invalidateQueries([host, 'labwareOffsets'])
-        .catch((e: Error) => {
-          console.error(`error invalidating labwareOffsets query: ${e.message}`)
-        })
-      return response.data.data
-    })
+  >(
+    documentationState,
+    ['create_offsets'],
+    getQueryKey(host, 'labwareOffsets'),
+    ({
+      variables: data,
+      userNotes,
+    }: DocumentedMutationParameters<CreateLabwareOffsetData>) =>
+      createLabwareOffsets(host!, data, userNotes).then(response => {
+        queryClient
+          .invalidateQueries(getQueryKey(host, 'labwareOffsets'))
+          .catch((e: Error) => {
+            console.error(
+              `error invalidating labwareOffsets query: ${e.message}`
+            )
+          })
+        return response.data.data
+      }),
+    options
   )
 
   return {

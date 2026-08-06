@@ -10,7 +10,7 @@ export function getDefaultBlowoutFlowRate(
   const specs = getPipetteSpecsV2(pipetteName)
 
   console.assert(
-    specs,
+    specs != null,
     `expected to find pipette specs from pipetteName ${pipetteName} but could not`
   )
 
@@ -29,7 +29,7 @@ export function getDefaultBlowoutFlowRate(
     return differenceA - differenceB
   })[0]
   console.assert(
-    matchingTipLiquidSpecs,
+    matchingTipLiquidSpecs != null,
     `expected to find the tip liquid specs but could not with pipetteName ${pipetteName}`
   )
 

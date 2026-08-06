@@ -1,4 +1,7 @@
-import { getAllLiquidClassDefs } from '@opentrons/shared-data'
+import {
+  getAllLiquidClassDefs,
+  POSITION_REFERENCE_TOP,
+} from '@opentrons/shared-data'
 
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -272,22 +275,17 @@ const getBlowoutPythonLocation = (
 const getBlowoutWellPosition = (
   args: TransferArgs | ConsolidateArgs | DistributeArgs
 ): {} | null => {
-  if (
-    args.blowoutXPosition &&
-    args.blowoutYPosition &&
-    args.blowoutOffsetFromTopMm &&
-    args.blowoutPositionReference
-  ) {
-    return {
-      offset: {
-        x: args.blowoutXPosition,
-        y: args.blowoutYPosition,
-        z: args.blowoutOffsetFromTopMm,
-      },
-      position_reference: args.blowoutPositionReference,
-    }
-  } else {
+  const location = getBlowoutPythonLocation(args.blowoutLocation)
+  if (!location || location === 'trash') {
     return null
+  }
+  return {
+    offset: {
+      x: args.blowoutXPosition ?? 0,
+      y: args.blowoutYPosition ?? 0,
+      z: args.blowoutOffsetFromTopMm ?? 1,
+    },
+    position_reference: args.blowoutPositionReference ?? POSITION_REFERENCE_TOP,
   }
 }
 

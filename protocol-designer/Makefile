@@ -4,9 +4,7 @@
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd .. && yarn bin):$(PATH)
-
-benchmark_output := $(shell node -e 'console.log(new Date());')
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 # These variables can be overridden when make is invoked to customize the
 # behavior of jest
@@ -18,35 +16,28 @@ test_opts ?=
 #####################################################################
 
 .PHONY: all
-all: clean build
+all: clean dist
 
 .PHONY: setup
 setup:
-	yarn
+	pnpm install
 
 .PHONY: clean
 clean:
-	shx rm -rf dist
+	pnpm exec shx rm -rf dist
 
 # artifacts
 #####################################################################
 
-.PHONY: build
-build: export NODE_ENV := production
-build: export NODE_OPTIONS := --max-old-space-size=8192
-build:
+.PHONY: dist
+dist: export NODE_ENV := production
+dist: export NODE_OPTIONS := --max-old-space-size=5120
+dist:
 	vite build
 	git rev-parse HEAD > dist/.commit
 
 # development
 #####################################################################
-
-.PHONY: benchmarks
-benchmarks: export NODE_ENV := test
-benchmarks:
-	shx mkdir -p benchmarks/output
-	node ../scripts/runBenchmarks "./benchmarks/*.js" | \
-	ntee "./benchmarks/output/$(benchmark_output)"
 
 .PHONY: dev
 dev: export NODE_ENV := development
@@ -66,9 +57,9 @@ test:
 
 .PHONY: test-cov
 test-cov:
-	make -C .. test-js-protocol-designer tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
+	$(MAKE) -C .. test-js-protocol-designer tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
 
 # analyze bundle
 .PHONY: bundle-analyzer
 bundle-analyzer:
-	ANALYZE_DEBUG=true make build
+	ANALYZE_DEBUG=true make dist

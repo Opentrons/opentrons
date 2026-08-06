@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import enum
+from dataclasses import dataclass
 from math import isclose, sqrt
 from typing import (
     TYPE_CHECKING,
@@ -78,6 +79,21 @@ class Point(NamedTuple):
     def from_xyz_attrs(cls, has_xyz: _HasXYZ) -> Point:
         """Construct a `Point` from another object that has .x/.y/.z attributes."""
         return cls(has_xyz.x, has_xyz.y, has_xyz.z)
+
+    @staticmethod
+    def to_pyro_dict(obj: "Point") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "x": float(obj.x),  # Types are constructed to float to avoid numpy.float64
+            "y": float(obj.y),
+            "z": float(obj.z),
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "Point":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return Point(x=float(data["x"]), y=float(data["y"]), z=float(data["z"]))
 
 
 class _HasXYZ(Protocol):
@@ -521,6 +537,21 @@ class StagingSlotName(enum.Enum):
         For explicitness, prefer using `.id` instead.
         """
         return self.id
+
+
+@dataclass(frozen=True)
+class ModuleFixtureLocation:
+    """A special location (dock, fixture, collar, holder, etc.) that is paired
+    with a specific module.
+
+    Used when a module has associated positions in the staging area or elsewhere
+    that are not standard deck slots.
+    """
+
+    addressable_area_name: str
+
+    def __str__(self) -> str:
+        return self.addressable_area_name
 
 
 class TransferTipPolicy(enum.Enum):

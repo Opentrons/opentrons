@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import last from 'lodash/last'
 
-import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
+import { getProtocol } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -27,7 +27,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  getQueryKey,
+  isDocumentedMutationError,
   useCreateRunMutation,
+  useDeleteProtocolMutation,
+  useDeleteRunMutation,
   useHost,
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
@@ -35,6 +39,8 @@ import {
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
 import { MediumButton, SmallButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { OddModal, SmallModalChildren } from '/app/molecules/OddModal'
 import {
@@ -46,6 +52,7 @@ import { ProtocolSetupParameters } from '/app/organisms/ODD/ProtocolSetup/Protoc
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '/app/redux/config'
+import { useIsRobotOutOfStorage } from '/app/resources/devices'
 import { useRunTimeParameters } from '/app/resources/protocols'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
@@ -55,6 +62,7 @@ import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 import { Liquids } from './Liquids'
 import { Parameters } from './Parameters'
+import { RobotOutOfStorageModal } from './RobotOutOfStorageModal'
 
 import type { Protocol } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '/app/App/types'
@@ -67,6 +75,7 @@ interface ProtocolHeaderProps {
   chipText: string
   isScrolled: boolean
   isProtocolFetching: boolean
+  startSetup: boolean
 }
 
 const ProtocolHeader = ({
@@ -75,11 +84,11 @@ const ProtocolHeader = ({
   chipText,
   isScrolled,
   isProtocolFetching,
+  startSetup,
 }: ProtocolHeaderProps): JSX.Element => {
   const navigate = useNavigate()
   const { t } = useTranslation(['protocol_info, protocol_details', 'shared'])
   const [truncate, setTruncate] = useState<boolean>(true)
-  const [startSetup, setStartSetup] = useState<boolean>(false)
   const toggleTruncate = (): void => {
     setTruncate(value => !value)
   }
@@ -148,10 +157,7 @@ const ProtocolHeader = ({
       </Flex>
       <SmallButton
         buttonCategory="rounded"
-        onClick={() => {
-          setStartSetup(true)
-          handleRunProtocol()
-        }}
+        onClick={handleRunProtocol}
         buttonText={t('protocol_details:start_setup')}
         disabled={isProtocolFetching}
         iconName={startSetup ? 'ot-spinner' : undefined}
@@ -295,7 +301,6 @@ const ProtocolSectionContent = ({
   }
   return (
     <Flex
-      paddingTop={SPACING.spacing32}
       justifyContent={currentOption === 'deck' ? JUSTIFY_CENTER : undefined}
     >
       {protocolSection}
@@ -344,14 +349,25 @@ export function ProtocolDetails(): JSX.Element | null {
     last(protocolRecord?.data.analysisSummaries)?.id ?? null,
     { enabled: protocolRecord != null }
   )
-
-  const { createRun } = useCreateRunMutation({
+  const { documentationState: deleteDocumentationState } =
+    useLinkedDocumentationState(['delete_protocol', 'delete_runs'], protocolId)
+  const { deleteProtocol } = useDeleteProtocolMutation(deleteDocumentationState)
+  const { deleteRun } = useDeleteRunMutation(deleteDocumentationState)
+  const documentationState = useDocumentationState()
+  const { createRun } = useCreateRunMutation(documentationState, {
     onSuccess: data => {
-      queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
-        console.error(`could not invalidate runs cache: ${e.message}`)
-      })
+      queryClient
+        .invalidateQueries(getQueryKey(host, 'runs'))
+        .catch((e: Error) => {
+          console.error(`could not invalidate runs cache: ${e.message}`)
+        })
     },
   })
+
+  const isRobotOutOfStorage = useIsRobotOutOfStorage()
+  const [showRobotOutOfStorageModal, setShowRobotOutOfStorageModal] =
+    useState<boolean>(false)
+  const [startSetup, setStartSetup] = useState<boolean>(false)
 
   const isRequiredCsv =
     mostRecentAnalysis?.result === 'parameter-value-required'
@@ -380,6 +396,11 @@ export function ProtocolDetails(): JSX.Element | null {
     )
   }
   const handleRunProtocol = (): void => {
+    if (isRobotOutOfStorage) {
+      setShowRobotOutOfStorageModal(true)
+      return
+    }
+    setStartSetup(true)
     runTimeParameters.length > 0
       ? setShowParameters(true)
       : createRun({ protocolId })
@@ -388,7 +409,6 @@ export function ProtocolDetails(): JSX.Element | null {
     useState<boolean>(false)
 
   const handleDeleteClick = (): void => {
-    setShowConfirmationDeleteProtocol(false)
     if (host != null) {
       getProtocol(host, protocolId)
         .then(
@@ -396,14 +416,21 @@ export function ProtocolDetails(): JSX.Element | null {
             response.data.links?.referencingRuns.map(({ id }) => id) ?? []
         )
         .then(referencingRunIds =>
-          Promise.all(referencingRunIds?.map(runId => deleteRun(host, runId)))
+          Promise.all(referencingRunIds?.map(runId => deleteRun({ runId })))
         )
-        .then(() => deleteProtocol(host, protocolId))
         .then(() => {
+          return deleteProtocol(protocolId)
+        })
+        .then(() => {
+          setShowConfirmationDeleteProtocol(false)
           navigate('/protocols')
         })
         .catch((e: Error) => {
+          if (isDocumentedMutationError(e)) {
+            return
+          }
           console.error(`error deleting resources: ${e.message}`)
+          setShowConfirmationDeleteProtocol(false)
           navigate('/protocols')
         })
     } else {
@@ -432,6 +459,16 @@ export function ProtocolDetails(): JSX.Element | null {
     />
   ) : (
     <>
+      {showRobotOutOfStorageModal ? (
+        <RobotOutOfStorageModal
+          onConfirm={() => {
+            navigate('/robot-settings')
+          }}
+          onClose={() => {
+            setShowRobotOutOfStorageModal(false)
+          }}
+        />
+      ) : null}
       {showConfirmDeleteProtocol ? (
         <Flex alignItems={ALIGN_CENTER}>
           {!isProtocolFetching ? (
@@ -493,8 +530,13 @@ export function ProtocolDetails(): JSX.Element | null {
           chipText={chipText}
           isScrolled={isScrolled}
           isProtocolFetching={isProtocolFetching}
+          startSetup={startSetup}
         />
-        <Flex flexDirection={DIRECTION_COLUMN} paddingTop={SPACING.spacing6}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          paddingTop={SPACING.spacing6}
+          gap={SPACING.spacing32}
+        >
           <ProtocolSectionTabs
             currentOption={currentOption}
             setCurrentOption={setCurrentOption}
@@ -508,36 +550,36 @@ export function ProtocolDetails(): JSX.Element | null {
           ) : (
             <ProtocolDetailsSectionContentSkeleton />
           )}
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing8}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            paddingTop={
-              // Skeleton is large. Better UX not to scroll to see buttons while loading.
-              !isProtocolFetching ? SPACING.spacing60 : SPACING.spacing24
+        </Flex>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          gridGap={SPACING.spacing8}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          paddingTop={
+            // Skeleton is large. Better UX not to scroll to see buttons while loading.
+            !isProtocolFetching ? SPACING.spacing60 : SPACING.spacing24
+          }
+        >
+          <MediumButton
+            buttonText={
+              pinned
+                ? t('protocol_info:unpin_protocol')
+                : t('protocol_info:pin_protocol')
             }
-          >
-            <MediumButton
-              buttonText={
-                pinned
-                  ? t('protocol_info:unpin_protocol')
-                  : t('protocol_info:pin_protocol')
-              }
-              buttonType="secondary"
-              iconName="pin"
-              onClick={handlePinClick}
-              width="100%"
-            />
-            <MediumButton
-              buttonText={t('protocol_info:delete_protocol')}
-              buttonType="alertSecondary"
-              iconName="trash"
-              onClick={() => {
-                setShowConfirmationDeleteProtocol(true)
-              }}
-              width="100%"
-            />
-          </Flex>
+            buttonType="secondary"
+            iconName="pin"
+            onClick={handlePinClick}
+            width="100%"
+          />
+          <MediumButton
+            buttonText={t('protocol_info:delete_protocol')}
+            buttonType="alertSecondary"
+            iconName="trash"
+            onClick={() => {
+              setShowConfirmationDeleteProtocol(true)
+            }}
+            width="100%"
+          />
         </Flex>
       </Flex>
     </>

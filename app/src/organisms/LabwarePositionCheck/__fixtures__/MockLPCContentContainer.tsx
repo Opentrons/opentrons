@@ -2,7 +2,9 @@
 import React from 'react'
 import { vi } from 'vitest'
 
-export const MockLPCContentContainer = vi.fn(
+import type { Mock } from 'vitest'
+
+export const MockLPCContentContainer: Mock = vi.fn(
   ({
     header,
     onClickButton,

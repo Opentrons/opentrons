@@ -74,8 +74,15 @@ export interface ShellState {
   update: ShellUpdateState
   isReady: boolean
   filePaths: string[]
+  usbMountPaths: string[]
   systemLanguage: string[] | null
+  stepDetailViewerClosed: StepDetailViewerClosedState
 }
+
+export type StepDetailViewerClosedState = {
+  protocolKey: string
+  closedAt: number
+} | null
 
 export interface UiInitializedAction {
   type: 'shell:UI_INITIALIZED'
@@ -98,6 +105,14 @@ export interface ReloadUiAction {
   type: 'shell:RELOAD_UI'
   payload: {
     message: string
+  }
+  meta: { shell: true }
+}
+
+export interface OT2AppOpenAction {
+  type: 'shell:OT2_APP_OPEN'
+  payload?: {
+    filePath?: string
   }
   meta: { shell: true }
 }
@@ -243,6 +258,13 @@ export interface StepDetailViewerCloseAction {
   }
 }
 
+export interface StepDetailViewerClosedAction {
+  type: 'shell:STEP_DETAIL_VIEWER_CLOSED'
+  payload: {
+    protocolKey: string
+  }
+}
+
 export type ShellAction =
   | UiInitializedAction
   | ShellUpdateAction
@@ -250,6 +272,7 @@ export type ShellAction =
   | UsbRequestsAction
   | AppRestartAction
   | ReloadUiAction
+  | OT2AppOpenAction
   | SendLogAction
   | UpdateBrightnessAction
   | RobotMassStorageDeviceAdded
@@ -263,6 +286,7 @@ export type ShellAction =
   | StepDetailViewerOpenAction
   | StepDetailViewerUpdateAction
   | StepDetailViewerCloseAction
+  | StepDetailViewerClosedAction
 
 export type IPCSafeFormDataEntry =
   | {

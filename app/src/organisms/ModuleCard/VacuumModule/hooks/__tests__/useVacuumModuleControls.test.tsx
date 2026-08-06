@@ -3,14 +3,18 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 
 import { useVacuumModuleControls } from '../useVacuumModuleControls'
 
-import type { AttachedModule } from '/app/redux/modules/types'
+import type { AttachedModule } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/analytics')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const mockVacuumModule = {
   id: 'vacuum_id',
@@ -85,10 +89,10 @@ describe('useVacuumModuleControls', () => {
 
       expect(mockCreateLiveCommand).toHaveBeenCalledWith({
         command: {
-          commandType: 'vacuumModule/setTargetPressure',
+          commandType: 'vacuumModule/startSetVacuumPressure',
           params: {
             moduleId: 'vacuum_id',
-            pressure: 500,
+            gaugePressure: 500,
           },
         },
       })
@@ -107,10 +111,10 @@ describe('useVacuumModuleControls', () => {
 
       expect(mockCreateLiveCommand).toHaveBeenCalledWith({
         command: {
-          commandType: 'vacuumModule/setTargetPower',
+          commandType: 'vacuumModule/startSetVacuumPower',
           params: {
             moduleId: 'vacuum_id',
-            power: 75,
+            percentPower: 75,
           },
         },
       })
@@ -129,7 +133,7 @@ describe('useVacuumModuleControls', () => {
 
       expect(mockCreateLiveCommand).toHaveBeenCalledWith({
         command: {
-          commandType: 'vacuumModule/deactivate',
+          commandType: 'vacuumModule/stopVacuum',
           params: {
             moduleId: 'vacuum_id',
           },
@@ -195,7 +199,7 @@ describe('useVacuumModuleControls', () => {
         expect(mockReportModuleCommand).toHaveBeenCalledWith({
           kind: 'liveCommand',
           moduleType: 'vacuumModuleType',
-          analyticCommand: 'vacuumModule/deactivate',
+          analyticCommand: 'vacuumModule/stopVacuum',
           result: { status: 'succeeded', data: undefined },
           serialNumber: 'vac123',
           errorDetails: '',

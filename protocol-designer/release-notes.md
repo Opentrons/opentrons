@@ -8,6 +8,57 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 9.0.1
+
+**Welcome to Protocol Designer 9.0.1!**
+
+This release includes bug fixes for Protocol Designer for Opentrons Flex.
+
+### Bug Fixes
+
+- Flex 20 µL filter pipette tips are compatible with the Flex Stacker in Protocol Designer protocols.
+- Protocol Designer no longer crashes when selecting multiple wells in a transfer step.
+- Flex 96-channel pipettes aspirate and dispense from the proper positions in NEST 8 well reservoirs (22 mL).
+
+## Opentrons Protocol Designer Changes in 9.0.0
+
+**Welcome to Protocol Designer 9.0.0!**
+
+This release is designed specifically for use with Opentrons Flex, and includes several bug fixes and improvements.
+
+### Improvements
+
+- When Protocol Designer detects a collision risk, the error message specifies the deck slot containing labware, modules, or fixtures at risk. To resolve the error, remove the items or move them to a new deck slot.
+- In every Protocol Designer step, pipettes must be able to safely pick up accessible tips from their tip rack. Improvements in this release can help you troubleshoot accessible tip errors:
+  - Warnings let you know when your deck setup or tip pickup settings present a collision risk with other tips or labware.
+  - In a transfer or mix step form, click **Manual tip tracking**, then click to select tips. This form can show you which tips are inaccessible and could cause a collision.
+- When you import a protocol with timeline errors, Protocol Designer maintains and displays the errors to help you troubleshoot.
+
+### Bug Fixes
+
+- Protocol Designer allows manual tip tracking with:
+  - A partial column pickup (for 5 or more pipette tips).
+  - Tip pickups with Flex 20 µL pipette tips.
+- Protocols that include partial column (2-7 pipette tips) liquid handling steps aspirate from and dispense into the correct source and destination wells.
+- Protocol Designer no longer includes unnecessary collision warnings when:
+  - Transferring liquid with every nozzle of a Flex 96-channel pipette.
+  - Aspirating from or dispensing to single-well reservoirs.
+  - Using the Flex 96-channel pipette to pick up tips from a rack next to a single-well reservoir or an empty Flex Stacker shuttle.
+- Move Opentrons Tough Universal Lids onto any compatible labware on the deck.
+- Protocol Designer lets you select all accessible wells for partial column tip pickups in compatible labware.
+
+## Opentrons Protocol Designer Changes in 8.10.1
+
+**Welcome to Protocol Designer 8.10.1!**
+
+This hotfix release addresses the following bugs:
+
+- Protocol Designer no longer includes excess collision errors when you choose a safe well and nozzle combination to:
+  - transfer liquid to or from labware in the OT-2 Thermocycler Module.
+  - use partial tip pickup with an 8- or 1-channel pipette in a 384-well plate.
+  - transfer liquid with a 96-channel pipette.
+- Protocol Designer lets you customize a location within the source or destination well to blow out excess liquid.
+
 ## Opentrons Protocol Designer Changes in 8.10.0
 
 **Welcome to Protocol Designer 8.10.0!**
@@ -33,6 +84,10 @@ This release adds full support for Flex 20 µL pipette tips and all available pa
 - Protocol Designer only lets you add a transfer step when the deck contains at least one labware without a lid, accessible to your attached pipette.
 - Protocol Designer lets you add compatible Opentrons Tough Universal Lids on custom well plates or reservoirs without errors.
 - Labware nicknames now apply to the topmost labware that is not a lid.
+
+### Known Issues
+
+- Opentrons pipettes' [low volume mode](https://docs.opentrons.com/python-api/pipettes/volume-modes/) makes small changes to pipette settings and behavior to ensure accuracy when aspirating and dispensing small volumes. Protocol Designer can make errors in these changes when distributing less than 5 µL with Flex 20 µL pipette tips. If your protocol fails analysis with an error for tip bounds, you'll need to adjust the volumes used in your step.
 
 ## Opentrons Protocol Designer Changes in 8.9.1
 

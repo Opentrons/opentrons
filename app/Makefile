@@ -4,10 +4,14 @@
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd .. && yarn bin):$(PATH)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 # dev server port
 PORT ?= 5173
+
+# Robot IP - Override on the CLI, e.g.:
+#   make dev-odd ODD_IP=10.14.19.236
+ODD_IP ?= localhost
 
 # Path of source package
 SRC_PATH = app
@@ -35,11 +39,11 @@ all: clean dist
 
 .PHONY: setup
 setup:
-	yarn
+	pnpm install
 
 .PHONY: clean
 clean:
-	shx rm -rf dist
+	pnpm exec shx rm -rf dist
 
 # artifacts
 #####################################################################
@@ -64,6 +68,7 @@ dev:
 dev-odd: export NODE_ENV := development
 dev-odd: export PORT := $(PORT)
 dev-odd: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
+dev-odd: export ODD_IP := $(ODD_IP)
 dev-odd:
 	concurrently --no-color --kill-others --names "server,shell" \
 		"$(MAKE) dev-server OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)" \
@@ -91,12 +96,12 @@ dev-shell-odd: export OT_APP_UI__WIDTH := 1024
 dev-shell-odd: export OT_APP_UI__HEIGHT := 600
 dev-shell-odd:
 	wait-on http-get://localhost:$(PORT)
-	$(MAKE) -C $(shell_odd_dir) dev OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)
+	$(MAKE) -C $(shell_odd_dir) dev OPENTRONS_PROJECT=$(OPENTRONS_PROJECT) ODD_IP=$(ODD_IP)
 
 .PHONY: test
 test:
-	make -C .. test-js-app tests="$(tests)" test_opts="$(test_opts)"
+	$(MAKE) -C .. test-js-app tests="$(tests)" test_opts="$(test_opts)"
 
 .PHONY: test-cov
 test-cov:
-	make -C .. test-js-app tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
+	$(MAKE) -C .. test-js-app tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"

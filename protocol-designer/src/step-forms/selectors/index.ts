@@ -12,7 +12,10 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { MODULE_INITIAL_STATE_BY_TYPE as STEP_GENERATION_MODULE_INITIAL_STATE_BY_TYPE } from '@opentrons/step-generation'
+import {
+  getStackedOnNodeFromPdStack,
+  MODULE_INITIAL_STATE_BY_TYPE as STEP_GENERATION_MODULE_INITIAL_STATE_BY_TYPE,
+} from '@opentrons/step-generation'
 
 import { getStepVisibilities } from '/protocol-designer/steplist/utils/getStepVisibilities'
 import {
@@ -37,6 +40,7 @@ import type { Selector } from 'reselect'
 import type { DropdownOption, Mount } from '@opentrons/components'
 import type {
   LabwareDefinition2,
+  LoadedLabwareLocation,
   ModuleType,
   PipetteName,
 } from '@opentrons/shared-data'
@@ -52,6 +56,7 @@ import type {
   ModuleTemporalProperties,
   NormalizedAdditionalEquipmentById,
   PipetteEntities,
+  RobotState,
   StagingAreaEntities,
   TrashBinEntities,
   WasteChuteEntities,
@@ -133,7 +138,7 @@ function _hydrateLabwareEntity(
 ): LabwareEntity {
   const def = defsByURI[l.labwareDefURI]
   console.assert(
-    def,
+    def != null,
     `could not hydrate labware ${labwareId}, missing def for URI ${l.labwareDefURI}`
   )
   return { ...l, id: labwareId, def }
@@ -152,7 +157,7 @@ export const getLabwareEntities: Selector<BaseState, LabwareEntities> =
 export const _getLabwareEntitiesRootState: (
   arg0: RootState
 ) => LabwareEntities = createSelector(
-  rs => rs.labwareInvariantProperties,
+  (rs: RootState) => rs.labwareInvariantProperties,
   labwareDefSelectors._getLabwareDefsByIdRootState,
   (normalizedLabwareById, labwareDefs) =>
     mapValues(normalizedLabwareById, (l: NormalizedLabware, id: string) =>
@@ -168,7 +173,7 @@ export const getModuleEntities: Selector<BaseState, ModuleEntities> =
 // Special version of `getPipetteEntities` selector for use in step-forms reducers
 export const _getPipetteEntitiesRootState: (arg: RootState) => PipetteEntities =
   createSelector(
-    rs => rs.pipetteInvariantProperties,
+    (rs: RootState) => rs.pipetteInvariantProperties,
     labwareDefSelectors._getLabwareDefsByIdRootState,
     _getInitialDeckSetupStepFormRootState,
     (pipetteInvariantProperties, labwareDefs, initialDeckSetupStepForm) =>
@@ -231,6 +236,22 @@ const _getInitialDeckSetup = (
     (initialSetupStep && initialSetupStep.moduleLocationUpdate) || {}
   const pipetteLocations =
     (initialSetupStep && initialSetupStep.pipetteLocationUpdate) || {}
+  const labwareStackedOnNodeUpdate =
+    (initialSetupStep?.labwareStackedOnNodeUpdate ?? {}) as Record<
+      string,
+      LoadedLabwareLocation
+    >
+  const labwareEntityIds = new Set(Object.keys(labwareEntities))
+
+  const modulesRobotState = Object.fromEntries(
+    Object.entries(moduleLocations).map(([moduleId, slot]) => [
+      moduleId,
+      {
+        slot,
+        moduleState: MODULE_INITIAL_STATES_MAP[moduleEntities[moduleId].type],
+      },
+    ])
+  ) as RobotState['modules']
 
   // filtering only the additionalEquipmentEntities that are rendered on the deck
   // which for now is wasteChute, trashBin, and stagingArea
@@ -247,13 +268,24 @@ const _getInitialDeckSetup = (
     labware: mapValues<Record<string, string>, LabwareOnDeck>(
       labwareLocations as Record<string, string>,
       (id: string, labwareId: string): LabwareOnDeck => {
+        const stack = getLocationStackTopToBottom(
+          labwareId,
+          labwareLocations,
+          moduleLocations,
+          moduleEntities
+        )
+        const stackedOnNode =
+          labwareStackedOnNodeUpdate[labwareId] ??
+          getStackedOnNodeFromPdStack({
+            stack,
+            subjectLabwareId: labwareId,
+            moduleEntities,
+            labwareEntityIds,
+            modules: modulesRobotState,
+          })
         return {
-          stack: getLocationStackTopToBottom(
-            labwareId,
-            labwareLocations,
-            moduleLocations,
-            moduleEntities
-          ),
+          stack,
+          ...(stackedOnNode != null ? { stackedOnNode } : {}),
           ...labwareEntities[labwareId],
         }
       }
@@ -567,8 +599,9 @@ export const _hasFormLevelErrors = (
       invariantContext.moduleEntities,
       invariantContext.labwareEntities
     ).length > 0
-  )
+  ) {
     return true
+  }
 
   if (
     hydratedForm.stepType === 'thermocycler' &&

@@ -8,6 +8,7 @@ import {
   customDisplay,
   fullKeyboardLayout,
   layoutCandidates,
+  softwareKeyboardButtonAttributes,
 } from '../constants'
 
 import type { MutableRefObject } from 'react'
@@ -19,7 +20,7 @@ import './index.css'
 
 const SPECIAL_LAYOUT_KEYS = ['{numbers}', '{abc}', '{shift}', '{symbols}']
 const PREVIEW_LABEL_RENDERING_DURATION_MS = 800
-const PREVIEW_LABEL_EN = 'english (us)'
+const PREVIEW_LABEL_EN = 'English (US)'
 const PREVIEW_LABEL_CH = '简体拼音'
 
 // TODO (kk:04/05/2024) add debug to make debugging easy
@@ -153,7 +154,8 @@ export function FullKeyboard({
       }
       display={display}
       mergeDisplay={true}
-      useButtonTag={true}
+      useButtonTag={false} // Exclude from the tab order.
+      buttonAttributes={softwareKeyboardButtonAttributes}
       debug={debug} // If true, <ENTER> will input a \n
       baseClass="fullKeyboard"
       buttonTheme={[
@@ -174,6 +176,7 @@ export function FullKeyboard({
           buttons: '{shift}',
         },
       ]}
+      preventMouseDownDefault // Don't steal focus from inputs.
     />
   )
 }

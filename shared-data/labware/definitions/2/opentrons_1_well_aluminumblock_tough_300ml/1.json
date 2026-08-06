@@ -1,0 +1,41 @@
+{
+  "ordering": [],
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": ["991-00521"]
+  },
+  "metadata": {
+    "displayName": "Opentrons 1 Well Aluminum Block",
+    "displayCategory": "adapter",
+    "displayVolumeUnits": "µL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127.76,
+    "yDimension": 85.48,
+    "zDimension": 27.75
+  },
+  "wells": {},
+  "groups": [
+    {
+      "metadata": {},
+      "wells": []
+    }
+  ],
+  "parameters": {
+    "format": "96Standard",
+    "quirks": [],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "opentrons_1_well_aluminumblock_tough_300ml"
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
+  "allowedRoles": ["adapter"],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
+}

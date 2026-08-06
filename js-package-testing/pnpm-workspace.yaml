@@ -1,0 +1,5 @@
+overrides:
+  '@opentrons/components': link:pack/opentrons-components
+  '@opentrons/shared-data': link:pack/opentrons-shared-data
+  '@opentrons/step-generation': link:pack/opentrons-step-generation
+  '@opentrons/protocol-visualization': link:pack/opentrons-protocol-visualization

@@ -2,9 +2,9 @@ import { useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
 
 import {
-  AlertPrimaryButton,
   COLORS,
   JUSTIFY_FLEX_END,
+  PrimaryButton,
   SecondaryButton,
   SPACING,
   TYPOGRAPHY,
@@ -43,8 +43,9 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
       break
     }
   }
-  if (Boolean(isRobotMoving))
+  if (Boolean(isRobotMoving)) {
     return <SimpleWizardInProgressBody description={t('stand_back')} />
+  }
 
   return (
     <SimpleWizardBody
@@ -70,12 +71,13 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
           <SecondaryButton onClick={goBack} marginRight={SPACING.spacing4}>
             {t('shared:go_back')}
           </SecondaryButton>
-          <AlertPrimaryButton
+          <PrimaryButton
+            variant="warning"
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             onClick={proceed}
           >
             {t('shared:exit')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </>
       )}
     </SimpleWizardBody>

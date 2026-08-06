@@ -1,7 +1,7 @@
 [project]
 name = "robot_server"
 dynamic = ["version"]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
 authors = [{ name = "Opentrons", email = "engineering@opentrons.com" }]
 classifiers = [
@@ -16,33 +16,33 @@ dependencies = [
     "anyio==4.9.0",
     "fastapi==0.100.0",
     "python-dotenv==1.0.1",
-    "python-multipart==0.0.6",
+    "python-multipart==0.0.28",
     "pydantic==2.11.7",
     "pydantic-settings==2.4.0",
     "typing-extensions>=4.0.0,<5",
     "uvicorn==0.27.0.post1",
     "wsproto==1.2.0",
     "opentrons-hardware[FLEX]==0.0.0",
+    "hardware-testing==0.0.0",
     "systemd-python==234; sys_platform == 'linux'",
     "sqlalchemy==1.4.51",
     "paho-mqtt==1.6.1",
     "aiohttp>=3.12.14,<4",
     "Pyro5>=5.16,<6",
 ]
-[tool.uv.dependency-groups]
-dev = {requires-python = ">=3.11"}
 
 [dependency-groups]
 # Robot dependencies - exact versions for robot deployment
 robot = [
     "opentrons==0.0.0",
     "opentrons-hardware[FLEX]==0.0.0",
+    "hardware-testing==0.0.0",
     "opentrons-shared-data==0.0.0",
     "server-utils==0.0.0",
     "anyio==4.9.0",
     "fastapi==0.100.0",
     "python-dotenv==1.0.1",
-    "python-multipart==0.0.6",
+    "python-multipart==0.0.28",
     "pydantic==2.11.7",
     "pydantic-settings==2.4.0",
     "uvicorn==0.27.0.post1",
@@ -71,13 +71,13 @@ dev = [
     "pytest-lazy-fixtures>=1.1.4,<2",
     "pytest-xdist~=2.5.0",
     "python-box==6.1.0",
-    "requests==2.27.1",
+    "requests==2.33.*",
     "rpds-py==0.18.1",
     "sqlalchemy2-stubs==0.0.2a38",
     "tavern>=3.0.2",
     "types-mock~=5.1.0",
     "types-paho-mqtt==1.6.0.20240106",
-    "types-requests~=2.27.1",
+    "types-requests==2.33.*",
     "zipp==3.21.0",
     "opentrons-hardware",
 ]
@@ -115,6 +115,8 @@ dependency-metadata = [
     { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
     ] },
 ]
+# cooldown time for security
+exclude-newer = "1 week"
 
 # local editable sources satisfying the 0.0.0 placeholders
 [tool.uv.sources]
@@ -122,6 +124,7 @@ opentrons = { path = "../api", editable = true }
 opentrons-shared-data = { path = "../shared-data", editable = true }
 server-utils = { path = "../server-utils", editable = true }
 opentrons-hardware = { path = "../hardware", editable = true }
+hardware-testing = { path = "../hardware-testing", editable = true }
 
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/robot-server"
@@ -136,7 +139,7 @@ build-backend = "hatchling.build"
 
 # --- hatch-dependency-coversion: exact co-versioning of specific deps ---
 [tool.hatch.metadata.hooks.dependency-coversion]
-override-versions-of = ["opentrons-shared-data", "opentrons", "server-utils"]
+override-versions-of = ["opentrons-shared-data", "opentrons", "server-utils", "hardware-testing"]
 
 # --- hatch-vcs-tunable: VCS-derived version with env-tunable settings ---
 [tool.hatch.build.hooks.vcs-tunable]
@@ -149,7 +152,7 @@ source = "vcs-tunable"
 
 [tool.hatch.version.raw-options]
 root = ".."
-git_describe_command = "git describe --dirty --tags --long --match=v*"
+git_describe_command = "git describe --dirty --tags --long --match=v[0-9]*.[0-9]*"
 fallback_version = "0.0.0-dev"
 version_scheme = "only-version"
 local_scheme = "no-local-version"
@@ -180,6 +183,9 @@ markers = [
 filterwarnings = [
     "error::sqlalchemy.exc.RemovedIn20Warning",
     "error::pydantic.PydanticDeprecatedSince20",
+    # FastAPI 0.100.0 calls pydantic_core's deprecated `general_plain_validator_function`
+    # internally. Ignore until we upgrade FastAPI.
+    "ignore:`general_plain_validator_function` is deprecated:DeprecationWarning",
 ]
 
 [tool.mypy]

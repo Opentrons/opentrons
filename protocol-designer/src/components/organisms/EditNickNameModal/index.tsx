@@ -58,7 +58,6 @@ export function EditNickNameModal(props: EditNickNameModalProps): JSX.Element {
       }}
     >
       <Modal
-        marginLeft="0"
         title={t('rename_labware')}
         type="info"
         onClose={onClose}
@@ -116,7 +115,6 @@ export function EditNickNameModal(props: EditNickNameModalProps): JSX.Element {
             error={
               nickName.length >= MAX_NICK_NAME_LENGTH ? t('rename_error') : null
             }
-            data-testid="renameLabware_inputField"
             name="renameLabware"
             onChange={e => {
               setNickName(e.target.value)

@@ -1,0 +1,70 @@
+# Protocol Designer E2E Tests using Playwright cron job
+
+name: 'PD E2E Tests'
+
+on:
+  schedule:
+    - cron: '0 15 * * *' # 10:00 AM EST (15:00 UTC)
+  workflow_dispatch: {}
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CI: 'true'
+
+jobs:
+  e2e-test-local:
+    name: 'E2E tests against local build'
+    runs-on: 'ubuntu-24.04'
+    timeout-minutes: 15
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0 # Full history. Unclear if this is actually necessary in this workflow.
+          ref: edge
+
+      - name: 'Log edge commit'
+        run: |
+          echo "### 🚀 Latest Edge Commit" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`text" >> $GITHUB_STEP_SUMMARY
+          git log -1 --format="commit %H%nAuthor: %an <%ae>%nDate:   %ad%n%n    %s" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+      - name: 'Setup JS Environment'
+        uses: ./.github/actions/js/setup
+
+      - name: 'Setup UV for E2E tests'
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
+        with:
+          python-version: '3.12'
+          cache-dependency-glob: |
+            e2e-testing/uv.lock
+            e2e-testing/pyproject.toml
+
+      - name: 'Install E2E test dependencies'
+        working-directory: e2e-testing
+        run: make setup
+
+      - name: 'Install Playwright browser'
+        working-directory: e2e-testing
+        run: make test-setup
+
+      - name: 'Run E2E tests against local build'
+        working-directory: e2e-testing
+        env:
+          APPLITOOLS_BRANCH: edge
+          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+        run: make test-pd-local
+
+      - name: 'Upload test results'
+        if: always()
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: playwright-results-local
+          path: |
+            e2e-testing/test-results/
+          retention-days: 7
+          if-no-files-found: warn

@@ -54,7 +54,7 @@ stacker_2.set_stored_labware(
 )
 ```
 
-In this example, `stacker_1` is configured to hold 5 Flex tip racks, each with a compatible lid. To be properly stored in the Stacker, all Flex tip racks must match: either all tip racks have lids, or none have lids.
+In this example, `stacker_1` is configured to hold 5 Flex tip racks, each with a compatible lid. To be properly stored in the Stacker, all Flex tip racks should have lids.
 
 `stacker_2` is configured to hold 12 PCR plates without lids. You must configure each Stacker in your protocol before using [`store()`][opentrons.protocol_api.FlexStackerContext.store] or [`retrieve()`][opentrons.protocol_api.FlexStackerContext.retrieve].
 
@@ -97,6 +97,9 @@ stacker_2.store()
 ```
 
 After placing labware on the shuttle in slot C3, `stacker_2` stores another well plate on the bottom of the stack.
+
+!!! note
+    You can store empty tip racks you'd like to reuse in a Stacker during your protocol, but each tip rack needs a lid to properly stack together. 
 
 You can use [`fill()`][opentrons.protocol_api.FlexStackerContext.fill] to fill the Stacker with as many of its configured labware as it can store. Alternatively, use [`empty()`][opentrons.protocol_api.FlexStackerContext.empty] to remove all labware from the Stacker:
 

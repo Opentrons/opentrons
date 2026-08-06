@@ -13,20 +13,21 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  getModuleDisplayName,
+  VACUUM_MAX_PRESSURE_MBAR,
+  VACUUM_MIN_PRESSURE_MBAR,
+} from '@opentrons/shared-data'
 
 import { SubmitPrimaryButton } from '/app/atoms/buttons'
 import { Slideout } from '/app/atoms/Slideout'
 
 import { useVacuumModuleControls } from './hooks/useVacuumModuleControls'
+import { parseGaugePressureValue } from './utils/parseGaugePressureValue'
+import { sanitizeGaugePressureInput } from './utils/sanitizeGaugePressureInput'
 import styles from './vacuummodule.module.css'
 
-import type { VacuumMode } from '/app/redux/modules/api-types'
-import type { VacuumModule } from '/app/redux/modules/types'
-
-// TODO: get from module definition or equivalent
-const MAX_PRESSURE = 1000
-const MIN_PRESSURE = 0
+import type { VacuumMode, VacuumModule } from '@opentrons/api-client'
 
 interface VacuumModuleSlideoutProps {
   module: VacuumModule
@@ -41,10 +42,16 @@ export function VacuumModuleSlideout(
   const { moduleModel } = module
   const { t } = useTranslation('device_details')
   const [modeType, setModeType] = useState<VacuumMode | null>(null)
-  const [pressure, setPressure] = useState<number | null>(null)
+  const [pressureInput, setPressureInput] = useState<string>('')
   const [powerPercent, setPowerPercent] = useState<number>(1)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { setVacuumPressure, setVacuumPower } = useVacuumModuleControls(module)
+  const [showPressureRangeError, setShowPressureRangeError] =
+    useState<boolean>(false)
+  const pressure = parseGaugePressureValue(pressureInput)
+  const isPressureRangeError =
+    pressure != null &&
+    (pressure < VACUUM_MIN_PRESSURE_MBAR || pressure > VACUUM_MAX_PRESSURE_MBAR)
 
   const handleConfirm = (): void => {
     if (modeType == null) {
@@ -54,6 +61,10 @@ export function VacuumModuleSlideout(
       setVacuumPower(powerPercent)
     } else if (pressure != null) {
       // non-null pressure value with pressure mode selected
+      if (isPressureRangeError) {
+        setShowPressureRangeError(true)
+        return
+      }
       setVacuumPressure(pressure)
     } else {
       return
@@ -70,7 +81,6 @@ export function VacuumModuleSlideout(
       isExpanded={isExpanded}
       footer={
         <SubmitPrimaryButton
-          form="VacuumModuleSlideout_submitValue"
           value={t('confirm')}
           onClick={handleConfirm}
           data-testid={`VacuumModuleSlideout_btn_${module.serialNumber}`}
@@ -129,17 +139,23 @@ export function VacuumModuleSlideout(
             <InputField
               title={t('gauge_pressure')}
               caption={t('valid_range', {
-                min: MIN_PRESSURE,
-                max: MAX_PRESSURE,
+                min: VACUUM_MIN_PRESSURE_MBAR,
+                max: VACUUM_MAX_PRESSURE_MBAR,
               })}
               units={t('mbar')}
-              type="number"
+              type="text"
               onChange={e => {
-                setPressure(e.target.valueAsNumber)
+                setPressureInput(sanitizeGaugePressureInput(e.target.value))
               }}
-              value={pressure}
-              max={MAX_PRESSURE}
-              min={MIN_PRESSURE}
+              value={pressureInput}
+              error={
+                showPressureRangeError && isPressureRangeError
+                  ? t('vacuum_range_error', {
+                      min: VACUUM_MIN_PRESSURE_MBAR,
+                      max: VACUUM_MAX_PRESSURE_MBAR,
+                    })
+                  : null
+              }
             />
           )}
           {modeType === 'power' && (

@@ -58,6 +58,7 @@ pip-delete-this-directory.txt
 
 # node packages
 node_modules
+.pnpm-store/
 package-lock.json
 
 # Unit test / coverage reports
@@ -86,6 +87,9 @@ docs/build/
 # mkdocs documentation
 docs/*/site/
 
+# docs diff output
+docs-visual-diff-report/
+
 # PyBuilder
 target/
 .idea/
@@ -101,8 +105,6 @@ api/tests/opentrons/data/labware-def/
 api/opentrons/config/*.json
 sample_protocol.py
 api/opentrons/server/endpoints/ignore.json
-
-protocol-designer/benchmarks/output
 
 # Local Calibration Data
 calibrations/
@@ -160,4 +162,6 @@ api/docs/dist/v2/
 
 package-testing/results
 all_analysis_results/
+
 auth-server/.env
+key-server/.key-server-storage

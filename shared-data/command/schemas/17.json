@@ -1131,6 +1131,54 @@
       "title": "CloseLabwareLatchParams",
       "type": "object"
     },
+    "CloseVentCreate": {
+      "description": "A request to close the vent.",
+      "properties": {
+        "commandAnnotationIds": {
+          "description": "A list of command annotation IDs (if any) that apply to this command.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Commandannotationids",
+          "type": "array"
+        },
+        "commandType": {
+          "const": "vacuumModule/closeVent",
+          "default": "vacuumModule/closeVent",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/CloseVentParams"
+        }
+      },
+      "required": ["params"],
+      "title": "CloseVentCreate",
+      "type": "object"
+    },
+    "CloseVentParams": {
+      "description": "Input parameters to close the vent.",
+      "properties": {
+        "moduleId": {
+          "description": "Unique ID of the vacuum module.",
+          "title": "Moduleid",
+          "type": "string"
+        }
+      },
+      "required": ["moduleId"],
+      "title": "CloseVentParams",
+      "type": "object"
+    },
     "ColumnNozzleLayoutConfiguration": {
       "description": "Information required for nozzle configurations of type ROW and COLUMN.",
       "properties": {
@@ -3605,12 +3653,6 @@
       "title": "LoadPipetteParams",
       "type": "object"
     },
-    "MaintenancePosition": {
-      "description": "Maintenance position options.",
-      "enum": ["attachPlate", "attachInstrument"],
-      "title": "MaintenancePosition",
-      "type": "string"
-    },
     "MixParams": {
       "additionalProperties": false,
       "description": "Parameters for mix.",
@@ -3688,6 +3730,12 @@
         "vacuumModuleV1"
       ],
       "title": "ModuleModel",
+      "type": "string"
+    },
+    "MotionModifier": {
+      "description": "Motion modifier options for maintenance position moves.",
+      "enum": ["lowerZAxesSequentially", "lowerMountZAxis"],
+      "title": "MotionModifier",
       "type": "string"
     },
     "MotorAxis": {
@@ -4302,9 +4350,16 @@
     "MoveToMaintenancePositionParams": {
       "description": "Calibration set up position command parameters.",
       "properties": {
-        "maintenancePosition": {
-          "$ref": "#/$defs/MaintenancePosition",
-          "default": "attachInstrument",
+        "motionModifier": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MotionModifier"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
           "description": "The position the gantry mount needs to move to."
         },
         "mount": {
@@ -4697,6 +4752,60 @@
       },
       "required": ["moduleId"],
       "title": "OpenLabwareLatchParams",
+      "type": "object"
+    },
+    "OpenVentCreate": {
+      "description": "A request to open the vent.",
+      "properties": {
+        "commandAnnotationIds": {
+          "description": "A list of command annotation IDs (if any) that apply to this command.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Commandannotationids",
+          "type": "array"
+        },
+        "commandType": {
+          "const": "vacuumModule/openVent",
+          "default": "vacuumModule/openVent",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/OpenVentParams"
+        }
+      },
+      "required": ["params"],
+      "title": "OpenVentCreate",
+      "type": "object"
+    },
+    "OpenVentParams": {
+      "description": "Input parameters to open the vent.",
+      "properties": {
+        "equalizeTimeout": {
+          "default": null,
+          "description": "Time in seconds to wait for pressure equalization after opening the vent. Does not wait if None.",
+          "title": "Equalizetimeout",
+          "type": "integer"
+        },
+        "moduleId": {
+          "description": "Unique ID of the vacuum module.",
+          "title": "Moduleid",
+          "type": "string"
+        }
+      },
+      "required": ["moduleId"],
+      "title": "OpenVentParams",
       "type": "object"
     },
     "PickUpTipCreate": {
@@ -6517,11 +6626,342 @@
       "title": "StartRunExtendedProfileParams",
       "type": "object"
     },
+    "StartRunProfileCreate": {
+      "description": "A request to run a vacuum module profile.",
+      "properties": {
+        "commandAnnotationIds": {
+          "description": "A list of command annotation IDs (if any) that apply to this command.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Commandannotationids",
+          "type": "array"
+        },
+        "commandType": {
+          "const": "vacuumModule/startRunProfile",
+          "default": "vacuumModule/startRunProfile",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/StartRunProfileParams"
+        }
+      },
+      "required": ["params"],
+      "title": "StartRunProfileCreate",
+      "type": "object"
+    },
+    "StartRunProfileParams": {
+      "description": "Input parameters to run a vacuum profile.",
+      "properties": {
+        "equalizeTimeout": {
+          "default": null,
+          "description": "Time in seconds to wait for pressure equalization after the profile completes if ventAfter is True. Does not wait if None.",
+          "title": "Equalizetimeout",
+          "type": "integer"
+        },
+        "moduleId": {
+          "description": "Unique ID of the vacuum module.",
+          "title": "Moduleid",
+          "type": "string"
+        },
+        "profile": {
+          "description": "List of Vacuum Module profile steps.",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/VacuumModuleProfilePowerStep"
+              },
+              {
+                "$ref": "#/$defs/VacuumModuleProfilePressureStep"
+              },
+              {
+                "$ref": "#/$defs/VacuumModuleProfileCycle"
+              }
+            ]
+          },
+          "title": "Profile",
+          "type": "array"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The id of the profile task",
+          "title": "Taskid"
+        },
+        "ventAfter": {
+          "default": false,
+          "description": "Whether to open the vent after the profile is complete.",
+          "title": "Ventafter",
+          "type": "boolean"
+        }
+      },
+      "required": ["moduleId", "profile"],
+      "title": "StartRunProfileParams",
+      "type": "object"
+    },
+    "StartSetVacuumPowerCreate": {
+      "description": "A request to set the vacuum pump power.",
+      "properties": {
+        "commandAnnotationIds": {
+          "description": "A list of command annotation IDs (if any) that apply to this command.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Commandannotationids",
+          "type": "array"
+        },
+        "commandType": {
+          "const": "vacuumModule/startSetVacuumPower",
+          "default": "vacuumModule/startSetVacuumPower",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/StartSetVacuumPowerParams"
+        }
+      },
+      "required": ["params"],
+      "title": "StartSetVacuumPowerCreate",
+      "type": "object"
+    },
+    "StartSetVacuumPowerParams": {
+      "description": "Input parameters to start the vacuum pump.",
+      "properties": {
+        "duration": {
+          "default": null,
+          "description": "Duration in sec. to hold target power for after it is reached.",
+          "title": "Duration",
+          "type": "integer"
+        },
+        "equalizeTimeout": {
+          "default": null,
+          "description": "Time in seconds to wait for pressure equalization after opening the vent. Does not wait if None.",
+          "title": "Equalizetimeout",
+          "type": "integer"
+        },
+        "moduleId": {
+          "description": "Unique ID of the vacuum module.",
+          "title": "Moduleid",
+          "type": "string"
+        },
+        "percentPower": {
+          "description": "Desired duty cycle of the vacuum pump as a percentage between 1 and 100%.",
+          "title": "Percentpower",
+          "type": "integer"
+        },
+        "rate": {
+          "default": null,
+          "description": "Target rate of power change in mbar/sec",
+          "title": "Rate",
+          "type": "number"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The id of the task",
+          "title": "Taskid"
+        },
+        "timeout": {
+          "default": null,
+          "description": "Specify timeframe in seconds that target power must be reached in before a timeout error occurs.",
+          "title": "Timeout",
+          "type": "integer"
+        },
+        "ventAfter": {
+          "default": true,
+          "description": "Whether the system should open the vent after the target power is held for the duration.",
+          "title": "Ventafter",
+          "type": "boolean"
+        }
+      },
+      "required": ["moduleId", "percentPower"],
+      "title": "StartSetVacuumPowerParams",
+      "type": "object"
+    },
+    "StartSetVacuumPressureCreate": {
+      "description": "A request to start the vacuum pump.",
+      "properties": {
+        "commandAnnotationIds": {
+          "description": "A list of command annotation IDs (if any) that apply to this command.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Commandannotationids",
+          "type": "array"
+        },
+        "commandType": {
+          "const": "vacuumModule/startSetVacuumPressure",
+          "default": "vacuumModule/startSetVacuumPressure",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/StartSetVacuumPressureParams"
+        }
+      },
+      "required": ["params"],
+      "title": "StartSetVacuumPressureCreate",
+      "type": "object"
+    },
+    "StartSetVacuumPressureParams": {
+      "description": "Input parameters to set the internal vacuum pressure.",
+      "properties": {
+        "duration": {
+          "default": null,
+          "description": "Duration in sec. to hold target pressure for after it is reached.",
+          "title": "Duration",
+          "type": "integer"
+        },
+        "equalizeTimeout": {
+          "default": null,
+          "description": "Time in seconds to wait for pressure equalization after opening the vent. Does not wait if None.",
+          "title": "Equalizetimeout",
+          "type": "integer"
+        },
+        "gaugePressure": {
+          "description": "Target gauge pressure in mBar.",
+          "title": "Gaugepressure",
+          "type": "number"
+        },
+        "moduleId": {
+          "description": "Unique ID of the vacuum module.",
+          "title": "Moduleid",
+          "type": "string"
+        },
+        "rate": {
+          "default": null,
+          "description": "Target rate of pressure change in mbar/sec",
+          "title": "Rate",
+          "type": "number"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The id of the task",
+          "title": "Taskid"
+        },
+        "timeout": {
+          "default": null,
+          "description": "Specify timeframe in seconds that pressure must be reached in before a timeout error occurs.",
+          "title": "Timeout",
+          "type": "integer"
+        },
+        "ventAfter": {
+          "default": true,
+          "description": "Whether the system should open the vent after the target pressure is held for the duration.",
+          "title": "Ventafter",
+          "type": "boolean"
+        }
+      },
+      "required": ["moduleId", "gaugePressure"],
+      "title": "StartSetVacuumPressureParams",
+      "type": "object"
+    },
     "StatusBarAnimation": {
       "description": "Status Bar animation options.",
       "enum": ["idle", "confirm", "updating", "disco", "off"],
       "title": "StatusBarAnimation",
       "type": "string"
+    },
+    "StopVacuumCreate": {
+      "description": "A request to stop the vacuum pump.",
+      "properties": {
+        "commandAnnotationIds": {
+          "description": "A list of command annotation IDs (if any) that apply to this command.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Commandannotationids",
+          "type": "array"
+        },
+        "commandType": {
+          "const": "vacuumModule/stopVacuum",
+          "default": "vacuumModule/stopVacuum",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/StopVacuumParams"
+        }
+      },
+      "required": ["params"],
+      "title": "StopVacuumCreate",
+      "type": "object"
+    },
+    "StopVacuumParams": {
+      "description": "Input parameters to stop the vacuum pump.",
+      "properties": {
+        "moduleId": {
+          "description": "Unique ID of the vacuum module.",
+          "title": "Moduleid",
+          "type": "string"
+        }
+      },
+      "required": ["moduleId"],
+      "title": "StopVacuumParams",
+      "type": "object"
     },
     "StoreCreate": {
       "description": "A request to execute a Flex Stacker store command.",
@@ -7413,6 +7853,121 @@
       },
       "required": ["axes"],
       "title": "UpdatePositionEstimatorsParams",
+      "type": "object"
+    },
+    "VacuumModuleProfileCycle": {
+      "description": "Input parameters for a vacuum module cycle.",
+      "properties": {
+        "repetitions": {
+          "title": "Repetitions",
+          "type": "integer"
+        },
+        "steps": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/VacuumModuleProfilePowerStep"
+              },
+              {
+                "$ref": "#/$defs/VacuumModuleProfilePressureStep"
+              }
+            ]
+          },
+          "title": "Steps",
+          "type": "array"
+        },
+        "ventAfter": {
+          "default": null,
+          "title": "Ventafter",
+          "type": "boolean"
+        }
+      },
+      "required": ["steps", "repetitions"],
+      "title": "VacuumModuleProfileCycle",
+      "type": "object"
+    },
+    "VacuumModuleProfilePowerStep": {
+      "description": "Input parameters for a vacuum module Power Step.",
+      "properties": {
+        "enablePump": {
+          "title": "Enablepump",
+          "type": "boolean"
+        },
+        "holdTimeMinutes": {
+          "default": null,
+          "title": "Holdtimeminutes",
+          "type": "integer"
+        },
+        "holdTimeSeconds": {
+          "default": null,
+          "title": "Holdtimeseconds",
+          "type": "integer"
+        },
+        "percentPower": {
+          "default": null,
+          "title": "Percentpower",
+          "type": "integer"
+        },
+        "rampRate": {
+          "default": null,
+          "title": "Ramprate",
+          "type": "number"
+        },
+        "timeoutSeconds": {
+          "default": null,
+          "title": "Timeoutseconds",
+          "type": "integer"
+        },
+        "ventAfter": {
+          "default": null,
+          "title": "Ventafter",
+          "type": "boolean"
+        }
+      },
+      "required": ["enablePump"],
+      "title": "VacuumModuleProfilePowerStep",
+      "type": "object"
+    },
+    "VacuumModuleProfilePressureStep": {
+      "description": "Input parameters for a vacuum module Pressure Step.",
+      "properties": {
+        "enablePump": {
+          "title": "Enablepump",
+          "type": "boolean"
+        },
+        "gaugePressureMbar": {
+          "default": null,
+          "title": "Gaugepressurembar",
+          "type": "integer"
+        },
+        "holdTimeMinutes": {
+          "default": null,
+          "title": "Holdtimeminutes",
+          "type": "integer"
+        },
+        "holdTimeSeconds": {
+          "default": null,
+          "title": "Holdtimeseconds",
+          "type": "integer"
+        },
+        "rampRate": {
+          "default": null,
+          "title": "Ramprate",
+          "type": "number"
+        },
+        "timeoutSeconds": {
+          "default": null,
+          "title": "Timeoutseconds",
+          "type": "integer"
+        },
+        "ventAfter": {
+          "default": null,
+          "title": "Ventafter",
+          "type": "boolean"
+        }
+      },
+      "required": ["enablePump"],
+      "title": "VacuumModuleProfilePressureStep",
       "type": "object"
     },
     "Vec3f": {
@@ -8309,6 +8864,12 @@
       "unsafe/ungripLabware": "#/$defs/UnsafeUngripLabwareCreate",
       "unsafe/updatePositionEstimators": "#/$defs/UpdatePositionEstimatorsCreate",
       "unsealPipetteFromTip": "#/$defs/UnsealPipetteFromTipCreate",
+      "vacuumModule/closeVent": "#/$defs/CloseVentCreate",
+      "vacuumModule/openVent": "#/$defs/OpenVentCreate",
+      "vacuumModule/startRunProfile": "#/$defs/StartRunProfileCreate",
+      "vacuumModule/startSetVacuumPower": "#/$defs/StartSetVacuumPowerCreate",
+      "vacuumModule/startSetVacuumPressure": "#/$defs/StartSetVacuumPressureCreate",
+      "vacuumModule/stopVacuum": "#/$defs/StopVacuumCreate",
       "verifyTipPresence": "#/$defs/VerifyTipPresenceCreate",
       "waitForDuration": "#/$defs/WaitForDurationCreate",
       "waitForResume": "#/$defs/WaitForResumeCreate",
@@ -8577,6 +9138,24 @@
     },
     {
       "$ref": "#/$defs/EmptyCreate"
+    },
+    {
+      "$ref": "#/$defs/StopVacuumCreate"
+    },
+    {
+      "$ref": "#/$defs/StartSetVacuumPressureCreate"
+    },
+    {
+      "$ref": "#/$defs/StartSetVacuumPowerCreate"
+    },
+    {
+      "$ref": "#/$defs/OpenVentCreate"
+    },
+    {
+      "$ref": "#/$defs/CloseVentCreate"
+    },
+    {
+      "$ref": "#/$defs/StartRunProfileCreate"
     },
     {
       "$ref": "#/$defs/CalibrateGripperCreate"

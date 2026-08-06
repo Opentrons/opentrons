@@ -4,7 +4,7 @@ import pytest
 from playwright.sync_api import Page
 
 from automation.pd_pages import ProtocolEditorPage
-from utility import _import_protocol_and_open_editor
+from utility import import_protocol_and_open_editor
 
 PROTOCOL_PATH = "fixtures/protocol/9/PD_Move_Lids_Setup.py"
 
@@ -30,7 +30,7 @@ def test_move_labware_flex(page: Page, pd_base_url: str) -> None:
     - Made test for OT2 (only manual moves)
     """
     # Import setup protocol and open editor
-    _import_protocol_and_open_editor(page, PROTOCOL_PATH, migration=True)
+    import_protocol_and_open_editor(page, PROTOCOL_PATH, migration=True)
 
     editor = ProtocolEditorPage(page)
 
@@ -56,7 +56,6 @@ def test_move_labware_flex(page: Page, pd_base_url: str) -> None:
     editor.verify_add_step_menu_options()
     editor.select_step_type("Move")
     editor.move_labware("A3 Opentrons Tough PCR Auto-Sealing Lid", "D3 Waste Chute in D3")
-    page.get_by_role("button", name="Confirm").click()
 
     # Add Manual Move to move Universal Lid to off-deck
     editor.open_add_step_menu()

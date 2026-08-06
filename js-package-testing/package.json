@@ -1,0 +1,34 @@
+{
+  "name": "js-package-testing",
+  "version": "1.0.0",
+  "description": "Vite demo and Playwright tests for built @opentrons JS packages (components, shared-data, step-generation, protocol-visualization)",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "preview": "vite preview",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "@fontsource/public-sans": "5.0.3",
+    "@opentrons/components": "link:pack/opentrons-components",
+    "@opentrons/protocol-visualization": "link:pack/opentrons-protocol-visualization",
+    "@opentrons/shared-data": "link:pack/opentrons-shared-data",
+    "@opentrons/step-generation": "link:pack/opentrons-step-generation",
+    "i18next": "^19.8.3",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-i18next": "14.0.0"
+  },
+  "devDependencies": {
+    "@applitools/eyes-playwright": "1.46.2",
+    "@playwright/test": "^1.58.2",
+    "@types/react": "18.2.51",
+    "@types/react-dom": "18.2.0",
+    "@vitejs/plugin-react": "4.2.0",
+    "dotenv": "^16.6.1",
+    "typescript": "5.3.3",
+    "vite": "7.3.5"
+  },
+  "packageManager": "pnpm@10.32.1"
+}

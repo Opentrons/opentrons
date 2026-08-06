@@ -10,12 +10,15 @@ import {
   E1_NOZZLE,
   F1_NOZZLE,
   G1_NOZZLE,
+  get96Channel384WellPlateWells,
   H1_NOZZLE,
   H12_NOZZLE,
+  INTERACTIVE_WELL_DATA_ATTRIBUTE,
   PARTIAL_COLUMN,
   PARTIAL_NOZZLE_MAP,
   ROW,
   SINGLE,
+  skipEveryOtherWell,
 } from '@opentrons/shared-data'
 
 import type { TFunction } from 'i18next'
@@ -122,7 +125,7 @@ export const getAvailablePrimaryNozzles = (
         F1_NOZZLE,
       ],
     },
-    1: { ALL: [A1_NOZZLE] },
+    1: { ALL: [A1_NOZZLE], SINGLE: [A1_NOZZLE] },
   }
   const filteredAllowedNozzles =
     allowedNozzlesMapping[channels][nozzleConfiguration]
@@ -172,36 +175,59 @@ export const getEntireWellSelection = (
   const columnIndex = wellOrdering.findIndex(column =>
     column.includes(wellName)
   )
-  if (columnIndex === -1) return []
+  if (columnIndex === -1) {
+    return []
+  }
   const rowIndex = wellOrdering[columnIndex].indexOf(wellName)
+  const is384Plate = wellOrdering.flat().length === 384
+
   switch (nozzleConfiguration) {
     case ALL:
       if (channels === 8) {
-        return wellOrdering[columnIndex]
+        return is384Plate
+          ? skipEveryOtherWell(wellName, wellOrdering[columnIndex])
+          : wellOrdering[columnIndex]
       }
       if (channels === 96) {
-        return wellOrdering.flat()
+        return is384Plate
+          ? get96Channel384WellPlateWells(wellOrdering.flat(), wellName)
+          : wellOrdering.flat()
       }
       return [wellName]
     case COLUMN:
-      return wellOrdering[columnIndex]
+      return is384Plate
+        ? skipEveryOtherWell(wellName, wellOrdering[columnIndex])
+        : wellOrdering[columnIndex]
     case ROW:
-      return wellOrdering.map(column => column[rowIndex])
+      return is384Plate
+        ? skipEveryOtherWell(
+            wellName,
+            wellOrdering.map(column => column[rowIndex])
+          )
+        : wellOrdering.map(column => column[rowIndex])
     case PARTIAL_COLUMN: {
       if (!isPartialPrimaryNozzle(primaryNozzle)) {
         return []
       }
-
       const column = wellOrdering[columnIndex]
-      const count = PARTIAL_NOZZLE_MAP[primaryNozzle]
+      const count = is384Plate
+        ? PARTIAL_NOZZLE_MAP[primaryNozzle] * 2
+        : PARTIAL_NOZZLE_MAP[primaryNozzle]
       const remainingWells = column.length - rowIndex
       const isSingleRowLabware = column.length === 1
       if (!isSingleRowLabware && remainingWells < count) {
         const beginning = column.length - count
-        return column.slice(beginning, column.length)
+        return is384Plate
+          ? skipEveryOtherWell(wellName, column.slice(beginning, column.length))
+          : column.slice(beginning, column.length)
       }
       const end = rowIndex + count
-      return column.slice(rowIndex, Math.min(end, column.length))
+      return is384Plate
+        ? skipEveryOtherWell(
+            wellName,
+            column.slice(rowIndex, Math.min(end, column.length))
+          )
+        : column.slice(rowIndex, Math.min(end, column.length))
     }
     default:
       return [wellName]
@@ -216,7 +242,7 @@ export const getInaccessibleWellsForPartialNozzleRowMap = (
 ): string[] => {
   const inaccessible: string[] = []
   const selectedFlat = selectedWells.flat()
-
+  const is384Plate = wellDefMap.flat().length === 384
   for (const column of wellDefMap) {
     // Find indices of selected wells within the column
     const selectedIndices = selectedFlat
@@ -234,7 +260,7 @@ export const getInaccessibleWellsForPartialNozzleRowMap = (
         .slice(start, end)
         .filter(well => allWellsWithState[well] !== INACCESSIBLE)
       // Only mark inaccessible if chunk is smaller than channels
-      if (chunk.length > 0 && chunk.length < channels) {
+      if (chunk.length > 0 && chunk.length < channels && !is384Plate) {
         chunk.forEach(well => {
           if (!inaccessible.includes(well)) inaccessible.push(well)
         })
@@ -263,4 +289,20 @@ export function getWellGroupLength(
     default:
       return totalSelected / 1
   }
+}
+
+export const getWellNameAtClientPoint = (
+  clientX: number,
+  clientY: number
+): string | null => {
+  const top = document.elementFromPoint(clientX, clientY)
+  if (top instanceof HTMLElement) {
+    const well = top.closest(
+      INTERACTIVE_WELL_DATA_ATTRIBUTE
+    ) as HTMLElement | null
+    if (well?.dataset.wellname != null) {
+      return well.dataset.wellname
+    }
+  }
+  return null
 }

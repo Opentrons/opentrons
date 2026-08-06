@@ -21,8 +21,8 @@ stages:
       url: '{run_server.base_url}/auth/users'
       json:
         data:
-          userName: test_user
-          password: test_user_password
+          username: testuser
+          password: testuserpassword
           fullName: Test User
           accountType: user
     response:
@@ -33,8 +33,8 @@ stages:
       method: POST
       json:
         data:
-          userName: test_user
-          password: test_user_password
+          username: testuser
+          password: testuserpassword
           fullName: Test User
           accountType: user
       url: '{run_server.base_url}/auth/users'
@@ -50,9 +50,9 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: password
-        username: test_admin
-        password: test_admin_password
-        scope: users.read # Omit users.write.
+        username: testadmin
+        password: testadminpassword
+        scope: users.read.others # Omit users.write.
     response:
       status_code: 200
       json:
@@ -60,7 +60,7 @@ stages:
         refresh_token: !anystr
         expires_in: !anyint
         token_type: Bearer
-        scope: users.read
+        scope: users.read.others
       save:
         json:
           access_token: access_token
@@ -71,8 +71,8 @@ stages:
       url: '{run_server.base_url}/auth/users'
       json:
         data:
-          userName: test_user
-          password: test_user_password
+          username: testuser
+          password: testuserpassword
           fullName: Test User
           accountType: user
       headers:
@@ -87,8 +87,8 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: password
-        username: test_admin
-        password: test_admin_password
+        username: testadmin
+        password: testadminpassword
         scope: users.write
     response:
       status_code: 200
@@ -108,8 +108,8 @@ stages:
       url: '{run_server.base_url}/auth/users'
       json:
         data:
-          userName: test_user_new
-          password: test_user_password
+          username: testuser_new
+          password: testuserpassword
           fullName: Test User
           accountType: user
       headers:

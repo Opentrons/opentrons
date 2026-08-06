@@ -76,9 +76,7 @@ describe('steps actions', () => {
   describe('deselectAllSteps', () => {
     const id = 'some_id'
     beforeEach(() => {
-      when(vi.mocked(getMultiSelectLastSelected))
-        .calledWith(expect.anything())
-        .thenReturn(id)
+      vi.mocked(getMultiSelectLastSelected).mockReturnValue(id)
     })
     afterEach(() => {
       vi.resetAllMocks()
@@ -114,9 +112,7 @@ describe('steps actions', () => {
       })
     })
     it('should console warn when NOT in multi select mode', () => {
-      when(vi.mocked(getMultiSelectLastSelected))
-        .calledWith(expect.anything())
-        .thenReturn(null)
+      vi.mocked(getMultiSelectLastSelected).mockReturnValue(null)
       const consoleWarnSpy = vi
         .spyOn(global.console, 'warn')
         .mockImplementation(() => null)
@@ -140,14 +136,14 @@ describe('steps actions', () => {
             },
             {
               type: 'thermocyclerProfileGroup',
-              thermocyclerProfileStepId: 'id_2',
+              startStepId: 'id_2',
               concurrentSteps: [
                 {
                   type: 'standaloneStep',
                   stepId: 'id_3',
                 },
               ],
-              waitForThermocyclerProfileStepId: 'id_4',
+              waitStepId: 'id_4',
             },
             {
               type: 'standaloneStep',
@@ -167,9 +163,7 @@ describe('steps actions', () => {
       when(vi.mocked(getMultiSelectItemIds))
         .calledWith(expect.anything())
         .thenReturn(null)
-      when(vi.mocked(getMultiSelectLastSelected))
-        .calledWith(expect.anything())
-        .thenReturn(null)
+      vi.mocked(getMultiSelectLastSelected).mockReturnValue(null)
       vi.spyOn(utils, 'uuid').mockReturnValueOnce('dup')
       const store: any = mockStore()
       store.dispatch(duplicateSelectedSteps())
@@ -201,9 +195,7 @@ describe('steps actions', () => {
       when(vi.mocked(getMultiSelectItemIds))
         .calledWith(expect.anything())
         .thenReturn(['id_2', 'id_3'])
-      when(vi.mocked(getMultiSelectLastSelected))
-        .calledWith(expect.anything())
-        .thenReturn('id_3')
+      vi.mocked(getMultiSelectLastSelected).mockReturnValue('id_3')
       vi.spyOn(utils, 'uuid')
         .mockReturnValueOnce('dup_of_2')
         .mockReturnValueOnce('dup_of_3')
@@ -321,7 +313,7 @@ describe('steps actions', () => {
             type: 'SAVE_STEP_FORM',
             payload: {
               form: temperatureForm,
-              thermocyclerPauseStepId: expect.any(String),
+              concurrentGroupPauseStepId: expect.any(String),
             },
           })
 
@@ -395,7 +387,7 @@ describe('steps actions', () => {
             type: 'SAVE_STEP_FORM',
             payload: {
               form: heaterShakerForm,
-              thermocyclerPauseStepId: expect.any(String),
+              concurrentGroupPauseStepId: expect.any(String),
             },
           })
 

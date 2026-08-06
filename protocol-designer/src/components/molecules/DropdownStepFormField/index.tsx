@@ -85,11 +85,14 @@ export function DropdownStepFormField(
       )
     }
   }
-
   useEffect(
     () => {
       if (options.length === 1) {
         updateValue(options[0].value)
+      }
+      const valueOptions = options.map(option => option.value)
+      if (!valueOptions.includes(value as string)) {
+        updateValue(null)
       }
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.

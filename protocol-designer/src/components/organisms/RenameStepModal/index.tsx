@@ -55,7 +55,6 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
 
   return createPortal(
     <Modal
-      marginLeft="0"
       title={t('shared:name_step')}
       type="info"
       closeOnOutsideClick
@@ -71,7 +70,6 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
             {t('shared:cancel')}
           </SecondaryButton>
           <PrimaryButton
-            data-testid="RenameStepModal_saveButton"
             disabled={stepName.length >= MAX_STEP_NAME_LENGTH}
             onClick={handleSave}
           >

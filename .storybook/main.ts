@@ -1,4 +1,9 @@
+import { createRequire } from 'node:module'
+import { dirname, join } from 'node:path'
+
 import type { StorybookConfig } from '@storybook/react-vite'
+
+const require = createRequire(import.meta.url)
 
 const config: StorybookConfig = {
   stories: [
@@ -14,13 +19,14 @@ const config: StorybookConfig = {
   ],
 
   addons: [
-    '@storybook/addon-links',
-    '@storybook/addon-essentials',
-    'storybook-addon-pseudo-states',
+    getAbsolutePath('@storybook/addon-links'),
+    getAbsolutePath('@storybook/addon-docs'),
+    getAbsolutePath('storybook-addon-pseudo-states'),
+    '@chromatic-com/storybook',
   ],
 
   framework: {
-    name: '@storybook/react-vite',
+    name: getAbsolutePath('@storybook/react-vite'),
     options: {
       builder: {
         // Storybook would normally find the Vite config automatically.
@@ -32,9 +38,15 @@ const config: StorybookConfig = {
     },
   },
 
-  docs: {
-    autodocs: true,
+  docs: {},
+
+  typescript: {
+    reactDocgen: 'react-docgen-typescript',
   },
 }
 
 export default config
+
+function getAbsolutePath(value: string): any {
+  return dirname(require.resolve(join(value, 'package.json')))
+}

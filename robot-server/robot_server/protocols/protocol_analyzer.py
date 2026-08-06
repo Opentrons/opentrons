@@ -2,10 +2,11 @@
 
 import asyncio
 import logging
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import opentrons.protocol_runner.create_simulating_orchestrator as simulating_runner
 import opentrons.util.helpers as datetime_helper
+from opentrons.config import feature_flags
 from opentrons.protocol_engine.errors import ErrorOccurrence
 from opentrons.protocol_engine.types import (
     CSVRuntimeParamPaths,
@@ -22,6 +23,8 @@ from opentrons_shared_data.robot.types import RobotType
 import robot_server.errors.error_mappers as em
 from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.protocol_store import ProtocolResource
+from robot_server.runs.run_process import DirectedRunProcess
+from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
 
 log = logging.getLogger(__name__)
 
@@ -33,11 +36,13 @@ class ProtocolAnalyzer:
         self,
         analysis_store: AnalysisStore,
         protocol_resource: ProtocolResource,
+        run_process_pyro_provider: RunProcessPyroProvider,
     ) -> None:
         """Initialize the analyzer and its dependencies."""
         self._analysis_store = analysis_store
         self._protocol_resource = protocol_resource
-        self._orchestrator: Optional[RunOrchestrator] = None
+        self._coordinator: Optional[Union[RunOrchestrator, DirectedRunProcess]] = None
+        self._run_process_pyro_provider = run_process_pyro_provider
 
     @property
     def protocol_resource(self) -> ProtocolResource:
@@ -46,8 +51,8 @@ class ProtocolAnalyzer:
 
     def get_verified_run_time_parameters(self) -> List[RunTimeParameter]:
         """Get the validated RTPs with values set by the client."""
-        assert self._orchestrator is not None
-        return self._orchestrator.get_run_time_parameters()
+        assert self._coordinator is not None
+        return self._coordinator.get_run_time_parameters()
 
     async def load_orchestrator(
         self,
@@ -58,11 +63,18 @@ class ProtocolAnalyzer:
 
         Returns: The RunOrchestrator instance.
         """
-        self._orchestrator = await simulating_runner.create_simulating_orchestrator(
-            robot_type=self._protocol_resource.source.robot_type,
-            protocol_config=self._protocol_resource.source.config,
-        )
-        await self._orchestrator.load(
+        if feature_flags.protocol_subprocess_enabled():
+            run_coordinator = (
+                await self._run_process_pyro_provider.wait_for_simulating_run_proxy()
+            )
+            await run_coordinator.create_simulating(self._protocol_resource)
+            self._coordinator = run_coordinator
+        else:
+            self._coordinator = await simulating_runner.create_simulating_orchestrator(
+                robot_type=self._protocol_resource.source.robot_type,
+                protocol_config=self._protocol_resource.source.config,
+            )
+        await self._coordinator.load(
             protocol_source=self._protocol_resource.source,
             parse_mode=ParseMode.NORMAL,
             run_time_param_values=run_time_param_values,
@@ -79,9 +91,9 @@ class ProtocolAnalyzer:
         This method should only be called once the run orchestrator is loaded.
         """
         assert self._protocol_resource is not None
-        assert self._orchestrator is not None
+        assert self._coordinator is not None
         try:
-            result = await self._orchestrator.run(
+            result = await self._coordinator.run(
                 deck_configuration=[],
             )
         except BaseException as error:
@@ -89,7 +101,7 @@ class ProtocolAnalyzer:
                 analysis_id=analysis_id,
                 protocol_robot_type=self._protocol_resource.source.robot_type,
                 error=error,
-                run_time_parameters=self._orchestrator.get_run_time_parameters(),
+                run_time_parameters=self._coordinator.get_run_time_parameters(),
             )
             return
 
@@ -150,11 +162,18 @@ class ProtocolAnalyzer:
         or was not required, stop the orchestrator so that all its background tasks
         are stopped timely and do not block server shutdown.
         """
-        if self._orchestrator is not None:
-            if self._orchestrator.get_is_okay_to_clear():
+        if self._coordinator is not None:
+            if self._coordinator.get_is_okay_to_clear():
                 asyncio.run_coroutine_threadsafe(
-                    self._orchestrator.stop(), asyncio.get_running_loop()
+                    self._coordinator.stop(), asyncio.get_running_loop()
                 )
+                if feature_flags.protocol_subprocess_enabled():
+                    asyncio.run_coroutine_threadsafe(
+                        self._run_process_pyro_provider.refresh_simulating(
+                            access_control_mode=self._analysis_store.get_access_control_status()
+                        ),
+                        asyncio.get_running_loop(),
+                    )
             else:
                 log.warning(
                     "Analyzer is no longer in use but orchestrator is busy. "
@@ -165,8 +184,11 @@ class ProtocolAnalyzer:
 def create_protocol_analyzer(
     analysis_store: AnalysisStore,
     protocol_resource: ProtocolResource,
+    run_process_pyro_provider: RunProcessPyroProvider,
 ) -> ProtocolAnalyzer:
     """Protocol analyzer factory function."""
     return ProtocolAnalyzer(
-        analysis_store=analysis_store, protocol_resource=protocol_resource
+        analysis_store=analysis_store,
+        protocol_resource=protocol_resource,
+        run_process_pyro_provider=run_process_pyro_provider,
     )

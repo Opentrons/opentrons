@@ -1,7 +1,10 @@
 import { describe, expect, it, test } from 'vitest'
 
+import { VACUUM_PROGRAM_STATE } from '@opentrons/step-generation'
+
 import {
   PAUSE_UNTIL_TC_PROFILE_COMPLETE,
+  PAUSE_UNTIL_VACUUM_STATE_COMPLETE,
   THERMOCYCLER_PROFILE,
 } from '/protocol-designer/constants'
 import {
@@ -82,12 +85,12 @@ describe('convertFlatStepArrayToHierarchy() and convertStepHierarchyToFlatArray(
           { type: 'standaloneStep', stepId: 'a' },
           {
             type: 'thermocyclerProfileGroup',
-            thermocyclerProfileStepId: 'b',
+            startStepId: 'b',
             concurrentSteps: [
               { type: 'standaloneStep', stepId: 'c' },
               { type: 'standaloneStep', stepId: 'd' },
             ],
-            waitForThermocyclerProfileStepId: 'e',
+            waitStepId: 'e',
           },
           { type: 'standaloneStep', stepId: 'f' },
         ],
@@ -131,10 +134,46 @@ describe('convertFlatStepArrayToHierarchy() and convertStepHierarchyToFlatArray(
           { type: 'standaloneStep', stepId: 'd' },
           {
             type: 'thermocyclerProfileGroup',
-            thermocyclerProfileStepId: 'e',
+            startStepId: 'e',
             concurrentSteps: [],
-            waitForThermocyclerProfileStepId: 'f',
+            waitStepId: 'f',
           },
+        ],
+      },
+    },
+    {
+      label: 'timed Vacuum state group with concurrent steps',
+      flat: [
+        { id: 'a', stepType: 'comment' },
+        {
+          id: 'b',
+          stepType: 'vacuum',
+          programType: VACUUM_PROGRAM_STATE,
+          pumpDurationCheckbox: true,
+          pumpDurationTime: '00:01:00',
+        },
+        { id: 'c', stepType: 'comment' },
+        { id: 'd', stepType: 'comment' },
+        {
+          id: 'e',
+          stepType: 'pause',
+          pauseAction: PAUSE_UNTIL_VACUUM_STATE_COMPLETE,
+        },
+        { id: 'f', stepType: 'comment' },
+      ],
+      hierarchy: {
+        topLevelItems: [
+          { type: 'standaloneStep', stepId: 'a' },
+          {
+            type: 'vacuumStateDurationGroup',
+            startStepId: 'b',
+            concurrentSteps: [
+              { type: 'standaloneStep', stepId: 'c' },
+              { type: 'standaloneStep', stepId: 'd' },
+            ],
+            waitStepId: 'e',
+          },
+          { type: 'standaloneStep', stepId: 'f' },
         ],
       },
     },
@@ -204,12 +243,12 @@ describe('computeStepMove()', () => {
         },
         {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: 'b',
+          startStepId: 'b',
           concurrentSteps: [
             { type: 'standaloneStep', stepId: 'c' },
             { type: 'standaloneStep', stepId: 'd' },
           ],
-          waitForThermocyclerProfileStepId: 'e',
+          waitStepId: 'e',
         },
         {
           type: 'standaloneStep',
@@ -217,9 +256,9 @@ describe('computeStepMove()', () => {
         },
         {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: 'g',
+          startStepId: 'g',
           concurrentSteps: [{ type: 'standaloneStep', stepId: 'h' }],
-          waitForThermocyclerProfileStepId: 'i',
+          waitStepId: 'i',
         },
         {
           type: 'standaloneStep',
@@ -242,9 +281,9 @@ describe('computeStepMove()', () => {
           },
           {
             type: 'thermocyclerProfileGroup',
-            thermocyclerProfileStepId: 'b',
+            startStepId: 'b',
             concurrentSteps: [{ type: 'standaloneStep', stepId: 'c' }],
-            waitForThermocyclerProfileStepId: 'e',
+            waitStepId: 'e',
           },
           {
             type: 'standaloneStep',
@@ -252,12 +291,12 @@ describe('computeStepMove()', () => {
           },
           {
             type: 'thermocyclerProfileGroup',
-            thermocyclerProfileStepId: 'g',
+            startStepId: 'g',
             concurrentSteps: [
               { type: 'standaloneStep', stepId: 'd' },
               { type: 'standaloneStep', stepId: 'h' },
             ],
-            waitForThermocyclerProfileStepId: 'i',
+            waitStepId: 'i',
           },
           {
             type: 'standaloneStep',
@@ -278,9 +317,9 @@ describe('computeStepMove()', () => {
         },
         {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: 'b',
+          startStepId: 'b',
           concurrentSteps: [],
-          waitForThermocyclerProfileStepId: 'c',
+          waitStepId: 'c',
         },
         {
           type: 'standaloneStep',
@@ -299,13 +338,79 @@ describe('computeStepMove()', () => {
         topLevelItems: [
           {
             type: 'thermocyclerProfileGroup',
-            thermocyclerProfileStepId: 'b',
+            startStepId: 'b',
             concurrentSteps: [{ type: 'standaloneStep', stepId: 'a' }],
-            waitForThermocyclerProfileStepId: 'c',
+            waitStepId: 'c',
           },
           {
             type: 'standaloneStep',
             stepId: 'd',
+          },
+        ],
+      },
+    }
+    expect(result).toStrictEqual(expectedResult)
+  })
+
+  it('allows moving a standalone step to the end of a Vacuum profile concurrent group', () => {
+    const originalHierarchy: StepHierarchy = {
+      topLevelItems: [
+        { type: 'standaloneStep', stepId: 'pipette' },
+        {
+          type: 'vacuumProfileGroup',
+          startStepId: 'vp',
+          concurrentSteps: [],
+          waitStepId: 'w',
+        },
+      ],
+    }
+    const result = computeStepMove(originalHierarchy, {
+      moveType: 'insertAsLastStepOfGroup',
+      movedStepId: 'pipette',
+      destinationGroupRootStepId: 'vp',
+    })
+    const expectedResult: typeof result = {
+      isMoveAllowed: true,
+      stepsAfterMove: {
+        topLevelItems: [
+          {
+            type: 'vacuumProfileGroup',
+            startStepId: 'vp',
+            concurrentSteps: [{ type: 'standaloneStep', stepId: 'pipette' }],
+            waitStepId: 'w',
+          },
+        ],
+      },
+    }
+    expect(result).toStrictEqual(expectedResult)
+  })
+
+  it('allows moving a standalone step to the end of a timed Vacuum state concurrent group', () => {
+    const originalHierarchy: StepHierarchy = {
+      topLevelItems: [
+        { type: 'standaloneStep', stepId: 'pipette' },
+        {
+          type: 'vacuumStateDurationGroup',
+          startStepId: 'vs',
+          concurrentSteps: [],
+          waitStepId: 'w',
+        },
+      ],
+    }
+    const result = computeStepMove(originalHierarchy, {
+      moveType: 'insertAsLastStepOfGroup',
+      movedStepId: 'pipette',
+      destinationGroupRootStepId: 'vs',
+    })
+    const expectedResult: typeof result = {
+      isMoveAllowed: true,
+      stepsAfterMove: {
+        topLevelItems: [
+          {
+            type: 'vacuumStateDurationGroup',
+            startStepId: 'vs',
+            concurrentSteps: [{ type: 'standaloneStep', stepId: 'pipette' }],
+            waitStepId: 'w',
           },
         ],
       },
@@ -322,9 +427,9 @@ describe('computeStepMove()', () => {
         },
         {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: 'b',
+          startStepId: 'b',
           concurrentSteps: [{ type: 'standaloneStep', stepId: 'c' }],
-          waitForThermocyclerProfileStepId: 'd',
+          waitStepId: 'd',
         },
         {
           type: 'standaloneStep',
@@ -343,9 +448,9 @@ describe('computeStepMove()', () => {
         topLevelItems: [
           {
             type: 'thermocyclerProfileGroup',
-            thermocyclerProfileStepId: 'b',
+            startStepId: 'b',
             concurrentSteps: [{ type: 'standaloneStep', stepId: 'c' }],
-            waitForThermocyclerProfileStepId: 'd',
+            waitStepId: 'd',
           },
           {
             type: 'standaloneStep',
@@ -370,9 +475,9 @@ describe('computeStepMove()', () => {
         },
         {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: 'b',
+          startStepId: 'b',
           concurrentSteps: [{ type: 'standaloneStep', stepId: 'c' }],
-          waitForThermocyclerProfileStepId: 'd',
+          waitStepId: 'd',
         },
         {
           type: 'standaloneStep',
@@ -411,12 +516,12 @@ describe('computeStepSwap()', () => {
     const step2: StandaloneStep = { type: 'standaloneStep', stepId: 'step_2' }
     const step3TCProfile: ThermocyclerProfileGroup = {
       type: 'thermocyclerProfileGroup',
-      thermocyclerProfileStepId: 'step_3_tc_profile',
+      startStepId: 'step_3_tc_profile',
       concurrentSteps: [
         { type: 'standaloneStep', stepId: 'step_3_tc_concurrent_1' },
         { type: 'standaloneStep', stepId: 'step_3_tc_concurrent_2' },
       ],
-      waitForThermocyclerProfileStepId: 'step_3_tc_wait',
+      waitStepId: 'step_3_tc_wait',
     }
     const step4: StandaloneStep = { type: 'standaloneStep', stepId: 'step_4' }
     const originalHierarchy: StepHierarchy = {
@@ -439,11 +544,7 @@ describe('computeStepSwap()', () => {
 
     // Swap step_3_tc_profile up (should swap with step_2)
     expect(
-      computeStepSwap(
-        originalHierarchy,
-        step3TCProfile.thermocyclerProfileStepId,
-        'up'
-      )
+      computeStepSwap(originalHierarchy, step3TCProfile.startStepId, 'up')
     ).toStrictEqual({
       topLevelItems: [step1, step3TCProfile, step2, step4],
     })
@@ -461,13 +562,13 @@ describe('computeStepSwap()', () => {
       topLevelItems: [
         {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: 'profile_step',
+          startStepId: 'profile_step',
           concurrentSteps: [
             { type: 'standaloneStep', stepId: 'concurrent_1' },
             { type: 'standaloneStep', stepId: 'concurrent_2' },
             { type: 'standaloneStep', stepId: 'concurrent_3' },
           ],
-          waitForThermocyclerProfileStepId: 'wait_step',
+          waitStepId: 'wait_step',
         },
       ],
     }
@@ -476,13 +577,13 @@ describe('computeStepSwap()', () => {
       topLevelItems: [
         {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: 'profile_step',
+          startStepId: 'profile_step',
           concurrentSteps: [
             { type: 'standaloneStep', stepId: 'concurrent_2' },
             { type: 'standaloneStep', stepId: 'concurrent_1' },
             { type: 'standaloneStep', stepId: 'concurrent_3' },
           ],
-          waitForThermocyclerProfileStepId: 'wait_step',
+          waitStepId: 'wait_step',
         },
       ],
     })
@@ -495,12 +596,12 @@ describe('computeStepSwap()', () => {
         { type: 'standaloneStep', stepId: 'step_2' },
         {
           type: 'thermocyclerProfileGroup',
-          thermocyclerProfileStepId: 'profile_step',
+          startStepId: 'profile_step',
           concurrentSteps: [
             { type: 'standaloneStep', stepId: 'concurrent_1' },
             { type: 'standaloneStep', stepId: 'concurrent_2' },
           ],
-          waitForThermocyclerProfileStepId: 'wait_step',
+          waitStepId: 'wait_step',
         },
         { type: 'standaloneStep', stepId: 'step_3' },
       ],
@@ -554,13 +655,13 @@ describe('findStep()', () => {
       { type: 'standaloneStep', stepId: 'standalone_2' },
       {
         type: 'thermocyclerProfileGroup',
-        thermocyclerProfileStepId: 'tc_profile_root',
+        startStepId: 'tc_profile_root',
         concurrentSteps: [
           { type: 'standaloneStep', stepId: 'concurrent_1' },
           { type: 'standaloneStep', stepId: 'concurrent_2' },
           { type: 'standaloneStep', stepId: 'concurrent_3' },
         ],
-        waitForThermocyclerProfileStepId: 'tc_wait',
+        waitStepId: 'tc_wait',
       },
       { type: 'standaloneStep', stepId: 'standalone_3' },
     ],
@@ -603,10 +704,7 @@ describe('findStep()', () => {
     const thermocyclerProfileGroup = stepHierarchy
       .topLevelItems[2] as ThermocyclerProfileGroup
 
-    const result = findStep(
-      stepHierarchy,
-      thermocyclerProfileGroup.waitForThermocyclerProfileStepId
-    )
+    const result = findStep(stepHierarchy, thermocyclerProfileGroup.waitStepId)
     expect(result).toBeNull()
   })
 
@@ -622,12 +720,12 @@ describe('getPairedSteps()', () => {
       { type: 'standaloneStep', stepId: '1' },
       {
         type: 'thermocyclerProfileGroup',
-        thermocyclerProfileStepId: '2',
+        startStepId: '2',
         concurrentSteps: [
           { type: 'standaloneStep', stepId: '3' },
           { type: 'standaloneStep', stepId: '4' },
         ],
-        waitForThermocyclerProfileStepId: '5',
+        waitStepId: '5',
       },
       { type: 'standaloneStep', stepId: '6' },
     ],

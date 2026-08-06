@@ -1,19 +1,20 @@
 {
-  "select_instructions": "Click + Drag to select multiple.",
+  "accessible": {
+    "deselect_multiple": "Unselect wells",
+    "deselect_one": "Unselect well",
+    "select_multiple": "Select wells",
+    "select_one": "Select well"
+  },
+  "all_pickups_selected": "All wells selected",
+  "inaccessible": {
+    "collision": "Selection will cause a collision",
+    "labware_well_spacing": "Incompatible nozzle configuration for this labware",
+    "partial_tip": "Blocked by existing selection"
+  },
   "legend": {
     "inaccessible_tip": "Inaccessible well",
     "selected_well": "Selected well",
     "unselected_well": "Unselected well"
   },
-  "accessible": {
-    "select_one": "Select well",
-    "select_multiple": "Select wells",
-    "deselect_one": "Unselect well",
-    "deselect_multiple": "Unselect wells"
-  },
-  "inaccessible": {
-    "collision": "Selection will cause a collision",
-    "partial_tip": "Blocked by existing selection"
-  },
-  "all_pickups_selected": "All wells selected"
+  "select_instructions": "Click + Drag to select multiple."
 }

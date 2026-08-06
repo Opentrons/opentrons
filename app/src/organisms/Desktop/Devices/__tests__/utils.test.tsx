@@ -16,7 +16,7 @@ import {
 import type {
   FetchPipettesResponseBody,
   FetchPipettesResponsePipette,
-} from '/app/redux/pipettes/types'
+} from '@opentrons/api-client'
 
 describe('getIs96ChannelPipetteAttached hook', () => {
   it('returns false when there is no pipette attached on the left mount', () => {
@@ -35,7 +35,7 @@ describe('getIs96ChannelPipetteAttached hook', () => {
 
   it('returns false when there is no 96 channel pipette attached on the left mount', () => {
     const mockLeftMountAttachedPipette = {
-      name: 'p10_single_v1',
+      name: 'p10_single',
     } as FetchPipettesResponsePipette
 
     const result = getIs96ChannelPipetteAttached(mockLeftMountAttachedPipette)
@@ -45,10 +45,10 @@ describe('getIs96ChannelPipetteAttached hook', () => {
 
 describe('getOffsetCalibrationForMount', () => {
   const mockLeftMountAttachedPipette = {
-    name: 'mock left pipette',
+    name: 'p10_single',
   } as FetchPipettesResponsePipette
   const mockRightMountAttachedPipette = {
-    name: 'mock right pipette',
+    name: 'p10_single',
   } as FetchPipettesResponsePipette
   it('returns null when not given calibrations', () => {
     const result = getOffsetCalibrationForMount(
@@ -81,7 +81,7 @@ describe('getOffsetCalibrationForMount', () => {
       left: mockLeftMountAttachedPipette, // this one doesn't matter too much since we're looking for the right mount cal
       right: {
         id: pipette,
-        name: `test-${pipette}`,
+        name: 'p10_single',
         model: 'p10_single_v1',
         tip_length: 0,
         mount_axis: 'z',

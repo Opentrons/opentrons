@@ -2,6 +2,8 @@ import { combineReducers } from 'redux'
 
 // app-wide alerts state
 import { alertsReducer } from './alerts/reducer'
+// audit log period deletion key state
+import { auditReducer } from './audit/slice'
 // calibration data state
 import { calibrationReducer } from './calibration/reducer'
 // config state
@@ -10,10 +12,6 @@ import { configReducer } from './config/reducer'
 import { customLabwareReducer } from './custom-labware/reducer'
 // discovery state
 import { discoveryReducer } from './discovery/reducer'
-// networking state
-import { networkingReducer } from './networking/reducer'
-// pipettes state
-import { pipettesReducer } from './pipettes/reducer'
 // local protocol run state
 import { protocolRunReducer } from './protocol-runs/reducer'
 // local protocol storage from file system state
@@ -22,10 +20,8 @@ import { protocolStorageReducer } from './protocol-storage/reducer'
 import { robotAdminReducer } from './robot-admin/reducer'
 // api state
 import { robotApiReducer } from './robot-api/reducer'
-// robot controls state
-import { robotControlsReducer } from './robot-controls/reducer'
-// robot settings state
-import { robotSettingsReducer } from './robot-settings/reducer'
+// robot auth state
+import { robotAuthReducer } from './robot-auth/slice'
 // robot robot update state
 import { robotUpdateReducer } from './robot-update/reducer'
 // robot  calibration and (eventually) protocol sessions state
@@ -43,13 +39,11 @@ export const rootReducer: Reducer<State, Action> = (
   action: Action
 ): State => {
   const combinedReducer = combineReducers({
-    robotApi: robotApiReducer,
+    audit: auditReducer,
     robotAdmin: robotAdminReducer,
-    robotControls: robotControlsReducer,
-    robotSettings: robotSettingsReducer,
+    robotApi: robotApiReducer,
+    robotAuth: robotAuthReducer,
     robotUpdate: robotUpdateReducer,
-    pipettes: pipettesReducer,
-    networking: networkingReducer,
     config: configReducer,
     discovery: discoveryReducer,
     labware: customLabwareReducer,

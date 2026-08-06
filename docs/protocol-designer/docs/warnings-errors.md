@@ -19,6 +19,7 @@ The step warning appears in a red text box at the top of the step form. In most 
 In some cases, a step warning appears after creating a step. If a transfer step aspirates more liquid than is available in the source well, a step warning is included only after the step has been saved and analyzed by Protocol Designer. To view and resolve the warning, double-click the step to reopen the form and edit. 
 
 Many step warnings shown by Protocol Designer will not affect the function of your protocol steps. You can save and run a protocol on the robot with these warnings present. For example, the robot can still aspirate and dispense your chosen amount of liquid, even if it overflows a destination well. We recommend resolving all warnings to avoid problems in your workflow. 
+ 
 
 ## Errors
 
@@ -41,3 +42,14 @@ When designing your protocol, consider the order the labware and modules should 
 </figure>
 
 For example, the labware latch of the Heater-Shaker needs to be open to move labware to and from the module. Before heating or shaking, the latch needs to be closed. To resolve this error, add a Heater-Shaker step to open the labware latch or drag and drop to change the order of steps. 
+
+As you add hardware, labware, and protocol steps, Protocol Designer also considers pipette collision risk. Some actions, like partial tip pickup, require the pipette to hover above adjacent deck slots.
+
+<figure class="screenshot" markdown>
+  ![Pipette collisions likely warning](images/collision_warning.png)
+  <figcaption>Partial tip pickup settings could result in a pipette collision, causing a protocol error.</figcaption>
+</figure>
+
+On this example Flex deck, tip racks, labware, and modules are concentrated in a single corner of the deck. For any partial tip pickup step, the pipette would need to hover over an adjacent deck slot containing labware or a module, increasing collision risk.
+
+For more details, see [partial tip pickup](steps/transfer.md#partial-tip-pickup).

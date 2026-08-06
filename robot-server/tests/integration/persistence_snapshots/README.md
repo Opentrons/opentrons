@@ -84,3 +84,18 @@ This has a single Python protocol and a single run of that protocol. The protoco
 ### v7.1.1
 
 An amalgamation of the office's ABR (Application Based Reliability) robots, which were running the v7.1.1 stable release. A few runs were extracted from each robot and manually combined to form a single Frankenstein persistence directory.
+
+### schema_15_minimal_for_v16_migration
+
+Synthetic snapshot used to regression-test the database migration from schema 15 to schema 16 (see `robot_server.persistence._migrations.v15_to_v16`). The persistence layout has only the versioned subdirectory `15/` with `robot_server.db` at that schema revision, plus no `protocols/` tree (empty protocol store).
+
+The database was produced by migrating an empty root through all folder migrations up to and including 14 to 15, then inserting rows into `boolean_setting_extended` for every key that exists in schema 15 (`enable_error_recovery`, `enable_camera`, `enable_live_stream`, `enable_error_recovery_camera`) with alternating true or false values so HTTP checks after migration can tell the data was preserved.
+
+To regenerate the SQLite file after migration logic changes:
+
+```bash
+cd robot-server
+uv run --python 3.12 python tests/integration/persistence_snapshots/generate_schema_15_for_v16_migration_snapshot.py
+```
+
+Integration coverage: `tests/integration/http_api/persistence/test_schema_15_to_16_migration.py` (including legacy `GET /camera` for the three enablement flags).

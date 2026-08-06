@@ -345,6 +345,52 @@ export function useDropTipFlowUtils({
     }
   }
 
+  // Leaving the documentation modal must unmount the drop tip wizard. Using the
+  // normal closeFlow path re-checks tip status and re-enters this flow, which
+  // immediately re-prompts for documentation.
+  const onDocumentationCancel = (): void => {
+    switch (selectedRecoveryOption) {
+      case RETRY_NEW_TIPS.ROUTE:
+        void proceedToRouteAndStep(
+          RETRY_NEW_TIPS.ROUTE,
+          RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+        )
+        break
+      case SKIP_STEP_WITH_NEW_TIPS.ROUTE:
+        void proceedToRouteAndStep(
+          SKIP_STEP_WITH_NEW_TIPS.ROUTE,
+          SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS
+        )
+        break
+      case HOME_AND_RETRY.ROUTE:
+        void proceedToRouteAndStep(
+          HOME_AND_RETRY.ROUTE,
+          HOME_AND_RETRY.STEPS.HOME_BEFORE_RETRY
+        )
+        break
+      case MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE:
+        void proceedToRouteAndStep(
+          MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
+          MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+        )
+        break
+      case RECOVERY_MAP.CANCEL_RUN.ROUTE:
+        void proceedToRouteAndStep(
+          RECOVERY_MAP.CANCEL_RUN.ROUTE,
+          RECOVERY_MAP.CANCEL_RUN.STEPS.CONFIRM_CANCEL
+        )
+        break
+      default:
+        // Splash cancel and other entry points: return to begin-removal so the
+        // wizard unmounts and documentation is not prompted again.
+        void proceedToRouteAndStep(
+          DROP_TIP_FLOWS.ROUTE,
+          DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL
+        )
+        break
+    }
+  }
+
   // If a specific step within the DROP_TIP_FLOWS route is selected, begin the Drop Tip Flows at its related route.
   //
   // NOTE: The substep is cleared by drop tip wizard after the completion of the wizard flow.
@@ -378,6 +424,7 @@ export function useDropTipFlowUtils({
     buttonOverrides: buildButtonOverrides(),
     routeOverride: buildRouteOverride(),
     reportMap: updateSubMap,
+    onDocumentationCancel,
   }
 }
 
@@ -396,7 +443,7 @@ function routeAlternativelyIfNoPipette(props: RecoveryContentProps): void {
     MANUAL_FILL_AND_RETRY_NEW_TIPS,
   } = RECOVERY_MAP
 
-  if (tipStatusUtils.aPipetteWithTip == null)
+  if (tipStatusUtils.aPipetteWithTip == null) {
     switch (selectedRecoveryOption) {
       case RETRY_NEW_TIPS.ROUTE: {
         proceedToRouteAndStep(
@@ -430,4 +477,5 @@ function routeAlternativelyIfNoPipette(props: RecoveryContentProps): void {
         proceedToRouteAndStep(OPTION_SELECTION.ROUTE)
       }
     }
+  }
 }

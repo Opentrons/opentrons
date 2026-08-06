@@ -102,17 +102,19 @@ def extract_api_level(protocol_text: str) -> str:
     return ""
 
 
-def extract_robot_type(protocol_text: str) -> str:
+def extract_robot_type(protocol_text: str) -> str | None:
     """
     Extract the robot type from the protocol text.
-    Returns "Flex" if 'robotType': 'Flex' is found, otherwise "OT2".
+
+    Returns "Flex" if 'robotType': 'Flex' is found, otherwise None.
     """
     import re
 
-    # Look for 'robotType': 'Flex' or "robotType": "Flex"
     if re.search(r'["\']robotType["\']\s*:\s*["\']Flex["\']', protocol_text):
         return "Flex"
-    return "OT2"
+    if re.search(r'["\']robotType["\']\s*:\s*["\']OT-3["\']', protocol_text):
+        return "Flex"
+    return None
 
 
 def main():
@@ -133,6 +135,8 @@ def main():
         slug = protocol["slug"]
         protocol_text = protocol["protocolText"]
         robot_type = extract_robot_type(protocol_text)
+        if robot_type is None:
+            continue
         api_level = extract_api_level(protocol_text)
         if api_level:
             file_name = f"{robot_type}_S_v{api_level}_PL_{slug}.py"

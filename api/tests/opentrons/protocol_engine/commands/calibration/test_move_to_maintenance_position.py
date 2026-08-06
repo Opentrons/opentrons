@@ -7,9 +7,10 @@ from typing import TYPE_CHECKING
 import pytest
 from decoy import Decoy
 
+from opentrons.config import feature_flags
 from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.protocol_engine.commands.calibration.move_to_maintenance_position import (
-    MaintenancePosition,
+    MotionModifier,
     MoveToMaintenancePositionImplementation,
     MoveToMaintenancePositionParams,
     MoveToMaintenancePositionResult,
@@ -43,7 +44,7 @@ async def test_calibration_move_to_location_implementation_for_attach_instrument
 ) -> None:
     """Command should get a move to target location and critical point and should verify move_to call."""
     params = MoveToMaintenancePositionParams(
-        mount=mount_type, maintenancePosition=MaintenancePosition.ATTACH_INSTRUMENT
+        mount=mount_type,
     )
 
     decoy.when(
@@ -69,9 +70,6 @@ async def test_calibration_move_to_location_implementation_for_attach_instrument
             critical_point=CriticalPoint.MOUNT,
         ),
         await ot3_hardware_api.prepare_for_mount_movement(hw_mount),
-        await ot3_hardware_api.move_axes(
-            position={Axis.by_mount(hw_mount): 400},
-        ),
         await ot3_hardware_api.disengage_axes(
             [Axis.by_mount(hw_mount)],
         ),
@@ -80,18 +78,33 @@ async def test_calibration_move_to_location_implementation_for_attach_instrument
 
 @pytest.mark.ot3_only
 @pytest.mark.parametrize("mount_type", [MountType.LEFT, MountType.RIGHT])
+@pytest.mark.parametrize(
+    "internal_96ch_attach, expected_right_z",
+    [
+        (False, 105),
+        (True, 86.85),
+    ],
+)
 async def test_calibration_move_to_location_implementation_for_attach_plate(
     decoy: Decoy,
     subject: MoveToMaintenancePositionImplementation,
     state_view: StateView,
     ot3_hardware_api: OT3API,
     mount_type: MountType,
+    internal_96ch_attach: bool,
+    expected_right_z: float,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Command should get a move to target location and critical point and should verify move_to call."""
     params = MoveToMaintenancePositionParams(
-        mount=mount_type, maintenancePosition=MaintenancePosition.ATTACH_PLATE
+        mount=mount_type, motionModifier=MotionModifier.LOWER_Z_AXES_SEQUENTIALLY
     )
 
+    mock_internal_96ch_attach = decoy.mock(func=feature_flags.internal_96ch_attach)
+    monkeypatch.setattr(
+        feature_flags, "internal_96ch_attach", mock_internal_96ch_attach
+    )
+    decoy.when(mock_internal_96ch_attach()).then_return(internal_96ch_attach)
     decoy.when(
         await ot3_hardware_api.gantry_position(
             Mount.LEFT, critical_point=CriticalPoint.MOUNT
@@ -123,11 +136,60 @@ async def test_calibration_move_to_location_implementation_for_attach_plate(
         ),
         await ot3_hardware_api.move_axes(
             position={
-                Axis.Z_R: 105,
+                Axis.Z_R: expected_right_z,
             }
         ),
         await ot3_hardware_api.disengage_axes(
             [Axis.Z_R],
+        ),
+    )
+
+
+@pytest.mark.ot3_only
+@pytest.mark.parametrize("mount_type", [MountType.LEFT, MountType.RIGHT])
+async def test_calibration_move_to_location_for_lower_mount_z_axis(
+    decoy: Decoy,
+    subject: MoveToMaintenancePositionImplementation,
+    state_view: StateView,
+    ot3_hardware_api: OT3API,
+    mount_type: MountType,
+) -> None:
+    """Command should prepare mount, lower the mount's z-axis, and disengage."""
+    params = MoveToMaintenancePositionParams(
+        mount=mount_type, motionModifier=MotionModifier.LOWER_MOUNT_Z_AXIS
+    )
+
+    decoy.when(
+        await ot3_hardware_api.gantry_position(
+            Mount.LEFT, critical_point=CriticalPoint.MOUNT
+        )
+    ).then_return(Point(x=1, y=2, z=250))
+
+    decoy.when(ot3_hardware_api.get_instrument_max_height(Mount.LEFT)).then_return(300)
+
+    result = await subject.execute(params=params)
+    assert result == SuccessData(
+        public=MoveToMaintenancePositionResult(),
+    )
+
+    hw_mount = mount_type.to_hw_mount()
+    mount_to_axis = Axis.by_mount(hw_mount)
+    decoy.verify(
+        await ot3_hardware_api.prepare_for_mount_movement(Mount.LEFT),
+        await ot3_hardware_api.retract(Mount.LEFT),
+        await ot3_hardware_api.move_to(
+            mount=Mount.LEFT,
+            abs_position=Point(x=0, y=110, z=250),
+            critical_point=CriticalPoint.MOUNT,
+        ),
+        await ot3_hardware_api.prepare_for_mount_movement(hw_mount),
+        await ot3_hardware_api.move_axes(
+            {
+                mount_to_axis: 400.0,
+            }
+        ),
+        await ot3_hardware_api.disengage_axes(
+            [mount_to_axis],
         ),
     )
 
@@ -142,7 +204,6 @@ async def test_calibration_move_to_location_implementation_for_gripper(
     """Command should get a move to target location and critical point and should verify move_to call."""
     params = MoveToMaintenancePositionParams(
         mount=MountType.EXTENSION,
-        maintenancePosition=MaintenancePosition.ATTACH_INSTRUMENT,
     )
 
     decoy.when(

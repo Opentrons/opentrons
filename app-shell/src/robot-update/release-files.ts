@@ -100,13 +100,6 @@ export function downloadAndNotify(
             })
           })
         }
-        // This action will only have an effect if the user is actively waiting for the download to complete.
-        else {
-          dispatch({
-            type: 'robotUpdate:DOWNLOAD_DONE',
-            payload: target,
-          })
-        }
       })
       .then(() => path)
   })
@@ -161,7 +154,7 @@ export function readUpdateFileInfo(systemFile: string): Promise<UserFileInfo> {
 export function cleanupReleaseFiles(
   downloadsDir: string,
   currentRelease: string
-): Promise<unknown> {
+): Promise<void> {
   return readdir(downloadsDir, { withFileTypes: true })
     .then(files => {
       return files
@@ -169,4 +162,5 @@ export function cleanupReleaseFiles(
         .map(f => path.join(downloadsDir, f.name))
     })
     .then(removals => Promise.all(removals.map(f => remove(f))))
+    .then(() => {})
 }

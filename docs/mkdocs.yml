@@ -21,6 +21,9 @@ nav:
   - Protocol Designer: '!include protocol-designer/mkdocs.yml'
   - Python API: '!include python-api/mkdocs.yml'
 
+exclude_docs: |
+  python-api/liquid-class-tables/*.md
+
 plugins:
   - monorepo
   - search
@@ -53,7 +56,9 @@ plugins:
             extensions:
               - python-api/griffe_version_required.py:RequiresVersionExtension
   - autorefs
-  - macros
+  - macros:
+      # Same partials as standalone python-api site (liquid-class-tables/*.md).
+      include_dir: python-api/docs
 
 theme:
   name: material
@@ -91,6 +96,7 @@ markdown_extensions:
   - sane_lists
   - toc:
       permalink: true
+      title: Table of Contents
 
 extra_css:
   - opentrons-theme.css
@@ -98,7 +104,7 @@ extra_css:
   - python-api.css
 
 extra:
-  apiLevel: 2.27
-  robot_stack_version: 8.8.0
+  apiLevel: 2.29
+  robot_stack_version: 9.1.1
 
 copyright: '© Opentrons 2026. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'

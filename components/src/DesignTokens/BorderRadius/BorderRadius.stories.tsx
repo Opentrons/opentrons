@@ -1,61 +1,50 @@
 import { StyledText } from '../../atoms/StyledText'
-import { BORDERS, COLORS } from '../../helix-design-system'
-import { Box, Flex } from '../../primitives'
-import { ALIGN_FLEX_START, DIRECTION_COLUMN } from '../../styles'
-import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { BORDERS } from '../../helix-design-system'
+import { TYPOGRAPHY } from '../../ui-style-constants'
+import styles from './borderradius.stories.module.css'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+type BorderRadiusEntry = [token: string, value: string | number]
+
+interface StoryArgs {
+  borderRadius: BorderRadiusEntry[]
+}
+
+const meta: Meta<StoryArgs> = {
   title: 'Design Tokens/BorderRadius',
-} as Meta
-
-interface BorderRadiusStorybookProps {
-  borderRadius: string[]
 }
+export default meta
 
-const Template: Story<BorderRadiusStorybookProps> = args => {
-  const targetBorderRadiuses = args.borderRadius
-    .filter(s => s[0].includes('borderRadius'))
-    .sort((a, b) => {
-      const aValue = parseInt(a[1])
-      const bValue = parseInt(b[1])
-      return aValue - bValue
-    })
+export const AllBorderRadiuses: StoryObj<StoryArgs> = {
+  args: {
+    borderRadius: Object.entries(BORDERS) as BorderRadiusEntry[],
+  },
+  render: args => {
+    const targetBorderRadiuses = args.borderRadius
+      .filter(([token]) => token.includes('borderRadius'))
+      .sort((a, b) => {
+        const aValue = Number.parseFloat(String(a[1]))
+        const bValue = Number.parseFloat(String(b[1]))
+        return aValue - bValue
+      })
 
-  return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing8}
-      padding={SPACING.spacing24}
-    >
-      {targetBorderRadiuses.map((br, index) => (
-        <Flex
-          key={`spacing_${index}`}
-          flexDirection={DIRECTION_COLUMN}
-          alignItems={ALIGN_FLEX_START}
-          padding={SPACING.spacing16}
-          gridGap={SPACING.spacing8}
-          width="100%"
-          height="6rem"
-        >
-          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightRegular}>
-            {`${br[0]}" ${br[1]}`}
-          </StyledText>
-          <Box
-            width="10rem"
-            height="4rem"
-            backgroundColor={COLORS.blue50}
-            borderRadius={br[1]}
-          />
-        </Flex>
-      ))}
-    </Flex>
-  )
-}
-
-export const AllBorderRadiuses = Template.bind({})
-const allBorderRadiuses = Object.entries(BORDERS)
-AllBorderRadiuses.args = {
-  borderRadius: allBorderRadiuses,
+    return (
+      <div className={styles.container}>
+        {targetBorderRadiuses.map((br, index) => (
+          <div className={styles.item} key={`spacing_${index}`}>
+            <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+              {`${br[0]}" ${br[1]}`}
+            </StyledText>
+            <div
+              className={styles.example_box}
+              style={{
+                borderRadius: typeof br[1] === 'number' ? `${br[1]}px` : br[1],
+              }}
+            />
+          </div>
+        ))}
+      </div>
+    )
+  },
 }

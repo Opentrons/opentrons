@@ -10,7 +10,7 @@ import type { ChangeEvent, ComponentProps } from 'react'
 const meta: Meta<typeof TouchInputFieldComponent> = {
   title: 'Helix/Molecules/TouchInputField',
   component: TouchInputFieldComponent,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   argTypes: {
     units: {
       control: {

@@ -1,12 +1,16 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
   Banner,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  JUSTIFY_FLEX_END,
   LegacyStyledText,
+  PrimaryButton,
   SPACING,
 } from '@opentrons/components'
 import {
@@ -16,7 +20,10 @@ import {
   WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
 
+import { SmallButton } from '/app/atoms/buttons'
+import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
 import { usePipetteNameSpecs } from '/app/local-resources/instruments'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
@@ -41,6 +48,7 @@ import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '@opentrons/react-api-client'
 import type {
   CreateCommand,
   DeckConfiguration,
@@ -59,6 +67,7 @@ interface BeforeBeginningProps extends PipetteWizardStepProps {
   createdMaintenanceRunId: string | null
   deckConfig: UseQueryResult<DeckConfiguration>
   requiredPipette?: LoadedPipette
+  documentationState: DocumentationState
 }
 export const BeforeBeginning = (
   props: BeforeBeginningProps
@@ -74,24 +83,42 @@ export const BeforeBeginning = (
     isRobotMoving,
     errorMessage,
     setShowErrorMessage,
+    isDoorOpenError,
+    setIsDoorOpenError,
+    dismissDoorOpenError,
     selectedPipette,
     isOnDevice,
     requiredPipette,
     maintenanceRunId,
     createdMaintenanceRunId,
     deckConfig,
+    documentationState,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-  useEffect(
-    () => {
-      if (createdMaintenanceRunId == null) {
-        createMaintenanceRun({})
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+
+  const handleCommandError = (error: Error): void => {
+    if (isMaintenanceDoorOpenError(error)) {
+      setIsDoorOpenError(true)
+      setShowErrorMessage(t('door_is_open') as string)
+    } else {
+      setShowErrorMessage(error.message)
+    }
+  }
+
+  const hasSentCreateMaintenanceRun = useRef(false)
+  useEffect(() => {
+    if (createdMaintenanceRunId != null) return
+    if (isCreateLoading || hasSentCreateMaintenanceRun.current) return
+    if (!isDocumentationProvided(documentationState)) return
+
+    hasSentCreateMaintenanceRun.current = true
+    createMaintenanceRun({})
+  }, [
+    createMaintenanceRun,
+    createdMaintenanceRunId,
+    documentationState,
+    isCreateLoading,
+  ])
   const pipetteId = attachedPipettes[mount]?.serialNumber
   const isGantryEmpty = getIsGantryEmpty(attachedPipettes)
   const isGantryEmptyFor96ChannelAttachment =
@@ -105,8 +132,9 @@ export const BeforeBeginning = (
   if (
     pipetteId == null &&
     (flowType === FLOWS.CALIBRATE || flowType === FLOWS.DETACH)
-  )
+  ) {
     return null
+  }
 
   let equipmentList = [CALIBRATION_PROBE]
   const proceedButtonText = t('move_gantry_to_front')
@@ -186,6 +214,9 @@ export const BeforeBeginning = (
   )
 
   const handleOnClickCalibrateOrDetach = (): void => {
+    const is96Channel =
+      attachedPipettes[mount]?.instrumentName === 'p1000_96' ||
+      attachedPipettes[mount]?.instrumentName === 'p200_96'
     let moveToFrontCommands: CreateCommand[] = [
       {
         commandType: 'loadPipette' as const,
@@ -200,6 +231,9 @@ export const BeforeBeginning = (
         commandType: 'calibration/moveToMaintenancePosition' as const,
         params: {
           mount,
+          ...(is96Channel
+            ? { motionModifier: 'lowerMountZAxis' as const }
+            : {}),
         },
       },
     ]
@@ -208,9 +242,7 @@ export const BeforeBeginning = (
       .then(() => {
         proceed()
       })
-      .catch(error => {
-        setShowErrorMessage(error.message as string)
-      })
+      .catch(handleCommandError)
   }
 
   const SingleMountAttachCommand: CreateCommand[] = [
@@ -229,7 +261,7 @@ export const BeforeBeginning = (
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
         mount: RIGHT,
-        maintenancePosition: 'attachPlate',
+        motionModifier: 'lowerZAxesSequentially',
       },
     },
   ]
@@ -244,21 +276,47 @@ export const BeforeBeginning = (
       .then(() => {
         proceed()
       })
-      .catch(error => {
-        setShowErrorMessage(error.message as string)
-      })
+      .catch(handleCommandError)
   }
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return <SimpleWizardInProgressBody description={t('stand_back')} />
+  }
 
   return errorMessage != null ? (
-    <SimpleWizardBody
-      isSuccess={false}
-      iconColor={COLORS.red50}
-      header={t('shared:error_encountered')}
-      subHeader={errorMessage}
-    />
+    isDoorOpenError ? (
+      <SimpleWizardBody
+        isSuccess={false}
+        iconColor={COLORS.red50}
+        header={t('door_is_open')}
+        subHeader={t('close_door_and_try_again')}
+      >
+        <Flex
+          width="100%"
+          justifyContent={JUSTIFY_FLEX_END}
+          alignItems={Boolean(isOnDevice) ? ALIGN_CENTER : ALIGN_FLEX_END}
+          gridGap={SPACING.spacing8}
+        >
+          {Boolean(isOnDevice) ? (
+            <SmallButton
+              buttonText={t('try_again')}
+              onClick={dismissDoorOpenError}
+            />
+          ) : (
+            <PrimaryButton onClick={dismissDoorOpenError}>
+              {t('try_again')}
+            </PrimaryButton>
+          )}
+        </Flex>
+      </SimpleWizardBody>
+    ) : (
+      <SimpleWizardBody
+        isSuccess={false}
+        iconColor={COLORS.red50}
+        header={t('shared:error_encountered')}
+        subHeader={errorMessage}
+      />
+    )
   ) : (
     <GenericWizardTile
       header={t('before_you_begin')}

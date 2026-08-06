@@ -1,15 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
 
-import {
-  ALIGN_CENTER,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
@@ -18,6 +8,8 @@ import { PipetteRecalibrationODDWarning } from '/app/organisms/ODD/PipetteRecali
 import { isGripperInCommands } from '/app/resources/protocols/utils'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
+
+import styles from './protocolsetupinstruments.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { GripperData, PipetteData } from '@opentrons/api-client'
@@ -48,32 +40,26 @@ export function ProtocolSetupInstruments({
     : null
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      width="100%"
-      gridGap={SPACING.spacing8}
-    >
-      <ODDBackButton
-        label={t('instruments')}
-        onClick={() => {
-          setSetupScreen('prepare to run')
-        }}
-      />
+    <div className={styles.instruments_container}>
+      <div className={styles.back_button_container}>
+        <ODDBackButton
+          label={t('instruments')}
+          onClick={() => {
+            setSetupScreen('prepare to run')
+          }}
+        />
+      </div>
       {getShowPipetteCalibrationWarning(attachedInstruments) && (
-        <Flex paddingBottom={SPACING.spacing16}>
+        <div className={styles.warning_container}>
           <PipetteRecalibrationODDWarning />
-        </Flex>
+        </div>
       )}
-      <Flex
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        alignItems={ALIGN_CENTER}
-        paddingX={SPACING.spacing24}
-      >
-        <ColumnLabel>{t('location')}</ColumnLabel>
-        <ColumnLabel>
+      <div className={styles.header_container}>
+        <p className={styles.column_label}>{t('location')}</p>
+        <p className={styles.column_label}>
           {i18n.format(t('calibration_status'), 'sentenceCase')}
-        </ColumnLabel>
-      </Flex>
+        </p>
+      </div>
       {(mostRecentAnalysis?.pipettes ?? []).map(loadedPipette => {
         const attachedPipetteMatch =
           (attachedInstruments?.data ?? []).find(
@@ -102,14 +88,6 @@ export function ProtocolSetupInstruments({
           attachedInstrument={attachedGripperMatch}
         />
       ) : null}
-    </Flex>
+    </div>
   )
 }
-
-const ColumnLabel = styled.p`
-  flex: 1;
-  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  font-size: ${TYPOGRAPHY.fontSize22};
-  line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${COLORS.grey60};
-`

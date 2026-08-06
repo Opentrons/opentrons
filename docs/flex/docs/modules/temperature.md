@@ -16,11 +16,9 @@ The Opentrons Temperature Module GEN2 is a hot and cold plate module. It is ofte
 
 ### Thermal blocks { #thermal-blocks-flex }
 
-To hold labware at temperature, the module uses aluminum thermal blocks. The module comes with 24- well and 96-well thermal blocks. The Temperature Module caddy comes with a deep well block and a flat bottom block designed for use with the Flex Gripper. The blocks hold 1.5 mL and 2.0 mL tubes, 96-well PCR plates, PCR strips, deep well plates, and flat bottom plates.
+The Temperature Module uses interchangeable aluminum *thermal blocks* to help hold labware at temperature.
 
-!!! note
-    Note: The module also ships with a flat bottom block for the OT-2. Do not use the OT-2 block with Flex. The flat bottom block for Flex has the words “Opentrons Flex” on its top surface. The one for OT-2 does not.
-
+At the time of purchase, each Temperature Module includes your choice of one (1) thermal block. You can select a 24-well block, a 96-well block, a deep well block, or a flat-bottom block. The blocks hold 1.5 mL and 2.0 mL tubes, 96-well PCR plates, PCR strips, deep well plates, and flat bottom plates.
 
 <div class="parts-list" markdown>
 

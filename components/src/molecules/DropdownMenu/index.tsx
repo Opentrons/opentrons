@@ -168,8 +168,9 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
         !dropDownMenuWrapperRef.current ||
         !showDropdownMenu ||
         !menuItemsContainerRef.current
-      )
+      ) {
         return
+      }
       const currentTriggerRect =
         dropDownMenuWrapperRef.current.getBoundingClientRect()
       const currentMenuHeight = menuItemsContainerRef.current.scrollHeight
@@ -181,11 +182,14 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
       if (menuPlacement === 'auto') {
         const currentFitsBelow = currentSpaceBelow >= currentMenuHeight
         const currentFitsAbove = currentSpaceAbove >= currentMenuHeight
-        if (currentFitsBelow) determinedPosition = 'bottom'
-        else if (currentFitsAbove) determinedPosition = 'top'
-        else
+        if (currentFitsBelow) {
+          determinedPosition = 'bottom'
+        } else if (currentFitsAbove) {
+          determinedPosition = 'top'
+        } else {
           determinedPosition =
             currentSpaceBelow >= currentSpaceAbove ? 'bottom' : 'top'
+        }
       } else {
         determinedPosition = menuPlacement
       }
@@ -233,9 +237,11 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     padding: ${SPACING.spacing8} ${SPACING.spacing12};
     border: 1px ${BORDERS.styleSolid}
       ${disabled ? COLORS.grey35 : defaultBorderColor};
-    border-radius: ${dropdownType === 'rounded'
-      ? BORDERS.borderRadiusFull
-      : BORDERS.borderRadius4};
+    border-radius: ${
+      dropdownType === 'rounded'
+        ? BORDERS.borderRadiusFull
+        : BORDERS.borderRadius4
+    };
     align-items: ${ALIGN_CENTER};
     justify-content: ${JUSTIFY_SPACE_BETWEEN};
     width: ${width};
@@ -313,9 +319,11 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             <Flex
               flexDirection={DIRECTION_COLUMN}
               css={css`
-                font-weight: ${dropdownType === 'rounded'
-                  ? TYPOGRAPHY.pSemiBold
-                  : TYPOGRAPHY.pRegular};
+                font-weight: ${
+                  dropdownType === 'rounded'
+                    ? TYPOGRAPHY.pSemiBold
+                    : TYPOGRAPHY.pRegular
+                };
               `}
             >
               {currentOption.deckLabel !== currentOption.name ? (
@@ -441,7 +449,7 @@ export const LINE_CLAMP_TEXT_STYLE = (
   text-overflow: ellipsis;
   word-wrap: break-word;
   -webkit-line-clamp: ${lineClamp ?? 1};
-  word-break: ${wordBreak === true
-    ? 'normal'
-    : 'break-all'}; // normal for tile and break-all for a non word case like aaaaaaaa
+  word-break: ${
+    wordBreak === true ? 'normal' : 'break-all'
+  }; // normal for tile and break-all for a non word case like aaaaaaaa
 `

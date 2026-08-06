@@ -91,7 +91,7 @@ describe('VacuumModuleSlideout', () => {
     fireEvent.click(pressureButton)
 
     expect(screen.getByText('Gauge pressure')).toBeInTheDocument()
-    expect(screen.getByText('Valid range between 0-1000')).toBeInTheDocument()
+    expect(screen.getByText('Valid range between -800-0')).toBeInTheDocument()
     expect(screen.getByText('mbar')).toBeInTheDocument()
   })
 
@@ -141,10 +141,8 @@ describe('VacuumModuleSlideout', () => {
     const pressureButton = screen.getByLabelText('Pressure')
     fireEvent.click(pressureButton)
 
-    const input = screen.getByRole('spinbutton')
-    fireEvent.change(input, { target: { value: '500' } })
-
-    expect(input).toHaveValue(500)
+    screen.getByText('Gauge pressure')
+    screen.getByText('Valid range between -800-0')
   })
 
   it('calls setVacuumPressure with correct value when confirming in pressure mode', () => {
@@ -153,15 +151,15 @@ describe('VacuumModuleSlideout', () => {
     const pressureButton = screen.getByLabelText('Pressure')
     fireEvent.click(pressureButton)
 
-    const input = screen.getByRole('spinbutton')
-    fireEvent.change(input, { target: { value: '500' } })
+    const input = screen.getByLabelText('Gauge pressure')
+    fireEvent.change(input, { target: { value: '-50' } })
 
     const confirmButton = screen.getByTestId(
       `VacuumModuleSlideout_btn_${mockVacuumModule.serialNumber}`
     )
     fireEvent.click(confirmButton)
 
-    expect(mockSetVacuumPressure).toHaveBeenCalledWith(500)
+    expect(mockSetVacuumPressure).toHaveBeenCalledWith(-50)
     expect(mockSetVacuumPower).not.toHaveBeenCalled()
     expect(mockOnCloseClick).toHaveBeenCalled()
   })

@@ -22,9 +22,14 @@ import {
   convertStepArrayToHierarchy,
   findStep,
   getPairedSteps,
+  isConcurrentGroup,
 } from '/protocol-designer/steplist/utils/stepHierarchy'
 
-import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import {
+  INITIAL_DECK_SETUP_STEP_ID,
+  PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE,
+  PAUSE_UNTIL_VACUUM_STATE_COMPLETE,
+} from '../../constants'
 import { getPDMetadata } from '../../file-types'
 import {
   getOnlyLatestDefs,
@@ -58,6 +63,8 @@ import {
   getIdsInRange,
 } from '../utils'
 import { findAndSplice } from '../utils/findAndSplice'
+import { getIsVacuumProfileForm } from '../utils/getIsVacuumProfileForm'
+import { getIsVacuumStateWithDurationForm } from '../utils/getIsVacuumStateWithDurationForm'
 import { getThermocyclerFormType } from '../utils/getThermocyclerFormType'
 import { nestedCombineReducers } from './nestedCombineReducers'
 
@@ -313,7 +320,7 @@ export const _editModuleFormUpdate = ({
         : null
       const moduleEntity = initialDeckSetup.modules[moduleId]
       console.assert(
-        moduleEntity,
+        moduleEntity != null,
         `editModuleFormUpdate expected moduleEntity for module ${moduleId}`
       )
       const prevModuleModel = moduleEntity?.model
@@ -399,6 +406,9 @@ export const savedStepForms = (
           allLabware,
           latestDefs
         )
+        if (updatedLabwareId == null) {
+          return acc
+        }
         // The `location` can be a labwareId too, so update its version as well.
         // (We only recently realized that we need to update `location`, so there are
         // probably saved protocols out there where we hadn't updated `location` and
@@ -589,7 +599,7 @@ export const savedStepForms = (
           ? action.payload.id
           : action.payload.duplicateLabwareId
       console.assert(
-        prevInitialDeckSetupStep,
+        prevInitialDeckSetupStep != null,
         'expected initial deck setup step to exist, could not handle CREATE_CONTAINER'
       )
       const slot = action.payload.slot
@@ -1717,6 +1727,7 @@ export const stackerLabwareReducer = (
 
 // If/when FormData becomes a proper union, these should automatically pick up the improved property types.
 type ThermocyclerFormData = FormData & { stepType: 'thermocycler' }
+type VacuumFormData = FormData & { stepType: 'vacuum' }
 type PauseFormData = FormData & { stepType: 'pause' }
 
 interface SaveStepFormHelperArgs {
@@ -1728,6 +1739,32 @@ interface SaveStepFormHelperResult {
   newOrderedStepIds: StepIdType[]
   newStepFormsById: Record<StepIdType, FormData>
 }
+
+function getVacuumConcurrentPauseKind(
+  form: FormData | null
+): null | 'profile' | 'stateDuration' {
+  if (form == null) {
+    return null
+  }
+  if (getIsVacuumProfileForm(form)) {
+    return 'profile'
+  }
+  if (getIsVacuumStateWithDurationForm(form)) {
+    return 'stateDuration'
+  }
+  return null
+}
+
+function getWaitStepIdAfterEnclosingConcurrentGroup(
+  findResult: NonNullable<ReturnType<typeof findStep>>
+): StepIdType | null {
+  const { enclosingNode } = findResult
+  if (!('type' in enclosingNode)) {
+    return null
+  }
+  return isConcurrentGroup(enclosingNode) ? enclosingNode.waitStepId : null
+}
+
 function saveStepFormHelper(
   args: SaveStepFormHelperArgs
 ): SaveStepFormHelperResult {
@@ -1749,23 +1786,39 @@ function saveStepFormHelper(
     // We're creating a brand new step. Append it to the end.
     // If it's a Thermocycler profile, also pair it with a "wait for profile to complete" step.
 
-    const newPauseForm: PauseFormData | null =
+    const newThermoPauseForm: PauseFormData | null =
       getThermocyclerFormType(newForm) === 'thermocyclerProfile'
-        ? getThermocyclerProfilePauseForm(
+        ? buildThermocyclerProfilePauseForm(
             newForm as ThermocyclerFormData,
-            action.payload.thermocyclerPauseStepId
+            action.payload.concurrentGroupPauseStepId
           )
         : null
+    const newVacVacKind = getVacuumConcurrentPauseKind(newForm)
+    let newVacuumPauseForm: PauseFormData | null = null
+    if (newVacVacKind === 'profile') {
+      newVacuumPauseForm = buildVacuumProfilePauseForm(
+        newForm as VacuumFormData,
+        action.payload.concurrentGroupPauseStepId
+      )
+    } else if (newVacVacKind === 'stateDuration') {
+      newVacuumPauseForm = buildVacuumStateDurationPauseForm(
+        newForm as VacuumFormData,
+        action.payload.concurrentGroupPauseStepId
+      )
+    }
+    const newPauseForms = [newThermoPauseForm, newVacuumPauseForm].filter(
+      (f): f is PauseFormData => f != null
+    )
     return {
       newOrderedStepIds: [
         ...originalOrderedStepIds,
         newForm.id,
-        ...(newPauseForm != null ? [newPauseForm.id] : []),
+        ...newPauseForms.map(f => f.id),
       ],
       newStepFormsById: {
         ...originalStepFormsById,
         [newForm.id]: newForm,
-        ...(newPauseForm != null && { [newPauseForm.id]: newPauseForm }),
+        ...Object.fromEntries(newPauseForms.map(f => [f.id, f])),
       },
     }
   } else {
@@ -1791,6 +1844,111 @@ function saveStepFormHelper(
         },
       }
     } else if (
+      getVacuumConcurrentPauseKind(originalStep) != null &&
+      getVacuumConcurrentPauseKind(newForm) == null
+    ) {
+      const pairedStepIds = getPairedSteps(
+        originalStepHierarchy,
+        new Set([originalStep.id])
+      )
+      return {
+        newOrderedStepIds: originalOrderedStepIds.filter(
+          id => !pairedStepIds.has(id)
+        ),
+        newStepFormsById: {
+          ...omit(originalStepFormsById, [...pairedStepIds]),
+          [newForm.id]: newForm,
+        },
+      }
+    } else if (
+      getVacuumConcurrentPauseKind(originalStep) != null &&
+      getVacuumConcurrentPauseKind(newForm) != null &&
+      getVacuumConcurrentPauseKind(originalStep) !==
+        getVacuumConcurrentPauseKind(newForm)
+    ) {
+      const pairedToRemove = getPairedSteps(
+        originalStepHierarchy,
+        new Set([originalStep.id])
+      )
+      const newVacKind = getVacuumConcurrentPauseKind(newForm)
+      const newPauseForm =
+        newVacKind === 'profile'
+          ? buildVacuumProfilePauseForm(
+              newForm as VacuumFormData,
+              action.payload.concurrentGroupPauseStepId
+            )
+          : buildVacuumStateDurationPauseForm(
+              newForm as VacuumFormData,
+              action.payload.concurrentGroupPauseStepId
+            )
+      const orderWithoutOldPauses = originalOrderedStepIds.filter(
+        id => id === newForm.id || !pairedToRemove.has(id)
+      )
+      const vacuumStepIndex = orderWithoutOldPauses.indexOf(newForm.id)
+      if (vacuumStepIndex === -1) {
+        console.error(
+          'Error rearranging steps for a vacuum concurrent pairing change. Leaving the steps unchanged.'
+        )
+        return {
+          newOrderedStepIds: originalOrderedStepIds,
+          newStepFormsById: originalStepFormsById,
+        }
+      }
+      const newOrderedStepIds = [
+        ...orderWithoutOldPauses.slice(0, vacuumStepIndex + 1),
+        newPauseForm.id,
+        ...orderWithoutOldPauses.slice(vacuumStepIndex + 1),
+      ]
+      return {
+        newOrderedStepIds,
+        newStepFormsById: {
+          ...omit(originalStepFormsById, [...pairedToRemove]),
+          [newForm.id]: newForm,
+          [newPauseForm.id]: newPauseForm,
+        },
+      }
+    } else if (
+      getVacuumConcurrentPauseKind(originalStep) == null &&
+      getVacuumConcurrentPauseKind(newForm) != null
+    ) {
+      const newVacKind = getVacuumConcurrentPauseKind(newForm)
+      const newPauseForm =
+        newVacKind === 'profile'
+          ? buildVacuumProfilePauseForm(
+              newForm as VacuumFormData,
+              action.payload.concurrentGroupPauseStepId
+            )
+          : buildVacuumStateDurationPauseForm(
+              newForm as VacuumFormData,
+              action.payload.concurrentGroupPauseStepId
+            )
+      const stepIdToMoveEditedStepAfter =
+        getWaitStepIdAfterEnclosingConcurrentGroup(findResult)
+      const { result: newOrderedStepIds, success: spliceSuccess } =
+        findAndSplice({
+          source: originalOrderedStepIds,
+          elementToRemove: originalStep.id,
+          elementToInsertAfter: stepIdToMoveEditedStepAfter,
+          elementsToInsert: [newForm.id, newPauseForm.id],
+        })
+      if (!spliceSuccess) {
+        console.error(
+          'Error rearranging steps for a new Vacuum concurrent group. Leaving the steps unchanged.'
+        )
+        return {
+          newOrderedStepIds: originalOrderedStepIds,
+          newStepFormsById: originalStepFormsById,
+        }
+      }
+      return {
+        newOrderedStepIds,
+        newStepFormsById: {
+          ...originalStepFormsById,
+          [newForm.id]: newForm,
+          [newPauseForm.id]: newPauseForm,
+        },
+      }
+    } else if (
       getThermocyclerFormType(originalStep) !== 'thermocyclerProfile' &&
       getThermocyclerFormType(newForm) === 'thermocyclerProfile'
     ) {
@@ -1798,18 +1956,15 @@ function saveStepFormHelper(
       // 1) Potentially find a new position to move it to, since we can't allow Thermocycler profiles to nest.
       // 2) Create a hidden "wait for profile to complete" step that it will be permanently paired with.
 
-      const newPauseForm = getThermocyclerProfilePauseForm(
+      const newPauseForm = buildThermocyclerProfilePauseForm(
         newForm as ThermocyclerFormData,
-        action.payload.thermocyclerPauseStepId
+        action.payload.concurrentGroupPauseStepId
       )
 
       // If the edited step was is inside a Thermocycler profile, we'll move it to just after the profile.
       // null means "leave the edited step in-place."
-      const stepIdToMoveEditedStepAfter: StepIdType | null =
-        'type' in findResult.enclosingNode &&
-        findResult.enclosingNode.type === 'thermocyclerProfileGroup'
-          ? findResult.enclosingNode.waitForThermocyclerProfileStepId
-          : null
+      const stepIdToMoveEditedStepAfter =
+        getWaitStepIdAfterEnclosingConcurrentGroup(findResult)
 
       const { result: newOrderedStepIds, success: spliceSuccess } =
         findAndSplice({
@@ -1842,7 +1997,7 @@ function saveStepFormHelper(
         },
       }
     } else {
-      // We're editing an existing step and there's no Thermocycler profile nonsense going on,
+      // We're editing an existing step and there's no concurrent profile pairing change,
       // so just update the step to its new value and leave the step order unchanged.
       return {
         newOrderedStepIds: originalOrderedStepIds,
@@ -1855,7 +2010,7 @@ function saveStepFormHelper(
   }
 }
 
-function getThermocyclerProfilePauseForm(
+function buildThermocyclerProfilePauseForm(
   thermocyclerForm: ThermocyclerFormData,
   id: string
 ): PauseFormData {
@@ -1867,6 +2022,36 @@ function getThermocyclerProfilePauseForm(
 
     pauseAction: 'untilThermocyclerProfileComplete',
     moduleId: thermocyclerForm.moduleId,
+  }
+}
+
+function buildVacuumProfilePauseForm(
+  vacuumForm: VacuumFormData,
+  id: string
+): PauseFormData {
+  return {
+    id,
+    stepType: 'pause',
+    stepName: 'pause',
+    stepDetails: '',
+
+    pauseAction: PAUSE_UNTIL_VACUUM_PROFILE_COMPLETE,
+    moduleId: vacuumForm.moduleId,
+  }
+}
+
+function buildVacuumStateDurationPauseForm(
+  vacuumForm: VacuumFormData,
+  id: string
+): PauseFormData {
+  return {
+    id,
+    stepType: 'pause',
+    stepName: 'pause',
+    stepDetails: '',
+
+    pauseAction: PAUSE_UNTIL_VACUUM_STATE_COMPLETE,
+    moduleId: vacuumForm.moduleId,
   }
 }
 
@@ -1933,8 +2118,7 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
     stackerLabwareReducer: stackerLabwareReducer(
       prevStateFallback.stackerLabwareReducer,
       action as
-        | StackerLabwareCreationStartAction
-        | StackerLabwareCreationFinishAction
+        StackerLabwareCreationStartAction | StackerLabwareCreationFinishAction
     ),
   })
 )

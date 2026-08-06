@@ -1,4 +1,4 @@
-import { defaultMemoize } from 'reselect'
+import { lruMemoize } from 'reselect'
 
 import { getDisabledFieldsHeaterShaker } from './getDisabledFieldsHeaterShaker'
 import { getDisabledFieldsMixForm } from './getDisabledFieldsMixForm'
@@ -39,4 +39,4 @@ function _getDisabledFields(hydratedForm: HydratedFormData): Set<string> {
 // WARNING: do not mutate the same rawForm obj or this memoization will break
 export const getDisabledFields: (
   hydratedForm: HydratedFormData
-) => Set<string> = defaultMemoize(_getDisabledFields)
+) => Set<string> = lruMemoize(_getDisabledFields)

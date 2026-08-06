@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
+import CheckConnections from '/app/assets/videos/error-recovery/Vacuum_CheckConnections.webm'
 import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
 
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
@@ -24,8 +25,7 @@ export function VacuumCheckTubeConnections(
           message={t('tubes_must_be_secured')}
           notificationHeader={t('push_tube')}
         />
-        {/* TODO(nd, 02-24-26): Add animation */}
-        <RightColumnAnimation animationSrc={''} />
+        <RightColumnAnimation animationSrc={CheckConnections} />
       </TwoColumn>
       <RecoveryFooterButtons
         primaryBtnOnClick={proceedNextStep}

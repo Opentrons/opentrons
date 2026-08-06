@@ -4,7 +4,7 @@ name: 'Step generation test'
 
 on:
   pull_request:
-    paths:
+    paths: &paths
       - 'step-generation/**'
       - 'shared-data/**'
       - 'package.json'
@@ -14,15 +14,7 @@ on:
       - '.github/actions/environment/complex-variables/action.yml'
       - 'vitest.config.*'
   push:
-    paths:
-      - 'step-generation/**'
-      - 'shared-data/**'
-      - 'package.json'
-      - '.github/workflows/step-generation-test.yaml'
-      - '.github/actions/js/setup/action.yml'
-      - '.github/actions/git/resolve-tag/action.yml'
-      - '.github/actions/environment/complex-variables/action.yml'
-      - 'vitest.config.*'
+    paths: *paths
     branches:
       - '*'
 
@@ -44,12 +36,9 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: 'Checkout Repository'
-        uses: actions/checkout@v5
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ./.github/actions/js/setup
+      - name: 'build step-generation package (tsc + vite)'
+        run: make -C step-generation lib
       - name: 'run step generation unit tests'
         run: make -C step-generation test-cov
-      - name: 'Upload coverage report'
-        uses: codecov/codecov-action@v5
-        with:
-          flags: step-generation
-          token: ${{ secrets.CODECOV_TOKEN }}

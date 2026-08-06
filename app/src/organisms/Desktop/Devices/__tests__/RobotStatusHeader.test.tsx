@@ -7,39 +7,40 @@ import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import '@testing-library/jest-dom/vitest'
 
-import { useProtocolQuery } from '@opentrons/react-api-client'
+import {
+  useAccessControlEnabledQuery,
+  useProtocolQuery,
+} from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
-import { useIsFlex } from '/app/redux-resources/robots'
 import {
   getRobotAddressesByName,
   HEALTH_STATUS_OK,
   OPENTRONS_USB,
 } from '/app/redux/discovery'
-import { getNetworkInterfaces } from '/app/redux/networking'
+import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
 import { RobotStatusHeader } from '../RobotStatusHeader'
 
 import type { ComponentProps } from 'react'
 import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'
-import type { SimpleInterfaceStatus } from '/app/redux/networking/types'
 import type { State } from '/app/redux/types'
+import type { SimpleInterfaceStatus } from '/app/resources/networking/hooks'
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/redux/shell/remote', () => ({
+  appShellListener: vi.fn(),
+  appShellUSBRequestor: {},
+}))
 vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/redux/discovery')
-vi.mock('/app/redux/networking')
 vi.mock('/app/redux-resources/robots')
+vi.mock('/app/resources/networking/hooks')
 vi.mock('/app/resources/runs')
 
-const MOCK_OTIE = {
-  name: 'otie',
-  local: true,
-  robotModel: 'OT-2',
-}
 const MOCK_BUZZ = {
   name: 'buzz',
   local: true,
@@ -63,7 +64,8 @@ describe('RobotStatusHeader', () => {
   let props: ComponentProps<typeof RobotStatusHeader>
 
   beforeEach(() => {
-    props = MOCK_OTIE
+    props = MOCK_BUZZ
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({} as any)
     vi.mocked(useCurrentRunId).mockReturnValue(null)
     vi.mocked(useCurrentRunStatus).mockReturnValue(null)
     when(useNotifyRunQuery)
@@ -88,11 +90,11 @@ describe('RobotStatusHeader', () => {
           },
         },
       } as any)
-    when(getNetworkInterfaces)
-      .calledWith({} as State, 'otie')
+    when(useNetworkInterfaces)
+      .calledWith('buzz', 5000)
       .thenReturn({ wifi: null, ethernet: null })
     when(getRobotAddressesByName)
-      .calledWith({} as State, 'otie')
+      .calledWith({} as State, 'buzz')
       .thenReturn([
         {
           ip: WIFI_IP,
@@ -107,18 +109,11 @@ describe('RobotStatusHeader', () => {
           healthStatus: HEALTH_STATUS_OK,
         } as DiscoveryClientRobotAddress,
       ])
-    when(useIsFlex).calledWith('otie').thenReturn(true)
-  })
-
-  it('renders the model of robot and robot name - OT-2', () => {
-    render(props)
-    screen.getByText('OT-2')
-    screen.getByText('otie')
   })
 
   it('renders the model of robot and robot name - OT-3', () => {
-    when(getNetworkInterfaces)
-      .calledWith({} as State, 'buzz')
+    when(useNetworkInterfaces)
+      .calledWith('buzz', 5000)
       .thenReturn({ wifi: null, ethernet: null })
     when(getRobotAddressesByName)
       .calledWith({} as State, 'buzz')
@@ -158,13 +153,13 @@ describe('RobotStatusHeader', () => {
 
     const runLink = screen.getByRole('link', { name: 'Go to Run' })
     expect(runLink.getAttribute('href')).toEqual(
-      '/devices/otie/protocol-runs/fakeRunId/run-preview'
+      '/devices/buzz/protocol-runs/fakeRunId/run-preview'
     )
   })
 
   it('renders an ethernet icon when connected by wifi and ethernet', () => {
-    when(getNetworkInterfaces)
-      .calledWith({} as State, 'otie')
+    when(useNetworkInterfaces)
+      .calledWith('buzz', 5000)
       .thenReturn({
         wifi: { ipAddress: WIFI_IP } as SimpleInterfaceStatus,
         ethernet: { ipAddress: ETHERNET_IP } as SimpleInterfaceStatus,
@@ -176,8 +171,8 @@ describe('RobotStatusHeader', () => {
   })
 
   it('renders a wifi icon when only connected by wifi', () => {
-    when(getNetworkInterfaces)
-      .calledWith({} as State, 'otie')
+    when(useNetworkInterfaces)
+      .calledWith('buzz', 5000)
       .thenReturn({
         wifi: { ipAddress: WIFI_IP } as SimpleInterfaceStatus,
         ethernet: null,
@@ -188,33 +183,20 @@ describe('RobotStatusHeader', () => {
     screen.getByLabelText('wifi')
   })
 
-  it('renders a usb icon when OT-2 connected locally via USB-ethernet adapter', () => {
-    when(getNetworkInterfaces)
-      .calledWith({} as State, 'otie')
-      .thenReturn({
-        wifi: null,
-        ethernet: { ipAddress: ETHERNET_IP } as SimpleInterfaceStatus,
-      })
-    when(useIsFlex).calledWith('otie').thenReturn(false)
-    render(props)
-
-    screen.getByLabelText('usb')
-  })
-
   it('renders a usb icon when only connected locally', () => {
     render(props)
     screen.getByLabelText('usb')
   })
 
   it('does not render a wifi or ethernet icon when discovery client cannot find a healthy robot at its network connection ip addresses', () => {
-    when(getNetworkInterfaces)
-      .calledWith({} as State, 'otie')
+    when(useNetworkInterfaces)
+      .calledWith('buzz', 5000)
       .thenReturn({
         wifi: { ipAddress: WIFI_IP } as SimpleInterfaceStatus,
         ethernet: { ipAddress: ETHERNET_IP } as SimpleInterfaceStatus,
       })
     when(getRobotAddressesByName)
-      .calledWith({} as State, 'otie')
+      .calledWith({} as State, 'buzz')
       .thenReturn([])
     render(props)
 

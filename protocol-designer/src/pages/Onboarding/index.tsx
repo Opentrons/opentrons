@@ -37,9 +37,9 @@ import {
 import { actions as steplistActions } from '../../steplist'
 import { uuid } from '../../utils'
 import { AddMetadata } from './AddMetadata'
+import { FLEX_TRASH_FIXTURE_INFO } from './constants'
 import { SelectBasics } from './SelectBasics'
-import { SelectHardware } from './SelectFlexHardware'
-import { SelectOt2Modules } from './SelectOt2Modules'
+import { SelectFlexHardware } from './SelectFlexHardware'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { Dispatch, SetStateAction } from 'react'
@@ -86,7 +86,7 @@ const initialFormState: WizardFormState = {
   },
   modules: {},
   hasGripper: null,
-  fixtures: {},
+  fixtures: { [uuid()]: FLEX_TRASH_FIXTURE_INFO },
   hasThermocycler: null,
   hasWasteChute: null,
 }
@@ -365,7 +365,6 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     resolver: yupResolver(validationSchema),
   })
   const dispatch = useDispatch()
-  const robotType = formProps.watch('fields').robotType
 
   // for resetting the onboarding page back to empty and page 1 when you hit "create new"
   //  from the nav bar
@@ -389,11 +388,7 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
           case 'basics':
             return <SelectBasics {...{ ...formProps, proceed, goBack }} />
           case 'modules':
-            return robotType === OT2_ROBOT_TYPE ? (
-              <SelectOt2Modules {...{ ...formProps, proceed, goBack }} />
-            ) : (
-              <SelectHardware {...{ ...formProps, proceed, goBack }} />
-            )
+            return <SelectFlexHardware {...{ ...formProps, proceed, goBack }} />
           case 'metadata':
             return (
               <AddMetadata

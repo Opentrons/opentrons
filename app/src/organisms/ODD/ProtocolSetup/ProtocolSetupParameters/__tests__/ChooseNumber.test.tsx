@@ -1,4 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
@@ -81,26 +82,41 @@ describe('ChooseNumber', () => {
     expect(screen.getByRole('button', { name: '-' })).toBeInTheDocument()
   })
 
-  it('should call mock function when tapping go back button', () => {
+  it('should call mock function when tapping go back button', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getAllByRole('button')[0])
+    await user.click(screen.getAllByRole('button')[0])
     expect(mockHandleGoBack).toHaveBeenCalled()
   })
 
-  it('should render error message when inputting an out of range number', () => {
+  it('should render error message when inputting an out of range number', async () => {
+    const user = userEvent.setup()
     render(props)
     const numKey = screen.getByRole('button', { name: '1' })
-    fireEvent.click(numKey)
-    fireEvent.click(numKey)
+    await user.click(numKey)
+    await user.click(numKey)
     screen.getByText('Value must be between 1-10')
   })
 
-  it('should call mock snack bar function when inputting an out of range number', () => {
+  it('should call mock snack bar function when inputting an out of range number', async () => {
+    const user = userEvent.setup()
     render(props)
     const numKey = screen.getByRole('button', { name: '1' })
-    fireEvent.click(numKey)
-    fireEvent.click(numKey)
-    fireEvent.click(screen.getAllByRole('button')[0])
+    await user.click(numKey)
+    await user.click(numKey)
+    await user.click(screen.getAllByRole('button')[0])
     expect(mockMakeSnackbar).toHaveBeenCalledWith('Value must be in range')
+  })
+
+  it('should delete external keyboard input with the numerical keyboard', async () => {
+    const user = userEvent.setup()
+    props = { ...props, parameter: mockFloatNumberParameterData }
+    render(props)
+    const input = screen.getByLabelText('EtoH Volume')
+
+    fireEvent.change(input, { target: { value: '12' } })
+    await user.click(screen.getByRole('button', { name: 'del' }))
+
+    expect(input).toHaveValue('1')
   })
 })

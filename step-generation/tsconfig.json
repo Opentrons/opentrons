@@ -8,7 +8,6 @@
   "compilerOptions": {
     "composite": true,
     "noErrorTruncation": true,
-    "emitDeclarationOnly": false,
     "rootDir": "src",
     "outDir": "lib"
   },

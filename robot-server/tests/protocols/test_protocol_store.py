@@ -295,6 +295,7 @@ def test_remove_protocol_conflict(
         run_id="run-id",
         protocol_id="protocol-id",
         created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
+        log_period_id=None,
     )
 
     with pytest.raises(ProtocolUsedByRunError, match="protocol-id"):
@@ -362,6 +363,7 @@ def test_get_usage_info(
         run_id="run-id-1",
         protocol_id="protocol-id-1",
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
     assert subject.get_usage_info() == [
         ProtocolUsageInfo(
@@ -418,6 +420,7 @@ def test_get_referencing_run_ids(
         run_id="run-id-1",
         protocol_id="protocol-id-1",
         created_at=datetime(year=2022, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
     assert subject.get_referencing_run_ids("protocol-id-1") == ["run-id-1"]
 
@@ -425,6 +428,7 @@ def test_get_referencing_run_ids(
         run_id="run-id-2",
         protocol_id="protocol-id-1",
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
     assert subject.get_referencing_run_ids("protocol-id-1") == ["run-id-1", "run-id-2"]
 
@@ -638,6 +642,7 @@ async def test_get_referenced_data_files(
         run_id="run-id-1",
         protocol_id="protocol-id",
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
 
     run_store.insert_csv_rtp(

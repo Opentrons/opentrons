@@ -13,7 +13,7 @@ MATRIX_FILE = Path(CHUNK_DIR, "matrix.json")
 
 def protocols_under_test() -> List[Protocol]:
     "Use the PROTOCOL_NAMES and OVERRIDE_PROTOCOL_NAMES environment variables to determine which protocols to test."
-    # make snapshot-test-update PROTOCOL_NAMES="OT2_S_v2_11_PL_customizable_serial_dilution_ot2" OVERRIDE_PROTOCOL_NAMES="none"
+    # make snapshot-test-update PROTOCOL_NAMES="Flex_S_v2_19_Example" OVERRIDE_PROTOCOL_NAMES="none"
     protocol_names = os.getenv("PROTOCOL_NAMES")
     override_protocol_names = os.getenv("OVERRIDE_PROTOCOL_NAMES")
     if not protocol_names:

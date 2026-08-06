@@ -30,6 +30,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
+import { getOffDeckRenderGroups } from '/app/resources/protocols/utils/getOffDeckRenderGroups'
 
 import { OffDeckLabwareList } from './OffDeckLabwareList'
 import { SlotDetailModal } from './SlotDetailModal'
@@ -74,12 +75,26 @@ export function SetupLabwareMap({
       getLabwareDefinitionsByURIForProtocol(protocolAnalysis?.commands ?? []),
     [protocolAnalysis]
   )
+  const labwareByLiquidId = useMemo(
+    () => getLabwareInfoByLiquidId(protocolAnalysis?.commands ?? []),
+    [protocolAnalysis]
+  )
+  const offDeckItems = useMemo(
+    () =>
+      protocolAnalysis != null
+        ? getOffDeckRenderGroups(
+            startingDeck,
+            protocolAnalysis,
+            labwareByLiquidId
+          )
+        : [],
+    [startingDeck, protocolAnalysis, labwareByLiquidId]
+  )
   // early return null if no protocol analysis
   if (protocolAnalysis == null) return null
 
   const robotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
   const deckDef = getDeckDefFromRobotType(robotType)
-  const labwareByLiquidId = getLabwareInfoByLiquidId(protocolAnalysis.commands)
 
   const modulesOnDeck = Object.entries(getStacksOnModules(startingDeck)).map(
     ([slotName, { allItemsInStack: stackedItems, moduleInStack: module }]) => {
@@ -250,7 +265,7 @@ export function SetupLabwareMap({
           />
         </Box>
         <OffDeckLabwareList
-          labwareItems={startingDeck}
+          offDeckItems={offDeckItems}
           isFlex={robotType === FLEX_ROBOT_TYPE}
           setSelectedStack={setSelectedStack}
           definitionsByURI={labwareDefinitionsByURI}

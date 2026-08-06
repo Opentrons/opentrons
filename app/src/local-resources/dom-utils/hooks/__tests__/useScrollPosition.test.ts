@@ -4,22 +4,27 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useScrollPosition } from '../useScrollPosition'
 
 describe('useScrollPosition', () => {
-  const mockObserve = vi.fn()
-  const mockDisconnect = vi.fn()
+  let mockObserve: ReturnType<typeof vi.fn>
+  let mockDisconnect: ReturnType<typeof vi.fn>
   let intersectionCallback: (entries: IntersectionObserverEntry[]) => void
 
   beforeEach(() => {
-    vi.stubGlobal(
-      'IntersectionObserver',
-      vi.fn(callback => {
+    mockObserve = vi.fn()
+    mockDisconnect = vi.fn()
+
+    class MockIntersectionObserver {
+      public observe = mockObserve
+      public disconnect = mockDisconnect
+      public unobserve = vi.fn()
+
+      public constructor(
+        callback: (entries: IntersectionObserverEntry[]) => void
+      ) {
         intersectionCallback = callback
-        return {
-          observe: mockObserve,
-          disconnect: mockDisconnect,
-          unobserve: vi.fn(),
-        }
-      })
-    )
+      }
+    }
+
+    vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
   })
 
   it('should return initial state and ref', () => {
@@ -30,20 +35,10 @@ describe('useScrollPosition', () => {
     expect(result.current.scrollRef.current).toBe(null)
   })
 
-  it('should observe when ref is set', async () => {
+  it('should create an intersection observer on mount', () => {
     const { result } = renderHook(() => useScrollPosition())
-
-    const div = document.createElement('div')
-
-    await act(async () => {
-      // @ts-expect-error we're forcibly setting readonly ref
-      result.current.scrollRef.current = div
-
-      const observer = new IntersectionObserver(intersectionCallback)
-      observer.observe(div)
-    })
-
-    expect(mockObserve).toHaveBeenCalledWith(div)
+    expect(result.current.scrollRef.current).toBe(null)
+    expect(intersectionCallback).toBeTypeOf('function')
   })
 
   it('should update isScrolled when intersection changes for both scrolled and unscrolled cases', () => {

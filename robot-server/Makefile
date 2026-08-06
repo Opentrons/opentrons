@@ -46,8 +46,15 @@ clean_cmd = $(SHX) rm -rf build .coverage coverage.xml '*.egg-info'
 clean_cache_cmd = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 clean_wheel_cmd = $(clean_cmd) dist/*.whl
 clean_all_cmd = $(clean_cmd) dist
-# Uvicorn command to run the robot server in dev mode.
-#
+
+# When the env has BEHIND_DEV_PROXY=1 (or any non-empty string), switch the `make dev` port
+# from 31950 to 31951, to support coexisting with other dev servers (auth-server, etc.)
+# behind a reverse proxy on 31950. See `make dev-proxy` in the top-level Makefile.
+BEHIND_DEV_PROXY ?=
+dev_port_when_running_alone ?= "31950"
+dev_port_when_behind_dev_proxy ?= "31951"
+dev_port ?= $(if $(BEHIND_DEV_PROXY), $(dev_port_when_behind_dev_proxy), $(dev_port_when_running_alone))
+dev_host ?= "localhost"
 # todo(mm, 2021-07-08): Figure out how to run the server with Python development
 # mode enabled, to expose more errors and warnings.
 #   * Using a Makefile target-specific variable to set PYTHONDEVMODE=1
@@ -58,8 +65,6 @@ clean_all_cmd = $(clean_cmd) dist
 #     OT_ROBOT_SERVER_DOT_ENV_PATH doesn't work because that's read too late.
 #   * Doing `uv run env PYTHONDEVMODE=1 uvicorn ...` works, except it's
 #     probably POSIX-only.
-dev_port ?= "31950"
-dev_host ?= "localhost"
 run_dev ?= uvicorn "robot_server.app:app" --host $(dev_host) --port $(dev_port) --ws wsproto --reload --reload-dir robot_server
 
 .PHONY: all
@@ -172,7 +177,9 @@ push: wheel
 .PHONY: push-ot3
 push-ot3: wheel
 	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-robot-server/)
-	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-robot-server)
+	$(call stop-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-pyro-nameserver opentrons-hardware-api")
+	$(call start-service,$(host),$(ssh_key),$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: install-key
 install-key:

@@ -35,7 +35,7 @@ from hardware_testing.drivers.mitutoyo_digimatic_indicator import (
     Mitutoyo_Digimatic_Indicator,
 )
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Mount
+from opentrons.hardware_control.types import OT3Mount
 from hardware_testing.data import ui
 
 

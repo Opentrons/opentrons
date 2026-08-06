@@ -25,14 +25,15 @@ import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { useIsRobotBusy } from '/app/redux-resources/robots'
 import {
   DOWNGRADE,
+  downloadRobotUpdate,
   getRobotUpdateDisplayInfo,
   getRobotUpdateVersion,
   REINSTALL,
   robotUpdateChangelogSeen,
   UPGRADE,
 } from '/app/redux/robot-update'
-import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 import { useIsOEMMode } from '/app/resources/robot-settings'
+import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
 import type { RobotSystemType } from '/app/redux/robot-update/types'
 import type { Dispatch, State } from '/app/redux/types'
@@ -80,7 +81,7 @@ export function UpdateRobotModal({
   const { updateFromFileDisabledReason } = useSelector((state: State) => {
     return getRobotUpdateDisplayInfo(state, robotName)
   })
-  const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
+  const { startUpdate } = useRobotUpdateContext()
   const robotUpdateVersion = useSelector((state: State) => {
     return getRobotUpdateVersion(state, robotName) ?? ''
   })
@@ -89,9 +90,11 @@ export function UpdateRobotModal({
   const updateDisabled = updateFromFileDisabledReason !== null || isRobotBusy
 
   let disabledReason: string = ''
-  if (updateFromFileDisabledReason)
+  if (updateFromFileDisabledReason) {
     disabledReason = t(updateFromFileDisabledReason)
-  else if (isRobotBusy) disabledReason = t('robot_busy_protocol')
+  } else if (isRobotBusy) {
+    disabledReason = t('robot_busy_protocol')
+  }
 
   useEffect(
     () => {
@@ -123,7 +126,6 @@ export function UpdateRobotModal({
         css={css`
           font-size: 0.875rem;
         `}
-        id="SoftwareUpdateReleaseNotesLink"
       >
         {t('release_notes')}
       </ExternalLink>
@@ -137,7 +139,8 @@ export function UpdateRobotModal({
         </SecondaryButton>
         <PrimaryButton
           onClick={() => {
-            dispatchStartRobotUpdate(robotName)
+            dispatch(downloadRobotUpdate())
+            startUpdate(robotName)
           }}
           css={FOOTER_BUTTON_STYLE}
           disabled={updateDisabled}

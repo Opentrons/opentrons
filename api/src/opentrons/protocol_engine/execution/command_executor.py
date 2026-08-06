@@ -37,6 +37,9 @@ from .task_handler import TaskHandler
 from .tip_handler import TipHandler
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.execution.defined_error_failure import (
+    dispatch_fail_command_for_defined_error,
+)
 from opentrons.protocol_engine.notes import make_error_recovery_debug_note
 
 log = getLogger(__name__)
@@ -208,23 +211,15 @@ class CommandExecutor:
                 )
             else:
                 # The command encountered a defined error.
-                error_recovery_type = error_recovery_policy(
-                    self._state_store.config,
-                    running_command,
-                    result,
+                error_recovery_type = dispatch_fail_command_for_defined_error(
+                    action_dispatcher=self._action_dispatcher,
+                    state_store=self._state_store,
+                    command_id=running_command.id,
+                    running_command=running_command,
+                    defined_error=result,
+                    notes=note_tracker.get_notes(),
                 )
                 note_tracker(make_error_recovery_debug_note(error_recovery_type))
-                self._action_dispatcher.dispatch(
-                    FailCommandAction(
-                        error=result,
-                        command_id=running_command.id,
-                        running_command=running_command,
-                        error_id=result.public.id,
-                        failed_at=result.public.createdAt,
-                        notes=note_tracker.get_notes(),
-                        type=error_recovery_type,
-                    )
-                )
                 error_occurred = True
         finally:
             # Handle error image capture if appropriate

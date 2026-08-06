@@ -9,9 +9,9 @@ import {
   Flex,
   Icon,
   JUSTIFY_END,
-  LegacyStyledText,
   NO_WRAP,
   SPACING,
+  StyledText,
   truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -21,10 +21,7 @@ import { useToaster } from '../../../ToasterOven'
 const CSV_FILE_MAX_LENGTH = 18 // truncated text + three dots
 
 export type ProtocolSetupStepStatus =
-  | 'ready'
-  | 'not ready'
-  | 'general'
-  | 'inform'
+  'ready' | 'not ready' | 'general' | 'inform'
 export interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
   status: ProtocolSetupStepStatus
@@ -140,21 +137,25 @@ export function ProtocolSetupStep({
           flexDirection={DIRECTION_COLUMN}
           textAlign={TYPOGRAPHY.textAlignLeft}
         >
-          <LegacyStyledText
-            forwardedAs="h4"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          <StyledText
+            oddStyle="level4HeaderSemiBold"
             color={disabled ? COLORS.grey50 : COLORS.black90}
           >
             {title}
-          </LegacyStyledText>
+          </StyledText>
           {description != null ? (
-            <LegacyStyledText
-              forwardedAs="h4"
+            <StyledText
+              oddStyle="level4HeaderRegular"
               color={disabled ? COLORS.grey50 : COLORS.grey60}
               maxWidth="35rem"
+              style={{
+                overflowWrap: 'anywhere',
+                whiteSpace: 'normal',
+                wordBreak: 'normal',
+              }}
             >
               {description}
-            </LegacyStyledText>
+            </StyledText>
           ) : null}
         </Flex>
         <Flex
@@ -164,8 +165,8 @@ export function ProtocolSetupStep({
             isToggle ? `${SPACING.spacing12} ${SPACING.spacing10}` : 'undefined'
           }
         >
-          <LegacyStyledText
-            as={fontSize as keyof JSX.IntrinsicElements}
+          <StyledText
+            oddStyle="level4HeaderSemiBold"
             textAlign={TYPOGRAPHY.textAlignRight}
             color={interactionDisabled ? COLORS.grey50 : COLORS.black90}
             maxWidth="20rem"
@@ -176,7 +177,7 @@ export function ProtocolSetupStep({
               : detail}
             {subDetail != null && detail != null ? <br /> : null}
             {subDetail}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         {interactionDisabled || !hasRightIcon ? null : (
           <Icon

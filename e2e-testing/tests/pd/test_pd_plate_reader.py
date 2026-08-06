@@ -1,7 +1,9 @@
+import re
+
 import pytest
 from playwright.sync_api import Page
-from test_pd_create_new_flex import test_flex_onboarding_workflow
 
+from automation.pd_pages import LandingPage
 from automation.pd_pages.create_protocol_wizard import CreateProtocolWizard
 from automation.pd_pages.plate_reader_page import PlateReaderPage
 from automation.pd_pages.protocol_editor_page import ProtocolEditorPage
@@ -94,3 +96,28 @@ def test_flex_absorbance_reader_setup(page: Page, pd_base_url: str, eyes: Eyes |
             checkpoint_name="Stitched Final Timeline",
             element=page.get_by_test_id(timeline.timeline_box_testid),
         )
+
+
+def test_flex_onboarding_workflow(page: Page, pd_base_url: str) -> None:
+    """This sets up the deck for the Flex Absorbance Reader test"""
+    # Start on home page
+    landing = LandingPage(page)
+    landing.wait_for_page_load()
+    landing.confirm_welcome_modal()
+    # Click "Create a Flex protocol" to start onboarding
+    landing.click_create_protocol()
+    # Part 1: Add pipette - Click "Add a pipette" to open selector
+    page.get_by_text("Add a pipette").click()
+    # Select 1-Channel pipette type
+    page.get_by_text("1-Channel").click()
+    # Select 50 µL volume
+    page.get_by_text("50 µL").click()
+    # Select Tip Rack 50 µL (not Filter Tip Rack) - use exact match
+    page.locator("label").filter(has=page.get_by_text(re.compile(r"^Tip Rack 50 µL$"))).first.click()
+    # Save pipette configuration
+    page.get_by_role("button", name="Save").click()
+    # Part 2: Gripper question - "Do you want to move labware automatically with the gripper?"
+    page.get_by_text("Yes", exact=True).click()
+    # Confirm basics and proceed to deck hardware configuration
+    confirm_button = page.get_by_role("button", name="Confirm")
+    confirm_button.click()

@@ -172,7 +172,15 @@ describe('SelectPipetteModal', () => {
     screen.getByText('Add custom pipette tips')
 
     //  add custom pipette tips
-    fireEvent.change(screen.getByTestId('SelectPipettes_customTipInput'))
+    fireEvent.change(screen.getByLabelText('Add custom pipette tips'), {
+      target: {
+        files: [
+          new File(['{}'], 'custom-tips.json', {
+            type: 'application/json',
+          }),
+        ],
+      },
+    })
     expect(vi.mocked(createCustomTiprackDef)).toHaveBeenCalled()
 
     //  change all tip setting

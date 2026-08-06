@@ -28,8 +28,9 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element => {
   const pipetteWizardStep = { mount, flowType, section: SECTIONS.DETACH_PROBE }
   const channel = attachedPipettes[mount]?.data.channels
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return <SimpleWizardInProgressBody description={t('stand_back')} />
+  }
   return (
     <GenericWizardTile
       header={i18n.format(t('remove_cal_probe'), 'capitalize')}

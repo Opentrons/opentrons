@@ -14,6 +14,7 @@ interface SelectionRectProps {
   children?: ReactNode
   originXOffset?: number
   originYOffset?: number
+  customWidth?: number
 }
 
 export function SelectionRect(props: SelectionRectProps): JSX.Element {
@@ -24,6 +25,7 @@ export function SelectionRect(props: SelectionRectProps): JSX.Element {
     children,
     originXOffset = 0,
     originYOffset = 0,
+    customWidth,
   } = props
   const [positions, setPositions] = useState<DragRect | null>(null)
   const parentRef = useRef<HTMLElement | SVGElement | null>(null)
@@ -145,7 +147,9 @@ export function SelectionRect(props: SelectionRectProps): JSX.Element {
       document.removeEventListener('mouseup', handleMouseUp)
     }
   }, [handleDrag, handleMouseUp])
-
+  const optionalWidthProp = customWidth
+    ? { style: { width: `${customWidth}rem` } }
+    : {}
   return svg ? (
     <g
       onMouseDown={handleMouseDown}
@@ -162,6 +166,7 @@ export function SelectionRect(props: SelectionRectProps): JSX.Element {
       ref={ref => {
         parentRef.current = ref
       }}
+      {...optionalWidthProp}
     >
       {positions !== null && renderRect(positions)}
       {children}

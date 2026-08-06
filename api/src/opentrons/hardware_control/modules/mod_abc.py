@@ -2,10 +2,11 @@ import abc
 import asyncio
 import logging
 import re
-from typing import Any, ClassVar, Mapping, Optional, TypeVar
+from typing import Any, Callable, ClassVar, Coroutine, Optional, TypeVar
 
 from packaging.version import InvalidVersion, Version, parse
 
+from ..abstract_device import AbstractDevice
 from ..execution_manager import ExecutionManager
 from .types import (
     BundledFirmware,
@@ -37,7 +38,7 @@ def parse_fw_version(version: str) -> Version:
     return device_version
 
 
-class AbstractModule(abc.ABC):
+class AbstractModule(AbstractDevice):
     """Defines the common methods of a module."""
 
     MODULE_TYPE: ClassVar[ModuleType]
@@ -112,6 +113,16 @@ class AbstractModule(abc.ABC):
         """Called from within the module object when an asynchronous hardware error occurrs."""
         self._error_callback(exc, self.model(), self.port, self.serial_number)
 
+    def inject_async_gcode_response(
+        self,
+        gcode_response: str,
+        command: str,
+    ) -> None:
+        """Inject a firmware-style async G-code error for module testing."""
+        raise NotImplementedError(
+            f"inject_async_gcode_response is not supported by {self.model()}"
+        )
+
     def get_bundled_fw(self) -> Optional[BundledFirmware]:
         """Get absolute path to bundled version of module fw if available."""
         if not IS_ROBOT:
@@ -143,36 +154,10 @@ class AbstractModule(abc.ABC):
         if self._execution_manager is not None:
             self._execution_manager.register_cancellable_task(task)
 
-    @abc.abstractmethod
-    async def deactivate(self, must_be_running: bool = True) -> None:
-        """Deactivate the module.
-
-        Contains an override to the `wait_for_is_running` step in cases where the
-        module must be deactivated regardless of context."""
-        pass
-
-    @property
-    @abc.abstractmethod
-    def status(self) -> str:
-        """Return some string describing status."""
-        pass
-
-    @property
-    @abc.abstractmethod
-    def device_info(self) -> Mapping[str, str]:
-        """Return a dict of the module's static information (serial, etc)"""
-        pass
-
     @property
     @abc.abstractmethod
     def live_data(self) -> LiveData:
         """Return a dict of the module's dynamic information"""
-        pass
-
-    @property
-    @abc.abstractmethod
-    def is_simulated(self) -> bool:
-        """True if >this is a simulated module."""
         pass
 
     @property
@@ -213,17 +198,6 @@ class AbstractModule(abc.ABC):
         return self._bundled_fw
 
     @abc.abstractmethod
-    def model(self) -> str:
-        """A name for this specific module, matching module defs"""
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def name(cls) -> str:
-        """A shortname used for matching usb ports, among other things"""
-        pass
-
-    @abc.abstractmethod
     def firmware_prefix(self) -> str:
         """The prefix used for looking up firmware"""
         pass
@@ -233,22 +207,35 @@ class AbstractModule(abc.ABC):
         """Method used to upload file to this module's bootloader."""
         pass
 
-    async def cleanup(self) -> None:
-        """Clean up the module instance.
+    async def move_port(self, port: str, usb_port: USBPort) -> None:
+        pass
 
-        Clean up, i.e. stop pollers, disconnect serial, etc in preparation for
-        object destruction.
+    async def attempt_reconnect(self) -> None:
+        """Attempt to reestablish connections."""
+        pass
+
+    async def run_task_fault_tolerant(
+        self,
+        task_function: Callable[[], Coroutine[Any, Any, None]],
+        debounce_count: int = 4,
+    ) -> None:
+        """Convenience function for module actions where we have to wait for some action to happen.
+        This will end up calling the task function multiple times in the event of a failure.
         """
-        pass
-
-    def event_listener(self, event: Any) -> None:
-        """Listen for events and update the module state."""
-        pass
-
-    async def identify(self, start: bool, color_name: Optional[str] = None) -> None:
-        """Identify the module."""
-        pass
-
-    def cleanup_persistent(self) -> None:
-        """Reset any persistent data on the module that should not exist outside of a run."""
-        pass
+        while debounce_count > 0:
+            try:
+                t = self._loop.create_task(task_function())
+                self.make_cancellable(t)
+                await t
+            except BaseException:
+                mod_log.exception(
+                    f"error in fault tolerant module call debounce {debounce_count}"
+                )
+                debounce_count -= 1
+                await asyncio.sleep(1)
+                if debounce_count == 0:
+                    # out of retries
+                    raise
+            else:
+                # success
+                return

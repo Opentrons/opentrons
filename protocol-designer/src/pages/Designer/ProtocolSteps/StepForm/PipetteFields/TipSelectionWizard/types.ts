@@ -6,7 +6,10 @@ import type {
   PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms/types'
-import type { INACCESSIBLE_PARTIAL_TIP } from '../NozzleAndWellSelectionModal/constants'
+import type {
+  INACCESSIBLE_PARTIAL_TIP,
+  INACCESSIBLE_WELL_SPACING_MISMATCH,
+} from '../NozzleAndWellSelectionModal/constants'
 import type {
   INACCESSIBLE_COLLISION,
   INACCESSIBLE_INCOMPLETE,
@@ -50,13 +53,20 @@ export type InaccessibleReason =
   | typeof INACCESSIBLE_INCOMPLETE
   | typeof INACCESSIBLE_TOO_MANY_PICKUPS
   | typeof INACCESSIBLE_PARTIAL_TIP
+  | typeof INACCESSIBLE_WELL_SPACING_MISMATCH
 
-export interface AccessibilityStatus {
-  isAccessible: boolean
-  inaccessibleReason?: InaccessibleReason
+interface AccessibilityStatusBase {
+  affectedWells: string[]
+}
+interface AccessibleStatus extends AccessibilityStatusBase {
+  isAccessible: true
 }
 
+interface InaccessibleStatus extends AccessibilityStatusBase {
+  isAccessible: false
+  inaccessibleReason: InaccessibleReason
+}
+export type AccessibilityStatus = AccessibleStatus | InaccessibleStatus
+
 export type TipSelectionBannerReason =
-  | 'incompletePickup'
-  | 'pickupsRequired'
-  | 'tooManyTips'
+  'incompletePickup' | 'pickupsRequired' | 'tooManyTips'

@@ -73,12 +73,13 @@ export const Success = (
   }
   const { header, buttonText } = infoByAction[successfulAction]
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
+  }
 
   return (
     <SimpleWizardBody

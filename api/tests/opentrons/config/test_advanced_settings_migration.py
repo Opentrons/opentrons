@@ -9,7 +9,7 @@ from opentrons.config.advanced_settings import _ensure, _migrate
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 40
+    return 44
 
 
 # make sure to set a boolean value in default_file_settings only if
@@ -32,9 +32,10 @@ def default_file_settings() -> Dict[str, Any]:
         "enableOEMMode": None,
         "enablePerformanceMetrics": None,
         "disableFlexStackerLabwareDetection": None,
-        "enableProtocolSubprocess": False,
-        "enableHardwareSubprocess": False,
-        "allowStepGrouping": None,
+        "enableProtocolSubprocess": True,
+        "enableHardwareSubprocess": True,
+        "alwaysRunProtocolAsUser": False,
+        "internal96chAttach": False,
     }
 
 
@@ -480,6 +481,50 @@ def v40_config(v39_config: Dict[str, Any]) -> Dict[str, Any]:
     return r
 
 
+@pytest.fixture
+def v41_config(v40_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = {k: v for k, v in v40_config.items() if k != "allowStepGrouping"}
+    r["_version"] = 41
+    return r
+
+
+@pytest.fixture
+def v42_config(v41_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v41_config.copy()
+    r.update(
+        {
+            "_version": 42,
+            "alwaysRunProtocolAsUser": False,
+        }
+    )
+    return r
+
+
+@pytest.fixture
+def v43_config(v42_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v42_config.copy()
+    r.update(
+        {
+            "_version": 43,
+            "enableProtocolSubprocess": True,
+            "enableHardwareSubprocess": True,
+        }
+    )
+    return r
+
+
+@pytest.fixture
+def v44_config(v43_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v43_config.copy()
+    r.update(
+        {
+            "_version": 44,
+            "internal96chAttach": False,
+        }
+    )
+    return r
+
+
 @pytest.fixture(
     params=[
         lazy_fixture("empty_settings"),
@@ -524,6 +569,10 @@ def v40_config(v39_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v38_config"),
         lazy_fixture("v39_config"),
         lazy_fixture("v40_config"),
+        lazy_fixture("v41_config"),
+        lazy_fixture("v42_config"),
+        lazy_fixture("v43_config"),
+        lazy_fixture("v44_config"),
     ],
 )
 def old_settings(request: SubRequest) -> Dict[str, Any]:
@@ -617,5 +666,6 @@ def test_ensures_config() -> None:
         "disableFlexStackerLabwareDetection": None,
         "enableProtocolSubprocess": None,
         "enableHardwareSubprocess": None,
-        "allowStepGrouping": None,
+        "alwaysRunProtocolAsUser": None,
+        "internal96chAttach": None,
     }

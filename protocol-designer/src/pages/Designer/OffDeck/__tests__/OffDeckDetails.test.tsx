@@ -18,7 +18,7 @@ import {
   getSelectedDropdownItem,
 } from '/protocol-designer/ui/steps/selectors'
 
-import { HighlightOffdeckSlot } from '../HighlightOffdeckSlot'
+import { HighlightOffDeckSlot } from '../HighlightOffDeckSlot'
 import { OffDeckDetails } from '../OffDeckDetails'
 
 import type { ComponentProps } from 'react'
@@ -26,7 +26,7 @@ import type * as Components from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('/protocol-designer/ui/steps/selectors')
-vi.mock('../HighlightOffdeckSlot')
+vi.mock('../HighlightOffDeckSlot')
 vi.mock('/protocol-designer/top-selectors/labware-locations')
 vi.mock('/protocol-designer/file-data/selectors')
 vi.mock('/protocol-designer/labware-ingred/selectors')
@@ -70,8 +70,8 @@ describe('OffDeckDetails', () => {
     })
     vi.mocked(selectors.getLiquidDisplayColors).mockReturnValue({})
     vi.mocked(getAllWellContentsForActiveItem).mockReturnValue({})
-    vi.mocked(HighlightOffdeckSlot).mockReturnValue(
-      <div>Highlight Offdeck Slot</div>
+    vi.mocked(HighlightOffDeckSlot).mockReturnValue(
+      <div>Highlight OffDeck Slot</div>
     )
     vi.mocked(getSelectedDropdownItem).mockReturnValue([])
     vi.mocked(getHoveredDropdownItem).mockReturnValue({ id: null, text: null })
@@ -82,6 +82,6 @@ describe('OffDeckDetails', () => {
     screen.getByText('OFF-DECK LABWARE')
     screen.getByText('mock LabwareRender')
     screen.getByText('Add labware')
-    expect(screen.getAllByText('Highlight Offdeck Slot')).toHaveLength(2)
+    expect(screen.getAllByText('Highlight OffDeck Slot')).toHaveLength(2)
   })
 })

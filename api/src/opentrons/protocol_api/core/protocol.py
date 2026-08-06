@@ -25,6 +25,7 @@ from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.types import (
     DeckSlotName,
     Location,
+    ModuleFixtureLocation,
     Mount,
     Point,
     StagingSlotName,
@@ -77,7 +78,12 @@ class AbstractProtocol(
         self,
         load_name: str,
         location: Union[
-            DeckSlotName, StagingSlotName, LabwareCoreType, ModuleCoreType, OffDeckType
+            DeckSlotName,
+            StagingSlotName,
+            LabwareCoreType,
+            ModuleCoreType,
+            ModuleFixtureLocation,
+            OffDeckType,
         ],
         label: Optional[str],
         namespace: Optional[str],
@@ -90,7 +96,13 @@ class AbstractProtocol(
     def load_adapter(
         self,
         load_name: str,
-        location: Union[DeckSlotName, StagingSlotName, ModuleCoreType, OffDeckType],
+        location: Union[
+            DeckSlotName,
+            StagingSlotName,
+            ModuleCoreType,
+            ModuleFixtureLocation,
+            OffDeckType,
+        ],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCoreType:
@@ -117,6 +129,7 @@ class AbstractProtocol(
             StagingSlotName,
             LabwareCoreType,
             ModuleCoreType,
+            ModuleFixtureLocation,
             OffDeckType,
             WasteChute,
             TrashBin,

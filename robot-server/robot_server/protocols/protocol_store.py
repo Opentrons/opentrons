@@ -13,6 +13,7 @@ from typing import Dict, List, Optional, Set
 import sqlalchemy
 from anyio import Path as AsyncPath
 from anyio import create_task_group
+from pydantic import BaseModel, ConfigDict
 
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 from opentrons.protocols.parse import PythonParseMode
@@ -38,9 +39,10 @@ _CACHE_ENTRIES = 32
 _log = getLogger(__name__)
 
 
-@dataclass(frozen=True)
-class ProtocolResource:
+class ProtocolResource(BaseModel):
     """Represents an uploaded protocol."""
+
+    model_config = ConfigDict(frozen=True)
 
     protocol_id: str
     created_at: datetime

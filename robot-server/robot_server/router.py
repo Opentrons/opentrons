@@ -4,6 +4,7 @@ from fastapi import Depends, status
 
 from server_utils.fastapi_utils.light_router import LightRouter
 
+from .access_control.settings.router import router as access_control_settings_router
 from .client_data.router import router as client_data_router
 from .commands.router import commands_router
 from .constants import V1_TAG
@@ -104,6 +105,12 @@ router.include_router(
 router.include_router(
     router=deck_configuration_router,
     tags=["Flex Deck Configuration"],
+    dependencies=[Depends(check_version_header)],
+)
+
+router.include_router(
+    router=access_control_settings_router,
+    tags=["Access Control Settings"],
     dependencies=[Depends(check_version_header)],
 )
 

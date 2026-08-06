@@ -12,7 +12,7 @@ export function ExportButton({ onClick }: ExportButtonProps): JSX.Element {
 
   return (
     <Btn css={GREY_BUTTON_STYLE} onClick={onClick}>
-      <Icon size="1rem" name="export" data-testid="export-icon" />
+      <Icon size="1rem" name="export" />
       <StyledText desktopStyle="bodyDefaultSemiBold">{t('export')}</StyledText>
     </Btn>
   )

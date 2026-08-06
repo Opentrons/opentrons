@@ -7,6 +7,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { PAUSE_UNTIL_TEMP } from '/protocol-designer/constants'
@@ -170,6 +171,20 @@ export const addAndSelectStep: (arg: {
         })
       )
     }
+  } else if (payload.stepType === 'vacuum') {
+    const vacuumModules = Object.entries(modules).filter(
+      ([_, module]) => module.type === VACUUM_MODULE_TYPE
+    )
+    const vacuumModuleId =
+      vacuumModules.length === 1 ? vacuumModules[0][0] : null
+    if (vacuumModuleId != null) {
+      dispatch(
+        selectDropdownItem({
+          selection: { id: vacuumModuleId, text: 'Selected', field: '1' },
+          mode: 'add',
+        })
+      )
+    }
   } else if (payload.stepType === 'mix' || payload.stepType === 'moveLiquid') {
     const labwares = Object.entries(labware).filter(
       ([key, lw]) =>
@@ -292,9 +307,7 @@ export const duplicateSelectedSteps: () => ThunkAction<
     },
   }
   const selectNewStepsAction = (():
-    | SelectStepAction
-    | SelectMultipleStepsAction
-    | null => {
+    SelectStepAction | SelectMultipleStepsAction | null => {
     // If we have multiple step IDs to select, dispatch a SELECT_MULTIPLE_STEPS; if we
     // have just one, dispatch a SELECT_STEP. This just preserves prior behavior and
     // I'm not sure the distinction actually matters. We might be able to simplify this
@@ -332,13 +345,13 @@ export interface SaveStepFormAction {
     form: FormData
 
     /**
-     * If a new Thermocycler profile step is being saved, a "wait for profile to
+     * If a new concurrent group step is being saved, a "wait for group to
      * complete" step will be saved along with it, implicitly. This is the ID to use
      * for that new wait step.
      *
      * If no wait step needs to be created, this is ignored.
      */
-    thermocyclerPauseStepId: StepIdType
+    concurrentGroupPauseStepId: StepIdType
   }
 }
 export const _saveStepForm = (form: FormData): SaveStepFormAction => {
@@ -350,7 +363,7 @@ export const _saveStepForm = (form: FormData): SaveStepFormAction => {
     type: SAVE_STEP_FORM,
     payload: {
       form: adjustedForm,
-      thermocyclerPauseStepId: uuid(),
+      concurrentGroupPauseStepId: uuid(),
     },
   }
 }

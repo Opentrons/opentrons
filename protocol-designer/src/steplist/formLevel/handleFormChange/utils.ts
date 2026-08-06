@@ -258,8 +258,9 @@ export function getDefaultWells(args: GetDefaultWellsArgs): string[] {
     !labwareEntities[labwareId] ||
     !pipetteId ||
     !pipetteEntities[pipetteId]
-  )
+  ) {
     return []
+  }
   const labwareDef = labwareEntities[labwareId].def
   const pipetteCanUseLabware = canPipetteUseLabware(
     pipetteEntities[pipetteId].spec,

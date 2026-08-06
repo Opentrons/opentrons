@@ -4,7 +4,7 @@
 name: 'abr-testing lint/test'
 on:
   push:
-    paths:
+    paths: &paths
       - 'Makefile'
       - 'abr-testing/**'
       - 'scripts/**.mk'
@@ -16,11 +16,7 @@ on:
     tags-ignore:
       - '**'
   pull_request:
-    paths:
-      - 'abr-testing/**'
-      - 'scripts/**.mk'
-      - 'scripts/**.py'
-      - '.github/workflows/abr-testing-lint-test.yaml'
+    paths: *paths
   workflow_dispatch:
 
 concurrency:
@@ -36,15 +32,13 @@ jobs:
     runs-on: 'windows-latest'
     steps:
       - name: Checkout opentrons repo
-        uses: 'actions/checkout@v4'
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Setup Node
-        uses: 'actions/setup-node@v6'
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: '12'
       - name: Setup Python
-        uses: 'actions/setup-python@v4'
+        uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4.9.1
         with:
           python-version: '3.12'
       - name: Set up abr-testing project

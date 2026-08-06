@@ -321,6 +321,7 @@ def aspirate_with_liquid_class(
     transfer_properties: TransferProperties,
     transfer_type: tx_comps_executor.TransferType,
     source: Well,
+    tip_size: int,
 ) -> List[tx_comps_executor.LiquidAndAirGapPair]:
     """Aspirate with liquid class."""
     contents = pipette._core.aspirate_liquid_class(  # type: ignore [attr-defined]
@@ -337,6 +338,7 @@ def aspirate_with_liquid_class(
                 air_gap=0,
             )
         ],
+        max_pipette_and_tip_volume=tip_size,
         volume_for_pipette_mode_configuration=None,
     )
     return contents
@@ -420,7 +422,11 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # NOQA: C901
                      Only {rounded} uL detected. Refill and try again."
                 )
                 retrying = True
+        # pip._retract()
+        pip.return_tip()
         pip._retract()
+        ctx.pause("Replace tip rack.")
+        pip.pick_up_tip(tips["A1"])
         # if ctx.params.lld:  # type: ignore [attr-defined]
         #    pip.return_tip()
         #    pip._retract()
@@ -430,7 +436,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # NOQA: C901
     target_volume = ctx.params.target_volume  # type: ignore [attr-defined]
 
     def _get_transfer_settings(tiprack: Labware, first_trial: bool) -> LiquidClass:
-        liquid_class = ctx.get_liquid_class("water", version=2)
+        liquid_class = ctx.get_liquid_class("water", version=3)
         transfer_properties = liquid_class.get_for(pip, tiprack)
 
         asp_offset = Coordinate(x=0, y=0, z=-1 * ctx.params.asp_sub_depth)  # type: ignore [attr-defined]
@@ -505,6 +511,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # NOQA: C901
             liquid_class.get_for(pip, tips),
             transfer_type,
             dye_source["A1"],
+            ctx.params.tip_type,  # type: ignore [attr-defined]
         )
         # Dispense conditioning volume, if any, while submerged
         if ctx.params.conditioning_volume:  # type: ignore [attr-defined]

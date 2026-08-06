@@ -127,10 +127,14 @@ async def _quick_update(
 ) -> AsyncIterator[HWUpdateStatus]:
     assert subsystems
     subsystem = next(iter(subsystems))
-    yield HWUpdateStatus(subsystem, HWUpdateState.queued, 0)
+    yield HWUpdateStatus.model_construct(
+        subsystem=subsystem, state=HWUpdateState.queued, progress=0
+    )
     await asyncio.sleep(0)
     for value in range(0, 100, 10):
-        yield HWUpdateStatus(subsystem, HWUpdateState.updating, value)
+        yield HWUpdateStatus.model_construct(
+            subsystem=subsystem, state=HWUpdateState.updating, progress=value
+        )
         await asyncio.sleep(0)
 
 
@@ -140,7 +144,9 @@ async def _eternal_update(
     assert subsystems
     subsystem = next(iter(subsystems))
     while True:
-        yield HWUpdateStatus(subsystem, HWUpdateState.queued, 0)
+        yield HWUpdateStatus.model_construct(
+            subsystem=subsystem, state=HWUpdateState.queued, progress=0
+        )
         await asyncio.sleep(0)
 
 
@@ -149,7 +155,9 @@ async def _instant_update(
 ) -> AsyncIterator[HWUpdateStatus]:
     assert subsystems
     subsystem = next(iter(subsystems))
-    yield HWUpdateStatus(subsystem, HWUpdateState.done, 100)
+    yield HWUpdateStatus.model_construct(
+        subsystem=subsystem, state=HWUpdateState.done, progress=100
+    )
     await asyncio.sleep(0)
 
 
@@ -166,10 +174,14 @@ async def _error_update(
 ) -> AsyncIterator[HWUpdateStatus]:
     assert subsystems
     subsystem = next(iter(subsystems))
-    yield HWUpdateStatus(subsystem, HWUpdateState.queued, 0)
+    yield HWUpdateStatus.model_construct(
+        subsystem=subsystem, state=HWUpdateState.queued, progress=0
+    )
     await asyncio.sleep(0)
     for value in range(0, 30, 10):
-        yield HWUpdateStatus(subsystem, HWUpdateState.updating, value)
+        yield HWUpdateStatus.model_construct(
+            subsystem=subsystem, state=HWUpdateState.updating, progress=value
+        )
         await asyncio.sleep(0)
     raise RuntimeError("oh no!")
 
@@ -179,10 +191,14 @@ async def _baseexception_update(
 ) -> AsyncIterator[HWUpdateStatus]:
     assert subsystems
     subsystem = next(iter(subsystems))
-    yield HWUpdateStatus(subsystem, HWUpdateState.queued, 0)
+    yield HWUpdateStatus.model_construct(
+        subsystem=subsystem, state=HWUpdateState.queued, progress=0
+    )
     await asyncio.sleep(0)
     for value in range(0, 30, 10):
-        yield HWUpdateStatus(subsystem, HWUpdateState.updating, value)
+        yield HWUpdateStatus.model_construct(
+            subsystem=subsystem, state=HWUpdateState.updating, progress=value
+        )
         await asyncio.sleep(0)
     raise BaseException()
 
@@ -229,7 +245,9 @@ async def test_conflicting_in_progress_updates_fail(
     ) -> AsyncIterator[HWUpdateStatus]:
         assert subsystems == {HWSubSystem.gantry_x}
         while True:
-            yield HWUpdateStatus(HWSubSystem.gantry_x, HWUpdateState.queued, 0)
+            yield HWUpdateStatus.model_construct(
+                subsystem=HWSubSystem.gantry_x, state=HWUpdateState.queued, progress=0
+            )
             await asyncio.sleep(0)
 
     decoy.when(ot3_hardware_api.update_firmware).then_return(_eternal_update)

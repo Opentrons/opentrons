@@ -1,7 +1,7 @@
 name: 'Setup JS Environment'
 description: >
   Composite action to fix tag handling in checkout,
-  setup Node.js, install udev for USB detection, cache Yarn/NPM caches,
+  setup Node.js, install udev for USB detection, cache PNPM/NPM caches,
   and perform JS setup.
 
 inputs: {}
@@ -11,14 +11,24 @@ runs:
   steps:
     - uses: ./.github/actions/git/resolve-tag
     - uses: ./.github/actions/environment/complex-variables
+
+    # must install pnpm directly before setup-node
+    - name: Install pnpm
+      uses: 'pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320' # v4.4.0
+      with:
+        version: 10.32.1
+
     - name: 'Setup Node'
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
       with:
         node-version: '22.22.0'
-        cache: 'yarn'
+        cache: 'pnpm'
+        cache-dependency-path: |
+          pnpm-lock.yaml
+          components-testing/pnpm-lock.yaml
 
     - name: 'Setup Python'
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4.9.1
       with:
         python-version: '3.12'
 
@@ -29,4 +39,4 @@ runs:
 
     - name: 'Setup JS'
       shell: bash
-      run: make setup-js
+      run: make setup-js-ci

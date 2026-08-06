@@ -21,16 +21,14 @@ In addition, Opentrons Care Plus includes on-site visits for:
 
 You can also [purchase services](https://opentrons.com/instrument-services) individually, including installation, protocol development (remote or on-site), repair, relocation, and preventive maintenance. Contact Opentrons Sales for more information.
 
-## Installation qualification and operation qualification
+## Installation qualification
 
-Opentrons recommends performing installation qualification and operation qualification (IQ/OQ) after you first set up Flex, after you attach hardware, and after having service performed. IQ/OQ generally verifies:
+Perform an installation qualification (IQ) procedure after you first set up Flex, attach new hardware, or have the robot serviced. For this process you should verify the:
 
-- The serial numbers of your hardware, including the Flex robot, pipettes, gripper, and modules.
+- Serial numbers of all hardware, including the Flex robot, pipettes, gripper, and modules.
 - Software and firmware versions.
-- Proper connection of attached hardware.
-- Pipette and module calibrations.
-
-Consult the [Flex IQ/OQ form](https://opentrons-flex-iq-oq-checklist.paperform.co) for a complete checklist of IQ/OQ activities to perform.
+- Physical hardware connections of all hardware attached to the robot.
+- Calibration status of all attached instruments and modules.
 
 ## Preventative maintenance
 

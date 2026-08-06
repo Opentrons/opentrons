@@ -25,12 +25,13 @@ export function useVacuumModeUpdate(
     useState<boolean>(false)
 
   const isVacuumWithProfile =
-    formData.stepType === 'vacuum' && formData.orderedProfileIds.length > 0
+    formData.stepType === 'vacuum' &&
+    formData.vacuumOrderedProfileIds.length > 0
 
-  const firstProfileId = formData.orderedProfileIds?.[0]
+  const firstProfileId = formData.vacuumOrderedProfileIds?.[0]
   const firstProfileItem =
     firstProfileId != null
-      ? formData.profileItemsById?.[firstProfileId]
+      ? formData.vacuumProfileItemsById?.[firstProfileId]
       : undefined
   const savedProfileModeType =
     firstProfileItem != null
@@ -38,11 +39,11 @@ export function useVacuumModeUpdate(
       : null
 
   const handleConfirmVacuumModeUpdate = (): void => {
-    propsForFields.orderedProfileIds.updateValue(
-      getDefaultsForStepType('vacuum').orderedProfileIds
+    propsForFields.vacuumOrderedProfileIds.updateValue(
+      getDefaultsForStepType('vacuum').vacuumOrderedProfileIds
     )
-    propsForFields.profileItemsById.updateValue(
-      getDefaultsForStepType('vacuum').profileItemsById
+    propsForFields.vacuumProfileItemsById.updateValue(
+      getDefaultsForStepType('vacuum').vacuumProfileItemsById
     )
     setShowVacuumModeUpdateModal(false)
   }

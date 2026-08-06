@@ -245,15 +245,21 @@ settings = [
         internal_only=True,
     ),
     SettingDefinition(
-        _id="allowStepGrouping",
-        title="Allow creation of step groups via command annotations.",
-        description=(
-            "Do not enable."
-            " This is an Opentrons internal setting to allow using in-development"
-            " command annotations and step groups."
-        ),
+        _id="alwaysRunProtocolAsUser",
+        title="Run protocols under the 'ot-protocol' user account",
+        description="Always set the protocol subprocess to execute under the 'ot-protocol' user on the Flex with limited permissions.",
         robot_type=[RobotTypeEnum.FLEX],
         internal_only=True,
+    ),
+    SettingDefinition(
+        _id="internal96chAttach",
+        title="Modified 96-channel pipette attachment",
+        description=(
+            "Lower the right mount to attach mount without detaching z axis during"
+            " 96-channel pipette attach, reducing the Z margin from 20 mm to 1.85 mm."
+            "This can and will ruin the right z axis, do not use."
+        ),
+        robot_type=[RobotTypeEnum.FLEX],
     ),
 ]
 
@@ -798,6 +804,47 @@ def _migrate39to40(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate40to41(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 41 of the feature flags file.
+
+    - Removes the allowStepGrouping config element.
+    """
+    return {k: v for k, v in previous.items() if "allowStepGrouping" != k}
+
+
+def _migrate41to42(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 42 of the feature flags file.
+
+    -  Adds the alwaysRunProtocolAsUser config element.
+    -  Ensure element begins as false.
+
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["alwaysRunProtocolAsUser"] = False
+    return newmap
+
+
+def _migrate42to43(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 43 of the feature flags file.
+
+    -  Ensure the subprocess flags default to True ensuring the hardware always runs with Pyro.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enableProtocolSubprocess"] = True
+    newmap["enableHardwareSubprocess"] = True
+    return newmap
+
+
+def _migrate43to44(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 44 of the feature flags file.
+
+    - Adds the internal96chAttach config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["internal96chAttach"] = False
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -839,6 +886,10 @@ _MIGRATIONS = [
     _migrate37to38,
     _migrate38to39,
     _migrate39to40,
+    _migrate40to41,
+    _migrate41to42,
+    _migrate42to43,
+    _migrate43to44,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

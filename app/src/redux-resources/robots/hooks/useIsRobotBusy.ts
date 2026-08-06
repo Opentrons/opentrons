@@ -39,7 +39,7 @@ export function useIsRobotBusy(
       refetchInterval: ROBOT_SUBSTATE_POLL_MS,
     })
   const isSubsystemUpdating =
-    currentSubsystemsUpdatesData?.data.some(
+    (currentSubsystemsUpdatesData?.data ?? []).some(
       update =>
         update.updateStatus === 'queued' || update.updateStatus === 'updating'
     ) ?? false

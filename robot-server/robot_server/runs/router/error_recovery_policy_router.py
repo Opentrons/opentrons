@@ -5,7 +5,8 @@ from typing import Annotated
 
 from fastapi import Depends, status
 
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.audit.fastapi import get_audit_logger
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
 from server_utils.fastapi_utils.models.json_api import (
@@ -28,19 +29,20 @@ error_recovery_policy_router = LightRouter()
     error_recovery_policy_router.put,
     path="/runs/{runId}/errorRecoveryPolicy",
     summary="Set a run's error recovery policy",
-    description=dedent(
-        """
+    description=dedent("""
         Update how to handle different kinds of command failures.
 
         For this to have any effect, error recovery must also be enabled globally.
         See `PATCH /errorRecovery/settings`.
-        """
-    ),
+        """),
     responses={
         status.HTTP_200_OK: {"model": SimpleEmptyBody},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("change run error recovery policy")),
+    ],
 )
 async def put_error_recovery_policy(
     runId: str,

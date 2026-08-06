@@ -1,0 +1,117 @@
+.nav_bar {
+  display: flex;
+  width: 100%;
+  height: 7.75rem;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: var(--spacing-40);
+  padding-left: var(--spacing-40);
+  background-color: var(--white);
+  gap: var(--spacing-24);
+}
+
+.nav_bar_sticky {
+  position: sticky;
+  z-index: 3;
+  top: 0;
+}
+
+.nav_bar_static {
+  position: static;
+  z-index: 0;
+}
+
+.carousel_contents {
+  display: flex;
+  flex-direction: row;
+  margin-right: var(--spacing-24);
+  gap: var(--spacing-32);
+}
+
+.carousel_scroll_container {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  align-items: flex-start;
+  mask-image: linear-gradient(to left, transparent, black 6.25rem, black 100%);
+  overflow-x: scroll;
+}
+
+.carousel_scroll_container::-webkit-scrollbar {
+  display: none;
+}
+
+.account_icon {
+  width: 3.75rem;
+  height: 3.75rem;
+  flex: none;
+  align-content: center;
+  border-radius: var(--border-radius-full);
+  background-color: var(--black-90);
+  color: var(--white);
+  font-size: var(--font-size-28);
+  font-weight: var(--font-weight-semi-bold);
+  line-height: var(--line-height-36);
+  text-align: center;
+  text-decoration: none;
+}
+
+.touch_nav_link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--grey-50);
+  font-size: var(--font-size-32);
+  font-weight: var(--font-weight-semi-bold);
+  gap: var(--spacing-8);
+  line-height: var(--line-height-42);
+  white-space: nowrap;
+
+  &.touch_nav_link_active {
+    color: var(--black-90);
+  }
+}
+
+.nav_link_indicator {
+  width: 2.5rem;
+  height: 0.3125rem;
+  border-radius: var(--border-radius-2);
+
+  .touch_nav_link_active & {
+    background-color: var(--purple-50);
+  }
+}
+
+.icon_button {
+  max-height: 100%;
+  flex: none;
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
+
+  &:hover {
+    background-color: var(--grey-35);
+  }
+
+  &:active {
+    background-color: var(--grey-30);
+  }
+
+  &:focus-visible {
+    background-color: var(--grey-35);
+    box-shadow: 0 0 0 4px var(--blue-50);
+    outline: none;
+  }
+
+  &:disabled {
+    background-color: transparent;
+  }
+}
+
+.nav_bar_scrolled {
+  box-shadow: 0 3px 6px rgb(0 0 0 / 23%);
+}
+
+.cursor_default {
+  cursor: default;
+}

@@ -5,6 +5,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional, Union
 
+from pydantic import BaseModel, ConfigDict
+
 from ..util import StrEnum
 
 
@@ -32,9 +34,10 @@ class DataFileSource(Enum):
     GENERATED = "generated"
 
 
-@dataclass(frozen=True)
-class DataFileInfo:
+class DataFileInfo(BaseModel):
     """Metadata about a data file."""
+
+    model_config = ConfigDict(frozen=True)
 
     id: str
     name: str
@@ -54,7 +57,6 @@ class CmdDataFileInfo:
     prev_command_id: str
 
 
-@dataclass(frozen=True)
 class DataFileInfoWithCommands(DataFileInfo):
     """Data file info with associated command information."""
 

@@ -5,7 +5,7 @@ import {
   TOO_HOT_TEMP,
 } from '@opentrons/shared-data'
 
-import type { AttachedModule } from '/app/redux/modules/types'
+import type { AttachedModule } from '@opentrons/api-client'
 
 export function getModuleTooHot(module: AttachedModule): boolean {
   switch (module.moduleType) {

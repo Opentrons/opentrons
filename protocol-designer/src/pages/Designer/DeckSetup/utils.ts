@@ -14,9 +14,13 @@ import {
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
+  VACUUM_MODULE_TYPE,
   VACUUM_MODULE_V1,
 } from '@opentrons/shared-data'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import {
+  getIsVacuumSpacer,
+  getSlotInLocationStack,
+} from '@opentrons/step-generation'
 
 import {
   getIsAdapter,
@@ -60,6 +64,21 @@ const OT2_TC_SLOTS = ['7', '8', '10', '11']
 const FLEX_TC_SLOTS = ['A1', 'B1']
 
 export type ModuleModelExtended = ModuleModel | 'stagingAreaAndMagneticBlock'
+
+/**
+ * Check if a labware definition is that of a vacuum module collar
+ * @param labwareDef - The labware definition to check
+ * @returns True if the labware definition is a vacuum module collar, false otherwise
+ */
+export function getIsVacuumCollar(labwareDef: LabwareDefinition2): boolean {
+  const loadName = labwareDef.parameters.loadName
+  return (
+    loadName === 'opentrons_vacuum_manifold_collar_tall' ||
+    loadName === 'opentrons_vacuum_manifold_collar_short'
+  )
+}
+
+export { getIsVacuumSpacer } from '@opentrons/step-generation'
 
 export function getCutoutIdForAddressableArea(
   addressableArea: AddressableAreaName,
@@ -143,7 +162,10 @@ export function getModuleModelsBySlot(
 
 export const getLabwareIsRecommended = (
   def: LabwareDefinition2,
-  moduleModel?: ModuleModel | null
+  moduleModel?: ModuleModel | null,
+  moduleHasLabware?: boolean,
+  isVacuumDock?: boolean,
+  dockHasCollar?: boolean
 ): boolean => {
   //  special-casing the thermocycler module V2 recommended labware since the thermocyclerModuleTypes
   //  have different recommended labware
@@ -151,7 +173,40 @@ export const getLabwareIsRecommended = (
     // permissive early exit if no module passed
     return true
   }
+
+  // For vacuum dock, recommendations depend on whether collar is present
+  if (isVacuumDock) {
+    if (!dockHasCollar) {
+      // No collar is present, so recommend both collars
+      return getIsVacuumCollar(def)
+    }
+    // Collar is present, so recommend tough wellplate
+    return (
+      def.parameters.loadName === 'opentrons_96_wellplate_200ul_pcr_full_skirt'
+    )
+  }
+
   const moduleType = getModuleType(moduleModel)
+
+  // For vacuum module, show different labware based on whether module has labware
+  if (moduleType === VACUUM_MODULE_TYPE) {
+    if (moduleHasLabware) {
+      // Show collars, wellplates, and filter plates when module already has labware
+      return (
+        def.parameters.loadName === 'opentrons_vacuum_manifold_collar_tall' ||
+        def.parameters.loadName === 'opentrons_vacuum_manifold_collar_short' ||
+        def.parameters.loadName ===
+          'opentrons_96_wellplate_200ul_pcr_full_skirt' ||
+        (def.parameters.quirks ?? []).includes('filterPlate')
+      )
+    } else {
+      // Show spacer and wellplate for empty module
+      return RECOMMENDED_LABWARE_BY_MODULE[moduleType].includes(
+        def.parameters.loadName
+      )
+    }
+  }
+
   return moduleModel === THERMOCYCLER_MODULE_V2
     ? def.parameters.loadName === 'opentrons_96_wellplate_200ul_pcr_full_skirt'
     : RECOMMENDED_LABWARE_BY_MODULE[moduleType].includes(
@@ -168,12 +223,67 @@ export const getLabwareCompatibleWithAdapter = (
     return []
   }
 
+  // vacuum spacers expose the same recommended well plates as the bare module
+  const adapterDef = Object.values(defs).find(
+    d => d.parameters.loadName === adapterLoadName
+  )
+  if (adapterDef != null && getIsVacuumSpacer(adapterDef)) {
+    const vacuumRecommended = RECOMMENDED_LABWARE_BY_MODULE[VACUUM_MODULE_TYPE]
+    return Object.entries(defs)
+      .filter(
+        ([, def]) =>
+          vacuumRecommended.includes(def.parameters.loadName) &&
+          !getIsVacuumSpacer(def) &&
+          !getIsVacuumCollar(def)
+      )
+      .map(([uri]) => uri)
+  }
+
   return Object.entries(defs)
     .filter(
-      ([, { stackingOffsetWithLabware }]) =>
-        stackingOffsetWithLabware?.[adapterLoadName] != null
+      ([, def]) =>
+        def.stackingOffsetWithLabware?.[adapterLoadName] != null ||
+        (def.parameters.quirks ?? []).includes('filterPlate')
     )
     .map(([labwareDefUri]) => labwareDefUri)
+}
+
+const _stackTopIsNonAdapter = (
+  labwareStack: string[],
+  deckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware']
+): boolean => {
+  const topDef =
+    labwareStack.length > 0 ? deckSetupLabware[labwareStack[0]]?.def : null
+  return topDef != null && !topDef.allowedRoles?.includes('adapter')
+}
+
+export const getIsVacuumModuleFull = (
+  labwareStack: string[],
+  deckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware']
+): boolean => {
+  // Full only when a non-adapter (filter plate/wellplate) sits on top of a collar.
+  // A base plate alone (no collar) or a collar alone does not make the module full.
+  const hasCollar = labwareStack.some(labwareId => {
+    const def = deckSetupLabware[labwareId]?.def
+    return def != null && getIsVacuumCollar(def)
+  })
+  return _stackTopIsNonAdapter(labwareStack, deckSetupLabware) && hasCollar
+}
+
+export const getIsVacuumDockFull = (
+  adapterLabwareId: string | null,
+  labwareStack: string[],
+  deckSetupLabware: AllTemporalPropertiesForTimelineFrame['labware']
+): boolean => {
+  // Full only when a non-adapter sits on top of a collar in the dock.
+  // A collar alone does not make the dock full.
+  const adapterIsCollar =
+    adapterLabwareId != null &&
+    deckSetupLabware[adapterLabwareId]?.def != null &&
+    getIsVacuumCollar(deckSetupLabware[adapterLabwareId].def)
+  return (
+    adapterIsCollar && _stackTopIsNonAdapter(labwareStack, deckSetupLabware)
+  )
 }
 
 const getStackerDefinitionsFromLoadName = (
@@ -534,7 +644,9 @@ export function getHighlightLabwareAndModules(
         const moduleIdUnderLabwareToUse =
           item.id != null &&
           labware[item.id] != null &&
-          getIsAdapter(item.id, labware)
+          getIsAdapter(item.id, labware) &&
+          // collars are unique adapters in that they can be moved around the deck
+          !getIsVacuumCollar(labware[item.id].def)
             ? getModuleIdFromStack(labware[item.id].stack, modules)
             : null
 

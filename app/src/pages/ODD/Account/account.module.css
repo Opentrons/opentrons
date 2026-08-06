@@ -1,0 +1,18 @@
+.page {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  padding: 7.75rem var(--spacing-40) var(--spacing-40) var(--spacing-40);
+  gap: var(--spacing-40);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.footer {
+  margin-top: auto;
+  text-align: center;
+}

@@ -1,14 +1,18 @@
-"""HTTP responses for authorization failures."""
+"""HTTP responses for authorization failures.
+
+This module should be framework-agnostic, not tied to FastAPI or whatever.
+"""
 
 from typing import Annotated
 
 import fastapi
 from pydantic import BaseModel, Field
 
-from .authorization_checker import (
+from .types import (
     InsufficientScopeResult,
     MissingTokenResult,
     NotAnActiveTokenResult,
+    UnableToContactAuthServerResult,
 )
 from server_utils.auth.scopes import Scope
 
@@ -16,8 +20,8 @@ from server_utils.auth.scopes import Scope
 # todo(mm, 2026-02-10): Follow the server's existing error response conventions,
 # such as returning an error code.
 #
-# Note: The shape of this error response is just an Opentrons API design decision.
-# The OAuth 2 specs don't care.
+# Note: The shape of this response body is just an Opentrons API design decision.
+# The specs only care about response headers and status codes.
 class AuthorizationErrorResponse(BaseModel):
     """Returned when the client lacks authorization to access a protected resource."""
 
@@ -28,18 +32,24 @@ class AuthorizationErrorResponse(BaseModel):
         ),
     ]
     requiredScopes: Annotated[
-        list[str], Field(description="The authorization scopes carried by the request.")
-    ]
-    providedScopes: Annotated[
         list[str],
         Field(
             description="The authorization scopes required to access the requested resource."
         ),
     ]
+    providedScopes: Annotated[
+        list[str],
+        Field(description="The authorization scopes carried by the request."),
+    ]
 
 
 def build_response_for_error(
-    error: MissingTokenResult | NotAnActiveTokenResult | InsufficientScopeResult,
+    error: (
+        MissingTokenResult
+        | NotAnActiveTokenResult
+        | InsufficientScopeResult
+        | UnableToContactAuthServerResult
+    ),
     required_scopes: set[Scope],
 ) -> tuple[int, dict[str, str], AuthorizationErrorResponse]:
     """Turn the given authorization error into an HTTP response.
@@ -82,10 +92,25 @@ def build_response_for_error(
                     providedScopes=provided_scopes_str_list,
                 ),
             )
+        case UnableToContactAuthServerResult():
+            return (
+                fastapi.status.HTTP_503_SERVICE_UNAVAILABLE,
+                headers,
+                AuthorizationErrorResponse(
+                    debugMessage="The auth server cannot be contacted, so this endpoint is unavailable",
+                    requiredScopes=[],
+                    providedScopes=[],
+                ),
+            )
 
 
 def _build_response_headers_for_error(
-    error: MissingTokenResult | NotAnActiveTokenResult | InsufficientScopeResult,
+    error: (
+        MissingTokenResult
+        | NotAnActiveTokenResult
+        | InsufficientScopeResult
+        | UnableToContactAuthServerResult
+    ),
 ) -> dict[str, str]:
     """Return the headers that should be sent for an error response.
 
@@ -120,6 +145,8 @@ def _build_response_headers_for_error(
                     "Bearer", {"error": "insufficient_scope"}
                 )
             }
+        case UnableToContactAuthServerResult():
+            return {}
 
 
 def _www_authenticate(scheme: str, attributes: dict[str, str]) -> str:

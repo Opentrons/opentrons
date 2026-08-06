@@ -19,6 +19,10 @@ dependencies = [
     "opentrons-shared-data",
 ]
 
+[tool.uv]
+# cooldown time for security
+exclude-newer = "1 week"
+
 [tool.uv.sources]
 mkdocs-parent-css-plugin = { path = "mkdocs-parent-css-plugin", editable = true }
 opentrons-shared-data = { path = "../shared-data", editable = true }

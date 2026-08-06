@@ -21,5 +21,6 @@
       "/protocol-designer/*": ["./src/*"]
     }
   },
-  "include": ["typings", "src"]
+  "include": ["typings", "src"],
+  "exclude": ["**/*.stories.tsx"]
 }

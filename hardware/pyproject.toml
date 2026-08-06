@@ -18,12 +18,13 @@ dependencies = [
     "typing-extensions>=4.0.0,<5",
     "numpy>=1.24.5,<2",
     "python-can==4.2.2",
+    "setuptools>=69.1.1,<82.0.0"
 ]
 
 dynamic = ['version', 'hatch-dependency-coversion']
 
 [project.optional-dependencies]
-"FLEX" = ["python-can==4.2.2"]
+"FLEX" = ["python-can==4.2.2", "setuptools>=69.1.1,<82.0.0"]
 
 [dependency-groups]
 dev = [
@@ -83,7 +84,7 @@ source = 'vcs-tunable'
 
 [tool.hatch.version.raw-options]
 root = '..'
-git_describe_command = 'git describe --dirty --tags --long --match=v*'
+git_describe_command = 'git describe --dirty --tags --long --match=v[0-9]*.[0-9]*'
 fallback_version='0.0.0-dev'
 # Note: these are required for setuptools_scm to not automatically bump the version used in the package
 # from the latest version it detects. This would actually be kind of useful, but we can only do it if
@@ -116,6 +117,10 @@ filterwarnings = [
 show_error_codes = true
 warn_unused_configs = true
 strict = true
+
+[tool.uv]
+# cooldown time for security
+exclude-newer = "1 week"
 
 # local editable sources satisfying the 0.0.0 placeholders
 [tool.uv.sources]

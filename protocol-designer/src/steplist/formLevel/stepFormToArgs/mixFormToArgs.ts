@@ -69,7 +69,7 @@ export const mixFormToArgs = (
   // It's radiobutton, so one should always be selected.
   // One changeTip option should always be selected.
   console.assert(
-    castFormData.changeTip,
+    castFormData.changeTip != null,
     'mixFormToArgs expected non-falsey changeTip option'
   )
   const changeTip = castFormData.changeTip || DEFAULT_CHANGE_TIP_OPTION

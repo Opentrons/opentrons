@@ -6,6 +6,7 @@ import {
   ALL,
   COLUMN,
   F1_NOZZLE,
+  fixture384Plate,
   fixtureTiprack1000ul,
   fixtureTiprackAdapter,
   PARTIAL_COLUMN,
@@ -83,6 +84,59 @@ describe('getEntireWellSelection', () => {
         8
       )
     ).toStrictEqual(['A1', 'B1', 'C1'])
+  })
+
+  it('returns the correct wells when the 96CH configuration is ROW and the labware is a 384 plate', () => {
+    const nozzleConfiguration = ROW
+    const partialPrimaryNozzle = A1_NOZZLE
+    expect(
+      getEntireWellSelection(
+        wellName,
+        fixture384Plate.ordering,
+        nozzleConfiguration,
+        partialPrimaryNozzle,
+        96
+      )
+    ).toStrictEqual([
+      'A1',
+      'A3',
+      'A5',
+      'A7',
+      'A9',
+      'A11',
+      'A13',
+      'A15',
+      'A17',
+      'A19',
+      'A21',
+      'A23',
+    ])
+  })
+  it('returns the correct wells when the 96CH configuration is COLUMN and the labware is a 384 plate', () => {
+    const nozzleConfiguration = COLUMN
+    const partialPrimaryNozzle = A1_NOZZLE
+    expect(
+      getEntireWellSelection(
+        wellName,
+        fixture384Plate.ordering,
+        nozzleConfiguration,
+        partialPrimaryNozzle,
+        96
+      )
+    ).toStrictEqual(['A1', 'C1', 'E1', 'G1', 'I1', 'K1', 'M1', 'O1'])
+  })
+  it('returns the correct wells when the pipette configuration is PARTIAL and the labware is a 384 plate', () => {
+    const nozzleConfiguration = PARTIAL_COLUMN
+    const partialPrimaryNozzle = F1_NOZZLE
+    expect(
+      getEntireWellSelection(
+        'B1',
+        fixture384Plate.ordering,
+        nozzleConfiguration,
+        partialPrimaryNozzle,
+        8
+      )
+    ).toStrictEqual(['B1', 'D1', 'F1'])
   })
 })
 
@@ -285,5 +339,17 @@ describe('getInaccessibleWellsForPartialNozzleRowMap', () => {
         twoChannels
       )
     ).toStrictEqual(['A1', 'H1'])
+  })
+  it('marks does not mark wells as inaccessible during 384 plate', () => {
+    const twoChannels = 4
+    const selectedWells4Grouping = [['A1', 'C1', 'E1', 'G1']]
+    expect(
+      getInaccessibleWellsForPartialNozzleRowMap(
+        selectedWells4Grouping,
+        fixture384Plate.ordering,
+        allWellsWithState,
+        twoChannels
+      )
+    ).toStrictEqual([])
   })
 })

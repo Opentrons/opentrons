@@ -6,6 +6,7 @@ import { createCommand } from '@opentrons/api-client'
 
 import { useCreateCommandMutation } from '..'
 import { mockAnonLoadCommand, RUN_ID_1 } from '../__fixtures__'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
@@ -33,9 +34,17 @@ describe('useCreateCommandMutation hook', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(createCommand).mockResolvedValue({ data: 'something' } as any)
 
-    const { result } = renderHook(() => useCreateCommandMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCreateCommandMutation(
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+          [],
+          () => {}
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
     act(() => {
@@ -54,9 +63,17 @@ describe('useCreateCommandMutation hook', () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
     vi.mocked(createCommand).mockResolvedValue({ data: 'something' } as any)
 
-    const { result } = renderHook(() => useCreateCommandMutation(), {
-      wrapper,
-    })
+    const { result } = renderHook(
+      () =>
+        useCreateCommandMutation(
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+          [],
+          () => {}
+        ),
+      {
+        wrapper,
+      }
+    )
 
     expect(result.current.data).toBeUndefined()
     act(() => {

@@ -2,10 +2,10 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
-  AlertPrimaryButton,
   COLORS,
   Flex,
   JUSTIFY_FLEX_END,
+  PrimaryButton,
   SecondaryButton,
   SPACING,
 } from '@opentrons/components'
@@ -40,12 +40,13 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
   const flowTitle: string = titleFlowType[flowType]
   const isOnDevice = useSelector(getIsOnDevice)
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
+  }
 
   return (
     <SimpleWizardBody
@@ -79,9 +80,9 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
           >
             {t('shared:go_back')}
           </SecondaryButton>
-          <AlertPrimaryButton onClick={handleExit}>
+          <PrimaryButton variant="warning" onClick={handleExit}>
             {i18n.format(t('shared:exit'), 'capitalize')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </>
       )}
     </SimpleWizardBody>

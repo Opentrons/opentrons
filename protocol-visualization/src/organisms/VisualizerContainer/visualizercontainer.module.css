@@ -1,0 +1,72 @@
+.layout_container {
+  display: flex;
+  overflow: hidden;
+  height: 100%;
+  box-sizing: border-box;
+  padding: var(--spacing-16);
+  background-color: var(--grey-10);
+}
+
+.left_column {
+  position: relative;
+  display: flex;
+  min-width: 10.75rem; /* 172px */
+  max-width: 37.5rem; /* 600px */
+  flex-direction: column;
+  flex-shrink: 0;
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
+  overflow-y: auto;
+}
+
+.center_column {
+  display: flex;
+  min-width: 9.25rem; /* 148px */
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-40);
+  overflow-y: auto;
+}
+
+.right_column {
+  position: relative;
+  display: flex;
+  min-width: 10.75rem; /* 172px */
+  max-width: 37.5rem; /* 600px */
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+
+.gutter {
+  position: relative;
+  width: 1rem; /* 16px: align with GUTTER_WIDTH_PX */
+  flex-shrink: 0;
+}
+
+/* line when hovering */
+.gutter::before {
+  position: absolute;
+  top: var(--spacing-8);
+  bottom: var(--spacing-8);
+  left: 50%;
+  width: 1px;
+  background-color: transparent;
+  content: '';
+  transform: translateX(-50%);
+  transition: background-color 0.2s;
+}
+
+.gutter:hover {
+  cursor: grab;
+}
+
+.gutter:hover::before {
+  background-color: var(--grey-40);
+}
+
+.gutter.grabbing,
+.gutter.grabbing:hover {
+  cursor: grabbing;
+}

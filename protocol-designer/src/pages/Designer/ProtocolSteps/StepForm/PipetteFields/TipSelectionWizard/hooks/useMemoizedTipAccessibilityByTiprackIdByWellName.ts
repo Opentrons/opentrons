@@ -1,10 +1,16 @@
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 
-import { COLUMN, PARTIAL_COLUMN, ROW, SINGLE } from '@opentrons/shared-data'
+import {
+  ALL,
+  COLUMN,
+  PARTIAL_COLUMN,
+  PARTIAL_NOZZLE_MAP,
+  ROW,
+} from '@opentrons/shared-data'
 import {
   getIsSafePickupWithinTiprack,
-  getIsSafePipetteMovement,
+  getPipetteMovementSafetyStatus,
 } from '@opentrons/step-generation'
 
 import { OFFDECK } from '/protocol-designer/constants'
@@ -19,7 +25,9 @@ import {
 } from '../constants'
 
 import type {
+  ActiveNozzleNumber,
   NozzleConfigurationStyle,
+  PartialPrimaryNozzles,
   PipetteV2Specs,
   PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
@@ -27,33 +35,43 @@ import type { AccessibilityStatus, InaccessibleReason } from '../types'
 
 export const getWellsToCheck = (
   nozzles: NozzleConfigurationStyle,
-  wellOrdering: string[][]
+  wellOrdering: string[][],
+  channels: ActiveNozzleNumber,
+  primaryNozzle?: PrimaryNozzleConfigurationStyle
 ): string[] => {
-  switch (nozzles) {
-    case ROW:
-      return wellOrdering[0]
-    case COLUMN:
-      return wellOrdering.map(row => row[0])
-
-    case SINGLE:
-    case PARTIAL_COLUMN:
-      return wellOrdering.flat()
+  if (channels === 96 && nozzles === ALL) {
+    return [wellOrdering.flat()[0]]
+  } else if (nozzles === ROW) {
+    return wellOrdering[0]
+  } else if (nozzles === COLUMN || (channels === 8 && nozzles === ALL)) {
+    return wellOrdering.map(col => col[0])
+  } else if (nozzles === PARTIAL_COLUMN && primaryNozzle != null) {
+    // partial column config
+    const nozzleCount =
+      PARTIAL_NOZZLE_MAP[primaryNozzle as PartialPrimaryNozzles]
+    const isSingleColumn = wellOrdering.length === 1
+    return wellOrdering.flatMap(column => {
+      if (isSingleColumn) {
+        return column
+      }
+      // find only valid primaries such that the nozzles wouldn't "fall off" the labware
+      // for example, if you have 3 nozzles configured, the only valid wells to check
+      // are column wells A-F (targeting G + H does not supply enough wells)
+      const uniqueCount = Math.max(1, column.length - nozzleCount + 1)
+      return column.slice(0, uniqueCount)
+    })
+  } else {
+    return wellOrdering.flat()
   }
-  return []
 }
 
 /**
- * Returns a record of tip accessibility status by  tiprack id and well name.
- * Example return:
- * {
- *   'tiprack1Id': {
- *     'A1': {isAccessible: true},
- *     'A2': {isAccessible: false, inaccessibleReason: 'incomplete'},
- *   },
- *   'tiprack2Id': {
- *     'A1': {isAccessible: true},
- *     'A2': {isAccessible: false, inaccessibleReason: 'collision'},
- *   },
+ * Returns accessibility status keyed by tiprack id and PRIMARY well name.
+ * Each entry contains `affectedWells` (the full set of wells the pipette
+ * would pick up from that primary target) plus `isAccessible` / `inaccessibleReason`.
+ *
+ * Only primary wells are keys — cascading wells are represented through
+ * `affectedWells` on their respective primary entry.
  */
 export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
   nozzles: NozzleConfigurationStyle
@@ -73,33 +91,38 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
   } = args
   const robotState = useSelector(getRobotStateAtActiveItem)
   const invariantContext = useSelector(getInvariantContext)
-  const { labwareEntities } = invariantContext
 
-  return useMemo(
-    () => {
-      if (robotState == null) {
-        return {}
+  return useMemo(() => {
+    if (robotState == null) {
+      return {}
+    }
+    return Object.entries(robotState.labware).reduce<
+      Record<string, Record<string, AccessibilityStatus>>
+    >((acc, [id, { stack }]) => {
+      const { labwareEntities } = invariantContext
+      const { def, labwareDefURI } = labwareEntities[id]
+      const isMatchingTiprackOnDeck =
+        !stack.includes(OFFDECK) &&
+        def.parameters.isTiprack &&
+        labwareDefURI === tiprackUri
+      if (!isMatchingTiprackOnDeck) {
+        return acc
       }
-      return Object.entries(robotState.labware).reduce<
-        Record<string, Record<string, AccessibilityStatus>>
-      >((acc, [id, { stack }]) => {
-        const { def, labwareDefURI } = labwareEntities[id]
-        const isMatchingTiprackOnDeck =
-          !stack.includes(OFFDECK) &&
-          def.parameters.isTiprack &&
-          labwareDefURI === tiprackUri
-        if (!isMatchingTiprackOnDeck) {
-          return acc
-        }
-        const tipState = robotState?.tipState.tipracks[id] ?? null
-        if (tipState == null) {
-          return acc
-        }
-        const pipetteChannels = pipetteSpecs.channels
-        const wellNamesToCheck = getWellsToCheck(nozzles, def.ordering)
-        return {
-          ...acc,
-          [id]: wellNamesToCheck.reduce((acc, wellName) => {
+      const tipState = robotState?.tipState.tipracks[id] ?? null
+      if (tipState == null) {
+        return acc
+      }
+      const pipetteChannels = pipetteSpecs.channels
+      const wellNamesToCheck = getWellsToCheck(
+        nozzles,
+        def.ordering,
+        pipetteChannels,
+        primaryNozzle
+      )
+      return {
+        ...acc,
+        [id]: wellNamesToCheck.reduce<Record<string, AccessibilityStatus>>(
+          (tiprackAcc, wellName) => {
             const { isSafe, isComplete } = getIsSafePickupWithinTiprack({
               tipState,
               primaryNozzle,
@@ -109,7 +132,7 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
               tiprackDef: def,
               tipsToIgnore: selectedTips.flat(),
             })
-            const isCollision = !getIsSafePipetteMovement({
+            const isCollision = !getPipetteMovementSafetyStatus({
               robotState,
               invariantContext,
               pipetteId,
@@ -117,43 +140,49 @@ export const useMemoizedTipAccessibilityByTiprackIdByWellName = (args: {
               wellTargetName: wellName,
               primaryNozzle,
               nozzleConfiguration: nozzles,
-            })
-            const isAccessible = isSafe && isComplete && !isCollision
-            let inaccessibleReason: InaccessibleReason | null = null
-            if (isCollision) {
-              inaccessibleReason = INACCESSIBLE_COLLISION
-            } else if (!isSafe) {
-              inaccessibleReason = INACCESSIBLE_TOO_MANY_PICKUPS
-            } else if (!isComplete) {
-              inaccessibleReason = INACCESSIBLE_INCOMPLETE
-            }
-            const wellGroup = getEntireWellSelection(
+            }).isSafe
+            const isAccessible = isSafe && isComplete === true && !isCollision
+            const affectedWells = getEntireWellSelection(
               wellName,
               def.ordering,
               nozzles,
               primaryNozzle,
               pipetteChannels
             )
-            const groupEntries = Object.fromEntries(
-              wellGroup.map(well => [
-                well,
-                {
-                  isAccessible,
-                  ...(inaccessibleReason != null ? { inaccessibleReason } : {}),
-                },
-              ])
-            )
 
-            return {
-              ...acc,
-              ...groupEntries,
+            let status: AccessibilityStatus
+            if (isAccessible) {
+              status = { isAccessible: true, affectedWells }
+            } else {
+              let inaccessibleReason: InaccessibleReason
+              if (isCollision) {
+                inaccessibleReason = INACCESSIBLE_COLLISION
+              } else if (!isSafe) {
+                inaccessibleReason = INACCESSIBLE_TOO_MANY_PICKUPS
+              } else {
+                inaccessibleReason = INACCESSIBLE_INCOMPLETE
+              }
+              status = {
+                isAccessible: false,
+                affectedWells,
+                inaccessibleReason,
+              }
             }
-          }, {}),
-        }
-      }, {})
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedTips]
-  )
+
+            return { ...tiprackAcc, [wellName]: status }
+          },
+          {}
+        ),
+      }
+    }, {})
+  }, [
+    robotState,
+    invariantContext,
+    nozzles,
+    primaryNozzle,
+    pipetteSpecs,
+    pipetteId,
+    tiprackUri,
+    selectedTips,
+  ])
 }

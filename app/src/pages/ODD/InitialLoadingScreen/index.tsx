@@ -1,5 +1,3 @@
-import { useSelector } from 'react-redux'
-
 import {
   ALIGN_CENTER,
   COLORS,
@@ -9,26 +7,9 @@ import {
   JUSTIFY_CENTER,
   SPACING,
 } from '@opentrons/components'
-import { useRobotSettingsQuery } from '@opentrons/react-api-client'
 
-import { getIsShellReady } from '/app/redux/shell'
-
-import type { ReactNode } from 'react'
-
-export function InitialLoadingScreen({
-  children,
-}: {
-  children?: ReactNode
-}): JSX.Element {
-  const isShellReady = useSelector(getIsShellReady)
-
-  // ensure robot-server api is up and settings query data available for localization provider
-  const { settings } =
-    useRobotSettingsQuery({ retry: true, retryDelay: 1000 }).data ?? {}
-
-  return isShellReady && settings != null ? (
-    <>{children}</>
-  ) : (
+export function InitialLoadingScreen(): JSX.Element {
+  return (
     <Flex
       backgroundColor={COLORS.grey35}
       flexDirection={DIRECTION_COLUMN}

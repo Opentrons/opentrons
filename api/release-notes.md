@@ -6,13 +6,47 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 By installing and using Opentrons software, you agree to the Opentrons End-User License Agreement (EULA). You can view the EULA at [opentrons.com/eula](https://opentrons.com/eula).
 
+## Opentrons Robot Software Changes in 9.1.2
+
+Welcome to the v9.1.2 release of the Opentrons Flex robot software! This release includes bug fixes and improvements.
+
+### Feature Improvements
+
+- Opentrons Flex 96 Filter Tip Racks (20 µL) are compatible with the Opentrons Flex Tip Rack Lid.
+
+### Bug Fixes
+
+- Flex 96-channel pipettes properly align over 8-well reservoirs for liquid handling with a single row of tips.
+
+---
+
+## Opentrons Robot Software Changes in 9.1.1
+
+Welcome to the v9.1.1 release of the Opentrons Flex robot software! This release enables step grouping to better visualize and organize Python protocols, along with other new features, improvements, and bug fixes.
+
+### New Features
+
+- Use new methods to create step groups within your Python protocols. These groups are visible in your protocol file, or in [protocol visualization](https://docs.opentrons.com/flex/opentrons-app/protocol-viz/).
+- Use the `set_empty()` method to label a tip rack as empty, and return used tips to an empty rack throughout your protocol.
+- Attach and use a keyboard (via USB) to set up quick transfer protocols, enter passwords and runtime parameters, and more on the Flex touchscreen.
+- Adds the ability to turn off the Flex from the touchscreen. Click the three-dot menu, then click to **Turn off robot**. When it's time to restart your Flex, use the power switch on the rear panel.
+
+### Feature Improvements
+
+- Most Flex pipettes no longer descend during attachment, detachment, or probe attachment to prevent collision risk. The 96-channel pipette still descends.
+
+### Bug Fixes
+
+Transfers, consolidates, and distributes using a liquid class now correctly calculate the maximum aspirate volume for Flex 50 µL pipettes (using 20 or 30 µL tips). Each liquid handling action now uses the correct volume mode to determine the amount of liquid that should be in the tip.
+
+---
+
 ## Opentrons Robot Software Changes in 9.0.0
 
 Welcome to the v9.0.0 release of the Opentrons robot software! This release includes several new and improved features.
 
 ### New Features
 
-- Use the `set_empty()` method to load an empty tip rack on the deck.
 - Use Opentrons Flex 20 µL pipette tips in your protocols. The tips are fully compatible with [liquid class](https://docs.opentrons.com/python-api/liquid-classes/) commands and with Flex 1- and 8-Channel (1-50 µL range) and 96-Channel (1-200 µL range) pipettes.
 
 ### Feature Improvements
@@ -22,10 +56,15 @@ Welcome to the v9.0.0 release of the Opentrons robot software! This release incl
 - Choose a blowout flow rate and location for custom liquid class transfer settings.
 - Change the position to dispose of tips in any trash bin, including a non-default trash bin, with the `drop_tip()` method.
 - Liquid class transfers are optimized to prevent unnecessary movements to the top of a well before proceeding.
+- This release includes improved handling of CSV files added to protocols.
 
 ### Bug Fixes
 
 - This release fixes the Flex boot issue on some network configurations.
+
+### Known Issues
+
+- Returning a full rack of Flex 20 µL pipette tips can result in incorrect placement in the tip rack. If you experience this, check to make sure your Flex is operating in [ideal conditions](https://docs.opentrons.com/flex/installation/requirements/#environmental-conditions-flex).
 
 ---
 

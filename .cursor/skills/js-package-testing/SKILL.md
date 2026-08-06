@@ -1,0 +1,125 @@
+---
+name: js-package-testing
+description: Vite demo and Playwright + Applitools tests for packed @opentrons JS packages in js-package-testing/. Covers components, shared-data, step-generation, and protocol-visualization. Use for integration testing, package linking, external consumer bootstrap, or visual testing.
+---
+
+# JS package testing
+
+## Purpose
+
+Reference **external consumer** for four npm packages:
+
+- `@opentrons/shared-data`
+- `@opentrons/step-generation`
+- `@opentrons/components`
+- `@opentrons/protocol-visualization`
+
+Builds packed artifacts (not live monorepo source), applies the same debt
+patches as `publish.mts` (after `pnpm pack` rewrote catalog/workspace), links
+via `link:pack/...`, and runs a Vite demo plus Playwright + Applitools Eyes.
+
+**Full external consumer docs:** `js-package-testing/README.md` section "External consumer guide".
+
+## External consumer checklist
+
+1. Install all four `@opentrons/*` at the **same version**.
+2. Install peers: `react@18.2.0`, `react-dom@18.2.0`, `react-i18next@14.0.0`, `i18next@^19.8.3`.
+3. Import CSS in app entry:
+   - `@opentrons/protocol-visualization/styles`
+   - `@opentrons/components/styles/global`
+   - `@opentrons/components/styles`
+4. Wrap app in `I18nextProvider` with `protocol_visualization` namespace (see `src/i18n.ts`).
+5. Vite: dedupe React, use `cssModulesSideEffect` plugin, `define: { 'process.env': {} }` if needed.
+
+Library runtime deps (`styled-components`, `redux`, etc.) are bundled; host app does not install them.
+
+## Applitools
+
+- Set **`APPLITOOLS_API_KEY`** via `.env` in `js-package-testing/` or shell export.
+- App name: **`js-package-testing`** (`playwright.config.ts`).
+- Import **`test`** from `@applitools/eyes-playwright/fixture`; use **`eyes.check()`**.
+
+## Package linking strategy
+
+**Order matters:** build packs first, patch manifests, then install.
+
+1. `make pack` in each library (`pnpm pack` rewrites catalog/workspace) → extract to `pack/opentrons-*/`
+2. `scripts/patch-packed-packages.mts` applies debt patches (same module as `publish.mts`)
+3. `pnpm install` with `link:pack/...` deps
+4. `pnpm-workspace.yaml` **overrides** pin transitive `@opentrons/*` to `pack/`
+
+Shared debt patches: `scripts/package-json-patches.mts` (not catalog/workspace;
+those are pnpm's job).
+
+## Publish
+
+From repo root:
+
+```bash
+node --experimental-strip-types scripts/next-npm-version.mts
+node --experimental-strip-types scripts/publish.mts \
+  --version X.Y.Z-alpha.0 --dry-run
+```
+
+Flow: debt-patch manifests → `pnpm pack` (protocol rewrite) → inject README/LICENSE
+→ `npm publish` (OIDC on pnpm 10). **When the monorepo is on pnpm 11+, switch
+the last step to `pnpm publish`.**
+
+Always publishes dist-tag `latest` (no `--tag` flag). Dry-run needs no auth; real
+local publish needs interactive npm 2FA (tokens disallowed). Prefer CI for releases.
+
+## Project structure
+
+```text
+scripts/
+├── next-npm-version.mts       # patch bump from npm latest
+├── npm-latest-versions.mts    # print npm dist-tags
+├── package-json-patches.mts   # debt patches (files/exports/@types/peers)
+├── patch-packed-packages.mts  # applies debt patches to js-package-testing/pack/
+└── publish.mts                # pnpm pack + npm publish (pnpm publish on pnpm 11+)
+
+js-package-testing/
+├── Makefile
+├── package.json
+├── pnpm-workspace.yaml
+├── playwright.config.ts
+├── cssModulesSideEffect.ts
+├── tests/
+├── src/
+│   ├── main.tsx          # CSS imports + I18nextProvider
+│   ├── i18n.ts
+│   └── locale/en/protocol_visualization.json
+└── pack/                 # gitignored
+```
+
+## Makefile targets
+
+| Target                      | Description                                                 |
+| --------------------------- | ----------------------------------------------------------- |
+| `make setup`                | Build/extract/patch packs, `pnpm install --frozen-lockfile` |
+| `make dev`                  | Run Vite dev server (runs `setup` first)                    |
+| `make test-setup`           | Install Playwright Chromium (`make setup` first)            |
+| `make test`                 | Playwright + Eyes (needs `APPLITOOLS_API_KEY`)              |
+| `make build-local-packages` | Rebuild and patch `pack/` only                              |
+| `make teardown`             | Remove `pack/` and `node_modules`                           |
+
+## Quick start
+
+```bash
+# monorepo root
+make setup-js
+
+cd js-package-testing
+make teardown setup dev
+```
+
+## Lint (monorepo root)
+
+`make lint-js`, `make lint-css`, `make format-js`
+
+## Troubleshooting
+
+- **Module not found / broken links:** `make clean-local-packages && make setup`
+- **Unstyled UI:** missing CSS imports in app entry (see `src/main.tsx`)
+- **Translation keys visible:** missing i18n namespace setup
+- **After library source edits:** `make build-local-packages` then `pnpm install`

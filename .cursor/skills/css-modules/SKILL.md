@@ -117,13 +117,13 @@ All tokens are defined in `components/src/styles/global.css`. **Always use these
 
 **Flex brand:** `--flex-40`, `--flex-50`, `--flex-55`
 
-**Semi-transparent:** `--transparent-white-80`, `--transparent-white-50`, `--transparent-black-60`, `--transparent-black-80`, `--transparent`
+**Semi-transparent:** `--transparent-white-80`, `--transparent-white-50`, `--transparent-black-10`, `--transparent-black-60`, `--transparent-black-80`, `--transparent`
 
 > Some colors (green, purple) have touchscreen variants that activate when `components/src/styles/global.css` applies the `.enable_touchscreen_colors` class. The default values are non-touchscreen.
 
 ### Border Radius
 
-`--border-radius-2`, `--border-radius-4`, `--border-radius-8`, `--border-radius-12`, `--border-radius-16`, `--border-radius-40`, `--border-radius-200` (pill/circle)
+`--border-radius-2`, `--border-radius-4`, `--border-radius-8`, `--border-radius-12`, `--border-radius-16`, `--border-radius-40`, `--border-radius-full` (pill/circle)
 
 ### Typography
 
@@ -225,10 +225,10 @@ make lint-css
 make format-css
 
 # Lint a single file
-yarn stylelint path/to/componentname.module.css
+pnpm stylelint path/to/componentname.module.css
 
 # Auto-fix a single file
-yarn stylelint path/to/componentname.module.css --fix
+pnpm stylelint path/to/componentname.module.css --fix
 ```
 
 Always run `make lint-css` and fix any issues before committing.

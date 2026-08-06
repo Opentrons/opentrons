@@ -1,6 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from enum import Enum
-from typing import Dict
+from typing import Any, Dict
 
 from opentrons_shared_data.util import StrEnum
 
@@ -32,6 +32,8 @@ class HardwareRevision(Enum):
     """Hardware Revision."""
 
     NFF = "nff"
+    EVT = "a1"
+    DVT = "b1"
 
 
 @dataclass
@@ -95,18 +97,43 @@ class VentState(Enum):
     CLOSED = 0
     OPENED = 1
 
+    def __init__(self, val: int) -> None:
+        self.formatted = self.name.lower()
+
 
 @dataclass
 class VacuumState:
     """Get the vacuum state."""
 
-    target_guage_pressure: float
-    current_guage_pressure: float
+    target_gauge_pressure: float
+    current_gauge_pressure: float
     pressure_abs_a: float
     pressure_abs_b: float
     pressure_atm: float
     vacuum_enabled: bool
+    vacuum_duration: int
     vent_state: VentState
+
+    @staticmethod
+    def to_pyro_dict(obj: "VacuumState") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        pyro_dict = asdict(obj)
+        # Override specific variables for safe conversion
+        pyro_dict["__class__"] = f"{obj.__module__}.{obj.__class__.__qualname__}"
+        pyro_dict["vent_state"] = obj.vent_state.value
+
+        return pyro_dict
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "VacuumState":
+        """Consumed by Serpent, convert to type from a Pyro Dictionary."""
+        data.pop("__class__", None)
+        return VacuumState(
+            **{  # type: ignore
+                key: (VentState(data[key]) if key == "vent_state" else data[key])
+                for key, value in data.items()
+            }
+        )
 
 
 @dataclass
@@ -148,3 +175,16 @@ class PumpState:
     current_pwm: float
     pump_running: bool
     manual_control: bool
+
+    @staticmethod
+    def to_pyro_dict(obj: "PumpState") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        pyro_dict = asdict(obj)
+        pyro_dict["__class__"] = f"{obj.__module__}.{obj.__class__.__qualname__}"
+        return pyro_dict
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "PumpState":
+        """Convert from a Pyro Dictionary."""
+        data.pop("__class__", None)
+        return PumpState(**data)

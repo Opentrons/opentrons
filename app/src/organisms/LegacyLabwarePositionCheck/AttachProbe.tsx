@@ -162,11 +162,11 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       })
   }
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <RobotMotionLoader header={t('shared:stand_back_robot_is_in_motion')} />
     )
-  else if (showUnableToDetect)
+  } else if (showUnableToDetect) {
     return (
       <ProbeNotAttached
         handleOnClick={handleProbeAttached}
@@ -174,6 +174,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         isOnDevice={isOnDevice}
       />
     )
+  }
 
   return (
     <GenericWizardTile

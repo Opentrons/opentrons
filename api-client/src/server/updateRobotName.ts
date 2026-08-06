@@ -6,12 +6,13 @@ import type { UpdatedRobotName } from './types'
 
 export function updateRobotName(
   config: HostConfig,
-  newName: string
+  newName: string,
+  userNotes: string
 ): ResponsePromise<UpdatedRobotName> {
   return request<UpdatedRobotName, { name: string }>(
     POST,
     '/server/name',
-    { name: newName },
-    config
+    config,
+    { body: { name: newName }, userNotes }
   )
 }

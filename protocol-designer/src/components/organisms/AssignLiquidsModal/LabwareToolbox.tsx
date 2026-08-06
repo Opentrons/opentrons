@@ -229,7 +229,6 @@ export function LabwareStackToolbox({
           alignItems={ALIGN_CENTER}
           gridGap={SPACING.spacing8}
           width="100%"
-          data-testid="Toolbox_confirmButton"
           onClick={handleAddAnotherLabware}
         >
           <Icon size="1.5rem" name="plus" />
@@ -290,10 +289,11 @@ export function LabwareStackToolboxContainer({
     labwareId != null ? (labware[labwareId]?.stack ?? []) : []
   const slot = getSlotInLocationStack(labwareStack)
 
-  const largestStackInSlot = getLargestStackInSlot(
-    initialRobotState.labware,
-    slot
-  )
+  const largestStackInSlot = getLargestStackInSlot({
+    slot,
+    labwareState: initialRobotState.labware,
+    modulesState: initialRobotState.modules,
+  })
 
   const liquidLocations = useSelector(
     labwareIngredSelectors.getLiquidsByLabwareId

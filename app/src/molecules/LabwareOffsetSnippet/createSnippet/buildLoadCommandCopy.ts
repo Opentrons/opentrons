@@ -233,8 +233,9 @@ function buildLoadModuleCommandInfo(
   moduleVariableById: { [moduleId: string]: string }
   commandLines: string[]
 } {
-  if (command.result == null)
+  if (command.result == null) {
     return { moduleVariableById: currentModuleVariableById, commandLines: [] }
+  }
 
   const moduleVariable = `module_${
     Object.keys(currentModuleVariableById).length + 1

@@ -29,6 +29,35 @@ from opentrons.drivers.flex_stacker.types import (
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 
+class VacuumModuleStepBase(TypedDict, total=False):
+    enable_pump: bool
+    hold_time_seconds: int | None
+    hold_time_minutes: int | None
+    ramp_rate: float | None
+    timeout_seconds: int | None
+    vent_after: bool | None
+
+
+class VacuumModulePowerStep(VacuumModuleStepBase):
+    percent_power: int | None
+
+
+class VacuumModulePressureStep(VacuumModuleStepBase):
+    gauge_pressure_mbar: int | None
+
+
+class VacuumModuleCycle(TypedDict):
+    steps: List[VacuumModuleStep]
+    repetitions: int
+    vent_after: bool | None
+
+
+VacuumModuleStep = Union[VacuumModulePowerStep, VacuumModulePressureStep]
+VacuumModuleProfileStep = Union[
+    VacuumModulePowerStep, VacuumModulePressureStep, VacuumModuleCycle
+]
+
+
 class ThermocyclerStepBase(TypedDict):
     temperature: float
 
@@ -121,6 +150,13 @@ class FlexStackerData(TypedDict):
 
 class VacuumModuleData(TypedDict):
     errorDetails: str | None
+    pumpEngaged: bool | None
+    currentPressure: float | None
+    targetPressure: float | None
+    currentPower: float | None
+    targetPower: float | None
+    ventStatus: str
+    modeType: str
 
 
 ModuleData = Union[
@@ -176,8 +212,7 @@ class ModuleDataValidator:
     def is_vacuum_module_data(
         cls, data: ModuleData | None
     ) -> TypeGuard[VacuumModuleData]:
-        # TODO(nd: 2026-02-12): Add appropriate data key check when VacuumModuleData is defined
-        return data is not None
+        return data is not None and "pumpEngaged" in data.keys()
 
 
 class LiveData(TypedDict):
@@ -318,6 +353,20 @@ class BundledFirmware(NamedTuple):
     def __repr__(self) -> str:
         return f"<BundledFirmware {self.version}, path={self.path}>"
 
+    @staticmethod
+    def to_pyro_dict(obj: "BundledFirmware") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "version": obj.version,
+            "path_str": str(obj.path),
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "BundledFirmware":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return BundledFirmware(version=data["version"], path=Path(data["path_str"]))
+
 
 class ModuleInfo(NamedTuple):
     model: str  # A module model such as "magneticModuleV2"
@@ -455,8 +504,14 @@ class VacuumModuleStatus(StrEnum):
     VENTING = "venting"  # Opening valve to atmosphere
     COMPLETE = "complete"  # Finished cycle
     ERROR = "error"  # An error has occured
+    RUNNING = "running"  # General use- the pump is turned on
 
 
-class VentState(StrEnum):
+class VacuumOperationMode(StrEnum):
+    POWER = "power"
+    PRESSURE = "pressure"
+
+
+class VentStatus(StrEnum):
     CLOSED = "closed"
     OPENED = "opened"

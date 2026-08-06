@@ -23,6 +23,8 @@ import { migrateFile as migrateFileEightEight } from './8_8_0'
 import { isBroken890Export, migrateFile as migrateFileEightNine } from './8_9_0'
 import { migrateFile as migrateFileEightTen } from './8_10_0'
 
+// import { migrateFile as migrateFileEightEleven } from './8_11_0'
+
 import type {
   PDProtocolFile,
   PythonDesignerApplication,
@@ -86,6 +88,10 @@ export const allMigrationsByVersion: MigrationsByVersion = {
   '8.9.0': migrateFileEightNine,
   // @ts-expect-error
   '8.10.0': migrateFileEightTen,
+  // TODO (nd, 05/28/2026) The feature work scoped in what was previously slated
+  // as release 8.11.0 is coming after an intermediate Flex/OT-2 split release (9.0.0)
+  // I will re-wire up the 8.11.0 migration and rename appropriately to 9.1.0 as that
+  // release approaches.
 }
 export const migration = (
   file: any

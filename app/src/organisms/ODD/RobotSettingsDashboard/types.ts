@@ -20,6 +20,7 @@ export type SettingOption =
   | 'LanguageSetting'
   | 'CameraPreferences'
   | 'Devices'
-  | 'ExternalKeyboardTest' // this is for a testing purpose so will be removed
+  | 'RobotEncryptionKey'
+  | 'FileManager'
 
 export type SetSettingOption = (option: SettingOption | null) => void

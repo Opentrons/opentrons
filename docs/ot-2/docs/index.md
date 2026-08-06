@@ -12,4 +12,4 @@ description: "Official instruction manual for the Opentrons OT-2 liquid handling
 ![OT-2 rendered cover image](images/OT2-render-HERO.png)
 
 **Opentrons Labworks Inc.**<br>
-February 2026
+June 2026

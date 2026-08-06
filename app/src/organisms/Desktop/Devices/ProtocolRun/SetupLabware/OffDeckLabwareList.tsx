@@ -7,19 +7,15 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getOffDeckRenderInfo } from '@opentrons/shared-data'
 
 import { LabwareListItem } from './LabwareListItem'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type {
-  LabwareDefinitionsByURI,
-  StackedItemsOnDeck,
-  StackItem,
-} from '@opentrons/shared-data'
+import type { LabwareDefinitionsByURI, StackItem } from '@opentrons/shared-data'
+import type { OffDeckRenderGroup } from '/app/resources/protocols/utils/getOffDeckRenderGroups'
 
 interface OffDeckLabwareListProps {
-  labwareItems: StackedItemsOnDeck
+  offDeckItems: OffDeckRenderGroup[]
   isFlex: boolean
   definitionsByURI: LabwareDefinitionsByURI
   setSelectedStack: Dispatch<
@@ -29,10 +25,10 @@ interface OffDeckLabwareListProps {
 export function OffDeckLabwareList(
   props: OffDeckLabwareListProps
 ): JSX.Element | null {
-  const { labwareItems, isFlex, definitionsByURI, setSelectedStack } = props
+  const { offDeckItems, isFlex, definitionsByURI, setSelectedStack } = props
   const { t } = useTranslation('protocol_setup')
-  const offDeckItems = getOffDeckRenderInfo(labwareItems)
   if (offDeckItems.length < 1) return null
+
   return (
     <>
       <LegacyStyledText
@@ -44,19 +40,22 @@ export function OffDeckLabwareList(
         {t('additional_off_deck_labware')}
       </LegacyStyledText>
       <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
-        {offDeckItems.map((labwareItem, index) => (
+        {offDeckItems.map((offDeckGroup, index) => (
           <LabwareListItem
             key={index}
             attachedModuleInfo={{}}
             extraAttentionModules={[]}
-            stackedItems={[labwareItem]}
-            offDeckQuantity={labwareItem.quantity}
+            stackedItems={[offDeckGroup.representativeItem]}
+            offDeckQuantity={offDeckGroup.quantity}
             slotName="offDeck"
             isFlex={isFlex}
             showLabwareSVG
             definitionsByURI={definitionsByURI}
             onClick={() => {
-              setSelectedStack({ slotName: 'offDeck', stack: [labwareItem] })
+              setSelectedStack({
+                slotName: 'offDeck',
+                stack: offDeckGroup.stackedItems,
+              })
             }}
           />
         ))}

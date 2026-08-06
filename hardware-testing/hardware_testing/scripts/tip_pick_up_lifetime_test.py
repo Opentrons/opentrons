@@ -9,11 +9,11 @@ import termios
 import tty
 import json
 from typing import Dict, Tuple
-from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing import data
 
-from hardware_testing.opentrons_api.types import OT3Mount, Axis, Point
+from opentrons.hardware_control.types import OT3Mount, Axis
+from opentrons.types import Point
 
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.hardware_control.ot3api import OT3API
@@ -178,7 +178,7 @@ async def _calibrate_tip_racks(
     return calibrated_slot_loc
 
 
-async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:  # noqa: C901
+async def _main(is_simulating: bool, mount: OT3Mount) -> None:  # noqa: C901
     path = "/data/testing_data/calibrated_slot_locations.json"
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.home()
@@ -576,9 +576,9 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:  # noqa: C9
 
 if __name__ == "__main__":
     mount_options = {
-        "left": types.OT3Mount.LEFT,
-        "right": types.OT3Mount.RIGHT,
-        "gripper": types.OT3Mount.GRIPPER,
+        "left": OT3Mount.LEFT,
+        "right": OT3Mount.RIGHT,
+        "gripper": OT3Mount.GRIPPER,
     }
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")

@@ -1,5 +1,5 @@
-import { screen } from '@testing-library/react'
-import { beforeEach, describe, it, vi } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -24,7 +24,7 @@ const render = (props: ComponentProps<typeof Devices>) => {
             vendorId: 1,
             productId: 2,
             serialNumber: 'abc',
-            location: 'USB-1',
+            location: 'FRONTPORT',
           },
           {
             identifier: 'drive-1',
@@ -67,10 +67,17 @@ describe('Devices', () => {
     screen.getByText('Location')
     screen.getByText('Location')
     screen.getByText('External Keyboard')
-    screen.getByText('USB-1')
+    screen.getByText('FRONTPORT')
     screen.getByText('USB drive')
     screen.getByText('USB-2')
     screen.getByText('Opentrons RearPanel FS')
     screen.getByText('INTERNAL')
+  })
+
+  it('should call mock function when tapping back button', () => {
+    render(props)
+    const backButton = screen.getByRole('button')
+    fireEvent.click(backButton)
+    expect(mockFunc).toHaveBeenCalled()
   })
 })

@@ -5,16 +5,6 @@ marks:
   - usefixtures:
       - ot3_server_base_url
 stages:
-  - name: Set allowStepGrouping to True
-    request:
-      method: POST
-      url: '{ot3_server_base_url}/settings'
-      json:
-        id: 'allowStepGrouping'
-        value: true
-    response:
-      status_code: 200
-
   - name: Upload a protocol with user command annotations
     request:
       url: '{ot3_server_base_url}/protocols'

@@ -1,11 +1,14 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import React from 'react'
 import { css } from 'styled-components'
 
 import { TextListTableContent as TextListTableContentComponent } from '.'
+import { customViewports } from '../../../../.storybook/preview'
 import { StyledText } from '../../atoms'
 import { DISPLAY_GRID } from '../../styles'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, StoryFn } from '@storybook/react'
 import type { ComponentProps } from 'react'
 
 export default {
@@ -26,7 +29,9 @@ export default {
         'For Storybook only. Number of lorem ipsum text rows to display in the table. ',
     },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  viewport: {
+    options: [VIEWPORT.touchScreenViewport, customViewports],
+  },
 } as Meta
 
 interface TextListTableContentStoryProps extends Omit<
@@ -47,11 +52,12 @@ const loremIpsumSentences = [
   'Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus.',
 ]
 
-const Template: Story<TextListTableContentStoryProps> = args => {
+const Template: StoryFn<TextListTableContentStoryProps> = args => {
   const { rowCount, ...textListTableContentProps } = args
-  const numColumns = textListTableContentProps.listTableHeaders
-    ? textListTableContentProps.listTableHeaders.filter(Boolean).length
-    : 1
+  const numColumns: number =
+    textListTableContentProps.listTableHeaders != null
+      ? textListTableContentProps.listTableHeaders.filter(Boolean).length
+      : 1
 
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const renderRows = () => {

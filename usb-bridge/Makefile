@@ -6,11 +6,11 @@ include ../scripts/python-uv.mk
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
-PATH := $(shell cd .. && yarn bin):$(PATH)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 SHX := npx shx
 
-# add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
-PATH := $(shell cd .. && yarn bin):$(PATH)
+# add pnpm CLI dev deps to PATH (for cross platform POSIX commands via shx)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,

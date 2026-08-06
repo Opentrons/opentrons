@@ -16,6 +16,7 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getAddressableAreaFromSlotId,
   getCutoutIdForAddressableArea,
   getDeckDefFromRobotType,
@@ -78,6 +79,10 @@ export function BaseDeckTipSelection(
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
   )
   const initialDeckSetup = useSelector(getInitialDeckSetup)
+  const isStackerOnDeck =
+    Object.values(initialDeckSetup.modules).filter(
+      m => m.type === FLEX_STACKER_MODULE_TYPE
+    ).length > 0
   const stagingAreaFixtures: AdditionalEquipmentEntity[] = Object.values(
     activeDeckSetup.additionalEquipmentOnDeck
   ).filter(
@@ -181,7 +186,6 @@ export function BaseDeckTipSelection(
       ))}
     </>
   )
-
   return (
     <RobotCoordinateSpaceWithRef
       height="100%"
@@ -189,6 +193,7 @@ export function BaseDeckTipSelection(
       deckDef={deckDef}
       viewBox={viewBox ?? undefined}
       zoomed={viewBox != null}
+      adjustViewBoxForStacker={isStackerOnDeck}
     >
       {() => (
         <>

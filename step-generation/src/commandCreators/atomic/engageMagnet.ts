@@ -1,5 +1,3 @@
-import assert from 'assert'
-
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 
 import * as errorCreators from '../../errorCreators'
@@ -24,10 +22,11 @@ export const engageMagnet: CommandCreator<EngageMagnetParams> = (
     }
   }
 
-  assert(
-    moduleEntities[moduleId]?.type === MAGNETIC_MODULE_TYPE,
-    `expected module ${moduleId} to be magdeck, got ${moduleEntities[moduleId]?.type}`
-  )
+  if (moduleEntities[moduleId]?.type !== MAGNETIC_MODULE_TYPE) {
+    throw new Error(
+      `expected module ${moduleId} to be magdeck, got ${moduleEntities[moduleId]?.type}`
+    )
+  }
 
   const pythonName = moduleEntities[moduleId].pythonName
 

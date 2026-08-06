@@ -24,6 +24,10 @@
   gap: var(--spacing-8);
 }
 
+.modal_footer_continue {
+  align-self: flex-end;
+}
+
 .modal_header {
   display: flex;
   flex-direction: row;
@@ -33,7 +37,7 @@
 
 .select_tips_deck_container {
   display: flex;
-  width: 714px;
+  width: 100%;
   height: 536px;
   align-self: center;
 }
@@ -68,4 +72,9 @@
 
 .shadow_overlay {
   pointer-events: none;
+}
+
+.legend_box {
+  display: flex;
+  width: 10rem;
 }

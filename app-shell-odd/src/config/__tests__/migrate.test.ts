@@ -1,5 +1,5 @@
 // config migration tests
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -20,17 +20,21 @@ import {
   MOCK_CONFIG_V26,
   MOCK_CONFIG_V27,
   MOCK_CONFIG_V28,
+  MOCK_CONFIG_V29,
+  MOCK_CONFIG_V30,
 } from '../__fixtures__'
 import { migrate } from '../migrate'
 
-vi.mock('uuid/v4')
+vi.mock('uuid', () => ({
+  v4: vi.fn(),
+}))
 
-const NEWEST_VERSION = 28
-const NEWEST_MOCK_CONFIG = MOCK_CONFIG_V28
+const NEWEST_VERSION = 30
+const NEWEST_MOCK_CONFIG = MOCK_CONFIG_V30
 
 describe('config migration', () => {
   beforeEach(() => {
-    vi.mocked(uuid).mockReturnValue('MOCK_UUIDv4')
+    vi.mocked(uuid).mockImplementation((() => 'MOCK_UUIDv4') as typeof uuid)
   })
 
   it('should migrate version 12 to latest', () => {
@@ -139,23 +143,37 @@ describe('config migration', () => {
     expect(result.version).toBe(NEWEST_VERSION)
     expect(result).toEqual(NEWEST_MOCK_CONFIG)
   })
-  it('should keep version 26', () => {
+  it('should migrate version 26 to latest', () => {
     const v26Config = MOCK_CONFIG_V26
     const result = migrate(v26Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
     expect(result).toEqual(NEWEST_MOCK_CONFIG)
   })
-  it('should keep version 27', () => {
+  it('should migrate version 27 to latest', () => {
     const v27Config = MOCK_CONFIG_V27
     const result = migrate(v27Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
     expect(result).toEqual(NEWEST_MOCK_CONFIG)
   })
-  it('should keep version 28', () => {
+  it('should migrate version 28 to latest', () => {
     const v28Config = MOCK_CONFIG_V28
     const result = migrate(v28Config)
+
+    expect(result.version).toBe(NEWEST_VERSION)
+    expect(result).toEqual(NEWEST_MOCK_CONFIG)
+  })
+  it('should migrate version 29 to latest', () => {
+    const v29Config = MOCK_CONFIG_V29
+    const result = migrate(v29Config)
+
+    expect(result.version).toBe(NEWEST_VERSION)
+    expect(result).toEqual(NEWEST_MOCK_CONFIG)
+  })
+  it('should keep version 30', () => {
+    const v30Config = MOCK_CONFIG_V30
+    const result = migrate(v30Config)
 
     expect(result.version).toBe(NEWEST_VERSION)
     expect(result).toEqual(NEWEST_MOCK_CONFIG)

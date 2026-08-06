@@ -2,6 +2,10 @@ version = 1
 revision = 3
 requires-python = ">=3.10"
 
+[options]
+exclude-newer = "2026-03-30T17:27:44.113487Z"
+exclude-newer-span = "P1W"
+
 [[package]]
 name = "backports-asyncio-runner"
 version = "1.2.0"

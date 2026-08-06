@@ -86,9 +86,7 @@ describe('app-shell main http module', () => {
     it(`it should handle when ${name}`, () => {
       vi.mocked(fetch).mockResolvedValueOnce(response as unknown as Response)
 
-      // @ts-expect-error(mc, 2021-02-17): reqwrite as integration tests and
-      // avoid mocking node-fetch
-      return method(request as unknown as Request).then((result: string) => {
+      return method(request as unknown as Request).then((result: unknown) => {
         expect(vi.mocked(fetch)).toHaveBeenCalledWith(request, requestOptions)
         expect(result).toEqual(expected)
       })

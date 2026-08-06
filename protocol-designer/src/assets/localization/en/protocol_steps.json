@@ -13,6 +13,7 @@
   "advanced_settings": "Advanced pipetting settings",
   "air_gap_volume": "Air gap volume",
   "all_nozzles": "All nozzles (recommended)",
+  "all_nozzles_are_preselected": "All nozzles are preselected",
   "and": "and",
   "aspirate": "Aspirate",
   "aspirate_labware": "Source labware",
@@ -149,13 +150,14 @@
   "multiDispense": "Distribute",
   "multi_dispense_options": "Disposal volume",
   "new_location": "New location",
-  "no_tiprack": "No tiprack available",
   "no_nozzles_and_wells_selected": "No nozzles and wells selected",
+  "no_tiprack": "No tiprack available",
   "nozzles_selected": "{{nozzleSelection}} selected, {{aspWells}} aspirate {{positionType}} selected, and {{dispWells}} dispense {{positionType}} selected",
   "num_nozzles": "{{num}} nozzles",
   "number_of_nozzles_used": "Number of nozzles used",
   "of": "of",
   "off_deck": "Off-Deck",
+  "partial_nozzles": "Partial nozzles",
   "pause": {
     "forDuration": "For {{duration}}",
     "pausingForDuration": "<text>Pausing for</text><tag/>",
@@ -164,7 +166,6 @@
     "untilResume": "Until told to resume",
     "untilTemperature": "Until {{temperature}} °C reached"
   },
-  "partial_nozzles": "Partial nozzles",
   "pipette": "Pipette",
   "pipette_nozzles_and_wells": "Pipette nozzles and wells",
   "pipette_path": "Pipette path",
@@ -282,7 +283,7 @@
         "label": "Time at pressure",
         "title": "Duration"
       },
-      "ending_hold_vent": { "title": "Ending hold", "label": "Vent" },
+      "ending_hold_vent": { "label": "Vent", "title": "Ending hold" },
       "label": "Module controls",
       "mode": {
         "label": "Select mode type",
@@ -313,6 +314,7 @@
         "add_step": "Add step",
         "cancel": "Cancel",
         "cycle": "Cycle",
+        "cycle_repetitions": "Cycle, {{repetitions}}x",
         "delete": "Delete",
         "edit": "Edit",
         "errors": {
@@ -325,9 +327,9 @@
         "no_profile_defined": "No profile defined",
         "no_steps_defined": "No steps defined",
         "number_of_cycles": "Number of cycles",
-        "profile_steps": "Profile steps",
-        "profile_defined_single": "{{numSteps}} profile step defined",
         "profile_defined_multiple": "{{numSteps}} profile steps defined",
+        "profile_defined_single": "{{numSteps}} profile step defined",
+        "profile_steps": "Profile steps",
         "pump_power": "Pump power",
         "repetitions": "Number of cycles",
         "save": "Save",
@@ -344,7 +346,11 @@
       "state": {
         "label": "Select the state to change",
         "options": {
-          "pump": "Turn on Vacuum pump",
+          "pump": {
+            "change": "Change vacuum pump settings",
+            "off": "Turn off Vacuum pump",
+            "on": "Turn on Vacuum pump"
+          },
           "vent": {
             "closed": "Close vent",
             "open": "Open vent"
@@ -359,13 +365,22 @@
         "label": "Pump",
         "off": "Off",
         "power": "{{power}}%",
-        "pressure": "{{pressure}} mbar"
+        "pressure": "{{pressure}} mbar",
+        "profile": "Running profile"
       },
       "vent": {
         "closed": "Closed",
         "label": "Vent",
-        "open": "Open"
+        "opened": "Open"
       }
+    },
+    "profile_timeline": {
+      "start": "Start profile",
+      "wait_for_complete": "Wait for profile to complete"
+    },
+    "state_timeline": {
+      "start": "Start vacuum",
+      "wait_for_complete": "Wait for vacuum to complete"
     },
     "step_summary": {
       "num_steps_multiple": "{{numSteps}} steps",
@@ -375,6 +390,7 @@
         "closed": "Closed",
         "open": "Open",
         "pump": {
+          "off": "Stop pump",
           "power": "<text>Set pump power to</text><tag/>",
           "pressure": "<text>Set gauge pressure to</text><tag/>"
         },
@@ -389,6 +405,7 @@
   "valid_range": "Must be between 0.1 and {{max}} {{unit}}",
   "view_details": "View details",
   "volume_per_well": {
+    "mix": "Mix volume",
     "multiAspirate": "Aspirate volume per well",
     "multiDispense": "Dispense volume per well",
     "single": "Volume per well"

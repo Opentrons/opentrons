@@ -62,8 +62,9 @@ export function StackerEmptyInterventionContent({
     moduleLocation?.slotName == null ||
     labwareName == null ||
     flexStacker == null
-  )
+  ) {
     return null
+  }
 
   const infoProps: ComponentProps<typeof InterventionInfo> = {
     layout: 'default',

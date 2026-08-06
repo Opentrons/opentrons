@@ -9,12 +9,15 @@ import aiohttp.web
 import pytest
 
 from server_utils.auth.resource_server.auth_server import (
+    ALL_AUTH_SETTINGS_ENDPOINT_PATH,
     CLIENT_ID,
     SETTINGS_ENDPOINT_PATH,
     TOKEN_INTROSPECTION_ENDPOINT_PATH,
+    LocalHTTPClient,
+)
+from server_utils.auth.resource_server.types import (
     AuthSettingsResponse,
     AuthSettingsResponseData,
-    LocalHTTPClient,
     TokenIntrospectionResponse,
 )
 
@@ -42,15 +45,23 @@ class AppMock:
     A JSON-serializable object.
     """
 
+    all_auth_settings_response: object
+    """How the server should respond to GET /auth/settings."""
+
     app: Final[aiohttp.web.Application]
 
     def __init__(self) -> None:
         self.settings_response = {}
+        self.all_auth_settings_response = {}
         self.introspect_response = {}
         self.introspect_requests = []
 
         app = aiohttp.web.Application()
         app.router.add_get(f"/{SETTINGS_ENDPOINT_PATH}", self._get_settings)
+        app.router.add_get(
+            f"/{ALL_AUTH_SETTINGS_ENDPOINT_PATH}",
+            self._get_all_auth_settings,
+        )
         app.router.add_post(
             f"/{TOKEN_INTROSPECTION_ENDPOINT_PATH}", self._post_introspect
         )
@@ -60,6 +71,11 @@ class AppMock:
         self, _request: aiohttp.web.Request
     ) -> aiohttp.web.Response:
         return aiohttp.web.json_response(data=self.settings_response)
+
+    async def _get_all_auth_settings(
+        self, _request: aiohttp.web.Request
+    ) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(data=self.all_auth_settings_response)
 
     async def _post_introspect(
         self, request: aiohttp.web.Request
@@ -148,10 +164,18 @@ async def test_token_introspection(
 
     app_mock.introspect_requests.clear()
 
-    app_mock.introspect_response = {"active": True, "scope": "mama_mia papa_pia"}
+    app_mock.introspect_response = {
+        "active": True,
+        "scope": "mama_mia papa_pia",
+        "username": "test_username",
+        "ot_fullname": "Test Fullname",
+    }
     introspect_response = await client.introspect_token("test-token")
     assert introspect_response == TokenIntrospectionResponse(
-        active=True, scope="mama_mia papa_pia"
+        active=True,
+        scope="mama_mia papa_pia",
+        username="test_username",
+        ot_fullname="Test Fullname",
     )
     assert app_mock.introspect_requests == [
         {"token": "test-token", "client_id": CLIENT_ID}

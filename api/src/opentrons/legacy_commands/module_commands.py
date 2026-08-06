@@ -3,7 +3,7 @@ from typing import Any, List
 
 from . import types as command_types
 from opentrons.drivers import utils
-from opentrons.hardware_control.modules import ThermocyclerStep
+from opentrons.hardware_control.modules import ThermocyclerStep, VacuumModuleProfileStep
 
 
 def magdeck_engage() -> command_types.MagdeckEngageCommand:
@@ -333,5 +333,93 @@ def flex_stacker_fill(
     text = f"Filling {self} with {count} labware"
     return {
         "name": command_types.FLEX_STACKER_FILL,
+        "payload": {"text": text},
+    }
+
+
+def vacuum_module_start_set_vacuum_pressure(
+    self: Any,
+    gauge_pressure_mbar: float,
+    duration_s: int | None,
+    ramp_rate: float | None,
+    timeout_s: int | None,
+    vent_after: bool | None,
+    equalize_timeout_s: int | None = None,
+) -> command_types.VacuumModuleStartSetVacuumPressureCommand:
+    text = (
+        f"Setting module {self} pressure to {gauge_pressure_mbar} mbar: "
+        f"duration_s={duration_s}, ramp_rate={ramp_rate}, timeout_s={timeout_s}, "
+        f"vent_after={vent_after}, equalize_timeout_s={equalize_timeout_s}"
+    )
+    return {
+        "name": command_types.VACUUM_MODULE_START_SET_VACUUM_PRESSURE,
+        "payload": {"text": text},
+    }
+
+
+def vacuum_module_start_set_vacuum_power(
+    self: Any,
+    percent_power: float,
+    duration_s: int | None,
+    ramp_rate: float | None,
+    timeout_s: int | None,
+    vent_after: bool | None,
+    equalize_timeout_s: int | None = None,
+) -> command_types.VacuumModuleStartSetVacuumPowerCommand:
+    text = (
+        f"Setting module {self} power to {percent_power}%: "
+        f"duration_s={duration_s}, ramp_rate={ramp_rate}, timeout_s={timeout_s}, "
+        f"vent_after={vent_after}, equalize_timeout_s={equalize_timeout_s}"
+    )
+    return {
+        "name": command_types.VACUUM_MODULE_START_SET_VACUUM_POWER,
+        "payload": {"text": text},
+    }
+
+
+def vacuum_module_stop_vacuum(
+    self: Any,
+) -> command_types.VacuumModuleStopVacuumCommand:
+    text = f"Stopping vacuum for {self}"
+    return {
+        "name": command_types.VACUUM_MODULE_STOP_VACUUM,
+        "payload": {"text": text},
+    }
+
+
+def vacuum_module_start_execute_profile(
+    self: Any,
+    steps: List[VacuumModuleProfileStep],
+    repetitions: bool,
+) -> command_types.VacuumModuleStartExecuteProfileCommand:
+    steps_msg = "\n".join([f"\t{str(s)}" for s in steps])
+    text = (
+        f"In the background, vacuum module {self} starting to"
+        f" run {repetitions} repetitions"
+        f" of cycle composed of the following steps: \n{steps_msg}"
+    )
+    return {
+        "name": command_types.VACUUM_MODULE_START_EXECUTE_PROFILE,
+        "payload": {"text": text},
+    }
+
+
+def vacuum_module_open_vent(
+    self: Any,
+    equalize_timeout_s: int | None = None,
+) -> command_types.VacuumModuleOpenVentCommand:
+    text = f"Opening vent for {self}: equalize_timeout_s={equalize_timeout_s}"
+    return {
+        "name": command_types.VACUUM_MODULE_OPEN_VENT,
+        "payload": {"text": text},
+    }
+
+
+def vacuum_module_close_vent(
+    self: Any,
+) -> command_types.VacuumModuleCloseVentCommand:
+    text = f"Closing vent for {self}"
+    return {
+        "name": command_types.VACUUM_MODULE_CLOSE_VENT,
         "payload": {"text": text},
     }

@@ -51,8 +51,9 @@ export function RobotSettingsPipetteOffsetCalibration({
     isFlex &&
     (ot3AttachedLeftPipetteOffsetCal != null ||
       ot3AttachedRightPipetteOffsetCal != null)
-  )
+  ) {
     showPipetteOffsetCalItems = true
+  }
 
   return (
     <Flex

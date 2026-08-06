@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -6,9 +6,14 @@ import { COLORS, ListButton, StyledText } from '@opentrons/components'
 import { ALL, COLUMN, PARTIAL_NOZZLE_MAP, ROW } from '@opentrons/shared-data'
 import { getDefaultPrimaryNozzle } from '@opentrons/step-generation'
 
-import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+import {
+  getInitialDeckSetup,
+  getInvariantContext,
+} from '/protocol-designer/step-forms/selectors'
+import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 
 import { PLURAL_COLUMNS, PLURAL_ROWS } from './constants'
+import { getAllWellsSafetyStatus } from './getAllWellsSafetyStatus'
 import { NozzleAndWellSelectionModal } from './NozzleAndWellSelectionModal'
 import styles from './nozzleandwellwizard.module.css'
 import { getNozzleText, getWellGroupLength } from './utils'
@@ -26,7 +31,7 @@ import type { FieldProps, FieldPropsByName } from '../../types'
 interface ExtendedPartialTipFieldProps extends FieldProps {
   pipetteSpecs: PipetteV2Specs
   propsForFields: FieldPropsByName
-  stepType: string
+  stepType: 'mix' | 'transfer'
 }
 export function ExtendedPartialTipField(
   props: ExtendedPartialTipFieldProps
@@ -34,6 +39,8 @@ export function ExtendedPartialTipField(
   const { pipetteSpecs, propsForFields, stepType } = props
   const { t } = useTranslation('protocol_steps')
   const deckSetup = useSelector(getInitialDeckSetup)
+  const invariantContext = useSelector(getInvariantContext)
+  const robotState = useSelector(getRobotStateAtActiveItem)
   const { channels } = pipetteSpecs
   const [isNozzleAndWellModalOpen, setIsNozzleAndWellModalOpen] =
     useState<boolean>(false)
@@ -64,6 +71,82 @@ export function ExtendedPartialTipField(
 
       break
   }
+  // if deck setup changes and selected wells are now inaccessible - unselect them so that an error is raised
+  interface WellCheckConfig {
+    wells: string[][]
+    selectedWells: string[]
+    labwareId: string | null
+    fieldKey: keyof FieldPropsByName
+  }
+  const wellConfigs: WellCheckConfig[] = []
+  const addWellConfig = (
+    labwareId: string,
+    selectedWells: string[] | undefined,
+    fieldKey: keyof FieldPropsByName
+  ): void => {
+    const wells =
+      invariantContext.labwareEntities[labwareId]?.def.ordering ?? []
+
+    wellConfigs.push({
+      wells,
+      selectedWells: selectedWells ?? [],
+      labwareId,
+      fieldKey,
+    })
+  }
+  if (stepType === 'mix') {
+    addWellConfig(
+      propsForFields.labware.value as string,
+      propsForFields.wells?.value as string[],
+      'wells'
+    )
+  }
+  if (stepType === 'transfer') {
+    addWellConfig(
+      propsForFields.aspirate_labware.value as string,
+      propsForFields.aspirate_wells?.value as string[],
+      'aspirate_wells'
+    )
+    addWellConfig(
+      propsForFields.dispense_labware.value as string,
+      propsForFields.dispense_wells?.value as string[],
+      'dispense_wells'
+    )
+  }
+  const tiprackLabwareDefURI = propsForFields.tipRack.value as string
+  const tiprackId = Object.values(deckSetup.labware).find(
+    labware => labware.labwareDefURI === tiprackLabwareDefURI
+  )?.id
+  const inaccessibleFields = wellConfigs
+    .map(config => {
+      if (!config.labwareId || config.wells.length === 0) {
+        return null
+      }
+
+      const status = getAllWellsSafetyStatus({
+        allWells: config.wells,
+        robotState,
+        invariantContext,
+        pipetteId: propsForFields.pipette.value as string,
+        labwareId: config.labwareId,
+        primaryNozzle: primaryNozzle,
+        nozzleConfiguration: nozzleConfiguration,
+        tiprackId,
+      })
+
+      const hasInaccessibleWell = config.selectedWells.some(
+        well => status[well] !== 0
+      )
+
+      return hasInaccessibleWell ? config.fieldKey : null
+    })
+    .filter(Boolean) as Array<keyof FieldPropsByName>
+  useEffect(() => {
+    inaccessibleFields.forEach(fieldKey => {
+      propsForFields[fieldKey]?.updateValue([])
+    })
+  }, [inaccessibleFields, propsForFields])
+
   const dspWells = propsForFields.dispense_wells
     ? (propsForFields.dispense_wells.value as [])
     : []
@@ -107,8 +190,11 @@ export function ExtendedPartialTipField(
       (channels === 8 && nozzleConfiguration === ALL) ||
       nozzleConfiguration === COLUMN
     const isRow = nozzleConfiguration === ROW
-    const hasRequiredWells = aspWells.length > 0
-    if (!nozzleText || !hasRequiredWells) {
+    if (
+      !nozzleText ||
+      aspWellsLength === 0 ||
+      (isTransfer && isDispenseInLabware && dspWellsLength === 0)
+    ) {
       return t('no_nozzles_and_wells_selected')
     }
     let positionType: string = 'wells'
@@ -149,6 +235,18 @@ export function ExtendedPartialTipField(
     })
   }
 
+  const fieldsForWellSelection = [
+    'primaryNozzle',
+    'nozzles',
+    ...(stepType === 'transfer'
+      ? ['aspirate_wells', 'dispense_wells']
+      : ['wells']),
+  ]
+  const shouldShowErrorForNozzleAndWellModalButton =
+    fieldsForWellSelection.some(
+      field => propsForFields[field].errorToShow != null
+    )
+
   return (
     <>
       <div className={styles.nozzle_selection_text}>
@@ -156,7 +254,9 @@ export function ExtendedPartialTipField(
           {t('pipette_nozzles_and_wells')}
         </StyledText>
         <ListButton
-          type="noActive"
+          type={
+            shouldShowErrorForNozzleAndWellModalButton ? 'error' : 'noActive'
+          }
           onClick={handleOpen}
           testId="nozzle_and_well_modal"
         >

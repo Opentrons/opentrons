@@ -28,7 +28,7 @@ You can use the Custom Labware Creator if your labware meets the following crite
 | ![Labware with 3 evenly spaced rows and 4 evenly spaced columns.](../images/labware-layout-regular-even-space.svg "Regular labware layout") | :material-check-bold:{ .opentrons-blue } **Regular** <br />All columns are evenly spaced and all rows are evenly spaced.<br />Columns do not need to have the same spacing as rows. |
 | ![Labware with 3 evenly spaced rows and 4 evenly spaced columns on the left side of the labware.](../images/labware-layout-regular-off-center.svg "Regular labware layout") | :material-check-bold:{ .opentrons-blue } **Regular** <br />The grid does not have to be in the center of labware.  |
 
-For other labware, consider the Custom Labware Service, outlined below. Or you can reference the complete JSON schema to create a labware definition from scratch, although this is not recommended.
+For other labware, consider the Custom Labware Service, outlined below. Or you can reference the complete *JSON schema* to create a labware definition from scratch, although this is not recommended.
 
 ## Custom Labware Service 
 

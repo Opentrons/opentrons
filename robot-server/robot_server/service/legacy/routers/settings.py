@@ -17,6 +17,7 @@ from opentrons.config import (
 from opentrons.config import (
     reset as reset_util,
 )
+from opentrons.config.types import OT3Config
 from opentrons.hardware_control import (
     API,
     HardwareControlAPI,
@@ -36,8 +37,13 @@ from opentrons_shared_data.pipette import (
     types as pip_types,
 )
 from opentrons_shared_data.robot.types import RobotTypeEnum
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from server_utils.audit.fastapi import get_audit_logger, get_supplied_user_notes
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    get_app_state,
+)
 from server_utils.persistence.persistence_directory import PersistenceResetter
 
 from robot_server.deck_configuration.fastapi_dependencies import (
@@ -46,15 +52,22 @@ from robot_server.deck_configuration.fastapi_dependencies import (
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.hardware import (
+    clean_up_hardware,
     get_hardware,
+    get_hardware_resource,
     get_ot2_hardware,
     get_robot_type_enum,
+    start_initializing_hardware,
 )
 from robot_server.persistence.fastapi_dependencies import (
     get_images_resetter,
     get_persistence_resetter,
 )
 from robot_server.persistence.images_directory import ImagesResetter
+from robot_server.runs.dependencies import (
+    mark_light_control_startup_finished,
+    start_light_control_task,
+)
 from robot_server.service.legacy import reset_odd
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.settings import (
@@ -78,13 +91,15 @@ log = logging.getLogger(__name__)
 router = APIRouter()
 
 
-async def _set_oem_mode_request(enable: bool, authorization_header: str | None) -> int:
+async def _set_oem_mode_request(
+    enable: bool, authorization_header: str | None, user_notes_header: str | None
+) -> int:
     """PUT request to set the OEM Mode for the system server."""
-    headers = (
-        {"Authorization": authorization_header}
-        if authorization_header is not None
-        else None
-    )
+    headers: dict[str, str] = {}
+    if authorization_header is not None:
+        headers["Authorization"] = authorization_header
+    if user_notes_header is not None:
+        headers["Opentrons-User-Notes"] = user_notes_header
 
     async with aiohttp.ClientSession() as session:
         async with session.put(
@@ -93,6 +108,29 @@ async def _set_oem_mode_request(enable: bool, authorization_header: str | None) 
             json={"enable": enable},
         ) as resp:
             return resp.status
+
+
+async def _hardware_subprocess_transition(enable: bool, app_state: AppState) -> None:
+    """Request to transition the source of the hardware api between inner-process and subprocess."""
+    if enable:
+        # cleanup state/kill any local hardware API
+        await clean_up_hardware(app_state)
+        # todo(chb: 04-09-2026): Send SystemD socket request to opentrons-hardware-controller to start subprocess
+
+    else:
+        # cleanup state
+        await clean_up_hardware(app_state)
+
+        # todo(chb: 04-09-2026): Send SystemD socket request to opentrons-hardware-controller to end subprocess
+
+    # rerun the hardware API setup
+    start_initializing_hardware(
+        app_state=app_state,
+        callbacks=[
+            (start_light_control_task, True),
+            (mark_light_control_startup_finished, False),
+        ],
+    )
 
 
 @router.post(
@@ -105,12 +143,17 @@ async def _set_oem_mode_request(enable: bool, authorization_header: str | None) 
         status.HTTP_400_BAD_REQUEST: {"model": LegacyErrorResponse},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": LegacyErrorResponse},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("change feature flag")),
+    ],
 )
 async def post_settings(
     update: AdvancedSettingRequest,
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    app_state: Annotated[AppState, Depends(get_app_state)],
     robot_type: Annotated[RobotTypeEnum, Depends(get_robot_type_enum)],
+    user_notes: Annotated[str | None, Depends(get_supplied_user_notes)],
     authorization: Annotated[str | None, Header()] = None,
 ) -> AdvancedSettingsResponse:
     """Update advanced setting (feature flag)"""
@@ -122,14 +165,24 @@ async def post_settings(
                 # `None`/`null` to restore to default. Storing `False` instead is close
                 # enough.
                 update.value if update.value is not None else False,
-                # Forward along the client's authorization, if it has authorization.
+                # Forward along the client's authorization and reason, if it has them
                 authorization_header=authorization,
+                user_notes_header=user_notes,
             )
             if resp != 200:
                 # TODO: raise correct error here
                 raise Exception(f"Something went wrong setting OEM Mode. err: {resp}")
 
         await advanced_settings.set_adv_setting(update.id, update.value)
+        if update.id == "enableHardwareSubprocess" and robot_type == RobotTypeEnum.FLEX:
+            await _hardware_subprocess_transition(
+                enable=update.value if update.value is not None else False,
+                app_state=app_state,
+            )
+
+            # Refresh the hardware dependency
+            hardware = await get_hardware_resource(app_state)
+
         hardware.hardware_feature_flags = HardwareFeatureFlags.build_from_ff()
         await hardware.set_status_bar_enabled(ff.status_bar_enabled())
     except ValueError as e:
@@ -191,7 +244,10 @@ def _create_settings_response(robot_type: RobotTypeEnum) -> AdvancedSettingsResp
     responses={
         status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": LegacyErrorResponse},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("change log level")),
+    ],
 )
 async def post_log_level_local(
     log_level: LogLevel, hardware: Annotated[HardwareControlAPI, Depends(get_hardware)]
@@ -225,7 +281,10 @@ async def post_log_level_local(
     ),
     response_model=LegacyErrorResponse,
     deprecated=True,
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("change legacy log upstreaming")),
+    ],
 )
 async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
     raise LegacyErrorResponse(
@@ -267,7 +326,10 @@ async def get_settings_reset_options(
         status.HTTP_403_FORBIDDEN: {"model": LegacyErrorResponse},
         status.HTTP_503_SERVICE_UNAVAILABLE: {"model": LegacyErrorResponse},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("reset settings")),
+    ],
 )
 async def post_settings_reset_options(
     factory_reset_commands: Dict[reset_util.ResetOptionId, bool],
@@ -341,6 +403,8 @@ async def post_settings_reset_options(
 async def get_robot_settings(
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> RobotConfigs:
+    if isinstance(hardware.config, OT3Config):
+        return hardware.config.model_dump()
     return asdict(hardware.config)
 
 
@@ -409,7 +473,10 @@ async def get_pipette_setting(
     responses={
         status.HTTP_412_PRECONDITION_FAILED: {"model": LegacyErrorResponse},
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("change OT-2 pipette settings")),
+    ],
 )
 async def patch_pipette_setting(
     pipette_id: str,

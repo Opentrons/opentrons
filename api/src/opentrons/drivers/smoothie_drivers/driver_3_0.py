@@ -40,7 +40,7 @@ from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.drivers.serial_communication import get_ports_by_name
-from opentrons.drivers.smoothie_drivers import parse_utils
+from opentrons.drivers.smoothie_drivers import parse_utils, smoothie_update
 from opentrons.drivers.smoothie_drivers.connection import SmoothieConnection
 from opentrons.drivers.smoothie_drivers.constants import (
     AXES,
@@ -81,7 +81,6 @@ from opentrons.drivers.smoothie_drivers.errors import (
 )
 from opentrons.drivers.types import MoveSplits
 from opentrons.drivers.utils import AxisMoveTimestamp, ParseError, string_to_hex
-from opentrons.system import smoothie_update
 
 if TYPE_CHECKING:
     from opentrons.config.types import RobotConfig
@@ -1878,7 +1877,7 @@ class SmoothieDriver:
         programming mode.
         """
         try:
-            smoothie_update._ensure_programmer_executable()
+            smoothie_update.ensure_programmer_executable()
         except OSError as ose:
             if ose.errno == 30:
                 # This is "read only filesystem" and happens on buildroot

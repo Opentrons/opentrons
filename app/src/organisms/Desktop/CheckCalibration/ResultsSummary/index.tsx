@@ -14,16 +14,16 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { LEFT, RIGHT } from '@opentrons/shared-data'
 
-import { LEFT, RIGHT } from '/app/redux/pipettes'
 import { CHECK_STATUS_OUTSIDE_THRESHOLD } from '/app/redux/sessions'
 
 import { CalibrationHealthCheckResults } from './CalibrationHealthCheckResults'
 import { CalibrationResult } from './CalibrationResult'
 import { RenderMountInformation } from './RenderMountInformation'
 
+import type { Mount } from '@opentrons/api-client'
 import type { CalibrationPanelProps } from '/app/organisms/Desktop/CalibrationPanels/types'
-import type { Mount } from '/app/redux/pipettes/types'
 import type {
   CalibrationCheckComparisonsPerCalibration,
   CalibrationCheckInstrument,

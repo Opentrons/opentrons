@@ -666,7 +666,9 @@ class UpdateProgress:
                 if isinstance(target, NodeId)
                 else SubSystem.rear_panel
             )
-            self._tracker[target] = UpdateStatus(subsystem, UpdateState.queued, 0)
+            self._tracker[target] = UpdateStatus.model_construct(
+                subsystem=subsystem, state=UpdateState.queued, progress=0
+            )
 
     @property
     def targets(self) -> Set[FirmwareTarget]:
@@ -689,7 +691,9 @@ class UpdateProgress:
         )
         state = fw_update_state_from_status(fw_update_status)
         progress = int(progress * 100)
-        self._tracker[target] = UpdateStatus(subsystem, state, progress)
+        self._tracker[target] = UpdateStatus.model_construct(
+            subsystem=subsystem, state=state, progress=progress
+        )
         return set(self._tracker.values())
 
 

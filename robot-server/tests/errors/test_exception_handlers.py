@@ -8,6 +8,12 @@ from fastapi import FastAPI, Header, status
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
 
+from server_utils.auth.resource_server.fastapi import AuthorizationError
+from server_utils.auth.resource_server.types import (
+    NotAnActiveTokenResult,
+)
+from server_utils.auth.scopes import Scope
+
 from robot_server.constants import V1_TAG
 from robot_server.errors.error_responses import ApiError
 from robot_server.errors.exception_handlers import exception_handlers
@@ -245,4 +251,32 @@ def test_handles_legacy_validation_error(app: FastAPI, client: TestClient) -> No
             "string as an integer; body.array_field.0: Input should be a valid "
             "boolean, unable to interpret input"
         ),
+    }
+
+
+def test_handles_authorization_error(app: FastAPI, client: TestClient) -> None:
+    """It should properly format authorization errors.
+
+    We won't test every kind of authorization error here, since that's the
+    responsibility of server-utils. Just enough to make sure that the exceptions
+    don't become HTTP 500 errors.
+    """
+
+    @app.post("/trigger-auth-error")
+    def trigger_auth_error() -> None:
+        raise AuthorizationError(
+            authorization_error=NotAnActiveTokenResult(),
+            required_scopes={Scope.ROBOT_CONTROL_WRITE},
+        )
+
+    response = client.post(
+        "/trigger-auth-error",
+    )
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.headers["WWW-Authenticate"] == 'Bearer error="invalid_token"'
+    assert response.json() == {
+        "debugMessage": "The access token provided by the request is bogus or expired.",
+        "providedScopes": [],
+        "requiredScopes": [Scope.ROBOT_CONTROL_WRITE.api_name],
     }

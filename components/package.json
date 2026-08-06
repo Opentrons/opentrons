@@ -29,31 +29,28 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons#readme",
   "peerDependencies": {
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react": "catalog:react18",
+    "react-dom": "catalog:react18"
   },
   "dependencies": {
-    "@opentrons/shared-data": "link:../shared-data",
-    "@opentrons/step-generation": "link:../step-generation",
+    "@opentrons/shared-data": "workspace:*",
+    "@opentrons/step-generation": "workspace:*",
     "@popperjs/core": "2.1.1",
     "@react-spring/types": "9.6.1",
     "@react-spring/web": "9.6.1",
     "@types/classnames": "2.2.5",
-    "@types/lodash": "^4.14.191",
+    "@types/lodash": "catalog:",
     "@types/styled-components": "^5.1.26",
     "@types/webpack-env": "^1.16.0",
     "classnames": "2.2.5",
+    "date-fns": "^4.1.0",
     "interactjs": "^1.10.27",
-    "lodash": "4.17.21",
+    "lodash": "catalog:",
     "react-markdown": "9.0.3",
     "react-popper": "1.0.0",
     "react-remove-scroll": "2.4.3",
     "react-select": "5.4.0",
     "react-viewport-list": "6.3.0",
-    "redux": "5.0.1",
     "styled-components": "5.3.6"
-  },
-  "devDependencies": {
-    "react-redux": "8.1.2"
   }
 }

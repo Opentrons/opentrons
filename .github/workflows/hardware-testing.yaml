@@ -6,7 +6,7 @@ name: 'hardware-testing testing lint/test'
 on:
   # Most of the time, we run on pull requests, which lets us handle external PRs
   push:
-    paths:
+    paths: &paths
       - 'Makefile'
       - 'hardware-testing/**'
       - 'api/**'
@@ -20,14 +20,7 @@ on:
     tags-ignore:
       - '*'
   pull_request:
-    paths:
-      - 'Makefile'
-      - 'hardware-testing/**'
-      - 'api/**'
-      - 'hardware/**'
-      - 'shared-data/**'
-      - '.github/workflows/hardware-testing.yaml'
-      - '.github/actions/python/**'
+    paths: *paths
 
   workflow_dispatch:
 
@@ -46,12 +39,12 @@ jobs:
     runs-on: 'ubuntu-24.04'
     steps:
       - name: Checkout opentrons repo
-        uses: 'actions/checkout@v4'
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # Full history. These tests appear to hang without this. I'm not sure why.
 
       - name: Setup Node
-        uses: 'actions/setup-node@v6'
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: '22.22.0'
 
@@ -66,9 +59,3 @@ jobs:
 
       - name: Test
         run: make -C hardware-testing test-cov
-
-      - name: Coverage
-        uses: 'codecov/codecov-action@v3'
-        with:
-          files: ./hardware-testing/coverage.xml
-          flags: hardware-testing

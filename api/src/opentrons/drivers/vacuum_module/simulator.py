@@ -10,6 +10,7 @@ from .types import (
     VentState,
     WasteConfigParameters,
 )
+from opentrons.drivers.asyncio.communication.errors import SerialException
 from opentrons.util.async_helpers import ensure_yield
 
 
@@ -22,11 +23,23 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
         self.vent_state = VentState.OPENED
         self.vacuum_on = False
         self.pump_enabled = False
+        self.duration = 0
         self.pressure_sensor_enabled = False
         self.target_pressure = 0.0
         self.current_pressure = 0.0
         self.target_rpm = 0
         self.current_rpm = 0
+        self._pending_async_error: Optional[SerialException] = None
+
+    def inject_async_error(self, error: SerialException) -> None:
+        """Queue an async module error to raise on the next polled driver read."""
+        self._pending_async_error = error
+
+    def _raise_pending_async_error(self) -> None:
+        if self._pending_async_error is not None:
+            error = self._pending_async_error
+            self._pending_async_error = None
+            raise error
 
     def model(self) -> str:
         return self._model
@@ -42,6 +55,10 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
     @ensure_yield
     async def is_connected(self) -> bool:
         return True
+
+    @ensure_yield
+    async def move_port(self, new_port: str) -> None:
+        pass
 
     def reset_serial_buffers(self) -> None:
         pass
@@ -88,7 +105,7 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
     async def set_vacuum_state(
         self,
         enable_vacuum: bool,
-        guage_pressure_mbar: Optional[float] = None,
+        gauge_pressure_mbar: Optional[float] = None,
         duration_s: Optional[int] = None,
         timeout_s: Optional[int] = None,
         rate: Optional[float] = None,
@@ -96,10 +113,12 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
     ) -> None:
         """Engage or release the vacuum until a desired internal pressure is reached."""
         self.vacuum_on = enable_vacuum
-        self.target_pressure = guage_pressure_mbar or self.target_pressure
+        self.target_pressure = gauge_pressure_mbar or self.target_pressure
+        self.duration = duration_s or 0
 
     async def get_vacuum_state(self) -> VacuumState:
         """Get the pressure state."""
+        self._raise_pending_async_error()
         return VacuumState(
             self.target_pressure,
             self.current_pressure,
@@ -107,6 +126,7 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
             0,
             0,
             self.vacuum_on,
+            self.duration,
             self.vent_state,
         )
 
@@ -115,6 +135,10 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
         start_pump: bool,
         target_rpm: Optional[int] = None,
         duty_cycle: Optional[int] = None,
+        duration_s: Optional[int] = None,
+        timeout_s: Optional[int] = None,
+        rate: Optional[float] = None,
+        vent_after: Optional[bool] = None,
     ) -> None:
         """Start or the stop the pump at a given rpm or duty cycle."""
         self.pump_enabled = start_pump
@@ -122,6 +146,7 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
 
     async def get_pump_state(self) -> PumpState:
         """Get the pump state."""
+        self._raise_pending_async_error()
         return PumpState(0, 0, 0, 0, False, False)
 
     async def set_vent_state(self, state: VentState) -> None:

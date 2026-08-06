@@ -1,11 +1,13 @@
 """Test the dependency for locking endpoints based on Estop."""
 
+import inspect
 from typing import TYPE_CHECKING, Optional
 
 import pytest
 from decoy import Decoy, matchers
 from fastapi import status
 
+from opentrons.config import feature_flags
 from opentrons.hardware_control import ThreadManagedHardware
 from opentrons.hardware_control.api import API
 from opentrons.hardware_control.types import (
@@ -13,6 +15,7 @@ from opentrons.hardware_control.types import (
     EstopPhysicalStatus,
     EstopState,
 )
+from opentrons_shared_data.robot.types import RobotTypeEnum
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -53,9 +56,25 @@ async def thread_manager_ot3(
     return thread_manager
 
 
-async def test_estop_ignored_ot2(thread_manager_ot2: ThreadManagedHardware) -> None:
+@pytest.fixture
+def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Get a mocked feature flags."""
+    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
+        params = inspect.getfullargspec(func)
+        mock_get_ff = decoy.mock(func=func)
+        if any("robot_type" in p for p in params.args):
+            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
+        else:
+            decoy.when(mock_get_ff()).then_return(False)
+        monkeypatch.setattr(feature_flags, name, mock_get_ff)
+
+
+async def test_estop_ignored_ot2(
+    decoy: Decoy, thread_manager_ot2: ThreadManagedHardware, mock_feature_flags: None
+) -> None:
     """Test that we can use the dependency on OT-2."""
-    assert await require_estop_in_good_state(thread_manager=thread_manager_ot2)
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
+    assert await require_estop_in_good_state(hardware_resource=thread_manager_ot2)
 
 
 @pytest.mark.ot3_only
@@ -74,9 +93,10 @@ async def test_estop_ot3(
     decoy: Decoy,
     estop_state: EstopState,
     error_code: Optional[ErrorCode],
+    mock_feature_flags: None,
 ) -> None:
     """Test that ot3 hardware will check estop state."""
-
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
     decoy.when(hardware_ot3.estop_status).then_return(
         EstopOverallStatus(
             state=estop_state,
@@ -86,10 +106,10 @@ async def test_estop_ot3(
     )
 
     if error_code is None:
-        assert await require_estop_in_good_state(thread_manager=thread_manager_ot3)
+        assert await require_estop_in_good_state(hardware_resource=thread_manager_ot3)
     else:
         with pytest.raises(ApiError) as details:
-            await require_estop_in_good_state(thread_manager=thread_manager_ot3)
+            await require_estop_in_good_state(hardware_resource=thread_manager_ot3)
         err = details.value
 
         assert err.status_code == status.HTTP_403_FORBIDDEN

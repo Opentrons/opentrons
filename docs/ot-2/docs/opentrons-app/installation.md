@@ -1,17 +1,17 @@
 ---
 title: "Opentrons OT-2: Installing the App"
-description: "System requirements, download, and installation for the Opentrons App on Windows, macOS, or Linux."
+description: "System requirements, download, and installation for the Opentrons OT-2 App on Windows, macOS, or Linux."
 ---
 
-Start here for step-by-step instructions for downloading, installing, and updating the Opentrons App.
+Start here for step-by-step instructions for downloading, installing, and updating the Opentrons OT-2 App.
 
 ## App installation { #app-installation-ot2 }
 
-Download the Opentrons App from [opentrons.com/ot-app](https://opentrons.com/ot-app/). The latest version of the app requires Windows 10, macOS 11, or Ubuntu 20.04 or later. The app may run on other Linux distributions, but Opentrons does not officially support them.
+Download the Opentrons OT-2 App from [opentrons.com/app](https://opentrons.com/app/). The latest version of the app requires Windows 10, macOS 11, or Ubuntu 22.04 or later. The app may run on other Linux distributions, but Opentrons does not officially support them.
 
 ### Windows
 
-The Windows version of the Opentrons App is packaged as an installer. To use it:
+The Windows version of the Opentrons OT-2 App is packaged as an installer. To use it:
 
 <div class="instruction-list" markdown>
 
@@ -25,7 +25,7 @@ The app opens automatically once installed. Grant it security or firewall permis
 
 ### macOS
 
-The macOS version of the Opentrons App is packaged as a disk image. To use it:
+The macOS version of the Opentrons OT-2 App is packaged as a disk image. To use it:
 
 <div class="instruction-list" markdown>
 
@@ -43,7 +43,7 @@ Grant the app security or firewall permissions, if prompted, to make sure it can
 
 ### Ubuntu
 
-The Ubuntu version of the Opentrons App is packaged as an AppImage. To use it:
+The Ubuntu version of the Opentrons OT-2 App is packaged as an AppImage. To use it:
 
 <div class="instruction-list" markdown>
 

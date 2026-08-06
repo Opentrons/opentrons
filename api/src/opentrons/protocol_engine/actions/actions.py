@@ -27,6 +27,7 @@ from ..types import (
     LabwareOffsetCreateInternal,
     Liquid,
     ModuleDefinition,
+    PeripheralDefinition,
     Task,
 )
 from opentrons.hardware_control.modules import LiveData
@@ -71,6 +72,11 @@ class ResumeFromRecoveryAction:
     """See `ProtocolEngine.resume_from_recovery()`."""
 
     state_update: StateUpdate
+
+
+@dataclasses.dataclass(frozen=True)
+class MarkProtocolPauseDeferredAction:
+    """Record that error recovery interrupted an in-flight protocol pause."""
 
 
 @dataclasses.dataclass(frozen=True)
@@ -157,10 +163,43 @@ class SucceedCommandAction:
 
 
 @dataclasses.dataclass(frozen=True)
+class BeginAwaitingRecoveryAction:
+    """Enter error recovery without marking the associated command as failed.
+
+    Used when a background task or async module error occurs after a ``start_*``
+    command has already succeeded.
+    """
+
+    command_id: str
+    """The command to recover from."""
+
+    error_id: str
+    """An ID to assign to the recovery error.
+
+    Must be unique to this occurrence of the error.
+    """
+
+    failed_at: datetime
+    """When the error occurred."""
+
+    error: Union[CommandDefinedErrorData, EnumeratedError]
+    """The error that triggered recovery."""
+
+    notes: List[CommandNote]
+    """Debug notes to associate with the recovery error."""
+
+    type: ErrorRecoveryType
+    """How this error should be handled in the context of the overall run."""
+
+    command: Command
+    """The associated command in its current state."""
+
+
+@dataclasses.dataclass(frozen=True)
 class FailCommandAction:
     """Mark a given command as failed.
 
-    At the time of dispatching this action, the command must be running.
+    Normally dispatched while the command is running.
     """
 
     command_id: str
@@ -209,6 +248,7 @@ class StartTaskAction:
     """Store new task in state."""
 
     task: Task
+    originating_command_id: str | None = None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -293,6 +333,15 @@ class AddModuleAction:
 
 
 @dataclasses.dataclass(frozen=True)
+class AddPeripheralAction:
+    """Add an attached peripheral directly to state without a location."""
+
+    peripheral_id: str
+    serial_number: str
+    definition: PeripheralDefinition
+
+
+@dataclasses.dataclass(frozen=True)
 class SetPipetteMovementSpeedAction:
     """Set the speed of a pipette's X/Y/Z movements. Does not affect plunger speed.
 
@@ -323,6 +372,7 @@ class CreateUserCommandAnnotation:
 Action = Union[
     PlayAction,
     PauseAction,
+    MarkProtocolPauseDeferredAction,
     StopAction,
     ResumeFromRecoveryAction,
     FinishAction,
@@ -331,6 +381,7 @@ Action = Union[
     QueueCommandAction,
     RunCommandAction,
     SucceedCommandAction,
+    BeginAwaitingRecoveryAction,
     FailCommandAction,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,

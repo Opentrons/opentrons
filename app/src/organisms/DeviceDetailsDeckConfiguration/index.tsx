@@ -12,6 +12,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  InfoScreen,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
@@ -31,9 +32,11 @@ import {
   getCutoutDisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
+  getJoinedVisualSlotDisplayNamesForFixture,
   getVisualSlotIdForAA,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_SLOT_FIXTURES,
+  VACUUM_MODULE_V1_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { useIsRobotViewable } from '/app/redux-resources/robots'
@@ -140,6 +143,22 @@ export function DeviceDetailsDeckConfiguration({
           }
         }
       }
+      if (cutoutFixtureId === VACUUM_MODULE_V1_FIXTURE) {
+        return {
+          ...acc,
+          displayList: [
+            ...acc.displayList,
+            {
+              displayLocation: getJoinedVisualSlotDisplayNamesForFixture(
+                deckDef,
+                cutoutFixtureId,
+                cutoutId
+              ),
+              displayName,
+            },
+          ],
+        }
+      }
       const vsId = getVisualSlotIdForAA(
         cutoutId,
         cutoutFixtureId,
@@ -191,7 +210,7 @@ export function DeviceDetailsDeckConfiguration({
           borderBottom={BORDERS.lineBorder}
         >
           <StyledText desktopStyle="bodyLargeSemiBold">
-            {t('deck_configuration')}
+            {t('deck_configuration', { robotName })}
           </StyledText>
           <Link
             role="button"
@@ -308,9 +327,7 @@ export function DeviceDetailsDeckConfiguration({
             paddingBottom={SPACING.spacing24}
             width="100%"
           >
-            <LegacyStyledText forwardedAs="p" color={COLORS.grey40}>
-              {t('offline_deck_configuration')}
-            </LegacyStyledText>
+            <InfoScreen content={t('offline_deck_configuration')} />
           </Flex>
         )}
       </Flex>

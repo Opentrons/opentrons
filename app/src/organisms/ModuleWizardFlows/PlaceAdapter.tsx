@@ -27,6 +27,7 @@ import HeaterShaker_PlaceAdapter_R from '/app/assets/videos/module_wizard_flows/
 import TempModule_PlaceAdapter_L from '/app/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_L.webm'
 import TempModule_PlaceAdapter_R from '/app/assets/videos/module_wizard_flows/TempModule_PlaceAdapter_R.webm'
 import Thermocycler_PlaceAdapter from '/app/assets/videos/module_wizard_flows/Thermocycler_PlaceAdapter.webm'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 import { getModulePrepCommands } from '/app/local-resources/modules'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
@@ -59,6 +60,7 @@ export function PlaceAdapter(props: PlaceAdapterProps): JSX.Element {
     attachedModule,
     chainRunCommands,
     setErrorMessage,
+    setIsDoorOpenError,
     setCreatedAdapterId,
     attachedPipette,
     isRobotMoving,
@@ -166,7 +168,6 @@ export function PlaceAdapter(props: PlaceAdapterProps): JSX.Element {
         commandType: 'calibration/moveToMaintenancePosition',
         params: {
           mount,
-          maintenancePosition: 'attachInstrument',
         },
       },
     ]
@@ -176,7 +177,12 @@ export function PlaceAdapter(props: PlaceAdapterProps): JSX.Element {
         proceed()
       })
       .catch((e: Error) => {
-        setErrorMessage(e.message)
+        if (isMaintenanceDoorOpenError(e)) {
+          setIsDoorOpenError(true)
+          setErrorMessage(t('door_is_open') as string)
+        } else {
+          setErrorMessage(e.message)
+        }
       })
   }
 
@@ -211,13 +217,13 @@ export function PlaceAdapter(props: PlaceAdapterProps): JSX.Element {
     )
   }
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <SimpleWizardInProgressBody
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
-  else {
+  } else {
     return (
       <GenericWizardTile
         header={

@@ -66,8 +66,9 @@ const optIntoAnalyticsEpic: Epic = (_, state$) => {
         getAnalyticsOptedIn(prevState) !== getAnalyticsOptedIn(nextState)
     ),
     tap(([_, state]: [State, State]) => {
-      if (state.config?.analytics != null)
+      if (state.config?.analytics != null) {
         setMixpanelTracking(state.config?.analytics, state.config?.isOnDevice)
+      }
     }),
     ignoreElements() as OperatorFunction<[State, State], never>
   )

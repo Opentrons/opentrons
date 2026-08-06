@@ -8,9 +8,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse
 
-from server_utils.auth.resource_server.fastapi_dependencies import (
-    build_authorization_checker,
-    install_authorization_checker,
+from server_utils.audit.fastapi import (
+    audit_logger_middleware,
+    build_audit_client,
+    install_audit_client,
+)
+from server_utils.auth.resource_server.fastapi import (
+    AuthorizationError,
+    build_authentication_checker,
+    handle_authorization_error,
+    install_authentication_checker,
 )
 from server_utils.fastapi_utils.server_timing_middleware import server_timing_middleware
 
@@ -26,13 +33,20 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     async with AsyncExitStack() as exit_stack:
         settings = get_settings()
 
-        authorization_checker = await exit_stack.enter_async_context(
-            build_authorization_checker(
+        authentication_checker = await exit_stack.enter_async_context(
+            build_authentication_checker(
                 auth_server_uds=settings.auth_server_uds,
                 auth_server_url=settings.auth_server_url,
             )
         )
-        install_authorization_checker(app.state, authorization_checker)
+        install_authentication_checker(app.state, authentication_checker)
+        audit_client = await exit_stack.enter_async_context(
+            build_audit_client(
+                audit_server_uds=settings.audit_server_uds,
+                audit_server_url=settings.audit_server_url,
+            )
+        )
+        install_audit_client(app.state, audit_client)
 
         # Start serving requests.
         yield
@@ -58,8 +72,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+app.middleware("http")(audit_logger_middleware)
 app.middleware("http")(server_timing_middleware())
+
+app.exception_handler(AuthorizationError)(handle_authorization_error)
 
 # main router
 app.include_router(router=router)

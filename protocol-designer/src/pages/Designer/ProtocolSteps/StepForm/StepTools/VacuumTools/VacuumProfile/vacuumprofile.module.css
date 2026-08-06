@@ -30,6 +30,13 @@
   flex-direction: column;
 }
 
+.ending_hold_toggle_row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-8);
+}
+
 .saved_vacuum_cycle_header {
   box-sizing: border-box;
   padding: var(--spacing-12);

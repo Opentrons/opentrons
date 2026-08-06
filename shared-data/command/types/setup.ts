@@ -237,9 +237,7 @@ interface ReloadLabwareResult {
 }
 
 export type LabwareMovementStrategy =
-  | 'usingGripper'
-  | 'manualMoveWithPause'
-  | 'manualMoveWithoutPause'
+  'usingGripper' | 'manualMoveWithPause' | 'manualMoveWithoutPause'
 
 export interface MoveLabwareParams {
   labwareId: string
@@ -344,6 +342,7 @@ export type PrimaryNozzleConfigurationStyle =
 
 export interface NozzleConfigurationParams {
   primaryNozzle?: PrimaryNozzleConfigurationStyle
+  backLeftNozzle?: PartialPrimaryNozzles
   style: NozzleConfigurationStyle
 }
 

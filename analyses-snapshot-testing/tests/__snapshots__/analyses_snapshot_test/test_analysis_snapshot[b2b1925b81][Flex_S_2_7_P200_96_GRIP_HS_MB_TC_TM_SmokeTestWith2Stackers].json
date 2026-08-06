@@ -1265,6 +1265,7 @@
           "compatibleParentLabware": [
             "opentrons_flex_96_filtertiprack_1000ul",
             "opentrons_flex_96_filtertiprack_200ul",
+            "opentrons_flex_96_filtertiprack_20ul",
             "opentrons_flex_96_filtertiprack_50ul",
             "opentrons_flex_96_tiprack_1000ul",
             "opentrons_flex_96_tiprack_200ul",
@@ -1345,6 +1346,11 @@
               "z": 14.25
             },
             "opentrons_flex_96_filtertiprack_200ul": {
+              "x": 0,
+              "y": 0,
+              "z": 14.25
+            },
+            "opentrons_flex_96_filtertiprack_20ul": {
               "x": 0,
               "y": 0,
               "z": 14.25
@@ -2942,6 +2948,10 @@
             "kind": "onAddressableArea"
           },
           {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
             "cutoutId": "cutoutA3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
@@ -3186,6 +3196,10 @@
               "kind": "onAddressableArea"
             },
             {
+              "kind": "onModule",
+              "moduleId": "UUID"
+            },
+            {
               "cutoutId": "cutoutA3",
               "kind": "onCutoutFixture",
               "possibleCutoutFixtureIds": [
@@ -3212,68 +3226,8 @@
               "kind": "onAddressableArea"
             },
             {
-              "cutoutId": "cutoutA3",
-              "kind": "onCutoutFixture",
-              "possibleCutoutFixtureIds": [
-                "stagingAreaRightSlot",
-                "stagingAreaSlotWithMagneticBlockV1"
-              ]
-            }
-          ],
-          [
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "addressableAreaName": "A4",
-              "kind": "onAddressableArea"
-            },
-            {
-              "cutoutId": "cutoutA3",
-              "kind": "onCutoutFixture",
-              "possibleCutoutFixtureIds": [
-                "stagingAreaRightSlot",
-                "stagingAreaSlotWithMagneticBlockV1"
-              ]
-            }
-          ],
-          [
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "addressableAreaName": "A4",
-              "kind": "onAddressableArea"
+              "kind": "onModule",
+              "moduleId": "UUID"
             },
             {
               "cutoutId": "cutoutA3",
@@ -3302,6 +3256,36 @@
               "labwareId": "UUID"
             },
             {
+              "addressableAreaName": "A4",
+              "kind": "onAddressableArea"
+            },
+            {
+              "kind": "onModule",
+              "moduleId": "UUID"
+            },
+            {
+              "cutoutId": "cutoutA3",
+              "kind": "onCutoutFixture",
+              "possibleCutoutFixtureIds": [
+                "stagingAreaRightSlot",
+                "stagingAreaSlotWithMagneticBlockV1"
+              ]
+            }
+          ],
+          [
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
               "kind": "onLabware",
               "labwareId": "UUID"
             },
@@ -3312,6 +3296,52 @@
             {
               "addressableAreaName": "A4",
               "kind": "onAddressableArea"
+            },
+            {
+              "kind": "onModule",
+              "moduleId": "UUID"
+            },
+            {
+              "cutoutId": "cutoutA3",
+              "kind": "onCutoutFixture",
+              "possibleCutoutFixtureIds": [
+                "stagingAreaRightSlot",
+                "stagingAreaSlotWithMagneticBlockV1"
+              ]
+            }
+          ],
+          [
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "addressableAreaName": "A4",
+              "kind": "onAddressableArea"
+            },
+            {
+              "kind": "onModule",
+              "moduleId": "UUID"
             },
             {
               "cutoutId": "cutoutA3",
@@ -3332,6 +3362,10 @@
           {
             "addressableAreaName": "A4",
             "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutA3",
@@ -9513,6 +9547,10 @@
             "kind": "onAddressableArea"
           },
           {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
             "cutoutId": "cutoutD3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
@@ -9787,6 +9825,10 @@
           {
             "addressableAreaName": "gripperWasteChute",
             "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutD3",
@@ -10866,6 +10908,10 @@
           {
             "addressableAreaName": "gripperWasteChute",
             "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutD3",
@@ -13589,6 +13635,10 @@
             "kind": "onAddressableArea"
           },
           {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
             "cutoutId": "cutoutA3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
@@ -13727,6 +13777,10 @@
           {
             "addressableAreaName": "gripperWasteChute",
             "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutD3",
@@ -14620,6 +14674,10 @@
             "kind": "onAddressableArea"
           },
           {
+            "kind": "onModule",
+            "moduleId": "UUID"
+          },
+          {
             "cutoutId": "cutoutD3",
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
@@ -14750,6 +14808,10 @@
           {
             "addressableAreaName": "gripperWasteChute",
             "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutD3",
@@ -14958,6 +15020,10 @@
           {
             "addressableAreaName": "gripperWasteChute",
             "kind": "onAddressableArea"
+          },
+          {
+            "kind": "onModule",
+            "moduleId": "UUID"
           },
           {
             "cutoutId": "cutoutD3",

@@ -5,28 +5,21 @@ name: 'system-server test/lint'
 
 on:
   push:
-    paths:
+    paths: &paths
       - 'system-server/**/*'
       - 'Makefile'
       - 'scripts/**/*.mk'
       - 'scripts/**/*.py'
       - '.github/workflows/system-server-lint-test.yaml'
       - '.github/actions/python/**'
-      - 'server-utils/**/*'
+      - 'server-utils/**'
     branches: # ignore any release-related thing (handled elsewhere)
       - 'edge'
     tags-ignore:
       - '*'
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
-    paths:
-      - 'system-server/**/*'
-      - 'Makefile'
-      - 'scripts/**/*.mk'
-      - 'scripts/**/*.py'
-      - '.github/workflows/system-server-lint-test.yaml'
-      - '.github/actions/python/**'
-      - 'server-utils/**/*'
+    paths: *paths
   workflow_dispatch:
 
 concurrency:
@@ -43,10 +36,8 @@ jobs:
     timeout-minutes: 10
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: 'actions/checkout@v4'
-        with:
-          fetch-depth: 0
-      - uses: 'actions/setup-node@v6'
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: '22.22.0'
       - uses: './.github/actions/python/setup-uv'
@@ -60,10 +51,8 @@ jobs:
     needs: [lint]
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: 'actions/checkout@v4'
-        with:
-          fetch-depth: 0
-      - uses: 'actions/setup-node@v6'
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: '22.22.0'
       - uses: './.github/actions/python/setup-uv'
@@ -71,7 +60,3 @@ jobs:
           project: 'system-server'
       - name: Test
         run: make -C system-server test
-      - uses: 'codecov/codecov-action@v3'
-        with:
-          files: ./system-server/coverage.xml
-          flags: system-server

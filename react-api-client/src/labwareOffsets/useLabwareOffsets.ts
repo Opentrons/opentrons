@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 
 import { getLabwareOffsets } from '@opentrons/api-client'
 
-import { useHost } from '../api'
+import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
@@ -17,7 +17,7 @@ export function useLabwareOffsets(
 ): UseQueryResult<LabwareOffsetsResponse, AxiosError> {
   const host = useHost()
   const query = useQuery<LabwareOffsetsResponse, AxiosError>(
-    [host, 'labwareOffsets', params],
+    getQueryKey(host, 'labwareOffsets', params),
     () =>
       getLabwareOffsets(host!, params)
         .then(response => response.data)

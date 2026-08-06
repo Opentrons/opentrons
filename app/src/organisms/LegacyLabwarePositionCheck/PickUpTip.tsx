@@ -103,8 +103,9 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   const pipette = protocolData.pipettes.find(p => p.id === pipetteId)
   const pipetteName = pipette?.pipetteName
   const pipetteMount = pipette?.mount
-  if (pipetteName == null || labwareDef == null || pipetteMount == null)
+  if (pipetteName == null || labwareDef == null || pipetteMount == null) {
     return null
+  }
   const pipetteZMotorAxis: 'leftZ' | 'rightZ' =
     pipetteMount === 'left' ? 'leftZ' : 'rightZ'
 
@@ -424,10 +425,11 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       location
     )?.vector ?? IDENTITY_VECTOR
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <RobotMotionLoader header={t('shared:stand_back_robot_is_in_motion')} />
     )
+  }
   return showTipConfirmation ? (
     <TipConfirmation
       invalidateTip={handleInvalidateTip}

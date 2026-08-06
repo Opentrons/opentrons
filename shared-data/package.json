@@ -14,9 +14,9 @@
   "module": "lib/index.mjs",
   "exports": {
     ".": {
-  "types": "./lib/js/index.d.ts",
-  "import": "./lib/index.mjs",
-  "require": "./lib/index.cjs"
+      "types": "./lib/js/index.d.ts",
+      "import": "./lib/index.mjs",
+      "require": "./lib/index.cjs"
     }
   },
   "files": [
@@ -26,10 +26,11 @@
   ],
   "dependencies": {
     "ajv": "^6.12.3",
-    "lodash": "4.17.21",
+    "lodash": "catalog:",
     "path-browserify": "1.0.1"
   },
   "devDependencies": {
+    "@types/lodash": "catalog:",
     "@types/path-browserify": "1.0.3"
   }
 }

@@ -6,8 +6,9 @@ from typing import TYPE_CHECKING, Annotated, Optional
 from fastapi import Depends, Request, Response, status
 from typing_extensions import Literal
 
-from opentrons.hardware_control import ThreadManagedHardware
-from server_utils.auth.resource_server.fastapi_dependencies import require_scopes
+from opentrons.hardware_control import HardwareControlAPI, ThreadManagedHardware
+from server_utils.audit.fastapi import get_audit_logger
+from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
 from server_utils.fastapi_utils.models.json_api import (
@@ -46,8 +47,8 @@ from robot_server.errors.global_errors import IDNotFound
 from robot_server.errors.robot_errors import NotSupportedOnOT2
 from robot_server.hardware import (
     get_firmware_update_manager,
+    get_hardware_resource,
     get_ot3_hardware,
-    get_thread_manager,
 )
 from robot_server.service.dependencies import get_current_time, get_unique_id
 
@@ -126,10 +127,12 @@ class NoOngoingUpdate(ErrorDetails):
     },
 )
 async def get_attached_subsystems(
-    thread_manager: Annotated[ThreadManagedHardware, Depends(get_thread_manager)],
+    hardware_resource: Annotated[
+        ThreadManagedHardware | HardwareControlAPI, Depends(get_hardware_resource)
+    ],
 ) -> PydanticResponse[SimpleMultiBody[PresentSubsystem]]:
     """Return all subsystems currently present on the machine."""
-    hardware = get_ot3_hardware(thread_manager)
+    hardware = get_ot3_hardware(hardware_resource)
     data = [
         PresentSubsystem.model_construct(
             name=SubSystem.from_hw(subsystem_id),
@@ -160,13 +163,15 @@ async def get_attached_subsystems(
 )
 async def get_attached_subsystem(
     subsystem: SubSystem,
-    thread_manager: Annotated[ThreadManagedHardware, Depends(get_thread_manager)],
+    hardware_resource: Annotated[
+        ThreadManagedHardware | HardwareControlAPI, Depends(get_hardware_resource)
+    ],
 ) -> PydanticResponse[SimpleBody[PresentSubsystem]]:
     """Return the status of a single attached subsystem.
 
     Response: A subsystem status, if the subsystem is present. Otherwise, an appropriate error.
     """
-    hardware = get_ot3_hardware(thread_manager)
+    hardware = get_ot3_hardware(hardware_resource)
     subsystem_status = hardware.attached_subsystems.get(subsystem.to_hw(), None)
     if not subsystem_status:
         raise SubsystemNotPresent(detail=subsystem.value).as_error(
@@ -342,7 +347,10 @@ async def get_update_process(
             "model": ErrorBody[FirmwareUpdateFailed]
         },
     },
-    dependencies=[Depends(require_scopes(Scope.UPDATES_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.UPDATES_WRITE)),
+        Depends(get_audit_logger("start subsystem update")),
+    ],
 )
 async def begin_subsystem_update(
     subsystem: SubSystem,

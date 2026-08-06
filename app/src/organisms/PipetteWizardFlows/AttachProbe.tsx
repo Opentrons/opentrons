@@ -3,11 +3,15 @@ import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
 import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
   AnimationVideo,
   Banner,
   COLORS,
   Flex,
+  JUSTIFY_FLEX_END,
   LegacyStyledText,
+  PrimaryButton,
   RESPONSIVENESS,
   SPACING,
   TYPOGRAPHY,
@@ -16,6 +20,7 @@ import {
 import pipetteProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
 import pipetteProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
 import probing96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
+import { SmallButton } from '/app/atoms/buttons'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
@@ -62,6 +67,8 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     isOnDevice,
     flowType,
     deckConfig,
+    isDoorOpenError,
+    dismissDoorOpenError,
   } = props
 
   const handleOnClick = (): void => {
@@ -79,7 +86,8 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const startCalibration = startCalibrationOnClick(
     props,
     setShowUnableToDetect,
-    pipetteId
+    pipetteId,
+    t('door_is_open') as string
   )
 
   const calSlotNum = 'C2'
@@ -110,7 +118,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     </Flex>
   )
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <SimpleWizardInProgressBody
         alternativeSpinner={isExiting ? null : pipetteProbeVid}
@@ -131,7 +139,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         )}
       </SimpleWizardInProgressBody>
     )
-  else if (showUnableToDetect)
+  } else if (showUnableToDetect) {
     return (
       <ProbeNotAttached
         handleOnClick={
@@ -143,29 +151,57 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         isOnDevice={isOnDevice ?? false}
       />
     )
+  }
 
   return errorMessage != null ? (
-    <SimpleWizardBody
-      isSuccess={false}
-      iconColor={COLORS.red50}
-      header={t('shared:error_encountered')}
-      subHeader={
-        <Trans
-          t={t}
-          i18nKey={'return_probe_error'}
-          values={{ error: errorMessage }}
-          components={{
-            block: <LegacyStyledText forwardedAs="p" />,
-            bold: (
-              <LegacyStyledText
-                forwardedAs="p"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              />
-            ),
-          }}
-        />
-      }
-    />
+    isDoorOpenError ? (
+      <SimpleWizardBody
+        isSuccess={false}
+        iconColor={COLORS.red50}
+        header={t('door_is_open')}
+        subHeader={t('close_door_and_try_again')}
+      >
+        <Flex
+          width="100%"
+          justifyContent={JUSTIFY_FLEX_END}
+          alignItems={Boolean(isOnDevice) ? ALIGN_CENTER : ALIGN_FLEX_END}
+          gridGap={SPACING.spacing8}
+        >
+          {Boolean(isOnDevice) ? (
+            <SmallButton
+              buttonText={t('try_again')}
+              onClick={dismissDoorOpenError}
+            />
+          ) : (
+            <PrimaryButton onClick={dismissDoorOpenError}>
+              {t('try_again')}
+            </PrimaryButton>
+          )}
+        </Flex>
+      </SimpleWizardBody>
+    ) : (
+      <SimpleWizardBody
+        isSuccess={false}
+        iconColor={COLORS.red50}
+        header={t('shared:error_encountered')}
+        subHeader={
+          <Trans
+            t={t}
+            i18nKey={'return_probe_error'}
+            values={{ error: errorMessage }}
+            components={{
+              block: <LegacyStyledText forwardedAs="p" />,
+              bold: (
+                <LegacyStyledText
+                  forwardedAs="p"
+                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                />
+              ),
+            }}
+          />
+        }
+      />
+    )
   ) : (
     <GenericWizardTile
       header={i18n.format(t('attach_probe'), 'capitalize')}

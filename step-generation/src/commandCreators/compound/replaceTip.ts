@@ -132,7 +132,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   const isFlexPipette =
     (pipetteSpec?.displayCategory === 'FLEX' || channels === 96) ?? false
 
-  if (!pipetteSpec)
+  if (!pipetteSpec) {
     return {
       errors: [
         errorCreators.pipetteDoesNotExist({
@@ -140,6 +140,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
         }),
       ],
     }
+  }
   const labwareDef =
     invariantContext.labwareEntities[nextTiprack.tiprackId]?.def
 

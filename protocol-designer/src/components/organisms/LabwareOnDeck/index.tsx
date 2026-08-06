@@ -1,6 +1,11 @@
 import { useSelector } from 'react-redux'
 
-import { CenterLabwareInSlot, LabwareRender } from '@opentrons/components'
+import {
+  CenterLabwareInSlot,
+  INACCESSIBLE,
+  LabwareRender,
+  SELECTED_ERROR,
+} from '@opentrons/components'
 import { getIsLid } from '@opentrons/shared-data'
 import * as wellContentsSelectors from '@opentrons/step-generation'
 
@@ -12,6 +17,7 @@ import { getAllWellContentsForActiveItem } from '../../../top-selectors/well-con
 import type { CSSProperties } from 'react'
 import type {
   TipType,
+  WellGroup,
   WellLabelOption,
   WellMouseEvent,
   WellType,
@@ -32,8 +38,8 @@ interface LabwareOnDeckProps {
   fill?: CSSProperties['fill']
   borderStroke?: CSSProperties['stroke']
   ignoreMissingTips?: boolean
-  inWellSelectionModal?: boolean
   wellLabelOptions?: WellLabelOption
+  centerInSlot?: boolean
 }
 
 export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
@@ -51,8 +57,8 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     fill,
     borderStroke,
     ignoreMissingTips = false,
-    inWellSelectionModal = false,
     wellLabelOptions,
+    centerInSlot = false,
   } = props
   const missingAndUsedTipsByLabwareId = useSelector(
     tipContentsSelectors.getMissingAndUsedTipsByLabwareId
@@ -67,24 +73,42 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
   const wellContents = allWellContentsForActiveItem
     ? allWellContentsForActiveItem[labwareOnDeck.id]
     : null
-  const highlightedWells = allHighlightedWells[labwareOnDeck.id]
+  const selectedWells: WellGroup = Object.entries(statusByWellName ?? {})
+    .filter(([, status]) => status === 'selected')
+    .reduce<WellGroup>((acc, [wellName]) => {
+      acc[wellName] = null
+      return acc
+    }, {})
+  const highlightedWells = statusByWellName
+    ? selectedWells
+    : allHighlightedWells[labwareOnDeck.id]
   const labwareTipInfo =
     missingAndUsedTipsByLabwareId != null
       ? missingAndUsedTipsByLabwareId[labwareOnDeck.id]
       : null
   const { missingTips } = labwareTipInfo ?? {}
   const isLid = getIsLid(labwareOnDeck.def)
-  const wellFill = inWellSelectionModal
-    ? undefined
-    : wellContentsSelectors.wellFillFromWellContents(
-        wellContents,
-        liquidDisplayColors
+  const shouldCenter = isLid || centerInSlot
+  const wellFill = wellContentsSelectors.wellFillFromWellContents(
+    wellContents,
+    liquidDisplayColors
+  )
+
+  const newWellFill = statusByWellName
+    ? Object.fromEntries(
+        Object.entries(wellFill).filter(
+          ([wellName]) =>
+            statusByWellName[wellName] !== INACCESSIBLE &&
+            statusByWellName[wellName] !== SELECTED_ERROR
+        )
       )
+    : wellFill
+
   const labwareRenderComponent = (
     <LabwareRender
       definition={labwareOnDeck.def}
-      positioningMode="offsetInSlot"
-      wellFill={wellFill}
+      positioningMode={shouldCenter ? 'passThrough' : 'offsetInSlot'}
+      wellFill={newWellFill}
       handleClickWell={handleClickWell}
       {...(showHighlightedWells ? { highlightedWells } : {})}
       {...(ignoreMissingTips ? {} : { missingTips })}
@@ -101,7 +125,7 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
   return (
     <g transform={`translate(${x}, ${y})`}>
       {/* TODO (ND, 01/06/2026): Center all labware including non-lids in the slot. Requires a larger audit of LabwareOnDeck implementation. */}
-      {isLid ? (
+      {shouldCenter ? (
         <CenterLabwareInSlot definition={labwareOnDeck.def}>
           {labwareRenderComponent}
         </CenterLabwareInSlot>

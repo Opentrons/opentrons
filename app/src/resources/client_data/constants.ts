@@ -7,4 +7,5 @@
 export const KEYS = {
   ERROR_RECOVERY: 'ot-error-recovery-v1',
   LPC: 'ot-lpc-v1',
+  ENCRYPTION_KEYS: 'ot-encryption-keys-v1',
 } as const

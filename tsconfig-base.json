@@ -12,6 +12,6 @@
     "noErrorTruncation": true,
     "skipLibCheck": true,
     "moduleResolution": "node",
-    "types": ["vite/client", "@testing-library/jest-dom"]
+    "types": ["node", "vite/client", "@testing-library/jest-dom"]
   }
 }

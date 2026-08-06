@@ -3,6 +3,7 @@ import path from 'path'
 import glob from 'glob'
 import { vi } from 'vitest'
 
+import type { Mock } from 'vitest'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
 // require all definitions in the labware/definitions/2 directory
@@ -14,12 +15,13 @@ const DEFS_FIXTURE_PATTERN = path.join(
 
 const allDefs: unknown[] = glob.sync(DEFS_FIXTURE_PATTERN).map(require)
 
-export const getAllDefs = vi.fn(() =>
-  (allDefs as LabwareDefinition[]).reduce(
-    (acc, def: LabwareDefinition): Record<string, LabwareDefinition> => ({
-      ...acc,
-      [def.namespace]: def,
-    }),
-    {}
-  )
+export const getAllDefs: Mock<() => Record<string, LabwareDefinition>> = vi.fn(
+  (): Record<string, LabwareDefinition> =>
+    (allDefs as LabwareDefinition[]).reduce(
+      (acc, def: LabwareDefinition): Record<string, LabwareDefinition> => ({
+        ...acc,
+        [def.namespace]: def,
+      }),
+      {}
+    )
 )

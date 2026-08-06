@@ -1,6 +1,7 @@
 import net from 'net'
 import intersectionBy from 'lodash/intersectionBy'
 import isEqual from 'lodash/isEqual'
+import pick from 'lodash/pick'
 import unionBy from 'lodash/unionBy'
 import xorWith from 'lodash/xorWith'
 import fetch from 'node-fetch'
@@ -9,6 +10,7 @@ import {
   ROBOT_SERVER_HEALTH_PATH,
   UPDATE_SERVER_HEALTH_PATH,
 } from './constants'
+import { HEALTH_RESPONSE_KEYS, SERVER_HEALTH_RESPONSE_KEYS } from './types'
 
 import type { Agent } from 'http'
 import type { RequestInit } from 'node-fetch'
@@ -181,7 +183,7 @@ function fetchAndParse<SuccessBody>(
  * Poll both /heath and /server/update/health of an IP address and combine the
  * responses into a single result object
  */
-function pollHealth({
+async function pollHealth({
   ip,
   port,
   agent,
@@ -201,19 +203,39 @@ function pollHealth({
     `http://${urlIp}:${port}${UPDATE_SERVER_HEALTH_PATH}`,
     { agent }
   )
+  const [healthResp, serverHealthResp] = await Promise.all([
+    healthReq,
+    serverHealthReq,
+  ])
 
-  return Promise.all([healthReq, serverHealthReq]).then(
-    ([healthResp, serverHealthResp]) => ({
-      ip,
-      port,
-      health: healthResp.ok ? healthResp.body : null,
-      serverHealth: serverHealthResp.ok ? serverHealthResp.body : null,
-      healthError: !healthResp.ok
-        ? { status: healthResp.status, body: healthResp.body }
-        : null,
-      serverHealthError: !serverHealthResp.ok
-        ? { status: serverHealthResp.status, body: serverHealthResp.body }
-        : null,
-    })
-  )
+  return {
+    ip,
+    port,
+    health: healthResp.ok ? trimHealthResponse(healthResp.body) : null,
+    serverHealth: serverHealthResp.ok
+      ? trimServerHealthResponse(serverHealthResp.body)
+      : null,
+    healthError: !healthResp.ok
+      ? { status: healthResp.status, body: healthResp.body }
+      : null,
+    serverHealthError: !serverHealthResp.ok
+      ? { status: serverHealthResp.status, body: serverHealthResp.body }
+      : null,
+  }
+}
+
+/**
+ * To avoid unnecessary client updates, this removes any extra fields that the
+ * server might have returned but that aren't relevant for robot discovery purposes.
+ * Especially fields that change over time, like disk usage.
+ */
+function trimHealthResponse(response: HealthResponse): HealthResponse {
+  return pick(response, HEALTH_RESPONSE_KEYS)
+}
+
+/** Like trimHealthResponse(), but for ServerHealthResponse. */
+function trimServerHealthResponse(
+  response: ServerHealthResponse
+): ServerHealthResponse {
+  return pick(response, SERVER_HEALTH_RESPONSE_KEYS)
 }

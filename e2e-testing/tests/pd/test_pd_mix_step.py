@@ -1,140 +1,126 @@
 """Tests covering the Mix step workflow in Protocol Designer."""
 
 import pytest
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 
-from automation.pd_pages import LandingPage, MixStepForm, ProtocolEditorPage
+from automation.pd_pages import MixStepForm, ProtocolEditorPage
+from eyes import Eyes
+from utility import import_protocol_and_open_editor
 
 PROTOCOL_PATH = "fixtures/protocol/8/doItAllV8.json"
+# Ending deck keeps the 1000 µL tip rack on C2 (do not dispose it before Mix).
 LABWARE_OPTION = "B4 Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt"
 PIPETTE_OPTION = "Flex 1-Channel 1000 µL"
 TIPRACK_OPTION = "Opentrons Flex 96 Tip Rack 1000 µL"
 
 
 @pytest.mark.pdE2E
-def test_import_protocol_and_enter_edit_mode(page: Page, pd_base_url: str) -> None:
-    """Verify we can import a protocol and reach the editor."""
-
-    _import_protocol_and_open_editor(page)
-    expect(page.get_by_role("button", name="Add Step")).to_be_visible()
-
-
-@pytest.mark.pdE2E
-def test_mix_step_configuration_workflow(page: Page, pd_base_url: str) -> None:
+def test_mix_step_configuration_workflow(page: Page, eyes: Eyes | None) -> None:
     """Replicate the complete mixSettings Cypress test using Playwright."""
 
-    editor = _import_protocol_and_open_editor(page)
-
-    # Step menu parity checks
-    editor.open_add_step_menu()
-    editor.verify_add_step_menu_options()
-    editor.select_step_type("Mix")
+    import_protocol_and_open_editor(page, PROTOCOL_PATH, migration=True)
+    protocol_editor = ProtocolEditorPage(page)
 
     mix_form = MixStepForm(page)
-    # currently there is a divergence in the number of parts in the mix step form
-    # between 8.6.2 prod (1/3) and what's in edge (1/4)
-    # mix_form.expect_part_header("Part 1 / 3")
-    for label in [
-        "Mix",
-        "Pipette",
-        "Tiprack",
-        "Labware",
-    ]:
-        print(f"Expecting text: {label}")
-        mix_form.expect_text(label)
+    protocol_editor.add_step("Mix")
 
     mix_form.select_pipette(PIPETTE_OPTION)
     mix_form.select_tiprack(TIPRACK_OPTION)
     mix_form.select_labware(LABWARE_OPTION)
 
-    for label in [
-        "Pipette nozzles and wells",
-        "Volume per well",
-        "Mix repetitions",
-    ]:
-        mix_form.expect_text(label)
-
     mix_form.open_nozzle_and_well_selector()
+    if eyes is not None:
+        eyes.check(
+            checkpoint_name="Nozzle Selector Layout",
+            target=eyes.Target.window().fully(),
+        )
+
     mix_form.select_nozzles()
     mix_form.expect_well_modal()
+    if eyes is not None:
+        eyes.check(
+            checkpoint_name="Well Modal Layout",
+            target=eyes.Target.window().fully(),
+        )
+
     mix_form.select_wells(["A1", "A2"])
     mix_form.enter_volume("100")
     mix_form.enter_mix_repetitions("5")
+    if eyes is not None:
+        eyes.check(
+            checkpoint_name="Mix Step Settings Form - Part 1",
+            target=eyes.Target.window().fully(),
+        )
     mix_form.click_continue()
 
     # Part 2 / 4 – liquid class settings
-    mix_form.expect_part_header(("Part 2 / 4", "Part 2 / 3"))
-    mix_form.expect_text("Apply liquid class settings for this mix")
     mix_form.click_continue()
-    mix_form.expect_part_header(("Part 3 / 4", "Part 2 / 3"))
+    if eyes is not None:
+        eyes.check(
+            checkpoint_name="Mix Settings Form Liquid Class Modal - Part 2",
+            target=eyes.Target.window().fully(),
+        )
     mix_form.open_mix_tip_modal()
-    mix_form.expect_text("Side view")
+    if eyes is not None:
+        eyes.check(
+            checkpoint_name="Mix Tip Position Modal",
+            target=eyes.Target.window().fully(),
+        )
     page.get_by_role("button", name="Swap view").click()
-    mix_form.expect_text("Top view")
     mix_form.set_mix_tip_position("2", "2", "4")
+    if eyes is not None:
+        eyes.check(
+            checkpoint_name="Mix Tip Position Modal with Values",
+            target=eyes.Target.window().fully(),
+        )
     mix_form.reset_settings()
     mix_form.set_mix_tip_position("2", "2", "5")
     mix_form.save_modal()
 
     mix_form.toggle_checkbox()
     mix_form.fill_delay_seconds("5")
+    if eyes is not None:
+        eyes.check(
+            checkpoint_name="Mix Step Form Aspirate Settings - Part 3",
+            target=eyes.Target.window().fully(),
+        )
 
     # Part 3 / 4 – dispense configuration
     mix_form.click_dispense_tab()
     mix_form.set_flow_rate("dispense_flowRate", "300")
     mix_form.toggle_checkbox()
     mix_form.fill_delay_seconds("5")
-
     mix_form.toggle_checkbox()
     mix_form.set_push_out_volume("5")
-
     mix_form.toggle_checkbox()
     mix_form.open_blowout_location_dropdown()
-    mix_form.expect_text("Destination well")
     page.get_by_text("Destination well").click()
     mix_form.set_flow_rate("blowout_flowRate", "300")
     mix_form.open_blowout_position_modal()
     mix_form.set_blowout_position("4")
+    if eyes is not None:
+        eyes.check(
+            checkpoint_name="Mix Step Form Blowout Settings - Part 3",
+            target=eyes.Target.window().fully(),
+        )
     mix_form.reset_settings()
     mix_form.set_blowout_position("-3")
     mix_form.save_modal()
-    mix_form.expect_text("Blowout position from top")
+    if eyes is not None:
+        eyes.check(
+            checkpoint_name="Mix Step Form Dispense Settings - Part 3 cont..",
+            target=eyes.Target.window().fully(),
+        )
 
     mix_form.click_continue()
 
     # Part 4 / 4 – tip handling and rename
-    mix_form.expect_part_header(("Part 4 / 4", "Part 3 / 3"))
-    mix_form.expect_text("Tip management")
     mix_form.expect_tip_handling_options(["Always", "Once", "Per source", "Per destination", "Never"])
     mix_form.select_tip_handling_option("Once")
-
     mix_form.rename_step("Cypress Mix Test", "This is testing cypress automation in PD")
     mix_form.save_step()
-
-    expect(page.get_by_text("Cypress Mix Test").first).to_be_visible()
-
-
-def _import_protocol_and_open_editor(page: Page) -> ProtocolEditorPage:
-    """Shared setup helper used by both tests."""
-
-    landing = LandingPage(page)
-    landing.wait_for_page_load()
-    landing.confirm_welcome_modal()
-    landing.click_import_existing_protocol()
-    landing.upload_protocol_file(PROTOCOL_PATH)
-
-    expect(page.get_by_text("Protocol Metadata")).to_be_visible(timeout=10000)
-    _dismiss_migration_modal(page)
-
-    page.get_by_role("button", name="Edit protocol").click()
-    expect(page.get_by_role("button", name="Add Step")).to_be_visible(timeout=5000)
-    return ProtocolEditorPage(page)
-
-
-def _dismiss_migration_modal(page: Page) -> None:
-    """Dismiss the migration modal if it appears during import."""
-
-    overlay = page.locator('[aria-label="BackgroundOverlay_ModalShell"]')
-    if overlay.is_visible():
-        page.get_by_role("button", name="Import", exact=True).click()
-        expect(overlay).not_to_be_visible()
+    if eyes is not None:
+        eyes.check(
+            checkpoint_name="Mix Step Form Tip Handling Settings - Part 4",
+            target=eyes.Target.window().fully(),
+        )

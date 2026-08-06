@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -20,7 +20,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { FloatingActionButton } from '/app/atoms/buttons'
+import { TouchFloatingActionButton } from '/app/atoms/buttons'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
@@ -84,20 +84,30 @@ export function ProtocolSetupModulesAndDeck({
   const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery({
     refetchInterval: DECK_CONFIG_POLL_MS,
   })
-  const attachedModules =
-    useAttachedModules({
-      refetchInterval: ATTACHED_MODULE_POLL_MS,
-    }) ?? []
+  const attachedModulesData = useAttachedModules({
+    refetchInterval: ATTACHED_MODULE_POLL_MS,
+  })
+  const attachedModules = useMemo(
+    () => attachedModulesData ?? [],
+    [attachedModulesData]
+  )
 
-  const protocolModulesInfo =
-    mostRecentAnalysis != null
-      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-      : []
+  const protocolModulesInfo = useMemo(
+    () =>
+      mostRecentAnalysis != null
+        ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+        : [],
+    [mostRecentAnalysis, deckDef]
+  )
 
-  const attachedProtocolModuleMatches = getAttachedProtocolModuleMatches(
-    attachedModules,
-    protocolModulesInfo,
-    deckConfig
+  const attachedProtocolModuleMatches = useMemo(
+    () =>
+      getAttachedProtocolModuleMatches(
+        attachedModules,
+        protocolModulesInfo,
+        deckConfig
+      ),
+    [attachedModules, protocolModulesInfo, deckConfig]
   )
 
   const hasModules = attachedProtocolModuleMatches.length > 0
@@ -196,11 +206,14 @@ export function ProtocolSetupModulesAndDeck({
           </>
         )}
       </Flex>
-      <FloatingActionButton
+      <TouchFloatingActionButton
         buttonText={showMapView ? t('list_view') : t('map_view')}
         onClick={() => {
           setShowMapView(mapView => !mapView)
         }}
+        aria-label={
+          showMapView ? t('display_list_view') : t('display_map_view')
+        }
       />
     </>
   )

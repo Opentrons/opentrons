@@ -51,12 +51,12 @@ export const _getLabwareDefsByIdRootState: (
   _makeAllLabwareDefsObj
 )
 export const getLabwareDefsByURI: Selector<LabwareDefByDefURI> = createSelector(
-  state => rootSelector(state).customDefs,
+  (state: BaseState) => rootSelector(state).customDefs,
   _makeAllLabwareDefsObj
 )
 export const getCustomLabwareDefsByURI: Selector<LabwareDefByDefURI> =
   createSelector(
-    state => rootSelector(state).customDefs,
+    (state: BaseState) => rootSelector(state).customDefs,
     _makeCustomLabwareDefsObj
   )
 export const getLabwareUploadMessage: Selector<

@@ -1,10 +1,10 @@
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import { useIsFlex } from '/app/redux-resources/robots'
-import { INEXACT_MATCH, MATCH } from '/app/redux/pipettes'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useDeckCalibrationStatus } from '/app/resources/calibration'
 import { isGripperInCommands } from '/app/resources/protocols/utils'
+import { INEXACT_MATCH, MATCH } from '/app/resources/runs/constants'
 
 import { useMostRecentCompletedAnalysis, useRunPipetteInfoByMount } from '.'
 
@@ -70,8 +70,9 @@ function getFlexRunCalibrationStatus(
     )
     return pipetteOnThisMount?.instrumentName !== speccedPipette.pipetteName
   })
-  if (wrongPipettesAttached)
+  if (wrongPipettesAttached) {
     return { complete: false, reason: 'attach_pipette_failure_reason' }
+  }
 
   const pipettesNotCalibrated = requiredPipettes.some(speccedPipette => {
     const pipetteMatch = instrumentsQueryData?.data.find(
@@ -83,8 +84,9 @@ function getFlexRunCalibrationStatus(
     )
     return pipetteMatch?.data.calibratedOffset?.last_modified == null
   })
-  if (pipettesNotCalibrated)
+  if (pipettesNotCalibrated) {
     return { complete: false, reason: 'calibrate_pipette_failure_reason' }
+  }
 
   const protocolRequiresGripper = isGripperInCommands(
     robotAnalysis?.commands ?? storedAnalysis?.commands ?? []

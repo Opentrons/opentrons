@@ -1,11 +1,15 @@
 # Analyses Generation and Snapshot Testing
 
+Flex-only protocol analysis snapshot testing for this repository.
+
+OT-2 compatibility is covered separately by `tests/test_ot2_compatibility.py`. It runs in the `analyses-snapshot-test` CI workflow via `make ot2-compatibility-test` and is not part of the snapshot generation battery.
+
 ## Setup
 
 1. Follow the instructions in [DEV_SETUP.md](../DEV_SETUP.md) for javascript
 1. `cd analyses-snapshot-testing`
 1. have uv installed
-1. `make setup`
+1. `make setup` (creates a Python 3.12 virtual environment)
 
 ## Concepts
 
@@ -32,7 +36,6 @@ These are the property names in `protocols.py` and `protocols_with_overrides.py`
 
 - `make snapshot-test PROTOCOL_NAMES=Flex_S_v2_19_Illumina_DNA_PCR_Free OVERRIDE_PROTOCOL_NAMES=none`
 - `make snapshot-test PROTOCOL_NAMES=none OVERRIDE_PROTOCOL_NAMES=Flex_X_v2_18_NO_PIPETTES_Overrides_BadTypesInRTP`
-- `make snapshot-test PROTOCOL_NAMES="Flex_S_v2_19_Illumina_DNA_PCR_Free,OT2_S_v2_18_P300M_P20S_HS_TC_TM_SmokeTestV3" OVERRIDE_PROTOCOL_NAMES=none`
 
 ## Updating the snapshots
 
@@ -44,7 +47,6 @@ These are the property names in `protocols.py` and `protocols_with_overrides.py`
 
 - `make snapshot-test-update PROTOCOL_NAMES=Flex_S_v2_19_Illumina_DNA_PCR_Free OVERRIDE_PROTOCOL_NAMES=none`
 - `make snapshot-test-update PROTOCOL_NAMES=none OVERRIDE_PROTOCOL_NAMES=Flex_X_v2_18_NO_PIPETTES_Overrides_BadTypesInRTP`
-- `make snapshot-test-update PROTOCOL_NAMES="Flex_S_v2_19_Illumina_DNA_PCR_Free,OT2_S_v2_18_P300M_P20S_HS_TC_TM_SmokeTestV3" OVERRIDE_PROTOCOL_NAMES=none`
 
 ### Add some protocols to the analyses battery
 
@@ -76,7 +78,7 @@ These are the property names in `protocols.py` and `protocols_with_overrides.py`
 
 ### Naming Convention in order
 
-- Robot (OT2 or Flex)
+- Robot (Flex only)
 - Success (S) or Failure (X)
 - PD or API version
 - _PL_ = Protocol Library - (if applicable)

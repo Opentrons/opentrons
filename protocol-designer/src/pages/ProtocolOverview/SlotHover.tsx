@@ -72,8 +72,9 @@ export function SlotHover(props: SlotHoverProps): JSX.Element | null {
     ) ?? 'cutoutD1'
 
   //  return null for TC slots
-  if (slotPosition === null || (hasTCOnSlot && tcSlots.includes(slotId)))
+  if (slotPosition === null || (hasTCOnSlot && tcSlots.includes(slotId))) {
     return null
+  }
 
   const hoverOpacity = hover != null && hover === slotId ? 1 : 0
   const slotFill = (
@@ -125,7 +126,8 @@ export function SlotHover(props: SlotHoverProps): JSX.Element | null {
   } else {
     const { width, height, x, y } = getOT2HoverDimensions(
       hasTCOnSlot != null,
-      slotPosition
+      slotPosition,
+      false
     )
 
     return (

@@ -5,6 +5,8 @@ from __future__ import annotations
 import dataclasses
 from logging import getLogger
 from typing import (
+    Any,
+    Callable,
     Dict,
     List,
     Mapping,
@@ -13,6 +15,7 @@ from typing import (
     cast,
 )
 
+from pydantic import BaseModel
 from typing_extensions import assert_never
 
 from opentrons_shared_data.pipette import pipette_definition
@@ -53,6 +56,18 @@ from opentrons.types import Mount as HwMount
 from opentrons.types import MountType, NozzleConfigurationType, Point
 
 LOG = getLogger(__name__)
+
+
+class NozzleMapNotification(BaseModel):
+    """Engine notification for Nozzle map status change for the instruments."""
+
+    nozzle_maps: Dict[str, NozzleMap]
+
+
+class TipAttachedNotification(BaseModel):
+    """Engine notification for tip attached status change for the instruments."""
+
+    tip_attached_dict: Dict[str, bool]
 
 
 @dataclasses.dataclass(frozen=True)
@@ -113,7 +128,7 @@ class StaticPipetteConfig:
     shaft_ul_per_mm: float
     available_sensors: pipette_definition.AvailableSensorDefinition
     volume_mode: VolumeModes
-    available_volume_modes_min_vol: Dict[VolumeModes, float]
+    available_volume_modes_min_and_max_vol: Dict[VolumeModes, Dict[str, float]]
 
 
 @dataclasses.dataclass
@@ -143,7 +158,12 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
     _state: PipetteState
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        updates_callback: Optional[
+            Callable[[NozzleMapNotification | TipAttachedNotification | Any], None]
+        ] = None,
+    ) -> None:
         """Initialize a PipetteStore and its state."""
         self._state = PipetteState(
             pipettes_by_id={},
@@ -160,6 +180,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             has_clean_tips_by_id={},
             tip_source_by_id={},
         )
+        self._updates_callback = updates_callback
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
@@ -191,6 +212,12 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.attached_tip_by_id[pipette_id] = None
             self._state.ready_to_aspirate_by_id[pipette_id] = False
             self._state.tip_source_by_id[pipette_id] = None
+            if self._updates_callback:
+                self._updates_callback(
+                    TipAttachedNotification(
+                        tip_attached_dict=self._build_tip_attached_dict()
+                    )
+                )
 
     def _update_tip_state(self, state_update: update_types.StateUpdate) -> None:
         if state_update.pipette_tip_state != update_types.NO_CHANGE:
@@ -243,6 +270,13 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                         default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
                         default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
                     )
+
+            if self._updates_callback:
+                self._updates_callback(
+                    TipAttachedNotification(
+                        tip_attached_dict=self._build_tip_attached_dict()
+                    )
+                )
 
     def _update_current_location(self, state_update: update_types.StateUpdate) -> None:
         location_update = state_update.pipette_location
@@ -320,7 +354,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                     shaft_ul_per_mm=config.shaft_ul_per_mm,
                     available_sensors=config.available_sensors,
                     volume_mode=config.volume_mode,
-                    available_volume_modes_min_vol=config.available_volume_modes_min_vol,
+                    available_volume_modes_min_and_max_vol=config.available_volume_modes_min_and_max_vol,
                 )
             )
             self._state.flow_rates_by_id[state_update.pipette_config.pipette_id] = (
@@ -329,6 +363,12 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.nozzle_configuration_by_id[
                 state_update.pipette_config.pipette_id
             ] = config.nozzle_map
+            if self._updates_callback:
+                self._updates_callback(
+                    NozzleMapNotification(
+                        nozzle_maps=self._state.nozzle_configuration_by_id
+                    ),
+                )
 
     def _update_pipette_nozzle_map(
         self, state_update: update_types.StateUpdate
@@ -337,6 +377,12 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.nozzle_configuration_by_id[
                 state_update.pipette_nozzle_map.pipette_id
             ] = state_update.pipette_nozzle_map.nozzle_map
+            if self._updates_callback:
+                self._updates_callback(
+                    NozzleMapNotification(
+                        nozzle_maps=self._state.nozzle_configuration_by_id
+                    ),
+                )
 
     def _update_ready_for_aspirate(
         self, state_update: update_types.StateUpdate
@@ -392,6 +438,15 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             LOG.error("Pipette state tried to alter an unknown-contents pipette")
             return fluid_stack.FluidStack()
         return stack
+
+    def _build_tip_attached_dict(self) -> Dict[str, bool]:
+        def _has_tip_attached(pipette_id: str) -> bool:
+            return self._state.attached_tip_by_id[pipette_id] is not None
+
+        pipette_ids = (
+            pipette.id for pipette in list(self._state.pipettes_by_id.values())
+        )
+        return {pipette_id: _has_tip_attached(pipette_id) for pipette_id in pipette_ids}
 
 
 class PipetteView:
@@ -777,6 +832,8 @@ class PipetteView:
                 return nozzle_map.instrument_xy_center_offset
             case CriticalPoint.XY_CENTER:
                 return nozzle_map.xy_center_offset
+            case CriticalPoint.X_CENTER:
+                return nozzle_map.x_center_offset
             case CriticalPoint.Y_CENTER:
                 return nozzle_map.y_center_offset
             case CriticalPoint.FRONT_NOZZLE:
@@ -884,16 +941,14 @@ class PipetteView:
         self, pipette_id: str, volume: float
     ) -> VolumeModes:
         """Get the volume mode for the given pipette and volume quantity."""
-        available_volume_modes_min_vol = self.get_config(
+        available_volume_modes = self.get_config(
             pipette_id
-        ).available_volume_modes_min_vol
-        has_low_volume_mode = (
-            VolumeModes.lowVolumeDefault in available_volume_modes_min_vol
-        )
+        ).available_volume_modes_min_and_max_vol
+        has_low_volume_mode = VolumeModes.lowVolumeDefault in available_volume_modes
 
         if not has_low_volume_mode:
             return VolumeModes.default
-        if volume >= available_volume_modes_min_vol[VolumeModes.default]:
+        if volume >= available_volume_modes[VolumeModes.default]["min_volume"]:
             return VolumeModes.default
         return VolumeModes.lowVolumeDefault
 
@@ -903,6 +958,24 @@ class PipetteView:
             self.get_volume_mode_from_volume(pipette_id, volume)
             != self.get_config(pipette_id).volume_mode
         )
+
+    def get_max_volume_for_volume_mode(
+        self, pipette_id: str, volume_mode: VolumeModes
+    ) -> float:
+        """Get the maximum pipette volume defined for the given volume mode.
+
+        Note: This merely returns the maxVolume value from the definition of the specific volume mode,
+        without taking attached tip volume into consideration.
+        """
+        try:
+            volume = self.get_config(pipette_id).available_volume_modes_min_and_max_vol[
+                volume_mode
+            ]["max_volume"]
+        except KeyError as e:
+            raise errors.VolumeModeDoesNotExistError(
+                f"Volume mode {volume_mode} does not exist for pipette {pipette_id}."
+            ) from e
+        return volume
 
     def lookup_volume_to_mm_conversion(
         self, pipette_id: str, volume: float, action: str

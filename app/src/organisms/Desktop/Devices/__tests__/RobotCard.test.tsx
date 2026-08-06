@@ -5,27 +5,25 @@ import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
+import { mockFetchModulesSuccessActionPayloadModules } from '@opentrons/api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getRobotModelByName } from '/app/redux/discovery'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import {
   HEALTH_STATUS_OK,
-  ROBOT_MODEL_OT2,
   ROBOT_MODEL_OT3,
 } from '/app/redux/discovery/constants'
-import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
+import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
+import { useAttachedPipettes } from '/app/resources/instruments'
 import {
   mockLeftProtoPipette,
   mockRightProtoPipette,
-} from '/app/redux/pipettes/__fixtures__'
-import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
-import { useAttachedPipettes } from '/app/resources/instruments'
+} from '/app/resources/instruments/__fixtures__'
 import { useAttachedModules } from '/app/resources/modules'
 
 import {
-  mockOT2HealthResponse,
-  mockOT2ServerHealthResponse,
   mockOT3HealthResponse,
   mockOT3ServerHealthResponse,
 } from '../../../../../../discovery-client/src/fixtures'
@@ -52,29 +50,11 @@ vi.mock('../RobotOverflowMenu')
 vi.mock('../RobotStatusHeader')
 vi.mock('../ErrorRecoveryBanner')
 
-const OT2_PNG_FILE_NAME = '/app/src/assets/images/OT2-R_HERO.png'
 const FLEX_PNG_FILE_NAME = '/app/src/assets/images/FLEX.png'
 const MOCK_STATE: State = {
   discovery: {
     robot: { connection: { connectedTo: null } },
     robotsByName: {
-      'opentrons-robot-name': {
-        name: 'opentrons-robot-name',
-        health: mockOT2HealthResponse,
-        serverHealth: mockOT2ServerHealthResponse,
-        addresses: [
-          {
-            ip: '10.0.0.3',
-            port: 31950,
-            seen: true,
-            healthStatus: HEALTH_STATUS_OK,
-            serverHealthStatus: HEALTH_STATUS_OK,
-            healthError: null,
-            serverHealthError: null,
-            advertisedModel: ROBOT_MODEL_OT2,
-          },
-        ],
-      },
       buzz: {
         name: 'buzz',
         health: mockOT3HealthResponse,
@@ -135,8 +115,8 @@ describe('RobotCard', () => {
       updateFromFileDisabledReason: null,
     })
     when(getRobotModelByName)
-      .calledWith(MOCK_STATE, mockConnectableRobot.name)
-      .thenReturn('OT-2')
+      .calledWith(MOCK_STATE, 'buzz')
+      .thenReturn('Opentrons Flex')
     vi.mocked(ErrorRecoveryBanner).mockReturnValue(
       <div>MOCK_RECOVERY_BANNER</div>
     )
@@ -146,18 +126,8 @@ describe('RobotCard', () => {
     })
   })
 
-  it('renders an OT-2 image when robot model is OT-2', () => {
-    render(props)
-    const image = screen.getByRole('img')
-
-    expect(image.getAttribute('src')).toEqual(OT2_PNG_FILE_NAME)
-  })
-
   it('renders a Flex image when robot model is OT-3', () => {
     props = { robot: { ...mockConnectableRobot, name: 'buzz' } }
-    when(getRobotModelByName)
-      .calledWith(MOCK_STATE, 'buzz')
-      .thenReturn('Opentrons Flex')
     render(props)
     const image = screen.getByRole('img')
 

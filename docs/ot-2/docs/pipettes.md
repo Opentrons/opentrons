@@ -32,7 +32,7 @@ OT-2 GEN2 pipettes are different than their GEN1 predecessors. GEN2 pipettes are
 
 ## Installing OT-2 pipettes
 
-For instructions on installing pipettes, see the [Instrument Installation and Calibration section](installation/instruments.md).
+For instructions on installing, calibrating, and detaching pipettes, see the [Instrument Installation and Calibration section](installation/instruments.md).
 
 ## Replacing OT-2 pipettes
 

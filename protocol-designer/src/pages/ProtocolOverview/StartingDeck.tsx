@@ -67,7 +67,6 @@ function StartingDeckHeader(props: StartingDeckHeaderProps): JSX.Element {
         </StyledText>
         <Flex padding={SPACING.spacing4}>
           <Btn
-            data-testid="Materials_list"
             textDecoration={TYPOGRAPHY.textDecorationUnderline}
             onClick={() => {
               setShowMaterialsListModal(true)

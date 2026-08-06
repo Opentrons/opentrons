@@ -24,7 +24,8 @@ from hardware_testing.data.csv_report import (
     CSVLine,
     CSVLineRepeating,
 )
-from hardware_testing.opentrons_api.types import Axis, Point
+from opentrons.hardware_control.types import Axis
+from opentrons.types import Point
 
 MOVING_Z_AXIS = Axis.Z_L
 MOVING_DISTANCE = 100

@@ -23,13 +23,13 @@ runs:
       shell: bash
       run: echo "OT_PYTHON=$(which python)" >> $GITHUB_ENV
     - name: If provided set the OT_VIRTUALENV_VERSION env variable
-      shell : bash
+      shell: bash
       if: ${{ inputs.python-version != 'false' }}
       run: echo "OT_VIRTUALENV_VERSION=${{ inputs.python-version }}" >> $GITHUB_ENV
     - shell: bash
       run: npm install --global shx@0.3.3
     - name: Setup Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
       with:
         python-version: '3.12'
     - name: Install pipenv and virtualenv

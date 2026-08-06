@@ -1,11 +1,7 @@
-import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import last from 'lodash/last'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
@@ -17,17 +13,12 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
-import { resetConfig } from '/app/redux/robot-admin'
-import {
-  getRequestById,
-  PENDING,
-  SUCCESS,
-  useDispatchApiRequest,
-} from '/app/redux/robot-api'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useResetRobotConfigMutation } from '/app/resources/devices/hooks/useResetRobotConfigMutation'
 
-import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
-import type { State } from '/app/redux/types'
+import type { ResetConfigRequest } from '@opentrons/api-client'
 
 interface DeviceResetModalProps {
   closeModal: () => void
@@ -44,24 +35,28 @@ export function DeviceResetModal({
 }: DeviceResetModalProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared', 'branded'])
   const navigate = useNavigate()
-  const [dispatchRequest, requestIds] = useDispatchApiRequest()
-  const resetRequestStatus = useSelector((state: State) => {
-    const lastId = last(requestIds)
-    return lastId != null ? getRequestById(state, lastId) : null
-  })?.status
+  const documentationState = useDocumentationState()
+  const { postResetConfig, isLoading, reset } = useResetRobotConfigMutation(
+    documentationState,
+    robotName,
+    {
+      onSuccess: () => {
+        closeModal()
+        navigate('/devices/')
+      },
+      onError: error => {
+        if (isDocumentedMutationError(error)) {
+          reset()
+        }
+      },
+    }
+  )
 
   const triggerReset = (): void => {
     if (resetOptions != null) {
-      dispatchRequest(resetConfig(robotName, resetOptions))
-      navigate('/devices/')
+      postResetConfig(resetOptions)
     }
   }
-
-  useEffect(() => {
-    if (resetRequestStatus === SUCCESS) closeModal()
-  }, [resetRequestStatus, closeModal])
-
-  const PENDING_STATUS = resetRequestStatus === PENDING
 
   return (
     <>
@@ -86,12 +81,13 @@ export function DeviceResetModal({
               >
                 {t('shared:cancel')}
               </Link>
-              <AlertPrimaryButton
+              <PrimaryButton
+                variant="warning"
                 onClick={triggerReset}
-                disabled={PENDING_STATUS}
+                disabled={isLoading}
               >
                 {t('shared:confirm')}
-              </AlertPrimaryButton>
+              </PrimaryButton>
             </Flex>
           </Flex>
         </Modal>

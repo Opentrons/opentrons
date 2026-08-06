@@ -1,4 +1,3 @@
-import assert from 'assert'
 import * as React from 'react'
 import Ajv from 'ajv'
 import { saveAs } from 'file-saver'
@@ -75,6 +74,12 @@ import type { LabwareCreatorErrors } from './formLevelValidation'
 // better type-guarding.
 const ajv = new Ajv()
 const validateLabwareSchema2 = ajv.compile(labwareSchemaV2)
+
+function assert(condition: unknown, message: string): asserts condition {
+  if (!condition) {
+    throw new Error(message)
+  }
+}
 
 type WizardStep =
   | 'intro'
@@ -243,8 +248,7 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
   const onUpload = React.useCallback(
     (
       event:
-        | React.DragEvent<HTMLLabelElement>
-        | React.ChangeEvent<HTMLInputElement>
+        React.DragEvent<HTMLLabelElement> | React.ChangeEvent<HTMLInputElement>
     ) => {
       let files: FileList | never[] = []
       if ('dataTransfer' in event && event.dataTransfer.files !== null) {
@@ -590,8 +594,7 @@ interface CreateFileFormProps {
   currentWizardStep: WizardStep
   onUpload: (
     event:
-      | React.DragEvent<HTMLLabelElement>
-      | React.ChangeEvent<HTMLInputElement>
+      React.DragEvent<HTMLLabelElement> | React.ChangeEvent<HTMLInputElement>
   ) => void
   goBack: (stepsBack: number) => void
   onExportClick: () => void

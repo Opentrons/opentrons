@@ -23,17 +23,23 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useHomeGantry } from '/app/local-resources/instruments'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
-import { useIsRobotBusy } from '/app/redux-resources/robots'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
 import { CONNECTABLE, REACHABLE, UNREACHABLE } from '/app/redux/discovery'
-import { restartRobot } from '/app/redux/robot-admin'
-import { home, ROBOT } from '/app/redux/robot-controls'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { checkShellUpdate } from '/app/redux/shell'
+import { useIsRobotOutOfStorage } from '/app/resources/devices'
+import { useFullShutdownMutation } from '/app/resources/devices/hooks/useFullShutdownMutation'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
+import { useRestartRobotMutation } from '/app/resources/devices/hooks/useRestartRobotMutation'
 import { useCanDisconnect } from '/app/resources/networking/hooks'
 import { useCurrentRunId } from '/app/resources/runs'
 
+import { RobotOutOfStorageModal } from './RobotOutOfStorageModal.tsx'
 import { DisconnectModal } from './RobotSettings/ConnectNetwork/DisconnectModal'
 import { handleUpdateBuildroot } from './RobotSettings/UpdateBuildroot'
 
@@ -56,20 +62,42 @@ export const RobotOverviewOverflowMenu = (
     showOverflowMenu,
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
-  const navigate = useNavigate()
   const isRobotBusy = useIsRobotBusy()
   const runId = useCurrentRunId()
   const [targetProps, tooltipProps] = useHoverTooltip()
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robot.name)
 
   const dispatch = useDispatch<Dispatch>()
+  const isFlex = useIsFlex(robot.name)
+
+  const documentationState = useDocumentationState()
+  const fullShutdownMutation = useFullShutdownMutation(documentationState)
+  const { restart } = useRestartRobotMutation(documentationState, robot.name)
+
+  const { makeSnackbar } = useToaster()
+  const { homeGantry } = useHomeGantry({
+    onError: error => {
+      if (isMaintenanceDoorOpenError(error)) {
+        makeSnackbar(t('close_door_to_home') as string)
+      }
+    },
+  })
+
+  const isRobotOutOfStorage = useIsRobotOutOfStorage()
+  const [showRobotOutOfStorageModal, setShowRobotOutOfStorageModal] =
+    useState<boolean>(false)
+  const navigate = useNavigate()
 
   const handleClickRestart: MouseEventHandler<HTMLButtonElement> = () => {
-    dispatch(restartRobot(robot.name))
+    restart()
+  }
+
+  const handleClickShutdown: MouseEventHandler<HTMLButtonElement> = () => {
+    fullShutdownMutation.mutate()
   }
 
   const handleClickHomeGantry: MouseEventHandler<HTMLButtonElement> = () => {
-    dispatch(home(robot.name, ROBOT))
+    void homeGantry()
   }
 
   const [showChooseProtocolSlideout, setShowChooseProtocolSlideout] =
@@ -87,6 +115,10 @@ export const RobotOverviewOverflowMenu = (
   })
 
   const handleClickRun: MouseEventHandler<HTMLButtonElement> = () => {
+    if (isRobotOutOfStorage) {
+      setShowRobotOutOfStorageModal(true)
+      return
+    }
     setShowChooseProtocolSlideout(true)
   }
 
@@ -101,6 +133,19 @@ export const RobotOverviewOverflowMenu = (
 
   return (
     <Flex data-testid="RobotOverview_overflowMenu" position={POSITION_RELATIVE}>
+      {showRobotOutOfStorageModal
+        ? createPortal(
+            <RobotOutOfStorageModal
+              onConfirm={() => {
+                navigate(`/devices/${robot.name}/robot-settings/file-manager`)
+              }}
+              onClose={() => {
+                setShowRobotOutOfStorageModal(false)
+              }}
+            />,
+            getTopPortalEl()
+          )
+        : null}
       {showDisconnectModal
         ? createPortal(
             <DisconnectModal
@@ -201,6 +246,17 @@ export const RobotOverviewOverflowMenu = (
           >
             {t('robot_controls:restart_label')}
           </MenuItem>
+          {isFlex ? (
+            <MenuItem
+              disabled={isRobotUnavailable || isEstopNotDisengaged}
+              onClick={handleClickShutdown}
+              data-testid={`RobotOverviewOverflowMenu_shutdownRobot_${String(
+                robot.name
+              )}`}
+            >
+              {t('robot_controls:turn_off_label')}
+            </MenuItem>
+          ) : null}
           <Divider marginY="0" />
           <MenuItem
             onClick={() => {

@@ -9,7 +9,7 @@ hide: toc
 ![Plate reader cover image](images/plate-reader-hero.png){style="width: 60%"}
 
 **Opentrons Labworks Inc**<br>
-October 2024
+August 2025
 
 </div>
 

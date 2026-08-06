@@ -2,33 +2,40 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import { opentrons96PcrAdapterV1 } from '@opentrons/shared-data'
-
-import { renderWithProviders } from '/app/__testing-utils__'
-import { i18n } from '/app/i18n'
-import { mockLabwareDef } from '/app/organisms/LegacyLabwarePositionCheck/__fixtures__/mockLabwareDef'
 import {
   mockHeaterShaker,
   mockMagneticModule,
   mockTemperatureModule,
   mockThermocycler,
-} from '/app/redux/modules/__fixtures__'
+} from '@opentrons/api-client'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import {
+  opentrons96PcrAdapterV1,
+  VACUUM_MODULE_TYPE,
+} from '@opentrons/shared-data'
+
+import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
+import { mockLabwareDef } from '/app/organisms/LegacyLabwarePositionCheck/__fixtures__/mockLabwareDef'
 
 import { LabwareListItem } from '../LabwareListItem'
 import { SecureLabwareModal } from '../SecureLabwareModal'
 
 import type { ComponentProps } from 'react'
+import type { AttachedModule } from '@opentrons/api-client'
 import type {
   LabwareDefinition,
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
-import type { AttachedModule } from '/app/redux/modules/types'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 
 vi.mock('../SecureLabwareModal')
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition
 const mockAdapterId = 'mockAdapterId'
@@ -521,5 +528,25 @@ describe('LabwareListItem', () => {
     screen.getByTestId('RobotInfoLabel_A2')
     screen.getByText('Quantity: 2')
     screen.getByText('Multiple liquid layouts')
+  })
+  it('renders the vacuum module icon for dock labware via moduleTypeOverride', () => {
+    render({
+      stackedItems: [
+        {
+          labwareId: 'dock-labware-id',
+          displayName: 'Filter Plate',
+          definitionUri: 'mockDefUri',
+        },
+      ],
+      slotName: 'A4',
+      extraAttentionModules: [],
+      attachedModuleInfo: {},
+      isFlex: true,
+      onClick: vi.fn(),
+      moduleTypeOverride: VACUUM_MODULE_TYPE,
+    })
+    screen.getByText('Filter Plate')
+    screen.getByTestId('RobotInfoLabel_A4')
+    screen.getByTestId('RobotInfoLabel_ot-vacuum')
   })
 })

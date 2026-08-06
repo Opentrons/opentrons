@@ -1,0 +1,22 @@
+# Rules for checking the security of our GitHub Actions with zizmor.
+
+rules:
+  # todo(mm, 2026-04-03): Incrementally fix violations and remove `disable: true`.
+  artipacked:
+    disable: true
+  cache-poisoning:
+    disable: true
+  excessive-permissions:
+    disable: true
+  github-env:
+    disable: true
+  misfeature:
+    disable: true
+  secrets-outside-env:
+    disable: true
+  superfluous-actions:
+    disable: true
+  template-injection:
+    disable: true
+  use-trusted-publishing:
+    disable: true

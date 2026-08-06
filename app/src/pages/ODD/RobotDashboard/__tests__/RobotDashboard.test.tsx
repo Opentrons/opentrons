@@ -1,8 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
-import { screen } from '@testing-library/react'
+import { act, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
-import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -19,7 +17,6 @@ import { RobotDashboard } from '..'
 import { WelcomeModal } from '../WelcomeModal'
 
 import type { NavigateFunction } from 'react-router-dom'
-import type { ProtocolResource } from '@opentrons/shared-data'
 
 const mockNavigate = vi.fn()
 
@@ -49,23 +46,6 @@ const render = () => {
     }
   )
 }
-const mockProtocol: ProtocolResource = {
-  id: 'mockProtocol1',
-  createdAt: '2022-05-03T21:36:12.494778+00:00',
-  protocolType: 'json',
-  protocolKind: 'standard',
-  robotType: 'OT-3 Standard',
-  metadata: {
-    protocolName: 'yay mock protocol',
-    author: 'engineering',
-    description: 'A short mock protocol',
-    created: 1606853851893,
-    tags: ['unitTest'],
-  },
-  analysisSummaries: [],
-  files: [],
-  key: '26ed5a82-502f-4074-8981-57cdda1d066d',
-}
 const mockRunData = {
   id: 'mockProtocol1',
   createdAt: '2022-05-03T21:36:12.494778+00:00',
@@ -76,7 +56,6 @@ const mockRunData = {
 
 describe('RobotDashboard', () => {
   beforeEach(() => {
-    vi.mocked(useAllProtocolsQuery).mockReturnValue({} as any)
     vi.mocked(useNotifyAllRunsQuery).mockReturnValue({} as any)
     vi.mocked(useMissingProtocolHardware).mockReturnValue({
       missingProtocolHardware: [],
@@ -98,19 +77,37 @@ describe('RobotDashboard', () => {
     expect(vi.mocked(EmptyRecentRun)).toHaveBeenCalled()
   })
 
-  it('should render a recent run protocol carousel', () => {
-    vi.mocked(useAllProtocolsQuery).mockReturnValue({
-      data: {
-        data: [mockProtocol],
-      },
-    } as any)
+  it('should render the carousel while cards are resolving', () => {
     vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
       data: { data: [mockRunData] },
     } as any)
     render()
     expect(vi.mocked(Navigation)).toHaveBeenCalled()
-    screen.getByText('Run again')
     expect(vi.mocked(RecentRunProtocolCarousel)).toHaveBeenCalled()
+  })
+
+  it('should show run again header when cards resolve with standard protocols', () => {
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
+      data: { data: [mockRunData] },
+    } as any)
+    render()
+    const carouselProps = vi.mocked(RecentRunProtocolCarousel).mock.calls[0][0]
+    act(() => {
+      carouselProps.onCardResolved(mockRunData.id, true)
+    })
+    screen.getByText('Run again')
+  })
+
+  it('should show empty recent run when all cards resolve as quick-transfer', () => {
+    vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
+      data: { data: [mockRunData] },
+    } as any)
+    render()
+    const carouselProps = vi.mocked(RecentRunProtocolCarousel).mock.calls[0][0]
+    act(() => {
+      carouselProps.onCardResolved(mockRunData.id, false)
+    })
+    expect(vi.mocked(EmptyRecentRun)).toHaveBeenCalled()
   })
 
   it('should render WelcomeModal component when finish unboxing flow', () => {

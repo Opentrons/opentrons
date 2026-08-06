@@ -56,7 +56,6 @@ describe('MultiInputField', () => {
   it('should render a caption with InputStepFromFields wrapped by ListItem', () => {
     render(props)
     screen.getByText('Retract')
-    screen.getByTestId('information_icon')
     const listItem = screen.getByTestId('ListItem_default')
     expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.grey20}`)
     screen.getAllByText('mock InputStepFormField')

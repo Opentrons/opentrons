@@ -4,7 +4,7 @@
 SHELL := bash
 
 # add node_modules/.bin to PATH
-PATH := $(shell cd .. && yarn bin):$(PATH)
+PATH := $(shell cd .. && pnpm bin):$(PATH)
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of jest
@@ -22,7 +22,7 @@ all: clean dist
 
 .PHONY: clean
 clean:
-	shx rm -rf dist
+	pnpm exec shx rm -rf dist
 
 # production assets
 .PHONY: dist
@@ -52,4 +52,4 @@ test:
 
 .PHONY: test-cov
 test-cov:
-	make -C .. test-js-labware-library tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
+	$(MAKE) -C .. test-js-labware-library tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"

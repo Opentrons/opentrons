@@ -198,6 +198,7 @@ def state_summary() -> StateSummary:
         pipettes=[analysis_pipette],
         # TODO(mc, 2022-02-14): evaluate usage of modules in the analysis resp.
         modules=[],
+        peripherals=[],
         # TODO (tz 22-4-19): added the field to class. make sure what to initialize
         labwareOffsets=[],
         status=EngineStatus.IDLE,
@@ -306,6 +307,7 @@ def invalid_state_summary() -> StateSummary:
         pipettes=[analysis_pipette],
         # TODO(mc, 2022-02-14): evaluate usage of modules in the analysis resp.
         modules=[],
+        peripherals=[],
         # TODO (tz 22-4-19): added the field to class. make sure what to initialize
         labwareOffsets=[],
         status=EngineStatus.IDLE,
@@ -353,6 +355,7 @@ async def test_update_run_state(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
     subject.insert_action(run_id="run-id", action=action)
 
@@ -378,6 +381,8 @@ async def test_update_run_state(
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         actions=[action],
+        signed_by=None,
+        log_period_id=None,
     )
     assert run_summary_result == state_summary
     assert parameters_result == run_time_parameters
@@ -410,6 +415,7 @@ async def test_update_run_state_command_with_errors(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
 
     subject.update_run_state(
@@ -455,6 +461,7 @@ async def test_insert_and_get_csv_rtp(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
 
     subject.insert_csv_rtp(run_id="run-id", run_time_parameters=run_time_parameters)
@@ -491,6 +498,7 @@ def test_add_run(subject: RunStore) -> None:
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
+        log_period_id="123",
     )
 
     assert result == RunResource(
@@ -499,6 +507,8 @@ def test_add_run(subject: RunStore) -> None:
         protocol_id=None,
         created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
         actions=[],
+        signed_by=None,
+        log_period_id="123",
     )
 
 
@@ -514,6 +524,46 @@ def test_insert_actions_missing_run_id(subject: RunStore) -> None:
         subject.insert_action(run_id="missing-run-id", action=action)
 
 
+def test_set_signed_by(subject: RunStore) -> None:
+    """It should store the signed_by value for a run."""
+    subject.insert(
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
+    )
+
+    subject.set_signed_by(run_id="run-id", signed_by="Alice Example")
+
+    assert subject.get(run_id="run-id") == RunResource(
+        ok=True,
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        actions=[],
+        signed_by="Alice Example",
+        log_period_id=None,
+    )
+
+    subject.set_signed_by(run_id="run-id", signed_by="Bob Example")
+
+    assert subject.get(run_id="run-id") == RunResource(
+        ok=True,
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        actions=[],
+        signed_by="Bob Example",
+        log_period_id=None,
+    )
+
+
+def test_set_signed_by_missing_run_id(subject: RunStore) -> None:
+    """It should raise if the run does not exist."""
+    with pytest.raises(RunNotFoundError, match="missing-run-id"):
+        subject.set_signed_by(run_id="missing-run-id", signed_by="Alice Example")
+
+
 def test_insert_run_missing_protocol_id(subject: RunStore) -> None:
     """Should not be able to insert an action with a run id that does not exist."""
     with pytest.raises(ProtocolNotFoundError, match="missing-protocol-id"):
@@ -521,6 +571,7 @@ def test_insert_run_missing_protocol_id(subject: RunStore) -> None:
             run_id="run-id",
             protocol_id="missing-protocol-id",
             created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+            log_period_id=None,
         )
 
 
@@ -530,6 +581,7 @@ def test_get_run_no_actions(subject: RunStore) -> None:
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
 
     result = subject.get("run-id")
@@ -540,6 +592,8 @@ def test_get_run_no_actions(subject: RunStore) -> None:
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         actions=[],
+        signed_by=None,
+        log_period_id=None,
     )
 
 
@@ -555,6 +609,7 @@ def test_get_run(subject: RunStore) -> None:
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id="1337",
     )
 
     subject.insert_action("run-id", action)
@@ -567,6 +622,8 @@ def test_get_run(subject: RunStore) -> None:
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         actions=[action],
+        signed_by=None,
+        log_period_id="1337",
     )
 
 
@@ -589,6 +646,8 @@ def test_get_run_missing(subject: RunStore) -> None:
                     protocol_id=None,
                     created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
                     actions=[],
+                    signed_by=None,
+                    log_period_id=None,
                 )
             ],
         ),
@@ -601,6 +660,8 @@ def test_get_run_missing(subject: RunStore) -> None:
                     protocol_id=None,
                     created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
                     actions=[],
+                    signed_by=None,
+                    log_period_id=None,
                 ),
                 RunResource(
                     ok=True,
@@ -608,6 +669,8 @@ def test_get_run_missing(subject: RunStore) -> None:
                     protocol_id=None,
                     created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
                     actions=[],
+                    signed_by=None,
+                    log_period_id=None,
                 ),
             ],
         ),
@@ -620,6 +683,8 @@ def test_get_run_missing(subject: RunStore) -> None:
                     protocol_id=None,
                     created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
                     actions=[],
+                    signed_by=None,
+                    log_period_id=None,
                 ),
                 RunResource(
                     ok=True,
@@ -627,6 +692,8 @@ def test_get_run_missing(subject: RunStore) -> None:
                     protocol_id=None,
                     created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
                     actions=[],
+                    signed_by=None,
+                    log_period_id=None,
                 ),
             ],
         ),
@@ -640,11 +707,13 @@ def test_get_all_runs(
         run_id="run-id-1",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
     subject.insert(
         run_id="run-id-2",
         protocol_id=None,
         created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
+        log_period_id=None,
     )
 
     result = subject.get_all(length=length)
@@ -655,6 +724,8 @@ def test_get_all_runs(
 async def test_remove_run(
     subject: RunStore,
     mock_runs_publisher: mock.Mock,
+    state_summary: StateSummary,
+    command_annotations: List[pe_types.CommandAnnotation],
     data_files_store: DataFilesStore,
     run_time_parameters: List[pe_types.RunTimeParameter],
 ) -> None:
@@ -669,6 +740,15 @@ async def test_remove_run(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
+    )
+    # Add command annotations
+    subject.update_run_state(
+        run_id="run-id",
+        summary=state_summary,
+        commands=[],
+        command_annotations=command_annotations,
+        run_time_parameters=[],
     )
     subject.insert_action(run_id="run-id", action=action)
     await data_files_store.insert(
@@ -718,6 +798,7 @@ def test_get_state_summary(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
     subject.update_run_state(
         run_id="run-id",
@@ -741,6 +822,7 @@ def test_get_state_summary_failure(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
 
     with warnings.catch_warnings():
@@ -770,6 +852,7 @@ def test_get_state_summary_none(subject: RunStore) -> None:
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
     result = subject.get_state_summary(run_id="run-id")
     assert isinstance(result, BadStateSummary)
@@ -786,6 +869,7 @@ def test_get_run_time_parameters(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
     subject.update_run_state(
         run_id="run-id",
@@ -808,6 +892,7 @@ def test_get_run_time_parameters_invalid(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
     subject.update_run_state(
         run_id="run-id",
@@ -829,6 +914,7 @@ def test_get_run_time_parameters_none(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
     result = subject.get_run_time_parameters(run_id="run-id")
     assert result == []
@@ -840,6 +926,7 @@ def test_has_run_id(subject: RunStore) -> None:
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
     result = subject.has("run-id")
     assert result is True
@@ -859,7 +946,10 @@ def test_get_command(
 ) -> None:
     """Should return a run command from the db."""
     subject.insert(
-        run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime.now(timezone.utc),
+        log_period_id=None,
     )
     subject.update_run_state(
         run_id="run-id",
@@ -881,7 +971,10 @@ def test_get_command_annotation(
 ) -> None:
     """Should return a run command annotation from the db."""
     subject.insert(
-        run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime.now(timezone.utc),
+        log_period_id=None,
     )
     subject.update_run_state(
         run_id="run-id",
@@ -904,7 +997,10 @@ def test_get_command_annotation_missing(
 ) -> None:
     """Should raise if the command annotation does not exist."""
     subject.insert(
-        run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime.now(timezone.utc),
+        log_period_id=None,
     )
     subject.update_run_state(
         run_id="run-id",
@@ -929,7 +1025,10 @@ def test_get_total_command_annotations_count(
 ) -> None:
     """Should return a run command annotation from the db."""
     subject.insert(
-        run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime.now(timezone.utc),
+        log_period_id=None,
     )
     subject.update_run_state(
         run_id="run-id",
@@ -1004,7 +1103,10 @@ def test_get_command_annotations_slice(
 ) -> None:
     """Should return a run command annotation from the db."""
     subject.insert(
-        run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime.now(timezone.utc),
+        log_period_id=None,
     )
     subject.update_run_state(
         run_id="run-id",
@@ -1039,7 +1141,10 @@ def test_get_command_raise_exception(
 ) -> None:
     """Should raise exception."""
     subject.insert(
-        run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime.now(timezone.utc),
+        log_period_id=None,
     )
     subject.update_run_state(
         run_id="run-id",
@@ -1063,6 +1168,7 @@ def test_get_command_slice(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
     subject.update_run_state(
         run_id="run-id",
@@ -1115,6 +1221,7 @@ def test_get_commands_slice_clamping(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
     subject.update_run_state(
         run_id="run-id",
@@ -1143,6 +1250,7 @@ def test_get_run_command_slice_none(subject: RunStore) -> None:
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
 
     result = subject.get_commands_slice(
@@ -1154,7 +1262,10 @@ def test_get_run_command_slice_none(subject: RunStore) -> None:
 def test_get_commands_slice_run_not_found(subject: RunStore) -> None:
     """Should raise an error RunNotFoundError."""
     subject.insert(
-        run_id="run-id", protocol_id=None, created_at=datetime.now(timezone.utc)
+        run_id="run-id",
+        protocol_id=None,
+        created_at=datetime.now(timezone.utc),
+        log_period_id=None,
     )
     with pytest.raises(RunNotFoundError):
         subject.get_commands_slice(
@@ -1173,6 +1284,7 @@ def test_get_commands_slice_no_fixit_commands(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
     subject.update_run_state(
         run_id="run-id",
@@ -1208,6 +1320,7 @@ def test_get_all_commands_as_preserialized_list(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
     subject.update_run_state(
         run_id="run-id",
@@ -1246,6 +1359,7 @@ def test_get_all_commands_as_preserialized_list_no_fixit(
         run_id="run-id",
         protocol_id=None,
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        log_period_id=None,
     )
     subject.update_run_state(
         run_id="run-id",

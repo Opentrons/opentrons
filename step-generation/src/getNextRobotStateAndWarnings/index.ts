@@ -1,4 +1,3 @@
-import assert from 'assert'
 import { produce } from 'immer'
 
 import { stripNoOpCommands } from '../utils/stripNoOpCommands'
@@ -18,6 +17,7 @@ import { forMoveLabware } from './forMoveLabware'
 import { forMoveToAddressableArea } from './forMoveToAddressableArea'
 import { forMoveToWell } from './forMoveToWell'
 import { forPickUpTip } from './forPickUpTip'
+import { forSetTipState } from './forSetTipState'
 import { forWaitForTasks } from './forWaitForTasks'
 import {
   forHeaterShakerCloseLatch,
@@ -57,6 +57,14 @@ import {
   forThermocyclerSetTargetLidTemperature,
   forThermocyclerStartRunExtendedProfile,
 } from './thermocyclerUpdates'
+import {
+  forVacuumCloseVent,
+  forVacuumOpenVent,
+  forVacuumSetPumpPower,
+  forVacuumSetPumpPressure,
+  forVacuumStartRunProfile,
+  forVacuumStopPump,
+} from './vacuumUpdates'
 
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
@@ -71,7 +79,9 @@ function _getNextRobotStateAndWarningsSingleCommand(
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
-  assert(command, 'undefined command passed to getNextRobotStateAndWarning')
+  if (!command) {
+    throw new Error('undefined command passed to getNextRobotStateAndWarning')
+  }
   switch (command.commandType) {
     case 'aspirateWhileTracking':
     case 'aspirate':
@@ -110,6 +120,10 @@ function _getNextRobotStateAndWarningsSingleCommand(
 
     case 'pickUpTip':
       forPickUpTip(command.params, invariantContext, robotStateAndWarnings)
+      break
+
+    case 'setTipState':
+      forSetTipState(command.params, invariantContext, robotStateAndWarnings)
       break
 
     case 'magneticModule/engage':
@@ -389,6 +403,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
     case 'heaterShaker/setAndWaitForShakeSpeed':
+    case 'heaterShaker/setShakeSpeed':
       forHeaterShakerSetTargetShakeSpeed(
         command.params,
         invariantContext,
@@ -441,6 +456,40 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
     case 'absorbanceReader/read':
+      break
+    case 'vacuumModule/startSetVacuumPressure':
+      forVacuumSetPumpPressure(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'vacuumModule/startSetVacuumPower':
+      forVacuumSetPumpPower(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'vacuumModule/openVent':
+      forVacuumOpenVent(command.params, invariantContext, robotStateAndWarnings)
+      break
+    case 'vacuumModule/closeVent':
+      forVacuumCloseVent(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'vacuumModule/stopVacuum':
+      forVacuumStopPump(command.params, invariantContext, robotStateAndWarnings)
+      break
+    case 'vacuumModule/startRunProfile':
+      forVacuumStartRunProfile(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
       break
     default:
       console.error(

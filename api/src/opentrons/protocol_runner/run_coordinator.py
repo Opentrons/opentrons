@@ -4,7 +4,7 @@ import enum
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Mapping, Optional, Tuple
 
-from opentrons_shared_data.errors import GeneralError
+from opentrons_shared_data.errors import EnumeratedError, GeneralError
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType
@@ -25,7 +25,6 @@ from opentrons.protocol_engine import (
     ErrorOccurrence,
     StateSummary,
 )
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
 from opentrons.protocol_engine.state.commands import CommandAnnotationsSlice
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
@@ -309,7 +308,10 @@ class AbstractRunCoordinator(ABC):
 
     @abstractmethod
     async def asynchronous_module_error(
-        self, module_model: HardwareModuleModel, module_serial: str | None
+        self,
+        module_model: HardwareModuleModel,
+        module_serial: str | None,
+        error: EnumeratedError | None = None,
     ) -> bool:
         """Handle an asynchronous module error reported by hardware.
 
@@ -376,11 +378,6 @@ class AbstractRunCoordinator(ABC):
     @abstractmethod
     def get_tip_attached(self) -> Dict[str, bool]:
         """Get current tip state keyed by pipette id."""
-        ...
-
-    @abstractmethod
-    def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
-        """Create error recovery policy for the run."""
         ...
 
     @abstractmethod

@@ -1,0 +1,62 @@
+# JS package testing: ProtocolDeck + protocol-visualization against packed packages
+
+name: 'JS package testing'
+
+on:
+  schedule:
+    - cron: '0 15 * * *' # 10:00 AM EST (15:00 UTC)
+  workflow_dispatch: {}
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CI: 'true'
+
+jobs:
+  js-package-testing:
+    name: 'js package testing setup and validation'
+    timeout-minutes: 30
+    runs-on: 'ubuntu-24.04'
+    steps:
+      # schedule: pin to edge. workflow_dispatch: use the branch selected in the Actions UI.
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'schedule' && 'edge' || github.ref }}
+      - uses: ./.github/actions/js/setup
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
+        with:
+          version: 10.32.1
+      - name: 'setup js-package-testing environment'
+        working-directory: js-package-testing
+        run: make test-setup
+      - name: 'run js-package-testing tests'
+        working-directory: js-package-testing
+        env:
+          # Eyes baseline: edge for cron; selected branch for workflow_dispatch.
+          APPLITOOLS_BRANCH: ${{ github.event_name == 'schedule' && 'edge' || github.ref_name }}
+          APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
+        run: make test
+      - name: 'upload playwright report'
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        if: ${{ !cancelled() }}
+        id: upload-report
+        with:
+          name: playwright-report
+          path: js-package-testing/playwright-report/
+          retention-days: 30
+      - name: 'add test results to summary'
+        if: ${{ !cancelled() }}
+        run: |
+          echo "## 🎭 Playwright Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -d "js-package-testing/playwright-report" ]; then
+            echo "📊 **Test Report**: [Download HTML Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload-report.outputs.artifact-id }})" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The detailed HTML report with screenshots and traces has been uploaded as an artifact." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ No test report generated" >> $GITHUB_STEP_SUMMARY
+          fi

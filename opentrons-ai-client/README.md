@@ -98,7 +98,7 @@ make test-js
 make test-js-opentrons-ai-client
 
 # run a specific file directly
-yarn vitest opentrons-ai-client/src/resources/hooks/
+pnpm vitest opentrons-ai-client/src/resources/hooks/
 ```
 
 Test tasks accept these arguments:

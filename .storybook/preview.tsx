@@ -66,8 +66,11 @@ export const customViewports = {
 }
 
 export const parameters = {
-  actions: { argTypesRegex: '^on[A-Z].*' },
-  viewport: { viewports: customViewports },
+  viewport: {
+    options: {
+      ...customViewports,
+    },
+  },
   options: {
     storySort: {
       method: 'alphabetical',
@@ -93,3 +96,4 @@ export const decorators = [
     </I18nextProvider>
   ),
 ]
+export const tags = ['autodocs']

@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-from typing import Iterable, Sequence
+from typing import Iterable, Literal, Optional, Sequence
 
 from playwright.sync_api import Locator, Page
 
 from automation.base_page import BasePage
+from automation.pd_pages.protocol_editor_page import ProtocolEditorPage
 
 
 class MixStepForm(BasePage):
@@ -37,17 +38,21 @@ class MixStepForm(BasePage):
         self.wait_for_visible(self.page.get_by_text(text).first)
 
     def expect_tip_handling_options(self, options: Sequence[str]) -> None:
-        """Verify the tip handling dropdown exposes the expected options."""
+        """Verify the tip handling dropdown exposes the expected options.
 
-        dropdown = self._dropdown_by_title("Tip handling")
+        Leaves the listbox open so ``select_tip_handling_option`` can reuse it
+        (Escape does not reliably dismiss this dropdown).
+        """
+
+        dropdown = self._change_tip_dropdown()
         self.wait_for_visible(dropdown)
-        dropdown.click()
+        listbox = self.page.get_by_role("listbox")
+        if listbox.count() == 0 or not listbox.first.is_visible():
+            dropdown.click()
+            self.wait_for_visible(listbox)
 
-        listbox = self.page.locator("div[role='listbox']").last
-        self.wait_for_visible(listbox)
-        available = [" ".join(text.split()) for text in listbox.locator("button").all_inner_texts()]
+        available = [" ".join(text.split()) for text in listbox.get_by_role("button").all_inner_texts()]
         missing = [option for option in options if option not in available]
-        self.page.keyboard.press("Escape")
         if missing:
             raise AssertionError(f"Missing tip handling options: {missing}. Available options: {available}")
 
@@ -84,17 +89,52 @@ class MixStepForm(BasePage):
         print(f"Selecting tiprack option: {option_text}")
         self._select_dropdown_option("Tiprack", option_text)
 
+    NozzleConfig = Literal[
+        "All nozzles (recommended)",
+        "Single nozzle",
+        "Single column of nozzles",
+        "Single row of nozzles",
+        "Partial nozzles",
+    ]
+
     def open_nozzle_and_well_selector(self) -> None:
         """Open the well selector modal."""
 
         self.page.get_by_test_id("nozzle_and_well_modal").click()
 
-    def select_nozzles(self) -> None:
+    def select_primary_nozzle(self, nozzle: str) -> None:
+        """Click a primary nozzle in the nozzle selection modal."""
+        modal = self._modal_area()
+        modal.locator(f'[data-wellname="{nozzle}"]').click()
+
+    def select_partial_nozzle_count(self, count: int) -> None:
+        """Select partial nozzle count from the dropdown (e.g. 4 for 4/8 nozzles)."""
+        modal = self._modal_area()
+        dropdown = modal.get_by_test_id("dropdownMenu")
+        self.wait_for_visible(dropdown)
+        dropdown.click()
+        modal.get_by_role("listbox").get_by_text(f"{count} nozzles", exact=True).click()
+
+    def select_nozzle_configuration(
+        self,
+        config: NozzleConfig,
+        partial_count: Optional[int] = None,
+        primary_nozzle: Optional[str] = None,
+    ) -> None:
+        """Select nozzle configuration in step 1 of the nozzle/well modal."""
         modal = self._modal_area()
         self.wait_for_visible(modal.get_by_text("Select Pipette nozzles to use", exact=False).first)
         self.wait_for_visible(modal.get_by_role("button", name="Continue"))
-        modal.locator('label:has-text("All nozzles (recommended)")').click()
+        modal.locator(f'label:has-text("{config}")').click()
+        if partial_count is not None:
+            self.select_partial_nozzle_count(partial_count)
+        if primary_nozzle is not None:
+            self.select_primary_nozzle(primary_nozzle)
         modal.get_by_role("button", name="Continue").click()
+
+    def select_nozzles(self) -> None:
+        """Select all nozzles and continue to well selection."""
+        self.select_nozzle_configuration("All nozzles (recommended)")
 
     def expect_well_modal(self) -> None:
         modal = self._modal_area()
@@ -103,6 +143,12 @@ class MixStepForm(BasePage):
                 "Select wells to mix liquid in Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt", exact=False
             ).first
         )
+        self.wait_for_visible(modal.get_by_role("button", name="Save"))
+
+    def expect_mix_well_modal(self, labware_name: str) -> None:
+        """Wait for the mix well-selection modal for a given labware display name."""
+        modal = self._modal_area()
+        self.wait_for_visible(modal.get_by_text(labware_name, exact=False).first)
         self.wait_for_visible(modal.get_by_role("button", name="Save"))
 
     def select_wells(self, wells: Iterable[str]) -> None:
@@ -210,27 +256,18 @@ class MixStepForm(BasePage):
                 # continue to label/test-id based fallbacks.
                 pass
 
-        # Try CheckboxExpandStepFormField - these use ListButton with a Btn containing Check icon
-        # The inner Btn has a testId like "delay_checkbox", "blowout_checkbox", etc.
-        checkbox_buttons = self.page.locator('[data-testid*="checkbox"]')
-        if checkbox_buttons.count() > index:
-            checkbox_button = checkbox_buttons.nth(index)
-            self.wait_for_visible(checkbox_button)
-            checkbox_button.click()
+        # CheckboxExpandStepFormField renders ListButton rows with visible titles.
+        checkbox_titles = ["Delay", "Push out", "Blowout", "Touch tip", "Air gap", "Mix"]
+        visible_rows: list[Locator] = []
+        for title in checkbox_titles:
+            row = self.page.locator('[data-testid="ListButton_noActive"]').filter(has_text=title).first
+            if row.count() > 0 and row.is_visible():
+                visible_rows.append(row)
+        if len(visible_rows) > index:
+            checkbox_row = visible_rows[index]
+            self.wait_for_visible(checkbox_row)
+            checkbox_row.click()
             return
-
-        # Fallback: CheckboxExpandStepFormField wraps everything in a ListButton that's also clickable
-        # Find ListButtons that contain checkbox-related text (Delay, Push out, Blowout, etc.)
-        # These are the clickable containers for CheckboxExpandStepFormField
-        # Look for buttons containing text that matches checkbox labels
-        checkbox_texts = ["Delay", "Push out", "Blowout", "Touch tip", "Air gap", "Mix"]
-        for text in checkbox_texts:
-            buttons_with_text = self.page.locator("button").filter(has_text=text)
-            if buttons_with_text.count() > index:
-                list_button = buttons_with_text.nth(index)
-                self.wait_for_visible(list_button)
-                list_button.click()
-                return
 
         # Last resort: try to find input[type="checkbox"] (CheckboxField component)
         checkbox_input = self.page.locator('input[type="checkbox"]').nth(index)
@@ -266,31 +303,9 @@ class MixStepForm(BasePage):
 
     def open_blowout_location_dropdown(self) -> None:
         """Open the blowout location dropdown menu."""
-
-        # First, ensure the blowout checkbox is checked (dropdown only appears when checked)
-        # The checkbox has testId="blowout_checkbox"
-        blowout_checkbox_button = self.page.get_by_test_id("blowout_checkbox").first
-        if blowout_checkbox_button.count() > 0:
-            # Check if checkbox is already checked by looking for the checked state
-            # If not checked, click it to enable the dropdown
-            try:
-                # Try to find if the checkbox area is expanded (dropdown should be visible)
-                dropdown_check = self.page.locator('[data-testid="blowout_location_dropdownMenu"]')
-                if dropdown_check.count() == 0:
-                    # Checkbox is not checked, click it to enable
-                    self.wait_for_visible(blowout_checkbox_button)
-                    blowout_checkbox_button.click()
-                    # Wait a moment for React to update the DOM
-                    self.page.wait_for_timeout(500)
-            except Exception:
-                pass
-
-        # Now wait for the dropdown to appear in the DOM
-        # The dropdown has testId="blowout_location_dropdownMenu" (field name + _dropdownMenu)
+        # Prefer the rendered dropdown if the blowout row is already expanded.
         dropdown_locator = self.page.locator('[data-testid="blowout_location_dropdownMenu"]')
 
-        # Wait for the dropdown to be attached to the DOM with a longer timeout
-        # This handles the case where the checkbox was just toggled and the DOM is updating
         try:
             dropdown_locator.wait_for(state="attached", timeout=15000)
             dropdown = dropdown_locator.first
@@ -298,8 +313,20 @@ class MixStepForm(BasePage):
             dropdown.click()
             return
         except Exception:
-            # If waiting for attached fails, try alternative approaches
-            pass
+            # If the dropdown isn't rendered yet, explicitly expand the Blowout row.
+            blowout_row = self.page.locator('[data-testid="ListButton_noActive"]').filter(has_text="Blowout").first
+            if blowout_row.count() > 0 and blowout_row.is_visible():
+                self.wait_for_visible(blowout_row)
+                blowout_row.click()
+                self.page.wait_for_timeout(300)
+                try:
+                    dropdown_locator.wait_for(state="attached", timeout=5000)
+                    dropdown = dropdown_locator.first
+                    self.wait_for_visible(dropdown, timeout=5000)
+                    dropdown.click()
+                    return
+                except Exception:
+                    pass
 
         # Fallback: Try using the dropdown_by_title helper which finds dropdowns by their label text
         try:
@@ -362,10 +389,21 @@ class MixStepForm(BasePage):
     def select_tip_handling_option(self, option: str) -> None:
         """Choose a tip handling option such as ``Once`` or ``Always``."""
 
-        option_button = self.page.get_by_role("button", name=option)
-        if option_button.count() == 0:
-            option_button = self.page.get_by_text(option)
-        option_button.first.click()
+        listbox = self.page.get_by_role("listbox")
+        if listbox.count() == 0 or not listbox.first.is_visible():
+            dropdown = self._change_tip_dropdown()
+            self.wait_for_visible(dropdown)
+            dropdown.click()
+            self.wait_for_visible(listbox)
+        listbox.get_by_text(option, exact=True).click()
+
+    def _change_tip_dropdown(self) -> Locator:
+        """Return the Mix/Transfer tip-handling (changeTip) dropdown control."""
+
+        dropdown = self.page.get_by_test_id("changeTip_dropdownMenu")
+        if dropdown.count() > 0:
+            return dropdown.first
+        return self._dropdown_by_title("Tip handling")
 
     def _fill_input_and_blur(self, selector: str, value: str) -> None:
         locator = self.page.locator(selector).first
@@ -471,3 +509,38 @@ class MixStepForm(BasePage):
 
         texts = [" ".join(text.split()) for text in list_item.locator("p").all_inner_texts()]
         return any(option_text in text for text in texts)
+
+
+def add_mix_step(
+    editor: ProtocolEditorPage,
+    mix_form: MixStepForm,
+    *,
+    pipette: str,
+    tip_rack: str,
+    labware: str,
+    wells: Sequence[str],
+    volume: str,
+    repetitions: str,
+    nozzle_config: MixStepForm.NozzleConfig = "All nozzles (recommended)",
+    partial_count: Optional[int] = None,
+    primary_nozzle: Optional[str] = None,
+) -> None:
+    """Add and save a basic mix step through the four-part wizard."""
+    editor.add_step("Mix")
+    mix_form.select_pipette(pipette)
+    mix_form.select_tiprack(tip_rack)
+    mix_form.select_labware(labware)
+    mix_form.open_nozzle_and_well_selector()
+    mix_form.select_nozzle_configuration(
+        nozzle_config,
+        partial_count=partial_count,
+        primary_nozzle=primary_nozzle,
+    )
+    mix_form.expect_mix_well_modal(labware)
+    mix_form.select_wells(wells)
+    mix_form.enter_volume(volume)
+    mix_form.enter_mix_repetitions(repetitions)
+    mix_form.click_continue()
+    mix_form.click_continue()
+    mix_form.click_continue()
+    mix_form.save_step()

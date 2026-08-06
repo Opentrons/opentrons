@@ -19,6 +19,11 @@
   "homepage": "https://github.com/Opentrons/opentrons",
   "license": "Apache-2.0",
   "dependencies": {
-    "@opentrons/shared-data": "link:../shared-data"
+    "@opentrons/components": "workspace:*",
+    "@opentrons/shared-data": "workspace:*",
+    "styled-components": "5.3.6"
+  },
+  "devDependencies": {
+    "@types/styled-components": "^5.1.26"
   }
 }

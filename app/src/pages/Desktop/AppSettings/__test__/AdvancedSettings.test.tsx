@@ -1,19 +1,18 @@
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
   AdditionalCustomLabwareSourceFolder,
+  AuditLogFolder,
   ClearUnavailableRobots,
   EnableDevTools,
-  OT2AdvancedSettings,
   OverridePathToPython,
   PreventRobotCaching,
   ShowHeaterShakerAttachmentModal,
   ShowLabwareOffsetSnippets,
-  U2EInformation,
   UpdatedChannel,
 } from '/app/organisms/Desktop/AdvancedSettings'
 
@@ -45,11 +44,7 @@ describe('AdvancedSettings', () => {
     vi.mocked(PreventRobotCaching).mockReturnValue(
       <div>mock PreventRobotCaching</div>
     )
-    vi.mocked(OT2AdvancedSettings).mockReturnValue(
-      <div>mock OT2AdvancedSettings</div>
-    )
     vi.mocked(EnableDevTools).mockReturnValue(<div>mock EnableDevTools</div>)
-    vi.mocked(U2EInformation).mockReturnValue(<div>mock U2EInformation</div>)
     vi.mocked(ShowLabwareOffsetSnippets).mockReturnValue(
       <div>mock ShowLabwareOffsetSnippets</div>
     )
@@ -66,6 +61,7 @@ describe('AdvancedSettings', () => {
     vi.mocked(AdditionalCustomLabwareSourceFolder).mockReturnValue(
       <div>mock AdditionalCustomLabwareSourceFolder</div>
     )
+    vi.mocked(AuditLogFolder).mockReturnValue(<div>mock AuditLogFolder</div>)
   })
 
   afterEach(() => {
@@ -82,19 +78,14 @@ describe('AdvancedSettings', () => {
     screen.getByText('mock AdditionalCustomLabwareSourceFolder')
   })
 
-  it('should render mock OT-2 Advanced Settings Tip Length Calibration Method section', () => {
+  it('should render mock AuditLogFolder section', () => {
     render()
-    screen.getByText('mock OT2AdvancedSettings')
+    screen.getByText('mock AuditLogFolder')
   })
 
   it('should render mock robot caching section', () => {
     render()
     screen.getByText('mock PreventRobotCaching')
-  })
-
-  it('should render mock U2EInformation', () => {
-    render()
-    expect(screen.getByText('mock U2EInformation'))
   })
 
   it('should render mock show link to get labware offset data section', () => {

@@ -23,7 +23,7 @@ description: "Dimensions, weight, deck slots, connectivity, and power specificat
 | **Frame composition**    | Rigid steel and CNC aluminum design |
 | **Window composition**   | Removable polycarbonate side windows and front door |
 | **Ventilation requirements** | At least 20 cm / 8 in between the unit and a wall |
-| **Connected PC requirements** | The latest version of the Opentrons App runs on: <ul><li>Windows 10 or later</li><li>macOS 11 or later</li><li>Ubuntu 20.04 or later</li></ul> |
+| **Connected PC requirements** | The latest version of the Opentrons App runs on: <ul><li>Windows 10 or later</li><li>macOS 11 or later</li><li>Ubuntu 22.04 or later</li></ul> |
 
 ## Environmental specifications
 
@@ -45,12 +45,11 @@ For additional information on acceptable environmental conditions for use and tr
 
 A summary of certification information is printed on a sticker on the back of Flex, near the on/off switch. For detailed certification and compliance information, see the [Regulatory Compliance section][regulatory-compliance].
 
-## Serial number
+## Model and serial numbers
 
-Every Flex has a unique serial number. The format of the serial number
-provides additional information, including the robot's date of
-production. For example, the serial number `FLXA1020231007001` would
-indicate:
+The model number for all Flex robots is `FLEX12SUV`.
+
+Every Flex has a unique serial number. The format of the serial number provides additional information, including the robot's date of production. For example, the serial number `FLXA1020231007001` would indicate:
 
 | Characters  | Category | Meaning                                          |
 |-------------|----------|--------------------------------------------------|
@@ -64,7 +63,12 @@ indicate:
 You can find the serial number for your Flex:
 
 - On the certification sticker on the back of Flex, near the on/off switch.
-
 - On the reverse side of the touchscreen (towards the working area).
-
 - In the Opentrons App under **Devices** \> your Flex \> **Robot settings** \> **Advanced**.
+
+<figure markdown>
+
+![Regulatory and certification sticker](../images/regulatory-specs-sticker.png){ width="80%" }
+
+<figcaption>Example of a Flex regulatory and certification sticker. Your specific sticker may vary slightly.</figcaption>
+</figure>

@@ -2,14 +2,16 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
+import { INTERFACE_WIFI } from '@opentrons/api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
-import { getNetworkInterfaces, INTERFACE_WIFI } from '/app/redux/networking'
+import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 
 import { AlternativeSecurityTypeModal } from '../AlternativeSecurityTypeModal'
 import { SelectAuthenticationType } from '../SelectAuthenticationType'
-import { SetWifiCred } from '../SetWifiCred'
+import { WifiPasswordInput } from '../WifiPasswordInput'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
@@ -17,8 +19,8 @@ import type { NavigateFunction } from 'react-router-dom'
 const mockNavigate = vi.fn()
 const mockSetSelectedAuthType = vi.fn()
 
-vi.mock('../SetWifiCred')
-vi.mock('/app/redux/networking')
+vi.mock('../WifiPasswordInput')
+vi.mock('/app/resources/networking/hooks')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('../AlternativeSecurityTypeModal')
 vi.mock('/app/redux-resources/config')
@@ -55,11 +57,13 @@ describe('SelectAuthenticationType', () => {
       selectedAuthType: 'wpa-psk',
       setSelectedAuthType: mockSetSelectedAuthType,
     }
-    vi.mocked(getNetworkInterfaces).mockReturnValue({
+    vi.mocked(useNetworkInterfaces).mockReturnValue({
       wifi: initialMockWifi,
       ethernet: null,
     })
-    vi.mocked(SetWifiCred).mockReturnValue(<div>Mock SetWifiCred</div>)
+    vi.mocked(WifiPasswordInput).mockReturnValue(
+      <div>Mock WifiPasswordInput</div>
+    )
     vi.mocked(AlternativeSecurityTypeModal).mockReturnValue(
       <div>mock AlternativeSecurityTypeModal</div>
     )

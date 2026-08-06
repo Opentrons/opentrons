@@ -1,13 +1,12 @@
-import isIp from 'is-ip'
+import { isIPv6 } from 'is-ip'
 import concat from 'lodash/concat'
 import find from 'lodash/find'
 import head from 'lodash/head'
 import isEqual from 'lodash/isEqual'
 import orderBy from 'lodash/orderBy'
-import { createSelector, createSelectorCreator, defaultMemoize } from 'reselect'
+import { createSelector, lruMemoize } from 'reselect'
 import semver from 'semver'
 
-import { getFeatureFlags } from '../config/selectors'
 import {
   CONNECTABLE,
   HEALTH_STATUS_OK,
@@ -43,11 +42,6 @@ type GetAllRobots = (state: State) => DiscoveredRobot[]
 type GetViewableRobots = (state: State) => ViewableRobot[]
 type GetLocalRobot = (state: State) => DiscoveredRobot | null
 
-// from https://github.com/reduxjs/reselect#customize-equalitycheck-for-defaultmemoize
-const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual)
-
-const makeDisplayName = (name: string): string => name.replace('opentrons-', '')
-
 const isLocal = (ip: string): boolean => {
   return (
     RE_HOSTNAME_IPV6_LL.test(ip) ||
@@ -58,7 +52,7 @@ const isLocal = (ip: string): boolean => {
   )
 }
 
-const ipToHostname = (ip: string): string => (isIp.v6(ip) ? `[${ip}]` : ip)
+const ipToHostname = (ip: string): string => (isIPv6(ip) ? `[${ip}]` : ip)
 
 const makeRobotModel = (
   healthModel: string | null,
@@ -99,9 +93,8 @@ const isNotOT2Robot = (robot: DiscoveredRobot): boolean => {
 
 export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
   createSelector(
-    state => state.discovery.robotsByName,
-    state => getFeatureFlags(state).ignoreOT2App ?? false,
-    (robotsMap, ignoreOT2App) => {
+    (state: State) => state.discovery.robotsByName,
+    robotsMap => {
       const robots = Object.keys(robotsMap).map((robotName: string) => {
         const robot = robotsMap[robotName]
         const { addresses, ...robotState } = robot
@@ -114,7 +107,6 @@ export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
         const serverHealthStatus = addr?.serverHealthStatus ?? null
         const baseRobot = {
           ...robotState,
-          displayName: makeDisplayName(robotName),
           local: ip !== null ? isLocal(ip) : null,
           seen: addr?.seen === true,
           robotModel: makeRobotModel(
@@ -164,9 +156,7 @@ export const getDiscoveredRobots: (state: State) => DiscoveredRobot[] =
         }
       })
 
-      return ignoreOT2App
-        ? robots.filter(robot => isNotOT2Robot(robot))
-        : robots
+      return robots.filter(robot => isNotOT2Robot(robot))
     }
   )
 
@@ -175,7 +165,7 @@ export const getConnectableRobots: GetConnectableRobots = createSelector(
   robots =>
     orderBy(
       robots.flatMap(r => (r.status === CONNECTABLE ? [r] : [])),
-      [robot => robot.displayName.toLowerCase()],
+      [robot => robot.name.toLowerCase()],
       ['asc']
     )
 )
@@ -185,7 +175,7 @@ export const getReachableRobots: GetReachableRobots = createSelector(
   robots =>
     orderBy(
       robots.flatMap(r => (r.status === REACHABLE ? [r] : [])),
-      [robot => robot.displayName.toLowerCase()],
+      [robot => robot.name.toLowerCase()],
       ['asc']
     )
 )
@@ -195,7 +185,7 @@ export const getUnreachableRobots: GetUnreachableRobots = createSelector(
   robots =>
     orderBy(
       robots.flatMap(r => (r.status === UNREACHABLE ? [r] : [])),
-      [robot => robot.displayName.toLowerCase()],
+      [robot => robot.name.toLowerCase()],
       ['asc']
     )
 )
@@ -207,7 +197,7 @@ export const getAllRobots: GetAllRobots = createSelector(
   (cr: DiscoveredRobot[], rr: DiscoveredRobot[], ur: DiscoveredRobot[]) =>
     orderBy(
       concat<DiscoveredRobot>(cr, rr, ur),
-      [robot => robot.displayName.toLowerCase()],
+      [robot => robot.name.toLowerCase()],
       ['asc']
     )
 )
@@ -218,14 +208,14 @@ export const getViewableRobots: GetViewableRobots = createSelector(
   (cr: ViewableRobot[], rr: ViewableRobot[]) =>
     orderBy(
       concat<ViewableRobot>(cr, rr),
-      [robot => robot.displayName.toLowerCase()],
+      [robot => robot.name.toLowerCase()],
       ['asc']
     )
 )
 
 export const getLocalRobot: GetLocalRobot = createSelector(
   getAllRobots,
-  robots => find(robots, { ip: 'localhost' }) ?? null
+  robots => find(robots, { ip: _ODD_IP_ ?? 'localhost' }) ?? null
 )
 
 export const getRobotByName = (
@@ -238,10 +228,16 @@ export const getRobotByName = (
 export const getDiscoverableRobotByName: (
   state: State,
   robotName: string | null
-) => DiscoveredRobot | null = createDeepEqualSelector(
+) => DiscoveredRobot | null = createSelector(
   getAllRobots,
   (state: State, robotName: string | null) => robotName,
-  (robots, robotName) => robots.find(r => r.name === robotName) ?? null
+  (robots, robotName) => robots.find(r => r.name === robotName) ?? null,
+  {
+    memoize: lruMemoize,
+    memoizeOptions: {
+      resultEqualityCheck: isEqual,
+    },
+  }
 )
 
 export const getRobotSerialNumber = (robot: DiscoveredRobot): string | null =>

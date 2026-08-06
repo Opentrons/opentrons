@@ -15,6 +15,7 @@ import { LEFT, WASTE_CHUTE_FIXTURES } from '@opentrons/shared-data'
 import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
@@ -42,6 +43,7 @@ export function AttachProbe(props: AttachProbeProps): JSX.Element {
     goBack,
     chainRunCommands,
     setErrorMessage,
+    setIsDoorOpenError,
     adapterId,
     isRobotMoving,
     attachedModule,
@@ -109,11 +111,16 @@ export function AttachProbe(props: AttachProbeProps): JSX.Element {
         proceed()
       })
       .catch((e: Error) => {
-        setErrorMessage(`error starting module calibration: ${e.message}`)
+        if (isMaintenanceDoorOpenError(e)) {
+          setIsDoorOpenError(true)
+          setErrorMessage(t('module_wizard_flows:door_is_open') as string)
+        } else {
+          setErrorMessage(`error starting module calibration: ${e.message}`)
+        }
       })
   }
 
-  if (isRobotMoving)
+  if (isRobotMoving) {
     return (
       <SimpleWizardInProgressBody
         // TODO ND: 9/6/23 use spinner until animations are made
@@ -121,52 +128,52 @@ export function AttachProbe(props: AttachProbeProps): JSX.Element {
         description={t('stand_back')}
       />
     )
+  }
   // TODO: add calibration loading screen and error screen
-  else
-    return (
-      <GenericWizardTile
-        header={i18n.format(t('attach_probe'), 'capitalize')}
-        rightHandBody={
-          <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
-            <AnimationVideo
-              css={css`
-                max-width: 100%;
-                max-height: 100%;
-              `}
-            >
-              <source src={pipetteAttachProbeVideoSource} />
-            </AnimationVideo>
-          </Flex>
-        }
-        bodyText={
-          <>
-            <LegacyStyledText css={BODY_STYLE}>
-              <Trans
-                t={t}
-                i18nKey="pipette_wizard_flows:install_probe"
-                values={{ location: probeLocation }}
-                components={{
-                  bold: <strong />,
-                }}
-              />
-            </LegacyStyledText>
+  return (
+    <GenericWizardTile
+      header={i18n.format(t('attach_probe'), 'capitalize')}
+      rightHandBody={
+        <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
+          <AnimationVideo
+            css={css`
+              max-width: 100%;
+              max-height: 100%;
+            `}
+          >
+            <source src={pipetteAttachProbeVideoSource} />
+          </AnimationVideo>
+        </Flex>
+      }
+      bodyText={
+        <>
+          <LegacyStyledText css={BODY_STYLE}>
+            <Trans
+              t={t}
+              i18nKey="pipette_wizard_flows:install_probe"
+              values={{ location: probeLocation }}
+              components={{
+                bold: <strong />,
+              }}
+            />
+          </LegacyStyledText>
 
-            {wasteChuteConflictWith96Channel && (
-              <Banner
-                type={isWasteChuteOnDeck ? 'error' : 'warning'}
-                size={isOnDevice ? '1.5rem' : '1rem'}
-                marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
-              >
-                {isWasteChuteOnDeck
-                  ? t('pipette_wizard_flows:waste_chute_error')
-                  : t('pipette_wizard_flows:waste_chute_warning')}
-              </Banner>
-            )}
-          </>
-        }
-        proceedButtonText={t('begin_calibration')}
-        proceed={handleBeginCalibration}
-        back={goBack}
-      />
-    )
+          {wasteChuteConflictWith96Channel && (
+            <Banner
+              type={isWasteChuteOnDeck ? 'error' : 'warning'}
+              size={isOnDevice ? '1.5rem' : '1rem'}
+              marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
+            >
+              {isWasteChuteOnDeck
+                ? t('pipette_wizard_flows:waste_chute_error')
+                : t('pipette_wizard_flows:waste_chute_warning')}
+            </Banner>
+          )}
+        </>
+      }
+      proceedButtonText={t('begin_calibration')}
+      proceed={handleBeginCalibration}
+      back={goBack}
+    />
+  )
 }

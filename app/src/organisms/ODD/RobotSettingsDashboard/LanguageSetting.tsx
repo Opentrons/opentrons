@@ -2,7 +2,7 @@ import { Fragment, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
-import uuidv1 from 'uuid/v4'
+import { v4 as uuidv4 } from 'uuid'
 
 import {
   BORDERS,
@@ -19,6 +19,7 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_LANGUAGE_UPDATED_ODD_SETTINGS } from '/app/redux/analytics'
 import { getAppLanguage, updateConfigValue } from '/app/redux/config'
+import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 
 import type { ChangeEvent } from 'react'
 import type { Dispatch } from '/app/redux/types'
@@ -45,7 +46,7 @@ interface LanguageSettingProps {
   setCurrentOption: SetSettingOption
 }
 
-const uuid: () => string = uuidv1
+const uuid: () => string = uuidv4
 
 export function LanguageSetting({
   setCurrentOption,
@@ -74,6 +75,15 @@ export function LanguageSetting({
     })
   }
 
+  const handleChangeAndLog = useHandleAndLog<ChangeEvent<HTMLInputElement>>(
+    handleChange,
+    'change_language',
+    event => ({
+      action: 'change language',
+      message: `user changed language to ${event.target.value}`,
+    })
+  )
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <ChildNavigation
@@ -95,7 +105,7 @@ export function LanguageSetting({
               type="radio"
               value={lng.value}
               checked={lng.value === appLanguage}
-              onChange={handleChange}
+              onChange={handleChangeAndLog}
             />
             <SettingButtonLabel
               htmlFor={lng.name}

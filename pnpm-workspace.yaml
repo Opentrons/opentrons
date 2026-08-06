@@ -1,0 +1,40 @@
+packages:
+  - 'app'
+  - 'app-shell'
+  - 'app-shell-odd'
+  - 'components'
+  - 'discovery-client'
+  - 'labware-designer'
+  - 'labware-library'
+  - 'opentrons-ai-client'
+  - 'protocol-designer'
+  - 'protocol-visualization'
+  - 'shared-data'
+  - 'step-generation'
+  - 'api-client'
+  - 'react-api-client'
+  - 'usb-bridge/node-client'
+  - 'js-package-testing'
+
+onlyBuiltDependencies:
+  - electron
+  - electron-winstaller
+  - esbuild
+  - '@serialport/bindings-cpp'
+  - usb
+  - '@sentry/cli'
+  - sharp
+
+minimumReleaseAge: 10080 # 1 week
+
+catalog:
+  lodash: 4.18.1
+  react-i18next: 14.0.0
+  react-router-dom: 6.24.1
+  '@types/lodash': 4.17.24
+
+catalogs:
+  react18:
+    react: 18.2.0
+    react-dom: 18.2.0
+    '@types/react-dom': 18.2.0

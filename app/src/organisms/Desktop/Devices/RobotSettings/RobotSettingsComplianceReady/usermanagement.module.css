@@ -1,0 +1,49 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.header_cell {
+  padding-bottom: var(--spacing-8);
+  color: var(--grey-60);
+  font-weight: normal;
+  text-align: left;
+}
+
+.body_cell {
+  padding: var(--spacing-12) 0;
+  border-top: 1px solid var(--grey-30);
+  vertical-align: top;
+}
+
+.body_cell_text {
+  color: var(--grey-60);
+}
+
+.overflow_cell {
+  padding: var(--spacing-12) 0;
+  border-top: 1px solid var(--grey-30);
+  vertical-align: top;
+}
+
+.overflow_cell_inner {
+  position: relative;
+  width: fit-content;
+  margin-left: auto;
+}
+
+.overflow_menu_container {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: var(--spacing-2);
+}
+
+.overflow_menu_container > * {
+  top: 0;
+  right: 0;
+}
+
+.add_user_button {
+  width: fit-content;
+}

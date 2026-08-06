@@ -2,7 +2,7 @@
 
 React components for Opentrons' applications. Visit the [Opentrons Components Library][components-library] to see available components.
 
-[components-library]: https://s3-us-west-2.amazonaws.com/opentrons-components/edge/index.html
+[components-library]: https://sandbox.components.opentrons.com/edge/
 
 ## example usage
 
@@ -18,7 +18,7 @@ export default function CowButton(props) {
 
 Usage requirements for dependent projects:
 
-- Node v22.12.0+ and yarn
+- Node v22.22.0+ and pnpm v10.32.1+
 - The following `dependencies` (peer dependencies of `@opentrons/components`)
   - `react`: `18.2.0`,
   - `react-router-dom`: `6.24.1`,
@@ -44,12 +44,12 @@ Unit tests live in a `__tests__` directory in the same directory as the module u
   - Make sure DOM attributes are mapped correctly
   - Make sure handlers fire correctly
 - Render tests
-  - Snapshot tests using [jest's snapshot functionality][jest-snapshots]
+  - Snapshot tests using [vitest's snapshot functionality][vitest-snapshots]
   - To regenerate snapshots after an intentional rendering change, run:
 
   ```shell
-  make test-js updateSnapshot=true
+  make test-js test_opts="-u"
   ```
 
-[jest-snapshots]: https://facebook.github.io/jest/docs/en/snapshot-testing.html
+[vitest-snapshots]: https://vitest.dev/guide/snapshot
 [contributing]: ../CONTRIBUTING.md

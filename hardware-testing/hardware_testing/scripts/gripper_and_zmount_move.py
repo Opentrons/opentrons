@@ -12,11 +12,8 @@ from opentrons_shared_data.errors.exceptions import (
     StallOrCollisionDetectedError,
     PythonException,
 )
-from hardware_testing.opentrons_api.types import (
-    OT3Mount,
-    Axis,
-    Point,
-)
+from opentrons.hardware_control.types import OT3Mount, Axis
+from opentrons.types import Point
 from hardware_testing.opentrons_api.helpers_ot3 import (
     build_async_ot3_hardware_api,
 )
@@ -116,8 +113,6 @@ async def _main(
     mount: OT3Mount, mount_name: str, simulate: bool, time_min: int, z_axis: Axis
 ) -> None:
 
-    domain_url = "https://opentrons.atlassian.net"
-
     # make directory for tests. check if directory exists, make if doesn't.
     BASE_DIRECTORY = "/userfs/data/testing_data/z_axis_test/"
     if not os.path.exists(BASE_DIRECTORY):
@@ -146,7 +141,7 @@ async def _main(
                     f"Please add json file with the testing team \
 jira credentials to: {storage_directory}."
                 )
-            ticket = jira_tool.JiraTicket(domain_url, api_token, email)
+            ticket = jira_tool.JiraTicket(api_token, email)
             issue_key = ticket.get_ticket()
             break
         elif y_or_no == "N" or y_or_no == "n":

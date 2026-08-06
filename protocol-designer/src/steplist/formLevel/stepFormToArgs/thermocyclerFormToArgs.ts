@@ -68,9 +68,10 @@ export const thermocyclerFormToArgs = (
     }
 
     case THERMOCYCLER_PROFILE: {
+      const profileItemsById = castFormData.profileItemsById
       const profileElements = _convertToProfileElements({
         orderedProfileItems: castFormData.orderedProfileItems,
-        profileItemsById: castFormData.profileItemsById,
+        profileItemsById,
       })
 
       const args = {
@@ -84,7 +85,7 @@ export const thermocyclerFormToArgs = (
 
         meta: {
           rawProfileItems: castFormData.orderedProfileItems.map(
-            (itemId: string | number) => castFormData.profileItemsById[itemId]
+            (itemId: string | number) => profileItemsById[itemId]
           ),
         },
         profileElements,

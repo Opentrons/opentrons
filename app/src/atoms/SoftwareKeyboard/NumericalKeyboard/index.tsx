@@ -1,6 +1,10 @@
 import { KeyboardReact as Keyboard } from 'react-simple-keyboard'
 
-import { numericalCustom, numericalKeyboardLayout } from '../constants'
+import {
+  numericalCustom,
+  numericalKeyboardLayout,
+  softwareKeyboardButtonAttributes,
+} from '../constants'
 
 import type { MutableRefObject } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
@@ -32,10 +36,6 @@ export function NumericalKeyboard({
   }`
 
   return (
-    /*
-     *  autoUseTouchEvents: for Flex on-device app
-     *  useButtonTag: this is for testing purpose that each key renders as a button
-     */
     <Keyboard
       keyboardRef={r => {
         keyboardRef.current = r
@@ -46,10 +46,12 @@ export function NumericalKeyboard({
       }}
       onChange={onChange}
       display={numericalCustom}
-      useButtonTag={true}
+      useButtonTag={false} // Exclude from the tab order.
+      buttonAttributes={softwareKeyboardButtonAttributes}
       layoutName={layoutName}
       layout={numericalKeyboardLayout}
       debug={debug} // If true, <ENTER> will input a \n
+      preventMouseDownDefault // Don't steal focus from inputs.
     />
   )
 }

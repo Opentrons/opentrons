@@ -372,7 +372,7 @@ class Well:
 
     @requires_version(2, 27)
     def has_tracked_liquid(self) -> bool:
-        """Get the current liquid volume in a well."""
+        """Return `True` if liquid has been loaded or probed in a well."""
         return self._core.has_tracked_liquid()
 
     @requires_version(2, 24)

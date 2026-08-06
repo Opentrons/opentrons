@@ -83,21 +83,22 @@ export const getSelectedWellsCommonValues = createSelector(
   labwareIngredSelectors.getSelectedLabwareId,
   labwareIngredSelectors.getLiquidsByLabwareId,
   (selectedWells, labwareId, allIngreds): CommonWellValues => {
-    if (!labwareId)
+    if (!labwareId) {
       return {
         ingredientId: null,
         volume: null,
       }
+    }
     const ingredsInLabware = allIngreds[labwareId]
-    if (!ingredsInLabware || isEmpty(selectedWells))
+    if (!ingredsInLabware || isEmpty(selectedWells)) {
       return {
         ingredientId: null,
         volume: null,
       }
+    }
     const initialWellContents:
-      | StepGeneration.LocationLiquidState
-      | null
-      | undefined = ingredsInLabware[Object.keys(selectedWells)[0]]
+      StepGeneration.LocationLiquidState | null | undefined =
+      ingredsInLabware[Object.keys(selectedWells)[0]]
     // TODO IMMEDIATELY why arbitrary 0th???
     const initialIngredId: string | null | undefined =
       initialWellContents && Object.keys(initialWellContents)[0]

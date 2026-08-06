@@ -4,19 +4,14 @@ name: 'JS API Clients test'
 
 on:
   pull_request:
-    paths:
+    paths: &paths
       - 'react-api-client/**'
       - 'api-client/**'
       - 'package.json'
       - '.github/workflows/react-api-client-test.yaml'
       - 'vitest.config.*'
   push:
-    paths:
-      - 'react-api-client/**'
-      - 'api-client/**'
-      - 'package.json'
-      - '.github/workflows/react-api-client-test.yaml'
-      - 'vitest.config.*'
+    paths: *paths
     branches:
       - '*'
   workflow_dispatch:
@@ -38,33 +33,31 @@ jobs:
     timeout-minutes: 30
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: 'actions/checkout@v4'
-      - uses: 'actions/setup-node@v6'
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: '22.22.0'
+      - uses: 'pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320' # v4.4.0
+        with:
+          version: 10.32.1
       - name: 'install libudev for usb-detection'
         run: |
           # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
-        uses: actions/cache@v4
+      - name: 'cache pnpm cache'
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
-            ${{ github.workspace }}/.yarn-cache
+            ${{ github.workspace }}/.pnpm-cache
             ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
-      - name: 'setup-js'
+            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-
+      - name: 'setup-js-ci'
         run: |
           npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
-          make setup-js
+          pnpm config set cache ./.pnpm-cache
+          make setup-js-ci
       - name: 'run api-client and react-api-client unit tests'
         run: make -C api-client test-cov
-      - name: 'Upload coverage report'
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage/lcov.info
-          flags: react-api-client

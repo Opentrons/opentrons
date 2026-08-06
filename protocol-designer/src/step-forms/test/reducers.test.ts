@@ -90,7 +90,7 @@ describe('orderedStepIds reducer', () => {
           id: '123',
           stepType: 'moveLiquid',
         },
-        thermocyclerPauseStepId: 'thermocyclerPauseStepId',
+        concurrentGroupPauseStepId: 'concurrentGroupPauseStepId',
       },
     }
     expect(orderedStepIds(state as RootState, action)).toEqual(['99', '123'])
@@ -120,7 +120,7 @@ describe('orderedStepIds reducer', () => {
           id: '123',
           stepType: 'moveLiquid',
         },
-        thermocyclerPauseStepId: 'thermocyclerPauseStepId',
+        concurrentGroupPauseStepId: 'concurrentGroupPauseStepId',
       },
     }
     expect(orderedStepIds(state as RootState, action)).toBe(
@@ -146,7 +146,7 @@ describe('orderedStepIds reducer', () => {
           thermocyclerFormType: 'thermocyclerProfile',
           moduleId: 'thermocyclerModuleId',
         },
-        thermocyclerPauseStepId: 'id-3',
+        concurrentGroupPauseStepId: 'id-3',
       },
     }
     const expectedOrder = ['id-1', 'id-2', 'id-3']
@@ -182,7 +182,7 @@ describe('orderedStepIds reducer', () => {
           thermocyclerFormType: 'thermocyclerProfile',
           moduleId: 'thermocyclerModuleId',
         },
-        thermocyclerPauseStepId: 'pause-for-2',
+        concurrentGroupPauseStepId: 'pause-for-2',
       },
     }
 
@@ -241,7 +241,7 @@ describe('orderedStepIds reducer', () => {
           thermocyclerFormType: 'thermocyclerProfile',
           moduleId: 'thermocyclerModuleId',
         },
-        thermocyclerPauseStepId: 'pause-for-4',
+        concurrentGroupPauseStepId: 'pause-for-4',
       },
     }
 
@@ -287,7 +287,7 @@ describe('orderedStepIds reducer', () => {
           thermocyclerFormType: 'thermocyclerState',
           moduleId: 'thermocyclerModuleId',
         },
-        thermocyclerPauseStepId: 'unused-thermocycler-pause-step-id',
+        concurrentGroupPauseStepId: 'unused-thermocycler-pause-step-id',
       },
     }
 
@@ -1094,16 +1094,18 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         it(testName, () => {
           const result = savedStepForms(prevRootStateWithMagAndTCSteps, action)
           // @ts-expect-error(sa, 2021-6-14): null check
-          if (action.payload.type)
+          if (action.payload.type) {
             expect(result.mag_step_form_id.moduleId).toBe(expectedModuleId)
+          }
         })
       })
       TCStepCases.forEach(({ testName, action, expectedModuleId }) => {
         it(testName, () => {
           const result = savedStepForms(prevRootStateWithMagAndTCSteps, action)
           // @ts-expect-error(sa, 2021-6-14): null check
-          if (action.payload.type)
+          if (action.payload.type) {
             expect(result.TC_step_form_id.moduleId).toBe(expectedModuleId)
+          }
         })
       })
     })
@@ -1454,7 +1456,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         type: 'SAVE_STEP_FORM',
         payload: {
           form: tcProfileForm,
-          thermocyclerPauseStepId: pauseStepFormId,
+          concurrentGroupPauseStepId: pauseStepFormId,
         },
       }
 
@@ -1513,7 +1515,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         type: 'SAVE_STEP_FORM',
         payload: {
           form: form2ThermocyclerProfile,
-          thermocyclerPauseStepId: pauseFormId,
+          concurrentGroupPauseStepId: pauseFormId,
         },
       }
 
@@ -1572,7 +1574,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         type: 'SAVE_STEP_FORM',
         payload: {
           form: form2ThermocyclerState,
-          thermocyclerPauseStepId: 'unused-thermocycler-pause-step-id',
+          concurrentGroupPauseStepId: 'unused-thermocycler-pause-step-id',
         },
       }
 

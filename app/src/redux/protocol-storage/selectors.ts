@@ -7,8 +7,8 @@ import type { GroupedCommands, StoredProtocolData } from './types'
 
 export const getStoredProtocols: (state: State) => StoredProtocolData[] =
   createSelector(
-    state => state.protocolStorage.protocolKeys,
-    state => state.protocolStorage.filesByProtocolKey,
+    (state: State) => state.protocolStorage.protocolKeys,
+    (state: State) => state.protocolStorage.filesByProtocolKey,
     (protocolKeys, filesByProtocolKey) =>
       protocolKeys
         .map(protocolKey => filesByProtocolKey[protocolKey])

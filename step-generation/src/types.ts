@@ -1,5 +1,7 @@
 import type {
   ABSORBANCE_READER_TYPE,
+  AddressableArea,
+  CommonArgs,
   CreateCommand,
   FLEX_STACKER_MODULE_TYPE,
   FlexStackerStoredLabwareGroup,
@@ -8,12 +10,14 @@ import type {
   LabwareDefinition2,
   LabwareLocation,
   LabwareMovementStrategy,
+  LoadedLabwareLocation,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
   ModuleModel,
   ModuleType,
   PipetteMount as Mount,
   NozzleConfigurationStyle,
+  OpentronsAIArgs,
   PipetteName,
   PipetteV2Specs,
   PositionReference,
@@ -24,6 +28,7 @@ import type {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   VACUUM_MODULE_TYPE,
+  VacuumRunProfileParams,
   Width,
 } from '@opentrons/shared-data'
 import type {
@@ -51,6 +56,10 @@ export const TOUCHED_PIPETTABLE_LABWARE: 'TOUCHED_PIPETTABLE_LABWARE' =
 export interface LabwareTemporalProperties {
   // a stack of ids from top to bottom
   stack: string[]
+  // The single entity this labware is stacked on (labware, module, slot, hopper, etc.).
+  stackedOnNode?: LoadedLabwareLocation
+  // The single labware ID this labware contains when that applies.
+  contains?: string
   // we currently use this property only to track if a lid has been placed on a "pipettable" labware that could presumably contain liquid
   // we can expand this type in the future to track other types of sterility for various labware types
   sterility?: typeof TOUCHED_PIPETTABLE_LABWARE
@@ -92,6 +101,12 @@ export interface TemperatureModuleState {
   targetTemperature: number | null
 }
 
+export interface Point {
+  x: number
+  y: number
+  z?: number
+}
+
 export interface ThermocyclerModuleState {
   type: typeof THERMOCYCLER_MODULE_TYPE
 
@@ -99,9 +114,7 @@ export interface ThermocyclerModuleState {
 
   /** What the thermal block is currently doing. */
   currentBlockActivity:
-    | ProfileBlockActivity
-    | TargetTempBlockActivity
-    | DeactivatedBlockActivity
+    ProfileBlockActivity | TargetTempBlockActivity | DeactivatedBlockActivity
 
   /** If false, closed. If null, unknown. */
   lidOpen: boolean | null
@@ -126,6 +139,43 @@ export interface ProfileBlockActivity {
    * and step-generation only has access to the startRunExtendedProfile params.
    */
   taskId: string | null
+}
+
+export interface VacuumPumpProfileActivity {
+  type: 'profile'
+  profileElements: VacuumRunProfileParams['steps']
+  taskId: string
+  ventAfter: boolean
+}
+
+interface BaseVacuumPumpTimedHold {
+  type: 'timedHold'
+  durationSeconds: number
+  taskId: string
+  ventAfter: boolean
+}
+interface VacuumPumpPressureTimedHold extends BaseVacuumPumpTimedHold {
+  mode: typeof VACUUM_MODE_PRESSURE
+  targetPressure: number
+}
+interface VacuumPumpPowerTimedHold extends BaseVacuumPumpTimedHold {
+  mode: typeof VACUUM_MODE_POWER
+  targetPower: number
+}
+interface VacuumPumpPressureIndefiniteHold {
+  type: 'indefiniteHold'
+  mode: typeof VACUUM_MODE_PRESSURE
+  targetPressure: number
+}
+
+interface VacuumPumpPowerIndefiniteHold {
+  type: 'indefiniteHold'
+  mode: typeof VACUUM_MODE_POWER
+  targetPower: number
+}
+
+export interface VacuumPumpDeactivatedActivity {
+  type: 'pumpDeactivated'
 }
 
 /** The thermal block is targeting a constant temperature, outside of a profile. */
@@ -173,23 +223,21 @@ export interface FlexStackerModuleState {
   fillCount?: number
 }
 
-interface VacuumModulePressureState {
-  modeType: typeof VACUUM_MODE_PRESSURE
-  currentPressure: number | null
-  targetPressure: number | null
-}
-
-interface VacuumModulePowerState {
-  modeType: typeof VACUUM_MODE_POWER
-  currentPower: number | null
-  targetPower: number | null
-}
-
 export type VentStatus = typeof VACUUM_VENT_OPEN | typeof VACUUM_VENT_CLOSED
+
+export type VacuumPumpActivity =
+  | VacuumPumpProfileActivity
+  | VacuumPumpDeactivatedActivity
+  | VacuumPumpPressureTimedHold
+  | VacuumPumpPowerTimedHold
+  | VacuumPumpPressureIndefiniteHold
+  | VacuumPumpPowerIndefiniteHold
 export interface VacuumModuleState {
   type: typeof VACUUM_MODULE_TYPE
-  vacuumState: VacuumModulePressureState | VacuumModulePowerState | null
   ventStatus: VentStatus | null
+  // timed holds and profiles have a task ID, so this is handy as a unique identifier
+  numPumpActivitiesStarted: number
+  currentPumpActivity: VacuumPumpActivity
 }
 
 export type ModuleState =
@@ -255,10 +303,7 @@ export interface Ingredients {
 }
 
 export type AdditionalEquipmentName =
-  | 'gripper'
-  | 'wasteChute'
-  | 'stagingArea'
-  | 'trashBin'
+  'gripper' | 'wasteChute' | 'stagingArea' | 'trashBin'
 
 export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
@@ -337,11 +382,7 @@ export interface PipetteEntities {
 
 // ===== MIX-IN TYPES =====
 export type ChangeTipOptions =
-  | 'always'
-  | 'once'
-  | 'never'
-  | 'perDest'
-  | 'perSource'
+  'always' | 'once' | 'never' | 'perDest' | 'perSource'
 
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
 
@@ -352,19 +393,6 @@ export interface InnerMixArgs {
 
 export interface InnerDelayArgs {
   seconds: number
-}
-
-interface CommonArgs {
-  /** NOTE: stepNumber probably shouldn't be optional but making it optional
-   * for the sake of not having to make too many changes for PD 8.5.2
-   * this should be refactored to not be optional for PD 8.6.0
-   * making it optional saves a lot of changes in unit tests
-   */
-  stepNumber?: number
-  /** Optional user-readable name for this step */
-  name?: string | null
-  /** Optional user-readable description/notes for this step */
-  description?: string | null
 }
 
 // ===== Processed form types. Used as args to call command creator fns =====
@@ -586,8 +614,10 @@ export interface WaitForModuleTaskArgs extends CommonArgs {
 
   /** This step will wait for this to happen before moving on. */
   // Note: Leaving room for this to become a union with stuff like 'temperatureModuleReachedTarget'.
-  waitCondition: 'thermocyclerProfileComplete'
-
+  waitCondition:
+    | 'thermocyclerProfileComplete'
+    | 'vacuumProfileComplete'
+    | 'vacuumStateComplete'
   moduleId: string
 }
 
@@ -652,6 +682,21 @@ interface ProfileCycleItem {
   id: string
   steps: ProfileStepItem[]
   repetitions: string
+}
+
+interface VacuumProfileStepItem {
+  type: typeof PROFILE_STEP
+  id: string
+  durationSeconds: number
+  pumpData: VacuumPumpData
+  ventAfter: boolean
+}
+
+interface VacuumProfileCycleItem {
+  type: typeof PROFILE_CYCLE
+  id: string
+  steps: VacuumProfileStepItem[]
+  repetitions: number
 }
 
 // TODO IMMEDIATELY: ProfileStepItem -> ProfileStep, ProfileCycleItem -> ProfileCycle
@@ -758,6 +803,104 @@ export interface FlexStackerRetrieveArgs extends CommonArgs {
   commandCreatorFnName: 'flexStackerRetrieve'
 }
 
+export interface VacuumPumpAdvancedArgs {
+  duration?: number
+  ventAfter?: boolean
+}
+
+export interface VacuumPumpPressureArgs
+  extends CommonArgs, VacuumPumpAdvancedArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumSetPumpPressure'
+  gaugePressure: number
+}
+
+export interface VacuumPumpPowerArgs
+  extends CommonArgs, VacuumPumpAdvancedArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumSetPumpPower'
+  percentPower: number
+}
+
+export interface VacuumCloseVentSetPumpPressureArgs
+  extends CommonArgs, VacuumPumpAdvancedArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumCloseVentSetPumpPressure'
+  gaugePressure: number
+}
+
+export interface VacuumCloseVentSetPumpPowerArgs
+  extends CommonArgs, VacuumPumpAdvancedArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumCloseVentSetPumpPower'
+  percentPower: number
+}
+
+export interface VacuumOpenVentArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumOpenVent'
+}
+
+export interface VacuumCloseVentArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumCloseVent'
+}
+
+export interface VacuumStopPumpArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumStopPump'
+}
+
+export interface VacuumPressureData {
+  mode: typeof VACUUM_MODE_PRESSURE
+  pressureMbar: string | null
+}
+
+export interface VacuumPowerData {
+  mode: typeof VACUUM_MODE_POWER
+  percentPower: number
+}
+
+type VacuumPumpData = VacuumPressureData | VacuumPowerData
+interface ProfileStepItemBase {
+  type: typeof PROFILE_STEP
+  id: string
+  title: string
+}
+export interface VacuumProfileStep extends ProfileStepItemBase {
+  durationSeconds: number
+  pumpData: VacuumPumpData
+}
+
+export type VacuumProfileItem = VacuumProfileStepItem | VacuumProfileCycleItem
+
+export type VacuumPumpArgs =
+  | VacuumPumpPressureArgs
+  | VacuumPumpPowerArgs
+  | VacuumCloseVentSetPumpPowerArgs
+  | VacuumCloseVentSetPumpPressureArgs
+  | VacuumCloseVentStartProfileArgs
+export interface VacuumStartRunProfileArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumStartRunProfile'
+  profile: VacuumRunProfileParams['steps']
+  ventAfter: boolean
+}
+
+export interface VacuumCloseVentStartProfileArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'vacuumCloseVentStartProfile'
+  profile: VacuumRunProfileParams['steps']
+  ventAfter: boolean
+}
+
+export type VacuumArgs =
+  | VacuumPumpArgs
+  | VacuumStartRunProfileArgs
+  | VacuumOpenVentArgs
+  | VacuumCloseVentArgs
+  | VacuumStopPumpArgs
+
 export type FlexStackerArgs =
   | FlexStackerEmptyArgs
   | FlexStackerFillItemsArgs
@@ -786,6 +929,8 @@ export type CommandCreatorArgs =
   | MoveLabwareArgs
   | CommentArgs
   | FlexStackerArgs
+  | VacuumArgs
+  | OpentronsAIArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }
@@ -891,18 +1036,22 @@ export type ErrorType =
   | 'INCOMPLETE_PICKUP'
   | 'INSUFFICIENT_TIPS'
   | 'INVALID_SLOT'
+  | 'INVALID_WAIT_CONDITION'
   | 'LABWARE_DISCARDED_IN_TRASH'
   | 'LABWARE_DOES_NOT_EXIST'
   | 'LABWARE_OFF_DECK'
   | 'LABWARE_ON_ANOTHER_ENTITY'
   | 'LABWARE_ON_HOPPER'
+  | 'LIVE_TASK_ERROR'
   | 'MISMATCHED_SOURCE_DEST_WELLS'
   | 'MISMATCHED_STACKER_LABWARE_TYPE'
   | 'MISSING_96_CHANNEL_TIPRACK_ADAPTER'
   | 'MISSING_MODULE'
   | 'MISSING_PROFILE_STEP'
+  | 'MISSING_PUMP_ACTIVITY'
   | 'MISSING_STACKER_LABWARE_TYPE'
   | 'MISSING_TEMPERATURE_STEP'
+  | 'MOVE_LOCATION_NOT_SPECIFIED'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
   | 'MULTI_ASPIRATE_VOLUME_TOO_HIGH'
   | 'MULTI_DISPENSE_VOLUME_TOO_HIGH'
@@ -913,7 +1062,9 @@ export type ErrorType =
   | 'PIPETTE_HAS_TIP'
   | 'PIPETTE_VOLUME_EXCEEDED'
   | 'PIPETTING_INTO_COLUMN_4'
-  | 'POSSIBLE_PIPETTE_COLLISION'
+  | 'POSSIBLE_PIPETTE_COLLISION_THERMOCYCLER_LID'
+  | 'POSSIBLE_PIPETTE_COLLISION_OUTSIDE_DECK_EXTENTS'
+  | 'POSSIBLE_PIPETTE_COLLISION_ADJACENT_ADDRESSABLE_AREA'
   | 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER'
   | 'RETRACT_BELOW_ASPIRATE'
   | 'RETRACT_BELOW_DISPENSE'
@@ -929,10 +1080,12 @@ export type ErrorType =
   | 'TIP_VOLUME_EXCEEDED'
   | 'TIPRACK_LID_NOT_ALLOWED_ON_DECK'
   | 'TOO_MANY_TIPS'
+  | 'VACUUM_UNDER_PRESSURE'
 
 export interface CommandCreatorError {
   message: string
   type: ErrorType
+  translationParams?: Record<string, string>
 }
 
 export type WarningType =
@@ -973,8 +1126,7 @@ export interface CommandsAndWarnings extends StepInfo {
   python?: string
 }
 export type CommandCreatorResult =
-  | CommandsAndWarnings
-  | CommandCreatorErrorResponse
+  CommandsAndWarnings | CommandCreatorErrorResponse
 export type CommandCreator<Args> = (
   args: Args,
   invariantContext: InvariantContext,
@@ -1009,3 +1161,18 @@ export interface WellContentsByNumber {
 }
 
 export type TipTrackingOption = typeof AUTOMATIC | typeof MANUAL
+
+export type UnsafePipetteMovementReason =
+  | {
+      type: 'thermocyclerLidCollision'
+    }
+  | {
+      type: 'outsidePipetteExtents'
+    }
+  | {
+      type: 'adjacentAdressableAreaCollision'
+      addressableAreaCausingCollision: AddressableArea
+    }
+
+export type PipetteMovementSafetyStatus =
+  { isSafe: true } | { isSafe: false; reason: UnsafePipetteMovementReason }

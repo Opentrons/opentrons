@@ -1,7 +1,7 @@
 """Tests for SQL tables."""
 
+import re
 from pathlib import Path
-from typing import List, cast
 
 import pytest
 import sqlalchemy
@@ -28,6 +28,9 @@ from robot_server.persistence.tables import (
     schema_13,
     schema_14,
     schema_15,
+    schema_16,
+    schema_18,
+    schema_19,
 )
 
 # The statements that we expect to emit when we create a fresh database.
@@ -42,7 +45,762 @@ from robot_server.persistence.tables import (
 #   * Adding, removing, or renaming a constraint or relation.
 #
 # Whitespace and formatting changes, on the other hand, are allowed.
-EXPECTED_STATEMENTS_LATEST = [
+
+EXPECTED_STATEMENTS_LATEST = EXPECTED_STATEMENTS_V19 = [
+    """
+    CREATE TABLE protocol (
+        id VARCHAR NOT NULL,
+        created_at DATETIME NOT NULL,
+        protocol_key VARCHAR,
+        protocol_kind VARCHAR(14) NOT NULL,
+        PRIMARY KEY (id),
+        CONSTRAINT protocolkindsqlenum CHECK (protocol_kind IN ('standard', 'quick-transfer'))
+    )
+    """,
+    """
+    CREATE TABLE analysis (
+        id VARCHAR NOT NULL,
+        protocol_id VARCHAR NOT NULL,
+        analyzer_version VARCHAR NOT NULL,
+        completed_analysis VARCHAR NOT NULL,
+        PRIMARY KEY (id),
+        FOREIGN KEY(protocol_id) REFERENCES protocol (id)
+    )
+    """,
+    """
+    CREATE TABLE analysis_primitive_rtp_table (
+        row_id INTEGER NOT NULL,
+        analysis_id VARCHAR NOT NULL,
+        parameter_variable_name VARCHAR NOT NULL,
+        parameter_type VARCHAR(5) NOT NULL,
+        parameter_value VARCHAR NOT NULL,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(analysis_id) REFERENCES analysis (id),
+        CONSTRAINT primitiveparamsqlenum CHECK (parameter_type IN ('int', 'float', 'bool', 'str'))
+    )
+    """,
+    """
+    CREATE TABLE analysis_csv_rtp_table (
+        row_id INTEGER NOT NULL,
+        analysis_id VARCHAR NOT NULL,
+        parameter_variable_name VARCHAR NOT NULL,
+        file_id VARCHAR,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(analysis_id) REFERENCES analysis (id),
+        FOREIGN KEY(file_id) REFERENCES data_files (id)
+    )
+    """,
+    """
+    CREATE INDEX ix_analysis_protocol_id ON analysis (protocol_id)
+    """,
+    """
+    CREATE TABLE run (
+        id VARCHAR NOT NULL,
+        created_at DATETIME NOT NULL,
+        protocol_id VARCHAR,
+        state_summary VARCHAR,
+        engine_status VARCHAR,
+        _updated_at DATETIME,
+        run_time_parameters VARCHAR,
+        input_file_ids VARCHAR,
+        output_file_ids VARCHAR,
+        signed_by VARCHAR,
+        log_period_id VARCHAR,
+        PRIMARY KEY (id),
+        FOREIGN KEY(protocol_id) REFERENCES protocol (id)
+    )
+    """,
+    """
+    CREATE TABLE action (
+        id VARCHAR NOT NULL,
+        created_at DATETIME NOT NULL,
+        action_type VARCHAR NOT NULL,
+        run_id VARCHAR NOT NULL,
+        PRIMARY KEY (id),
+        FOREIGN KEY(run_id) REFERENCES run (id)
+    )
+    """,
+    """
+    CREATE TABLE run_command (
+        row_id INTEGER NOT NULL,
+        run_id VARCHAR NOT NULL,
+        index_in_run INTEGER NOT NULL,
+        command_id VARCHAR NOT NULL,
+        command VARCHAR NOT NULL,
+        command_intent VARCHAR,
+        command_error VARCHAR,
+        command_status VARCHAR(9),
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(run_id) REFERENCES run (id)
+    )
+    """,
+    """
+    CREATE UNIQUE INDEX ix_run_run_id_command_id ON run_command (run_id, command_id)
+    """,
+    """
+    CREATE UNIQUE INDEX ix_run_run_id_index_in_run ON run_command (run_id, index_in_run)
+    """,
+    """
+    CREATE UNIQUE INDEX ix_run_run_id_command_status_index_in_run ON run_command (run_id, command_status, index_in_run)
+    """,
+    """
+    CREATE INDEX ix_protocol_protocol_kind ON protocol (protocol_kind)
+    """,
+    """
+    CREATE TABLE command_annotation (
+        row_id INTEGER NOT NULL,
+        run_id VARCHAR NOT NULL,
+        annotation_id VARCHAR NOT NULL,
+        name VARCHAR NOT NULL,
+        description VARCHAR,
+        source VARCHAR(13) NOT NULL,
+        parent_id VARCHAR,
+        params VARCHAR,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(run_id, parent_id) REFERENCES command_annotation (run_id, annotation_id) ON DELETE CASCADE,
+        FOREIGN KEY(run_id) REFERENCES run (id),
+        CONSTRAINT annotationsourcesqlenum CHECK (source IN ('userCommand', 'systemCommand'))
+    )
+    """,
+    """
+    CREATE UNIQUE INDEX ix_run_id_annotation_id ON command_annotation (run_id, annotation_id)
+    """,
+    """
+    CREATE TABLE command_to_annotation (
+        row_id INTEGER NOT NULL,
+        run_id VARCHAR NOT NULL,
+        command_id VARCHAR NOT NULL,
+        annotation_id VARCHAR NOT NULL,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(run_id, command_id) REFERENCES run_command (run_id, command_id),
+        FOREIGN KEY(run_id, annotation_id) REFERENCES command_annotation (run_id, annotation_id)
+    )
+    """,
+    """
+    CREATE UNIQUE INDEX ix_c2a_run_id_command_id_annotation_id ON command_to_annotation (run_id, command_id, annotation_id)
+    """,
+    """
+    CREATE TABLE data_files (
+        id VARCHAR NOT NULL,
+        name VARCHAR NOT NULL,
+        path VARCHAR NOT NULL,
+        stored BOOLEAN NOT NULL,
+        generated BOOLEAN NOT NULL,
+        mime_type VARCHAR NOT NULL,
+        file_hash VARCHAR NOT NULL,
+        created_at DATETIME NOT NULL,
+        PRIMARY KEY (id)
+    )
+    """,
+    """
+    CREATE INDEX ix_data_files_generated ON data_files (generated)
+    """,
+    """
+    CREATE INDEX ix_data_files_mime_type ON data_files (mime_type)
+    """,
+    """
+    CREATE TABLE input_data_files (
+        file_id VARCHAR NOT NULL,
+        run_id VARCHAR NOT NULL,
+        PRIMARY KEY (file_id, run_id),
+        FOREIGN KEY(file_id) REFERENCES data_files (id),
+        FOREIGN KEY(run_id) REFERENCES run (id)
+    )
+    """,
+    """
+    CREATE INDEX ix_input_data_files_file_id ON input_data_files (file_id)
+    """,
+    """
+    CREATE INDEX ix_input_data_files_run_id ON input_data_files (run_id)
+    """,
+    """
+    CREATE TABLE output_data_files (
+        run_id VARCHAR NOT NULL,
+        command_id VARCHAR NOT NULL,
+        prev_command_id VARCHAR NOT NULL,
+        file_id VARCHAR NOT NULL,
+        PRIMARY KEY (file_id, run_id),
+        FOREIGN KEY(run_id) REFERENCES run (id),
+        FOREIGN KEY(file_id) REFERENCES data_files (id)
+    )
+    """,
+    """
+    CREATE INDEX ix_output_data_files_run_id ON output_data_files (run_id)
+    """,
+    """
+    CREATE INDEX ix_output_data_files_file_id ON output_data_files (file_id)
+    """,
+    """
+    CREATE TABLE run_csv_rtp_table (
+        row_id INTEGER NOT NULL,
+        run_id VARCHAR NOT NULL,
+        parameter_variable_name VARCHAR NOT NULL,
+        file_id VARCHAR,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(run_id) REFERENCES run (id),
+        FOREIGN KEY(file_id) REFERENCES data_files (id)
+    )
+    """,
+    """
+    CREATE TABLE boolean_setting_extended (
+        "key" VARCHAR(200) NOT NULL,
+        value BOOLEAN NOT NULL,
+        PRIMARY KEY ("key")
+    )
+    """,
+    """
+    CREATE TABLE camera_capture_image_settings (
+        camera_id VARCHAR NOT NULL,
+        resolution_x INTEGER,
+        resolution_y INTEGER,
+        zoom FLOAT,
+        pan_x INTEGER,
+        pan_y INTEGER,
+        contrast FLOAT,
+        brightness FLOAT,
+        saturation FLOAT,
+        PRIMARY KEY (camera_id)
+    )
+    """,
+    """
+    CREATE TABLE labware_offset_with_sequence (
+        row_id INTEGER NOT NULL,
+        offset_id VARCHAR NOT NULL,
+        definition_uri VARCHAR NOT NULL,
+        vector_x FLOAT NOT NULL,
+        vector_y FLOAT NOT NULL,
+        vector_z FLOAT NOT NULL,
+        active BOOLEAN NOT NULL,
+        created_at DATETIME NOT NULL,
+        PRIMARY KEY (row_id)
+    )
+    """,
+    """
+    CREATE UNIQUE INDEX ix__labware_offset_with_sequence__active__row_id ON labware_offset_with_sequence (active, row_id)
+    """,
+    """
+    CREATE UNIQUE INDEX ix_labware_offset_with_sequence_offset_id ON labware_offset_with_sequence (offset_id)
+    """,
+    """
+    CREATE TABLE labware_offset_sequence_components (
+       row_id INTEGER NOT NULL,
+       offset_id INTEGER NOT NULL,
+       sequence_ordinal INTEGER NOT NULL,
+       component_kind VARCHAR NOT NULL,
+       primary_component_value VARCHAR NOT NULL,
+       component_value_json VARCHAR NOT NULL,
+       PRIMARY KEY (row_id),
+       FOREIGN KEY(offset_id) REFERENCES labware_offset_with_sequence (row_id)
+    )
+    """,
+    """
+    CREATE INDEX ix_labware_offset_sequence_components_offset_id ON labware_offset_sequence_components (offset_id)
+    """,
+]
+
+EXPECTED_STATEMENTS_V18 = [
+    """
+    CREATE TABLE protocol (
+        id VARCHAR NOT NULL,
+        created_at DATETIME NOT NULL,
+        protocol_key VARCHAR,
+        protocol_kind VARCHAR(14) NOT NULL,
+        PRIMARY KEY (id),
+        CONSTRAINT protocolkindsqlenum CHECK (protocol_kind IN ('standard', 'quick-transfer'))
+    )
+    """,
+    """
+    CREATE TABLE analysis (
+        id VARCHAR NOT NULL,
+        protocol_id VARCHAR NOT NULL,
+        analyzer_version VARCHAR NOT NULL,
+        completed_analysis VARCHAR NOT NULL,
+        PRIMARY KEY (id),
+        FOREIGN KEY(protocol_id) REFERENCES protocol (id)
+    )
+    """,
+    """
+    CREATE TABLE analysis_primitive_rtp_table (
+        row_id INTEGER NOT NULL,
+        analysis_id VARCHAR NOT NULL,
+        parameter_variable_name VARCHAR NOT NULL,
+        parameter_type VARCHAR(5) NOT NULL,
+        parameter_value VARCHAR NOT NULL,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(analysis_id) REFERENCES analysis (id),
+        CONSTRAINT primitiveparamsqlenum CHECK (parameter_type IN ('int', 'float', 'bool', 'str'))
+    )
+    """,
+    """
+    CREATE TABLE analysis_csv_rtp_table (
+        row_id INTEGER NOT NULL,
+        analysis_id VARCHAR NOT NULL,
+        parameter_variable_name VARCHAR NOT NULL,
+        file_id VARCHAR,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(analysis_id) REFERENCES analysis (id),
+        FOREIGN KEY(file_id) REFERENCES data_files (id)
+    )
+    """,
+    """
+    CREATE INDEX ix_analysis_protocol_id ON analysis (protocol_id)
+    """,
+    """
+    CREATE TABLE run (
+        id VARCHAR NOT NULL,
+        created_at DATETIME NOT NULL,
+        protocol_id VARCHAR,
+        state_summary VARCHAR,
+        engine_status VARCHAR,
+        _updated_at DATETIME,
+        run_time_parameters VARCHAR,
+        input_file_ids VARCHAR,
+        output_file_ids VARCHAR,
+        signed_by VARCHAR,
+        PRIMARY KEY (id),
+        FOREIGN KEY(protocol_id) REFERENCES protocol (id)
+    )
+    """,
+    """
+    CREATE TABLE action (
+        id VARCHAR NOT NULL,
+        created_at DATETIME NOT NULL,
+        action_type VARCHAR NOT NULL,
+        run_id VARCHAR NOT NULL,
+        PRIMARY KEY (id),
+        FOREIGN KEY(run_id) REFERENCES run (id)
+    )
+    """,
+    """
+    CREATE TABLE run_command (
+        row_id INTEGER NOT NULL,
+        run_id VARCHAR NOT NULL,
+        index_in_run INTEGER NOT NULL,
+        command_id VARCHAR NOT NULL,
+        command VARCHAR NOT NULL,
+        command_intent VARCHAR,
+        command_error VARCHAR,
+        command_status VARCHAR(9),
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(run_id) REFERENCES run (id)
+    )
+    """,
+    """
+    CREATE UNIQUE INDEX ix_run_run_id_command_id ON run_command (run_id, command_id)
+    """,
+    """
+    CREATE UNIQUE INDEX ix_run_run_id_index_in_run ON run_command (run_id, index_in_run)
+    """,
+    """
+    CREATE UNIQUE INDEX ix_run_run_id_command_status_index_in_run ON run_command (run_id, command_status, index_in_run)
+    """,
+    """
+    CREATE INDEX ix_protocol_protocol_kind ON protocol (protocol_kind)
+    """,
+    """
+    CREATE TABLE command_annotation (
+        row_id INTEGER NOT NULL,
+        run_id VARCHAR NOT NULL,
+        annotation_id VARCHAR NOT NULL,
+        name VARCHAR NOT NULL,
+        description VARCHAR,
+        source VARCHAR(13) NOT NULL,
+        parent_id VARCHAR,
+        params VARCHAR,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(run_id, parent_id) REFERENCES command_annotation (run_id, annotation_id) ON DELETE CASCADE,
+        FOREIGN KEY(run_id) REFERENCES run (id),
+        CONSTRAINT annotationsourcesqlenum CHECK (source IN ('userCommand', 'systemCommand'))
+    )
+    """,
+    """
+    CREATE UNIQUE INDEX ix_run_id_annotation_id ON command_annotation (run_id, annotation_id)
+    """,
+    """
+    CREATE TABLE command_to_annotation (
+        row_id INTEGER NOT NULL,
+        run_id VARCHAR NOT NULL,
+        command_id VARCHAR NOT NULL,
+        annotation_id VARCHAR NOT NULL,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(run_id, command_id) REFERENCES run_command (run_id, command_id),
+        FOREIGN KEY(run_id, annotation_id) REFERENCES command_annotation (run_id, annotation_id)
+    )
+    """,
+    """
+    CREATE UNIQUE INDEX ix_c2a_run_id_command_id_annotation_id ON command_to_annotation (run_id, command_id, annotation_id)
+    """,
+    """
+    CREATE TABLE data_files (
+        id VARCHAR NOT NULL,
+        name VARCHAR NOT NULL,
+        path VARCHAR NOT NULL,
+        stored BOOLEAN NOT NULL,
+        generated BOOLEAN NOT NULL,
+        mime_type VARCHAR NOT NULL,
+        file_hash VARCHAR NOT NULL,
+        created_at DATETIME NOT NULL,
+        PRIMARY KEY (id)
+    )
+    """,
+    """
+    CREATE INDEX ix_data_files_generated ON data_files (generated)
+    """,
+    """
+    CREATE INDEX ix_data_files_mime_type ON data_files (mime_type)
+    """,
+    """
+    CREATE TABLE input_data_files (
+        file_id VARCHAR NOT NULL,
+        run_id VARCHAR NOT NULL,
+        PRIMARY KEY (file_id, run_id),
+        FOREIGN KEY(file_id) REFERENCES data_files (id),
+        FOREIGN KEY(run_id) REFERENCES run (id)
+    )
+    """,
+    """
+    CREATE INDEX ix_input_data_files_file_id ON input_data_files (file_id)
+    """,
+    """
+    CREATE INDEX ix_input_data_files_run_id ON input_data_files (run_id)
+    """,
+    """
+    CREATE TABLE output_data_files (
+        run_id VARCHAR NOT NULL,
+        command_id VARCHAR NOT NULL,
+        prev_command_id VARCHAR NOT NULL,
+        file_id VARCHAR NOT NULL,
+        PRIMARY KEY (file_id, run_id),
+        FOREIGN KEY(run_id) REFERENCES run (id),
+        FOREIGN KEY(file_id) REFERENCES data_files (id)
+    )
+    """,
+    """
+    CREATE INDEX ix_output_data_files_run_id ON output_data_files (run_id)
+    """,
+    """
+    CREATE INDEX ix_output_data_files_file_id ON output_data_files (file_id)
+    """,
+    """
+    CREATE TABLE run_csv_rtp_table (
+        row_id INTEGER NOT NULL,
+        run_id VARCHAR NOT NULL,
+        parameter_variable_name VARCHAR NOT NULL,
+        file_id VARCHAR,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(run_id) REFERENCES run (id),
+        FOREIGN KEY(file_id) REFERENCES data_files (id)
+    )
+    """,
+    """
+    CREATE TABLE boolean_setting_extended (
+        "key" VARCHAR(200) NOT NULL,
+        value BOOLEAN NOT NULL,
+        PRIMARY KEY ("key")
+    )
+    """,
+    """
+    CREATE TABLE camera_capture_image_settings (
+        camera_id VARCHAR NOT NULL,
+        resolution_x INTEGER,
+        resolution_y INTEGER,
+        zoom FLOAT,
+        pan_x INTEGER,
+        pan_y INTEGER,
+        contrast FLOAT,
+        brightness FLOAT,
+        saturation FLOAT,
+        PRIMARY KEY (camera_id)
+    )
+    """,
+    """
+    CREATE TABLE labware_offset_with_sequence (
+        row_id INTEGER NOT NULL,
+        offset_id VARCHAR NOT NULL,
+        definition_uri VARCHAR NOT NULL,
+        vector_x FLOAT NOT NULL,
+        vector_y FLOAT NOT NULL,
+        vector_z FLOAT NOT NULL,
+        active BOOLEAN NOT NULL,
+        created_at DATETIME NOT NULL,
+        PRIMARY KEY (row_id)
+    )
+    """,
+    """
+    CREATE UNIQUE INDEX ix__labware_offset_with_sequence__active__row_id ON labware_offset_with_sequence (active, row_id)
+    """,
+    """
+    CREATE UNIQUE INDEX ix_labware_offset_with_sequence_offset_id ON labware_offset_with_sequence (offset_id)
+    """,
+    """
+    CREATE TABLE labware_offset_sequence_components (
+       row_id INTEGER NOT NULL,
+       offset_id INTEGER NOT NULL,
+       sequence_ordinal INTEGER NOT NULL,
+       component_kind VARCHAR NOT NULL,
+       primary_component_value VARCHAR NOT NULL,
+       component_value_json VARCHAR NOT NULL,
+       PRIMARY KEY (row_id),
+       FOREIGN KEY(offset_id) REFERENCES labware_offset_with_sequence (row_id)
+    )
+    """,
+    """
+    CREATE INDEX ix_labware_offset_sequence_components_offset_id ON labware_offset_sequence_components (offset_id)
+    """,
+]
+
+# schema 17 = schema 16 with file permissions
+EXPECTED_STATEMENTS_V17 = EXPECTED_STATEMENTS_V16 = [
+    """
+    CREATE TABLE protocol (
+        id VARCHAR NOT NULL,
+        created_at DATETIME NOT NULL,
+        protocol_key VARCHAR,
+        protocol_kind VARCHAR(14) NOT NULL,
+        PRIMARY KEY (id),
+        CONSTRAINT protocolkindsqlenum CHECK (protocol_kind IN ('standard', 'quick-transfer'))
+    )
+    """,
+    """
+    CREATE TABLE analysis (
+        id VARCHAR NOT NULL,
+        protocol_id VARCHAR NOT NULL,
+        analyzer_version VARCHAR NOT NULL,
+        completed_analysis VARCHAR NOT NULL,
+        PRIMARY KEY (id),
+        FOREIGN KEY(protocol_id) REFERENCES protocol (id)
+    )
+    """,
+    """
+    CREATE TABLE analysis_primitive_rtp_table (
+        row_id INTEGER NOT NULL,
+        analysis_id VARCHAR NOT NULL,
+        parameter_variable_name VARCHAR NOT NULL,
+        parameter_type VARCHAR(5) NOT NULL,
+        parameter_value VARCHAR NOT NULL,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(analysis_id) REFERENCES analysis (id),
+        CONSTRAINT primitiveparamsqlenum CHECK (parameter_type IN ('int', 'float', 'bool', 'str'))
+    )
+    """,
+    """
+    CREATE TABLE analysis_csv_rtp_table (
+        row_id INTEGER NOT NULL,
+        analysis_id VARCHAR NOT NULL,
+        parameter_variable_name VARCHAR NOT NULL,
+        file_id VARCHAR,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(analysis_id) REFERENCES analysis (id),
+        FOREIGN KEY(file_id) REFERENCES data_files (id)
+    )
+    """,
+    """
+    CREATE INDEX ix_analysis_protocol_id ON analysis (protocol_id)
+    """,
+    """
+    CREATE TABLE run (
+        id VARCHAR NOT NULL,
+        created_at DATETIME NOT NULL,
+        protocol_id VARCHAR,
+        state_summary VARCHAR,
+        engine_status VARCHAR,
+        _updated_at DATETIME,
+        run_time_parameters VARCHAR,
+        input_file_ids VARCHAR,
+        output_file_ids VARCHAR,
+        PRIMARY KEY (id),
+        FOREIGN KEY(protocol_id) REFERENCES protocol (id)
+    )
+    """,
+    """
+    CREATE TABLE action (
+        id VARCHAR NOT NULL,
+        created_at DATETIME NOT NULL,
+        action_type VARCHAR NOT NULL,
+        run_id VARCHAR NOT NULL,
+        PRIMARY KEY (id),
+        FOREIGN KEY(run_id) REFERENCES run (id)
+    )
+    """,
+    """
+    CREATE TABLE run_command (
+        row_id INTEGER NOT NULL,
+        run_id VARCHAR NOT NULL,
+        index_in_run INTEGER NOT NULL,
+        command_id VARCHAR NOT NULL,
+        command VARCHAR NOT NULL,
+        command_intent VARCHAR,
+        command_error VARCHAR,
+        command_status VARCHAR(9),
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(run_id) REFERENCES run (id)
+    )
+    """,
+    """
+    CREATE UNIQUE INDEX ix_run_run_id_command_id ON run_command (run_id, command_id)
+    """,
+    """
+    CREATE UNIQUE INDEX ix_run_run_id_index_in_run ON run_command (run_id, index_in_run)
+    """,
+    """
+    CREATE UNIQUE INDEX ix_run_run_id_command_status_index_in_run ON run_command (run_id, command_status, index_in_run)
+    """,
+    """
+    CREATE INDEX ix_protocol_protocol_kind ON protocol (protocol_kind)
+    """,
+    """
+    CREATE TABLE command_annotation (
+        row_id INTEGER NOT NULL,
+        run_id VARCHAR NOT NULL,
+        annotation_id VARCHAR NOT NULL,
+        name VARCHAR NOT NULL,
+        description VARCHAR,
+        source VARCHAR(13) NOT NULL,
+        parent_id VARCHAR,
+        params VARCHAR,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(run_id, parent_id) REFERENCES command_annotation (run_id, annotation_id) ON DELETE CASCADE,
+        FOREIGN KEY(run_id) REFERENCES run (id),
+        CONSTRAINT annotationsourcesqlenum CHECK (source IN ('userCommand', 'systemCommand'))
+    )
+    """,
+    """
+    CREATE UNIQUE INDEX ix_run_id_annotation_id ON command_annotation (run_id, annotation_id)
+    """,
+    """
+    CREATE TABLE command_to_annotation (
+        row_id INTEGER NOT NULL,
+        run_id VARCHAR NOT NULL,
+        command_id VARCHAR NOT NULL,
+        annotation_id VARCHAR NOT NULL,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(run_id, command_id) REFERENCES run_command (run_id, command_id),
+        FOREIGN KEY(run_id, annotation_id) REFERENCES command_annotation (run_id, annotation_id)
+    )
+    """,
+    """
+    CREATE UNIQUE INDEX ix_c2a_run_id_command_id_annotation_id ON command_to_annotation (run_id, command_id, annotation_id)
+    """,
+    """
+    CREATE TABLE data_files (
+        id VARCHAR NOT NULL,
+        name VARCHAR NOT NULL,
+        path VARCHAR NOT NULL,
+        stored BOOLEAN NOT NULL,
+        generated BOOLEAN NOT NULL,
+        mime_type VARCHAR NOT NULL,
+        file_hash VARCHAR NOT NULL,
+        created_at DATETIME NOT NULL,
+        PRIMARY KEY (id)
+    )
+    """,
+    """
+    CREATE INDEX ix_data_files_generated ON data_files (generated)
+    """,
+    """
+    CREATE INDEX ix_data_files_mime_type ON data_files (mime_type)
+    """,
+    """
+    CREATE TABLE input_data_files (
+        file_id VARCHAR NOT NULL,
+        run_id VARCHAR NOT NULL,
+        PRIMARY KEY (file_id, run_id),
+        FOREIGN KEY(file_id) REFERENCES data_files (id),
+        FOREIGN KEY(run_id) REFERENCES run (id)
+    )
+    """,
+    """
+    CREATE INDEX ix_input_data_files_file_id ON input_data_files (file_id)
+    """,
+    """
+    CREATE INDEX ix_input_data_files_run_id ON input_data_files (run_id)
+    """,
+    """
+    CREATE TABLE output_data_files (
+        run_id VARCHAR NOT NULL,
+        command_id VARCHAR NOT NULL,
+        prev_command_id VARCHAR NOT NULL,
+        file_id VARCHAR NOT NULL,
+        PRIMARY KEY (file_id, run_id),
+        FOREIGN KEY(run_id) REFERENCES run (id),
+        FOREIGN KEY(file_id) REFERENCES data_files (id)
+    )
+    """,
+    """
+    CREATE INDEX ix_output_data_files_run_id ON output_data_files (run_id)
+    """,
+    """
+    CREATE INDEX ix_output_data_files_file_id ON output_data_files (file_id)
+    """,
+    """
+    CREATE TABLE run_csv_rtp_table (
+        row_id INTEGER NOT NULL,
+        run_id VARCHAR NOT NULL,
+        parameter_variable_name VARCHAR NOT NULL,
+        file_id VARCHAR,
+        PRIMARY KEY (row_id),
+        FOREIGN KEY(run_id) REFERENCES run (id),
+        FOREIGN KEY(file_id) REFERENCES data_files (id)
+    )
+    """,
+    """
+    CREATE TABLE boolean_setting_extended (
+        "key" VARCHAR(200) NOT NULL,
+        value BOOLEAN NOT NULL,
+        PRIMARY KEY ("key")
+    )
+    """,
+    """
+    CREATE TABLE camera_capture_image_settings (
+        camera_id VARCHAR NOT NULL,
+        resolution_x INTEGER,
+        resolution_y INTEGER,
+        zoom FLOAT,
+        pan_x INTEGER,
+        pan_y INTEGER,
+        contrast FLOAT,
+        brightness FLOAT,
+        saturation FLOAT,
+        PRIMARY KEY (camera_id)
+    )
+    """,
+    """
+    CREATE TABLE labware_offset_with_sequence (
+        row_id INTEGER NOT NULL,
+        offset_id VARCHAR NOT NULL,
+        definition_uri VARCHAR NOT NULL,
+        vector_x FLOAT NOT NULL,
+        vector_y FLOAT NOT NULL,
+        vector_z FLOAT NOT NULL,
+        active BOOLEAN NOT NULL,
+        created_at DATETIME NOT NULL,
+        PRIMARY KEY (row_id)
+    )
+    """,
+    """
+    CREATE UNIQUE INDEX ix__labware_offset_with_sequence__active__row_id ON labware_offset_with_sequence (active, row_id)
+    """,
+    """
+    CREATE UNIQUE INDEX ix_labware_offset_with_sequence_offset_id ON labware_offset_with_sequence (offset_id)
+    """,
+    """
+    CREATE TABLE labware_offset_sequence_components (
+       row_id INTEGER NOT NULL,
+       offset_id INTEGER NOT NULL,
+       sequence_ordinal INTEGER NOT NULL,
+       component_kind VARCHAR NOT NULL,
+       primary_component_value VARCHAR NOT NULL,
+       component_value_json VARCHAR NOT NULL,
+       PRIMARY KEY (row_id),
+       FOREIGN KEY(offset_id) REFERENCES labware_offset_with_sequence (row_id)
+    )
+    """,
+    """
+    CREATE INDEX ix_labware_offset_sequence_components_offset_id ON labware_offset_sequence_components (offset_id)
+    """,
+]
+
+EXPECTED_STATEMENTS_V15 = [
     """
     CREATE TABLE protocol (
         id VARCHAR NOT NULL,
@@ -291,8 +1049,6 @@ EXPECTED_STATEMENTS_LATEST = [
     CREATE INDEX ix_labware_offset_sequence_components_offset_id ON labware_offset_sequence_components (offset_id)
     """,
 ]
-
-EXPECTED_STATEMENTS_V15 = EXPECTED_STATEMENTS_LATEST
 
 EXPECTED_STATEMENTS_V14 = [
     """
@@ -1809,43 +2565,35 @@ EXPECTED_STATEMENTS_V2 = [
 ]
 
 
-def _normalize_statement(statement: str) -> str:
-    """Fix up the internal formatting of a single SQL statement for easier comparison."""
-    lines = statement.splitlines()
-
-    # Remove whitespace at the beginning and end of each line.
-    lines = [line.strip() for line in lines]
-
-    # Filter out blank lines.
-    lines = [line for line in lines if line != ""]
-
-    # Normalize line breaks to spaces. When we ask SQLite for its schema, it appears
-    # inconsistent in whether it uses spaces or line breaks to separate tokens.
-    # That may have to do with whether `ALTER TABLE` has been used on the table.
-    return " ".join(lines)
-
-
 @pytest.mark.parametrize(
     ("metadata", "expected_statements"),
     [
-        (latest_metadata, EXPECTED_STATEMENTS_LATEST),
-        (schema_15.metadata, EXPECTED_STATEMENTS_V15),
-        (schema_14.metadata, EXPECTED_STATEMENTS_V14),
-        (schema_13.metadata, EXPECTED_STATEMENTS_V13),
-        (schema_11.metadata, EXPECTED_STATEMENTS_V11),
-        (schema_10.metadata, EXPECTED_STATEMENTS_V10),
-        (schema_09.metadata, EXPECTED_STATEMENTS_V9),
-        (schema_08.metadata, EXPECTED_STATEMENTS_V8),
-        (schema_07.metadata, EXPECTED_STATEMENTS_V7),
-        (schema_06.metadata, EXPECTED_STATEMENTS_V6),
-        (schema_05.metadata, EXPECTED_STATEMENTS_V5),
-        (schema_04.metadata, EXPECTED_STATEMENTS_V4),
-        (schema_03.metadata, EXPECTED_STATEMENTS_V3),
-        (schema_02.metadata, EXPECTED_STATEMENTS_V2),
+        pytest.param(latest_metadata, EXPECTED_STATEMENTS_LATEST, id="latest"),
+        pytest.param(schema_19.metadata, EXPECTED_STATEMENTS_V19, id="v19"),
+        pytest.param(schema_18.metadata, EXPECTED_STATEMENTS_V18, id="v18"),
+        pytest.param(
+            schema_16.metadata,
+            EXPECTED_STATEMENTS_V17,
+            id="v17",
+        ),  # schema 17 = schema 16 with file permissions
+        pytest.param(schema_16.metadata, EXPECTED_STATEMENTS_V16, id="v16"),
+        pytest.param(schema_15.metadata, EXPECTED_STATEMENTS_V15, id="v15"),
+        pytest.param(schema_14.metadata, EXPECTED_STATEMENTS_V14, id="v14"),
+        pytest.param(schema_13.metadata, EXPECTED_STATEMENTS_V13, id="v13"),
+        pytest.param(schema_11.metadata, EXPECTED_STATEMENTS_V11, id="v11"),
+        pytest.param(schema_10.metadata, EXPECTED_STATEMENTS_V10, id="v10"),
+        pytest.param(schema_09.metadata, EXPECTED_STATEMENTS_V9, id="v9"),
+        pytest.param(schema_08.metadata, EXPECTED_STATEMENTS_V8, id="v8"),
+        pytest.param(schema_07.metadata, EXPECTED_STATEMENTS_V7, id="v7"),
+        pytest.param(schema_06.metadata, EXPECTED_STATEMENTS_V6, id="v6"),
+        pytest.param(schema_05.metadata, EXPECTED_STATEMENTS_V5, id="v5"),
+        pytest.param(schema_04.metadata, EXPECTED_STATEMENTS_V4, id="v4"),
+        pytest.param(schema_03.metadata, EXPECTED_STATEMENTS_V3, id="v3"),
+        pytest.param(schema_02.metadata, EXPECTED_STATEMENTS_V2, id="v2"),
     ],
 )
 def test_creating_from_metadata_emits_expected_statements(
-    metadata: sqlalchemy.MetaData, expected_statements: List[str]
+    metadata: sqlalchemy.MetaData, expected_statements: list[str], tmp_path: Path
 ) -> None:
     """Test that each schema compiles down to the expected SQL statements.
 
@@ -1856,16 +2604,12 @@ def test_creating_from_metadata_emits_expected_statements(
     Based on:
     https://docs.sqlalchemy.org/en/14/faq/metadata_schema.html#faq-ddl-as-string
     """
-    actual_statements: List[str] = []
-
-    def record_statement(
-        sql: sqlalchemy.schema.DDLElement, *multiparams: object, **params: object
-    ) -> None:
-        compiled_statement = str(sql.compile(dialect=engine.dialect))
-        actual_statements.append(compiled_statement)
-
-    engine = sqlalchemy.create_mock_engine("sqlite://", record_statement)
-    metadata.create_all(cast(sqlalchemy.engine.Engine, engine))
+    with (
+        sql_engine_ctx(tmp_path / "test.db") as sql_engine,
+        sql_engine.begin() as transaction,
+    ):
+        metadata.create_all(transaction)
+        actual_statements = _get_schema(transaction)
 
     normalized_actual = [_normalize_statement(s) for s in actual_statements]
     normalized_expected = [_normalize_statement(s) for s in expected_statements]
@@ -1895,13 +2639,7 @@ def test_migrated_db_matches_db_created_from_metadata(tmp_path: Path) -> None:
         sql_engine_ctx(active_subdirectory / DB_FILE) as sql_engine,
         sql_engine.begin() as transaction,
     ):
-        actual_statements = (
-            transaction.execute(
-                sqlalchemy.text("SELECT sql FROM sqlite_schema WHERE sql IS NOT NULL")
-            )
-            .scalars()
-            .all()
-        )
+        actual_statements = _get_schema(transaction)
 
     normalized_actual = [_normalize_statement(s) for s in actual_statements]
     normalized_expected = [_normalize_statement(s) for s in expected_statements]
@@ -1910,3 +2648,32 @@ def test_migrated_db_matches_db_created_from_metadata(tmp_path: Path) -> None:
     # nondeterministic order that varies across runs. Although statement order
     # theoretically matters, it's unlikely to matter in practice for our purposes here.
     assert set(normalized_actual) == set(normalized_expected)
+
+
+def _get_schema(connection: sqlalchemy.engine.Connection) -> list[str]:
+    """Return the schema of the given SQLite database.
+
+    The schema is returned in the form of DDL statements
+    (like `CREATE TABLE ...`, etc.).
+    """
+    return (
+        connection.execute(
+            sqlalchemy.text("SELECT sql FROM sqlite_schema WHERE sql IS NOT NULL")
+        )
+        .scalars()
+        .all()
+    )
+
+
+def _normalize_statement(statement: str) -> str:
+    """Fix up the internal formatting of a single SQL statement for easier comparison.
+
+    For example, when we ask SQLite for its schema, it appears
+    inconsistent in whether it uses spaces or line breaks to separate tokens.
+    It may have to do with whether `ALTER TABLE` has been used on the table.
+    """
+    # Replace runs of any whitespace with a single literal space.
+    statement = re.sub(r"\s+", " ", statement)
+    # Remove whitespace at the beginning and end of the statement.
+    statement = statement.strip()
+    return statement

@@ -1,12 +1,11 @@
 """File interaction resource provider."""
 
 import csv
-from dataclasses import dataclass
 from datetime import datetime
 from io import StringIO
 from typing import Awaitable, Callable, Dict, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from opentrons_shared_data.data_files import (
     DataFileInfo,
@@ -39,35 +38,39 @@ SPECIAL_CHARACTERS = {
 }
 
 
-@dataclass(frozen=True)
-class FileNameCmdMetadata:
+class FileNameCmdMetadata(BaseModel):
     """Command metadata associated with a specific data file."""
+
+    model_config = ConfigDict(frozen=True)
 
     command_id: str
     prev_command_id: str
     file_id: Optional[str]
 
 
-@dataclass(frozen=True)
 class ReadCmdFileNameMetadata(FileNameCmdMetadata):
     """Data from a plate reader `read` command used to build the finalized file name."""
+
+    model_config = ConfigDict(frozen=True)
 
     base_filename: str
     wavelength: int
 
 
-@dataclass(frozen=True)
 class ImageCaptureCmdFileNameMetadata(FileNameCmdMetadata):
     """Data from a camera capture command used to build the finalized file name."""
+
+    model_config = ConfigDict(frozen=True)
 
     step_number: int
     command_timestamp: datetime
     base_filename: Optional[str]
 
 
-@dataclass(frozen=True)
 class UserDefinedCSVCmdFileNameMetadata(FileNameCmdMetadata):
     """Data for a user-defined csv file."""
+
+    model_config = ConfigDict(frozen=True)
 
     filename: str
 

@@ -240,6 +240,9 @@ class PythonException(GeneralError):
             detail=base_details,
             wrapping=_descend_exc_ctx(exc),
         )
+        # Overwriting this here in case this was called with `exc=`, which breaks
+        # pickle serialization
+        self.args = (exc,)
 
 
 class RobotInUseError(CommunicationError):
@@ -369,6 +372,19 @@ class CANBusBusError(CommunicationError):
         super().__init__(ErrorCodes.CANBUS_BUS_ERROR, message, detail, wrapping)
 
 
+class KeyStorageUnavailableError(CommunicationError):
+    """An error indicating a low-level communications failure with key storage."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a KeyStorageUnavailableError."""
+        super().__init__(ErrorCodes.KEY_STORAGE_UNAVAILABLE, message, detail, wrapping)
+
+
 class MotionFailedError(RoboticsControlError):
     """An error indicating that a motion failed."""
 
@@ -483,15 +499,14 @@ class CalibrationStructureNotFoundError(RoboticsControlError):
 
     def __init__(
         self,
-        structure_height: float,
-        lower_limit: float,
+        message: Optional[str] = None,
         detail: Optional[Dict[str, str]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a CalibrationStructureNotFoundError."""
         super().__init__(
             ErrorCodes.CALIBRATION_STRUCTURE_NOT_FOUND,
-            f"Structure height at z={structure_height}mm beyond lower limit: {lower_limit}.",
+            message,
             detail,
             wrapping,
         )
@@ -520,15 +535,14 @@ class EdgeNotFoundError(RoboticsControlError):
 
     def __init__(
         self,
-        edge_name: str,
-        stride: float,
+        message: Optional[str] = None,
         detail: Optional[Dict[str, str]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a EdgeNotFoundError."""
         super().__init__(
             ErrorCodes.EDGE_NOT_FOUND,
-            f"Edge {edge_name} could not be verified at {stride} mm resolution.",
+            message,
             detail,
             wrapping,
         )
@@ -539,15 +553,14 @@ class EarlyCapacitiveSenseTrigger(RoboticsControlError):
 
     def __init__(
         self,
-        found: float,
-        nominal: float,
+        message: Optional[str] = None,
         detail: Optional[Dict[str, str]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a EarlyCapacitiveSenseTrigger."""
         super().__init__(
             ErrorCodes.EARLY_CAPACITIVE_SENSE_TRIGGER,
-            f"Calibration triggered early at z={found}mm, expected {nominal}",
+            message,
             detail,
             wrapping,
         )
@@ -558,19 +571,14 @@ class InaccurateNonContactSweepError(RoboticsControlError):
 
     def __init__(
         self,
-        found: float,
-        nominal: float,
+        message: Optional[str] = None,
         detail: Optional[Dict[str, str]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a InaccurateNonContactSweepError."""
-        msg = (
-            f"Calibration detected a slot width of {found:.3f}mm, "
-            f"which is too far from the design width of {nominal:.3f}mm"
-        )
         super().__init__(
             ErrorCodes.INACCURATE_NON_CONTACT_SWEEP,
-            msg,
+            message,
             detail,
             wrapping,
         )
@@ -620,6 +628,7 @@ class UnmatchedTipPresenceStates(RoboticsControlError):
             detail,
             wrapping,
         )
+        self.args = (states, detail, wrapping)
 
 
 class PositionUnknownError(RoboticsControlError):
@@ -755,6 +764,7 @@ class UnexpectedTipRemovalError(RoboticsInteractionError):
         super().__init__(
             ErrorCodes.UNEXPECTED_TIP_REMOVAL, message, checked_detail, wrapping
         )
+        self.args = (action, pipette_name, message, detail, wrapping)
 
 
 class UnexpectedTipAttachError(RoboticsInteractionError):
@@ -775,6 +785,7 @@ class UnexpectedTipAttachError(RoboticsInteractionError):
         checked_detail["mount"] = mount
         message = f"Cannot perform {action} with a tip already attached."
         super().__init__(ErrorCodes.UNEXPECTED_TIP_ATTACH, message, detail, wrapping)
+        self.args = (action, pipette_name, message, detail, wrapping)
 
 
 class HepaUVFailedError(RoboticsInteractionError):
@@ -820,6 +831,7 @@ class FlexStackerShuttleMissingError(RoboticsInteractionError):
             checked_detail,
             wrapping,
         )
+        self.args = (serial, expected_state, shuttle_state, message, detail, wrapping)
 
 
 class FlexStackerShuttleLabwareError(RoboticsInteractionError):
@@ -851,6 +863,7 @@ class FlexStackerShuttleLabwareError(RoboticsInteractionError):
             checked_detail,
             wrapping,
         )
+        self.args = (serial, shuttle_state, labware_expected, message, detail, wrapping)
 
 
 class FlexStackerHopperLabwareError(RoboticsInteractionError):
@@ -878,6 +891,7 @@ class FlexStackerHopperLabwareError(RoboticsInteractionError):
             checked_detail,
             wrapping,
         )
+        self.args = (serial, labware_expected, message, detail, wrapping)
 
 
 class FlexStackerShuttleNotEmptyError(RoboticsInteractionError):
@@ -907,6 +921,30 @@ class FlexStackerShuttleNotEmptyError(RoboticsInteractionError):
             checked_detail,
             wrapping,
         )
+        self.args = (serial, shuttle_state, labware_expected, message, detail, wrapping)
+
+
+class BarcodeScanFailureError(RoboticsInteractionError):
+    """An error occurred when the Barcode scanner unable to detect barcode."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a BarcodeScanFailureError."""
+        checked_detail: Dict[str, Any] = detail or {}
+        if message is not None:
+            checked_message = message
+        else:
+            checked_message = "Barcode scanner unable to detect barcode."
+        super().__init__(
+            ErrorCodes.BARCODE_SCANNER_FAILURE,
+            checked_message,
+            checked_detail,
+            wrapping,
+        )
 
 
 class FirmwareUpdateRequiredError(RoboticsInteractionError):
@@ -926,6 +964,7 @@ class FirmwareUpdateRequiredError(RoboticsInteractionError):
         checked_detail["subsystems_to_update"] = subsystems_to_update
         message = f"Cannot perform {action} until {subsystems_to_update} are updated."
         super().__init__(ErrorCodes.FIRMWARE_UPDATE_REQUIRED, message, detail, wrapping)
+        self.args = (action, subsystems_to_update, message, detail, wrapping)
 
 
 class PipetteOverpressureError(RoboticsInteractionError):
@@ -1023,6 +1062,7 @@ class ModuleNotPresent(RoboticsInteractionError):
         super().__init__(
             ErrorCodes.MODULE_NOT_PRESENT, checked_message, checked_detail, wrapping
         )
+        self.args = (identifier, message, detail, wrapping)
 
 
 class InvalidInstrumentData(RoboticsInteractionError):
@@ -1244,6 +1284,13 @@ class CommandParameterLimitViolated(GeneralError):
                 for e in wrapping_checked
             ],
         )
+        self.args = (
+            command_name,
+            parameter_name,
+            limit_statement,
+            actual_value,
+            wrapping,
+        )
 
 
 class UnsupportedHardwareCommand(GeneralError):
@@ -1306,3 +1353,131 @@ class MissingConfigurationData(GeneralError):
         super().__init__(
             ErrorCodes.MISSING_CONFIGURATION_DATA, message, detail, wrapping
         )
+
+
+class AuditLoggingError(GeneralError):
+    """An error indicating an audit logging failure.
+
+    Raised when audit log storage or ingest operations fail.
+    """
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an AuditLoggingError."""
+        super().__init__(ErrorCodes.AUDIT_LOGGING_ERROR, message, detail, wrapping)
+
+
+class VacuumModuleUnknownError(RoboticsControlError):
+    """An error indicating that some unknown issue has happened with the vacuum module."""
+
+    def __init__(
+        self,
+        serial: str,
+        mode: str,
+        target: float,
+        current: float,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a VacuumModuleUnknownError."""
+        checked_detail: Dict[str, str] = dict(detail) if detail else {}
+        checked_detail["serial"] = serial
+        checked_detail["mode"] = mode
+        checked_detail["target"] = str(target)
+        checked_detail["current"] = str(current)
+        self.serial = serial
+        self.mode = mode
+        self.target = target
+        self.current = current
+        super().__init__(
+            ErrorCodes.GENERAL_ERROR,
+            message,
+            checked_detail,
+            wrapping,
+        )
+        self.args = (
+            serial,
+            mode,
+            target,
+            current,
+            message,
+            detail,
+            wrapping,
+        )
+
+
+class VacuumModulePressureNotReachedError(RoboticsControlError):
+    """An error indicating that the target pressure was not reached in the vacuum module."""
+
+    def __init__(
+        self,
+        serial: str,
+        mode: str,
+        target_pressure: float,
+        current_pressure: float,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a VacuumModulePressureNotReachedError."""
+        checked_detail: Dict[str, str] = dict(detail) if detail else {}
+        checked_detail["serial"] = serial
+        checked_detail["mode"] = mode
+        checked_detail["target"] = str(target_pressure)
+        checked_detail["current"] = str(current_pressure)
+        self.serial = serial
+        self.mode = mode
+        self.target_pressure = target_pressure
+        self.current_pressure = current_pressure
+        super().__init__(
+            ErrorCodes.VACUUM_PRESSURE_NOT_REACHED,
+            message,
+            checked_detail,
+            wrapping,
+        )
+        self.args = (
+            serial,
+            target_pressure,
+            current_pressure,
+            mode,
+            message,
+            detail,
+            wrapping,
+        )
+
+
+class VacuumModuleWasteFullError(RoboticsControlError):
+    """An error indicating that the vacuum module waste container is full."""
+
+    def __init__(
+        self,
+        serial: str,
+        mode: str,
+        target: float,
+        current: float,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a VacuumModuleWasteFullError."""
+        checked_detail: Dict[str, str] = dict(detail) if detail else {}
+        checked_detail["serial"] = serial
+        checked_detail["mode"] = mode
+        checked_detail["target"] = str(target)
+        checked_detail["current"] = str(current)
+        self.serial = serial
+        self.mode = mode
+        self.target = target
+        self.current = current
+        super().__init__(
+            ErrorCodes.VACUUM_WASTE_CONTAINER_FULL,
+            message,
+            checked_detail,
+            wrapping,
+        )
+        self.args = (serial, message, detail, wrapping)

@@ -37,13 +37,17 @@ describe('ConcurrentGroup', () => {
 
   it('renders a gray line when not active', () => {
     render({ active: false })
-    const ornamentalLine = screen.getByTestId('ConcurrentGroup_OrnamentalLine')
+    const ornamentalLine = screen.getByLabelText(
+      'ConcurrentGroup OrnamentalLine'
+    )
     expect(ornamentalLine).toHaveStyle(`background-color: ${COLORS.grey50}`)
   })
 
   it('renders a blue line when active', () => {
     render({ active: true })
-    const ornamentalLine = screen.getByTestId('ConcurrentGroup_OrnamentalLine')
+    const ornamentalLine = screen.getByLabelText(
+      'ConcurrentGroup OrnamentalLine'
+    )
     expect(ornamentalLine).toHaveStyle(`background-color: ${COLORS.blue50}`)
   })
 })

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { List, useDynamicRowHeight, useListCallbackRef } from 'react-window'
 
@@ -7,6 +7,11 @@ import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import { ProtocolAnalysisErrorModal } from '../../Devices/ProtocolRun/ProtocolRunHeader/RunHeaderModalContainer/modals'
 import styles from './annotatedsteps.module.css'
 import { AnnotatedStepsRowItem } from './AnnotatedStepsRowItem'
+import {
+  getGroupedNodeIndexContainingCommandId,
+  getIsVisibleProtocolStep,
+  getLastVisibleAnalysisCommandId,
+} from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
@@ -25,6 +30,8 @@ interface AnnotatedStepsProps {
   setSelectedCommand?: Dispatch<SetStateAction<string | null>>
   handlePause?: () => void
   setIsAtBottom?: Dispatch<SetStateAction<boolean>>
+  milliSecondsPerFrame?: number
+  isGlobalPlaying?: boolean
 }
 
 type GroupNode = Extract<GroupedCommands[number], { annotationId: string }>
@@ -34,6 +41,8 @@ interface GroupRow {
   group: GroupNode
   annotationType: string
   commandStartNumber: number
+  annotationDescription: string
+  trailingErrors?: AnalysisError[]
 }
 
 interface CommandRow {
@@ -49,23 +58,33 @@ interface ErrorRow {
   errors: AnalysisError[]
 }
 
-type AnnotatedStepsRow = GroupRow | CommandRow | ErrorRow
+interface ErrorPastStepsMessageRow {
+  type: 'errors_past_steps_message'
+}
+
+type AnnotatedStepsRow =
+  GroupRow | CommandRow | ErrorRow | ErrorPastStepsMessageRow
 
 export interface ItemData {
   rows: AnnotatedStepsRow[]
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
   allRunDefs: LabwareDefinition[]
-  setSelectedCommand?: Dispatch<SetStateAction<string | null>>
-  handlePause?: () => void
   scrollTargetId: string | null
   listElement: HTMLElement | null
+  /** height of the virtualized list viewport; used to size expanded step groups vertically. */
+  listViewportHeight: number
   onShowErrorDetails: () => void
   t: (key: string) => string
+  milliSecondsPerFrame: number
+  isGlobalPlaying: boolean
+  setSelectedCommand?: Dispatch<SetStateAction<string | null>>
+  handlePause?: () => void
 }
 
 // Note: Since we're using the height value that appears most frequently in the design,
 // we may need to adjust it later.
 const DEFAULT_ROW_HEIGHT_PX = 64
+const DEFAULT_STEP_GROUP_SECONDS = 2000
 
 export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
   const {
@@ -75,7 +94,10 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     setSelectedCommand,
     handlePause,
     setIsAtBottom,
+    milliSecondsPerFrame = DEFAULT_STEP_GROUP_SECONDS,
+    isGlobalPlaying = false,
   } = props
+
   const { t } = useTranslation('protocol_visualization')
   const [showErrorDetailsModal, setShowErrorDetailsModal] =
     useState<boolean>(false)
@@ -91,19 +113,51 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [isValidRobotSideAnalysis]
   )
-  const commandIndexById = useMemo(
+  const filteredCommands = useMemo(
     () =>
-      new Map(analysis.commands.map((command, index) => [command.id, index])),
+      analysis.commands.filter(
+        // ToDo: the following condition will be updated for phase 2
+        command =>
+          !command.commandType.includes('load') &&
+          command.commandType !== 'home'
+      ),
     [analysis.commands]
   )
+  const filteredGroupedCommands = useMemo(() => {
+    if (groupedCommands == null) {
+      return null
+    }
+    const next: GroupedCommands = []
+    for (const node of groupedCommands) {
+      if ('annotationId' in node) {
+        const subCommands = node.subCommands.filter(leaf =>
+          getIsVisibleProtocolStep(leaf.command)
+        )
+        if (subCommands.length > 0) {
+          next.push({ ...node, subCommands })
+        }
+      } else if (getIsVisibleProtocolStep(node.command)) {
+        next.push(node)
+      }
+    }
+    return next
+  }, [groupedCommands])
+  const currentCommandId =
+    currentCommandIndex != null && currentCommandIndex >= 0
+      ? (filteredCommands[currentCommandIndex]?.id ?? null)
+      : null
+  const lastVisibleAnalysisCommandId = useMemo(
+    () => getLastVisibleAnalysisCommandId(analysis.commands),
+    [analysis.commands]
+  )
+
   const groupedCommandsHighlightedInfo = useMemo(
     () =>
-      groupedCommands?.map(node => {
+      filteredGroupedCommands?.map(node => {
         if ('annotationId' in node) {
           const updatedSubCommands = node.subCommands.map(subNode => ({
             ...subNode,
-            isHighlighted:
-              currentCommandIndex === commandIndexById.get(subNode.command.id),
+            isHighlighted: currentCommandId === subNode.command.id,
           }))
 
           return {
@@ -116,50 +170,55 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
         }
         return {
           ...node,
-          isHighlighted:
-            currentCommandIndex === commandIndexById.get(node.command.id),
+          isHighlighted: currentCommandId === node.command.id,
         }
       }),
-    [groupedCommands, currentCommandIndex, commandIndexById]
-  )
-  const filteredCommands = useMemo(
-    () =>
-      analysis.commands.filter(
-        command =>
-          !command.commandType.includes('load') &&
-          command.commandType !== 'home'
-      ),
-    [analysis.commands]
+    [filteredGroupedCommands, currentCommandId]
   )
 
+  const groupedRowIndexForTrailingErrors = useMemo(() => {
+    if (
+      analysis.errors.length === 0 ||
+      groupedCommandsHighlightedInfo == null ||
+      groupedCommandsHighlightedInfo.length === 0 ||
+      lastVisibleAnalysisCommandId == null
+    ) {
+      return null
+    }
+    return getGroupedNodeIndexContainingCommandId(
+      groupedCommandsHighlightedInfo,
+      lastVisibleAnalysisCommandId
+    )
+  }, [
+    analysis.errors,
+    groupedCommandsHighlightedInfo,
+    lastVisibleAnalysisCommandId,
+  ])
+
   useEffect(() => {
-    if (currentCommandIndex == null) return
-    if (groupedCommands != null) {
-      const flatCommands = groupedCommands.flatMap(node =>
+    if (currentCommandId == null) {
+      return
+    }
+    if (filteredGroupedCommands != null && filteredGroupedCommands.length > 0) {
+      const flatCommands = filteredGroupedCommands.flatMap(node =>
         'subCommands' in node ? node.subCommands : [node]
       )
 
       const targetNode = flatCommands.find(
-        node => commandIndexById.get(node.command.id) === currentCommandIndex
+        node => node.command.id === currentCommandId
       )
+      const targetCommandId = targetNode?.command.id ?? null
 
-      if (targetNode?.command.id && scrollTargetId !== targetNode.command.id) {
-        setScrollTargetId(targetNode.command.id)
+      if (targetCommandId != null && scrollTargetId !== targetCommandId) {
+        setScrollTargetId(targetCommandId)
       }
       return
     }
 
-    const targetCommand = filteredCommands[currentCommandIndex]
-    if (targetCommand?.id && scrollTargetId !== targetCommand.id) {
-      setScrollTargetId(targetCommand.id)
+    if (scrollTargetId !== currentCommandId) {
+      setScrollTargetId(currentCommandId)
     }
-  }, [
-    groupedCommands,
-    currentCommandIndex,
-    scrollTargetId,
-    commandIndexById,
-    filteredCommands,
-  ])
+  }, [filteredGroupedCommands, currentCommandId, scrollTargetId])
 
   const { rows, rowIndexByCommandId } = useMemo(() => {
     const nextRows: AnnotatedStepsRow[] = []
@@ -182,8 +241,13 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
           nextRows.push({
             type: 'group',
             group,
-            annotationType: group.annotation?.userSpecifiedName ?? '',
+            annotationType: group.annotation?.name ?? '',
             commandStartNumber: subCommandStartNumber,
+            annotationDescription: group.annotation?.description ?? '',
+            ...(groupedRowIndexForTrailingErrors === index &&
+            analysis.errors.length > 0
+              ? { trailingErrors: analysis.errors }
+              : {}),
           })
           group.subCommands.forEach(subCommand => {
             nextRowIndexByCommandId.set(subCommand.command.id, rowIndex)
@@ -210,6 +274,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
           command,
           isHighlighted:
             currentCommandIndex != null &&
+            currentCommandIndex >= 0 &&
             filteredCommands[currentCommandIndex]?.id === command.id,
           fromGroup: false,
           commandNumber: currentCommandNumber,
@@ -218,10 +283,20 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       })
     }
 
-    if (analysis.errors.length > 0) {
+    if (
+      analysis.errors.length > 0 &&
+      groupedRowIndexForTrailingErrors == null
+    ) {
       nextRows.push({
         type: 'errors',
         errors: analysis.errors,
+      })
+    } else if (
+      analysis.errors.length > 0 &&
+      groupedRowIndexForTrailingErrors != null
+    ) {
+      nextRows.push({
+        type: 'errors_past_steps_message',
       })
     }
 
@@ -234,28 +309,66 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     filteredCommands,
     currentCommandIndex,
     analysis.errors,
+    groupedRowIndexForTrailingErrors,
   ])
 
   const [listRef, listRefCallback] = useListCallbackRef()
   const [listWidth, setListWidth] = useState(0)
+  const [listViewportHeight, setListViewportHeight] = useState(0)
+  const visibleRowRangeRef = useRef({ start: 0, stop: 0 })
   const dynamicRowHeight = useDynamicRowHeight({
     defaultRowHeight: DEFAULT_ROW_HEIGHT_PX,
     key: `${listWidth}-${rows.length}`,
   })
 
   useEffect(() => {
+    const element = listRef?.element
+    if (element == null) return
+
+    const updateHeight = (): void => {
+      setListViewportHeight(element.clientHeight)
+    }
+
+    updateHeight()
+    const resizeObserver = new ResizeObserver(updateHeight)
+    resizeObserver.observe(element)
+    return () => {
+      resizeObserver.disconnect()
+    }
+  }, [listRef])
+
+  useEffect(() => {
     if (scrollTargetId == null) return
     const rowIndex = rowIndexByCommandId.get(scrollTargetId)
     if (rowIndex == null) return
-    listRef?.scrollToRow({ index: rowIndex, align: 'auto' })
-  }, [scrollTargetId, rowIndexByCommandId, listRef])
+
+    if (!isGlobalPlaying) {
+      const { start, stop } = visibleRowRangeRef.current
+      const isRowVisible = rowIndex >= start && rowIndex <= stop
+      if (isRowVisible) {
+        return
+      }
+    }
+
+    listRef?.scrollToRow({
+      index: rowIndex,
+      align: rowIndex >= rows.length - 1 ? 'end' : 'auto',
+    })
+  }, [
+    scrollTargetId,
+    rowIndexByCommandId,
+    listRef,
+    rows.length,
+    isGlobalPlaying,
+  ])
 
   useEffect(() => {
     setListElement(listRef?.element ?? null)
   }, [listRef])
 
   const handleRowsRendered = useCallback(
-    ({ stopIndex }: { startIndex: number; stopIndex: number }) => {
+    ({ startIndex, stopIndex }: { startIndex: number; stopIndex: number }) => {
+      visibleRowRangeRef.current = { start: startIndex, stop: stopIndex }
       if (rows.length === 0) {
         setIsAtBottom?.(true)
       } else {
@@ -273,10 +386,13 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       handlePause,
       scrollTargetId,
       listElement,
+      listViewportHeight,
       onShowErrorDetails: () => {
         setShowErrorDetailsModal(true)
       },
       t,
+      milliSecondsPerFrame,
+      isGlobalPlaying,
     }),
     [
       rows,
@@ -286,7 +402,10 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       handlePause,
       scrollTargetId,
       listElement,
+      listViewportHeight,
       t,
+      milliSecondsPerFrame,
+      isGlobalPlaying,
     ]
   )
 

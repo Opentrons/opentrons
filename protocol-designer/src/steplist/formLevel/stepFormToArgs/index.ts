@@ -13,6 +13,7 @@ import { moveLiquidFormToArgs } from './moveLiquidFormToArgs'
 import { pauseFormToArgs } from './pauseFormToArgs'
 import { temperatureFormToArgs } from './temperatureFormToArgs'
 import { thermocyclerFormToArgs } from './thermocyclerFormToArgs'
+import { vacuumFormToArgs } from './vacuumFormToArgs'
 
 import type {
   CommandCreatorArgs,
@@ -88,6 +89,11 @@ export const stepFormToArgs = (
     }
     case 'flexStacker': {
       stepArgs = flexStackerFormToArgs(_castForm(hydratedForm))
+      break
+    }
+    case 'vacuum': {
+      stepArgs = vacuumFormToArgs(_castForm(hydratedForm))
+      break
     }
   }
 

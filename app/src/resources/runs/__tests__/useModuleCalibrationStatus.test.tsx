@@ -5,8 +5,9 @@ import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+import { mockMagneticModuleGen2, mockVacuumModule } from '@opentrons/api-client'
+
 import { useIsFlex } from '/app/redux-resources/robots'
-import { mockMagneticModuleGen2 } from '/app/redux/modules/__fixtures__'
 
 import { useModuleCalibrationStatus } from '../useModuleCalibrationStatus'
 import { useModuleRenderInfoForProtocolById } from '../useModuleRenderInfoForProtocolById'
@@ -47,6 +48,16 @@ const MAGNETIC_MODULE_INFO = {
   protocolLoadOrder: 0,
   slotName: '1',
 }
+
+const VACUUM_MODULE_INFO = {
+  moduleId: 'vacuumModuleId',
+  x: 0,
+  y: 0,
+  z: 0,
+  moduleDef: {
+    moduleType: 'vacuumModuleType',
+  },
+} as any
 
 const mockOffsetData = {
   offset: {
@@ -149,5 +160,27 @@ describe('useModuleCalibrationStatus hook', () => {
       complete: false,
       reason: 'calibrate_module_failure_reason',
     })
+  })
+
+  it('should return calibration complete if vacuum module is connected', () => {
+    when(vi.mocked(useIsFlex)).calledWith('otie').thenReturn(true)
+    when(vi.mocked(useModuleRenderInfoForProtocolById))
+      .calledWith('1')
+      .thenReturn({
+        vacuumModuleId: {
+          attachedModuleMatch: {
+            ...mockVacuumModule,
+          },
+          conflictedFixture: null,
+          ...VACUUM_MODULE_INFO,
+        },
+      })
+
+    const { result } = renderHook(
+      () => useModuleCalibrationStatus('otie', '1'),
+      { wrapper }
+    )
+
+    expect(result.current).toEqual({ complete: true })
   })
 })
