@@ -34,7 +34,7 @@ from server_utils.persistence.persistence_directory import (
 )
 from server_utils.robot.fastapi import build_robot_client, install_robot_server_client
 from server_utils.robot.robot_server import Client as RobotClientABC
-from server_utils.robot.robot_server import RobotNameandSerial
+from server_utils.robot.robot_server import RobotCurrentRunLog, RobotNameandSerial
 
 from audit_server.log_export.router import router as log_export_router
 from audit_server.log_ingest.router import router as ingest_router
@@ -90,6 +90,10 @@ class _StubRobotServerClient(RobotClientABC):
             name="localrobot",
             serial=None,
         )
+
+    @override
+    async def get_current_run_log(self) -> RobotCurrentRunLog:
+        return RobotCurrentRunLog(serialized_log=None)
 
 
 @asynccontextmanager
