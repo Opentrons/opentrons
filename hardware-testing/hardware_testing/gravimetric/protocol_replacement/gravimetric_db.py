@@ -1,6 +1,6 @@
 """Gravimetric QC protocol."""
 
-from typing import List, Dict, Tuple, Optional, Any, cast, Generator
+from typing import List, Dict, Tuple, Optional, Any, Union, cast, Generator
 from contextlib import contextmanager
 from dataclasses import dataclass, asdict, replace
 from time import time
@@ -18,6 +18,7 @@ from opentrons.protocol_api import (
     Liquid,
     LiquidClass,
     OFF_DECK,
+    TrashBin,
 )
 from opentrons.protocol_api.module_contexts import FlexStackerContext
 from opentrons.protocol_api._liquid_properties import TransferProperties
@@ -29,6 +30,8 @@ from opentrons.protocol_api.core.engine import (
     transfer_components_executor as tx_comps_executor,
     pipette_movement_conflict,
 )
+from opentrons.protocol_engine import commands as protocol_engine_commands
+from opentrons.protocol_engine.types import AddressableOffsetVector
 from opentrons.config import IS_ROBOT
 from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
 from opentrons.hardware_control.types import OT3AxisKind, OT3Mount, Axis
@@ -128,11 +131,17 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
 from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
 
 
-metadata = {"protocolName": "Gravimetric QC V3"}
+metadata = {"protocolName": "Gravimetric QC V3 db"}
 requirements = {"robotType": "Flex", "apiLevel": "2.29"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
 IMPACT_96CH_PIPETTE_MOVE_WAIT_SECONDS = 15
+
+# Dual P50M/P1000M runs use the physical A3 collection position instead of a
+# registered Flex trash bin. The active tip moves to this A3 height and ejects
+# immediately without an additional Z home or relative move.
+DUAL_MULTI_A3_DISPOSAL_SLOT = "A3"
+DUAL_MULTI_A3_DROP_Z_MM = 40.0
 
 
 # =============================================================================
@@ -779,7 +788,9 @@ class FixtureSettings(CSVSettings):
             stackers_96 = _build_96ch_stackers(
                 ctx, csv_settings, use_96ch_stackers
             )
-            if not _uses_96ch_stackers(csv_settings, use_96ch_stackers):
+            if not _uses_96ch_stackers(
+                csv_settings, use_96ch_stackers
+            ) and not _uses_no_trash_runtime_settings(csv_settings):
                 _ensure_trash_bin(ctx)
             _do_simulating_lpc_moves(
                 ctx, csv_settings, pipette, source_well, use_96ch_stackers
@@ -1272,14 +1283,71 @@ def maybe_switch_mode(fixture_settings: FixtureSettings, tip: int) -> None:
 # Production-compatible tip handling and liquid measurement helpers.
 # -----------------------------------------------------------------------------
 #
-# These functions should stay easy to compare with production. Stacker-specific
-# behavior is guarded by _uses_96ch_stacker_runtime().
+# These functions should stay easy to compare with production. No-trash behavior
+# is guarded for 96ch stacker runs and dual P50S/P1000S runs.
+
+
+def _drop_dual_multi_tip_to_a3(
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+) -> None:
+    """Drop one active dual-M tip into the physical A3 opening.
+
+    A3 is physically open on this fixture, so it must not be represented as a
+    Flex ``movableTrashA3``. The ordinary A3 addressable area is compatible
+    with the A4 staging fixture. ``ignoreTipConfiguration=True`` matches the
+    standard Trash Bin path by centering the entire instrument over A3. This
+    keeps the full 8-channel nozzle/ejector assembly inside the A3 opening
+    instead of extending from an A1/H1 active nozzle toward the B3 tip rack.
+
+    As in the original Trash Bin flow, Protocol Engine performs a safe arc
+    move and lowers the active tip to 40 mm above the deck reference before
+    ejecting it in place.
+    """
+    core = pipette._core  # type: ignore[attr-defined]
+    engine_client = core._engine_client
+    pipette_id = core._pipette_id
+    annotations = core._protocol_core.annotation_ids
+
+    ctx.comment(
+        "dual M tip disposal: center the full instrument at A3, "
+        "Z=+40 mm then eject tip"
+    )
+    engine_client.execute_command(
+        protocol_engine_commands.MoveToAddressableAreaForDropTipParams(
+            pipetteId=pipette_id,
+            addressableAreaName=DUAL_MULTI_A3_DISPOSAL_SLOT,
+            offset=AddressableOffsetVector(
+                x=0,
+                y=0,
+                z=DUAL_MULTI_A3_DROP_Z_MM,
+            ),
+            forceDirect=False,
+            speed=None,
+            minimumZHeight=None,
+            alternateDropLocation=False,
+            ignoreTipConfiguration=True,
+        ),
+        annotations,
+    )
+    engine_client.execute_command(
+        protocol_engine_commands.DropTipInPlaceParams(
+            pipetteId=pipette_id,
+            homeAfter=True,
+        ),
+        annotations,
+    )
 
 
 def remove_tip(fixture_settings: FixtureSettings) -> None:
-    """Either return or drop tip(s)."""
+    """Return, discard, or dispose of the active tip according to the run mode."""
     maybe_close_all_gratings(fixture_settings)
-    if fixture_settings.return_tip or _uses_96ch_stacker_runtime(fixture_settings):
+    if _uses_dual_multi_extension_deck(fixture_settings):
+        _drop_dual_multi_tip_to_a3(
+            fixture_settings.ctx,
+            fixture_settings.pipette,
+        )
+    elif fixture_settings.return_tip or _uses_no_trash_runtime(fixture_settings):
         fixture_settings.pipette.return_tip()
     else:
         fixture_settings.pipette.drop_tip()
@@ -1540,7 +1608,7 @@ def run_blank_test(
         liquid_height = fixture_settings.liquid_source.current_liquid_height()  # type: ignore[assignment]
     # Move away from the scale before opening/closing the impact protection.
     maybe_close_all_gratings(fixture_settings)
-    if not _uses_96ch_stacker_runtime(fixture_settings):
+    if not _uses_no_trash_runtime(fixture_settings):
         fixture_settings.pipette.move_to(fixture_settings.pipette.trash_container)  # type: ignore[arg-type]
     fixture_settings.pipette.move_to(
         fixture_settings.pipette._last_tip_picked_up_from.top(10)  # type: ignore[union-attr]
@@ -2206,6 +2274,23 @@ SHARED_TIPRACK_OFFSET_REFERENCE_TIP = 50
 STACKER_MODEL = "flexStackerModuleV1"
 STACKER_HOPPER_CAPACITY = 6
 STACKER_SLOTS = ["A4", "B4", "C4", "D4"]
+DUAL_MULTI_TEST_SLOTS = ["D2", "D3", "B2", "B3"]
+DUAL_MULTI_AUX_SLOT_BY_TEST_SLOT = {
+    "D2": "A4",
+    "D3": "B4",
+    "B2": "C4",
+    "B3": "D4",
+}
+DUAL_MULTI_RACK_SWAP_MOVES = [
+    ("D2", "B1"),
+    ("D3", "A1"),
+    ("A4", "D2"),
+    ("B4", "D3"),
+    ("B2", "A4"),
+    ("B3", "B4"),
+    ("C4", "B2"),
+    ("D4", "B3"),
+]
 IMPACT_96CH_STACKER_HOME_SLOTS = {"A1", "B1"}
 STACKER_DROP_OFFSETS_CONFIG_FILE = "gravimetric_stacker_drop_offsets.json"
 STACKER_TO_DECK_DROP_OFFSET_TARGETS = [
@@ -2529,13 +2614,48 @@ def _get_mounts_to_test_from_runtime_param(
     return _parse_mounts_to_test([mount_selection])
 
 
+def _uses_dual_multi_extension_deck(csv_settings: "CSVSettings") -> bool:
+    """Whether this is a sequential dual P50M/P1000M extension-deck run."""
+    return (
+        csv_settings.pipette_channels == 8
+        and csv_settings.pipette_volume in (50, 1000)
+        and "left" in csv_settings.mounts_to_test
+        and "right" in csv_settings.mounts_to_test
+    )
+
+
+def _uses_dual_single_no_trash(csv_settings: "CSVSettings") -> bool:
+    """Whether this is a sequential dual P50S/P1000S no-trash run."""
+    return (
+        csv_settings.pipette_channels == 1
+        and csv_settings.pipette_volume in (50, 1000)
+        and "left" in csv_settings.mounts_to_test
+        and "right" in csv_settings.mounts_to_test
+    )
+
+
+def _uses_dual_mount_no_trash(csv_settings: "CSVSettings") -> bool:
+    """Whether a dual-pipette workflow returns tips instead of loading trash."""
+    return _uses_dual_single_no_trash(csv_settings)
+
+
+def _uses_no_trash_runtime_settings(csv_settings: "CSVSettings") -> bool:
+    """Whether setup must avoid registering a physical trash bin."""
+    return _uses_dual_single_no_trash(
+        csv_settings
+    ) or _uses_dual_multi_extension_deck(csv_settings)
+
+
 # -----------------------------------------------------------------------------
 # Custom: shared helpers for stacker labware bookkeeping and offsets.
 # -----------------------------------------------------------------------------
 
 
 def _deck_slot_key(slot: str) -> str:
-    return str(DeckSlotName.from_primitive(slot).to_ot3_equivalent())
+    normalized_slot = str(slot).upper()
+    if normalized_slot in {"A4", "B4", "C4", "D4"}:
+        return normalized_slot
+    return str(DeckSlotName.from_primitive(normalized_slot).to_ot3_equivalent())
 
 
 def _nonzero_drop_offset(
@@ -2610,6 +2730,112 @@ def _ensure_trash_bin(ctx: ProtocolContext) -> None:
 
 def _tiprack_load_name(tip_size: int) -> str:
     return f"opentrons_flex_96_tiprack_{tip_size}ul"
+
+
+def _dual_multi_tip_size_by_test_slot(
+    csv_settings: "CSVSettings",
+) -> Dict[str, int]:
+    """Map the four CSV test slots to their configured tip sizes."""
+    slot_to_tip_size: Dict[str, int] = {}
+    for tip_size, slots in csv_settings.tips.items():
+        for slot in slots:
+            slot_key = _deck_slot_key(slot)
+            if slot_key in slot_to_tip_size:
+                raise RuntimeError(
+                    "Dual multi slot "
+                    f"{slot_key} is configured for more than one tip size."
+                )
+            slot_to_tip_size[slot_key] = tip_size
+
+    expected_slots = set(DUAL_MULTI_TEST_SLOTS)
+    configured_slots = set(slot_to_tip_size)
+    if configured_slots != expected_slots:
+        raise RuntimeError(
+            "Dual P50M/P1000M mode requires CSV tiprack slots exactly "
+            f"{DUAL_MULTI_TEST_SLOTS}; configured slots are "
+            f"{sorted(configured_slots)}."
+        )
+    return {slot: slot_to_tip_size[slot] for slot in DUAL_MULTI_TEST_SLOTS}
+
+
+def _prepare_dual_multi_extension_deck_layout(
+    ctx: ProtocolContext, csv_settings: "CSVSettings"
+) -> None:
+    """Load the left test racks and matching right-side reserve racks."""
+    if csv_settings.mounts_to_test != ["left", "right"]:
+        raise RuntimeError(
+            "Dual P50M/P1000M extension-deck mode must run left, then right."
+        )
+
+    reserved_slots = {
+        *DUAL_MULTI_TEST_SLOTS,
+        *DUAL_MULTI_AUX_SLOT_BY_TEST_SLOT.values(),
+        "A1",
+        "B1",
+    }
+    scale_slot = _deck_slot_key(csv_settings.slot_scale)
+    if scale_slot in reserved_slots:
+        raise RuntimeError(
+            f"Scale slot {scale_slot} conflicts with the dual multi rack layout."
+        )
+
+    tip_size_by_test_slot = _dual_multi_tip_size_by_test_slot(csv_settings)
+    for test_slot in DUAL_MULTI_TEST_SLOTS:
+        tip_size = tip_size_by_test_slot[test_slot]
+        reserve_slot = DUAL_MULTI_AUX_SLOT_BY_TEST_SLOT[test_slot]
+        load_name = _tiprack_load_name(tip_size)
+        _load_or_get_labware(ctx, load_name, test_slot)
+        _load_or_get_labware(ctx, load_name, reserve_slot)
+        ctx.comment(
+            f"dual multi layout: T{tip_size} left rack at {test_slot}, "
+            f"right reserve rack at {reserve_slot}"
+        )
+
+
+def _move_registered_labware_with_gripper(
+    ctx: ProtocolContext, source_slot: str, target_slot: str
+) -> None:
+    """Move one deck labware and keep the protocol's slot cache synchronized."""
+    source_slot = _deck_slot_key(source_slot)
+    target_slot = _deck_slot_key(target_slot)
+    labware = _get_loaded_labware_in_slot(source_slot)
+    if labware is None:
+        raise RuntimeError(f"No labware is registered in source slot {source_slot}.")
+    target_labware = _get_loaded_labware_in_slot(target_slot)
+    if target_labware is not None:
+        raise RuntimeError(
+            f"Cannot move {source_slot} to {target_slot}: target contains "
+            f"{target_labware.load_name}."
+        )
+
+    ctx.comment(f"dual multi rack swap: {source_slot} -> {target_slot}")
+    ctx.move_labware(labware, target_slot, use_gripper=True)
+    _forget_loaded_labware_in_slot(source_slot)
+    _register_loaded_labware_in_slot(target_slot, labware)
+
+
+def _rearrange_tipracks_for_dual_multi_right_mount(
+    ctx: ProtocolContext, csv_settings: "CSVSettings"
+) -> None:
+    """Replace left-used racks with A4-D4 reserve racks for the right run."""
+    ctx.comment("start dual P50M/P1000M rack swap for right mount")
+    for source_slot, target_slot in DUAL_MULTI_RACK_SWAP_MOVES:
+        _move_registered_labware_with_gripper(ctx, source_slot, target_slot)
+
+    tip_size_by_test_slot = _dual_multi_tip_size_by_test_slot(csv_settings)
+    for test_slot, expected_tip_size in tip_size_by_test_slot.items():
+        rack = _get_loaded_labware_in_slot(test_slot)
+        if rack is None:
+            raise RuntimeError(
+                f"Dual multi rack swap left target slot {test_slot} empty."
+            )
+        actual_tip_size = _tip_size_from_rack(rack)
+        if actual_tip_size != expected_tip_size:
+            raise RuntimeError(
+                f"Dual multi rack swap placed T{actual_tip_size} in {test_slot}; "
+                f"expected T{expected_tip_size}."
+            )
+    ctx.comment("dual P50M/P1000M rack swap complete")
 
 
 def _tip_size_from_rack(rack: Labware) -> int:
@@ -3337,7 +3563,7 @@ def _get_csv_tipracks(fixture_settings: "FixtureSettings", tip: int) -> List[Lab
     return [
         _load_or_get_labware(
             fixture_settings.ctx,
-            f"opentrons_flex_96_tiprack_{tip}uL",
+            _tiprack_load_name(tip),
             slot,
         )
         for slot in fixture_settings.tips[tip]
@@ -3351,7 +3577,7 @@ def _load_csv_tipracks(
     return [
         _load_or_get_labware(
             ctx,
-            f"opentrons_flex_96_tiprack_{tip}uL",
+            _tiprack_load_name(tip),
             slot,
         )
         for slot in csv_settings.tips[tip]
@@ -3415,11 +3641,16 @@ def _do_simulating_lpc_moves(
             pipette.pick_up_tip(lpc_tip)
             pipette.aspirate(min(tip, pipette.max_volume), source_well)
             pipette.dispense(min(tip, pipette.max_volume), source_well)
-            pipette.drop_tip()
+            if _uses_dual_single_no_trash(csv_settings):
+                pipette.return_tip()
+            elif _uses_dual_multi_extension_deck(csv_settings):
+                _drop_dual_multi_tip_to_a3(ctx, pipette)
+            else:
+                pipette.drop_tip()
 
 
 # -----------------------------------------------------------------------------
-# Custom: right-mount current guard for dual P1000S/P50S workflows.
+# Custom: right-mount current guard for dual P1000S/P50S/P1000M/P50M workflows.
 # -----------------------------------------------------------------------------
 
 
@@ -3848,9 +4079,19 @@ def _uses_96ch_stacker_runtime(fixture_settings: FixtureSettings) -> bool:
     )
 
 
-def _liquid_class_trash_location(fixture_settings: FixtureSettings) -> Location:
+def _uses_no_trash_runtime(fixture_settings: FixtureSettings) -> bool:
+    """Whether this run returns tips and does not load or visit a trash bin."""
+    return (
+        _uses_96ch_stacker_runtime(fixture_settings)
+        or _uses_no_trash_runtime_settings(fixture_settings)
+    )
+
+
+def _liquid_class_trash_location(
+    fixture_settings: FixtureSettings,
+) -> Union[Location, TrashBin]:
     """Return a liquid-class trash fallback without requiring a loaded trash bin."""
-    if _uses_96ch_stacker_runtime(fixture_settings):
+    if _uses_no_trash_runtime(fixture_settings):
         return fixture_settings.liquid_source.top()
     return fixture_settings.pipette.trash_container  # type: ignore[return-value]
 
@@ -3942,11 +4183,27 @@ def run(ctx: ProtocolContext) -> None:
         mount=mounts_to_test[0],
         mounts_to_test=mounts_to_test,
     )
+    dual_multi_extension_deck = _uses_dual_multi_extension_deck(csv_settings)
+    dual_mount_no_trash = _uses_dual_mount_no_trash(csv_settings)
+    if dual_mount_no_trash:
+        csv_settings = replace(csv_settings, return_tip=True)
+        ctx.comment(
+            "dual P50S/P1000S mode: force return_tip and "
+            "skip the trash bin"
+        )
+    elif dual_multi_extension_deck:
+        csv_settings = replace(csv_settings, return_tip=False)
+        ctx.comment(
+            "dual P50M/P1000M mode: drop every tip at centered A3 with "
+            "Z=+40 mm; do not return tips"
+        )
+    if dual_multi_extension_deck:
+        _prepare_dual_multi_extension_deck_layout(ctx, csv_settings)
     manage_right_heat = _should_manage_right_pipette_heat(csv_settings.mounts_to_test)
     if manage_right_heat:
         _set_right_pipette_axes_engaged(ctx, False)
 
-    for mount in csv_settings.mounts_to_test:
+    for mount_index, mount in enumerate(csv_settings.mounts_to_test):
         if manage_right_heat and mount == "left":
             _set_right_pipette_axes_engaged(ctx, False)
         print_title(f"Starting gravimetric test on {mount} mount")
@@ -3957,3 +4214,10 @@ def run(ctx: ProtocolContext) -> None:
             mount=mount,
         )
         _run_fixture(ctx, fixture_settings, manage_right_heat)
+        mounts_remaining = csv_settings.mounts_to_test[mount_index + 1 :]
+        if (
+            dual_multi_extension_deck
+            and mount == "left"
+            and "right" in mounts_remaining
+        ):
+            _rearrange_tipracks_for_dual_multi_right_mount(ctx, csv_settings)
