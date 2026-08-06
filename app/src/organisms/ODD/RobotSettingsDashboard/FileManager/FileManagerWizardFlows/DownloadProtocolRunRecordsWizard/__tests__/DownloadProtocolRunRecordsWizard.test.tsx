@@ -48,7 +48,7 @@ describe('DownloadProtocolRunRecordsWizard', () => {
       eatToast: vi.fn(),
     } as any)
 
-    mockDownloadRuns = vi.fn().mockResolvedValue(undefined)
+    mockDownloadRuns = vi.fn().mockResolvedValue([mockRun])
     mockDeleteSelectedRuns = vi.fn().mockResolvedValue(undefined)
     vi.mocked(useDownloadSelectedRuns).mockReturnValue({
       downloadRuns: mockDownloadRuns,
