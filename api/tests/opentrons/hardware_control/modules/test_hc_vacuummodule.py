@@ -960,6 +960,8 @@ async def test_configure_device_applies_waste_and_pressure_defaults(
             k_velocity=pid.k_velocity,
             k_holding=pid.k_holding,
             tolerance=pid.tolerance_error,
+            approach_band=pid.approach_band,
+            slew_end_fraction=pid.slew_end_fraction,
         ),
     )
 
