@@ -4,13 +4,54 @@ title: "Vacuum Module: Maintenance and Cleaning"
 
 ## Maintenance
 
-You should not attempt to service or repair the vacuum module. If you have concerns about the module’s performance, contact Opentrons Support at <support@opentrons.com>.
+Do not attempt to service or repair the Vacuum Module unless specified in this manual or at the direction of Opentrons Support. If you have concerns about the safety or performance of any part of the Vacuum Module, contact Opentrons Support at <support@opentrons.com>.
+
+The following Vacuum Module components can be serviced at the intervals indicated below or as needed.
+
+<table>
+  <thead>
+    <tr>
+      <th>Interval</th>
+      <th>Inspect</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Weekly</strong></td>
+      <td>
+        <ul>
+            <li>Carboy</li>
+            <li>Air-liquid separator</li>
+        </td>
+      <td>Check for and dispose of any accumulated waste according to the health, safety, and environmental guidelines established by your facility.</td>
+    </tr>
+    <tr>
+      <td><strong>Monthly</strong></td>
+      <td>Carboy</td>
+      <td>Check for chips and cracks. Replace if damaged.</td>
+    </tr>
+    <tr>
+      <td><strong>Yearly</strong></td>
+      <td>
+        <ul>
+          <li>Vacuum hoses</li>
+          <li>Carboy float valve</li>
+        </ul>
+      </td>
+      <td>Replace vacuum hoses and the carboy float valve annually, or sooner if they show signs of wear, cracking, or deterioration.</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Cleaning
 
 Turn off and unplug the module from the wall outlet before cleaning it.
 
-The following table lists the chemicals you can use to clean the exterior of the vacuum pump and waste collection jug. Diluted alcohol and distilled water are our recommended cleaning products. You can also refer to the table below for other compatible options. For cleaning or decontaminating vacuum tubes or the waste collection jug, refer to your lab's procedures for handling biohazardous and other chemically hazardous waste.
+!!! Warning
+    Do not disassemble the Control Box for cleaning or attempt to clean its internal electronic components or mechanical parts.
+
+The following table lists the chemicals you can use to clean the exterior of the vacuum pump and waste collection jug. Diluted alcohol and distilled water are our recommended cleaning products. You can also refer to the table below for other compatible options.
 
 | Solution | Recommendations |
 |----|----|
@@ -18,10 +59,13 @@ The following table lists the chemicals you can use to clean the exterior of the
 | Bleach | Dilute to 10% (1:10 bleach/water ratio) for cleaning. Do not use 100% bleach. |
 | Distilled water | You can use distilled water to clean or rinse your vacuum module. |
 
-!!! Warning
-    Do not disassemble the vacuum module for cleaning or attempt to clean its internal electronic components or mechanical parts.
+For cleaning or decontaminating vacuum hoses or the waste collection carboy, wear the proper protective equipment (PPE) and follow  your lab's procedures for handling biohazardous and other chemically hazardous waste.
 
-## Air-liquid separator service
+!!! tip "Tip: working with vacuum hoses"
+    - Drain any trapped liquid from the vacuum hoses before disconnecting them.
+    - To prevent any residual material from dripping, store hoses with the quick connect fittings facing up.
+
+## Cleaning the air-liquid separator
 
 The Control Box includes an air-liquid separator located in a niche on its side panel. This device traps liquid droplets in a clear, removable collection bowl while allowing dry air to pass through the vacuum pump. You can remove the bowl to clean condensate from it, or whenever any accumulated liquid reaches the max fill line.
 
