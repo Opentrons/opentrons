@@ -6,7 +6,7 @@ import { i18n } from '/app/i18n'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getLocalRobot } from '/app/redux/discovery'
-import { getShellUsbMountPaths } from '/app/redux/shell'
+import { getShellUsbMassStorageMountPaths } from '/app/redux/shell'
 import { useDeleteSelectedRuns } from '/app/resources/devices/hooks/useDeleteSelectedRuns'
 import { useDownloadSelectedRuns } from '/app/resources/devices/hooks/useDownloadSelectedRuns'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
@@ -39,7 +39,7 @@ describe('DownloadProtocolRunRecordsWizard', () => {
   beforeEach(() => {
     vi.mocked(useDocumentationState).mockReturnValue({} as any)
     vi.mocked(getLocalRobot).mockReturnValue({ name: ROBOT_NAME } as any)
-    vi.mocked(getShellUsbMountPaths).mockReturnValue(['/mnt/usb1'])
+    vi.mocked(getShellUsbMassStorageMountPaths).mockReturnValue(['/mnt/usb1'])
     vi.mocked(useNotifyAllRunsQuery).mockReturnValue({
       data: { data: [mockRun] },
     } as any)

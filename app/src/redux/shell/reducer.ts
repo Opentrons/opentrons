@@ -8,6 +8,7 @@ import type {
   ShellState,
   ShellUpdateState,
   StepDetailViewerClosedState,
+  UsbMountPath,
 } from './types'
 
 const INITIAL_STATE: ShellUpdateState = {
@@ -69,16 +70,22 @@ export function massStorageReducer(
 }
 
 export function usbMountPathsReducer(
-  state = [] as string[],
+  state = [] as UsbMountPath[],
   action: Action
-): string[] {
+): UsbMountPath[] {
   switch (action.type) {
     case 'shell:ROBOT_MASS_STORAGE_DEVICE_ADDED':
-      return state.includes(action.payload.rootPath)
+      return state.some(entry => entry.path === action.payload.rootPath)
         ? state
-        : [...state, action.payload.rootPath]
+        : [
+            ...state,
+            {
+              path: action.payload.rootPath,
+              isMassStorage: action.payload.isMassStorage ?? true,
+            },
+          ]
     case 'shell:ROBOT_MASS_STORAGE_DEVICE_REMOVED':
-      return state.filter(p => p !== action.payload.rootPath)
+      return state.filter(entry => entry.path !== action.payload.rootPath)
   }
   return state
 }
@@ -113,7 +120,7 @@ interface ShellReducerMap {
   update: Reducer<ShellUpdateState, Action>
   isReady: Reducer<boolean, Action>
   filePaths: Reducer<string[], Action>
-  usbMountPaths: Reducer<string[], Action>
+  usbMountPaths: Reducer<UsbMountPath[], Action>
   systemLanguage: Reducer<string[] | null, Action>
   stepDetailViewerClosed: Reducer<StepDetailViewerClosedState, Action>
 }
