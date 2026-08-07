@@ -151,6 +151,16 @@ async def test_download_log_period_stages_under_persistence_temp(
     decoy.when(mock_log_data_manager.get_period_entries(period_id="1")).then_return(
         period_entries
     )
+    decoy.when(mock_log_data_manager.get_log_period_details(period_id="1")).then_return(
+        LogPeriodDetails(
+            id=1,
+            startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
+            endedAt=datetime(2024, 1, 2, tzinfo=timezone.utc),
+            recordCount=123,
+            totalSizeBytes=456,
+            attachedFilenames=[],
+        )
+    )
     decoy.when(await mock_key_client.get_key_and_hash()).then_return(
         PublicKeyAndHash(publicKey="public-key", publicHash="public-hash")
     )

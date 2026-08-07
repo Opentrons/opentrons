@@ -6,6 +6,7 @@ import {
   AuditLogFolder,
   ClearUnavailableRobots,
   EnableDevTools,
+  IncludeProtocolSourceInRunDownload,
   OverridePathToPython,
   PreventRobotCaching,
   ShowHeaterShakerAttachmentModal,
@@ -23,6 +24,8 @@ export function AdvancedSettings(): JSX.Element {
       <AdditionalCustomLabwareSourceFolder />
       <Divider marginY={SPACING.spacing24} />
       <AuditLogFolder />
+      <Divider marginY={SPACING.spacing24} />
+      <IncludeProtocolSourceInRunDownload />
       <Divider marginY={SPACING.spacing24} />
       <PreventRobotCaching />
       <Divider marginY={SPACING.spacing24} />

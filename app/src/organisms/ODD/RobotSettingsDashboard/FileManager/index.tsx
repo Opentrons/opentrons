@@ -70,13 +70,6 @@ export function FileManager({
 
   const tabs = useMemo(() => {
     return [
-      {
-        text: t('diagnostic_files'),
-        onClick: () => {
-          setActiveTab('diagnostic')
-        },
-        isActive: activeTab === 'diagnostic',
-      },
       ...(isComplianceReady
         ? [
             {
@@ -88,6 +81,14 @@ export function FileManager({
             },
           ]
         : []),
+
+      {
+        text: t('diagnostic_files'),
+        onClick: () => {
+          setActiveTab('diagnostic')
+        },
+        isActive: activeTab === 'diagnostic',
+      },
       {
         text: t('protocol_run_records'),
         onClick: () => {

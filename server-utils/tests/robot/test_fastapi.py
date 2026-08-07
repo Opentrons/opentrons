@@ -11,7 +11,12 @@ from server_utils.robot.fastapi import (
     get_robot_client,
     install_robot_server_client,
 )
-from server_utils.robot.robot_server import Client, LocalHTTPClient, RobotNameandSerial
+from server_utils.robot.robot_server import (
+    Client,
+    LocalHTTPClient,
+    RobotCurrentRunLog,
+    RobotNameandSerial,
+)
 
 
 async def test_build_robot_client_with_uds_yields_local_http_client(
@@ -54,6 +59,9 @@ def test_install_and_get_robot_client_via_dependency() -> None:
 
     class StubClient(Client):
         async def get_name_and_serial(self) -> RobotNameandSerial:
+            raise NotImplementedError
+
+        async def get_current_run_log(self) -> RobotCurrentRunLog:
             raise NotImplementedError
 
     stub_client = StubClient()
