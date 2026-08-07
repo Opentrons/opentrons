@@ -1,18 +1,17 @@
 import { useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { saveAs } from 'file-saver'
+import { useDispatch, useStore } from 'react-redux'
 
-import {
-  getLogPeriodRaw,
-  LOG_PERIOD_DELETION_KEY_HEADER,
-} from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
 
-import { logPeriodDeletionKeyReceived } from '/app/redux/audit'
-import { saveFileToUsb } from '/app/redux/shell/remote'
+import {
+  downloadAuditLog,
+  getLogPeriodDownloadDeleteStatus,
+} from '/app/redux/audit'
+import { waitForStoreCondition } from '/app/redux/waitForStoreCondition'
 
 import type { LogPeriodSummary } from '@opentrons/api-client'
-import type { Dispatch } from '/app/redux/types'
+import type { LogPeriodDownloadDeleteStatus } from '/app/redux/audit'
+import type { Dispatch, State } from '/app/redux/types'
 
 export function useDownloadLogPeriod(
   logPeriod: LogPeriodSummary,
@@ -24,6 +23,7 @@ export function useDownloadLogPeriod(
   const host = useHost()
   const dispatch = useDispatch<Dispatch>()
   const [isDownloading, setIsDownloading] = useState(false)
+  const store = useStore<State>()
 
   const logPeriodStartDateTransformed = logPeriod.startedAt.replaceAll(':', '_')
 
@@ -33,33 +33,31 @@ export function useDownloadLogPeriod(
     }
     setIsDownloading(true)
     const filename = `logperiod_${logPeriodStartDateTransformed}.zip`
-    return getLogPeriodRaw(host, logPeriod.id, 'blob')
-      .then(async res => {
-        // the server hands back a one-time deletion key when a log period is
-        // downloaded; stash it in redux so a later delete can use it
-        const deletionKey = res.headers?.[LOG_PERIOD_DELETION_KEY_HEADER]
-        if (typeof deletionKey === 'string') {
-          dispatch(
-            logPeriodDeletionKeyReceived({
-              logPeriodId: logPeriod.id,
-              deletionKey,
-            })
-          )
-        }
-        if (usbPath != null) {
-          const buffer = await (res.data as Blob).arrayBuffer()
-          await saveFileToUsb(`${usbPath}/${filename}`, buffer)
-        } else {
-          saveAs(res.data as Blob, filename)
-        }
-        setIsDownloading(false)
+    dispatch(
+      downloadAuditLog({
+        logPeriodId: logPeriod.id,
+        fileName: filename,
+        hostname: host.hostname,
+        port: host.port,
+        destination: usbPath,
       })
-      .catch((e: Error) => {
+    )
+    return waitForStoreCondition<LogPeriodDownloadDeleteStatus>(
+      store,
+      state => getLogPeriodDownloadDeleteStatus(state, logPeriod.id),
+      status =>
+        status?.status === 'download-success' ||
+        status?.status === 'download-failure'
+    )
+      .then(status => {
+        if (status.status === 'download-failure') {
+          onError?.(new Error(status.error))
+          throw new Error(status.error)
+        }
+      })
+      .finally(() => {
         setIsDownloading(false)
-        onError?.(e)
-        throw e
       })
   }
-
   return { downloadLogPeriod, isDownloading }
 }

@@ -4,7 +4,7 @@ import type { Dispatch as ReduxDispatch, Store as ReduxStore } from 'redux'
 import type { Observable } from 'rxjs'
 import type { AlertsAction, AlertsState } from './alerts/types'
 import type { AnalyticsTriggerAction } from './analytics/types'
-import type { AuditAction, AuditState } from './audit/slice'
+import type { AuditAction, AuditState } from './audit'
 import type { CalibrationAction, CalibrationState } from './calibration/types'
 import type { ConfigAction, ConfigState } from './config/types'
 import type {
@@ -13,7 +13,6 @@ import type {
   CustomLabwareState,
 } from './custom-labware/types'
 import type { DiscoveryAction, DiscoveryState } from './discovery/types'
-import type { LogLocationAction } from './log-location'
 import type { ProtocolAnalysisAction } from './protocol-analysis'
 import type { ProtocolRunAction, ProtocolRunState } from './protocol-runs/types'
 import type {
@@ -58,7 +57,6 @@ export type Action =
   | RobotUpdateAction
   | ShellAction
   | ConfigAction
-  | LogLocationAction
   | RouterAction
   | DiscoveryAction
   | ProtocolAnalysisAction
