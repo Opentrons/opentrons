@@ -107,7 +107,6 @@ export function ProtocolRunRecords({
     const selectedRuns = runs.filter(run => selectedIds.has(run.id))
     void downloadRuns(selectedRuns)
       .then(successfullyDownloadedRuns => {
-        console.log(successfullyDownloadedRuns)
         if (successfullyDownloadedRuns.length < selectedRuns.length) {
           makeToast(t('some_runs_not_deleted') as string, WARNING_TOAST, {
             closeButton: true,

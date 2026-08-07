@@ -16,6 +16,7 @@ import { formatTimestamp } from '/app/transformations/runs'
 
 import styles from './compliancereadysoftwarefiles.module.css'
 
+import type { ReactNode } from 'react'
 import type { LogPeriodSummary } from '@opentrons/api-client'
 
 interface LogPeriodRowProps {
@@ -30,7 +31,7 @@ export function LogPeriodRow({
   isSelected,
   isDeleting,
   onToggle,
-}: LogPeriodRowProps): JSX.Element {
+}: LogPeriodRowProps): ReactNode {
   const { t } = useTranslation('device_details')
   const isComplete = period.endedAt != null
   const { data: protocolsData } = useAllProtocolsQuery()
