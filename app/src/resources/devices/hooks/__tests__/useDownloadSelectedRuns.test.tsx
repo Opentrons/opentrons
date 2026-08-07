@@ -28,6 +28,13 @@ vi.mock('jszip', () => ({ default: MockJSZip }))
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/shell/remote', () => ({ saveFileToUsb: vi.fn() }))
+vi.mock('react-redux', async importOriginal => {
+  const actual = await importOriginal<typeof import('react-redux')>()
+  return {
+    ...actual,
+    useSelector: vi.fn(() => false),
+  }
+})
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const ROBOT_NAME = 'otie'

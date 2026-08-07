@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { useSelector } from 'react-redux'
 import { saveAs } from 'file-saver'
 
 import { DEFAULT_RUN_DOWNLOAD_PARAMS, getRunRaw } from '@opentrons/api-client'
 import { useAllProtocolsQuery, useHost } from '@opentrons/react-api-client'
 
+import { getIncludeProtocolSourceInRunDownload } from '/app/redux/config'
 import { saveFileToUsb } from '/app/redux/shell/remote'
 
 import { isEmptyDownloadResponse } from './utils/isEmptyDownloadResponse'
@@ -19,6 +21,9 @@ export function useDownloadRunRecord(
 } {
   const host = useHost()
   const [isDownloading, setIsDownloading] = useState(false)
+  const includeProtocolSource = useSelector(
+    getIncludeProtocolSourceInRunDownload
+  )
 
   const { data: protocols } = useAllProtocolsQuery()
 
@@ -34,8 +39,12 @@ export function useDownloadRunRecord(
     }
     setIsDownloading(true)
     const filename = `${matchingProtocolName ?? run.id}_${runDateTransformed}.zip`
+    const params = {
+      ...DEFAULT_RUN_DOWNLOAD_PARAMS,
+      protocol: includeProtocolSource,
+    }
 
-    return getRunRaw(host, run.id, DEFAULT_RUN_DOWNLOAD_PARAMS, 'blob')
+    return getRunRaw(host, run.id, params, 'blob')
       .then(async res => {
         if (isEmptyDownloadResponse(res.data, res.status)) {
           setIsDownloading(false)

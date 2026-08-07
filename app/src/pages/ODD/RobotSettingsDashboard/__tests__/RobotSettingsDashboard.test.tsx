@@ -31,6 +31,7 @@ import { FileManager } from '/app/organisms/ODD/RobotSettingsDashboard/FileManag
 import {
   getAppLanguage,
   getConfig,
+  getIncludeProtocolSourceInRunDownload,
   toggleConfigValue,
   toggleDevtools,
 } from '/app/redux/config'
@@ -164,6 +165,7 @@ describe('RobotSettingsDashboard', () => {
     vi.mocked(getConfig).mockReturnValue({
       update: { automaticallyDownloadUpdates: false },
     } as Config)
+    vi.mocked(getIncludeProtocolSourceInRunDownload).mockReturnValue(false)
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
   })
 
@@ -258,6 +260,32 @@ describe('RobotSettingsDashboard', () => {
     expect(mockDispatch).toHaveBeenCalledWith(
       toggleConfigValue('update.automaticallyDownloadUpdates')
     )
+  })
+
+  it('should render text with download protocol source file off and clicking it turns the setting on', () => {
+    render()
+    expect(
+      screen.getByTestId(
+        'RobotSettingButton_include_protocol_source_in_run_download'
+      )
+    ).toHaveTextContent('Off')
+    screen.getByText('Download Protocol Source File')
+    screen.getByText('Include protocol source file in run record downloads')
+    const toggle = screen.getByText('Download Protocol Source File')
+    fireEvent.click(toggle)
+    expect(mockDispatch).toHaveBeenCalledWith(
+      toggleConfigValue('protocols.includeProtocolSourceInRunDownload')
+    )
+  })
+
+  it('should render text with download protocol source file on', () => {
+    vi.mocked(getIncludeProtocolSourceInRunDownload).mockReturnValue(true)
+    render()
+    expect(
+      screen.getByTestId(
+        'RobotSettingButton_include_protocol_source_in_run_download'
+      )
+    ).toHaveTextContent('On')
   })
 
   it('should render appropriate error recovery mode copy, and calls the toggle', () => {

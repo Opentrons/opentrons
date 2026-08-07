@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { useSelector } from 'react-redux'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 
 import { DEFAULT_RUN_DOWNLOAD_PARAMS, getRunRaw } from '@opentrons/api-client'
 import { useAllProtocolsQuery, useHost } from '@opentrons/react-api-client'
 
+import { getIncludeProtocolSourceInRunDownload } from '/app/redux/config'
 import { saveFileToUsb } from '/app/redux/shell/remote'
 
 import { isEmptyDownloadResponse } from './utils/isEmptyDownloadResponse'
@@ -26,6 +28,9 @@ export function useDownloadSelectedRuns(
   const host = useHost()
   const [isDownloading, setIsDownloading] = useState(false)
   const [hasError, setHasError] = useState(false)
+  const includeProtocolSource = useSelector(
+    getIncludeProtocolSourceInRunDownload
+  )
 
   const { data: protocols } = useAllProtocolsQuery()
 
@@ -44,6 +49,10 @@ export function useDownloadSelectedRuns(
     setHasError(false)
 
     const zip = new JSZip()
+    const params = {
+      ...DEFAULT_RUN_DOWNLOAD_PARAMS,
+      protocol: includeProtocolSource,
+    }
 
     const results = await Promise.allSettled(
       runs.map(async run => {
@@ -53,12 +62,7 @@ export function useDownloadSelectedRuns(
         const matchingProtocolName = matchingProtocol?.metadata.protocolName
         const runDateTransformed = run.createdAt.replaceAll(':', '_')
 
-        const res = await getRunRaw(
-          currentHost,
-          run.id,
-          DEFAULT_RUN_DOWNLOAD_PARAMS,
-          'blob'
-        )
+        const res = await getRunRaw(currentHost, run.id, params, 'blob')
         if (isEmptyDownloadResponse(res.data, res.status)) {
           throw new Error(`No downloadable content for run ${run.id}`)
         }
