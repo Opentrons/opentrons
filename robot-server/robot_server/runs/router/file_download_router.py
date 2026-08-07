@@ -109,9 +109,7 @@ async def download_run_files(
     csvOutput: Annotated[
         bool,
         Query(
-            description=(
-                "Include CSV output files."
-            ),
+            description=("Include CSV output files."),
         ),
     ] = False,
 ) -> Union[FileResponse, Response]:

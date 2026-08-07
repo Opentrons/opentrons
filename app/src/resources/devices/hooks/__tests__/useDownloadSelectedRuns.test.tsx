@@ -29,9 +29,9 @@ vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/shell/remote', () => ({ saveFileToUsb: vi.fn() }))
 vi.mock('react-redux', async importOriginal => {
-  const actual = await importOriginal<typeof import('react-redux')>()
+  const actual = await importOriginal()
   return {
-    ...actual,
+    ...(actual as Record<string, unknown>),
     useSelector: vi.fn(() => false),
   }
 })
