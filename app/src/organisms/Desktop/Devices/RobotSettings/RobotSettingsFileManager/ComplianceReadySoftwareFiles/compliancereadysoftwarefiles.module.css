@@ -1,64 +1,39 @@
-/* Left: 12px(container padding) + 16px(CheckboxBasic) + 12px(HEADER_ICON_CHILD gap) = 40px
-   Right: 12px(container padding) + 24px(chevron) + 24px(HEADER_CONTAINER gap) = 60px */
+/* Left padding matches the log period row's own padding so the select-all
+   checkbox lines up with each row's checkbox. */
 .compliance_table_header_row {
   display: flex;
   height: 1.25rem;
   align-items: center;
-  padding: var(--spacing-4) var(--spacing-60) var(--spacing-4) var(--spacing-40);
+  padding: var(--spacing-4) var(--spacing-12);
   color: var(--grey-60);
   gap: var(--spacing-12);
 }
 
-/* Aligns with the 3 data columns in compliance_period_card_inner.
-   Offset = checkbox touch target (24px) + period-row gap (12px) + card inner padding-left (12px). */
-.compliance_period_col_headers {
+.log_period_row {
   display: flex;
-  padding-left: var(--spacing-40);
-  color: var(--grey-60);
-  gap: var(--spacing-24);
-}
-
-.compliance_checkbox_wrapper {
-  display: flex;
+  width: 100%;
   align-items: center;
-}
-
-.compliance_accordion_content {
-  display: flex;
-  min-width: 0;
-  flex: 1;
-  align-items: center;
+  padding: var(--spacing-12);
   gap: var(--spacing-12);
 }
 
-.compliance_period_row {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-12);
-}
-
-.compliance_period_card_outer {
-  min-width: 0;
+/* Shared by the header row and each log period row so the columns align. */
+.log_period_columns {
+  display: grid;
   flex: 1;
-  border-radius: var(--border-radius-4);
-  background-color: var(--grey-20);
-}
-
-.compliance_period_card_inner {
-  display: flex;
   align-items: center;
-  padding: var(--spacing-12) 0 var(--spacing-12) var(--spacing-12);
-  border-radius: var(--border-radius-4);
-  background-color: var(--white);
   gap: var(--spacing-24);
-}
-
-.log_file_col {
-  min-width: 0;
-  flex: 1;
+  grid-template-columns: 25% 25% 25% 25%;
 }
 
 .log_date_col {
   min-width: 0;
-  flex: 1;
+  flex: 3;
+}
+
+.log_status_col {
+  display: flex;
+  min-width: 0;
+  flex: 2;
+  align-items: center;
 }
