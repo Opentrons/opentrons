@@ -76,7 +76,7 @@ def fake_auth_server(
         return aiohttp.web.json_response(
             data={
                 "active": True,
-                "scope": "auth_settings.write audit_log.write",
+                "scope": "auth_settings.write audit_log.write audit_log.delete",
                 "username": "test",
                 "ot_fullname": "Test",
             },

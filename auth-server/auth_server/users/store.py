@@ -95,6 +95,7 @@ class UserStore:
         full_name: str | None = None,
         account_type: str | None = None,
         reset_password: bool | None = None,
+        deactivated: bool | None = None,
         *,
         now: datetime.datetime,
     ) -> User:
@@ -118,6 +119,8 @@ class UserStore:
                 user.account_type = AccountType(account_type)
             if reset_password is not None:
                 user.reset_password = reset_password
+            if deactivated is not None:
+                user.deactivated = deactivated
 
             session.commit()
             session.expunge(user)

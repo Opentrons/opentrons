@@ -52,6 +52,16 @@ def find_enums_in_packages(modules: list[ModuleType]) -> list[type[enum.Enum]]:
     return enums
 
 
+def find_basic_errors_in_packages(modules: list[ModuleType]) -> list[type[Exception]]:
+    """Return non-enumerated errors defined in the given modules."""
+    exceptions = []
+    for module in modules:
+        for name, obj in inspect.getmembers(module, inspect.isclass):
+            if issubclass(obj, Exception) and obj is not Exception:
+                exceptions.append(obj)
+    return exceptions
+
+
 def find_pydantic_classes_in_packages(
     modules: list[ModuleType],
 ) -> list[type[BaseModel]]:
@@ -279,6 +289,7 @@ class OpentronsPyroSerializer:
         return {
             "__class__": ".".join((obj.__module__, obj.__class__.__name__)),
             "args": obj.args,
+            "state": dict[str, Any](obj.__dict__),
         }
 
     @classmethod
@@ -291,7 +302,12 @@ class OpentronsPyroSerializer:
             raise TypeError(
                 f"Could not convert {class_name} to an error, unregistered with pyro."
             )
-        return error_type(*d["args"])
+        # Rebuild error object without calling subclass __init__, including new info
+        obj = error_type.__new__(error_type)
+        BaseException.__init__(obj, *d["args"])
+        if hasattr(obj, "__dict__"):
+            obj.__dict__.update(d.get("state", {}))
+        return obj
 
     @classmethod
     def register_typed_dict(cls, typed_dict: type) -> None:

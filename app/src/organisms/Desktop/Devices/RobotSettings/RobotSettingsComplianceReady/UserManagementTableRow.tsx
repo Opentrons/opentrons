@@ -1,12 +1,11 @@
 import { useTranslation } from 'react-i18next'
 
 import {
+  MenuItem,
   OverflowBtn,
   StyledText,
   useMenuHandleClickOutside,
 } from '@opentrons/components'
-
-import { MenuOverlay } from '/app/molecules/InstrumentCard/MenuOverlay'
 
 import styles from './usermanagement.module.css'
 
@@ -17,12 +16,18 @@ export interface UserManagementTableRowProps {
   user: AuthUser
   onEdit: (user: AuthUser) => void
   onDelete: (user: AuthUser) => void
+  onActivate: (user: AuthUser) => void
+  onResetPassword: (user: AuthUser) => void
+  onDeactivate: (user: AuthUser) => void
 }
 
 export function UserManagementTableRow({
   user,
   onEdit,
   onDelete,
+  onActivate,
+  onResetPassword,
+  onDeactivate,
 }: UserManagementTableRowProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const {
@@ -35,6 +40,7 @@ export function UserManagementTableRow({
   const handleMenuAction =
     (action: (selectedUser: AuthUser) => void): MouseEventHandler =>
     () => {
+      setShowOverflowMenu(false)
       action(user)
     }
 
@@ -81,33 +87,32 @@ export function UserManagementTableRow({
             aria-label={`UserManagement_overflowMenu_${user.username}`}
           />
           {showOverflowMenu ? (
-            <div className={styles.overflow_menu_container}>
-              <MenuOverlay
-                hasDivider={false}
-                menuOverlayItems={[
-                  {
-                    label: t('desktop_edit_user'),
-                    onClick: handleMenuAction(onEdit),
-                  },
-                  {
-                    label: t('desktop_delete_user'),
-                    onClick: handleMenuAction(onDelete),
-                  },
-                  {
-                    label: t('desktop_activate_user'),
-                    onClick: () => {},
-                    disabled: true,
-                  },
-                  {
-                    label: t('desktop_reset_password'),
-                    onClick: () => {},
-                    disabled: true,
-                  },
-                ]}
-                setShowMenuOverlay={setShowOverflowMenu}
-              />
+            <>
+              <div className={styles.overflow_menu}>
+                <MenuItem onClick={handleMenuAction(onEdit)}>
+                  {t('desktop_edit_user')}
+                </MenuItem>
+                <MenuItem onClick={handleMenuAction(onDelete)}>
+                  {t('desktop_delete_user')}
+                </MenuItem>
+                {user.locked ? (
+                  <MenuItem onClick={handleMenuAction(onActivate)}>
+                    {t('desktop_unlock_user')}
+                  </MenuItem>
+                ) : null}
+                {!user.locked ? (
+                  <MenuItem onClick={handleMenuAction(onResetPassword)}>
+                    {t('desktop_reset_password')}
+                  </MenuItem>
+                ) : null}
+                {!user.locked ? (
+                  <MenuItem onClick={handleMenuAction(onDeactivate)}>
+                    {t('desktop_lock_user')}
+                  </MenuItem>
+                ) : null}
+              </div>
               {menuOverlay}
-            </div>
+            </>
           ) : null}
         </div>
       </td>

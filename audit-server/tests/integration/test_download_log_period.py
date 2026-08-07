@@ -1,7 +1,5 @@
 import io
-import tempfile
 import zipfile
-from pathlib import Path
 
 import httpx
 
@@ -94,14 +92,12 @@ async def test_download_log_period_not_current(run_server: DevServer) -> None:
         )
         response.raise_for_status()
 
-        # This will rotate the logs
-        with tempfile.NamedTemporaryFile() as temp_file:
-            temp_file_name = Path(temp_file.name).name
-            response = await client.post(
-                f"{run_server.base_url}/audit/internal/storeRobotLog",
-                files={"file": temp_file.file},
-            )
-            response.raise_for_status()
+        # post a "robot log" to force log period rotation
+        response = await client.post(
+            f"{run_server.base_url}/audit/internal/storeRobotLog",
+            files={"file": ("robotlog.json", io.BytesIO(b"hi"), "application/json")},
+        )
+        response.raise_for_status()
 
         response = await client.get(f"{run_server.base_url}/audit/external/logPeriods")
         period_id = response.json()["data"][0]["id"]
@@ -121,5 +117,5 @@ async def test_download_log_period_not_current(run_server: DevServer) -> None:
                 "log_period.json",
                 "signing_key.pem",
                 "robot_identity.json",
-                temp_file_name,
+                "robotlog.json",
             ]

@@ -1,35 +1,28 @@
-import { useDispatch } from 'react-redux'
-import { renderHook } from '@testing-library/react'
+import { useDispatch, useStore } from 'react-redux'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import {
-  getLogPeriodRaw,
-  LOG_PERIOD_DELETION_KEY_HEADER,
-} from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
 
-import { logPeriodDeletionKeyReceived } from '/app/redux/audit'
-import { saveFileToUsb } from '/app/redux/shell/remote'
+import { downloadAuditLog } from '/app/redux/audit'
+import { waitForStoreCondition } from '/app/redux/waitForStoreCondition'
 
 import { useDownloadLogPeriod } from '../useDownloadLogPeriod'
 
 import type { HostConfig, LogPeriodSummary } from '@opentrons/api-client'
+import type { LogPeriodDownloadDeleteStatus } from '/app/redux/audit'
 
-const mockSaveAs = vi.hoisted(() => vi.fn())
-
-vi.mock('file-saver', () => ({ saveAs: mockSaveAs }))
-vi.mock('@opentrons/api-client', async importOriginal => {
-  const actual = await importOriginal<typeof getLogPeriodRaw>()
-  return { ...actual, getLogPeriodRaw: vi.fn() }
-})
 vi.mock('@opentrons/react-api-client')
-vi.mock('/app/redux/shell/remote', () => ({ saveFileToUsb: vi.fn() }))
+vi.mock('/app/redux/waitForStoreCondition', () => ({
+  waitForStoreCondition: vi.fn(),
+}))
 vi.mock('react-redux', async importOriginal => {
   const actual = await importOriginal()
   return {
     ...(actual as Record<string, unknown>),
     useDispatch: vi.fn(),
+    useStore: vi.fn(),
   }
 })
 
@@ -41,95 +34,120 @@ const mockPeriod = {
 } as LogPeriodSummary
 
 const mockDispatch = vi.fn()
+const mockStore = {
+  getState: vi.fn(),
+  subscribe: vi.fn(),
+  dispatch: vi.fn(),
+  replaceReducer: vi.fn(),
+  [Symbol.observable]: vi.fn(),
+}
 
 describe('useDownloadLogPeriod', () => {
   beforeEach(() => {
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
+    vi.mocked(useStore).mockReturnValue(mockStore as any)
     when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
-    vi.mocked(getLogPeriodRaw).mockResolvedValue({
-      data: { arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)) },
-      headers: { [LOG_PERIOD_DELETION_KEY_HEADER]: 'key-for-lp' },
-    } as any)
-    mockSaveAs.mockClear()
     mockDispatch.mockClear()
-    vi.mocked(saveFileToUsb).mockClear()
-    vi.mocked(saveFileToUsb).mockResolvedValue(undefined)
+    vi.mocked(waitForStoreCondition).mockReset()
+    vi.mocked(waitForStoreCondition).mockResolvedValue({
+      status: 'download-success',
+      deletionKey: 'key-for-lp',
+    })
   })
 
   afterEach(() => {
     vi.resetAllMocks()
   })
 
-  it('should not fetch when there is no host', async () => {
+  it('should not dispatch when there is no host', async () => {
     when(vi.mocked(useHost)).calledWith().thenReturn(null)
     const { result } = renderHook(() => useDownloadLogPeriod(mockPeriod))
 
     await result.current.downloadLogPeriod()
 
-    expect(getLogPeriodRaw).not.toHaveBeenCalled()
+    expect(mockDispatch).not.toHaveBeenCalled()
+    expect(waitForStoreCondition).not.toHaveBeenCalled()
   })
 
-  it('should fetch the log period and save via the browser when no usbPath is given', async () => {
+  it('should dispatch downloadAuditLog with a filename built from the start date', async () => {
     const { result } = renderHook(() => useDownloadLogPeriod(mockPeriod))
 
-    await result.current.downloadLogPeriod()
-
-    expect(getLogPeriodRaw).toHaveBeenCalledWith(HOST_CONFIG, 'lp-1', 'blob')
-    expect(mockSaveAs).toHaveBeenCalledWith(
-      expect.anything(),
-      'logperiod_2024-01-01T10_00_00.000Z.zip'
-    )
-    expect(saveFileToUsb).not.toHaveBeenCalled()
-  })
-
-  it('should save to the usbPath instead of the browser when provided', async () => {
-    const { result } = renderHook(() => useDownloadLogPeriod(mockPeriod))
-
-    await result.current.downloadLogPeriod('/mnt/usb')
-
-    expect(saveFileToUsb).toHaveBeenCalledWith(
-      '/mnt/usb/logperiod_2024-01-01T10_00_00.000Z.zip',
-      expect.any(ArrayBuffer)
-    )
-    expect(mockSaveAs).not.toHaveBeenCalled()
-  })
-
-  it('should dispatch the deletion key from the response header', async () => {
-    const { result } = renderHook(() => useDownloadLogPeriod(mockPeriod))
-
-    await result.current.downloadLogPeriod()
+    await act(async () => {
+      await result.current.downloadLogPeriod()
+    })
 
     expect(mockDispatch).toHaveBeenCalledWith(
-      logPeriodDeletionKeyReceived({
+      downloadAuditLog({
         logPeriodId: 'lp-1',
-        deletionKey: 'key-for-lp',
+        fileName: 'logperiod_2024-01-01T10_00_00.000Z.zip',
+        hostname: HOST_CONFIG.hostname,
+        port: HOST_CONFIG.port,
+        destination: undefined,
       })
     )
   })
 
-  it('should not dispatch a deletion key when the header is absent', async () => {
-    vi.mocked(getLogPeriodRaw).mockResolvedValue({
-      data: { arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)) },
-      headers: {},
-    } as any)
+  it('should pass the usbPath as the destination when provided', async () => {
     const { result } = renderHook(() => useDownloadLogPeriod(mockPeriod))
 
-    await result.current.downloadLogPeriod()
+    await act(async () => {
+      await result.current.downloadLogPeriod('/mnt/usb')
+    })
 
-    expect(mockDispatch).not.toHaveBeenCalled()
+    expect(mockDispatch).toHaveBeenCalledWith(
+      downloadAuditLog({
+        logPeriodId: 'lp-1',
+        fileName: 'logperiod_2024-01-01T10_00_00.000Z.zip',
+        hostname: HOST_CONFIG.hostname,
+        port: HOST_CONFIG.port,
+        destination: '/mnt/usb',
+      })
+    )
   })
 
-  it('should call onError and stop downloading when the fetch fails', async () => {
-    const error = new Error('nope')
-    vi.mocked(getLogPeriodRaw).mockRejectedValue(error)
+  it('should report isDownloading while the download is in flight', async () => {
+    let resolveWait: (status: LogPeriodDownloadDeleteStatus) => void = () => {}
+    vi.mocked(waitForStoreCondition).mockImplementation(
+      () =>
+        new Promise(resolve => {
+          resolveWait = resolve
+        })
+    )
+
+    const { result } = renderHook(() => useDownloadLogPeriod(mockPeriod))
+
+    let download: Promise<void> = Promise.resolve()
+    act(() => {
+      download = result.current.downloadLogPeriod()
+    })
+
+    await waitFor(() => {
+      expect(result.current.isDownloading).toEqual(true)
+    })
+
+    await act(async () => {
+      resolveWait({ status: 'download-success', deletionKey: 'key-for-lp' })
+      await download
+    })
+
+    expect(result.current.isDownloading).toEqual(false)
+  })
+
+  it('should call onError and stop downloading when the download fails', async () => {
+    vi.mocked(waitForStoreCondition).mockResolvedValue({
+      status: 'download-failure',
+      error: 'nope',
+    })
     const onError = vi.fn()
     const { result } = renderHook(() =>
       useDownloadLogPeriod(mockPeriod, onError)
     )
 
-    await result.current.downloadLogPeriod().catch(() => {})
+    await act(async () => {
+      await result.current.downloadLogPeriod().catch(() => {})
+    })
 
-    expect(onError).toHaveBeenCalledWith(error)
+    expect(onError).toHaveBeenCalledWith(new Error('nope'))
     expect(result.current.isDownloading).toEqual(false)
   })
 })

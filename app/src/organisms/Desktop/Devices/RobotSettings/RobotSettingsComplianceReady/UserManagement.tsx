@@ -8,6 +8,8 @@ import {
 } from '@opentrons/components'
 import {
   useDeleteUserMutation,
+  useResetUserPasswordMutation,
+  useUpdateUserMutation,
   useUsersQuery,
 } from '@opentrons/react-api-client'
 
@@ -17,8 +19,9 @@ import { useUsernameForRobot } from '/app/redux/robot-auth'
 
 import { Accordion } from './Accordion'
 import { AddUserModal } from './AddUserModal'
-import { DeleteUserConfirmModal } from './DeleteUserConfirmModal'
 import { EditUserModal } from './EditUserModal'
+import { OneTimePasswordModal } from './userAccount/OneTimePasswordModal'
+import { UserAccountConfirmModal } from './userAccount/UserAccountConfirmModal'
 import styles from './usermanagement.module.css'
 import { UserManagementTableRow } from './UserManagementTableRow'
 
@@ -33,12 +36,18 @@ interface UserManagementTableProps {
   users: AuthUser[]
   onEdit: (user: AuthUser) => void
   onDelete: (user: AuthUser) => void
+  onActivate: (user: AuthUser) => void
+  onResetPassword: (user: AuthUser) => void
+  onDeactivate: (user: AuthUser) => void
 }
 
 function UserManagementTable({
   users,
   onEdit,
   onDelete,
+  onActivate,
+  onResetPassword,
+  onDeactivate,
 }: UserManagementTableProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -76,6 +85,9 @@ function UserManagementTable({
             user={user}
             onEdit={onEdit}
             onDelete={onDelete}
+            onActivate={onActivate}
+            onResetPassword={onResetPassword}
+            onDeactivate={onDeactivate}
           />
         ))}
       </tbody>
@@ -86,15 +98,27 @@ function UserManagementTable({
 export function UserManagement({
   robotName,
 }: UserManagementProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'shared'])
   const username = useUsernameForRobot(robotName)
   const usersQuery = useUsersQuery({ enabled: username != null })
   const users = usersQuery?.data?.data ?? []
   const documentationState = useDocumentationState(undefined, robotName)
   const { deleteUser } = useDeleteUserMutation(documentationState)
+  const { resetUserPassword, isLoading: isResettingPassword } =
+    useResetUserPasswordMutation(documentationState)
+  const { updateUser, isLoading: isUpdatingUser } =
+    useUpdateUserMutation(documentationState)
   const [showAddUserModal, setShowAddUserModal] = useState(false)
   const [userToEdit, setUserToEdit] = useState<AuthUser | null>(null)
   const [userToDelete, setUserToDelete] = useState<AuthUser | null>(null)
+  const [userToActivate, setUserToActivate] = useState<AuthUser | null>(null)
+  const [userToResetPassword, setUserToResetPassword] =
+    useState<AuthUser | null>(null)
+  const [userToDeactivate, setUserToDeactivate] = useState<AuthUser | null>(
+    null
+  )
+  const [resetPasswordTemporaryPassword, setResetPasswordTemporaryPassword] =
+    useState<string | null>(null)
   const { makeToast } = useToaster()
 
   const handleDeleteConfirm = (): void => {
@@ -116,12 +140,95 @@ export function UserManagement({
       })
   }
 
+  const handleActivateConfirm = (): void => {
+    if (userToActivate == null) {
+      return
+    }
+
+    const { username } = userToActivate
+
+    void updateUser({
+      username,
+      request: { data: { locked: false } },
+    })
+      .then(() => resetUserPassword(username))
+      .then(response => {
+        setUserToActivate(null)
+        makeToast(
+          t('desktop_activate_user_success_banner') as string,
+          SUCCESS_TOAST,
+          { closeButton: true }
+        )
+        const { temporaryPassword } = response.data
+        if (temporaryPassword != null) {
+          setResetPasswordTemporaryPassword(temporaryPassword)
+        }
+      })
+      .catch(() => {
+        setUserToActivate(null)
+      })
+  }
+
+  const handleResetPasswordConfirm = (): void => {
+    if (userToResetPassword == null) {
+      return
+    }
+
+    void resetUserPassword(userToResetPassword.username)
+      .then(response => {
+        makeToast(
+          t('desktop_reset_password_success_banner') as string,
+          SUCCESS_TOAST,
+          { closeButton: true }
+        )
+        const { temporaryPassword } = response.data
+        if (temporaryPassword != null) {
+          setResetPasswordTemporaryPassword(temporaryPassword)
+        } else {
+          setUserToResetPassword(null)
+        }
+      })
+      .catch(() => {
+        setUserToResetPassword(null)
+      })
+  }
+
+  const handleResetPasswordCancel = (): void => {
+    setResetPasswordTemporaryPassword(null)
+    setUserToResetPassword(null)
+  }
+
+  const handleDeactivateConfirm = (): void => {
+    if (userToDeactivate == null) {
+      return
+    }
+
+    void updateUser({
+      username: userToDeactivate.username,
+      request: { data: { locked: true } },
+    })
+      .then(() => {
+        makeToast(
+          t('desktop_lock_user_success_banner') as string,
+          SUCCESS_TOAST,
+          { closeButton: true }
+        )
+        setUserToDeactivate(null)
+      })
+      .catch(() => {
+        setUserToDeactivate(null)
+      })
+  }
+
   return (
     <Accordion id="user-management" title={t('desktop_user_management')}>
       <UserManagementTable
         users={users}
         onEdit={setUserToEdit}
         onDelete={setUserToDelete}
+        onActivate={setUserToActivate}
+        onResetPassword={setUserToResetPassword}
+        onDeactivate={setUserToDeactivate}
       />
       <div className={styles.add_user_button}>
         <EmptySelectorButton
@@ -165,11 +272,60 @@ export function UserManagement({
         />
       ) : null}
       {userToDelete != null ? (
-        <DeleteUserConfirmModal
+        <UserAccountConfirmModal
+          title={t('desktop_delete_user_modal_title') as string}
+          heading={t('desktop_delete_user_modal_heading') as string}
+          description={t('desktop_delete_user_modal_description') as string}
+          confirmLabel={t('shared:delete') as string}
           onConfirm={handleDeleteConfirm}
           onCancel={() => {
             setUserToDelete(null)
           }}
+        />
+      ) : null}
+      {userToActivate != null ? (
+        <UserAccountConfirmModal
+          title={t('desktop_activate_user_modal_title') as string}
+          heading={t('desktop_activate_user_modal_heading') as string}
+          description={t('desktop_activate_user_modal_description') as string}
+          confirmLabel={t('desktop_unlock_user') as string}
+          isConfirmDisabled={isUpdatingUser || isResettingPassword}
+          onConfirm={handleActivateConfirm}
+          onCancel={() => {
+            setUserToActivate(null)
+          }}
+        />
+      ) : null}
+      {userToDeactivate != null ? (
+        <UserAccountConfirmModal
+          title={t('desktop_lock_user_modal_title') as string}
+          heading={t('desktop_lock_user_modal_heading') as string}
+          description={t('desktop_lock_user_modal_description') as string}
+          confirmLabel={t('desktop_lock_user') as string}
+          isConfirmDisabled={isUpdatingUser}
+          onConfirm={handleDeactivateConfirm}
+          onCancel={() => {
+            setUserToDeactivate(null)
+          }}
+        />
+      ) : null}
+      {userToResetPassword != null && resetPasswordTemporaryPassword == null ? (
+        <UserAccountConfirmModal
+          title={t('desktop_reset_password') as string}
+          heading={t('desktop_reset_password_modal_heading') as string}
+          description={t('desktop_reset_password_modal_description') as string}
+          confirmLabel={t('desktop_reset_password') as string}
+          isConfirmDisabled={isResettingPassword}
+          onConfirm={handleResetPasswordConfirm}
+          onCancel={handleResetPasswordCancel}
+        />
+      ) : null}
+      {resetPasswordTemporaryPassword != null ? (
+        <OneTimePasswordModal
+          password={resetPasswordTemporaryPassword}
+          message={t('desktop_add_user_success_message') as string}
+          onConfirm={handleResetPasswordCancel}
+          onClose={handleResetPasswordCancel}
         />
       ) : null}
     </Accordion>
