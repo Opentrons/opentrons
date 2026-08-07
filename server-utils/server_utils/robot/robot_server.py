@@ -133,7 +133,7 @@ class LocalHTTPClient(Client):
                 response.raise_for_status()
                 try:
                     protocol_name = Path(response_json["data"]["files"][0]["name"]).stem
-                except IndexError:
+                except (IndexError, KeyError):
                     protocol_name = None
             else:
                 protocol_name = None
@@ -162,7 +162,7 @@ def _get_run_log_file_name(
 ) -> str:
     if protocol_name is not None:
         file_base_name = _sanitize_filename_component(protocol_name)
-    elif protocol_name is not None:
+    elif protocol_id is not None:
         file_base_name = _sanitize_filename_component(protocol_id)
     else:
         file_base_name = _sanitize_filename_component(run_id)
