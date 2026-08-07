@@ -2,22 +2,23 @@
 title: "Vacuum Module: Chemical Compatibility"
 description: "Chemicals compatibility with hoses and other Vacuum Module components."
 ---
+<!-- recommend legal review -->
 
-The chemical compatibility ratings below reflect data compiled from both Opentrons internal testing and component manufacturer specifications. Because variables such as temperature, chemical concentration, and exposure time fall outside our control, Opentrons makes no express or implied warranty regarding material performance under specific operational conditions.
+The chemical compatibility ratings below reflect Opentrons test data combined with published specifications from original equipment manufacturers (OEMs). Because OEM testing conditions (e.g., temperature, chemical concentration, exposure duration, and other methodologies) vary and fall outside our control, Opentrons makes no express or implied warranty regarding material performance or chemical suitability.
 
 ## Compatibility key
 
 The chemical compatibility tables use these ratings:
 
 * :material-check-circle:{ .dark-green } **Excellent** — No degradation after continuous exposure.
-* :material-check-circle-outline:{ .light-green } **Good** — Minor swelling or discoloration; long-term suitability.
-* :material-alert-circle-outline:{ .gray } **Fair / Marginal** — Moderate effect; flush with water/alcohol after exposure.
+* :material-check-circle-outline:{ .light-green } **Good** — Occasional minor effects (e.g., swelling or discoloration); suitable for long-term use.
+* :material-alert-circle-outline:{ .gray } **Fair / Marginal** — Moderate effects; flush after exposure.
 * :material-minus-circle-outline:{ .yellow } **Poor** — Severe degradation; brief or accidental contact only.
 * :material-close-circle:{ .red } **Not Recommended** — Rapid breakdown or complete material failure.
 
 ## Hoses
 
-Vacuum Module hoses are constructed from Tygon® 2375, a clear, plasticizer-free, non-DEHP flexible tubing. This material resists a wide range of laboratory chemicals, including aqueous solutions, acids, bases, ketones, salts, and alcohols. Refer to the table below for specific compatibility ratings.
+Vacuum Module hoses are constructed from Tygon® 2375. This is a clear, plasticizer-free, non-DEHP flexible tubing. It resists a wide range of laboratory chemicals, including aqueous solutions, acids, bases, ketones, salts, and alcohols. Refer to the table below for specific compatibility ratings.
 
 | Chemical/Solvent | Compatibility |
 |----|----|

@@ -3,11 +3,11 @@ title: "Vacuum Module: Use Cases"
 description: "Stacking deck pieces for filtrate collection and filter-to-waste applications."
 ---
 
-The Vacuum Module uses a modular deck stack to support different filtration protocols. For example, combining specific deck components allows you to adjust stack height to either collect or discard filtrate. Selecting the appropriate collar, spacer, and support grid ensures an airtight seal during vacuum filtration.
+The Vacuum Module uses a modular deck stack that supports a variety of filtration protocols. By combining specific collars, spacers, and support grids, you can configure the module to either collect samples or extract liquids directly to waste. Selecting the correct stack configuration ensures a reliable, airtight seal across different labware types and protocols.
 
 ## Stacking configurations
 
-Different pieces of the module's hardware stack control the vertical distance between the top (sample) filter plate and the bottom (collection) well plate. Adjusting this gap is critical for maintaining droplet control and preventing cross-contamination.
+Each stack configuration helps you control the vertical distance between the sample filter plate and the lower collection plate (or waste manifold). Minimizing the clearance between well plates helps prevents cross-contamination, aerosol/droplet spraying, and ensures clean liquid transfer into target wells.
 
 ### With spacers
 
@@ -22,7 +22,7 @@ From top to bottom, a filtrate collection stack uses the pieces shown below.
 
 <figure markdown>
   ![Waste collection stack showing labeled parts](images/stack-filter-to-plate.svg){ width="70%" }
-  <figcaption>Elution and filtrate collection stack</figcaption>
+  <figcaption>Elution and filtrate collection stack with spacers</figcaption>
 </figure>
 
 ### Without spacers
@@ -31,7 +31,7 @@ This stack omits spacers altogether to seat a sample filter plate directly on to
 
 <figure markdown>
   ![Waste collection stack with well plates only, no spacers](images/stack-plate-to-plate.svg){ width="80%" }
-  <figcaption>Elution and filtrate collection stack, without spacers</figcaption>
+  <figcaption>Elution and filtrate collection stack without spacers</figcaption>
 </figure>
 
 ### Direct to waste
