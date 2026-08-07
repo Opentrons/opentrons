@@ -5,6 +5,7 @@ import enum
 import functools
 import inspect
 import logging
+from dataclasses import is_dataclass
 from types import FunctionType, MethodType
 from typing import Any, Callable, Dict, Iterator, Optional, ParamSpec, TypeVar
 
@@ -807,6 +808,10 @@ def convert_result_to_wrapped_dict(  # noqa: C901
         if isinstance(result, dict):
             if hasattr(return_types, "__args__"):
                 key_type, value_type = return_types.__args__
+                if is_dataclass(value_type):
+                    result = {
+                        key: value.to_pyro_dict(value) for key, value in result.items()
+                    }
                 # Filter out `typing.Optional`` typings to the inner type, only works for non-tuples
                 # todo(chb: 2025-04-01): Catch and error on cases where we have optional tuples, does that even happen?
                 try:

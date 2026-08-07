@@ -1,48 +1,30 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useStore } from 'react-redux'
 import { renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import {
-  getLogPeriodRaw,
-  LOG_PERIOD_DELETION_KEY_HEADER,
-} from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
 
-import { logPeriodDeletionKeyReceived } from '/app/redux/audit'
-import { saveFileToUsb } from '/app/redux/shell/remote'
+import { downloadAuditLogs } from '/app/redux/audit'
+import { waitForStoreCondition } from '/app/redux/waitForStoreCondition'
 
 import { useDownloadSelectedLogPeriods } from '../useDownloadSelectedLogPeriods'
 
 import type * as React from 'react'
 import type { HostConfig, LogPeriodSummary } from '@opentrons/api-client'
+import type { LogPeriodDownloadDeleteStatus } from '/app/redux/audit'
 
-const mockJSZip = vi.hoisted(() => ({
-  file: vi.fn(),
-  generateAsync: vi.fn(),
-}))
-const mockSaveAs = vi.hoisted(() => vi.fn())
-const MockJSZip = vi.hoisted(
-  () =>
-    function MockJSZip() {
-      return mockJSZip
-    }
-)
-
-vi.mock('file-saver', () => ({ saveAs: mockSaveAs }))
-vi.mock('jszip', () => ({ default: MockJSZip }))
-vi.mock('@opentrons/api-client', async importOriginal => {
-  const actual = await importOriginal<typeof getLogPeriodRaw>()
-  return { ...actual, getLogPeriodRaw: vi.fn() }
-})
 vi.mock('@opentrons/react-api-client')
-vi.mock('/app/redux/shell/remote', () => ({ saveFileToUsb: vi.fn() }))
+vi.mock('/app/redux/waitForStoreCondition', () => ({
+  waitForStoreCondition: vi.fn(),
+}))
 vi.mock('react-redux', async importOriginal => {
   const actual = await importOriginal()
   return {
     ...(actual as Record<string, unknown>),
     useDispatch: vi.fn(),
+    useStore: vi.fn(),
   }
 })
 
@@ -60,6 +42,13 @@ const mockPeriodTwo = {
 } as LogPeriodSummary
 
 const mockDispatch = vi.fn()
+const mockStore = {
+  getState: vi.fn(),
+  subscribe: vi.fn(),
+  dispatch: vi.fn(),
+  replaceReducer: vi.fn(),
+  [Symbol.observable]: vi.fn(),
+}
 
 describe('useDownloadSelectedLogPeriods', () => {
   let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
@@ -71,25 +60,17 @@ describe('useDownloadSelectedLogPeriods', () => {
     )
 
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
+    vi.mocked(useStore).mockReturnValue(mockStore as any)
     when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
-    vi.mocked(getLogPeriodRaw).mockResolvedValue({
-      data: { arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)) },
-      headers: { [LOG_PERIOD_DELETION_KEY_HEADER]: 'key-for-lp' },
-    } as any)
-    mockJSZip.file.mockClear()
-    mockJSZip.generateAsync.mockClear()
-    mockJSZip.generateAsync.mockResolvedValue(new ArrayBuffer(0))
-    mockSaveAs.mockClear()
     mockDispatch.mockClear()
-    vi.mocked(saveFileToUsb).mockClear()
-    vi.mocked(saveFileToUsb).mockResolvedValue(undefined)
+    vi.mocked(waitForStoreCondition).mockReset()
   })
 
   afterEach(() => {
     vi.resetAllMocks()
   })
 
-  it('should reject and not fetch when given an empty array', async () => {
+  it('should reject and not dispatch when given an empty array', async () => {
     const { result } = renderHook(
       () => useDownloadSelectedLogPeriods(ROBOT_NAME),
       {
@@ -101,10 +82,20 @@ describe('useDownloadSelectedLogPeriods', () => {
       result.current.mutateAsync({ logPeriods: [] })
     ).rejects.toThrow()
 
-    expect(getLogPeriodRaw).not.toHaveBeenCalled()
+    expect(mockDispatch).not.toHaveBeenCalled()
   })
 
-  it('should fetch every log period, zip them, and save via the browser when no usbPath is given', async () => {
+  it('should dispatch downloadAuditLogs and resolve successful downloads', async () => {
+    vi.mocked(waitForStoreCondition)
+      .mockResolvedValueOnce({
+        status: 'download-success',
+        deletionKey: 'key-1',
+      })
+      .mockResolvedValueOnce({
+        status: 'download-success',
+        deletionKey: 'key-2',
+      })
+
     const { result } = renderHook(
       () => useDownloadSelectedLogPeriods(ROBOT_NAME),
       {
@@ -112,28 +103,32 @@ describe('useDownloadSelectedLogPeriods', () => {
       }
     )
 
-    await result.current.mutateAsync({
+    const downloads = await result.current.mutateAsync({
       logPeriods: [mockPeriodOne, mockPeriodTwo],
     })
 
-    expect(getLogPeriodRaw).toHaveBeenCalledWith(HOST_CONFIG, 'lp-1', 'blob')
-    expect(getLogPeriodRaw).toHaveBeenCalledWith(HOST_CONFIG, 'lp-2', 'blob')
-    expect(mockJSZip.file).toHaveBeenCalledWith(
-      'logperiod_2024-01-01T10_00_00.000Z.zip',
-      expect.any(ArrayBuffer)
+    expect(mockDispatch).toHaveBeenCalledWith(
+      downloadAuditLogs({
+        logPeriodSummaries: [mockPeriodOne, mockPeriodTwo],
+        hostname: HOST_CONFIG.hostname,
+        port: HOST_CONFIG.port,
+        robotName: ROBOT_NAME,
+        destination: undefined,
+      })
     )
-    expect(mockJSZip.file).toHaveBeenCalledWith(
-      'logperiod_2024-01-02T10_00_00.000Z.zip',
-      expect.any(ArrayBuffer)
-    )
-    expect(mockSaveAs).toHaveBeenCalledWith(
-      expect.any(Blob),
-      `${ROBOT_NAME}-log-periods.zip`
-    )
-    expect(saveFileToUsb).not.toHaveBeenCalled()
+    expect(waitForStoreCondition).toHaveBeenCalledTimes(2)
+    expect(downloads).toEqual([
+      { logPeriod: mockPeriodOne, deletionKey: 'key-1' },
+      { logPeriod: mockPeriodTwo, deletionKey: 'key-2' },
+    ])
   })
 
-  it('should save to the usbPath instead of the browser when provided', async () => {
+  it('should pass callTimeUsbPath as destination', async () => {
+    vi.mocked(waitForStoreCondition).mockResolvedValue({
+      status: 'download-success',
+      deletionKey: 'key-1',
+    })
+
     const { result } = renderHook(
       () => useDownloadSelectedLogPeriods(ROBOT_NAME),
       {
@@ -146,14 +141,28 @@ describe('useDownloadSelectedLogPeriods', () => {
       callTimeUsbPath: '/mnt/usb',
     })
 
-    expect(saveFileToUsb).toHaveBeenCalledWith(
-      `/mnt/usb/${ROBOT_NAME}-log-periods.zip`,
-      expect.any(ArrayBuffer)
+    expect(mockDispatch).toHaveBeenCalledWith(
+      downloadAuditLogs({
+        logPeriodSummaries: [mockPeriodOne],
+        hostname: HOST_CONFIG.hostname,
+        port: HOST_CONFIG.port,
+        robotName: ROBOT_NAME,
+        destination: '/mnt/usb',
+      })
     )
-    expect(mockSaveAs).not.toHaveBeenCalled()
   })
 
-  it('should dispatch the deletion key from the response header for every period', async () => {
+  it('should omit failed downloads from the result', async () => {
+    vi.mocked(waitForStoreCondition)
+      .mockResolvedValueOnce({
+        status: 'download-success',
+        deletionKey: 'key-1',
+      })
+      .mockResolvedValueOnce({
+        status: 'download-failure',
+        error: 'boom',
+      })
+
     const { result } = renderHook(
       () => useDownloadSelectedLogPeriods(ROBOT_NAME),
       {
@@ -161,73 +170,44 @@ describe('useDownloadSelectedLogPeriods', () => {
       }
     )
 
-    await result.current.mutateAsync({
+    const downloads = await result.current.mutateAsync({
       logPeriods: [mockPeriodOne, mockPeriodTwo],
     })
 
-    expect(mockDispatch).toHaveBeenCalledWith(
-      logPeriodDeletionKeyReceived({
-        logPeriodId: 'lp-1',
-        deletionKey: 'key-for-lp',
-      })
-    )
-    expect(mockDispatch).toHaveBeenCalledWith(
-      logPeriodDeletionKeyReceived({
-        logPeriodId: 'lp-2',
-        deletionKey: 'key-for-lp',
-      })
-    )
+    expect(downloads).toEqual([
+      { logPeriod: mockPeriodOne, deletionKey: 'key-1' },
+    ])
   })
 
-  it('should not dispatch a deletion key when the header is absent', async () => {
-    vi.mocked(getLogPeriodRaw).mockResolvedValue({
-      data: { arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)) },
-      headers: {},
-    } as any)
-    const { result } = renderHook(
-      () => useDownloadSelectedLogPeriods(ROBOT_NAME),
-      {
-        wrapper,
-      }
-    )
-
-    await result.current.mutateAsync({ logPeriods: [mockPeriodOne] })
-
-    expect(mockDispatch).not.toHaveBeenCalled()
-  })
-
-  it('should report an error status and stop loading when a log period fails to fetch', async () => {
-    vi.mocked(getLogPeriodRaw).mockRejectedValue(new Error('nope'))
-    const { result } = renderHook(
-      () => useDownloadSelectedLogPeriods(ROBOT_NAME),
-      {
-        wrapper,
-      }
-    )
-
-    await result.current
-      .mutateAsync({ logPeriods: [mockPeriodOne] })
-      .catch(() => {})
-
-    await waitFor(() => {
-      expect(result.current.status).toEqual('error')
+  it('should reject when every download fails', async () => {
+    vi.mocked(waitForStoreCondition).mockResolvedValue({
+      status: 'download-failure',
+      error: 'boom',
     })
-    expect(result.current.isLoading).toEqual(false)
+
+    const { result } = renderHook(
+      () => useDownloadSelectedLogPeriods(ROBOT_NAME),
+      {
+        wrapper,
+      }
+    )
+
+    await expect(
+      result.current.mutateAsync({
+        logPeriods: [mockPeriodOne, mockPeriodTwo],
+      })
+    ).rejects.toThrow('Failed to download any of the selected log periods.')
   })
 
   it('should report a loading status while a download is in flight', async () => {
-    let resolveFirstFetch: () => void = () => {}
-    vi.mocked(getLogPeriodRaw).mockImplementation(
+    let resolveWait: (status: LogPeriodDownloadDeleteStatus) => void = () => {}
+    vi.mocked(waitForStoreCondition).mockImplementation(
       () =>
         new Promise(resolve => {
-          resolveFirstFetch = () => {
-            resolve({
-              data: { arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)) },
-              headers: { [LOG_PERIOD_DELETION_KEY_HEADER]: 'key-for-lp' },
-            } as any)
-          }
-        }) as any
+          resolveWait = resolve
+        })
     )
+
     const { result } = renderHook(
       () => useDownloadSelectedLogPeriods(ROBOT_NAME),
       {
@@ -242,7 +222,7 @@ describe('useDownloadSelectedLogPeriods', () => {
       expect(result.current.status).toEqual('loading')
     })
 
-    resolveFirstFetch()
+    resolveWait({ status: 'download-success', deletionKey: 'key-1' })
     await firstCall
 
     await waitFor(() => {

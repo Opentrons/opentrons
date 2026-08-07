@@ -57,6 +57,7 @@
     "postWifiDisconnect",
     "postWifiKeys",
     "putSystemTime",
+    "resetUserPassword",
     "restart",
     "searchLabwareOffsets",
     "setLights",

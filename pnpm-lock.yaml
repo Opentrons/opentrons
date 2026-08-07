@@ -393,6 +393,9 @@ importers:
       '@opentrons/step-generation':
         specifier: workspace:*
         version: link:../step-generation
+      '@popperjs/core':
+        specifier: 2.1.1
+        version: 2.1.1
       '@reduxjs/toolkit':
         specifier: 2.11.2
         version: 2.11.2(react-redux@8.1.2(@types/react-dom@18.2.18)(@types/react@18.2.51)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(redux@5.0.1))(react@18.2.0)
@@ -1313,6 +1316,9 @@ importers:
       '@opentrons/step-generation':
         specifier: workspace:*
         version: link:../step-generation
+      '@popperjs/core':
+        specifier: 2.1.1
+        version: 2.1.1
       '@types/lodash':
         specifier: 'catalog:'
         version: 4.17.24

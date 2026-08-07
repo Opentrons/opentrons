@@ -306,4 +306,18 @@ export type ConfigV29 = Omit<ConfigV28, 'version' | 'update'> & {
   }
 }
 
-export type Config = ConfigV29
+export type ConfigV30 = Omit<ConfigV29, 'version'> & {
+  version: 30
+  audit: {
+    logDirectory: string | null
+  }
+}
+
+export type ConfigV31 = Omit<ConfigV30, 'version' | 'protocols'> & {
+  version: 31
+  protocols: ConfigV30['protocols'] & {
+    includeProtocolSourceInRunDownload: boolean
+  }
+}
+
+export type Config = ConfigV31

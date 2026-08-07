@@ -233,6 +233,7 @@ def run_resource() -> RunResource:
         created_at=datetime(year=2022, month=2, day=2),
         actions=[],
         signed_by="Alice Example",
+        log_period_id="123",
     )
 
 
@@ -341,6 +342,7 @@ async def test_create(
             run_id=run_id,
             protocol_id=protocol.protocol_id,
             created_at=created_at,
+            log_period_id="123",
         )
     ).then_return(run_resource)
 
@@ -374,11 +376,13 @@ async def test_create(
         run_time_param_paths=sentinel.run_time_param_paths,
         notify_publishers=mock_notify_publishers,
         access_control_status=False,
+        log_period_id="123",
     )
 
     assert result == Run(
         id=run_resource.run_id,
         protocolId=run_resource.protocol_id,
+        logPeriodId="123",
         createdAt=run_resource.created_at,
         current=True,
         actions=run_resource.actions,
@@ -468,6 +472,7 @@ async def test_create_engine_error(
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
             access_control_status=False,
+            log_period_id=None,
         )
 
     decoy.verify(
@@ -475,6 +480,7 @@ async def test_create_engine_error(
             run_id=run_id,
             created_at=matchers.Anything(),
             protocol_id=matchers.Anything(),
+            log_period_id=matchers.Anything(),
         ),
         times=0,
     )
@@ -507,6 +513,7 @@ async def test_get_current_run(
         current=True,
         id=run_resource.run_id,
         protocolId=run_resource.protocol_id,
+        logPeriodId=run_resource.log_period_id,
         createdAt=run_resource.created_at,
         actions=run_resource.actions,
         status=engine_state_summary.status,
@@ -552,6 +559,7 @@ async def test_get_historical_run(
         current=False,
         id=run_resource.run_id,
         protocolId=run_resource.protocol_id,
+        logPeriodId=run_resource.log_period_id,
         createdAt=run_resource.created_at,
         actions=run_resource.actions,
         status=engine_state_summary.status,
@@ -598,6 +606,7 @@ async def test_get_historical_run_no_data(
         current=False,
         id=run_resource.run_id,
         protocolId=run_resource.protocol_id,
+        logPeriodId=run_resource.log_period_id,
         createdAt=run_resource.created_at,
         actions=run_resource.actions,
         status=EngineStatus.STOPPED,
@@ -677,6 +686,7 @@ async def test_get_all_runs(
         created_at=datetime(year=2022, month=2, day=2),
         actions=[],
         signed_by=None,
+        log_period_id=None,
     )
 
     historical_run_resource = RunResource(
@@ -686,6 +696,7 @@ async def test_get_all_runs(
         created_at=datetime(year=2023, month=3, day=3),
         actions=[],
         signed_by=None,
+        log_period_id=None,
     )
 
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("current-run")
@@ -712,6 +723,7 @@ async def test_get_all_runs(
             current=False,
             id=historical_run_resource.run_id,
             protocolId=historical_run_resource.protocol_id,
+            logPeriodId=historical_run_resource.log_period_id,
             createdAt=historical_run_resource.created_at,
             actions=historical_run_resource.actions,
             status=historical_run_data.status,
@@ -730,6 +742,7 @@ async def test_get_all_runs(
             current=True,
             id=current_run_resource.run_id,
             protocolId=current_run_resource.protocol_id,
+            logPeriodId=current_run_resource.log_period_id,
             createdAt=current_run_resource.created_at,
             actions=current_run_resource.actions,
             status=current_run_data.status,
@@ -812,6 +825,7 @@ async def test_delete_signoff_enforcement(
             created_at=datetime(year=2022, month=2, day=2),
             actions=[],
             signed_by=signed_by,
+            log_period_id=None,
         )
     )
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
@@ -888,6 +902,7 @@ async def test_uncurrent(
         current=False,
         id=run_resource.run_id,
         protocolId=run_resource.protocol_id,
+        logPeriodId=run_resource.log_period_id,
         createdAt=run_resource.created_at,
         actions=run_resource.actions,
         status=engine_state_summary.status,
@@ -962,6 +977,7 @@ async def test_uncurrent_signoff_enforcement(
             created_at=datetime(year=2022, month=2, day=2),
             actions=[],
             signed_by=signed_by,
+            log_period_id=None,
         )
     )
 
@@ -1076,6 +1092,7 @@ async def test_create_archives_existing(
             run_id=run_id_new,
             created_at=datetime(year=2021, month=1, day=1),
             protocol_id=None,
+            log_period_id=None,
         )
     ).then_return(run_resource)
 
@@ -1090,6 +1107,7 @@ async def test_create_archives_existing(
         run_time_param_paths=None,
         notify_publishers=mock_notify_publishers,
         access_control_status=False,
+        log_period_id=None,
     )
 
     decoy.verify(
@@ -1148,6 +1166,7 @@ async def test_create_replacement_signoff_enforcement(
             created_at=datetime(year=2022, month=2, day=2),
             actions=[],
             signed_by=signed_by,
+            log_period_id=None,
         )
     )
 
@@ -1164,6 +1183,7 @@ async def test_create_replacement_signoff_enforcement(
                 run_time_param_paths=None,
                 notify_publishers=mock_notify_publishers,
                 access_control_status=access_control_status,
+                log_period_id=None,
             )
 
         decoy.verify(await mock_run_orchestrator_store.clear(), times=0)
@@ -1172,6 +1192,7 @@ async def test_create_replacement_signoff_enforcement(
                 run_id=run_id_new,
                 created_at=matchers.Anything(),
                 protocol_id=matchers.Anything(),
+                log_period_id=matchers.Anything(),
             ),
             times=0,
         )
@@ -1219,6 +1240,7 @@ async def test_create_replacement_signoff_enforcement(
                 run_id=run_id_new,
                 created_at=datetime(year=2021, month=1, day=1),
                 protocol_id=None,
+                log_period_id=None,
             )
         ).then_return(run_resource)
 
@@ -1233,6 +1255,7 @@ async def test_create_replacement_signoff_enforcement(
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
             access_control_status=access_control_status,
+            log_period_id=None,
         )
 
         decoy.verify(

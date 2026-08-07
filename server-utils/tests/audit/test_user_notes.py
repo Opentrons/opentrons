@@ -263,3 +263,39 @@ async def test_passes_if_missing_and_required_but_crs_off(
     )
     response = client.get("/notes")
     assert response.status_code == 200
+
+
+async def test_passes_if_missing_and_not_required_and_min_length_set(
+    client: TestClient,
+    decoy: Decoy,
+    mock_audit_client: Client,
+    mock_authentication_checker: AuthenticationChecker,
+) -> None:
+    decoy.when(await mock_authentication_checker.access_control_status()).then_return(
+        True
+    )
+    decoy.when(await mock_audit_client.get_settings()).then_return(
+        AuditSettingsResponseData(
+            requireReasonForInteraction=False, minLengthOfReasonForInteraction=25
+        )
+    )
+    response = client.get("/notes")
+    assert response.status_code == 200
+
+
+async def test_passes_if_below_min_length_when_not_required(
+    client: TestClient,
+    decoy: Decoy,
+    mock_audit_client: Client,
+    mock_authentication_checker: AuthenticationChecker,
+) -> None:
+    decoy.when(await mock_authentication_checker.access_control_status()).then_return(
+        True
+    )
+    decoy.when(await mock_audit_client.get_settings()).then_return(
+        AuditSettingsResponseData(
+            requireReasonForInteraction=False, minLengthOfReasonForInteraction=25
+        )
+    )
+    response = client.get("/notes", headers={USER_NOTES_HEADER: "a" * 24})
+    assert response.status_code == 200
