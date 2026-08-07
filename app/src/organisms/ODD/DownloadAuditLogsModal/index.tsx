@@ -9,7 +9,7 @@ import { OddModal } from '/app/molecules/OddModal'
 import { useIsLogDeleted } from '/app/resources/audit/useIsLogDeleted'
 
 export function DownloadAuditLogsModal(): JSX.Element {
-  const { t } = useTranslation('access_control')
+  const { t } = useTranslation('branded')
 
   return (
     <OddModal>

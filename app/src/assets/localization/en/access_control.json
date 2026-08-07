@@ -14,8 +14,6 @@
   "documentation_required": "Documentation Required",
   "download_audit_logs": "Download audit logs",
   "download_audit_logs_description": "Audit logs are not saved to the robot and must be downloaded locally before continuing. Once this session ends, the data cannot be recovered.",
-  "download_audit_logs_in_opentrons_app": "Download audit logs in the Opentrons App",
-  "download_audit_logs_on_device_description": "Audit logs are not saved to the robot and must be downloaded in the Opentrons App",
   "forgot_password_heading": "Forgot password?",
   "forgot_password_link": "Forgot password?",
   "forgot_password_subheading": "Log in to an admin account to reset the password for your account.",
