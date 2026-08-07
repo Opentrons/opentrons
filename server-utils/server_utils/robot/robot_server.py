@@ -132,9 +132,17 @@ class LocalHTTPClient(Client):
                     response_json = await response.json()
                 response.raise_for_status()
                 try:
-                    protocol_name = Path(response_json["data"]["files"][0]["name"]).stem
+                    protocol_name = response_json["data"]["metadata"]["protocolName"]
                 except (IndexError, KeyError):
                     protocol_name = None
+
+                if protocol_name is None:
+                    try:
+                        protocol_name = Path(
+                            response_json["data"]["files"][0]["name"]
+                        ).stem
+                    except (IndexError, KeyError):
+                        pass
             else:
                 protocol_name = None
             run_log_filename = _get_run_log_file_name(

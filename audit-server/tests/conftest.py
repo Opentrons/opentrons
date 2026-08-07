@@ -211,7 +211,12 @@ def fake_robot_server(
 
     async def fake_stub_protocol(request: aiohttp.web.Request) -> aiohttp.web.Response:
         return aiohttp.web.json_response(
-            data={"data": {"files": [{"name": "my_cool_protocol.py"}]}},
+            data={
+                "data": {
+                    "files": [{"name": "my_cool_protocol.py"}],
+                    "metadata": {"protocolName": "Flex Cool Protocol"},
+                }
+            },
         )
 
     app = aiohttp.web.Application()

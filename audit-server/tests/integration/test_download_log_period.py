@@ -58,7 +58,7 @@ async def test_download_log_period_current_period(run_server: DevServer) -> None
                 "log_period.json",
                 "signing_key.pem",
                 "robot_identity.json",
-                "my_cool_protocol_2026-01-01T18_00_00.123Z.json",
+                "Flex_Cool_Protocol_2026-01-01T18_00_00.123Z.json",
             ]
 
 

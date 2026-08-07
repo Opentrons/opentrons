@@ -194,6 +194,43 @@ async def test_get_current_run_log(
     app_mock.get_run_commands_response = {"commands": [{"foo": "bar"}]}
 
     app_mock.get_protocols_response = {
+        "data": {
+            "files": [{"name": "my_cool_protocol.py"}],
+            "metadata": {"protocolName": "Flex Cool Protocol"},
+        }
+    }
+
+    result = await client.get_current_run_log()
+
+    assert result == RobotCurrentRunLog(
+        serialized_log=SerializedLog(
+            serialized_json='{"data": {"id": "myRunId", "current": true, "protocolId": "myProtocolId", "createdAt": "2026-01-01T18:00:00.123456Z"}, "commands": {"commands": [{"foo": "bar"}]}}',
+            filename="Flex_Cool_Protocol_2026-01-01T18_00_00.123Z.json",
+        )
+    )
+
+
+async def test_get_current_run_log_no_protocol_name(
+    mock_server: tuple[AppMock, LocalHTTPClient],
+) -> None:
+    """Test that the client can get the current run logs from the robot server, using the filename"""
+    app_mock, client = mock_server
+
+    app_mock.get_runs_response = {
+        "data": [
+            {
+                "id": "myRunId",
+                "current": True,
+                "protocolId": "myProtocolId",
+                "createdAt": "2026-01-01T18:00:00.123456Z",
+            }
+        ],
+        "links": {"current": {"href": "/runs/myRunId"}},
+    }
+
+    app_mock.get_run_commands_response = {"commands": [{"foo": "bar"}]}
+
+    app_mock.get_protocols_response = {
         "data": {"files": [{"name": "my_cool_protocol.py"}]}
     }
 
@@ -207,7 +244,7 @@ async def test_get_current_run_log(
     )
 
 
-async def test_get_current_run_log_no_protocol_name(
+async def test_get_current_run_log_no_protocol_filename(
     mock_server: tuple[AppMock, LocalHTTPClient],
 ) -> None:
     """Test that the client can get the current run logs from the robot server, with no protocol name."""
