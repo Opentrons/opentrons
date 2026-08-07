@@ -226,6 +226,25 @@ export type ErrorRecoveryPolicyResponse = UpdateErrorRecoveryPolicyRequest
 
 export type DownloadedRunResponse = Blob | string
 
+export interface GetRunDownloadParams {
+  protocol?: boolean
+  images?: boolean
+  runLog?: boolean
+  labwareOffsets?: boolean
+  csvInput?: boolean
+  csvOutput?: boolean
+}
+
+/** Default download set used by the desktop app (everything except protocol source). */
+export const DEFAULT_RUN_DOWNLOAD_PARAMS: Required<GetRunDownloadParams> = {
+  protocol: false,
+  images: true,
+  runLog: true,
+  labwareOffsets: true,
+  csvInput: true,
+  csvOutput: true,
+}
+
 /**
  * Current Run State Data
  */
