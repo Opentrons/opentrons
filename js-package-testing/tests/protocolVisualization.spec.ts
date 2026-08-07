@@ -11,29 +11,20 @@ test.describe('ProtocolVisualization', () => {
   test('captures first and last protocol steps', async ({ page, eyes }) => {
     const container = page.getByTestId('protocol-visualization-container')
     await container.waitFor({ state: 'visible' })
+    await page
+      .getByRole('button', { name: 'Play' })
+      .waitFor({ state: 'visible' })
+
     await eyes.check('ProtocolVisualization initial step', {
       region: container,
       matchLevel: 'Strict',
     })
 
-    const scrubberTrack = container
-      .locator('[class*="track_container"]')
-      .first()
-    await scrubberTrack.waitFor({ state: 'visible' })
-
-    // Drag the scrubber thumb to the end. A single end-click is flaky because
-    // TrackSlider subtracts thumb radius from the usable width.
-    const scrubberBox = await scrubberTrack.boundingBox()
-    if (scrubberBox == null) {
-      throw new Error('Protocol visualization scrubber was not visible')
-    }
-    const y = scrubberBox.y + scrubberBox.height / 2
-    await page.mouse.move(scrubberBox.x + 8, y)
-    await page.mouse.down()
-    await page.mouse.move(scrubberBox.x + scrubberBox.width - 2, y, {
-      steps: 8,
-    })
-    await page.mouse.up()
+    // TimelineScrubber's track_container uses height: 0 (hit-area via ::before),
+    // so Playwright treats it as hidden. Jump to the last annotated step instead.
+    const lastStep = container.getByRole('listitem').last()
+    await lastStep.scrollIntoViewIfNeeded()
+    await lastStep.click()
 
     await page.getByText('100% complete').waitFor({ state: 'visible' })
 
