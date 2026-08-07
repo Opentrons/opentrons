@@ -5,7 +5,7 @@ description: "Setting up, running, and documenting protocols in Compliance Ready
 
 Opentrons Flex Compliance Ready Software requires users to pause during protocol setup and a run to document their reason for completing actions like calibrating pipettes and modules, running a protocol, or recovering from an error.
 
-This section includes examples that users might see while using a compliance ready Flex. For a full list of user actions that require documentation, see the [Documented Actions](../docs/actions.md) appendix.
+This section includes examples that users might see while using a compliance ready Flex. For a full list of user actions that require documentation, see the [Documented Actions](actions.md) appendix.
 
 ## Setting up a protocol
 
@@ -14,7 +14,7 @@ After logging in on the Flex touchscreen or in the Opentrons App, you'll be able
 Click or tap the protocols tab to view all protocols loaded on the Flex. Remember that your compliance ready Flex can only run approved Python protocols: protocols your lab's administrator sends to the Flex by an administrator. 
 
 !!! note
-     By default, only administrators can send protocols to a compliance ready Flex. Your lab can choose which users can send approved protocols in [administrator settings](../docs/admin.md).
+     By default, only administrators can send protocols to a compliance ready Flex. Your lab can choose which users can send approved protocols in [administrator settings](admin.md).
 
 After choosing any runtime parameters and clicking **Start setup**, your Flex will prompt you to document your reason for setting up the protocol.
 
@@ -28,7 +28,7 @@ You'll need to continue adding documentation at several points during protocol s
 * Attaching, detaching, or calibrating pipettes or hardware, like modules.
 * Updating or confirming deck placements, including labware and liquids.
 * Changing a module's state, like opening a labware latch or setting temperature.
-* Applying [labware offsets](../../../flex/docs/touchscreen/protocol-setup#labware-offsets) or starting a labware position check.
+* Applying [labware offsets] or starting a labware position check.
 * Updating protocol run settings, like camera and image preferences.
 
 Although you can begin a protocol run on the Flex before some setup steps are complete, you'll need to document your reason for doing so. 
@@ -40,7 +40,7 @@ Although you can begin a protocol run on the Flex before some setup steps are co
 
 In this example, you can still begin the protocol run. You'll see a warning on the Flex touchscreen and, if you tap **Start run**, you'll need to document a separate action—starting the run without applying labware offsets. 
 
-If you need to make changes to the Flex or an attached instrument or module before you begin setup, you'll also need to add documentation for those [actions](../docs/actions.md). 
+If you need to make changes to the Flex or an attached instrument or module before you begin setup, you'll also need to add documentation for those [actions](actions.md). 
 
 <!---------
 
@@ -64,7 +64,7 @@ You won't be blocked from completing any of the actions listed above while your 
 
 For example, if you encounter an error during your protocol, you can choose from the available recovery actions and give the Flex time to correct the error. You'll prompted to add documentation after either:
 
-* Successfully completing [error recovery](../../flex/docs/touchscreen/protocol-run.md#error-recovery).
+* Successfully completing [error recovery].
 * Retrying or skipping the step causing the error. 
 * Canceling the protocol run.
 

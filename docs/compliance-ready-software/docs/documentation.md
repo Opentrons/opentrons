@@ -5,9 +5,9 @@ description: "Covers the concept of documenting user actions in Compliance Ready
 
 Required *documentation* is an important part of Opentrons Flex Compliance Ready Software.  Whenever administrators and users make changes to modules, set up a protocol, detach a pipette, or run a protocol, they'll need to document their reason for doing so. 
 
-Their documentation, along with their name and user ID, become a part of the [files](../records.md) your compliance ready Flex generates.
+Their documentation, along with their name and user ID, become a part of the [files](files.md) your compliance ready Flex generates.
 
-This section covers *how* users will add documentation. For a full list of user actions that require documentation, see the [Documented Actions](../docs/actions.md) appendix.
+This section covers *how* users will add documentation. For a full list of user actions that require documentation, see the [Documented Actions](actions.md) appendix.
 
 !!! note
     Opentrons Flex Compliance Ready Software adds required documentation checkpoints to the Opentrons App and Flex touchscreen. It's up to your lab to decide what suffient, audit-ready documentation looks like for you.
@@ -33,7 +33,7 @@ Your compliance ready Flex will prompt all users to document nearly every action
        * Tap the gray arrow on the right side to collapse the keyboard.
        * Double tap text to cut, copy, or paste.
    
-    Flex also supports an [external keyboard](../docs/devices.md), attached via USB, to type documentation.
+    Flex also supports an [external keyboard](devices.md), attached via USB, to type documentation.
 
 Users can also add text in the Opentrons App. Here, they can also view a list of documented actions on the right. 
 
@@ -77,7 +77,7 @@ Administrators can customize documentation settings in the Opentrons App. In **R
 *  **Require documentation for robot actions**: on by default.
 *  **Minimum length of documentation for robot actions**: default of 20 characters.
 
-See the complete list of administrator-customizable [settings](../docs/admin.md) for more.
+See the complete list of administrator-customizable [settings](admin.md) for more.
 
 <!----
 - triple check that these settings can only be accessed from the app 

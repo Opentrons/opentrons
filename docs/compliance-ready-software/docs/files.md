@@ -85,7 +85,7 @@ While storage is full, you won't be able to send or start new protocols on the F
 
 ## Download and delete files
 
-You have the option to download files immediately after [signing](../docs/complete.md) for a protocol run, or later.
+You have the option to download files immediately after [signing](complete.md) for a protocol run, or later.
 
 In the file manager in the Opentrons App, you can click to expand each protocol run record and see the files that are included: the `.py` protocol file, a run log, labware offset data, and any images or CSV files generated during the protocol run. 
 
@@ -96,7 +96,7 @@ When you're ready to download, click the check boxes on the left to select indiv
   <figcaption>Select individual or all files for download.</figcaption>
 </figure>
 
-The app packages your selected files as a `.zip` file for download. You can use compliance ready [settings](../docs/admin.md) to choose a default location for file downloads from the Opentrons App, or choose a location in your computer's files each time. 
+The app packages your selected files as a `.zip` file for download. You can use compliance ready [settings](admin.md) to choose a default location for file downloads from the Opentrons App, or choose a location in your computer's files each time. 
 
 <figure class="screenshot" markdown>
   ![Choose a download location from the Opentrons App.](../images/download-location.png)

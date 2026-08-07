@@ -16,9 +16,9 @@ When a protocol is complete, you'll need to sign for the run in the Opentrons Ap
   <figcaption>Sign for a protocol run in the Opentrons App.</figcaption>
 </figure>
 
-After signing, your Flex will prompt you to download audit logs. Audit logs are [files](../docs/files.md) the Flex generates containing data like responsible users, timestamps, and documentation for every robot action. 
+After signing, your Flex will prompt you to download audit logs. Audit logs are [files](files.md) the Flex generates containing data like responsible users, timestamps, and documentation for every robot action. 
 
-These files are not saved to the Flex and must be downloaded after signing for your protocol run. You'll see a prompt to download in the Opentrons App, and on the Flex touchscreen if you've chosen to download files from [both places](../docs/settings.md#file-downloads).
+These files are not saved to the Flex and must be downloaded after signing for your protocol run. You'll see a prompt to download in the Opentrons App, and on the Flex touchscreen if you've chosen to download files from [both places](settings.md#file-downloads).
 
 <figure class="screenshot" markdown>
   ![Download audit logs.](../images/download-logs-odd.png)
@@ -27,7 +27,7 @@ These files are not saved to the Flex and must be downloaded after signing for y
 
 When you're finished, end your session on the Flex by swiping down on the touchscreen or clicking the account icon in the top right to log out.
 
-You can download additional protocol [files](../docs/files.md) before you log out, or in your next session. 
+You can download additional protocol [files](files.md) before you log out, or in your next session. 
 
 <!---------
 

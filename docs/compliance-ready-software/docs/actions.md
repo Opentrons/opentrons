@@ -24,7 +24,7 @@ Users will need to document their reason for updating robot settings:
 * Placing the Flex in OEM mode for third-party use.
 * Resetting the Flex.
 
-By default, administrator credentials are required to update robot software. Adminstrators can update those permissions in [settings](../features/settings.md).
+By default, administrator credentials are required to update robot software. Adminstrators can update those permissions in [settings](admin.md).
 
 <!-----------
 

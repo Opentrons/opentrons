@@ -5,7 +5,7 @@ description: "An overview of the Flex's compliance-ready setings, and who has pe
 
 Administrators can customize compliance ready settings in the Opentrons App and on the Flex touchscreen.
 
-For a complete list of Flex robot settings, see the [Flex Instruction Manual](../../../flex/). 
+For a complete list of Flex robot settings, see the [Flex Instruction Manual]. 
 
 <!---------
 
@@ -57,7 +57,7 @@ All accounts are locked by default after 5 failed login attempts. After unlockin
   <figcaption>Administrators can unlock user accounts with a one-time password.</figcaption>
 </figure>
 
-If your lab [loses access](../docs/roles.md#account-recovery) to all administrator accounts, Opentrons offers a paid on-site recovery service.
+If your lab [loses access](roles.md#account-recovery) to all administrator accounts, Opentrons offers a paid on-site recovery service.
 
 
 ## Compliance Ready Software settings
@@ -81,7 +81,7 @@ TODO and comments:
 
 ## File source folder
 
-You can choose a location to automatically download and save [files](../files.md) from the Opentrons App.
+You can choose a location to automatically download and save [files](files.md) from the Opentrons App.
 
 Choose **App Settings** in the Opentrons App, then click the **Advanced** tab and click to select a folder.
 

@@ -39,7 +39,7 @@ TODO:
 
 ## Completing activation
 
-Finally, your representative will create accounts for your lab to use, assigned either an administrator or user [role](../docs/roles.md). You'll also be able to customize Compliance Ready Software [settings](../docs/settings.md).
+Finally, your representative will create accounts for your lab to use, assigned either an administrator or user [role](roles.md). You'll also be able to customize Compliance Ready Software [settings](settings.md).
 
 After setup, a "Compliance Ready" badge appears next to your Flex in the Opentrons App.
 

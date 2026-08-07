@@ -2,12 +2,12 @@
 title: "Compliance-Ready Features"
 description: "An overview of the Flex's compliance-ready features."
 ---
-Opentrons Flex Compliance-Ready software introduces several new, irreversible features when installed on your Flex. This section covers features like disabled features, data protection, external [devices](../docs/devices.md), and [administrator settings](../docs/admin.md).
+Opentrons Flex Compliance-Ready software introduces several new, irreversible features when installed on your Flex. This section covers features like disabled features, data protection, external [devices](devices.md), and [administrator settings](admin.md).
 
 
 ## Disabled features
 
-The Opentrons Flex is an open-source liquid handling robot, and includes features that let users control the robot outside of Opentrons software. Once Compliance Ready Software is active on your Flex, open-source features that allow access outside of the touchscreen or Opentrons App, like [Jupyter notebook](../../../flex/docs/advanced-operation/jupyter-notebook.md) and [SSH command line operation](../../../flex/docs/advanced-operation/command-line.md), are permanently disabled. This ensures that only your lab users can use your Flex.  
+The Opentrons Flex is an open-source liquid handling robot, and includes features that let users control the robot outside of Opentrons software. Once Compliance Ready Software is active on your Flex, open-source features that allow access outside of the touchscreen or Opentrons App, like [Jupyter notebook] and [SSH command line operation], are permanently disabled. This ensures that only your lab users can use your Flex.  
 
 Because activating Compliance Ready Software is permanent and irreversible, a factory reset of your Flex will delete calibration, run history, and protocols, but cannot remove Compliance Ready Software from the system. 
 
@@ -17,11 +17,11 @@ Before activation, a Flex can run any valid Python file developed using the Open
 
 Any action on your compliance ready Flex's touchscreen or connected Opentrons App requires a user login. Once Compliance Ready Software is activated, your Flex is blocked from running any actions, like protocol commands, unless a user is logged in.
 
-Screen timeouts and other security policies can be customized by [administrators](../features/settings.md) to further protect your data in the lab.
+Screen timeouts and other security policies can be customized by [administrators](admin.md) to further protect your data in the lab.
 
 ### Files
 
-Your compliance ready Flex locally generates robot and protocol [files](../docs/files.md) to preserve audit-ready information. Every data point includes: 
+Your compliance ready Flex locally generates robot and protocol [files](files.md) to preserve audit-ready information. Every data point includes: 
 
 * cryptographically hashed timestamps.
 * unique electronic user IDs and signatures.
