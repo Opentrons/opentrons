@@ -239,6 +239,76 @@ async def test_store_robot_log_stores_file(
             assert temp_path.is_file()
 
 
+async def test_store_robot_log_renames_file(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+    mock_key_client: KeyClient,
+) -> None:
+    """It should append _copy to the file if it already exists."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file.write("beep boop".encode("utf-8"))
+            temp_file.seek(0)
+            robot_log = StoredLog(
+                message="beep",
+                message_hash="bzzzt",
+                message_sig="boop",
+                sig_version="3",
+            )
+            decoy.when(
+                await mock_key_client.sign_message(
+                    SignMessageData(message="beep boop", previousHash=None)
+                )
+            ).then_return(
+                SignedMessageData(
+                    message="beep",
+                    messageHash="bzzzt",
+                    messageSignature="boop",
+                    signatureVersion=3,
+                )
+            )
+            temp_path = Path(temp_dir) / Path(temp_file.name).name
+            decoy.when(mock_store.store_robot_log(robot_log, temp_path)).then_return(
+                "eeeeee"
+            )
+            assert not temp_path.is_file()
+            stored_hash = await subject.store_robot_log(
+                UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
+                Path(temp_dir),
+            )
+            assert stored_hash == "eeeeee"
+            assert temp_path.is_file()
+
+            # It should it handle it for the first copy
+            copied_temp_path = temp_path.with_stem(f"{temp_path.stem}_copy")
+            decoy.when(
+                mock_store.store_robot_log(robot_log, copied_temp_path)
+            ).then_return("iiiiii")
+            temp_file.seek(0)
+            stored_hash = await subject.store_robot_log(
+                UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
+                Path(temp_dir),
+            )
+            assert stored_hash == "iiiiii"
+            assert copied_temp_path.is_file()
+
+            # Trying the same file a third time should make _copy_copy
+            copied_copied_temp_path = copied_temp_path.with_stem(
+                f"{copied_temp_path.stem}_copy"
+            )
+            decoy.when(
+                mock_store.store_robot_log(robot_log, copied_copied_temp_path)
+            ).then_return("oooooo")
+            temp_file.seek(0)
+            stored_hash = await subject.store_robot_log(
+                UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
+                Path(temp_dir),
+            )
+            assert stored_hash == "oooooo"
+            assert copied_copied_temp_path.is_file()
+
+
 async def test_store_robot_log_raises_keyserver_unavailable(
     subject: LogDataManager,
     mock_store: LogStore,
