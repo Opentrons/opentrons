@@ -142,10 +142,14 @@ describe('PersonalAccountSettings', () => {
       perRobotAuthStates: {},
       mostRecentRobotName: null,
     })
-    screen.getByText('Personal account settings')
+    screen.getByText('Log in to manage Compliance Ready Software settings')
+    expect(
+      screen.queryByText('Personal account settings')
+    ).not.toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: 'Edit' })
     ).not.toBeInTheDocument()
+    expect(screen.queryByText('alice')).not.toBeInTheDocument()
   })
 
   it('calls updateSelf and returns to view mode with updated fields on successful save', async () => {
