@@ -5,9 +5,12 @@ import pytest
 from decoy import Decoy, matchers
 
 from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.drivers.temp_deck import DEFAULT_COMMAND_RETRIES
 from opentrons.hardware_control import ExecutionManager, modules
-from opentrons.hardware_control.modules.tempdeck import TempDeck, TempDeckReader
+from opentrons.hardware_control.modules.tempdeck import (
+    READER_ERROR_DEBOUNCE,
+    TempDeck,
+    TempDeckReader,
+)
 from opentrons.hardware_control.modules.types import (
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
@@ -148,14 +151,14 @@ def test_tempdeck_reader_on_error_fires_callback_after_retries_exhausted(
     decoy: Decoy,
 ) -> None:
     """TempDeckReader.on_error should invoke the error callback exactly once
-    after DEFAULT_COMMAND_RETRIES consecutive errors."""
+    after READER_ERROR_DEBOUNCE consecutive errors."""
     driver = decoy.mock(name="driver")
     reader = TempDeckReader(driver=driver)
     cb = decoy.mock(name="error_callback")
     reader.set_error_callback(cb)
 
     exc = Exception("boom")
-    for _ in range(DEFAULT_COMMAND_RETRIES):
+    for _ in range(READER_ERROR_DEBOUNCE):
         reader.on_error(exc)
 
     decoy.verify(cb(exc), times=1)
@@ -172,9 +175,9 @@ def test_tempdeck_reader_on_error_recovers_after_firing(decoy: Decoy) -> None:
     reader.set_error_callback(cb)
 
     exc = Exception("boom")
-    for _ in range(DEFAULT_COMMAND_RETRIES):
+    for _ in range(READER_ERROR_DEBOUNCE):
         reader.on_error(exc)
-    for _ in range(DEFAULT_COMMAND_RETRIES):
+    for _ in range(READER_ERROR_DEBOUNCE):
         reader.on_error(exc)
 
     decoy.verify(cb(exc), times=2)
@@ -190,12 +193,12 @@ def test_tempdeck_reader_on_error_resets_on_successful_read(decoy: Decoy) -> Non
 
     exc = Exception("boom")
     # One error short of firing.
-    for _ in range(DEFAULT_COMMAND_RETRIES - 1):
+    for _ in range(READER_ERROR_DEBOUNCE - 1):
         reader.on_error(exc)
     decoy.verify(cb(matchers.Anything()), times=0)
 
-    reader._debounce_count = DEFAULT_COMMAND_RETRIES
+    reader._debounce_count = READER_ERROR_DEBOUNCE
 
-    for _ in range(DEFAULT_COMMAND_RETRIES - 1):
+    for _ in range(READER_ERROR_DEBOUNCE - 1):
         reader.on_error(exc)
     decoy.verify(cb(matchers.Anything()), times=0)
