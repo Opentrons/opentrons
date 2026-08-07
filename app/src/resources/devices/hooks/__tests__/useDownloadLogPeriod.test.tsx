@@ -11,7 +11,7 @@ import { waitForStoreCondition } from '/app/redux/waitForStoreCondition'
 import { useDownloadLogPeriod } from '../useDownloadLogPeriod'
 
 import type { HostConfig, LogPeriodSummary } from '@opentrons/api-client'
-import type { LogPeriodDownloadDeleteStatus } from '/app/redux/audit'
+import type { LogPeriodDownloadStatus } from '/app/redux/audit'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/waitForStoreCondition', () => ({
@@ -106,7 +106,7 @@ describe('useDownloadLogPeriod', () => {
   })
 
   it('should report isDownloading while the download is in flight', async () => {
-    let resolveWait: (status: LogPeriodDownloadDeleteStatus) => void = () => {}
+    let resolveWait: (status: LogPeriodDownloadStatus) => void = () => {}
     vi.mocked(waitForStoreCondition).mockImplementation(
       () =>
         new Promise(resolve => {

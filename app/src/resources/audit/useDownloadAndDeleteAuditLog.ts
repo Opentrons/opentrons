@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDispatch } from 'react-redux'
 
 import {
   useDeleteLogPeriodMutation,
@@ -6,9 +7,12 @@ import {
 } from '@opentrons/react-api-client'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { logPeriodDeleteStarted } from '/app/redux/audit'
 
 import { useUpdateClientDataLogDeletion } from '../client_data/audit'
 import { useDownloadLogPeriod } from '../devices/hooks/useDownloadLogPeriod'
+
+import type { Dispatch } from '/app/redux/types'
 
 export function useDownloadAndDeleteAuditLog(
   logPeriodId: string,
@@ -20,6 +24,7 @@ export function useDownloadAndDeleteAuditLog(
 } {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
+  const dispatch = useDispatch<Dispatch>()
 
   const updateLogDeletionStatus = useUpdateClientDataLogDeletion(logPeriodId)
 
@@ -39,6 +44,7 @@ export function useDownloadAndDeleteAuditLog(
     try {
       const deletionKey = await downloadLogPeriod()
       if (deletionKey != null) {
+        dispatch(logPeriodDeleteStarted({ logPeriodId }))
         deleteLogPeriod(
           { logPeriodId, deletionKey },
           {

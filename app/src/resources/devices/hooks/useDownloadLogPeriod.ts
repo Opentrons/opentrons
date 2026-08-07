@@ -3,14 +3,11 @@ import { useDispatch, useStore } from 'react-redux'
 
 import { useHost } from '@opentrons/react-api-client'
 
-import {
-  downloadAuditLog,
-  getLogPeriodDownloadDeleteStatus,
-} from '/app/redux/audit'
+import { downloadAuditLog, getLogPeriodDownloadStatus } from '/app/redux/audit'
 import { waitForStoreCondition } from '/app/redux/waitForStoreCondition'
 
 import type { LogPeriodDetails, LogPeriodSummary } from '@opentrons/api-client'
-import type { LogPeriodDownloadDeleteStatus } from '/app/redux/audit'
+import type { LogPeriodDownloadStatus } from '/app/redux/audit'
 import type { Dispatch, State } from '/app/redux/types'
 
 export function useDownloadLogPeriod(
@@ -45,9 +42,9 @@ export function useDownloadLogPeriod(
         destination: usbPath,
       })
     )
-    return waitForStoreCondition<LogPeriodDownloadDeleteStatus>(
+    return waitForStoreCondition<LogPeriodDownloadStatus>(
       store,
-      state => getLogPeriodDownloadDeleteStatus(state, logPeriod.id),
+      state => getLogPeriodDownloadStatus(state, logPeriod.id),
       status =>
         status?.status === 'download-success' ||
         status?.status === 'download-failure'
