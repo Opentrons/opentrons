@@ -188,7 +188,8 @@ class MotionController(Protocol[MountArgType]):
         max_speeds: Optional[Dict[Axis, float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
         fail_on_not_homed: bool = False,
-    ) -> None:
+        critical_point: Optional[CriticalPoint] = None,
+    ) -> Point:
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed.
         'speed' sets the speed of all axes to the given value. So, if multiple
@@ -196,6 +197,8 @@ class MotionController(Protocol[MountArgType]):
 
         If fail_on_not_homed is True (default False), if an axis that is not
         homed moves it will raise a PositionUnknownError. Otherwise, it will home the axis.
+
+        :returns: The gantry position of ``critical_point`` after the move.
         """
         ...
 

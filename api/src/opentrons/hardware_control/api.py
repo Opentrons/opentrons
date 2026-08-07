@@ -821,9 +821,12 @@ class API(  # type: ignore[misc]
         max_speeds: Optional[Dict[Axis, float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
         fail_on_not_homed: bool = False,
-    ) -> None:
+        critical_point: Optional[CriticalPoint] = None,
+    ) -> top_types.Point:
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed.
+
+        :returns: The gantry position of ``critical_point`` after the move.
         """
 
         # TODO: Remove the fail_on_not_homed and make this the behavior all the time.
@@ -861,6 +864,12 @@ class API(  # type: ignore[misc]
             speed=speed,
             max_speeds=max_speeds,
             check_bounds=check_bounds,
+        )
+        # Position cache was updated by the successful move; do not re-check
+        # fail_on_not_homed here (unrelated axes like plungers may still be unhomed).
+        return await self.gantry_position(
+            mount=mount,
+            critical_point=critical_point,
         )
 
     async def _cache_and_maybe_retract_mount(self, mount: top_types.Mount) -> None:

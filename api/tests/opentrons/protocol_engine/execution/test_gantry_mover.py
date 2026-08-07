@@ -235,10 +235,12 @@ async def test_move_relative(
         )
     )
     decoy.when(
-        await mock_hardware_api.gantry_position(
+        await mock_hardware_api.move_rel(
             mount=Mount.RIGHT,
-            critical_point=CriticalPoint.XY_CENTER,
+            delta=Point(1, 2, 3),
             fail_on_not_homed=True,
+            speed=9001,
+            critical_point=CriticalPoint.XY_CENTER,
         )
     ).then_return(Point(4, 5, 6))
 
@@ -249,18 +251,6 @@ async def test_move_relative(
     )
 
     assert result == Point(4, 5, 6)
-
-    # TODO(mc, 2022-05-13): the order of these calls is difficult to manage
-    # and test for. Ideally, `hardware.move_rel` would return the resulting position
-    decoy.verify(
-        await mock_hardware_api.move_rel(
-            mount=Mount.RIGHT,
-            delta=Point(1, 2, 3),
-            fail_on_not_homed=True,
-            speed=9001,
-        ),
-        times=1,
-    )
 
 
 async def test_move_relative_must_home(
@@ -277,11 +267,12 @@ async def test_move_relative_must_home(
         )
     )
     decoy.when(
-        await mock_hardware_api.move_rel(  # type: ignore[func-returns-value]
+        await mock_hardware_api.move_rel(
             mount=Mount.LEFT,
             delta=Point(x=1, y=2, z=3),
             fail_on_not_homed=True,
             speed=456.7,
+            critical_point=CriticalPoint.XY_CENTER,
         )
     ).then_raise(PositionUnknownError("oh no"))
 

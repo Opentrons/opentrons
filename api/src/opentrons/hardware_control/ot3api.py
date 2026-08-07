@@ -1454,9 +1454,13 @@ class OT3API(
         check_bounds: MotionChecks = MotionChecks.NONE,
         fail_on_not_homed: bool = False,
         expect_stalls: bool = False,
-    ) -> None:
+        critical_point: Optional[CriticalPoint] = None,
+    ) -> top_types.Point:
         """Move the critical point of the specified mount by a specified
-        displacement in a specified direction, at the specified speed."""
+        displacement in a specified direction, at the specified speed.
+
+        :returns: The gantry position of ``critical_point`` after the move.
+        """
         if not self._current_position:
             await self.refresh_positions()
 
@@ -1497,6 +1501,12 @@ class OT3API(
             max_speeds=checked_max,
             check_bounds=check_bounds,
             expect_stalls=expect_stalls,
+        )
+        # Position cache was updated by the successful move; do not re-check
+        # fail_on_not_homed here (unrelated axes like plungers may still be unhomed).
+        return await self.gantry_position(
+            mount=realmount,
+            critical_point=critical_point,
         )
 
     async def _cache_and_maybe_retract_mount(self, mount: OT3Mount) -> None:
