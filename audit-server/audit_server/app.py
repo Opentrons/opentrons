@@ -145,7 +145,7 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         else:
             _log.warning(
                 "robot-server is not configured."
-                " robot identity file in log period download"
+                " robot identity file and run log in log period download"
                 " will return stub data."
             )
             robot_server_client = _StubRobotServerClient()
