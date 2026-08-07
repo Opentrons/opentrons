@@ -59,9 +59,7 @@ def test_update_deactivated(user_store: UserStore) -> None:
         now=_NOW,
         reset_password=False,
     )
-    updated = user_store.update(
-        "deactivate_test_user", deactivated=True, now=_NOW
-    )
+    updated = user_store.update("deactivate_test_user", deactivated=True, now=_NOW)
     assert updated.deactivated is True
 
 

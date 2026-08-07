@@ -4,6 +4,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: Setup - Enable access control
@@ -175,6 +176,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: Setup - Enable access control
@@ -278,6 +280,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: Setup - Enable access control
