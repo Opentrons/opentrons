@@ -54,7 +54,6 @@ from auth_server.settings.router import router as settings_router
 from auth_server.settings.store import SettingsStore, install_settings_store
 from auth_server.users.router import router as users_router
 from auth_server.users.store import UserStore
-from auth_server.users.user_data_manager import UserDataManager
 
 _REDOC_CDN_URL = "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js"
 
@@ -119,10 +118,6 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             lambda action, message: _oauth_audit_log(audit_client, action, message),
         )
         install_oauth2_backend(app.state, oauth2_backend)
-        user_service = UserDataManager(
-            user_store=user_store, settings_store=settings_store
-        )
-        user_service.seed_initial_users()
         install_settings_store(app.state, settings_store)
         authentication_checker = build_authentication_checker(
             settings_store, oauth2_backend
