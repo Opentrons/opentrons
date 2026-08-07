@@ -1,36 +1,21 @@
-import { Provider } from 'react-redux'
-import { legacy_createStore } from 'redux'
 import { action } from 'storybook/actions'
 
 import { TopPortalRoot } from '/app/App/portal'
 import { i18n } from '/app/i18n'
-import { configReducer } from '/app/redux/config/reducer'
 
 import { UserAccountConfirmModal } from './UserAccountConfirmModal'
 
 import type { Meta, StoryObj } from '@storybook/react'
-import type { Store, StoreEnhancer } from 'redux'
-
-const dummyConfig = {
-  config: {
-    isOnDevice: false,
-  },
-} as any
-
-const store: Store<any> = legacy_createStore(
-  configReducer,
-  dummyConfig as StoreEnhancer
-)
 
 const meta: Meta<typeof UserAccountConfirmModal> = {
   title: 'App/Organisms/UserAccountConfirmModal',
   component: UserAccountConfirmModal,
   decorators: [
     Story => (
-      <Provider store={store}>
+      <>
         <TopPortalRoot />
         <Story />
-      </Provider>
+      </>
     ),
   ],
 }

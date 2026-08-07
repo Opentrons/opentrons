@@ -3,14 +3,17 @@ import { useTranslation } from 'react-i18next'
 
 import {
   COLORS,
+  Icon,
   ModalShell,
   PrimaryButton,
   SecondaryButton,
+  StyledText,
   WizardHeader,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
+
+import styles from './userAccountForm.module.css'
 
 import type { JSX } from 'react'
 
@@ -48,23 +51,27 @@ export function UserAccountConfirmModal({
         />
       }
     >
-      <SimpleWizardBody
-        iconColor={COLORS.yellow50}
-        header={heading}
-        subHeader={description}
-        isSuccess={false}
-      >
-        <SecondaryButton type="button" onClick={onCancel}>
-          {t('cancel') as string}
-        </SecondaryButton>
-        <PrimaryButton
-          type="button"
-          disabled={isConfirmDisabled}
-          onClick={onConfirm}
-        >
-          {confirmLabel}
-        </PrimaryButton>
-      </SimpleWizardBody>
+      <div className={styles.confirm_modal_content}>
+        <div className={styles.confirm_modal_body}>
+          <Icon name="ot-alert" size="2.5rem" color={COLORS.yellow50} />
+          <StyledText desktopStyle="headingSmallBold">{heading}</StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {description}
+          </StyledText>
+        </div>
+        <div className={styles.confirm_modal_actions}>
+          <SecondaryButton type="button" onClick={onCancel}>
+            {t('cancel') as string}
+          </SecondaryButton>
+          <PrimaryButton
+            type="button"
+            disabled={isConfirmDisabled}
+            onClick={onConfirm}
+          >
+            {confirmLabel}
+          </PrimaryButton>
+        </div>
+      </div>
     </ModalShell>,
     getTopPortalEl()
   )
