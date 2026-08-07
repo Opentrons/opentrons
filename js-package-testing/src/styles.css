@@ -2,6 +2,13 @@
 @import url('@fontsource/public-sans/600.css');
 @import url('@fontsource/public-sans/700.css');
 
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
 * {
   font-family: 'Public Sans', sans-serif;
 }
@@ -11,8 +18,22 @@
   padding: var(--spacing-16);
 }
 
+.app_container_visualization {
+  display: flex;
+  overflow: hidden;
+  height: 100vh;
+  max-width: none;
+  box-sizing: border-box;
+  flex-direction: column;
+}
+
 .demo_header {
   margin-bottom: var(--spacing-32);
+}
+
+.app_container_visualization .demo_header {
+  flex-shrink: 0;
+  margin-bottom: var(--spacing-12);
 }
 
 .demo_lead {
@@ -20,11 +41,19 @@
   line-height: var(--lh-copy);
 }
 
+.app_container_visualization .demo_lead {
+  display: none;
+}
+
 .demo_nav {
   display: flex;
   flex-wrap: wrap;
   margin-top: var(--spacing-16);
   gap: var(--spacing-16);
+}
+
+.app_container_visualization .demo_nav {
+  margin-top: var(--spacing-8);
 }
 
 .demo_nav a {
@@ -70,6 +99,26 @@
   background-color: var(--white);
 }
 
+.protocol_visualization_section {
+  display: flex;
+  min-height: 0;
+  max-width: none;
+  flex: 1;
+  flex-direction: column;
+  padding-bottom: 0;
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.protocol_visualization_toolbar {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-16);
+  margin-bottom: var(--spacing-8);
+}
+
 .protocol_visualization_demo {
   /*
    * PlayBackControls in @opentrons/protocol-visualization uses position: fixed
@@ -81,8 +130,8 @@
   transform: translateZ(0);
   overflow: hidden;
   width: 100%;
-  height: min(44rem, calc(100vh - 14rem));
-  margin-top: var(--spacing-16);
+  min-height: 0;
+  flex: 1;
   border: 0.0625rem solid var(--grey-35);
   border-radius: var(--border-radius-8);
   background-color: var(--grey-10);

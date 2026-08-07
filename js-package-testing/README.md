@@ -211,14 +211,20 @@ what an external app must install (React, i18n, the four packages). Test tooling
 
 ## Protocol fixtures
 
-Flex deck / visualization demos use a paired protocol + analysis under `src/`:
+Deck / visualization demos use paired protocol + analysis files under `src/`:
 
-| File | Role |
-| --- | --- |
-| `Flex_Smoke_2_27_96_SmokeTestWith2Stackers.py` | Source Flex smoke protocol (API 2.27, 2 stackers + waste chute). Copied from `analyses-snapshot-testing/files/protocols/Flex_S_2_7_P200_96_GRIP_HS_MB_TC_TM_SmokeTestWith2Stackers.py` |
-| `StackerAnalysis.json` | Analysis of that protocol |
+| File                                           | Role                                                                                                                                                                          |
+| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Flex_Smoke_2_27_96_SmokeTestWith2Stackers.py` | Flex smoke source (API 2.27, 2 stackers + waste chute). Copied from `analyses-snapshot-testing/files/protocols/Flex_S_2_7_P200_96_GRIP_HS_MB_TC_TM_SmokeTestWith2Stackers.py` |
+| `StackerAnalysis.json`                         | Analysis of the Flex smoke protocol                                                                                                                                           |
+| `ot2TC.py`                                     | OT-2 companion source matching the historical `ot2TC` PD export (TC + mag + transfer)                                                                                         |
+| `ot2Analysis.json`                             | OT-2 analysis fixture (historical PD export; keep as-is)                                                                                                                      |
 
-Keep them side by side so visual diffs can be traced back to protocol commands. To regenerate the analysis from the monorepo root (requires `api/.venv`):
+Keep each pair side by side so visual diffs can be traced to protocol commands.
+
+### Regenerate Flex analysis
+
+From the monorepo root (requires `api/.venv`):
 
 ```bash
 api/.venv/bin/python -m opentrons.cli analyze \
@@ -228,6 +234,10 @@ api/.venv/bin/python -m opentrons.cli analyze \
 ```
 
 Pretty-print the JSON afterward if you want readable diffs. Accept Applitools baselines after intentional analysis changes.
+
+### OT-2 analysis note
+
+This monorepo rejects OT-2 protocol analysis (OT-2 app fork). Do not overwrite `ot2Analysis.json` with `opentrons.cli analyze` here. Update that fixture only from an OT-2-capable analyzer, or keep the checked-in snapshot.
 
 ## Applitools Eyes
 
@@ -354,8 +364,10 @@ js-package-testing/
 │   ├── i18n.ts
 │   ├── styles.css
 │   ├── locale/en/protocol_visualization.json
-│   ├── Flex_Smoke_2_27_96_SmokeTestWith2Stackers.py  # source Flex smoke protocol
-│   └── StackerAnalysis.json  # analysis of that protocol (regenerate via opentrons analyze)
+│   ├── Flex_Smoke_2_27_96_SmokeTestWith2Stackers.py
+│   ├── StackerAnalysis.json
+│   ├── ot2TC.py
+│   └── ot2Analysis.json
 └── tests/
     ├── protocolDeck.spec.ts
     └── protocolVisualization.spec.ts

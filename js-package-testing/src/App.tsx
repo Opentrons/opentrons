@@ -26,7 +26,13 @@ export function App(): JSX.Element {
   const currentPage = getCurrentPage()
 
   return (
-    <div className="app_container">
+    <div
+      className={
+        currentPage === 'protocol-visualization'
+          ? 'app_container app_container_visualization'
+          : 'app_container'
+      }
+    >
       <header className="demo_header">
         <h1>JS package testing</h1>
         <p className="demo_lead">
@@ -103,8 +109,7 @@ function VisualizationPage(): JSX.Element {
   const [showFlex, setShowFlex] = useState<boolean>(true)
   return (
     <main className="demo_section protocol_visualization_section">
-      <h2>Protocol visualization</h2>
-      <div style={{ display: 'flex', gap: '1rem' }}>
+      <div className="protocol_visualization_toolbar">
         <PrimaryButton
           onClick={() => {
             setShowFlex(true)
@@ -119,14 +124,12 @@ function VisualizationPage(): JSX.Element {
         >
           Ot-2
         </PrimaryButton>
+        <p>
+          {showFlex
+            ? 'Flex: Flex_Smoke_2_27_96_SmokeTestWith2Stackers.py + StackerAnalysis.json'
+            : 'OT-2: ot2TC.py + ot2Analysis.json'}
+        </p>
       </div>
-      <p>
-        From <code>@opentrons/protocol-visualization</code> using the{' '}
-        {showFlex ? 'StackerAnalysis' : 'Ot2Analysis'} fixture. Flex analysis is
-        generated from{' '}
-        <code>Flex_Smoke_2_27_96_SmokeTestWith2Stackers.py</code> (kept beside{' '}
-        <code>StackerAnalysis.json</code> for troubleshooting).
-      </p>
       <div
         data-testid="protocol-visualization-container"
         className="protocol_visualization_demo"
