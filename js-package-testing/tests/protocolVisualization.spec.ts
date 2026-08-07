@@ -20,11 +20,42 @@ test.describe('ProtocolVisualization', () => {
       matchLevel: 'Strict',
     })
 
-    // TimelineScrubber's track_container uses height: 0 (hit-area via ::before),
-    // so Playwright treats it as hidden. Jump to the last annotated step instead.
-    const lastStep = container.getByRole('listitem').last()
-    await lastStep.scrollIntoViewIfNeeded()
-    await lastStep.click()
+    // TimelineScrubber track_container uses height: 0 (hit-area via ::before), so
+    // Playwright treats it as hidden and page.mouse may miss hit-testing.
+    // Annotated steps are virtualized, so listitem.last() is only the last rendered
+    // row. Dispatch mousedown at the track's right edge so TrackSlider seeks to end.
+    const scrubberTrack = container
+      .locator('[class*="track_container"]')
+      .first()
+    await scrubberTrack.waitFor({ state: 'attached' })
+
+    await scrubberTrack.evaluate(el => {
+      const rect = el.getBoundingClientRect()
+      if (rect.width < 10) {
+        throw new Error('Protocol visualization scrubber has no width')
+      }
+      const clientX = rect.right - 2
+      const clientY = rect.top
+      el.dispatchEvent(
+        new MouseEvent('mousedown', {
+          bubbles: true,
+          cancelable: true,
+          clientX,
+          clientY,
+          buttons: 1,
+          view: window,
+        })
+      )
+      window.dispatchEvent(
+        new MouseEvent('mouseup', {
+          bubbles: true,
+          cancelable: true,
+          clientX,
+          clientY,
+          view: window,
+        })
+      )
+    })
 
     await page.getByText('100% complete').waitFor({ state: 'visible' })
 
