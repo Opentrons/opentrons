@@ -127,7 +127,7 @@ function VisualizationPage(): JSX.Element {
         <p>
           {showFlex
             ? 'Flex: Flex_Smoke_2_27_96_SmokeTestWith2Stackers.py + StackerAnalysis.json'
-            : 'OT-2: ot2TC.py + ot2Analysis.json'}
+            : 'OT-2: OT2_Smoke_2_19_P300M_P20S_HS_TC_TM_SmokeTestV3.py + ot2Analysis.json'}
         </p>
       </div>
       <div
