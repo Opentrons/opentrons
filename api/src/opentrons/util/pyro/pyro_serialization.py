@@ -305,7 +305,7 @@ class OpentronsPyroSerializer:
         # Rebuild error object without calling subclass __init__, including new info
         obj = error_type.__new__(error_type)
         BaseException.__init__(obj, *d["args"])
-        if hasattr(obj,"__dict__"):
+        if hasattr(obj, "__dict__"):
             obj.__dict__.update(d.get("state", {}))
         return obj
 
