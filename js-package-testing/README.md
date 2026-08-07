@@ -7,10 +7,10 @@ A Vite app and Playwright suite for exercising **packed** builds of:
 - `@opentrons/step-generation`
 - `@opentrons/protocol-visualization`
 
-The demo app includes two pages: a **Deck map** page built with
-**ProtocolDeck** from `@opentrons/components`, and a **Protocol visualization**
-page built with `@opentrons/protocol-visualization`. Visual regression uses
-**Applitools Eyes**, not committed screenshots.
+The demo app includes two pages: a **Deck map** page with Flex and OT-2
+**ProtocolDeck** views from `@opentrons/components`, and a **Protocol
+visualization** page built with `@opentrons/protocol-visualization`. Visual
+regression uses **Applitools Eyes**, not committed screenshots.
 
 This project is the **reference external consumer**. It installs the four
 packages the way another app would (pack, patch manifests, link, install peer

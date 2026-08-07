@@ -1,6 +1,5 @@
 import { PrimaryButton, ProtocolDeck } from '@opentrons/components'
 import { ProtocolVisualization } from '@opentrons/protocol-visualization'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import Ot2Analysis from './ot2Analysis.json'
 import StackerAnalysis from './StackerAnalysis.json'
@@ -11,7 +10,7 @@ import './styles.css'
 
 import { useState } from 'react'
 
-const analysis = StackerAnalysis as unknown as ProtocolAnalysisOutput
+const flexAnalysis = StackerAnalysis as unknown as ProtocolAnalysisOutput
 const ot2Analysis = Ot2Analysis as unknown as ProtocolAnalysisOutput
 
 type DemoPage = 'deck-map' | 'protocol-visualization'
@@ -69,29 +68,60 @@ function DeckMapPage(): JSX.Element {
     <main className="demo_section">
       <h2>Deck map</h2>
       <p>
-        From <code>@opentrons/components</code> using the same StackerAnalysis
-        fixture as the protocol visualization page. Source protocol:{' '}
-        <code>Flex_Smoke_2_27.py</code>.
+        From <code>@opentrons/components</code> using the same Flex and OT-2
+        analysis fixtures as the protocol visualization page.
       </p>
 
+      <div className="deck_map_grid">
+        <DeckMapPanel
+          testId="protocol-deck-flex"
+          title="Flex"
+          protocolFile="Flex_Smoke_2_27.py"
+          analysisFile="StackerAnalysis.json"
+          analysis={flexAnalysis}
+        />
+        <DeckMapPanel
+          testId="protocol-deck-ot2"
+          title="OT-2"
+          protocolFile="OT2_Smoke_2_19.py"
+          analysisFile="ot2Analysis.json"
+          analysis={ot2Analysis}
+        />
+      </div>
+    </main>
+  )
+}
+
+interface DeckMapPanelProps {
+  testId: string
+  title: string
+  protocolFile: string
+  analysisFile: string
+  analysis: ProtocolAnalysisOutput
+}
+
+function DeckMapPanel({
+  testId,
+  title,
+  protocolFile,
+  analysisFile,
+  analysis,
+}: DeckMapPanelProps): JSX.Element {
+  return (
+    <section className="deck_map_panel">
+      <h3>{title}</h3>
+      <p>
+        <code>{protocolFile}</code> + <code>{analysisFile}</code>
+      </p>
       <div className="analysis_info">
-        <h3>Analysis</h3>
         <p>
-          <strong>Protocol:</strong>{' '}
-          {analysis.metadata?.protocolName ?? 'ot-2 protocol'}
+          <strong>Protocol:</strong> {analysis.metadata?.protocolName ?? title}
         </p>
         <p>
           <strong>Robot type:</strong> {analysis.robotType}
         </p>
-        <p>
-          <strong>FLEX_ROBOT_TYPE:</strong> {FLEX_ROBOT_TYPE}
-        </p>
       </div>
-      <div
-        data-testid="protocol-deck-container"
-        className="protocol_deck_container"
-      >
-        <h3>ProtocolDeck</h3>
+      <div data-testid={testId} className="protocol_deck_container">
         <ProtocolDeck
           protocolAnalysis={analysis}
           baseDeckProps={{
@@ -101,7 +131,7 @@ function DeckMapPage(): JSX.Element {
           showLabwareLabels
         />
       </div>
-    </main>
+    </section>
   )
 }
 
@@ -135,7 +165,7 @@ function VisualizationPage(): JSX.Element {
         className="protocol_visualization_demo"
       >
         <ProtocolVisualization
-          analysis={showFlex ? analysis : ot2Analysis}
+          analysis={showFlex ? flexAnalysis : ot2Analysis}
           groupedCommands={null}
           appType="web"
         />
