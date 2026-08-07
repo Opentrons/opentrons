@@ -57,6 +57,10 @@ export function useDownloadLogPeriod(
           onError?.(new Error(status.error))
           throw new Error(status.error)
         }
+        if (status.status === 'download-success') {
+          return status.deletionKey
+        }
+        return null
       })
       .finally(() => {
         setIsDownloading(false)

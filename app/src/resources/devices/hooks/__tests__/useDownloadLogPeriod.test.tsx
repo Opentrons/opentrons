@@ -116,7 +116,7 @@ describe('useDownloadLogPeriod', () => {
 
     const { result } = renderHook(() => useDownloadLogPeriod(mockPeriod))
 
-    let download: Promise<void> = Promise.resolve()
+    let download: Promise<string | null> = Promise.resolve(null)
     act(() => {
       download = result.current.downloadLogPeriod()
     })
