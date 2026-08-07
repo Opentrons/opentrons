@@ -209,6 +209,27 @@ what an external app must install (React, i18n, the four packages). Test tooling
 - **Legacy CI tag publishes** for `components@*` / `shared-data@*` tags may not
   match `publish.mts` output. Prefer `publish.mts` for all four packages.
 
+## Protocol fixtures
+
+Flex deck / visualization demos use a paired protocol + analysis under `src/`:
+
+| File | Role |
+| --- | --- |
+| `Flex_Smoke_2_25_96_Overrides_Stacker_LC.py` | Source Flex smoke protocol (API 2.25, stackers + liquid classes) |
+| `StackerAnalysis.json` | Analysis of that protocol (defaults: 2 stackers, Nest 290 mL, Tough PCR plate) |
+
+Keep them side by side so visual diffs can be traced back to protocol commands. To regenerate the analysis from the monorepo root (requires `api/.venv`):
+
+```bash
+api/.venv/bin/python -m opentrons.cli analyze \
+  js-package-testing/src/Flex_Smoke_2_25_96_Overrides_Stacker_LC.py \
+  --check \
+  --json-output=js-package-testing/src/StackerAnalysis.json \
+  --rtp-values='{"number_of_stackers":"2","test_configuration":"full","reservoir_name":"nest_1_reservoir_290ml","well_plate_name":"opentrons_96_wellplate_200ul_pcr_full_skirt"}'
+```
+
+Pretty-print the JSON afterward if you want readable diffs. Accept Applitools baselines after intentional analysis changes.
+
 ## Applitools Eyes
 
 Visual checks use [`@applitools/eyes-playwright`](https://www.npmjs.com/package/@applitools/eyes-playwright) with the fixture-based `eyes.check()` API. Baselines and diffs live in Applitools, not in this repo.
@@ -334,7 +355,8 @@ js-package-testing/
 │   ├── i18n.ts
 │   ├── styles.css
 │   ├── locale/en/protocol_visualization.json
-│   └── StackerAnalysis.json
+│   ├── Flex_Smoke_2_25_96_Overrides_Stacker_LC.py  # source Flex smoke protocol
+│   └── StackerAnalysis.json  # analysis of that protocol (regenerate via opentrons analyze)
 └── tests/
     ├── protocolDeck.spec.ts
     └── protocolVisualization.spec.ts

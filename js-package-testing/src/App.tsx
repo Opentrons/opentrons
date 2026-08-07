@@ -64,7 +64,8 @@ function DeckMapPage(): JSX.Element {
       <h2>Deck map</h2>
       <p>
         From <code>@opentrons/components</code> using the same StackerAnalysis
-        fixture as the protocol visualization page.
+        fixture as the protocol visualization page. Source protocol:{' '}
+        <code>Flex_Smoke_2_25_96_Overrides_Stacker_LC.py</code>.
       </p>
 
       <div className="analysis_info">
@@ -121,8 +122,10 @@ function VisualizationPage(): JSX.Element {
       </div>
       <p>
         From <code>@opentrons/protocol-visualization</code> using the{' '}
-        {showFlex ? 'StackerAnalysis' : 'Ot2Analysis'} fixture as the deck map
-        page.
+        {showFlex ? 'StackerAnalysis' : 'Ot2Analysis'} fixture. Flex analysis is
+        generated from{' '}
+        <code>Flex_Smoke_2_25_96_Overrides_Stacker_LC.py</code> (kept beside{' '}
+        <code>StackerAnalysis.json</code> for troubleshooting).
       </p>
       <div
         data-testid="protocol-visualization-container"
