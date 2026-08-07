@@ -195,6 +195,9 @@ class LogDataManager:
 
         assert robot_log.filename is not None
         robot_log_path = robot_log_dir_path / Path(robot_log.filename).name
+        while robot_log_path.is_file():
+            robot_log_path = robot_log_path.with_stem(f"{robot_log_path.stem}_copy")
+
         with open(robot_log_path, "w") as fh:
             fh.write(contents)
 
