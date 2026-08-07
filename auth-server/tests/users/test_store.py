@@ -47,6 +47,22 @@ def test_add_and_get_user(user_store: UserStore) -> None:
     assert fetched.full_name == "Add Test"
     assert fetched.account_type == AccountType.USER
     assert fetched.reset_password is False
+    assert fetched.deactivated is False
+
+
+def test_update_deactivated(user_store: UserStore) -> None:
+    user_store.add(
+        username="deactivate_test_user",
+        hashed_password=HASHED_PW,
+        full_name="Deactivate Test",
+        account_type=AccountType.USER,
+        now=_NOW,
+        reset_password=False,
+    )
+    updated = user_store.update(
+        "deactivate_test_user", deactivated=True, now=_NOW
+    )
+    assert updated.deactivated is True
 
 
 def test_list_all_returns_users_ordered_by_username(user_store: UserStore) -> None:

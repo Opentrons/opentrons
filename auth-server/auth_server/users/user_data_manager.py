@@ -3,7 +3,6 @@
 import datetime
 import secrets
 import string
-from typing import Literal
 
 from pwdlib import PasswordHash
 
@@ -128,7 +127,7 @@ class UserDataManager:
 
     def _to_response(self, user: User) -> UserResponse:
         settings = self._settings_store.get_settings()
-        is_currently_locked, _ = is_account_locked(
+        is_failed_login_locked, _ = is_account_locked(
             failed_login_count=self._user_store.get_failed_login_count(user.username),
             max_attempts=settings.maxNumberOfLoginAttempts,
         )
@@ -140,7 +139,7 @@ class UserDataManager:
             username=user.username,
             fullName=user.full_name,
             accountType=account_type,
-            locked=is_currently_locked,
+            locked=user.deactivated or is_failed_login_locked,
             resetPassword=must_reset_password(user, now, settings.passwordResetTime),
         )
 
@@ -228,7 +227,7 @@ class UserDataManager:
         new_password: str | None = None,
         new_full_name: str | None = None,
         new_account_type: str | None = None,
-        new_locked: Literal[False] | None = None,
+        new_locked: bool | None = None,
         reset_password: bool = False,
         *,
         now: datetime.datetime,
@@ -251,9 +250,14 @@ class UserDataManager:
         ):
             raise UserAlreadyExistsError(f"User {new_username!r} already exists")
         try:
-            if new_locked is not None and not new_locked:
-                # Note: do this BEFORE the username is potentially changed
-                self._user_store.clear_failed_logins(username_to_update)
+            deactivated: bool | None = None
+            if new_locked is not None:
+                if new_locked:
+                    deactivated = True
+                else:
+                    # Note: do this BEFORE the username is potentially changed
+                    self._user_store.clear_failed_logins(username_to_update)
+                    deactivated = False
             if new_password is not None:
                 reset_password = False
             updated_user = self._user_store.update(
@@ -265,6 +269,7 @@ class UserDataManager:
                 full_name=new_full_name,
                 account_type=new_account_type,
                 reset_password=reset_password,
+                deactivated=deactivated,
                 now=now,
             )
             return self._to_response(updated_user)
@@ -278,6 +283,7 @@ class UserDataManager:
     ) -> TemporaryPasswordResponse:
         """Reset a user's password to a random temporary password.
 
+        Clears failed login attempts so locked accounts become active again.
         Flag the account so the user is required to set a real password before
         doing anything else with the robot.
         """
@@ -286,10 +292,12 @@ class UserDataManager:
         )
         temporary_password = _generate_temporary_password(min_length, require_special)
         try:
+            self._user_store.clear_failed_logins(username)
             updated_user = self._user_store.update(
                 username,
                 hashed_password=password_hash.hash(temporary_password),
                 reset_password=True,
+                deactivated=False,
                 now=now,
             )
         except ValueError as e:

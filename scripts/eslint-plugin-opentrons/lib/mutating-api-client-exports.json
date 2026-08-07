@@ -58,6 +58,7 @@
     "postWifiKeys",
     "putSystemTime",
     "restart",
+    "resetUserPassword",
     "searchLabwareOffsets",
     "setLights",
     "shutdown",
