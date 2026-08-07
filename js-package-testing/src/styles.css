@@ -21,8 +21,8 @@ body,
 .app_container_visualization {
   display: flex;
   overflow: hidden;
-  height: 100vh;
   max-width: none;
+  height: 100vh;
   box-sizing: border-box;
   flex-direction: column;
 }
@@ -74,8 +74,8 @@ body,
 .deck_map_grid {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-32);
   margin-top: var(--spacing-24);
+  gap: var(--spacing-32);
 }
 
 .deck_map_panel {
@@ -113,8 +113,8 @@ body,
 
 .protocol_visualization_section {
   display: flex;
-  min-height: 0;
   max-width: none;
+  min-height: 0;
   flex: 1;
   flex-direction: column;
   padding-bottom: 0;
@@ -127,8 +127,8 @@ body,
   flex-shrink: 0;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--spacing-16);
   margin-bottom: var(--spacing-8);
+  gap: var(--spacing-16);
 }
 
 .protocol_visualization_demo {
@@ -139,7 +139,6 @@ body,
    * instead of floating on the page.
    */
   position: relative;
-  transform: translateZ(0);
   overflow: hidden;
   width: 100%;
   min-height: 0;
@@ -147,6 +146,7 @@ body,
   border: 0.0625rem solid var(--grey-35);
   border-radius: var(--border-radius-8);
   background-color: var(--grey-10);
+  transform: translateZ(0);
 }
 
 .protocol_visualization_demo > [class*='layout_container'] {
