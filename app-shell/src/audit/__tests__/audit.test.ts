@@ -1,3 +1,4 @@
+import path from 'path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -58,7 +59,7 @@ describe('audit module dispatches', () => {
     } as Config)
     vi.mocked(Dialogs.showOpenDirectoryDialog).mockResolvedValue([])
     vi.mocked(Http.fetchToFile).mockResolvedValue(
-      '/existing/audit-logs/logperiod.zip'
+      path.join('/existing/audit-logs', 'logperiod.zip')
     )
     dispatch = vi.fn()
     handleAction = registerAudit(dispatch, mockMainWindow)
@@ -138,7 +139,7 @@ describe('audit module dispatches', () => {
 
     expect(Http.fetchToFile).toHaveBeenCalledWith(
       'http://192.168.1.100:31950/audit/external/logPeriods/lp-1/download',
-      '/existing/audit-logs/logperiod.zip',
+      path.join('/existing/audit-logs', 'logperiod.zip'),
       expect.objectContaining({ onResponse: expect.any(Function) })
     )
     expect(dispatch).toHaveBeenCalledWith(
@@ -163,7 +164,7 @@ describe('audit module dispatches', () => {
 
     expect(Http.fetchToFile).toHaveBeenCalledWith(
       `http://${OPENTRONS_USB}:31950/audit/external/logPeriods/lp-1/download`,
-      '/existing/audit-logs/logperiod.zip',
+      path.join('/existing/audit-logs', 'logperiod.zip'),
       expect.objectContaining({ requestInit: { agent: mockAgent } })
     )
   })
