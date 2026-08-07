@@ -213,13 +213,13 @@ what an external app must install (React, i18n, the four packages). Test tooling
 
 Deck / visualization demos use paired protocol + analysis files under `src/`:
 
-| File                                                | Role                                                                                                                                                                          |
-| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Flex_Smoke_2_27_96_SmokeTestWith2Stackers.py`      | Flex smoke source (API 2.27, 2 stackers + waste chute). Copied from `analyses-snapshot-testing/files/protocols/Flex_S_2_7_P200_96_GRIP_HS_MB_TC_TM_SmokeTestWith2Stackers.py` |
-| `StackerAnalysis.json`                              | Analysis of the Flex smoke protocol                                                                                                                                           |
-| `OT2_Smoke_2_19_P300M_P20S_HS_TC_TM_SmokeTestV3.py` | OT-2 smoke source (API 2.19, HS + TC + TM). Copied from `opentrons-ot2` `analyses-snapshot-testing/files/protocols/OT2_S_v2_19_P300M_P20S_HS_TC_TM_SmokeTestV3.py`            |
-| `labware/cpx_4_tuberack_100ul.json`                 | Custom labware required by the OT-2 smoke protocol                                                                                                                            |
-| `ot2Analysis.json`                                  | Analysis of the OT-2 smoke protocol (regenerate from `opentrons-ot2`)                                                                                                         |
+| File                                                                       | Role                                                                                                                                                                          |
+| -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Flex_Smoke_2_27_96_SmokeTestWith2Stackers.py`                             | Flex smoke source (API 2.27, 2 stackers + waste chute). Copied from `analyses-snapshot-testing/files/protocols/Flex_S_2_7_P200_96_GRIP_HS_MB_TC_TM_SmokeTestWith2Stackers.py` |
+| `StackerAnalysis.json`                                                     | Analysis of the Flex smoke protocol                                                                                                                                           |
+| `OT2_Smoke_2_19_P300M_P20S_HS_TC_TM_SmokeTestV3.py`                        | OT-2 smoke source (API 2.19, HS + TC + TM). Copied from `opentrons-ot2` `analyses-snapshot-testing/files/protocols/OT2_S_v2_19_P300M_P20S_HS_TC_TM_SmokeTestV3.py`            |
+| `OT2_Smoke_2_19_P300M_P20S_HS_TC_TM_SmokeTestV3_cpx_4_tuberack_100ul.json` | Custom labware for the OT-2 smoke protocol                                                                                                                                    |
+| `ot2Analysis.json`                                                         | Analysis of the OT-2 smoke protocol (regenerate from `opentrons-ot2`)                                                                                                         |
 
 Keep each pair side by side so visual diffs can be traced to protocol commands.
 
@@ -243,7 +243,7 @@ This monorepo rejects OT-2 protocol analysis. Use the `opentrons-ot2` API venv (
 ```bash
 # from the Flex monorepo root; paths assume ../opentrons-ot2
 ../opentrons-ot2/api/.venv/bin/python -m opentrons.cli analyze \
-  js-package-testing/src/labware/cpx_4_tuberack_100ul.json \
+  js-package-testing/src/OT2_Smoke_2_19_P300M_P20S_HS_TC_TM_SmokeTestV3_cpx_4_tuberack_100ul.json \
   js-package-testing/src/OT2_Smoke_2_19_P300M_P20S_HS_TC_TM_SmokeTestV3.py \
   --json-output=js-package-testing/src/ot2Analysis.json
 ```
@@ -378,7 +378,7 @@ js-package-testing/
 │   ├── Flex_Smoke_2_27_96_SmokeTestWith2Stackers.py
 │   ├── StackerAnalysis.json
 │   ├── OT2_Smoke_2_19_P300M_P20S_HS_TC_TM_SmokeTestV3.py
-│   ├── labware/cpx_4_tuberack_100ul.json
+│   ├── OT2_Smoke_2_19_P300M_P20S_HS_TC_TM_SmokeTestV3_cpx_4_tuberack_100ul.json
 │   └── ot2Analysis.json
 └── tests/
     ├── protocolDeck.spec.ts
