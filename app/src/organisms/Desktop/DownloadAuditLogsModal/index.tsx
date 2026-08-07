@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
@@ -5,6 +6,8 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { Icon, Modal, PrimaryButton, StyledText } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
+import { useCurrentRobotName } from '/app/redux/robot-auth'
 import { useDownloadAndDeleteAuditLog } from '/app/resources/audit/useDownloadAndDeleteAuditLog'
 
 import styles from './downloadauditlogsmodal.module.css'
@@ -53,34 +56,60 @@ export function DownloadAuditLogsModal({
 }
 
 const DownloadAuditLogsModalImpl = NiceModal.create(
-  ({ logPeriodId }: { logPeriodId: string }): JSX.Element => {
+  ({ logPeriodId }: { logPeriodId: string }): JSX.Element | null => {
     const modal = useModal()
+    const robotName = useCurrentRobotName()
 
-    const { downloadAndDeleteAuditLog, isLoading } =
-      useDownloadAndDeleteAuditLog(logPeriodId, '')
+    useEffect(() => {
+      if (robotName == null) {
+        modal.resolve(false)
+        modal.remove()
+      }
+    }, [modal, robotName])
 
-    const handleDownload = (): void => {
-      downloadAndDeleteAuditLog()
-        .then(() => {
-          modal.resolve(true)
-        })
-        .catch(error => {
-          modal.reject(error)
-        })
-        .finally(() => {
-          modal.remove()
-        })
+    if (robotName == null) {
+      return null
     }
 
     return (
-      <DownloadAuditLogsModal
-        logPeriodId={logPeriodId}
-        onDownload={handleDownload}
-        isLoading={isLoading}
-      />
+      <ApiHostProvider robotName={robotName}>
+        <DownloadAuditLogsModalContent logPeriodId={logPeriodId} />
+      </ApiHostProvider>
     )
   }
 )
+
+function DownloadAuditLogsModalContent({
+  logPeriodId,
+}: {
+  logPeriodId: string
+}): JSX.Element {
+  const modal = useModal()
+
+  const { downloadAndDeleteAuditLog, isLoading } =
+    useDownloadAndDeleteAuditLog(logPeriodId)
+
+  const handleDownload = (): void => {
+    downloadAndDeleteAuditLog()
+      .then(() => {
+        modal.resolve(true)
+      })
+      .catch(error => {
+        modal.reject(error)
+      })
+      .finally(() => {
+        modal.remove()
+      })
+  }
+
+  return (
+    <DownloadAuditLogsModal
+      logPeriodId={logPeriodId}
+      onDownload={handleDownload}
+      isLoading={isLoading}
+    />
+  )
+}
 
 /** Open the desktop download audit logs modal and await whether logs were downloaded. */
 export const showDownloadLogsModal = (logPeriodId: string): Promise<boolean> =>

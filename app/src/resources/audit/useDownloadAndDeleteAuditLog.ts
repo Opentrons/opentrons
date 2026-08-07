@@ -14,10 +14,7 @@ import { useDownloadLogPeriod } from '../devices/hooks/useDownloadLogPeriod'
 
 import type { Dispatch } from '/app/redux/types'
 
-export function useDownloadAndDeleteAuditLog(
-  logPeriodId: string,
-  fileLocation: string
-): {
+export function useDownloadAndDeleteAuditLog(logPeriodId: string): {
   downloadAndDeleteAuditLog: () => Promise<void>
   isLoading: boolean
   error: Error | null
@@ -45,18 +42,13 @@ export function useDownloadAndDeleteAuditLog(
       const deletionKey = await downloadLogPeriod()
       if (deletionKey != null) {
         dispatch(logPeriodDeleteStarted({ logPeriodId }))
-        deleteLogPeriod(
-          { logPeriodId, deletionKey },
-          {
-            onSuccess: () => {
-              updateLogDeletionStatus('completed')
-            },
-          }
-        )
+        await deleteLogPeriod({ logPeriodId, deletionKey })
+        updateLogDeletionStatus('completed')
       }
     } catch (error) {
       updateLogDeletionStatus('failed')
       setError(error as Error)
+      throw error
     } finally {
       setIsLoading(false)
     }

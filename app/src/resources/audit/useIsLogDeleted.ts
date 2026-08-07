@@ -23,5 +23,9 @@ export function useIsLogDeleted(logPeriodId: string): {
     return false
   }, [error?.response?.status, logDeletionStatus])
 
+  if (!logPeriodId) {
+    return { isLoading: false, isDeleted: false, isError: true }
+  }
+
   return { isLoading, isDeleted, isError }
 }

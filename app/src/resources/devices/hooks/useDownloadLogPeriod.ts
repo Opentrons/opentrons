@@ -22,7 +22,7 @@ export function useDownloadLogPeriod(
   const [isDownloading, setIsDownloading] = useState(false)
   const store = useStore<State>()
 
-  const logPeriodStartDateTransformed = logPeriod?.startedAt.replaceAll(
+  const logPeriodStartDateTransformed = logPeriod?.startedAt?.replaceAll(
     ':',
     '_'
   )
