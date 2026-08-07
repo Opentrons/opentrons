@@ -18,6 +18,7 @@ import type {
   ConfigV28,
   ConfigV29,
   ConfigV30,
+  ConfigV31,
 } from '@opentrons/app/src/redux/config/types'
 
 const PKG_VERSION: string = _PKG_VERSION_
@@ -224,5 +225,14 @@ export const MOCK_CONFIG_V30: ConfigV30 = {
   version: 30,
   audit: {
     logDirectory: null,
+  },
+}
+
+export const MOCK_CONFIG_V31: ConfigV31 = {
+  ...MOCK_CONFIG_V30,
+  version: 31,
+  protocols: {
+    ...MOCK_CONFIG_V30.protocols,
+    includeProtocolSourceInRunDownload: false,
   },
 }

@@ -313,4 +313,11 @@ export type ConfigV30 = Omit<ConfigV29, 'version'> & {
   }
 }
 
-export type Config = ConfigV30
+export type ConfigV31 = Omit<ConfigV30, 'version' | 'protocols'> & {
+  version: 31
+  protocols: ConfigV30['protocols'] & {
+    includeProtocolSourceInRunDownload: boolean
+  }
+}
+
+export type Config = ConfigV31

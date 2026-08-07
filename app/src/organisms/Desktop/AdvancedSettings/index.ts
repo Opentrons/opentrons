@@ -1,6 +1,7 @@
 export * from './AdditionalCustomLabwareSourceFolder'
 export * from './ClearUnavailableRobots'
 export * from './EnableDevTools'
+export * from './IncludeProtocolSourceInRunDownload'
 export * from './OverridePathToPython'
 export * from './PreventRobotCaching'
 export * from './ShowHeaterShakerAttachmentModal'
