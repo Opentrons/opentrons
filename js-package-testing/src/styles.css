@@ -71,6 +71,23 @@
 }
 
 .protocol_visualization_demo {
+  /*
+   * PlayBackControls in @opentrons/protocol-visualization uses position: fixed
+   * (viewport-anchored). A transform on this host makes that fixed positioning
+   * relative to the demo frame so the play bar stays inside the visualization
+   * instead of floating on the page.
+   */
+  position: relative;
+  transform: translateZ(0);
+  overflow: hidden;
   width: 100%;
-  height: 700px;
+  height: min(44rem, calc(100vh - 14rem));
+  margin-top: var(--spacing-16);
+  border: 0.0625rem solid var(--grey-35);
+  border-radius: var(--border-radius-8);
+  background-color: var(--grey-10);
+}
+
+.protocol_visualization_demo > [class*='layout_container'] {
+  height: 100%;
 }

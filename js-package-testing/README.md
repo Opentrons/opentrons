@@ -397,3 +397,5 @@ The bundled CSS for these packages uses **per-module hashed scoped names** (`[na
 - `protocol-visualization/vite.config.mts` -> `css.modules.generateScopedName`
 
 If a future change reverts those scoped names back to `'[local]'`, expect cross-component class collisions in the packed `lib/style.css` (for example the right rail panel collapsing, deck slot labels misrendering, or footer text getting clipped) because many modules share generic class names. The fix is to keep the hashed scoped name pattern in those library `vite.config.mts` files, not to add per-class overrides in this consumer.
+
+`PlayBackControls` uses `position: fixed`. The demo host (`.protocol_visualization_demo`) applies `transform: translateZ(0)` so that fixed bar is contained in the visualization frame rather than the browser viewport. Do not remove that transform without replacing it with another containing-block strategy.

@@ -134,6 +134,7 @@ function VisualizationPage(): JSX.Element {
         <ProtocolVisualization
           analysis={showFlex ? analysis : ot2Analysis}
           groupedCommands={null}
+          appType="web"
         />
       </div>
     </main>
