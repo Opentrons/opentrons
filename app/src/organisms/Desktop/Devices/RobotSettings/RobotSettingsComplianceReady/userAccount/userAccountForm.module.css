@@ -57,3 +57,23 @@
   justify-content: flex-end;
   gap: var(--spacing-8);
 }
+
+.confirm_intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-12);
+}
+
+.confirm_icon {
+  flex-shrink: 0;
+  color: var(--grey-60);
+}
+
+.confirm_text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-8);
+  text-align: center;
+}
