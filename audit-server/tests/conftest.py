@@ -187,8 +187,43 @@ def fake_robot_server(
             data={"name": "my robot", "robot_serial": "123abc"}
         )
 
+    async def fake_stub_runs(request: aiohttp.web.Request) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(
+            data={
+                "data": [
+                    {
+                        "id": "myRunId",
+                        "current": True,
+                        "protocolId": "myProtocolId",
+                        "createdAt": "2026-01-01T18:00:00.123456Z",
+                    }
+                ],
+                "links": {"current": {"href": "/runs/myRunId"}},
+            },
+        )
+
+    async def fake_stub_run_commands(
+        request: aiohttp.web.Request,
+    ) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(
+            data={"commands": [{"foo": "bar"}]},
+        )
+
+    async def fake_stub_protocol(request: aiohttp.web.Request) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(
+            data={
+                "data": {
+                    "files": [{"name": "my_cool_protocol.py"}],
+                    "metadata": {"protocolName": "Flex Cool Protocol"},
+                }
+            },
+        )
+
     app = aiohttp.web.Application()
     app.router.add_get("/health", fake_stub_health)
+    app.router.add_get("/runs", fake_stub_runs)
+    app.router.add_get("/runs/{runId}/commands", fake_stub_run_commands)
+    app.router.add_get("/protocols/{protocolId}", fake_stub_protocol)
     loop = asyncio.new_event_loop()
     runner = aiohttp.web.AppRunner(app)
 

@@ -12,8 +12,13 @@ import pytest
 
 from server_utils.robot.robot_server import (
     HEALTH_ENDPOINT_PATH,
+    PROTOCOLS_ENDPOINT_PATH,
+    RUNS_ENDPOINT_PATH,
+    ActiveCurrentRunNotFoundError,
     LocalHTTPClient,
+    RobotCurrentRunLog,
     RobotNameandSerial,
+    SerializedLog,
 )
 
 
@@ -23,30 +28,82 @@ class AppMock:
     This should mirror the HTTP API of our real robot-server.
     """
 
-    get_name_and_serial_response: object
-    """The JSON body the server should respond with to a get_name_and_serial request."""
+    get_health_response: object
+    """The JSON body the server should respond with to a GET health request."""
 
-    get_name_and_serial_response_status: int
-    """The HTTP status code the server should respond with to a get_name_and_serialrequest."""
+    get_health_response_status: int
+    """The HTTP status code the server should respond with to a GET health request."""
+
+    get_runs_response: object
+    """The JSON body the server should respond with to a GET runs request."""
+
+    get_runs_response_status: int
+    """The HTTP status code the server should respond with to a GET runs request."""
+
+    get_run_commands_response: object
+    """The JSON body the server should respond with to a GET run commands request."""
+
+    get_run_commands_response_status: int
+    """The HTTP status code the server should respond with to a GET run commands request."""
+
+    get_protocols_response: object
+    """The JSON body the server should respond with to a GET protocols request."""
+
+    get_protocols_response_status: int
+    """The HTTP status code the server should respond with to a GET protocols request."""
 
     app: Final[aiohttp.web.Application]
 
     def __init__(self) -> None:
-        self.get_name_and_serial_response = {}
-        self.get_name_and_serial_response_status = 200
+        self.get_health_response = {}
+        self.get_health_response_status = 200
+
+        self.get_runs_response = {}
+        self.get_runs_response_status = 200
+
+        self.get_run_commands_response = {}
+        self.get_run_commands_response_status = 200
+
+        self.get_protocols_response = {}
+        self.get_protocols_response_status = 200
 
         app = aiohttp.web.Application()
+        app.router.add_get(f"/{HEALTH_ENDPOINT_PATH}", self._get_health)
+        app.router.add_get(f"/{RUNS_ENDPOINT_PATH}", self._get_runs)
         app.router.add_get(
-            f"/{HEALTH_ENDPOINT_PATH}", self._get_name_and_serial_request_content_types
+            f"/{RUNS_ENDPOINT_PATH}" + "/{runId}/commands", self._get_run_commands
+        )
+        app.router.add_get(
+            f"/{PROTOCOLS_ENDPOINT_PATH}" + "/{protocolId}", self._get_protocols
         )
         self.app = app
 
-    async def _get_name_and_serial_request_content_types(
+    async def _get_health(self, request: aiohttp.web.Request) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(
+            data=self.get_health_response,
+            status=self.get_health_response_status,
+        )
+
+    async def _get_runs(self, request: aiohttp.web.Request) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(
+            data=self.get_runs_response,
+            status=self.get_runs_response_status,
+        )
+
+    async def _get_run_commands(
         self, request: aiohttp.web.Request
     ) -> aiohttp.web.Response:
         return aiohttp.web.json_response(
-            data=self.get_name_and_serial_response,
-            status=self.get_name_and_serial_response_status,
+            data=self.get_run_commands_response,
+            status=self.get_run_commands_response_status,
+        )
+
+    async def _get_protocols(
+        self, request: aiohttp.web.Request
+    ) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(
+            data=self.get_protocols_response,
+            status=self.get_protocols_response_status,
         )
 
 
@@ -103,7 +160,7 @@ async def test_get_name_and_serial(
     """Test that the client can send a well-formed get_name_and_serial and parse the response."""
     app_mock, client = mock_server
 
-    app_mock.get_name_and_serial_response = {
+    app_mock.get_health_response = {
         "name": "my cool robot",
         "robot_serial": "987-zyx",
     }
@@ -116,14 +173,193 @@ async def test_get_name_and_serial(
     )
 
 
+async def test_get_current_run_log(
+    mock_server: tuple[AppMock, LocalHTTPClient],
+) -> None:
+    """Test that the client can get the current run logs from the robot server."""
+    app_mock, client = mock_server
+
+    app_mock.get_runs_response = {
+        "data": [
+            {
+                "id": "myRunId",
+                "current": True,
+                "protocolId": "myProtocolId",
+                "createdAt": "2026-01-01T18:00:00.123456Z",
+            }
+        ],
+        "links": {"current": {"href": "/runs/myRunId"}},
+    }
+
+    app_mock.get_run_commands_response = {"commands": [{"foo": "bar"}]}
+
+    app_mock.get_protocols_response = {
+        "data": {
+            "files": [{"name": "my_cool_protocol.py"}],
+            "metadata": {"protocolName": "Flex Cool Protocol"},
+        }
+    }
+
+    result = await client.get_current_run_log()
+
+    assert result == RobotCurrentRunLog(
+        serialized_log=SerializedLog(
+            serialized_json='{"data": {"id": "myRunId", "current": true, "protocolId": "myProtocolId", "createdAt": "2026-01-01T18:00:00.123456Z"}, "commands": {"commands": [{"foo": "bar"}]}}',
+            filename="Flex_Cool_Protocol_2026-01-01T18_00_00.123Z.json",
+        )
+    )
+
+
+async def test_get_current_run_log_no_protocol_name(
+    mock_server: tuple[AppMock, LocalHTTPClient],
+) -> None:
+    """Test that the client can get the current run logs from the robot server, using the filename"""
+    app_mock, client = mock_server
+
+    app_mock.get_runs_response = {
+        "data": [
+            {
+                "id": "myRunId",
+                "current": True,
+                "protocolId": "myProtocolId",
+                "createdAt": "2026-01-01T18:00:00.123456Z",
+            }
+        ],
+        "links": {"current": {"href": "/runs/myRunId"}},
+    }
+
+    app_mock.get_run_commands_response = {"commands": [{"foo": "bar"}]}
+
+    app_mock.get_protocols_response = {
+        "data": {"files": [{"name": "my_cool_protocol.py"}]}
+    }
+
+    result = await client.get_current_run_log()
+
+    assert result == RobotCurrentRunLog(
+        serialized_log=SerializedLog(
+            serialized_json='{"data": {"id": "myRunId", "current": true, "protocolId": "myProtocolId", "createdAt": "2026-01-01T18:00:00.123456Z"}, "commands": {"commands": [{"foo": "bar"}]}}',
+            filename="my_cool_protocol_2026-01-01T18_00_00.123Z.json",
+        )
+    )
+
+
+async def test_get_current_run_log_no_protocol_filename(
+    mock_server: tuple[AppMock, LocalHTTPClient],
+) -> None:
+    """Test that the client can get the current run logs from the robot server, with no protocol name."""
+    app_mock, client = mock_server
+
+    app_mock.get_runs_response = {
+        "data": [
+            {
+                "id": "myRunId",
+                "current": True,
+                "protocolId": "myProtocolId",
+                "createdAt": "2026-01-01T18:00:00.123456Z",
+            }
+        ],
+        "links": {"current": {"href": "/runs/myRunId"}},
+    }
+
+    app_mock.get_run_commands_response = {"commands": [{"foo": "bar"}]}
+
+    app_mock.get_protocols_response = {"data": {"files": []}}
+
+    result = await client.get_current_run_log()
+
+    assert result == RobotCurrentRunLog(
+        serialized_log=SerializedLog(
+            serialized_json='{"data": {"id": "myRunId", "current": true, "protocolId": "myProtocolId", "createdAt": "2026-01-01T18:00:00.123456Z"}, "commands": {"commands": [{"foo": "bar"}]}}',
+            filename="myProtocolId_2026-01-01T18_00_00.123Z.json",
+        )
+    )
+
+
+async def test_get_current_run_log_no_protocol_Id(
+    mock_server: tuple[AppMock, LocalHTTPClient],
+) -> None:
+    """Test that the client can get the current run logs from the robot server, with no protocol ID."""
+    app_mock, client = mock_server
+
+    app_mock.get_runs_response = {
+        "data": [
+            {
+                "id": "myRunId",
+                "current": True,
+                "createdAt": "2026-01-01T18:00:00.123456Z",
+            }
+        ],
+        "links": {"current": {"href": "/runs/myRunId"}},
+    }
+
+    app_mock.get_run_commands_response = {"commands": [{"foo": "bar"}]}
+
+    app_mock.get_protocols_response = {"data": {"files": []}}
+
+    result = await client.get_current_run_log()
+
+    assert result == RobotCurrentRunLog(
+        serialized_log=SerializedLog(
+            serialized_json='{"data": {"id": "myRunId", "current": true, "createdAt": "2026-01-01T18:00:00.123456Z"}, "commands": {"commands": [{"foo": "bar"}]}}',
+            filename="myRunId_2026-01-01T18_00_00.123Z.json",
+        )
+    )
+
+
+async def test_get_current_run_log_no_current_run(
+    mock_server: tuple[AppMock, LocalHTTPClient],
+) -> None:
+    """Test that the client returns None when no current run is found."""
+    app_mock, client = mock_server
+
+    app_mock.get_runs_response = {
+        "data": [
+            {
+                "id": "myRunId",
+                "current": False,
+                "protocolId": "myProtocolId",
+                "createdAt": "2026-01-01T18:00:00.123456Z",
+            }
+        ],
+        "links": {},
+    }
+
+    result = await client.get_current_run_log()
+
+    assert result == RobotCurrentRunLog(serialized_log=None)
+
+
+async def test_get_current_run_log_raises_active_run_could_not_be_found(
+    mock_server: tuple[AppMock, LocalHTTPClient],
+) -> None:
+    """Test that the client raises if there is supposed to be an active run but there is not."""
+    app_mock, client = mock_server
+
+    app_mock.get_runs_response = {
+        "data": [
+            {
+                "id": "myRunId",
+                "current": False,
+                "protocolId": "myProtocolId",
+                "createdAt": "2026-01-01T18:00:00.123456Z",
+            }
+        ],
+        "links": {"current": {"href": "/runs/myRunId"}},
+    }
+
+    with pytest.raises(ActiveCurrentRunNotFoundError):
+        await client.get_current_run_log()
+
+
 async def test_get_name_and_serial_http_error(
     mock_server: tuple[AppMock, LocalHTTPClient],
 ) -> None:
     """A non-2xx response from robot-server should be raised as an exception."""
     app_mock, client = mock_server
 
-    app_mock.get_name_and_serial_response = {"errors": [{"detail": "oops"}]}
-    app_mock.get_name_and_serial_response_status = 500
+    app_mock.get_health_response = {"errors": [{"detail": "oops"}]}
+    app_mock.get_health_response_status = 500
 
     with pytest.raises(aiohttp.ClientResponseError):
         await client.get_name_and_serial()
