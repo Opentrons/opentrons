@@ -306,6 +306,12 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             self.__send_audit_log("login failed", f"unrecognized user name {username}")
             raise _CustomInvalidCredentialsError(login_attempts_remaining=None)
 
+        if user.deactivated:
+            self.__send_audit_log(
+                "login failed", f"user {username} failed to login: account is locked"
+            )
+            raise _CustomInvalidCredentialsError(login_attempts_remaining=None)
+
         password_is_correct = password_hash.verify(password, user.hashed_password)
 
         failed_login_count: int

@@ -74,9 +74,12 @@ class UpdateUser(BaseModel):
         Field(description="The type of account for the user."),
     ] = None
     locked: Annotated[
-        Literal[False] | None,
+        bool | None,
         Field(
-            description="Set to false to clear a failed-login lockout for this user.",
+            description=(
+                "Set to true to lock this user, or false to unlock the user "
+                "and clear a failed-login lockout."
+            ),
         ),
     ] = None
     resetPassword: Annotated[
@@ -114,7 +117,10 @@ class UserResponse(BaseModel):
     locked: Annotated[
         bool,
         Field(
-            description="If true, this account is locked because of too many failed login attempts."
+            description=(
+                "If true, this account is locked because it was deactivated by an admin "
+                "or because of too many failed login attempts."
+            )
         ),
     ]
     resetPassword: Annotated[

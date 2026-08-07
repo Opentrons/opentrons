@@ -1,2 +1,0 @@
-export const CHANGE_AUDIT_LOG_DIRECTORY: 'log-location:CHANGE_AUDIT_LOG_DIRECTORY' =
-  'log-location:CHANGE_AUDIT_LOG_DIRECTORY'

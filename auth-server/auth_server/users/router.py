@@ -292,6 +292,7 @@ async def update_user(
     summary="Reset a user's password",
     description=(
         "Reset a specific user's password to a newly generated temporary password. "
+        "Clears failed login attempts so locked accounts become active again. "
         "The user must change their password upon next login."
     ),
     responses={
