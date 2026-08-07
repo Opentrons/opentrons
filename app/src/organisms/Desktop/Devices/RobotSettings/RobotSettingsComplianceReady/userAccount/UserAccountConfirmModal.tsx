@@ -2,17 +2,15 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Icon,
+  COLORS,
   ModalShell,
   PrimaryButton,
   SecondaryButton,
-  StyledText,
   WizardHeader,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-
-import styles from './userAccountForm.module.css'
+import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
 import type { JSX } from 'react'
 
@@ -50,35 +48,23 @@ export function UserAccountConfirmModal({
         />
       }
     >
-      <div className={styles.modal_content}>
-        <div className={styles.form_fields}>
-          <div className={styles.confirm_intro}>
-            <Icon
-              name="information"
-              size="1.25rem"
-              className={styles.confirm_icon}
-            />
-            <div className={styles.confirm_text}>
-              <StyledText desktopStyle="headingSmallBold">{heading}</StyledText>
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {description}
-              </StyledText>
-            </div>
-          </div>
-          <div className={styles.actions}>
-            <SecondaryButton type="button" onClick={onCancel}>
-              {t('cancel') as string}
-            </SecondaryButton>
-            <PrimaryButton
-              type="button"
-              disabled={isConfirmDisabled}
-              onClick={onConfirm}
-            >
-              {confirmLabel}
-            </PrimaryButton>
-          </div>
-        </div>
-      </div>
+      <SimpleWizardBody
+        iconColor={COLORS.yellow50}
+        header={heading}
+        subHeader={description}
+        isSuccess={false}
+      >
+        <SecondaryButton type="button" onClick={onCancel}>
+          {t('cancel') as string}
+        </SecondaryButton>
+        <PrimaryButton
+          type="button"
+          disabled={isConfirmDisabled}
+          onClick={onConfirm}
+        >
+          {confirmLabel}
+        </PrimaryButton>
+      </SimpleWizardBody>
     </ModalShell>,
     getTopPortalEl()
   )
