@@ -1,20 +1,12 @@
-# key = "1 stacker"
-# key = "2 stackers"
-key = "3 stackers"
-# key = "1 stacker with OT 12 Well 22 mL"
-# key = "2 stackers with OT 12 Well 22 mL"
-# key = "3 stackers with OT 12 Well 22 mL"
-# key = "1 stacker with OT 4 Well 300 mL"
-# key = "2 stackers with OT 4 Well 300 mL"
-# key = "3 stackers with OT 4 Well 300 mL"
-# key = "1 stacker with OT 1 Well 300 mL"
-# protocol.override_variable_name = key
-
-
 #############
 # CHANGELOG #
 #############
 
+# ----
+# 2.27
+# ----
+# Dynamic liquid pipetting 
+# Camera
 
 # ----
 # 2.25
@@ -111,13 +103,13 @@ from opentrons.protocol_api import Labware
 
 
 metadata = {
-    "protocolName": "Flex Smoke Test - v2.25",
+    "protocolName": "Flex Smoke Test - v2.27",
     "author": "QA team",
 }
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.25",
+    "apiLevel": "2.27",
 }
 
 
@@ -196,150 +188,29 @@ def comment_tip_rack_status(ctx, tip_rack):
 # -------------------------- #
 
 
-def add_parameters(parameters: protocol_api.Parameters):
-    """This is the standard use of parameters"""
-
-    # We are using the defaults for every case.
-    # Other tests cover regression testing for
-    # other types of parameters and UI appearance
-    # there are many tests in Analyses Battery that cover errors and edge cases
-
-    parameters.add_str(
-        variable_name="number_of_stackers",
-        display_name="Number of Stackers",
-        description="Number of stackers to use in the protocol",
-        default="2",
-        choices=[
-            {"display_name": "1 Stacker", "value": "1"},
-            {"display_name": "2 Stackers", "value": "2"},
-            {"display_name": "3 Stackers", "value": "3"},
-        ]
-    )
-
-    parameters.add_str(
-        variable_name="test_configuration",
-        display_name="Test Configuration",
-        description="Configuration of QA test to perform",
-        default="full",
-        choices=[{"display_name": "Full Smoke Test", "value": "full"}],
-    )
-
-    parameters.add_str(
-        variable_name="reservoir_name",
-        display_name="Reservoir Name",
-        description="Name of the reservoir",
-        default="nest_1_reservoir_290ml",
-        choices=[
-            {"display_name": "Nest 1 Well 290 mL", "value": "nest_1_reservoir_290ml"},
-            {"display_name": "OT 12 Well 22 mL", "value": "opentrons_tough_12_reservoir_22ml"},
-            {"display_name": "OT 4 Well 300 mL", "value": "opentrons_tough_4_reservoir_72ml"},
-            {"display_name": "OT 1 Well 300 mL", "value": "opentrons_tough_1_reservoir_300ml"},
-        ],
-    )
-
-    parameters.add_str(
-        variable_name="well_plate_name",
-        display_name="Well Plate Name",
-        description="Name of the well plate",
-        default="opentrons_96_wellplate_200ul_pcr_full_skirt",
-        choices=[{"display_name": "Opentrons Tough 96 Well 200 µL", "value": "opentrons_96_wellplate_200ul_pcr_full_skirt"}],
-    )
 
 def log_position(ctx, item):
     ctx.comment(f"Item {item.load_name} is at {item.parent}")
 
-from dataclasses import dataclass
-
-@dataclass
-class Test:
-    key: str
-    number_of_stackers: str
-    test_configuration: str
-    reservoir_name: str
-    well_plate_name: str
-
-
-
-Tests = [
-    Test(key="1 stacker",
-         number_of_stackers="1",
-         test_configuration="full",
-         reservoir_name="nest_1_reservoir_290ml",
-         well_plate_name="opentrons_96_wellplate_200ul_pcr_full_skirt"),
-    Test(key="2 stackers",
-         number_of_stackers="2",
-         test_configuration="full",
-         reservoir_name="nest_1_reservoir_290ml",
-         well_plate_name="opentrons_96_wellplate_200ul_pcr_full_skirt"),
-    Test(key="3 stackers",
-         number_of_stackers="3",
-         test_configuration="full",
-         reservoir_name="nest_1_reservoir_290ml",
-         well_plate_name="opentrons_96_wellplate_200ul_pcr_full_skirt"),
-    Test(key="1 stacker with OT 12 Well 22 mL",
-         number_of_stackers="1",
-         test_configuration="full",
-         reservoir_name="opentrons_tough_12_reservoir_22ml",
-         well_plate_name="opentrons_96_wellplate_200ul_pcr_full_skirt"),
-    Test(key="2 stackers with OT 12 Well 22 mL",
-         number_of_stackers="2",
-         test_configuration="full",
-         reservoir_name="opentrons_tough_12_reservoir_22ml",
-         well_plate_name="opentrons_96_wellplate_200ul_pcr_full_skirt"),
-    Test(key="3 stackers with OT 12 Well 22 mL",
-         number_of_stackers="3",
-         test_configuration="full",
-         reservoir_name="opentrons_tough_12_reservoir_22ml",
-         well_plate_name="opentrons_96_wellplate_200ul_pcr_full_skirt"),
-    Test(key="1 stacker with OT 4 Well 300 mL",
-         number_of_stackers="1",
-         test_configuration="full",
-         reservoir_name="opentrons_tough_4_reservoir_72ml",
-         well_plate_name="opentrons_96_wellplate_200ul_pcr_full_skirt"),
-    Test(key="2 stackers with OT 4 Well 300 mL",        
-         number_of_stackers="2",
-         test_configuration="full",
-         reservoir_name="opentrons_tough_4_reservoir_72ml",
-         well_plate_name="opentrons_96_wellplate_200ul_pcr_full_skirt"),
-    Test(key="3 stackers with OT 4 Well 300 mL",    
-            number_of_stackers="3",
-            test_configuration="full",
-            reservoir_name="opentrons_tough_4_reservoir_72ml",
-            well_plate_name="opentrons_96_wellplate_200ul_pcr_full_skirt"), 
-    Test(key="1 stacker with OT 1 Well 300 mL",
-         number_of_stackers="1",
-         test_configuration="full",
-         reservoir_name="opentrons_tough_1_reservoir_300ml",
-         well_plate_name="opentrons_96_wellplate_200ul_pcr_full_skirt"),    
-]
-
-
-def get_test(key):
-    matches = [test for test in Tests if test.key == key]
-    if not matches:
-        raise ValueError(f"No test found with key: {key}")
-    if len(matches) > 1:
-        raise ValueError(f"Multiple tests found with key: {key}")
-    return matches[0]
-
-
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
-    test = get_test(key=key)
-    ctx.param = test
 
     ################
     ### FIXTURES ###
     ################
+    well_plate_name = "opentrons_96_wellplate_200ul_pcr_full_skirt"
+    reservoir_name = "nest_1_reservoir_290ml"
+
 
     waste_chute = ctx.load_waste_chute()
-    STACKER_PARAMS = ctx.params.number_of_stackers  
+    STACKER_PARAMS = '2'
 
 
 
     ######################
     ### STACKER SET UP ###
     ######################
+    
 
     if STACKER_PARAMS == "1":
         stacker_D4 = ctx.load_module(FLEX_STACKER, "D4")
@@ -352,7 +223,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         stacker_D4.set_stored_labware(TIPRACK_96_1000, count=6, lid="opentrons_flex_tiprack_lid") 
     elif STACKER_PARAMS == "3":
         stacker_A4 = ctx.load_module(FLEX_STACKER, "A4")
-        stacker_A4.set_stored_labware(ctx.params.well_plate_name, count=2)
+        stacker_A4.set_stored_labware(well_plate_name, count=2)
 
         stacker_C4 = ctx.load_module(FLEX_STACKER, "C4")
         stacker_C4.set_stored_labware(TIPRACK_96_1000, count=0)
@@ -394,15 +265,17 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         dest_pcr_plate = stacker_A4.retrieve()
         ctx.move_labware(dest_pcr_plate, WELL_PLATE_STARTING_POSITION, use_gripper=True)
         stacker_A4.empty('Clear stacker of any labware before resuming the protocol')
-        stacker_A4.set_stored_labware(ctx.params.reservoir_name, count=0)
+        stacker_A4.set_stored_labware(reservoir_name, count=0)
         stacker_A4.fill(1,'Fill stacker with reservoir before resuming the protocol')
         source_reservoir = stacker_A4.retrieve()
         ctx.move_labware(source_reservoir, RESERVOIR_STARTING_POSITION, use_gripper=True)
     else:
-        dest_pcr_plate = ctx.load_labware(ctx.params.well_plate_name, WELL_PLATE_STARTING_POSITION, label="Destination PCR Plate")
-        source_reservoir = ctx.load_labware(ctx.params.reservoir_name, RESERVOIR_STARTING_POSITION, label="Source Reservoir")
+        dest_pcr_plate = ctx.load_labware(well_plate_name, WELL_PLATE_STARTING_POSITION)
+        source_reservoir = ctx.load_labware(reservoir_name, RESERVOIR_STARTING_POSITION)
     dest_pcr_plate.load_empty(dest_pcr_plate.wells())
     tip_rack_adapter = ctx.load_adapter(TIPRACK_96_ADAPTER_NAME, "A2")
+
+    off_deck_wellplate = ctx.load_labware(well_plate_name, protocol_api.OFF_DECK)
 
     tip_racks = []
 
@@ -429,6 +302,24 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     pipette_96_channel.trash_container = waste_chute
 
     assert isinstance(pipette_96_channel.trash_container, protocol_api.WasteChute)
+
+
+    # Concurrent Module Calls
+    heater_shaker.set_target_temperature(85)
+    temperature_module.start_set_temperature(4)
+    thermocycler.start_set_block_temperature(
+        temperature=80,
+        block_max_volume=100)
+    thermocycler.start_set_lid_temperature(85)
+
+    profile_task = thermocycler.start_execute_profile(
+        steps=[
+            {"temperature": 98, "hold_time_minutes": 1},
+            {"temperature": 85, "hold_time_minutes": 1},
+        ],
+        repetitions=2,
+        block_max_volume=100,
+    )
 
     
     ################################
@@ -468,24 +359,36 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
     # 96 channel column pickup 
     pipette_96_channel.configure_nozzle_layout(style=protocol_api.COLUMN, start="A12")
+    ctx.capture_image(filename="before_96_channel_column_pickup_Test_If_Break")
     
     
     pipette_96_channel.pick_up_tip(tip_rack_2["A1"])
     comment_tip_rack_status(ctx, tip_rack_2)
-    pipette_96_channel.aspirate(5, source_reservoir["A1"])
+    pipette_96_channel.aspirate(
+        volume=5, 
+        location=source_reservoir["A1"].bottom(z=1),
+        end_location=source_reservoir["A1"].top(z=-1)
+    )
     pipette_96_channel.touch_tip()
-    pipette_96_channel.dispense(5, dest_pcr_plate[f"A1"])
+    pipette_96_channel.dispense(
+        volume=5, 
+        location=dest_pcr_plate[f"A1"].bottom(z=1),
+        end_location=dest_pcr_plate[f"A1"].top(z=-1)
+
+    )
     pipette_96_channel.drop_tip(waste_chute)
 
     # 96 channel single pickup
     pipette_96_channel.configure_nozzle_layout(style=protocol_api.SINGLE, start="H12")
 
     pipette_96_channel.pick_up_tip(tip_rack_2)
-    pipette_96_channel.aspirate(5, source_reservoir["A1"])
+    pipette_96_channel.aspirate(5, source_reservoir["A1"].meniscus(target='dynamic', z=-1))
     pipette_96_channel.touch_tip()
-    pipette_96_channel.dispense(5, source_reservoir["A1"])
-    pipette_96_channel.aspirate(500, source_reservoir["A1"])
-    pipette_96_channel.dispense(500, source_reservoir["A1"])
+    pipette_96_channel.dispense(5, source_reservoir["A1"].meniscus(target='dynamic', z=-1))
+    pipette_96_channel.prepare_to_aspirate()
+
+    pipette_96_channel.aspirate(500, source_reservoir["A1"].meniscus(target='dynamic', z=-1))
+    pipette_96_channel.dispense(500, source_reservoir["A1"].meniscus(target='dynamic', z=-1))
     pipette_96_channel.drop_tip(waste_chute)
     comment_tip_rack_status(ctx, tip_rack_2)
     
@@ -503,6 +406,15 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ctx.move_lid(tip_rack_3, waste_chute, use_gripper=True)
     ctx.move_labware(tip_rack_3, "C3", use_gripper=True)
 
+
+    # # Concurrent Module Calls
+    # heater_shaker.set_target_temperature(75)
+    # temperature_module.start_set_temperature(4)
+    # thermocycler.start_set_block_temperature(
+    #     temperature=80,
+    #     block_max_volume=100)
+    # thermocycler.start_set_lid_temperature(85)
+
     # 96 channel row pickup
     pipette_96_channel.configure_nozzle_layout(style=protocol_api.ROW, start="H1")
     pipette_96_channel.pick_up_tip(tip_rack_3)
@@ -514,19 +426,19 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     pipette_96_channel.configure_nozzle_layout(style=protocol_api.ALL, start="A1")
     pipette_96_channel.pick_up_tip(tip_rack_1["A1"])
     comment_tip_rack_status(ctx, tip_rack_1)
-    pipette_96_channel.aspirate(5, source_reservoir["A1"])
+    pipette_96_channel.aspirate(5, source_reservoir["A1"].meniscus(target='dynamic', z=-1))
     pipette_96_channel.touch_tip()
     pipette_96_channel.air_gap(height=30)
     pipette_96_channel.blow_out(waste_chute)
     pipette_96_channel.prepare_to_aspirate()
-    pipette_96_channel.aspirate(5, source_reservoir["A1"])
+    pipette_96_channel.aspirate(5, source_reservoir["A1"].meniscus(target='dynamic', z=-1))
     pipette_96_channel.touch_tip()
     pipette_96_channel.air_gap(height=30)
     pipette_96_channel.blow_out(waste_chute)
     pipette_96_channel.prepare_to_aspirate()
-    pipette_96_channel.aspirate(10, source_reservoir["A1"])
+    pipette_96_channel.aspirate(10, source_reservoir["A1"].meniscus(target='dynamic', z=-1))
     pipette_96_channel.touch_tip()
-    pipette_96_channel.dispense(10, dest_pcr_plate["A1"])
+    pipette_96_channel.dispense(10, dest_pcr_plate["A1"].meniscus(target='dynamic', z=-1))
     pipette_96_channel.mix(repetitions=5, volume=15)
     pipette_96_channel.return_tip()
     comment_tip_rack_status(ctx, tip_rack_1)
@@ -561,17 +473,13 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     heater_shaker.open_labware_latch()
     ctx.move_labware(dest_pcr_plate, heater_shaker_adapter, use_gripper=True)
     heater_shaker.close_labware_latch()
-
-    heater_shaker.set_target_temperature(38)
-    heater_shaker.set_and_wait_for_shake_speed(777)
-    heater_shaker.wait_for_temperature()
-
+    heater_shaker.set_shake_speed(500)
+    ctx.delay(minutes=1)
     heater_shaker.deactivate_heater()
     heater_shaker.deactivate_shaker()
     heater_shaker.open_labware_latch()
 
     ctx.move_labware(dest_pcr_plate, temperature_module_adapter, use_gripper=True)
-    temperature_module.set_temperature(38)
     temperature_module.deactivate()
 
     ctx.move_labware(dest_pcr_plate, absorbance_module, use_gripper=True)
@@ -590,6 +498,8 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         ctx.move_labware(tip_rack_3, stacker_C4, use_gripper=True)
         stacker_C4.store()
 
+    ctx.move_labware(off_deck_wellplate, thermocycler, use_gripper=False)
+    ctx.wait_for_tasks([profile_task])
 
     #########################
     # Liquid Class Transfer #

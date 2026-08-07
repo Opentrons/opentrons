@@ -215,17 +215,16 @@ Flex deck / visualization demos use a paired protocol + analysis under `src/`:
 
 | File | Role |
 | --- | --- |
-| `Flex_Smoke_2_25_96_Overrides_Stacker_LC.py` | Source Flex smoke protocol (API 2.25, stackers + liquid classes) |
-| `StackerAnalysis.json` | Analysis of that protocol (defaults: 2 stackers, Nest 290 mL, Tough PCR plate) |
+| `Flex_Smoke_2_27_96_SmokeTestWith2Stackers.py` | Source Flex smoke protocol (API 2.27, 2 stackers + waste chute). Copied from `analyses-snapshot-testing/files/protocols/Flex_S_2_7_P200_96_GRIP_HS_MB_TC_TM_SmokeTestWith2Stackers.py` |
+| `StackerAnalysis.json` | Analysis of that protocol |
 
 Keep them side by side so visual diffs can be traced back to protocol commands. To regenerate the analysis from the monorepo root (requires `api/.venv`):
 
 ```bash
 api/.venv/bin/python -m opentrons.cli analyze \
-  js-package-testing/src/Flex_Smoke_2_25_96_Overrides_Stacker_LC.py \
+  js-package-testing/src/Flex_Smoke_2_27_96_SmokeTestWith2Stackers.py \
   --check \
-  --json-output=js-package-testing/src/StackerAnalysis.json \
-  --rtp-values='{"number_of_stackers":"2","test_configuration":"full","reservoir_name":"nest_1_reservoir_290ml","well_plate_name":"opentrons_96_wellplate_200ul_pcr_full_skirt"}'
+  --json-output=js-package-testing/src/StackerAnalysis.json
 ```
 
 Pretty-print the JSON afterward if you want readable diffs. Accept Applitools baselines after intentional analysis changes.
@@ -355,7 +354,7 @@ js-package-testing/
 │   ├── i18n.ts
 │   ├── styles.css
 │   ├── locale/en/protocol_visualization.json
-│   ├── Flex_Smoke_2_25_96_Overrides_Stacker_LC.py  # source Flex smoke protocol
+│   ├── Flex_Smoke_2_27_96_SmokeTestWith2Stackers.py  # source Flex smoke protocol
 │   └── StackerAnalysis.json  # analysis of that protocol (regenerate via opentrons analyze)
 └── tests/
     ├── protocolDeck.spec.ts
