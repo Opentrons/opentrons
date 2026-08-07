@@ -14,10 +14,7 @@ import {
 } from '@opentrons/components'
 
 import { TertiaryButton } from '/app/atoms/buttons'
-import {
-  changeAuditLogDirectory,
-  getAuditLogDirectory,
-} from '/app/redux/log-location'
+import { changeAuditLogDirectory, getAuditLogDirectory } from '/app/redux/audit'
 
 import type { Dispatch } from '/app/redux/types'
 

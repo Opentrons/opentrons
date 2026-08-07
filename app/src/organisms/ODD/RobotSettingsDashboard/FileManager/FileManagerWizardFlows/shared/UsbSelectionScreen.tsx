@@ -7,7 +7,7 @@ import { INFO_TOAST, RadioButton, StyledText } from '@opentrons/components'
 import { SmallButton } from '/app/atoms/buttons'
 import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { getShellUsbMountPaths } from '/app/redux/shell'
+import { getShellUsbMassStorageMountPaths } from '/app/redux/shell'
 
 import styles from './shared.module.css'
 
@@ -33,8 +33,9 @@ export function UsbSelectionScreen({
   onContinue,
 }: UsbSelectionScreenProps): JSX.Element {
   const { t, i18n } = useTranslation(['device_details', 'shared'])
+  // only single-function USB mass-storage devices
   const usbMountPaths = useSelector((state: State) =>
-    getShellUsbMountPaths(state)
+    getShellUsbMassStorageMountPaths(state)
   )
   const [selectedPath, setSelectedPath] = useState<string | null>(
     usbMountPaths[0] ?? null

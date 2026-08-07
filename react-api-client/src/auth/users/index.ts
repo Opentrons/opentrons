@@ -1,5 +1,6 @@
 export * from './useCreateUserMutation'
 export * from './useDeleteUserMutation'
+export * from './useResetUserPasswordMutation'
 export * from './useSelfQuery'
 export * from './useUpdateSelfMutation'
 export * from './useUpdateUserMutation'

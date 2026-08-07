@@ -3,14 +3,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import {
-  changeAuditLogDirectory,
-  getAuditLogDirectory,
-} from '/app/redux/log-location'
+import { changeAuditLogDirectory, getAuditLogDirectory } from '/app/redux/audit'
 
 import { AuditLogFolder } from '../AuditLogFolder'
 
-vi.mock('/app/redux/log-location')
+vi.mock('/app/redux/audit')
 
 const render = () => {
   return renderWithProviders(<AuditLogFolder />, {

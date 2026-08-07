@@ -1,6 +1,7 @@
 """Tests for data_files router."""
 
 import io
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import List
@@ -39,6 +40,7 @@ from robot_server.data_files.router import (
     get_data_file_info_by_id,
     get_data_files_by_run_id,
     get_run_image_metadata,
+    sanitize_path,
     upload_data_file,
 )
 from robot_server.errors.error_responses import ApiError
@@ -971,3 +973,67 @@ async def test_get_data_files_by_run_id_run_not_found(
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "/usr/lib/something",
+        "/etc/something",
+        "/data/mmcblk0p1",
+        "/media/RFS-mmcblk0p2",
+        "/home/BOOT-mmcblk0p1",
+        "/userfs/whatever",
+        "/run/something",
+        "/var/something",
+        "/run",
+        "/var/",
+        "/var",
+    ],
+)
+def test_sanitize_path_blocks_paths(path: str) -> None:
+    """It should prevent the use of paths that match denylist or don't match allowlist."""
+    with pytest.raises(ApiError):
+        sanitize_path(path)
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        pytest.param(
+            "/var/lib/opentrons-robot-server/some/path",
+            marks=[
+                pytest.mark.skipif(
+                    os.path.realpath("/var") != "/var",
+                    reason="/var symlinked to /private/var (likely macos)",
+                ),
+            ],
+        ),
+        "/media/ENFAINT-sda1/something",
+        "/data/some/random/path",
+        pytest.param(
+            "/var/lib/jupyter/data/some/path",
+            marks=[
+                pytest.mark.skipif(
+                    os.path.realpath("/var") != "/var",
+                    reason="/var symlinked to /private/var (likely macos)",
+                )
+            ],
+        ),
+        "/run/media/efasda-sdc",
+        "/data",
+        "/userfs/media/afffsd",
+        pytest.param(
+            "/var/user-packages/asdasd",
+            marks=[
+                pytest.mark.skipif(
+                    os.path.realpath("/var") != "/var",
+                    reason="/var/ symlinked to /private/var (likely macos)",
+                )
+            ],
+        ),
+    ],
+)
+def test_sanitize_path_allows_paths(path: str) -> None:
+    """It should allow paths that match allowlist and not denylist."""
+    assert sanitize_path(path) == path
