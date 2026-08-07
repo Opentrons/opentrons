@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 
-import { getRunRaw } from '@opentrons/api-client'
+import { DEFAULT_RUN_DOWNLOAD_PARAMS, getRunRaw } from '@opentrons/api-client'
 import { useAllProtocolsQuery, useHost } from '@opentrons/react-api-client'
 
 import { saveFileToUsb } from '/app/redux/shell/remote'
+
+import { isEmptyDownloadResponse } from './utils/isEmptyDownloadResponse'
 
 import type { RunData } from '@opentrons/api-client'
 
@@ -51,7 +53,15 @@ export function useDownloadSelectedRuns(
         const matchingProtocolName = matchingProtocol?.metadata.protocolName
         const runDateTransformed = run.createdAt.replaceAll(':', '_')
 
-        const res = await getRunRaw(currentHost, run.id, 'blob')
+        const res = await getRunRaw(
+          currentHost,
+          run.id,
+          DEFAULT_RUN_DOWNLOAD_PARAMS,
+          'blob'
+        )
+        if (isEmptyDownloadResponse(res.data, res.status)) {
+          throw new Error(`No downloadable content for run ${run.id}`)
+        }
         const buf = await (res.data as Blob).arrayBuffer()
 
         zip.file(

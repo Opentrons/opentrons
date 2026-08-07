@@ -2,7 +2,7 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { getRunRaw } from '@opentrons/api-client'
+import { DEFAULT_RUN_DOWNLOAD_PARAMS, getRunRaw } from '@opentrons/api-client'
 import { useAllProtocolsQuery, useHost } from '@opentrons/react-api-client'
 
 import { saveFileToUsb } from '/app/redux/shell/remote'
@@ -74,8 +74,18 @@ describe('useDownloadSelectedRuns', () => {
 
     await result.current.downloadRuns([mockRunOne, mockRunTwo])
 
-    expect(getRunRaw).toHaveBeenCalledWith(HOST_CONFIG, 'run-1', 'blob')
-    expect(getRunRaw).toHaveBeenCalledWith(HOST_CONFIG, 'run-2', 'blob')
+    expect(getRunRaw).toHaveBeenCalledWith(
+      HOST_CONFIG,
+      'run-1',
+      DEFAULT_RUN_DOWNLOAD_PARAMS,
+      'blob'
+    )
+    expect(getRunRaw).toHaveBeenCalledWith(
+      HOST_CONFIG,
+      'run-2',
+      DEFAULT_RUN_DOWNLOAD_PARAMS,
+      'blob'
+    )
     expect(mockJSZip.file).toHaveBeenCalledWith(
       'run-1_2024-01-01T10_00_00.000Z.zip',
       expect.any(ArrayBuffer)
@@ -148,7 +158,12 @@ describe('useDownloadSelectedRuns', () => {
     await result.current.downloadRuns([mockRunTwo]).catch(() => {})
 
     expect(getRunRaw).toHaveBeenCalledTimes(1)
-    expect(getRunRaw).toHaveBeenCalledWith(HOST_CONFIG, 'run-1', 'blob')
+    expect(getRunRaw).toHaveBeenCalledWith(
+      HOST_CONFIG,
+      'run-1',
+      DEFAULT_RUN_DOWNLOAD_PARAMS,
+      'blob'
+    )
 
     resolveFirstFetch()
     await firstCall
