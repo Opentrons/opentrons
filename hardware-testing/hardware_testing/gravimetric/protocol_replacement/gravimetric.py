@@ -1,11 +1,20 @@
 """Gravimetric QC protocol."""
 
-from typing import List, Dict, Tuple, Optional
+from typing import Any, Dict, List, Mapping, Optional, Tuple
 from dataclasses import dataclass, asdict
+from http import HTTPStatus
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 from time import sleep, time
 import copy
 import json
+import math
+import socket
+import threading
 import traceback
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
 from uuid import uuid4
 
 from opentrons.protocol_api import (
@@ -54,7 +63,7 @@ from hardware_testing.drivers.data_center_client import (
 )
 
 # ------ TODO remove and move necessary libraries into a standard release library. ----
-import importlib
+import importlib.util
 import os
 from opentrons.config import infer_config_base_dir
 from opentrons import version
@@ -123,7 +132,7 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
 from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
 
 
-metadata = {"protocolName": "Gravimetric QC V3"}
+metadata = {"protocolName": "Gravimetric QC V3 Manual-LLD"}
 requirements = {"robotType": "Flex", "apiLevel": "2.29"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
@@ -131,10 +140,18 @@ SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
 MANUAL_LLD_STATE_FILE = os.environ.get(
     "MANUAL_LLD_STATE_FILE", "/data/testing_data/manual_lld.json"
 )
+MANUAL_LLD_HTTP_HOST = os.environ.get("MANUAL_LLD_HTTP_HOST", "0.0.0.0")
+MANUAL_LLD_HTTP_PORT = int(os.environ.get("MANUAL_LLD_HTTP_PORT", "8088"))
+MANUAL_LLD_PUBLIC_HOST = os.environ.get("MANUAL_LLD_PUBLIC_HOST")
+MANUAL_LLD_ROBOT_SERVER_URL = os.environ.get(
+    "MANUAL_LLD_ROBOT_SERVER_URL", "http://localhost:31950"
+)
 MANUAL_LLD_START_OFFSET_MM = 3.0
 MANUAL_LLD_POLL_INTERVAL_SECONDS = 0.1
 MANUAL_LLD_MIN_HEIGHT_MM = 0.5
 MANUAL_LLD_DEFAULT_JOG_STEP_MM = 0.1
+MANUAL_LLD_MAX_JOG_MM = 5.0
+MANUAL_LLD_ROBOT_API_VERSION = "3"
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -1537,6 +1554,645 @@ def _configure_tip_count(fixture_settings: FixtureSettings, channel: int) -> Non
         print_info(f"Configuring for single tip with {primary}")
 
 
+class _ManualLLDServiceError(Exception):
+    """An expected error from the embedded manual LLD service."""
+
+
+class _ManualLLDStateStore:
+    """Read and atomically update the manual LLD state shared with the protocol."""
+
+    def __init__(self, path: Path) -> None:
+        self.path = path
+        self.lock = threading.Lock()
+
+    def read(self) -> Dict[str, object]:
+        """Read the current calibration state."""
+        with self.lock:
+            return self._read_unlocked()
+
+    def replace(self, state: Mapping[str, object]) -> None:
+        """Replace the current calibration state."""
+        with self.lock:
+            self._write_unlocked(state)
+
+    def _read_unlocked(self) -> Dict[str, object]:
+        with self.path.open(encoding="utf-8") as state_file:
+            state = json.load(state_file)
+        if not isinstance(state, dict):
+            raise _ManualLLDServiceError("manual_lld.json must contain a JSON object.")
+        return state
+
+    def _write_unlocked(self, state: Mapping[str, object]) -> None:
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        temporary_path = self.path.with_name(f"{self.path.name}.{uuid4().hex}.tmp")
+        with temporary_path.open("w", encoding="utf-8") as state_file:
+            json.dump(state, state_file, indent=2, sort_keys=True)
+            state_file.flush()
+            os.fsync(state_file.fileno())
+        os.replace(temporary_path, self.path)
+
+
+class _ManualLLDRobotServerClient:
+    """Minimal client for resuming the run and submitting Z jog commands."""
+
+    def __init__(self, base_url: str) -> None:
+        self.base_url = base_url.rstrip("/")
+
+    def ensure_current_run_is_running(self) -> Dict[str, object]:
+        """Resume the current run when it is paused by the calibration prompt."""
+        current_run = self._get_current_run()
+        run_status = current_run.get("status")
+        if run_status == "running":
+            return current_run
+        if run_status != "paused":
+            raise _ManualLLDServiceError(
+                "The current run must be running or paused for manual jog; "
+                f"current status is {run_status!r}."
+            )
+
+        run_id = self._run_id(current_run)
+        self._request_json(
+            "POST",
+            f"/runs/{run_id}/actions",
+            {"data": {"actionType": "play"}},
+        )
+        resume_deadline = time() + 10
+        while time() < resume_deadline:
+            current_run = self._get_current_run()
+            if current_run.get("status") == "running":
+                return current_run
+            sleep(MANUAL_LLD_POLL_INTERVAL_SECONDS)
+        raise _ManualLLDServiceError(
+            "Timed out waiting for the protocol run to resume."
+        )
+
+    def move_relative(self, pipette_id: str, distance_mm: float) -> Dict[str, object]:
+        """Jog the given pipette Z axis in the current protocol run."""
+        current_run = self.ensure_current_run_is_running()
+        run_id = self._run_id(current_run)
+        command = self._request_json(
+            "POST",
+            f"/runs/{run_id}/commands?"
+            + urlencode({"waitUntilComplete": "true", "timeout": 30000}),
+            {
+                "data": {
+                    "commandType": "moveRelative",
+                    "intent": "protocol",
+                    "params": {
+                        "pipetteId": pipette_id,
+                        "axis": "z",
+                        "distance": distance_mm,
+                    },
+                }
+            },
+        )
+        command_data = command.get("data")
+        if not isinstance(command_data, dict):
+            raise _ManualLLDServiceError("Robot Server returned no jog command data.")
+        command_status = command_data.get("status")
+        if command_status != "succeeded":
+            raise _ManualLLDServiceError(
+                f"Jog command did not succeed; status is {command_status!r}."
+            )
+        return command_data
+
+    @staticmethod
+    def _run_id(run: Mapping[str, object]) -> str:
+        run_id = run.get("id")
+        if not isinstance(run_id, str) or not run_id:
+            raise _ManualLLDServiceError(
+                "Robot Server did not return a current run ID."
+            )
+        return run_id
+
+    def _get_current_run(self) -> Dict[str, object]:
+        runs = self._request_json("GET", "/runs?pageLength=1")
+        links = runs.get("links")
+        if not isinstance(links, dict):
+            raise _ManualLLDServiceError("Robot Server returned no current-run link.")
+        current = links.get("current")
+        if not isinstance(current, dict):
+            raise _ManualLLDServiceError("There is no current robot run.")
+        href = current.get("href")
+        if not isinstance(href, str) or not href:
+            raise _ManualLLDServiceError("The current-run link has no href.")
+        response = self._request_json("GET", href)
+        run_data = response.get("data")
+        if not isinstance(run_data, dict):
+            raise _ManualLLDServiceError("Robot Server returned no current run data.")
+        return run_data
+
+    def _request_json(
+        self,
+        method: str,
+        path: str,
+        body: Optional[Mapping[str, object]] = None,
+    ) -> Dict[str, object]:
+        request_body = None if body is None else json.dumps(body).encode("utf-8")
+        url = path if path.startswith(("http://", "https://")) else self.base_url + path
+        request = Request(
+            url,
+            data=request_body,
+            method=method,
+            headers={
+                "Opentrons-Version": MANUAL_LLD_ROBOT_API_VERSION,
+                "Content-Type": "application/json",
+            },
+        )
+        try:
+            with urlopen(request, timeout=35) as response:
+                response_data = json.loads(response.read())
+        except HTTPError as error:
+            details = error.read().decode("utf-8", errors="replace")
+            raise _ManualLLDServiceError(
+                f"Robot Server returned HTTP {error.code}: {details}"
+            ) from error
+        except URLError as error:
+            raise _ManualLLDServiceError(
+                "Could not connect to Robot Server at "
+                f"{self.base_url}: {error.reason}"
+            ) from error
+        if not isinstance(response_data, dict):
+            raise _ManualLLDServiceError(
+                "Robot Server returned a non-object JSON response."
+            )
+        return response_data
+
+
+_MANUAL_LLD_HTML = """<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>手动液面高度</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, -apple-system, sans-serif; }
+    body { margin: 0; background: #f4f6f8; color: #182026; }
+    main { max-width: 520px; margin: 0 auto; padding: 24px 16px 48px; }
+    .card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 8px 28px #0001; }
+    h1 { margin: 0 0 6px; font-size: 24px; }
+    .hint { margin: 0 0 18px; color: #5f6b76; line-height: 1.45; }
+    .status { padding: 10px 12px; border-radius: 10px; background: #e8f1ff; margin-bottom: 16px; }
+    .height { text-align: center; padding: 18px 0; }
+    .height strong { display: block; font-size: 42px; font-variant-numeric: tabular-nums; }
+    .height span { color: #5f6b76; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    button, input { box-sizing: border-box; width: 100%; min-height: 48px; border-radius: 10px; font-size: 17px; }
+    button { border: 0; background: #056de8; color: white; font-weight: 650; cursor: pointer; }
+    button.secondary { background: #e8eef5; color: #17324d; }
+    button.danger { background: #b42318; }
+    button:disabled { opacity: .45; cursor: wait; }
+    input { border: 1px solid #aab7c4; padding: 0 12px; }
+    label { display: block; margin-top: 18px; color: #44515c; }
+    .error { min-height: 24px; margin-top: 14px; color: #b42318; white-space: pre-wrap; }
+    .details { margin-top: 16px; color: #5f6b76; font-size: 14px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+<main><section class="card">
+  <h1>手动液面高度</h1>
+  <p class="hint">点击“开始调节”恢复协议，然后向下移动枪头。枪头刚接触液面时保存高度。</p>
+  <div id="status" class="status">正在连接机器人…</div>
+  <div class="height"><strong id="height">--</strong><span>距孔底高度（mm）</span></div>
+  <button id="start" onclick="act('/start')">开始调节 / 恢复协议</button>
+  <div class="row">
+    <button id="up" class="secondary" onclick="jog('up')">↑ 向上</button>
+    <button id="down" onclick="jog('down')">↓ 向下</button>
+  </div>
+  <label for="step">单次移动距离（mm）</label>
+  <div class="row">
+    <input id="step" type="number" min="0.01" max="5" step="0.01" value="0.1">
+    <button class="secondary" onclick="setStep()">设置步长</button>
+  </div>
+  <div class="row">
+    <button id="save" onclick="act('/confirm')">保存高度</button>
+    <button id="cancel" class="danger" onclick="act('/cancel')">取消检测</button>
+  </div>
+  <div id="error" class="error"></div>
+  <div id="details" class="details"></div>
+</section></main>
+<script>
+let busy = false;
+let refreshTimer = null;
+let stepIsEditing = false;
+const ids = ['start', 'up', 'down', 'save', 'cancel'];
+const stepInput = document.getElementById('step');
+stepInput.addEventListener('input', () => { stepIsEditing = true; });
+function showError(message) { document.getElementById('error').textContent = message || ''; }
+function render(state) {
+  const statusNames = {waiting: '等待手动调节', confirmed: '高度已保存', cancelled: '检测已取消', consumed: '协议已读取高度'};
+  document.getElementById('status').textContent = statusNames[state.status] || state.status || '未知状态';
+  const height = Number(state.height_from_bottom_mm);
+  document.getElementById('height').textContent = Number.isFinite(height) ? height.toFixed(3) : '--';
+  const step = Number(state.jog_step_mm);
+  if (Number.isFinite(step) && !stepIsEditing) stepInput.value = step;
+  document.getElementById('details').textContent = [
+    `孔位：${state.source_well || '--'}`,
+    `累计 Z 移动：${Number(state.cumulative_z_mm || 0).toFixed(3)} mm`,
+    `允许范围：${state.minimum_height_from_bottom_mm || '--'} - ${state.source_well_depth_mm || '--'} mm`
+  ].join(' · ');
+  const waiting = state.status === 'waiting';
+  ids.forEach(id => document.getElementById(id).disabled = busy || !waiting);
+  if (!waiting && refreshTimer !== null) {
+    clearInterval(refreshTimer);
+    refreshTimer = null;
+  }
+}
+async function request(path, body) {
+  busy = true; showError('');
+  try {
+    const options = {method: 'POST', headers: {'Content-Type': 'application/json'}};
+    if (body !== undefined) options.body = JSON.stringify(body);
+    const response = await fetch(path, options);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+    render(data); return data;
+  } catch (error) { showError(error.message); throw error; }
+  finally { busy = false; }
+}
+async function act(path) {
+  try {
+    const state = await request(path);
+    if (state.status !== 'waiting') return;
+  } catch (_) {}
+  await refresh();
+}
+async function jog(direction) { try { await request('/jog', {direction}); } catch (_) {} await refresh(); }
+async function setStep() {
+  const step = Number(stepInput.value);
+  try {
+    const state = await request('/step', {step_mm: step});
+    stepIsEditing = false;
+    render(state);
+  } catch (_) {}
+  await refresh();
+}
+async function refresh() {
+  if (busy) return;
+  try {
+    const response = await fetch('/status', {cache: 'no-store'});
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+    render(data);
+  } catch (error) { showError(`连接失败：${error.message}`); }
+}
+refresh(); refreshTimer = setInterval(refresh, 750);
+</script>
+</body>
+</html>
+""".encode(
+    "utf-8"
+)
+
+
+class _ManualLLDHTTPServer(ThreadingHTTPServer):
+    """Embedded HTTP server containing manual LLD dependencies."""
+
+    allow_reuse_address = True
+    daemon_threads = True
+
+    def __init__(
+        self,
+        server_address: Tuple[str, int],
+        state_store: _ManualLLDStateStore,
+        robot_client: _ManualLLDRobotServerClient,
+        max_jog_mm: float,
+    ) -> None:
+        super().__init__(server_address, _ManualLLDRequestHandler)
+        self.state_store = state_store
+        self.robot_client = robot_client
+        self.max_jog_mm = max_jog_mm
+
+
+class _ManualLLDRequestHandler(BaseHTTPRequestHandler):
+    """Serve the calibration page and handle jog/save actions."""
+
+    server: _ManualLLDHTTPServer
+
+    def do_OPTIONS(self) -> None:
+        """Allow browser requests."""
+        self.send_response(HTTPStatus.NO_CONTENT)
+        self._send_common_headers()
+        self.end_headers()
+
+    def do_GET(self) -> None:
+        """Serve the front end, health, or current state."""
+        try:
+            path = self.path.split("?", 1)[0]
+            if path == "/":
+                self._send_html()
+            elif path == "/health":
+                self._send_json(HTTPStatus.OK, {"status": "ok"})
+            elif path == "/status":
+                self._send_json(HTTPStatus.OK, self.server.state_store.read())
+            elif path == "/favicon.ico":
+                self.send_response(HTTPStatus.NO_CONTENT)
+                self.end_headers()
+            else:
+                self._send_error(HTTPStatus.NOT_FOUND, "Unknown endpoint.")
+        except _ManualLLDServiceError as error:
+            self._send_error(HTTPStatus.CONFLICT, str(error))
+        except Exception as error:
+            self._send_error(HTTPStatus.INTERNAL_SERVER_ERROR, str(error))
+
+    def do_POST(self) -> None:
+        """Process one manual liquid-height action."""
+        try:
+            path = self.path.split("?", 1)[0]
+            if path == "/start":
+                self._handle_start()
+            elif path == "/jog":
+                self._handle_jog(self._read_json_body())
+            elif path == "/step":
+                self._handle_step(self._read_json_body())
+            elif path == "/confirm":
+                self._handle_confirm()
+            elif path == "/cancel":
+                self._handle_cancel()
+            else:
+                self._send_error(HTTPStatus.NOT_FOUND, "Unknown endpoint.")
+        except _ManualLLDServiceError as error:
+            self._send_error(HTTPStatus.CONFLICT, str(error))
+        except (ValueError, TypeError, json.JSONDecodeError) as error:
+            self._send_error(HTTPStatus.BAD_REQUEST, str(error))
+        except Exception as error:
+            self._send_error(HTTPStatus.INTERNAL_SERVER_ERROR, str(error))
+
+    def _handle_start(self) -> None:
+        store = self.server.state_store
+        with store.lock:
+            state = store._read_unlocked()
+            self._require_waiting_state(state)
+            self.server.robot_client.ensure_current_run_is_running()
+            state.update({"controls_started": True, "controls_started_at": time()})
+            store._write_unlocked(state)
+        self._send_json(HTTPStatus.OK, state)
+
+    def _handle_jog(self, body: Mapping[str, object]) -> None:
+        distance_value = body.get("distance_mm", body.get("distance"))
+        store = self.server.state_store
+        with store.lock:
+            state = store._read_unlocked()
+            self._require_waiting_state(state)
+            if distance_value is None:
+                direction = body.get("direction")
+                jog_step = self._numeric_state_value(state, "jog_step_mm")
+                if direction == "up":
+                    distance_mm = jog_step
+                elif direction == "down":
+                    distance_mm = -jog_step
+                else:
+                    raise ValueError(
+                        "Provide distance_mm, or set direction to 'up' or 'down'."
+                    )
+            else:
+                distance_mm = self._finite_number(distance_value, "distance_mm")
+            if distance_mm == 0:
+                raise ValueError("distance_mm must be non-zero.")
+            if abs(distance_mm) > self.server.max_jog_mm:
+                raise ValueError(
+                    f"A single jog cannot exceed {self.server.max_jog_mm:g} mm."
+                )
+
+            cumulative_z = self._numeric_state_value(state, "cumulative_z_mm")
+            start_height = self._numeric_state_value(
+                state, "start_height_from_bottom_mm"
+            )
+            minimum_height = self._numeric_state_value(
+                state, "minimum_height_from_bottom_mm"
+            )
+            maximum_height = self._numeric_state_value(
+                state, "maximum_height_from_bottom_mm"
+            )
+            next_cumulative_z = cumulative_z + distance_mm
+            next_height = start_height + next_cumulative_z
+            if not minimum_height <= next_height <= maximum_height:
+                raise _ManualLLDServiceError(
+                    f"Jog would place the tip at {next_height:.3f} mm from the well "
+                    f"bottom; allowed range is {minimum_height:.3f} to "
+                    f"{maximum_height:.3f} mm."
+                )
+            pipette_id = state.get("pipette_id")
+            if not isinstance(pipette_id, str) or not pipette_id:
+                raise _ManualLLDServiceError("The active session has no pipette_id.")
+
+            command = self.server.robot_client.move_relative(
+                pipette_id=pipette_id, distance_mm=distance_mm
+            )
+            result = command.get("result")
+            position = result.get("position") if isinstance(result, dict) else None
+            state.update(
+                {
+                    "controls_started": True,
+                    "cumulative_z_mm": next_cumulative_z,
+                    "height_from_bottom_mm": next_height,
+                    "last_jog_mm": distance_mm,
+                    "last_jog_at": time(),
+                    "last_robot_position": position,
+                }
+            )
+            store._write_unlocked(state)
+        self._send_json(HTTPStatus.OK, state)
+
+    def _handle_step(self, body: Mapping[str, object]) -> None:
+        step_value = body.get("step_mm", body.get("step"))
+        step_mm = self._finite_number(step_value, "step_mm")
+        if step_mm <= 0:
+            raise ValueError("step_mm must be greater than zero.")
+        if step_mm > self.server.max_jog_mm:
+            raise ValueError(f"step_mm cannot exceed {self.server.max_jog_mm:g} mm.")
+
+        store = self.server.state_store
+        with store.lock:
+            state = store._read_unlocked()
+            self._require_waiting_state(state)
+            state.update({"jog_step_mm": step_mm, "step_updated_at": time()})
+            store._write_unlocked(state)
+        self._send_json(HTTPStatus.OK, state)
+
+    def _handle_confirm(self) -> None:
+        store = self.server.state_store
+        with store.lock:
+            state = store._read_unlocked()
+            self._require_waiting_state(state)
+            height = self._numeric_state_value(state, "height_from_bottom_mm")
+            minimum_height = self._numeric_state_value(
+                state, "minimum_height_from_bottom_mm"
+            )
+            source_well_depth = self._numeric_state_value(state, "source_well_depth_mm")
+            if not minimum_height <= height <= source_well_depth:
+                raise _ManualLLDServiceError(
+                    f"Cannot confirm {height:.3f} mm. Jog the tip inside the well "
+                    f"between {minimum_height:.3f} and {source_well_depth:.3f} mm."
+                )
+            self.server.robot_client.ensure_current_run_is_running()
+            state.update(
+                {
+                    "controls_started": True,
+                    "status": "confirmed",
+                    "confirmed": True,
+                    "confirmed_at": time(),
+                }
+            )
+            store._write_unlocked(state)
+        self._send_json(HTTPStatus.OK, state)
+
+    def _handle_cancel(self) -> None:
+        store = self.server.state_store
+        with store.lock:
+            state = store._read_unlocked()
+            self._require_waiting_state(state)
+            self.server.robot_client.ensure_current_run_is_running()
+            state.update(
+                {
+                    "controls_started": True,
+                    "status": "cancelled",
+                    "confirmed": False,
+                    "cancelled_at": time(),
+                }
+            )
+            store._write_unlocked(state)
+        self._send_json(HTTPStatus.OK, state)
+
+    @staticmethod
+    def _require_waiting_state(state: Mapping[str, object]) -> None:
+        if state.get("status") != "waiting" or state.get("confirmed") is not False:
+            raise _ManualLLDServiceError(
+                "There is no active calibration waiting for input. "
+                f"Current status is {state.get('status')!r}."
+            )
+        if not state.get("session_id"):
+            raise _ManualLLDServiceError("The waiting calibration has no session_id.")
+
+    @staticmethod
+    def _finite_number(value: object, name: str) -> float:
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise ValueError(f"{name} must be a number.")
+        result = float(value)
+        if not math.isfinite(result):
+            raise ValueError(f"{name} must be finite.")
+        return result
+
+    @staticmethod
+    def _numeric_state_value(state: Mapping[str, object], key: str) -> float:
+        value = state.get(key)
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise _ManualLLDServiceError(f"The active session has no numeric {key}.")
+        return float(value)
+
+    def _read_json_body(self) -> Dict[str, object]:
+        content_length = int(self.headers.get("Content-Length", "0"))
+        if content_length <= 0 or content_length > 65536:
+            raise ValueError("Request body must contain a small JSON object.")
+        body = json.loads(self.rfile.read(content_length))
+        if not isinstance(body, dict):
+            raise ValueError("Request body must be a JSON object.")
+        return body
+
+    def _send_html(self) -> None:
+        self.send_response(HTTPStatus.OK)
+        self._send_common_headers()
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(_MANUAL_LLD_HTML)))
+        self.end_headers()
+        self.wfile.write(_MANUAL_LLD_HTML)
+
+    def _send_json(self, status: HTTPStatus, body: Mapping[str, object]) -> None:
+        payload = json.dumps(body, indent=2, sort_keys=True).encode("utf-8")
+        self.send_response(status)
+        self._send_common_headers()
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(payload)))
+        self.end_headers()
+        self.wfile.write(payload)
+
+    def _send_error(self, status: HTTPStatus, message: str) -> None:
+        self._send_json(status, {"error": message, "status": status.value})
+
+    def _send_common_headers(self) -> None:
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Cache-Control", "no-store")
+
+    def log_message(self, format: str, *args: Any) -> None:
+        """Log requests with a stable service prefix."""
+        print(f"[manual-lld] {self.address_string()} - {format % args}")
+
+
+def _get_manual_lld_public_host(bind_host: str) -> str:
+    """Return a browser-reachable host name or IP for the pause message."""
+    if MANUAL_LLD_PUBLIC_HOST:
+        return MANUAL_LLD_PUBLIC_HOST
+    if bind_host not in ("", "0.0.0.0", "::"):
+        return bind_host
+
+    candidate_addresses: List[str] = []
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as network_socket:
+            network_socket.connect(("8.8.8.8", 80))
+            candidate_addresses.append(network_socket.getsockname()[0])
+    except OSError:
+        pass
+    try:
+        host_name = socket.gethostname()
+        candidate_addresses.extend(
+            address[4][0]
+            for address in socket.getaddrinfo(host_name, None, socket.AF_INET)
+        )
+    except OSError:
+        pass
+    return next(
+        (address for address in candidate_addresses if not address.startswith("127.")),
+        "127.0.0.1",
+    )
+
+
+class _ManualLLDService:
+    """Lifecycle wrapper for the embedded manual LLD HTTP server."""
+
+    def __init__(
+        self,
+        server: _ManualLLDHTTPServer,
+        thread: threading.Thread,
+        url: str,
+    ) -> None:
+        self.server = server
+        self.thread = thread
+        self.url = url
+
+    @classmethod
+    def start(cls, state: Mapping[str, object]) -> "_ManualLLDService":
+        """Write the active state and start serving the calibration page."""
+        state_store = _ManualLLDStateStore(Path(MANUAL_LLD_STATE_FILE))
+        state_store.replace(state)
+        server = _ManualLLDHTTPServer(
+            (MANUAL_LLD_HTTP_HOST, MANUAL_LLD_HTTP_PORT),
+            state_store=state_store,
+            robot_client=_ManualLLDRobotServerClient(MANUAL_LLD_ROBOT_SERVER_URL),
+            max_jog_mm=MANUAL_LLD_MAX_JOG_MM,
+        )
+        actual_port = int(server.server_address[1])
+        public_host = _get_manual_lld_public_host(MANUAL_LLD_HTTP_HOST)
+        url = f"http://{public_host}:{actual_port}"
+        updated_state = dict(state)
+        updated_state.update({"service_url": url, "service_started_at": time()})
+        state_store.replace(updated_state)
+        thread = threading.Thread(
+            target=server.serve_forever,
+            name="manual-lld-http",
+            daemon=True,
+        )
+        thread.start()
+        return cls(server=server, thread=thread, url=url)
+
+    def close(self) -> None:
+        """Stop the embedded server and release its listening port."""
+        self.server.shutdown()
+        self.server.server_close()
+        self.thread.join(timeout=2)
+
+
 def _write_manual_lld_state(state: Dict[str, object]) -> None:
     """Atomically write the shared manual LLD state file."""
     state_directory = os.path.dirname(MANUAL_LLD_STATE_FILE)
@@ -1559,8 +2215,50 @@ def _read_manual_lld_state() -> Dict[str, object]:
     return state
 
 
+def _wait_for_manual_lld_confirmation(
+    session_id: str, start_height: float, source_well_depth: float
+) -> Tuple[Dict[str, object], float]:
+    """Poll the shared state until the active browser session saves a height."""
+    while True:
+        try:
+            state = _read_manual_lld_state()
+        except (FileNotFoundError, json.JSONDecodeError):
+            sleep(MANUAL_LLD_POLL_INTERVAL_SECONDS)
+            continue
+
+        state_session_id = state.get("session_id")
+        status = state.get("status")
+        if state_session_id != session_id:
+            raise RuntimeError(
+                "The manual LLD service reset or replaced the active calibration "
+                f"session. Expected {session_id}, found {state_session_id}."
+            )
+        if status == "cancelled":
+            raise RuntimeError("Manual liquid-height calibration was cancelled.")
+        if status == "confirmed" and state.get("confirmed") is True:
+            cumulative_z = state.get("cumulative_z_mm")
+            if isinstance(cumulative_z, bool) or not isinstance(
+                cumulative_z, (int, float)
+            ):
+                raise RuntimeError(
+                    "manual_lld.json confirmed without a numeric cumulative_z_mm."
+                )
+            height_from_bottom = start_height + float(cumulative_z)
+            if not (
+                MANUAL_LLD_MIN_HEIGHT_MM <= height_from_bottom <= source_well_depth
+            ):
+                raise RuntimeError(
+                    "Confirmed manual liquid height is outside the source well: "
+                    f"{height_from_bottom:.3f} mm from bottom; expected "
+                    f"{MANUAL_LLD_MIN_HEIGHT_MM:.3f} to "
+                    f"{source_well_depth:.3f} mm."
+                )
+            return state, height_from_bottom
+        sleep(MANUAL_LLD_POLL_INTERVAL_SECONDS)
+
+
 def _manually_set_liquid_height(fixture_settings: FixtureSettings) -> None:
-    """Wait for HTTP-driven Z jog confirmation and update liquid tracking."""
+    """Start the jog UI, wait for confirmation, and update liquid tracking."""
     if fixture_settings.manual_lld_completed:
         print_info("Reusing the manually calibrated liquid height.")
         return
@@ -1568,19 +2266,16 @@ def _manually_set_liquid_height(fixture_settings: FixtureSettings) -> None:
         fixture_settings.manual_lld_completed = True
         print_info("Simulating manual LLD with the configured source liquid volume.")
         return
-    if not os.path.exists(MANUAL_LLD_STATE_FILE):
-        raise RuntimeError(
-            f"Manual LLD state file does not exist at {MANUAL_LLD_STATE_FILE}. "
-            "Start manual_lld_http_server.py on the robot before starting the run."
-        )
 
     source_well = fixture_settings.liquid_source
     source_well_depth = float(source_well.depth)
     start_height = source_well_depth + MANUAL_LLD_START_OFFSET_MM
     session_id = f"{fixture_settings.run_id}-{uuid4().hex}"
     pipette_id = fixture_settings.pipette._core.pipette_id  # type: ignore[attr-defined]
-    existing_state = _read_manual_lld_state()
-    existing_jog_step = existing_state.get("jog_step_mm")
+    try:
+        existing_jog_step = _read_manual_lld_state().get("jog_step_mm")
+    except (FileNotFoundError, json.JSONDecodeError, RuntimeError):
+        existing_jog_step = None
     jog_step = (
         float(existing_jog_step)
         if isinstance(existing_jog_step, (int, float))
@@ -1607,44 +2302,27 @@ def _manually_set_liquid_height(fixture_settings: FixtureSettings) -> None:
         "jog_step_mm": jog_step,
         "minimum_height_from_bottom_mm": MANUAL_LLD_MIN_HEIGHT_MM,
         "maximum_height_from_bottom_mm": start_height,
+        "controls_started": False,
     }
-    _write_manual_lld_state(waiting_state)
+    service = _ManualLLDService.start(waiting_state)
     print_info(
-        "Manual LLD is waiting for Z jog and confirmation. "
-        f"Session: {session_id}; state file: {MANUAL_LLD_STATE_FILE}"
+        "Manual LLD HTTP service started. "
+        f"Open {service.url}; session: {session_id}."
     )
-
-    while True:
-        try:
-            state = _read_manual_lld_state()
-        except (FileNotFoundError, json.JSONDecodeError):
-            sleep(MANUAL_LLD_POLL_INTERVAL_SECONDS)
-            continue
-
-        state_session_id = state.get("session_id")
-        status = state.get("status")
-        if state_session_id != session_id:
-            raise RuntimeError(
-                "The manual LLD service reset or replaced the active calibration "
-                f"session. Expected {session_id}, found {state_session_id}."
-            )
-        if status == "cancelled":
-            raise RuntimeError("Manual liquid-height calibration was cancelled.")
-        if status == "confirmed" and state.get("confirmed") is True:
-            cumulative_z = state.get("cumulative_z_mm")
-            if not isinstance(cumulative_z, (int, float)):
-                raise RuntimeError(
-                    "manual_lld.json confirmed without a numeric cumulative_z_mm."
-                )
-            height_from_bottom = start_height + float(cumulative_z)
-            if not MANUAL_LLD_MIN_HEIGHT_MM <= height_from_bottom <= source_well_depth:
-                raise RuntimeError(
-                    "Confirmed manual liquid height is outside the source well: "
-                    f"{height_from_bottom:.3f} mm from bottom; expected "
-                    f"{MANUAL_LLD_MIN_HEIGHT_MM:.3f} to {source_well_depth:.3f} mm."
-                )
-            break
-        sleep(MANUAL_LLD_POLL_INTERVAL_SECONDS)
+    try:
+        fixture_settings.ctx.pause(
+            "Manual liquid-height detection: open "
+            f"{service.url} in a browser. Click 'Start', jog the pipette down to "
+            "the liquid surface, then save the height. / 手动液面检测：请在浏览器"
+            f"打开 {service.url}，点击“开始调节”，移动枪头并保存高度。"
+        )
+        state, height_from_bottom = _wait_for_manual_lld_confirmation(
+            session_id=session_id,
+            start_height=start_height,
+            source_well_depth=source_well_depth,
+        )
+    finally:
+        service.close()
 
     consumed_state = dict(state)
     consumed_state.update(
