@@ -986,7 +986,6 @@ async def test_get_data_files_by_run_id_run_not_found(
         "/userfs/whatever",
         "/run/something",
         "/var/something",
-        "/var/user-packages/asdasd",
         "/run",
         "/var/",
         "/var",
@@ -1024,6 +1023,15 @@ def test_sanitize_path_blocks_paths(path: str) -> None:
         "/run/media/efasda-sdc",
         "/data",
         "/userfs/media/afffsd",
+        pytest.param(
+            "/var/user-packages/asdasd",
+            marks=[
+                pytest.mark.skipif(
+                    os.path.realpath("/var") != "/var",
+                    reason="/var/ symlinked to /private/var (likely macos)",
+                )
+            ],
+        ),
     ],
 )
 def test_sanitize_path_allows_paths(path: str) -> None:
