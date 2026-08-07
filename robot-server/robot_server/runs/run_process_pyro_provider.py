@@ -281,9 +281,9 @@ class RunProcessPyroProvider:
         self, process: _RunProcess, process_registry: List[_RunProcess]
     ) -> None:
         """Removes a process from a process registry, ending that process and delisting it from the global Pyro Nameserver."""
-        await self._end_process(process=process.process)
         with Pyro5.api.locate_ns() as ns:
             ns.remove(process.pyroname)
+        await self._end_process(process=process.process)
         process_registry.remove(process)
 
     def _start_run_process(self, process_name: str) -> subprocess.Popen[bytes]:
