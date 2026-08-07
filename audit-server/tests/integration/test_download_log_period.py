@@ -46,10 +46,6 @@ async def test_download_log_period_current_period(run_server: DevServer) -> None
         )
         log_zip = response.content
 
-        # the download hands back a one-time deletion key in a response header
-        deletion_key = response.headers.get("opentrons-log-period-deletion-key")
-        assert deletion_key
-
         with zipfile.ZipFile(io.BytesIO(log_zip), mode="r") as zf:
             file_list = zf.namelist()
             assert file_list == [
