@@ -10,20 +10,20 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type { RunData } from '@opentrons/api-client'
+import type { Run } from '@opentrons/api-client'
 import type { DocumentationState } from '../accessControl'
 import type { DocumentedMutationParameters } from '../accessControl/types'
 
 export type UseDismissCurrentRunMutationResult = UseMutationResult<
-  RunData,
+  Run,
   unknown,
   string
 > & {
-  dismissCurrentRun: UseMutateFunction<RunData, unknown, string>
+  dismissCurrentRun: UseMutateFunction<Run, unknown, string>
 }
 
 export type UseDismissCurrentRunMutationOptions = UseMutationOptions<
-  RunData,
+  Run,
   unknown,
   string
 >
@@ -35,7 +35,7 @@ export function useDismissCurrentRunMutation(
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useDocumentedMutation<RunData, unknown, string>(
+  const mutation = useDocumentedMutation<Run, unknown, string>(
     documentationState,
     ['dismiss_run'],
     ({ userNotes, variables: runId }: DocumentedMutationParameters<string>) =>

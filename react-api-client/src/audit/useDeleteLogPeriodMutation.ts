@@ -6,7 +6,7 @@ import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
 import type {
-  UseMutateFunction,
+  UseMutateAsyncFunction,
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
@@ -29,7 +29,7 @@ export type UseDeleteLogPeriodMutationResult = UseMutationResult<
   unknown,
   DeleteLogPeriodParams
 > & {
-  deleteLogPeriod: UseMutateFunction<
+  deleteLogPeriod: UseMutateAsyncFunction<
     EmptyResponse,
     unknown,
     DeleteLogPeriodParams
@@ -76,6 +76,6 @@ export function useDeleteLogPeriodMutation(
 
   return {
     ...mutation,
-    deleteLogPeriod: mutation.mutate,
+    deleteLogPeriod: mutation.mutateAsync,
   }
 }

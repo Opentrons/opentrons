@@ -16,8 +16,10 @@ export function useLogPeriodDetailsQuery(
   const query = useQuery<LogPeriodDetails, AxiosError>(
     getQueryKey(host, 'audit', 'logPeriods', logPeriodId),
     () =>
-      getLogPeriodDetails(host!, logPeriodId).then(response => response.data),
-    { enabled: host !== null, ...options }
+      getLogPeriodDetails(host!, logPeriodId).then(
+        response => response.data.data
+      ),
+    { enabled: host !== null && logPeriodId !== '', ...options }
   )
   return query
 }
