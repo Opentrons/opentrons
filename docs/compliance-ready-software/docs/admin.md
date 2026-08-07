@@ -3,81 +3,96 @@ title: "Compliance-Ready Settings"
 description: "An overview of the Flex's compliance-ready setings, and who has permission to update them."
 ---
 
-Administrators and users they give permission to can make changes to and customize some compliance-ready features in the Opentrons App. 
+Administrators can customize compliance ready settings in the Opentrons App and on the Flex touchscreen.
 
-In the app, choose robot settings for your device, then select the **Compliance Ready** tab. For a complete list of Flex robot settings, see the [Flex Instruction Manual](../../../flex/). 
-
-<!---------
-
-TODO + comments: 
-- fairly confident that "and users they give permission to" is incorrect here, but triple check
--------------->
-
-## Protocol records and logs
-
-Your compliance-ready Flex needs a secure location to export protocol [files](../files.md) to. Administrators can change this location in the Opentrons App settings. 
-
-Under your Flex's settings, select the **Advanced** tab and click to select a folder under **Protocol Logs Source Folder**.
-
-Select the folder you'd like to save all protocol logs in. Each time you make changes, you'll need to officially authorize the new storage location: 
-
-1. Export a protocol log. 
-2. Place the protocol log in the new, secure location. 
-3. View the protocol log in the log viewer.
+For a complete list of Flex robot settings, see the [Flex Instruction Manual](../../../flex/). 
 
 <!---------
 
 TODO + comments: 
-- does it make sense to export the log and then place it in the new, secure location? isn't this automated when users select the storage location? this is text from the PRD etc. so check this in the software flow
-- do you need to enter documentation when changing the secure storage location?
-- also, need to check the process users will complete to authorize the storage location if we don't launch with the log viewer. make any required changes in activation > log storage too
-- maybe add an image if I can find the right one (or test in the alpha). doesn't show anything besides the "advanced" settings tab in designs.
+- properly link flex manual
 -------------->
 
-## Accounts
+## Access settings
 
-Administrators can make changes to users accounts. In the Opentrons App, click **Robot Settings**, then choose **Compliance Ready Software**. Here, unlock or delete users accounts, reset passwords, or edit user permissions. 
+In the Opentrons App, click the **Devices** page on the left side, then choose **Robot Settings**. Click the **Compliance Ready** tab to view available settings.
 
 <figure class="screenshot" markdown>
-  ![Image showing admin controls for user management.](../../images/user-management.png)
+  ![Image showing an open keyboard for documentation on the Flex touchscreen.](../images/crs-settings-app.png)
+  <figcaption>Use the keyboard to enter documentation on the Flex touchscreen.</figcaption>
+</figure>
+
+On the Flex touchscreen, tap the **Settings** tab, then **Compliance Ready Software**. 
+
+<figure class="screenshot" markdown>
+  ![Image showing an open keyboard for documentation on the Flex touchscreen.](../images/crs-settings-odd.png)
+  <figcaption>Use the keyboard to enter documentation on the Flex touchscreen.</figcaption>
+</figure>
+
+Not all Compliance Ready Software settings are available from the Flex touchscreen. For example, administrators can only create accounts, and aren't able to delete accounts or reset passwords. 
+
+The sections below cover every Compliance Ready Software setting available in the Opentrons App. 
+
+## Personal account settings 
+
+In personal account settings, every user can update their username, legal name, and password. Usernames are restricted to 20 characters on the Flex.
+
+Administrators can customize password settings, like character length, whether to include special characters, and how often users will need to update their passwords.
+
+Users can only make changes to their personal account settings, and can't view or customize settings in User Management or Compliance Ready Software settings. 
+
+## User management
+
+Administrators can unlock or delete users accounts, reset passwords, or edit user permissions. 
+
+<figure class="screenshot" markdown>
+  ![Image showing admin controls for user management.](../images/create-account.png)
   <figcaption>Administrators can manage user accounts in compliance-ready settings.</figcaption>
 </figure>
 
-User accounts are locked by default after 5 failed login attempts. After unlocking an account, users will receive a one-time password, and can choose a new one after logging in.
+All accounts are locked by default after 5 failed login attempts. After unlocking an account, users will receive a one-time password, and can choose a new one after logging in.
 
 <figure class="screenshot" markdown>
-  ![Image showing a one time password generation for a locked user account.](../../images/user-management.png)
+  ![Image showing a one time password generation for a locked user account.](../images/one-time.png)
   <figcaption>Administrators can unlock user accounts with a one-time password.</figcaption>
 </figure>
 
-If your lab loses administrator access, Opentrons offers an on-site recovery service. 
+If your lab [loses access](../docs/roles.md#account-recovery) to all administrator accounts, Opentrons offers a paid on-site recovery service.
 
-<!-----
-TODO and comments: 
-- who should I direct users to for an on-site recovery service? start with support? I don't want to continually update the price, but maybe we should just call it "paid" to underline the severity
-- under the "compliance ready" tab, regular users can make changes to their username, legal name, and password. can add this text + an image here
------->
 
-## Customize compliance-ready software
+## Compliance Ready Software settings
 
-Although compliance-ready software is permanently installed and can't be removed from your Flex, administrators can customize some settings for a different user experience. 
+Administrators can make changes to security, documentation, and storage settings to customize your lab's daily user experience.
 
 | **Setting** | **Options** | 
 | :--------|---------------- |
 | **Login attempts** | <ul><li>Maximum login attempts before the account locks.</li><li>Default: 5.</li></ul> |
-| **Passwords** | <ul><li>Time before user passwords must be changed (default: 30 days).</li></li><li>Password complexity, like minimum length or special character requirements</li></ul> |
+| **Passwords** | <ul><li>Time before user passwords must be changed (default: 30 days).</li></li><li>Password complexity, like minimum length (default: 20 characters) or special character requirements</li></ul> |
 | **Screen timeout** | <ul><li>Time before the Opentrons App or Flex touchscreen lock due to inactivity.</li><li>Default: 3 minutes.</li></ul> |
+| **User permissions** | <ul><li>Whether administrator credentials are required for updating the Flex, sending protocols to the Flex, or signing run protocol run records.</li></ul> |
 | **Documentation** | <ul><li>Whether to require documentation for robot actions, like dropping attached tips or homing the gantry.</li><li>Set minimum character length (default: 20 characters).</li></ul> |
-| **Protocol logs** | <ul><li>Whether to require protocol logs to be signed and saved in the Opentrons App.</li><li>Automatically delete protocol logs when the Flex reaches its storage limit (20 logs).</li></ul> |
-| **User permissions** | <ul><li>Whether administrator credentials are required for updating the Flex, sending protocols to the Flex, or signing run protocol run records.**</li></ul> |
-
+| **Files** | <ul><li>Whether to require protocol logs to be signed and saved in the Opentrons App.</li><li>Automatically delete protocol logs when the Flex reaches its storage limit (20 logs).</li></ul> |
 <!---------
 
 TODO and comments: 
-- reinforce in this section that admins can find all these settings in a single place (compliance ready tab) IF true that these are found only in a single place
-- any differences for app vs ODD? re: what settings can be accessed? 
-- for regular users, the only thing that appears under "compliance ready" tab is their personal account settings: username, legal name, password. 
+- I chose a better name for these categories that I'll have to revert. sigh. example: "user permissions" instead of "Actions requiring admin credentials"
 - do both the app and ODD lock upon screen timeout? 
-- check what `robot actions` reallys means; what does this include
+------->
+
+## File source folder
+
+You can choose a location to automatically download and save [files](../files.md) from the Opentrons App.
+
+Choose **App Settings** in the Opentrons App, then click the **Advanced** tab and click to select a folder.
+
+<figure class="screenshot" markdown>
+  ![Image showing an open keyboard for documentation on the Flex touchscreen.](../images/source-folder.png)
+  <figcaption> Set a location on your computer to download files to from the Opentrons App.</figcaption>
+</figure>
+
+<!---------
+
+TODO + comments: 
+- do you need to enter documentation when setting or changing this storage location?
 -------------->
 

@@ -7,117 +7,140 @@ All Flex robots locally generate files to store information about robot actions,
 
 This section covers the types of files on your compliance ready Flex and how to access and manage them.
 
+<!---------
+TODO and comments: 
+- link to relevant section for files in the flex manual
+---->
+
 ## File types
 
-On any Flex, you can view the time and date of your recent protocol runs. Compliance Ready Software adds two specific file types, compliance-ready files and protocol run records, to store additional user and protocol information. 
+On any Flex, you can view the time and date of your recent protocol runs. Compliance Ready Software adds two specific file types, *compliance-ready files* and *protocol run records*, to store additional user and protocol information. 
 
 In total, your compliance ready Flex generates three types of files:
 
 | **Type** | **Description** | 
 | :--------|---------------- |
-| **Diagnostic files** | <ul><li>Includes troubleshooting logs and calibration logs.</li><li>May be needed when working with Opentrons Support.</li></ul> |
 | **Compliance-ready files** | <ul><li>Contain user actions and documentation.</li></li><li>Grouped together by a *period*, or the amount of time since your last file download.</li></ul> |
+| **Diagnostic files** | <ul><li>Includes troubleshooting logs and calibration logs.</li><li>May be needed when working with Opentrons Support.</li></ul> |
 | **Protocol run records** | <ul><li>Contain the name, date, and status (completed, canceled, or failed) for each protocol run.</li></ul> |
-
-<!---------
-
-TODO and comments: 
-- section IN PROGRESS as I adjust for the file manager...
-- for now, this is a table. I think next week I'll expand this to individual sections and I'll want to show an example of each?? need to think about how this section should look pre- and post-log viewer software 
-
-- how do the protocol run records and log period line up? like how do users make sure that they export the right sets of files together? what if you export the user action period and miss exporting the protocol that was included in that period? not that this is our responsibility, but I should probably talk about it?
-- 20 most recent runs correct for BOTH file types? not likely? doesn't this not make sense for CRS files, as there would be more user actions for a protocol that is 200 steps vs one thats 20? 
-
----->
-
-## Managing files
 
 Your Flex can store all three file types for up to 20 recent protocol runs. It's your lab's responsibility to manage these files, including downloading and storing in a secure location.
 
-You'll use the file manager to view, download, and delete files from your Flex. You can find the file manager...
-
-**image**
-
-You can choose to download these files after every run, or wait for the Flex to remind you. You'll see a reminder to download files when the Flex reaches X% of its storage capacity. 
-
-**image: what does it look like for the Flex to prompt you to download files?**
-
-* Download section 2: download options - can download for an indivudal run (or the individual log period) or can download all and receive a .zip file; outline what is in those .zip files 
-
-Tap and hold a protocol run history item to choose an action: 
-
-* Download the associated log file. You'll also need to choose which USB device to download run logs to.
-* Delete the associated log file. You can also choose for the Flex to automatically delete it after downloading.
-
-If your Flex can't detect a USB or other external memory drive, you'll need to add one. 
-
-secion 3: download to a storage device (USB, from the ODD) or secure storage location (directory/folder, from the Opentrons App)
-
-section 3: deleting files - prompted to download before deleting; you need to delete to free up space on the Flex and have the ability to start another run. differentiate between CRS and protocol run records
 <!---------
 
 TODO and comments: 
-- at what point does the Flex prompt you? a % full? 
-- 20 most recent runs correct for BOTH file types? 
-- remind users that they can't start a new run with full storage
-- might need to split this section into how you manage compliance ready files and how you manage protocol run records if there are major differences. for now, it looks like there's single and individual download options
-- are file downloads the same from the app and from the ODD? 
-- I like "managing" because it covers multiple file actions. when we have a log viewer, it may make more sense to split these out. at the same time, if we feel "managing" obscures downloading, which is a very critical part of the software...
--------------->
+- insert text / make updates as needed between audit logs and compliance ready files. there are two names in the designs still for what I feel are likely the same thing
+- do we need more of an example for each?
+- how do the protocol run records and log period line up? like how do users make sure that they export the right sets of files together? what if you export the user action period and miss exporting the protocol that was included in that period? not that this is our responsibility, but I should probably talk about it?
+- 20 most recent runs correct for BOTH file types? not likely? doesn't this not make sense for CRS files, as there would be more user actions for a protocol that is 200 steps vs one thats 20? 
+- these files are currently listed as "compliance-ready files" in designs and this is the only reason I'm using the hyphen here (decision was not to use it anywhere else)
+- link italicized terms to the glossary, and somehow link diagnostic files too
 
-## Viewing files
+---->
+
+## Accessing files
+
+You'll access each file type using the *file manager* in either the Opentrons App or on the Flex touchscreen.
+
+In the Opentrons App, choose the **File manager** tab in your Flex's settings page. Here, you'll be able to see the robot's current storage capacity and available files from each category.
+
+<figure class="screenshot" markdown>
+  ![Access the file manager in the app.](../images/file-manager-app.png)
+  <figcaption>Access the file manager in your compliance ready Flex's setting page.</figcaption>
+</figure>
+
+On the Flex touchscreen, tap **Settings**, then choose **File Manager** from the list of options. Tap each tab to view Compliance Ready files, diagnostic files, or protocol run records.
+
+<figure class="screenshot" markdown>
+  ![Delete audit logs.](../images/file-manager-odd.png)
+  <figcaption>Download audit logs from the Flex touchscreen.</figcaption>
+</figure>
 
 <!---------
 
 TODO and comments: 
-- Nick: without the log viewer "basically just look at them as ugly long strings" 
-- do we mention this is coming (probably not)
-- any guidance we want to give or do I just leave it after "deleting files"?
--------------->
+- don't love using accessing files for the overall title and an H2. is bad. coming back to this
+- link italicized terms to glossary
+---->
 
+## File storage
 
+You'll use the file manager in the Opentrons App or on the Flex touchscreen to download and delete files from your Flex.
 
+You can choose to download these files after every run, or wait for the Flex to remind you. 
 
-## Run records and files
+<figure class="screenshot" markdown>
+  ![Storage nears capacity on the touchscreen.](../images/storage-full-odd.png)
+  <figcaption>Tap to manage files on the Flex's touchscreen when storage is full.</figcaption>
+</figure>
 
-All Flex robots locally generate data files when idle, when running a protocol, or when performing robot actions like homing the gantry. [Without compliance-ready software](../../../flex/docs/advanced-operation/log-files.md), users normally don't need to access these files, but have the option to download all logs as a `.zip` file.
+You'll see reminders in the Opentrons App or on the Flex touchscreen to download files when the Flex nears its storage capacity.
 
-A compliance-ready Flex generates more files and run records to preserve audit-ready information:
+<figure class="screenshot" markdown>
+  ![A reminder to download files.](../images/storage-full-app.png)
+  <figcaption>The Opentrons App includes a reminder of the Flex.</figcaption>
+</figure>
 
-* **Diagnostic files**: Logs to view calibration data or provide to Opentrons Support for troubleshooting.
-* **Compliance-ready files**: Logs capturing every user action with a precise timestamp, legal name and user ID, and documentation for the action.
-* **Protocol run records**: Record of every protocol run with the date and run status (completed, canceled, or failed).
+While storage is full, you won't be able to send or start new protocols on the Flex.
 
-These records and files are yours to store, and are never viewed or stored by Opentrons. Read more about viewing, downloading, and managing [files](../files.md) in this manual.
+## Download and delete files
 
-## Protocol log files
+You have the option to download files immediately after [signing](../docs/complete.md) for a protocol run, or later.
 
-All Flex robots generate [log files] when idle, when running a protocol, or when performing robot actions like homing the gantry. Without compliance-ready software, users normally don't need to access these files, but have the option to download all logs as a `.zip` file. 
+In the file manager in the Opentrons App, you can click to expand each protocol run record and see the files that are included: the `.py` protocol file, a run log, labware offset data, and any images or CSV files generated during the protocol run. 
 
-A compliance-ready Flex generates the same log files, but preserves audit-ready information: 
+When you're ready to download, click the check boxes on the left to select individual files of any type for download.
 
-* **What** robot actions the Flex performed
-* **Who** completed the action, with user ID and legal name
-* **When** the Flex completed the action, with a precise UTC timestamp
-* **Why** each action was performed, with documentation
+<figure class="screenshot" markdown>
+  ![Access the file manager in the app.](../images/file-manager-app.png)
+  <figcaption>Select individual or all files for download.</figcaption>
+</figure>
 
-On the Flex's touchscreen, click [insert here] to view all protocols loaded on the Flex, then click [insert here] to view the protocol's full run history. 
+The app packages your selected files as a `.zip` file for download. You can use compliance ready [settings](../docs/admin.md) to choose a default location for file downloads from the Opentrons App, or choose a location in your computer's files each time. 
 
-**image ** 
+<figure class="screenshot" markdown>
+  ![Choose a download location from the Opentrons App.](../images/download-location.png)
+  <figcaption>Choose a location for your files to download to.</figcaption>
+</figure>
 
-Run history includes completed, canceled, or failed protocol runs, and a date for each. 
+After downloading and safely storing in your lab's storage location, select files and choose **Delete selected**.
 
-Read more about [log files] in this manual, including downloading, exporting, and viewing logs from the Flex. 
+On the Flex touchscreen, choose the file type you'd like to manage. Then, choose which files to download: 
+
+* Tap **Download all** in the top right.
+* Tap the three-dot menu on the right for an individual file, then choose whether to download or delete.
+
+<figure class="screenshot" markdown>
+  ![Delete audit logs.](../images/manage-odd.png)
+  <figcaption>Download audit logs from the Flex touchscreen.</figcaption>
+</figure> 
+
+Both the Opentrons App or Flex touchscreen, shown below, include a reminder to make sure you're ready to delete files.
+
+<figure class="screenshot" markdown>
+  ![Delete audit logs.](../images/delete-crs-logs.png)
+  <figcaption>Make sure all files are downloaded and safely stored before deleting.</figcaption>
+</figure> 
+
+If you'd like to download files using the Flex touchscreen, you'll need to attach an external storage device.
+
+<figure class="screenshot" markdown>
+  ![Delete audit logs.](../images/devices.png)
+  <figcaption>View attached external devices on the Flex touchscreen.</figcaption>
+</figure> 
+
+Your compliance ready Flex supports USB storage devices via the front USB port.
 
 <!---------
 
-TODO: 
-- need to better differentiate between run records and log files. this is confusing for me, so is going to continue to be confusing for users
-- then, name this file and section accordingly, and update .yml file
-- maybe run history? and if this is truly different from the log files, this header text should be moved elsehwere
-- if run history itself isn't a new feature (which I'm not sure it is), combine that with the larger log files doc and differentiate at the beginning instead of in this separate file
-- where did protocol `run records` come from? the Flex manual only uses `log files`
-- Link to Flex manual > Advanced Operations > Flex log files
-- do protocol cards on a regular flex include this much run history? or has some functionality been added for CRS? 
-- is run history ever deleted? is it truly a "full" run history? 
+TODO and comments: 
+- link to USB port section of Flex manual
+- shorten first image in this section; doesn't need to be this long
+- repeat text about 20 most recent runs correct for BOTH file types? 
+- will need to differentiate between downloading from the file manager and downloading from devices > run history...these are somehow different AND I think I need to ticket for regular flex changes here (have an image in extra images)
+- if I have text about how log periods "line up," that needs to go here...just an in general mention of log period too? 
+- for now, I've cut viewing files. just going to add this entire section when we have a log viewer.
+- "The app packages your selected files as a `.zip` file for download." TRUE??
+- do you tap the three dot menu, or tap and hold for an individual file from the ODD? 
+- you have to choose an external device from the odd? every time? 
 -------------->
