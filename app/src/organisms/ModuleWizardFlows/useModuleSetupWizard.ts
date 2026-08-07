@@ -178,7 +178,6 @@ export function useModuleSetupWizard(
     {
       onSuccess: () => {
         setMaintenanceRunId(null)
-        handleClose()
       },
       onError: () => {
         setIsExiting(false)
@@ -207,7 +206,11 @@ export function useModuleSetupWizard(
           console.log(
             'closing module setup wizard: homed, clearing maintenance run'
           )
-          deleteMaintenanceRun(maintenanceRunId)
+          deleteMaintenanceRun(maintenanceRunId, {
+            onSuccess: () => {
+              handleClose()
+            },
+          })
         })
         .catch(error => {
           if (isMaintenanceDoorOpenError(error)) {
