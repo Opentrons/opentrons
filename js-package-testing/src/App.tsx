@@ -71,7 +71,7 @@ function DeckMapPage(): JSX.Element {
       <p>
         From <code>@opentrons/components</code> using the same StackerAnalysis
         fixture as the protocol visualization page. Source protocol:{' '}
-        <code>Flex_Smoke_2_27_96_SmokeTestWith2Stackers.py</code>.
+        <code>Flex_Smoke_2_27.py</code>.
       </p>
 
       <div className="analysis_info">
@@ -126,8 +126,8 @@ function VisualizationPage(): JSX.Element {
         </PrimaryButton>
         <p>
           {showFlex
-            ? 'Flex: Flex_Smoke_2_27_96_SmokeTestWith2Stackers.py + StackerAnalysis.json'
-            : 'OT-2: OT2_Smoke_2_19_P300M_P20S_HS_TC_TM_SmokeTestV3.py + ot2Analysis.json'}
+            ? 'Flex: Flex_Smoke_2_27.py + StackerAnalysis.json'
+            : 'OT-2: OT2_Smoke_2_19.py + ot2Analysis.json'}
         </p>
       </div>
       <div
