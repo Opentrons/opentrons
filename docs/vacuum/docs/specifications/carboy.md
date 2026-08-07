@@ -40,6 +40,6 @@ The Vacuum Module ships with a borosilicate glass carboy, carboy holder, cap, an
 
 ## Chemical compatibility
 
-The waste carboy is constructed from low-expansion Borosilicate 3.3 glass. This material offers exceptional chemical durability against water, steam, acids, salt solutions, halogens, and organic solvents, while its low coefficient of thermal expansion provides high resistance to thermal shock.
+The waste carboy is made of Borosilicate 3.3 glass. This material offers exceptional chemical durability against water, steam, acids, salt solutions, halogens, and organic solvents. Its low coefficient of thermal expansion provides high resistance to thermal shock.
 
-Although Borosilicate 3.3 is durable, this material provides only moderate resistance to strong alkaline solutions. Exposure to hot, concentrated phosphoric acid or hydrofluoric acid will cause surface etching or complete dissolution.
+Although Borosilicate 3.3 is durable, this material provides only moderate resistance to strong alkaline solutions. Also, exposure to hot, concentrated phosphoric acid or hydrofluoric acid will cause surface etching or complete dissolution.
