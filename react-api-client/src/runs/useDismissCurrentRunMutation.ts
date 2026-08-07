@@ -5,6 +5,7 @@ import { dismissCurrentRun } from '@opentrons/api-client'
 import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
+import type { AxiosError } from 'axios'
 import type {
   UseMutateFunction,
   UseMutationOptions,
@@ -16,15 +17,15 @@ import type { DocumentedMutationParameters } from '../accessControl/types'
 
 export type UseDismissCurrentRunMutationResult = UseMutationResult<
   Run,
-  unknown,
+  AxiosError,
   string
 > & {
-  dismissCurrentRun: UseMutateFunction<Run, unknown, string>
+  dismissCurrentRun: UseMutateFunction<Run, AxiosError, string>
 }
 
 export type UseDismissCurrentRunMutationOptions = UseMutationOptions<
   Run,
-  unknown,
+  AxiosError,
   string
 >
 
@@ -35,7 +36,7 @@ export function useDismissCurrentRunMutation(
   const host = useHost()
   const queryClient = useQueryClient()
 
-  const mutation = useDocumentedMutation<Run, unknown, string>(
+  const mutation = useDocumentedMutation<Run, AxiosError, string>(
     documentationState,
     ['dismiss_run'],
     ({ userNotes, variables: runId }: DocumentedMutationParameters<string>) =>

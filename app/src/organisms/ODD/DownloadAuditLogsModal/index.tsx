@@ -35,8 +35,10 @@ const DownloadAuditLogsModalImpl = NiceModal.create(
       }
       if (isDeleted) {
         modal.resolve(true)
+        modal.remove()
       } else if (isError) {
         modal.reject(new Error('Failed to delete logs'))
+        modal.remove()
       }
     }, [isDeleted, isError, isLoading, modal])
 

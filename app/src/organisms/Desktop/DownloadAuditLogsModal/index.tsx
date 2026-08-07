@@ -9,6 +9,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useCurrentRobotName } from '/app/redux/robot-auth'
 import { useDownloadAndDeleteAuditLog } from '/app/resources/audit/useDownloadAndDeleteAuditLog'
+import { useIsLogDeleted } from '/app/resources/audit/useIsLogDeleted'
 
 import styles from './downloadauditlogsmodal.module.css'
 
@@ -101,6 +102,15 @@ function DownloadAuditLogsModalContent({
         modal.remove()
       })
   }
+
+  const { isDeleted, isLoading: isLogDeletedLoading } =
+    useIsLogDeleted(logPeriodId)
+
+  useEffect(() => {
+    if (!isLogDeletedLoading && isDeleted) {
+      modal.resolve(true)
+    }
+  }, [isDeleted, isLogDeletedLoading, modal])
 
   return (
     <DownloadAuditLogsModal
