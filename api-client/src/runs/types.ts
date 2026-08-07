@@ -79,6 +79,8 @@ export interface KnownGoodRunData extends LegacyGoodRunData {
   runTimeParameters: RunTimeParameter[]
   /** @deprecated Prefer using bindings for /dataFiles/:runId/all */
   outputFileIds: string[]
+  // if the robot has audit logging enabled, the log period this run was associated with
+  logPeriodId?: string
 }
 
 export interface KnownInvalidRunData extends LegacyGoodRunData {
