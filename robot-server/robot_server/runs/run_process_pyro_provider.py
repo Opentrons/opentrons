@@ -29,8 +29,8 @@ _RUN_PROXY_NAME = (
 )
 _SIMULATING_RUN_PROXY_NAME = "ot-simulating-protocol"  # During runtime this gains a random uuid4 extension  "_1234ABCD"
 
-_RUN_PROCESS_LIMIT = 3  # Number of run processes to keep qeueued
-_SIMULATING_PROCESS_LIMIT = 3  # Number of simulation processes to keep qeueued
+_RUN_PROCESS_LIMIT = 1  # Number of run processes to keep qeueued
+_SIMULATING_PROCESS_LIMIT = 1  # Number of simulation processes to keep qeueued
 
 
 _RUN_PROXY_TIMEOUT = 30  # seconds
@@ -63,7 +63,7 @@ class RunProcessPyroProvider:
         self._teardown_signal = asyncio.Event()
         self._process_maintainer_task: asyncio.Task[None] | None = None
 
-    async def initialize(self, access_control_mode: bool) -> None:
+    def initialize(self, access_control_mode: bool) -> None:
         """Called when server first starts up.
 
         If feature flag is on for protocol subprocess, registers the process types
@@ -108,7 +108,6 @@ class RunProcessPyroProvider:
                 "Run process registries were not empty on startup of process maintainer task."
             )
         while not self._teardown_signal.is_set():
-            # Ensure the number of readied processes does not fall below the limit
             if len(self._run_processes) < _RUN_PROCESS_LIMIT:
                 pyro_id = _RUN_PROXY_NAME + "_" + str(uuid4())
                 self._run_processes.append(
@@ -119,28 +118,30 @@ class RunProcessPyroProvider:
                     )
                 )
             if len(self._simulating_run_processes) < _SIMULATING_PROCESS_LIMIT:
-                pyro_id = _SIMULATING_RUN_PROXY_NAME + "_" + str(uuid4())
-                self._run_processes.append(
+                sim_pyro_id = _SIMULATING_RUN_PROXY_NAME + "_" + str(uuid4())
+                self._simulating_run_processes.append(
                     _RunProcess(
-                        pyroname=pyro_id,
-                        process=self._start_run_process(process_name=pyro_id),
+                        pyroname=sim_pyro_id,
+                        process=self._start_run_process(process_name=sim_pyro_id),
                         status=_ProcessStatus.UNUSED,
                     )
                 )
 
             # Groom process queue for used inactive processes
             for process in self._run_processes:
-                if process.status is _ProcessStatus.USED:
+                if process.status == _ProcessStatus.USED:
                     await self._dequeue_process(
                         process=process, process_registry=self._run_processes
                     )
 
             for sim_process in self._simulating_run_processes:
-                if sim_process.status is _ProcessStatus.USED:
+                if sim_process.status == _ProcessStatus.USED:
                     await self._dequeue_process(
                         process=sim_process,
                         process_registry=self._simulating_run_processes,
                     )
+            # Wait and then repeat process spin-up and grooming as needed
+            await asyncio.sleep(1.0)
 
         # Teardown behavior after teardown signal recieved:
         for process in self._run_processes:
@@ -160,14 +161,14 @@ class RunProcessPyroProvider:
         """Get the active process to be used by a run."""
         if process_registry is not None:
             for process in process_registry:
-                if process.status is _ProcessStatus.ACTIVE:
+                if process.status == _ProcessStatus.ACTIVE:
                     return process
         return None
 
     def _set_active_process(self, process_registry: List[_RunProcess]) -> _RunProcess:
         """Set a run process in a given process registry as the active process to be used by a run."""
         for process in process_registry:
-            if process.status is _ProcessStatus.UNUSED:
+            if process.status == _ProcessStatus.UNUSED:
                 process.status = _ProcessStatus.ACTIVE
                 return process
         raise RuntimeError("Could not identify unused process in process registry.")
@@ -177,12 +178,12 @@ class RunProcessPyroProvider:
         if simulator:
             assert self._simulating_run_processes is not None
             for process in self._simulating_run_processes:
-                if process.status is _ProcessStatus.ACTIVE:
+                if process.status == _ProcessStatus.ACTIVE:
                     process.status = _ProcessStatus.USED
         else:
             assert self._run_processes is not None
             for process in self._run_processes:
-                if process.status is _ProcessStatus.ACTIVE:
+                if process.status == _ProcessStatus.ACTIVE:
                     process.status = _ProcessStatus.USED
 
     async def _validate_process_registry_ready(
