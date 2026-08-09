@@ -33,6 +33,7 @@
   "pipette": "Pipette",
   "play": "Play",
   "protocol_steps": "Protocol Steps",
+  "protocol_analysis_failure":"Protocol analysis failure",
   "quantity": "Quantity: {{quantity}}",
   "reference_wavelength": "Reference wavelength",
   "remaining_tips": "{{remaining}} tips",
