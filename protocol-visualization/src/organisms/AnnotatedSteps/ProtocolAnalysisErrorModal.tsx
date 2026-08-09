@@ -32,9 +32,9 @@ export function ProtocolAnalysisErrorModal({
       onClose={onClose}
     >
       <div className={styles.container}>
-      {errors.map((error, index) => (
-        <CodeBlock key={error.id}>{error.detail}</CodeBlock>
-      ))}
+        {errors.map(error => (
+          <CodeBlock key={error.id}>{error.detail}</CodeBlock>
+        ))}
       <div className={styles.button_container}>
         <PrimaryButton
           role="button"
