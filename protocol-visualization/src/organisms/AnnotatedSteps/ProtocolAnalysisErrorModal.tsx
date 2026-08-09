@@ -24,7 +24,7 @@ export function ProtocolAnalysisErrorModal({
   onClose,
   portalRoot,
 }: ProtocolAnalysisErrorModalProps): ReactNode {
-  const { i18n, t } = useTranslation('protocol_visualization')
+  const { i18n, t } = useTranslation(['protocol_visualization', 'shared'])
   return createPortal(
     <Modal
       type="error"
