@@ -35,16 +35,16 @@ export function ProtocolAnalysisErrorModal({
         {errors.map(error => (
           <CodeBlock key={error.id}>{error.detail}</CodeBlock>
         ))}
-      <div className={styles.button_container}>
-        <PrimaryButton
-          role="button"
-          aria-label="close_analysis_error_modal"
-          onClick={onClose}
-        >
-          <StyledText desktopStyle="bodyDefaultSemiBold">
-            {i18n.format(t('shared:close'), 'capitalize')}
-          </StyledText>
-        </PrimaryButton>
+        <div className={styles.button_container}>
+          <PrimaryButton
+            role="button"
+            aria-label="close_analysis_error_modal"
+            onClick={onClose}
+          >
+            <StyledText desktopStyle="bodyDefaultSemiBold">
+              {i18n.format(t('shared:close'), 'capitalize')}
+            </StyledText>
+          </PrimaryButton>
         </div>
       </div>
     </Modal>,
