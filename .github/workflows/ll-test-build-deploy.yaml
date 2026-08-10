@@ -102,6 +102,10 @@ jobs:
     runs-on: 'ubuntu-24.04'
     needs: ['determine-deploy-config', 'build-ll']
     timeout-minutes: 5
+    # Uses GitHub Environments to require manual approval in the UI before production deploys.
+    # Configure required reviewers on the `ll-prod` environment.
+    environment:
+      name: ${{ needs.determine-deploy-config.outputs.environment == 'production' && 'll-prod' || 'll-non-prod' }}
     if: always() && needs.build-ll.result == 'success' && needs.determine-deploy-config.result == 'success' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     permissions:
       id-token: write
