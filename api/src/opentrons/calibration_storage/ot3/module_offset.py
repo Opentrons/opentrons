@@ -84,7 +84,6 @@ def save_module_calibration(
 def get_module_offset(
     module: ModuleType, module_id: str, slot: Optional[str] = None
 ) -> Optional[v1.ModuleOffsetModel]:
-    """Load a module offset from disk."""
     try:
         module_calibration_filepath = (
             config.get_opentrons_path("module_calibration_dir") / f"{module_id}.json"
