@@ -68,14 +68,6 @@
   font-size: var(--font-size-38);
 }
 
-.input_field:active {
-  border: 2px solid var(--blue-50);
-}
-
-.input_field.error:active {
-  border: 2px solid var(--red-50);
-}
-
 .input_field:focus-within {
   border: 3px solid var(--blue-50);
   box-shadow: none;
