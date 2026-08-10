@@ -411,7 +411,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): ReactNode {
     <>
       {showErrorDetailsModal ? (
         <ProtocolAnalysisErrorModal
-          errors={analysis?.errors.length > 0 ? analysis.errors : []}
+          errors={analysis?.errors ?? []}
           onClose={() => {
             setShowErrorDetailsModal(false)
           }}
