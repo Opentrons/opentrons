@@ -7,6 +7,7 @@ description: "Type definitions used in the Python Protocol API."
     options:
       members: ["Location", "Point", "Mount", "StringAxisMap"]
       filters:
+        - "!^__"
         - "!to_pyro_dict"
         - "!from_pyro_dict"
 
