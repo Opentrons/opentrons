@@ -39,10 +39,7 @@ export function UserAccountConfirmModal({
   const { t } = useTranslation('shared')
 
   return createPortal(
-    <ModalShell
-      width="31.25rem"
-      header={<ModalHeader title={title} onClose={onCancel} />}
-    >
+    <ModalShell width="37.125rem" header={<ModalHeader title={title} />}>
       <div className={styles.content}>
         <div className={styles.body}>
           <Icon name="ot-alert" size="2.5rem" color={COLORS.yellow50} />
