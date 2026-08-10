@@ -21,6 +21,7 @@ import {
 } from '/app/App/hooks/useGetModulesNeedingSetup'
 import { SmallButton } from '/app/atoms/buttons'
 import { i18n } from '/app/i18n'
+import { getCalibratedPipetteForModuleSetup } from '/app/local-resources/instruments'
 import { useModuleUSBPort } from '/app/local-resources/modules'
 import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
 import {
@@ -67,19 +68,24 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
   // right now (e.g. because they need calibration but we don't have a pipette)
   const allNeedingSetup = useGetModulesNeedingSetup()
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
-  const hasAnyAttachedPipette =
-    attachedPipettes.left != null || attachedPipettes.right != null
   const newModules =
     attachedModuleOnLaunch == null ? allSetupable : [attachedModuleOnLaunch]
   // if there are more modules that need setup than modules that can be set up, then
   // it follows that some modules need setup but cannot be set up. in that case we want
   // a warning
   const hasUnsetupabbleModules = allNeedingSetup.length > allSetupable.length
-  const unsetupableModulesWarning = !hasUnsetupabbleModules
-    ? null
-    : hasAnyAttachedPipette
-      ? t('calibrate_a_pipette_to_set_up_more_modules')
-      : t('connect_a_pipette_to_set_up_more_modules')
+  const unsetupableModulesWarning = (() => {
+    if (hasUnsetupabbleModules) {
+      if (getCalibratedPipetteForModuleSetup(attachedPipettes)) {
+        return null
+      }
+      if (attachedPipettes.left != null || attachedPipettes.right != null) {
+        return t('calibrate_a_pipette_to_set_up_more_modules')
+      }
+      return t('connect_a_pipette_to_set_up_more_modules')
+    }
+    return null
+  })()
   // And our special short-circuit flows where we never show a menu if there's only one
   // entry should be avoided if we have that warning
   const isSingleModule = newModules.length === 1 && !hasUnsetupabbleModules
