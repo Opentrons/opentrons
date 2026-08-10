@@ -74,7 +74,7 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
   // it follows that some modules need setup but cannot be set up. in that case we want
   // a warning
   const hasUnsetupabbleModules = allNeedingSetup.length > allSetupable.length
-  let unsetupableModulesWarning: string | null = null
+  let unsetupableModulesWarning: string | undefined
   if (hasUnsetupabbleModules) {
     if (getCalibratedPipetteForModuleSetup(attachedPipettes) == null) {
       if (attachedPipettes.left != null || attachedPipettes.right != null) {
