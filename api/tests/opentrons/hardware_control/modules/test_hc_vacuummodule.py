@@ -1510,6 +1510,46 @@ async def sim_vacuum_with_injected_error(
         await vacuum.cleanup()
 
 
+async def test_wait_for_target_reraises_waste_full_as_enumerated_error(
+    test_wait_for_target_subject: modules.VacuumModule,
+    mock_driver: SimulatingDriver,
+    decoy: Decoy,
+) -> None:
+    """Background wait paths must raise recoverable enumerated vacuum errors.
+
+    Protocol engine associates recovery via FinishTaskAction error codes. Raw
+    driver WasteContainerFull becomes GENERAL_ERROR and waitForTasks fails the
+    run; VacuumModuleWasteFullError enters associated-command recovery instead.
+    """
+    subject = test_wait_for_target_subject
+    await subject._poller.stop()
+    subject._reader.set_operation_mode(VacuumOperationMode.PRESSURE)
+    subject._reader.set_target_pressure(-300.0)
+    subject._reader.vacuum_state = VacuumState(
+        target_gauge_pressure=-300.0,
+        current_gauge_pressure=-50.0,
+        pressure_abs_a=0,
+        pressure_abs_b=0,
+        pressure_atm=0,
+        vacuum_enabled=True,
+        vacuum_duration=0,
+        vent_state=VentState.CLOSED,
+    )
+
+    decoy.when(await mock_driver.get_vacuum_state()).then_raise(
+        WasteContainerFull("port", "async ERR401:waste full", "M121")
+    )
+
+    with mock.patch(
+        "opentrons.hardware_control.modules.vacuum_module.TARGET_REACHED_POLL_PERIOD",
+        0.0,
+    ):
+        with pytest.raises(VacuumModuleWasteFullError) as exc_info:
+            await subject.wait_for_target()
+
+    assert exc_info.value.serial == subject.serial_number
+
+
 async def test_injected_async_error_reaches_module_error_callback(
     sim_vacuum_with_injected_error: tuple[modules.VacuumModule, List[Exception]],
 ) -> None:
