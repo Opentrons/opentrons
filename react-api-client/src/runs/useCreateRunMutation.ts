@@ -41,7 +41,7 @@ export function useCreateRunMutation(
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const mutation = useDocumentedMutation<Run, AxiosError, CreateRunData>(
     documentationState,
-    [...(actionsToDocument ?? []), 'play_run'],
+    [...(actionsToDocument ?? []), 'create_run'],
     getQueryKey(host, 'runs'),
     ({
       variables: createRunData,
