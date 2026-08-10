@@ -92,7 +92,7 @@ export function useModuleSetupWizard(
     state
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   const attachedPipette = getCalibratedPipetteForModuleSetup(attachedPipettes)
-    
+
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
   const goBack = (): void => {
