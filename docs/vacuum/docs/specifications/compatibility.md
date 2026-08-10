@@ -13,11 +13,11 @@ The chemical compatibility ratings below reflect Opentrons test data combined wi
 
 The chemical compatibility tables use these ratings:
 
-* :material-check-circle:{ .dark-green } **Excellent** — No degradation after continuous exposure.
-* :material-check-circle-outline:{ .light-green } **Good** — Occasional minor effects (e.g., swelling or discoloration); suitable for long-term use.
-* :material-alert-circle-outline:{ .gray } **Fair / Marginal** — Moderate effects; Use with caution, flush after exposure.
-* :material-minus-circle-outline:{ .yellow } **Poor** — Severe degradation; brief or accidental contact only.
-* :material-close-circle:{ .red } **Not Recommended** — Rapid breakdown or complete material failure.
+* :material-check-circle:{ .dark-green } **Excellent:** No degradation after continuous exposure.
+* :material-check-circle-outline:{ .light-green } **Good:** Occasional minor effects (e.g., swelling or discoloration); suitable for long-term use.
+* :material-alert-circle-outline:{ .gray } **Fair / Marginal:** Moderate effects; use with caution, flush after exposure.
+* :material-minus-circle-outline:{ .yellow } **Poor:** Severe degradation; brief or accidental contact only.
+* :material-close-circle:{ .red } **Not Recommended:** Rapid breakdown or complete material failure.
 
 ## Hoses
 

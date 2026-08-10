@@ -13,11 +13,11 @@ The chemical compatibility ratings below reflect Opentrons test data combined wi
 
 The chemical compatibility tables use these ratings:
 
-* :material-check-circle:{ .dark-green } **Excellent** — No degradation after continuous exposure.
-* :material-check-circle-outline:{ .light-green } **Good** — Occasional minor effects (e.g., swelling or discoloration); suitable for long-term use.
-* :material-alert-circle-outline:{ .gray } **Fair / Marginal** — Moderate effects; Use with caution, flush after exposure.
-* :material-minus-circle-outline:{ .yellow } **Poor** — Severe degradation; brief or accidental contact only.
-* :material-close-circle:{ .red } **Not Recommended** — Rapid breakdown or complete material failure.
+* :material-check-circle:{ .dark-green } **Excellent:** No degradation after continuous exposure.
+* :material-check-circle-outline:{ .light-green } **Good:** Occasional minor effects (e.g., swelling or discoloration); suitable for long-term use.
+* :material-alert-circle-outline:{ .gray } **Fair / Marginal:** Moderate effects; use with caution, flush after exposure.
+* :material-minus-circle-outline:{ .yellow } **Poor:** Severe degradation; brief or accidental contact only.
+* :material-close-circle:{ .red } **Not Recommended:** Rapid breakdown or complete material failure.
 
 ## Compatibility summary
 
@@ -41,7 +41,7 @@ This section lists parts compatibility by chemical reagent.
 | Hoses | Tygon® 2375 | :material-check-circle-outline:{ .light-green } Good |
 | Manifold deck hardware | Nylon 6 | :material-check-circle:{ .dark-green } Excellent |
 | Manifold gaskets | Silicone 3003/20 | :material-close-circle:{ .red } Not Recommended |
-| Quick connect fittings and carboy float | Polypropylene | :material-check-circle-outline:{ .light-green } Good |
+| Quick connect fittings, carboy float | Polypropylene | :material-check-circle-outline:{ .light-green } Good |
 
 ### Acetonitrile
 
@@ -50,7 +50,7 @@ This section lists parts compatibility by chemical reagent.
 | Hoses | Tygon® 2375 | :material-check-circle-outline:{ .light-green } Good |
 | Manifold deck hardware | Nylon 6 | :material-check-circle:{ .dark-green } Excellent |
 | Manifold gaskets | Silicone 3003/20 | :material-alert-circle-outline:{ .gray } Moderate |
-| Quick connect fittings and carboy float | Polypropylene | :material-check-circle-outline:{ .light-green } Good |
+| Quick connect fittings, carboy float | Polypropylene | :material-check-circle-outline:{ .light-green } Good |
 
 ### Dimethyl Sulfoxide (DMSO)
 
@@ -59,7 +59,7 @@ This section lists parts compatibility by chemical reagent.
 | Hoses | Tygon® 2375 | :material-check-circle-outline:{ .light-green } Good |
 | Manifold deck hardware | Nylon 6 | :material-check-circle:{ .dark-green } Excellent |
 | Manifold gaskets | Silicone 3003/20 | :material-check-circle-outline:{ .light-green } Good |
-| Quick connect fittings and carboy float | Polypropylene | :material-check-circle-outline:{ .light-green } Good |
+| Quick connect fittings, carboy float | Polypropylene | :material-check-circle-outline:{ .light-green } Good |
 
 ### Dimethylformamide (DMF)
 
@@ -68,7 +68,7 @@ This section lists parts compatibility by chemical reagent.
 | Hoses | Tygon® 2375 | :material-check-circle:{ .dark-green } Excellent |
 | Manifold deck hardware | Nylon 6 | :material-check-circle:{ .dark-green } Excellent |
 | Manifold gaskets | Silicone 3003/20 | :material-alert-circle-outline:{ .gray } Moderate |
-| Quick connect fittings and carboy float | Polypropylene | :material-check-circle-outline:{ .light-green } Good |
+| Quick connect fittings, carboy float | Polypropylene | :material-check-circle-outline:{ .light-green } Good |
 
 ### Ethanol
 
@@ -77,7 +77,7 @@ This section lists parts compatibility by chemical reagent.
 | Hoses | Tygon® 2375 | :material-check-circle:{ .dark-green } Excellent |
 | Manifold deck hardware | Nylon 6 | :material-check-circle:{ .dark-green } Excellent |
 | Manifold gaskets | Silicone 3003/20 | :material-check-circle:{ .dark-green } Excellent |
-| Quick connect fittings and carboy float | Polypropylene | :material-check-circle:{ .dark-green } Excellent |
+| Quick connect fittings, carboy float | Polypropylene | :material-check-circle:{ .dark-green } Excellent |
 
 ### Ethyl Acetate
 
@@ -86,7 +86,7 @@ This section lists parts compatibility by chemical reagent.
 | Hoses | Tygon® 2375 | :material-close-circle:{ .red } Not Recommended |
 | Manifold deck hardware | Nylon 6 | :material-check-circle:{ .dark-green } Excellent |
 | Manifold gaskets | Silicone 3003/20 | :material-close-circle:{ .red } Not Recommended |
-| Quick connect fittings and carboy float | Polypropylene | :material-check-circle-outline:{ .light-green } Good |
+| Quick connect fittings, carboy float | Polypropylene | :material-check-circle-outline:{ .light-green } Good |
 
 ### Formic Acid
 
@@ -95,7 +95,7 @@ This section lists parts compatibility by chemical reagent.
 | Hoses | Tygon® 2375 | :material-check-circle:{ .dark-green } Excellent |
 | Manifold deck hardware | Nylon 6 | :material-close-circle:{ .red } Not Recommended |
 | Manifold gaskets | Silicone 3003/20 | :material-check-circle-outline:{ .light-green } Good |
-| Quick connect fittings and carboy float | Polypropylene | :material-check-circle:{ .dark-green } Excellent |
+| Quick connect fittings, carboy float | Polypropylene | :material-check-circle:{ .dark-green } Excellent |
 
 ### Hexane
 
@@ -104,7 +104,7 @@ This section lists parts compatibility by chemical reagent.
 | Hoses | Tygon® 2375 | :material-close-circle:{ .red } Not Recommended |
 | Manifold deck hardware | Nylon 6 | :material-check-circle:{ .dark-green } Excellent |
 | Manifold gaskets | Silicone 3003/20 | :material-close-circle:{ .red } Not Recommended |
-| Quick connect fittings and carboy float | Polypropylene | :material-minus-circle-outline:{ .yellow } Poor |
+| Quick connect fittings, carboy float | Polypropylene | :material-minus-circle-outline:{ .yellow } Poor |
 
 ### Hydrochloric Acid (37% concentration)
 
@@ -113,7 +113,7 @@ This section lists parts compatibility by chemical reagent.
 | Hoses | Tygon® 2375 | :material-check-circle:{ .dark-green } Excellent |
 | Manifold deck hardware | Nylon 6 | :material-close-circle:{ .red } Not Recommended |
 | Manifold gaskets | Silicone 3003/20 | :material-alert-circle-outline:{ .gray } Moderate |
-| Quick connect fittings and carboy float | Polypropylene | :material-check-circle:{ .dark-green } Excellent |
+| Quick connect fittings, carboy float | Polypropylene | :material-check-circle:{ .dark-green } Excellent |
 
 ### Isopropanol (IPA)
 
@@ -122,7 +122,7 @@ This section lists parts compatibility by chemical reagent.
 | Hoses | Tygon® 2375 | :material-check-circle:{ .dark-green } Excellent |
 | Manifold deck hardware | Nylon 6 | :material-check-circle:{ .dark-green } Excellent |
 | Manifold gaskets | Silicone 3003/20 | :material-check-circle:{ .dark-green } Excellent |
-| Quick connect fittings and carboy float | Polypropylene | :material-check-circle:{ .dark-green } Excellent |
+| Quick connect fittings, carboy float | Polypropylene | :material-check-circle:{ .dark-green } Excellent |
 
 ### Methanol
 
@@ -131,7 +131,7 @@ This section lists parts compatibility by chemical reagent.
 | Hoses | Tygon® 2375 | :material-check-circle:{ .dark-green } Excellent |
 | Manifold deck hardware | Nylon 6 | :material-check-circle:{ .dark-green } Excellent |
 | Manifold gaskets | Silicone 3003/20 | :material-check-circle:{ .dark-green } Excellent |
-| Quick connect fittings and carboy float | Polypropylene | :material-check-circle:{ .dark-green } Excellent |
+| Quick connect fittings, carboy float | Polypropylene | :material-check-circle:{ .dark-green } Excellent |
 
 ### Methylene Chloride (Dichloromethane/DCM)
 
@@ -140,7 +140,7 @@ This section lists parts compatibility by chemical reagent.
 | Hoses | Tygon® 2375 | :material-close-circle:{ .red } Not Recommended |
 | Manifold deck hardware | Nylon 6 | :material-close-circle:{ .red } Not Recommended |
 | Manifold gaskets | Silicone 3003/20 | :material-close-circle:{ .red } Not Recommended |
-| Quick connect fittings and carboy float | Polypropylene | :material-check-circle:{ .dark-green } Excellent |
+| Quick connect fittings, carboy float | Polypropylene | :material-check-circle:{ .dark-green } Excellent |
 
 ### Sodium Hypochlorite (Bleach)
 
@@ -149,7 +149,7 @@ This section lists parts compatibility by chemical reagent.
 | Hoses | Tygon® 2375 | :material-check-circle:{ .dark-green } Excellent |
 | Manifold deck hardware | Nylon 6 | :material-alert-circle-outline:{ .gray } Moderate |
 | Manifold gaskets | Silicone 3003/20 | :material-check-circle-outline:{ .light-green } Good |
-| Quick connect fittings and carboy float | Polypropylene | :material-check-circle:{ .dark-green } Excellent |
+| Quick connect fittings, carboy float | Polypropylene | :material-check-circle:{ .dark-green } Excellent |
 
 ### Tetrahydrofuran (THF)
 
@@ -158,7 +158,7 @@ This section lists parts compatibility by chemical reagent.
 | Hoses | Tygon® 2375 | :material-close-circle:{ .red } Not Recommended |
 | Manifold deck hardware | Nylon 6 | :material-check-circle:{ .dark-green } Excellent |
 | Manifold gaskets | Silicone 3003/20 | :material-close-circle:{ .red } Not Recommended |
-| Quick connect fittings and carboy float | Polypropylene | :material-minus-circle-outline:{ .yellow } Poor |
+| Quick connect fittings, carboy float | Polypropylene | :material-minus-circle-outline:{ .yellow } Poor |
 
 ### Toluene
 
@@ -167,7 +167,7 @@ This section lists parts compatibility by chemical reagent.
 | Hoses | Tygon® 2375 | :material-close-circle:{ .red } Not Recommended |
 | Manifold deck hardware | Nylon 6 | :material-check-circle:{ .dark-green } Excellent |
 | Manifold gaskets | Silicone 3003/20 | :material-close-circle:{ .red } Not Recommended |
-| Quick connect fittings and carboy float | Polypropylene | :material-minus-circle-outline:{ .yellow } Poor |
+| Quick connect fittings, carboy float | Polypropylene | :material-minus-circle-outline:{ .yellow } Poor |
 
 ### Trichloroacetic Acid (TCA)
 
@@ -176,7 +176,7 @@ This section lists parts compatibility by chemical reagent.
 | Hoses | Tygon® 2375 | :material-check-circle:{ .dark-green } Excellent |
 | Manifold deck hardware | Nylon 6 | :material-close-circle:{ .red } Not Recommended |
 | Manifold gaskets | Silicone 3003/20 | :material-close-circle:{ .red } Not Recommended |
-| Quick connect fittings and carboy float | Polypropylene | :material-check-circle:{ .dark-green } Excellent |
+| Quick connect fittings, carboy float | Polypropylene | :material-check-circle:{ .dark-green } Excellent |
 
 ### Trifluoroacetic Acid (TFA)
 
