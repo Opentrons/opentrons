@@ -7,7 +7,7 @@ description: "Chemicals compatibility with hoses and other Vacuum Module compone
 The chemical compatibility ratings below reflect Opentrons test data combined with published specifications from original equipment manufacturers (OEMs).
 
 !!! note
-    Because OEM testing conditions (e.g., temperature, chemical concentration, exposure duration, and other methodologies) vary and fall outside our control, Opentrons makes no express or implied warranty regarding material performance or chemical suitability.
+    Opentrons makes no express or implied warranty regarding material performance or chemical suitability.
 
 ## Compatibility key
 

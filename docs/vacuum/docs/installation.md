@@ -46,7 +46,7 @@ The Vacuum Module ships in three separate boxes containing all the components re
 
     <figure markdown>
     ![Vacuum base positioned inside the deck adapter with the quick-connect fitting at the rear](images/base-in-adapter.png)
-    <figcaption>Deck adapter and vacuum base. Quick-connect fitting faces rear of robot.</figcaption>
+    <figcaption>Vacuum base and deck adapter. Quick-connect fitting faces rear of robot.</figcaption>
     </figure>
 
 9. Working off-deck, insert the 4 manifold screws from underneath the deck adapter into the vacuum base and hand-tighten them using the supplied 7/64″ L-key.
