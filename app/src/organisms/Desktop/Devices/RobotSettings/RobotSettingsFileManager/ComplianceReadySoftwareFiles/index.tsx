@@ -82,7 +82,7 @@ export function ComplianceReadySoftwareFiles({
     if (downloadLogPeriodsMutation.status !== 'loading') {
       const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
       const toastId = makeToast(
-        t('downloading_all_log_periods') as string,
+        t('downloading_log_periods') as string,
         INFO_TOAST,
         {
           disableTimeout: true,
@@ -206,7 +206,7 @@ export function ComplianceReadySoftwareFiles({
                   desktopStyle="bodyDefaultRegular"
                   className={styles.log_date_col}
                 >
-                  {t('log_period_start')}
+                  {t('log_period_end')}
                 </StyledText>
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
