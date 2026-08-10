@@ -18,14 +18,14 @@ TODO + comments:
 In the Opentrons App, click the **Devices** page on the left side, then choose **Robot Settings**. Click the **Compliance Ready** tab to view available settings.
 
 <figure class="screenshot" markdown>
-  ![Image showing an open keyboard for documentation on the Flex touchscreen.](../images/crs-settings-app.png)
+  ![Image showing an open keyboard for documentation on the Flex touchscreen.](images/crs-settings-app.png)
   <figcaption>Use the keyboard to enter documentation on the Flex touchscreen.</figcaption>
 </figure>
 
 On the Flex touchscreen, tap the **Settings** tab, then **Compliance Ready Software**. 
 
 <figure class="screenshot" markdown>
-  ![Image showing an open keyboard for documentation on the Flex touchscreen.](../images/crs-settings-odd.png)
+  ![Image showing an open keyboard for documentation on the Flex touchscreen.](images/crs-settings-odd.png)
   <figcaption>Use the keyboard to enter documentation on the Flex touchscreen.</figcaption>
 </figure>
 
@@ -46,14 +46,14 @@ Users can only make changes to their personal account settings, and can't view o
 Administrators can unlock or delete users accounts, reset passwords, or edit user permissions. 
 
 <figure class="screenshot" markdown>
-  ![Image showing admin controls for user management.](../images/create-account.png)
+  ![Image showing admin controls for user management.](images/create-account.png)
   <figcaption>Administrators can manage user accounts in compliance-ready settings.</figcaption>
 </figure>
 
 All accounts are locked by default after 5 failed login attempts. After unlocking an account, users will receive a one-time password, and can choose a new one after logging in.
 
 <figure class="screenshot" markdown>
-  ![Image showing a one time password generation for a locked user account.](../images/one-time.png)
+  ![Image showing a one time password generation for a locked user account.](images/one-time.png)
   <figcaption>Administrators can unlock user accounts with a one-time password.</figcaption>
 </figure>
 
@@ -86,7 +86,7 @@ You can choose a location to automatically download and save [files](files.md) f
 Choose **App Settings** in the Opentrons App, then click the **Advanced** tab and click to select a folder.
 
 <figure class="screenshot" markdown>
-  ![Image showing an open keyboard for documentation on the Flex touchscreen.](../images/source-folder.png)
+  ![Image showing an open keyboard for documentation on the Flex touchscreen.](images/source-folder.png)
   <figcaption> Set a location on your computer to download files to from the Opentrons App.</figcaption>
 </figure>
 

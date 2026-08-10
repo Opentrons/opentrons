@@ -12,7 +12,7 @@ When a protocol is complete, you'll need to sign for the run in the Opentrons Ap
     * Allow users to sign for protocol runs in either the app or on the Flex touchscreen.
 
 <figure class="screenshot" markdown>
-  ![Sign for a protocol run in the Opentrons App.](../images/sign-run.png)
+  ![Sign for a protocol run in the Opentrons App.](images/sign-run.png)
   <figcaption>Sign for a protocol run in the Opentrons App.</figcaption>
 </figure>
 
@@ -21,7 +21,7 @@ After signing, your Flex will prompt you to download audit logs. Audit logs are 
 These files are not saved to the Flex and must be downloaded after signing for your protocol run. You'll see a prompt to download in the Opentrons App, and on the Flex touchscreen if you've chosen to download files from [both places](settings.md#file-downloads).
 
 <figure class="screenshot" markdown>
-  ![Download audit logs.](../images/download-logs-odd.png)
+  ![Download audit logs.](images/download-logs-odd.png)
   <figcaption>Download audit logs from the Flex touchscreen.</figcaption>
 </figure>
 

@@ -45,14 +45,14 @@ You'll access each file type using the *file manager* in either the Opentrons Ap
 In the Opentrons App, choose the **File manager** tab in your Flex's settings page. Here, you'll be able to see the robot's current storage capacity and available files from each category.
 
 <figure class="screenshot" markdown>
-  ![Access the file manager in the app.](../images/file-manager-app.png)
+  ![Access the file manager in the app.](images/file-manager-app.png)
   <figcaption>Access the file manager in your compliance ready Flex's setting page.</figcaption>
 </figure>
 
 On the Flex touchscreen, tap **Settings**, then choose **File Manager** from the list of options. Tap each tab to view Compliance Ready files, diagnostic files, or protocol run records.
 
 <figure class="screenshot" markdown>
-  ![Delete audit logs.](../images/file-manager-odd.png)
+  ![Delete audit logs.](images/file-manager-odd.png)
   <figcaption>Download audit logs from the Flex touchscreen.</figcaption>
 </figure>
 
@@ -70,14 +70,14 @@ You'll use the file manager in the Opentrons App or on the Flex touchscreen to d
 You can choose to download these files after every run, or wait for the Flex to remind you. 
 
 <figure class="screenshot" markdown>
-  ![Storage nears capacity on the touchscreen.](../images/storage-full-odd.png)
+  ![Storage nears capacity on the touchscreen.](images/storage-full-odd.png)
   <figcaption>Tap to manage files on the Flex's touchscreen when storage is full.</figcaption>
 </figure>
 
 You'll see reminders in the Opentrons App or on the Flex touchscreen to download files when the Flex nears its storage capacity.
 
 <figure class="screenshot" markdown>
-  ![A reminder to download files.](../images/storage-full-app.png)
+  ![A reminder to download files.](images/storage-full-app.png)
   <figcaption>The Opentrons App includes a reminder of the Flex.</figcaption>
 </figure>
 
@@ -92,14 +92,14 @@ In the file manager in the Opentrons App, you can click to expand each protocol 
 When you're ready to download, click the check boxes on the left to select individual files of any type for download.
 
 <figure class="screenshot" markdown>
-  ![Access the file manager in the app.](../images/file-manager-app.png)
+  ![Access the file manager in the app.](images/file-manager-app.png)
   <figcaption>Select individual or all files for download.</figcaption>
 </figure>
 
 The app packages your selected files as a `.zip` file for download. You can use compliance ready [settings](admin.md) to choose a default location for file downloads from the Opentrons App, or choose a location in your computer's files each time. 
 
 <figure class="screenshot" markdown>
-  ![Choose a download location from the Opentrons App.](../images/download-location.png)
+  ![Choose a download location from the Opentrons App.](images/download-location.png)
   <figcaption>Choose a location for your files to download to.</figcaption>
 </figure>
 
@@ -111,21 +111,21 @@ On the Flex touchscreen, choose the file type you'd like to manage. Then, choose
 * Tap the three-dot menu on the right for an individual file, then choose whether to download or delete.
 
 <figure class="screenshot" markdown>
-  ![Delete audit logs.](../images/manage-odd.png)
+  ![Delete audit logs.](images/manage-odd.png)
   <figcaption>Download audit logs from the Flex touchscreen.</figcaption>
 </figure> 
 
 Both the Opentrons App or Flex touchscreen, shown below, include a reminder to make sure you're ready to delete files.
 
 <figure class="screenshot" markdown>
-  ![Delete audit logs.](../images/delete-crs-logs.png)
+  ![Delete audit logs.](images/delete-crs-logs.png)
   <figcaption>Make sure all files are downloaded and safely stored before deleting.</figcaption>
 </figure> 
 
 If you'd like to download files using the Flex touchscreen, you'll need to attach an external storage device.
 
 <figure class="screenshot" markdown>
-  ![Delete audit logs.](../images/devices.png)
+  ![Delete audit logs.](images/devices.png)
   <figcaption>View attached external devices on the Flex touchscreen.</figcaption>
 </figure> 
 

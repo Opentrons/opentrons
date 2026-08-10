@@ -23,7 +23,7 @@ When you run protocols, your compliance ready Flex locally generates files conta
 If you choose to restrict users to signing for a run only in the Opentrons App, you'll also need to configure the app to download these logs to a storage location. 
 
 <figure class="screenshot" markdown>
-![Image showing how to choose a storage location.](../images/storage-location.png)
+![Image showing how to choose a storage location.](images/storage-location.png)
 </figure>
 <figcaption>Choose a storage location for your files.</figcaption>
 

@@ -16,7 +16,7 @@ Your lab can set up multiple administrator accounts that will have full access t
 User accounts can run protocols already on the Flex and view files. By default, they won't be able to add protocols to the Flex or download files, and they can't customize settings. In addition, users are blocked from completing actions that require administrator credentials. 
 
 <figure class="screenshot" markdown>
-  ![Image showing a locked user account where admin credentials are required.](../images/admin-credentials-required.png)
+  ![Image showing a locked user account where admin credentials are required.](images/admin-credentials-required.png)
   <figcaption>Users can't log in to the Flex touchscreen when administrator credentials are required.</figcaption>
 </figure>
 

@@ -19,7 +19,7 @@ Click or tap the protocols tab to view all protocols loaded on the Flex. Remembe
 After choosing any runtime parameters and clicking **Start setup**, your Flex will prompt you to document your reason for setting up the protocol.
 
 <figure class="screenshot" markdown>
-  ![Users should add documentation bfeore beginning protocol setup.](../images/setup-documentation.png)
+  ![Users should add documentation bfeore beginning protocol setup.](images/setup-documentation.png)
   <figcaption>Add documentation before beginning protocol setup.</figcaption>
 </figure>
 
@@ -34,7 +34,7 @@ You'll need to continue adding documentation at several points during protocol s
 Although you can begin a protocol run on the Flex before some setup steps are complete, you'll need to document your reason for doing so. 
 
 <figure class="screenshot" markdown>
-  ![Add documentation after starting the run anyways.](../images/offset-override.png)
+  ![Add documentation after starting the run anyways.](images/offset-override.png)
   <figcaption>Your Flex includes a warning before running a protocol without applying labware offsets.</figcaption>
 </figure>
 
@@ -69,7 +69,7 @@ For example, if you encounter an error during your protocol, you can choose from
 * Canceling the protocol run.
 
 <figure class="screenshot" markdown>
-  ![Add documentation after completing error recovery.](../images/recovery-action.png)
+  ![Add documentation after completing error recovery.](images/recovery-action.png)
   <figcaption>You'll need to add documentation after completing error recovery.</figcaption>
 </figure>
 
