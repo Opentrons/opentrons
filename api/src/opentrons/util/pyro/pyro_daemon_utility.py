@@ -2,7 +2,7 @@
 
 import logging
 import socket
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 import Pyro5
 from Pyro5 import api as pyro
@@ -16,7 +16,12 @@ from opentrons.util.pyro.pyro_synchronous_adapter import (
 log = logging.getLogger(__name__)
 
 
-def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable, broadcast_mode: Optional[bool] = False) -> None:  # type: ignore
+def create_pyro_daemon(
+    pyroname: str,
+    resource: Any,
+    registry: Callable,  # type: ignore
+    broadcast_mode: Optional[bool] = False,
+) -> None:
     """Function to create a Pyro Daemon request loop servicing a given resource.
 
     Registers the resource with the NameServer at the given PyroName.
@@ -33,7 +38,7 @@ def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable, broadca
         pyro_object = PyroSynchronousObject(core_obj=resource, utility=utility)
         utility.add_PSO(pyro_object)
         try:
-            with pyro.locate_ns(broadcast=broadcast_mode) as ns:
+            with pyro.locate_ns(broadcast=broadcast_mode if broadcast_mode is not None else False) as ns:
                 # Register our objects URI with the system nameserver
                 try:
                     ns.register(pyroname, daemon.uriFor(pyro_object))

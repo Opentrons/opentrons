@@ -76,7 +76,12 @@ async def build_and_run_hwc_pyro(simulate: bool, broadcast_mode: bool) -> None:
     def _daemon_request_loop(pyroname: str, resource: Any, registry: Any) -> None:
         # todo(chb: 2026-02-18): For the PYRONAMEs registered with the nameserver, do we want them to live in a centralized location (shared-data)?
         log.info("Creating Pyro Daemon for OT3API")
-        create_pyro_daemon(pyroname=pyroname, resource=resource, registry=registry, broadcast_mode=broadcast_mode)
+        create_pyro_daemon(
+            pyroname=pyroname,
+            resource=resource,
+            registry=registry,
+            broadcast_mode=broadcast_mode,
+        )
 
     daemon_request_thread = threading.Thread(
         target=_daemon_request_loop,
@@ -89,7 +94,7 @@ async def build_and_run_hwc_pyro(simulate: bool, broadcast_mode: bool) -> None:
     # Alert the systemd service that this process has spun up as soon as the resource is on the nameserver
     service_notified = False
     start_time = time.monotonic()
-    with pyro.locate_ns() as ns:
+    with pyro.locate_ns(broadcast=broadcast_mode) as ns:
         while time.monotonic() - start_time < 60:
             if "OT3API" in ns.list():
                 service_notified = hardware_process_notify_up()
@@ -128,4 +133,8 @@ if __name__ == "__main__":
         default=False,
         help="Flag to determine if the process should run in broadcast mode, looking for a Nameserver on the network.",
     )
-    asyncio.run(build_and_run_hwc_pyro(parser.parse_args().simulate, parser.parse_args().broadcast))
+    asyncio.run(
+        build_and_run_hwc_pyro(
+            parser.parse_args().simulate, parser.parse_args().broadcast
+        )
+    )

@@ -1,16 +1,14 @@
 """Support utilities for accessing the RobotServerPyroResource."""
 
-import time
 from typing import TYPE_CHECKING, Callable, cast
 
-import Pyro5.api as pyro
 import Pyro5.errors as pyro_errors
 
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
 )
 from opentrons.protocol_engine.resources.file_provider import FileProvider
-from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
+from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
 from server_utils.fastapi_utils.app_state import (
     AppState,
 )
@@ -31,27 +29,16 @@ if TYPE_CHECKING:
 
 
 # Pyro Resource Retreival for local processes (recieve proxies, etc)
-# todo(chb, 04-09-2026): for now this is using the same methodology as the DirectedRunProcess work, consolidate
 def get_pyro_resource() -> RobotServerPyroResource:
     """Get a Proxy of the hosted Robot Server Pyro Resource."""
-
-    robot_server_proxy = None
-    start_time = time.monotonic()
-    with pyro.locate_ns() as ns:
-        while time.monotonic() - start_time < 60:
-            if RS_PYRONAME in ns.list():
-                robot_server_proxy = pyro.Proxy(ns.list()[RS_PYRONAME])  # type: ignore[no-untyped-call]
-                break
-            time.sleep(0.01)
+    robot_server_proxy = wait_for_proxy(proxy_name=RS_PYRONAME)
 
     if robot_server_proxy is None:
         raise pyro_errors.CommunicationError(
             "Could not find robot-server-resource URI on Pyro5 Nameserver."
         )
     else:
-        robot_server_resource = cast(
-            RobotServerPyroResource, AsyncClientPyroObject(robot_server_proxy)
-        )
+        robot_server_resource = cast(RobotServerPyroResource, robot_server_proxy)
         return robot_server_resource
 
 
