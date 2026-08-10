@@ -71,6 +71,10 @@ _SCENARIO_CHOICES: list[ParameterChoice] = [
         "value": "async_error_during_gantry",
     },
     {
+        "display_name": "No injection",
+        "value": "async_error_no_injection",
+    },
+    {
         "display_name": "Latest background start",
         "value": "latest_background_start",
     },
@@ -377,6 +381,17 @@ def _scenario_async_error_during_gantry(
     )
 
 
+def _scenario_async_error_no_injection(
+    ctx: ProtocolContext,
+    vacuum_task: Task,
+) -> None:
+    _finish_waiting_for_tasks(
+        ctx,
+        [vacuum_task],
+        label="No async error injection",
+    )
+
+
 def _scenario_latest_background_start(
     ctx: ProtocolContext,
     vm_mod: VacuumModuleContext,
@@ -435,6 +450,8 @@ def run(ctx: ProtocolContext) -> None:
         _scenario_async_error_outside_wait(ctx, vm_mod, vacuum_task)
     elif scenario == "async_error_during_gantry":
         _scenario_async_error_during_gantry(ctx, vm_mod, vacuum_task, trash)
+    elif scenario == "async_error_no_injection":
+        _scenario_async_error_no_injection(ctx, vacuum_task)
     elif scenario == "latest_background_start":
         _scenario_latest_background_start(ctx, vm_mod, vacuum_task)
     else:

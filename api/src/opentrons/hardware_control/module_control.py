@@ -293,7 +293,9 @@ class AttachedModulesControl:
             if attached_mod.port != old_mod.port:
                 log.info(f"module moved from {old_mod.port} to {attached_mod.port}")
                 await old_mod.move_port(attached_mod.port, attached_mod.usb_port)
+                log.info("Module port migration complete.")
             await old_mod.attempt_reconnect()
+            log.info("Module reconnection complete.")
             if old_mod in self._recently_removed_modules:
                 self._recently_removed_modules.remove(old_mod)
             self._dedupe_available_modules(old_mod)

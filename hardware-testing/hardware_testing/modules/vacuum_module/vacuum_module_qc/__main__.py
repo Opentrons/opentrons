@@ -12,7 +12,7 @@ import subprocess
 from pathlib import Path
 from typing import Tuple
 
-from hardware_testing.data import ui
+from hardware_testing.data import ui, get_git_description
 from hardware_testing.data.csv_report import CSVReport
 
 from .config import TestSection, TestConfig, build_report, TESTS
@@ -49,6 +49,8 @@ async def build_vacuum_module_report(
     report.set_operator(
         "simulating" if is_simulating else input("enter OPERATOR name: ")
     )
+    git_description = get_git_description()
+    report.set_version(git_description)
     return report, vacuum_module
 
 
@@ -63,6 +65,7 @@ async def _main(cfg: TestConfig) -> None:
 
     device_info = await vacuum_module._driver.get_device_info()
     report.set_tag(device_info.get("serial", "UNKNOWN"))
+    report.set_firmware(device_info.get("version", "UNKNOWN"))
 
     # RUN TESTS
     try:
