@@ -82,7 +82,6 @@ export const TouchInputField = forwardRef<
     label,
     caption,
     onClick,
-    tabIndex,
     isIndeterminate = false,
     textAlign = TYPOGRAPHY.textAlignLeft,
     size = 'small',
@@ -141,7 +140,6 @@ export const TouchInputField = forwardRef<
           onClick={disabled === true ? undefined : onClick}
         >
           <div
-            tabIndex={tabIndex}
             style={inputFieldStyles}
             className={clsx(
               styles.input_field,
