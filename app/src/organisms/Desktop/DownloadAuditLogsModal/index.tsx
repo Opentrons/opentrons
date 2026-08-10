@@ -109,6 +109,7 @@ function DownloadAuditLogsModalContent({
   useEffect(() => {
     if (!isLogDeletedLoading && isDeleted) {
       modal.resolve(true)
+      modal.remove()
     }
   }, [isDeleted, isLogDeletedLoading, modal])
 

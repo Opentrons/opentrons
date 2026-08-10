@@ -99,6 +99,7 @@ export function useCloseCurrentRun(documentationState: DocumentationState): {
       dismissCurrentRun(currentRunId, {
         ...callerOptions,
         onSuccess: (response: Run, ...args) => {
+          lastDismissedRunId.current = response.data.id
           callerOptions.onSuccess?.()
         },
         onError: async (error: AxiosError) => {

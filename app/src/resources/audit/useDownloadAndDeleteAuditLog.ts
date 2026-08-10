@@ -39,12 +39,18 @@ export function useDownloadAndDeleteAuditLog(logPeriodId: string): {
     setIsLoading(true)
     updateLogDeletionStatus('pending')
     try {
-      const deletionKey = await downloadLogPeriod()
-      if (deletionKey != null) {
-        dispatch(logPeriodDeleteStarted({ logPeriodId }))
-        await deleteLogPeriod({ logPeriodId, deletionKey })
-        updateLogDeletionStatus('completed')
+      if (logPeriodDetails == null) {
+        throw new Error(
+          'Log period details not found for period ID: ' + logPeriodId
+        )
       }
+      const deletionKey = await downloadLogPeriod()
+      if (deletionKey == null) {
+        throw new Error('Deletion key not found for period ID: ' + logPeriodId)
+      }
+      dispatch(logPeriodDeleteStarted({ logPeriodId }))
+      await deleteLogPeriod({ logPeriodId, deletionKey })
+      updateLogDeletionStatus('completed')
     } catch (error) {
       updateLogDeletionStatus('failed')
       setError(error as Error)
