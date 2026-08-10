@@ -13,7 +13,7 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 
-import styles from './userAccountForm.module.css'
+import styles from './useraccountconfirmmodal.module.css'
 
 import type { JSX } from 'react'
 
@@ -51,15 +51,15 @@ export function UserAccountConfirmModal({
         />
       }
     >
-      <div className={styles.confirm_modal_content}>
-        <div className={styles.confirm_modal_body}>
+      <div className={styles.content}>
+        <div className={styles.body}>
           <Icon name="ot-alert" size="2.5rem" color={COLORS.yellow50} />
           <StyledText desktopStyle="headingSmallBold">{heading}</StyledText>
           <StyledText desktopStyle="bodyDefaultRegular">
             {description}
           </StyledText>
         </div>
-        <div className={styles.confirm_modal_actions}>
+        <div className={styles.actions}>
           <SecondaryButton type="button" onClick={onCancel}>
             {t('cancel') as string}
           </SecondaryButton>

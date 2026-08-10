@@ -1,29 +1,3 @@
-.confirm_modal_content {
-  display: flex;
-  padding: var(--spacing-24);
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--spacing-24);
-  align-self: stretch;
-}
-
-.confirm_modal_body {
-  display: flex;
-  width: 100%;
-  flex-direction: column;
-  align-items: center;
-  align-self: stretch;
-  text-align: center;
-  gap: var(--spacing-8);
-}
-
-.confirm_modal_actions {
-  display: flex;
-  width: 100%;
-  justify-content: flex-end;
-  gap: var(--spacing-8);
-}
-
 .success_intro {
   display: flex;
   width: 100%;
