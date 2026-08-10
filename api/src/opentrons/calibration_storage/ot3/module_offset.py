@@ -84,12 +84,7 @@ def save_module_calibration(
 def get_module_offset(
     module: ModuleType, module_id: str, slot: Optional[str] = None
 ) -> Optional[v1.ModuleOffsetModel]:
-    """Load a module offset from disk.
-
-    Intentionally uncached as pyro, saves clear cache only in the
-    HW process while robot-server /modules reads in another process.
-    LRU cache would make the modules appear uncalibrated after setup.
-    """
+    """Load a module offset from disk."""
     try:
         module_calibration_filepath = (
             config.get_opentrons_path("module_calibration_dir") / f"{module_id}.json"
@@ -109,10 +104,7 @@ def get_module_offset(
 
 
 def load_all_module_offsets() -> List[v1.ModuleOffsetModel]:
-    """Load all module offsets from the disk.
-
-    Intentionally uncached for the same cross-process reason as get_module_offset.
-    """
+    """Load all module offsets from the disk."""
 
     calibrations: List[v1.ModuleOffsetModel] = []
     files = os.listdir(config.get_opentrons_path("module_calibration_dir"))
