@@ -13,6 +13,15 @@
   flex-direction: column;
   align-items: center;
   align-self: stretch;
+  padding: var(--spacing-40);
+  gap: var(--spacing-24);
+}
+
+.body_text {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
   gap: var(--spacing-8);
   text-align: center;
 }

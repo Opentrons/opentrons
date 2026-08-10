@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   Icon,
+  ModalHeader,
   ModalShell,
   PrimaryButton,
   SecondaryButton,
   StyledText,
-  WizardHeader,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -41,23 +41,17 @@ export function UserAccountConfirmModal({
   return createPortal(
     <ModalShell
       width="31.25rem"
-      header={
-        <WizardHeader
-          title={title}
-          onExit={onCancel}
-          hideStepText
-          exitButtonCopy={t('exit') as string}
-          exitDisabled={isConfirmDisabled}
-        />
-      }
+      header={<ModalHeader title={title} onClose={onCancel} />}
     >
       <div className={styles.content}>
         <div className={styles.body}>
           <Icon name="ot-alert" size="2.5rem" color={COLORS.yellow50} />
-          <StyledText desktopStyle="headingSmallBold">{heading}</StyledText>
-          <StyledText desktopStyle="bodyDefaultRegular">
-            {description}
-          </StyledText>
+          <div className={styles.body_text}>
+            <StyledText desktopStyle="headingSmallBold">{heading}</StyledText>
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {description}
+            </StyledText>
+          </div>
         </div>
         <div className={styles.actions}>
           <SecondaryButton type="button" onClick={onCancel}>
