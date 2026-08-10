@@ -82,7 +82,7 @@ export const TouchInputField = forwardRef<
     label,
     caption,
     onClick,
-    tabIndex = 0,
+    tabIndex,
     isIndeterminate = false,
     textAlign = TYPOGRAPHY.textAlignLeft,
     size = 'small',
