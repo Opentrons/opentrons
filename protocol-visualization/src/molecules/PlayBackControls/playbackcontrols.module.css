@@ -25,21 +25,6 @@
   gap: var(--spacing-16);
 }
 
-.time_label {
-  text-align: center;
-  user-select: none;
-}
-
-.time_current {
-  min-width: 65px;
-  text-align: right;
-}
-
-.time_total {
-  min-width: 65px;
-  text-align: left;
-}
-
 .slider_wrapper {
   display: flex;
   flex: 1;

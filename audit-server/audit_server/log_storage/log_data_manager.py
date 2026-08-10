@@ -19,7 +19,12 @@ from server_utils.keys.key_server import SignMessageData
 
 from . import constants
 from .models import LogPeriodDetails, LogPeriodSummary
-from .store import LogStore, NoActivePeriodError, NoLogInPeriodError
+from .store import (
+    LogStore,
+    NoActivePeriodError,
+    NoLogInPeriodError,
+    PeriodIsActiveError,
+)
 from .types import LogPeriodEntries, StoredLog
 from audit_server.log_ingest.models import AuditLogMessage
 from audit_server.settings.store import (
@@ -31,6 +36,10 @@ LOG = getLogger(__name__)
 # Number of random bytes behind each deletion key. urlsafe encoding produces a
 # longer string than this byte count.
 _DELETION_KEY_BYTES: Final = 32
+
+
+class InvalidDeletionKeyError(Exception):
+    """The specified deletion key does not correspond to the specified period id."""
 
 
 class _GetTime:
@@ -94,11 +103,17 @@ class LogDataManager:
 
     def get_period_entries(self, period_id: str) -> LogPeriodEntries:
         """Get the given log period's user and robot log entries."""
-        return self._store.get_period_entries(period_id)
+        entries = self._store.get_period_entries(period_id)
+        if isinstance(entries, Exception):
+            raise entries
+        return entries
 
     def get_log_period_details(self, period_id: str) -> LogPeriodDetails:
         """Get aggregate details for a log period."""
-        return self._store.get_period_details(period_id)
+        details = self._store.get_period_details(period_id)
+        if isinstance(details, Exception):
+            raise details
+        return details
 
     def create_deletion_key(self, period_id: str) -> str:
         """Mint a new one-time deletion key linked to a log period.
@@ -107,9 +122,36 @@ class LogDataManager:
         distinct key, and previously issued keys for the same period remain
         valid.
         """
+        period = self._store.get_period_details(period_id)
+        if isinstance(period, Exception):
+            raise period
+        if period.endedAt is None:
+            raise PeriodIsActiveError()
         key = secrets.token_urlsafe(_DELETION_KEY_BYTES)
         self._deletion_keys[key] = period_id
         return key
+
+    async def delete_log_period(self, period_id: str, deletion_key: str) -> str:
+        """Delete a log period, rotating if necessary, and return the deleted period."""
+        try:
+            deletable_period = self._deletion_keys[deletion_key]
+        except KeyError:
+            raise InvalidDeletionKeyError()
+        if deletable_period != period_id:
+            raise InvalidDeletionKeyError()
+
+        async with self._lock:
+            robot_logs_to_delete = self._store.delete_period(period_id)
+        if isinstance(robot_logs_to_delete, Exception):
+            raise robot_logs_to_delete
+
+        for log_path in robot_logs_to_delete:
+            try:
+                Path(log_path).unlink()
+            except BaseException:
+                LOG.exception(f"Could not delete {log_path}")
+
+        return period_id
 
     async def _do_store_log(self, log_message: str) -> str:
         previous_hash = self._store.tail_hash()
@@ -153,6 +195,9 @@ class LogDataManager:
 
         assert robot_log.filename is not None
         robot_log_path = robot_log_dir_path / Path(robot_log.filename).name
+        while robot_log_path.is_file():
+            robot_log_path = robot_log_path.with_stem(f"{robot_log_path.stem}_copy")
+
         with open(robot_log_path, "w") as fh:
             fh.write(contents)
 

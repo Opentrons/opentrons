@@ -8,7 +8,6 @@ import {
   ModalShell,
   PrimaryButton,
   SecondaryButton,
-  StyledText,
   WizardHeader,
 } from '@opentrons/components'
 import { useCreateUserMutation } from '@opentrons/react-api-client'
@@ -16,7 +15,12 @@ import { useCreateUserMutation } from '@opentrons/react-api-client'
 import { getTopPortalEl } from '/app/App/portal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
+import {
+  MANAGEABLE_USER_ACCOUNT_TYPES,
+  USERNAME_MAX_LENGTH,
+} from './userAccount/constants'
 import { mapAuthUserMutationError } from './userAccount/mapAuthUserMutationError'
+import { OneTimePasswordModal } from './userAccount/OneTimePasswordModal'
 import styles from './userAccount/userAccountForm.module.css'
 import { UserAccountIdentityFormFields } from './userAccount/UserAccountIdentityFormFields'
 
@@ -27,14 +31,6 @@ import type {
   CreateUserRequest,
 } from '@opentrons/api-client'
 import type { DropdownOption } from '@opentrons/components'
-
-const USERNAME_MAX_LENGTH = 20
-
-const ADD_USER_ACCOUNT_TYPES: AuthUserAccountType[] = [
-  'admin',
-  'user',
-  'auditor',
-]
 
 interface FormValues {
   username: string
@@ -74,12 +70,11 @@ export function AddUserModal({
     })
 
   const { username, fullName, accountType } = watch()
-  const accountTypeOptions: DropdownOption[] = ADD_USER_ACCOUNT_TYPES.map(
-    accountType => ({
+  const accountTypeOptions: DropdownOption[] =
+    MANAGEABLE_USER_ACCOUNT_TYPES.map(accountType => ({
       name: t(`desktop_user_role_${accountType}`),
       value: accountType,
-    })
-  )
+    }))
   const selectedAccountTypeOption =
     accountTypeOptions.find(option => option.value === accountType) ??
     accountTypeOptions[0]!
@@ -129,6 +124,17 @@ export function AddUserModal({
       })
   }
 
+  if (generatedPassword != null) {
+    return (
+      <OneTimePasswordModal
+        password={generatedPassword}
+        message={t('desktop_add_user_success_message') as string}
+        onConfirm={handleConfirm}
+        onClose={handleClose}
+      />
+    )
+  }
+
   return createPortal(
     <ModalShell
       width="31.25rem"
@@ -141,71 +147,41 @@ export function AddUserModal({
         />
       }
     >
-      {generatedPassword != null ? (
-        <div className={styles.modal_content}>
+      <div className={styles.modal_content}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className={styles.form_fields}>
-            <div className={styles.success_intro}>
-              <StyledText desktopStyle="headingSmallBold">
-                {t('desktop_one_time_password') as string}
-              </StyledText>
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {t('desktop_add_user_success_message') as string}
-              </StyledText>
-            </div>
+            <UserAccountIdentityFormFields
+              control={control}
+              stacked
+              usernameMaxLength={USERNAME_MAX_LENGTH}
+            />
             <div className={styles.field_group}>
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {t('desktop_one_time_password') as string}
-              </StyledText>
-              <div className={styles.one_time_password_value}>
-                <StyledText desktopStyle="bodyDefaultRegular">
-                  {generatedPassword}
-                </StyledText>
+              <div className={styles.field_group_value}>
+                <DropdownMenu
+                  filterOptions={accountTypeOptions}
+                  currentOption={selectedAccountTypeOption}
+                  dropdownType="neutral"
+                  onClick={value => {
+                    setValue('accountType', value as AuthUserAccountType, {
+                      shouldValidate: true,
+                    })
+                  }}
+                  title={t('desktop_role')}
+                  width="100%"
+                />
               </div>
             </div>
             <div className={styles.actions}>
-              <PrimaryButton type="button" onClick={handleConfirm}>
-                {t('shared:confirm')}
+              <SecondaryButton type="button" onClick={handleClose}>
+                {t('shared:cancel') as string}
+              </SecondaryButton>
+              <PrimaryButton type="submit" disabled={isSaveDisabled}>
+                {t('desktop_create_account') as string}
               </PrimaryButton>
             </div>
           </div>
-        </div>
-      ) : (
-        <div className={styles.modal_content}>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className={styles.form_fields}>
-              <UserAccountIdentityFormFields
-                control={control}
-                stacked
-                usernameMaxLength={USERNAME_MAX_LENGTH}
-              />
-              <div className={styles.field_group}>
-                <div className={styles.field_group_value}>
-                  <DropdownMenu
-                    filterOptions={accountTypeOptions}
-                    currentOption={selectedAccountTypeOption}
-                    dropdownType="neutral"
-                    onClick={value => {
-                      setValue('accountType', value as AuthUserAccountType, {
-                        shouldValidate: true,
-                      })
-                    }}
-                    title={t('desktop_role')}
-                    width="100%"
-                  />
-                </div>
-              </div>
-              <div className={styles.actions}>
-                <SecondaryButton type="button" onClick={handleClose}>
-                  {t('shared:cancel') as string}
-                </SecondaryButton>
-                <PrimaryButton type="submit" disabled={isSaveDisabled}>
-                  {t('desktop_create_account')}
-                </PrimaryButton>
-              </div>
-            </div>
-          </form>
-        </div>
-      )}
+        </form>
+      </div>
     </ModalShell>,
     getTopPortalEl()
   )

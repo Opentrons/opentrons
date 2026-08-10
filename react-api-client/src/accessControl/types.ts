@@ -182,8 +182,12 @@ type AuditLogAction =
   | 'apply_offsets'
   | 'update_subsystem'
   | 'update_module'
+  | 'update_robot_software'
   | 'update_settings'
   | 'create_user'
+  | 'update_user'
+  | 'delete_user'
+  | 'reset_user_password'
   | 'delete_log_period'
   | 'sign_run'
   | 'delete_log_periods'
@@ -193,6 +197,7 @@ type AuditLogAction =
   | 'toggle_devtools'
   | 'change_language'
   | 'toggle_analytics'
+  | 'download_log_period'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.

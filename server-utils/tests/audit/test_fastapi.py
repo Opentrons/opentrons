@@ -12,8 +12,11 @@ from server_utils.audit.audit_server import (
     AuditSettingsResponseData,
     Client,
     GetLoggingEnabledData,
+    GetLogPeriodsData,
     LocalHTTPClient,
     NoOpClient,
+    PatchLoggingEnabledRequestData,
+    PatchLoggingEnabledResponseData,
     StoreRobotLogSuccessData,
     SubmitAuditLogMessageData,
     SubmitAuditLogSuccessData,
@@ -77,6 +80,14 @@ def test_install_and_get_audit_client_via_dependency() -> None:
             raise NotImplementedError
 
         async def get_logging_enabled(self) -> GetLoggingEnabledData:
+            raise NotImplementedError
+
+        async def set_logging_enabled(
+            self, setting: PatchLoggingEnabledRequestData
+        ) -> PatchLoggingEnabledResponseData:
+            raise NotImplementedError()
+
+        async def get_current_log_period(self) -> GetLogPeriodsData:
             raise NotImplementedError
 
     stub_client = StubClient()

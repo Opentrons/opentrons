@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
 
@@ -10,31 +10,24 @@ import {
   Flex,
   SPACING,
 } from '@opentrons/components'
-import {
-  useAccessControlEnabledQuery,
-  useGetRobotServerAccessControlSettingsQuery,
-  useModulesQuery,
-} from '@opentrons/react-api-client'
+import { useModulesQuery } from '@opentrons/react-api-client'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useInitializeCameraState } from '/app/local-resources/images/hooks/useInitializeCameraState'
-import {
-  isCancellableStatus,
-  isTerminatingOrTerminal,
-} from '/app/local-resources/runs/utils'
+import { isCancellableStatus } from '/app/local-resources/runs/utils'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import {
   DEFAULT_STATUS_REFETCH_INTERVAL,
   useCloseCurrentRun,
-  useIsRunCurrent,
   useNotifyRunQuery,
   useProtocolDetailsForRun,
 } from '/app/resources/runs'
+import { useIsDownloadAuditLogsRequired } from '/app/resources/runs/useIsDownloadAuditLogsRequired'
 
 import { EQUIPMENT_POLL_MS } from '../../../../DoorOpenControl/constants'
+import { showDownloadLogsModal } from '../../../DownloadAuditLogsModal'
 import { RunProgressMeter } from '../../../RunProgressMeter'
-import { SignRunModal } from '../../../SignRunModal/SignRun'
 import { useRunAnalytics, useRunErrors, useRunHeaderRunControls } from './hooks'
 import { RunHeaderBannerContainer } from './RunHeaderBannerContainer'
 import { RunHeaderContent } from './RunHeaderContent'
@@ -60,13 +53,10 @@ export function ProtocolRunHeader(
 
   const navigate = useNavigate()
 
-  const { data: runRecord, isLoading: isRunRecordLoading } = useNotifyRunQuery(
-    runId,
-    {
-      staleTime: Infinity,
-      refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
-    }
-  )
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    staleTime: Infinity,
+    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+  })
   const { protocolData } = useProtocolDetailsForRun(runId)
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = runRecord?.data.status ?? null
@@ -85,74 +75,35 @@ export function ProtocolRunHeader(
   const documentationState = useDocumentationState()
   const { closeCurrentRun, isClosingCurrentRun } =
     useCloseCurrentRun(documentationState)
-  const {
-    data: accessControlEnabled,
-    isLoading: isAccessControlEnabledLoading,
-  } = useAccessControlEnabledQuery()
-  const {
-    data: accessControlSettings,
-    isLoading: isAccessControlSettingsLoading,
-  } = useGetRobotServerAccessControlSettingsQuery()
-  const isSigningSettingsLoading =
-    isAccessControlEnabledLoading || isAccessControlSettingsLoading
-  const isSigningRequired =
-    (accessControlEnabled?.data.accessControlEnabled ?? false) &&
-    (accessControlSettings?.data.requireSignoffForProtocolLog ?? false)
-  const hasSignedBy = !!runRecord?.data.signedBy
-  const isSigned = !isSigningRequired || hasSignedBy
-  const isRunCurrent = useIsRunCurrent(runId)
-  // Set when the run becomes terminal or close is requested before signing;
-  // cleared after a successful sign.
-  const [isSignRunPending, setIsSignRunPending] = useState(false)
+  const isDownloadAuditLogsInFlight = useRef(false)
 
-  // Keep the run current until the user signs when signoff is required.
-  const closeCurrentRunIfSigned = useCallback(() => {
-    if (isSigningSettingsLoading || !isSigned) {
-      setIsSignRunPending(true)
-      return
-    }
-    setIsSignRunPending(false)
-    closeCurrentRun()
-  }, [closeCurrentRun, isSigningSettingsLoading, isSigned])
+  const {
+    isRequired: isDownloadAuditLogsRequired,
+    isLoading: isDownloadAuditLogsLoading,
+  } = useIsDownloadAuditLogsRequired(runId)
 
-  // Canceled runs often have no terminal banner close button, so arm SignRun
-  // when the run itself becomes terminal — not only on an explicit close click.
   useEffect(() => {
     if (
-      isTerminatingOrTerminal(runStatus) &&
-      isRunCurrent &&
-      !hasSignedBy &&
-      (isSigningSettingsLoading || isSigningRequired)
+      !isClosingCurrentRun &&
+      runRecord?.data.logPeriodId != null &&
+      !runRecord?.data.current &&
+      !isDownloadAuditLogsLoading &&
+      isDownloadAuditLogsRequired &&
+      !isDownloadAuditLogsInFlight.current
     ) {
-      setIsSignRunPending(true)
+      isDownloadAuditLogsInFlight.current = true
+      void showDownloadLogsModal(runRecord?.data.logPeriodId ?? '').finally(
+        () => {
+          isDownloadAuditLogsInFlight.current = false
+        }
+      )
     }
   }, [
-    runStatus,
-    isRunCurrent,
-    hasSignedBy,
-    isSigningSettingsLoading,
-    isSigningRequired,
-  ])
-
-  useEffect(() => {
-    if (!isSignRunPending || isSigningSettingsLoading) {
-      return
-    }
-    // Signoff not required after load — clear pending; tip auto-close dismisses.
-    if (!isSigningRequired) {
-      setIsSignRunPending(false)
-      return
-    }
-    if (isSigned) {
-      setIsSignRunPending(false)
-      closeCurrentRun()
-    }
-  }, [
-    isSigned,
-    isSignRunPending,
-    isSigningSettingsLoading,
-    isSigningRequired,
-    closeCurrentRun,
+    isDownloadAuditLogsRequired,
+    runId,
+    isDownloadAuditLogsLoading,
+    isClosingCurrentRun,
+    runRecord?.data,
   ])
 
   const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
@@ -164,23 +115,8 @@ export function ProtocolRunHeader(
     protocolRunControls,
     runRecord: runRecord ?? null,
     runErrors,
-    closeCurrentRun: closeCurrentRunIfSigned,
+    closeCurrentRun,
   })
-  const { dropTipUtils } = runHeaderModalContainerUtils
-  const isDropTipBlocking =
-    dropTipUtils.dropTipModalUtils.showModal ||
-    dropTipUtils.dropTipWizardUtils.showDTWiz
-  // Wait for tip status so SignRun does not flash ahead of drop-tip CTAs.
-  // Also wait for runRecord after sign (cache cleared) so we don't re-prompt
-  // while signedBy is still missing from the refetch.
-  const showSignRunModal =
-    isSignRunPending &&
-    !isRunRecordLoading &&
-    !isSigningSettingsLoading &&
-    isSigningRequired &&
-    !hasSignedBy &&
-    dropTipUtils.isPostRunTipStatusSettled &&
-    !isDropTipBlocking
 
   useEffect(() => {
     if (protocolData != null && !isRobotViewable) {
@@ -208,9 +144,6 @@ export function ProtocolRunHeader(
         protocolRunControls={protocolRunControls}
         {...props}
       />
-      {showSignRunModal ? (
-        <SignRunModal runId={runId} robotName={robotName} />
-      ) : null}
       <Flex ref={protocolRunHeaderRef} css={CONTAINER_STYLE}>
         <RunHeaderProtocolName runId={runId} />
         <RunHeaderBannerContainer
@@ -221,7 +154,7 @@ export function ProtocolRunHeader(
           runHeaderModalContainerUtils={runHeaderModalContainerUtils}
           hasImages={outputFileIds.jpeg.length > 0}
           hasCsvFiles={outputFileIds.csv.length > 0}
-          closeCurrentRun={closeCurrentRunIfSigned}
+          closeCurrentRun={closeCurrentRun}
           isClosingCurrentRun={isClosingCurrentRun}
           {...props}
         />

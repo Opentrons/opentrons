@@ -9,13 +9,12 @@ import { swatchColors } from '@opentrons/step-generation'
 
 import { formatPercentage } from '../utils/formatPercentage'
 import { formatVolume } from '../utils/formatVolume'
+import { useWellTooltipPopper } from './useWellTooltipPopper'
 import styles from './welltooltip.module.css'
 
 import type { MouseEvent, ReactNode } from 'react'
 import type { LocationLiquidState } from '@opentrons/step-generation'
-
-const DEFAULT_TOOLTIP_OFFSET = 22
-const WELL_BORDER_WIDTH = 4
+import type { WellReferenceRect } from './useWellTooltipPopper'
 
 interface WellTooltipParams {
   liquidDisplayColors: Record<string, string>
@@ -33,20 +32,17 @@ interface WellTooltipProps {
 }
 
 interface TooltipState {
-  tooltipX?: number | null
-  tooltipY?: number | null
-  tooltipWellName?: string | null
-  tooltipWellIngreds?: LocationLiquidState | null
-  tooltipOffset?: number | null
+  referenceRect: WellReferenceRect | null
+  tooltipWellName: string | null
+  tooltipWellIngreds: LocationLiquidState | null
 }
 
 const initialTooltipState: TooltipState = {
-  tooltipX: null,
-  tooltipY: null,
+  referenceRect: null,
   tooltipWellName: null,
   tooltipWellIngreds: null,
-  tooltipOffset: DEFAULT_TOOLTIP_OFFSET,
 }
+
 export function WellTooltip({
   children,
   ingredNames,
@@ -55,6 +51,7 @@ export function WellTooltip({
   const { t } = useTranslation('protocol_visualization')
   const [tooltipState, setTooltipState] =
     useState<TooltipState>(initialTooltipState)
+  const [tooltipEl, setTooltipEl] = useState<HTMLElement | null>(null)
 
   const makeHandleMouseEnterWell =
     (wellName: string, wellIngreds: LocationLiquidState) =>
@@ -63,11 +60,9 @@ export function WellTooltip({
       const { left, top, height, width } = target.getBoundingClientRect()
       if (wellIngreds != null && Object.keys(wellIngreds).length > 0) {
         setTooltipState({
-          tooltipX: left + width / 2,
-          tooltipY: top + height / 3,
+          referenceRect: { left, top, width, height },
           tooltipWellName: wellName,
           tooltipWellIngreds: wellIngreds,
-          tooltipOffset: height / 2,
         })
       }
     }
@@ -76,13 +71,9 @@ export function WellTooltip({
     setTooltipState(initialTooltipState)
   }
 
-  const {
-    tooltipX,
-    tooltipY,
-    tooltipOffset,
-    tooltipWellIngreds,
-    tooltipWellName,
-  } = tooltipState
+  const { referenceRect, tooltipWellIngreds, tooltipWellName } = tooltipState
+
+  useWellTooltipPopper(tooltipEl, referenceRect)
 
   const totalLiquidVolume = reduce(
     tooltipWellIngreds,
@@ -98,19 +89,9 @@ export function WellTooltip({
         makeHandleMouseEnterWell,
         handleMouseLeaveWell,
       })}
-      {tooltipWellName != null && tooltipX != null && tooltipY != null
+      {tooltipWellName != null
         ? createPortal(
-            <div
-              className={styles.popper_content}
-              style={{
-                top:
-                  tooltipY +
-                  (tooltipOffset ?? DEFAULT_TOOLTIP_OFFSET) +
-                  WELL_BORDER_WIDTH * 2,
-                left: tooltipX,
-                transform: 'translate(-50%, 0)',
-              }}
-            >
+            <div ref={setTooltipEl} className={styles.popper_content}>
               <table className={styles.tooltip_table}>
                 <tbody>
                   {map(tooltipWellIngreds || {}, (ingred, groupId) => (

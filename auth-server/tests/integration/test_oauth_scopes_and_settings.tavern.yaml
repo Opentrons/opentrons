@@ -4,6 +4,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: With default settings, regular users should not get admin-only scopes

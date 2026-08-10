@@ -3,11 +3,7 @@ import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
-import {
-  useAccessControlEnabledQuery,
-  useGetRobotServerAccessControlSettingsQuery,
-  useModulesQuery,
-} from '@opentrons/react-api-client'
+import { useModulesQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -16,7 +12,6 @@ import { useIsRobotViewable } from '/app/redux-resources/robots'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import {
   useCloseCurrentRun,
-  useIsRunCurrent,
   useNotifyRunQuery,
   useProtocolDetailsForRun,
 } from '/app/resources/runs'
@@ -42,6 +37,12 @@ vi.mock('react-router-dom')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/runs')
+vi.mock('/app/resources/runs/useIsDownloadAuditLogsRequired', () => ({
+  useIsDownloadAuditLogsRequired: () => ({
+    isRequired: false,
+    isLoading: false,
+  }),
+}))
 vi.mock('/app/redux/protocol-runs')
 vi.mock('../RunHeaderModalContainer')
 vi.mock('../RunHeaderBannerContainer')
@@ -64,7 +65,6 @@ const MOCK_RUN_HEADER_MODAL_CONTAINER_UTILS = {
     dropTipModalUtils: { showModal: false, modalProps: null },
     dropTipWizardUtils: { showDTWiz: false, dtWizProps: null },
     resetTipStatus: vi.fn(),
-    isPostRunTipStatusSettled: true,
   },
 }
 
@@ -97,15 +97,6 @@ describe('ProtocolRunHeader', () => {
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [] },
     } as any)
-    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
-      data: { data: { accessControlEnabled: false } },
-      isLoading: false,
-    } as any)
-    vi.mocked(useGetRobotServerAccessControlSettingsQuery).mockReturnValue({
-      data: { data: { requireSignoffForProtocolLog: false } },
-      isLoading: false,
-    } as any)
-    vi.mocked(useIsRunCurrent).mockReturnValue(true)
     vi.mocked(useCloseCurrentRun).mockReturnValue({
       isClosingCurrentRun: false,
       closeCurrentRun: vi.fn(),

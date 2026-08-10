@@ -3,10 +3,16 @@ import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useUsersQuery } from '@opentrons/react-api-client'
+import {
+  useDeleteUserMutation,
+  useResetUserPasswordMutation,
+  useUpdateUserMutation,
+  useUsersQuery,
+} from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
 
 import { UserManagement } from '../UserManagement'
@@ -25,7 +31,20 @@ vi.mock('../AddUserModal', () => ({
     </div>
   ),
 }))
+vi.mock('../EditUserModal', () => ({
+  EditUserModal: ({ onClose }: { onClose: () => void }) => (
+    <div>
+      <span>mock EditUserModal</span>
+      <button type="button" onClick={onClose}>
+        Close mock edit modal
+      </button>
+    </div>
+  ),
+}))
 vi.mock('/app/organisms/ToasterOven')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const ROBOT_NAME = 'flex-1'
 
@@ -84,13 +103,34 @@ function expandAccordion(): void {
   fireEvent.click(screen.getByRole('button', { name: 'User management' }))
 }
 
+const mockDeleteUser = vi.fn()
+const mockResetUserPassword = vi.fn()
+const mockUpdateUser = vi.fn()
+
 describe('UserManagement', () => {
   beforeEach(() => {
+    mockDeleteUser.mockReset()
+    mockDeleteUser.mockResolvedValue(undefined)
+    mockResetUserPassword.mockReset()
+    mockResetUserPassword.mockResolvedValue(undefined)
+    mockUpdateUser.mockReset()
+    mockUpdateUser.mockResolvedValue(undefined)
     vi.mocked(useToaster).mockReturnValue({
       makeToast: vi.fn(),
       eatToast: vi.fn(),
       makeSnackbar: vi.fn(),
     })
+    vi.mocked(useDeleteUserMutation).mockReturnValue({
+      deleteUser: mockDeleteUser,
+    } as any)
+    vi.mocked(useResetUserPasswordMutation).mockReturnValue({
+      resetUserPassword: mockResetUserPassword,
+      isLoading: false,
+    } as any)
+    vi.mocked(useUpdateUserMutation).mockReturnValue({
+      updateUser: mockUpdateUser,
+      isLoading: false,
+    } as any)
     vi.mocked(useUsersQuery).mockImplementation(
       options =>
         ({
@@ -140,5 +180,150 @@ describe('UserManagement', () => {
     expandAccordion()
     fireEvent.click(screen.getByRole('button', { name: 'Add User' }))
     screen.getByText('mock AddUserModal')
+  })
+
+  it('opens the edit user modal when Edit user is selected from the overflow menu', () => {
+    render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Edit user' }))
+    screen.getByText('mock EditUserModal')
+  })
+
+  it('opens the delete user confirm modal when Delete user is selected from the overflow menu', () => {
+    render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Delete user' }))
+    screen.getByText('Delete this account?')
+  })
+
+  it('opens the reset password confirm modal when Reset password is selected from the overflow menu', () => {
+    render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Reset password' }))
+    screen.getByText("Reset this user's password?")
+  })
+
+  it('shows Unlock in the overflow menu only for locked users', () => {
+    render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
+    )
+    expect(
+      screen.queryByRole('button', {
+        name: 'Unlock account and reset password',
+      })
+    ).not.toBeInTheDocument()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
+    )
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_bob' })
+    )
+    screen.getByRole('button', { name: 'Unlock account and reset password' })
+  })
+
+  it('opens the activate modal with unlock and cancel actions', () => {
+    render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_bob' })
+    )
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Unlock account and reset password' })
+    )
+    screen.getByText('Activate this account?')
+    expect(
+      screen.getAllByRole('button', {
+        name: 'Unlock account and reset password',
+      })
+    ).toHaveLength(1)
+    screen.getByRole('button', { name: 'Cancel' })
+  })
+
+  it('shows Lock account only for active users in the overflow menu', () => {
+    render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
+    )
+    screen.getByRole('button', { name: 'Lock account' })
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
+    )
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_bob' })
+    )
+    expect(
+      screen.queryByRole('button', { name: 'Lock account' })
+    ).not.toBeInTheDocument()
+  })
+
+  it('opens the lock confirm modal when Lock account is selected', () => {
+    render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Lock account' }))
+    screen.getByText('Lock this account?')
+  })
+
+  it('locks the user when confirmed in the lock modal', async () => {
+    render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_alice' })
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Lock account' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Lock account' }))
+
+    await vi.waitFor(() => {
+      expect(mockUpdateUser).toHaveBeenCalledWith({
+        username: 'alice',
+        request: { data: { locked: true } },
+      })
+    })
+    expect(mockUpdateUser).toHaveBeenCalledTimes(1)
+  })
+
+  it('unlocks and resets password when confirmed in the activate modal', async () => {
+    mockResetUserPassword.mockResolvedValue({
+      data: { temporaryPassword: 'temp-password-123' },
+    })
+    render()
+    expandAccordion()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'UserManagement_overflowMenu_bob' })
+    )
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Unlock account and reset password' })
+    )
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Unlock account and reset password' })
+    )
+
+    await vi.waitFor(() => {
+      expect(mockUpdateUser).toHaveBeenCalledWith({
+        username: 'bob',
+        request: { data: { locked: false } },
+      })
+      expect(mockResetUserPassword).toHaveBeenCalledWith('bob')
+      screen.getByText('temp-password-123')
+    })
+    expect(mockUpdateUser).toHaveBeenCalledTimes(1)
+    expect(mockResetUserPassword).toHaveBeenCalledTimes(1)
+    expect(mockUpdateUser.mock.invocationCallOrder[0]).toBeLessThan(
+      mockResetUserPassword.mock.invocationCallOrder[0]!
+    )
   })
 })

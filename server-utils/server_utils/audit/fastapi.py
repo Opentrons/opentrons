@@ -16,6 +16,7 @@ from .audit_logger import AuditLogger
 from .audit_server import Client, LocalHTTPClient, NoOpClient
 from server_utils.auth.resource_server.fastapi import (
     RequireAuthenticationResult,
+    get_access_control_status,
     require_authentication,
 )
 from server_utils.fastapi_utils.app_state import (
@@ -34,6 +35,7 @@ USER_NOTES_HEADER: Final[str] = "Opentrons-User-Notes"
 
 async def get_supplied_user_notes(
     audit_client: Annotated[Client, fastapi.Depends(get_audit_client)],
+    access_control_status: Annotated[bool, fastapi.Depends(get_access_control_status)],
     request: fastapi.Request,
     # for reasons unknown to me, the annotated version of this declaration
     # fails with AttributeError: 'FieldInfo' object has no attribute 'in_'.
@@ -63,6 +65,8 @@ async def get_supplied_user_notes(
     If the value only contains whitespace (after decoding), it's treated the same
     as if it's not present.
     """
+    if not access_control_status:
+        return None
     if request.method not in MUTATING_HTTP_METHODS:
         return None
     try:
@@ -89,7 +93,8 @@ async def get_supplied_user_notes(
         ) from base_e
     stripped = decoded.strip()
     if (
-        settings.minLengthOfReasonForInteraction is not None
+        settings.requireReasonForInteraction is True
+        and settings.minLengthOfReasonForInteraction is not None
         and len(stripped) < settings.minLengthOfReasonForInteraction
     ):
         raise fastapi.HTTPException(

@@ -112,6 +112,8 @@ class Scope(enum.Enum):
         "Write arbitrary audit logs.",
     )
 
+    AUDIT_LOG_DELETE = ("audit_log.delete", "Delete audit logs after downloading them.")
+
     _description: str
 
     def __new__(cls, api_name: str, description: str) -> Self:  # noqa: D102

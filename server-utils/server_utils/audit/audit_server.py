@@ -15,10 +15,12 @@ from datetime import datetime, timezone
 import aiohttp
 import pydantic
 
+LOGGING_ENABLED_ENDPOINT_PATH: typing.Final = "audit/internal/loggingEnabled"
 LOG_MESSAGE_ENDPOINT_PATH: typing.Final = "audit/internal/logMessage"
 SETTINGS_ENDPOINT_PATH: typing.Final = "audit/external/settings"
 STORE_ROBOT_LOG_ENDPOINT_PATH = "/audit/internal/storeRobotLog"
 GET_LOGGING_ENABLED_ENDPOINT_PATH = "/audit/internal/loggingEnabled"
+GET_LOG_PERIODS = "/audit/external/logPeriods"
 
 _log = logging.getLogger(__name__)
 
@@ -56,6 +58,17 @@ class Client(ABC):
     @abstractmethod
     async def get_logging_enabled(self) -> GetLoggingEnabledData:
         """Get if the robot has audit logging enabled."""
+        pass
+
+    @abstractmethod
+    async def set_logging_enabled(
+        self, setting: PatchLoggingEnabledRequestData
+    ) -> PatchLoggingEnabledResponseData:
+        """Enable or disable logging."""
+
+    @abstractmethod
+    async def get_current_log_period(self) -> GetLogPeriodsData:
+        """Get the current log period, if any."""
         pass
 
 
@@ -158,6 +171,34 @@ class LocalHTTPClient(Client):
         )
         return parsed_response.data
 
+    @typing.override
+    async def set_logging_enabled(
+        self, setting: PatchLoggingEnabledRequestData
+    ) -> PatchLoggingEnabledResponseData:
+        """Enable or disable logging."""
+        request_body = PatchLoggingEnabledRequestBody(data=setting)
+        async with self._session.patch(
+            LOGGING_ENABLED_ENDPOINT_PATH,
+            data=request_body.model_dump_json(),
+            headers={"Content-Type": "application/json"},
+        ) as response:
+            response_bytes = await response.read()
+        parsed_response = PatchLoggingEnabledResponseBody.model_validate_json(
+            response_bytes
+        )
+        return parsed_response.data
+
+    @typing.override
+    async def get_current_log_period(self) -> GetLogPeriodsData:
+        async with self._session.get(GET_LOG_PERIODS) as response:
+            response_bytes = await response.read()
+        response.raise_for_status()
+        parsed_response = GetLogPeriodsResponseBody.model_validate_json(response_bytes)
+        for log_period in parsed_response.data:
+            if log_period.endedAt is None:
+                return log_period
+        raise NoCurrentLogPeriodError("Could not find a current log period.")
+
 
 class NoOpClient(Client):
     """A client implementation that doesn't actually contact audit-server.
@@ -200,6 +241,24 @@ class NoOpClient(Client):
     async def get_logging_enabled(self) -> GetLoggingEnabledData:
         _log.info("Get logging enabled (audit-server not configured): Returning false")
         return GetLoggingEnabledData(loggingEnabled=False)
+
+    @typing.override
+    async def set_logging_enabled(
+        self, setting: PatchLoggingEnabledRequestData
+    ) -> PatchLoggingEnabledResponseData:
+        """Enable or disable logging."""
+        return PatchLoggingEnabledResponseData(loggingEnabled=False)
+
+    @typing.override
+    async def get_current_log_period(self) -> GetLogPeriodsData:
+        _log.info(
+            "Get current log period (audit-server not configured): Returning log period 0"
+        )
+        return GetLogPeriodsData(
+            id=0,
+            startedAt=datetime.now(timezone.utc),
+            endedAt=None,
+        )
 
 
 class _StrictBaseModel(pydantic.BaseModel):
@@ -253,6 +312,12 @@ class StoreRobotLogSuccessData(_StrictBaseModel):
     loggingEnabled: bool
 
 
+class PatchLoggingEnabledResponseData(_StrictBaseModel):
+    """A response with the current logging-enabled setting."""
+
+    loggingEnabled: bool
+
+
 class StoreRobotLogResponseBody(_StrictBaseModel):
     """Response envelope for store robot log."""
 
@@ -269,3 +334,42 @@ class GetLoggingEnabledResponseBody(_StrictBaseModel):
     """Response envelope for get logging enabled."""
 
     data: GetLoggingEnabledData
+
+
+class PatchLoggingEnabledRequestData(_StrictBaseModel):
+    """A request to change the logging-enabled setting."""
+
+    loggingEnabled: bool
+    accountName: str
+    legalName: str
+    reason: str | None
+
+
+class PatchLoggingEnabledRequestBody(_StrictBaseModel):
+    """Request envelope for logging-enabled."""
+
+    data: PatchLoggingEnabledRequestData
+
+
+class PatchLoggingEnabledResponseBody(_StrictBaseModel):
+    """Response envelope for logging-enabled."""
+
+    data: PatchLoggingEnabledResponseData
+
+
+class NoCurrentLogPeriodError(BaseException):
+    """Error to be raised if no current log period can be found."""
+
+
+class GetLogPeriodsData(_StrictBaseModel):
+    """The payload of a get log periods response."""
+
+    id: int
+    startedAt: datetime
+    endedAt: datetime | None
+
+
+class GetLogPeriodsResponseBody(_StrictBaseModel):
+    """Response envelope for get log periods."""
+
+    data: list[GetLogPeriodsData]

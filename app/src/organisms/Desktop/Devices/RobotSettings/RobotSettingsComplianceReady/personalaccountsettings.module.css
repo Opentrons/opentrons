@@ -38,3 +38,27 @@
 .field_value_text {
   color: var(--grey-60);
 }
+
+.logged_out_message {
+  display: flex;
+  width: 100%;
+  min-height: 132px;
+  box-sizing: border-box;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-40) var(--spacing-16);
+  border-radius: var(--border-radius-8);
+  background-color: var(--grey-30);
+  gap: var(--spacing-12);
+}
+
+.logged_out_icon {
+  flex-shrink: 0;
+  color: var(--grey-60);
+}
+
+.logged_out_message_text {
+  color: var(--grey-60);
+  text-align: center;
+}

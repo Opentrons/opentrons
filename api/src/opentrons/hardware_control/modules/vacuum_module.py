@@ -3,7 +3,17 @@ from __future__ import annotations
 import asyncio
 import logging
 import math
-from typing import Any, Awaitable, Callable, List, Mapping, Optional, Type, Union
+from typing import (
+    Any,
+    Awaitable,
+    Callable,
+    List,
+    Mapping,
+    Optional,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from typing_extensions import cast
 
@@ -21,7 +31,6 @@ from opentrons.drivers.vacuum_module.driver import (
     VacuumModuleDriver,
 )
 from opentrons.drivers.vacuum_module.errors import (
-    FailedToVent,
     PressureNotReached,
     WasteContainerFull,
     async_gcode_response_to_error,
@@ -75,6 +84,8 @@ _RECOVERABLE_VACUUM_DRIVER_ERRORS: dict[
     PressureNotReached: VacuumModulePressureNotReachedError,
     WasteContainerFull: VacuumModuleWasteFullError,
 }
+
+_T = TypeVar("_T")
 
 POLL_PERIOD = 2.0
 SIMULATING_POLL_PERIOD = POLL_PERIOD / 20.0
@@ -254,6 +265,19 @@ class VacuumModule(mod_abc.AbstractModule):
             if isinstance(exception, driver_error_type):
                 return enumerated_error_type(serial, mode, target, current)
         return VacuumModuleUnknownError(serial, mode, target, current)
+
+    async def _map_err(self, awaitable: Awaitable[_T]) -> _T:
+        """Await driver calls, mapping recoverable driver errors to enumerated errors.
+
+        PE background tasks record failures via FinishTaskAction; associated-command
+        recovery needs enumerated error codes, not raw driver exceptions.
+        """
+        try:
+            return await awaitable
+        except Exception as exc:
+            if isinstance(exc, tuple(_RECOVERABLE_VACUUM_DRIVER_ERRORS)):
+                raise self._to_enumerated_error(exc) from exc
+            raise
 
     async def soft_cleanup(self) -> None:
         """Stop the poller and disconnect the serial driver without notifying pyro."""
@@ -474,8 +498,8 @@ class VacuumModule(mod_abc.AbstractModule):
     async def stop_vacuum(self) -> None:
         """Stop pressure control and the pump; clear software targets."""
         self._profile_stop_requested = True
-        await self._driver.set_vacuum_state(False)
-        await self._driver.set_pump_state(False)
+        await self._map_err(self._driver.set_vacuum_state(False))
+        await self._map_err(self._driver.set_pump_state(False))
         self._reader.reset_pressure_target()
         self._reader.reset_power_target()
 
@@ -484,7 +508,7 @@ class VacuumModule(mod_abc.AbstractModule):
         if must_be_running:
             await self.wait_for_is_running()
         await self.stop_vacuum()
-        await self._driver.set_vent_state(VentState.OPENED)
+        await self.set_vent_state(VentState.OPENED)
 
     async def set_led_state(
         self,
@@ -495,8 +519,10 @@ class VacuumModule(mod_abc.AbstractModule):
         reps: Optional[int] = None,
     ) -> None:
         """Sets the statusbar state."""
-        return await self._driver.set_led(
-            power, color=color, pattern=pattern, duration=duration, reps=reps
+        await self._map_err(
+            self._driver.set_led(
+                power, color=color, pattern=pattern, duration=duration, reps=reps
+            )
         )
 
     def event_listener(self, event: Any) -> None:
@@ -562,10 +588,7 @@ class VacuumModule(mod_abc.AbstractModule):
 
     async def set_vent_state(self, vent_state: VentState) -> None:
         """Open or close the vent."""
-        try:
-            await self._driver.set_vent_state(state=vent_state)
-        except FailedToVent:
-            raise
+        await self._map_err(self._driver.set_vent_state(state=vent_state))
 
     async def set_vacuum_state(
         self,
@@ -580,13 +603,15 @@ class VacuumModule(mod_abc.AbstractModule):
         self._reader.set_operation_mode(VacuumOperationMode.PRESSURE)
         self._reader.reset_power_target()
         self._reader.set_target_pressure(gauge_pressure_mbar)
-        await self._driver.set_vacuum_state(
-            enable_vacuum=enable_vacuum,
-            gauge_pressure_mbar=gauge_pressure_mbar,
-            duration_s=duration_s,
-            timeout_s=timeout_s,
-            rate=rate,
-            vent_after=vent_after,
+        await self._map_err(
+            self._driver.set_vacuum_state(
+                enable_vacuum=enable_vacuum,
+                gauge_pressure_mbar=gauge_pressure_mbar,
+                duration_s=duration_s,
+                timeout_s=timeout_s,
+                rate=rate,
+                vent_after=vent_after,
+            )
         )
 
     async def set_pump_state(
@@ -603,15 +628,17 @@ class VacuumModule(mod_abc.AbstractModule):
         self._reader.set_operation_mode(VacuumOperationMode.POWER)
         self._reader.reset_pressure_target()
         self._reader.set_target_power(duty_cycle)
-        await self._driver.set_vacuum_state(False)
-        await self._driver.set_pump_state(
-            start_pump=start_pump,
-            target_rpm=target_rpm,
-            duty_cycle=duty_cycle,
-            duration_s=duration_s,
-            timeout_s=timeout_s,
-            rate=rate,
-            vent_after=vent_after,
+        await self._map_err(self._driver.set_vacuum_state(False))
+        await self._map_err(
+            self._driver.set_pump_state(
+                start_pump=start_pump,
+                target_rpm=target_rpm,
+                duty_cycle=duty_cycle,
+                duration_s=duration_s,
+                timeout_s=timeout_s,
+                rate=rate,
+                vent_after=vent_after,
+            )
         )
 
     async def _execute_cycle_step(self, step: VacuumModuleStep) -> None:
@@ -731,13 +758,13 @@ class VacuumModule(mod_abc.AbstractModule):
         await self.wait_for_is_running()
         task = self._loop.create_task(self._wait_for_command_duration())
         self.make_cancellable(task)
-        await task
+        await self._map_err(task)
 
     async def wait_for_target(self) -> None:
         await self.wait_for_is_running()
         task = self._loop.create_task(self._wait_for_target())
         self.make_cancellable(task)
-        await task
+        await self._map_err(task)
 
     async def _wait_for_pressure_equalization(self, timeout_s: float) -> None:
         """Poll until chamber pressure has equalized to atmospheric."""
@@ -760,7 +787,7 @@ class VacuumModule(mod_abc.AbstractModule):
         await self.wait_for_is_running()
         task = self._loop.create_task(self._wait_for_pressure_equalization(timeout_s))
         self.make_cancellable(task)
-        await task
+        await self._map_err(task)
 
     async def _wait_for_target(self) -> None:
         if self._reader.operation_mode == VacuumOperationMode.POWER:

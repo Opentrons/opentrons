@@ -6,8 +6,8 @@ import { UpdateSoftware } from '/app/organisms/UpdateRobotSoftware/UpdateSoftwar
 import {
   downloadRobotUpdate,
   getRobotUpdateSession,
-  startRobotUpdate,
 } from '/app/redux/robot-update'
+import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
 import { CheckUpdates } from './CheckUpdates'
 import { ErrorUpdateSoftware } from './ErrorUpdateSoftware'
@@ -36,6 +36,7 @@ export function UpdateRobotSoftware(
   const { localRobot, afterError, beforeCommittingSuccessfulUpdate } = props
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const dispatch = useDispatch<Dispatch>()
+  const { startUpdate } = useRobotUpdateContext()
 
   const session = useSelector(getRobotUpdateSession)
   const {
@@ -53,9 +54,9 @@ export function UpdateRobotSoftware(
     if (!isDownloading) {
       setIsDownloading(true)
       dispatch(downloadRobotUpdate())
-      dispatch(startRobotUpdate(robotName))
+      startUpdate(robotName)
     }
-  }, [dispatch, robotName, isDownloading])
+  }, [dispatch, startUpdate, robotName, isDownloading])
 
   // Display Error screen
   if (sessionError != null) {
