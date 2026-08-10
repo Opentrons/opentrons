@@ -36,6 +36,11 @@ FLEX_LOG_PATHS = [
     "/logs/server.log",
     "/logs/update_server.log",
     "/logs/touchscreen.log",
+    "/logs/kernel.log",
+    "/logs/auth_server.log",
+    "/logs/audit_server.log",
+    "/logs/remote_access.log",
+    "/logs/kernel.log",
 ]
 VERSION_PATH = "/etc/VERSION.json"
 
