@@ -46,6 +46,7 @@ import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/comman
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { RunTimer } from '/app/molecules/RunTimer'
 import { handleTipsAttachedModal } from '/app/organisms/DropTipWizardFlows'
+import { DownloadAuditLogsModal } from '/app/organisms/ODD/DownloadAuditLogsModal'
 import { RunFailedModal } from '/app/organisms/ODD/RunningProtocol'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import {
@@ -64,6 +65,7 @@ import {
   useTrackEvent,
 } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
+import { useIsLogDeleted } from '/app/resources/audit/useIsLogDeleted'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import { useTipAttachmentStatus } from '/app/resources/instruments'
 import {
@@ -203,7 +205,7 @@ export function RunSummary(): JSX.Element {
     data: accessControlSettings,
     isLoading: isAccessControlSettingsLoading,
   } = useGetRobotServerAccessControlSettingsQuery()
-  const isSigningSettingsLoading =
+  const isSettingsLoading =
     isAccessControlEnabledLoading || isAccessControlSettingsLoading
   const isSigningRequired =
     (accessControlEnabled?.data.accessControlEnabled ?? false) &&
@@ -214,9 +216,25 @@ export function RunSummary(): JSX.Element {
   // while signedBy is still missing from the refetch.
   const shouldPromptSignRun =
     !isRunRecordLoading &&
-    !isSigningSettingsLoading &&
+    !isSettingsLoading &&
     isSigningRequired &&
     !hasSignedBy
+
+  const logPeriodId = runRecord?.data.logPeriodId ?? null
+  const { isLoading: isLogDeletedLoading, isDeleted: isLogDeleted } =
+    useIsLogDeleted(logPeriodId ?? '')
+
+  const isDownloadingRequired =
+    ((accessControlEnabled?.data.accessControlEnabled ?? false) &&
+      accessControlSettings?.data.requireLogsToBeSavedInApp) ??
+    false
+  const shouldPromptDownloadLog =
+    !isRunRecordLoading &&
+    !isSettingsLoading &&
+    isDownloadingRequired &&
+    !shouldPromptSignRun &&
+    !isLogDeletedLoading &&
+    !isLogDeleted
 
   let headerText: string | null = null
   if (runStatus === RUN_STATUS_SUCCEEDED) {
@@ -404,6 +422,10 @@ export function RunSummary(): JSX.Element {
 
   if (shouldPromptSignRun && !showSplash) {
     return <SignRun runId={runId} />
+  }
+
+  if (shouldPromptDownloadLog && !showSplash) {
+    return <DownloadAuditLogsModal />
   }
 
   return (

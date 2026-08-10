@@ -489,9 +489,7 @@ class RunOrchestratorStore:
 
         run_data = self.run_coordinator.get_state_summary()
 
-        await self._run_process_pyro_provider.refresh(
-            access_control_mode=self._access_control_mode
-        )
+        self._run_process_pyro_provider.set_active_process_as_used()
 
         self._run_coordinator = None
 

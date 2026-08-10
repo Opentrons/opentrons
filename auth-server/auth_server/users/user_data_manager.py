@@ -143,27 +143,6 @@ class UserDataManager:
             resetPassword=must_reset_password(user, now, settings.passwordResetTime),
         )
 
-    def seed_initial_users(self) -> None:
-        """Insert default placeholder users if they don't already exist."""
-        now = datetime.datetime.now(tz=datetime.UTC)
-        defaults = [
-            User(
-                username="testadmin",
-                hashed_password=password_hash.hash("testadminpassword"),
-                full_name="Test Admin",
-                account_type=AccountType.ADMIN,
-                password_set_at=now,
-            ),
-            User(
-                username="testuser",
-                hashed_password=password_hash.hash("testuserpassword"),
-                full_name="Test User",
-                account_type=AccountType.USER,
-                password_set_at=now,
-            ),
-        ]
-        self._user_store.seed(defaults)
-
     def create_user(
         self,
         username: str,
@@ -263,9 +242,11 @@ class UserDataManager:
             updated_user = self._user_store.update(
                 username_to_update,
                 new_username=new_username,
-                hashed_password=password_hash.hash(new_password)
-                if new_password is not None
-                else None,
+                hashed_password=(
+                    password_hash.hash(new_password)
+                    if new_password is not None
+                    else None
+                ),
                 full_name=new_full_name,
                 account_type=new_account_type,
                 reset_password=reset_password,

@@ -24,17 +24,6 @@ class UserStore:
     def _session(self) -> Session:
         return self._session_factory()
 
-    def seed(self, users: list[User]) -> None:
-        """Insert users that don't already exist (matched by username)."""
-        with self._session() as session:
-            for user in users:
-                existing = session.scalar(
-                    select(User).where(User.username == user.username)
-                )
-                if existing is None:
-                    session.add(user)
-            session.commit()
-
     def get(self, username: str) -> User | None:
         """Look up a user by username. Returns the User or None."""
         with self._session() as session:

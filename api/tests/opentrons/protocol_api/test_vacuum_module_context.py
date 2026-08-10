@@ -179,7 +179,7 @@ def test_vacuum_module_move_to_dock(
         mock_protocol_core.move_labware(
             labware_core=mock_labware_core,
             new_location=subject.manifold_dock,
-            use_gripper=False,
+            use_gripper=True,
             pause_for_manual_move=True,
             pick_up_offset=None,
             drop_offset=None,

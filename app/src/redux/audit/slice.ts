@@ -1,6 +1,7 @@
-/** The Redux slice for audit log period download and delete status. */
+/** The Redux slice for audit log period download status. */
 
 import { createSlice } from '@reduxjs/toolkit'
+import omit from 'lodash/omit'
 
 import { type ActionTypesFromSlice } from '../ActionTypesFromSlice'
 import { DOWNLOAD_AUDIT_LOG, DOWNLOAD_AUDIT_LOGS } from './constants'
@@ -9,25 +10,22 @@ import type { PayloadAction } from '@reduxjs/toolkit'
 import type { LogPeriodSummary } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 
-export type LogPeriodDownloadDeleteStatus =
+export type LogPeriodDownloadStatus =
   | { status: 'download-pending' }
   | { status: 'download-success'; deletionKey: string }
   | { status: 'download-failure'; error: string }
-  | { status: 'delete-pending' }
-  | { status: 'delete-success' }
-  | { status: 'delete-failure'; error: string }
 
 export interface AuditState {
   /**
-   * Download/delete lifecycle for a log period, keyed by logPeriodId.
+   * Download lifecycle for a log period, keyed by logPeriodId.
    */
-  logPeriodDownloadDeleteStatusById: {
-    [logPeriodId: string]: LogPeriodDownloadDeleteStatus
+  logPeriodDownloadStatusById: {
+    [logPeriodId: string]: LogPeriodDownloadStatus
   }
 }
 
 export const INITIAL_AUDIT_STATE: AuditState = {
-  logPeriodDownloadDeleteStatusById: {},
+  logPeriodDownloadStatusById: {},
 }
 
 interface LogPeriodIdPayload {
@@ -53,7 +51,7 @@ const auditSlice = createSlice({
       action: PayloadAction<LogPeriodDownloadSucceededPayload>
     ) => {
       const { logPeriodId, deletionKey } = action.payload
-      stateDraft.logPeriodDownloadDeleteStatusById[logPeriodId] = {
+      stateDraft.logPeriodDownloadStatusById[logPeriodId] = {
         status: 'download-success',
         deletionKey,
       }
@@ -63,7 +61,7 @@ const auditSlice = createSlice({
       action: PayloadAction<LogPeriodFailedPayload>
     ) => {
       const { logPeriodId, error } = action.payload
-      stateDraft.logPeriodDownloadDeleteStatusById[logPeriodId] = {
+      stateDraft.logPeriodDownloadStatusById[logPeriodId] = {
         status: 'download-failure',
         error,
       }
@@ -73,38 +71,20 @@ const auditSlice = createSlice({
       action: PayloadAction<LogPeriodIdPayload>
     ) => {
       const { logPeriodId } = action.payload
-      stateDraft.logPeriodDownloadDeleteStatusById[logPeriodId] = {
+      stateDraft.logPeriodDownloadStatusById[logPeriodId] = {
         status: 'download-failure',
         error: 'download canceled by user',
       }
     },
-    logPeriodDeletePending: (
+    logPeriodDeleteStarted: (
       stateDraft,
       action: PayloadAction<LogPeriodIdPayload>
     ) => {
-      stateDraft.logPeriodDownloadDeleteStatusById[action.payload.logPeriodId] =
-        {
-          status: 'delete-pending',
-        }
-    },
-    logPeriodDeleteSucceeded: (
-      stateDraft,
-      action: PayloadAction<LogPeriodIdPayload>
-    ) => {
-      stateDraft.logPeriodDownloadDeleteStatusById[action.payload.logPeriodId] =
-        {
-          status: 'delete-success',
-        }
-    },
-    logPeriodDeleteFailed: (
-      stateDraft,
-      action: PayloadAction<LogPeriodFailedPayload>
-    ) => {
-      const { logPeriodId, error } = action.payload
-      stateDraft.logPeriodDownloadDeleteStatusById[logPeriodId] = {
-        status: 'delete-failure',
-        error,
-      }
+      const { logPeriodId } = action.payload
+      stateDraft.logPeriodDownloadStatusById = omit(
+        stateDraft.logPeriodDownloadStatusById,
+        logPeriodId
+      )
     },
   },
   extraReducers: builder => {
@@ -116,9 +96,7 @@ const auditSlice = createSlice({
         payload: { logPeriodId: string }
       } => action.type === DOWNLOAD_AUDIT_LOG,
       (stateDraft, action) => {
-        stateDraft.logPeriodDownloadDeleteStatusById[
-          action.payload.logPeriodId
-        ] = {
+        stateDraft.logPeriodDownloadStatusById[action.payload.logPeriodId] = {
           status: 'download-pending',
         }
       }
@@ -132,7 +110,7 @@ const auditSlice = createSlice({
       } => action.type === DOWNLOAD_AUDIT_LOGS,
       (stateDraft, action) => {
         action.payload.logPeriodSummaries.forEach(logPeriodSummary => {
-          stateDraft.logPeriodDownloadDeleteStatusById[logPeriodSummary.id] = {
+          stateDraft.logPeriodDownloadStatusById[logPeriodSummary.id] = {
             status: 'download-pending',
           }
         })
@@ -147,24 +125,22 @@ export const {
   logPeriodDownloadSucceeded,
   logPeriodDownloadFailed,
   logPeriodDownloadCanceled,
-  logPeriodDeletePending,
-  logPeriodDeleteSucceeded,
-  logPeriodDeleteFailed,
+  logPeriodDeleteStarted,
 } = auditSlice.actions
 
 export type AuditSliceAction = ActionTypesFromSlice<typeof auditSlice.actions>
 
-export function getLogPeriodDownloadDeleteStatusById(
+export function getLogPeriodDownloadStatusById(
   state: State
-): AuditState['logPeriodDownloadDeleteStatusById'] {
-  return state.audit.logPeriodDownloadDeleteStatusById
+): AuditState['logPeriodDownloadStatusById'] {
+  return state.audit.logPeriodDownloadStatusById
 }
 
-export function getLogPeriodDownloadDeleteStatus(
+export function getLogPeriodDownloadStatus(
   state: State,
   logPeriodId: string
-): LogPeriodDownloadDeleteStatus | null {
-  return state.audit.logPeriodDownloadDeleteStatusById[logPeriodId] ?? null
+): LogPeriodDownloadStatus | null {
+  return state.audit.logPeriodDownloadStatusById[logPeriodId] ?? null
 }
 
 /**
@@ -174,17 +150,14 @@ export function getLogPeriodDeletionKey(
   state: State,
   logPeriodId: string
 ): string | null {
-  const status = getLogPeriodDownloadDeleteStatus(state, logPeriodId)
+  const status = getLogPeriodDownloadStatus(state, logPeriodId)
   return status?.status === 'download-success' ? status.deletionKey : null
 }
 
-export function getLogPeriodDownloadDeleteError(
+export function getLogPeriodDownloadError(
   state: State,
   logPeriodId: string
 ): string | null {
-  const status = getLogPeriodDownloadDeleteStatus(state, logPeriodId)
-  return status?.status === 'download-failure' ||
-    status?.status === 'delete-failure'
-    ? status.error
-    : null
+  const status = getLogPeriodDownloadStatus(state, logPeriodId)
+  return status?.status === 'download-failure' ? status.error : null
 }
