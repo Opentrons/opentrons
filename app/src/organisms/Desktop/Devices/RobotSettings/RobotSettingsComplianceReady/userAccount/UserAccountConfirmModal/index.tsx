@@ -2,7 +2,10 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Modal,
+  COLORS,
+  Icon,
+  ModalHeader,
+  ModalShell,
   PrimaryButton,
   SecondaryButton,
   StyledText,
@@ -10,7 +13,7 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 
-import styles from './userAccountForm.module.css'
+import styles from './useraccountconfirmmodal.module.css'
 
 import type { JSX } from 'react'
 
@@ -36,10 +39,17 @@ export function UserAccountConfirmModal({
   const { t } = useTranslation('shared')
 
   return createPortal(
-    <Modal type="warning" title={title} onClose={onCancel}>
-      <div className={styles.form_fields}>
-        <StyledText desktopStyle="headingSmallBold">{heading}</StyledText>
-        <StyledText desktopStyle="bodyDefaultRegular">{description}</StyledText>
+    <ModalShell width="37.125rem" header={<ModalHeader title={title} />}>
+      <div className={styles.content}>
+        <div className={styles.content_body}>
+          <Icon name="ot-alert" size="2.5rem" color={COLORS.yellow50} />
+          <div className={styles.body_text}>
+            <StyledText desktopStyle="headingSmallBold">{heading}</StyledText>
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {description}
+            </StyledText>
+          </div>
+        </div>
         <div className={styles.actions}>
           <SecondaryButton type="button" onClick={onCancel}>
             {t('cancel') as string}
@@ -53,7 +63,7 @@ export function UserAccountConfirmModal({
           </PrimaryButton>
         </div>
       </div>
-    </Modal>,
+    </ModalShell>,
     getTopPortalEl()
   )
 }
