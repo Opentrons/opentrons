@@ -72,6 +72,7 @@ export interface LegacyGoodRunData {
   labwareOffsets?: LabwareOffset[]
   cameraSettings?: CameraData
   signedBy?: string
+  logPeriodId?: string
 }
 
 export interface KnownGoodRunData extends LegacyGoodRunData {

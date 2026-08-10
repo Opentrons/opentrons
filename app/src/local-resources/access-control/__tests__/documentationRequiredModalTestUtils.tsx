@@ -16,6 +16,10 @@ export const mockShowLoginModal: () => Promise<{ username: string } | null> =
 export const mockShowSignRunModal: () => Promise<boolean> =
   vi.fn<() => Promise<boolean>>()
 
+export const mockShowDownloadLogsModal: (
+  logPeriodId: string
+) => Promise<boolean> = vi.fn<(logPeriodId: string) => Promise<boolean>>()
+
 export const DocumentationRequiredModalTestProvider: FunctionComponent<{
   children: ReactNode
 }> = ({ children }) => (
@@ -24,6 +28,7 @@ export const DocumentationRequiredModalTestProvider: FunctionComponent<{
       showDocumentationRequiredModal: mockShowDocumentationRequiredModal,
       showLoginModal: mockShowLoginModal,
       showSignRunModal: mockShowSignRunModal,
+      showDownloadLogsModal: mockShowDownloadLogsModal,
     }}
   >
     {children}

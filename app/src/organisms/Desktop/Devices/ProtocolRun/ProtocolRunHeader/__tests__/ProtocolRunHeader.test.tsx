@@ -37,6 +37,12 @@ vi.mock('react-router-dom')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/runs')
+vi.mock('/app/resources/runs/useIsDownloadAuditLogsRequired', () => ({
+  useIsDownloadAuditLogsRequired: () => ({
+    isRequired: false,
+    isLoading: false,
+  }),
+}))
 vi.mock('/app/redux/protocol-runs')
 vi.mock('../RunHeaderModalContainer')
 vi.mock('../RunHeaderBannerContainer')

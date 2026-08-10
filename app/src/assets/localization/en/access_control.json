@@ -12,6 +12,8 @@
   "desktop_password_expired_new_password_field": "New password",
   "desktop_password_expired_subheading": "Create a new password to use",
   "documentation_required": "Documentation Required",
+  "download_audit_logs": "Download audit logs",
+  "download_audit_logs_description": "Audit logs are not saved to the robot and must be downloaded locally before continuing. Once this session ends, the data cannot be recovered.",
   "forgot_password_heading": "Forgot password?",
   "forgot_password_link": "Forgot password?",
   "forgot_password_subheading": "Log in to an admin account to reset the password for your account.",

@@ -9,6 +9,8 @@ import { useNotifyRunQuery } from './useNotifyRunQuery'
 export function useIsSigningRequired(): {
   isLoading: boolean
   isSigningRequired: boolean
+  isDownloadingRequired: boolean
+  logPeriodId: string | null
 } {
   const currentRunId = useCurrentRunId()
   const { data: runRecord, isLoading: isRunRecordLoading } =
@@ -32,5 +34,9 @@ export function useIsSigningRequired(): {
       isAccessControlEnabledLoading ||
       isAccessControlSettingsLoading,
     isSigningRequired: isSigningRequired && !hasSignedBy,
+    isDownloadingRequired:
+      !!accessControlEnabled?.data.accessControlEnabled &&
+      !!accessControlSettings?.data.requireLogsToBeSavedInApp,
+    logPeriodId: runRecord?.data.logPeriodId ?? null,
   }
 }

@@ -3,15 +3,12 @@ import { useDispatch, useStore } from 'react-redux'
 
 import { useHost } from '@opentrons/react-api-client'
 
-import {
-  downloadAuditLogs,
-  getLogPeriodDownloadDeleteStatus,
-} from '/app/redux/audit'
+import { downloadAuditLogs, getLogPeriodDownloadStatus } from '/app/redux/audit'
 import { waitForStoreCondition } from '/app/redux/waitForStoreCondition'
 
 import type { UseMutationResult } from 'react-query'
 import type { LogPeriodSummary } from '@opentrons/api-client'
-import type { LogPeriodDownloadDeleteStatus } from '/app/redux/audit'
+import type { LogPeriodDownloadStatus } from '/app/redux/audit'
 import type { Dispatch, State } from '/app/redux/types'
 
 export interface DownloadedLogPeriod {
@@ -57,14 +54,13 @@ export function useDownloadSelectedLogPeriods(
 
     const results = await Promise.all(
       logPeriods.map(async logPeriod => {
-        const status =
-          await waitForStoreCondition<LogPeriodDownloadDeleteStatus>(
-            store,
-            state => getLogPeriodDownloadDeleteStatus(state, logPeriod.id),
-            downloadStatus =>
-              downloadStatus.status === 'download-success' ||
-              downloadStatus.status === 'download-failure'
-          )
+        const status = await waitForStoreCondition<LogPeriodDownloadStatus>(
+          store,
+          state => getLogPeriodDownloadStatus(state, logPeriod.id),
+          downloadStatus =>
+            downloadStatus.status === 'download-success' ||
+            downloadStatus.status === 'download-failure'
+        )
         return { logPeriod, status }
       })
     )
