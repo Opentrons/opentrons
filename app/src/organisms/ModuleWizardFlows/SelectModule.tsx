@@ -74,18 +74,20 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
   // it follows that some modules need setup but cannot be set up. in that case we want
   // a warning
   const hasUnsetupabbleModules = allNeedingSetup.length > allSetupable.length
-  const unsetupableModulesWarning = (() => {
-    if (hasUnsetupabbleModules) {
-      if (getCalibratedPipetteForModuleSetup(attachedPipettes)) {
-        return null
-      }
+  let unsetupableModulesWarning: string | null = null
+  if (hasUnsetupabbleModules) {
+    if (getCalibratedPipetteForModuleSetup(attachedPipettes) == null) {
       if (attachedPipettes.left != null || attachedPipettes.right != null) {
-        return t('calibrate_a_pipette_to_set_up_more_modules')
+        unsetupableModulesWarning = t(
+          'calibrate_a_pipette_to_set_up_more_modules'
+        )
+      } else {
+        unsetupableModulesWarning = t(
+          'connect_a_pipette_to_set_up_more_modules'
+        )
       }
-      return t('connect_a_pipette_to_set_up_more_modules')
     }
-    return null
-  })()
+  }
   // And our special short-circuit flows where we never show a menu if there's only one
   // entry should be avoided if we have that warning
   const isSingleModule = newModules.length === 1 && !hasUnsetupabbleModules
