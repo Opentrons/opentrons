@@ -62,7 +62,7 @@ async def _build_api(use_simulator: bool) -> ThreadManager[OT3API]:
     return tm
 
 
-async def build_and_run_hwc_pyro(simulate: bool) -> None:
+async def build_and_run_hwc_pyro(simulate: bool, broadcast_mode: bool) -> None:
     """Build an instance of the OT3API and provide it to the Pyro Daemon Factory as a resource"""
     robot_conf = robot_configs.load()
     logging_config.log_init(robot_conf.log_level)
@@ -76,7 +76,7 @@ async def build_and_run_hwc_pyro(simulate: bool) -> None:
     def _daemon_request_loop(pyroname: str, resource: Any, registry: Any) -> None:
         # todo(chb: 2026-02-18): For the PYRONAMEs registered with the nameserver, do we want them to live in a centralized location (shared-data)?
         log.info("Creating Pyro Daemon for OT3API")
-        create_pyro_daemon(pyroname=pyroname, resource=resource, registry=registry)
+        create_pyro_daemon(pyroname=pyroname, resource=resource, registry=registry, broadcast_mode=broadcast_mode)
 
     daemon_request_thread = threading.Thread(
         target=_daemon_request_loop,
@@ -122,4 +122,10 @@ if __name__ == "__main__":
         default=False,
         help="Flag to determine if the process should run with a hardware simulator or active hardware.",
     )
-    asyncio.run(build_and_run_hwc_pyro(parser.parse_args().simulate))
+    parser.add_argument(
+        "--broadcast",
+        required=False,
+        default=False,
+        help="Flag to determine if the process should run in broadcast mode, looking for a Nameserver on the network.",
+    )
+    asyncio.run(build_and_run_hwc_pyro(parser.parse_args().simulate, parser.parse_args().broadcast))

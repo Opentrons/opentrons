@@ -16,7 +16,7 @@ from opentrons.util.pyro.pyro_synchronous_adapter import (
 log = logging.getLogger(__name__)
 
 
-def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable) -> None:  # type: ignore
+def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable, broadcast_mode: Optional[bool] = False) -> None:  # type: ignore
     """Function to create a Pyro Daemon request loop servicing a given resource.
 
     Registers the resource with the NameServer at the given PyroName.
@@ -33,12 +33,12 @@ def create_pyro_daemon(pyroname: str, resource: Any, registry: Callable) -> None
         pyro_object = PyroSynchronousObject(core_obj=resource, utility=utility)
         utility.add_PSO(pyro_object)
         try:
-            with pyro.locate_ns() as ns:
+            with pyro.locate_ns(broadcast=broadcast_mode) as ns:
                 # Register our objects URI with the system nameserver
                 try:
                     ns.register(pyroname, daemon.uriFor(pyro_object))
                     log.info(
-                        f"Pyro5 Dameon available: pyroname={pyroname} uri={daemon.uriFor(pyro_object)}"
+                        f"Pyro5 Daemon available: pyroname={pyroname} uri={daemon.uriFor(pyro_object)}"
                     )
 
                     # Maintain a request loop to handle requests on our resource instance from remote processes
