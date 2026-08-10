@@ -7,7 +7,7 @@
   gap: var(--spacing-24);
 }
 
-.body {
+.content_body {
   display: flex;
   width: 100%;
   flex-direction: column;

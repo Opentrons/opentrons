@@ -41,7 +41,7 @@ export function UserAccountConfirmModal({
   return createPortal(
     <ModalShell width="37.125rem" header={<ModalHeader title={title} />}>
       <div className={styles.content}>
-        <div className={styles.body}>
+        <div className={styles.content_body}>
           <Icon name="ot-alert" size="2.5rem" color={COLORS.yellow50} />
           <div className={styles.body_text}>
             <StyledText desktopStyle="headingSmallBold">{heading}</StyledText>
