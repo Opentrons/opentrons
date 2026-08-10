@@ -4,11 +4,12 @@ import {
 } from '@opentrons/shared-data'
 
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { useAttachedPipettes } from '/app/resources/instruments'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { useAttachedModules } from '/app/resources/modules'
 
 import type { AttachedModule } from '@opentrons/api-client'
 import type { ModuleType } from '@opentrons/shared-data'
+import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 
 const MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP: ModuleType[] = [
   ABSORBANCE_READER_TYPE,
@@ -18,6 +19,15 @@ const MODULES_NOT_REQUIRING_CALIBRATION =
   MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP
 const ATTACHED_MODULE_POLL_MS = 5000
 const DECK_CONFIG_POLL_MS = 5000
+
+export function hasCalibratedPipetteForModuleSetup(
+  attachedPipettes: AttachedPipettesFromInstrumentsQuery
+): boolean {
+  return (
+    attachedPipettes.left?.data.calibratedOffset?.last_modified != null ||
+    attachedPipettes.right?.data.calibratedOffset?.last_modified != null
+  )
+}
 
 export function useGetModulesNeedingSetup(): AttachedModule[] {
   const attachedModules =
@@ -45,11 +55,12 @@ export function useGetModulesNeedingSetup(): AttachedModule[] {
 
 export function useGetModulesNeedingSetupThatCanCurrentlyBeSetUp(): AttachedModule[] {
   const modulesRequiringSetup = useGetModulesNeedingSetup()
-  const attachedPipettes = useAttachedPipettes(modulesRequiringSetup.length > 0)
+  const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
+  const hasCalibratedPipette =
+    hasCalibratedPipetteForModuleSetup(attachedPipettes)
   return modulesRequiringSetup.filter(
     m =>
       MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP.includes(m.moduleType) ||
-      attachedPipettes.left != null ||
-      attachedPipettes.right != null
+      hasCalibratedPipette
   )
 }

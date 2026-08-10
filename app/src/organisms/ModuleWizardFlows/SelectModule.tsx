@@ -27,6 +27,7 @@ import {
   SimpleWizardBody,
   SimpleWizardBodyContainer,
 } from '/app/molecules/SimpleWizardBody'
+import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 
 import type { AttachedModule } from '@opentrons/api-client'
 import type { SendIdentifyModule } from './types'
@@ -65,12 +66,20 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
   // Every module that needs setup, but not all are guaranteed to be able to be set up
   // right now (e.g. because they need calibration but we don't have a pipette)
   const allNeedingSetup = useGetModulesNeedingSetup()
+  const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
+  const hasAnyAttachedPipette =
+    attachedPipettes.left != null || attachedPipettes.right != null
   const newModules =
     attachedModuleOnLaunch == null ? allSetupable : [attachedModuleOnLaunch]
   // if there are more modules that need setup than modules that can be set up, then
   // it follows that some modules need setup but cannot be set up. in that case we want
   // a warning
   const hasUnsetupabbleModules = allNeedingSetup.length > allSetupable.length
+  const unsetupableModulesWarning = !hasUnsetupabbleModules
+    ? null
+    : hasAnyAttachedPipette
+      ? t('calibrate_a_pipette_to_set_up_more_modules')
+      : t('connect_a_pipette_to_set_up_more_modules')
   // And our special short-circuit flows where we never show a menu if there's only one
   // entry should be avoided if we have that warning
   const isSingleModule = newModules.length === 1 && !hasUnsetupabbleModules
@@ -186,11 +195,7 @@ export function SelectModule(props: SelectModuleProps): JSX.Element | null {
             onSelect={event => {
               handleModuleSelected(event.target.value)
             }}
-            subText={
-              hasUnsetupabbleModules
-                ? t('connect_a_pipette_to_set_up_more_modules')
-                : null
-            }
+            subText={unsetupableModulesWarning}
             scroll={true}
           />
         </Flex>

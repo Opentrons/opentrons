@@ -93,7 +93,9 @@ export function useModuleSetupWizard(
   const attachedPipette =
     attachedPipettes.left?.data.calibratedOffset?.last_modified != null
       ? attachedPipettes.left
-      : attachedPipettes.right
+      : attachedPipettes.right?.data.calibratedOffset?.last_modified != null
+        ? attachedPipettes.right
+        : null
 
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
