@@ -38,8 +38,10 @@ def get_scope_set_of_account_type(
         elif account_type == AccountType.USER:
             result = {
                 Scope.RESTART_WRITE,
+                Scope.SHUTDOWN_WRITE,
                 Scope.ROBOT_CONTROL_WRITE,
                 Scope.ROBOT_SETTINGS_WRITE,
+                Scope.RUN_DATA_WRITE,
                 Scope.USERS_READ_SELF,
                 Scope.USERS_WRITE_SELF,
                 Scope.AUDIT_LOG_WRITE,
