@@ -114,11 +114,6 @@ async def post_users(
             fastapi.status.HTTP_400_BAD_REQUEST,
             _build_password_missing_special_characters_error(e),
         ) from e
-    except PasswordPreviouslyUsedError as e:
-        raise APIError(
-            fastapi.status.HTTP_400_BAD_REQUEST,
-            _build_password_previously_used_error(e),
-        ) from e
     except InvalidInputError as e:
         # todo(mm, 2026-06-24): Convert this to a more structured error response.
         raise fastapi.HTTPException(
@@ -394,7 +389,7 @@ async def get_self(  # noqa: D103
         fastapi.status.HTTP_401_UNAUTHORIZED: {},
     },
 )
-async def update_self(
+async def update_self(  # noqa: C901
     request_body: RequestModel[UpdateSelf],
     authentication: Annotated[
         RequireAuthenticationResult, fastapi.Depends(require_authentication)

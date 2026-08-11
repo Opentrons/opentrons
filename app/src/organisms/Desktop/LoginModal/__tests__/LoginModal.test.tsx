@@ -279,6 +279,8 @@ describe('LoginModal', () => {
 
     expect(submitNewPassword).toHaveBeenCalledWith('alice', 'new-password')
     expect(storeLoginState).toHaveBeenCalledTimes(1)
+    screen.getByText('Password reset for alice')
+    screen.getByTestId('Toast_success')
     screen.getByText('Compliance Ready Software Login')
     expect(screen.getByLabelText('Username')).toHaveValue('alice')
     expect(screen.getByLabelText('Password')).toHaveValue('')

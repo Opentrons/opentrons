@@ -119,6 +119,30 @@ describe('useSetNewPasswordAndSignIn', () => {
     expect(onSuccess).not.toHaveBeenCalled()
   })
 
+  it('reports when the password matches the current password', async () => {
+    mockUpdateSelf.mockRejectedValue({
+      isAxiosError: true,
+      response: {
+        data: {
+          errors: [{ id: 'passwordPreviouslyUsed' }],
+        },
+      },
+    })
+
+    const { result } = renderHook(() =>
+      useSetNewPasswordAndSignIn({ onSuccess, onError })
+    )
+
+    act(() => {
+      result.current.submitNewPassword('alice', 'same-as-current')
+    })
+
+    await waitFor(() => {
+      expect(onError).toHaveBeenCalledWith('desktop_password_previously_used')
+    })
+    expect(onSuccess).not.toHaveBeenCalled()
+  })
+
   it('reports when the password is missing a special character', async () => {
     mockUpdateSelf.mockRejectedValue({
       isAxiosError: true,
