@@ -1,6 +1,7 @@
 import { useId, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import {
@@ -16,6 +17,7 @@ import { useHost } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
+import { logOut } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
@@ -115,6 +117,7 @@ interface LoginModalImplProps {
 function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const { robotName, uncloseable } = props
   const modal = useModal()
+  const dispatch = useDispatch()
   const host = useHost()
   const { t } = useTranslation()
   const [screen, setScreen] = useState<LoginModalScreen>({
@@ -160,8 +163,15 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
     useSetNewPasswordAndSignIn({
       onSuccess: successfulUsername => {
-        modal.resolve({ username: successfulUsername })
-        modal.remove()
+        dispatch(logOut({ robotName }))
+        setScreen({
+          kind: 'login',
+          formData: {
+            username: successfulUsername,
+            logInPassword: '',
+            error: null,
+          },
+        })
       },
       onError: message => {
         updateSetNewPasswordFormData(setScreen, { error: message })

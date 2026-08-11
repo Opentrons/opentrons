@@ -4,7 +4,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useSetNewPasswordAndSignIn } from '../useSetNewPasswordAndSignIn'
 
 const mockUpdateSelf = vi.fn()
-const mockGetOAuth2Token = vi.fn()
 const mockUseHost = vi.fn()
 
 vi.mock('@opentrons/api-client', async importOriginal => {
@@ -12,7 +11,6 @@ vi.mock('@opentrons/api-client', async importOriginal => {
   return {
     ...actual,
     updateSelf: (...args: unknown[]) => mockUpdateSelf(...args),
-    getOAuth2Token: (...args: unknown[]) => mockGetOAuth2Token(...args),
   }
 })
 
@@ -37,7 +35,6 @@ describe('useSetNewPasswordAndSignIn', () => {
 
   beforeEach(() => {
     mockUpdateSelf.mockReset()
-    mockGetOAuth2Token.mockReset()
     onSuccess.mockReset()
     onError.mockReset()
     mockUseHost.mockReturnValue(host)
@@ -50,16 +47,9 @@ describe('useSetNewPasswordAndSignIn', () => {
         resetPassword: false,
       },
     })
-    mockGetOAuth2Token.mockResolvedValue({
-      data: {
-        token_type: 'Bearer',
-        access_token: 'new-access-token',
-        refresh_token: 'new-refresh-token',
-      },
-    })
   })
 
-  it('patches self then signs in with the new password', async () => {
+  it('patches self with the new password', async () => {
     const { result } = renderHook(() =>
       useSetNewPasswordAndSignIn({ onSuccess, onError })
     )
@@ -77,18 +67,8 @@ describe('useSetNewPasswordAndSignIn', () => {
         ''
       )
     })
-    expect(mockGetOAuth2Token).toHaveBeenCalledWith(host, {
-      grant_type: 'password',
-      username: 'alice',
-      password: 'new-secret',
-      client_id: 'opentrons_app',
-    })
     await waitFor(() => {
-      expect(onSuccess).toHaveBeenCalledWith('alice', {
-        token_type: 'Bearer',
-        access_token: 'new-access-token',
-        refresh_token: 'new-refresh-token',
-      })
+      expect(onSuccess).toHaveBeenCalledWith('alice')
     })
     expect(onError).not.toHaveBeenCalled()
   })
@@ -104,9 +84,10 @@ describe('useSetNewPasswordAndSignIn', () => {
       result.current.submitNewPassword('alice', 'new-secret')
     })
 
-    expect(onError).toHaveBeenCalledWith('login_error_incorrect')
+    expect(onError).toHaveBeenCalledWith(
+      'set_new_password_error_session_expired'
+    )
     expect(mockUpdateSelf).not.toHaveBeenCalled()
-    expect(mockGetOAuth2Token).not.toHaveBeenCalled()
   })
 
   it('reports failure when patch self request fails', async () => {
@@ -124,23 +105,6 @@ describe('useSetNewPasswordAndSignIn', () => {
       expect(onError).toHaveBeenCalledWith(
         'set_new_password_error_update_failed'
       )
-    })
-    expect(mockGetOAuth2Token).not.toHaveBeenCalled()
-  })
-
-  it('reports failure when sign in request fails', async () => {
-    mockGetOAuth2Token.mockRejectedValue(new Error('network'))
-
-    const { result } = renderHook(() =>
-      useSetNewPasswordAndSignIn({ onSuccess, onError })
-    )
-
-    act(() => {
-      result.current.submitNewPassword('alice', 'new-secret')
-    })
-
-    await waitFor(() => {
-      expect(onError).toHaveBeenCalledWith('login_error_unknown')
     })
     expect(onSuccess).not.toHaveBeenCalled()
   })
