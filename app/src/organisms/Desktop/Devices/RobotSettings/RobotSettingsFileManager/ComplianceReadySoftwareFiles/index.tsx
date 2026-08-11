@@ -175,7 +175,7 @@ export function ComplianceReadySoftwareFiles({
       )}
       <div className={fileManagerStyles.file_management_group}>
         <FileManagementSectionHeader
-          titleText={t('compliance_ready_audit_logs')}
+          titleText={t('audit_logs')}
           showButtons={isSomeSelected || isAllSelected}
           onDownloadSelected={handleDownloadSelected}
           onDeleteSelected={handleClickDeleteSelected}
@@ -207,12 +207,6 @@ export function ComplianceReadySoftwareFiles({
                   className={styles.log_date_col}
                 >
                   {t('log_period_end')}
-                </StyledText>
-                <StyledText
-                  desktopStyle="bodyDefaultRegular"
-                  className={styles.log_status_col}
-                >
-                  {t('status')}
                 </StyledText>
               </div>
             </div>

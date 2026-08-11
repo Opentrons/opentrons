@@ -23,7 +23,7 @@
   flex: 1;
   align-items: center;
   gap: var(--spacing-24);
-  grid-template-columns: 25% 25% 25% 25%;
+  grid-template-columns: 33% 33% 33%;
 }
 
 .log_date_col {
