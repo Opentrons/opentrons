@@ -21,6 +21,7 @@ SETTINGS_ENDPOINT_PATH: typing.Final = "audit/external/settings"
 STORE_ROBOT_LOG_ENDPOINT_PATH = "/audit/internal/storeRobotLog"
 GET_LOGGING_ENABLED_ENDPOINT_PATH = "/audit/internal/loggingEnabled"
 GET_LOG_PERIODS = "/audit/external/logPeriods"
+GET_FILESYSTEM_USAGE = "/audit/external/diskUsage"
 
 _log = logging.getLogger(__name__)
 
@@ -69,6 +70,11 @@ class Client(ABC):
     @abstractmethod
     async def get_current_log_period(self) -> GetLogPeriodsData:
         """Get the current log period, if any."""
+        pass
+
+    @abstractmethod
+    async def get_filesystem_usage_summary(self) -> TotalUsageSummaryData:
+        """Get disk usage from the audit server."""
         pass
 
 
@@ -199,6 +205,15 @@ class LocalHTTPClient(Client):
                 return log_period
         raise NoCurrentLogPeriodError("Could not find a current log period.")
 
+    @typing.override
+    async def get_filesystem_usage_summary(self) -> TotalUsageSummaryData:
+        """Get disk usage from the audit server."""
+        async with self._session.get(GET_FILESYSTEM_USAGE) as response:
+            response_bytes = await response.read()
+        response.raise_for_status()
+        parsed_response = TotalUsageSummaryResponse.model_validate_json(response_bytes)
+        return parsed_response.data
+
 
 class NoOpClient(Client):
     """A client implementation that doesn't actually contact audit-server.
@@ -259,6 +274,14 @@ class NoOpClient(Client):
             startedAt=datetime.now(timezone.utc),
             endedAt=None,
         )
+
+    @typing.override
+    async def get_filesystem_usage_summary(self) -> TotalUsageSummaryData:
+        """Get disk usage from the audit server."""
+        _log.info(
+            "Get filesystem usage summary (audit-server not configured): Returning 0 usage"
+        )
+        return TotalUsageSummaryData(totalUsageBytes=0, totalPeriods=0)
 
 
 class _StrictBaseModel(pydantic.BaseModel):
@@ -373,3 +396,16 @@ class GetLogPeriodsResponseBody(_StrictBaseModel):
     """Response envelope for get log periods."""
 
     data: list[GetLogPeriodsData]
+
+
+class TotalUsageSummaryData(_StrictBaseModel):
+    """Information about disk usage."""
+
+    totalUsageBytes: int
+    totalPeriods: int
+
+
+class TotalUsageSummaryResponse(_StrictBaseModel):
+    """Response envelope for disk usage,."""
+
+    data: TotalUsageSummaryData
