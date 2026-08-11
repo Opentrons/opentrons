@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { updateSelf } from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
 
+import { mapAuthUserMutationError } from '../mapAuthUserMutationError'
+
 import type { TFunction } from 'i18next'
 
 export interface UseSetNewPasswordAndSignInOptions {
@@ -27,7 +29,9 @@ export function useSetNewPasswordAndSignIn(
   options: UseSetNewPasswordAndSignInOptions
 ): UseSetNewPasswordAndSignInResult {
   const { onSuccess, onError } = options
-  const { t } = useTranslation('access_control') as { t: TFunction }
+  const { t } = useTranslation(['access_control', 'device_settings']) as {
+    t: TFunction
+  }
   const host = useHost()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -35,7 +39,11 @@ export function useSetNewPasswordAndSignIn(
     (username: string, password: string): void => {
       if (host == null || host.token == null) {
         console.error('useSetNewPasswordAndSignIn: missing host token')
-        onError(t('set_new_password_error_session_expired') as string)
+        onError(
+          t('set_new_password_error_session_expired', {
+            ns: 'access_control',
+          }) as string
+        )
         return
       }
 
@@ -52,7 +60,17 @@ export function useSetNewPasswordAndSignIn(
             'useSetNewPasswordAndSignIn: failed to update password',
             error
           )
-          onError(t('set_new_password_error_update_failed') as string)
+          const formError = mapAuthUserMutationError<{ password: string }>(
+            error,
+            t
+          )
+          onError(
+            formError?.field === 'password'
+              ? formError.error.message
+              : (t('set_new_password_error_update_failed', {
+                  ns: 'access_control',
+                }) as string)
+          )
         } finally {
           setIsLoading(false)
         }

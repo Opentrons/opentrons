@@ -90,6 +90,32 @@ describe('useSetNewPasswordAndSignIn', () => {
     expect(mockUpdateSelf).not.toHaveBeenCalled()
   })
 
+  it('reports when the password is missing a special character', async () => {
+    mockUpdateSelf.mockRejectedValue({
+      isAxiosError: true,
+      response: {
+        data: {
+          errors: [{ id: 'passwordMissingSpecialCharacters' }],
+        },
+      },
+    })
+
+    const { result } = renderHook(() =>
+      useSetNewPasswordAndSignIn({ onSuccess, onError })
+    )
+
+    act(() => {
+      result.current.submitNewPassword('alice', 'password123')
+    })
+
+    await waitFor(() => {
+      expect(onError).toHaveBeenCalledWith(
+        'desktop_password_missing_special_characters'
+      )
+    })
+    expect(onSuccess).not.toHaveBeenCalled()
+  })
+
   it('reports failure when patch self request fails', async () => {
     mockUpdateSelf.mockRejectedValue(new Error('network'))
 
