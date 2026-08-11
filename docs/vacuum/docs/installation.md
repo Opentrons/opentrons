@@ -52,16 +52,16 @@ The Vacuum Module ships in three separate boxes containing all the components re
 9. Working off-deck, insert the 4 manifold screws from underneath the deck adapter into the vacuum base and hand-tighten them using the supplied 7/64″ L-key.
 
     !!! note
-        - **Pass-through openings:** The clearance openings in the deck adapter are unthreaded. Screws pass through from the bottom of the adapter to thread directly into the vacuum base.
-        - **Imperial fasteners:** Unlike other Flex deck modules that use Metric hardware, the vacuum base uses Imperial fasteners requiring the provided 7/64″ L-key.
+        - **Pass-through openings:** The four holes in the deck adapter are unthreaded. The provided fasteners pass through these holes from the bottom of the adapter and screw into threaded holes in the vacuum base.
+        - **Imperial fasteners:** Unlike other Flex deck modules that use Metric hardware, the vacuum base uses Imperial screws requiring the provided 7/64″ L-key.
 
 10. Press the L-shaped 6 mm (&frac14;") quick connect fitting (and its attached hose) into the exhaust manifold. The quick connect fittings lock into place with an audible click.
 
 11. Run the hose from the exhaust manifold through the notch on the side of the deck plate adapter into the space below the deck. This area keeps cables, tubes, hoses, and other module connections from cluttering the deck.
 
     <figure markdown>
-    ![Deck plate with magnified image of vacuum hose notch](images/deck-plate-notch.png){ width="80%" }
-    <figcaption>Adapter notch provides below-deck access for the vacuum hose.</figcaption>
+    ![Deck plate with magnified image of vacuum hose notch](images/deck-plate-notch.svg)
+    <figcaption>A second notch provides below-deck access for the vacuum hose.</figcaption>
     </figure>
 
 12. Remove a lower cosmetic side panel on the robot and bring the remaining hose section through this opening. From here, you can connect the hose to the waste collection jar.
