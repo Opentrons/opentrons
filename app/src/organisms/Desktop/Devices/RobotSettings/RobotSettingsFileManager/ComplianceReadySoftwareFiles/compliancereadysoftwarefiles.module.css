@@ -37,3 +37,10 @@
   flex: 2;
   align-items: center;
 }
+
+.skeleton_container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
