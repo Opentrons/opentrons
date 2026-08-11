@@ -9,7 +9,7 @@ import pydantic
 class LogPeriodSummary(pydantic.BaseModel):
     """Summary of a single audit log period."""
 
-    id: int = pydantic.Field(
+    id: str = pydantic.Field(
         description=(
             "A monotonically increasing integer that uniquely identifies this log period. "
             "Use this value to reference the period in other API calls. "
@@ -25,7 +25,7 @@ class LogPeriodSummary(pydantic.BaseModel):
 class LogPeriodDetails(pydantic.BaseModel):
     """Detailed information about a single audit log period."""
 
-    id: int = pydantic.Field(
+    id: str = pydantic.Field(
         description=(
             "A monotonically increasing integer that uniquely identifies this log period. "
             "Use this value to reference the period in other API calls. "

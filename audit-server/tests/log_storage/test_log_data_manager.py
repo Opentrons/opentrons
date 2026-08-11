@@ -86,7 +86,7 @@ def test_get_log_period_details(
 ) -> None:
     """It should get aggregate period details from the store."""
     details = LogPeriodDetails(
-        id=1,
+        id="1",
         startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
         endedAt=None,
         recordCount=10,
@@ -895,7 +895,7 @@ def test_create_deletion_key_mints_a_key(
     """It should mint a non-empty deletion key for a completed log period."""
     decoy.when(mock_store.get_period_details("1")).then_return(
         LogPeriodDetails(
-            id=1,
+            id="1",
             startedAt=datetime.now(),
             endedAt=datetime.now(),
             recordCount=10,
@@ -914,7 +914,7 @@ def test_create_deletion_key_mints_distinct_keys(
     """Each call should mint a new, distinct key for the same period."""
     decoy.when(mock_store.get_period_details("1")).then_return(
         LogPeriodDetails(
-            id=1,
+            id="1",
             startedAt=datetime.now(),
             endedAt=datetime.now(),
             recordCount=10,
@@ -934,7 +934,7 @@ def test_create_deletion_key_fails_if_period_is_active(
     """Deletion keys cannot be created for active periods."""
     decoy.when(mock_store.get_period_details("1")).then_return(
         LogPeriodDetails(
-            id=1,
+            id="1",
             startedAt=datetime.now(),
             endedAt=None,
             recordCount=10,
@@ -962,7 +962,7 @@ async def test_delete_log_period_requires_deletion_key(
     period_id = "2"
     decoy.when(mock_store.get_period_details(period_id)).then_return(
         LogPeriodDetails(
-            id=1,
+            id="1",
             startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
             endedAt=datetime(2025, 1, 1, tzinfo=timezone.utc),
             recordCount=10,
@@ -1008,7 +1008,7 @@ async def test_delete_log_period_deletes_log_collateral(
     period_id = "1"
     decoy.when(mock_store.get_period_details(period_id)).then_return(
         LogPeriodDetails(
-            id=1,
+            id="1",
             startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
             endedAt=datetime(2025, 1, 1, tzinfo=timezone.utc),
             recordCount=10,
