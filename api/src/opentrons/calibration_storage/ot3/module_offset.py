@@ -84,6 +84,7 @@ def save_module_calibration(
 def get_module_offset(
     module: ModuleType, module_id: str, slot: Optional[str] = None
 ) -> Optional[v1.ModuleOffsetModel]:
+    """Always read from disk as robot-server and HW process may be separate processes."""
     try:
         module_calibration_filepath = (
             config.get_opentrons_path("module_calibration_dir") / f"{module_id}.json"
@@ -103,7 +104,10 @@ def get_module_offset(
 
 
 def load_all_module_offsets() -> List[v1.ModuleOffsetModel]:
-    """Load all module offsets from the disk."""
+    """Load all module offsets from the disk.
+
+    Always read from disk as robot-server and HW process may be separate processes.
+    """
 
     calibrations: List[v1.ModuleOffsetModel] = []
     files = os.listdir(config.get_opentrons_path("module_calibration_dir"))
