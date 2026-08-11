@@ -67,3 +67,14 @@ class UserLogForExport(pydantic.BaseModel):
     endedAt: Optional[datetime] = pydantic.Field(
         description="The time this period ended, or null if the period is still active."
     )
+
+
+class TotalUsageSummary(pydantic.BaseModel):
+    """Information about disk usage."""
+
+    totalUsageBytes: int = pydantic.Field(
+        description="Approximate total size in bytes of all log periods and attached log files."
+    )
+    totalPeriods: int = pydantic.Field(
+        description="Number of stored log periods, including the current."
+    )
