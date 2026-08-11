@@ -90,6 +90,35 @@ describe('useSetNewPasswordAndSignIn', () => {
     expect(mockUpdateSelf).not.toHaveBeenCalled()
   })
 
+  it('reports when the password is too short', async () => {
+    mockUpdateSelf.mockRejectedValue({
+      isAxiosError: true,
+      response: {
+        data: {
+          errors: [
+            {
+              id: 'passwordTooShort',
+              meta: { requiredLength: 8, actualLength: 5 },
+            },
+          ],
+        },
+      },
+    })
+
+    const { result } = renderHook(() =>
+      useSetNewPasswordAndSignIn({ onSuccess, onError })
+    )
+
+    act(() => {
+      result.current.submitNewPassword('alice', 'short')
+    })
+
+    await waitFor(() => {
+      expect(onError).toHaveBeenCalledWith('desktop_password_too_short')
+    })
+    expect(onSuccess).not.toHaveBeenCalled()
+  })
+
   it('reports when the password is missing a special character', async () => {
     mockUpdateSelf.mockRejectedValue({
       isAxiosError: true,

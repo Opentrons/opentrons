@@ -29,7 +29,7 @@ export function useSetNewPasswordAndSignIn(
   options: UseSetNewPasswordAndSignInOptions
 ): UseSetNewPasswordAndSignInResult {
   const { onSuccess, onError } = options
-  const { t } = useTranslation(['access_control', 'device_settings']) as {
+  const { t } = useTranslation(['device_settings', 'access_control']) as {
     t: TFunction
   }
   const host = useHost()
