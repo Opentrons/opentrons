@@ -176,7 +176,7 @@ export function ComplianceReadySoftwareFiles({
     }
   }, [])
 
-  // loading skeleton since log period summary query can take a noticible amount of time
+  // loading skeleton since log period summary query can take a noticeable amount of time
   const skeletonContent = (
     <div className={styles.skeleton_container} ref={observer}>
       <Skeleton width="100%" height="3rem" backgroundSize={`${width}px`} />
