@@ -1203,7 +1203,7 @@ class HeaterShakerContext(ModuleContext):
     @requires_version(2, 27)
     @publish(command=cmds.heater_shaker_set_shake_speed)
     def set_shake_speed(self, rpm: int) -> Task:
-        """Sets the Heater-Shaker's shake speed in RPM and returns a :py:class:`Task` that represents concurrent shaking.
+        """Sets the Heater-Shaker's shake speed in RPM and returns a [`Task`][opentrons.protocol_api.Task] that represents concurrent shaking.
 
         !!! note
             Before shaking, this command will retract the pipettes upward if they are
