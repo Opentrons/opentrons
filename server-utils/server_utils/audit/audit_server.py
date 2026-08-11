@@ -270,7 +270,7 @@ class NoOpClient(Client):
             "Get current log period (audit-server not configured): Returning log period 0"
         )
         return GetLogPeriodsData(
-            id=0,
+            id="0",
             startedAt=datetime.now(timezone.utc),
             endedAt=None,
         )
@@ -387,7 +387,7 @@ class NoCurrentLogPeriodError(BaseException):
 class GetLogPeriodsData(_StrictBaseModel):
     """The payload of a get log periods response."""
 
-    id: int
+    id: str
     startedAt: datetime
     endedAt: datetime | None
 
