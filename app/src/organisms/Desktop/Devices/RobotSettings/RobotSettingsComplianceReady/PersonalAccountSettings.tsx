@@ -92,7 +92,7 @@ export function PersonalAccountSettings({
   const handleCancelEdit = (): void => {
     setIsEditing(false)
   }
-  // TODO: refresh fields when user is logged out
+
   return (
     <div className={styles.container}>
       {loggedInUser == null ? (

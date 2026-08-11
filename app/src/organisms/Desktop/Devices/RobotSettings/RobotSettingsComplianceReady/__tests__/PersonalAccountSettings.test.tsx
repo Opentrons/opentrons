@@ -137,7 +137,7 @@ describe('PersonalAccountSettings', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('does not show the edit button when the user is not logged in', () => {
+  it('shows the logged out message when the user is not logged in', () => {
     renderComponent({
       perRobotAuthStates: {},
       mostRecentRobotName: null,
@@ -149,6 +149,50 @@ describe('PersonalAccountSettings', () => {
     expect(
       screen.queryByRole('button', { name: 'Edit' })
     ).not.toBeInTheDocument()
+    expect(screen.queryByText('alice')).not.toBeInTheDocument()
+  })
+
+  it('shows the logged out message after the session expires', () => {
+    const store = configureStore({
+      reducer: { robotAuth: robotAuthReducer },
+      preloadedState: {
+        robotAuth: {
+          perRobotAuthStates: {
+            [ROBOT_NAME]: MOCK_AUTH_STATE,
+          },
+          mostRecentRobotName: ROBOT_NAME,
+        },
+      },
+    })
+
+    const { rerender } = render(
+      <QueryClientProvider client={new QueryClient()}>
+        <I18nextProvider i18n={i18n}>
+          <Provider store={store}>
+            <PersonalAccountSettings robotName={ROBOT_NAME} />
+          </Provider>
+        </I18nextProvider>
+      </QueryClientProvider>
+    )
+
+    screen.getByText('alice')
+
+    store.dispatch({
+      type: 'robotAuth/timeOutLogin',
+      payload: { robotName: ROBOT_NAME },
+    })
+
+    rerender(
+      <QueryClientProvider client={new QueryClient()}>
+        <I18nextProvider i18n={i18n}>
+          <Provider store={store}>
+            <PersonalAccountSettings robotName={ROBOT_NAME} />
+          </Provider>
+        </I18nextProvider>
+      </QueryClientProvider>
+    )
+
+    screen.getByText('Log in to manage Compliance Ready Software settings')
     expect(screen.queryByText('alice')).not.toBeInTheDocument()
   })
 

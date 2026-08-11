@@ -5,10 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@opentrons/components': link:pack/opentrons-components
-  '@opentrons/shared-data': link:pack/opentrons-shared-data
-  '@opentrons/step-generation': link:pack/opentrons-step-generation
-  '@opentrons/protocol-visualization': link:pack/opentrons-protocol-visualization
+  lodash: 4.18.1
 
 importers:
 
@@ -1359,8 +1356,8 @@ packages:
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
-  lodash@4.17.23:
-    resolution: {integrity: sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==}
+  lodash@4.18.1:
+    resolution: {integrity: sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==}
 
   loglevel-plugin-prefix@0.8.4:
     resolution: {integrity: sha512-WpG9CcFAOjz/FtNht+QJeGpvVl/cdR6P0z6OcXSkr8wFJOsV2GRj2j10JLfjuA4aYkcKCNIEqRGCyTife9R8/g==}
@@ -3121,7 +3118,7 @@ snapshots:
 
   lodash.merge@4.6.2: {}
 
-  lodash@4.17.23:
+  lodash@4.18.1:
     optional: true
 
   loglevel-plugin-prefix@0.8.4: {}
@@ -3431,7 +3428,7 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.29.2
       bluebird: 3.7.2
-      lodash: 4.17.23
+      lodash: 4.18.1
       shell-quote: 1.8.3
       source-map-support: 0.5.21
       which: 2.0.2
