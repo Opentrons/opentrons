@@ -1,7 +1,8 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 
 import { createProtocolAnalysis } from '@opentrons/api-client'
 
+import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
@@ -17,6 +18,7 @@ import type {
   RunTimeParameterFilesCreateData,
   RunTimeParameterValuesCreateData,
 } from '@opentrons/api-client'
+import type { DocumentationState } from '../accessControl'
 
 export interface CreateProtocolAnalysisVariables {
   protocolKey: string
@@ -43,6 +45,7 @@ export type UseCreateProtocolAnalysisMutationOptions = UseMutationOptions<
 >
 
 export function useCreateProtocolAnalysisMutation(
+  documentationState: DocumentationState,
   protocolId: string | null,
   hostOverride?: HostConfig | null,
   options: UseCreateProtocolAnalysisMutationOptions | undefined = {}
@@ -51,26 +54,28 @@ export function useCreateProtocolAnalysisMutation(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const queryClient = useQueryClient()
-  // Protocol analysis endpoint, does not require documentation.
-  // eslint-disable-next-line opentrons/no-direct-use-mutation
-  const mutation = useMutation<
+  const mutation = useDocumentedMutation<
     ProtocolAnalysisSummaryResult,
     AxiosError<ErrorResponse>,
     CreateProtocolAnalysisVariables
   >(
+    documentationState,
+    ['create_protocol_analysis'],
     getQueryKey(host, 'protocols', protocolId, 'analyses'),
-    async ({
-      protocolKey,
-      runTimeParameterValues,
-      runTimeParameterFiles,
-      forceReAnalyze,
-    }) => {
+    async ({ variables, userNotes }) => {
+      const {
+        protocolKey,
+        runTimeParameterValues,
+        runTimeParameterFiles,
+        forceReAnalyze,
+      } = variables
       const response = await createProtocolAnalysis(
         host!,
         protocolKey,
         runTimeParameterValues,
         runTimeParameterFiles,
-        forceReAnalyze
+        forceReAnalyze,
+        userNotes
       )
       // Note: Not awaiting invalidateQueries() to preserve prior behavior.
       // Not sure this is what we actually want.
