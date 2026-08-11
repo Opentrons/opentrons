@@ -21,7 +21,7 @@ The chemical compatibility tables use these ratings:
 
 ## Hoses
 
-The external vacuum hoses are made of Tygon® 2375, a clear, plasticizer-free, non-DEHP flexible tubing. This material is resistant to aqueous solutions, acids, bases, ketones, salts, and alcohols. It is less resistant to aromatic and chlorinated hydrocarbons (e.g., Toluene, Hexane, Methylene Chloride/DCM, Tetrahydrofuran/THF, Ethyl Acetate). Expand table below for specific compatibility ratings.
+The external vacuum hoses are made of Tygon® 2375, a clear, plasticizer-free, non-DEHP flexible tubing. This material is resistant to aqueous solutions, acids, bases, ketones, salts, and alcohols. It is less resistant to aromatic and chlorinated hydrocarbons (e.g., Toluene, Hexane, Methylene Chloride/DCM, Tetrahydrofuran/THF, Ethyl Acetate).
 
 | Chemical/Solvent | Compatibility |
 |----|----|
@@ -43,7 +43,7 @@ The external vacuum hoses are made of Tygon® 2375, a clear, plasticizer-free, n
 
 ## Vacuum base, collars, spacers
 
-These vacuum manifold deck pieces are made of Nylon 6 (PA6). This material is resistant to alkalis, esters, and hydrocarbons. It is less resistant to strong acids (e.g., sulfuric acid, hydrochloric acid) and oxidizing agents. Expand table below for specific compatibility ratings.
+These vacuum manifold deck pieces are made of Nylon 6 (PA6). This material is resistant to alkalis, esters, and hydrocarbons. It is less resistant to strong acids (e.g., sulfuric acid, hydrochloric acid) and oxidizing agents. 
 
 | Chemical/Solvent | Compatibility |
 |---|---|
@@ -67,7 +67,7 @@ These vacuum manifold deck pieces are made of Nylon 6 (PA6). This material is re
 
 ## Gaskets
 
-Manifold gaskets are made of Silicone 3003/20. This material is resistant to aqueous solutions, dilute acids, bases, and alcohols. It is less resistant to concentrated acids, non-polar organic solvents (e.g., Hexane, Toluene), ketones (e.g., Acetone), and strong hydrocarbons. Expand the table below for specific compatibility ratings.
+Manifold gaskets are made of Silicone 3003/20. This material is resistant to aqueous solutions, dilute acids, bases, and alcohols. It is less resistant to concentrated acids, non-polar organic solvents (e.g., Hexane, Toluene), ketones (e.g., Acetone), and strong hydrocarbons.
 
 | Chemical/Solvent | Compatibility |
 |---|---|
@@ -91,4 +91,4 @@ Manifold gaskets are made of Silicone 3003/20. This material is resistant to aqu
 
 ## Quick connect fittings and carboy float
 
-The CPC quick connect/disconnect fittings (excluding o-rings) and the carboy float are made of polypropylene. This material is resistant to aqueous solutions, biological buffers, alcohols (e.g. Ethanol, Isopropanol), along with salts and oxidizing washes. It is less resistant to non-polar organic solvents (e.g., Hexane, Toluene), chlorinated solvents (e.g., Methylene Chloride), and concentrated fuming acids (e.g., concentrated Nitric Acid, Aqua Regia). Expand the table below for specific compatibility ratings.
+The CPC quick connect/disconnect fittings (excluding o-rings) and the carboy float are made of polypropylene. This material is resistant to aqueous solutions, biological buffers, alcohols (e.g. Ethanol, Isopropanol), along with salts and oxidizing washes. It is less resistant to non-polar organic solvents (e.g., Hexane, Toluene), chlorinated solvents (e.g., Methylene Chloride), and concentrated fuming acids (e.g., concentrated Nitric Acid, Aqua Regia).
