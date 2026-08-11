@@ -6,7 +6,6 @@ from typing import Any, Dict
 import Pyro5
 from numpy import float64
 
-import opentrons_hardware.firmware_bindings.messages.message_definitions
 import opentrons_shared_data.errors.codes
 import opentrons_shared_data.gripper.gripper_definition
 import opentrons_shared_data.pipette.pipette_definition
@@ -92,7 +91,6 @@ HARDWARE_CLASS_PACKAGES = [
     opentrons.hardware_control.ot3_calibration,
     opentrons.hardware_control.instruments.ot3.instrument_calibration,
     opentrons.drivers.flex_stacker.types,
-    opentrons_hardware.firmware_bindings.messages.message_definitions,
 ]
 
 HARDWARE_ERROR_PACKAGES = [
