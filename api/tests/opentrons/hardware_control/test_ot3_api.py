@@ -23,7 +23,22 @@ from hypothesis import HealthCheck, assume, example, given, settings, strategies
 from mock import AsyncMock, MagicMock, Mock, PropertyMock, call, patch
 from typing_extensions import Literal
 
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId
+from opentrons_hardware.firmware_bindings.constants import (
+    MessageId,
+    MotorUsageValueType,
+    NodeId,
+    SensorId,
+)
+from opentrons_hardware.firmware_bindings.messages.fields import MotorUsageTypeField
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    GetMotorUsageResponse,
+)
+from opentrons_hardware.firmware_bindings.messages.payloads import (
+    GetMotorUsageResponsePayload,
+)
+from opentrons_hardware.firmware_bindings.utils import (
+    UInt8Field,
+)
 from opentrons_hardware.hardware_control.motion_planning.types import Move
 from opentrons_hardware.sensors.types import SensorDataType
 from opentrons_shared_data.errors.exceptions import (
@@ -371,6 +386,16 @@ async def gripper_present(
     )
     hardware_backend._present_axes.update((Axis.G, Axis.Z_G))
     await ot3_hardware.cache_gripper(instr_data)
+
+
+@pytest.fixture
+def mock_get_usage_data(managed_obj: OT3API) -> Iterator[AsyncMock]:
+    with patch.object(
+        managed_obj._backend,
+        "get_motor_usage_data",
+        Mock(spec=managed_obj._backend.get_motor_usage_data),
+    ) as mock_get_lifetime:
+        yield mock_get_lifetime
 
 
 @pytest.fixture
@@ -1928,7 +1953,6 @@ async def test_dispense_while_tracking(
     is_ready: bool,
 ) -> None:
     mount = OT3Mount.LEFT
-
     instr_data = AttachedPipette(
         config=load_pipette_data.load_definition(
             PipetteModelType("p1000"),
@@ -2647,3 +2671,118 @@ async def test_stop_only_home_necessary_axes(
     await ot3_hardware.stop(home_after=True)
     if jaw_state == GripperJawState.GRIPPING:
         mock_home.assert_called_once_with(skip=[Axis.G])
+
+
+@pytest.mark.parametrize(
+    "lifetime_data",
+    [
+        {
+            Axis.X: GetMotorUsageResponse(
+                payload=GetMotorUsageResponsePayload(
+                    num_elements=UInt8Field(2),
+                    usage_elements=[
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.linear_motor_distance,
+                            length=8,
+                            usage_value=9189578909,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.total_error_count,
+                            length=4,
+                            usage_value=5398,
+                        ),
+                    ],
+                ),
+                payload_type=GetMotorUsageResponsePayload,
+                message_id=MessageId.get_motor_usage_response,
+            ),
+        },
+        {
+            Axis.X: GetMotorUsageResponse(
+                payload=GetMotorUsageResponsePayload(
+                    num_elements=UInt8Field(2),
+                    usage_elements=[
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.linear_motor_distance,
+                            length=8,
+                            usage_value=9189578909,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.total_error_count,
+                            length=4,
+                            usage_value=5398,
+                        ),
+                    ],
+                ),
+                payload_type=GetMotorUsageResponsePayload,
+                message_id=MessageId.get_motor_usage_response,
+            ),
+            Axis.P_R: GetMotorUsageResponse(
+                payload=GetMotorUsageResponsePayload(
+                    num_elements=UInt8Field(4),
+                    usage_elements=[
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.linear_motor_distance,
+                            length=8,
+                            usage_value=287997293,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.total_error_count,
+                            length=4,
+                            usage_value=5514,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.overpressure_error_count,
+                            length=4,
+                            usage_value=161,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.resin_tip_dispense_count,
+                            length=4,
+                            usage_value=0,
+                        ),
+                    ],
+                ),
+                payload_type=GetMotorUsageResponsePayload,
+                message_id=MessageId.get_motor_usage_response,
+            ),
+            Axis.G: GetMotorUsageResponse(
+                payload=GetMotorUsageResponsePayload(
+                    num_elements=UInt8Field(3),
+                    usage_elements=[
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.linear_motor_distance,
+                            length=8,
+                            usage_value=314519951,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.force_application_time,
+                            length=4,
+                            usage_value=15446218,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.total_error_count,
+                            length=4,
+                            usage_value=7536,
+                        ),
+                    ],
+                ),
+                payload_type=GetMotorUsageResponsePayload,
+                message_id=MessageId.get_motor_usage_response,
+            ),
+        },
+    ],
+)
+async def test_get_motor_usage_data(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_get_usage_data: Mock,
+    lifetime_data: Dict[Axis, GetMotorUsageResponse],
+) -> None:
+    mock_get_usage_data.return_value = lifetime_data
+
+    api_result = await ot3_hardware.get_motor_usage_data()
+    for ax in lifetime_data.keys():
+        usage_elements = lifetime_data[ax].payload.usage_elements
+        assert api_result[ax] == {
+            MotorUsageValueType(el.key).name: el.usage_value for el in usage_elements
+        }
