@@ -177,6 +177,12 @@ class PasswordMissingSpecialCharactersErrorDetails(BaseModel):
     id: Literal["passwordMissingSpecialCharacters"]
 
 
+class PasswordPreviouslyUsedErrorDetails(BaseModel):
+    """An error when a new password matches the user's current password."""
+
+    id: Literal["passwordPreviouslyUsed"]
+
+
 class UserAlreadyExistsErrorDetails(BaseModel):
     """An error when a username is already taken."""
 
