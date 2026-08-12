@@ -29,9 +29,9 @@ if TYPE_CHECKING:
 
 
 # Pyro Resource Retreival for local processes (recieve proxies, etc)
-def get_pyro_resource() -> RobotServerPyroResource:
+async def get_pyro_resource() -> RobotServerPyroResource:
     """Get a Proxy of the hosted Robot Server Pyro Resource."""
-    robot_server_proxy = wait_for_proxy(proxy_name=RS_PYRONAME)
+    robot_server_proxy = await wait_for_proxy(proxy_name=RS_PYRONAME)
 
     if robot_server_proxy is None:
         raise pyro_errors.CommunicationError(

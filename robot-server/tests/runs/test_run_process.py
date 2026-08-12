@@ -22,8 +22,8 @@ from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
 )
 from opentrons.protocol_engine.resources.file_provider import FileProvider
-from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
+from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
 from opentrons_shared_data.robot.types import RobotTypeEnum
 from server_utils.fastapi_utils.app_state import AppState
 
@@ -141,28 +141,11 @@ async def _host_pyro_nameserver_and_ot3api(
     name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
     # Initialize the RobotServerPyroResource
     pyro_resource.start_initializing_pyro_resource(app_state)
-    ns = pyro.locate_ns()
-
-    retries_counter = 0
-    uri = None
-    while retries_counter <= 10:
-        # Wait and try again, the resource isnt registered yet
-        try:
-            uri = ns.lookup("OT3API")
-            ns.lookup("robot-server-resource")
-            break
-        except Exception:
-            await asyncio.sleep(0.01)
-            retries_counter += 1
-
-    # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-    if uri is None:
+    ot3_async = await wait_for_proxy(proxy_name="OT3API", broadcast_mode=False)
+    if ot3_async is None:
         raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
 
-    uri = pyro.resolve(uri="PYRONAME:OT3API")
-    ot3_proxy = pyro.Proxy(uri)  # type: ignore
-    ot3_async = AsyncClientPyroObject(ot3_proxy)
-    rs_async = resource_utilities.get_pyro_resource()
+    rs_async = await resource_utilities.get_pyro_resource()
 
     return (ot3_async, rs_async)
 
@@ -184,33 +167,18 @@ async def test_run_process_proxy(
 
     # Client-side requests below
     register_process_types()
-    ns = pyro.locate_ns()
-
-    retries_counter = 0
-    uri = None
-    while retries_counter <= 10:
-        # Wait and try again, the resource isnt registered yet
-        try:
-            uri = ns.lookup("ot-protocol")
-            break
-        except Exception:
-            await asyncio.sleep(0.01)
-            retries_counter += 1
-
-    # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-    if uri is None:
+    protocol_async = await wait_for_proxy(
+        proxy_name="ot-protocol", broadcast_mode=False
+    )
+    if protocol_async is None:
         raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
-
-    # uri = pyro.resolve(uri="PYRONAME:ot-protocol")
-    protocol_proxy = pyro.Proxy(uri)  # type: ignore
-    protocol_async = AsyncClientPyroObject(protocol_proxy)
     run_process = cast(DirectedRunProcess, cast(object, protocol_async))
 
     result = run_process.get_robot_type()
     assert result == "OT-3 Standard"
 
     # Clean up client resources.
-    protocol_proxy._pyroRelease()  # type: ignore
+    protocol_async._proxy._pyroRelease()  # type: ignore
 
 
 async def test_run_process_create(
@@ -282,25 +250,12 @@ async def test_run_process_create(
 
     # Client-side requests below
     register_all_needed_types()
-    ns = pyro.locate_ns()
-
-    retries_counter = 0
-    uri = None
-    while retries_counter <= 10:
-        # Wait and try again, the resource isnt registered yet
-        try:
-            uri = ns.lookup("ot-protocol")
-            break
-        except Exception:
-            await asyncio.sleep(0.01)
-            retries_counter += 1
-
-    # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-    if uri is None:
+    protocol_async = await wait_for_proxy(
+        proxy_name="ot-protocol", broadcast_mode=False
+    )
+    if protocol_async is None:
         raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
 
-    protocol_proxy = pyro.Proxy(uri)  # type: ignore
-    protocol_async = AsyncClientPyroObject(protocol_proxy)
     run_process = cast(DirectedRunProcess, cast(object, protocol_async))
 
     result = run_process.get_robot_type()
@@ -322,4 +277,4 @@ async def test_run_process_create(
     await run_process.finish()
 
     # Clean up client resources.
-    protocol_proxy._pyroRelease()  # type: ignore
+    protocol_async._proxy._pyroRelease()  # type: ignore

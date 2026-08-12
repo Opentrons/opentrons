@@ -160,7 +160,7 @@ async def initialize() -> ThreadManagedHardware:
     return await _create_thread_manager()
 
 
-def identify_hardware_process() -> HardwareControlAPI:
+async def identify_hardware_process() -> HardwareControlAPI:
     """
     Identify the Pyro Proxy for the OT3API and return a wrapped hardware instance.
     """
@@ -168,7 +168,7 @@ def identify_hardware_process() -> HardwareControlAPI:
     logging_config.log_init(robot_conf.log_level)
     try:
         # Find the OT3API on the nameserver
-        ot3_process_proxy = wait_for_proxy(proxy_name=_OT3API_PYRONAME)
+        ot3_process_proxy = await wait_for_proxy(proxy_name=_OT3API_PYRONAME)
 
         if ot3_process_proxy is None:
             raise pyro_errors.CommunicationError(

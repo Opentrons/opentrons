@@ -146,7 +146,7 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             register_hardware_state_store_to_pyro_resource(
                 app_state=app.state, hardware_store=hardware_store
             )
-            pyro_resource_proxy = get_pyro_resource()
+            pyro_resource_proxy = await get_pyro_resource()
             hardware_store.register_proxy_hardware_status_callback(
                 pyro_resource_proxy.create_hardware_state_update_callback()
             )

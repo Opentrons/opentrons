@@ -38,7 +38,9 @@ def create_pyro_daemon(
         pyro_object = PyroSynchronousObject(core_obj=resource, utility=utility)
         utility.add_PSO(pyro_object)
         try:
-            with pyro.locate_ns(broadcast=broadcast_mode if broadcast_mode is not None else False) as ns:
+            with pyro.locate_ns(
+                broadcast=broadcast_mode if broadcast_mode is not None else False
+            ) as ns:
                 # Register our objects URI with the system nameserver
                 try:
                     ns.register(pyroname, daemon.uriFor(pyro_object))

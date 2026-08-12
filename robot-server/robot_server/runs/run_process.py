@@ -169,9 +169,10 @@ class DirectedRunProcess(AbstractRunCoordinator):
         self._run_orchestrator: Optional[RunOrchestrator] = None
         self._loop: Optional[asyncio.AbstractEventLoop] = None
         # Grab the Proxy resources for the Robot Server and OT3API - always expect the resources to be up before a run
-        self._robot_server_resource: RobotServerPyroResource = get_pyro_resource()
-        self._hardware_api: HardwareControlAPI = identify_hardware_process()
+        self._robot_server_resource: Optional[RobotServerPyroResource] = None
+        self._hardware_api: Optional[HardwareControlAPI] = None
         log.info(f"Directed Run Process initialized with Run ID: {self._run_id}")
+        # task create
 
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def register_hardware_door_event(self) -> HardwareEventHandler:
@@ -189,6 +190,14 @@ class DirectedRunProcess(AbstractRunCoordinator):
                 )
 
         return door_event_handler
+
+    async def _connect_to_hardware_api(self) -> None:
+        """Initiate the run resource's connection to the hardware API."""
+        self._hardware_api = await identify_hardware_process()
+
+    async def _connect_to_robot_server_resource(self) -> None:
+        """Initiate the run resource's connection to the Robot-Server resource."""
+        self._robot_server_resource = await get_pyro_resource()
 
     @property
     def loop(self) -> asyncio.AbstractEventLoop:
@@ -215,6 +224,13 @@ class DirectedRunProcess(AbstractRunCoordinator):
         ] = None,
     ) -> None:
         """Create a run orchestrator and protocol engine for a given run."""
+        if self._hardware_api is None:
+            await self._connect_to_hardware_api()
+            assert self._hardware_api is not None
+        if self._robot_server_resource is None:
+            await self._connect_to_robot_server_resource()
+            assert self._robot_server_resource is not None
+
         self._run_id = run_id
 
         if protocol is not None:
@@ -249,7 +265,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
             run_id=run_id,
             protocol_engine=engine,
             hardware_api=self._hardware_api,
-            # camera_provider=camera_provider,
+            camera_provider=self._robot_server_resource.get_camera_provider(),
             protocol_config=protocol.source.config if protocol else None,
         )
 
