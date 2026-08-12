@@ -7,12 +7,22 @@ import json
 from pathlib import Path
 
 
+def run_label(run: dict) -> str:
+    """Display name: prefer run_name, else folder; always fall back to _dir."""
+    return str(run.get("run_name") or run.get("_dir") or "")
+
+
 def load_runs(runs_dir: Path) -> list[dict]:
+    """Load results.json under runs_dir, sorted alphabetically by run name."""
     runs = []
-    for p in sorted(runs_dir.glob("*/results.json")):
+    for p in runs_dir.glob("*/results.json"):
         data = json.loads(p.read_text())
         data["_dir"] = p.parent.name
+        if not data.get("run_name"):
+            data["run_name"] = data["_dir"]
         runs.append(data)
+    # Alphabetical by run_name (sequence-prefixed names sort in run order).
+    runs.sort(key=lambda r: run_label(r).casefold())
     return runs
 
 
@@ -21,14 +31,14 @@ def main(args) -> int:
     out = args.output
     runs = load_runs(runs_dir)
     if not runs:
-        out.write_text("<html><body><h1>No runs yet</h1><meta http-equiv='refresh' content='5'></body></html>")
+        out.write_text("<html><body><h1>No runs yet</h1></body></html>")
         print("no runs")
         return 0
 
     # Summary table rows
     targets = sorted({t for r in runs for t in r.get("targets", [])})
     header = "<tr><th>Target</th>" + "".join(
-        f"<th>{r.get('run_name', r['_dir'])}<br/><small>mean|err| / p2p / stdev</small></th>"
+        f"<th>{run_label(r)}<br/><small>mean|err| / p2p / stdev</small></th>"
         for r in runs
     ) + "</tr>"
 
@@ -58,7 +68,7 @@ def main(args) -> int:
         row += "</tr>"
         body_rows.append(row)
 
-    # Series payload for charts: one chart per target, lines = runs
+    # Series payload for charts: one chart per target, lines = runs (alpha by name)
     chart_payload = []
     for tgt in targets:
         series = []
@@ -68,15 +78,16 @@ def main(args) -> int:
                 continue
             samples = run.get("samples", [])
             series.append({
-                "name": r.get("run_name", r["_dir"]),
+                "name": run_label(r),
                 "t": [s["t_s"] for s in samples],
                 "current": [s["current_mbar"] for s in samples],
                 "error": [s["error_mbar"] for s in samples],
             })
+        series.sort(key=lambda s: s["name"].casefold())
         chart_payload.append({"target": tgt, "series": series})
 
     meta_rows = "".join(
-        f"<tr><td>{r.get('run_name', r['_dir'])}</td>"
+        f"<tr><td>{run_label(r)}</td>"
         f"<td>{r.get('status')}</td><td>{r.get('timestamp')}</td>"
         f"<td>{r.get('firmware','')[:80]}</td></tr>"
         for r in runs
@@ -87,7 +98,6 @@ def main(args) -> int:
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta http-equiv="refresh" content="5" />
   <title>Pressure hold comparison</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
@@ -108,7 +118,7 @@ def main(args) -> int:
 <body>
   <header>
     <h1>Pressure hold controller comparison</h1>
-    <div class="muted">Green cells = best mean |error| for that target. Page auto-refreshes every 5s while runs accumulate.</div>
+    <div class="muted">Runs and chart series are sorted alphabetically by run name (use a sequence prefix like <code>23_…</code>). Green cells = best mean |error| for that target.</div>
   </header>
   <main>
     <div class="panel">

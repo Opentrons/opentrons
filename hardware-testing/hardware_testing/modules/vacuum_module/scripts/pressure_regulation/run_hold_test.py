@@ -277,7 +277,11 @@ if __name__ == "__main__":
         "--run-name",
         type=str,
         default="unnamed",
-        help="Label for this run (stored in results JSON; default: unnamed)",
+        help=(
+            "Label for this run (stored in results JSON). Prefer a sequence "
+            "prefix matching the results folder, e.g. 23_1888194c_water_3x0p2mm "
+            "(default: unnamed)"
+        ),
     )
     parser.add_argument(
         "--waste-detection",
