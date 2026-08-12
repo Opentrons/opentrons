@@ -35,6 +35,7 @@ import {
   THERMOCYCLER_MODULE_CUTOUTS,
   THERMOCYCLER_MODULE_V2,
   TRASH_BIN_ADAPTER_FIXTURE,
+  VACUUM_MODULE_V1,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack, uuid } from '@opentrons/step-generation'
@@ -313,6 +314,24 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       .map(cf => cf.id)
       .includes(newModule.cutoutFixtureId as CutoutFixtureId)
 
+    const isVacuumModule = getCutoutFixturesForModuleModel(
+      VACUUM_MODULE_V1,
+      deckDef
+    )
+      .map(cf => cf.id)
+      .includes(newModule.cutoutFixtureId as CutoutFixtureId)
+
+    let slot: string = getSlotDisplayNameFromAAWithFakes(
+      newModule.addressableAreaId as AddressableAreaName
+    )
+    if (isThermocyclerModule) {
+      slot = 'B1'
+    }
+    if (isVacuumModule) {
+      slot = 'A3'
+    }
+    console.log({ isVacuumModule, slot })
+
     const updatedModules: FormModules = {
       ...filteredModules,
       ...(matchedModule != null &&
@@ -323,11 +342,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       [uuid()]: {
         model: moduleModel,
         type: getModuleType(moduleModel as ModuleModel),
-        slot: isThermocyclerModule
-          ? 'B1'
-          : getSlotDisplayNameFromAAWithFakes(
-              newModule.addressableAreaId as AddressableAreaName
-            ),
+        slot,
         cutoutFixtureId: newModule.cutoutFixtureId as FlexModuleCutoutFixtureId,
         cutoutId: isThermocyclerModule ? 'cutoutB1' : newModule.cutoutId,
       },
