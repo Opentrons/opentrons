@@ -2781,8 +2781,4 @@ async def test_get_motor_usage_data(
     mock_get_usage_data.return_value = lifetime_data
 
     api_result = await ot3_hardware.get_motor_usage_data()
-    for ax in lifetime_data.keys():
-        usage_elements = lifetime_data[ax].payload.usage_elements
-        assert api_result[ax] == {
-            MotorUsageValueType(el.key).name: el.usage_value for el in usage_elements
-        }
+    assert api_result == lifetime_data
