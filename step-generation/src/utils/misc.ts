@@ -107,6 +107,10 @@ export function getIsVacuumSpacer(def: LabwareDefinition2): boolean {
   return VACUUM_SPACER_LOAD_NAMES.includes(def.parameters.loadName)
 }
 
+const getIsVacuumCollar = (def: LabwareDefinition2): boolean => {
+  return (def.parameters.quirks ?? []).includes('vacuumModuleDock')
+}
+
 type trashOrLabware = 'wasteChute' | 'trashBin' | 'labware' | null
 
 export const getCutoutIdByAddressableArea = (
@@ -1106,6 +1110,11 @@ export const getIsLabwareCompatibleWithStack = (
     const isLidRole = allowedRoles.includes('lid')
 
     const isVacuumSpacer = getIsVacuumSpacer(topLabwareEntity.def)
+    const isOccupiedByCollar = stack.some(
+      entityId =>
+        entityId in labwareEntities &&
+        getIsVacuumCollar(labwareEntities[entityId].def)
+    )
     const movingLabwareIsCollar =
       movingLabwareEntity.def.parameters.quirks?.includes('vacuumModuleDock') ??
       false
@@ -1121,7 +1130,7 @@ export const getIsLabwareCompatibleWithStack = (
           false
         )) ||
       // vacuum spacer: same rules as the main module area — only collars and filter plates
-      (isVacuumSpacer && movingLabwareIsCollar) ||
+      (!isOccupiedByCollar && movingLabwareIsCollar) ||
       // any labware can go onto an adapter that provides a stacking default (spacers excluded above)
       ((topLabwareEntity.def.parameters.quirks?.includes(
         'providesStackingDefault'
