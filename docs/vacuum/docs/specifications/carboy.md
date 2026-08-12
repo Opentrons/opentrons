@@ -29,7 +29,7 @@ Text and image for the wrench, jar holder, hose holder.
   </thead>
   <tbody>
     <tr>
-      <td><strong>Waste jar</strong></td>
+      <td><strong>Carboy</strong></td>
       <td> <ul>
           <li>Composition: Borosilicate 3.3, clear glass</li>
           <li>Capacity: 2 L</li>

@@ -168,13 +168,25 @@ The Control Box includes the vacuum pump, air/water separator, electronics, and 
       <td><strong>Weight</strong></td>
       <td><font color="red"><strong>TBD</strong></font> kg</td>
     </tr>
-      <td><strong>Maximum pump rate</strong></td>
-      <td><font color="red"><strong>TBD</strong></font> L/min</td>
-    </tr>
     <tr>
-      <td><strong>Vacuum range (absolute)</strong></td>
-      <td>1,013 mbar (sea level ambient) to 200 mbar (max)</td>
+ <tr>
+      <td><strong>Pump type</strong></td>
+      <td>The module uses a Thomas® WOB-L® 260Z series piston-driven pump.
+        <ul>
+          <li>Flow rate (gas): 50.1 L/min (1.8 cfm)</li>
+          <li>Vacuum: -881.31 mbar (26 inHg)</li>
+        </ul>
+        <p>Note: Values reflect the manufacturer's published hardware specifications. Operational performance is controlled by Opentrons Vacuum Module software.</p>
+      </td>
+   </tr>
     </tr>
+      <td><strong>Vacuum range<strong></td>
+      <td>
+        <ul>
+          <li>Absolute: 1,013 mbar (sea level) to 200 mbar.</li>
+          <li>Gauge pressure: 0 mbar (ambient) to -800 mbar.</li>
+        </ul>
+      </td>
   </tbody>
 </table>
 
@@ -200,8 +212,17 @@ The Vacuum Module ships with two vacuum hoses and factory installed quick connec
       </td>
     </tr>
     <tr>
-      <td><strong>Material composition</strong></td>
+      <td><strong>Hose material</strong></td>
       <td>Vacuum hoses are made from Tygon® 2375. This material is compatible with a wide range of chemicals. See <a href="compatibility/">Chemical Compatibility</a> for details.</td>
+    </tr>
+    <tr>
+      <td><strong>Fittings</strong></td>
+      <td>The Vacuum Manifold uses CPC quick connect/disconnect fittings. Fittings come from the factory attached to the hoses. You also get extra fittings to make your own hose connections. Dimensions are given below:
+        <ul>
+          <li>L-shaped fitting: 3.2 mm (⅛")</li>
+          <li>All other fittings: 6.4 mm (&frac14;")</li>
+        </ul>
+      </td>
     </tr>
   </tbody>
 </table>
