@@ -58,7 +58,7 @@ function mockSuccessfulLogin(): void {
 
   vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(({ onSuccess }) => ({
     submitNewPassword: (username: string, _password: string) => {
-      onSuccess(username, OAUTH_RESPONSE)
+      onSuccess(username)
     },
     isLoading: false,
   }))
@@ -211,8 +211,7 @@ describe('LoginModal', () => {
     expect(modalResolved).toBe(false)
   })
 
-  it('completes the new-password flow and resolves the modal', async () => {
-    mockSuccessfulLogin()
+  it('returns to login after setting a new password', async () => {
     vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
       submitPassword: (username: string, _password: string) => {
         onSuccess(
@@ -223,6 +222,14 @@ describe('LoginModal', () => {
       },
       isAuthLoading: false,
     }))
+    vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(
+      ({ onSuccess }) => ({
+        submitNewPassword: (username: string, _password: string) => {
+          onSuccess(username)
+        },
+        isLoading: false,
+      })
+    )
 
     const clickOpenLoginModal = setupLoginModalTrigger()
     const resultPromise = clickOpenLoginModal()
@@ -240,6 +247,16 @@ describe('LoginModal', () => {
     fillField('Confirm password', 'newpass123')
     clickPrimary('Confirm')
 
-    await expect(resultPromise).resolves.toEqual({ username: 'alice' })
+    expect(
+      await screen.findByRole('heading', { name: 'Login' })
+    ).toBeInTheDocument()
+    expect(screen.getByLabelText('Password')).toBeInTheDocument()
+
+    let modalResolved = false
+    void Promise.resolve(resultPromise).then(() => {
+      modalResolved = true
+    })
+    await new Promise(resolve => setTimeout(resolve, 50))
+    expect(modalResolved).toBe(false)
   })
 })
