@@ -41,17 +41,19 @@ export function ComplianceReadyFiles(): ReactNode {
     const protocols = protocolsData?.data ?? []
     const runs = runsData?.data ?? []
 
-    const protocolNameById = protocols.reduce<Map<string, string>>(
+    const protocolNameById = protocols.reduce<Record<string, string>>(
       (acc, { id, metadata }) => {
-        return metadata.protocolName != null
-          ? { ...acc, [id]: metadata.protocolName }
-          : acc
+        if (metadata?.protocolName != null) {
+          acc[id] = metadata.protocolName
+        }
+        return acc
       },
-      new Map()
+      {}
     )
+
     return runs.reduce<Record<string, string>>((acc, run) => {
       const protocolName =
-        run.protocolId != null ? protocolNameById.get(run.protocolId) : null
+        run.protocolId != null ? protocolNameById[run.protocolId] : null
       if (run.logPeriodId != null && protocolName != null) {
         acc[run.logPeriodId] = protocolName
       }
