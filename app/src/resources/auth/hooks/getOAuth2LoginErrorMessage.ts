@@ -5,13 +5,13 @@ import type { TFunction } from 'i18next'
 /**
  * Shape of an error response from `POST /auth/oauth2/token`: the standard
  * RFC 6749 § 5.2 fields plus the opentrons-specific
- * `opentrons_login_attempts_remaining` field returned when the lockout limit
- * is configured.
+ * `opentrons_login_attempts_remaining` and `opentrons_account_locked` fields.
  */
 interface OAuth2TokenErrorResponse {
   error?: string
   error_description?: string
   opentrons_login_attempts_remaining?: number
+  opentrons_account_locked?: boolean
 }
 
 export function getOAuth2LoginErrorMessage(
@@ -22,15 +22,14 @@ export function getOAuth2LoginErrorMessage(
     const data = error.response?.data as OAuth2TokenErrorResponse | undefined
     const oauth2ErrorCode = data?.error
     const attemptsRemaining = data?.opentrons_login_attempts_remaining
+    const accountLocked = data?.opentrons_account_locked === true
     if (oauth2ErrorCode === 'invalid_grant') {
-      if (typeof attemptsRemaining === 'number') {
-        if (attemptsRemaining === 0) {
-          return t('login_error_locked')
-        } else {
-          return t('login_error_incorrect_with_attempts_remaining', {
-            attemptsRemaining,
-          })
-        }
+      if (accountLocked || attemptsRemaining === 0) {
+        return t('login_error_locked')
+      } else if (typeof attemptsRemaining === 'number') {
+        return t('login_error_incorrect_with_attempts_remaining', {
+          attemptsRemaining,
+        })
       } else {
         return t('login_error_incorrect')
       }

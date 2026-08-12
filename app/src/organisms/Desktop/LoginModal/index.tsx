@@ -434,9 +434,7 @@ function LoginView(props: LoginViewProps): JSX.Element {
           title={t('access_control:login_form_password_field')}
           type="password"
           value={formData.logInPassword}
-          error={
-            formData.passwordRequiredError ?? formData.error ?? undefined
-          }
+          error={formData.passwordRequiredError ?? formData.error ?? undefined}
           onChange={event => {
             onLogInPasswordChange(event.target.value)
           }}
