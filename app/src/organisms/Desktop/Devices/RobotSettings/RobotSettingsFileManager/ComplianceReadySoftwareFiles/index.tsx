@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -15,6 +15,7 @@ import {
   useLogPeriodSummariesQuery,
 } from '@opentrons/react-api-client'
 
+import { Skeleton } from '/app/atoms/Skeleton'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useDeleteSelectedLogPeriods } from '/app/resources/devices/hooks/useDeleteSelectedLogPeriods'
@@ -27,6 +28,7 @@ import fileManagerStyles from '../robotsettingsfilemanager.module.css'
 import styles from './compliancereadysoftwarefiles.module.css'
 import { LogPeriodRow } from './LogPeriodRow'
 
+import type { ReactNode } from 'react'
 import type { IconProps } from '@opentrons/components'
 import type { MakeToastOptions } from '/app/organisms/ToasterOven/ToasterContext'
 import type { DownloadedLogPeriod } from '/app/resources/devices/hooks/useDownloadSelectedLogPeriods'
@@ -42,14 +44,16 @@ interface ComplianceReadySoftwareFilesProps {
 
 export function ComplianceReadySoftwareFiles({
   robotName,
-}: ComplianceReadySoftwareFilesProps): JSX.Element {
+}: ComplianceReadySoftwareFilesProps): ReactNode {
   const { t } = useTranslation('device_details')
-  const { data: logPeriodSummariesData } = useLogPeriodSummariesQuery()
+  const { data: logPeriodSummariesData, status: logPeriodSummaryStatus } =
+    useLogPeriodSummariesQuery()
   const documentationState = useDocumentationState()
   const downloadLogPeriodsMutation = useDownloadSelectedLogPeriods(robotName)
   const { deleteSelectedLogPeriods, deletingIds } =
     useDeleteSelectedLogPeriods(documentationState)
   const { makeToast, eatToast } = useToaster()
+  const observer = useRef<HTMLDivElement>(null)
 
   // API returns periods oldest-to-newest; reverse for newest-first display.
   const periods = useMemo(
@@ -161,6 +165,84 @@ export function ComplianceReadySoftwareFiles({
         }
       })
   }
+  const [width, setWidth] = useState(0)
+
+  // width updates on mount only right now; known limitation that should be fine in practice
+  useEffect(() => {
+    if (observer.current != null) {
+      // Get the width of the element
+      const currentWidth = observer.current.getBoundingClientRect().width
+      setWidth(currentWidth)
+    }
+  }, [])
+
+  // loading skeleton since log period summary query can take a noticeable amount of time
+  const skeletonContent = (
+    <div className={styles.skeleton_container} ref={observer}>
+      <Skeleton width="100%" height="3rem" backgroundSize={`${width}px`} />
+      <Skeleton width="100%" height="3rem" backgroundSize={`${width}px`} />
+      <Skeleton width="100%" height="3rem" backgroundSize={`${width}px`} />
+      <Skeleton width="100%" height="3rem" backgroundSize={`${width}px`} />
+    </div>
+  )
+  const header = (
+    <div className={styles.compliance_table_header_row}>
+      <CheckboxBasic
+        checked={isSomeSelected ? 'indeterminate' : isAllSelected}
+        onChange={handleToggleAll}
+      />
+
+      <div className={styles.log_period_columns}>
+        <StyledText
+          desktopStyle="bodyDefaultRegular"
+          className={styles.log_date_col}
+        >
+          {t('protocol')}
+        </StyledText>
+        <StyledText
+          desktopStyle="bodyDefaultRegular"
+          className={styles.log_date_col}
+        >
+          {t('log_period_start')}
+        </StyledText>
+        <StyledText
+          desktopStyle="bodyDefaultRegular"
+          className={styles.log_date_col}
+        >
+          {t('log_period_end')}
+        </StyledText>
+      </div>
+    </div>
+  )
+
+  let content: ReactNode = <></>
+  if (logPeriodSummaryStatus === 'loading') {
+    content = (
+      <div className={fileManagerStyles.log_table}>
+        {header}
+        {skeletonContent}
+      </div>
+    )
+  } else if (logPeriodSummariesData?.data.length === 0) {
+    content = <InfoScreen content={t('no_user_action_logs')} />
+  } else {
+    content = (
+      <div className={fileManagerStyles.log_table}>
+        {header}
+        {periods.map(period => (
+          <LogPeriodRow
+            key={period.id}
+            period={period}
+            isSelected={selectedIds.has(period.id)}
+            isDeleting={deletingIds.has(period.id)}
+            onToggle={() => {
+              togglePeriod(period.id)
+            }}
+          />
+        ))}
+      </div>
+    )
+  }
 
   return (
     <>
@@ -180,49 +262,7 @@ export function ComplianceReadySoftwareFiles({
           onDownloadSelected={handleDownloadSelected}
           onDeleteSelected={handleClickDeleteSelected}
         />
-        {periods.length === 0 ? (
-          <InfoScreen content={t('no_user_action_logs')} />
-        ) : (
-          <div className={fileManagerStyles.log_table}>
-            <div className={styles.compliance_table_header_row}>
-              <CheckboxBasic
-                checked={isSomeSelected ? 'indeterminate' : isAllSelected}
-                onChange={handleToggleAll}
-              />
-              <div className={styles.log_period_columns}>
-                <StyledText
-                  desktopStyle="bodyDefaultRegular"
-                  className={styles.log_date_col}
-                >
-                  {t('protocol')}
-                </StyledText>
-                <StyledText
-                  desktopStyle="bodyDefaultRegular"
-                  className={styles.log_date_col}
-                >
-                  {t('log_period_start')}
-                </StyledText>
-                <StyledText
-                  desktopStyle="bodyDefaultRegular"
-                  className={styles.log_date_col}
-                >
-                  {t('log_period_end')}
-                </StyledText>
-              </div>
-            </div>
-            {periods.map(period => (
-              <LogPeriodRow
-                key={period.id}
-                period={period}
-                isSelected={selectedIds.has(period.id)}
-                isDeleting={deletingIds.has(period.id)}
-                onToggle={() => {
-                  togglePeriod(period.id)
-                }}
-              />
-            ))}
-          </div>
-        )}
+        {content}
       </div>
     </>
   )

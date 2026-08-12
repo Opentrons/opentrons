@@ -7,6 +7,7 @@ import {
   useLogPeriodSummariesQuery,
 } from '@opentrons/react-api-client'
 
+import { Skeleton } from '/app/atoms/Skeleton'
 import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
@@ -20,7 +21,8 @@ import type { LogPeriodSummary } from '@opentrons/api-client'
 
 export function ComplianceReadyFiles(): ReactNode {
   const { t } = useTranslation('device_details')
-  const { data: logPeriodSummariesData } = useLogPeriodSummariesQuery()
+  const { data: logPeriodSummariesData, status: logPeriodSummaryQueryStatus } =
+    useLogPeriodSummariesQuery()
 
   const logPeriodSummariesSorted = useMemo(() => {
     const logPeriodSummaries = logPeriodSummariesData?.data ?? []
@@ -39,17 +41,19 @@ export function ComplianceReadyFiles(): ReactNode {
     const protocols = protocolsData?.data ?? []
     const runs = runsData?.data ?? []
 
-    const protocolNameById = protocols.reduce<Map<string, string>>(
+    const protocolNameById = protocols.reduce<Record<string, string>>(
       (acc, { id, metadata }) => {
-        return metadata.protocolName != null
-          ? { ...acc, [id]: metadata.protocolName }
-          : acc
+        if (metadata?.protocolName != null) {
+          acc[id] = metadata.protocolName
+        }
+        return acc
       },
-      new Map()
+      {}
     )
+
     return runs.reduce<Record<string, string>>((acc, run) => {
       const protocolName =
-        run.protocolId != null ? protocolNameById.get(run.protocolId) : null
+        run.protocolId != null ? protocolNameById[run.protocolId] : null
       if (run.logPeriodId != null && protocolName != null) {
         acc[run.logPeriodId] = protocolName
       }
@@ -89,7 +93,10 @@ export function ComplianceReadyFiles(): ReactNode {
     setSelectedLogPeriod(null)
   }
 
-  if (logPeriodSummariesSorted.length === 0) {
+  if (
+    logPeriodSummaryQueryStatus !== 'loading' &&
+    logPeriodSummariesData?.data.length === 0
+  ) {
     return (
       <OddInfoScreen
         type="neutral"
@@ -99,6 +106,15 @@ export function ComplianceReadyFiles(): ReactNode {
     )
   }
 
+  // loading skeleton since log period summary query can take a noticible amount of time
+  const skeletonContent = (
+    <>
+      <Skeleton width="100%" height="5.75rem" backgroundSize="59rem" />
+      <Skeleton width="100%" height="5.75rem" backgroundSize="59rem" />
+      <Skeleton width="100%" height="5.75rem" backgroundSize="59rem" />
+    </>
+  )
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -106,14 +122,16 @@ export function ComplianceReadyFiles(): ReactNode {
         <StyledText oddStyle="bodyTextSemiBold">{t('period_start')}</StyledText>
         <StyledText oddStyle="bodyTextSemiBold">{t('period_end')}</StyledText>
       </div>
-      {logPeriodSummariesSorted.map(logPeriodSummary => (
-        <LogPeriodRow
-          key={logPeriodSummary.id}
-          logPeriodSummary={logPeriodSummary}
-          protocolName={protocolNameByLogPeriodId[logPeriodSummary.id]}
-          handleOverflowClick={handleOverflowClick}
-        />
-      ))}
+      {logPeriodSummaryQueryStatus === 'loading'
+        ? skeletonContent
+        : logPeriodSummariesSorted.map(logPeriodSummary => (
+            <LogPeriodRow
+              key={logPeriodSummary.id}
+              logPeriodSummary={logPeriodSummary}
+              protocolName={protocolNameByLogPeriodId[logPeriodSummary.id]}
+              handleOverflowClick={handleOverflowClick}
+            />
+          ))}
       {selectedLogPeriod != null ? (
         <ConfirmLogPeriodModal
           onClose={handleCloseConfirmModal}
