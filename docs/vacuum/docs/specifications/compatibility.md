@@ -5,7 +5,6 @@ description: "Chemicals compatibility with hoses and other Vacuum Module compone
 
 The chemical compatibility ratings below reflect Opentrons test data combined with published specifications from original equipment manufacturers (OEMs).
 
-<!-- recommend legal review of note disclaimer; similar text found on other MFG websites -->
 !!! note
     Opentrons makes no express or implied warranty regarding material performance or chemical suitability.
 
@@ -15,9 +14,9 @@ The chemical compatibility tables use these ratings:
 
 * :material-check-circle:{ .dark-green } **Excellent:** No degradation after continuous exposure.
 * :material-check-circle-outline:{ .light-green } **Good:** Occasional minor effects (e.g., swelling or discoloration). Suitable for long-term use.
-* :material-alert-circle-outline:{ .gray } **Fair/Moderate:** Use with caution. Flush after exposure.
-* :material-minus-circle-outline:{ .yellow } **Poor:** Severe degradation. Brief or accidental contact only.
+* :material-minus-circle-outline:{ .yellow } **Moderate/Poor:** Use with caution. Flush after exposure.
 * :material-close-circle:{ .red } **Not Recommended:** Rapid breakdown or complete material failure.
+* :material-alert-circle-outline:{ .gray } **No Data:** Information not available.
 
 ## Control Box housing
 
@@ -27,7 +26,7 @@ The exterior of the Control Box is made of aluminum. This material is resistant 
 | :--- | :--- |
 | Acetone | :material-check-circle-outline:{ .light-green } Good |
 | Acetonitrile (ACN) | :material-check-circle:{ .dark-green } Excellent |
-| Dimethyl Sulfoxide (DMSO) | — |
+| Dimethyl Sulfoxide (DMSO) | :material-alert-circle-outline:{ .gray } No Data |
 | Dimethylformamide (DMF) | :material-check-circle:{ .dark-green } Excellent |
 | Ethanol | :material-check-circle-outline:{ .light-green } Good |
 | Ethyl Acetate | :material-check-circle-outline:{ .light-green } Good |
@@ -41,7 +40,7 @@ The exterior of the Control Box is made of aluminum. This material is resistant 
 | Tetrahydrofuran (THF) | :material-close-circle:{ .red } Not Recommended |
 | Toluene | :material-check-circle:{ .dark-green } Excellent |
 | Trichloroacetic Acid (TCA) | :material-close-circle:{ .red } Not Recommended |
-| Trifluoroacetic Acid (TFA) | — |
+| Trifluoroacetic Acid (TFA) | :material-alert-circle-outline:{ .gray } No Data | |
 
 ## Control Box hoses
 
@@ -62,7 +61,7 @@ Plumbing inside the Control Box is made of perfluoroalkoxy alkane (PFA). This ma
 | Methanol | :material-check-circle:{ .dark-green } Excellent |
 | Methylene Chloride (Dichloromethane/DCM) | :material-check-circle:{ .dark-green } Excellent |
 | Sodium Hypochlorite (Bleach) | :material-check-circle:{ .dark-green } Excellent |
-| Tetrahydrofuran (THF) | :material-alert-circle-outline:{ .gray } Fair |
+| Tetrahydrofuran (THF) | :material-minus-circle-outline:{ .yellow } Moderate/Poor |
 | Toluene | :material-check-circle:{ .dark-green } Excellent |
 | Trichloroacetic Acid (TCA) | :material-check-circle:{ .dark-green } Excellent |
 | Trifluoroacetic Acid (TFA) | :material-check-circle:{ .dark-green } Excellent |
@@ -75,7 +74,7 @@ Deck pieces include the vacuum base, the short and tall collars, and the short a
 | :--- | :--- |
 | Acetone | :material-check-circle:{ .dark-green } Excellent |
 | Acetonitrile | :material-check-circle:{ .dark-green } Excellent |
-| Dimethyl Sulfoxide (DMSO) | :material-alert-circle-outline:{ .gray } Fair |
+| Dimethyl Sulfoxide (DMSO) | :material-minus-circle-outline:{ .yellow } Moderate/Poor |
 | Dimethylformamide (DMF) | :material-check-circle:{ .dark-green } Excellent |
 | Ethanol | :material-check-circle:{ .dark-green } Excellent |
 | Ethyl Acetate | :material-check-circle:{ .dark-green } Excellent |
@@ -84,11 +83,11 @@ Deck pieces include the vacuum base, the short and tall collars, and the short a
 | Hydrochloric Acid (37% concentration) | :material-close-circle:{ .red } Not Recommended |
 | Isopropanol (IPA) | :material-close-circle:{ .red } Not Recommended |
 | Methanol | :material-check-circle-outline:{ .light-green } Good |
-| Methylene Chloride (Dichloromethane/DCM) | :material-alert-circle-outline:{ .gray } Fair |
+| Methylene Chloride (Dichloromethane/DCM) | :material-minus-circle-outline:{ .yellow } Moderate/Poor |
 | Sodium Hypochlorite (Bleach) | :material-close-circle:{ .red } Not Recommended |
 | Tetrahydrofuran (THF) | :material-check-circle:{ .dark-green } Excellent |
 | Toluene | :material-check-circle:{ .dark-green } Excellent |
-| Trichloroacetic Acid (TCA) | :material-alert-circle-outline:{ .gray } Fair |
+| Trichloroacetic Acid (TCA) | :material-minus-circle-outline:{ .yellow } Moderate/Poor |
 | Trifluoroacetic Acid (TFA) | :material-close-circle:{ .red } Not Recommended |
 
 ## External hoses
@@ -113,7 +112,7 @@ The external vacuum hoses are made of Tygon® 2375, a clear, plasticizer-free, n
 | Tetrahydrofuran (THF) | :material-close-circle:{ .red } Not Recommended |
 | Toluene| :material-close-circle:{ .red } Not Recommended |
 | Trichloroacetic Acid (TCA) | :material-check-circle:{ .dark-green } Excellent |
-| Trifluoroacetic Acid (TFA) | — |
+| Trifluoroacetic Acid (TFA) | :material-alert-circle-outline:{ .gray } No Data |
 
 ## Gaskets
 
@@ -129,7 +128,7 @@ Manifold gaskets are made of Silicone 3003/20. This material is resistant to aqu
 | Ethyl Acetate | :material-check-circle-outline:{ .light-green } Good |
 | Formic Acid | :material-check-circle-outline:{ .light-green } Good |
 | Hexane | :material-close-circle:{ .red } Not Recommended |
-| Hydrochloric Acid (37% concentration) | :material-alert-circle-outline:{ .gray } Fair |
+| Hydrochloric Acid (37% concentration) | :material-minus-circle-outline:{ .yellow } Moderate/Poor |
 | Isopropanol (IPA) | :material-check-circle:{ .dark-green } Excellent |
 | Methanol | :material-check-circle:{ .dark-green } Excellent |
 | Methylene Chloride (Dichloromethane/DCM) | :material-close-circle:{ .red } Not Recommended |
@@ -153,14 +152,14 @@ The o-rings on the CPC quick connect/disconnect fittings, the carboy cap, and ca
 | Ethyl Acetate | :material-check-circle-outline:{ .light-green } Good |
 | Formic Acid | :material-check-circle:{ .dark-green } Excellent |
 | Hexane | :material-check-circle-outline:{ .light-green } Good |
-| Hydrochloric Acid (37% concentration) | :material-alert-circle-outline:{ .gray } Fair |
+| Hydrochloric Acid (37% concentration) | :material-minus-circle-outline:{ .yellow } Moderate/Poor |
 | Isopropanol (IPA) | :material-check-circle:{ .dark-green } Excellent |
 | Methanol | :material-check-circle:{ .dark-green } Excellent |
 | Methylene Chloride (Dichloromethane/DCM) | :material-close-circle:{ .red } Not Recommended |
 | Sodium Hypochlorite (Bleach) | :material-check-circle-outline:{ .light-green } Good |
-| Tetrahydrofuran (THF) | :material-alert-circle-outline:{ .gray } Fair |
+| Tetrahydrofuran (THF) | :material-minus-circle-outline:{ .yellow } Moderate/Poor |
 | Toluene | :material-close-circle:{ .red } Not Recommended |
-| Trichloroacetic Acid (TCA) | :material-alert-circle-outline:{ .gray } Fair |
+| Trichloroacetic Acid (TCA) | :material-minus-circle-outline:{ .yellow } Moderate/Poor |
 | Trifluoroacetic Acid (TFA) | :material-check-circle:{ .dark-green } Excellent |
 
 ## Quick connect fittings and carboy float
@@ -170,7 +169,7 @@ The CPC quick connect/disconnect fittings (excluding o-rings) and the carboy flo
 | Reagent | Compatibility |
 | :--- | :--- |
 | Acetone | :material-check-circle:{ .dark-green } Excellent |
-| Acetonitrile (ACN) | :material-alert-circle-outline:{ .gray } Fair |
+| Acetonitrile (ACN) | :material-minus-circle-outline:{ .yellow } Moderate/Poor |
 | Dimethyl Sulfoxide (DMSO) | :material-check-circle:{ .dark-green } Excellent |
 | Dimethylformamide (DMF) | :material-check-circle:{ .dark-green } Excellent |
 | Ethanol | :material-check-circle:{ .dark-green } Excellent |
