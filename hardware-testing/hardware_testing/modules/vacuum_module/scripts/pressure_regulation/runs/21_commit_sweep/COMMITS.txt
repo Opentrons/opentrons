@@ -1,0 +1,10 @@
+# Commits to sweep (oldest → newest). Tip work saved at branch hold-tuning-tip-save = 07101f71
+# Order: test each, pause for user before next.
+208f0ace  vacuum-module: pressure control and pump coordination improvements (#574)  [BASELINE]
+1888194c  fix(vacuum-module): allow integral to finish short of final vacuum target
+1f73bc87  fix(vacuum-module): keep holding feed-forward at target depth
+ede8542f  fix(vacuum-module): soft-hold past final pressure target
+5397af9e  fix(vacuum-module): detune PID once pressure hold is settled
+1753e83c  fix(vacuum-module): low-pass filter absolute pressure before PID
+9c22da8b  feat(vacuum-module): expose hold-path knobs on M125/M126
+07101f71  experimenting  [TIP - also hold-tuning-tip-save]
