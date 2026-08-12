@@ -48,10 +48,14 @@ def main(args) -> int:
 
     # Summary table rows
     targets = sorted({t for r in runs for t in r.get("targets", [])})
-    header = "<tr><th>Target</th>" + "".join(
-        f"<th>{run_label(r)}<br/><small>mean|err| / p2p / stdev</small></th>"
-        for r in runs
-    ) + "</tr>"
+    header = (
+        "<tr><th>Target</th>"
+        + "".join(
+            f"<th>{run_label(r)}<br/><small>mean|err| / p2p / stdev</small></th>"
+            for r in runs
+        )
+        + "</tr>"
+    )
 
     body_rows = []
     for tgt in targets:
@@ -59,7 +63,9 @@ def main(args) -> int:
         best_abs = None
         vals = []
         for r in runs:
-            run = next((x for x in r.get("runs", []) if x.get("target_mbar") == tgt), None)
+            run = next(
+                (x for x in r.get("runs", []) if x.get("target_mbar") == tgt), None
+            )
             st = (run or {}).get("stats") or {}
             if st.get("n"):
                 s = f"{st['mean_abs_err']:.2f} / {st.get('p2p', float('nan')):.2f} / {st['stdev_err']:.2f}"
@@ -73,7 +79,12 @@ def main(args) -> int:
         best = min(finite) if finite else None
         row = "<tr>"
         for i, c in enumerate(cells):
-            if i > 0 and vals[i - 1] is not None and best is not None and abs(vals[i - 1] - best) < 1e-9:
+            if (
+                i > 0
+                and vals[i - 1] is not None
+                and best is not None
+                and abs(vals[i - 1] - best) < 1e-9
+            ):
                 c = c.replace("<td", "<td style='background:#1a3d2e;color:#3ecf8e'", 1)
             row += c
         row += "</tr>"
@@ -84,16 +95,20 @@ def main(args) -> int:
     for tgt in targets:
         series = []
         for r in runs:
-            run = next((x for x in r.get("runs", []) if x.get("target_mbar") == tgt), None)
+            run = next(
+                (x for x in r.get("runs", []) if x.get("target_mbar") == tgt), None
+            )
             if not run:
                 continue
             samples = run.get("samples", [])
-            series.append({
-                "name": run_label(r),
-                "t": [s["t_s"] for s in samples],
-                "current": [s["current_mbar"] for s in samples],
-                "error": [s["error_mbar"] for s in samples],
-            })
+            series.append(
+                {
+                    "name": run_label(r),
+                    "t": [s["t_s"] for s in samples],
+                    "current": [s["current_mbar"] for s in samples],
+                    "error": [s["error_mbar"] for s in samples],
+                }
+            )
         series.sort(key=lambda s: s["name"].casefold())
         chart_payload.append({"target": tgt, "series": series})
 
@@ -202,7 +217,9 @@ def main(args) -> int:
     if "pdf" in paths:
         _report_format.write_compare_pdf(runs, paths["pdf"])
         written.append(paths["pdf"])
-    print(f"Wrote {', '.join(str(path.resolve()) for path in written)} with {len(runs)} runs")
+    print(
+        f"Wrote {', '.join(str(path.resolve()) for path in written)} with {len(runs)} runs"
+    )
     return 0
 
 

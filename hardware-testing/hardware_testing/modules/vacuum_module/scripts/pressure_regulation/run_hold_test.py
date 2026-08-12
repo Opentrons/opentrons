@@ -17,7 +17,9 @@ from opentrons.drivers import vacuum_module
 from opentrons.drivers.vacuum_module.types import VentState
 
 from hardware_testing.modules.common.utils import find_module_port
-from hardware_testing.modules.vacuum_module.scripts.pressure_regulation import hold_results
+from hardware_testing.modules.vacuum_module.scripts.pressure_regulation import (
+    hold_results,
+)
 
 
 DEFAULT_CSV_PATH = hold_results.DEFAULT_CSV_PATH
@@ -167,9 +169,7 @@ async def main(args: argparse.Namespace) -> int:
             f"SerialNo:{info['serial']}"
         )
         print("M115:", fw, flush=True)
-        await pump.set_waste_configs(
-            enable_waste_full_detection=args.waste_detection
-        )
+        await pump.set_waste_configs(enable_waste_full_detection=args.waste_detection)
         waste_label = (
             "enabled (M127 E1)" if args.waste_detection else "disabled (M127 E0)"
         )

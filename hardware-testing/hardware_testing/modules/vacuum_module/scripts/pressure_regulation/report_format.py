@@ -30,7 +30,9 @@ def infer_format(output: Path, explicit: Optional[str] = None) -> str:
     """Return html/pdf/both from ``--format`` or the output suffix."""
     if explicit:
         if explicit not in FORMAT_CHOICES:
-            raise ValueError(f"format must be one of {FORMAT_CHOICES}, got {explicit!r}")
+            raise ValueError(
+                f"format must be one of {FORMAT_CHOICES}, got {explicit!r}"
+            )
         return explicit
     if output.suffix.lower() == ".pdf":
         return FORMAT_PDF
@@ -79,7 +81,11 @@ def write_single_run_pdf(data: dict[str, Any], path: Path) -> Path:
     runs = data.get("runs", [])
     with pdf_pages(path) as pdf:
         _savefig(plt, pdf, _single_summary_figure(plt, data, runs))
-        _savefig(plt, pdf, _overlay_figure(plt, runs, "current_mbar", "Gauge pressure (mbar)"))
+        _savefig(
+            plt,
+            pdf,
+            _overlay_figure(plt, runs, "current_mbar", "Gauge pressure (mbar)"),
+        )
         _savefig(
             plt,
             pdf,
@@ -126,7 +132,9 @@ def _run_label(run: dict[str, Any]) -> str:
     return str(run.get("run_name") or run.get("_dir") or "")
 
 
-def _single_summary_figure(plt: Any, data: dict[str, Any], runs: list[dict[str, Any]]) -> Any:
+def _single_summary_figure(
+    plt: Any, data: dict[str, Any], runs: list[dict[str, Any]]
+) -> Any:
     fig, ax = plt.subplots(figsize=(11.0, 8.5))
     ax.axis("off")
     fig.suptitle("Vacuum module pressure hold", fontsize=16, fontweight="bold")
@@ -139,7 +147,9 @@ def _single_summary_figure(plt: Any, data: dict[str, Any], runs: list[dict[str, 
         f"Hold: {data.get('duration_s')}s    "
         f"Sample: {data.get('sample_period_s')}s",
     ]
-    fig.text(0.08, 0.88, "\n".join(meta_lines), fontsize=9, va="top", family="monospace")
+    fig.text(
+        0.08, 0.88, "\n".join(meta_lines), fontsize=9, va="top", family="monospace"
+    )
     headers = [
         "Target",
         "Status",
@@ -209,7 +219,9 @@ def _overlay_figure(
         color = _LINE_COLORS[i % len(_LINE_COLORS)]
         xs = [s["t_s"] for s in samples]
         ys = [s[y_key] for s in samples]
-        ax.plot(xs, ys, color=color, linewidth=1.2, label=f"{run.get('target_mbar')} mbar")
+        ax.plot(
+            xs, ys, color=color, linewidth=1.2, label=f"{run.get('target_mbar')} mbar"
+        )
         if y_key == "current_mbar":
             ax.plot(
                 xs,
@@ -245,7 +257,9 @@ def _compare_index_figure(plt: Any, runs: list[dict[str, Any]]) -> Any:
         ]
         for run in runs
     ] or [["—", "", "", ""]]
-    table = ax.table(cellText=rows, colLabels=headers, loc="upper center", cellLoc="left")
+    table = ax.table(
+        cellText=rows, colLabels=headers, loc="upper center", cellLoc="left"
+    )
     table.auto_set_font_size(False)
     table.set_fontsize(8)
     table.scale(1.0, 1.3)
@@ -293,7 +307,11 @@ def _compare_target_figure(plt: Any, runs: list[dict[str, Any]], target: float) 
     ):
         for i, run in enumerate(runs):
             hold = next(
-                (item for item in run.get("runs", []) if item.get("target_mbar") == target),
+                (
+                    item
+                    for item in run.get("runs", [])
+                    if item.get("target_mbar") == target
+                ),
                 None,
             )
             samples = (hold or {}).get("samples") or []
@@ -309,7 +327,9 @@ def _compare_target_figure(plt: Any, runs: list[dict[str, Any]], target: float) 
                 label=_run_label(run),
             )
         if y_key == "current_mbar":
-            ax.axhline(target, color="#6b7280", linestyle="--", linewidth=0.9, label="target")
+            ax.axhline(
+                target, color="#6b7280", linestyle="--", linewidth=0.9, label="target"
+            )
         ax.set_xlabel("t (s)")
         ax.set_ylabel(ylabel)
         if ylim is not None:

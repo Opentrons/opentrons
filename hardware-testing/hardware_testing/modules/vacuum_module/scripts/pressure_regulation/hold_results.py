@@ -103,9 +103,7 @@ def steady_stats(samples: list[dict[str, Any]], duration_s: int) -> dict[str, An
     steady = [
         s
         for s in samples
-        if s["t_s"] >= (duration_s - 30)
-        and s["t_s"] < duration_s
-        and s["enabled"] == 1
+        if s["t_s"] >= (duration_s - 30) and s["t_s"] < duration_s and s["enabled"] == 1
     ]
     if not steady:
         return {"n": 0, "note": "no steady samples (pump stopped early?)"}
