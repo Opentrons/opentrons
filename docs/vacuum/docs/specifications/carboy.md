@@ -1,9 +1,22 @@
 ---
-title: "Vacuum Module: Carboy"
+title: "Vacuum Module: Waste Collection Carboy"
 description: "Physical features and chemical compatibility."
 ---
 
-The Vacuum Module ships with a borosilicate glass carboy, carboy holder, cap, and cap wrench.
+The Vacuum Module ships with a borosilicate 3.3 glass carboy, carboy holder, cap, cap wrench, jar holder, and a vacuum hose holder/clip.
+
+## Carboy features
+
+Text and image for the jar, diverter, float, wrench
+
+## Accessories
+
+Text and image for the wrench, jar holder, hose holder.
+
+<figure class="screenshot side-by-side" markdown>
+
+<figcaption></figcaption>
+</figure>
 
 ## Specifications
 
@@ -38,8 +51,10 @@ The Vacuum Module ships with a borosilicate glass carboy, carboy holder, cap, an
   </tbody>
 </table>
 
-## Chemical compatibility
+## Reagent compatibility
 
 The waste carboy is made of Borosilicate 3.3 glass. This material offers exceptional chemical durability against water, steam, acids, salt solutions, halogens, and organic solvents. Its low coefficient of thermal expansion provides high resistance to thermal shock.
 
 Although Borosilicate 3.3 is durable, this material provides only moderate resistance to strong alkaline solutions. Also, exposure to hot, concentrated phosphoric acid or hydrofluoric acid will cause surface etching or complete dissolution.
+
+For the suitability ratings of individual carboy pieces, see [Chemical Compatibility](compatibility.md).
