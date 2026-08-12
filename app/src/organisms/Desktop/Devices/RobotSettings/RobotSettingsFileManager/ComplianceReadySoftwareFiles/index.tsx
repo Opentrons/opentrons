@@ -185,41 +185,50 @@ export function ComplianceReadySoftwareFiles({
       <Skeleton width="100%" height="3rem" backgroundSize={`${width}px`} />
     </div>
   )
+  const header = (
+    <div className={styles.compliance_table_header_row}>
+      <CheckboxBasic
+        checked={isSomeSelected ? 'indeterminate' : isAllSelected}
+        onChange={handleToggleAll}
+      />
+
+      <div className={styles.log_period_columns}>
+        <StyledText
+          desktopStyle="bodyDefaultRegular"
+          className={styles.log_date_col}
+        >
+          {t('protocol')}
+        </StyledText>
+        <StyledText
+          desktopStyle="bodyDefaultRegular"
+          className={styles.log_date_col}
+        >
+          {t('log_period_start')}
+        </StyledText>
+        <StyledText
+          desktopStyle="bodyDefaultRegular"
+          className={styles.log_date_col}
+        >
+          {t('log_period_end')}
+        </StyledText>
+      </div>
+    </div>
+  )
 
   let content: ReactNode = <></>
   if (logPeriodSummaryStatus === 'loading') {
-    content = skeletonContent
+    content = (
+      <div className={fileManagerStyles.log_table}>
+        {header}
+        {skeletonContent}
+      </div>
+    )
   } else if (logPeriodSummariesData?.data.length === 0) {
     content = <InfoScreen content={t('no_user_action_logs')} />
   } else {
     content = (
       <div className={fileManagerStyles.log_table}>
-        <div className={styles.compliance_table_header_row}>
-          <CheckboxBasic
-            checked={isSomeSelected ? 'indeterminate' : isAllSelected}
-            onChange={handleToggleAll}
-          />
-          <div className={styles.log_period_columns}>
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              className={styles.log_date_col}
-            >
-              {t('protocol')}
-            </StyledText>
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              className={styles.log_date_col}
-            >
-              {t('log_period_start')}
-            </StyledText>
-            <StyledText
-              desktopStyle="bodyDefaultRegular"
-              className={styles.log_date_col}
-            >
-              {t('log_period_end')}
-            </StyledText>
-          </div>
-        </div>
+        {header}
         {periods.map(period => (
           <LogPeriodRow
             key={period.id}
