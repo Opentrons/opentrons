@@ -168,11 +168,9 @@ class DirectedRunProcess(AbstractRunCoordinator):
         self._run_id: Optional[str] = None
         self._run_orchestrator: Optional[RunOrchestrator] = None
         self._loop: Optional[asyncio.AbstractEventLoop] = None
-        # Grab the Proxy resources for the Robot Server and OT3API - always expect the resources to be up before a run
         self._robot_server_resource: Optional[RobotServerPyroResource] = None
         self._hardware_api: Optional[HardwareControlAPI] = None
         log.info(f"Directed Run Process initialized with Run ID: {self._run_id}")
-        # task create
 
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def register_hardware_door_event(self) -> HardwareEventHandler:
