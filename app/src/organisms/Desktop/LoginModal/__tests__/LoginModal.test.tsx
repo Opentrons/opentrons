@@ -33,6 +33,10 @@ vi.mock('/app/redux-resources/robots', () => ({
 }))
 vi.mock('/app/redux/robot-auth', () => ({
   useAccessTokenForRobot: vi.fn(() => null),
+  logOut: vi.fn((payload: { robotName: string }) => ({
+    type: 'robotAuth/logOut',
+    payload,
+  })),
 }))
 
 const ROBOT_NAME = 'otie'
@@ -106,7 +110,7 @@ function mockSetNewPasswordSuccess(
   vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(({ onSuccess }) => ({
     submitNewPassword: (username: string, password: string) => {
       onSubmit?.(username, password)
-      onSuccess(username, TOKEN_RESPONSE)
+      onSuccess(username)
     },
     isLoading: false,
   }))
@@ -258,7 +262,7 @@ describe('LoginModal', () => {
     screen.getByRole('button', { name: 'Confirm' })
   })
 
-  it('submits a new password and closes on success', () => {
+  it('returns to login after setting a new password', () => {
     mockLoginRequiringPasswordReset()
     mockSetNewPasswordSuccess(submitNewPassword)
 
@@ -275,7 +279,11 @@ describe('LoginModal', () => {
 
     expect(submitNewPassword).toHaveBeenCalledWith('alice', 'new-password')
     expect(storeLoginState).toHaveBeenCalledTimes(1)
-    expect(screen.queryByText('Compliance Ready Software Login')).toBeNull()
+    screen.getByText('Password reset for alice')
+    screen.getByTestId('Toast_success')
+    screen.getByText('Compliance Ready Software Login')
+    expect(screen.getByLabelText('Username')).toHaveValue('alice')
+    expect(screen.getByLabelText('Password')).toHaveValue('')
   })
 
   it('shows a mismatch error when confirm password does not match', () => {

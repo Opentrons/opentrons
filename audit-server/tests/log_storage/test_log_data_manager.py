@@ -18,7 +18,7 @@ from audit_server.log_storage.log_data_manager import (
     LogDataManager,
     _GetTime,
 )
-from audit_server.log_storage.models import LogPeriodDetails
+from audit_server.log_storage.models import LogPeriodDetails, LogPeriodSummary
 from audit_server.log_storage.store import (
     LogStore,
     NoActivePeriodError,
@@ -86,7 +86,7 @@ def test_get_log_period_details(
 ) -> None:
     """It should get aggregate period details from the store."""
     details = LogPeriodDetails(
-        id=1,
+        id="1",
         startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
         endedAt=None,
         recordCount=10,
@@ -895,7 +895,7 @@ def test_create_deletion_key_mints_a_key(
     """It should mint a non-empty deletion key for a completed log period."""
     decoy.when(mock_store.get_period_details("1")).then_return(
         LogPeriodDetails(
-            id=1,
+            id="1",
             startedAt=datetime.now(),
             endedAt=datetime.now(),
             recordCount=10,
@@ -914,7 +914,7 @@ def test_create_deletion_key_mints_distinct_keys(
     """Each call should mint a new, distinct key for the same period."""
     decoy.when(mock_store.get_period_details("1")).then_return(
         LogPeriodDetails(
-            id=1,
+            id="1",
             startedAt=datetime.now(),
             endedAt=datetime.now(),
             recordCount=10,
@@ -934,7 +934,7 @@ def test_create_deletion_key_fails_if_period_is_active(
     """Deletion keys cannot be created for active periods."""
     decoy.when(mock_store.get_period_details("1")).then_return(
         LogPeriodDetails(
-            id=1,
+            id="1",
             startedAt=datetime.now(),
             endedAt=None,
             recordCount=10,
@@ -962,7 +962,7 @@ async def test_delete_log_period_requires_deletion_key(
     period_id = "2"
     decoy.when(mock_store.get_period_details(period_id)).then_return(
         LogPeriodDetails(
-            id=1,
+            id="1",
             startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
             endedAt=datetime(2025, 1, 1, tzinfo=timezone.utc),
             recordCount=10,
@@ -1008,7 +1008,7 @@ async def test_delete_log_period_deletes_log_collateral(
     period_id = "1"
     decoy.when(mock_store.get_period_details(period_id)).then_return(
         LogPeriodDetails(
-            id=1,
+            id="1",
             startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
             endedAt=datetime(2025, 1, 1, tzinfo=timezone.utc),
             recordCount=10,
@@ -1022,3 +1022,64 @@ async def test_delete_log_period_deletes_log_collateral(
     assert result == "1"
     for file in files:
         assert not file.exists()
+
+
+def test_usage_summary_adds_up(
+    subject: LogDataManager, mock_store: LogStore, decoy: Decoy
+) -> None:
+    """It should sum up usage of each log period."""
+
+    def _build_summary(id: str) -> LogPeriodSummary:
+        return LogPeriodSummary(
+            id=id,
+            startedAt=datetime.now(tz=timezone.utc),
+            endedAt=datetime.now(tz=timezone.utc),
+        )
+
+    def _build_details(id: str, usage: int) -> LogPeriodDetails:
+        return LogPeriodDetails(
+            id=id,
+            startedAt=datetime.now(tz=timezone.utc),
+            endedAt=datetime.now(tz=timezone.utc),
+            recordCount=usage // 1000,
+            totalSizeBytes=usage,
+            attachedFilenames=["a"] * 10,
+        )
+
+    decoy.when(mock_store.list_periods()).then_return(
+        [
+            _build_summary("1"),
+            _build_summary(
+                id="-5",
+            ),
+            _build_summary(
+                id="steve",
+            ),
+            _build_summary(
+                id="nazgul",
+            ),
+            _build_summary(
+                id="8589934583",
+            ),
+        ]
+    )
+    decoy.when(mock_store.get_period_details("1")).then_return(
+        _build_details("1", 1000000)
+    )
+    decoy.when(mock_store.get_period_details("-5")).then_return(
+        _build_details("-5", 5000000)
+    )
+    decoy.when(mock_store.get_period_details("steve")).then_return(
+        _build_details("steve", 123123123123)
+    )
+    decoy.when(mock_store.get_period_details("nazgul")).then_return(
+        _build_details("nazgul", 9000000)
+    )
+    decoy.when(mock_store.get_period_details("8589934583")).then_return(
+        _build_details("8589934583", 8589934583)
+    )
+    result = subject.get_total_fs_usage()
+    assert result.totalUsageBytes == (
+        1000000 + 5000000 + 123123123123 + 9000000 + 8589934583
+    )
+    assert result.totalPeriods == 5

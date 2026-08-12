@@ -12,7 +12,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons_shared_data.robot.types import RobotType
 from server_utils.util import call_once
 
-from .models import DiskDetails, Health, HealthLinks
+from .models import Health, HealthLinks
 from robot_server.disk_monitor.dependencies import get_disk_monitor
 from robot_server.disk_monitor.monitor import DiskMonitor
 from robot_server.hardware import get_hardware, get_robot_type
@@ -179,9 +179,5 @@ async def get_health(
         robot_model=robot_type,
         links=health_links,
         robot_serial=(await hardware.get_serial_number()),
-        disk_details=DiskDetails(
-            systemAvailableMb=disk_monitor.get_available_disk_space_mb(),
-            systemTotalMb=disk_monitor.get_total_disk_space_mb(),
-            imagesDirectorySizeMb=disk_monitor.get_images_directory_size_mb(),
-        ),
+        disk_details=disk_monitor.get_details(),
     )

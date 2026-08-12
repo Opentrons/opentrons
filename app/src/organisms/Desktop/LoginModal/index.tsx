@@ -1,6 +1,7 @@
 import { useId, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import {
@@ -8,14 +9,19 @@ import {
   COLORS,
   InputField,
   Modal,
+  POSITION_FIXED,
   PrimaryButton,
   SecondaryButton,
+  SPACING,
   StyledText,
+  SUCCESS_TOAST,
+  Toast,
 } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
+import { logOut } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
@@ -43,7 +49,11 @@ interface SetNewPasswordFormState {
 }
 
 type LoginModalScreen =
-  | { kind: 'login'; formData: LoginFormState }
+  | {
+      kind: 'login'
+      formData: LoginFormState
+      passwordResetSuccess?: boolean
+    }
   | { kind: 'forgotPassword'; formData: LoginFormState }
   | { kind: 'setNewPassword'; formData: SetNewPasswordFormState }
 
@@ -115,6 +125,7 @@ interface LoginModalImplProps {
 function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const { robotName, uncloseable } = props
   const modal = useModal()
+  const dispatch = useDispatch()
   const host = useHost()
   const { t } = useTranslation()
   const [screen, setScreen] = useState<LoginModalScreen>({
@@ -124,6 +135,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const storeLoginState = useStoreLoginState()
 
   const loginFormId = useId()
+  const passwordResetSuccessToastId = useId()
   const [showRobotCertImportModal, setShowRobotCertImportModal] =
     useState<boolean>(false)
 
@@ -160,8 +172,16 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
     useSetNewPasswordAndSignIn({
       onSuccess: successfulUsername => {
-        modal.resolve({ username: successfulUsername })
-        modal.remove()
+        dispatch(logOut({ robotName }))
+        setScreen({
+          kind: 'login',
+          passwordResetSuccess: true,
+          formData: {
+            username: successfulUsername,
+            logInPassword: '',
+            error: null,
+          },
+        })
       },
       onError: message => {
         updateSetNewPasswordFormData(setScreen, { error: message })
@@ -254,62 +274,86 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   }
 
   return createPortal(
-    <Modal
-      title={t('access_control:desktop_login_modal_header')}
-      onClose={uncloseable ? undefined : handleClose}
-      // Above SignRun and other run-header modals (zIndexOverlay: 1000); below
-      // permission toasts that use TOAST_ABOVE_LOGIN_Z_INDEX (10002).
-      zIndexOverlay={10001}
-      footer={<div className={styles.modal_footer_container}>{footer}</div>}
-    >
-      <div className={styles.content_container}>
-        {screen.kind === 'login' ? (
-          <LoginView
-            formId={loginFormId}
-            formData={screen.formData}
-            onSubmit={handleLoginSubmit}
-            onUsernameChange={value => {
-              updateLoginFormData(setScreen, { username: value, error: null })
-            }}
-            onLogInPasswordChange={value => {
-              updateLoginFormData(setScreen, {
-                logInPassword: value,
-                error: null,
-              })
-            }}
-            onForgotPasswordClick={() => {
-              setScreen({ kind: 'forgotPassword', formData: screen.formData })
-            }}
-          />
-        ) : screen.kind === 'forgotPassword' ? (
-          <ForgotPasswordView />
-        ) : (
-          <SetNewPasswordView
-            formData={screen.formData}
-            onNewPasswordChange={value => {
-              updateSetNewPasswordFormData(setScreen, {
-                newPassword: value,
-                error: null,
-                confirmPasswordError: null,
-              })
-            }}
-            onConfirmPasswordChange={value => {
-              updateSetNewPasswordFormData(setScreen, {
-                confirmPassword: value,
-                error: null,
-                confirmPasswordError: null,
-              })
-            }}
-            onPasswordFieldBlur={() => {
-              const { newPassword, confirmPassword } = screen.formData
-              if (newPassword !== '' && confirmPassword !== '') {
-                validateConfirmPasswordMatch(screen.formData)
-              }
-            }}
-          />
-        )}
-      </div>
-    </Modal>,
+    <>
+      <Modal
+        title={t('access_control:desktop_login_modal_header')}
+        onClose={uncloseable ? undefined : handleClose}
+        // Above SignRun and other run-header modals (zIndexOverlay: 1000).
+        zIndexOverlay={10001}
+        footer={<div className={styles.modal_footer_container}>{footer}</div>}
+      >
+        <div className={styles.content_container}>
+          {screen.kind === 'login' ? (
+            <LoginView
+              formId={loginFormId}
+              formData={screen.formData}
+              onSubmit={handleLoginSubmit}
+              onUsernameChange={value => {
+                updateLoginFormData(setScreen, { username: value, error: null })
+              }}
+              onLogInPasswordChange={value => {
+                updateLoginFormData(setScreen, {
+                  logInPassword: value,
+                  error: null,
+                })
+              }}
+              onForgotPasswordClick={() => {
+                setScreen({ kind: 'forgotPassword', formData: screen.formData })
+              }}
+            />
+          ) : screen.kind === 'forgotPassword' ? (
+            <ForgotPasswordView />
+          ) : (
+            <SetNewPasswordView
+              formData={screen.formData}
+              onNewPasswordChange={value => {
+                updateSetNewPasswordFormData(setScreen, {
+                  newPassword: value,
+                  error: null,
+                  confirmPasswordError: null,
+                })
+              }}
+              onConfirmPasswordChange={value => {
+                updateSetNewPasswordFormData(setScreen, {
+                  confirmPassword: value,
+                  error: null,
+                  confirmPasswordError: null,
+                })
+              }}
+              onPasswordFieldBlur={() => {
+                const { newPassword, confirmPassword } = screen.formData
+                if (newPassword !== '' && confirmPassword !== '') {
+                  validateConfirmPasswordMatch(screen.formData)
+                }
+              }}
+            />
+          )}
+        </div>
+      </Modal>
+      {screen.kind === 'login' && screen.passwordResetSuccess === true ? (
+        <Toast
+          id={passwordResetSuccessToastId}
+          message={
+            t('access_control:set_new_password_success', {
+              username: screen.formData.username,
+            }) as string
+          }
+          type={SUCCESS_TOAST}
+          closeButton
+          displayType="desktop"
+          position={POSITION_FIXED}
+          right={SPACING.spacing32}
+          bottom={SPACING.spacing32}
+          onClose={() => {
+            setScreen(prev =>
+              prev.kind === 'login'
+                ? { ...prev, passwordResetSuccess: false }
+                : prev
+            )
+          }}
+        />
+      ) : null}
+    </>,
     getTopPortalEl()
   )
 }
