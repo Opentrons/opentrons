@@ -77,14 +77,13 @@ stages:
           username: test_new_user
           locked: false
           resetPassword: false
-  - name: Update the username and password
+  - name: Update the username
     request:
       method: PATCH
       url: '{run_server.base_url}/auth/users/byUsername/test_new_user'
       json:
         data:
           username: test_new_user_upd
-          password: securepassword123
       headers:
         Authorization: '{admin_access_token}'
     response:
