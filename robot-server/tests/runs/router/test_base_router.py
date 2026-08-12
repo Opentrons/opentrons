@@ -209,7 +209,7 @@ async def test_create_run(
     )
     decoy.when(await mock_audit_client.get_current_log_period()).then_return(
         GetLogPeriodsData(
-            id=123,
+            id="123",
             startedAt=datetime(year=2021, month=1, day=1),
             endedAt=None,
         )
@@ -337,7 +337,7 @@ async def test_create_protocol_run(
     )
     decoy.when(await mock_audit_client.get_current_log_period()).then_return(
         GetLogPeriodsData(
-            id=123,
+            id="123",
             startedAt=datetime(year=2021, month=1, day=1),
             endedAt=None,
         )
@@ -627,7 +627,7 @@ async def test_create_protocol_run_succeeds_when_out_of_space_with_acm_off(
     )
     decoy.when(await mock_audit_client.get_current_log_period()).then_return(
         GetLogPeriodsData(
-            id=123,
+            id="123",
             startedAt=datetime(year=2021, month=1, day=1),
             endedAt=None,
         )
