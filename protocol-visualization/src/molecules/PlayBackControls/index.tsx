@@ -25,7 +25,8 @@ interface PlayBackControlsProps {
   setSelectedCommand: Dispatch<SetStateAction<string | null>>
   milliSecondsPerFrame: number
   setMilliSecondsPerFrame: Dispatch<SetStateAction<number>>
-  onClickStepDetail?: () => void
+  showStepDetails: boolean
+  onClickStepDetails: Dispatch<SetStateAction<boolean>>
 }
 
 export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
@@ -38,7 +39,8 @@ export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
     setSelectedCommand,
     milliSecondsPerFrame,
     setMilliSecondsPerFrame,
-    // onClickStepDetail,
+    showStepDetails,
+    onClickStepDetails,
   } = props
 
   const { t } = useTranslation('protocol_visualization')
@@ -144,7 +146,9 @@ export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
       <div className={styles.controls_right}>
         <button
           type="button"
-          onClick={() => {}}
+          onClick={() => {
+            onClickStepDetails(!showStepDetails)
+          }}
           className={styles.icon_button}
           aria-label={t('step_details')}
         >
