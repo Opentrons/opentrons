@@ -5,7 +5,7 @@ import type { TFunction } from 'i18next'
 /**
  * Shape of an error response from `POST /auth/oauth2/token`: the standard
  * RFC 6749 § 5.2 fields plus the opentrons-specific
- * `opentrons_login_attempts_remaining` and `opentrons_account_locked` fields.
+ * `opentrons_login_attempts_remaining` field returned when the lockout limit is configured. `opentrons_account_locked` field returned when the account is locked by an admin.
  */
 interface OAuth2TokenErrorResponse {
   error?: string
