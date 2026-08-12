@@ -93,7 +93,6 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
-  - pymdownx.details
   - sane_lists
   - toc:
       permalink: true
