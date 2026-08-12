@@ -3,14 +3,13 @@
 import threading
 from dataclasses import dataclass, field
 from logging import Logger
-from typing import Any, Type, Dict
+from typing import Any, Type
 
 from typing_extensions import Literal
 
 from .. import utils
 from ..constants import ErrorCode, ErrorSeverity, MessageId
 from . import payloads
-from .fields import MotorUsageTypeField
 
 
 class SingletonMessageIndexGenerator(object):
@@ -978,6 +977,7 @@ class GetMotorUsageResponse(BaseMessage):
     message_id: Literal[MessageId.get_motor_usage_response] = (
         MessageId.get_motor_usage_response
     )
+
 
 @dataclass
 class HepaUVInfoResponse(BaseMessage):  # noqa: D101
