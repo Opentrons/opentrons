@@ -1,10 +1,19 @@
 #!/usr/bin/env python3
-"""Build multi-run comparison HTML from saved sweep JSON files."""
+"""Build multi-run comparison HTML from saved sweep result files."""
 from __future__ import annotations
 
 import argparse
 import json
 from pathlib import Path
+
+try:
+    from hardware_testing.modules.vacuum_module.scripts.pressure_regulation import (
+        hold_results as _hold_results,
+    )
+except ImportError:
+    import hold_results as _hold_results  # type: ignore[no-redef,import-not-found]
+
+load_runs_dir = _hold_results.load_runs_dir
 
 
 def run_label(run: dict) -> str:
@@ -13,17 +22,8 @@ def run_label(run: dict) -> str:
 
 
 def load_runs(runs_dir: Path) -> list[dict]:
-    """Load results.json under runs_dir, sorted alphabetically by run name."""
-    runs = []
-    for p in runs_dir.glob("*/results.json"):
-        data = json.loads(p.read_text())
-        data["_dir"] = p.parent.name
-        if not data.get("run_name"):
-            data["run_name"] = data["_dir"]
-        runs.append(data)
-    # Alphabetical by run_name (sequence-prefixed names sort in run order).
-    runs.sort(key=lambda r: run_label(r).casefold())
-    return runs
+    """Load results under runs_dir, sorted alphabetically by run name."""
+    return load_runs_dir(runs_dir)
 
 
 def main(args) -> int:
@@ -191,13 +191,13 @@ def main(args) -> int:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Build multi-run comparison HTML from saved sweep JSON files"
+        description="Build multi-run comparison HTML from saved sweep result files"
     )
     parser.add_argument(
         "--runs-dir",
         type=Path,
         default=Path("runs"),
-        help="Directory of run folders with results.json (default: runs)",
+        help="Directory of run folders with results.json or results.csv (default: runs)",
     )
     parser.add_argument(
         "--output",

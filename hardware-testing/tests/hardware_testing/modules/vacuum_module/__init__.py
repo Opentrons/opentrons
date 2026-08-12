@@ -1,0 +1,1 @@
+"""Vacuum module test package."""

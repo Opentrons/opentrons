@@ -2,16 +2,13 @@
 """Vacuum module pressure hold regulation test.
 
 Assumes exclusive serial access (robot-server stopped).
-Disables waste detection, runs targets, prints samples, writes JSON incrementally
-so a host-side report can update live.
+Disables waste detection, runs targets, prints samples, and writes JSON and/or
+CSV incrementally so a host-side report can update live.
 """
 from __future__ import annotations
 
 import argparse
 import asyncio
-import json
-import os
-import statistics
 import sys
 import time
 from typing import Any
@@ -20,10 +17,18 @@ from opentrons.drivers import vacuum_module
 from opentrons.drivers.vacuum_module.types import VentState
 
 from hardware_testing.modules.common.utils import find_module_port
+from hardware_testing.modules.vacuum_module.scripts.pressure_regulation import hold_results
+
+
+DEFAULT_CSV_PATH = hold_results.DEFAULT_CSV_PATH
+DEFAULT_JSON_PATH = hold_results.DEFAULT_JSON_PATH
+OUTPUT_CHOICES = hold_results.OUTPUT_CHOICES
+OUTPUT_JSON = hold_results.OUTPUT_JSON
+steady_stats = hold_results.steady_stats
+write_results = hold_results.write_results
 
 VACUUM_VID = 0x0483
 VACUUM_PID = 0xEF40
-OUT_JSON = "/tmp/vacuum_pressure_hold_results.json"
 
 DEFAULT_TARGETS = [float(p) for p in range(0, -801, -50)]  # 0, -50, ..., -800 mbar
 DEFAULT_DURATION_S = 120  # 2 minutes each
@@ -34,42 +39,13 @@ DEFAULT_KI = 4.59
 DEFAULT_KD = 0.15
 
 
-def write_results(result: dict[str, Any]) -> None:
-    tmp = OUT_JSON + ".tmp"
-    with open(tmp, "w") as f:
-        json.dump(result, f)
-    os.replace(tmp, OUT_JSON)
-
-
-def steady_stats(samples: list[dict[str, Any]], duration_s: int) -> dict[str, Any]:
-    steady = [
-        s
-        for s in samples
-        if s["t_s"] >= (duration_s - 30)
-        and s["t_s"] < duration_s
-        and s["enabled"] == 1
-    ]
-    if not steady:
-        return {"n": 0, "note": "no steady samples (pump stopped early?)"}
-    errs = [s["error_mbar"] for s in steady]
-    currents = [s["current_mbar"] for s in steady]
-    return {
-        "n": len(steady),
-        "mean_current": statistics.mean(currents),
-        "mean_err": statistics.mean(errs),
-        "mean_abs_err": statistics.mean(abs(e) for e in errs),
-        "stdev_err": statistics.stdev(errs) if len(errs) > 1 else 0.0,
-        "p95_abs_err": sorted(abs(e) for e in errs)[int(0.95 * (len(errs) - 1))],
-        "max_abs_err": max(abs(e) for e in errs),
-    }
-
-
 async def run_target(
     pump: vacuum_module.VacuumModuleDriver,
     target_gauge: float,
     duration_s: int,
     sample_period: float,
     result: dict[str, Any],
+    output: str,
 ) -> dict[str, Any]:
     print(f"\n=== Target {target_gauge} mbar for {duration_s}s ===", flush=True)
     await pump.set_vent_state(VentState.CLOSED)
@@ -99,7 +75,7 @@ async def run_target(
     }
     result["runs"].append(run)
     result["current_target_mbar"] = target_gauge
-    write_results(result)
+    write_results(result, output=output)
 
     t0 = time.time()
     last_write = 0.0
@@ -138,7 +114,7 @@ async def run_target(
         # Incremental write ~every 2s for live graph
         if elapsed - last_write >= 2.0:
             run["stats"] = steady_stats(samples, duration_s)
-            write_results(result)
+            write_results(result, output=output)
             last_write = elapsed
         await asyncio.sleep(sample_period)
 
@@ -160,7 +136,7 @@ async def run_target(
     print("stop", flush=True)
     await pump.set_vent_state(VentState.OPENED)
     print("open vent: OPENED", flush=True)
-    write_results(result)
+    write_results(result, output=output)
     await asyncio.sleep(2)
     return run
 
@@ -220,10 +196,12 @@ async def main(args: argparse.Namespace) -> int:
             "current_target_mbar": None,
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         }
-        write_results(result)
+        write_results(result, output=args.output)
 
         for tgt in targets:
-            await run_target(pump, tgt, duration_s, SAMPLE_PERIOD_S, result)
+            await run_target(
+                pump, tgt, duration_s, SAMPLE_PERIOD_S, result, args.output
+            )
 
         result["status"] = "complete"
         result["current_target_mbar"] = None
@@ -232,8 +210,8 @@ async def main(args: argparse.Namespace) -> int:
             f"FW:{info['version']} HW:Opentrons-vacuum-module-{info['model']} "
             f"SerialNo:{info['serial']}"
         )
-        write_results(result)
-        print(f"\nWrote {OUT_JSON}", flush=True)
+        written = write_results(result, output=args.output)
+        print(f"\nWrote {', '.join(str(path) for path in written)}", flush=True)
 
         print("\n======== STEADY-STATE SUMMARY (last ~30s) ========", flush=True)
         for run in result["runs"]:
@@ -278,7 +256,7 @@ if __name__ == "__main__":
         type=str,
         default="unnamed",
         help=(
-            "Label for this run (stored in results JSON). Prefer a sequence "
+            "Label for this run (stored in results). Prefer a sequence "
             "prefix matching the results folder, e.g. 23_1888194c_water_3x0p2mm "
             "(default: unnamed)"
         ),
@@ -306,6 +284,16 @@ if __name__ == "__main__":
         type=float,
         default=DEFAULT_KD,
         help="Derivative gain",
+    )
+    parser.add_argument(
+        "--output",
+        choices=list(OUTPUT_CHOICES),
+        default=OUTPUT_JSON,
+        help=(
+            "Result file format (default: json). json writes "
+            f"{DEFAULT_JSON_PATH}; csv writes {DEFAULT_CSV_PATH} plus "
+            "a sibling *_summary.csv; both writes all three."
+        ),
     )
     args = parser.parse_args()
     sys.exit(asyncio.run(main(args)))

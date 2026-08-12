@@ -1,21 +1,30 @@
 #!/usr/bin/env python3
-"""Build an interactive HTML report from vacuum pressure hold JSON results."""
+"""Build an interactive HTML report from vacuum pressure hold results."""
 from __future__ import annotations
 
 import argparse
 import json
 from pathlib import Path
 
+try:
+    from hardware_testing.modules.vacuum_module.scripts.pressure_regulation import (
+        hold_results as _hold_results,
+    )
+except ImportError:
+    import hold_results as _hold_results  # type: ignore[no-redef,import-not-found]
+
+load_results = _hold_results.load_results
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Build an interactive HTML report from vacuum pressure hold JSON results"
+        description="Build an interactive HTML report from vacuum pressure hold results"
     )
     parser.add_argument(
         "--input",
         type=Path,
-        default=Path("resulrs.json"),
-        help="Input JSON results path (default: results.json)",
+        default=Path("results.json"),
+        help="Input results path (.json, .csv, or a run directory; default: results.json)",
     )
     parser.add_argument(
         "--output",
@@ -36,7 +45,7 @@ def main() -> int:
         print(f"No data yet; wrote placeholder {out}")
         return 0
 
-    data = json.loads(src.read_text())
+    data = load_results(src)
     series_js = []
     stats_rows = []
     for run in data.get("runs", []):
