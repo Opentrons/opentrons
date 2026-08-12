@@ -104,7 +104,7 @@ PRESSURE_TOL = 5.0
 EQUALIZE_PRESSURE_TOL = 10.0
 POWER_TOL = 1.0
 
-# Pressure-control PID defaults
+# Pressure-control tuning defaults
 # See pressure_task.hpp and pressure_controller.hpp in opentrons-modules for details
 DEFAULT_PRESSURE_CONTROL_TUNINGS = PressureControlTunings(
     kp=13.1,
@@ -114,6 +114,8 @@ DEFAULT_PRESSURE_CONTROL_TUNINGS = PressureControlTunings(
     k_velocity=20.0,
     k_holding=43.0,
     tolerance_error=2.0,  # rel_tol_pct (%)
+    approach_band=80.0,
+    slew_end_fraction=0.30,
 )
 
 # Waste-full detection defaults
@@ -314,16 +316,18 @@ class VacuumModule(mod_abc.AbstractModule):
             waste.max_window_time,
         )
 
-        # Pressure control PID parameters
+        # Pressure control parameters
         pid = DEFAULT_PRESSURE_CONTROL_TUNINGS
         await self._driver.set_pressure_control_tunings(
-            pid.kp,
-            pid.ki,
-            pid.kd,
-            pid.overshoot_error,
-            pid.k_velocity,
-            pid.k_holding,
-            pid.tolerance_error,
+            kp=pid.kp,
+            ki=pid.ki,
+            kd=pid.kd,
+            overshoot=pid.overshoot_error,
+            k_velocity=pid.k_velocity,
+            k_holding=pid.k_holding,
+            tolerance=pid.tolerance_error,
+            approach_band=pid.approach_band,
+            slew_end_fraction=pid.slew_end_fraction,
         )
 
     async def attempt_reconnect(self) -> None:
