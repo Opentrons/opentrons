@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build multi-run comparison HTML from saved sweep result files."""
+"""Build multi-run comparison HTML and/or PDF from saved sweep result files."""
 from __future__ import annotations
 
 import argparse
@@ -10,8 +10,12 @@ try:
     from hardware_testing.modules.vacuum_module.scripts.pressure_regulation import (
         hold_results as _hold_results,
     )
+    from hardware_testing.modules.vacuum_module.scripts.pressure_regulation import (
+        report_format as _report_format,
+    )
 except ImportError:
     import hold_results as _hold_results  # type: ignore[no-redef,import-not-found]
+    import report_format as _report_format  # type: ignore[no-redef,import-not-found]
 
 load_runs_dir = _hold_results.load_runs_dir
 
@@ -28,11 +32,18 @@ def load_runs(runs_dir: Path) -> list[dict]:
 
 def main(args) -> int:
     runs_dir = args.runs_dir
-    out = args.output
+    fmt = _report_format.infer_format(args.output, args.fmt)
+    paths = _report_format.output_paths(args.output, fmt)
     runs = load_runs(runs_dir)
     if not runs:
-        out.write_text("<html><body><h1>No runs yet</h1></body></html>")
-        print("no runs")
+        written = []
+        if "html" in paths:
+            paths["html"].write_text("<html><body><h1>No runs yet</h1></body></html>")
+            written.append(paths["html"])
+        if "pdf" in paths:
+            _report_format.write_waiting_pdf(paths["pdf"], "No runs yet")
+            written.append(paths["pdf"])
+        print(f"no runs; wrote {', '.join(str(p) for p in written)}")
         return 0
 
     # Summary table rows
@@ -184,14 +195,20 @@ def main(args) -> int:
 </body>
 </html>
 """
-    out.write_text(html)
-    print(f"Wrote {out.resolve()} with {len(runs)} runs")
+    written = []
+    if "html" in paths:
+        paths["html"].write_text(html)
+        written.append(paths["html"])
+    if "pdf" in paths:
+        _report_format.write_compare_pdf(runs, paths["pdf"])
+        written.append(paths["pdf"])
+    print(f"Wrote {', '.join(str(path.resolve()) for path in written)} with {len(runs)} runs")
     return 0
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Build multi-run comparison HTML from saved sweep result files"
+        description="Build multi-run comparison HTML and/or PDF from saved sweep result files"
     )
     parser.add_argument(
         "--runs-dir",
@@ -203,7 +220,14 @@ if __name__ == "__main__":
         "--output",
         type=Path,
         default=Path("compare.html"),
-        help="Output HTML path (default: compare.html)",
+        help="Output path (default: compare.html). Suffix .pdf selects PDF if --format omitted.",
+    )
+    parser.add_argument(
+        "--format",
+        dest="fmt",
+        choices=list(_report_format.FORMAT_CHOICES),
+        default=None,
+        help="Report format: html, pdf, or both (default: from --output suffix, else html)",
     )
     args = parser.parse_args()
     raise SystemExit(main(args))

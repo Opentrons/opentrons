@@ -80,24 +80,34 @@ python3 -m hardware_testing.modules.vacuum_module.scripts.pressure_regulation.ru
 ### `make_report.py`
 
 ```bash
-python3 make_report.py [--input PATH] [--output PATH]
+python3 make_report.py [--input PATH] [--output PATH] [--format html|pdf|both]
 ```
 
 | Arg | Default | Meaning |
 |-----|---------|---------|
 | `--input` | `results.json` | Hold-test `.json`, `.csv`, or a run directory |
-| `--output` | `index.html` | HTML report |
+| `--output` | `index.html` | Output path (`.pdf` selects PDF if `--format` omitted) |
+| `--format` | from `--output` suffix, else `html` | `html` (live Chart.js), `pdf` (matplotlib), or `both` |
+
+PDF needs matplotlib on the host (`hardware-testing` dev extra).
+
+```bash
+python3 make_report.py --input results.json --output index.html
+python3 make_report.py --input results.json --output index.pdf
+python3 make_report.py --input results.json --output index.html --format both
+```
 
 ### `make_compare_report.py`
 
 ```bash
-python3 make_compare_report.py [--runs-dir DIR] [--output PATH]
+python3 make_compare_report.py [--runs-dir DIR] [--output PATH] [--format html|pdf|both]
 ```
 
 | Arg | Default | Meaning |
 |-----|---------|---------|
 | `--runs-dir` | `runs` | Dir of run folders with `results.json` or `results.csv` |
-| `--output` | `compare.html` | Comparison HTML |
+| `--output` | `compare.html` | Output path (`.pdf` selects PDF if `--format` omitted) |
+| `--format` | from `--output` suffix, else `html` | `html`, `pdf`, or `both` |
 
 Each folder prefers `results.json` when both formats are present.
 

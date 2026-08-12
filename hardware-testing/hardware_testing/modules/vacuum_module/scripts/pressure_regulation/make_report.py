@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build an interactive HTML report from vacuum pressure hold results."""
+"""Build an HTML and/or PDF report from vacuum pressure hold results."""
 from __future__ import annotations
 
 import argparse
@@ -10,15 +10,26 @@ try:
     from hardware_testing.modules.vacuum_module.scripts.pressure_regulation import (
         hold_results as _hold_results,
     )
+    from hardware_testing.modules.vacuum_module.scripts.pressure_regulation import (
+        report_format as _report_format,
+    )
 except ImportError:
     import hold_results as _hold_results  # type: ignore[no-redef,import-not-found]
+    import report_format as _report_format  # type: ignore[no-redef,import-not-found]
 
 load_results = _hold_results.load_results
 
 
+_WAITING_HTML = (
+    "<!DOCTYPE html><html><body style='background:#0f1419;color:#e7ecf3;"
+    "font-family:system-ui;padding:2rem'><h1>Waiting for data…</h1>"
+    "<meta http-equiv='refresh' content='3'></body></html>"
+)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Build an interactive HTML report from vacuum pressure hold results"
+        description="Build an HTML and/or PDF report from vacuum pressure hold results"
     )
     parser.add_argument(
         "--input",
@@ -30,19 +41,29 @@ def main() -> int:
         "--output",
         type=Path,
         default=Path("index.html"),
-        help="Output HTML path (default: index.html)",
+        help="Output path (default: index.html). Suffix .pdf selects PDF if --format omitted.",
+    )
+    parser.add_argument(
+        "--format",
+        dest="fmt",
+        choices=list(_report_format.FORMAT_CHOICES),
+        default=None,
+        help="Report format: html, pdf, or both (default: from --output suffix, else html)",
     )
     args = parser.parse_args()
 
     src = args.input
-    out = args.output
+    fmt = _report_format.infer_format(args.output, args.fmt)
+    paths = _report_format.output_paths(args.output, fmt)
     if not src.exists():
-        out.write_text(
-            "<!DOCTYPE html><html><body style='background:#0f1419;color:#e7ecf3;"
-            "font-family:system-ui;padding:2rem'><h1>Waiting for data…</h1>"
-            "<meta http-equiv='refresh' content='3'></body></html>"
-        )
-        print(f"No data yet; wrote placeholder {out}")
+        written = []
+        if "html" in paths:
+            paths["html"].write_text(_WAITING_HTML)
+            written.append(paths["html"])
+        if "pdf" in paths:
+            _report_format.write_waiting_pdf(paths["pdf"])
+            written.append(paths["pdf"])
+        print(f"No data yet; wrote placeholder {', '.join(str(p) for p in written)}")
         return 0
 
     data = load_results(src)
@@ -253,8 +274,17 @@ def main() -> int:
 </body>
 </html>
 """
-    out.write_text(html)
-    print(f"Wrote {out.resolve()} status={status} runs={len(series_js)}")
+    written = []
+    if "html" in paths:
+        paths["html"].write_text(html)
+        written.append(paths["html"])
+    if "pdf" in paths:
+        _report_format.write_single_run_pdf(data, paths["pdf"])
+        written.append(paths["pdf"])
+    print(
+        f"Wrote {', '.join(str(path.resolve()) for path in written)} "
+        f"status={status} runs={len(series_js)}"
+    )
     return 0
 
 
