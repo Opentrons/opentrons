@@ -7,7 +7,7 @@ Once activated, Opentrons Flex Compliance Ready Software becomes a permanent par
 
 This section takes a look at using Compliance Ready Software, from logging in, documenting actions, and running protocols to accessing protocol files.
 
-You'll start by logging in. Compliance Ready Software restricts access to both your Flex and the Opentrons App to prevent unauthorized access.
+You'll start by logging in. Compliance Ready Software restricts access to your Flex through both the touchscreen and the Opentrons App.
 
 If your lab uses more than one Opentrons robot, you can still use the same Opentrons App to control them. You'll be blocked from completing actions, like running protocols, changing module status, or updating robot settings, for any compliance ready Flex robots. Until you're logged in, you'll only be able to view some information in the Opentrons App, like the Flex's status or list of protocols.
 
@@ -20,6 +20,7 @@ If your lab uses more than one Opentrons robot, you can still use the same Opent
 
 TODO and comments: 
 - took this pre-login image from designs and updated some dummy text in figma. should double check that this isn't missing a "compliance ready" badge next to the flex's name "Dusty"
+- should I add here what users are able to access before logging in? 
 -------------->
 
 Your Flex touchscreen will appear locked until you log in.

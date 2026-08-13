@@ -18,9 +18,7 @@ TODO: link terms in italics to glossary
 
 ## Adding documentation
 
-Installing Opentrons Compliance Ready Software on your Flex slows down your lab's workflows on purpose. It adds checkpoints to document nearly every robot and protocol action. 
-
-Your compliance ready Flex will prompt all users to document nearly every action they complete on the robot. On the Flex touchscreen, users can use the on-screen, collapsible keyboard to add text on the touchscreen.
+Opentrons Flex Compliance Ready Software adds checkpoints to prompt all users to document nearly every robot and protocol action they complete on the robot. On the Flex touchscreen, users can use the on-screen, collapsible keyboard to add text on the touchscreen.
 
 <figure class="screenshot" markdown>
   ![Add documentation on the Flex touchscreen.](images/documentation-required.png)
@@ -55,7 +53,7 @@ TODO:
 
 ## Viewing actions
 
-While working on the bench, your compliance ready Flex will prompt you many times in the same workflow to add documentation. In case you've stepped away, forgot which action you started, or simply want to view a list of every user action during your session, you can click **View Actions** when adding documentation on the Flex touchscreen.
+While working on the bench, you'll see several prompts to add documentation in the same workflow. In case you've stepped away, forgot which action you started, or simply want to view a list of every user action during your session, you can click **View Actions** when adding documentation on the Flex touchscreen.
 
 <figure class="screenshot" markdown>
   ![View the list of actions on the Flex touchscreen.](images/view-actions-odd.png)
