@@ -51,6 +51,7 @@ import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import {
   AnalysisFailedModal,
   getUnmatchedModulesForProtocol,
+  ProtocolSetupButtonsSkeleton,
   ProtocolSetupInstruments,
   ProtocolSetupLabware,
   ProtocolSetupModulesAndDeck,
@@ -183,7 +184,6 @@ function PrepareToRun({
     'shared',
     'deck_configuration',
   ])
-  const navigate = useNavigate()
   const { makeSnackbar } = useToaster()
   const { scrollRef, isScrolled } = useScrollPosition()
 
@@ -237,11 +237,6 @@ function PrepareToRun({
       setIsPollingForCompletedAnalysis(true)
     }
   }, [mostRecentAnalysis?.status])
-
-  const onConfirmCancelClose = (): void => {
-    setShowConfirmCancelModal(false)
-    navigate(-1)
-  }
 
   const protocolHasModules =
     mostRecentAnalysis?.modules != null &&
@@ -657,21 +652,22 @@ function PrepareToRun({
             )}
           </Flex>
           <Flex gridGap={SPACING.spacing16}>
-            <CloseButton
-              onClose={
-                !isLoading
-                  ? () => {
-                      setShowConfirmCancelModal(true)
-                    }
-                  : onConfirmCancelClose
-              }
-            />
-            <PlayButton
-              disabled={isLoading}
-              onPlay={!isLoading ? onPlay : undefined}
-              ready={!isLoading ? isReadyToRun : false}
-              isDoorOpen={doorStatus.isDoorOpen}
-            />
+            {!isLoading ? (
+              <>
+                <CloseButton
+                  onClose={() => {
+                    setShowConfirmCancelModal(true)
+                  }}
+                />
+                <PlayButton
+                  onPlay={onPlay}
+                  ready={isReadyToRun}
+                  isDoorOpen={doorStatus.isDoorOpen}
+                />
+              </>
+            ) : (
+              <ProtocolSetupButtonsSkeleton />
+            )}
           </Flex>
         </Flex>
       </Flex>
