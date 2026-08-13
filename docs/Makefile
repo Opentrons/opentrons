@@ -54,7 +54,8 @@ PDF_PROJECTS := \
 	python-api \
 	stacker \
 	temperature-module \
-	thermocycler
+	thermocycler \
+	vacuum
 
 pdf-title-absorbance-plate-reader := Absorbance Plate Reader Instruction Manual
 pdf-file-absorbance-plate-reader := Opentrons-Absorbance-Plate-Reader-Instruction-Manual.pdf
@@ -76,6 +77,8 @@ pdf-title-temperature-module := Temperature Module GEN2 Instruction Manual
 pdf-file-temperature-module := Opentrons-Temperature-Module-Instruction-Manual.pdf
 pdf-title-thermocycler := Thermocycler GEN2 Instruction Manual
 pdf-file-thermocycler := Opentrons-Thermocycler-Instruction-Manual.pdf
+pdf-title-vacuum := Vacuum Module Instruction Manual
+pdf-file-vacuum := Opentrons-Vacuum-Module-Instruction-Manual.pdf
 
 .PHONY: pdf pdf-all
 pdf:
@@ -87,8 +90,8 @@ pdf:
 	@case " $(PDF_PROJECTS) " in *" $(PROJECT) "*) ;; *) \
 		echo "Unknown PROJECT '$(PROJECT)'. Valid: $(PDF_PROJECTS)"; exit 1;; \
 	esac
-	uv run --python 3.10 mkdocs build -f ./$(PROJECT)/mkdocs.yml && \
-	uv run --python 3.10 python ./scripts/export_to_pdf.py \
+	uv run --python 3.12 mkdocs build -f ./$(PROJECT)/mkdocs.yml && \
+	uv run --python 3.12 python ./scripts/export_to_pdf.py \
 		$(PROJECT)/site/print_page/index.html \
 		site/$(pdf-file-$(PROJECT)) \
 		'$(pdf-title-$(PROJECT))'
