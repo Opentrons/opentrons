@@ -14,7 +14,7 @@ The chemical compatibility tables use these ratings:
 
 * :material-check-circle:{ .dark-green } **Excellent:** No degradation after continuous exposure.
 * :material-check-circle-outline:{ .light-green } **Good:** Occasional minor effects (e.g., swelling or discoloration). Suitable for long-term use.
-* :material-minus-circle-outline:{ .yellow } **Moderate/Poor:** Avoid accidental contact and use with caution. Flush after exposure.
+* :material-minus-circle-outline:{ .yellow } **Moderate/Poor:** Avoid accidental contact and use with caution. Rinse after exposure.
 * :material-close-circle:{ .red } **Not Recommended:** Rapid breakdown or complete material failure.
 * :material-alert-circle-outline:{ .gray } **No Data:** Information not available.
 

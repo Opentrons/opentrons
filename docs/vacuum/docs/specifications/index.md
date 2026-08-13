@@ -85,7 +85,7 @@ Box 2 includes the Control Box (vacuum pump and electronics), a deck adapter (an
 <div class="parts-list" markdown>
 
 <figure markdown>
-![USB A-to-B cable](../images/usb-ab-cable.png "USB A-to-B cable")
+![USB A-to-B cable](../images/usb-ab-cable.png)
 <figcaption>(1) USB A-B cable</figcaption>
 </figure>
 
@@ -126,7 +126,7 @@ Box 3 includes the waste collection carboy and cap, a carboy holder (to help pre
 </figure>
 
 <figure markdown>
-![Carboy holder](../images/carboy-holder2.png "Waste carboy holder")
+![Carboy holder](../images/carboy-holder.png "Waste carboy holder")
 <figcaption>(1) Carboy holder</figcaption>
 </figure>
 
@@ -175,7 +175,7 @@ The Control Box includes the vacuum pump, air/water separator, electronics, and 
     </tr>
     <tr>
       <td><strong>Weight</strong></td>
-      <td>10 kg</td>10 kg (22 lbs)</td>
+      <td>10 kg (22 lbs)</td>
     </tr>
     <tr>
  <tr>
@@ -212,7 +212,7 @@ The Vacuum Module ships with two vacuum hoses and factory installed quick connec
   </thead>
   <tbody>
     <tr>
-      <td><strong>Hose dimensions</strong></td>
+      <td><strong>Dimensions</strong></td>
       <td>
         <ul>
           <li>6 mm (&frac14;") ID, 2 m length (&asymp; 79")</li>
@@ -221,12 +221,12 @@ The Vacuum Module ships with two vacuum hoses and factory installed quick connec
       </td>
     </tr>
     <tr>
-      <td><strong>Hose material</strong></td>
-      <td>Vacuum hoses are made from Tygon® 2375. This material is compatible with a wide range of chemicals. See <a href="compatibility/">Chemical Compatibility</a> for details.</td>
+      <td><strong>Material</strong></td>
+      <td>Tygon® 2375</td>
     </tr>
     <tr>
       <td><strong>Fittings</strong></td>
-      <td>The Vacuum Manifold uses CPC quick connect/disconnect fittings. Fittings come from the factory attached to the hoses. You also get extra fittings to make your own hose connections. Dimensions are given below:
+      <td>The Vacuum Manifold uses CPC quick connect/disconnect couplings. These fittings come attached to the hoses from the factory. You also get extra fittings to make your own hose connections. Dimensions are given below:
         <ul>
           <li>L-shaped fitting: 3.2 mm (⅛")</li>
           <li>All other fittings: 6.4 mm (&frac14;")</li>
