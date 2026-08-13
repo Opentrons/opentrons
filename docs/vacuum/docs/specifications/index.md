@@ -116,17 +116,17 @@ Box 3 includes the waste collection carboy and cap, a carboy holder (to help pre
 
 * The carboy, cap, and hoses ship with quick connector fittings already installed at the factory.
 * The hoses are wrapped around the shaped foam padding in the bottom of the box.
-* You can use extra hardware (fittings and clamps) to create your own, customized set of vacuum hoses.
+* You can use extra hardware (fittings and clamps) included in the box to create your own, customized set of vacuum hoses.
 
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Glass 2 liter carboy and cap](../images/carboy.png "2 liter glass carboy and cap"){ width="70%" }
-<figcaption>(1) Waste carboy and cap, 2 L<br></figcaption>
+![Borosilicate glass, 2 liter carboy and cap](../images/carboy-and-cap.png "2 liter glass carboy and cap")
+<figcaption>(1) Carboy and cap, 2 L<br></figcaption>
 </figure>
 
 <figure markdown>
-![Carboy cradle](../images/carboy-holder.png "Waste carboy holder")
+![Carboy holder](../images/carboy-holder2.png "Waste carboy holder")
 <figcaption>(1) Carboy holder</figcaption>
 </figure>
 
@@ -142,6 +142,15 @@ Box 3 includes the waste collection carboy and cap, a carboy holder (to help pre
 <figure markdown>
 ![9 mm vacuum hose](../images/hose-9mm.svg)
 <figcaption>(1) 9 mm diameter hose,<br>2 m</figcaption>
+</figure>
+
+</div>
+
+<div class="parts-list" markdown>
+
+<figure markdown>
+![Carboy cap wrench](../images/carboy-cap-wrench.svg "Large diameter wrench for loosening the carboy cap")
+<figcaption>(1) Carboy cap wrench</figcaption>
 </figure>
 
 </div>
@@ -166,7 +175,7 @@ The Control Box includes the vacuum pump, air/water separator, electronics, and 
     </tr>
     <tr>
       <td><strong>Weight</strong></td>
-      <td><font color="red"><strong>TBD</strong></font> kg</td>
+      <td>10 kg</td>10 kg (22 lbs)</td>
     </tr>
     <tr>
  <tr>
@@ -294,17 +303,16 @@ The Vacuum Module requires the following power inputs, which are met by its inte
 </table>
 
 ## Environmental conditions
-<!-- Using Flex specs as placeholder -->
 
 Environmental conditions for recommended use, acceptable use, and storage vary.
 
-|                 | Recommended for system operation | Acceptable for system operation | Storage and transportation |
-| :---------------------- | :----------------------------------- | :---------------------------------- | :----------------------------- |
-| **Ambient temperature** | +20 to +25 °C                        | +2 to +40 °C                        | −10 to +60 °C                  |
-| **Relative humidity** | 40–60%, non-condensing            | 30–80%, non-condensing (below 30 °C) | 10–85%, non-condensing (below 30 °C) |
-| **Altitude** | Approximately 500 m above sea level | Up to 2000 m above sea level    | Up to 2000 m above sea level |
+| | Recommended for system operation | Acceptable for system operation | Storage and transportation |
+| :---- | :---- | :---- | :---- |
+| **Ambient temperature** | +20 to +25 °C | +2 to +40 °C | −10 to +60 °C |
+| **Relative humidity** | 40–60%, non-condensing | 30–80%, non-condensing (below 30 °C) | 10–85%, non-condensing (below 30 °C) |
+| **Altitude** | Approximately 500 m above sea level  | Up to 2000 m above sea level | Up to 2000 m above sea level |
 
-Opentrons has validated the performance of the Vacuum Module in the conditions recommended for system operation, and operation in those conditions should provide optimal results. The module is safe to use in conditions acceptable for system operation, but results may vary. Do not power on or use the Vacuum Module in conditions outside of those bounds. The storage and transportation conditions only apply when the module is completely disconnected from power and other equipment.
+Operating the vacuum module within the recommended conditions provides optimal performance. The module is safe to use within acceptable conditions, but results may vary. Do not power on or run the Vacuum Module outside of acceptable operating conditions. The storage and transportation conditions only apply when the module is completely disconnected from power and other equipment.
 
 ## LED Status Lights
 

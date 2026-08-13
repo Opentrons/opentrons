@@ -14,13 +14,13 @@ The chemical compatibility tables use these ratings:
 
 * :material-check-circle:{ .dark-green } **Excellent:** No degradation after continuous exposure.
 * :material-check-circle-outline:{ .light-green } **Good:** Occasional minor effects (e.g., swelling or discoloration). Suitable for long-term use.
-* :material-minus-circle-outline:{ .yellow } **Moderate/Poor:** Use with caution. Flush after exposure.
+* :material-minus-circle-outline:{ .yellow } **Moderate/Poor:** Avoid accidental contact and use with caution. Flush after exposure.
 * :material-close-circle:{ .red } **Not Recommended:** Rapid breakdown or complete material failure.
 * :material-alert-circle-outline:{ .gray } **No Data:** Information not available.
 
 ## Control Box housing
 
-The exterior of the Control Box is made of aluminum. This material is resistant to many common laboratory solvents, alcohols, and neutral aqeuous solutions. It can be affected or corroded by concentrated acids, strong alkalis (bases), and halogenated compounds.
+The exterior of the Control Box is made of aluminum. This material is resistant to many common laboratory solvents, alcohols, and neutral aqueous solutions. It can be affected or corroded by concentrated acids, strong alkalis (bases), and halogenated compounds.
 
 | Reagent | Compatibility |
 | :--- | :--- |
@@ -44,7 +44,7 @@ The exterior of the Control Box is made of aluminum. This material is resistant 
 
 ## Control Box hoses
 
-Plumbing inside the Control Box is made of perfluoroalkoxy alkane (PFA). This material offers exceptional chemical inertness and universal resistance to strong acids, bases, biological buffers, and organic solvents (including aromatic and chlorinated hydrocarbons). It is less resistant to molten alkali metals, elemental fluorine, and certain fluorine compounds at elevated temperatures.
+Plumbing inside the Control Box is made of perfluoroalkoxy alkane (PFA). This material offers exceptional chemical inertness and resistance to strong acids, bases, biological buffers, and organic solvents (including aromatic and chlorinated hydrocarbons). It is less resistant to molten alkali metals, elemental fluorine, and certain fluorine compounds at elevated temperatures.
 
 | Reagent | Compatibility |
 | :--- | :--- |
