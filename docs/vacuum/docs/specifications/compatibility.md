@@ -120,16 +120,16 @@ Manifold gaskets are made of Silicone 3003/20. This material is resistant to aqu
 
 | Reagent | Compatibility |
 | :--- | :--- |
-| Acetone | :material-check-circle-outline:{ .light-green } Good |
+| Acetone | :material-minus-circle-outline:{ .yellow } Moderate/Poor |
 | Acetonitrile | :material-check-circle-outline:{ .light-green } Good |
 | Dimethyl Sulfoxide (DMSO) | :material-check-circle-outline:{ .light-green } Good |
 | Dimethylformamide (DMF) | :material-check-circle-outline:{ .light-green } Good |
 | Ethanol | :material-check-circle-outline:{ .light-green } Good |
-| Ethyl Acetate | :material-check-circle-outline:{ .light-green } Good |
+| Ethyl Acetate | :material-close-circle:{ .red } Not Recommended |
 | Formic Acid | :material-check-circle-outline:{ .light-green } Good |
 | Hexane | :material-close-circle:{ .red } Not Recommended |
 | Hydrochloric Acid (37% concentration) | :material-minus-circle-outline:{ .yellow } Moderate/Poor |
-| Isopropanol (IPA) | :material-check-circle:{ .dark-green } Excellent |
+| Isopropanol (IPA) | :material-minus-circle-outline:{ .yellow } Moderate/Poor |
 | Methanol | :material-check-circle:{ .dark-green } Excellent |
 | Methylene Chloride (Dichloromethane/DCM) | :material-close-circle:{ .red } Not Recommended |
 | Sodium Hypochlorite (Bleach) | :material-check-circle-outline:{ .light-green } Good |
@@ -140,7 +140,7 @@ Manifold gaskets are made of Silicone 3003/20. This material is resistant to aqu
 
 ## O-rings
 
-The o-rings on the CPC quick connect/disconnect fittings, the carboy cap, and carboy float are made of ethylene propylene diene monomer (EPDM). This material is resistant to aqueous solutions, dilute acids, bases, alcohols, and polar organic solvents (e.g., Acetone). It is less resistant to petroleum-based oils, mineral oils, gasoline, halogenated solvents, and non-polar hydrocarbons (e.g., Hexane, Toluene).
+The O-rings on the CPC quick connect/disconnect fittings, the carboy cap, and carboy float are made of ethylene propylene diene monomer (EPDM). This material is resistant to aqueous solutions, dilute acids, bases, alcohols, and polar organic solvents (e.g., Acetone). It is less resistant to petroleum-based oils, mineral oils, gasoline, halogenated solvents, and non-polar hydrocarbons (e.g., Hexane, Toluene).
 
 | Reagent | Compatibility |
 | :--- | :--- |
@@ -164,7 +164,7 @@ The o-rings on the CPC quick connect/disconnect fittings, the carboy cap, and ca
 
 ## Quick connect fittings and carboy float
 
-The CPC quick connect/disconnect fittings (excluding o-rings) and the carboy float are made of polypropylene. This material is resistant to aqueous solutions, biological buffers, alcohols (e.g. Ethanol, Isopropanol), along with salts and oxidizing washes. It is less resistant to non-polar organic solvents (e.g., Hexane, Toluene), chlorinated solvents (e.g., Methylene Chloride), and concentrated fuming acids (e.g., concentrated Nitric Acid, Aqua Regia).
+The CPC quick connect/disconnect fittings (excluding O-rings) and the carboy float are made of polypropylene. This material is resistant to aqueous solutions, biological buffers, alcohols (e.g. Ethanol, Isopropanol), along with salts and oxidizing washes. It is less resistant to non-polar organic solvents (e.g., Hexane, Toluene), chlorinated solvents (e.g., Methylene Chloride), and concentrated fuming acids (e.g., concentrated Nitric Acid, Aqua Regia).
 
 | Reagent | Compatibility |
 | :--- | :--- |
