@@ -83,7 +83,7 @@ function useFlexLPCLabwareInfo({
       enabled:
         runStatus === RUN_STATUS_IDLE &&
         robotType === FLEX_ROBOT_TYPE &&
-        searchLwOffsetsParams.filters.length > 0,
+        searchLwOffsetsParams?.filters?.length > 0,
       refetchInterval: REFETCH_OFFSET_SEARCH_MS,
     }
   )
