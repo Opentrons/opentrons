@@ -72,16 +72,6 @@ def _make_orm_user(
     )
 
 
-# ── seed_initial_users ──────────────────────────────────────────────
-
-
-def test_seed_calls_store_seed(
-    decoy: Decoy, mock_store: UserStore, manager: UserDataManager
-) -> None:
-    manager.seed_initial_users()
-    decoy.verify(mock_store.seed(matchers.IsA(list)))
-
-
 # ── create_user ─────────────────────────────────────────────────────
 
 

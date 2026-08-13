@@ -7,6 +7,7 @@ import {
   INFO_TOAST,
   InfoScreen,
   StyledText,
+  SUCCESS_TOAST,
   WARNING_TOAST,
 } from '@opentrons/components'
 import { isDocumentedMutationError } from '@opentrons/react-api-client'
@@ -83,6 +84,9 @@ export function ProtocolRunRecords({
       )
         .catch((e: Error) => {
           makeToast(e.message, ERROR_TOAST, { closeButton: true })
+        })
+        .then(() => {
+          makeToast(t('files_successfully_downloaded') as string, SUCCESS_TOAST)
         })
         .finally(() => {
           eatToast(toastId)

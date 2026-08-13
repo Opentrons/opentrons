@@ -3,13 +3,11 @@ import { useTranslation } from 'react-i18next'
 
 import {
   CheckboxBasic,
-  COLORS,
   ERROR_TOAST,
   INFO_TOAST,
   InfoScreen,
-  ListAccordion,
   StyledText,
-  Tag,
+  SUCCESS_TOAST,
   WARNING_TOAST,
 } from '@opentrons/components'
 import {
@@ -21,7 +19,6 @@ import { useDocumentationState } from '/app/local-resources/access-control/useDo
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useDeleteSelectedLogPeriods } from '/app/resources/devices/hooks/useDeleteSelectedLogPeriods'
 import { useDownloadSelectedLogPeriods } from '/app/resources/devices/hooks/useDownloadSelectedLogPeriods'
-import { formatTimestamp } from '/app/transformations/runs'
 
 import { DeleteRecordsModal } from '../../../DeleteRecordsModal'
 import { FileManagementSectionHeader } from '../FileManagementSectionHeader'
@@ -31,7 +28,13 @@ import styles from './compliancereadysoftwarefiles.module.css'
 import { LogPeriodRow } from './LogPeriodRow'
 
 import type { IconProps } from '@opentrons/components'
+import type { MakeToastOptions } from '/app/organisms/ToasterOven/ToasterContext'
 import type { DownloadedLogPeriod } from '/app/resources/devices/hooks/useDownloadSelectedLogPeriods'
+
+const TOAST_STYLE: MakeToastOptions = {
+  closeButton: true,
+  width: '80%',
+}
 
 interface ComplianceReadySoftwareFilesProps {
   robotName: string
@@ -58,24 +61,12 @@ export function ComplianceReadySoftwareFiles({
     selectedIds,
     isAllSelected,
     isSomeSelected,
-    toggleAll,
+    toggleAll: handleToggleAll,
     toggleOne: togglePeriod,
   } = useRecordSelection(periods)
 
   const [showDeleteRecordsModal, setShowDeleteRecordsModal] =
     useState<boolean>(false)
-
-  // Sorted newest-first; oldest is last in array, newest is first
-  const oldestPeriod = periods.at(-1)
-  const newestPeriod = periods[0]
-  const firstDate =
-    oldestPeriod?.startedAt != null
-      ? formatTimestamp(oldestPeriod.startedAt)
-      : t('na')
-  const lastDate =
-    newestPeriod != null
-      ? formatTimestamp(newestPeriod.endedAt ?? newestPeriod.startedAt)
-      : t('na')
 
   const handleNoLogsSelected = (type: 'delete' | 'download'): void => {
     makeToast(t(`select_entry_to_${type}`) as string, WARNING_TOAST, {
@@ -91,18 +82,27 @@ export function ComplianceReadySoftwareFiles({
     if (downloadLogPeriodsMutation.status !== 'loading') {
       const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
       const toastId = makeToast(
-        t('downloading_run_records') as string,
+        t('downloading_log_periods') as string,
         INFO_TOAST,
-        { disableTimeout: true, icon: toastIcon }
+        {
+          disableTimeout: true,
+          icon: toastIcon,
+          ...TOAST_STYLE,
+        }
       )
       downloadLogPeriodsMutation
         .mutateAsync({
           logPeriods: periods.filter(period => selectedIds.has(period.id)),
         })
         .catch((error: Error) => {
-          makeToast(error.message, ERROR_TOAST, {
-            closeButton: true,
-          })
+          makeToast(error.message, ERROR_TOAST, TOAST_STYLE)
+        })
+        .then(() => {
+          makeToast(
+            t('files_successfully_downloaded') as string,
+            SUCCESS_TOAST,
+            TOAST_STYLE
+          )
         })
         .finally(() => {
           eatToast(toastId)
@@ -162,12 +162,6 @@ export function ComplianceReadySoftwareFiles({
       })
   }
 
-  const periodHeaderKeys: Array<'started' | 'ended' | 'status'> = [
-    'started',
-    'ended',
-    'status',
-  ]
-
   return (
     <>
       {showDeleteRecordsModal && (
@@ -181,7 +175,7 @@ export function ComplianceReadySoftwareFiles({
       )}
       <div className={fileManagerStyles.file_management_group}>
         <FileManagementSectionHeader
-          titleText={t('compliance_ready_software_files')}
+          titleText={t('compliance_ready_audit_logs')}
           showButtons={isSomeSelected || isAllSelected}
           onDownloadSelected={handleDownloadSelected}
           onDeleteSelected={handleClickDeleteSelected}
@@ -191,83 +185,48 @@ export function ComplianceReadySoftwareFiles({
         ) : (
           <div className={fileManagerStyles.log_table}>
             <div className={styles.compliance_table_header_row}>
-              {periodHeaderKeys.map(key => (
-                <StyledText
-                  key={key}
-                  desktopStyle="bodyDefaultRegular"
-                  className={styles.log_date_col}
-                >
-                  {t(key)}
-                </StyledText>
-              ))}
-            </div>
-
-            <ListAccordion
-              alertKind="default"
-              tableHeaders={undefined}
-              icon={
-                <div
-                  className={styles.compliance_checkbox_wrapper}
-                  onClick={e => {
-                    e.stopPropagation()
-                  }}
-                >
-                  <CheckboxBasic
-                    checked={isSomeSelected ? 'indeterminate' : isAllSelected}
-                    onChange={toggleAll}
-                    backgroundColor={COLORS.white}
-                  />
-                </div>
-              }
-              headerChild={
-                <div className={styles.compliance_accordion_content}>
-                  <StyledText
-                    desktopStyle="bodyDefaultRegular"
-                    className={styles.log_file_col}
-                  >
-                    {t('user_action_logs')}
-                  </StyledText>
-                  <div className={styles.log_date_col}>
-                    <Tag text={firstDate} type="default" shrinkToContent />
-                  </div>
-                  <div className={styles.log_date_col}>
-                    <Tag text={lastDate} type="default" shrinkToContent />
-                  </div>
-                </div>
-              }
-            >
-              <div className={styles.compliance_period_col_headers}>
+              <CheckboxBasic
+                checked={isSomeSelected ? 'indeterminate' : isAllSelected}
+                onChange={handleToggleAll}
+              />
+              <div className={styles.log_period_columns}>
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
                   className={styles.log_date_col}
                 >
-                  {t('started')}
+                  {t('protocol')}
                 </StyledText>
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
                   className={styles.log_date_col}
                 >
-                  {t('ended')}
+                  {t('log_period_start')}
                 </StyledText>
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
                   className={styles.log_date_col}
+                >
+                  {t('log_period_end')}
+                </StyledText>
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  className={styles.log_status_col}
                 >
                   {t('status')}
                 </StyledText>
               </div>
-              {periods.map(period => (
-                <LogPeriodRow
-                  key={period.id}
-                  period={period}
-                  isSelected={selectedIds.has(period.id)}
-                  isDeleting={deletingIds.has(period.id)}
-                  onToggle={() => {
-                    togglePeriod(period.id)
-                  }}
-                />
-              ))}
-            </ListAccordion>
+            </div>
+            {periods.map(period => (
+              <LogPeriodRow
+                key={period.id}
+                period={period}
+                isSelected={selectedIds.has(period.id)}
+                isDeleting={deletingIds.has(period.id)}
+                onToggle={() => {
+                  togglePeriod(period.id)
+                }}
+              />
+            ))}
           </div>
         )}
       </div>

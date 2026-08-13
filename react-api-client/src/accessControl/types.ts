@@ -149,6 +149,7 @@ type AuditLogAction =
   | 'create_protocol'
   | 'launching_error_recovery'
   | 'resume_run_from_recovery'
+  | 'create_run'
   | 'dismiss_run'
   | 'retry_action'
   | 'shutdown_robot'
@@ -197,6 +198,7 @@ type AuditLogAction =
   | 'toggle_devtools'
   | 'change_language'
   | 'toggle_analytics'
+  | 'download_log_period'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.

@@ -10,7 +10,6 @@ import {
 
 import { PerStepOverflowMenu } from '../PerStepOverflowMenu'
 import styles from './playbackcontrols.module.css'
-import { formatTime } from './utils/formatTime'
 import { getSpeedMultiplierText } from './utils/getSpeedMultiplierText'
 import { isEditableKeyboardTarget } from './utils/isEditableKeyboardTarget'
 
@@ -26,7 +25,8 @@ interface PlayBackControlsProps {
   setSelectedCommand: Dispatch<SetStateAction<string | null>>
   milliSecondsPerFrame: number
   setMilliSecondsPerFrame: Dispatch<SetStateAction<number>>
-  onClickStepDetail?: () => void
+  showStepDetails: boolean
+  onClickStepDetails: Dispatch<SetStateAction<boolean>>
 }
 
 export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
@@ -39,7 +39,8 @@ export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
     setSelectedCommand,
     milliSecondsPerFrame,
     setMilliSecondsPerFrame,
-    // onClickStepDetail,
+    showStepDetails,
+    onClickStepDetails,
   } = props
 
   const { t } = useTranslation('protocol_visualization')
@@ -69,9 +70,6 @@ export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
     }
   }
 
-  const elapsedSeconds = currentCommandIndex >= 0 ? currentCommandIndex : 0
-  const totalSeconds = numCommandLength >= 0 ? numCommandLength : 0
-  const forceHours = totalSeconds >= 3600
   const currentProgress =
     numCommandLength > 1
       ? (currentCommandIndex / (numCommandLength - 1)) * 100
@@ -89,7 +87,10 @@ export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
         return
       }
 
-      if (isEditableKeyboardTarget(event.target)) {
+      if (
+        isEditableKeyboardTarget(event.target) ||
+        isEditableKeyboardTarget(document.activeElement)
+      ) {
         return
       }
 
@@ -114,23 +115,9 @@ export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
           aria-label={isPlaying ? t('pause') : t('play')}
         />
 
-        {/* elapsed time */}
-        <div className={`${styles.time_label} ${styles.time_current}`}>
-          <StyledText desktopStyle="captionRegular">
-            {formatTime(elapsedSeconds, forceHours)}
-          </StyledText>
-        </div>
-
         {/* time slider */}
         <div className={styles.slider_wrapper}>
           <TimelineScrubber tracks={tracks} onTrackChange={handleTrackChange} />
-        </div>
-
-        {/* total time */}
-        <div className={`${styles.time_label} ${styles.time_total}`}>
-          <StyledText desktopStyle="captionRegular">
-            {formatTime(totalSeconds, false)}
-          </StyledText>
         </div>
 
         {/* speed switch */}
@@ -159,7 +146,9 @@ export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
       <div className={styles.controls_right}>
         <button
           type="button"
-          onClick={() => {}}
+          onClick={() => {
+            onClickStepDetails(!showStepDetails)
+          }}
           className={styles.icon_button}
           aria-label={t('step_details')}
         >

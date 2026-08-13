@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQueryClient } from 'react-query'
+import { useDispatch } from 'react-redux'
 
 import { deleteLogPeriod } from '@opentrons/api-client'
 import {
@@ -8,9 +9,12 @@ import {
   useHost,
 } from '@opentrons/react-api-client'
 
+import { logPeriodDeleteStarted } from '/app/redux/audit'
+
 import type { QueryKey } from 'react-query'
 import type { LogPeriodSummary } from '@opentrons/api-client'
 import type { DocumentationState } from '@opentrons/react-api-client'
+import type { Dispatch } from '/app/redux/types'
 
 interface UseDeleteSelectedLogPeriodsResult {
   deleteSelectedLogPeriods: (
@@ -24,6 +28,7 @@ export function useDeleteSelectedLogPeriods(
   documentationState: DocumentationState
 ): UseDeleteSelectedLogPeriodsResult {
   const host = useHost()
+  const dispatch = useDispatch<Dispatch>()
   const queryClient = useQueryClient()
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set())
 
@@ -54,6 +59,7 @@ export function useDeleteSelectedLogPeriods(
             hasDeleteError = true
             continue
           }
+          dispatch(logPeriodDeleteStarted({ logPeriodId }))
           // deleteLogPeriod call is safe here within /app since we are wrapped in a useDocumentedMutation
           // eslint-disable-next-line opentrons/no-direct-mutating
           await deleteLogPeriod(

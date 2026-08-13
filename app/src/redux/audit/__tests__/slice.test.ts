@@ -4,12 +4,10 @@ import { DOWNLOAD_AUDIT_LOG } from '../constants'
 import {
   auditReducer,
   getLogPeriodDeletionKey,
-  getLogPeriodDownloadDeleteError,
-  getLogPeriodDownloadDeleteStatus,
+  getLogPeriodDownloadError,
+  getLogPeriodDownloadStatus,
   INITIAL_AUDIT_STATE,
-  logPeriodDeleteFailed,
-  logPeriodDeletePending,
-  logPeriodDeleteSucceeded,
+  logPeriodDeleteStarted,
   logPeriodDownloadCanceled,
   logPeriodDownloadFailed,
   logPeriodDownloadSucceeded,
@@ -20,7 +18,7 @@ import type { AuditState } from '../slice'
 
 const makeState = (audit: AuditState): State => ({ audit }) as State
 
-describe('audit download/delete status', () => {
+describe('audit download status', () => {
   it('marks a log period download as pending when download is requested', () => {
     const next = auditReducer(INITIAL_AUDIT_STATE, {
       type: DOWNLOAD_AUDIT_LOG,
@@ -32,7 +30,7 @@ describe('audit download/delete status', () => {
       meta: { shell: true },
     })
 
-    expect(next.logPeriodDownloadDeleteStatusById['lp-1']).toEqual({
+    expect(next.logPeriodDownloadStatusById['lp-1']).toEqual({
       status: 'download-pending',
     })
   })
@@ -46,16 +44,14 @@ describe('audit download/delete status', () => {
       })
     )
 
-    expect(getLogPeriodDownloadDeleteStatus(makeState(next), 'lp-1')).toEqual({
+    expect(getLogPeriodDownloadStatus(makeState(next), 'lp-1')).toEqual({
       status: 'download-success',
       deletionKey: 'deletion-key-1',
     })
     expect(getLogPeriodDeletionKey(makeState(next), 'lp-1')).toEqual(
       'deletion-key-1'
     )
-    expect(getLogPeriodDownloadDeleteError(makeState(next), 'lp-1')).toEqual(
-      null
-    )
+    expect(getLogPeriodDownloadError(makeState(next), 'lp-1')).toEqual(null)
   })
 
   it('marks a log period download as failed with an error', () => {
@@ -67,12 +63,12 @@ describe('audit download/delete status', () => {
       })
     )
 
-    expect(getLogPeriodDownloadDeleteStatus(makeState(next), 'lp-1')).toEqual({
+    expect(getLogPeriodDownloadStatus(makeState(next), 'lp-1')).toEqual({
       status: 'download-failure',
       error: 'network error',
     })
     expect(getLogPeriodDeletionKey(makeState(next), 'lp-1')).toEqual(null)
-    expect(getLogPeriodDownloadDeleteError(makeState(next), 'lp-1')).toEqual(
+    expect(getLogPeriodDownloadError(makeState(next), 'lp-1')).toEqual(
       'network error'
     )
   })
@@ -91,60 +87,35 @@ describe('audit download/delete status', () => {
       pending,
       logPeriodDownloadCanceled({ logPeriodId: 'lp-1' })
     )
-    expect(getLogPeriodDownloadDeleteStatus(makeState(next), 'lp-1')).toEqual({
+    expect(getLogPeriodDownloadStatus(makeState(next), 'lp-1')).toEqual({
       status: 'download-failure',
       error: 'download canceled by user',
     })
-    expect(getLogPeriodDownloadDeleteError(makeState(next), 'lp-1')).toEqual(
+    expect(getLogPeriodDownloadError(makeState(next), 'lp-1')).toEqual(
       'download canceled by user'
     )
   })
 
-  it('tracks delete pending, success, and failure', () => {
-    const pending = auditReducer(
+  it('clears download status when delete starts', () => {
+    const downloaded = auditReducer(
       INITIAL_AUDIT_STATE,
-      logPeriodDeletePending({ logPeriodId: 'lp-1' })
-    )
-    expect(
-      getLogPeriodDownloadDeleteStatus(makeState(pending), 'lp-1')
-    ).toEqual({
-      status: 'delete-pending',
-    })
-
-    const succeeded = auditReducer(
-      pending,
-      logPeriodDeleteSucceeded({ logPeriodId: 'lp-1' })
-    )
-    expect(
-      getLogPeriodDownloadDeleteStatus(makeState(succeeded), 'lp-1')
-    ).toEqual({
-      status: 'delete-success',
-    })
-
-    const failed = auditReducer(
-      pending,
-      logPeriodDeleteFailed({
+      logPeriodDownloadSucceeded({
         logPeriodId: 'lp-1',
-        error: 'delete failed',
+        deletionKey: 'deletion-key-1',
       })
     )
-    expect(getLogPeriodDownloadDeleteStatus(makeState(failed), 'lp-1')).toEqual(
-      {
-        status: 'delete-failure',
-        error: 'delete failed',
-      }
+    const next = auditReducer(
+      downloaded,
+      logPeriodDeleteStarted({ logPeriodId: 'lp-1' })
     )
-    expect(getLogPeriodDownloadDeleteError(makeState(failed), 'lp-1')).toEqual(
-      'delete failed'
-    )
+
+    expect(getLogPeriodDownloadStatus(makeState(next), 'lp-1')).toEqual(null)
+    expect(next.logPeriodDownloadStatusById).toEqual({})
   })
 
   it('returns null when no status exists for a log period', () => {
     expect(
-      getLogPeriodDownloadDeleteStatus(
-        makeState(INITIAL_AUDIT_STATE),
-        'lp-missing'
-      )
+      getLogPeriodDownloadStatus(makeState(INITIAL_AUDIT_STATE), 'lp-missing')
     ).toEqual(null)
   })
 })

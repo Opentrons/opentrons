@@ -17,6 +17,9 @@ from pydantic import BaseModel
 from Pyro5 import api as pyro
 from Pyro5 import nameserver
 
+import opentrons_hardware.firmware_bindings.messages.message_definitions as hw_message_defs
+import opentrons_hardware.firmware_bindings.messages.payloads as hw_message_payloads
+import opentrons_hardware.firmware_bindings.utils as hw_binding_utils
 import opentrons_shared_data.pipette.types as pipette_types
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.errors.categories import ErrorCategories
@@ -935,6 +938,11 @@ CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
     stacker_types.SpadMapID: stacker_types.SpadMapID.SPAD_MAP_ID_3,
     stacker_types.MoveResult: stacker_types.MoveResult.NO_ERROR,
     hw_util.DeckTransformState: hw_util.DeckTransformState.SINGULARITY,
+    hw_message_defs.GetMotorUsageResponse: hw_message_defs.GetMotorUsageResponse(
+        payload=hw_message_payloads.GetMotorUsageResponsePayload(
+            usage_elements=[], num_elements=hw_binding_utils.UInt8Field(0)
+        )
+    ),
 }
 
 # This list should only include types that are either builtins that we work around or error related content thats delt with via pickle
