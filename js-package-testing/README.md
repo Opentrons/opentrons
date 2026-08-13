@@ -271,6 +271,15 @@ pnpm exec playwright show-report
 
 Use the Applitools UI to accept or reject visual changes when baselines need updating.
 
+Locally, Eyes diffs are reported but do not fail Playwright (`failTestsOnDiff` is off
+unless `CI` is set or you export `APPLITOOLS_FAIL_ON_DIFF=true`). CI still fails on
+diffs until baselines are accepted. To ignore diffs in any environment:
+
+```bash
+make test-ignore-diffs
+# or: APPLITOOLS_FAIL_ON_DIFF=false make test
+```
+
 ## Quick start
 
 ### Requirements
