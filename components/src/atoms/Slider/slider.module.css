@@ -52,6 +52,6 @@
   appearance: none;
   background-color: var(--blue-50);
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='4' height='24'><rect width='4' height='24' rx='2' fill='white' fill-opacity='0.5'/></svg>");
-  background-repeat: no-repeat;
   background-position: center;
+  background-repeat: no-repeat;
 }
