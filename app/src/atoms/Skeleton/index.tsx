@@ -8,9 +8,10 @@ interface SkeletonProps {
   //  backgroundSize is the total width to add to every Skeleton in the component which controls the animation speed
   backgroundSize: string
   borderRadius?: string
+  fixedBackround?: boolean
 }
 export const Skeleton = (props: SkeletonProps): JSX.Element => {
-  const { width, height, backgroundSize, borderRadius } = props
+  const { width, height, backgroundSize, borderRadius, fixedBackround } = props
   const SKELETON_STYLE = css`
     border-radius: ${borderRadius ?? BORDERS.borderRadius8};
     animation: shimmer 2s infinite linear;
@@ -23,6 +24,12 @@ export const Skeleton = (props: SkeletonProps): JSX.Element => {
     background-size: ${backgroundSize};
     width: ${width};
     height: ${height};
+    ${
+      fixedBackround &&
+      `
+      background-attachment: fixed;
+    `
+    }
 
     @keyframes shimmer {
       0% {
