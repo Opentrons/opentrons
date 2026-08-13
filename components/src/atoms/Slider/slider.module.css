@@ -31,7 +31,7 @@
   background: linear-gradient(
     to right,
     var(--blue-50) 0%,
-    var(--blue-50) calc(var(--value-percent)),
+    var(--blue-50) var(--value-percent),
     var(--slider-unfilled, var(--blue-20)) var(--value-percent),
     var(--slider-unfilled, var(--blue-20)) 100%
   );
