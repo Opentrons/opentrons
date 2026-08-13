@@ -172,6 +172,17 @@ class NetworkInfo:
             USBTarget(target) for target in devices if target in USBTarget
         }
 
+    async def get_motor_usage_data(
+        self,
+        can_messenger: CanMessenger,
+        expected: Optional[Set[NodeId]],
+        timeout: float = 1.0,
+    ) -> Dict[NodeId, GetMotorUsageResponse]:
+        """Pass motor usage data up to the hardware control backend layer."""
+        return await self._can_network_info.get_motor_usage_data(
+            can_messenger=can_messenger, expected=expected, timeout=timeout
+        )
+
 
 class UsbNetworkInfo:
     """This class is responsible for keeping track of usb devices."""
@@ -454,6 +465,36 @@ class CanNetworkInfo:
         for device in devices:
             self._device_info_cache.pop(device.application_for(), None)
         return self._device_info_cache
+
+    async def get_motor_usage_data(
+        self,
+        can_messenger: CanMessenger,
+        expected: Optional[Set[NodeId]],
+        timeout: float = 1.0,
+    ) -> Dict[NodeId, GetMotorUsageResponse]:
+        """Request and return motor usage data."""
+        event = asyncio.Event()
+        expected_nodes = expected or set()
+        responses: Dict[NodeId, GetMotorUsageResponse] = dict()
+
+        def listener(message: MessageDefinition, arbitration_id: ArbitrationId) -> None:
+            if not isinstance(message, GetMotorUsageResponse):
+                return
+            responses[arbitration_id.parts.originating_node_id] = message
+            if expected_nodes and expected_nodes.issubset(set(responses.keys())):
+                event.set()
+
+        can_messenger.add_listener(listener)
+        await can_messenger.send(
+            node_id=NodeId.broadcast, message=GetMotorUsageRequest()
+        )
+        try:
+            await asyncio.wait_for(event.wait(), timeout)
+        except asyncio.TimeoutError:
+            log.debug(f"Motor Usage Request timed out, got {responses}")
+        finally:
+            self._can_messenger.remove_listener(listener)
+            return responses
 
 
 def _parse_usb_device_info_response(

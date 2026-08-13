@@ -149,6 +149,7 @@ type AuditLogAction =
   | 'create_protocol'
   | 'launching_error_recovery'
   | 'resume_run_from_recovery'
+  | 'create_run'
   | 'dismiss_run'
   | 'retry_action'
   | 'shutdown_robot'

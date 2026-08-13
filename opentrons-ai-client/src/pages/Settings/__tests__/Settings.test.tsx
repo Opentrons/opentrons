@@ -4,7 +4,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/ai-client/__testing-utils__'
 import { i18n } from '/ai-client/i18n'
-import { featureFlagsAtom } from '/ai-client/resources/atoms'
 
 import { Settings } from '../index'
 
@@ -53,29 +52,5 @@ describe('Settings', () => {
     render()
     fireEvent.click(screen.getByText('Back'))
     expect(mockNavigate).toHaveBeenCalledWith(-1)
-  })
-
-  it('should render Feature Flags section when prerelease mode is enabled', () => {
-    const mockFeatureFlags = {
-      enablePrereleaseMode: true,
-      enableAnalytics: true,
-      enablePDProtocolGeneration: true,
-    }
-
-    renderWithProviders(
-      <MemoryRouter>
-        <Settings />
-      </MemoryRouter>,
-      {
-        i18nInstance: i18n,
-        initialValues: [[featureFlagsAtom, mockFeatureFlags]],
-      }
-    )
-
-    screen.getByText('Feature Flags')
-    screen.getByText('Protocol Designer Protocol Generation')
-    screen.getByText('Enable Protocol Designer protocol generation features')
-    const switches = screen.getAllByRole('switch')
-    expect(switches.length).toBeGreaterThanOrEqual(2)
   })
 })

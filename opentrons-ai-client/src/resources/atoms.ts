@@ -68,7 +68,6 @@ export const emailVerifiedAtom = atom<boolean | null>(null)
 
 const DEFAULT_FEATURE_FLAG_STATE = {
   enablePrereleaseMode: false,
-  enablePDProtocolGeneration: true,
   enableAnalytics: true,
 }
 

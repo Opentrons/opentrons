@@ -3432,3 +3432,10 @@ class OT3API(
         )
         cp = self.critical_point_for(realmount, None)
         return end_point + offset + cp
+
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
+    async def get_motor_usage_data(
+        self,
+        expected_nodes: Optional[List[Axis]] = None,
+    ) -> Dict[Axis, Dict[str, int]]:
+        return await self._backend.get_motor_usage_data(expected_nodes)
