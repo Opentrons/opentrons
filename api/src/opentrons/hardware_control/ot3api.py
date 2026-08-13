@@ -1419,11 +1419,11 @@ class OT3API(
         for axis in [Axis.Z_L, Axis.Z_R, Axis.Z_G]:
             if axis in position:
                 have_z = True
-                if Axis.Z_L:
+                if axis == Axis.Z_L:
                     carriage_effectors_offset = (
                         self._robot_calibration.left_mount_offset
                     )
-                elif Axis.Z_R:
+                elif axis == Axis.Z_R:
                     carriage_effectors_offset = (
                         self._robot_calibration.right_mount_offset
                     )
@@ -2582,7 +2582,7 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         cp_override: Optional[CriticalPoint] = None,
     ) -> top_types.Point:
-        if mount == OT3Mount.GRIPPER:
+        if mount == OT3Mount.GRIPPER or mount == top_types.Mount.EXTENSION:
             return self._gripper_handler.get_critical_point(cp_override)
         else:
             return self._pipette_handler.critical_point_for(
