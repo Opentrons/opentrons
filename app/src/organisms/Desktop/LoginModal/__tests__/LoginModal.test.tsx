@@ -90,6 +90,12 @@ function mockLoginFailure(message: string): void {
   }))
 }
 
+function mockLoginAccountLocked(): void {
+  mockLoginFailure(
+    'Account locked. Please contact an administrator to unlock your account.'
+  )
+}
+
 function mockLoginSSLError(): void {
   const sslError = {
     isAxiosError: true,
@@ -183,6 +189,30 @@ describe('LoginModal', () => {
     screen.getByLabelText('Username')
     screen.getByLabelText('Password')
     screen.getByRole('button', { name: 'Forgot password?' })
+    expect(screen.getByRole('button', { name: 'Log in' })).toBeEnabled()
+  })
+
+  it('shows required field errors when log in is clicked with empty fields', () => {
+    renderAndOpenLoginModal()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+
+    screen.getByText('Username required')
+    screen.getByText('Password required')
+    expect(submitPassword).not.toHaveBeenCalled()
+  })
+
+  it('shows a password required error when username is filled', () => {
+    renderAndOpenLoginModal()
+
+    fireEvent.change(screen.getByLabelText('Username'), {
+      target: { value: 'alice' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+
+    screen.getByText('Password required')
+    expect(screen.queryByText('Username required')).toBeNull()
+    expect(submitPassword).not.toHaveBeenCalled()
   })
 
   it('shows forgot password content and returns to login on back', () => {
@@ -242,6 +272,24 @@ describe('LoginModal', () => {
 
     screen.getByText('Test error message')
     screen.getByText('Compliance Ready Software Login')
+  })
+
+  it('shows an account locked error when the account is locked', () => {
+    mockLoginAccountLocked()
+
+    renderAndOpenLoginModal()
+
+    fireEvent.change(screen.getByLabelText('Username'), {
+      target: { value: 'alice' },
+    })
+    fireEvent.change(screen.getByLabelText('Password'), {
+      target: { value: 'secret-password' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+
+    screen.getByText(
+      'Account locked. Please contact an administrator to unlock your account.'
+    )
   })
 
   it('shows password expired view when login requires a new password', () => {

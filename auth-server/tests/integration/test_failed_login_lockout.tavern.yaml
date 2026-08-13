@@ -80,6 +80,7 @@ stages:
         error: invalid_grant
         error_description: Invalid credentials given.
         opentrons_login_attempts_remaining: 0
+        opentrons_account_locked: true
 
   - name: Correct credentials, but rejected because of the lockout
     request:
@@ -96,6 +97,7 @@ stages:
         error: invalid_grant
         error_description: Invalid credentials given.
         opentrons_login_attempts_remaining: 0
+        opentrons_account_locked: true
 
   - name: Incorrect credentials rejected with exactly the same response (to prevent fishing for them)
     request:

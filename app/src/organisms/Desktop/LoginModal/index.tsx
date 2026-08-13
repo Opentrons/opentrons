@@ -37,6 +37,8 @@ import type { ComponentProps, Dispatch, SetStateAction } from 'react'
 interface LoginFormState {
   username: string
   logInPassword: string
+  usernameRequiredError: string | null
+  passwordRequiredError: string | null
   error: string | null
 }
 
@@ -60,6 +62,8 @@ type LoginModalScreen =
 const INITIAL_LOGIN_FORM: LoginFormState = {
   username: '',
   logInPassword: '',
+  usernameRequiredError: null,
+  passwordRequiredError: null,
   error: null,
 }
 
@@ -179,6 +183,8 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
           formData: {
             username: successfulUsername,
             logInPassword: '',
+            usernameRequiredError: null,
+            passwordRequiredError: null,
             error: null,
           },
         })
@@ -192,7 +198,31 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
     event.preventDefault()
     if (screen.kind !== 'login') return
     const { username, logInPassword } = screen.formData
-    submitPassword(username, logInPassword)
+    const trimmedUsername = username.trim()
+    const trimmedPassword = logInPassword.trim()
+    const usernameRequiredError =
+      trimmedUsername === ''
+        ? (t('access_control:on_device_login_username_required') as string)
+        : null
+    const passwordRequiredError =
+      trimmedPassword === ''
+        ? (t('access_control:on_device_login_password_required') as string)
+        : null
+
+    if (usernameRequiredError != null || passwordRequiredError != null) {
+      updateLoginFormData(setScreen, {
+        usernameRequiredError,
+        passwordRequiredError,
+        error: null,
+      })
+      return
+    }
+
+    updateLoginFormData(setScreen, {
+      usernameRequiredError: null,
+      passwordRequiredError: null,
+    })
+    submitPassword(trimmedUsername, trimmedPassword)
   }
 
   const validateConfirmPasswordMatch = (
@@ -213,16 +243,11 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const footer = (() => {
     switch (screen.kind) {
       case 'login': {
-        const { username, logInPassword } = screen.formData
-        const isLoginDisabled =
-          username === '' || logInPassword === '' || isAuthLoading
         return (
           <PrimaryButton
             type="submit"
             form={loginFormId}
-            // todo(mm, 2026-06-02): Instead of outright disabling the submit button
-            // when any fields are missing, we should show errors on those fields.
-            disabled={isLoginDisabled}
+            disabled={isAuthLoading}
           >
             {t('access_control:log_in_link')}
           </PrimaryButton>
@@ -289,11 +314,15 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
               formData={screen.formData}
               onSubmit={handleLoginSubmit}
               onUsernameChange={value => {
-                updateLoginFormData(setScreen, { username: value, error: null })
+                updateLoginFormData(setScreen, {
+                  username: value,
+                  usernameRequiredError: null,
+                })
               }}
               onLogInPasswordChange={value => {
                 updateLoginFormData(setScreen, {
                   logInPassword: value,
+                  passwordRequiredError: null,
                   error: null,
                 })
               }}
@@ -395,6 +424,7 @@ function LoginView(props: LoginViewProps): JSX.Element {
           title={t('access_control:login_form_username_field')}
           type="text"
           value={formData.username}
+          error={formData.usernameRequiredError ?? undefined}
           onChange={event => {
             onUsernameChange(event.target.value)
           }}
@@ -404,7 +434,7 @@ function LoginView(props: LoginViewProps): JSX.Element {
           title={t('access_control:login_form_password_field')}
           type="password"
           value={formData.logInPassword}
-          error={formData.error ?? undefined}
+          error={formData.passwordRequiredError ?? formData.error ?? undefined}
           onChange={event => {
             onLogInPasswordChange(event.target.value)
           }}
