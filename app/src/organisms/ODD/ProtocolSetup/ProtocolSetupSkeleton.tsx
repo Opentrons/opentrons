@@ -37,14 +37,14 @@ export function ProtocolSetupButtonsSkeleton(): JSX.Element {
         width="6.25rem"
         backgroundSize="99rem"
         borderRadius={BORDERS.borderRadiusFull}
-        fixedBackround
+        fixedBackground
       />
       <Skeleton
         height="6.25rem"
         width="6.25rem"
         backgroundSize="99rem"
         borderRadius={BORDERS.borderRadiusFull}
-        fixedBackround
+        fixedBackground
       />
     </>
   )
