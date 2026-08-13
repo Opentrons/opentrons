@@ -4,7 +4,6 @@ import { useMutation, useQueryClient } from 'react-query'
 
 import {
   createUser,
-  CreateUserRequest,
   deleteUser,
   patchAccessControlEnabled,
 } from '@opentrons/api-client'
@@ -14,6 +13,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import type { UseMutationResult } from 'react-query'
+import type { CreateUserRequest } from '@opentrons/api-client'
 
 export interface EnableCRSParams {
   adminAccount: AccountCreationParams
