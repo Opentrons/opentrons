@@ -2,7 +2,12 @@
 
 import { useMutation, useQueryClient } from 'react-query'
 
-import { createUser, patchAccessControlEnabled } from '@opentrons/api-client'
+import {
+  createUser,
+  CreateUserRequest,
+  deleteUser,
+  patchAccessControlEnabled,
+} from '@opentrons/api-client'
 import {
   accessControlEnabledQueryKey,
   useHost,
@@ -45,34 +50,35 @@ export function useEnableCRSMutation(): UseMutationResult<
       )
     }
 
-    // todo(mm, 2026-07-20): If the wizard was previously interrupted, these requests
-    // will fail because the users already exist. We might want to clear preexisting
-    // users beforehand.
-
-    await createUser(hostConfig, {
-      data: {
+    const usersToCreate: Array<CreateUserRequest['data']> = [
+      {
         accountType: 'admin',
         username: params.adminAccount.username,
         password: params.adminAccount.password,
         fullName: params.adminAccount.fullName,
       },
-    })
-    await createUser(hostConfig, {
-      data: {
+      {
         accountType: 'admin',
         username: params.recoveryAccount.username,
         password: params.recoveryAccount.password,
         fullName: params.recoveryAccount.fullName,
       },
-    })
-    await createUser(hostConfig, {
-      data: {
+      {
         accountType: 'service',
         username: params.serviceAccount.username,
         password: params.serviceAccount.password,
         fullName: params.serviceAccount.fullName,
       },
-    })
+    ]
+    for (const userToCreate of usersToCreate) {
+      // If the user already exists, try deleting it to make room for our new one.
+      // This should never happen in normal production use, but it might happen in dev--
+      // users might be left over from prior testing.
+      try {
+        await deleteUser(hostConfig, userToCreate.username)
+      } catch {}
+      await createUser(hostConfig, { data: userToCreate })
+    }
 
     const response = await patchAccessControlEnabled(hostConfig, {
       data: { accessControlEnabled: true },
