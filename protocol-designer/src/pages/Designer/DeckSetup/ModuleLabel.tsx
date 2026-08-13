@@ -22,7 +22,7 @@ import type {
 } from '@opentrons/shared-data'
 
 const CENTER_SLOT_WIDTH = 160
-const CETNER_SLOT_HEIGHT = 106
+const CENTER_SLOT_HEIGHT = 106
 const VACUUM_OFFSET_X = -19
 const VACUUM_OFFSET_Y = -10
 
@@ -99,7 +99,7 @@ export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
         x={position[0] + VACUUM_OFFSET_X}
         y={position[1] - labelContainerHeight + VACUUM_OFFSET_Y}
         width={CENTER_SLOT_WIDTH}
-        height={CETNER_SLOT_HEIGHT}
+        height={CENTER_SLOT_HEIGHT}
         showModuleIcon={showModuleIcon}
       />
     )
