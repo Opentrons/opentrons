@@ -31,7 +31,7 @@ def create_pyro_daemon(
     registry()
 
     # Handle Pyro registration and publication of our synchronized object
-    Pyro5.config.THREADPOOL_SIZE = 200  # type: ignore
+    Pyro5.config.THREADPOOL_SIZE = 300  # type: ignore
     with pyro.Daemon() as daemon:  # type: ignore
         utility = DaemonUtility(daemon)
         # Create a guaranteed synchronous adapted alias to the resource
