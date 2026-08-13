@@ -52,6 +52,7 @@
   "setup_wizard_permanent_message": "Once activated, all user actions will require a successful login. This cannot be undone.",
   "setup_wizard_recovery_account_details_description": "Record recovery account details in a safe location in case you forget your password and are locked out of the robot system.",
   "setup_wizard_recovery_account_details_title": "Recovery account details",
+  "setup_wizard_restarting_robot": "Restarting robot",
   "setup_wizard_service_pin_field_label": "Service PIN",
   "setup_wizard_service_pin_incorrect": "Incorrect service PIN",
   "setup_wizard_service_pin_internal_error": "Internal error while validating the service PIN",
