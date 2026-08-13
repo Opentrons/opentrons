@@ -1,9 +1,9 @@
 ---
 title: "Vacuum Module: Waste Collection Carboy"
-description: "Physical features and chemical compatibility."
+description: "Physical features, accessory descriptions, and chemical compatibility."
 ---
 
-The Vacuum Module ships with a glass carboy, carboy holder, cap, cap wrench, jar holder, and a vacuum hose holder/clip.
+The Vacuum Module ships with a glass carboy, cap, cap wrench, carboy holder, and a vacuum hose clip.
 
 ## Carboy features
 
@@ -11,16 +11,29 @@ The Vacuum Module includes a 2 L borosilicate 3.3 glass carboy for liquid waste 
 
 The carboy ships with a blue polypropylene (PP) cap with GL80 wide-mouth threads. The cap is ported and threaded for CPC quick-connect couplings.
 
+<figure markdown>
 ![Carboy and cap with labeled features](../images/carboy-labeled.png)
+<figcaption>Carboy features</figcaption>
+</figure>
 
 The cap assembly features a waste diverter and mechanical float. The diverter directs incoming fluid away from the float. The float acts as a mechanical backflow preventer. As liquid fills the carboy, the float rises to seal the vacuum port which protects the Control Box and pump from contact with waste liquid. Once the port is closed, the system detects a pressure change and shuts down the pump.
 
 ## Accessories
 
-<figure class="screenshot side-by-side" markdown>
+### Cap wrench
 
-<figcaption></figcaption>
+A large cap wrench (or ring spanner) is included with the carboy. This tool slips over the carboy cap to help you loosen it after it's been under vacuum pressure.
+
+<figure markdown>
+![Carboy cap wrench](../images/carboy-cap-wrench.svg){ width="70%" }
+<figcaption>Carboy cap wrench</figcaption>
 </figure>
+
+### Hose clip
+
+The magnetic hose clip mounts to the top of the Control Box. It's designed to keep one end of a disconnected hose upright so residual liquid does not drip onto workspace surfaces. Two semi-circular cutouts accommodate the 6 mm and 9 mm vacuum hoses.
+
+<font color="red"><strong>IMAGE PLACEHOLDER</strong></font>
 
 ## Chemical compatibility
 
@@ -28,7 +41,7 @@ The waste carboy is made of Borosilicate 3.3 glass. This material offers excepti
 
 Although Borosilicate 3.3 is durable, this material provides only moderate resistance to strong alkaline solutions. Also, exposure to hot, concentrated phosphoric acid or hydrofluoric acid will cause surface etching or complete dissolution.
 
-For the suitability ratings of individual carboy pieces, see [Chemical Compatibility](compatibility.md).
+See [Chemical Compatibility](compatibility.md) for the ratings of individual carboy pieces and materials.
 
 ## Specifications
 
@@ -45,7 +58,7 @@ For the suitability ratings of individual carboy pieces, see [Chemical Compatibi
       <td> <ul>
           <li>Composition: Borosilicate 3.3, clear glass</li>
           <li>Capacity: 2 L</li>
-          <li>Graduations (approximate): 400–2000 mL (200 mL increments)
+          <li>Graduations: 400–2,000 mL (200 mL increments)
           <li>Opening: wide-mouth, screw top</li>
         </ul>
       </td>
