@@ -268,12 +268,10 @@ class RunProcessPyroProvider:
         self,
         process: _RunProcess,
         process_registry: List[_RunProcess],
-        broadcast_mode: Optional[bool] = False,
+        broadcast_mode: bool = False,
     ) -> None:
         """Removes a process from a process registry, ending that process and delisting it from the global Pyro Nameserver."""
-        with Pyro5.api.locate_ns(
-            broadcast=broadcast_mode if broadcast_mode is not None else False
-        ) as ns:
+        with Pyro5.api.locate_ns(broadcast=broadcast_mode) as ns:
             ns.remove(process.pyroname)
         await self._end_process(process=process.process)
         process_registry.remove(process)
