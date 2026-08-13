@@ -59,7 +59,7 @@
   "choose_enum": "Choose {{displayName}}",
   "cli_ssh": "Command Line Interface (SSH)",
   "closing": "Closing...",
-  "complete_setup_before_proceeding": "complete setup before continuing run",
+  "complete_setup_before_proceeding": "complete setup before starting the run",
   "configure": "Configure",
   "configured": "configured",
   "confirm_heater_shaker_module_modal_description": "Before the run begins, module should have both anchors fully extended for a firm attachment. The thermal adapter should be attached to the module. ",
