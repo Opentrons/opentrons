@@ -72,8 +72,8 @@ export function useEnableCRSMutation(): UseMutationResult<
     ]
     for (const userToCreate of usersToCreate) {
       // If the user already exists, try deleting it to make room for our new one.
-      // This should never happen in normal production use, but it might happen in dev--
-      // users might be left over from prior testing.
+      // This might happen if a prior attempt to enable CRS was interrupted.
+      // It can also happen in dev, if users were left over from prior testing.
       try {
         await deleteUser(hostConfig, userToCreate.username)
       } catch {}
