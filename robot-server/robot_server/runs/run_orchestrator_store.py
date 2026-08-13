@@ -257,7 +257,7 @@ class RunOrchestratorStore:
 
         proxy_door_callback = None
         if ff.hardware_subprocess_enabled():
-            pyro_resource = get_pyro_resource()
+            pyro_resource = await get_pyro_resource()
             proxy_door_callback = (
                 pyro_resource.get_default_run_orchestrator_door_watcher_callback()
             )

@@ -78,8 +78,8 @@ from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
 )
 from opentrons.hardware_control.robot_calibration import DeckCalibration
 from opentrons.hardware_control.types import DoorState
-from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
+from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
 from opentrons.util.pyro.pyro_serialization import (
     find_enums_in_packages,
     find_opentrons_classes_in_packages,
@@ -245,25 +245,7 @@ async def _setup_OT3API_pyro_resource(
     ot3api_thread = threading.Thread(target=_ot3api_pyro_daemon, daemon=True)
     ot3api_thread.start()
 
-    ns = pyro.locate_ns()
-    retries_counter = 0
-    uri = None
-    while retries_counter <= 10:
-        # Wait and try again, the resource isnt registered yet
-        try:
-            uri = ns.lookup("OT3API")
-            break
-        except Exception:
-            await asyncio.sleep(0.01)
-            retries_counter += 1
-
-    # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-    if uri is None:
-        raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER IN OT3API SETUP.")
-
-    uri = pyro.resolve(uri="PYRONAME:OT3API")
-    ot3_proxy = pyro.Proxy(uri)  # type: ignore
-    ot3_async = AsyncClientPyroObject(ot3_proxy, force_synchronous=False)
+    ot3_async = await wait_for_proxy(proxy_name="OT3API")
     return ot3_async  # type: ignore
 
 
