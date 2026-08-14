@@ -1,10 +1,46 @@
-from typing import assert_never
+from typing import Final, assert_never
 
 from server_utils.auth.scopes import Scope
 
 from auth_server.persistence.orm_models import User
 from auth_server.settings.models import SettingsResponseData
 from auth_server.users.models import AccountType
+
+_REGULAR_USER_SCOPES: Final[frozenset[Scope]] = frozenset(
+    {
+        Scope.PROTOCOL_ANALYSES_WRITE,
+        Scope.RESTART_WRITE,
+        Scope.ROBOT_CONTROL_WRITE,
+        Scope.ROBOT_SETTINGS_WRITE,
+        Scope.USERS_READ_SELF,
+        Scope.USERS_WRITE_SELF,
+        Scope.AUDIT_LOG_WRITE,
+    }
+)
+
+# Scopes that only admin/service accounts may hold. Whether they are granted depends
+# on the matching requireAdminCreds* auth setting being enabled.
+_ADMIN_ONLY_SCOPES: Final[frozenset[Scope]] = frozenset(
+    {
+        Scope.UPDATES_WRITE,
+        Scope.PROTOCOLS_WRITE,
+        Scope.RUN_SIGNOFF_WRITE,
+    }
+)
+
+
+def _settings_gated_admin_only_scopes(
+    settings: SettingsResponseData,
+) -> set[Scope]:
+    """Return admin-only scopes that are enabled by the current auth settings."""
+    result: set[Scope] = set()
+    if settings.requireAdminCredsWhenUpdatingRobotSoftware:
+        result.add(Scope.UPDATES_WRITE)
+    if settings.requireAdminCredsWhenSendingProtocolToRobot:
+        result.add(Scope.PROTOCOLS_WRITE)
+    if settings.requireAdminCredsForSignoffProtocol:
+        result.add(Scope.RUN_SIGNOFF_WRITE)
+    return result
 
 
 def get_scope_set_of_account_type(
@@ -27,7 +63,9 @@ def get_scope_set_of_account_type(
 
     else:
         if account_type == AccountType.ADMIN or account_type == AccountType.SERVICE:
-            return set(Scope)  # All scopes.
+            return (set(Scope) - _ADMIN_ONLY_SCOPES) | _settings_gated_admin_only_scopes(
+                settings
+            )
 
         elif account_type == AccountType.AUDITOR:
             # Auditors should have read-only access to everything. Our read-only endpoints are
@@ -36,22 +74,7 @@ def get_scope_set_of_account_type(
             return {Scope.USERS_READ_OTHERS}
 
         elif account_type == AccountType.USER:
-            result = {
-                Scope.PROTOCOL_ANALYSES_WRITE,
-                Scope.RESTART_WRITE,
-                Scope.ROBOT_CONTROL_WRITE,
-                Scope.ROBOT_SETTINGS_WRITE,
-                Scope.USERS_READ_SELF,
-                Scope.USERS_WRITE_SELF,
-                Scope.AUDIT_LOG_WRITE,
-            }
-            if not settings.requireAdminCredsWhenUpdatingRobotSoftware:
-                result.add(Scope.UPDATES_WRITE)
-            if not settings.requireAdminCredsWhenSendingProtocolToRobot:
-                result.add(Scope.PROTOCOLS_WRITE)
-            if not settings.requireAdminCredsForSignoffProtocol:
-                result.add(Scope.RUN_SIGNOFF_WRITE)
-            return result
+            return set(_REGULAR_USER_SCOPES)
 
         else:
             assert_never(account_type)
