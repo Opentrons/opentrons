@@ -2,6 +2,7 @@
 
 import asyncio
 import types
+from datetime import datetime
 from math import copysign, isclose
 from typing import (
     Any,
@@ -101,6 +102,7 @@ from opentrons.hardware_control.modules import (
 )
 from opentrons.hardware_control.motion_utilities import target_position_from_plunger
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.robot_calibration import DeckCalibration
 from opentrons.hardware_control.types import (
     Axis,
     CriticalPoint,
@@ -366,6 +368,17 @@ async def mock_instrument_handlers(
         ) as mock_pipette_handler,
     ):
         yield mock_gripper_handler, mock_pipette_handler
+
+
+@pytest.fixture
+def fake_deck_calibration() -> DeckCalibration:
+    inrange_matrix = [[1.0, 0, 0], [0.0, 1, 0], [0.0, 0, 1]]
+    return DeckCalibration(
+        attitude=inrange_matrix,
+        last_modified=datetime.now(),
+        source=SourceType.user,
+        status=CalibrationStatus(),
+    )
 
 
 @pytest.fixture
@@ -2080,19 +2093,17 @@ async def test_move_to_plunger_bottom(
 
 @pytest.mark.parametrize(
     "input_position, expected_move_pos",
-    [
-        ({Axis.X: 13}, {Axis.X: 13, Axis.Y: 493.8, Axis.Z_L: 253.475}),
+    [  
+        ({Axis.X: 13}, {Axis.X: 13, Axis.Y: 493.8}),
         (
             {Axis.X: 13, Axis.Y: 14, Axis.Z_R: 15},
-            {Axis.X: 13, Axis.Y: 14, Axis.Z_R: -240.675},
+            {Axis.X: 13, Axis.Y: 14},
         ),
         (
             {Axis.Z_R: 15, Axis.Z_L: 16},
             {
                 Axis.X: 477.2,
                 Axis.Y: 493.8,
-                Axis.Z_L: -239.675,
-                Axis.Z_R: -240.675,
             },
         ),
     ],
@@ -2101,12 +2112,38 @@ async def test_move_axes(
     ot3_hardware: ThreadManager[OT3API],
     mock_move: AsyncMock,
     mock_check_motor: Mock,
+    fake_deck_calibration: DeckCalibration,
     input_position: Dict[Axis, float],
     expected_move_pos: OrderedDict[Axis, float],
 ) -> None:
+    mount_axes = [Axis.Z_L, Axis.Z_R, Axis.Z_G]
+    dummy_mount_offsets = {
+        Axis.Z_L: Point(z=50),
+        Axis.Z_R: Point(z=150),
+        Axis.Z_G: Point(z=100),
+    }
+    current_position = ot3_hardware._current_position
+    ot3_hardware._robot_calibration.right_mount_offset = dummy_mount_offsets[Axis.Z_R]
+    ot3_hardware._robot_calibration.left_mount_offset = dummy_mount_offsets[Axis.Z_L]
+    ot3_hardware._robot_calibration.gripper_mount_offset = dummy_mount_offsets[Axis.Z_G]
+    # make sure we test against the robot calibration directly
+    expected_mount_offsets = {
+        Axis.Z_L: ot3_hardware._robot_calibration.left_mount_offset,
+        Axis.Z_R: ot3_hardware._robot_calibration.right_mount_offset,
+        Axis.Z_G: ot3_hardware._robot_calibration.gripper_mount_offset,
+    }
+
+    # ensure that calibration offsets get applied properly for each mount
+    for axis in input_position:
+        if axis in mount_axes:
+            expected_move_pos[axis] = (
+                input_position[axis] - expected_mount_offsets[axis].z
+            )
+    if all([mount_ax not in input_position for mount_ax in mount_axes]):
+        expected_move_pos[Axis.Z_L] = current_position[Axis.Z_L]
+
     await ot3_hardware.move_axes(position=input_position)
     mock_check_motor.return_value = True
-
     mock_move.assert_called_once_with(
         target_position=expected_move_pos, speed=None, expect_stalls=False
     )
