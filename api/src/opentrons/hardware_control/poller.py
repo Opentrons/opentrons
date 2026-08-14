@@ -86,6 +86,8 @@ class Poller:
                 return
             except BaseException:
                 if r < (retries - 1):
+                    log.error(f"Got error waiting for next poll {r} or {retries}")
+                    await asyncio.sleep(self.interval)
                     pass
                 else:
                     raise
