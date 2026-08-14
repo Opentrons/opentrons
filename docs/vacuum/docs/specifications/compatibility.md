@@ -68,7 +68,7 @@ Plumbing inside the Control Box is made of perfluoroalkoxy alkane (PFA). This ma
 
 ## Deck pieces
 
-Deck pieces include the vacuum base, the short and tall collars, and the short and tall spacers. These vacuum manifold deck pieces are made of Nylon 6 (PA6). This material is resistant to alkalis, esters, and hydrocarbons. It is less resistant to strong acids (e.g., sulfuric acid, hydrochloric acid) and oxidizing agents. 
+Deck pieces include the vacuum base, the short and tall collars, and the short and tall spacers. These deck pieces are made of Nylon 6 (PA6). This material is resistant to alkalis, esters, and hydrocarbons. It is less resistant to strong acids (e.g., sulfuric acid, hydrochloric acid) and oxidizing agents.
 
 | Reagent | Compatibility |
 | :--- | :--- |

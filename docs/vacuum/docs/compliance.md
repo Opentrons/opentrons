@@ -29,7 +29,7 @@ Various labels on the vacuum module or in this manual warn you about sources of 
 
 ## Standards compliance
 
-The vacuum module has been tested and found to be in compliance with all applicable requirements of the following standards.
+The Vacuum Module has been tested and found to be in compliance with all applicable requirements of the following standards.
 
 ### Safety
 

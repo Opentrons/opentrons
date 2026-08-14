@@ -1,17 +1,17 @@
 ---
 title: "Vacuum Module: Installation"
-description: "Installing the Vacuum Module on a Flex robot."
+description: "Installation instructions for attaching the module to a Flex robot."
 ---
 
 The Vacuum Module ships in three separate boxes containing all the components required for assembly and operation. Read the safety precautions below before following the step-by-step setup instructions.
 
 !!! warning "Installation Safety Precautions"
-    - ![Pump and carboy placement warning](images/warning-triangle-exclamation.svg){: style="vertical-align: middle; height: 2.0em;"} **Accessory placement:** When choosing a location for the carboy and pump control box, follow all health, safety, and environmental guidelines established by your facility.
+    - ![Pump and carboy placement warning](images/warning-triangle-exclamation.svg){: style="vertical-align: middle; height: 2.0em;"} **Accessory placement:** When choosing a location for the carboy and Control Box, follow all health, safety, and environmental guidelines established by your facility.
     - ![Electrical cable routing warning](images/warning-triangle-exclamation.svg){: style="vertical-align: middle; height: 2.0em;"} **Cable routing:** Route electrical and data cables carefully to avoid extreme bending/kinking and damp or wet locations.
     - ![Electrical shock warning](images/warning-triangle-shock.svg){: style="vertical-align: middle; height: 2.0em;"} **Electrical hazard:** Turn off the power to the Flex before beginning the installation process. This prevents the robot from operating unexpectedly during setup and allows the gantry to move freely.
     - ![Glass carboy fragile warning](images/warning-triangle-fragile.svg){: style="vertical-align: middle; height: 2.0em;"} **Fragile items:** Inspect the glass carboy for damage before installation. Replace if chipped or cracked.
-    - ![Vacuum hose routing and placement warning](images/warning-triangle-exclamation.svg){: style="vertical-align: middle; height: 2.0em;"} **Hose placement:** When connecting vacuum hoses, maintain a continuous downward slope from the deck module to the waste carboy. Avoid sharp bends, kinks, or low dips that allow fluid to accumulate and impede airflow.
-    - ![Pinch hazard warning](images/warning-triangle-pinch.svg){: style="vertical-align: middle; height: 2.0em;"} **Pinch hazard:** Keep fingers clear of deck slot edges when removing deck plates or seating the deck adapter.
+    - ![Vacuum hose routing and placement warning](images/warning-triangle-exclamation.svg){: style="vertical-align: middle; height: 2.0em;"} **Hose placement:** When connecting vacuum hoses, maintain a continuous downward slope from the deck to the carboy. Avoid sharp bends, kinks, or low dips that allow fluid to accumulate and restrict airflow.
+    - ![Pinch hazard warning](images/warning-triangle-pinch.svg){: style="vertical-align: middle; height: 2.0em;"} **Pinch hazard:** Keep fingers clear of deck slot edges when installing the deck adapter.
     - ![Vacuum hose trip hazard warning](images/warning-triangle-exclamation.svg){: style="vertical-align: middle; height: 2.0em;"} **Tripping hazard:** Keep hoses secure and clear of walkways to help prevent trip hazards.
 
 <div class="instruction-list" markdown>
@@ -20,7 +20,7 @@ The Vacuum Module ships in three separate boxes containing all the components re
 
 1. Open the shipping boxes.
 
-2. Cut open and remove any protective material and padding around the internal boxes that contain the component parts to your module.
+2. Cut open and remove any protective material and padding around the internal boxes that contain the different parts of your module.
 
 3. Remove the inner boxes from the shipping boxes.
 
@@ -57,7 +57,7 @@ The Vacuum Module ships in three separate boxes containing all the components re
 
 10. Press the L-shaped 6 mm (&frac14;") quick connect fitting (and its attached hose) into the exhaust manifold. The quick connect fittings lock into place with an audible click.
 
-11. Run the hose from the exhaust manifold through the notch on the side of the deck plate adapter into the space below the deck. This area keeps cables, tubes, hoses, and other module connections from cluttering the deck.
+11. Run the hose from the exhaust manifold through the notch on the side of the deck adapter into the space below the deck.
 
     <figure markdown>
     ![Deck plate with magnified image of vacuum hose notch](images/deck-plate-notch.svg)
@@ -91,9 +91,9 @@ The Vacuum Module ships in three separate boxes containing all the components re
 
 17. Place the cap on the waste jar and hand tighten it. Do not over-tighten the cap; this is not a trial of strength.
 
-18. Attach the free end of the 6 mm (&frac14;") quick connect on the vacuum tube into the quick connect fitting on the cap. You can cut the tubing to length if needed.
+18. Attach the free end of the 6 mm (&frac14;") quick connect on the vacuum tube into the quick connect fitting on the cap.
 
-19. Attach the 9.5 mm (&frac38;") vacuum hose and coupling inserts into the connector on the cap and on the Control Box. You can cut the tubing to length if needed.
+19. Attach the 9.5 mm (&frac38;") vacuum hose and coupling inserts into the connector on the cap and on the Control Box.
 
 ## Part 4: Data and power connections
 
