@@ -41,8 +41,13 @@ export function useCloneRun(
     documentationState,
     {
       onSuccess: response => {
+        queryClient.setQueryData(
+          getQueryKey(host, 'runs', response.data.id, 'details'),
+          response
+        )
+
         const invalidateRuns = queryClient.invalidateQueries(
-          getQueryKey(host, 'runs')
+          getQueryKey(host, 'runs', 'details')
         )
         const invalidateProtocols = queryClient.invalidateQueries(
           getQueryKey(host, 'protocols', protocolKey)

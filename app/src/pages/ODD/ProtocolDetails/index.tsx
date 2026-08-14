@@ -356,8 +356,12 @@ export function ProtocolDetails(): JSX.Element | null {
   const documentationState = useDocumentationState()
   const { createRun } = useCreateRunMutation(documentationState, {
     onSuccess: data => {
+      queryClient.setQueryData(
+        getQueryKey(host, 'runs', data.data.id, 'details'),
+        data
+      )
       queryClient
-        .invalidateQueries(getQueryKey(host, 'runs'))
+        .invalidateQueries(getQueryKey(host, 'runs', 'details'))
         .catch((e: Error) => {
           console.error(`could not invalidate runs cache: ${e.message}`)
         })
