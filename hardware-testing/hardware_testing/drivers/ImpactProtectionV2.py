@@ -22,6 +22,9 @@ log = logging.getLogger(__name__)
 
 USB_VID = None     # 如果有固定 VID / PID 可填写
 USB_PID = None
+COMMAND_RESPONSE_TIMEOUT_SECONDS = 5.0
+COMMAND_RESPONSE_POLL_INTERVAL_SECONDS = 0.01
+STATE_COMMAND_CACHE_SECONDS = 30.0
 
 
 def _port_is_open_in_this_process(device: str) -> bool:
@@ -57,6 +60,7 @@ class ImpactState:
     """Impact protection state."""
     mode: str
     raw_response: str
+    command_sent: bool = True
 
 
 # =========================
@@ -96,6 +100,8 @@ class ImpactProtectionSerial(ImpactProtectionBase):
         self._ser: Optional[serial.Serial] = None
         self.port: Optional[str] = None
         self.ctx = ctx
+        self._last_successful_command: Optional[str] = None
+        self._last_successful_command_at: Optional[float] = None
 
 
     # ---------- connection ----------
@@ -152,6 +158,8 @@ class ImpactProtectionSerial(ImpactProtectionBase):
                 if "VersionImpact 0.0.1" in resp1:
                     self._ser = ser
                     self.port = p.device
+                    self._last_successful_command = None
+                    self._last_successful_command_at = None
                     return True
 
                 ser.close()
@@ -182,7 +190,9 @@ class ImpactProtectionSerial(ImpactProtectionBase):
     #         elif "Wrong Channel" in data1:
     #             break
     #     return data1
-    def _send(self, cmd: str, timeout=5) -> str:
+    def _send(
+        self, cmd: str, timeout: float = COMMAND_RESPONSE_TIMEOUT_SECONDS
+    ) -> str:
         if not self._ser or not self._ser.is_open:
             raise ImpactProtectionError("Impact device not connected")
 
@@ -190,35 +200,20 @@ class ImpactProtectionSerial(ImpactProtectionBase):
         ser.reset_input_buffer()
         ser.reset_output_buffer()
 
-        # 打印发送的命令
-        #.delay(seconds=0.2, msg=f"send- {cmd}")
-
         ser.write((cmd.strip() + "\r\n").encode("ascii"))
 
-        # 增加发送后的延迟，给设备更多时间响应
-        time.sleep(0.5)
-
-        start = time.time()
+        # Read only buffered bytes so Serial.timeout does not delay every command.
+        deadline = time.monotonic() + timeout
         buf = ""
 
-        while time.time() - start < timeout:
-            # 即使 in_waiting 为 0，也尝试读取一些数据
-            # 这可以捕获设备在延迟后发送的数据
-            chunk = ser.read(500).decode(errors="ignore")
-            if chunk:
-                buf += chunk
-                #self.ctx.delay(seconds=0.2, msg=f"data- {chunk}")
-
-                # 先判断错误
-                if "Wrong Channel" in buf:
+        while time.monotonic() < deadline:
+            waiting = ser.in_waiting
+            if waiting:
+                buf += ser.read(waiting).decode(errors="ignore")
+                if "Wrong Channel" in buf or "OK" in buf:
                     break
-
-                # 再判断成功
-                if "OK" in buf:
-                    break
-
-            # 短暂休眠，避免占用过多 CPU
-            time.sleep(0.1)
+            else:
+                time.sleep(COMMAND_RESPONSE_POLL_INTERVAL_SECONDS)
 
         return buf.strip()
 
@@ -226,15 +221,38 @@ class ImpactProtectionSerial(ImpactProtectionBase):
     def get_version(self) -> str:
         return self._send("M115")
 
-    def switch_mode(self, mode: str) -> ImpactState:
-        resp = self._send(mode)
+    def _send_state_command(self, command: str, mode: str) -> ImpactState:
+        now = time.monotonic()
+        if (
+            command == self._last_successful_command
+            and self._last_successful_command_at is not None
+            and now - self._last_successful_command_at <= STATE_COMMAND_CACHE_SECONDS
+        ):
+            return ImpactState(
+                mode=mode,
+                raw_response=f"{command} OK (cached)",
+                command_sent=False,
+            )
+
+        resp = self._send(command)
+        if "OK" in resp and "Wrong Channel" not in resp:
+            self._last_successful_command = command
+            self._last_successful_command_at = time.monotonic()
+        else:
+            self._last_successful_command = None
+            self._last_successful_command_at = None
         return ImpactState(mode=mode, raw_response=resp)
 
+    def switch_mode(self, mode: str) -> ImpactState:
+        command = mode.strip()
+        return self._send_state_command(command, command)
+
     def close_all_gratings(self) -> ImpactState:
-        resp = self._send("M18")
-        return ImpactState(mode="CLOSE_ALL", raw_response=resp)
+        return self._send_state_command("M18", "CLOSE_ALL")
 
     def close(self) -> None:
+        self._last_successful_command = None
+        self._last_successful_command_at = None
         if self._ser:
             self._ser.close()
             ui.print_info("Impact serial closed")

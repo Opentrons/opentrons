@@ -3,6 +3,7 @@
 from typing import List, Dict, Tuple, Optional, Any, Union, cast, Generator
 from contextlib import contextmanager
 from dataclasses import dataclass, asdict, replace
+from statistics import median
 from time import time
 import copy
 import json
@@ -30,7 +31,7 @@ from opentrons.protocol_api.core.engine import (
     transfer_components_executor as tx_comps_executor,
     pipette_movement_conflict,
 )
-from opentrons.config import IS_ROBOT, name as get_robot_name
+from opentrons.config import IS_ROBOT
 from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
 from opentrons.hardware_control.types import OT3AxisKind, OT3Mount, Axis
 from opentrons.types import Point, DeckSlotName, Location
@@ -134,10 +135,46 @@ requirements = {"robotType": "Flex", "apiLevel": "2.29"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
 IMPACT_96CH_PIPETTE_MOVE_WAIT_SECONDS = 15
-RIGHT_PIPETTE_IDLE_HOLD_CURRENT_AMPS = 0.1
+EVAPORATION_MIN_BLANK_TRIALS = 3
+EVAPORATION_MAD_SCALE = 1.4826
+EVAPORATION_MAD_LIMIT = 3.0
+EVAPORATION_MIN_OUTLIER_THRESHOLD_UL = 0.01
+EVAPORATION_MIN_COMPENSATION_LIMIT_UL = 0.05
+EVAPORATION_MAX_COMPENSATION_FRACTION = 0.25
+EVAPORATION_MAX_ABSOLUTE_COMPENSATION_UL = 0.5
+EVAPORATION_MIN_SPREAD_LIMIT_UL = 0.01
+EVAPORATION_MAX_SPREAD_FRACTION = 0.05
+EVAPORATION_MAX_ABSOLUTE_SPREAD_UL = 0.1
 
 # Dual P50M/P1000M runs use a registered Flex Trash Bin in A1.
 DUAL_MULTI_TRASH_SLOT = "A1"
+
+
+@dataclass(frozen=True)
+class RobustEvaporationEstimate:
+    """One signed blank estimate and the statistics used to accept it."""
+
+    compensation: float
+    arithmetic_mean: float
+    median: float
+    mad: float
+    robust_sigma: float
+    inlier_count: int
+    rejected_count: int
+    values: Tuple[float, ...]
+    inlier_values: Tuple[float, ...]
+    rejected_values: Tuple[float, ...]
+
+
+@dataclass(frozen=True)
+class EvaporationProfile:
+    """Evaporation compensation measured for one tip and target volume."""
+
+    tip_size: int
+    volume: float
+    aspirate: RobustEvaporationEstimate
+    dispense: RobustEvaporationEstimate
+    measurements: List[List[MeasurementData]]
 
 
 # =============================================================================
@@ -477,6 +514,27 @@ class CSVSettings:
         )
 
 
+def _configured_evaporation_profiles(
+    csv_settings: CSVSettings,
+) -> List[Tuple[int, float]]:
+    """Return unique tip/volume pairs that may need evaporation compensation."""
+    profiles: List[Tuple[int, float]] = []
+    for tip_size in csv_settings.tip_sizes:
+        for volume in (
+            csv_settings.volumes[tip_size]
+            + csv_settings.extra_volumes[tip_size]
+        ):
+            profile = (tip_size, volume)
+            if profile not in profiles:
+                profiles.append(profile)
+    return profiles
+
+
+def _report_supports_evaporation_profiles() -> bool:
+    """Whether the installed report module supports detailed evaporation data."""
+    return callable(getattr(report, "store_evaporation_profile", None))
+
+
 # -----------------------------------------------------------------------------
 # Production fixture settings, extended with stacker and 96ch impact state.
 # -----------------------------------------------------------------------------
@@ -605,6 +663,9 @@ class FixtureSettings(CSVSettings):
             csv_settings = CSVSettings.parse_csv(csv_params, ctx.is_simulating())
         if mount is not None:
             csv_settings = replace(csv_settings, mount=mount)
+        run_evaporation = bool(getattr(ctx.params, "run_evaporation", True))
+        if run_evaporation:
+            _validate_evaporation_configuration(csv_settings)
 
         source_well = _load_or_get_labware(
             ctx,
@@ -635,16 +696,28 @@ class FixtureSettings(CSVSettings):
         run_id = create_run_id()
         fast_simulate = IS_ROBOT and simulating
 
-        test_report = report.create_csv_test_report(
-            volumes=csv_settings.volumes_flat,
-            pipette_channels=csv_settings.channels,
-            trials=csv_settings.trials,
-            name=csv_settings.name,
-            run_id=run_id,
-            blank_trials=csv_settings.blank_trials,
-            runtime_parameters=csv_params,
-            dont_write_to_disk=fast_simulate,
-        )
+        report_arguments: Dict[str, Any] = {
+            "volumes": csv_settings.volumes_flat,
+            "pipette_channels": csv_settings.channels,
+            "trials": csv_settings.trials,
+            "name": csv_settings.name,
+            "run_id": run_id,
+            "blank_trials": csv_settings.blank_trials,
+            "runtime_parameters": csv_params,
+            "dont_write_to_disk": fast_simulate,
+        }
+        if _report_supports_evaporation_profiles():
+            report_arguments["evaporation_profiles"] = (
+                _configured_evaporation_profiles(csv_settings)
+                if run_evaporation
+                else None
+            )
+        elif run_evaporation:
+            print_warning(
+                "Installed gravimetric report module does not support detailed "
+                "evaporation profiles; using the production-compatible summary."
+            )
+        test_report = report.create_csv_test_report(**report_arguments)
         os.makedirs(f"{test_report.parent}", exist_ok=True)
         set_output_file(f"{test_report.parent}/run_output.txt")
 
@@ -684,8 +757,7 @@ class FixtureSettings(CSVSettings):
             env_sensor, link_port = AsairDriver.BuildAsairSensorWithPort(simulating)
             env_serial = env_sensor.get_serial()
             use_impact_protection = ctx.params.use_impact_protection  # type: ignore [attr-defined]
-            use_96ch_stackers = getattr(ctx.params, "use_96ch_stackers", False)
-            run_evaporation = bool(getattr(ctx.params, "run_evaporation", True))
+            use_96ch_stackers = getattr(ctx.params, "use_96ch_stackers", True)
             if use_impact_protection:
                 if csv_settings.pipette_channels == 96:
                     skip_port = link_port if link_port is not None else ""
@@ -743,7 +815,8 @@ class FixtureSettings(CSVSettings):
         robot_name = "Simulating"
         if IS_ROBOT:
             try:
-                robot_name = get_robot_name()
+                with open("/data/ODD/discovery.json", "r") as disc:
+                    robot_name = json.load(disc)["robots"][0]["name"]
             except Exception:
                 robot_name = "Error Reading Robot Name"
 
@@ -788,7 +861,12 @@ class FixtureSettings(CSVSettings):
             if not _uses_96ch_stackers(
                 csv_settings, use_96ch_stackers
             ) and not _uses_no_trash_runtime_settings(csv_settings):
-                _ensure_trash_bin(ctx, _trash_bin_slot(csv_settings))
+                trash_slot = (
+                    DUAL_MULTI_TRASH_SLOT
+                    if _uses_dual_multi_extension_deck(csv_settings)
+                    else "A3"
+                )
+                _ensure_trash_bin(ctx, trash_slot)
             _do_simulating_lpc_moves(
                 ctx, csv_settings, pipette, source_well, use_96ch_stackers
             )
@@ -1292,7 +1370,7 @@ def maybe_switch_mode(fixture_settings: FixtureSettings, tip: int) -> None:
 # -----------------------------------------------------------------------------
 #
 # These functions should stay easy to compare with production. No-trash behavior
-# is guarded for 96ch stacker runs and CSV-enabled dual P50S/P1000S return-tip runs.
+# is guarded for 96ch stacker runs and dual P50S/P1000S runs.
 
 
 def remove_tip(fixture_settings: FixtureSettings) -> None:
@@ -1335,6 +1413,10 @@ def pick_up_tip_for_channel(
     _USED_TIP_LOCATIONS.add(_tip_location_key(tip))
     if fixture_settings.increment and not fixture_settings.ctx.is_simulating():
         print_info("clearing pipette ul-per-mm table to be linear")
+        from hardware_testing.opentrons_api.helpers_ot3 import (  # noqa: WPS433
+            clear_pipette_ul_per_mm,
+        )
+
         clear_pipette_ul_per_mm(
             fixture_settings.ctx._core.get_hardware()._obj_to_adapt,  # type: ignore[arg-type]
             OT3Mount.LEFT if fixture_settings.mount == "left" else OT3Mount.RIGHT,
@@ -1357,12 +1439,10 @@ def _update_environment_first_last_min_max(test_report: report.CSVReport) -> Non
 
 
 @contextmanager
-def _batch_report_update(
+def _batch_measurement_report_update(
     test_report: report.CSVReport,
-    *,
-    save_on_error: bool = False,
 ) -> Generator[None, None, None]:
-    """Defer disk writes until one logical report update is complete."""
+    """Write one complete measurement update to disk in a single operation."""
     original_dont_write = test_report._dont_write_to_disk
     if original_dont_write:
         yield
@@ -1375,7 +1455,7 @@ def _batch_report_update(
         completed = True
     finally:
         test_report._dont_write_to_disk = original_dont_write
-        if completed or save_on_error:
+        if completed:
             test_report.save_to_disk()
 
 
@@ -1421,14 +1501,15 @@ def retract_and_wait(
         False,  # Shorten is always false
         fixture_settings.scale_delay,
     )
-    report.store_measurement(fixture_settings.test_report, m_tag, m_data)
-    _MEASUREMENTS.append(
-        (
-            m_tag,
-            m_data,
+    with _batch_measurement_report_update(fixture_settings.test_report):
+        report.store_measurement(fixture_settings.test_report, m_tag, m_data)
+        _MEASUREMENTS.append(
+            (
+                m_tag,
+                m_data,
+            )
         )
-    )
-    _update_environment_first_last_min_max(fixture_settings.test_report)
+        _update_environment_first_last_min_max(fixture_settings.test_report)
 
     maybe_close_all_gratings(fixture_settings)
     return m_data
@@ -1817,56 +1898,62 @@ def _run_and_store_trial(
     avg_asp_evap: float,
     avg_disp_evap: float,
 ) -> Tuple[List[MeasurementData], float, float]:
-    """Run one complete trial and store its in-memory report updates."""
-    trial_measurements = run_one_test(
-        fixture_settings,
-        tip,
-        tip_well,
-        volume,
-        trial,
-        channel,
-        last_measurement,
-    )
-    asp_with_evap = (
-        calculate_change_in_volume(
+    """Run one complete trial and save its report updates in one disk write."""
+    with _batch_measurement_report_update(fixture_settings.test_report):
+        trial_measurements = run_one_test(
+            fixture_settings,
+            tip,
+            tip_well,
+            volume,
+            trial,
+            channel,
+            last_measurement,
+        )
+        raw_aspirate = calculate_change_in_volume(
             trial_measurements[0],
             trial_measurements[1],
             liq,
         )
-        - avg_asp_evap
-    )
-    disp_with_evap = (
-        calculate_change_in_volume(
+        raw_dispense = calculate_change_in_volume(
             trial_measurements[1],
             trial_measurements[2],
             liq,
         )
-        + avg_disp_evap
-    )
+        asp_with_evap = raw_aspirate - avg_asp_evap
+        disp_with_evap = raw_dispense + avg_disp_evap
+        if asp_with_evap < 0 or disp_with_evap < 0:
+            raise RuntimeError(
+                f"Evaporation correction produced a negative volume for T{tip} "
+                f"{volume} uL channel {channel} trial {trial}: "
+                f"aspirate={raw_aspirate:.6f}-{avg_asp_evap:.6f}="
+                f"{asp_with_evap:.6f}, dispense={raw_dispense:.6f}+"
+                f"{avg_disp_evap:.6f}={disp_with_evap:.6f}."
+            )
 
-    full_tip_increment = (
-        len(fixture_settings.channels) == 8 and fixture_settings.increment
-    )
-    if full_tip_increment or (
-        fixture_settings.pipette_channels == 96 and not fixture_settings.single_tip_96
-    ):
-        asp_with_evap = asp_with_evap / fixture_settings.pipette_channels
-        disp_with_evap = disp_with_evap / fixture_settings.pipette_channels
+        full_tip_increment = (
+            len(fixture_settings.channels) == 8 and fixture_settings.increment
+        )
+        if full_tip_increment or (
+            fixture_settings.pipette_channels == 96
+            and not fixture_settings.single_tip_96
+        ):
+            asp_with_evap = asp_with_evap / fixture_settings.pipette_channels
+            disp_with_evap = disp_with_evap / fixture_settings.pipette_channels
 
-    if fixture_settings.ctx.is_simulating():
-        cur_height: float = 10.0
-    else:
-        lh = fixture_settings.liquid_source.current_liquid_height()
-        cur_height = lh  # type: ignore[assignment]
-    report.store_trial(
-        fixture_settings.test_report,
-        trial,
-        volume,
-        channel,
-        asp_with_evap,
-        disp_with_evap,
-        cur_height,
-    )
+        if fixture_settings.ctx.is_simulating():
+            cur_height: float = 10.0
+        else:
+            lh = fixture_settings.liquid_source.current_liquid_height()
+            cur_height = lh  # type: ignore[assignment]
+        report.store_trial(
+            fixture_settings.test_report,
+            trial,
+            volume,
+            channel,
+            asp_with_evap,
+            disp_with_evap,
+            cur_height,
+        )
 
     return trial_measurements, asp_with_evap, disp_with_evap
 
@@ -1890,65 +1977,272 @@ def _configure_tip_count(fixture_settings: FixtureSettings, channel: int) -> Non
         print_info(f"Configuring for single tip with {primary}")
 
 
+def _calculate_signed_background_volume(
+    before: MeasurementData,
+    after: MeasurementData,
+    liq: SupportedLiquid,
+) -> float:
+    """Return positive volume for mass loss and negative volume for mass gain."""
+    magnitude = calculate_change_in_volume(before, after, liq)
+    mass_change = before.grams_average - after.grams_average
+    if mass_change > 0:
+        return magnitude
+    if mass_change < 0:
+        return -magnitude
+    return 0.0
+
+
+def _evaporation_compensation_limit(volume: float) -> float:
+    return min(
+        EVAPORATION_MAX_ABSOLUTE_COMPENSATION_UL,
+        max(
+            EVAPORATION_MIN_COMPENSATION_LIMIT_UL,
+            volume * EVAPORATION_MAX_COMPENSATION_FRACTION,
+        ),
+    )
+
+
+def _evaporation_spread_limit(volume: float) -> float:
+    return min(
+        EVAPORATION_MAX_ABSOLUTE_SPREAD_UL,
+        max(
+            EVAPORATION_MIN_SPREAD_LIMIT_UL,
+            volume * EVAPORATION_MAX_SPREAD_FRACTION,
+        ),
+    )
+
+
+def _robust_evaporation_compensation(
+    values: List[float],
+    phase: str,
+    tip_size: int,
+    volume: float,
+) -> RobustEvaporationEstimate:
+    """Return a signed median estimate after MAD filtering and quality gates."""
+    if len(values) < EVAPORATION_MIN_BLANK_TRIALS:
+        raise RuntimeError(
+            f"T{tip_size} {volume} uL {phase} requires at least "
+            f"{EVAPORATION_MIN_BLANK_TRIALS} blank measurements; got {len(values)}."
+        )
+
+    center = float(median(values))
+    deviations = [abs(value - center) for value in values]
+    raw_mad = float(median(deviations))
+    threshold = max(
+        EVAPORATION_MIN_OUTLIER_THRESHOLD_UL,
+        EVAPORATION_MAD_LIMIT * EVAPORATION_MAD_SCALE * raw_mad,
+    )
+    inliers = [value for value in values if abs(value - center) <= threshold]
+    rejected_values = [
+        value for value in values if abs(value - center) > threshold
+    ]
+    minimum_inliers = max(
+        EVAPORATION_MIN_BLANK_TRIALS,
+        (len(values) * 3 + 4) // 5,
+    )
+    if len(inliers) < minimum_inliers:
+        raise RuntimeError(
+            f"T{tip_size} {volume} uL {phase} evaporation blanks are unstable: "
+            f"only {len(inliers)}/{len(values)} values passed MAD filtering; "
+            f"at least {minimum_inliers} are required."
+        )
+
+    compensation = float(median(inliers))
+    inlier_deviations = [abs(value - compensation) for value in inliers]
+    inlier_mad = float(median(inlier_deviations))
+    robust_sigma = EVAPORATION_MAD_SCALE * inlier_mad
+    compensation_limit = _evaporation_compensation_limit(volume)
+    spread_limit = _evaporation_spread_limit(volume)
+    if abs(compensation) > compensation_limit:
+        raise RuntimeError(
+            f"T{tip_size} {volume} uL {phase} evaporation compensation "
+            f"{compensation:.6f} uL exceeds the allowed signed magnitude "
+            f"{compensation_limit:.6f} uL."
+        )
+    if robust_sigma > spread_limit:
+        raise RuntimeError(
+            f"T{tip_size} {volume} uL {phase} evaporation blanks are too noisy: "
+            f"robust sigma {robust_sigma:.6f} uL exceeds {spread_limit:.6f} uL."
+        )
+
+    estimate = RobustEvaporationEstimate(
+        compensation=compensation,
+        arithmetic_mean=sum(values) / len(values),
+        median=compensation,
+        mad=inlier_mad,
+        robust_sigma=robust_sigma,
+        inlier_count=len(inliers),
+        rejected_count=len(values) - len(inliers),
+        values=tuple(values),
+        inlier_values=tuple(inliers),
+        rejected_values=tuple(rejected_values),
+    )
+    print_info(
+        f"T{tip_size} {volume} uL robust {phase} evaporation: "
+        f"compensation={estimate.compensation:.6f} uL, "
+        f"mean={estimate.arithmetic_mean:.6f} uL, "
+        f"MAD={estimate.mad:.6f}, sigma={estimate.robust_sigma:.6f}, "
+        f"inliers={estimate.inlier_count}/{len(values)}, "
+        f"rejected={estimate.rejected_count}, signed_values={values}."
+    )
+    return estimate
+
+
 def calculate_evaporation(
     ctx: ProtocolContext,
     fixture_settings: FixtureSettings,
     liq: SupportedLiquid,
-    tip: Well,
-) -> Tuple[List[List[MeasurementData]], float, float]:
-    """This is done at the begining of the test and during the cavity test it happens again for each cavity."""
-    print_info("Detecting liquid height.")
-
-
+    tip_well: Well,
+    tip_size: int,
+    volume: float,
+    *,
+    detect_liquid_height: bool,
+    stabilize_scale: bool,
+    store_legacy_average: bool,
+) -> EvaporationProfile:
+    """Measure one signed evaporation profile for a tip and target volume."""
     fixture_settings.pipette._retract()
-    maybe_switch_mode(fixture_settings, fixture_settings.tip_sizes[0])
+    maybe_switch_mode(fixture_settings, tip_size)
 
-    fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
-    print_info(
-        f"Test source has {fixture_settings.liquid_source.current_liquid_volume()}"
-    )
-    fixture_settings.pipette._retract()
+    if detect_liquid_height:
+        print_info("Detecting liquid height before evaporation blanks.")
+        fixture_settings.pipette.require_liquid_presence(
+            fixture_settings.liquid_source
+        )
+        print_info(
+            f"Test source has {fixture_settings.liquid_source.current_liquid_volume()}"
+        )
+        fixture_settings.pipette._retract()
     blank_measurments: List[List[MeasurementData]] = []
-    _stabilize_scale_before_evaporation(ctx, fixture_settings)
+    if stabilize_scale:
+        ctx.delay(
+            seconds=SCALE_SECONDS_TO_TRUE_STABILIZE,
+            msg=f"Waiting {SCALE_SECONDS_TO_TRUE_STABILIZE} for scale to stabilize",
+        )
     for i in range(fixture_settings.blank_trials):
-        print_header(f"Running blank trial {i}")
-        with _batch_report_update(fixture_settings.test_report):
+        print_header(f"Running T{tip_size} {volume} uL blank trial {i}")
+        with _batch_measurement_report_update(fixture_settings.test_report):
             blank_measurments.append(
                 run_blank_test(
                     fixture_settings,
-                    fixture_settings.tip_sizes[0],
-                    fixture_settings.volumes[fixture_settings.tip_sizes[0]][0],
+                    tip_size,
+                    volume,
                     i,
-                    tip,
+                    tip_well,
                 )
             )
     asp_evaps = [
-        calculate_change_in_volume(blank[0], blank[1], liq)
+        _calculate_signed_background_volume(blank[0], blank[1], liq)
         for blank in blank_measurments
     ]
     disp_evaps = [
-        calculate_change_in_volume(blank[1], blank[2], liq)
+        _calculate_signed_background_volume(blank[1], blank[2], liq)
         for blank in blank_measurments
     ]
     for i in range(len(asp_evaps)):
-        print(f"Trial {i+1} evap: aspirate {asp_evaps[i]} dispense {disp_evaps[i]}")
-    avg_asp_evap = sum(asp_evaps) / len(asp_evaps)
-    avg_disp_evap = sum(disp_evaps) / len(disp_evaps)
-    report.store_average_evaporation(
-        fixture_settings.test_report,
-        avg_asp_evap,
-        avg_disp_evap,
+        print_info(
+            f"T{tip_size} {volume} uL blank {i + 1}: "
+            f"aspirate={asp_evaps[i]:.6f} uL, "
+            f"dispense={disp_evaps[i]:.6f} uL"
+        )
+    aspirate_estimate = _robust_evaporation_compensation(
+        asp_evaps, "aspirate", tip_size, volume
     )
-    volume_lost_during_blank = calculate_change_in_volume(
+    dispense_estimate = _robust_evaporation_compensation(
+        disp_evaps, "dispense", tip_size, volume
+    )
+    store_evaporation_profile = getattr(
+        report, "store_evaporation_profile", None
+    )
+    with _batch_measurement_report_update(fixture_settings.test_report):
+        for phase, estimate in (
+            ("aspirate", aspirate_estimate),
+            ("dispense", dispense_estimate),
+        ):
+            if callable(store_evaporation_profile):
+                store_evaporation_profile(
+                    fixture_settings.test_report,
+                    tip_size=tip_size,
+                    volume=volume,
+                    phase=phase,
+                    mean=estimate.arithmetic_mean,
+                    compensation=estimate.compensation,
+                    median=estimate.median,
+                    mad=estimate.mad,
+                    robust_sigma=estimate.robust_sigma,
+                    inliers=estimate.inlier_count,
+                    rejected=estimate.rejected_count,
+                    signed_values=list(estimate.values),
+                    inlier_values=list(estimate.inlier_values),
+                    rejected_values=list(estimate.rejected_values),
+                )
+        if store_legacy_average:
+            report.store_average_evaporation(
+                fixture_settings.test_report,
+                aspirate_estimate.arithmetic_mean,
+                dispense_estimate.arithmetic_mean,
+            )
+
+    signed_volume_lost_during_blank = _calculate_signed_background_volume(
         blank_measurments[0][0], blank_measurments[-1][-1], liq
     )
+    volume_lost_during_blank = max(0.0, signed_volume_lost_during_blank)
+    if signed_volume_lost_during_blank < 0:
+        print_warning(
+            f"T{tip_size} {volume} uL blank sequence gained "
+            f"{-signed_volume_lost_during_blank:.6f} uL equivalent mass; "
+            "the liquid-volume model will not increase."
+        )
     if not ctx.is_simulating():
         fixture_settings.liquid_source.load_liquid(
             fixture_settings.liquid,
             fixture_settings.liquid_source.current_liquid_volume()  # type: ignore[arg-type]
             - volume_lost_during_blank,
         )
-    return blank_measurments, avg_asp_evap, avg_disp_evap
+    return EvaporationProfile(
+        tip_size=tip_size,
+        volume=volume,
+        aspirate=aspirate_estimate,
+        dispense=dispense_estimate,
+        measurements=blank_measurments,
+    )
+
+
+def _calculate_evaporation_profiles_for_tip(
+    ctx: ProtocolContext,
+    fixture_settings: FixtureSettings,
+    liq: SupportedLiquid,
+    tip_well: Well,
+    tip_size: int,
+    volumes: List[float],
+    *,
+    detect_liquid_height: bool,
+    stabilize_scale: bool,
+    store_legacy_average: bool,
+) -> Tuple[Dict[Tuple[int, float], EvaporationProfile], MeasurementData]:
+    """Measure every configured volume for a tip while one blank tip is attached."""
+    unique_volumes = list(dict.fromkeys(volumes))
+    if not unique_volumes:
+        raise RuntimeError(f"No evaporation profile volume is configured for T{tip_size}.")
+
+    profiles: Dict[Tuple[int, float], EvaporationProfile] = {}
+    last_measurement: Optional[MeasurementData] = None
+    for index, volume in enumerate(unique_volumes):
+        profile = calculate_evaporation(
+            ctx,
+            fixture_settings,
+            liq,
+            tip_well,
+            tip_size,
+            volume,
+            detect_liquid_height=detect_liquid_height and index == 0,
+            stabilize_scale=stabilize_scale and index == 0,
+            store_legacy_average=store_legacy_average and index == 0,
+        )
+        profiles[(tip_size, volume)] = profile
+        last_measurement = profile.measurements[-1][-1]
+    assert last_measurement is not None
+    return profiles, last_measurement
 
 
 # -----------------------------------------------------------------------------
@@ -1972,40 +2266,81 @@ def _get_passing_requirements(
     return None
 
 
+def _evaporation_volumes_for_tip(
+    fixture_settings: CSVSettings, tip_size: int
+) -> List[float]:
+    return list(
+        dict.fromkeys(
+            fixture_settings.volumes[tip_size]
+            + fixture_settings.extra_volumes[tip_size]
+        )
+    )
+
+
+def _validate_evaporation_configuration(
+    fixture_settings: CSVSettings,
+) -> None:
+    if fixture_settings.blank_trials < EVAPORATION_MIN_BLANK_TRIALS:
+        raise ValueError(
+            "Evaporation compensation requires at least "
+            f"{EVAPORATION_MIN_BLANK_TRIALS} blank trials; "
+            f"CSV configured {fixture_settings.blank_trials}."
+        )
+    for tip_size in fixture_settings.tip_sizes:
+        volumes = _evaporation_volumes_for_tip(fixture_settings, tip_size)
+        if not volumes:
+            raise ValueError(
+                f"Evaporation compensation has no configured volume for T{tip_size}."
+            )
+        invalid_volumes = [volume for volume in volumes if volume <= 0]
+        if invalid_volumes:
+            raise ValueError(
+                f"T{tip_size} evaporation volumes must be positive: "
+                f"{invalid_volumes}."
+            )
+
+
 def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     """Run."""
     # close all gratings
     maybe_close_all_gratings(fixture_settings)
 
-    first_tip = _get_tips_for_test(
-        fixture_settings, fixture_settings.tip_sizes[0], True
-    )[0]
+    first_tip_size = fixture_settings.tip_sizes[0]
+    first_tip = _get_tips_for_test(fixture_settings, first_tip_size, True)[0]
     print_info("Picking up first tip.")
     _configure_tip_count(fixture_settings, 0)
     pick_up_tip_for_channel(fixture_settings, first_tip, 0)
-    last_probed_tip_size = fixture_settings.tip_sizes[0]
+    last_probed_tip_size = first_tip_size
     liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
+    evaporation_profiles: Dict[Tuple[int, float], EvaporationProfile] = {}
+    last_measurement: Optional[MeasurementData]
     if fixture_settings.run_evaporation:
-        blank_measurments, avg_asp_evap, avg_disp_evap = calculate_evaporation(
-            ctx, fixture_settings, liq, first_tip
+        new_profiles, last_measurement = _calculate_evaporation_profiles_for_tip(
+            ctx,
+            fixture_settings,
+            liq,
+            first_tip,
+            first_tip_size,
+            _evaporation_volumes_for_tip(fixture_settings, first_tip_size),
+            detect_liquid_height=True,
+            stabilize_scale=True,
+            store_legacy_average=True,
         )
-        last_measurement: Optional[MeasurementData] = blank_measurments[-1][-1]
+        evaporation_profiles.update(new_profiles)
     else:
         ctx.comment(
             "evaporation blank disabled: skip scale stabilization and blank trials"
         )
         fixture_settings.pipette._retract()
-        maybe_switch_mode(fixture_settings, fixture_settings.tip_sizes[0])
+        maybe_switch_mode(fixture_settings, first_tip_size)
         fixture_settings.pipette.require_liquid_presence(
             fixture_settings.liquid_source
         )
         fixture_settings.pipette._retract()
-        avg_asp_evap = 0.0
-        avg_disp_evap = 0.0
         report.store_average_evaporation(
             fixture_settings.test_report,
-            avg_asp_evap,
-            avg_disp_evap,
+            0.0,
+            0.0,
         )
         last_measurement = None
     remove_tip(fixture_settings)
@@ -2025,6 +2360,21 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                     fixture_settings.liquid_source
                 )
                 last_probed_tip_size = tip
+                if fixture_settings.run_evaporation:
+                    new_profiles, last_measurement = (
+                        _calculate_evaporation_profiles_for_tip(
+                            ctx,
+                            fixture_settings,
+                            liq,
+                            probe_tip,
+                            tip,
+                            _evaporation_volumes_for_tip(fixture_settings, tip),
+                            detect_liquid_height=False,
+                            stabilize_scale=False,
+                            store_legacy_average=False,
+                        )
+                    )
+                    evaporation_profiles.update(new_profiles)
                 remove_tip(fixture_settings)
 
         volumes_to_tests = fixture_settings.volumes[tip]
@@ -2045,11 +2395,33 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 # override pipette movement conflict checking 'cause we specially lay out our tipracks
                 tips = _get_tips_for_test(fixture_settings, tip, False, channel)
                 if deferred_96ch_probe:
-                    tips = _run_deferred_96ch_stacker_probe(
-                        fixture_settings, tip, tips
+                    tips, new_profiles, probe_last_measurement = (
+                        _run_deferred_96ch_stacker_probe(
+                            fixture_settings,
+                            tip,
+                            tips,
+                            liq,
+                            _evaporation_volumes_for_tip(
+                                fixture_settings, tip
+                            ),
+                        )
                     )
+                    evaporation_profiles.update(new_profiles)
+                    if probe_last_measurement is not None:
+                        last_measurement = probe_last_measurement
                     last_probed_tip_size = tip
                     deferred_96ch_probe = False
+                if fixture_settings.run_evaporation:
+                    evaporation_profile = evaporation_profiles.get((tip, volume))
+                    if evaporation_profile is None:
+                        raise RuntimeError(
+                            f"Missing evaporation profile for T{tip} {volume} uL."
+                        )
+                    avg_asp_evap = evaporation_profile.aspirate.compensation
+                    avg_disp_evap = evaporation_profile.dispense.compensation
+                else:
+                    avg_asp_evap = 0.0
+                    avg_disp_evap = 0.0
                 print_info(str(tips))
                 if channel == 7:
                     # we're doing an 8 channel test and just swapped over to the front channel.
@@ -2064,34 +2436,42 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                     last_measurement = None
                 actual_asp_list_channel: List[float] = []
                 actual_disp_list_channel: List[float] = []
-                with _batch_report_update(
-                    fixture_settings.test_report, save_on_error=True
-                ):
-                    for trial in range(fixture_settings.trials):
-                        if (
-                            fixture_settings.run_evaporation
-                            and fixture_settings.cavity_test
-                            and trial != 0
-                            and trial % 15 == 0
-                        ):
-                            pick_up_tip_for_channel(fixture_settings, tips[0], 0)
-                            print_info("calculating evap.")
-                            (
-                                blank_measurments,
-                                avg_asp_evap,
-                                avg_disp_evap,
-                            ) = calculate_evaporation(
-                                ctx, fixture_settings, liq, tips.pop(0)
-                            )
-                            remove_tip(fixture_settings)
-                        print_header(
-                            f"Running trial {trial} for channel {channel} {volume}ul with T{tip}"
+
+                for trial in range(fixture_settings.trials):
+                    if (
+                        fixture_settings.run_evaporation
+                        and fixture_settings.cavity_test
+                        and trial != 0
+                        and trial % 15 == 0
+                    ):
+                        blank_tip = tips.pop(0)
+                        pick_up_tip_for_channel(fixture_settings, blank_tip, 0)
+                        print_info("calculating evap.")
+                        evaporation_profile = calculate_evaporation(
+                            ctx,
+                            fixture_settings,
+                            liq,
+                            blank_tip,
+                            tip,
+                            volume,
+                            detect_liquid_height=True,
+                            stabilize_scale=True,
+                            store_legacy_average=False,
                         )
-                        (
-                            trial_measurements,
-                            asp_with_evap,
-                            disp_with_evap,
-                        ) = _run_and_store_trial(
+                        evaporation_profiles[(tip, volume)] = evaporation_profile
+                        avg_asp_evap = (
+                            evaporation_profile.aspirate.compensation
+                        )
+                        avg_disp_evap = (
+                            evaporation_profile.dispense.compensation
+                        )
+                        last_measurement = evaporation_profile.measurements[-1][-1]
+                        remove_tip(fixture_settings)
+                    print_header(
+                        f"Running trial {trial} for channel {channel} {volume}ul with T{tip}"
+                    )
+                    trial_measurements, asp_with_evap, disp_with_evap = (
+                        _run_and_store_trial(
                             fixture_settings,
                             tip,
                             tips.pop(0),
@@ -2103,70 +2483,63 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                             avg_asp_evap,
                             avg_disp_evap,
                         )
-                        measurements[volume].append(trial_measurements)
-                        print_info(
-                            f"Finished trial {trial} asp {asp_with_evap} disp {disp_with_evap}"
-                        )
-                        actual_asp_list_channel.append(asp_with_evap)
-                        actual_disp_list_channel.append(disp_with_evap)
-                        trial_asp_dict[trial].append(asp_with_evap)
-                        trial_disp_dict[trial].append(disp_with_evap)
-                        last_measurement = trial_measurements[-1]
-                    (
-                        aspirate_average,
-                        aspirate_cv,
-                        aspirate_d,
-                    ) = helpers._calculate_stats(actual_asp_list_channel, volume)
-                    (
-                        dispense_average,
-                        dispense_cv,
-                        dispense_d,
-                    ) = helpers._calculate_stats(actual_disp_list_channel, volume)
-                    aspirate_data_list = [elem[1] for elem in measurements[volume]]
-                    dispense_data_list = [elem[2] for elem in measurements[volume]]
-                    # Average Celsius
-                    aspirate_celsius_avg = sum(
-                        a_data.environment.celsius_pipette
-                        for a_data in aspirate_data_list
-                    ) / len(aspirate_data_list)
-                    dispense_celsius_avg = sum(
-                        d_data.environment.celsius_pipette
-                        for d_data in dispense_data_list
-                    ) / len(dispense_data_list)
-                    # Average humidity
-                    aspirate_humidity_avg = sum(
-                        a_data.environment.humidity_pipette
-                        for a_data in aspirate_data_list
-                    ) / len(aspirate_data_list)
-                    dispense_humidity_avg = sum(
-                        d_data.environment.humidity_pipette
-                        for d_data in dispense_data_list
-                    ) / len(dispense_data_list)
+                    )
+                    measurements[volume].append(trial_measurements)
+                    print_info(
+                        f"Finished trial {trial} asp {asp_with_evap} disp {disp_with_evap}"
+                    )
+                    actual_asp_list_channel.append(asp_with_evap)
+                    actual_disp_list_channel.append(disp_with_evap)
+                    trial_asp_dict[trial].append(asp_with_evap)
+                    trial_disp_dict[trial].append(disp_with_evap)
+                    last_measurement = trial_measurements[-1]
+                aspirate_average, aspirate_cv, aspirate_d = helpers._calculate_stats(
+                    actual_asp_list_channel, volume
+                )
+                dispense_average, dispense_cv, dispense_d = helpers._calculate_stats(
+                    actual_disp_list_channel, volume
+                )
+                aspirate_data_list = [elem[1] for elem in measurements[volume]]
+                dispense_data_list = [elem[2] for elem in measurements[volume]]
+                # Average Celsius
+                aspirate_celsius_avg = sum(
+                    a_data.environment.celsius_pipette for a_data in aspirate_data_list
+                ) / len(aspirate_data_list)
+                dispense_celsius_avg = sum(
+                    d_data.environment.celsius_pipette for d_data in dispense_data_list
+                ) / len(dispense_data_list)
+                # Average humidity
+                aspirate_humidity_avg = sum(
+                    a_data.environment.humidity_pipette for a_data in aspirate_data_list
+                ) / len(aspirate_data_list)
+                dispense_humidity_avg = sum(
+                    d_data.environment.humidity_pipette for d_data in dispense_data_list
+                ) / len(dispense_data_list)
 
-                    report.store_volume_per_channel(
-                        report=fixture_settings.test_report,
-                        mode="aspirate",
-                        volume=volume,
-                        channel=channel,
-                        average=aspirate_average,
-                        cv=aspirate_cv,
-                        d=aspirate_d,
-                        celsius=aspirate_celsius_avg,
-                        humidity=aspirate_humidity_avg,
-                        flag="isolated" if fixture_settings.isolate_volumes else "",
-                    )
-                    report.store_volume_per_channel(
-                        report=fixture_settings.test_report,
-                        mode="dispense",
-                        volume=volume,
-                        channel=channel,
-                        average=dispense_average,
-                        cv=dispense_cv,
-                        d=dispense_d,
-                        celsius=dispense_celsius_avg,
-                        humidity=dispense_humidity_avg,
-                        flag="isolated" if fixture_settings.isolate_volumes else "",
-                    )
+                report.store_volume_per_channel(
+                    report=fixture_settings.test_report,
+                    mode="aspirate",
+                    volume=volume,
+                    channel=channel,
+                    average=aspirate_average,
+                    cv=aspirate_cv,
+                    d=aspirate_d,
+                    celsius=aspirate_celsius_avg,
+                    humidity=aspirate_humidity_avg,
+                    flag="isolated" if fixture_settings.isolate_volumes else "",
+                )
+                report.store_volume_per_channel(
+                    report=fixture_settings.test_report,
+                    mode="dispense",
+                    volume=volume,
+                    channel=channel,
+                    average=dispense_average,
+                    cv=dispense_cv,
+                    d=dispense_d,
+                    celsius=dispense_celsius_avg,
+                    humidity=dispense_humidity_avg,
+                    flag="isolated" if fixture_settings.isolate_volumes else "",
+                )
 
                 actual_asp_list_all.extend(actual_asp_list_channel)
                 actual_disp_list_all.extend(actual_disp_list_channel)
@@ -2184,58 +2557,57 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                         raise RuntimeError(
                             f"Pipette failed on QC channel {channel} tip {tip} volume {volume}"
                         )
-            with _batch_report_update(fixture_settings.test_report):
-                for trial in range(fixture_settings.trials):
-                    aspirate_average, aspirate_cv, aspirate_d = (
-                        helpers._calculate_stats(trial_asp_dict[trial], volume)
-                    )
-                    dispense_average, dispense_cv, dispense_d = (
-                        helpers._calculate_stats(trial_disp_dict[trial], volume)
-                    )
-                    report.store_volume_per_trial(
-                        report=fixture_settings.test_report,
-                        mode="aspirate",
-                        volume=volume,
-                        trial=trial,
-                        average=aspirate_average,
-                        cv=aspirate_cv,
-                        d=aspirate_d,
-                        flag="isolated" if fixture_settings.isolate_volumes else "",
-                    )
-                    report.store_volume_per_trial(
-                        report=fixture_settings.test_report,
-                        mode="dispense",
-                        volume=volume,
-                        trial=trial,
-                        average=dispense_average,
-                        cv=dispense_cv,
-                        d=dispense_d,
-                        flag="isolated" if fixture_settings.isolate_volumes else "",
-                    )
+            for trial in range(fixture_settings.trials):
                 aspirate_average, aspirate_cv, aspirate_d = helpers._calculate_stats(
-                    actual_asp_list_all, volume
+                    trial_asp_dict[trial], volume
                 )
                 dispense_average, dispense_cv, dispense_d = helpers._calculate_stats(
-                    actual_disp_list_all, volume
+                    trial_disp_dict[trial], volume
                 )
-                report.store_volume_all(
+                report.store_volume_per_trial(
                     report=fixture_settings.test_report,
                     mode="aspirate",
                     volume=volume,
+                    trial=trial,
                     average=aspirate_average,
                     cv=aspirate_cv,
                     d=aspirate_d,
-                    flag="",
+                    flag="isolated" if fixture_settings.isolate_volumes else "",
                 )
-                report.store_volume_all(
+                report.store_volume_per_trial(
                     report=fixture_settings.test_report,
                     mode="dispense",
                     volume=volume,
+                    trial=trial,
                     average=dispense_average,
                     cv=dispense_cv,
                     d=dispense_d,
-                    flag="",
+                    flag="isolated" if fixture_settings.isolate_volumes else "",
                 )
+            aspirate_average, aspirate_cv, aspirate_d = helpers._calculate_stats(
+                actual_asp_list_all, volume
+            )
+            dispense_average, dispense_cv, dispense_d = helpers._calculate_stats(
+                actual_disp_list_all, volume
+            )
+            report.store_volume_all(
+                report=fixture_settings.test_report,
+                mode="aspirate",
+                volume=volume,
+                average=aspirate_average,
+                cv=aspirate_cv,
+                d=aspirate_d,
+                flag="",
+            )
+            report.store_volume_all(
+                report=fixture_settings.test_report,
+                mode="dispense",
+                volume=volume,
+                average=dispense_average,
+                cv=dispense_cv,
+                d=dispense_d,
+                flag="",
+            )
         tip_sizes_done.append(tip)
         maybe_close_all_gratings(fixture_settings)
 
@@ -2297,7 +2669,7 @@ def _adjust_settings_for_increment(fixture_settings: FixtureSettings) -> None:
 
 _USED_TIP_LOCATIONS: set[Tuple[str, str]] = set()
 _DECK_LABWARE_BY_SLOT: Dict[str, Labware] = {}
-_TRASH_BIN_SLOT: Optional[str] = None
+_TRASH_BIN_LOADED = False
 TIPRACK_ADAPTER = "opentrons_flex_96_tiprack_adapter"
 SHARED_TIPRACK_OFFSET_REFERENCE_TIP = 50
 STACKER_MODEL = "flexStackerModuleV1"
@@ -2321,7 +2693,6 @@ DUAL_MULTI_RACK_SWAP_MOVES = [
     ("B4", "B3"),
     ("A2", "A4"),
 ]
-DUAL_MULTI_UNCALIBRATED_STORAGE_SLOTS = {"B1"}
 IMPACT_96CH_STACKER_HOME_SLOTS = {"A1", "B1"}
 STACKER_DROP_OFFSETS_CONFIG_FILE = "gravimetric_stacker_drop_offsets.json"
 STACKER_TO_DECK_DROP_OFFSET_TARGETS = [
@@ -2655,19 +3026,14 @@ def _uses_dual_multi_extension_deck(csv_settings: "CSVSettings") -> bool:
     )
 
 
-def _uses_dual_single(csv_settings: "CSVSettings") -> bool:
-    """Whether this is a sequential dual P50S/P1000S run."""
+def _uses_dual_single_no_trash(csv_settings: "CSVSettings") -> bool:
+    """Whether this is a sequential dual P50S/P1000S no-trash run."""
     return (
         csv_settings.pipette_channels == 1
         and csv_settings.pipette_volume in (50, 1000)
         and "left" in csv_settings.mounts_to_test
         and "right" in csv_settings.mounts_to_test
     )
-
-
-def _uses_dual_single_no_trash(csv_settings: "CSVSettings") -> bool:
-    """Whether CSV enables return-tip for a sequential dual P50S/P1000S run."""
-    return _uses_dual_single(csv_settings) and csv_settings.return_tip
 
 
 def _uses_dual_mount_no_trash(csv_settings: "CSVSettings") -> bool:
@@ -2678,15 +3044,6 @@ def _uses_dual_mount_no_trash(csv_settings: "CSVSettings") -> bool:
 def _uses_no_trash_runtime_settings(csv_settings: "CSVSettings") -> bool:
     """Whether setup must avoid registering a physical trash bin."""
     return _uses_dual_single_no_trash(csv_settings)
-
-
-def _trash_bin_slot(csv_settings: "CSVSettings") -> str:
-    """Return the trash slot for the selected deck layout."""
-    if _uses_dual_multi_extension_deck(csv_settings) or _uses_dual_single(
-        csv_settings
-    ):
-        return DUAL_MULTI_TRASH_SLOT
-    return "A3"
 
 
 # -----------------------------------------------------------------------------
@@ -2764,16 +3121,11 @@ def _load_or_get_labware(ctx: ProtocolContext, load_name: str, slot: str) -> Lab
     return labware
 
 
-def _ensure_trash_bin(ctx: ProtocolContext, slot: str) -> None:
-    global _TRASH_BIN_SLOT
-    if _TRASH_BIN_SLOT is not None:
-        if _TRASH_BIN_SLOT != slot:
-            raise RuntimeError(
-                f"Trash Bin is already loaded in {_TRASH_BIN_SLOT}, not {slot}."
-            )
-        return
-    ctx.load_trash_bin(slot)
-    _TRASH_BIN_SLOT = slot
+def _ensure_trash_bin(ctx: ProtocolContext, slot: str = "A3") -> None:
+    global _TRASH_BIN_LOADED
+    if not _TRASH_BIN_LOADED:
+        ctx.load_trash_bin(slot)
+        _TRASH_BIN_LOADED = True
 
 
 def _tiprack_load_name(tip_size: int) -> str:
@@ -2819,8 +3171,8 @@ def _prepare_dual_multi_extension_deck_layout(
         *DUAL_MULTI_TEST_SLOTS,
         *DUAL_MULTI_AUX_SLOT_BY_TEST_SLOT.values(),
         DUAL_MULTI_TRASH_SLOT,
-        "B1",
         "A2",
+        "B1",
     }
     scale_slot = _deck_slot_key(csv_settings.slot_scale)
     if scale_slot in reserved_slots:
@@ -2856,25 +3208,6 @@ def _move_registered_labware_with_gripper(
             f"Cannot move {source_slot} to {target_slot}: target contains "
             f"{target_labware.load_name}."
         )
-
-    if (
-        ctx.is_simulating()
-        and target_slot in DUAL_MULTI_UNCALIBRATED_STORAGE_SLOTS
-    ):
-        ctx.comment(
-            f"analysis only: move {source_slot} rack off deck so temporary "
-            f"storage slot {target_slot} is excluded from LPC"
-        )
-        ctx._core.move_labware(
-            labware._core,
-            new_location=OFF_DECK,
-            use_gripper=False,
-            pause_for_manual_move=False,
-            pick_up_offset=None,
-            drop_offset=None,
-        )
-        _forget_loaded_labware_in_slot(source_slot)
-        return
 
     ctx.comment(f"dual multi rack swap: {source_slot} -> {target_slot}")
     ctx.move_labware(labware, target_slot, use_gripper=True)
@@ -3724,50 +4057,31 @@ def _right_pipette_axes() -> List[Axis]:
     return [Axis.P_R]
 
 
-def _set_right_pipette_idle_hold_current(ctx: ProtocolContext) -> None:
-    """Lower P_R hold current so an idle right pipette cannot continue heating."""
+def _set_hold_current_for_axis(
+    ctx: ProtocolContext, axis: Axis, current: float
+) -> None:
+    """Set hold current on a backend axis from the protocol sync context."""
     hw_api = ctx._core.get_hardware()
-    result = hw_api._backend.set_hold_current(
-        {Axis.P_R: RIGHT_PIPETTE_IDLE_HOLD_CURRENT_AMPS}
-    )
+    backend = hw_api._backend
+    result = backend.set_hold_current({axis: current})
     if asyncio.iscoroutine(result):
         asyncio.run_coroutine_threadsafe(
             result, hw_api._obj_to_adapt._loop
         ).result()
 
 
-def _restore_right_pipette_default_currents(ctx: ProtocolContext) -> None:
-    """Restore P_R run and hold currents from the robot's system configuration."""
+def _set_default_currents(ctx: ProtocolContext) -> None:
+    """Restore the OT3 backend's configured default motor currents."""
     hw_api = ctx._core.get_hardware()
     backend = hw_api._backend
-    default = backend.get_current_settings(hw_api.gantry_load)[Axis.P_R]
-    for setter, current in (
-        (backend.set_active_current, default.run_current),
-        (backend.set_hold_current, default.hold_current),
-    ):
-        result = setter({Axis.P_R: current})
-        if asyncio.iscoroutine(result):
-            asyncio.run_coroutine_threadsafe(
-                result, hw_api._obj_to_adapt._loop
-            ).result()
+    result = backend.set_default_currents()
+    if asyncio.iscoroutine(result):
+        asyncio.run_coroutine_threadsafe(
+            result, hw_api._obj_to_adapt._loop
+        ).result()
 
 
-def _stabilize_scale_before_evaporation(
-    ctx: ProtocolContext, fixture_settings: FixtureSettings
-) -> None:
-    """Stabilize the scale without changing the active pipette's motor state."""
-    ctx.delay(
-        seconds=SCALE_SECONDS_TO_TRUE_STABILIZE,
-        msg=(
-            f"Waiting {SCALE_SECONDS_TO_TRUE_STABILIZE} "
-            "for scale to stabilize"
-        ),
-    )
-
-
-def _set_right_pipette_axes_engaged(
-    ctx: ProtocolContext, engaged: bool
-) -> None:
+def _set_right_pipette_axes_engaged(ctx: ProtocolContext, engaged: bool) -> None:
     """Engage or disengage the right pipette axes to control motor heat."""
     if ctx.is_simulating():
         return
@@ -3778,60 +4092,39 @@ def _set_right_pipette_axes_engaged(
     if not axes:
         return
     if engaged:
-        _restore_right_pipette_default_currents(ctx)
-        print_info(
-            "Restored default right pipette currents and engaging the right "
-            "pipette plunger for right mount testing."
-        )
+        _set_default_currents(ctx)
+        print_info("Engaging right pipette axes for right mount testing.")
         hw_api.engage_axes(axes)
     else:
-        print_info(
-            "Lowering right pipette plunger hold current to "
-            f"{RIGHT_PIPETTE_IDLE_HOLD_CURRENT_AMPS} A and disengaging it."
-        )
-        _set_right_pipette_idle_hold_current(ctx)
+        print_info("Lowering and disengaging right pipette plunger to prevent heating.")
+        _set_hold_current_for_axis(ctx, Axis.P_R, 0.1)
         hw_api.disengage_axes(axes)
 
 
 @contextmanager
 def _right_pipette_heat_guard(
-    ctx: ProtocolContext,
-    active_mount: str,
-    enabled: bool,
-    pipette: InstrumentContext,
+    ctx: ProtocolContext, active_mount: str, enabled: bool
 ) -> Generator[None, None, None]:
-    """Cool the waiting right pipette, then restore defaults before its test."""
+    """Keep the right pipette cold unless the right mount is under test."""
     if not enabled:
         yield
         return
     right_mount_active = active_mount == "right"
     try:
-        if right_mount_active:
-            _set_right_pipette_axes_engaged(ctx, True)
-            if not ctx.is_simulating():
-                pipette.home_plunger()
-                print_info(
-                    "Right pipette anti-heating settings cleared; system defaults "
-                    "are active before testing."
-                )
-        else:
-            _set_right_pipette_axes_engaged(ctx, False)
+        _set_right_pipette_axes_engaged(ctx, right_mount_active)
         yield
     finally:
-        if not right_mount_active:
-            try:
-                _set_right_pipette_axes_engaged(ctx, False)
-            except Exception as cleanup_error:
-                print_warning(
-                    "Failed to keep the waiting right pipette disengaged after "
-                    f"{active_mount} test: {cleanup_error}"
-                )
+        try:
+            _set_right_pipette_axes_engaged(ctx, False)
+        except Exception as cleanup_error:
+            print_warning(
+                f"Failed to disengage right pipette after {active_mount} test: "
+                f"{cleanup_error}"
+            )
 
 
-def _should_manage_right_pipette_heat(
-    mounts_to_test: List[str],
-) -> bool:
-    """Manage heat only when both mounts are tested in one run."""
+def _should_manage_right_pipette_heat(mounts_to_test: List[str]) -> bool:
+    """Only manage right heat when both left and right are tested in one run."""
     return "left" in mounts_to_test and "right" in mounts_to_test
 
 
@@ -3953,8 +4246,16 @@ def _p200h_deferred_probe_recovery_pool_tip_size(
 
 
 def _run_deferred_96ch_stacker_probe(
-    fixture_settings: FixtureSettings, tip: int, tips: List[Well]
-) -> List[Well]:
+    fixture_settings: FixtureSettings,
+    tip: int,
+    tips: List[Well],
+    liq: SupportedLiquid,
+    evaporation_volumes: List[float],
+) -> Tuple[
+    List[Well],
+    Dict[Tuple[int, float], EvaporationProfile],
+    Optional[MeasurementData],
+]:
     if fixture_settings.stackers_96 is None:
         raise RuntimeError("96ch stackers are not initialized.")
     if not tips:
@@ -3973,6 +4274,22 @@ def _run_deferred_96ch_stacker_probe(
     fixture_settings.pipette.require_liquid_presence(
         fixture_settings.liquid_source
     )
+    evaporation_profiles: Dict[Tuple[int, float], EvaporationProfile] = {}
+    last_measurement: Optional[MeasurementData] = None
+    if fixture_settings.run_evaporation:
+        evaporation_profiles, last_measurement = (
+            _calculate_evaporation_profiles_for_tip(
+                fixture_settings.ctx,
+                fixture_settings,
+                liq,
+                probe_tip,
+                tip,
+                evaporation_volumes,
+                detect_liquid_height=False,
+                stabilize_scale=False,
+                store_legacy_average=False,
+            )
+        )
     remove_tip(fixture_settings)
 
     fixture_settings.ctx.comment(
@@ -4005,12 +4322,13 @@ def _run_deferred_96ch_stacker_probe(
     )
     fixture_settings.active_96ch_racks_by_slot[probe_slot] = replacement_rack
 
-    return [
+    replacement_tips = [
         replacement_rack.wells()[0]
         if cast(Labware, tip_to_use.parent) is probe_rack
         else tip_to_use
         for tip_to_use in tips
     ]
+    return replacement_tips, evaporation_profiles, last_measurement
 
 
 # -----------------------------------------------------------------------------
@@ -4127,15 +4445,12 @@ def _switch_impact_protection_v2(
         f"pipette_channels={fixture_settings.pipette_channels}"
     )
     impp = fixture_settings.ImpactSerial_U.switch_mode(mode)
+    fixture_settings.ctx.delay(
+        seconds=0.1,
+        msg=f"switch_mode state :{impp.raw_response}",
+    )
     if "OK" not in impp.raw_response:
         raise RuntimeError("Collision avoidance switch failed to activate.")
-    if getattr(impp, "command_sent", True):
-        fixture_settings.ctx.delay(
-            seconds=0.1,
-            msg=f"switch_mode state :{impp.raw_response}",
-        )
-    else:
-        print_info(f"Impact V2 mode unchanged; skipping command: {mode}")
 
 
 def _close_impact_protection_v2(fixture_settings: FixtureSettings) -> None:
@@ -4146,18 +4461,15 @@ def _close_impact_protection_v2(fixture_settings: FixtureSettings) -> None:
         f"Impact V2 close_all_gratings: pipette_channels={fixture_settings.pipette_channels}"
     )
     impp = fixture_settings.ImpactSerial_U.close_all_gratings()
+    fixture_settings.ctx.delay(
+        seconds=0.1,
+        msg=f"close_all_gratings state :{impp.raw_response}",
+    )
     if "OK" not in impp.raw_response:
         raise RuntimeError(
             "close all gratings Collision avoidance switch failed to activate. "
             f"{impp.raw_response}"
         )
-    if getattr(impp, "command_sent", True):
-        fixture_settings.ctx.delay(
-            seconds=0.1,
-            msg=f"close_all_gratings state :{impp.raw_response}",
-        )
-    else:
-        print_info("Impact V2 gratings already closed; skipping command: M18")
 
 
 # -----------------------------------------------------------------------------
@@ -4230,10 +4542,7 @@ def _run_fixture(
     _MEASUREMENTS.clear()
     try:
         with _right_pipette_heat_guard(
-            ctx,
-            fixture_settings.mount,
-            manage_right_heat,
-            fixture_settings.pipette,
+            ctx, fixture_settings.mount, manage_right_heat
         ):
             if fixture_settings.fast_simulate:
                 # do LPC when it is simulating
@@ -4268,12 +4577,6 @@ def _run_fixture(
         print_error(f"Captured traceback:\n{traceback.format_exc()}")
         raise e
     finally:
-        if (
-            fixture_settings.test_report._dont_write_to_disk
-            and not fixture_settings.fast_simulate
-        ):
-            fixture_settings.test_report._dont_write_to_disk = False
-            fixture_settings.test_report.save_to_disk()
         if fixture_settings.recorder is not None:
             print_info("ending recording")
             fixture_settings.recorder.stop()
@@ -4307,20 +4610,16 @@ def run(ctx: ProtocolContext) -> None:
     dual_multi_extension_deck = _uses_dual_multi_extension_deck(csv_settings)
     dual_mount_no_trash = _uses_dual_mount_no_trash(csv_settings)
     if dual_mount_no_trash:
+        csv_settings = replace(csv_settings, return_tip=True)
         ctx.comment(
-            "dual P50S/P1000S mode: CSV return_tip is enabled; "
-            "return tips and skip the trash bin"
+            "dual P50S/P1000S mode: force return_tip and "
+            "skip the trash bin"
         )
     elif dual_multi_extension_deck:
         csv_settings = replace(csv_settings, return_tip=False)
         ctx.comment(
-            "dual P50M/P1000M mode: use the A1 Trash Bin and drop every tip; "
-            "do not return tips"
-        )
-    elif _uses_dual_single(csv_settings):
-        ctx.comment(
-            "dual P50S/P1000S mode: CSV return_tip is disabled; "
-            "use the A1 Trash Bin and drop every tip"
+            "dual P50M/P1000M mode: drop every tip into the Flex Trash Bin "
+            f"in {DUAL_MULTI_TRASH_SLOT}; do not return tips"
         )
     if dual_multi_extension_deck:
         _prepare_dual_multi_extension_deck_layout(ctx, csv_settings)
@@ -4329,6 +4628,8 @@ def run(ctx: ProtocolContext) -> None:
         _set_right_pipette_axes_engaged(ctx, False)
 
     for mount_index, mount in enumerate(csv_settings.mounts_to_test):
+        if manage_right_heat and mount == "left":
+            _set_right_pipette_axes_engaged(ctx, False)
         print_title(f"Starting gravimetric test on {mount} mount")
         fixture_settings = FixtureSettings.build(
             ctx,
