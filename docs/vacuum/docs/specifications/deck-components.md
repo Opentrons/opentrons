@@ -3,22 +3,22 @@ title: "Vacuum Module: Deck Components"
 description: "General descriptions of Vacuum Module deck pieces."
 ---
 
-Module deck components consist of a vacuum base, interchangeable collars, internal spacers, and well plate support grids. The vacuum base forms the foundation of this on-deck hardware stack. Collars and spacers rest sequentially on the base to control labware stacking heights between well plates and help ensure an airtight seal. At the top of the stack, a wide or narrow metal grid provides extra support for a filter plate when placed under vacuum.
+Module deck components consist of a vacuum base, interchangeable collars, internal spacers, and well plate support grids. The vacuum base forms the foundation of this on-deck hardware stack. Collars and spacers rest sequentially on the base to control labware stacking heights between well plates and help ensure an airtight seal. At the top of the stack, a wide or narrow aperture metal grid provides extra support for a filter plate when placed under vacuum.
 
 ## Vacuum base
 
-The vacuum base sits directly on its own deck plate. The vacuum base serves as the foundation of the module's hardware stack, supporting all internal spacers, collars, and protocol labware.
+The vacuum base sits directly on its own deck plate. It serves as the foundation of the module's hardware stack, supporting all internal spacers, collars, and protocol labware.
 
 <figure markdown>
   ![Vacuum base](../images/vacuum-module-base.svg){ width="90%" }
   <figcaption>Vacuum base with quick-connect manifold</figcaption>
 </figure>
 
-When connected to the off-deck waste carboy and Control Box, negative pressure draws liquid down cleanly through the module assembly. The vacuum base collects this fluid, routing it into an internal collection plate or out to the external 2-liter waste jar via the attached 6 mm hose.
+When connected to the waste carboy, negative pressure from the vacuum pump draws liquid down cleanly through the module assembly. The vacuum base collects this fluid, routing it into an internal collection plate or out to the external carboy via the attached 6 mm hose.
 
 ## Collars
 
-Collars sit directly on the vacuum base. They support filter plates used during vacuum extraction protocols. Each collar features an integrated gasket that forms an airtight vacuum seal with the well plate, while a secondary gasket on the vacuum base seals it to the collar. The short and tall collars can be paired interchangeably with either spacer. Both collar variations are fully compatible with the Flex Gripper.
+Collars sit directly on the vacuum base. They support filter plates used during vacuum extraction protocols. Each collar features an integrated gasket that forms an airtight vacuum seal with the well plate, while a secondary gasket on the vacuum base seals it to the collar. The short and tall collars can be paired interchangeably with the spacers. Both collar variations are fully compatible with the Flex Gripper.
 
 The Vacuum Module includes two collars to match different labware profiles:
 
@@ -50,7 +50,7 @@ The Vacuum Module includes two support grids with perforations that match differ
 
 ## Spacers
 
-In a vacuum filtration protocol, you can place an internal spacer beneath a sample collection plate to raise it closer to the source filter plate. Elevating the collection plate minimizes the vertical gap between the two well plates, ensuring fluid droplets fall cleanly into the receiving wells. Reducing the space between plates also prevents vacuum pressure from pulling liquid sideways, eliminating cross-contamination and sample loss. The short and tall spacers can be paired interchangeably with either collar.
+In a vacuum filtration protocol, you can place an internal spacer beneath a sample collection plate to raise it closer to the source filter plate. Elevating the collection plate minimizes the vertical gap between the two well plates, ensuring fluid droplets fall cleanly into the receiving wells. Reducing the space between plates also prevents vacuum pressure from pulling liquid sideways, eliminating cross-contamination. The short and tall spacers can be paired interchangeably with either collar.
 
 The Vacuum Module includes two spacers to match different labware profiles:
 

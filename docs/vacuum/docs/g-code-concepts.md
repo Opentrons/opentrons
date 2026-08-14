@@ -7,7 +7,7 @@ G-codes are machine-readable instructions used to control hardware. You do not n
 
 ## G-code command syntax
 
-Vacuum Module G-codes are strings starting with M followed by an integer. Arguments are formatted as letter-number combinations without separators. Each command must end with a new line terminator; Opentrons modules do not support multiple commands on a single line. For a complete list of codes and examples see [Vacuum Module G-Codes](g-codes.md).
+Vacuum Module G-codes are strings starting with M followed by an integer. Arguments are formatted as letter-number combinations without separators. Each command must end with a new line terminator. Opentrons modules do not support multiple commands on a single line. For a complete list of codes and examples see [Vacuum Module G-Codes](g-codes.md).
 
 - **Syntax:** `MCOMMAND [ARGUMENT-KEY][ARGUMENT-VALUE] TERMINATOR`
 - **Examples:** `M115 \n` or `M120 S1 P-400 \n`

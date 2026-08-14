@@ -1,5 +1,6 @@
 ---
 title: "Vacuum Module: Maintenance and Cleaning"
+description: "Instructions and restrictions on user-level maintenance and cleaning."
 ---
 
 ## Maintenance
@@ -51,7 +52,7 @@ Turn off and unplug the module from the wall outlet before cleaning it.
 !!! Warning
     Do not disassemble the Control Box for cleaning or attempt to clean its internal electronic components or mechanical parts.
 
-The following table lists the chemicals you can use to clean the exterior of the vacuum pump and waste collection jug. Diluted alcohol and distilled water are our recommended cleaning products. You can also refer to the table below for other compatible options.
+The following table lists the chemicals you can use to clean the exterior of the Control Box and carboy. Diluted alcohol and distilled water are our recommended cleaning products. You can also refer to the table below for other compatible options.
 
 | Solution | Recommendations |
 |----|----|
@@ -59,7 +60,7 @@ The following table lists the chemicals you can use to clean the exterior of the
 | Bleach | Dilute to 10% (1:10 bleach/water ratio) for cleaning. Do not use 100% bleach. |
 | Distilled water | You can use distilled water to clean or rinse your vacuum module. |
 
-For cleaning or decontaminating vacuum hoses or the waste collection carboy, wear the proper protective equipment (PPE) and follow  your lab's procedures for handling biohazardous and other chemically hazardous waste.
+For cleaning or decontaminating vacuum hoses and the carboy, wear the required personal protective equipment (PPE) and follow your lab's procedures for handling biohazardous and other chemically hazardous waste.
 
 !!! tip "Tip: working with vacuum hoses"
     - Drain any trapped liquid from the vacuum hoses before disconnecting them.

@@ -10,7 +10,7 @@ All hardware purchased from Opentrons is covered under a 1-year standard warrant
 
 Opentrons Support can help you with questions about our products and services. If you discover a defect, or believe your product is not functioning to published specifications, contact us at <support@opentrons.com>.
 
-Please have the module’s serial number available when contacting support. You can find the serial number on <span style="color: red; font-weight: bold;"><strong>SN LOCATION PLACEHOLDER</strong></span>.
+Please have the module’s serial number available when contacting support. To find the module serial number in the app, go to the Instruments and Modules section of your robot’s device details page, click the three-dot menu (⋮) and then click **About**. You can also find the serial number on <span style="color: red; font-weight: bold;"><strong>STICKER LOCATION PLACEHOLDER</strong></span>.
 
 ## App Download
 
@@ -26,7 +26,7 @@ Long Island City, NY 11101
 
 <strong>Post-sales service & contacting Opentrons</strong>
 
-If you have any questions about the use of the system, abnormal phenomena, or special needs, please contact: support@opentrons.com. Also visit [www.opentrons.com](http://www.opentrons.com).
+If you have any questions about the use of the system, abnormal phenomena, or special needs, please contact: <support@opentrons.com>. Also visit [www.opentrons.com](https://www.opentrons.com).
 
 Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.
 

@@ -1,9 +1,9 @@
 ---
 title: "Vacuum Module: Product Specifications"
-description: "Box contents and summary of physical specifications for the Vacuum Module."
+description: "Box contents and physical specifications summary for module components."
 ---
 
-![Vacuum Module illustration showing main parts with brief labels](../images/vacuum-module-labels.png)
+![Vacuum Module illustration showing main parts with labels](../images/vacuum-module-labels.png)
 
 ## Vacuum Module parts
 
@@ -66,7 +66,7 @@ Box 1 includes support grids, collars and spacers, and the vacuum manifold base.
 
 ### Box 2: pump components
 
-Box 2 includes the Control Box (vacuum pump and electronics), a deck adapter (and screws), an IEC power cable, a USB A-B data cable, and assorted fasteners.
+Box 2 includes the Control Box (vacuum pump and electronics), a deck adapter (and screws), an IEC power cable, a USB A-B data cable, assorted fasteners, and L-key.
 
 <div class="parts-list" markdown>
 
@@ -77,7 +77,7 @@ Box 2 includes the Control Box (vacuum pump and electronics), a deck adapter (an
 
 <figure markdown>
 ![Deck plate adapter](../images/deck-plate.png" Deck plate")
-<figcaption>(1) Deck plate</figcaption>
+<figcaption>(1) Deck adapter</figcaption>
 </figure>
 
 </div>
@@ -99,8 +99,8 @@ Box 2 includes the Control Box (vacuum pump and electronics), a deck adapter (an
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Spare deck plate screws, M4 x 10](../images/fasteners-deck.png "Spare deck plate screws"){ width="70%" }
-<figcaption>(2) Deck plate screws, M4x10 metric thread</figcaption>
+![Spare deck adapter screws, M4 x 10](../images/fasteners-deck.png "Spare deck adapter screws"){ width="70%" }
+<figcaption>(2) Deck adapter screws, M4x10 metric thread</figcaption>
 </figure>
 
 <figure markdown>
@@ -182,10 +182,10 @@ The Control Box includes the vacuum pump, air/water separator, electronics, and 
       <td><strong>Pump type</strong></td>
       <td>The module uses a Thomas® WOB-L® 260Z series piston-driven pump.
         <ul>
-          <li>Flow rate (gas): 50.1 L/min (1.8 cfm)</li>
-          <li>Vacuum: -881.31 mbar (26 inHg)</li>
+          <li>Flow rate (gas): 50.1 L/min</li>
+          <li>Vacuum: -881.31 mbar</li>
         </ul>
-        <p>Note: Values reflect the manufacturer's published hardware specifications. Operational performance is controlled by Opentrons Vacuum Module software.</p>
+        <p><strong>Note:</strong> <em>Values reflect the manufacturer's published hardware specifications. Operational performance is controlled by Opentrons Vacuum Module software</em>.</p>
       </td>
    </tr>
     </tr>
@@ -201,7 +201,7 @@ The Control Box includes the vacuum pump, air/water separator, electronics, and 
 
 ### Vacuum hoses
 
-The Vacuum Module ships with two vacuum hoses and factory installed quick connect/disconnect fittings.
+The Vacuum Module ships with two vacuum hoses, factory installed quick connect/disconnect fittings, and spare fittings.
 
 <table>
   <thead>
@@ -226,7 +226,7 @@ The Vacuum Module ships with two vacuum hoses and factory installed quick connec
     </tr>
     <tr>
       <td><strong>Fittings</strong></td>
-      <td>The Vacuum Manifold uses CPC quick connect/disconnect couplings. These fittings come attached to the hoses from the factory. You also get extra fittings to make your own hose connections. Dimensions are given below:
+      <td>The Vacuum Manifold uses CPC quick connect/disconnect fittings. These fittings come attached to the hoses from the factory. You also get extra fittings (and hose clamps) to make your own,custom hose connections. Dimensions are given below:
         <ul>
           <li>L-shaped fitting: 3.2 mm (⅛")</li>
           <li>All other fittings: 6.4 mm (&frac14;")</li>

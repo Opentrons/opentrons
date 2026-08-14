@@ -56,7 +56,7 @@ The Vacuum Module accepts the G-code commands listed below.
           <li><code>R</code>: Ramp rate in mbar/s <i>(optional)</i>. Range: <code>0–50</code> mbar/s.</li>
           <li><code>V</code>: Vent state after cycle <i>(optional)</i>. Accepts <code>1</code> (open) or <code>0</code> (close).</li>
         </ul>
-        <strong>Example:</strong> <code>M120 S1 P-400</code> sets the gague pressure to -400 mbar.<br>
+        <strong>Example:</strong> <code>M120 S1 P-400</code> sets the gauge pressure to -400 mbar.<br>
         <strong>Response:</strong> <code>M120 OK</code>.<br>
       </td>
     </tr>
