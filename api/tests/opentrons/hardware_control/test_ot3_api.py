@@ -2819,3 +2819,30 @@ async def test_get_motor_usage_data(
 
     api_result = await ot3_hardware.get_motor_usage_data()
     assert api_result == lifetime_data
+
+
+@pytest.mark.parametrize(
+    "mount",
+    [
+        Mount.LEFT,
+        Mount.RIGHT,
+        Mount.EXTENSION,
+        OT3Mount.LEFT,
+        OT3Mount.RIGHT,
+        OT3Mount.GRIPPER,
+    ],
+)
+async def test_critical_point_for(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_instrument_handlers: Tuple[Mock, Mock],
+    mount: Union[Mount, OT3Mount],
+    decoy: Decoy,
+) -> None:
+    """Ensure that the correct instrument handler is called for each possible mount."""
+    mock_gripper, mock_pipette = mock_instrument_handlers
+
+    _ = ot3_hardware.critical_point_for(mount)
+    if mount in [Mount.EXTENSION, OT3Mount.GRIPPER]:
+        decoy.verify(mock_gripper.get_critical_point(None))
+    else:
+        decoy.verify(mock_pipette.critical_point_for(OT3Mount.from_mount(mount)))
