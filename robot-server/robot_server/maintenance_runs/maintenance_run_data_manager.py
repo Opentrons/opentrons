@@ -197,8 +197,9 @@ class MaintenanceRunDataManager:
             RunNotFoundError: The given run identifier was not found.
         """
         if run_id == self._run_orchestrator_store.current_run_id:
-            self._maintenance_runs_publisher.stop_publishing_for_maintenance_run()
+            # Ensure maintenance run is cleared before stop publishing to eliminate race condition
             await self._run_orchestrator_store.clear()
+            self._maintenance_runs_publisher.stop_publishing_for_maintenance_run()
 
             if camera_settings is not None:
                 # Restart the live stream for the external run when the maintenance run has ended.
