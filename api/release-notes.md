@@ -17,6 +17,7 @@ Welcome to the v9.1.2 release of the Opentrons Flex robot software! This release
 ### Bug Fixes
 
 - Flex 96-channel pipettes properly align over 8-well reservoirs for liquid handling with a single row of tips.
+- Fixes an issue where a Flex pipette cannot update its firmware.
 
 ---
 

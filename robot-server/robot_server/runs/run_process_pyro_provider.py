@@ -14,7 +14,7 @@ from uuid import uuid4
 import Pyro5.api
 
 from opentrons.config import feature_flags
-from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
+from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
 
 from . import run_process_entry_point
 from .run_process import DirectedRunProcess, register_process_types
@@ -219,19 +219,6 @@ class RunProcessPyroProvider:
                 )
             return self._run_processes
 
-    @staticmethod
-    async def _wait_for_proxy(proxy_name: str) -> Optional[DirectedRunProcess]:
-        start_time = time.monotonic()
-        with Pyro5.api.locate_ns() as ns:
-            while time.monotonic() - start_time < _RUN_PROXY_TIMEOUT:
-                if proxy_name in ns.list():
-                    proxy = AsyncClientPyroObject(
-                        Pyro5.api.Proxy(ns.list()[proxy_name])  # type: ignore[no-untyped-call]
-                    )
-                    return cast(DirectedRunProcess, cast(object, proxy))
-                await asyncio.sleep(0.01)
-        return None
-
     async def wait_for_run_proxy(
         self, simulator: Optional[bool] = False
     ) -> DirectedRunProcess:
@@ -246,10 +233,10 @@ class RunProcessPyroProvider:
         if run_process is None:
             run_process = self._set_active_process(process_registry=process_regisry)
 
-        run_proxy = await self._wait_for_proxy(run_process.pyroname)
+        run_proxy = await wait_for_proxy(proxy_name=run_process.pyroname)
         if run_proxy is None:
             raise RuntimeError(f"Can't resolve pyro proxy '{run_process.pyroname}'")
-        return run_proxy
+        return cast(DirectedRunProcess, cast(object, run_proxy))
 
     @staticmethod
     def _open_process(process_name: str, user_name: str) -> subprocess.Popen[bytes]:
@@ -278,10 +265,13 @@ class RunProcessPyroProvider:
             process.kill()
 
     async def _dequeue_process(
-        self, process: _RunProcess, process_registry: List[_RunProcess]
+        self,
+        process: _RunProcess,
+        process_registry: List[_RunProcess],
+        broadcast_mode: bool = False,
     ) -> None:
         """Removes a process from a process registry, ending that process and delisting it from the global Pyro Nameserver."""
-        with Pyro5.api.locate_ns() as ns:
+        with Pyro5.api.locate_ns(broadcast=broadcast_mode) as ns:
             ns.remove(process.pyroname)
         await self._end_process(process=process.process)
         process_registry.remove(process)

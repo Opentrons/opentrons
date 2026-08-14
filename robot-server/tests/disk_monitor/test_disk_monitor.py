@@ -144,3 +144,13 @@ def test_is_images_directory_over_limit_when_above_limit(
     """It should return True when directory size exceeds limit."""
     with patch.object(subject, "get_images_directory_size_mb", return_value=600.0):
         assert subject.is_images_directory_over_limit() is True
+
+
+def test_is_run_start_limit_respected(
+    subject: DiskMonitor, mock_settings: RobotServerSettings
+) -> None:
+    """It should treat the run start limit separately from the system."""
+    mock_settings.run_start_limit_free_space_mb = 2048
+    mock_settings.system_low_space_threshold_mb = 500
+    with patch.object(subject, "get_available_disk_space_mb", return_value=2040):
+        assert subject.is_disk_space_below_run_start_limit()

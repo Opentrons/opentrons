@@ -89,6 +89,10 @@ class PasswordMissingSpecialCharactersError(InvalidInputError):
     """Raised when a password does not meet the configured requirements on special chars."""
 
 
+class PasswordPreviouslyUsedError(InvalidInputError):
+    """Raised when a new password matches the user's current password."""
+
+
 def _validate_fields_non_empty(
     username: str | None = None,
     password: str | None = None,
@@ -222,6 +226,13 @@ class UserDataManager:
             _validate_password_complexity(
                 new_password, self._settings_store.get_settings()
             )
+            existing_user = self._user_store.get(username_to_update)
+            if existing_user is not None and password_hash.verify(
+                new_password, existing_user.hashed_password
+            ):
+                raise PasswordPreviouslyUsedError(
+                    "New password must be different from the current password."
+                )
         if (
             new_username is not None
             and new_username != username_to_update

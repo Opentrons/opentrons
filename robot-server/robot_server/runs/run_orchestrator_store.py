@@ -257,7 +257,7 @@ class RunOrchestratorStore:
 
         proxy_door_callback = None
         if ff.hardware_subprocess_enabled():
-            pyro_resource = get_pyro_resource()
+            pyro_resource = await get_pyro_resource()
             proxy_door_callback = (
                 pyro_resource.get_default_run_orchestrator_door_watcher_callback()
             )
@@ -414,9 +414,6 @@ class RunOrchestratorStore:
             RunConflictError: The current run orchestrator is not idle, so it cannot
                 be cleared.
         """
-        if feature_flags.protocol_subprocess_enabled():
-            return await self.clear_pyro()
-
         if self.run_coordinator.get_is_okay_to_clear():
             await self.run_coordinator.finish(
                 drop_tips_after_run=False,
@@ -431,6 +428,9 @@ class RunOrchestratorStore:
         run_time_parameters = self.run_coordinator.get_run_time_parameters()
         command_annotations = self.run_coordinator.get_all_command_annotations()
         preconditions = self.run_coordinator.get_preconditions()
+
+        if feature_flags.protocol_subprocess_enabled():
+            self._run_process_pyro_provider.set_active_process_as_used()
 
         if self._run_coordinator is not None:
             self._run_coordinator.clear_command_history()
@@ -475,31 +475,6 @@ class RunOrchestratorStore:
         self._run_coordinator = run_process
         self._initialize_stored_engine_state()
         return summary
-
-    async def clear_pyro(self) -> RunResult:
-        """End the pyro protocol subprocess and remove the pyro proxy from the nameserver."""
-        if self.run_coordinator.get_is_okay_to_clear():
-            await self.run_coordinator.finish(
-                drop_tips_after_run=False,
-                set_run_status=False,
-                post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
-            )
-        else:
-            raise RunConflictError("Current run is not idle or stopped.")
-
-        run_data = self.run_coordinator.get_state_summary()
-
-        self._run_process_pyro_provider.set_active_process_as_used()
-
-        self._run_coordinator = None
-
-        return RunResult(
-            state_summary=run_data,
-            commands=[],
-            parameters=[],
-            command_annotations=[],
-            command_preconditions=None,
-        )
 
     # todo(mm, 2024-11-15): Are all of these pass-through methods helpful?
     # Can we delete them and make callers just call .run_orchestrator.play(), etc.?

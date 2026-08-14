@@ -172,10 +172,13 @@ export function ProtocolSetupParameters({
     }
   }
 
-  const { createProtocolAnalysis, isLoading: isAnalysisLoading } =
-    useCreateProtocolAnalysisMutation(protocolId, host)
-
+  // todo(mm, 2026-08-10): This could perhaps be useLinkedDocumentationState so a single
+  // prompt could be reused across the multiple setup requests, but the promise chaining
+  // inside handleConfirmValues is hurting my brain.
   const documentationState = useDocumentationState()
+
+  const { createProtocolAnalysis, isLoading: isAnalysisLoading } =
+    useCreateProtocolAnalysisMutation(documentationState, protocolId, host)
 
   const { uploadCsvFile } = useUploadCsvFileMutation(
     documentationState,
@@ -283,6 +286,7 @@ export function ProtocolSetupParameters({
       setChooseCsvFileScreen(parameter)
     } else {
       // bad param
+      parameter.type satisfies never
       console.error('error: bad param. not expected to reach this')
     }
   }

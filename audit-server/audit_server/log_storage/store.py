@@ -308,7 +308,7 @@ class LogStore:
                     pass
 
             return LogPeriodDetails(
-                id=details[0],
+                id=str(details[0]),
                 startedAt=details[1],
                 endedAt=details[2],
                 recordCount=details[3],
@@ -324,7 +324,7 @@ class LogStore:
             ).all()
             return [
                 LogPeriodSummary(
-                    id=period.id,
+                    id=str(period.id),
                     startedAt=period.started_at,
                     endedAt=period.ended_at,
                 )

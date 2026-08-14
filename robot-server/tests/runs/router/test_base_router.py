@@ -61,6 +61,7 @@ from robot_server.data_files.data_files_store import (
     DataFilesStore,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
+from robot_server.disk_monitor.monitor import DiskMonitor
 from robot_server.errors.error_responses import ApiError
 from robot_server.file_provider.provider import FileProviderExecutor
 from robot_server.hardware import HardwareStateStore
@@ -157,6 +158,12 @@ def labware_definition(minimal_labware_def: LabwareDefDict) -> LabwareDefinition
     return labware_definition_type_adapter.validate_python(minimal_labware_def)
 
 
+@pytest.fixture
+def mock_disk_monitor(decoy: Decoy) -> DiskMonitor:
+    """Get a mock disk monitor."""
+    return decoy.mock(cls=DiskMonitor)
+
+
 async def test_create_run(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
@@ -169,6 +176,7 @@ async def test_create_run(
     mock_file_provider: FileProvider,
     mock_camera_provider: CameraProvider,
     mock_audit_client: AuditClient,
+    mock_disk_monitor: DiskMonitor,
 ) -> None:
     """It should be able to create a basic run."""
     run_id = "run-id"
@@ -201,10 +209,13 @@ async def test_create_run(
     )
     decoy.when(await mock_audit_client.get_current_log_period()).then_return(
         GetLogPeriodsData(
-            id=123,
+            id="123",
             startedAt=datetime(year=2021, month=1, day=1),
             endedAt=None,
         )
+    )
+    decoy.when(mock_disk_monitor.is_disk_space_below_run_start_limit()).then_return(
+        False
     )
 
     decoy.when(
@@ -240,6 +251,7 @@ async def test_create_run(
         audit_client=mock_audit_client,
         check_estop=True,
         access_control_status=False,
+        disk_monitor=mock_disk_monitor,
     )
 
     assert result.content.data == expected_response
@@ -258,6 +270,7 @@ async def test_create_protocol_run(
     mock_file_provider: FileProvider,
     mock_camera_provider: CameraProvider,
     mock_audit_client: AuditClient,
+    mock_disk_monitor: DiskMonitor,
 ) -> None:
     """It should be able to create a protocol run."""
     run_id = "run-id"
@@ -298,6 +311,9 @@ async def test_create_protocol_run(
         outputFileIds=[],
         hasEverEnteredErrorRecovery=False,
     )
+    decoy.when(mock_disk_monitor.is_disk_space_below_run_start_limit()).then_return(
+        False
+    )
     decoy.when(mock_data_files_store.get("file-id")).then_return(
         DataFileInfo(
             id="123",
@@ -321,7 +337,7 @@ async def test_create_protocol_run(
     )
     decoy.when(await mock_audit_client.get_current_log_period()).then_return(
         GetLogPeriodsData(
-            id=123,
+            id="123",
             startedAt=datetime(year=2021, month=1, day=1),
             endedAt=None,
         )
@@ -364,6 +380,7 @@ async def test_create_protocol_run(
         audit_client=mock_audit_client,
         check_estop=True,
         access_control_status=False,
+        disk_monitor=mock_disk_monitor,
     )
 
     assert result.content.data == expected_response
@@ -383,6 +400,7 @@ async def test_create_protocol_run_bad_protocol_id(
     mock_file_provider: FileProvider,
     mock_camera_provider: CameraProvider,
     mock_audit_client: AuditClient,
+    mock_disk_monitor: DiskMonitor,
 ) -> None:
     """It should 404 if a protocol for a run does not exist."""
     error = ProtocolNotFoundError("protocol-id")
@@ -393,7 +411,9 @@ async def test_create_protocol_run_bad_protocol_id(
         GetLoggingEnabledData(loggingEnabled=False)
     )
     decoy.when(mock_protocol_store.get(protocol_id="protocol-id")).then_raise(error)
-
+    decoy.when(mock_disk_monitor.is_disk_space_below_run_start_limit()).then_return(
+        False
+    )
     with pytest.raises(ApiError) as exc_info:
         await create_run(
             request_body=RequestModel(data=RunCreate(protocolId="protocol-id")),
@@ -410,6 +430,7 @@ async def test_create_protocol_run_bad_protocol_id(
             check_estop=True,
             notify_publishers=mock_notify_publishers,
             access_control_status=False,
+            disk_monitor=mock_disk_monitor,
         )
 
     assert exc_info.value.status_code == 404
@@ -427,6 +448,7 @@ async def test_create_run_conflict(
     mock_file_provider: FileProvider,
     mock_camera_provider: CameraProvider,
     mock_audit_client: AuditClient,
+    mock_disk_monitor: DiskMonitor,
 ) -> None:
     """It should respond with a conflict error if multiple engines are created."""
     created_at = datetime(year=2021, month=1, day=1)
@@ -436,6 +458,9 @@ async def test_create_run_conflict(
     ).then_return([])
     decoy.when(await mock_audit_client.get_logging_enabled()).then_return(
         GetLoggingEnabledData(loggingEnabled=False)
+    )
+    decoy.when(mock_disk_monitor.is_disk_space_below_run_start_limit()).then_return(
+        False
     )
     decoy.when(
         await mock_run_data_manager.create(
@@ -469,10 +494,189 @@ async def test_create_run_conflict(
             audit_client=mock_audit_client,
             check_estop=True,
             access_control_status=False,
+            disk_monitor=mock_disk_monitor,
         )
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunAlreadyActive"
+
+
+async def create_run_fails_when_out_of_space_under_acm(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+    mock_run_auto_deleter: RunAutoDeleter,
+    mock_deck_configuration_store: DeckConfigurationStore,
+    mock_protocol_store: ProtocolStore,
+    mock_data_files_store: DataFilesStore,
+    mock_data_files_directory: Path,
+    mock_file_provider: FileProvider,
+    mock_camera_provider: CameraProvider,
+    mock_audit_client: AuditClient,
+    mock_disk_monitor: DiskMonitor,
+) -> None:
+    """It should refuse to create a run when out of space and ACM is enabled."""
+    created_at = datetime(year=2021, month=1, day=1)
+
+    decoy.when(
+        await mock_deck_configuration_store.get_deck_configuration()
+    ).then_return([])
+    decoy.when(await mock_audit_client.get_logging_enabled()).then_return(
+        GetLoggingEnabledData(loggingEnabled=False)
+    )
+    decoy.when(mock_disk_monitor.is_disk_space_below_run_start_limit()).then_return(
+        True
+    )
+
+    with pytest.raises(ApiError) as exc_info:
+        await create_run(
+            run_id="run-id",
+            created_at=created_at,
+            request_body=None,
+            protocol_store=mock_protocol_store,
+            run_data_manager=mock_run_data_manager,
+            run_auto_deleter=mock_run_auto_deleter,
+            deck_configuration_store=mock_deck_configuration_store,
+            data_files_store=mock_data_files_store,
+            data_files_directory=mock_data_files_directory,
+            camera_provider=mock_camera_provider,
+            notify_publishers=mock_notify_publishers,
+            audit_client=mock_audit_client,
+            check_estop=True,
+            access_control_status=True,
+            disk_monitor=mock_disk_monitor,
+        )
+
+    assert exc_info.value.status_code == 507
+    assert exc_info.value.content["errors"][0]["id"] == "NoSpaceForRun"
+
+
+async def test_create_protocol_run_succeeds_when_out_of_space_with_acm_off(
+    decoy: Decoy,
+    mock_protocol_store: ProtocolStore,
+    mock_run_data_manager: RunDataManager,
+    mock_run_auto_deleter: RunAutoDeleter,
+    mock_deck_configuration_store: DeckConfigurationStore,
+    mock_data_files_store: DataFilesStore,
+    mock_file_provider: FileProvider,
+    mock_camera_provider: CameraProvider,
+    mock_audit_client: AuditClient,
+    mock_disk_monitor: DiskMonitor,
+) -> None:
+    """It should be able to create a protocol run."""
+    run_id = "run-id"
+    run_created_at = datetime(year=2021, month=1, day=1)
+    protocol_id = "protocol-id"
+
+    protocol_resource = ProtocolResource(
+        protocol_id=protocol_id,
+        protocol_key=None,
+        protocol_kind=ProtocolKind.STANDARD,
+        created_at=datetime(year=2022, month=2, day=2),
+        source=ProtocolSource(
+            directory=Path("/dev/null"),
+            main_file=Path("/dev/null/abc.json"),
+            config=JsonProtocolConfig(schema_version=123),
+            files=[],
+            metadata={},
+            robot_type="OT-2 Standard",
+            content_hash="abc123",
+        ),
+    )
+
+    expected_response = Run(
+        id=run_id,
+        createdAt=run_created_at,
+        protocolId=protocol_id,
+        logPeriodId="123",
+        current=True,
+        actions=[],
+        errors=[],
+        pipettes=[],
+        modules=[],
+        labware=[],
+        labwareOffsets=[],
+        status=pe_types.EngineStatus.IDLE,
+        liquids=[],
+        liquidClasses=[],
+        outputFileIds=[],
+        hasEverEnteredErrorRecovery=False,
+    )
+    decoy.when(mock_disk_monitor.is_disk_space_below_run_start_limit()).then_return(
+        True
+    )
+    decoy.when(mock_data_files_store.get("file-id")).then_return(
+        DataFileInfo(
+            id="123",
+            name="abc.xyz",
+            file_hash="987",
+            created_at=datetime(month=1, day=2, year=2024),
+            mime_type=MimeType.TEXT_CSV,
+            generated=False,
+            stored=True,
+            path="/dev/null/123/abc.xyz",
+        )
+    )
+    decoy.when(
+        await mock_deck_configuration_store.get_deck_configuration()
+    ).then_return([])
+    decoy.when(mock_protocol_store.get(protocol_id=protocol_id)).then_return(
+        protocol_resource
+    )
+    decoy.when(await mock_audit_client.get_logging_enabled()).then_return(
+        GetLoggingEnabledData(loggingEnabled=True)
+    )
+    decoy.when(await mock_audit_client.get_current_log_period()).then_return(
+        GetLogPeriodsData(
+            id="123",
+            startedAt=datetime(year=2021, month=1, day=1),
+            endedAt=None,
+        )
+    )
+
+    decoy.when(
+        await mock_run_data_manager.create(
+            run_id=run_id,
+            created_at=run_created_at,
+            labware_offsets=[],
+            deck_configuration=[],
+            camera_provider=mock_camera_provider,
+            protocol=protocol_resource,
+            run_time_param_values={"foo": "bar"},
+            run_time_param_paths={"my-csv-param": Path("/dev/null/file-id/abc.xyz")},
+            notify_publishers=mock_notify_publishers,
+            access_control_status=False,
+            log_period_id="123",
+        )
+    ).then_return(expected_response)
+
+    result = await create_run(
+        request_body=RequestModel(
+            data=RunCreate(
+                protocolId="protocol-id",
+                runTimeParameterValues={"foo": "bar"},
+                runTimeParameterFiles={"my-csv-param": "file-id"},
+            )
+        ),
+        protocol_store=mock_protocol_store,
+        run_data_manager=mock_run_data_manager,
+        data_files_store=mock_data_files_store,
+        data_files_directory=Path("/dev/null"),
+        run_id=run_id,
+        created_at=run_created_at,
+        run_auto_deleter=mock_run_auto_deleter,
+        deck_configuration_store=mock_deck_configuration_store,
+        camera_provider=mock_camera_provider,
+        notify_publishers=mock_notify_publishers,
+        audit_client=mock_audit_client,
+        check_estop=True,
+        access_control_status=False,
+        disk_monitor=mock_disk_monitor,
+    )
+
+    assert result.content.data == expected_response
+    assert result.status_code == 201
+
+    decoy.verify(mock_run_auto_deleter.make_room_for_new_run(), times=1)
 
 
 async def test_get_run_data_from_url(
