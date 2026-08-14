@@ -15,11 +15,21 @@ let isSentryInitialized = false
 
 // Production DSN is shared by production and staging so sourcemaps live in one project.
 // Development can still fall back to the dev DSN if it is configured locally.
-const sentryDsn = _OT_PD_SENTRY_DSN_ ?? _OT_PD_SENTRY_DEV_DSN_
+const sentryDsn =
+  typeof _OT_PD_SENTRY_DSN_ !== 'undefined'
+    ? _OT_PD_SENTRY_DSN_
+    : typeof _OT_PD_SENTRY_DEV_DSN_ !== 'undefined'
+      ? _OT_PD_SENTRY_DEV_DSN_
+      : undefined
 
 // Sentry release is normally the app version, but local builds can override it
 // (e.g. `local-dev`) so locally uploaded sourcemaps resolve against local events.
-const sentryRelease = _OT_PD_SENTRY_RELEASE_ ?? _OT_PD_VERSION_
+const sentryRelease =
+  typeof _OT_PD_SENTRY_RELEASE_ !== 'undefined'
+    ? _OT_PD_SENTRY_RELEASE_
+    : typeof _OT_PD_VERSION_ !== 'undefined'
+      ? _OT_PD_VERSION_
+      : undefined
 
 const resolveSentryEnvironment = ():
   'production' | 'staging' | 'development' => {
