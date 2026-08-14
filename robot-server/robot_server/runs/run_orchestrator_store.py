@@ -105,7 +105,7 @@ async def _do_handle_hardware_event(  # noqa: C901
             return
         # todo(mm, 2024-04-17): This estop teardown sequencing belongs in the
         # runner layer.
-        run_orchestrator_store.run_coordinator.estop()
+        await run_orchestrator_store.run_coordinator.estop()  # CASEY NOTE flag
         await run_orchestrator_store.run_coordinator.finish(error=EStopActivatedError())
     elif isinstance(event, AsynchronousModuleErrorNotification):
         if run_orchestrator_store.current_run_id is None:
@@ -204,6 +204,7 @@ class RunOrchestratorStore:
         self._run_coordinator: Optional[Union[RunOrchestrator, DirectedRunProcess]] = (
             None
         )
+        self._current_run_id: Optional[str] = None
         self._default_run_orchestrator: Optional[RunOrchestrator] = None
         self._run_process_pyro_provider = run_process_pyro_provider
         if not feature_flags.hardware_subprocess_enabled():
@@ -228,8 +229,8 @@ class RunOrchestratorStore:
     def current_run_id(self) -> Optional[str]:
         """Get the run identifier associated with the current run orchestrator."""
         return (
-            self.run_coordinator.run_id if self._run_coordinator is not None else None
-        )
+            self._current_run_id
+        )  # CASEY NOTE flag - this whole thing was changed out, no more remote request
 
     def default_run_orchestrator_door_watcher_callback_route_for_proxy(
         self, event: HardwareEvent
@@ -248,10 +249,10 @@ class RunOrchestratorStore:
         Raises:
             RunConflictError: if a run-specific run orchestrator is active.
         """
-        if (
+        if (  # CASEY NOTE flag all this must change
             self._run_coordinator is not None
-            and self.run_coordinator.run_has_started()
-            and not self.run_coordinator.run_has_stopped()
+            and await self.run_coordinator.run_has_started()
+            and not await self.run_coordinator.run_has_stopped()
         ):
             raise RunConflictError("A run is currently active")
 
@@ -284,14 +285,14 @@ class RunOrchestratorStore:
 
             # Initialize values for the default run orchestrator
             self._clear_stored_engine_state()
-            self._nozzle_maps = self._default_run_orchestrator.get_nozzle_maps()
-            self._tip_attached = self._default_run_orchestrator.get_tip_attached()
-            self._current_command = self._default_run_orchestrator.get_current_command()
-            self._most_recent_finalized_command = (
-                self._default_run_orchestrator.get_most_recently_finalized_command()
+            self._nozzle_maps = await self._default_run_orchestrator.get_nozzle_maps()
+            self._tip_attached = await self._default_run_orchestrator.get_tip_attached()
+            self._current_command = (
+                await self._default_run_orchestrator.get_current_command()
             )
+            self._most_recent_finalized_command = await self._default_run_orchestrator.get_most_recently_finalized_command()
             self._flex_stacker_substate = (
-                self._default_run_orchestrator.get_flex_stacker_substate()
+                await self._default_run_orchestrator.get_flex_stacker_substate()
             )
             return self._default_run_orchestrator
         return default_orchestrator
@@ -397,13 +398,16 @@ class RunOrchestratorStore:
             orchestrator.prepare()
 
         for offset in labware_offsets:
-            orchestrator.add_labware_offset(offset)
+            await orchestrator.add_labware_offset(offset)
 
-        summary = orchestrator.get_state_summary()
+        summary = await orchestrator.get_state_summary()
         self._clear_stored_engine_state()
         self._run_coordinator = orchestrator
+        self._current_run_id = run_id
 
-        self._initialize_stored_engine_state()
+        await (
+            self._initialize_stored_engine_state()
+        )  # CASEY NOTE flag - doesn't matter here but could be awaited if made async
 
         return summary
 
@@ -414,7 +418,9 @@ class RunOrchestratorStore:
             RunConflictError: The current run orchestrator is not idle, so it cannot
                 be cleared.
         """
-        if self.run_coordinator.get_is_okay_to_clear():
+        if (
+            await self.run_coordinator.get_is_okay_to_clear()
+        ):  # CASEY NOTE flag needs async?
             await self.run_coordinator.finish(
                 drop_tips_after_run=False,
                 set_run_status=False,
@@ -423,18 +429,31 @@ class RunOrchestratorStore:
         else:
             raise RunConflictError("Current run is not idle or stopped.")
 
-        run_data = self.run_coordinator.get_state_summary()
-        commands = self.run_coordinator.get_all_commands()
-        run_time_parameters = self.run_coordinator.get_run_time_parameters()
-        command_annotations = self.run_coordinator.get_all_command_annotations()
-        preconditions = self.run_coordinator.get_preconditions()
+        run_data = (
+            await self.run_coordinator.get_state_summary()
+        )  # CASEY NOTE flag needs async?
+        commands = (
+            await self.run_coordinator.get_all_commands()
+        )  # CASEY NOTE flag needs async?
+        run_time_parameters = (
+            await self.run_coordinator.get_run_time_parameters()
+        )  # CASEY NOTE flag needs async?
+        command_annotations = (
+            await self.run_coordinator.get_all_command_annotations()
+        )  # CASEY NOTE flag needs async?
+        preconditions = (
+            await self.run_coordinator.get_preconditions()
+        )  # CASEY NOTE flag needs async?
 
         if feature_flags.protocol_subprocess_enabled():
             self._run_process_pyro_provider.set_active_process_as_used()
 
         if self._run_coordinator is not None:
-            self._run_coordinator.clear_command_history()
+            await (
+                self._run_coordinator.clear_command_history()
+            )  # CASEY NOTE flag needs async?
             self._run_coordinator = None
+            self._current_run_id = None
 
         return RunResult(
             state_summary=run_data,
@@ -467,49 +486,64 @@ class RunOrchestratorStore:
             error_recovery_is_enabled=error_recovery_is_enabled,
             run_time_param_values=run_time_param_values,
             run_time_param_paths=run_time_param_paths,
-            proxy_of_callback_for_handling_door_events=run_process.register_hardware_door_event(),
+            proxy_of_callback_for_handling_door_events=await run_process.register_hardware_door_event(),  # CASEY NOTE flag - THESE MUST BE DONE! UH OH
         )
 
-        summary = run_process.get_state_summary()
+        summary = await run_process.get_state_summary()  # CASEY NOTE flag
         self._clear_stored_engine_state()
         self._run_coordinator = run_process
-        self._initialize_stored_engine_state()
+        self._current_run_id = run_id
+        await (
+            self._initialize_stored_engine_state()
+        )  # CASEY NOTE flag - matters here, make this async
         return summary
 
     # todo(mm, 2024-11-15): Are all of these pass-through methods helpful?
     # Can we delete them and make callers just call .run_orchestrator.play(), etc.?
 
-    def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
+    async def play(
+        self, deck_configuration: Optional[DeckConfigurationType] = None
+    ) -> None:
         """Start or resume the run."""
-        self.run_coordinator.play(deck_configuration=deck_configuration)
+        await self.run_coordinator.play(
+            deck_configuration=deck_configuration
+        )  # CASEY NOTE flag - make this whole func async
 
     async def run(self, deck_configuration: DeckConfigurationType) -> RunResult:
         """Start the run."""
         return await self.run_coordinator.run(deck_configuration=deck_configuration)
 
-    def pause(self) -> None:
+    async def pause(self) -> None:
         """Pause the run."""
-        self.run_coordinator.pause()
+        await (
+            self.run_coordinator.pause()
+        )  # CASEY NOTE flag - make this whole func async
 
     async def stop(self) -> None:
         """Stop the run."""
         await self.run_coordinator.stop()
 
-    def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
+    async def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
         """Resume the run from recovery mode."""
-        self.run_coordinator.resume_from_recovery(reconcile_false_positive)
+        await self.run_coordinator.resume_from_recovery(
+            reconcile_false_positive
+        )  # CASEY NOTE flag - make this whole func async
 
     async def finish(self, error: Optional[Exception]) -> None:
         """Finish the run."""
         await self.run_coordinator.finish(error=error)
 
-    def get_state_summary(self) -> StateSummary:
+    async def get_state_summary(self) -> StateSummary:
         """Get protocol run data."""
-        return self.run_coordinator.get_state_summary()
+        return (
+            await self.run_coordinator.get_state_summary()
+        )  # CASEY NOTE flag - make this whole func async
 
-    def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
+    async def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
         """Get loaded labware definitions."""
-        return self.run_coordinator.get_loaded_labware_definitions()
+        return (
+            await self.run_coordinator.get_loaded_labware_definitions()
+        )  # CASEY NOTE flag - make this whole func async
 
     def get_nozzle_maps(self) -> Mapping[str, NozzleMapInterface]:
         """Get the current nozzle map keyed by pipette id."""
@@ -521,9 +555,11 @@ class RunOrchestratorStore:
         assert self._tip_attached is not None
         return self._tip_attached
 
-    def get_run_time_parameters(self) -> List[RunTimeParameter]:
+    async def get_run_time_parameters(self) -> List[RunTimeParameter]:
         """Parameter definitions defined by protocol, if any. Will always be empty before execution."""
-        return self.run_coordinator.get_run_time_parameters()
+        return (
+            await self.run_coordinator.get_run_time_parameters()
+        )  # CASEY NOTE flag - make this whole func async
 
     def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
         """Get the current (if any) Flex Stacker Substates keyed by modile id."""
@@ -538,7 +574,7 @@ class RunOrchestratorStore:
         """Get the most recently finalized command, if any."""
         return self._most_recent_finalized_command
 
-    def get_command_slice(
+    async def get_command_slice(
         self, cursor: Optional[int], length: int, include_fixit_commands: bool
     ) -> CommandSlice:
         """Get a slice of run commands.
@@ -548,11 +584,11 @@ class RunOrchestratorStore:
             length: Length of slice to return.
             include_fixit_commands: Include fixit commands.
         """
-        return self.run_coordinator.get_command_slice(
+        return await self.run_coordinator.get_command_slice(  # CASEY NOTE flag - make this whole func async
             cursor=cursor, length=length, include_fixit_commands=include_fixit_commands
         )
 
-    def get_command_error_slice(
+    async def get_command_error_slice(
         self,
         cursor: int,
         length: int,
@@ -563,53 +599,69 @@ class RunOrchestratorStore:
             cursor: Requested index of first command error in the returned slice.
             length: Length of slice to return.
         """
-        return self.run_coordinator.get_command_error_slice(
+        return await self.run_coordinator.get_command_error_slice(  # CASEY NOTE flag - make this whole func async
             cursor=cursor, length=length
         )
 
-    def get_command_errors(self) -> list[ErrorOccurrence]:
+    async def get_command_errors(self) -> list[ErrorOccurrence]:
         """Get all command errors."""
-        return self.run_coordinator.get_command_errors()
+        return (
+            await self.run_coordinator.get_command_errors()
+        )  # CASEY NOTE flag - make this whole func async
 
-    def get_command_recovery_target(self) -> Optional[CommandPointer]:
+    async def get_command_recovery_target(self) -> Optional[CommandPointer]:
         """Get the current error recovery target."""
-        return self.run_coordinator.get_command_recovery_target()
+        return (
+            await self.run_coordinator.get_command_recovery_target()
+        )  # CASEY NOTE flag - make this whole func async
 
-    def get_command(self, command_id: str) -> Command:
+    async def get_command(self, command_id: str) -> Command:
         """Get a run's command by ID."""
-        return self.run_coordinator.get_command(command_id=command_id)
+        return await self.run_coordinator.get_command(
+            command_id=command_id
+        )  # CASEY NOTE flag - make this whole func async
 
-    def get_total_command_annotations_count(self) -> int:
+    async def get_total_command_annotations_count(self) -> int:
         """Get the total number of command annotations in the run."""
-        return self.run_coordinator.get_total_command_annotations_count()
+        return (
+            await self.run_coordinator.get_total_command_annotations_count()
+        )  # CASEY NOTE flag - make this whole func async
 
-    def get_command_annotations_slice(
+    async def get_command_annotations_slice(
         self,
         cursor: int,
         length: int,
     ) -> CommandAnnotationsSlice:
         """Get a slice of run commands."""
-        return self.run_coordinator.get_command_annotations_slice(
+        return await self.run_coordinator.get_command_annotations_slice(  # CASEY NOTE flag - make this whole func async
             cursor=cursor, length=length
         )
 
-    def get_command_annotation(self, annotation_id: str) -> CommandAnnotation:
+    async def get_command_annotation(self, annotation_id: str) -> CommandAnnotation:
         """Get the specified command annotation."""
-        return self.run_coordinator.get_command_annotation(annotation_id)
+        return await self.run_coordinator.get_command_annotation(
+            annotation_id
+        )  # CASEY NOTE flag - make this whole func async
 
-    def get_status(self) -> EngineStatus:
+    async def get_status(self) -> EngineStatus:
         """Get the current execution status of the run."""
-        return self.run_coordinator.get_run_status()
+        return (
+            await self.run_coordinator.get_run_status()
+        )  # CASEY NOTE flag - make this whole func async
 
-    def get_is_run_terminal(self) -> bool:
+    async def get_is_run_terminal(self) -> bool:
         """Get whether run is in a terminal state."""
-        return self.run_coordinator.get_is_run_terminal()
+        return (
+            await self.run_coordinator.get_is_run_terminal()
+        )  # CASEY NOTE flag - make this whole func async
 
-    def get_camera_capture_image_settings(
+    async def get_camera_capture_image_settings(
         self, camera_id: str
     ) -> CameraCaptureImageSettings:
         """Get camera capture image settings to state."""
-        settings = self.run_coordinator.get_camera_capture_image_settings()
+        settings = (
+            await self.run_coordinator.get_camera_capture_image_settings()
+        )  # CASEY NOTE flag - make this whole func async
 
         # todo(chb, 2026-01-12): Currently we only store one set of camera settings in the camera store at a time.
         # Storing multiple will mean updating get_camera_capture_image_settings() to return specific cameras.
@@ -627,31 +679,39 @@ class RunOrchestratorStore:
             saturation=settings["saturation"],
         )
 
-    def run_was_started(self) -> bool:
+    async def run_was_started(self) -> bool:
         """Get whether the run has started."""
-        return self.run_coordinator.run_has_started()
+        return (
+            await self.run_coordinator.run_has_started()
+        )  # CASEY NOTE flag - make this whole func async
 
-    def add_labware_offset(
+    async def add_labware_offset(
         self, request: LabwareOffsetCreate | LegacyLabwareOffsetCreate
     ) -> LabwareOffset:
         """Add a new labware offset to state."""
-        return self.run_coordinator.add_labware_offset(request)
+        return await self.run_coordinator.add_labware_offset(
+            request
+        )  # CASEY NOTE flag - make this whole func async
 
-    def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
+    async def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         """Add a new labware definition to state."""
-        return self.run_coordinator.add_labware_definition(definition)
+        return await self.run_coordinator.add_labware_definition(
+            definition
+        )  # CASEY NOTE flag - make this whole func async
 
-    def set_error_recovery_policy(
+    async def set_error_recovery_policy(
         self,
         policy: error_recovery_policy.ErrorRecoveryPolicy,
         error_recovery_rules: List[ErrorRecoveryRule],
         error_recovery_is_enabled: bool,
     ) -> None:
         """Create run policy rules for error recovery."""
-        if isinstance(self.run_coordinator, RunOrchestrator):
-            self.run_coordinator.set_error_recovery_policy(policy)
+        if isinstance(
+            self.run_coordinator, RunOrchestrator
+        ):  # CASEY NOTE flag - make this whole func async
+            await self.run_coordinator.set_error_recovery_policy(policy)
         else:
-            self.run_coordinator.set_error_recovery_policy(
+            await self.run_coordinator.set_error_recovery_policy(
                 error_recovery_rules, error_recovery_is_enabled
             )
 
@@ -659,17 +719,19 @@ class RunOrchestratorStore:
         """Set the access control policy for the Run Orchestrator Store."""
         self._access_control_mode = access_control_mode
 
-    def add_camera_enablement_settings(
+    async def add_camera_enablement_settings(
         self, enablement_settings: CameraSettings
     ) -> CameraSettings:
         """Add new camera enablement settings to state."""
-        return self.run_coordinator.add_camera_enablement_settings(enablement_settings)
+        return await self.run_coordinator.add_camera_enablement_settings(
+            enablement_settings
+        )  # CASEY NOTE flag - make this whole func async
 
-    def add_camera_capture_image_settings(
+    async def add_camera_capture_image_settings(
         self, capture_image_settings: CameraCaptureImageSettings
     ) -> None:
         """Add new camera capture image settings to state."""
-        self.run_coordinator.add_camera_capture_image_settings(
+        await self.run_coordinator.add_camera_capture_image_settings(  # CASEY NOTE flag - make this whole func async
             camera_id=capture_image_settings.cameraId,
             resolution=capture_image_settings.resolution,
             zoom=capture_image_settings.zoom,
@@ -735,15 +797,19 @@ class RunOrchestratorStore:
             if isinstance(event, FlexStackerSubstateNotification):
                 self._flex_stacker_substate = event.stacker_substate_map
 
-    def _initialize_stored_engine_state(self) -> None:
+    async def _initialize_stored_engine_state(self) -> None:
         """Initialize the orchestrator store local engine state."""
-        self._nozzle_maps = self.run_coordinator.get_nozzle_maps()
-        self._tip_attached = self.run_coordinator.get_tip_attached()
-        self._current_command = self.run_coordinator.get_current_command()
+        self._nozzle_maps = (
+            await self.run_coordinator.get_nozzle_maps()
+        )  # CASEY NOTE flag - make this whole func async
+        self._tip_attached = await self.run_coordinator.get_tip_attached()
+        self._current_command = await self.run_coordinator.get_current_command()
         self._most_recent_finalized_command = (
-            self.run_coordinator.get_most_recently_finalized_command()
+            await self.run_coordinator.get_most_recently_finalized_command()
         )
-        self._flex_stacker_substate = self.run_coordinator.get_flex_stacker_substate()
+        self._flex_stacker_substate = (
+            await self.run_coordinator.get_flex_stacker_substate()
+        )
 
     def _clear_stored_engine_state(self) -> None:
         """Clear the stored engine state, called when creating a new run orchestrator so no state persists between runs."""

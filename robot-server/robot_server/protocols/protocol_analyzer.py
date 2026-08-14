@@ -49,10 +49,10 @@ class ProtocolAnalyzer:
         """Return the protocol resource."""
         return self._protocol_resource
 
-    def get_verified_run_time_parameters(self) -> List[RunTimeParameter]:
+    async def get_verified_run_time_parameters(self) -> List[RunTimeParameter]:
         """Get the validated RTPs with values set by the client."""
         assert self._coordinator is not None
-        return self._coordinator.get_run_time_parameters()
+        return await self._coordinator.get_run_time_parameters()
 
     async def load_orchestrator(
         self,
@@ -101,7 +101,7 @@ class ProtocolAnalyzer:
                 analysis_id=analysis_id,
                 protocol_robot_type=self._protocol_resource.source.robot_type,
                 error=error,
-                run_time_parameters=self._coordinator.get_run_time_parameters(),
+                run_time_parameters=await self._coordinator.get_run_time_parameters(),
             )
             return
 
@@ -163,7 +163,10 @@ class ProtocolAnalyzer:
         are stopped timely and do not block server shutdown.
         """
         if self._coordinator is not None:
-            if self._coordinator.get_is_okay_to_clear():
+            okay_to_clear = asyncio.run_coroutine_threadsafe(
+                self._coordinator.get_is_okay_to_clear(), asyncio.get_running_loop()
+            ).result()
+            if okay_to_clear:
                 asyncio.run_coroutine_threadsafe(
                     self._coordinator.stop(), asyncio.get_running_loop()
                 )

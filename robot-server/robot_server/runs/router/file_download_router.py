@@ -141,7 +141,7 @@ async def download_run_files(
     staging_path = Path(staging_dir.name)
 
     try:
-        zip_entries = _collect_run_download_entries(
+        zip_entries = await _collect_run_download_entries(
             run_id=runId,
             run=run,
             run_data_manager=run_data_manager,
@@ -186,7 +186,7 @@ def _append_if_present(zip_entries: List[ZipEntry], entry: Optional[ZipEntry]) -
         zip_entries.append(entry)
 
 
-def _collect_run_download_entries(
+async def _collect_run_download_entries(
     *,
     run_id: str,
     run: Union[RunResource, BadRunResource],
@@ -222,7 +222,7 @@ def _collect_run_download_entries(
     if csv_input:
         _append_if_present(
             zip_entries,
-            collect_rtp_csv(
+            await collect_rtp_csv(
                 run_id=run_id,
                 run_data_manager=run_data_manager,
                 data_files_store=data_files_store,
@@ -231,7 +231,7 @@ def _collect_run_download_entries(
     if run_log:
         _append_if_present(
             zip_entries,
-            collect_run_log(
+            await collect_run_log(
                 run_id=run_id,
                 run=run,
                 run_data_manager=run_data_manager,
@@ -242,7 +242,7 @@ def _collect_run_download_entries(
     if labware_offsets:
         _append_if_present(
             zip_entries,
-            collect_labware_offsets(
+            await collect_labware_offsets(
                 run_id=run_id,
                 run=run,
                 run_data_manager=run_data_manager,

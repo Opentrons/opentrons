@@ -223,7 +223,10 @@ async def get_is_okay_to_create_maintenance_run(
         orchestrator = run_orchestrator_store.run_coordinator
     except NoRunCoordinator:
         return True
-    return not orchestrator.run_has_started() or orchestrator.get_is_run_terminal()
+    return (
+        not await orchestrator.run_has_started()
+        or await orchestrator.get_is_run_terminal()
+    )
 
 
 async def get_run_data_manager(
