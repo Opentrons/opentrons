@@ -52,6 +52,7 @@ from .robot_calibration import (
     RobotCalibrationProvider,
 )
 from .types import (
+    HardwareSystemInfo,
     AsynchronousModuleErrorNotification,
     Axis,
     CriticalPoint,
@@ -374,6 +375,14 @@ class API(  # type: ignore[misc]
     @property
     def fw_version(self) -> str:
         return self.get_fw_version()
+
+    async def get_hw_details(self) -> HardwareSystemInfo:
+        serial = await self.get_serial_number()
+        return HardwareSystemInfo(
+            fw_version=self.fw_version,
+            board_revision=self.board_revision,
+            serial_number=serial,
+        )
 
     @property
     def board_revision(self) -> str:

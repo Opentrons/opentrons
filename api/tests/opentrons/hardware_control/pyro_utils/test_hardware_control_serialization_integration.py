@@ -775,6 +775,9 @@ CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
         left_physical_state=hw_types.EstopPhysicalStatus.ENGAGED,
         right_physical_state=hw_types.EstopPhysicalStatus.DISENGAGED,
     ),
+    hw_types.HardwareSystemInfo: hw_types.HardwareSystemInfo(
+        fw_version="1.2.3", board_revision="A2", serial_number="asfasdasd"
+    ),
     instr_calibration_types.GripperCalibrationOffset: instr_calibration_types.GripperCalibrationOffset(
         status=instr_calibration_types.CalibrationStatus(
             markedBad=False,

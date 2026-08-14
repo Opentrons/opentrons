@@ -1118,3 +1118,30 @@ class PipetteSensorData:
 
 
 PipetteSensorResponseQueue = Queue[Dict[PipetteSensorId, List[PipetteSensorData]]]
+
+
+@dataclass(frozen=True)
+class HardwareSystemInfo:
+    fw_version: str
+    board_revision: str
+    serial_number: str | None
+
+    @staticmethod
+    def to_pyro_dict(obj: "HardwareSystemInfo") -> dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        pyro_dict = {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "fw_version": obj.fw_version,
+            "board_revision": obj.board_revision,
+            "serial_number": obj.serial_number,
+        }
+        return pyro_dict
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "HardwareSystemInfo":
+        """Consumed by Serpent, Convert from a Pyro Dictionary."""
+        return HardwareSystemInfo(
+            fw_version=data["fw_version"],
+            board_revision=data["board_revision"],
+            serial_number=data["serial_number"],
+        )

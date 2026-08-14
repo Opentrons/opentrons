@@ -167,17 +167,19 @@ async def get_health(
         minimum_protocol_api_version = protocol_api.MIN_SUPPORTED_VERSION
         logs = OT2_LOG_PATHS
 
+    hardware_details = await hardware.get_hw_details()
+
     return Health(
         name=config.name(),
         api_version=versions.api_version,
-        fw_version=hardware.fw_version,
-        board_revision=hardware.board_revision,
+        fw_version=hardware_details.fw_version,
+        board_revision=hardware_details.board_revision,
         logs=logs,
         system_version=versions.system_version,
         maximum_protocol_api_version=list(protocol_api.MAX_SUPPORTED_VERSION),
         minimum_protocol_api_version=list(minimum_protocol_api_version),
         robot_model=robot_type,
         links=health_links,
-        robot_serial=(await hardware.get_serial_number()),
+        robot_serial=hardware_details.serial_number,
         disk_details=disk_monitor.get_details(),
     )

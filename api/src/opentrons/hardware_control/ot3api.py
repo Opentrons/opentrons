@@ -110,6 +110,7 @@ from .types import (
     HardwareEvent,
     HardwareEventHandler,
     HardwareFeatureFlags,
+    HardwareSystemInfo,
     HepaFanState,
     HepaUVState,
     InstrumentProbeType,
@@ -560,6 +561,14 @@ class OT3API(
             self._callbacks.remove(cb)
 
         return unregister
+
+    async def get_hw_details(self) -> HardwareSystemInfo:
+        serial = await self.get_serial_number()
+        return HardwareSystemInfo(
+            fw_version=self.fw_version,
+            board_revision=self.board_revision,
+            serial_number=serial,
+        )
 
     def get_fw_version(self) -> str:
         """
