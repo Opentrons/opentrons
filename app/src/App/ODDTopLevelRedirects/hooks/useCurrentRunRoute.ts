@@ -21,7 +21,7 @@ export function useCurrentRunRoute(currentRunId: string): string | null {
   const hasRunStarted = runRecord?.data.startedAt != null
   const runStatus = runRecord?.data.status
 
-  if (isFetching) {
+  if (isFetching || runRecord?.data.id !== currentRunId) {
     return null
   } else if (
     runStatus === RUN_STATUS_SUCCEEDED ||

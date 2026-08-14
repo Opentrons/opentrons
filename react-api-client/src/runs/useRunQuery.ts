@@ -22,8 +22,12 @@ export function useRunQuery<TError = Error>(
     getQueryKey(host, 'runs', runId, 'details'),
     () => getRun(host!, runId!).then(response => response.data),
     {
-      enabled: host !== null && runId != null && options.enabled !== false,
       ...options,
+      enabled:
+        host !== null &&
+        runId != null &&
+        runId !== 'null' &&
+        options.enabled !== false,
     }
   )
 

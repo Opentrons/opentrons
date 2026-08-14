@@ -108,7 +108,7 @@ function useOT2LPCLabwareInfo({
   robotType,
 }: UseLPCLabwareInfoProps): Pick<UseLPCLabwareInfoResult, 'legacyOffsets'> {
   const { data: runRecord } = useNotifyRunQuery(runId ?? null, {
-    enabled: robotType === OT2_ROBOT_TYPE,
+    enabled: robotType === OT2_ROBOT_TYPE && runId != null,
   })
   const legacyOffsets = runRecord?.data?.labwareOffsets ?? []
 

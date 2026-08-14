@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import { useRunQuery } from '@opentrons/react-api-client'
 
 import { useNotifyDataReady } from '../useNotifyDataReady'
@@ -20,9 +22,14 @@ export function useNotifyRunQuery<TError = Error>(
 
   const httpQueryResult = useRunQuery(runId, queryOptionsNotify, hostOverride)
 
-  if (shouldRefetch && runId != null) {
-    void httpQueryResult.refetch()
-  }
+  useEffect(() => {
+    if (shouldRefetch && runId != null && runId !== 'null') {
+      void httpQueryResult.refetch()
+    }
+
+    // refetch is stable, the result object is not
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldRefetch, runId])
 
   return httpQueryResult
 }
