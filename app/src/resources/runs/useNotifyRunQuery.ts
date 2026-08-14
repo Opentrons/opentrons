@@ -23,7 +23,9 @@ export function useNotifyRunQuery<TError = Error>(
   const httpQueryResult = useRunQuery(runId, queryOptionsNotify, hostOverride)
 
   useEffect(() => {
-    if (shouldRefetch && runId != null && runId !== 'null') {
+    // Route params can turn a missing id into the literal string "null" (e.g. `/runs/${null}` → `/runs/null`). Treat that like no id.
+    const isValidRunId = runId != null && runId !== 'null'
+    if (shouldRefetch && isValidRunId) {
       void httpQueryResult.refetch()
     }
 
