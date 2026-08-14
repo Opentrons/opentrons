@@ -2093,7 +2093,7 @@ async def test_move_to_plunger_bottom(
 
 @pytest.mark.parametrize(
     "input_position, expected_move_pos",
-    [  
+    [
         ({Axis.X: 13}, {Axis.X: 13, Axis.Y: 493.8}),
         (
             {Axis.X: 13, Axis.Y: 14, Axis.Z_R: 15},

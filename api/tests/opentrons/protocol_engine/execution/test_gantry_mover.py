@@ -718,3 +718,32 @@ async def test_virtual_move_axes(
     """It should simulate moving a set of axis by a certain distance."""
     pos = await virtual_subject.move_axes(axis_map, critical_point, 100, relative_move)
     assert pos == expected_position
+
+
+@pytest.mark.parametrize(
+    ("input_axis", "expected_mount"),
+    [
+        (MotorAxis.LEFT_Z, Mount.LEFT),
+        (MotorAxis.RIGHT_Z, Mount.RIGHT),
+        (MotorAxis.EXTENSION_Z, Mount.EXTENSION),
+        (MotorAxis.RIGHT_PLUNGER, Mount.RIGHT),
+        (MotorAxis.LEFT_PLUNGER, Mount.LEFT),
+        (MotorAxis.EXTENSION_JAW, Mount.EXTENSION),
+    ],
+)
+def test_pick_mount_from_axis_map(
+    hardware_subject: HardwareGantryMover,
+    virtual_subject: VirtualGantryMover,
+    input_axis: MotorAxis,
+    expected_mount: Mount,
+) -> None:
+    """Make sure pick_mount_from_axis_map returns the expected mount."""
+    fake_position = 19.0
+    virtual_mount = virtual_subject.pick_mount_from_axis_map(
+        {input_axis: fake_position}
+    )
+    hardware_mount = hardware_subject.pick_mount_from_axis_map(
+        {input_axis: fake_position}
+    )
+
+    assert virtual_mount == hardware_mount == expected_mount

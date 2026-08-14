@@ -1438,7 +1438,6 @@ class OT3API(
         for axis, position_value in position.items():
             if axis not in absolute_positions:
                 absolute_positions[axis] = position_value
-        # breakpoint()
         await self._move(
             target_position=absolute_positions,
             speed=speed,
