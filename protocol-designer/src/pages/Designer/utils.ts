@@ -28,7 +28,6 @@ import {
 import {
   HOPPER_LABWARE_X_OFFSET,
   VACUUM_DOCK_DISPLAY_LOCATION,
-  VACUUM_DOCK_LABWARE_X_OFFSET,
 } from '/protocol-designer/constants'
 
 import { getRobotType } from '../../file-data/selectors'
