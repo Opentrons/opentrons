@@ -6,6 +6,16 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 By installing and using Opentrons software, you agree to the Opentrons End-User License Agreement (EULA). You can view the EULA at [opentrons.com/eula](https://opentrons.com/eula).
 
+## Opentrons Robot Software Changes in 10.0.0
+
+Welcome to the v10.0.0 release of the Opentrons Flex robot software! This release introduces Opentrons Flex Compliance Ready Software.
+
+### New Features
+
+- [Opentrons Flex Compliance Ready Software](https://opentrons.com/compliance-ready-software) is additional software installed on your Flex robot by Opentrons. It permanently enables features like role-based user access and required documentation for 21 CFR part 11-ready operation.
+
+---
+
 ## Opentrons Robot Software Changes in 9.1.2
 
 Welcome to the v9.1.2 release of the Opentrons Flex robot software! This release includes bug fixes and improvements.
