@@ -25,6 +25,7 @@ const CENTER_SLOT_WIDTH = 160
 const CENTER_SLOT_HEIGHT = 106
 const VACUUM_OFFSET_X = -19
 const VACUUM_OFFSET_Y = -10
+const VACUUM_DOCK_OFFSET_X = 7
 
 interface ModuleLabelProps {
   showModuleIcon: boolean
@@ -37,6 +38,7 @@ interface ModuleLabelProps {
   isZoomed?: boolean
   labwareInfos?: DeckLabelProps[]
   labelName?: string
+  isVacuumDock?: boolean
 }
 export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
   const {
@@ -50,6 +52,7 @@ export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
     labelName,
     slot,
     showModuleIcon = false,
+    isVacuumDock = false,
   } = props
   const robotType = useSelector(getRobotType)
   const labelContainerRef = useRef<HTMLDivElement>(null)
@@ -96,7 +99,11 @@ export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
             isZoomed: isZoomed,
           },
         ]}
-        x={position[0] + VACUUM_OFFSET_X}
+        x={
+          position[0] +
+          VACUUM_OFFSET_X +
+          (isVacuumDock ? VACUUM_DOCK_OFFSET_X : 0)
+        }
         y={position[1] - labelContainerHeight + VACUUM_OFFSET_Y}
         width={CENTER_SLOT_WIDTH}
         height={CENTER_SLOT_HEIGHT}

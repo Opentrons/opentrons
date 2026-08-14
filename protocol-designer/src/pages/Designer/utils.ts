@@ -28,7 +28,6 @@ import {
 import {
   HOPPER_LABWARE_X_OFFSET,
   VACUUM_DOCK_DISPLAY_LOCATION,
-  VACUUM_DOCK_LABWARE_X_OFFSET,
 } from '/protocol-designer/constants'
 
 import { getRobotType } from '../../file-data/selectors'
@@ -111,14 +110,7 @@ const _getAdjustedSlot = (
   }
   return slot
 }
-const _getOffsetFromSlot = (
-  slot: DeckSlot,
-  isSlotAVacuumDock: boolean,
-  isSlotAHopper: boolean
-): number => {
-  if (isSlotAVacuumDock) {
-    return VACUUM_DOCK_LABWARE_X_OFFSET
-  }
+const _getOffsetFromSlot = (slot: DeckSlot, isSlotAHopper: boolean): number => {
   if (isSlotAHopper) {
     return HOPPER_LABWARE_X_OFFSET
   }
@@ -152,7 +144,7 @@ export const getSlotInformation = (
       ? getPositionFromSlotId(
           adjustedSlot,
           deckDef,
-          _getOffsetFromSlot(slot, isSlotAVacuumDock, isSlotAHopper)
+          _getOffsetFromSlot(slot, isSlotAHopper)
         )
       : null
   const createdModuleForSlot = Object.values(deckSetupModules).find(
