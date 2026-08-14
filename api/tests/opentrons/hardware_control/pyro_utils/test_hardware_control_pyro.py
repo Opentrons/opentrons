@@ -71,7 +71,6 @@ from opentrons.hardware_control.types import (
 from opentrons.types import Mount, Point
 from opentrons.util.pyro.pyro_client_async_adapter import (
     AsyncClientPyroFunctionWrapper,
-    ClientPyroFunctionWrapper,
 )
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
@@ -633,11 +632,11 @@ async def test_pyro_async_wrapped_calls(  # noqa: C901
     assert isinstance(async_uploader, AsyncClientPyroFunctionWrapper)
 
     # Test registering an outbound function from one remote resource with another remote resouce
-    result = ot3api.register_callback(cb=door_async.cool_hardware_event())  # type: ignore
+    result = await ot3api.register_callback_async(cb=door_async.cool_hardware_event())  # type: ignore
 
     # Verify the resulting callback proxy (which is wrapped automagically) is wrapped and callable
-    assert isinstance(result, ClientPyroFunctionWrapper)
-    result()
+    assert isinstance(result, AsyncClientPyroFunctionWrapper)
+    await result()
 
     assert (
         ot3api.build_temporary_identity_calibration().deck_calibration.source.value

@@ -562,6 +562,18 @@ class OT3API(
 
         return unregister
 
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    async def register_callback_async(
+        self, cb: HardwareEventHandler
+    ) -> Callable[[], Awaitable[None]]:
+        """As register_callback, but async to be more friendly to remote invocation."""
+        self._callbacks.add(cb)
+
+        async def unregister() -> None:
+            self._callbacks.remove(cb)
+
+        return unregister
+
     async def get_hw_details(self) -> HardwareSystemInfo:
         serial = await self.get_serial_number()
         return HardwareSystemInfo(

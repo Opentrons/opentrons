@@ -7,6 +7,7 @@ from dataclasses import replace
 from functools import partial
 from typing import (
     Any,
+    Awaitable,
     Callable,
     Dict,
     List,
@@ -52,7 +53,6 @@ from .robot_calibration import (
     RobotCalibrationProvider,
 )
 from .types import (
-    HardwareSystemInfo,
     AsynchronousModuleErrorNotification,
     Axis,
     CriticalPoint,
@@ -64,6 +64,7 @@ from .types import (
     HardwareEvent,
     HardwareEventHandler,
     HardwareFeatureFlags,
+    HardwareSystemInfo,
     MotionChecks,
     PauseType,
     StatusBarState,
@@ -355,6 +356,17 @@ class API(  # type: ignore[misc]
         self._callbacks.add(cb)
 
         def unregister() -> None:
+            self._callbacks.remove(cb)
+
+        return unregister
+
+    async def register_callback_async(
+        self, cb: HardwareEventHandler
+    ) -> Callable[[], Awaitable[None]]:
+        """As register_callback, but async to be more friendly to remote invocation."""
+        self._callbacks.add(cb)
+
+        async def unregister() -> None:
             self._callbacks.remove(cb)
 
         return unregister

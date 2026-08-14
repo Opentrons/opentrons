@@ -85,6 +85,9 @@ from robot_server.service.legacy.models.settings import (
     PipetteSettingsUpdate,
     RobotConfigs,
 )
+from robot_server.service.pyro_utils.pyro_resource import (
+    start_initializing_pyro_resource,
+)
 
 log = logging.getLogger(__name__)
 
@@ -126,6 +129,7 @@ async def _hardware_subprocess_transition(enable: bool, app_state: AppState) -> 
     # rerun the hardware API setup
     start_initializing_hardware(
         app_state=app_state,
+        pyro_task=start_initializing_pyro_resource(app_state=app_state),
         callbacks=[
             (start_light_control_task, True),
             (mark_light_control_startup_finished, False),

@@ -76,7 +76,7 @@ def ot3_hardware_api(decoy: Decoy, request: pytest.FixtureRequest) -> OT3API:
 
 @pytest.fixture
 def mock_app_state(decoy: Decoy) -> AppState:
-    """Get a mock DataFilesStore."""
+    """Get a mock AppState."""
     return decoy.mock(cls=AppState)
 
 
@@ -375,7 +375,9 @@ async def test_run_hardware_state_update_callback(
         mock_app_state, run_store
     )
 
-    hardware_store = HardwareStateStore(hardware_resource=ot3_hardware_api)
+    hardware_store = await HardwareStateStore.build(
+        hardware_resource=ot3_hardware_api, app_state=mock_app_state
+    )
 
     resource_utilities.register_hardware_state_store_to_pyro_resource(
         mock_app_state, hardware_store

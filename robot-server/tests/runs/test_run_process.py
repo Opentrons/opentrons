@@ -140,7 +140,7 @@ async def _host_pyro_nameserver_and_ot3api(
     register_hardware_types()
     name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
     # Initialize the RobotServerPyroResource
-    pyro_resource.start_initializing_pyro_resource(app_state)
+    await pyro_resource.start_initializing_pyro_resource(app_state)
     ot3_async = await wait_for_proxy(proxy_name="OT3API", broadcast_mode=False)
     if ot3_async is None:
         raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
@@ -158,10 +158,10 @@ async def test_run_process_proxy(
 ) -> None:
     """Test the run process pyro creation and a proxy can be created that returns data and async commands can be called."""
     decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
+
     ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
         ot3_hardware_api, mock_app_state
     )
-
     pyro_thread = initialize_run_process("ot-protocol")
     pyro_thread.start()
 
@@ -179,6 +179,8 @@ async def test_run_process_proxy(
 
     # Clean up client resources.
     protocol_async._proxy._pyroRelease()  # type: ignore
+    ot3_async._proxy._pyroRelease()
+    rs_async._proxy._pyroRelease()
 
 
 async def test_run_process_create(
@@ -191,7 +193,6 @@ async def test_run_process_create(
 ) -> None:
     """Test the run process pyro proxy `create` method can be called to create the run."""
     decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
-
     sock = socket.socket()
     sock.bind(("localhost", 0))
     host, port = sock.getsockname()

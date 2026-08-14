@@ -17,7 +17,9 @@ from opentrons.protocol_engine.resources.camera_provider import (
 from opentrons.protocol_engine.resources.file_provider import FileProvider
 from opentrons.protocol_engine.state.state import EngineEventNotification
 from opentrons.protocol_engine.types import DeckConfigurationType
-from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
+from opentrons.util.pyro.pyro_daemon_utility import (
+    create_pyro_daemon_with_monitored_start,
+)
 from opentrons.util.pyro.pyro_synchronous_adapter import (
     convert_result_to_proxy,
     pyro_behavior,
@@ -27,13 +29,13 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
 )
 
-from robot_server.hardware import HardwareStateStore
 from robot_server.service.pyro_utils.serpent_type_registry import (
     register_robot_server_types,
 )
 
 if TYPE_CHECKING:
     from robot_server.deck_configuration.store import DeckConfigurationStore
+    from robot_server.hardware import HardwareStateStore
     from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
         MaintenanceRunOrchestratorStore,
     )
@@ -74,7 +76,7 @@ class RobotServerPyroResource:
         self._camera_provider: Optional[CameraProvider] = None
         self._file_provider: Optional[FileProvider] = None
         self._notify_publishers: Optional[Callable[[], None]] = None
-        self._hardware_state_store: Optional[HardwareStateStore] = None
+        self._hardware_state_store: Optional["HardwareStateStore"] = None
 
     ### Setters for procedural state gathering - Not to be used from remote process ###
     def set_run_orchestrator_store(
@@ -117,7 +119,7 @@ class RobotServerPyroResource:
         # Do we need an entirely seperate notification publisher for maintenance runs?
         self._notify_publishers = notify_publishers
 
-    def set_hardware_state_store(self, hardware_store: HardwareStateStore) -> None:
+    def set_hardware_state_store(self, hardware_store: "HardwareStateStore") -> None:
         """Set the HardwareStateStore of the RobotServerPyroResource, not serialized for remote processes."""
         self._hardware_state_store = hardware_store
 
@@ -125,14 +127,14 @@ class RobotServerPyroResource:
 
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def create_run_hardware_event_callback(self) -> HardwareEventHandler:
-        """Create a callback for estop and other events during a Run.
+        """Create a callback for estop and other events.
 
-        The returned callback is meant to run in the hardware API's thread.
+        The returned callback is meant to run in the pyro daemon's thread.
         """
         orchestrator_store = self._run_orchestrator_store
         if orchestrator_store is not None:
 
-            def run_handler_in_engine_thread_from_hardware_thread(
+            def run_handler_in_main_loop(
                 event: HardwareEvent,
             ) -> None:
                 asyncio.run_coroutine_threadsafe(
@@ -140,7 +142,7 @@ class RobotServerPyroResource:
                     self._loop,
                 )
 
-            return run_handler_in_engine_thread_from_hardware_thread
+            return run_handler_in_main_loop
         else:
             raise RuntimeError(
                 "Cannot provide a hardware listener from the RobotServerPyroResource without a RunOrchestratorStore."
@@ -297,22 +299,36 @@ class RobotServerPyroResource:
 ### Utility methods for initializing and registering state within the RobotServerPyroResource
 
 
-def start_initializing_pyro_resource(app_state: AppState) -> None:
+def start_initializing_pyro_resource(app_state: AppState) -> "asyncio.Task[None]":
     """Entry point for creating a hosted Robot Server Pyro Resource and serving requests on it via a Pyro5 Daemon."""
+    return asyncio.create_task(
+        asyncio.to_thread(
+            _do_start_initialize_pyro, app_state, asyncio.get_event_loop()
+        )
+    )
+
+
+def _do_start_initialize_pyro(
+    app_state: AppState, main_thread_event_loop: asyncio.AbstractEventLoop
+) -> None:
+    event = threading.Event()
 
     def _start_and_run_pyro_daemon(pyroname: str, registry: Any) -> None:
         robot_server_pyro_resource = robot_server_pyro_resource_accessor.get_from(
             app_state
         )
         assert robot_server_pyro_resource is not None
-        create_pyro_daemon(
+        daemon_gen = create_pyro_daemon_with_monitored_start(
             pyroname=pyroname, resource=robot_server_pyro_resource, registry=registry
         )
+        next(daemon_gen)
+        event.set()
+        for _ in daemon_gen:
+            pass
 
     # Create the new instance of the Robot server resource manager using the Robot Server's existing event loop
-    resource = RobotServerPyroResource(loop=asyncio.get_event_loop())
+    resource = RobotServerPyroResource(loop=main_thread_event_loop)
     robot_server_pyro_resource_accessor.set_on(app_state, resource)
-
     # Only spin up a request handling daemon if subprocess mode is enabled
     if ff.hardware_subprocess_enabled():
         pyro_daemon_thread = threading.Thread(
@@ -326,3 +342,4 @@ def start_initializing_pyro_resource(app_state: AppState) -> None:
             daemon=True,
         )
         pyro_daemon_thread.start()
+        event.wait()
