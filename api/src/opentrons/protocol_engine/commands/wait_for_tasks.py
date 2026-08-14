@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Type
+from typing import TYPE_CHECKING, Optional, Sequence, Type, Union
 
 from pydantic import BaseModel, Field
 from typing_extensions import Literal
@@ -10,11 +10,31 @@ from typing_extensions import Literal
 from ..errors import ErrorOccurrence
 from ..errors.error_occurrence import ProtocolCommandFailedError
 from ..errors.exceptions import TaskFailedError
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from ..resources import ModelUtils
+from .background_task_recovery import (
+    defined_error_from_failed_tasks,
+    is_fixit_wait_for_tasks,
+    restart_originating_background_tasks,
+)
+from .command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+    SuccessData,
+)
 
 if TYPE_CHECKING:
-    from ..execution import RunControlHandler, TaskHandler
+    from ..execution import (
+        EquipmentHandler,
+        MovementHandler,
+        RunControlHandler,
+        TaskHandler,
+    )
+    from ..execution.associated_command_recovery_resolver import (
+        AssociatedCommandRecoveryResolver,
+    )
     from ..state.state import StateView
+    from .command_unions import CommandDefinedErrorData
 
 
 WaitForTasksCommandType = Literal["waitForTasks"]
@@ -38,8 +58,14 @@ class WaitForTasksResult(BaseModel):
     )
 
 
+_ExecuteReturn = Union[
+    SuccessData[WaitForTasksResult],
+    "CommandDefinedErrorData",
+]
+
+
 class WaitForTasksImplementation(
-    AbstractCommandImpl[WaitForTasksParams, SuccessData[WaitForTasksResult]]
+    AbstractCommandImpl[WaitForTasksParams, _ExecuteReturn]
 ):
     """WaitForTasks command implementation."""
 
@@ -48,42 +74,91 @@ class WaitForTasksImplementation(
         task_handler: TaskHandler,
         run_control: RunControlHandler,
         state_view: StateView,
-        **kwargs: object,
+        equipment: EquipmentHandler | None = None,
+        movement: MovementHandler | None = None,
+        model_utils: ModelUtils | None = None,
+        resolvers: Sequence[AssociatedCommandRecoveryResolver] | None = None,
+        **_unused_dependencies: object,
     ) -> None:
         self._task_handler = task_handler
         self._run_control = run_control
         self._state_view = state_view
+        self._equipment = equipment
+        self._movement = movement
+        self._model_utils = model_utils or ModelUtils()
+        self._resolvers = resolvers
 
-    async def execute(
-        self, params: WaitForTasksParams
-    ) -> SuccessData[WaitForTasksResult]:
-        """Checks for existance of task id and then asynchronously waits for the valid, specified tasks to finish."""
-        # Raises the exception if we don't have a valid task id.
+    async def execute(self, params: WaitForTasksParams) -> _ExecuteReturn:
+        """Wait for tasks. Recoverable background failures become defined errors."""
         for task_id in params.task_ids:
             _ = self._state_view.tasks.get(task_id)
 
-        await self._run_control.wait_for_tasks(params.task_ids)
+        waited_task_ids = list(params.task_ids)
+        if is_fixit_wait_for_tasks(self._state_view):
+            failed_already = self._state_view.tasks.get_failed_tasks(params.task_ids)
+            if (
+                failed_already
+                and defined_error_from_failed_tasks(
+                    failed_already,
+                    self._state_view,
+                    self._get_resolvers(),
+                    self._model_utils,
+                )
+                is not None
+            ):
+                restarted = await restart_originating_background_tasks(
+                    failed_already,
+                    self._state_view,
+                    self._get_resolvers(),
+                    self._task_handler,
+                    self._equipment,
+                    self._movement,
+                    self._model_utils,
+                )
+                if restarted:
+                    waited_task_ids = restarted
 
-        failed_tasks = self._state_view.tasks.get_failed_tasks(params.task_ids)
-        if (
-            failed_tasks
-            and not self._state_view.failed_task_failures_absorbed_by_active_recovery(
-                params.task_ids
-            )
+        await self._run_control.wait_for_tasks(waited_task_ids)
+
+        failed_tasks = self._state_view.tasks.get_failed_tasks(waited_task_ids)
+        if not failed_tasks:
+            return SuccessData(public=WaitForTasksResult(task_ids=params.task_ids))
+
+        # Fail-before-wait race only: start_* already owns recovery, so do not
+        # raise a second error. Mixed or uncovered failures still fail the wait.
+        if self._state_view.failed_task_failures_absorbed_by_active_recovery(
+            waited_task_ids
         ):
-            raise TaskFailedError(
-                message=f"{len(failed_tasks)} tasks failed.",
-                details={"failed_task_ids": failed_tasks},
-                wrapping=[
-                    ProtocolCommandFailedError(
-                        original_error=self._state_view.tasks.get_finished(
-                            task_id
-                        ).error
-                    )
-                    for task_id in failed_tasks
-                ],
+            return SuccessData(public=WaitForTasksResult(task_ids=params.task_ids))
+
+        defined_error = defined_error_from_failed_tasks(
+            failed_tasks,
+            self._state_view,
+            self._get_resolvers(),
+            self._model_utils,
+        )
+        if defined_error is not None:
+            return defined_error
+
+        raise TaskFailedError(
+            message=f"{len(failed_tasks)} tasks failed.",
+            details={"failed_task_ids": failed_tasks},
+            wrapping=[
+                ProtocolCommandFailedError(
+                    original_error=self._state_view.tasks.get_finished(task_id).error
+                )
+                for task_id in failed_tasks
+            ],
+        )
+
+    def _get_resolvers(self) -> Sequence[AssociatedCommandRecoveryResolver]:
+        if self._resolvers is None:
+            from ..execution.associated_command_error_recovery import (
+                default_associated_command_recovery_resolvers,
             )
-        return SuccessData(public=WaitForTasksResult(task_ids=params.task_ids))
+
+            self._resolvers = default_associated_command_recovery_resolvers()
+        return self._resolvers
 
 
 class WaitForTasks(

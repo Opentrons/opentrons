@@ -180,9 +180,11 @@ class StateView(HasState[State]):
     ) -> bool:
         """Return whether every failed waited-on task is covered by active recovery.
 
-        A failed task is covered when the engine is awaiting recovery and the task's
-        originating command is the current recovery target. This lets ``waitForTasks``
-        succeed after associated-command recovery without masking unrelated failures.
+        Used only for the fail-before-wait race: ``start_*`` already entered
+        recovery, and ``waitForTasks`` must not raise a second error. A failed
+        task is covered when the engine is awaiting recovery and the task's
+        originating command is the current recovery target. Unrelated failures
+        are not absorbed.
         """
         failed_task_ids = self._tasks.get_failed_tasks(task_ids)
         if not failed_task_ids:

@@ -7,6 +7,9 @@ from typing import TYPE_CHECKING, get_args
 from opentrons_shared_data.errors.exceptions import EnumeratedError
 
 from ...errors import ErrorOccurrence
+from ...execution.associated_command_recovery_resolver import (
+    reexecute_background_start_command,
+)
 from ...state import update_types
 from ...types import LoadedModule, ModuleModel
 from .common import (
@@ -14,9 +17,15 @@ from .common import (
     defined_error_data_from_task_error,
     is_recoverable_module_error,
 )
-from .start_run_profile import StartRunProfileCommandType
-from .start_set_vacuum_power import StartSetVacuumPowerCommandType
-from .start_set_vacuum_pressure import StartSetVacuumPressureCommandType
+from .start_run_profile import StartRunProfileCommandType, StartRunProfileImpl
+from .start_set_vacuum_power import (
+    StartSetVacuumPowerCommandType,
+    StartSetVacuumPowerImpl,
+)
+from .start_set_vacuum_pressure import (
+    StartSetVacuumPressureCommandType,
+    StartSetVacuumPressureImpl,
+)
 
 VACUUM_BACKGROUND_COMMAND_TYPES: frozenset[str] = frozenset(
     {
@@ -29,8 +38,17 @@ VACUUM_BACKGROUND_COMMAND_TYPES: frozenset[str] = frozenset(
 if TYPE_CHECKING:
     from ...commands import Command
     from ...commands.command_unions import CommandDefinedErrorData
+    from ...execution import EquipmentHandler, MovementHandler, TaskHandler
     from ...resources import ModelUtils
     from ...state.state import StateView
+
+
+def _vacuum_start_impl_cls(command_type: str) -> type | None:
+    return {
+        get_args(StartSetVacuumPressureCommandType)[0]: StartSetVacuumPressureImpl,
+        get_args(StartSetVacuumPowerCommandType)[0]: StartSetVacuumPowerImpl,
+        get_args(StartRunProfileCommandType)[0]: StartRunProfileImpl,
+    }.get(command_type)
 
 
 class VacuumModuleAssociatedCommandRecoveryResolver:
@@ -90,6 +108,27 @@ class VacuumModuleAssociatedCommandRecoveryResolver:
             error,
             model_utils,
             state_update_if_false_positive=state_update_if_false_positive,
+        )
+
+    async def restart(
+        self,
+        command: Command,
+        *,
+        state_view: StateView,
+        task_handler: TaskHandler,
+        equipment: EquipmentHandler | None,
+        movement: MovementHandler | None,
+        model_utils: ModelUtils,
+    ) -> str | None:
+        """Re-run a vacuum start_* implementation and return the new task id."""
+        return await reexecute_background_start_command(
+            _vacuum_start_impl_cls(command.commandType),
+            command,
+            state_view=state_view,
+            task_handler=task_handler,
+            equipment=equipment,
+            movement=movement,
+            model_utils=model_utils,
         )
 
 
