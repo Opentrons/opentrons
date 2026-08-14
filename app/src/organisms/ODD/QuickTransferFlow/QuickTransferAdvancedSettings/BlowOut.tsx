@@ -401,9 +401,6 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
               value={String(speed ?? '')}
               label={t('blow_out_speed')}
               error={speedError}
-              onBlur={e => {
-                e.target.focus()
-              }}
               onChange={e => {
                 handleFlowRateChange(e.target.value as string)
               }}

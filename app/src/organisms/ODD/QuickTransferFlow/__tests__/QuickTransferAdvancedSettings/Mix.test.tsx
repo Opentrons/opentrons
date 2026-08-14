@@ -110,7 +110,6 @@ describe('Mix', () => {
         error: null,
         type: 'number',
         value: null,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -144,7 +143,6 @@ describe('Mix', () => {
         error: 'Value must be between 1 to 200',
         type: 'number',
         value: 0,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -173,7 +171,6 @@ describe('Mix', () => {
         error: 'Value must be between 1 to 999',
         type: 'number',
         value: 0,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -223,7 +220,6 @@ describe('Mix', () => {
         error: null,
         type: 'number',
         value: 15,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -236,7 +232,6 @@ describe('Mix', () => {
         error: null,
         type: 'number',
         value: 55,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -266,7 +261,6 @@ describe('Mix', () => {
         error: null,
         type: 'number',
         value: 18,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -279,7 +273,6 @@ describe('Mix', () => {
         error: null,
         type: 'number',
         value: 2,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
