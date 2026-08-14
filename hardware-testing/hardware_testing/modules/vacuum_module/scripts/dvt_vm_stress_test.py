@@ -15,12 +15,12 @@ import time
 import csv
 
 
-metadata = {"protocolName": "DVT VM 200mbar Life Test"}
+metadata = {"protocolName": "PID DVT VM 200mbar Life Test"}
 requirements = {"robotType": "Flex", "apiLevel": "2.30"}
 
 FIXTURE_OFFSET_MM = 1
 LABWARE_OFFSET_MM = 0
-ASPIRATE_OFFSET_MM = 5 + LABWARE_OFFSET_MM + FIXTURE_OFFSET_MM
+ASPIRATE_OFFSET_MM = 3 + LABWARE_OFFSET_MM + FIXTURE_OFFSET_MM
 
 OUTPUT_DIR = "/data/vacuum_manifold_life_test_dvt/"
 
@@ -96,7 +96,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_int(
         "target_liquid_height",
         "target_liquid_height",
-        default=34,
+        default=45,
         minimum=1,
         maximum=60,
         description="Height of the liquid column in mm.",
@@ -318,6 +318,20 @@ def enable_waste_detection(vm_mod: VacuumModuleContext, enable: bool = False) ->
         enable_waste_full_detection=enable,
     )
 
+def set_tunings(vm_mod: VacuumModuleContext, kp: float, ki: float, kd: float) -> None:
+    """Set the PID tunings on the vacuum module via the driver. Not part of public PAPI."""
+    core = cast(VacuumModuleCore, vm_mod._core)
+    adapter = core._sync_module_hardware
+    vacuum_hw = object.__getattribute__(adapter, "_obj_to_adapt")
+    driver = vacuum_hw._driver
+
+    SynchronousAdapter.call_coroutine_sync(
+        vacuum_hw._loop,
+        driver.set_pressure_control_tunings,
+        kp=kp,
+        ki=ki,
+        kd=kd,
+    )
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
     """Execute the vacuum manifold stress test protocol."""
@@ -359,6 +373,10 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             raise
     # Disable waste Detection to avoid false positives during the stress test
     enable_waste_detection(vm_mod, False)  # type: ignore[attr-defined]
+    kp = 17.03  # type: ignore[attr-defined]
+    ki = 5.38  # type: ignore[attr-defined]
+    kd = 0.15  # type: ignore[attr-defined]
+    set_tunings(vm_mod, kp, ki, kd)  # type: ignore[attr-defined]
     ctx.move_labware(manifold_collar, vm_mod, use_gripper=True)
     pip.pick_up_tip()
     output_dir = Path(OUTPUT_DIR)

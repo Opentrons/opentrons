@@ -57,11 +57,10 @@ async def test_vacuum_regulation(
 ) -> None:
     """Test setting target vacuum."""
     ui.print_header(f"Target Gauge Pressure = {target_pressure}")
-
     # Reset system
     await vacuum.set_vacuum_state(False)
     await vacuum.set_vent_state(VentState.OPENED)
-
+    
     # Wait for the Pressure to equalize
     for i in range(10):
         await vacuum._reader.update_vacuum_state()
@@ -177,7 +176,11 @@ async def run(vacuum: VacuumModule, report: CSVReport, section: str) -> None:
     """Run."""
     print("Set Vacuum State")
     # Disable waste detection for now
+    kp = 17.03  # type: ignore[attr-defined]
+    ki = 5.38  # type: ignore[attr-defined]
+    kd = 0.15  # type: ignore[attr-defined]
     await vacuum._driver.set_waste_configs(enable_waste_full_detection=False)
+    await vacuum._driver.set_pressure_control_tunings(kp=kp, ki=ki, kd=kd)
 
     try:
         for pressure in TARGET_PRESSURES:
