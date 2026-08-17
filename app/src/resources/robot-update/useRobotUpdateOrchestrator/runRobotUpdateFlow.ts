@@ -262,6 +262,7 @@ function reportFlowError(dispatch: Dispatch, error: unknown): void {
       )
       return
     }
+    // base case, the user backed out.
     dispatch(clearRobotUpdateSession())
     return
   }

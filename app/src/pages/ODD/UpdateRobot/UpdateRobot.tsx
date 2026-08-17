@@ -74,6 +74,10 @@ export function UpdateRobot(): JSX.Element {
         <UpdateRobotSoftware
           localRobot={localRobot}
           afterError={setErrorString}
+          afterCancel={() => {
+            dispatch(clearRobotUpdateSession())
+            navigate(-1)
+          }}
         />
       )}
     </Flex>
