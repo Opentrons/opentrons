@@ -18,6 +18,9 @@ The carboy cap is a blue polypropylene (PP) cap with GL80 wide-mouth threads. Th
 
 The cap assembly features a waste diverter and mechanical float. The diverter directs incoming fluid away from the float. The float acts as a mechanical backflow preventer. As liquid fills the carboy, the float rises to seal the vacuum port which protects the Control Box and pump from contact with waste liquid. After the port closes, the pump will detect a pressure change and shut down.
 
+!!! note
+    Inspect the glass carboy for damage during unpacking, installation, and use. Replace if chipped or cracked.
+
 ## Accessories
 
 ### Cap wrench
