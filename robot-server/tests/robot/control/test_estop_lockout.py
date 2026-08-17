@@ -35,7 +35,12 @@ async def hardware_ot2(decoy: Decoy) -> API:
 @pytest.fixture
 async def hardware_ot3(decoy: Decoy, request: pytest.FixtureRequest) -> "OT3API":
     request.node.add_marker("ot3_only")
-    return decoy.mock(cls="OT3API")
+    try:
+        from opentrons.hardware_control.ot3api import OT3API
+
+        return decoy.mock(cls=OT3API)
+    except ImportError:
+        return None  # type: ignore[return-type]
 
 
 @pytest.fixture
@@ -97,7 +102,7 @@ async def test_estop_ot3(
 ) -> None:
     """Test that ot3 hardware will check estop state."""
     decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
-    decoy.when(hardware_ot3.estop_status).then_return(
+    decoy.when(await hardware_ot3.get_estop_status()).then_return(
         EstopOverallStatus(
             state=estop_state,
             left_physical_state=EstopPhysicalStatus.NOT_PRESENT,

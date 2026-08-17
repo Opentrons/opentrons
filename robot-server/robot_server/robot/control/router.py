@@ -36,11 +36,7 @@ async def _get_estop_status_response(
     estop_handler: EstopHandler,
 ) -> PydanticResponse[SimpleBody[EstopStatusModel]]:
     """Helper to generate the current Estop Status as a response model."""
-    data = EstopStatusModel.model_construct(
-        status=estop_handler.get_state(),
-        leftEstopPhysicalStatus=estop_handler.get_left_physical_status(),
-        rightEstopPhysicalStatus=estop_handler.get_right_physical_status(),
-    )
+    data = await estop_handler.get_status()
     return await PydanticResponse.create(content=SimpleBody.model_construct(data=data))
 
 
@@ -80,7 +76,7 @@ async def put_acknowledge_estop_disengage(
     estop_handler: Annotated[EstopHandler, Depends(get_estop_handler)],
 ) -> PydanticResponse[SimpleBody[EstopStatusModel]]:
     """Transition from the `logically_engaged` status if applicable."""
-    estop_handler.acknowledge_and_clear()
+    await estop_handler.acknowledge_and_clear()
     return await _get_estop_status_response(estop_handler)
 
 

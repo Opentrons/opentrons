@@ -3380,7 +3380,10 @@ class OT3API(
     def estop_status(self) -> EstopOverallStatus:
         return self._backend.estop_status
 
-    def estop_acknowledge_and_clear(self) -> EstopOverallStatus:
+    async def get_estop_status(self) -> EstopOverallStatus:
+        return self._backend.estop_status
+
+    async def estop_acknowledge_and_clear(self) -> EstopOverallStatus:
         """Attempt to acknowledge an Estop event and clear the status.
 
         Returns the estop status after clearing the status."""
