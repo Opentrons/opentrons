@@ -1,13 +1,11 @@
 import asyncio
-from pathlib import Path
 
 import pytest
-from mock import PropertyMock, patch
+from mock import PropertyMock
 
 from opentrons.drivers.rpi_drivers.types import PortGroup, USBPort
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import (
-    BundledFirmware,
     HeaterShaker,
     MagDeck,
     ModuleType,
@@ -167,7 +165,7 @@ def test_execute_module_command_410s(api_client):
 def test_post_serial_update_no_bundled_fw(api_client, hardware, magdeck):
     magdeck._bundled_fw = None
     hardware.update_module.side_effect = MissingConfigurationData(
-        message=f"No stored firmware for magdeck dummySerialMD"
+        message="No stored firmware for magdeck dummySerialMD"
     )
 
     resp = api_client.post("/modules/dummySerialMD/update")
@@ -213,7 +211,10 @@ def test_post_serial_update_error(api_client, hardware, magdeck):
     resp = api_client.post("/modules/dummySerialMD/update")
     body = resp.json()
     assert resp.status_code == 500
-    assert body == {"message": "Update error: not possible", "errorCode": "1005"}
+    assert body == {
+        "message": "Update error: Error 1005 FIRMWARE_UPDATE_FAILED (UpdateError): not possible",
+        "errorCode": "1005",
+    }
 
 
 def test_post_serial_timeout_error(api_client, hardware):
