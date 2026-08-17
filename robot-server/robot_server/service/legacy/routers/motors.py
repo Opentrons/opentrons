@@ -1,3 +1,4 @@
+import asyncio
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
@@ -33,7 +34,7 @@ async def get_engaged_motors(
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> model.EngagedMotors:
     try:
-        engaged_axes = hardware.engaged_axes
+        engaged_axes = await asyncio.to_thread(lambda: hardware.engaged_axes)
         axes_dict = {
             str(k).lower(): model.EngagedMotor(enabled=v)
             for k, v in engaged_axes.items()

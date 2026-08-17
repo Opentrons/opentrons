@@ -1,3 +1,4 @@
+import asyncio
 import typing
 
 from fastapi import APIRouter, Depends, Query
@@ -58,7 +59,7 @@ async def get_pipettes(
     if refresh is True:
         await hardware.cache_instruments()
 
-    attached = hardware.attached_instruments
+    attached = await asyncio.to_thread(lambda: hardware.attached_instruments)
 
     def make_pipette(
         mount: Mount, pipette_dict: PipetteDict, is_ot2: bool
@@ -75,9 +76,9 @@ async def get_pipettes(
             id=pipette_dict.get("pipette_id"),
             mount_axis=mount_axis.lower(),
             plunger_axis=plunger_axis.lower(),
-            tip_length=pipette_dict.get("tip_length", 0)
-            if pipette_dict.get("model")
-            else None,
+            tip_length=(
+                pipette_dict.get("tip_length", 0) if pipette_dict.get("model") else None
+            ),
         )
 
     try:

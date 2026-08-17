@@ -207,13 +207,14 @@ class ModuleDataMapper:
             # support the Stacker.
             compatible_with_robot = False
             if self.deck_type == DeckType.OT3_STANDARD:
-                compatible_with_robot = self.hardware.is_simulator
                 rear_panel = self.hardware_state_store.attached_subsystems.get(
                     SubSystem.rear_panel
                 )
                 if rear_panel is not None:
                     rear_panel_rev = PCBARevision.from_string(rear_panel.pcba_revision)
                     compatible_with_robot = rear_panel_rev >= PCBARevision("D1")
+                else:
+                    compatible_with_robot = self.hardware.is_simulator
         elif module_type == ModuleType.VACUUM_MODULE:
             module_cls = VacuumModule
             assert ModuleDataValidator.is_vacuum_module_data(live_data["data"])

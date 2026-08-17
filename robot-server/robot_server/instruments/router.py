@@ -1,5 +1,6 @@
 """Instruments routes."""
 
+import asyncio
 from typing import Annotated, Dict, List, Optional, cast
 
 from fastapi import Depends, status
@@ -203,8 +204,11 @@ async def _get_instrument_data(
     hardware: OT3HardwareControlAPI,
     hardware_state_store: HardwareStateStore,
 ) -> List[AttachedItem]:
-    attached_pipettes = hardware.attached_pipettes
-    attached_gripper = hardware.attached_gripper
+    # TODO: replace these yucky thread calls with a designed async interface
+    # (not done before because they're used synchronously in a very large number of
+    # places)
+    attached_pipettes = await asyncio.to_thread(lambda: hardware.attached_pipettes)
+    attached_gripper = await asyncio.to_thread(lambda: hardware.attached_gripper)
 
     pipette_left = await _get_pipette_instrument_data(
         hardware, hardware_state_store, attached_pipettes, Mount.LEFT
