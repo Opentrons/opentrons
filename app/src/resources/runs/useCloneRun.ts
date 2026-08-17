@@ -41,20 +41,11 @@ export function useCloneRun(
     documentationState,
     {
       onSuccess: response => {
-        queryClient.setQueryData(
-          getQueryKey(host, 'runs', response.data.id, 'details'),
-          response
-        )
-
-        const invalidateRuns = queryClient.invalidateQueries(
-          getQueryKey(host, 'runs', 'details')
-        )
-        const invalidateProtocols = queryClient.invalidateQueries(
-          getQueryKey(host, 'protocols', protocolKey)
-        )
-        Promise.all([invalidateRuns, invalidateProtocols]).catch((e: Error) => {
-          console.error(`error invalidating runs query: ${e.message}`)
-        })
+        queryClient
+          .invalidateQueries(getQueryKey(host, 'protocols', protocolKey))
+          .catch((e: Error) => {
+            console.error(`error invalidating protocol query: ${e.message}`)
+          })
         // The onSuccess callback is not awaited until query invalidation, because currently, in every instance this
         // onSuccessCallback is utilized, we only use it for navigating. We may need to revisit this.
         onSuccessCallback?.(response)
