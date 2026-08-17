@@ -46,3 +46,9 @@
 .at_bottom {
   padding-bottom: var(--spacing-8);
 }
+
+.command_step_header input {
+  width: 60px;
+  text-align: center;
+  padding: 2px 4px;
+}

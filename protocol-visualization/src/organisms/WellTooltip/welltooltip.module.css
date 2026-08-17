@@ -1,6 +1,6 @@
 .popper_content {
   position: fixed;
-  z-index: 2;
+  z-index: 1001;
   width: max-content;
   padding: var(--spacing-8);
   border-radius: var(--border-radius-8);

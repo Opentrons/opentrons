@@ -52,6 +52,8 @@ export function ProtocolVisualization(
 
   const [selectedCommandId, setSelectedCommand] = useState<string | null>(null)
 
+  const [showStepDetail, setShowStepDetail] = useState<boolean>(true)
+
   // for resizable columns
   const [leftWidth, setLeftWidth] = useState<number>(INITIAL_WIDTH_PX)
   const [rightWidth, setRightWidth] = useState<number>(INITIAL_WIDTH_PX)
@@ -305,10 +307,8 @@ export function ProtocolVisualization(
             setSelectedCommand={setSelectedCommand}
             milliSecondsPerFrame={milliSecondsPerFrame}
             setMilliSecondsPerFrame={setMilliSecondsPerFrame}
-            // 将来のサイドバー制御をバインド可能
-            onClickStepDetail={() => {
-              console.log('Toggle sidebar action')
-            }}
+            showStepDetail={showStepDetail}
+            onClickStepDetail={setShowStepDetail}
           />
         </div>
         {/* Gutter between center & right */}
@@ -323,7 +323,7 @@ export function ProtocolVisualization(
           className={styles.right_column}
           style={{ width: `${rightWidth}px` }}
         >
-          {selectedRunTimeCommand != null ? (
+          {selectedRunTimeCommand != null && showStepDetail ? (
             <StepDetailContainer
               commands={commands}
               robotState={robotState}

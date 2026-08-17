@@ -1,7 +1,8 @@
 import { useLayoutEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import clsx from 'clsx'
 
-import { COLORS, CommandText } from '@opentrons/components'
+import { COLORS, CommandText, StyledText } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { CommandIcon } from '/app/molecules/Command'
@@ -60,6 +61,7 @@ export function IndividualCommand({
   scrollTargetId,
   listElement,
 }: IndividualCommandProps): JSX.Element {
+  const { t } = useTranslation('protocol_visualization')
   const commandRef = useRef<HTMLDivElement | null>(null)
   const iconColor = isHighlighted ? COLORS.purple50 : COLORS.grey50
 
@@ -68,10 +70,9 @@ export function IndividualCommand({
     if (command.id !== scrollTargetId) return
 
     const commandEl = commandRef.current
-    const groupExpandedEl =
-      fromGroup === true
-        ? commandEl.closest<HTMLElement>(`.${styles.annotated_group_expanded}`)
-        : null
+    const groupExpandedEl = fromGroup
+      ? commandEl.closest<HTMLElement>(`.${styles.annotated_group_expanded}`)
+      : null
     const outerListEl =
       listElement ?? commandEl.closest<HTMLElement>('[role="list"]') ?? null
 
@@ -128,6 +129,12 @@ export function IndividualCommand({
             </div>
           </div>
         </div>
+        <StyledText
+          color={COLORS.grey60}
+          desktopStyle="bodyDefaultRegular"
+        >
+          {t('step', { number: commandNumber })}
+        </StyledText>
       </div>
     </div>
   )

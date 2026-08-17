@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import clsx from 'clsx'
 
-import { COLORS, CommandText } from '@opentrons/components'
+import { COLORS, CommandText, StyledText } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { CommandIcon } from '../../molecules/CommandIcon'
@@ -67,10 +67,9 @@ export function IndividualCommand({
     if (command.id !== scrollTargetId) return
 
     const commandEl = commandRef.current
-    const groupExpandedEl =
-      fromGroup === true
-        ? commandEl.closest<HTMLElement>(`.${styles.annotated_group_expanded}`)
-        : null
+    const groupExpandedEl = fromGroup
+      ? commandEl.closest<HTMLElement>(`.${styles.annotated_group_expanded}`)
+      : null
     const outerListEl =
       listElement ?? commandEl.closest<HTMLElement>('[role="list"]') ?? null
 
