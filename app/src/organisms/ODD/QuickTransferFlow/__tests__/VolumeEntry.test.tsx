@@ -79,7 +79,6 @@ describe('VolumeEntry', () => {
         error: null,
         type: 'text',
         value: '',
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -104,7 +103,6 @@ describe('VolumeEntry', () => {
         error: null,
         type: 'text',
         value: '',
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -129,7 +127,6 @@ describe('VolumeEntry', () => {
         error: null,
         type: 'text',
         value: '',
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -172,7 +169,6 @@ describe('VolumeEntry', () => {
         error: 'Value must be between 5 to 50',
         type: 'text',
         value: '90',
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}

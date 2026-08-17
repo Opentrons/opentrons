@@ -69,8 +69,13 @@ export function useCreateRunFromProtocol(
     {
       ...options,
       onSuccess: (...args) => {
+        const [response] = args
+        queryClient.setQueryData(
+          getQueryKey(host, 'runs', response.data.id, 'details'),
+          response
+        )
         queryClient
-          .invalidateQueries(getQueryKey(host, 'runs'))
+          .invalidateQueries(getQueryKey(host, 'runs', 'details'))
           .catch((e: Error) => {
             console.error(`error invalidating runs query: ${e.message}`)
           })

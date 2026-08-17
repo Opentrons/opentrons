@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import { useRunQuery } from '@opentrons/react-api-client'
 
 import { useNotifyDataReady } from '../useNotifyDataReady'
@@ -20,9 +22,16 @@ export function useNotifyRunQuery<TError = Error>(
 
   const httpQueryResult = useRunQuery(runId, queryOptionsNotify, hostOverride)
 
-  if (shouldRefetch && runId != null) {
-    void httpQueryResult.refetch()
-  }
+  useEffect(() => {
+    // Route params can turn a missing id into the literal string "null" (e.g. `/runs/${null}` → `/runs/null`). Treat that like no id.
+    const isValidRunId = runId != null && runId !== 'null'
+    if (shouldRefetch && isValidRunId) {
+      void httpQueryResult.refetch()
+    }
+
+    // refetch is stable, the result object is not
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldRefetch, runId])
 
   return httpQueryResult
 }

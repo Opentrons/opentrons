@@ -26,10 +26,6 @@ export function WifiPasswordInput({
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
-  const handleBlur = (): void => {
-    if (inputRef.current != null) inputRef.current?.focus()
-  }
-
   const mainWrapperClasses = clsx(
     styles.main_wrapper,
     !isUnboxingFlowOngoing && styles.main_wrapper_with_top_margin
@@ -55,7 +51,6 @@ export function WifiPasswordInput({
                 aria-label="wifi_password"
                 value={password}
                 type={showPassword ? 'text' : 'password'}
-                onBlur={handleBlur}
                 ref={inputRef}
                 autoFocus
                 onChange={e => {

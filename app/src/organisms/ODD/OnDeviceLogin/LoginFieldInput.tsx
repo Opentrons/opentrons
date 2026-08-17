@@ -51,10 +51,7 @@ export function LoginFieldInput<
       value={field.value ?? ''}
       name={field.name}
       id={field.name}
-      onBlur={e => {
-        field.onBlur()
-        e.target.focus()
-      }}
+      onBlur={field.onBlur}
       onChange={(e: ChangeEvent<HTMLInputElement>) => {
         field.onChange(e.target.value)
         onClearError?.()

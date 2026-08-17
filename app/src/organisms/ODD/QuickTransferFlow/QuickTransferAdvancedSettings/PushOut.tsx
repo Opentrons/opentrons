@@ -181,9 +181,6 @@ export function PushOut(props: PushOutProps): JSX.Element {
               value={volume}
               error={volumeError}
               label={t('push_out_volume')}
-              onBlur={e => {
-                e.target.focus()
-              }}
               onChange={e => {
                 setVolume(Number(e.target.value))
               }}

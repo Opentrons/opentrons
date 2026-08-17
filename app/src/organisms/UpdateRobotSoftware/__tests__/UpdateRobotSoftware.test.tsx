@@ -78,13 +78,15 @@ const mockSession = {
 
 const mockAfterError = vi.fn()
 const mockBeforeCommitting = vi.fn()
+const mockAfterCancel = vi.fn()
 
-const render = () => {
+const render = (afterCancel: () => void = mockAfterCancel) => {
   return renderWithProviders(
     <UpdateRobotSoftware.UpdateRobotSoftware
       localRobot={mockRobot}
       afterError={mockAfterError}
       beforeCommittingSuccessfulUpdate={mockBeforeCommitting}
+      afterCancel={afterCancel}
     />,
     {
       i18nInstance: i18n,
@@ -96,6 +98,9 @@ const render = () => {
 describe('UpdateRobotSoftware', () => {
   beforeEach(() => {
     mockStartUpdate.mockClear()
+    mockAfterError.mockClear()
+    mockBeforeCommitting.mockClear()
+    mockAfterCancel.mockClear()
     vi.mocked(CompleteUpdateSoftware).mockReturnValue(
       <div>mock CompleteUpdateSoftware</div>
     )
@@ -179,5 +184,33 @@ describe('UpdateRobotSoftware', () => {
     vi.mocked(getRobotUpdateSession).mockReturnValue(mockInstallingSession)
     render()
     screen.getByText('mock UpdateSoftware')
+  })
+
+  it('should call afterCancel when the session is cleared', () => {
+    vi.mocked(getRobotUpdateSession).mockReturnValue(mockSession)
+    const [{ rerender }, store] = render(mockAfterCancel)
+    expect(mockAfterCancel).not.toHaveBeenCalled()
+
+    vi.mocked(getRobotUpdateSession).mockReturnValue(null)
+    vi.mocked(store.getState).mockReturnValue({
+      ...MOCK_STATE,
+      nonce: 1,
+    } as any)
+    rerender(
+      <UpdateRobotSoftware.UpdateRobotSoftware
+        localRobot={mockRobot}
+        afterError={mockAfterError}
+        beforeCommittingSuccessfulUpdate={mockBeforeCommitting}
+        afterCancel={mockAfterCancel}
+      />
+    )
+    expect(mockAfterCancel).toHaveBeenCalled()
+  })
+
+  it('should not call afterCancel before a session exists', () => {
+    vi.mocked(getRobotUpdateSession).mockReturnValue(null)
+    render(mockAfterCancel)
+    expect(mockAfterError).not.toHaveBeenCalled()
+    expect(mockAfterCancel).not.toHaveBeenCalled()
   })
 })

@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 
 import { useClientData, useUpdateClientData } from '@opentrons/react-api-client'
 
@@ -27,9 +27,14 @@ export function useClientDataLogDeletion(
     queryOptionsNotify
   )
 
-  if (shouldRefetch) {
-    void httpQueryResult.refetch()
-  }
+  useEffect(() => {
+    if (shouldRefetch) {
+      void httpQueryResult.refetch()
+    }
+
+    // refetch is stable, the result object is not
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldRefetch])
 
   const { data } = httpQueryResult
 

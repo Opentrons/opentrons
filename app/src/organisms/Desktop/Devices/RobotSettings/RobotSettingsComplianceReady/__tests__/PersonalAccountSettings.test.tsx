@@ -128,12 +128,12 @@ describe('PersonalAccountSettings', () => {
     openEditForm()
     expect(screen.getByDisplayValue('alice')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Alice Example')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'save' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
 
     fireEvent.click(screen.getAllByRole('button', { name: 'Cancel' })[1]!)
     expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument()
     expect(
-      screen.queryByRole('button', { name: 'save' })
+      screen.queryByRole('button', { name: 'Save' })
     ).not.toBeInTheDocument()
   })
 
@@ -202,7 +202,7 @@ describe('PersonalAccountSettings', () => {
     fireEvent.change(screen.getByDisplayValue('Alice Example'), {
       target: { value: 'Alice Updated' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'save' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
       expect(mockUpdateSelf).toHaveBeenCalledOnce()
@@ -216,7 +216,7 @@ describe('PersonalAccountSettings', () => {
     })
     expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument()
     expect(
-      screen.queryByRole('button', { name: 'save' })
+      screen.queryByRole('button', { name: 'Save' })
     ).not.toBeInTheDocument()
   })
 
@@ -251,7 +251,7 @@ describe('PersonalAccountSettings', () => {
       renderComponent()
       openEditForm()
       applyChange()
-      fireEvent.click(screen.getByRole('button', { name: 'save' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 
       await waitFor(() => {
         expect(mockUpdateSelf).toHaveBeenCalledWith({ data: expectedData })
@@ -266,12 +266,12 @@ describe('PersonalAccountSettings', () => {
     fireEvent.change(screen.getByDisplayValue('alice'), {
       target: { value: 'alice2' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'save' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
       screen.getByText('Unable to save account settings. Try again.')
     })
-    expect(screen.getByRole('button', { name: 'save' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
   })
 
   it('shows a username error when updateSelf returns username already exists', async () => {
@@ -281,14 +281,14 @@ describe('PersonalAccountSettings', () => {
     fireEvent.change(screen.getByDisplayValue('alice'), {
       target: { value: 'bob' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'save' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
       screen.getByText(
         'This username is already taken. Choose a different username.'
       )
     })
-    expect(screen.getByRole('button', { name: 'save' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
     expect(
       screen.queryByText('Unable to save account settings. Try again.')
     ).not.toBeInTheDocument()
