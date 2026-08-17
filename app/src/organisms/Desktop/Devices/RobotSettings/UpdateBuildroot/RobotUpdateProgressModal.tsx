@@ -73,10 +73,6 @@ export function RobotUpdateProgressModal({
   const [showFileSelect, setShowFileSelect] = useState<boolean>(false)
   const installFromFileRef = useRef<HTMLInputElement>(null)
 
-  const completeRobotUpdateHandler = (): void => {
-    if (closeUpdateBuildroot != null) closeUpdateBuildroot()
-  }
-
   const { updateStep, progressPercent } = useRobotUpdateInfo(robotName, session)
 
   let { error } = session || { error: null }
@@ -87,7 +83,6 @@ export function RobotUpdateProgressModal({
 
   useStatusBarAnimation(error != null)
   useCleanupRobotUpdateSessionOnDismount()
-  useDismissIfSessionCleared(session, closeUpdateBuildroot)
 
   const handleFileSelect: ChangeEventHandler<HTMLInputElement> = event => {
     const { files } = event.target
@@ -328,17 +323,6 @@ function useCleanupRobotUpdateSessionOnDismount(): void {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
-}
-
-function useDismissIfSessionCleared(
-  session: RobotUpdateSession | null,
-  closeUpdateBuildroot?: () => void
-): void {
-  useEffect(() => {
-    if (session == null) {
-      closeUpdateBuildroot?.()
-    }
-  }, [session, closeUpdateBuildroot])
 }
 
 function useGetModalText(

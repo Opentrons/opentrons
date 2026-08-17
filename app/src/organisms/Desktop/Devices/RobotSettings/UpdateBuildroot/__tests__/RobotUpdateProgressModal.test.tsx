@@ -108,12 +108,6 @@ describe('DownloadUpdateModal', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
-  it('closes when the update session is cleared after login or documentation cancel', () => {
-    props = { ...props, session: null }
-    render(props)
-    expect(props.closeUpdateBuildroot).toHaveBeenCalled()
-  })
-
   it('renders the correct text when finalizing the robot update with no close button', () => {
     vi.mocked(useRobotUpdateInfo).mockReturnValue({
       updateStep: 'restart',

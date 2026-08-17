@@ -13,7 +13,6 @@ import type { RobotUpdateSession } from '/app/redux/robot-update/types'
 import type { State } from '/app/redux/types'
 
 const mockStartUpdate = vi.hoisted(() => vi.fn())
-const mockNavigate = vi.hoisted(() => vi.fn())
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
