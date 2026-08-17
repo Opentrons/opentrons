@@ -288,7 +288,7 @@ async def test_create_pause_action(
     )
 
     decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
-    decoy.verify(mock_run_orchestrator_store.pause(), times=1)
+    decoy.verify(await mock_run_orchestrator_store.pause(), times=1)
 
 
 async def test_create_stop_action(
@@ -341,7 +341,9 @@ async def test_create_resume_from_recovery_action(
 
     decoy.verify(mock_run_store.insert_action(run_id, result), times=1)
     decoy.verify(
-        mock_run_orchestrator_store.resume_from_recovery(reconcile_false_positive=False)
+        await mock_run_orchestrator_store.resume_from_recovery(
+            reconcile_false_positive=False
+        )
     )
 
 

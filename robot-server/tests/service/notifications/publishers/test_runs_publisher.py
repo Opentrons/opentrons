@@ -201,7 +201,7 @@ async def test_handle_relevant_engine_change(
     assert runs_publisher._engine_state_slice
 
     runs_publisher._run_hooks.run_id = "1234"
-    runs_publisher._run_hooks.get_state_summary = MagicMock(
+    runs_publisher._run_hooks.get_state_summary = AsyncMock(
         return_value=MagicMock(status=EngineStatus.IDLE, labwareOffsets=[])
     )
     runs_publisher._engine_state_slice.state_summary_status = EngineStatus.IDLE
@@ -241,7 +241,7 @@ async def test_handle_labware_offset_count_change(
 
     initial_offsets = ["offset1", "offset2"]
     runs_publisher._run_hooks.run_id = "1234"
-    runs_publisher._run_hooks.get_state_summary = MagicMock(
+    runs_publisher._run_hooks.get_state_summary = AsyncMock(
         return_value=MagicMock(status=EngineStatus.IDLE, labwareOffsets=initial_offsets)
     )
     runs_publisher._engine_state_slice.state_summary_status = EngineStatus.IDLE

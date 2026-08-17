@@ -155,7 +155,7 @@ class ProtocolAnalyzer:
             labware_offsets=[],
         )
 
-    def __del__(self) -> None:
+    async def __aexit__(self) -> None:
         """Stop the simulating run orchestrator.
 
         Once the analyzer is no longer in use- either because analysis completed
@@ -163,13 +163,9 @@ class ProtocolAnalyzer:
         are stopped timely and do not block server shutdown.
         """
         if self._coordinator is not None:
-            okay_to_clear = asyncio.run_coroutine_threadsafe(
-                self._coordinator.get_is_okay_to_clear(), asyncio.get_running_loop()
-            ).result()
+            okay_to_clear = await self._coordinator.get_is_okay_to_clear()
             if okay_to_clear:
-                asyncio.run_coroutine_threadsafe(
-                    self._coordinator.stop(), asyncio.get_running_loop()
-                )
+                await self._coordinator.stop()
                 if feature_flags.protocol_subprocess_enabled():
                     self._run_process_pyro_provider.set_active_process_as_used(
                         simulator=True
