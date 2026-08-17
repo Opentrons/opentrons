@@ -46,7 +46,11 @@ from .instrument_models import (
     PipetteData,
     PipetteState,
 )
-from robot_server.hardware import get_hardware
+from robot_server.hardware import (
+    HardwareStateStore,
+    get_hardware,
+    get_hardware_state_store,
+)
 from robot_server.subsystems.models import SubSystem
 from robot_server.subsystems.router import status_route_for, update_route_for
 
@@ -75,27 +79,29 @@ def _pipette_dict_to_pipette_res(
                 channels=pipette_dict["channels"],
                 min_volume=pipette_dict["min_volume"],
                 max_volume=pipette_dict["max_volume"],
-                calibratedOffset=InstrumentCalibrationData.model_construct(
-                    offset=Vec3f(
-                        x=calibration_data.offset.x,
-                        y=calibration_data.offset.y,
-                        z=calibration_data.offset.z,
-                    ),
-                    source=calibration_data.source,
-                    last_modified=calibration_data.last_modified,
-                    reasonability_check_failures=[
-                        InconsistentCalibrationFailure.model_construct(
-                            offsets={
-                                k.name: Vec3f.model_construct(x=v.x, y=v.y, z=v.z)
-                                for k, v in failure.offsets.items()
-                            },
-                            limit=failure.limit,
-                        )
-                        for failure in calibration_data.reasonability_check_failures
-                    ],
-                )
-                if calibration_data
-                else None,
+                calibratedOffset=(
+                    InstrumentCalibrationData.model_construct(
+                        offset=Vec3f(
+                            x=calibration_data.offset.x,
+                            y=calibration_data.offset.y,
+                            z=calibration_data.offset.z,
+                        ),
+                        source=calibration_data.source,
+                        last_modified=calibration_data.last_modified,
+                        reasonability_check_failures=[
+                            InconsistentCalibrationFailure.model_construct(
+                                offsets={
+                                    k.name: Vec3f.model_construct(x=v.x, y=v.y, z=v.z)
+                                    for k, v in failure.offsets.items()
+                                },
+                                limit=failure.limit,
+                            )
+                            for failure in calibration_data.reasonability_check_failures
+                        ],
+                    )
+                    if calibration_data
+                    else None
+                ),
             ),
             state=PipetteState.model_validate(pipette_state) if pipette_state else None,
         )
@@ -151,10 +157,11 @@ def _bad_pipette_response(subsystem: SubSystem) -> BadPipette:
 
 async def _get_gripper_instrument_data(
     hardware: OT3HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
     attached_gripper: Optional[GripperDict],
 ) -> Optional[AttachedItem]:
     subsys = HWSubSystem.of_mount(OT3Mount.GRIPPER)
-    status = hardware.attached_subsystems.get(subsys)
+    status = hardware_state_store.attached_subsystems.get(subsys)
     if status and (status.fw_update_needed or not status.ok):
         return _bad_gripper_response()
     if attached_gripper:
@@ -167,12 +174,13 @@ async def _get_gripper_instrument_data(
 
 async def _get_pipette_instrument_data(
     hardware: OT3HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
     attached_pipettes: Dict[Mount, PipetteDict],
     mount: Mount,
 ) -> Optional[AttachedItem]:
     pipette_dict = attached_pipettes.get(mount)
     subsys = HWSubSystem.of_mount(mount)
-    status = hardware.attached_subsystems.get(subsys)
+    status = hardware_state_store.attached_subsystems.get(subsys)
     if status and (status.fw_update_needed or not status.ok):
         return _bad_pipette_response(SubSystem.from_hw(subsys))
     if pipette_dict:
@@ -193,17 +201,20 @@ async def _get_pipette_instrument_data(
 
 async def _get_instrument_data(
     hardware: OT3HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
 ) -> List[AttachedItem]:
     attached_pipettes = hardware.attached_pipettes
     attached_gripper = hardware.attached_gripper
 
     pipette_left = await _get_pipette_instrument_data(
-        hardware, attached_pipettes, Mount.LEFT
+        hardware, hardware_state_store, attached_pipettes, Mount.LEFT
     )
     pipette_right = await _get_pipette_instrument_data(
-        hardware, attached_pipettes, Mount.RIGHT
+        hardware, hardware_state_store, attached_pipettes, Mount.RIGHT
     )
-    gripper = await _get_gripper_instrument_data(hardware, attached_gripper)
+    gripper = await _get_gripper_instrument_data(
+        hardware, hardware_state_store, attached_gripper
+    )
 
     info_list = []
     for info in (pipette_left, pipette_right, gripper):
@@ -213,11 +224,10 @@ async def _get_instrument_data(
 
 
 async def _get_attached_instruments_ot3(
-    hardware: OT3HardwareControlAPI,
+    hardware: OT3HardwareControlAPI, hardware_state_store: HardwareStateStore
 ) -> PydanticResponse[SimpleMultiBody[AttachedItem]]:
-    # OT3
     await hardware.cache_instruments(skip_if_would_block=True)
-    response_data = await _get_instrument_data(hardware)
+    response_data = await _get_instrument_data(hardware, hardware_state_store)
     return await PydanticResponse.create(
         content=SimpleMultiBody.model_construct(
             data=response_data,
@@ -266,6 +276,9 @@ async def _get_attached_instruments_ot2(
 )
 async def get_attached_instruments(
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    hardware_state_store: Annotated[
+        HardwareStateStore, Depends(get_hardware_state_store)
+    ],
 ) -> PydanticResponse[SimpleMultiBody[AttachedItem]]:
     """Get a list of all attached instruments.
 
@@ -277,7 +290,7 @@ async def get_attached_instruments(
     """
     try:
         ot3_hardware = ensure_ot3_hardware(hardware_api=hardware)
-        return await _get_attached_instruments_ot3(ot3_hardware)
+        return await _get_attached_instruments_ot3(ot3_hardware, hardware_state_store)
     except HardwareNotSupportedError:
         # OT2
         pass

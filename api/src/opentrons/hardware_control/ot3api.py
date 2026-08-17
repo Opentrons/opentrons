@@ -399,7 +399,9 @@ class OT3API(
                 mod_log.exception("Errored during module asynchronous callback")
 
     def _send_subsystem_notification(self) -> None:
-        subsystem_event = SubsystemConnectionNotification()
+        subsystem_event = SubsystemConnectionNotification(
+            tracked_subsystems=self.attached_subsystems
+        )
         mod_log.info("Forwarding subsystem event.")
         for cb in self._callbacks:
             try:

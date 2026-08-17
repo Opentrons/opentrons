@@ -9,7 +9,6 @@ from decoy import Decoy, matchers
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
-    DoorState,
     EstopState,
     EstopStateNotification,
     StatusBarState,
@@ -30,19 +29,6 @@ from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
 def run_orchestrator_store(decoy: Decoy) -> RunOrchestratorStore:
     """Mock out the EngineStore."""
     return decoy.mock(cls=RunOrchestratorStore)
-
-
-@pytest.fixture
-def hardware_state_store(hardware_api: HardwareControlAPI) -> HardwareStateStore:
-    """Build a hardware state store on fixtured data."""
-    return HardwareStateStore(
-        hardware_resource=hardware_api,
-        attached_modules=[],
-        attached_subsystems={},
-        estop_state=EstopState.DISENGAGED,
-        door_state=DoorState.CLOSED,
-        module_door_serial=None,
-    )
 
 
 @pytest.fixture
@@ -130,21 +116,26 @@ async def test_get_current_status(
         SubSystem.head,
     ]
 
-    mock_ret = {
-        node: SubSystemState(
-            ok=True,
-            current_fw_version=1,
-            next_fw_version=1,
-            fw_update_needed=False,
-            current_fw_sha="abcdefg",
-            pcba_revision="fake_pcb",
-            update_state=UpdateState.updating if node in active_updates else None,
-        )
-        for node in all_nodes
-    }
-    decoy.when(hardware_api.attached_subsystems).then_return(mock_ret)
+    decoy.when(hardware_api.attached_subsystems).then_raise(
+        RuntimeError("not allowed to call this")
+    )
     subject._hardware_state_store.update_hardware_status_callback(
-        event=SubsystemConnectionNotification()
+        event=SubsystemConnectionNotification(
+            tracked_subsystems={
+                node: SubSystemState(
+                    ok=True,
+                    current_fw_version=1,
+                    next_fw_version=1,
+                    fw_update_needed=False,
+                    current_fw_sha="abcdefg",
+                    pcba_revision="fake_pcb",
+                    update_state=(
+                        UpdateState.updating if node in active_updates else None
+                    ),
+                )
+                for node in all_nodes
+            },
+        )
     )
 
     current_status = await subject.get_current_status()

@@ -670,6 +670,7 @@ class ModuleConnectedNotification:
 
 @dataclass(frozen=True)
 class SubsystemConnectionNotification:
+    tracked_subsystems: dict[SubSystem, SubSystemState]
     event: Literal[HardwareEventType.SUBSYSTEM_CONNECTION] = (
         HardwareEventType.SUBSYSTEM_CONNECTION
     )
@@ -680,6 +681,9 @@ class SubsystemConnectionNotification:
         return {
             "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
             "event": obj.event,
+            "tracked_subsystems": {
+                k.value: v for k, v in obj.tracked_subsystems.items()
+            },
         }
 
     @staticmethod
@@ -689,6 +693,10 @@ class SubsystemConnectionNotification:
         """Consumed by Serpent, convert from a Pyro Dictionary."""
         return SubsystemConnectionNotification(
             event=HardwareEventType(data["event"]["value"]),  # type: ignore
+            tracked_subsystems={
+                SubSystem(k): SubSystemState.model_validate(v)
+                for k, v in data["tracked_subsystems"].items()
+            },
         )
 
 

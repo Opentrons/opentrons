@@ -214,7 +214,7 @@ class HardwareStateStore:
         ):
             self._attached_modules = self._hardware_resource.attached_modules
         if isinstance(event, SubsystemConnectionNotification):
-            self._attached_subsystems = self._hardware_resource.attached_subsystems
+            self._attached_subsystems = event.tracked_subsystems
         if isinstance(event, EstopStateNotification):
             self._estop_state = event.new_state
         if isinstance(event, DoorStateNotification):

@@ -31,6 +31,7 @@ from opentrons_shared_data.gripper.gripper_definition import (
 )
 from opentrons_shared_data.pipette.types import PipetteModel, PipetteName
 
+from robot_server.hardware import HardwareStateStore
 from robot_server.instruments.instrument_models import (
     BadGripper,
     BadPipette,
@@ -95,19 +96,21 @@ def ot3_hardware_api(
 async def test_get_instruments_empty(
     decoy: Decoy,
     ot3_hardware_api: OT3API,
+    hardware_state_store: HardwareStateStore,
 ) -> None:
     """It should get an empty instruments list from hardware API."""
     decoy.when(ot3_hardware_api.attached_gripper).then_return(None)
     decoy.when(ot3_hardware_api.attached_pipettes).then_return({})
-    result = await get_attached_instruments(hardware=ot3_hardware_api)
+    result = await get_attached_instruments(
+        hardware=ot3_hardware_api, hardware_state_store=hardware_state_store
+    )
     assert result.content.data == []
     assert result.status_code == 200
 
 
 @pytest.mark.ot3_only
 async def test_get_all_attached_instruments(
-    decoy: Decoy,
-    ot3_hardware_api: OT3API,
+    decoy: Decoy, ot3_hardware_api: OT3API, hardware_state_store: HardwareStateStore
 ) -> None:
     """It should get data of all attached instruments."""
     left_pipette_dict = get_sample_pipette_dict(
@@ -156,36 +159,37 @@ async def test_get_all_attached_instruments(
         decoy.when(
             await ot3_hardware_api.get_instrument_state(Mount.RIGHT)
         ).then_return({"tip_detected": False})
-        decoy.when(ot3_hardware_api.attached_subsystems).then_return(
-            {
-                HWSubSystem.pipette_left: SubSystemState(
-                    ok=True,
-                    current_fw_version=10,
-                    next_fw_version=11,
-                    fw_update_needed=False,
-                    current_fw_sha="some-sha",
-                    pcba_revision="A1.0",
-                    update_state=None,
-                ),
-                HWSubSystem.pipette_right: SubSystemState(
-                    ok=True,
-                    current_fw_version=11,
-                    next_fw_version=11,
-                    fw_update_needed=False,
-                    current_fw_sha="some-other-sha",
-                    pcba_revision="A1.0",
-                    update_state=None,
-                ),
-                HWSubSystem.gripper: SubSystemState(
-                    ok=True,
-                    current_fw_version=11,
-                    next_fw_version=11,
-                    fw_update_needed=False,
-                    current_fw_sha="some-other-sha",
-                    pcba_revision="A1.0",
-                    update_state=None,
-                ),
-            }
+        hardware_state_store._attached_subsystems = {
+            HWSubSystem.pipette_left: SubSystemState(
+                ok=True,
+                current_fw_version=10,
+                next_fw_version=11,
+                fw_update_needed=False,
+                current_fw_sha="some-sha",
+                pcba_revision="A1.0",
+                update_state=None,
+            ),
+            HWSubSystem.pipette_right: SubSystemState(
+                ok=True,
+                current_fw_version=11,
+                next_fw_version=11,
+                fw_update_needed=False,
+                current_fw_sha="some-other-sha",
+                pcba_revision="A1.0",
+                update_state=None,
+            ),
+            HWSubSystem.gripper: SubSystemState(
+                ok=True,
+                current_fw_version=11,
+                next_fw_version=11,
+                fw_update_needed=False,
+                current_fw_sha="some-other-sha",
+                pcba_revision="A1.0",
+                update_state=None,
+            ),
+        }
+        decoy.when(ot3_hardware_api.attached_subsystems).then_raise(
+            RuntimeError("cant touch this")
         )
 
     # We use this convoluted way of testing to verify the important point that
@@ -213,7 +217,9 @@ async def test_get_all_attached_instruments(
             reasonability_check_failures=[],
         )
     )
-    result = await get_attached_instruments(hardware=ot3_hardware_api)
+    result = await get_attached_instruments(
+        hardware=ot3_hardware_api, hardware_state_store=hardware_state_store
+    )
 
     assert result.content.data == [
         Pipette.model_construct(
@@ -284,12 +290,15 @@ async def test_get_all_attached_instruments(
 async def test_get_ot2_instruments(
     decoy: Decoy,
     ot2_hardware_api: HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
 ) -> None:
     """It should return attached pipettes on OT2."""
     # Return empty data when no pipettes attached
     decoy.when(ot2_hardware_api.attached_instruments).then_return({})
 
-    result1 = await get_attached_instruments(hardware=ot2_hardware_api)
+    result1 = await get_attached_instruments(
+        hardware=ot2_hardware_api, hardware_state_store=hardware_state_store
+    )
     assert result1.content.data == []
     assert result1.status_code == 200
 
@@ -305,7 +314,9 @@ async def test_get_ot2_instruments(
             Mount.LEFT: cast(PipetteDict, {}),
         }
     )
-    result2 = await get_attached_instruments(hardware=ot2_hardware_api)
+    result2 = await get_attached_instruments(
+        hardware=ot2_hardware_api, hardware_state_store=hardware_state_store
+    )
     decoy.verify(await ot2_hardware_api.cache_instruments(), times=0)
     assert result2.status_code == 200
     assert result2.content.data == [
@@ -328,7 +339,7 @@ async def test_get_ot2_instruments(
 
 @pytest.mark.ot3_only
 async def test_get_96_channel_instruments(
-    decoy: Decoy, ot3_hardware_api: OT3API
+    decoy: Decoy, ot3_hardware_api: OT3API, hardware_state_store: HardwareStateStore
 ) -> None:
     """It should correctly be able to construct a 96 channel pipette."""
     # Return attached pipettes
@@ -350,7 +361,9 @@ async def test_get_96_channel_instruments(
         }
     )
     decoy.when(ot3_hardware_api.attached_gripper).then_return(None)
-    result2 = await get_attached_instruments(hardware=ot3_hardware_api)
+    result2 = await get_attached_instruments(
+        hardware=ot3_hardware_api, hardware_state_store=hardware_state_store
+    )
     decoy.when(ot3_hardware_api.get_instrument_offset(OT3Mount.LEFT)).then_return(None)
     decoy.when(ot3_hardware_api.get_instrument_offset(OT3Mount.RIGHT)).then_return(None)
     assert result2.status_code == 200
@@ -376,6 +389,7 @@ async def test_get_96_channel_instruments(
 async def test_get_instrument_not_ok(
     decoy: Decoy,
     ot3_hardware_api: OT3API,
+    hardware_state_store: HardwareStateStore,
 ) -> None:
     """It should return a BadPipette/BadGripper if an instrument needs an update."""
     left_pipette_dict = get_sample_pipette_dict(
@@ -408,38 +422,41 @@ async def test_get_instrument_not_ok(
             Mount.LEFT: left_pipette_dict,
         }
     )
-    decoy.when(ot3_hardware_api.attached_subsystems).then_return(
-        {
-            HWSubSystem.pipette_left: SubSystemState(
-                ok=True,
-                current_fw_version=10,
-                next_fw_version=11,
-                fw_update_needed=True,
-                current_fw_sha="some-sha",
-                pcba_revision="A1.0",
-                update_state=None,
-            ),
-            HWSubSystem.pipette_right: SubSystemState(
-                ok=False,
-                current_fw_version=11,
-                next_fw_version=11,
-                fw_update_needed=True,
-                current_fw_sha="some-other-sha",
-                pcba_revision="A1.0",
-                update_state=None,
-            ),
-            HWSubSystem.gripper: SubSystemState(
-                ok=False,
-                current_fw_version=11,
-                next_fw_version=11,
-                fw_update_needed=True,
-                current_fw_sha="some-other-sha",
-                pcba_revision="A1.0",
-                update_state=None,
-            ),
-        }
+    hardware_state_store._attached_subsystems = {
+        HWSubSystem.pipette_left: SubSystemState(
+            ok=True,
+            current_fw_version=10,
+            next_fw_version=11,
+            fw_update_needed=True,
+            current_fw_sha="some-sha",
+            pcba_revision="A1.0",
+            update_state=None,
+        ),
+        HWSubSystem.pipette_right: SubSystemState(
+            ok=False,
+            current_fw_version=11,
+            next_fw_version=11,
+            fw_update_needed=True,
+            current_fw_sha="some-other-sha",
+            pcba_revision="A1.0",
+            update_state=None,
+        ),
+        HWSubSystem.gripper: SubSystemState(
+            ok=False,
+            current_fw_version=11,
+            next_fw_version=11,
+            fw_update_needed=True,
+            current_fw_sha="some-other-sha",
+            pcba_revision="A1.0",
+            update_state=None,
+        ),
+    }
+    decoy.when(ot3_hardware_api.attached_subsystems).then_raise(
+        RuntimeError("cant touch this")
     )
-    response = await get_attached_instruments(ot3_hardware_api)
+    response = await get_attached_instruments(
+        ot3_hardware_api, hardware_state_store=hardware_state_store
+    )
     assert response.status_code == 200
     assert response.content.data == [
         BadPipette(

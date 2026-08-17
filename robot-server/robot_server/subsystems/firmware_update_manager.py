@@ -347,6 +347,7 @@ class FirmwareUpdateManager:
     ) -> _UpdateProcess:
         hw_subsystem = subsystem.to_hw()
 
+        # note: this is a pyro blocking call but it is rare
         if hw_subsystem not in self._hardware_handle.attached_subsystems:
             raise SubsystemNotFound(subsystem)
 

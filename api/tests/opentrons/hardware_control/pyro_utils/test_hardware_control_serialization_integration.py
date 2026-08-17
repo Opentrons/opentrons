@@ -743,7 +743,27 @@ CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
         module_serial="ABCDF4",
     ),
     hw_types.SubsystemConnectionNotification: hw_types.SubsystemConnectionNotification(
-        event=hw_types.HardwareEventType.SUBSYSTEM_CONNECTION
+        tracked_subsystems={
+            hw_types.SubSystem.gantry_x: hw_types.SubSystemState(
+                ok=True,
+                current_fw_version=10,
+                next_fw_version=10,
+                fw_update_needed=True,
+                current_fw_sha="asdasd",
+                pcba_revision="a1",
+                update_state=None,
+            ),
+            hw_types.SubSystem.rear_panel: hw_types.SubSystemState(
+                ok=False,
+                current_fw_version=49,
+                next_fw_version=12,
+                fw_update_needed=False,
+                current_fw_sha="asdasd",
+                pcba_revision="12312",
+                update_state=hw_types.UpdateState.updating,
+            ),
+        },
+        event=hw_types.HardwareEventType.SUBSYSTEM_CONNECTION,
     ),
     hw_types.AsynchronousModuleErrorNotification: hw_types.AsynchronousModuleErrorNotification(
         exception=CommunicationError(
@@ -985,7 +1005,14 @@ async def test_serialization_validation_with_mock_data() -> None:  # noqa: C901
                     # then please mock it anyways, something might expose it some day causing other tests to fail!
                     raise KeyError(f"{e} - Mock data missing for type {clazz}")
 
-                deserialized_output = tester_proxy.data_in_data_out(mock_data)
+                try:
+                    deserialized_output = tester_proxy.data_in_data_out(mock_data)
+                except BaseException:
+                    print(  # noqa: T201
+                        f"Pyro deserialization failure for class {clazz} with data {mock_data}"
+                    )
+                    raise
+
                 assert deserialized_output == mock_data
 
         daemon.close()

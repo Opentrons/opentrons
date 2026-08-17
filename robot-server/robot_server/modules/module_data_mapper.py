@@ -55,7 +55,12 @@ from .module_models import (
     VacuumModule,
     VacuumModuleData,
 )
-from robot_server.hardware import get_deck_type, get_hardware
+from robot_server.hardware import (
+    HardwareStateStore,
+    get_deck_type,
+    get_hardware,
+    get_hardware_state_store,
+)
 
 
 class ModuleDataMapper:
@@ -65,9 +70,13 @@ class ModuleDataMapper:
         self,
         deck_type: Annotated[DeckType, Depends(get_deck_type)],
         hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
+        hardware_state_store: Annotated[
+            HardwareStateStore, Depends(get_hardware_state_store)
+        ],
     ) -> None:
         self.deck_type = deck_type
         self.hardware = hardware
+        self.hardware_state_store = hardware_state_store
 
     def map_data(  # noqa: C901
         self,
@@ -199,7 +208,9 @@ class ModuleDataMapper:
             compatible_with_robot = False
             if self.deck_type == DeckType.OT3_STANDARD:
                 compatible_with_robot = self.hardware.is_simulator
-                rear_panel = self.hardware.attached_subsystems.get(SubSystem.rear_panel)
+                rear_panel = self.hardware_state_store.attached_subsystems.get(
+                    SubSystem.rear_panel
+                )
                 if rear_panel is not None:
                     rear_panel_rev = PCBARevision.from_string(rear_panel.pcba_revision)
                     compatible_with_robot = rear_panel_rev >= PCBARevision("D1")
