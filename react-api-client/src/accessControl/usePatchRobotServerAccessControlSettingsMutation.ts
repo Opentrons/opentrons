@@ -58,13 +58,10 @@ export function usePatchRobotServerAccessControlSettingsMutation(
     }: DocumentedMutationParameters<PatchRobotServerAccessControlSettingsRequest>) =>
       patchRobotServerAccessControlSettings(host!, body, userNotes)
         .then(response => {
-          queryClient
-            .invalidateQueries(getQueryKey(host, 'accessControl', 'settings'))
-            .catch((e: Error) => {
-              console.error(
-                `error invalidating robot server access control settings query: ${e.message}`
-              )
-            })
+          queryClient.setQueryData(
+            getQueryKey(host, 'accessControl', 'settings'),
+            response.data
+          )
           return response.data
         })
         .catch((e: AxiosError) => {
