@@ -172,6 +172,7 @@ async def test_add_pending(
     expected_summary = AnalysisSummary(
         id="analysis-id",
         status=AnalysisStatus.PENDING,
+        result=None,
     )
 
     subject.add_pending(
@@ -226,6 +227,12 @@ async def test_returned_in_order_added(
     full_analyses = await subject.get_by_protocol(protocol_id="protocol-id")
     assert [s.id for s in summaries] == expected_order
     assert [a.id for a in full_analyses] == expected_order
+    assert [s.result for s in summaries] == [
+        AnalysisResult.OK,
+        AnalysisResult.OK,
+        AnalysisResult.OK,
+        None,
+    ]
 
 
 async def test_update_adds_details_and_completes_analysis(
@@ -301,6 +308,13 @@ async def test_update_adds_details_and_completes_analysis(
         commandAnnotations=[command_annotation],
     )
     assert await subject.get_by_protocol("protocol-id") == [result]
+    assert subject.get_summaries_by_protocol("protocol-id") == [
+        AnalysisSummary(
+            id="analysis-id",
+            status=AnalysisStatus.COMPLETED,
+            result=AnalysisResult.OK,
+        )
+    ]
     assert json.loads(result_as_document) == {
         "id": "analysis-id",
         "result": "ok",
@@ -528,6 +542,13 @@ async def test_update_infers_status_from_errors(
     analysis = (await subject.get_by_protocol("protocol-id"))[0]
     assert isinstance(analysis, CompletedAnalysis)
     assert analysis.result == expected_result
+    assert subject.get_summaries_by_protocol("protocol-id") == [
+        AnalysisSummary(
+            id="analysis-id",
+            status=AnalysisStatus.COMPLETED,
+            result=expected_result,
+        )
+    ]
 
 
 async def test_save_initialization_failed_analysis(

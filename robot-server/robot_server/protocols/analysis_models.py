@@ -75,6 +75,10 @@ class AnalysisSummary(BaseModel):
 
     id: str = Field(..., description="Unique identifier of this analysis resource")
     status: AnalysisStatus = Field(..., description="Status of the analysis")
+    result: Optional[AnalysisResult] = Field(
+        default=None,
+        description="Result of the analysis. This field is only present after the analysis is completed.",
+    )
     runTimeParameters: Optional[List[RunTimeParameter]] = Field(
         default=None,
         description=(

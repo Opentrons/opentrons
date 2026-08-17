@@ -14,7 +14,12 @@ from pydantic import ValidationError
 from opentrons.protocols.parameters.types import PrimitiveAllowedTypes
 
 from .analysis_memcache import MemoryCache
-from .analysis_models import CompletedAnalysis
+from .analysis_models import (
+    AnalysisResult,
+    AnalysisStatus,
+    AnalysisSummary,
+    CompletedAnalysis,
+)
 from .rtp_resources import CSVParameterResource, PrimitiveParameterResource
 from robot_server.persistence.database import sqlite_rowid
 from robot_server.persistence.pydantic import json_to_pydantic, pydantic_to_json
@@ -74,6 +79,7 @@ class CompletedAnalysisResource:
             "protocol_id": self.protocol_id,
             "analyzer_version": self.analyzer_version,
             "completed_analysis": serialized_analysis,
+            "result": self.completed_analysis.result,
         }
 
     @classmethod
@@ -283,6 +289,29 @@ class CompletedAnalysisStore:
             result_ids.append(row.id)
 
         return result_ids
+
+    def get_summaries_by_protocol(self, protocol_id: str) -> List[AnalysisSummary]:
+        """Like `get_by_protocol()`, but return only the summary of each analysis."""
+        statement = (
+            sqlalchemy.select(analysis_table.c.id, analysis_table.c.result)
+            .where(analysis_table.c.protocol_id == protocol_id)
+            .order_by(sqlite_rowid)
+        )
+        with self._sql_engine.begin() as transaction:
+            results = transaction.execute(statement).all()
+
+        summaries: List[AnalysisSummary] = []
+        for row in results:
+            summary = AnalysisSummary.model_construct(
+                id=row.id,
+                status=AnalysisStatus.COMPLETED,
+                result=(
+                    AnalysisResult(row.result.value) if row.result is not None else None
+                ),
+            )
+            summaries.append(summary)
+
+        return summaries
 
     def get_primitive_rtps_by_analysis_id(
         self, analysis_id: str

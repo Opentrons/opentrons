@@ -27,6 +27,7 @@ from robot_server.protocols.analysis_memcache import MemoryCache
 from robot_server.protocols.analysis_models import (
     AnalysisResult,
     AnalysisStatus,
+    AnalysisSummary,
     CompletedAnalysis,
     RunTimeParameterAnalysisData,
 )
@@ -240,6 +241,45 @@ async def test_get_ids_by_protocol(
     assert subject.get_ids_by_protocol("protocol-id-1") == [
         "analysis-id-1",
         "analysis-id-2",
+    ]
+
+
+async def test_get_summaries_by_protocol(
+    subject: CompletedAnalysisStore, protocol_store: ProtocolStore
+) -> None:
+    """It should return analysis summaries with denormalized result values."""
+    ok_resource = _completed_analysis_resource("analysis-id-1", "protocol-id")
+    not_ok_resource = CompletedAnalysisResource(
+        "analysis-id-2",
+        "protocol-id",
+        "2",
+        CompletedAnalysis(
+            id="analysis-id-2",
+            status=AnalysisStatus.COMPLETED,
+            result=AnalysisResult.NOT_OK,
+            pipettes=[],
+            labware=[],
+            modules=[],
+            commands=[],
+            errors=[],
+            liquids=[],
+        ),
+    )
+    protocol_store.insert(make_dummy_protocol_resource("protocol-id"))
+    await subject.make_room_and_add(ok_resource, [], [])
+    await subject.make_room_and_add(not_ok_resource, [], [])
+
+    assert subject.get_summaries_by_protocol("protocol-id") == [
+        AnalysisSummary(
+            id="analysis-id-1",
+            status=AnalysisStatus.COMPLETED,
+            result=AnalysisResult.OK,
+        ),
+        AnalysisSummary(
+            id="analysis-id-2",
+            status=AnalysisStatus.COMPLETED,
+            result=AnalysisResult.NOT_OK,
+        ),
     ]
 
 
