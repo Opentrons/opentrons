@@ -221,7 +221,7 @@ async def _protocol_engine(
         else CameraProvider(),
     )
     try:
-        orchestrator.play(deck_configuration)
+        await orchestrator.play(deck_configuration)
         yield protocol_engine
     finally:
         await orchestrator.finish(

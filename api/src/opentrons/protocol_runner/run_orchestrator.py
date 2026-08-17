@@ -167,7 +167,9 @@ class RunOrchestrator(AbstractRunCoordinator):
             camera_provider=camera_provider,
         )
 
-    async def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
+    async def play(
+        self, deck_configuration: Optional[DeckConfigurationType] = None
+    ) -> None:
         """Start or resume the run."""
         # todo(mm, 2024-07-09): The deck configuration is set at the same time here for
         # historical reasons. It's unsafe to change the deck configuration mid-run

@@ -44,7 +44,6 @@ from opentrons.protocol_engine.types.execution import PostRunHardwareState
 from opentrons.protocol_reader.protocol_source import ProtocolSource
 from opentrons.protocol_runner.protocol_runner import RunResult
 from opentrons.types import NozzleMapInterface
-from robot_server.runs.error_recovery_models import ErrorRecoveryRule
 
 
 class NoProtocolRunAvailable(RuntimeError):
@@ -76,7 +75,9 @@ class AbstractRunCoordinator(ABC):
         ...
 
     @abstractmethod
-    async def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
+    async def play(
+        self, deck_configuration: Optional[DeckConfigurationType] = None
+    ) -> None:
         """Start or resume the run."""
         ...
 
@@ -379,15 +380,6 @@ class AbstractRunCoordinator(ABC):
     @abstractmethod
     async def get_tip_attached(self) -> Dict[str, bool]:
         """Get current tip state keyed by pipette id."""
-        ...
-
-    @abstractmethod
-    async def set_error_recovery_policy(
-            self,
-            error_recovery_rules: List[ErrorRecoveryRule],
-            error_recovery_is_enabled: bool,
-    ) -> None:
-        """Create error recovery policy for the run."""
         ...
 
     @abstractmethod

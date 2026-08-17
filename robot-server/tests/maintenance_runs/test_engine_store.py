@@ -194,7 +194,7 @@ async def test_estop_callback(
     decoy.when(run_orchestrator_store.current_run_id).then_return(None)
     await handle_estop_event(run_orchestrator_store, disengage_event)
     decoy.verify(
-        run_orchestrator_store.run_orchestrator.estop(),
+        await run_orchestrator_store.run_orchestrator.estop(),
         ignore_extra_args=True,
         times=0,
     )
@@ -207,7 +207,7 @@ async def test_estop_callback(
     decoy.when(run_orchestrator_store.current_run_id).then_return("fake-run-id")
     await handle_estop_event(run_orchestrator_store, engage_event)
     decoy.verify(
-        run_orchestrator_store.run_orchestrator.estop(),
+        await run_orchestrator_store.run_orchestrator.estop(),
         await run_orchestrator_store.run_orchestrator.finish(
             error=matchers.IsA(EStopActivatedError)
         ),

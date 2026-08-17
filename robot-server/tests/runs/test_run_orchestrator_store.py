@@ -499,7 +499,7 @@ async def test_estop_callback(
     await handle_hardware_event(run_orchestrator_store, disengage_event)
     assert run_orchestrator_store.run_coordinator is not None
     decoy.verify(
-        run_orchestrator_store.run_coordinator.estop(),
+        await run_orchestrator_store.run_coordinator.estop(),
         ignore_extra_args=True,
         times=0,
     )
@@ -513,7 +513,7 @@ async def test_estop_callback(
     await handle_hardware_event(run_orchestrator_store, engage_event)
     assert run_orchestrator_store._run_coordinator is not None
     decoy.verify(
-        run_orchestrator_store.run_coordinator.estop(),
+        await run_orchestrator_store.run_coordinator.estop(),
         await run_orchestrator_store.run_coordinator.finish(
             error=matchers.IsA(EStopActivatedError)
         ),

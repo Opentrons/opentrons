@@ -662,7 +662,9 @@ async def test_delete_run_images(
     data_file_publisher: DataFilePublisher,
 ) -> None:
     """It should delete all images for a run."""
-    decoy.when(run_data_manager.get("run-id")).then_return(decoy.mock(name="run_data"))
+    decoy.when(await run_data_manager.get("run-id")).then_return(
+        decoy.mock(name="run_data")
+    )
     decoy.when(run_data_manager.current_run_id).then_return(None)
 
     result = await delete_run_images(
@@ -686,7 +688,7 @@ async def test_delete_run_images_run_not_found(
     data_file_publisher: DataFilePublisher,
 ) -> None:
     """It should raise an error if the run doesn't exist."""
-    decoy.when(run_data_manager.get("run-id")).then_raise(
+    decoy.when(await run_data_manager.get("run-id")).then_raise(
         RunNotFoundError(run_id="run-id")
     )
 
@@ -927,7 +929,9 @@ async def test_get_data_files_by_run_id(
     expected_length: int,
 ) -> None:
     """It should return metadata for all data files associated with a run."""
-    decoy.when(run_data_manager.get("run-id")).then_return(decoy.mock(name="run_data"))
+    decoy.when(await run_data_manager.get("run-id")).then_return(
+        decoy.mock(name="run_data")
+    )
 
     decoy.when(data_files_store.get_data_files_by_run_id("run-id")).then_return(
         DataFilesByRunInfo(
@@ -960,7 +964,7 @@ async def test_get_data_files_by_run_id_run_not_found(
     run_data_manager: RunDataManager,
 ) -> None:
     """It should raise an error if the run doesn't exist."""
-    decoy.when(run_data_manager.get("run-id")).then_raise(
+    decoy.when(await run_data_manager.get("run-id")).then_raise(
         RunNotFoundError(run_id="run-id")
     )
 
