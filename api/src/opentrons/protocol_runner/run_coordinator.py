@@ -44,6 +44,7 @@ from opentrons.protocol_engine.types.execution import PostRunHardwareState
 from opentrons.protocol_reader.protocol_source import ProtocolSource
 from opentrons.protocol_runner.protocol_runner import RunResult
 from opentrons.types import NozzleMapInterface
+from robot_server.runs.error_recovery_models import ErrorRecoveryRule
 
 
 class NoProtocolRunAvailable(RuntimeError):

@@ -331,7 +331,7 @@ async def test_clear_engine_not_stopped_or_idle(
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_coordinator is not None
-    subject._run_coordinator.play(deck_configuration=[])
+    await subject._run_coordinator.play(deck_configuration=[])
     with pytest.raises(RunConflictError):
         await subject.clear()
 
@@ -448,7 +448,7 @@ async def test_get_default_orchestrator_conflict(
         camera_provider=CameraProvider(),
         notify_publishers=mock_notify_publishers,
     )
-    subject.play()
+    await subject.play()
 
     with pytest.raises(RunConflictError):
         await subject.get_default_orchestrator()

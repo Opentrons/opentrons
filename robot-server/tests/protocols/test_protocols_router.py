@@ -501,7 +501,7 @@ async def test_create_existing_protocol(
             run_time_param_paths={},
         )
     ).then_return(analyzer)
-    decoy.when(analyzer.get_verified_run_time_parameters()).then_return([])
+    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return([])
     decoy.when(
         await analysis_store.matching_rtp_values_in_analysis(
             last_analysis_summary=completed_analysis, new_parameters=[]
@@ -626,7 +626,7 @@ async def test_create_protocol(
             run_time_param_paths={},
         )
     ).then_return(analyzer)
-    decoy.when(analyzer.get_verified_run_time_parameters()).then_return([])
+    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return([])
     decoy.when(
         await analyses_manager.start_analysis(
             analysis_id="analysis-id",
@@ -1049,7 +1049,7 @@ async def test_create_existing_protocol_with_different_run_time_params(
             },
         )
     ).then_return(analyzer)
-    decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
+    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return(
         [run_time_parameter]
     )
     decoy.when(
@@ -1189,7 +1189,7 @@ async def test_create_existing_protocol_with_same_run_time_params(
             run_time_param_paths={},
         )
     ).then_return(analyzer)
-    decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
+    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return(
         [run_time_parameter]
     )
     decoy.when(
@@ -1323,7 +1323,7 @@ async def test_create_existing_protocol_with_pending_analysis_raises(
             run_time_param_paths={},
         )
     ).then_return(analyzer)
-    decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
+    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return(
         [run_time_parameter]
     )
     decoy.when(
@@ -1800,7 +1800,7 @@ async def test_create_protocol_analyses_with_same_rtp_values(
             run_time_param_paths={},
         )
     ).then_return(analyzer)
-    decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
+    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return(
         [run_time_parameter]
     )
     decoy.when(
@@ -1912,7 +1912,7 @@ async def test_update_protocol_analyses_with_new_rtp_values(
             run_time_param_paths=rtp_files,
         )
     ).then_return(analyzer)
-    decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
+    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return(
         [run_time_parameter, csv_parameter]
     )
     decoy.when(

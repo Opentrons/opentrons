@@ -703,7 +703,7 @@ async def test_get_run_data_from_url(
         hasEverEnteredErrorRecovery=False,
     )
 
-    decoy.when(mock_run_data_manager.get("run-id")).then_return(expected_response)
+    decoy.when(await mock_run_data_manager.get("run-id")).then_return(expected_response)
 
     result = await get_run_data_from_url(
         runId="run-id",
@@ -720,7 +720,9 @@ async def test_get_run_with_missing_id(
     """It should 404 if the run ID does not exist."""
     not_found_error = RunNotFoundError(run_id="run-id")
 
-    decoy.when(mock_run_data_manager.get(run_id="run-id")).then_raise(not_found_error)
+    decoy.when(await mock_run_data_manager.get(run_id="run-id")).then_raise(
+        not_found_error
+    )
 
     with pytest.raises(ApiError) as exc_info:
         await get_run_data_from_url(
@@ -764,7 +766,7 @@ async def test_get_runs_empty(
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should return an empty collection response when no runs exist."""
-    decoy.when(mock_run_data_manager.get_all(length=20)).then_return([])
+    decoy.when(await mock_run_data_manager.get_all(length=20)).then_return([])
     decoy.when(mock_run_data_manager.current_run_id).then_return(None)
 
     result = await get_runs(run_data_manager=mock_run_data_manager, pageLength=20)
@@ -821,7 +823,9 @@ async def test_get_runs_not_empty(
         hasEverEnteredErrorRecovery=False,
     )
 
-    decoy.when(mock_run_data_manager.get_all(20)).then_return([response_1, response_2])
+    decoy.when(await mock_run_data_manager.get_all(20)).then_return(
+        [response_1, response_2]
+    )
     decoy.when(mock_run_data_manager.current_run_id).then_return("unique-id-2")
 
     result = await get_runs(run_data_manager=mock_run_data_manager, pageLength=20)
@@ -994,7 +998,7 @@ async def test_update_current_none_noop(
         hasEverEnteredErrorRecovery=False,
     )
 
-    decoy.when(mock_run_data_manager.get("run-id")).then_return(expected_response)
+    decoy.when(await mock_run_data_manager.get("run-id")).then_return(expected_response)
 
     result = await update_run(
         runId="run-id",
@@ -1043,7 +1047,9 @@ async def test_update_run_signed_by_and_uncurrent(
     uncurrent_response = signed_response.model_copy(update={"current": False})
 
     decoy.when(
-        mock_run_data_manager.set_signed_by(run_id="run-id", signed_by="Alice Example")
+        await mock_run_data_manager.set_signed_by(
+            run_id="run-id", signed_by="Alice Example"
+        )
     ).then_return(signed_response)
     decoy.when(
         await mock_run_data_manager.uncurrent("run-id", access_control_status=False)
@@ -1080,7 +1086,9 @@ async def test_update_run_not_complete(
 ) -> None:
     """It should 409 if signing a run that has not completed."""
     decoy.when(
-        mock_run_data_manager.set_signed_by(run_id="run-id", signed_by="Alice Example")
+        await mock_run_data_manager.set_signed_by(
+            run_id="run-id", signed_by="Alice Example"
+        )
     ).then_raise(RunNotCompleteError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
@@ -1286,7 +1294,9 @@ async def test_update_run_signed_by(
     )
 
     decoy.when(
-        mock_run_data_manager.set_signed_by(run_id="run-id", signed_by="Alice Example")
+        await mock_run_data_manager.set_signed_by(
+            run_id="run-id", signed_by="Alice Example"
+        )
     ).then_return(expected_response)
 
     result = await update_run(
@@ -1310,14 +1320,16 @@ async def test_get_run_commands_errors(
 ) -> None:
     """It should return a list of all commands errors in a run."""
     decoy.when(
-        mock_run_data_manager.get_command_error_slice(
+        await mock_run_data_manager.get_command_error_slice(
             run_id="run-id",
             cursor=0,
             length=42,
         )
     ).then_raise(RunNotCurrentError("oh no!"))
 
-    decoy.when(mock_run_data_manager.get_command_errors_count("run-id")).then_return(1)
+    decoy.when(
+        await mock_run_data_manager.get_command_errors_count("run-id")
+    ).then_return(1)
 
     with pytest.raises(ApiError):
         result = await get_run_commands_error(
@@ -1339,14 +1351,16 @@ async def test_get_run_commands_errors_raises_no_run(
         createdAt=datetime(year=2024, month=4, day=4),
         detail="Things are not looking good.",
     )
-    decoy.when(mock_run_data_manager.get_command_errors_count("run-id")).then_return(1)
+    decoy.when(
+        await mock_run_data_manager.get_command_errors_count("run-id")
+    ).then_return(1)
 
     command_error_slice = CommandErrorSlice(
         cursor=1, total_length=3, commands_errors=[error]
     )
 
     decoy.when(
-        mock_run_data_manager.get_command_error_slice(
+        await mock_run_data_manager.get_command_error_slice(
             run_id="run-id",
             cursor=0,
             length=42,
@@ -1383,14 +1397,16 @@ async def test_get_run_commands_errors_default_cursor(
     expected_cursor_result: int,
 ) -> None:
     """It should return a list of all commands errors in a run."""
-    decoy.when(mock_run_data_manager.get_command_errors_count("run-id")).then_return(1)
+    decoy.when(
+        await mock_run_data_manager.get_command_errors_count("run-id")
+    ).then_return(1)
 
     command_error_slice = CommandErrorSlice(
         cursor=expected_cursor_result, total_length=3, commands_errors=error_list
     )
 
     decoy.when(
-        mock_run_data_manager.get_command_error_slice(
+        await mock_run_data_manager.get_command_error_slice(
             run_id="run-id",
             cursor=0,
             length=42,
@@ -1526,7 +1542,7 @@ async def test_get_current_state_run_not_current(
     """It should raise RunStopped when the run is not current."""
     run_id = "non-current-run-id"
 
-    decoy.when(mock_run_data_manager.get(run_id=run_id)).then_raise(
+    decoy.when(await mock_run_data_manager.get(run_id=run_id)).then_raise(
         RunNotCurrentError("Run is not current")
     )
 

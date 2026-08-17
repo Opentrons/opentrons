@@ -305,14 +305,14 @@ async def test_get_current_run(
     decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(
         run_id
     )
-    decoy.when(mock_maintenance_run_orchestrator_store.get_state_summary()).then_return(
-        engine_state_summary
-    )
+    decoy.when(
+        await mock_maintenance_run_orchestrator_store.get_state_summary()
+    ).then_return(engine_state_summary)
     decoy.when(
         mock_maintenance_run_orchestrator_store.current_run_created_at
     ).then_return(datetime(2023, 1, 1))
 
-    result = subject.get(run_id=run_id)
+    result = await subject.get(run_id=run_id)
 
     assert result == MaintenanceRun(
         current=True,
@@ -348,7 +348,7 @@ async def test_get_run_not_current(
         "not-current-id"
     )
     with pytest.raises(MaintenanceRunNotFoundError):
-        subject.get(run_id=run_id)
+        await subject.get(run_id=run_id)
 
 
 async def test_delete_current_run(
@@ -375,7 +375,7 @@ async def test_delete_current_run(
     )
 
 
-def test_get_commands_slice_current_run(
+async def test_get_commands_slice_current_run(
     decoy: Decoy,
     subject: MaintenanceRunDataManager,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
@@ -403,9 +403,9 @@ def test_get_commands_slice_current_run(
         "run-id"
     )
     decoy.when(
-        mock_maintenance_run_orchestrator_store.get_command_slice(1, 2)
+        await mock_maintenance_run_orchestrator_store.get_command_slice(1, 2)
     ).then_return(expected_command_slice)
 
-    result = subject.get_commands_slice("run-id", 1, 2)
+    result = await subject.get_commands_slice("run-id", 1, 2)
 
     assert expected_command_slice == result

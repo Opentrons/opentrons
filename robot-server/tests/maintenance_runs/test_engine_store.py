@@ -155,7 +155,7 @@ async def test_clear_engine_not_stopped_or_idle(
         created_at=datetime(2023, 6, 1),
         notify_publishers=mock_notify_publishers,
     )
-    subject.run_orchestrator.play()
+    await subject.run_orchestrator.play()
 
     with pytest.raises(RunConflictError):
         await subject.clear()

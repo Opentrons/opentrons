@@ -112,7 +112,7 @@ async def test_create_run_command(
     ).then_return(command_once_added)
 
     decoy.when(
-        mock_maintenance_run_orchestrator_store.get_command("command-id")
+        await mock_maintenance_run_orchestrator_store.get_command("command-id")
     ).then_return(command_once_added)
 
     result = await create_run_command(
@@ -158,7 +158,7 @@ async def test_create_run_command_blocking_completion(
     ).then_return(command_once_completed)
 
     decoy.when(
-        mock_maintenance_run_orchestrator_store.get_command("command-id")
+        await mock_maintenance_run_orchestrator_store.get_command("command-id")
     ).then_return(command_once_completed)
 
     result = await create_run_command(
@@ -230,7 +230,7 @@ async def test_create_run_command_door_open_allows_when_opted_out(
     ).then_return(command_once_added)
 
     decoy.when(
-        mock_maintenance_run_orchestrator_store.get_command("command-id")
+        await mock_maintenance_run_orchestrator_store.get_command("command-id")
     ).then_return(command_once_added)
 
     result = await create_run_command(
@@ -271,7 +271,7 @@ async def test_get_run_commands(
     )
 
     decoy.when(
-        mock_maintenance_run_data_manager.get_current_command("run-id")
+        await mock_maintenance_run_data_manager.get_current_command("run-id")
     ).then_return(
         CommandPointer(
             command_id="current-command-id",
@@ -281,7 +281,7 @@ async def test_get_run_commands(
         )
     )
     decoy.when(
-        mock_maintenance_run_data_manager.get_recovery_target_command("run-id")
+        await mock_maintenance_run_data_manager.get_recovery_target_command("run-id")
     ).then_return(
         CommandPointer(
             command_id="recovery-target-command-id",
@@ -292,7 +292,7 @@ async def test_get_run_commands(
     )
 
     decoy.when(
-        mock_maintenance_run_data_manager.get_commands_slice(
+        await mock_maintenance_run_data_manager.get_commands_slice(
             run_id="run-id",
             cursor=None,
             length=42,
@@ -358,10 +358,10 @@ async def test_get_run_commands_empty(
 ) -> None:
     """It should return an empty commands list if no commands."""
     decoy.when(
-        mock_maintenance_run_data_manager.get_current_command("run-id")
+        await mock_maintenance_run_data_manager.get_current_command("run-id")
     ).then_return(None)
     decoy.when(
-        mock_maintenance_run_data_manager.get_commands_slice(
+        await mock_maintenance_run_data_manager.get_commands_slice(
             run_id="run-id", cursor=21, length=42
         )
     ).then_return(CommandSlice(commands=[], cursor=0, total_length=0))
@@ -387,7 +387,7 @@ async def test_get_run_commands_not_found(
     not_found_error = MaintenanceRunNotFoundError("oh no")
 
     decoy.when(
-        mock_maintenance_run_data_manager.get_commands_slice(
+        await mock_maintenance_run_data_manager.get_commands_slice(
             run_id="run-id", cursor=21, length=42
         )
     ).then_raise(not_found_error)
@@ -420,7 +420,7 @@ async def test_get_run_command_by_id(
     )
 
     decoy.when(
-        mock_maintenance_run_data_manager.get_command("run-id", "command-id")
+        await mock_maintenance_run_data_manager.get_command("run-id", "command-id")
     ).then_return(command)
 
     result = await get_run_command(
@@ -447,7 +447,7 @@ async def test_get_run_command_missing(
 ) -> None:
     """It should 404 if you attempt to get a non-existent command."""
     decoy.when(
-        mock_maintenance_run_data_manager.get_command(
+        await mock_maintenance_run_data_manager.get_command(
             run_id="run-id", command_id="command-id"
         )
     ).then_raise(exception)

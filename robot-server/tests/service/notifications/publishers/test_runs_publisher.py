@@ -22,6 +22,16 @@ def make_command_pointer(command_id: str) -> CommandPointer:
     )
 
 
+async def make_async_command_pointer(command_id: str) -> CommandPointer:
+    """Create a dummy CommandPointer."""
+    return CommandPointer(
+        command_id=command_id,
+        command_key="1",
+        index=0,
+        created_at=datetime(year=2021, month=1, day=1),
+    )
+
+
 @pytest.fixture
 def notification_client() -> Mock:
     """Mocked notification client."""
@@ -53,7 +63,7 @@ async def test_initialize(
     get_recovery_target_command = AsyncMock()
     get_state_summary = AsyncMock()
 
-    runs_publisher.start_publishing_for_run(
+    await runs_publisher.start_publishing_for_run(
         run_id, get_current_command, get_recovery_target_command, get_state_summary
     )
 
@@ -83,7 +93,7 @@ async def test_clean_up_current_run(
     runs_publisher: RunsPublisher, notification_client: Mock
 ) -> None:
     """It should publish to appropriate topics at the end of a run."""
-    runs_publisher.start_publishing_for_run(
+    await runs_publisher.start_publishing_for_run(
         "1234", AsyncMock(), AsyncMock(), AsyncMock()
     )
 
@@ -108,7 +118,7 @@ async def test_handle_current_command_change(
     runs_publisher: RunsPublisher, notification_client: Mock
 ) -> None:
     """It should handle command changes appropriately."""
-    runs_publisher.start_publishing_for_run(
+    await runs_publisher.start_publishing_for_run(
         run_id="1234",
         get_current_command=lambda _: make_command_pointer("command1"),
         get_recovery_target_command=AsyncMock(),
@@ -143,10 +153,10 @@ async def test_handle_recovery_target_command_change(
     runs_publisher: RunsPublisher, notification_client: Mock
 ) -> None:
     """It should handle command changes appropriately."""
-    runs_publisher.start_publishing_for_run(
+    await runs_publisher.start_publishing_for_run(
         run_id="1234",
         get_current_command=AsyncMock(),
-        get_recovery_target_command=lambda _: make_command_pointer("command1"),
+        get_recovery_target_command=lambda _: make_async_command_pointer("command1"),
         get_state_summary=AsyncMock(),
     )
 
@@ -164,7 +174,7 @@ async def test_handle_recovery_target_command_change(
     assert notification_client.publish_advise_refetch.call_count == 2
 
     runs_publisher._run_hooks.get_recovery_target_command = (
-        lambda _: make_command_pointer("command2")
+        lambda _: make_async_command_pointer("command2")
     )
 
     await runs_publisher._handle_recovery_target_command_change()
@@ -178,7 +188,7 @@ async def test_handle_relevant_engine_change(
     runs_publisher: RunsPublisher, notification_client: Mock
 ) -> None:
     """It should handle relevant engine changes appropriately."""
-    runs_publisher.start_publishing_for_run(
+    await runs_publisher.start_publishing_for_run(
         run_id="1234",
         get_current_command=lambda _: make_command_pointer("command1"),
         get_recovery_target_command=AsyncMock(),
@@ -217,7 +227,7 @@ async def test_handle_labware_offset_count_change(
     runs_publisher: RunsPublisher, notification_client: Mock
 ) -> None:
     """It should handle labware offset count changes appropriately."""
-    runs_publisher.start_publishing_for_run(
+    await runs_publisher.start_publishing_for_run(
         run_id="1234",
         get_current_command=lambda _: make_command_pointer("command1"),
         get_recovery_target_command=AsyncMock(),
@@ -258,7 +268,7 @@ async def test_publish_pre_serialized_commannds_notif(
     runs_publisher: RunsPublisher, notification_client: Mock
 ) -> None:
     """It should send out a notification for pre serialized commands."""
-    runs_publisher.start_publishing_for_run(
+    await runs_publisher.start_publishing_for_run(
         run_id="1234",
         get_current_command=lambda _: make_command_pointer("command1"),
         get_recovery_target_command=AsyncMock(),

@@ -347,7 +347,7 @@ async def test_analyze_updates_pending_on_error(
             deck_configuration=[],
         )
     ).then_raise(raised_exception)
-    decoy.when(orchestrator.get_run_time_parameters()).then_return([])
+    decoy.when(await orchestrator.get_run_time_parameters()).then_return([])
     decoy.when(em.map_unexpected_error(error=raised_exception)).then_return(
         enumerated_error
     )

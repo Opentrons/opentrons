@@ -169,7 +169,7 @@ async def test_raises_error_and_saves_result_if_initialization_errors(
             run_time_param_paths={},
         )
     ).then_raise(raised_exception)
-    decoy.when(analyzer.get_verified_run_time_parameters()).then_return([])
+    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return([])
     decoy.when(em.map_unexpected_error(error=raised_exception)).then_return(
         enumerated_error
     )
@@ -225,7 +225,7 @@ async def test_start_analysis(
     )
     analyzer = decoy.mock(cls=protocol_analyzer.ProtocolAnalyzer)
     decoy.when(analyzer.protocol_resource).then_return(protocol_resource)
-    decoy.when(analyzer.get_verified_run_time_parameters()).then_return(
+    decoy.when(await analyzer.get_verified_run_time_parameters()).then_return(
         [bool_parameter]
     )
     analysis_summary_result = await subject.start_analysis(
