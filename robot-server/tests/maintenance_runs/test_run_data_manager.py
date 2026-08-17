@@ -1,6 +1,5 @@
 """Tests for RunDataManager."""
 
-import inspect
 from datetime import datetime
 
 import pytest
@@ -25,7 +24,6 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.resources import CameraProvider
 from opentrons.types import DeckSlotName
-from opentrons_shared_data.robot.types import RobotTypeEnum
 
 from robot_server.camera.provider import CameraProviderWrapper
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
@@ -124,19 +122,6 @@ def mock_camera_provider(
 ) -> CameraProvider:
     """Return a mock CameraProvider."""
     return decoy.mock(cls=CameraProvider)
-
-
-@pytest.fixture
-def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Get a mocked feature flags."""
-    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
-        params = inspect.getfullargspec(func)
-        mock_get_ff = decoy.mock(func=func)
-        if any("robot_type" in p for p in params.args):
-            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
-        else:
-            decoy.when(mock_get_ff()).then_return(False)
-        monkeypatch.setattr(feature_flags, name, mock_get_ff)
 
 
 async def test_create(

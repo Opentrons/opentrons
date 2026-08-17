@@ -7,11 +7,10 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.util import ot2_axis_to_string
-from opentrons.protocol_engine.errors import HardwareNotSupportedError
-from opentrons.protocol_engine.resources import ot3_validation
 from opentrons.types import Mount
 
-from robot_server.hardware import get_hardware
+from robot_server.errors.error_responses import ApiError
+from robot_server.hardware import get_hardware, get_ot3_hardware
 from robot_server.service.legacy.models import pipettes
 
 router = APIRouter()
@@ -82,9 +81,9 @@ async def get_pipettes(
         )
 
     try:
-        ot3_validation.ensure_ot3_hardware(hardware)
+        get_ot3_hardware(hardware)
         is_ot2 = False
-    except HardwareNotSupportedError:
+    except ApiError:
         is_ot2 = True
     e = {
         mount.name.lower(): make_pipette(mount=mount, pipette_dict=data, is_ot2=is_ot2)

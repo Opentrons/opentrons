@@ -1,6 +1,5 @@
 """Test the dependency for locking endpoints based on Estop."""
 
-import inspect
 from typing import TYPE_CHECKING, Optional
 
 import pytest
@@ -15,7 +14,6 @@ from opentrons.hardware_control.types import (
     EstopPhysicalStatus,
     EstopState,
 )
-from opentrons_shared_data.robot.types import RobotTypeEnum
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -59,19 +57,6 @@ async def thread_manager_ot3(
     decoy.when(thread_manager.wraps_instance(matchers.Anything())).then_return(True)
     decoy.when(thread_manager.wrapped()).then_return(hardware_ot3)
     return thread_manager
-
-
-@pytest.fixture
-def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Get a mocked feature flags."""
-    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
-        params = inspect.getfullargspec(func)
-        mock_get_ff = decoy.mock(func=func)
-        if any("robot_type" in p for p in params.args):
-            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
-        else:
-            decoy.when(mock_get_ff()).then_return(False)
-        monkeypatch.setattr(feature_flags, name, mock_get_ff)
 
 
 async def test_estop_ignored_ot2(

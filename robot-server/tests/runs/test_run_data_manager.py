@@ -1,6 +1,5 @@
 """Tests for RunDataManager."""
 
-import inspect
 from datetime import datetime
 from typing import Dict, List
 from unittest.mock import Mock, sentinel
@@ -42,7 +41,6 @@ from opentrons.protocol_runner import RunResult
 from opentrons_shared_data.data_files import RunFileNameMetadata
 from opentrons_shared_data.errors.exceptions import InvalidStoredData
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
-from opentrons_shared_data.robot.types import RobotTypeEnum
 
 from robot_server.access_control.settings.models import ResponseData
 from robot_server.access_control.settings.store import AccessControlSettingStore
@@ -247,19 +245,6 @@ def run_command() -> commands.Command:
         status=commands.CommandStatus.SUCCEEDED,
         params=commands.WaitForResumeParams(message="Hello"),
     )
-
-
-@pytest.fixture
-def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Get a mocked feature flags."""
-    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
-        params = inspect.getfullargspec(func)
-        mock_get_ff = decoy.mock(func=func)
-        if any("robot_type" in p for p in params.args):
-            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
-        else:
-            decoy.when(mock_get_ff()).then_return(False)
-        monkeypatch.setattr(feature_flags, name, mock_get_ff)
 
 
 @pytest.fixture

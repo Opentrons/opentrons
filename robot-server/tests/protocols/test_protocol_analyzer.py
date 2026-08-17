@@ -1,6 +1,5 @@
 """Tests for the ProtocolAnalyzer."""
 
-import inspect
 from datetime import datetime
 from pathlib import Path
 
@@ -34,7 +33,7 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import DeckSlotName, MountType
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes
 from opentrons_shared_data.pipette.types import PipetteNameType
-from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotType
 
 import robot_server.errors.error_mappers as em
 from robot_server.protocols.analysis_store import AnalysisStore
@@ -79,19 +78,6 @@ def analysis_store(decoy: Decoy) -> AnalysisStore:
 def run_process_pyro_provider(decoy: Decoy) -> RunProcessPyroProvider:
     """Get a mocket out RunProcessPyroProvider."""
     return decoy.mock(cls=RunProcessPyroProvider)
-
-
-@pytest.fixture
-def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Get a mocked feature flags."""
-    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
-        params = inspect.getfullargspec(func)
-        mock_get_ff = decoy.mock(func=func)
-        if any("robot_type" in p for p in params.args):
-            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
-        else:
-            decoy.when(mock_get_ff()).then_return(False)
-        monkeypatch.setattr(feature_flags, name, mock_get_ff)
 
 
 async def test_load_orchestrator(

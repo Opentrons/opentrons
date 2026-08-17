@@ -536,12 +536,16 @@ def get_ot3_hardware(
     if ff.hardware_subprocess_enabled():
         return cast(OT3API, hardware_resource)
 
-    assert isinstance(hardware_resource, ThreadManager)
-    if not hardware_resource.wraps_instance(OT3API):
-        raise NotSupportedOnOT2(
-            detail="This route is only available on a Flex."
-        ).as_error(status.HTTP_403_FORBIDDEN)
-    return cast(OT3API, hardware_resource.wrapped())
+    if isinstance(
+        hardware_resource, ThreadManager
+    ) and hardware_resource.wraps_instance(OT3API):
+        return cast(OT3API, hardware_resource.wrapped())
+    if isinstance(hardware_resource, OT3API):
+        return hardware_resource
+
+    raise NotSupportedOnOT2(detail="This route is only available on a Flex.").as_error(
+        status.HTTP_403_FORBIDDEN
+    )
 
 
 def get_ot2_hardware(

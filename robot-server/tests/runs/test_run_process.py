@@ -1,7 +1,6 @@
 """Tests for run process."""
 
 import asyncio
-import inspect
 import socket
 import threading
 from typing import cast
@@ -24,7 +23,6 @@ from opentrons.protocol_engine.resources.camera_provider import (
 from opentrons.protocol_engine.resources.file_provider import FileProvider
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
-from opentrons_shared_data.robot.types import RobotTypeEnum
 from server_utils.fastapi_utils.app_state import AppState
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
@@ -59,19 +57,6 @@ def mock_run_process_pyro_provider(decoy: Decoy) -> RunProcessPyroProvider:
 def mock_deck_configuration_store(decoy: Decoy) -> DeckConfigurationStore:
     """Get a mock DeckConfigurationStore."""
     return decoy.mock(cls=DeckConfigurationStore)
-
-
-@pytest.fixture
-def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Get a mocked feature flags."""
-    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
-        params = inspect.getfullargspec(func)
-        mock_get_ff = decoy.mock(func=func)
-        if any("robot_type" in p for p in params.args):
-            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
-        else:
-            decoy.when(mock_get_ff()).then_return(False)
-        monkeypatch.setattr(feature_flags, name, mock_get_ff)
 
 
 @pytest.fixture

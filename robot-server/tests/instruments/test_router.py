@@ -8,6 +8,7 @@ import pytest
 from decoy import Decoy
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
+from opentrons.config import feature_flags
 from opentrons.hardware_control import (
     API,
     HardwareControlAPI,
@@ -52,9 +53,10 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture
-def ot2_hardware_api(decoy: Decoy) -> HardwareControlAPI:
+def ot2_hardware_api(decoy: Decoy, mock_feature_flags: None) -> HardwareControlAPI:
     """Get a mock hardware control API."""
     mock = decoy.mock(cls=API)
+    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
     decoy.when(mock.get_robot_type()).then_return(OT2RobotType)
     return mock
 

@@ -1,3 +1,4 @@
+import inspect
 import json
 import os
 import pathlib
@@ -42,6 +43,7 @@ from opentrons.hardware_control import (
 from opentrons.protocol_api import labware
 from opentrons.types import Mount, Point
 from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.robot.types import RobotTypeEnum
 from server_utils.audit.audit_server import (
     AuditSettingsResponseData,
 )
@@ -591,3 +593,15 @@ def zulu_iso8601_to_datetime(iso8601_str: str) -> datetime:
     See `datetime_to_zulu_iso8601()`.
     """
     return datetime.fromisoformat(iso8601_str.replace("Z", "+00:00"))
+
+
+@pytest.fixture
+def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    for name, func in inspect.getmembers(config.feature_flags, inspect.isfunction):
+        params = inspect.getfullargspec(func)
+        mock_get_ff = decoy.mock(func=func)
+        if any("robot_type" in p for p in params.args):
+            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
+        else:
+            decoy.when(mock_get_ff()).then_return(False)
+        monkeypatch.setattr(config.feature_flags, name, mock_get_ff)

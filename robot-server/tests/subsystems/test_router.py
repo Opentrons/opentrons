@@ -1,6 +1,5 @@
 """Tests for /subsystems routes."""
 
-import inspect
 from datetime import datetime
 from typing import TYPE_CHECKING, Dict, Set
 
@@ -9,7 +8,6 @@ from decoy import Decoy
 from fastapi import Request, Response
 from starlette.datastructures import URL, MutableHeaders
 
-from opentrons.config import feature_flags
 from opentrons.hardware_control.types import (
     SubSystem as HWSubSystem,
 )
@@ -19,7 +17,6 @@ from opentrons.hardware_control.types import (
 from opentrons.hardware_control.types import (
     UpdateState as HWUpdateState,
 )
-from opentrons_shared_data.robot.types import RobotTypeEnum
 
 from robot_server.errors.error_responses import ApiError
 from robot_server.hardware import HardwareStateStore
@@ -79,19 +76,6 @@ def ot3_hardware_api(decoy: Decoy) -> "OT3API":
     except ImportError:
         pytest.skip("Cannot run on OT-2 (for now)")
     return decoy.mock(cls=OT3API)
-
-
-@pytest.fixture
-def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Get a mocked feature flags."""
-    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
-        params = inspect.getfullargspec(func)
-        mock_get_ff = decoy.mock(func=func)
-        if any("robot_type" in p for p in params.args):
-            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
-        else:
-            decoy.when(mock_get_ff()).then_return(False)
-        monkeypatch.setattr(feature_flags, name, mock_get_ff)
 
 
 def _build_attached_subsystem(

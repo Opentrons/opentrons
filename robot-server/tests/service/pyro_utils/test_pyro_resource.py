@@ -1,6 +1,5 @@
 """Testing suite for the RobotServerPyroResource."""
 
-import inspect
 import socket
 import threading
 from typing import cast
@@ -28,7 +27,6 @@ from opentrons.util.pyro.pyro_client_async_adapter import ClientPyroFunctionWrap
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
 from opentrons_shared_data.data_files import DataFileInfo, MimeType
-from opentrons_shared_data.robot.types import RobotTypeEnum
 from server_utils.fastapi_utils.app_state import AppState
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
@@ -46,18 +44,6 @@ from robot_server.service.pyro_utils import (
 )
 
 TEST_PYRO_TIMEOUT = 5
-
-
-@pytest.fixture
-def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
-        params = inspect.getfullargspec(func)
-        mock_get_ff = decoy.mock(func=func)
-        if any("robot_type" in p for p in params.args):
-            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
-        else:
-            decoy.when(mock_get_ff()).then_return(False)
-        monkeypatch.setattr(feature_flags, name, mock_get_ff)
 
 
 @pytest.fixture

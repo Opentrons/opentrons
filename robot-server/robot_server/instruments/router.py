@@ -23,8 +23,6 @@ from opentrons.hardware_control.types import (
 from opentrons.hardware_control.types import (
     SubSystem as HWSubSystem,
 )
-from opentrons.protocol_engine.errors import HardwareNotSupportedError
-from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 from opentrons.protocol_engine.types import Vec3f
 from opentrons.types import Mount, MountType
 from opentrons_shared_data.gripper.gripper_definition import GripperModelStr
@@ -47,10 +45,12 @@ from .instrument_models import (
     PipetteData,
     PipetteState,
 )
+from robot_server.errors.error_responses import ApiError
 from robot_server.hardware import (
     HardwareStateStore,
     get_hardware,
     get_hardware_state_store,
+    get_ot3_hardware,
 )
 from robot_server.subsystems.models import SubSystem
 from robot_server.subsystems.router import status_route_for, update_route_for
@@ -187,7 +187,9 @@ async def _get_pipette_instrument_data(
     if pipette_dict:
         offset = cast(
             Optional[PipetteOffsetSummary],
-            hardware.get_instrument_offset(OT3Mount.from_mount(mount)),
+            await asyncio.to_thread(
+                hardware.get_instrument_offset, OT3Mount.from_mount(mount)
+            ),
         )
         pipette_state = await hardware.get_instrument_state(mount)
         return _pipette_dict_to_pipette_res(
@@ -293,9 +295,9 @@ async def get_attached_instruments(
           a pipette attachment/ removal.
     """
     try:
-        ot3_hardware = ensure_ot3_hardware(hardware_api=hardware)
+        ot3_hardware = get_ot3_hardware(hardware_resource=hardware)
         return await _get_attached_instruments_ot3(ot3_hardware, hardware_state_store)
-    except HardwareNotSupportedError:
+    except ApiError:
         # OT2
         pass
     return await _get_attached_instruments_ot2(hardware)
