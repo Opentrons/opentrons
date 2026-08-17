@@ -60,22 +60,18 @@ const HIDDEN_CSS = css`
 interface RobotUpdateProgressModalProps {
   robotName: string
   session: RobotUpdateSession | null
-  closeUpdateBuildroot?: () => void
+  closeRobotUpdate: () => void
 }
 
 export function RobotUpdateProgressModal({
   robotName,
   session,
-  closeUpdateBuildroot,
+  closeRobotUpdate,
 }: RobotUpdateProgressModalProps): JSX.Element {
   const dispatch = useDispatch()
   const { t } = useTranslation('device_settings')
   const [showFileSelect, setShowFileSelect] = useState<boolean>(false)
   const installFromFileRef = useRef<HTMLInputElement>(null)
-
-  const completeRobotUpdateHandler = (): void => {
-    if (closeUpdateBuildroot != null) closeUpdateBuildroot()
-  }
 
   const { updateStep, progressPercent } = useRobotUpdateInfo(robotName, session)
 
@@ -123,14 +119,12 @@ export function RobotUpdateProgressModal({
       textAlign="center"
       onClose={
         hasRobotCompletedInit || error || letUserExitUpdate
-          ? completeRobotUpdateHandler
+          ? closeRobotUpdate
           : undefined
       }
       footer={
         hasRobotCompletedInit || error ? (
-          <RobotUpdateProgressFooter
-            closeUpdateBuildroot={completeRobotUpdateHandler}
-          />
+          <RobotUpdateProgressFooter closeRobotUpdate={closeRobotUpdate} />
         ) : null
       }
     >
@@ -175,11 +169,11 @@ export function RobotUpdateProgressModal({
 }
 
 interface RobotUpdateProgressFooterProps {
-  closeUpdateBuildroot?: () => void
+  closeRobotUpdate: () => void
 }
 
 function RobotUpdateProgressFooter({
-  closeUpdateBuildroot,
+  closeRobotUpdate,
 }: RobotUpdateProgressFooterProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -190,7 +184,7 @@ function RobotUpdateProgressFooter({
       padding={`${SPACING.spacing16} 0`}
     >
       <NewPrimaryBtn
-        onClick={closeUpdateBuildroot}
+        onClick={closeRobotUpdate}
         marginRight={SPACING.spacing12}
         css={FOOTER_BUTTON_STYLE}
       >
