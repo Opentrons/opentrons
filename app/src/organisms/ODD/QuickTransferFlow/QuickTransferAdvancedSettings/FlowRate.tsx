@@ -159,9 +159,6 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
             value={flowRate}
             label={textEntryCopy}
             error={error}
-            onBlur={e => {
-              e.target.focus()
-            }}
             onChange={e => {
               handleFlowRateChange(e.target.value as string)
             }}

@@ -135,9 +135,6 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
             value={tipPosition}
             label={textEntryCopy}
             error={error}
-            onBlur={e => {
-              e.target.focus()
-            }}
             onChange={e => {
               setTipPosition(Number(e.target.value))
             }}

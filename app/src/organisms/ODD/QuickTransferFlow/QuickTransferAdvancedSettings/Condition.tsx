@@ -190,9 +190,6 @@ export function Condition(props: DelayProps): JSX.Element {
               value={conditionVolume}
               label={t('condition_volume')}
               error={volumeError}
-              onBlur={e => {
-                e.target.focus()
-              }}
               onChange={e => {
                 setConditionVolume(Number(e.target.value))
               }}
