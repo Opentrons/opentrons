@@ -5,8 +5,8 @@ from mock import MagicMock
 from starlette.testclient import TestClient
 
 from opentrons import types
-from opentrons.protocol_engine.resources import ot3_validation
 from opentrons.config import feature_flags
+from opentrons.protocol_engine.resources import ot3_validation
 from opentrons.types import Mount
 
 

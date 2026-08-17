@@ -12,7 +12,7 @@ from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 
-from robot_server.errors.error_responses import LegacyErrorResponse, ApiError
+from robot_server.errors.error_responses import ApiError, LegacyErrorResponse
 from robot_server.hardware import get_hardware, get_ot3_hardware
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models import motors as model
