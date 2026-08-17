@@ -57,7 +57,7 @@ describe('DownloadUpdateModal', () => {
     props = {
       robotName: 'testRobot',
       session: mockRobotUpdateSession,
-      closeUpdateBuildroot: vi.fn(),
+      closeRobotUpdate: vi.fn(),
     }
     vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
@@ -141,7 +141,7 @@ describe('DownloadUpdateModal', () => {
     expect(exitButton).toBeInTheDocument()
     expect(mockCreateLiveCommand).toHaveBeenCalled()
     fireEvent.click(exitButton)
-    expect(props.closeUpdateBuildroot).toHaveBeenCalled()
+    expect(props.closeRobotUpdate).toHaveBeenCalled()
   })
 
   it('renders an error modal and exit button if an error occurs', () => {
@@ -162,7 +162,7 @@ describe('DownloadUpdateModal', () => {
 
     expect(screen.getByText('test error')).toBeInTheDocument()
     fireEvent.click(exitButton)
-    expect(props.closeUpdateBuildroot).toHaveBeenCalled()
+    expect(props.closeRobotUpdate).toHaveBeenCalled()
 
     expect(useCreateLiveCommandMutation).toBeCalledWith(
       ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE

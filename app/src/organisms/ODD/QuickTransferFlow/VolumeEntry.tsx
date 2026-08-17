@@ -121,9 +121,6 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
             value={volume}
             label={textEntryCopy}
             error={error}
-            onBlur={e => {
-              e.target.focus()
-            }}
             onChange={e => {
               handleVolumeChange(e.target.value as string)
             }}

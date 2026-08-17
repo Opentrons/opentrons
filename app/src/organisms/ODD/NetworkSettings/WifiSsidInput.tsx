@@ -56,9 +56,6 @@ export function WifiSsidInput({
           }}
           type="text"
           error={errorMessage}
-          onBlur={e => {
-            e.target.focus()
-          }}
         />
       </Flex>
       <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">

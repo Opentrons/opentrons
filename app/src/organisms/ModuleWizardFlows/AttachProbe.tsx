@@ -57,21 +57,29 @@ export function AttachProbe(props: AttachProbeProps): JSX.Element {
   ])
   const fixtureIdByCutoutId = getFixtureIdByCutoutId(attachedModule, deckConfig)
   const attachedPipetteChannels = attachedPipette.data.channels
-  let pipetteAttachProbeVideoSource, probeLocation
-  switch (attachedPipetteChannels) {
-    case 1:
-      pipetteAttachProbeVideoSource = attachProbe1
-      probeLocation = ''
-      break
-    case 8:
-      pipetteAttachProbeVideoSource = attachProbe8
-      probeLocation = t('pipette_wizard_flows:backmost')
-      break
-    case 96:
-      pipetteAttachProbeVideoSource = attachProbe96
-      probeLocation = t('pipette_wizard_flows:ninety_six_probe_location')
-      break
-  }
+  const mount = attachedPipette.mount
+  const pipetteAttachProbeVideoSource = ((): string => {
+    switch (attachedPipetteChannels) {
+      case 8:
+        return attachProbe8
+      case 96:
+        return attachProbe96
+      case 1:
+      default:
+        return attachProbe1
+    }
+  })()
+  const probeLocation = ((): string => {
+    switch (attachedPipetteChannels) {
+      case 8:
+        return `${t('pipette_wizard_flows:backmost')} (${mount} mount)`
+      case 96:
+        return t('pipette_wizard_flows:ninety_six_probe_location')
+      case 1:
+      default:
+        return `${mount} mount`
+    }
+  })()
   const wasteChuteConflictWith96Channel =
     'cutoutC3' in fixtureIdByCutoutId && attachedPipette.data.channels === 96
   const isWasteChuteOnDeck = deckConfig.some(cc =>

@@ -77,3 +77,18 @@
   height: 2.5rem;
   color: var(--yellow-50);
 }
+
+.loading_content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-24);
+}
+
+.loading_spinner {
+  width: 5.125rem;
+  height: 5.125rem;
+  color: var(--grey-60);
+}

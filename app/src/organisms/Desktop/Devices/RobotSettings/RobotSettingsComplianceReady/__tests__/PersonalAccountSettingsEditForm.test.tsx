@@ -41,7 +41,7 @@ describe('PersonalAccountSettingsEditForm', () => {
     render(props)
     expect(screen.getByDisplayValue('alice')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Alice Example')).toBeInTheDocument()
-    const saveButton = screen.getByRole('button', { name: 'save' })
+    const saveButton = screen.getByRole('button', { name: 'Save' })
     expect(saveButton).toBeDisabled()
     fireEvent.click(saveButton)
     expect(props.onCancel).not.toHaveBeenCalled()
@@ -53,7 +53,7 @@ describe('PersonalAccountSettingsEditForm', () => {
     fireEvent.change(screen.getByDisplayValue('alice'), {
       target: { value: 'alice2' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'save' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
     await waitFor(() => {
       expect(props.onSave).toHaveBeenCalledWith({
         data: { username: 'alice2' },
@@ -66,7 +66,7 @@ describe('PersonalAccountSettingsEditForm', () => {
     fireEvent.change(screen.getByDisplayValue('Alice Example'), {
       target: { value: 'Alice Updated' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'save' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
     await waitFor(() => {
       expect(props.onSave).toHaveBeenCalledWith({
         data: { fullName: 'Alice Updated' },
@@ -79,7 +79,7 @@ describe('PersonalAccountSettingsEditForm', () => {
     fireEvent.change(screen.getByDisplayValue('alice'), {
       target: { value: '   ' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'save' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
     await waitFor(() => {
       expect(props.onSave).not.toHaveBeenCalled()
     })
@@ -90,7 +90,7 @@ describe('PersonalAccountSettingsEditForm', () => {
     fireEvent.change(screen.getByDisplayValue('alice'), {
       target: { value: '' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'save' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
       expect(screen.getByText('Username is required.')).toBeInTheDocument()
@@ -110,14 +110,14 @@ describe('PersonalAccountSettingsEditForm', () => {
     await waitFor(() => {
       screen.getByText('Passwords do not match')
     })
-    fireEvent.click(screen.getByRole('button', { name: 'save' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
     expect(props.onSave).not.toHaveBeenCalled()
     const [passwordInput, confirmPasswordInput] = getPasswordInputs(container)
     fireEvent.change(passwordInput, { target: { value: 'new-password' } })
     fireEvent.change(confirmPasswordInput, {
       target: { value: 'new-password' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'save' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
     await waitFor(() => {
       expect(props.onSave).toHaveBeenCalledWith({
         data: { password: 'new-password' },
@@ -139,7 +139,7 @@ describe('PersonalAccountSettingsEditForm', () => {
     fireEvent.change(screen.getByDisplayValue('alice'), {
       target: { value: 'alice2' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'save' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
       screen.getByText('Unable to save account settings. Try again.')

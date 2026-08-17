@@ -9,7 +9,10 @@ import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach
 import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
-import { selectActivePipetteChannelCount } from '/app/redux/protocol-runs'
+import {
+  selectActivePipette,
+  selectActivePipetteChannelCount,
+} from '/app/redux/protocol-runs'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
@@ -18,6 +21,8 @@ export function AttachProbe(props: LPCWizardContentProps): JSX.Element {
     props.commandUtils.headerCommands
   const { t } = useTranslation('labware_position_check')
   const channelCount = useSelector(selectActivePipetteChannelCount(props.runId))
+  const activePipette = useSelector(selectActivePipette(props.runId))
+  const mount = activePipette?.mount ?? 'left'
 
   const probeVideo = (): string => {
     switch (channelCount) {
@@ -71,9 +76,11 @@ export function AttachProbe(props: LPCWizardContentProps): JSX.Element {
             <Trans
               t={t}
               i18nKey={probei18nString()}
+              values={{ mount }}
               components={{
                 block: <LegacyStyledText forwardedAs="p" />,
                 bold: <strong />,
+                strong: <strong />,
               }}
             />
           }

@@ -286,9 +286,6 @@ function RetractSettingComponent({
             type="number"
             value={speed}
             label={t('speed')}
-            onBlur={e => {
-              e.target.focus()
-            }}
             onChange={e => {
               handleSpeedChange(e.target.value as string)
             }}
@@ -327,9 +324,6 @@ function RetractSettingComponent({
             type="number"
             value={delayDuration}
             label={t('delay_duration_s')}
-            onBlur={e => {
-              e.target.focus()
-            }}
             onChange={e => {
               handleDelayDurationChange(e.target.value as string)
             }}
@@ -372,9 +366,6 @@ function RetractSettingComponent({
             value={position}
             error={positionError}
             label={positionText}
-            onBlur={e => {
-              e.target.focus()
-            }}
             onChange={e => {
               handlePositionChange(e.target.value as string)
             }}

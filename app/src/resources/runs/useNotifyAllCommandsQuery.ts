@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import { useAllCommandsQuery } from '@opentrons/react-api-client'
 
 import { useNotifyDataReady } from '../useNotifyDataReady'
@@ -24,9 +26,14 @@ export function useNotifyAllCommandsQuery<TError = Error>(
 
   const httpQueryResult = useAllCommandsQuery(runId, params, queryOptionsNotify)
 
-  if (shouldRefetch) {
-    void httpQueryResult.refetch()
-  }
+  useEffect(() => {
+    if (shouldRefetch) {
+      void httpQueryResult.refetch()
+    }
+
+    // refetch is stable, the result object is not
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldRefetch])
 
   return httpQueryResult
 }
