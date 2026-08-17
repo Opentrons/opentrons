@@ -1,4 +1,4 @@
-test_name: OAuth scopes for regular users and settings-gated admin scopes
+test_name: Robot settings affect OAuth scopes returned to regular users
 
 marks:
   - usefixtures:
@@ -7,7 +7,7 @@ marks:
       - seed_users
 
 stages:
-  - name: With default settings, regular users should not get admin-only scopes
+  - name: With default settings, regular users should not get updates or protocols scopes
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
@@ -21,12 +21,28 @@ stages:
       verify_response_with:
         function: tests.integration.utils:verify_oauth_scopes
         extra_kwargs:
-          expected_absent: updates.write protocols.write run_signoff.write
+          expected_present: run_signoff.write
+          expected_absent: updates.write protocols.write
       save:
         json:
           user_access_token: access_token
 
-  - name: With default settings, admins should get enabled admin-only scopes
+  - name: Token introspection should match default-settings login scopes
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/introspect'
+      data:
+        client_id: opentrons_app
+        token: '{user_access_token}'
+    response:
+      status_code: 200
+      verify_response_with:
+        function: tests.integration.utils:verify_oauth_scopes
+        extra_kwargs:
+          expected_present: run_signoff.write
+          expected_absent: updates.write protocols.write
+
+  - name: Admins should always get all scopes with default settings
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
@@ -40,10 +56,9 @@ stages:
       verify_response_with:
         function: tests.integration.utils:verify_oauth_scopes
         extra_kwargs:
-          expected_present: updates.write protocols.write
-          expected_absent: run_signoff.write
+          expected_present: updates.write protocols.write run_signoff.write
 
-  - name: Disable all require-admin-credential settings
+  - name: Allow regular users to update robot software
     request:
       method: PATCH
       url: '{run_server.base_url}/auth/settings'
@@ -52,12 +67,10 @@ stages:
       json:
         data:
           requireAdminCredsWhenUpdatingRobotSoftware: false
-          requireAdminCredsWhenSendingProtocolToRobot: false
-          requireAdminCredsForSignoffProtocol: false
     response:
       status_code: 200
 
-  - name: Regular users should still not get admin-only scopes
+  - name: Regular users should now get updates.write but not protocols.write
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
@@ -71,25 +84,73 @@ stages:
       verify_response_with:
         function: tests.integration.utils:verify_oauth_scopes
         extra_kwargs:
-          expected_absent: updates.write protocols.write run_signoff.write
+          expected_present: updates.write run_signoff.write
+          expected_absent: protocols.write
+      save:
+        json:
+          user_access_token: access_token
 
-  - name: Admins should lose admin-only scopes when settings are disabled
+  - name: Token introspection should match updates-enabled login scopes
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/introspect'
+      data:
+        client_id: opentrons_app
+        token: '{user_access_token}'
+    response:
+      status_code: 200
+      verify_response_with:
+        function: tests.integration.utils:verify_oauth_scopes
+        extra_kwargs:
+          expected_present: updates.write run_signoff.write
+          expected_absent: protocols.write
+
+  - name: Allow regular users to send protocols to the robot
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          requireAdminCredsWhenSendingProtocolToRobot: false
+    response:
+      status_code: 200
+
+  - name: Regular users should now get both updates.write and protocols.write
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
       data:
         client_id: opentrons_app
         grant_type: password
-        username: testadmin
-        password: testadminpassword
+        username: testuser
+        password: testuserpassword
     response:
       status_code: 200
       verify_response_with:
         function: tests.integration.utils:verify_oauth_scopes
         extra_kwargs:
-          expected_absent: updates.write protocols.write run_signoff.write
+          expected_present: updates.write protocols.write run_signoff.write
+      save:
+        json:
+          user_access_token: access_token
 
-  - name: Enable signoff admin-credential requirement
+  - name: Token introspection should match fully-enabled login scopes
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/introspect'
+      data:
+        client_id: opentrons_app
+        token: '{user_access_token}'
+    response:
+      status_code: 200
+      verify_response_with:
+        function: tests.integration.utils:verify_oauth_scopes
+        extra_kwargs:
+          expected_present: updates.write protocols.write run_signoff.write
+
+  - name: Require admin credentials for protocol signoff
     request:
       method: PATCH
       url: '{run_server.base_url}/auth/settings'
@@ -101,7 +162,42 @@ stages:
     response:
       status_code: 200
 
-  - name: Admins should get run_signoff.write when that setting is enabled
+  - name: Regular users should lose run_signoff.write when signoff is admin-only
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: testuser
+        password: testuserpassword
+    response:
+      status_code: 200
+      verify_response_with:
+        function: tests.integration.utils:verify_oauth_scopes
+        extra_kwargs:
+          expected_present: updates.write protocols.write
+          expected_absent: run_signoff.write
+      save:
+        json:
+          user_access_token: access_token
+
+  - name: Token introspection should match signoff-restricted login scopes
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/introspect'
+      data:
+        client_id: opentrons_app
+        token: '{user_access_token}'
+    response:
+      status_code: 200
+      verify_response_with:
+        function: tests.integration.utils:verify_oauth_scopes
+        extra_kwargs:
+          expected_present: updates.write protocols.write
+          expected_absent: run_signoff.write
+
+  - name: Admins should still get all scopes when signoff is admin-only
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
@@ -115,5 +211,4 @@ stages:
       verify_response_with:
         function: tests.integration.utils:verify_oauth_scopes
         extra_kwargs:
-          expected_present: run_signoff.write
-          expected_absent: updates.write protocols.write
+          expected_present: updates.write protocols.write run_signoff.write

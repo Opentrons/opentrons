@@ -18,30 +18,6 @@ _REGULAR_USER_SCOPES: Final[frozenset[Scope]] = frozenset(
     }
 )
 
-# Scopes that only admin/service accounts may hold. Whether they are granted depends
-# on the matching requireAdminCreds* auth setting being enabled.
-_ADMIN_ONLY_SCOPES: Final[frozenset[Scope]] = frozenset(
-    {
-        Scope.UPDATES_WRITE,
-        Scope.PROTOCOLS_WRITE,
-        Scope.RUN_SIGNOFF_WRITE,
-    }
-)
-
-
-def _settings_gated_admin_only_scopes(
-    settings: SettingsResponseData,
-) -> set[Scope]:
-    """Return admin-only scopes that are enabled by the current auth settings."""
-    result: set[Scope] = set()
-    if settings.requireAdminCredsWhenUpdatingRobotSoftware:
-        result.add(Scope.UPDATES_WRITE)
-    if settings.requireAdminCredsWhenSendingProtocolToRobot:
-        result.add(Scope.PROTOCOLS_WRITE)
-    if settings.requireAdminCredsForSignoffProtocol:
-        result.add(Scope.RUN_SIGNOFF_WRITE)
-    return result
-
 
 def get_scope_set_of_account_type(
     account_type: AccountType,
@@ -63,9 +39,7 @@ def get_scope_set_of_account_type(
 
     else:
         if account_type == AccountType.ADMIN or account_type == AccountType.SERVICE:
-            return (set(Scope) - _ADMIN_ONLY_SCOPES) | _settings_gated_admin_only_scopes(
-                settings
-            )
+            return set(Scope)  # All scopes.
 
         elif account_type == AccountType.AUDITOR:
             # Auditors should have read-only access to everything. Our read-only endpoints are
@@ -74,7 +48,14 @@ def get_scope_set_of_account_type(
             return {Scope.USERS_READ_OTHERS}
 
         elif account_type == AccountType.USER:
-            return set(_REGULAR_USER_SCOPES)
+            result = set(_REGULAR_USER_SCOPES)
+            if not settings.requireAdminCredsWhenUpdatingRobotSoftware:
+                result.add(Scope.UPDATES_WRITE)
+            if not settings.requireAdminCredsWhenSendingProtocolToRobot:
+                result.add(Scope.PROTOCOLS_WRITE)
+            if not settings.requireAdminCredsForSignoffProtocol:
+                result.add(Scope.RUN_SIGNOFF_WRITE)
+            return result
 
         else:
             assert_never(account_type)
