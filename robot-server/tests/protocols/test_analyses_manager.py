@@ -193,7 +193,8 @@ async def test_raises_error_and_saves_result_if_initialization_errors(
                     error=enumerated_error,
                 )
             ],
-        )
+        ),
+        await analyzer.clean_up(),
     )
 
 

@@ -92,35 +92,38 @@ class ProtocolAnalyzer:
         assert self._protocol_resource is not None
         assert self._coordinator is not None
         try:
-            result = await self._coordinator.run(
-                deck_configuration=[],
-            )
-        except BaseException as error:
-            await self.update_to_failed_analysis(
+            try:
+                result = await self._coordinator.run(
+                    deck_configuration=[],
+                )
+            except BaseException as error:
+                await self.update_to_failed_analysis(
+                    analysis_id=analysis_id,
+                    protocol_robot_type=self._protocol_resource.source.robot_type,
+                    error=error,
+                    run_time_parameters=await self._coordinator.get_run_time_parameters(),
+                )
+                return
+
+            log.info(f'Completed analysis "{analysis_id}".')
+
+            await self._analysis_store.update(
                 analysis_id=analysis_id,
-                protocol_robot_type=self._protocol_resource.source.robot_type,
-                error=error,
-                run_time_parameters=await self._coordinator.get_run_time_parameters(),
+                robot_type=self._protocol_resource.source.robot_type,
+                run_time_parameters=result.parameters,
+                commands=result.commands,
+                labware=result.state_summary.labware,
+                modules=result.state_summary.modules,
+                pipettes=result.state_summary.pipettes,
+                errors=result.state_summary.errors,
+                liquids=result.state_summary.liquids,
+                liquidClasses=result.state_summary.liquidClasses,
+                command_annotations=result.command_annotations,
+                command_preconditions=result.command_preconditions,
+                labware_offsets=result.state_summary.labwareOffsets,
             )
-            return
-
-        log.info(f'Completed analysis "{analysis_id}".')
-
-        await self._analysis_store.update(
-            analysis_id=analysis_id,
-            robot_type=self._protocol_resource.source.robot_type,
-            run_time_parameters=result.parameters,
-            commands=result.commands,
-            labware=result.state_summary.labware,
-            modules=result.state_summary.modules,
-            pipettes=result.state_summary.pipettes,
-            errors=result.state_summary.errors,
-            liquids=result.state_summary.liquids,
-            liquidClasses=result.state_summary.liquidClasses,
-            command_annotations=result.command_annotations,
-            command_preconditions=result.command_preconditions,
-            labware_offsets=result.state_summary.labwareOffsets,
-        )
+        finally:
+            await self.clean_up()
 
     async def update_to_failed_analysis(
         self,
@@ -154,7 +157,7 @@ class ProtocolAnalyzer:
             labware_offsets=[],
         )
 
-    async def __aexit__(self) -> None:
+    async def clean_up(self) -> None:
         """Stop the simulating run orchestrator.
 
         Once the analyzer is no longer in use- either because analysis completed
@@ -174,6 +177,7 @@ class ProtocolAnalyzer:
                     "Analyzer is no longer in use but orchestrator is busy. "
                     "Cannot stop the orchestrator currently."
                 )
+            self._coordinator = None
 
 
 def create_protocol_analyzer(

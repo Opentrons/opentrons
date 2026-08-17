@@ -563,6 +563,8 @@ async def _start_new_analysis_if_necessary(
                     analyzer=analyzer,
                 )
             )
+        else:
+            await analyzer.clean_up()
 
     return analyses, started_new_analysis
 
