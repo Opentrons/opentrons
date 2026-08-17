@@ -197,7 +197,6 @@ class MaintenanceRunDataManager:
             RunNotFoundError: The given run identifier was not found.
         """
         if run_id == self._run_orchestrator_store.current_run_id:
-            # Ensure maintenance run is cleared before stop publishing to eliminate race condition
             await self._run_orchestrator_store.clear()
             self._maintenance_runs_publisher.stop_publishing_for_maintenance_run()
 
