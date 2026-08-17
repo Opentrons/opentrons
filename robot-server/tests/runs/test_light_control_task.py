@@ -72,7 +72,7 @@ async def test_get_current_status_ot2(
     decoy.when(run_orchestrator_store.current_run_id).then_return(
         "fake_id" if active else None
     )
-    decoy.when(run_orchestrator_store.get_status()).then_return(status)
+    decoy.when(await run_orchestrator_store.get_status()).then_return(status)
     decoy.when(hardware_api.get_estop_state()).then_return(estop)
     subject._hardware_state_store.update_hardware_status_callback(
         event=EstopStateNotification()
@@ -84,7 +84,7 @@ async def test_get_current_status_ot2(
         engine_status=status if active else None,
     )
 
-    assert subject.get_current_status() == expected
+    assert await subject.get_current_status() == expected
 
 
 @pytest.mark.parametrize(
@@ -126,7 +126,8 @@ async def test_get_current_status(
         event=SubsystemConnectionNotification()
     )
 
-    result = subject.get_current_status().active_updates
+    current_status = await subject.get_current_status()
+    result = current_status.active_updates
     assert len(result) == len(active_updates)
     for subsystem in result:
         assert subsystem in active_updates
@@ -220,17 +221,19 @@ async def test_provide_run_orchestrator_store(
     )
     decoy.when(hardware_api.get_estop_state()).then_return(EstopState.DISENGAGED)
     hardware_store.update_hardware_status_callback(event=EstopStateNotification())
-    assert subject.get_current_status() == Status(
+    assert await subject.get_current_status() == Status(
         active_updates=[],
         estop_status=EstopState.DISENGAGED,
         engine_status=None,
     )
 
     decoy.when(run_orchestrator_store.current_run_id).then_return("fake_id")
-    decoy.when(run_orchestrator_store.get_status()).then_return(EngineStatus.RUNNING)
+    decoy.when(await run_orchestrator_store.get_status()).then_return(
+        EngineStatus.RUNNING
+    )
 
     subject.update_run_orchestrator_store(run_orchestrator_store=run_orchestrator_store)
-    assert subject.get_current_status() == Status(
+    assert await subject.get_current_status() == Status(
         active_updates=[],
         estop_status=EstopState.DISENGAGED,
         engine_status=EngineStatus.RUNNING,

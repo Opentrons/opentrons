@@ -271,7 +271,7 @@ async def test_run_process_create(
         protocol=None,
         run_time_param_values=None,
         run_time_param_paths=None,
-        proxy_of_callback_for_handling_door_events=run_process.register_hardware_door_event(),
+        proxy_of_callback_for_handling_door_events=await run_process.register_hardware_door_event(),
     )
 
     await run_process.finish()

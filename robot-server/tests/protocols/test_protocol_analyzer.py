@@ -265,6 +265,7 @@ async def test_analyze(
             command_preconditions=command_preconditions,
         )
     )
+    decoy.when(await orchestrator.get_is_okay_to_clear()).then_return(True)
 
     await subject.analyze(
         analysis_id="analysis-id",
@@ -347,7 +348,7 @@ async def test_analyze_updates_pending_on_error(
             deck_configuration=[],
         )
     ).then_raise(raised_exception)
-    decoy.when(orchestrator.get_run_time_parameters()).then_return([])
+    decoy.when(await orchestrator.get_run_time_parameters()).then_return([])
     decoy.when(em.map_unexpected_error(error=raised_exception)).then_return(
         enumerated_error
     )
@@ -355,6 +356,7 @@ async def test_analyze_updates_pending_on_error(
     decoy.when(datetime_helper.utc_now()).then_return(
         datetime(year=2023, month=3, day=3)
     )
+    decoy.when(await orchestrator.get_is_okay_to_clear()).then_return(True)
     await subject.load_orchestrator(
         run_time_param_values={"rtp_var": 123}, run_time_param_paths={}
     )
