@@ -36,11 +36,6 @@ export function LoginFieldInput<
   const isPasswordHidden = isPasswordField && !showPassword
   const inputType: 'text' | 'password' = isPasswordHidden ? 'password' : 'text'
 
-  const togglePasswordVisibility = (): void => {
-    setShowPassword(current => !current)
-    inputRef.current?.focus()
-  }
-
   const inputField = (
     <TouchInputField
       ref={setRefs(inputRef, field.ref)}
@@ -66,7 +61,9 @@ export function LoginFieldInput<
       <div className={styles.password_field_input}>{inputField}</div>
       <PasswordVisibilityToggle
         isVisible={showPassword}
-        onToggle={togglePasswordVisibility}
+        onToggle={() => {
+          setShowPassword(current => !current)
+        }}
       />
     </div>
   )
