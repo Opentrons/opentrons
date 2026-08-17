@@ -61,9 +61,9 @@ export function RobotNameEditor(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const ipAddress = localRobot?.ip
   const previousName = localRobot?.name != null ? localRobot.name : null
-  const [newName, setNewName] = useState<string>('')
-  const [isShowConfirmRobotName, setIsShowConfirmRobotName] =
-    useState<boolean>(false)
+  const [robotNameConfirmation, setRobotNameConfirmation] = useState<
+    string | null
+  >(null)
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
   const dispatch = useDispatch<Dispatch>()
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
@@ -122,7 +122,6 @@ export function RobotNameEditor(): JSX.Element {
     handleSubmit,
     control,
     formState: { errors },
-    reset,
     trigger,
     watch,
   } = useForm({
@@ -143,7 +142,6 @@ export function RobotNameEditor(): JSX.Element {
       dispatch(removeRobot(sameNameRobotInUnavailable.name))
     }
     updateRobotName(newName)
-    reset({ newRobotName: '' })
   }
 
   const documentationState = useDocumentationState()
@@ -153,11 +151,10 @@ export function RobotNameEditor(): JSX.Element {
     {
       onSuccess: (data: UpdatedRobotName) => {
         if (data.name != null) {
-          setNewName(data.name)
           if (!isUnboxingFlowOngoing) {
             navigate('/robot-settings')
           } else {
-            setIsShowConfirmRobotName(true)
+            setRobotNameConfirmation(data.name)
           }
           if (previousName != null) {
             dispatch(removeRobot(previousName))
@@ -187,8 +184,8 @@ export function RobotNameEditor(): JSX.Element {
 
   return (
     <>
-      {isShowConfirmRobotName && isUnboxingFlowOngoing ? (
-        <ConfirmRobotName robotName={newName} />
+      {robotNameConfirmation != null && isUnboxingFlowOngoing ? (
+        <ConfirmRobotName robotName={robotNameConfirmation} />
       ) : (
         <>
           {isUnboxingFlowOngoing ? (
@@ -287,7 +284,6 @@ export function RobotNameEditor(): JSX.Element {
                     onChange={e => {
                       const newVal = e.target.value
                       field.onChange(newVal)
-                      setNewName(newVal)
                       void trigger('newRobotName')
                     }}
                   />
@@ -320,7 +316,6 @@ export function RobotNameEditor(): JSX.Element {
                 <AlphanumericKeyboard
                   onChange={(input: string) => {
                     field.onChange(input)
-                    setNewName(input)
                     void trigger('newRobotName')
                   }}
                   keyboardRef={keyboardRef}
