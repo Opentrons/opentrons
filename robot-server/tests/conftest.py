@@ -120,7 +120,7 @@ def hardware_api(decoy: Decoy) -> HardwareControlAPI:
 
 
 @pytest.fixture
-def hardware_state_store(hardware_api: HardwareControlAPI) -> HardwareStateStore:
+async def hardware_state_store(hardware_api: HardwareControlAPI) -> HardwareStateStore:
     """Build a hardware state store on fixtured data."""
     return HardwareStateStore(
         hardware_resource=hardware_api,

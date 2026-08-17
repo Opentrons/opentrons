@@ -269,7 +269,7 @@ class RobotServerPyroResource:
                 event: HardwareEvent,
             ) -> None:
                 async def _async_call(event: HardwareEvent) -> None:
-                    hardware_store.update_hardware_status_callback(event)
+                    await hardware_store.update_hardware_status_callback(event)
 
                 asyncio.run_coroutine_threadsafe(
                     _async_call(event),

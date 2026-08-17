@@ -140,15 +140,15 @@ class HardwareStateStore:
         else:
             inner_hardware_resource = hardware_resource
 
+        attached_modules = await inner_hardware_resource.get_attached_modules()
+
         def _get_hw_info() -> tuple[
-            list[AbstractModule],
             dict[HwSubSystem, SubSystemState],
             EstopState,
             DoorState,
             str | None,
         ]:
             return (
-                inner_hardware_resource.attached_modules,
                 inner_hardware_resource.attached_subsystems,
                 inner_hardware_resource.get_estop_state(),
                 inner_hardware_resource.door_state,
@@ -156,7 +156,6 @@ class HardwareStateStore:
             )
 
         (
-            attached_modules,
             attached_subsystems,
             estop_state,
             door_state,
@@ -206,13 +205,16 @@ class HardwareStateStore:
         self._estop_state = estop_state
         self._door_state = door_state
         self._module_door_serial = module_door_serial
+        self._loop = asyncio.get_running_loop()
 
-    def update_hardware_status_callback(self, event: HardwareEvent) -> None:
+    async def update_hardware_status_callback(self, event: HardwareEvent) -> None:
         """Callback to update the Hardware State Store when changes occur on the hardware resource."""
         if isinstance(event, ModuleConnectedNotification) or isinstance(
             event, ModuleDisconnectedNotification
         ):
-            self._attached_modules = self._hardware_resource.attached_modules
+            self._attached_modules = (
+                await self._hardware_resource.get_attached_modules()
+            )
         if isinstance(event, SubsystemConnectionNotification):
             self._attached_subsystems = event.tracked_subsystems
         if isinstance(event, EstopStateNotification):
@@ -226,7 +228,12 @@ class HardwareStateStore:
         if self._unregister_hw_callback is None:
             self._unregister_hw_callback = (
                 await self._hardware_resource.register_callback_async(
-                    self.update_hardware_status_callback
+                    lambda event: cast(
+                        None,
+                        asyncio.run_coroutine_threadsafe(
+                            self.update_hardware_status_callback(event), self._loop
+                        ),
+                    )
                 )
             )
         else:

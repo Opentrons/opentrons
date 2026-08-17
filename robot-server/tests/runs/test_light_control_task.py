@@ -81,7 +81,7 @@ async def test_get_current_status_ot2(
         "fake_id" if active else None
     )
     decoy.when(await run_orchestrator_store.get_status()).then_return(status)
-    hardware_state_store.update_hardware_status_callback(
+    await hardware_state_store.update_hardware_status_callback(
         event=EstopStateNotification(new_state=estop)
     )
 
@@ -119,7 +119,7 @@ async def test_get_current_status(
     decoy.when(hardware_api.attached_subsystems).then_raise(
         RuntimeError("not allowed to call this")
     )
-    subject._hardware_state_store.update_hardware_status_callback(
+    await subject._hardware_state_store.update_hardware_status_callback(
         event=SubsystemConnectionNotification(
             tracked_subsystems={
                 node: SubSystemState(
@@ -231,7 +231,7 @@ async def test_provide_run_orchestrator_store(
         run_orchestrator_store=None,
         hardware_state_store=hardware_state_store,
     )
-    hardware_state_store.update_hardware_status_callback(
+    await hardware_state_store.update_hardware_status_callback(
         event=EstopStateNotification(new_state=EstopState.DISENGAGED)
     )
     assert await subject.get_current_status() == Status(

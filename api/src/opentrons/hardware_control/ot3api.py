@@ -29,6 +29,8 @@ from opentrons_shared_data.errors.exceptions import (
     FirmwareUpdateFailedError,
     GripperNotPresentError,
     InvalidActuator,
+    MissingConfigurationData,
+    ModuleNotPresent,
     PipetteLiquidNotFoundError,
     PipetteOverpressureError,
     PositionUnknownError,
@@ -705,6 +707,21 @@ class OT3API(
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def attached_modules(self) -> List[modules.AbstractModule]:
         return self._backend.module_controls.available_modules
+
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    async def get_attached_modules(self) -> list[modules.AbstractModule]:
+        return self.attached_modules
+
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    async def get_attached_module_by_serial(
+        self, serial: str
+    ) -> modules.AbstractModule:
+        for module in self.attached_modules:
+            if module.device_info.get("serial") == serial:
+                return module
+        raise ModuleNotPresent(
+            serial, message=f"Could not find module with serial {serial}"
+        )
 
     @property
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
@@ -3455,3 +3472,12 @@ class OT3API(
         )
         cp = self.critical_point_for(realmount, None)
         return end_point + offset + cp
+
+    async def update_module(self, module_serial: str) -> None:
+        module = await self.get_attached_module_by_serial(module_serial)
+        bundled_fw = module.bundled_fw
+        if bundled_fw is None:
+            raise MissingConfigurationData(
+                message=f"No stored firmware for {module.name} {module.serial_number}"
+            )
+        return await modules.update_firmware(module, bundled_fw.path)

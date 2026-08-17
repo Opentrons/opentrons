@@ -302,7 +302,8 @@ async def _setup_and_validate_modules_on_OT3API_and_nameserver(
     modules_list_NO_MAG_BLOCK = tuple(
         arg for arg in get_args(ModuleModel) if arg != MagneticBlockModel
     )
-    assert len(ot3api_async_instance.attached_modules) == len(modules_list_NO_MAG_BLOCK)
+    attached_modules = await ot3api_async_instance.get_attached_modules()
+    assert len(attached_modules) == len(modules_list_NO_MAG_BLOCK)
 
     return ot3api_async_instance
 
@@ -699,6 +700,35 @@ CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
     ),
     module_types.BundledFirmware: module_types.BundledFirmware(
         version="v1", path=Path("coolpath")
+    ),
+    module_types.ModuleStateSummary: module_types.ModuleStateSummary(
+        model="asda",
+        usb_port=rpi_types.USBPort(
+            name="USB",
+            port_number=10,
+            port_group=rpi_types.PortGroup.MAIN,
+            hub=True,
+            hub_port=11,
+            device_path="cooldevpath",
+        ),
+        has_available_update=True,
+        live_data={
+            "status": "good",
+            "data": {
+                "latchState": True,
+                "platformState": False,
+                "hopperDoorState": 10,
+                "installDetected": "3",
+                "errorDetails": "hi",
+            },
+        },
+        device_info={
+            "serial": "blahablahblh",
+            "version": "1.2.3",
+            "model": "ac",
+            "reset_reason": "10",
+        },
+        serial_number=None,
     ),
     vac_types.PumpState: vac_types.PumpState(
         target_rpm=0.1,

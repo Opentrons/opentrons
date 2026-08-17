@@ -799,9 +799,10 @@ async def get_current_state(  # noqa: C901
                 ):
                     continue
                 for hw_mod in hardware_store.attached_modules:
+                    summary = await hw_mod.get_state_summary()
                     if (
                         mod.location is not None
-                        and hw_mod.serial_number == mod.serialNumber
+                        and summary.serial_number == mod.serialNumber
                     ):
                         location = mod.location
                         # TODO: Not the best location for this, we should
