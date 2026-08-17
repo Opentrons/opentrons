@@ -62,7 +62,7 @@ export function LoginFieldInput<
       <PasswordVisibilityToggle
         isVisible={showPassword}
         onToggle={() => {
-          setShowPassword(current => !current)
+          setShowPassword(prev=> !prev)
         }}
       />
     </div>
