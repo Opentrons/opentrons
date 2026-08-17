@@ -16,7 +16,7 @@ Welcome to the v10.0.0 release of the Opentrons App! This release introduces Ope
   - The app and touchscreen require user login to change settings, set up and run protocols, and complete robot actions like homing the gantry.
   - The app and touchscreen include prompts to enter required documentation after nearly every robot action.
 - Use the new file manager to download files your Flex generates, like protocol run records (for all Flex robots) or audit logs that capture user actions and documentation (for Flex robots with Opentrons Flex Compliance Ready Software). Find the file manager under your robot's settings on the Flex touchscreen or in the Opentrons App.
-- The Flex now supports external keyboards via the front USB port for use with Opentrons Flex Compliance Ready Software.
+- The Flex now supports external keyboards via the front USB port.
 
 ### Feature Improvements
 
