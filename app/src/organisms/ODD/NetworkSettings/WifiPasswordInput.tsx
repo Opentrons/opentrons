@@ -62,7 +62,6 @@ export function WifiPasswordInput({
               isVisible={showPassword}
               onToggle={() => {
                 setShowPassword(currentState => !currentState)
-                inputRef?.current?.focus()
               }}
             />
           </div>
