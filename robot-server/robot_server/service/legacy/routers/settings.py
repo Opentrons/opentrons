@@ -269,8 +269,8 @@ async def post_log_level_local(
     for logger_name in ("opentrons", "robot_server", "uvicorn"):
         logging.getLogger(logger_name).setLevel(level.level_id)
     # Update and save settings
-    await hardware.update_config(log_level=level_name)
-    robot_configs.save_robot_settings(hardware.config)
+    new_config = await hardware.update_config(log_level=level_name)
+    robot_configs.save_robot_settings(new_config)
 
     return V1BasicResponse(message=f"log_level set to {level}")
 
@@ -407,9 +407,10 @@ async def post_settings_reset_options(
 async def get_robot_settings(
     hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
 ) -> RobotConfigs:
-    if isinstance(hardware.config, OT3Config):
-        return hardware.config.model_dump()
-    return asdict(hardware.config)
+    config = await hardware.update_config()
+    if isinstance(config, OT3Config):
+        return config.model_dump()
+    return asdict(config)
 
 
 @router.get(

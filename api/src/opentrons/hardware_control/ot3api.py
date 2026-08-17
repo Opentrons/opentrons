@@ -1965,9 +1965,10 @@ class OT3API(
         else:
             self._log.error("Tried to specify an OT2 config object")
 
-    async def update_config(self, **kwargs: Any) -> None:
+    async def update_config(self, **kwargs: Any) -> OT3Config:
         """Update values of the robot's configuration."""
         self._config = self._config.model_copy(update=kwargs)
+        return self._config
 
     @property
     def hardware_feature_flags(self) -> HardwareFeatureFlags:

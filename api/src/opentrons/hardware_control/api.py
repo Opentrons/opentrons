@@ -1047,7 +1047,7 @@ class API(  # type: ignore[misc]
         else:
             self._log.error("Cannot use an OT-3 config on an OT-2")
 
-    async def update_config(self, **kwargs: Any) -> None:
+    async def update_config(self, **kwargs: Any) -> RobotConfig:
         """Update values of the robot's configuration.
 
         `kwargs` should contain keys of the robot's configuration. For
@@ -1058,6 +1058,7 @@ class API(  # type: ignore[misc]
         :py:class:`.RobotConfig`.
         """
         self._config = replace(self._config, **kwargs)
+        return self._config
 
     @property
     def hardware_feature_flags(self) -> HardwareFeatureFlags:
