@@ -518,6 +518,14 @@ async def test_home_z(
             OrderedDict({HardwareAxis.Q: 10.0}),
             {HardwareAxis.Q: 10.0},
         ],
+        [
+            {MotorAxis.EXTENSION_Z: 10.0},
+            None,
+            False,
+            Mount.EXTENSION,
+            OrderedDict({HardwareAxis.Z_G: 9.0}),
+            {HardwareAxis.Z_G: 10.0},
+        ],
     ],
 )
 @pytest.mark.ot3_only
