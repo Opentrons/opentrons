@@ -273,6 +273,16 @@ The Vacuum Module requires the following power inputs, which are met by its inte
       </td>
     </tr>
     <tr>
+      <td><strong>Fuse</strong></td>
+      <td>
+        <ul>
+          <li>Slow-blow (time-delay)</li>
+          <li>8 A, 250 V</li>
+        </ul>
+          <img src="../images/warning-triangle-shock.svg" alt="Electrical shock warning" style="vertical-align: middle; height: 2.0em;"> Do not attempt to replace the fuse unless at the direction of Opentrons Support.
+      </td>
+    </tr>
+    <tr>
       <td><strong>Over-voltage</strong></td>
       <td>
         <ul>
