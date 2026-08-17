@@ -1,6 +1,5 @@
 """Protocol analysis module."""
 
-import asyncio
 import logging
 from typing import List, Optional, Union
 
