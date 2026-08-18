@@ -53,6 +53,7 @@ from server_utils.fastapi_utils.models.json_api import (
 from .analyses_manager import AnalysesManager, FailedToInitializeAnalyzer
 from .analysis_models import (
     AnalysisRequest,
+    AnalysisResult,
     AnalysisStatus,
     AnalysisSummary,
     ProtocolAnalysis,
@@ -536,6 +537,7 @@ async def _start_new_analysis_if_necessary(
             AnalysisSummary(
                 id=analysis_id,
                 status=AnalysisStatus.COMPLETED,
+                result=AnalysisResult.NOT_OK,
             )
         )
     else:
