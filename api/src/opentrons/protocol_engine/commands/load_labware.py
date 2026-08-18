@@ -192,6 +192,10 @@ class LoadLabwareImplementation(
             )
 
         elif self._is_loading_to_module(params.location, ModuleModel.VACUUM_MODULE_V1):
+            if isinstance(verified_location, ModuleLocation):
+                self._state_view.labware.raise_if_labware_incompatible_with_vacuum_module(
+                    loaded_labware.definition
+                )
             self._state_view.labware.raise_if_labware_incompatible_with_vacuum_module_dock(
                 verified_location, loaded_labware.definition
             )

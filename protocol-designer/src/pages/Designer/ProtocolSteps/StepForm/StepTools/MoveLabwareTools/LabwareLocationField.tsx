@@ -190,6 +190,13 @@ export function LabwareLocationField(
   // explicit compatibleParentLabware / stackingOffsetWithLabware
   const isMovingLabwareFilterPlate =
     movingLabwareDef?.parameters.quirks?.includes('filterPlate') ?? false
+  // filter plates cannot sit directly on the vacuum module
+  if (isMovingLabwareFilterPlate) {
+    unoccupiedLabwareLocationsOptions =
+      unoccupiedLabwareLocationsOptions.filter(
+        ({ value }) => moduleEntities[value]?.type !== VACUUM_MODULE_TYPE
+      )
+  }
   if (movingLabwareDef != null && !isMovingLabwareFilterPlate) {
     unoccupiedLabwareLocationsOptions =
       unoccupiedLabwareLocationsOptions.filter(({ value }) => {
