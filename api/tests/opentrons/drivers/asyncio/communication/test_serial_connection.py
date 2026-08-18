@@ -5,6 +5,7 @@ import mock
 import pytest
 from _pytest.fixtures import SubRequest
 from mock import AsyncMock, call
+from serial.serialutil import SerialException as PySerialSerialException
 
 from opentrons.drivers.asyncio.communication.async_serial import AsyncSerial
 from opentrons.drivers.asyncio.communication.errors import (
@@ -434,6 +435,50 @@ async def test_send_data_does_not_retry_async_error(
     mock_serial_port.write.assert_awaited_once_with(data=data.encode())
     # Combined async + command frame is fully consumed in a single read.
     assert mock_serial_port.read_until.await_count == 1
+
+
+async def test_send_data_does_not_log_traceback_for_async_error(
+    mock_serial_port: AsyncMock,
+    async_subject: AsyncResponseSerialConnection,
+    ack: str,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Device-reported async errors are valid responses, not unexpected send failures."""
+    data = "M121 "
+    async_line = "async ERR400:vacuum:target pressure not reached"
+    combined_response = f"{async_line}\nM121 T:0.0 C:-4.7 V:1 {ack}".encode()
+    mock_serial_port.read_until.side_effect = [combined_response]
+
+    with caplog.at_level("DEBUG"):
+        with pytest.raises(ErrorResponse, match="ERR400"):
+            await async_subject._send_data_multiack(data=data, retries=2, acks=1)
+
+    assert "Got an error during send" not in caplog.text
+    assert "Already used" not in caplog.text
+    assert "Traceback" not in caplog.text
+    assert "Device reported an error during send" in caplog.text
+
+
+async def test_send_data_does_not_log_traceback_for_serial_io_error(
+    mock_serial_port: AsyncMock,
+    async_subject: AsyncResponseSerialConnection,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Unplug I/O errors should retry without a traceback on every attempt."""
+    mock_serial_port.write.side_effect = PySerialSerialException(
+        "write failed: [Errno 5] Input/output error"
+    )
+
+    with caplog.at_level("DEBUG"):
+        with pytest.raises(PySerialSerialException, match="write failed"):
+            await async_subject._send_data_multiack(data="M121 ", retries=2, acks=1)
+
+    assert mock_serial_port.write.await_count == 3
+    assert "Got an error during send" not in caplog.text
+    assert "Traceback" not in caplog.text
+    assert "retrying 0/2" in caplog.text
+    assert "retrying 1/2" in caplog.text
+    assert "send failed after 2 retries" in caplog.text
 
 
 async def test_send_data_still_retries_missing_response(
