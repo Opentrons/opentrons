@@ -31,7 +31,8 @@ describe('DownloadAuditLogsModal', () => {
 
   it('renders the warning title, description, and download button', () => {
     render(props)
-    expect(screen.getAllByText('Download audit logs')).toHaveLength(2)
+    expect(screen.getAllByText('Download audit logs')).toHaveLength(1)
+    expect(screen.getAllByText('Download now')).toHaveLength(1)
     screen.getByText(
       'Once a protocol run is complete, audit logs must be downloaded locally before continuing.'
     )
@@ -39,7 +40,7 @@ describe('DownloadAuditLogsModal', () => {
 
   it('calls onDownload when the download button is clicked', () => {
     render(props)
-    screen.getByRole('button', { name: 'Download audit logs' }).click()
+    screen.getByRole('button', { name: 'Download now' }).click()
     expect(props.onDownload).toHaveBeenCalled()
   })
 

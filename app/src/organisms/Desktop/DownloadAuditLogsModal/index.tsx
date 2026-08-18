@@ -46,7 +46,7 @@ export function DownloadAuditLogsModal({
                 aria-hidden
                 spin={isLoading}
               />
-              {t('download_audit_logs')}
+              {t('download_now')}
             </span>
           </PrimaryButton>
         </div>

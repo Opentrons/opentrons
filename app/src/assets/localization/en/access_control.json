@@ -14,6 +14,7 @@
   "documentation_required": "Documentation Required",
   "download_audit_logs": "Download audit logs",
   "download_audit_logs_description": "Once a protocol run is complete, audit logs must be downloaded locally before continuing.",
+  "download_now": "Download now",
   "forgot_password_heading": "Forgot password?",
   "forgot_password_link": "Forgot password?",
   "forgot_password_subheading": "Log in to an admin account to reset the password for your account.",
