@@ -170,7 +170,6 @@ interface MenuDropdownProps extends HistoricalProtocolRunOverflowMenuProps {
 }
 function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   const { t } = useTranslation('device_details')
-  const navigate = useNavigate()
 
   const {
     run,
