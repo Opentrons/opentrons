@@ -318,20 +318,22 @@ export function ProtocolVisualization(
           }}
         />
         {/* Right Column is resizable */}
-        <div
-          className={styles.right_column}
-          style={{ width: `${rightWidth}px` }}
-        >
-          {selectedRunTimeCommand != null && showStepDetails ? (
-            <StepDetailContainer
-              commands={commands}
-              robotState={robotState}
-              invariantContext={invariantContext}
-              currentCommand={selectedRunTimeCommand}
-              liquids={liquids}
-            />
-          ) : null}
-        </div>
+        {showStepDetails ? (
+          <div
+            className={styles.right_column}
+            style={{ width: `${rightWidth}px` }}
+          >
+            {selectedRunTimeCommand != null ? (
+              <StepDetailContainer
+                commands={commands}
+                robotState={robotState}
+                invariantContext={invariantContext}
+                currentCommand={selectedRunTimeCommand}
+                liquids={liquids}
+              />
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </>
   )

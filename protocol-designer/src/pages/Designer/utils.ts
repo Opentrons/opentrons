@@ -413,6 +413,10 @@ export const useLabwareDropdownOptions = (
         isOffDeck &&
         (type === 'labware' || (type === 'moveLabware' && useGripper))
 
+      // if pipetting, ensure the labware is pipettable (not an adapter)
+      const isPipetteInaccessible =
+        type === 'labware' && !getIsPipettableLabware(labwareEntity.def)
+
       const lwIndex = fullStackFromLabwares.findIndex(
         element => element === labwareId
       )
@@ -443,6 +447,8 @@ export const useLabwareDropdownOptions = (
           !isTopOfStack &&
           !isMovableAdapter &&
           !isLabwareLidCombo) ||
+        (type === 'labware' && !isTopOfStack) ||
+        isPipetteInaccessible ||
         (type === 'labware' && !isAccessibleFromTop) ||
         (type === 'moveLabware' && isAdapterAbove) ||
         isPipettingToNonPipettableLabware
