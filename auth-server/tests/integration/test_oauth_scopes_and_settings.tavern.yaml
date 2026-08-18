@@ -89,6 +89,33 @@ stages:
           expected_present: updates.write run_signoff.write
           expected_absent: protocols.write
 
+  - name: Require admin credentials for updates again
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          requireAdminCredsWhenUpdatingRobotSoftware: true
+    response:
+      status_code: 200
+
+  - name: Existing user tokens should lose updates.write without re-login
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/introspect'
+      data:
+        client_id: opentrons_app
+        token: '{user_access_token}'
+    response:
+      status_code: 200
+      verify_response_with:
+        function: tests.integration.utils:verify_oauth_scopes
+        extra_kwargs:
+          expected_present: run_signoff.write
+          expected_absent: updates.write protocols.write
+
   - name: Allow regular users to send protocols to the robot
     request:
       method: PATCH
@@ -101,7 +128,7 @@ stages:
     response:
       status_code: 200
 
-  - name: Regular users should now get both updates.write and protocols.write
+  - name: Regular users should now get protocols.write but not updates.write
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
@@ -115,12 +142,13 @@ stages:
       verify_response_with:
         function: tests.integration.utils:verify_oauth_scopes
         extra_kwargs:
-          expected_present: updates.write protocols.write run_signoff.write
+          expected_present: protocols.write run_signoff.write
+          expected_absent: updates.write
       save:
         json:
           user_access_token: access_token
 
-  - name: Token introspection should match fully-enabled login scopes
+  - name: Token introspection should match protocols-enabled login scopes
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/introspect'
@@ -132,7 +160,8 @@ stages:
       verify_response_with:
         function: tests.integration.utils:verify_oauth_scopes
         extra_kwargs:
-          expected_present: updates.write protocols.write run_signoff.write
+          expected_present: protocols.write run_signoff.write
+          expected_absent: updates.write
 
   - name: Require admin credentials for protocol signoff
     request:
@@ -145,6 +174,21 @@ stages:
           requireAdminCredsForSignoffProtocol: true
     response:
       status_code: 200
+
+  - name: Existing user tokens should lose run_signoff.write without re-login
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/introspect'
+      data:
+        client_id: opentrons_app
+        token: '{user_access_token}'
+    response:
+      status_code: 200
+      verify_response_with:
+        function: tests.integration.utils:verify_oauth_scopes
+        extra_kwargs:
+          expected_present: protocols.write
+          expected_absent: run_signoff.write updates.write
 
   - name: Regular users should lose run_signoff.write when signoff is admin-only
     request:
@@ -160,8 +204,8 @@ stages:
       verify_response_with:
         function: tests.integration.utils:verify_oauth_scopes
         extra_kwargs:
-          expected_present: updates.write protocols.write
-          expected_absent: run_signoff.write
+          expected_present: protocols.write
+          expected_absent: run_signoff.write updates.write
       save:
         json:
           user_access_token: access_token
@@ -178,5 +222,5 @@ stages:
       verify_response_with:
         function: tests.integration.utils:verify_oauth_scopes
         extra_kwargs:
-          expected_present: updates.write protocols.write
-          expected_absent: run_signoff.write
+          expected_present: protocols.write
+          expected_absent: run_signoff.write updates.write

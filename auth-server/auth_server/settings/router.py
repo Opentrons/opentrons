@@ -32,8 +32,11 @@ from .models import (
     AccessControlResponseData,
     PatchSettingsRequestData,
     SettingsResponseData,
+    patch_affects_token_scopes,
 )
 from .store import AccessControlAlreadySetError, SettingsStore, get_settings_store
+from auth_server.oauth2.backend import Backend as OAuth2Backend
+from auth_server.oauth2.fastapi_dependencies import get_oauth2_backend
 from auth_server.settings.models import PatchAccessControlRequestData
 
 router = fastapi.APIRouter()
@@ -127,8 +130,12 @@ async def patch_access_control_settings(  # noqa: D103
 async def patch_settings(  # noqa: D103
     request_body: RequestModel[PatchSettingsRequestData],
     settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
+    oauth2_backend: Annotated[OAuth2Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> SimpleBody[SettingsResponseData]:
-    new_settings = settings_store.patch_settings(request_body.data)
+    patch = request_body.data
+    new_settings = settings_store.patch_settings(patch)
+    if patch_affects_token_scopes(patch):
+        oauth2_backend.refresh_active_token_scopes()
     return SimpleBody.model_construct(data=new_settings)
 
 
@@ -147,7 +154,9 @@ async def patch_settings(  # noqa: D103
 )
 async def delete_settings(  # noqa: D103
     settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
+    oauth2_backend: Annotated[OAuth2Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> SimpleBody[SettingsResponseData]:
     settings_store.reset_settings()
     new_settings = settings_store.get_settings()
+    oauth2_backend.refresh_active_token_scopes()
     return SimpleBody.model_construct(data=new_settings)

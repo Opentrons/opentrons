@@ -58,6 +58,10 @@ class Backend:
         settings_store: SettingsStore,
         send_audit_log: SendAuditLog,
     ) -> None:
+        self._user_store = user_store
+        self._settings_store = settings_store
+        self._token_store = _TokenStore()
+
         def get_token_expires_in(request: oauthlib.common.Request) -> int:
             idle_logout_setting = settings_store.get_settings().idleLogout
             return int(idle_logout_setting)
@@ -66,13 +70,34 @@ class Backend:
         # grant type.
         self._inner_backend = oauthlib.oauth2.LegacyApplicationServer(
             _RequestValidator(
-                _TokenStore(),
+                self._token_store,
                 user_store,
                 settings_store,
                 lambda: datetime.now(tz=UTC),
                 send_audit_log,
             ),
             token_expires_in=get_token_expires_in,
+        )
+
+    def refresh_active_token_scopes(self) -> None:
+        """Recompute scopes for all active tokens from current settings and users."""
+        now = datetime.now(tz=UTC)
+        self._token_store.refresh_active_token_scopes(
+            now=now,
+            get_scopes_for_username=self._get_scopes_for_username,
+        )
+
+    def _get_scopes_for_username(self, username: str) -> set[Scope]:
+        user = self._user_store.get(username)
+        if user is None:
+            return set()
+
+        settings = self._settings_store.get_settings()
+        now = datetime.now(tz=UTC)
+        return get_scope_set_of_user(
+            user,
+            settings,
+            must_reset_password(user, now, settings.passwordResetTime),
         )
 
     def create_token_response(
@@ -566,6 +591,17 @@ class _TokenStore:
             if self._is_active(token, now) and token.refresh_token == refresh_token:
                 return token
         return None
+
+    def refresh_active_token_scopes(
+        self,
+        now: datetime,
+        get_scopes_for_username: Callable[[str], set[Scope]],
+    ) -> None:
+        """Update stored scopes on active tokens to match current settings."""
+        self.prune_inactive(now)
+        for token in self._tokens:
+            if self._is_active(token, now):
+                token.scopes = get_scopes_for_username(token.username)
 
     @staticmethod
     def _is_active(token: _TokenIssuance, now: datetime) -> bool:
