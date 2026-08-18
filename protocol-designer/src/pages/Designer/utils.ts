@@ -7,6 +7,7 @@ import {
   FLEX_STACKER_MODULE_TYPE,
   getAllDefinitions,
   getIsLid,
+  getIsPipettableLabware,
   getIsTiprack,
   getPositionFromSlotId,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
@@ -23,6 +24,7 @@ import {
   getIsSlotAVacuumDock,
   getIsVacuumSpacer,
   getSlotInLocationStack,
+  VACUUM_DOCK_ADDRESSABLE_AREA,
 } from '@opentrons/step-generation'
 
 import {
@@ -37,8 +39,10 @@ import { getLabwareNicknamesById } from '../../ui/labware/selectors'
 import {
   getAllLabwareIdsOfCertainURIOnStack,
   getFullStackFromLabwaresOnDeck,
+  getIsAdapter,
   getStagingAreaAddressableAreas,
 } from '../../utils'
+import { getIsVacuumCollar } from './DeckSetup/utils'
 
 import type { DropdownOption } from '@opentrons/components'
 import type {
@@ -409,6 +413,24 @@ export const useLabwareDropdownOptions = (
         isOffDeck &&
         (type === 'labware' || (type === 'moveLabware' && useGripper))
 
+      const lwIndex = fullStackFromLabwares.findIndex(
+        element => element === labwareId
+      )
+      const elementsAboveLw = fullStackFromLabwares.slice(0, lwIndex)
+      const isAdapterAbove = elementsAboveLw.some(element =>
+        getIsAdapter(element, labwareEntities)
+      )
+      const isOnlyCollarAboveAndIsPipettable =
+        elementsAboveLw.length === 1 &&
+        elementsAboveLw[0] in labwareEntities &&
+        getIsVacuumCollar(labwareEntities[elementsAboveLw[0]].def) &&
+        getIsPipettableLabware(def)
+      const isAccessibleFromTop =
+        isTopOfStack || isOnlyCollarAboveAndIsPipettable
+
+      const isPipettingToNonPipettableLabware =
+        type === 'labware' && !getIsPipettableLabware(def)
+
       //  TODO: refactor this to be easier to read
       const shouldExclude =
         isInaccessible ||
@@ -421,7 +443,9 @@ export const useLabwareDropdownOptions = (
           !isTopOfStack &&
           !isMovableAdapter &&
           !isLabwareLidCombo) ||
-        (type === 'labware' && !isTopOfStack)
+        (type === 'labware' && !isAccessibleFromTop) ||
+        (type === 'moveLabware' && isAdapterAbove) ||
+        isPipettingToNonPipettableLabware
       if (shouldExclude) {
         return acc
       }
@@ -488,6 +512,7 @@ export const getUnoccupiedStackOptions = (args: {
       const destIsVacuumSpacer = getIsVacuumSpacer(labwareOnDeckDef)
       const movingLabwareIsCollar =
         def.parameters.quirks?.includes('vacuumModuleDock') ?? false
+      const isVacuumDock = slot === VACUUM_DOCK_ADDRESSABLE_AREA
 
       const isCompatible =
         // filter plates can go on any non-lid, non-tiprack, non-filter-plate labware
@@ -537,7 +562,7 @@ export const getUnoccupiedStackOptions = (args: {
                   })
                 : displayName,
             value: labwareId,
-            deckLabel: slot,
+            deckLabel: isVacuumDock ? VACUUM_DOCK_DISPLAY_LOCATION : slot,
           },
         ]
       }

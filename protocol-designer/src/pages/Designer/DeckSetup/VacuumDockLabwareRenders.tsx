@@ -1,6 +1,10 @@
 import { VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA } from '@opentrons/shared-data'
 
 import { LabwareOnDeck } from '/protocol-designer/components/organisms'
+import {
+  VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_X,
+  VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_Y,
+} from '/protocol-designer/constants'
 
 import { HighlightLabware } from '../HighlightLabware'
 import { LabwareControls } from './Overlays'
@@ -86,7 +90,11 @@ export function VacuumDockLabwareRenders(
       })}
       <HighlightLabware
         labwareOnDeck={topLabware}
-        position={[x, y, 0]}
+        position={[
+          x + VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_X,
+          y + VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_Y,
+          0,
+        ]}
         isZoomed={selectedZoomInSlot != null}
       />
       <LabwareControls
@@ -95,7 +103,11 @@ export function VacuumDockLabwareRenders(
         setHover={setHover}
         setShowMenuListForId={setShowMenuListForId}
         hover={hover}
-        slotPosition={[x, y, 0]}
+        slotPosition={[
+          x + VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_X,
+          y + VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_Y,
+          0,
+        ]}
         setHoveredLabware={setHoveredLabware}
         setDraggedLabware={setDraggedLabware}
         swapBlocked={false}
@@ -105,7 +117,11 @@ export function VacuumDockLabwareRenders(
       />
       <ActiveLabwareControls
         itemId={VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA}
-        slotPosition={[x, y, 0]}
+        slotPosition={[
+          x + VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_X,
+          y + VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_Y,
+          0,
+        ]}
         hover={hover}
         setHover={setHover}
         slotBoundingBox={labwareInterfaceBoundingBox}
