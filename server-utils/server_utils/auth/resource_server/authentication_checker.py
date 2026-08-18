@@ -13,6 +13,7 @@ from .auth_server import (
     Client as AuthServerClient,
 )
 from .types import (
+    AdminCredsSettingsData,
     AuthenticatedResult,
     AuthenticationNotRequiredResult,
     AuthenticationResult,
@@ -42,6 +43,11 @@ class AuthenticationChecker(ABC):
         """Check whether access control is currently enabled."""
         pass
 
+    @abstractmethod
+    async def admin_creds_settings(self) -> AdminCredsSettingsData:
+        """Return the live requireAdminCreds* flags."""
+        pass
+
 
 class FailedClosedAuthenticationChecker(AuthenticationChecker):
     """An `AuthenticationChecker` that always denies access.
@@ -57,6 +63,14 @@ class FailedClosedAuthenticationChecker(AuthenticationChecker):
     async def access_control_status(self) -> bool:
         return True
 
+    @override
+    async def admin_creds_settings(self) -> AdminCredsSettingsData:
+        return AdminCredsSettingsData(
+            requireAdminCredsWhenUpdatingRobotSoftware=True,
+            requireAdminCredsWhenSendingProtocolToRobot=True,
+            requireAdminCredsForSignoffProtocol=True,
+        )
+
 
 class AlwaysAllowedAuthenticationChecker(AuthenticationChecker):
     """An `AuthenticationChecker` that always allows access."""
@@ -68,6 +82,14 @@ class AlwaysAllowedAuthenticationChecker(AuthenticationChecker):
     @override
     async def access_control_status(self) -> bool:
         return False
+
+    @override
+    async def admin_creds_settings(self) -> AdminCredsSettingsData:
+        return AdminCredsSettingsData(
+            requireAdminCredsWhenUpdatingRobotSoftware=False,
+            requireAdminCredsWhenSendingProtocolToRobot=False,
+            requireAdminCredsForSignoffProtocol=False,
+        )
 
 
 class AuthServerAuthenticationChecker(AuthenticationChecker):
@@ -108,6 +130,7 @@ class AuthServerAuthenticationChecker(AuthenticationChecker):
                     scope=token_info.scope,
                     username=token_info.username,
                     fullname=token_info.ot_fullname,
+                    account_type=token_info.ot_account_type or "",
                 )
             return NotAnActiveTokenResult()
 
@@ -115,3 +138,8 @@ class AuthServerAuthenticationChecker(AuthenticationChecker):
     async def access_control_status(self) -> bool:
         """See base class for documentation."""
         return (await self._client.get_auth_settings()).data.accessControlEnabled
+
+    @override
+    async def admin_creds_settings(self) -> AdminCredsSettingsData:
+        """See base class for documentation."""
+        return (await self._client.get_admin_creds_settings()).data

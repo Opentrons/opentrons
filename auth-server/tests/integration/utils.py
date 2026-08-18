@@ -13,13 +13,15 @@ def verify_oauth_scopes(
     *,
     expected_present: str = "",
     expected_absent: str = "",
+    expected_account_type: str = "",
 ) -> None:
     """Verify that an OAuth response's scope field includes and excludes specific scopes.
 
     `expected_present` and `expected_absent` are space-separated scope API names
     (e.g. ``"updates.write protocols.write"``).
     """
-    parsed_actual = parse_scopes(response.json().get("scope", ""))
+    body = response.json()
+    parsed_actual = parse_scopes(body.get("scope", ""))
     parsed_expected_present = parse_scopes(expected_present)
     parsed_expected_absent = parse_scopes(expected_absent)
 
@@ -34,3 +36,6 @@ def verify_oauth_scopes(
         "Unexpected scopes present in response: "
         f"{sorted(scope.api_name for scope in unexpected)}"
     )
+
+    if expected_account_type:
+        assert body.get("ot_account_type") == expected_account_type

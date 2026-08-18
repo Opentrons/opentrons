@@ -32,6 +32,7 @@ from server_utils.auth.resource_server.authentication_checker import (
     AuthServerAuthenticationChecker,
 )
 from server_utils.auth.resource_server.types import (
+    AdminCredsSettingsResponse,
     AuthSettingsResponse,
     TokenIntrospectionRequestFormData,
     TokenIntrospectionResponse,
@@ -75,6 +76,13 @@ class _SelfClient(Client):
         response_body = {"data": {"accessControlEnabled": access_control_enabled}}
         converted_response_body = AuthSettingsResponse.model_validate(response_body)
         return converted_response_body
+
+    @override
+    async def get_admin_creds_settings(self) -> AdminCredsSettingsResponse:
+        settings = self._settings_store.get_settings()
+        return AdminCredsSettingsResponse.model_validate(
+            {"data": settings.model_dump(mode="json")}
+        )
 
     @override
     async def introspect_token(self, token: str) -> TokenIntrospectionResponse:

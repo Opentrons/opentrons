@@ -46,6 +46,8 @@ from server_utils.audit.audit_server import (
 )
 from server_utils.auth.resource_server.fastapi import AuthorizationError
 from server_utils.auth.resource_server.types import (
+    AdminCredentialsRequiredResult,
+    AdminCredsSettingsData,
     AuthenticatedResult,
     AuthenticationNotRequiredResult,
 )
@@ -1270,6 +1272,102 @@ async def test_update_run_signed_by_requires_run_signoff_write_scope(
         )
 
     assert exc_info.value.required_scopes == {Scope.RUN_SIGNOFF_WRITE}
+
+
+async def test_update_run_signed_by_requires_admin_when_setting_true(
+    mock_run_data_manager: RunDataManager,
+    mock_run_store: RunStore,
+    mock_audit_client: AuditClient,
+    mock_persistence_directory_root: Path,
+    mock_protocol_store: ProtocolStore,
+) -> None:
+    """It should reject user signoff when requireAdminCredsForSignoffProtocol is true."""
+    with pytest.raises(AuthorizationError) as exc_info:
+        await update_run(
+            runId="run-id",
+            request_body=RequestModel(data=RunUpdate(signedBy="Alice Example")),
+            run_data_manager=mock_run_data_manager,
+            run_store=mock_run_store,
+            audit_client=mock_audit_client,
+            persistence_directory_root=Path(),
+            protocol_store=mock_protocol_store,
+            access_control_status=True,
+            authentication=AuthenticatedResult(
+                scope=serialize_scopes(
+                    {Scope.ROBOT_CONTROL_WRITE, Scope.RUN_SIGNOFF_WRITE}
+                ),
+                username="testuser",
+                fullname="Test User",
+                account_type="user",
+            ),
+            admin_creds=AdminCredsSettingsData(
+                requireAdminCredsForSignoffProtocol=True,
+            ),
+        )
+
+    assert isinstance(
+        exc_info.value.authorization_error, AdminCredentialsRequiredResult
+    )
+
+
+async def test_update_run_signed_by_allows_admin_when_setting_true(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+    mock_run_store: RunStore,
+    mock_audit_client: AuditClient,
+    mock_persistence_directory_root: Path,
+    mock_protocol_store: ProtocolStore,
+) -> None:
+    """It should allow admin signoff when requireAdminCredsForSignoffProtocol is true."""
+    expected_response = Run(
+        id="run-id",
+        protocolId=None,
+        logPeriodId=None,
+        createdAt=datetime(year=2021, month=1, day=1),
+        status=pe_types.EngineStatus.SUCCEEDED,
+        current=True,
+        actions=[],
+        errors=[],
+        pipettes=[],
+        modules=[],
+        labware=[],
+        labwareOffsets=[],
+        liquids=[],
+        liquidClasses=[],
+        outputFileIds=[],
+        hasEverEnteredErrorRecovery=False,
+        signedBy="Alice Example",
+    )
+
+    decoy.when(
+        await mock_run_data_manager.set_signed_by(
+            run_id="run-id", signed_by="Alice Example"
+        )
+    ).then_return(expected_response)
+
+    result = await update_run(
+        runId="run-id",
+        request_body=RequestModel(data=RunUpdate(signedBy="Alice Example")),
+        run_data_manager=mock_run_data_manager,
+        run_store=mock_run_store,
+        audit_client=mock_audit_client,
+        persistence_directory_root=Path(),
+        protocol_store=mock_protocol_store,
+        access_control_status=True,
+        authentication=AuthenticatedResult(
+            scope=serialize_scopes(
+                {Scope.ROBOT_CONTROL_WRITE, Scope.RUN_SIGNOFF_WRITE}
+            ),
+            username="testadmin",
+            fullname="Test Admin",
+            account_type="admin",
+        ),
+        admin_creds=AdminCredsSettingsData(
+            requireAdminCredsForSignoffProtocol=True,
+        ),
+    )
+
+    assert result.content.data.signedBy == "Alice Example"
 
 
 async def test_update_run_signed_by(

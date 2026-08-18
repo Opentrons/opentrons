@@ -46,10 +46,13 @@ from server_utils.auth.resource_server.fastapi import (
     AuthorizationError,
     RequireAuthenticationResult,
     get_access_control_status,
+    get_admin_creds_settings,
+    require_admin_account,
     require_authentication,
     require_scopes,
 )
 from server_utils.auth.resource_server.types import (
+    AdminCredsSettingsData,
     AuthorizationNotRequiredResult,
     AuthorizedResult,
 )
@@ -519,6 +522,7 @@ async def remove_run(
 
 def _require_signoff_scope(
     authentication: RequireAuthenticationResult,
+    require_admin: bool,
 ) -> None:
     authorization_result = check_authorization(
         authentication, {Scope.RUN_SIGNOFF_WRITE}
@@ -527,6 +531,8 @@ def _require_signoff_scope(
         authorization_result, (AuthorizationNotRequiredResult, AuthorizedResult)
     ):
         raise AuthorizationError(authorization_result, {Scope.RUN_SIGNOFF_WRITE})
+    if require_admin:
+        require_admin_account(authentication)
 
 
 @PydanticResponse.wrap_route(
@@ -562,6 +568,9 @@ async def update_run(  # noqa: C901
     authentication: Annotated[
         RequireAuthenticationResult, Depends(require_authentication)
     ],
+    admin_creds: Annotated[
+        AdminCredsSettingsData | None, Depends(get_admin_creds_settings)
+    ] = None,
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Update a run by its ID.
 
@@ -576,9 +585,16 @@ async def update_run(  # noqa: C901
         access_control_status: Whether access control (Compliance Ready Software) is
             currently enabled on the robot.
         authentication: The authenticated user, if any.
+        admin_creds: Live requireAdminCreds* flags. None in unit tests that call
+            this function directly.
     """
     if request_body.data.signedBy is not None:
-        _require_signoff_scope(authentication)
+        require_admin = (
+            admin_creds.requireAdminCredsForSignoffProtocol
+            if admin_creds is not None
+            else False
+        )
+        _require_signoff_scope(authentication, require_admin)
 
     try:
         run_data: Run | BadRun | None = None

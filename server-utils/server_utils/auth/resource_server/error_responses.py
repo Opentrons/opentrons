@@ -3,18 +3,27 @@
 This module should be framework-agnostic, not tied to FastAPI or whatever.
 """
 
-from typing import Annotated
+from typing import Annotated, TypeAlias
 
 import fastapi
 from pydantic import BaseModel, Field
 
 from .types import (
+    AdminCredentialsRequiredResult,
     InsufficientScopeResult,
     MissingTokenResult,
     NotAnActiveTokenResult,
     UnableToContactAuthServerResult,
 )
 from server_utils.auth.scopes import Scope
+
+AuthorizationFailure: TypeAlias = (
+    MissingTokenResult
+    | NotAnActiveTokenResult
+    | InsufficientScopeResult
+    | AdminCredentialsRequiredResult
+    | UnableToContactAuthServerResult
+)
 
 
 # todo(mm, 2026-02-10): Follow the server's existing error response conventions,
@@ -41,15 +50,20 @@ class AuthorizationErrorResponse(BaseModel):
         list[str],
         Field(description="The authorization scopes carried by the request."),
     ]
+    adminCredentialsRequired: Annotated[
+        bool,
+        Field(
+            description=(
+                "If true, the token is valid and has the action's scopes, but a "
+                "requireAdminCreds* setting currently restricts this action to admin "
+                "or service accounts."
+            )
+        ),
+    ] = False
 
 
 def build_response_for_error(
-    error: (
-        MissingTokenResult
-        | NotAnActiveTokenResult
-        | InsufficientScopeResult
-        | UnableToContactAuthServerResult
-    ),
+    error: AuthorizationFailure,
     required_scopes: set[Scope],
 ) -> tuple[int, dict[str, str], AuthorizationErrorResponse]:
     """Turn the given authorization error into an HTTP response.
@@ -92,6 +106,17 @@ def build_response_for_error(
                     providedScopes=provided_scopes_str_list,
                 ),
             )
+        case AdminCredentialsRequiredResult():
+            return (
+                fastapi.status.HTTP_403_FORBIDDEN,
+                headers,
+                AuthorizationErrorResponse(
+                    debugMessage="This action requires admin credentials.",
+                    requiredScopes=required_scopes_str_list,
+                    providedScopes=[],
+                    adminCredentialsRequired=True,
+                ),
+            )
         case UnableToContactAuthServerResult():
             return (
                 fastapi.status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -105,12 +130,7 @@ def build_response_for_error(
 
 
 def _build_response_headers_for_error(
-    error: (
-        MissingTokenResult
-        | NotAnActiveTokenResult
-        | InsufficientScopeResult
-        | UnableToContactAuthServerResult
-    ),
+    error: AuthorizationFailure,
 ) -> dict[str, str]:
     """Return the headers that should be sent for an error response.
 
@@ -140,6 +160,12 @@ def _build_response_headers_for_error(
                 )
             }
         case InsufficientScopeResult():
+            return {
+                "WWW-Authenticate": _www_authenticate(
+                    "Bearer", {"error": "insufficient_scope"}
+                )
+            }
+        case AdminCredentialsRequiredResult():
             return {
                 "WWW-Authenticate": _www_authenticate(
                     "Bearer", {"error": "insufficient_scope"}

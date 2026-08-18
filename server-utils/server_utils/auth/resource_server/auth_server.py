@@ -12,6 +12,7 @@ from abc import ABC, abstractmethod
 import aiohttp
 
 from .types import (
+    AdminCredsSettingsResponse,
     AuthSettingsResponse,
     ClientIDType,
     TokenIntrospectionRequestFormData,
@@ -40,6 +41,15 @@ class Client(ABC):
     @abstractmethod
     async def get_auth_settings(self) -> AuthSettingsResponse:
         """Ask the Opentrons auth-server what the current system-wide auth settings are.
+
+        If there's an internal error (e.g. the auth server is unconnectable),
+        the implementation should raise it as an exception.
+        """
+        pass
+
+    @abstractmethod
+    async def get_admin_creds_settings(self) -> AdminCredsSettingsResponse:
+        """Ask the Opentrons auth-server for the requireAdminCreds* flags.
 
         If there's an internal error (e.g. the auth server is unconnectable),
         the implementation should raise it as an exception.
@@ -108,6 +118,13 @@ class LocalHTTPClient(Client):
         response.raise_for_status()
         parsed_response = AuthSettingsResponse.model_validate_json(response_bytes)
         return parsed_response
+
+    @typing.override
+    async def get_admin_creds_settings(self) -> AdminCredsSettingsResponse:
+        async with self._session.get(ALL_AUTH_SETTINGS_ENDPOINT_PATH) as response:
+            response_bytes = await response.read()
+        response.raise_for_status()
+        return AdminCredsSettingsResponse.model_validate_json(response_bytes)
 
     @typing.override
     async def introspect_token(self, token: str) -> TokenIntrospectionResponse:

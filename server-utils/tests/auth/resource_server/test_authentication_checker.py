@@ -138,9 +138,13 @@ async def test_passes_active_token(
     )
     decoy.when(await mock_client.introspect_token("asdasf")).then_return(
         TokenIntrospectionResponse(
-            active=True, username="hi", ot_fullname="lo", scope=serialize_scopes(set())
+            active=True,
+            username="hi",
+            ot_fullname="lo",
+            ot_account_type="user",
+            scope=serialize_scopes(set()),
         )
     )
     assert await subject.check("asdasf") == AuthenticatedResult(
-        scope="", username="hi", fullname="lo"
+        scope="", username="hi", fullname="lo", account_type="user"
     )

@@ -37,6 +37,8 @@ class AuthenticatedResult:
     scope: str
     username: str
     fullname: str
+    account_type: str = ""
+    """The account type from auth-server (`admin`, `user`, `auditor`, `service`)."""
 
 
 @dataclass
@@ -64,6 +66,13 @@ class NotAnActiveTokenResult:
 @dataclass
 class UnableToContactAuthServerResult:
     """The authorization server couldn't be contacted."""
+
+    pass
+
+
+@dataclass
+class AdminCredentialsRequiredResult:
+    """The token is valid, but this action currently requires an admin account."""
 
     pass
 
@@ -100,6 +109,7 @@ class TokenIntrospectionResponse(_StrictBaseModel):
     scope: str = ""
     username: str | None = None
     ot_fullname: str | None = None
+    ot_account_type: str | None = None
 
 
 class TokenIntrospectionRequestFormData(TypedDict):
@@ -123,6 +133,25 @@ class AuthSettingsResponseData(_StrictBaseModel):
     """Response body data from auth-server's /settings endpoint."""
 
     accessControlEnabled: bool
+
+
+class AdminCredsSettingsData(pydantic.BaseModel):
+    """The requireAdminCreds* flags from GET /auth/settings.
+
+    Extra fields on that endpoint are ignored. Defaults match auth-server.
+    """
+
+    model_config = {"extra": "ignore"}
+
+    requireAdminCredsWhenUpdatingRobotSoftware: bool = True
+    requireAdminCredsWhenSendingProtocolToRobot: bool = True
+    requireAdminCredsForSignoffProtocol: bool = False
+
+
+class AdminCredsSettingsResponse(_StrictBaseModel):
+    """A response body from auth-server's GET /auth/settings endpoint."""
+
+    data: AdminCredsSettingsData
 
 
 ClientIDType: TypeAlias = Literal["opentrons_app"]

@@ -42,6 +42,7 @@ stages:
         active: true
         username: testadmin
         ot_fullname: Test Admin
+        ot_account_type: admin
         scope: *returned_scope
 
   - name: Introspect the refresh token and confirm it's inactive (only access tokens are active)
@@ -92,6 +93,7 @@ stages:
         active: true
         username: testadmin
         ot_fullname: Test Admin
+        ot_account_type: admin
         scope: *returned_scope
 
   - name: Introspect the new refresh token and confirm it's inactive (only access tokens are active)

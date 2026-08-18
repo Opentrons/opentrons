@@ -24,6 +24,7 @@ from server_utils.audit.audit_server import (
 from server_utils.audit.fastapi import get_audit_client, get_audit_logger
 from server_utils.auth.resource_server.fastapi import (
     RequireAuthenticationResult,
+    require_admin_creds,
     require_authentication,
     require_scopes,
 )
@@ -77,6 +78,9 @@ def require_session(
     summary="Create an update session.",
     dependencies=[
         fastapi.Depends(require_scopes(Scope.UPDATES_WRITE)),
+        fastapi.Depends(
+            require_admin_creds("requireAdminCredsWhenUpdatingRobotSoftware")
+        ),
         fastapi.Depends(get_audit_logger("start update session")),
     ],
 )
@@ -164,6 +168,9 @@ async def status(
     summary="Upload a system update file.",
     dependencies=[
         fastapi.Depends(require_scopes(Scope.UPDATES_WRITE)),
+        fastapi.Depends(
+            require_admin_creds("requireAdminCredsWhenUpdatingRobotSoftware")
+        ),
         fastapi.Depends(get_audit_logger("upload update file")),
     ],
 )
@@ -239,6 +246,9 @@ async def file_upload(
     summary="Commit a validated update.",
     dependencies=[
         fastapi.Depends(require_scopes(Scope.UPDATES_WRITE)),
+        fastapi.Depends(
+            require_admin_creds("requireAdminCredsWhenUpdatingRobotSoftware")
+        ),
         fastapi.Depends(get_audit_logger("commit update")),
     ],
 )
@@ -278,6 +288,9 @@ async def commit(
     summary="Cancel the active update session.",
     dependencies=[
         fastapi.Depends(require_scopes(Scope.UPDATES_WRITE)),
+        fastapi.Depends(
+            require_admin_creds("requireAdminCredsWhenUpdatingRobotSoftware")
+        ),
         fastapi.Depends(get_audit_logger("cancel update")),
     ],
 )

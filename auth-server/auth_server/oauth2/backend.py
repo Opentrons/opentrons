@@ -438,19 +438,18 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             )
             return False
 
-    def _live_scopes_for_username(self, username: str) -> set[Scope] | None:
-        """Return the user's current scopes, or None if the user no longer exists.
+    def _live_auth_for_username(self, username: str) -> tuple[set[Scope], str] | None:
+        """Return live scopes and account type, or None if the user no longer exists.
 
-        Token issuance snapshots scopes from account type plus the current
-        requireAdminCreds* settings. Resource servers authorize from introspection,
-        so we recompute here. Otherwise a settings change would leave old
-        permissions on already-issued tokens (RQA-5854).
+        Token issuance snapshots scopes. Resource servers authorize from
+        introspection, so we recompute scopes (password-reset restriction) and
+        account type here.
         """
         user = self.__user_store.get(username)
         if user is None:
             return None
         settings = self.__settings_store.get_settings()
-        return get_scope_set_of_user(
+        scopes = get_scope_set_of_user(
             user,
             settings,
             must_reset_password(
@@ -459,6 +458,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
                 settings.passwordResetTime,
             ),
         )
+        return scopes, user.account_type
 
     @override
     @pydantic.validate_call(config=_validate_call_config)
@@ -475,8 +475,9 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             refresh_token, now=self.__get_now()
         )
         assert token is not None
-        live_scopes = self._live_scopes_for_username(token.username)
-        assert live_scopes is not None
+        live_auth = self._live_auth_for_username(token.username)
+        assert live_auth is not None
+        live_scopes, _account_type = live_auth
         return sorted(s.api_name for s in live_scopes)
 
     @override
@@ -497,17 +498,19 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         )
         if found_access_token is None:
             return None
-        live_scopes = self._live_scopes_for_username(found_access_token.username)
-        if live_scopes is None:
+        live_auth = self._live_auth_for_username(found_access_token.username)
+        if live_auth is None:
             return None
+        live_scopes, account_type = live_auth
         # Values defined by:
         # https://datatracker.ietf.org/doc/html/rfc7662#section-2.2
-        # except ot_fullname, which is custom to us. if you add other custom fields,
-        # please prefix them with ot-.
+        # except ot_fullname and ot_account_type, which are custom to us. if you add
+        # other custom fields, please prefix them with ot-.
         return {
             "scope": serialize_scopes(live_scopes),
             "username": found_access_token.username,
             "ot_fullname": found_access_token.fullname,
+            "ot_account_type": account_type,
             # "active": True is set implicitly by oauthlib.
         }
 

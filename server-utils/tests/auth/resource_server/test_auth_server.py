@@ -16,6 +16,8 @@ from server_utils.auth.resource_server.auth_server import (
     LocalHTTPClient,
 )
 from server_utils.auth.resource_server.types import (
+    AdminCredsSettingsData,
+    AdminCredsSettingsResponse,
     AuthSettingsResponse,
     AuthSettingsResponseData,
     TokenIntrospectionResponse,
@@ -146,6 +148,30 @@ async def test_settings(mock_server: tuple[AppMock, LocalHTTPClient]) -> None:
     settings_result = await client.get_auth_settings()
     assert settings_result == AuthSettingsResponse(
         data=AuthSettingsResponseData(accessControlEnabled=True)
+    )
+
+
+async def test_admin_creds_settings(
+    mock_server: tuple[AppMock, LocalHTTPClient],
+) -> None:
+    """Test that the client can retrieve requireAdminCreds* flags from GET /auth/settings."""
+    app_mock, client = mock_server
+
+    app_mock.all_auth_settings_response = {
+        "data": {
+            "maxNumberOfLoginAttempts": 5,
+            "requireAdminCredsWhenUpdatingRobotSoftware": False,
+            "requireAdminCredsWhenSendingProtocolToRobot": True,
+            "requireAdminCredsForSignoffProtocol": True,
+        }
+    }
+    result = await client.get_admin_creds_settings()
+    assert result == AdminCredsSettingsResponse(
+        data=AdminCredsSettingsData(
+            requireAdminCredsWhenUpdatingRobotSoftware=False,
+            requireAdminCredsWhenSendingProtocolToRobot=True,
+            requireAdminCredsForSignoffProtocol=True,
+        )
     )
 
 

@@ -11,6 +11,7 @@ from typing import (
     Awaitable,
     Callable,
     Final,
+    Literal,
     Type,
     TypeAlias,
 )
@@ -28,6 +29,8 @@ from .authentication_checker import (
 from .authorization_checker import check as check_authorization
 from .error_responses import build_response_for_error
 from .types import (
+    AdminCredentialsRequiredResult,
+    AdminCredsSettingsData,
     AuthenticatedResult,
     AuthenticationNotRequiredResult,
     AuthorizationNotRequiredResult,
@@ -122,6 +125,14 @@ RequireAuthenticationResult: TypeAlias = (
     AuthenticationNotRequiredResult | AuthenticatedResult
 )
 RequireScopesResult: TypeAlias = AuthorizationNotRequiredResult | AuthorizedResult
+
+_ADMIN_ACCOUNT_TYPES: Final[frozenset[str]] = frozenset({"admin", "service"})
+
+AdminCredsSetting: TypeAlias = Literal[
+    "requireAdminCredsWhenUpdatingRobotSoftware",
+    "requireAdminCredsWhenSendingProtocolToRobot",
+    "requireAdminCredsForSignoffProtocol",
+]
 
 
 async def require_authentication(
@@ -223,6 +234,54 @@ def require_scopes(
     return dependency
 
 
+async def get_admin_creds_settings(
+    authentication_checker: Annotated[
+        AuthenticationChecker, fastapi.Depends(get_authentication_checker)
+    ],
+) -> AdminCredsSettingsData:
+    """A FastAPI dependency to retrieve the live requireAdminCreds* flags."""
+    return await authentication_checker.admin_creds_settings()
+
+
+def require_admin_account(
+    authentication: RequireAuthenticationResult,
+) -> None:
+    """Reject non-admin callers when access control is on.
+
+    No-op when access control is disabled.
+    """
+    if isinstance(authentication, AuthenticationNotRequiredResult):
+        return
+    if authentication.account_type in _ADMIN_ACCOUNT_TYPES:
+        return
+    raise AuthorizationError(AdminCredentialsRequiredResult(), set())
+
+
+def require_admin_creds(
+    setting: AdminCredsSetting,
+) -> Callable[..., Awaitable[None]]:
+    """A FastAPI dependency that requires an admin account when a requireAdminCreds* flag is true.
+
+    Use next to `require_scopes()` on protocol upload, software update, and similar
+    actions. User tokens keep the matching write scopes (RQA-5855). This gate is what
+    actually denies the user when the flag is on (RQA-5854).
+    """
+
+    async def dependency(
+        authentication: Annotated[
+            RequireAuthenticationResult, fastapi.Depends(require_authentication)
+        ],
+        admin_creds: Annotated[
+            AdminCredsSettingsData, fastapi.Depends(get_admin_creds_settings)
+        ],
+    ) -> None:
+        if not getattr(admin_creds, setting):
+            return
+        require_admin_account(authentication)
+
+    return dependency
+
+
 async def get_access_control_status(
     authentication_checker: Annotated[
         AuthenticationChecker, fastapi.Depends(get_authentication_checker)
@@ -243,6 +302,7 @@ class AuthorizationError(Exception):
         self,
         authorization_error: (
             InsufficientScopeResult
+            | AdminCredentialsRequiredResult
             | MissingTokenResult
             | NotAnActiveTokenResult
             | UnableToContactAuthServerResult

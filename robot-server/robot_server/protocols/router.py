@@ -36,6 +36,7 @@ from server_utils.audit.audit_logger import AuditLogger
 from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import (
     get_access_control_status,
+    require_admin_creds,
     require_scopes,
 )
 from server_utils.auth.scopes import Scope
@@ -212,7 +213,10 @@ protocols_router = LightRouter()
         },
         status.HTTP_503_SERVICE_UNAVAILABLE: {"model": ErrorBody[LastAnalysisPending]},
     },
-    dependencies=[Depends(require_scopes(Scope.PROTOCOLS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.PROTOCOLS_WRITE)),
+        Depends(require_admin_creds("requireAdminCredsWhenSendingProtocolToRobot")),
+    ],
 )
 async def create_protocol(  # noqa: C901
     protocol_directory: Annotated[Path, Depends(get_protocol_directory)],

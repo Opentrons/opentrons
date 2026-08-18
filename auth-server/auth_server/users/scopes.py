@@ -16,7 +16,11 @@ def get_scope_set_of_account_type(
 
     A user who must reset their password is restricted to reading and writing their
     own account, so they can change their password but nothing else until they do.
+
+    ``settings`` is unused. requireAdminCreds* flags are enforced at request time
+    so user tokens always include the matching write scopes (RQA-5854, RQA-5855).
     """
+    del settings
     if must_reset_password:
         # Grant the user only the permissions that they need to set a new password,
         # not to actually do anything on the robot.
@@ -36,7 +40,11 @@ def get_scope_set_of_account_type(
             return {Scope.USERS_READ_OTHERS}
 
         elif account_type == AccountType.USER:
-            result = {
+            # User tokens always include these write scopes. requireAdminCreds* is a
+            # separate request-time gate so flipping a flag cannot leave stale
+            # permissions on an old token, and so a user is not 403'd for a missing
+            # scope when the flag is on (RQA-5854, RQA-5855).
+            return {
                 Scope.PROTOCOL_ANALYSES_WRITE,
                 Scope.RESTART_WRITE,
                 Scope.ROBOT_CONTROL_WRITE,
@@ -44,18 +52,10 @@ def get_scope_set_of_account_type(
                 Scope.USERS_READ_SELF,
                 Scope.USERS_WRITE_SELF,
                 Scope.AUDIT_LOG_WRITE,
+                Scope.UPDATES_WRITE,
+                Scope.PROTOCOLS_WRITE,
+                Scope.RUN_SIGNOFF_WRITE,
             }
-            # These three scopes are granted to users only while the matching
-            # requireAdminCreds* setting is false. Token issuance snapshots this
-            # set, but introspection recomputes it from live settings so a policy
-            # change takes effect without waiting for re-login (RQA-5854).
-            if not settings.requireAdminCredsWhenUpdatingRobotSoftware:
-                result.add(Scope.UPDATES_WRITE)
-            if not settings.requireAdminCredsWhenSendingProtocolToRobot:
-                result.add(Scope.PROTOCOLS_WRITE)
-            if not settings.requireAdminCredsForSignoffProtocol:
-                result.add(Scope.RUN_SIGNOFF_WRITE)
-            return result
 
         else:
             assert_never(account_type)
