@@ -85,13 +85,6 @@ export function WellOrderModal(props: WellOrderModalProps): JSX.Element | null {
     secondValue: initialSecondValue,
   })
 
-  useEffect(() => {
-    setWellOrder({
-      firstValue: initialFirstValue,
-      secondValue: initialSecondValue,
-    })
-  }, [initialFirstValue, initialSecondValue])
-
   const applyChanges = (): void => {
     updateValues(wellOrder.firstValue, wellOrder.secondValue)
   }
