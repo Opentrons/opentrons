@@ -30,7 +30,7 @@ export function AlphanumericKeyboard({
   onChange,
   keyboardRef,
   value,
-  debug = false, // If true, <ENTER> will input a \n
+  debug = false,
 }: AlphanumericKeyboardProps): JSX.Element {
   const [layoutName, setLayoutName] = useState<LayoutName>('default')
 
@@ -91,7 +91,7 @@ export function AlphanumericKeyboard({
       useButtonTag={false} // Exclude from the tab order.
       buttonAttributes={softwareKeyboardButtonAttributes}
       width="100%"
-      debug={debug} // If true, <ENTER> will input a \n
+      debug={debug}
       preventMouseDownDefault // Don't steal focus from inputs.
     />
   )
