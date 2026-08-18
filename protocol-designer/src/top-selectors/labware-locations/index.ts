@@ -22,9 +22,11 @@ import {
 import {
   COLUMN_4_SLOTS,
   getAllLargestStacks,
+  getModuleLocationSlot,
   getProvidedAddressableAreasExposed,
   getSlotInLocationStack,
   getTopLocationInStack,
+  VACUUM_DOCK_LOCATION,
 } from '@opentrons/step-generation'
 
 import { OFFDECK, VACUUM_DOCK_DISPLAY_LOCATION } from '../../constants'
@@ -210,6 +212,12 @@ export const getUnoccupiedLabwareLocationOptions: Selector<Option[] | null> =
               getTopLocationInStack(stack) !== labwareId
           )
           const adapterSlot = getSlotInLocationStack(labwareOnDeck.stack)
+          // an adapter parked on the vacuum dock still has the vacuum module's id
+          // in its stack, but it isn't sitting on the module's own registered slot
+          // (getUnoccupiedStackOptions already offers it as a destination correctly,
+          // so skip it here rather than mislabeling it with the module's A3 slot)
+          const isOnVacuumDock =
+            labwareOnDeck.stack.includes(VACUUM_DOCK_LOCATION)
           const modIdWithAdapter = Object.keys(modules).find(modId =>
             labwareOnDeck.stack.includes(modId)
           )
@@ -217,15 +225,17 @@ export const getUnoccupiedLabwareLocationOptions: Selector<Option[] | null> =
             labwareEntities[labwareId].def.metadata.displayName
           const modSlot =
             modIdWithAdapter != null ? modules[modIdWithAdapter].slot : null
+          const transformedModSlot =
+            modSlot != null ? getModuleLocationSlot(modSlot) : null
           const isAdapter = getIsAdapter(labwareId, labwareEntities)
           const moduleUnderAdapter =
             modIdWithAdapter != null
               ? getModuleDisplayName(moduleEntities[modIdWithAdapter].model)
               : 'unknown module'
-          const moduleSlotInfo = modSlot ?? 'unknown slot'
+          const moduleSlotInfo = transformedModSlot ?? 'unknown slot'
           const adapterSlotInfo = adapterSlot ?? 'unknown adapter'
 
-          return isAdapter && !hasLabwareAboveAdapter
+          return isAdapter && !hasLabwareAboveAdapter && !isOnVacuumDock
             ? [
                 ...acc,
                 {

@@ -52,6 +52,7 @@ import {
   HOPPER_FAKE_LOCATIONS,
   HOPPER_STACKER_LOCATION,
   STAGING_AREA_SLOTS,
+  VACUUM_DOCK_DISPLAY_LOCATION,
   VACUUM_DOCK_LOCATION,
   VACUUM_SPACER_LOAD_NAMES,
   ZERO_OFFSET,
@@ -915,6 +916,13 @@ export const getSlotInLocationStack = (
       return slot
     }
   }
+}
+
+export const getModuleLocationSlot = (moduleSlot: string): string => {
+  if (moduleSlot === VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA) {
+    return VACUUM_DOCK_DISPLAY_LOCATION
+  }
+  return moduleSlot
 }
 
 export const getTopLocationInStack = (stack?: string[]): string => {
