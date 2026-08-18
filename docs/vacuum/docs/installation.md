@@ -18,8 +18,8 @@ The Vacuum Module ships in three separate boxes containing all the components re
 
 3. Remove the inner boxes from the shipping boxes.
 
-    !!! note "Vacuum hose location"
-        The vacuum hoses are wrapped around the specially shaped foam padding on the bottom of the large shipping box that holds the smaller box with the carboy and its accessories.
+    !!! info "Vacuum hose location"
+        Vacuum hoses are wrapped around the specially shaped foam padding on the bottom of the large shipping box that holds the smaller box with the carboy and its accessories.
 
 ## Part 2: Deck hardware assembly
 
@@ -71,9 +71,6 @@ The Vacuum Module ships in three separate boxes containing all the components re
     <figcaption>The Vacuum Module installs in slots A3–A4 only.</figcaption>
     </figure>
 
-    !!! note
-        Pinch hazard: keep fingers clear of deck slot edges when installing the deck adapter.
-
 14. Using a 2.5 mm screwdriver, fasten the deck adapter to the deck with the original screws or the two deck screws provided with the module.
 
 ## Part 3: Carboy and vacuum hose connections
@@ -85,14 +82,14 @@ The Vacuum Module ships in three separate boxes containing all the components re
 17. Place the carboy in a suitable location below the level of the robot.
 
     !!! tip
-        For added spill containment safety, place the carboy and holder in a larger, secondary basin or on a tray.
+        For added spill containment, place the carboy and holder in a larger, secondary basin or on a tray.
 
 18. Place the cap on the waste jar and hand tighten it. Do not over-tighten the cap; this is not a trial of strength.
 
 19. Attach the free end of the 6 mm (&frac14;") vacuum hose coupling to the quick connect fitting on the cap.
 
     !!! tip
-        When routing the 6 mm vacuum hose, maintain a continuous downward slope from the robot to the carboy. Avoid sharp bends, kinks, or low dips that could allow fluid to accumulate in the hose and restrict airflow.
+        When routing the 6 mm vacuum hose, try to maintain a continuous downward slope from the robot to the carboy. Avoid sharp bends, kinks, or low dips that could allow fluid to accumulate in the hose and restrict airflow.
 
 20. Attach the 9.5 mm (&frac38;") vacuum hose coupling into the connector on the cap and on the Control Box.
 
@@ -105,9 +102,8 @@ The Vacuum Module ships in three separate boxes containing all the components re
 
 22. Connect the power cable to the Control Box power inlet and and into a power outlet.
 
-    !!! warning "Electrical warning"
-        - Do not use the AC power cable if it is frayed or damaged. The use of damaged power cords can cause an electric shock hazard resulting in injury or damage to the Vacuum Module.
-         - Do not replace the AC power cable unless directed by Opentrons support. 
+    !!! warning
+        Connect the Vacuum Module to a grounded/earthed (⏚) electrical outlet only.
 
 23. Turn on the power to the Flex. After the robot reboots, then power on the Vacuum Module. The LED status light on the Control Box illuminates <font color="red"><strong>LED STATUS LIGHT CONDITION HERE</strong></font> when the module is ready for use.
 

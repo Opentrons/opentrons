@@ -185,7 +185,7 @@ The Control Box includes the vacuum pump, air/water separator, electronics, and 
           <li>Flow rate (gas): 50.1 L/min</li>
           <li>Vacuum: -881.31 mbar</li>
         </ul>
-        <p><strong>Note:</strong> <em>Values reflect the manufacturer's published hardware specifications. Operational performance is controlled by Opentrons Vacuum Module software</em>.</p>
+        <p><strong>Note:</strong> Pump values reflect the manufacturer's published hardware specifications. Operational performance is controlled by Opentrons Vacuum Module software.</p>
       </td>
    </tr>
     </tr>
@@ -279,8 +279,20 @@ The Vacuum Module requires the following power inputs, which are met by its inte
           <li>Slow-blow (time-delay)</li>
           <li>8 A, 250 V</li>
         </ul>
-          <img src="../images/warning-triangle-shock.svg" alt="Electrical shock warning" style="vertical-align: middle; height: 2.0em;"> Do not attempt to replace the fuse unless at the direction of Opentrons Support.
+          <strong>Warning:</strong> Do not attempt to replace the fuse unless at the direction of Opentrons Support.
       </td>
+    </tr>
+    <tr>
+      <td><strong>Power cable</strong></td>
+      <td>The module ships with a region-specific, AC power cable that meets International Electrotechnical Commission (IEC) standards for electronic and technical devices.<br>
+        <p>
+        <strong>Warning:</strong>
+          <ul>
+            <li>Do not replace the AC power cable unless directed by Opentrons Support.</li>
+            <li>Do not use the AC power cable if it is frayed or damaged. The use of damaged power cords can cause an electric shock hazard resulting in injury or damage to the Vacuum Module.</li>
+          </ul>
+        </p>
+      </td
     </tr>
     <tr>
       <td><strong>Over-voltage</strong></td>
