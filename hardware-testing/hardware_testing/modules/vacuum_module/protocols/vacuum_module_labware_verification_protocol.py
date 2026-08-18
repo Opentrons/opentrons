@@ -82,6 +82,10 @@ FILTER_PLATE_CHOICES: List[ParameterChoice] = [
         "value": "lunanano_96_wellplate_1000ul_filter",
     },
     {
+        "display_name": "Empore C18-SD 96 1200µL Filter",
+        "value": "empore_96_wellplate_1200ul_c18_filter",
+    },
+    {
         "display_name": "InVitroVen Filter",
         "value": "invitroven_filter_plate",
     },
