@@ -65,6 +65,7 @@ export function RobotNameEditor(): JSX.Element {
     string | null
   >(null)
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
   const dispatch = useDispatch<Dispatch>()
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
   const connectableRobots = useSelector((state: State) =>
@@ -274,6 +275,7 @@ export function RobotNameEditor(): JSX.Element {
                 name="newRobotName"
                 render={({ field, fieldState }) => (
                   <TouchInputField
+                    ref={inputElementRef}
                     autoFocus
                     data-testid="name-robot_input"
                     name="newRobotName"
@@ -314,12 +316,8 @@ export function RobotNameEditor(): JSX.Element {
               name="newRobotName"
               render={({ field }) => (
                 <AlphanumericKeyboard
-                  onChange={(input: string) => {
-                    field.onChange(input)
-                    void trigger('newRobotName')
-                  }}
+                  inputElementRef={inputElementRef}
                   keyboardRef={keyboardRef}
-                  value={newRobotName}
                 />
               )}
             />
