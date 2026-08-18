@@ -6,6 +6,19 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 By installing and using Opentrons software, you agree to the Opentrons End-User License Agreement (EULA). You can view the EULA at [opentrons.com/eula](https://opentrons.com/eula).
 
+## Opentrons Robot Software Changes in 10.2.0
+
+Welcome to the v10.2.0 release of the Opentrons Flex robot software! This release introduces the Opentrons Vacuum Module, an on-deck vacuum filtration and purification module for the Opentrons Flex.
+
+### New Features
+
+- Use the Opentrons Vacuum Module to:
+  - Filter samples through filter and collection well plates.
+  - Control pressure, power, and vacuum profiles using new Python Protocol API methods.
+  - Collect waste in an off-deck waste carboy.
+
+---
+
 ## Opentrons Robot Software Changes in 9.1.2
 
 Welcome to the v9.1.2 release of the Opentrons Flex robot software! This release includes bug fixes and improvements.
