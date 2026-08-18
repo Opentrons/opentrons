@@ -36,7 +36,6 @@ export function FileManager({
   setCurrentOption,
 }: FileManagerProps): JSX.Element {
   const { t } = useTranslation('device_details')
-  const [activeTab, setActiveTab] = useState<FileManagerTab>('diagnostic')
   const [showDownloadModal, setShowDownloadModal] = useState(false)
   const [showDownloadRecordsWizard, setShowDownloadRecordsWizard] =
     useState(false)
@@ -54,6 +53,9 @@ export function FileManager({
   const { data: accessControlData } = useAccessControlEnabledQuery()
   const isComplianceReady =
     accessControlData?.data?.accessControlEnabled ?? false
+  const [activeTab, setActiveTab] = useState<FileManagerTab>(
+    isComplianceReady ? 'compliance' : 'diagnostic'
+  )
 
   const hasLogPeriods =
     (useLogPeriodSummariesQuery().data?.data ?? []).length > 0
@@ -73,7 +75,7 @@ export function FileManager({
       ...(isComplianceReady
         ? [
             {
-              text: t('compliance_ready_files'),
+              text: t('audit_logs'),
               onClick: () => {
                 setActiveTab('compliance')
               },

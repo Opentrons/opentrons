@@ -20,6 +20,7 @@ from server_utils.audit.audit_server import (
     StoreRobotLogSuccessData,
     SubmitAuditLogMessageData,
     SubmitAuditLogSuccessData,
+    TotalUsageSummaryData,
 )
 from server_utils.audit.fastapi import (
     build_audit_client,
@@ -88,7 +89,10 @@ def test_install_and_get_audit_client_via_dependency() -> None:
             raise NotImplementedError()
 
         async def get_current_log_period(self) -> GetLogPeriodsData:
-            raise NotImplementedError
+            raise NotImplementedError()
+
+        async def get_filesystem_usage_summary(self) -> TotalUsageSummaryData:
+            raise NotImplementedError()
 
     stub_client = StubClient()
 

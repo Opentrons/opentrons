@@ -310,7 +310,9 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             self.__send_audit_log(
                 "login failed", f"user {username} failed to login: account is locked"
             )
-            raise _CustomInvalidCredentialsError(login_attempts_remaining=None)
+            raise _CustomInvalidCredentialsError(
+                login_attempts_remaining=None, account_locked=True
+            )
 
         password_is_correct = password_hash.verify(password, user.hashed_password)
 
@@ -337,7 +339,9 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             self.__send_audit_log(
                 "login failed", f"user {username} failed to login: {reason}"
             )
-            raise _CustomInvalidCredentialsError(attempts_remaining)
+            raise _CustomInvalidCredentialsError(
+                attempts_remaining, account_locked=is_currently_locked
+            )
 
         # If the credentials pass the gauntlet above, it's a successful login.
         self.__user_store.clear_failed_logins(username)
@@ -488,14 +492,18 @@ class _CustomInvalidCredentialsError(oauthlib.oauth2.InvalidGrantError):
     this way, but you gotta do what you gotta do.
     """
 
-    def __init__(self, login_attempts_remaining: int | None) -> None:
+    def __init__(
+        self, login_attempts_remaining: int | None, *, account_locked: bool = False
+    ) -> None:
         """Construct the error.
 
         Params:
             login_attempts_remaining: How many login attempts the user has left
                 before their account is locked, or `None` to omit that information.
+            account_locked: Whether the account is locked and requires admin unlock.
         """
         self.__login_attempts_remaining = login_attempts_remaining
+        self.__account_locked = account_locked
         super().__init__(
             description="Invalid credentials given.",  # Match oauthlib's default description.
             uri=None,
@@ -513,6 +521,8 @@ class _CustomInvalidCredentialsError(oauthlib.oauth2.InvalidGrantError):
             result["opentrons_login_attempts_remaining"] = (
                 self.__login_attempts_remaining
             )
+        if self.__account_locked:
+            result["opentrons_account_locked"] = True
         return json.dumps(result)
 
 

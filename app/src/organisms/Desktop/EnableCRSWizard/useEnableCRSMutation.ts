@@ -2,13 +2,18 @@
 
 import { useMutation, useQueryClient } from 'react-query'
 
-import { createUser, patchAccessControlEnabled } from '@opentrons/api-client'
+import {
+  createUser,
+  deleteUser,
+  patchAccessControlEnabled,
+} from '@opentrons/api-client'
 import {
   accessControlEnabledQueryKey,
   useHost,
 } from '@opentrons/react-api-client'
 
 import type { UseMutationResult } from 'react-query'
+import type { CreateUserRequest } from '@opentrons/api-client'
 
 export interface EnableCRSParams {
   adminAccount: AccountCreationParams
@@ -45,34 +50,35 @@ export function useEnableCRSMutation(): UseMutationResult<
       )
     }
 
-    // todo(mm, 2026-07-20): If the wizard was previously interrupted, these requests
-    // will fail because the users already exist. We might want to clear preexisting
-    // users beforehand.
-
-    await createUser(hostConfig, {
-      data: {
+    const usersToCreate: Array<CreateUserRequest['data']> = [
+      {
         accountType: 'admin',
         username: params.adminAccount.username,
         password: params.adminAccount.password,
         fullName: params.adminAccount.fullName,
       },
-    })
-    await createUser(hostConfig, {
-      data: {
+      {
         accountType: 'admin',
         username: params.recoveryAccount.username,
         password: params.recoveryAccount.password,
         fullName: params.recoveryAccount.fullName,
       },
-    })
-    await createUser(hostConfig, {
-      data: {
+      {
         accountType: 'service',
         username: params.serviceAccount.username,
         password: params.serviceAccount.password,
         fullName: params.serviceAccount.fullName,
       },
-    })
+    ]
+    for (const userToCreate of usersToCreate) {
+      // If the user already exists, try deleting it to make room for our new one.
+      // This might happen if a prior attempt to enable CRS was interrupted.
+      // It can also happen in dev, if users were left over from prior testing.
+      try {
+        await deleteUser(hostConfig, userToCreate.username)
+      } catch {}
+      await createUser(hostConfig, { data: userToCreate })
+    }
 
     const response = await patchAccessControlEnabled(hostConfig, {
       data: { accessControlEnabled: true },

@@ -7,19 +7,7 @@ from pydantic import BaseModel, Field
 from opentrons_shared_data.deck.types import RobotModel
 from server_utils.fastapi_utils.models.json_api import BaseResponseBody
 
-
-class DiskDetails(BaseModel):
-    """System disk usage details."""
-
-    systemAvailableMb: float = Field(
-        ..., description="The system's available disk space in MB."
-    )
-    systemTotalMb: float = Field(
-        ..., description="The total disk space of the /data partition in MB."
-    )
-    imagesDirectorySizeMb: float = Field(
-        ..., description="The system's images directory disk size in MB."
-    )
+from robot_server.disk_monitor.models import DiskDetails
 
 
 class HealthLinks(BaseModel):

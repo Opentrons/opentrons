@@ -2,6 +2,8 @@ export interface DiskDetails {
   systemAvailableMb: number
   systemTotalMb: number
   imagesDirectorySizeMb: number
+  runStartLimitFreeSpaceMb: number
+  isDiskSpaceBelowRunStartLimit: boolean
 }
 
 export interface Health {

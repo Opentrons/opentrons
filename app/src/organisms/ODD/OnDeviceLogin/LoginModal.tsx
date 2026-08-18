@@ -1,12 +1,12 @@
 import { useCallback, useState } from 'react'
 import { useQueryClient } from 'react-query'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import { getSelfQueryKey, useHost } from '@opentrons/react-api-client'
 
 import { getLocalRobot } from '/app/redux/discovery'
-import { useUsernameForRobot } from '/app/redux/robot-auth'
+import { logOut, useUsernameForRobot } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
@@ -24,11 +24,15 @@ type LoginModalPhase = 'login' | 'chooseNewPassword'
 
 const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const modal = useModal()
+  const dispatch = useDispatch()
   const host = useHost()
   const queryClient = useQueryClient()
   const [phase, setPhase] = useState<LoginModalPhase>('login')
   const [step, setStep] = useState<LoginStep>('username')
   const [loginError, setLoginError] = useState<string | null>(null)
+  const [loginUsername, setLoginUsername] = useState<string | undefined>(
+    undefined
+  )
   const storeLoginState = useStoreLoginState()
   const localRobotName = useSelector(
     (state: State) => getLocalRobot(state)?.name ?? null
@@ -51,6 +55,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
       storeLoginState(localRobotName, user, response)
 
       if (user.resetPassword) {
+        setLoginUsername(username)
         setPhase('chooseNewPassword')
         setStep('password')
       } else {
@@ -68,14 +73,17 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const handleNewPasswordSuccess = useCallback(
     (username: string) => {
       setLoginError(null)
-      // Password-reset success does not include a user payload; invalidate so
-      // observers refetch once the new token is on the host config.
+      setLoginUsername(username)
+      if (localRobotName != null) {
+        dispatch(logOut({ robotName: localRobotName }))
+      }
       if (host != null) {
         void queryClient.invalidateQueries(getSelfQueryKey(host))
       }
-      finishModal(username)
+      setPhase('login')
+      setStep('password')
     },
-    [finishModal, host, queryClient]
+    [dispatch, host, localRobotName, queryClient]
   )
 
   const { submitPassword, isAuthLoading: isLoginAuthLoading } =
@@ -99,7 +107,9 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   }
 
   const initialUsername =
-    phase === 'chooseNewPassword' ? (loggedInUsername ?? undefined) : undefined
+    phase === 'chooseNewPassword'
+      ? (loggedInUsername ?? loginUsername)
+      : loginUsername
 
   return (
     <div className={styles.overlay}>

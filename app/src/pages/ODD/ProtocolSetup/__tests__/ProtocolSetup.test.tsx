@@ -37,6 +37,7 @@ import {
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import {
   getUnmatchedModulesForProtocol,
+  ProtocolSetupButtonsSkeleton,
   ProtocolSetupLabware,
   ProtocolSetupModulesAndDeck,
   ProtocolSetupOffsets,
@@ -165,6 +166,7 @@ const MockProtocolSetupLabware = vi.mocked(ProtocolSetupLabware)
 const MockProtocolSetupOffsets = vi.mocked(ProtocolSetupOffsets)
 const MockProtocolSetupCamera = vi.mocked(ProtocolSetupCamera)
 const MockProtocolSetupTitleSkeleton = vi.mocked(ProtocolSetupTitleSkeleton)
+const MockProtocolSetupButtonsSkeleton = vi.mocked(ProtocolSetupButtonsSkeleton)
 const MockProtocolSetupStepSkeleton = vi.mocked(ProtocolSetupStepSkeleton)
 const MockConfirmSetupStepsCompleteModal = vi.mocked(
   ConfirmSetupStepsCompleteModal
@@ -551,9 +553,10 @@ describe('ProtocolSetup', () => {
       data: null,
     } as any)
     MockProtocolSetupTitleSkeleton.mockReturnValue(<div>SKELETON</div>)
+    MockProtocolSetupButtonsSkeleton.mockReturnValue(<div>SKELETON</div>)
     MockProtocolSetupStepSkeleton.mockReturnValue(<div>SKELETON</div>)
     render(`/runs/${RUN_ID}/setup/`)
-    expect(screen.getAllByText('SKELETON').length).toBeGreaterThanOrEqual(2)
+    expect(screen.getAllByText('SKELETON').length).toBeGreaterThanOrEqual(3)
   })
 
   it('should render toast and make a button disabled when a robot door is open', async () => {

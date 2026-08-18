@@ -10,6 +10,7 @@ from mock import MagicMock, patch
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, MIN_SUPPORTED_VERSION
 from opentrons_shared_data.robot.types import RobotType
 
+from robot_server.disk_monitor.models import DiskDetails
 from robot_server.disk_monitor.monitor import DiskMonitor
 from robot_server.health.router import (
     ComponentVersions,
@@ -31,9 +32,15 @@ def images_directory(tmp_path: Path) -> Path:
 def disk_monitor(decoy: Decoy) -> DiskMonitor:
     """Get a mocked out DiskMonitor interface."""
     mock = decoy.mock(cls=DiskMonitor)
-    decoy.when(mock.get_available_disk_space_mb()).then_return(1000.0)
-    decoy.when(mock.get_total_disk_space_mb()).then_return(5000.0)
-    decoy.when(mock.get_images_directory_size_mb()).then_return(500.0)
+    decoy.when(mock.get_details()).then_return(
+        DiskDetails(
+            systemAvailableMb=1000.0,
+            systemTotalMb=5000.0,
+            imagesDirectorySizeMb=500.0,
+            runStartLimitFreeSpaceMb=100.0,
+            isDiskSpaceBelowRunStartLimit=True,
+        )
+    )
     return mock
 
 
@@ -88,6 +95,8 @@ async def test_get_health(
             "systemAvailableMb": 1000.0,
             "systemTotalMb": 5000.0,
             "imagesDirectorySizeMb": 500.0,
+            "runStartLimitFreeSpaceMb": 100.0,
+            "isDiskSpaceBelowRunStartLimit": True,
         },
     }
 
@@ -144,6 +153,8 @@ async def test_get_health_with_none_version(
             "systemAvailableMb": 1000.0,
             "systemTotalMb": 5000.0,
             "imagesDirectorySizeMb": 500.0,
+            "runStartLimitFreeSpaceMb": 100.0,
+            "isDiskSpaceBelowRunStartLimit": True,
         },
     }
 

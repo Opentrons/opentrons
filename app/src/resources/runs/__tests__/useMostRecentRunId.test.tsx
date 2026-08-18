@@ -14,7 +14,7 @@ describe('useMostRecentRunId hook', () => {
 
   it('should return the first run if any runs exist', async () => {
     when(vi.mocked(useNotifyAllRunsQuery))
-      .calledWith()
+      .calledWith({ pageLength: 1 })
       .thenReturn({ data: { data: [{ id: 'some_run_id' }] } } as any)
 
     const { result } = renderHook(useMostRecentRunId)
@@ -24,7 +24,7 @@ describe('useMostRecentRunId hook', () => {
 
   it('should return null if no runs exist', async () => {
     when(vi.mocked(useNotifyAllRunsQuery))
-      .calledWith()
+      .calledWith({ pageLength: 1 })
       .thenReturn({ data: { data: [] } } as any)
 
     const { result } = renderHook(useMostRecentRunId)
@@ -33,7 +33,7 @@ describe('useMostRecentRunId hook', () => {
   })
   it('should return null if no run data exists', async () => {
     when(vi.mocked(useNotifyAllRunsQuery))
-      .calledWith()
+      .calledWith({ pageLength: 1 })
       .thenReturn({ data: { data: null } } as any)
 
     const { result } = renderHook(useMostRecentRunId)
