@@ -40,7 +40,10 @@ import { pollRobotUpdateStatus } from './pollRobotUpdateStatus'
 
 import type { AxiosError } from 'axios'
 import type { Store } from 'redux'
-import type { HostConfig } from '@opentrons/api-client'
+import type {
+  HostConfig,
+  RobotUpdateSessionStatus,
+} from '@opentrons/api-client'
 import type {
   CreateRobotUpdateSessionVariables,
   DocumentationState,
@@ -153,14 +156,69 @@ export function runRobotUpdateFlow(deps: RobotUpdateFlowDeps): Promise<void> {
       const hostConfigFor = (): HostConfig =>
         buildHostConfig(robot, deps.getAccessToken())
 
-      return pollRobotUpdateStatus(
-        hostConfigFor(),
+      const watchUntilReadyForRestart = (
+        uploadFailed: boolean,
+        uploadError: unknown
+      ): Promise<RobotUpdateSessionStatus | 'already-finished'> => {
+        return pollRobotUpdateStatus({
+          hostConfig: hostConfigFor(),
+          pathPrefix,
+          token,
+          dispatch,
+          isDone: status => {
+            if (uploadFailed && status.stage === AWAITING_FILE) {
+              return true
+            }
+            return (
+              status.stage === READY_FOR_RESTART ||
+              (!ctx.autoCommitAndRestart && status.stage === DONE)
+            )
+          },
+          signal,
+          completeOnRequestError: ctx.autoCommitAndRestart,
+        }).then(status => {
+          if (uploadFailed && status.stage === AWAITING_FILE) {
+            if (isRobotOnTargetVersion(store, robot)) {
+              dispatch(setRobotUpdateSessionStep(FINISHED))
+              dispatch(finishDiscovery())
+              return 'already-finished'
+            }
+            return Promise.reject(
+              uploadError instanceof Error
+                ? uploadError
+                : new Error(
+                    i18n.t('unable_to_start_update_session', {
+                      ns: 'device_settings',
+                    })
+                  )
+            )
+          } else if (status.stage === DONE && !ctx.autoCommitAndRestart) {
+            return commitIfNeeded(deps, false, pathPrefix, token).then(() =>
+              pollRobotUpdateStatus({
+                hostConfig: hostConfigFor(),
+                pathPrefix,
+                token,
+                dispatch,
+                isDone: s => s.stage === READY_FOR_RESTART,
+                signal,
+                completeOnRequestError: false,
+              })
+            )
+          } else {
+            return status
+          }
+        })
+      }
+
+      return pollRobotUpdateStatus({
+        hostConfig: hostConfigFor(),
         pathPrefix,
         token,
         dispatch,
-        status => status.stage === AWAITING_FILE,
-        signal
-      )
+        isDone: status => status.stage === AWAITING_FILE,
+        signal,
+        completeOnRequestError: false,
+      })
         .then(() =>
           uploadUpdateFile(
             deps,
@@ -169,37 +227,28 @@ export function runRobotUpdateFlow(deps: RobotUpdateFlowDeps): Promise<void> {
             pathPrefix,
             token,
             systemFilePath
+          ).then(
+            () => ({ failed: false as const, error: null }),
+            (error: unknown) => {
+              if (!ctx.autoCommitAndRestart) {
+                return Promise.reject(error)
+              }
+              // Status is the source of truth, not client network errors.
+              return { failed: true as const, error }
+            }
           )
         )
-        .then(() =>
-          pollRobotUpdateStatus(
-            hostConfigFor(),
-            pathPrefix,
-            token,
-            dispatch,
-            status =>
-              status.stage === READY_FOR_RESTART ||
-              (!ctx.autoCommitAndRestart && status.stage === DONE),
-            signal
-          )
+        .then(uploadResult =>
+          watchUntilReadyForRestart(uploadResult.failed, uploadResult.error)
         )
-        .then(status => {
-          if (status.stage === DONE && !ctx.autoCommitAndRestart) {
-            return commitIfNeeded(deps, false, pathPrefix, token).then(() =>
-              pollRobotUpdateStatus(
-                hostConfigFor(),
-                pathPrefix,
-                token,
-                dispatch,
-                s => s.stage === READY_FOR_RESTART,
-                signal
-              )
-            )
+        .then(result => {
+          if (result === 'already-finished') {
+            return
           }
-          return status
+          return beginRestartPhase(deps, robot, ctx.autoCommitAndRestart).then(
+            () => finishAfterRestart(deps, robot)
+          )
         })
-        .then(() => beginRestartPhase(deps, robot, ctx.autoCommitAndRestart))
-        .then(() => finishAfterRestart(deps, robot))
     })
     .catch((error: unknown) => {
       reportFlowError(dispatch, error)
@@ -482,4 +531,21 @@ function finishAfterRestart(
     }
     dispatch(finishDiscovery())
   })
+}
+
+function isRobotOnTargetVersion(
+  store: Store<State>,
+  robot: ViewableRobot
+): boolean {
+  const currentRobot = getRobotUpdateRobot(store.getState()) ?? robot
+  const targetVersion = getRobotUpdateTargetVersion(
+    store.getState(),
+    currentRobot.name
+  )
+  const robotVersion = getRobotApiVersion(currentRobot)
+  return (
+    targetVersion != null &&
+    robotVersion != null &&
+    robotVersion === targetVersion
+  )
 }
