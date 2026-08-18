@@ -11,7 +11,7 @@ import { LabwareControls } from './Overlays'
 import { ActiveLabwareControls } from './Overlays/ActiveLabwareControls'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { DeckSlotId } from '@opentrons/shared-data'
+import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'
 import type {
   LabwareOnDeck as LabwareOnDeckType,
   ModuleOnDeck,
@@ -73,6 +73,12 @@ export function VacuumDockLabwareRenders(
     zDimension: 0,
   }
 
+  const dockPositionWithOffset: CoordinateTuple = [
+    x + VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_X,
+    y + VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_Y,
+    0,
+  ]
+
   return (
     <>
       {/* Render all labware in the stack (bottom to top) */}
@@ -90,11 +96,7 @@ export function VacuumDockLabwareRenders(
       })}
       <HighlightLabware
         labwareOnDeck={topLabware}
-        position={[
-          x + VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_X,
-          y + VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_Y,
-          0,
-        ]}
+        position={dockPositionWithOffset}
         isZoomed={selectedZoomInSlot != null}
       />
       <LabwareControls
@@ -103,11 +105,7 @@ export function VacuumDockLabwareRenders(
         setHover={setHover}
         setShowMenuListForId={setShowMenuListForId}
         hover={hover}
-        slotPosition={[
-          x + VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_X,
-          y + VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_Y,
-          0,
-        ]}
+        slotPosition={dockPositionWithOffset}
         setHoveredLabware={setHoveredLabware}
         setDraggedLabware={setDraggedLabware}
         swapBlocked={false}
@@ -117,11 +115,7 @@ export function VacuumDockLabwareRenders(
       />
       <ActiveLabwareControls
         itemId={VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA}
-        slotPosition={[
-          x + VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_X,
-          y + VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_Y,
-          0,
-        ]}
+        slotPosition={dockPositionWithOffset}
         hover={hover}
         setHover={setHover}
         slotBoundingBox={labwareInterfaceBoundingBox}
