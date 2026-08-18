@@ -233,7 +233,7 @@ class TempDeck(mod_abc.AbstractModule):
             "targetTemp": self.target,
         }
         return {
-            "status": self.status,
+            "status": self.status.value,
             "data": data,
         }
 
