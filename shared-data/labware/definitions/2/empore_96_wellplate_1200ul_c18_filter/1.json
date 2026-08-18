@@ -1019,10 +1019,30 @@
     "z": 0
   },
   "stackingOffsetWithLabware": {
+    "opentrons_vacuum_manifold_collar_short": {
+      "x": 0,
+      "y": 0,
+      "z": 24.81
+    },
+    "opentrons_vacuum_manifold_collar_tall": {
+      "x": 0,
+      "y": 0,
+      "z": 24.81
+    },
+    "opentrons_vacuum_manifold_spacer_short": {
+      "x": 0,
+      "y": 0,
+      "z": 28.31
+    },
+    "opentrons_vacuum_manifold_spacer_tall": {
+      "x": 0,
+      "y": 0,
+      "z": 28.31
+    },
     "default": {
       "x": 0,
       "y": 0,
-      "z": 0
+      "z": 22.81
     }
   }
 }
