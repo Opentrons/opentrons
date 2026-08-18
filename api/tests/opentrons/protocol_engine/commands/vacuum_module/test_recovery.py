@@ -1,13 +1,12 @@
 """Tests for vacuum module associated-command recovery resolver."""
 
 from datetime import datetime
-from unittest.mock import AsyncMock, MagicMock, patch
 
 from decoy import Decoy
 
 from opentrons_shared_data.errors.exceptions import VacuumModuleWasteFullError
 
-from opentrons.protocol_engine.commands.command import CommandStatus, SuccessData
+from opentrons.protocol_engine.commands.command import CommandIntent, CommandStatus
 from opentrons.protocol_engine.commands.vacuum_module.common import (
     VACUUM_WASTE_CONTAINER_FULL_ERROR_CODE,
     VacuumModuleCarboyFullError,
@@ -17,6 +16,7 @@ from opentrons.protocol_engine.commands.vacuum_module.recovery import (
 )
 from opentrons.protocol_engine.commands.vacuum_module.start_set_vacuum_pressure import (
     StartSetVacuumPressure,
+    StartSetVacuumPressureCreate,
     StartSetVacuumPressureParams,
     StartSetVacuumPressureResult,
 )
@@ -25,11 +25,6 @@ from opentrons.protocol_engine.commands.wait_for_tasks import (
     WaitForTasksParams,
 )
 from opentrons.protocol_engine.errors import ErrorOccurrence
-from opentrons.protocol_engine.execution import (
-    EquipmentHandler,
-    MovementHandler,
-    TaskHandler,
-)
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state.module_substates.vacuum_module_substate import (
     VacuumModuleId,
@@ -156,35 +151,22 @@ def _start_pressure_command(timestamp: datetime) -> StartSetVacuumPressure:
     )
 
 
-async def test_restart_runs_start_pressure_impl(decoy: Decoy) -> None:
-    """It should re-run the public start pressure impl and clear taskId."""
+def test_create_retry_builds_new_start_pressure_request() -> None:
+    """It should copy start_* params onto a new fixit request with a new task id."""
     subject = VacuumModuleAssociatedCommandRecoveryResolver()
     command = _start_pressure_command(datetime.now())
-    impl = MagicMock()
-    impl.execute = AsyncMock(
-        return_value=SuccessData(public=StartSetVacuumPressureResult(taskId="new-task"))
-    )
 
-    with patch(
-        "opentrons.protocol_engine.commands.vacuum_module.recovery.StartSetVacuumPressureImpl",
-        return_value=impl,
-    ):
-        task_id = await subject.restart(
-            command,
-            state_view=decoy.mock(cls=StateView),
-            task_handler=decoy.mock(cls=TaskHandler),
-            equipment=decoy.mock(cls=EquipmentHandler),
-            movement=decoy.mock(cls=MovementHandler),
-            model_utils=ModelUtils(),
-        )
+    create = subject.create_retry(command, task_id="new-task")
 
-    assert task_id == "new-task"
-    executed_params = impl.execute.await_args.args[0]
-    assert executed_params.taskId is None
+    assert isinstance(create, StartSetVacuumPressureCreate)
+    assert create.intent == CommandIntent.FIXIT
+    assert create.params.moduleId == "vacuum-module-id"
+    assert create.params.gaugePressure == -50.0
+    assert create.params.taskId == "new-task"
 
 
-async def test_restart_returns_none_for_unassociated_command(decoy: Decoy) -> None:
-    """It should not restart commands that are not vacuum start_* commands."""
+def test_create_retry_returns_none_for_unassociated_command() -> None:
+    """It should not build a retry request for non-vacuum start_* commands."""
     subject = VacuumModuleAssociatedCommandRecoveryResolver()
     command = WaitForTasks.model_construct(
         id="wait-id",
@@ -195,13 +177,4 @@ async def test_restart_returns_none_for_unassociated_command(decoy: Decoy) -> No
         params=WaitForTasksParams(task_ids=["task-1"]),
     )
 
-    task_id = await subject.restart(
-        command,
-        state_view=decoy.mock(cls=StateView),
-        task_handler=decoy.mock(cls=TaskHandler),
-        equipment=decoy.mock(cls=EquipmentHandler),
-        movement=decoy.mock(cls=MovementHandler),
-        model_utils=ModelUtils(),
-    )
-
-    assert task_id is None
+    assert subject.create_retry(command, task_id="new-task") is None

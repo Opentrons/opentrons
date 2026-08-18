@@ -5,16 +5,18 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Sequence
 
 from ..types import FinishedTask
-from .command import CommandIntent
 
 if TYPE_CHECKING:
-    from ..execution import EquipmentHandler, MovementHandler, TaskHandler
+    from ..commands.command_unions import (
+        Command,
+        CommandCreate,
+        CommandDefinedErrorData,
+    )
     from ..execution.associated_command_recovery_resolver import (
         AssociatedCommandRecoveryResolver,
     )
     from ..resources import ModelUtils
     from ..state.state import StateView
-    from .command_unions import Command, CommandDefinedErrorData
 
 
 def running_wait_for_tasks_covers_task(state_view: StateView, task_id: str) -> bool:
@@ -65,59 +67,78 @@ def defined_error_from_failed_tasks(
     return mapped
 
 
-async def restart_originating_background_tasks(
+def expand_wait_for_tasks_fixit(
+    task_ids: Sequence[str],
+    state_view: StateView,
+    resolvers: Sequence[AssociatedCommandRecoveryResolver],
+    model_utils: ModelUtils,
+) -> tuple[list[CommandCreate], list[str]] | None:
+    """Queue-time expansion for a waitForTasks fixit.
+
+    When the wait is retrying recoverable background failures, return new
+    originating command requests plus rewritten ``task_ids``. The caller must
+    queue those requests first so the new start_* commands run before wait.
+
+    Returns None when the wait should be queued unchanged.
+    """
+    failed_task_ids = state_view.tasks.get_failed_tasks(list(task_ids))
+    if not failed_task_ids:
+        return None
+    if (
+        defined_error_from_failed_tasks(
+            failed_task_ids, state_view, resolvers, model_utils
+        )
+        is None
+    ):
+        return None
+
+    origin_to_new_task: dict[str, str] = {}
+    creates: list[CommandCreate] = []
+    for task_id in failed_task_ids:
+        origin_id = state_view.tasks.get_originating_command_id(task_id)
+        if origin_id is None:
+            return None
+        if origin_id in origin_to_new_task:
+            continue
+        command = state_view.commands.get(origin_id)
+        new_task_id = model_utils.generate_id()
+        create = _create_retry(command, new_task_id, resolvers)
+        if create is None:
+            return None
+        origin_to_new_task[origin_id] = new_task_id
+        creates.append(create)
+
+    rewritten_task_ids = [
+        _rewritten_task_id(task_id, failed_task_ids, state_view, origin_to_new_task)
+        for task_id in task_ids
+    ]
+    return creates, rewritten_task_ids
+
+
+def _create_retry(
+    command: Command,
+    task_id: str,
+    resolvers: Sequence[AssociatedCommandRecoveryResolver],
+) -> CommandCreate | None:
+    for resolver in resolvers:
+        create = resolver.create_retry(command, task_id=task_id)
+        if create is not None:
+            return create
+    return None
+
+
+def _rewritten_task_id(
+    task_id: str,
     failed_task_ids: Sequence[str],
     state_view: StateView,
-    resolvers: Sequence[AssociatedCommandRecoveryResolver],
-    task_handler: TaskHandler,
-    equipment: EquipmentHandler | None,
-    movement: MovementHandler | None,
-    model_utils: ModelUtils,
-) -> list[str]:
-    """Ask resolvers to re-run each unique originating command.
-
-    Returns new task ids, or an empty list if any origin cannot be restarted.
-    """
-    origins = _background_commands_to_restart(failed_task_ids, state_view)
-    new_task_ids: list[str] = []
-    for command in origins:
-        restarted_task_id = await _restart_command(
-            command,
-            resolvers,
-            state_view=state_view,
-            task_handler=task_handler,
-            equipment=equipment,
-            movement=movement,
-            model_utils=model_utils,
-        )
-        if restarted_task_id is None:
-            return []
-        new_task_ids.append(restarted_task_id)
-    return new_task_ids
-
-
-async def _restart_command(
-    command: Command,
-    resolvers: Sequence[AssociatedCommandRecoveryResolver],
-    *,
-    state_view: StateView,
-    task_handler: TaskHandler,
-    equipment: EquipmentHandler | None,
-    movement: MovementHandler | None,
-    model_utils: ModelUtils,
-) -> str | None:
-    for resolver in resolvers:
-        if not resolver.is_associated_command(command):
-            continue
-        return await resolver.restart(
-            command,
-            state_view=state_view,
-            task_handler=task_handler,
-            equipment=equipment,
-            movement=movement,
-            model_utils=model_utils,
-        )
-    return None
+    origin_to_new_task: dict[str, str],
+) -> str:
+    if task_id not in failed_task_ids:
+        return task_id
+    origin_id = state_view.tasks.get_originating_command_id(task_id)
+    if origin_id is None:
+        return task_id
+    return origin_to_new_task.get(origin_id, task_id)
 
 
 def _running_wait_for_tasks(state_view: StateView) -> Command | None:
@@ -164,66 +185,14 @@ def _map_failed_task(
     for resolver in resolvers:
         if not resolver.can_handle_error(finished.error):
             continue
-        # Prefer the background command, but still map if a retry attributed the
-        # new task to waitForTasks. The error itself is what recovery needs.
-        command_for_mapping = originating_command
         if not resolver.is_associated_command(originating_command):
-            fallback_id = _associated_origin_for_error(
-                originating_command, state_view, resolver
-            )
-            if fallback_id is not None:
-                command_for_mapping = state_view.commands.get(fallback_id)
+            continue
         mapped = resolver.to_defined_error_data(
             error=finished.error,
-            command=command_for_mapping,
+            command=originating_command,
             state_view=state_view,
             model_utils=model_utils,
         )
         if mapped is not None:
             return mapped
     return None
-
-
-def _associated_origin_for_error(
-    originating_command: Command,
-    state_view: StateView,
-    resolver: AssociatedCommandRecoveryResolver,
-) -> str | None:
-    """If origin is waitForTasks, recover the background command it was waiting on."""
-    for command in _background_commands_to_restart(
-        _waited_task_ids(originating_command), state_view
-    ):
-        if resolver.is_associated_command(command):
-            return command.id
-    return None
-
-
-def _background_commands_to_restart(
-    failed_task_ids: Sequence[str], state_view: StateView
-) -> list[Command]:
-    """Walk from failed tasks to unique background commands.
-
-    A waitForTasks fixit creates new tasks attributed to itself. Those must
-    still restart the original background task implementations, not waitForTasks.
-    """
-    seen_origin_ids: set[str] = set()
-    commands: list[Command] = []
-    pending = list(failed_task_ids)
-    while pending:
-        task_id = pending.pop()
-        origin_id = state_view.tasks.get_originating_command_id(task_id)
-        if origin_id is None or origin_id in seen_origin_ids:
-            continue
-        seen_origin_ids.add(origin_id)
-        command = state_view.commands.get(origin_id)
-        if getattr(command, "commandType", None) == "waitForTasks":
-            pending.extend(_waited_task_ids(command))
-            continue
-        commands.append(command)
-    return commands
-
-
-def is_fixit_wait_for_tasks(state_view: StateView) -> bool:
-    """Return whether the running command is a waitForTasks fixit retry."""
-    running_command = _running_wait_for_tasks(state_view)
-    return running_command is not None and running_command.intent == CommandIntent.FIXIT

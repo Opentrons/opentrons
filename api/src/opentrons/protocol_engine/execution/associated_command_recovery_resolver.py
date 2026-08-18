@@ -2,22 +2,19 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Protocol
+from typing import TYPE_CHECKING, Protocol
 
 from opentrons_shared_data.errors.exceptions import EnumeratedError
 
 from ..commands import Command
-from ..commands.command import SuccessData
 from ..commands.command_unions import CommandDefinedErrorData
 from ..errors import ErrorOccurrence
 from ..types import ModuleModel
 
 if TYPE_CHECKING:
+    from ..commands.command_unions import CommandCreate
     from ..resources import ModelUtils
     from ..state.state import StateView
-    from .equipment import EquipmentHandler
-    from .movement import MovementHandler
-    from .task_handler import TaskHandler
 
 
 class AssociatedCommandRecoveryResolver(Protocol):
@@ -50,49 +47,11 @@ class AssociatedCommandRecoveryResolver(Protocol):
         """Map the error to defined command error data for the associated command."""
         ...
 
-    async def restart(
-        self,
-        command: Command,
-        *,
-        state_view: StateView,
-        task_handler: TaskHandler,
-        equipment: EquipmentHandler | None,
-        movement: MovementHandler | None,
-        model_utils: ModelUtils,
-    ) -> str | None:
-        """Re-run ``command`` and return the new background task id, if any."""
+    def create_retry(self, command: Command, *, task_id: str) -> CommandCreate | None:
+        """Return a new originating command request for a waitForTasks fixit.
+
+        The request must use ``task_id`` so the following waitForTasks can wait
+        on the new background task. Return None if this resolver does not own
+        ``command``.
+        """
         ...
-
-
-async def reexecute_background_start_command(
-    impl_cls: type | None,
-    command: Command,
-    *,
-    state_view: StateView,
-    task_handler: TaskHandler,
-    equipment: EquipmentHandler | None,
-    movement: MovementHandler | None,
-    model_utils: ModelUtils,
-) -> str | None:
-    """Construct ``impl_cls``, re-run ``command.params``, and return the new task id."""
-    if impl_cls is None or equipment is None or movement is None:
-        return None
-    impl = impl_cls(
-        state_view=state_view,
-        task_handler=task_handler,
-        equipment=equipment,
-        movement=movement,
-        model_utils=model_utils,
-    )
-    result = await impl.execute(_params_for_restart(command))
-    if not isinstance(result, SuccessData):
-        return None
-    task_id = getattr(result.public, "taskId", None)
-    return task_id if isinstance(task_id, str) else None
-
-
-def _params_for_restart(command: Command) -> Any:
-    params = command.params
-    if getattr(params, "taskId", None) is None:
-        return params
-    return params.model_copy(update={"taskId": None})

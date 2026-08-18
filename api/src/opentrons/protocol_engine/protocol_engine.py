@@ -248,6 +248,8 @@ class ProtocolEngine:
                 "failed command id should be supplied with a FIXIT command."
             )
 
+        request = self._expand_wait_for_tasks_fixit(request, failed_command_id)
+
         command_id = self._model_utils.generate_id()
         if request.intent in (
             commands.CommandIntent.SETUP,
@@ -271,6 +273,45 @@ class ProtocolEngine:
         )
         self._action_dispatcher.dispatch(action)
         return self._state_store.commands.get(command_id)
+
+    def _expand_wait_for_tasks_fixit(
+        self,
+        request: commands.CommandCreate,
+        failed_command_id: Optional[str],
+    ) -> commands.CommandCreate:
+        """Queue new originating start_* commands before a waitForTasks fixit.
+
+        App Retry re-posts the failed wait with the old task ids. Those tasks
+        already failed, so we dispatch new start_* commands (new ids) and point
+        the wait at the new task ids. The start_* commands are queued first so
+        the worker runs them before wait.
+        """
+        if not isinstance(request, commands.WaitForTasksCreate):
+            return request
+        if request.intent != commands.CommandIntent.FIXIT:
+            return request
+
+        from .commands.background_task_recovery import expand_wait_for_tasks_fixit
+        from .execution.associated_command_error_recovery import (
+            default_associated_command_recovery_resolvers,
+        )
+
+        expansion = expand_wait_for_tasks_fixit(
+            request.params.task_ids,
+            self.state_view,
+            default_associated_command_recovery_resolvers(),
+            self._model_utils,
+        )
+        if expansion is None:
+            return request
+
+        creates, rewritten_task_ids = expansion
+        for create in creates:
+            self.add_command(create, failed_command_id=failed_command_id)
+        rewritten_params = request.params.model_copy(
+            update={"task_ids": rewritten_task_ids}
+        )
+        return request.model_copy(update={"params": rewritten_params})
 
     async def wait_for_command(self, command_id: str) -> None:
         """Wait for a command to be completed.

@@ -11,11 +11,7 @@ from ..errors import ErrorOccurrence
 from ..errors.error_occurrence import ProtocolCommandFailedError
 from ..errors.exceptions import TaskFailedError
 from ..resources import ModelUtils
-from .background_task_recovery import (
-    defined_error_from_failed_tasks,
-    is_fixit_wait_for_tasks,
-    restart_originating_background_tasks,
-)
+from .background_task_recovery import defined_error_from_failed_tasks
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -24,12 +20,7 @@ from .command import (
 )
 
 if TYPE_CHECKING:
-    from ..execution import (
-        EquipmentHandler,
-        MovementHandler,
-        RunControlHandler,
-        TaskHandler,
-    )
+    from ..execution import RunControlHandler, TaskHandler
     from ..execution.associated_command_recovery_resolver import (
         AssociatedCommandRecoveryResolver,
     )
@@ -74,8 +65,6 @@ class WaitForTasksImplementation(
         task_handler: TaskHandler,
         run_control: RunControlHandler,
         state_view: StateView,
-        equipment: EquipmentHandler | None = None,
-        movement: MovementHandler | None = None,
         model_utils: ModelUtils | None = None,
         resolvers: Sequence[AssociatedCommandRecoveryResolver] | None = None,
         **_unused_dependencies: object,
@@ -83,8 +72,6 @@ class WaitForTasksImplementation(
         self._task_handler = task_handler
         self._run_control = run_control
         self._state_view = state_view
-        self._equipment = equipment
-        self._movement = movement
         self._model_utils = model_utils or ModelUtils()
         self._resolvers = resolvers
 
@@ -93,41 +80,16 @@ class WaitForTasksImplementation(
         for task_id in params.task_ids:
             _ = self._state_view.tasks.get(task_id)
 
-        waited_task_ids = list(params.task_ids)
-        if is_fixit_wait_for_tasks(self._state_view):
-            failed_already = self._state_view.tasks.get_failed_tasks(params.task_ids)
-            if (
-                failed_already
-                and defined_error_from_failed_tasks(
-                    failed_already,
-                    self._state_view,
-                    self._get_resolvers(),
-                    self._model_utils,
-                )
-                is not None
-            ):
-                restarted = await restart_originating_background_tasks(
-                    failed_already,
-                    self._state_view,
-                    self._get_resolvers(),
-                    self._task_handler,
-                    self._equipment,
-                    self._movement,
-                    self._model_utils,
-                )
-                if restarted:
-                    waited_task_ids = restarted
+        await self._run_control.wait_for_tasks(params.task_ids)
 
-        await self._run_control.wait_for_tasks(waited_task_ids)
-
-        failed_tasks = self._state_view.tasks.get_failed_tasks(waited_task_ids)
+        failed_tasks = self._state_view.tasks.get_failed_tasks(params.task_ids)
         if not failed_tasks:
             return SuccessData(public=WaitForTasksResult(task_ids=params.task_ids))
 
         # Fail-before-wait race only: start_* already owns recovery, so do not
         # raise a second error. Mixed or uncovered failures still fail the wait.
         if self._state_view.failed_task_failures_absorbed_by_active_recovery(
-            waited_task_ids
+            params.task_ids
         ):
             return SuccessData(public=WaitForTasksResult(task_ids=params.task_ids))
 
