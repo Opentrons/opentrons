@@ -1,6 +1,5 @@
 """Tests for the EngineStore interface."""
 
-import inspect
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
@@ -29,7 +28,7 @@ from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import RunOrchestrator, RunResult
 from opentrons.types import DeckSlotName
 from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
-from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotType
 
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource
@@ -76,15 +75,13 @@ async def bad_python_protocol_source(tmp_path: Path) -> ProtocolResource:
     """Get a protocol source for a bad python protocol."""
     with open(tmp_path / "bad_protocol.py", "w") as proto:
         proto.write(
-            dedent(
-                """
+            dedent("""
     requirements = {'apiLevel': '2.20', 'robotType': 'Flex'}
     a = 1/0
 
     def run(ctx):
         pass
-    """
-            )
+    """)
         )
     return ProtocolResource(
         protocol_id="protocol-id",
@@ -97,19 +94,6 @@ async def bad_python_protocol_source(tmp_path: Path) -> ProtocolResource:
         protocol_kind=ProtocolKind.STANDARD,
         protocol_key="some-name",
     )
-
-
-@pytest.fixture
-def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Get a mocked feature flags."""
-    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
-        params = inspect.getfullargspec(func)
-        mock_get_ff = decoy.mock(func=func)
-        if any("robot_type" in p for p in params.args):
-            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
-        else:
-            decoy.when(mock_get_ff()).then_return(False)
-        monkeypatch.setattr(feature_flags, name, mock_get_ff)
 
 
 async def test_create_engine(

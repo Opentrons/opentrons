@@ -302,7 +302,8 @@ async def _setup_and_validate_modules_on_OT3API_and_nameserver(
     modules_list_NO_MAG_BLOCK = tuple(
         arg for arg in get_args(ModuleModel) if arg != MagneticBlockModel
     )
-    assert len(ot3api_async_instance.attached_modules) == len(modules_list_NO_MAG_BLOCK)
+    attached_modules = await ot3api_async_instance.get_attached_modules()
+    assert len(attached_modules) == len(modules_list_NO_MAG_BLOCK)
 
     return ot3api_async_instance
 
@@ -700,6 +701,35 @@ CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
     module_types.BundledFirmware: module_types.BundledFirmware(
         version="v1", path=Path("coolpath")
     ),
+    module_types.ModuleStateSummary: module_types.ModuleStateSummary(
+        model="asda",
+        usb_port=rpi_types.USBPort(
+            name="USB",
+            port_number=10,
+            port_group=rpi_types.PortGroup.MAIN,
+            hub=True,
+            hub_port=11,
+            device_path="cooldevpath",
+        ),
+        has_available_update=True,
+        live_data={
+            "status": "good",
+            "data": {
+                "latchState": True,
+                "platformState": False,
+                "hopperDoorState": 10,
+                "installDetected": "3",
+                "errorDetails": "hi",
+            },
+        },
+        device_info={
+            "serial": "blahablahblh",
+            "version": "1.2.3",
+            "model": "ac",
+            "reset_reason": "10",
+        },
+        serial_number=None,
+    ),
     vac_types.PumpState: vac_types.PumpState(
         target_rpm=0.1,
         current_rpm=0.2,
@@ -743,7 +773,27 @@ CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
         module_serial="ABCDF4",
     ),
     hw_types.SubsystemConnectionNotification: hw_types.SubsystemConnectionNotification(
-        event=hw_types.HardwareEventType.SUBSYSTEM_CONNECTION
+        tracked_subsystems={
+            hw_types.SubSystem.gantry_x: hw_types.SubSystemState(
+                ok=True,
+                current_fw_version=10,
+                next_fw_version=10,
+                fw_update_needed=True,
+                current_fw_sha="asdasd",
+                pcba_revision="a1",
+                update_state=None,
+            ),
+            hw_types.SubSystem.rear_panel: hw_types.SubSystemState(
+                ok=False,
+                current_fw_version=49,
+                next_fw_version=12,
+                fw_update_needed=False,
+                current_fw_sha="asdasd",
+                pcba_revision="12312",
+                update_state=hw_types.UpdateState.updating,
+            ),
+        },
+        event=hw_types.HardwareEventType.SUBSYSTEM_CONNECTION,
     ),
     hw_types.AsynchronousModuleErrorNotification: hw_types.AsynchronousModuleErrorNotification(
         exception=CommunicationError(
@@ -774,6 +824,9 @@ CLASS_TYPE_MOCK_TABLE: Dict[type, Any] = {
         state=hw_types.EstopState.DISENGAGED,
         left_physical_state=hw_types.EstopPhysicalStatus.ENGAGED,
         right_physical_state=hw_types.EstopPhysicalStatus.DISENGAGED,
+    ),
+    hw_types.HardwareSystemInfo: hw_types.HardwareSystemInfo(
+        fw_version="1.2.3", board_revision="A2", serial_number="asfasdasd"
     ),
     instr_calibration_types.GripperCalibrationOffset: instr_calibration_types.GripperCalibrationOffset(
         status=instr_calibration_types.CalibrationStatus(
@@ -982,7 +1035,14 @@ async def test_serialization_validation_with_mock_data() -> None:  # noqa: C901
                     # then please mock it anyways, something might expose it some day causing other tests to fail!
                     raise KeyError(f"{e} - Mock data missing for type {clazz}")
 
-                deserialized_output = tester_proxy.data_in_data_out(mock_data)
+                try:
+                    deserialized_output = tester_proxy.data_in_data_out(mock_data)
+                except BaseException:
+                    print(  # noqa: T201
+                        f"Pyro deserialization failure for class {clazz} with data {mock_data}"
+                    )
+                    raise
+
                 assert deserialized_output == mock_data
 
         daemon.close()

@@ -8,6 +8,7 @@ from decoy import Decoy
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.hardware_control.types import DoorState, EstopState
 from opentrons.protocol_engine import (
     CommandErrorSlice,
     CommandPointer,
@@ -49,6 +50,7 @@ from server_utils.auth.resource_server.types import (
     AuthenticationNotRequiredResult,
 )
 from server_utils.auth.scopes import Scope, serialize_scopes
+from server_utils.fastapi_utils.app_state import AppState
 from server_utils.fastapi_utils.models.json_api import (
     MultiBodyMeta,
     RequestModel,
@@ -109,6 +111,12 @@ from robot_server.runs.run_store import RunStore
 def mock_notify_publishers() -> None:
     """A mock notify_publishers."""
     return None
+
+
+@pytest.fixture
+def mock_app_state(decoy: Decoy) -> AppState:
+    """Get a mock AppState."""
+    return decoy.mock(cls=AppState)
 
 
 @pytest.fixture
@@ -1432,6 +1440,7 @@ async def test_get_current_state_success(
     mock_run_data_manager: RunDataManager,
     mock_hardware_api: HardwareControlAPI,
     labware_definition: LabwareDefinition,
+    mock_app_state: AppState,
 ) -> None:
     """It should return different state from the current run.
 
@@ -1491,7 +1500,14 @@ async def test_get_current_state_success(
         mock_run_data_manager.get_flex_stacker_substate(run_id=run_id)
     ).then_return(stacker_substates)
 
-    hardware_store = HardwareStateStore(hardware_resource=mock_hardware_api)
+    hardware_store = HardwareStateStore(
+        hardware_resource=mock_hardware_api,
+        attached_modules=[],
+        attached_subsystems={},
+        estop_state=EstopState.DISENGAGED,
+        door_state=DoorState.CLOSED,
+        module_door_serial=None,
+    )
 
     result = await get_current_state(
         runId=run_id,
@@ -1538,6 +1554,7 @@ async def test_get_current_state_run_not_current(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
     mock_hardware_api: HardwareControlAPI,
+    mock_app_state: AppState,
 ) -> None:
     """It should raise RunStopped when the run is not current."""
     run_id = "non-current-run-id"
@@ -1546,7 +1563,14 @@ async def test_get_current_state_run_not_current(
         RunNotCurrentError("Run is not current")
     )
 
-    hardware_store = HardwareStateStore(hardware_resource=mock_hardware_api)
+    hardware_store = HardwareStateStore(
+        hardware_resource=mock_hardware_api,
+        attached_modules=[],
+        attached_subsystems={},
+        estop_state=EstopState.DISENGAGED,
+        door_state=DoorState.CLOSED,
+        module_door_serial=None,
+    )
 
     with pytest.raises(ApiError) as exc_info:
         await get_current_state(

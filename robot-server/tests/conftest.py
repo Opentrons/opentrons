@@ -1,3 +1,4 @@
+import inspect
 import json
 import os
 import pathlib
@@ -31,10 +32,18 @@ from opentrons.calibration_storage.ot2 import (
     save_pipette_calibration,
     save_tip_length_calibration,
 )
-from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLock
+from opentrons.hardware_control import (
+    API,
+    HardwareControlAPI,
+    ThreadedAsyncLock,
+)
+from opentrons.hardware_control import (
+    types as hw_types,
+)
 from opentrons.protocol_api import labware
 from opentrons.types import Mount, Point
 from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.robot.types import RobotTypeEnum
 from server_utils.audit.audit_server import (
     AuditSettingsResponseData,
 )
@@ -51,7 +60,7 @@ from server_utils.auth.resource_server.fastapi import (
 )
 
 from robot_server.app import app
-from robot_server.hardware import get_hardware, get_ot2_hardware
+from robot_server.hardware import HardwareStateStore, get_hardware, get_ot2_hardware
 from robot_server.health.router import ComponentVersions, get_versions
 from robot_server.persistence.database import sql_engine_ctx
 from robot_server.persistence.fastapi_dependencies import get_sql_engine
@@ -110,6 +119,19 @@ def hardware_api(decoy: Decoy) -> HardwareControlAPI:
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
     return decoy.mock(cls=API)
+
+
+@pytest.fixture
+async def hardware_state_store(hardware_api: HardwareControlAPI) -> HardwareStateStore:
+    """Build a hardware state store on fixtured data."""
+    return HardwareStateStore(
+        hardware_resource=hardware_api,
+        attached_modules=[],
+        attached_subsystems={},
+        estop_state=hw_types.EstopState.DISENGAGED,
+        door_state=hw_types.DoorState.CLOSED,
+        module_door_serial=None,
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -571,3 +593,15 @@ def zulu_iso8601_to_datetime(iso8601_str: str) -> datetime:
     See `datetime_to_zulu_iso8601()`.
     """
     return datetime.fromisoformat(iso8601_str.replace("Z", "+00:00"))
+
+
+@pytest.fixture
+def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    for name, func in inspect.getmembers(config.feature_flags, inspect.isfunction):
+        params = inspect.getfullargspec(func)
+        mock_get_ff = decoy.mock(func=func)
+        if any("robot_type" in p for p in params.args):
+            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
+        else:
+            decoy.when(mock_get_ff()).then_return(False)
+        monkeypatch.setattr(config.feature_flags, name, mock_get_ff)

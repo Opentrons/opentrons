@@ -18,6 +18,7 @@ from opentrons.hardware_control.types import (
     UpdateState,
 )
 from opentrons.protocol_engine.types import EngineStatus
+from server_utils.fastapi_utils.app_state import AppState
 
 from robot_server.hardware import HardwareStateStore
 from robot_server.runs.light_control_task import LightController, Status
@@ -31,19 +32,25 @@ def run_orchestrator_store(decoy: Decoy) -> RunOrchestratorStore:
 
 
 @pytest.fixture
-def subject(
+async def subject(
     hardware_api: HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
     run_orchestrator_store: RunOrchestratorStore,
     decoy: Decoy,
+    mock_app_state: AppState,
 ) -> LightController:
     """Test subject - LightController."""
-    decoy.when(hardware_api.attached_subsystems).then_return({})
-    hardware_store = HardwareStateStore(hardware_api)
     return LightController(
         api=hardware_api,
         run_orchestrator_store=run_orchestrator_store,
-        hardware_state_store=hardware_store,
+        hardware_state_store=hardware_state_store,
     )
+
+
+@pytest.fixture
+def mock_app_state(decoy: Decoy) -> AppState:
+    """Get a mock AppState."""
+    return decoy.mock(cls=AppState)
 
 
 @pytest.mark.parametrize(
@@ -67,15 +74,15 @@ async def test_get_current_status_ot2(
     status: EngineStatus,
     estop: EstopState,
     hardware_api: HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
 ) -> None:
     """Test LightController.get_current_status."""
     decoy.when(run_orchestrator_store.current_run_id).then_return(
         "fake_id" if active else None
     )
     decoy.when(await run_orchestrator_store.get_status()).then_return(status)
-    decoy.when(hardware_api.get_estop_state()).then_return(estop)
-    subject._hardware_state_store.update_hardware_status_callback(
-        event=EstopStateNotification()
+    await hardware_state_store.update_hardware_status_callback(
+        event=EstopStateNotification(new_state=estop)
     )
 
     expected = Status(
@@ -109,21 +116,26 @@ async def test_get_current_status(
         SubSystem.head,
     ]
 
-    mock_ret = {
-        node: SubSystemState(
-            ok=True,
-            current_fw_version=1,
-            next_fw_version=1,
-            fw_update_needed=False,
-            current_fw_sha="abcdefg",
-            pcba_revision="fake_pcb",
-            update_state=UpdateState.updating if node in active_updates else None,
+    decoy.when(hardware_api.attached_subsystems).then_raise(
+        RuntimeError("not allowed to call this")
+    )
+    await subject._hardware_state_store.update_hardware_status_callback(
+        event=SubsystemConnectionNotification(
+            tracked_subsystems={
+                node: SubSystemState(
+                    ok=True,
+                    current_fw_version=1,
+                    next_fw_version=1,
+                    fw_update_needed=False,
+                    current_fw_sha="abcdefg",
+                    pcba_revision="fake_pcb",
+                    update_state=(
+                        UpdateState.updating if node in active_updates else None
+                    ),
+                )
+                for node in all_nodes
+            },
         )
-        for node in all_nodes
-    }
-    decoy.when(hardware_api.attached_subsystems).then_return(mock_ret)
-    subject._hardware_state_store.update_hardware_status_callback(
-        event=SubsystemConnectionNotification()
     )
 
     current_status = await subject.get_current_status()
@@ -209,18 +221,19 @@ async def test_light_controller_update(
 async def test_provide_run_orchestrator_store(
     decoy: Decoy,
     hardware_api: HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
     run_orchestrator_store: RunOrchestratorStore,
+    mock_app_state: AppState,
 ) -> None:
     """Test providing an engine store after initialization."""
-    decoy.when(hardware_api.attached_subsystems).then_return({})
-    hardware_store = HardwareStateStore(hardware_api)
     subject = LightController(
         api=hardware_api,
         run_orchestrator_store=None,
-        hardware_state_store=hardware_store,
+        hardware_state_store=hardware_state_store,
     )
-    decoy.when(hardware_api.get_estop_state()).then_return(EstopState.DISENGAGED)
-    hardware_store.update_hardware_status_callback(event=EstopStateNotification())
+    await hardware_state_store.update_hardware_status_callback(
+        event=EstopStateNotification(new_state=EstopState.DISENGAGED)
+    )
     assert await subject.get_current_status() == Status(
         active_updates=[],
         estop_status=EstopState.DISENGAGED,
