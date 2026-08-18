@@ -45,6 +45,10 @@ def get_scope_set_of_account_type(
                 Scope.USERS_WRITE_SELF,
                 Scope.AUDIT_LOG_WRITE,
             }
+            # These three scopes are granted to users only while the matching
+            # requireAdminCreds* setting is false. Token issuance snapshots this
+            # set, but introspection recomputes it from live settings so a policy
+            # change takes effect without waiting for re-login (RQA-5854).
             if not settings.requireAdminCredsWhenUpdatingRobotSoftware:
                 result.add(Scope.UPDATES_WRITE)
             if not settings.requireAdminCredsWhenSendingProtocolToRobot:

@@ -438,21 +438,46 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             )
             return False
 
+    def _live_scopes_for_username(self, username: str) -> set[Scope] | None:
+        """Return the user's current scopes, or None if the user no longer exists.
+
+        Token issuance snapshots scopes from account type plus the current
+        requireAdminCreds* settings. Resource servers authorize from introspection,
+        so we recompute here. Otherwise a settings change would leave old
+        permissions on already-issued tokens (RQA-5854).
+        """
+        user = self.__user_store.get(username)
+        if user is None:
+            return None
+        settings = self.__settings_store.get_settings()
+        return get_scope_set_of_user(
+            user,
+            settings,
+            must_reset_password(
+                user,
+                self.__get_now(),
+                settings.passwordResetTime,
+            ),
+        )
+
     @override
     @pydantic.validate_call(config=_validate_call_config)
     def get_original_scopes(
         self, refresh_token: str, request: oauthlib.common.Request
     ) -> list[str]:
-        """Return the scopes that a refresh token was originally associated with.
+        """Return the scopes to attach to a refreshed access token.
 
-        These will be passed on to the refreshed access token if the client did not
-        specify a scope during the request.
+        oauthlib uses this when the client does not specify a scope on refresh.
+        Compute from the user's current account type and auth settings, not the
+        scopes that were stored when the refresh token was issued.
         """
         token = self.__token_store.find_active_refresh_token(
             refresh_token, now=self.__get_now()
         )
         assert token is not None
-        return sorted(s.api_name for s in token.scopes)
+        live_scopes = self._live_scopes_for_username(token.username)
+        assert live_scopes is not None
+        return sorted(s.api_name for s in live_scopes)
 
     @override
     @pydantic.validate_call(config=_validate_call_config)
@@ -472,17 +497,19 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         )
         if found_access_token is None:
             return None
-        else:
-            # Values defined by:
-            # https://datatracker.ietf.org/doc/html/rfc7662#section-2.2
-            # except ot_fullname, which is custom to us. if you add other custom fields,
-            # please prefix them with ot-.
-            return {
-                "scope": serialize_scopes(found_access_token.scopes),
-                "username": found_access_token.username,
-                "ot_fullname": found_access_token.fullname,
-                # "active": True is set implicitly by oauthlib.
-            }
+        live_scopes = self._live_scopes_for_username(found_access_token.username)
+        if live_scopes is None:
+            return None
+        # Values defined by:
+        # https://datatracker.ietf.org/doc/html/rfc7662#section-2.2
+        # except ot_fullname, which is custom to us. if you add other custom fields,
+        # please prefix them with ot-.
+        return {
+            "scope": serialize_scopes(live_scopes),
+            "username": found_access_token.username,
+            "ot_fullname": found_access_token.fullname,
+            # "active": True is set implicitly by oauthlib.
+        }
 
 
 class _CustomInvalidCredentialsError(oauthlib.oauth2.InvalidGrantError):
