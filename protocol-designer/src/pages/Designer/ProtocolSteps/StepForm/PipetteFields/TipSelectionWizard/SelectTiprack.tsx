@@ -15,10 +15,7 @@ import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
 import { BaseDeckTipSelection } from './BaseDeckTipSelection'
 import { TiprackSelectHover } from './TiprackSelectHover'
 import styles from './tipselectionwizard.module.css'
-import {
-  getFirstSelectableTiprackId,
-  getIsTiprackSelectable,
-} from './utils'
+import { getFirstSelectableTiprackId, getIsTiprackSelectable } from './utils'
 
 import type { TipSelectionBaseProps } from './types'
 
