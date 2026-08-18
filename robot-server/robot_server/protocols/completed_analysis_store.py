@@ -79,7 +79,6 @@ class CompletedAnalysisResource:
             "protocol_id": self.protocol_id,
             "analyzer_version": self.analyzer_version,
             "completed_analysis": serialized_analysis,
-            "result": self.completed_analysis.result,
         }
 
     @classmethod
@@ -293,7 +292,12 @@ class CompletedAnalysisStore:
     def get_summaries_by_protocol(self, protocol_id: str) -> List[AnalysisSummary]:
         """Like `get_by_protocol()`, but return only the summary of each analysis."""
         statement = (
-            sqlalchemy.select(analysis_table.c.id, analysis_table.c.result)
+            sqlalchemy.select(
+                analysis_table.c.id,
+                sqlalchemy.func.json_extract(
+                    analysis_table.c.completed_analysis, "$.result"
+                ).label("result"),
+            )
             .where(analysis_table.c.protocol_id == protocol_id)
             .order_by(sqlite_rowid)
         )
@@ -305,9 +309,7 @@ class CompletedAnalysisStore:
             summary = AnalysisSummary.model_construct(
                 id=row.id,
                 status=AnalysisStatus.COMPLETED,
-                result=(
-                    AnalysisResult(row.result.value) if row.result is not None else None
-                ),
+                result=AnalysisResult(row.result) if row.result is not None else None,
             )
             summaries.append(summary)
 

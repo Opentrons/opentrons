@@ -30,7 +30,6 @@ from ._migrations import (
     v16_to_v17,
     v17_to_v18,
     v18_to_v19,
-    v19_to_v20,
 )
 from .file_and_directory_names import LATEST_VERSION_DIRECTORY
 
@@ -74,8 +73,7 @@ def make_migration_orchestrator(prepared_root: Path) -> MigrationOrchestrator:
             v15_to_v16.Migration15to16(subdirectory="16"),
             v16_to_v17.Migration16to17(subdirectory="17"),
             v17_to_v18.Migration17to18(subdirectory="18"),
-            v18_to_v19.Migration18to19(subdirectory="19"),
-            v19_to_v20.Migration19to20(subdirectory=LATEST_VERSION_DIRECTORY),
+            v18_to_v19.Migration18to19(subdirectory=LATEST_VERSION_DIRECTORY),
         ],
         temp_file_prefix="temp-",
     )

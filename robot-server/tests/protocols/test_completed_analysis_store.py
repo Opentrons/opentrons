@@ -247,7 +247,7 @@ async def test_get_ids_by_protocol(
 async def test_get_summaries_by_protocol(
     subject: CompletedAnalysisStore, protocol_store: ProtocolStore
 ) -> None:
-    """It should return analysis summaries with denormalized result values."""
+    """It should return analysis summaries with result values from the analysis JSON."""
     ok_resource = _completed_analysis_resource("analysis-id-1", "protocol-id")
     not_ok_resource = CompletedAnalysisResource(
         "analysis-id-2",
