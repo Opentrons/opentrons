@@ -1164,12 +1164,14 @@ class LabwareView:
     def raise_if_labware_incompatible_with_vacuum_module(
         self,
         labware_definition: LabwareDefinition,
-    ) -> None:
+    ) -> bool:
         """Raise if a filter plate is placed directly on the vacuum module.
 
         Filter plates must sit on a collar, spacer, or receiver plate. Some
         of them have their wells extend below the skirt and will not seat on
         the module surface.
+
+        Returns True if it does not raise.
         """
         if labware_validation.validate_definition_is_filter_plate(labware_definition):
             raise errors.LabwareIsNotAllowedInLocationError(
@@ -1177,6 +1179,7 @@ class LabwareView:
                 " onto the vacuum module. Filter plates must sit on a manifold"
                 " collar, spacer, or receiver plate."
             )
+        return True
 
     def raise_if_labware_incompatible_with_vacuum_module_dock(
         self,
