@@ -21,7 +21,8 @@
   "dependencies": {
     "@opentrons/components": "workspace:*",
     "@opentrons/shared-data": "workspace:*",
-    "styled-components": "5.3.6"
+    "styled-components": "5.3.6",
+    "typeface-open-sans": "0.0.75"
   },
   "devDependencies": {
     "@types/styled-components": "^5.1.26"
