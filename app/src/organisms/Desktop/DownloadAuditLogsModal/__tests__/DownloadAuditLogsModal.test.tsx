@@ -33,7 +33,7 @@ describe('DownloadAuditLogsModal', () => {
     render(props)
     expect(screen.getAllByText('Download audit logs')).toHaveLength(2)
     screen.getByText(
-      'Audit logs are not saved to the robot and must be downloaded locally before continuing. Once this session ends, the data cannot be recovered.'
+      'Once a protocol run is complete, audit logs must be downloaded locally before continuing.'
     )
   })
 
