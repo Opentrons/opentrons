@@ -131,6 +131,8 @@
   "swap_view": "Swap view",
   "temperaturemoduletype": "Temperature Module",
   "thermocycler_blocked": "The Thermocycler needs slots A1 and B1. Slot A1 is occupied.",
+  "vacuum_module_adjacent": "A Vacuum Module is adjacent to this slot. Modules cannot be placed next to a Vacuum Module.",
+  "vacuum_module_adjacent_to": "A module is adjacent to this slot. The Vacuum Module cannot be placed next to a module.",
   "thermocyclermoduletype": "Thermocycler Module",
   "tip_position_aspirate_delay_mmFromBottom": "Edit aspirate delay position",
   "tip_position_aspirate_touchTip_mmFromTop": "Edit aspirate touch tip position",
