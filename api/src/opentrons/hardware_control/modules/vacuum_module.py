@@ -940,7 +940,11 @@ class VacuumModuleReader(Reader):
         self._refresh_state = True
 
     def on_error(self, exception: Exception) -> None:
-        self._driver.reset_serial_buffers()
+        try:
+            self._driver.reset_serial_buffers()
+        except Exception:
+            # Port is often already gone on unplug; still record the poll error.
+            log.debug("Could not reset serial buffers after poll error", exc_info=True)
         self._set_error(exception)
 
     def _set_error(self, exception: Optional[Exception]) -> None:
