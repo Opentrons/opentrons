@@ -1008,16 +1008,8 @@ def _get_child_labware_overlap_with_parent_labware(
         else child_labware.legacyStackingOffsetWithLabware.get(parent_labware_name)
     )
 
-    # The parent labware does not exist in the child mapping, use the childs `default` value
-    if overlap is None:
-        overlap = (
-            child_labware.stackingOffsetWithLabware.get("default")
-            if isinstance(child_labware, LabwareDefinition2)
-            else child_labware.legacyStackingOffsetWithLabware.get("default")
-        )
-
-    # The child mapping does not have a default, use the `default` from the parent
-    # IF the parent has the `providesStackingDefault` quirk.
+    # The parent labware does not exist in the child mapping, use the `default`
+    # from the parent if the parent has the `providesStackingDefault` quirk.
     if overlap is None:
         if isinstance(parent_labware, LabwareDefinition2):
             if (
@@ -1027,6 +1019,15 @@ def _get_child_labware_overlap_with_parent_labware(
                 overlap = parent_labware.stackingOffsetWithLabware.get("default")
         else:
             overlap = parent_labware.legacyStackingOffsetWithLabware.get("default")
+
+    # The parent does not have a `providesStackingDefault` quirk or explicit
+    # mapping, use the `default` from the parent.
+    if overlap is None:
+        overlap = (
+            child_labware.stackingOffsetWithLabware.get("default")
+            if isinstance(child_labware, LabwareDefinition2)
+            else child_labware.legacyStackingOffsetWithLabware.get("default")
+        )
 
     if overlap is None:
         if isinstance(child_labware, LabwareDefinition3):
