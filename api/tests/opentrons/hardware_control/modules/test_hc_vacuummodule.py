@@ -10,6 +10,7 @@ from opentrons_shared_data.errors.exceptions import (
     VacuumModuleWasteFullError,
 )
 
+from . import require_live_data_real_string
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.vacuum_module.errors import (
     PressureNotReached,
@@ -276,6 +277,7 @@ async def test_live_data_includes_target_power_after_set_pump_state(
     assert live_data["targetPower"] == 65.0
     assert live_data["modeType"] == VacuumOperationMode.POWER
     assert live_data["ventStatus"] == VentStatus.CLOSED
+    require_live_data_real_string(subject)
 
 
 @pytest.mark.parametrize(

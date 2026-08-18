@@ -4,6 +4,7 @@ from typing import AsyncGenerator
 import pytest
 from decoy import Decoy, matchers
 
+from . import require_live_data_real_string
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control import ExecutionManager, modules
 from opentrons.hardware_control.modules.tempdeck import (
@@ -68,6 +69,7 @@ async def test_sim_state(subject: modules.AbstractModule) -> None:
     assert modules.ModuleDataValidator.is_temperature_module_data(live_data)
     assert live_data["currentTemp"] == subject.temperature
     assert live_data["targetTemp"] == subject.target
+    require_live_data_real_string(subject)
     status = subject.device_info
     assert status["serial"] == "dummySerialTD"
     # return v1 if sim_model is not passed

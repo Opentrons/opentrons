@@ -90,9 +90,9 @@ class HeaterShaker(mod_abc.AbstractModule):
         if not simulating:
             poll_interval_seconds = poll_interval_seconds or POLL_PERIOD
 
-            async def _init_driver() -> tuple[
-                AbstractHeaterShakerDriver, Mapping[str, str]
-            ]:
+            async def _init_driver() -> (
+                tuple[AbstractHeaterShakerDriver, Mapping[str, str]]
+            ):
                 d = await HeaterShakerDriver.create(port=port, loop=hw_control_loop)
                 try:
                     info = await d.get_device_info()
@@ -246,9 +246,9 @@ class HeaterShaker(mod_abc.AbstractModule):
     @property
     def live_data(self) -> LiveData:
         data: HeaterShakerData = {
-            "temperatureStatus": self.temperature_status,
-            "speedStatus": self.speed_status,
-            "labwareLatchStatus": self.labware_latch_status,
+            "temperatureStatus": self.temperature_status.value,
+            "speedStatus": self.speed_status.value,
+            "labwareLatchStatus": self.labware_latch_status.value,
             "currentTemp": self.temperature,
             "targetTemp": self.target_temperature,
             "currentSpeed": self.speed,
