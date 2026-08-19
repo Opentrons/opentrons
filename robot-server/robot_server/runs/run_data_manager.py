@@ -424,7 +424,8 @@ class RunDataManager:
         """
         if run_id == self._run_orchestrator_store.current_run_id:
             # We will only raise for a signoff if the run is current. Uncurrent unsigned
-            # runs are allowed to be deleted.
+            # runs are allowed to be deleted, as they can come from runs interrupted by
+            # a power cycle or runs created before signoff was required.
             self._raise_if_run_requires_signoff(run_id, access_control_status)
             await self._run_orchestrator_store.clear()
 
