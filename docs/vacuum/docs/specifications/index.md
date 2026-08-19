@@ -257,7 +257,7 @@ The Vacuum Module requires the following power inputs, which are met by its inte
       <td><strong>Input Power</strong></td>
       <td>
         <ul>
-          <li>110&ndash;240 VAC</li>
+          <li>100&ndash;240 VAC</li>
           <li>50&ndash;60 Hz</li>
         </ul>
       </td>
