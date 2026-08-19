@@ -1,13 +1,9 @@
-import {
-  EmptySelectorButton,
-  Flex,
-  FLEX_MAX_CONTENT,
-  SPACING,
-  TYPOGRAPHY,
-  WRAP,
-} from '@opentrons/components'
+import { EmptySelectorButton, TYPOGRAPHY } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
+import styles from './moduleemptyselectorbuttons.module.css'
+
+import type { ReactNode } from 'react'
 import type { ModuleModel } from '@opentrons/shared-data'
 
 interface ModuleEmptSelectorButtonProps {
@@ -20,14 +16,14 @@ interface ModuleEmptSelectorButtonProps {
 //  NOTE: This fn is used for selecting modules for the OT-2 only
 export function ModuleEmptySelectorButtons(
   props: ModuleEmptSelectorButtonProps
-): JSX.Element {
+): ReactNode {
   const { modules, addModule } = props
   return (
-    <Flex gridGap={SPACING.spacing4} flexWrap={WRAP}>
-      {modules
+    <div className={styles.buttons_container}>
+      {[...modules]
         .sort((moduleA, moduleB) => moduleA.localeCompare(moduleB))
         .map(moduleModel => (
-          <Flex width={FLEX_MAX_CONTENT} key={moduleModel}>
+          <div className={styles.button_container} key={moduleModel}>
             <EmptySelectorButton
               disabled={false}
               textAlignment={TYPOGRAPHY.textAlignLeft}
@@ -37,8 +33,8 @@ export function ModuleEmptySelectorButtons(
                 addModule(moduleModel)
               }}
             />
-          </Flex>
+          </div>
         ))}
-    </Flex>
+    </div>
   )
 }

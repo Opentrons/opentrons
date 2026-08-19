@@ -13,6 +13,7 @@ import { START_TERMINAL_ITEM_ID } from '../../steplist'
 import { getSelectedTerminalItemId } from '../../ui/steps'
 import { getIsVacuumCollar } from './DeckSetup/utils'
 
+import type { ReactNode } from 'react'
 import type { DeckLabelProps } from '@opentrons/components'
 import type {
   CoordinateTuple,
@@ -36,7 +37,7 @@ interface LabwareLabelProps {
   nestedLabwareInfo?: DeckLabelProps[]
   labelText?: string
 }
-export const LabwareLabel = (props: LabwareLabelProps): JSX.Element => {
+export const LabwareLabel = (props: LabwareLabelProps): ReactNode => {
   const {
     labwareDef,
     position,
@@ -57,8 +58,8 @@ export const LabwareLabel = (props: LabwareLabelProps): JSX.Element => {
       text: greaterThan1
         ? `${labelText} (${selectedTopLabware.amount})`
         : labelText,
-      isSelected: isSelected,
-      isLast: isLast,
+      isSelected,
+      isLast,
       isZoomed: terminalItemId === START_TERMINAL_ITEM_ID,
     },
     ...nestedLabwareInfo,

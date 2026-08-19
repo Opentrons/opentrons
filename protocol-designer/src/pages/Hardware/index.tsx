@@ -20,7 +20,9 @@ import { NAV_BAR_HEIGHT_REM } from '../../components/atoms'
 import { FlexHardware, Ot2Modules } from '../../components/organisms'
 import { getFileMetadata, getRobotType } from '../../file-data/selectors'
 
-export function Hardware(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function Hardware(): ReactNode {
   const { t } = useTranslation([
     'protocol_steps',
     'protocol_overview',

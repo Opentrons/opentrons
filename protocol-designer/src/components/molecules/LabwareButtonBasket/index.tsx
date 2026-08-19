@@ -30,7 +30,7 @@ export function LabwareButtonBasket(
         {stackOfLabware.map((item, index) =>
           labware[item] ? (
             <LabwareButton
-              key={`${item}_${index}`}
+              key={item}
               numberInStack={stackOfLabware.length - index}
               displayName={labware[item].def.metadata.displayName}
               isSelected={selectedLabware.includes(item)}
