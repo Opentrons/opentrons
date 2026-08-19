@@ -5,10 +5,12 @@ import { Link, StyledText, TYPOGRAPHY } from '@opentrons/components'
 import styles from './enduseragreementfooter.module.css'
 import { getYearFromDate } from './utils'
 
+import type { ReactNode } from 'react'
+
 const PRIVACY_POLICY_URL = 'https://opentrons.com/privacy-policy'
 const EULA_URL = 'https://opentrons.com/eula'
 
-export function EndUserAgreementFooter(): JSX.Element {
+export function EndUserAgreementFooter(): ReactNode {
   const { t } = useTranslation('shared')
   return (
     <footer>

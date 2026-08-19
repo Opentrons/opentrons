@@ -17,6 +17,7 @@ import { ToggleButton } from '/protocol-designer/components/atoms/ToggleButton'
 import { actions as featureFlagActions } from '/protocol-designer/feature-flags'
 import { actions as tutorialActions } from '/protocol-designer/tutorial'
 
+import type { ReactNode } from 'react'
 import type { FlagTypes } from '/protocol-designer/feature-flags'
 
 const userFacingFlags: FlagTypes[] = [
@@ -32,7 +33,7 @@ interface UserSettingsProps {
 export function UserSettings({
   canClearHintDismissals,
   flags,
-}: UserSettingsProps): JSX.Element {
+}: UserSettingsProps): ReactNode {
   const { t } = useTranslation(['feature_flags', 'shared'])
   const dispatch = useDispatch()
   const setFeatureFlags = (

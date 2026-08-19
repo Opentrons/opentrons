@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { clsx } from 'clsx'
+import { i } from 'vite/dist/node/chunks/moduleRunnerTransport'
 
 import {
   ALIGN_CENTER,
@@ -18,6 +19,7 @@ import {
 import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 import { selectDropdownItem } from '/protocol-designer/ui/steps/actions/actions'
 
+import type { ReactNode } from 'react'
 import type { DropdownOption, MenuPlacement } from '@opentrons/components'
 import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
@@ -35,7 +37,7 @@ const SECOND_FIELDS = ['dispense_labware', 'newLocation']
 
 export function DropdownStepFormField(
   props: DropdownStepFormFieldProps
-): JSX.Element {
+): ReactNode {
   const {
     options,
     value,
