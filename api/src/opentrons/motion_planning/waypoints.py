@@ -12,6 +12,10 @@ from opentrons.types import Point
 DEFAULT_GENERAL_ARC_Z_MARGIN: Final[float] = 10.0
 DEFAULT_IN_LABWARE_ARC_Z_MARGIN: Final[float] = 5.0
 MINIMUM_Z_MARGIN: Final[float] = 1.0
+# Open/close the jaws this far above the grip point, not at homed Z.
+# Opening at home Z keeps the paddles fully spread while they travel,
+# which crashes into a vacuum-module collar on an adjacent slot.
+GRIPPER_JAW_OPEN_ABOVE_GRIP_MM: Final[float] = 20.0
 
 
 def get_waypoints(
@@ -127,10 +131,18 @@ def get_gripper_labware_movement_waypoints(
     gripper_home_z: float,
     post_drop_slide_offset: Optional[Point],
     gripper_home_z_offset: Optional[float] = None,
+    restrict_pickup_approach: bool = False,
+    restrict_drop_retract: bool = False,
 ) -> List[GripperMovementWaypointsWithJawStatus]:
     """Get waypoints for moving labware using a gripper."""
     gripper_max_z_home = gripper_home_z - (gripper_home_z_offset or 0)
     post_drop_home_pos = Point(to_labware_center.x, to_labware_center.y, gripper_home_z)
+    pickup_hover_z = min(
+        gripper_home_z, from_labware_center.z + GRIPPER_JAW_OPEN_ABOVE_GRIP_MM
+    )
+    drop_hover_z = min(
+        gripper_home_z, to_labware_center.z + GRIPPER_JAW_OPEN_ABOVE_GRIP_MM
+    )
 
     waypoints_with_jaw_status = [
         GripperMovementWaypointsWithJawStatus(
@@ -140,34 +152,68 @@ def get_gripper_labware_movement_waypoints(
             jaw_open=False,
             dropping=False,
         ),
-        GripperMovementWaypointsWithJawStatus(
-            position=from_labware_center, jaw_open=True, dropping=False
-        ),
-        # Gripper grips the labware here
-        GripperMovementWaypointsWithJawStatus(
-            position=Point(
-                from_labware_center.x, from_labware_center.y, gripper_max_z_home
-            ),
-            jaw_open=False,
-            dropping=False,
-        ),
-        GripperMovementWaypointsWithJawStatus(
-            position=Point(
-                to_labware_center.x, to_labware_center.y, gripper_max_z_home
-            ),
-            jaw_open=False,
-            dropping=False,
-        ),
-        GripperMovementWaypointsWithJawStatus(
-            position=to_labware_center, jaw_open=False, dropping=False
-        ),
-        # Gripper ungrips here
-        GripperMovementWaypointsWithJawStatus(
-            position=post_drop_home_pos,
-            jaw_open=True,
-            dropping=True,
-        ),
     ]
+    if restrict_pickup_approach:
+        waypoints_with_jaw_status.append(
+            GripperMovementWaypointsWithJawStatus(
+                position=Point(
+                    from_labware_center.x, from_labware_center.y, pickup_hover_z
+                ),
+                jaw_open=False,
+                dropping=False,
+            )
+        )
+    waypoints_with_jaw_status.extend(
+        [
+            GripperMovementWaypointsWithJawStatus(
+                position=from_labware_center, jaw_open=True, dropping=False
+            ),
+            # Gripper grips the labware here
+            GripperMovementWaypointsWithJawStatus(
+                position=Point(
+                    from_labware_center.x, from_labware_center.y, gripper_max_z_home
+                ),
+                jaw_open=False,
+                dropping=False,
+            ),
+            GripperMovementWaypointsWithJawStatus(
+                position=Point(
+                    to_labware_center.x, to_labware_center.y, gripper_max_z_home
+                ),
+                jaw_open=False,
+                dropping=False,
+            ),
+            GripperMovementWaypointsWithJawStatus(
+                position=to_labware_center, jaw_open=False, dropping=False
+            ),
+        ]
+    )
+    if restrict_drop_retract:
+        waypoints_with_jaw_status.extend(
+            [
+                GripperMovementWaypointsWithJawStatus(
+                    position=Point(
+                        to_labware_center.x, to_labware_center.y, drop_hover_z
+                    ),
+                    jaw_open=True,
+                    dropping=True,
+                ),
+                GripperMovementWaypointsWithJawStatus(
+                    position=post_drop_home_pos,
+                    jaw_open=False,
+                    dropping=True,
+                ),
+            ]
+        )
+    else:
+        # Gripper ungrips here
+        waypoints_with_jaw_status.append(
+            GripperMovementWaypointsWithJawStatus(
+                position=post_drop_home_pos,
+                jaw_open=True,
+                dropping=True,
+            )
+        )
     if post_drop_slide_offset is not None:
         # IF it is specified, add one more step after homing the gripper
         waypoints_with_jaw_status.append(
