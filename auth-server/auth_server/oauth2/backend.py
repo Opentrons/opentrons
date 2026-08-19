@@ -409,6 +409,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
                 refresh_token=refresh_token,
                 expires_at=expires_at,
                 granted_scopes=granted_scopes,
+                fullname=user.full_name,
             )
         )
 
@@ -488,7 +489,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
                 self.__get_effective_token_scopes(found_access_token)
             ),
             "username": found_access_token.username,
-            "ot_fullname": user.full_name,
+            "ot_fullname": found_access_token.fullname,
             # "active": True is set implicitly by oauthlib.
         }
 
@@ -573,6 +574,7 @@ class _TokenIssuance:
     # to resist problems from clock adjustment.
     expires_at: datetime
     granted_scopes: set[Scope]
+    fullname: str
 
 
 class _TokenStore:
