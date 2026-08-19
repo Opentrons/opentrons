@@ -30,7 +30,7 @@ const getLabwareDimensionsEqual = (
   def2: LabwareDefinition
 ): boolean => {
   const [columns1, columns2] = [def1.ordering, def2.ordering]
-  if (Object.keys(columns1).length !== Object.keys(columns2).length) {
+  if (columns1.length !== columns2.length) {
     return false
   }
   for (let i = 0; i < columns1.length; i++) {
@@ -64,19 +64,18 @@ const vacuumMergeLiquid = (
     return
   }
   if (pipettableLabwareOnVacuumTopDown.length === 2) {
-    const filterLw = pipettableLabwareOnVacuumTopDown[0]
-    const collectionLw = pipettableLabwareOnVacuumTopDown[1]
+    const filterLwId = pipettableLabwareOnVacuumTopDown[0]
+    const collectionLwId = pipettableLabwareOnVacuumTopDown[1]
     if (
       !getLabwareDimensionsEqual(
-        labwareEntities[filterLw].def,
-        labwareEntities[collectionLw].def
+        labwareEntities[filterLwId].def,
+        labwareEntities[collectionLwId].def
       )
     ) {
-      console.log('filter and collection LW dimensions do not match')
       return
     }
-    const filterLwLiquidState = liquidState.labware[filterLw]
-    const collectionLwLiquidState = liquidState.labware[collectionLw]
+    const filterLwLiquidState = liquidState.labware[filterLwId]
+    const collectionLwLiquidState = liquidState.labware[collectionLwId]
 
     // merge filter well ingredients into collection
     Object.entries(collectionLwLiquidState).forEach(
