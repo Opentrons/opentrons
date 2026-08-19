@@ -81,7 +81,6 @@
   "runtime_parameters_section_textbody": "OpentronsAI can add adjustable parameters for sample count, pipettes, labware, and more. Available for Python protocols only.",
   "runtime_parameters_section_title": "Runtime Parameters",
   "runtime_parameters_title": "Runtime Parameters",
-  "runtime_parameters_unavailable": "Runtime Parameters are only available for Python protocols on Opentrons Flex.",
   "search_for_labware_placeholder": "Search for labware...",
   "section_confirm_button": "Confirm",
   "serial_dilution": "Serial dilution",

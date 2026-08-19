@@ -1,5 +1,5 @@
 import { FormProvider, useForm } from 'react-hook-form'
-import { screen, waitFor } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import { renderWithProviders } from '/ai-client/__testing-utils__'
@@ -47,7 +47,7 @@ describe('RuntimeParametersSection', () => {
     expect(screen.getByText('Optional')).toBeInTheDocument()
   })
 
-  it('should not render the input field when robot type is OT2', async () => {
+  it('should render the input field when robot type is OT2', () => {
     renderWithProviders(
       <TestFormProviderComponent robotType={OPENTRONS_OT2} />,
       {
@@ -55,16 +55,10 @@ describe('RuntimeParametersSection', () => {
       }
     )
 
-    await waitFor(() => {
-      expect(
-        screen.queryByTestId('RuntimeParametersSection_inputArea')
-      ).not.toBeInTheDocument()
-    })
-
     expect(
-      screen.getByText(
-        'Runtime Parameters are only available for Python protocols on Opentrons Flex.'
-      )
+      screen.getByTestId('RuntimeParametersSection_inputArea')
     ).toBeInTheDocument()
+    expect(screen.getByText('Define Runtime Parameters')).toBeInTheDocument()
+    expect(screen.getByText('Optional')).toBeInTheDocument()
   })
 })

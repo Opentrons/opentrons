@@ -12,7 +12,6 @@ import {
   NO_PIPETTES,
   OPENTRONS_FLEX,
   OPENTRONS_OT2,
-  ROBOT_FIELD_NAME,
   TWO_PIPETTES,
 } from '/ai-client/components/organisms/InstrumentsSection'
 
@@ -243,10 +242,8 @@ export function generatePromptPreviewRuntimeParametersItems(
   t: any
 ): string[] {
   const { runtime_parameters } = watch()
-  const robotType = watch(ROBOT_FIELD_NAME)
 
-  // Only show in preview if robot is Flex
-  if (robotType !== OPENTRONS_FLEX || !runtime_parameters) {
+  if (!runtime_parameters) {
     return []
   }
 
@@ -404,12 +401,11 @@ export function generateChatPrompt(
   const fixtureSection =
     values.fixtures.length > 0 ? `\n\n${t('fixtures_title')}:\n${fixtures}` : ''
 
-  const runtimeParametersSection =
-    values.instruments.robot === OPENTRONS_FLEX && values.runtime_parameters
-      ? `\n\n${t(
-          'runtime_parameters_title'
-        )}:\n- ${values.runtime_parameters.replace(/\n/g, '\n- ')}`
-      : ''
+  const runtimeParametersSection = values.runtime_parameters
+    ? `\n\n${t(
+        'runtime_parameters_title'
+      )}:\n- ${values.runtime_parameters.replace(/\n/g, '\n- ')}`
+    : ''
 
   const prompt = `${t('create_protocol_prompt_robot', { robotType }) + '\n'}
 

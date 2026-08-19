@@ -1,4 +1,3 @@
-import { useFormContext, useWatch } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -6,31 +5,16 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  InfoScreen,
   SPACING,
   StyledText,
 } from '@opentrons/components'
 
 import { ControlledTextAreaField } from '/ai-client/components/atoms/ControlledTextAreaField'
-import {
-  OPENTRONS_FLEX,
-  ROBOT_FIELD_NAME,
-} from '/ai-client/components/organisms/InstrumentsSection'
 
 const RUNTIME_PARAMETERS_FIELD_NAME = 'runtime_parameters'
 
-export function RuntimeParametersSection(): JSX.Element | null {
+export function RuntimeParametersSection(): JSX.Element {
   const { t } = useTranslation('create_protocol')
-  const { control } = useFormContext()
-
-  const robotType = useWatch({ control, name: ROBOT_FIELD_NAME })
-
-  // Only show this section when robot type is Flex
-  const shouldShowSection = robotType === OPENTRONS_FLEX
-
-  if (!shouldShowSection) {
-    return <InfoScreen content={t('runtime_parameters_unavailable')} />
-  }
 
   return (
     <Flex
