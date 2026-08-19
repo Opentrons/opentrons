@@ -111,6 +111,7 @@ export interface LabwareDefinition1 {
 // here and in shared-data/labware/schemas/2.json
 export type LabwareDisplayCategory =
   | 'wellPlate'
+  | 'filterPlate'
   | 'tipRack'
   | 'tubeRack'
   | 'reservoir'

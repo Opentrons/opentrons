@@ -5,6 +5,7 @@ export const CATEGORY_LABELS_BY_CATEGORY = {
   tubeRack: 'Tube Rack',
   tipRack: 'Tip Rack',
   wellPlate: 'Well Plate',
+  filterPlate: 'Filter Plate',
   reservoir: 'Reservoir',
   aluminumBlock: 'Aluminum Block',
   trash: 'Trash',
@@ -20,6 +21,7 @@ export const PLURAL_CATEGORY_LABELS_BY_CATEGORY = {
   tubeRack: 'Tube Racks',
   tipRack: 'Tip Racks',
   wellPlate: 'Well Plates',
+  filterPlate: 'Filter Plates',
   reservoir: 'Reservoirs',
   aluminumBlock: 'Aluminum Blocks',
   lid: 'Lid',
@@ -31,6 +33,7 @@ export const PLURAL_CATEGORY_LABELS_BY_CATEGORY = {
 export const WELL_TYPE_BY_CATEGORY = {
   tubeRack: 'tube',
   tipRack: 'tip',
+  filterPlate: 'well',
   other: 'well',
 }
 

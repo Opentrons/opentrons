@@ -21,6 +21,7 @@ LabwareDisplayCategory = Literal[
     "reservoir",
     "trash",
     "wellPlate",
+    "filterPlate",
     "aluminumBlock",
     "adapter",
     "other",
