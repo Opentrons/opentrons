@@ -221,8 +221,11 @@ export function RunSummary(): JSX.Element {
     !hasSignedBy
 
   const logPeriodId = runRecord?.data.logPeriodId ?? null
-  const { isLoading: isLogDeletedLoading, isDeleted: isLogDeleted } =
-    useIsLogDeleted(logPeriodId ?? '')
+  const {
+    isLoading: isLogDeletedLoading,
+    isDeleted: isLogDeleted,
+    isError: isLogDeletedError,
+  } = useIsLogDeleted(logPeriodId ?? '')
 
   const isDownloadingRequired =
     ((accessControlEnabled?.data.accessControlEnabled ?? false) &&
@@ -234,6 +237,7 @@ export function RunSummary(): JSX.Element {
     isDownloadingRequired &&
     !shouldPromptSignRun &&
     !isLogDeletedLoading &&
+    !isLogDeletedError &&
     !isLogDeleted
 
   let headerText: string | null = null
