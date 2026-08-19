@@ -10,6 +10,7 @@ from typing import (
     NotRequired,
     Protocol,
     TypedDict,
+    TypeGuard,
     cast,
     override,
 )
@@ -387,8 +388,8 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
 
         # This cast is because request.scopes is apparently mis-typed as a str; it's actually a list[str].
         scopes = cast(Any, request.scopes)
-        assert isinstance(scopes, list)
-        granted_scopes = {Scope.from_api_name(s) for s in scopes}
+        assert _is_list_of_type(scopes, str)
+        scopes = {Scope.from_api_name(s) for s in scopes}
 
         expires_in = token["expires_in"]
 
@@ -408,7 +409,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
                 access_token=access_token,
                 refresh_token=refresh_token,
                 expires_at=expires_at,
-                granted_scopes=granted_scopes,
+                scopes=scopes,
                 fullname=user.full_name,
             )
         )
@@ -446,7 +447,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
     def get_original_scopes(
         self, refresh_token: str, request: oauthlib.common.Request
     ) -> list[str]:
-        """Return the scopes that a refresh token should be associated with.
+        """Return the scopes that a refresh token was originally associated with.
 
         These will be passed on to the refreshed access token if the client did not
         specify a scope during the request.
@@ -475,36 +476,25 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         )
         if found_access_token is None:
             return None
-
-        user = self.__user_store.get(found_access_token.username)
-        if user is None:
-            return None
-
-        # Values defined by:
-        # https://datatracker.ietf.org/doc/html/rfc7662#section-2.2
-        # except ot_fullname, which is custom to us. if you add other custom fields,
-        # please prefix them with ot-.
-        return {
-            "scope": serialize_scopes(
-                self.__get_effective_token_scopes(found_access_token)
-            ),
-            "username": found_access_token.username,
-            "ot_fullname": found_access_token.fullname,
-            # "active": True is set implicitly by oauthlib.
-        }
+        else:
+            # Values defined by:
+            # https://datatracker.ietf.org/doc/html/rfc7662#section-2.2
+            # except ot_fullname, which is custom to us. if you add other custom fields,
+            # please prefix them with ot-.
+            return {
+                "scope": serialize_scopes(
+                    self.__get_effective_token_scopes(found_access_token)
+                ),
+                "username": found_access_token.username,
+                "ot_fullname": found_access_token.fullname,
+                # "active": True is set implicitly by oauthlib.
+            }
 
     def __get_effective_token_scopes(self, token: _TokenIssuance) -> set[Scope]:
-        """Return token scopes, respecting the original grant and current user/settings.
-
-        Tokens never gain scopes beyond what was granted at login, but they can lose
-        scopes when settings or user state (e.g. password expiration) changes.
-        """
-        return token.granted_scopes & self.__get_live_scopes_for_username(
-            token.username
-        )
+        """Return stored token scopes, updated for current settings and user state."""
+        return token.scopes & self.__get_live_scopes_for_username(token.username)
 
     def __get_live_scopes_for_username(self, username: str) -> set[Scope]:
-        """Return scopes for a username using current settings and user data."""
         user = self.__user_store.get(username)
         if user is None:
             return set()
@@ -573,7 +563,7 @@ class _TokenIssuance:
     # todo(mm, 2026-01-29): We might want expires_at to be a CLOCK_BOOTTIME value or something
     # to resist problems from clock adjustment.
     expires_at: datetime
-    granted_scopes: set[Scope]
+    scopes: set[Scope]
     fullname: str
 
 
@@ -606,3 +596,14 @@ class _TokenStore:
     @staticmethod
     def _is_active(token: _TokenIssuance, now: datetime) -> bool:
         return token.expires_at > now
+
+
+def _is_list_of_type[ElementT](
+    alleged_list: object, expected_element_type: type[ElementT]
+) -> TypeGuard[list[ElementT]]:
+    if not isinstance(alleged_list, list):
+        return False
+    return all(
+        isinstance(element, expected_element_type)
+        for element in cast(list[object], alleged_list)
+    )
