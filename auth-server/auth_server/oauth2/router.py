@@ -21,8 +21,8 @@ router = fastapi.APIRouter(prefix="/auth")
 
         Omit `scope` to receive the scopes appropriate for the authenticated user
         under current server settings. Clients may optionally include `scope` to
-        request a subset of those permissions; in that case, the exact behavior
-        is a server implementation detail and may not match other OAuth 2 servers.
+        request a subset of those permissions; granted scopes are stored on the
+        token and may be further restricted when settings or user state changes.
         """),
     dependencies=[fastapi.Depends(skip_audit_logger)],
 )
