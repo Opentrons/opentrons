@@ -82,22 +82,21 @@ class Backend:
     def refresh_active_token_scopes(self) -> None:
         """Recompute scopes for all active tokens from current settings and users."""
         now = datetime.now(tz=UTC)
+        settings = self._settings_store.get_settings()
+
+        def get_scopes_for_username(username: str) -> set[Scope]:
+            user = self._user_store.get(username)
+            if user is None:
+                return set()
+            return get_scope_set_of_user(
+                user,
+                settings,
+                must_reset_password(user, now, settings.passwordResetTime),
+            )
+
         self._token_store.refresh_active_token_scopes(
             now=now,
-            get_scopes_for_username=self._get_scopes_for_username,
-        )
-
-    def _get_scopes_for_username(self, username: str) -> set[Scope]:
-        user = self._user_store.get(username)
-        if user is None:
-            return set()
-
-        settings = self._settings_store.get_settings()
-        now = datetime.now(tz=UTC)
-        return get_scope_set_of_user(
-            user,
-            settings,
-            must_reset_password(user, now, settings.passwordResetTime),
+            get_scopes_for_username=get_scopes_for_username,
         )
 
     def create_token_response(
