@@ -194,7 +194,10 @@ class VacuumModule(mod_abc.AbstractModule):
         )
 
         # Configure the default parameters
-        await module._configure_device()
+        try:
+            await module._configure_device()
+        except Exception:
+            log.exception("Could not configure device")
 
         try:
             await poller.start()
@@ -341,7 +344,6 @@ class VacuumModule(mod_abc.AbstractModule):
                     port=self.port, loop=self.loop
                 )
                 self._reader._driver = self._driver
-            await self._configure_device()
             self._unsubscribe_init = self._reader.set_initialized_callback(
                 self._initialized_callback
             )
@@ -350,6 +352,7 @@ class VacuumModule(mod_abc.AbstractModule):
             )
             await self._poller.stop()
             await self._poller.start()
+            await self._configure_device()
         except BaseException:
             log.exception("Got an error when trying to reconnect vacuum module.")
 
