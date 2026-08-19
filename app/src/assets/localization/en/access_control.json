@@ -60,7 +60,7 @@
   "setup_wizard_service_pin_incorrect": "Incorrect service PIN",
   "setup_wizard_service_pin_internal_error": "Internal error while validating the service PIN",
   "setup_wizard_service_pin_title": "Enter service PIN",
-  "setup_wizard_setup_title": "Set Up Compliance Ready Software",
+  "setup_wizard_setup_title": "Set up Compliance Ready Software",
   "setup_wizard_submission_error": "Unable to enable Compliance Ready Software. Try again.",
   "setup_wizard_username_reserved": "This username is reserved. Choose a different username.",
   "setup_wizard_verify_encryption_key_description": "Enter the encryption key displayed on your robot's touchscreen into the field below.",
