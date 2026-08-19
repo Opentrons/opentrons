@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -13,7 +13,12 @@ import styles from './playbackcontrols.module.css'
 import { getSpeedMultiplierText } from './utils/getSpeedMultiplierText'
 import { isEditableKeyboardTarget } from './utils/isEditableKeyboardTarget'
 
-import type { Dispatch, ReactNode, SetStateAction } from 'react'
+import type {
+  Dispatch,
+  ReactNode,
+  PointerEvent as ReactPointerEvent,
+  SetStateAction,
+} from 'react'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 
 interface PlayBackControlsProps {
@@ -45,6 +50,127 @@ export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
 
   const { t } = useTranslation('protocol_visualization')
   const [showPerStepOverflowMenu, setShowPerStepOverflowMenu] = useState(false)
+  const [position, setPosition] = useState({ x: 0, y: 0 })
+  const [isDragging, setIsDragging] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const dragRef = useRef<{
+    pointerId: number
+    startPointer: { x: number; y: number }
+    startPosition: { x: number; y: number }
+    startRect: DOMRect
+  } | null>(null)
+
+  const handlePointerDown = (
+    event: ReactPointerEvent<HTMLDivElement>
+  ): void => {
+    const target = event.target as HTMLElement
+    const interactiveTarget = target.closest(
+      'button, input, [role="slider"], [role="menu"], [data-playback-slider]'
+    )
+    if (interactiveTarget != null) {
+      return
+    }
+
+    const container = containerRef.current
+    if (container == null) {
+      return
+    }
+
+    dragRef.current = {
+      pointerId: event.pointerId,
+      startPointer: { x: event.clientX, y: event.clientY },
+      startPosition: position,
+      startRect: container.getBoundingClientRect(),
+    }
+    container.setPointerCapture(event.pointerId)
+    setIsDragging(true)
+  }
+
+  const handlePointerMove = (
+    event: ReactPointerEvent<HTMLDivElement>
+  ): void => {
+    const drag = dragRef.current
+    if (drag == null || drag.pointerId !== event.pointerId) {
+      return
+    }
+
+    const margin = 8
+    const deltaX = event.clientX - drag.startPointer.x
+    const deltaY = event.clientY - drag.startPointer.y
+    const maxLeft = Math.max(
+      margin,
+      window.innerWidth - margin - drag.startRect.width
+    )
+    const maxTop = Math.max(
+      margin,
+      window.innerHeight - margin - drag.startRect.height
+    )
+    const left = Math.min(
+      Math.max(drag.startRect.left + deltaX, margin),
+      maxLeft
+    )
+    const top = Math.min(Math.max(drag.startRect.top + deltaY, margin), maxTop)
+
+    setPosition({
+      x: drag.startPosition.x + left - drag.startRect.left,
+      y: drag.startPosition.y + top - drag.startRect.top,
+    })
+  }
+
+  const handlePointerUp = (event: ReactPointerEvent<HTMLDivElement>): void => {
+    if (dragRef.current?.pointerId !== event.pointerId) {
+      return
+    }
+
+    dragRef.current = null
+    setIsDragging(false)
+    const container = containerRef.current
+    if (container?.hasPointerCapture(event.pointerId) === true) {
+      container.releasePointerCapture(event.pointerId)
+    }
+  }
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (container == null) {
+      return
+    }
+
+    container.style.setProperty('--drag-x', `${position.x}px`)
+    container.style.setProperty('--drag-y', `${position.y}px`)
+  }, [position])
+
+  useEffect(() => {
+    const handleResize = (): void => {
+      const container = containerRef.current
+      if (container == null) {
+        return
+      }
+
+      const rect = container.getBoundingClientRect()
+      const margin = 8
+      const xAdjustment = Math.min(
+        Math.max(margin - rect.left, 0),
+        Math.max(window.innerWidth - margin - rect.right, 0)
+      )
+      const yAdjustment = Math.min(
+        Math.max(margin - rect.top, 0),
+        Math.max(window.innerHeight - margin - rect.bottom, 0)
+      )
+
+      if (xAdjustment !== 0 || yAdjustment !== 0) {
+        setPosition(prev => ({
+          x: prev.x + xAdjustment,
+          y: prev.y + yAdjustment,
+        }))
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
 
   const handlePerStepOverflowClick = (): void => {
     setShowPerStepOverflowMenu(prev => !prev)
@@ -102,7 +228,14 @@ export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
   }, [handlePlayPause])
 
   return (
-    <div className={styles.container}>
+    <div
+      ref={containerRef}
+      className={`${styles.container} ${isDragging ? styles.dragging : ''}`}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+    >
       <div className={styles.controls_left}>
         {/* play/pause button */}
         <NewIconButton
@@ -113,7 +246,7 @@ export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
         />
 
         {/* time slider */}
-        <div className={styles.slider_wrapper}>
+        <div className={styles.slider_wrapper} data-playback-slider>
           <TimelineScrubber tracks={tracks} onTrackChange={handleTrackChange} />
         </div>
 

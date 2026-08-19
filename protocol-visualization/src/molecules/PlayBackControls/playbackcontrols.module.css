@@ -15,7 +15,14 @@
   border-radius: var(--border-radius-full);
   background-color: var(--white);
   box-shadow: 0 0 6px 1px rgb(22 33 45 / 15%);
-  transform: translateX(-50%);
+  cursor: grab;
+  touch-action: none;
+  transform: translate(calc(-50% + var(--drag-x, 0)), var(--drag-y, 0));
+}
+
+.dragging {
+  cursor: grabbing;
+  user-select: none;
 }
 
 .controls_left {
