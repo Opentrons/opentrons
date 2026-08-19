@@ -22,21 +22,16 @@ export function useClientDataLogDeletion(
     options,
   })
 
-  const httpQueryResult = useClientData<LogDeletionStatus>(
+  const { data, refetch: refetchQuery } = useClientData<LogDeletionStatus>(
     KEYS.LOG_DELETION,
     queryOptionsNotify
   )
 
   useEffect(() => {
     if (refetch > 0) {
-      void httpQueryResult.refetch()
+      void refetchQuery()
     }
-
-    // httpQueryResult.refetch is stable, the result object is not
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refetch])
-
-  const { data } = httpQueryResult
+  }, [refetch, refetchQuery])
 
   const logDeletionStatus =
     data?.data?.logPeriodId === logPeriodId ? data?.data?.status : 'pending'

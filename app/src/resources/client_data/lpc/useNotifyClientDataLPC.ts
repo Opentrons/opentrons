@@ -26,15 +26,13 @@ export function useNotifyClientDataLPC(
     KEYS.LPC,
     queryOptionsNotify
   )
+  const { refetch: refetchQuery } = httpQueryResult
 
   useEffect(() => {
     if (refetch > 0) {
-      void httpQueryResult.refetch()
+      void refetchQuery()
     }
-
-    // httpQueryResult.refetch is stable, the result object is not
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refetch])
+  }, [refetch, refetchQuery])
 
   return httpQueryResult
 }
