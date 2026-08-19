@@ -19,7 +19,7 @@ describe('useNotifyRunQuery', () => {
 
   beforeEach(() => {
     vi.mocked(useNotifyDataReady).mockReturnValue({
-      shouldRefetch: false,
+      refetch: 0,
       queryOptionsNotify,
     } as any)
     vi.mocked(useRunQuery).mockReturnValue({
@@ -46,9 +46,9 @@ describe('useNotifyRunQuery', () => {
     )
   })
 
-  it('should refetch in an effect when shouldRefetch is true, not during render', () => {
+  it('should refetch in an effect when a refetch is requested, not during render', () => {
     vi.mocked(useNotifyDataReady).mockReturnValue({
-      shouldRefetch: true,
+      refetch: 1,
       queryOptionsNotify,
     } as any)
     vi.mocked(useRunQuery).mockImplementation(() => {
@@ -62,7 +62,7 @@ describe('useNotifyRunQuery', () => {
     expect(refetch).toHaveBeenCalledTimes(1)
   })
 
-  it('should not refetch when shouldRefetch is false', () => {
+  it('should not refetch when no refetch has been requested', () => {
     renderHook(() => useNotifyRunQuery(MOCK_RUN_ID, MOCK_OPTIONS))
 
     expect(refetch).not.toHaveBeenCalled()
@@ -70,7 +70,7 @@ describe('useNotifyRunQuery', () => {
 
   it('should not refetch when runId is null', () => {
     vi.mocked(useNotifyDataReady).mockReturnValue({
-      shouldRefetch: true,
+      refetch: 1,
       queryOptionsNotify,
     } as any)
 
@@ -81,7 +81,7 @@ describe('useNotifyRunQuery', () => {
 
   it('should not refetch when runId is the string "null"', () => {
     vi.mocked(useNotifyDataReady).mockReturnValue({
-      shouldRefetch: true,
+      refetch: 1,
       queryOptionsNotify,
     } as any)
 
@@ -90,7 +90,7 @@ describe('useNotifyRunQuery', () => {
     expect(refetch).not.toHaveBeenCalled()
   })
 
-  it('should refetch when shouldRefetch becomes true after a rerender', () => {
+  it('should refetch when a refetch is requested after a rerender', () => {
     const { rerender } = renderHook(() =>
       useNotifyRunQuery(MOCK_RUN_ID, MOCK_OPTIONS)
     )
@@ -98,11 +98,32 @@ describe('useNotifyRunQuery', () => {
     expect(refetch).not.toHaveBeenCalled()
 
     vi.mocked(useNotifyDataReady).mockReturnValue({
-      shouldRefetch: true,
+      refetch: 1,
       queryOptionsNotify,
     } as any)
     rerender()
 
     expect(refetch).toHaveBeenCalledTimes(1)
+  })
+
+  it('should refetch again for each subsequent refetch request', () => {
+    vi.mocked(useNotifyDataReady).mockReturnValue({
+      refetch: 1,
+      queryOptionsNotify,
+    } as any)
+
+    const { rerender } = renderHook(() =>
+      useNotifyRunQuery(MOCK_RUN_ID, MOCK_OPTIONS)
+    )
+
+    expect(refetch).toHaveBeenCalledTimes(1)
+
+    vi.mocked(useNotifyDataReady).mockReturnValue({
+      refetch: 2,
+      queryOptionsNotify,
+    } as any)
+    rerender()
+
+    expect(refetch).toHaveBeenCalledTimes(2)
   })
 })

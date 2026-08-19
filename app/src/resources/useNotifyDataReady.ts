@@ -15,8 +15,6 @@ import type { UseQueryOptions } from 'react-query'
 import type { HostConfig } from '@opentrons/api-client'
 import type { NotifyResponseData, NotifyTopic } from '/app/redux/shell/types'
 
-export type HTTPRefetchFrequency = 'once' | null
-
 export interface QueryOptionsWithPolling<
   TData,
   TError = Error,
@@ -33,14 +31,16 @@ interface UseNotifyDataReadyProps<TData, TError = Error> {
 interface UseNotifyDataReadyResults<TData, TError> {
   /* React Query options with notification-specific logic. */
   queryOptionsNotify: QueryOptionsWithPolling<TData, TError>
-  /* Whether notifications indicate the server has new data ready. Always returns false if notifications are disabled. */
-  shouldRefetch: boolean
+
+  /* Increments each time the shell indicates the server has new data ready. */
+  refetch: number
 }
 
 // React query hooks perform refetches when instructed by the shell via a refetch mechanism, which useNotifyDataReady manages.
-// The notification refetch states may be:
-// 'once' - The shell has received an MQTT update. Execute the HTTP refetch once.
-// null - The shell has not received an MQTT update. Don't execute an HTTP refetch.
+// `refetch` counts incoming refetch notifications, and consumers refetch whenever the count changes.
+// 0 means the shell has not requested an HTTP refetch yet, so don't execute one.
+// Counting rather than flagging keeps consecutive notifications from collapsing into a single refetch
+// when one arrives while an HTTP refetch is already in flight.
 //
 // Eagerly assume notifications are enabled unless specified by the client via React Query options or by the shell via errors.
 export function useNotifyDataReady<TData, TError = Error>({
@@ -58,8 +58,8 @@ export function useNotifyDataReady<TData, TError = Error>({
   const doTrackEvent = useTrackEvent()
   const forcePollingFF = useFeatureFlag('forceHttpPolling')
   const seenHostname = useRef<string | null>(null)
-  const [refetch, setRefetch] = useState<HTTPRefetchFrequency>(null)
-  const [pendingRefetch, setPendingRefetch] = useState(false)
+  const [refetch, setRefetch] = useState(0)
+
   const [
     hasEncounteredNotificationsError,
     setHasEncounteredNotificationsError,
@@ -78,7 +78,7 @@ export function useNotifyDataReady<TData, TError = Error>({
     () => {
       if (shouldUseNotifications) {
         // Always fetch on initial mount to keep latency as low as possible.
-        setRefetch('once')
+        setRefetch(refetch => refetch + 1)
         appShellListener({
           hostname,
           notifyTopic: topic,
@@ -115,18 +115,7 @@ export function useNotifyDataReady<TData, TError = Error>({
           })
         }
       } else if ('refetch' in data || 'unsubscribe' in data) {
-        setRefetch(currentRefetch => {
-          // A refetch is already in progress, mark that we need to do another
-          // one after the current refetch resolves.
-          if (currentRefetch === 'once') {
-            setPendingRefetch(true)
-            return currentRefetch
-          }
-          // No refetch is in progress, start one immediately.
-          else {
-            return 'once'
-          }
-        })
+        setRefetch(currentRefetch => currentRefetch + 1)
       }
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
@@ -134,31 +123,15 @@ export function useNotifyDataReady<TData, TError = Error>({
     []
   )
 
-  const notifyOnSettled = useCallback(
-    (data: TData | undefined, error: TError | null) => {
-      if (refetch === 'once') {
-        setRefetch(pendingRefetch ? 'once' : null)
-        // We only ever need to queue up one additional refetch to get the latest
-        // data, so it's safe to the pending to false as soon as the refetch settles.
-        setPendingRefetch(false)
-      }
-      options.onSettled?.(data, error)
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [refetch, pendingRefetch, options.onSettled]
-  )
-
   const isNotifyEnabled =
     shouldUseNotifications && !hasEncounteredNotificationsError
   const queryOptionsNotify = {
     ...options,
-    onSettled: isNotifyEnabled ? notifyOnSettled : options.onSettled,
     refetchInterval: isNotifyEnabled ? false : options.refetchInterval,
   }
 
   return {
     queryOptionsNotify,
-    shouldRefetch: isNotifyEnabled && refetch != null,
+    refetch,
   }
 }

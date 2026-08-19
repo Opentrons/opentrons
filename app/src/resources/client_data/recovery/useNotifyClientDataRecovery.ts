@@ -16,7 +16,7 @@ export function useNotifyClientDataRecovery(
     AxiosError
   > = {}
 ): UseQueryResult<ClientDataResponse<ClientDataRecovery>, AxiosError> {
-  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
+  const { refetch, queryOptionsNotify } = useNotifyDataReady({
     topic: `robot-server/clientData/${KEYS.ERROR_RECOVERY}`,
     options,
   })
@@ -27,13 +27,13 @@ export function useNotifyClientDataRecovery(
   )
 
   useEffect(() => {
-    if (shouldRefetch) {
+    if (refetch > 0) {
       void httpQueryResult.refetch()
     }
 
-    // refetch is stable, the result object is not
+    // httpQueryResult.refetch is stable, the result object is not
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shouldRefetch])
+  }, [refetch])
 
   return httpQueryResult
 }
