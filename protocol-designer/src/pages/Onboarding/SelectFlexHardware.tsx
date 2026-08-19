@@ -4,9 +4,10 @@ import { HandleEnter } from '../../components/atoms'
 import { HardwareConfigurator } from '../../components/organisms/HardwareConfigurator'
 import { WizardBody } from './WizardBody'
 
+import type { ReactNode } from 'react'
 import type { WizardTileProps } from './types'
 
-export function SelectFlexHardware(props: WizardTileProps): JSX.Element | null {
+export function SelectFlexHardware(props: WizardTileProps): ReactNode {
   const { goBack, proceed, watch, setValue } = props
   const fixtures = watch('fixtures')
   const modules = watch('modules')
