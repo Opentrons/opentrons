@@ -5,6 +5,7 @@ import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import (
+    Any,
     Callable,
     NotRequired,
     Protocol,
@@ -384,6 +385,11 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         access_token = token["access_token"]
         refresh_token = token.get("refresh_token", None)
 
+        # This cast is because request.scopes is apparently mis-typed as a str; it's actually a list[str].
+        scopes = cast(Any, request.scopes)
+        assert isinstance(scopes, list)
+        granted_scopes = {Scope.from_api_name(s) for s in scopes}
+
         expires_in = token["expires_in"]
 
         user = request.user
@@ -402,6 +408,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
                 access_token=access_token,
                 refresh_token=refresh_token,
                 expires_at=expires_at,
+                granted_scopes=granted_scopes,
             )
         )
 
@@ -447,9 +454,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             refresh_token, now=self.__get_now()
         )
         assert token is not None
-        return sorted(
-            s.api_name for s in self.__get_live_scopes_for_username(token.username)
-        )
+        return sorted(s.api_name for s in self.__get_effective_token_scopes(token))
 
     @override
     @pydantic.validate_call(config=_validate_call_config)
@@ -474,26 +479,28 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         if user is None:
             return None
 
-        settings = self.__settings_store.get_settings()
-        scopes = get_scope_set_of_user(
-            user,
-            settings,
-            must_reset_password(
-                user,
-                self.__get_now(),
-                settings.passwordResetTime,
-            ),
-        )
         # Values defined by:
         # https://datatracker.ietf.org/doc/html/rfc7662#section-2.2
         # except ot_fullname, which is custom to us. if you add other custom fields,
         # please prefix them with ot-.
         return {
-            "scope": serialize_scopes(scopes),
+            "scope": serialize_scopes(
+                self.__get_effective_token_scopes(found_access_token)
+            ),
             "username": found_access_token.username,
             "ot_fullname": user.full_name,
             # "active": True is set implicitly by oauthlib.
         }
+
+    def __get_effective_token_scopes(self, token: _TokenIssuance) -> set[Scope]:
+        """Return token scopes, respecting the original grant and current user/settings.
+
+        Tokens never gain scopes beyond what was granted at login, but they can lose
+        scopes when settings or user state (e.g. password expiration) changes.
+        """
+        return token.granted_scopes & self.__get_live_scopes_for_username(
+            token.username
+        )
 
     def __get_live_scopes_for_username(self, username: str) -> set[Scope]:
         """Return scopes for a username using current settings and user data."""
@@ -565,6 +572,7 @@ class _TokenIssuance:
     # todo(mm, 2026-01-29): We might want expires_at to be a CLOCK_BOOTTIME value or something
     # to resist problems from clock adjustment.
     expires_at: datetime
+    granted_scopes: set[Scope]
 
 
 class _TokenStore:

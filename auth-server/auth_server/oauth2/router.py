@@ -1,5 +1,6 @@
 """HTTP routes to implement OAuth 2 flows, as an authorization server."""
 
+from textwrap import dedent
 from typing import Annotated
 
 import fastapi
@@ -12,7 +13,19 @@ from .fastapi_dependencies import get_oauth2_backend
 router = fastapi.APIRouter(prefix="/auth")
 
 
-@router.post("/oauth2/token", dependencies=[fastapi.Depends(skip_audit_logger)])
+@router.post(
+    "/oauth2/token",
+    summary="Request an access token",
+    description=dedent("""\
+        The OAuth 2 token endpoint, as specified in RFC 6749.
+
+        Omit `scope` to receive the scopes appropriate for the authenticated user
+        under current server settings. Clients may optionally include `scope` to
+        request a subset of those permissions; in that case, the exact behavior
+        is a server implementation detail and may not match other OAuth 2 servers.
+        """),
+    dependencies=[fastapi.Depends(skip_audit_logger)],
+)
 async def token_endpoint(
     request: fastapi.Request,
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
