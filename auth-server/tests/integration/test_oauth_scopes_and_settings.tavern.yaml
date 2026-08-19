@@ -1,12 +1,13 @@
-test_name: Default settings give regular users base OAuth scopes
+test_name: Settings changes affect user OAuth scopes
 
 marks:
   - usefixtures:
       - run_server
+      - admin_access_token
       - seed_users
 
 stages:
-  - name: Regular users should not get admin-only scopes at login
+  - name: Default settings exclude admin-gated scopes for regular users
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
@@ -23,17 +24,7 @@ stages:
           expected_present: run_signoff.write
           expected_absent: updates.write protocols.write
 
----
-test_name: requireAdminCredsWhenUpdatingRobotSoftware affects user OAuth scopes
-
-marks:
-  - usefixtures:
-      - run_server
-      - admin_access_token
-      - seed_users
-
-stages:
-  - name: Allow regular users to update robot software
+  - name: Update all admin-credential requirements at once
     request:
       method: PATCH
       url: '{run_server.base_url}/auth/settings'
@@ -42,10 +33,12 @@ stages:
       json:
         data:
           requireAdminCredsWhenUpdatingRobotSoftware: false
+          requireAdminCredsWhenSendingProtocolToRobot: false
+          requireAdminCredsForSignoffProtocol: false
     response:
       status_code: 200
 
-  - name: Login should include updates.write
+  - name: Login should include all optional user scopes
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
@@ -59,13 +52,12 @@ stages:
       verify_response_with:
         function: tests.integration.utils:verify_oauth_scopes
         extra_kwargs:
-          expected_present: updates.write run_signoff.write
-          expected_absent: protocols.write
+          expected_present: updates.write protocols.write run_signoff.write
       save:
         json:
           user_access_token: access_token
 
-  - name: Requiring admin credentials again should revoke updates.write on existing tokens
+  - name: Re-enable all admin-credential requirements at once
     request:
       method: PATCH
       url: '{run_server.base_url}/auth/settings'
@@ -74,131 +66,7 @@ stages:
       json:
         data:
           requireAdminCredsWhenUpdatingRobotSoftware: true
-    response:
-      status_code: 200
-
-  - name: Existing token introspection should reflect updated scopes
-    request:
-      method: POST
-      url: '{run_server.base_url}/auth/oauth2/introspect'
-      data:
-        client_id: opentrons_app
-        token: '{user_access_token}'
-    response:
-      status_code: 200
-      verify_response_with:
-        function: tests.integration.utils:verify_oauth_scopes
-        extra_kwargs:
-          expected_present: run_signoff.write
-          expected_absent: updates.write protocols.write
-
----
-test_name: requireAdminCredsWhenSendingProtocolToRobot affects user OAuth scopes
-
-marks:
-  - usefixtures:
-      - run_server
-      - admin_access_token
-      - seed_users
-
-stages:
-  - name: Allow regular users to send protocols to the robot
-    request:
-      method: PATCH
-      url: '{run_server.base_url}/auth/settings'
-      headers:
-        Authorization: '{admin_access_token}'
-      json:
-        data:
-          requireAdminCredsWhenSendingProtocolToRobot: false
-    response:
-      status_code: 200
-
-  - name: Login should include protocols.write
-    request:
-      method: POST
-      url: '{run_server.base_url}/auth/oauth2/token'
-      data:
-        client_id: opentrons_app
-        grant_type: password
-        username: testuser
-        password: testuserpassword
-    response:
-      status_code: 200
-      verify_response_with:
-        function: tests.integration.utils:verify_oauth_scopes
-        extra_kwargs:
-          expected_present: protocols.write run_signoff.write
-          expected_absent: updates.write
-      save:
-        json:
-          user_access_token: access_token
-
-  - name: Requiring admin credentials again should revoke protocols.write on existing tokens
-    request:
-      method: PATCH
-      url: '{run_server.base_url}/auth/settings'
-      headers:
-        Authorization: '{admin_access_token}'
-      json:
-        data:
           requireAdminCredsWhenSendingProtocolToRobot: true
-    response:
-      status_code: 200
-
-  - name: Existing token introspection should reflect updated scopes
-    request:
-      method: POST
-      url: '{run_server.base_url}/auth/oauth2/introspect'
-      data:
-        client_id: opentrons_app
-        token: '{user_access_token}'
-    response:
-      status_code: 200
-      verify_response_with:
-        function: tests.integration.utils:verify_oauth_scopes
-        extra_kwargs:
-          expected_present: run_signoff.write
-          expected_absent: updates.write protocols.write
-
----
-test_name: requireAdminCredsForSignoffProtocol affects user OAuth scopes
-
-marks:
-  - usefixtures:
-      - run_server
-      - admin_access_token
-      - seed_users
-
-stages:
-  - name: Login with default settings should include run_signoff.write
-    request:
-      method: POST
-      url: '{run_server.base_url}/auth/oauth2/token'
-      data:
-        client_id: opentrons_app
-        grant_type: password
-        username: testuser
-        password: testuserpassword
-    response:
-      status_code: 200
-      verify_response_with:
-        function: tests.integration.utils:verify_oauth_scopes
-        extra_kwargs:
-          expected_present: run_signoff.write
-          expected_absent: updates.write protocols.write
-      save:
-        json:
-          user_access_token: access_token
-
-  - name: Require admin credentials for protocol signoff
-    request:
-      method: PATCH
-      url: '{run_server.base_url}/auth/settings'
-      headers:
-        Authorization: '{admin_access_token}'
-      json:
-        data:
           requireAdminCredsForSignoffProtocol: true
     response:
       status_code: 200
@@ -215,5 +83,4 @@ stages:
       verify_response_with:
         function: tests.integration.utils:verify_oauth_scopes
         extra_kwargs:
-          expected_present: ''
-          expected_absent: run_signoff.write updates.write protocols.write
+          expected_absent: updates.write protocols.write run_signoff.write
