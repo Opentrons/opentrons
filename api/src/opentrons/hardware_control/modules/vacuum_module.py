@@ -197,7 +197,11 @@ class VacuumModule(mod_abc.AbstractModule):
         try:
             await module._configure_device()
         except Exception:
-            log.exception("Could not configure device")
+            log.warning(
+                "Could not configure vacuum module defaults on port %s.",
+                port,
+                exc_info=True,
+            )
 
         try:
             await poller.start()
@@ -252,6 +256,12 @@ class VacuumModule(mod_abc.AbstractModule):
             await self._handle_status_bar_event(self._last_status_bar_event)
 
     def _async_error_callback(self, exception: Exception) -> None:
+        """Forward poller/firmware faults as async module errors."""
+        # Parse mismatches (e.g. an M121 pressure line consumed as M123 pump
+        # state) are comms glitches, not firmware faults. Do not escalate them
+        # as ASYNCHRONOUS_MODULE_ERROR or a run can be stopped.
+        if isinstance(exception, ValueError):
+            return
         self.error_callback(self._to_enumerated_error(exception))
 
     def _to_enumerated_error(self, exception: Exception) -> EnumeratedError:
