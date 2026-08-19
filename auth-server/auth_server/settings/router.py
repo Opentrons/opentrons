@@ -135,7 +135,7 @@ async def patch_settings(  # noqa: D103
     patch = request_body.data
     new_settings = settings_store.patch_settings(patch)
     if patch_affects_token_scopes(patch):
-        oauth2_backend.refresh_active_token_scopes()
+        oauth2_backend.recompute_active_token_scopes()
     return SimpleBody.model_construct(data=new_settings)
 
 
@@ -158,5 +158,5 @@ async def delete_settings(  # noqa: D103
 ) -> SimpleBody[SettingsResponseData]:
     settings_store.reset_settings()
     new_settings = settings_store.get_settings()
-    oauth2_backend.refresh_active_token_scopes()
+    oauth2_backend.recompute_active_token_scopes()
     return SimpleBody.model_construct(data=new_settings)

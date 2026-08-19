@@ -79,8 +79,8 @@ class Backend:
             token_expires_in=get_token_expires_in,
         )
 
-    def refresh_active_token_scopes(self) -> None:
-        """Recompute scopes for all active tokens from current settings and users."""
+    def recompute_active_token_scopes(self) -> None:
+        """Recompute scopes for all active tokens from current settings and user data."""
         now = datetime.now(tz=UTC)
         settings = self._settings_store.get_settings()
 
