@@ -25,7 +25,7 @@ export function useCurrentRunRoute(currentRunId: string): string | null {
     return null
   } else if (
     runStatus === RUN_STATUS_SUCCEEDED ||
-    (runStatus === RUN_STATUS_STOPPED && hasRunStarted) ||
+    runStatus === RUN_STATUS_STOPPED ||
     runStatus === RUN_STATUS_FAILED
   ) {
     return `/runs/${runId}/summary`
