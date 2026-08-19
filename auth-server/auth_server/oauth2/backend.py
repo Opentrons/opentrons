@@ -484,7 +484,10 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
                 settings.passwordResetTime,
             ),
         )
-
+        # Values defined by:
+        # https://datatracker.ietf.org/doc/html/rfc7662#section-2.2
+        # except ot_fullname, which is custom to us. if you add other custom fields,
+        # please prefix them with ot-.
         return {
             "scope": serialize_scopes(scopes),
             "username": found_access_token.username,
