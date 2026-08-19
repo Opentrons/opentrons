@@ -782,11 +782,12 @@ async def test_delete_historical_run(
 
 
 @pytest.mark.parametrize(
-    ("signed_by", "access_control_status", "expect_signoff_required"),
+    ("signed_by", "access_control_status", "expect_signoff_required", "current_run_id"),
     [
-        pytest.param(None, True, True, id="signoff_required"),
-        pytest.param("Alice Example", True, False, id="already_signed"),
-        pytest.param(None, False, False, id="access_control_disabled"),
+        pytest.param(None, True, True, "test-run-id", id="signoff_required"),
+        pytest.param("Alice Example", True, False, "test-run-id", id="already_signed"),
+        pytest.param(None, False, False, "test-run-id", id="access_control_disabled"),
+        pytest.param(None, True, False, "not-run-id", id="not_current_run"),
     ],
 )
 async def test_delete_signoff_enforcement(
@@ -798,6 +799,7 @@ async def test_delete_signoff_enforcement(
     signed_by: str | None,
     access_control_status: bool,
     expect_signoff_required: bool,
+    current_run_id: str,
 ) -> None:
     """It should enforce signoff before deleting a run when required."""
     run_id = "test-run-id"
@@ -815,7 +817,7 @@ async def test_delete_signoff_enforcement(
             log_period_id=None,
         )
     )
-    decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return(current_run_id)
 
     if expect_signoff_required:
         with pytest.raises(RunSignoffRequiredError, match=run_id):
@@ -827,11 +829,13 @@ async def test_delete_signoff_enforcement(
         decoy.verify(mock_run_store.remove(run_id=run_id), times=0)
     else:
         await subject.delete(run_id=run_id, access_control_status=access_control_status)
-
-        decoy.verify(
-            await mock_run_orchestrator_store.clear(),
-            mock_run_store.remove(run_id=run_id),
-        )
+        if current_run_id == run_id:
+            decoy.verify(
+                await mock_run_orchestrator_store.clear(),
+                mock_run_store.remove(run_id=run_id),
+            )
+        else:
+            decoy.verify(mock_run_store.remove(run_id=run_id))
 
 
 async def test_uncurrent(

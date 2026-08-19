@@ -422,9 +422,10 @@ class RunDataManager:
                 be deleted.
             RunNotFoundError: The given run identifier was not found in the database.
         """
-        self._raise_if_run_requires_signoff(run_id, access_control_status)
-
         if run_id == self._run_orchestrator_store.current_run_id:
+            # We will only raise for a signoff if the run is current. Uncurrent unsigned
+            # runs are allowed to be deleted.
+            self._raise_if_run_requires_signoff(run_id, access_control_status)
             await self._run_orchestrator_store.clear()
 
         self._runs_publisher.clean_up_run(run_id=run_id)
