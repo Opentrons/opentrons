@@ -117,15 +117,6 @@ class PatchSettingsRequestData(_StrictBaseModel):
         }
     )
 
-    _SCOPE_AFFECTING_FIELDS: ClassVar[frozenset[str]] = frozenset(
-        {
-            "requireAdminCredsWhenUpdatingRobotSoftware",
-            "requireAdminCredsWhenSendingProtocolToRobot",
-            "requireAdminCredsForSignoffProtocol",
-            "passwordResetTime",
-        }
-    )
-
     @pydantic.model_validator(mode="before")
     @classmethod
     def reject_explicit_nulls(cls, data: Any) -> Any:
@@ -135,14 +126,6 @@ class PatchSettingsRequestData(_StrictBaseModel):
                 if field in data and data[field] is None:
                     raise ValueError(f"{field} cannot be null")
         return data
-
-
-def patch_affects_token_scopes(patch: PatchSettingsRequestData) -> bool:
-    """Return whether a settings patch can change OAuth scopes on active tokens."""
-    updated_fields = patch.model_dump(exclude_unset=True)
-    return bool(
-        updated_fields.keys() & PatchSettingsRequestData._SCOPE_AFFECTING_FIELDS
-    )
 
 
 class PatchAccessControlRequestData(_StrictBaseModel):

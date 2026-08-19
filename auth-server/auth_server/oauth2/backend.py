@@ -5,12 +5,10 @@ import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import (
-    Any,
     Callable,
     NotRequired,
     Protocol,
     TypedDict,
-    TypeGuard,
     cast,
     override,
 )
@@ -77,26 +75,6 @@ class Backend:
                 send_audit_log,
             ),
             token_expires_in=get_token_expires_in,
-        )
-
-    def recompute_active_token_scopes(self) -> None:
-        """Recompute scopes for all active tokens from current settings and user data."""
-        now = datetime.now(tz=UTC)
-        settings = self._settings_store.get_settings()
-
-        def get_scopes_for_username(username: str) -> set[Scope]:
-            user = self._user_store.get(username)
-            if user is None:
-                return set()
-            return get_scope_set_of_user(
-                user,
-                settings,
-                must_reset_password(user, now, settings.passwordResetTime),
-            )
-
-        self._token_store.refresh_active_token_scopes(
-            now=now,
-            get_scopes_for_username=get_scopes_for_username,
         )
 
     def create_token_response(
@@ -406,11 +384,6 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         access_token = token["access_token"]
         refresh_token = token.get("refresh_token", None)
 
-        # This cast is because request.scopes is apparently mis-typed as a str; it's actually a list[str].
-        scopes = cast(Any, request.scopes)
-        assert _is_list_of_type(scopes, str)
-        scopes = {Scope.from_api_name(s) for s in scopes}
-
         expires_in = token["expires_in"]
 
         user = request.user
@@ -429,8 +402,6 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
                 access_token=access_token,
                 refresh_token=refresh_token,
                 expires_at=expires_at,
-                scopes=scopes,
-                fullname=user.full_name,
             )
         )
 
@@ -467,7 +438,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
     def get_original_scopes(
         self, refresh_token: str, request: oauthlib.common.Request
     ) -> list[str]:
-        """Return the scopes that a refresh token was originally associated with.
+        """Return the scopes that a refresh token should be associated with.
 
         These will be passed on to the refreshed access token if the client did not
         specify a scope during the request.
@@ -476,7 +447,9 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             refresh_token, now=self.__get_now()
         )
         assert token is not None
-        return sorted(s.api_name for s in token.scopes)
+        return sorted(
+            s.api_name for s in self.__get_live_scopes_for_username(token.username)
+        )
 
     @override
     @pydantic.validate_call(config=_validate_call_config)
@@ -496,17 +469,45 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         )
         if found_access_token is None:
             return None
-        else:
-            # Values defined by:
-            # https://datatracker.ietf.org/doc/html/rfc7662#section-2.2
-            # except ot_fullname, which is custom to us. if you add other custom fields,
-            # please prefix them with ot-.
-            return {
-                "scope": serialize_scopes(found_access_token.scopes),
-                "username": found_access_token.username,
-                "ot_fullname": found_access_token.fullname,
-                # "active": True is set implicitly by oauthlib.
-            }
+
+        user = self.__user_store.get(found_access_token.username)
+        if user is None:
+            return None
+
+        settings = self.__settings_store.get_settings()
+        scopes = get_scope_set_of_user(
+            user,
+            settings,
+            must_reset_password(
+                user,
+                self.__get_now(),
+                settings.passwordResetTime,
+            ),
+        )
+
+        return {
+            "scope": serialize_scopes(scopes),
+            "username": found_access_token.username,
+            "ot_fullname": user.full_name,
+            # "active": True is set implicitly by oauthlib.
+        }
+
+    def __get_live_scopes_for_username(self, username: str) -> set[Scope]:
+        """Return scopes for a username using current settings and user data."""
+        user = self.__user_store.get(username)
+        if user is None:
+            return set()
+
+        settings = self.__settings_store.get_settings()
+        return get_scope_set_of_user(
+            user,
+            settings,
+            must_reset_password(
+                user,
+                self.__get_now(),
+                settings.passwordResetTime,
+            ),
+        )
 
 
 class _CustomInvalidCredentialsError(oauthlib.oauth2.InvalidGrantError):
@@ -561,8 +562,6 @@ class _TokenIssuance:
     # todo(mm, 2026-01-29): We might want expires_at to be a CLOCK_BOOTTIME value or something
     # to resist problems from clock adjustment.
     expires_at: datetime
-    scopes: set[Scope]
-    fullname: str
 
 
 class _TokenStore:
@@ -591,28 +590,6 @@ class _TokenStore:
                 return token
         return None
 
-    def refresh_active_token_scopes(
-        self,
-        now: datetime,
-        get_scopes_for_username: Callable[[str], set[Scope]],
-    ) -> None:
-        """Update stored scopes on active tokens to match current settings."""
-        self.prune_inactive(now)
-        for token in self._tokens:
-            if self._is_active(token, now):
-                token.scopes = get_scopes_for_username(token.username)
-
     @staticmethod
     def _is_active(token: _TokenIssuance, now: datetime) -> bool:
         return token.expires_at > now
-
-
-def _is_list_of_type[ElementT](
-    alleged_list: object, expected_element_type: type[ElementT]
-) -> TypeGuard[list[ElementT]]:
-    if not isinstance(alleged_list, list):
-        return False
-    return all(
-        isinstance(element, expected_element_type)
-        for element in cast(list[object], alleged_list)
-    )
