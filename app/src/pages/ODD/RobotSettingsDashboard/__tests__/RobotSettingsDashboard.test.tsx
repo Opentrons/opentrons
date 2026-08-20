@@ -180,7 +180,7 @@ describe('RobotSettingsDashboard', () => {
 
   it('should render setting buttons', () => {
     render()
-    screen.getByText('Robot Name')
+    screen.getByText('Robot name')
     screen.getByText('opentrons-robot-name')
     screen.getByText('Robot System Version')
     screen.getByText('Network Settings')
@@ -195,7 +195,7 @@ describe('RobotSettingsDashboard', () => {
     screen.getByText('Touchscreen Brightness')
     screen.getByText('Privacy')
     screen.getByText('Choose what data to share with Opentrons.')
-    screen.getByText('Device Reset')
+    screen.getByText('Device reset')
     screen.getByText('Camera Preferences')
     screen.getByText('Devices')
     screen.getByText('Update Channel')
@@ -205,9 +205,9 @@ describe('RobotSettingsDashboard', () => {
 
   it('should render component when tapping robot name button', () => {
     render()
-    const button = screen.getByText('Robot Name')
+    const button = screen.getByText('Robot name')
     fireEvent.click(button)
-    screen.getByText('Robot Name')
+    screen.getByText('Robot name')
   })
 
   it('should render component when tapping robot system version', () => {
@@ -315,7 +315,7 @@ describe('RobotSettingsDashboard', () => {
 
   it('should render disable stacker sensors copy, and calls toggleSensors', () => {
     render()
-    screen.getByText('Disable Stacker Sensors for Labware Detection')
+    screen.getByText('Disable Stacker sensors for labware detection')
 
     const toggle = screen.getByTestId(
       'RobotSettingButton_disable_stacker_sensors'
@@ -374,7 +374,7 @@ describe('RobotSettingsDashboard', () => {
 
   it('should render component when tapping device rest', () => {
     render()
-    const button = screen.getByText('Device Reset')
+    const button = screen.getByText('Device reset')
     fireEvent.click(button)
     expect(vi.mocked(DeviceReset)).toHaveBeenCalled()
   })
