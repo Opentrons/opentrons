@@ -22,9 +22,9 @@ import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
 
+import { ComplianceReadySoftwareSettings } from '..'
+import { RobotSettingsComplianceReady } from '../../index'
 import { UI_ONLY_FIELD_IDS } from '../complianceReadySettingsTypes'
-import { ComplianceReadySoftwareSettings } from '../ComplianceReadySoftwareSettings'
-import { RobotSettingsComplianceReady } from '../index'
 
 import type { RenderResult } from '@testing-library/react'
 import type {
@@ -94,7 +94,7 @@ vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
 }))
 vi.mock('/app/organisms/ToasterOven')
 
-vi.mock('../PersonalAccountSettings', () => ({
+vi.mock('../../PersonalAccountSettings', () => ({
   PersonalAccountSettings: () => null,
 }))
 

@@ -17,11 +17,11 @@ import { useDocumentationState } from '/app/local-resources/access-control/useDo
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useUsernameForRobot } from '/app/redux/robot-auth'
 
-import { Accordion } from './Accordion'
+import { Accordion } from '../Accordion'
+import { OneTimePasswordModal } from '../userAccount/OneTimePasswordModal'
+import { UserAccountConfirmModal } from '../userAccount/UserAccountConfirmModal'
 import { AddUserModal } from './AddUserModal'
 import { EditUserModal } from './EditUserModal'
-import { OneTimePasswordModal } from './userAccount/OneTimePasswordModal'
-import { UserAccountConfirmModal } from './userAccount/UserAccountConfirmModal'
 import styles from './usermanagement.module.css'
 import { UserManagementTableRow } from './UserManagementTableRow'
 

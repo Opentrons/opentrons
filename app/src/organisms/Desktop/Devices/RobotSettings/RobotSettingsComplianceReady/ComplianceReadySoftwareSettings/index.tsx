@@ -13,7 +13,7 @@ import {
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
-import { Accordion } from './Accordion'
+import { Accordion } from '../Accordion'
 import {
   getAuditInputPatch,
   getAuthInputPatch,
