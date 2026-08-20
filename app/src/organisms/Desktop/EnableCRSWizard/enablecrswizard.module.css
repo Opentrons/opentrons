@@ -1,9 +1,10 @@
 .content {
   display: flex;
-  min-height: 25rem;
+  min-height: 18.5rem;
   flex-direction: column;
-  padding: var(--spacing-24);
   gap: var(--spacing-24);
+  padding-block-start: var(--spacing-24);
+  padding-inline: var(--spacing-24);
 }
 
 .step_body {
@@ -24,7 +25,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
-  padding: var(--spacing-16) var(--spacing-24) var(--spacing-24);
+  padding: var(--spacing-24);
   gap: var(--spacing-8);
 }
 
