@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import { clsx } from 'clsx'
-import { i } from 'vite/dist/node/chunks/moduleRunnerTransport'
 
 import {
   ALIGN_CENTER,

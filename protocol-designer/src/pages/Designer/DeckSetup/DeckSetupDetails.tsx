@@ -89,7 +89,6 @@ import type {
   ModuleOnDeck,
 } from '../../../step-forms'
 import type { DeckSetupTerminalIdType } from '../types'
-import type { DroppedItem } from './types'
 
 interface DeckSetupDetailsProps extends DeckSetupTerminalIdType {
   activeDeckSetup: InitialDeckSetup
