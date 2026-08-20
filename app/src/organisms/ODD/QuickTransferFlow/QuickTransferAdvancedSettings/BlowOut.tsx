@@ -32,6 +32,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { i18n } from '/app/i18n'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -132,8 +133,10 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
   const [blowOutLocation, setBlowOutLocation] = useState<
     BlowOutLocation | undefined
   >(state.blowOutDispense?.location ?? undefined)
-  const [speed, setSpeed] = useState<number | null>(
-    state.blowOutDispense?.flowRate! ?? null
+  const [speed, setSpeed] = useState<string>(
+    state.blowOutDispense?.flowRate != null
+      ? String(state.blowOutDispense.flowRate)
+      : ''
   )
   const enableBlowOutDisplayItems = [
     {
@@ -189,7 +192,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
         type: ACTIONS.SET_BLOW_OUT,
         blowOutSettings: {
           location: blowOutLocation,
-          flowRate: speed ?? 1,
+          flowRate: parsedSpeed.result === 'success' ? parsedSpeed.data : 1,
         },
       })
       trackEventWithRobotSerial({
@@ -206,11 +209,6 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
     isBlowOutEnabled && currentStep < 3
       ? t('shared:continue')
       : t('shared:save')
-
-  let buttonIsDisabled = false
-  if (currentStep === 3) {
-    buttonIsDisabled = blowOutLocation == null
-  }
 
   const pipetteName = getPipetteName(state.pipette)
   const liquidSpecs = state.pipette.liquids
@@ -295,20 +293,26 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
     robotType: FLEX_ROBOT_TYPE,
   })
 
-  const speedError =
-    speed != null && (speed < minFlowRate || speed > maxFlowRate)
-      ? t(`value_out_of_range`, {
-          min: minFlowRate,
-          max: maxFlowRate,
+  const parsedSpeed = parseNumericalInput(speed, {
+    allowDecimal: false,
+    allowNegative: false,
+    min: minFlowRate,
+    max: maxFlowRate,
+  })
+  const speedErrorMessage =
+    parsedSpeed.result === 'rangeError'
+      ? t('value_out_of_range', {
+          min: parsedSpeed.min,
+          max: parsedSpeed.max,
         })
-      : null
+      : parsedSpeed.result === 'syntaxError'
+        ? t('enter_a_valid_number')
+        : null
 
-  const handleFlowRateChange = (userInput: string): void => {
-    if (userInput === '') {
-      setSpeed(null)
-    }
-    const parsedFlowRate = parseInt(userInput)
-    setSpeed(!isNaN(parsedFlowRate) ? parsedFlowRate : null)
+  let buttonIsDisabled = false
+  if (currentStep === 3) {
+    buttonIsDisabled =
+      blowOutLocation == null || parsedSpeed.result !== 'success'
   }
 
   return createPortal(
@@ -398,11 +402,11 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
             <TouchInputField
               autoFocus
               type="text"
-              value={String(speed ?? '')}
+              value={speed}
               label={t('blow_out_speed')}
-              error={speedError}
+              error={speedErrorMessage}
               onChange={e => {
-                handleFlowRateChange(e.target.value as string)
+                setSpeed(e.target.value)
               }}
             />
           </Flex>
@@ -414,10 +418,8 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={String(speed ?? '')}
-              onChange={e => {
-                handleFlowRateChange(e)
-              }}
+              initialValue={speed}
+              onChange={setSpeed}
             />
           </Flex>
         </Flex>

@@ -182,8 +182,8 @@ describe('PipettePath', () => {
         autoFocus: true,
         label: 'Disposal volume (µL)',
         error: null,
-        type: 'number',
-        value: 20,
+        type: 'text',
+        value: '20',
         onChange: expect.any(Function),
       },
       {}
@@ -215,8 +215,8 @@ describe('PipettePath', () => {
         autoFocus: true,
         label: 'Disposal volume (µL)',
         error: 'Value must be between 1 to 160',
-        type: 'number',
-        value: 201,
+        type: 'text',
+        value: '201',
         onChange: expect.any(Function),
       },
       {}

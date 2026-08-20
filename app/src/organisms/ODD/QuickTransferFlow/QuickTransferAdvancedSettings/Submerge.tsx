@@ -17,6 +17,7 @@ import { POSITION_REFERENCE_TOP } from '@opentrons/shared-data'
 import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
@@ -49,14 +50,16 @@ export function Submerge({
   const [currentStep, setCurrentStep] = useState<number>(1)
   const submergeSettings =
     kind === 'aspirate' ? state.submergeAspirate : state.submergeDispense
-  const [speed, setSpeed] = useState<number | null>(
-    submergeSettings?.speed ?? null
+  const [speed, setSpeed] = useState<string>(
+    submergeSettings?.speed != null ? String(submergeSettings.speed) : ''
   )
-  const [delayDuration, setDelayDuration] = useState<number | null>(
-    submergeSettings?.delayDuration ?? null
+  const [delayDuration, setDelayDuration] = useState<string>(
+    submergeSettings?.delayDuration != null
+      ? String(submergeSettings.delayDuration)
+      : ''
   )
-  const [position, setPosition] = useState<string | null>(
-    String(submergeSettings?.position) ?? null
+  const [position, setPosition] = useState<string>(
+    submergeSettings?.position != null ? String(submergeSettings.position) : ''
   )
   const positionReference =
     kind === 'aspirate'
@@ -81,13 +84,17 @@ export function Submerge({
         setCurrentStep(3)
         break
       case 3:
-        if (speed != null && position != null && delayDuration != null) {
+        if (
+          parsedSpeed.result === 'success' &&
+          parsedPosition.result === 'success' &&
+          parsedDelayDuration.result === 'success'
+        ) {
           dispatch({
             type: action,
             submergeSettings: {
-              speed,
-              delayDuration,
-              position: Number(position),
+              speed: parsedSpeed.data,
+              delayDuration: parsedDelayDuration.data,
+              position: parsedPosition.data,
               positionReference: positionReference ?? undefined,
             },
           })
@@ -108,15 +115,60 @@ export function Submerge({
       ? t('shared:continue')
       : t('shared:save')
 
+  const parsedSpeed = parseNumericalInput(speed, {
+    allowDecimal: true,
+    allowNegative: false,
+  })
+  const parsedDelayDuration = parseNumericalInput(delayDuration, {
+    allowDecimal: true,
+    allowNegative: false,
+  })
+  let wellHeight = 1
+  if (
+    kind === 'aspirate' &&
+    state.sourceWells != null &&
+    state.sourceWells.length > 0
+  ) {
+    wellHeight = Math.max(
+      ...state.sourceWells.map(well =>
+        state.source != null ? state.source.wells[well].depth : 0
+      )
+    )
+  } else if (
+    kind === 'dispense' &&
+    state.destinationWells != null &&
+    state.destinationWells.length > 0
+  ) {
+    const destLabwareDefinition =
+      state.destination === 'source' ? state.source : state.destination
+    wellHeight = Math.max(
+      ...state.destinationWells.map(well =>
+        destLabwareDefinition != null
+          ? destLabwareDefinition.wells[well].depth
+          : 0
+      )
+    )
+  }
+  const positionRange =
+    positionReference === POSITION_REFERENCE_TOP
+      ? { min: -wellHeight, max: 2 }
+      : { min: 0, max: wellHeight + 2 }
+  const parsedPosition = parseNumericalInput(position, {
+    allowDecimal: false,
+    allowNegative: positionReference === POSITION_REFERENCE_TOP,
+    min: positionRange.min,
+    max: positionRange.max,
+  })
+
   let buttonIsDisabled = false
-  if (speed == null && currentStep === 1) {
-    buttonIsDisabled = true
+  if (currentStep === 1) {
+    buttonIsDisabled = parsedSpeed.result !== 'success'
   }
-  if (delayDuration == null && currentStep === 2) {
-    buttonIsDisabled = true
+  if (currentStep === 2) {
+    buttonIsDisabled = parsedDelayDuration.result !== 'success'
   }
-  if ((position == null || isNaN(Number(position))) && currentStep === 3) {
-    buttonIsDisabled = true
+  if (currentStep === 3) {
+    buttonIsDisabled = parsedPosition.result !== 'success'
   }
 
   return createPortal(
@@ -163,12 +215,12 @@ export function Submerge({
 interface SubmergeSettingComponentProps {
   kind: FlowRateKind
   state: QuickTransferSummaryState
-  setSpeed: (speed: number | null) => void
-  setPosition: (position: string | null) => void
-  delayDuration: number | null
-  setDelayDuration: (delayDuration: number | null) => void
-  speed: number | null
-  position: string | null
+  setSpeed: (speed: string) => void
+  setPosition: (position: string) => void
+  delayDuration: string
+  setDelayDuration: (delayDuration: string) => void
+  speed: string
+  position: string
   currentStep: number
   positionReference?: PositionReference
 }
@@ -185,7 +237,7 @@ function SubmergeSettingComponent({
   currentStep,
   positionReference,
 }: SubmergeSettingComponentProps): JSX.Element {
-  const { t } = useTranslation(['quick_transfer'])
+  const { t } = useTranslation('quick_transfer')
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
 
   // TODO: accommodate arbitrary position reference
@@ -231,42 +283,35 @@ function SubmergeSettingComponent({
           max: wellHeight + 2,
         }
 
-  console.log(positionRange)
-  const positionError =
-    position != null &&
-    (Number(position) < positionRange.min ||
-      Number(position) > positionRange.max)
-      ? t(`value_out_of_range`, {
-          min: positionRange.min,
-          max: positionRange.max,
+  const parsedPosition = parseNumericalInput(position, {
+    allowDecimal: false,
+    allowNegative: positionReference === POSITION_REFERENCE_TOP,
+    min: positionRange.min,
+    max: positionRange.max,
+  })
+  const positionErrorMessage =
+    parsedPosition.result === 'rangeError'
+      ? t('value_out_of_range', {
+          min: parsedPosition.min,
+          max: parsedPosition.max,
         })
+      : parsedPosition.result === 'syntaxError'
+        ? t('enter_a_valid_number')
+        : null
+  const parsedSpeed = parseNumericalInput(speed, {
+    allowDecimal: true,
+    allowNegative: false,
+  })
+  const speedErrorMessage =
+    parsedSpeed.result === 'syntaxError' ? t('enter_a_valid_number') : null
+  const parsedDelayDuration = parseNumericalInput(delayDuration, {
+    allowDecimal: true,
+    allowNegative: false,
+  })
+  const delayDurationErrorMessage =
+    parsedDelayDuration.result === 'syntaxError'
+      ? t('enter_a_valid_number')
       : null
-
-  const handleSpeedChange = (userInput: string): void => {
-    if (userInput === '') {
-      setSpeed(null)
-    } else {
-      const parsedValue = Number(userInput)
-      setSpeed(!isNaN(parsedValue) ? parsedValue : null)
-    }
-  }
-
-  const handleDelayDurationChange = (userInput: string): void => {
-    if (userInput === '') {
-      setDelayDuration(null)
-    } else {
-      const parsedValue = Number(userInput)
-      setDelayDuration(!isNaN(parsedValue) ? parsedValue : null)
-    }
-  }
-
-  const handlePositionChange = (userInput: string): void => {
-    if (userInput === '') {
-      setPosition(null)
-    } else {
-      setPosition(userInput)
-    }
-  }
 
   const speedSetting = (): JSX.Element => {
     return (
@@ -283,11 +328,12 @@ function SubmergeSettingComponent({
           </StyledText>
           <TouchInputField
             autoFocus
-            type="number"
+            type="text"
             value={speed}
             label={t('speed')}
+            error={speedErrorMessage}
             onChange={e => {
-              handleSpeedChange(e.target.value as string)
+              setSpeed(e.target.value)
             }}
           />
         </Flex>
@@ -301,8 +347,8 @@ function SubmergeSettingComponent({
             key={`${kind}_speed_keyboard`}
             keyboardRef={keyboardRef}
             isDecimal
-            initialValue={String(speed ?? '')}
-            onChange={handleSpeedChange}
+            initialValue={speed}
+            onChange={setSpeed}
           />
         </Flex>
       </>
@@ -321,11 +367,12 @@ function SubmergeSettingComponent({
         >
           <TouchInputField
             autoFocus
-            type="number"
+            type="text"
             value={delayDuration}
             label={t('delay_duration_s')}
+            error={delayDurationErrorMessage}
             onChange={e => {
-              handleDelayDurationChange(e.target.value as string)
+              setDelayDuration(e.target.value)
             }}
           />
         </Flex>
@@ -339,8 +386,8 @@ function SubmergeSettingComponent({
             key={`${kind}_delay_duration_keyboard`}
             keyboardRef={keyboardRef}
             isDecimal
-            initialValue={String(delayDuration ?? '')}
-            onChange={handleDelayDurationChange}
+            initialValue={delayDuration}
+            onChange={setDelayDuration}
           />
         </Flex>
       </>
@@ -365,13 +412,13 @@ function SubmergeSettingComponent({
             autoFocus
             type="text"
             value={position}
-            error={positionError}
+            error={positionErrorMessage}
             label={positionText}
             onChange={e => {
-              handlePositionChange(e.target.value as string)
+              setPosition(e.target.value)
             }}
           />
-          {positionError == null ? (
+          {positionErrorMessage == null ? (
             <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
               {caption}
             </StyledText>
@@ -386,8 +433,8 @@ function SubmergeSettingComponent({
           <NumericalKeyboard
             key={`${kind}_position_keyboard`}
             keyboardRef={keyboardRef}
-            initialValue={String(position ?? '')}
-            onChange={handlePositionChange}
+            initialValue={position}
+            onChange={setPosition}
             hasHyphen={positionReference === POSITION_REFERENCE_TOP}
           />
         </Flex>

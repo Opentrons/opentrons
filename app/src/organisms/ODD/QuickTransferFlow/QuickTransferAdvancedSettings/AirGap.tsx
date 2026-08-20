@@ -18,6 +18,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { i18n } from '/app/i18n'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
@@ -53,10 +54,10 @@ export function AirGap(props: AirGapProps): JSX.Element {
       : state.airGapDispense != null
   )
   const [currentStep, setCurrentStep] = useState<number>(1)
-  const [volume, setVolume] = useState<number | null>(
-    kind === 'aspirate'
-      ? (state.airGapAspirate ?? null)
-      : (state.airGapDispense ?? null)
+  const existingVolume =
+    kind === 'aspirate' ? state.airGapAspirate : state.airGapDispense
+  const [volume, setVolume] = useState<string>(
+    existingVolume != null ? String(existingVolume) : ''
   )
 
   const action =
@@ -100,21 +101,23 @@ export function AirGap(props: AirGapProps): JSX.Element {
         onBack()
       }
     } else if (currentStep === 2) {
-      dispatch({ type: action, volume: volume ?? undefined })
-      trackEventWithRobotSerial({
-        name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
-        properties: {
-          setting: `AirGap_${kind}`,
-        },
-      })
-      onBack()
+      if (parsedVolume.result === 'success') {
+        dispatch({ type: action, volume: parsedVolume.data })
+        trackEventWithRobotSerial({
+          name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
+          properties: {
+            setting: `AirGap_${kind}`,
+          },
+        })
+        onBack()
+      }
     }
   }
 
   const setSaveOrContinueButtonText =
     airGapEnabled && currentStep < 2 ? t('shared:continue') : t('shared:save')
 
-  const { min, max } =
+  const volumeRange =
     kind === 'aspirate'
       ? getAspirateAirGapVolumeRange(state.pipette, state.tipRack)
       : getDispenseAirGapVolumeRange(
@@ -125,23 +128,29 @@ export function AirGap(props: AirGapProps): JSX.Element {
           state.tipRack
         )
 
-  const volumeRange = { min, max }
-  let volumeError = null
-  if (volumeRange.min > volumeRange.max) {
-    volumeError = t('air_gap_capacity_error')
-  } else if (
-    volume !== null &&
-    (volume < volumeRange.min || volume > volumeRange.max)
-  ) {
-    volumeError = t(`value_out_of_range`, {
-      min: volumeRange.min,
-      max: volumeRange.max,
+  const parsedVolume = parseNumericalInput(volume, {
+    allowDecimal: false,
+    allowNegative: false,
+    min: volumeRange.min,
+    max: volumeRange.max,
+  })
+  const isVolumeRangeEmpty = volumeRange.min > volumeRange.max
+
+  let volumeErrorMessage = null
+  if (parsedVolume.result === 'syntaxError') {
+    volumeErrorMessage = t('enter_a_valid_number')
+  } else if (isVolumeRangeEmpty) {
+    volumeErrorMessage = t('air_gap_capacity_error')
+  } else if (parsedVolume.result === 'rangeError') {
+    volumeErrorMessage = t('value_out_of_range', {
+      min: parsedVolume.min,
+      max: parsedVolume.max,
     })
   }
 
   let buttonIsDisabled = false
   if (currentStep === 2) {
-    buttonIsDisabled = volume == null || volumeError != null
+    buttonIsDisabled = isVolumeRangeEmpty || parsedVolume.result !== 'success'
   }
 
   return createPortal(
@@ -204,12 +213,12 @@ export function AirGap(props: AirGapProps): JSX.Element {
           >
             <TouchInputField
               autoFocus
-              type="number"
+              type="text"
               value={volume}
               label={t('air_gap_volume_µL')}
-              error={volumeError}
+              error={volumeErrorMessage}
               onChange={e => {
-                setVolume(Number(e.target.value))
+                setVolume(e.target.value)
               }}
             />
           </Flex>
@@ -221,10 +230,8 @@ export function AirGap(props: AirGapProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={String(volume ?? '')}
-              onChange={e => {
-                setVolume(Number(e))
-              }}
+              initialValue={volume}
+              onChange={setVolume}
             />
           </Flex>
         </Flex>

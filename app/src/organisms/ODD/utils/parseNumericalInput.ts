@@ -25,7 +25,8 @@ export function parseNumericalInput(
     return { result: 'empty' }
   }
 
-  // Validate it through a regex first to disallow weird stuff like "1e10".
+  // Validate it through a regex before parsing it via Number() to make sure we disallow
+  // weird stuff like "1e10", avoid parsing "" as 0, etc.
 
   // -12.34
   // ^       sign (optional)
