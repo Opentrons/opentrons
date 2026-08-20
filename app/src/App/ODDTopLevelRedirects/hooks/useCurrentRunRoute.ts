@@ -37,6 +37,7 @@ export function useCurrentRunRoute(currentRunId: string): string | null {
   } else if (hasRunStarted) {
     return `/runs/${runId}/run`
   } else {
+    console.error(`Unexpected run route found for run ${runId}`, runStatus)
     return null
   }
 }
