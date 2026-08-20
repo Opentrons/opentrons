@@ -32,8 +32,6 @@ export interface SoftwareKeyboardControlResult {
  * and the DOM state, and it causes various problems when it falls out of sync with them.
  * So this keeps the internal state refreshed to match the latest from the DOM.
  * https://github.com/hodgef/simple-keyboard/issues/2756
- *
- * So this keeps the internal state in sync.
  */
 export function useSoftwareKeyboardControl(
   options: SoftwareKeyboardControlOptions
