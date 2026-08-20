@@ -182,24 +182,24 @@ describe('RobotSettingsDashboard', () => {
     render()
     screen.getByText('Robot name')
     screen.getByText('opentrons-robot-name')
-    screen.getByText('Robot System Version')
-    screen.getByText('Network Settings')
+    screen.getByText('Robot system version')
+    screen.getByText('Network settings')
     screen.getByText('Status LEDs')
-    screen.getByText('Recovery Mode')
+    screen.getByText('Recovery mode')
     screen.getByText(
       'Control the strip of color lights on the front of the robot.'
     )
-    screen.getByText('File Manager')
+    screen.getByText('File manager')
     screen.getByText('Download and delete robot files.')
-    screen.getByText('Touchscreen Sleep')
-    screen.getByText('Touchscreen Brightness')
+    screen.getByText('Touchscreen sleep')
+    screen.getByText('Touchscreen brightness')
     screen.getByText('Privacy')
     screen.getByText('Choose what data to share with Opentrons.')
     screen.getByText('Device reset')
-    screen.getByText('Camera Preferences')
+    screen.getByText('Camera preferences')
     screen.getByText('Devices')
-    screen.getByText('Update Channel')
-    screen.getByText('Developer Tools')
+    screen.getByText('Update channel')
+    screen.getByText('Developer tools')
     screen.getByText('Access additional logging and feature flags.')
   })
 
@@ -212,7 +212,7 @@ describe('RobotSettingsDashboard', () => {
 
   it('should render component when tapping robot system version', () => {
     render()
-    const button = screen.getByText('Robot System Version')
+    const button = screen.getByText('Robot system version')
     fireEvent.click(button)
     expect(vi.mocked(RobotSystemVersion)).toHaveBeenCalled()
   })
@@ -269,9 +269,9 @@ describe('RobotSettingsDashboard', () => {
         'RobotSettingButton_include_protocol_source_in_run_download'
       )
     ).toHaveTextContent('Off')
-    screen.getByText('Download Protocol Source File')
+    screen.getByText('Download protocol source file')
     screen.getByText('Include protocol source file in run record downloads')
-    const toggle = screen.getByText('Download Protocol Source File')
+    const toggle = screen.getByText('Download protocol source file')
     fireEvent.click(toggle)
     expect(mockDispatch).toHaveBeenCalledWith(
       toggleConfigValue('protocols.includeProtocolSourceInRunDownload')
@@ -339,28 +339,28 @@ describe('RobotSettingsDashboard', () => {
 
   it('should render component when tapping network settings', () => {
     render()
-    const button = screen.getByText('Network Settings')
+    const button = screen.getByText('Network settings')
     fireEvent.click(button)
     expect(vi.mocked(NetworkSettings)).toHaveBeenCalled()
   })
 
   it('should render component when tapping display touchscreen sleep', () => {
     render()
-    const button = screen.getByText('Touchscreen Sleep')
+    const button = screen.getByText('Touchscreen sleep')
     fireEvent.click(button)
     expect(vi.mocked(TouchScreenSleep)).toHaveBeenCalled()
   })
 
   it('should render component when tapping touchscreen brightness', () => {
     render()
-    const button = screen.getByText('Touchscreen Brightness')
+    const button = screen.getByText('Touchscreen brightness')
     fireEvent.click(button)
     expect(vi.mocked(TouchscreenBrightness)).toHaveBeenCalled()
   })
 
   it('should render component when tapping camera preferences', () => {
     render()
-    const button = screen.getByText('Camera Preferences')
+    const button = screen.getByText('Camera preferences')
     fireEvent.click(button)
     expect(vi.mocked(CameraPreferences)).toHaveBeenCalled()
   })
@@ -381,7 +381,7 @@ describe('RobotSettingsDashboard', () => {
 
   it('should render component when tapping update channel', () => {
     render()
-    const button = screen.getByText('Update Channel')
+    const button = screen.getByText('Update channel')
     fireEvent.click(button)
     expect(vi.mocked(UpdateChannel)).toHaveBeenCalled()
   })
@@ -408,7 +408,7 @@ describe('RobotSettingsDashboard', () => {
 
   it('should call a mock function when tapping enable dev tools', () => {
     render()
-    const button = screen.getByText('Developer Tools')
+    const button = screen.getByText('Developer tools')
     fireEvent.click(button)
     expect(vi.mocked(toggleDevtools)).toHaveBeenCalled()
   })
@@ -428,10 +428,10 @@ describe('RobotSettingsDashboard', () => {
     expect(vi.mocked(LanguageSetting)).toHaveBeenCalled()
   })
 
-  it('should render component when tapping File Manager', () => {
+  it('should render component when tapping File manager', () => {
     render()
 
-    const button = screen.getByText('File Manager')
+    const button = screen.getByText('File manager')
     fireEvent.click(button)
     expect(vi.mocked(FileManager)).toHaveBeenCalled()
   })
