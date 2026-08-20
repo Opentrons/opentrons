@@ -14,13 +14,14 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import type { ReactNode } from 'react'
 
 import { getMainPagePortalEl } from '../Portal'
 
 // Note: We decided not to use this component for the release.
 // We will find out a better way to handle responsiveness with user's screen size issue.
 // This component may be used in the future. If not, we will remove it.
-export function DisabledScreen(): JSX.Element {
+export function DisabledScreen(): ReactNode {
   const { t } = useTranslation('shared')
 
   return createPortal(

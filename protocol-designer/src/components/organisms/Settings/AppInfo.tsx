@@ -13,7 +13,7 @@ import {
 
 import { DOC_URL } from '..'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 
 interface AppInfoProps {
   setShowAnnouncementModal: Dispatch<SetStateAction<boolean>>
@@ -21,7 +21,7 @@ interface AppInfoProps {
 
 export function AppInfo({
   setShowAnnouncementModal,
-}: AppInfoProps): JSX.Element {
+}: AppInfoProps): ReactNode {
   const { t } = useTranslation('shared')
   const pdVersion = _OT_PD_VERSION_
 

@@ -5,11 +5,12 @@ import {
   StepFormStatusList,
 } from '/protocol-designer/components/molecules'
 
+import type { ReactNode } from 'react'
 import type { TemperatureModuleState } from '@opentrons/step-generation'
 
 export function PriorTemperatureState(props: {
   priorState: TemperatureModuleState
-}): JSX.Element {
+}): ReactNode {
   const { t } = useTranslation()
   const { targetTemperature } = props.priorState
   return (

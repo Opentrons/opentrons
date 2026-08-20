@@ -11,6 +11,7 @@ import {
   TertiaryButton,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { LiquidHandlingTab } from '../../types'
 
 interface ResetSettingsFieldProps {
@@ -20,7 +21,7 @@ interface ResetSettingsFieldProps {
 
 export function ResetSettingsField(
   props: ResetSettingsFieldProps
-): JSX.Element {
+): ReactNode {
   const { tab, onClick } = props
   const { t } = useTranslation(['protocol_steps'])
 

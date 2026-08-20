@@ -51,6 +51,7 @@ import type {
 import type { PipetteOnDeck } from '/protocol-designer/step-forms'
 import type { ThunkDispatch } from '/protocol-designer/types'
 import type { PipetteConfig } from './usePipetteConfig'
+import type { ReactNode } from 'react'
 
 interface PipetteConfigurationProps {
   robotType: RobotType
@@ -66,7 +67,7 @@ export function PipetteConfiguration({
   pipetteConfig,
   leftPipette,
   rightPipette,
-}: PipetteConfigurationProps): JSX.Element {
+}: PipetteConfigurationProps): ReactNode {
   const { t } = useTranslation(['onboarding', 'shared'])
   const [allowAllTipracks, setAllowAllTipracks] = useState<boolean>(false)
   const dispatch = useDispatch<ThunkDispatch<any>>()

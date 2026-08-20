@@ -18,6 +18,8 @@ import { getLiquidClassDisplayName } from '/protocol-designer/liquid-defs/utils'
 
 import { getMainPagePortalEl } from './Portal'
 
+import type { ReactNode } from 'react'
+
 interface ResetSettingsModalProps {
   tab: 'aspirate' | 'dispense'
   onContinue: () => void
@@ -27,7 +29,7 @@ interface ResetSettingsModalProps {
 }
 export function ResetSettingsModal(
   props: ResetSettingsModalProps
-): JSX.Element {
+): ReactNode {
   const { tab, liquidClass, onContinue, onClose, onScroll } = props
   const { t, i18n } = useTranslation('protocol_steps')
 

@@ -16,7 +16,7 @@ import styles from './byvolumebuilder.module.css'
 import { ByVolumeCalculator } from './ByVolumeCalculator'
 import { getByVolumeMappedToXY } from './utils'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { LiquidHandlingPropertyByVolume } from '@opentrons/shared-data'
 import type { ByVolumeType } from './types'
 
@@ -28,7 +28,7 @@ export function ByVolumeBuilderModal(props: {
   defaultFlowRates: LiquidHandlingPropertyByVolume
   maxX: number
   maxY: number
-}): JSX.Element {
+}): ReactNode {
   const {
     byVolume = [],
     type,

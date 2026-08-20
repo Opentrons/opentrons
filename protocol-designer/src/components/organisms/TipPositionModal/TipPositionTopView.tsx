@@ -14,6 +14,8 @@ import BOTTOM_LAYER from '/protocol-designer/assets/images/tip_top_bottom_layer.
 import MID_LAYER from '/protocol-designer/assets/images/tip_top_mid_layer.svg'
 import TOP_LAYER from '/protocol-designer/assets/images/tip_top_top_layer.svg'
 
+import type { ReactNode } from 'react'
+
 const WELL_WIDTH_PIXELS = 110
 const PIXEL_DECIMALS = 2
 
@@ -24,7 +26,7 @@ interface TipPositionAllVizProps {
   yWidthMm: number
 }
 
-export function TipPositionTopView(props: TipPositionAllVizProps): JSX.Element {
+export function TipPositionTopView(props: TipPositionAllVizProps): ReactNode {
   const { yPosition, xPosition, yWidthMm, xWidthMm } = props
   const { t } = useTranslation('application')
 

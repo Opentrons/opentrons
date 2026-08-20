@@ -5,7 +5,7 @@ import { HighlightLabware } from '../HighlightLabware'
 import { LabwareControls } from './Overlays'
 import { ActiveLabwareControls } from './Overlays/ActiveLabwareControls'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   DeckSlotId,
   FlexStackerStoredLabwareGroup,
@@ -42,7 +42,7 @@ interface HopperLabwareRendersProps {
 
 export function HopperLabwareRenders(
   props: HopperLabwareRendersProps
-): JSX.Element | null {
+): ReactNode {
   const {
     labwaresOnDeck,
     slot,

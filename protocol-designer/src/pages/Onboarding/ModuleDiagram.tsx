@@ -25,6 +25,8 @@ import tempdeck_gen1 from '../../assets/images/modules/tempdeck_gen1.png'
 import thermocycler_gen2 from '../../assets/images/modules/thermocycler_gen2.png'
 import thermocycler from '../../assets/images/modules/thermocycler.png'
 
+import type { ReactNode } from 'react'
+
 interface ModuleDiagramProps {
   type: OT2ModuleType
   model: ModuleModel
@@ -55,7 +57,7 @@ const MODULE_IMG_BY_TYPE: ModuleImg = {
 }
 
 const IMAGE_MAX_WIDTH = '96px'
-export function ModuleDiagram(props: ModuleDiagramProps): JSX.Element {
+export function ModuleDiagram(props: ModuleDiagramProps): ReactNode {
   const model = MODULE_IMG_BY_TYPE[props.type][props.model]
   return (
     <img

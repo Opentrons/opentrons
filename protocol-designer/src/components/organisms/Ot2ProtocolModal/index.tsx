@@ -10,6 +10,7 @@ import {
 
 import { getMainPagePortalEl } from '../Portal'
 import styles from './ot2protocolmodal.module.css'
+import type { ReactNode } from 'react'
 
 interface Props {
   onClose: () => void
@@ -19,7 +20,7 @@ interface Props {
 export function Ot2ProtocolModal({
   onClose,
   onOpenOt2Designer,
-}: Props): JSX.Element {
+}: Props): ReactNode {
   const { t } = useTranslation('modal')
 
   return createPortal(

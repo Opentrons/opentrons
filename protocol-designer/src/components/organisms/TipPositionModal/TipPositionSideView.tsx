@@ -14,6 +14,8 @@ import BOTTOM_LAYER from '/protocol-designer/assets/images/tip_side_bottom_layer
 import MID_LAYER from '/protocol-designer/assets/images/tip_side_mid_layer.svg'
 import TOP_LAYER from '/protocol-designer/assets/images/tip_side_top_layer.svg'
 
+import type { ReactNode } from 'react'
+
 const WELL_HEIGHT_PIXELS = 78
 const WELL_WIDTH_PIXELS = 80
 const PIXEL_DECIMALS = 2
@@ -29,7 +31,7 @@ interface TipPositionAllVizProps {
 
 export function TipPositionSideView(
   props: TipPositionAllVizProps
-): JSX.Element {
+): ReactNode {
   const { mmFromBottom, xPosition, wellDepthMm, xWidthMm } = props
   const { t } = useTranslation('application')
   const fractionOfWellHeight =

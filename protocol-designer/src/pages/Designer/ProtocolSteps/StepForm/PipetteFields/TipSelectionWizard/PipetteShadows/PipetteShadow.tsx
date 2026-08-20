@@ -17,6 +17,8 @@ import { PipetteLabel } from './PipetteLabel'
 import { SingleChannelOT2Shadow } from './SingleChannelOT2Shadow'
 import { SingleChannelFlexShadow } from './SingleChannelShadow'
 
+import type { ReactNode } from 'react'
+
 import type { Channels } from '@opentrons/components'
 import type {
   CoordinateTuple,
@@ -30,7 +32,7 @@ import type { InaccessibleReason, PipetteShadowProps } from '../types'
 
 const SHADOW_BY_ROBOT_TYPE_AND_CHANNELS: Record<
   RobotType,
-  Record<Channels, (props: PipetteShadowProps) => JSX.Element>
+  Record<Channels, (props: PipetteShadowProps) => ReactNode>
 > = {
   [OT2_ROBOT_TYPE]: {
     1: SingleChannelOT2Shadow,
@@ -62,7 +64,7 @@ export function PipetteShadow(props: {
   enclosingViewbox: string | null
   nozzles: NozzleConfigurationStyle
   rotate?: boolean
-}): JSX.Element {
+}): ReactNode {
   const {
     pipetteSpec,
     slotPosition,

@@ -68,7 +68,7 @@ import {
 } from './utils'
 import { VacuumDockLabwareRenders } from './VacuumDockLabwareRenders'
 
-import type { ComponentProps, Dispatch, SetStateAction } from 'react'
+import type { ComponentProps, Dispatch, ReactNode, SetStateAction } from 'react'
 import type { ThermocyclerVizProps } from '@opentrons/components'
 import type {
   AddressableAreaName,
@@ -103,7 +103,7 @@ interface DeckSetupDetailsProps extends DeckSetupTerminalIdType {
   selectedZoomInSlot?: DeckSlotId
 }
 
-export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
+export function DeckSetupDetails(props: DeckSetupDetailsProps): ReactNode {
   const {
     activeDeckSetup,
     addEquipment,

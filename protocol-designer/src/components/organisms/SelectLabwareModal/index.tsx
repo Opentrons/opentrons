@@ -82,7 +82,7 @@ import { getMainPagePortalEl } from '../Portal'
 import { SelectCustomLabware } from './SelectCustomLabware'
 import { SelectLabware } from './SelectLabware'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '/protocol-designer/labware-defs'
 import type { CategoryExpand } from '/protocol-designer/pages/Designer/DeckSetup/DeckSetupToolbox'
@@ -111,7 +111,7 @@ export interface LabwareInfo {
 
 export function SelectLabwareModal(
   props: SelectLabwareModalProps
-): JSX.Element {
+): ReactNode {
   const { slot, onClose, onConfirm, slotFull, moduleHasLabware = false } = props
   const { t } = useTranslation(['starting_deck_state', 'shared'])
   const robotType = useSelector(getRobotType)

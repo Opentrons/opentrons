@@ -4,7 +4,7 @@ import { DECK_CONTROLS_STYLE_BASE } from '/protocol-designer/pages/Designer/Deck
 
 import styles from './tipselectionwizard.module.css'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { CoordinateTuple } from '@opentrons/shared-data'
 import type { LabwareOnDeck } from '/protocol-designer/step-forms'
 
@@ -17,7 +17,7 @@ interface TiprackSelectHoverProps {
 
 export function TiprackSelectHover(
   props: TiprackSelectHoverProps
-): JSX.Element {
+): ReactNode {
   const slotFill = <div className={styles.slot_fill} />
 
   const { slotPosition, setHover, labware, onClick } = props

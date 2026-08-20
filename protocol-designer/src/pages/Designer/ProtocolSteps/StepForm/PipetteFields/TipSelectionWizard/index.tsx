@@ -23,7 +23,7 @@ import {
   getIsTiprackSelectableAndValid,
 } from './utils'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   NozzleConfigurationStyle,
   PrimaryNozzleConfigurationStyle,
@@ -54,7 +54,7 @@ interface TipSelectionWizardProps {
 
 export function TipSelectionWizard(
   props: TipSelectionWizardProps
-): JSX.Element {
+): ReactNode {
   const {
     setShowTipSelectionModal,
     formTiprackUri,

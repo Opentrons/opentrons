@@ -25,6 +25,7 @@ import {
   getEntireWellSelection,
 } from './utils'
 
+import type { ReactNode } from 'react'
 import type { TFunction } from 'i18next'
 import type { DropdownOption } from '@opentrons/components'
 import type {
@@ -44,7 +45,7 @@ interface PipetteNozzleSelectorProps {
 
 export function PipetteNozzleSelector(
   props: PipetteNozzleSelectorProps
-): JSX.Element {
+): ReactNode {
   const { pipetteSpecs, propsForFields, robotType } = props
   const { channels, displayName } = pipetteSpecs
   const { t } = useTranslation('protocol_steps')

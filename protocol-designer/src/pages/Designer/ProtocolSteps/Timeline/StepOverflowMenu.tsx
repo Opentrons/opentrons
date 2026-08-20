@@ -29,12 +29,7 @@ import { OPEN_STEP_DETAILS_EVENT } from '../../../../analytics/constants'
 import { OVERFLOW_MENU_POSITION_ADJUSTMENT } from '../../../../constants'
 
 import type { ThunkDispatch } from 'redux-thunk'
-import type {
-  Dispatch,
-  MouseEvent,
-  MutableRefObject,
-  SetStateAction,
-} from 'react'
+import type { Dispatch, MouseEvent, MutableRefObject, ReactNode, SetStateAction } from 'react'
 import type { AnalyticsEvent } from '/protocol-designer/analytics/mixpanel'
 import type { BaseState } from '/protocol-designer/types'
 
@@ -50,7 +45,7 @@ interface StepOverflowMenuProps {
   sidebarWidth: number // adjust the position of the overflow menu
 }
 
-export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
+export function StepOverflowMenu(props: StepOverflowMenuProps): ReactNode {
   const {
     stepId,
     menuRootRef,
