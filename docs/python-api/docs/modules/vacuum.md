@@ -35,9 +35,55 @@ A deck stack consists of various collars, internal spacers, and well plates. The
 
 ### Staging collars
 
-You can store a short or tall collar on the manifold deck adapter (slot A4) using [`load_adapter_to_doc()`][opentrons.protocol_api.VacuumModuleContext.load_adapter_to_doc]. 
+You can store a short collar (`opentrons_vacuum_manifold_collar_short`) or tall collar (`opentrons_vacuum_manifold_collar_tall`) on the dock side (A4) of the deck adapter using [`load_adapter_to_doc()`][opentrons.protocol_api.VacuumModuleContext.load_adapter_to_dock]. For example:
 
+```python
+collar = vacuum.load_adapter_to_doc("opentrons_vacuum_manifold_collar_short")
+```
 
+### Assembling collection stacks with spacers
+
+For collecting filtrate, you can place an internal spacer on the vacuum base to raise the collection plate closer to the filter plate. Reducing the gap between the source (filter plate) and destination (well plate) helps reduce droplet deflection and cross-well contamination. Spacer types and load names are provided below:
+
+* **Short spacer (27 mm):** `opentrons_vacuum_manifold_spacer_short`
+* **Tall spacer (34 mm):** `opentrons_vacuum_manifold_spacer_tall`
+
+Load spacers and sample collection plates to the module as shown here:
+
+```python
+# Loads a spacer onto the vacuum base piece
+spacer = vacuum.load_adapter("opentrons_vacuum_manifold_spacer_short")
+
+# Loads a collection well plate on the spacer
+collection_plate = spacer.load_labware(
+    name="corning_96_wellplate_360ul_flat",
+    label="Collection Wellplate",
+)
+
+# Loads a sample filter plate on the staged collar
+filter_plate = collar.load_labware(
+    name="thermoscientificnunc_96_wellplate_1000ul_filter",
+    label="Sample Filter Plate",
+)
+```
+### Moving collars and plates
+
+The collars and spacers are compatible with the Gripper. You can use the gripper to stack well plates on the collars and spacers and move the stack to the dock or onto the vacuum base to put samples under vacuum.
+
+```python
+protocol.move_labware(collar, new_location=vacuum, use_gripper=True)
+```
+
+After depressurizing the system, you can use the Gripper to return a stack to the dock using [`move_to_dock()`][opentrons.protocol_api.VacuumModuleContext.move_to_dock]:
+
+```python
+vacuum.move_to_doc(collar, use_gripper=True)
+```
+
+!!! note
+    You cannot move labware on or off the vacuum module while the pump is running or the system is under vacuum pressure. You must return the system to return to atmospheric pressure (0 mbar) before moving labware manually or with the Gripper.
+
+## Placeholder for stack and gripper
 
 
 ## Vacuum operations
