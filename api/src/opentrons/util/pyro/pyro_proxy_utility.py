@@ -8,7 +8,7 @@ import Pyro5.api
 
 from opentrons.util.pyro.pyro_client_async_adapter import _ACPO, AsyncClientPyroObject
 
-_RUN_PROXY_TIMEOUT = 30  # seconds
+_RUN_PROXY_TIMEOUT = 60  # seconds
 
 
 async def wait_for_proxy(

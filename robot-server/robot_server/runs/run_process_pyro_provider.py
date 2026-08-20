@@ -33,7 +33,7 @@ _RUN_PROCESS_LIMIT = 1  # Number of run processes to keep qeueued
 _SIMULATING_PROCESS_LIMIT = 1  # Number of simulation processes to keep qeueued
 
 
-_RUN_PROXY_TIMEOUT = 30  # seconds
+_RUN_PROCESS_TIMEOUT = 60  # seconds
 _RUN_PROCESS_TERMINATE_TIMEOUT = 10  # seconds
 
 
@@ -191,14 +191,14 @@ class RunProcessPyroProvider:
     ) -> List[_RunProcess]:
         """Validate that the process registries have processes that can be used.
 
-        If `simulator` sprovided, this will validate that there is a simulation process available.
+        If `simulator` is provided, this will validate that there is a simulation process available.
         Otherwise, it will validate that a normal run process is available.
         """
         if simulator:
             if self._simulating_run_processes is None:
                 # There are no run processes yet, try again throughout the timeout period and raise if one never appears
                 start_time = time.monotonic()
-                while time.monotonic() - start_time < _RUN_PROXY_TIMEOUT:
+                while time.monotonic() - start_time < _RUN_PROCESS_TIMEOUT:
                     if self._simulating_run_processes is not None:
                         # Simulation process is ready
                         return self._simulating_run_processes
@@ -209,7 +209,7 @@ class RunProcessPyroProvider:
             if self._run_processes is None:
                 # There are no run processes yet, try again throughout the timeout period and raise if one never appears
                 start_time = time.monotonic()
-                while time.monotonic() - start_time < _RUN_PROXY_TIMEOUT:
+                while time.monotonic() - start_time < _RUN_PROCESS_TIMEOUT:
                     if self._run_processes is not None:
                         # Run process is ready
                         return self._run_processes

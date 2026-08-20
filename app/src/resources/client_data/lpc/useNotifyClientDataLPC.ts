@@ -17,7 +17,7 @@ export function useNotifyClientDataLPC(
     AxiosError
   > = {}
 ): UseQueryResult<ClientDataResponse<ClientDataLPC>, AxiosError> {
-  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
+  const { refetch, queryOptionsNotify } = useNotifyDataReady({
     topic: `robot-server/clientData/${KEYS.LPC}`,
     options,
   })
@@ -26,15 +26,13 @@ export function useNotifyClientDataLPC(
     KEYS.LPC,
     queryOptionsNotify
   )
+  const { refetch: refetchQuery } = httpQueryResult
 
   useEffect(() => {
-    if (shouldRefetch) {
-      void httpQueryResult.refetch()
+    if (refetch > 0) {
+      void refetchQuery()
     }
-
-    // refetch is stable, the result object is not
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shouldRefetch])
+  }, [refetch, refetchQuery])
 
   return httpQueryResult
 }
