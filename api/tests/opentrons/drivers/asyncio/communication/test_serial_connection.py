@@ -5,7 +5,9 @@ import mock
 import pytest
 from _pytest.fixtures import SubRequest
 from mock import AsyncMock, call
-from serial.serialutil import SerialException as PySerialSerialException
+from serial.serialutil import (  # type: ignore[import-untyped]
+    SerialException as PySerialSerialException,
+)
 
 from opentrons.drivers.asyncio.communication.async_serial import AsyncSerial
 from opentrons.drivers.asyncio.communication.errors import (
