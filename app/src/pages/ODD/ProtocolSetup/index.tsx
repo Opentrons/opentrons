@@ -749,7 +749,6 @@ function PrepareToRun({
           runId={runId}
           setShowConfirmCancelRunModal={setShowConfirmCancelModal}
           isActiveRun={false}
-          protocolId={protocolId}
         />
       ) : null}
     </>
