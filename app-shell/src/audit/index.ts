@@ -1,5 +1,6 @@
 import { mkdir, rmdir } from 'fs/promises'
 import path from 'path'
+import { dialog } from 'electron'
 
 import {
   logPeriodDownloadCanceled,
@@ -20,7 +21,11 @@ import { fetchToFile } from '../http'
 import { buildRobotHttpUrl } from '../robot-update/httpUrl'
 import { getSerialPortHttpAgent } from '../usb'
 
-import type { BrowserWindow } from 'electron'
+import type {
+  BrowserWindow,
+  OpenDialogOptions,
+  OpenDialogReturnValue,
+} from 'electron'
 import type {
   DownloadAuditLogPayload,
   DownloadAuditLogsPayload,
@@ -81,12 +86,20 @@ async function downloadAuditLog(
 
   if (!directory) {
     const defaultDirectory = config.audit.logDirectory
-    const dialogOptions = {
+    const dialogOptions: OpenDialogOptions = {
       defaultPath: defaultDirectory ?? '',
+      buttonLabel: 'Save',
       properties: ['openDirectory', 'createDirectory'],
     }
-    const filePaths = await showOpenDirectoryDialog(mainWindow, dialogOptions)
-    directory = filePaths[0]?.toString()
+
+    const filePaths = await dialog
+      .showOpenDialog(mainWindow, dialogOptions)
+      .then((result: OpenDialogReturnValue) => {
+        return result.canceled ? [] : result.filePaths
+      })
+
+    directory = filePaths[0]
+
     if (!directory) {
       dispatch(logPeriodDownloadCanceled({ logPeriodId }) as Action)
       return false
@@ -140,12 +153,19 @@ async function downloadAuditLogs(
 
   if (!directory) {
     const defaultDirectory = config.audit.logDirectory
-    const dialogOptions = {
+    const dialogOptions: OpenDialogOptions = {
       defaultPath: defaultDirectory ?? '',
+      buttonLabel: 'Save',
       properties: ['openDirectory', 'createDirectory'],
     }
-    const filePaths = await showOpenDirectoryDialog(mainWindow, dialogOptions)
-    directory = filePaths[0]?.toString()
+
+    const filePaths = await dialog
+      .showOpenDialog(mainWindow, dialogOptions)
+      .then((result: OpenDialogReturnValue) => {
+        return result.canceled ? [] : result.filePaths
+      })
+
+    directory = filePaths[0]
   }
 
   const folderName =
