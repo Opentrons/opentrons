@@ -8,23 +8,77 @@ Opentrons recommends that you follow the safe use specifications listed in this 
 
 The Vacuum Module is designed for use only as specified. Review all safety information before installing or operating this module. If the equipment is used in a manner not specified by Opentrons, the protection provided by the module may be impaired. The Vacuum Module must be operated by trained personnel and is designed strictly for laboratory research and non-in-vitro diagnostic analyses.
 
-## Standards compliance
+## Regulatory compliance and standards
 
-The Vacuum Module has been tested and found to be in compliance with all applicable requirements of the following standards.
+The Vacuum Module has been tested and and evaluated found to meet international and regional safety and electromagnetic compatibility (EMC) standards for laboratory electrical equipment.
 
-### Safety
+### Safety standards
 
-| Rule ID | Title |
-|----|----|
-| <span style="color: red;">**TBD**</span> | |
-| | |
+The Vacuum Module complies with the following electrical and safety requirements for measurement, control, and laboratory use.
+
+| Country/Region | Complies With |
+|:----|:----|
+| **International** | IEC 61010-1: Safety Requirements for Electrical Equipment for Measurement, Control, and Laboratory Use - Part 1: General Requirements. |
+| **Canada** | CSA C22.2 No. 61010-1 |
+| **United States** | UL 61010-1 |
 
 ### Electromagnetic compatibility
 
-| Rule ID | Title |
-|----|----|
-| <span style="color: red;">**TBD**</span> | |
-| | |
+The Vacuum Module complies with harmonized and regional EMC standards governing emissions and immunity in commercial and industrial laboratory environments.
+
+<table>
+  <thead>
+    <tr>
+      <th>Country/Region</th>
+      <th>Complies With</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>International</strong></td>
+      <td>IEC 61000-3-3: Limitation of voltage changes, voltage fluctuations, and flicker in public low-voltage supply systems.</td>
+    </tr>
+    <tr>
+      <td><strong>Australia &amp; New Zealand (RCM)</strong></td>
+      <td>AS/NZS CISPR 32</td>
+    </tr>
+    <tr>
+      <td><strong>Canada (ISED)</strong></td>
+      <td>ICES-003, Class A</td>
+    </tr>
+    <tr>
+      <td><strong>European Economic Area (EEA)</strong></td>
+      <td>
+        <ul>
+          <li>EN IEC 61326-1: Electrical equipment for measurement, control, and laboratory use – EMC requirements.</li>
+          <li>EN IEC 61000-3-2: Limits for harmonic current emissions.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Japan (VCCI)</strong></td>
+      <td>VCCI CISPR 32: Class A standard for information technology equipment.</td>
+    </tr>
+    <tr>
+      <td><strong>South Korea (KC)</strong></td>
+      <td>
+        <ul>
+          <li>KS C 9610-6-2: Immunity for industrial environments.</li>
+          <li>KS C 9610-6-4: Emissions for industrial environments.</li>
+          <li>KS C 9610-3-2: Harmonic current emissions.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>United Kingdom (BSI)</strong></td>
+      <td>BS EN 61326-1</td>
+    </tr>
+    <tr>
+      <td><strong>United States (FCC)</strong></td>
+      <td>FCC 47 CFR Part 15 Subpart B: Class A digital device limits for commercial environments.</td>
+    </tr>
+  </tbody>
+</table>
 
 ### Hazardous substances
 
