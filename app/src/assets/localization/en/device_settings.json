@@ -246,7 +246,7 @@
   "estop_pressed": "E-stop pressed",
   "ethernet": "Ethernet",
   "ethernet_connection_description": "Connect an Ethernet cable to the back of the robot and a network switch or hub.",
-  "exit": "exit",
+  "exit": "Exit",
   "factory_mode": "Factory Mode",
   "factory_reset": "Factory Reset",
   "factory_reset_description": "Resets all settings. You’ll have to redo initial setup before using the robot again.",

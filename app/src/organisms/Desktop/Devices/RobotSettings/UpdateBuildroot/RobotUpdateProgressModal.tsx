@@ -13,7 +13,7 @@ import {
   JUSTIFY_FLEX_END,
   LegacyStyledText,
   Modal,
-  NewPrimaryBtn,
+  PrimaryButton,
   SPACING,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
@@ -183,13 +183,13 @@ function RobotUpdateProgressFooter({
       justifyContent={JUSTIFY_FLEX_END}
       padding={`${SPACING.spacing16} 0`}
     >
-      <NewPrimaryBtn
+      <PrimaryButton
         onClick={closeRobotUpdate}
         marginRight={SPACING.spacing12}
         css={FOOTER_BUTTON_STYLE}
       >
         {t('exit')}
-      </NewPrimaryBtn>
+      </PrimaryButton>
     </Flex>
   )
 }

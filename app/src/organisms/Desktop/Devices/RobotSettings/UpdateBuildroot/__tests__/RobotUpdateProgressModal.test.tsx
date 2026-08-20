@@ -133,7 +133,7 @@ describe('DownloadUpdateModal', () => {
     })
     render(props)
 
-    const exitButton = screen.getByText('exit')
+    const exitButton = screen.getByRole('button', { name: 'Exit' })
 
     expect(
       screen.getByText('Robot software successfully updated')
@@ -158,7 +158,7 @@ describe('DownloadUpdateModal', () => {
     }
 
     render(props)
-    const exitButton = screen.getByText('exit')
+    const exitButton = screen.getByRole('button', { name: 'Exit' })
 
     expect(screen.getByText('test error')).toBeInTheDocument()
     fireEvent.click(exitButton)
