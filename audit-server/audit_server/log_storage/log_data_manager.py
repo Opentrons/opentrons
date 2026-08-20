@@ -18,7 +18,7 @@ from server_utils.keys.key_server import Client as KeyClient
 from server_utils.keys.key_server import SignMessageData
 
 from . import constants
-from .models import LogPeriodDetails, LogPeriodSummary
+from .models import LogPeriodDetails, LogPeriodSummary, TotalUsageSummary
 from .store import (
     LogStore,
     NoActivePeriodError,
@@ -114,6 +114,15 @@ class LogDataManager:
         if isinstance(details, Exception):
             raise details
         return details
+
+    def get_total_fs_usage(self) -> TotalUsageSummary:
+        """Get a summary of filesystem usage by stored logs."""
+        periods = self.get_log_periods()
+        details = [self.get_log_period_details(period.id) for period in periods]
+        return TotalUsageSummary(
+            totalUsageBytes=sum([period.totalSizeBytes for period in details]),
+            totalPeriods=len(details),
+        )
 
     def create_deletion_key(self, period_id: str) -> str:
         """Mint a new one-time deletion key linked to a log period.

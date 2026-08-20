@@ -169,3 +169,9 @@ class RobotServerSettings(BaseSettings):
             "The maximum number of uploaded data files to allow before auto-deleting old ones."
         ),
     )
+
+    run_start_limit_free_space_mb: int = Field(
+        default=2048,
+        gt=0,
+        description="The minimum free space required to launch a run.",
+    )

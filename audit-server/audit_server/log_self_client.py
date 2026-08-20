@@ -28,6 +28,9 @@ from server_utils.audit.audit_server import (
 from server_utils.audit.audit_server import (
     SubmitAuditLogSuccessData as SUSuccessData,
 )
+from server_utils.audit.audit_server import (
+    TotalUsageSummaryData as SUTotalUsageSummaryData,
+)
 
 from .log_ingest.models import AuditLogMessage
 from audit_server.log_storage.log_data_manager import LogDataManager
@@ -89,4 +92,8 @@ class LocalClient(SUClient):
 
     @override
     async def get_current_log_period(self) -> SULogPeriodsData:
+        raise NotImplementedError("Do not use the self client for this")
+
+    @override
+    async def get_filesystem_usage_summary(self) -> SUTotalUsageSummaryData:
         raise NotImplementedError("Do not use the self client for this")

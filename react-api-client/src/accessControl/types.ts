@@ -147,6 +147,7 @@ type AuditLogAction =
   | 'attach_pipette_left'
   | 'attach_pipette_right'
   | 'create_protocol'
+  | 'create_protocol_analysis'
   | 'launching_error_recovery'
   | 'resume_run_from_recovery'
   | 'create_run'

@@ -1,6 +1,5 @@
 """Testing suite for the RobotServerPyroResource."""
 
-import asyncio
 import inspect
 import socket
 import threading
@@ -25,11 +24,9 @@ from opentrons.protocol_engine.resources.file_provider import (
     FileProvider,
     UserDefinedCSVCmdFileNameMetadata,
 )
-from opentrons.util.pyro.pyro_client_async_adapter import (
-    AsyncClientPyroObject,
-    ClientPyroFunctionWrapper,
-)
+from opentrons.util.pyro.pyro_client_async_adapter import ClientPyroFunctionWrapper
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
+from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
 from opentrons_shared_data.data_files import DataFileInfo, MimeType
 from opentrons_shared_data.robot.types import RobotTypeEnum
 from server_utils.fastapi_utils.app_state import AppState
@@ -133,21 +130,10 @@ async def _host_pyro_nameserver_and_ot3api(
     # Client-side requests below
     register_hardware_types()
     name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
-    ns = pyro.locate_ns()
-
-    retries_counter = 0
-    while ns.count() < 3:
-        # Wait and try again, the resource isnt registered yet
-        await asyncio.sleep(0.01)
-        retries_counter += 1
-        if retries_counter > 10:
-            # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
-
-    uri = pyro.resolve(uri="PYRONAME:OT3API")
-    ot3_proxy = pyro.Proxy(uri)  # type: ignore
-    ot3_async = AsyncClientPyroObject(ot3_proxy)
-    rs_async = resource_utilities.get_pyro_resource()
+    ot3_async = await wait_for_proxy(proxy_name="OT3API", broadcast_mode=False)
+    if ot3_async is None:
+        raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
+    rs_async = await resource_utilities.get_pyro_resource()
 
     return (ot3_async, rs_async)
 

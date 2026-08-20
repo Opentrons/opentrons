@@ -18,7 +18,9 @@ import { getFileUploadMessages } from '/protocol-designer/load-file/selectors'
 
 import { useFileUploadModalContents } from './utils'
 
-export function FileUploadMessagesModal(): JSX.Element | null {
+import type { ReactNode } from 'react'
+
+export function FileUploadMessagesModal(): ReactNode {
   const message = useSelector(getFileUploadMessages)
   const dispatch = useDispatch()
   const { t } = useTranslation('shared')

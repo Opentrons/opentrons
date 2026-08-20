@@ -1,6 +1,7 @@
 import { useId, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import {
@@ -8,14 +9,19 @@ import {
   COLORS,
   InputField,
   Modal,
+  POSITION_FIXED,
   PrimaryButton,
   SecondaryButton,
+  SPACING,
   StyledText,
+  SUCCESS_TOAST,
+  Toast,
 } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
+import { logOut } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
@@ -31,6 +37,8 @@ import type { ComponentProps, Dispatch, SetStateAction } from 'react'
 interface LoginFormState {
   username: string
   logInPassword: string
+  usernameRequiredError: string | null
+  passwordRequiredError: string | null
   error: string | null
 }
 
@@ -43,13 +51,19 @@ interface SetNewPasswordFormState {
 }
 
 type LoginModalScreen =
-  | { kind: 'login'; formData: LoginFormState }
+  | {
+      kind: 'login'
+      formData: LoginFormState
+      passwordResetSuccess?: boolean
+    }
   | { kind: 'forgotPassword'; formData: LoginFormState }
   | { kind: 'setNewPassword'; formData: SetNewPasswordFormState }
 
 const INITIAL_LOGIN_FORM: LoginFormState = {
   username: '',
   logInPassword: '',
+  usernameRequiredError: null,
+  passwordRequiredError: null,
   error: null,
 }
 
@@ -115,6 +129,7 @@ interface LoginModalImplProps {
 function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const { robotName, uncloseable } = props
   const modal = useModal()
+  const dispatch = useDispatch()
   const host = useHost()
   const { t } = useTranslation()
   const [screen, setScreen] = useState<LoginModalScreen>({
@@ -124,6 +139,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const storeLoginState = useStoreLoginState()
 
   const loginFormId = useId()
+  const passwordResetSuccessToastId = useId()
   const [showRobotCertImportModal, setShowRobotCertImportModal] =
     useState<boolean>(false)
 
@@ -160,8 +176,18 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
     useSetNewPasswordAndSignIn({
       onSuccess: successfulUsername => {
-        modal.resolve({ username: successfulUsername })
-        modal.remove()
+        dispatch(logOut({ robotName }))
+        setScreen({
+          kind: 'login',
+          passwordResetSuccess: true,
+          formData: {
+            username: successfulUsername,
+            logInPassword: '',
+            usernameRequiredError: null,
+            passwordRequiredError: null,
+            error: null,
+          },
+        })
       },
       onError: message => {
         updateSetNewPasswordFormData(setScreen, { error: message })
@@ -172,7 +198,31 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
     event.preventDefault()
     if (screen.kind !== 'login') return
     const { username, logInPassword } = screen.formData
-    submitPassword(username, logInPassword)
+    const trimmedUsername = username.trim()
+    const trimmedPassword = logInPassword.trim()
+    const usernameRequiredError =
+      trimmedUsername === ''
+        ? (t('access_control:on_device_login_username_required') as string)
+        : null
+    const passwordRequiredError =
+      trimmedPassword === ''
+        ? (t('access_control:on_device_login_password_required') as string)
+        : null
+
+    if (usernameRequiredError != null || passwordRequiredError != null) {
+      updateLoginFormData(setScreen, {
+        usernameRequiredError,
+        passwordRequiredError,
+        error: null,
+      })
+      return
+    }
+
+    updateLoginFormData(setScreen, {
+      usernameRequiredError: null,
+      passwordRequiredError: null,
+    })
+    submitPassword(trimmedUsername, trimmedPassword)
   }
 
   const validateConfirmPasswordMatch = (
@@ -193,16 +243,11 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   const footer = (() => {
     switch (screen.kind) {
       case 'login': {
-        const { username, logInPassword } = screen.formData
-        const isLoginDisabled =
-          username === '' || logInPassword === '' || isAuthLoading
         return (
           <PrimaryButton
             type="submit"
             form={loginFormId}
-            // todo(mm, 2026-06-02): Instead of outright disabling the submit button
-            // when any fields are missing, we should show errors on those fields.
-            disabled={isLoginDisabled}
+            disabled={isAuthLoading}
           >
             {t('access_control:log_in_link')}
           </PrimaryButton>
@@ -254,62 +299,90 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
   }
 
   return createPortal(
-    <Modal
-      title={t('access_control:desktop_login_modal_header')}
-      onClose={uncloseable ? undefined : handleClose}
-      // Above SignRun and other run-header modals (zIndexOverlay: 1000); below
-      // permission toasts that use TOAST_ABOVE_LOGIN_Z_INDEX (10002).
-      zIndexOverlay={10001}
-      footer={<div className={styles.modal_footer_container}>{footer}</div>}
-    >
-      <div className={styles.content_container}>
-        {screen.kind === 'login' ? (
-          <LoginView
-            formId={loginFormId}
-            formData={screen.formData}
-            onSubmit={handleLoginSubmit}
-            onUsernameChange={value => {
-              updateLoginFormData(setScreen, { username: value, error: null })
-            }}
-            onLogInPasswordChange={value => {
-              updateLoginFormData(setScreen, {
-                logInPassword: value,
-                error: null,
-              })
-            }}
-            onForgotPasswordClick={() => {
-              setScreen({ kind: 'forgotPassword', formData: screen.formData })
-            }}
-          />
-        ) : screen.kind === 'forgotPassword' ? (
-          <ForgotPasswordView />
-        ) : (
-          <SetNewPasswordView
-            formData={screen.formData}
-            onNewPasswordChange={value => {
-              updateSetNewPasswordFormData(setScreen, {
-                newPassword: value,
-                error: null,
-                confirmPasswordError: null,
-              })
-            }}
-            onConfirmPasswordChange={value => {
-              updateSetNewPasswordFormData(setScreen, {
-                confirmPassword: value,
-                error: null,
-                confirmPasswordError: null,
-              })
-            }}
-            onPasswordFieldBlur={() => {
-              const { newPassword, confirmPassword } = screen.formData
-              if (newPassword !== '' && confirmPassword !== '') {
-                validateConfirmPasswordMatch(screen.formData)
-              }
-            }}
-          />
-        )}
-      </div>
-    </Modal>,
+    <>
+      <Modal
+        title={t('access_control:desktop_login_modal_header')}
+        onClose={uncloseable ? undefined : handleClose}
+        // Above SignRun and other run-header modals (zIndexOverlay: 1000).
+        zIndexOverlay={10001}
+        footer={<div className={styles.modal_footer_container}>{footer}</div>}
+      >
+        <div className={styles.content_container}>
+          {screen.kind === 'login' ? (
+            <LoginView
+              formId={loginFormId}
+              formData={screen.formData}
+              onSubmit={handleLoginSubmit}
+              onUsernameChange={value => {
+                updateLoginFormData(setScreen, {
+                  username: value,
+                  usernameRequiredError: null,
+                })
+              }}
+              onLogInPasswordChange={value => {
+                updateLoginFormData(setScreen, {
+                  logInPassword: value,
+                  passwordRequiredError: null,
+                  error: null,
+                })
+              }}
+              onForgotPasswordClick={() => {
+                setScreen({ kind: 'forgotPassword', formData: screen.formData })
+              }}
+            />
+          ) : screen.kind === 'forgotPassword' ? (
+            <ForgotPasswordView />
+          ) : (
+            <SetNewPasswordView
+              formData={screen.formData}
+              onNewPasswordChange={value => {
+                updateSetNewPasswordFormData(setScreen, {
+                  newPassword: value,
+                  error: null,
+                  confirmPasswordError: null,
+                })
+              }}
+              onConfirmPasswordChange={value => {
+                updateSetNewPasswordFormData(setScreen, {
+                  confirmPassword: value,
+                  error: null,
+                  confirmPasswordError: null,
+                })
+              }}
+              onPasswordFieldBlur={() => {
+                const { newPassword, confirmPassword } = screen.formData
+                if (newPassword !== '' && confirmPassword !== '') {
+                  validateConfirmPasswordMatch(screen.formData)
+                }
+              }}
+            />
+          )}
+        </div>
+      </Modal>
+      {screen.kind === 'login' && screen.passwordResetSuccess === true ? (
+        <Toast
+          id={passwordResetSuccessToastId}
+          message={
+            t('access_control:set_new_password_success', {
+              username: screen.formData.username,
+            }) as string
+          }
+          type={SUCCESS_TOAST}
+          closeButton
+          displayType="desktop"
+          position={POSITION_FIXED}
+          right={SPACING.spacing32}
+          bottom={SPACING.spacing32}
+          onClose={() => {
+            setScreen(prev =>
+              prev.kind === 'login'
+                ? { ...prev, passwordResetSuccess: false }
+                : prev
+            )
+          }}
+        />
+      ) : null}
+    </>,
     getTopPortalEl()
   )
 }
@@ -351,6 +424,7 @@ function LoginView(props: LoginViewProps): JSX.Element {
           title={t('access_control:login_form_username_field')}
           type="text"
           value={formData.username}
+          error={formData.usernameRequiredError ?? undefined}
           onChange={event => {
             onUsernameChange(event.target.value)
           }}
@@ -360,7 +434,7 @@ function LoginView(props: LoginViewProps): JSX.Element {
           title={t('access_control:login_form_password_field')}
           type="password"
           value={formData.logInPassword}
-          error={formData.error ?? undefined}
+          error={formData.passwordRequiredError ?? formData.error ?? undefined}
           onChange={event => {
             onLogInPasswordChange(event.target.value)
           }}

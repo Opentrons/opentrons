@@ -147,6 +147,8 @@ class PressureControlTunings:
     k_velocity: float
     k_holding: float
     tolerance_error: float
+    approach_band: float
+    slew_end_fraction: float
 
 
 @dataclass

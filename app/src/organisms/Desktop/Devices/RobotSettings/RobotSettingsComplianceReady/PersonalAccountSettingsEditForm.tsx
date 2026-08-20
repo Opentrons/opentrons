@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 
 import { PrimaryButton, SecondaryButton } from '@opentrons/components'
 
-import { mapAuthUserMutationError } from './userAccount/mapAuthUserMutationError'
+import { mapAuthUserMutationError } from '/app/resources/auth/mapAuthUserMutationError'
+
 import styles from './userAccount/userAccountForm.module.css'
 import { UserAccountIdentityFormFields } from './userAccount/UserAccountIdentityFormFields'
 import { UserAccountPasswordFormFields } from './userAccount/UserAccountPasswordFormFields'

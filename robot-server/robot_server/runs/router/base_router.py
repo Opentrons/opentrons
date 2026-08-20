@@ -110,6 +110,8 @@ from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
+from robot_server.disk_monitor.dependencies import get_disk_monitor
+from robot_server.disk_monitor.monitor import DiskMonitor
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
 from robot_server.hardware import (
     HardwareStateStore,
@@ -211,6 +213,14 @@ class CurrentStateLinks(BaseModel):
     )
 
 
+class NoSpaceForRun(ErrorDetails):
+    """An error if there is not enough space on the robot to start a new run."""
+
+    id: Literal["NoSpaceForRun"] = "NoSpaceForRun"
+    title: str = "No Space For Run"
+    errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
+
+
 async def get_run_data_from_url(
     runId: str,
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
@@ -271,6 +281,7 @@ async def create_run(  # noqa: C901
     notify_publishers: Annotated[Callable[[], None], Depends(get_pe_notify_publishers)],
     access_control_status: Annotated[bool, Depends(get_access_control_status)],
     audit_client: Annotated[AuditClient, Depends(get_audit_client)],
+    disk_monitor: Annotated[DiskMonitor, Depends(get_disk_monitor)],
     request_body: Optional[RequestModel[RunCreate]] = None,
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Create a new run.
@@ -293,6 +304,7 @@ async def create_run(  # noqa: C901
         access_control_status: Whether access control (Compliance Ready Software) is
             currently enabled on the robot.
         audit_client: Client to get log period info from
+        disk_monitor: Disk monitor for checking if we have enough space.
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None
     offsets = request_body.data.labwareOffsets if request_body is not None else []
@@ -344,6 +356,13 @@ async def create_run(  # noqa: C901
     # to pass to `RunDataManager.create`. Right now, runs may be deleted
     # even if a new create is unable to succeed due to a conflict
     run_auto_deleter.make_room_for_new_run()
+
+    if disk_monitor.is_disk_space_below_run_start_limit() and access_control_status:
+        log_line = f"Disk free space is {disk_monitor.get_available_disk_space_mb()}MB which is below the limit for starting a run."
+        log.error(log_line)
+        raise NoSpaceForRun(detail=log_line).as_error(
+            status.HTTP_507_INSUFFICIENT_STORAGE
+        )
 
     try:
         run_data = await run_data_manager.create(

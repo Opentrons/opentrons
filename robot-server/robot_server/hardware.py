@@ -739,7 +739,7 @@ async def _initialize_hardware_api(
     try:
         if should_use_ot3():
             if ff.hardware_subprocess_enabled():
-                hardware = identify_hardware_process()
+                hardware = await identify_hardware_process()
                 _hw_subprocess_accessor.set_on(app_state, hardware)
             else:
                 hardware = await _initialize_ot3_robot(
