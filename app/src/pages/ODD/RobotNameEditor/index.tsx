@@ -311,15 +311,9 @@ export function RobotNameEditor(): JSX.Element {
           </Flex>
 
           <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
-            <Controller
-              control={control}
-              name="newRobotName"
-              render={({ field }) => (
-                <AlphanumericKeyboard
-                  inputElementRef={inputElementRef}
-                  keyboardRef={keyboardRef}
-                />
-              )}
+            <AlphanumericKeyboard
+              inputElementRef={inputElementRef}
+              keyboardRef={keyboardRef}
             />
           </Flex>
         </>
