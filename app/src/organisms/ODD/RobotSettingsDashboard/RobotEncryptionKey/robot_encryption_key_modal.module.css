@@ -14,6 +14,7 @@
 
 .password_container {
   display: flex;
+  position: relative;
   overflow: hidden;
   width: 100%;
   height: calc(var(--spacing-16) * 2 + 40px);
@@ -26,11 +27,11 @@
 
 .last_password {
   position: absolute;
-  animation: fade-out 0.2s forwards ease-in;
+  animation: fade-out 0.2s ease-in forwards;
 }
 
 .password {
-  animation: fade-in 0.2s forwards ease-in;
+  animation: fade-in 0.2s 0.2s ease-out both;
 }
 
 @keyframes fade-out {
