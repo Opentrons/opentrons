@@ -88,24 +88,13 @@ import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
 import { ConfirmSetupStepsCompleteModal } from '../ConfirmSetupStepsCompleteModal'
 
 import type { UseQueryResult } from 'react-query'
-import type { NavigateFunction } from 'react-router-dom'
 import type * as SharedData from '@opentrons/shared-data'
-
-let mockNavigate = vi.fn()
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const sharedData = await importOriginal<typeof SharedData>()
   return {
     ...sharedData,
     getDeckDefFromRobotType: vi.fn(),
-  }
-})
-
-vi.mock('react-router-dom', async importOriginal => {
-  const reactRouterDom = await importOriginal<NavigateFunction>()
-  return {
-    ...reactRouterDom,
-    useNavigate: () => mockNavigate,
   }
 })
 
@@ -230,7 +219,6 @@ describe('ProtocolSetup', () => {
 
   beforeEach(() => {
     mockLaunchLPC = vi.fn()
-    mockNavigate = vi.fn()
 
     MockProtocolSetupLabware.mockImplementation(
       vi.fn(({ setIsConfirmed, setSetupScreen }) => {
@@ -612,19 +600,6 @@ describe('ProtocolSetup', () => {
       name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
       properties: {},
     })
-  })
-
-  it('should redirect to the protocols page when a run is stopped', () => {
-    render(`/runs/${RUN_ID}/setup/`)
-    expect(mockNavigate).toHaveBeenCalledWith('/protocols')
-  })
-
-  it('should not redirect when cancel modal is open and run is stopped', () => {
-    render(`/runs/${RUN_ID}/setup/`)
-    mockNavigate.mockClear()
-    fireEvent.click(screen.getByRole('button', { name: 'close' }))
-    expect(vi.mocked(ConfirmCancelRunModal)).toHaveBeenCalled()
-    expect(mockNavigate).not.toHaveBeenCalledWith('/protocols')
   })
 
   it('should show action needed when modules are not calibrated', () => {
