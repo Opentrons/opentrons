@@ -157,4 +157,7 @@ const Header = styled.div`
   background-color: ${COLORS.white};
   position: ${POSITION_STICKY};
   top: 0;
+  overflow: hidden;
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
 `
