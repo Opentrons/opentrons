@@ -57,6 +57,7 @@ dev = [
     "tavern>=3.0.2",
     "requests==2.33.*",
     "python-box>=6.1.0",
+    "watchfiles>=1.2.0,<2",
 ]
 
 [tool.ruff.lint]
