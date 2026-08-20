@@ -58,6 +58,10 @@ class Backend:
         settings_store: SettingsStore,
         send_audit_log: SendAuditLog,
     ) -> None:
+        self._user_store = user_store
+        self._settings_store = settings_store
+        self._token_store = _TokenStore()
+
         def get_token_expires_in(request: oauthlib.common.Request) -> int:
             idle_logout_setting = settings_store.get_settings().idleLogout
             return int(idle_logout_setting)
@@ -66,7 +70,7 @@ class Backend:
         # grant type.
         self._inner_backend = oauthlib.oauth2.LegacyApplicationServer(
             _RequestValidator(
-                _TokenStore(),
+                self._token_store,
                 user_store,
                 settings_store,
                 lambda: datetime.now(tz=UTC),
@@ -452,7 +456,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             refresh_token, now=self.__get_now()
         )
         assert token is not None
-        return sorted(s.api_name for s in token.scopes)
+        return sorted(s.api_name for s in self.__get_effective_token_scopes(token))
 
     @override
     @pydantic.validate_call(config=_validate_call_config)
@@ -478,11 +482,33 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             # except ot_fullname, which is custom to us. if you add other custom fields,
             # please prefix them with ot-.
             return {
-                "scope": serialize_scopes(found_access_token.scopes),
+                "scope": serialize_scopes(
+                    self.__get_effective_token_scopes(found_access_token)
+                ),
                 "username": found_access_token.username,
                 "ot_fullname": found_access_token.fullname,
                 # "active": True is set implicitly by oauthlib.
             }
+
+    def __get_effective_token_scopes(self, token: _TokenIssuance) -> set[Scope]:
+        """Return granted token scopes, updated for current settings and user state."""
+        return token.scopes & self.__get_live_scopes_for_username(token.username)
+
+    def __get_live_scopes_for_username(self, username: str) -> set[Scope]:
+        user = self.__user_store.get(username)
+        if user is None:
+            return set()
+
+        settings = self.__settings_store.get_settings()
+        return get_scope_set_of_user(
+            user,
+            settings,
+            must_reset_password(
+                user,
+                self.__get_now(),
+                settings.passwordResetTime,
+            ),
+        )
 
 
 class _CustomInvalidCredentialsError(oauthlib.oauth2.InvalidGrantError):
