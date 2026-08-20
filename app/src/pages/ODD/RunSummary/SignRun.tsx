@@ -23,15 +23,18 @@ import { useCurrentRunId, useNotifyAllRunsQuery } from '/app/resources/runs'
 import styles from './signrun.module.css'
 
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
+import type { DocumentationState } from '@opentrons/react-api-client'
 
 // Above OnDeviceLogin overlay (z-index: 10001) so the toast is visible on login.
 const TOAST_ABOVE_LOGIN_Z_INDEX = 10002
 
 export function SignRun({
   runId,
+  documentationState,
   onSigned,
 }: {
   runId: string
+  documentationState: DocumentationState
   onSigned?: () => void
 }): JSX.Element {
   const { t, i18n } = useTranslation(['access_control', 'shared'])
@@ -74,6 +77,7 @@ export function SignRun({
       async () => await showLoginModal(),
       popToast,
       eatToast,
+      documentationState,
       onSigned
     )
 
@@ -184,34 +188,41 @@ export function SignRun({
   )
 }
 
-const SignRunModalImpl = NiceModal.create((): JSX.Element | null => {
-  const modal = useModal()
-  const runId = useCurrentRunId()
-  const { isFetched } = useNotifyAllRunsQuery({ pageLength: 0 })
+const SignRunModalImpl = NiceModal.create(
+  ({
+    documentationState,
+  }: {
+    documentationState: DocumentationState
+  }): JSX.Element | null => {
+    const modal = useModal()
+    const runId = useCurrentRunId()
+    const { isFetched } = useNotifyAllRunsQuery({ pageLength: 0 })
 
-  useEffect(() => {
-    if (isFetched && runId == null) {
-      modal.resolve(false)
-      modal.remove()
+    useEffect(() => {
+      if (isFetched && runId == null) {
+        modal.resolve(false)
+        modal.remove()
+      }
+    }, [isFetched, modal, runId])
+
+    if (runId == null) {
+      return null
     }
-  }, [isFetched, modal, runId])
 
-  if (runId == null) {
-    return null
+    return (
+      <div className={styles.overlay}>
+        <SignRun
+          runId={runId}
+          documentationState={documentationState}
+          onSigned={() => {
+            modal.resolve(true)
+            modal.remove()
+          }}
+        />
+      </div>
+    )
   }
-
-  return (
-    <div className={styles.overlay}>
-      <SignRun
-        runId={runId}
-        onSigned={() => {
-          modal.resolve(true)
-          modal.remove()
-        }}
-      />
-    </div>
-  )
-})
+)
 
 /** Open the ODD sign-run modal and await whether the run was signed. */
 export const showSignRunModal = (): Promise<boolean> =>
