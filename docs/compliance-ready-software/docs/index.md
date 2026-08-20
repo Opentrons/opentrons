@@ -15,13 +15,7 @@ description: "Permanent, compliance-ready software to enable 21 CFR part 11-read
 
 This instruction manual covers the use of Opentrons Flex Compliance Ready Software, from the irreversible changes to your Flex upon activation to daily use in the lab.
 
-This manual describes Opentrons Flex Compliance Ready Software's key features, like [user roles](roles.md), [documenting user actions](documentation.md), and [files](files.md), and shows you what you'll experience when using the software at the lab bench.
+Read more about key features, like [user roles](roles.md), [documenting user actions](documentation.md), and [files](files.md), and take a look at you what you'll experience when [using the software](login.md) at the lab bench.
 
-Have questions about software controls or compliance? Get in touch with Opentrons. 
-
-<!-----
-
-TODO: check on last sentence (connect with us for questions about compliance)
-
------>
+Have questions about software controls or compliance? Get in touch with [Opentrons](opentrons.com/contact).
 

@@ -3,13 +3,13 @@ title: "Roles"
 description: "Types of roles (service, administrator, and service) in Compliance Ready Software."
 ---
 
-Three kinds of users can operate a compliance ready Flex. During software installation and activation, an Opentrons-trained representative will create accounts that fit into each role. 
+Three kinds of users can operate a compliance ready Flex. During software installation and activation, an Opentrons-trained representative will create accounts that fit into each role.
 
 | **Role** | **Permissions** | 
 | :--------|---------------- |
 | **Service** | <ul><li>Required for software activation</li><li>Used for maintenance, service, or to restore locked accounts</li></ul> |
 | **Administrator** | <ul><li>Full system access</li><li>Can change Flex system settings</li><li>Can add, remove, and manage protocols</li><li>Day-to-day operation of the Flex</li></ul> |
-| **User** | <ul><li>Day-to-day operation of the Flex</li></ul> |
+| **User** | <ul><li>Day-to-day operation of the Flex</li><li>By default, can't add, remove, or manage protocols</li></ul> |
  
 Your lab can set up multiple administrator accounts that will have full access to the Flex. These accounts can configure [administrator settings](admin.md) and the day-to-day user's experience. By default, they can also send protocols to the Flex, and view and download [files](files.md). 
 
@@ -25,9 +25,6 @@ User accounts can run protocols already on the Flex and view files. By default, 
 TODO: only image I could access from designs was 1) user tries to complete an action without being *logged in* to the Flex 2) user is prompted to log in 3) user doesn't have relevant credentials to complete the action and can't even log in 
 
 this could be confusing, so if I can find an example where user just tries to do something like download logs when they're not allowed...from the alpha
-
-TODO: 
-- triple check the differences between users and administrators by default
 
 ----->
 

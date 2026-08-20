@@ -3,7 +3,7 @@ title: "Activation"
 description: "What users need to know about activating Flex Compliance-Ready Software."
 ---
 
-Activating Opentrons Flex Compliance Ready Software permanently adds technical controls, like required documentation and user access, for FDA regulation 21 CFR part 11–ready operation. 
+Activating Opentrons Flex Compliance Ready Software permanently adds technical controls, like required documentation and user access, for FDA regulation 21 CFR part 11–ready operation.
 
 An Opentrons-trained representative will install and activate Compliance Ready Software during an on-site visit. The price of the software includes installation, activation, and training.
 
@@ -27,16 +27,6 @@ If a certificate expires or if you make updates to device settings like the robo
   <figcaption>Enter your robot encryption key in the Opentrons App.</figcaption>
 </figure>
 
-
-<!--------
-
-TODO: 
-- confirm that users can *only* access the encryption key from the ODD, and then only *enter* it in the app 
-- can update these pngs later - direct from designs, and some are layers upon layers and difficult for me to update dummy text *behind* a modal 
-- link terms in italics to glossary after I build it
-
------>
-
 ## Completing activation
 
 Finally, your representative will create accounts for your lab to use, assigned either an administrator or user [role](roles.md). You'll also be able to customize Compliance Ready Software [settings](settings.md).
@@ -52,12 +42,5 @@ After setup, a "Compliance Ready" badge appears next to your Flex in the Opentro
     Remember that you can control multiple robots through the same Opentrons App, including those that don't have Compliance Ready Software. The way you use the app to interact with a compliance ready Flex will be different, including logins, protocol runs, and required documentation.
 
 After activation, you'll need to add your own validations, protocols, and data management practices to make your Flex fully audit-ready.
-
-<!--------
-
-TODO: 
-- weird energy with this last section title. was just feeling too choppy without some H2s breaking it up, but can change this
-
------>
 
 
