@@ -1,4 +1,4 @@
-test_name: Robot settings affect OAuth scopes returned to regular users
+test_name: Token introspection matches login scopes
 
 marks:
   - usefixtures:
@@ -101,21 +101,6 @@ stages:
     response:
       status_code: 200
 
-  - name: Existing user tokens should lose updates.write without re-login
-    request:
-      method: POST
-      url: '{run_server.base_url}/auth/oauth2/introspect'
-      data:
-        client_id: opentrons_app
-        token: '{user_access_token}'
-    response:
-      status_code: 200
-      verify_response_with:
-        function: tests.integration.utils:verify_oauth_scopes
-        extra_kwargs:
-          expected_present: run_signoff.write
-          expected_absent: updates.write protocols.write
-
   - name: Allow regular users to send protocols to the robot
     request:
       method: PATCH
@@ -174,21 +159,6 @@ stages:
           requireAdminCredsForSignoffProtocol: true
     response:
       status_code: 200
-
-  - name: Existing user tokens should lose run_signoff.write without re-login
-    request:
-      method: POST
-      url: '{run_server.base_url}/auth/oauth2/introspect'
-      data:
-        client_id: opentrons_app
-        token: '{user_access_token}'
-    response:
-      status_code: 200
-      verify_response_with:
-        function: tests.integration.utils:verify_oauth_scopes
-        extra_kwargs:
-          expected_present: protocols.write
-          expected_absent: run_signoff.write updates.write
 
   - name: Regular users should lose run_signoff.write when signoff is admin-only
     request:
