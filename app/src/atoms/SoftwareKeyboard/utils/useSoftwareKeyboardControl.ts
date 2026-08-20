@@ -75,12 +75,7 @@ export function useSoftwareKeyboardControl(
       // This programmatically dispatches an input event with the new value. We're
       // careful to do this in a way that looks to React as if it's just a normal,
       // native input event from a hardware keyboard, so React will call all our event
-      // handlers as normal. We're also careful to   We are careful to do this in a way that React will detect
-      // * Update the input field's value and dispatch an event as if the user had typed
-      //   with a hardware keyboard.
-      // * Be careful to position the cursor correctly. (By default, programmatically
-      //   editing an input's value like this would normally move the cursor to the end,
-      //   which we don't want.)
+      // handlers as normal.
       onChange: newValue => {
         const inputElement = inputElementRef.current
         if (!(
@@ -101,7 +96,7 @@ export function useSoftwareKeyboardControl(
         // 2. We focus() the element first. Without this, if you enter multiple characters
         //    into the middle of the input, and the input isn't focused, the cursor jumps
         //    to the end. I don't fully understand this, but it seems like setSelectionRange()
-        //    requires it., like setSelectionRange() isn't having the effect it should.
+        //    requires it.
         inputElement.focus()
         setValue(inputElement, newValue)
         inputElement.setSelectionRange(
