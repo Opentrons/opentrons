@@ -3,9 +3,7 @@ import styles from '../tipselectionwizard.module.css'
 import type { ReactNode } from 'react'
 import type { PipetteShadowProps } from '../types'
 
-export function SingleChannelFlexShadow(
-  props: PipetteShadowProps
-): ReactNode {
+export function SingleChannelFlexShadow(props: PipetteShadowProps): ReactNode {
   const { x, y, width, height, fill, stroke } = props
   return (
     <svg

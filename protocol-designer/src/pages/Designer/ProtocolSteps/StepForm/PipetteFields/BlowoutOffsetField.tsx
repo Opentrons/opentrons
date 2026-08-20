@@ -26,9 +26,7 @@ interface BlowoutOffsetFieldProps extends FieldProps {
   blowoutLabwareId?: unknown
 }
 
-export function BlowoutOffsetField(
-  props: BlowoutOffsetFieldProps
-): ReactNode {
+export function BlowoutOffsetField(props: BlowoutOffsetFieldProps): ReactNode {
   const {
     disabled,
     value,

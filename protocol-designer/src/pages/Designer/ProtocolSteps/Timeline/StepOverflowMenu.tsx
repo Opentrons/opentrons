@@ -29,7 +29,13 @@ import { OPEN_STEP_DETAILS_EVENT } from '../../../../analytics/constants'
 import { OVERFLOW_MENU_POSITION_ADJUSTMENT } from '../../../../constants'
 
 import type { ThunkDispatch } from 'redux-thunk'
-import type { Dispatch, MouseEvent, MutableRefObject, ReactNode, SetStateAction } from 'react'
+import type {
+  Dispatch,
+  MouseEvent,
+  MutableRefObject,
+  ReactNode,
+  SetStateAction,
+} from 'react'
 import type { AnalyticsEvent } from '/protocol-designer/analytics/mixpanel'
 import type { BaseState } from '/protocol-designer/types'
 

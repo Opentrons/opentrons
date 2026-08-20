@@ -52,9 +52,7 @@ interface TipSelectionWizardProps {
   tipAccessibilityStatus: Record<string, Record<string, AccessibilityStatus>>
 }
 
-export function TipSelectionWizard(
-  props: TipSelectionWizardProps
-): ReactNode {
+export function TipSelectionWizard(props: TipSelectionWizardProps): ReactNode {
   const {
     setShowTipSelectionModal,
     formTiprackUri,

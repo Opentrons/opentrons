@@ -25,8 +25,8 @@ import {
   getEntireWellSelection,
 } from './utils'
 
-import type { ReactNode } from 'react'
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,

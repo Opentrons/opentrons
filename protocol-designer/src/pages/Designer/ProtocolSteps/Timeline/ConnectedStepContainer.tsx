@@ -35,7 +35,12 @@ import {
 } from './utils'
 
 import type { ThunkDispatch } from 'redux-thunk'
-import type { Dispatch, MouseEvent as ReactMouseEvent, ReactNode, SetStateAction } from 'react'
+import type {
+  Dispatch,
+  MouseEvent as ReactMouseEvent,
+  ReactNode,
+  SetStateAction,
+} from 'react'
 import type { IconName } from '@opentrons/components'
 import type { BaseState } from '/protocol-designer/types'
 

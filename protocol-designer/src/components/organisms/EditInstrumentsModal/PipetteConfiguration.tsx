@@ -41,6 +41,7 @@ import { removeOpentronsPhrases } from '/protocol-designer/utils'
 
 import { getShouldShowPipetteType, getTiprackOptions } from './utils'
 
+import type { ReactNode } from 'react'
 import type { PipetteName, RobotType } from '@opentrons/shared-data'
 import type {
   Gen,
@@ -51,7 +52,6 @@ import type {
 import type { PipetteOnDeck } from '/protocol-designer/step-forms'
 import type { ThunkDispatch } from '/protocol-designer/types'
 import type { PipetteConfig } from './usePipetteConfig'
-import type { ReactNode } from 'react'
 
 interface PipetteConfigurationProps {
   robotType: RobotType

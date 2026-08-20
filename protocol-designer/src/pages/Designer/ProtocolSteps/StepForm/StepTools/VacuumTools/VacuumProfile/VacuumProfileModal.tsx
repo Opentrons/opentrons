@@ -35,9 +35,7 @@ export interface VacuumProfileModalProps {
   onClose: () => void
 }
 
-export function VacuumProfileModal(
-  props: VacuumProfileModalProps
-): ReactNode {
+export function VacuumProfileModal(props: VacuumProfileModalProps): ReactNode {
   const { formData, propsForFields, mode, onClose } = props
   const { vacuumOrderedProfileIds, vacuumProfileItemsById } = formData
   const { t } = useTranslation('protocol_steps')

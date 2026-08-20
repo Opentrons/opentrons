@@ -27,9 +27,7 @@ interface ResetSettingsModalProps {
   onScroll: () => void
   liquidClass?: string | null
 }
-export function ResetSettingsModal(
-  props: ResetSettingsModalProps
-): ReactNode {
+export function ResetSettingsModal(props: ResetSettingsModalProps): ReactNode {
   const { tab, liquidClass, onContinue, onClose, onScroll } = props
   const { t, i18n } = useTranslation('protocol_steps')
 

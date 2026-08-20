@@ -19,9 +19,7 @@ interface ResetSettingsFieldProps {
   onClick: () => void
 }
 
-export function ResetSettingsField(
-  props: ResetSettingsFieldProps
-): ReactNode {
+export function ResetSettingsField(props: ResetSettingsFieldProps): ReactNode {
   const { tab, onClick } = props
   const { t } = useTranslation(['protocol_steps'])
 

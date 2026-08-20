@@ -92,9 +92,7 @@ interface DeckSetupContainerProps {
   initialViewBox: string
   currentStep: FormData | null
 }
-export function DeckSetupContainer(
-  props: DeckSetupContainerProps
-): ReactNode {
+export function DeckSetupContainer(props: DeckSetupContainerProps): ReactNode {
   const {
     robotType,
     hoverSlot,

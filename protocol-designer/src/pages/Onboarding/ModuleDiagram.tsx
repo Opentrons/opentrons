@@ -14,6 +14,7 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
+import type { ReactNode } from 'react'
 import type { ModuleModel } from '@opentrons/shared-data'
 import type { OT2ModuleType } from '../../types'
 
@@ -24,8 +25,6 @@ import temp_deck_gen_2_transparent from '../../assets/images/modules/temp_deck_g
 import tempdeck_gen1 from '../../assets/images/modules/tempdeck_gen1.png'
 import thermocycler_gen2 from '../../assets/images/modules/thermocycler_gen2.png'
 import thermocycler from '../../assets/images/modules/thermocycler.png'
-
-import type { ReactNode } from 'react'
 
 interface ModuleDiagramProps {
   type: OT2ModuleType

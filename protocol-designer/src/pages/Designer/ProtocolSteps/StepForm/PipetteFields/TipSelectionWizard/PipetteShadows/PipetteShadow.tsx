@@ -18,7 +18,6 @@ import { SingleChannelOT2Shadow } from './SingleChannelOT2Shadow'
 import { SingleChannelFlexShadow } from './SingleChannelShadow'
 
 import type { ReactNode } from 'react'
-
 import type { Channels } from '@opentrons/components'
 import type {
   CoordinateTuple,

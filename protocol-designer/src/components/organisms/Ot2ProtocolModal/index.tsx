@@ -10,6 +10,7 @@ import {
 
 import { getMainPagePortalEl } from '../Portal'
 import styles from './ot2protocolmodal.module.css'
+
 import type { ReactNode } from 'react'
 
 interface Props {

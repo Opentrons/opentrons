@@ -109,9 +109,7 @@ export interface LabwareInfo {
   def: LabwareDefinition2
 }
 
-export function SelectLabwareModal(
-  props: SelectLabwareModalProps
-): ReactNode {
+export function SelectLabwareModal(props: SelectLabwareModalProps): ReactNode {
   const { slot, onClose, onConfirm, slotFull, moduleHasLabware = false } = props
   const { t } = useTranslation(['starting_deck_state', 'shared'])
   const robotType = useSelector(getRobotType)

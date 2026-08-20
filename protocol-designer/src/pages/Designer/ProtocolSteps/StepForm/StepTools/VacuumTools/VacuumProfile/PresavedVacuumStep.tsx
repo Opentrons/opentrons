@@ -43,9 +43,7 @@ export interface PresavedVacuumStepProps extends VacuumStepBaseProps {
   forceShowErrors?: boolean
 }
 
-export function PresavedVacuumStep(
-  props: PresavedVacuumStepProps
-): ReactNode {
+export function PresavedVacuumStep(props: PresavedVacuumStepProps): ReactNode {
   const {
     stepData,
     displayIndex,

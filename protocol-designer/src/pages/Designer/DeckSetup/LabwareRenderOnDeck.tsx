@@ -1,7 +1,7 @@
 import { LabwareRender } from '@opentrons/components'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ReactNode } from 'react'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 interface LabwareRenderOnDeckProps {
   labwareDef: LabwareDefinition2

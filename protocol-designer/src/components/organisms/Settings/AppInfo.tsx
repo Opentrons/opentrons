@@ -19,9 +19,7 @@ interface AppInfoProps {
   setShowAnnouncementModal: Dispatch<SetStateAction<boolean>>
 }
 
-export function AppInfo({
-  setShowAnnouncementModal,
-}: AppInfoProps): ReactNode {
+export function AppInfo({ setShowAnnouncementModal }: AppInfoProps): ReactNode {
   const { t } = useTranslation('shared')
   const pdVersion = _OT_PD_VERSION_
 

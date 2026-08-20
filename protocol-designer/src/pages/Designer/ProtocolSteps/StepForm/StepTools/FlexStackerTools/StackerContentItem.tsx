@@ -12,9 +12,7 @@ interface StackerContentItemProps {
   isTiprack: boolean
   quantity?: number
 }
-export function StackerContentItem(
-  props: StackerContentItemProps
-): ReactNode {
+export function StackerContentItem(props: StackerContentItemProps): ReactNode {
   const { primaryLabwareName, hasLid, isTiprack, quantity } = props
   const { t } = useTranslation('form')
   return (

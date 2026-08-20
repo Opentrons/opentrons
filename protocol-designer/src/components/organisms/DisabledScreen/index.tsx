@@ -14,9 +14,10 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import type { ReactNode } from 'react'
 
 import { getMainPagePortalEl } from '../Portal'
+
+import type { ReactNode } from 'react'
 
 // Note: We decided not to use this component for the release.
 // We will find out a better way to handle responsiveness with user's screen size issue.

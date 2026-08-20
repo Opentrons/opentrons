@@ -52,9 +52,7 @@ const getChannelsFromNozzleType = (nozzleType: NozzleType): ChannelType => {
   }
 }
 
-export const SelectableLabware = (
-  props: SelectableLabwareProps
-): ReactNode => {
+export const SelectableLabware = (props: SelectableLabwareProps): ReactNode => {
   const {
     labwareProps,
     selectedPrimaryWells,

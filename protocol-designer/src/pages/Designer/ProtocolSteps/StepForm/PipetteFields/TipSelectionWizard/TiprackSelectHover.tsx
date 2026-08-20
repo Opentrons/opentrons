@@ -15,9 +15,7 @@ interface TiprackSelectHoverProps {
   onClick: () => void
 }
 
-export function TiprackSelectHover(
-  props: TiprackSelectHoverProps
-): ReactNode {
+export function TiprackSelectHover(props: TiprackSelectHoverProps): ReactNode {
   const slotFill = <div className={styles.slot_fill} />
 
   const { slotPosition, setHover, labware, onClick } = props

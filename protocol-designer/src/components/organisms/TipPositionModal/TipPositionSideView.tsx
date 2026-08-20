@@ -29,9 +29,7 @@ interface TipPositionAllVizProps {
   xWidthMm: number
 }
 
-export function TipPositionSideView(
-  props: TipPositionAllVizProps
-): ReactNode {
+export function TipPositionSideView(props: TipPositionAllVizProps): ReactNode {
   const { mmFromBottom, xPosition, wellDepthMm, xWidthMm } = props
   const { t } = useTranslation('application')
   const fractionOfWellHeight =

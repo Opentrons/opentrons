@@ -449,9 +449,7 @@ function VacuumStateDurationConcurrent(
  * The "wait for profile to complete" checkpoint at the end of a Vacuum profile's
  * nested block. The user can drag a step onto it to move that step right above it.
  */
-function VacuumProfileEndCheckpoint(props: {
-  startStepId: string
-}): ReactNode {
+function VacuumProfileEndCheckpoint(props: { startStepId: string }): ReactNode {
   const { startStepId } = props
 
   const dispatch = useDispatch()
