@@ -119,4 +119,13 @@ describe('ChooseNumber', () => {
 
     expect(input).toHaveValue('1')
   })
+
+  it('should retain incomplete decimal input and show a syntax error', () => {
+    props = { ...props, parameter: mockFloatNumberParameterData }
+    render(props)
+    const input = screen.getByLabelText('EtoH Volume')
+    fireEvent.change(input, { target: { value: '1.' } })
+    expect(input).toHaveValue('1.')
+    screen.getByText('Enter a valid number')
+  })
 })
