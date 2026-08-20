@@ -42,7 +42,7 @@ describe('DocumentationRequired', () => {
 
   it('renders header, the per-user note label, and the confirm + back buttons', () => {
     render(props)
-    screen.getByText('Documentation required for robot action')
+    screen.getByText('Documentation required')
     screen.getByText('Note for robot audit log by alice')
     screen.getByRole('button', { name: 'Confirm' })
     screen.getByRole('button', { name: 'Back to previous page' })
