@@ -11,6 +11,7 @@
   "desktop_password_expired_mismatch": "Passwords do not match.",
   "desktop_password_expired_new_password_field": "New password",
   "desktop_password_expired_subheading": "Create a new password to use",
+  "documentation_is_required": "Documentation is required",
   "documentation_required": "Documentation Required",
   "download_audit_logs": "Download audit logs",
   "download_audit_logs_description": "Once a protocol run is complete, audit logs must be downloaded locally before continuing.",

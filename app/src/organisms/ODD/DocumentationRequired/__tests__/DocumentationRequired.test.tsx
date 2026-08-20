@@ -48,21 +48,9 @@ describe('DocumentationRequired', () => {
     screen.getByRole('button', { name: 'Back to previous page' })
   })
 
-  it('keeps the confirm button disabled until a non-empty note is entered', () => {
+  it('keeps the confirm button enabled even when the note is empty', () => {
     render(props)
-    const confirm = screen.getByRole('button', { name: 'Confirm' })
-    expect(confirm).toBeDisabled()
-
-    editNote('starting QC run')
-
-    expect(confirm).toBeEnabled()
-  })
-
-  it('treats whitespace-only input as empty and keeps confirm disabled', () => {
-    render(props)
-    editNote('   \n\t  ')
-
-    expect(screen.getByRole('button', { name: 'Confirm' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Confirm' })).toBeEnabled()
   })
 
   it('calls onConfirm with the trimmed note when confirm is clicked', () => {
@@ -73,10 +61,33 @@ describe('DocumentationRequired', () => {
     expect(props.onConfirm).toHaveBeenCalledWith('starting QC run')
   })
 
-  it('does not call onConfirm when the note is empty', () => {
+  it('shows a required error and does not confirm when the note is empty', () => {
     render(props)
     fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+
     expect(props.onConfirm).not.toHaveBeenCalled()
+    screen.getByText('Documentation is required')
+  })
+
+  it('treats whitespace-only input as empty and shows a required error', () => {
+    render(props)
+    editNote('   \n\t  ')
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+
+    expect(props.onConfirm).not.toHaveBeenCalled()
+    screen.getByText('Documentation is required')
+  })
+
+  it('clears the required error when the user edits the note', () => {
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    screen.getByText('Documentation is required')
+
+    editNote('starting QC run')
+
+    expect(
+      screen.queryByText('Documentation is required')
+    ).not.toBeInTheDocument()
   })
 
   it('shows a min-length error and does not confirm when the note is too short', () => {
