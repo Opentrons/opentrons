@@ -31,7 +31,6 @@ import {
   useRobotInitializationStatus,
 } from '/app/resources/health/useRobotInitializationStatus'
 
-import { FOOTER_BUTTON_STYLE } from './UpdateRobotModal'
 import { useRobotUpdateInfo } from './useRobotUpdateInfo'
 
 import type { ChangeEventHandler } from 'react'
@@ -181,15 +180,9 @@ function RobotUpdateProgressFooter({
     <Flex
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_FLEX_END}
-      padding={`${SPACING.spacing16} 0`}
+      padding={`0 ${SPACING.spacing24} ${SPACING.spacing24}`}
     >
-      <PrimaryButton
-        onClick={closeRobotUpdate}
-        marginRight={SPACING.spacing12}
-        css={FOOTER_BUTTON_STYLE}
-      >
-        {t('exit')}
-      </PrimaryButton>
+      <PrimaryButton onClick={closeRobotUpdate}>{t('exit')}</PrimaryButton>
     </Flex>
   )
 }
