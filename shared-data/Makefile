@@ -50,11 +50,15 @@ format-js:
 	pnpm exec prettier --ignore-path ../.eslintignore --write $(FORMAT_FILE_GLOB)
 
 .PHONY: lint-js
-lint-js: lint-js-eslint lint-js-prettier
+lint-js: lint-js-oxlint lint-js-eslint lint-js-prettier
+
+.PHONY: lint-js-oxlint
+lint-js-oxlint:
+	$(MAKE) -C .. lint-js-oxlint
 
 .PHONY: lint-js-eslint
 lint-js-eslint:
-	pnpm eslint --ignore-path ../.eslintignore --quiet=$(quiet) "**/*.@(js|ts|tsx)"
+	$(MAKE) -C .. lint-js-eslint
 
 .PHONY: lint-js-prettier
 lint-js-prettier:

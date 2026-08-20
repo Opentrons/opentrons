@@ -75,9 +75,9 @@ export function GeneralSettings(): JSX.Element {
   const appLanguage = useSelector(getAppLanguage)
   const currentLanguageOption = LANGUAGES.find(lng => lng.value === appLanguage)
   let transactionId = ''
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     transactionId = uuid()
   }, [])
   const handleDropdownClick = (value: string): void => {

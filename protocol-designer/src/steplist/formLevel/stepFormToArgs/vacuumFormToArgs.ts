@@ -20,8 +20,10 @@ import type {
   VacuumProfileStep,
   VacuumPumpAdvancedArgs,
 } from '@opentrons/step-generation'
-import type { VacuumProfileStep as FormVacuumProfileStep } from '/protocol-designer/form-types'
-import type { HydratedVacuumFormData } from '../../../form-types'
+import type {
+  VacuumProfileStep as FormVacuumProfileStep,
+  HydratedVacuumFormData,
+} from '/protocol-designer/form-types'
 import type { GetCastFormData } from '../../fieldLevel'
 
 type StepGenVacuumProfileStep = Extract<

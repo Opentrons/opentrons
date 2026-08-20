@@ -88,6 +88,7 @@ export function ChooseCsvFile({
     handleGoBack()
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (csvFilesOnUSB.length === 0) {
       setCsvFileSelected({})

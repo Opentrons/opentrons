@@ -12,13 +12,12 @@ import { useRemoveActiveAppUpdateToast } from '../../Alerts'
 
 import type { ComponentProps } from 'react'
 import type * as Dom from 'react-router-dom'
-import type * as ShellState from '/app/redux/shell'
 import type { ShellUpdateState } from '/app/redux/shell/types'
 import type { State } from '/app/redux/types'
 import type { UpdateAppModalProps } from '..'
 
 vi.mock('/app/redux/shell/update', async importOriginal => {
-  const actual = await importOriginal<typeof ShellState>()
+  const actual = await importOriginal<typeof Shell>()
   return {
     ...actual,
     getShellUpdateState: vi.fn(),

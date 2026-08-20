@@ -255,7 +255,7 @@ $(SHARED_DATA_DIR)-py-lint:
 	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
 
 .PHONY: lint-js
-lint-js: check-mutating-api-client-exports lint-js-eslint lint-js-prettier
+lint-js: check-mutating-api-client-exports lint-js-oxlint lint-js-eslint lint-js-prettier
 
 # Regenerate the denylist used by opentrons/no-direct-mutating.
 .PHONY: generate-mutating-api-client-exports
@@ -267,11 +267,13 @@ generate-mutating-api-client-exports:
 check-mutating-api-client-exports:
 	node scripts/eslint-plugin-opentrons/generate-mutating-api-client-exports.js --check
 
+.PHONY: lint-js-oxlint
+lint-js-oxlint:
+	pnpm exec oxlint
+
 .PHONY: lint-js-eslint
 lint-js-eslint:
-# todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
-# when the file supports it (upgrade eslint and/or move away from legacy config format)
-	NODE_OPTIONS="--max-old-space-size=8192 $(NODE_OPTIONS)" pnpm exec eslint --quiet=$(quiet) --report-unused-disable-directives-severity error --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
+	NODE_OPTIONS="--max-old-space-size=8192 $(NODE_OPTIONS)" pnpm exec eslint --quiet=$(quiet) .
 
 .PHONY: lint-js-prettier
 lint-js-prettier:
@@ -280,9 +282,7 @@ lint-js-prettier:
 
 .PHONY: lint-json
 lint-json:
-# todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
-# when the file supports it (upgrade eslint and/or move away from legacy config format)
-	NODE_OPTIONS="--max-old-space-size=8192 $(NODE_OPTIONS)" pnpm exec eslint --report-unused-disable-directives-severity error --ignore-pattern "abr-testing/protocols/" --max-warnings 0 --ext .json .
+	NODE_OPTIONS="--max-old-space-size=8192 $(NODE_OPTIONS)" pnpm exec eslint --ignore-pattern "abr-testing/protocols/" --ignore-pattern ".oxlintrc.json" --max-warnings 0 "**/*.json"
 
 .PHONY: lint-css
 lint-css:

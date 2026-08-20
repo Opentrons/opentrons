@@ -48,6 +48,7 @@
     "api-client/src",
     "react-api-client/src",
     "usb-bridge/node-client/src",
+    ".storybook/**/*",
     "**/*.js",
     "**/*.ts",
     "**/*.mts",
