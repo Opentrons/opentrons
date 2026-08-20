@@ -13,6 +13,8 @@ import {
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useLogout } from '/app/redux/robot-auth'
 
+import { useNotifyRunQuery } from '../runs'
+
 // login gate states to control login prompting
 // idle: need to prompt for login
 // prompting: login prompt in flight, or waiting for post-login /self
@@ -23,6 +25,7 @@ type LoginGate = 'idle' | 'prompting' | 'needsadmin' | 'done'
 export interface SignRunFlowResult {
   signRun: (name: string) => void
   isLoading: boolean
+  isSigned: boolean
   loginGate: LoginGate
   correctName: string | undefined
 }
@@ -44,6 +47,9 @@ export function useSignRunFlow(
   const documentationState = useDocumentationState()
   const { signRun: signRunMutation, isLoading: isSignRunLoading } =
     useSignRunMutation(documentationState)
+
+  const { data: run } = useNotifyRunQuery(runId)
+  const isSigned = !!run?.data?.signedBy
 
   const { data: authSettings, isLoading: isAuthSettingsLoading } =
     useAuthSettingsQuery()
@@ -170,6 +176,7 @@ export function useSignRunFlow(
     signRun,
     isLoading,
     loginGate,
+    isSigned,
     correctName: self?.data?.fullName,
   }
 }

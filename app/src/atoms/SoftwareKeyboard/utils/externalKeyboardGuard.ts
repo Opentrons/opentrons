@@ -61,16 +61,3 @@ export const getInvalidCharForKeyboard = (
 ): string | null => {
   return findFirstInvalidChar(value, buildAllowedSet(type, options))
 }
-
-export const shouldAcceptKeyboardInput = (
-  newValue: string,
-  prevValue: string,
-  type: KeyboardType,
-  options?: NumericalOptions
-): boolean => {
-  if (newValue.length > prevValue.length) {
-    const prevInvalid = getInvalidCharForKeyboard(prevValue, type, options)
-    if (prevInvalid !== null) return false
-  }
-  return true
-}

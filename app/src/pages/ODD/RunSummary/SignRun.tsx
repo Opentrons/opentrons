@@ -67,14 +67,15 @@ export function SignRun({
     }
   }
 
-  const { signRun, isLoading, loginGate, correctName } = useSignRunFlow(
-    runId,
-    robotName,
-    async () => await showLoginModal(),
-    popToast,
-    eatToast,
-    onSigned
-  )
+  const { signRun, isSigned, isLoading, loginGate, correctName } =
+    useSignRunFlow(
+      runId,
+      robotName,
+      async () => await showLoginModal(),
+      popToast,
+      eatToast,
+      onSigned
+    )
 
   const trimmedName = name.trim()
 
@@ -87,6 +88,12 @@ export function SignRun({
     }
     keyboardRef.current?.setInput(name)
   }, [name])
+
+  useEffect(() => {
+    if (isSigned) {
+      onSigned?.()
+    }
+  }, [isSigned, onSigned])
 
   const handleNameChange = (value: string): void => {
     setName(value)

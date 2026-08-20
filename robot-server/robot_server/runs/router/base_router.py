@@ -501,7 +501,6 @@ async def remove_run(
         await run_data_manager.delete(
             run_id=runId, access_control_status=access_control_status
         )
-
     except RunConflictError as e:
         raise RunNotIdle().as_error(status.HTTP_409_CONFLICT) from e
     except RunSignoffRequiredError as e:
