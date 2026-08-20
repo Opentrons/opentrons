@@ -113,7 +113,7 @@
   "desktop_activate_user_modal_heading": "Activate this account?",
   "desktop_activate_user_modal_title": "Activate account",
   "desktop_activate_user_success_banner": "User account activated",
-  "desktop_add_user": "Add User",
+  "desktop_add_user": "Add user",
   "desktop_add_user_created_banner": "New user account added",
   "desktop_add_user_legal_name_required_error": "Legal name is required.",
   "desktop_add_user_success_message": "Give the one time password to the account owner. When they log in, they will be prompted to create a new password.",
