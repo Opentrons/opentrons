@@ -51,10 +51,15 @@ export function DocumentationRequired({
 
   const trimmedNote = inputText.trim()
   const handleConfirm = (): void => {
-    if (trimmedNote === '') return
+    if (trimmedNote === '') {
+      setError(t('documentation_is_required') as string)
+      return
+    }
     if (trimmedNote.length < minReportLength) {
       setError(
-        '' + t('must_be_at_least_characters', { minLength: minReportLength })
+        t('must_be_at_least_characters', {
+          minLength: minReportLength,
+        }) as string
       )
       return
     }
@@ -74,7 +79,6 @@ export function DocumentationRequired({
           header={t('documentation_required')}
           buttonText={t('shared:confirm')}
           onClickButton={handleConfirm}
-          buttonIsDisabled={trimmedNote === ''}
           secondaryButtonProps={{
             buttonText: 'View actions',
             buttonType: 'tertiaryHighLight',
