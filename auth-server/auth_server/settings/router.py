@@ -34,9 +34,21 @@ from .models import (
     SettingsResponseData,
 )
 from .store import AccessControlAlreadySetError, SettingsStore, get_settings_store
+from auth_server.oauth2.backend import Backend
+from auth_server.oauth2.fastapi_dependencies import get_oauth2_backend
 from auth_server.settings.models import PatchAccessControlRequestData
+from auth_server.users.dependencies import get_user_store
+from auth_server.users.store import UserStore
 
 router = fastapi.APIRouter()
+
+
+def _patch_enables_password_complexity(patch: PatchSettingsRequestData) -> bool:
+    """Return whether a settings patch turns on password complexity requirements."""
+    return (
+        patch.model_dump(exclude_unset=True).get("passwordComplexitySpecialCharacters")
+        is True
+    )
 
 
 @router.get(
@@ -127,8 +139,13 @@ async def patch_access_control_settings(  # noqa: D103
 async def patch_settings(  # noqa: D103
     request_body: RequestModel[PatchSettingsRequestData],
     settings_store: Annotated[SettingsStore, fastapi.Depends(get_settings_store)],
+    user_store: Annotated[UserStore, fastapi.Depends(get_user_store)],
+    oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> SimpleBody[SettingsResponseData]:
     new_settings = settings_store.patch_settings(request_body.data)
+    if _patch_enables_password_complexity(request_body.data):
+        user_store.mark_all_reset_password()
+        oauth2_backend.revoke_all_tokens()
     return SimpleBody.model_construct(data=new_settings)
 
 
