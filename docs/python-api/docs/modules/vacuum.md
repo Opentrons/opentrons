@@ -31,7 +31,10 @@ def run(protocol: protocol_api.ProtocolContext):
 
 ## Staging collars and adding labware
 
-A deck stack consists of various collars, internal spacers, and well plates. The short and tall collars support filter well plates and help seal the stack. The short and tall spacers control the vertical gap between a filter plate and a collection plate. Short and tall collars and spacers are interchangeable. See <font color="red">LINK TO MANUAL USE CASES?</font>
+The module supports two primary configurations with the following stacking order (from bottom to top).
+
+- **Direct to waste:** vacuum base → collar → filter plate
+- **Filtrate collection:** vacuum base → spacer → collection plate → collar → filter plate
 
 ### Staging collars
 
@@ -81,7 +84,7 @@ vacuum.move_to_doc(collar, use_gripper=True)
 ```
 
 !!! note
-    You cannot move labware on or off the vacuum module while the pump is running or the system is under vacuum pressure. You must return the system to return to atmospheric pressure (0 mbar) before moving labware manually or with the Gripper.
+    You cannot move labware on or off the vacuum module while the pump is running or the system is under vacuum pressure. Return the system to return to atmospheric pressure (0 mbar) before moving labware with the Gripper or by hand.
 
 ## Placeholder for stack and gripper
 
@@ -97,10 +100,6 @@ The Vacuum Module measures vacuum as gauge pressure in millibars (mbar). The mod
 * **0 mbar (atmospheric pressure):** [`min_gauge_pressure_mbar`][opentrons.protocol_api.VacuumModuleContext.min_gauge_pressure_mbar]
 
 * **-800 mbar (maximum vacuum):** [`max_gauge_pressure_mbar`][opentrons.protocol_api.VacuumModuleContext.max_gauge_pressure_mbar]
-
-
-
-
 
 
 
