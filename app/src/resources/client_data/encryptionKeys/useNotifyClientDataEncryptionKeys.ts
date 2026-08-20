@@ -16,7 +16,7 @@ export function useNotifyClientDataEncryptionKeys(
     AxiosError
   > = {}
 ): UseQueryResult<ClientDataResponse<ClientDataEncryptionKeys>, AxiosError> {
-  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
+  const { refetch, queryOptionsNotify } = useNotifyDataReady({
     topic: `robot-server/clientData/${KEYS.ENCRYPTION_KEYS}`,
     options,
   })
@@ -25,15 +25,13 @@ export function useNotifyClientDataEncryptionKeys(
     KEYS.ENCRYPTION_KEYS,
     queryOptionsNotify
   )
+  const { refetch: refetchQuery } = httpQueryResult
 
   useEffect(() => {
-    if (shouldRefetch) {
-      void httpQueryResult.refetch()
+    if (refetch > 0) {
+      void refetchQuery()
     }
-
-    // refetch is stable, the result object is not
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shouldRefetch])
+  }, [refetch, refetchQuery])
 
   return httpQueryResult
 }

@@ -19,21 +19,19 @@ export function useNotifyAllCommandsQuery<TError = Error>(
   // running to succeeded, that may change the useAllCommandsQuery response, but it
   // will not necessarily change the command links. We might need an MQTT topic
   // covering "any change in `GET /runs/{id}/commands`".
-  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
+  const { refetch, queryOptionsNotify } = useNotifyDataReady({
     topic: 'robot-server/runs/commands_links',
     options,
   })
 
   const httpQueryResult = useAllCommandsQuery(runId, params, queryOptionsNotify)
+  const { refetch: refetchQuery } = httpQueryResult
 
   useEffect(() => {
-    if (shouldRefetch) {
-      void httpQueryResult.refetch()
+    if (refetch > 0) {
+      void refetchQuery()
     }
-
-    // refetch is stable, the result object is not
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shouldRefetch])
+  }, [refetch, refetchQuery])
 
   return httpQueryResult
 }

@@ -11,21 +11,19 @@ import type { QueryOptionsWithPolling } from '../../useNotifyDataReady'
 export function useNotifyCurrentMaintenanceRun(
   options: QueryOptionsWithPolling<MaintenanceRun, Error> = {}
 ): UseQueryResult<MaintenanceRun> | UseQueryResult<MaintenanceRun, Error> {
-  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
+  const { refetch, queryOptionsNotify } = useNotifyDataReady({
     topic: 'robot-server/maintenance_runs/current_run',
     options,
   })
 
   const httpQueryResult = useCurrentMaintenanceRun(queryOptionsNotify)
+  const { refetch: refetchQuery } = httpQueryResult
 
   useEffect(() => {
-    if (shouldRefetch) {
-      void httpQueryResult.refetch()
+    if (refetch > 0) {
+      void refetchQuery()
     }
-
-    // refetch is stable, the result object is not
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shouldRefetch])
+  }, [refetch, refetchQuery])
 
   return httpQueryResult
 }

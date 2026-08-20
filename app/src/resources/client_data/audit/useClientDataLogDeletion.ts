@@ -17,26 +17,21 @@ export function useClientDataLogDeletion(
     AxiosError
   > = {}
 ): 'pending' | 'completed' | 'failed' {
-  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
+  const { refetch, queryOptionsNotify } = useNotifyDataReady({
     topic: `robot-server/clientData/${KEYS.LOG_DELETION}`,
     options,
   })
 
-  const httpQueryResult = useClientData<LogDeletionStatus>(
+  const { data, refetch: refetchQuery } = useClientData<LogDeletionStatus>(
     KEYS.LOG_DELETION,
     queryOptionsNotify
   )
 
   useEffect(() => {
-    if (shouldRefetch) {
-      void httpQueryResult.refetch()
+    if (refetch > 0) {
+      void refetchQuery()
     }
-
-    // refetch is stable, the result object is not
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shouldRefetch])
-
-  const { data } = httpQueryResult
+  }, [refetch, refetchQuery])
 
   const logDeletionStatus =
     data?.data?.logPeriodId === logPeriodId ? data?.data?.status : 'pending'

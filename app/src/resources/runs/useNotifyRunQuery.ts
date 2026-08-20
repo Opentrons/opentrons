@@ -14,24 +14,22 @@ export function useNotifyRunQuery<TError = Error>(
   options: QueryOptionsWithPolling<Run, TError> = {},
   hostOverride?: HostConfig | null
 ): UseQueryResult<Run, TError> {
-  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
+  const { refetch, queryOptionsNotify } = useNotifyDataReady({
     topic: `robot-server/runs/${runId}` as NotifyTopic,
     options,
     hostOverride,
   })
 
   const httpQueryResult = useRunQuery(runId, queryOptionsNotify, hostOverride)
+  const { refetch: refetchQuery } = httpQueryResult
 
   useEffect(() => {
     // Route params can turn a missing id into the literal string "null" (e.g. `/runs/${null}` → `/runs/null`). Treat that like no id.
     const isValidRunId = runId != null && runId !== 'null'
-    if (shouldRefetch && isValidRunId) {
-      void httpQueryResult.refetch()
+    if (refetch > 0 && isValidRunId) {
+      void refetchQuery()
     }
-
-    // refetch is stable, the result object is not
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shouldRefetch, runId])
+  }, [refetch, refetchQuery, runId])
 
   return httpQueryResult
 }

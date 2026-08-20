@@ -14,7 +14,7 @@ export function useNotifyAllCommandsAsPreSerializedList(
   params?: GetRunCommandsParams | null,
   options: QueryOptionsWithPolling<CommandsData, AxiosError> = {}
 ): UseQueryResult<CommandsData, AxiosError> {
-  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
+  const { refetch, queryOptionsNotify } = useNotifyDataReady({
     topic: `robot-server/runs/pre_serialized_commands/${runId}`,
     options,
   })
@@ -24,15 +24,13 @@ export function useNotifyAllCommandsAsPreSerializedList(
     params,
     queryOptionsNotify
   )
+  const { refetch: refetchQuery } = httpQueryResult
 
   useEffect(() => {
-    if (shouldRefetch) {
-      void httpQueryResult.refetch()
+    if (refetch > 0) {
+      void refetchQuery()
     }
-
-    // refetch is stable, the result object is not
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shouldRefetch])
+  }, [refetch, refetchQuery])
 
   return httpQueryResult
 }
