@@ -13,8 +13,8 @@
 }
 
 .password_container {
-  display: flex;
   position: relative;
+  display: flex;
   overflow: hidden;
   width: 100%;
   height: calc(var(--spacing-16) * 2 + 40px);
