@@ -53,8 +53,11 @@ export function ComplianceReadySoftwareFiles({
     useLogPeriodSummariesQuery()
   const documentationState = useDocumentationState()
   const downloadLogPeriodsMutation = useDownloadSelectedLogPeriods(robotName)
-  const { deleteSelectedLogPeriods, deletingIds } =
-    useDeleteSelectedLogPeriods(documentationState)
+  const {
+    deleteSelectedLogPeriods,
+    deletingIds,
+    isLoading: isDeleting,
+  } = useDeleteSelectedLogPeriods(documentationState)
   const { makeToast, eatToast } = useToaster()
   const observer = useRef<HTMLDivElement>(null)
 
@@ -308,7 +311,7 @@ export function ComplianceReadySoftwareFiles({
       {showRequiredDownloadModal && (
         <DownloadAuditLogsModal
           onDownload={handleDownloadAndDeleteRequired}
-          isLoading={downloadLogPeriodsMutation.status === 'loading'}
+          isLoading={downloadLogPeriodsMutation.isLoading || isDeleting}
         />
       )}
       <div className={fileManagerStyles.file_management_group}>
