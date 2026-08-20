@@ -60,8 +60,7 @@ export function useSoftwareKeyboardControl(
           )
         } else {
           console.error(
-            `useSoftwareKeyboardControl requires <input> or <textarea>, but got: ${inputElement}. This is a bug in the caller.`,
-            inputElement
+            `useSoftwareKeyboardControl requires <input> or <textarea>, but got: ${inputElement}. This is a bug in the caller.`
           )
           keyboard.setInput('')
           keyboard.setCaretPosition(0)
@@ -83,8 +82,7 @@ export function useSoftwareKeyboardControl(
           inputElement instanceof HTMLInputElement
         )) {
           console.error(
-            `useSoftwareKeyboardControl requires <input> or <textarea>, but got: ${inputElement}. This is a bug in the caller.`,
-            inputElement
+            `useSoftwareKeyboardControl requires <input> or <textarea>, but got: ${inputElement}. This is a bug in the caller.`
           )
           return
         }
