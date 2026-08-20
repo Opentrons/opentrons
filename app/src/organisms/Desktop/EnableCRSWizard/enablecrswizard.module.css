@@ -2,9 +2,9 @@
   display: flex;
   min-height: 18.5rem;
   flex-direction: column;
-  padding-inline: var(--spacing-24);
-  padding-block-start: var(--spacing-24);
   gap: var(--spacing-24);
+  padding-block-start: var(--spacing-24);
+  padding-inline: var(--spacing-24);
 }
 
 .step_body {
