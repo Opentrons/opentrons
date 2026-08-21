@@ -91,13 +91,103 @@ vacuum.move_to_doc(collar, use_gripper=True)
 
 Something something soon?
 
-## Setting vacuum pressure
+## Controlling vacuum pressure
 
 The module measures vacuum as gauge pressure in millibars (mbar). The vacuum range is from 0 mbar (atmospheric) to -800 mbar. Lower, or more negative, values represent a deeper vacuum. Two properties let you set the minimum and maximum vacuum in a protocol.
 
 * **0 mbar:** [`min_gauge_pressure_mbar`][opentrons.protocol_api.VacuumModuleContext.min_gauge_pressure_mbar]
 
 * **-800 mbar:** [`max_gauge_pressure_mbar`][opentrons.protocol_api.VacuumModuleContext.max_gauge_pressure_mbar]
+
+Show longer code snippet here?
+
+### Closed-loop pressure control
+
+Use [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure] to run the pump to reach a target pressure. This method returns a [task][opentrons.protocol_api.Task] (`Task`?) object representing concurrent execution. Pass the task to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to make the protocol wait for the system to return to atmospheric pressure before continuing.
+
+```python
+# Set system pressure to -300 mbar for 30 seconds and then equalize to atmospheric
+
+vacuum_task = vacuum.start_set_vacuum_pressure(
+    gauge_pressure_mbar=-300,
+    duration_s=30,
+    vent_after=True,
+    equalize_timeout_s=5
+)
+
+# Runs other pipetting or protocols actions while pump runs...
+
+# Wait for pressure equalization
+protocol.wait_for_tasks([vacuum_task])
+```
+
+In this example:
+
+- Setting `vent_after=True` opens the vent after 30 seconds (`duration_s=30`).
+- Setting `equalize_timeout_s` sets the maximum time allowed to 5 seconds (`equalize_timeout_s=5`) for the system to return to atmospheric pressure.
+
+What does protocol.wait_for_tasks then do? Continue with other steps in the protocol?
+Why is the "closed loop"?
+
+### Open-loop power control
+
+To run the pump using % power, rather than to a target pressure, use [`start_set_vacuum_power()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_power].
+
+```python
+# Run pump at 60% power for 20 seconds
+power_task = vacuum.start_set_vacuum_power(
+    percent_power=60,
+    duration_s=20,
+    vent_after=True,
+    equalize_timeout_s=5,
+)
+
+protocol.wait_for_tasks([power_task])
+```
+
+In this example:
+
+- The pump runs at a duty cycle of 60% of its rated power (`percent_power=60`) for a duration of 20 seconds (`duration_s=20`).
+- Setting `equalize_timeout_s` sets the maximum time allowed to 5 seconds (`equalize_timeout_s=5`) for the system to return to atmospheric pressure.
+
+### Multi-step vacuum profiles
+
+Use [start_execute_profile()][opentrons.protocol_api.VacuumModuleContext.start_execute_profile] to run a multi-step sequence of pressure or power stages without pausing the protocol run.
+
+```python
+# Define the different steps
+profile_steps = [
+    {
+        "enable_pump": True,
+        "gauge_pressure_mbar": -200,
+        "hold_time_seconds": 15,
+    },
+    {
+        "enable_pump": True,
+        "gauge_pressure_mbar": -500,
+        "hold_time_seconds": 30,
+    },
+]
+
+# Start profile execution
+profile_task = vacuum.start_execute_profile(
+    steps=profile_steps,
+    repetitions=1,
+    vent_after=True,
+    equalize_timeout_s=10,
+)
+protocol.wait_for_tasks([profile_task])
+```
+
+In this example, each step requires `enable_pump` and either `gauge_pressure_mbar` (0 to -800 mbar) or `percent_power` (1–100%). A single step cannot specify both pressure and power.
+
+### Manual pump and vent control
+
+You can also control the pump motor and vent using these standalone, utility commands:
+
+- **Stop pump:** Use [`stop_vacuum_pump()`][opentrons.protocol_api.VacuumModuleContext.stop_vacuum_pump] to stop the pump motor immediately.
+- **Open vent:** Use [open_vent()][opentrons.protocol_api.VacuumModuleContext.open_vent] to open the vent and return the system to atmospheric pressure.
+- **Close vent:** Use [close_vent()][opentrons.protocol_api.VacuumModuleContext.close_vent] to close the vent so the system can hold vacuum.
 
 ## Filter plate load names
 
