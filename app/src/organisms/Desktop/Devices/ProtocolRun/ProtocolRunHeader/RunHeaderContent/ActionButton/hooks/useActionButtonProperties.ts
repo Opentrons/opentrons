@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import {
   isModuleConfirmationStatus,
   isRunAgainStatus,
@@ -28,10 +29,12 @@ import {
   getCameraUsageState,
   getMissingSetupSteps,
 } from '/app/redux/protocol-runs'
+import { useIsRobotOutOfStorage } from '/app/resources/devices'
 
 import { isAnyHeaterShakerShaking } from '../../../RunHeaderModalContainer/modals'
 import { useActionBtnDisabledUtils } from './useActionBtnDisabledUtils'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { IconName } from '@opentrons/components'
 import type { StepKey } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
@@ -50,6 +53,7 @@ interface UseButtonPropertiesProps extends BaseActionButtonProps {
   areCameraPreferencesConfirmed: boolean
   isClosingCurrentRun: boolean
   isCameraReadyToRun: boolean
+  setShowRobotOutOfStorageModal: Dispatch<SetStateAction<boolean>>
 }
 
 // Returns ActionButton properties.
@@ -76,6 +80,7 @@ export function useActionButtonProperties({
   isValidRunAgain,
   protocolRunHeaderRef,
   isCameraReadyToRun,
+  setShowRobotOutOfStorageModal,
 }: UseButtonPropertiesProps): {
   buttonText: string
   handleButtonClick: () => void
@@ -95,13 +100,17 @@ export function useActionButtonProperties({
   const missingSetupSteps = useSelector<State, StepKey[]>((state: State) =>
     getMissingSetupSteps(state, runId)
   )
-  const { addCameraSettingsToRun } = useAddCameraSettingsToRunMutation()
+  const documentationState = useDocumentationState()
+  const { addCameraSettingsToRun } =
+    useAddCameraSettingsToRunMutation(documentationState)
   const runCameraSettings = useSelector((state: State) =>
     getCameraUsageState(state, runId)
   )
   let buttonText = ''
   let handleButtonClick = (): void => {}
   let buttonIconName: IconName | null = null
+
+  const isRobotOutOfMemory = useIsRobotOutOfStorage()
 
   const handlePlay = (): void => {
     play()
@@ -202,6 +211,8 @@ export function useActionButtonProperties({
           },
           { onSettled: handlePlay }
         )
+      } else if (isRobotOutOfMemory) {
+        setShowRobotOutOfStorageModal(true)
       } else {
         handlePlay()
       }
@@ -210,8 +221,18 @@ export function useActionButtonProperties({
     buttonIconName = isResetRunLoadingRef.current ? 'ot-spinner' : 'play'
     buttonText = t('run_again')
     handleButtonClick = () => {
+      if (isRobotOutOfMemory) {
+        setShowRobotOutOfStorageModal(true)
+        return
+      }
+
       isResetRunLoadingRef.current = true
-      reset()
+      reset({
+        onError: () => {
+          // e.g. user cancelled the documentation modal
+          isResetRunLoadingRef.current = false
+        },
+      })
       runHeaderModalContainerUtils.dropTipUtils.resetTipStatus()
       trackEvent({
         name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,

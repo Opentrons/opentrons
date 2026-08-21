@@ -38,7 +38,7 @@ export default {
       },
     },
   },
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof OddInfoScreen>> = args => (

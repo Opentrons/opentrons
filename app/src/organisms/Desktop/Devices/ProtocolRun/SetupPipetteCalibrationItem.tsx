@@ -21,12 +21,13 @@ import {
 } from '@opentrons/components'
 
 import { TertiaryButton } from '/app/atoms/buttons'
-import * as PipetteConstants from '/app/redux/pipettes/constants'
+import { INEXACT_MATCH, MATCH } from '/app/resources/runs/constants'
 
 import { useDeckCalibrationData } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 
-import type { Mount, PipetteInfo } from '/app/redux/pipettes'
+import type { Mount } from '@opentrons/api-client'
+import type { PipetteInfo } from '/app/resources/runs/types'
 
 const inexactPipetteSupportArticle =
   'https://support.opentrons.com/s/article/GEN2-pipette-compatibility'
@@ -60,10 +61,10 @@ export function SetupPipetteCalibrationItem({
   const pipetteCalDate = pipetteInfo.pipetteCalDate
 
   const attached =
-    pipetteInfo.requestedPipetteMatch === PipetteConstants.INEXACT_MATCH ||
-    pipetteInfo.requestedPipetteMatch === PipetteConstants.MATCH
+    pipetteInfo.requestedPipetteMatch === INEXACT_MATCH ||
+    pipetteInfo.requestedPipetteMatch === MATCH
 
-  if (pipetteInfo.requestedPipetteMatch === PipetteConstants.INEXACT_MATCH) {
+  if (pipetteInfo.requestedPipetteMatch === INEXACT_MATCH) {
     pipetteMismatchInfo = (
       <Flex alignItems={ALIGN_CENTER}>
         <Banner type="warning" padding={SPACING.spacing4}>
@@ -76,7 +77,6 @@ export function SetupPipetteCalibrationItem({
               lineHeight={TYPOGRAPHY.lineHeight12}
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
               href={inexactPipetteSupportArticle}
-              id="PipetteCalibration_pipetteMismatchHelpLink"
             >
               {t('learn_more')}
             </Link>
@@ -93,9 +93,7 @@ export function SetupPipetteCalibrationItem({
     button = (
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
         <RRDLink to={deviceDetailsUrl}>
-          <TertiaryButton id="PipetteCalibration_attachPipetteButton">
-            {t('attach_pipette_cta')}
-          </TertiaryButton>
+          <TertiaryButton>{t('attach_pipette_cta')}</TertiaryButton>
         </RRDLink>
       </Flex>
     )
@@ -113,11 +111,7 @@ export function SetupPipetteCalibrationItem({
           <RRDLink
             to={`/devices/${robotName}/robot-settings/calibration/dashboard`}
           >
-            <TertiaryButton
-              disabled={!isDeckCalibrated}
-              id="PipetteCalibration_calibratePipetteButton"
-              {...targetProps}
-            >
+            <TertiaryButton disabled={!isDeckCalibrated} {...targetProps}>
               {t('calibrate_now')}
             </TertiaryButton>
           </RRDLink>
@@ -142,7 +136,6 @@ export function SetupPipetteCalibrationItem({
       subText={subText}
       label={t(`devices_landing:${mount}_mount`)}
       title={pipetteInfo.pipetteSpecs?.displayName}
-      id={`PipetteCalibration_${mount}MountTitle`}
       runId={runId}
     />
   )

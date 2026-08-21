@@ -94,7 +94,10 @@ export function request<
   const tokenHeader = token != null ? { Authorization: `Bearer ${token}` } : {}
   const userNotesHeader =
     requestConfig?.userNotes != null
-      ? { 'Opentrons-User-Notes': requestConfig.userNotes }
+      ? // encodeURI() is nominally for URIs, and this is a header, not a URI.
+        // But encodeURI() is sufficient for percent-encoding all the characters
+        // that would be invalid in a header.
+        { 'Opentrons-User-Notes': encodeURI(requestConfig.userNotes) }
       : {}
   const extraHeaders = requestConfig?.headers ?? {}
   const headers = {
@@ -114,7 +117,13 @@ export function request<
       : 'http'
   const defaultPort = protocol === 'https' ? DEFAULT_HTTPS_PORT : DEFAULT_PORT
 
-  const baseURL = `${protocol}://${hostname}:${port ?? defaultPort}`
+  const portToUse = port
+    ? port === DEFAULT_PORT && protocol === 'https'
+      ? DEFAULT_HTTPS_PORT
+      : port
+    : defaultPort
+
+  const baseURL = `${protocol}://${hostname}:${portToUse}`
 
   return requestor<ResponseBodyT>({
     method,

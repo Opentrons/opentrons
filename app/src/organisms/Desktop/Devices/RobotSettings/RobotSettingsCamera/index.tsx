@@ -1,5 +1,6 @@
 import { Divider } from '@opentrons/components'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useCameraUsageSettings } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 import {
   SOURCE_ROBOT_SETTINGS,
@@ -22,6 +23,7 @@ export function RobotSettingsCamera({
   robotName,
   isRobotBusy,
 }: RobotSettingsCameraProps): JSX.Element {
+  const documentationState = useDocumentationState()
   const {
     toggleCameraEnabled,
     isCameraEnabled,
@@ -29,7 +31,7 @@ export function RobotSettingsCamera({
     isLiveVideoEnabled,
     toggleRecoveryCaptureEnabled,
     isRecoveryCaptureEnabled,
-  } = useCameraUsageSettings()
+  } = useCameraUsageSettings(documentationState)
   const robotType = useRobotType(robotName)
   const isFlex = useIsFlex(robotName)
   const { reportCameraEnablementSettings } = useCameraAnalytics({

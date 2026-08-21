@@ -32,14 +32,14 @@ export function IconButton(props: IconButtonProps): JSX.Element {
         }
         &:focus-visible {
           box-shadow: ${ODD_FOCUS_VISIBLE};
-          background-color: ${hasBackground
-            ? COLORS.grey35
-            : COLORS.transparent};
+          background-color: ${
+            hasBackground ? COLORS.grey35 : COLORS.transparent
+          };
         }
         &:disabled {
-          background-color: ${hasBackground
-            ? COLORS.grey35
-            : COLORS.transparent};
+          background-color: ${
+            hasBackground ? COLORS.grey35 : COLORS.transparent
+          };
           color: ${COLORS.grey50};
         }
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {

@@ -31,7 +31,9 @@ describe('CompleteUpdateSoftware', () => {
     render(props)
     screen.getByText('Update complete!')
     screen.getByText('Install complete, robot restarting...')
-    const bar = screen.getByTestId('ProgressBar_Bar')
+    const container = screen.getByRole('progressbar')
+    // eslint-disable-next-line testing-library/no-node-access
+    const bar = container.firstChild
     expect(bar).toHaveStyle('width: 100%')
   })
 })

@@ -13,15 +13,23 @@ class Scope(enum.Enum):
 
     # Example:
     #
-    # PYTHON_NAME = ("api_name", "description")
+    #   PYTHON_NAME = ("api_name", "description")
     #
     # "PYTHON_NAME" is arbitrary.
     # "api_name" is exposed as part of the HTTP API, and may be stored persistently.
     # "description" is developer-readable documentation for the OpenAPI spec.
+    #
+    # If you add a scope here, remember that you may also need to add it to
+    # auth-server's get_scope_set_of_account_type().
 
     AUTH_SETTINGS_WRITE = (
         "auth_settings.write",
         "Edit settings related to authentication, authorization, and access control.",
+    )
+
+    PROTOCOL_ANALYSES_WRITE = (
+        "protocol_analyses.write",
+        "Create robot-side protocol analyses.",
     )
 
     PROTOCOLS_WRITE = (
@@ -52,12 +60,22 @@ class Scope(enum.Enum):
         "Edit robot settings for which there is no more specific scope.",
     )
 
+    SYSTEM_TIME_WRITE = (
+        "system_time.write",
+        "Set the robot's system clock.",
+    )
+
     RUN_DATA_WRITE = (
         "run_data.write",
         (
             "Create, update, or delete data that's the input or output of a run,"
             " such as images and CSV files."
         ),
+    )
+
+    RUN_SIGNOFF_WRITE = (
+        "run_signoff.write",
+        "Sign off on a completed protocol run.",
     )
 
     # We actually want access control mode to totally disable SSH, so this scope is
@@ -89,19 +107,17 @@ class Scope(enum.Enum):
         "Update the currently authenticated user's own account (e.g. change password).",
     )
 
-    USERS_WRITE_SELF_PASSWORD = (
-        "users.write.self.password",
-        (
-            "Change the currently authenticated user's own password."
-            " This is the minimum scope granted to a user who must reset their"
-            " password before they can do anything else."
-        ),
-    )
-
     USERS_WRITE = (
         "users.write",
         "Create, update, and delete users.",
     )
+
+    AUDIT_LOG_WRITE = (
+        "audit_log.write",
+        "Write arbitrary audit logs.",
+    )
+
+    AUDIT_LOG_DELETE = ("audit_log.delete", "Delete audit logs after downloading them.")
 
     _description: str
 

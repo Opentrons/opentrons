@@ -11,13 +11,18 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { ActionsView } from './ActionsView'
 import styles from './documentationrequired.module.css'
 
-import type { DocumentedAction } from '@opentrons/react-api-client'
+import type {
+  DocumentationReport,
+  DocumentedAction,
+} from '@opentrons/react-api-client'
 
 interface DocumentationRequiredProps {
   username: string
   actionsToDocument: DocumentedAction[]
   onConfirm: (note: string) => void
   onBack: () => void
+  minReportLength: number
+  initialDocreport?: DocumentationReport
 }
 
 export function DocumentationRequired({
@@ -25,9 +30,12 @@ export function DocumentationRequired({
   actionsToDocument,
   onConfirm,
   onBack,
+  minReportLength,
+  initialDocreport,
 }: DocumentationRequiredProps): JSX.Element {
   const { t } = useTranslation(['access_control', 'shared'])
-  const [inputText, setInputText] = useState<string>('')
+  const [inputText, setInputText] = useState<string>(initialDocreport ?? '')
+  const [error, setError] = useState<string | null>(null)
   const [keyboardExpanded, setKeyboardExpanded] = useState(true)
   const keyboardRef = useRef(null)
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
@@ -36,9 +44,25 @@ export function DocumentationRequired({
     setKeyboardExpanded(prev => !prev)
   }
 
+  const handleInputChange = (value: string): void => {
+    setInputText(value)
+    setError(null)
+  }
+
   const trimmedNote = inputText.trim()
   const handleConfirm = (): void => {
-    if (trimmedNote === '') return
+    if (trimmedNote === '') {
+      setError(t('documentation_is_required') as string)
+      return
+    }
+    if (trimmedNote.length < minReportLength) {
+      setError(
+        t('must_be_at_least_characters', {
+          minLength: minReportLength,
+        }) as string
+      )
+      return
+    }
     onConfirm(trimmedNote)
   }
 
@@ -55,7 +79,6 @@ export function DocumentationRequired({
           header={t('documentation_required')}
           buttonText={t('shared:confirm')}
           onClickButton={handleConfirm}
-          buttonIsDisabled={trimmedNote === ''}
           secondaryButtonProps={{
             buttonText: 'View actions',
             buttonType: 'tertiaryHighLight',
@@ -76,15 +99,14 @@ export function DocumentationRequired({
           >
             <div className={styles.text_area_field_fill}>
               <TouchTextAreaField
+                multiline
                 autoFocus
                 value={inputText}
                 ref={textAreaRef}
                 label={t('access_control_note', { user: username })}
+                error={error}
                 onChange={e => {
-                  setInputText(e.target.value)
-                }}
-                onBlur={e => {
-                  e.target.focus()
+                  handleInputChange(e.target.value)
                 }}
               />
             </div>
@@ -98,7 +120,7 @@ export function DocumentationRequired({
         >
           <FullKeyboard
             onChange={(input: string) => {
-              setInputText(input)
+              handleInputChange(input)
               textAreaRef.current?.focus()
             }}
             keyboardRef={keyboardRef}

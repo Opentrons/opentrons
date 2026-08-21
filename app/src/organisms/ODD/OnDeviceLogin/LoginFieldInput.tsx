@@ -18,7 +18,7 @@ export interface LoginFieldInputProps<
   error: string | null
   isPasswordField: boolean
   onClearError?: () => void
-  onFocus: () => void
+  autoFocus?: boolean
 }
 
 export function LoginFieldInput<
@@ -29,21 +29,17 @@ export function LoginFieldInput<
   error,
   isPasswordField,
   onClearError,
-  onFocus,
+  autoFocus,
 }: LoginFieldInputProps<TFieldName>): JSX.Element {
   const [showPassword, setShowPassword] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isPasswordHidden = isPasswordField && !showPassword
   const inputType: 'text' | 'password' = isPasswordHidden ? 'password' : 'text'
 
-  const togglePasswordVisibility = (): void => {
-    setShowPassword(current => !current)
-    inputRef.current?.focus()
-  }
-
   const inputField = (
     <TouchInputField
       ref={setRefs(inputRef, field.ref)}
+      autoFocus={autoFocus}
       type={inputType}
       label={label}
       error={error}
@@ -55,7 +51,6 @@ export function LoginFieldInput<
         field.onChange(e.target.value)
         onClearError?.()
       }}
-      onFocus={onFocus}
     />
   )
 
@@ -66,7 +61,9 @@ export function LoginFieldInput<
       <div className={styles.password_field_input}>{inputField}</div>
       <PasswordVisibilityToggle
         isVisible={showPassword}
-        onToggle={togglePasswordVisibility}
+        onToggle={() => {
+          setShowPassword(prev => !prev)
+        }}
       />
     </div>
   )

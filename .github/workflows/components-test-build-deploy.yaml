@@ -47,7 +47,7 @@ jobs:
       relative_artifact_dir: ${{ steps.deploy-config.outputs.RELATIVE_ARTIFACT_DIR }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ./.github/actions/git/resolve-tag
       - name: Setup UV
         uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
@@ -66,7 +66,7 @@ jobs:
     timeout-minutes: 30
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ./.github/actions/js/setup
       - name: 'run components unit tests'
         run: make -C components test-cov
@@ -76,7 +76,7 @@ jobs:
     runs-on: 'ubuntu-24.04'
     needs: ['determine-deploy-config', 'js-unit-test']
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: ./.github/actions/js/setup
       - name: 'build components'
         run: make -C components
@@ -102,9 +102,7 @@ jobs:
           role-to-assume: ${{ vars.STATIC_DEPLOY_ROLE }}
           aws-region: us-east-2
       - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - id: resolve-tag
         uses: ./.github/actions/git/resolve-tag
       - name: Setup UV
@@ -134,7 +132,7 @@ jobs:
     needs: ['js-unit-test']
     if: startsWith(github.ref, 'refs/tags/components')
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       # https://github.com/actions/checkout/issues/290
       - name: 'Fix actions/checkout odd handling of tags'
         if: startsWith(github.ref, 'refs/tags')
@@ -179,7 +177,7 @@ jobs:
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && needs.js-unit-test.result == 'success' && needs.build-components-storybook.result == 'success' && needs.deploy-components.result == 'success' && needs.publish-components.result == 'success'
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'Send success alert'
         uses: ./.github/actions/simple-build-alert
         with:
@@ -200,7 +198,7 @@ jobs:
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.js-unit-test.result == 'failure' || needs.build-components-storybook.result == 'failure' || needs.deploy-components.result == 'failure' || needs.publish-components.result == 'failure')
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'Determine failed jobs'
         id: failed-jobs
         shell: bash
@@ -243,7 +241,7 @@ jobs:
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.js-unit-test.result == 'cancelled' || needs.build-components-storybook.result == 'cancelled' || needs.deploy-components.result == 'cancelled' || needs.publish-components.result == 'cancelled')
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: 'Send cancelled alert'
         uses: ./.github/actions/simple-build-alert
         with:

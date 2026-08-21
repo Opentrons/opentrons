@@ -9,7 +9,7 @@ import {
 import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
-import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
+import { mockPipetteInfo } from '/app/resources/instruments/__fixtures__'
 
 import { useTipAttachmentStatus } from '../useTipAttachmentStatus'
 
@@ -135,6 +135,7 @@ describe('useTipAttachmentStatus', () => {
 
     expect(result.current.areTipsAttached).toBe(false)
     expect(result.current.aPipetteWithTip).toBeNull()
+    expect(result.current.initialPipettesWithTipsCount).toBe(0)
   })
 
   it('should reset tip status', async () => {
@@ -155,6 +156,29 @@ describe('useTipAttachmentStatus', () => {
     expect(result.current.areTipsAttached).toBe(false)
     expect(result.current.aPipetteWithTip).toEqual(null)
     expect(result.current.initialPipettesWithTipsCount).toEqual(null)
+  })
+
+  it('should resolve all tips without resetting the settled tip-check count', async () => {
+    const { result } = renderTipAttachmentStatus()
+
+    await waitFor(() => {
+      expect(result.current).toBeDefined()
+    })
+
+    await act(async () => {
+      await result.current.determineTipStatus()
+    })
+
+    expect(result.current.areTipsAttached).toBe(true)
+    expect(result.current.initialPipettesWithTipsCount).toBe(2)
+
+    act(() => {
+      result.current.resolveAllTips()
+    })
+
+    expect(result.current.areTipsAttached).toBe(false)
+    expect(result.current.aPipetteWithTip).toEqual(null)
+    expect(result.current.initialPipettesWithTipsCount).toBe(2)
   })
 
   it('should set tip status resolved and a  state', async () => {

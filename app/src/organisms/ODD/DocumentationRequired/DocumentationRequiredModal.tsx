@@ -12,9 +12,15 @@ const DocumentationRequiredModalImpl = NiceModal.create(
   ({
     username,
     actionsToDocument,
+    minReportLength,
+    onCancel,
+    initialDocreport,
   }: {
     username: string
     actionsToDocument: DocumentedAction[]
+    minReportLength: number
+    onCancel?: () => void
+    initialDocreport?: DocumentationReport
   }): JSX.Element => {
     const modal = useModal()
 
@@ -25,6 +31,7 @@ const DocumentationRequiredModalImpl = NiceModal.create(
     }
 
     const handleBack = (): void => {
+      onCancel?.()
       modal.resolve('' as DocumentationReport)
       modal.remove()
     }
@@ -36,6 +43,8 @@ const DocumentationRequiredModalImpl = NiceModal.create(
           actionsToDocument={actionsToDocument}
           onConfirm={handleConfirm}
           onBack={handleBack}
+          initialDocreport={initialDocreport}
+          minReportLength={minReportLength}
         />
       </div>
     )
@@ -44,9 +53,15 @@ const DocumentationRequiredModalImpl = NiceModal.create(
 
 export const showDocumentationRequiredModal = (
   username: string,
-  actionsToDocument: DocumentedAction[]
+  actionsToDocument: DocumentedAction[],
+  minReportLength: number,
+  onCancel?: () => void,
+  initialDocreport?: DocumentationReport
 ): Promise<DocumentationReport> =>
   NiceModal.show(DocumentationRequiredModalImpl, {
     username,
     actionsToDocument,
+    minReportLength,
+    onCancel,
+    initialDocreport,
   })

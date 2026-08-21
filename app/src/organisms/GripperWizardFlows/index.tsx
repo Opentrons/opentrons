@@ -15,6 +15,7 @@ import {
   WizardHeader,
 } from '@opentrons/components'
 import {
+  isDocumentedMutationError,
   useCreateMaintenanceCommandMutation,
   useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
@@ -73,7 +74,7 @@ export function GripperWizardFlows(
     deletionDocState,
     actionsToDocument,
     addActionToDocument,
-  } = useMaintenanceRunDocumentation(flowName)
+  } = useMaintenanceRunDocumentation(flowName, closeFlow)
   const {
     chainRunCommands,
     isCommandMutationLoading: isChainCommandMutationLoading,
@@ -106,8 +107,11 @@ export function GripperWizardFlows(
       onSuccess: response => {
         setCreatedMaintenanceRunId(response.data.id)
       },
-      onError: error => {
-        setErrorMessage(error.message)
+      onError: (error: unknown) => {
+        if (isDocumentedMutationError(error)) {
+          return
+        }
+        setErrorMessage(error instanceof Error ? error.message : String(error))
       },
     })
 
@@ -147,8 +151,9 @@ export function GripperWizardFlows(
     }
     if (maintenanceRunData != null) {
       deleteMaintenanceRun(maintenanceRunData?.data.id)
+    } else {
+      closeFlow()
     }
-    closeFlow()
   }
 
   const { deleteMaintenanceRun, isLoading: isDeleteLoading } =
@@ -160,7 +165,7 @@ export function GripperWizardFlows(
           closeFlow()
         },
         onError: () => {
-          closeFlow()
+          setIsExiting(false)
         },
       }
     )
@@ -205,7 +210,14 @@ export function GripperWizardFlows(
       handleCleanUpAndClose={handleCleanUpAndClose}
       handleClose={handleClose}
       chainRunCommands={chainRunCommands}
-      createRunCommand={createMaintenanceCommand}
+      createRunCommand={params =>
+        createMaintenanceCommand(params).catch(error => {
+          if (isDocumentedMutationError(error)) {
+            return new Promise(() => {})
+          }
+          return Promise.reject(error)
+        })
+      }
       errorMessage={errorMessage}
       setErrorMessage={setErrorMessage}
       isExiting={isExiting}
@@ -434,7 +446,7 @@ export const GripperWizard = (
         {modalContent}
       </Flex>
     ) : (
-      <ModalShell width="48rem" header={wizardHeader}>
+      <ModalShell width="47rem" header={wizardHeader}>
         {modalContent}
       </ModalShell>
     ),

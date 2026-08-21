@@ -75,9 +75,7 @@ export type LabwareLocation =
   | { labwareId: string }
 
 export type NonStackedLocation =
-  | 'offDeck'
-  | { slotName: string }
-  | { moduleId: string }
+  'offDeck' | { slotName: string } | { moduleId: string }
 
 export interface ModuleLocation {
   slotName: string
@@ -105,9 +103,7 @@ interface LoadLabwareResult {
 }
 
 export type LabwareMovementStrategy =
-  | 'usingGripper'
-  | 'manualMoveWithPause'
-  | 'manualMoveWithoutPause'
+  'usingGripper' | 'manualMoveWithPause' | 'manualMoveWithoutPause'
 
 export interface MoveLabwareParams {
   labwareId: string

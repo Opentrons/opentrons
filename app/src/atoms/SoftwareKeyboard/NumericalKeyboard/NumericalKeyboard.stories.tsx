@@ -15,7 +15,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 const meta: Meta<typeof NumericalKeyboard> = {
   title: 'ODD/Atoms/SoftwareKeyboard/NumericalKeyboard',
   component: NumericalKeyboard,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   argTypes: {
     isDecimal: {
       control: {

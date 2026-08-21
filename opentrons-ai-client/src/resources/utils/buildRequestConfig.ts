@@ -11,7 +11,6 @@ import {
 } from '/ai-client/resources/constants'
 
 import { buildMultipartFormData } from './buildMultipartFormData'
-import { detectProtocolFormat } from './protocolFormat'
 import { getUpdateOrCreatePrompt } from './protocolUtils'
 
 import type { AxiosRequestConfig } from 'axios'
@@ -114,9 +113,7 @@ export const buildRequestConfig = (
       createProtocol,
       updateProtocol,
       false, // isRegenerateRequest will be passed from handleClick
-      detectProtocolFormat(
-        isNewProtocol ? createProtocol.prompt : updateProtocol.prompt
-      )
+      protocolFormat
     )
 
     return {

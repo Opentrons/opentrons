@@ -3,7 +3,9 @@ from typing import AsyncGenerator
 
 import pytest
 from decoy import Decoy, matchers
-from serial.serialutil import SerialException as PySerialSerialException
+from serial.serialutil import (  # type: ignore[import-untyped]
+    SerialException as PySerialSerialException,
+)
 
 from opentrons.hardware_control.poller import Poller, Reader
 
@@ -146,7 +148,9 @@ async def test_poller_disconnect_io_does_not_log_callback_traceback(
     io_error = PySerialSerialException("write failed: [Errno 5] Input/output error")
     decoy.when(await mock_reader.read()).then_raise(io_error)  # type: ignore[func-returns-value]
     decoy.when(
-        mock_reader.on_error(matchers.ErrorMatching(PySerialSerialException))
+        mock_reader.on_error(  # type: ignore[func-returns-value]
+            matchers.ErrorMatching(PySerialSerialException)
+        )
     ).then_raise(io_error)
 
     with caplog.at_level("DEBUG"):

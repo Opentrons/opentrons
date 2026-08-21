@@ -5,7 +5,7 @@ from __future__ import annotations
 import enum
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from pydantic import BaseModel, ConfigDict
 from typing_extensions import assert_never
@@ -166,6 +166,19 @@ class CommandAnnotationsSlice(BaseModel):
     total_length: int
 
 
+class CurrentCommandNotification(BaseModel):
+    """Engine notification for Command status change of the running command."""
+
+    running_command_pointer: CommandPointer | None
+
+
+class FinalizedCommandNotification(BaseModel):
+    """Engine notification for Command status change of the finalized and running commands."""
+
+    finalized_command_pointer: CommandPointer | None
+    running_command_pointer: CommandPointer | None
+
+
 @dataclass(frozen=True)
 class _RecoveryTargetInfo:
     """Info about the command that we're currently recovering from."""
@@ -285,6 +298,11 @@ class CommandStore(HasState[CommandState], HandlesActions):
         config: Config,
         is_door_open: bool,
         error_recovery_policy: ErrorRecoveryPolicy,
+        updates_callback: Optional[
+            Callable[
+                [CurrentCommandNotification | FinalizedCommandNotification | Any], None
+            ]
+        ] = None,
     ) -> None:
         """Initialize a CommandStore and its state."""
         self._config = config
@@ -308,6 +326,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             protocol_pause_deferred=False,
             command_annotations={},
         )
+        self._updates_callback = updates_callback
 
     def handle_action(self, action: Action) -> None:  # noqa: C901
         """Modify state in reaction to an action."""
@@ -384,10 +403,49 @@ class CommandStore(HasState[CommandState], HandlesActions):
         )
 
         self._state.command_history.set_command_running(running_command)
+        if self._updates_callback:
+            updated_command = self._state.command_history.get_running_command()
+            self._updates_callback(
+                CurrentCommandNotification(
+                    running_command_pointer=CommandPointer(
+                        command_id=updated_command.command.id,
+                        command_key=updated_command.command.key,
+                        created_at=updated_command.command.createdAt,
+                        index=updated_command.index,
+                    )
+                    if updated_command is not None
+                    else None
+                ),
+            )
 
     def _handle_succeed_command_action(self, action: SucceedCommandAction) -> None:
         succeeded_command = action.command
         self._state.command_history.set_command_succeeded(succeeded_command)
+        if self._updates_callback:
+            finalized_command = (
+                self._state.command_history.get_most_recently_completed_command()
+            )
+            running_command = self._state.command_history.get_running_command()
+            self._updates_callback(
+                FinalizedCommandNotification(
+                    finalized_command_pointer=CommandPointer(
+                        command_id=finalized_command.command.id,
+                        command_key=finalized_command.command.key,
+                        created_at=finalized_command.command.createdAt,
+                        index=finalized_command.index,
+                    )
+                    if finalized_command is not None
+                    else None,
+                    running_command_pointer=CommandPointer(
+                        command_id=running_command.command.id,
+                        command_key=running_command.command.key,
+                        created_at=running_command.command.createdAt,
+                        index=running_command.index,
+                    )
+                    if running_command is not None
+                    else None,
+                ),
+            )
 
     def _handle_begin_awaiting_recovery_action(
         self, action: BeginAwaitingRecoveryAction
@@ -670,6 +728,31 @@ class CommandStore(HasState[CommandState], HandlesActions):
         self._state.command_history.set_command_failed(failed_command)
         if error_recovery_type is not None:
             self._state.command_error_recovery_types[command_id] = error_recovery_type
+        if self._updates_callback:
+            finalized_command = (
+                self._state.command_history.get_most_recently_completed_command()
+            )
+            running_command = self._state.command_history.get_running_command()
+            self._updates_callback(
+                FinalizedCommandNotification(
+                    finalized_command_pointer=CommandPointer(
+                        command_id=finalized_command.command.id,
+                        command_key=finalized_command.command.key,
+                        created_at=finalized_command.command.createdAt,
+                        index=finalized_command.index,
+                    )
+                    if finalized_command is not None
+                    else None,
+                    running_command_pointer=CommandPointer(
+                        command_id=running_command.command.id,
+                        command_key=running_command.command.key,
+                        created_at=running_command.command.createdAt,
+                        index=running_command.index,
+                    )
+                    if running_command is not None
+                    else None,
+                ),
+            )
 
     def _handle_create_user_command_annotation(
         self, action: CreateUserCommandAnnotation

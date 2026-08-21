@@ -18,12 +18,14 @@ export function useRunQuery<TError = Error>(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const queryClient = useQueryClient()
+  // Route params can turn a missing id into the literal string "null" (e.g. `/runs/${null}` → `/runs/null`). Treat that like no id.
+  const isValidRunId = runId != null && runId !== 'null'
   const query = useQuery<Run, TError>(
     getQueryKey(host, 'runs', runId, 'details'),
     () => getRun(host!, runId!).then(response => response.data),
     {
-      enabled: host !== null && runId != null && options.enabled !== false,
       ...options,
+      enabled: host !== null && isValidRunId && options.enabled !== false,
     }
   )
 
@@ -45,7 +47,9 @@ export function useRunQuery<TError = Error>(
           ((query.data?.data?.errors ?? []) as RunError[]).map(estopInErrorTree)
         )
       ) {
-        queryClient.invalidateQueries(getQueryKey(host, '/robot/control'))
+        queryClient.invalidateQueries(
+          getQueryKey(host, 'robot/control/estopStatus')
+        )
       }
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.

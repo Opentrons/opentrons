@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import first from 'lodash/first'
@@ -17,25 +18,27 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import {
-  ApiHostProvider,
+  isDocumentedMutationError,
   useUploadCsvFileMutation,
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { getTopPortalEl } from '/app/App/portal'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/hooks'
 import { LegacyApplyHistoricOffsets } from '/app/organisms/LegacyApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useRobotType } from '/app/redux-resources/robots'
-import { OPENTRONS_USB } from '/app/redux/discovery'
-import { useAccessTokenForRobot } from '/app/redux/robot-auth'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
-import { appShellUSBRequestor } from '/app/redux/shell/remote'
+import { useIsRobotOutOfStorage } from '/app/resources/devices'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
 } from '/app/transformations/runs'
 
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
+import { RobotOutOfStorageModal } from '../Devices/RobotOutOfStorageModal.tsx'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
 
 import type { MouseEventHandler } from 'react'
@@ -79,8 +82,10 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     storedProtocolData,
     selectedRobot?.name ?? ''
   )
-  const runTimeParameters =
-    storedProtocolData.mostRecentAnalysis?.runTimeParameters ?? []
+  const runTimeParameters = useMemo(
+    () => mostRecentAnalysis?.runTimeParameters ?? [],
+    [mostRecentAnalysis]
+  )
 
   const [runTimeParametersOverrides, setRunTimeParametersOverrides] =
     useState<RunTimeParameter[]>(runTimeParameters)
@@ -88,14 +93,12 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   const [hasMissingFileParam, setHasMissingFileParam] = useState<boolean>(
     runTimeParameters?.some(parameter => parameter.type === 'csv_file') ?? false
   )
-  useEffect(
-    () => {
-      setRunTimeParametersOverrides(runTimeParameters)
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [protocolKey]
-  )
+  useEffect(() => {
+    setRunTimeParametersOverrides(runTimeParameters)
+    setHasMissingFileParam(
+      runTimeParameters.some(parameter => parameter.type === 'csv_file')
+    )
+  }, [protocolKey, runTimeParameters])
 
   const [targetProps, tooltipProps] = useHoverTooltip()
 
@@ -105,7 +108,12 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     null
   )
 
-  const { uploadCsvFile } = useUploadCsvFileMutation()
+  const documentationState = useDocumentationState()
+  const { uploadCsvFile } = useUploadCsvFileMutation(documentationState)
+
+  const isRobotOutOfStorage = useIsRobotOutOfStorage()
+  const [showRobotOutOfStorageModal, setShowRobotOutOfStorageModal] =
+    useState<boolean>(false)
 
   const {
     createRunFromProtocolSource,
@@ -138,9 +146,15 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
           location,
           definitionUri,
         }))
-      : []
+      : [],
+    runTimeParameters?.length > 0 ? ['confirm_parameters'] : []
   )
   const handleProceed: MouseEventHandler<HTMLButtonElement> = () => {
+    if (isRobotOutOfStorage) {
+      setShowRobotOutOfStorageModal(true)
+      return
+    }
+
     trackCreateProtocolRunEvent({ name: 'createProtocolRecordRequest' })
     const dataFilesForProtocolMap = runTimeParametersOverrides.reduce<
       Record<string, File>
@@ -157,26 +171,48 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
         const varName = Promise.resolve(key)
         return Promise.all([fileResponse, varName])
       })
-    ).then(responseTuples => {
-      const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
-        Record<string, string>
-      >((acc, [uploadedFileResponse, variableName]) => {
-        return { ...acc, [variableName]: uploadedFileResponse.data.id }
-      }, {})
-      const runTimeParameterValues = getRunTimeParameterValuesForRun(
-        runTimeParametersOverrides
-      )
-      const runTimeParameterFiles = getRunTimeParameterFilesForRun(
-        runTimeParametersOverrides,
-        mappedResolvedCsvVariableToFileId
-      )
-      createRunFromProtocolSource({
-        files: srcFileObjects,
-        protocolKey,
-        runTimeParameterValues,
-        runTimeParameterFiles,
+    )
+      .then(responseTuples => {
+        const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
+          Record<string, string>
+        >((acc, [uploadedFileResponse, variableName]) => {
+          return { ...acc, [variableName]: uploadedFileResponse.data.id }
+        }, {})
+        const runTimeParameterValues = getRunTimeParameterValuesForRun(
+          runTimeParametersOverrides
+        )
+        const runTimeParameterFiles = getRunTimeParameterFilesForRun(
+          runTimeParametersOverrides,
+          mappedResolvedCsvVariableToFileId
+        )
+        createRunFromProtocolSource({
+          files: srcFileObjects,
+          protocolKey,
+          runTimeParameterValues,
+          runTimeParameterFiles,
+        })
       })
-    })
+      .catch((error: unknown) => {
+        if (!isDocumentedMutationError(error)) {
+          throw error
+        }
+      })
+  }
+
+  const handleProceedToRTP = (): void => {
+    if (isRobotOutOfStorage) {
+      setShowRobotOutOfStorageModal(true)
+      return
+    }
+    setCurrentPage(2)
+  }
+
+  const handleClickManageFiles = (): void => {
+    if (selectedRobot != null) {
+      navigate(`/devices/${selectedRobot.name}/robot-settings/file-manager`)
+      return
+    }
+    setShowRobotOutOfStorageModal(false)
   }
 
   const isSelectedRobotOnDifferentSoftwareVersion =
@@ -244,9 +280,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
           <>
             {offsetsComponent}
             <PrimaryButton
-              onClick={() => {
-                setCurrentPage(2)
-              }}
+              onClick={handleProceedToRTP}
               width="100%"
               disabled={
                 isCreatingRun ||
@@ -317,42 +351,56 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   }
 
   return (
-    <ChooseRobotSlideout
-      multiSlideout={hasRunTimeParameters ? { currentPage } : null}
-      isExpanded={showSlideout}
-      isSelectedRobotOnDifferentSoftwareVersion={
-        isSelectedRobotOnDifferentSoftwareVersion
-      }
-      onCloseClick={() => {
-        onCloseClick()
-        resetRunTimeParameters()
-        setCurrentPage(1)
-        setSelectedRobot(null)
-      }}
-      title={
-        hasRunTimeParameters && currentPage === 2
-          ? t('select_parameters_for_robot', {
-              robot_name: selectedRobot?.name,
-            })
-          : t('choose_robot_to_run', {
-              protocol_name: protocolDisplayName,
-            })
-      }
-      runTimeParametersOverrides={runTimeParametersOverrides}
-      setRunTimeParametersOverrides={setRunTimeParametersOverrides}
-      footer={footer}
-      selectedRobot={selectedRobot}
-      setSelectedRobot={setSelectedRobot}
-      robotType={robotType}
-      isCreatingRun={isCreatingRun}
-      reset={resetCreateRun}
-      runCreationError={runCreationError}
-      runCreationErrorCode={runCreationErrorCode}
-      showIdleOnly
-      setHasParamError={setHasParamError}
-      resetRunTimeParameters={resetRunTimeParameters}
-      setHasMissingFileParam={setHasMissingFileParam}
-    />
+    <>
+      {showRobotOutOfStorageModal
+        ? createPortal(
+            <RobotOutOfStorageModal
+              onConfirm={handleClickManageFiles}
+              onClose={() => {
+                setShowRobotOutOfStorageModal(false)
+              }}
+            />,
+            getTopPortalEl()
+          )
+        : null}
+
+      <ChooseRobotSlideout
+        multiSlideout={hasRunTimeParameters ? { currentPage } : null}
+        isExpanded={showSlideout}
+        isSelectedRobotOnDifferentSoftwareVersion={
+          isSelectedRobotOnDifferentSoftwareVersion
+        }
+        onCloseClick={() => {
+          onCloseClick()
+          resetRunTimeParameters()
+          setCurrentPage(1)
+          setSelectedRobot(null)
+        }}
+        title={
+          hasRunTimeParameters && currentPage === 2
+            ? t('select_parameters_for_robot', {
+                robot_name: selectedRobot?.name,
+              })
+            : t('choose_robot_to_run', {
+                protocol_name: protocolDisplayName,
+              })
+        }
+        runTimeParametersOverrides={runTimeParametersOverrides}
+        setRunTimeParametersOverrides={setRunTimeParametersOverrides}
+        footer={footer}
+        selectedRobot={selectedRobot}
+        setSelectedRobot={setSelectedRobot}
+        robotType={robotType}
+        isCreatingRun={isCreatingRun}
+        reset={resetCreateRun}
+        runCreationError={runCreationError}
+        runCreationErrorCode={runCreationErrorCode}
+        showIdleOnly
+        setHasParamError={setHasParamError}
+        resetRunTimeParameters={resetRunTimeParameters}
+        setHasMissingFileParam={setHasMissingFileParam}
+      />
+    </>
   )
 }
 
@@ -360,16 +408,8 @@ export function ChooseRobotToRunProtocolSlideout(
   props: ChooseRobotToRunProtocolSlideoutProps
 ): JSX.Element | null {
   const [selectedRobot, setSelectedRobot] = useState<Robot | null>(null)
-  const token = useAccessTokenForRobot(selectedRobot?.name ?? null)
   return (
-    <ApiHostProvider
-      hostname={selectedRobot?.ip ?? null}
-      port={selectedRobot?.port ?? null}
-      requestor={
-        selectedRobot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined
-      }
-      token={token}
-    >
+    <ApiHostProvider robotName={selectedRobot?.name ?? null}>
       <ChooseRobotToRunProtocolSlideoutComponent
         {...{ ...props, selectedRobot, setSelectedRobot }}
       />

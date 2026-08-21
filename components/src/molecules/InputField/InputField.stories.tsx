@@ -1,5 +1,6 @@
 import * as React from 'react'
 
+import { customViewports } from '../../../../.storybook/preview'
 import { DIRECTION_COLUMN } from '../../styles'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { InputField as InputFieldComponent } from './index'
@@ -11,7 +12,9 @@ const meta: Meta<typeof InputFieldComponent> = {
   // The unification for this component will be done when the old component is retired completely.
   title: 'Helix/Molecules/InputField',
   component: InputFieldComponent,
-  parameters: VIEWPORT.touchScreenViewport,
+  viewport: {
+    options: [VIEWPORT.touchScreenViewport, customViewports],
+  },
   argTypes: {
     units: {
       control: {

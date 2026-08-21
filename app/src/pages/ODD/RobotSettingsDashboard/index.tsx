@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import last from 'lodash/last'
 
+import { usePostWifiConfigureMutation } from '@opentrons/react-api-client'
+
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import {
   DeviceReset,
   Devices,
@@ -22,14 +24,14 @@ import {
   UpdateChannel,
 } from '/app/organisms/ODD/RobotSettingsDashboard'
 import { CameraPreferences } from '/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences'
+import { FileManager } from '/app/organisms/ODD/RobotSettingsDashboard/FileManager'
 import { EthernetConnectionDetails } from '/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings/EthernetConnectionDetails'
 import {
   getLocalRobot,
   getRobotApiVersion,
+  startDiscovery,
   UNREACHABLE,
 } from '/app/redux/discovery'
-import { fetchStatus, postWifiConfigure } from '/app/redux/networking'
-import { getRequestById, useDispatchApiRequest } from '/app/redux/robot-api'
 import {
   getRobotUpdateAvailable,
   getRobotUpdateInfoForRobot,
@@ -80,10 +82,18 @@ export function RobotSettingsDashboard(): JSX.Element {
 
   // REQUESTS
   const dispatch = useDispatch<Dispatch>()
-  const [dispatchApiRequest, requestIds] = useDispatchApiRequest()
-  const requestState = useSelector((state: State) => {
-    const lastId = last(requestIds)
-    return lastId != null ? getRequestById(state, lastId) : null
+  const documentationState = useDocumentationState()
+  const {
+    postWifiConfigure,
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+    reset: resetWifiConfigure,
+  } = usePostWifiConfigureMutation(documentationState, {
+    onSuccess: () => {
+      dispatch(startDiscovery())
+    },
   })
 
   const handleWifiConnect = (): void => {
@@ -93,14 +103,10 @@ export function RobotSettingsDashboard(): JSX.Element {
       hidden: selectedAuthType === 'none',
       psk: password,
     }
-    dispatchApiRequest(postWifiConfigure(robotName, options))
+    postWifiConfigure(options)
     setCurrentOption('RobotSettingsWifiConnect')
     setPassword('')
   }
-
-  useEffect(() => {
-    dispatch(fetchStatus(robotName))
-  }, [robotName, dispatch])
 
   // PAGE-LEVEL SWITCH MANAGEMENT
   const [currentOption, setCurrentOption] = useState<SettingOption | null>(null)
@@ -197,7 +203,11 @@ export function RobotSettingsDashboard(): JSX.Element {
       return (
         <RobotSettingsWifiConnect
           handleConnect={handleWifiConnect}
-          requestState={requestState}
+          isPending={isLoading}
+          isSuccess={isSuccess}
+          isError={isError}
+          error={error}
+          resetConfigure={resetWifiConfigure}
           selectedSsid={selectedSsid}
           setCurrentOption={setCurrentOption}
         />
@@ -232,6 +242,8 @@ export function RobotSettingsDashboard(): JSX.Element {
       return (
         <RobotEncryptionKeySettingOption setCurrentOption={setCurrentOption} />
       )
+    case 'FileManager':
+      return <FileManager setCurrentOption={setCurrentOption} />
 
     // fallthrough option: render the robot settings list of buttons
     default:

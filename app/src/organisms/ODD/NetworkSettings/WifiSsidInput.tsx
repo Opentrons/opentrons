@@ -51,15 +51,11 @@ export function WifiSsidInput({
           autoFocus
           aria-label="wifi_ssid"
           value={inputSsid}
-          id="wifiSsid"
           onChange={e => {
             setInputSsid(e.target.value)
           }}
           type="text"
           error={errorMessage}
-          onBlur={e => {
-            e.target.focus()
-          }}
         />
       </Flex>
       <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">

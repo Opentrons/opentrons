@@ -4,8 +4,8 @@ import { FLOWS, SECTIONS } from './constants'
 import { isWasteChuteOnDeck } from './utils'
 
 import type { UseQueryResult } from 'react-query'
+import type { Mount } from '@opentrons/api-client'
 import type { DeckConfiguration, LoadedPipette } from '@opentrons/shared-data'
-import type { Mount } from '/app/redux/pipettes/types'
 import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import type { PipetteWizardStep } from './types'
 

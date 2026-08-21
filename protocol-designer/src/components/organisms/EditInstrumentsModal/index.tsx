@@ -144,7 +144,6 @@ export function EditInstrumentsModal(
   return createPortal(
     <HandleEnter onEnter={handleOnSave}>
       <Modal
-        marginLeft="0"
         title={page === 'add' ? t('edit_pipette') : t('edit_instruments')}
         type="info"
         closeOnOutsideClick

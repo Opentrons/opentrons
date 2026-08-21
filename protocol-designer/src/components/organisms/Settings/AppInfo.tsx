@@ -26,7 +26,7 @@ export function AppInfo({
   const pdVersion = _OT_PD_VERSION_
 
   const handleSoftwareManualClick = (): void => {
-    window.open(DOC_URL, '_blank')
+    window.open(DOC_URL, '_blank', 'noopener')
   }
 
   return (

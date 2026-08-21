@@ -2,11 +2,15 @@ import { useEffect, useRef } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
   Banner,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  JUSTIFY_FLEX_END,
   LegacyStyledText,
+  PrimaryButton,
   SPACING,
 } from '@opentrons/components'
 import {
@@ -16,8 +20,10 @@ import {
   WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
 
+import { SmallButton } from '/app/atoms/buttons'
 import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
 import { usePipetteNameSpecs } from '/app/local-resources/instruments'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import {
   SimpleWizardBody,
@@ -77,6 +83,9 @@ export const BeforeBeginning = (
     isRobotMoving,
     errorMessage,
     setShowErrorMessage,
+    isDoorOpenError,
+    setIsDoorOpenError,
+    dismissDoorOpenError,
     selectedPipette,
     isOnDevice,
     requiredPipette,
@@ -86,6 +95,15 @@ export const BeforeBeginning = (
     documentationState,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
+
+  const handleCommandError = (error: Error): void => {
+    if (isMaintenanceDoorOpenError(error)) {
+      setIsDoorOpenError(true)
+      setShowErrorMessage(t('door_is_open') as string)
+    } else {
+      setShowErrorMessage(error.message)
+    }
+  }
 
   const hasSentCreateMaintenanceRun = useRef(false)
   useEffect(() => {
@@ -224,9 +242,7 @@ export const BeforeBeginning = (
       .then(() => {
         proceed()
       })
-      .catch(error => {
-        setShowErrorMessage(error.message as string)
-      })
+      .catch(handleCommandError)
   }
 
   const SingleMountAttachCommand: CreateCommand[] = [
@@ -260,9 +276,7 @@ export const BeforeBeginning = (
       .then(() => {
         proceed()
       })
-      .catch(error => {
-        setShowErrorMessage(error.message as string)
-      })
+      .catch(handleCommandError)
   }
 
   if (isRobotMoving) {
@@ -270,12 +284,39 @@ export const BeforeBeginning = (
   }
 
   return errorMessage != null ? (
-    <SimpleWizardBody
-      isSuccess={false}
-      iconColor={COLORS.red50}
-      header={t('shared:error_encountered')}
-      subHeader={errorMessage}
-    />
+    isDoorOpenError ? (
+      <SimpleWizardBody
+        isSuccess={false}
+        iconColor={COLORS.red50}
+        header={t('door_is_open')}
+        subHeader={t('close_door_and_try_again')}
+      >
+        <Flex
+          width="100%"
+          justifyContent={JUSTIFY_FLEX_END}
+          alignItems={Boolean(isOnDevice) ? ALIGN_CENTER : ALIGN_FLEX_END}
+          gridGap={SPACING.spacing8}
+        >
+          {Boolean(isOnDevice) ? (
+            <SmallButton
+              buttonText={t('try_again')}
+              onClick={dismissDoorOpenError}
+            />
+          ) : (
+            <PrimaryButton onClick={dismissDoorOpenError}>
+              {t('try_again')}
+            </PrimaryButton>
+          )}
+        </Flex>
+      </SimpleWizardBody>
+    ) : (
+      <SimpleWizardBody
+        isSuccess={false}
+        iconColor={COLORS.red50}
+        header={t('shared:error_encountered')}
+        subHeader={errorMessage}
+      />
+    )
   ) : (
     <GenericWizardTile
       header={t('before_you_begin')}

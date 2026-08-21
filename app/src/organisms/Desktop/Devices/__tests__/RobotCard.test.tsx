@@ -5,6 +5,8 @@ import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
+import { mockFetchModulesSuccessActionPayloadModules } from '@opentrons/api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getRobotModelByName } from '/app/redux/discovery'
@@ -13,13 +15,12 @@ import {
   HEALTH_STATUS_OK,
   ROBOT_MODEL_OT3,
 } from '/app/redux/discovery/constants'
-import { mockFetchModulesSuccessActionPayloadModules } from '/app/redux/modules/__fixtures__'
+import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
+import { useAttachedPipettes } from '/app/resources/instruments'
 import {
   mockLeftProtoPipette,
   mockRightProtoPipette,
-} from '/app/redux/pipettes/__fixtures__'
-import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
-import { useAttachedPipettes } from '/app/resources/instruments'
+} from '/app/resources/instruments/__fixtures__'
 import { useAttachedModules } from '/app/resources/modules'
 
 import {

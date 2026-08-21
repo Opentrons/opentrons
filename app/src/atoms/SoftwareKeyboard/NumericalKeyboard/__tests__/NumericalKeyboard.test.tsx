@@ -1,9 +1,9 @@
 import { useRef } from 'react'
+import { renderHook, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { fireEvent, renderHook, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
@@ -140,7 +140,8 @@ describe('NumericalKeyboard', () => {
     })
   })
 
-  it('should call mock function when clicking num key', () => {
+  it('should call mock function when clicking num key', async () => {
+    const user = userEvent.setup()
     const { result } = renderHook(() => useRef(null))
     const props = {
       onChange: vi.fn(),
@@ -150,11 +151,12 @@ describe('NumericalKeyboard', () => {
     }
     render(props)
     const numKey = screen.getByRole('button', { name: '1' })
-    fireEvent.click(numKey)
+    await user.click(numKey)
     expect(props.onChange).toHaveBeenCalled()
   })
 
-  it('should call mock function when clicking decimal point key', () => {
+  it('should call mock function when clicking decimal point key', async () => {
+    const user = userEvent.setup()
     const { result } = renderHook(() => useRef(null))
     const props = {
       onChange: vi.fn(),
@@ -164,11 +166,12 @@ describe('NumericalKeyboard', () => {
     }
     render(props)
     const numKey = screen.getByRole('button', { name: '.' })
-    fireEvent.click(numKey)
+    await user.click(numKey)
     expect(props.onChange).toHaveBeenCalled()
   })
 
-  it('should call mock function when clicking hyphen key', () => {
+  it('should call mock function when clicking hyphen key', async () => {
+    const user = userEvent.setup()
     const { result } = renderHook(() => useRef(null))
     const props = {
       onChange: vi.fn(),
@@ -178,7 +181,7 @@ describe('NumericalKeyboard', () => {
     }
     render(props)
     const numKey = screen.getByRole('button', { name: '-' })
-    fireEvent.click(numKey)
+    await user.click(numKey)
     expect(props.onChange).toHaveBeenCalled()
   })
 })

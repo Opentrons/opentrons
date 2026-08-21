@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
@@ -9,6 +8,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   Link,
+  PrimaryButton,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -57,9 +57,9 @@ export function ConfirmCrashRecovery(
         >
           {t('shared:resume')}
         </Link>
-        <AlertPrimaryButton onClick={confirm}>
+        <PrimaryButton variant="warning" onClick={confirm}>
           {t('start_over')}
-        </AlertPrimaryButton>
+        </PrimaryButton>
       </Flex>
     </Flex>
   )

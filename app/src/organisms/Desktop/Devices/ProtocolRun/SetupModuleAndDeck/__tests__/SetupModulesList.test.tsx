@@ -2,6 +2,12 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+import {
+  mockHeaterShaker,
+  mockMagneticModule as mockMagneticModuleFixture,
+  mockMagneticModuleGen2,
+  mockThermocycler,
+} from '@opentrons/api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -10,14 +16,6 @@ import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { ModuleSetupModal } from '/app/organisms/ModuleCard/ModuleSetupModal'
 import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
-import {
-  mockMagneticModuleGen2,
-  mockThermocycler,
-} from '/app/redux/modules/__fixtures__'
-import {
-  mockHeaterShaker,
-  mockMagneticModule as mockMagneticModuleFixture,
-} from '/app/redux/modules/__fixtures__/index'
 import {
   useChainLiveCommands,
   useModuleRenderInfoForProtocolById,

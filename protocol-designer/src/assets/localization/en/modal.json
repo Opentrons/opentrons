@@ -52,9 +52,9 @@
       "body2": "All protocols now require {{app}} version <strong> 7.0+ </strong> to run."
     },
     "genericStartingFrom861": {
-      "heading": "{{version}} Announcements",
       "body1": "All protocols created in Protocol Designer v{{version}} generate Python protocols using API version {{apiVersion}} and now require Opentrons App version {{appVersion}} or newer to run.",
-      "footer": "For more information, see the <link1>Protocol Designer Instruction Manual</link1>."
+      "footer": "For more information, see the <link1>Protocol Designer Instruction Manual</link1>.",
+      "heading": "{{version}} Announcements"
     },
     "header": "We've updated the {{pd}}",
     "heaterShakerSupport": {
@@ -63,13 +63,13 @@
     },
     "liquidClassAndPythonExport": {
       "body1": "Welcome to Protocol Designer {{version}}!",
-      "body7": "All protocols now require Opentrons App version 8.5.1+ to run.",
-      "body8": "For more information, see the <link1>Protocol Designer Instruction Manual</link1>.",
       "body2": "This release adds support for liquid classes in Flex protocols, exports Python protocols for Flex and OT-2, and includes feature improvements and bug fixes.",
       "body3": "Other new features:",
       "body4": "Make edits to advanced settings like submerge and retract position and speed, touch tip, and air gap to customize each transfer.",
       "body5": "Customize push out volume after a dispense to ensure all liquid leaves the pipette tip.",
       "body6": "Add conditioning volumes to transfer steps. After aspirating liquid, the pipette will aspirate a smaller conditioning volume for a more accurate first dispense.",
+      "body7": "All protocols now require Opentrons App version 8.5.1+ to run.",
+      "body8": "For more information, see the <link1>Protocol Designer Instruction Manual</link1>.",
       "heading": "{{version}} Release Notes"
     },
     "liquidColorEnhancements": {
@@ -256,16 +256,16 @@
       "button": "update protocol",
       "title": "Update protocol to use new labware definitions"
     },
-    "toV8_1Migration": {
-      "body1": "Your protocol will be automatically updated to the latest version.",
-      "body2": "The default dispense height is now 1 mm from the bottom of the well, instead of 0.5 mm. All dispense commands without a custom height will change to use the new default height.",
-      "body3": "Additionally, blowout actions now precede touch tip actions. The new order affects all dispenses that include both actions."
-    },
     "toV8Migration": {
       "body1": "Your protocol will be automatically updated to the latest version.",
       "body2": "{{pd}} no longer supports aspirate or mix actions in a trash bin. If your protocol contains these actions, an error icon will appear next to them in the Protocol Timeline. To resolve the error, choose another location for aspirating or mixing.",
       "body3": "Additionally, we have addressed a bug where blow out speeds were slower than expected. Your protocol will automatically update the flow rates unless they were specifically initialized.",
       "body4": "As always, please contact us with any questions or feedback."
+    },
+    "toV8_1Migration": {
+      "body1": "Your protocol will be automatically updated to the latest version.",
+      "body2": "The default dispense height is now 1 mm from the bottom of the well, instead of 0.5 mm. All dispense commands without a custom height will change to use the new default height.",
+      "body3": "Additionally, blowout actions now precede touch tip actions. The new order affects all dispenses that include both actions."
     }
   },
   "name_your_protocol": "Name your protocol.",
@@ -286,8 +286,8 @@
     "tiprack": "Tiprack*"
   },
   "pipette_type": "Pipette Type",
-  "protocol_name_and_description": "Protocol name and description",
   "protocol_name": "Protocol Name",
+  "protocol_name_and_description": "Protocol name and description",
   "redirect_to_ot2_pd": {
     "body": "This protocol is for the OT-2. Import and edit it in OT-2 Protocol Designer.",
     "cancel": "Cancel",

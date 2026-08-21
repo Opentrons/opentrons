@@ -9,7 +9,6 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useUpdateDeckConfigurationMutation } from '@opentrons/react-api-client'
 import {
   COMBO_FIXTURES,
   FAKE_FIXTURE_IDS,
@@ -37,6 +36,7 @@ import {
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 import { useModuleUSBPort } from '/app/local-resources/modules'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
@@ -63,6 +63,7 @@ export interface SelectLocationProps extends ModuleSetupWizardMaybePipetteStepPr
   deckConfig: DeckConfiguration
   createMaintenanceRun: CreateMaintenanceRunType
   isLoadedInRun: boolean
+  updateDeckConfiguration: (deckConfig: DeckConfiguration) => void
 }
 export function SelectLocation(props: SelectLocationProps): JSX.Element {
   const {
@@ -73,6 +74,8 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     createMaintenanceRun,
     maintenanceRunId,
     setErrorMessage,
+    setIsDoorOpenError,
+    updateDeckConfiguration,
   } = props
 
   const configuredFixtureIdByCutoutId = getFixtureIdByCutoutIdForModule(
@@ -94,14 +97,18 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
     if (maintenanceRunId == null) {
       createMaintenanceRun({})
         .catch(error => {
-          setErrorMessage(error.message as string)
+          if (isMaintenanceDoorOpenError(error)) {
+            setIsDoorOpenError(true)
+            setErrorMessage(t('door_is_open') as string)
+          } else {
+            setErrorMessage(error.message as string)
+          }
         })
         .then(proceed)
     } else {
       proceed()
     }
   }
-  const { updateDeckConfiguration } = useUpdateDeckConfigurationMutation()
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const cutoutConfig = deckConfig.find(
     cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber

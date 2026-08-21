@@ -12,8 +12,13 @@ import { UpdateRobotDuringOnboarding } from '../UpdateRobotDuringOnboarding'
 import type { RobotUpdateSession } from '/app/redux/robot-update/types'
 import type { State } from '/app/redux/types'
 
+const mockStartUpdate = vi.hoisted(() => vi.fn())
+
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
+vi.mock('/app/resources/robot-update/RobotUpdateContext', () => ({
+  useRobotUpdateContext: () => ({ startUpdate: mockStartUpdate }),
+}))
 
 const MOCK_STATE: State = {
   discovery: {
@@ -55,7 +60,7 @@ const mockSession: RobotUpdateSession = {
   fileInfo: null,
   token: null,
   pathPrefix: null,
-  step: 'restarting',
+  step: 'restart',
   stage: null,
   progress: 10,
   error: null,
@@ -75,7 +80,6 @@ const render = () => {
 
 describe('UpdateRobotDuringOnboarding', () => {
   beforeEach(() => {
-    vi.useFakeTimers()
     vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
       RobotUpdate.UPGRADE
     )
@@ -83,6 +87,7 @@ describe('UpdateRobotDuringOnboarding', () => {
   })
 
   afterEach(() => {
+    vi.useRealTimers()
     vi.resetAllMocks()
   })
 
@@ -94,8 +99,8 @@ describe('UpdateRobotDuringOnboarding', () => {
     screen.getByText('Checking for updates')
   })
 
-  it('should stop rendering CheckUpdates should after 10 sec', async () => {
-    vi.useFakeTimers()
+  it('should stop rendering CheckUpdates should after 10 sec', () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
     vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
       RobotUpdate.REINSTALL
     )
@@ -129,7 +134,7 @@ describe('UpdateRobotDuringOnboarding', () => {
   })
 
   it('should render NoUpdate found when there is no upgrade - reinstall', () => {
-    vi.useFakeTimers()
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
     vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
       RobotUpdate.REINSTALL
     )
@@ -141,7 +146,7 @@ describe('UpdateRobotDuringOnboarding', () => {
   })
 
   it('should render NoUpdate found when there is no upgrade - downgrade', () => {
-    vi.useFakeTimers()
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
     vi.mocked(RobotUpdate.getRobotUpdateAvailable).mockReturnValue(
       RobotUpdate.DOWNGRADE
     )

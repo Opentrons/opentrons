@@ -65,6 +65,7 @@ def offset_for_mount(
         OT3Mount.LEFT: left_mount_offset,
         OT3Mount.RIGHT: right_mount_offset,
         OT3Mount.GRIPPER: cast(Point, gripper_mount_offset),
+        Mount.EXTENSION: cast(Point, gripper_mount_offset),
     }
     return offsets[primary_mount]
 

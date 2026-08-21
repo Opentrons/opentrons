@@ -1,16 +1,9 @@
 import { StyledText } from '../../atoms/StyledText'
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { Flex } from '../../primitives'
-import {
-  ALIGN_FLEX_START,
-  CURSOR_POINTER,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  JUSTIFY_SPACE_BETWEEN,
-} from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 import type { Meta, StoryObj } from '@storybook/react'
+import type { CSSProperties } from 'react'
 
 type ColorEntry = [token: string, value: string]
 interface StoryArgs {
@@ -21,6 +14,31 @@ const meta: Meta<StoryArgs> = {
   title: 'Design Tokens/Colors',
 }
 export default meta
+
+const CONTAINER_STYLE: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'row',
+  padding: SPACING.spacing16,
+}
+
+const BOX_CONTAINER_STYLE: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+}
+
+const BOX_STYLE: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  justifyContent: 'space-between',
+  padding: SPACING.spacing40,
+  width: '12rem',
+  height: '12rem',
+  margin: SPACING.spacing2,
+  borderRadius: BORDERS.borderRadius4,
+  cursor: 'pointer',
+  border: `1px solid ${COLORS.grey20}`,
+}
 
 const ORDER = [
   'grey',
@@ -94,29 +112,17 @@ export const AllColors: StoryObj<StoryArgs> = {
     const colorCategories = groupByCategory(args.colors)
 
     return (
-      <Flex flexDirection={DIRECTION_ROW} padding={SPACING.spacing16}>
+      <div style={CONTAINER_STYLE}>
         {Object.entries(colorCategories).map(([category, colors], index) => (
-          <Flex key={`${category}_${index}`} flexDirection={DIRECTION_COLUMN}>
+          <div key={`${category}_${index}`} style={BOX_CONTAINER_STYLE}>
             {colors.map(([token, value], colorIndex) => {
               const textColor = invertColor(value)
 
               return (
-                <Flex
+                <div
                   key={`${token}_${colorIndex}`}
                   className={`color_${colorIndex}`}
-                  flexDirection={DIRECTION_COLUMN}
-                  alignItems={ALIGN_FLEX_START}
-                  justifyContent={JUSTIFY_SPACE_BETWEEN}
-                  backgroundColor={value}
-                  padding={SPACING.spacing40}
-                  width="12rem"
-                  height="12rem"
-                  margin={SPACING.spacing2}
-                  borderRadius={BORDERS.borderRadius4}
-                  style={{
-                    cursor: CURSOR_POINTER,
-                    border: `1px solid ${COLORS.grey20}`,
-                  }}
+                  style={{ backgroundColor: value, ...BOX_STYLE }}
                 >
                   <StyledText
                     color={textColor}
@@ -132,12 +138,12 @@ export const AllColors: StoryObj<StoryArgs> = {
                   >
                     {value}
                   </StyledText>
-                </Flex>
+                </div>
               )
             })}
-          </Flex>
+          </div>
         ))}
-      </Flex>
+      </div>
     )
   },
 }

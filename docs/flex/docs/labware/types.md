@@ -33,7 +33,6 @@ The Opentrons Flex works by default with well plates in a variety of well config
 
 The Labware Library includes plates with 12, 24, and 48 wells. Due to the grid configuration and spacing of the wells on these plates, they are only usable with 1-channel pipettes.
 
-
 ### 96-well plates 
 
 The Labware Library includes many 96-well plates, including Opentrons and third-party plates. The 8-channel and 96-channel Flex pipettes are optimized to work with the 8×12 well grid on these plates. 8-channel pipettes in their full nozzle configuration pipette in an entire column of wells, and the 96-channel pipette in its full configuration pipettes to every well on the plate.
@@ -56,7 +55,7 @@ For a full example of a well plate lid, reference the [Opentrons Tough PCR Auto-
 
 ## Tips and tip racks 
 
-Opentrons Flex tips come in racks that hold 96 tips. Currently, we offer tips in 20 µL, 50 µL, 200 µL, and 1000 µL sizes. These are clear, non-conducting polypropylene tips that are available with or without filters.
+Opentrons Flex tips come in racks that hold 96 tips. Flex pipette tips are made of clear, non-conducting polypropylene and are available with or without filters. Currently, we offer tips in 20 µL, 50 µL, 200 µL, and 1000 µL sizes.
 
 ### Tip sterility
 
@@ -67,7 +66,7 @@ Sealed, unopened packages of Opentrons pipette tips are certified to be free of 
 
 ### Tip racks 
 
-Unfiltered and filtered tips are bundled into a rack that consists of a reusable base plate, a mid-plate that holds 96 tips, and a lid.
+Opentrons Flex tip racks consist of a lid, a mid-plate that holds 96 filtered or unfiltered tips, and a reusable base plate. Like the pipette tips, tip rack lids are made of polypropylene. The tip rack mid-plate and base plate are made from a  polycarbonate-ABS (PC-ABS) blend.
 
 To help with identification, each tip rack package includes an 8-digit lot number in YYYYMMDD format, which reflects the production date. Additionally, individual tip racks are color coded and labeled based on the maximum rated volume for each tip type.
 
@@ -78,10 +77,42 @@ To help with identification, each tip rack package includes an 8-digit lot numbe
 
 ![Flex 20 µL, 50 µL, 200 µL, and 1000 µL tip racks](../images/flex-tipracks-hero.png)
 
-When ordering or reordering, tips and racks come in two different packaged configurations: 
+When ordering or reordering, tips are available as racks or refills. Both racks and refills include the same number of tips (1,920) but ship in two distinct packaging configurations.
 
-- **Racks:** Consist of separately shrink-wrapped tip racks (base plate, mid-plate with tips, and lid). Racked configurations are best when cleanliness is paramount, to avoid cross-contamination, or when your protocols don't allow for base plate or component reuse.
-- **Refills:** Consist of one complete tip rack (base plate, mid-plate with tips, and lid) and individual tip containers. Refill configurations are best when your protocols allow for base plate or component reuse. 
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Contents</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Racks</strong></td>
+      <td>A rack configuration consists of:
+        <ul>
+          <li>4 boxes per carton (5 tip racks per box).</li>
+          <li>20 individual tip racks total.</li>
+          <li>Each tip rack includes a lid, a mid-plate with 96 tips, and a base plate.</li>
+          <li>All tip racks are individually shrink-wrapped to prevent contamination.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Refills</strong></td>
+      <td>A refill configuration consists of:
+        <ul>
+          <li>4 blister packs per carton (5 mid-plates per pack).</li>
+          <li>20 tip rack mid-plates total.</li>
+          <li>Each mid-plate includes 96 tips.</li>
+          <li>All mid-plates are nested in blister packs to minimize packaging waste.</li>
+          <li>2 individually shrink-wrapped base plates are included separately.</li>
+        </ul>
+        <p><strong>Note:</strong> Refills do not include lids.</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ### Tip-pipette compatibility
 

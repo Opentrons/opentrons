@@ -38,9 +38,11 @@ import {
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
+import { SmallButton, TouchFloatingActionButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
+import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { getOffDeckRenderGroups } from '/app/resources/protocols/utils/getOffDeckRenderGroups'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
@@ -153,6 +155,19 @@ export function ProtocolSetupLabware({
     [attachedModules, protocolModulesInfo, deckConfig]
   )
 
+  const handleProceed = useHandleAndLog(
+    () => {
+      setIsConfirmed(true)
+      setSetupScreen('prepare to run')
+    },
+    'confirm_placements',
+    {
+      action: 'confirmed liquid and labware placements',
+      message:
+        'user confirmed liquid and labware placements before running protocol',
+    }
+  )
+
   return (
     <>
       {selectedLabwareStack != null && mostRecentAnalysis != null ? (
@@ -187,10 +202,7 @@ export function ProtocolSetupLabware({
             ) : (
               <SmallButton
                 buttonText={t('confirm_placements')}
-                onClick={() => {
-                  setIsConfirmed(true)
-                  setSetupScreen('prepare to run')
-                }}
+                onClick={handleProceed}
                 buttonCategory="rounded"
               />
             )}
@@ -247,11 +259,14 @@ export function ProtocolSetupLabware({
               </>
             )}
           </Flex>
-          <FloatingActionButton
+          <TouchFloatingActionButton
             buttonText={showMapView ? t('list_view') : t('map_view')}
             onClick={() => {
               setShowMapView(mapView => !mapView)
             }}
+            aria-label={
+              showMapView ? t('display_list_view') : t('display_map_view')
+            }
           />
         </>
       )}
@@ -275,8 +290,9 @@ function LabwareLatch({
   refetchModules,
 }: LabwareLatchProps): JSX.Element {
   const { t } = useTranslation(['heater_shaker', 'protocol_setup'])
+  const documentationState = useDocumentationState()
   const { createLiveCommand, isLoading: isLiveCommandLoading } =
-    useCreateLiveCommandMutation()
+    useCreateLiveCommandMutation(documentationState)
   const [isRefetchingModules, setIsRefetchingModules] = useState(false)
   const isLatchLoading =
     isLiveCommandLoading ||
@@ -291,8 +307,7 @@ function LabwareLatch({
   let icon: 'latch-open' | 'latch-closed' | null = null
 
   const latchCommand:
-    | HeaterShakerOpenLatchCreateCommand
-    | HeaterShakerCloseLatchCreateCommand = {
+    HeaterShakerOpenLatchCreateCommand | HeaterShakerCloseLatchCreateCommand = {
     commandType: isLatchClosed
       ? 'heaterShaker/openLabwareLatch'
       : 'heaterShaker/closeLabwareLatch',

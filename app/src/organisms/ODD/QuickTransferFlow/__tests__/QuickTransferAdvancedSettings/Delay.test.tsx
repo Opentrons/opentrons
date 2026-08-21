@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { TouchInputField } from '@opentrons/components'
@@ -83,23 +84,25 @@ describe('Delay', () => {
     vi.resetAllMocks()
   })
 
-  it('renders the first delay screen, continue, and back buttons', () => {
+  it('renders the first delay screen, continue, and back buttons', async () => {
     render(props)
+    const user = userEvent.setup()
     screen.getByText('Delay after aspirating')
     screen.getByTestId('ChildNavigation_Primary_Button')
     screen.getByText('Enabled')
     screen.getByText('Disabled')
     const exitBtn = screen.getByTestId('ChildNavigation_Back_Button')
-    fireEvent.click(exitBtn)
+    await user.click(exitBtn)
     expect(props.onBack).toHaveBeenCalled()
   })
 
-  it('renders save button if you select enabled, then moves to second screen', () => {
+  it('renders save button if you select enabled, then moves to second screen', async () => {
     render(props)
+    const user = userEvent.setup()
     const enabledBtn = screen.getByText('Enabled')
-    fireEvent.click(enabledBtn)
+    await user.click(enabledBtn)
     const continueBtn = screen.getByText('Continue')
-    fireEvent.click(continueBtn)
+    await user.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
         autoFocus: true,
@@ -107,31 +110,32 @@ describe('Delay', () => {
         error: null,
         type: 'number',
         value: null,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
     )
   })
 
-  it('calls dispatch button if you select disabled and save', () => {
+  it('calls dispatch button if you select disabled and save', async () => {
     render(props)
+    const user = userEvent.setup()
     const disabledBtn = screen.getByText('Disabled')
-    fireEvent.click(disabledBtn)
+    await user.click(disabledBtn)
     const saveBtn = screen.getByText('Save')
-    fireEvent.click(saveBtn)
+    await user.click(saveBtn)
     expect(props.dispatch).toHaveBeenCalled()
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalled()
   })
 
-  it('has correct delay duration range', () => {
+  it('has correct delay duration range', async () => {
     render(props)
+    const user = userEvent.setup()
     const enabledBtn = screen.getByText('Enabled')
-    fireEvent.click(enabledBtn)
+    await user.click(enabledBtn)
     const continueBtn = screen.getByText('Continue')
-    fireEvent.click(continueBtn)
+    await user.click(continueBtn)
     const oneButton = screen.getByText('0')
-    fireEvent.click(oneButton)
+    await user.click(oneButton)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
         autoFocus: true,
@@ -139,7 +143,6 @@ describe('Delay', () => {
         error: 'Value must be between 0.1 to 9999999999',
         type: 'number',
         value: 0,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -148,25 +151,27 @@ describe('Delay', () => {
     expect(nextBtn).toBeDisabled()
   })
 
-  it('calls dispatch when an in range value is entered and saved', () => {
+  it('calls dispatch when an in range value is entered and saved', async () => {
     render(props)
+    const user = userEvent.setup()
     const enabledBtn = screen.getByText('Enabled')
-    fireEvent.click(enabledBtn)
+    await user.click(enabledBtn)
     const continueBtn = screen.getByText('Continue')
-    fireEvent.click(continueBtn)
+    await user.click(continueBtn)
     const oneButton = screen.getByText('1')
-    fireEvent.click(oneButton)
+    await user.click(oneButton)
     const nextBtn = screen.getByTestId('ChildNavigation_Primary_Button')
-    fireEvent.click(nextBtn)
+    await user.click(nextBtn)
     const twoButton = screen.getByText('2')
-    fireEvent.click(twoButton)
+    await user.click(twoButton)
     const saveBtn = screen.getByText('Save')
-    fireEvent.click(saveBtn)
+    await user.click(saveBtn)
     expect(props.dispatch).toHaveBeenCalled()
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalled()
   })
 
-  it('persists previously set value saved in state for aspirate', () => {
+  it('persists previously set value saved in state for aspirate', async () => {
+    const user = userEvent.setup()
     props = {
       ...props,
       state: {
@@ -178,7 +183,7 @@ describe('Delay', () => {
     }
     render(props)
     const continueBtn = screen.getByText('Continue')
-    fireEvent.click(continueBtn)
+    await user.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
         autoFocus: true,
@@ -186,14 +191,14 @@ describe('Delay', () => {
         error: null,
         type: 'number',
         value: 15,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
     )
   })
 
-  it('persists previously set value saved in state for dispense', () => {
+  it('persists previously set value saved in state for dispense', async () => {
+    const user = userEvent.setup()
     props = {
       ...props,
       kind: 'dispense',
@@ -206,7 +211,7 @@ describe('Delay', () => {
     }
     render(props)
     const continueBtn = screen.getByText('Continue')
-    fireEvent.click(continueBtn)
+    await user.click(continueBtn)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
         autoFocus: true,
@@ -214,7 +219,6 @@ describe('Delay', () => {
         error: null,
         type: 'number',
         value: 20,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}

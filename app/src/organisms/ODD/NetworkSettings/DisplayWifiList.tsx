@@ -21,7 +21,7 @@ import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
 
 import { DisplaySearchNetwork } from './DisplaySearchNetwork'
 
-import type { WifiNetwork } from '/app/redux/networking/types'
+import type { WifiNetwork } from '@opentrons/api-client'
 
 const NETWORK_ROW_STYLE = css`
   display: ${DISPLAY_FLEX};

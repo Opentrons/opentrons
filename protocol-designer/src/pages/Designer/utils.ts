@@ -7,6 +7,7 @@ import {
   FLEX_STACKER_MODULE_TYPE,
   getAllDefinitions,
   getIsLid,
+  getIsPipettableLabware,
   getIsTiprack,
   getPositionFromSlotId,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
@@ -23,12 +24,12 @@ import {
   getIsSlotAVacuumDock,
   getIsVacuumSpacer,
   getSlotInLocationStack,
+  VACUUM_DOCK_ADDRESSABLE_AREA,
 } from '@opentrons/step-generation'
 
 import {
   HOPPER_LABWARE_X_OFFSET,
   VACUUM_DOCK_DISPLAY_LOCATION,
-  VACUUM_DOCK_LABWARE_X_OFFSET,
 } from '/protocol-designer/constants'
 
 import { getRobotType } from '../../file-data/selectors'
@@ -38,8 +39,10 @@ import { getLabwareNicknamesById } from '../../ui/labware/selectors'
 import {
   getAllLabwareIdsOfCertainURIOnStack,
   getFullStackFromLabwaresOnDeck,
+  getIsAdapter,
   getStagingAreaAddressableAreas,
 } from '../../utils'
+import { getIsVacuumCollar } from './DeckSetup/utils'
 
 import type { DropdownOption } from '@opentrons/components'
 import type {
@@ -111,14 +114,7 @@ const _getAdjustedSlot = (
   }
   return slot
 }
-const _getOffsetFromSlot = (
-  slot: DeckSlot,
-  isSlotAVacuumDock: boolean,
-  isSlotAHopper: boolean
-): number => {
-  if (isSlotAVacuumDock) {
-    return VACUUM_DOCK_LABWARE_X_OFFSET
-  }
+const _getOffsetFromSlot = (slot: DeckSlot, isSlotAHopper: boolean): number => {
   if (isSlotAHopper) {
     return HOPPER_LABWARE_X_OFFSET
   }
@@ -152,7 +148,7 @@ export const getSlotInformation = (
       ? getPositionFromSlotId(
           adjustedSlot,
           deckDef,
-          _getOffsetFromSlot(slot, isSlotAVacuumDock, isSlotAHopper)
+          _getOffsetFromSlot(slot, isSlotAHopper)
         )
       : null
   const createdModuleForSlot = Object.values(deckSetupModules).find(
@@ -417,6 +413,28 @@ export const useLabwareDropdownOptions = (
         isOffDeck &&
         (type === 'labware' || (type === 'moveLabware' && useGripper))
 
+      // if pipetting, ensure the labware is pipettable (not an adapter)
+      const isPipetteInaccessible =
+        type === 'labware' && !getIsPipettableLabware(labwareEntity.def)
+
+      const lwIndex = fullStackFromLabwares.findIndex(
+        element => element === labwareId
+      )
+      const elementsAboveLw = fullStackFromLabwares.slice(0, lwIndex)
+      const isAdapterAbove = elementsAboveLw.some(element =>
+        getIsAdapter(element, labwareEntities)
+      )
+      const isOnlyCollarAboveAndIsPipettable =
+        elementsAboveLw.length === 1 &&
+        elementsAboveLw[0] in labwareEntities &&
+        getIsVacuumCollar(labwareEntities[elementsAboveLw[0]].def) &&
+        getIsPipettableLabware(def)
+      const isAccessibleFromTop =
+        isTopOfStack || isOnlyCollarAboveAndIsPipettable
+
+      const isPipettingToNonPipettableLabware =
+        type === 'labware' && !getIsPipettableLabware(def)
+
       //  TODO: refactor this to be easier to read
       const shouldExclude =
         isInaccessible ||
@@ -429,7 +447,11 @@ export const useLabwareDropdownOptions = (
           !isTopOfStack &&
           !isMovableAdapter &&
           !isLabwareLidCombo) ||
-        (type === 'labware' && !isTopOfStack)
+        (type === 'labware' && !isTopOfStack) ||
+        isPipetteInaccessible ||
+        (type === 'labware' && !isAccessibleFromTop) ||
+        (type === 'moveLabware' && isAdapterAbove) ||
+        isPipettingToNonPipettableLabware
       if (shouldExclude) {
         return acc
       }
@@ -496,6 +518,7 @@ export const getUnoccupiedStackOptions = (args: {
       const destIsVacuumSpacer = getIsVacuumSpacer(labwareOnDeckDef)
       const movingLabwareIsCollar =
         def.parameters.quirks?.includes('vacuumModuleDock') ?? false
+      const isVacuumDock = slot === VACUUM_DOCK_ADDRESSABLE_AREA
 
       const isCompatible =
         // filter plates can go on any non-lid, non-tiprack, non-filter-plate labware
@@ -545,7 +568,7 @@ export const getUnoccupiedStackOptions = (args: {
                   })
                 : displayName,
             value: labwareId,
-            deckLabel: slot,
+            deckLabel: isVacuumDock ? VACUUM_DOCK_DISPLAY_LOCATION : slot,
           },
         ]
       }

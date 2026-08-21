@@ -4,6 +4,7 @@ from typing import Annotated
 
 import fastapi
 
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -39,7 +40,10 @@ async def get_access_control_settings(  # noqa: D103
     router.patch,
     path=_PATH,
     summary="Set access control settings",
-    dependencies=[fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        fastapi.Depends(get_audit_logger("change compliance ready software settings")),
+    ],
 )
 async def patch_access_control_settings(  # noqa: D103
     request_body: RequestModel[RequestData],
@@ -55,7 +59,10 @@ async def patch_access_control_settings(  # noqa: D103
     router.delete,
     path=_PATH,
     summary="Reset access control settings to defaults",
-    dependencies=[fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        fastapi.Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        fastapi.Depends(get_audit_logger("reset compliance ready software settings")),
+    ],
 )
 async def delete_access_control_settings(  # noqa: D103
     store: Annotated[

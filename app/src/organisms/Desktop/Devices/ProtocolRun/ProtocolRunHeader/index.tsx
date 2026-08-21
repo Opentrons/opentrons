@@ -22,8 +22,10 @@ import {
   useNotifyRunQuery,
   useProtocolDetailsForRun,
 } from '/app/resources/runs'
+import { useIsDownloadAuditLogsRequired } from '/app/resources/runs/useIsDownloadAuditLogsRequired'
 
 import { EQUIPMENT_POLL_MS } from '../../../../DoorOpenControl/constants'
+import { showDownloadLogsModal } from '../../../DownloadAuditLogsModal'
 import { RunProgressMeter } from '../../../RunProgressMeter'
 import { useRunAnalytics, useRunErrors, useRunHeaderRunControls } from './hooks'
 import { RunHeaderBannerContainer } from './RunHeaderBannerContainer'
@@ -68,7 +70,38 @@ export function ProtocolRunHeader(
     runStatus: runStatus,
     runId,
   })
+
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
+  const isDownloadAuditLogsInFlight = useRef(false)
+
+  const {
+    isRequired: isDownloadAuditLogsRequired,
+    isLoading: isDownloadAuditLogsLoading,
+  } = useIsDownloadAuditLogsRequired(runId)
+
+  useEffect(() => {
+    if (
+      !isClosingCurrentRun &&
+      runRecord?.data.logPeriodId != null &&
+      !runRecord?.data.current &&
+      !isDownloadAuditLogsLoading &&
+      isDownloadAuditLogsRequired &&
+      !isDownloadAuditLogsInFlight.current
+    ) {
+      isDownloadAuditLogsInFlight.current = true
+      void showDownloadLogsModal(runRecord?.data.logPeriodId ?? '').finally(
+        () => {
+          isDownloadAuditLogsInFlight.current = false
+        }
+      )
+    }
+  }, [
+    isDownloadAuditLogsRequired,
+    runId,
+    isDownloadAuditLogsLoading,
+    isClosingCurrentRun,
+    runRecord?.data,
+  ])
 
   const enteredER = runRecord?.data.hasEverEnteredErrorRecovery ?? false
   const protocolRunControls = useRunHeaderRunControls(runId, robotName)
@@ -118,6 +151,8 @@ export function ProtocolRunHeader(
           runHeaderModalContainerUtils={runHeaderModalContainerUtils}
           hasImages={outputFileIds.jpeg.length > 0}
           hasCsvFiles={outputFileIds.csv.length > 0}
+          closeCurrentRun={closeCurrentRun}
+          isClosingCurrentRun={isClosingCurrentRun}
           {...props}
         />
         <RunHeaderContent

@@ -24,14 +24,12 @@ describe('StatusLabel', () => {
       status: 'Engaged',
       backgroundColor: C_SKY_BLUE,
       iconColor: COLORS.blue50,
-      id: 'engaged_status',
       showIcon: true,
     }
     render(props)
     expect(screen.getByText('Engaged')).toHaveStyle(
       'backgroundColor: C_SKY_BLUE'
     )
-    screen.getByTestId('status_label_Engaged_engaged_status')
   })
 
   it('renders a disengaged status label with a blue background and text', () => {
@@ -105,7 +103,9 @@ describe('StatusLabel', () => {
       pulse: true,
     }
     render(props)
-    const pulsingCircle = screen.getByTestId('pulsing_status_circle')
+    const labelText = screen.getByText('Engaged')
+    // eslint-disable-next-line testing-library/no-node-access
+    const pulsingCircle = labelText.closest('div')?.querySelector('animate')
     expect(pulsingCircle).toHaveAttribute('attributeName', 'fill')
     expect(pulsingCircle).toHaveAttribute(
       'values',

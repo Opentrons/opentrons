@@ -59,8 +59,3 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     # ### end Alembic commands ###
-
-
-def downgrade() -> None:
-    """Downgrade schema."""
-    pass

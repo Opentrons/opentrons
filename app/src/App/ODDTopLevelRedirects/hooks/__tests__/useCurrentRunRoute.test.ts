@@ -57,7 +57,7 @@ describe('useCurrentRunRoute', () => {
     expect(result.current).toBe(`/runs/${MOCK_RUN_ID}/summary`)
   })
 
-  it('returns the summary route for a started run that has a stopped status', () => {
+  it('returns the summary route for a run that has a stopped status', () => {
     vi.mocked(useNotifyRunQuery).mockReturnValue({
       data: {
         data: {
@@ -132,18 +132,5 @@ describe('useCurrentRunRoute', () => {
     const { result } = renderHook(() => useCurrentRunRoute(MOCK_RUN_ID))
 
     expect(result.current).toBe(`/runs/${MOCK_RUN_ID}/run`)
-  })
-
-  it('returns null for cancelled run before starting', () => {
-    vi.mocked(useNotifyRunQuery).mockReturnValue({
-      data: {
-        data: { id: MOCK_RUN_ID, status: RUN_STATUS_STOPPED, startedAt: null },
-      },
-      isFetching: false,
-    } as any)
-
-    const { result } = renderHook(() => useCurrentRunRoute(MOCK_RUN_ID))
-
-    expect(result.current).toBeNull()
   })
 })
