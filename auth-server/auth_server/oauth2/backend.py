@@ -390,6 +390,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         # calculated from current settings and user state at use time. When the
         # client explicitly requests scopes, store that ceiling.
         if request.scope is not None:
+            # This cast is because request.scopes is apparently mis-typed as a str; it's actually a list[str].
             scopes = cast(Any, request.scopes)
             assert _is_list_of_type(scopes, str)
             stored_scopes = {Scope.from_api_name(s) for s in scopes}
