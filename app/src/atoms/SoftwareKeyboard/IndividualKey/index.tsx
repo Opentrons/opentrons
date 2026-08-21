@@ -43,7 +43,7 @@ export function IndividualKey({
       buttonAttributes={softwareKeyboardButtonAttributes}
       {...numericalKeyboard}
       width="100%"
-      debug={debug} // If true, <ENTER> will input a \n
+      debug={debug}
       preventMouseDownDefault // Don't steal focus from inputs.
     />
   )

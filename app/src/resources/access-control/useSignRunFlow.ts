@@ -10,10 +10,11 @@ import {
   useSignRunMutation,
 } from '@opentrons/react-api-client'
 
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useLogout } from '/app/redux/robot-auth'
 
 import { useNotifyRunQuery } from '../runs'
+
+import type { DocumentationState } from '@opentrons/react-api-client'
 
 // login gate states to control login prompting
 // idle: need to prompt for login
@@ -39,12 +40,12 @@ export function useSignRunFlow(
   }) => Promise<{ username: string } | null>,
   popToast: () => void,
   eatToast: () => void,
+  documentationState: DocumentationState,
   onSigned?: () => void
 ): SignRunFlowResult {
   const queryClient = useQueryClient()
   const host = useHost()
   const logout = useLogout()
-  const documentationState = useDocumentationState()
   const { signRun: signRunMutation, isLoading: isSignRunLoading } =
     useSignRunMutation(documentationState)
 

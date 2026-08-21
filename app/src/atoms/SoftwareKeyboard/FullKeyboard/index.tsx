@@ -156,7 +156,7 @@ export function FullKeyboard({
       mergeDisplay={true}
       useButtonTag={false} // Exclude from the tab order.
       buttonAttributes={softwareKeyboardButtonAttributes}
-      debug={debug} // If true, <ENTER> will input a \n
+      debug={debug}
       baseClass="fullKeyboard"
       buttonTheme={[
         {
