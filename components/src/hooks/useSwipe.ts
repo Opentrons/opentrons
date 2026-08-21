@@ -19,52 +19,47 @@ export const useSwipe = (): UseSwipeResult => {
   const interactiveRef = useRef(null)
   const THRESHOLD = 50
 
-  useEffect(
-    () => {
-      const element = interactiveRef.current
-      if (element == null || !isEnabled) {
-        return
-      }
+  useEffect(() => {
+    const element = interactiveRef.current
+    if (element == null || !isEnabled) {
+      return
+    }
 
-      let startX = 0
-      let startY = 0
+    let startX = 0
+    let startY = 0
 
-      const interactable = interact(element).draggable({
-        inertia: false,
-        modifiers: [],
-        autoScroll: false,
-        listeners: {
-          start(event) {
-            startX = event.clientX
-            startY = event.clientY
-          },
-          // Note (kk:07/11/2024) want to keep this for debugging
-          // move(event) {
-          //   console.log('Drag move:', event.clientX, event.clientY)
-          // },
-          end(event) {
-            const dx = event.clientX - startX
-            const dy = event.clientY - startY
-            const absX = Math.abs(dx)
-            const absY = Math.abs(dy)
-
-            if (absX > absY && absX > THRESHOLD) {
-              setSwipeType(dx > 0 ? 'swipe-right' : 'swipe-left')
-            } else if (absY > absX && absY > THRESHOLD) {
-              setSwipeType(dy > 0 ? 'swipe-down' : 'swipe-up')
-            }
-          },
+    const interactable = interact(element).draggable({
+      inertia: false,
+      modifiers: [],
+      autoScroll: false,
+      listeners: {
+        start(event) {
+          startX = event.clientX
+          startY = event.clientY
         },
-      })
+        // Note (kk:07/11/2024) want to keep this for debugging
+        // move(event) {
+        //   console.log('Drag move:', event.clientX, event.clientY)
+        // },
+        end(event) {
+          const dx = event.clientX - startX
+          const dy = event.clientY - startY
+          const absX = Math.abs(dx)
+          const absY = Math.abs(dy)
 
-      return () => {
-        interactable.unset()
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isEnabled]
-  )
+          if (absX > absY && absX > THRESHOLD) {
+            setSwipeType(dx > 0 ? 'swipe-right' : 'swipe-left')
+          } else if (absY > absX && absY > THRESHOLD) {
+            setSwipeType(dy > 0 ? 'swipe-down' : 'swipe-up')
+          }
+        },
+      },
+    })
+
+    return () => {
+      interactable.unset()
+    }
+  }, [isEnabled])
 
   return {
     ref: interactiveRef,
