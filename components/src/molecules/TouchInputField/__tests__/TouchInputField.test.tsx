@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { TouchInputField } from '../'
 import { renderWithProviders } from '../../../testing/utils'
+import styles from '../touchinputfield.module.css'
 
 import type { ComponentProps } from 'react'
 
@@ -79,6 +80,13 @@ describe('TouchInputField', () => {
 
     render(props)
     screen.getByText('error')
+  })
+
+  it('renders the label in the error style when error is provided', () => {
+    props.error = 'error'
+
+    render(props)
+    expect(screen.getByText('Speed')).toHaveClass(styles.label_error)
   })
 
   it('renders an accessory beside the input field', () => {

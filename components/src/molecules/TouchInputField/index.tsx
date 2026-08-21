@@ -126,6 +126,9 @@ export const TouchInputField = forwardRef<
               htmlFor={inputId}
               className={clsx(
                 styles.label,
+                {
+                  [styles.label_error]: hasError,
+                },
                 textAlign === TYPOGRAPHY.textAlignCenter
                   ? styles.align_center
                   : styles.align_left

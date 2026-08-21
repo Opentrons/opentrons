@@ -132,6 +132,10 @@
   line-height: var(--line-height-28);
 }
 
+.label_error {
+  color: var(--red-50);
+}
+
 .caption {
   padding: var(--spacing-8) 0 0;
 }
