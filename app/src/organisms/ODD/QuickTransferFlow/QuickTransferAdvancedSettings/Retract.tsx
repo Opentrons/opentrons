@@ -160,6 +160,22 @@ export function Retract({
     max: positionRange.max,
   })
 
+  const speedErrorMessage =
+    parsedSpeed.result === 'syntaxError' ? t('enter_a_valid_number') : null
+  const delayDurationErrorMessage =
+    parsedDelayDuration.result === 'syntaxError'
+      ? t('enter_a_valid_number')
+      : null
+  const positionErrorMessage =
+    parsedPosition.result === 'rangeError'
+      ? t('value_out_of_range', {
+          min: parsedPosition.min,
+          max: parsedPosition.max,
+        })
+      : parsedPosition.result === 'syntaxError'
+        ? t('enter_a_valid_number')
+        : null
+
   let buttonIsDisabled = false
   if (currentStep === 1) {
     buttonIsDisabled = parsedSpeed.result !== 'success'
@@ -196,15 +212,18 @@ export function Retract({
       >
         <RetractSettingComponent
           kind={kind}
-          state={state}
           speed={speed}
           setSpeed={setSpeed}
+          speedErrorMessage={speedErrorMessage}
           delayDuration={delayDuration}
           setDelayDuration={setDelayDuration}
+          delayDurationErrorMessage={delayDurationErrorMessage}
           position={position}
           setPosition={setPosition}
+          positionErrorMessage={positionErrorMessage}
           currentStep={currentStep}
           positionReference={positionReference}
+          wellHeight={wellHeight}
         />
       </Flex>
     </Flex>,
@@ -214,28 +233,34 @@ export function Retract({
 
 interface RetractSettingComponentProps {
   kind: FlowRateKind
-  state: QuickTransferSummaryState
+  speed: string
   setSpeed: (speed: string) => void
-  setPosition: (position: string) => void
+  speedErrorMessage: string | null
   delayDuration: string
   setDelayDuration: (delayDuration: string) => void
-  speed: string
+  delayDurationErrorMessage: string | null
   position: string
+  setPosition: (position: string) => void
+  positionErrorMessage: string | null
   currentStep: number
   positionReference?: PositionReference
+  wellHeight: number
 }
 
 function RetractSettingComponent({
   kind,
-  state,
   speed,
   setSpeed,
+  speedErrorMessage,
   delayDuration,
   setDelayDuration,
+  delayDurationErrorMessage,
   position,
   setPosition,
+  positionErrorMessage,
   currentStep,
   positionReference,
+  wellHeight,
 }: RetractSettingComponentProps): JSX.Element {
   const { t } = useTranslation('quick_transfer')
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
@@ -245,72 +270,6 @@ function RetractSettingComponent({
     positionReference === POSITION_REFERENCE_TOP
       ? t('distance_top_of_well_mm')
       : t('distance_bottom_of_well_mm')
-
-  let wellHeight = 1
-  if (
-    kind === 'aspirate' &&
-    state.sourceWells != null &&
-    state.sourceWells.length > 0
-  ) {
-    wellHeight = Math.max(
-      ...state.sourceWells.map(well =>
-        state.source != null ? state.source.wells[well].depth : 0
-      )
-    )
-  } else if (
-    kind === 'dispense' &&
-    state.destinationWells != null &&
-    state.destinationWells.length > 0
-  ) {
-    const destLabwareDefinition =
-      state.destination === 'source' ? state.source : state.destination
-    wellHeight = Math.max(
-      ...state.destinationWells.map(well =>
-        destLabwareDefinition != null
-          ? destLabwareDefinition.wells[well].depth
-          : 0
-      )
-    )
-  }
-  const positionRange =
-    positionReference === POSITION_REFERENCE_TOP
-      ? {
-          min: -wellHeight,
-          max: 2,
-        }
-      : {
-          min: 0,
-          max: wellHeight + 2,
-        }
-  const parsedPosition = parseNumericalInput(position, {
-    allowDecimal: false,
-    allowNegative: positionReference === POSITION_REFERENCE_TOP,
-    min: positionRange.min,
-    max: positionRange.max,
-  })
-  const positionErrorMessage =
-    parsedPosition.result === 'rangeError'
-      ? t('value_out_of_range', {
-          min: parsedPosition.min,
-          max: parsedPosition.max,
-        })
-      : parsedPosition.result === 'syntaxError'
-        ? t('enter_a_valid_number')
-        : null
-  const parsedSpeed = parseNumericalInput(speed, {
-    allowDecimal: true,
-    allowNegative: false,
-  })
-  const speedErrorMessage =
-    parsedSpeed.result === 'syntaxError' ? t('enter_a_valid_number') : null
-  const parsedDelayDuration = parseNumericalInput(delayDuration, {
-    allowDecimal: true,
-    allowNegative: false,
-  })
-  const delayDurationErrorMessage =
-    parsedDelayDuration.result === 'syntaxError'
-      ? t('enter_a_valid_number')
-      : null
 
   const speedSetting = (): JSX.Element => {
     return (
