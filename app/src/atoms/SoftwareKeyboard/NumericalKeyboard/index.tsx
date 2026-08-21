@@ -50,7 +50,7 @@ export function NumericalKeyboard({
       buttonAttributes={softwareKeyboardButtonAttributes}
       layoutName={layoutName}
       layout={numericalKeyboardLayout}
-      debug={debug} // If true, <ENTER> will input a \n
+      debug={debug}
       preventMouseDownDefault // Don't steal focus from inputs.
     />
   )
