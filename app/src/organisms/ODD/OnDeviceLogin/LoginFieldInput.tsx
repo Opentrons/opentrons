@@ -4,8 +4,6 @@ import { setRefs, TouchInputField } from '@opentrons/components'
 
 import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 
-import styles from './OnDeviceLogin.module.css'
-
 import type { ChangeEvent } from 'react'
 import type { ControllerRenderProps, FieldPath } from 'react-hook-form'
 import type { LoginFormValues } from './index'
@@ -36,7 +34,7 @@ export function LoginFieldInput<
   const isPasswordHidden = isPasswordField && !showPassword
   const inputType: 'text' | 'password' = isPasswordHidden ? 'password' : 'text'
 
-  const inputField = (
+  return (
     <TouchInputField
       ref={setRefs(inputRef, field.ref)}
       autoFocus={autoFocus}
@@ -51,20 +49,16 @@ export function LoginFieldInput<
         field.onChange(e.target.value)
         onClearError?.()
       }}
+      accessory={
+        isPasswordField ? (
+          <PasswordVisibilityToggle
+            isVisible={showPassword}
+            onToggle={() => {
+              setShowPassword(prev => !prev)
+            }}
+          />
+        ) : null
+      }
     />
-  )
-
-  if (!isPasswordField) return inputField
-
-  return (
-    <div className={styles.password_field_row}>
-      <div className={styles.password_field_input}>{inputField}</div>
-      <PasswordVisibilityToggle
-        isVisible={showPassword}
-        onToggle={() => {
-          setShowPassword(prev => !prev)
-        }}
-      />
-    </div>
   )
 }

@@ -45,26 +45,24 @@ export function WifiPasswordInput({
           <StyledText oddStyle="bodyTextRegular">
             {t('enter_password')}
           </StyledText>
-          <div className={styles.input_row}>
-            <div className={styles.input_field_wrapper}>
-              <TouchInputField
-                aria-label="wifi_password"
-                value={password}
-                type={showPassword ? 'text' : 'password'}
-                ref={inputRef}
-                autoFocus
-                onChange={e => {
-                  setPassword(e.target.value)
+          <TouchInputField
+            aria-label="wifi_password"
+            value={password}
+            type={showPassword ? 'text' : 'password'}
+            ref={inputRef}
+            autoFocus
+            onChange={e => {
+              setPassword(e.target.value)
+            }}
+            accessory={
+              <PasswordVisibilityToggle
+                isVisible={showPassword}
+                onToggle={() => {
+                  setShowPassword(currentState => !currentState)
                 }}
               />
-            </div>
-            <PasswordVisibilityToggle
-              isVisible={showPassword}
-              onToggle={() => {
-                setShowPassword(currentState => !currentState)
-              }}
-            />
-          </div>
+            }
+          />
         </div>
       </div>
       <div className={styles.keyboard_wrapper}>
