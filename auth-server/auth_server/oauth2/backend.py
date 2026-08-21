@@ -106,7 +106,7 @@ class Backend:
 
     def revoke_all_tokens(self) -> None:
         """Invalidate every issued access and refresh token."""
-        self._token_store.clear()
+        self._token_store._tokens.clear()
 
     def create_introspect_response(
         self, body_form_data: list[tuple[str, str]], headers: dict[str, str]
@@ -590,9 +590,6 @@ class _TokenStore:
 
     def prune_inactive(self, now: datetime) -> None:
         self._tokens = [t for t in self._tokens if self._is_active(t, now)]
-
-    def clear(self) -> None:
-        self._tokens.clear()
 
     def find_active_access_token(
         self, access_token: str, now: datetime
