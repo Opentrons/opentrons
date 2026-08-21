@@ -154,32 +154,44 @@ In this example:
 
 Use [start_execute_profile()][opentrons.protocol_api.VacuumModuleContext.start_execute_profile] to run a multi-step sequence of pressure or power stages without pausing the protocol run.
 
-```python
-# Define the different steps
-profile_steps = [
-    {
-        "enable_pump": True,
-        "gauge_pressure_mbar": -200,
-        "hold_time_seconds": 15,
-    },
-    {
-        "enable_pump": True,
-        "gauge_pressure_mbar": -500,
-        "hold_time_seconds": 30,
-    },
-]
+<font color="red">Maybe use inline tabs here to show multi-step with pressure and power?</font>
 
-# Start profile execution
-profile_task = vacuum.start_execute_profile(
-    steps=profile_steps,
-    repetitions=1,
-    vent_after=True,
-    equalize_timeout_s=10,
-)
-protocol.wait_for_tasks([profile_task])
-```
+=== "Pressure"
 
-In this example, each step requires `enable_pump` and either `gauge_pressure_mbar` (0 to -800 mbar) or `percent_power` (1–100%). A single step cannot specify both pressure and power.
+    In this example, each step requires `enable_pump` and either `gauge_pressure_mbar` (0 to -800 mbar) or `percent_power` (1–100%). A single step cannot specify both pressure and power.
+
+    ```python
+    # Define the different steps
+    profile_steps = [
+        {
+            "enable_pump": True,
+            "gauge_pressure_mbar": -200,
+            "hold_time_seconds": 15,
+        },
+        {
+            "enable_pump": True,
+            "gauge_pressure_mbar": -500,
+            "hold_time_seconds": 30,
+        },
+    ]
+
+    # Start profile execution
+    profile_task = vacuum.start_execute_profile(
+        steps=profile_steps,
+        repetitions=1,
+        vent_after=True,
+        equalize_timeout_s=10,
+    )
+    protocol.wait_for_tasks([profile_task])
+    ```
+
+=== "Power"
+
+    Duty cycle text here
+
+doc continues normally here.
+
+
 
 ### Manual pump and vent control
 
