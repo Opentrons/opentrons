@@ -1,11 +1,4 @@
-import {
-  Fragment,
-  useCallback,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from 'react'
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
@@ -49,6 +42,7 @@ import {
 import { ToggleButton } from '/app/atoms/buttons'
 import { Slideout } from '/app/atoms/Slideout'
 import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { UploadInput } from '/app/molecules/UploadInput'
 import { useFeatureFlag } from '/app/redux/config'
 import {
@@ -335,7 +329,7 @@ export function ChooseRobotSlideout(
           const isSelected =
             selectedRobot != null && selectedRobot.ip === robot.ip
           return (
-            <Fragment key={robot.ip}>
+            <ApiHostProvider key={robot.ip} robotName={robot.name}>
               <AvailableRobotOption
                 robot={robot}
                 onClick={() => {
@@ -382,7 +376,7 @@ export function ChooseRobotSlideout(
                   )}
                 </LegacyStyledText>
               )}
-            </Fragment>
+            </ApiHostProvider>
           )
         })
       )}

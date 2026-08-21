@@ -15,9 +15,11 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
 import FLEX_PNG from '/app/assets/images/FLEX.png'
 import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
+import { StatusLabel } from '/app/atoms/StatusLabel'
 import { MiniCard } from '/app/molecules/MiniCard'
 import { getRobotModelByName, OPENTRONS_USB } from '/app/redux/discovery'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
@@ -101,6 +103,10 @@ export function AvailableRobotOption(
 
   const { ethernet, wifi } = useNetworkInterfaces(robotName)
 
+  const { data: complianceReadyData } = useAccessControlEnabledQuery({})
+  const isComplianceReady =
+    complianceReadyData?.data.accessControlEnabled ?? false
+
   let iconName: IconName | null = null
   if (ethernet?.ipAddress != null) {
     iconName = 'ethernet'
@@ -157,6 +163,15 @@ export function AvailableRobotOption(
               />
             </LegacyStyledText>
           </Box>
+          {isComplianceReady ? (
+            <StatusLabel
+              status={t('protocol_list:compliance_ready')}
+              backgroundColor={COLORS.blue30}
+              showIcon={false}
+              // override capitalization since both words should be capitalized in this instance
+              capitalizeStatus={false}
+            />
+          ) : null}
         </Flex>
         {(isError || isSelectedRobotOnDifferentSoftwareVersion) &&
         isSelected ? (
