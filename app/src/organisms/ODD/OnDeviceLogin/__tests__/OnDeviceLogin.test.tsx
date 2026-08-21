@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { fireEvent, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -141,6 +142,16 @@ describe('OnDeviceLogin', () => {
     expect(
       screen.getByLabelText('access_control:on_device_login_confirm_password')
     ).toBeInTheDocument()
+  })
+
+  it('types into the login field with the software keyboard', async () => {
+    const user = userEvent.setup()
+    renderLogin({ initialStep: 'username' })
+
+    await user.click(screen.getByRole('button', { name: 'a' }))
+    await user.click(screen.getByRole('button', { name: 'b' }))
+
+    expect(screen.getByLabelText('access_control:username')).toHaveValue('ab')
   })
 
   it('advances from username to password', () => {
