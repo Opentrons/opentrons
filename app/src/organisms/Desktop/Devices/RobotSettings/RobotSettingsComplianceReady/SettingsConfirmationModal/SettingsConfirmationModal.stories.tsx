@@ -2,13 +2,13 @@ import { action } from 'storybook/actions'
 
 import { TopPortalRoot } from '/app/App/portal'
 
-import { UserAccountConfirmModal } from './index'
+import { SettingsConfirmationModal } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
-const meta: Meta<typeof UserAccountConfirmModal> = {
-  title: 'App/Organisms/UserAccountConfirmModal',
-  component: UserAccountConfirmModal,
+const meta: Meta<typeof SettingsConfirmationModal> = {
+  title: 'App/Organisms/SettingsConfirmationModal',
+  component: SettingsConfirmationModal,
   decorators: [
     Story => (
       <>
@@ -21,7 +21,7 @@ const meta: Meta<typeof UserAccountConfirmModal> = {
 
 export default meta
 
-type Story = StoryObj<typeof UserAccountConfirmModal>
+type Story = StoryObj<typeof SettingsConfirmationModal>
 
 const defaultHandlers = {
   onConfirm: action('onConfirm'),
@@ -68,6 +68,17 @@ export const ResetPassword: Story = {
     description:
       'Once the password is reset, the user will be prompted to create a new password the next time they log in.',
     confirmLabel: 'Reset password',
+    ...defaultHandlers,
+  },
+}
+
+export const RequirePasswordComplexity: Story = {
+  args: {
+    title: 'Require password complexity?',
+    heading: 'Users will need to reset their passwords',
+    description:
+      'Updating this setting will sign out all users and require them to reset their passwords the next time they sign in.',
+    confirmLabel: 'Require password complexity',
     ...defaultHandlers,
   },
 }
