@@ -2,10 +2,12 @@ import { useRef, useState } from 'react'
 
 import { setRefs, TouchInputField } from '@opentrons/components'
 
+import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, RefObject } from 'react'
 import type { ControllerRenderProps, FieldPath } from 'react-hook-form'
+import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { LoginFormValues } from './index'
 
 export interface LoginFieldInputProps<
@@ -17,6 +19,7 @@ export interface LoginFieldInputProps<
   isPasswordField: boolean
   onClearError?: () => void
   autoFocus?: boolean
+  keyboardRef?: RefObject<KeyboardReactInterface | null>
 }
 
 export function LoginFieldInput<
@@ -28,11 +31,16 @@ export function LoginFieldInput<
   isPasswordField,
   onClearError,
   autoFocus,
+  keyboardRef,
 }: LoginFieldInputProps<TFieldName>): JSX.Element {
   const [showPassword, setShowPassword] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isPasswordHidden = isPasswordField && !showPassword
   const inputType: 'text' | 'password' = isPasswordHidden ? 'password' : 'text'
+
+  usePlaceCaretAtEndOnToggle(inputRef, showPassword, isPasswordField, end => {
+    keyboardRef?.current?.setCaretPosition(end)
+  })
 
   return (
     <TouchInputField

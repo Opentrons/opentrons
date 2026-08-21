@@ -91,11 +91,13 @@ export function OnDeviceLogin({
     onClearLoginError?.()
   }
 
-  // reset keyboard input when switching steps
+  // Keep the software keyboard's value and caret in sync with the active field,
+  // including after username -> password so new keys insert at the end.
   useEffect(() => {
     const kb = keyboardRef.current
     if (kb == null) return
     kb.setInput(keyboardFieldValue)
+    kb.setCaretPosition(keyboardFieldValue.length)
   }, [step, keyboardFieldValue])
 
   const handleNext = useCallback((): void => {
@@ -235,6 +237,7 @@ export function OnDeviceLogin({
               loginError={passwordPolicyError ?? loginError}
               confirmPasswordError={confirmPasswordError}
               onClearFieldErrors={clearFieldErrors}
+              keyboardRef={keyboardRef}
             />
           </div>
         </div>

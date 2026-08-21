@@ -22,9 +22,13 @@ export function PasswordVisibilityToggle({
   return (
     <button
       type="button"
+      tabIndex={-1}
+      onPointerDown={e => {
+        // Keep focus (and the caret) on the password field for mouse and touch.
+        e.preventDefault()
+      }}
       onMouseDown={e => {
-        // This prevents focus from moving from the password field to this toggle button,
-        // but lets the click event go through.
+        // Fallback for browsers that do not emit pointer events.
         e.preventDefault()
       }}
       onClick={onToggle}

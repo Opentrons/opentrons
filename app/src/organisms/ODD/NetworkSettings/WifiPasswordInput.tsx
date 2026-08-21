@@ -5,6 +5,7 @@ import clsx from 'clsx'
 import { StyledText, TouchInputField } from '@opentrons/components'
 
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 
@@ -36,7 +37,12 @@ export function WifiPasswordInput({
       inputRef.current.focus()
     }
     keyboardRef.current?.setInput(password)
+    keyboardRef.current?.setCaretPosition(password.length)
   }, [password])
+
+  usePlaceCaretAtEndOnToggle(inputRef, showPassword, true, end => {
+    keyboardRef.current?.setCaretPosition(end)
+  })
 
   return (
     <>

@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Icon, InputField } from '@opentrons/components'
+
+import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 
 import styles from './passwordinputfield.module.css'
 
@@ -24,9 +26,13 @@ export function PasswordInputField({
 }: PasswordInputFieldProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const [showPassword, setShowPassword] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  usePlaceCaretAtEndOnToggle(inputRef, showPassword, true)
 
   return (
     <InputField
+      ref={inputRef}
       type={showPassword ? 'text' : 'password'}
       value={value}
       placeholder={placeholder}
@@ -38,6 +44,9 @@ export function PasswordInputField({
           type="button"
           className={styles.password_visibility_button}
           aria-label={t('toggle_password_visibility')}
+          onPointerDown={e => {
+            e.preventDefault()
+          }}
           onMouseDown={e => {
             // This prevents focus from moving from the password field to this toggle button,
             // but lets the click event go through.
