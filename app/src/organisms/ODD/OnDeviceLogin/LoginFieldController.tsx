@@ -1,3 +1,4 @@
+import { forwardRef } from 'react'
 import { Controller } from 'react-hook-form'
 
 import { LoginFieldInput } from './LoginFieldInput'
@@ -20,17 +21,23 @@ export interface LoginFieldControllerProps {
   keyboardRef: RefObject<KeyboardReactInterface | null>
 }
 
-export function LoginFieldController({
-  control,
-  step,
-  t,
-  isPasswordResetRequired,
-  loginError,
-  confirmPasswordError,
-  usernameError,
-  onClearFieldErrors,
-  keyboardRef,
-}: LoginFieldControllerProps): JSX.Element | null {
+export const LoginFieldController = forwardRef<
+  HTMLInputElement,
+  LoginFieldControllerProps
+>(function LoginFieldController(
+  {
+    control,
+    step,
+    t,
+    isPasswordResetRequired,
+    loginError,
+    confirmPasswordError,
+    usernameError,
+    onClearFieldErrors,
+    keyboardRef,
+  },
+  ref
+): JSX.Element | null {
   if (step === 'username') {
     return (
       <Controller
@@ -39,6 +46,7 @@ export function LoginFieldController({
         name="username"
         render={({ field }) => (
           <LoginFieldInput
+            ref={ref}
             field={field}
             label={t('access_control:username')}
             error={usernameError}
@@ -63,6 +71,7 @@ export function LoginFieldController({
         name="password"
         render={({ field }) => (
           <LoginFieldInput
+            ref={ref}
             field={field}
             label={
               isPasswordResetRequired
@@ -88,6 +97,7 @@ export function LoginFieldController({
         name="confirmPassword"
         render={({ field }) => (
           <LoginFieldInput
+            ref={ref}
             field={field}
             label={t('access_control:on_device_login_confirm_password')}
             error={confirmPasswordError}
@@ -102,4 +112,4 @@ export function LoginFieldController({
   }
 
   return null
-}
+})
