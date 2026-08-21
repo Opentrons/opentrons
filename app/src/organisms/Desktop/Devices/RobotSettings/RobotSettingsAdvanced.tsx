@@ -187,7 +187,10 @@ export function RobotSettingsAdvanced({
             />
           </>
         )}
-        <Divider marginY={SPACING.spacing16} />
+        <Divider
+          marginTop={SPACING.spacing16}
+          marginBottom={SPACING.spacing24}
+        />
         <GantryHoming
           settings={findSettings('disableHomeOnBoot')}
           isRobotBusy={isRobotBusy || isEstopNotDisengaged}

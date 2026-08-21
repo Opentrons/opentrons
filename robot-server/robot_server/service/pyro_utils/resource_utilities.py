@@ -13,7 +13,6 @@ from server_utils.fastapi_utils.app_state import (
     AppState,
 )
 
-from robot_server.hardware import HardwareStateStore
 from robot_server.service.pyro_utils.pyro_resource import (
     RS_PYRONAME,
     RobotServerPyroResource,
@@ -22,6 +21,7 @@ from robot_server.service.pyro_utils.pyro_resource import (
 
 if TYPE_CHECKING:
     from robot_server.deck_configuration.store import DeckConfigurationStore
+    from robot_server.hardware import HardwareStateStore
     from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
         MaintenanceRunOrchestratorStore,
     )
@@ -134,7 +134,7 @@ def register_notify_publishers_to_pyro_resource(
 
 
 def register_hardware_state_store_to_pyro_resource(
-    app_state: AppState, hardware_store: HardwareStateStore
+    app_state: AppState, hardware_store: "HardwareStateStore"
 ) -> None:
     """Set the provided Hardware State Store as the active instance to be used by the Robot Server's Pyro Resource."""
     robot_server_pyro_resource = robot_server_pyro_resource_accessor.get_from(app_state)

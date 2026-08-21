@@ -69,9 +69,6 @@ export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
             type="text"
             value={name}
             textAlign={TYPOGRAPHY.textAlignCenter}
-            onBlur={e => {
-              e.target.focus()
-            }}
             onChange={e => {
               setName(e.target.value as string)
             }}

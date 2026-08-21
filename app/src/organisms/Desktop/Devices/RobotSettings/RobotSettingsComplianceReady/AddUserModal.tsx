@@ -138,6 +138,7 @@ export function AddUserModal({
   return createPortal(
     <ModalShell
       width="31.25rem"
+      overflow="visible"
       header={
         <WizardHeader
           title={t('desktop_add_user')}

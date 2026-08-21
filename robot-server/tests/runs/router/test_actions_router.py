@@ -64,7 +64,7 @@ async def test_create_run_action(
     ).then_return([])
     decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(None)
     decoy.when(
-        mock_run_controller.create_action(
+        await mock_run_controller.create_action(
             action_id=action_id,
             action_type=action_type,
             created_at=created_at,
@@ -117,7 +117,7 @@ async def test_play_action_clears_maintenance_run(
         "some-id"
     )
     decoy.when(
-        mock_run_controller.create_action(
+        await mock_run_controller.create_action(
             action_id=action_id,
             action_type=action_type,
             created_at=created_at,
@@ -175,7 +175,7 @@ async def test_create_play_action_not_allowed(
     ).then_return([])
     decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(None)
     decoy.when(
-        mock_run_controller.create_action(
+        await mock_run_controller.create_action(
             action_id=action_id,
             action_type=action_type,
             created_at=created_at,

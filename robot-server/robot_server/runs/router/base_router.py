@@ -232,7 +232,7 @@ async def get_run_data_from_url(
         run_data_manager: Current and historical run data management.
     """
     try:
-        run_data = run_data_manager.get(runId)
+        run_data = await run_data_manager.get(runId)
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
@@ -426,7 +426,7 @@ async def get_runs(
         pageLength: Maximum number of items to return.
         run_data_manager: Current and historical run data management.
     """
-    data = run_data_manager.get_all(length=pageLength)
+    data = await run_data_manager.get_all(length=pageLength)
     current_run_id = run_data_manager.current_run_id
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
     links = AllRunsLinks(
@@ -501,7 +501,6 @@ async def remove_run(
         await run_data_manager.delete(
             run_id=runId, access_control_status=access_control_status
         )
-
     except RunConflictError as e:
         raise RunNotIdle().as_error(status.HTTP_409_CONFLICT) from e
     except RunSignoffRequiredError as e:
@@ -585,7 +584,7 @@ async def update_run(  # noqa: C901
         if request_body.data.signedBy is not None:
             # Depending on settings, updating `current` may require `signedBy`
             # to have already been set, so we need to process `signedBy` first.
-            run_data = run_data_manager.set_signed_by(
+            run_data = await run_data_manager.set_signed_by(
                 run_id=runId, signed_by=request_body.data.signedBy
             )
         if request_body.data.current is not None:
@@ -601,7 +600,7 @@ async def update_run(  # noqa: C901
                 staging_dir = create_download_staging_dir(persistence_directory_root)
                 staging_path = Path(staging_dir.name)
 
-                run_log_entry = collect_run_log(
+                run_log_entry = await collect_run_log(
                     run_id=runId,
                     run=run_store.get(runId),
                     run_data_manager=run_data_manager,
@@ -615,7 +614,7 @@ async def update_run(  # noqa: C901
                 staging_dir.cleanup()
 
         if run_data is None:
-            run_data = run_data_manager.get(runId)
+            run_data = await run_data_manager.get(runId)
     except RunConflictError as e:
         raise RunNotIdle(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
     except RunNotCurrentError as e:
@@ -683,14 +682,14 @@ async def get_run_commands_error(
         run_data_manager: Run data retrieval interface.
     """
     try:
-        all_errors_count = run_data_manager.get_command_errors_count(run_id=runId)
+        all_errors_count = await run_data_manager.get_command_errors_count(run_id=runId)
 
         if cursor is None:
             cursor = max(all_errors_count - 1, 0)
             cursor = max(cursor - pageLength + 1, 0)
             cursor = min(cursor, all_errors_count)
 
-        command_error_slice = run_data_manager.get_command_error_slice(
+        command_error_slice = await run_data_manager.get_command_error_slice(
             run_id=runId,
             cursor=cursor,
             length=pageLength,
@@ -741,7 +740,7 @@ async def get_current_state(  # noqa: C901
         robot_type: The type of robot.
     """
     try:
-        run = run_data_manager.get(run_id=runId)
+        run = await run_data_manager.get(run_id=runId)
     except RunNotCurrentError as e:
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
@@ -773,7 +772,7 @@ async def get_current_state(  # noqa: C901
         ]
 
         command = (
-            run_data_manager.get_command(runId, current_command.command_id)
+            await run_data_manager.get_command(runId, current_command.command_id)
             if current_command
             else None
         )
@@ -799,9 +798,10 @@ async def get_current_state(  # noqa: C901
                 ):
                     continue
                 for hw_mod in hardware_store.attached_modules:
+                    summary = await hw_mod.get_state_summary()
                     if (
                         mod.location is not None
-                        and hw_mod.serial_number == mod.serialNumber
+                        and summary.serial_number == mod.serialNumber
                     ):
                         location = mod.location
                         # TODO: Not the best location for this, we should

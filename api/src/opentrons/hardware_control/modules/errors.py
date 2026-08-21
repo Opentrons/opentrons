@@ -1,4 +1,7 @@
-class UpdateError(RuntimeError):
+from opentrons_shared_data.errors.exceptions import FirmwareUpdateFailedError
+
+
+class UpdateError(FirmwareUpdateFailedError):
     pass
 
 

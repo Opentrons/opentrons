@@ -208,9 +208,6 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
               value={disposalVolume}
               label={t('disposal_volume_µL')}
               error={volumeError}
-              onBlur={e => {
-                e.target.focus()
-              }}
               onChange={e => {
                 setDisposalVolume(Number(e.target.value))
               }}

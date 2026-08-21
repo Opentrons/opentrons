@@ -72,7 +72,7 @@ async def _read_and_cleanup_zip(result: FileResponse) -> zipfile.ZipFile:
     return zipfile.ZipFile(io.BytesIO(zip_bytes))
 
 
-def _stub_run_record_for_download(
+async def _stub_run_record_for_download(
     decoy: Decoy,
     run_data_manager: RunDataManager,
     *,
@@ -86,13 +86,13 @@ def _stub_run_record_for_download(
     )
     decoy.when(mock_run_record.labwareOffsets).then_return(labware_offsets or [])
     decoy.when(mock_run_record.runTimeParameters).then_return(run_time_parameters or [])
-    decoy.when(run_data_manager.get(run_id)).then_return(mock_run_record)
+    decoy.when(await run_data_manager.get(run_id)).then_return(mock_run_record)
 
     command = _make_home_command()
     empty_slice = CommandSlice(commands=[], cursor=0, total_length=1)
     full_slice = CommandSlice(commands=[command], cursor=0, total_length=1)
     decoy.when(
-        run_data_manager.get_commands_slice(
+        await run_data_manager.get_commands_slice(
             run_id=run_id,
             cursor=0,
             length=0,
@@ -100,7 +100,7 @@ def _stub_run_record_for_download(
         )
     ).then_return(empty_slice)
     decoy.when(
-        run_data_manager.get_commands_slice(
+        await run_data_manager.get_commands_slice(
             run_id=run_id,
             cursor=0,
             length=1,
@@ -235,7 +235,7 @@ async def test_download_run_files_with_images_protocol_run_log_and_offsets(
             stored=True,
         )
     )
-    _stub_run_record_for_download(
+    await _stub_run_record_for_download(
         decoy,
         mock_run_data_manager,
         labware_offsets=[labware_offset],
@@ -459,7 +459,9 @@ async def test_download_run_files_skips_missing_run_log_and_offsets_silently(
         datetime(2024, 6, 20, 10, 30, 15, tzinfo=timezone.utc)
     )
     decoy.when(mock_run_store.get("run-id")).then_return(mock_run)
-    decoy.when(mock_run_data_manager.get("run-id")).then_raise(RuntimeError("boom"))
+    decoy.when(await mock_run_data_manager.get("run-id")).then_raise(
+        RuntimeError("boom")
+    )
 
     result = await download_run_files(
         runId="run-id",
@@ -560,7 +562,9 @@ async def test_download_run_files_requested_but_missing_returns_204(
         )
     ).then_return(DataFileWithCommandsInfoSlice(file_info=[], total_length=0))
     _stub_empty_output_files(decoy, data_files_store)
-    decoy.when(mock_run_data_manager.get("run-id")).then_raise(RuntimeError("skip"))
+    decoy.when(await mock_run_data_manager.get("run-id")).then_raise(
+        RuntimeError("skip")
+    )
 
     result = await download_run_files(
         runId="run-id",

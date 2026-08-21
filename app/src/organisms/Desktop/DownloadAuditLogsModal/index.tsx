@@ -14,13 +14,11 @@ import { useIsLogDeleted } from '/app/resources/audit/useIsLogDeleted'
 import styles from './downloadauditlogsmodal.module.css'
 
 export interface DownloadAuditLogsModalProps {
-  logPeriodId: string
   onDownload: () => void
   isLoading: boolean
 }
 
 export function DownloadAuditLogsModal({
-  logPeriodId: _logPeriodId,
   onDownload,
   isLoading,
 }: DownloadAuditLogsModalProps): JSX.Element {
@@ -46,7 +44,7 @@ export function DownloadAuditLogsModal({
                 aria-hidden
                 spin={isLoading}
               />
-              {t('download_audit_logs')}
+              {t('download_now')}
             </span>
           </PrimaryButton>
         </div>
@@ -114,11 +112,7 @@ function DownloadAuditLogsModalContent({
   }, [isDeleted, isLogDeletedLoading, modal])
 
   return (
-    <DownloadAuditLogsModal
-      logPeriodId={logPeriodId}
-      onDownload={handleDownload}
-      isLoading={isLoading}
-    />
+    <DownloadAuditLogsModal onDownload={handleDownload} isLoading={isLoading} />
   )
 }
 

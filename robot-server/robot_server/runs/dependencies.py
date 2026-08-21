@@ -201,7 +201,7 @@ async def get_run_orchestrator_store(
                 app_state=app_state, run_orchestrator_store=run_orchestrator_store
             )
             pyro_resource = await get_pyro_resource()
-            hardware_api.register_callback(
+            await hardware_api.register_callback_async(
                 pyro_resource.create_run_hardware_event_callback()
             )
 
@@ -223,7 +223,10 @@ async def get_is_okay_to_create_maintenance_run(
         orchestrator = run_orchestrator_store.run_coordinator
     except NoRunCoordinator:
         return True
-    return not orchestrator.run_has_started() or orchestrator.get_is_run_terminal()
+    return (
+        not await orchestrator.run_has_started()
+        or await orchestrator.get_is_run_terminal()
+    )
 
 
 async def get_run_data_manager(

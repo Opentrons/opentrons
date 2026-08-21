@@ -157,7 +157,7 @@ export function RunSummary(): JSX.Element {
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
   const documentationState = useDocumentationState()
-  const { closeCurrentRun } = useCloseCurrentRun(documentationState)
+  const { closeCurrentRun } = useCloseCurrentRun()
   // Close the current run only if it's active and then execute the onSuccess callback. Prefer this wrapper over
   // closeCurrentRun directly, since the callback is swallowed if currentRun is null.
   const closeCurrentRunIfValid = (onSettled?: () => void): void => {
@@ -221,8 +221,11 @@ export function RunSummary(): JSX.Element {
     !hasSignedBy
 
   const logPeriodId = runRecord?.data.logPeriodId ?? null
-  const { isLoading: isLogDeletedLoading, isDeleted: isLogDeleted } =
-    useIsLogDeleted(logPeriodId ?? '')
+  const {
+    isLoading: isLogDeletedLoading,
+    isDeleted: isLogDeleted,
+    isError: isLogDeletedError,
+  } = useIsLogDeleted(logPeriodId ?? '')
 
   const isDownloadingRequired =
     ((accessControlEnabled?.data.accessControlEnabled ?? false) &&
@@ -234,6 +237,7 @@ export function RunSummary(): JSX.Element {
     isDownloadingRequired &&
     !shouldPromptSignRun &&
     !isLogDeletedLoading &&
+    !isLogDeletedError &&
     !isLogDeleted
 
   let headerText: string | null = null
@@ -421,7 +425,7 @@ export function RunSummary(): JSX.Element {
   )
 
   if (shouldPromptSignRun && !showSplash) {
-    return <SignRun runId={runId} />
+    return <SignRun runId={runId} documentationState={documentationState} />
   }
 
   if (shouldPromptDownloadLog && !showSplash) {

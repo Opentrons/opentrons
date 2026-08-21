@@ -27,7 +27,7 @@ describe('EnableDevTools', () => {
 
   it('should render text and toggle button', () => {
     render()
-    screen.getByText('Developer Tools')
+    screen.getByText('Developer tools')
     screen.getByText(
       'Enabling this setting opens Developer Tools on app launch, enables additional logging and gives access to feature flags.'
     )

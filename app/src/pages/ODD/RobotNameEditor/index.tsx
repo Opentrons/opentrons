@@ -30,7 +30,6 @@ import { SmallButton } from '/app/atoms/buttons'
 import {
   AlphanumericKeyboard,
   getInvalidCharForKeyboard,
-  shouldAcceptKeyboardInput,
 } from '/app/atoms/SoftwareKeyboard'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ConfirmRobotName } from '/app/organisms/ODD/NameRobot/ConfirmRobotName'
@@ -62,10 +61,11 @@ export function RobotNameEditor(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const ipAddress = localRobot?.ip
   const previousName = localRobot?.name != null ? localRobot.name : null
-  const [newName, setNewName] = useState<string>('')
-  const [isShowConfirmRobotName, setIsShowConfirmRobotName] =
-    useState<boolean>(false)
+  const [robotNameConfirmation, setRobotNameConfirmation] = useState<
+    string | null
+  >(null)
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
   const dispatch = useDispatch<Dispatch>()
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
   const connectableRobots = useSelector((state: State) =>
@@ -83,14 +83,16 @@ export function RobotNameEditor(): JSX.Element {
     errors: Record<string, FieldError>
   ): Record<string, FieldError> => {
     const newName = data.newRobotName
+    // It's a little unclear what characters the backend can actually support.
+    // Historically, the user was limited to whatever they could type on the on-screen
+    // keyboard, so, for now, keep restricting to those characters.
+    const invalidChar = getInvalidCharForKeyboard(newName, 'alphanumeric')
     let errorMessage: string | undefined
-    // In ODD users cannot input letters and numbers from software keyboard
-    // so the app only checks the length of input string
-    if (newName.length < 1 || newName.length > MAX_LENGTH) {
+    if (invalidChar != null) {
+      errorMessage = t('shared:character_not_supported', { char: invalidChar })
+    } else if (newName.length < 1 || newName.length > MAX_LENGTH) {
       errorMessage = t('name_rule_error_name_length')
-    }
-
-    if (
+    } else if (
       [...connectableRobots, ...reachableRobots].some(
         robot => newName === robot.name && robot.ip !== ipAddress
       )
@@ -121,7 +123,6 @@ export function RobotNameEditor(): JSX.Element {
     handleSubmit,
     control,
     formState: { errors },
-    reset,
     trigger,
     watch,
   } = useForm({
@@ -132,7 +133,6 @@ export function RobotNameEditor(): JSX.Element {
   })
 
   const newRobotName = watch('newRobotName')
-  const invalidChar = getInvalidCharForKeyboard(newRobotName, 'alphanumeric')
 
   const onSubmit = (data: FormValues): void => {
     const newName = data.newRobotName
@@ -143,7 +143,6 @@ export function RobotNameEditor(): JSX.Element {
       dispatch(removeRobot(sameNameRobotInUnavailable.name))
     }
     updateRobotName(newName)
-    reset({ newRobotName: '' })
   }
 
   const documentationState = useDocumentationState()
@@ -153,11 +152,10 @@ export function RobotNameEditor(): JSX.Element {
     {
       onSuccess: (data: UpdatedRobotName) => {
         if (data.name != null) {
-          setNewName(data.name)
           if (!isUnboxingFlowOngoing) {
             navigate('/robot-settings')
           } else {
-            setIsShowConfirmRobotName(true)
+            setRobotNameConfirmation(data.name)
           }
           if (previousName != null) {
             dispatch(removeRobot(previousName))
@@ -187,8 +185,8 @@ export function RobotNameEditor(): JSX.Element {
 
   return (
     <>
-      {isShowConfirmRobotName && isUnboxingFlowOngoing ? (
-        <ConfirmRobotName robotName={newName} />
+      {robotNameConfirmation != null && isUnboxingFlowOngoing ? (
+        <ConfirmRobotName robotName={robotNameConfirmation} />
       ) : (
         <>
           {isUnboxingFlowOngoing ? (
@@ -277,6 +275,7 @@ export function RobotNameEditor(): JSX.Element {
                 name="newRobotName"
                 render={({ field, fieldState }) => (
                   <TouchInputField
+                    ref={inputElementRef}
                     autoFocus
                     data-testid="name-robot_input"
                     name="newRobotName"
@@ -286,18 +285,7 @@ export function RobotNameEditor(): JSX.Element {
                     textAlign={TYPOGRAPHY.textAlignCenter}
                     onChange={e => {
                       const newVal = e.target.value
-                      if (
-                        !shouldAcceptKeyboardInput(
-                          newVal,
-                          newRobotName,
-                          'alphanumeric'
-                        )
-                      ) {
-                        field.onChange(newRobotName)
-                        return
-                      }
                       field.onChange(newVal)
-                      setNewName(newVal)
                       void trigger('newRobotName')
                     }}
                   />
@@ -311,15 +299,7 @@ export function RobotNameEditor(): JSX.Element {
             >
               {t('name_rule_description')}
             </LegacyStyledText>
-            {invalidChar != null ? (
-              <LegacyStyledText
-                forwardedAs="p"
-                fontWeight={TYPOGRAPHY.fontWeightRegular}
-                color={COLORS.red50}
-              >
-                {t('shared:character_not_supported', { char: invalidChar })}
-              </LegacyStyledText>
-            ) : errors.newRobotName != null ? (
+            {errors.newRobotName != null ? (
               <LegacyStyledText
                 forwardedAs="p"
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
@@ -331,30 +311,9 @@ export function RobotNameEditor(): JSX.Element {
           </Flex>
 
           <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
-            <Controller
-              control={control}
-              name="newRobotName"
-              render={({ field }) => (
-                <AlphanumericKeyboard
-                  onChange={(input: string) => {
-                    if (
-                      !shouldAcceptKeyboardInput(
-                        input,
-                        newRobotName,
-                        'alphanumeric'
-                      )
-                    ) {
-                      keyboardRef.current?.setInput(newRobotName)
-                      return
-                    }
-                    field.onChange(input)
-                    setNewName(input)
-                    void trigger('newRobotName')
-                  }}
-                  keyboardRef={keyboardRef}
-                  value={newRobotName}
-                />
-              )}
+            <AlphanumericKeyboard
+              inputElementRef={inputElementRef}
+              keyboardRef={keyboardRef}
             />
           </Flex>
         </>

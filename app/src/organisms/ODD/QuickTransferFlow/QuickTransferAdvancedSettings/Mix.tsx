@@ -224,9 +224,6 @@ export function Mix(props: MixProps): JSX.Element {
               value={mixVolume}
               label={t('mix_volume_µL')}
               error={volumeError}
-              onBlur={e => {
-                e.target.focus()
-              }}
               onChange={e => {
                 setMixVolume(Number(e.target.value))
               }}
@@ -271,9 +268,6 @@ export function Mix(props: MixProps): JSX.Element {
               value={mixReps}
               error={repititionError}
               label={t('mix_repetitions')}
-              onBlur={e => {
-                e.target.focus()
-              }}
               onChange={e => {
                 setMixReps(Number(e.target.value))
               }}

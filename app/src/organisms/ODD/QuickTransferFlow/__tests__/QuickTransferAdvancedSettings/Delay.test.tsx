@@ -110,7 +110,6 @@ describe('Delay', () => {
         error: null,
         type: 'number',
         value: null,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -144,7 +143,6 @@ describe('Delay', () => {
         error: 'Value must be between 0.1 to 9999999999',
         type: 'number',
         value: 0,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -193,7 +191,6 @@ describe('Delay', () => {
         error: null,
         type: 'number',
         value: 15,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -222,7 +219,6 @@ describe('Delay', () => {
         error: null,
         type: 'number',
         value: 20,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}

@@ -116,6 +116,10 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
         <UpdateRobotSoftware
           localRobot={localRobot}
           afterError={setErrorString}
+          afterCancel={() => {
+            dispatch(clearRobotUpdateSession())
+            navigate('/emergency-stop')
+          }}
           beforeCommittingSuccessfulUpdate={handleSuccessfulUpdate}
         />
       )}
