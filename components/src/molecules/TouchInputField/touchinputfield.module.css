@@ -25,9 +25,18 @@
   column-gap: var(--spacing-8);
 }
 
-.outer {
+.input_set {
   display: flex;
   width: 100%;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-24);
+}
+
+.outer {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
   flex-direction: column;
   gap: var(--spacing-8);
 }

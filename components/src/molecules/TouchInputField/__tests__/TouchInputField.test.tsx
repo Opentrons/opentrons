@@ -81,6 +81,13 @@ describe('TouchInputField', () => {
     screen.getByText('error')
   })
 
+  it('renders an accessory beside the input field', () => {
+    props.accessory = <button type="button">Show</button>
+
+    render(props)
+    screen.getByRole('button', { name: 'Show' })
+  })
+
   it('bubbles click from units to onClick handler', () => {
     const onClick = vi.fn()
     props.onClick = onClick
