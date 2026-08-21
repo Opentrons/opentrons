@@ -1,7 +1,8 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 
 import { InputField } from '@opentrons/components'
 
+import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 
 import styles from './passwordinputfield.module.css'
@@ -16,11 +17,6 @@ export interface PasswordInputFieldProps {
   onBlur?: (event: FocusEvent<HTMLInputElement>) => void
 }
 
-interface InputSelection {
-  start: number
-  end: number
-}
-
 export function PasswordInputField({
   value,
   placeholder,
@@ -30,39 +26,8 @@ export function PasswordInputField({
 }: PasswordInputFieldProps): JSX.Element {
   const [showPassword, setShowPassword] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
-  const selectionRef = useRef<InputSelection | null>(null)
 
-  useLayoutEffect(() => {
-    const input = inputRef.current
-    const selection = selectionRef.current
-    if (input == null || selection == null) {
-      return
-    }
-
-    // Chrome resets the caret to the start when input type changes.
-    // Restore immediately, then again on the next frame in case Chrome
-    // overwrites the selection after the type attribute update.
-    const restoreSelection = (): void => {
-      input.setSelectionRange(selection.start, selection.end)
-    }
-    restoreSelection()
-    const frameId = requestAnimationFrame(restoreSelection)
-
-    return () => {
-      cancelAnimationFrame(frameId)
-    }
-  }, [showPassword])
-
-  const handleToggle = (): void => {
-    const input = inputRef.current
-    if (input != null) {
-      selectionRef.current = {
-        start: input.selectionStart ?? input.value.length,
-        end: input.selectionEnd ?? input.value.length,
-      }
-    }
-    setShowPassword(current => !current)
-  }
+  usePlaceCaretAtEndOnToggle(inputRef, showPassword, true)
 
   return (
     <div className={styles.password_field_row}>
@@ -79,7 +44,9 @@ export function PasswordInputField({
       </div>
       <PasswordVisibilityToggle
         isVisible={showPassword}
-        onToggle={handleToggle}
+        onToggle={() => {
+          setShowPassword(current => !current)
+        }}
       />
     </div>
   )

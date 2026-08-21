@@ -114,7 +114,7 @@ describe('useSetNewPasswordAndSignIn', () => {
     })
 
     await waitFor(() => {
-      expect(onError).toHaveBeenCalledWith('desktop_password_too_short')
+      expect(onError).toHaveBeenCalledWith('must_be_at_least_characters')
     })
     expect(onSuccess).not.toHaveBeenCalled()
   })
@@ -143,6 +143,36 @@ describe('useSetNewPasswordAndSignIn', () => {
     expect(onSuccess).not.toHaveBeenCalled()
   })
 
+  it('prefers the length error when both password policy errors are returned', async () => {
+    mockUpdateSelf.mockRejectedValue({
+      isAxiosError: true,
+      response: {
+        data: {
+          errors: [
+            { id: 'passwordMissingSpecialCharacters' },
+            {
+              id: 'passwordTooShort',
+              meta: { requiredLength: 12, actualLength: 5 },
+            },
+          ],
+        },
+      },
+    })
+
+    const { result } = renderHook(() =>
+      useSetNewPasswordAndSignIn({ onSuccess, onError })
+    )
+
+    act(() => {
+      result.current.submitNewPassword('alice', 'short')
+    })
+
+    await waitFor(() => {
+      expect(onError).toHaveBeenCalledWith('must_be_at_least_characters')
+    })
+    expect(onSuccess).not.toHaveBeenCalled()
+  })
+
   it('reports when the password is missing a special character', async () => {
     mockUpdateSelf.mockRejectedValue({
       isAxiosError: true,
@@ -163,7 +193,7 @@ describe('useSetNewPasswordAndSignIn', () => {
 
     await waitFor(() => {
       expect(onError).toHaveBeenCalledWith(
-        'desktop_password_missing_special_characters'
+        'must_include_at_least_one_special_character'
       )
     })
     expect(onSuccess).not.toHaveBeenCalled()

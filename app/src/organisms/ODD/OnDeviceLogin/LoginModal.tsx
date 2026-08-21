@@ -3,12 +3,17 @@ import { useQueryClient } from 'react-query'
 import { useDispatch, useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
-import { getSelfQueryKey, useHost } from '@opentrons/react-api-client'
+import {
+  getSelfQueryKey,
+  useAuthSettingsQuery,
+  useHost,
+} from '@opentrons/react-api-client'
 
 import { getLocalRobot } from '/app/redux/discovery'
 import { logOut, useUsernameForRobot } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
+  DEFAULT_MIN_PASSWORD_LENGTH,
   useOAuth2PasswordLogin,
   useSetNewPasswordAndSignIn,
 } from '/app/resources/auth'
@@ -99,8 +104,23 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
       onSuccess: handleNewPasswordSuccess,
       onError: message => {
         setLoginError(message)
+        setStep('password')
       },
     })
+
+  const { data: authSettings } = useAuthSettingsQuery({
+    enabled: isChoosingNewPassword,
+  })
+  const passwordComplexity =
+    isChoosingNewPassword && authSettings?.data != null
+      ? {
+          minLength:
+            authSettings.data.passwordComplexityMinimumLength ??
+            DEFAULT_MIN_PASSWORD_LENGTH,
+          requireSpecialCharacters:
+            authSettings.data.passwordComplexitySpecialCharacters === true,
+        }
+      : null
 
   const handleCancel = (): void => {
     dismissModal()
@@ -129,6 +149,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
         onClearLoginError={() => {
           setLoginError(null)
         }}
+        passwordComplexity={passwordComplexity}
         onCancel={handleCancel}
       />
     </div>
