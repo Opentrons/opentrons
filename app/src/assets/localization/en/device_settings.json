@@ -498,7 +498,7 @@
   "value_percent": "{{value}}%",
   "verify": "Verify",
   "verify_robot_encryption_key": "Verify robot encryption key",
-  "verify_the_robot_encryption_key_to_use_the_robot": "Verify the robot encryption key to use the robot. The encryption key can be found under settings on the on-device touchscreen.",
+  "verify_the_robot_encryption_key_to_use_the_robot": "Enter the encryption key displayed on your robot's touchscreen into the field below.",
   "view_details": "View details",
   "view_network_details": "View network details",
   "view_realtime_video": "View real-time video of the deck while a running a protocol.",
