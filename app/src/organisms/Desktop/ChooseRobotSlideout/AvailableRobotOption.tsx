@@ -20,13 +20,14 @@ import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 import FLEX_PNG from '/app/assets/images/FLEX.png'
 import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 import { StatusLabel } from '/app/atoms/StatusLabel'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { MiniCard } from '/app/molecules/MiniCard'
 import { getRobotModelByName, OPENTRONS_USB } from '/app/redux/discovery'
 import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
-import type { Dispatch as ReactDispatch } from 'react'
+import type { Dispatch as ReactDispatch, ReactNode } from 'react'
 import type { Runs } from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
 import type { Robot } from '/app/redux/discovery/types'
@@ -43,7 +44,7 @@ interface AvailableRobotOptionProps {
   showIdleOnly?: boolean
 }
 
-export function AvailableRobotOption(
+export function AvailableRobotOptionComponent(
   props: AvailableRobotOptionProps
 ): JSX.Element | null {
   const {
@@ -203,5 +204,17 @@ export function AvailableRobotOption(
         </LegacyStyledText>
       ) : null}
     </>
+  )
+}
+
+export function AvailableRobotOption(
+  props: AvailableRobotOptionProps
+): ReactNode {
+  const { robot } = props
+  const { name: robotName } = robot
+  return (
+    <ApiHostProvider robotName={robotName}>
+      <AvailableRobotOptionComponent {...props} />
+    </ApiHostProvider>
   )
 }

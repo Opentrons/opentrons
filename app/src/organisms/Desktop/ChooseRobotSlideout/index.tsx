@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
@@ -329,7 +336,7 @@ export function ChooseRobotSlideout(
           const isSelected =
             selectedRobot != null && selectedRobot.ip === robot.ip
           return (
-            <ApiHostProvider key={robot.ip} robotName={robot.name}>
+            <Fragment key={robot.ip}>
               <AvailableRobotOption
                 robot={robot}
                 onClick={() => {
@@ -376,7 +383,7 @@ export function ChooseRobotSlideout(
                   )}
                 </LegacyStyledText>
               )}
-            </ApiHostProvider>
+            </Fragment>
           )
         })
       )}
