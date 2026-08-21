@@ -41,6 +41,7 @@ describe('PersonalAccountSettingsEditForm', () => {
     render(props)
     expect(screen.getByDisplayValue('alice')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Alice Example')).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Show' })).toHaveLength(2)
     const saveButton = screen.getByRole('button', { name: 'Save' })
     expect(saveButton).toBeDisabled()
     fireEvent.click(saveButton)

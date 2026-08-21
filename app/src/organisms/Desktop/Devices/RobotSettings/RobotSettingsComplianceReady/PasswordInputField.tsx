@@ -1,7 +1,8 @@
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useLayoutEffect, useRef, useState } from 'react'
 
-import { Icon, InputField } from '@opentrons/components'
+import { InputField } from '@opentrons/components'
+
+import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 
 import styles from './passwordinputfield.module.css'
 
@@ -15,6 +16,11 @@ export interface PasswordInputFieldProps {
   onBlur?: (event: FocusEvent<HTMLInputElement>) => void
 }
 
+interface InputSelection {
+  start: number
+  end: number
+}
+
 export function PasswordInputField({
   value,
   placeholder,
@@ -22,34 +28,59 @@ export function PasswordInputField({
   onChange,
   onBlur,
 }: PasswordInputFieldProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
   const [showPassword, setShowPassword] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const selectionRef = useRef<InputSelection | null>(null)
+
+  useLayoutEffect(() => {
+    const input = inputRef.current
+    const selection = selectionRef.current
+    if (input == null || selection == null) {
+      return
+    }
+
+    // Chrome resets the caret to the start when input type changes.
+    // Restore immediately, then again on the next frame in case Chrome
+    // overwrites the selection after the type attribute update.
+    const restoreSelection = (): void => {
+      input.setSelectionRange(selection.start, selection.end)
+    }
+    restoreSelection()
+    const frameId = requestAnimationFrame(restoreSelection)
+
+    return () => {
+      cancelAnimationFrame(frameId)
+    }
+  }, [showPassword])
+
+  const handleToggle = (): void => {
+    const input = inputRef.current
+    if (input != null) {
+      selectionRef.current = {
+        start: input.selectionStart ?? input.value.length,
+        end: input.selectionEnd ?? input.value.length,
+      }
+    }
+    setShowPassword(current => !current)
+  }
 
   return (
-    <InputField
-      type={showPassword ? 'text' : 'password'}
-      value={value}
-      placeholder={placeholder}
-      error={error}
-      onChange={onChange}
-      onBlur={onBlur}
-      rightElement={
-        <button
-          type="button"
-          className={styles.password_visibility_button}
-          aria-label={t('toggle_password_visibility')}
-          onMouseDown={e => {
-            // This prevents focus from moving from the password field to this toggle button,
-            // but lets the click event go through.
-            e.preventDefault()
-          }}
-          onClick={() => {
-            setShowPassword(current => !current)
-          }}
-        >
-          <Icon name={showPassword ? 'eye-slash' : 'eye'} size="1.25rem" />
-        </button>
-      }
-    />
+    <div className={styles.password_field_row}>
+      <div className={styles.password_field_input}>
+        <InputField
+          ref={inputRef}
+          type={showPassword ? 'text' : 'password'}
+          value={value}
+          placeholder={placeholder}
+          error={error}
+          onChange={onChange}
+          onBlur={onBlur}
+        />
+      </div>
+      <PasswordVisibilityToggle
+        isVisible={showPassword}
+        onToggle={handleToggle}
+      />
+    </div>
   )
 }
