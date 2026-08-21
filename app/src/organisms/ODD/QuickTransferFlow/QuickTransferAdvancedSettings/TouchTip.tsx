@@ -239,9 +239,6 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
               type="text"
               value={String(speed ?? '')}
               label={t('speed')}
-              onBlur={e => {
-                e.target.focus()
-              }}
               onChange={e => {
                 handleSpeedChange(e.target.value as string)
               }}
@@ -286,9 +283,6 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
               value={String(position ?? '')}
               label={t('touch_tip_position_mm')}
               error={positionError}
-              onBlur={e => {
-                e.target.focus()
-              }}
               onChange={e => {
                 setPosition(e.target.value as string)
               }}

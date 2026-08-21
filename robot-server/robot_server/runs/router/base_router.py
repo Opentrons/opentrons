@@ -32,7 +32,12 @@ from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_engine.types import CSVRuntimeParamPaths, DeckSlotLocation
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.robot.types import RobotTypeEnum
-from server_utils.audit.audit_server import Client as AuditClient
+from server_utils.audit.audit_server import (
+    Client as AuditClient,
+)
+from server_utils.audit.audit_server import (
+    NoCurrentLogPeriodError,
+)
 from server_utils.audit.fastapi import get_audit_client, get_audit_logger
 from server_utils.auth.resource_server.authorization_checker import (
     check as check_authorization,
@@ -105,6 +110,8 @@ from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
+from robot_server.disk_monitor.dependencies import get_disk_monitor
+from robot_server.disk_monitor.monitor import DiskMonitor
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
 from robot_server.hardware import (
     HardwareStateStore,
@@ -180,6 +187,14 @@ class RunSignoffRequired(ErrorDetails):
     errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
 
 
+class NoCurrentAuditLogFound(ErrorDetails):
+    """An error if audit logging is enabled but no current log period could be found."""
+
+    id: Literal["NoCurrentAuditLogFound"] = "NoCurrentAuditLogFound"
+    title: str = "No Current Audit Log Found"
+    errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
+
+
 class AllRunsLinks(BaseModel):
     """Links returned along with a collection of runs."""
 
@@ -198,6 +213,14 @@ class CurrentStateLinks(BaseModel):
     )
 
 
+class NoSpaceForRun(ErrorDetails):
+    """An error if there is not enough space on the robot to start a new run."""
+
+    id: Literal["NoSpaceForRun"] = "NoSpaceForRun"
+    title: str = "No Space For Run"
+    errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
+
+
 async def get_run_data_from_url(
     runId: str,
     run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
@@ -209,7 +232,7 @@ async def get_run_data_from_url(
         run_data_manager: Current and historical run data management.
     """
     try:
-        run_data = run_data_manager.get(runId)
+        run_data = await run_data_manager.get(runId)
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
@@ -232,7 +255,9 @@ async def get_run_data_from_url(
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
         status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorBody[FileIdNotFound]},
         status.HTTP_409_CONFLICT: {
-            "model": ErrorBody[Union[RunAlreadyActive, RunSignoffRequired]]
+            "model": ErrorBody[
+                Union[RunAlreadyActive, RunSignoffRequired, NoCurrentAuditLogFound]
+            ]
         },
     },
     dependencies=[
@@ -255,6 +280,8 @@ async def create_run(  # noqa: C901
     camera_provider: Annotated[CameraProvider, Depends(get_camera_provider)],
     notify_publishers: Annotated[Callable[[], None], Depends(get_pe_notify_publishers)],
     access_control_status: Annotated[bool, Depends(get_access_control_status)],
+    audit_client: Annotated[AuditClient, Depends(get_audit_client)],
+    disk_monitor: Annotated[DiskMonitor, Depends(get_disk_monitor)],
     request_body: Optional[RequestModel[RunCreate]] = None,
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
     """Create a new run.
@@ -276,6 +303,8 @@ async def create_run(  # noqa: C901
         notify_publishers: Utilized by the engine to notify publishers of state changes.
         access_control_status: Whether access control (Compliance Ready Software) is
             currently enabled on the robot.
+        audit_client: Client to get log period info from
+        disk_monitor: Disk monitor for checking if we have enough space.
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None
     offsets = request_body.data.labwareOffsets if request_body is not None else []
@@ -304,6 +333,17 @@ async def create_run(  # noqa: C901
 
     deck_configuration = await deck_configuration_store.get_deck_configuration()
 
+    logging_enabled = await audit_client.get_logging_enabled()
+    if logging_enabled.loggingEnabled:
+        try:
+            log_period = await audit_client.get_current_log_period()
+        except NoCurrentLogPeriodError as e:
+            raise NoCurrentAuditLogFound(detail=str(e)).as_error(
+                status.HTTP_409_CONFLICT
+            )
+    else:
+        log_period = None
+
     # TODO (tz, 5-16-22): same error raised twice.
     #  Check if we can consolidate to one place.
     if protocol_id is not None:
@@ -317,6 +357,13 @@ async def create_run(  # noqa: C901
     # even if a new create is unable to succeed due to a conflict
     run_auto_deleter.make_room_for_new_run()
 
+    if disk_monitor.is_disk_space_below_run_start_limit() and access_control_status:
+        log_line = f"Disk free space is {disk_monitor.get_available_disk_space_mb()}MB which is below the limit for starting a run."
+        log.error(log_line)
+        raise NoSpaceForRun(detail=log_line).as_error(
+            status.HTTP_507_INSUFFICIENT_STORAGE
+        )
+
     try:
         run_data = await run_data_manager.create(
             run_id=run_id,
@@ -329,6 +376,7 @@ async def create_run(  # noqa: C901
             protocol=protocol_resource,
             notify_publishers=notify_publishers,
             access_control_status=access_control_status,
+            log_period_id=str(log_period.id) if log_period is not None else None,
         )
     except RunConflictError as e:
         raise RunAlreadyActive(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
@@ -378,7 +426,7 @@ async def get_runs(
         pageLength: Maximum number of items to return.
         run_data_manager: Current and historical run data management.
     """
-    data = run_data_manager.get_all(length=pageLength)
+    data = await run_data_manager.get_all(length=pageLength)
     current_run_id = run_data_manager.current_run_id
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
     links = AllRunsLinks(
@@ -453,7 +501,6 @@ async def remove_run(
         await run_data_manager.delete(
             run_id=runId, access_control_status=access_control_status
         )
-
     except RunConflictError as e:
         raise RunNotIdle().as_error(status.HTTP_409_CONFLICT) from e
     except RunSignoffRequiredError as e:
@@ -537,7 +584,7 @@ async def update_run(  # noqa: C901
         if request_body.data.signedBy is not None:
             # Depending on settings, updating `current` may require `signedBy`
             # to have already been set, so we need to process `signedBy` first.
-            run_data = run_data_manager.set_signed_by(
+            run_data = await run_data_manager.set_signed_by(
                 run_id=runId, signed_by=request_body.data.signedBy
             )
         if request_body.data.current is not None:
@@ -553,7 +600,7 @@ async def update_run(  # noqa: C901
                 staging_dir = create_download_staging_dir(persistence_directory_root)
                 staging_path = Path(staging_dir.name)
 
-                run_log_entry = collect_run_log(
+                run_log_entry = await collect_run_log(
                     run_id=runId,
                     run=run_store.get(runId),
                     run_data_manager=run_data_manager,
@@ -567,7 +614,7 @@ async def update_run(  # noqa: C901
                 staging_dir.cleanup()
 
         if run_data is None:
-            run_data = run_data_manager.get(runId)
+            run_data = await run_data_manager.get(runId)
     except RunConflictError as e:
         raise RunNotIdle(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
     except RunNotCurrentError as e:
@@ -635,14 +682,14 @@ async def get_run_commands_error(
         run_data_manager: Run data retrieval interface.
     """
     try:
-        all_errors_count = run_data_manager.get_command_errors_count(run_id=runId)
+        all_errors_count = await run_data_manager.get_command_errors_count(run_id=runId)
 
         if cursor is None:
             cursor = max(all_errors_count - 1, 0)
             cursor = max(cursor - pageLength + 1, 0)
             cursor = min(cursor, all_errors_count)
 
-        command_error_slice = run_data_manager.get_command_error_slice(
+        command_error_slice = await run_data_manager.get_command_error_slice(
             run_id=runId,
             cursor=cursor,
             length=pageLength,
@@ -693,7 +740,7 @@ async def get_current_state(  # noqa: C901
         robot_type: The type of robot.
     """
     try:
-        run = run_data_manager.get(run_id=runId)
+        run = await run_data_manager.get(run_id=runId)
     except RunNotCurrentError as e:
         raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT)
 
@@ -725,7 +772,7 @@ async def get_current_state(  # noqa: C901
         ]
 
         command = (
-            run_data_manager.get_command(runId, current_command.command_id)
+            await run_data_manager.get_command(runId, current_command.command_id)
             if current_command
             else None
         )
@@ -751,9 +798,10 @@ async def get_current_state(  # noqa: C901
                 ):
                     continue
                 for hw_mod in hardware_store.attached_modules:
+                    summary = await hw_mod.get_state_summary()
                     if (
                         mod.location is not None
-                        and hw_mod.serial_number == mod.serialNumber
+                        and summary.serial_number == mod.serialNumber
                     ):
                         location = mod.location
                         # TODO: Not the best location for this, we should

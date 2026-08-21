@@ -199,9 +199,6 @@ export function Delay(props: DelayProps): JSX.Element {
               value={delayDuration}
               error={durationError}
               label={t('delay_duration_s')}
-              onBlur={e => {
-                e.target.focus()
-              }}
               onChange={e => {
                 setDelayDuration(Number(e.target.value))
               }}

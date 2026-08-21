@@ -2,7 +2,7 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { getRunRaw } from '@opentrons/api-client'
+import { DEFAULT_RUN_DOWNLOAD_PARAMS, getRunRaw } from '@opentrons/api-client'
 import { useAllProtocolsQuery, useHost } from '@opentrons/react-api-client'
 
 import { saveFileToUsb } from '/app/redux/shell/remote'
@@ -28,6 +28,13 @@ vi.mock('jszip', () => ({ default: MockJSZip }))
 vi.mock('@opentrons/api-client')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/shell/remote', () => ({ saveFileToUsb: vi.fn() }))
+vi.mock('react-redux', async importOriginal => {
+  const actual = await importOriginal()
+  return {
+    ...(actual as Record<string, unknown>),
+    useSelector: vi.fn(() => false),
+  }
+})
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const ROBOT_NAME = 'otie'
@@ -74,8 +81,18 @@ describe('useDownloadSelectedRuns', () => {
 
     await result.current.downloadRuns([mockRunOne, mockRunTwo])
 
-    expect(getRunRaw).toHaveBeenCalledWith(HOST_CONFIG, 'run-1', 'blob')
-    expect(getRunRaw).toHaveBeenCalledWith(HOST_CONFIG, 'run-2', 'blob')
+    expect(getRunRaw).toHaveBeenCalledWith(
+      HOST_CONFIG,
+      'run-1',
+      DEFAULT_RUN_DOWNLOAD_PARAMS,
+      'blob'
+    )
+    expect(getRunRaw).toHaveBeenCalledWith(
+      HOST_CONFIG,
+      'run-2',
+      DEFAULT_RUN_DOWNLOAD_PARAMS,
+      'blob'
+    )
     expect(mockJSZip.file).toHaveBeenCalledWith(
       'run-1_2024-01-01T10_00_00.000Z.zip',
       expect.any(ArrayBuffer)
@@ -148,7 +165,12 @@ describe('useDownloadSelectedRuns', () => {
     await result.current.downloadRuns([mockRunTwo]).catch(() => {})
 
     expect(getRunRaw).toHaveBeenCalledTimes(1)
-    expect(getRunRaw).toHaveBeenCalledWith(HOST_CONFIG, 'run-1', 'blob')
+    expect(getRunRaw).toHaveBeenCalledWith(
+      HOST_CONFIG,
+      'run-1',
+      DEFAULT_RUN_DOWNLOAD_PARAMS,
+      'blob'
+    )
 
     resolveFirstFetch()
     await firstCall

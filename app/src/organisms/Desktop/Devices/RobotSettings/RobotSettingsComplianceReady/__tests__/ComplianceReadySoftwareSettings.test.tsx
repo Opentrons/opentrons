@@ -8,8 +8,11 @@ import {
   useAuditSettingsQuery,
   useAuthSettingsMutation,
   useAuthSettingsQuery,
+  useDeleteUserMutation,
   useGetRobotServerAccessControlSettingsQuery,
   usePatchRobotServerAccessControlSettingsMutation,
+  useResetUserPasswordMutation,
+  useUpdateUserMutation,
   useUsersQuery,
 } from '@opentrons/react-api-client'
 
@@ -79,6 +82,7 @@ const COMPLIANCE_READY_FIELD_IDS = [
   'requireAdminCredsWhenSendingProtocolToRobot',
   'requireAdminCredsForSignoffProtocol',
   'requireSignoffForProtocolLog',
+  'requireLogsToBeSavedInApp',
   'deleteOverMaxOnDiskProtocols',
   'requireReasonForInteraction',
   'minLengthOfReasonForInteraction',
@@ -203,8 +207,8 @@ describe('ComplianceReadySoftwareSettings', () => {
 
     screen.getByText('Login and security')
     screen.getByText('Actions requiring admin credentials')
-    screen.getByText('Protocol logs')
     screen.getByText('Audit log requirements')
+    screen.getByText('Robot storage')
     screen.getByText('Maximum login attempts before account deactivation')
   })
 
@@ -270,9 +274,14 @@ describe('ComplianceReadySoftwareSettings', () => {
     ).toHaveAttribute('aria-checked', 'true')
     expect(
       screen.getByRole('switch', {
-        name: 'Require signoff for protocol logs',
+        name: 'Require signature upon completing a protocol run',
       })
     ).toHaveAttribute('aria-checked', 'true')
+    expect(
+      screen.getByRole('switch', {
+        name: 'Require downloading audit logs in the Opentrons App at the end of a protocol run',
+      })
+    ).toHaveAttribute('aria-checked', 'false')
     expect(
       screen.getByRole('switch', {
         name: 'Automatically delete protocol run logs on the robot when there are 20 protocol run records',
@@ -387,6 +396,25 @@ describe('ComplianceReadySoftwareSettings', () => {
 })
 
 describe('RobotSettingsComplianceReady', () => {
+  beforeEach(() => {
+    vi.mocked(useDeleteUserMutation).mockReturnValue({
+      deleteUser: vi.fn(),
+    } as any)
+    vi.mocked(useUpdateUserMutation).mockReturnValue({
+      updateUser: vi.fn(),
+      isLoading: false,
+    } as any)
+    vi.mocked(useResetUserPasswordMutation).mockReturnValue({
+      resetUserPassword: vi.fn(),
+    } as any)
+    vi.mocked(useUsersQuery).mockReturnValue(
+      mockSuccessQueryResults({
+        data: [],
+        meta: { cursor: 0, totalLength: 0 },
+      })
+    )
+  })
+
   it('hides admin sections for non-admin users', () => {
     renderPage('regular-user', 'user')
 

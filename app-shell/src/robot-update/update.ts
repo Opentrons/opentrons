@@ -3,10 +3,13 @@
 
 import path from 'path'
 
+import { createRobotHttpsAgent } from '../certs'
 import { OPENTRONS_USB } from '../constants'
 import { fetch, postFile } from '../http'
 import { getSerialPortHttpAgent } from '../usb'
+import { buildRobotHttpUrl } from './httpUrl'
 
+import type { RequestInit } from 'node-fetch'
 import type {
   RobotModel,
   ViewableRobot,
@@ -58,26 +61,54 @@ export function startPremigration(robot: RobotHost): Promise<unknown> {
     )
 }
 
+interface UploadSystemFileHttpOptions {
+  userNotes?: string
+  token?: string | null
+  secure?: boolean
+}
+
+interface UploadSystemFileRobot {
+  ip: string
+  port?: number | null
+  name?: string
+  robotModel?: RobotModel | null
+}
+
 export function uploadSystemFile(
-  robot: ViewableRobot,
+  robot: UploadSystemFileRobot | ViewableRobot,
   urlPath: string,
   file: string,
-  progressCallback: (progress: number) => void
+  progressCallback: (progress: number) => void,
+  httpOptions: UploadSystemFileHttpOptions = {}
 ): Promise<unknown> {
   const isUsbUpload = robot.ip === OPENTRONS_USB
-
   const serialPortHttpAgent = getSerialPortHttpAgent()
-  const url = `http://${robot.ip}:${robot.port}${urlPath}`
+  const url = buildRobotHttpUrl(robot, urlPath, {
+    token: httpOptions.token,
+    secure: httpOptions.secure,
+    forceHttp: isUsbUpload,
+  })
+
+  const headers: Record<string, string> = {}
+  if (httpOptions.token != null && httpOptions.token !== '') {
+    headers.Authorization = `Bearer ${httpOptions.token}`
+  }
+  if (httpOptions.userNotes != null && httpOptions.userNotes !== '') {
+    headers['Opentrons-User-Notes'] = encodeURI(httpOptions.userNotes)
+  }
+
+  const isHttps = url.startsWith('https:')
+  const init: RequestInit = isUsbUpload
+    ? { agent: serialPortHttpAgent, headers }
+    : isHttps
+      ? { agent: createRobotHttpsAgent(), headers }
+      : { headers }
 
   return postFile(
     url,
-    getSystemFileName(robot?.robotModel || null),
+    getSystemFileName(robot.robotModel ?? null),
     file,
-    isUsbUpload
-      ? {
-          agent: serialPortHttpAgent,
-        }
-      : {},
+    init,
     progressCallback
   )
 }

@@ -48,6 +48,7 @@ import { ReachableBanner } from './ReachableBanner'
 import { RobotOutOfStorageNotification } from './RobotOutOfStorageNotification'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
+import { SignAndDownloadRunBanner } from './SignAndDownloadRunBanner/SignAndDownloadRunBanner'
 
 import type { GripperData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
@@ -104,6 +105,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
             marginRight={SPACING.spacing24}
           />
         ) : null}
+        <SignAndDownloadRunBanner robotName={robotName} />
         {showRobotOutOfStorageNotification ? (
           <RobotOutOfStorageNotification
             robotName={robotName}

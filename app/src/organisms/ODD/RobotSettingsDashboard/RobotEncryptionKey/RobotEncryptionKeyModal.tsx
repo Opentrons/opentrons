@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useLayoutEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
+import clsx from 'clsx'
 
 import { StyledText } from '@opentrons/components'
 import { useCACertPasswordQuery } from '@opentrons/react-api-client'
@@ -33,7 +34,7 @@ function RobotEncryptionKeyModalElement({
     modal.remove()
     clearClientData()
   }
-  const { password, valid_from_utc, valid_until_utc } = useCACertPasswordQuery({
+  const { data, isLoading } = useCACertPasswordQuery({
     refetchInterval: query =>
       !!query
         ? refetchTimeForPassword(
@@ -41,13 +42,16 @@ function RobotEncryptionKeyModalElement({
             new Date(query.data.valid_until_utc)
           )
         : BACKUP_REFETCH_TIME_MS,
-  }).data?.data ?? {
-    password: '',
+  })
+
+  const { password, valid_from_utc, valid_until_utc } = data?.data ?? {
+    password: null,
     valid_from_utc: new Date().toISOString(),
     valid_until_utc: new Date(
       Date.now() + BACKUP_REFETCH_TIME_MS
     ).toISOString(),
   }
+
   const header = {
     title: t('device_settings:robot_encryption_key'),
     onClick: close,
@@ -65,11 +69,15 @@ function RobotEncryptionKeyModalElement({
 
   const [lastPassword, setLastPassword] = useState<string | null>(null)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     return () => {
       setLastPassword(password)
     }
   }, [password])
+
+  if (isLoading || password == null) {
+    return <></>
+  }
 
   return (
     <OddModal
@@ -89,7 +97,7 @@ function RobotEncryptionKeyModalElement({
           </StyledText>
           <StyledText
             oddStyle="bodyTextRegular"
-            className={styles.password}
+            className={clsx({ [styles.password]: lastPassword != null })}
             key={password}
           >
             {password}

@@ -37,7 +37,7 @@ import {
   useModuleRenderInfoForProtocolById,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
-  useProtocolDetailsForRun,
+  useQuickProtocolDetailsForRun,
   useRunStatuses,
 } from '/app/resources/runs'
 
@@ -97,7 +97,7 @@ function PageContents(props: PageContentsProps): JSX.Element {
   const runRecordCameraSettings = run?.data?.data.cameraSettings ?? null
   const runTimestamp = run.data?.data.createdAt ?? ''
   const runStatus = run?.data?.data.status ?? null
-  const { displayName: protocolName } = useProtocolDetailsForRun(runId)
+  const { displayName: protocolName } = useQuickProtocolDetailsForRun(runId)
   const protocolRunHeaderRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<ViewportListRef | null>(null)
   const [jumpedIndex, setJumpedIndex] = useState<number | null>(null)

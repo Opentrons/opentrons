@@ -42,7 +42,7 @@ class RunController:
         self._runs_publisher = runs_publisher
         self._maintenance_runs_publisher = maintenance_runs_publisher
 
-    def create_action(
+    async def create_action(
         self,
         action_id: str,
         action_type: RunActionType,
@@ -70,9 +70,9 @@ class RunController:
 
         try:
             if action_type == RunActionType.PLAY:
-                if self._run_orchestrator_store.run_was_started():
+                if await self._run_orchestrator_store.run_was_started():
                     log.info(f'Resuming run "{self._run_id}".')
-                    self._run_orchestrator_store.play()
+                    await self._run_orchestrator_store.play()
                 else:
                     log.info(f'Starting run "{self._run_id}".')
                     # TODO(mc, 2022-05-13): run_orchestrator_store.runner.run could raise
@@ -88,7 +88,7 @@ class RunController:
 
             elif action_type == RunActionType.PAUSE:
                 log.info(f'Pausing run "{self._run_id}".')
-                self._run_orchestrator_store.pause()
+                await self._run_orchestrator_store.pause()
 
             elif action_type == RunActionType.STOP:
                 log.info(f'Stopping run "{self._run_id}".')
@@ -96,7 +96,7 @@ class RunController:
 
             elif action_type == RunActionType.RESUME_FROM_RECOVERY:
                 log.info(f'Resuming run "{self._run_id}" from error recovery mode.')
-                self._run_orchestrator_store.resume_from_recovery(
+                await self._run_orchestrator_store.resume_from_recovery(
                     reconcile_false_positive=False
                 )
 
@@ -108,7 +108,7 @@ class RunController:
                     f'Resuming run "{self._run_id}" from error recovery mode,'
                     f" assuming false-positive."
                 )
-                self._run_orchestrator_store.resume_from_recovery(
+                await self._run_orchestrator_store.resume_from_recovery(
                     reconcile_false_positive=True
                 )
 

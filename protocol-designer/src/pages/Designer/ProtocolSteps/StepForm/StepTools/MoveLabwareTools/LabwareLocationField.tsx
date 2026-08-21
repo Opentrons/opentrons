@@ -7,6 +7,7 @@ import {
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   getIsDeckSlotCompatible,
   getIsLid,
+  getIsTiprack,
   getModuleDisplayName,
   OT2_SINGLE_SLOT_ADDRESSABLE_AREAS,
   VACUUM_MODULE_TYPE,
@@ -14,6 +15,7 @@ import {
 } from '@opentrons/shared-data'
 import {
   getFullStackFromLabwares,
+  getIsVacuumSpacer,
   getSlotInLocationStack,
   VACUUM_DOCK_ADDRESSABLE_AREA,
   VACUUM_DOCK_LOCATION,
@@ -37,6 +39,7 @@ import {
   getUnoccupiedLabwareLocationOptions,
 } from '/protocol-designer/top-selectors/labware-locations'
 import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
+import { getIsAdapter } from '/protocol-designer/utils'
 
 import { getSortedAddressableArea } from './utils'
 
@@ -188,6 +191,9 @@ export function LabwareLocationField(
   // compatible— filter plates can go anywhere, adapters with
   // providesStackingDefault accept any labware, otherwise fall back to
   // explicit compatibleParentLabware / stackingOffsetWithLabware
+  const isTiprack = movingLabwareDef != null && getIsTiprack(movingLabwareDef)
+  const isAdapter =
+    movingLabwareDef != null && getIsAdapter(labware, labwareEntities)
   const isMovingLabwareFilterPlate =
     movingLabwareDef?.parameters.quirks?.includes('filterPlate') ?? false
   if (movingLabwareDef != null && !isMovingLabwareFilterPlate) {
@@ -197,7 +203,11 @@ export function LabwareLocationField(
         if (destDef?.parameters.isMovableAdapter !== true) {
           return true
         }
-        if (destDef.parameters.quirks?.includes('providesStackingDefault')) {
+        if (
+          destDef.parameters.quirks?.includes('providesStackingDefault') &&
+          !isTiprack &&
+          !isAdapter
+        ) {
           return true
         }
         const destLoadName = destDef.parameters.loadName
@@ -212,6 +222,8 @@ export function LabwareLocationField(
     labwareEntities[labware]?.def.parameters.quirks?.includes(
       'vacuumModuleDock'
     ) ?? false
+  const isLabwareVacuumSpacer =
+    movingLabwareDef != null && getIsVacuumSpacer(movingLabwareDef)
 
   // only vacuumModuleDock-quirk labware can be moved to the vacuum dock
   if (!isLabwareVacuumDockCompatible) {
@@ -219,7 +231,12 @@ export function LabwareLocationField(
       unoccupiedLabwareLocationsOptions.filter(
         ({ value }) => value !== VACUUM_DOCK_ADDRESSABLE_AREA
       )
-  } else if (isLabwareVacuumDockCompatible && robotState != null) {
+  }
+
+  if (
+    (isLabwareVacuumDockCompatible || isLabwareVacuumSpacer) &&
+    robotState != null
+  ) {
     const vacuumModuleEntry = Object.entries(moduleEntities).find(
       ([, entity]) => entity.type === VACUUM_MODULE_TYPE
     )
@@ -240,8 +257,9 @@ export function LabwareLocationField(
       })
 
       // offer the vacuum module as a destination when it has no collar yet
-      // (empty module is valid — collar can sit directly on the module)
-      // forMoveLabware will build the full stack including any existing module labware
+      // (empty/exposed module is valid — a collar or a vacuum spacer can sit
+      // directly on the module) forMoveLabware will build the full stack
+      // including any existing module labware
       if (vacuumModuleHasNoCollar) {
         const isVacuumModuleAlreadyIncluded =
           unoccupiedLabwareLocationsOptions.some(
@@ -259,13 +277,17 @@ export function LabwareLocationField(
         }
       }
 
-      // collar can only go to the vacuum dock or the vacuum module main area (when eligible)
-      unoccupiedLabwareLocationsOptions =
-        unoccupiedLabwareLocationsOptions.filter(
-          ({ value }) =>
-            value === VACUUM_DOCK_ADDRESSABLE_AREA ||
-            (vacuumModuleHasNoCollar && value === vacuumModuleId)
-        )
+      // collar can only go to the vacuum dock or the vacuum module main area
+      // (when eligible); a vacuum spacer isn't restricted this way — it just
+      // gains the empty main area as an extra option above
+      if (isLabwareVacuumDockCompatible) {
+        unoccupiedLabwareLocationsOptions =
+          unoccupiedLabwareLocationsOptions.filter(
+            ({ value }) =>
+              value === VACUUM_DOCK_ADDRESSABLE_AREA ||
+              (vacuumModuleHasNoCollar && value === vacuumModuleId)
+          )
+      }
     }
   }
 

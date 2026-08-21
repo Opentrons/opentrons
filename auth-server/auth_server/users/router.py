@@ -27,6 +27,7 @@ from auth_server.users.models import (
     AccountType,
     ErrorBody,
     PasswordMissingSpecialCharactersErrorDetails,
+    PasswordPreviouslyUsedErrorDetails,
     PasswordTooShortErrorDetails,
     TemporaryPasswordResponse,
     UpdateSelf,
@@ -38,6 +39,7 @@ from auth_server.users.models import (
 from auth_server.users.user_data_manager import (
     InvalidInputError,
     PasswordMissingSpecialCharactersError,
+    PasswordPreviouslyUsedError,
     PasswordTooShortError,
     UserAlreadyExistsError,
     UserDataManager,
@@ -209,6 +211,7 @@ async def delete_user(
             "model": ErrorBody[
                 PasswordTooShortErrorDetails
                 | PasswordMissingSpecialCharactersErrorDetails
+                | PasswordPreviouslyUsedErrorDetails
                 | UserAlreadyExistsErrorDetails
             ]
         },
@@ -275,6 +278,11 @@ async def update_user(
             fastapi.status.HTTP_400_BAD_REQUEST,
             _build_password_missing_special_characters_error(e),
         ) from e
+    except PasswordPreviouslyUsedError as e:
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST,
+            _build_password_previously_used_error(e),
+        ) from e
     except InvalidInputError as e:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
@@ -292,6 +300,7 @@ async def update_user(
     summary="Reset a user's password",
     description=(
         "Reset a specific user's password to a newly generated temporary password. "
+        "Clears failed login attempts so locked accounts become active again. "
         "The user must change their password upon next login."
     ),
     responses={
@@ -373,13 +382,14 @@ async def get_self(  # noqa: D103
             "model": ErrorBody[
                 PasswordTooShortErrorDetails
                 | PasswordMissingSpecialCharactersErrorDetails
+                | PasswordPreviouslyUsedErrorDetails
                 | UserAlreadyExistsErrorDetails
             ]
         },
         fastapi.status.HTTP_401_UNAUTHORIZED: {},
     },
 )
-async def update_self(
+async def update_self(  # noqa: C901
     request_body: RequestModel[UpdateSelf],
     authentication: Annotated[
         RequireAuthenticationResult, fastapi.Depends(require_authentication)
@@ -458,6 +468,11 @@ async def update_self(
             fastapi.status.HTTP_400_BAD_REQUEST,
             _build_password_missing_special_characters_error(e),
         ) from e
+    except PasswordPreviouslyUsedError as e:
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST,
+            _build_password_previously_used_error(e),
+        ) from e
     except InvalidInputError as e:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
@@ -498,4 +513,12 @@ def _build_password_missing_special_characters_error(
                 id="passwordMissingSpecialCharacters"
             )
         ]
+    )
+
+
+def _build_password_previously_used_error(
+    error: PasswordPreviouslyUsedError,
+) -> ErrorBody[PasswordPreviouslyUsedErrorDetails]:
+    return ErrorBody(
+        errors=[PasswordPreviouslyUsedErrorDetails(id="passwordPreviouslyUsed")]
     )

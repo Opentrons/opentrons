@@ -9,11 +9,7 @@ import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
-import {
-  getRobotSessionIsManualFile,
-  getRobotUpdateDownloadError,
-} from '/app/redux/robot-update'
-import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
+import { getRobotUpdateDownloadError } from '/app/redux/robot-update'
 import {
   INIT_STATUS,
   useRobotInitializationStatus,
@@ -33,7 +29,6 @@ import type { RobotUpdateSession } from '/app/redux/robot-update/types'
 vi.mock('@opentrons/react-api-client')
 vi.mock('../useRobotUpdateInfo')
 vi.mock('/app/redux/robot-update')
-vi.mock('/app/redux/robot-update/hooks')
 vi.mock('/app/resources/health/useRobotInitializationStatus')
 
 const render = (props: ComponentProps<typeof RobotUpdateProgressModal>) => {
@@ -56,14 +51,13 @@ describe('DownloadUpdateModal', () => {
 
   let props: ComponentProps<typeof RobotUpdateProgressModal>
   const mockCreateLiveCommand = vi.fn()
-  const mockDispatchStartRobotUpdate = vi.fn()
 
   beforeEach(() => {
     mockCreateLiveCommand.mockResolvedValue(null)
     props = {
       robotName: 'testRobot',
       session: mockRobotUpdateSession,
-      closeUpdateBuildroot: vi.fn(),
+      closeRobotUpdate: vi.fn(),
     }
     vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
@@ -72,10 +66,6 @@ describe('DownloadUpdateModal', () => {
       updateStep: 'install',
       progressPercent: 50,
     })
-    vi.mocked(getRobotSessionIsManualFile).mockReturnValue(false)
-    vi.mocked(useDispatchStartRobotUpdate).mockReturnValue(
-      mockDispatchStartRobotUpdate
-    )
     vi.mocked(getRobotUpdateDownloadError).mockReturnValue(null)
   })
 
@@ -143,7 +133,7 @@ describe('DownloadUpdateModal', () => {
     })
     render(props)
 
-    const exitButton = screen.getByText('exit')
+    const exitButton = screen.getByRole('button', { name: 'Exit' })
 
     expect(
       screen.getByText('Robot software successfully updated')
@@ -151,7 +141,7 @@ describe('DownloadUpdateModal', () => {
     expect(exitButton).toBeInTheDocument()
     expect(mockCreateLiveCommand).toHaveBeenCalled()
     fireEvent.click(exitButton)
-    expect(props.closeUpdateBuildroot).toHaveBeenCalled()
+    expect(props.closeRobotUpdate).toHaveBeenCalled()
   })
 
   it('renders an error modal and exit button if an error occurs', () => {
@@ -168,11 +158,11 @@ describe('DownloadUpdateModal', () => {
     }
 
     render(props)
-    const exitButton = screen.getByText('exit')
+    const exitButton = screen.getByRole('button', { name: 'Exit' })
 
     expect(screen.getByText('test error')).toBeInTheDocument()
     fireEvent.click(exitButton)
-    expect(props.closeUpdateBuildroot).toHaveBeenCalled()
+    expect(props.closeRobotUpdate).toHaveBeenCalled()
 
     expect(useCreateLiveCommandMutation).toBeCalledWith(
       ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE

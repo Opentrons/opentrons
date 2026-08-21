@@ -401,11 +401,13 @@ export const robotMassStorageDeviceRemoved = (
 })
 
 export const robotMassStorageDeviceAdded = (
-  rootPath: string
+  rootPath: string,
+  isMassStorage: boolean
 ): RobotMassStorageDeviceAdded => ({
   type: ROBOT_MASS_STORAGE_DEVICE_ADDED,
   payload: {
     rootPath,
+    isMassStorage,
   },
   meta: { shell: true },
 })

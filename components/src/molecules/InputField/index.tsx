@@ -83,8 +83,6 @@ export interface InputFieldProps {
   leftElement?: ReactNode
   /** optional element to display aligned to the right of the input field */
   rightElement?: ReactNode
-  /** if true, style the background of input field to error state */
-  hasBackgroundError?: boolean
   /** optional prop to override input field border radius */
   borderRadius?: string
   /** optional prop to override input field padding */
@@ -111,13 +109,11 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       caption,
       type,
       onClick,
-      tabIndex = 0,
       isIndeterminate = false,
       textAlign = TYPOGRAPHY.textAlignLeft,
       size = 'small',
       leftElement,
       rightElement,
-      hasBackgroundError = false,
       borderRadius,
       padding,
       testId,
@@ -137,25 +133,17 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
     const value = (isIndeterminate ?? false) ? '' : (rawValue ?? '')
     const placeHolder = (isIndeterminate ?? false) ? '-' : rawPlaceholder
 
-    const INPUT_FIELD = css`
-      background-color: ${hasBackgroundError ? COLORS.red30 : COLORS.white};
+    const INPUT_FIELD_CONTAINER_STYLE = css`
+      background-color: ${COLORS.white};
       border-radius: ${
         borderRadius != null ? borderRadius : BORDERS.borderRadius4
       };
       padding: ${padding ?? SPACING.spacing8};
-      border: ${
-        hasBackgroundError
-          ? 'none'
-          : `1px ${BORDERS.styleSolid}
-        ${hasError ? COLORS.red50 : COLORS.grey50}`
-      };
+      border: 1px ${BORDERS.styleSolid}
+        ${hasError ? COLORS.red50 : COLORS.grey50};
       font-size: ${TYPOGRAPHY.fontSizeP};
       width: 100%;
       height: ${size === 'small' ? '2rem' : '2.75rem'};
-
-      &:active:enabled {
-        border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
-      }
 
       & input {
         border-radius: inherit;
@@ -170,24 +158,22 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
         outline: none;
       }
 
-      &:hover {
-        border: 1px ${BORDERS.styleSolid}
-          ${hasError ? COLORS.red50 : COLORS.grey60};
+      /* Styles for the container when the inner input is in certain states. */
+      &:has(input:disabled) {
+        border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
       }
-
-      &:focus-visible {
-        border: 1px ${BORDERS.styleSolid} ${COLORS.grey55};
+      &:has(input:focus) {
+        border: 1px ${BORDERS.styleSolid}
+          ${hasError ? COLORS.red50 : COLORS.blue50};
+      }
+      &:has(input:focus-visible) {
         outline: 2px ${BORDERS.styleSolid} ${COLORS.blue50};
         outline-offset: 2px;
       }
 
-      &:focus-within {
+      &:hover {
         border: 1px ${BORDERS.styleSolid}
-          ${hasError ? COLORS.red50 : COLORS.blue50};
-      }
-
-      &:disabled {
-        border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
+          ${hasError ? COLORS.red50 : COLORS.grey60};
       }
 
       input[type='number']::-webkit-inner-spin-button,
@@ -253,8 +239,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
             onClick={disabled === true ? undefined : onClick}
           >
             <Flex
-              tabIndex={tabIndex}
-              css={INPUT_FIELD}
+              css={INPUT_FIELD_CONTAINER_STYLE}
               alignItems={ALIGN_CENTER}
               onClick={() => {
                 internalRef.current?.focus()

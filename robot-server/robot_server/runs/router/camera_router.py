@@ -116,7 +116,7 @@ async def add_camera_settings(
         ),
     )
 
-    response_data = run_orchestrator_store.add_camera_enablement_settings(
+    response_data = await run_orchestrator_store.add_camera_enablement_settings(
         camera_settings
     )
     log.info(f'Added unique camera settings "{request_body.data}" to run "{run.id}".')
@@ -193,7 +193,7 @@ async def add_camera_capture_image_settings(
             status.HTTP_409_CONFLICT
         )
 
-    run_orchestrator_store.add_camera_capture_image_settings(
+    await run_orchestrator_store.add_camera_capture_image_settings(
         capture_image_settings=request_body.data
     )
     log.info(
@@ -233,7 +233,7 @@ async def get_camera_capture_image_settings(
         robot_type: Used to validate robot type for live stream service.
         camera_provider: Access to the camera settings and related services.
     """
-    result = run_orchestrator_store.get_camera_capture_image_settings(
+    result = await run_orchestrator_store.get_camera_capture_image_settings(
         camera_id=cameraId
     )
 

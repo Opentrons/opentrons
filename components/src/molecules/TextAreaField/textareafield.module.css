@@ -88,11 +88,6 @@
   border: 1px solid var(--red-50);
 }
 
-.textarea_background_error {
-  border: none;
-  background-color: var(--red-30);
-}
-
 .textarea_keyboard_focus:focus {
   border: 1px solid var(--blue-50);
   outline: 2px solid var(--blue-50);

@@ -79,7 +79,7 @@ describe('NetworkSettings', () => {
     screen.getByText('Wi-Fi').click()
     container.querySelector('button')?.click()
     expect(screen.queryByText('WIFI DETAILS')).toBeFalsy()
-    expect(screen.getByText('Network Settings')).toBeTruthy()
+    expect(screen.getByText('Network settings')).toBeTruthy()
   })
 
   it('selecting the Ethernet option displays the ethernet details', () => {
@@ -95,6 +95,6 @@ describe('NetworkSettings', () => {
     screen.getByText('Ethernet').click()
     container.querySelector('button')?.click()
     expect(screen.queryByText('ETHERNET DETAILS')).toBeFalsy()
-    expect(screen.getByText('Network Settings')).toBeTruthy()
+    expect(screen.getByText('Network settings')).toBeTruthy()
   })
 })

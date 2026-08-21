@@ -1,6 +1,5 @@
 import * as Constants from './constants'
 
-import type { ViewableRobot } from '../discovery/types'
 import type { RobotHost } from '../robot-api/types'
 import type {
   RobotUpdateAction,
@@ -86,18 +85,6 @@ export function readSystemRobotUpdateFile(
   return {
     type: Constants.ROBOTUPDATE_READ_SYSTEM_FILE,
     payload: { target },
-    meta: { shell: true },
-  }
-}
-
-export function uploadRobotUpdateFile(
-  host: ViewableRobot,
-  path: string,
-  systemFile: string
-): RobotUpdateAction {
-  return {
-    type: Constants.ROBOTUPDATE_UPLOAD_FILE,
-    payload: { host, path, systemFile: systemFile },
     meta: { shell: true },
   }
 }

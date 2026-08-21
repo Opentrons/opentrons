@@ -31,7 +31,7 @@ describe('UpdatedChannel', () => {
   })
   it('renders text and selector', () => {
     render()
-    screen.getByText('Update Channel')
+    screen.getByText('Update channel')
     screen.getByText(
       'Stable receives the latest stable releases. Beta allows you to try out new in-progress features before they launch in Stable channel, but they have not completed testing yet.'
     )

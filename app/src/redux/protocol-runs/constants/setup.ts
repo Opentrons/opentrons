@@ -22,8 +22,3 @@ export const STEP_KEY_TO_I18N_KEY = {
   [ROBOT_CALIBRATION_STEP_KEY]: 'robot_calibration',
   [CAMERA_SETUP_STEP_KEY]: 'camera_settings',
 }
-
-export const UPDATE_RUN_SETUP_STEPS_COMPLETE =
-  'protocolRuns:UPDATE_RUN_SETUP_STEPS_COMPLETE' as const
-export const UPDATE_RUN_SETUP_STEPS_REQUIRED =
-  'protocolRuns:UPDATE_RUN_SETUP_STEPS_REQUIRED' as const

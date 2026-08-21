@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import clsx from 'clsx'
 
 import {
@@ -17,15 +18,25 @@ import { showLoginModal } from '/app/organisms/ODD/OnDeviceLogin/LoginModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useLocalRobotName } from '/app/redux-resources/robots/hooks/useLocalRobotName'
 import { useSignRunFlow } from '/app/resources/access-control/useSignRunFlow'
+import { useCurrentRunId, useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import styles from './signrun.module.css'
 
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
+import type { DocumentationState } from '@opentrons/react-api-client'
 
 // Above OnDeviceLogin overlay (z-index: 10001) so the toast is visible on login.
 const TOAST_ABOVE_LOGIN_Z_INDEX = 10002
 
-export function SignRun({ runId }: { runId: string }): JSX.Element {
+export function SignRun({
+  runId,
+  documentationState,
+  onSigned,
+}: {
+  runId: string
+  documentationState: DocumentationState
+  onSigned?: () => void
+}): JSX.Element {
   const { t, i18n } = useTranslation(['access_control', 'shared'])
 
   const [name, setName] = useState('')
@@ -59,13 +70,16 @@ export function SignRun({ runId }: { runId: string }): JSX.Element {
     }
   }
 
-  const { signRun, isLoading, loginGate, correctName } = useSignRunFlow(
-    runId,
-    robotName,
-    async () => await showLoginModal(),
-    popToast,
-    eatToast
-  )
+  const { signRun, isSigned, isLoading, loginGate, correctName } =
+    useSignRunFlow(
+      runId,
+      robotName,
+      async () => await showLoginModal(),
+      popToast,
+      eatToast,
+      documentationState,
+      onSigned
+    )
 
   const trimmedName = name.trim()
 
@@ -78,6 +92,12 @@ export function SignRun({ runId }: { runId: string }): JSX.Element {
     }
     keyboardRef.current?.setInput(name)
   }, [name])
+
+  useEffect(() => {
+    if (isSigned) {
+      onSigned?.()
+    }
+  }, [isSigned, onSigned])
 
   const handleNameChange = (value: string): void => {
     setName(value)
@@ -167,3 +187,43 @@ export function SignRun({ runId }: { runId: string }): JSX.Element {
     </>
   )
 }
+
+const SignRunModalImpl = NiceModal.create(
+  ({
+    documentationState,
+  }: {
+    documentationState: DocumentationState
+  }): JSX.Element | null => {
+    const modal = useModal()
+    const runId = useCurrentRunId()
+    const { isFetched } = useNotifyAllRunsQuery({ pageLength: 0 })
+
+    useEffect(() => {
+      if (isFetched && runId == null) {
+        modal.resolve(false)
+        modal.remove()
+      }
+    }, [isFetched, modal, runId])
+
+    if (runId == null) {
+      return null
+    }
+
+    return (
+      <div className={styles.overlay}>
+        <SignRun
+          runId={runId}
+          documentationState={documentationState}
+          onSigned={() => {
+            modal.resolve(true)
+            modal.remove()
+          }}
+        />
+      </div>
+    )
+  }
+)
+
+/** Open the ODD sign-run modal and await whether the run was signed. */
+export const showSignRunModal = (): Promise<boolean> =>
+  NiceModal.show(SignRunModalImpl)

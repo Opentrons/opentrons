@@ -13,12 +13,18 @@ from server_utils.keys.key_server import Client as KeyClient
 from server_utils.keys.key_server import SignedMessageData, SignMessageData
 
 from audit_server.log_storage import constants
-from audit_server.log_storage.log_data_manager import LogDataManager, _GetTime
-from audit_server.log_storage.models import LogPeriodDetails
+from audit_server.log_storage.log_data_manager import (
+    InvalidDeletionKeyError,
+    LogDataManager,
+    _GetTime,
+)
+from audit_server.log_storage.models import LogPeriodDetails, LogPeriodSummary
 from audit_server.log_storage.store import (
     LogStore,
     NoActivePeriodError,
     NoLogInPeriodError,
+    NoPeriodById,
+    PeriodIsActiveError,
 )
 from audit_server.log_storage.types import StoredLog
 from audit_server.settings.store import SettingsStore
@@ -80,7 +86,7 @@ def test_get_log_period_details(
 ) -> None:
     """It should get aggregate period details from the store."""
     details = LogPeriodDetails(
-        id=1,
+        id="1",
         startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
         endedAt=None,
         recordCount=10,
@@ -92,6 +98,19 @@ def test_get_log_period_details(
     result = subject.get_log_period_details("1")
 
     assert result == details
+
+
+def test_get_log_period_details_handles_failure(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+) -> None:
+    """It should raise failures from the store."""
+
+    decoy.when(mock_store.get_period_details("1")).then_return(NoPeriodById())
+
+    with pytest.raises(NoPeriodById):
+        subject.get_log_period_details("1")
 
 
 async def test_store_log_stores_nothing_if_logging_disabled(
@@ -218,6 +237,76 @@ async def test_store_robot_log_stores_file(
             )
             assert stored_hash == "eeeeee"
             assert temp_path.is_file()
+
+
+async def test_store_robot_log_renames_file(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+    mock_key_client: KeyClient,
+) -> None:
+    """It should append _copy to the file if it already exists."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file.write("beep boop".encode("utf-8"))
+            temp_file.seek(0)
+            robot_log = StoredLog(
+                message="beep",
+                message_hash="bzzzt",
+                message_sig="boop",
+                sig_version="3",
+            )
+            decoy.when(
+                await mock_key_client.sign_message(
+                    SignMessageData(message="beep boop", previousHash=None)
+                )
+            ).then_return(
+                SignedMessageData(
+                    message="beep",
+                    messageHash="bzzzt",
+                    messageSignature="boop",
+                    signatureVersion=3,
+                )
+            )
+            temp_path = Path(temp_dir) / Path(temp_file.name).name
+            decoy.when(mock_store.store_robot_log(robot_log, temp_path)).then_return(
+                "eeeeee"
+            )
+            assert not temp_path.is_file()
+            stored_hash = await subject.store_robot_log(
+                UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
+                Path(temp_dir),
+            )
+            assert stored_hash == "eeeeee"
+            assert temp_path.is_file()
+
+            # It should it handle it for the first copy
+            copied_temp_path = temp_path.with_stem(f"{temp_path.stem}_copy")
+            decoy.when(
+                mock_store.store_robot_log(robot_log, copied_temp_path)
+            ).then_return("iiiiii")
+            temp_file.seek(0)
+            stored_hash = await subject.store_robot_log(
+                UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
+                Path(temp_dir),
+            )
+            assert stored_hash == "iiiiii"
+            assert copied_temp_path.is_file()
+
+            # Trying the same file a third time should make _copy_copy
+            copied_copied_temp_path = copied_temp_path.with_stem(
+                f"{copied_temp_path.stem}_copy"
+            )
+            decoy.when(
+                mock_store.store_robot_log(robot_log, copied_copied_temp_path)
+            ).then_return("oooooo")
+            temp_file.seek(0)
+            stored_hash = await subject.store_robot_log(
+                UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
+                Path(temp_dir),
+            )
+            assert stored_hash == "oooooo"
+            assert copied_copied_temp_path.is_file()
 
 
 async def test_store_robot_log_raises_keyserver_unavailable(
@@ -800,16 +889,197 @@ async def test_rotate_no_previous_log_handles_no_key_server(
     assert await subject.rotate_periods() == ""
 
 
-def test_create_deletion_key_mints_a_key(subject: LogDataManager) -> None:
-    """It should mint a non-empty deletion key for a log period."""
+def test_create_deletion_key_mints_a_key(
+    subject: LogDataManager, mock_store: LogStore, decoy: Decoy
+) -> None:
+    """It should mint a non-empty deletion key for a completed log period."""
+    decoy.when(mock_store.get_period_details("1")).then_return(
+        LogPeriodDetails(
+            id="1",
+            startedAt=datetime.now(),
+            endedAt=datetime.now(),
+            recordCount=10,
+            totalSizeBytes=100,
+            attachedFilenames=[],
+        )
+    )
     key = subject.create_deletion_key(period_id="1")
 
     assert key
 
 
-def test_create_deletion_key_mints_distinct_keys(subject: LogDataManager) -> None:
+def test_create_deletion_key_mints_distinct_keys(
+    subject: LogDataManager, mock_store: LogStore, decoy: Decoy
+) -> None:
     """Each call should mint a new, distinct key for the same period."""
+    decoy.when(mock_store.get_period_details("1")).then_return(
+        LogPeriodDetails(
+            id="1",
+            startedAt=datetime.now(),
+            endedAt=datetime.now(),
+            recordCount=10,
+            totalSizeBytes=100,
+            attachedFilenames=[],
+        )
+    )
     first = subject.create_deletion_key(period_id="1")
     second = subject.create_deletion_key(period_id="1")
 
     assert first != second
+
+
+def test_create_deletion_key_fails_if_period_is_active(
+    subject: LogDataManager, mock_store: LogStore, decoy: Decoy
+) -> None:
+    """Deletion keys cannot be created for active periods."""
+    decoy.when(mock_store.get_period_details("1")).then_return(
+        LogPeriodDetails(
+            id="1",
+            startedAt=datetime.now(),
+            endedAt=None,
+            recordCount=10,
+            totalSizeBytes=100,
+            attachedFilenames=[],
+        )
+    )
+    with pytest.raises(PeriodIsActiveError):
+        subject.create_deletion_key("1")
+
+
+def test_create_deletion_key_fails_if_period_does_not_exist(
+    subject: LogDataManager, mock_store: LogStore, decoy: Decoy
+) -> None:
+    """Deletion keys cannot be created for non-existent periods."""
+    decoy.when(mock_store.get_period_details("1")).then_return(NoPeriodById())
+    with pytest.raises(NoPeriodById):
+        subject.create_deletion_key("1")
+
+
+async def test_delete_log_period_requires_deletion_key(
+    subject: LogDataManager, mock_store: LogStore, decoy: Decoy
+) -> None:
+    """It should refuse to delete a log period without a valid key."""
+    period_id = "2"
+    decoy.when(mock_store.get_period_details(period_id)).then_return(
+        LogPeriodDetails(
+            id="1",
+            startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
+            endedAt=datetime(2025, 1, 1, tzinfo=timezone.utc),
+            recordCount=10,
+            totalSizeBytes=100,
+            attachedFilenames=[],
+        )
+    )
+    valid_key = subject.create_deletion_key(period_id)
+    with pytest.raises(InvalidDeletionKeyError):
+        await subject.delete_log_period(
+            period_id=period_id, deletion_key="asdasdasdasd////"
+        )
+    with pytest.raises(InvalidDeletionKeyError):
+        await subject.delete_log_period(period_id="1", deletion_key=valid_key)
+    decoy.verify(mock_store.delete_period(matchers.Anything()), times=0)
+
+
+async def test_delete_log_period_fails_if_period_is_active(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+    mock_key_client: KeyClient,
+) -> None:
+    """It should refuse to delete active periods even if there's somehow a valid deletion key."""
+    period_id = "1"
+    valid_key = "gabbagool"
+    subject._deletion_keys[valid_key] = "1"
+
+    decoy.when(mock_store.delete_period(period_id)).then_return(
+        PeriodIsActiveError(), []
+    )
+    with pytest.raises(PeriodIsActiveError):
+        await subject.delete_log_period(period_id=period_id, deletion_key=valid_key)
+
+
+async def test_delete_log_period_deletes_log_collateral(
+    subject: LogDataManager, mock_store: LogStore, decoy: Decoy, tmp_path: Path
+) -> None:
+    """If there are logs to delete, they should be deleted."""
+    files = [tmp_path / "file1.txt", tmp_path / "file2.txt"]
+    for file_to_write in files:
+        file_to_write.write_text("hello")
+    period_id = "1"
+    decoy.when(mock_store.get_period_details(period_id)).then_return(
+        LogPeriodDetails(
+            id="1",
+            startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
+            endedAt=datetime(2025, 1, 1, tzinfo=timezone.utc),
+            recordCount=10,
+            totalSizeBytes=100,
+            attachedFilenames=[],
+        )
+    )
+    valid_key = subject.create_deletion_key(period_id)
+    decoy.when(mock_store.delete_period("1")).then_return([str(f) for f in files])
+    result = await subject.delete_log_period(period_id, valid_key)
+    assert result == "1"
+    for file in files:
+        assert not file.exists()
+
+
+def test_usage_summary_adds_up(
+    subject: LogDataManager, mock_store: LogStore, decoy: Decoy
+) -> None:
+    """It should sum up usage of each log period."""
+
+    def _build_summary(id: str) -> LogPeriodSummary:
+        return LogPeriodSummary(
+            id=id,
+            startedAt=datetime.now(tz=timezone.utc),
+            endedAt=datetime.now(tz=timezone.utc),
+        )
+
+    def _build_details(id: str, usage: int) -> LogPeriodDetails:
+        return LogPeriodDetails(
+            id=id,
+            startedAt=datetime.now(tz=timezone.utc),
+            endedAt=datetime.now(tz=timezone.utc),
+            recordCount=usage // 1000,
+            totalSizeBytes=usage,
+            attachedFilenames=["a"] * 10,
+        )
+
+    decoy.when(mock_store.list_periods()).then_return(
+        [
+            _build_summary("1"),
+            _build_summary(
+                id="-5",
+            ),
+            _build_summary(
+                id="steve",
+            ),
+            _build_summary(
+                id="nazgul",
+            ),
+            _build_summary(
+                id="8589934583",
+            ),
+        ]
+    )
+    decoy.when(mock_store.get_period_details("1")).then_return(
+        _build_details("1", 1000000)
+    )
+    decoy.when(mock_store.get_period_details("-5")).then_return(
+        _build_details("-5", 5000000)
+    )
+    decoy.when(mock_store.get_period_details("steve")).then_return(
+        _build_details("steve", 123123123123)
+    )
+    decoy.when(mock_store.get_period_details("nazgul")).then_return(
+        _build_details("nazgul", 9000000)
+    )
+    decoy.when(mock_store.get_period_details("8589934583")).then_return(
+        _build_details("8589934583", 8589934583)
+    )
+    result = subject.get_total_fs_usage()
+    assert result.totalUsageBytes == (
+        1000000 + 5000000 + 123123123123 + 9000000 + 8589934583
+    )
+    assert result.totalPeriods == 5

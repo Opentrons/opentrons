@@ -1,3 +1,6 @@
+import { mkdtemp, writeFile } from 'fs/promises'
+import { tmpdir } from 'os'
+import path from 'path'
 import isError from 'lodash/isError'
 import fetch from 'node-fetch'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -14,6 +17,23 @@ vi.mock('node-fetch')
 describe('app-shell main http module', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+  })
+
+  it('postFile rejects when fetch fails so IPC invoke can reply', async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), 'postfile-'))
+    const filePath = path.join(dir, 'update.zip')
+    await writeFile(filePath, 'zip-bytes')
+    vi.mocked(fetch).mockRejectedValueOnce(
+      new Error('certificate verify failed')
+    )
+
+    await expect(
+      Http.postFile(
+        'https://robot.local:32313/server/update/file',
+        'file',
+        filePath
+      )
+    ).rejects.toThrow(/certificate verify failed/)
   })
 
   const SUCCESS_SPECS = [

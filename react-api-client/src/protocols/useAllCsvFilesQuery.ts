@@ -18,7 +18,7 @@ export function useAllCsvFilesQuery(
   }
 
   const query = useQuery<UploadedCsvFilesResponse>(
-    getQueryKey(host, `protocols/${protocolId}/dataFiles`),
+    getQueryKey(host, 'protocols', protocolId, 'dataFiles'),
     () => getCsvFiles(host!, protocolId).then(response => response.data),
     allOptions
   )

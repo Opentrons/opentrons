@@ -14,10 +14,22 @@ from server_utils.audit.audit_server import (
     StoreRobotLogSuccessData,
 )
 from server_utils.audit.audit_server import (
+    GetLogPeriodsData as SULogPeriodsData,
+)
+from server_utils.audit.audit_server import (
+    PatchLoggingEnabledRequestData as SUEnabledRequestData,
+)
+from server_utils.audit.audit_server import (
+    PatchLoggingEnabledResponseData as SUEnabledResponseData,
+)
+from server_utils.audit.audit_server import (
     SubmitAuditLogMessageData as SUSubmitData,
 )
 from server_utils.audit.audit_server import (
     SubmitAuditLogSuccessData as SUSuccessData,
+)
+from server_utils.audit.audit_server import (
+    TotalUsageSummaryData as SUTotalUsageSummaryData,
 )
 
 from .log_ingest.models import AuditLogMessage
@@ -70,3 +82,18 @@ class LocalClient(SUClient):
         return GetLoggingEnabledData(
             loggingEnabled=self._settings_store.get_logging_enabled()
         )
+
+    @override
+    async def set_logging_enabled(
+        self, setting: SUEnabledRequestData
+    ) -> SUEnabledResponseData:
+        """Enable or disable logging."""
+        raise NotImplementedError("Do not use the self client for this")
+
+    @override
+    async def get_current_log_period(self) -> SULogPeriodsData:
+        raise NotImplementedError("Do not use the self client for this")
+
+    @override
+    async def get_filesystem_usage_summary(self) -> SUTotalUsageSummaryData:
+        raise NotImplementedError("Do not use the self client for this")

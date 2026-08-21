@@ -42,7 +42,7 @@ import { TipPositionTopView } from './TipPositionTopView'
 import { getIsTipInWell } from './utils'
 import * as utils from './utils'
 
-import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import type { ChangeEvent, Dispatch, ReactNode, SetStateAction } from 'react'
 import type { PositionReference } from '@opentrons/shared-data'
 import type { FormData, StepFieldName } from '/protocol-designer/form-types'
 import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
@@ -70,9 +70,7 @@ interface TipPositionModalProps {
   formData?: FormData | null
 }
 
-export function TipPositionModal(
-  props: TipPositionModalProps
-): JSX.Element | null {
+export function TipPositionModal(props: TipPositionModalProps): ReactNode {
   const {
     formData = null,
     isIndeterminate,

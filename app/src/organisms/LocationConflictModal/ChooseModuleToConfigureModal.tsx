@@ -29,7 +29,6 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useModuleUSBPort } from '/app/local-resources/modules'
 import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
 import { OddModal } from '/app/molecules/OddModal'
@@ -313,8 +312,7 @@ function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): JSX.Element {
   } = props
   const { t } = useTranslation('protocol_setup')
   const navigate = useNavigate()
-  const documentationState = useDocumentationState()
-  const { closeCurrentRun } = useCloseCurrentRun(documentationState)
+  const { closeCurrentRun } = useCloseCurrentRun()
   const handleCancelRun = (): void => {
     closeCurrentRun()
   }

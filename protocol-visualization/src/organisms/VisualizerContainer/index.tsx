@@ -51,6 +51,7 @@ export function ProtocolVisualization(
   const [isDragging, setIsDragging] = useState<boolean>(false)
 
   const [selectedCommandId, setSelectedCommand] = useState<string | null>(null)
+  const [showStepDetails, setShowStepDetails] = useState<boolean>(true)
 
   // for resizable columns
   const [leftWidth, setLeftWidth] = useState<number>(INITIAL_WIDTH_PX)
@@ -305,10 +306,8 @@ export function ProtocolVisualization(
             setSelectedCommand={setSelectedCommand}
             milliSecondsPerFrame={milliSecondsPerFrame}
             setMilliSecondsPerFrame={setMilliSecondsPerFrame}
-            // 将来のサイドバー制御をバインド可能
-            onClickStepDetail={() => {
-              console.log('Toggle sidebar action')
-            }}
+            showStepDetails={showStepDetails}
+            onClickStepDetails={setShowStepDetails}
           />
         </div>
         {/* Gutter between center & right */}
@@ -319,20 +318,22 @@ export function ProtocolVisualization(
           }}
         />
         {/* Right Column is resizable */}
-        <div
-          className={styles.right_column}
-          style={{ width: `${rightWidth}px` }}
-        >
-          {selectedRunTimeCommand != null ? (
-            <StepDetailContainer
-              commands={commands}
-              robotState={robotState}
-              invariantContext={invariantContext}
-              currentCommand={selectedRunTimeCommand}
-              liquids={liquids}
-            />
-          ) : null}
-        </div>
+        {showStepDetails ? (
+          <div
+            className={styles.right_column}
+            style={{ width: `${rightWidth}px` }}
+          >
+            {selectedRunTimeCommand != null ? (
+              <StepDetailContainer
+                commands={commands}
+                robotState={robotState}
+                invariantContext={invariantContext}
+                currentCommand={selectedRunTimeCommand}
+                liquids={liquids}
+              />
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </>
   )

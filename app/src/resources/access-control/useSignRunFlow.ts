@@ -10,8 +10,11 @@ import {
   useSignRunMutation,
 } from '@opentrons/react-api-client'
 
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useLogout } from '/app/redux/robot-auth'
+
+import { useNotifyRunQuery } from '../runs'
+
+import type { DocumentationState } from '@opentrons/react-api-client'
 
 // login gate states to control login prompting
 // idle: need to prompt for login
@@ -23,6 +26,7 @@ type LoginGate = 'idle' | 'prompting' | 'needsadmin' | 'done'
 export interface SignRunFlowResult {
   signRun: (name: string) => void
   isLoading: boolean
+  isSigned: boolean
   loginGate: LoginGate
   correctName: string | undefined
 }
@@ -35,14 +39,18 @@ export function useSignRunFlow(
     uncloseable: boolean
   }) => Promise<{ username: string } | null>,
   popToast: () => void,
-  eatToast: () => void
+  eatToast: () => void,
+  documentationState: DocumentationState,
+  onSigned?: () => void
 ): SignRunFlowResult {
   const queryClient = useQueryClient()
   const host = useHost()
   const logout = useLogout()
-  const documentationState = useDocumentationState()
   const { signRun: signRunMutation, isLoading: isSignRunLoading } =
     useSignRunMutation(documentationState)
+
+  const { data: run } = useNotifyRunQuery(runId)
+  const isSigned = !!run?.data?.signedBy
 
   const { data: authSettings, isLoading: isAuthSettingsLoading } =
     useAuthSettingsQuery()
@@ -153,15 +161,23 @@ export function useSignRunFlow(
       if (!trimmedName || trimmedName !== self?.data?.fullName) {
         return
       }
-      signRunMutation({ runId, name })
+      signRunMutation(
+        { runId, name },
+        {
+          onSuccess: () => {
+            onSigned?.()
+          },
+        }
+      )
     },
-    [self?.data?.fullName, signRunMutation, runId]
+    [self?.data?.fullName, signRunMutation, runId, onSigned]
   )
 
   return {
     signRun,
     isLoading,
     loginGate,
+    isSigned,
     correctName: self?.data?.fullName,
   }
 }

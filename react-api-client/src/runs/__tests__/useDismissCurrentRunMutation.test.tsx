@@ -32,7 +32,12 @@ describe('useDismissCurrentRunMutation hook', () => {
 
   it('should dismiss the current run when callback is called', async () => {
     vi.mocked(useHost).mockReturnValue(HOST_CONFIG)
-    vi.mocked(dismissCurrentRun).mockResolvedValue({ data: 'something' } as any)
+    const mockRunResponse = {
+      data: { id: RUN_ID_1, logPeriodId: 'log-period-1' },
+    }
+    vi.mocked(dismissCurrentRun).mockResolvedValue({
+      data: mockRunResponse,
+    } as any)
 
     const { result } = renderHook(
       () =>
@@ -49,7 +54,7 @@ describe('useDismissCurrentRunMutation hook', () => {
       result.current.dismissCurrentRun(RUN_ID_1)
     })
     await waitFor(() => {
-      expect(result.current.data).toBe('something')
+      expect(result.current.data).toEqual(mockRunResponse)
     })
   })
 })

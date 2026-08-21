@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest'
 
 import { fireEvent, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -39,6 +40,25 @@ describe('PasswordVisibilityToggle', () => {
   it('calls onToggle when the button is pressed', () => {
     render(props)
     fireEvent.click(screen.getByRole('button', { name: 'Show' }))
+    expect(props.onToggle).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not steal focus from an adjacent password input when clicked', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(
+      <>
+        <input aria-label="password" defaultValue="secret" />
+        <PasswordVisibilityToggle {...props} />
+      </>,
+      { i18nInstance: i18n }
+    )
+    const input = screen.getByLabelText('password')
+    input.focus()
+    expect(input).toHaveFocus()
+
+    await user.click(screen.getByRole('button', { name: 'Show' }))
+
+    expect(input).toHaveFocus()
     expect(props.onToggle).toHaveBeenCalledTimes(1)
   })
 

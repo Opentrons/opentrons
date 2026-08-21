@@ -4,6 +4,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: Create a new user
@@ -76,14 +77,13 @@ stages:
           username: test_new_user
           locked: false
           resetPassword: false
-  - name: Update the username and password
+  - name: Update the username
     request:
       method: PATCH
       url: '{run_server.base_url}/auth/users/byUsername/test_new_user'
       json:
         data:
           username: test_new_user_upd
-          password: securepassword123
       headers:
         Authorization: '{admin_access_token}'
     response:
@@ -242,6 +242,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: Enable access control mode
@@ -371,6 +372,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: Enable access control mode
@@ -536,6 +538,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: Create a user
@@ -578,6 +581,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: Create a user without a password
@@ -663,6 +667,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: Reject creating a user with a username longer than 20 characters

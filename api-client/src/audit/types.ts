@@ -25,3 +25,16 @@ export interface PostLogMessageResponse {
     loggedAt: string
   }
 }
+
+export interface LogPeriodDetails {
+  id: string
+  startedAt: string
+  endedAt: string | null
+  recordCount: number
+  totalSizeBytes: number
+  attachedFilenames: string[]
+}
+
+export interface LogPeriodDetailsResponse {
+  data: LogPeriodDetails
+}

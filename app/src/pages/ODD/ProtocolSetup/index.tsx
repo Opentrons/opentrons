@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import first from 'lodash/first'
 import last from 'lodash/last'
 import { css } from 'styled-components'
 
-import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -51,6 +51,7 @@ import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import {
   AnalysisFailedModal,
   getUnmatchedModulesForProtocol,
+  ProtocolSetupButtonsSkeleton,
   ProtocolSetupInstruments,
   ProtocolSetupLabware,
   ProtocolSetupModulesAndDeck,
@@ -155,6 +156,8 @@ interface PrepareToRunProps {
   isCameraRequired: boolean
   appCameraSettings: CameraState
   storageInfo: RobotStorageInfo
+  showConfirmCancelModal: boolean
+  setShowConfirmCancelModal: Dispatch<SetStateAction<boolean>>
 }
 
 function PrepareToRun({
@@ -173,13 +176,14 @@ function PrepareToRun({
   isCameraRequired,
   appCameraSettings,
   storageInfo,
+  showConfirmCancelModal,
+  setShowConfirmCancelModal,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation([
     'protocol_setup',
     'shared',
     'deck_configuration',
   ])
-  const navigate = useNavigate()
   const { makeSnackbar } = useToaster()
   const { scrollRef, isScrolled } = useScrollPosition()
 
@@ -234,11 +238,6 @@ function PrepareToRun({
     }
   }, [mostRecentAnalysis?.status])
 
-  const onConfirmCancelClose = (): void => {
-    setShowConfirmCancelModal(false)
-    navigate(-1)
-  }
-
   const protocolHasModules =
     mostRecentAnalysis?.modules != null &&
     mostRecentAnalysis?.modules.length > 0
@@ -289,9 +288,6 @@ function PrepareToRun({
     parameter =>
       parameter.type === 'csv_file' || parameter.value !== parameter.default
   )
-
-  const [showConfirmCancelModal, setShowConfirmCancelModal] =
-    useState<boolean>(false)
 
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
@@ -656,21 +652,22 @@ function PrepareToRun({
             )}
           </Flex>
           <Flex gridGap={SPACING.spacing16}>
-            <CloseButton
-              onClose={
-                !isLoading
-                  ? () => {
-                      setShowConfirmCancelModal(true)
-                    }
-                  : onConfirmCancelClose
-              }
-            />
-            <PlayButton
-              disabled={isLoading}
-              onPlay={!isLoading ? onPlay : undefined}
-              ready={!isLoading ? isReadyToRun : false}
-              isDoorOpen={doorStatus.isDoorOpen}
-            />
+            {!isLoading ? (
+              <>
+                <CloseButton
+                  onClose={() => {
+                    setShowConfirmCancelModal(true)
+                  }}
+                />
+                <PlayButton
+                  onPlay={onPlay}
+                  ready={isReadyToRun}
+                  isDoorOpen={doorStatus.isDoorOpen}
+                />
+              </>
+            ) : (
+              <ProtocolSetupButtonsSkeleton />
+            )}
           </Flex>
         </Flex>
       </Flex>
@@ -752,7 +749,6 @@ function PrepareToRun({
           runId={runId}
           setShowConfirmCancelRunModal={setShowConfirmCancelModal}
           isActiveRun={false}
-          protocolId={protocolId}
         />
       ) : null}
     </>
@@ -803,11 +799,8 @@ export function ProtocolSetup(): JSX.Element {
     useNotifyCurrentMaintenanceRun({ refetchInterval: MAINTENANCE_RUN_POLL_MS })
       .data?.data.id != null
 
-  const navigate = useNavigate()
-
-  if (runStatus === RUN_STATUS_STOPPED) {
-    navigate('/protocols')
-  }
+  const [showConfirmCancelModal, setShowConfirmCancelModal] =
+    useState<boolean>(false)
 
   const { data: mostRecentAnalysis = null } =
     useProtocolAnalysisAsDocumentQuery(
@@ -1000,6 +993,8 @@ export function ProtocolSetup(): JSX.Element {
         isCameraRequired={isCameraRequired}
         appCameraSettings={appCameraSettings}
         storageInfo={storageInfo}
+        showConfirmCancelModal={showConfirmCancelModal}
+        setShowConfirmCancelModal={setShowConfirmCancelModal}
       />
     ),
     instruments: (

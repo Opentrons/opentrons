@@ -60,11 +60,14 @@ import {
 import { getLocalRobot } from '/app/redux/discovery'
 import { getIsShellReady, updateBrightness } from '/app/redux/shell'
 import { useTrackRobotRestarts } from '/app/resources/devices/hooks/useTrackRobotRestarts'
+import { RobotUpdateProvider } from '/app/resources/robot-update/RobotUpdateProvider'
 
 import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { LocalizationProvider } from '../LocalizationProvider'
 import { requireDocumentation } from '../organisms/ODD/DocumentationRequired/requireDocumentation'
+import { showDownloadLogsModal } from '../organisms/ODD/DownloadAuditLogsModal'
 import { showLoginModal } from '../organisms/ODD/OnDeviceLogin/LoginModal'
+import { showSignRunModal } from '../pages/ODD/RunSummary/SignRun'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
 import { hackWindowNavigatorOnLine } from './hacks'
 import {
@@ -176,7 +179,6 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   const [showModuleSetupModal, setShowModuleSetupModal] = useState(false)
 
   useSoftwareUpdatePoll()
-  // TODO(jh,2026-07-28): Refactor hook usage alongside robot system update epic.
   useTrackRobotRestarts()
 
   // Normally, our hooks get the HostConfig from the nearest ApiHostProvider context.
@@ -258,41 +260,45 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                     value={{
                       showDocumentationRequiredModal: requireDocumentation,
                       showLoginModal,
+                      showSignRunModal,
+                      showDownloadLogsModal,
                     }}
                   >
-                    <MaintenanceRunTakeover>
-                      <EstopTakeover />
-                      <FirmwareUpdateTakeover />
-                      {showModuleSetupModal && localRobot?.name != null ? (
-                        <ModuleWizardFlows
-                          showSetupLauncher={true}
-                          closeFlow={() => {
-                            setShowModuleSetupModal(false)
-                          }}
-                          robotName={localRobot.name}
-                        />
-                      ) : null}
+                    <RobotUpdateProvider>
+                      <MaintenanceRunTakeover>
+                        <EstopTakeover />
+                        <FirmwareUpdateTakeover />
+                        {showModuleSetupModal && localRobot?.name != null ? (
+                          <ModuleWizardFlows
+                            showSetupLauncher={true}
+                            closeFlow={() => {
+                              setShowModuleSetupModal(false)
+                            }}
+                            robotName={localRobot.name}
+                          />
+                        ) : null}
 
-                      <NiceModal.Provider>
-                        <RobotEncryptionKeyTakeover>
-                          <ToasterOven>
-                            <ProtocolReceiptToasts />
-                            {!showModuleSetupModal ? (
-                              <ModuleAttachedToasts
-                                openFlow={(open: boolean) => {
-                                  setShowModuleSetupModal(open)
-                                }}
-                              />
-                            ) : null}
+                        <NiceModal.Provider>
+                          <RobotEncryptionKeyTakeover>
+                            <ToasterOven>
+                              <ProtocolReceiptToasts />
+                              {!showModuleSetupModal ? (
+                                <ModuleAttachedToasts
+                                  openFlow={(open: boolean) => {
+                                    setShowModuleSetupModal(open)
+                                  }}
+                                />
+                              ) : null}
 
-                            <SharedScrollRefProvider>
-                              <OnDeviceDisplayAppRoutes />
-                            </SharedScrollRefProvider>
-                            <LoggedOutOverlayMount />
-                          </ToasterOven>
-                        </RobotEncryptionKeyTakeover>
-                      </NiceModal.Provider>
-                    </MaintenanceRunTakeover>
+                              <SharedScrollRefProvider>
+                                <OnDeviceDisplayAppRoutes />
+                              </SharedScrollRefProvider>
+                              <LoggedOutOverlayMount />
+                            </ToasterOven>
+                          </RobotEncryptionKeyTakeover>
+                        </NiceModal.Provider>
+                      </MaintenanceRunTakeover>
+                    </RobotUpdateProvider>
                   </DocumentationRequiredModalContext.Provider>
                 </>
               )}

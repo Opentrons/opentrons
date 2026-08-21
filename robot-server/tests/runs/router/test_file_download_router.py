@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 from decoy import Decoy
+from fastapi import Response
 from fastapi.responses import FileResponse
 
 from opentrons.protocol_engine import CommandSlice
@@ -32,6 +33,15 @@ from robot_server.runs.router.file_download_router import download_run_files
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.runs.run_models import Run, RunNotFoundError
 from robot_server.runs.run_store import RunStore
+
+_ALL_DOWNLOAD_TYPES = {
+    "protocol": True,
+    "images": True,
+    "runLog": True,
+    "labwareOffsets": True,
+    "csvInput": True,
+    "csvOutput": True,
+}
 
 
 def _make_home_command() -> pe_commands.Command:
@@ -62,7 +72,7 @@ async def _read_and_cleanup_zip(result: FileResponse) -> zipfile.ZipFile:
     return zipfile.ZipFile(io.BytesIO(zip_bytes))
 
 
-def _stub_run_record_for_download(
+async def _stub_run_record_for_download(
     decoy: Decoy,
     run_data_manager: RunDataManager,
     *,
@@ -76,13 +86,13 @@ def _stub_run_record_for_download(
     )
     decoy.when(mock_run_record.labwareOffsets).then_return(labware_offsets or [])
     decoy.when(mock_run_record.runTimeParameters).then_return(run_time_parameters or [])
-    decoy.when(run_data_manager.get(run_id)).then_return(mock_run_record)
+    decoy.when(await run_data_manager.get(run_id)).then_return(mock_run_record)
 
     command = _make_home_command()
     empty_slice = CommandSlice(commands=[], cursor=0, total_length=1)
     full_slice = CommandSlice(commands=[command], cursor=0, total_length=1)
     decoy.when(
-        run_data_manager.get_commands_slice(
+        await run_data_manager.get_commands_slice(
             run_id=run_id,
             cursor=0,
             length=0,
@@ -90,7 +100,7 @@ def _stub_run_record_for_download(
         )
     ).then_return(empty_slice)
     decoy.when(
-        run_data_manager.get_commands_slice(
+        await run_data_manager.get_commands_slice(
             run_id=run_id,
             cursor=0,
             length=1,
@@ -225,7 +235,7 @@ async def test_download_run_files_with_images_protocol_run_log_and_offsets(
             stored=True,
         )
     )
-    _stub_run_record_for_download(
+    await _stub_run_record_for_download(
         decoy,
         mock_run_data_manager,
         labware_offsets=[labware_offset],
@@ -239,8 +249,10 @@ async def test_download_run_files_with_images_protocol_run_log_and_offsets(
         data_files_store=data_files_store,
         protocol_store=mock_protocol_store,
         persistence_directory_root=tmp_path,
+        **_ALL_DOWNLOAD_TYPES,
     )
 
+    assert isinstance(result, FileResponse)
     assert result.media_type == "application/zip"
     assert "attachment" in result.headers["Content-Disposition"]
     assert ".zip" in result.headers["Content-Disposition"]
@@ -299,16 +311,6 @@ async def test_download_run_files_protocol_json_keeps_extension(
     protocol_path = tmp_path / "my_protocol.json"
     protocol_path.write_text('{"metadata": {"protocolName": "JSON Proto"}}')
 
-    decoy.when(
-        data_files_store.get_files_info_by_run_mime_type(
-            run_id="run-id",
-            mime_type=MimeType.IMAGE_JPEG,
-            offset=0,
-            limit=None,
-        )
-    ).then_return(DataFileWithCommandsInfoSlice(file_info=[], total_length=0))
-    _stub_empty_output_files(decoy, data_files_store)
-
     mock_run = decoy.mock(name="run_data")
     decoy.when(mock_run.run_id).then_return("run-id")
     decoy.when(mock_run.protocol_id).then_return("protocol-id")
@@ -329,9 +331,6 @@ async def test_download_run_files_protocol_json_keeps_extension(
     decoy.when(mock_protocol.source).then_return(mock_source)
     decoy.when(mock_protocol_store.get("protocol-id")).then_return(mock_protocol)
 
-    # Skip run log so this test stays focused on protocol naming.
-    decoy.when(mock_run_data_manager.get("run-id")).then_raise(RuntimeError("skip"))
-
     result = await download_run_files(
         runId="run-id",
         run_store=mock_run_store,
@@ -339,8 +338,10 @@ async def test_download_run_files_protocol_json_keeps_extension(
         data_files_store=data_files_store,
         protocol_store=mock_protocol_store,
         persistence_directory_root=tmp_path,
+        protocol=True,
     )
 
+    assert isinstance(result, FileResponse)
     with await _read_and_cleanup_zip(result) as zf:
         assert "JSON_Proto.json" in zf.namelist()
         assert zf.read("JSON_Proto.json") == protocol_path.read_bytes()
@@ -382,7 +383,6 @@ async def test_download_run_files_skips_missing_protocol_silently(
             limit=None,
         )
     ).then_return(DataFileWithCommandsInfoSlice(file_info=[file_info], total_length=1))
-    _stub_empty_output_files(decoy, data_files_store)
 
     mock_run = decoy.mock(name="run_data")
     decoy.when(mock_run.run_id).then_return("run-id")
@@ -394,7 +394,6 @@ async def test_download_run_files_skips_missing_protocol_silently(
     decoy.when(mock_protocol_store.get("protocol-id")).then_raise(
         ProtocolNotFoundError("protocol-id")
     )
-    decoy.when(mock_run_data_manager.get("run-id")).then_raise(RuntimeError("skip"))
 
     result = await download_run_files(
         runId="run-id",
@@ -403,8 +402,11 @@ async def test_download_run_files_skips_missing_protocol_silently(
         data_files_store=data_files_store,
         protocol_store=mock_protocol_store,
         persistence_directory_root=tmp_path,
+        protocol=True,
+        images=True,
     )
 
+    assert isinstance(result, FileResponse)
     with await _read_and_cleanup_zip(result) as zf:
         names = zf.namelist()
         assert "protocol-id_2024-06-20T10_30_15.000Z_images/image1.jpeg" in names
@@ -449,7 +451,6 @@ async def test_download_run_files_skips_missing_run_log_and_offsets_silently(
             limit=None,
         )
     ).then_return(DataFileWithCommandsInfoSlice(file_info=[file_info], total_length=1))
-    _stub_empty_output_files(decoy, data_files_store)
 
     mock_run = decoy.mock(name="run_data")
     decoy.when(mock_run.run_id).then_return("run-id")
@@ -458,7 +459,9 @@ async def test_download_run_files_skips_missing_run_log_and_offsets_silently(
         datetime(2024, 6, 20, 10, 30, 15, tzinfo=timezone.utc)
     )
     decoy.when(mock_run_store.get("run-id")).then_return(mock_run)
-    decoy.when(mock_run_data_manager.get("run-id")).then_raise(RuntimeError("boom"))
+    decoy.when(await mock_run_data_manager.get("run-id")).then_raise(
+        RuntimeError("boom")
+    )
 
     result = await download_run_files(
         runId="run-id",
@@ -467,8 +470,12 @@ async def test_download_run_files_skips_missing_run_log_and_offsets_silently(
         data_files_store=data_files_store,
         protocol_store=mock_protocol_store,
         persistence_directory_root=tmp_path,
+        images=True,
+        runLog=True,
+        labwareOffsets=True,
     )
 
+    assert isinstance(result, FileResponse)
     with await _read_and_cleanup_zip(result) as zf:
         assert "run-id_2024-06-20T10_30_15.000Z_images/image1.jpeg" in zf.namelist()
         assert not any(name.endswith(".json") for name in zf.namelist())
@@ -495,20 +502,47 @@ async def test_download_run_files_run_not_found(
             data_files_store=data_files_store,
             protocol_store=mock_protocol_store,
             persistence_directory_root=tmp_path,
+            images=True,
         )
 
     assert exc_info.value.status_code == 404
     assert exc_info.value.content["errors"][0]["id"] == "RunNotFound"
 
 
-async def test_download_run_files_no_content(
+async def test_download_run_files_no_query_params_returns_204(
     decoy: Decoy,
     mock_run_store: RunStore,
     mock_run_data_manager: RunDataManager,
     mock_protocol_store: ProtocolStore,
     tmp_path: Path,
 ) -> None:
-    """It should 404 when the run exists but has nothing downloadable."""
+    """It should 204 when no file types are requested."""
+    data_files_store = decoy.mock(cls=DataFilesStore)
+
+    mock_run = decoy.mock(name="run_data")
+    decoy.when(mock_run_store.get("run-id")).then_return(mock_run)
+
+    result = await download_run_files(
+        runId="run-id",
+        run_store=mock_run_store,
+        run_data_manager=mock_run_data_manager,
+        data_files_store=data_files_store,
+        protocol_store=mock_protocol_store,
+        persistence_directory_root=tmp_path,
+    )
+
+    assert isinstance(result, Response)
+    assert result.status_code == 204
+
+
+async def test_download_run_files_requested_but_missing_returns_204(
+    decoy: Decoy,
+    mock_run_store: RunStore,
+    mock_run_data_manager: RunDataManager,
+    mock_protocol_store: ProtocolStore,
+    tmp_path: Path,
+) -> None:
+    """It should 204 when requested types have no available files."""
     data_files_store = decoy.mock(cls=DataFilesStore)
 
     mock_run = decoy.mock(name="run_data")
@@ -528,17 +562,19 @@ async def test_download_run_files_no_content(
         )
     ).then_return(DataFileWithCommandsInfoSlice(file_info=[], total_length=0))
     _stub_empty_output_files(decoy, data_files_store)
-    decoy.when(mock_run_data_manager.get("run-id")).then_raise(RuntimeError("skip"))
+    decoy.when(await mock_run_data_manager.get("run-id")).then_raise(
+        RuntimeError("skip")
+    )
 
-    with pytest.raises(ApiError) as exc_info:
-        await download_run_files(
-            runId="run-id",
-            run_store=mock_run_store,
-            run_data_manager=mock_run_data_manager,
-            data_files_store=data_files_store,
-            protocol_store=mock_protocol_store,
-            persistence_directory_root=tmp_path,
-        )
+    result = await download_run_files(
+        runId="run-id",
+        run_store=mock_run_store,
+        run_data_manager=mock_run_data_manager,
+        data_files_store=data_files_store,
+        protocol_store=mock_protocol_store,
+        persistence_directory_root=tmp_path,
+        **_ALL_DOWNLOAD_TYPES,
+    )
 
-    assert exc_info.value.status_code == 404
-    assert exc_info.value.content["errors"][0]["id"] == "NoDownloadContent"
+    assert isinstance(result, Response)
+    assert result.status_code == 204

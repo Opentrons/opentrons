@@ -5,6 +5,9 @@ from typing import Annotated, Any, ClassVar, Literal
 
 import pydantic
 
+AUTH_SERVER_AUDIT_SYSTEM_NAME = "system"
+AUTH_SERVER_AUDIT_SYSTEM_FULLNAME = "authentication subsystem"
+
 
 class _StrictBaseModel(pydantic.BaseModel):
     model_config = {"strict": True}

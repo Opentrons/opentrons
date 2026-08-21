@@ -33,7 +33,7 @@ from opentrons.util.performance_helpers import TrackingFunctions
 from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons_shared_data.robot.types import RobotType
 from server_utils.audit.audit_logger import AuditLogger
-from server_utils.audit.fastapi import get_audit_logger, skip_audit_logger
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import (
     get_access_control_status,
     require_scopes,
@@ -53,6 +53,7 @@ from server_utils.fastapi_utils.models.json_api import (
 from .analyses_manager import AnalysesManager, FailedToInitializeAnalyzer
 from .analysis_models import (
     AnalysisRequest,
+    AnalysisResult,
     AnalysisStatus,
     AnalysisSummary,
     ProtocolAnalysis,
@@ -536,6 +537,7 @@ async def _start_new_analysis_if_necessary(
             AnalysisSummary(
                 id=analysis_id,
                 status=AnalysisStatus.COMPLETED,
+                result=AnalysisResult.NOT_OK,
             )
         )
     else:
@@ -550,7 +552,7 @@ async def _start_new_analysis_if_necessary(
             # The most recent analysis was done using different RTP values
             not await analysis_store.matching_rtp_values_in_analysis(
                 last_analysis_summary=analyses[-1],
-                new_parameters=analyzer.get_verified_run_time_parameters(),
+                new_parameters=await analyzer.get_verified_run_time_parameters(),
             )
         ):
             log.info(
@@ -563,6 +565,8 @@ async def _start_new_analysis_if_necessary(
                     analyzer=analyzer,
                 )
             )
+        else:
+            await analyzer.clean_up()
 
     return analyses, started_new_analysis
 
@@ -766,7 +770,7 @@ async def delete_protocol_by_id(
         status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorBody[FileIdNotFound]},
         status.HTTP_503_SERVICE_UNAVAILABLE: {"model": ErrorBody[LastAnalysisPending]},
     },
-    dependencies=[Depends(skip_audit_logger)],
+    dependencies=[Depends(require_scopes(Scope.PROTOCOL_ANALYSES_WRITE))],
 )
 async def create_protocol_analysis(
     protocolId: str,

@@ -77,7 +77,11 @@ describe('ProtocolSetupParameters', () => {
     vi.mocked(ChooseCsvFile).mockReturnValue(<div>mock ChooseCsvFile</div>)
     vi.mocked(useHost).mockReturnValue(MOCK_HOST_CONFIG)
     when(vi.mocked(useCreateProtocolAnalysisMutation))
-      .calledWith(expect.anything(), expect.anything())
+      .calledWith(
+        ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+        expect.anything(),
+        expect.anything()
+      )
       .thenReturn({ createProtocolAnalysis: mockCreateProtocolAnalysis } as any)
     when(vi.mocked(useCreateRunMutation))
       .calledWith(
