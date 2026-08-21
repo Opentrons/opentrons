@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 
 import { InputField } from '@opentrons/components'
 
@@ -16,6 +16,11 @@ export interface PasswordInputFieldProps {
   onBlur?: (event: FocusEvent<HTMLInputElement>) => void
 }
 
+interface InputSelection {
+  start: number
+  end: number
+}
+
 export function PasswordInputField({
   value,
   placeholder,
@@ -24,11 +29,46 @@ export function PasswordInputField({
   onBlur,
 }: PasswordInputFieldProps): JSX.Element {
   const [showPassword, setShowPassword] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const selectionRef = useRef<InputSelection | null>(null)
+
+  useLayoutEffect(() => {
+    const input = inputRef.current
+    const selection = selectionRef.current
+    if (input == null || selection == null) {
+      return
+    }
+
+    // Chrome resets the caret to the start when input type changes.
+    // Restore immediately, then again on the next frame in case Chrome
+    // overwrites the selection after the type attribute update.
+    const restoreSelection = (): void => {
+      input.setSelectionRange(selection.start, selection.end)
+    }
+    restoreSelection()
+    const frameId = requestAnimationFrame(restoreSelection)
+
+    return () => {
+      cancelAnimationFrame(frameId)
+    }
+  }, [showPassword])
+
+  const handleToggle = (): void => {
+    const input = inputRef.current
+    if (input != null) {
+      selectionRef.current = {
+        start: input.selectionStart ?? input.value.length,
+        end: input.selectionEnd ?? input.value.length,
+      }
+    }
+    setShowPassword(current => !current)
+  }
 
   return (
     <div className={styles.password_field_row}>
       <div className={styles.password_field_input}>
         <InputField
+          ref={inputRef}
           type={showPassword ? 'text' : 'password'}
           value={value}
           placeholder={placeholder}
@@ -39,9 +79,7 @@ export function PasswordInputField({
       </div>
       <PasswordVisibilityToggle
         isVisible={showPassword}
-        onToggle={() => {
-          setShowPassword(current => !current)
-        }}
+        onToggle={handleToggle}
       />
     </div>
   )
