@@ -386,10 +386,15 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         access_token = token["access_token"]
         refresh_token = token.get("refresh_token", None)
 
-        # This cast is because request.scopes is apparently mis-typed as a str; it's actually a list[str].
-        scopes = cast(Any, request.scopes)
-        assert _is_list_of_type(scopes, str)
-        scopes = {Scope.from_api_name(s) for s in scopes}
+        # When the client omits `scope`, store nothing so effective scopes are
+        # calculated from current settings and user state at use time. When the
+        # client explicitly requests scopes, store that ceiling.
+        if request.scope is not None:
+            scopes = cast(Any, request.scopes)
+            assert _is_list_of_type(scopes, str)
+            stored_scopes = {Scope.from_api_name(s) for s in scopes}
+        else:
+            stored_scopes = set()
 
         expires_in = token["expires_in"]
 
@@ -409,7 +414,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
                 access_token=access_token,
                 refresh_token=refresh_token,
                 expires_at=expires_at,
-                scopes=scopes,
+                scopes=stored_scopes,
                 fullname=user.full_name,
             )
         )
@@ -492,7 +497,10 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
 
     def __get_effective_token_scopes(self, token: _TokenIssuance) -> set[Scope]:
         """Return granted token scopes, updated for current settings and user state."""
-        return token.scopes & self.__get_live_scopes_for_username(token.username)
+        live_scopes = self.__get_live_scopes_for_username(token.username)
+        if not token.scopes:
+            return live_scopes
+        return token.scopes & live_scopes
 
     def __get_live_scopes_for_username(self, username: str) -> set[Scope]:
         user = self.__user_store.get(username)
@@ -563,6 +571,7 @@ class _TokenIssuance:
     # todo(mm, 2026-01-29): We might want expires_at to be a CLOCK_BOOTTIME value or something
     # to resist problems from clock adjustment.
     expires_at: datetime
+    # Empty when the client did not request an explicit scope ceiling.
     scopes: set[Scope]
     fullname: str
 
