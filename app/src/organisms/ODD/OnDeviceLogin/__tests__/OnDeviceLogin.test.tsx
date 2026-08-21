@@ -155,6 +155,19 @@ describe('OnDeviceLogin', () => {
     ).toBeInTheDocument()
   })
 
+  it('keeps next enabled and shows a required error when the username is empty', () => {
+    const { onStepChange } = renderLogin({ initialStep: 'username' })
+
+    const nextButton = screen.getByRole('button', { name: 'next' })
+    expect(nextButton).toBeEnabled()
+    fireEvent.click(nextButton)
+
+    expect(
+      screen.getByText('on_device_login_username_required')
+    ).toBeInTheDocument()
+    expect(onStepChange).not.toHaveBeenCalled()
+  })
+
   it('submits credentials from the password step during normal login', () => {
     const { submitPassword } = renderLogin({
       initialStep: 'password',
@@ -165,6 +178,39 @@ describe('OnDeviceLogin', () => {
     clickPrimary('confirm')
 
     expect(submitPassword).toHaveBeenCalledWith('alice', 'secret123')
+  })
+
+  it('keeps confirm enabled and shows a required error when the password is empty', () => {
+    const { submitPassword } = renderLogin({
+      initialStep: 'password',
+      initialUsername: 'alice',
+    })
+
+    const confirmButton = screen.getByRole('button', { name: 'confirm' })
+    expect(confirmButton).toBeEnabled()
+    fireEvent.click(confirmButton)
+
+    expect(
+      screen.getByText('on_device_login_password_required')
+    ).toBeInTheDocument()
+    expect(submitPassword).not.toHaveBeenCalled()
+  })
+
+  it('keeps next enabled and shows a required error when the new password is empty', () => {
+    const { onStepChange } = renderLogin({
+      initialStep: 'password',
+      isPasswordResetRequired: true,
+      initialUsername: 'alice',
+    })
+
+    const nextButton = screen.getByRole('button', { name: 'next' })
+    expect(nextButton).toBeEnabled()
+    fireEvent.click(nextButton)
+
+    expect(
+      screen.getByText('on_device_login_password_required')
+    ).toBeInTheDocument()
+    expect(onStepChange).not.toHaveBeenCalled()
   })
 
   it('shows a length error when the new password is too short', () => {
@@ -266,6 +312,23 @@ describe('OnDeviceLogin', () => {
 
     expect(
       screen.getByText('on_device_login_password_mismatch')
+    ).toBeInTheDocument()
+    expect(submitPassword).not.toHaveBeenCalled()
+  })
+
+  it('keeps confirm enabled and shows a required error when confirm password is empty', () => {
+    const { submitPassword } = renderLogin({
+      initialStep: 'confirmPassword',
+      isPasswordResetRequired: true,
+      initialUsername: 'alice',
+    })
+
+    const confirmButton = screen.getByRole('button', { name: 'confirm' })
+    expect(confirmButton).toBeEnabled()
+    fireEvent.click(confirmButton)
+
+    expect(
+      screen.getByText('on_device_login_password_required')
     ).toBeInTheDocument()
     expect(submitPassword).not.toHaveBeenCalled()
   })

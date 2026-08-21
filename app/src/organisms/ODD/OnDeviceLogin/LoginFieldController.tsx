@@ -15,6 +15,7 @@ export interface LoginFieldControllerProps {
   isPasswordResetRequired: boolean
   loginError: string | null
   confirmPasswordError: string | null
+  usernameError: string | null
   onClearFieldErrors: () => void
   keyboardRef: RefObject<KeyboardReactInterface | null>
 }
@@ -26,6 +27,7 @@ export function LoginFieldController({
   isPasswordResetRequired,
   loginError,
   confirmPasswordError,
+  usernameError,
   onClearFieldErrors,
   keyboardRef,
 }: LoginFieldControllerProps): JSX.Element | null {
@@ -39,7 +41,7 @@ export function LoginFieldController({
           <LoginFieldInput
             field={field}
             label={t('access_control:username')}
-            error={null}
+            error={usernameError}
             isPasswordField={false}
             onClearError={onClearFieldErrors}
             autoFocus

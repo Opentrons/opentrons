@@ -57,6 +57,7 @@ export function OnDeviceLogin({
   const [passwordPolicyError, setPasswordPolicyError] = useState<string | null>(
     null
   )
+  const [usernameError, setUsernameError] = useState<string | null>(null)
   const { control, watch, setValue } = useForm<LoginFormValues>({
     defaultValues: {
       username: initialUsername ?? '',
@@ -88,6 +89,7 @@ export function OnDeviceLogin({
   const clearFieldErrors = (): void => {
     setConfirmPasswordError(null)
     setPasswordPolicyError(null)
+    setUsernameError(null)
     onClearLoginError?.()
   }
 
@@ -102,12 +104,26 @@ export function OnDeviceLogin({
 
   const handleNext = useCallback((): void => {
     if (step === 'username') {
-      if (username.trim() === '') return
+      if (username.trim() === '') {
+        setUsernameError(
+          t('on_device_login_username_required', {
+            ns: 'access_control',
+          }) as string
+        )
+        return
+      }
       onStepChange('password')
       return
     }
     if (step === 'password') {
-      if (password.trim() === '') return
+      if (password.trim() === '') {
+        setPasswordPolicyError(
+          t('on_device_login_password_required', {
+            ns: 'access_control',
+          }) as string
+        )
+        return
+      }
       if (isPasswordResetRequired) {
         if (passwordComplexity != null) {
           const complexityError = getPasswordComplexityError(
@@ -140,7 +156,14 @@ export function OnDeviceLogin({
       submitPassword(username, password)
       return
     }
-    if (confirmPassword.trim() === '') return
+    if (confirmPassword.trim() === '') {
+      setConfirmPasswordError(
+        t('on_device_login_password_required', {
+          ns: 'access_control',
+        }) as string
+      )
+      return
+    }
     if (confirmPassword !== password) {
       setConfirmPasswordError(
         t('on_device_login_password_mismatch', {
@@ -163,12 +186,7 @@ export function OnDeviceLogin({
     t,
   ])
 
-  const primaryDisabled =
-    step === 'username'
-      ? username.trim() === ''
-      : step === 'password'
-        ? password.trim() === '' || isAuthLoading
-        : confirmPassword.trim() === '' || isAuthLoading
+  const primaryDisabled = isAuthLoading
 
   const header = isPasswordResetRequired
     ? t('on_device_login_new_password', { ns: 'access_control' })
@@ -236,6 +254,7 @@ export function OnDeviceLogin({
               isPasswordResetRequired={isPasswordResetRequired}
               loginError={passwordPolicyError ?? loginError}
               confirmPasswordError={confirmPasswordError}
+              usernameError={usernameError}
               onClearFieldErrors={clearFieldErrors}
               keyboardRef={keyboardRef}
             />
