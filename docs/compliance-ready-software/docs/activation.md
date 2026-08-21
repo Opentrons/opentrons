@@ -20,6 +20,8 @@ The encryption key is a three-word string, and your Flex generates a new one eve
   <figcaption>The robot-generated encryption key changes every 30 seconds.</figcaption>
 </figure>
 
+In your Opentrons App, click the three-dot menu to the right of your robot's name to access its settings. Select the **Advanced** tab, then click to **Enter encryption key**. 
+
 If a certificate expires or if you make updates to device settings like the robot's name, you may need to enter the encryption key again to re-establish the connection between your Flex and Opentrons App. You'll be prompted to do this in the app. 
 
 <figure class="screenshot" markdown>
@@ -41,6 +43,6 @@ After setup, a "Compliance Ready" badge appears next to your Flex in the Opentro
 !!! note
     Remember that you can control multiple robots through the same Opentrons App, including those that don't have Compliance Ready Software. The way you use the app to interact with a compliance ready Flex will be different, including logins, protocol runs, and required documentation.
 
-After activation, you'll need to add your own validations, protocols, and data management practices to make your Flex fully audit-ready.
+After activation, you'll need to add your own protocols and data management practices to use your Flex into a fully audit-ready workflow.
 
 

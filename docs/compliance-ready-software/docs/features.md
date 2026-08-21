@@ -21,7 +21,7 @@ Screen timeouts and other security policies can be customized by [administrators
 
 ### Files
 
-Your compliance ready Flex locally generates robot and protocol [files](files.md) to preserve audit-ready information. Every data point includes: 
+Your compliance ready Flex locally generates robot and protocol [files](using/files.md) to preserve audit-ready information. Every data point includes: 
 
 * cryptographically hashed timestamps.
 * unique electronic user IDs and signatures.

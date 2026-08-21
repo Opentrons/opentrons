@@ -81,7 +81,7 @@ TODO and comments:
 
 ## File source folder
 
-You can choose a location to automatically download and save [files](files.md) from the Opentrons App.
+You can choose a location to automatically download and save [files](using/files.md) from the Opentrons App.
 
 Choose **App Settings** in the Opentrons App, then click the **Advanced** tab and click to select a folder.
 

@@ -7,21 +7,19 @@ Required *documentation* is an important part of Opentrons Flex Compliance Ready
 
 Their documentation, along with their name and user ID, become a part of the [files](files.md) your compliance ready Flex generates.
 
-This section covers *how* users will add documentation. For a full list of user actions that require documentation, see the [Documented Actions](actions.md) appendix.
+This section covers how users will add documentation. For a full list of user actions that require documentation, see the [Documented Actions](../actions.md) appendix.
 
 !!! note
-    Opentrons Flex Compliance Ready Software adds required documentation checkpoints to the Opentrons App and Flex touchscreen. It's up to your lab to decide what suffient, audit-ready documentation looks like for you.
-
-<!----
-TODO: link terms in italics to glossary
------>
+    Opentrons Flex Compliance Ready Software adds required documentation checkpoints to the Opentrons App and Flex touchscreen. Users should follow their lab's process to add sufficient documentation.
 
 ## Adding documentation
 
-Opentrons Flex Compliance Ready Software adds checkpoints to prompt all users to document nearly every robot and protocol action they complete on the robot. On the Flex touchscreen, users can use the on-screen, collapsible keyboard to add text on the touchscreen.
+Opentrons Flex Compliance Ready Software adds checkpoints to prompt all users to document nearly every robot and protocol action they complete on the robot. Users will see a prompt to add documentation after completing actions like pipette calibration or a protocol run on both the Flex touchscreen and Opentrons App.
+
+On the Flex touchscreen, users can use the on-screen, collapsible keyboard to add text on the touchscreen.
 
 <figure class="screenshot" markdown>
-  ![Add documentation on the Flex touchscreen.](images/documentation-required.png)
+  ![Add documentation on the Flex touchscreen.](../images/documentation-required.png)
   <figcaption>Add documentation on the Flex touchscreen.</figcaption>
 </figure>
 
@@ -31,12 +29,12 @@ Opentrons Flex Compliance Ready Software adds checkpoints to prompt all users to
        * Tap the gray arrow on the right side to collapse the keyboard.
        * Double tap text to cut, copy, or paste.
    
-    Flex also supports an [external keyboard](devices.md), attached via USB, to type documentation.
+    Flex also supports an [external keyboard](../devices.md), attached via USB, to type documentation.
 
 Users can also add text in the Opentrons App. Here, they can also view a list of documented actions on the right. 
 
 <figure class="screenshot" markdown>
-  ![Add documentation in the Opentrons App.](images/documentation-required-app.png)
+  ![Add documentation in the Opentrons App.](../images/documentation-required-app.png)
   <figcaption>Add documentation on the Flex touchscreen.</figcaption>
 </figure>
 
@@ -47,8 +45,7 @@ When you're finished, click **Confirm** to save your text and move on.
 <!----
 TODO: 
 - I replaced dummy text for the list of actions for this image. need to make sure this text is realistic 
--  need to confirm that the documentation required screen pops up simultaneouly on BOTH odd and app in the alpha 
-- add some language about how users are prompted to enter documentation AFTER each action? 
+-  need to confirm that the documentation required screen pops up simultaneouly on BOTH odd and app
 ----->
 
 ## Viewing actions
@@ -56,16 +53,15 @@ TODO:
 While working on the bench, you'll see several prompts to add documentation in the same workflow. In case you've stepped away, forgot which action you started, or simply want to view a list of every user action during your session, you can click **View Actions** when adding documentation on the Flex touchscreen.
 
 <figure class="screenshot" markdown>
-  ![View the list of actions on the Flex touchscreen.](images/view-actions-odd.png)
+  ![View the list of actions on the Flex touchscreen.](../images/view-actions-odd.png)
   <figcaption>View a list of actions requiring documentation on the Flex touchscreen.</figcaption>
 </figure>
 
 Click each action to view its documentation. When you're finished, click **Confirm** to save your text.
 
 <!----
-- may be confusing to say in the section ABOVE that users can view a list of actions, and then in this section introduce the concept? 
 - can you actually click each action to view its documentation? on app and in ODD? confirm in alpha? and can you EDIT text here? 
-- again, replaced dummy text for this image
+- again, confirm that dummy text here is realistic
 ----->
 
 ## Documentation Settings
@@ -75,7 +71,7 @@ Administrators can customize documentation settings in the Opentrons App. In **R
 *  **Require documentation for robot actions**: on by default.
 *  **Minimum length of documentation for robot actions**: default of 20 characters.
 
-See the complete list of administrator-customizable [settings](admin.md) for more.
+See the complete list of administrator-customizable [settings](../admin.md) for more.
 
 <!----
 - triple check that these settings can only be accessed from the app 

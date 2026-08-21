@@ -42,16 +42,17 @@ plugins:
 nav:
   
   - Comliance Ready Software Instruction Manual: index.md
-  - Introduction: 
+  - Activation: 
       - Activation: activation.md
       - Roles: roles.md
       - Settings: settings.md
-  - Using Compliance Ready Software: 
-      - Logging in: login.md
-      - Document actions: documentation.md
-      - Running a protocol: running.md 
-      - Completing a protocol: complete.md
-      - Accessing files: files.md
+  - Using Compliance Ready Software:
+      - Using Compliance Ready Software: using/index.md 
+      - Logging in: using/login.md
+      - Document actions: using/documentation.md
+      - Running a protocol: using/running.md 
+      - Completing a protocol: using/complete.md
+      - Accessing files: using/files.md
   - Additional Features: 
       - Additional Features: features.md 
       - Devices: devices.md
