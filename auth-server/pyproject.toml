@@ -54,6 +54,7 @@ dev = [
     "types-requests==2.33.*",
     "tavern>=3.0.2",
     "types-oauthlib==3.3.0.20250822",
+    "watchfiles>=1.2.0,<2", # For uvicorn hot reloading.
 ]
 
 [tool.ruff.lint]

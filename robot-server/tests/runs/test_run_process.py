@@ -1,7 +1,6 @@
 """Tests for run process."""
 
 import asyncio
-import inspect
 import socket
 import threading
 from typing import cast
@@ -24,7 +23,6 @@ from opentrons.protocol_engine.resources.camera_provider import (
 from opentrons.protocol_engine.resources.file_provider import FileProvider
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
-from opentrons_shared_data.robot.types import RobotTypeEnum
 from server_utils.fastapi_utils.app_state import AppState
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
@@ -59,19 +57,6 @@ def mock_run_process_pyro_provider(decoy: Decoy) -> RunProcessPyroProvider:
 def mock_deck_configuration_store(decoy: Decoy) -> DeckConfigurationStore:
     """Get a mock DeckConfigurationStore."""
     return decoy.mock(cls=DeckConfigurationStore)
-
-
-@pytest.fixture
-def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Get a mocked feature flags."""
-    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
-        params = inspect.getfullargspec(func)
-        mock_get_ff = decoy.mock(func=func)
-        if any("robot_type" in p for p in params.args):
-            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
-        else:
-            decoy.when(mock_get_ff()).then_return(False)
-        monkeypatch.setattr(feature_flags, name, mock_get_ff)
 
 
 @pytest.fixture
@@ -140,7 +125,7 @@ async def _host_pyro_nameserver_and_ot3api(
     register_hardware_types()
     name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
     # Initialize the RobotServerPyroResource
-    pyro_resource.start_initializing_pyro_resource(app_state)
+    await pyro_resource.start_initializing_pyro_resource(app_state)
     ot3_async = await wait_for_proxy(proxy_name="OT3API", broadcast_mode=False)
     if ot3_async is None:
         raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
@@ -158,10 +143,10 @@ async def test_run_process_proxy(
 ) -> None:
     """Test the run process pyro creation and a proxy can be created that returns data and async commands can be called."""
     decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
+
     ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
         ot3_hardware_api, mock_app_state
     )
-
     pyro_thread = initialize_run_process("ot-protocol")
     pyro_thread.start()
 
@@ -179,6 +164,8 @@ async def test_run_process_proxy(
 
     # Clean up client resources.
     protocol_async._proxy._pyroRelease()  # type: ignore
+    ot3_async._proxy._pyroRelease()
+    rs_async._proxy._pyroRelease()
 
 
 async def test_run_process_create(
@@ -191,7 +178,6 @@ async def test_run_process_create(
 ) -> None:
     """Test the run process pyro proxy `create` method can be called to create the run."""
     decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
-
     sock = socket.socket()
     sock.bind(("localhost", 0))
     host, port = sock.getsockname()
@@ -271,7 +257,7 @@ async def test_run_process_create(
         protocol=None,
         run_time_param_values=None,
         run_time_param_paths=None,
-        proxy_of_callback_for_handling_door_events=run_process.register_hardware_door_event(),
+        proxy_of_callback_for_handling_door_events=await run_process.register_hardware_door_event(),
     )
 
     await run_process.finish()

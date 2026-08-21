@@ -143,13 +143,13 @@ class LightController:
                 )
             )
 
-    def _get_current_engine_status(self) -> Optional[EngineStatus]:
+    async def _get_current_engine_status(self) -> Optional[EngineStatus]:
         """Get the `status` value from the engine's active run engine."""
         if self._run_orchestrator_store is None:
             return None
         current_id = self._run_orchestrator_store.current_run_id
         if current_id is not None:
-            return self._run_orchestrator_store.get_status()
+            return await self._run_orchestrator_store.get_status()
 
         return None
 
@@ -162,12 +162,12 @@ class LightController:
             and status.update_state is UpdateState.updating
         ]
 
-    def get_current_status(self) -> Status:
+    async def get_current_status(self) -> Status:
         """Get the overall status of the system for light purposes."""
         return Status(
             active_updates=self._get_active_updates(),
             estop_status=self._hardware_state_store.get_estop_state(),
-            engine_status=self._get_current_engine_status(),
+            engine_status=await self._get_current_engine_status(),
         )
 
 
@@ -176,10 +176,10 @@ async def run_light_task(driver: LightController) -> None:
 
     This is intended to be run as a background task once the EngineStore has been created.
     """
-    prev_status = driver.get_current_status()
+    prev_status = await driver.get_current_status()
     await driver.update(prev_status=None, new_status=prev_status)
     while True:
         await asyncio.sleep(0.1)
-        new_status = driver.get_current_status()
+        new_status = await driver.get_current_status()
         await driver.update(prev_status=prev_status, new_status=new_status)
         prev_status = new_status

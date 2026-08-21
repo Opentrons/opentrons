@@ -444,7 +444,7 @@ async def get_data_files_by_run_id(
         run_data_manager: Current and historical run data management.
     """
     try:
-        run_data_manager.get(runId)
+        await run_data_manager.get(runId)
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
@@ -595,7 +595,7 @@ async def delete_run_images(
         data_file_publisher: The data file MQTT event publisher.
     """
     try:
-        run_data_manager.get(runId)
+        await run_data_manager.get(runId)
     except RunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 

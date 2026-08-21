@@ -22,6 +22,7 @@ interface UseDeleteSelectedLogPeriodsResult {
     deletionKeysByLogPeriodId: Record<string, string>
   ) => Promise<void>
   deletingIds: Set<string>
+  isLoading: boolean
 }
 
 export function useDeleteSelectedLogPeriods(
@@ -115,5 +116,9 @@ export function useDeleteSelectedLogPeriods(
       .then(() => {})
   }
 
-  return { deleteSelectedLogPeriods, deletingIds }
+  return {
+    deleteSelectedLogPeriods,
+    deletingIds,
+    isLoading: mutation.isLoading,
+  }
 }

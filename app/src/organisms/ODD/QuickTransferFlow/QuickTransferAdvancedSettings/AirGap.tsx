@@ -208,9 +208,6 @@ export function AirGap(props: AirGapProps): JSX.Element {
               value={volume}
               label={t('air_gap_volume_µL')}
               error={volumeError}
-              onBlur={e => {
-                e.target.focus()
-              }}
               onChange={e => {
                 setVolume(Number(e.target.value))
               }}

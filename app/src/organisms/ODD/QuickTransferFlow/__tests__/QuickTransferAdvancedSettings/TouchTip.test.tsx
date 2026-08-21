@@ -121,7 +121,6 @@ describe('TouchTip', () => {
         error: null,
         type: 'text',
         value: '',
-        onBlur: expect.any(Function),
       }),
       {}
     )
@@ -160,7 +159,6 @@ describe('TouchTip', () => {
         error: 'Value must be between -25 to 0',
         type: 'text',
         value: '-98',
-        onBlur: expect.any(Function),
       }),
       {}
     )
@@ -190,7 +188,6 @@ describe('TouchTip', () => {
         error: 'Value must be between -100 to 0',
         type: 'text',
         value: '1',
-        onBlur: expect.any(Function),
       }),
       {}
     )
@@ -237,7 +234,6 @@ describe('TouchTip', () => {
         error: null,
         type: 'text',
         value: '-25',
-        onBlur: expect.any(Function),
       }),
       {}
     )
@@ -265,7 +261,6 @@ describe('TouchTip', () => {
         error: null,
         type: 'text',
         value: '-8',
-        onBlur: expect.any(Function),
       }),
       {}
     )

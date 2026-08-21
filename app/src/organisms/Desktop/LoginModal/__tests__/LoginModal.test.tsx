@@ -185,7 +185,7 @@ describe('LoginModal', () => {
   it('renders the login form when opened', () => {
     renderAndOpenLoginModal()
 
-    screen.getByText('Compliance Ready Software Login')
+    screen.getByText('Compliance Ready Software login')
     screen.getByLabelText('Username')
     screen.getByLabelText('Password')
     screen.getByRole('button', { name: 'Forgot password?' })
@@ -254,7 +254,7 @@ describe('LoginModal', () => {
       AUTH_USER,
       TOKEN_RESPONSE
     )
-    expect(screen.queryByText('Compliance Ready Software Login')).toBeNull()
+    expect(screen.queryByText('Compliance Ready Software login')).toBeNull()
   })
 
   it('shows an error when authentication fails', () => {
@@ -271,7 +271,7 @@ describe('LoginModal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
 
     screen.getByText('Test error message')
-    screen.getByText('Compliance Ready Software Login')
+    screen.getByText('Compliance Ready Software login')
   })
 
   it('shows an account locked error when the account is locked', () => {
@@ -329,7 +329,7 @@ describe('LoginModal', () => {
     expect(storeLoginState).toHaveBeenCalledTimes(1)
     screen.getByText('Password reset for alice')
     screen.getByTestId('Toast_success')
-    screen.getByText('Compliance Ready Software Login')
+    screen.getByText('Compliance Ready Software login')
     expect(screen.getByLabelText('Username')).toHaveValue('alice')
     expect(screen.getByLabelText('Password')).toHaveValue('')
   })

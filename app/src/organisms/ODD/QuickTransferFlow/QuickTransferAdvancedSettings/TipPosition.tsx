@@ -36,7 +36,7 @@ interface TipPositionEntryProps {
 
 export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
   const { onBack, state, dispatch, kind } = props
-  const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
+  const { t } = useTranslation(['quick_transfer', 'shared'])
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = useRef(null)
 
@@ -107,7 +107,7 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
             ? t('aspirate_tip_position')
             : t('dispense_tip_position')
         }
-        buttonText={i18n.format(t('shared:save'), 'capitalize')}
+        buttonText={t('shared:save')}
         onClickBack={onBack}
         onClickButton={handleClickSave}
         top={SPACING.spacing8}
@@ -135,9 +135,6 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
             value={tipPosition}
             label={textEntryCopy}
             error={error}
-            onBlur={e => {
-              e.target.focus()
-            }}
             onChange={e => {
               setTipPosition(Number(e.target.value))
             }}

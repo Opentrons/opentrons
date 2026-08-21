@@ -1,0 +1,11 @@
+.banner_wrapper {
+  display: flex;
+  width: 100%;
+  padding-right: var(--spacing-24);
+}
+
+/* the doubled selector outweighs InlineNotification's own styled-components
+   class, which is injected into the document after this stylesheet */
+.notification.notification {
+  padding: var(--spacing-4) var(--spacing-8) var(--spacing-4) var(--spacing-12);
+}

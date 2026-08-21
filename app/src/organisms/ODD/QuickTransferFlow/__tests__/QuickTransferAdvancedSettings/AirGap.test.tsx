@@ -104,7 +104,6 @@ describe('AirGap', () => {
         error: null,
         type: 'number',
         value: null,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -139,7 +138,6 @@ describe('AirGap', () => {
         error: 'Value must be between 0 to 195',
         type: 'number',
         value: 200,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -171,7 +169,6 @@ describe('AirGap', () => {
         error: null,
         type: 'number',
         value: 0,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -201,7 +198,6 @@ describe('AirGap', () => {
         error: null,
         type: 'number',
         value: 0,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -229,7 +225,6 @@ describe('AirGap', () => {
         error: null,
         type: 'number',
         value: 0,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -270,7 +265,6 @@ describe('AirGap', () => {
         error: null,
         type: 'number',
         value: 4,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -298,7 +292,6 @@ describe('AirGap', () => {
         error: null,
         type: 'number',
         value: 16,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}

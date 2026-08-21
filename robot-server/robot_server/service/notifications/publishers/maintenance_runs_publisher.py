@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Annotated, Callable, Optional
+from typing import Annotated, Any, Callable, Coroutine, Optional
 
 from fastapi import Depends
 
@@ -21,7 +21,7 @@ class _RunHooks:
     """Generated during a protocol run. Utilized by MaintenanceRunsPublisher."""
 
     run_id: str
-    get_state_summary: Callable[[str], Optional[StateSummary]]
+    get_state_summary: Callable[[str], Coroutine[Any, Any, Optional[StateSummary]]]
 
 
 @dataclass
@@ -50,7 +50,7 @@ class MaintenanceRunsPublisher:
     async def start_publishing_for_maintenance_run(
         self,
         run_id: str,
-        get_state_summary: Callable[[str], Optional[StateSummary]],
+        get_state_summary: Callable[[str], Coroutine[Any, Any, Optional[StateSummary]]],
     ) -> None:
         """Initialize RunsPublisher with necessary information derived from the current run.
 
@@ -87,7 +87,7 @@ class MaintenanceRunsPublisher:
     async def _handle_engine_status_change(self) -> None:
         """Publish a refetch flag if the engine status has changed."""
         if self._run_hooks is not None and self._engine_state_slice is not None:
-            new_state_summary = self._run_hooks.get_state_summary(
+            new_state_summary = await self._run_hooks.get_state_summary(
                 self._run_hooks.run_id
             )
 

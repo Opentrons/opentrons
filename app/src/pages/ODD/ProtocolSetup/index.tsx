@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import first from 'lodash/first'
 import last from 'lodash/last'
 import { css } from 'styled-components'
 
-import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -749,7 +749,6 @@ function PrepareToRun({
           runId={runId}
           setShowConfirmCancelRunModal={setShowConfirmCancelModal}
           isActiveRun={false}
-          protocolId={protocolId}
         />
       ) : null}
     </>
@@ -800,13 +799,8 @@ export function ProtocolSetup(): JSX.Element {
     useNotifyCurrentMaintenanceRun({ refetchInterval: MAINTENANCE_RUN_POLL_MS })
       .data?.data.id != null
 
-  const navigate = useNavigate()
   const [showConfirmCancelModal, setShowConfirmCancelModal] =
     useState<boolean>(false)
-
-  if (runStatus === RUN_STATUS_STOPPED && !showConfirmCancelModal) {
-    navigate('/protocols')
-  }
 
   const { data: mostRecentAnalysis = null } =
     useProtocolAnalysisAsDocumentQuery(

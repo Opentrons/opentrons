@@ -1,9 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 
-import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   COLORS,
   DIRECTION_COLUMN,
@@ -25,11 +23,7 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { useAttachedModules } from '/app/resources/modules'
-import {
-  DEFAULT_STATUS_REFETCH_INTERVAL,
-  useMostRecentCompletedAnalysis,
-  useNotifyRunQuery,
-} from '/app/resources/runs'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import {
   getAttachedProtocolModuleMatches,
   getProtocolModulesInfo,
@@ -60,16 +54,6 @@ export function ProtocolSetupModulesAndDeck({
   setSetupScreen,
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
-  const navigate = useNavigate()
-  const { data: runRecord } = useNotifyRunQuery(runId, {
-    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
-  })
-  const runStatus = runRecord?.data.status ?? null
-  useEffect(() => {
-    if (runStatus === RUN_STATUS_STOPPED) {
-      navigate('/protocols')
-    }
-  }, [runStatus, navigate])
   const [showSetupInstructionsModal, setShowSetupInstructionsModal] =
     useState<boolean>(false)
   const [showMapView, setShowMapView] = useState<boolean>(false)

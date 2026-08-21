@@ -126,7 +126,7 @@ async def get_run_data_from_url(
         run_data_manager: Current and historical run data management.
     """
     try:
-        run_data = run_data_manager.get(runId)
+        run_data = await run_data_manager.get(runId)
     except MaintenanceRunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
@@ -235,7 +235,7 @@ async def get_current_run(
             detail="No maintenance run currently running."
         ).as_error(status.HTTP_404_NOT_FOUND)
 
-    data = run_data_manager.get(current_run_id)
+    data = await run_data_manager.get(current_run_id)
     links = AllRunsLinks(
         current=ResourceLink.model_construct(href=f"/maintenance_runs/{current_run_id}")
     )
@@ -304,7 +304,7 @@ async def remove_run(
         camera_settings = None
         if run_data_manager.current_run_id is not None:
             # Import the camera settings from an external run if one exists
-            state_summary = run_data_manager._get_good_state_summary(
+            state_summary = await run_data_manager._get_good_state_summary(
                 run_data_manager.current_run_id
             )
             if (

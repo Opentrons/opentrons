@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
-  Box,
+  DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
@@ -40,24 +40,30 @@ export function GantryHoming({
   }
 
   return (
-    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-      <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.pSemiBold}
-          paddingBottom={SPACING.spacing4}
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+      <LegacyStyledText css={TYPOGRAPHY.h2SemiBold}>
+        {t('usage_settings')}
+      </LegacyStyledText>
+      <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing4}
+          width="70%"
         >
-          {t('gantry_homing')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
-          {t('gantry_homing_description')}
-        </LegacyStyledText>
-      </Box>
-      <ToggleButton
-        label="gantry_homing"
-        toggledOn={!value}
-        onClick={handleClick}
-        disabled={isRobotBusy}
-      />
+          <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+            {t('gantry_homing')}
+          </LegacyStyledText>
+          <LegacyStyledText forwardedAs="p">
+            {t('gantry_homing_description')}
+          </LegacyStyledText>
+        </Flex>
+        <ToggleButton
+          label="gantry_homing"
+          toggledOn={!value}
+          onClick={handleClick}
+          disabled={isRobotBusy}
+        />
+      </Flex>
     </Flex>
   )
 }

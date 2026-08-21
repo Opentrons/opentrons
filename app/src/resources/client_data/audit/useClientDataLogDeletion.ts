@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 
 import { useClientData, useUpdateClientData } from '@opentrons/react-api-client'
 
@@ -17,21 +17,21 @@ export function useClientDataLogDeletion(
     AxiosError
   > = {}
 ): 'pending' | 'completed' | 'failed' {
-  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
+  const { refetch, queryOptionsNotify } = useNotifyDataReady({
     topic: `robot-server/clientData/${KEYS.LOG_DELETION}`,
     options,
   })
 
-  const httpQueryResult = useClientData<LogDeletionStatus>(
+  const { data, refetch: refetchQuery } = useClientData<LogDeletionStatus>(
     KEYS.LOG_DELETION,
     queryOptionsNotify
   )
 
-  if (shouldRefetch) {
-    void httpQueryResult.refetch()
-  }
-
-  const { data } = httpQueryResult
+  useEffect(() => {
+    if (refetch > 0) {
+      void refetchQuery()
+    }
+  }, [refetch, refetchQuery])
 
   const logDeletionStatus =
     data?.data?.logPeriodId === logPeriodId ? data?.data?.status : 'pending'
