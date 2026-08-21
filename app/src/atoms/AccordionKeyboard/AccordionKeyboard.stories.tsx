@@ -4,6 +4,7 @@ import { legacy_createStore } from 'redux'
 
 import {
   DIRECTION_COLUMN,
+  InputField,
   POSITION_ABSOLUTE,
   SPACING,
   VIEWPORT,
@@ -16,6 +17,7 @@ import { FullKeyboard } from '../SoftwareKeyboard'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import type { Store, StoreEnhancer } from 'redux'
+import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
 const dummyConfig = {
   config: {
@@ -48,12 +50,22 @@ export default meta
 type Story = StoryObj<typeof AccordionKeyboardComponent>
 
 const Keyboard = (): JSX.Element => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [value, setValue] = useState('')
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(true)
-  const keyboardRef = useRef(null)
+  const keyboardRef = useRef<KeyboardReactInterface | null>(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
   return (
     <div style={{ flexDirection: DIRECTION_COLUMN, gap: SPACING.spacing16 }}>
+      <form id="test_form">
+        <InputField
+          ref={inputElementRef}
+          value={value}
+          type="text"
+          onChange={e => {
+            setValue(e.target.value)
+          }}
+        />
+      </form>
       <div
         style={{
           position: POSITION_ABSOLUTE,
@@ -69,9 +81,8 @@ const Keyboard = (): JSX.Element => {
           }}
         >
           <FullKeyboard
-            // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-            onChange={e => e != null && setValue(String(e))}
             keyboardRef={keyboardRef}
+            inputElementRef={inputElementRef}
           />
         </AccordionKeyboardComponent>
       </div>
