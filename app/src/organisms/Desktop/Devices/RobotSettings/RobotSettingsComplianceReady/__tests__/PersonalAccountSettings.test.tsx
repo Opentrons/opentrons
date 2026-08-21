@@ -129,8 +129,11 @@ describe('PersonalAccountSettings', () => {
     expect(screen.getByDisplayValue('alice')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Alice Example')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
+    expect(
+      screen.queryByRole('button', { name: 'Edit' })
+    ).not.toBeInTheDocument()
 
-    fireEvent.click(screen.getAllByRole('button', { name: 'Cancel' })[1]!)
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: 'Save' })
