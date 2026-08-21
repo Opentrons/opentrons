@@ -223,6 +223,61 @@ describe('ComplianceReadySoftwareSettings', () => {
     expect(screen.queryByText('Login and security')).not.toBeInTheDocument()
   })
 
+  it('should show password complexity confirmation before enabling requirements', async () => {
+    render()
+    expandAccordion()
+
+    fireEvent.click(
+      screen.getByRole('switch', {
+        name: 'Require password complexity requirements',
+      })
+    )
+
+    screen.getByText('Require password complexity?')
+    screen.getByText('Users will need to reset their passwords')
+    screen.getByText(
+      'Updating this setting will sign out all users and require them to reset their passwords the next time they sign in.'
+    )
+    expect(mockPatchAuthSettings).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    expect(
+      screen.queryByText('Require password complexity?')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('switch', {
+        name: 'Require password complexity requirements',
+      })
+    ).toHaveAttribute('aria-checked', 'false')
+    expect(
+      screen.queryByText('Require special characters')
+    ).not.toBeInTheDocument()
+  })
+
+  it('should patch password complexity settings when confirmation is accepted', async () => {
+    render()
+    expandAccordion()
+
+    fireEvent.click(
+      screen.getByRole('switch', {
+        name: 'Require password complexity requirements',
+      })
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+
+    await waitFor(() => {
+      expect(mockPatchAuthSettings).toHaveBeenCalledWith({
+        data: {
+          passwordComplexitySpecialCharacters: true,
+          passwordComplexityMinimumLength: 8,
+        },
+      })
+    })
+    screen.getByText('Require special characters')
+  })
+
   it('should expand password reset sub-setting and patch on blur', async () => {
     render()
     expandAccordion()

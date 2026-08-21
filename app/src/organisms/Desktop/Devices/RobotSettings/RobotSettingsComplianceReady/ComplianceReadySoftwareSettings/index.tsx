@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Divider, StyledText } from '@opentrons/components'
@@ -14,6 +14,7 @@ import {
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
 import { Accordion } from '../Accordion'
+import { SettingsConfirmationModal } from '../SettingsConfirmationModal'
 import {
   getAuditInputPatch,
   getAuthInputPatch,
@@ -74,6 +75,12 @@ export function ComplianceReadySoftwareSettings({
 }: ComplianceReadySoftwareSettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const documentationState = useDocumentationState()
+  const [
+    showPasswordComplexityConfirmModal,
+    setShowPasswordComplexityConfirmModal,
+  ] = useState(false)
+  const [passwordComplexityToggleKey, setPasswordComplexityToggleKey] =
+    useState(0)
   const authSettingsQuery = useAuthSettingsQuery()
   const auditSettingsQuery = useAuditSettingsQuery()
   const robotServerAccessControlSettingsQuery =
@@ -152,6 +159,30 @@ export function ComplianceReadySoftwareSettings({
     }
   }
 
+  const handlePasswordComplexityEnabledToggle = (toggledOn: boolean): void => {
+    if (toggledOn) {
+      setShowPasswordComplexityConfirmModal(true)
+      return
+    }
+
+    handleToggleChange('passwordComplexityEnabled', false)
+  }
+
+  const handlePasswordComplexityConfirm = (): void => {
+    patchAuthSettings({
+      data: {
+        passwordComplexitySpecialCharacters: true,
+        passwordComplexityMinimumLength: 8,
+      },
+    })
+    setShowPasswordComplexityConfirmModal(false)
+  }
+
+  const handlePasswordComplexityCancel = (): void => {
+    setShowPasswordComplexityConfirmModal(false)
+    setPasswordComplexityToggleKey(key => key + 1)
+  }
+
   return (
     <Accordion
       id="compliance-ready-software-settings"
@@ -194,12 +225,11 @@ export function ComplianceReadySoftwareSettings({
           </ComplianceReadyToggleField>
           <Divider />
           <ComplianceReadyToggleField
+            key={passwordComplexityToggleKey}
             id="passwordComplexityEnabled"
             labelKey="desktop_require_password_complexity_requirements"
             values={fieldValues}
-            onToggleChange={toggledOn => {
-              handleToggleChange('passwordComplexityEnabled', toggledOn)
-            }}
+            onToggleChange={handlePasswordComplexityEnabledToggle}
           >
             <ComplianceReadyToggleField
               id="passwordComplexitySpecialCharacters"
@@ -353,6 +383,20 @@ export function ComplianceReadySoftwareSettings({
           />
         </ComplianceReadySettingsSection>
       </div>
+      {showPasswordComplexityConfirmModal ? (
+        <SettingsConfirmationModal
+          title={t('desktop_require_password_complexity_modal_title') as string}
+          heading={
+            t('desktop_require_password_complexity_modal_heading') as string
+          }
+          description={
+            t('desktop_require_password_complexity_modal_description') as string
+          }
+          confirmLabel={t('shared:confirm') as string}
+          onConfirm={handlePasswordComplexityConfirm}
+          onCancel={handlePasswordComplexityCancel}
+        />
+      ) : null}
     </Accordion>
   )
 }

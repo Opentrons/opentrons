@@ -78,7 +78,7 @@ export const RequirePasswordComplexity: Story = {
     heading: 'Users will need to reset their passwords',
     description:
       'Updating this setting will sign out all users and require them to reset their passwords the next time they sign in.',
-    confirmLabel: 'Require password complexity',
+    confirmLabel: 'Confirm',
     ...defaultHandlers,
   },
 }

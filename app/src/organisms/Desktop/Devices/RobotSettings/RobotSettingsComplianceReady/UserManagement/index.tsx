@@ -19,7 +19,7 @@ import { useUsernameForRobot } from '/app/redux/robot-auth'
 
 import { Accordion } from '../Accordion'
 import { OneTimePasswordModal } from '../userAccount/OneTimePasswordModal'
-import { UserAccountConfirmModal } from '../userAccount/UserAccountConfirmModal'
+import { SettingsConfirmationModal } from '../SettingsConfirmationModal'
 import { AddUserModal } from './AddUserModal'
 import { EditUserModal } from './EditUserModal'
 import styles from './usermanagement.module.css'
@@ -272,7 +272,7 @@ export function UserManagement({
         />
       ) : null}
       {userToDelete != null ? (
-        <UserAccountConfirmModal
+        <SettingsConfirmationModal
           title={t('desktop_delete_user_modal_title') as string}
           heading={t('desktop_delete_user_modal_heading') as string}
           description={t('desktop_delete_user_modal_description') as string}
@@ -284,7 +284,7 @@ export function UserManagement({
         />
       ) : null}
       {userToActivate != null ? (
-        <UserAccountConfirmModal
+        <SettingsConfirmationModal
           title={t('desktop_activate_user_modal_title') as string}
           heading={t('desktop_activate_user_modal_heading') as string}
           description={t('desktop_activate_user_modal_description') as string}
@@ -297,7 +297,7 @@ export function UserManagement({
         />
       ) : null}
       {userToDeactivate != null ? (
-        <UserAccountConfirmModal
+        <SettingsConfirmationModal
           title={t('desktop_lock_user_modal_title') as string}
           heading={t('desktop_lock_user_modal_heading') as string}
           description={t('desktop_lock_user_modal_description') as string}
@@ -310,7 +310,7 @@ export function UserManagement({
         />
       ) : null}
       {userToResetPassword != null && resetPasswordTemporaryPassword == null ? (
-        <UserAccountConfirmModal
+        <SettingsConfirmationModal
           title={t('desktop_reset_password') as string}
           heading={t('desktop_reset_password_modal_heading') as string}
           description={t('desktop_reset_password_modal_description') as string}
