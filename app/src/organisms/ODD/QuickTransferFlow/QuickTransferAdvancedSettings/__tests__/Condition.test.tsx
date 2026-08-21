@@ -18,6 +18,8 @@ let mockTrackEventWithRobotSerial: any
 const modifiedQuickTransferState = {
   ...QuickTransferState,
   path: 'multiAspirate',
+  // leaves 8 µL of the 10 µL tip free for conditioning
+  volume: 1,
 }
 
 const render = (props: ComponentProps<typeof Condition>) => {
@@ -91,12 +93,11 @@ describe('Condition', () => {
     screen.getByText('Continue')
     await user.click(screen.getByText('Enabled'))
     await user.click(screen.getByText('Continue'))
-    await user.click(screen.getByRole('button', { name: '1' }))
-    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByRole('button', { name: '8' }))
     await user.click(screen.getByText('Save'))
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_CONDITION_ASPIRATE',
-      conditionAspirate: 11,
+      conditionAspirate: 8,
     })
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalledWith({
       name: 'quickTransferSettingSaved',
