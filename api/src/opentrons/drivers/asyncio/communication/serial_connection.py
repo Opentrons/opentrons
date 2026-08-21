@@ -5,6 +5,10 @@ import logging
 import os
 from typing import AsyncIterator, Literal, Type
 
+from serial.serialutil import (  # type: ignore[import-untyped]
+    SerialException as PySerialSerialException,
+)
+
 from .async_serial import AsyncSerial
 from .errors import (
     AlarmResponse,
@@ -720,17 +724,6 @@ class AsyncResponseSerialConnection(SerialConnection):
             ackless_responses.append(str_response)
         return ackless_responses
 
-    @staticmethod
-    def _is_retryable_send_error(error: BaseException) -> bool:
-        """Return whether a send failure should be retried.
-
-        Device-reported failures (error/alarm responses, including async module
-        errors such as ``async ERR401:...``) are permanent or one-shot. Retrying
-        them can consume the only notification and leave higher layers thinking
-        the command succeeded.
-        """
-        return not isinstance(error, FailedCommand)
-
     async def _send_data_multiack(
         self, data: str, retries: int, acks: int
     ) -> list[str]:
@@ -773,13 +766,36 @@ class AsyncResponseSerialConnection(SerialConnection):
                 responses = await self._send_one_retry(data, acks)
                 if responses:
                     return responses
-            except Exception as error:
+            except FailedCommand as error:
+                # Device-reported failures (error/alarm responses, including async module
+                # errors such as ``async ERR401:...``) are permanent or one-shot. Retrying
+                # them can consume the only notification and leave higher layers thinking
+                # the command succeeded. Also they are expected responses, dont log the
+                # error as a traceback.
+                log.info("Device reported an error during send: %s", error)
+                raise
+            except PySerialSerialException as error:
+                # Unplug / I/O errors are expected while a module is disappearing.
+                # Retry without a traceback; the poller already logs the final failure.
+                if retry < retries and not self._closed_on_purpose:
+                    log.warning(
+                        "%s: send failed (%s); retrying %s/%s",
+                        self._name,
+                        error,
+                        retry,
+                        retries,
+                    )
+                else:
+                    log.warning(
+                        "%s: send failed after %s retries: %s",
+                        self._name,
+                        retries,
+                        error,
+                    )
+                    raise
+            except Exception:
                 log.exception("Got an error during send")
-                if (
-                    retry < retries
-                    and not self._closed_on_purpose
-                    and self._is_retryable_send_error(error)
-                ):
+                if retry < retries and not self._closed_on_purpose:
                     pass
                 else:
                     log.warning(f"Already used {retry} {retries} and raising error")

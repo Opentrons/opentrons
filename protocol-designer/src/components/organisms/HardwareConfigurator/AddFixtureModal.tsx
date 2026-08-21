@@ -42,6 +42,10 @@ import { getSlotInLocationStack, uuid } from '@opentrons/step-generation'
 
 import { editDeckConfiguration } from '/protocol-designer/step-forms/actions'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+import {
+  isCutoutBlockedByExistingVacuumModule,
+  wouldVacuumModuleBlockExistingModule,
+} from '/protocol-designer/utils/vacuumModuleSlotRestrictions'
 
 import { mapFixtureIdToFixtureName } from '../FlexHardware/util'
 import { useKitchen } from '../Kitchen/useKitchen'
@@ -144,13 +148,19 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       ]
       setAllFixtureOptions(options)
       const moduleOptions = [
-        ...getModuleOptions(cutoutId, addressableAreaId, deckDef, fixtures),
+        ...getModuleOptions(
+          cutoutId,
+          addressableAreaId,
+          deckDef,
+          fixtures,
+          modules
+        ),
       ]
       setAllModuleOptions(moduleOptions)
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [cutoutId, addressableAreaId, existingCutoutFixtureId]
+    [cutoutId, addressableAreaId, existingCutoutFixtureId, modules]
   )
 
   const modalProps: ModalProps = {
@@ -169,6 +179,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     deckDefinition: deckDef,
     addressableAreaId,
     fixtures,
+    modules,
   })
 
   let nextStageOptions = null
@@ -260,6 +271,23 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         ))
     ) {
       return t('thermocycler_blocked') as string
+    }
+    const addedModuleModels = addedCutoutConfigs.map(cutoutConfig =>
+      getModuleModelFromFixtureId(
+        cutoutConfig.cutoutFixtureId as CutoutFixtureId
+      )
+    )
+    if (
+      addedModuleModels.includes(VACUUM_MODULE_V1) &&
+      wouldVacuumModuleBlockExistingModule(cutoutId, modules)
+    ) {
+      return t('vacuum_module_adjacent_to') as string
+    }
+    if (
+      addedModuleModels.some(model => model != null) &&
+      isCutoutBlockedByExistingVacuumModule(addressableAreaId, modules)
+    ) {
+      return t('vacuum_module_adjacent') as string
     }
     return null
   }

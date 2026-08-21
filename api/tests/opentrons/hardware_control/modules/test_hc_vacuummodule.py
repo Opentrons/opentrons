@@ -3,7 +3,7 @@ from typing import AsyncGenerator, List, Optional, Union
 from unittest import mock
 
 import pytest
-from decoy import Decoy
+from decoy import Decoy, matchers
 
 from opentrons_shared_data.errors.exceptions import (
     VacuumModulePressureNotReachedError,
@@ -1399,6 +1399,57 @@ async def test_execute_profile_continues_after_natural_duration_end(
             rate=None,
             vent_after=False,
         ),
+    )
+
+
+def test_async_error_callback_does_not_escalate_parse_errors(
+    subject: modules.VacuumModule,
+    module_error_callback: ModuleErrorCallback,
+    decoy: Decoy,
+) -> None:
+    """A poll parse miss must not become an asynchronous module error."""
+    parse_error = ValueError(
+        "Incorrect Response for get pump state: "
+        "M121 T:0.0 C:-5.7 A:1008.6 B:1007.4 H:1013.1 E:0 D:0 V:1"
+    )
+
+    subject._reader.on_error(parse_error)
+
+    decoy.verify(
+        module_error_callback(
+            matchers.Anything(),
+            matchers.Anything(),
+            matchers.Anything(),
+            matchers.Anything(),
+        ),
+        times=0,
+    )
+    assert subject._reader.error is not None
+    assert "Incorrect Response for get pump state" in subject._reader.error
+
+
+def test_reader_on_error_still_escalates_firmware_errors(
+    subject: modules.VacuumModule,
+    module_error_callback: ModuleErrorCallback,
+    decoy: Decoy,
+) -> None:
+    """Firmware poll errors should still reach the module error callback."""
+    _set_reader_async_error_context(
+        subject._reader,
+        mode=VacuumOperationMode.PRESSURE,
+        target=-500.0,
+        current=-300.0,
+    )
+    subject._reader.on_error(
+        WasteContainerFull("port", "async ERR401:waste full", "M121")
+    )
+    decoy.verify(
+        module_error_callback(
+            VacuumModuleWasteFullError("dummySerialFS", "pressure", -500.0, -300.0),
+            "vacuumModuleV1",
+            "/dev/ot_module_sim_vacuummodule0",
+            "dummySerialFS",
+        )
     )
 
 
