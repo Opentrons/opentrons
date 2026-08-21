@@ -12,7 +12,7 @@ interface PasswordVisibilityToggleProps {
 }
 
 /**
- * On-device display "Show / Hide" button rendered next to a password input.
+ * "Show / Hide" button rendered next to a password input.
  */
 export function PasswordVisibilityToggle({
   isVisible,
@@ -30,8 +30,11 @@ export function PasswordVisibilityToggle({
       onClick={onToggle}
       className={styles.toggle_button}
     >
-      <Icon name={isVisible ? 'eye-slash' : 'eye'} size="3rem" />
-      <StyledText oddStyle="bodyTextSemiBold">
+      <Icon name={isVisible ? 'eye-slash' : 'eye'} className={styles.icon} />
+      <StyledText
+        oddStyle="bodyTextSemiBold"
+        desktopStyle="bodyDefaultSemiBold"
+      >
         {isVisible ? t('hide') : t('show')}
       </StyledText>
     </button>
