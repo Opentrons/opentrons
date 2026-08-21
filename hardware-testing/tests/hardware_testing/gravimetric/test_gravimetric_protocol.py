@@ -9,8 +9,10 @@ from typing import Any, Dict, List, Optional
 from pathlib import Path
 import glob
 import csv
+from unittest.mock import MagicMock, call, patch
 import pytest
 
+from hardware_testing.gravimetric.protocol_replacement import gravimetric
 from hardware_testing.gravimetric.protocol_replacement.gravimetric import CSVSettings
 
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
@@ -96,6 +98,68 @@ def test_all_csvs_are_valid() -> None:
             reader = csv.reader(input_file)
             csv_params = [row for row in reader]
             CSVSettings.parse_csv(csv_params, False)
+
+
+def test_liquid_height_calibration_is_triggered_by_volume_not_tip() -> None:
+    """Calibrate on volume changes, but not when only the tip size changes."""
+    fixture_settings = MagicMock()
+
+    with patch.object(gravimetric, "_calibrate_liquid_height_for_volume") as calibrate:
+        previous_volume = gravimetric._calibrate_liquid_height_if_volume_changed(
+            fixture_settings,
+            tip=50,
+            test_volume=1.0,
+            previous_volume=None,
+            tip_already_attached=True,
+        )
+        previous_volume = gravimetric._calibrate_liquid_height_if_volume_changed(
+            fixture_settings,
+            tip=20,
+            test_volume=1.0,
+            previous_volume=previous_volume,
+        )
+        gravimetric._calibrate_liquid_height_if_volume_changed(
+            fixture_settings,
+            tip=20,
+            test_volume=5.0,
+            previous_volume=previous_volume,
+        )
+
+    assert calibrate.call_args_list == [
+        call(
+            fixture_settings,
+            50,
+            1.0,
+            tip_already_attached=True,
+        ),
+        call(
+            fixture_settings,
+            20,
+            5.0,
+            tip_already_attached=False,
+        ),
+    ]
+
+
+@pytest.mark.parametrize("use_lld", [True, False])
+def test_liquid_height_calibration_mode_is_selected_by_parameter(
+    use_lld: bool,
+) -> None:
+    """Keep the runtime parameter as the automatic/manual LLD selector."""
+    fixture_settings = MagicMock()
+    fixture_settings.use_lld = use_lld
+
+    with patch.object(gravimetric, "_manually_set_liquid_height") as manual_lld:
+        gravimetric._initialize_liquid_height(fixture_settings, test_volume=5.0)
+
+    if use_lld:
+        fixture_settings.pipette.require_liquid_presence.assert_called_once_with(
+            fixture_settings.liquid_source
+        )
+        manual_lld.assert_not_called()
+    else:
+        fixture_settings.pipette.require_liquid_presence.assert_not_called()
+        manual_lld.assert_called_once_with(fixture_settings, 5.0)
 
 
 @pytest.mark.parametrize(

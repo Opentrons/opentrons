@@ -276,7 +276,6 @@ class CSVSettings:
     slot_scale: str
     retract_discontinuity: float
     disc_ver_cuttoff: int
-    lld_every_tip: bool
     single_tip_96: bool
     cavity_test: bool
     touch_blank: bool
@@ -365,7 +364,6 @@ class CSVSettings:
         )
         disc_ver_cuttoff = int(lookup_key("disc_ver_cuttoff", csv_params)[0])
         gantry_speed = int(lookup_key("gantry_speed", csv_params)[0])
-        lld_every_tip = bool(lookup_key("lld_every_tip", csv_params)[0] == "TRUE")
         single_tip_96 = bool(lookup_key("single_tip_96", csv_params)[0] == "TRUE")
         cavity_test = bool(lookup_key("cavity_test", csv_params)[0] == "TRUE")
         touch_blank = bool(lookup_key("touch_blank", csv_params)[0] == "TRUE")
@@ -430,7 +428,6 @@ class CSVSettings:
             slot_scale=slot_scale,
             retract_discontinuity=retract_discontinuity,
             disc_ver_cuttoff=disc_ver_cuttoff,
-            lld_every_tip=lld_every_tip,
             single_tip_96=single_tip_96,
             cavity_test=cavity_test,
             touch_blank=touch_blank,
@@ -464,7 +461,6 @@ class FixtureSettings(CSVSettings):
     use_impact_protection: bool
     use_lld: bool
     ImpactSerial_U: Optional[ImpactProtectionV2.ImpactProtectionBase]
-    manual_lld_completed: bool = False
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -1491,9 +1487,7 @@ def run_one_test(
         fixture_settings, MeasurementType.INIT, tip, volume, trial, channel=channel
     )
     liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
-    if fixture_settings.lld_every_tip and fixture_settings.use_lld:
-        fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
-    elif last_measurement:
+    if last_measurement:
         volume_lost_since_last_trial = calculate_change_in_volume(
             last_measurement, pre_aspirate, liq
         )
@@ -1787,6 +1781,7 @@ function render(state) {
   const step = Number(state.jog_step_mm);
   if (Number.isFinite(step) && !stepIsEditing) stepInput.value = step;
   document.getElementById('details').textContent = [
+    `目标体积：${state.test_volume_ul ?? '--'} µL`,
     `孔位：${state.source_well || '--'}`,
     `累计 Z 移动：${Number(state.cumulative_z_mm || 0).toFixed(3)} mm`,
     `允许范围：${state.minimum_height_from_bottom_mm || '--'} - ${state.source_well_depth_mm || '--'} mm`
@@ -2257,13 +2252,11 @@ def _wait_for_manual_lld_confirmation(
         sleep(MANUAL_LLD_POLL_INTERVAL_SECONDS)
 
 
-def _manually_set_liquid_height(fixture_settings: FixtureSettings) -> None:
+def _manually_set_liquid_height(
+    fixture_settings: FixtureSettings, test_volume: float
+) -> None:
     """Start the jog UI, wait for confirmation, and update liquid tracking."""
-    if fixture_settings.manual_lld_completed:
-        print_info("Reusing the manually calibrated liquid height.")
-        return
     if fixture_settings.ctx.is_simulating():
-        fixture_settings.manual_lld_completed = True
         print_info("Simulating manual LLD with the configured source liquid volume.")
         return
 
@@ -2293,6 +2286,7 @@ def _manually_set_liquid_height(fixture_settings: FixtureSettings) -> None:
         "created_at": time(),
         "pipette_id": pipette_id,
         "pipette_mount": fixture_settings.mount,
+        "test_volume_ul": test_volume,
         "source_labware_uri": source_well.parent.uri,
         "source_well": source_well.well_name,
         "start_height_from_bottom_mm": start_height,
@@ -2311,10 +2305,11 @@ def _manually_set_liquid_height(fixture_settings: FixtureSettings) -> None:
     )
     try:
         fixture_settings.ctx.pause(
-            "Manual liquid-height detection: open "
+            f"Manual liquid-height detection for {test_volume:g} uL: open "
             f"{service.url} in a browser. Click 'Start', jog the pipette down to "
             "the liquid surface, then save the height. / 手动液面检测：请在浏览器"
-            f"打开 {service.url}，点击“开始调节”，移动枪头并保存高度。"
+            f"打开 {service.url}，为 {test_volume:g} uL 测试点击“开始调节”，"
+            "移动枪头并保存高度。"
         )
         state, height_from_bottom = _wait_for_manual_lld_confirmation(
             session_id=session_id,
@@ -2342,7 +2337,6 @@ def _manually_set_liquid_height(fixture_settings: FixtureSettings) -> None:
             "Could not convert the confirmed manual liquid height to a volume."
         )
     source_well.load_liquid(fixture_settings.liquid, float(liquid_volume))
-    fixture_settings.manual_lld_completed = True
     print_info(
         "Manual liquid height confirmed: "
         f"{height_from_bottom:.3f} mm from well bottom "
@@ -2350,12 +2344,56 @@ def _manually_set_liquid_height(fixture_settings: FixtureSettings) -> None:
     )
 
 
-def _initialize_liquid_height(fixture_settings: FixtureSettings) -> None:
-    """Initialize the source liquid height using LLD or manual calibration."""
+def _initialize_liquid_height(
+    fixture_settings: FixtureSettings, test_volume: float
+) -> None:
+    """Calibrate source liquid height for a test volume."""
+    print_info(f"Calibrating liquid height for {test_volume:g} uL.")
     if fixture_settings.use_lld:
         fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
     else:
-        _manually_set_liquid_height(fixture_settings)
+        _manually_set_liquid_height(fixture_settings, test_volume)
+
+
+def _calibrate_liquid_height_for_volume(
+    fixture_settings: FixtureSettings,
+    tip: int,
+    test_volume: float,
+    *,
+    tip_already_attached: bool = False,
+) -> None:
+    """Calibrate liquid height before testing a new volume."""
+    if not tip_already_attached:
+        _configure_tip_count(fixture_settings, 0)
+        probe_tip = _get_tips_for_test(fixture_settings, tip, False)[0]
+        pick_up_tip_for_channel(fixture_settings, probe_tip, 0)
+
+    fixture_settings.pipette._retract()
+    maybe_switch_mode(fixture_settings, tip)
+    _initialize_liquid_height(fixture_settings, test_volume)
+    fixture_settings.pipette._retract()
+
+    if not tip_already_attached:
+        remove_tip(fixture_settings)
+
+
+def _calibrate_liquid_height_if_volume_changed(
+    fixture_settings: FixtureSettings,
+    tip: int,
+    test_volume: float,
+    previous_volume: Optional[float],
+    *,
+    tip_already_attached: bool = False,
+) -> float:
+    """Calibrate only when entering a different test volume."""
+    if previous_volume != test_volume:
+        _calibrate_liquid_height_for_volume(
+            fixture_settings,
+            tip,
+            test_volume,
+            tip_already_attached=tip_already_attached,
+        )
+    return test_volume
 
 
 def calculate_evaporation(
@@ -2365,13 +2403,7 @@ def calculate_evaporation(
     tip: Well,
 ) -> Tuple[List[List[MeasurementData]], float, float]:
     """This is done at the begining of the test and during the cavity test it happens again for each cavity."""
-    print_info("Detecting liquid height.")
-
-    # Z轴在秤的上方，调用switch_mode
-    fixture_settings.pipette._retract()
-    maybe_switch_mode(fixture_settings, fixture_settings.tip_sizes[0])
-
-    _initialize_liquid_height(fixture_settings)
+    print_info("Calculating evaporation.")
     print_info(
         f"Test source has {fixture_settings.liquid_source.current_liquid_volume()}"
     )
@@ -2447,7 +2479,15 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     print_info("Picking up first tip.")
     _configure_tip_count(fixture_settings, 0)
     pick_up_tip_for_channel(fixture_settings, first_tip, 0)
-    last_probed_tip_size = fixture_settings.tip_sizes[0]
+    first_tip_size = fixture_settings.tip_sizes[0]
+    first_test_volume = fixture_settings.volumes[first_tip_size][0]
+    last_calibrated_volume = _calibrate_liquid_height_if_volume_changed(
+        fixture_settings,
+        first_tip_size,
+        first_test_volume,
+        None,
+        tip_already_attached=True,
+    )
     liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
     blank_measurments, avg_asp_evap, avg_disp_evap = calculate_evaporation(
         ctx, fixture_settings, liq, first_tip
@@ -2458,21 +2498,13 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     last_measurement: Optional[MeasurementData] = blank_measurments[-1][-1]
     tip_sizes_done = []
     for tip in fixture_settings.tip_sizes:
-        if tip != last_probed_tip_size:
-            if fixture_settings.use_lld:
-                _configure_tip_count(fixture_settings, 0)
-                probe_tip = _get_tips_for_test(fixture_settings, tip, False)[0]
-                pick_up_tip_for_channel(fixture_settings, probe_tip, 0)
-                fixture_settings.pipette.require_liquid_presence(
-                    fixture_settings.liquid_source
-                )
-                remove_tip(fixture_settings)
-            last_probed_tip_size = tip
-
         volumes_to_tests = fixture_settings.volumes[tip]
         if tip in tip_sizes_done or len(fixture_settings.volumes[tip]) == 0:
             volumes_to_tests = fixture_settings.extra_volumes[tip]
         for volume in volumes_to_tests:
+            last_calibrated_volume = _calibrate_liquid_height_if_volume_changed(
+                fixture_settings, tip, volume, last_calibrated_volume
+            )
             trial_asp_dict: Dict[int, List[float]] = {
                 t: [] for t in range(fixture_settings.trials)
             }
@@ -2487,16 +2519,11 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 # override pipette movement conflict checking 'cause we specially lay out our tipracks
                 tips = _get_tips_for_test(fixture_settings, tip, False, channel)
                 print_info(str(tips))
-                if channel == 7 and fixture_settings.use_lld:
-                    # we're doing an 8 channel test and just swapped over to the front channel.
+                if channel == 7:
+                    # Skip evaporation loss across the 8-channel nozzle-layout transition.
                     print_info(
-                        "Switching to channel 7, running LLD again and skipping evap loss application."
+                        "Switching to channel 7 and skipping evap loss application."
                     )
-                    pick_up_tip_for_channel(fixture_settings, tips.pop(0), channel)
-                    fixture_settings.pipette.require_liquid_presence(
-                        fixture_settings.liquid_source
-                    )
-                    remove_tip(fixture_settings)
                     last_measurement = None
                 actual_asp_list_channel: List[float] = []
                 actual_disp_list_channel: List[float] = []
