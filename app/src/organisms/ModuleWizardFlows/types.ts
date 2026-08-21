@@ -14,6 +14,7 @@ export type ModuleSetupWizardStep =
   | CheckInstallationPinsStep
   | InstallShuttleStep
   | UpdateFirmwareStep
+  | VerifyVacuumStep
 
 export type ModuleWizardAction =
   | ModuleWizardBuildFlowAction
@@ -93,6 +94,9 @@ export interface InstallShuttleStep {
 }
 export interface UpdateFirmwareStep {
   section: typeof SECTIONS.UPDATE_FIRMWARE
+}
+export interface VerifyVacuumStep {
+  section: typeof SECTIONS.VERIFY_VACUUM
 }
 export interface SelectLocationStep {
   section: typeof SECTIONS.SELECT_LOCATION

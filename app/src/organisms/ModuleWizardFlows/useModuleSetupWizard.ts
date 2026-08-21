@@ -2,6 +2,7 @@ import { useEffect, useReducer, useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
+import { VACUUM_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
 import { getIsOnDevice } from '/app/redux/config'
@@ -14,6 +15,7 @@ import {
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
 import { ACTIONS } from './constants'
+import { getVacuumCleanupCommands } from './getVerifyVacuumCommands'
 import { useSendIdentifyModule } from './hooks'
 import { moduleSetupWizardReducer } from './moduleSetupWizardReducer'
 
@@ -166,9 +168,16 @@ export function useModuleSetupWizard(
       console.log(
         'closing module setup wizard: homing and clearing maintenance run'
       )
+      const vacuumCleanupCommands =
+        attachedModule?.moduleType === VACUUM_MODULE_TYPE
+          ? getVacuumCleanupCommands(String(attachedModule.id))
+          : []
       chainRunCommands(
         maintenanceRunId,
-        [{ commandType: 'home' as const, params: {} }],
+        [
+          ...vacuumCleanupCommands,
+          { commandType: 'home' as const, params: {} },
+        ],
         true
       )
         .then(() => {
