@@ -56,11 +56,10 @@ export function RobotCertImportModal(
       zIndexOverlay={10000}
     >
       <div className={styles.robot_cert_import_container}>
-        <div>
+        <div className={styles.text_block}>
           <StyledText desktopStyle="headingSmallBold">
             {t('verify_robot_encryption_key')}
           </StyledText>
-
           <StyledText desktopStyle="bodyDefaultRegular">
             {t('verify_the_robot_encryption_key_to_use_the_robot')}
           </StyledText>
