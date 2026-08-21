@@ -50,7 +50,6 @@ export function ChooseNumber({
   }
 
   const paramValueAsNumber = paramValue !== '' ? Number(paramValue) : null
-  const resetValueDisabled = parameter.default === paramValueAsNumber
   const { min, max } = parameter
   const error =
     Number.isNaN(paramValueAsNumber) ||
@@ -83,10 +82,6 @@ export function ChooseNumber({
         buttonType="tertiaryLowLight"
         buttonText={t('restore_default')}
         onClickButton={() => {
-          if (resetValueDisabled) {
-            makeSnackbar(t('no_custom_values') as string)
-            return
-          }
           setParamValue(String(parameter.default))
         }}
       />
