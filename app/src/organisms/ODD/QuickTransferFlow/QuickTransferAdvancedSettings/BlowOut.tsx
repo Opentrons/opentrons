@@ -192,6 +192,8 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
         type: ACTIONS.SET_BLOW_OUT,
         blowOutSettings: {
           location: blowOutLocation,
+          // todo(mm, 2026-08-21): This fallback to 1 is inherited from prior code,
+          // but it seems sneaky. We should probably refuse to save/continue if result !== 'success'
           flowRate: parsedSpeed.result === 'success' ? parsedSpeed.data : 1,
         },
       })
