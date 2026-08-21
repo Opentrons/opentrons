@@ -61,7 +61,9 @@ export function ChooseNumber({
 
   const handleClickGoBack = (): void => {
     if (parsedValue.result !== 'success') {
-      makeSnackbar(t('value_out_of_range_generic') as string)
+      makeSnackbar(
+        (valueErrorMessage ?? t('value_out_of_range_generic')) as string
+      )
     } else {
       setParameter(parsedValue.data, parameter.variableName)
       handleGoBack()

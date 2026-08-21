@@ -105,7 +105,19 @@ describe('ChooseNumber', () => {
     await user.click(numKey)
     await user.click(numKey)
     await user.click(screen.getAllByRole('button')[0])
-    expect(mockMakeSnackbar).toHaveBeenCalledWith('Value must be in range')
+    expect(mockMakeSnackbar).toHaveBeenCalledWith('Value must be between 1-10')
+  })
+
+  it('should call mock snack bar with the syntax error when going back with invalid input', async () => {
+    const user = userEvent.setup()
+    props = { ...props, parameter: mockFloatNumberParameterData }
+    render(props)
+    fireEvent.change(screen.getByLabelText('EtoH Volume'), {
+      target: { value: '1.' },
+    })
+    await user.click(screen.getAllByRole('button')[0])
+    expect(mockMakeSnackbar).toHaveBeenCalledWith('Enter a valid number')
+    expect(mockHandleGoBack).not.toHaveBeenCalled()
   })
 
   it('should delete external keyboard input with the numerical keyboard', async () => {
