@@ -18,10 +18,7 @@ from opentrons_shared_data.errors.exceptions import (
     LabwareDroppedError,
     StallOrCollisionDetectedError,
 )
-from opentrons_shared_data.gripper.constants import (
-    GRIPPER_JAW_WIDTH_MAX,
-    GRIPPER_PADDLE_WIDTH,
-)
+from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     LabwareDefinition2,
@@ -49,7 +46,6 @@ from ..types import (
     LabwareMovementStrategy,
     LabwareOffsetVector,
     LoadableLabwareLocation,
-    LoadedLabware,
     ModuleLocation,
     ModuleModel,
     NotOnDeckLocationSequenceComponent,
@@ -81,24 +77,11 @@ def _remove_default(s: dict[str, Any]) -> None:
 _TRASH_CHUTE_DROP_BUFFER_MM = 8
 
 
-def get_neighbors_wider_than_gripper_jaws(
-    location: LabwareLocation, state_view: StateView
-) -> List[LoadedLabware]:
-    """Return north/south neighbors whose Y extent exceeds the gripper's max jaw width."""
-    wide_neighbors = []
-    neighbors = state_view.geometry.get_north_south_neighbors(location)
-    for labware in neighbors:
-        dimensions = state_view.labware.get_dimensions(labware_id=labware.id)
-        if dimensions.y > GRIPPER_JAW_WIDTH_MAX:
-            wide_neighbors.append(labware)
-    return wide_neighbors
-
-
 def _has_vacuum_collar_neighbor(
     location: LabwareLocation, state_view: StateView
 ) -> bool:
-    neighbors = get_neighbors_wider_than_gripper_jaws(location, state_view)
-    for labware in neighbors:
+    """Return True if a north/south neighbor is a vacuum module collar."""
+    for labware in state_view.geometry.get_north_south_neighbors(location):
         lw_def = state_view.labware.get_definition(labware_id=labware.id)
         if labware_validation.validate_definition_is_vacuum_module_dock(lw_def):
             return True

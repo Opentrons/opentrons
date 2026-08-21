@@ -13,10 +13,7 @@ from opentrons_shared_data.errors.exceptions import (
     LabwareDroppedError,
     StallOrCollisionDetectedError,
 )
-from opentrons_shared_data.gripper.constants import (
-    GRIPPER_JAW_WIDTH_MAX,
-    GRIPPER_PADDLE_WIDTH,
-)
+from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
 from opentrons_shared_data.labware.labware_definition import (
     Dimensions,
     LabwareDefinition,
@@ -33,7 +30,6 @@ from opentrons.protocol_engine.commands.move_labware import (
     MoveLabwareResult,
     VacuumModuleUnderVacuumMovementError,
     _has_vacuum_collar_neighbor,
-    get_neighbors_wider_than_gripper_jaws,
 )
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
@@ -61,7 +57,6 @@ from opentrons.protocol_engine.types import (
     OnLabwareLocationSequenceComponent,
 )
 from opentrons.protocol_engine.types.module import LoadedModule, ModuleModel
-from opentrons.protocol_engine.types.util import Dimensions as EngineDimensions
 from opentrons.types import DeckSlotName, Point
 
 
@@ -392,9 +387,6 @@ async def test_gripper_move_labware_implementation(
             sentinel.from_location_validated_for_gripper
         )
     ).then_return([collar])
-    decoy.when(state_view.labware.get_dimensions(labware_id="collar-id")).then_return(
-        EngineDimensions(x=150.5, y=108.6, z=71.68)
-    )
     decoy.when(state_view.labware.get_definition(labware_id="collar-id")).then_return(
         collar_def
     )
@@ -406,9 +398,6 @@ async def test_gripper_move_labware_implementation(
             sentinel.new_location_validated_for_gripper
         )
     ).then_return([adapter])
-    decoy.when(state_view.labware.get_dimensions(labware_id="adapter-id")).then_return(
-        EngineDimensions(x=156.5, y=93.0, z=132.0)
-    )
     decoy.when(state_view.labware.get_definition(labware_id="adapter-id")).then_return(
         adapter_def
     )
@@ -1550,30 +1539,10 @@ def _neighbor(labware_id: str, slot: DeckSlotName) -> LoadedLabware:
     )
 
 
-def test_get_gripper_wide_neighbors_keeps_labware_wider_than_jaws(
+def test_has_vacuum_collar_neighbor_true_for_collar(
     decoy: Decoy, state_view: StateView
 ) -> None:
-    """Only north/south neighbors with Y greater than max jaw width are wide."""
-    location = DeckSlotLocation(slotName=DeckSlotName.SLOT_B3)
-    wide = _neighbor("wide-id", DeckSlotName.SLOT_A3)
-    exact = _neighbor("exact-id", DeckSlotName.SLOT_C3)
-    decoy.when(state_view.geometry.get_north_south_neighbors(location)).then_return(
-        [wide, exact]
-    )
-    decoy.when(state_view.labware.get_dimensions(labware_id="wide-id")).then_return(
-        EngineDimensions(x=150.5, y=GRIPPER_JAW_WIDTH_MAX + 0.1, z=50)
-    )
-    decoy.when(state_view.labware.get_dimensions(labware_id="exact-id")).then_return(
-        EngineDimensions(x=128, y=GRIPPER_JAW_WIDTH_MAX, z=50)
-    )
-
-    assert get_neighbors_wider_than_gripper_jaws(location, state_view) == [wide]
-
-
-def test_has_vacuum_collar_neighbor_true_for_wide_collar(
-    decoy: Decoy, state_view: StateView
-) -> None:
-    """A wide vacuum-module collar on a north/south neighbor restricts the gripper."""
+    """A vacuum-module collar on a north/south neighbor restricts the gripper."""
     location = DeckSlotLocation(slotName=DeckSlotName.SLOT_B3)
     collar = _neighbor("collar-id", DeckSlotName.SLOT_A3)
     collar_def = LabwareDefinition2.model_construct(
@@ -1586,9 +1555,6 @@ def test_has_vacuum_collar_neighbor_true_for_wide_collar(
     decoy.when(state_view.geometry.get_north_south_neighbors(location)).then_return(
         [collar]
     )
-    decoy.when(state_view.labware.get_dimensions(labware_id="collar-id")).then_return(
-        EngineDimensions(x=150.5, y=108.6, z=71.68)
-    )
     decoy.when(state_view.labware.get_definition(labware_id="collar-id")).then_return(
         collar_def
     )
@@ -1599,10 +1565,10 @@ def test_has_vacuum_collar_neighbor_true_for_wide_collar(
     assert _has_vacuum_collar_neighbor(location, state_view) is True
 
 
-def test_has_vacuum_collar_neighbor_false_for_wide_non_collar(
+def test_has_vacuum_collar_neighbor_false_for_non_collar(
     decoy: Decoy, state_view: StateView
 ) -> None:
-    """Wide non-collar neighbors (96 adapter, riser) do not restrict the gripper."""
+    """Non-collar neighbors (96 adapter, riser) do not restrict the gripper."""
     location = DeckSlotLocation(slotName=DeckSlotName.SLOT_B3)
     adapter = _neighbor("adapter-id", DeckSlotName.SLOT_A3)
     adapter_def = LabwareDefinition2.model_construct(
@@ -1614,9 +1580,6 @@ def test_has_vacuum_collar_neighbor_false_for_wide_non_collar(
     )
     decoy.when(state_view.geometry.get_north_south_neighbors(location)).then_return(
         [adapter]
-    )
-    decoy.when(state_view.labware.get_dimensions(labware_id="adapter-id")).then_return(
-        EngineDimensions(x=156.5, y=93.0, z=132.0)
     )
     decoy.when(state_view.labware.get_definition(labware_id="adapter-id")).then_return(
         adapter_def

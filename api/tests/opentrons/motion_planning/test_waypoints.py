@@ -12,7 +12,7 @@ from opentrons.motion_planning import (
     get_waypoints,
 )
 from opentrons.motion_planning.types import GripperMovementWaypointsWithJawStatus
-from opentrons.motion_planning.waypoints import GRIPPER_JAW_OPEN_ABOVE_GRIP_MM
+from opentrons.motion_planning.waypoints import GRIPPER_JAW_OPEN_ABOVE_LABWARE_MM
 from opentrons.types import Point
 
 
@@ -314,6 +314,7 @@ def test_get_gripper_labware_movement_waypoint_with_slide() -> None:
 
 def test_get_gripper_labware_movement_waypoints_vacuum_adjacent() -> None:
     """Near a vacuum module, open jaws only close to the labware."""
+    height_above_grip = 40.0
     result = get_gripper_labware_movement_waypoints(
         from_labware_center=Point(101, 102, 119.5),
         to_labware_center=Point(201, 202, 219.5),
@@ -321,9 +322,10 @@ def test_get_gripper_labware_movement_waypoints_vacuum_adjacent() -> None:
         post_drop_slide_offset=None,
         restrict_pickup_approach=True,
         restrict_drop_retract=True,
+        labware_height_above_grip=height_above_grip,
     )
-    pickup_hover_z = 119.5 + GRIPPER_JAW_OPEN_ABOVE_GRIP_MM
-    drop_hover_z = 219.5 + GRIPPER_JAW_OPEN_ABOVE_GRIP_MM
+    pickup_hover_z = 119.5 + height_above_grip + GRIPPER_JAW_OPEN_ABOVE_LABWARE_MM
+    drop_hover_z = 219.5 + height_above_grip + GRIPPER_JAW_OPEN_ABOVE_LABWARE_MM
     assert result == [
         GripperMovementWaypointsWithJawStatus(Point(101, 102, 999), False, False),
         GripperMovementWaypointsWithJawStatus(

@@ -229,12 +229,20 @@ class LabwareMovementHandler:
         async with self._thermocycler_plate_lifter.lift_plate_for_labware_movement(
             labware_location=current_location
         ):
+            labware_height_above_grip = 0.0
+            if restrict_pickup_approach or restrict_drop_retract:
+                grip_z = self._state_store.labware.get_grip_z(labware_definition)
+                extents = self._state_store.labware.get_extents_around_lw_origin(
+                    labware_definition
+                )
+                labware_height_above_grip = max(0.0, extents.max_z - grip_z)
             movement_waypoints = get_gripper_labware_movement_waypoints(
                 from_labware_center=from_labware_center,
                 to_labware_center=to_labware_center,
                 gripper_home_z=gripper_homed_position.z,
                 post_drop_slide_offset=post_drop_slide_offset,
                 gripper_home_z_offset=gripper_z_offset,
+                labware_height_above_grip=labware_height_above_grip,
                 restrict_pickup_approach=restrict_pickup_approach,
                 restrict_drop_retract=restrict_drop_retract,
             )

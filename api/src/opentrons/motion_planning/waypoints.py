@@ -12,10 +12,10 @@ from opentrons.types import Point
 DEFAULT_GENERAL_ARC_Z_MARGIN: Final[float] = 10.0
 DEFAULT_IN_LABWARE_ARC_Z_MARGIN: Final[float] = 5.0
 MINIMUM_Z_MARGIN: Final[float] = 1.0
-# Open/close the jaws this far above the grip point, not at homed Z.
+# Open/close the jaws this far above the labware stack top, not at homed Z.
 # Opening at home Z keeps the paddles fully spread while they travel,
 # which crashes into a vacuum-module collar on an adjacent slot.
-GRIPPER_JAW_OPEN_ABOVE_GRIP_MM: Final[float] = 20.0
+GRIPPER_JAW_OPEN_ABOVE_LABWARE_MM: Final[float] = 20.0
 
 
 def get_waypoints(
@@ -131,6 +131,7 @@ def get_gripper_labware_movement_waypoints(
     gripper_home_z: float,
     post_drop_slide_offset: Optional[Point],
     gripper_home_z_offset: Optional[float] = None,
+    labware_height_above_grip: float = 0.0,
     restrict_pickup_approach: bool = False,
     restrict_drop_retract: bool = False,
 ) -> List[GripperMovementWaypointsWithJawStatus]:
@@ -138,10 +139,16 @@ def get_gripper_labware_movement_waypoints(
     gripper_max_z_home = gripper_home_z - (gripper_home_z_offset or 0)
     post_drop_home_pos = Point(to_labware_center.x, to_labware_center.y, gripper_home_z)
     pickup_hover_z = min(
-        gripper_home_z, from_labware_center.z + GRIPPER_JAW_OPEN_ABOVE_GRIP_MM
+        gripper_home_z,
+        from_labware_center.z
+        + labware_height_above_grip
+        + GRIPPER_JAW_OPEN_ABOVE_LABWARE_MM,
     )
     drop_hover_z = min(
-        gripper_home_z, to_labware_center.z + GRIPPER_JAW_OPEN_ABOVE_GRIP_MM
+        gripper_home_z,
+        to_labware_center.z
+        + labware_height_above_grip
+        + GRIPPER_JAW_OPEN_ABOVE_LABWARE_MM,
     )
 
     waypoints_with_jaw_status = [
