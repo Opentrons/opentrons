@@ -4,11 +4,13 @@ import { useTranslation } from 'react-i18next'
 
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { getPasswordComplexityError } from '/app/resources/auth'
 
 import { LoginFieldController } from './LoginFieldController'
 import styles from './OnDeviceLogin.module.css'
 
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
+import type { PasswordComplexityRequirements } from '/app/resources/auth'
 
 export type LoginStep = 'username' | 'password' | 'confirmPassword'
 
@@ -32,6 +34,8 @@ export interface OnDeviceLoginProps {
   /** Shown under the password field with error styling when login fails */
   loginError?: string | null
   onClearLoginError?: () => void
+  /** Robot password policy for client-side validation on the new-password step. */
+  passwordComplexity: PasswordComplexityRequirements | null
 }
 
 export function OnDeviceLogin({
@@ -44,11 +48,15 @@ export function OnDeviceLogin({
   initialUsername,
   loginError = null,
   onClearLoginError,
+  passwordComplexity,
 }: OnDeviceLoginProps): JSX.Element {
   const { t } = useTranslation(['shared', 'access_control'])
   const [confirmPasswordError, setConfirmPasswordError] = useState<
     string | null
   >(null)
+  const [passwordPolicyError, setPasswordPolicyError] = useState<string | null>(
+    null
+  )
   const { control, watch, setValue } = useForm<LoginFormValues>({
     defaultValues: {
       username: initialUsername ?? '',
@@ -79,6 +87,7 @@ export function OnDeviceLogin({
 
   const clearFieldErrors = (): void => {
     setConfirmPasswordError(null)
+    setPasswordPolicyError(null)
     onClearLoginError?.()
   }
 
@@ -98,7 +107,31 @@ export function OnDeviceLogin({
     if (step === 'password') {
       if (password.trim() === '') return
       if (isPasswordResetRequired) {
+        if (passwordComplexity != null) {
+          const complexityError = getPasswordComplexityError(
+            password,
+            passwordComplexity
+          )
+          if (complexityError === 'tooShort') {
+            setPasswordPolicyError(
+              t('must_be_at_least_characters', {
+                ns: 'access_control',
+                minLength: passwordComplexity.minLength,
+              }) as string
+            )
+            return
+          }
+          if (complexityError === 'missingSpecialCharacters') {
+            setPasswordPolicyError(
+              t('must_include_at_least_one_special_character', {
+                ns: 'access_control',
+              }) as string
+            )
+            return
+          }
+        }
         setConfirmPasswordError(null)
+        setPasswordPolicyError(null)
         onStepChange('confirmPassword')
         return
       }
@@ -124,6 +157,7 @@ export function OnDeviceLogin({
     isPasswordResetRequired,
     onStepChange,
     submitPassword,
+    passwordComplexity,
     t,
   ])
 
@@ -198,7 +232,7 @@ export function OnDeviceLogin({
               step={step}
               t={t}
               isPasswordResetRequired={isPasswordResetRequired}
-              loginError={loginError}
+              loginError={passwordPolicyError ?? loginError}
               confirmPasswordError={confirmPasswordError}
               onClearFieldErrors={clearFieldErrors}
             />
@@ -212,6 +246,7 @@ export function OnDeviceLogin({
               shouldDirty: true,
               shouldTouch: true,
             })
+            clearFieldErrors()
           }}
           keyboardRef={keyboardRef}
         />

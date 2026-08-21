@@ -51,6 +51,7 @@ function renderLogin(
         onCancel={onCancel}
         onClearLoginError={onClearLoginError}
         loginError={null}
+        passwordComplexity={null}
         {...rest}
       />
     )
@@ -164,6 +165,74 @@ describe('OnDeviceLogin', () => {
     clickPrimary('confirm')
 
     expect(submitPassword).toHaveBeenCalledWith('alice', 'secret123')
+  })
+
+  it('shows a length error when the new password is too short', () => {
+    const { onStepChange } = renderLogin({
+      initialStep: 'password',
+      isPasswordResetRequired: true,
+      initialUsername: 'alice',
+      passwordComplexity: { minLength: 8, requireSpecialCharacters: true },
+    })
+
+    fillField('access_control:on_device_login_new_password', 'abc')
+    clickPrimary('next')
+
+    expect(screen.getByText('must_be_at_least_characters')).toBeInTheDocument()
+    expect(onStepChange).not.toHaveBeenCalled()
+  })
+
+  it('shows a special-character error when length is met but a special character is missing', () => {
+    const { onStepChange } = renderLogin({
+      initialStep: 'password',
+      isPasswordResetRequired: true,
+      initialUsername: 'alice',
+      passwordComplexity: { minLength: 8, requireSpecialCharacters: true },
+    })
+
+    fillField('access_control:on_device_login_new_password', 'password1')
+    clickPrimary('next')
+
+    expect(
+      screen.getByText('must_include_at_least_one_special_character')
+    ).toBeInTheDocument()
+    expect(onStepChange).not.toHaveBeenCalled()
+  })
+
+  it('shows the length error when both password policy rules fail', () => {
+    const { onStepChange } = renderLogin({
+      initialStep: 'password',
+      isPasswordResetRequired: true,
+      initialUsername: 'alice',
+      passwordComplexity: { minLength: 8, requireSpecialCharacters: true },
+    })
+
+    fillField('access_control:on_device_login_new_password', 'short')
+    clickPrimary('next')
+
+    expect(screen.getByText('must_be_at_least_characters')).toBeInTheDocument()
+    expect(
+      screen.queryByText('must_include_at_least_one_special_character')
+    ).not.toBeInTheDocument()
+    expect(onStepChange).not.toHaveBeenCalled()
+  })
+
+  it('advances to confirm password when the new password meets complexity rules', () => {
+    const { onStepChange, submitPassword } = renderLogin({
+      initialStep: 'password',
+      isPasswordResetRequired: true,
+      initialUsername: 'alice',
+      passwordComplexity: { minLength: 8, requireSpecialCharacters: true },
+    })
+
+    fillField('access_control:on_device_login_new_password', 'password!')
+    clickPrimary('next')
+
+    expect(onStepChange).toHaveBeenCalledWith('confirmPassword')
+    expect(submitPassword).not.toHaveBeenCalled()
+    expect(
+      screen.queryByText('must_be_at_least_characters')
+    ).not.toBeInTheDocument()
   })
 
   it('advances to confirm password when reset is required', () => {
