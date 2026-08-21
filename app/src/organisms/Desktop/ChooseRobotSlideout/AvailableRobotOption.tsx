@@ -46,7 +46,7 @@ interface AvailableRobotOptionProps {
 
 export function AvailableRobotOptionComponent(
   props: AvailableRobotOptionProps
-): JSX.Element | null {
+): ReactNode | null {
   const {
     robot,
     onClick,
