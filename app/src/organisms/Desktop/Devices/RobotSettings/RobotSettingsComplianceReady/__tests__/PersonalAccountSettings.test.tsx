@@ -142,6 +142,8 @@ describe('PersonalAccountSettings', () => {
       perRobotAuthStates: {},
       mostRecentRobotName: null,
     })
+    screen.getByTestId('InfoScreen')
+    screen.getByLabelText('alert')
     screen.getByText('Log in to manage Compliance Ready Software settings')
     expect(
       screen.queryByText('Personal account settings')
@@ -192,6 +194,8 @@ describe('PersonalAccountSettings', () => {
       </QueryClientProvider>
     )
 
+    screen.getByTestId('InfoScreen')
+    screen.getByLabelText('alert')
     screen.getByText('Log in to manage Compliance Ready Software settings')
     expect(screen.queryByText('alice')).not.toBeInTheDocument()
   })
