@@ -70,7 +70,7 @@ describe('PasswordInputField', () => {
   it('preserves caret position when toggling password visibility', async () => {
     const user = userEvent.setup()
     render({ ...props, value: 'secret' })
-    const input = screen.getByDisplayValue('secret')
+    const input = screen.getByDisplayValue<HTMLInputElement>('secret')
     input.focus()
     input.setSelectionRange(3, 3)
     expect(input.selectionStart).toBe(3)
