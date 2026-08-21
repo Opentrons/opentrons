@@ -41,7 +41,7 @@ import singleChannelAndEightChannel from '/app/assets/images/change-pip/1_and_8_
 import ninetySixChannel from '/app/assets/images/change-pip/ninety-six-channel.png'
 import { SmallButton } from '/app/atoms/buttons'
 import { i18n } from '/app/i18n'
-import { usePromptForInteractionReason } from '/app/local-resources/access-control/usePromptForInteractionReason'
+import { usePromptForDocumentation } from '/app/local-resources/access-control/usePromptForDocumentation'
 import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
 import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
@@ -130,7 +130,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
 
   const initialAction =
     mount === LEFT ? 'attach_pipette_left' : 'attach_pipette_right'
-  const initialDocstate = usePromptForInteractionReason([initialAction])
+  const initialDocstate = usePromptForDocumentation([initialAction], exit)
   const isWaitingForDocumentation = !isDocumentationProvided(initialDocstate)
 
   const bothMounts = getIsGantryEmpty(attachedPipettesByMount)

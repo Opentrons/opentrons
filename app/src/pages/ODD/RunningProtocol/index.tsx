@@ -19,7 +19,7 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 
-import { useGuardedAction } from '/app/local-resources/access-control/useGuardedAction'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useToastOnErrorImage } from '/app/local-resources/images/hooks/useToastOnErrorImage'
 import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import {
@@ -108,8 +108,7 @@ export function RunningProtocol(): JSX.Element {
     staleTime: Infinity,
   })
 
-  // TODO(jj): figure out what to do with actionsToDocument
-  const docstate = useGuardedAction()
+  const docstate = useDocumentationState()
 
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??

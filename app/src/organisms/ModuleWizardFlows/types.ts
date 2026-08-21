@@ -1,6 +1,6 @@
 import type { AttachedModule } from '@opentrons/api-client'
-import type { CreateCommand } from '@opentrons/shared-data'
-import type { PipetteInformation } from '/app/redux/pipettes'
+import type { CreateCommand, IdentifyColor } from '@opentrons/shared-data'
+import type { PipetteInformation } from '/app/resources/instruments/types'
 import type { ACTIONS, FLOWS, SECTIONS } from './constants'
 
 export type ModuleSetupWizardStep =
@@ -63,7 +63,11 @@ export interface ModuleSetupWizardBaseStepProps {
   attachedModule: AttachedModule
   errorMessage: string | null
   setErrorMessage: (message: string | null) => void
+  isDoorOpenError: boolean
+  setIsDoorOpenError: (isDoorOpenError: boolean) => void
+  dismissDoorOpenError: () => void
   isOnDevice: boolean
+  sendIdentifyModule: SendIdentifyModule
 }
 
 export interface ModuleSetupWizardRequiresPipetteStepProps extends ModuleSetupWizardBaseStepProps {
@@ -79,6 +83,12 @@ export type ModuleSetupWizardStepProps =
   | ModuleSetupWizardRequiresPipetteStepProps
 
 export type ModuleWizardFlow = typeof FLOWS.SETUP
+
+export type SendIdentifyModule = (
+  module: AttachedModule,
+  start: boolean,
+  color?: IdentifyColor
+) => void
 
 export interface BeforeBeginningStep {
   section: typeof SECTIONS.BEFORE_BEGINNING

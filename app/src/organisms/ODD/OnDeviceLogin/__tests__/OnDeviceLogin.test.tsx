@@ -90,7 +90,7 @@ describe('OnDeviceLogin', () => {
       initialUsername: 'alice',
     })
 
-    fillField('device_settings:password', 'temp-pass')
+    fillField('access_control:login_form_password_field', 'temp-pass')
     clickPrimary('confirm')
 
     expect(submitPassword).toHaveBeenCalledWith('alice', 'temp-pass')
@@ -138,19 +138,19 @@ describe('OnDeviceLogin', () => {
       screen.getByRole('heading', { name: 'on_device_login_new_password' })
     ).toBeInTheDocument()
     expect(
-      screen.getByLabelText('device_settings:on_device_login_confirm_password')
+      screen.getByLabelText('access_control:on_device_login_confirm_password')
     ).toBeInTheDocument()
   })
 
   it('advances from username to password', () => {
     const { onStepChange } = renderLogin({ initialStep: 'username' })
 
-    fillField('device_settings:username', 'alice')
+    fillField('access_control:username', 'alice')
     clickPrimary('next')
 
     expect(onStepChange).toHaveBeenCalledWith('password')
     expect(
-      screen.getByLabelText('device_settings:password')
+      screen.getByLabelText('access_control:login_form_password_field')
     ).toBeInTheDocument()
   })
 
@@ -160,7 +160,7 @@ describe('OnDeviceLogin', () => {
       initialUsername: 'alice',
     })
 
-    fillField('device_settings:password', 'secret123')
+    fillField('access_control:login_form_password_field', 'secret123')
     clickPrimary('confirm')
 
     expect(submitPassword).toHaveBeenCalledWith('alice', 'secret123')
@@ -173,13 +173,13 @@ describe('OnDeviceLogin', () => {
       initialUsername: 'alice',
     })
 
-    fillField('device_settings:on_device_login_new_password', 'newpass123')
+    fillField('access_control:on_device_login_new_password', 'newpass123')
     clickPrimary('next')
 
     expect(onStepChange).toHaveBeenCalledWith('confirmPassword')
     expect(submitPassword).not.toHaveBeenCalled()
     expect(
-      screen.getByLabelText('device_settings:on_device_login_confirm_password')
+      screen.getByLabelText('access_control:on_device_login_confirm_password')
     ).toBeInTheDocument()
   })
 
@@ -190,9 +190,9 @@ describe('OnDeviceLogin', () => {
       initialUsername: 'alice',
     })
 
-    fillField('device_settings:on_device_login_new_password', 'newpass123')
+    fillField('access_control:on_device_login_new_password', 'newpass123')
     clickPrimary('next')
-    fillField('device_settings:on_device_login_confirm_password', 'different')
+    fillField('access_control:on_device_login_confirm_password', 'different')
     clickPrimary('confirm')
 
     expect(
@@ -208,9 +208,9 @@ describe('OnDeviceLogin', () => {
       initialUsername: 'alice',
     })
 
-    fillField('device_settings:on_device_login_new_password', 'newpass123')
+    fillField('access_control:on_device_login_new_password', 'newpass123')
     clickPrimary('next')
-    fillField('device_settings:on_device_login_confirm_password', 'newpass123')
+    fillField('access_control:on_device_login_confirm_password', 'newpass123')
     clickPrimary('confirm')
 
     expect(submitPassword).toHaveBeenCalledWith('alice', 'newpass123')
@@ -270,7 +270,7 @@ describe('OnDeviceLogin', () => {
 
     expect(onStepChange).toHaveBeenCalledWith('password')
     expect(
-      screen.getByLabelText('device_settings:on_device_login_new_password')
+      screen.getByLabelText('access_control:on_device_login_new_password')
     ).toBeInTheDocument()
   })
 })

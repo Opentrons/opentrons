@@ -83,6 +83,28 @@ describe('useProtocolDropTipModal', () => {
     expect(mockHomePipettes).toHaveBeenCalled()
   })
 
+  it('should dismiss the modal and call onSkipAndHome on home success', () => {
+    let onSuccess: (() => void) | undefined
+    vi.mocked(useHomePipettes).mockImplementation(homeProps => {
+      onSuccess = homeProps.onSuccess
+      return {
+        homePipettes: mockHomePipettes,
+        isHoming: false,
+      }
+    })
+
+    const { result } = renderHook(() => useProtocolDropTipModal(props))
+
+    expect(result.current.showModal).toBe(true)
+
+    act(() => {
+      onSuccess?.()
+    })
+
+    expect(result.current.showModal).toBe(false)
+    expect(props.onSkipAndHome).toHaveBeenCalled()
+  })
+
   it('should call toggleDTWiz when onDTModalRemoval is called', () => {
     const { result } = renderHook(() => useProtocolDropTipModal(props))
 

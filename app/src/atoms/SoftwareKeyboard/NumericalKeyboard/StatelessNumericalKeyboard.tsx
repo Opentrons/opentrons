@@ -1,7 +1,11 @@
 import { useRef } from 'react'
 import { KeyboardReact as Keyboard } from 'react-simple-keyboard'
 
-import { numericalCustom, numericalKeyboardLayout } from '../constants'
+import {
+  numericalCustom,
+  numericalKeyboardLayout,
+  softwareKeyboardButtonAttributes,
+} from '../constants'
 import { applyNumericalKeyboardKey } from '../utils/applyNumericalKeyboardKey'
 import { toNumericalKeyboardKey } from '../utils/toNumericalKeyboardKey'
 
@@ -53,10 +57,12 @@ export function StatelessNumericalKeyboard({
         )
       }}
       display={numericalCustom}
-      useButtonTag={true}
+      useButtonTag={false} // Exclude from the tab order.
+      buttonAttributes={softwareKeyboardButtonAttributes}
       layoutName={layoutName}
       layout={numericalKeyboardLayout}
       debug={debug}
+      preventMouseDownDefault // Don't steal focus from inputs.
     />
   )
 }

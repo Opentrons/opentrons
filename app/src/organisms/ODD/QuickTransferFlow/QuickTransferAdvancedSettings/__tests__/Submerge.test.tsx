@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -52,11 +53,12 @@ describe('Submerge', () => {
     screen.getByRole('button', { name: 'del' })
   })
 
-  it('renders text, buttons, input field, and keyboard for submerge before aspirating - delay duration', () => {
+  it('renders text, buttons, input field, and keyboard for submerge before aspirating - delay duration', async () => {
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByText('Continue'))
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Continue')
     screen.getByText('Delay duration (seconds)')
     screen.getByRole('button', { name: '1' })
@@ -66,16 +68,17 @@ describe('Submerge', () => {
     screen.getByRole('button', { name: '.' })
   })
 
-  it('renders text, buttons, input field, and keyboard for submerge before aspirating - position', () => {
+  it('renders text, buttons, input field, and keyboard for submerge before aspirating - position', async () => {
     render({
       ...props,
       state: {
         submergeAspirate: { positionReference: 'well-bottom', position: 0 },
       } as any,
     })
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByText('Continue'))
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Continue')
     screen.getByText('Delay duration (seconds)')
     screen.getByRole('button', { name: '1' })
@@ -83,20 +86,21 @@ describe('Submerge', () => {
     screen.getByRole('button', { name: '9' })
     screen.getByRole('button', { name: 'del' })
     screen.getByRole('button', { name: '.' })
-    fireEvent.click(screen.getByRole('button', { name: '0' }))
-    fireEvent.click(screen.getByRole('button', { name: '.' }))
-    fireEvent.click(screen.getByRole('button', { name: '5' }))
-    fireEvent.click(screen.getByText('Continue'))
+    await user.click(screen.getByRole('button', { name: '0' }))
+    await user.click(screen.getByRole('button', { name: '.' }))
+    await user.click(screen.getByRole('button', { name: '5' }))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Save')
     screen.getByText('Distance from bottom of well (mm)')
     screen.getByText('Between 0 and 3 mm')
-    fireEvent.click(screen.getByRole('button', { name: '2' }))
-    fireEvent.click(screen.getByRole('button', { name: '2' }))
-    fireEvent.click(screen.getByRole('button', { name: '2' }))
+    await user.click(screen.getByRole('button', { name: '2' }))
+    await user.click(screen.getByRole('button', { name: '2' }))
+    await user.click(screen.getByRole('button', { name: '2' }))
     screen.getByText('Value must be between 0 to 3')
   })
 
-  it('should call dispatch when clicking save button', () => {
+  it('should call dispatch when clicking save button', async () => {
+    const user = userEvent.setup()
     props.state.submergeAspirate = {
       speed: 0,
       delayDuration: 0,
@@ -104,16 +108,16 @@ describe('Submerge', () => {
       positionReference: 'well-top',
     }
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByText('Continue'))
-    fireEvent.click(screen.getByRole('button', { name: '0' }))
-    fireEvent.click(screen.getByRole('button', { name: '.' }))
-    fireEvent.click(screen.getByRole('button', { name: '5' }))
-    fireEvent.click(screen.getByText('Continue'))
-    fireEvent.click(screen.getByRole('button', { name: '2' }))
-    fireEvent.click(screen.getByRole('button', { name: '2' }))
-    fireEvent.click(screen.getByText('Save'))
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByText('Continue'))
+    await user.click(screen.getByRole('button', { name: '0' }))
+    await user.click(screen.getByRole('button', { name: '.' }))
+    await user.click(screen.getByRole('button', { name: '5' }))
+    await user.click(screen.getByText('Continue'))
+    await user.click(screen.getByRole('button', { name: '2' }))
+    await user.click(screen.getByRole('button', { name: '2' }))
+    await user.click(screen.getByText('Save'))
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_SUBMERGE_ASPIRATE',
       submergeSettings: {
@@ -124,9 +128,10 @@ describe('Submerge', () => {
       },
     })
   })
-  it('should call mock function when clicking back button', () => {
+  it('should call mock function when clicking back button', async () => {
     render(props)
-    fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
+    const user = userEvent.setup()
+    await user.click(screen.getByTestId('ChildNavigation_Back_Button'))
     expect(props.onBack).toHaveBeenCalled()
   })
 })

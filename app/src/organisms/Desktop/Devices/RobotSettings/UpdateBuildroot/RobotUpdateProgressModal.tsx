@@ -13,13 +13,14 @@ import {
   JUSTIFY_FLEX_END,
   LegacyStyledText,
   Modal,
-  NewPrimaryBtn,
+  PrimaryButton,
   SPACING,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import successIcon from '/app/assets/images/icon_success.png'
 import { ProgressBar } from '/app/atoms/ProgressBar'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/utils'
 import {
   clearRobotUpdateSession,
   getRobotUpdateDownloadError,
@@ -30,7 +31,6 @@ import {
   useRobotInitializationStatus,
 } from '/app/resources/health/useRobotInitializationStatus'
 
-import { FOOTER_BUTTON_STYLE } from './UpdateRobotModal'
 import { useRobotUpdateInfo } from './useRobotUpdateInfo'
 
 import type { ChangeEventHandler } from 'react'
@@ -59,22 +59,18 @@ const HIDDEN_CSS = css`
 interface RobotUpdateProgressModalProps {
   robotName: string
   session: RobotUpdateSession | null
-  closeUpdateBuildroot?: () => void
+  closeRobotUpdate: () => void
 }
 
 export function RobotUpdateProgressModal({
   robotName,
   session,
-  closeUpdateBuildroot,
+  closeRobotUpdate,
 }: RobotUpdateProgressModalProps): JSX.Element {
   const dispatch = useDispatch()
   const { t } = useTranslation('device_settings')
   const [showFileSelect, setShowFileSelect] = useState<boolean>(false)
   const installFromFileRef = useRef<HTMLInputElement>(null)
-
-  const completeRobotUpdateHandler = (): void => {
-    if (closeUpdateBuildroot != null) closeUpdateBuildroot()
-  }
 
   const { updateStep, progressPercent } = useRobotUpdateInfo(robotName, session)
 
@@ -120,17 +116,14 @@ export function RobotUpdateProgressModal({
       title={`${t('updating')} ${robotName}`}
       width="40rem"
       textAlign="center"
-      marginLeft="0"
       onClose={
         hasRobotCompletedInit || error || letUserExitUpdate
-          ? completeRobotUpdateHandler
+          ? closeRobotUpdate
           : undefined
       }
       footer={
         hasRobotCompletedInit || error ? (
-          <RobotUpdateProgressFooter
-            closeUpdateBuildroot={completeRobotUpdateHandler}
-          />
+          <RobotUpdateProgressFooter closeRobotUpdate={closeRobotUpdate} />
         ) : null
       }
     >
@@ -175,11 +168,11 @@ export function RobotUpdateProgressModal({
 }
 
 interface RobotUpdateProgressFooterProps {
-  closeUpdateBuildroot?: () => void
+  closeRobotUpdate: () => void
 }
 
 function RobotUpdateProgressFooter({
-  closeUpdateBuildroot,
+  closeRobotUpdate,
 }: RobotUpdateProgressFooterProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -187,15 +180,9 @@ function RobotUpdateProgressFooter({
     <Flex
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_FLEX_END}
-      padding={`${SPACING.spacing16} 0`}
+      padding={`0 ${SPACING.spacing24} ${SPACING.spacing24}`}
     >
-      <NewPrimaryBtn
-        onClick={closeUpdateBuildroot}
-        marginRight={SPACING.spacing12}
-        css={FOOTER_BUTTON_STYLE}
-      >
-        {t('exit')}
-      </NewPrimaryBtn>
+      <PrimaryButton onClick={closeRobotUpdate}>{t('exit')}</PrimaryButton>
     </Flex>
   )
 }
@@ -274,7 +261,12 @@ function useAllowExitIfUpdateStalled(
 }
 
 function useStatusBarAnimation(isError: boolean): void {
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  // TODO(jj): setStatusBar will fail in CRS mode.
+  // We don't want to prompt the user for documentation or require login here
+  // We need to add a new backend endpoint for setStatusBar specifically.
+  const { createLiveCommand } = useCreateLiveCommandMutation(
+    ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
+  )
   const updatingCommand: SetStatusBarCreateCommand = {
     commandType: 'setStatusBar',
     params: { animation: 'updating' },

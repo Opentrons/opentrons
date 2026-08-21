@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   ALIGN_START,
-  BORDERS,
   Box,
   COLORS,
   DIRECTION_COLUMN,
@@ -27,7 +26,7 @@ import {
   useRobot,
 } from '/app/redux-resources/robots'
 import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'
-import { useLights } from '/app/resources/devices'
+import { useIsRobotOutOfStorage, useLights } from '/app/resources/devices'
 
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { CalibrationStatusBanner } from './CalibrationStatusBanner'
@@ -37,8 +36,10 @@ import {
 } from './ErrorRecoveryBanner'
 import { useUSBRegistration } from './hooks'
 import { ReachableBanner } from './ReachableBanner'
+import { RobotOutOfStorageNotification } from './RobotOutOfStorageNotification'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
+import { SignAndDownloadRunBanner } from './SignAndDownloadRunBanner/SignAndDownloadRunBanner'
 
 import type { State } from '/app/redux/types'
 
@@ -68,6 +69,8 @@ export function RobotOverview({
 
   useUSBRegistration(robot)
 
+  const isRobotOutOfStorage = useIsRobotOutOfStorage()
+
   return robot != null ? (
     <>
       <Flex
@@ -90,7 +93,6 @@ export function RobotOverview({
                 width: '6rem',
                 height: '5.4375rem',
               }}
-              id="RobotOverview_robotImage"
               alt={
                 robotModel === 'OT-2' ? 'Image of `OT-2 image' : 'Flex image'
               }
@@ -101,11 +103,15 @@ export function RobotOverview({
               <ReachableBanner robot={robot} />
             </Box>
             <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing8} />
+            <SignAndDownloadRunBanner robotName={robotName} />
             {showRecoveryBanner ? (
               <ErrorRecoveryBanner
                 recoveryIntent={recoveryIntent}
                 marginBottom={SPACING.spacing8}
               />
+            ) : null}
+            {isRobotOutOfStorage ? (
+              <RobotOutOfStorageNotification robotName={robotName} />
             ) : null}
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
               <RobotStatusHeader
@@ -137,7 +143,6 @@ export function RobotOverview({
                         }
                         onClick={toggleLights}
                         height="0.813rem"
-                        id="RobotOverview_lightsToggle"
                       />
                     </Flex>
                     <LegacyStyledText
@@ -163,12 +168,6 @@ export function RobotOverview({
       {robotModel === 'OT-2' && !isRobotBusy && isRobotViewable ? (
         <CalibrationStatusBanner robotName={robotName} />
       ) : null}
-      <Flex
-        borderBottom={BORDERS.lineBorder}
-        marginBottom={SPACING.spacing16}
-        position={POSITION_RELATIVE}
-        width="100%"
-      />
     </>
   ) : null
 }

@@ -7,7 +7,9 @@ import {
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
+import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
 import { useInitLPCStore } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import {
@@ -77,10 +79,21 @@ export function useLPCFlows({
   const [maintenanceRunId, setMaintenanceRunId] = useState<string | null>(null)
   const [isLaunching, setIsLaunching] = useState(false)
   const [hasCreatedLPCRun, setHasCreatedLPCRun] = useState(false)
+  const [promptForDocumentation, setPromptForDocumentation] = useState(false)
 
   // if launchLPC is called while other queries are still loading, we will return a constructed promise and store any provided callbacks in this ref
   // once unblocked, the useEffect will launch LPC and resolve the constructed promise with the results
   const pendingLaunchRef = useRef<PendingLaunch | null>(null)
+
+  const handleDocumentationCancel = useCallback((): void => {
+    if (pendingLaunchRef.current != null) {
+      const { reject } = pendingLaunchRef.current
+      pendingLaunchRef.current = null
+      reject(new Error('Documentation cancelled'))
+    }
+    setPromptForDocumentation(false)
+    setIsLaunching(false)
+  }, [])
 
   const {
     commandDocState,
@@ -88,19 +101,35 @@ export function useLPCFlows({
     actionsToDocument,
     addActionToDocument,
     isLoading: isDocumentationLoading,
-  } = useMaintenanceRunDocumentation('lpc_flow')
+  } = useMaintenanceRunDocumentation(
+    'lpc_flow',
+    handleDocumentationCancel,
+    undefined,
+    promptForDocumentation
+  )
 
   const isFlex = robotType === FLEX_ROBOT_TYPE
   const deckConfig = useNotifyDeckConfigurationQuery().data
   const { data: runRecord } = useNotifyRunQuery(runId ?? null, {
     refetchInterval: RUN_RECORD_INTERVAL_MS,
   })
+
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+
+  // useCompatibleAnalysis() may need to trigger a new analysis, and that may require
+  // the user to log in and enter a reason for interaction.
+  //
+  // todo(mm, 2026-08-10): This could perhaps be combined with our call to
+  // useMaintenanceRunDocumentation() to avoid prompting the user twice,
+  // but it's unclear which hook should be responsible for that.
+  const analysisDocumentationState = useDocumentationState()
+
   const compatibleFlexAnalysis = useCompatibleAnalysis(
     runId,
     runRecord,
     mostRecentAnalysis,
-    isFlex
+    isFlex,
+    analysisDocumentationState
   )
   const compatibleRobotAnalysis = isFlex
     ? compatibleFlexAnalysis
@@ -184,8 +213,12 @@ export function useLPCFlows({
   )
 
   const isFlexLPCInitializing = flexOffsets == null
+  const isWaitingForDocumentation =
+    promptForDocumentation && !isDocumentationProvided(commandDocState)
   const isLaunchBlocked =
-    isDocumentationLoading || (isFlex && isFlexLPCInitializing)
+    isDocumentationLoading ||
+    (isFlex && isFlexLPCInitializing) ||
+    !isDocumentationProvided(commandDocState)
 
   const createLPCMaintenanceRun = useCallback((): Promise<void> => {
     // Inject OT-2 offsets into the maintenance run upon creation.
@@ -221,6 +254,7 @@ export function useLPCFlows({
     }
 
     analytics.reportLaunchLpcWizard()
+    setPromptForDocumentation(true)
     setIsLaunching(true)
 
     if (isLaunchBlocked) {
@@ -277,7 +311,8 @@ export function useLPCFlows({
       }
     : {
         launchLPC,
-        isLaunchingLPC: isLaunching || isDocumentationLoading,
+        isLaunchingLPC:
+          isLaunching || isWaitingForDocumentation || isDocumentationLoading,
         isFlexLPCInitializing,
         lpcProps: null,
         showLPC,

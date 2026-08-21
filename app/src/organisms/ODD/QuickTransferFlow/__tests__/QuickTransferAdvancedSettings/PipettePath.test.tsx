@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { TouchInputField } from '@opentrons/components'
@@ -79,26 +80,29 @@ describe('PipettePath', () => {
     vi.resetAllMocks()
   })
 
-  it('renders the first pipette path screen, continue, back buttons', () => {
+  it('renders the first pipette path screen, continue, back buttons', async () => {
     render(props)
+    const user = userEvent.setup()
     screen.getByText('Pipette path')
     screen.getByTestId('ChildNavigation_Primary_Button')
     const exitBtn = screen.getByTestId('ChildNavigation_Back_Button')
-    fireEvent.click(exitBtn)
+    await user.click(exitBtn)
     expect(props.onBack).toHaveBeenCalled()
   })
 
-  it('renders multi aspirate and single options for consolidate if there is room in the tip', () => {
+  it('renders multi aspirate and single options for consolidate if there is room in the tip', async () => {
     render(props)
+    const user = userEvent.setup()
     screen.getByText('Single transfers')
     screen.getByText('Multi-aspirate')
     const saveBtn = screen.getByTestId('ChildNavigation_Primary_Button')
-    fireEvent.click(saveBtn)
+    await user.click(saveBtn)
     expect(props.dispatch).toHaveBeenCalled()
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalled()
   })
 
-  it('renders single option only for consolidate if there is not room in the tip', () => {
+  it('renders single option only for consolidate if there is not room in the tip', async () => {
+    const user = userEvent.setup()
     props = {
       ...props,
       state: {
@@ -110,12 +114,13 @@ describe('PipettePath', () => {
     screen.getByText('Single transfers')
     expect(screen.queryByText('Multi-aspirate')).not.toBeInTheDocument()
     const saveBtn = screen.getByTestId('ChildNavigation_Primary_Button')
-    fireEvent.click(saveBtn)
+    await user.click(saveBtn)
     expect(props.dispatch).toHaveBeenCalled()
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalled()
   })
 
-  it('renders multi dispense and single options for distribute if there is room in the tip', () => {
+  it('renders multi dispense and single options for distribute if there is room in the tip', async () => {
+    const user = userEvent.setup()
     props = {
       ...props,
       state: {
@@ -127,12 +132,13 @@ describe('PipettePath', () => {
     screen.getByText('Single transfers')
     screen.getByText('Multi-dispense')
     const saveBtn = screen.getByTestId('ChildNavigation_Primary_Button')
-    fireEvent.click(saveBtn)
+    await user.click(saveBtn)
     expect(props.dispatch).toHaveBeenCalled()
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalled()
   })
 
-  it('renders single option only for distribute if there is not room in the tip', () => {
+  it('renders single option only for distribute if there is not room in the tip', async () => {
+    const user = userEvent.setup()
     props = {
       ...props,
       state: {
@@ -145,12 +151,13 @@ describe('PipettePath', () => {
     screen.getByText('Single transfers')
     expect(screen.queryByText('Multi-dispense')).not.toBeInTheDocument()
     const saveBtn = screen.getByTestId('ChildNavigation_Primary_Button')
-    fireEvent.click(saveBtn)
+    await user.click(saveBtn)
     expect(props.dispatch).toHaveBeenCalled()
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalled()
   })
 
-  it('renders next cta and disposal volume screen if you choose multi dispense', () => {
+  it('renders next cta and disposal volume screen if you choose multi dispense', async () => {
+    const user = userEvent.setup()
     props = {
       ...props,
       state: {
@@ -166,9 +173,9 @@ describe('PipettePath', () => {
     }
     render(props)
     const multiDispenseBtn = screen.getByText('Multi-dispense')
-    fireEvent.click(multiDispenseBtn)
+    await user.click(multiDispenseBtn)
     const continueBtn = screen.getByTestId('ChildNavigation_Primary_Button')
-    fireEvent.click(continueBtn)
+    await user.click(continueBtn)
 
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
@@ -177,14 +184,14 @@ describe('PipettePath', () => {
         error: null,
         type: 'number',
         value: 20,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
     )
   })
 
-  it('renders error on disposal volume screen if you select an out of range value', () => {
+  it('renders error on disposal volume screen if you select an out of range value', async () => {
+    const user = userEvent.setup()
     props = {
       ...props,
       state: {
@@ -200,9 +207,9 @@ describe('PipettePath', () => {
     }
     render(props)
     const continueBtn = screen.getByText('Continue')
-    fireEvent.click(continueBtn)
+    await user.click(continueBtn)
     const oneButton = screen.getByText('1')
-    fireEvent.click(oneButton)
+    await user.click(oneButton)
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
         autoFocus: true,
@@ -210,7 +217,6 @@ describe('PipettePath', () => {
         error: 'Value must be between 1 to 160',
         type: 'number',
         value: 201,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -219,7 +225,8 @@ describe('PipettePath', () => {
     expect(nextBtn).toBeDisabled()
   })
 
-  it('renders blowout options on third screen and calls dispatch when saved', () => {
+  it('renders blowout options on third screen and calls dispatch when saved', async () => {
+    const user = userEvent.setup()
     props = {
       ...props,
       state: {
@@ -235,8 +242,8 @@ describe('PipettePath', () => {
     }
     render(props)
     const continueBtn = screen.getByText('Continue')
-    fireEvent.click(continueBtn)
-    fireEvent.click(continueBtn)
+    await user.click(continueBtn)
+    await user.click(continueBtn)
     screen.getByText('Source well')
   })
 })

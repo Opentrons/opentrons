@@ -4,6 +4,7 @@ import * as Constants from '../constants'
 
 import type { TFunction } from 'i18next'
 import type { FieldError } from 'react-hook-form'
+import type { WifiKey } from '@opentrons/api-client'
 import type {
   ConnectFormErrors,
   ConnectFormField,
@@ -14,7 +15,6 @@ import type {
   WifiAuthField,
   WifiConfigureRequest,
   WifiEapConfig,
-  WifiKey,
   WifiNetwork,
   WifiSecurityType,
 } from '../types'

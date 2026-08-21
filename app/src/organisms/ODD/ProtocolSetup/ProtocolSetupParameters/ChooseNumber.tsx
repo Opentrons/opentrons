@@ -125,9 +125,6 @@ export function ChooseNumber({
                 : `${parameter.min.toFixed(1)}-${parameter.max.toFixed(1)}`
             }
             error={error}
-            onBlur={e => {
-              e.target.focus()
-            }}
             onChange={e => {
               const inputValue = e.target.value
               handleInputChange(inputValue)

@@ -13,8 +13,6 @@ from server_utils.fastapi_utils.models.json_api.response import (
     EmptyBody,
     MultiBody,
     MultiBodyMeta,
-    NotifyRefetchBody,
-    NotifyUnsubscribeBody,
     ResourceModel,
     SimpleBody,
     SimpleEmptyBody,
@@ -118,11 +116,6 @@ RESPONSE_SPECS = [
             "data": [{"id": "hello", "val": None}, {"id": "goodbye", "val": None}],
             "links": {"sibling": {"href": "/bar", "meta": None}},
         },
-    ),
-    ResponseSpec(subject=NotifyRefetchBody(), expected={"refetch": True}),
-    ResponseSpec(
-        subject=NotifyUnsubscribeBody(),
-        expected={"unsubscribe": True},
     ),
 ]
 

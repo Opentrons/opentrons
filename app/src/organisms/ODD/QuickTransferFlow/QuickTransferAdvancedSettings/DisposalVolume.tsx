@@ -246,9 +246,6 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
               type="text"
               value={String(volume ?? '')}
               label={t('disposal_volume_µL')}
-              onBlur={e => {
-                e.target.focus()
-              }}
               onChange={e => {
                 handleVolumeChange(e.target.value as string)
               }}
@@ -321,9 +318,6 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
               value={String(flowRate ?? '')}
               label={t('blowout_flow_rate_µL')}
               error={flowRateError}
-              onBlur={e => {
-                e.target.focus()
-              }}
               onChange={e => {
                 handleFlowRateChange(e.target.value as string)
               }}

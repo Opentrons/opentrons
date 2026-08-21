@@ -28,7 +28,6 @@ export function ConfirmDeleteEntityInUseModal(
   return createPortal(
     <HandleEnter onEnter={onConfirm}>
       <Modal
-        marginLeft="0"
         zIndexOverlay={11}
         title={t(`are_you_sure_clear_slot`)}
         type="warning"

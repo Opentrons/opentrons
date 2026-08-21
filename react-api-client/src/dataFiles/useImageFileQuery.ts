@@ -18,7 +18,7 @@ export function useImageFileQuery(
   }
 
   const query = useQuery<ImageFilesDataResponse>(
-    getQueryKey(host, '/dataFiles/', runId, '/images'),
+    getQueryKey(host, 'dataFiles', runId, 'images'),
     () => getImageFiles(host!, runId).then(response => response.data),
     allOptions
   )

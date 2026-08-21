@@ -34,7 +34,7 @@ const store: Store<any> = legacy_createStore(
 const meta: Meta<typeof AccordionKeyboard> = {
   title: 'ODD/Atoms/AccordionKeyboard',
   component: AccordionKeyboardComponent,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
   decorators: [
     Story => (
       <Provider store={store}>

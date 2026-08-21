@@ -14,11 +14,8 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
     get_app_state,
 )
-from server_utils.fastapi_utils.models.json_api import (
-    NotifyRefetchBody,
-    NotifyUnsubscribeBody,
-)
 
+from .models import NotifyRefetchBody, NotifyUnsubscribeBody
 from .topics import TopicName
 
 log: logging.Logger = logging.getLogger(__name__)

@@ -3,14 +3,43 @@
 import logging
 from contextlib import AsyncExitStack, asynccontextmanager
 from pathlib import Path
-from typing import AsyncGenerator, Optional
+from typing import AsyncGenerator, Optional, override
 
-from fastapi import FastAPI
+from anyio import to_thread
+from fastapi import FastAPI, Request, Response
+from opentrons_shared_data.errors.exceptions import AuditLoggingError
 
 from server_utils import systemd_utils
+from server_utils.audit.fastapi import audit_logger_middleware, install_audit_client
+from server_utils.auth.resource_server.authentication_checker import (
+    FailedClosedAuthenticationChecker,
+)
+from server_utils.auth.resource_server.fastapi import (
+    AuthorizationError,
+    build_authentication_checker,
+    handle_authorization_error,
+    install_authentication_checker,
+)
 from server_utils.keys.fastapi import build_key_client, install_key_client
+from server_utils.keys.key_server import (
+    Client as KeyClientABC,
+)
+from server_utils.keys.key_server import (
+    PublicKeyAndHash,
+    SignedMessageData,
+    SignMessageData,
+)
+from server_utils.persistence.persistence_directory import (
+    cleanup_persistence_temp_directory,
+)
+from server_utils.robot.fastapi import build_robot_client, install_robot_server_client
+from server_utils.robot.robot_server import Client as RobotClientABC
+from server_utils.robot.robot_server import RobotCurrentRunLog, RobotNameandSerial
 
+from audit_server.log_export.router import router as log_export_router
 from audit_server.log_ingest.router import router as ingest_router
+from audit_server.log_self_client import LocalClient
+from audit_server.log_storage.dependency import build_log_data_manager, build_log_store
 from audit_server.persistence.database import sql_engine_ctx
 from audit_server.persistence.fastapi_dependencies import (
     set_persistence_directory,
@@ -21,23 +50,58 @@ from audit_server.persistence.persistence_directory import (
     prepare_active_subdirectory,
     prepare_root,
 )
-from audit_server.server_settings import AuditServerSettings, get_settings
+from audit_server.server_configuration import (
+    AuditServerConfiguration,
+    get_configuration,
+)
+from audit_server.settings.router import router as settings_router
+from audit_server.settings.store import SettingsStore, install_settings_store
 
 _log = logging.getLogger(__name__)
 
 
-def _get_persistence_directory_root(settings: AuditServerSettings) -> Optional[Path]:
+def _get_persistence_directory_root(
+    configuration: AuditServerConfiguration,
+) -> Optional[Path]:
     """Return the root persistence directory, or ``None`` for auto-temp."""
-    if settings.persistence_directory == "automatically_make_temporary":
+    if configuration.persistence_directory == "automatically_make_temporary":
         return None
-    return settings.persistence_directory
+    return configuration.persistence_directory
+
+
+class _NoOpFailKeyClient(KeyClientABC):
+    """A local key client for when the server is unconfigured that fails to sign."""
+
+    @override
+    async def sign_message(self, message: SignMessageData) -> SignedMessageData:
+        raise AuditLoggingError(message="Key server unavailable (not configured)")
+
+    @override
+    async def get_key_and_hash(self) -> PublicKeyAndHash:
+        raise AuditLoggingError(message="Key server unavailable (not configured)")
+
+
+class _StubRobotServerClient(RobotClientABC):
+    """A local robot server client when no robot server url/uds has been provided."""
+
+    @override
+    async def get_name_and_serial(self) -> RobotNameandSerial:
+        return RobotNameandSerial(
+            name="localrobot",
+            serial=None,
+        )
+
+    @override
+    async def get_current_run_log(self) -> RobotCurrentRunLog:
+        return RobotCurrentRunLog(serialized_log=None)
 
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    settings = get_settings()
-    persistence_directory_root = _get_persistence_directory_root(settings)
+    configuration = get_configuration()
+    persistence_directory_root = _get_persistence_directory_root(configuration)
     prepared_root = await prepare_root(persistence_directory_root)
+    await to_thread.run_sync(cleanup_persistence_temp_directory, prepared_root)
     set_persistence_directory(app.state, prepared_root)
 
     active_subdirectory = await prepare_active_subdirectory(prepared_root)
@@ -46,15 +110,19 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     async with AsyncExitStack() as exit_stack:
         engine = exit_stack.enter_context(sql_engine_ctx(db_path))
         set_sql_engine(app.state, engine)
+        settings_store = SettingsStore(sql_engine=engine)
+        install_settings_store(app.state, settings_store)
 
-        if settings.key_server_uds is not None or settings.key_server_url is not None:
+        if (
+            configuration.key_server_uds is not None
+            or configuration.key_server_url is not None
+        ):
             key_client = await exit_stack.enter_async_context(
                 build_key_client(
-                    key_server_uds=settings.key_server_uds,
-                    key_server_url=settings.key_server_url,
+                    key_server_uds=configuration.key_server_uds,
+                    key_server_url=configuration.key_server_url,
                 )
             )
-            install_key_client(app.state, key_client)
         else:
             _log.warning(
                 "key-server is not configured."
@@ -62,9 +130,50 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                 " Set OT_AUDIT_SERVER_key_server_uds or OT_AUDIT_SERVER_key_server_url"
                 " to enable logging."
             )
+            key_client = _NoOpFailKeyClient()
+        install_key_client(app.state, key_client)
+        if (
+            configuration.robot_server_uds is not None
+            or configuration.robot_server_url is not None
+        ):
+            robot_server_client = await exit_stack.enter_async_context(
+                build_robot_client(
+                    robot_server_uds=configuration.robot_server_uds,
+                    robot_server_url=configuration.robot_server_url,
+                )
+            )
+        else:
+            _log.warning(
+                "robot-server is not configured."
+                " robot identity file and run log in log period download"
+                " will return stub data."
+            )
+            robot_server_client = _StubRobotServerClient()
 
+        install_robot_server_client(app.state, robot_server_client)
+        log_store = build_log_store(app.state, engine)
+        log_data_manager = build_log_data_manager(
+            app.state, log_store, settings_store, key_client
+        )
+        authentication_checker = await exit_stack.enter_async_context(
+            build_authentication_checker(
+                auth_server_uds=configuration.auth_server_uds,
+                auth_server_url=configuration.auth_server_url,
+                fallback=FailedClosedAuthenticationChecker,
+            )
+        )
+        install_authentication_checker(app.state, authentication_checker)
+        local_log_client = LocalClient(log_data_manager, settings_store)
+        install_audit_client(app.state, local_log_client)
+        await log_data_manager.rotate_periods()
         systemd_utils.notify_up()
         yield
+
+
+async def _handle_auth_error_async(
+    request: Request, error: AuthorizationError
+) -> Response:
+    return handle_authorization_error(request, error)
 
 
 app = FastAPI(
@@ -73,6 +182,11 @@ app = FastAPI(
     docs_url=None,
     redoc_url=None,
     lifespan=_lifespan,
+    exception_handlers={AuthorizationError: _handle_auth_error_async},
 )
 
 app.include_router(ingest_router)
+app.include_router(log_export_router)
+app.include_router(settings_router)
+
+app.middleware("http")(audit_logger_middleware)

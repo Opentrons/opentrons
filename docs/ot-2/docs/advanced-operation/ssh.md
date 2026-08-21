@@ -35,7 +35,7 @@ Follow these steps to create an SSH key on your Mac, Windows, or Linux computer:
 
 ## Get the robot's IP address
 
-3. From the Opentrons App, click **Devices** and locate the robot that you want to work with.
+3. From the Opentrons OT-2 App, click **Devices** and locate the robot that you want to work with.
 
 4. Click the three-dot menu (⋮) for that robot and then click **Robot settings**.
 

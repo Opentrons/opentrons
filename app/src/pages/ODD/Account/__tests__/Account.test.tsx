@@ -4,12 +4,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useLogOut } from '/app/resources/access-control/useLogOut'
+import { logOut } from '/app/redux/robot-auth'
 
 import { Account } from '..'
 import { useAccountInfo } from '../hooks'
 
-vi.mock('/app/resources/access-control/useLogOut')
+vi.mock('/app/redux/discovery', () => ({
+  getLocalRobot: vi.fn(() => ({ name: 'local-robot' })),
+}))
 vi.mock('../hooks', () => ({
   useAccountInfo: vi.fn(),
 }))
@@ -22,8 +24,6 @@ vi.mock('react-router-dom', async importOriginal => {
     useNavigate: () => mockNavigate,
   }
 })
-
-const mockLogOut = vi.fn()
 
 const renderAccount = (initialPath = '/account') => {
   return renderWithProviders(
@@ -41,7 +41,6 @@ const renderAccount = (initialPath = '/account') => {
 describe('Account', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(useLogOut).mockReturnValue(mockLogOut)
   })
 
   it('renders account details when logged in', () => {
@@ -79,17 +78,19 @@ describe('Account', () => {
     })
   })
 
-  it('calls logOut when the "log out" button is tapped', () => {
+  it('dispatches logOut when the "log out" button is tapped', () => {
     vi.mocked(useAccountInfo).mockReturnValue({
       isLoggedIn: true,
       username: 'username',
       fullName: 'Full Name',
     })
 
-    renderAccount()
+    const [, store] = renderAccount()
 
     fireEvent.click(screen.getByRole('button', { name: 'Log out' }))
-    expect(mockLogOut).toHaveBeenCalled()
+    expect(store.dispatch).toHaveBeenCalledWith(
+      logOut({ robotName: 'local-robot' })
+    )
   })
 
   it('navigates to the previous page when the back button is tapped', () => {

@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -62,13 +63,14 @@ describe('Retract', () => {
     screen.getByRole('button', { name: 'del' })
   })
 
-  it('renders test, buttons, input field, and keyboard for retract after dispense - delay duration', () => {
+  it('renders test, buttons, input field, and keyboard for retract after dispense - delay duration', async () => {
+    const user = userEvent.setup()
     props.kind = 'dispense'
     render(props)
     screen.getByText('Retract after dispensing')
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByText('Continue'))
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Continue')
     screen.getByRole('button', { name: '1' })
     screen.getByRole('button', { name: '5' })
@@ -79,30 +81,32 @@ describe('Retract', () => {
     screen.getByText('Delay duration (seconds)')
   })
 
-  it('renders test, buttons, input field, and keyboard for retract after aspirating - position', () => {
+  it('renders test, buttons, input field, and keyboard for retract after aspirating - position', async () => {
     render({
       ...props,
       state: {
         retractAspirate: { positionReference: 'well-bottom', position: 0 },
       } as any,
     })
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByText('Continue'))
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Continue')
-    fireEvent.click(screen.getByRole('button', { name: '0' }))
-    fireEvent.click(screen.getByRole('button', { name: '.' }))
-    fireEvent.click(screen.getByRole('button', { name: '6' }))
-    fireEvent.click(screen.getByText('Continue'))
+    await user.click(screen.getByRole('button', { name: '0' }))
+    await user.click(screen.getByRole('button', { name: '.' }))
+    await user.click(screen.getByRole('button', { name: '6' }))
+    await user.click(screen.getByText('Continue'))
     screen.getByText('Distance from bottom of well (mm)')
     screen.getByText('Between 0 and 3 mm')
-    fireEvent.click(screen.getByRole('button', { name: '2' }))
-    fireEvent.click(screen.getByRole('button', { name: '2' }))
-    fireEvent.click(screen.getByRole('button', { name: '2' }))
+    await user.click(screen.getByRole('button', { name: '2' }))
+    await user.click(screen.getByRole('button', { name: '2' }))
+    await user.click(screen.getByRole('button', { name: '2' }))
     screen.getByText('Value must be between 0 to 3')
     screen.getByText('Save')
   })
-  it('calls dispatch with correct action and settings when save is clicked', () => {
+  it('calls dispatch with correct action and settings when save is clicked', async () => {
+    const user = userEvent.setup()
     props.state.retractAspirate = {
       speed: 0,
       delayDuration: 0,
@@ -110,16 +114,16 @@ describe('Retract', () => {
       positionReference: 'well-bottom',
     }
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    fireEvent.click(screen.getByText('Continue'))
-    fireEvent.click(screen.getByRole('button', { name: '0' }))
-    fireEvent.click(screen.getByRole('button', { name: '.' }))
-    fireEvent.click(screen.getByRole('button', { name: '5' }))
-    fireEvent.click(screen.getByText('Continue'))
-    fireEvent.click(screen.getByRole('button', { name: '2' }))
-    fireEvent.click(screen.getByRole('button', { name: '2' }))
-    fireEvent.click(screen.getByText('Save'))
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByRole('button', { name: '1' }))
+    await user.click(screen.getByText('Continue'))
+    await user.click(screen.getByRole('button', { name: '0' }))
+    await user.click(screen.getByRole('button', { name: '.' }))
+    await user.click(screen.getByRole('button', { name: '5' }))
+    await user.click(screen.getByText('Continue'))
+    await user.click(screen.getByRole('button', { name: '2' }))
+    await user.click(screen.getByRole('button', { name: '2' }))
+    await user.click(screen.getByText('Save'))
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_RETRACT_ASPIRATE',
       retractSettings: {
@@ -131,9 +135,10 @@ describe('Retract', () => {
     })
   })
 
-  it('should call mock function when clicking back button', () => {
+  it('should call mock function when clicking back button', async () => {
     render(props)
-    fireEvent.click(screen.getByTestId('ChildNavigation_Back_Button'))
+    const user = userEvent.setup()
+    await user.click(screen.getByTestId('ChildNavigation_Back_Button'))
     expect(props.onBack).toHaveBeenCalled()
   })
 })

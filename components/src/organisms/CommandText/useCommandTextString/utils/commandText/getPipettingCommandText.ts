@@ -36,7 +36,7 @@ export const getPipettingCommandText = ({
     0,
     commandTextData.commands.findIndex(c => c.id === command?.id)
   )
-  const labwareLocation =
+  const labwareLocationFromCommands =
     allPreviousCommands != null
       ? getFinalLabwareLocation(
           labwareId,
@@ -44,9 +44,21 @@ export const getPipettingCommandText = ({
         )
       : null
 
+  const loadedLabware =
+    commandTextData != null
+      ? getLoadedLabware(commandTextData.labware ?? [], labwareId)
+      : null
+
+  // Prefer location derived from prior commands; fall back to the run's loaded
+  // labware location (needed when command history IDs don't match, e.g. fixit
+  // commands documented against protocol-analysis command lists).
   const displayLocation = getLabwareDisplayLocation({
     loadedLabwares: commandTextData?.labware ?? [],
-    location: labwareLocation?.locationSequence ?? labwareLocation?.location,
+    location:
+      labwareLocationFromCommands?.locationSequence ??
+      labwareLocationFromCommands?.location ??
+      loadedLabware?.location ??
+      null,
     robotType,
     allRunDefs,
     loadedModules: commandTextData?.modules ?? [],
@@ -146,10 +158,6 @@ export const getPipettingCommandText = ({
       })
     }
     case 'dropTip': {
-      const loadedLabware =
-        commandTextData != null
-          ? getLoadedLabware(commandTextData.labware ?? [], labwareId)
-          : null
       const labwareDefinitions =
         commandTextData != null
           ? getLabwareDefinitionsFromCommands(

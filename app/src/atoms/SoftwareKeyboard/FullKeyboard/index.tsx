@@ -8,6 +8,7 @@ import {
   customDisplay,
   fullKeyboardLayout,
   layoutCandidates,
+  softwareKeyboardButtonAttributes,
 } from '../constants'
 
 import type { MutableRefObject } from 'react'
@@ -153,8 +154,9 @@ export function FullKeyboard({
       }
       display={display}
       mergeDisplay={true}
-      useButtonTag={true}
-      debug={debug} // If true, <ENTER> will input a \n
+      useButtonTag={false} // Exclude from the tab order.
+      buttonAttributes={softwareKeyboardButtonAttributes}
+      debug={debug}
       baseClass="fullKeyboard"
       buttonTheme={[
         {
@@ -174,6 +176,7 @@ export function FullKeyboard({
           buttons: '{shift}',
         },
       ]}
+      preventMouseDownDefault // Don't steal focus from inputs.
     />
   )
 }

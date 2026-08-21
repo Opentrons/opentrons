@@ -149,6 +149,32 @@ describe('shell/update', () => {
         } as any,
         expected: '1.0.0',
       },
+      {
+        name: 'getShellUsbMountPaths returns every mount path',
+        selector: ShellUpdate.getShellUsbMountPaths,
+        state: {
+          shell: {
+            usbMountPaths: [
+              { path: '/media/DRIVE-sdb1', isMassStorage: true },
+              { path: '/media/PHONE-sdc1', isMassStorage: false },
+            ],
+          },
+        } as any,
+        expected: ['/media/DRIVE-sdb1', '/media/PHONE-sdc1'],
+      },
+      {
+        name: 'getShellUsbMassStorageMountPaths returns only mass-storage mounts',
+        selector: ShellUpdate.getShellUsbMassStorageMountPaths,
+        state: {
+          shell: {
+            usbMountPaths: [
+              { path: '/media/DRIVE-sdb1', isMassStorage: true },
+              { path: '/media/PHONE-sdc1', isMassStorage: false },
+            ],
+          },
+        } as any,
+        expected: ['/media/DRIVE-sdb1'],
+      },
     ]
 
     SPECS.forEach(spec => {

@@ -89,8 +89,11 @@ vi.mock('../hooks/useProtocolReceiptToast')
 vi.mock('../hooks/useSoftwareUpdatePoll')
 vi.mock('../ODDTopLevelRedirects')
 vi.mock('../../molecules/LoggedOutOverlay')
-vi.mock('/app/organisms/ODD/OnDeviceLogin/clearStaleAuthBeforeLogin', () => ({
-  clearStaleAuthBeforeLogin: () => Promise.resolve(),
+vi.mock('/app/resources/devices/hooks/useTrackRobotRestarts', () => ({
+  useTrackRobotRestarts: vi.fn(),
+}))
+vi.mock('/app/resources/robot-update/RobotUpdateProvider', () => ({
+  RobotUpdateProvider: ({ children }: { children: JSX.Element }) => children,
 }))
 
 const mockSettings = {

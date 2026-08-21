@@ -1,4 +1,4 @@
-import { mockPipetteInfo } from '/app/redux/pipettes/__fixtures__'
+import { mockPipetteInfo } from '/app/resources/instruments/__fixtures__'
 
 import { CHOOSE_DROP_TIP_LOCATION, DT_ROUTES } from '../constants'
 
@@ -19,6 +19,7 @@ export const mockDropTipWizardContainerProps: DropTipWizardContainerProps = {
   issuedCommandsType: 'setup',
   activeMaintenanceRunId: 'MOCK_MAINTENANCE_RUN_ID',
   errorDetails: null,
+  clearErrorDetails: MOCK_FN,
   currentStep: CHOOSE_DROP_TIP_LOCATION,
   currentRoute: DT_ROUTES.DROP_TIP,
   currentStepIdx: 0,

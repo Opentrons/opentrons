@@ -38,9 +38,9 @@ export function Navigation(props: NavigationProps): JSX.Element {
   const { t } = useTranslation('top_navigation')
 
   const location = useLocation()
-  const accountIcon = useAccountIconInitial()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+  const accountIcon = useAccountIconInitial(robotName)
 
   const [showNavMenu, setShowNavMenu] = useState<boolean>(false)
 

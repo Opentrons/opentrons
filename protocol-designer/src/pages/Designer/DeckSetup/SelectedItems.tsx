@@ -7,8 +7,12 @@ import {
   getModuleDef,
   getModuleType,
   inferModuleOrientationFromXCoordinate,
+  VACUUM_MODULE_V1,
 } from '@opentrons/shared-data'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import {
+  getSlotInLocationStack,
+  VACUUM_DOCK_ADDRESSABLE_AREA,
+} from '@opentrons/step-generation'
 
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { selectors } from '../../../labware-ingred/selectors'
@@ -107,6 +111,12 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
     (selectedAdapterDefURI ? 1 : 0) +
     (selectedTopLabware?.labwareDefURI ? 1 : 0)
 
+  const isVacuumDock = selectedSlot.slot === VACUUM_DOCK_ADDRESSABLE_AREA
+
+  const transformedModuleModel = isVacuumDock
+    ? VACUUM_MODULE_V1
+    : selectedModuleModel
+
   return (
     <>
       {selectedFixture != null && selectedSlot.cutout != null ? (
@@ -117,7 +127,7 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
           deckDef={deckDef}
         />
       ) : null}
-      {selectedModuleModel != null &&
+      {transformedModuleModel != null &&
       slotPosition != null &&
       orientation != null ? (
         <>
@@ -131,17 +141,18 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
           available for labware on the stacker. so we don't want to re-render the stacker
           in the hopper slot
           */}
-          {isSlotAHopper ? null : (
+          {isSlotAHopper || isVacuumDock ? null : (
             <Module
-              key={`${selectedModuleModel}_${selectedSlot.slot}_selected`}
+              key={`${transformedModuleModel}_${selectedSlot.slot}_selected`}
               x={slotPosition[0]}
               y={slotPosition[1]}
-              def={getModuleDef(selectedModuleModel)}
+              def={getModuleDef(transformedModuleModel)}
               orientation={orientation}
               targetDeckId={null}
               targetSlotId={null}
               childrenPositioningMode={
-                getModuleType(selectedModuleModel) === FLEX_STACKER_MODULE_TYPE
+                getModuleType(transformedModuleModel) ===
+                FLEX_STACKER_MODULE_TYPE
                   ? 'passThrough'
                   : 'offsetToSlot'
               }
@@ -149,15 +160,15 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
               <SelectedModuleLabwareRender
                 topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}
                 adapterDef={selectedAdapterDef}
-                moduleModel={selectedModuleModel}
+                moduleModel={transformedModuleModel}
                 lidOnDeck={matchingSelectedLidOnDeck}
               />
             </Module>
           )}
-          {selectedModuleModel != null ? (
+          {transformedModuleModel != null ? (
             <ModuleLabel
               isLast={selectedAdapterDefURI == null}
-              moduleModel={selectedModuleModel}
+              moduleModel={transformedModuleModel}
               position={slotPosition}
               orientation={orientation}
               isSelected={true}
@@ -166,6 +177,7 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
               showModuleIcon={
                 selectedTopLabware.amount > 1 || lengthOfStack > 1
               }
+              isVacuumDock={isVacuumDock}
             />
           ) : null}
         </>
@@ -174,7 +186,7 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
         showModuleIcon={selectedTopLabware.amount > 1 || lengthOfStack > 1}
         labwareDef={selectedTopLabwareDef ?? selectedAdapterDef}
         slotPosition={slotPosition}
-        moduleModel={selectedModuleModel ?? null}
+        moduleModel={transformedModuleModel}
         nestedLabwareInfo={
           selectedAdapterDef != null && selectedTopLabwareDef != null
             ? [

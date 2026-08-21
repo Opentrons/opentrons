@@ -55,12 +55,9 @@ export interface TouchInputFieldProps {
   min?: number | string
   /** horizontal text alignment for label, input, and (sub)captions */
   textAlign?:
-    | typeof TYPOGRAPHY.textAlignLeft
-    | typeof TYPOGRAPHY.textAlignCenter
+    typeof TYPOGRAPHY.textAlignLeft | typeof TYPOGRAPHY.textAlignCenter
   /** small or medium input field height */
   size?: 'medium' | 'small'
-  /** if true, style the background of input field to error state */
-  hasBackgroundError?: boolean
   /** optional prop to override input field border radius */
   borderRadius?: string
   /** optional prop to override input field padding */
@@ -85,11 +82,9 @@ export const TouchInputField = forwardRef<
     label,
     caption,
     onClick,
-    tabIndex = 0,
     isIndeterminate = false,
     textAlign = TYPOGRAPHY.textAlignLeft,
     size = 'small',
-    hasBackgroundError = false,
     borderRadius,
     padding,
     type,
@@ -145,7 +140,6 @@ export const TouchInputField = forwardRef<
           onClick={disabled === true ? undefined : onClick}
         >
           <div
-            tabIndex={tabIndex}
             style={inputFieldStyles}
             className={clsx(
               styles.input_field,
@@ -154,7 +148,6 @@ export const TouchInputField = forwardRef<
                 : styles.input_field_medium,
               {
                 [styles.error]: hasError,
-                [styles.background_error]: hasBackgroundError,
               }
             )}
             onClick={() => {

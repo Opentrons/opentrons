@@ -14,7 +14,6 @@ export interface LoginFieldControllerProps {
   loginError: string | null
   confirmPasswordError: string | null
   onClearFieldErrors: () => void
-  onFocus: () => void
 }
 
 export function LoginFieldController({
@@ -25,7 +24,6 @@ export function LoginFieldController({
   loginError,
   confirmPasswordError,
   onClearFieldErrors,
-  onFocus,
 }: LoginFieldControllerProps): JSX.Element | null {
   if (step === 'username') {
     return (
@@ -36,11 +34,11 @@ export function LoginFieldController({
         render={({ field }) => (
           <LoginFieldInput
             field={field}
-            label={t('device_settings:username')}
+            label={t('access_control:username')}
             error={null}
             isPasswordField={false}
             onClearError={onClearFieldErrors}
-            onFocus={onFocus}
+            autoFocus
           />
         )}
       />
@@ -61,13 +59,13 @@ export function LoginFieldController({
             field={field}
             label={
               isPasswordResetRequired
-                ? t('device_settings:on_device_login_new_password')
-                : t('device_settings:password')
+                ? t('access_control:on_device_login_new_password')
+                : t('access_control:login_form_password_field')
             }
             error={passwordError}
             isPasswordField={true}
             onClearError={onClearFieldErrors}
-            onFocus={onFocus}
+            autoFocus
           />
         )}
       />
@@ -83,11 +81,11 @@ export function LoginFieldController({
         render={({ field }) => (
           <LoginFieldInput
             field={field}
-            label={t('device_settings:on_device_login_confirm_password')}
+            label={t('access_control:on_device_login_confirm_password')}
             error={confirmPasswordError}
             isPasswordField={true}
             onClearError={onClearFieldErrors}
-            onFocus={onFocus}
+            autoFocus
           />
         )}
       />

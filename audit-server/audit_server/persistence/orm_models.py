@@ -12,8 +12,9 @@ from datetime import datetime
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.schema import UniqueConstraint
 
-from server_utils.sql_utils import UTCDateTime
+from server_utils.sql_utils import JsonPythonValue, JsonValue, UTCDateTime
 
 
 class Base(DeclarativeBase):
@@ -48,8 +49,12 @@ class LogPeriod(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     started_at: Mapped[datetime]
     ended_at: Mapped[datetime | None]
-    log_entries: Mapped[list["LogEntry"]] = relationship(back_populates="log_period")
-    robot_logs: Mapped[list["RobotLog"]] = relationship(back_populates="log_period")
+    log_entries: Mapped[list[LogEntry]] = relationship(
+        back_populates="log_period",
+        foreign_keys="LogEntry.log_period_id",
+        order_by="LogEntry.period_ordinal",
+    )
+    robot_logs: Mapped[list[RobotLog]] = relationship(back_populates="log_period")
 
 
 class LogEntry(Base):
@@ -63,9 +68,19 @@ class LogEntry(Base):
     """
 
     __tablename__ = "logentry"
+    __table_args__ = (
+        UniqueConstraint(
+            "log_period_id", "period_ordinal", name="uc_period_ordinal_period_id"
+        ),
+    )
     id: Mapped[int] = mapped_column(primary_key=True)
-    log_period_id: Mapped[int] = mapped_column(ForeignKey("logperiod.id"))
-    log_period: Mapped["LogPeriod"] = relationship(back_populates="log_entries")
+    period_ordinal: Mapped[int]
+    log_period_id: Mapped[int] = mapped_column(
+        ForeignKey("logperiod.id", name="fk_log_period_for_audit_log")
+    )
+    log_period: Mapped[LogPeriod] = relationship(
+        back_populates="log_entries", foreign_keys=log_period_id
+    )
     message: Mapped[str]
     message_hash: Mapped[str]
     message_sig: Mapped[str]
@@ -82,9 +97,41 @@ class RobotLog(Base):
 
     __tablename__ = "robotlog"
     id: Mapped[int] = mapped_column(primary_key=True)
-    log_period_id: Mapped[int] = mapped_column(ForeignKey("logperiod.id"))
-    log_period: Mapped["LogPeriod"] = relationship(back_populates="robot_logs")
+    log_period_id: Mapped[int] = mapped_column(
+        ForeignKey("logperiod.id", name="fk_log_period_for_robot_log")
+    )
+    log_period: Mapped[LogPeriod] = relationship(
+        back_populates="robot_logs", foreign_keys=log_period_id
+    )
     file_path: Mapped[str]
     file_hash: Mapped[str]
     file_sig: Mapped[str]
     file_sig_version: Mapped[str]
+
+
+class Setting(Base):
+    """ORM model for a single generic setting, stored as a JSON-encoded value.
+
+    This is the generic key/value settings table. Settings that don't warrant
+    their own dedicated table live here. There are currently no such settings,
+    but the table exists so new ones can be added without a schema change.
+    """
+
+    __tablename__ = "setting"
+
+    key: Mapped[str] = mapped_column(primary_key=True)
+    value: Mapped[JsonPythonValue] = mapped_column(JsonValue, nullable=False)
+
+
+class LoggingEnabled(Base):
+    """ORM model for the logging-enabled setting.
+
+    This setting lives in its own table (rather than the generic ``setting``
+    table) because it's a special case that we want to read and write through a
+    dedicated, internal-only API.
+    """
+
+    __tablename__ = "logging_enabled"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    enabled: Mapped[bool]

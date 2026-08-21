@@ -26,10 +26,6 @@ export function WifiPasswordInput({
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
-  const handleBlur = (): void => {
-    if (inputRef.current != null) inputRef.current?.focus()
-  }
-
   const mainWrapperClasses = clsx(
     styles.main_wrapper,
     !isUnboxingFlowOngoing && styles.main_wrapper_with_top_margin
@@ -53,10 +49,8 @@ export function WifiPasswordInput({
             <div className={styles.input_field_wrapper}>
               <TouchInputField
                 aria-label="wifi_password"
-                id="wifiPassword"
                 value={password}
                 type={showPassword ? 'text' : 'password'}
-                onBlur={handleBlur}
                 ref={inputRef}
                 autoFocus
                 onChange={e => {
@@ -68,7 +62,6 @@ export function WifiPasswordInput({
               isVisible={showPassword}
               onToggle={() => {
                 setShowPassword(currentState => !currentState)
-                inputRef?.current?.focus()
               }}
             />
           </div>

@@ -47,6 +47,7 @@ module.exports = {
     '@typescript-eslint/default-param-last': 'off',
     '@typescript-eslint/consistent-indexed-object-style': 'off',
     '@typescript-eslint/no-non-null-assertion': 'warn',
+    'opentrons/no-direct-use-mutation': 'error',
 
     // TODO(mc, 2021-01-29): fix these and remove warning overrides
     'lines-between-class-members': 'warn',
@@ -148,6 +149,7 @@ module.exports = {
         './app/src/**/*.@(ts|tsx)',
         './opentrons-ai-client/src/**/*.@(ts|tsx)',
         './protocol-designer/src/**/*.@(ts|tsx)',
+        './protocol-visualization/src/**/*.@(ts|tsx)',
       ],
       rules: {
         'import/no-absolute-path': 'off',
@@ -198,6 +200,8 @@ module.exports = {
       files: ['./app/src/**/*.@(ts|tsx)'],
       rules: {
         'opentrons/no-imports-up-the-tree-of-life': 'error',
+        // Ban direct calls to mutating api-client helpers; use react-api-client mutations.
+        'opentrons/no-direct-mutating': 'error',
       },
     },
     {
@@ -231,6 +235,15 @@ module.exports = {
       rules: {
         'opentrons/no-margins-in-css': 'warn',
         'opentrons/no-margins-inline': 'warn',
+      },
+    },
+    {
+      files: ['./protocol-visualization/src/**/*.@(ts|tsx)'],
+      rules: {
+        'opentrons/no-imports-up-the-tree-of-life': 'warn',
+        'opentrons/no-margins-in-css': 'warn',
+        'opentrons/no-margins-inline': 'warn',
+        '@eslint-react/no-nested-component-definitions': 'error',
       },
     },
     {

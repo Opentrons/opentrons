@@ -44,7 +44,7 @@ interface FlowRateEntryProps {
 
 export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
   const { onBack, state, dispatch, kind } = props
-  const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
+  const { t } = useTranslation(['quick_transfer', 'shared'])
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
   const initialFlowRate =
@@ -131,7 +131,7 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
       <ChildNavigation
         header={headerCopy}
-        buttonText={i18n.format(t('shared:save'), 'capitalize')}
+        buttonText={t('shared:save')}
         onClickBack={onBack}
         onClickButton={handleClickSave}
         top={SPACING.spacing8}
@@ -159,9 +159,6 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
             value={flowRate}
             label={textEntryCopy}
             error={error}
-            onBlur={e => {
-              e.target.focus()
-            }}
             onChange={e => {
               handleFlowRateChange(e.target.value as string)
             }}

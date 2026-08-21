@@ -21,15 +21,9 @@ export interface ReleaseSetFilepaths {
 type ComponentVersionKind = 'version' | 'sha' | 'branch'
 
 type ReleaseComponent =
-  | 'robot_server'
-  | 'update_server'
-  | 'system_server'
-  | 'opentrons_api'
+  'robot_server' | 'update_server' | 'system_server' | 'opentrons_api'
 type FlexReleaseComponent =
-  | ReleaseComponent
-  | 'usb_bridge'
-  | 'firmware'
-  | 'openembedded'
+  ReleaseComponent | 'usb_bridge' | 'firmware' | 'openembedded'
 type OT2ReleaseComponent = ReleaseComponent | 'buildroot'
 
 type FlexReleaseComponentVersions =

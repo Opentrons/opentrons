@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getAuthStateForRobot,
+  getIsAdminForRobot,
   getIsLoggedInToLocalRobot,
   getLocalRobotAuthState,
   getMostRecentRobotName,
+  getUsernameForRobot,
 } from '../slice'
 
 import type {
@@ -24,7 +26,11 @@ describe('robot auth selectors', () => {
   const stateWithRobotA = makeTestState({
     perRobotAuthStates: {
       robotA: {
-        username: 'alice',
+        user: {
+          username: 'alice',
+          fullName: 'Alice',
+          accountType: 'user',
+        },
         accessToken: 'token-a',
         refreshToken: null,
         expiresAt: 1234,
@@ -45,11 +51,58 @@ describe('robot auth selectors', () => {
 
     it('returns per-robot auth when present', () => {
       expect(getAuthStateForRobot(stateWithRobotA, 'robotA')).toEqual({
-        username: 'alice',
+        user: {
+          username: 'alice',
+          fullName: 'Alice',
+          accountType: 'user',
+        },
         accessToken: 'token-a',
         refreshToken: null,
         expiresAt: 1234,
       })
+    })
+  })
+
+  describe('getUsernameForRobot', () => {
+    it('returns null when robot name is null', () => {
+      expect(getUsernameForRobot(stateWithRobotA, null)).toEqual(null)
+    })
+
+    it('returns username when logged in to robot', () => {
+      expect(getUsernameForRobot(stateWithRobotA, 'robotA')).toEqual('alice')
+    })
+
+    it('returns null when not logged in to robot', () => {
+      expect(getUsernameForRobot(emptyRobotAuthState, 'robotA')).toEqual(null)
+    })
+  })
+
+  describe('getIsAdminForRobot', () => {
+    it('returns true when the logged-in user is an admin', () => {
+      expect(
+        getIsAdminForRobot(
+          makeTestState({
+            perRobotAuthStates: {
+              robotA: {
+                user: {
+                  username: 'admin',
+                  fullName: 'Admin User',
+                  accountType: 'admin',
+                },
+                accessToken: 'token',
+                refreshToken: null,
+                expiresAt: null,
+              },
+            },
+            mostRecentRobotName: 'robotA',
+          }),
+          'robotA'
+        )
+      ).toBe(true)
+    })
+
+    it('returns false when the logged-in user is not an admin', () => {
+      expect(getIsAdminForRobot(stateWithRobotA, 'robotA')).toBe(false)
     })
   })
 
@@ -65,10 +118,14 @@ describe('robot auth selectors', () => {
       serverHealth: { robotModel: 'OT-3 Standard' } as any,
     }
     const authState = {
+      user: {
+        username: 'george_clooney',
+        fullName: 'George Clooney',
+        accountType: 'user' as const,
+      },
       accessToken: 'access-token',
       refreshToken: 'refresh-token',
       expiresAt: 1234,
-      username: 'george_clooney',
     }
 
     it('returns data when the local robot has auth state', () => {

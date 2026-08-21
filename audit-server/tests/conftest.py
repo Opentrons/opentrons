@@ -1,15 +1,111 @@
 import asyncio
 import threading
 import time
+from pathlib import Path
 from typing import Callable, Generator
 
 import aiohttp.web
 import pytest
 import requests
+from decoy import Decoy
+from sqlalchemy.engine import Engine as SQLEngine
 
+from server_utils.keys.key_server import Client as KeyClient
 from tests.dev_server import DevServer
 
+from audit_server.log_storage.log_data_manager import LogDataManager
+from audit_server.persistence.database import create_schema, sql_engine_ctx
+
 _INTEGRATION_SERVER_STARTUP_TIMEOUT_S = 30
+
+
+@pytest.fixture
+def db_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
+    """A SQLAlchemy engine backed by a fresh SQLite DB with the schema created."""
+    db_path = tmp_path / "test_audit.db"
+    with sql_engine_ctx(db_path) as engine:
+        create_schema(engine)
+        yield engine
+
+
+@pytest.fixture(autouse=True)
+def configure_test_logs(caplog: pytest.LogCaptureFixture) -> None:
+    """Configure which logs pytest captures and displays.
+
+    Because of the autouse=True, this automatically applies to each test.
+
+    By default, pytest displays log messages of level WARNING and above.
+    If you need to adjust this in the course of a debugging adventure,
+    you should normally do it by passing something like --log-level=DEBUG
+    to pytest on the command line.
+    """
+    # Fix up SQLAlchemy's logging so that it uses the same log level as everything else.
+    # By default, SQLAlchemy's logging is slightly unusual: it hides messages below
+    # WARNING, even if you pass --log-level=DEBUG to pytest on the command line.
+    # See: https://docs.sqlalchemy.org/en/14/core/engines.html#configuring-logging
+    caplog.set_level("NOTSET", logger="sqlalchemy")
+
+
+@pytest.fixture
+def mock_key_client(decoy: Decoy) -> KeyClient:
+    """A decoy mock key client."""
+    return decoy.mock(cls=KeyClient)
+
+
+@pytest.fixture
+def mock_log_data_manager(decoy: Decoy) -> LogDataManager:
+    return decoy.mock(cls=LogDataManager)
+
+
+@pytest.fixture
+def fake_auth_server(
+    unused_tcp_port_factory: Callable[[], int],
+) -> Generator[str, None, None]:
+    """Run a minimal in-process standin for auth-server on a TCP port.
+
+    Yields the base URL. Always pretends that auth is disabled.
+    """
+    port = unused_tcp_port_factory()
+
+    async def fake_auth_on(request: aiohttp.web.Request) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(data={"data": {"accessControlEnabled": True}})
+
+    async def fake_token_introspect(
+        request: aiohttp.web.Request,
+    ) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(
+            data={
+                "active": True,
+                "scope": "auth_settings.write audit_log.write audit_log.delete",
+                "username": "test",
+                "ot_fullname": "Test",
+            },
+        )
+
+    app = aiohttp.web.Application()
+    app.router.add_get("/auth/settings/accessControlEnabled", fake_auth_on)
+    app.router.add_post("/auth/oauth2/introspect", fake_token_introspect)
+    loop = asyncio.new_event_loop()
+    runner = aiohttp.web.AppRunner(app)
+
+    def serve() -> None:
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(runner.setup())
+        site = aiohttp.web.TCPSite(runner, host="127.0.0.1", port=port)
+        loop.run_until_complete(site.start())
+        loop.run_forever()
+
+    thread = threading.Thread(target=serve, name="fake-auth-server", daemon=True)
+    thread.start()
+
+    base_url = f"http://127.0.0.1:{port}"
+    _wait_for_tcp(base_url)
+    try:
+        yield base_url
+    finally:
+        loop.call_soon_threadsafe(loop.stop)
+        thread.join(timeout=5)
+        asyncio.run(runner.cleanup())
 
 
 @pytest.fixture
@@ -39,8 +135,19 @@ def fake_key_server(
             }
         )
 
+    async def get_key_and_hash(request: aiohttp.web.Request) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(
+            data={
+                "data": {
+                    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAqvlF5UaVgYPvt/vNtirrzIWSlARPyf69ZVWpnSqpdB4=\n-----END PUBLIC KEY-----\n",
+                    "hashedKey": "sha256:7joao5sCagU94b_QvDskeDWJGikWPJJdsrlG6kSuWiI=",
+                }
+            }
+        )
+
     app = aiohttp.web.Application()
     app.router.add_post("/keys/internal/logSigning/signMessage", sign_message)
+    app.router.add_get("/keys/external/logSigning/publicKey", get_key_and_hash)
 
     loop = asyncio.new_event_loop()
     runner = aiohttp.web.AppRunner(app)
@@ -66,15 +173,97 @@ def fake_key_server(
 
 
 @pytest.fixture
+def fake_robot_server(
+    unused_tcp_port_factory: Callable[[], int],
+) -> Generator[str, None, None]:
+    """Run a minimal in-process standin for robot-server on a TCP port.
+
+    Yields the base URL.
+    """
+    port = unused_tcp_port_factory()
+
+    async def fake_stub_health(request: aiohttp.web.Request) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(
+            data={"name": "my robot", "robot_serial": "123abc"}
+        )
+
+    async def fake_stub_runs(request: aiohttp.web.Request) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(
+            data={
+                "data": [
+                    {
+                        "id": "myRunId",
+                        "current": True,
+                        "protocolId": "myProtocolId",
+                        "createdAt": "2026-01-01T18:00:00.123456Z",
+                    }
+                ],
+                "links": {"current": {"href": "/runs/myRunId"}},
+            },
+        )
+
+    async def fake_stub_run_commands(
+        request: aiohttp.web.Request,
+    ) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(
+            data={"commands": [{"foo": "bar"}]},
+        )
+
+    async def fake_stub_protocol(request: aiohttp.web.Request) -> aiohttp.web.Response:
+        return aiohttp.web.json_response(
+            data={
+                "data": {
+                    "files": [{"name": "my_cool_protocol.py"}],
+                    "metadata": {"protocolName": "Flex Cool Protocol"},
+                }
+            },
+        )
+
+    app = aiohttp.web.Application()
+    app.router.add_get("/health", fake_stub_health)
+    app.router.add_get("/runs", fake_stub_runs)
+    app.router.add_get("/runs/{runId}/commands", fake_stub_run_commands)
+    app.router.add_get("/protocols/{protocolId}", fake_stub_protocol)
+    loop = asyncio.new_event_loop()
+    runner = aiohttp.web.AppRunner(app)
+
+    def serve() -> None:
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(runner.setup())
+        site = aiohttp.web.TCPSite(runner, host="127.0.0.1", port=port)
+        loop.run_until_complete(site.start())
+        loop.run_forever()
+
+    thread = threading.Thread(target=serve, name="fake-robot-server", daemon=True)
+    thread.start()
+
+    base_url = f"http://127.0.0.1:{port}"
+    _wait_for_tcp(base_url)
+    try:
+        yield base_url
+    finally:
+        loop.call_soon_threadsafe(loop.stop)
+        thread.join(timeout=5)
+        asyncio.run(runner.cleanup())
+
+
+@pytest.fixture
 def run_server(
-    unused_tcp_port: int, fake_key_server: str
+    unused_tcp_port: int,
+    fake_key_server: str,
+    fake_auth_server: str,
+    fake_robot_server: str,
 ) -> Generator[DevServer, None, None]:
     """Run a dev server as a fixture scoped to the test.
 
     The dev server is configured to talk to the in-process ``fake_key_server``
     so that routes that depend on the key-server client resolve cleanly.
     """
-    extra_env = {"OT_AUDIT_SERVER_key_server_url": fake_key_server}
+    extra_env = {
+        "OT_AUDIT_SERVER_key_server_url": fake_key_server,
+        "OT_AUDIT_SERVER_auth_server_url": fake_auth_server,
+        "OT_AUDIT_SERVER_robot_server_url": fake_robot_server,
+    }
     with DevServer(port=unused_tcp_port, extra_env=extra_env) as dev_server:
         dev_server.start()
         base_url = f"http://localhost:{dev_server.port}"

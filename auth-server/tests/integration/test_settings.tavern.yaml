@@ -16,15 +16,11 @@ stages:
           maxNumberOfLoginAttempts: 5
           passwordResetTime: null
           idleLogout: 180.0
-          requireReasonForInteraction: true
-          minLengthOfReasonForInteraction: null
           passwordComplexitySpecialCharacters: null
           passwordComplexityMinimumLength: null
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
-
-
 
 ---
 test_name: PATCH updates and returns new settings
@@ -33,6 +29,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: GET initial settings
@@ -48,8 +45,6 @@ stages:
           passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
           idleLogout: 180.0
-          requireReasonForInteraction: true
-          minLengthOfReasonForInteraction: null
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -67,7 +62,6 @@ stages:
           passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
-          requireReasonForInteraction: false
           requireAdminCredsWhenUpdatingRobotSoftware: false
     response:
       status_code: 200
@@ -78,8 +72,6 @@ stages:
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
           idleLogout: 60.0
-          requireReasonForInteraction: false
-          minLengthOfReasonForInteraction: null
           requireAdminCredsWhenUpdatingRobotSoftware: false
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -97,8 +89,6 @@ stages:
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
           idleLogout: 60.0
-          requireReasonForInteraction: false
-          minLengthOfReasonForInteraction: null
           requireAdminCredsWhenUpdatingRobotSoftware: false
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -116,8 +106,6 @@ stages:
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
           idleLogout: 60.0
-          requireReasonForInteraction: false
-          minLengthOfReasonForInteraction: null
           requireAdminCredsWhenUpdatingRobotSoftware: false
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -129,6 +117,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: PATCH to change some settings
@@ -144,8 +133,6 @@ stages:
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
           idleLogout: 60.0
-          requireReasonForInteraction: false
-          minLengthOfReasonForInteraction: 10
           requireAdminCredsWhenUpdatingRobotSoftware: false
     response:
       status_code: 200
@@ -156,12 +143,9 @@ stages:
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
           idleLogout: 60.0
-          requireReasonForInteraction: false
-          minLengthOfReasonForInteraction: 10
           requireAdminCredsWhenUpdatingRobotSoftware: false
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
-
 
   - name: DELETE resets everything except accessControlEnabled to its default
     request:
@@ -175,15 +159,11 @@ stages:
         data:
           maxNumberOfLoginAttempts: 5
           passwordResetTime: null
-          minLengthOfReasonForInteraction: null
-          passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
           idleLogout: 180.0
-          requireReasonForInteraction: true
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
-
 
 test_name: DELETE resets to defaults except including accessControlEnabled when not in db
 
@@ -191,6 +171,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: PATCH to enable maxNumberOfLoginAttempts
@@ -211,8 +192,6 @@ stages:
           passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
           idleLogout: 180.0
-          requireReasonForInteraction: true
-          minLengthOfReasonForInteraction: null          
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -232,8 +211,6 @@ stages:
           passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
           idleLogout: 180.0
-          requireReasonForInteraction: true
-          minLengthOfReasonForInteraction: null
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -244,6 +221,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: GET access control enabled default

@@ -1,0 +1,1085 @@
+"""Tests for the log data manager."""
+
+import tempfile
+from datetime import datetime, timezone
+from pathlib import Path
+
+import pytest
+from decoy import Decoy, matchers
+from fastapi import UploadFile
+from opentrons_shared_data.errors.exceptions import KeyStorageUnavailableError
+
+from server_utils.keys.key_server import Client as KeyClient
+from server_utils.keys.key_server import SignedMessageData, SignMessageData
+
+from audit_server.log_storage import constants
+from audit_server.log_storage.log_data_manager import (
+    InvalidDeletionKeyError,
+    LogDataManager,
+    _GetTime,
+)
+from audit_server.log_storage.models import LogPeriodDetails, LogPeriodSummary
+from audit_server.log_storage.store import (
+    LogStore,
+    NoActivePeriodError,
+    NoLogInPeriodError,
+    NoPeriodById,
+    PeriodIsActiveError,
+)
+from audit_server.log_storage.types import StoredLog
+from audit_server.settings.store import SettingsStore
+
+
+@pytest.fixture
+def mock_store(decoy: Decoy) -> LogStore:
+    """A mock log store."""
+    return decoy.mock(cls=LogStore)
+
+
+@pytest.fixture
+def mock_time(decoy: Decoy) -> _GetTime:
+    """Handle to alter the timestamps used in logs."""
+    mt = decoy.mock(cls=_GetTime)
+    decoy.when(mt.now()).then_return(datetime.now(timezone.utc))
+    return mt
+
+
+@pytest.fixture
+def mock_settings(decoy: Decoy) -> SettingsStore:
+    """A mock settings store."""
+    settings = decoy.mock(cls=SettingsStore)
+    decoy.when(settings.get_logging_enabled()).then_return(True)
+    return settings
+
+
+@pytest.fixture
+def mock_key_client(decoy: Decoy) -> KeyClient:
+    return decoy.mock(cls=KeyClient)
+
+
+@pytest.fixture
+def subject(
+    mock_store: LogStore,
+    mock_key_client: KeyClient,
+    mock_settings: SettingsStore,
+    mock_time: _GetTime,
+) -> LogDataManager:
+    """Get a LogDataManager to test."""
+    return LogDataManager(
+        key_client=mock_key_client,
+        log_store=mock_store,
+        settings_store=mock_settings,
+        time_getter=mock_time,
+    )
+
+
+@pytest.fixture
+def disable_logging(mock_settings: SettingsStore, decoy: Decoy) -> None:
+    """Force logging off."""
+    decoy.when(mock_settings.get_logging_enabled()).then_return(False)
+
+
+def test_get_log_period_details(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+) -> None:
+    """It should get aggregate period details from the store."""
+    details = LogPeriodDetails(
+        id="1",
+        startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
+        endedAt=None,
+        recordCount=10,
+        totalSizeBytes=100,
+        attachedFilenames=[],
+    )
+    decoy.when(mock_store.get_period_details("1")).then_return(details)
+
+    result = subject.get_log_period_details("1")
+
+    assert result == details
+
+
+def test_get_log_period_details_handles_failure(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+) -> None:
+    """It should raise failures from the store."""
+
+    decoy.when(mock_store.get_period_details("1")).then_return(NoPeriodById())
+
+    with pytest.raises(NoPeriodById):
+        subject.get_log_period_details("1")
+
+
+async def test_store_log_stores_nothing_if_logging_disabled(
+    subject: LogDataManager, disable_logging: None, mock_store: LogStore, decoy: Decoy
+) -> None:
+    """It should store no data if logging is disabled."""
+    await subject.store_log("asd")
+    decoy.verify(mock_store.tail_hash(), times=0)
+    decoy.verify(mock_store.store_log(matchers.Anything()), times=0)
+
+
+async def test_rotate_periods_does_nothing_if_logging_disabled(
+    subject: LogDataManager,
+    disable_logging: None,
+    mock_store: LogStore,
+    decoy: Decoy,
+) -> None:
+    """It should not interact with the store if logging is disabled."""
+    await subject.rotate_periods()
+    decoy.verify(mock_store.store_log(matchers.Anything()), times=0)
+    decoy.verify(mock_store.start_period(matchers.Anything()), times=0)
+    decoy.verify(mock_store.end_period(matchers.Anything()), times=0)
+
+
+async def test_store_robot_log_does_nothing_if_logging_disabled(
+    subject: LogDataManager,
+    disable_logging: None,
+    mock_store: LogStore,
+    decoy: Decoy,
+) -> None:
+    """It should store no robot log if logging is disabled."""
+    mock_file = decoy.mock(cls=UploadFile)
+    await subject.store_robot_log(mock_file, Path())
+    decoy.verify(
+        mock_store.store_robot_log(matchers.Anything(), matchers.Anything()), times=0
+    )
+
+
+async def test_store_log_stores_log(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+    mock_key_client: KeyClient,
+) -> None:
+    """It should store the log it's passsed in and return a hash of its own devising."""
+    log = StoredLog(
+        message="helo",
+        message_hash="helicopter",
+        message_sig="hollycopter",
+        sig_version="3",
+    )
+    decoy.when(mock_store.tail_hash()).then_return("ph")
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData(message="helo", previousHash="ph")
+        )
+    ).then_return(
+        SignedMessageData(
+            message="helo",
+            messageHash="helicopter",
+            messageSignature="hollycopter",
+            signatureVersion=3,
+        )
+    )
+    decoy.when(mock_store.store_log(log)).then_return("fffff")
+    stored_hash = await subject.store_log("helo")
+    assert stored_hash == "fffff"
+
+
+async def test_store_log_raises_keyserver_unavailable(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+    mock_key_client: KeyClient,
+) -> None:
+    """It should raise if the key server is unavailable."""
+    decoy.when(mock_store.tail_hash()).then_return("oh well")
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData(message="mymessage", previousHash="oh well")
+        )
+    ).then_raise(Exception("nope im broken"))
+    with pytest.raises(KeyStorageUnavailableError):
+        await subject.store_log("mymessage")
+
+
+async def test_store_robot_log_stores_file(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+    mock_key_client: KeyClient,
+) -> None:
+    """It should save the file to memory and save the hashed robot log to the store."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file.write("beep boop".encode("utf-8"))
+            temp_file.seek(0)
+            robot_log = StoredLog(
+                message="beep",
+                message_hash="bzzzt",
+                message_sig="boop",
+                sig_version="3",
+            )
+            decoy.when(
+                await mock_key_client.sign_message(
+                    SignMessageData(message="beep boop", previousHash=None)
+                )
+            ).then_return(
+                SignedMessageData(
+                    message="beep",
+                    messageHash="bzzzt",
+                    messageSignature="boop",
+                    signatureVersion=3,
+                )
+            )
+            temp_path = Path(temp_dir) / Path(temp_file.name).name
+            decoy.when(mock_store.store_robot_log(robot_log, temp_path)).then_return(
+                "eeeeee"
+            )
+            assert not temp_path.is_file()
+            stored_hash = await subject.store_robot_log(
+                UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
+                Path(temp_dir),
+            )
+            assert stored_hash == "eeeeee"
+            assert temp_path.is_file()
+
+
+async def test_store_robot_log_renames_file(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+    mock_key_client: KeyClient,
+) -> None:
+    """It should append _copy to the file if it already exists."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file.write("beep boop".encode("utf-8"))
+            temp_file.seek(0)
+            robot_log = StoredLog(
+                message="beep",
+                message_hash="bzzzt",
+                message_sig="boop",
+                sig_version="3",
+            )
+            decoy.when(
+                await mock_key_client.sign_message(
+                    SignMessageData(message="beep boop", previousHash=None)
+                )
+            ).then_return(
+                SignedMessageData(
+                    message="beep",
+                    messageHash="bzzzt",
+                    messageSignature="boop",
+                    signatureVersion=3,
+                )
+            )
+            temp_path = Path(temp_dir) / Path(temp_file.name).name
+            decoy.when(mock_store.store_robot_log(robot_log, temp_path)).then_return(
+                "eeeeee"
+            )
+            assert not temp_path.is_file()
+            stored_hash = await subject.store_robot_log(
+                UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
+                Path(temp_dir),
+            )
+            assert stored_hash == "eeeeee"
+            assert temp_path.is_file()
+
+            # It should it handle it for the first copy
+            copied_temp_path = temp_path.with_stem(f"{temp_path.stem}_copy")
+            decoy.when(
+                mock_store.store_robot_log(robot_log, copied_temp_path)
+            ).then_return("iiiiii")
+            temp_file.seek(0)
+            stored_hash = await subject.store_robot_log(
+                UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
+                Path(temp_dir),
+            )
+            assert stored_hash == "iiiiii"
+            assert copied_temp_path.is_file()
+
+            # Trying the same file a third time should make _copy_copy
+            copied_copied_temp_path = copied_temp_path.with_stem(
+                f"{copied_temp_path.stem}_copy"
+            )
+            decoy.when(
+                mock_store.store_robot_log(robot_log, copied_copied_temp_path)
+            ).then_return("oooooo")
+            temp_file.seek(0)
+            stored_hash = await subject.store_robot_log(
+                UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
+                Path(temp_dir),
+            )
+            assert stored_hash == "oooooo"
+            assert copied_copied_temp_path.is_file()
+
+
+async def test_store_robot_log_raises_keyserver_unavailable(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+    mock_key_client: KeyClient,
+) -> None:
+    """It should raise if the key server is unavailable."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file.write("it's a secret to everyone".encode("utf-8"))
+            temp_file.seek(0)
+            decoy.when(
+                await mock_key_client.sign_message(
+                    SignMessageData(
+                        message="it's a secret to everyone", previousHash=None
+                    )
+                )
+            ).then_raise(Exception("ain't a secret no more"))
+            with pytest.raises(KeyStorageUnavailableError):
+                await subject.store_robot_log(
+                    UploadFile(temp_file.file, filename=temp_file.name),  # type: ignore[arg-type]
+                    Path(temp_dir),
+                )
+
+
+async def test_store_log_rotates_if_cannot_get_tail_hash(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+    mock_key_client: KeyClient,
+    mock_time: _GetTime,
+) -> None:
+    """It should rotate log periods if it cannot get the last hash."""
+    decoy.when(mock_store.tail_hash()).then_return(NoActivePeriodError())
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(".*Log period begun.*"),
+                previousHash=None,
+            )
+        )
+    ).then_return(
+        SignedMessageData(
+            message="log period begun",
+            messageHash="he",
+            messageSignature="lo",
+            signatureVersion=3,
+        )
+    )
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(".*log-error.*"), previousHash="he"
+            )
+        )
+    ).then_return(
+        SignedMessageData(
+            message="log error",
+            messageHash="go",
+            messageSignature="od",
+            signatureVersion=4,
+        )
+    )
+    decoy.when(
+        mock_store.store_log(
+            StoredLog(
+                message="log period begun",
+                message_hash="he",
+                message_sig="lo",
+                sig_version="3",
+            )
+        )
+    ).then_return("he")
+    decoy.when(
+        mock_store.store_log(
+            StoredLog(
+                message="log error",
+                message_hash="go",
+                message_sig="od",
+                sig_version="4",
+            )
+        )
+    ).then_return("od")
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(".*mymessage.*"),
+                previousHash="go",
+            )
+        )
+    ).then_return(
+        SignedMessageData(
+            message="my message",
+            messageHash="by",
+            messageSignature="ee",
+            signatureVersion=5,
+        )
+    )
+    decoy.when(
+        mock_store.store_log(
+            StoredLog(
+                message="my message",
+                message_hash="by",
+                message_sig="ee",
+                sig_version="5",
+            )
+        )
+    ).then_return("ee")
+    decoy.when(
+        mock_store.start_period(
+            [
+                StoredLog(
+                    message="log period begun",
+                    message_hash="he",
+                    message_sig="lo",
+                    sig_version="3",
+                ),
+                StoredLog(
+                    message="log error",
+                    message_hash="go",
+                    message_sig="od",
+                    sig_version="4",
+                ),
+            ]
+        )
+    ).then_return("go")
+    result = await subject.store_log("mymessage")
+    assert result == "ee"
+
+
+async def test_rotate_happypath(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+    mock_key_client: KeyClient,
+    mock_time: _GetTime,
+) -> None:
+    """It should rotate log periods without errors cleanly."""
+    decoy.when(mock_store.tail_hash()).then_return("gg")
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(
+                    f".*{constants.ACTION_LOG_PERIOD_END}.*"
+                ),
+                previousHash="gg",
+            )
+        )
+    ).then_return(
+        SignedMessageData(
+            message="end-log-period",
+            messageHash="ff",
+            messageSignature="s1",
+            signatureVersion=1,
+        )
+    )
+    decoy.when(
+        mock_store.end_period(
+            [
+                StoredLog(
+                    message="end-log-period",
+                    message_hash="ff",
+                    message_sig="s1",
+                    sig_version="1",
+                )
+            ]
+        )
+    ).then_return("ff")
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(
+                    f".*{constants.ACTION_LOG_PERIOD_START}.*"
+                ),
+                previousHash="ff",
+            )
+        )
+    ).then_return(
+        SignedMessageData(
+            message="start-log-period",
+            messageHash="ee",
+            messageSignature="s2",
+            signatureVersion=2,
+        )
+    )
+    decoy.when(
+        mock_store.start_period([StoredLog("start-log-period", "ee", "s2", "2")])
+    ).then_return("ee")
+    assert await subject.rotate_periods() == "ee"
+
+
+async def test_rotate_no_previous_period(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+    mock_key_client: KeyClient,
+    mock_time: _GetTime,
+) -> None:
+    """It should not emit an end-period message if there is no period to end."""
+    decoy.when(mock_store.tail_hash()).then_return(NoActivePeriodError())
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(
+                    f".*{constants.ACTION_LOG_PERIOD_START}.*"
+                ),
+                previousHash=None,
+            )
+        )
+    ).then_return(
+        SignedMessageData(
+            message="start-log-period",
+            messageHash="ff",
+            messageSignature="s1",
+            signatureVersion=1,
+        )
+    )
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(
+                    f".*{constants.MESSAGE_NO_PREVIOUS_PERIOD}.*"
+                ),
+                previousHash="ff",
+            )
+        )
+    ).then_return(
+        SignedMessageData(
+            message="error-no-period",
+            messageHash="ee",
+            messageSignature="s2",
+            signatureVersion=2,
+        )
+    )
+    decoy.when(
+        mock_store.start_period(
+            [
+                StoredLog(
+                    message="start-log-period",
+                    message_hash="ff",
+                    message_sig="s1",
+                    sig_version="1",
+                ),
+                StoredLog(
+                    message="error-no-period",
+                    message_hash="ee",
+                    message_sig="s2",
+                    sig_version="2",
+                ),
+            ]
+        )
+    ).then_return("ee")
+    assert await subject.rotate_periods() == "ee"
+
+
+async def test_rotate_no_previous_log(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+    mock_key_client: KeyClient,
+    mock_time: _GetTime,
+) -> None:
+    """It should emit an end-period message with an empty hash if there is no previous log."""
+    decoy.when(mock_store.tail_hash()).then_return(NoLogInPeriodError())
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(
+                    f".*{constants.MESSAGE_NO_PREVIOUS_LOG}.*"
+                ),
+                previousHash=None,
+            )
+        )
+    ).then_return(
+        SignedMessageData(
+            message="error-no-log",
+            messageHash="ff",
+            messageSignature="s1",
+            signatureVersion=1,
+        )
+    )
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(
+                    f".*{constants.MESSAGE_LOG_PERIOD_END}.*"
+                ),
+                previousHash="ff",
+            )
+        )
+    ).then_return(
+        SignedMessageData(
+            message="end-period",
+            messageHash="ee",
+            messageSignature="s2",
+            signatureVersion=2,
+        )
+    )
+    decoy.when(
+        mock_store.end_period(
+            [
+                StoredLog("error-no-log", "ff", "s1", "1"),
+                StoredLog("end-period", "ee", "s2", "2"),
+            ]
+        )
+    ).then_return("ee")
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(
+                    f".*{constants.MESSAGE_LOG_PERIOD_START}.*"
+                ),
+                previousHash="ee",
+            )
+        )
+    ).then_return(
+        SignedMessageData(
+            message="start-period",
+            messageHash="dd",
+            messageSignature="s3",
+            signatureVersion=3,
+        )
+    )
+    decoy.when(
+        mock_store.start_period(
+            [
+                StoredLog(
+                    message="start-period",
+                    message_hash="dd",
+                    message_sig="s3",
+                    sig_version="3",
+                )
+            ]
+        )
+    ).then_return("dd")
+    assert await subject.rotate_periods() == "dd"
+
+
+async def test_rotate_log_happypath_handles_no_keyserver(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+    mock_key_client: KeyClient,
+    mock_time: _GetTime,
+) -> None:
+    """It should log key server failures and still rotate period."""
+    decoy.when(mock_store.tail_hash()).then_return("aa")
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(
+                    f".*{constants.MESSAGE_LOG_PERIOD_END}.*"
+                ),
+                previousHash="aa",
+            )
+        )
+    ).then_raise(KeyStorageUnavailableError())
+    decoy.when(
+        mock_store.end_period(
+            [
+                StoredLog(
+                    message=matchers.StringMatching(
+                        f".*{constants.MESSAGE_LOG_SIGNING_UNAVAILABLE}.*"
+                    ),
+                    message_hash="",
+                    message_sig="",
+                    sig_version="-1",
+                ),
+                StoredLog(
+                    matchers.StringMatching(f".*{constants.MESSAGE_LOG_PERIOD_END}.*"),
+                    "",
+                    "",
+                    "-1",
+                ),
+            ]
+        )
+    ).then_return("")
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(
+                    f".*{constants.MESSAGE_LOG_PERIOD_START}.*"
+                ),
+                previousHash=None,
+            )
+        )
+    ).then_raise(KeyStorageUnavailableError())
+    decoy.when(
+        mock_store.start_period(
+            [
+                StoredLog(
+                    message=matchers.StringMatching(
+                        f".*{constants.MESSAGE_LOG_PERIOD_START}.*"
+                    ),
+                    message_hash="",
+                    message_sig="",
+                    sig_version="-1",
+                ),
+                StoredLog(
+                    message=matchers.StringMatching(
+                        f".*{constants.MESSAGE_LOG_SIGNING_UNAVAILABLE}.*"
+                    ),
+                    message_hash="",
+                    message_sig="",
+                    sig_version="-1",
+                ),
+            ]
+        )
+    ).then_return("dd")
+    assert await subject.rotate_periods() == "dd"
+
+
+async def test_rotate_no_previous_period_handles_no_keyserver(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+    mock_key_client: KeyClient,
+    mock_time: _GetTime,
+) -> None:
+    """Its no-previous-period codepath should handle no key server.."""
+    decoy.when(mock_store.tail_hash()).then_return(NoActivePeriodError())
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(
+                    f".*{constants.ACTION_LOG_PERIOD_START}.*"
+                ),
+                previousHash=None,
+            )
+        )
+    ).then_raise(KeyStorageUnavailableError())
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(
+                    f".*{constants.MESSAGE_NO_PREVIOUS_PERIOD}.*"
+                ),
+                previousHash=None,
+            )
+        )
+    ).then_raise(KeyStorageUnavailableError())
+    decoy.when(
+        mock_store.start_period(
+            [
+                StoredLog(
+                    message=matchers.StringMatching(
+                        f".*{constants.MESSAGE_LOG_PERIOD_START}.*"
+                    ),
+                    message_hash="",
+                    message_sig="",
+                    sig_version="-1",
+                ),
+                StoredLog(
+                    message=matchers.StringMatching(
+                        f".*{constants.MESSAGE_LOG_SIGNING_UNAVAILABLE}.*"
+                    ),
+                    message_hash="",
+                    message_sig="",
+                    sig_version="-1",
+                ),
+                StoredLog(
+                    message=matchers.StringMatching(
+                        f".*{constants.MESSAGE_NO_PREVIOUS_PERIOD}.*"
+                    ),
+                    message_hash="",
+                    message_sig="",
+                    sig_version="-1",
+                ),
+                StoredLog(
+                    message=matchers.StringMatching(
+                        f".*{constants.MESSAGE_LOG_SIGNING_UNAVAILABLE}.*"
+                    ),
+                    message_hash="",
+                    message_sig="",
+                    sig_version="-1",
+                ),
+            ]
+        )
+    ).then_return("")
+    assert await subject.rotate_periods() == ""
+
+
+async def test_rotate_no_previous_log_handles_no_key_server(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+    mock_key_client: KeyClient,
+    mock_time: _GetTime,
+) -> None:
+    """Rotation after no previous log should handle no key server."""
+    decoy.when(mock_store.tail_hash()).then_return(NoLogInPeriodError())
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(
+                    f".*{constants.MESSAGE_NO_PREVIOUS_LOG}.*"
+                ),
+                previousHash=None,
+            )
+        )
+    ).then_raise(KeyStorageUnavailableError())
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(
+                    f".*{constants.MESSAGE_LOG_PERIOD_END}.*"
+                ),
+                previousHash=None,
+            )
+        )
+    ).then_raise(KeyStorageUnavailableError())
+    decoy.when(
+        mock_store.end_period(
+            [
+                StoredLog(
+                    matchers.StringMatching(f".*{constants.MESSAGE_NO_PREVIOUS_LOG}.*"),
+                    "",
+                    "",
+                    "-1",
+                ),
+                StoredLog(
+                    matchers.StringMatching(
+                        f".*{constants.MESSAGE_LOG_SIGNING_UNAVAILABLE}.*"
+                    ),
+                    "",
+                    "",
+                    "-1",
+                ),
+                StoredLog(
+                    matchers.StringMatching(
+                        f".*{constants.MESSAGE_LOG_SIGNING_UNAVAILABLE}.*"
+                    ),
+                    "",
+                    "",
+                    "-1",
+                ),
+                StoredLog(
+                    matchers.StringMatching(f".*{constants.MESSAGE_LOG_PERIOD_END}.*"),
+                    "",
+                    "",
+                    "-1",
+                ),
+            ]
+        )
+    ).then_return("")
+    decoy.when(
+        await mock_key_client.sign_message(
+            SignMessageData.model_construct(
+                message=matchers.StringMatching(
+                    f".*{constants.MESSAGE_LOG_PERIOD_START}.*"
+                ),
+                previousHash=None,
+            )
+        )
+    ).then_raise(KeyStorageUnavailableError())
+    decoy.when(
+        mock_store.start_period(
+            [
+                StoredLog(
+                    message=matchers.StringMatching(
+                        f".*{constants.MESSAGE_LOG_PERIOD_START}.*"
+                    ),
+                    message_hash="",
+                    message_sig="",
+                    sig_version="-1",
+                ),
+                StoredLog(
+                    matchers.StringMatching(
+                        f".*{constants.MESSAGE_LOG_SIGNING_UNAVAILABLE}.*"
+                    ),
+                    "",
+                    "",
+                    "-1",
+                ),
+            ]
+        )
+    ).then_return("")
+    assert await subject.rotate_periods() == ""
+
+
+def test_create_deletion_key_mints_a_key(
+    subject: LogDataManager, mock_store: LogStore, decoy: Decoy
+) -> None:
+    """It should mint a non-empty deletion key for a completed log period."""
+    decoy.when(mock_store.get_period_details("1")).then_return(
+        LogPeriodDetails(
+            id="1",
+            startedAt=datetime.now(),
+            endedAt=datetime.now(),
+            recordCount=10,
+            totalSizeBytes=100,
+            attachedFilenames=[],
+        )
+    )
+    key = subject.create_deletion_key(period_id="1")
+
+    assert key
+
+
+def test_create_deletion_key_mints_distinct_keys(
+    subject: LogDataManager, mock_store: LogStore, decoy: Decoy
+) -> None:
+    """Each call should mint a new, distinct key for the same period."""
+    decoy.when(mock_store.get_period_details("1")).then_return(
+        LogPeriodDetails(
+            id="1",
+            startedAt=datetime.now(),
+            endedAt=datetime.now(),
+            recordCount=10,
+            totalSizeBytes=100,
+            attachedFilenames=[],
+        )
+    )
+    first = subject.create_deletion_key(period_id="1")
+    second = subject.create_deletion_key(period_id="1")
+
+    assert first != second
+
+
+def test_create_deletion_key_fails_if_period_is_active(
+    subject: LogDataManager, mock_store: LogStore, decoy: Decoy
+) -> None:
+    """Deletion keys cannot be created for active periods."""
+    decoy.when(mock_store.get_period_details("1")).then_return(
+        LogPeriodDetails(
+            id="1",
+            startedAt=datetime.now(),
+            endedAt=None,
+            recordCount=10,
+            totalSizeBytes=100,
+            attachedFilenames=[],
+        )
+    )
+    with pytest.raises(PeriodIsActiveError):
+        subject.create_deletion_key("1")
+
+
+def test_create_deletion_key_fails_if_period_does_not_exist(
+    subject: LogDataManager, mock_store: LogStore, decoy: Decoy
+) -> None:
+    """Deletion keys cannot be created for non-existent periods."""
+    decoy.when(mock_store.get_period_details("1")).then_return(NoPeriodById())
+    with pytest.raises(NoPeriodById):
+        subject.create_deletion_key("1")
+
+
+async def test_delete_log_period_requires_deletion_key(
+    subject: LogDataManager, mock_store: LogStore, decoy: Decoy
+) -> None:
+    """It should refuse to delete a log period without a valid key."""
+    period_id = "2"
+    decoy.when(mock_store.get_period_details(period_id)).then_return(
+        LogPeriodDetails(
+            id="1",
+            startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
+            endedAt=datetime(2025, 1, 1, tzinfo=timezone.utc),
+            recordCount=10,
+            totalSizeBytes=100,
+            attachedFilenames=[],
+        )
+    )
+    valid_key = subject.create_deletion_key(period_id)
+    with pytest.raises(InvalidDeletionKeyError):
+        await subject.delete_log_period(
+            period_id=period_id, deletion_key="asdasdasdasd////"
+        )
+    with pytest.raises(InvalidDeletionKeyError):
+        await subject.delete_log_period(period_id="1", deletion_key=valid_key)
+    decoy.verify(mock_store.delete_period(matchers.Anything()), times=0)
+
+
+async def test_delete_log_period_fails_if_period_is_active(
+    subject: LogDataManager,
+    mock_store: LogStore,
+    decoy: Decoy,
+    mock_key_client: KeyClient,
+) -> None:
+    """It should refuse to delete active periods even if there's somehow a valid deletion key."""
+    period_id = "1"
+    valid_key = "gabbagool"
+    subject._deletion_keys[valid_key] = "1"
+
+    decoy.when(mock_store.delete_period(period_id)).then_return(
+        PeriodIsActiveError(), []
+    )
+    with pytest.raises(PeriodIsActiveError):
+        await subject.delete_log_period(period_id=period_id, deletion_key=valid_key)
+
+
+async def test_delete_log_period_deletes_log_collateral(
+    subject: LogDataManager, mock_store: LogStore, decoy: Decoy, tmp_path: Path
+) -> None:
+    """If there are logs to delete, they should be deleted."""
+    files = [tmp_path / "file1.txt", tmp_path / "file2.txt"]
+    for file_to_write in files:
+        file_to_write.write_text("hello")
+    period_id = "1"
+    decoy.when(mock_store.get_period_details(period_id)).then_return(
+        LogPeriodDetails(
+            id="1",
+            startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
+            endedAt=datetime(2025, 1, 1, tzinfo=timezone.utc),
+            recordCount=10,
+            totalSizeBytes=100,
+            attachedFilenames=[],
+        )
+    )
+    valid_key = subject.create_deletion_key(period_id)
+    decoy.when(mock_store.delete_period("1")).then_return([str(f) for f in files])
+    result = await subject.delete_log_period(period_id, valid_key)
+    assert result == "1"
+    for file in files:
+        assert not file.exists()
+
+
+def test_usage_summary_adds_up(
+    subject: LogDataManager, mock_store: LogStore, decoy: Decoy
+) -> None:
+    """It should sum up usage of each log period."""
+
+    def _build_summary(id: str) -> LogPeriodSummary:
+        return LogPeriodSummary(
+            id=id,
+            startedAt=datetime.now(tz=timezone.utc),
+            endedAt=datetime.now(tz=timezone.utc),
+        )
+
+    def _build_details(id: str, usage: int) -> LogPeriodDetails:
+        return LogPeriodDetails(
+            id=id,
+            startedAt=datetime.now(tz=timezone.utc),
+            endedAt=datetime.now(tz=timezone.utc),
+            recordCount=usage // 1000,
+            totalSizeBytes=usage,
+            attachedFilenames=["a"] * 10,
+        )
+
+    decoy.when(mock_store.list_periods()).then_return(
+        [
+            _build_summary("1"),
+            _build_summary(
+                id="-5",
+            ),
+            _build_summary(
+                id="steve",
+            ),
+            _build_summary(
+                id="nazgul",
+            ),
+            _build_summary(
+                id="8589934583",
+            ),
+        ]
+    )
+    decoy.when(mock_store.get_period_details("1")).then_return(
+        _build_details("1", 1000000)
+    )
+    decoy.when(mock_store.get_period_details("-5")).then_return(
+        _build_details("-5", 5000000)
+    )
+    decoy.when(mock_store.get_period_details("steve")).then_return(
+        _build_details("steve", 123123123123)
+    )
+    decoy.when(mock_store.get_period_details("nazgul")).then_return(
+        _build_details("nazgul", 9000000)
+    )
+    decoy.when(mock_store.get_period_details("8589934583")).then_return(
+        _build_details("8589934583", 8589934583)
+    )
+    result = subject.get_total_fs_usage()
+    assert result.totalUsageBytes == (
+        1000000 + 5000000 + 123123123123 + 9000000 + 8589934583
+    )
+    assert result.totalPeriods == 5

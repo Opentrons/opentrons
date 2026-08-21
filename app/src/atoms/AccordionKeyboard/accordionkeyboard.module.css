@@ -3,6 +3,7 @@
   width: 100%;
   flex-direction: column;
   background-color: var(--transparent);
+  pointer-events: none;
 }
 
 .accordion_header {
@@ -25,9 +26,11 @@
   background-color: var(--grey-35);
   color: var(--black-90);
   cursor: pointer;
+  pointer-events: auto;
 }
 
 .accordion_body {
   width: 100%;
   background-color: var(--grey-35);
+  pointer-events: auto;
 }

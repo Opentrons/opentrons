@@ -17,6 +17,7 @@ from fastapi import (
     status,
 )
 
+from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
 
@@ -64,7 +65,10 @@ oem_mode_router = APIRouter()
             "message": "OEM Mode unhandled exception."
         },
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("alter OEM mode")),
+    ],
 )
 async def enable_oem_mode_endpoint(
     response: Response,
@@ -100,7 +104,10 @@ async def enable_oem_mode_endpoint(
             "message": "OEM Mode splash unhandled exception."
         },
     },
-    dependencies=[Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE))],
+    dependencies=[
+        Depends(require_scopes(Scope.ROBOT_SETTINGS_WRITE)),
+        Depends(get_audit_logger("set boot splash")),
+    ],
 )
 async def upload_splash_image(
     response: Response,

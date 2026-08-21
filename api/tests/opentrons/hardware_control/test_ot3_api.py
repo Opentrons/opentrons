@@ -2,6 +2,7 @@
 
 import asyncio
 import types
+from datetime import datetime
 from math import copysign, isclose
 from typing import (
     Any,
@@ -23,7 +24,22 @@ from hypothesis import HealthCheck, assume, example, given, settings, strategies
 from mock import AsyncMock, MagicMock, Mock, PropertyMock, call, patch
 from typing_extensions import Literal
 
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId
+from opentrons_hardware.firmware_bindings.constants import (
+    MessageId,
+    MotorUsageValueType,
+    NodeId,
+    SensorId,
+)
+from opentrons_hardware.firmware_bindings.messages.fields import MotorUsageTypeField
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    GetMotorUsageResponse,
+)
+from opentrons_hardware.firmware_bindings.messages.payloads import (
+    GetMotorUsageResponsePayload,
+)
+from opentrons_hardware.firmware_bindings.utils import (
+    UInt8Field,
+)
 from opentrons_hardware.hardware_control.motion_planning.types import Move
 from opentrons_hardware.sensors.types import SensorDataType
 from opentrons_shared_data.errors.exceptions import (
@@ -86,6 +102,7 @@ from opentrons.hardware_control.modules import (
 )
 from opentrons.hardware_control.motion_utilities import target_position_from_plunger
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.robot_calibration import DeckCalibration
 from opentrons.hardware_control.types import (
     Axis,
     CriticalPoint,
@@ -354,6 +371,17 @@ async def mock_instrument_handlers(
 
 
 @pytest.fixture
+def fake_deck_calibration() -> DeckCalibration:
+    inrange_matrix = [[1.0, 0, 0], [0.0, 1, 0], [0.0, 0, 1]]
+    return DeckCalibration(
+        attitude=inrange_matrix,
+        last_modified=datetime.now(),
+        source=SourceType.user,
+        status=CalibrationStatus(),
+    )
+
+
+@pytest.fixture
 async def gripper_present(
     managed_obj: OT3API,
     ot3_hardware: ThreadManager[OT3API],
@@ -371,6 +399,16 @@ async def gripper_present(
     )
     hardware_backend._present_axes.update((Axis.G, Axis.Z_G))
     await ot3_hardware.cache_gripper(instr_data)
+
+
+@pytest.fixture
+def mock_get_usage_data(managed_obj: OT3API) -> Iterator[AsyncMock]:
+    with patch.object(
+        managed_obj._backend,
+        "get_motor_usage_data",
+        Mock(spec=managed_obj._backend.get_motor_usage_data),
+    ) as mock_get_lifetime:
+        yield mock_get_lifetime
 
 
 @pytest.fixture
@@ -1928,7 +1966,6 @@ async def test_dispense_while_tracking(
     is_ready: bool,
 ) -> None:
     mount = OT3Mount.LEFT
-
     instr_data = AttachedPipette(
         config=load_pipette_data.load_definition(
             PipetteModelType("p1000"),
@@ -2057,18 +2094,16 @@ async def test_move_to_plunger_bottom(
 @pytest.mark.parametrize(
     "input_position, expected_move_pos",
     [
-        ({Axis.X: 13}, {Axis.X: 13, Axis.Y: 493.8, Axis.Z_L: 253.475}),
+        ({Axis.X: 13}, {Axis.X: 13, Axis.Y: 493.8}),
         (
             {Axis.X: 13, Axis.Y: 14, Axis.Z_R: 15},
-            {Axis.X: 13, Axis.Y: 14, Axis.Z_R: -240.675},
+            {Axis.X: 13, Axis.Y: 14},
         ),
         (
             {Axis.Z_R: 15, Axis.Z_L: 16},
             {
                 Axis.X: 477.2,
                 Axis.Y: 493.8,
-                Axis.Z_L: -239.675,
-                Axis.Z_R: -240.675,
             },
         ),
     ],
@@ -2077,12 +2112,38 @@ async def test_move_axes(
     ot3_hardware: ThreadManager[OT3API],
     mock_move: AsyncMock,
     mock_check_motor: Mock,
+    fake_deck_calibration: DeckCalibration,
     input_position: Dict[Axis, float],
     expected_move_pos: OrderedDict[Axis, float],
 ) -> None:
+    mount_axes = [Axis.Z_L, Axis.Z_R, Axis.Z_G]
+    dummy_mount_offsets = {
+        Axis.Z_L: Point(z=50),
+        Axis.Z_R: Point(z=150),
+        Axis.Z_G: Point(z=100),
+    }
+    current_position = ot3_hardware._current_position
+    ot3_hardware._robot_calibration.right_mount_offset = dummy_mount_offsets[Axis.Z_R]
+    ot3_hardware._robot_calibration.left_mount_offset = dummy_mount_offsets[Axis.Z_L]
+    ot3_hardware._robot_calibration.gripper_mount_offset = dummy_mount_offsets[Axis.Z_G]
+    # make sure we test against the robot calibration directly
+    expected_mount_offsets = {
+        Axis.Z_L: ot3_hardware._robot_calibration.left_mount_offset,
+        Axis.Z_R: ot3_hardware._robot_calibration.right_mount_offset,
+        Axis.Z_G: ot3_hardware._robot_calibration.gripper_mount_offset,
+    }
+
+    # ensure that calibration offsets get applied properly for each mount
+    for axis in input_position:
+        if axis in mount_axes:
+            expected_move_pos[axis] = (
+                input_position[axis] - expected_mount_offsets[axis].z
+            )
+    if all([mount_ax not in input_position for mount_ax in mount_axes]):
+        expected_move_pos[Axis.Z_L] = current_position[Axis.Z_L]
+
     await ot3_hardware.move_axes(position=input_position)
     mock_check_motor.return_value = True
-
     mock_move.assert_called_once_with(
         target_position=expected_move_pos, speed=None, expect_stalls=False
     )
@@ -2647,3 +2708,141 @@ async def test_stop_only_home_necessary_axes(
     await ot3_hardware.stop(home_after=True)
     if jaw_state == GripperJawState.GRIPPING:
         mock_home.assert_called_once_with(skip=[Axis.G])
+
+
+@pytest.mark.parametrize(
+    "lifetime_data",
+    [
+        {
+            Axis.X: GetMotorUsageResponse(
+                payload=GetMotorUsageResponsePayload(
+                    num_elements=UInt8Field(2),
+                    usage_elements=[
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.linear_motor_distance,
+                            length=8,
+                            usage_value=9189578909,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.total_error_count,
+                            length=4,
+                            usage_value=5398,
+                        ),
+                    ],
+                ),
+                payload_type=GetMotorUsageResponsePayload,
+                message_id=MessageId.get_motor_usage_response,
+            ),
+        },
+        {
+            Axis.X: GetMotorUsageResponse(
+                payload=GetMotorUsageResponsePayload(
+                    num_elements=UInt8Field(2),
+                    usage_elements=[
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.linear_motor_distance,
+                            length=8,
+                            usage_value=9189578909,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.total_error_count,
+                            length=4,
+                            usage_value=5398,
+                        ),
+                    ],
+                ),
+                payload_type=GetMotorUsageResponsePayload,
+                message_id=MessageId.get_motor_usage_response,
+            ),
+            Axis.P_R: GetMotorUsageResponse(
+                payload=GetMotorUsageResponsePayload(
+                    num_elements=UInt8Field(4),
+                    usage_elements=[
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.linear_motor_distance,
+                            length=8,
+                            usage_value=287997293,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.total_error_count,
+                            length=4,
+                            usage_value=5514,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.overpressure_error_count,
+                            length=4,
+                            usage_value=161,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.resin_tip_dispense_count,
+                            length=4,
+                            usage_value=0,
+                        ),
+                    ],
+                ),
+                payload_type=GetMotorUsageResponsePayload,
+                message_id=MessageId.get_motor_usage_response,
+            ),
+            Axis.G: GetMotorUsageResponse(
+                payload=GetMotorUsageResponsePayload(
+                    num_elements=UInt8Field(3),
+                    usage_elements=[
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.linear_motor_distance,
+                            length=8,
+                            usage_value=314519951,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.force_application_time,
+                            length=4,
+                            usage_value=15446218,
+                        ),
+                        MotorUsageTypeField(
+                            key=MotorUsageValueType.total_error_count,
+                            length=4,
+                            usage_value=7536,
+                        ),
+                    ],
+                ),
+                payload_type=GetMotorUsageResponsePayload,
+                message_id=MessageId.get_motor_usage_response,
+            ),
+        },
+    ],
+)
+async def test_get_motor_usage_data(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_get_usage_data: Mock,
+    lifetime_data: Dict[Axis, GetMotorUsageResponse],
+) -> None:
+    mock_get_usage_data.return_value = lifetime_data
+
+    api_result = await ot3_hardware.get_motor_usage_data()
+    assert api_result == lifetime_data
+
+
+@pytest.mark.parametrize(
+    "mount",
+    [
+        Mount.LEFT,
+        Mount.RIGHT,
+        Mount.EXTENSION,
+        OT3Mount.LEFT,
+        OT3Mount.RIGHT,
+        OT3Mount.GRIPPER,
+    ],
+)
+async def test_critical_point_for(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_instrument_handlers: Tuple[Mock, Mock],
+    mount: Union[Mount, OT3Mount],
+    decoy: Decoy,
+) -> None:
+    """Ensure that the correct instrument handler is called for each possible mount."""
+    mock_gripper, mock_pipette = mock_instrument_handlers
+
+    _ = ot3_hardware.critical_point_for(mount)
+    if mount in [Mount.EXTENSION, OT3Mount.GRIPPER]:
+        decoy.verify(mock_gripper.get_critical_point(None))
+    else:
+        decoy.verify(mock_pipette.critical_point_for(OT3Mount.from_mount(mount)))

@@ -7,6 +7,6 @@ future migrations can be added cleanly.
 
 from typing import Final
 
-LATEST_VERSION_DIRECTORY: Final = "1_f37b867e27cf"
+LATEST_VERSION_DIRECTORY: Final = "1_b8c4e2f1a903"
 
 DB_FILE: Final = "auth_server.db"

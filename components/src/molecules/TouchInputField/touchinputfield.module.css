@@ -8,10 +8,6 @@
   line-height: 1;
 }
 
-.container_error {
-  color: #9e5e00;
-}
-
 .container_disabled {
   opacity: 0.5;
 }
@@ -54,11 +50,6 @@
   background-color: var(--white);
 }
 
-.background_error {
-  border: none;
-  background-color: var(--red-30);
-}
-
 .error {
   border-color: var(--red-50);
 }
@@ -71,14 +62,6 @@
 .input_field_medium {
   height: var(--spacing-80);
   font-size: var(--font-size-38);
-}
-
-.input_field:active {
-  border: 2px solid var(--blue-50);
-}
-
-.input_field.error:active {
-  border: 2px solid var(--red-50);
 }
 
 .input_field:focus-within {
