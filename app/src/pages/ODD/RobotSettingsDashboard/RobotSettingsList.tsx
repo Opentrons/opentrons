@@ -267,10 +267,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           }}
         />
         <RobotSettingButton
-          settingName={i18n.format(
-            t('app_settings:error_recovery_mode'),
-            'titleCase'
-          )}
+          settingName={t('app_settings:error_recovery_mode')}
           dataTestId="RobotSettingButton_error_recovery_mode"
           settingInfo={t('app_settings:error_recovery_mode_description')}
           iconName="recovery-alt"

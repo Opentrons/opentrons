@@ -40,7 +40,7 @@ describe('RobotSettings DisableHoming', () => {
   it('should render title, description and toggle button', () => {
     render()
     screen.getByText('Usage Settings')
-    screen.getByText('Home Gantry on Restart')
+    screen.getByText('Home gantry on restart')
     screen.getByText('Homes the gantry along the z-axis.')
     const toggleButton = screen.getByRole('switch', { name: 'gantry_homing' })
     expect(toggleButton.getAttribute('aria-checked')).toBe('false')
