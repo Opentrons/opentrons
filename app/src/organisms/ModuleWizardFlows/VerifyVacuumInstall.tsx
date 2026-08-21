@@ -41,28 +41,6 @@ interface VerifyVacuumInstallProps extends ModuleSetupWizardMaybePipetteStepProp
   deckConfig: DeckConfiguration
 }
 
-function verificationCommandsSucceeded(results: unknown): boolean {
-  if (!Array.isArray(results) || results.length === 0) {
-    return false
-  }
-  return results.every(result => {
-    if (typeof result !== 'object' || result == null || !('data' in result)) {
-      return false
-    }
-    const { data } = result as { data?: { status?: string } }
-    return data?.status === 'succeeded'
-  })
-}
-
-const BODY_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.275rem;
-    line-height: 1.75rem;
-  }
-`
-
 export function VerifyVacuumInstall(
   props: VerifyVacuumInstallProps
 ): JSX.Element {
@@ -74,13 +52,12 @@ export function VerifyVacuumInstall(
     setErrorMessage,
     isOnDevice,
     deckConfig,
+    setExitCleanupCommands,
   } = props
   const { t } = useTranslation(['module_wizard_flows', 'shared'])
   const [screen, setScreen] = useState<VacuumVerifyScreen>('checkTubes')
   const verificationAttempt = useRef(0)
   const startedVerification = useRef(false)
-  const chainRunCommandsRef = useRef(chainRunCommands)
-  chainRunCommandsRef.current = chainRunCommands
 
   const cutoutId = deckConfig.find(
     cc => cc.opentronsModuleSerialNumber === attachedModule.serialNumber
@@ -90,15 +67,11 @@ export function VerifyVacuumInstall(
   const moduleId: string = attachedModule.id
 
   useEffect(() => {
+    setExitCleanupCommands(getVacuumCleanupCommands(moduleId))
     return () => {
-      if (startedVerification.current && chainRunCommandsRef.current != null) {
-        void chainRunCommandsRef.current(
-          getVacuumCleanupCommands(moduleId),
-          true
-        )
-      }
+      setExitCleanupCommands([])
     }
-  }, [moduleId])
+  }, [moduleId, setExitCleanupCommands])
 
   const stopVacuum = (): Promise<unknown> => {
     if (chainRunCommands == null) {
@@ -200,6 +173,28 @@ export function VerifyVacuumInstall(
     />
   )
 }
+
+function verificationCommandsSucceeded(results: unknown): boolean {
+  if (!Array.isArray(results) || results.length === 0) {
+    return false
+  }
+  return results.every(result => {
+    if (typeof result !== 'object' || result == null || !('data' in result)) {
+      return false
+    }
+    const { data } = result as { data?: { status?: string } }
+    return data?.status === 'succeeded'
+  })
+}
+
+const BODY_STYLE = css`
+  ${TYPOGRAPHY.pRegular};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    font-size: 1.275rem;
+    line-height: 1.75rem;
+  }
+`
 
 interface VacuumInstructionScreenProps {
   onBack: () => void

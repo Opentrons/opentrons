@@ -1,12 +1,12 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { mockVacuumModule } from '@opentrons/api-client'
 import { VACUUM_MODULE_V1_FIXTURE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockVacuumModule } from '/app/redux/modules/__fixtures__'
-import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 
 import { VerifyVacuumInstall } from '../VerifyVacuumInstall'
 
@@ -47,14 +47,38 @@ describe('VerifyVacuumInstall', () => {
       attachedPipette: mockAttachedPipetteInformation,
       errorMessage: null,
       setErrorMessage: vi.fn(),
+      isDoorOpenError: false,
+      setIsDoorOpenError: vi.fn(),
+      dismissDoorOpenError: vi.fn(),
+      sendIdentifyModule: vi.fn(),
       isOnDevice: false,
       deckConfig: mockDeckConfig,
       maintenanceRunId: 'maintenance-run-id',
+      setExitCleanupCommands: vi.fn(),
     }
   })
 
   afterEach(() => {
     vi.clearAllMocks()
+  })
+
+  it('registers vacuum cleanup commands while mounted', () => {
+    const { unmount } = render(props)
+
+    expect(props.setExitCleanupCommands).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          commandType: 'vacuumModule/stopVacuum',
+        }),
+        expect.objectContaining({
+          commandType: 'vacuumModule/openVent',
+        }),
+      ])
+    )
+
+    unmount()
+
+    expect(props.setExitCleanupCommands).toHaveBeenCalledWith([])
   })
 
   it('renders tube connection instructions first', () => {

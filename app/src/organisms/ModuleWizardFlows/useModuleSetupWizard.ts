@@ -2,7 +2,6 @@ import { useEffect, useReducer, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { VACUUM_MODULE_TYPE } from '@opentrons/shared-data'
 import {
   useDeleteMaintenanceRunMutation,
   useUpdateDeckConfigurationMutation,
@@ -21,7 +20,6 @@ import {
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
 import { ACTIONS } from './constants'
-import { getVacuumCleanupCommands } from './getVerifyVacuumCommands'
 import { useSendIdentifyModule } from './hooks'
 import { moduleSetupWizardReducer } from './moduleSetupWizardReducer'
 
@@ -64,6 +62,7 @@ export interface UseModuleSetupWizardResult {
     isExiting: boolean
     sendIdentifyModule: SendIdentifyModule
     updateDeckConfiguration: (deckConfig: DeckConfiguration) => void
+    setExitCleanupCommands: (commands: CreateCommand[]) => void
   }
   buildFlowForSelectedModule: (module: AttachedModule) => void
   patchModuleAfterUpdate: (module: AttachedModule) => void
@@ -159,6 +158,9 @@ export function useModuleSetupWizard(
     setIsDoorOpenError(false)
   }
   const [isExiting, setIsExiting] = useState<boolean>(false)
+  const [exitCleanupCommands, setExitCleanupCommands] = useState<
+    CreateCommand[]
+  >([])
   const proceed = (): void => {
     if (!isCommandMutationLoading) {
       dispatch({
@@ -197,14 +199,10 @@ export function useModuleSetupWizard(
       console.log(
         'closing module setup wizard: homing and clearing maintenance run'
       )
-      const vacuumCleanupCommands =
-        attachedModule?.moduleType === VACUUM_MODULE_TYPE
-          ? getVacuumCleanupCommands(String(attachedModule.id))
-          : []
       chainRunCommands(
         maintenanceRunId,
         [
-          ...vacuumCleanupCommands,
+          ...exitCleanupCommands,
           { commandType: 'home' as const, params: {} },
         ],
         true
@@ -282,6 +280,7 @@ export function useModuleSetupWizard(
     isExiting,
     sendIdentifyModule,
     updateDeckConfiguration,
+    setExitCleanupCommands,
   }
 
   const buildFlowForSelectedModule = (

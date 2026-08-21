@@ -112,6 +112,7 @@ const getBaseProps = (): ComponentProps<typeof SelectLocation> => ({
   isLoadedInRun: false,
   isOnDevice: false,
   sendIdentifyModule: vi.fn(),
+  setExitCleanupCommands: vi.fn(),
   errorMessage: '',
   attachedPipette: {} as PipetteInformation,
   updateDeckConfiguration: mockUpdateDeckConfiguration,

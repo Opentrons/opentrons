@@ -68,6 +68,7 @@ export interface ModuleSetupWizardBaseStepProps {
   dismissDoorOpenError: () => void
   isOnDevice: boolean
   sendIdentifyModule: SendIdentifyModule
+  setExitCleanupCommands: (commands: CreateCommand[]) => void
 }
 
 export interface ModuleSetupWizardRequiresPipetteStepProps extends ModuleSetupWizardBaseStepProps {
