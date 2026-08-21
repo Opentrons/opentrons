@@ -10,6 +10,7 @@ from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse
 
 from opentrons import __version__
+from server_utils.audit import constants as log_constants
 from server_utils.audit.audit_server import (
     SubmitAuditLogMessageData,
 )
@@ -214,6 +215,7 @@ def _get_persistence_directory(settings: RobotServerSettings) -> Optional[Path]:
 async def _report_unsigned_runs(
     app_state: AppState,
 ) -> None:
+    """If access control enabled and run signoff required, log any unsigned runs."""
     if not get_authentication_checker(app_state).access_control_status():
         return
 
@@ -248,9 +250,9 @@ async def _report_unsigned_runs(
     audit_client = get_audit_client(app_state)
     await audit_client.submit_log_message(
         SubmitAuditLogMessageData(
-            action="System warning",
-            accountName="system",
-            legalName="",
+            action=log_constants.ACTION_UNSIGNED_RUNS_WARNING,
+            accountName=log_constants.ACCOUNT_NAME_SYSTEM,
+            legalName=log_constants.LEGAL_NAME_SYSTEM,
             message=message,
             reason=None,
         )

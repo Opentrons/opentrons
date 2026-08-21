@@ -14,10 +14,10 @@ from opentrons_shared_data.errors.exceptions import (
     PythonException,
 )
 
+from server_utils.audit import constants
 from server_utils.keys.key_server import Client as KeyClient
 from server_utils.keys.key_server import SignMessageData
 
-from . import constants
 from .models import LogPeriodDetails, LogPeriodSummary, TotalUsageSummary
 from .store import (
     LogStore,

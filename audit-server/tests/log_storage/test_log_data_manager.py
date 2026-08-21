@@ -9,10 +9,10 @@ from decoy import Decoy, matchers
 from fastapi import UploadFile
 from opentrons_shared_data.errors.exceptions import KeyStorageUnavailableError
 
+from server_utils.audit import constants
 from server_utils.keys.key_server import Client as KeyClient
 from server_utils.keys.key_server import SignedMessageData, SignMessageData
 
-from audit_server.log_storage import constants
 from audit_server.log_storage.log_data_manager import (
     InvalidDeletionKeyError,
     LogDataManager,
