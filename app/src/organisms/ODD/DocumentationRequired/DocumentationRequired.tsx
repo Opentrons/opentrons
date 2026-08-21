@@ -119,11 +119,8 @@ export function DocumentationRequired({
           onToggle={handleKeyboardToggle}
         >
           <FullKeyboard
-            onChange={(input: string) => {
-              handleInputChange(input)
-              textAreaRef.current?.focus()
-            }}
             keyboardRef={keyboardRef}
+            inputElementRef={textAreaRef}
           />
         </AccordionKeyboard>
       </div>

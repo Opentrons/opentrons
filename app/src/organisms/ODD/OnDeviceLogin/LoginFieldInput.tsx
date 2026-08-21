@@ -7,7 +7,6 @@ import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggl
 
 import type { ChangeEvent, RefObject } from 'react'
 import type { ControllerRenderProps } from 'react-hook-form'
-import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { LoginFormValues } from './index'
 
 // todo(mm, 2026-08-21): It seems like LoginFieldInput and LoginFieldController could
@@ -24,22 +23,13 @@ export interface LoginFieldInputProps {
   isPasswordField: boolean
   onClearError?: () => void
   autoFocus?: boolean
-  keyboardRef?: RefObject<KeyboardReactInterface | null>
 }
 
 export const LoginFieldInput = forwardRef<
   HTMLInputElement,
   LoginFieldInputProps
 >(function LoginFieldInput(
-  {
-    field,
-    label,
-    error,
-    isPasswordField,
-    onClearError,
-    autoFocus,
-    keyboardRef,
-  },
+  { field, label, error, isPasswordField, onClearError, autoFocus },
   ref
 ): JSX.Element {
   const [showPassword, setShowPassword] = useState(false)
@@ -47,9 +37,7 @@ export const LoginFieldInput = forwardRef<
   const isPasswordHidden = isPasswordField && !showPassword
   const inputType: 'text' | 'password' = isPasswordHidden ? 'password' : 'text'
 
-  usePlaceCaretAtEndOnToggle(inputRef, showPassword, isPasswordField, end => {
-    keyboardRef?.current?.setCaretPosition(end)
-  })
+  usePlaceCaretAtEndOnToggle(inputRef, showPassword, isPasswordField)
 
   return (
     <TouchInputField

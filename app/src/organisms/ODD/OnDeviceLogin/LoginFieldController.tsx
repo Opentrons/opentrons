@@ -4,9 +4,7 @@ import { Controller } from 'react-hook-form'
 import { LoginFieldInput } from './LoginFieldInput'
 
 import type { TFunction } from 'i18next'
-import type { RefObject } from 'react'
 import type { Control } from 'react-hook-form'
-import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { LoginFormValues, LoginStep } from './index'
 
 export interface LoginFieldControllerProps {
@@ -18,7 +16,6 @@ export interface LoginFieldControllerProps {
   confirmPasswordError: string | null
   usernameError: string | null
   onClearFieldErrors: () => void
-  keyboardRef: RefObject<KeyboardReactInterface | null>
 }
 
 export const LoginFieldController = forwardRef<
@@ -34,7 +31,6 @@ export const LoginFieldController = forwardRef<
     confirmPasswordError,
     usernameError,
     onClearFieldErrors,
-    keyboardRef,
   },
   ref
 ): JSX.Element | null {
@@ -53,7 +49,6 @@ export const LoginFieldController = forwardRef<
             isPasswordField={false}
             onClearError={onClearFieldErrors}
             autoFocus
-            keyboardRef={keyboardRef}
           />
         )}
       />
@@ -82,7 +77,6 @@ export const LoginFieldController = forwardRef<
             isPasswordField={true}
             onClearError={onClearFieldErrors}
             autoFocus
-            keyboardRef={keyboardRef}
           />
         )}
       />
@@ -104,7 +98,6 @@ export const LoginFieldController = forwardRef<
             isPasswordField={true}
             onClearError={onClearFieldErrors}
             autoFocus
-            keyboardRef={keyboardRef}
           />
         )}
       />

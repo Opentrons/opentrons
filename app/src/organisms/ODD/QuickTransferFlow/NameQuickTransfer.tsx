@@ -29,6 +29,7 @@ export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
   const { t } = useTranslation('quick_transfer')
   const [name, setName] = useState('')
   const keyboardRef = useRef(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const [isSaving, setIsSaving] = useState<boolean>(false)
 
   let error: string | null = null
@@ -42,6 +43,10 @@ export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
         header={t('name_your_transfer')}
         buttonText={t('save')}
         onClickButton={() => {
+          // todo(mm, 2026-08-21): If the async save task has an error, this will get us
+          // stuck in a "saving" state forever. We could fix this by making this
+          // component take a prop like "isSaving", which higher-level code could
+          // populate from React Query.
           setIsSaving(true)
           onSave(name)
         }}
@@ -65,12 +70,13 @@ export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
           width="100%"
         >
           <TouchInputField
+            ref={inputRef}
             autoFocus
             type="text"
             value={name}
             textAlign={TYPOGRAPHY.textAlignCenter}
             onChange={e => {
-              setName(e.target.value as string)
+              setName(e.target.value)
             }}
           />
           <StyledText
@@ -90,12 +96,7 @@ export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
         </Flex>
       </Flex>
       <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
-        <FullKeyboard
-          onChange={(input: string) => {
-            setName(input)
-          }}
-          keyboardRef={keyboardRef}
-        />
+        <FullKeyboard keyboardRef={keyboardRef} inputElementRef={inputRef} />
       </Flex>
     </Flex>,
     getTopPortalEl()
