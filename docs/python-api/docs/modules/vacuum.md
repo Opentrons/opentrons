@@ -91,7 +91,7 @@ vacuum.move_to_doc(collar, use_gripper=True)
 
 Something something soon?
 
-## Controlling vacuum pressure
+## Controlling vacuum operations
 
 The module measures vacuum as gauge pressure in millibars (mbar). The vacuum range is from 0 mbar (atmospheric) to -800 mbar. Lower, or more negative, values represent a deeper vacuum. Two properties let you set the minimum and maximum vacuum in a protocol.
 
@@ -99,9 +99,11 @@ The module measures vacuum as gauge pressure in millibars (mbar). The vacuum ran
 
 * **-800 mbar:** [`max_gauge_pressure_mbar`][opentrons.protocol_api.VacuumModuleContext.max_gauge_pressure_mbar]
 
-Show longer code snippet here?
+You may note that some vacuum commands are prefixed with `start_` (e.g., [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure] and [`start_set_vacuum_power()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_power]). These are _non-blocking_ or _asynchronous commands_. They return a [`Task`][opentrons.protocol_api.Task] object and execute in the background, allowing the Flex to perform liquid handling or other deck operations concurrently. See also [Concurrent Module Actions](concurrent.md).
 
 ### Closed-loop pressure control
+
+In a closed loop, the module receives data from a sensor to actively monitor vacuum state and adjust the pump's speed to reach and maintain the specified vacuum pressure.
 
 Use [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure] to run the pump to reach a target pressure. This method returns a [task][opentrons.protocol_api.Task] (`Task`?) object representing concurrent execution. Pass the task to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to make the protocol wait for the system to return to atmospheric pressure before continuing.
 
@@ -131,6 +133,8 @@ Why is the "closed loop"?
 
 ### Open-loop power control
 
+In an open-loop, the module sends a fixed instruction to the pump motor (e.g., run at 60%) but does not check sensor readings to control its power. The data feedback here is "open" because the sensor doesn't control the pump.
+
 To run the pump using % power, rather than to a target pressure, use [`start_set_vacuum_power()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_power].
 
 ```python
@@ -141,7 +145,7 @@ power_task = vacuum.start_set_vacuum_power(
     vent_after=True,
     equalize_timeout_s=5,
 )
-
+# Wait for power duration and pressure equalization to complete.
 protocol.wait_for_tasks([power_task])
 ```
 
@@ -156,12 +160,19 @@ Use [start_execute_profile()][opentrons.protocol_api.VacuumModuleContext.start_e
 
 <font color="red">Maybe use inline tabs here to show multi-step with pressure and power?</font>
 
+### Multi-step vacuum profiles
+
+Use [`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start_execute_profile] to run a multi-step sequence of pressure or power stages without pausing the protocol run.
+
+!!! note
+    Multi-step profiles cannot combine `gauge_pressure_mbar` and `percent_power` within the same profile. Specify one or the other for all steps in your profile list.
+
 === "Pressure"
 
-    In this example, each step requires `enable_pump` and either `gauge_pressure_mbar` (0 to -800 mbar) or `percent_power` (1–100%). A single step cannot specify both pressure and power.
+    Each step dictionary requires `enable_pump: True` and a target `gauge_pressure_mbar` (from `0` to `-800` mbar). You can also specify an optional `hold_time_seconds` or `hold_time_minutes` for each stage.
 
     ```python
-    # Define the different steps
+    # Define multi-stage pressure steps
     profile_steps = [
         {
             "enable_pump": True,
@@ -187,11 +198,32 @@ Use [start_execute_profile()][opentrons.protocol_api.VacuumModuleContext.start_e
 
 === "Power"
 
-    Duty cycle text here
+    Each step dictionary requires `enable_pump: True` and a target `percent_power` (from `1` to `100`% duty cycle). Use power steps when you want fixed pump duty cycles across multiple stages instead of closed-loop pressure regulation.
 
-doc continues normally here.
+    ```python
+    # Define multi-stage power steps
+    profile_steps = [
+        {
+            "enable_pump": True,
+            "percent_power": 40,
+            "hold_time_seconds": 20,
+        },
+        {
+            "enable_pump": True,
+            "percent_power": 80,
+            "hold_time_seconds": 30,
+        },
+    ]
 
-
+    # Start profile execution
+    profile_task = vacuum.start_execute_profile(
+        steps=profile_steps,
+        repetitions=1,
+        vent_after=True,
+        equalize_timeout_s=10,
+    )
+    protocol.wait_for_tasks([profile_task])
+    ```
 
 ### Manual pump and vent control
 

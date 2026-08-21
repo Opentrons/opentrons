@@ -22,6 +22,7 @@ When you use a Heater-Shaker, Temperature, or Thermocycler Module in your protoc
 | Heater-Shaker Module | <ul><li>[`set_target_temperarature()`][opentrons.protocol_api.HeaterShakerContext.set_target_temperature]</li><li>[`set_shake_speed()`][opentrons.protocol_api.HeaterShakerContext.set_shake_speed]</li></ul> |
 | Temperature Module | <ul><li>[`start_set_temperature()`][opentrons.protocol_api.TemperatureModuleContext.start_set_temperature]</li></ul> |
 | Thermocycler Module | <ul><li>[`start_set_lid_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_lid_temperature]</li><li>[`start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature]</li><li>[`start_execute_profile()`][opentrons.protocol_api.ThermocyclerContext.start_execute_profile]</li></ul> |
+| Vacuum Module | <ul><li>[`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure]</li><li>[`start_set_vacuum_power()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_power]</li><li>[`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start_execute_profile]</li></ul> |
 
 Your protocol can include multiple module tasks that run parallel to one another. The example below has the API create two tasks: one for a Temperature Module, holding samples at 4 °C, and another for a Thermocycler Module running a profile. Neither task affects the other, and neither module action will prevent the robot from continuing to the next protocol steps. 
 
