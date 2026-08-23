@@ -51,7 +51,7 @@ export interface ModalShellProps extends StyleProps {
  * - An optional sticky footer
  * - An optional onOutsideClick function
  */
-export function ModalShell(props: ModalShellProps): JSX.Element {
+export function ModalShell(props: ModalShellProps): ReactNode {
   const {
     onOutsideClick,
     zIndex = 10,

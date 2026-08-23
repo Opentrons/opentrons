@@ -3,10 +3,9 @@ import { INTERACTIVE_WELL_DATA_ATTRIBUTE } from '@opentrons/shared-data'
 import { COLORS } from '../../../../helix-design-system'
 import { DEFAULT_TIP_SIZE } from './constants'
 
-export function NewTip(props: {
-  wellName: string
-  size?: string
-}): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function NewTip(props: { wellName: string; size?: string }): ReactNode {
   const { size, wellName } = props
   const commonProps = {
     [INTERACTIVE_WELL_DATA_ATTRIBUTE]: wellName,
