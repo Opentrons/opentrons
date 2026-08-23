@@ -22,6 +22,7 @@ import { useRunTimeParameters } from '/app/resources/protocols'
 
 import { EmptySection } from './EmptySection'
 
+import type { ReactNode } from 'react'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
 const Table = styled('table')`
@@ -57,7 +58,7 @@ const TableDatum = styled('td')`
   }
 `
 
-export const Parameters = (props: { protocolId: string }): JSX.Element => {
+export const Parameters = (props: { protocolId: string }): ReactNode => {
   const runTimeParameters = useRunTimeParameters(props.protocolId)
   const { makeSnackbar } = useToaster()
   const { t, i18n } = useTranslation('protocol_details')

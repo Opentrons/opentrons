@@ -6,6 +6,8 @@ import { useIsSigningOrDownloadingRequired } from '/app/resources/audit/useIsSig
 
 import styles from './signanddownloadrunbanner.module.css'
 
+import type { ReactNode } from 'react'
+
 const COPY_BY_BANNER_TYPE = {
   signing: {
     headingKey: 'signature_required',
@@ -25,7 +27,7 @@ export interface SignAndDownloadRunBannerProps {
 
 export function SignAndDownloadRunBanner({
   robotName,
-}: SignAndDownloadRunBannerProps): JSX.Element {
+}: SignAndDownloadRunBannerProps): ReactNode {
   const { t } = useTranslation('access_control')
 
   const { isSigningRequired, isDownloadingRequired, onLinkClick } =

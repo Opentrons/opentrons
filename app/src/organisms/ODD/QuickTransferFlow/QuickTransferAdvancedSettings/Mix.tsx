@@ -23,7 +23,7 @@ import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
 import { ACTIONS } from '../constants'
 
-import type { Dispatch } from 'react'
+import type { Dispatch, ReactNode } from 'react'
 import type {
   FlowRateKind,
   QuickTransferSummaryAction,
@@ -37,7 +37,7 @@ interface MixProps {
   kind: FlowRateKind
 }
 
-export function Mix(props: MixProps): JSX.Element {
+export function Mix(props: MixProps): ReactNode {
   const { kind, onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()

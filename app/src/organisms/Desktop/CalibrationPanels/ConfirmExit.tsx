@@ -17,6 +17,8 @@ import {
 
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 
+import type { ReactNode } from 'react'
+
 interface ConfirmExitProps {
   back: () => void
   exit: () => void
@@ -24,7 +26,7 @@ interface ConfirmExitProps {
   body?: string
 }
 
-export function ConfirmExit(props: ConfirmExitProps): JSX.Element {
+export function ConfirmExit(props: ConfirmExitProps): ReactNode {
   const { t } = useTranslation('shared')
   const { back, exit, heading, body } = props
   return (

@@ -11,6 +11,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import type { ReactNode } from 'react'
 import type {
   CoordinateTuple,
   DeckSlotId,
@@ -31,7 +32,7 @@ interface ModuleCommandSummaryProps {
 // NOTE: a lot of this is similar to ModuleLabel in PD so we should try to combine them
 export const ModuleCommandSummary = (
   props: ModuleCommandSummaryProps
-): JSX.Element => {
+): ReactNode => {
   const {
     moduleModel,
     position,

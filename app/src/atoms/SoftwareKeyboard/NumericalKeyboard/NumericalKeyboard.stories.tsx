@@ -11,6 +11,7 @@ import {
 import { NumericalKeyboard } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
+import type { ReactNode } from 'react'
 
 const meta: Meta<typeof NumericalKeyboard> = {
   title: 'ODD/Atoms/SoftwareKeyboard/NumericalKeyboard',
@@ -36,7 +37,7 @@ export default meta
 
 type Story = StoryObj<typeof NumericalKeyboard>
 
-const Keyboard = (args): JSX.Element => {
+const Keyboard = (args): ReactNode => {
   const { isDecimal, hasHyphen } = args
   const [showKeyboard, setShowKeyboard] = useState(false)
   const [value, setValue] = useState<string>('')

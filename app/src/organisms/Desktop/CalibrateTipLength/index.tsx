@@ -34,7 +34,7 @@ import {
 } from '/app/organisms/Desktop/CalibrationPanels'
 import * as Sessions from '/app/redux/sessions'
 
-import type { ComponentType } from 'react'
+import type { ComponentType, ReactNode } from 'react'
 import type { Mount } from '@opentrons/components'
 import type { CalibrationPanelProps } from '/app/organisms/Desktop/CalibrationPanels/types'
 import type {
@@ -196,9 +196,7 @@ const blockRemovalAssetBySlot: Record<string, string> = {
   '3': slotThreeRemoveBlockAsset,
 }
 
-function TipLengthCalibrationComplete(
-  props: CalibrationPanelProps
-): JSX.Element {
+function TipLengthCalibrationComplete(props: CalibrationPanelProps): ReactNode {
   const { t } = useTranslation('robot_calibration')
   const { calBlock, cleanUpAndExit } = props
 

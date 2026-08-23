@@ -10,11 +10,13 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 interface RenderResultProps {
   isBadCal: boolean
 }
 
-export const RenderResult = ({ isBadCal }: RenderResultProps): JSX.Element => {
+export const RenderResult = ({ isBadCal }: RenderResultProps): ReactNode => {
   const { t } = useTranslation('robot_calibration')
 
   return (

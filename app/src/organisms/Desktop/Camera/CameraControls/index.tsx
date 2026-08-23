@@ -22,6 +22,7 @@ import styles from './cameracontrols.module.css'
 import { PreviewSettings } from './PreviewSettings'
 import { ZoomSettings } from './ZoomSettings'
 
+import type { ReactNode } from 'react'
 import type { CameraImageSettings } from '@opentrons/api-client'
 import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 
@@ -33,7 +34,7 @@ export interface CameraControlsProps {
 export function CameraControls({
   onClose,
   runId,
-}: CameraControlsProps): JSX.Element {
+}: CameraControlsProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const settings = useCameraSettingsValues(runId)
   const dispatch = useDispatch()
@@ -115,7 +116,7 @@ interface CameraControlSettingsProps {
 
 function CameraControlSettings({
   settings,
-}: CameraControlSettingsProps): JSX.Element {
+}: CameraControlSettingsProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   return (

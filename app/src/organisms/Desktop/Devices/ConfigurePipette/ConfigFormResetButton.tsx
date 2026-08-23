@@ -11,12 +11,14 @@ import {
 
 import { Divider } from '/app/atoms/structure'
 
+import type { ReactNode } from 'react'
+
 export interface ButtonProps {
   onClick?: () => unknown
   disabled: boolean
 }
 
-export function ConfigFormResetButton(props: ButtonProps): JSX.Element {
+export function ConfigFormResetButton(props: ButtonProps): ReactNode {
   const { onClick, disabled } = props
   const { t } = useTranslation(['shared', 'branded'])
 

@@ -14,7 +14,9 @@ import {
 
 import abstractImage from '/app/assets/images/on-device-display/empty_protocol_dashboard.png'
 
-export function EmptyRecentRun(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function EmptyRecentRun(): ReactNode {
   const { t } = useTranslation('device_details')
   return (
     <Flex

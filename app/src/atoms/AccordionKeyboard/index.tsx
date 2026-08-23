@@ -13,7 +13,7 @@ export function AccordionKeyboard({
   children,
   isOpen,
   onToggle,
-}: AccordionKeyboardProps): JSX.Element {
+}: AccordionKeyboardProps): ReactNode {
   return (
     <div className={styles.accordion_container}>
       <div className={styles.accordion_header}>

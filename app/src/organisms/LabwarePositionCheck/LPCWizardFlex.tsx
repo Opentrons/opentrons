@@ -23,13 +23,14 @@ import { LPCFatalError } from './LPCFatalError'
 import { LPCProbeNotAttached } from './LPCProbeNotAttached'
 import { LPCRobotInMotion } from './LPCRobotInMotion'
 
+import type { ReactNode } from 'react'
 import type { LPCFlowsProps } from '/app/organisms/LabwarePositionCheck/LPCFlows'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type { LPCStep } from '/app/redux/protocol-runs'
 
 export interface LPCWizardFlexProps extends Omit<LPCFlowsProps, 'robotType'> {}
 
-export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
+export function LPCWizardFlex(props: LPCWizardFlexProps): ReactNode {
   const proceedStep = (toStep?: LPCStep): void => {
     dispatch(proceedStepDispatch(props.runId, toStep))
   }
@@ -71,7 +72,7 @@ export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
   )
 }
 
-function LPCWizardContent(props: LPCWizardContentProps): JSX.Element {
+function LPCWizardContent(props: LPCWizardContentProps): ReactNode {
   const { t } = useTranslation('shared')
   const currentStep = useSelector(selectCurrentStep(props.runId))
   const { isRobotMoving, errorMessage, unableToDetect } = props.commandUtils

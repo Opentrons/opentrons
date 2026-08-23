@@ -6,7 +6,7 @@ import {
   softwareKeyboardButtonAttributes,
 } from '../constants'
 
-import type { MutableRefObject } from 'react'
+import type { MutableRefObject, ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
 import '../index.css'
@@ -30,7 +30,7 @@ export function NumericalKeyboard({
   hasHyphen = false,
   debug = false,
   initialValue = '',
-}: NumericalKeyboardProps): JSX.Element {
+}: NumericalKeyboardProps): ReactNode {
   const layoutName = `${isDecimal ? 'float' : 'int'}${
     hasHyphen ? 'NegKeyboard' : 'Keyboard'
   }`

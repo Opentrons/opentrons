@@ -14,9 +14,10 @@ import {
 import { ToggleButton } from '/app/atoms/buttons'
 import { getIsHeaterShakerAttached, updateConfigValue } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
-export function ShowHeaterShakerAttachmentModal(): JSX.Element {
+export function ShowHeaterShakerAttachmentModal(): ReactNode {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
   const isHeaterShakerAttachmentModalVisible = useSelector(

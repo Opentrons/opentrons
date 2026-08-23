@@ -17,9 +17,10 @@ import {
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import { getIsOnDevice } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
-export function LPCProbeNotAttached(props: LPCWizardContentProps): JSX.Element {
+export function LPCProbeNotAttached(props: LPCWizardContentProps): ReactNode {
   const { t } = useTranslation('labware_position_check')
   const { commandUtils } = props
   const { headerCommands } = commandUtils

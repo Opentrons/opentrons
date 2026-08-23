@@ -13,6 +13,7 @@ import { ActionList } from '/app/organisms/ActionItems/ActionList'
 
 import styles from './documentationrequired.module.css'
 
+import type { ReactNode } from 'react'
 import type {
   DocumentationReport,
   DocumentedAction,
@@ -34,7 +35,7 @@ export function DocumentationRequired({
   onClose,
   minReportLength,
   initialDocreport,
-}: DocumentationRequiredProps): JSX.Element {
+}: DocumentationRequiredProps): ReactNode {
   const { t } = useTranslation(['access_control', 'shared'])
   const [inputText, setInputText] = useState<string>(initialDocreport ?? '')
   const [error, setError] = useState<string | null>(null)

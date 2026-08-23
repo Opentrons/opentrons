@@ -16,13 +16,14 @@ import {
 import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLogin.module.css'
 
+import type { ReactNode } from 'react'
 import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 import type { LoginStep } from './index'
 
 type LoginModalPhase = 'login' | 'chooseNewPassword'
 
-const LoginModalImpl = NiceModal.create((): JSX.Element => {
+const LoginModalImpl = NiceModal.create((): ReactNode => {
   const modal = useModal()
   const dispatch = useDispatch()
   const host = useHost()

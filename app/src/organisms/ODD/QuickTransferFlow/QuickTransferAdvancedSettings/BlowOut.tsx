@@ -40,7 +40,7 @@ import { ACTIONS } from '../constants'
 import { getMaxUiFlowRate, getPipetteName } from '../utils'
 import { getExtractTiprackTypeFromURI } from '../utils/getExtractTiprackTypeFromURI'
 
-import type { Dispatch } from 'react'
+import type { Dispatch, ReactNode } from 'react'
 import type {
   CutoutConfig,
   DeckConfiguration,
@@ -118,7 +118,7 @@ export const useBlowOutLocationOptions = (
   return blowOutLocationItems
 }
 
-export function BlowOut(props: BlowOutProps): JSX.Element {
+export function BlowOut(props: BlowOutProps): ReactNode {
   const { onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()

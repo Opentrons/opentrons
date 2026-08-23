@@ -44,6 +44,7 @@ import {
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type {
   LabwareOffset,
   LegacyLabwareOffsetCreateData,
@@ -234,7 +235,7 @@ interface OffsetTableProps {
   labwareDefinitions: LabwareDefinition[]
 }
 
-const OffsetTable = (props: OffsetTableProps): JSX.Element => {
+const OffsetTable = (props: OffsetTableProps): ReactNode => {
   const { offsets, labwareDefinitions } = props
   const { t, i18n } = useTranslation('labware_position_check')
   return (
@@ -308,7 +309,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
 
 // Very similar to the OffsetTable, but abbreviates certain things to be optimized
 // for smaller screens
-export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
+export const TerseOffsetTable = (props: OffsetTableProps): ReactNode => {
   const { offsets, labwareDefinitions } = props
   const { i18n, t } = useTranslation('labware_position_check')
   return (

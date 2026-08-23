@@ -34,6 +34,7 @@ import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 import styles from './setupcamera.module.css'
 
+import type { ReactNode } from 'react'
 import type { UseCameraUsageSettingsResult } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 import type { State } from '/app/redux/types'
 
@@ -53,7 +54,7 @@ export function SetupCamera({
   isCameraRequired,
   cameraConfirmed,
   confirmCameraSettings,
-}: SetupCameraProps): JSX.Element {
+}: SetupCameraProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
   const { makeSnackbar } = useToaster()
   const storageInfo = useRobotStorageInfo()
@@ -178,7 +179,7 @@ function StorageAlmostFullNotification({
   robotName,
 }: {
   robotName: string
-}): JSX.Element {
+}): ReactNode {
   const { t } = useTranslation('device_settings')
   const navigate = useNavigate()
 
@@ -197,7 +198,7 @@ function StorageAlmostFullNotification({
   )
 }
 
-function CameraRequiredNotification(): JSX.Element {
+function CameraRequiredNotification(): ReactNode {
   const { t } = useTranslation('device_settings')
 
   return (
@@ -221,7 +222,7 @@ function CameraStatus({
   isCameraEnabled,
   cameraConfirmed,
   isFlex,
-}: CameraStatusProps): JSX.Element {
+}: CameraStatusProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   return (

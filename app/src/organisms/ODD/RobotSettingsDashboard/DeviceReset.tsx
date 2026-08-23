@@ -21,6 +21,7 @@ import { OddModal } from '/app/molecules/OddModal'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useResetRobotConfigMutation } from '/app/resources/devices/hooks/useResetRobotConfigMutation'
 
+import type { ReactNode } from 'react'
 import type { ResetConfigRequest } from '@opentrons/api-client'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { SetSettingOption } from './types'
@@ -117,7 +118,7 @@ interface DeviceResetProps {
 export function DeviceReset({
   robotName,
   setCurrentOption,
-}: DeviceResetProps): JSX.Element {
+}: DeviceResetProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const [resetOptions, setResetOptions] = useState<DisplayedResetOptionState>({
     pipetteOffsetCalibrations: false,
@@ -319,7 +320,7 @@ interface ConfirmClearDataModalProps {
 export const ConfirmClearDataModal = ({
   cancelClearData,
   confirmClearData,
-}: ConfirmClearDataModalProps): JSX.Element => {
+}: ConfirmClearDataModalProps): ReactNode => {
   const { t } = useTranslation(['device_settings', 'shared'])
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('confirm_device_reset_heading'),

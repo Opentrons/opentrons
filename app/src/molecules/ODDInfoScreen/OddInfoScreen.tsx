@@ -11,6 +11,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { IconName, ODDStyles, StyleProps } from '@opentrons/components'
 
 export type OddInfoScreenType =
@@ -59,7 +60,7 @@ const INFO_SCREEN_PROPS_BY_SIZE: Record<
   },
 }
 
-export function OddInfoScreen(props: OddInfoScreenProps): JSX.Element {
+export function OddInfoScreen(props: OddInfoScreenProps): ReactNode {
   const {
     type,
     header,

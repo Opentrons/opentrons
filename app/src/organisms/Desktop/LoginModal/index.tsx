@@ -32,7 +32,7 @@ import { isSSLError } from '/app/resources/auth/hooks/isSSLError'
 import { RobotCertImportModal } from '../RobotCertImport'
 import styles from './loginmodal.module.css'
 
-import type { ComponentProps, Dispatch, SetStateAction } from 'react'
+import type { ComponentProps, Dispatch, ReactNode, SetStateAction } from 'react'
 
 interface LoginFormState {
   username: string
@@ -126,7 +126,7 @@ interface LoginModalImplProps {
   uncloseable?: boolean
 }
 
-function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
+function LoginModalImpl(props: LoginModalImplProps): ReactNode {
   const { robotName, uncloseable } = props
   const modal = useModal()
   const dispatch = useDispatch()
@@ -396,7 +396,7 @@ interface LoginViewProps {
   onForgotPasswordClick: () => void
 }
 
-function LoginView(props: LoginViewProps): JSX.Element {
+function LoginView(props: LoginViewProps): ReactNode {
   const {
     formId,
     formData,
@@ -449,7 +449,7 @@ function LoginView(props: LoginViewProps): JSX.Element {
   )
 }
 
-function ForgotPasswordView(): JSX.Element {
+function ForgotPasswordView(): ReactNode {
   const { t } = useTranslation()
 
   return (
@@ -471,7 +471,7 @@ interface SetNewPasswordViewProps {
   onPasswordFieldBlur: () => void
 }
 
-function SetNewPasswordView(props: SetNewPasswordViewProps): JSX.Element {
+function SetNewPasswordView(props: SetNewPasswordViewProps): ReactNode {
   const {
     formData,
     onNewPasswordChange,

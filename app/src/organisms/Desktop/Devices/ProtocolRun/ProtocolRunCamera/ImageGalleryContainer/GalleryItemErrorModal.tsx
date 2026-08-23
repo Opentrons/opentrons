@@ -15,7 +15,7 @@ import { useDownloadRunLog } from '/app/organisms/Desktop/Devices/hooks'
 
 import styles from './gallery.module.css'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { ModalProps } from '@opentrons/components'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 
@@ -31,7 +31,7 @@ export function GalleryItemErrorModal({
   runId,
   toggleModal,
   robotName,
-}: GalleryItemErrorModalProps): JSX.Element {
+}: GalleryItemErrorModalProps): ReactNode {
   const { i18n, t } = useTranslation(['run_details', 'shared', 'branded'])
   const { downloadRunLog } = useDownloadRunLog(robotName, runId)
 
@@ -81,7 +81,7 @@ export function ErrorContent({
   erroredCommand,
 }: {
   erroredCommand: RunTimeCommand
-}): JSX.Element {
+}): ReactNode {
   return (
     <div className={styles.error_content_container}>
       <div className={styles.error_message_container}>

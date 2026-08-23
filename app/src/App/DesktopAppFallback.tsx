@@ -16,10 +16,11 @@ import {
 import { useSentryReport } from '/app/App/hooks/useSentryReport'
 import { reloadUi } from '/app/redux/shell'
 
+import type { ReactNode } from 'react'
 import type { FallbackProps } from 'react-error-boundary'
 import type { Dispatch } from '/app/redux/types'
 
-export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
+export function DesktopAppFallback({ error }: FallbackProps): ReactNode {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
   const navigate = useNavigate()

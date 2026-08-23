@@ -13,6 +13,7 @@ import { useDocumentationState } from '/app/local-resources/access-control/useDo
 import { OddModal } from '/app/molecules/OddModal'
 import { useFullShutdownMutation } from '/app/resources/devices/hooks/useFullShutdownMutation'
 
+import type { ReactNode } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface ShutdownRobotConfirmationModalProps {
@@ -24,7 +25,7 @@ interface ShutdownRobotConfirmationModalProps {
 export function ShutdownRobotConfirmationModal({
   robotName,
   setShowShutdownRobotConfirmationModal,
-}: ShutdownRobotConfirmationModalProps): JSX.Element {
+}: ShutdownRobotConfirmationModalProps): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('turn_off_robot'),

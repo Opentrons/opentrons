@@ -4,6 +4,7 @@ import { RUN_STATUS_AWAITING_RECOVERY } from '@opentrons/api-client'
 import { ALIGN_CENTER, Chip, Flex } from '@opentrons/components'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { RunStatus } from '@opentrons/api-client'
 import type { ChipType, IconName } from '@opentrons/components'
 
@@ -55,7 +56,7 @@ const getRunStatusChip = (
 }
 
 // Styles the run status copy.
-export function DisplayRunStatus(props: DisplayRunStatusProps): JSX.Element {
+export function DisplayRunStatus(props: DisplayRunStatusProps): ReactNode {
   const { t } = useTranslation('run_details')
   const {
     chipType,

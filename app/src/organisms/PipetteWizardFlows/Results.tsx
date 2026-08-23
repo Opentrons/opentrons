@@ -29,7 +29,7 @@ import {
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { LoadedPipette, MotorAxes } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
@@ -44,7 +44,7 @@ interface ResultsProps extends PipetteWizardStepProps {
   nextMount?: string
 }
 
-export const Results = (props: ResultsProps): JSX.Element => {
+export const Results = (props: ResultsProps): ReactNode => {
   const {
     goBack,
     proceed,

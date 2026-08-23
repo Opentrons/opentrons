@@ -18,13 +18,15 @@ import { getTopPortalEl } from '/app/App/portal'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
+import type { ReactNode } from 'react'
+
 interface NameQuickTransferProps {
   onSave: (protocolName: string) => void
 }
 
 const MAX_CHARACTERS = 60
 
-export function NameQuickTransfer(props: NameQuickTransferProps): JSX.Element {
+export function NameQuickTransfer(props: NameQuickTransferProps): ReactNode {
   const { onSave } = props
   const { t } = useTranslation('quick_transfer')
   const [name, setName] = useState('')

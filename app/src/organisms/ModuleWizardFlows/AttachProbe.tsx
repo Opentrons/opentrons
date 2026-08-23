@@ -21,6 +21,7 @@ import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
 import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
 
+import type { ReactNode } from 'react'
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
 import type { ModuleSetupWizardRequiresPipetteStepProps } from './types'
 
@@ -37,7 +38,7 @@ const BODY_STYLE = css`
   }
 `
 
-export function AttachProbe(props: AttachProbeProps): JSX.Element {
+export function AttachProbe(props: AttachProbeProps): ReactNode {
   const {
     proceed,
     goBack,

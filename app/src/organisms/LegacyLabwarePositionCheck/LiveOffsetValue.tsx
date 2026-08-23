@@ -17,6 +17,7 @@ import {
 
 import { getIsOnDevice } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
 
 interface OffsetVectorProps extends StyleProps {
@@ -25,7 +26,7 @@ interface OffsetVectorProps extends StyleProps {
   z: number
 }
 
-export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
+export function LiveOffsetValue(props: OffsetVectorProps): ReactNode {
   const { x, y, z, ...styleProps } = props
   const axisLabels = ['X', 'Y', 'Z']
   const { i18n, t } = useTranslation('labware_position_check')

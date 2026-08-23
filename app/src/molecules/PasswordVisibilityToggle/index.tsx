@@ -4,6 +4,8 @@ import { Icon, StyledText } from '@opentrons/components'
 
 import styles from './passwordvisibilitytoggle.module.css'
 
+import type { ReactNode } from 'react'
+
 interface PasswordVisibilityToggleProps {
   /** Whether the password is currently visible (i.e. input type="text"). */
   isVisible: boolean
@@ -17,7 +19,7 @@ interface PasswordVisibilityToggleProps {
 export function PasswordVisibilityToggle({
   isVisible,
   onToggle,
-}: PasswordVisibilityToggleProps): JSX.Element {
+}: PasswordVisibilityToggleProps): ReactNode {
   const { t } = useTranslation('device_settings')
   return (
     <button
