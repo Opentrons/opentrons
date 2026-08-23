@@ -161,12 +161,7 @@ function LPCLabwareListContent(props: LPCLabwareListContentProps): ReactNode {
         </thead>
       </Flex>
       {labwareInfo.map(({ uri, info }) => (
-        <LabwareItem
-          key={`labware_${uri}${Math.random()}`}
-          uri={uri}
-          info={info}
-          {...props}
-        />
+        <LabwareItem key={`labware_${uri}`} uri={uri} info={info} {...props} />
       ))}
       {/* Accommodate scrolling on the ODD. */}
       <Flex css={ODD_SCROLL_BUFFER} />
