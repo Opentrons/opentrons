@@ -93,13 +93,15 @@ Something something soon?
 
 ## Controlling vacuum operations
 
+<font color="red">Mixed up. Do "intro" and then "min - max". Move note about concurrent to intro.</font>
+
 The module measures vacuum as gauge pressure in millibars (mbar). The vacuum range is from 0 mbar (atmospheric) to -800 mbar. Lower, or more negative, values represent a deeper vacuum. Two properties let you set the minimum and maximum vacuum in a protocol.
 
 * **0 mbar:** [`min_gauge_pressure_mbar`][opentrons.protocol_api.VacuumModuleContext.min_gauge_pressure_mbar]
 
 * **-800 mbar:** [`max_gauge_pressure_mbar`][opentrons.protocol_api.VacuumModuleContext.max_gauge_pressure_mbar]
 
-You may note that some vacuum commands are prefixed with `start_` (e.g., [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure] and [`start_set_vacuum_power()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_power]). These are _non-blocking_ or _asynchronous commands_. They return a [`Task`][opentrons.protocol_api.Task] object and execute in the background, allowing the Flex to perform liquid handling or other deck operations concurrently. See also [Concurrent Module Actions](concurrent.md).
+You may note that some vacuum commands are prefixed with `start_` (e.g., [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure] and [`start_set_vacuum_power()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_power]). These are _non-blocking_ or _asynchronous commands_. They return a [`Task`][opentrons.protocol_api.Task] object and execute in the background, allowing the Flex to perform liquid handling or other module operations while also running the Vacuum Module. See also [Concurrent Module Actions](concurrent.md).
 
 ### Closed-loop pressure control
 
@@ -165,11 +167,11 @@ Use [start_execute_profile()][opentrons.protocol_api.VacuumModuleContext.start_e
 Use [`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start_execute_profile] to run a multi-step sequence of pressure or power stages without pausing the protocol run.
 
 !!! note
-    Multi-step profiles cannot combine `gauge_pressure_mbar` and `percent_power` within the same profile. Specify one or the other for all steps in your profile list.
+    Multi-step profiles cannot combine `gauge_pressure_mbar` and `percent_power` arguments in the same profile. Specify pressure _or_ power for steps in a particular profile.
 
 === "Pressure"
 
-    Each step dictionary requires `enable_pump: True` and a target `gauge_pressure_mbar` (from `0` to `-800` mbar). You can also specify an optional `hold_time_seconds` or `hold_time_minutes` for each stage.
+    In a multi-step pressure profile, each step requires `enable_pump: True` and a target `gauge_pressure_mbar` (from `0` to `-800` mbar). You can also specify an optional `hold_time_seconds` or `hold_time_minutes` for each stage. Use pressure steps when you need to reach and hold a specific vacuum across multiple stages, instead of open-loop pressure regulation.
 
     ```python
     # Define multi-stage pressure steps
@@ -198,7 +200,7 @@ Use [`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start
 
 === "Power"
 
-    Each step dictionary requires `enable_pump: True` and a target `percent_power` (from `1` to `100`% duty cycle). Use power steps when you want fixed pump duty cycles across multiple stages instead of closed-loop pressure regulation.
+    In a multi-step power profile, each step requires `enable_pump: True` and a target `percent_power` (from `1` to `100` % duty cycle). Use power steps when you want fixed pump duty cycles across multiple stages instead of closed-loop pressure regulation.
 
     ```python
     # Define multi-stage power steps
@@ -264,7 +266,7 @@ The Vacuum Module is compatible with the filter plates listed below and in the [
 
 ### Cytiva (formerly Pall)
 
-Product images on the manufacturer's website and your existing lab stock may display "Pall" and "Pall Corporation" on the box.
+Products may show "Pall" and "Pall Corporation" on the box.
 
 | Display Name | API Load Name |
 | --- | --- |
