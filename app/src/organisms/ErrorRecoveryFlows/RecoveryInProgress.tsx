@@ -127,10 +127,6 @@ export function useReleaseLabware({
   const [countdown, setCountdown] = useState(RELEASE_COUNTDOWN_S)
   const countdownRef = useRef(RELEASE_COUNTDOWN_S)
 
-  useEffect(() => {
-    countdownRef.current = countdown
-  }, [countdown])
-
   const proceedToDoorStep = (): void => {
     switch (selectedRecoveryOption) {
       case MANUAL_MOVE_AND_SKIP.ROUTE:
@@ -191,9 +187,11 @@ export function useReleaseLabware({
         case RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE:
         case RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE:
           intervalId = setInterval(() => {
+            const updatedCountdown = countdownRef.current - 1
+            countdownRef.current = updatedCountdown
             setCountdown(prevCountdown => prevCountdown - 1)
 
-            if (countdownRef.current !== 1) {
+            if (updatedCountdown !== 0) {
               return
             }
 
