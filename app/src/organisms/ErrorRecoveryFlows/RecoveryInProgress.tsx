@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -125,6 +125,11 @@ export function useReleaseLabware({
     STACKER_SHUTTLE_EMPTY_SKIP,
   } = RECOVERY_MAP
   const [countdown, setCountdown] = useState(RELEASE_COUNTDOWN_S)
+  const countdownRef = useRef(RELEASE_COUNTDOWN_S)
+
+  useEffect(() => {
+    countdownRef.current = countdown
+  }, [countdown])
 
   const proceedToDoorStep = (): void => {
     switch (selectedRecoveryOption) {
@@ -186,41 +191,40 @@ export function useReleaseLabware({
         case RECOVERY_MAP.ROBOT_RELEASING_LABWARE.ROUTE:
         case RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE:
           intervalId = setInterval(() => {
-            setCountdown(prevCountdown => {
-              const updatedCountdown = prevCountdown - 1
+            setCountdown(prevCountdown => prevCountdown - 1)
 
-              if (updatedCountdown === 0) {
-                if (intervalId != null) {
-                  clearInterval(intervalId)
-                }
-                if (
-                  recoveryMap.route ===
-                  RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE
-                ) {
-                  void releaseLabwareLatch().then(() => {
-                    return handleMotionRouting(false).then(() => {
-                      proceedToValidNextStep()
-                    })
-                  })
-                } else {
-                  void releaseGripperJaws().then(() => {
-                    if (isDoorOpen) {
-                      return handleMotionRouting(false).then(() => {
-                        proceedToDoorStep()
-                      })
-                    }
+            if (countdownRef.current !== 1) {
+              return
+            }
 
-                    return handleMotionRouting(true)
-                      .then(() => homeExceptPlungers())
-                      .then(() => handleMotionRouting(false))
-                      .then(() => {
-                        proceedToValidNextStep()
-                      })
+            if (intervalId != null) {
+              clearInterval(intervalId)
+            }
+            if (
+              recoveryMap.route ===
+              RECOVERY_MAP.STACKER_RELEASING_LABWARE_LATCH.ROUTE
+            ) {
+              void releaseLabwareLatch().then(() => {
+                return handleMotionRouting(false).then(() => {
+                  proceedToValidNextStep()
+                })
+              })
+            } else {
+              void releaseGripperJaws().then(() => {
+                if (isDoorOpen) {
+                  return handleMotionRouting(false).then(() => {
+                    proceedToDoorStep()
                   })
                 }
-              }
-              return updatedCountdown
-            })
+
+                return handleMotionRouting(true)
+                  .then(() => homeExceptPlungers())
+                  .then(() => handleMotionRouting(false))
+                  .then(() => {
+                    proceedToValidNextStep()
+                  })
+              })
+            }
           }, 1000)
           break
       }
