@@ -43,6 +43,7 @@ export function Mix(props: MixProps): JSX.Element {
   const { t } = useTranslation('quick_transfer')
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = useRef(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
 
   const [mixIsEnabled, setMixIsEnabled] = useState<boolean>(
     kind === 'aspirate'
@@ -244,6 +245,7 @@ export function Mix(props: MixProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              ref={inputElementRef}
               autoFocus
               type="text"
               value={mixVolume}
@@ -262,8 +264,7 @@ export function Mix(props: MixProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={mixVolume}
-              onChange={setMixVolume}
+              inputElementRef={inputElementRef}
             />
           </Flex>
         </Flex>
@@ -286,6 +287,7 @@ export function Mix(props: MixProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              ref={inputElementRef}
               autoFocus
               type="text"
               value={mixReps}
@@ -304,7 +306,7 @@ export function Mix(props: MixProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              onChange={setMixReps}
+              inputElementRef={inputElementRef}
             />
           </Flex>
         </Flex>

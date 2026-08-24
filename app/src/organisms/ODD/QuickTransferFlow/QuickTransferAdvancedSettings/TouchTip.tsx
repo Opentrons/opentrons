@@ -43,6 +43,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
   const { t } = useTranslation('quick_transfer')
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = useRef(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
 
   const [touchTipIsEnabled, setTouchTipIsEnabled] = useState<boolean>(
     kind === 'aspirate'
@@ -242,6 +243,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              ref={inputElementRef}
               autoFocus
               type="text"
               value={speed}
@@ -260,8 +262,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={speed}
-              onChange={setSpeed}
+              inputElementRef={inputElementRef}
             />
           </Flex>
         </Flex>
@@ -284,6 +285,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              ref={inputElementRef}
               autoFocus
               type="text"
               value={position}
@@ -309,8 +311,7 @@ export function TouchTip(props: TouchTipProps): JSX.Element {
             <NumericalKeyboard
               hasHyphen
               keyboardRef={keyboardRef}
-              initialValue={position}
-              onChange={setPosition}
+              inputElementRef={inputElementRef}
             />
           </Flex>
         </Flex>

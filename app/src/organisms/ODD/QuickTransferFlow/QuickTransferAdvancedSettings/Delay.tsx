@@ -43,6 +43,7 @@ export function Delay(props: DelayProps): JSX.Element {
   const { t } = useTranslation('quick_transfer')
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = useRef(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
 
   const [currentStep, setCurrentStep] = useState<number>(1)
   const [delayIsEnabled, setDelayIsEnabled] = useState<boolean>(
@@ -203,6 +204,7 @@ export function Delay(props: DelayProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              ref={inputElementRef}
               autoFocus
               type="text"
               value={delayDuration}
@@ -221,9 +223,8 @@ export function Delay(props: DelayProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={delayDuration}
+              inputElementRef={inputElementRef}
               isDecimal
-              onChange={setDelayDuration}
             />
           </Flex>
         </Flex>

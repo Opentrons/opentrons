@@ -44,6 +44,7 @@ export function PushOut(props: PushOutProps): JSX.Element {
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = useRef(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
   const [pushOutIsEnabled, setPushOutIsEnabled] = useState<boolean | null>(
     state.pushOutDispense?.volume != null
   )
@@ -190,6 +191,7 @@ export function PushOut(props: PushOutProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              ref={inputElementRef}
               autoFocus
               type="text"
               value={volume}
@@ -207,9 +209,8 @@ export function PushOut(props: PushOutProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              inputElementRef={inputElementRef}
               isDecimal
-              initialValue={volume}
-              onChange={setVolume}
             />
           </Flex>
         </Flex>
