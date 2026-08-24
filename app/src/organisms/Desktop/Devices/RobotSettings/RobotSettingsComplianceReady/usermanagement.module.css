@@ -1,35 +1,49 @@
-.table {
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.header_row,
+.row {
+  display: grid;
   width: 100%;
-  border-collapse: collapse;
+  align-items: center;
+  padding: 0 var(--spacing-12);
+  gap: var(--spacing-24);
+  grid-template-columns: repeat(4, 1fr) 1.1875rem;
 }
 
-.header_cell {
-  padding-bottom: var(--spacing-8);
-  color: var(--grey-60);
-  font-weight: normal;
-  text-align: left;
-}
-
-.body_cell {
-  padding: var(--spacing-12) 0;
-  border-top: 1px solid var(--grey-30);
-  vertical-align: top;
-}
-
-.body_cell_text {
+.header_row {
+  align-items: start;
   color: var(--grey-60);
 }
 
-.overflow_cell {
-  padding: var(--spacing-12) 0;
-  border-top: 1px solid var(--grey-30);
-  vertical-align: top;
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.row {
+  flex: 1;
+  padding: var(--spacing-12);
+}
+
+.cell {
+  min-width: 0;
 }
 
 .overflow_cell_inner {
   position: relative;
-  width: fit-content;
-  margin-left: auto;
+  width: 1.1875rem;
+  flex-shrink: 0;
 }
 
 .overflow_menu {
