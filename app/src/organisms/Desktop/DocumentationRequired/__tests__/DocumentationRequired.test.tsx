@@ -38,6 +38,7 @@ describe('DocumentationRequired', () => {
     render(props)
     screen.getByText('Documentation required')
     screen.getByText('Note for robot audit log by alice')
+    expect(screen.getByRole('textbox')).toHaveFocus()
     screen.getByText('Action list')
     screen.getByRole('button', { name: 'Confirm' })
     screen.getByRole('button', { name: 'Cancel action' })

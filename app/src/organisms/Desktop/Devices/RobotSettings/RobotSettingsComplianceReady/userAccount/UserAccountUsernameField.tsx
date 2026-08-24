@@ -10,11 +10,13 @@ import type { Control, FieldValues, Path } from 'react-hook-form'
 
 export interface UserAccountUsernameFieldProps<T extends FieldValues> {
   control: Control<T>
+  autoFocus?: boolean
   usernameMaxLength?: number
 }
 
 export function UserAccountUsernameField<T extends FieldValues>({
   control,
+  autoFocus,
   usernameMaxLength,
 }: UserAccountUsernameFieldProps<T>): JSX.Element {
   const { t } = useTranslation('device_settings')
@@ -62,6 +64,7 @@ export function UserAccountUsernameField<T extends FieldValues>({
 
             return (
               <InputField
+                autoFocus={autoFocus}
                 value={field.value}
                 error={error}
                 caption={

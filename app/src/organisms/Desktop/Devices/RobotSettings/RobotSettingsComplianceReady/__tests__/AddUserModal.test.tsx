@@ -55,6 +55,7 @@ describe('AddUserModal', () => {
       name: 'Create account',
     })
     expect(createAccountButton).toBeEnabled()
+    expect(screen.getAllByRole('textbox')[0]).toHaveFocus()
     screen.getAllByText('Create account')
   })
 

@@ -420,6 +420,7 @@ function LoginView(props: LoginViewProps): JSX.Element {
 
       <form id={formId} onSubmit={onSubmit} className={styles.fields_container}>
         <InputField
+          autoFocus
           name="username"
           title={t('access_control:login_form_username_field')}
           type="text"
@@ -493,6 +494,7 @@ function SetNewPasswordView(props: SetNewPasswordViewProps): JSX.Element {
 
       <div className={styles.fields_container}>
         <InputField
+          autoFocus
           name="newPassword"
           title={t(
             'access_control:desktop_password_expired_new_password_field'

@@ -135,6 +135,7 @@ export function EditUserModal({
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className={styles.form_fields}>
             <UserAccountIdentityFormFields
+              autoFocusFirstField
               control={control}
               stacked
               usernameMaxLength={USERNAME_MAX_LENGTH}
