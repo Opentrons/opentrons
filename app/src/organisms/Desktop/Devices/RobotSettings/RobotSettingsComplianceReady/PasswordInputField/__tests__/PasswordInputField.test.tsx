@@ -67,7 +67,7 @@ describe('PasswordInputField', () => {
     expect(input).toHaveAttribute('type', 'text')
   })
 
-  it('preserves caret position when toggling password visibility', async () => {
+  it('places caret at end when toggling password visibility', async () => {
     const user = userEvent.setup()
     render({ ...props, value: 'secret' })
     const input = screen.getByDisplayValue<HTMLInputElement>('secret')
@@ -79,8 +79,8 @@ describe('PasswordInputField', () => {
     await user.click(screen.getByRole('button', { name: 'Show' }))
 
     expect(input).toHaveFocus()
-    expect(input.selectionStart).toBe(3)
-    expect(input.selectionEnd).toBe(3)
+    expect(input.selectionStart).toBe(input.value.length)
+    expect(input.selectionEnd).toBe(input.value.length)
   })
 
   it('calls onChange when the value changes', () => {

@@ -18,6 +18,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { i18n } from '/app/i18n'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -52,8 +53,10 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
     BlowOutLocation | undefined
   >(state.blowOutDispense?.location)
 
-  const [disposalVolume, setDisposalVolume] = useState<number | undefined>(
-    state?.disposalVolumeDispenseSettings?.volume
+  const [disposalVolume, setDisposalVolume] = useState<string>(
+    state?.disposalVolumeDispenseSettings?.volume != null
+      ? String(state.disposalVolumeDispenseSettings.volume)
+      : ''
   )
   const maxPipetteVolume = Object.values(state.pipette.liquids)[0].maxVolume
   const tipVolume = Object.values(state.tipRack.wells)[0].totalLiquidVolume
@@ -138,18 +141,25 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
   const maxDisposalCapacity = maxTipCapacity - state.volume * 2
   const volumeRange = { min: 1, max: maxDisposalCapacity }
 
-  const volumeError =
-    disposalVolume != null &&
-    (disposalVolume < volumeRange.min || disposalVolume > volumeRange.max)
-      ? t(`value_out_of_range`, {
-          min: volumeRange.min,
-          max: volumeRange.max,
+  const parsedDisposalVolume = parseNumericalInput(disposalVolume, {
+    allowDecimal: false,
+    allowNegative: false,
+    min: volumeRange.min,
+    max: volumeRange.max,
+  })
+  const volumeErrorMessage =
+    parsedDisposalVolume.result === 'rangeError'
+      ? t('value_out_of_range', {
+          min: parsedDisposalVolume.min,
+          max: parsedDisposalVolume.max,
         })
-      : null
+      : parsedDisposalVolume.result === 'syntaxError'
+        ? t('enter_a_valid_number')
+        : null
 
   let buttonIsDisabled = false
   if (currentStep === 2) {
-    buttonIsDisabled = disposalVolume == null || volumeError != null
+    buttonIsDisabled = parsedDisposalVolume.result !== 'success'
   } else if (currentStep === 3) {
     buttonIsDisabled = blowOutLocation == null
   }
@@ -204,12 +214,12 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
           >
             <TouchInputField
               autoFocus
-              type="number"
+              type="text"
               value={disposalVolume}
               label={t('disposal_volume_µL')}
-              error={volumeError}
+              error={volumeErrorMessage}
               onChange={e => {
-                setDisposalVolume(Number(e.target.value))
+                setDisposalVolume(e.target.value)
               }}
             />
           </Flex>
@@ -221,10 +231,8 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={String(disposalVolume ?? '')}
-              onChange={e => {
-                setDisposalVolume(Number(e))
-              }}
+              initialValue={disposalVolume}
+              onChange={setDisposalVolume}
             />
           </Flex>
         </Flex>

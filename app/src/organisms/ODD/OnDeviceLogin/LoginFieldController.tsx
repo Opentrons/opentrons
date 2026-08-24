@@ -3,7 +3,9 @@ import { Controller } from 'react-hook-form'
 import { LoginFieldInput } from './LoginFieldInput'
 
 import type { TFunction } from 'i18next'
+import type { RefObject } from 'react'
 import type { Control } from 'react-hook-form'
+import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { LoginFormValues, LoginStep } from './index'
 
 export interface LoginFieldControllerProps {
@@ -13,7 +15,9 @@ export interface LoginFieldControllerProps {
   isPasswordResetRequired: boolean
   loginError: string | null
   confirmPasswordError: string | null
+  usernameError: string | null
   onClearFieldErrors: () => void
+  keyboardRef: RefObject<KeyboardReactInterface | null>
 }
 
 export function LoginFieldController({
@@ -23,7 +27,9 @@ export function LoginFieldController({
   isPasswordResetRequired,
   loginError,
   confirmPasswordError,
+  usernameError,
   onClearFieldErrors,
+  keyboardRef,
 }: LoginFieldControllerProps): JSX.Element | null {
   if (step === 'username') {
     return (
@@ -35,10 +41,11 @@ export function LoginFieldController({
           <LoginFieldInput
             field={field}
             label={t('access_control:username')}
-            error={null}
+            error={usernameError}
             isPasswordField={false}
             onClearError={onClearFieldErrors}
             autoFocus
+            keyboardRef={keyboardRef}
           />
         )}
       />
@@ -66,6 +73,7 @@ export function LoginFieldController({
             isPasswordField={true}
             onClearError={onClearFieldErrors}
             autoFocus
+            keyboardRef={keyboardRef}
           />
         )}
       />
@@ -86,6 +94,7 @@ export function LoginFieldController({
             isPasswordField={true}
             onClearError={onClearFieldErrors}
             autoFocus
+            keyboardRef={keyboardRef}
           />
         )}
       />

@@ -97,7 +97,7 @@ describe('TipPosition', () => {
         label: 'Distance from bottom of well (mm)',
         error: null,
         type: 'text',
-        value: 10,
+        value: '10',
         onChange: expect.any(Function),
       },
       {}
@@ -120,7 +120,7 @@ describe('TipPosition', () => {
         label: 'Distance from bottom of well (mm)',
         error: null,
         type: 'text',
-        value: 75,
+        value: '75',
         onChange: expect.any(Function),
       },
       {}
@@ -137,9 +137,21 @@ describe('TipPosition', () => {
       {
         autoFocus: true,
         label: 'Distance from bottom of well (mm)',
+        error: null,
+        type: 'text',
+        value: '',
+        onChange: expect.any(Function),
+      },
+      {}
+    )
+    await user.click(screen.getByText('0'))
+    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
+      {
+        autoFocus: true,
+        label: 'Distance from bottom of well (mm)',
         error: 'Value must be between 1 to 52',
         type: 'text',
-        value: 0,
+        value: '0',
         onChange: expect.any(Function),
       },
       {}
@@ -158,13 +170,14 @@ describe('TipPosition', () => {
     const deleteBtn = screen.getByText('del')
     await user.click(deleteBtn)
     await user.click(deleteBtn)
+    await user.click(screen.getByText('0'))
     expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
       {
         autoFocus: true,
         label: 'Distance from bottom of well (mm)',
         error: 'Value must be between 1 to 202',
         type: 'text',
-        value: 0,
+        value: '0',
         onChange: expect.any(Function),
       },
       {}

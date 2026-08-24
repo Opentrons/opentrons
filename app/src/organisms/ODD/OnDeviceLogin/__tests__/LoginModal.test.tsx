@@ -259,4 +259,44 @@ describe('LoginModal', () => {
     await new Promise(resolve => setTimeout(resolve, 50))
     expect(modalResolved).toBe(false)
   })
+
+  it('returns to the new-password step with a policy error when setting a password fails', async () => {
+    vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
+      submitPassword: (username: string, _password: string) => {
+        onSuccess(
+          username,
+          mockAuthUser({ resetPassword: true }),
+          OAUTH_RESPONSE
+        )
+      },
+      isAuthLoading: false,
+    }))
+    vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(({ onError }) => ({
+      submitNewPassword: () => {
+        onError('Must include at least one special character')
+      },
+      isLoading: false,
+    }))
+
+    const clickOpenLoginModal = setupLoginModalTrigger()
+    void clickOpenLoginModal()
+    await waitForLoginModalOpen()
+
+    fillField('Username', 'alice')
+    clickPrimary('Next')
+    fillField('Password', 'temp-pass')
+    clickPrimary('Confirm')
+
+    await screen.findByRole('heading', { name: 'New password' })
+
+    fillField('New password', 'newpass123')
+    clickPrimary('Next')
+    fillField('Confirm password', 'newpass123')
+    clickPrimary('Confirm')
+
+    expect(
+      await screen.findByText('Must include at least one special character')
+    ).toBeInTheDocument()
+    expect(screen.getByLabelText('New password')).toBeInTheDocument()
+  })
 })

@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { act, fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { TouchInputField } from '@opentrons/components'
@@ -10,9 +10,16 @@ import { i18n } from '/app/i18n'
 import { getVolumeRange } from '../utils'
 import { VolumeEntry } from '../VolumeEntry'
 
-import type { ComponentProps } from 'react'
+import type { ChangeEvent, ComponentProps } from 'react'
+import type * as SoftwareKeyboard from '/app/atoms/SoftwareKeyboard'
 
-vi.mock('/app/atoms/SoftwareKeyboard')
+vi.mock('/app/atoms/SoftwareKeyboard', async importOriginal => {
+  const actual = await importOriginal<typeof SoftwareKeyboard>()
+  return {
+    ...actual,
+    StatelessNumericalKeyboard: vi.fn(),
+  }
+})
 vi.mock('../utils')
 
 vi.mock('@opentrons/components', async importOriginal => {
@@ -172,6 +179,35 @@ describe('VolumeEntry', () => {
         onChange: expect.any(Function),
       },
       {}
+    )
+  })
+
+  it('retains malformed input, shows an error, and disables continue', () => {
+    render(props)
+    const lastCall = vi.mocked(TouchInputField).mock.calls.at(-1)
+    act(() => {
+      lastCall?.[0].onChange?.({
+        target: { value: '1.' },
+      } as ChangeEvent<HTMLInputElement>)
+    })
+    expect(vi.mocked(TouchInputField).mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({
+        value: '1.',
+        error: 'Enter a valid number',
+      })
+    )
+    expect(screen.getByTestId('ChildNavigation_Primary_Button')).toBeDisabled()
+    const nextCall = vi.mocked(TouchInputField).mock.calls.at(-1)
+    act(() => {
+      nextCall?.[0].onChange?.({
+        target: { value: '1.5' },
+      } as ChangeEvent<HTMLInputElement>)
+    })
+    expect(vi.mocked(TouchInputField).mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({
+        value: '1.5',
+        error: 'Value must be between 5 to 50',
+      })
     )
   })
 })

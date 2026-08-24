@@ -108,8 +108,8 @@ describe('Delay', () => {
         autoFocus: true,
         label: 'Delay duration (seconds)',
         error: null,
-        type: 'number',
-        value: null,
+        type: 'text',
+        value: '',
         onChange: expect.any(Function),
       },
       {}
@@ -141,8 +141,8 @@ describe('Delay', () => {
         autoFocus: true,
         label: 'Delay duration (seconds)',
         error: 'Value must be between 0.1 to 9999999999',
-        type: 'number',
-        value: 0,
+        type: 'text',
+        value: '0',
         onChange: expect.any(Function),
       },
       {}
@@ -189,8 +189,8 @@ describe('Delay', () => {
         autoFocus: true,
         label: 'Delay duration (seconds)',
         error: null,
-        type: 'number',
-        value: 15,
+        type: 'text',
+        value: '15',
         onChange: expect.any(Function),
       },
       {}
@@ -217,8 +217,8 @@ describe('Delay', () => {
         autoFocus: true,
         label: 'Delay duration (seconds)',
         error: null,
-        type: 'number',
-        value: 20,
+        type: 'text',
+        value: '20',
         onChange: expect.any(Function),
       },
       {}

@@ -9,11 +9,9 @@ import {
   TouchInputField,
 } from '@opentrons/components'
 
-import {
-  isValidNumericalInput,
-  StatelessNumericalKeyboard,
-} from '/app/atoms/SoftwareKeyboard'
+import { StatelessNumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 
 import { ACTIONS, CONSOLIDATE, DISTRIBUTE } from './constants'
 import { getVolumeRange } from './utils'
@@ -50,41 +48,37 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
     textEntryCopy = t('dispense_volume_µL')
   }
 
-  const volumeAsNumber = volume !== '' ? Number(volume) : null
-
-  const handleVolumeChange = (input: string): void => {
-    const isValidInput = isValidNumericalInput(input, { allowDecimal: true })
-    if (isValidInput === false) {
-      return
-    }
-    setVolume(input)
-  }
+  const parsedVolume = parseNumericalInput(volume, {
+    allowDecimal: true,
+    allowNegative: false,
+    min: volumeRange.min,
+    max: volumeRange.max,
+  })
 
   const handleClickNext = (): void => {
-    // the button will be disabled if this values is null
-    if (volumeAsNumber != null && !Number.isNaN(volumeAsNumber)) {
+    if (parsedVolume.result === 'success') {
       dispatch({
         type: ACTIONS.SET_VOLUME,
-        volume: volumeAsNumber,
+        volume: parsedVolume.data,
       })
       onNext()
     }
   }
-  let error = null
-  if (volumeRange.min > volumeRange.max) {
-    error =
+
+  const isVolumeRangeEmpty = volumeRange.min > volumeRange.max
+
+  let volumeErrorMessage = null
+  if (parsedVolume.result === 'syntaxError') {
+    volumeErrorMessage = t('enter_a_valid_number')
+  } else if (isVolumeRangeEmpty) {
+    volumeErrorMessage =
       state.transferType === 'consolidate'
         ? t('consolidate_volume_error')
         : t('distribute_volume_error')
-  } else if (
-    volume !== '' &&
-    (Number.isNaN(volumeAsNumber) ||
-      (volumeAsNumber != null && volumeAsNumber < volumeRange.min) ||
-      (volumeAsNumber != null && volumeAsNumber > volumeRange.max))
-  ) {
-    error = t(`value_out_of_range`, {
-      min: volumeRange.min,
-      max: volumeRange.max,
+  } else if (parsedVolume.result === 'rangeError') {
+    volumeErrorMessage = t('value_out_of_range', {
+      min: parsedVolume.min,
+      max: parsedVolume.max,
     })
   }
 
@@ -97,7 +91,9 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
         onClickButton={handleClickNext}
         secondaryButtonProps={exitButtonProps}
         top={SPACING.spacing8}
-        buttonIsDisabled={error != null || volume === ''}
+        buttonIsDisabled={
+          isVolumeRangeEmpty || parsedVolume.result !== 'success'
+        }
       />
       <Flex
         alignSelf={ALIGN_CENTER}
@@ -120,9 +116,9 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
             type="text"
             value={volume}
             label={textEntryCopy}
-            error={error}
+            error={volumeErrorMessage}
             onChange={e => {
-              handleVolumeChange(e.target.value as string)
+              setVolume(e.target.value)
             }}
           />
         </Flex>
@@ -135,7 +131,7 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
           <StatelessNumericalKeyboard
             value={volume}
             isDecimal
-            onChange={handleVolumeChange}
+            onChange={setVolume}
           />
         </Flex>
       </Flex>

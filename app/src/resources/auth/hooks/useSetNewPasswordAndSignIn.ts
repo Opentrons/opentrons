@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { updateSelf } from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
 
-import { mapAuthUserMutationError } from '../mapAuthUserMutationError'
+import { mapSetNewPasswordError } from '../mapAuthUserMutationError'
 
 import type { TFunction } from 'i18next'
 
@@ -42,7 +42,7 @@ export function useSetNewPasswordAndSignIn(
         onError(
           t('set_new_password_error_session_expired', {
             ns: 'access_control',
-          }) as string
+          })
         )
         return
       }
@@ -60,17 +60,7 @@ export function useSetNewPasswordAndSignIn(
             'useSetNewPasswordAndSignIn: failed to update password',
             error
           )
-          const formError = mapAuthUserMutationError<{ password: string }>(
-            error,
-            t
-          )
-          onError(
-            formError?.field === 'password'
-              ? formError.error.message
-              : (t('set_new_password_error_update_failed', {
-                  ns: 'access_control',
-                }) as string)
-          )
+          onError(mapSetNewPasswordError(error, t))
         } finally {
           setIsLoading(false)
         }

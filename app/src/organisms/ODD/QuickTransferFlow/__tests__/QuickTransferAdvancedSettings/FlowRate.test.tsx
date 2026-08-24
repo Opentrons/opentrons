@@ -194,4 +194,24 @@ describe('FlowRate', () => {
       })
     )
   })
+
+  it('retains incomplete decimal input, shows an error, and disables save', () => {
+    render(props)
+    changeTouchInputValue('1.')
+    expect(getLastTouchInputFieldProps()).toEqual(
+      expect.objectContaining({
+        value: '1.',
+        error: 'Enter a valid number',
+      })
+    )
+    expect(screen.getByTestId('ChildNavigation_Primary_Button')).toBeDisabled()
+    changeTouchInputValue('1.5')
+    expect(getLastTouchInputFieldProps()).toEqual(
+      expect.objectContaining({
+        value: '1.5',
+        error: null,
+      })
+    )
+    expect(screen.getByTestId('ChildNavigation_Primary_Button')).toBeEnabled()
+  })
 })

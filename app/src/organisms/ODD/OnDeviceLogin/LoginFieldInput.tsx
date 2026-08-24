@@ -2,12 +2,12 @@ import { useRef, useState } from 'react'
 
 import { setRefs, TouchInputField } from '@opentrons/components'
 
+import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 
-import styles from './OnDeviceLogin.module.css'
-
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, RefObject } from 'react'
 import type { ControllerRenderProps, FieldPath } from 'react-hook-form'
+import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { LoginFormValues } from './index'
 
 export interface LoginFieldInputProps<
@@ -19,6 +19,7 @@ export interface LoginFieldInputProps<
   isPasswordField: boolean
   onClearError?: () => void
   autoFocus?: boolean
+  keyboardRef?: RefObject<KeyboardReactInterface | null>
 }
 
 export function LoginFieldInput<
@@ -30,13 +31,18 @@ export function LoginFieldInput<
   isPasswordField,
   onClearError,
   autoFocus,
+  keyboardRef,
 }: LoginFieldInputProps<TFieldName>): JSX.Element {
   const [showPassword, setShowPassword] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isPasswordHidden = isPasswordField && !showPassword
   const inputType: 'text' | 'password' = isPasswordHidden ? 'password' : 'text'
 
-  const inputField = (
+  usePlaceCaretAtEndOnToggle(inputRef, showPassword, isPasswordField, end => {
+    keyboardRef?.current?.setCaretPosition(end)
+  })
+
+  return (
     <TouchInputField
       ref={setRefs(inputRef, field.ref)}
       autoFocus={autoFocus}
@@ -51,20 +57,16 @@ export function LoginFieldInput<
         field.onChange(e.target.value)
         onClearError?.()
       }}
+      accessory={
+        isPasswordField ? (
+          <PasswordVisibilityToggle
+            isVisible={showPassword}
+            onToggle={() => {
+              setShowPassword(prev => !prev)
+            }}
+          />
+        ) : null
+      }
     />
-  )
-
-  if (!isPasswordField) return inputField
-
-  return (
-    <div className={styles.password_field_row}>
-      <div className={styles.password_field_input}>{inputField}</div>
-      <PasswordVisibilityToggle
-        isVisible={showPassword}
-        onToggle={() => {
-          setShowPassword(prev => !prev)
-        }}
-      />
-    </div>
   )
 }
