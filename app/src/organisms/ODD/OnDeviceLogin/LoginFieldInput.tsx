@@ -5,7 +5,7 @@ import { setRefs, TouchInputField } from '@opentrons/components'
 import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 
-import type { ChangeEvent, RefObject } from 'react'
+import type { ChangeEvent } from 'react'
 import type { ControllerRenderProps } from 'react-hook-form'
 import type { LoginFormValues } from './index'
 
