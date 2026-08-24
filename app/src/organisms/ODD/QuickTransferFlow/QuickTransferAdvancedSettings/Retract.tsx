@@ -264,6 +264,7 @@ function RetractSettingComponent({
 }: RetractSettingComponentProps): JSX.Element {
   const { t } = useTranslation('quick_transfer')
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
 
   // TODO: accommodate arbitrary position reference
   const positionText =
@@ -287,6 +288,7 @@ function RetractSettingComponent({
               : t('withdraw_tip_from_liquid_dispense')}
           </StyledText>
           <TouchInputField
+            ref={inputElementRef}
             autoFocus
             type="text"
             value={speed}
@@ -306,9 +308,8 @@ function RetractSettingComponent({
           <NumericalKeyboard
             key={`${kind}_speed_keyboard`}
             keyboardRef={keyboardRef}
+            inputElementRef={inputElementRef}
             isDecimal
-            initialValue={speed}
-            onChange={setSpeed}
           />
         </Flex>
       </>
@@ -326,6 +327,7 @@ function RetractSettingComponent({
           marginTop={SPACING.spacing68}
         >
           <TouchInputField
+            ref={inputElementRef}
             autoFocus
             type="text"
             value={delayDuration}
@@ -344,9 +346,8 @@ function RetractSettingComponent({
           <NumericalKeyboard
             key={`${kind}_delay_duration_keyboard`}
             keyboardRef={keyboardRef}
+            inputElementRef={inputElementRef}
             isDecimal
-            initialValue={delayDuration}
-            onChange={setDelayDuration}
           />
         </Flex>
       </>
@@ -368,6 +369,7 @@ function RetractSettingComponent({
           marginTop={SPACING.spacing68}
         >
           <TouchInputField
+            ref={inputElementRef}
             autoFocus
             type="text"
             value={position}
@@ -391,8 +393,7 @@ function RetractSettingComponent({
           <NumericalKeyboard
             key={`${kind}_position_keyboard`}
             keyboardRef={keyboardRef}
-            initialValue={position}
-            onChange={setPosition}
+            inputElementRef={inputElementRef}
             hasHyphen={positionReference === POSITION_REFERENCE_TOP}
           />
         </Flex>

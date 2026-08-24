@@ -58,7 +58,7 @@ export function OnDeviceLogin({
     null
   )
   const [usernameError, setUsernameError] = useState<string | null>(null)
-  const { control, watch, setValue } = useForm<LoginFormValues>({
+  const { control, watch } = useForm<LoginFormValues>({
     defaultValues: {
       username: initialUsername ?? '',
       password: '',
@@ -67,24 +67,11 @@ export function OnDeviceLogin({
   })
 
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
 
   const username = watch('username')
   const password = watch('password')
   const confirmPassword = watch('confirmPassword')
-
-  const activeFieldName: LoginFieldName =
-    step === 'username'
-      ? 'username'
-      : step === 'confirmPassword'
-        ? 'confirmPassword'
-        : 'password'
-
-  const keyboardFieldValue =
-    step === 'username'
-      ? username
-      : step === 'confirmPassword'
-        ? confirmPassword
-        : password
 
   const clearFieldErrors = (): void => {
     setConfirmPasswordError(null)
@@ -92,15 +79,6 @@ export function OnDeviceLogin({
     setUsernameError(null)
     onClearLoginError?.()
   }
-
-  // Keep the software keyboard's value and caret in sync with the active field,
-  // including after username -> password so new keys insert at the end.
-  useEffect(() => {
-    const kb = keyboardRef.current
-    if (kb == null) return
-    kb.setInput(keyboardFieldValue)
-    kb.setCaretPosition(keyboardFieldValue.length)
-  }, [step, keyboardFieldValue])
 
   const handleNext = useCallback((): void => {
     if (step === 'username') {
@@ -248,6 +226,7 @@ export function OnDeviceLogin({
         <div className={styles.content_container}>
           <div className={styles.form_inner_container}>
             <LoginFieldController
+              ref={inputElementRef}
               control={control}
               step={step}
               t={t}
@@ -256,21 +235,14 @@ export function OnDeviceLogin({
               confirmPasswordError={confirmPasswordError}
               usernameError={usernameError}
               onClearFieldErrors={clearFieldErrors}
-              keyboardRef={keyboardRef}
             />
           </div>
         </div>
       </div>
       <div className={styles.keyboard_container}>
         <FullKeyboard
-          onChange={(input: string) => {
-            setValue(activeFieldName, input, {
-              shouldDirty: true,
-              shouldTouch: true,
-            })
-            clearFieldErrors()
-          }}
           keyboardRef={keyboardRef}
+          inputElementRef={inputElementRef}
         />
       </div>
     </>

@@ -47,6 +47,7 @@ export function AirGap(props: AirGapProps): JSX.Element {
   const { t } = useTranslation('quick_transfer')
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = useRef(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
 
   const [airGapEnabled, setAirGapEnabled] = useState<boolean>(
     kind === 'aspirate'
@@ -212,6 +213,7 @@ export function AirGap(props: AirGapProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              ref={inputElementRef}
               autoFocus
               type="text"
               value={volume}
@@ -230,8 +232,7 @@ export function AirGap(props: AirGapProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={volume}
-              onChange={setVolume}
+              inputElementRef={inputElementRef}
             />
           </Flex>
         </Flex>

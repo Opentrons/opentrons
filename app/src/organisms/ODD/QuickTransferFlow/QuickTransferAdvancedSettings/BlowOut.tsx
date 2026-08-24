@@ -126,6 +126,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
   const keyboardRef = useRef(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
   const [isBlowOutEnabled, setIsBlowOutEnabled] = useState<boolean>(
     state.blowOutDispense != null
   )
@@ -402,6 +403,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              ref={inputElementRef}
               autoFocus
               type="text"
               value={speed}
@@ -420,8 +422,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={speed}
-              onChange={setSpeed}
+              inputElementRef={inputElementRef}
             />
           </Flex>
         </Flex>

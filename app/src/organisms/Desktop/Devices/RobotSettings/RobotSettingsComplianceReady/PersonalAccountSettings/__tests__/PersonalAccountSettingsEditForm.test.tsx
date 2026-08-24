@@ -94,7 +94,7 @@ describe('PersonalAccountSettingsEditForm', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
-      expect(screen.getByText('Username is required.')).toBeInTheDocument()
+      expect(screen.getByText('Username is required')).toBeInTheDocument()
     })
     expect(props.onSave).not.toHaveBeenCalled()
   })

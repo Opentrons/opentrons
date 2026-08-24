@@ -55,6 +55,7 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
   const { t } = useTranslation('quick_transfer')
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = useRef(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
   const [currentStep, setCurrentStep] = useState<number>(1)
   const [volume, setVolume] = useState<string>('')
 
@@ -242,6 +243,7 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              ref={inputElementRef}
               autoFocus
               type="text"
               value={volume}
@@ -260,8 +262,7 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={volume}
-              onChange={setVolume}
+              inputElementRef={inputElementRef}
             />
           </Flex>
         </Flex>
@@ -312,6 +313,7 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              ref={inputElementRef}
               autoFocus
               type="text"
               value={flowRate}
@@ -336,8 +338,7 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={flowRate}
-              onChange={setFlowRate}
+              inputElementRef={inputElementRef}
             />
           </Flex>
         </Flex>

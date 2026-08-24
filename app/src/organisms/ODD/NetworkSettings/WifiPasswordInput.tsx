@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import clsx from 'clsx'
 
@@ -32,17 +32,7 @@ export function WifiPasswordInput({
     !isUnboxingFlowOngoing && styles.main_wrapper_with_top_margin
   )
 
-  useEffect(() => {
-    if (inputRef.current != null) {
-      inputRef.current.focus()
-    }
-    keyboardRef.current?.setInput(password)
-    keyboardRef.current?.setCaretPosition(password.length)
-  }, [password])
-
-  usePlaceCaretAtEndOnToggle(inputRef, showPassword, true, end => {
-    keyboardRef.current?.setCaretPosition(end)
-  })
+  usePlaceCaretAtEndOnToggle(inputRef, showPassword, true)
 
   return (
     <>
@@ -72,13 +62,7 @@ export function WifiPasswordInput({
         </div>
       </div>
       <div className={styles.keyboard_wrapper}>
-        <FullKeyboard
-          onChange={e => {
-            e != null && setPassword(String(e))
-            inputRef?.current?.focus()
-          }}
-          keyboardRef={keyboardRef}
-        />
+        <FullKeyboard keyboardRef={keyboardRef} inputElementRef={inputRef} />
       </div>
     </>
   )

@@ -264,6 +264,7 @@ function SubmergeSettingComponent({
 }: SubmergeSettingComponentProps): JSX.Element {
   const { t } = useTranslation('quick_transfer')
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
 
   // TODO: accommodate arbitrary position reference
   const positionText =
@@ -285,6 +286,7 @@ function SubmergeSettingComponent({
             {t(`submerge_${kind}_description`)}
           </StyledText>
           <TouchInputField
+            ref={inputElementRef}
             autoFocus
             type="text"
             value={speed}
@@ -304,9 +306,8 @@ function SubmergeSettingComponent({
           <NumericalKeyboard
             key={`${kind}_speed_keyboard`}
             keyboardRef={keyboardRef}
+            inputElementRef={inputElementRef}
             isDecimal
-            initialValue={speed}
-            onChange={setSpeed}
           />
         </Flex>
       </>
@@ -324,6 +325,7 @@ function SubmergeSettingComponent({
           marginTop={SPACING.spacing68}
         >
           <TouchInputField
+            ref={inputElementRef}
             autoFocus
             type="text"
             value={delayDuration}
@@ -343,9 +345,8 @@ function SubmergeSettingComponent({
           <NumericalKeyboard
             key={`${kind}_delay_duration_keyboard`}
             keyboardRef={keyboardRef}
+            inputElementRef={inputElementRef}
             isDecimal
-            initialValue={delayDuration}
-            onChange={setDelayDuration}
           />
         </Flex>
       </>
@@ -367,6 +368,7 @@ function SubmergeSettingComponent({
           marginTop={SPACING.spacing68}
         >
           <TouchInputField
+            ref={inputElementRef}
             autoFocus
             type="text"
             value={position}
@@ -391,8 +393,7 @@ function SubmergeSettingComponent({
           <NumericalKeyboard
             key={`${kind}_position_keyboard`}
             keyboardRef={keyboardRef}
-            initialValue={position}
-            onChange={setPosition}
+            inputElementRef={inputElementRef}
             hasHyphen={positionReference === POSITION_REFERENCE_TOP}
           />
         </Flex>

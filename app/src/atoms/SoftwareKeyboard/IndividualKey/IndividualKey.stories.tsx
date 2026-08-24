@@ -12,6 +12,7 @@ import {
 import { IndividualKey } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
+import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
 const meta: Meta<typeof IndividualKey> = {
   title: 'ODD/Atoms/SoftwareKeyboard/IndividualKey',
@@ -23,29 +24,33 @@ export default meta
 
 type Story = StoryObj<typeof IndividualKey>
 
-const Keyboard = ({ ...args }): JSX.Element => {
+const Keyboard = ({ keyText }: { keyText: string }): JSX.Element => {
   const [showKeyboard, setShowKeyboard] = useState(false)
   const [value, setValue] = useState<string>('')
-  const keyboardRef = useRef(null)
+  const keyboardRef = useRef<KeyboardReactInterface | null>(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
       <form id="test_form">
         <InputField
+          ref={inputElementRef}
           value={value}
           type="text"
-          placeholder="When focusing, the numpad shows up"
+          placeholder="When focusing, the keyboard shows up"
           onFocus={() => {
             setShowKeyboard(true)
+          }}
+          onChange={e => {
+            setValue(e.target.value)
           }}
         />
       </form>
       <Flex position={POSITION_ABSOLUTE} top="20%" width="15rem">
         {showKeyboard && (
           <IndividualKey
-            // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-            onChange={e => e != null && setValue(String(e))}
             keyboardRef={keyboardRef}
-            keyText={args.keyText}
+            inputElementRef={inputElementRef}
+            keyText={keyText}
           />
         )}
       </Flex>
@@ -53,9 +58,9 @@ const Keyboard = ({ ...args }): JSX.Element => {
   )
 }
 
-export const IndividualKeySoftwareKeyboard: Story = args => (
-  <Keyboard {...args} />
-)
-IndividualKeySoftwareKeyboard.args = {
-  keyText: 'hello',
+export const IndividualKeySoftwareKeyboard: Story = {
+  render: args => <Keyboard keyText={args.keyText} />,
+  args: {
+    keyText: 'hello',
+  },
 }

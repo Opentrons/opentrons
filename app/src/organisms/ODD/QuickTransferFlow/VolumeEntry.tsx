@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -9,7 +9,7 @@ import {
   TouchInputField,
 } from '@opentrons/components'
 
-import { StatelessNumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 
@@ -34,6 +34,8 @@ interface VolumeEntryProps {
 export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
   const { onNext, onBack, exitButtonProps, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
+  const keyboardRef = useRef(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
   const [volume, setVolume] = useState<string>(
     state.volume ? state.volume.toString() : ''
   )
@@ -112,6 +114,7 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
           marginTop={SPACING.spacing68}
         >
           <TouchInputField
+            ref={inputElementRef}
             autoFocus
             type="text"
             value={volume}
@@ -128,10 +131,10 @@ export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
           marginTop="7.75rem"
           borderRadius="0"
         >
-          <StatelessNumericalKeyboard
-            value={volume}
+          <NumericalKeyboard
+            keyboardRef={keyboardRef}
+            inputElementRef={inputElementRef}
             isDecimal
-            onChange={setVolume}
           />
         </Flex>
       </Flex>
