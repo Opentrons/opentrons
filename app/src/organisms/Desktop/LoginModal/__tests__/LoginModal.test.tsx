@@ -186,7 +186,7 @@ describe('LoginModal', () => {
     renderAndOpenLoginModal()
 
     screen.getByText('Compliance Ready Software login')
-    screen.getByLabelText('Username')
+    expect(screen.getByLabelText('Username')).toHaveFocus()
     screen.getByLabelText('Password')
     screen.getByRole('button', { name: 'Forgot password?' })
     expect(screen.getByRole('button', { name: 'Log in' })).toBeEnabled()
@@ -305,7 +305,7 @@ describe('LoginModal', () => {
     )
     screen.getByText('Your password has expired')
     screen.getByText('Create a new password to use')
-    screen.getByLabelText('New password')
+    expect(screen.getByLabelText('New password')).toHaveFocus()
     screen.getByLabelText('Confirm password')
     screen.getByRole('button', { name: 'Confirm' })
   })
