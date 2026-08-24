@@ -36,10 +36,24 @@ The module supports two primary configurations with the following stacking order
 
 ### Staging collars
 
-You can load a short collar (`opentrons_vacuum_manifold_collar_short`) or tall collar (`opentrons_vacuum_manifold_collar_tall`) on the adapter dock (A4) using [`load_adapter_to_doc()`][opentrons.protocol_api.VacuumModuleContext.load_adapter_to_dock]. For example:
+Collars support filter plates during vacuum extraction. The Vacuum Module includes a short and tall collar to match different labware profiles. Collar types and load names are shown below.
+
+| Collar | Height | Load Name |
+|:----|:----|:----|
+| **Short** | 42 mm | `opentrons_vacuum_manifold_collar_short` |
+| **Tall** |72 mm | `opentrons_vacuum_manifold_collar_tall` |
+
+Stage a collar on the manifold dock (slot A4) using [`load_adapter_to_dock()`][opentrons.protocol_api.VacuumModuleContext.load_adapter_to_dock], then load your filter plate directly onto the staged collar:
 
 ```python
-collar = vacuum.load_adapter_to_doc("opentrons_vacuum_manifold_collar_short")
+# Load a short collar on the manifold dock (slot A4)
+collar = vacuum.load_adapter_to_dock("opentrons_vacuum_manifold_collar_short")
+
+# Load the sample filter plate onto the staged collar
+filter_plate = collar.load_labware(
+    load_name="millipore_96_wellplate_500ul_ultracel_filter",
+    label="Sample Filter Plate",
+)
 ```
 
 ### Staging spacers
@@ -53,20 +67,16 @@ During collection procedures, you can use an optional spacer to raise the collec
 
 Load spacers and sample collection plates onto the module as shown here:
 
+Load spacers and internal collection labware directly onto the module base[cite: 7]:
+
 ```python
-# Loads a spacer onto the vacuum base
+# Load an internal spacer on the manifold base
 spacer = vacuum.load_adapter("opentrons_vacuum_manifold_spacer_short")
 
-# Loads a collection well plate on the spacer
+# Load a collection plate on top of the spacer
 collection_plate = spacer.load_labware(
-    name="corning_96_wellplate_360ul_flat",
-    label="Collection Wellplate"
-)
-
-# Loads a sample filter plate on the staged collar
-filter_plate = collar.load_labware(
-    name="millipore_96_wellplate_500ul_ultracel_filter",
-    label="Sample Filter Plate"
+    load_name="corning_96_wellplate_360ul_flat",
+    label="Collection Wellplate",
 )
 ```
 
