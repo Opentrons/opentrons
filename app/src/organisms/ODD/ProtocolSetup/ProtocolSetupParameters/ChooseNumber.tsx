@@ -47,8 +47,6 @@ export function ChooseNumber({
     min,
     max,
   })
-  const resetValueDisabled =
-    parsedValue.result === 'success' && parsedValue.data === parameter.default
   const valueErrorMessage =
     parsedValue.result === 'rangeError'
       ? t('value_out_of_range', {
