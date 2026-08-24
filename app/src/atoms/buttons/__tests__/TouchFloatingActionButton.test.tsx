@@ -40,4 +40,12 @@ describe('TouchFloatingActionButton', () => {
     const button = screen.getByRole('button')
     expect(button).toBeDisabled()
   })
+
+  it('can render on the lower left', () => {
+    props.buttonLocation = 'left'
+    render(props)
+
+    const button = screen.getByRole('button')
+    expect(button.className).toContain('floating_button_left')
+  })
 })

@@ -14,6 +14,11 @@
   cursor: default;
 }
 
+.floating_button_left {
+  right: auto;
+  left: var(--spacing-24);
+}
+
 .floating_button_style:active {
   background-color: var(--purple-55-touchscreen);
 }

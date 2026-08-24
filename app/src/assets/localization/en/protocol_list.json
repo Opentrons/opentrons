@@ -3,6 +3,8 @@
   "delete_n_protocols": "Delete {{count}} protocol?",
   "delete_n_protocols_plural": "Delete {{count}} protocols?",
   "delete_protocol_message": " and its run history will be permanently deleted.",
+  "delete_selected_protocol_message": "This protocol and its run history will be permanently deleted.",
+  "delete_selected_protocol_message_plural": "These protocols and their run histories will be permanently deleted.",
   "delete_this_protocol": "Delete this protocol?",
   "edit": "edit",
   "go_to_timeline": "Go to timeline",

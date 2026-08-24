@@ -10,7 +10,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   POSITION_STATIC,
   POSITION_STICKY,
@@ -258,7 +257,6 @@ export function ProtocolDashboard(): JSX.Element {
                 alignItems={ALIGN_CENTER}
                 backgroundColor={COLORS.white}
                 flexDirection={DIRECTION_ROW}
-                justifyContent={JUSTIFY_SPACE_BETWEEN}
                 paddingTop={SPACING.spacing16}
                 paddingBottom={SPACING.spacing16}
                 position={
@@ -329,11 +327,6 @@ export function ProtocolDashboard(): JSX.Element {
                     />
                   </Flex>
                 </Flex>
-                <SmallButton
-                  buttonText={isEditMode ? t('done') : t('edit_protocols')}
-                  buttonType={isEditMode ? 'primary' : 'tertiaryLowLight'}
-                  onClick={handleToggleEditMode}
-                />
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN}>
                 {sortedProtocols.map(protocol => {
@@ -364,11 +357,15 @@ export function ProtocolDashboard(): JSX.Element {
           ) : pinnedProtocols.length === 0 ? (
             <NoProtocols />
           ) : null}
+          <TouchFloatingActionButton
+            buttonText={isEditMode ? t('done') : t('edit_protocols')}
+            onClick={handleToggleEditMode}
+            aria-label={isEditMode ? t('done') : t('edit_protocols')}
+            buttonLocation="left"
+          />
           {isEditMode && selectedProtocolIds.length > 0 ? (
             <MediumButton
-              buttonText={t('delete_protocols', {
-                count: selectedProtocolIds.length,
-              })}
+              buttonText={t('delete_protocols')}
               buttonType="alert"
               iconName="trash"
               onClick={() => {

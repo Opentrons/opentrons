@@ -1,4 +1,4 @@
-import { act, fireEvent, screen } from '@testing-library/react'
+import { act, fireEvent, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -65,8 +65,37 @@ describe('BatchDeleteProtocolsModal', () => {
     screen.getByText('Delete 2 protocols?')
     screen.getByText('mock protocol 1')
     screen.getByText('mock protocol 2')
+    screen.getByText(
+      'These protocols and their run histories will be permanently deleted.'
+    )
     screen.getByText('Cancel')
     screen.getByText('Delete')
+  })
+
+  it('uses singular agreement when one protocol is selected', () => {
+    props.protocols = [mockProtocol1]
+    render(props)
+
+    screen.getByText('Delete 1 protocol?')
+    screen.getByText(
+      'This protocol and its run history will be permanently deleted.'
+    )
+  })
+
+  it('keeps a large protocol list in a bounded scroll area', () => {
+    props.protocols = Array.from({ length: 50 }, (_, index) => ({
+      ...mockProtocol1,
+      id: `protocol${index}`,
+      metadata: { protocolName: `mock protocol ${index}` },
+    }))
+    render(props)
+
+    const protocolNames = screen.getByTestId(
+      'BatchDeleteProtocolsModal_protocolNames'
+    )
+    expect(within(protocolNames).getAllByRole('listitem')).toHaveLength(50)
+    expect(protocolNames.className).toContain('protocol_names')
+    screen.getByText('mock protocol 49')
   })
 
   it('closes without deleting when tapping cancel', () => {

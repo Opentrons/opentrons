@@ -1,22 +1,18 @@
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
 
 import {
   ALIGN_CENTER,
-  Box,
   COLORS,
-  DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  OVERFLOW_WRAP_ANYWHERE,
   SPACING,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 
+import styles from './batchdeleteprotocolsmodal.module.css'
 import { useDeleteProtocols } from './useDeleteProtocols'
 
 import type { ProtocolResource } from '@opentrons/shared-data'
@@ -68,25 +64,27 @@ export function BatchDeleteProtocolsModal({
 
   return (
     <OddModal header={modalHeader}>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing32}
-        width="100%"
-      >
-        <Box width="100%">
-          <ProtocolNamesList>
+      <div className={styles.modal_content}>
+        <div className={styles.protocol_summary}>
+          <ul
+            className={styles.protocol_names}
+            data-testid="BatchDeleteProtocolsModal_protocolNames"
+          >
             {protocols.map(protocol => (
-              <ProtocolNameText key={protocol.id}>
+              <li className={styles.protocol_name} key={protocol.id}>
                 {protocol.metadata.protocolName ?? protocol.files[0]?.name}
-              </ProtocolNameText>
+              </li>
             ))}
-          </ProtocolNamesList>
-          <AdditionalText>{t('delete_protocol_message')}</AdditionalText>
-        </Box>
+          </ul>
+          <span className={styles.additional_text}>
+            {t('delete_selected_protocol_message', { count: protocolCount })}
+          </span>
+        </div>
         <Flex
           flexDirection={DIRECTION_ROW}
           gridGap={SPACING.spacing8}
           alignItems={ALIGN_CENTER}
+          flex="none"
         >
           <SmallButton
             flex="1"
@@ -104,30 +102,7 @@ export function BatchDeleteProtocolsModal({
             disabled={isDeleting}
           />
         </Flex>
-      </Flex>
+      </div>
     </OddModal>
   )
 }
-
-const ProtocolNamesList = styled.ul`
-  margin: 0 0 ${SPACING.spacing8} 0;
-  padding: 0;
-  list-style: none;
-  max-height: 12rem;
-  overflow-y: auto;
-`
-
-const ProtocolNameText = styled.li`
-  overflow-wrap: ${OVERFLOW_WRAP_ANYWHERE};
-  font-weight: ${TYPOGRAPHY.fontWeightBold};
-  font-size: ${TYPOGRAPHY.fontSize22};
-  line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${COLORS.grey60};
-`
-
-const AdditionalText = styled.span`
-  font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  font-size: ${TYPOGRAPHY.fontSize22};
-  line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${COLORS.grey60};
-`

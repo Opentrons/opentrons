@@ -1,0 +1,38 @@
+.modal_content {
+  display: flex;
+  width: 100%;
+  min-height: 0;
+  flex-direction: column;
+  gap: var(--spacing-32);
+}
+
+.protocol_summary {
+  display: flex;
+  overflow: hidden;
+  min-height: 0;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
+.protocol_names {
+  max-height: 12rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  overflow-wrap: anywhere;
+  overflow-y: auto;
+}
+
+.protocol_name {
+  color: var(--grey-60);
+  font-size: var(--font-size-22);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-28);
+}
+
+.additional_text {
+  color: var(--grey-60);
+  font-size: var(--font-size-22);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-28);
+}

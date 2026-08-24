@@ -13,7 +13,7 @@
   "date_added": "Date Added",
   "date_added_date": "Date added {{date}}",
   "delete_protocol": "Delete protocol",
-  "delete_protocols": "Delete ({{count}})",
+  "delete_protocols": "Delete",
   "description": "Description",
   "done": "Done",
   "drag_file_here": "Drag and drop protocol file here",

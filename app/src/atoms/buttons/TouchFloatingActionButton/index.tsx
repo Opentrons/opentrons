@@ -1,3 +1,5 @@
+import clsx from 'clsx'
+
 import { COLORS, Icon, StyledText } from '@opentrons/components'
 
 import styles from './touchfloatingactionbutton.module.css'
@@ -10,6 +12,7 @@ interface TouchFloatingActionButtonProps extends ComponentPropsWithoutRef<'butto
   'aria-label': string
   disabled?: boolean
   iconName?: IconName
+  buttonLocation?: 'left' | 'right'
 }
 
 export function TouchFloatingActionButton(
@@ -20,6 +23,7 @@ export function TouchFloatingActionButton(
     'aria-label': ariaLabel,
     disabled = false,
     iconName,
+    buttonLocation = 'right',
     ...restProps
   } = props
 
@@ -28,7 +32,9 @@ export function TouchFloatingActionButton(
   return (
     <button
       type="button"
-      className={styles.floating_button_style}
+      className={clsx(styles.floating_button_style, {
+        [styles.floating_button_left]: buttonLocation === 'left',
+      })}
       aria-label={ariaLabel}
       disabled={disabled}
       {...restProps}
