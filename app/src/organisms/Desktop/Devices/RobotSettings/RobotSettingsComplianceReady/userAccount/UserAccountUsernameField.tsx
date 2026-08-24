@@ -1,7 +1,7 @@
 import { Controller } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
-import { COLORS, InputField, StyledText } from '@opentrons/components'
+import { InputField, StyledText } from '@opentrons/components'
 
 import styles from './userAccountForm.module.css'
 
@@ -18,6 +18,15 @@ export function UserAccountUsernameField<T extends FieldValues>({
   usernameMaxLength,
 }: UserAccountUsernameFieldProps<T>): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const requiredError = t(
+    'desktop_personal_account_settings_username_required_error'
+  ) as string
+  const tooLongError =
+    usernameMaxLength != null
+      ? (t('desktop_username_characters_max', {
+          maxLength: usernameMaxLength,
+        }) as string)
+      : null
 
   return (
     <div className={styles.field_group}>
@@ -29,36 +38,40 @@ export function UserAccountUsernameField<T extends FieldValues>({
           control={control}
           name={'username' as Path<T>}
           rules={{
-            validate: value =>
-              (value as string).trim() !== '' ||
-              (t(
-                'desktop_personal_account_settings_username_required_error'
-              ) as string),
+            validate: value => {
+              const username = value as string
+              if (username.trim() === '') {
+                return requiredError
+              }
+              if (
+                usernameMaxLength != null &&
+                username.length > usernameMaxLength
+              ) {
+                return tooLongError ?? false
+              }
+              return true
+            },
           }}
           render={({ field, fieldState }) => {
             const isUsernameTooLong =
               usernameMaxLength != null &&
               (field.value as string).length > usernameMaxLength
+            const error =
+              fieldState.error?.message ??
+              (isUsernameTooLong ? tooLongError : null)
 
             return (
-              <>
-                <InputField
-                  value={field.value}
-                  error={fieldState.error?.message}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
-                />
-                {usernameMaxLength != null ? (
-                  <StyledText
-                    desktopStyle="bodyDefaultRegular"
-                    color={isUsernameTooLong ? COLORS.red50 : COLORS.grey60}
-                  >
-                    {t('desktop_username_characters_max', {
-                      maxLength: usernameMaxLength,
-                    })}
-                  </StyledText>
-                ) : null}
-              </>
+              <InputField
+                value={field.value}
+                error={error}
+                caption={
+                  usernameMaxLength != null && error == null
+                    ? tooLongError
+                    : null
+                }
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+              />
             )
           }}
         />
