@@ -58,24 +58,22 @@ filter_plate = collar.load_labware(
 
 ### Staging spacers
 
-During collection procedures, you can use an optional spacer to raise the collection well plate closer to the filter plate. Narrowing the gap between the filter plate and collection plate helps reduce droplet deflection under vacuum pressure. Spacers types and load names are shown below.
+Spacers fit inside collars (and the vacuum base). Spacers are used to raise a collection well plate so it's closer a filter plate. Narrowing the gap between these well plates helps reduce droplet deflection under vacuum pressure. Spacers are optional. Types and load names are shown below.
 
 | Spacer | Height | Load Name |
 |:----|:----|:----|
 | **Short** | 27 mm | `opentrons_vacuum_manifold_spacer_short` |
 | **Tall** | 34 mm | `opentrons_vacuum_manifold_spacer_tall` |
 
-Load spacers and sample collection plates onto the module as shown here:
-
-Load spacers and internal collection labware directly onto the module base[cite: 7]:
+Load spacers and internal collection labware directly onto the vacuum base in slot A3 using [load_adapter()][opentrons.protocol_api.ModuleContext.load_adapter]:
 
 ```python
-# Load an internal spacer on the manifold base
+# Load a short spacer on the manifold base
 spacer = vacuum.load_adapter("opentrons_vacuum_manifold_spacer_short")
 
 # Load a collection plate on top of the spacer
 collection_plate = spacer.load_labware(
-    load_name="corning_96_wellplate_360ul_flat",
+    load_name="opentrons_96_wellplate_200ul_pcr_full_skirt",
     label="Collection Wellplate",
 )
 ```
