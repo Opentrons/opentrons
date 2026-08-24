@@ -120,7 +120,7 @@ import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal
 
 import type { TFunction } from 'i18next'
 import type { FlattenSimpleInterpolation } from 'styled-components'
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { Run, RunStatus } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type {
@@ -178,7 +178,7 @@ function PrepareToRun({
   storageInfo,
   showConfirmCancelModal,
   setShowConfirmCancelModal,
-}: PrepareToRunProps): JSX.Element {
+}: PrepareToRunProps): ReactNode {
   const { t, i18n } = useTranslation([
     'protocol_setup',
     'shared',
@@ -758,7 +758,7 @@ function PrepareToRun({
 const MAINTENANCE_RUN_POLL_MS = 5000
 const RUN_RECORD_REFETCH_MS = 5000
 
-export function ProtocolSetup(): JSX.Element {
+export function ProtocolSetup(): ReactNode {
   const { runId } = useParams<
     keyof OnDeviceRouteParams
   >() as OnDeviceRouteParams

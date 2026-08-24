@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { CategorizedStepContent } from '/app/molecules/InterventionModal'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
 export function FailedStepNextStep({
@@ -19,7 +20,7 @@ export function FailedStepNextStep({
   | 'protocolAnalysis'
   | 'robotType'
   | 'allRunDefs'
->): JSX.Element {
+>): ReactNode {
   const { t } = useTranslation('error_recovery')
   const failedCommandByAnalysis = failedCommand?.byAnalysis ?? null
 

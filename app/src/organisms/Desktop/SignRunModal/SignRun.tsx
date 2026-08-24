@@ -22,6 +22,7 @@ import { useCurrentRunId, useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import styles from './signrunmodal.module.css'
 
+import type { ReactNode } from 'react'
 import type { DocumentationState } from '@opentrons/react-api-client'
 
 // Above typical desktop modal overlays so the toast remains visible on login.
@@ -39,7 +40,7 @@ export function SignRunModal({
   robotName,
   documentationState,
   onSigned,
-}: SignRunModalProps): JSX.Element {
+}: SignRunModalProps): ReactNode {
   const { t, i18n } = useTranslation(['access_control', 'shared'])
 
   const [name, setName] = useState('')

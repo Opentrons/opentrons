@@ -41,6 +41,7 @@ import {
   useRunStatuses,
 } from '/app/resources/runs'
 
+import type { ReactNode } from 'react'
 import type { ViewportListRef } from 'react-viewport-list'
 import type { DesktopRouteParams, ProtocolRunDetailsTab } from '/app/App/types'
 import type { Dispatch } from '/app/redux/types'
@@ -90,7 +91,7 @@ interface PageContentsProps {
   robotName: string
   protocolRunDetailsTab: ProtocolRunDetailsTab
 }
-function PageContents(props: PageContentsProps): JSX.Element {
+function PageContents(props: PageContentsProps): ReactNode {
   const { runId, robotName, protocolRunDetailsTab } = props
   const robotType = useRobotType(robotName)
   const run = useNotifyRunQuery(runId)
@@ -294,7 +295,7 @@ interface ParametersTabProps {
   protocolRunDetailsTab: ProtocolRunDetailsTab
 }
 
-const ParametersTab = (props: ParametersTabProps): JSX.Element => {
+const ParametersTab = (props: ParametersTabProps): ReactNode => {
   const { robotName, runId, protocolRunDetailsTab } = props
   const { t } = useTranslation('run_details')
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -358,7 +359,7 @@ const ModuleControlsTab = (
   )
 }
 
-const RunPreviewTab = (props: SetupTabProps): JSX.Element => {
+const RunPreviewTab = (props: SetupTabProps): ReactNode => {
   const { robotName, runId } = props
   const { t } = useTranslation('run_details')
 

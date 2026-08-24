@@ -8,6 +8,8 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 export interface ConfigFormSubmitButtonProps {
   disabled: boolean
   formId: string
@@ -15,7 +17,7 @@ export interface ConfigFormSubmitButtonProps {
 
 export function ConfigFormSubmitButton(
   props: ConfigFormSubmitButtonProps
-): JSX.Element {
+): ReactNode {
   const { disabled, formId } = props
   const { t } = useTranslation('shared')
 

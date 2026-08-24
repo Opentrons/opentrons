@@ -79,6 +79,7 @@ import {
 import { VacuumModuleData } from './VacuumModule/VacuumModuleData'
 import { VacuumModuleSlideout } from './VacuumModule/VacuumModuleSlideout'
 
+import type { ReactNode } from 'react'
 import type { AttachedModule, HeaterShakerModule } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
 import type { ModuleType } from '@opentrons/shared-data'
@@ -501,7 +502,7 @@ interface ModuleSlideoutProps {
   onCloseClick: () => unknown
 }
 
-const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
+const ModuleSlideout = (props: ModuleSlideoutProps): ReactNode => {
   const { module, isSecondary, showSlideout, onCloseClick } = props
 
   if (module.moduleType === THERMOCYCLER_MODULE_TYPE) {

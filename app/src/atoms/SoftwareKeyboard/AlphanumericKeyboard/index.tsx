@@ -11,7 +11,7 @@ import {
   softwareKeyboardButtonAttributes,
 } from '../constants'
 
-import type { MutableRefObject } from 'react'
+import type { MutableRefObject, ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { LayoutName } from '../types'
 
@@ -37,7 +37,7 @@ export function AlphanumericKeyboard({
   keyboardRef,
   inputElementRef,
   debug = false,
-}: AlphanumericKeyboardProps): JSX.Element {
+}: AlphanumericKeyboardProps): ReactNode {
   const [layoutName, setLayoutName] = useState<LayoutName>('default')
 
   const appLanguage = useSelector(getAppLanguage)

@@ -11,12 +11,14 @@ import {
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 
+import type { ReactNode } from 'react'
+
 interface ConfirmExitModalProps {
   confirmExit: () => void
   cancelExit: () => void
 }
 
-export const ConfirmExitModal = (props: ConfirmExitModalProps): JSX.Element => {
+export const ConfirmExitModal = (props: ConfirmExitModalProps): ReactNode => {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
 
   return (

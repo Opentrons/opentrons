@@ -29,6 +29,8 @@ import { useRobotType } from '/app/redux-resources/robots'
 
 import styles from './inputdevices.module.css'
 
+import type { ReactNode } from 'react'
+
 export interface CameraCardProps {
   isFlex: boolean
   robotName: string
@@ -39,7 +41,7 @@ export function CameraCard({
   isFlex,
   robotName,
   isRobotBusy,
-}: CameraCardProps): JSX.Element {
+}: CameraCardProps): ReactNode {
   const { t } = useTranslation('device_details')
   const { handleOverflowClick, showOverflowMenu, setShowOverflowMenu } =
     useMenuHandleClickOutside()
@@ -155,7 +157,7 @@ function CameraCardOverflowMenu({
   toggleControls: () => void
   navigateToUsageSettings: () => void
   setShowOverflowMenu: (show: boolean) => void
-}): JSX.Element {
+}): ReactNode {
   const { t } = useTranslation('device_details')
 
   const handleItemClick = (action: () => void): void => {

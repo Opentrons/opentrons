@@ -13,6 +13,8 @@ import { useIsLogDeleted } from '/app/resources/audit/useIsLogDeleted'
 
 import styles from './downloadauditlogsmodal.module.css'
 
+import type { ReactNode } from 'react'
+
 export interface DownloadAuditLogsModalProps {
   onDownload: () => void
   isLoading: boolean
@@ -21,7 +23,7 @@ export interface DownloadAuditLogsModalProps {
 export function DownloadAuditLogsModal({
   onDownload,
   isLoading,
-}: DownloadAuditLogsModalProps): JSX.Element {
+}: DownloadAuditLogsModalProps): ReactNode {
   const { t } = useTranslation('access_control')
 
   return createPortal(
@@ -82,7 +84,7 @@ function DownloadAuditLogsModalContent({
   logPeriodId,
 }: {
   logPeriodId: string
-}): JSX.Element {
+}): ReactNode {
   const modal = useModal()
 
   const { downloadAndDeleteAuditLog, isLoading } =

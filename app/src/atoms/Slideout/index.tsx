@@ -117,7 +117,7 @@ const CLOSE_ICON_STYLE = css`
   }
 `
 
-export const Slideout = (props: SlideoutProps): JSX.Element => {
+export const Slideout = (props: SlideoutProps): ReactNode => {
   const {
     isExpanded,
     title,

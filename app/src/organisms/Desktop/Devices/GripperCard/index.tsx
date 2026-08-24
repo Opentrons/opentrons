@@ -12,7 +12,7 @@ import { GRIPPER_FLOW_TYPES } from '/app/organisms/GripperWizardFlows/constants'
 
 import { AboutGripperSlideout } from './AboutGripperSlideout'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { BadGripper, GripperData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
 import type { MenuOverlayItemProps } from '/app/molecules/InstrumentCard/MenuOverlay'
@@ -42,7 +42,7 @@ export function GripperCard({
   isCalibrated,
   isRunActive,
   isEstopNotDisengaged,
-}: GripperCardProps): JSX.Element {
+}: GripperCardProps): ReactNode {
   const { t, i18n } = useTranslation(['device_details', 'shared'])
   const [openWizardFlowType, setOpenWizardFlowType] =
     useState<GripperWizardFlowType | null>(null)

@@ -25,6 +25,7 @@ import { useAttachedModules } from '/app/resources/modules'
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 import { getActiveHeaterShaker } from './utils'
 
+import type { ReactNode } from 'react'
 import type { AttachedModule, HeaterShakerModule } from '@opentrons/api-client'
 import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data'
 
@@ -64,7 +65,7 @@ interface HeaterShakerIsRunningModalProps {
 
 export const HeaterShakerIsRunningModal = (
   props: HeaterShakerIsRunningModalProps
-): JSX.Element => {
+): ReactNode => {
   const { closeModal, module, startRun } = props
   const { t } = useTranslation('heater_shaker')
   const documentationState = useDocumentationState()

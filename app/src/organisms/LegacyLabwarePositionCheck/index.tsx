@@ -39,7 +39,7 @@ interface LabwarePositionCheckModalProps {
 // LegacyFlows are utilized by the OT-2, and should never actually be utilized by the Flex despite offering Flex support.
 export const LegacyLabwarePositionCheck = (
   props: LabwarePositionCheckModalProps
-): JSX.Element => {
+): ReactNode => {
   const logger = useLogger(new URL('', import.meta.url).pathname)
   const isOnDevice = useSelector(getIsOnDevice)
   return (

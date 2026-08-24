@@ -12,13 +12,14 @@ import { ManufacturerDetails } from './ManufacturerDetails'
 import { WellDimensions } from './WellDimensions'
 import { WellProperties } from './WellProperties'
 
+import type { ReactNode } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
 export interface InsertDetailsProps {
   definition: LabwareDefinition
 }
 
-export function InsertDetails(props: InsertDetailsProps): JSX.Element {
+export function InsertDetails(props: InsertDetailsProps): ReactNode {
   const { definition } = props
   const { metadata, parameters } = definition
   const { displayVolumeUnits, displayCategory } = metadata

@@ -65,7 +65,12 @@ import {
 
 import { RobotOutOfStorageModal } from '../RobotOutOfStorageModal.tsx'
 
-import type { Dispatch, MouseEventHandler, SetStateAction } from 'react'
+import type {
+  Dispatch,
+  MouseEventHandler,
+  ReactNode,
+  SetStateAction,
+} from 'react'
 import type { Run, RunData } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
 import type { RunControls } from '/app/organisms/RunTimeControl'
@@ -79,7 +84,7 @@ export interface HistoricalProtocolRunOverflowMenuProps {
 
 export function HistoricalProtocolRunOverflowMenu(
   props: HistoricalProtocolRunOverflowMenuProps
-): JSX.Element {
+): ReactNode {
   const { run, robotName } = props
   const {
     menuOverlay,
@@ -168,7 +173,7 @@ interface MenuDropdownProps extends HistoricalProtocolRunOverflowMenuProps {
   setShowOverflowMenu: Dispatch<SetStateAction<boolean>>
   runControls: RunControls
 }
-function MenuDropdown(props: MenuDropdownProps): JSX.Element {
+function MenuDropdown(props: MenuDropdownProps): ReactNode {
   const { t } = useTranslation('device_details')
 
   const {
@@ -358,7 +363,7 @@ const handleDeleteRunImagesModal = (props: DeleteRunImagesModalProps): void => {
 }
 
 const DeleteRunImagesModal = NiceModal.create(
-  ({ onDeleteRunImages }: DeleteRunImagesModalProps): JSX.Element => {
+  ({ onDeleteRunImages }: DeleteRunImagesModalProps): ReactNode => {
     const { t } = useTranslation('device_details')
     const modal = useModal()
     const [isDeleting, setIsDeleting] = useState(false)

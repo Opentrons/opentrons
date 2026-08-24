@@ -47,7 +47,7 @@ export function Collapsible({
   collapsedIcon,
   toggleExpanded,
   children,
-}: CollapsibleProps): JSX.Element {
+}: CollapsibleProps): ReactNode {
   const expand = collapsedIcon ?? 'plus'
   const collapse = expandedIcon ?? 'minus'
 

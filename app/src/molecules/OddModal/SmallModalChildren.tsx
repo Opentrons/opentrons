@@ -11,15 +11,15 @@ import { SmallButton } from '/app/atoms/buttons'
 
 import { OddModal } from './index'
 
+import type { ReactNode } from 'react'
+
 interface SmallModalChildrenProps {
   handleCloseMaxPinsAlert: () => void
   header: string
   subText: string
   buttonText: string
 }
-export function SmallModalChildren(
-  props: SmallModalChildrenProps
-): JSX.Element {
+export function SmallModalChildren(props: SmallModalChildrenProps): ReactNode {
   const { handleCloseMaxPinsAlert, header, subText, buttonText } = props
 
   return (

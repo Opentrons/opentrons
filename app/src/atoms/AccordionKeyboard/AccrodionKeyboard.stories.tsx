@@ -16,6 +16,7 @@ import { FullKeyboard } from '../SoftwareKeyboard'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import type { Store, StoreEnhancer } from 'redux'
+import type { ReactNode } from 'react'
 
 const dummyConfig = {
   config: {
@@ -47,7 +48,7 @@ export default meta
 
 type Story = StoryObj<typeof AccordionKeyboardComponent>
 
-const Keyboard = (): JSX.Element => {
+const Keyboard = (): ReactNode => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [value, setValue] = useState('')
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(true)

@@ -16,7 +16,9 @@ import {
 
 import styles from './advancedsettings.module.css'
 
-export function AdvancedSettings(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function AdvancedSettings(): ReactNode {
   return (
     <div className={styles.container}>
       <UpdatedChannel />

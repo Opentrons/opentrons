@@ -18,6 +18,8 @@ import {
 
 import { useToaster } from '../../../ToasterOven'
 
+import type { ReactNode } from 'react'
+
 const CSV_FILE_MAX_LENGTH = 18 // truncated text + three dots
 
 export type ProtocolSetupStepStatus =
@@ -62,7 +64,7 @@ export function ProtocolSetupStep({
   hasRightIcon = true,
   hasLeftIcon = true,
   fontSize = 'p',
-}: ProtocolSetupStepProps): JSX.Element {
+}: ProtocolSetupStepProps): ReactNode {
   const isInteractionDisabled = interactionDisabled || disabled
   const backgroundColorByStepStatus = {
     ready: COLORS.green35,

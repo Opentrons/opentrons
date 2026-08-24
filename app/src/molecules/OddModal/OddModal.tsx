@@ -32,7 +32,7 @@ interface OddModalProps extends StyleProps {
 /**
  * For ODD use only.
  */
-export function OddModal(props: OddModalProps): JSX.Element {
+export function OddModal(props: OddModalProps): ReactNode {
   const {
     modalSize = 'medium',
     onOutsideClick,

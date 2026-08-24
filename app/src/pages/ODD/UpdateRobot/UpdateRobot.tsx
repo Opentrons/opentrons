@@ -20,9 +20,10 @@ import {
 } from '/app/redux/robot-update'
 import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
+import type { ReactNode } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
 
-export function UpdateRobot(): JSX.Element {
+export function UpdateRobot(): ReactNode {
   const navigate = useNavigate()
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const localRobot = useSelector(getLocalRobot)

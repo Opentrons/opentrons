@@ -45,6 +45,7 @@ import { addCustomLabwareFileFromCreator } from '/app/redux/custom-labware'
 
 import { useLabwareFailure, useNewLabwareName } from './hooks'
 
+import type { ReactNode } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type {
   LabwareDefAndDate,
@@ -85,7 +86,7 @@ const SORT_BY_BUTTON_STYLE = css`
   }
 `
 
-export function Labware(): JSX.Element {
+export function Labware(): ReactNode {
   const { t } = useTranslation(['labware_landing', 'shared'])
   const enableLabwareCreator = useFeatureFlag('enableLabwareCreator')
   const [sortBy, setSortBy] = useState<LabwareSort>('alphabetical')

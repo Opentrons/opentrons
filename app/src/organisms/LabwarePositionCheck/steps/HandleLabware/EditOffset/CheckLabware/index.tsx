@@ -41,6 +41,7 @@ import {
 } from '/app/redux/protocol-runs'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { VectorOffset } from '@opentrons/api-client'
 import type { Vector3D } from '@opentrons/shared-data'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
@@ -50,7 +51,7 @@ interface CheckLabwareProps extends EditOffsetContentProps {
   handleAddConfirmedWorkingVector: () => void
 }
 
-export function CheckLabware(props: CheckLabwareProps): JSX.Element {
+export function CheckLabware(props: CheckLabwareProps): ReactNode {
   const { runId, commandUtils, contentHeader } = props
   const { toggleRobotMoving, handleJog, resetJog, handleResetLwModulesOnDeck } =
     commandUtils
@@ -167,7 +168,7 @@ interface CheckLabwareContentProps extends CheckLabwareProps {
   isLwTiprack: boolean
 }
 
-function CheckLabwareContentODD(props: CheckLabwareContentProps): JSX.Element {
+function CheckLabwareContentODD(props: CheckLabwareContentProps): ReactNode {
   const { t } = useTranslation('labware_position_check')
   const {
     contentHeader,
@@ -255,7 +256,7 @@ function CheckLabwareContentODD(props: CheckLabwareContentProps): JSX.Element {
 
 function CheckLabwareContentDesktop(
   props: CheckLabwareContentProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation('labware_position_check')
   const {
     contentHeader,

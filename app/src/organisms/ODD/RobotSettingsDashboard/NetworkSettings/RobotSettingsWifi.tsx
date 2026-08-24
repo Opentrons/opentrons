@@ -6,7 +6,7 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import { WifiConnectionDetails } from './WifiConnectionDetails'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { SetSettingOption } from '../types'
 
@@ -25,7 +25,7 @@ export function RobotSettingsWifi({
   setCurrentOption,
   setSelectedSsid,
   activeSsid,
-}: RobotSettingsWifiProps): JSX.Element {
+}: RobotSettingsWifiProps): ReactNode {
   const { t } = useTranslation(['device_settings'])
 
   return (

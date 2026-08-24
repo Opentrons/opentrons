@@ -33,7 +33,7 @@ import {
 
 import { useRobotUpdateInfo } from './useRobotUpdateInfo'
 
-import type { ChangeEventHandler } from 'react'
+import type { ChangeEventHandler, ReactNode } from 'react'
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol'
 import type { RobotUpdateSession } from '/app/redux/robot-update/types'
 import type { State } from '/app/redux/types'
@@ -66,7 +66,7 @@ export function RobotUpdateProgressModal({
   robotName,
   session,
   closeRobotUpdate,
-}: RobotUpdateProgressModalProps): JSX.Element {
+}: RobotUpdateProgressModalProps): ReactNode {
   const dispatch = useDispatch()
   const { t } = useTranslation('device_settings')
   const [showFileSelect, setShowFileSelect] = useState<boolean>(false)
@@ -173,7 +173,7 @@ interface RobotUpdateProgressFooterProps {
 
 function RobotUpdateProgressFooter({
   closeRobotUpdate,
-}: RobotUpdateProgressFooterProps): JSX.Element {
+}: RobotUpdateProgressFooterProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   return (
@@ -191,7 +191,7 @@ interface SuccessOrErrorProps {
   errorMessage?: string | null
 }
 
-function SuccessOrError({ errorMessage }: SuccessOrErrorProps): JSX.Element {
+function SuccessOrError({ errorMessage }: SuccessOrErrorProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const IMAGE_ALT = 'Welcome screen background image'
   let renderedImg: JSX.Element

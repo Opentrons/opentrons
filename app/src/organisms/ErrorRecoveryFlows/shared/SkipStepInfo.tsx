@@ -5,9 +5,10 @@ import { LegacyStyledText } from '@opentrons/components'
 import { RECOVERY_MAP } from '../constants'
 import { TwoColTextAndFailedStepNextStep } from './TwoColTextAndFailedStepNextStep'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
-export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
+export function SkipStepInfo(props: RecoveryContentProps): ReactNode {
   const {
     failedCommand,
     recoveryCommands,

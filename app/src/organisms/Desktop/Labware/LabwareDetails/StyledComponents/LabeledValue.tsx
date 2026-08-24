@@ -8,12 +8,14 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 export interface LabeledValueProps {
   label: string
   value: number | string
 }
 
-export function LabeledValue({ label, value }: LabeledValueProps): JSX.Element {
+export function LabeledValue({ label, value }: LabeledValueProps): ReactNode {
   return (
     <Flex
       flexDirection={DIRECTION_ROW}

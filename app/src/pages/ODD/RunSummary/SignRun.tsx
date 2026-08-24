@@ -22,6 +22,7 @@ import { useCurrentRunId, useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import styles from './signrun.module.css'
 
+import type { ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { DocumentationState } from '@opentrons/react-api-client'
 
@@ -36,7 +37,7 @@ export function SignRun({
   runId: string
   documentationState: DocumentationState
   onSigned?: () => void
-}): JSX.Element {
+}): ReactNode {
   const { t, i18n } = useTranslation(['access_control', 'shared'])
 
   const [name, setName] = useState('')

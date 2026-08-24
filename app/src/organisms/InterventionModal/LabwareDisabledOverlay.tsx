@@ -1,6 +1,7 @@
 import { COLORS } from '@opentrons/components'
 import { getSchema2Dimensions } from '@opentrons/shared-data'
 
+import type { ReactNode } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
 interface LabwareDisabledOverlayProps {
@@ -8,7 +9,7 @@ interface LabwareDisabledOverlayProps {
 }
 export function LabwareDisabledOverlay({
   definition,
-}: LabwareDisabledOverlayProps): JSX.Element {
+}: LabwareDisabledOverlayProps): ReactNode {
   const { xDimension, yDimension } = getSchema2Dimensions(definition)
 
   return (

@@ -10,7 +10,9 @@ import {
 
 import { Skeleton } from '/app/atoms/Skeleton'
 
-export function ProtocolSetupTitleSkeleton(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function ProtocolSetupTitleSkeleton(): ReactNode {
   return (
     <>
       <Skeleton
@@ -29,7 +31,7 @@ export function ProtocolSetupTitleSkeleton(): JSX.Element {
   )
 }
 
-export function ProtocolSetupButtonsSkeleton(): JSX.Element {
+export function ProtocolSetupButtonsSkeleton(): ReactNode {
   return (
     <>
       <Skeleton
@@ -50,7 +52,7 @@ export function ProtocolSetupButtonsSkeleton(): JSX.Element {
   )
 }
 
-const SetupSkeleton = (): JSX.Element => {
+const SetupSkeleton = (): ReactNode => {
   return (
     <Skeleton
       height="5.5rem"
@@ -61,7 +63,7 @@ const SetupSkeleton = (): JSX.Element => {
   )
 }
 
-export function ProtocolSetupStepSkeleton(): JSX.Element {
+export function ProtocolSetupStepSkeleton(): ReactNode {
   return (
     <>
       <SetupSkeleton />
@@ -72,7 +74,7 @@ export function ProtocolSetupStepSkeleton(): JSX.Element {
   )
 }
 
-export function ProtocolSetupFullSkeleton(): JSX.Element {
+export function ProtocolSetupFullSkeleton(): ReactNode {
   return (
     <Flex
       position={POSITION_ABSOLUTE}

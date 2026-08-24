@@ -14,6 +14,7 @@ import { LabwareOffsetsDeckInfoLabels } from '/app/organisms/LabwareOffsetsDeckI
 import { OffsetTag } from '/app/organisms/LabwarePositionCheck'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { ReactNode } from 'react'
 import type { OffsetTagProps } from '/app/organisms/LabwarePositionCheck'
 import type { LocationSpecificOffsetDetailsWithCopy } from '/app/redux/protocol-runs'
 import type { AccordionChildrenProps } from './AccordionChildren'
@@ -25,7 +26,7 @@ interface AccordionDetailProps extends AccordionChildrenProps {
 export function AccordionDetail({
   detail,
   lpcLabwareInfo,
-}: AccordionDetailProps): JSX.Element {
+}: AccordionDetailProps): ReactNode {
   const { t } = useTranslation('labware_position_check')
   const { locationDetails, existingOffset: lsExistingOffset } = detail
   const { existingOffset: defaultExistingOffset } =
