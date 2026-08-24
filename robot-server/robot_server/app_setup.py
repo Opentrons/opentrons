@@ -239,12 +239,12 @@ async def _report_unsigned_runs(
     message = f"{len(unsigned_runs)} unsigned runs found in run history:"
     for unsigned_run in unsigned_runs:
         if unsigned_run.protocol_id is None:
-            message += f" run with no protocol created at {unsigned_run.created_at},"
+            message += f" run with no protocol created at {unsigned_run.created_at};"
         else:
             protocol = protocol_store.get(protocol_id=unsigned_run.protocol_id)
             message += (
                 f" run for {protocol.source.main_file.name} ({protocol.source.content_hash})"
-                f" created at {unsigned_run.created_at}"
+                f" created at {unsigned_run.created_at};"
             )
 
     audit_client = get_audit_client(app_state)
