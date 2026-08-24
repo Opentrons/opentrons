@@ -52,3 +52,16 @@
   background-color: var(--white);
   inset: 0;
 }
+
+.actions_view_list {
+  max-height: 28.625rem;
+  color: var(--black-90);
+  font-size: var(--font-size-22);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-28);
+  overflow-y: auto;
+}
+
+.actions_view_list::-webkit-scrollbar {
+  display: none;
+}
