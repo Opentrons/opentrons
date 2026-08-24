@@ -2,7 +2,12 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
-import { BasicButton, Divider, Icon, StyledText } from '@opentrons/components'
+import {
+  BasicButton,
+  Divider,
+  InfoScreen,
+  StyledText,
+} from '@opentrons/components'
 import { useUpdateSelfMutation } from '@opentrons/react-api-client'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
@@ -42,30 +47,16 @@ function LoggedOutMessage(): JSX.Element {
   const { t } = useTranslation('device_settings')
 
   return (
-    <div className={styles.logged_out_message}>
-      <Icon
-        name="information"
-        size="1.25rem"
-        className={styles.logged_out_icon}
-      />
-      <StyledText
-        desktopStyle="bodyDefaultRegular"
-        className={styles.logged_out_message_text}
-      >
-        {
-          t(
-            'desktop_login_to_manage_compliance_ready_software_settings'
-          ) as string
-        }
-      </StyledText>
-    </div>
+    <InfoScreen
+      content={t('desktop_login_to_manage_compliance_ready_software_settings')}
+    />
   )
 }
 
 export function PersonalAccountSettings({
   robotName,
 }: PersonalAccountSettingsProps): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'shared']) as {
+  const { t } = useTranslation('device_settings') as {
     t: TFunction
   }
   const dispatch = useDispatch()
@@ -103,11 +94,7 @@ export function PersonalAccountSettings({
             <StyledText desktopStyle="bodyLargeSemiBold">
               {t('desktop_personal_account_settings') as string}
             </StyledText>
-            {isEditing ? (
-              <BasicButton type="button" underLine onClick={handleCancelEdit}>
-                {t('shared:cancel')}
-              </BasicButton>
-            ) : (
+            {!isEditing && (
               <BasicButton
                 type="button"
                 underLine

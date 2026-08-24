@@ -78,10 +78,6 @@ export function ChooseNumber({
         buttonType="tertiaryLowLight"
         buttonText={t('restore_default')}
         onClickButton={() => {
-          if (resetValueDisabled) {
-            makeSnackbar(t('no_custom_values') as string)
-            return
-          }
           setParamValue(String(parameter.default))
         }}
       />

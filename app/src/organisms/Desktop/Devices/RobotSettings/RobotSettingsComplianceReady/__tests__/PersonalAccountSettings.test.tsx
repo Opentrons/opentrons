@@ -129,8 +129,11 @@ describe('PersonalAccountSettings', () => {
     expect(screen.getByDisplayValue('alice')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Alice Example')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
+    expect(
+      screen.queryByRole('button', { name: 'Edit' })
+    ).not.toBeInTheDocument()
 
-    fireEvent.click(screen.getAllByRole('button', { name: 'Cancel' })[1]!)
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: 'Save' })
@@ -142,6 +145,8 @@ describe('PersonalAccountSettings', () => {
       perRobotAuthStates: {},
       mostRecentRobotName: null,
     })
+    screen.getByTestId('InfoScreen')
+    screen.getByLabelText('alert')
     screen.getByText('Log in to manage Compliance Ready Software settings')
     expect(
       screen.queryByText('Personal account settings')
@@ -192,6 +197,8 @@ describe('PersonalAccountSettings', () => {
       </QueryClientProvider>
     )
 
+    screen.getByTestId('InfoScreen')
+    screen.getByLabelText('alert')
     screen.getByText('Log in to manage Compliance Ready Software settings')
     expect(screen.queryByText('alice')).not.toBeInTheDocument()
   })
