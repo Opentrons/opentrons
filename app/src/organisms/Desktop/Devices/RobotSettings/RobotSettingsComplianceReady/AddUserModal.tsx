@@ -8,6 +8,7 @@ import {
   ModalShell,
   PrimaryButton,
   SecondaryButton,
+  StyledText,
   WizardHeader,
 } from '@opentrons/components'
 import { useCreateUserMutation } from '@opentrons/react-api-client'
@@ -67,11 +68,11 @@ export function AddUserModal({
         fullName: '',
         accountType: 'admin',
       },
-      mode: 'onBlur',
+      mode: 'onSubmit',
       reValidateMode: 'onChange',
     })
 
-  const { username, fullName, accountType } = watch()
+  const { accountType } = watch()
   const accountTypeOptions: DropdownOption[] =
     MANAGEABLE_USER_ACCOUNT_TYPES.map(accountType => ({
       name: t(`desktop_user_role_${accountType}`),
@@ -80,12 +81,6 @@ export function AddUserModal({
   const selectedAccountTypeOption =
     accountTypeOptions.find(option => option.value === accountType) ??
     accountTypeOptions[0]!
-
-  const isSaveDisabled =
-    isSaving ||
-    username.trim() === '' ||
-    fullName.trim() === '' ||
-    username.length > USERNAME_MAX_LENGTH
 
   const handleClose = (): void => {
     clearErrors()
@@ -98,13 +93,12 @@ export function AddUserModal({
     handleClose()
   }
 
-  const onSubmit = (): void => {
-    const trimmedUsername = username.trim()
+  const onSubmit = (data: FormValues): void => {
     const request: CreateUserRequest = {
       data: {
-        username: trimmedUsername,
-        fullName: fullName.trim(),
-        accountType,
+        username: data.username.trim(),
+        fullName: data.fullName.trim(),
+        accountType: data.accountType,
       },
     }
 
@@ -155,6 +149,14 @@ export function AddUserModal({
       <div className={styles.modal_content}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className={styles.form_fields}>
+            <div className={styles.form_intro}>
+              <StyledText desktopStyle="headingSmallBold">
+                {t('desktop_create_account') as string}
+              </StyledText>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('desktop_add_user_create_account_description') as string}
+              </StyledText>
+            </div>
             <UserAccountIdentityFormFields
               control={control}
               stacked
@@ -180,7 +182,7 @@ export function AddUserModal({
               <SecondaryButton type="button" onClick={handleClose}>
                 {t('shared:cancel') as string}
               </SecondaryButton>
-              <PrimaryButton type="submit" disabled={isSaveDisabled}>
+              <PrimaryButton type="submit" disabled={isSaving}>
                 {t('desktop_create_account') as string}
               </PrimaryButton>
             </div>
