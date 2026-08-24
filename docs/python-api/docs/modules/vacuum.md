@@ -3,18 +3,16 @@ Title: "Python API: Vacuum Module"
 description: How to use the Vacuum Module in a Python protocol.
 ---
 
-The Vacuum Module is an automated filtration system for the Opentrons Flex liquid handling robot. This module enables Flex to run vacuum-based protocols for protein and peptide sample cleanup, solid-phase extraction, and nucleic acid extraction, all within in an enclosed system that includes waste collection.
-
-The system pairs a on-deck modular manifold stack with an off-deck vacuum pump control box and a 2-liter carboy for waste collection. The included on-deck pieces—a set of short and tall collars and height spacers, along with ANSI/SLAS compliant filter plates—are compatible with the Flex Gripper.
+The Vacuum Module is an automated filtration system for the Opentrons Flex liquid handling robot. This module enables Flex to run vacuum-based protocols for protein and peptide sample cleanup, solid-phase extraction, and nucleic acid extraction, all within in an enclosed system that includes waste collection. For hardware and installation information, see the .
 
 The module is represented in code by a [`VacuumModuleContext`][opentrons.protocol_api.VacuumModuleContext] object that includes methods for asynchronous vacuum pressure control (in mbar), pump duty-cycle regulation (power control), deck plate staging, and system venting.
 
-## Deck slots and loading
+## Deck slots and load names
 
-The Vacuum Module uses a physical deck adapter to hold labware and other pieces used in a vacuum filter protocol. See the <font color="red">PLACEHOLDER instruction manual?</font> for assembly instructions. This adapter fits in deck slots A3–A4 on the Flex.
+The Vacuum Module uses a physical deck adapter to hold labware and other pieces used in a vacuum filter protocol (see the [Vacuum Module Instruction Manual](../../modules/index.md) for hardware information and assembly instructions). This adapter fits in deck slots A3–A4 on the Flex.
 
-* **Slot A3:** You load the module in slot A3. On the deck adapter, this is the recessed half that holds the vacuum base and 6 mm hose that pulls waste to the carboy.
-* **Slot A4:** You load collars on slot A4. Known as "the dock," this is the raised half of the adapter. It's a pedestal or platform you can use to hold the tall or short collars and stacked spacers and well plates when they're not seated on the vacuum base.
+* **Slot A3:** This is the recessed half of the deck adapter that holds the vacuum base and 6 mm hose that pulls waste to the carboy.
+* **Slot A4:** Known as "the dock," this is the raised half of the deck adapter. It's a staging or storage space for collars (and other parts of the vacuum stack) when they're not seated on the vacuum base or actively used in a protocol.
 
 Load the module using [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module] with the load name, `vacuumModuleV1`:
 
@@ -29,7 +27,7 @@ def run(protocol: protocol_api.ProtocolContext):
     )
 ```
 
-## Staging collars and adding labware
+## Collars and spacers
 
 The module supports two primary configurations with the following stacking order (from bottom to top).
 <!-- note to readers, trying to avoid using images here -->
@@ -44,12 +42,14 @@ You can load a short collar (`opentrons_vacuum_manifold_collar_short`) or tall c
 collar = vacuum.load_adapter_to_doc("opentrons_vacuum_manifold_collar_short")
 ```
 
-### Assembling collection stacks with spacers
+### Staging spacers
 
-During filtrate collection, you can place an internal spacer on the vacuum base to raise the collection plate closer to the filter plate. Reducing the gap between the source (filter plate) and destination (well plate) helps reduce droplet deflection and cross-well contamination. Spacer types and load names are provided below:
+During collection procedures, you can use an optional spacer to raise the collection well plate closer to the filter plate. Narrowing the gap between the filter plate and collection plate helps reduce droplet deflection under vacuum pressure. Spacers types and load names are shown below.
 
-* **Short spacer (27 mm):** `opentrons_vacuum_manifold_spacer_short`
-* **Tall spacer (34 mm):** `opentrons_vacuum_manifold_spacer_tall`
+| Spacer | Height | Load Name |
+|:----|:----|:----|
+| **Short** | 27 mm | `opentrons_vacuum_manifold_spacer_short` |
+| **Tall** | 34 mm | `opentrons_vacuum_manifold_spacer_tall` |
 
 Load spacers and sample collection plates onto the module as shown here:
 
@@ -236,6 +236,8 @@ You can also control the pump motor and vent using these standalone, utility com
 - **Close vent:** Use [close_vent()][opentrons.protocol_api.VacuumModuleContext.close_vent] to close the vent so the system can hold vacuum.
 
 ## Filter plate load names
+
+<font color="red">Some of these are already in LL. Maybe remove and link, move this up earlier.</font>
 
 The Vacuum Module is compatible with the filter plates listed below and in the [Opentrons Labware Library](https://labware.opentrons.com/). Organized by manufacturer, refer to these tables to find the API `load_name` for a supported filter plate.
 
