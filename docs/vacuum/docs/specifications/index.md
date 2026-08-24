@@ -180,22 +180,15 @@ The Control Box includes the vacuum pump, air/water separator, electronics, and 
     <tr>
  <tr>
       <td><strong>Pump type</strong></td>
-      <td>The module uses a Thomas® WOB-L® 260Z series piston-driven pump.
-        <ul>
-          <li>Flow rate (gas): 50.1 L/min</li>
-          <li>Vacuum: -881.31 mbar</li>
-        </ul>
-        <p><strong>Note:</strong> Pump values reflect the manufacturer's published hardware specifications. Operational performance is controlled by Opentrons Vacuum Module software.</p>
+      <td>The module uses a piston-driven pump to create vacuum. The pump's flow rate is 50.1 L/min (gas).<br>
+        <p><strong>Note:</strong> Pump values reflect published hardware specifications. Operational performance is controlled by Opentrons Vacuum Module software.</p>
+        <font color="red">time to set vacuum?</font>
       </td>
    </tr>
     </tr>
       <td><strong>Vacuum range<strong></td>
-      <td>
-        <ul>
-          <li>Absolute: 1,013 mbar (sea level) to 200 mbar.</li>
-          <li>Gauge pressure: 0 mbar (ambient) to -800 mbar.</li>
-        </ul>
-      </td>
+      <td>Opentrons software and our Python API measure vacuum as gauge pressure in millibars (mbar), from 0 mbar (ambient atmospheric) to -881.31 mbar (maximum pump rating). In absolute pressure, this range is 1,013 mbar (sea level ambient) down to approximately 132 mbar.</td>
+    </tr>
   </tbody>
 </table>
 
