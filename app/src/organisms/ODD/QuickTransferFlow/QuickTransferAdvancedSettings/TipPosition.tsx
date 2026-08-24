@@ -40,6 +40,7 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = useRef(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
 
   const [tipPosition, setTipPosition] = useState<string>(
     String(
@@ -142,6 +143,7 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
           marginTop={SPACING.spacing68}
         >
           <TouchInputField
+            ref={inputElementRef}
             autoFocus
             type="text"
             value={tipPosition}
@@ -160,8 +162,7 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
         >
           <NumericalKeyboard
             keyboardRef={keyboardRef}
-            initialValue={tipPosition}
-            onChange={setTipPosition}
+            inputElementRef={inputElementRef}
           />
         </Flex>
       </Flex>

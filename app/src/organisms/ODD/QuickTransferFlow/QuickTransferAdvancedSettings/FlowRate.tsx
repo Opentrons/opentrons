@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -17,7 +17,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { StatelessNumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
@@ -44,6 +44,8 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
   const { onBack, state, dispatch, kind } = props
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
+  const keyboardRef = useRef(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
 
   const initialFlowRate =
     kind === 'aspirate' ? state.aspirateFlowRate : state.dispenseFlowRate
@@ -148,6 +150,7 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
           marginTop={SPACING.spacing68}
         >
           <TouchInputField
+            ref={inputElementRef}
             autoFocus
             type="text"
             value={flowRate}
@@ -164,10 +167,10 @@ export function FlowRateEntry(props: FlowRateEntryProps): JSX.Element {
           marginTop="7.75rem"
           borderRadius="0"
         >
-          <StatelessNumericalKeyboard
-            value={flowRate}
+          <NumericalKeyboard
+            keyboardRef={keyboardRef}
+            inputElementRef={inputElementRef}
             isDecimal
-            onChange={setFlowRate}
           />
         </Flex>
       </Flex>

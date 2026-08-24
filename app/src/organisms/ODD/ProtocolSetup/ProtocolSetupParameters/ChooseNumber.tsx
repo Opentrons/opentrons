@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -11,7 +11,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StatelessNumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -32,6 +32,8 @@ export function ChooseNumber({
   const { makeSnackbar } = useToaster()
 
   const { i18n, t } = useTranslation(['protocol_setup', 'shared'])
+  const keyboardRef = useRef(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
   const [paramValue, setParamValue] = useState<string>(String(parameter.value))
 
   if (parameter.type !== 'int' && parameter.type !== 'float') {
@@ -102,6 +104,7 @@ export function ChooseNumber({
             {parameter.description}
           </LegacyStyledText>
           <TouchInputField
+            ref={inputElementRef}
             autoFocus
             type="text"
             units={parameter.suffix}
@@ -124,11 +127,11 @@ export function ChooseNumber({
           height="21.25rem"
           marginTop="7.75rem"
         >
-          <StatelessNumericalKeyboard
-            value={paramValue}
+          <NumericalKeyboard
+            keyboardRef={keyboardRef}
+            inputElementRef={inputElementRef}
             isDecimal={allowDecimal}
             hasHyphen={min < 0 || max < min}
-            onChange={setParamValue}
           />
         </Flex>
       </Flex>

@@ -2,8 +2,6 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { TouchInputField } from '@opentrons/components'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
@@ -15,14 +13,6 @@ import type { QuickTransferSummaryState } from '../../types'
 
 vi.mock('/app/redux-resources/analytics')
 vi.mock('../utils')
-
-vi.mock('@opentrons/components', async importOriginal => {
-  const actualComponents = await importOriginal<typeof TouchInputField>()
-  return {
-    ...actualComponents,
-    TouchInputField: vi.fn(),
-  }
-})
 
 const render = (props: ComponentProps<typeof TouchTip>) => {
   return renderWithProviders(<TouchTip {...props} />, {
@@ -115,15 +105,9 @@ describe('TouchTip', () => {
     await user.click(continueBtn)
     await user.click(screen.getByText('1'))
     await user.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        label: 'Touch tip position from top of well (mm)',
-        error: null,
-        type: 'text',
-        value: '',
-      }),
-      {}
-    )
+    expect(
+      screen.getByLabelText('Touch tip position from top of well (mm)')
+    ).toHaveValue('')
   })
 
   it('calls dispatch button if you select disabled and save', async () => {
@@ -153,15 +137,10 @@ describe('TouchTip', () => {
     await user.click(numButton)
     const secondNumButton = screen.getByText('8')
     await user.click(secondNumButton)
-    expect(vi.mocked(TouchInputField)).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        label: 'Touch tip position from top of well (mm)',
-        error: 'Value must be between -25 to 0',
-        type: 'text',
-        value: '-98',
-      }),
-      {}
-    )
+    expect(
+      screen.getByLabelText('Touch tip position from top of well (mm)')
+    ).toHaveValue('-98')
+    screen.getByText('Value must be between -25 to 0')
     const saveBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(saveBtn).toBeDisabled()
   })
@@ -182,15 +161,10 @@ describe('TouchTip', () => {
     await user.click(continueBtn)
     const numButton = screen.getByText('1')
     await user.click(numButton)
-    expect(vi.mocked(TouchInputField)).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        label: 'Touch tip position from top of well (mm)',
-        error: 'Value must be between -100 to 0',
-        type: 'text',
-        value: '1',
-      }),
-      {}
-    )
+    expect(
+      screen.getByLabelText('Touch tip position from top of well (mm)')
+    ).toHaveValue('1')
+    screen.getByText('Value must be between -100 to 0')
     const saveBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(saveBtn).toBeDisabled()
   })
@@ -228,15 +202,9 @@ describe('TouchTip', () => {
     const numButton = screen.getByText('0')
     await user.click(numButton)
     await user.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        label: 'Touch tip position from top of well (mm)',
-        error: null,
-        type: 'text',
-        value: '-25',
-      }),
-      {}
-    )
+    expect(
+      screen.getByLabelText('Touch tip position from top of well (mm)')
+    ).toHaveValue('-25')
   })
 
   it('renders previously set value saved in state for dispense', async () => {
@@ -255,14 +223,8 @@ describe('TouchTip', () => {
     const numButton = screen.getByText('0')
     await user.click(numButton)
     await user.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        label: 'Touch tip position from top of well (mm)',
-        error: null,
-        type: 'text',
-        value: '-8',
-      }),
-      {}
-    )
+    expect(
+      screen.getByLabelText('Touch tip position from top of well (mm)')
+    ).toHaveValue('-8')
   })
 })

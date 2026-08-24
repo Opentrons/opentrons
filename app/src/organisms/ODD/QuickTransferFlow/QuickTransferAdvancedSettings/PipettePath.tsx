@@ -45,6 +45,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
   const { t } = useTranslation('quick_transfer')
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = useRef(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
   const [selectedPath, setSelectedPath] = useState<PathOption>(state.path)
@@ -213,6 +214,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              ref={inputElementRef}
               autoFocus
               type="text"
               value={disposalVolume}
@@ -231,8 +233,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={disposalVolume}
-              onChange={setDisposalVolume}
+              inputElementRef={inputElementRef}
             />
           </Flex>
         </Flex>

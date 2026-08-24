@@ -44,6 +44,7 @@ export function Condition(props: DelayProps): JSX.Element {
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = useRef(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
 
   const [currentStep, setCurrentStep] = useState<number>(1)
   const [conditionIsEnabled, setConditionIsEnabled] = useState<boolean>(
@@ -197,6 +198,7 @@ export function Condition(props: DelayProps): JSX.Element {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              ref={inputElementRef}
               autoFocus
               type="text"
               value={conditionVolume}
@@ -218,8 +220,7 @@ export function Condition(props: DelayProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={conditionVolume}
-              onChange={setConditionVolume}
+              inputElementRef={inputElementRef}
             />
           </Flex>
         </Flex>
