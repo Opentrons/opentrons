@@ -158,6 +158,7 @@ export function AddUserModal({
               </StyledText>
             </div>
             <UserAccountIdentityFormFields
+              autoFocusFirstField
               control={control}
               stacked
               usernameMaxLength={USERNAME_MAX_LENGTH}
