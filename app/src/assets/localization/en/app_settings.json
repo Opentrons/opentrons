@@ -9,7 +9,6 @@
   "__dev_internal__quickTransferExportJSON": "Enable JSON Export for Quick Transfer",
   "__dev_internal__quickTransferProtocolContentsLog": "Enable QT Protocol Contents Logging",
   "__dev_internal__reactQueryDevtools": "Enable React Query Devtools",
-  "__dev_internal__reactScan": "Enable React Scan",
   "__dev_internal__robotSearchBar": "Adds a robot search bar on select pages",
   "__dev_internal__showGitDetails": "Show git commit details in Robot System Version",
   "add_audit_log_folder_button": "Select folder",
