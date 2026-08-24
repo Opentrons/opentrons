@@ -249,6 +249,7 @@ describe('LoginModal', () => {
     fillField('Confirm password', 'newpass123')
     clickPrimary('Confirm')
 
+    expect(await screen.findByText('Password updated')).toBeInTheDocument()
     await expect(resultPromise).resolves.toEqual({ username: 'alice' })
   })
 

@@ -1,7 +1,14 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useId, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
+import {
+  POSITION_FIXED,
+  SPACING,
+  SUCCESS_TOAST,
+  Toast,
+} from '@opentrons/components'
 import { useAuthSettingsQuery } from '@opentrons/react-api-client'
 
 import { getLocalRobot } from '/app/redux/discovery'
@@ -22,14 +29,21 @@ import type { LoginStep } from './index'
 
 type LoginModalPhase = 'login' | 'chooseNewPassword'
 
+const PASSWORD_UPDATED_TOAST_MS = 2000
+
 const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const modal = useModal()
+  const { t } = useTranslation(['access_control'])
+  const passwordUpdatedToastId = useId()
   const [phase, setPhase] = useState<LoginModalPhase>('login')
   const [step, setStep] = useState<LoginStep>('username')
   const [loginError, setLoginError] = useState<string | null>(null)
   const [loginUsername, setLoginUsername] = useState<string | undefined>(
     undefined
   )
+  const [passwordUpdatedUsername, setPasswordUpdatedUsername] = useState<
+    string | null
+  >(null)
   const storeLoginState = useStoreLoginState()
   const localRobotName = useSelector(
     (state: State) => getLocalRobot(state)?.name ?? null
@@ -39,7 +53,12 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const isChoosingNewPassword = phase === 'chooseNewPassword'
 
   const finishModal = useCallback(
-    (username: string): void => {
+    (username: string, options?: { showPasswordUpdatedToast?: boolean }): void => {
+      if (options?.showPasswordUpdatedToast === true) {
+        setPasswordUpdatedUsername(username)
+        return
+      }
+
       modal.resolve({ username })
       modal.remove()
     },
@@ -56,10 +75,12 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
         setPhase('chooseNewPassword')
         setStep('password')
       } else {
-        finishModal(username)
+        finishModal(username, {
+          showPasswordUpdatedToast: isChoosingNewPassword,
+        })
       }
     },
-    [finishModal, storeLoginState, localRobotName]
+    [finishModal, storeLoginState, localRobotName, isChoosingNewPassword]
   )
 
   const dismissModal = useCallback((): void => {
@@ -138,6 +159,22 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
         passwordComplexity={passwordComplexity}
         onCancel={handleCancel}
       />
+      {passwordUpdatedUsername != null ? (
+        <Toast
+          id={passwordUpdatedToastId}
+          message={t('on_device_login_password_updated') as string}
+          type={SUCCESS_TOAST}
+          displayType="odd"
+          duration={PASSWORD_UPDATED_TOAST_MS}
+          position={POSITION_FIXED}
+          right={SPACING.spacing32}
+          bottom={SPACING.spacing32}
+          zIndex={10002}
+          onClose={() => {
+            finishModal(passwordUpdatedUsername)
+          }}
+        />
+      ) : null}
     </div>
   )
 })
