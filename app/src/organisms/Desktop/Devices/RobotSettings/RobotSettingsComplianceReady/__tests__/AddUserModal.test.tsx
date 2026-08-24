@@ -9,7 +9,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 
-import { AddUserModal } from '../AddUserModal'
+import { AddUserModal } from '../UserManagement/AddUserModal'
 
 import type { ComponentProps } from 'react'
 
