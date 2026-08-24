@@ -52,33 +52,23 @@ function UserManagementTable({
   const { t } = useTranslation('device_settings')
 
   return (
-    <table className={styles.table}>
-      <thead>
-        <tr>
-          <th className={styles.header_cell}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('desktop_username')}
-            </StyledText>
-          </th>
-          <th className={styles.header_cell}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('desktop_legal_name')}
-            </StyledText>
-          </th>
-          <th className={styles.header_cell}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('desktop_role')}
-            </StyledText>
-          </th>
-          <th className={styles.header_cell}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('desktop_status')}
-            </StyledText>
-          </th>
-          <th className={styles.header_cell} aria-hidden />
-        </tr>
-      </thead>
-      <tbody>
+    <div className={styles.list}>
+      <div className={styles.header_row}>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('desktop_username')}
+        </StyledText>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('desktop_legal_name')}
+        </StyledText>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('desktop_role')}
+        </StyledText>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('desktop_status')}
+        </StyledText>
+        <span className={styles.overflow_cell_inner} aria-hidden />
+      </div>
+      <div className={styles.rows}>
         {users.map(user => (
           <UserManagementTableRow
             key={user.username}
@@ -90,8 +80,8 @@ function UserManagementTable({
             onDeactivate={onDeactivate}
           />
         ))}
-      </tbody>
-    </table>
+      </div>
+    </div>
   )
 }
 
@@ -222,23 +212,25 @@ export function UserManagement({
 
   return (
     <Accordion id="user-management" title={t('desktop_user_management')}>
-      <UserManagementTable
-        users={users}
-        onEdit={setUserToEdit}
-        onDelete={setUserToDelete}
-        onActivate={setUserToActivate}
-        onResetPassword={setUserToResetPassword}
-        onDeactivate={setUserToDeactivate}
-      />
-      <div className={styles.add_user_button}>
-        <EmptySelectorButton
-          iconName="plus"
-          onClick={() => {
-            setShowAddUserModal(true)
-          }}
-          text={t('desktop_add_user')}
-          textAlignment="left"
+      <div className={styles.content}>
+        <UserManagementTable
+          users={users}
+          onEdit={setUserToEdit}
+          onDelete={setUserToDelete}
+          onActivate={setUserToActivate}
+          onResetPassword={setUserToResetPassword}
+          onDeactivate={setUserToDeactivate}
         />
+        <div className={styles.add_user_button}>
+          <EmptySelectorButton
+            iconName="plus"
+            onClick={() => {
+              setShowAddUserModal(true)
+            }}
+            text={t('desktop_add_user')}
+            textAlignment="left"
+          />
+        </div>
       </div>
       {showAddUserModal ? (
         <AddUserModal
