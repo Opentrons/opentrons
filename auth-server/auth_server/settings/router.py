@@ -43,12 +43,13 @@ from auth_server.users.store import UserStore
 router = fastapi.APIRouter()
 
 
-def _patch_enables_password_complexity(patch: PatchSettingsRequestData) -> bool:
-    """Return whether a settings patch turns on password complexity requirements."""
-    return (
-        patch.model_dump(exclude_unset=True).get("passwordComplexitySpecialCharacters")
-        is True
-    )
+def _patch_changes_password_complexity(
+    patch: PatchSettingsRequestData,
+) -> bool:
+    """Return whether a settings patch changes password complexity requirements."""
+    return "passwordComplexitySpecialCharacters" in patch.model_dump(
+        exclude_unset=True
+    ) or "passwordComplexityMinimumLength" in patch.model_dump(exclude_unset=True)
 
 
 @router.get(
@@ -143,7 +144,7 @@ async def patch_settings(  # noqa: D103
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> SimpleBody[SettingsResponseData]:
     new_settings = settings_store.patch_settings(request_body.data)
-    if _patch_enables_password_complexity(request_body.data):
+    if _patch_changes_password_complexity(request_body.data):
         user_store.mark_all_reset_password()
         oauth2_backend.revoke_all_tokens()
     return SimpleBody.model_construct(data=new_settings)
