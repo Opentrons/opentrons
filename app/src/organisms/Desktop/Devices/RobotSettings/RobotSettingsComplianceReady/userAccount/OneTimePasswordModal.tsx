@@ -34,7 +34,7 @@ export function OneTimePasswordModal({
       width="31.25rem"
       header={
         <WizardHeader
-          title={t('desktop_one_time_password')}
+          title={t('desktop_add_user')}
           onExit={onClose}
           hideStepText
           exitButtonCopy={t('shared:exit')}
