@@ -45,7 +45,10 @@ export function UsbSelectionScreen({
   useEffect(() => {
     // if previously selected path is not in the updated mount paths,
     // ensure the selected path is reset
-    if (selectedPath != null && !usbMountPaths.includes(selectedPath)) {
+    if (
+      selectedPath == null ||
+      (selectedPath != null && !usbMountPaths.includes(selectedPath))
+    ) {
       setSelectedPath(usbMountPaths.length > 0 ? usbMountPaths[0] : null)
     }
   }, [usbMountPaths, selectedPath])
