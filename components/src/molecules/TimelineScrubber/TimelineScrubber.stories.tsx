@@ -6,6 +6,7 @@ import { DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 import { TimelineScrubber as TimelineScrubberComponent } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
+import type { ReactNode } from 'react'
 import type { TrackData } from './TrackSlider'
 
 const meta: Meta<typeof TimelineScrubberComponent> = {
@@ -20,7 +21,7 @@ export default meta
 
 type Story = StoryObj<typeof TimelineScrubberComponent>
 
-function TimelineScrubber(args: any): JSX.Element {
+function TimelineScrubber(args: any): ReactNode {
   const [tracks, setTracks] = useState<TrackData[]>([
     { id: 'track-1', value: 50 },
   ])

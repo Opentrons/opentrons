@@ -20,10 +20,10 @@ import { Ot2ProtocolModal } from '../Ot2ProtocolModal'
 import { SettingsIcon } from '../SettingsIcon'
 import styles from './navigation.module.css'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { ThunkDispatch } from '/protocol-designer/types'
 
-export function Navigation(): JSX.Element | null {
+export function Navigation(): ReactNode {
   const { t } = useTranslation(['shared', 'alert'])
   const location = useLocation()
   const navigate = useNavigate()

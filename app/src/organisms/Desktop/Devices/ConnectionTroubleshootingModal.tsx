@@ -14,6 +14,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 const NEW_ROBOT_SETUP_SUPPORT_ARTICLE_HREF =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'
 const SUPPORT_EMAIL = 'support@opentrons.com'
@@ -21,7 +23,7 @@ const SUPPORT_EMAIL = 'support@opentrons.com'
 interface Props {
   onClose: () => void
 }
-export function ConnectionTroubleshootingModal(props: Props): JSX.Element {
+export function ConnectionTroubleshootingModal(props: Props): ReactNode {
   const { t } = useTranslation(['devices_landing', 'shared'])
 
   return (
@@ -77,7 +79,7 @@ interface TroubleshootingStepsProps {
   label: string
   steps: string[]
 }
-function TroubleshootingSteps(props: TroubleshootingStepsProps): JSX.Element {
+function TroubleshootingSteps(props: TroubleshootingStepsProps): ReactNode {
   const { label, steps } = props
   return (
     <Box marginTop={SPACING.spacing16}>

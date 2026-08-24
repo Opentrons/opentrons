@@ -100,6 +100,11 @@ async def post_camera(
         camera_settings_store.get_error_recovery_camera_enabled()
     )
 
+    run_data = (
+        await run_data_manager.get(run_data_manager.current_run_id)
+        if run_data_manager.current_run_id is not None
+        else None
+    )
     if camera.robot_supports_livestream(robot_type):
         stream_settings = _get_stream_settings()
         if (
@@ -109,7 +114,8 @@ async def post_camera(
                 run_data_manager.current_run_id is not None
                 and (
                     True
-                    if run_data_manager.get(run_data_manager.current_run_id).status
+                    if run_data is not None
+                    and run_data.status
                     not in [
                         EngineStatus.IDLE,
                         EngineStatus.STOPPED,
@@ -262,8 +268,14 @@ async def post_camera_preview_image(
     """
     Return a preview image based on the provided capture image settings.
     """
+    run_data = (
+        await run_data_manager.get(run_data_manager.current_run_id)
+        if run_data_manager.current_run_id is not None
+        else None
+    )
     if run_data_manager.current_run_id is not None and (
-        run_data_manager.get(run_data_manager.current_run_id).status
+        run_data is not None
+        and run_data.status
         not in [EngineStatus.STOPPED, EngineStatus.FAILED, EngineStatus.SUCCEEDED]
     ):
         raise HTTPException(
@@ -469,6 +481,11 @@ async def post_live_stream_settings(
     camera_enabled = camera_settings_store.get_camera_enabled()
     live_stream_enabled = camera_settings_store.get_live_stream_enabled()
 
+    run_data = (
+        await run_data_manager.get(run_data_manager.current_run_id)
+        if run_data_manager.current_run_id is not None
+        else None
+    )
     if (
         camera_enabled
         and live_stream_enabled
@@ -476,7 +493,8 @@ async def post_live_stream_settings(
             run_data_manager.current_run_id is not None
             and (
                 True
-                if run_data_manager.get(run_data_manager.current_run_id).status
+                if run_data is not None
+                and run_data.status
                 not in [
                     EngineStatus.IDLE,
                     EngineStatus.STOPPED,

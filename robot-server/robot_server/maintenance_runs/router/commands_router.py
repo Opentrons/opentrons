@@ -6,7 +6,6 @@ from typing import Annotated, Optional, Union
 from fastapi import Depends, Query, status
 from typing_extensions import Final, Literal
 
-from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocol_engine import (
     CommandPointer,
@@ -39,7 +38,7 @@ from ..maintenance_run_models import MaintenanceRunNotFoundError
 from ..maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
 from .base_router import RunNotFound
 from robot_server.errors.error_responses import ErrorBody, ErrorDetails
-from robot_server.hardware import get_hardware
+from robot_server.hardware import HardwareStateStore, get_hardware_state_store
 from robot_server.robot.control.dependencies import require_estop_in_good_state
 from robot_server.runs.command_models import (
     CommandCollectionLinks,
@@ -130,7 +129,9 @@ async def create_run_command(
     ],
     run_id: Annotated[str, Depends(get_current_run_from_url)],
     check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
-    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    hardware_state_store: Annotated[
+        HardwareStateStore, Depends(get_hardware_state_store)
+    ],
     waitUntilComplete: Annotated[
         bool,
         Query(
@@ -186,7 +187,7 @@ async def create_run_command(
             command will be enqueued.
         check_estop: Dependency to verify the estop is in a valid state.
         run_id: Run identification to attach command to.
-        hardware: The hardware API.
+        hardware_state_store: The hardware state store.
         requiresClosedDoor: If True, reject the command when the door is open.
     """
     # TODO(mc, 2022-05-26): increment the HTTP API version so that default
@@ -194,7 +195,7 @@ async def create_run_command(
     command_intent = pe_commands.CommandIntent.SETUP
     command_create = request_body.data.model_copy(update={"intent": command_intent})
 
-    if requiresClosedDoor and hardware.door_state == DoorState.OPEN:
+    if requiresClosedDoor and hardware_state_store.door_state == DoorState.OPEN:
         raise MaintenanceCommandDoorOpen(
             detail="This command requires the robot's door to be closed."
         ).as_error(status.HTTP_409_CONFLICT)
@@ -208,7 +209,7 @@ async def create_run_command(
     except pe_errors.SetupCommandNotAllowedError as e:
         raise CommandNotAllowed.from_exc(e).as_error(status.HTTP_409_CONFLICT)
 
-    response_data = run_orchestrator_store.get_command(command.id)
+    response_data = await run_orchestrator_store.get_command(command.id)
 
     return await PydanticResponse.create(
         content=SimpleBody.model_construct(data=response_data),
@@ -266,7 +267,7 @@ async def get_run_commands(
         run_data_manager: Run data retrieval interface.
     """
     try:
-        command_slice = run_data_manager.get_commands_slice(
+        command_slice = await run_data_manager.get_commands_slice(
             run_id=runId,
             cursor=cursor,
             length=pageLength,
@@ -274,8 +275,10 @@ async def get_run_commands(
     except MaintenanceRunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
 
-    current_command = run_data_manager.get_current_command(run_id=runId)
-    recovery_target_command = run_data_manager.get_recovery_target_command(run_id=runId)
+    current_command = await run_data_manager.get_current_command(run_id=runId)
+    recovery_target_command = await run_data_manager.get_recovery_target_command(
+        run_id=runId
+    )
 
     data = [
         RunCommandSummary.model_construct(
@@ -340,7 +343,7 @@ async def get_run_command(
         run_data_manager: Run data retrieval.
     """
     try:
-        command = run_data_manager.get_command(run_id=runId, command_id=commandId)
+        command = await run_data_manager.get_command(run_id=runId, command_id=commandId)
     except MaintenanceRunNotFoundError as e:
         raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
     except CommandDoesNotExistError as e:

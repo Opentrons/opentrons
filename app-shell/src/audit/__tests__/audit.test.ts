@@ -1,4 +1,5 @@
 import path from 'path'
+import { dialog } from 'electron'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -35,6 +36,11 @@ vi.mock('../../http', () => ({
 vi.mock('../../usb', () => ({
   getSerialPortHttpAgent: vi.fn(),
 }))
+vi.mock('electron', () => ({
+  dialog: {
+    showOpenDialog: vi.fn(),
+  },
+}))
 
 const flush = (): Promise<void> =>
   new Promise(resolve => setTimeout(resolve, 0))
@@ -44,6 +50,16 @@ const downloadPayload = {
   fileName: 'logperiod.zip',
   hostname: '192.168.1.100',
   port: 31950,
+}
+
+const mockShowOpenDialogCanceled = {
+  canceled: true,
+  filePaths: [],
+}
+
+const mockShowOpenDialogSelected = {
+  canceled: false,
+  filePaths: ['/existing/audit-logs'],
 }
 
 describe('audit module dispatches', () => {
@@ -58,6 +74,9 @@ describe('audit module dispatches', () => {
       audit: { logDirectory: '/existing/audit-logs' },
     } as Config)
     vi.mocked(Dialogs.showOpenDirectoryDialog).mockResolvedValue([])
+    vi.mocked(dialog.showOpenDialog).mockResolvedValue(
+      mockShowOpenDialogCanceled
+    )
     vi.mocked(Http.fetchToFile).mockResolvedValue(
       path.join('/existing/audit-logs', 'logperiod.zip')
     )
@@ -117,9 +136,9 @@ describe('audit module dispatches', () => {
   })
 
   it('downloads the audit log and reports success with deletion key', async () => {
-    vi.mocked(Dialogs.showOpenDirectoryDialog).mockResolvedValue([
-      '/existing/audit-logs',
-    ])
+    vi.mocked(dialog.showOpenDialog).mockResolvedValue(
+      mockShowOpenDialogSelected
+    )
     vi.mocked(Http.fetchToFile).mockImplementation(
       async (_url, destination, options) => {
         options?.onResponse?.({
@@ -153,9 +172,9 @@ describe('audit module dispatches', () => {
   it('routes over the serial port agent for a USB host', async () => {
     const mockAgent = { usbAgent: true }
     vi.mocked(getSerialPortHttpAgent).mockReturnValue(mockAgent as any)
-    vi.mocked(Dialogs.showOpenDirectoryDialog).mockResolvedValue([
-      '/existing/audit-logs',
-    ])
+    vi.mocked(dialog.showOpenDialog).mockResolvedValue(
+      mockShowOpenDialogSelected
+    )
 
     handleAction(
       downloadAuditLog({ ...downloadPayload, hostname: OPENTRONS_USB })
@@ -170,9 +189,9 @@ describe('audit module dispatches', () => {
   })
 
   it('dispatches failure when the download response is missing a deletion key', async () => {
-    vi.mocked(Dialogs.showOpenDirectoryDialog).mockResolvedValue([
-      '/existing/audit-logs',
-    ])
+    vi.mocked(dialog.showOpenDialog).mockResolvedValue(
+      mockShowOpenDialogSelected
+    )
     vi.mocked(Http.fetchToFile).mockImplementation(
       async (_url, destination, options) => {
         options?.onResponse?.({
@@ -196,9 +215,9 @@ describe('audit module dispatches', () => {
   })
 
   it('dispatches failure when the download fails', async () => {
-    vi.mocked(Dialogs.showOpenDirectoryDialog).mockResolvedValue([
-      '/existing/audit-logs',
-    ])
+    vi.mocked(dialog.showOpenDialog).mockResolvedValue(
+      mockShowOpenDialogSelected
+    )
     vi.mocked(Http.fetchToFile).mockRejectedValue(new Error('network error'))
 
     handleAction(downloadAuditLog(downloadPayload))

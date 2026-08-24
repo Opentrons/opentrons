@@ -15,6 +15,7 @@ import { getWellVolume } from '../utils/getWellVolume'
 import { WELL_GEOMETRY, WELL_VIEWBOX, WellSvg } from '../WellSvg'
 import styles from './wellcontainer.module.css'
 
+import type { ReactNode } from 'react'
 import type {
   LabwareWellMap,
   Liquid,
@@ -34,7 +35,7 @@ interface WellContainerProps {
   liquids: Liquid[]
   tipMaxVolume: number
 }
-export function WellContainer(props: WellContainerProps): JSX.Element {
+export function WellContainer(props: WellContainerProps): ReactNode {
   const {
     params,
     selectedWellName,

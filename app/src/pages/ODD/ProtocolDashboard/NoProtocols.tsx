@@ -14,7 +14,9 @@ import {
 
 import imgSrc from '/app/assets/images/on-device-display/empty_protocol_dashboard.png'
 
-export function NoProtocols(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function NoProtocols(): ReactNode {
   const { t } = useTranslation(['protocol_info', 'branded'])
   return (
     <Flex

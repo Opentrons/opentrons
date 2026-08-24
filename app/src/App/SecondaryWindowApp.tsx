@@ -25,7 +25,7 @@ import type { ReactNode } from 'react'
 import type { RouteProps } from './types'
 
 // UI root for secondary windows in the desktop app.
-export const SecondaryWindowApp = (): JSX.Element => {
+export const SecondaryWindowApp = (): ReactNode => {
   const secondaryRoutes: RouteProps[] = [
     {
       Component: LivestreamViewer,

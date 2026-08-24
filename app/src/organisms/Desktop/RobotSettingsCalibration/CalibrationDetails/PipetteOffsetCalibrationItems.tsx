@@ -23,6 +23,7 @@ import {
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated, getDisplayNameForTipRack } from './utils'
 
+import type { ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 import type { FormattedPipetteOffsetCalibration } from '..'
 
@@ -58,7 +59,7 @@ export function PipetteOffsetCalibrationItems({
   robotName,
   isRobotBusy,
   formattedPipetteOffsetCalibrations,
-}: PipetteOffsetCalibrationItemsProps): JSX.Element {
+}: PipetteOffsetCalibrationItemsProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   const customLabwareDefs = useSelector((state: State) => {

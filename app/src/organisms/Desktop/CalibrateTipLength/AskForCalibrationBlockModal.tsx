@@ -26,7 +26,7 @@ import { setUseTrashSurfaceForTipCal } from '/app/redux/calibration'
 
 import styles from './styles.module.css'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
 const BLOCK_REQUEST_EMAIL_BODY =
@@ -42,7 +42,7 @@ interface Props {
   closePrompt: () => void
 }
 
-export function AskForCalibrationBlockModal(props: Props): JSX.Element {
+export function AskForCalibrationBlockModal(props: Props): ReactNode {
   const { t } = useTranslation(['robot_calibration', 'shared', 'branded'])
   const [rememberPreference, setRememberPreference] = useState<boolean>(true)
   const dispatch = useDispatch<Dispatch>()

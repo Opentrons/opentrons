@@ -21,7 +21,7 @@ export function RobotSettingButton({
   settingInfo,
   rightElement,
   dataTestId,
-}: RobotSettingButtonProps): JSX.Element {
+}: RobotSettingButtonProps): ReactNode {
   return (
     <button
       className={styles.setting_button}

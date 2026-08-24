@@ -18,6 +18,7 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
+import type { ReactNode } from 'react'
 import type {
   AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
@@ -40,7 +41,7 @@ interface FlexStackerItemProps {
   selected?: boolean
 }
 
-export function FlexStackerItem(props: FlexStackerItemProps): JSX.Element {
+export function FlexStackerItem(props: FlexStackerItemProps): ReactNode {
   const {
     deckDefinition,
     handleClickRemove,

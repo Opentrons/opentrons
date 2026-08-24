@@ -37,7 +37,7 @@ import {
   openCustomLabwareDirectory,
 } from '/app/redux/custom-labware'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
@@ -49,7 +49,7 @@ interface CustomLabwareOverflowMenuProps {
 
 export function CustomLabwareOverflowMenu(
   props: CustomLabwareOverflowMenuProps
-): JSX.Element {
+): ReactNode {
   const { filename, onDelete } = props
   const { t } = useTranslation(['labware_landing', 'shared'])
   const dispatch = useDispatch<Dispatch>()

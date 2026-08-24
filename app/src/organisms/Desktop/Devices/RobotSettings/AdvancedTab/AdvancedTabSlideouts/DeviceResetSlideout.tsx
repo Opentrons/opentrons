@@ -38,7 +38,7 @@ import {
   useTipLengthCalibrations,
 } from '../../../hooks'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type {
   ResetConfigOption,
   ResetConfigRequest,
@@ -56,7 +56,7 @@ export function DeviceResetSlideout({
   onCloseClick,
   robotName,
   updateResetStatus,
-}: DeviceResetSlideoutProps): JSX.Element {
+}: DeviceResetSlideoutProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const doTrackEvent = useTrackEvent()
   const robot = useRobot(robotName)

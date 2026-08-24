@@ -1,34 +1,65 @@
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { StyledText } from '@opentrons/components'
 import {
-  ALIGN_FLEX_END,
-  ListItem,
-  OverflowBtn,
-  StyledText,
-  Tag,
-} from '@opentrons/components'
-import { useLogPeriodSummariesQuery } from '@opentrons/react-api-client'
+  useAllProtocolsQuery,
+  useLogPeriodSummariesQuery,
+} from '@opentrons/react-api-client'
 
+import { Skeleton } from '/app/atoms/Skeleton'
 import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
-import { formatTimestamp } from '/app/transformations/runs'
+import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import { ConfirmLogPeriodModal } from '../FileManagerWizardFlows/ConfirmLogPeriodModal'
 import { DownloadDeleteLogPeriodWizard } from '../FileManagerWizardFlows/DownloadDeleteLogPeriodWizard'
 import styles from './compliancereadyfiles.module.css'
+import { LogPeriodRow } from './LogPeriodRow'
 
 import type { ReactNode } from 'react'
 import type { LogPeriodSummary } from '@opentrons/api-client'
 
 export function ComplianceReadyFiles(): ReactNode {
   const { t } = useTranslation('device_details')
-  const { data } = useLogPeriodSummariesQuery()
-  const { data: logPeriodSummaries } = data ?? { data: [] }
+  const { data: logPeriodSummariesData, status: logPeriodSummaryQueryStatus } =
+    useLogPeriodSummariesQuery()
 
-  const logPeriodSummariesMutable = [...logPeriodSummaries]
-  const logPeriodSummariesSorted = logPeriodSummariesMutable.sort((a, b) => {
-    return new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime()
-  })
+  const logPeriodSummariesSorted = useMemo(() => {
+    const logPeriodSummaries = logPeriodSummariesData?.data ?? []
+
+    return [...logPeriodSummaries].sort(
+      (a, b) =>
+        new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime()
+    )
+  }, [logPeriodSummariesData])
+
+  const { data: protocolsData } = useAllProtocolsQuery()
+  const { data: runsData } = useNotifyAllRunsQuery()
+
+  // resolve protocol names once for the whole list
+  const protocolNameByLogPeriodId = useMemo(() => {
+    const protocols = protocolsData?.data ?? []
+    const runs = runsData?.data ?? []
+
+    const protocolNameById = protocols.reduce<Record<string, string>>(
+      (acc, { id, metadata }) => {
+        if (metadata?.protocolName != null) {
+          acc[id] = metadata.protocolName
+        }
+        return acc
+      },
+      {}
+    )
+
+    return runs.reduce<Record<string, string>>((acc, run) => {
+      const protocolName =
+        run.protocolId != null ? protocolNameById[run.protocolId] : null
+      if (run.logPeriodId != null && protocolName != null) {
+        acc[run.logPeriodId] = protocolName
+      }
+      return acc
+    }, {})
+  }, [protocolsData, runsData])
 
   const [selectedLogPeriod, setSelectedLogPeriod] =
     useState<LogPeriodSummary | null>(null)
@@ -36,9 +67,12 @@ export function ComplianceReadyFiles(): ReactNode {
   const [initialDeleteAfterDownload, setInitialDeleteAfterDownload] =
     useState(true)
 
-  const handleOverflowClick = (logPeriodSummary: LogPeriodSummary): void => {
-    setSelectedLogPeriod(logPeriodSummary)
-  }
+  const handleOverflowClick = useCallback(
+    (logPeriodSummary: LogPeriodSummary): void => {
+      setSelectedLogPeriod(logPeriodSummary)
+    },
+    []
+  )
 
   const handleCloseConfirmModal = (): void => {
     setSelectedLogPeriod(null)
@@ -59,7 +93,10 @@ export function ComplianceReadyFiles(): ReactNode {
     setSelectedLogPeriod(null)
   }
 
-  if (logPeriodSummariesSorted.length === 0) {
+  if (
+    logPeriodSummaryQueryStatus !== 'loading' &&
+    logPeriodSummariesData?.data.length === 0
+  ) {
     return (
       <OddInfoScreen
         type="neutral"
@@ -69,51 +106,32 @@ export function ComplianceReadyFiles(): ReactNode {
     )
   }
 
+  // loading skeleton since log period summary query can take a noticible amount of time
+  const skeletonContent = (
+    <>
+      <Skeleton width="100%" height="5.75rem" backgroundSize="59rem" />
+      <Skeleton width="100%" height="5.75rem" backgroundSize="59rem" />
+      <Skeleton width="100%" height="5.75rem" backgroundSize="59rem" />
+    </>
+  )
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <StyledText oddStyle="bodyTextSemiBold">{t('file_type')}</StyledText>
+        <StyledText oddStyle="bodyTextSemiBold">{t('protocol')}</StyledText>
         <StyledText oddStyle="bodyTextSemiBold">{t('period_start')}</StyledText>
         <StyledText oddStyle="bodyTextSemiBold">{t('period_end')}</StyledText>
       </div>
-      {logPeriodSummariesSorted.map(logPeriodSummary => {
-        return (
-          <ListItem
-            key={logPeriodSummary.id}
-            type="default"
-            className={styles.record_container}
-          >
-            <div className={styles.record_content}>
-              <StyledText
-                oddStyle="bodyTextSemiBold"
-                className={styles.protocol_name}
-              >
-                {t('user_action_logs')}
-              </StyledText>
-              <Tag
-                type="default"
-                text={formatTimestamp(logPeriodSummary.startedAt)}
-                shrinkToContent
-              />
-              <Tag
-                type="default"
-                text={
-                  logPeriodSummary.endedAt != null
-                    ? formatTimestamp(logPeriodSummary.endedAt)
-                    : t('in_progress')
-                }
-                shrinkToContent
-              />
-            </div>
-            <OverflowBtn
-              justifySelf={ALIGN_FLEX_END}
-              onClick={() => {
-                handleOverflowClick(logPeriodSummary)
-              }}
+      {logPeriodSummaryQueryStatus === 'loading'
+        ? skeletonContent
+        : logPeriodSummariesSorted.map(logPeriodSummary => (
+            <LogPeriodRow
+              key={logPeriodSummary.id}
+              logPeriodSummary={logPeriodSummary}
+              protocolName={protocolNameByLogPeriodId[logPeriodSummary.id]}
+              handleOverflowClick={handleOverflowClick}
             />
-          </ListItem>
-        )
-      })}
+          ))}
       {selectedLogPeriod != null ? (
         <ConfirmLogPeriodModal
           onClose={handleCloseConfirmModal}

@@ -863,6 +863,7 @@ export interface PendingProtocolAnalysis {
 export interface ProtocolAnalysisSummary {
   id: string
   status: 'pending' | 'completed'
+  result?: 'ok' | 'not-ok' | 'error' | 'parameter-value-required'
 }
 export interface LoadedPipette {
   id: string

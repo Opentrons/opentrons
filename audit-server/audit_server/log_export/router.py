@@ -41,6 +41,7 @@ from audit_server.log_storage.log_data_manager import (
 from audit_server.log_storage.models import (
     LogPeriodDetails,
     LogPeriodSummary,
+    TotalUsageSummary,
 )
 from audit_server.log_storage.store import NoPeriodById, PeriodIsActiveError
 from audit_server.persistence.fastapi_dependencies import get_persistence_directory_root
@@ -52,6 +53,19 @@ _DOWNLOAD_STAGING_PREFIX: Final = "temp-download-staging-"
 # Response header carrying the one-time deletion key for a downloaded log period.
 # Must match ``LOG_PERIOD_DELETION_KEY_HEADER`` in api-client/src/audit/constants.ts.
 _DELETION_KEY_HEADER: Final = "opentrons-log-period-deletion-key"
+
+
+@router.get(
+    "/audit/external/diskUsage",
+    summary="Get the disk usage of stored audit logs",
+    description="Return a summary of disk usage and a breakdown by period",
+)
+async def get_usage_summary(
+    log_data_manager: Annotated[LogDataManager, fastapi.Depends(get_log_data_manager)],
+) -> SimpleBody[TotalUsageSummary]:
+    """Get the disk usage of the audit server."""
+    summary = log_data_manager.get_total_fs_usage()
+    return SimpleBody.model_construct(data=summary)
 
 
 @router.get(

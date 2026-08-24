@@ -22,7 +22,9 @@ import { useConnectionsQuery } from '@opentrons/react-api-client'
 
 import { MediumButton } from '/app/atoms/buttons'
 
-export function ConnectViaUSB(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function ConnectViaUSB(): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared', 'branded'])
   const navigate = useNavigate()
   // TODO(bh, 2023-5-31): active connections from /system/connected isn't exactly the right way to monitor for a usb connection -

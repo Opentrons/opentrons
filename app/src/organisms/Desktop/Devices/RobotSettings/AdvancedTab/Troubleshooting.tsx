@@ -15,7 +15,7 @@ import {
 import { TertiaryButton } from '/app/atoms/buttons'
 import { useDownloadRobotLogs } from '/app/resources/devices/hooks'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 
 interface TroubleshootingProps {
   robotName: string
@@ -23,7 +23,7 @@ interface TroubleshootingProps {
 
 export function Troubleshooting({
   robotName,
-}: TroubleshootingProps): JSX.Element {
+}: TroubleshootingProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const { downloadLogs, isDownloading, canDownload } =
     useDownloadRobotLogs(robotName)

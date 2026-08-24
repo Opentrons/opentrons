@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createProtocolAnalysis } from '@opentrons/api-client'
 
 import { useCreateProtocolAnalysisMutation } from '..'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
 
 import type * as React from 'react'
@@ -42,7 +43,11 @@ describe('useCreateProtocolAnalysisMutation hook', () => {
     vi.mocked(createProtocolAnalysis).mockRejectedValue('oh no')
 
     const { result } = renderHook(
-      () => useCreateProtocolAnalysisMutation('fake-protocol-key'),
+      () =>
+        useCreateProtocolAnalysisMutation(
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+          'fake-protocol-key'
+        ),
       {
         wrapper,
       }
@@ -65,7 +70,11 @@ describe('useCreateProtocolAnalysisMutation hook', () => {
     } as Response<ProtocolAnalysisSummaryResult>)
 
     const { result } = renderHook(
-      () => useCreateProtocolAnalysisMutation('fake-protocol-key'),
+      () =>
+        useCreateProtocolAnalysisMutation(
+          ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+          'fake-protocol-key'
+        ),
       {
         wrapper,
       }

@@ -30,8 +30,8 @@ interface PlayBackControlsProps {
   setSelectedCommand: Dispatch<SetStateAction<string | null>>
   milliSecondsPerFrame: number
   setMilliSecondsPerFrame: Dispatch<SetStateAction<number>>
-  showStepDetail: boolean
-  onClickStepDetail: Dispatch<SetStateAction<boolean>>
+  showStepDetails: boolean
+  onClickStepDetails: Dispatch<SetStateAction<boolean>>
 }
 
 export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
@@ -44,8 +44,8 @@ export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
     setSelectedCommand,
     milliSecondsPerFrame,
     setMilliSecondsPerFrame,
-    showStepDetail,
-    onClickStepDetail,
+    showStepDetails,
+    onClickStepDetails,
   } = props
 
   const { t } = useTranslation('protocol_visualization')
@@ -213,7 +213,10 @@ export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
         return
       }
 
-      if (isEditableKeyboardTarget(event.target)) {
+      if (
+        isEditableKeyboardTarget(event.target) ||
+        isEditableKeyboardTarget(document.activeElement)
+      ) {
         return
       }
 
@@ -277,7 +280,7 @@ export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
         <button
           type="button"
           onClick={() => {
-            onClickStepDetail(!showStepDetail)
+            onClickStepDetails(!showStepDetails)
           }}
           className={styles.icon_button}
           aria-label={t('step_details')}

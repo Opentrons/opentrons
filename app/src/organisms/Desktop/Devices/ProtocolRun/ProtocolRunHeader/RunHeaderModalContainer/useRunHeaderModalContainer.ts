@@ -25,7 +25,10 @@ import {
   selectAreOffsetsApplied,
   selectOffsetSource,
 } from '/app/redux/protocol-runs'
-import { useCurrentRunId, useProtocolDetailsForRun } from '/app/resources/runs'
+import {
+  useCurrentRunId,
+  useQuickProtocolDetailsForRun,
+} from '/app/resources/runs'
 
 import { getFallbackRobotSerialNumber } from '../utils'
 import {
@@ -96,7 +99,7 @@ export function useRunHeaderModalContainer({
 }: UseRunHeaderModalContainerProps): UseRunHeaderModalContainerResult {
   const navigate = useNavigate()
 
-  const { displayName } = useProtocolDetailsForRun(runId)
+  const { displayName } = useQuickProtocolDetailsForRun(runId)
   const robot = useRobot(robotName)
   const robotSerialNumber = getFallbackRobotSerialNumber(robot)
   const trackEvent = useTrackEvent()

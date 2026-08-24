@@ -16,9 +16,10 @@ import {
 import { TertiaryButton } from '/app/atoms/buttons'
 import { changeAuditLogDirectory, getAuditLogDirectory } from '/app/redux/audit'
 
+import type { ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
-export function AuditLogFolder(): JSX.Element {
+export function AuditLogFolder(): ReactNode {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
   const logDirectory = useSelector(getAuditLogDirectory)

@@ -69,7 +69,7 @@ stages:
       status_code: 200
       json:
         data:
-          - id: 2
+          - id: '2'
             endedAt: null
             startedAt: !anystr
         meta:

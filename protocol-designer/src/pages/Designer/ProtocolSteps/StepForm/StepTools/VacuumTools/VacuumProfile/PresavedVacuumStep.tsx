@@ -3,8 +3,6 @@ import { useTranslation } from 'react-i18next'
 
 import {
   COLORS,
-  DIRECTION_COLUMN,
-  Flex,
   Icon,
   InputField,
   ListButton,
@@ -118,7 +116,7 @@ export function PresavedVacuumStep(
           />
         )}
         <div className={styles.presaved_content}>
-          <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing8}>
+          <div className={styles.presaved_fields}>
             <div className={styles.presaved_vacuum_step_form_row}>
               <div className={styles.flex_fill}>
                 <InputField
@@ -199,7 +197,7 @@ export function PresavedVacuumStep(
                 updateField('ventAfter', !ventAfter)
               }}
             />
-          </Flex>
+          </div>
         </div>
       </div>
     </ListItem>
@@ -217,22 +215,27 @@ function StepEndingHoldField(props: {
     : t('vacuum.previous_state.vent.closed')
 
   return (
-    <ListButton
-      type="noActive"
-      padding={SPACING.spacing12}
-      width="100%"
-      justifyContent="space-between"
-      onClick={onChange}
-      backgroundColor={COLORS.white}
-      alignItems="center"
-    >
-      <StyledText desktopStyle="bodyDefaultRegular">
-        {t('vacuum.controls.ending_hold_vent.label')}
+    <div className={styles.presaved_vacuum_step_hold}>
+      <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+        {t('vacuum.controls.ending_hold_vent.title')}
       </StyledText>
-      <div className={styles.ending_hold_toggle_row}>
-        <StyledText desktopStyle="bodyDefaultRegular">{label}</StyledText>
-        <ToggleButton label={label} toggledOn={toggledOn} />
-      </div>
-    </ListButton>
+      <ListButton
+        type="noActive"
+        padding={SPACING.spacing12}
+        width="100%"
+        justifyContent="space-between"
+        onClick={onChange}
+        backgroundColor={COLORS.white}
+        alignItems="center"
+      >
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('vacuum.controls.ending_hold_vent.label')}
+        </StyledText>
+        <div className={styles.ending_hold_toggle_row}>
+          <StyledText desktopStyle="bodyDefaultRegular">{label}</StyledText>
+          <ToggleButton label={label} toggledOn={toggledOn} />
+        </div>
+      </ListButton>
+    </div>
   )
 }

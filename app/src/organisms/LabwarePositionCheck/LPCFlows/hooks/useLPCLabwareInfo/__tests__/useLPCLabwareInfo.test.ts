@@ -30,7 +30,9 @@ describe('useLPCLabwareInfo', () => {
   const PROTOCOL_DATA = { commands: [] } as any
   const LABWARE_DEFS = [{ uri: 'labware-1' }] as any
   const MOCK_LW_LOCATION_COMBOS = [{ definitionUri: 'labware-uri-1' }] as any
-  const MOCK_SEARCH_PARAMS = { definitionUris: ['labware-uri-1'] } as any
+  const MOCK_SEARCH_PARAMS = {
+    filters: [{ definitionUri: 'labware-uri-1' }],
+  } as any
   const MOCK_STORED_OFFSETS = [{ id: 'offset-1' }] as any
   const MOCK_LEGACY_OFFSETS = [{ id: 'legacy-offset-1' }] as any
   const MOCK_LABWARE_INFO = { areOffsetsApplied: true } as any

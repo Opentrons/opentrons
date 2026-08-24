@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import first from 'lodash/first'
 import last from 'lodash/last'
 import { css } from 'styled-components'
 
-import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -51,6 +51,7 @@ import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import {
   AnalysisFailedModal,
   getUnmatchedModulesForProtocol,
+  ProtocolSetupButtonsSkeleton,
   ProtocolSetupInstruments,
   ProtocolSetupLabware,
   ProtocolSetupModulesAndDeck,
@@ -119,7 +120,7 @@ import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal
 
 import type { TFunction } from 'i18next'
 import type { FlattenSimpleInterpolation } from 'styled-components'
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { Run, RunStatus } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type {
@@ -177,13 +178,12 @@ function PrepareToRun({
   storageInfo,
   showConfirmCancelModal,
   setShowConfirmCancelModal,
-}: PrepareToRunProps): JSX.Element {
+}: PrepareToRunProps): ReactNode {
   const { t, i18n } = useTranslation([
     'protocol_setup',
     'shared',
     'deck_configuration',
   ])
-  const navigate = useNavigate()
   const { makeSnackbar } = useToaster()
   const { scrollRef, isScrolled } = useScrollPosition()
 
@@ -237,11 +237,6 @@ function PrepareToRun({
       setIsPollingForCompletedAnalysis(true)
     }
   }, [mostRecentAnalysis?.status])
-
-  const onConfirmCancelClose = (): void => {
-    setShowConfirmCancelModal(false)
-    navigate(-1)
-  }
 
   const protocolHasModules =
     mostRecentAnalysis?.modules != null &&
@@ -657,21 +652,22 @@ function PrepareToRun({
             )}
           </Flex>
           <Flex gridGap={SPACING.spacing16}>
-            <CloseButton
-              onClose={
-                !isLoading
-                  ? () => {
-                      setShowConfirmCancelModal(true)
-                    }
-                  : onConfirmCancelClose
-              }
-            />
-            <PlayButton
-              disabled={isLoading}
-              onPlay={!isLoading ? onPlay : undefined}
-              ready={!isLoading ? isReadyToRun : false}
-              isDoorOpen={doorStatus.isDoorOpen}
-            />
+            {!isLoading ? (
+              <>
+                <CloseButton
+                  onClose={() => {
+                    setShowConfirmCancelModal(true)
+                  }}
+                />
+                <PlayButton
+                  onPlay={onPlay}
+                  ready={isReadyToRun}
+                  isDoorOpen={doorStatus.isDoorOpen}
+                />
+              </>
+            ) : (
+              <ProtocolSetupButtonsSkeleton />
+            )}
           </Flex>
         </Flex>
       </Flex>
@@ -753,7 +749,6 @@ function PrepareToRun({
           runId={runId}
           setShowConfirmCancelRunModal={setShowConfirmCancelModal}
           isActiveRun={false}
-          protocolId={protocolId}
         />
       ) : null}
     </>
@@ -763,7 +758,7 @@ function PrepareToRun({
 const MAINTENANCE_RUN_POLL_MS = 5000
 const RUN_RECORD_REFETCH_MS = 5000
 
-export function ProtocolSetup(): JSX.Element {
+export function ProtocolSetup(): ReactNode {
   const { runId } = useParams<
     keyof OnDeviceRouteParams
   >() as OnDeviceRouteParams
@@ -804,13 +799,8 @@ export function ProtocolSetup(): JSX.Element {
     useNotifyCurrentMaintenanceRun({ refetchInterval: MAINTENANCE_RUN_POLL_MS })
       .data?.data.id != null
 
-  const navigate = useNavigate()
   const [showConfirmCancelModal, setShowConfirmCancelModal] =
     useState<boolean>(false)
-
-  if (runStatus === RUN_STATUS_STOPPED && !showConfirmCancelModal) {
-    navigate('/protocols')
-  }
 
   const { data: mostRecentAnalysis = null } =
     useProtocolAnalysisAsDocumentQuery(

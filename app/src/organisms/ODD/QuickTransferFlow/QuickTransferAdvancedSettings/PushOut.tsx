@@ -24,7 +24,7 @@ import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
 import { ACTIONS } from '../constants'
 
-import type { Dispatch } from 'react'
+import type { Dispatch, ReactNode } from 'react'
 import type {
   FlowRateKind,
   QuickTransferSummaryAction,
@@ -38,7 +38,7 @@ interface PushOutProps {
   kind: FlowRateKind
 }
 
-export function PushOut(props: PushOutProps): JSX.Element {
+export function PushOut(props: PushOutProps): ReactNode {
   const { kind, onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
@@ -181,9 +181,6 @@ export function PushOut(props: PushOutProps): JSX.Element {
               value={volume}
               error={volumeError}
               label={t('push_out_volume')}
-              onBlur={e => {
-                e.target.focus()
-              }}
               onChange={e => {
                 setVolume(Number(e.target.value))
               }}

@@ -104,7 +104,7 @@ PRESSURE_TOL = 5.0
 EQUALIZE_PRESSURE_TOL = 10.0
 POWER_TOL = 1.0
 
-# Pressure-control PID defaults
+# Pressure-control tuning defaults
 # See pressure_task.hpp and pressure_controller.hpp in opentrons-modules for details
 DEFAULT_PRESSURE_CONTROL_TUNINGS = PressureControlTunings(
     kp=13.1,
@@ -114,6 +114,8 @@ DEFAULT_PRESSURE_CONTROL_TUNINGS = PressureControlTunings(
     k_velocity=20.0,
     k_holding=43.0,
     tolerance_error=2.0,  # rel_tol_pct (%)
+    approach_band=80.0,
+    slew_end_fraction=0.30,
 )
 
 # Waste-full detection defaults
@@ -192,7 +194,14 @@ class VacuumModule(mod_abc.AbstractModule):
         )
 
         # Configure the default parameters
-        await module._configure_device()
+        try:
+            await module._configure_device()
+        except Exception:
+            log.warning(
+                "Could not configure vacuum module defaults on port %s.",
+                port,
+                exc_info=True,
+            )
 
         try:
             await poller.start()
@@ -247,6 +256,12 @@ class VacuumModule(mod_abc.AbstractModule):
             await self._handle_status_bar_event(self._last_status_bar_event)
 
     def _async_error_callback(self, exception: Exception) -> None:
+        """Forward poller/firmware faults as async module errors."""
+        # Parse mismatches (e.g. an M121 pressure line consumed as M123 pump
+        # state) are comms glitches, not firmware faults. Do not escalate them
+        # as ASYNCHRONOUS_MODULE_ERROR or a run can be stopped.
+        if isinstance(exception, ValueError):
+            return
         self.error_callback(self._to_enumerated_error(exception))
 
     def _to_enumerated_error(self, exception: Exception) -> EnumeratedError:
@@ -314,16 +329,18 @@ class VacuumModule(mod_abc.AbstractModule):
             waste.max_window_time,
         )
 
-        # Pressure control PID parameters
+        # Pressure control parameters
         pid = DEFAULT_PRESSURE_CONTROL_TUNINGS
         await self._driver.set_pressure_control_tunings(
-            pid.kp,
-            pid.ki,
-            pid.kd,
-            pid.overshoot_error,
-            pid.k_velocity,
-            pid.k_holding,
-            pid.tolerance_error,
+            kp=pid.kp,
+            ki=pid.ki,
+            kd=pid.kd,
+            overshoot=pid.overshoot_error,
+            k_velocity=pid.k_velocity,
+            k_holding=pid.k_holding,
+            tolerance=pid.tolerance_error,
+            approach_band=pid.approach_band,
+            slew_end_fraction=pid.slew_end_fraction,
         )
 
     async def attempt_reconnect(self) -> None:
@@ -337,7 +354,6 @@ class VacuumModule(mod_abc.AbstractModule):
                     port=self.port, loop=self.loop
                 )
                 self._reader._driver = self._driver
-            await self._configure_device()
             self._unsubscribe_init = self._reader.set_initialized_callback(
                 self._initialized_callback
             )
@@ -346,6 +362,7 @@ class VacuumModule(mod_abc.AbstractModule):
             )
             await self._poller.stop()
             await self._poller.start()
+            await self._configure_device()
         except BaseException:
             log.exception("Got an error when trying to reconnect vacuum module.")
 
@@ -419,7 +436,7 @@ class VacuumModule(mod_abc.AbstractModule):
             "currentPower": self._reader.pump_state.current_pwm,
             "targetPower": self._reader.get_target_power(),
             "ventStatus": self._reader.vacuum_state.vent_state.formatted,
-            "modeType": self._reader.operation_mode,
+            "modeType": self._reader.operation_mode.value,
         }
         return {"status": self.status.value, "data": data}
 
@@ -936,7 +953,11 @@ class VacuumModuleReader(Reader):
         self._refresh_state = True
 
     def on_error(self, exception: Exception) -> None:
-        self._driver.reset_serial_buffers()
+        try:
+            self._driver.reset_serial_buffers()
+        except Exception:
+            # Port is often already gone on unplug; still record the poll error.
+            log.debug("Could not reset serial buffers after poll error", exc_info=True)
         self._set_error(exception)
 
     def _set_error(self, exception: Optional[Exception]) -> None:

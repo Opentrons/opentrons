@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useQueryClient } from 'react-query'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import last from 'lodash/last'
@@ -27,7 +26,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  getQueryKey,
   isDocumentedMutationError,
   useCreateRunMutation,
   useDeleteProtocolMutation,
@@ -64,6 +62,7 @@ import { Liquids } from './Liquids'
 import { Parameters } from './Parameters'
 import { RobotOutOfStorageModal } from './RobotOutOfStorageModal'
 
+import type { ReactNode } from 'react'
 import type { Protocol } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
@@ -85,7 +84,7 @@ const ProtocolHeader = ({
   isScrolled,
   isProtocolFetching,
   startSetup,
-}: ProtocolHeaderProps): JSX.Element => {
+}: ProtocolHeaderProps): ReactNode => {
   const navigate = useNavigate()
   const { t } = useTranslation(['protocol_info, protocol_details', 'shared'])
   const [truncate, setTruncate] = useState<boolean>(true)
@@ -195,7 +194,7 @@ interface ProtocolSectionTabsProps {
 const ProtocolSectionTabs = ({
   currentOption,
   setCurrentOption,
-}: ProtocolSectionTabsProps): JSX.Element => {
+}: ProtocolSectionTabsProps): ReactNode => {
   const { t, i18n } = useTranslation('protocol_details')
   return (
     <Flex gridGap={SPACING.spacing8}>
@@ -219,7 +218,7 @@ interface SummaryProps {
   date: string | null
 }
 
-const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
+const Summary = ({ author, description, date }: SummaryProps): ReactNode => {
   const { t, i18n } = useTranslation('protocol_details')
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
@@ -327,7 +326,6 @@ export function ProtocolDetails(): JSX.Element | null {
   const host = useHost()
   const { makeSnackbar } = useToaster()
   const [showParameters, setShowParameters] = useState<boolean>(false)
-  const queryClient = useQueryClient()
   const [currentOption, setCurrentOption] = useState<TabOption>(
     protocolSectionTabOptions[0]
   )
@@ -354,15 +352,7 @@ export function ProtocolDetails(): JSX.Element | null {
   const { deleteProtocol } = useDeleteProtocolMutation(deleteDocumentationState)
   const { deleteRun } = useDeleteRunMutation(deleteDocumentationState)
   const documentationState = useDocumentationState()
-  const { createRun } = useCreateRunMutation(documentationState, {
-    onSuccess: data => {
-      queryClient
-        .invalidateQueries(getQueryKey(host, 'runs'))
-        .catch((e: Error) => {
-          console.error(`could not invalidate runs cache: ${e.message}`)
-        })
-    },
-  })
+  const { createRun } = useCreateRunMutation(documentationState)
 
   const isRobotOutOfStorage = useIsRobotOutOfStorage()
   const [showRobotOutOfStorageModal, setShowRobotOutOfStorageModal] =

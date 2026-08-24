@@ -170,7 +170,7 @@ describe('RobotNameEditor', () => {
     ).toBeInTheDocument()
   })
 
-  it('should block further input while invalid char is present', async () => {
+  it('should keep additional typed characters while an invalid char is present', async () => {
     render()
     const input = screen.getByRole('textbox')
     fireEvent.change(input, { target: { value: 'a!' } })
@@ -179,7 +179,7 @@ describe('RobotNameEditor', () => {
     })
     fireEvent.change(input, { target: { value: 'a!b' } })
     await waitFor(() => {
-      expect(input).toHaveValue('a!')
+      expect(input).toHaveValue('a!b')
     })
     expect(
       screen.getByText("Character '!' is not supported")

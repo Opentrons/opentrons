@@ -22,10 +22,10 @@ import { getHint } from '/protocol-designer/tutorial/selectors'
 
 import { getMainPagePortalEl } from '../Portal'
 
-import type { PropsWithChildren } from 'react'
+import type { PropsWithChildren, ReactNode } from 'react'
 import type { HintKey } from '/protocol-designer/tutorial'
 
-export const HintsModal = (): JSX.Element | null => {
+export const HintsModal = (): ReactNode => {
   const { t, i18n } = useTranslation(['alert', 'shared'])
   const [rememberDismissal, setRememberDismissal] = useState<boolean>(false)
   const toggleRememberDismissal = useCallback(() => {

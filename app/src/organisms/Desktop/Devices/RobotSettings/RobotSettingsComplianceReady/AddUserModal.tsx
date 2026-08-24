@@ -14,12 +14,12 @@ import { useCreateUserMutation } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { mapAuthUserMutationError } from '/app/resources/auth/mapAuthUserMutationError'
 
 import {
   MANAGEABLE_USER_ACCOUNT_TYPES,
   USERNAME_MAX_LENGTH,
 } from './userAccount/constants'
-import { mapAuthUserMutationError } from './userAccount/mapAuthUserMutationError'
 import { OneTimePasswordModal } from './userAccount/OneTimePasswordModal'
 import styles from './userAccount/userAccountForm.module.css'
 import { UserAccountIdentityFormFields } from './userAccount/UserAccountIdentityFormFields'
@@ -138,6 +138,7 @@ export function AddUserModal({
   return createPortal(
     <ModalShell
       width="31.25rem"
+      overflow="visible"
       header={
         <WizardHeader
           title={t('desktop_add_user')}

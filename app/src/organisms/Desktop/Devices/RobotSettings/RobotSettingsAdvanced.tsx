@@ -50,7 +50,7 @@ import { FactoryModeSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryM
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { handleUpdateBuildroot } from './UpdateBuildroot'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type {
   ResetConfigRequest,
   RobotSettingsField,
@@ -64,7 +64,7 @@ interface RobotSettingsAdvancedProps {
 export function RobotSettingsAdvanced({
   robotName,
   isRobotBusy,
-}: RobotSettingsAdvancedProps): JSX.Element {
+}: RobotSettingsAdvancedProps): ReactNode {
   const [showRenameRobotSlideout, setShowRenameRobotSlideout] =
     useState<boolean>(false)
   const [showDeviceResetSlideout, setShowDeviceResetSlideout] =
@@ -187,7 +187,10 @@ export function RobotSettingsAdvanced({
             />
           </>
         )}
-        <Divider marginY={SPACING.spacing16} />
+        <Divider
+          marginTop={SPACING.spacing16}
+          marginBottom={SPACING.spacing24}
+        />
         <GantryHoming
           settings={findSettings('disableHomeOnBoot')}
           isRobotBusy={isRobotBusy || isEstopNotDisengaged}

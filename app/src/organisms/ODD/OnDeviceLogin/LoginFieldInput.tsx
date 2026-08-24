@@ -6,7 +6,7 @@ import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggl
 
 import styles from './OnDeviceLogin.module.css'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { ControllerRenderProps, FieldPath } from 'react-hook-form'
 import type { LoginFormValues } from './index'
 
@@ -30,16 +30,11 @@ export function LoginFieldInput<
   isPasswordField,
   onClearError,
   autoFocus,
-}: LoginFieldInputProps<TFieldName>): JSX.Element {
+}: LoginFieldInputProps<TFieldName>): ReactNode {
   const [showPassword, setShowPassword] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isPasswordHidden = isPasswordField && !showPassword
   const inputType: 'text' | 'password' = isPasswordHidden ? 'password' : 'text'
-
-  const togglePasswordVisibility = (): void => {
-    setShowPassword(current => !current)
-    inputRef.current?.focus()
-  }
 
   const inputField = (
     <TouchInputField
@@ -51,10 +46,7 @@ export function LoginFieldInput<
       value={field.value ?? ''}
       name={field.name}
       id={field.name}
-      onBlur={e => {
-        field.onBlur()
-        e.target.focus()
-      }}
+      onBlur={field.onBlur}
       onChange={(e: ChangeEvent<HTMLInputElement>) => {
         field.onChange(e.target.value)
         onClearError?.()
@@ -69,7 +61,9 @@ export function LoginFieldInput<
       <div className={styles.password_field_input}>{inputField}</div>
       <PasswordVisibilityToggle
         isVisible={showPassword}
-        onToggle={togglePasswordVisibility}
+        onToggle={() => {
+          setShowPassword(prev => !prev)
+        }}
       />
     </div>
   )

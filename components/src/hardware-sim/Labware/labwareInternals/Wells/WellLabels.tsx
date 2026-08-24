@@ -7,7 +7,7 @@ import { C_BLACK, C_BLUE } from '../../../../styles/colors'
 import { RobotCoordsText } from '../../../Deck'
 import { WELL_LABEL_OPTIONS } from './constants'
 
-import type { MemoExoticComponent } from 'react'
+import type { MemoExoticComponent, ReactNode } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { WellLabelOption } from '../../LabwareRender'
 import type { HighlightedWellLabels } from './constants'
@@ -33,7 +33,7 @@ const Labels = (props: {
   isLetterColumn?: boolean
   highlightedWellLabels?: HighlightedWellLabels
   wellLabelColor?: string
-}): JSX.Element => {
+}): ReactNode => {
   const { wellLabelOption, highlightedWellLabels, wellLabelColor } = props
   const highlightColor = highlightedWellLabels?.color ?? C_BLUE
   const fillColor = wellLabelColor ?? C_BLACK
@@ -87,7 +87,7 @@ const Labels = (props: {
   )
 }
 
-export function WellLabelsComponent(props: WellLabelsProps): JSX.Element {
+export function WellLabelsComponent(props: WellLabelsProps): ReactNode {
   const { definition, wellLabelOption, highlightedWellLabels, wellLabelColor } =
     props
   const letterColumn = definition.ordering[0] ?? []

@@ -3,6 +3,9 @@ from typing import AsyncGenerator
 
 import pytest
 from decoy import Decoy, matchers
+from serial.serialutil import (  # type: ignore[import-untyped]
+    SerialException as PySerialSerialException,
+)
 
 from opentrons.hardware_control.poller import Poller, Reader
 
@@ -133,6 +136,31 @@ async def test_poller_start_error(
         mock_reader.on_error(matchers.ErrorMatching(RuntimeError, match="oh no")),
         times=1,
     )
+
+
+async def test_poller_disconnect_io_does_not_log_callback_traceback(
+    decoy: Decoy,
+    mock_reader: Reader,
+    subject: Poller,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Unplug I/O during poll/cleanup should not dump a traceback."""
+    io_error = PySerialSerialException("write failed: [Errno 5] Input/output error")
+    decoy.when(await mock_reader.read()).then_raise(io_error)  # type: ignore[func-returns-value]
+    decoy.when(
+        mock_reader.on_error(  # type: ignore[func-returns-value]
+            matchers.ErrorMatching(PySerialSerialException)
+        )
+    ).then_raise(io_error)
+
+    with caplog.at_level("DEBUG"):
+        with pytest.raises(PySerialSerialException, match="write failed"):
+            await subject.start()
+
+    assert "Exception in reader callback" not in caplog.text
+    assert "Traceback" not in caplog.text
+    assert "Polling failed" in caplog.text
+    assert "Reader cleanup failed after serial disconnect" in caplog.text
 
 
 async def test_poller_wait_next_poll_error(

@@ -1,7 +1,7 @@
 import { RunHeaderSectionLower } from './RunHeaderSectionLower'
 import { RunHeaderSectionUpper } from './RunHeaderSectionUpper'
 
-import type { MutableRefObject } from 'react'
+import type { MutableRefObject, ReactNode } from 'react'
 import type { AttachedModule, Run, RunStatus } from '@opentrons/api-client'
 import type { RunControls } from '/app/organisms/RunTimeControl'
 import type { ProtocolRunHeaderProps } from '..'
@@ -19,7 +19,7 @@ export type RunHeaderContentProps = ProtocolRunHeaderProps & {
   numberOfAtomicCommands: number
 }
 
-export function RunHeaderContent(props: RunHeaderContentProps): JSX.Element {
+export function RunHeaderContent(props: RunHeaderContentProps): ReactNode {
   return (
     <>
       <RunHeaderSectionUpper {...props} />

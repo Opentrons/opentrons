@@ -218,7 +218,7 @@ class MagDeck(mod_abc.AbstractModule):
             "height": self.current_height,
         }
         return {
-            "status": self.status,
+            "status": self.status.value,
             "data": data,
         }
 

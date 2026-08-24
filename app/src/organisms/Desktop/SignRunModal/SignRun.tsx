@@ -22,20 +22,25 @@ import { useCurrentRunId, useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import styles from './signrunmodal.module.css'
 
+import type { ReactNode } from 'react'
+import type { DocumentationState } from '@opentrons/react-api-client'
+
 // Above typical desktop modal overlays so the toast remains visible on login.
 const TOAST_ABOVE_LOGIN_Z_INDEX = 10002
 
 export interface SignRunModalProps {
   runId: string
   robotName: string
+  documentationState: DocumentationState
   onSigned?: () => void
 }
 
 export function SignRunModal({
   runId,
   robotName,
+  documentationState,
   onSigned,
-}: SignRunModalProps): JSX.Element {
+}: SignRunModalProps): ReactNode {
   const { t, i18n } = useTranslation(['access_control', 'shared'])
 
   const [name, setName] = useState('')
@@ -72,6 +77,7 @@ export function SignRunModal({
     showLoginModal,
     popToast,
     eatToast,
+    documentationState,
     onSigned
   )
 
@@ -178,40 +184,49 @@ export function SignRunModal({
   )
 }
 
-const SignRunModalImpl = NiceModal.create((): JSX.Element | null => {
-  const modal = useModal()
-  const robotName = useCurrentRobotName()
+const SignRunModalImpl = NiceModal.create(
+  ({
+    documentationState,
+  }: {
+    documentationState: DocumentationState
+  }): JSX.Element | null => {
+    const modal = useModal()
+    const robotName = useCurrentRobotName()
 
-  useEffect(() => {
+    useEffect(() => {
+      if (robotName == null) {
+        modal.resolve(false)
+        modal.remove()
+      }
+    }, [modal, robotName])
+
     if (robotName == null) {
-      modal.resolve(false)
-      modal.remove()
+      return null
     }
-  }, [modal, robotName])
 
-  if (robotName == null) {
-    return null
+    return (
+      <ApiHostProvider robotName={robotName}>
+        <SignRunModalCurrentRun
+          robotName={robotName}
+          onSigned={() => {
+            modal.resolve(true)
+            modal.remove()
+          }}
+          documentationState={documentationState}
+        />
+      </ApiHostProvider>
+    )
   }
-
-  return (
-    <ApiHostProvider robotName={robotName}>
-      <SignRunModalCurrentRun
-        robotName={robotName}
-        onSigned={() => {
-          modal.resolve(true)
-          modal.remove()
-        }}
-      />
-    </ApiHostProvider>
-  )
-})
+)
 
 function SignRunModalCurrentRun({
   robotName,
   onSigned,
+  documentationState,
 }: {
   robotName: string
   onSigned: () => void
+  documentationState: DocumentationState
 }): JSX.Element | null {
   const modal = useModal()
   const runId = useCurrentRunId()
@@ -229,10 +244,16 @@ function SignRunModalCurrentRun({
   }
 
   return (
-    <SignRunModal runId={runId} robotName={robotName} onSigned={onSigned} />
+    <SignRunModal
+      runId={runId}
+      robotName={robotName}
+      documentationState={documentationState}
+      onSigned={onSigned}
+    />
   )
 }
 
 /** Open the desktop sign-run modal and await whether the run was signed. */
-export const showSignRunModal = (): Promise<boolean> =>
-  NiceModal.show(SignRunModalImpl)
+export const showSignRunModal = (
+  documentationState: DocumentationState
+): Promise<boolean> => NiceModal.show(SignRunModalImpl, { documentationState })

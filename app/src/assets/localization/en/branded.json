@@ -16,7 +16,7 @@
   "connect_via_usb_description_3": "3. Launch the Opentrons App on the computer to continue.",
   "connection_description_usb": "Connect directly to a computer (running the Opentrons App).",
   "connection_lost_description": "The Opentrons App is unable to communicate with this robot right now. Double check the USB or Wi-Fi connection to the robot, then try to reconnect.",
-  "contact_information": "Download the robot logs from the Opentrons App and send it to support@opentrons.com for assistance.",
+  "contact_information": "Download the robot logs from the Opentrons App and send them to support@opentrons.com for assistance.",
   "contact_support_for_connection_help": "If none of these work, contact Opentrons Support for help (via the question mark link in this app, or by emailing {{support_email}}.)",
   "deck_fixture_setup_modal_bottom_description": "For details on installing different fixture types, scan the QR code or search for “deck configuration” on support.opentrons.com",
   "delete_protocol_from_app": "Delete the protocol, make changes to address the error, and resend the protocol to this robot from the Opentrons App.",

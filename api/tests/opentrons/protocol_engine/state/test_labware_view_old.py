@@ -2083,6 +2083,37 @@ def test_get_stacker_labware_overlap_offset_uses_default_when_no_match() -> None
     assert result == OverlapOffset(x=10, y=20, z=30)
 
 
+@pytest.mark.parametrize(
+    "quirks,should_raise",
+    [
+        (["filterPlate"], True),
+        (["filterPlate", "noLabwarePositionCheck"], True),
+        (None, False),
+        ([], False),
+    ],
+)
+def test_raise_if_labware_incompatible_with_vacuum_module(
+    quirks: list[str] | None, should_raise: bool
+) -> None:
+    """Filter plates cannot sit directly on the vacuum module."""
+    subject = get_labware_view()
+    definition = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+            loadName="some_filter_plate",
+            quirks=quirks,
+        ),
+    )
+
+    if should_raise:
+        with pytest.raises(
+            errors.LabwareIsNotAllowedInLocationError,
+            match="directly onto the vacuum module",
+        ):
+            subject.raise_if_labware_incompatible_with_vacuum_module(definition)
+    else:
+        subject.raise_if_labware_incompatible_with_vacuum_module(definition)
+
+
 def test_get_grip_force(
     flex_50uL_tiprack: LabwareDefinition,
     reservoir_def: LabwareDefinition,

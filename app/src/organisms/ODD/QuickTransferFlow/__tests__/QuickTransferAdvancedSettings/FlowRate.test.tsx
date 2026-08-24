@@ -117,7 +117,6 @@ describe('FlowRate', () => {
         error: null,
         type: 'text',
         value: '35',
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -141,7 +140,6 @@ describe('FlowRate', () => {
         error: null,
         type: 'text',
         value: '62',
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -161,7 +159,6 @@ describe('FlowRate', () => {
         error: null,
         type: 'text',
         value: '',
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}

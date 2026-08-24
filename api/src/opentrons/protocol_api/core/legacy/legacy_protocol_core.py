@@ -57,7 +57,7 @@ class LegacyProtocolCore(
         bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
         extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
     ) -> None:
-        """Build a :py:class:`.LegacyProtocolCore`.
+        """Build a `LegacyProtocolCore`.
 
         :param api_version: The API version to use. If this is ``None``, uses
                             the max supported version.
@@ -71,9 +71,9 @@ class LegacyProtocolCore(
         :param bundled_data: A dict mapping filenames to the contents of data
                              files. Can be used by the protocol, since it is
                              exposed as
-                             :py:attr:`.ProtocolContext.bundled_data`
+                             [`ProtocolContext.bundled_data`][opentrons.protocol_api.ProtocolContext.bundled_data]
         :param extra_labware: A dict mapping labware URIs to definitions. These
-                              URIs are searched during :py:meth:`.load_labware`
+                              URIs are searched during `load_labware()`
                               in addition to the system definitions (if
                               ``bundled_labware`` was not specified). Used to
                               provide custom labware definitions.

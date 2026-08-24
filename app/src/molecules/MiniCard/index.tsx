@@ -64,7 +64,7 @@ const warningOptionStyles = css`
   }
 `
 
-export function MiniCard(props: MiniCardProps): JSX.Element {
+export function MiniCard(props: MiniCardProps): ReactNode {
   const {
     children,
     onClick,

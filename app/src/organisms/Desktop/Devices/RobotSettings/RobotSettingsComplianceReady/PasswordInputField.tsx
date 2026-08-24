@@ -38,6 +38,11 @@ export function PasswordInputField({
           type="button"
           className={styles.password_visibility_button}
           aria-label={t('toggle_password_visibility')}
+          onMouseDown={e => {
+            // This prevents focus from moving from the password field to this toggle button,
+            // but lets the click event go through.
+            e.preventDefault()
+          }}
           onClick={() => {
             setShowPassword(current => !current)
           }}

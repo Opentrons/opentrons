@@ -184,7 +184,6 @@ describe('PipettePath', () => {
         error: null,
         type: 'number',
         value: 20,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -218,7 +217,6 @@ describe('PipettePath', () => {
         error: 'Value must be between 1 to 160',
         type: 'number',
         value: 201,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}

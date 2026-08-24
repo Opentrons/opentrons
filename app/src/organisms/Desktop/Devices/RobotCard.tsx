@@ -48,7 +48,9 @@ import { ReachableBanner } from './ReachableBanner'
 import { RobotOutOfStorageNotification } from './RobotOutOfStorageNotification'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
+import { SignAndDownloadRunBanner } from './SignAndDownloadRunBanner/SignAndDownloadRunBanner'
 
+import type { ReactNode } from 'react'
 import type { GripperData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
@@ -104,6 +106,7 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
             marginRight={SPACING.spacing24}
           />
         ) : null}
+        <SignAndDownloadRunBanner robotName={robotName} />
         {showRobotOutOfStorageNotification ? (
           <RobotOutOfStorageNotification
             robotName={robotName}
@@ -215,7 +218,7 @@ function AttachedDevices(props: { robotName: string }): JSX.Element | null {
   ) : null
 }
 
-function AttachedInstruments(props: { robotName: string }): JSX.Element {
+function AttachedInstruments(props: { robotName: string }): ReactNode {
   const { t, i18n } = useTranslation('devices_landing')
   const isFlex = useIsFlex(props.robotName)
   const { data: pipettesData, isLoading: isPipetteQueryLoading } =

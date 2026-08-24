@@ -8,6 +8,7 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { LoginFieldController } from './LoginFieldController'
 import styles from './OnDeviceLogin.module.css'
 
+import type { ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
 export type LoginStep = 'username' | 'password' | 'confirmPassword'
@@ -44,7 +45,7 @@ export function OnDeviceLogin({
   initialUsername,
   loginError = null,
   onClearLoginError,
-}: OnDeviceLoginProps): JSX.Element {
+}: OnDeviceLoginProps): ReactNode {
   const { t } = useTranslation(['shared', 'access_control'])
   const [confirmPasswordError, setConfirmPasswordError] = useState<
     string | null

@@ -12,6 +12,7 @@ import {
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 
+import type { ReactNode } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface DeckConfigurationDiscardChangesModalProps {
@@ -20,7 +21,7 @@ interface DeckConfigurationDiscardChangesModalProps {
 
 export function DeckConfigurationDiscardChangesModal({
   setShowConfirmationModal,
-}: DeckConfigurationDiscardChangesModalProps): JSX.Element {
+}: DeckConfigurationDiscardChangesModalProps): ReactNode {
   const { t } = useTranslation('device_details')
   const navigate = useNavigate()
   const modalHeader: OddModalHeaderBaseProps = {

@@ -36,7 +36,7 @@ import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instrume
 
 import { ConfirmDeleteCalibrationModal } from './ConfirmDeleteCalibrationModal'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type { DeleteCalRequestParams } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
 import type { PipetteName } from '@opentrons/shared-data'
@@ -60,7 +60,7 @@ export function OverflowMenu({
   serialNumber,
   pipetteName,
   tiprackDefURI = null,
-}: OverflowMenuProps): JSX.Element {
+}: OverflowMenuProps): ReactNode {
   const { t } = useTranslation([
     'device_settings',
     'shared',

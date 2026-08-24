@@ -11,6 +11,7 @@ import { getShellUsbMassStorageMountPaths } from '/app/redux/shell'
 
 import styles from './shared.module.css'
 
+import type { ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 
 interface UsbSelectionScreenProps {
@@ -31,7 +32,7 @@ const getVolumeLabel = (path: string): string | null => {
 export function UsbSelectionScreen({
   question,
   onContinue,
-}: UsbSelectionScreenProps): JSX.Element {
+}: UsbSelectionScreenProps): ReactNode {
   const { t, i18n } = useTranslation(['device_details', 'shared'])
   // only single-function USB mass-storage devices
   const usbMountPaths = useSelector((state: State) =>

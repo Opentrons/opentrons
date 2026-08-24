@@ -175,10 +175,10 @@ describe('UserManagement', () => {
     expect(screen.queryByText('alice')).not.toBeInTheDocument()
   })
 
-  it('opens the add user modal when Add User is clicked', () => {
+  it('opens the add user modal when Add user is clicked', () => {
     render()
     expandAccordion()
-    fireEvent.click(screen.getByRole('button', { name: 'Add User' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add user' }))
     screen.getByText('mock AddUserModal')
   })
 

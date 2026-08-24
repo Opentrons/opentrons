@@ -19,6 +19,7 @@ import { WifiAuthenticationSelector } from './WifiAuthenticationSelector'
 import { WifiConnectStatus } from './WifiConnectStatus'
 import { WifiCredentialForm } from './WifiCredentialForm'
 
+import type { ReactNode } from 'react'
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { Dispatch } from '/app/redux/types'
 
@@ -30,7 +31,7 @@ export type WifiScreenOption =
   | 'SetWifiCred'
   | 'WifiConnectStatus'
 
-export function ConnectViaWifi(): JSX.Element {
+export function ConnectViaWifi(): ReactNode {
   const [selectedSsid, setSelectedSsid] = useState<string>('')
   const [selectedAuthType, setSelectedAuthType] =
     useState<WifiSecurityType>('wpa-psk')

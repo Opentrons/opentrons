@@ -11,6 +11,7 @@ import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { LPC_STEP_KEY, STEP_KEY_TO_I18N_KEY } from '/app/redux/protocol-runs'
 
+import type { ReactNode } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { StepKey } from '/app/redux/protocol-runs'
 
@@ -26,7 +27,7 @@ export function ConfirmSetupStepsCompleteModal({
   missingSteps,
   onConfirmClick,
   isRunStarting,
-}: ConfirmSetupStepsCompleteModalProps): JSX.Element {
+}: ConfirmSetupStepsCompleteModalProps): ReactNode {
   const { i18n, t } = useTranslation(['protocol_setup', 'shared'])
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('are_you_sure_you_want_to_proceed'),

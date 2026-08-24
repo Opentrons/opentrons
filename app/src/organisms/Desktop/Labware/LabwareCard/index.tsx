@@ -28,6 +28,7 @@ import {
 import { UNIVERSAL_FLAT_ADAPTER_X_DIMENSION } from '../LabwareDetails/Gallery'
 import { CustomLabwareOverflowMenu } from './CustomLabwareOverflowMenu'
 
+import type { ReactNode } from 'react'
 import type { LabwareDefAndDate } from '/app/local-resources/labware'
 
 export interface LabwareCardProps {
@@ -35,7 +36,7 @@ export interface LabwareCardProps {
   onClick: () => void
 }
 
-export function LabwareCard(props: LabwareCardProps): JSX.Element {
+export function LabwareCard(props: LabwareCardProps): ReactNode {
   const { t } = useTranslation(['labware_landing', 'branded'])
   const { definition, modified, filename } = props.labware
   const apiName = definition.parameters.loadName

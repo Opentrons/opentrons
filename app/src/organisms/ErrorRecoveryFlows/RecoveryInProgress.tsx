@@ -15,6 +15,7 @@ import { InProgressModal } from '/app/molecules/InProgressModal'
 
 import { RECOVERY_MAP } from './constants'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps, RobotMovingRoute } from './types'
 
 export function RecoveryInProgress({
@@ -23,7 +24,7 @@ export function RecoveryInProgress({
   routeUpdateActions,
   doorStatusUtils,
   currentRecoveryOptionUtils,
-}: RecoveryContentProps): JSX.Element {
+}: RecoveryContentProps): ReactNode {
   const {
     ROBOT_CANCELING,
     ROBOT_IN_MOTION,

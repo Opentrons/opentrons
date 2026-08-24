@@ -5,7 +5,6 @@ from datetime import datetime
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocol_engine import (
     CommandPointer,
@@ -21,6 +20,7 @@ from opentrons.protocol_engine.errors import CommandDoesNotExistError
 from server_utils.fastapi_utils.models.json_api import MultiBodyMeta, RequestModel
 
 from robot_server.errors.error_responses import ApiError
+from robot_server.hardware import HardwareStateStore
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
 )
@@ -83,7 +83,7 @@ async def test_get_current_run_from_url_not_current(
 async def test_create_run_command(
     decoy: Decoy,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
-    mock_hardware_api: HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
 ) -> None:
     """It should add the requested command to the ProtocolEngine and return it."""
     command_request = pe_commands.WaitForResumeCreate(
@@ -98,8 +98,6 @@ async def test_create_run_command(
         params=pe_commands.WaitForResumeParams(message="Hello"),
     )
 
-    decoy.when(mock_hardware_api.door_state).then_return(DoorState.CLOSED)
-
     decoy.when(
         await mock_maintenance_run_orchestrator_store.add_command_and_wait_for_interval(
             request=pe_commands.WaitForResumeCreate(
@@ -112,7 +110,7 @@ async def test_create_run_command(
     ).then_return(command_once_added)
 
     decoy.when(
-        mock_maintenance_run_orchestrator_store.get_command("command-id")
+        await mock_maintenance_run_orchestrator_store.get_command("command-id")
     ).then_return(command_once_added)
 
     result = await create_run_command(
@@ -122,7 +120,7 @@ async def test_create_run_command(
         run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         timeout=None,
         check_estop=True,
-        hardware=mock_hardware_api,
+        hardware_state_store=hardware_state_store,
     )
 
     assert result.content.data == command_once_added
@@ -132,7 +130,7 @@ async def test_create_run_command(
 async def test_create_run_command_blocking_completion(
     decoy: Decoy,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
-    mock_hardware_api: HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
 ) -> None:
     """It should be able to create a command and wait for it to execute."""
     command_request = pe_commands.WaitForResumeCreate(
@@ -149,8 +147,6 @@ async def test_create_run_command_blocking_completion(
         result=pe_commands.WaitForResumeResult(),
     )
 
-    decoy.when(mock_hardware_api.door_state).then_return(DoorState.CLOSED)
-
     decoy.when(
         await mock_maintenance_run_orchestrator_store.add_command_and_wait_for_interval(
             request=command_request, wait_until_complete=True, timeout=999
@@ -158,7 +154,7 @@ async def test_create_run_command_blocking_completion(
     ).then_return(command_once_completed)
 
     decoy.when(
-        mock_maintenance_run_orchestrator_store.get_command("command-id")
+        await mock_maintenance_run_orchestrator_store.get_command("command-id")
     ).then_return(command_once_completed)
 
     result = await create_run_command(
@@ -168,7 +164,7 @@ async def test_create_run_command_blocking_completion(
         timeout=999,
         run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         check_estop=True,
-        hardware=mock_hardware_api,
+        hardware_state_store=hardware_state_store,
     )
 
     assert result.content.data == command_once_completed
@@ -178,12 +174,12 @@ async def test_create_run_command_blocking_completion(
 async def test_create_run_command_door_open_blocks_by_default(
     decoy: Decoy,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
-    mock_hardware_api: HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
 ) -> None:
     """It should return a 409 by default when the door is open."""
     command_request = pe_commands.HomeCreate(params=pe_commands.HomeParams())
 
-    decoy.when(mock_hardware_api.door_state).then_return(DoorState.OPEN)
+    hardware_state_store._door_state = DoorState.OPEN
 
     with pytest.raises(ApiError) as exc_info:
         await create_run_command(
@@ -193,7 +189,7 @@ async def test_create_run_command_door_open_blocks_by_default(
             run_orchestrator_store=mock_maintenance_run_orchestrator_store,
             timeout=None,
             check_estop=True,
-            hardware=mock_hardware_api,
+            hardware_state_store=hardware_state_store,
         )
 
     assert exc_info.value.status_code == 409
@@ -203,7 +199,7 @@ async def test_create_run_command_door_open_blocks_by_default(
 async def test_create_run_command_door_open_allows_when_opted_out(
     decoy: Decoy,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
-    mock_hardware_api: HardwareControlAPI,
+    hardware_state_store: HardwareStateStore,
 ) -> None:
     """It should allow commands through when requiresClosedDoor is False, even if the door is open."""
     command_request = pe_commands.HomeCreate(params=pe_commands.HomeParams())
@@ -216,7 +212,7 @@ async def test_create_run_command_door_open_allows_when_opted_out(
         params=pe_commands.HomeParams(),
     )
 
-    decoy.when(mock_hardware_api.door_state).then_return(DoorState.OPEN)
+    hardware_state_store._door_state = DoorState.OPEN
 
     decoy.when(
         await mock_maintenance_run_orchestrator_store.add_command_and_wait_for_interval(
@@ -230,7 +226,7 @@ async def test_create_run_command_door_open_allows_when_opted_out(
     ).then_return(command_once_added)
 
     decoy.when(
-        mock_maintenance_run_orchestrator_store.get_command("command-id")
+        await mock_maintenance_run_orchestrator_store.get_command("command-id")
     ).then_return(command_once_added)
 
     result = await create_run_command(
@@ -240,7 +236,7 @@ async def test_create_run_command_door_open_allows_when_opted_out(
         run_orchestrator_store=mock_maintenance_run_orchestrator_store,
         timeout=None,
         check_estop=True,
-        hardware=mock_hardware_api,
+        hardware_state_store=hardware_state_store,
         requiresClosedDoor=False,
     )
 
@@ -271,7 +267,7 @@ async def test_get_run_commands(
     )
 
     decoy.when(
-        mock_maintenance_run_data_manager.get_current_command("run-id")
+        await mock_maintenance_run_data_manager.get_current_command("run-id")
     ).then_return(
         CommandPointer(
             command_id="current-command-id",
@@ -281,7 +277,7 @@ async def test_get_run_commands(
         )
     )
     decoy.when(
-        mock_maintenance_run_data_manager.get_recovery_target_command("run-id")
+        await mock_maintenance_run_data_manager.get_recovery_target_command("run-id")
     ).then_return(
         CommandPointer(
             command_id="recovery-target-command-id",
@@ -292,7 +288,7 @@ async def test_get_run_commands(
     )
 
     decoy.when(
-        mock_maintenance_run_data_manager.get_commands_slice(
+        await mock_maintenance_run_data_manager.get_commands_slice(
             run_id="run-id",
             cursor=None,
             length=42,
@@ -358,10 +354,10 @@ async def test_get_run_commands_empty(
 ) -> None:
     """It should return an empty commands list if no commands."""
     decoy.when(
-        mock_maintenance_run_data_manager.get_current_command("run-id")
+        await mock_maintenance_run_data_manager.get_current_command("run-id")
     ).then_return(None)
     decoy.when(
-        mock_maintenance_run_data_manager.get_commands_slice(
+        await mock_maintenance_run_data_manager.get_commands_slice(
             run_id="run-id", cursor=21, length=42
         )
     ).then_return(CommandSlice(commands=[], cursor=0, total_length=0))
@@ -387,7 +383,7 @@ async def test_get_run_commands_not_found(
     not_found_error = MaintenanceRunNotFoundError("oh no")
 
     decoy.when(
-        mock_maintenance_run_data_manager.get_commands_slice(
+        await mock_maintenance_run_data_manager.get_commands_slice(
             run_id="run-id", cursor=21, length=42
         )
     ).then_raise(not_found_error)
@@ -420,7 +416,7 @@ async def test_get_run_command_by_id(
     )
 
     decoy.when(
-        mock_maintenance_run_data_manager.get_command("run-id", "command-id")
+        await mock_maintenance_run_data_manager.get_command("run-id", "command-id")
     ).then_return(command)
 
     result = await get_run_command(
@@ -447,7 +443,7 @@ async def test_get_run_command_missing(
 ) -> None:
     """It should 404 if you attempt to get a non-existent command."""
     decoy.when(
-        mock_maintenance_run_data_manager.get_command(
+        await mock_maintenance_run_data_manager.get_command(
             run_id="run-id", command_id="command-id"
         )
     ).then_raise(exception)

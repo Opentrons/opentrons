@@ -26,6 +26,8 @@
     "y": 0,
     "z": 0
   },
+  "gripForce": 15,
+  "gripHeightFromLabwareBottom": 11.95,
   "dimensions": {
     "xDimension": 127.75,
     "yDimension": 85.49,

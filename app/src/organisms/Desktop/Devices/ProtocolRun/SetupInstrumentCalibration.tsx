@@ -26,6 +26,7 @@ import { SetupFlexPipetteCalibrationItem } from './SetupFlexPipetteCalibrationIt
 import { SetupGripperCalibrationItem } from './SetupGripperCalibrationItem'
 import { SetupPipetteCalibrationItem } from './SetupPipetteCalibrationItem'
 
+import type { ReactNode } from 'react'
 import type { GripperData } from '@opentrons/api-client'
 
 const EQUIPMENT_POLL_MS = 5000
@@ -38,7 +39,7 @@ interface SetupInstrumentCalibrationProps {
 export function SetupInstrumentCalibration({
   robotName,
   runId,
-}: SetupInstrumentCalibrationProps): JSX.Element {
+}: SetupInstrumentCalibrationProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
   const isFlex = useIsFlex(robotName)

@@ -4,13 +4,15 @@ import { COLORS, RobotInfoLabel, StyledText } from '@opentrons/components'
 
 import styles from './slotdetailsemptystate.module.css'
 
+import type { ReactNode } from 'react'
+
 interface SlotDetailsEmptyStateProps {
   slotId: string
 }
 
 export function SlotDetailsEmptyState(
   props: SlotDetailsEmptyStateProps
-): JSX.Element {
+): ReactNode {
   const { slotId } = props
   const { t } = useTranslation('protocol_visualization')
   return (

@@ -12,6 +12,8 @@ import { useRecordSelection } from '../hooks/useRecordSelection'
 import fileManagerStyles from '../robotsettingsfilemanager.module.css'
 import styles from './diagnosticfiles.module.css'
 
+import type { ReactNode } from 'react'
+
 const DIAGNOSTIC_ROWS = [
   { id: 'troubleshooting', i18nKey: 'troubleshooting_logs' },
   { id: 'calibration', i18nKey: 'calibration_logs' },
@@ -23,7 +25,7 @@ interface DiagnosticsFilesProps {
 
 export function DiagnosticsFiles({
   robotName,
-}: DiagnosticsFilesProps): JSX.Element {
+}: DiagnosticsFilesProps): ReactNode {
   const { t } = useTranslation('device_details')
 
   const { downloadLogs, isDownloading: isDownloadingLogs } =

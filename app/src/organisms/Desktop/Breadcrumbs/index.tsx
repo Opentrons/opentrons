@@ -26,7 +26,7 @@ import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import styles from './breadcrumbs.module.css'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type { DesktopRouteParams } from '/app/App/types'
 import type { State } from '/app/redux/types'
 
@@ -38,7 +38,7 @@ interface CrumbAndSeparatorProps {
 function CrumbAndSeparator({
   crumbName,
   isLastCrumb,
-}: CrumbAndSeparatorProps): JSX.Element {
+}: CrumbAndSeparatorProps): ReactNode {
   return (
     <div
       className={clsx(
@@ -99,7 +99,7 @@ interface AccountIconAndMenuProps {
   robotName: string
 }
 
-function AccountIconAndMenu(props: AccountIconAndMenuProps): JSX.Element {
+function AccountIconAndMenu(props: AccountIconAndMenuProps): ReactNode {
   const { initial, robotName } = props
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const onClickOutside = useCallback(() => {
@@ -152,7 +152,7 @@ interface LoginLinkProps {
   robotName: string
 }
 
-function LoginLink({ robotName }: LoginLinkProps): JSX.Element {
+function LoginLink({ robotName }: LoginLinkProps): ReactNode {
   const { t } = useTranslation('top_navigation')
   const handleClick = useCallback(() => {
     if (robotName == null) {

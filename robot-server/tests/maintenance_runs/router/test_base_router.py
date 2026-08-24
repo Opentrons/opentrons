@@ -179,7 +179,7 @@ async def test_get_run_data_from_url(
         hasEverEnteredErrorRecovery=False,
     )
 
-    decoy.when(mock_maintenance_run_data_manager.get("run-id")).then_return(
+    decoy.when(await mock_maintenance_run_data_manager.get("run-id")).then_return(
         expected_response
     )
 
@@ -259,9 +259,9 @@ async def test_get_current_run(
     decoy.when(mock_maintenance_run_data_manager.current_run_id).then_return(
         "current-run-id"
     )
-    decoy.when(mock_maintenance_run_data_manager.get("current-run-id")).then_return(
-        current_run_data
-    )
+    decoy.when(
+        await mock_maintenance_run_data_manager.get("current-run-id")
+    ).then_return(current_run_data)
 
     result = await get_current_run(run_data_manager=mock_maintenance_run_data_manager)
 
@@ -320,7 +320,7 @@ async def test_delete_run_by_id_with_external_run(
     """It should pass in external camera settings if an external run exists when deleting a maintenance run."""
     assert mock_run_data_manager.current_run_id is not None
     decoy.when(
-        mock_run_data_manager._get_good_state_summary(
+        await mock_run_data_manager._get_good_state_summary(
             mock_run_data_manager.current_run_id
         )
     ).then_return(

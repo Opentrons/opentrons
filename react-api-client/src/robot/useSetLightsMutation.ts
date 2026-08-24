@@ -1,3 +1,5 @@
+import { useQueryClient } from 'react-query'
+
 import { setLights } from '@opentrons/api-client'
 
 import { useDocumentedMutation } from '../accessControl'
@@ -34,13 +36,17 @@ export function useSetLightsMutation(
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
+  const queryClient = useQueryClient()
   const mutation = useDocumentedMutation<Lights, AxiosError, SetLightsData>(
     documentationState,
     ['set_lights'],
     getQueryKey(host, 'robot', 'lights'),
     ({ variables: setLightsData, userNotes }) =>
       setLights(host!, setLightsData, userNotes)
-        .then(response => response.data)
+        .then(response => {
+          queryClient.setQueryData(getQueryKey(host, 'lights'), response.data)
+          return response.data
+        })
         .catch(e => {
           throw e
         }),

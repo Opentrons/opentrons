@@ -14,7 +14,7 @@ from uuid import uuid4
 import Pyro5.api
 
 from opentrons.config import feature_flags
-from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
+from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
 
 from . import run_process_entry_point
 from .run_process import DirectedRunProcess, register_process_types
@@ -33,7 +33,7 @@ _RUN_PROCESS_LIMIT = 1  # Number of run processes to keep qeueued
 _SIMULATING_PROCESS_LIMIT = 1  # Number of simulation processes to keep qeueued
 
 
-_RUN_PROXY_TIMEOUT = 30  # seconds
+_RUN_PROCESS_TIMEOUT = 60  # seconds
 _RUN_PROCESS_TERMINATE_TIMEOUT = 10  # seconds
 
 
@@ -191,14 +191,14 @@ class RunProcessPyroProvider:
     ) -> List[_RunProcess]:
         """Validate that the process registries have processes that can be used.
 
-        If `simulator` sprovided, this will validate that there is a simulation process available.
+        If `simulator` is provided, this will validate that there is a simulation process available.
         Otherwise, it will validate that a normal run process is available.
         """
         if simulator:
             if self._simulating_run_processes is None:
                 # There are no run processes yet, try again throughout the timeout period and raise if one never appears
                 start_time = time.monotonic()
-                while time.monotonic() - start_time < _RUN_PROXY_TIMEOUT:
+                while time.monotonic() - start_time < _RUN_PROCESS_TIMEOUT:
                     if self._simulating_run_processes is not None:
                         # Simulation process is ready
                         return self._simulating_run_processes
@@ -209,7 +209,7 @@ class RunProcessPyroProvider:
             if self._run_processes is None:
                 # There are no run processes yet, try again throughout the timeout period and raise if one never appears
                 start_time = time.monotonic()
-                while time.monotonic() - start_time < _RUN_PROXY_TIMEOUT:
+                while time.monotonic() - start_time < _RUN_PROCESS_TIMEOUT:
                     if self._run_processes is not None:
                         # Run process is ready
                         return self._run_processes
@@ -218,19 +218,6 @@ class RunProcessPyroProvider:
                     "Active protocol run process never became available."
                 )
             return self._run_processes
-
-    @staticmethod
-    async def _wait_for_proxy(proxy_name: str) -> Optional[DirectedRunProcess]:
-        start_time = time.monotonic()
-        with Pyro5.api.locate_ns() as ns:
-            while time.monotonic() - start_time < _RUN_PROXY_TIMEOUT:
-                if proxy_name in ns.list():
-                    proxy = AsyncClientPyroObject(
-                        Pyro5.api.Proxy(ns.list()[proxy_name])  # type: ignore[no-untyped-call]
-                    )
-                    return cast(DirectedRunProcess, cast(object, proxy))
-                await asyncio.sleep(0.01)
-        return None
 
     async def wait_for_run_proxy(
         self, simulator: Optional[bool] = False
@@ -246,10 +233,10 @@ class RunProcessPyroProvider:
         if run_process is None:
             run_process = self._set_active_process(process_registry=process_regisry)
 
-        run_proxy = await self._wait_for_proxy(run_process.pyroname)
+        run_proxy = await wait_for_proxy(proxy_name=run_process.pyroname)
         if run_proxy is None:
             raise RuntimeError(f"Can't resolve pyro proxy '{run_process.pyroname}'")
-        return run_proxy
+        return cast(DirectedRunProcess, cast(object, run_proxy))
 
     @staticmethod
     def _open_process(process_name: str, user_name: str) -> subprocess.Popen[bytes]:
@@ -278,10 +265,13 @@ class RunProcessPyroProvider:
             process.kill()
 
     async def _dequeue_process(
-        self, process: _RunProcess, process_registry: List[_RunProcess]
+        self,
+        process: _RunProcess,
+        process_registry: List[_RunProcess],
+        broadcast_mode: bool = False,
     ) -> None:
         """Removes a process from a process registry, ending that process and delisting it from the global Pyro Nameserver."""
-        with Pyro5.api.locate_ns() as ns:
+        with Pyro5.api.locate_ns(broadcast=broadcast_mode) as ns:
             ns.remove(process.pyroname)
         await self._end_process(process=process.process)
         process_registry.remove(process)

@@ -4,7 +4,8 @@ import { useQueryClient } from 'react-query'
 import { createLiveCommand } from '@opentrons/api-client'
 
 import { useDocumentedMutation } from '../accessControl'
-import { getQueryKey, useHost } from '../api'
+import { useHost } from '../api'
+import { modulesQueryKey } from '../modules'
 
 import type {
   UseMutateAsyncFunction,
@@ -66,9 +67,11 @@ export function useCreateLiveCommandMutation(
         userNotes
       ).then(response => {
         queryClient
-          .invalidateQueries(getQueryKey(host, 'commands'))
+          .invalidateQueries(modulesQueryKey(host))
           .catch((e: Error) => {
-            console.error(`error invalidating commands query: ${e.message}`)
+            console.error(
+              `error invalidating live commands query: ${e.message}`
+            )
           })
         addActionToDocument?.(response.data.data)
         return response.data

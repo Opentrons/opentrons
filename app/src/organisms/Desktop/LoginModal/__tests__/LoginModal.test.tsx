@@ -33,6 +33,10 @@ vi.mock('/app/redux-resources/robots', () => ({
 }))
 vi.mock('/app/redux/robot-auth', () => ({
   useAccessTokenForRobot: vi.fn(() => null),
+  logOut: vi.fn((payload: { robotName: string }) => ({
+    type: 'robotAuth/logOut',
+    payload,
+  })),
 }))
 
 const ROBOT_NAME = 'otie'
@@ -86,6 +90,12 @@ function mockLoginFailure(message: string): void {
   }))
 }
 
+function mockLoginAccountLocked(): void {
+  mockLoginFailure(
+    'Account locked. Please contact an administrator to unlock your account.'
+  )
+}
+
 function mockLoginSSLError(): void {
   const sslError = {
     isAxiosError: true,
@@ -106,7 +116,7 @@ function mockSetNewPasswordSuccess(
   vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(({ onSuccess }) => ({
     submitNewPassword: (username: string, password: string) => {
       onSubmit?.(username, password)
-      onSuccess(username, TOKEN_RESPONSE)
+      onSuccess(username)
     },
     isLoading: false,
   }))
@@ -175,10 +185,34 @@ describe('LoginModal', () => {
   it('renders the login form when opened', () => {
     renderAndOpenLoginModal()
 
-    screen.getByText('Compliance Ready Software Login')
+    screen.getByText('Compliance Ready Software login')
     screen.getByLabelText('Username')
     screen.getByLabelText('Password')
     screen.getByRole('button', { name: 'Forgot password?' })
+    expect(screen.getByRole('button', { name: 'Log in' })).toBeEnabled()
+  })
+
+  it('shows required field errors when log in is clicked with empty fields', () => {
+    renderAndOpenLoginModal()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+
+    screen.getByText('Username required')
+    screen.getByText('Password required')
+    expect(submitPassword).not.toHaveBeenCalled()
+  })
+
+  it('shows a password required error when username is filled', () => {
+    renderAndOpenLoginModal()
+
+    fireEvent.change(screen.getByLabelText('Username'), {
+      target: { value: 'alice' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+
+    screen.getByText('Password required')
+    expect(screen.queryByText('Username required')).toBeNull()
+    expect(submitPassword).not.toHaveBeenCalled()
   })
 
   it('shows forgot password content and returns to login on back', () => {
@@ -220,7 +254,7 @@ describe('LoginModal', () => {
       AUTH_USER,
       TOKEN_RESPONSE
     )
-    expect(screen.queryByText('Compliance Ready Software Login')).toBeNull()
+    expect(screen.queryByText('Compliance Ready Software login')).toBeNull()
   })
 
   it('shows an error when authentication fails', () => {
@@ -237,7 +271,25 @@ describe('LoginModal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
 
     screen.getByText('Test error message')
-    screen.getByText('Compliance Ready Software Login')
+    screen.getByText('Compliance Ready Software login')
+  })
+
+  it('shows an account locked error when the account is locked', () => {
+    mockLoginAccountLocked()
+
+    renderAndOpenLoginModal()
+
+    fireEvent.change(screen.getByLabelText('Username'), {
+      target: { value: 'alice' },
+    })
+    fireEvent.change(screen.getByLabelText('Password'), {
+      target: { value: 'secret-password' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
+
+    screen.getByText(
+      'Account locked. Please contact an administrator to unlock your account.'
+    )
   })
 
   it('shows password expired view when login requires a new password', () => {
@@ -258,7 +310,7 @@ describe('LoginModal', () => {
     screen.getByRole('button', { name: 'Confirm' })
   })
 
-  it('submits a new password and closes on success', () => {
+  it('returns to login after setting a new password', () => {
     mockLoginRequiringPasswordReset()
     mockSetNewPasswordSuccess(submitNewPassword)
 
@@ -275,7 +327,11 @@ describe('LoginModal', () => {
 
     expect(submitNewPassword).toHaveBeenCalledWith('alice', 'new-password')
     expect(storeLoginState).toHaveBeenCalledTimes(1)
-    expect(screen.queryByText('Compliance Ready Software Login')).toBeNull()
+    screen.getByText('Password reset for alice')
+    screen.getByTestId('Toast_success')
+    screen.getByText('Compliance Ready Software login')
+    expect(screen.getByLabelText('Username')).toHaveValue('alice')
+    expect(screen.getByLabelText('Password')).toHaveValue('')
   })
 
   it('shows a mismatch error when confirm password does not match', () => {

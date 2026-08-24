@@ -29,6 +29,8 @@ from opentrons_shared_data.errors.exceptions import (
     FirmwareUpdateFailedError,
     GripperNotPresentError,
     InvalidActuator,
+    MissingConfigurationData,
+    ModuleNotPresent,
     PipetteLiquidNotFoundError,
     PipetteOverpressureError,
     PositionUnknownError,
@@ -110,6 +112,7 @@ from .types import (
     HardwareEvent,
     HardwareEventHandler,
     HardwareFeatureFlags,
+    HardwareSystemInfo,
     HepaFanState,
     HepaUVState,
     InstrumentProbeType,
@@ -398,7 +401,9 @@ class OT3API(
                 mod_log.exception("Errored during module asynchronous callback")
 
     def _send_subsystem_notification(self) -> None:
-        subsystem_event = SubsystemConnectionNotification()
+        subsystem_event = SubsystemConnectionNotification(
+            tracked_subsystems=self.attached_subsystems
+        )
         mod_log.info("Forwarding subsystem event.")
         for cb in self._callbacks:
             try:
@@ -561,6 +566,26 @@ class OT3API(
 
         return unregister
 
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    async def register_callback_async(
+        self, cb: HardwareEventHandler
+    ) -> Callable[[], Awaitable[None]]:
+        """As register_callback, but async to be more friendly to remote invocation."""
+        self._callbacks.add(cb)
+
+        async def unregister() -> None:
+            self._callbacks.remove(cb)
+
+        return unregister
+
+    async def get_hw_details(self) -> HardwareSystemInfo:
+        serial = await self.get_serial_number()
+        return HardwareSystemInfo(
+            fw_version=self.fw_version,
+            board_revision=self.board_revision,
+            serial_number=serial,
+        )
+
     def get_fw_version(self) -> str:
         """
         Return the firmware version of the connected hardware.
@@ -682,6 +707,21 @@ class OT3API(
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def attached_modules(self) -> List[modules.AbstractModule]:
         return self._backend.module_controls.available_modules
+
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    async def get_attached_modules(self) -> list[modules.AbstractModule]:
+        return self.attached_modules
+
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    async def get_attached_module_by_serial(
+        self, serial: str
+    ) -> modules.AbstractModule:
+        for module in self.attached_modules:
+            if module.device_info.get("serial") == serial:
+                return module
+        raise ModuleNotPresent(
+            serial, message=f"Could not find module with serial {serial}"
+        )
 
     @property
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
@@ -1419,11 +1459,11 @@ class OT3API(
         for axis in [Axis.Z_L, Axis.Z_R, Axis.Z_G]:
             if axis in position:
                 have_z = True
-                if Axis.Z_L:
+                if axis == Axis.Z_L:
                     carriage_effectors_offset = (
                         self._robot_calibration.left_mount_offset
                     )
-                elif Axis.Z_R:
+                elif axis == Axis.Z_R:
                     carriage_effectors_offset = (
                         self._robot_calibration.right_mount_offset
                     )
@@ -1438,7 +1478,6 @@ class OT3API(
         for axis, position_value in position.items():
             if axis not in absolute_positions:
                 absolute_positions[axis] = position_value
-
         await self._move(
             target_position=absolute_positions,
             speed=speed,
@@ -1925,9 +1964,10 @@ class OT3API(
         else:
             self._log.error("Tried to specify an OT2 config object")
 
-    async def update_config(self, **kwargs: Any) -> None:
+    async def update_config(self, **kwargs: Any) -> OT3Config:
         """Update values of the robot's configuration."""
         self._config = self._config.model_copy(update=kwargs)
+        return self._config
 
     @property
     def hardware_feature_flags(self) -> HardwareFeatureFlags:
@@ -2582,7 +2622,7 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         cp_override: Optional[CriticalPoint] = None,
     ) -> top_types.Point:
-        if mount == OT3Mount.GRIPPER:
+        if mount == OT3Mount.GRIPPER or mount == top_types.Mount.EXTENSION:
             return self._gripper_handler.get_critical_point(cp_override)
         else:
             return self._pipette_handler.critical_point_for(
@@ -3339,7 +3379,10 @@ class OT3API(
     def estop_status(self) -> EstopOverallStatus:
         return self._backend.estop_status
 
-    def estop_acknowledge_and_clear(self) -> EstopOverallStatus:
+    async def get_estop_status(self) -> EstopOverallStatus:
+        return self._backend.estop_status
+
+    async def estop_acknowledge_and_clear(self) -> EstopOverallStatus:
         """Attempt to acknowledge an Estop event and clear the status.
 
         Returns the estop status after clearing the status."""
@@ -3432,3 +3475,19 @@ class OT3API(
         )
         cp = self.critical_point_for(realmount, None)
         return end_point + offset + cp
+
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
+    async def get_motor_usage_data(
+        self,
+        expected_nodes: Optional[List[Axis]] = None,
+    ) -> Dict[Axis, Dict[str, int]]:
+        return await self._backend.get_motor_usage_data(expected_nodes)
+
+    async def update_module(self, module_serial: str) -> None:
+        module = await self.get_attached_module_by_serial(module_serial)
+        bundled_fw = module.bundled_fw
+        if bundled_fw is None:
+            raise MissingConfigurationData(
+                message=f"No stored firmware for {module.name} {module.serial_number}"
+            )
+        return await modules.update_firmware(module, bundled_fw.path)

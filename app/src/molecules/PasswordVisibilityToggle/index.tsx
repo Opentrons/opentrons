@@ -4,26 +4,34 @@ import { Icon, StyledText } from '@opentrons/components'
 
 import styles from './passwordvisibilitytoggle.module.css'
 
+import type { ReactNode } from 'react'
+
 interface PasswordVisibilityToggleProps {
   /** Whether the password is currently visible (i.e. input type="text"). */
   isVisible: boolean
-  /** Called when the user taps the toggle. The caller owns visibility state and
-   * is responsible for refocusing the input if needed. */
+  /** Called when the user taps the toggle. */
   onToggle: () => void
 }
 
 /**
- * Touch-screen "Show / Hide" button rendered next to a password input on the
- * ODD. Used by `OnDeviceLogin` and `SetWifiCred` to keep the eye-icon control
- * outside the input field itself.
+ * On-device display "Show / Hide" button rendered next to a password input.
  */
 export function PasswordVisibilityToggle({
   isVisible,
   onToggle,
-}: PasswordVisibilityToggleProps): JSX.Element {
+}: PasswordVisibilityToggleProps): ReactNode {
   const { t } = useTranslation('device_settings')
   return (
-    <button type="button" onClick={onToggle} className={styles.toggle_button}>
+    <button
+      type="button"
+      onMouseDown={e => {
+        // This prevents focus from moving from the password field to this toggle button,
+        // but lets the click event go through.
+        e.preventDefault()
+      }}
+      onClick={onToggle}
+      className={styles.toggle_button}
+    >
       <Icon name={isVisible ? 'eye-slash' : 'eye'} size="3rem" />
       <StyledText oddStyle="bodyTextSemiBold">
         {isVisible ? t('hide') : t('show')}

@@ -12,7 +12,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-export function DisplaySearchNetwork(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function DisplaySearchNetwork(): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared'])
   return (
     <Flex

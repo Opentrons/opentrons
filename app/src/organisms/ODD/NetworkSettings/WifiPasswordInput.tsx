@@ -10,6 +10,7 @@ import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 
 import styles from './wifipasswordinput.module.css'
 
+import type { ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
 interface WifiPasswordInputProps {
@@ -20,16 +21,12 @@ interface WifiPasswordInputProps {
 export function WifiPasswordInput({
   password,
   setPassword,
-}: WifiPasswordInputProps): JSX.Element {
+}: WifiPasswordInputProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared'])
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
-  const handleBlur = (): void => {
-    if (inputRef.current != null) inputRef.current?.focus()
-  }
-
   const mainWrapperClasses = clsx(
     styles.main_wrapper,
     !isUnboxingFlowOngoing && styles.main_wrapper_with_top_margin
@@ -55,7 +52,6 @@ export function WifiPasswordInput({
                 aria-label="wifi_password"
                 value={password}
                 type={showPassword ? 'text' : 'password'}
-                onBlur={handleBlur}
                 ref={inputRef}
                 autoFocus
                 onChange={e => {
@@ -67,7 +63,6 @@ export function WifiPasswordInput({
               isVisible={showPassword}
               onToggle={() => {
                 setShowPassword(currentState => !currentState)
-                inputRef?.current?.focus()
               }}
             />
           </div>

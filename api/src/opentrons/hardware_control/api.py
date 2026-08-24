@@ -7,6 +7,7 @@ from dataclasses import replace
 from functools import partial
 from typing import (
     Any,
+    Awaitable,
     Callable,
     Dict,
     List,
@@ -20,6 +21,8 @@ from typing import (
 )
 
 from opentrons_shared_data.errors.exceptions import (
+    MissingConfigurationData,
+    ModuleNotPresent,
     PositionUnknownError,
     UnsupportedHardwareCommand,
 )
@@ -63,6 +66,7 @@ from .types import (
     HardwareEvent,
     HardwareEventHandler,
     HardwareFeatureFlags,
+    HardwareSystemInfo,
     MotionChecks,
     PauseType,
     StatusBarState,
@@ -358,6 +362,17 @@ class API(  # type: ignore[misc]
 
         return unregister
 
+    async def register_callback_async(
+        self, cb: HardwareEventHandler
+    ) -> Callable[[], Awaitable[None]]:
+        """As register_callback, but async to be more friendly to remote invocation."""
+        self._callbacks.add(cb)
+
+        async def unregister() -> None:
+            self._callbacks.remove(cb)
+
+        return unregister
+
     def get_fw_version(self) -> str:
         """
         Return the firmware version of the connected motor control board.
@@ -374,6 +389,14 @@ class API(  # type: ignore[misc]
     @property
     def fw_version(self) -> str:
         return self.get_fw_version()
+
+    async def get_hw_details(self) -> HardwareSystemInfo:
+        serial = await self.get_serial_number()
+        return HardwareSystemInfo(
+            fw_version=self.fw_version,
+            board_revision=self.board_revision,
+            serial_number=serial,
+        )
 
     @property
     def board_revision(self) -> str:
@@ -438,6 +461,17 @@ class API(  # type: ignore[misc]
     @property
     def attached_modules(self) -> List[modules.AbstractModule]:
         return self._backend.module_controls.available_modules
+
+    async def get_attached_modules(self) -> List[modules.AbstractModule]:
+        return self.attached_modules
+
+    async def get_attached_module_by_serial(
+        self, serial: str
+    ) -> modules.AbstractModule:
+        for module in self.attached_modules:
+            if module.device_info.get("serial") == serial:
+                return module
+        raise ModuleNotPresent(serial, message=f"Module with serial {serial} not found")
 
     async def update_firmware(
         self,
@@ -1013,7 +1047,7 @@ class API(  # type: ignore[misc]
         else:
             self._log.error("Cannot use an OT-3 config on an OT-2")
 
-    async def update_config(self, **kwargs: Any) -> None:
+    async def update_config(self, **kwargs: Any) -> RobotConfig:
         """Update values of the robot's configuration.
 
         `kwargs` should contain keys of the robot's configuration. For
@@ -1024,6 +1058,7 @@ class API(  # type: ignore[misc]
         :py:class:`.RobotConfig`.
         """
         self._config = replace(self._config, **kwargs)
+        return self._config
 
     @property
     def hardware_feature_flags(self) -> HardwareFeatureFlags:
@@ -1366,3 +1401,12 @@ class API(  # type: ignore[misc]
 
     def get_estop_state(self) -> EstopState:
         return EstopState.DISENGAGED
+
+    async def update_module(self, module_serial: str) -> None:
+        module = await self.get_attached_module_by_serial(module_serial)
+        bundled_fw = module.bundled_fw
+        if bundled_fw is None:
+            raise MissingConfigurationData(
+                message=f"No stored firmware for {module.name} {module.serial_number}"
+            )
+        return await modules.update_firmware(module, bundled_fw.path)

@@ -56,13 +56,10 @@ export function useAuthSettingsMutation(
     }: DocumentedMutationParameters<PatchAuthSettingsRequest>) =>
       patchAuthSettings(host!, body, userNotes)
         .then(response => {
-          queryClient
-            .invalidateQueries(getQueryKey(host, 'auth', 'settings'))
-            .catch((e: Error) => {
-              console.error(
-                `error invalidating auth settings query: ${e.message}`
-              )
-            })
+          queryClient.setQueryData(
+            getQueryKey(host, 'auth', 'settings'),
+            response.data
+          )
           return response.data
         })
         .catch((e: AxiosError) => {

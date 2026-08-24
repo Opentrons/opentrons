@@ -2,6 +2,8 @@ import { Icon } from '@opentrons/components'
 
 import styles from './loggedoutoverlay.module.css'
 
+import type { ReactNode } from 'react'
+
 export interface LoggedOutOverlayProps {
   onClick?: () => void
 }
@@ -11,7 +13,7 @@ export interface LoggedOutOverlayProps {
  *
  * This renders with `position: fixed` to fill the viewport, with a high z-index.
  */
-export function LoggedOutOverlay(props: LoggedOutOverlayProps): JSX.Element {
+export function LoggedOutOverlay(props: LoggedOutOverlayProps): ReactNode {
   const { onClick } = props
 
   // todo(mm, 2026-04-16): Handle keyboard interaction.

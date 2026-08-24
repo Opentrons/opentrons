@@ -1,9 +1,7 @@
 import { useTranslation } from 'react-i18next'
-import { useQueryClient } from 'react-query'
 import { useSelector } from 'react-redux'
 
 import {
-  getQueryKey,
   useCreateProtocolMutation,
   useCreateRunMutation,
   useHost,
@@ -45,7 +43,6 @@ export function useCreateRunFromProtocol(
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
-  const queryClient = useQueryClient()
   const { t } = useTranslation('shared')
 
   const customLabwareFiles = useSelector((state: State) =>
@@ -53,7 +50,7 @@ export function useCreateRunFromProtocol(
   )
 
   const { documentationState, clearDocreport } = useLinkedDocumentationState(
-    [...(actionsToDocument ?? []), 'create_protocol', 'play_run'],
+    [...(actionsToDocument ?? []), 'create_protocol', 'create_run'],
     host?.robotName ?? null,
     host?.robotName,
     host
@@ -68,14 +65,6 @@ export function useCreateRunFromProtocol(
     documentationState,
     {
       ...options,
-      onSuccess: (...args) => {
-        queryClient
-          .invalidateQueries(getQueryKey(host, 'runs'))
-          .catch((e: Error) => {
-            console.error(`error invalidating runs query: ${e.message}`)
-          })
-        options.onSuccess?.(...args)
-      },
       onError: (error, variables, context) => {
         clearDocreport()
         options.onError?.(error, variables, context)

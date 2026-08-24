@@ -4,6 +4,8 @@ import { BasicButton, StyledText } from '@opentrons/components'
 
 import styles from './robotsettingsfilemanager.module.css'
 
+import type { ReactNode } from 'react'
+
 interface FileManagementSectionHeaderProps {
   titleText: string
   showButtons: boolean
@@ -13,7 +15,7 @@ interface FileManagementSectionHeaderProps {
 
 export function FileManagementSectionHeader(
   props: FileManagementSectionHeaderProps
-): JSX.Element {
+): ReactNode {
   const { titleText, onDownloadSelected, onDeleteSelected, showButtons } = props
   const { t } = useTranslation('device_details')
   return (

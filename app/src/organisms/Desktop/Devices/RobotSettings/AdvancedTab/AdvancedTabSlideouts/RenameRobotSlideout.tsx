@@ -29,7 +29,7 @@ import {
   startDiscovery,
 } from '/app/redux/discovery'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { FieldError, Resolver } from 'react-hook-form'
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { Dispatch, State } from '/app/redux/types'
@@ -54,7 +54,7 @@ export function RenameRobotSlideout({
   isExpanded,
   onCloseClick,
   robotName,
-}: RenameRobotSlideoutProps): JSX.Element {
+}: RenameRobotSlideoutProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const [previousRobotName, setPreviousRobotName] = useState<string>(robotName)
   const isFlex = useIsFlex(robotName)

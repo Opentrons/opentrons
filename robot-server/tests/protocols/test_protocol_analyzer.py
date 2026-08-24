@@ -1,6 +1,5 @@
 """Tests for the ProtocolAnalyzer."""
 
-import inspect
 from datetime import datetime
 from pathlib import Path
 
@@ -34,7 +33,7 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import DeckSlotName, MountType
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes
 from opentrons_shared_data.pipette.types import PipetteNameType
-from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotType
 
 import robot_server.errors.error_mappers as em
 from robot_server.protocols.analysis_store import AnalysisStore
@@ -79,19 +78,6 @@ def analysis_store(decoy: Decoy) -> AnalysisStore:
 def run_process_pyro_provider(decoy: Decoy) -> RunProcessPyroProvider:
     """Get a mocket out RunProcessPyroProvider."""
     return decoy.mock(cls=RunProcessPyroProvider)
-
-
-@pytest.fixture
-def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Get a mocked feature flags."""
-    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
-        params = inspect.getfullargspec(func)
-        mock_get_ff = decoy.mock(func=func)
-        if any("robot_type" in p for p in params.args):
-            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
-        else:
-            decoy.when(mock_get_ff()).then_return(False)
-        monkeypatch.setattr(feature_flags, name, mock_get_ff)
 
 
 async def test_load_orchestrator(
@@ -265,6 +251,7 @@ async def test_analyze(
             command_preconditions=command_preconditions,
         )
     )
+    decoy.when(await orchestrator.get_is_okay_to_clear()).then_return(True)
 
     await subject.analyze(
         analysis_id="analysis-id",
@@ -347,7 +334,7 @@ async def test_analyze_updates_pending_on_error(
             deck_configuration=[],
         )
     ).then_raise(raised_exception)
-    decoy.when(orchestrator.get_run_time_parameters()).then_return([])
+    decoy.when(await orchestrator.get_run_time_parameters()).then_return([])
     decoy.when(em.map_unexpected_error(error=raised_exception)).then_return(
         enumerated_error
     )
@@ -355,6 +342,7 @@ async def test_analyze_updates_pending_on_error(
     decoy.when(datetime_helper.utc_now()).then_return(
         datetime(year=2023, month=3, day=3)
     )
+    decoy.when(await orchestrator.get_is_okay_to_clear()).then_return(True)
     await subject.load_orchestrator(
         run_time_param_values={"rtp_var": 123}, run_time_param_paths={}
     )

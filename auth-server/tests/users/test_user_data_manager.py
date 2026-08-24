@@ -16,6 +16,7 @@ from auth_server.users.store import UserStore
 from auth_server.users.user_data_manager import (
     InvalidInputError,
     PasswordMissingSpecialCharactersError,
+    PasswordPreviouslyUsedError,
     PasswordTooShortError,
     UserAlreadyExistsError,
     UserDataManager,
@@ -23,6 +24,7 @@ from auth_server.users.user_data_manager import (
     _generate_temporary_password,
     _password_complexity_requirements,
     must_reset_password,
+    password_hash,
 )
 
 _NOW = datetime.datetime(2026, 1, 1, tzinfo=datetime.UTC)
@@ -910,5 +912,23 @@ def test_update_user_password_missing_special_character(
         manager.update_user(
             "testadmin",
             new_password="validpass123",
+            now=_NOW,
+        )
+
+
+def test_update_user_rejects_current_password(
+    decoy: Decoy, mock_store: UserStore, manager: UserDataManager
+) -> None:
+    current_password = "currentpassword123"
+    decoy.when(mock_store.get("alice")).then_return(
+        _make_orm_user(
+            username="alice",
+            hashed_password=password_hash.hash(current_password),
+        )
+    )
+    with pytest.raises(PasswordPreviouslyUsedError):
+        manager.update_user(
+            "alice",
+            new_password=current_password,
             now=_NOW,
         )

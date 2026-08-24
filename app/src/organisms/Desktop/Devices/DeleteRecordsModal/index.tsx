@@ -9,6 +9,7 @@ import {
 
 import styles from './deleterecordsmodal.module.css'
 
+import type { ReactNode } from 'react'
 import type { DeleteRecordsType } from './types'
 
 interface DeleteRecordsModalProps {
@@ -17,9 +18,7 @@ interface DeleteRecordsModalProps {
   type: DeleteRecordsType
 }
 
-export function DeleteRecordsModal(
-  props: DeleteRecordsModalProps
-): JSX.Element {
+export function DeleteRecordsModal(props: DeleteRecordsModalProps): ReactNode {
   const { onClose, onConfirm, type } = props
   const { t } = useTranslation(['device_details', 'shared'])
   const { title, description, recommendation } = ((): {

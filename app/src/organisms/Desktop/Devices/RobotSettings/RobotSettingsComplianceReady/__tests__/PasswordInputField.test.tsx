@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest'
 
 import { fireEvent, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -47,6 +48,21 @@ describe('PasswordInputField', () => {
     const input = screen.getByDisplayValue('secret')
     expect(input).toHaveAttribute('type', 'text')
     expect(input).toHaveValue('secret')
+  })
+
+  it('keeps focus on the password input when the visibility toggle is clicked', async () => {
+    const user = userEvent.setup()
+    render({ ...props, value: 'secret' })
+    const input = screen.getByDisplayValue('secret')
+    input.focus()
+    expect(input).toHaveFocus()
+
+    await user.click(
+      screen.getByRole('button', { name: 'Toggle password visibility' })
+    )
+
+    expect(input).toHaveFocus()
+    expect(input).toHaveAttribute('type', 'text')
   })
 
   it('calls onChange when the value changes', () => {

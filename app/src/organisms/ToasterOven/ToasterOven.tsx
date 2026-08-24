@@ -37,7 +37,7 @@ const DEFAULT_TOAST_CONTAINER_Z_INDEX = 1000
  * @param children passes through and renders children
  * @returns
  */
-export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
+export function ToasterOven({ children }: ToasterOvenProps): ReactNode {
   const [toasts, setToasts] = useState<ToastProps[]>([])
   const [snackbar, setSnackbar] = useState<SnackbarProps | null>(null)
 

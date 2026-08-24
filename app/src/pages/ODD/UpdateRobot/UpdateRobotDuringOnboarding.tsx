@@ -25,11 +25,12 @@ import {
 } from '/app/redux/robot-update'
 import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
+import type { ReactNode } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
 
 const CHECK_UPDATES_DURATION = 10000 // Note: kj 1/10/2023 Currently set 10 sec later we may use a status from state
 
-export function UpdateRobotDuringOnboarding(): JSX.Element {
+export function UpdateRobotDuringOnboarding(): ReactNode {
   const [isShowCheckingUpdates, setIsShowCheckingUpdates] =
     useState<boolean>(true)
   const navigate = useNavigate()
@@ -116,6 +117,10 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
         <UpdateRobotSoftware
           localRobot={localRobot}
           afterError={setErrorString}
+          afterCancel={() => {
+            dispatch(clearRobotUpdateSession())
+            navigate('/emergency-stop')
+          }}
           beforeCommittingSuccessfulUpdate={handleSuccessfulUpdate}
         />
       )}

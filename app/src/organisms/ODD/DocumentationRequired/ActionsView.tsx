@@ -6,6 +6,7 @@ import { COLORS } from '@opentrons/components'
 import { OddModal } from '/app/molecules/OddModal'
 import { ActionList } from '/app/organisms/ActionItems/ActionList'
 
+import type { ReactNode } from 'react'
 import type { IconName } from '@opentrons/components'
 import type { DocumentedAction } from '@opentrons/react-api-client'
 
@@ -13,7 +14,7 @@ const ActionsViewImpl = ({
   actionsToDocument,
 }: {
   actionsToDocument: DocumentedAction[]
-}): JSX.Element => {
+}): ReactNode => {
   const { t } = useTranslation(['access_control', 'shared'])
   const modal = useModal()
   const actionViewHeader = {

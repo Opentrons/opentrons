@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -82,8 +82,10 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     storedProtocolData,
     selectedRobot?.name ?? ''
   )
-  const runTimeParameters =
-    storedProtocolData.mostRecentAnalysis?.runTimeParameters ?? []
+  const runTimeParameters = useMemo(
+    () => mostRecentAnalysis?.runTimeParameters ?? [],
+    [mostRecentAnalysis]
+  )
 
   const [runTimeParametersOverrides, setRunTimeParametersOverrides] =
     useState<RunTimeParameter[]>(runTimeParameters)
@@ -91,14 +93,12 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   const [hasMissingFileParam, setHasMissingFileParam] = useState<boolean>(
     runTimeParameters?.some(parameter => parameter.type === 'csv_file') ?? false
   )
-  useEffect(
-    () => {
-      setRunTimeParametersOverrides(runTimeParameters)
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [protocolKey]
-  )
+  useEffect(() => {
+    setRunTimeParametersOverrides(runTimeParameters)
+    setHasMissingFileParam(
+      runTimeParameters.some(parameter => parameter.type === 'csv_file')
+    )
+  }, [protocolKey, runTimeParameters])
 
   const [targetProps, tooltipProps] = useHoverTooltip()
 

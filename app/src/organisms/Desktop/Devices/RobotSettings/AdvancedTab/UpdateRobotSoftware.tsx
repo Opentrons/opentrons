@@ -26,7 +26,7 @@ import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { remote } from '/app/redux/shell/remote'
 import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
-import type { ChangeEventHandler, MouseEventHandler } from 'react'
+import type { ChangeEventHandler, MouseEventHandler, ReactNode } from 'react'
 import type { Run } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 
@@ -46,7 +46,7 @@ export function UpdateRobotSoftware({
   robotName,
   onUpdateStart,
   currentRun,
-}: UpdateRobotSoftwareProps): JSX.Element {
+}: UpdateRobotSoftwareProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'branded'])
   const { updateFromFileDisabledReason } = useSelector((state: State) => {
     return getRobotUpdateDisplayInfo(state, robotName)

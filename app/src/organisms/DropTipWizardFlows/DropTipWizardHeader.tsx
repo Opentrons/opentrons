@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { WizardHeader } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { DropTipWizardProps } from './DropTipWizard'
 import type { ErrorDetails } from './types'
 
@@ -19,7 +20,7 @@ export function DropTipWizardHeader({
   errorDetails,
   dropTipCommands,
   showConfirmExit,
-}: DropTipWizardHeaderProps): JSX.Element {
+}: DropTipWizardHeaderProps): ReactNode {
   const { handleCleanUpAndClose } = dropTipCommands
   const { t, i18n } = useTranslation('drop_tip_wizard')
 

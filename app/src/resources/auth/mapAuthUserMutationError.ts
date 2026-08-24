@@ -66,6 +66,16 @@ export function mapAuthUserMutationError<T extends FieldValues>(
     }
   }
 
+  if (errorId === 'passwordPreviouslyUsed') {
+    return {
+      field: 'password' as Path<T>,
+      error: {
+        type: 'server',
+        message: t('desktop_password_previously_used') as string,
+      },
+    }
+  }
+
   return {
     field: 'confirmPassword' as Path<T>,
     error: {

@@ -10,6 +10,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 
 const MODULE_ICON_STYLE = css`
@@ -22,7 +23,7 @@ interface ModuleIconProps {
   tooltipText: string
 }
 
-export function ModuleIcon(props: ModuleIconProps): JSX.Element {
+export function ModuleIcon(props: ModuleIconProps): ReactNode {
   const { module, tooltipText } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
 

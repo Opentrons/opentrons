@@ -93,16 +93,18 @@ export function WellsOrderField(props: WellsOrderFieldProps): JSX.Element {
           </StyledText>
         </ListButton>
       </Flex>
-      <WellOrderModal
-        prefix={prefix}
-        closeModal={handleClose}
-        isOpen={isModalOpen}
-        updateValues={updateValues}
-        firstValue={firstValue}
-        secondValue={secondValue}
-        firstName={firstName}
-        secondName={secondName}
-      />
+      {isModalOpen ? (
+        <WellOrderModal
+          prefix={prefix}
+          closeModal={handleClose}
+          isOpen={isModalOpen}
+          updateValues={updateValues}
+          firstValue={firstValue}
+          secondValue={secondValue}
+          firstName={firstName}
+          secondName={secondName}
+        />
+      ) : null}
     </>
   )
 }

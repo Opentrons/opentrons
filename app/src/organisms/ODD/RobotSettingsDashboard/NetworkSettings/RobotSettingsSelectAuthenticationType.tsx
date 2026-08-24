@@ -6,7 +6,7 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import { SelectAuthenticationType } from '../../NetworkSettings'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { SetSettingOption } from '../types'
 
@@ -25,7 +25,7 @@ export function RobotSettingsSelectAuthenticationType({
   selectedAuthType,
   setCurrentOption,
   setSelectedAuthType,
-}: RobotSettingsSelectAuthenticationTypeProps): JSX.Element {
+}: RobotSettingsSelectAuthenticationTypeProps): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
 
   return (

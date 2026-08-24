@@ -4,6 +4,7 @@ import { AttachModuleActionText } from './AttachModuleActionText'
 import { DocumentedCommandText } from './DocumentedCommandText'
 import { PipetteFlowActionText } from './PipetteFlowActionText'
 
+import type { ReactNode } from 'react'
 import type { CommandTextData } from '@opentrons/components'
 import type { DocumentedAction } from '@opentrons/react-api-client'
 import type { LabwareDefinition } from '@opentrons/shared-data'
@@ -18,7 +19,7 @@ export const ActionItem = ({
   allRunDefs: LabwareDefinition[]
   commandTextData: CommandTextData | null
   className?: string
-}): JSX.Element => {
+}): ReactNode => {
   const { t } = useTranslation(['audit_log', 'deck_configuration'])
   if (typeof action === 'string') {
     // AuditLog

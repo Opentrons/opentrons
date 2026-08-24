@@ -11,6 +11,8 @@ import {
 
 import { TertiaryButton } from '/app/atoms/buttons'
 
+import type { ReactNode } from 'react'
+
 interface IpHostnameFieldProps {
   field: any
   inputRef: { current: null | HTMLInputElement }
@@ -19,7 +21,7 @@ interface IpHostnameFieldProps {
 export function IpHostnameField({
   field,
   inputRef,
-}: IpHostnameFieldProps): JSX.Element {
+}: IpHostnameFieldProps): ReactNode {
   const { t } = useTranslation('app_settings')
 
   return (

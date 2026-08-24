@@ -10,7 +10,7 @@ export interface RobotCertRotatorProps {
 
 export function RobotCertRotator({
   children,
-}: RobotCertRotatorProps): JSX.Element {
+}: RobotCertRotatorProps): ReactNode {
   useRotateRobotCerts()
   return <Fragment>{children}</Fragment>
 }

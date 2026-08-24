@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import { useImageFileQuery } from '@opentrons/react-api-client'
 
 import { useNotifyDataReady } from '../useNotifyDataReady'
@@ -10,16 +12,19 @@ export function useNotifyImageFileQuery(
   runId: string,
   options: QueryOptionsWithPolling<ImageFilesDataResponse, unknown> = {}
 ): UseQueryResult<ImageFilesDataResponse> {
-  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
+  const { refetch, queryOptionsNotify } = useNotifyDataReady({
     topic: `robot-server/dataFiles/${runId}/images`,
     options,
   })
 
   const httpQueryResult = useImageFileQuery(runId, queryOptionsNotify)
+  const { refetch: refetchQuery } = httpQueryResult
 
-  if (shouldRefetch) {
-    void httpQueryResult.refetch()
-  }
+  useEffect(() => {
+    if (refetch > 0) {
+      void refetchQuery()
+    }
+  }, [refetch, refetchQuery])
 
   return httpQueryResult
 }

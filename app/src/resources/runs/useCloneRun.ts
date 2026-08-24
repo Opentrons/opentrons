@@ -8,7 +8,7 @@ import {
   useHost,
 } from '@opentrons/react-api-client'
 
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
@@ -33,20 +33,19 @@ export function useCloneRun(
   const queryClient = useQueryClient()
   const { data: runRecord, isLoading: isLoadingRun } = useNotifyRunQuery(runId)
   const protocolKey = runRecord?.data.protocolId ?? null
-  const documentationState = useDocumentationState()
+  const { documentationState, clearDocreport } = useLinkedDocumentationState(
+    ['create_protocol_analysis', 'create_run'],
+    null
+  )
   const { createRun, isLoading: isCloning } = useCreateRunMutation(
     documentationState,
     {
       onSuccess: response => {
-        const invalidateRuns = queryClient.invalidateQueries(
-          getQueryKey(host, 'runs')
-        )
-        const invalidateProtocols = queryClient.invalidateQueries(
-          getQueryKey(host, 'protocols', protocolKey)
-        )
-        Promise.all([invalidateRuns, invalidateProtocols]).catch((e: Error) => {
-          console.error(`error invalidating runs query: ${e.message}`)
-        })
+        queryClient
+          .invalidateQueries(getQueryKey(host, 'protocols', protocolKey))
+          .catch((e: Error) => {
+            console.error(`error invalidating protocol query: ${e.message}`)
+          })
         // The onSuccess callback is not awaited until query invalidation, because currently, in every instance this
         // onSuccessCallback is utilized, we only use it for navigating. We may need to revisit this.
         onSuccessCallback?.(response)
@@ -54,11 +53,13 @@ export function useCloneRun(
     }
   )
   const { createProtocolAnalysis } = useCreateProtocolAnalysisMutation(
+    documentationState,
     protocolKey,
     host
   )
   const cloneRun = (options?: { onError?: (error: unknown) => void }): void => {
     if (runRecord != null) {
+      clearDocreport()
       const { protocolId, labwareOffsets } = runRecord.data
       const runTimeParameters =
         'runTimeParameters' in runRecord.data

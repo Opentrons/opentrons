@@ -34,6 +34,7 @@ import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
 import { LEFT_SLOTS } from './constants'
 
+import type { ReactNode } from 'react'
 import type { CommandData } from '@opentrons/api-client'
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
 import type { ModuleSetupWizardRequiresPipetteStepProps } from './types'
@@ -52,7 +53,7 @@ export const BODY_STYLE = css`
   }
 `
 
-export function PlaceAdapter(props: PlaceAdapterProps): JSX.Element {
+export function PlaceAdapter(props: PlaceAdapterProps): ReactNode {
   const {
     proceed,
     goBack,

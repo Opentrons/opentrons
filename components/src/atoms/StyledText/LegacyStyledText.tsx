@@ -83,6 +83,16 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
   labelBold: TYPOGRAPHY.smallBodyTextBold,
 }
 
+/**
+ * LegacyStyledText
+ *
+ * @component
+ *
+ * @deprecated LegacyStyledText has been deprecated. Regarding text, all components should use
+ * StyledText with a proper style that the design uses.
+ * The existing LegacyStyledText should be replaced with StyledText,
+ *
+ */
 export const LegacyStyledText: (props: LegacyProps) => JSX.Element = styled(
   Text
 )<LegacyProps>`

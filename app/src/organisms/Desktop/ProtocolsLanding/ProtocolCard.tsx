@@ -43,7 +43,7 @@ import { ProtocolAnalysisStale } from '../ProtocolAnalysisFailure/ProtocolAnalys
 import { ProtocolStatusBanner } from '../ProtocolStatusBanner'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { StoredProtocolData } from '/app/redux/protocol-storage'
 import type { Dispatch, State } from '/app/redux/types'
@@ -140,7 +140,7 @@ interface AnalysisInfoProps {
   invalidRobotType: boolean
   mostRecentAnalysis?: ProtocolAnalysisOutput | null
 }
-function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
+function AnalysisInfo(props: AnalysisInfoProps): ReactNode {
   const {
     protocolKey,
     protocolDisplayName,

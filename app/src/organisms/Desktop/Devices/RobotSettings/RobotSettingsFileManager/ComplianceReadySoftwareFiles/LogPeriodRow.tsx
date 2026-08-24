@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next'
 
 import {
   CheckboxBasic,
-  Chip,
   COLORS,
   Icon,
   ListItem,
@@ -33,7 +32,6 @@ export function LogPeriodRow({
   onToggle,
 }: LogPeriodRowProps): ReactNode {
   const { t } = useTranslation('device_details')
-  const isComplete = period.endedAt != null
   const { data: protocolsData } = useAllProtocolsQuery()
   const { data: runsData } = useNotifyAllRunsQuery()
   const protocols = protocolsData?.data ?? []
@@ -73,19 +71,10 @@ export function LogPeriodRow({
               text={
                 period.endedAt != null
                   ? formatTimestamp(period.endedAt)
-                  : t('na')
+                  : t('in_progress')
               }
               type="default"
               shrinkToContent
-            />
-          </div>
-          <div className={styles.log_status_col}>
-            <Chip
-              text={isComplete ? t('complete') : t('in_progress')}
-              type={isComplete ? 'success' : 'info'}
-              hasIcon={false}
-              chipSize="small"
-              width="max-content"
             />
           </div>
         </div>

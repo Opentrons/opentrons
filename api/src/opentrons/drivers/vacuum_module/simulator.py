@@ -162,14 +162,16 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
         k_velocity: Optional[float] = None,
         k_holding: Optional[float] = None,
         tolerance: Optional[float] = None,
+        approach_band: Optional[float] = None,
+        slew_end_fraction: Optional[float] = None,
         reset: bool = False,
     ) -> None:
-        """Sets the PID tuning parameters for the pressure control."""
+        """Sets the PID tuning parameters for pressure control."""
         pass
 
     async def get_pressure_control_tunings(self) -> PressureControlTunings:
         """Get the pressure control pid tunings."""
-        return PressureControlTunings(0, 0, 0, 0, 0, 0, 0)
+        return PressureControlTunings(0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     async def set_waste_configs(
         self,

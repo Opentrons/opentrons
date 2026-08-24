@@ -84,7 +84,7 @@ async def add_labware_offset(
 
     added_offsets: list[LabwareOffset] = []
     for offset_to_add in offsets_to_add:
-        added_offset = run_orchestrator_store.add_labware_offset(offset_to_add)
+        added_offset = await run_orchestrator_store.add_labware_offset(offset_to_add)
         added_offsets.append(added_offset)
         log.info(f'Added labware offset "{added_offset.id}" to run "{run.id}".')
 
@@ -134,7 +134,7 @@ async def add_labware_definition(
         run_orchestrator_store: Engine storage interface.
         run: Run response data by ID from URL; ensures 404 if run not found.
     """
-    uri = run_orchestrator_store.add_labware_definition(request_body.data)
+    uri = await run_orchestrator_store.add_labware_definition(request_body.data)
     log.info(f'Added labware definition "{uri}" to run "{run.id}".')
 
     return PydanticResponse(

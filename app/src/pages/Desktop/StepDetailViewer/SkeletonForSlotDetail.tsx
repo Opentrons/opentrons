@@ -4,8 +4,10 @@ import { Skeleton } from '/app/atoms/Skeleton'
 
 import styles from './skeletonforslotdetail.module.css'
 
+import type { ReactNode } from 'react'
+
 // backgroundSize 23px + 360px from the default design size
-export function SkeletonForSlotDetail(): JSX.Element {
+export function SkeletonForSlotDetail(): ReactNode {
   return (
     <div className={styles.slot_loading_container}>
       <div className={styles.slot_loading_header}>

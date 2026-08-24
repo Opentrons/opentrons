@@ -98,7 +98,6 @@ describe('TipPosition', () => {
         error: null,
         type: 'text',
         value: 10,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -122,7 +121,6 @@ describe('TipPosition', () => {
         error: null,
         type: 'text',
         value: 75,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -142,7 +140,6 @@ describe('TipPosition', () => {
         error: 'Value must be between 1 to 52',
         type: 'text',
         value: 0,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}
@@ -168,7 +165,6 @@ describe('TipPosition', () => {
         error: 'Value must be between 1 to 202',
         type: 'text',
         value: 0,
-        onBlur: expect.any(Function),
         onChange: expect.any(Function),
       },
       {}

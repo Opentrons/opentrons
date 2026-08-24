@@ -6,6 +6,7 @@ import pytest
 
 from opentrons_shared_data.errors.exceptions import (
     PythonException,
+    RoboticsInteractionError,
     VacuumModulePressureNotReachedError,
     VacuumModuleUnknownError,
     VacuumModuleWasteFullError,
@@ -164,3 +165,21 @@ def test_vacuum_module_errors_round_trip_through_pickle(
     """Vacuum module errors should pickle and unpickle without losing data."""
     restored = pickle.loads(pickle.dumps(error))
     assert restored == error
+
+
+@pytest.mark.parametrize(
+    "error_cls",
+    [VacuumModulePressureNotReachedError, VacuumModuleWasteFullError],
+)
+def test_recoverable_vacuum_errors_are_robotics_interaction_errors(
+    error_cls: type[VacuumModulePressureNotReachedError]
+    | type[VacuumModuleWasteFullError],
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """3040/3041 belong to robotics interaction, not robotics control."""
+    with caplog.at_level("ERROR"):
+        error = error_cls("VM123", "pressure", 0.0, 0.0)
+
+    assert isinstance(error, RoboticsInteractionError)
+    assert "inappropriate for a RoboticsControlError" not in caplog.text
+    assert "inappropriate for a RoboticsInteractionError" not in caplog.text

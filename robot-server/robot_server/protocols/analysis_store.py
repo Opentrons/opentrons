@@ -315,15 +315,9 @@ class AnalysisStore:
 
         If `protocol_id` doesn't point to a valid protocol, returns an empty list.
         """
-        completed_analysis_ids = self._completed_store.get_ids_by_protocol(
+        completed_analysis_summaries = self._completed_store.get_summaries_by_protocol(
             protocol_id=protocol_id
         )
-        completed_analysis_summaries = [
-            AnalysisSummary.model_construct(
-                id=analysis_id, status=AnalysisStatus.COMPLETED
-            )
-            for analysis_id in completed_analysis_ids
-        ]
 
         pending_analysis = self._pending_store.get_by_protocol(protocol_id=protocol_id)
         if pending_analysis is None:
@@ -518,4 +512,8 @@ class _PendingAnalysisStore:
 
 
 def _summarize_pending(pending_analysis: PendingAnalysis) -> AnalysisSummary:
-    return AnalysisSummary(id=pending_analysis.id, status=pending_analysis.status)
+    return AnalysisSummary.model_construct(
+        id=pending_analysis.id,
+        status=pending_analysis.status,
+        result=None,
+    )

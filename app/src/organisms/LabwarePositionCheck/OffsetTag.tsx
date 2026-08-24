@@ -2,6 +2,8 @@ import { useTranslation } from 'react-i18next'
 
 import { Tag } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 export interface OffsetTagDefaultKindProps {
   kind: 'default'
 }
@@ -27,7 +29,7 @@ export type OffsetTagProps =
   | OffsetTagNoOffsetKindProps
   | OffsetTagHardCodedKindProps
 
-export function OffsetTag(props: OffsetTagProps): JSX.Element {
+export function OffsetTag(props: OffsetTagProps): ReactNode {
   const { t } = useTranslation('labware_position_check')
 
   // Ensure we never display "-0.0"

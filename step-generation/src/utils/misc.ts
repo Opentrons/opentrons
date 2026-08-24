@@ -52,6 +52,7 @@ import {
   HOPPER_FAKE_LOCATIONS,
   HOPPER_STACKER_LOCATION,
   STAGING_AREA_SLOTS,
+  VACUUM_DOCK_DISPLAY_LOCATION,
   VACUUM_DOCK_LOCATION,
   VACUUM_SPACER_LOAD_NAMES,
   ZERO_OFFSET,
@@ -105,6 +106,10 @@ export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
 
 export function getIsVacuumSpacer(def: LabwareDefinition2): boolean {
   return VACUUM_SPACER_LOAD_NAMES.includes(def.parameters.loadName)
+}
+
+const getIsVacuumCollar = (def: LabwareDefinition2): boolean => {
+  return (def.parameters.quirks ?? []).includes('vacuumModuleDock')
 }
 
 type trashOrLabware = 'wasteChute' | 'trashBin' | 'labware' | null
@@ -913,6 +918,13 @@ export const getSlotInLocationStack = (
   }
 }
 
+export const getModuleLocationSlot = (moduleSlot: string): string => {
+  if (moduleSlot === VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA) {
+    return VACUUM_DOCK_DISPLAY_LOCATION
+  }
+  return moduleSlot
+}
+
 export const getTopLocationInStack = (stack?: string[]): string => {
   if (stack == null) {
     console.error('expected to find stack but could not')
@@ -1106,6 +1118,11 @@ export const getIsLabwareCompatibleWithStack = (
     const isLidRole = allowedRoles.includes('lid')
 
     const isVacuumSpacer = getIsVacuumSpacer(topLabwareEntity.def)
+    const isOccupiedByCollar = stack.some(
+      entityId =>
+        entityId in labwareEntities &&
+        getIsVacuumCollar(labwareEntities[entityId].def)
+    )
     const movingLabwareIsCollar =
       movingLabwareEntity.def.parameters.quirks?.includes('vacuumModuleDock') ??
       false
@@ -1121,7 +1138,7 @@ export const getIsLabwareCompatibleWithStack = (
           false
         )) ||
       // vacuum spacer: same rules as the main module area — only collars and filter plates
-      (isVacuumSpacer && movingLabwareIsCollar) ||
+      (!isOccupiedByCollar && movingLabwareIsCollar) ||
       // any labware can go onto an adapter that provides a stacking default (spacers excluded above)
       ((topLabwareEntity.def.parameters.quirks?.includes(
         'providesStackingDefault'

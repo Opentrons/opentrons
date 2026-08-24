@@ -2,7 +2,7 @@ import { useId } from 'react'
 
 import { COLORS } from '@opentrons/components'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 
 export const WELL_VIEWBOX = { width: 165, height: 136 }
 export const WELL_GEOMETRY = {
@@ -26,7 +26,7 @@ export function WellSvg({
   color,
   setIsHovered,
   isHovered,
-}: WellSvgProps): JSX.Element {
+}: WellSvgProps): ReactNode {
   const clipId = useId()
   const percent = Math.min(Math.max(volume / maxVolume, 0), 1)
 

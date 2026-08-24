@@ -35,6 +35,7 @@ import {
 import { useIsOEMMode } from '/app/resources/robot-settings'
 import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
+import type { ReactNode } from 'react'
 import type { RobotSystemType } from '/app/redux/robot-update/types'
 import type { Dispatch, State } from '/app/redux/types'
 
@@ -72,7 +73,7 @@ export function UpdateRobotModal({
   systemType,
   updateType,
   closeModal,
-}: UpdateRobotModalProps): JSX.Element {
+}: UpdateRobotModalProps): ReactNode {
   const dispatch = useDispatch<Dispatch>()
   const { t } = useTranslation('device_settings')
   const isOEMMode = useIsOEMMode()

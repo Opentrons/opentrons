@@ -335,6 +335,15 @@ export function SelectLabwareModal(
         return !isFilterPlate
       }
 
+      // spacer on the module: still allow filter plates (they sit on the spacer)
+      if (
+        moduleType === VACUUM_MODULE_TYPE &&
+        mainModuleTopIsSpacer &&
+        (parameters.quirks ?? []).includes('filterPlate')
+      ) {
+        return false
+      }
+
       // for main vacuum module area with existing labware, filter explicitly
       // (skip when only a bare spacer is present — treat like an empty module)
       if (

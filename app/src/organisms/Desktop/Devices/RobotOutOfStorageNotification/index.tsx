@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 
 import { InlineNotification } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 interface RobotOutOfStorageNotificationProps {
   robotName: string
   onCloseClick?: (e?: MouseEvent) => void
@@ -10,7 +12,7 @@ interface RobotOutOfStorageNotificationProps {
 
 export function RobotOutOfStorageNotification(
   props: RobotOutOfStorageNotificationProps
-): JSX.Element {
+): ReactNode {
   const { robotName, onCloseClick } = props
   const { t } = useTranslation('device_details')
   const navigate = useNavigate()

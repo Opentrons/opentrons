@@ -14,7 +14,9 @@ import {
 
 import { LPC_HREF } from '/app/local-resources/offsets'
 
-export function LearnAboutOffsetsLink(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function LearnAboutOffsetsLink(): ReactNode {
   const { t } = useTranslation('protocol_setup')
 
   return (

@@ -34,7 +34,7 @@ def initialize_run_process(process_name: str) -> threading.Thread:
 
     process_resource_thread = threading.Thread(
         target=_start_and_run_process,
-        name="RunProcessThread",
+        name="RunProcessResourceThread",
         args=(),
         kwargs={"process": run_process},
         daemon=True,
@@ -43,7 +43,7 @@ def initialize_run_process(process_name: str) -> threading.Thread:
 
     pyro_daemon_thread = threading.Thread(
         target=_start_and_run_pyro_daemon,
-        name="RunProcessThread",
+        name="RunProcessPyroThread",
         args=(),
         kwargs={
             "pyroname": process_name,

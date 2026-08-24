@@ -23,7 +23,8 @@ export function createProtocolAnalysis(
   protocolKey: string,
   runTimeParameterValues?: RunTimeParameterValuesCreateData,
   runTimeParameterFiles?: RunTimeParameterFilesCreateData,
-  forceReAnalyze?: boolean
+  forceReAnalyze?: boolean,
+  userNotes?: string
 ): ResponsePromise<ProtocolAnalysisSummaryResult> {
   const data = {
     runTimeParameterValues: runTimeParameterValues ?? {},
@@ -33,6 +34,9 @@ export function createProtocolAnalysis(
   const response = request<
     ProtocolAnalysisSummaryResult,
     { data: CreateProtocolAnalysisData }
-  >(POST, `/protocols/${protocolKey}/analyses`, config, { body: { data } })
+  >(POST, `/protocols/${protocolKey}/analyses`, config, {
+    body: { data },
+    userNotes,
+  })
   return response
 }

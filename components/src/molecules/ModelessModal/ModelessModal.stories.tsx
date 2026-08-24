@@ -8,7 +8,7 @@ import { ModelessModal } from './'
 import styles from './modelessmodal.stories.module.css'
 
 import type { Meta, StoryObj } from '@storybook/react'
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 const meta: Meta<typeof ModelessModal> = {
   title: 'Helix/Molecules/ModelessModal',
@@ -24,7 +24,7 @@ const meta: Meta<typeof ModelessModal> = {
 export default meta
 type Story = StoryObj<typeof ModelessModal>
 
-const SampleSpotlightContent = (): JSX.Element => (
+const SampleSpotlightContent = (): ReactNode => (
   <div className={styles.content_container}>
     <div>
       <StyledText desktopStyle="bodyLargeSemiBold">Nickname</StyledText>
@@ -54,7 +54,7 @@ const SampleSpotlightContent = (): JSX.Element => (
 
 const InteractiveTemplate = (
   args: ComponentProps<typeof ModelessModal> & { onClose: () => void }
-): JSX.Element => {
+): ReactNode => {
   const [isOpen, setIsOpen] = useState(true)
 
   return (
@@ -118,7 +118,7 @@ export const Interactive: Story = {
 
 const SimpleVersionTemplate = (
   args: ComponentProps<typeof ModelessModal>
-): JSX.Element => {
+): ReactNode => {
   const [isOpen, setIsOpen] = useState(true)
 
   return isOpen ? (

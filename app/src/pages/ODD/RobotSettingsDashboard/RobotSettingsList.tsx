@@ -43,6 +43,7 @@ import {
 
 import styles from './robotsettingslist.module.css'
 
+import type { ReactNode } from 'react'
 import type { SetSettingOption } from '/app/organisms/ODD/RobotSettingsDashboard'
 import type { Dispatch, State } from '/app/redux/types'
 
@@ -51,7 +52,7 @@ interface RobotSettingsListProps {
   setCurrentOption: SetSettingOption
 }
 
-export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
+export function RobotSettingsList(props: RobotSettingsListProps): ReactNode {
   const { setCurrentOption } = props
   const { t, i18n } = useTranslation([
     'device_settings',
@@ -267,10 +268,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           }}
         />
         <RobotSettingButton
-          settingName={i18n.format(
-            t('app_settings:error_recovery_mode'),
-            'titleCase'
-          )}
+          settingName={t('app_settings:error_recovery_mode')}
           dataTestId="RobotSettingButton_error_recovery_mode"
           settingInfo={t('app_settings:error_recovery_mode_description')}
           iconName="recovery-alt"
@@ -330,7 +328,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   )
 }
 
-function FeatureFlags(): JSX.Element {
+function FeatureFlags(): ReactNode {
   const { t } = useTranslation('app_settings')
   const devInternalFlags = useSelector(getFeatureFlags)
   const dispatch = useDispatch<Dispatch>()

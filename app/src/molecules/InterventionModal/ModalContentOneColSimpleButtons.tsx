@@ -11,7 +11,7 @@ import {
 
 import { OneColumn } from './OneColumn'
 
-import type { ChangeEventHandler } from 'react'
+import type { ChangeEventHandler, ReactNode } from 'react'
 
 export interface ButtonProps {
   label: string
@@ -30,7 +30,7 @@ export interface ModalContentOneColSimpleButtonsProps {
 
 export function ModalContentOneColSimpleButtons(
   props: ModalContentOneColSimpleButtonsProps
-): JSX.Element {
+): ReactNode {
   const [selected, setSelected] = useState<string | null>(
     props.initialSelected ?? null
   )

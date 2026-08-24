@@ -9,6 +9,7 @@ import {
 } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
+import type { ReactNode } from 'react'
 import type { Mount } from '@opentrons/api-client'
 import type { CalibrationCheckInstrument } from '/app/redux/sessions/types'
 
@@ -20,7 +21,7 @@ interface MountInformationProps {
 export const RenderMountInformation = ({
   mount,
   pipette,
-}: MountInformationProps): JSX.Element => {
+}: MountInformationProps): ReactNode => {
   const { t } = useTranslation('shared')
   const displayName =
     (pipette?.model != null &&

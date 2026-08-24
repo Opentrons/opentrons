@@ -24,7 +24,7 @@ export interface RecoveryRadioGroupProps<T extends string> extends Omit<
 
 export function RecoveryRadioGroup<T extends string>(
   props: RecoveryRadioGroupProps<T>
-): JSX.Element {
+): ReactNode {
   return (
     <RadioGroup
       {...props}

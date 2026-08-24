@@ -39,6 +39,7 @@ import {
 import { getFixtureImage } from './utils'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type {
   CutoutConfigAndCompatibility,
   CutoutFixtureId,
@@ -55,7 +56,7 @@ interface SetupFixtureListProps {
  * @param props
  * @returns JSX.Element
  */
-export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
+export const SetupFixtureList = (props: SetupFixtureListProps): ReactNode => {
   const { deckConfigCompatibility, robotName } = props
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
@@ -88,7 +89,7 @@ export function FixtureListItem({
   deckDef,
   robotName,
   partialRequiredCutoutFixtureId,
-}: FixtureListItemProps): JSX.Element {
+}: FixtureListItemProps): ReactNode {
   const { t } = useTranslation(['protocol_setup', 'deck_configuration'])
 
   const isCurrentFixtureCompatible = isFixtureCompatible(

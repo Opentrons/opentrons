@@ -12,6 +12,7 @@ import {
 import { IndividualKey } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
+import type { ReactNode } from 'react'
 
 const meta: Meta<typeof IndividualKey> = {
   title: 'ODD/Atoms/SoftwareKeyboard/IndividualKey',
@@ -23,7 +24,7 @@ export default meta
 
 type Story = StoryObj<typeof IndividualKey>
 
-const Keyboard = ({ ...args }): JSX.Element => {
+const Keyboard = ({ ...args }): ReactNode => {
   const [showKeyboard, setShowKeyboard] = useState(false)
   const [value, setValue] = useState<string>('')
   const keyboardRef = useRef(null)

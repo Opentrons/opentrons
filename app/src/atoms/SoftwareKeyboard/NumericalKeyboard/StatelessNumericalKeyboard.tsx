@@ -9,6 +9,7 @@ import {
 import { applyNumericalKeyboardKey } from '../utils/applyNumericalKeyboardKey'
 import { toNumericalKeyboardKey } from '../utils/toNumericalKeyboardKey'
 
+import type { ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { NumericalKeyboardKey } from '../types'
 
@@ -28,7 +29,7 @@ export function StatelessNumericalKeyboard({
   hasHyphen = false,
   debug = false,
   onKeyPress,
-}: StatelessNumericalKeyboardProps): JSX.Element {
+}: StatelessNumericalKeyboardProps): ReactNode {
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
   const valueRef = useRef(value)
   const layoutName = `${isDecimal ? 'float' : 'int'}${

@@ -1,9 +1,17 @@
-import { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { useSelector } from 'react-redux'
 
 import { useDismissCurrentRunMutation } from '@opentrons/react-api-client'
 
 import { DocumentationRequiredModalContext } from '/app/local-resources/access-control/DocumentationRequiredModalContext'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { getIsOnDevice } from '/app/redux/config'
 import { useCurrentRunId } from '/app/resources/runs'
 
@@ -11,7 +19,7 @@ import { useIsSigningRequired } from './useIsSigningRequired'
 
 import type { AxiosError } from 'axios'
 import type { Run } from '@opentrons/api-client'
-import type { DocumentationState } from '@opentrons/react-api-client'
+import type { DocumentedAction } from '@opentrons/react-api-client'
 
 type CloseCallback = (options?: CloseOptions) => void
 
@@ -21,12 +29,28 @@ interface CloseOptions {
   onSettled?: () => void
 }
 
-export function useCloseCurrentRun(documentationState: DocumentationState): {
+export function useCloseCurrentRun(): {
   closeCurrentRun: CloseCallback
   isClosingCurrentRun: boolean
 } {
   const currentRunId = useCurrentRunId()
   const isOnDevice = useSelector(getIsOnDevice)
+
+  const {
+    isSigningRequired,
+    isLoading: isSigningRequiredLoading,
+    isDownloadingRequired,
+    logPeriodId,
+  } = useIsSigningRequired()
+
+  const actionsToDocument: DocumentedAction[] = useMemo(
+    () => (isSigningRequired ? ['sign_run', 'dismiss_run'] : ['dismiss_run']),
+    [isSigningRequired]
+  )
+  const { documentationState } = useLinkedDocumentationState(
+    actionsToDocument,
+    currentRunId
+  )
 
   const { dismissCurrentRun, isLoading: isDismissing } =
     useDismissCurrentRunMutation(documentationState)
@@ -37,13 +61,6 @@ export function useCloseCurrentRun(documentationState: DocumentationState): {
 
   const isDismissInFlight = useRef(false)
   const lastDismissedRunId = useRef<string | null>(null)
-
-  const {
-    isSigningRequired,
-    isLoading: isSigningRequiredLoading,
-    isDownloadingRequired,
-    logPeriodId,
-  } = useIsSigningRequired()
 
   const [isClosePending, setIsClosePending] = useState(false)
   const isSignRunPending = useRef(false)
@@ -69,14 +86,14 @@ export function useCloseCurrentRun(documentationState: DocumentationState): {
     }
   }
 
-  const handleDismiss = useCallback(() => {
+  const handleDismiss = useCallback(async () => {
     isDismissInFlight.current = true
     const callerOptions = closeOptions.current ?? {}
 
     if (currentRunId != null) {
       // on the ODD, if downloading is required, runs can now only be dismissed on the Desktop app.
       if (isOnDevice && isDownloadingRequired && logPeriodId != null) {
-        void showDownloadLogsModal(logPeriodId)
+        await showDownloadLogsModal(logPeriodId)
           .then(downloaded => {
             if (!downloaded) {
               console.warn('failed to download logs')
@@ -138,7 +155,7 @@ export function useCloseCurrentRun(documentationState: DocumentationState): {
         return
       }
       isSignRunPending.current = true
-      void showSignRunModal().then(signed => {
+      void showSignRunModal(documentationState).then(signed => {
         if (!signed) {
           resetClosePending()
           throw new Error(
@@ -151,6 +168,7 @@ export function useCloseCurrentRun(documentationState: DocumentationState): {
     }
     handleDismiss()
   }, [
+    documentationState,
     handleDismiss,
     isClosePending,
     isSigningRequired,

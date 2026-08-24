@@ -25,29 +25,18 @@ describe('useIsRobotOutOfStorage', () => {
       data: { data: { accessControlEnabled: true } },
     } as any)
     vi.mocked(useHealth).mockReturnValue({
-      disk_details: { systemTotalMb: 100, systemAvailableMb: 90 },
+      disk_details: { isDiskSpaceBelowRunStartLimit: false },
     } as any)
     const { result } = renderHook(useIsRobotOutOfStorage)
     expect(result.current).toBe(false)
   })
 
-  it('returns true if robot is in access control mode and used space is greater than limit', () => {
+  it('returns true if robot is in access control mode and limit is breached', () => {
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
       data: { data: { accessControlEnabled: true } },
     } as any)
     vi.mocked(useHealth).mockReturnValue({
-      disk_details: { systemTotalMb: 100, systemAvailableMb: 5 },
-    } as any)
-    const { result } = renderHook(useIsRobotOutOfStorage)
-    expect(result.current).toBe(true)
-  })
-
-  it('returns true if robot is in access control mode and used space equals limit', () => {
-    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
-      data: { data: { accessControlEnabled: true } },
-    } as any)
-    vi.mocked(useHealth).mockReturnValue({
-      disk_details: { systemTotalMb: 100, systemAvailableMb: 10 },
+      disk_details: { isDiskSpaceBelowRunStartLimit: true },
     } as any)
     const { result } = renderHook(useIsRobotOutOfStorage)
     expect(result.current).toBe(true)

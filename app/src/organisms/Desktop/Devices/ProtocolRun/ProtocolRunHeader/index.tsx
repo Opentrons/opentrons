@@ -12,7 +12,6 @@ import {
 } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
 
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useInitializeCameraState } from '/app/local-resources/images/hooks/useInitializeCameraState'
 import { isCancellableStatus } from '/app/local-resources/runs/utils'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
@@ -72,9 +71,7 @@ export function ProtocolRunHeader(
     runId,
   })
 
-  const documentationState = useDocumentationState()
-  const { closeCurrentRun, isClosingCurrentRun } =
-    useCloseCurrentRun(documentationState)
+  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
   const isDownloadAuditLogsInFlight = useRef(false)
 
   const {

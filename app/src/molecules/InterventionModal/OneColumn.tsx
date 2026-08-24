@@ -14,7 +14,7 @@ export interface OneColumnProps extends StyleProps {
 export function OneColumn({
   children,
   ...styleProps
-}: OneColumnProps): JSX.Element {
+}: OneColumnProps): ReactNode {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}

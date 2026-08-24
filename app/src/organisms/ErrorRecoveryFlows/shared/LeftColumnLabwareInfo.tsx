@@ -5,7 +5,7 @@ import { getStackerLocationFromSlotName } from '@opentrons/shared-data'
 import { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
 type LeftColumnLabwareInfoProps = RecoveryContentProps & {
@@ -26,7 +26,7 @@ export function LeftColumnLabwareInfo({
   bannerText,
   recoveryMap,
   showQuantity = true,
-}: LeftColumnLabwareInfoProps): JSX.Element {
+}: LeftColumnLabwareInfoProps): ReactNode {
   const { step, route } = recoveryMap
   const {
     failedLabwareNames,

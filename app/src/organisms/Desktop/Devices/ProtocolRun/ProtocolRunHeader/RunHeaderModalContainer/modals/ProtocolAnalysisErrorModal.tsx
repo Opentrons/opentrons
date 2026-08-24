@@ -17,6 +17,7 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import { useProtocolAnalysisErrors } from '/app/resources/runs'
 
+import type { ReactNode } from 'react'
 import type { AnalysisError } from '@opentrons/shared-data'
 
 export type UseAnalysisErrorsModalProps = Omit<
@@ -72,7 +73,7 @@ export function ProtocolAnalysisErrorModal({
   onClose,
   robotName,
   displayName,
-}: ProtocolAnalysisErrorModalProps): JSX.Element {
+}: ProtocolAnalysisErrorModalProps): ReactNode {
   const { t, i18n } = useTranslation(['run_details', 'shared'])
 
   return createPortal(
