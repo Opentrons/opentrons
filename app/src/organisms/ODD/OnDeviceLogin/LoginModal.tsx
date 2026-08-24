@@ -1,16 +1,11 @@
 import { useCallback, useState } from 'react'
-import { useQueryClient } from 'react-query'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
-import {
-  getSelfQueryKey,
-  useAuthSettingsQuery,
-  useHost,
-} from '@opentrons/react-api-client'
+import { useAuthSettingsQuery } from '@opentrons/react-api-client'
 
 import { getLocalRobot } from '/app/redux/discovery'
-import { logOut, useUsernameForRobot } from '/app/redux/robot-auth'
+import { useUsernameForRobot } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   DEFAULT_MIN_PASSWORD_LENGTH,
@@ -29,9 +24,6 @@ type LoginModalPhase = 'login' | 'chooseNewPassword'
 
 const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const modal = useModal()
-  const dispatch = useDispatch()
-  const host = useHost()
-  const queryClient = useQueryClient()
   const [phase, setPhase] = useState<LoginModalPhase>('login')
   const [step, setStep] = useState<LoginStep>('username')
   const [loginError, setLoginError] = useState<string | null>(null)
@@ -75,22 +67,6 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
     modal.remove()
   }, [modal])
 
-  const handleNewPasswordSuccess = useCallback(
-    (username: string) => {
-      setLoginError(null)
-      setLoginUsername(username)
-      if (localRobotName != null) {
-        dispatch(logOut({ robotName: localRobotName }))
-      }
-      if (host != null) {
-        void queryClient.invalidateQueries(getSelfQueryKey(host))
-      }
-      setPhase('login')
-      setStep('password')
-    },
-    [dispatch, host, localRobotName, queryClient]
-  )
-
   const { submitPassword, isAuthLoading: isLoginAuthLoading } =
     useOAuth2PasswordLogin({
       onSuccess: handleLoginSuccess,
@@ -98,6 +74,14 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
         setLoginError(message)
       },
     })
+
+  const handleNewPasswordSuccess = useCallback(
+    (username: string, newPassword: string) => {
+      setLoginError(null)
+      submitPassword(username, newPassword)
+    },
+    [submitPassword]
+  )
 
   const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
     useSetNewPasswordAndSignIn({
@@ -141,7 +125,9 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
           isChoosingNewPassword ? submitNewPassword : submitPassword
         }
         isAuthLoading={
-          isChoosingNewPassword ? isSetNewPasswordLoading : isLoginAuthLoading
+          isChoosingNewPassword
+            ? isSetNewPasswordLoading || isLoginAuthLoading
+            : isLoginAuthLoading
         }
         isPasswordResetRequired={isChoosingNewPassword}
         initialUsername={initialUsername}

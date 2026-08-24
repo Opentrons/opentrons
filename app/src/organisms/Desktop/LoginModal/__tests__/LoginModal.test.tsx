@@ -116,7 +116,7 @@ function mockSetNewPasswordSuccess(
   vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(({ onSuccess }) => ({
     submitNewPassword: (username: string, password: string) => {
       onSubmit?.(username, password)
-      onSuccess(username)
+      onSuccess(username, password)
     },
     isLoading: false,
   }))

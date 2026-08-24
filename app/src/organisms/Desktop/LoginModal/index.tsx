@@ -175,7 +175,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
 
   const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
     useSetNewPasswordAndSignIn({
-      onSuccess: successfulUsername => {
+      onSuccess: (successfulUsername, _newPassword) => {
         dispatch(logOut({ robotName }))
         setScreen({
           kind: 'login',
