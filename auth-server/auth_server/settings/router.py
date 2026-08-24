@@ -43,26 +43,13 @@ from auth_server.users.store import UserStore
 router = fastapi.APIRouter()
 
 
-def _patch_enables_password_complexity(
-    patch: PatchSettingsRequestData,
-    current_settings: SettingsResponseData,
-) -> bool:
-    """Return whether a settings patch enables password complexity requirements."""
+def _patch_changes_password_complexity(patch: PatchSettingsRequestData) -> bool:
+    """Return whether a settings patch includes password complexity fields."""
     patch_data = patch.model_dump(exclude_unset=True)
-
-    if patch_data.get("passwordComplexitySpecialCharacters") is True:
-        if current_settings.passwordComplexitySpecialCharacters is not True:
-            return True
-
-    if "passwordComplexityMinimumLength" in patch_data:
-        new_min_length = patch_data["passwordComplexityMinimumLength"]
-        current_min_length = current_settings.passwordComplexityMinimumLength
-        if new_min_length is not None and (
-            current_min_length is None or new_min_length > current_min_length
-        ):
-            return True
-
-    return False
+    return (
+        "passwordComplexitySpecialCharacters" in patch_data
+        or "passwordComplexityMinimumLength" in patch_data
+    )
 
 
 @router.get(
@@ -156,11 +143,9 @@ async def patch_settings(  # noqa: D103
     user_store: Annotated[UserStore, fastapi.Depends(get_user_store)],
     oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> SimpleBody[SettingsResponseData]:
-    current_settings = settings_store.get_settings()
     new_settings = settings_store.patch_settings(request_body.data)
-    if _patch_enables_password_complexity(request_body.data, current_settings):
-        if (request_body.data.passwordComplexitySpecialCharacters is True or request_body.data.passwordComplexityMinimumLength is not None):
-            user_store.mark_all_reset_password()
+    if _patch_changes_password_complexity(request_body.data):
+        user_store.mark_all_reset_password()
         oauth2_backend.revoke_all_tokens()
     return SimpleBody.model_construct(data=new_settings)
 
