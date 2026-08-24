@@ -4,6 +4,7 @@ import asyncio
 import enum
 import logging
 import os
+import pwd
 import subprocess
 import sys
 import time
@@ -57,8 +58,7 @@ class RunProcessPyroProvider:
         self._run_processes: Optional[List[_RunProcess]] = None
         self._simulating_run_processes: Optional[List[_RunProcess]] = None
 
-        # The protocol subprocess username defaults to root unless otherwise specified
-        self._protocol_username: str = "root"
+        self._update_user_subprocess(False)
 
         self._teardown_signal = asyncio.Event()
         self._process_maintainer_task: asyncio.Task[None] | None = None
@@ -73,7 +73,6 @@ class RunProcessPyroProvider:
         If feature flag is on for running as a user with limited permissions then
         ensure the protocol user name is set.
         """
-        self._protocol_username = _ROOT_USER_NAME
         self._update_user_subprocess(access_control_mode)
         if feature_flags.protocol_subprocess_enabled():
             register_process_types()
@@ -239,7 +238,12 @@ class RunProcessPyroProvider:
         return cast(DirectedRunProcess, cast(object, run_proxy))
 
     @staticmethod
-    def _open_process(process_name: str, user_name: str) -> subprocess.Popen[bytes]:
+    def _open_process(
+        process_name: str,
+        user_name: str,
+        main_group_id: int,
+        supplemental_group_ids: list[int],
+    ) -> subprocess.Popen[bytes]:
         return subprocess.Popen(
             args=[
                 sys.executable,
@@ -250,6 +254,8 @@ class RunProcessPyroProvider:
             ],
             env={k: v for k, v in os.environ.items()},
             user=user_name,
+            group=main_group_id,
+            extra_groups=supplemental_group_ids,
         )
 
     @staticmethod
@@ -278,12 +284,25 @@ class RunProcessPyroProvider:
 
     def _start_run_process(self, process_name: str) -> subprocess.Popen[bytes]:
         return self._open_process(
-            process_name=process_name, user_name=self._protocol_username
+            process_name=process_name,
+            user_name=self._process_username,
+            main_group_id=self._process_gid,
+            supplemental_group_ids=self._supplemental_gids,
         )
+
+    def _set_user_subprocess_for(self, username: str) -> None:
+        gid = pwd.getpwnam(username).pw_gid
+        supplemental_gids = os.getgrouplist(username, gid)
+        _log.info(
+            f"Configuring subprocesses to run as {username}: username={username}, main gid={gid}, supplemental gids={', '.join([str(gid) for gid in supplemental_gids])}"
+        )
+        self._process_username = username
+        self._process_gid = gid
+        self._supplemental_gids = supplemental_gids
 
     def _update_user_subprocess(self, access_control_mode: bool) -> None:
         """Update which system user should execute the protocol subprocess."""
         if feature_flags.run_protocol_as_restricted_user() or access_control_mode:
-            self._protocol_username = _RESTRICTED_USER_NAME
+            self._set_user_subprocess_for(_RESTRICTED_USER_NAME)
         else:
-            self._protocol_username = _ROOT_USER_NAME
+            self._set_user_subprocess_for(_ROOT_USER_NAME)
