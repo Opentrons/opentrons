@@ -229,7 +229,7 @@ describe('ComplianceReadySoftwareSettings', () => {
 
     fireEvent.click(
       screen.getByRole('switch', {
-        name: 'Require password complexity requirements',
+        name: 'Require password complexity',
       })
     )
 
@@ -247,7 +247,7 @@ describe('ComplianceReadySoftwareSettings', () => {
     ).not.toBeInTheDocument()
     expect(
       screen.getByRole('switch', {
-        name: 'Require password complexity requirements',
+        name: 'Require password complexity',
       })
     ).toHaveAttribute('aria-checked', 'false')
     expect(
@@ -261,7 +261,7 @@ describe('ComplianceReadySoftwareSettings', () => {
 
     fireEvent.click(
       screen.getByRole('switch', {
-        name: 'Require password complexity requirements',
+        name: 'Require password complexity',
       })
     )
 
