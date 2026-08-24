@@ -4,7 +4,12 @@ import { INTERACTIVE_WELL_DATA_ATTRIBUTE } from '@opentrons/shared-data'
 
 import { COLORS } from '../../../../helix-design-system'
 
-import type { CSSProperties, MemoExoticComponent, MouseEvent } from 'react'
+import type {
+  CSSProperties,
+  MemoExoticComponent,
+  MouseEvent,
+  ReactNode,
+} from 'react'
 import type { LabwareWell } from '@opentrons/shared-data'
 import type { WellMouseEvent } from './constants'
 
@@ -23,7 +28,7 @@ export interface WellProps extends CSSProperties {
   isInteractive?: boolean
 }
 
-export function WellComponent(props: WellProps): JSX.Element {
+export function WellComponent(props: WellProps): ReactNode {
   const {
     well,
     wellName,

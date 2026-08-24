@@ -25,7 +25,7 @@ export interface TitleBarProps {
  * @deprecated Use 'ModalHeader' instead
  */
 
-export function TitleBar(props: TitleBarProps): JSX.Element {
+export function TitleBar(props: TitleBarProps): ReactNode {
   const {
     title,
     subtitle,

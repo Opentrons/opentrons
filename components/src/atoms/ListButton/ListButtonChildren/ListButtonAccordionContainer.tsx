@@ -13,7 +13,7 @@ interface ListButtonAccordionContainerProps {
 **/
 export function ListButtonAccordionContainer(
   props: ListButtonAccordionContainerProps
-): JSX.Element {
+): ReactNode {
   const { id, children } = props
 
   return (

@@ -5,6 +5,8 @@ import { Icon } from '../icons'
 import styles from './modals.module.css'
 import { Overlay } from './Overlay'
 
+import type { ReactNode } from 'react'
+
 export interface SpinnerModalProps {
   /** Additional/Override style */
   contentsClassName?: string
@@ -20,7 +22,7 @@ export interface SpinnerModalProps {
  * @deprecated use Modal instead
  * Spinner Modal with no background and optional message
  */
-export function SpinnerModal(props: SpinnerModalProps): JSX.Element {
+export function SpinnerModal(props: SpinnerModalProps): ReactNode {
   return (
     <div className={styles.modal}>
       <Overlay alertOverlay={props.alertOverlay} />

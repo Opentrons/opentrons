@@ -10,6 +10,7 @@ import { ALIGN_CENTER, FLEX_MAX_CONTENT } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { ReactNode } from 'react'
 import type { ModuleModel } from '@opentrons/shared-data'
 
 export interface DeckLabelProps {
@@ -37,7 +38,7 @@ export function DeckLabel({
   maxWidth = FLEX_MAX_CONTENT,
   labelBorderRadius,
   isLast = false,
-}: DeckLabelProps): JSX.Element {
+}: DeckLabelProps): ReactNode {
   return (
     <Flex
       fontSize={isZoomed ? '6px' : '18px'}

@@ -34,7 +34,7 @@ export function ModelessModal({
   'aria-label': ariaLabel,
   defaultWidth = 400,
   defaultHeight = 400,
-}: ModelessModalProps): JSX.Element {
+}: ModelessModalProps): ReactNode {
   const modalRef = useRef<HTMLDivElement>(null)
 
   const [rect, setRect] = useState({

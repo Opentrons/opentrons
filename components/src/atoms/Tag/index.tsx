@@ -9,6 +9,7 @@ import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 import { StyledText } from '../StyledText'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { ReactNode } from 'react'
 import type { IconName } from '../../icons'
 import type { LiquidIconProps } from '../../molecules/LiquidIcon'
 
@@ -56,7 +57,7 @@ const TAG_PROPS_BY_TYPE: Record<
   },
 }
 
-export function Tag(props: TagProps): JSX.Element {
+export function Tag(props: TagProps): ReactNode {
   const {
     iconName,
     type,

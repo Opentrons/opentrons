@@ -1,6 +1,6 @@
 import { withStyleProps } from '../hocs/withStyleProps'
 
-import type { ComponentProps, FC } from 'react'
+import type { ComponentProps, FC, ReactNode } from 'react'
 import type { StyleProps } from './types'
 
 export interface LinkProps extends StyleProps {
@@ -11,7 +11,7 @@ export interface LinkProps extends StyleProps {
 const LinkComponent = ({
   external,
   ...props
-}: ComponentProps<'a'> & LinkProps): JSX.Element => (
+}: ComponentProps<'a'> & LinkProps): ReactNode => (
   <a
     {...props}
     {...(external === true && { target: '_blank', rel: 'noopener noreferrer' })}
