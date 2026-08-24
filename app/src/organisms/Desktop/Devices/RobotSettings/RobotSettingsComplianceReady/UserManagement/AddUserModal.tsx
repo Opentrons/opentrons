@@ -22,10 +22,10 @@ import {
   ADD_USER_WIZARD_TOTAL_STEPS,
   MANAGEABLE_USER_ACCOUNT_TYPES,
   USERNAME_MAX_LENGTH,
-} from './userAccount/constants'
-import { OneTimePasswordModal } from './userAccount/OneTimePasswordModal'
-import styles from './userAccount/userAccountForm.module.css'
-import { UserAccountIdentityFormFields } from './userAccount/UserAccountIdentityFormFields'
+} from '../userAccount/constants'
+import { OneTimePasswordModal } from '../userAccount/OneTimePasswordModal'
+import styles from '../userAccount/userAccountForm.module.css'
+import { UserAccountIdentityFormFields } from '../userAccount/UserAccountIdentityFormFields'
 
 import type { TFunction } from 'i18next'
 import type { JSX } from 'react'

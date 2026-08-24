@@ -13,11 +13,11 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 
-import styles from './useraccountconfirmmodal.module.css'
+import styles from './settingsconfirmationmodal.module.css'
 
 import type { JSX } from 'react'
 
-export interface UserAccountConfirmModalProps {
+export interface SettingsConfirmationModalProps {
   title: string
   heading: string
   description: string
@@ -27,7 +27,7 @@ export interface UserAccountConfirmModalProps {
   isConfirmDisabled?: boolean
 }
 
-export function UserAccountConfirmModal({
+export function SettingsConfirmationModal({
   title,
   heading,
   description,
@@ -35,7 +35,7 @@ export function UserAccountConfirmModal({
   onConfirm,
   onCancel,
   isConfirmDisabled = false,
-}: UserAccountConfirmModalProps): JSX.Element {
+}: SettingsConfirmationModalProps): JSX.Element {
   const { t } = useTranslation('shared')
 
   return createPortal(

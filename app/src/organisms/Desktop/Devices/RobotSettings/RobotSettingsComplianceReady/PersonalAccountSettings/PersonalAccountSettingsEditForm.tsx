@@ -5,9 +5,9 @@ import { PrimaryButton, SecondaryButton } from '@opentrons/components'
 
 import { mapAuthUserMutationError } from '/app/resources/auth/mapAuthUserMutationError'
 
-import styles from './userAccount/userAccountForm.module.css'
-import { UserAccountIdentityFormFields } from './userAccount/UserAccountIdentityFormFields'
-import { UserAccountPasswordFormFields } from './userAccount/UserAccountPasswordFormFields'
+import styles from '../userAccount/userAccountForm.module.css'
+import { UserAccountIdentityFormFields } from '../userAccount/UserAccountIdentityFormFields'
+import { UserAccountPasswordFormFields } from '../userAccount/UserAccountPasswordFormFields'
 
 import type { TFunction } from 'i18next'
 import type { JSX } from 'react'

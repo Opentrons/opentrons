@@ -104,6 +104,10 @@ class Backend:
             status_code=status_code,
         )
 
+    def revoke_all_tokens(self) -> None:
+        """Invalidate every issued access and refresh token."""
+        self._token_store._tokens.clear()
+
     def create_introspect_response(
         self, body_form_data: list[tuple[str, str]], headers: dict[str, str]
     ) -> fastapi.Response:
