@@ -18,6 +18,10 @@ import type { KeyboardLanguage, LayoutName } from '../types'
 import '../index.css'
 import './index.css'
 
+import { useSoftwareKeyboardControl } from '../utils/useSoftwareKeyboardControl'
+
+import type { SoftwareKeyboardControlOptions } from '../utils/useSoftwareKeyboardControl'
+
 const SPECIAL_LAYOUT_KEYS = ['{numbers}', '{abc}', '{shift}', '{symbols}']
 const PREVIEW_LABEL_RENDERING_DURATION_MS = 800
 const PREVIEW_LABEL_EN = 'English (US)'
@@ -25,14 +29,18 @@ const PREVIEW_LABEL_CH = '简体拼音'
 
 // TODO (kk:04/05/2024) add debug to make debugging easy
 interface FullKeyboardProps {
-  onChange: (input: string) => void
   keyboardRef: MutableRefObject<KeyboardReactInterface | null>
+  /**
+   * The underlying element that the software keyboard should type into.
+   * See `useSoftwareKeyboardControl()`.
+   */
+  inputElementRef: SoftwareKeyboardControlOptions['inputElementRef']
   debug?: boolean
 }
 
 export function FullKeyboard({
-  onChange,
   keyboardRef,
+  inputElementRef,
   debug = false,
 }: FullKeyboardProps): JSX.Element {
   const [layoutName, setLayoutName] = useState<LayoutName>('default')
@@ -137,6 +145,11 @@ export function FullKeyboard({
     }
   }, [keyboardLanguage, spacePreviewLabel])
 
+  const { beforeInputUpdate, onChange } = useSoftwareKeyboardControl({
+    keyboardRef,
+    inputElementRef,
+  })
+
   return (
     <Keyboard
       keyboardRef={r => {
@@ -144,6 +157,7 @@ export function FullKeyboard({
       }}
       theme="hg-theme-default oddTheme1"
       onChange={onChange}
+      beforeInputUpdate={beforeInputUpdate}
       onKeyPress={onKeyPress}
       layoutName={layoutName}
       layout={fullKeyboardLayout}
