@@ -18,9 +18,9 @@ import { mapAuthUserMutationError } from '/app/resources/auth/mapAuthUserMutatio
 import {
   MANAGEABLE_USER_ACCOUNT_TYPES,
   USERNAME_MAX_LENGTH,
-} from './userAccount/constants'
-import styles from './userAccount/userAccountForm.module.css'
-import { UserAccountIdentityFormFields } from './userAccount/UserAccountIdentityFormFields'
+} from '../userAccount/constants'
+import styles from '../userAccount/userAccountForm.module.css'
+import { UserAccountIdentityFormFields } from '../userAccount/UserAccountIdentityFormFields'
 
 import type { TFunction } from 'i18next'
 import type { JSX } from 'react'

@@ -258,3 +258,31 @@ def test_failed_login_counter(user_store: UserStore) -> None:
     user_store.record_failed_login("user_a", datetime.datetime.now(tz=datetime.UTC))
     user_store.remove("user_a")
     assert user_store.get("user_a") is None
+
+
+def test_mark_all_reset_password(user_store: UserStore) -> None:
+    user_store.add(
+        username="user_a",
+        hashed_password=HASHED_PW,
+        full_name="User A",
+        account_type=AccountType.USER,
+        now=_NOW,
+        reset_password=False,
+    )
+    user_store.add(
+        username="user_b",
+        hashed_password=HASHED_PW,
+        full_name="User B",
+        account_type=AccountType.ADMIN,
+        now=_NOW,
+        reset_password=False,
+    )
+
+    user_store.mark_all_reset_password()
+
+    user_a = user_store.get("user_a")
+    user_b = user_store.get("user_b")
+    assert user_a is not None
+    assert user_b is not None
+    assert user_a.reset_password is True
+    assert user_b.reset_password is True
