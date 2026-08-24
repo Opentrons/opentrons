@@ -11,11 +11,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import {
-  isValidNumericalInput,
-  StatelessNumericalKeyboard,
-} from '/app/atoms/SoftwareKeyboard'
+import { StatelessNumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useToaster } from '/app/organisms/ToasterOven'
 
 import type { NumberParameter } from '@opentrons/shared-data'
@@ -40,45 +38,41 @@ export function ChooseNumber({
     console.log(`Incorrect parameter type: ${parameter.type as string}`)
     return null
   }
-  const handleClickGoBack = (newValue: number | null): void => {
-    if (error != null || newValue === null) {
-      makeSnackbar(t('value_out_of_range_generic') as string)
-    } else {
-      setParameter(newValue, parameter.variableName)
-      handleGoBack()
-    }
-  }
 
-  const paramValueAsNumber = paramValue !== '' ? Number(paramValue) : null
   const { min, max } = parameter
-  const error =
-    Number.isNaN(paramValueAsNumber) ||
-    (paramValueAsNumber != null && paramValueAsNumber < min) ||
-    (paramValueAsNumber != null && paramValueAsNumber > max)
-      ? t(`value_out_of_range`, {
+  const allowDecimal = parameter.type === 'float'
+  const parsedValue = parseNumericalInput(paramValue, {
+    allowDecimal,
+    allowNegative: true,
+    min,
+    max,
+  })
+  const valueErrorMessage =
+    parsedValue.result === 'rangeError'
+      ? t('value_out_of_range', {
           min: parameter.type === 'int' ? min : min.toFixed(1),
           max: parameter.type === 'int' ? max : max.toFixed(1),
         })
-      : null
+      : parsedValue.result === 'syntaxError'
+        ? t('enter_a_valid_number')
+        : null
 
-  const handleInputChange = (inputValue: string): void => {
-    const isValidInput = isValidNumericalInput(inputValue, {
-      allowDecimal: parameter.type === 'float',
-      allowNegative: min < 0,
-    })
-    if (isValidInput === false) {
-      return
+  const handleClickGoBack = (): void => {
+    if (parsedValue.result !== 'success') {
+      makeSnackbar(
+        (valueErrorMessage ?? t('value_out_of_range_generic')) as string
+      )
+    } else {
+      setParameter(parsedValue.data, parameter.variableName)
+      handleGoBack()
     }
-    setParamValue(inputValue)
   }
 
   return (
     <>
       <ChildNavigation
         header={i18n.format(parameter.displayName, 'sentenceCase')}
-        onClickBack={() => {
-          handleClickGoBack(paramValueAsNumber)
-        }}
+        onClickBack={handleClickGoBack}
         buttonType="tertiaryLowLight"
         buttonText={t('restore_default')}
         onClickButton={() => {
@@ -119,10 +113,9 @@ export function ChooseNumber({
                 ? `${parameter.min}-${parameter.max}`
                 : `${parameter.min.toFixed(1)}-${parameter.max.toFixed(1)}`
             }
-            error={error}
+            error={valueErrorMessage}
             onChange={e => {
-              const inputValue = e.target.value
-              handleInputChange(inputValue)
+              setParamValue(e.target.value)
             }}
           />
         </Flex>
@@ -133,9 +126,9 @@ export function ChooseNumber({
         >
           <StatelessNumericalKeyboard
             value={paramValue}
-            isDecimal={parameter.type === 'float'}
+            isDecimal={allowDecimal}
             hasHyphen={min < 0 || max < min}
-            onChange={handleInputChange}
+            onChange={setParamValue}
           />
         </Flex>
       </Flex>

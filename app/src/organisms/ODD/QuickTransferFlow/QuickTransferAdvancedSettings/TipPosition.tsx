@@ -15,6 +15,7 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
@@ -40,8 +41,12 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = useRef(null)
 
-  const [tipPosition, setTipPosition] = useState<number>(
-    kind === 'aspirate' ? state.tipPositionAspirate : state.tipPositionDispense
+  const [tipPosition, setTipPosition] = useState<string>(
+    String(
+      kind === 'aspirate'
+        ? state.tipPositionAspirate
+        : state.tipPositionDispense
+    )
   )
 
   let wellHeight = 1
@@ -73,12 +78,18 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
       ? ACTIONS.SET_ASPIRATE_TIP_POSITION
       : ACTIONS.SET_DISPENSE_TIP_POSITION
 
+  const parsedTipPosition = parseNumericalInput(tipPosition, {
+    allowDecimal: false,
+    allowNegative: false,
+    min: tipPositionRange.min,
+    max: tipPositionRange.max,
+  })
+
   const handleClickSave = (): void => {
-    // the button will be disabled if this values is null
-    if (tipPosition != null) {
+    if (parsedTipPosition.result === 'success') {
       dispatch({
         type: tipPositionAction,
-        position: tipPosition,
+        position: parsedTipPosition.data,
       })
       trackEventWithRobotSerial({
         name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
@@ -90,14 +101,15 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
     onBack()
   }
 
-  const error =
-    tipPosition != null &&
-    (tipPosition < tipPositionRange.min || tipPosition > tipPositionRange.max)
-      ? t(`value_out_of_range`, {
-          min: Math.floor(tipPositionRange.min),
-          max: Math.floor(tipPositionRange.max),
+  const tipPositionErrorMessage =
+    parsedTipPosition.result === 'rangeError'
+      ? t('value_out_of_range', {
+          min: Math.floor(parsedTipPosition.min),
+          max: Math.floor(parsedTipPosition.max),
         })
-      : null
+      : parsedTipPosition.result === 'syntaxError'
+        ? t('enter_a_valid_number')
+        : null
 
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
@@ -111,7 +123,7 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
         onClickBack={onBack}
         onClickButton={handleClickSave}
         top={SPACING.spacing8}
-        buttonIsDisabled={error != null || tipPosition == null}
+        buttonIsDisabled={parsedTipPosition.result !== 'success'}
       />
       <Flex
         alignSelf={ALIGN_CENTER}
@@ -134,9 +146,9 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
             type="text"
             value={tipPosition}
             label={textEntryCopy}
-            error={error}
+            error={tipPositionErrorMessage}
             onChange={e => {
-              setTipPosition(Number(e.target.value))
+              setTipPosition(e.target.value)
             }}
           />
         </Flex>
@@ -148,10 +160,8 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
         >
           <NumericalKeyboard
             keyboardRef={keyboardRef}
-            initialValue={String(tipPosition ?? '')}
-            onChange={e => {
-              setTipPosition(Number(e))
-            }}
+            initialValue={tipPosition}
+            onChange={setTipPosition}
           />
         </Flex>
       </Flex>

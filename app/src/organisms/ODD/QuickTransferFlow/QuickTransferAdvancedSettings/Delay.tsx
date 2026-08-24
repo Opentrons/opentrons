@@ -18,6 +18,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { i18n } from '/app/i18n'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
@@ -49,10 +50,12 @@ export function Delay(props: DelayProps): JSX.Element {
       ? state.delayAspirate != null
       : state.delayDispense != null
   )
-  const [delayDuration, setDelayDuration] = useState<number | null>(
+  const existingDelayDuration =
     kind === 'aspirate'
-      ? (state.delayAspirate?.delayDuration ?? null)
-      : (state.delayDispense?.delayDuration ?? null)
+      ? state.delayAspirate?.delayDuration
+      : state.delayDispense?.delayDuration
+  const [delayDuration, setDelayDuration] = useState<string>(
+    existingDelayDuration != null ? String(existingDelayDuration) : ''
   )
 
   const action =
@@ -99,11 +102,11 @@ export function Delay(props: DelayProps): JSX.Element {
         setCurrentStep(2)
       }
     } else if (currentStep === 2) {
-      if (delayDuration != null) {
+      if (parsedDuration.result === 'success') {
         dispatch({
           type: action,
           delaySettings: {
-            delayDuration,
+            delayDuration: parsedDuration.data,
           },
         })
         trackEventWithRobotSerial({
@@ -120,19 +123,25 @@ export function Delay(props: DelayProps): JSX.Element {
   const setSaveOrContinueButtonText =
     delayIsEnabled && currentStep < 2 ? t('shared:continue') : t('shared:save')
 
-  // allow a maximum of 10 digits for delay duration
   const durationRange = { min: 0.1, max: 9999999999 }
-  const durationError =
-    delayDuration != null &&
-    (delayDuration < durationRange.min || delayDuration > durationRange.max)
-      ? t(`value_out_of_range`, {
-          min: durationRange.min,
-          max: durationRange.max,
+  const parsedDuration = parseNumericalInput(delayDuration, {
+    allowDecimal: true,
+    allowNegative: false,
+    min: durationRange.min,
+    max: durationRange.max,
+  })
+  const durationErrorMessage =
+    parsedDuration.result === 'rangeError'
+      ? t('value_out_of_range', {
+          min: parsedDuration.min,
+          max: parsedDuration.max,
         })
-      : null
+      : parsedDuration.result === 'syntaxError'
+        ? t('enter_a_valid_number')
+        : null
   let buttonIsDisabled = false
   if (currentStep === 2) {
-    buttonIsDisabled = delayDuration == null || durationError != null
+    buttonIsDisabled = parsedDuration.result !== 'success'
   }
 
   return createPortal(
@@ -195,12 +204,12 @@ export function Delay(props: DelayProps): JSX.Element {
           >
             <TouchInputField
               autoFocus
-              type="number"
+              type="text"
               value={delayDuration}
-              error={durationError}
+              error={durationErrorMessage}
               label={t('delay_duration_s')}
               onChange={e => {
-                setDelayDuration(Number(e.target.value))
+                setDelayDuration(e.target.value)
               }}
             />
           </Flex>
@@ -212,11 +221,9 @@ export function Delay(props: DelayProps): JSX.Element {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={String(delayDuration ?? '')}
+              initialValue={delayDuration}
               isDecimal
-              onChange={e => {
-                setDelayDuration(Number(e))
-              }}
+              onChange={setDelayDuration}
             />
           </Flex>
         </Flex>
