@@ -179,7 +179,7 @@ function EnterServicePINPage({
       header={header}
       footer={
         <div className={styles.footer}>
-          <SecondaryButton onClick={onBack}>
+          <SecondaryButton type="button" onClick={onBack}>
             {t('shared:cancel')}
           </SecondaryButton>
           <PrimaryButton variant="warning" type="submit" form={formId}>
@@ -225,6 +225,9 @@ function EnterServicePINPage({
                 autoFocus
                 error={fieldState.error?.message}
                 {...field}
+                // Validate only on enable-button submit. Form mode is onBlur, so
+                // Cancel would otherwise mark an empty PIN incorrect on mousedown.
+                onBlur={undefined}
               />
             )}
           />
