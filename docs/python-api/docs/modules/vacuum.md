@@ -3,11 +3,10 @@ Title: "Python API: Vacuum Module"
 description: How to use the Vacuum Module in a Python protocol.
 ---
 
-The Vacuum Module is an automated filtration system for the Opentrons Flex liquid handling robot. This module enables Flex to run vacuum-based protocols for protein and peptide sample cleanup, solid-phase extraction, and nucleic acid extraction, all within in an enclosed system that includes waste collection.
+The Vacuum Module is an automated filtration system for the Opentrons Flex liquid handling robot. This module enables Flex to run vacuum-based protocols for protein and peptide sample cleanup, solid-phase extraction, and nucleic acid extraction, all within in an enclosed system that includes waste collection. The module is represented in code by a [`VacuumModuleContext`][opentrons.protocol_api.VacuumModuleContext] object that includes methods for deck staging, vacuum pressure and power control, and system venting.
 
-For hardware specifications, installation steps, use cases, chemical compatibility, and other information, see the [Vacuum Module Instruction Manual](../../modules/index.md).
-
-The module is represented in code by a [`VacuumModuleContext`][opentrons.protocol_api.VacuumModuleContext] object that includes methods for deck staging, vacuum pressure and power control, and system venting.
+!!! tip
+    For module specifications, installation steps, use cases, chemical compatibility, and other hardware-related information, see the [Vacuum Module Instruction Manual](../../modules/index.md).
 
 ## Filter plate load names
 
@@ -22,7 +21,7 @@ The Vacuum Module uses a physical deck adapter to hold labware and other pieces 
 <figcaption>Vacuum Module deck adapter</figcaption>
 </figure>
 
-* **Slot A3:** This is the recessed half of the deck adapter that holds the vacuum base and 6 mm hose that pulls waste to the carboy.
+* **Slot A3:** This is the recessed half of the deck adapter that holds the vacuum base piece and its attached 6 mm hose that pulls waste to the carboy.
 * **Slot A4:** Known as "the dock," this is the raised half of the deck adapter. It's a staging or storage space for collars (and other parts of the vacuum stack) when they're not seated on the vacuum base or actively used in a protocol.
 
 Load the module using [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module] with the load name, `vacuumModuleV1`:
@@ -40,10 +39,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
 ## Collars and spacers
 
-The module supports two primary configurations with the following stacking order (from bottom to top).
-<!-- note to readers, trying to avoid using images here -->
-- **Direct to waste:** vacuum base → collar → filter plate
-- **Filtrate collection:** vacuum base → spacer → collection plate → collar → filter plate
+Collars and spacers are modular components that you use to create deck stacks for different types vacuum filtration protocols. Specific combinations configure the module to collect samples or extract liquids directly to the waste collection carboy. The following sections describe how to stage collars and spacers on the Vacuum Module deck adapter.
 
 ### Staging collars
 
@@ -89,7 +85,9 @@ collection_plate = spacer.load_labware(
 )
 ```
 
-### Moving collars and plates
+## Moving labware
+
+<font color="red">ignore this section, not ready yet</font>
 
 The collars and spacers are compatible with the Gripper. You can use the gripper to stack well plates on the collars and spacers and move the stack to the dock or onto the vacuum base to put samples under vacuum.
 
@@ -114,7 +112,7 @@ vacuum.move_to_doc(collar, use_gripper=True)
 
 The Vacuum Module measures vacuum as gauge pressure in millibars (mbar). The module has an operational range from 0 mbar (atmospheric pressure) to -800 mbar, where lower (more negative) values represent a deeper vacuum.
 
-Vacuum commands prefixed with `start_` (e.g., [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure] and [`start_set_vacuum_power()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_power]) are non-blocking commands. These methods return a [`Task`][opentrons.protocol_api.Task] object that runs in the background, allowing the Flex to perform liquid handling or other module operations in parallel with the Vacuum Module. See [Concurrent Module Actions](concurrent.md) for more information about operating multiple modules simultaneously.
+Vacuum commands prefixed with `start_` (e.g., [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure], [`start_set_vacuum_power()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_power], etc.) are non-blocking commands. These methods return a [`Task`][opentrons.protocol_api.Task] object that runs in the background, allowing the Flex to perform liquid handling or other module operations in parallel with the Vacuum Module. See [Concurrent Module Actions](concurrent.md) for more information about operating multiple modules simultaneously.
 
 The following sections describe how to configure minimum and maximum vacuum pressure, closed-loop pressure control, open-loop power regulation, and multi-step vacuum profiles.
 
@@ -128,7 +126,7 @@ Two properties set the operational minimum and maximum gauge pressure limits for
 
 ```python
 vacuum_task = vacuum.start_set_vacuum_pressure(
-    gauge_pressure=vacuum.max_gauge_pressure_mbar,
+    gauge_pressure_mbar=vacuum.max_gauge_pressure_mbar,
     duration_s=30,
     vent_after=True,
     equalize_timeout_s=5
@@ -242,10 +240,30 @@ Use [`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start
     protocol.wait_for_tasks([profile_task])
     ```
 
-### Manual pump and vent control
+## Utility controls
 
-You can also control the pump motor and vent using these standalone, utility commands:
+While commands like `start_set_vacuum_pressure()` automatically manage pump and vent operations, these standalone utility methods give you direct control over the pump motor and vent valve.
 
-- *[`stop_vacuum_pump()`][opentrons.protocol_api.VacuumModuleContext.stop_vacuum_pump] stops the pump motor immediately.
-- *[open_vent()][opentrons.protocol_api.VacuumModuleContext.open_vent] opens the vent and return the system to atmospheric pressure.
-- *[close_vent()][opentrons.protocol_api.VacuumModuleContext.close_vent] closes the vent so the system can hold vacuum.
+### Stopping the pump
+
+Call [`stop_vacuum_pump()`][opentrons.protocol_api.VacuumModuleContext.stop_vacuum_pump] to immediately stop the vacuum pump motor. Stopping the pump does not vent the module. The system will remain under vacuum until a vent command is issued or it depressurizes naturally from small air leaks among staked up deck pieces.
+
+```python
+vacuum.stop_vacuum_pump()
+```
+
+### Opening and closing the vent
+
+The vent valve regulates vacuum pressure inside the module.
+
+- [`open_vent()`][opentrons.protocol_api.VacuumModuleContext.open_vent]: opens the vent to release system vacuum and return the module to atmospheric pressure. Call this before removing labware if an asynchronous profile or pressure hold does not specify `vent_after=True`.
+
+```python
+vacuum.open_vent()
+```
+
+- [`close_vent()`][opentrons.protocol_api.VacuumModuleContext.close_vent]: closes the vent so the system can seal and hold vacuum.
+
+```python
+vacuum.close_vent()
+```
