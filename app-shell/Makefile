@@ -98,7 +98,7 @@ all: package
 # must be wrapped in pnpm run otherwise `prebuild-install` will fail silently
 # due to how `electron-rebuild` calls `prebuild-install`
 setup:
-	pnpm rebuild
+	pnpm run rebuild
 
 .PHONY: clean
 clean:
