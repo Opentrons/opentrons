@@ -29,7 +29,7 @@ If you choose to restrict users to signing for a run only in the Opentrons App, 
 </figure>
 <figcaption>Choose a storage location for your files.</figcaption>
 
-Click the **Advanced** tab in **App Settings**. Next, click **Select folder** to choose a storage location from your computer's directory for audit logs.
+Click the :material-cog: in the lower left to access **App settings**. Select the **Advanced** tab and click **Select folder** to choose a storage location from your computer's directory.
 
 If robot settings, like your Flex's name, are ever changed, you may need to repeat this process.
 

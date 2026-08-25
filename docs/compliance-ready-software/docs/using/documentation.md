@@ -10,11 +10,11 @@ Their documentation, along with their name and user ID, become a part of the [fi
 This section covers how users will add documentation. For a full list of user actions that require documentation, see the [Documented Actions](../actions.md) appendix.
 
 !!! note
-    Opentrons Flex Compliance Ready Software adds required documentation checkpoints to the Opentrons App and Flex touchscreen. Users should follow their lab's process to add sufficient documentation.
+    Opentrons Flex Compliance Ready Software adds required documentation checkpoints to the Opentrons App and Flex touchscreen. Users should follow their lab's own procedures to add sufficient documentation.
 
 ## Adding documentation
 
-Opentrons Flex Compliance Ready Software adds checkpoints to prompt all users to document nearly every robot and protocol action they complete on the robot. Users will see a prompt to add documentation after completing actions like pipette calibration or a protocol run on both the Flex touchscreen and Opentrons App.
+Opentrons Flex Compliance Ready Software adds checkpoints to prompt all users to document nearly every robot and protocol action they complete on the robot. Users will see a prompt on both the Opentrons App and Flex touchscreen to add documentation after completing actions like pipette calibration or protocol setup.
 
 On the Flex touchscreen, users can use the on-screen, collapsible keyboard to add text on the touchscreen.
 
@@ -31,7 +31,9 @@ On the Flex touchscreen, users can use the on-screen, collapsible keyboard to ad
    
     Flex also supports an [external keyboard](../devices.md), attached via USB, to type documentation.
 
-Users can also add text in the Opentrons App. Here, they can also view a list of documented actions on the right. 
+On the touchscreen, tap **View actions** in the top right to view a description of your user action, like "setting Thermocyler lid temperature to 45 °C" or "updating camera preferences." 
+
+Users can also add text in the Opentrons App. Here, you'll always see the user actions requiring documentation on the right. 
 
 <figure class="screenshot" markdown>
   ![Add documentation in the Opentrons App.](../images/documentation-required-app.png)
@@ -44,7 +46,7 @@ When you're finished, click **Confirm** to save your text and move on.
 
 <!----
 TODO: 
-- I replaced dummy text for the list of actions for this image. need to make sure this text is realistic 
+- replace dummy text, I put a lil too much detail in there
 -  need to confirm that the documentation required screen pops up simultaneouly on BOTH odd and app
 ----->
 
@@ -60,8 +62,7 @@ While working on the bench, you'll see several prompts to add documentation in t
 Click each action to view its documentation. When you're finished, click **Confirm** to save your text.
 
 <!----
-- can you actually click each action to view its documentation? on app and in ODD? confirm in alpha? and can you EDIT text here? 
-- again, confirm that dummy text here is realistic
+- update dummy text for this image
 ----->
 
 ## Documentation Settings
@@ -75,5 +76,5 @@ See the complete list of administrator-customizable [settings](../admin.md) for 
 
 <!----
 - triple check that these settings can only be accessed from the app 
-- add some text for the require documentation setting?... if this is off, does it just make documentation OPTIONAL? like does the screen still pop up? or does this stop all modals? 
+- add some text for the require documentation setting?... if this is off, users dont' see documentation modals, but I assume their user actions are still added to the protocol audit log
 ----->

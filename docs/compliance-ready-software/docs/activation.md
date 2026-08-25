@@ -20,9 +20,9 @@ The encryption key is a three-word string, and your Flex generates a new one eve
   <figcaption>The robot-generated encryption key changes every 30 seconds.</figcaption>
 </figure>
 
-In your Opentrons App, click the three-dot menu to the right of your robot's name to access its settings. Select the **Advanced** tab, then click to **Enter encryption key**. 
+In your Opentrons App, click the three-dot menu to the right of your robot's name to access its settings. Select the **Advanced** tab, then click to **Enter encryption key**.
 
-If a certificate expires or if you make updates to device settings like the robot's name, you may need to enter the encryption key again to re-establish the connection between your Flex and Opentrons App. You'll be prompted to do this in the app. 
+If a certificate expires, or if you make updates to device settings like the robot's name, you may need to enter the encryption key again to re-establish the connection between your Flex and Opentrons App. You'll be prompted to do this in the app. 
 
 <figure class="screenshot" markdown>
   ![Enter the robot-generated encryption key.](images/enter-key.png)
