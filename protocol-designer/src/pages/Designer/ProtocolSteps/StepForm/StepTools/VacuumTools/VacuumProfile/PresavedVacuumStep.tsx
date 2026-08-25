@@ -31,6 +31,7 @@ import { PresavedVacuumHeader } from './PresavedVacuumHeader'
 import { getStepErrors } from './utils'
 import styles from './vacuumprofile.module.css'
 
+import type { ReactNode } from 'react'
 import type { VacuumProfileStep } from '/protocol-designer/form-types'
 import type { VacuumPumpData, VacuumStepBaseProps } from './types'
 
@@ -42,9 +43,7 @@ export interface PresavedVacuumStepProps extends VacuumStepBaseProps {
   forceShowErrors?: boolean
 }
 
-export function PresavedVacuumStep(
-  props: PresavedVacuumStepProps
-): JSX.Element {
+export function PresavedVacuumStep(props: PresavedVacuumStepProps): ReactNode {
   const {
     stepData,
     displayIndex,
@@ -207,7 +206,7 @@ export function PresavedVacuumStep(
 function StepEndingHoldField(props: {
   toggledOn: boolean
   onChange: () => void
-}): JSX.Element {
+}): ReactNode {
   const { toggledOn, onChange } = props
   const { t } = useTranslation('protocol_steps')
   const label = toggledOn

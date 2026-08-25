@@ -14,6 +14,8 @@ import BOTTOM_LAYER from '/protocol-designer/assets/images/tip_side_bottom_layer
 import MID_LAYER from '/protocol-designer/assets/images/tip_side_mid_layer.svg'
 import TOP_LAYER from '/protocol-designer/assets/images/tip_side_top_layer.svg'
 
+import type { ReactNode } from 'react'
+
 const WELL_HEIGHT_PIXELS = 71
 const PIXEL_DECIMALS = 2
 
@@ -25,7 +27,7 @@ interface TipPositionZOnlyViewProps {
 
 export function TipPositionZOnlyView(
   props: TipPositionZOnlyViewProps
-): JSX.Element {
+): ReactNode {
   const { mmFromBottom, mmFromTop, wellDepthMm } = props
   const { t } = useTranslation('application')
   const positionInTube = mmFromBottom ?? mmFromTop ?? 0

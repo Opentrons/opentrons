@@ -17,7 +17,11 @@ import {
 
 import styles from './stepcontainer.module.css'
 
-import type { PropsWithChildren, MouseEvent as ReactMouseEvent } from 'react'
+import type {
+  PropsWithChildren,
+  MouseEvent as ReactMouseEvent,
+  ReactNode,
+} from 'react'
 import type {
   CURSOR_DEFAULT,
   CURSOR_POINTER,
@@ -55,7 +59,7 @@ export interface StepContainerProps {
   dataTestId?: string
 }
 
-export function StepContainer(props: StepContainerProps): JSX.Element {
+export function StepContainer(props: StepContainerProps): ReactNode {
   const {
     iconName,
     stepNumber,
@@ -190,7 +194,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
 
 function Subtext(
   props: PropsWithChildren<{ subtextColor: string }>
-): JSX.Element {
+): ReactNode {
   const { children, subtextColor } = props
   return (
     <Flex

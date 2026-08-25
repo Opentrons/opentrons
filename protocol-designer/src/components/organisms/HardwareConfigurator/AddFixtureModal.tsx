@@ -58,6 +58,7 @@ import {
 } from './utils'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
 import type { ModalProps } from '@opentrons/components'
 import type {
@@ -103,7 +104,7 @@ export type OptionStage =
 //  TODO: this is similar to the AddFixtureModal in the app but logic varies
 //  quite a bit. Would be ideal to merge them together but not sure how to do
 //  so cleanly.
-export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
+export function AddFixtureModal(props: AddFixtureModalProps): ReactNode {
   const {
     cutoutId,
     closeModal,

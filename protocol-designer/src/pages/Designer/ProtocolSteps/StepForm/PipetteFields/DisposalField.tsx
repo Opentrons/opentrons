@@ -19,6 +19,7 @@ import {
 import { FlowRateField } from './FlowRateField'
 import { PositionField } from './PositionField'
 
+import type { ReactNode } from 'react'
 import type {
   FormData,
   PathOption,
@@ -37,7 +38,7 @@ interface DisposalFieldProps {
   aspirate_airGap_volume?: string | null
 }
 
-export function DisposalField(props: DisposalFieldProps): JSX.Element {
+export function DisposalField(props: DisposalFieldProps): ReactNode {
   const {
     path,
     stepType,

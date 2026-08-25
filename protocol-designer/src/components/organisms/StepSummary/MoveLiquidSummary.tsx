@@ -13,6 +13,7 @@ import {
 import { getLiquidDisplay } from './getLiquidDisplay'
 import { getLiquidIdsForStepSummary, getWellsForStepSummary } from './utils'
 
+import type { ReactNode } from 'react'
 import type {
   AdditionalEquipmentEntities,
   LabwareEntities,
@@ -30,7 +31,7 @@ interface MoveLiquidSummaryProps {
   additionalEquipmentEntities: AdditionalEquipmentEntities
 }
 
-export function MoveLiquidSummary(props: MoveLiquidSummaryProps): JSX.Element {
+export function MoveLiquidSummary(props: MoveLiquidSummaryProps): ReactNode {
   const {
     currentStep,
     labwareNicknamesById,

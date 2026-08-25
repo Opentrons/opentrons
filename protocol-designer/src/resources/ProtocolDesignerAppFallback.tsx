@@ -17,6 +17,7 @@ import {
 
 import { actions } from '../load-file'
 
+import type { ReactNode } from 'react'
 import type { FallbackProps } from 'react-error-boundary'
 import type { ThunkDispatch } from '../types'
 
@@ -25,7 +26,7 @@ const LOG_LEVEL = 'error'
 export function ProtocolDesignerAppFallback({
   error,
   resetErrorBoundary,
-}: FallbackProps): JSX.Element {
+}: FallbackProps): ReactNode {
   const { t } = useTranslation('shared')
   const dispatch: ThunkDispatch<any> = useDispatch()
   const errorId = uuidv4()

@@ -14,7 +14,7 @@ import {
 import { LabwareCardOverflowMenu } from '../LabwareCardOverflowMenu'
 import styles from './labwarebutton.module.css'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 
 interface LabwareButtonProps {
   numberInStack: number
@@ -26,7 +26,7 @@ interface LabwareButtonProps {
   ) => void
   id: string
 }
-export function LabwareButton(props: LabwareButtonProps): JSX.Element {
+export function LabwareButton(props: LabwareButtonProps): ReactNode {
   const { isSelected, onClick, numberInStack, displayName, id } = props
   //  The tagHover is annoying to keep track of state locally in this Ts component
   //  but no other way to put it in css modules since its a tag prop
