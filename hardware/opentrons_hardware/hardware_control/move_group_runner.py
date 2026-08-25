@@ -4,7 +4,7 @@ import asyncio
 import logging
 import time
 from collections import defaultdict
-from typing import Iterator, List, Optional, Set, Tuple, Union
+from typing import Dict, Iterator, List, Optional, Set, Tuple, Union
 
 import numpy as np
 from opentrons_shared_data.errors.exceptions import (
@@ -90,6 +90,16 @@ _AcceptableMoves = Union[MoveCompleted, TipActionResponse]
 _CompletionPacket = Tuple[ArbitrationId, _AcceptableMoves]
 _Completions = List[_CompletionPacket]
 
+#: Maps the message index of a request that sets up a move to the
+#: (node id, group id, seq id) that request was sent for. Recorded by
+#: MoveGroupRunner._send_groups and handed to the MoveScheduler, which uses it to tell
+#: the completions of its own moves from every other completion on the bus.
+_ExpectedCompletions = Dict[int, Tuple[int, int, int]]
+
+#: Stands in for the gear motor id of a completion that did not come from a gear motor.
+#: GearMotorId values are 0 and 1, so -1 cannot collide with a real one.
+_NO_GEAR_MOTOR = -1
+
 
 class MoveGroupRunner:
     """A move command scheduler."""
@@ -111,6 +121,9 @@ class MoveGroupRunner:
         self._start_at_index = start_at_index
         self._ignore_stalls = ignore_stalls
         self._is_prepped: bool = False
+        # Populated by _send_groups. None means no moves have been sent yet, which is
+        # not the same thing as an empty mapping: see MoveScheduler.__init__.
+        self._expected_completions: Optional[_ExpectedCompletions] = None
 
     @staticmethod
     def _has_moves(move_groups: MoveGroups) -> bool:
@@ -256,16 +269,30 @@ class MoveGroupRunner:
         return node_set
 
     async def _send_groups(self, can_messenger: CanMessenger) -> None:
-        """Send commands to set up the message groups."""
+        """Send commands to set up the message groups.
+
+        Each request is built into a local before it is sent so that the message index
+        BaseMessage.__post_init__ assigned to it can be recorded. Firmware echoes that
+        index in the completion it sends for the move, so the recorded mapping is
+        exactly the set of completions this runner should ever accept.
+
+        The mapping is replaced rather than added to, because a runner can be prepped
+        more than once and completions left over from an earlier prep must not be
+        accepted against a later one.
+        """
+        expected: _ExpectedCompletions = {}
+        self._expected_completions = expected
         for group_i, group in enumerate(self._move_groups):
             for seq_i, sequence in enumerate(group):
                 for node, step in sequence.items():
-                    await can_messenger.send(
-                        node_id=node,
-                        message=self._get_message_type(
-                            step, group_i + self._start_at_index, seq_i
-                        ),
+                    group_id = group_i + self._start_at_index
+                    message = self._get_message_type(step, group_id, seq_i)
+                    expected[message.payload.message_index.value] = (
+                        node.value,
+                        group_id,
+                        seq_i,
                     )
+                    await can_messenger.send(node_id=node, message=message)
 
     def _convert_velocity(
         self, velocity: Union[float, np.float64], interrupts: int
@@ -402,7 +429,11 @@ class MoveGroupRunner:
         self, can_messenger: CanMessenger, start_at_index: int
     ) -> _Completions:
         """Run all the move groups."""
-        scheduler = MoveScheduler(self._move_groups, start_at_index)
+        scheduler = MoveScheduler(
+            self._move_groups,
+            start_at_index,
+            expected_completions=self._expected_completions,
+        )
         try:
             can_messenger.add_listener(scheduler)
             completions = await scheduler.run(can_messenger)
@@ -414,8 +445,24 @@ class MoveGroupRunner:
 class MoveScheduler:
     """A message listener that manages the sending of execute move group messages."""
 
-    def __init__(self, move_groups: MoveGroups, start_at_index: int = 0) -> None:
-        """Constructor."""
+    def __init__(
+        self,
+        move_groups: MoveGroups,
+        start_at_index: int = 0,
+        expected_completions: Optional[_ExpectedCompletions] = None,
+    ) -> None:
+        """Constructor.
+
+        Args:
+            move_groups: The move groups this scheduler waits for.
+            start_at_index: The group id the first of those move groups was sent with.
+            expected_completions: The message indices of the requests that set these
+                move groups up, as recorded by MoveGroupRunner._send_groups. When this
+                is None no completion can be validated and all of them are accepted,
+                which is only the case for a scheduler built without a preceding
+                _send_groups; an empty mapping means no moves were sent and so no
+                completion is expected. This mapping is never mutated.
+        """
         # For each move group create a set identifying the node and seq id.
         self._moves: List[Set[Tuple[int, int]]] = []
         self._durations: List[float] = []
@@ -454,6 +501,10 @@ class MoveScheduler:
         self._errors: List[EnumeratedError] = []
         self._current_group: Optional[int] = None
         self._should_stop = False
+        self._expected_completions = expected_completions
+        self._seen_completions: Set[Tuple[int, int]] = set()
+        self._dropped_foreign_completions = 0
+        self._dropped_duplicate_completions = 0
 
     def _remove_move_group(
         self, message: _AcceptableMoves, arbitration_id: ArbitrationId
@@ -469,10 +520,6 @@ class MoveScheduler:
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
                 f", which {'is' if in_group else 'isnt'} in group"
             )
-            if self._moves[group_id] and len(self._moves[group_id]) == 0:
-                log.error(
-                    f"Python bug proven if check {bool(not self._moves[group_id])} len check {len(self._moves[group_id]) == 0}"
-                )
             if not self._moves[group_id]:
                 log.debug(
                     f"Move group {group_id + self._start_at_index} has completed."
@@ -480,8 +527,10 @@ class MoveScheduler:
                 self._event.set()
         except KeyError:
             log.warning(
-                f"Got a move ack for ({node_id}, {seq_id}) which is not in this "
-                "group; may have leaked from an earlier timed-out group"
+                f"Got a move ack from node {node_id} for group "
+                f"{message.payload.group_id.value} seq {seq_id} with message index "
+                f"{message.payload.message_index.value}, which is not one of the moves "
+                "this group is still waiting for"
             )
         except IndexError:
             # If we have two move groups running at once, we need to handle
@@ -586,10 +635,110 @@ class MoveScheduler:
                 )
             )
 
+    @staticmethod
+    def _completion_key(message: _AcceptableMoves) -> Tuple[int, int]:
+        """Build the deduplication key for a move completion.
+
+        One TipActionRequest is answered twice, once per gear motor, and both responses
+        echo the message index of that single request; they differ only in gear motor
+        id. Every other kind of request is answered exactly once, so its message index
+        alone identifies its completion.
+        """
+        index = message.payload.message_index.value
+        if isinstance(message, TipActionResponse):
+            return (index, message.payload.gear_motor_id.value)
+        return (index, _NO_GEAR_MOTOR)
+
+    def _is_expected_completion(
+        self, message: _AcceptableMoves, arbitration_id: ArbitrationId
+    ) -> bool:
+        """Check whether a completion answers one of this scheduler's own moves.
+
+        Firmware echoes the message index of the request that set a move up in the
+        completion it sends for that move, and message indices are unique and
+        monotonically increasing for the life of the process. So a completion carrying
+        an index these move groups did not send belongs to another runner or to a group
+        that has already finished, and a completion carrying an index that was already
+        answered is a duplicate delivery. Neither may satisfy a pending move or report a
+        position: every move uses the same few (node id, seq id) pairs, so neither is
+        otherwise distinguishable from a real completion.
+
+        A completion whose index is one of ours but which arrives for a different
+        (node id, group id, seq id) than we sent that index for is logged and accepted
+        rather than dropped. Rejecting on originating node would turn a node that
+        answers from a subnode id into a move that never completes, which is a worse
+        failure than the one this check exists to prevent.
+
+        Args:
+            message: The completion that arrived.
+            arbitration_id: The arbitration id it arrived with.
+
+        Returns:
+            True if the completion should be handled, False if it must be dropped.
+        """
+        if self._expected_completions is None:
+            return True
+        index = message.payload.message_index.value
+        expected = self._expected_completions.get(index)
+        group_id = message.payload.group_id.value
+        seq_id = message.payload.seq_id.value
+        node_id = arbitration_id.parts.originating_node_id
+        if expected is None:
+            self._dropped_foreign_completions += 1
+            log.debug(
+                f"Dropping completion from node {node_id} for group {group_id} seq "
+                f"{seq_id} with message index {index}: no move was sent with that index"
+            )
+            return False
+        key = self._completion_key(message)
+        if key in self._seen_completions:
+            self._dropped_duplicate_completions += 1
+            log.warning(
+                f"Dropping duplicate delivery of the completion for group {group_id} "
+                f"seq {seq_id} with message index {index}: that move was already "
+                "answered"
+            )
+            return False
+        self._seen_completions.add(key)
+        if (node_id, group_id, seq_id) != expected:
+            log.error(
+                f"Message index {index} was sent for (node, group, seq) {expected} but "
+                f"its completion arrived for {(node_id, group_id, seq_id)}"
+            )
+        return True
+
+    def _group_index(self, message: _AcceptableMoves) -> Optional[int]:
+        """Map a completion's group id onto this scheduler's list of move groups.
+
+        Returns None if the group id is not one of this scheduler's groups. The bare
+        subtraction can go negative, and a negative index would quietly address the
+        last group instead of raising IndexError.
+        """
+        group_index = message.payload.group_id.value - self._start_at_index
+        if group_index < 0 or group_index >= len(self._moves):
+            return None
+        return group_index
+
+    def _dropped_completion_summary(self) -> str:
+        """Describe the completions this scheduler refused, for error reporting."""
+        return (
+            f"{self._dropped_foreign_completions} for moves this group did not send, "
+            f"{self._dropped_duplicate_completions} duplicate deliveries"
+        )
+
     def __call__(
         self, message: MessageDefinition, arbitration_id: ArbitrationId
     ) -> None:
         """Incoming message handler."""
+        if isinstance(message, (MoveCompleted, TipActionResponse)):
+            # This has to happen before either handler runs, because both of them
+            # mutate scheduler state and _handle_tip_action_motors mutates it before
+            # _remove_move_group is even reached. Note that ErrorMessage is
+            # deliberately not checked this way: firmware sends some of those with a
+            # message index of 0 (estop released, cancelling with no active move), and
+            # dropping them would hide estop and collision errors from _handle_error.
+            if not self._is_expected_completion(message, arbitration_id):
+                return
         if isinstance(message, MoveCompleted):
             self._remove_move_group(message, arbitration_id)
             self._handle_move_completed(message, arbitration_id)
@@ -604,12 +753,28 @@ class MoveScheduler:
 
     def _handle_tip_action_motors(self, message: TipActionResponse) -> bool:
         gear_id = GearMotorId(message.payload.gear_motor_id.value)
-        group_id = message.payload.group_id.value - self._start_at_index
         seq_id = message.payload.seq_id.value
-        self._expected_tip_action_motors[group_id][seq_id].remove(gear_id)
-        if len(self._expected_tip_action_motors[group_id][seq_id]) == 0:
-            return True
-        return False
+        group_index = self._group_index(message)
+        expected_motors: List[GearMotorId] = (
+            self._expected_tip_action_motors[group_index][seq_id]
+            if group_index is not None
+            and seq_id < len(self._expected_tip_action_motors[group_index])
+            else []
+        )
+        if gear_id not in expected_motors:
+            # A concurrently running gear axis runner shares this bus and its responses
+            # arrive here too. Removing a gear motor that is not expected used to raise
+            # ValueError out of a CAN listener callback, and CanMessenger._read_task
+            # only catches BinarySerializableException, so that aborted dispatch of the
+            # frame to every listener after this one.
+            log.warning(
+                f"Ignoring tip action response from gear motor {gear_id.name} for group "
+                f"{message.payload.group_id.value} seq {seq_id}, which this scheduler "
+                "is not waiting for"
+            )
+            return False
+        expected_motors.remove(gear_id)
+        return not expected_motors
 
     def _get_nodes_in_move_group(self, group_id: int) -> List[NodeId]:
         nodes = []
@@ -723,14 +888,15 @@ class MoveScheduler:
             full_duration = full_time - start_time
             second_duration = full_time - first_time
             missing_nodes = self._get_nodes_in_move_group(group_id)
+            dropped = self._dropped_completion_summary()
             if not missing_nodes:
                 log.warning(
-                    f"Move timeout fired with no missing nodes after {full_duration}s full, second-phase {second_duration} on a {full_timeout}s timeout; may not have been scheduled"
+                    f"Move timeout fired with no missing nodes after {full_duration}s full, second-phase {second_duration} on a {full_timeout}s timeout; may not have been scheduled. Dropped completions: {dropped}"
                 )
                 return
             missing_node_msg = ", ".join(node.name for node in missing_nodes)
             log.error(
-                f"Move set {str(group_id)} timed out of max duration {full_duration}s full, second-phase {second_duration}. Expected time: {expected_time}. Missing: {missing_node_msg}"
+                f"Move set {str(group_id)} timed out of max duration {full_duration}s full, second-phase {second_duration}. Expected time: {expected_time}. Missing: {missing_node_msg}. Dropped completions: {dropped}"
             )
 
             raise MotionFailedError(
@@ -740,6 +906,7 @@ class MoveScheduler:
                     "full-timeout": str(full_timeout),
                     "expected-time": str(expected_time),
                     "elapsed": str(time.monotonic() - start_time),
+                    "dropped-completions": dropped,
                 },
             )
 
@@ -749,6 +916,9 @@ class MoveScheduler:
             self._start_at_index, self._start_at_index + len(self._moves)
         ):
             await self._run_one_group(group_id, can_messenger)
+
+        if self._dropped_foreign_completions or self._dropped_duplicate_completions:
+            log.info(f"Dropped move completions: {self._dropped_completion_summary()}")
 
         def _reify_queue_iter() -> Iterator[_CompletionPacket]:
             while not self._completion_queue.empty():
