@@ -141,6 +141,73 @@ def test_liquid_height_calibration_is_triggered_by_volume_not_tip() -> None:
     ]
 
 
+@pytest.mark.parametrize(
+    ("tip_already_attached", "expected_retract_count"),
+    [(True, 1), (False, 2)],
+)
+def test_liquid_height_calibration_avoids_redundant_blank_retract(
+    tip_already_attached: bool, expected_retract_count: int
+) -> None:
+    """Let the blank path perform the post-calibration retract for its attached tip."""
+    fixture_settings = MagicMock()
+    probe_tip = MagicMock()
+    remove_tip = MagicMock()
+
+    with patch.multiple(
+        gravimetric,
+        _configure_tip_count=MagicMock(),
+        _get_tips_for_test=MagicMock(return_value=[probe_tip]),
+        pick_up_tip_for_channel=MagicMock(),
+        maybe_switch_mode=MagicMock(),
+        _initialize_liquid_height=MagicMock(),
+        remove_tip=remove_tip,
+    ):
+        gravimetric._calibrate_liquid_height_for_volume(
+            fixture_settings,
+            tip=50,
+            test_volume=1.0,
+            tip_already_attached=tip_already_attached,
+        )
+
+    fixture_settings.pipette.configure_for_volume.assert_called_once_with(1.0)
+    assert fixture_settings.pipette._retract.call_count == expected_retract_count
+    if tip_already_attached:
+        remove_tip.assert_not_called()
+    else:
+        remove_tip.assert_called_once_with(fixture_settings)
+
+
+def test_liquid_height_calibration_configures_volume_before_tip_and_lld() -> None:
+    """Switch to the target volume mode before preparing the probe path."""
+    fixture_settings = MagicMock()
+    probe_tip = MagicMock()
+    call_order: List[str] = []
+    fixture_settings.pipette.configure_for_volume.side_effect = (
+        lambda volume: call_order.append(f"configure:{volume:g}")
+    )
+
+    with patch.multiple(
+        gravimetric,
+        _configure_tip_count=MagicMock(),
+        _get_tips_for_test=MagicMock(return_value=[probe_tip]),
+        pick_up_tip_for_channel=MagicMock(
+            side_effect=lambda *args: call_order.append("pick-up-tip")
+        ),
+        maybe_switch_mode=MagicMock(),
+        _initialize_liquid_height=MagicMock(
+            side_effect=lambda *args: call_order.append("lld")
+        ),
+        remove_tip=MagicMock(),
+    ):
+        gravimetric._calibrate_liquid_height_for_volume(
+            fixture_settings,
+            tip=50,
+            test_volume=5.0,
+        )
+
+    assert call_order == ["configure:5", "pick-up-tip", "lld"]
+
+
 @pytest.mark.parametrize("use_lld", [True, False])
 def test_liquid_height_calibration_mode_is_selected_by_parameter(
     use_lld: bool,

@@ -132,7 +132,7 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
 from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
 
 
-metadata = {"protocolName": "Gravimetric QC V3 Manual-LLD"}
+metadata = {"protocolName": "Gravimetric QC V3 Manual-LLD T4"}
 requirements = {"robotType": "Flex", "apiLevel": "2.29"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
@@ -2363,6 +2363,8 @@ def _calibrate_liquid_height_for_volume(
     tip_already_attached: bool = False,
 ) -> None:
     """Calibrate liquid height before testing a new volume."""
+    fixture_settings.pipette.configure_for_volume(test_volume)
+
     if not tip_already_attached:
         _configure_tip_count(fixture_settings, 0)
         probe_tip = _get_tips_for_test(fixture_settings, tip, False)[0]
@@ -2371,9 +2373,9 @@ def _calibrate_liquid_height_for_volume(
     fixture_settings.pipette._retract()
     maybe_switch_mode(fixture_settings, tip)
     _initialize_liquid_height(fixture_settings, test_volume)
-    fixture_settings.pipette._retract()
 
     if not tip_already_attached:
+        fixture_settings.pipette._retract()
         remove_tip(fixture_settings)
 
 
