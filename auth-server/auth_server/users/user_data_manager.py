@@ -3,6 +3,7 @@
 import datetime
 import secrets
 import string
+from typing import Any
 
 from pwdlib import PasswordHash
 
@@ -12,10 +13,11 @@ from auth_server.settings.store import SettingsStore
 from auth_server.users.is_account_locked import is_account_locked
 from auth_server.users.models import (
     AccountType,
+    ResetPasswordReason,
     TemporaryPasswordResponse,
     UserResponse,
 )
-from auth_server.users.store import UserStore
+from auth_server.users.store import UserStore, _UNSET
 
 password_hash = PasswordHash.recommended()
 
@@ -110,16 +112,30 @@ def _validate_fields_non_empty(
             raise InvalidInputError(f"{field_name} must not be empty")
 
 
-def must_reset_password(
+def get_reset_password_reason(
     user: User, now: datetime.datetime, password_reset_time_sec: float | None
-) -> bool:
-    """Return whether the user must reset their password before full robot access."""
+) -> ResetPasswordReason:
+    """Return why the user must reset their password, if at all."""
+    if user.reset_password_reason is not None:
+        return ResetPasswordReason(user.reset_password_reason)
     password_is_expired = (
         password_reset_time_sec is not None
         and now
         > user.password_set_at + datetime.timedelta(seconds=password_reset_time_sec)
     )
-    return password_is_expired or user.reset_password
+    if password_is_expired:
+        return ResetPasswordReason.PASSWORD_EXPIRED
+    return ResetPasswordReason.NONE
+
+
+def must_reset_password(
+    user: User, now: datetime.datetime, password_reset_time_sec: float | None
+) -> bool:
+    """Return whether the user must reset their password before full robot access."""
+    return (
+        get_reset_password_reason(user, now, password_reset_time_sec)
+        != ResetPasswordReason.NONE
+    )
 
 
 class UserDataManager:
@@ -139,12 +155,17 @@ class UserDataManager:
         account_type = AccountType(user.account_type)
         now = datetime.datetime.now(tz=datetime.UTC)
 
+        password_reset_time = settings.passwordResetTime
+        reset_password_reason = get_reset_password_reason(
+            user, now, password_reset_time
+        )
         return UserResponse(
             username=user.username,
             fullName=user.full_name,
             accountType=account_type,
             locked=user.deactivated or is_failed_login_locked,
-            resetPassword=must_reset_password(user, now, settings.passwordResetTime),
+            resetPassword=reset_password_reason != ResetPasswordReason.NONE,
+            resetPasswordReason=reset_password_reason,
         )
 
     def create_user(
@@ -163,8 +184,8 @@ class UserDataManager:
             account_type=account_type,
         )
         settings = self._settings_store.get_settings()
-        reset_password = password is None
-        if reset_password:
+        issue_temporary_password = password is None
+        if issue_temporary_password:
             min_length, require_special = _password_complexity_requirements(settings)
             password = _generate_temporary_password(min_length, require_special)
         elif password is not None:
@@ -178,11 +199,15 @@ class UserDataManager:
             full_name=full_name,
             account_type=account_type,
             now=now,
-            reset_password=reset_password,
+            reset_password_reason=(
+                ResetPasswordReason.FIRST_TIME_LOGIN
+                if issue_temporary_password
+                else None
+            ),
         )
         return TemporaryPasswordResponse(
             **self._to_response(new_user).model_dump(),
-            temporaryPassword=password if reset_password else None,
+            temporaryPassword=password if issue_temporary_password else None,
         )
 
     def get_user(self, username: str) -> UserResponse:
@@ -211,7 +236,7 @@ class UserDataManager:
         new_full_name: str | None = None,
         new_account_type: str | None = None,
         new_locked: bool | None = None,
-        reset_password: bool = False,
+        require_admin_password_reset: bool = False,
         *,
         now: datetime.datetime,
     ) -> UserResponse:
@@ -241,6 +266,7 @@ class UserDataManager:
             raise UserAlreadyExistsError(f"User {new_username!r} already exists")
         try:
             deactivated: bool | None = None
+            reset_password_reason_update: ResetPasswordReason | None | Any = _UNSET
             if new_locked is not None:
                 if new_locked:
                     deactivated = True
@@ -248,8 +274,10 @@ class UserDataManager:
                     # Note: do this BEFORE the username is potentially changed
                     self._user_store.clear_failed_logins(username_to_update)
                     deactivated = False
+            if require_admin_password_reset:
+                reset_password_reason_update = ResetPasswordReason.ADMIN_FORCED
             if new_password is not None:
-                reset_password = False
+                reset_password_reason_update = None
             updated_user = self._user_store.update(
                 username_to_update,
                 new_username=new_username,
@@ -260,7 +288,7 @@ class UserDataManager:
                 ),
                 full_name=new_full_name,
                 account_type=new_account_type,
-                reset_password=reset_password,
+                reset_password_reason=reset_password_reason_update,
                 deactivated=deactivated,
                 now=now,
             )
@@ -288,7 +316,7 @@ class UserDataManager:
             updated_user = self._user_store.update(
                 username,
                 hashed_password=password_hash.hash(temporary_password),
-                reset_password=True,
+                reset_password_reason=ResetPasswordReason.ADMIN_FORCED,
                 deactivated=False,
                 now=now,
             )

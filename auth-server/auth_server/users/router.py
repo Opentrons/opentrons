@@ -263,7 +263,7 @@ async def update_user(
             new_full_name=update_data.fullName,
             new_account_type=update_data.accountType,
             new_locked=update_data.locked,
-            reset_password=update_data.resetPassword is True,
+            require_admin_password_reset=update_data.resetPassword is True,
         )
     except UserAlreadyExistsError:
         raise APIError(
