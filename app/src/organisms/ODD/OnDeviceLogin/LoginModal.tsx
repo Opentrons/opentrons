@@ -3,6 +3,7 @@ import { useQueryClient } from 'react-query'
 import { useDispatch, useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
+import { getUserLoginStatus } from '@opentrons/api-client'
 import {
   getSelfQueryKey,
   useAuthSettingsQuery,
@@ -21,7 +22,7 @@ import {
 import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLogin.module.css'
 
-import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
+import type { AuthUser, AuthUserResetPasswordReason, OAuth2TokenResponse } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 import type { LoginStep } from './index'
 
@@ -38,6 +39,9 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const [loginUsername, setLoginUsername] = useState<string | undefined>(
     undefined
   )
+  const [resetPasswordReason, setResetPasswordReason] =
+    useState<AuthUserResetPasswordReason | null>(null)
+  const [isFetchingLoginStatus, setIsFetchingLoginStatus] = useState(false)
   const storeLoginState = useStoreLoginState()
   const localRobotName = useSelector(
     (state: State) => getLocalRobot(state)?.name ?? null
@@ -85,11 +89,27 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
       if (host != null) {
         void queryClient.invalidateQueries(getSelfQueryKey(host))
       }
+      setResetPasswordReason(null)
       setPhase('login')
       setStep('password')
     },
     [dispatch, host, localRobotName, queryClient]
   )
+
+  const handleUsernameSubmit = async (username: string): Promise<void> => {
+    setLoginUsername(username)
+    if (host == null) return
+
+    setIsFetchingLoginStatus(true)
+    try {
+      const response = await getUserLoginStatus(host, username)
+      setResetPasswordReason(response.data.data.resetPasswordReason ?? null)
+    } catch {
+      setResetPasswordReason(null)
+    } finally {
+      setIsFetchingLoginStatus(false)
+    }
+  }
 
   const { submitPassword, isAuthLoading: isLoginAuthLoading } =
     useOAuth2PasswordLogin({
@@ -137,13 +157,17 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
         key={phase}
         step={step}
         onStepChange={setStep}
+        onUsernameSubmit={phase === 'login' ? handleUsernameSubmit : undefined}
         submitPassword={
           isChoosingNewPassword ? submitNewPassword : submitPassword
         }
         isAuthLoading={
-          isChoosingNewPassword ? isSetNewPasswordLoading : isLoginAuthLoading
+          isChoosingNewPassword
+            ? isSetNewPasswordLoading
+            : isLoginAuthLoading || isFetchingLoginStatus
         }
         isPasswordResetRequired={isChoosingNewPassword}
+        resetPasswordReason={resetPasswordReason}
         initialUsername={initialUsername}
         loginError={loginError}
         onClearLoginError={() => {

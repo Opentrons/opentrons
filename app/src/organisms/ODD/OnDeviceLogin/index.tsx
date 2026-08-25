@@ -10,6 +10,7 @@ import { LoginFieldController } from './LoginFieldController'
 import styles from './OnDeviceLogin.module.css'
 
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
+import type { AuthUserResetPasswordReason } from '@opentrons/api-client'
 import type { PasswordComplexityRequirements } from '/app/resources/auth'
 
 export type LoginStep = 'username' | 'password' | 'confirmPassword'
@@ -30,10 +31,14 @@ export interface OnDeviceLoginProps {
   onCancel: () => void
   /** New-password + confirm step after temporary-password login. */
   isPasswordResetRequired?: boolean
+  /** Drives the login password field label after username lookup. */
+  resetPasswordReason?: AuthUserResetPasswordReason | null
   initialUsername?: string
   /** Shown under the password field with error styling when login fails */
   loginError?: string | null
   onClearLoginError?: () => void
+  /** When set, called before advancing from the username step to the password step. */
+  onUsernameSubmit?: (username: string) => Promise<void>
   /** Robot password policy for client-side validation on the new-password step. */
   passwordComplexity: PasswordComplexityRequirements | null
 }
@@ -45,9 +50,11 @@ export function OnDeviceLogin({
   isAuthLoading,
   onCancel,
   isPasswordResetRequired = false,
+  resetPasswordReason = null,
   initialUsername,
   loginError = null,
   onClearLoginError,
+  onUsernameSubmit,
   passwordComplexity,
 }: OnDeviceLoginProps): JSX.Element {
   const { t } = useTranslation(['shared', 'access_control'])
@@ -90,7 +97,12 @@ export function OnDeviceLogin({
         )
         return
       }
-      onStepChange('password')
+      void (async (): Promise<void> => {
+        if (onUsernameSubmit != null) {
+          await onUsernameSubmit(username.trim())
+        }
+        onStepChange('password')
+      })()
       return
     }
     if (step === 'password') {
@@ -162,6 +174,7 @@ export function OnDeviceLogin({
     submitPassword,
     passwordComplexity,
     t,
+    onUsernameSubmit,
   ])
 
   const primaryDisabled = isAuthLoading
@@ -231,6 +244,7 @@ export function OnDeviceLogin({
               step={step}
               t={t}
               isPasswordResetRequired={isPasswordResetRequired}
+              resetPasswordReason={resetPasswordReason}
               loginError={passwordPolicyError ?? loginError}
               confirmPasswordError={confirmPasswordError}
               usernameError={usernameError}
