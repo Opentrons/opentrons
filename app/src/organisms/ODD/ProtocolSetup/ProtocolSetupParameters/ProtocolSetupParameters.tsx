@@ -273,6 +273,7 @@ export function ProtocolSetupParameters({
       setChooseCsvFileScreen(parameter)
     } else {
       // bad param
+      parameter.type satisfies never
       console.error('error: bad param. not expected to reach this')
     }
   }
