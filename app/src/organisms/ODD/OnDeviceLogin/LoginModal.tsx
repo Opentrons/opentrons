@@ -29,8 +29,6 @@ import type { LoginStep } from './index'
 
 type LoginModalPhase = 'login' | 'chooseNewPassword'
 
-const PASSWORD_UPDATED_TOAST_MS = 2000
-
 const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const modal = useModal()
   const { t } = useTranslation(['access_control'])
@@ -168,11 +166,9 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
           message={t('on_device_login_password_updated') as string}
           type={SUCCESS_TOAST}
           displayType="odd"
-          duration={PASSWORD_UPDATED_TOAST_MS}
           position={POSITION_FIXED}
           right={SPACING.spacing32}
           bottom={SPACING.spacing32}
-          zIndex={10002}
           onClose={() => {
             finishModal(passwordUpdatedUsername)
           }}

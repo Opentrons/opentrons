@@ -251,7 +251,7 @@ describe('LoginModal', () => {
 
     expect(await screen.findByText('Password updated')).toBeInTheDocument()
     await expect(resultPromise).resolves.toEqual({ username: 'alice' })
-  })
+  }, 10000)
 
   it('returns to the new-password step with a policy error when setting a password fails', async () => {
     vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
