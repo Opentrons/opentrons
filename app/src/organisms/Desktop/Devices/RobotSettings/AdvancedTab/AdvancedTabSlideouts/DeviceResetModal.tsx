@@ -18,6 +18,7 @@ import { isDocumentedMutationError } from '@opentrons/react-api-client'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useResetRobotConfigMutation } from '/app/resources/devices/hooks/useResetRobotConfigMutation'
 
+import type { ReactNode } from 'react'
 import type { ResetConfigRequest } from '@opentrons/api-client'
 
 interface DeviceResetModalProps {
@@ -32,7 +33,7 @@ export function DeviceResetModal({
   isRobotReachable,
   robotName,
   resetOptions,
-}: DeviceResetModalProps): JSX.Element {
+}: DeviceResetModalProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared', 'branded'])
   const navigate = useNavigate()
   const documentationState = useDocumentationState()

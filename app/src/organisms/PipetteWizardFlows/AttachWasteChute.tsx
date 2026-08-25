@@ -16,11 +16,10 @@ import {
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
 
+import type { ReactNode } from 'react'
 import type { PipetteWizardStepProps } from './types'
 
-export const AttachWasteChute = (
-  props: PipetteWizardStepProps
-): JSX.Element => {
+export const AttachWasteChute = (props: PipetteWizardStepProps): ReactNode => {
   const {
     isRobotMoving,
     errorMessage,

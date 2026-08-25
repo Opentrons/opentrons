@@ -30,7 +30,7 @@ export const RobotCoordsForeignObject = ({
   foreignObjectProps = {},
   flexProps,
   flexEvents = {},
-}: RobotCoordsForeignObjectProps): JSX.Element => {
+}: RobotCoordsForeignObjectProps): ReactNode => {
   return (
     <ForeignObject x={x} y={y} height={height} width={width}>
       <StyledDiv

@@ -28,7 +28,7 @@ interface MenuOverlayProps extends StyleProps {
 }
 
 // TODO(bh, 2022-10-31): consider making this a generic molecule if other overflow menus are refactored to use
-export function MenuOverlay(props: MenuOverlayProps): JSX.Element {
+export function MenuOverlay(props: MenuOverlayProps): ReactNode {
   const { hasDivider = false, menuOverlayItems, setShowMenuOverlay } = props
 
   return (

@@ -18,7 +18,7 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { ACTIONS, CONSOLIDATE, DISTRIBUTE } from './constants'
 import { getVolumeRange } from './utils'
 
-import type { ComponentProps, Dispatch } from 'react'
+import type { ComponentProps, Dispatch, ReactNode } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
 import type {
   QuickTransferWizardAction,
@@ -33,7 +33,7 @@ interface VolumeEntryProps {
   dispatch: Dispatch<QuickTransferWizardAction>
 }
 
-export function VolumeEntry(props: VolumeEntryProps): JSX.Element {
+export function VolumeEntry(props: VolumeEntryProps): ReactNode {
   const { onNext, onBack, exitButtonProps, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const [volume, setVolume] = useState<string>(

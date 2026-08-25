@@ -62,6 +62,7 @@ import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { getFixtureImage } from './utils'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type {
   CutoutConfigAndCompatibility,
@@ -82,7 +83,7 @@ interface SetupModulesListProps {
   runId: string
 }
 
-export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
+export const SetupModulesList = (props: SetupModulesListProps): ReactNode => {
   const { robotName, runId, deckConfigCompatibility } = props
   const moduleRenderInfoForProtocolById =
     useModuleRenderInfoForProtocolById(runId)
@@ -218,7 +219,7 @@ export function ModulesListItem({
   deckDef,
   robotName,
   comboFixtureId,
-}: ModulesListItemProps): JSX.Element {
+}: ModulesListItemProps): ReactNode {
   const { t } = useTranslation([
     'protocol_setup',
     'module_wizard_flows',

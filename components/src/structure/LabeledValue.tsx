@@ -16,7 +16,7 @@ export interface LabeledValueProps {
   valueClassName?: string
 }
 
-export function LabeledValue(props: LabeledValueProps): JSX.Element {
+export function LabeledValue(props: LabeledValueProps): ReactNode {
   const { label, value } = props
   const className = cx(styles.labeled_value, props.className)
 

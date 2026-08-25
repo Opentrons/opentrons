@@ -22,12 +22,13 @@ import { TRASH_BIN_LOAD_NAME } from '../constants'
 import { Body } from './Body'
 import { InvalidationWarning } from './InvalidationWarning'
 
+import type { ReactNode } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { CalibrationPanelProps } from '../types'
 
 const TRASH_BIN = 'Removable black plastic trash bin'
 
-export function Introduction(props: CalibrationPanelProps): JSX.Element {
+export function Introduction(props: CalibrationPanelProps): ReactNode {
   const {
     tipRack,
     calBlock,

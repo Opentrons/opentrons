@@ -120,7 +120,7 @@ interface ChoosePipetteProps {
   exit: () => void
   mount: PipetteMount
 }
-export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
+export const ChoosePipette = (props: ChoosePipetteProps): ReactNode => {
   const { selectedPipette, setSelectedPipette, proceed, exit, mount } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation(['pipette_wizard_flows', 'shared', 'audit_log'])
@@ -309,7 +309,7 @@ interface PipetteMountOptionProps extends StyleProps {
   onClick: () => void
   children: ReactNode
 }
-function PipetteMountOption(props: PipetteMountOptionProps): JSX.Element {
+function PipetteMountOption(props: PipetteMountOptionProps): ReactNode {
   const { isSelected, onClick, children, ...styleProps } = props
   return (
     <Flex

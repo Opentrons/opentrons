@@ -7,7 +7,9 @@ import { InfoScreen } from '@opentrons/components'
 
 import styles from './photoviewer.module.css'
 
-export function CameraPhotoViewer(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function CameraPhotoViewer(): ReactNode {
   const { t } = useTranslation('run_details')
   const [searchParams] = useSearchParams()
   const photoUrl = searchParams.get('photoUrl')

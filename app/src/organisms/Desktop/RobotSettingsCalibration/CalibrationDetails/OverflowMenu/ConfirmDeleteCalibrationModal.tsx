@@ -18,6 +18,7 @@ import {
 import { getModalPortalEl } from '/app/App/portal'
 import { TextOnlyButton } from '/app/atoms/buttons'
 
+import type { ReactNode } from 'react'
 import type { IconProps } from '@opentrons/components'
 
 export interface ConfirmDeleteCalibrationModalProps {
@@ -28,7 +29,7 @@ export interface ConfirmDeleteCalibrationModalProps {
 export function ConfirmDeleteCalibrationModal({
   onDelete,
   toggleModal,
-}: ConfirmDeleteCalibrationModalProps): JSX.Element {
+}: ConfirmDeleteCalibrationModalProps): ReactNode {
   const { t } = useTranslation('robot_calibration')
 
   const buildIcon = (): IconProps => {

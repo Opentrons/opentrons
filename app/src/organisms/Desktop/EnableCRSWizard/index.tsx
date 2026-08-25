@@ -65,7 +65,7 @@ export const handleEnableCRSWizard = (props: EnableCRSWizardProps): void => {
 }
 
 const EnableCRSWizard = NiceModal.create(
-  (props: EnableCRSWizardProps): JSX.Element => {
+  (props: EnableCRSWizardProps): ReactNode => {
     const { robotName } = props
     const modal = useModal()
     const { t } = useTranslation('access_control')
@@ -154,7 +154,7 @@ function EnterServicePINPage({
   header,
   onBack,
   onNext,
-}: CommonPageProps): JSX.Element {
+}: CommonPageProps): ReactNode {
   const { t } = useTranslation(['access_control', 'shared'])
   const { control, trigger } = useFormContext<FormValues>()
   const formId = useId()
@@ -237,7 +237,7 @@ function EnterServicePINPage({
 function VerifyRobotEncryptionKeyPage({
   header,
   onNext,
-}: CommonPageProps): JSX.Element {
+}: CommonPageProps): ReactNode {
   const { t } = useTranslation(['access_control', 'device_settings', 'shared'])
   const formId = useId()
 
@@ -332,7 +332,7 @@ function CreateServiceAccountPage({
   onBack,
   onNext,
   serviceAccountPassword,
-}: CommonPageProps): JSX.Element {
+}: CommonPageProps): ReactNode {
   const { t } = useTranslation(['access_control', 'shared'])
 
   return (
@@ -386,7 +386,7 @@ function CreateAdminAccountPage({
   header,
   onBack,
   onNext,
-}: CommonPageProps): JSX.Element {
+}: CommonPageProps): ReactNode {
   const { t } = useTranslation(['access_control', 'shared'])
   const { control, trigger } = useFormContext<FormValues>()
   const formId = useId()
@@ -471,7 +471,7 @@ function AdminPasswordPage({
   header,
   onBack,
   onNext,
-}: CommonPageProps): JSX.Element {
+}: CommonPageProps): ReactNode {
   const { t } = useTranslation(['access_control', 'shared'])
   const { control, getValues, trigger } = useFormContext<FormValues>()
   const formId = useId()
@@ -565,7 +565,7 @@ function RecoveryAccountDetailsPage({
   onNext,
   recoveryAccountPassword,
   serviceAccountPassword,
-}: CommonPageProps): JSX.Element {
+}: CommonPageProps): ReactNode {
   const { t } = useTranslation(['access_control', 'shared'])
   const { getValues } = useFormContext<FormValues>()
   const enableCRSMutation = useEnableCRSMutation()

@@ -14,6 +14,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 interface DeckCalibrationConfirmModalProps {
   confirm: () => unknown
   cancel: () => unknown
@@ -22,7 +24,7 @@ interface DeckCalibrationConfirmModalProps {
 export function DeckCalibrationConfirmModal({
   confirm,
   cancel,
-}: DeckCalibrationConfirmModalProps): JSX.Element {
+}: DeckCalibrationConfirmModalProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared'])
 
   return (

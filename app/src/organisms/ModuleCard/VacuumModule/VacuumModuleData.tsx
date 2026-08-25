@@ -12,13 +12,14 @@ import { formatDisplayPressureMbar } from './utils/formatDisplayPressureMbar'
 import styles from './vacuummodule.module.css'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { VacuumModuleData as VacuumModuleDataType } from '@opentrons/api-client'
 
 interface VacuumModuleDataProps {
   moduleData: VacuumModuleDataType
 }
 
-export function VacuumModuleData(props: VacuumModuleDataProps): JSX.Element {
+export function VacuumModuleData(props: VacuumModuleDataProps): ReactNode {
   const { t } = useTranslation('device_details')
   const { moduleData } = props
   const {

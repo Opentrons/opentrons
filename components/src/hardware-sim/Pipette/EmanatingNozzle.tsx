@@ -4,10 +4,12 @@ import { COLORS } from '../../helix-design-system'
 import { C_TRANSPARENT } from '../../styles'
 import { SINGLE_CHANNEL_PIPETTE_HEIGHT } from './constants'
 
+import type { ReactNode } from 'react'
+
 export const EmanatingNozzle = (props: {
   cx: number
   cy: number
-}): JSX.Element => {
+}): ReactNode => {
   const { cx, cy } = props
   return (
     <Fragment>

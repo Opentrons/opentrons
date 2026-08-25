@@ -15,11 +15,13 @@ import {
 
 import { MediumButton } from '/app/atoms/buttons'
 
+import type { ReactNode } from 'react'
+
 export interface NoUpdateFoundProps {
   onContinue: () => void
 }
 
-export function NoUpdateFound(props: NoUpdateFoundProps): JSX.Element {
+export function NoUpdateFound(props: NoUpdateFoundProps): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const { onContinue } = props
   return (

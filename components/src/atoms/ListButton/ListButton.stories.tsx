@@ -35,7 +35,7 @@ export default meta
 type Story = StoryObj<typeof ListButtonComponent>
 type ListButtonComponentProps = React.ComponentProps<typeof ListButtonComponent>
 
-const Template = (args: ListButtonComponentProps): JSX.Element => {
+const Template = (args: ListButtonComponentProps): React.ReactNode => {
   const [containerExpand, setContainerExpand] = React.useState<boolean>(false)
   const [buttonValue, setButtonValue] = React.useState<string | null>(null)
   const [nestedButtonValue, setNestedButtonValue] = React.useState<

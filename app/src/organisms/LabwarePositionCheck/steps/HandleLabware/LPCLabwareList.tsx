@@ -34,11 +34,12 @@ import {
 } from '/app/redux/protocol-runs'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { LPCContentContainerProps } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type { LwGeometryDetails } from '/app/redux/protocol-runs'
 
-export function LPCLabwareList(props: LPCWizardContentProps): JSX.Element {
+export function LPCLabwareList(props: LPCWizardContentProps): ReactNode {
   const { t } = useTranslation('labware_position_check')
   const isOnDevice = useSelector(getIsOnDevice)
   const dispatch = useDispatch()
@@ -121,7 +122,7 @@ interface LPCLabwareListContentProps extends LPCWizardContentProps {
   handlePrimaryOnClickOdd: (uri: string) => void
 }
 
-function LPCLabwareListContent(props: LPCLabwareListContentProps): JSX.Element {
+function LPCLabwareListContent(props: LPCLabwareListContentProps): ReactNode {
   const { t } = useTranslation('labware_position_check')
   const { runId } = props
   const labwareInfo = useSelector(
@@ -160,12 +161,7 @@ function LPCLabwareListContent(props: LPCLabwareListContentProps): JSX.Element {
         </thead>
       </Flex>
       {labwareInfo.map(({ uri, info }) => (
-        <LabwareItem
-          key={`labware_${uri}${Math.random()}`}
-          uri={uri}
-          info={info}
-          {...props}
-        />
+        <LabwareItem key={`labware_${uri}`} uri={uri} info={info} {...props} />
       ))}
       {/* Accommodate scrolling on the ODD. */}
       <Flex css={ODD_SCROLL_BUFFER} />
@@ -185,7 +181,7 @@ function LabwareItem({
   handlePrimaryOnClickOdd,
   setSelectedUri,
   selectedUri,
-}: LabwareItemProps): JSX.Element {
+}: LabwareItemProps): ReactNode {
   const { t } = useTranslation('labware_position_check')
   const isNecessaryDefaultOffsetMissing = useSelector(
     selectIsNecessaryDefaultOffsetMissing(runId, uri)
@@ -241,7 +237,7 @@ function LabwareInfoCopy({
 }: {
   displayName: LwGeometryDetails['displayName']
   version: LwGeometryDetails['version']
-}): JSX.Element {
+}): ReactNode {
   const { t } = useTranslation('labware_position_check')
   const isOnDevice = useSelector(getIsOnDevice)
   const nameString = isOnDevice ? truncateString(displayName, 40) : displayName

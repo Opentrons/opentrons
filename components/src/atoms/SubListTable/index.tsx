@@ -19,7 +19,7 @@ export interface SubListTableProps {
 export function SubListTable({
   headers,
   children,
-}: SubListTableProps): JSX.Element {
+}: SubListTableProps): ReactNode {
   const numHeaders = headers ? headers.filter(Boolean).length : 0
 
   return (

@@ -15,7 +15,7 @@ import {
 
 import { getIsOnDevice } from '/app/redux/config'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { StyleProps } from '@opentrons/components'
 import type { LabwareInStack } from '@opentrons/shared-data'
 
@@ -36,7 +36,7 @@ interface LabwareStackContentsProps extends StyleProps {
 
 export function LabwareStackContents(
   props: LabwareStackContentsProps
-): JSX.Element {
+): ReactNode {
   const { labwareInStack, selectedLabware, setSelectedLabware } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('protocol_setup')

@@ -8,7 +8,7 @@ import { CURSOR_NOT_ALLOWED, CURSOR_POINTER } from '../../styles/cursor'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { StyledText } from '../StyledText/StyledText'
 
-import type { ComponentProps, MouseEvent } from 'react'
+import type { ComponentProps, MouseEvent, ReactNode } from 'react'
 import type { IconName } from '../../icons'
 
 interface BasicButtonProps {
@@ -29,7 +29,7 @@ export function BasicButton({
   tabIndex = 0,
   iconName,
   ...props
-}: BasicButtonProps): JSX.Element {
+}: BasicButtonProps): ReactNode {
   const handleButtonClick = (event: MouseEvent<HTMLButtonElement>): void => {
     if (isDisabled) {
       event.preventDefault()

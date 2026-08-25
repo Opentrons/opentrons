@@ -20,6 +20,8 @@ import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { getIsOnDevice } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
+
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/creating-labware-offsets'
 
@@ -28,7 +30,7 @@ interface TipConfirmationProps {
   confirmTip: () => void
 }
 
-export function TipConfirmation(props: TipConfirmationProps): JSX.Element {
+export function TipConfirmation(props: TipConfirmationProps): ReactNode {
   const { invalidateTip, confirmTip } = props
   const { t } = useTranslation('shared')
   const isOnDevice = useSelector(getIsOnDevice)

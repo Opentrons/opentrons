@@ -14,6 +14,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
 import { JogControls } from '/app/molecules/JogControls'
 
+import type { ReactNode } from 'react'
 import type { VectorOffset } from '@opentrons/api-client'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 
@@ -26,7 +27,7 @@ export function LPCJogControlsOdd({
   toggleJogControls,
   setJoggedPosition,
   commandUtils,
-}: LPCJogControlsOddProps): JSX.Element {
+}: LPCJogControlsOddProps): ReactNode {
   const { handleJog } = commandUtils
   const { t } = useTranslation('labware_position_check')
 

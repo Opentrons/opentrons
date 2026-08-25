@@ -33,6 +33,7 @@ import { getCustomTipRackDefinitions } from '/app/redux/custom-labware'
 
 import { ChosenTipRackRender } from './ChosenTipRackRender'
 
+import type { ReactNode } from 'react'
 import type { MultiValue, SingleValue } from 'react-select'
 import type { Mount } from '@opentrons/api-client'
 import type { SelectOption, SelectOptionOrGroup } from '@opentrons/components'
@@ -68,7 +69,7 @@ interface ChooseTipRackProps {
   defaultTipracks?: LabwareDefinition[] | null
 }
 
-export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
+export function ChooseTipRack(props: ChooseTipRackProps): ReactNode {
   const {
     tipRack,
     mount,

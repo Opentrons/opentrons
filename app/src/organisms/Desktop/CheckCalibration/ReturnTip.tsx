@@ -14,10 +14,11 @@ import {
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import * as Sessions from '/app/redux/sessions'
 
+import type { ReactNode } from 'react'
 import type { CalibrationPanelProps } from '/app/organisms/Desktop/CalibrationPanels/types'
 import type { SessionCommandString } from '/app/redux/sessions/types'
 
-export function ReturnTip(props: CalibrationPanelProps): JSX.Element {
+export function ReturnTip(props: CalibrationPanelProps): ReactNode {
   const { t } = useTranslation('robot_calibration')
   const { sendCommands, checkBothPipettes, activePipette, instruments } = props
   const onFinalPipette =

@@ -17,6 +17,7 @@ import { getIsOnDevice } from '/app/redux/config'
 import { selectTotalOrMissingOffsetRequiredCountForLwCopy } from '/app/redux/protocol-runs'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 
 export interface AccordionHeaderProps {
   runId: string
@@ -30,7 +31,7 @@ export function AccordionHeader({
   runId,
   uri,
   lwVersion,
-}: AccordionHeaderProps): JSX.Element {
+}: AccordionHeaderProps): ReactNode {
   const { t } = useTranslation('labware_position_check')
   const offsetCopy = useSelector(
     selectTotalOrMissingOffsetRequiredCountForLwCopy(runId, uri, t as TFunction)

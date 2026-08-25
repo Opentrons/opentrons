@@ -25,7 +25,7 @@ interface MaintenanceRunProviderProps {
 
 export function MaintenanceRunStatusProvider(
   props: MaintenanceRunProviderProps
-): JSX.Element {
+): ReactNode {
   const [oddRunIds, setOddRunIds] = useState<MaintenanceRunIds>({
     currentRunId: null,
     oddRunId: null,

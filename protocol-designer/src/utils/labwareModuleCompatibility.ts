@@ -148,6 +148,10 @@ const _getLabwareCompatibleWithVacuumModule = (
   def: LabwareDefinition2,
   isDock: boolean = false
 ): boolean => {
+  // Filter plates cannot sit on the bare module or dock;
+  if ((def.parameters.quirks ?? []).includes('filterPlate')) {
+    return false
+  }
   if (isDock) {
     return (
       COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[
@@ -160,9 +164,7 @@ const _getLabwareCompatibleWithVacuumModule = (
   return (
     COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[VACUUM_MODULE_TYPE].includes(
       def.parameters.loadName
-    ) ||
-    def.metadata.displayCategory === 'wellPlate' ||
-    (def.parameters.quirks ?? []).includes('filterPlate')
+    ) || def.metadata.displayCategory === 'wellPlate'
   )
 }
 

@@ -19,6 +19,7 @@ import {
 import { TextOnlyButton } from '/app/atoms/buttons'
 import { useHomePipettes } from '/app/local-resources/instruments'
 
+import type { ReactNode } from 'react'
 import type { PipetteData } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
 import type { UseHomePipettesProps } from '/app/local-resources/instruments'
@@ -116,7 +117,7 @@ export function ProtocolDropTipModal({
   onBeginRemoval,
   mount,
   isDisabled,
-}: ProtocolDropTipModalProps): JSX.Element {
+}: ProtocolDropTipModalProps): ReactNode {
   const { t } = useTranslation('drop_tip_wizard')
 
   const buildIcon = (): IconProps => {

@@ -6,7 +6,7 @@ import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggl
 
 import styles from './OnDeviceLogin.module.css'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { ControllerRenderProps, FieldPath } from 'react-hook-form'
 import type { LoginFormValues } from './index'
 
@@ -30,7 +30,7 @@ export function LoginFieldInput<
   isPasswordField,
   onClearError,
   autoFocus,
-}: LoginFieldInputProps<TFieldName>): JSX.Element {
+}: LoginFieldInputProps<TFieldName>): ReactNode {
   const [showPassword, setShowPassword] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isPasswordHidden = isPasswordField && !showPassword

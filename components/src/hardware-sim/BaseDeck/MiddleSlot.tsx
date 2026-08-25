@@ -1,7 +1,7 @@
 import { SlotBase } from './SlotBase'
 import { SlotClip } from './SlotClip'
 
-import type { SVGProps } from 'react'
+import type { ReactNode, SVGProps } from 'react'
 
 export interface MiddleSlotProps {
   showSlotClips: boolean
@@ -10,7 +10,7 @@ export interface MiddleSlotProps {
   stroke?: string
 }
 // This slot is based of coordinates of slot A2. To reuse, wrap in <g transpose(x, y)>
-export function MiddleSlot(props: MiddleSlotProps): JSX.Element {
+export function MiddleSlot(props: MiddleSlotProps): ReactNode {
   const { showSlotClips, fixtureBaseColor, slotClipColor, stroke } = props
   return (
     <>

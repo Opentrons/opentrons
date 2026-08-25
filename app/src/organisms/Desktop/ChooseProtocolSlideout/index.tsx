@@ -64,7 +64,7 @@ import {
 
 import { FileCard } from '../ChooseRobotSlideout/FileCard'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { Robot } from '/app/redux/discovery/types'
@@ -738,7 +738,7 @@ interface StoredProtocolListProps {
   robot: Robot
 }
 
-function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
+function StoredProtocolList(props: StoredProtocolListProps): ReactNode {
   const {
     selectedProtocol,
     handleSelectProtocol,

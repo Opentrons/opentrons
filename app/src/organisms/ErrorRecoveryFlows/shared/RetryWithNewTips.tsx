@@ -5,9 +5,10 @@ import { LegacyStyledText } from '@opentrons/components'
 import { RECOVERY_MAP } from '../constants'
 import { TwoColTextAndFailedStepNextStep } from './TwoColTextAndFailedStepNextStep'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '/app/organisms/ErrorRecoveryFlows/types'
 
-export function RetryWithNewTips(props: RecoveryContentProps): JSX.Element {
+export function RetryWithNewTips(props: RecoveryContentProps): ReactNode {
   const { recoveryCommands, routeUpdateActions } = props
   const { retryFailedCommand, resumeRun } = recoveryCommands
   const { handleMotionRouting } = routeUpdateActions

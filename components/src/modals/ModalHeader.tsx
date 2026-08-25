@@ -27,7 +27,7 @@ export interface ModalHeaderProps {
   closeButton?: ReactNode
 }
 
-export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
+export const ModalHeader = (props: ModalHeaderProps): ReactNode => {
   const {
     icon,
     onClose,

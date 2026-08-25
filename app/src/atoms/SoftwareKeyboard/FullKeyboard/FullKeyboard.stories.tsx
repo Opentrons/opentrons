@@ -17,6 +17,7 @@ import { FullKeyboard } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import type { Store, StoreEnhancer } from 'redux'
+import type { ReactNode } from 'react'
 
 const dummyConfig = {
   config: {
@@ -48,7 +49,7 @@ export default meta
 
 type Story = StoryObj<typeof FullKeyboard>
 
-const Keyboard = (): JSX.Element => {
+const Keyboard = (): ReactNode => {
   const [showKeyboard, setShowKeyboard] = useState(false)
   const [value, setValue] = useState<string>('')
   const keyboardRef = useRef(null)

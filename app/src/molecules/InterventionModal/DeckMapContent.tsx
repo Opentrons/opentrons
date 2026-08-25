@@ -21,7 +21,7 @@ import {
   getModuleType,
 } from '@opentrons/shared-data'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type {
   LabwareDefinition,
   LabwareLocation,
@@ -59,7 +59,7 @@ export const DeckMapContent: (
 
 function InterventionStyleDeckMapContent(
   props: InterventionStyleDeckMapContentProps
-): JSX.Element {
+): ReactNode {
   const deckDef = getDeckDefFromRobotType(props.robotType)
 
   const labwareWithHighlights =
@@ -141,7 +141,7 @@ function InterventionStyleDeckMapContent(
 function DeckConfigStyleDeckMapContent({
   robotType,
   setSelectedLocation,
-}: DeckConfigStyleDeckMapContentProps): JSX.Element {
+}: DeckConfigStyleDeckMapContentProps): ReactNode {
   const { DeckLocationSelect, selectedLocation } = useDeckLocationSelect(
     robotType,
     'default'
@@ -158,7 +158,7 @@ function LabwareHighlight({
 }: {
   highlight: boolean
   definition: LabwareDefinition
-}): JSX.Element {
+}): ReactNode {
   // Size and position ourselves exactly like the underlying labware.
   const { minX, minY, xDimension, yDimension } = getLabwareViewBox(definition)
 

@@ -4,12 +4,14 @@ import { StyledText } from '@opentrons/components'
 
 import styles from './diagnosticfiles.module.css'
 
+import type { ReactNode } from 'react'
+
 const DIAGNOSTIC_ROWS = [
   { id: 'troubleshooting', i18nKey: 'troubleshooting_logs' },
   { id: 'calibration', i18nKey: 'calibration_logs' },
 ]
 
-export function DiagnosticFiles(): JSX.Element {
+export function DiagnosticFiles(): ReactNode {
   const { t } = useTranslation('device_details')
 
   return (

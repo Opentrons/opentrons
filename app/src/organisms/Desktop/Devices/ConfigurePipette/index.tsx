@@ -5,6 +5,7 @@ import { Box } from '@opentrons/components'
 import { ConfigErrorBanner } from './ConfigErrorBanner'
 import { ConfigForm } from './ConfigForm'
 
+import type { ReactNode } from 'react'
 import type {
   PipetteSettingsFieldsMap,
   UpdatePipetteSettingsData,
@@ -20,7 +21,7 @@ interface Props {
   settings: PipetteSettingsFieldsMap
 }
 
-export function ConfigurePipette(props: Props): JSX.Element {
+export function ConfigurePipette(props: Props): ReactNode {
   const { updateSettings, updateError, isUpdateLoading, formId, settings } =
     props
   const { t } = useTranslation('device_details')

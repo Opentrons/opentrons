@@ -32,9 +32,10 @@ import { DefaultLocationOffset } from './DefaultLocationOffset'
 import { LocationSpecificOffsetsContainer } from './LocationSpecificOffsetsContainer'
 import { OffsetBannerContainer } from './OffsetBannerContainer'
 
+import type { ReactNode } from 'react'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
-export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
+export function LPCLabwareDetails(props: LPCWizardContentProps): ReactNode {
   const { runId, commandUtils } = props
   const { isSavingWorkingOffsetsLoading, saveWorkingOffsets } = commandUtils
   const { t } = useTranslation('labware_position_check')
@@ -115,7 +116,7 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
   )
 }
 
-function LPCLabwareDetailsContent(props: LPCWizardContentProps): JSX.Element {
+function LPCLabwareDetailsContent(props: LPCWizardContentProps): ReactNode {
   return (
     <Flex css={LIST_CONTAINER_STYLE}>
       <OffsetBannerContainer {...props} />

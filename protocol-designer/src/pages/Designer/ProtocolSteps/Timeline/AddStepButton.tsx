@@ -65,7 +65,7 @@ import { AddStepOverflowButton } from './AddStepOverflowButton'
 import { getConsolidatedStacks } from './utils'
 
 import type { ThunkDispatch } from 'redux-thunk'
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type { StepType } from '/protocol-designer/form-types'
 import type { BaseState } from '/protocol-designer/types'
 
@@ -77,7 +77,7 @@ interface AddStepButtonProps {
 export function AddStepButton({
   hasText,
   sidebarWidth,
-}: AddStepButtonProps): JSX.Element {
+}: AddStepButtonProps): ReactNode {
   const { t } = useTranslation(['tooltip', 'button'])
   const enableComment = useSelector(getEnableComment)
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()

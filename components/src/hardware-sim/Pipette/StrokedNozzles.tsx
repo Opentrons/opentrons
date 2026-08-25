@@ -7,7 +7,7 @@ import {
   NOZZLE_SIZE_MM,
 } from './constants'
 
-import type { MemoExoticComponent } from 'react'
+import type { MemoExoticComponent, ReactNode } from 'react'
 import type { LabwareWell, PipetteV2Specs } from '@opentrons/shared-data'
 import type { WellType } from '../..'
 
@@ -16,9 +16,7 @@ export interface StrokedNozzleProps {
   nozzleStatus: Record<string, WellType>
   handleClickNozzle: (nozzleName: string) => void
 }
-export function StrokedNozzlesComponent(
-  props: StrokedNozzleProps
-): JSX.Element {
+export function StrokedNozzlesComponent(props: StrokedNozzleProps): ReactNode {
   const { pipetteSpecs, nozzleStatus, handleClickNozzle } = props
   const { nozzleMap, pipetteBoundingBoxOffsets } = pipetteSpecs
   const { backLeftCorner } = pipetteBoundingBoxOffsets

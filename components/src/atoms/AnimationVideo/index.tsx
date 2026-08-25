@@ -1,4 +1,4 @@
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 export type AnimationVideoProps = ComponentProps<'video'>
 
@@ -12,7 +12,7 @@ export type AnimationVideoProps = ComponentProps<'video'>
  * </AnimationVideo>
  * ```
  */
-export function AnimationVideo(props: AnimationVideoProps): JSX.Element {
+export function AnimationVideo(props: AnimationVideoProps): ReactNode {
   const {
     autoPlay = true,
     loop = true,

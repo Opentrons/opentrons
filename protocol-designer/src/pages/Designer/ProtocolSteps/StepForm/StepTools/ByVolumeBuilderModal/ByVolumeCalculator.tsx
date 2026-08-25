@@ -12,12 +12,13 @@ import { linearInterpolate } from '@opentrons/shared-data'
 import { maskToFloat } from '../../../../../../steplist/fieldLevel/processing'
 import styles from './byvolumebuilder.module.css'
 
+import type { ReactNode } from 'react'
 import type { ByVolumeType } from './types'
 
 export function ByVolumeCalculator(props: {
   type: ByVolumeType
   points: Array<[number, number]>
-}): JSX.Element {
+}): ReactNode {
   const { type, points } = props
   const [volumeToInterpolate, setVolumeToInterpolate] = useState<number | null>(
     null

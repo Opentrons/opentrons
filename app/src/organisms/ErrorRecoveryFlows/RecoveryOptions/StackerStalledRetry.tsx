@@ -8,9 +8,10 @@ import {
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
-export function StackerStalledRetry(props: RecoveryContentProps): JSX.Element {
+export function StackerStalledRetry(props: RecoveryContentProps): ReactNode {
   const { recoveryMap } = props
   const { step, route } = recoveryMap
   const { STACKER_STALLED_RETRY } = RECOVERY_MAP

@@ -14,6 +14,8 @@ import {
 
 import { RenderResult } from './RenderResult'
 
+import type { ReactNode } from 'react'
+
 export const RESULT_SUMMARY_STYLE = css`
   border: 1px solid ${COLORS.grey30};
   border-radius: ${BORDERS.borderRadius4};
@@ -29,7 +31,7 @@ interface CalibrationResultProps {
 export function CalibrationResult({
   calType,
   isBadCal,
-}: CalibrationResultProps): JSX.Element {
+}: CalibrationResultProps): ReactNode {
   const { t } = useTranslation('robot_calibration')
 
   const switchText = (calType: CalibrationType): string => {

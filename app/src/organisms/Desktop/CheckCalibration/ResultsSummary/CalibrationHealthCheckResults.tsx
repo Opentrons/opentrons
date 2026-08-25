@@ -11,13 +11,15 @@ import {
 
 import { StatusLabel } from '/app/atoms/StatusLabel'
 
+import type { ReactNode } from 'react'
+
 interface CalibrationHealthCheckResultsProps {
   isCalibrationRecommended: boolean
 }
 
 export const CalibrationHealthCheckResults = ({
   isCalibrationRecommended,
-}: CalibrationHealthCheckResultsProps): JSX.Element => {
+}: CalibrationHealthCheckResultsProps): ReactNode => {
   const { t } = useTranslation('robot_calibration')
   return (
     <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_SPACE_BETWEEN}>

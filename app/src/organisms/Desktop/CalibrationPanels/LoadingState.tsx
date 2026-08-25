@@ -9,12 +9,14 @@ import {
   SIZE_4,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 interface LoadingStateProps {
   header?: string
   body?: string
 }
 
-export function LoadingState(props: LoadingStateProps): JSX.Element {
+export function LoadingState(props: LoadingStateProps): ReactNode {
   const { header, body } = props
   return (
     <Flex

@@ -46,7 +46,7 @@ interface WrapperProps extends Omit<
   bottomCategoryCommand2: CommandType | 'none'
 }
 
-function Wrapper(props: WrapperProps): JSX.Element {
+function Wrapper(props: WrapperProps): React.ReactNode {
   const topCommand =
     props.topCategoryCommand === 'none'
       ? undefined

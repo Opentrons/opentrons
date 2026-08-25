@@ -12,6 +12,7 @@ import {
   ToggleStepFormField,
 } from '/protocol-designer/components/molecules'
 
+import type { ReactNode } from 'react'
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
 
@@ -23,7 +24,7 @@ interface ThermocyclerStateProps {
   focusedField?: string | null
 }
 
-export function ThermocyclerState(props: ThermocyclerStateProps): JSX.Element {
+export function ThermocyclerState(props: ThermocyclerStateProps): ReactNode {
   const { title, propsForFields, formData } = props
   const { i18n, t } = useTranslation(['application', 'form'])
 

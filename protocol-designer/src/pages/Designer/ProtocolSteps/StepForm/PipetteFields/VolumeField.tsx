@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { InputStepFormField } from '/protocol-designer/components/molecules'
 
+import type { ReactNode } from 'react'
 import type { PathOption, StepType } from '/protocol-designer/form-types'
 import type { FieldProps } from '../types'
 
@@ -11,7 +12,7 @@ interface VolumeFieldProps {
   path?: PathOption
 }
 
-export function VolumeField(props: VolumeFieldProps): JSX.Element {
+export function VolumeField(props: VolumeFieldProps): ReactNode {
   const { t } = useTranslation(['protocol_steps', 'application'])
   const { fieldProps, stepType, path = 'single' } = props
   const isMixStep = stepType === 'mix'

@@ -13,6 +13,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 export interface ConfirmCrashRecoveryProps {
   back: () => unknown
   confirm: () => unknown
@@ -20,7 +22,7 @@ export interface ConfirmCrashRecoveryProps {
 
 export function ConfirmCrashRecovery(
   props: ConfirmCrashRecoveryProps
-): JSX.Element {
+): ReactNode {
   const { back, confirm } = props
   const { t } = useTranslation(['robot_calibration', 'shared'])
 
