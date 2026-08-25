@@ -36,7 +36,7 @@ jobs:
     runs-on: 'ubuntu-24.04'
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - uses: 'pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320' # v4.4.0
+      - uses: 'pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86' # v6.0.10
         with:
           version: 11.20.0
       - name: 'install udev'
