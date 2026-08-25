@@ -53,7 +53,10 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const isChoosingNewPassword = phase === 'chooseNewPassword'
 
   const finishModal = useCallback(
-    (username: string, options?: { showPasswordUpdatedToast?: boolean }): void => {
+    (
+      username: string,
+      options?: { showPasswordUpdatedToast?: boolean }
+    ): void => {
       if (options?.showPasswordUpdatedToast === true) {
         setPasswordUpdatedUsername(username)
         return
