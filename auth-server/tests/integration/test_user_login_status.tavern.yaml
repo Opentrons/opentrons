@@ -1,0 +1,88 @@
+test_name: GET user login status without authentication
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+      - seed_users
+
+stages:
+  - name: GET login status for an existing user returns NONE
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/byUsername/testuser/loginStatus'
+    response:
+      status_code: 200
+      json:
+        data:
+          resetPasswordReason: NONE
+
+  - name: GET login status for an unknown user returns 404
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/byUsername/unknown_login_status_user/loginStatus'
+    response:
+      status_code: 404
+
+  - name: Create a user without a password
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: login_status_user
+          fullName: Login Status User
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 201
+      json:
+        data:
+          username: login_status_user
+          fullName: Login Status User
+          accountType: user
+          locked: false
+          resetPassword: true
+          resetPasswordReason: FIRST_TIME_LOGIN
+          temporaryPassword: !anystr
+
+  - name: GET login status for a first-time login user returns FIRST_TIME_LOGIN
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/byUsername/login_status_user/loginStatus'
+    response:
+      status_code: 200
+      json:
+        data:
+          resetPasswordReason: FIRST_TIME_LOGIN
+
+  - name: Require password reset for an existing user
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/byUsername/testuser'
+      json:
+        data:
+          resetPassword: true
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          username: testuser
+          fullName: Test User
+          accountType: user
+          locked: false
+          resetPassword: true
+          resetPasswordReason: ADMIN_FORCED
+
+  - name: GET login status for an admin-forced reset user returns ADMIN_FORCED
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/byUsername/testuser/loginStatus'
+    response:
+      status_code: 200
+      json:
+        data:
+          resetPasswordReason: ADMIN_FORCED

@@ -34,6 +34,7 @@ from auth_server.users.models import (
     UpdateUser,
     UserAlreadyExistsErrorDetails,
     UserCreate,
+    UserLoginStatusResponse,
     UserResponse,
 )
 from auth_server.users.user_data_manager import (
@@ -148,6 +149,31 @@ async def get_users(
         content=SimpleMultiBody.model_construct(
             data=users,
             meta=MultiBodyMeta(cursor=0, totalLength=len(users)),
+        ),
+    )
+
+
+@PydanticResponse.wrap_route(
+    router.get,
+    path="/auth/users/byUsername/{username}/loginStatus",
+    summary="Get user login status",
+    description=(
+        "Get login-related status for a user before authentication."
+        " Intended for login UI to determine whether a one-time password is required."
+    ),
+    responses={
+        fastapi.status.HTTP_200_OK: {"model": SimpleBody[UserLoginStatusResponse]},
+        fastapi.status.HTTP_404_NOT_FOUND: {"userNotFound": None},
+    },
+)
+async def get_user_login_status(
+    user: Annotated[UserResponse, fastapi.Depends(get_user_by_username)],
+) -> PydanticResponse[SimpleBody[UserLoginStatusResponse]]:
+    """Get login-related status for a user before authentication."""
+    return await PydanticResponse.create(
+        status_code=fastapi.status.HTTP_200_OK,
+        content=SimpleBody(
+            data=UserLoginStatusResponse(resetPasswordReason=user.resetPasswordReason)
         ),
     )
 

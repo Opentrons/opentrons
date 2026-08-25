@@ -117,6 +117,20 @@ class UpdateSelf(BaseModel):
     ] = None
 
 
+class UserLoginStatusResponse(BaseModel):
+    """Login-related user status for unauthenticated login UI."""
+
+    resetPasswordReason: Annotated[
+        ResetPasswordReason,
+        Field(
+            description=(
+                "Why a new password must be set."
+                " See `UserResponse.resetPasswordReason` for details."
+            ),
+        ),
+    ]
+
+
 class UserResponse(BaseModel):
     """Response body for a user (no password)."""
 
