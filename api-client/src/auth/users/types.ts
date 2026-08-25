@@ -37,6 +37,14 @@ export interface AuthUsersResponse {
   }
 }
 
+export interface UserLoginStatus {
+  resetPasswordReason: AuthUserResetPasswordReason
+}
+
+export interface UserLoginStatusResponse {
+  data: UserLoginStatus
+}
+
 export interface CreateUserRequest {
   data: {
     username: string
