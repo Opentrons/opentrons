@@ -13,7 +13,6 @@ import {
 import { getRunTimeParameterDataFromRun } from './utils'
 
 import type { Run } from '@opentrons/api-client'
-import type { DocumentationState } from '@opentrons/react-api-client'
 import type {
   CompletedProtocolAnalysis,
   RunTimeCommand,
@@ -22,16 +21,13 @@ import type {
 // TODO(jh, 03-14-25): Remove this adapter logic and Mixpanel event once analytics
 //  indicate that users no longer run old analyses.
 
-/**
- * If analysis is incompatible with LPC, force reanalysis and use that fresh analysis,
- * otherwise, use the current analysis.
- */
+// If analysis is incompatible with LPC, force reanalysis and use that fresh analysis,
+// otherwise, use the current analysis.
 export function useCompatibleAnalysis(
   runId: string | null,
   runRecord: Run | undefined,
   mostRecentAnalysis: CompletedProtocolAnalysis | null,
-  isFlex: boolean,
-  documentationState: DocumentationState
+  isFlex: boolean
 ): CompletedProtocolAnalysis | null {
   const [compatibleAnalysis, setCompatibleAnalysis] =
     useState<CompletedProtocolAnalysis | null>(null)
@@ -42,10 +38,8 @@ export function useCompatibleAnalysis(
 
   const trackEvent = useTrackEvent()
   const protocolId = runRecord?.data.protocolId ?? ''
-  const { createProtocolAnalysis } = useCreateProtocolAnalysisMutation(
-    documentationState,
-    protocolId
-  )
+  const { createProtocolAnalysis } =
+    useCreateProtocolAnalysisMutation(protocolId)
   const { data: freshAnalysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
     compatibleAnalysisId,

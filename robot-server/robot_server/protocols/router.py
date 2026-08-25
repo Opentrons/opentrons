@@ -33,7 +33,7 @@ from opentrons.util.performance_helpers import TrackingFunctions
 from opentrons_shared_data.robot import user_facing_robot_type
 from opentrons_shared_data.robot.types import RobotType
 from server_utils.audit.audit_logger import AuditLogger
-from server_utils.audit.fastapi import get_audit_logger
+from server_utils.audit.fastapi import get_audit_logger, skip_audit_logger
 from server_utils.auth.resource_server.fastapi import (
     get_access_control_status,
     require_scopes,
@@ -770,7 +770,7 @@ async def delete_protocol_by_id(
         status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorBody[FileIdNotFound]},
         status.HTTP_503_SERVICE_UNAVAILABLE: {"model": ErrorBody[LastAnalysisPending]},
     },
-    dependencies=[Depends(require_scopes(Scope.PROTOCOL_ANALYSES_WRITE))],
+    dependencies=[Depends(skip_audit_logger)],
 )
 async def create_protocol_analysis(
     protocolId: str,
