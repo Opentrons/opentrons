@@ -51,7 +51,7 @@ export function createSerialPortHttpAgent(
         logger: usbLog,
         timeout: 100000,
       },
-      (err, agent?) => {
+      (err: Error | null, agent?: SerialPortHttpAgent) => {
         if (err != null) {
           usbHttpAgent = undefined
         }
@@ -79,8 +79,8 @@ export function destroyAndStopUsbHttpRequests(dispatch: Dispatch): void {
 
 function isUsbDeviceOt3(device: UsbDevice): boolean {
   return (
-    device.productId === parseInt(DEFAULT_PRODUCT_ID, 16) &&
-    device.vendorId === parseInt(DEFAULT_VENDOR_ID, 16)
+    device.productId === parseInt(DEFAULT_PRODUCT_ID as string, 16) &&
+    device.vendorId === parseInt(DEFAULT_VENDOR_ID as string, 16)
   )
 }
 
@@ -191,21 +191,26 @@ function tryCreateAndStartUsbHttpRequests(dispatch: Dispatch): void {
         return
       }
       if (usbHttpAgent == null) {
-        createSerialPortHttpAgent(ot3UsbSerialPort.path, (err, agent?) => {
-          if (err != null) {
-            const message = err?.message ?? err
-            usbLog.error(`Failed to create serial port: ${message}`)
+        createSerialPortHttpAgent(
+          ot3UsbSerialPort.path as string,
+          (err: Error | null, agent?: SerialPortHttpAgent) => {
+            if (err != null) {
+              const message = err?.message ?? err
+              usbLog.error(`Failed to create serial port: ${message}`)
+            }
+            if (agent != null) {
+              ipcMain.removeHandler('usb:request')
+              ipcMain.handle('usb:request', usbListener)
+              dispatch(usbRequestsStart())
+            }
           }
-          if (agent != null) {
-            ipcMain.removeHandler('usb:request')
-            ipcMain.handle('usb:request', usbListener)
-            dispatch(usbRequestsStart())
-          }
-        })
+        )
       }
     })
-    .catch(e =>
-      usbLog.debug(`fetchSerialPortList error ${e?.message ?? 'unknown'}`)
+    .catch((e: unknown) =>
+      usbLog.debug(
+        `fetchSerialPortList error ${e instanceof Error ? e.message : 'unknown'}`
+      )
     )
 }
 

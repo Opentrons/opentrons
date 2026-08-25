@@ -19,7 +19,10 @@
     "target": "esnext",
     "module": "ESNext",
     "paths": {
-      "/app/*": ["../app/src/*"]
+      "/app/*": ["../app/src/*"],
+      "@opentrons/usb-bridge/node-client": [
+        "../usb-bridge/node-client/src/index.ts"
+      ]
     }
   },
   "include": ["typings", "src"]
