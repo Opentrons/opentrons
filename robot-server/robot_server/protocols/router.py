@@ -770,7 +770,12 @@ async def delete_protocol_by_id(
         status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorBody[FileIdNotFound]},
         status.HTTP_503_SERVICE_UNAVAILABLE: {"model": ErrorBody[LastAnalysisPending]},
     },
-    dependencies=[Depends(skip_audit_logger)],
+    dependencies=[
+        # Although protocol analyses do store data on the robot and do indirectly affect
+        # system behavior, the client currently triggers them implicitly, and thus isn't
+        # prepared for them to require authentication or audit log notes.
+        Depends(skip_audit_logger)
+    ],
 )
 async def create_protocol_analysis(
     protocolId: str,
