@@ -31,6 +31,7 @@ import type {
   ComponentProps,
   Dispatch,
   MouseEvent,
+  ReactNode,
   SetStateAction,
 } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
@@ -47,7 +48,7 @@ interface SelectDestWellsProps {
   dispatch: Dispatch<QuickTransferWizardAction>
 }
 
-export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
+export function SelectDestWells(props: SelectDestWellsProps): ReactNode {
   const { onNext, onBack, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
@@ -225,7 +226,7 @@ function NumberWellsSelectedErrorModal({
   wellCount: number
   selectionUnit: string
   selectionUnits: string
-}): JSX.Element {
+}): ReactNode {
   const { t } = useTranslation('quick_transfer')
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('well_selection'),

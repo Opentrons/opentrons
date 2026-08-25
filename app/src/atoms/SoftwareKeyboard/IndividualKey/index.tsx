@@ -5,7 +5,7 @@ import {
   softwareKeyboardButtonAttributes,
 } from '../constants'
 
-import type { MutableRefObject } from 'react'
+import type { MutableRefObject, ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
 import '../index.css'
@@ -24,7 +24,7 @@ export function IndividualKey({
   keyboardRef,
   keyText,
   debug = false,
-}: IndividualKeyProps): JSX.Element {
+}: IndividualKeyProps): ReactNode {
   const numericalKeyboard = {
     layout: {
       default: [`${keyText}`],
@@ -43,7 +43,7 @@ export function IndividualKey({
       buttonAttributes={softwareKeyboardButtonAttributes}
       {...numericalKeyboard}
       width="100%"
-      debug={debug} // If true, <ENTER> will input a \n
+      debug={debug}
       preventMouseDownDefault // Don't steal focus from inputs.
     />
   )

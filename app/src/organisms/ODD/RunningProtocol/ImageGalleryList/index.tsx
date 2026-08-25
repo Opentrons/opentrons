@@ -9,6 +9,7 @@ import { useImageInfo } from '/app/resources/dataFiles/useImageInfo'
 
 import styles from './gallery.module.css'
 
+import type { ReactNode } from 'react'
 import type { RunStatus } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
@@ -28,7 +29,7 @@ export interface ImageGalleryListProps {
   allRunDefs: LabwareDefinition[]
 }
 
-export function ImageGalleryList(props: ImageGalleryListProps): JSX.Element {
+export function ImageGalleryList(props: ImageGalleryListProps): ReactNode {
   const { runId, protocolAnalysis, robotType, allRunDefs } = props
 
   const { items } = useImageInfo(runId)
@@ -53,7 +54,7 @@ export function ImageGalleryList(props: ImageGalleryListProps): JSX.Element {
   )
 }
 
-function NoImagesAvailable(): JSX.Element {
+function NoImagesAvailable(): ReactNode {
   const { t } = useTranslation('run_details')
 
   return (
@@ -79,7 +80,7 @@ function GalleryListContent({
   runId,
   robotType,
   allRunDefs,
-}: GalleryListContentProps): JSX.Element {
+}: GalleryListContentProps): ReactNode {
   return (
     <ListTable headers={[<GalleryTableHeaders key="1" />]}>
       {imagesInfo.map(item => (
@@ -96,7 +97,7 @@ function GalleryListContent({
   )
 }
 
-function GalleryTableHeaders(): JSX.Element {
+function GalleryTableHeaders(): ReactNode {
   const { t } = useTranslation('run_details')
 
   return (

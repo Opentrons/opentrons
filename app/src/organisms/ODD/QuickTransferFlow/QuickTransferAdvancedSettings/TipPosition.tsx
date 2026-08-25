@@ -20,7 +20,7 @@ import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
 import { ACTIONS } from '../constants'
 
-import type { Dispatch } from 'react'
+import type { Dispatch, ReactNode } from 'react'
 import type {
   FlowRateKind,
   QuickTransferSummaryAction,
@@ -34,9 +34,9 @@ interface TipPositionEntryProps {
   kind: FlowRateKind // TODO: rename flowRateKind to be generic
 }
 
-export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
+export function TipPositionEntry(props: TipPositionEntryProps): ReactNode {
   const { onBack, state, dispatch, kind } = props
-  const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
+  const { t } = useTranslation(['quick_transfer', 'shared'])
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = useRef(null)
 
@@ -107,7 +107,7 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
             ? t('aspirate_tip_position')
             : t('dispense_tip_position')
         }
-        buttonText={i18n.format(t('shared:save'), 'capitalize')}
+        buttonText={t('shared:save')}
         onClickBack={onBack}
         onClickButton={handleClickSave}
         top={SPACING.spacing8}
@@ -135,9 +135,6 @@ export function TipPositionEntry(props: TipPositionEntryProps): JSX.Element {
             value={tipPosition}
             label={textEntryCopy}
             error={error}
-            onBlur={e => {
-              e.target.focus()
-            }}
             onChange={e => {
               setTipPosition(Number(e.target.value))
             }}

@@ -24,17 +24,6 @@ class UserStore:
     def _session(self) -> Session:
         return self._session_factory()
 
-    def seed(self, users: list[User]) -> None:
-        """Insert users that don't already exist (matched by username)."""
-        with self._session() as session:
-            for user in users:
-                existing = session.scalar(
-                    select(User).where(User.username == user.username)
-                )
-                if existing is None:
-                    session.add(user)
-            session.commit()
-
     def get(self, username: str) -> User | None:
         """Look up a user by username. Returns the User or None."""
         with self._session() as session:
@@ -95,6 +84,7 @@ class UserStore:
         full_name: str | None = None,
         account_type: str | None = None,
         reset_password: bool | None = None,
+        deactivated: bool | None = None,
         *,
         now: datetime.datetime,
     ) -> User:
@@ -118,6 +108,8 @@ class UserStore:
                 user.account_type = AccountType(account_type)
             if reset_password is not None:
                 user.reset_password = reset_password
+            if deactivated is not None:
+                user.deactivated = deactivated
 
             session.commit()
             session.expunge(user)

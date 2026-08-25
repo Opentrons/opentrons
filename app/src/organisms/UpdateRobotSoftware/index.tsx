@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { CompleteUpdateSoftware } from '/app/organisms/UpdateRobotSoftware/CompleteUpdateSoftware'
@@ -13,6 +13,7 @@ import { CheckUpdates } from './CheckUpdates'
 import { ErrorUpdateSoftware } from './ErrorUpdateSoftware'
 import { NoUpdateFound } from './NoUpdateFound'
 
+import type { ReactNode } from 'react'
 import type { ViewableRobot } from '/app/redux/discovery/types'
 import type { Dispatch } from '/app/redux/types'
 
@@ -28,12 +29,18 @@ interface UpdateRobotSoftwareProps {
   localRobot: ViewableRobot
   afterError: (errorMessage: string) => void
   beforeCommittingSuccessfulUpdate?: () => void
+  afterCancel: () => void
 }
 
 export function UpdateRobotSoftware(
   props: UpdateRobotSoftwareProps
-): JSX.Element {
-  const { localRobot, afterError, beforeCommittingSuccessfulUpdate } = props
+): ReactNode {
+  const {
+    localRobot,
+    afterError,
+    beforeCommittingSuccessfulUpdate,
+    afterCancel,
+  } = props
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const dispatch = useDispatch<Dispatch>()
   const { startUpdate } = useRobotUpdateContext()
@@ -48,6 +55,14 @@ export function UpdateRobotSoftware(
     error: null,
   }
   const [isDownloading, setIsDownloading] = useState<boolean>(false)
+  const afterCancelRef = useRef(afterCancel)
+  afterCancelRef.current = afterCancel
+  const hadSessionRef = useRef(session != null)
+  const didCancelRef = useRef(false)
+
+  if (session != null) {
+    hadSessionRef.current = true
+  }
 
   useEffect(() => {
     // check isDownloading to avoid dispatching again
@@ -57,6 +72,13 @@ export function UpdateRobotSoftware(
       startUpdate(robotName)
     }
   }, [dispatch, startUpdate, robotName, isDownloading])
+
+  useEffect(() => {
+    if (session == null && hadSessionRef.current && !didCancelRef.current) {
+      didCancelRef.current = true
+      afterCancelRef.current()
+    }
+  }, [session])
 
   // Display Error screen
   if (sessionError != null) {

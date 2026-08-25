@@ -30,6 +30,8 @@ import {
   useWifiList,
 } from '/app/resources/networking/hooks'
 
+import type { ReactNode } from 'react'
+
 export interface DisconnectModalProps {
   onCancel: () => unknown
   robotName: string
@@ -38,7 +40,7 @@ export interface DisconnectModalProps {
 export const DisconnectModal = ({
   onCancel,
   robotName,
-}: DisconnectModalProps): JSX.Element => {
+}: DisconnectModalProps): ReactNode => {
   const { t } = useTranslation(['device_settings', 'shared', 'branded'])
   const queryClient = useQueryClient()
 

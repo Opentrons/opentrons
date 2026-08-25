@@ -4,10 +4,14 @@ from typing import AsyncGenerator
 import pytest
 from decoy import Decoy, matchers
 
+from . import require_live_data_real_string
 from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.drivers.temp_deck import DEFAULT_COMMAND_RETRIES
 from opentrons.hardware_control import ExecutionManager, modules
-from opentrons.hardware_control.modules.tempdeck import TempDeck, TempDeckReader
+from opentrons.hardware_control.modules.tempdeck import (
+    READER_ERROR_DEBOUNCE,
+    TempDeck,
+    TempDeckReader,
+)
 from opentrons.hardware_control.modules.types import (
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
@@ -65,6 +69,7 @@ async def test_sim_state(subject: modules.AbstractModule) -> None:
     assert modules.ModuleDataValidator.is_temperature_module_data(live_data)
     assert live_data["currentTemp"] == subject.temperature
     assert live_data["targetTemp"] == subject.target
+    require_live_data_real_string(subject)
     status = subject.device_info
     assert status["serial"] == "dummySerialTD"
     # return v1 if sim_model is not passed
@@ -105,7 +110,7 @@ async def test_error_callback(
     decoy: Decoy,
     module_error_callback: ModuleErrorCallback,
 ) -> None:
-    """It should forward temperature check errors."""
+    """It should forward temperature check errors after debounce is exhausted."""
     mock_get_temp = decoy.mock(func=subject._driver.get_temperature)
     exc = Exception("oh no!")
     decoy.when(await mock_get_temp()).then_raise(exc)
@@ -113,19 +118,9 @@ async def test_error_callback(
     # TODO(sf,rh): this is EXEC-2757. wait_next_poll() doesn't handle disconnects
     # well and will raise before any HC-module-level error handling happens, aka
     # reconnect logic (driver-level error handling is fine, though)
-    with pytest.raises(Exception, match="oh no!"):
-        await subject._poller.wait_next_poll()
-    decoy.verify(
-        module_error_callback(
-            matchers.Anything(),
-            "temperatureModuleV1",
-            "/dev/ot_module_sim_tempdeck0",
-            "dummySerialTD",
-        ),
-        times=0,
-    )
-    with pytest.raises(Exception, match="oh no!"):
-        await subject._poller.wait_next_poll()
+    for _ in range(READER_ERROR_DEBOUNCE - 1):
+        with pytest.raises(Exception, match="oh no!"):
+            await subject._poller.wait_next_poll()
     decoy.verify(
         module_error_callback(
             matchers.Anything(),
@@ -148,14 +143,14 @@ def test_tempdeck_reader_on_error_fires_callback_after_retries_exhausted(
     decoy: Decoy,
 ) -> None:
     """TempDeckReader.on_error should invoke the error callback exactly once
-    after DEFAULT_COMMAND_RETRIES consecutive errors."""
+    after READER_ERROR_DEBOUNCE consecutive errors."""
     driver = decoy.mock(name="driver")
     reader = TempDeckReader(driver=driver)
     cb = decoy.mock(name="error_callback")
     reader.set_error_callback(cb)
 
     exc = Exception("boom")
-    for _ in range(DEFAULT_COMMAND_RETRIES):
+    for _ in range(READER_ERROR_DEBOUNCE):
         reader.on_error(exc)
 
     decoy.verify(cb(exc), times=1)
@@ -172,9 +167,9 @@ def test_tempdeck_reader_on_error_recovers_after_firing(decoy: Decoy) -> None:
     reader.set_error_callback(cb)
 
     exc = Exception("boom")
-    for _ in range(DEFAULT_COMMAND_RETRIES):
+    for _ in range(READER_ERROR_DEBOUNCE):
         reader.on_error(exc)
-    for _ in range(DEFAULT_COMMAND_RETRIES):
+    for _ in range(READER_ERROR_DEBOUNCE):
         reader.on_error(exc)
 
     decoy.verify(cb(exc), times=2)
@@ -190,12 +185,12 @@ def test_tempdeck_reader_on_error_resets_on_successful_read(decoy: Decoy) -> Non
 
     exc = Exception("boom")
     # One error short of firing.
-    for _ in range(DEFAULT_COMMAND_RETRIES - 1):
+    for _ in range(READER_ERROR_DEBOUNCE - 1):
         reader.on_error(exc)
     decoy.verify(cb(matchers.Anything()), times=0)
 
-    reader._debounce_count = DEFAULT_COMMAND_RETRIES
+    reader._debounce_count = READER_ERROR_DEBOUNCE
 
-    for _ in range(DEFAULT_COMMAND_RETRIES - 1):
+    for _ in range(READER_ERROR_DEBOUNCE - 1):
         reader.on_error(exc)
     decoy.verify(cb(matchers.Anything()), times=0)

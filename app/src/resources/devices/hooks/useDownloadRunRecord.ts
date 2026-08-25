@@ -1,10 +1,14 @@
 import { useState } from 'react'
+import { useSelector } from 'react-redux'
 import { saveAs } from 'file-saver'
 
-import { getRunRaw } from '@opentrons/api-client'
+import { DEFAULT_RUN_DOWNLOAD_PARAMS, getRunRaw } from '@opentrons/api-client'
 import { useAllProtocolsQuery, useHost } from '@opentrons/react-api-client'
 
+import { getIncludeProtocolSourceInRunDownload } from '/app/redux/config'
 import { saveFileToUsb } from '/app/redux/shell/remote'
+
+import { isEmptyDownloadResponse } from './utils/isEmptyDownloadResponse'
 
 import type { RunData } from '@opentrons/api-client'
 
@@ -17,6 +21,9 @@ export function useDownloadRunRecord(
 } {
   const host = useHost()
   const [isDownloading, setIsDownloading] = useState(false)
+  const includeProtocolSource = useSelector(
+    getIncludeProtocolSourceInRunDownload
+  )
 
   const { data: protocols } = useAllProtocolsQuery()
 
@@ -32,8 +39,17 @@ export function useDownloadRunRecord(
     }
     setIsDownloading(true)
     const filename = `${matchingProtocolName ?? run.id}_${runDateTransformed}.zip`
-    return getRunRaw(host, run.id, 'blob')
+    const params = {
+      ...DEFAULT_RUN_DOWNLOAD_PARAMS,
+      protocol: includeProtocolSource,
+    }
+
+    return getRunRaw(host, run.id, params, 'blob')
       .then(async res => {
+        if (isEmptyDownloadResponse(res.data, res.status)) {
+          setIsDownloading(false)
+          return
+        }
         if (usbPath != null) {
           const buffer = await (res.data as Blob).arrayBuffer()
           await saveFileToUsb(`${usbPath}/${filename}`, buffer)

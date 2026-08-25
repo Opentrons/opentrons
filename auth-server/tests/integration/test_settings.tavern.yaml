@@ -29,6 +29,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: GET initial settings
@@ -116,6 +117,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: PATCH to change some settings
@@ -169,6 +171,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: PATCH to enable maxNumberOfLoginAttempts
@@ -218,6 +221,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: GET access control enabled default

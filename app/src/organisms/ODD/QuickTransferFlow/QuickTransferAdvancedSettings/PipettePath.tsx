@@ -25,7 +25,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { ACTIONS } from '../constants'
 import { useBlowOutLocationOptions } from './BlowOut'
 
-import type { Dispatch } from 'react'
+import type { Dispatch, ReactNode } from 'react'
 import type {
   BlowOutLocation,
   PathOption,
@@ -39,7 +39,7 @@ interface PipettePathProps {
   dispatch: Dispatch<QuickTransferSummaryAction>
 }
 
-export function PipettePath(props: PipettePathProps): JSX.Element {
+export function PipettePath(props: PipettePathProps): ReactNode {
   const { onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
@@ -208,9 +208,6 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
               value={disposalVolume}
               label={t('disposal_volume_µL')}
               error={volumeError}
-              onBlur={e => {
-                e.target.focus()
-              }}
               onChange={e => {
                 setDisposalVolume(Number(e.target.value))
               }}

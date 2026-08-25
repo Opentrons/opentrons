@@ -32,7 +32,7 @@ export const RobotCoordsForeignDiv = ({
   extraTransform = '',
   dataTestId = '',
   innerDivEvents,
-}: RobotCoordsForeignDivProps): JSX.Element => {
+}: RobotCoordsForeignDivProps): ReactNode => {
   const svgTransform = `scale(1, -1) ${extraTransform}`
 
   return (

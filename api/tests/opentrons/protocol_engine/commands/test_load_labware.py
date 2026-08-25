@@ -40,6 +40,7 @@ from opentrons.protocol_engine.types.location import (
     OnCutoutFixtureLocationSequenceComponent,
     OnModuleLocationSequenceComponent,
 )
+from opentrons.protocol_engine.types.module import LoadedModule, ModuleModel
 from opentrons.types import DeckSlotName
 
 
@@ -711,6 +712,76 @@ async def test_load_black_plate_contained_inside_collar_on_same_vacuum_module(
         result.public.locationSequence[0], OnModuleLocationSequenceComponent
     )
     assert result.public.locationSequence[0].moduleId == "module-id"
+
+
+async def test_load_filter_plate_directly_on_vacuum_module_raises(
+    decoy: Decoy,
+    well_plate_def: LabwareDefinition,
+    equipment: EquipmentHandler,
+    state_view: StateView,
+) -> None:
+    """It should reject a filter plate loaded directly onto the vacuum module."""
+    subject = LoadLabwareImplementation(equipment=equipment, state_view=state_view)
+    module_location = ModuleLocation(moduleId="module-id")
+
+    data = LoadLabwareParams(
+        location=module_location,
+        loadName="empore_96_wellplate_1200ul_c18_filter",
+        namespace="opentrons",
+        version=1,
+        displayName=None,
+    )
+
+    decoy.when(
+        await equipment.load_definition_for_details(
+            load_name="empore_96_wellplate_1200ul_c18_filter",
+            namespace="opentrons",
+            version=1,
+        )
+    ).then_return((well_plate_def, "opentrons/empore_96_wellplate_1200ul_c18_filter/1"))
+
+    decoy.when(
+        state_view.geometry.ensure_location_not_occupied(
+            module_location, None, well_plate_def
+        )
+    ).then_return(module_location)
+
+    decoy.when(
+        await equipment._load_labware_from_def_and_uri(
+            well_plate_def,
+            "opentrons/empore_96_wellplate_1200ul_c18_filter/1",
+            module_location,
+            None,
+            None,
+        )
+    ).then_return(
+        LoadedLabwareData(
+            labware_id="filter-id", definition=well_plate_def, offsetId=None
+        )
+    )
+
+    decoy.when(state_view.modules.get("module-id")).then_return(
+        LoadedModule.model_construct(
+            id="module-id",
+            model=ModuleModel.VACUUM_MODULE_V1,
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+            serialNumber="serial",
+        )
+    )
+
+    decoy.when(
+        state_view.labware.raise_if_labware_incompatible_with_vacuum_module(
+            well_plate_def
+        )
+    ).then_raise(
+        LabwareIsNotAllowedInLocationError(
+            "Cannot place 'empore_96_wellplate_1200ul_c18_filter' directly"
+            " onto the vacuum module."
+        )
+    )
+
+    with pytest.raises(LabwareIsNotAllowedInLocationError, match="directly onto"):
+        await subject.execute(data)
 
 
 async def test_load_filter_plate_contained_inside_collar_on_vacuum_module(

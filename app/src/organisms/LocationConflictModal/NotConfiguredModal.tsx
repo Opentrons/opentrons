@@ -24,6 +24,7 @@ import { patchDeckConfigForRequiredFixture } from '/app/organisms/LocationConfli
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 
 interface NotConfiguredModalProps {
@@ -35,7 +36,7 @@ interface NotConfiguredModalProps {
 
 export const NotConfiguredModal = (
   props: NotConfiguredModalProps
-): JSX.Element => {
+): ReactNode => {
   const { onCloseClick, cutoutId, requiredFixtureId, isOnDevice } = props
   const { t, i18n } = useTranslation([
     'protocol_setup',

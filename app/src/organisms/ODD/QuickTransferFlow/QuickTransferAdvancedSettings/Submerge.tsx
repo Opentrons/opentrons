@@ -22,7 +22,7 @@ import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
 import { ACTIONS } from '../constants'
 
-import type { Dispatch } from 'react'
+import type { Dispatch, ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { PositionReference } from '@opentrons/shared-data'
 import type {
@@ -43,7 +43,7 @@ export function Submerge({
   state,
   dispatch,
   kind,
-}: SubmergeProps): JSX.Element {
+}: SubmergeProps): ReactNode {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const [currentStep, setCurrentStep] = useState<number>(1)
@@ -184,7 +184,7 @@ function SubmergeSettingComponent({
   setPosition,
   currentStep,
   positionReference,
-}: SubmergeSettingComponentProps): JSX.Element {
+}: SubmergeSettingComponentProps): ReactNode {
   const { t } = useTranslation(['quick_transfer'])
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
 
@@ -286,9 +286,6 @@ function SubmergeSettingComponent({
             type="number"
             value={speed}
             label={t('speed')}
-            onBlur={e => {
-              e.target.focus()
-            }}
             onChange={e => {
               handleSpeedChange(e.target.value as string)
             }}
@@ -327,9 +324,6 @@ function SubmergeSettingComponent({
             type="number"
             value={delayDuration}
             label={t('delay_duration_s')}
-            onBlur={e => {
-              e.target.focus()
-            }}
             onChange={e => {
               handleDelayDurationChange(e.target.value as string)
             }}
@@ -373,9 +367,6 @@ function SubmergeSettingComponent({
             value={position}
             error={positionError}
             label={positionText}
-            onBlur={e => {
-              e.target.focus()
-            }}
             onChange={e => {
               handlePositionChange(e.target.value as string)
             }}

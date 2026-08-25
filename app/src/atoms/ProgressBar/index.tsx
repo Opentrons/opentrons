@@ -21,7 +21,7 @@ export function ProgressBar({
   outerStyles,
   innerStyles,
   children,
-}: ProgressBarProps): JSX.Element {
+}: ProgressBarProps): ReactNode {
   const boundedPercent = Math.min(Math.max(percentComplete, 0), 100)
   const progress = `${String(boundedPercent)}%`
 

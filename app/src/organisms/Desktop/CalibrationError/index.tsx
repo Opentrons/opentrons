@@ -20,6 +20,7 @@ import {
 
 import { dismissAllRequests, getRequests } from '/app/redux/robot-api'
 
+import type { ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 
 export interface CalibrationErrorInfo {
@@ -92,7 +93,7 @@ export function CalibrationError({
   subText,
   title,
   onClose,
-}: CalibrationErrorProps): JSX.Element {
+}: CalibrationErrorProps): ReactNode {
   const [isClosing, setIsClosing] = useState(false)
   const { t } = useTranslation('robot_calibration')
 

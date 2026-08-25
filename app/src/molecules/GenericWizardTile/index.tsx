@@ -73,7 +73,7 @@ export interface GenericWizardTileProps {
   disableProceedReason?: string
 }
 
-export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
+export function GenericWizardTile(props: GenericWizardTileProps): ReactNode {
   const {
     rightHandBody,
     bodyText,

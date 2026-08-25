@@ -29,7 +29,6 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useModuleUSBPort } from '/app/local-resources/modules'
 import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
 import { OddModal } from '/app/molecules/OddModal'
@@ -39,6 +38,7 @@ import { useCloseCurrentRun } from '/app/resources/runs'
 import { useSendIdentifyModule } from '../ModuleWizardFlows/hooks'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { DeckDefinition, ModuleModel } from '@opentrons/shared-data'
 
@@ -62,7 +62,7 @@ interface ChooseModuleToConfigureModalProps {
 
 export const ChooseModuleToConfigureModal = (
   props: ChooseModuleToConfigureModalProps
-): JSX.Element => {
+): ReactNode => {
   const {
     handleConfigureModule,
     onCloseClick,
@@ -303,7 +303,7 @@ interface NoUnconfiguredModulesProps {
   isOnDevice: boolean
   robotName: string
 }
-function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): JSX.Element {
+function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): ReactNode {
   const {
     moduleDisplayName,
     configuredModuleMatches,
@@ -313,8 +313,7 @@ function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): JSX.Element {
   } = props
   const { t } = useTranslation('protocol_setup')
   const navigate = useNavigate()
-  const documentationState = useDocumentationState()
-  const { closeCurrentRun } = useCloseCurrentRun(documentationState)
+  const { closeCurrentRun } = useCloseCurrentRun()
   const handleCancelRun = (): void => {
     closeCurrentRun()
   }

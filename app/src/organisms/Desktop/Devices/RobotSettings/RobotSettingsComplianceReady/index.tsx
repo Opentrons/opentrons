@@ -22,7 +22,9 @@ export function RobotSettingsComplianceReady({
         <PersonalAccountSettings robotName={robotName} />
       </div>
       {isAdmin ? (
-        <div className={`${styles.section} ${styles.section_accordion}`}>
+        <div
+          className={`${styles.section} ${styles.section_accordion} ${styles.section_accordion_overflow_visible}`}
+        >
           <UserManagement robotName={robotName} />
         </div>
       ) : null}

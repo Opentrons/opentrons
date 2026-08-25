@@ -128,24 +128,76 @@ describe('PersonalAccountSettings', () => {
     openEditForm()
     expect(screen.getByDisplayValue('alice')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Alice Example')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'save' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
 
     fireEvent.click(screen.getAllByRole('button', { name: 'Cancel' })[1]!)
     expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument()
     expect(
-      screen.queryByRole('button', { name: 'save' })
+      screen.queryByRole('button', { name: 'Save' })
     ).not.toBeInTheDocument()
   })
 
-  it('does not show the edit button when the user is not logged in', () => {
+  it('shows the logged out message when the user is not logged in', () => {
     renderComponent({
       perRobotAuthStates: {},
       mostRecentRobotName: null,
     })
-    screen.getByText('Personal account settings')
+    screen.getByTestId('InfoScreen')
+    screen.getByLabelText('alert')
+    screen.getByText('Log in to manage Compliance Ready Software settings')
+    expect(
+      screen.queryByText('Personal account settings')
+    ).not.toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: 'Edit' })
     ).not.toBeInTheDocument()
+    expect(screen.queryByText('alice')).not.toBeInTheDocument()
+  })
+
+  it('shows the logged out message after the session expires', () => {
+    const store = configureStore({
+      reducer: { robotAuth: robotAuthReducer },
+      preloadedState: {
+        robotAuth: {
+          perRobotAuthStates: {
+            [ROBOT_NAME]: MOCK_AUTH_STATE,
+          },
+          mostRecentRobotName: ROBOT_NAME,
+        },
+      },
+    })
+
+    const { rerender } = render(
+      <QueryClientProvider client={new QueryClient()}>
+        <I18nextProvider i18n={i18n}>
+          <Provider store={store}>
+            <PersonalAccountSettings robotName={ROBOT_NAME} />
+          </Provider>
+        </I18nextProvider>
+      </QueryClientProvider>
+    )
+
+    screen.getByText('alice')
+
+    store.dispatch({
+      type: 'robotAuth/timeOutLogin',
+      payload: { robotName: ROBOT_NAME },
+    })
+
+    rerender(
+      <QueryClientProvider client={new QueryClient()}>
+        <I18nextProvider i18n={i18n}>
+          <Provider store={store}>
+            <PersonalAccountSettings robotName={ROBOT_NAME} />
+          </Provider>
+        </I18nextProvider>
+      </QueryClientProvider>
+    )
+
+    screen.getByTestId('InfoScreen')
+    screen.getByLabelText('alert')
+    screen.getByText('Log in to manage Compliance Ready Software settings')
+    expect(screen.queryByText('alice')).not.toBeInTheDocument()
   })
 
   it('calls updateSelf and returns to view mode with updated fields on successful save', async () => {
@@ -154,7 +206,7 @@ describe('PersonalAccountSettings', () => {
     fireEvent.change(screen.getByDisplayValue('Alice Example'), {
       target: { value: 'Alice Updated' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'save' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
       expect(mockUpdateSelf).toHaveBeenCalledOnce()
@@ -168,7 +220,7 @@ describe('PersonalAccountSettings', () => {
     })
     expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument()
     expect(
-      screen.queryByRole('button', { name: 'save' })
+      screen.queryByRole('button', { name: 'Save' })
     ).not.toBeInTheDocument()
   })
 
@@ -203,7 +255,7 @@ describe('PersonalAccountSettings', () => {
       renderComponent()
       openEditForm()
       applyChange()
-      fireEvent.click(screen.getByRole('button', { name: 'save' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 
       await waitFor(() => {
         expect(mockUpdateSelf).toHaveBeenCalledWith({ data: expectedData })
@@ -218,12 +270,12 @@ describe('PersonalAccountSettings', () => {
     fireEvent.change(screen.getByDisplayValue('alice'), {
       target: { value: 'alice2' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'save' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
       screen.getByText('Unable to save account settings. Try again.')
     })
-    expect(screen.getByRole('button', { name: 'save' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
   })
 
   it('shows a username error when updateSelf returns username already exists', async () => {
@@ -233,14 +285,14 @@ describe('PersonalAccountSettings', () => {
     fireEvent.change(screen.getByDisplayValue('alice'), {
       target: { value: 'bob' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'save' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
       screen.getByText(
         'This username is already taken. Choose a different username.'
       )
     })
-    expect(screen.getByRole('button', { name: 'save' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
     expect(
       screen.queryByText('Unable to save account settings. Try again.')
     ).not.toBeInTheDocument()

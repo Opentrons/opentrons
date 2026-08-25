@@ -69,7 +69,7 @@ async def handle_estop_event(
                 return
             # todo(mm, 2024-04-17): This estop teardown sequencing belongs in the
             # runner layer.
-            maintenance_run_orchestraotr_store.run_orchestrator.estop()
+            await maintenance_run_orchestraotr_store.run_orchestrator.estop()
             await maintenance_run_orchestraotr_store.run_orchestrator.finish(
                 error=EStopActivatedError()
             )
@@ -207,11 +207,11 @@ class MaintenanceRunOrchestratorStore:
         )
 
         for offset in labware_offsets:
-            self._run_orchestrator.add_labware_offset(offset)
+            await self._run_orchestrator.add_labware_offset(offset)
 
         self._created_at = created_at
 
-        return self._run_orchestrator.get_state_summary()
+        return await self._run_orchestrator.get_state_summary()
 
     async def clear(self) -> RunResult:
         """Remove the ProtocolEngine.
@@ -220,7 +220,7 @@ class MaintenanceRunOrchestratorStore:
             RunConflictError: The current run orchestrator is not idle, so
             it cannot be cleared.
         """
-        if self.run_orchestrator.get_is_okay_to_clear():
+        if await self.run_orchestrator.get_is_okay_to_clear():
             await self.run_orchestrator.finish(
                 drop_tips_after_run=False,
                 set_run_status=False,
@@ -229,9 +229,9 @@ class MaintenanceRunOrchestratorStore:
         else:
             raise RunConflictError("Current run is not idle or stopped.")
 
-        run_data = self.run_orchestrator.get_state_summary()
-        commands = self.run_orchestrator.get_all_commands()
-        preconditions = self.run_orchestrator.get_preconditions()
+        run_data = await self.run_orchestrator.get_state_summary()
+        commands = await self.run_orchestrator.get_all_commands()
+        preconditions = await self.run_orchestrator.get_preconditions()
         self._run_orchestrator = None
         self._created_at = None
 
@@ -243,7 +243,7 @@ class MaintenanceRunOrchestratorStore:
             command_preconditions=preconditions,
         )
 
-    def get_command_slice(
+    async def get_command_slice(
         self,
         cursor: Optional[int],
         length: int,
@@ -254,25 +254,25 @@ class MaintenanceRunOrchestratorStore:
             cursor: Requested index of first command in the returned slice.
             length: Length of slice to return.
         """
-        return self.run_orchestrator.get_command_slice(
+        return await self.run_orchestrator.get_command_slice(
             cursor=cursor, length=length, include_fixit_commands=False
         )
 
-    def get_current_command(self) -> Optional[CommandPointer]:
+    async def get_current_command(self) -> Optional[CommandPointer]:
         """Get the "current" command, if any."""
-        return self.run_orchestrator.get_current_command()
+        return await self.run_orchestrator.get_current_command()
 
-    def get_command_recovery_target(self) -> Optional[CommandPointer]:
+    async def get_command_recovery_target(self) -> Optional[CommandPointer]:
         """Get the current error recovery target."""
-        return self.run_orchestrator.get_command_recovery_target()
+        return await self.run_orchestrator.get_command_recovery_target()
 
-    def get_command(self, command_id: str) -> Command:
+    async def get_command(self, command_id: str) -> Command:
         """Get a run's command by ID."""
-        return self.run_orchestrator.get_command(command_id=command_id)
+        return await self.run_orchestrator.get_command(command_id=command_id)
 
-    def get_state_summary(self) -> StateSummary:
+    async def get_state_summary(self) -> StateSummary:
         """Get protocol run data."""
-        return self.run_orchestrator.get_state_summary()
+        return await self.run_orchestrator.get_state_summary()
 
     async def add_command_and_wait_for_interval(
         self,
@@ -285,15 +285,15 @@ class MaintenanceRunOrchestratorStore:
             command=request, wait_until_complete=wait_until_complete, timeout=timeout
         )
 
-    def add_labware_offset(
+    async def add_labware_offset(
         self, request: LegacyLabwareOffsetCreate | LabwareOffsetCreate
     ) -> LabwareOffset:
         """Add a new labware offset to state."""
-        return self.run_orchestrator.add_labware_offset(request)
+        return await self.run_orchestrator.add_labware_offset(request)
 
-    def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
+    async def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         """Add a new labware definition to state."""
-        return self.run_orchestrator.add_labware_definition(definition)
+        return await self.run_orchestrator.add_labware_definition(definition)
 
     async def handle_proxy_estop_event(
         self,
@@ -313,7 +313,7 @@ class MaintenanceRunOrchestratorStore:
                     return
                 # todo(mm, 2024-04-17): This estop teardown sequencing belongs in the
                 # runner layer.
-                self.run_orchestrator.estop()
+                await self.run_orchestrator.estop()
                 await self.run_orchestrator.finish(error=EStopActivatedError())
         except Exception:
             # This is a background task kicked off by a hardware event,

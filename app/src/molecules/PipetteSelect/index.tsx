@@ -13,6 +13,7 @@ import {
 
 import { Select } from '/app/atoms/SelectField/Select'
 
+import type { ReactNode } from 'react'
 import type { ActionMeta, MultiValue, SingleValue } from 'react-select'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { SelectOption } from '/app/atoms/SelectField/Select'
@@ -52,7 +53,7 @@ const specToOption = ({
   label: displayName,
 })
 
-export function PipetteSelect(props: PipetteSelectProps): JSX.Element {
+export function PipetteSelect(props: PipetteSelectProps): ReactNode {
   const { tabIndex, enableNoneOption, nameBlocklist = [] } = props
   const { t } = useTranslation('shared')
   const NONE = t('none')
@@ -108,7 +109,7 @@ export function PipetteSelect(props: PipetteSelectProps): JSX.Element {
   )
 }
 
-const PipetteNameItem = (props: PipetteNameSpecs): JSX.Element => {
+const PipetteNameItem = (props: PipetteNameSpecs): ReactNode => {
   const { channels, displayName, displayCategory } = props
   const volumeClassMaybeMatch = displayName.match(/P\d+/)
   const volumeClass =

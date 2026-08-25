@@ -30,13 +30,13 @@ from audit_server.log_storage.store import NoPeriodById
 from audit_server.log_storage.types import LogPeriodEntries
 
 _OLDER_PERIOD = LogPeriodSummary(
-    id=1,
+    id="1",
     startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
     endedAt=datetime(2024, 1, 2, tzinfo=timezone.utc),
 )
 
 _NEWER_PERIOD = LogPeriodSummary(
-    id=2,
+    id="2",
     startedAt=datetime(2024, 2, 1, tzinfo=timezone.utc),
     endedAt=None,
 )
@@ -90,7 +90,7 @@ async def test_get_log_period_summary(
 ) -> None:
     """It should return period details including size and attached filenames."""
     period_details = LogPeriodDetails(
-        id=1,
+        id="1",
         startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
         endedAt=datetime(2024, 1, 2, tzinfo=timezone.utc),
         recordCount=2,
@@ -106,7 +106,7 @@ async def test_get_log_period_summary(
         log_data_manager=mock_log_data_manager,
     )
 
-    assert result.data.id == 1
+    assert result.data.id == "1"
     assert result.data.startedAt == datetime(2024, 1, 1, tzinfo=timezone.utc)
     assert result.data.endedAt == datetime(2024, 1, 2, tzinfo=timezone.utc)
     assert result.data.recordCount == 2
@@ -150,6 +150,16 @@ async def test_download_log_period_stages_under_persistence_temp(
     )
     decoy.when(mock_log_data_manager.get_period_entries(period_id="1")).then_return(
         period_entries
+    )
+    decoy.when(mock_log_data_manager.get_log_period_details(period_id="1")).then_return(
+        LogPeriodDetails(
+            id="1",
+            startedAt=datetime(2024, 1, 1, tzinfo=timezone.utc),
+            endedAt=datetime(2024, 1, 2, tzinfo=timezone.utc),
+            recordCount=123,
+            totalSizeBytes=456,
+            attachedFilenames=[],
+        )
     )
     decoy.when(await mock_key_client.get_key_and_hash()).then_return(
         PublicKeyAndHash(publicKey="public-key", publicHash="public-hash")

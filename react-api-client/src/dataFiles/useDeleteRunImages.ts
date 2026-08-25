@@ -40,7 +40,11 @@ export function useDeleteRunImages(
     ['delete_run_images'],
     ({ variables: runId, userNotes }: DocumentedMutationParameters<string>) =>
       deleteRunImages(host!, runId, userNotes).then(response => {
-        queryClient.invalidateQueries(getQueryKey(host, 'dataFiles', runId))
+        queryClient
+          .invalidateQueries(getQueryKey(host, 'dataFiles', runId))
+          .catch((e: Error) => {
+            console.error(`error invalidating data files query: ${e.message}`)
+          })
         return response.data
       }),
     options

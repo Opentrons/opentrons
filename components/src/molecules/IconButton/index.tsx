@@ -4,7 +4,12 @@ import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import styles from './iconbutton.module.css'
 
-import type { ComponentPropsWithoutRef, CSSProperties, MouseEvent } from 'react'
+import type {
+  ComponentPropsWithoutRef,
+  CSSProperties,
+  MouseEvent,
+  ReactNode,
+} from 'react'
 import type { IconName } from '../../icons'
 
 /**
@@ -102,7 +107,7 @@ export function NewIconButton({
   onClick,
   className,
   ...restProps
-}: IconButtonProps): JSX.Element {
+}: IconButtonProps): ReactNode {
   const colors = COLOR_VARIANTS[variant]
   const iconSize = ICON_SIZES[size]
 

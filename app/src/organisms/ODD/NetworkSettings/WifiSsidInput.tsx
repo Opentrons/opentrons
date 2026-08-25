@@ -15,7 +15,7 @@ import {
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 
 interface WifiSsidInputProps {
   errorMessage?: string | null
@@ -27,7 +27,7 @@ export function WifiSsidInput({
   errorMessage,
   inputSsid,
   setInputSsid,
-}: WifiSsidInputProps): JSX.Element {
+}: WifiSsidInputProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared'])
   const keyboardRef = useRef(null)
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
@@ -56,9 +56,6 @@ export function WifiSsidInput({
           }}
           type="text"
           error={errorMessage}
-          onBlur={e => {
-            e.target.focus()
-          }}
         />
       </Flex>
       <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">

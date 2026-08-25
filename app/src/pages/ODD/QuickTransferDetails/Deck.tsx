@@ -6,7 +6,9 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 
-export const Deck = (props: { transferId: string }): JSX.Element => {
+import type { ReactNode } from 'react'
+
+export const Deck = (props: { transferId: string }): ReactNode => {
   const { data: transferData } = useProtocolQuery(props.transferId)
   const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
     props.transferId,

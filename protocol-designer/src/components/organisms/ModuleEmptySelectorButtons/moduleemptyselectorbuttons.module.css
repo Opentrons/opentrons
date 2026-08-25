@@ -1,0 +1,10 @@
+.buttons_container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-4);
+}
+
+.button_container {
+  display: flex;
+  width: max-content;
+}

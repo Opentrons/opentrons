@@ -7,7 +7,7 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import { WifiSsidInput } from '../../NetworkSettings'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { SetSettingOption } from '../types'
 
 interface RobotSettingsJoinOtherNetworkProps {
@@ -21,7 +21,7 @@ interface RobotSettingsJoinOtherNetworkProps {
 export function RobotSettingsJoinOtherNetwork({
   setCurrentOption,
   setSelectedSsid,
-}: RobotSettingsJoinOtherNetworkProps): JSX.Element {
+}: RobotSettingsJoinOtherNetworkProps): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
 
   const [inputSsid, setInputSsid] = useState<string>('')

@@ -9,7 +9,7 @@ interface LabeledValueProps {
   value: ReactNode
 }
 
-export function LabeledValue(props: LabeledValueProps): JSX.Element {
+export function LabeledValue(props: LabeledValueProps): ReactNode {
   return (
     <div className={styles.container}>
       <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>

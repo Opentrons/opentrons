@@ -14,6 +14,8 @@
 
 import { Box } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 export const MODAL_PORTAL_ID = '__otAppModalPortalRoot'
 export const TOP_PORTAL_ID = '__otAppTopPortalRoot'
 
@@ -25,10 +27,10 @@ export function getTopPortalEl(): HTMLElement {
   return global.document.getElementById(TOP_PORTAL_ID) ?? global.document.body
 }
 
-export function ModalPortalRoot(): JSX.Element {
+export function ModalPortalRoot(): ReactNode {
   return <Box zIndex={1} id={MODAL_PORTAL_ID} data-testid={MODAL_PORTAL_ID} />
 }
 
-export function TopPortalRoot(): JSX.Element {
+export function TopPortalRoot(): ReactNode {
   return <Box zIndex={10} id={TOP_PORTAL_ID} data-testid={TOP_PORTAL_ID} />
 }

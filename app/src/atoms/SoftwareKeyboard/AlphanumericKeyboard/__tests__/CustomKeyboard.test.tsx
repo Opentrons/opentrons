@@ -1,7 +1,7 @@
 import { useRef } from 'react'
-import { renderHook, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -9,20 +9,35 @@ import { renderWithProviders } from '/app/__testing-utils__'
 
 import { AlphanumericKeyboard } from '..'
 
-import type { ComponentProps } from 'react'
+import type { ReactNode } from 'react'
+import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
-const render = (props: ComponentProps<typeof AlphanumericKeyboard>) => {
-  return renderWithProviders(<AlphanumericKeyboard {...props} />)[0]
+function TestKeyboard(): ReactNode {
+  const keyboardRef = useRef<KeyboardReactInterface | null>(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
+
+  return (
+    <>
+      <input data-testid="AlphanumericKeyboard_Input" ref={inputElementRef} />
+      <AlphanumericKeyboard
+        keyboardRef={keyboardRef}
+        inputElementRef={inputElementRef}
+      />
+    </>
+  )
+}
+
+const render = () => {
+  return renderWithProviders(<TestKeyboard />)[0]
 }
 
 describe('AlphanumericKeyboard', () => {
+  afterEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('should render alphanumeric keyboard - lower case', () => {
-    const { result } = renderHook(() => useRef(null))
-    const props = {
-      onChange: vi.fn(),
-      keyboardRef: result.current,
-    }
-    render(props)
+    render()
     const buttons = screen.getAllByRole('button')
     const expectedButtonNames = [
       'q',
@@ -62,12 +77,7 @@ describe('AlphanumericKeyboard', () => {
   })
   it('should render alphanumeric keyboard - upper case, when clicking ABC key', async () => {
     const user = userEvent.setup()
-    const { result } = renderHook(() => useRef(null))
-    const props = {
-      onChange: vi.fn(),
-      keyboardRef: result.current,
-    }
-    render(props)
+    render()
     const shiftKey = screen.getByRole('button', { name: 'ABC' })
     await user.click(shiftKey)
 
@@ -111,12 +121,7 @@ describe('AlphanumericKeyboard', () => {
 
   it('should render alphanumeric keyboard - numbers, when clicking number key', async () => {
     const user = userEvent.setup()
-    const { result } = renderHook(() => useRef(null))
-    const props = {
-      onChange: vi.fn(),
-      keyboardRef: result.current,
-    }
-    render(props)
+    render()
     const numberKey = screen.getByRole('button', { name: '123' })
     await user.click(numberKey)
     const buttons = screen.getAllByRole('button')
@@ -142,12 +147,7 @@ describe('AlphanumericKeyboard', () => {
 
   it('should render alphanumeric keyboard - lower case when layout is numbers and clicking abc ', async () => {
     const user = userEvent.setup()
-    const { result } = renderHook(() => useRef(null))
-    const props = {
-      onChange: vi.fn(),
-      keyboardRef: result.current,
-    }
-    render(props)
+    render()
     const numberKey = screen.getByRole('button', { name: '123' })
     await user.click(numberKey)
     const abcKey = screen.getByRole('button', { name: 'abc' })
@@ -192,12 +192,7 @@ describe('AlphanumericKeyboard', () => {
 
   it('should switch each alphanumeric keyboard properly', async () => {
     const user = userEvent.setup()
-    const { result } = renderHook(() => useRef(null))
-    const props = {
-      onChange: vi.fn(),
-      keyboardRef: result.current,
-    }
-    render(props)
+    render()
     // lower case keyboard -> upper case keyboard
     const ABCKey = screen.getByRole('button', { name: 'ABC' })
     await user.click(ABCKey)
@@ -210,5 +205,14 @@ describe('AlphanumericKeyboard', () => {
     const abcKey = screen.getByRole('button', { name: 'abc' })
     await user.click(abcKey)
     screen.getByRole('button', { name: 'a' })
+  })
+
+  it('should update the input when clicking keys', async () => {
+    const user = userEvent.setup()
+    render()
+    await user.click(screen.getByRole('button', { name: 'a' }))
+    await user.click(screen.getByRole('button', { name: 'b' }))
+    await user.click(screen.getByRole('button', { name: 'c' }))
+    expect(screen.getByTestId('AlphanumericKeyboard_Input')).toHaveValue('abc')
   })
 })

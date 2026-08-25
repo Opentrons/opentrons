@@ -7,6 +7,7 @@ import {
   INFO_TOAST,
   InfoScreen,
   StyledText,
+  SUCCESS_TOAST,
   WARNING_TOAST,
 } from '@opentrons/components'
 import { isDocumentedMutationError } from '@opentrons/react-api-client'
@@ -26,6 +27,7 @@ import fileManagerStyles from '../robotsettingsfilemanager.module.css'
 import protocolRunRecordsStyles from './protocolrunrecords.module.css'
 import { RunRecord } from './RunRecord'
 
+import type { ReactNode } from 'react'
 import type { IconProps } from '@opentrons/components'
 
 interface ProtocolRunRecordsProps {
@@ -34,7 +36,7 @@ interface ProtocolRunRecordsProps {
 
 export function ProtocolRunRecords({
   robotName,
-}: ProtocolRunRecordsProps): JSX.Element {
+}: ProtocolRunRecordsProps): ReactNode {
   const { t } = useTranslation('device_details')
   const { makeToast, eatToast } = useToaster()
   const { data: runData } = useNotifyAllRunsQuery()
@@ -83,6 +85,9 @@ export function ProtocolRunRecords({
       )
         .catch((e: Error) => {
           makeToast(e.message, ERROR_TOAST, { closeButton: true })
+        })
+        .then(() => {
+          makeToast(t('files_successfully_downloaded') as string, SUCCESS_TOAST)
         })
         .finally(() => {
           eatToast(toastId)

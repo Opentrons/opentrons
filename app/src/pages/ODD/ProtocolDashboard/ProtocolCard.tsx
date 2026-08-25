@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import last from 'lodash/last'
 import { css } from 'styled-components'
 
 import { getProtocol } from '@opentrons/api-client'
@@ -27,8 +26,6 @@ import {
   useDeleteProtocolMutation,
   useDeleteRunMutation,
   useHost,
-  useMostRecentSuccessfulAnalysisAsDocumentQuery,
-  useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
 
 import { SmallButton } from '/app/atoms/buttons'
@@ -39,12 +36,10 @@ import { formatTimeWithUtcLabel } from '/app/resources/runs'
 
 import { LongPressModal } from './LongPressModal'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-
-const REFETCH_INTERVAL = 5000
 
 interface ProtocolCardProps {
   protocol: ProtocolResource
@@ -55,7 +50,7 @@ interface ProtocolCardProps {
   setIsRequiredCSV: (isRequiredCSV: boolean) => void
 }
 
-export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
+export function ProtocolCard(props: ProtocolCardProps): ReactNode {
   const {
     protocol,
     lastRun,
@@ -80,25 +75,12 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
   const { deleteRun } = useDeleteRunMutation(documentationState)
   const updatedLastRun = useUpdatedLastRunTime(lastRun)
 
-  const { id: protocolId, analysisSummaries } = protocol
-  const { data: mostRecentSuccessfulAnalysis } =
-    useMostRecentSuccessfulAnalysisAsDocumentQuery(
-      protocolId,
-      analysisSummaries,
-      {
-        enabled: protocol != null,
-        refetchInterval: analysisData =>
-          analysisData == null ? REFETCH_INTERVAL : false,
-      }
-    )
-  const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
-    protocolId,
-    last(protocol.analysisSummaries)?.id ?? null,
-    {
-      enabled: protocol != null,
-      refetchInterval: analysisData =>
-        analysisData == null ? REFETCH_INTERVAL : false,
-    }
+  const { analysisSummaries } = protocol
+  const mostRecentSuccessfulAnalysis = analysisSummaries.findLast(
+    summary => summary.status === 'completed' && summary.result === 'ok'
+  )
+  const mostRecentAnalysis = analysisSummaries.find(
+    summary => summary.status === 'completed'
   )
 
   const analysisForProtocolCard =

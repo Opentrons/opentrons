@@ -7,7 +7,6 @@ import { useModulesQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import {
@@ -37,6 +36,12 @@ vi.mock('react-router-dom')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/runs')
+vi.mock('/app/resources/runs/useIsDownloadAuditLogsRequired', () => ({
+  useIsDownloadAuditLogsRequired: () => ({
+    isRequired: false,
+    isLoading: false,
+  }),
+}))
 vi.mock('/app/redux/protocol-runs')
 vi.mock('../RunHeaderModalContainer')
 vi.mock('../RunHeaderBannerContainer')
@@ -46,9 +51,6 @@ vi.mock('../RunHeaderProtocolName')
 vi.mock('/app/resources/dataFiles/useRunGeneratedDataFiles')
 vi.mock('../hooks')
 vi.mock('/app/local-resources/images/hooks/useInitializeCameraState')
-vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
-  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
-}))
 
 const MOCK_PROTOCOL = 'MOCK_PROTOCOL'
 const MOCK_RUN_ID = 'MOCK_RUN_ID'

@@ -134,7 +134,7 @@ interface BaseDeckProps {
   svgProps?: any
 }
 
-export function BaseDeck(props: BaseDeckProps): JSX.Element {
+export function BaseDeck(props: BaseDeckProps): ReactNode {
   const {
     robotType,
     modulesOnDeck = [],

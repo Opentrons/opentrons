@@ -14,11 +14,13 @@ import {
 import { ToggleButton } from '/app/atoms/buttons'
 import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 
+import type { ReactNode } from 'react'
+
 export function EnableErrorRecoveryMode({
   isRobotBusy,
 }: {
   isRobotBusy: boolean
-}): JSX.Element {
+}): ReactNode {
   const { t } = useTranslation('app_settings')
   const { isEREnabled, toggleERSettings } = useErrorRecoverySettingsToggle()
 

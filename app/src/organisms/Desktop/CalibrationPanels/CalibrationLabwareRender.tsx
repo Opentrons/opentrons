@@ -13,6 +13,7 @@ import {
   getLabwareViewBox,
 } from '@opentrons/shared-data'
 
+import type { ReactNode } from 'react'
 import type { LabwareDefinition, Vector2D } from '@opentrons/shared-data'
 
 interface CalibrationLabwareRenderProps {
@@ -22,7 +23,7 @@ interface CalibrationLabwareRenderProps {
 
 export function CalibrationLabwareRender(
   props: CalibrationLabwareRenderProps
-): JSX.Element {
+): ReactNode {
   const { labwareDef, labwarePosition } = props
 
   const title = getLabwareDisplayName(labwareDef)

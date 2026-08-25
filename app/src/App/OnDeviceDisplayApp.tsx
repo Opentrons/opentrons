@@ -65,6 +65,7 @@ import { RobotUpdateProvider } from '/app/resources/robot-update/RobotUpdateProv
 import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { LocalizationProvider } from '../LocalizationProvider'
 import { requireDocumentation } from '../organisms/ODD/DocumentationRequired/requireDocumentation'
+import { showDownloadLogsModal } from '../organisms/ODD/DownloadAuditLogsModal'
 import { showLoginModal } from '../organisms/ODD/OnDeviceLogin/LoginModal'
 import { showSignRunModal } from '../pages/ODD/RunSummary/SignRun'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
@@ -81,6 +82,7 @@ import { ODDTopLevelRedirects } from './ODDTopLevelRedirects'
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
 import { ModalPortalRoot } from './portal'
 
+import type { ReactNode } from 'react'
 import type { HostConfig } from '@opentrons/api-client'
 import type { Dispatch } from '/app/redux/types'
 
@@ -171,7 +173,7 @@ const TURN_OFF_BACKLIGHT = '7'
 
 const RETRY_DELAY_MS = 1000
 
-export const OnDeviceDisplayApp = (): JSX.Element => {
+export const OnDeviceDisplayApp = (): ReactNode => {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
 
@@ -260,6 +262,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                       showDocumentationRequiredModal: requireDocumentation,
                       showLoginModal,
                       showSignRunModal,
+                      showDownloadLogsModal,
                     }}
                   >
                     <RobotUpdateProvider>
@@ -321,7 +324,7 @@ const getTargetPath = (unfinishedUnboxingFlowRoute: string | null): string => {
 
 // split to a separate function because scrollRef rerenders on every route change
 // this avoids rerendering parent providers as well
-export function OnDeviceDisplayAppRoutes(): JSX.Element {
+export function OnDeviceDisplayAppRoutes(): ReactNode {
   const { isScrolling, refCallback, element } = useScrollRef()
   const location = useLocation()
   useEffect(

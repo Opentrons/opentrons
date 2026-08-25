@@ -10,7 +10,6 @@
   "__dev_internal__quickTransferExportJSON": "启用快速移液的 JSON 导出功能",
   "__dev_internal__quickTransferProtocolContentsLog": "启用 QT 协议内容日志记录",
   "__dev_internal__reactQueryDevtools": "启用开发者工具",
-  "__dev_internal__reactScan": "启用 React 组件扫描",
   "__dev_internal__robotSearchBar": "在指定页面上添加机器人搜索栏",
   "__dev_internal__showGitDetails": "在机器人系统版本中显示 git 提交详情",
   "add_folder_button": "添加实验耗材源文件夹",

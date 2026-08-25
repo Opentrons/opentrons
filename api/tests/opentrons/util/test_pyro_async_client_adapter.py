@@ -1,6 +1,5 @@
 """Test for the Pyro Asynchronous Client Adapter."""
 
-import asyncio
 import socket
 import threading
 from typing import cast
@@ -18,8 +17,8 @@ from opentrons.hardware_control.pyro_utils.serpent_type_registry import (
     register_hardware_types,
 )
 from opentrons.util.pyro import pyro_client_async_adapter as _get_thread_proxy_module
-from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
+from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
 
 TEST_PYRO_TIMEOUT = 5
 
@@ -65,23 +64,10 @@ async def test_client_async_on_ot3api(decoy: Decoy, managed_obj: OT3API) -> None
     # Client-side requests below
     register_hardware_types()
     name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
-    ns = pyro.locate_ns()
-
-    retries_counter = 0
-    while ns.count() < 2:
-        # Wait and try again, the resource isnt registered yet
-        await asyncio.sleep(0.01)
-        retries_counter += 1
-        if retries_counter > 10:
-            # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
-
-    uri = pyro.resolve(uri="PYRONAME:OT3API")
-    ot3_proxy = pyro.Proxy(uri)  # type: ignore
 
     # Make an AsyncClientPyroObject out of the proxy, and then typecast it to HardwareControlAPI for helpful typehints
     # This is similar to what a "full" pyro implementation roundtrip will look like
-    ot3_async = AsyncClientPyroObject(ot3_proxy)
+    ot3_async = await wait_for_proxy(proxy_name="OT3API")
 
     # assert metadata info about an async function
     assert ot3_async.home.__name__ == "home"  # type: ignore
@@ -104,7 +90,7 @@ async def test_client_async_on_ot3api(decoy: Decoy, managed_obj: OT3API) -> None
     assert estop_state is hw_types.EstopState.DISENGAGED
 
     # Clean up client resources.
-    ot3_proxy._pyroRelease()  # type: ignore
+    ot3_async._proxy._pyroRelease()  # type: ignore
 
 
 async def test_thread_local_proxy_reuses_connections(
@@ -138,18 +124,9 @@ async def test_thread_local_proxy_reuses_connections(
 
     register_hardware_types()
     name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
-    ns = pyro.locate_ns()
 
-    retries_counter = 0
-    while ns.count() < 2:
-        await asyncio.sleep(0.01)
-        retries_counter += 1
-        if retries_counter > 10:
-            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
-
-    uri = pyro.resolve(uri="PYRONAME:OT3API")
-    ot3_proxy = pyro.Proxy(uri)  # type: ignore
-    casted_ot3api = cast(HardwareControlAPI, AsyncClientPyroObject(ot3_proxy))
+    ot3_async = await wait_for_proxy(proxy_name="OT3API")
+    casted_ot3api = cast(HardwareControlAPI, ot3_async)
 
     original_get_thread_proxy = _get_thread_proxy_module._get_thread_proxy
     new_proxy_count = 0
@@ -182,4 +159,4 @@ async def test_thread_local_proxy_reuses_connections(
         f"result validator proxy."
     )
 
-    ot3_proxy._pyroRelease()  # type: ignore
+    ot3_async._proxy._pyroRelease()  # type: ignore

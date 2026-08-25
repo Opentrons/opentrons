@@ -93,7 +93,8 @@ async def get_supplied_user_notes(
         ) from base_e
     stripped = decoded.strip()
     if (
-        settings.minLengthOfReasonForInteraction is not None
+        settings.requireReasonForInteraction is True
+        and settings.minLengthOfReasonForInteraction is not None
         and len(stripped) < settings.minLengthOfReasonForInteraction
     ):
         raise fastapi.HTTPException(

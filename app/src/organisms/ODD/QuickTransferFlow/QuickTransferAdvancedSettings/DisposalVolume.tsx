@@ -33,7 +33,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { ACTIONS } from '../constants'
 import { getPipetteName } from '../utils'
 
-import type { Dispatch } from 'react'
+import type { Dispatch, ReactNode } from 'react'
 import type { CutoutConfig, SupportedTip } from '@opentrons/shared-data'
 import type {
   BlowOutLocation,
@@ -49,7 +49,7 @@ interface DisposalVolumeProps {
   kind: FlowRateKind
 }
 
-export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
+export function DisposalVolume(props: DisposalVolumeProps): ReactNode {
   const { kind, onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
@@ -246,9 +246,6 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
               type="text"
               value={String(volume ?? '')}
               label={t('disposal_volume_µL')}
-              onBlur={e => {
-                e.target.focus()
-              }}
               onChange={e => {
                 handleVolumeChange(e.target.value as string)
               }}
@@ -321,9 +318,6 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
               value={String(flowRate ?? '')}
               label={t('blowout_flow_rate_µL')}
               error={flowRateError}
-              onBlur={e => {
-                e.target.focus()
-              }}
               onChange={e => {
                 handleFlowRateChange(e.target.value as string)
               }}

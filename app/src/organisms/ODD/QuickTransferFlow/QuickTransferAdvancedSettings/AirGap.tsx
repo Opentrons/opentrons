@@ -27,7 +27,7 @@ import {
   getDispenseAirGapVolumeRange,
 } from '../utils'
 
-import type { Dispatch } from 'react'
+import type { Dispatch, ReactNode } from 'react'
 import type {
   FlowRateKind,
   QuickTransferSummaryAction,
@@ -41,7 +41,7 @@ interface AirGapProps {
   kind: FlowRateKind
 }
 
-export function AirGap(props: AirGapProps): JSX.Element {
+export function AirGap(props: AirGapProps): ReactNode {
   const { kind, onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
@@ -208,9 +208,6 @@ export function AirGap(props: AirGapProps): JSX.Element {
               value={volume}
               label={t('air_gap_volume_µL')}
               error={volumeError}
-              onBlur={e => {
-                e.target.focus()
-              }}
               onChange={e => {
                 setVolume(Number(e.target.value))
               }}

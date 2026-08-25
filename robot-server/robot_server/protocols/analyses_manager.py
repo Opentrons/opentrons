@@ -73,19 +73,22 @@ class AnalysesManager:
             )
         except Exception as error:
             internal_error = em.map_unexpected_error(error)
-            await self._analysis_store.save_initialization_failed_analysis(
-                protocol_id=protocol_resource.protocol_id,
-                analysis_id=analysis_id,
-                robot_type=protocol_resource.source.robot_type,
-                run_time_parameters=analyzer.get_verified_run_time_parameters(),
-                errors=[
-                    ErrorOccurrence.from_failed(
-                        id="internal-error",
-                        createdAt=datetime_helper.utc_now(),
-                        error=internal_error,
-                    )
-                ],
-            )
+            try:
+                await self._analysis_store.save_initialization_failed_analysis(
+                    protocol_id=protocol_resource.protocol_id,
+                    analysis_id=analysis_id,
+                    robot_type=protocol_resource.source.robot_type,
+                    run_time_parameters=await analyzer.get_verified_run_time_parameters(),
+                    errors=[
+                        ErrorOccurrence.from_failed(
+                            id="internal-error",
+                            createdAt=datetime_helper.utc_now(),
+                            error=internal_error,
+                        )
+                    ],
+                )
+            finally:
+                await analyzer.clean_up()
             raise FailedToInitializeAnalyzer() from error
         return analyzer
 
@@ -95,7 +98,7 @@ class AnalysesManager:
         analyzer: protocol_analyzer.ProtocolAnalyzer,
     ) -> AnalysisSummary:
         """Start an analysis of the given protocol resource with verified run time parameters."""
-        run_time_parameters = analyzer.get_verified_run_time_parameters()
+        run_time_parameters = await analyzer.get_verified_run_time_parameters()
         self._analysis_store.add_pending(
             protocol_id=analyzer.protocol_resource.protocol_id,
             analysis_id=analysis_id,

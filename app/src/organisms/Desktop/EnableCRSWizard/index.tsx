@@ -65,7 +65,7 @@ export const handleEnableCRSWizard = (props: EnableCRSWizardProps): void => {
 }
 
 const EnableCRSWizard = NiceModal.create(
-  (props: EnableCRSWizardProps): JSX.Element => {
+  (props: EnableCRSWizardProps): ReactNode => {
     const { robotName } = props
     const modal = useModal()
     const { t } = useTranslation('access_control')
@@ -154,7 +154,7 @@ function EnterServicePINPage({
   header,
   onBack,
   onNext,
-}: CommonPageProps): JSX.Element {
+}: CommonPageProps): ReactNode {
   const { t } = useTranslation(['access_control', 'shared'])
   const { control, trigger } = useFormContext<FormValues>()
   const formId = useId()
@@ -237,7 +237,7 @@ function EnterServicePINPage({
 function VerifyRobotEncryptionKeyPage({
   header,
   onNext,
-}: CommonPageProps): JSX.Element {
+}: CommonPageProps): ReactNode {
   const { t } = useTranslation(['access_control', 'device_settings', 'shared'])
   const formId = useId()
 
@@ -332,7 +332,7 @@ function CreateServiceAccountPage({
   onBack,
   onNext,
   serviceAccountPassword,
-}: CommonPageProps): JSX.Element {
+}: CommonPageProps): ReactNode {
   const { t } = useTranslation(['access_control', 'shared'])
 
   return (
@@ -386,7 +386,7 @@ function CreateAdminAccountPage({
   header,
   onBack,
   onNext,
-}: CommonPageProps): JSX.Element {
+}: CommonPageProps): ReactNode {
   const { t } = useTranslation(['access_control', 'shared'])
   const { control, trigger } = useFormContext<FormValues>()
   const formId = useId()
@@ -471,7 +471,7 @@ function AdminPasswordPage({
   header,
   onBack,
   onNext,
-}: CommonPageProps): JSX.Element {
+}: CommonPageProps): ReactNode {
   const { t } = useTranslation(['access_control', 'shared'])
   const { control, getValues, trigger } = useFormContext<FormValues>()
   const formId = useId()
@@ -565,7 +565,7 @@ function RecoveryAccountDetailsPage({
   onNext,
   recoveryAccountPassword,
   serviceAccountPassword,
-}: CommonPageProps): JSX.Element {
+}: CommonPageProps): ReactNode {
   const { t } = useTranslation(['access_control', 'shared'])
   const { getValues } = useFormContext<FormValues>()
   const enableCRSMutation = useEnableCRSMutation()
@@ -598,62 +598,75 @@ function RecoveryAccountDetailsPage({
       width={WIZARD_MODAL_WIDTH}
       header={header}
       footer={
-        <div className={styles.footer}>
-          <SecondaryButton
-            // Unlike other pages, the "next" button is destructive here,
-            // so autofocus the "Back" button instead.
-            autoFocus
-            onClick={onBack}
-          >
-            {t('shared:back')}
-          </SecondaryButton>
-          <PrimaryButton
-            disabled={isLoading}
-            onClick={() => {
-              void handleCompleteSetup()
-            }}
-          >
-            {t('setup_wizard_complete_setup')}
-          </PrimaryButton>
-        </div>
+        isLoading ? null : (
+          <div className={styles.footer}>
+            <SecondaryButton
+              // Unlike other pages, the "next" button is destructive here,
+              // so autofocus the "Back" button instead.
+              autoFocus
+              onClick={onBack}
+            >
+              {t('shared:back')}
+            </SecondaryButton>
+            <PrimaryButton
+              onClick={() => {
+                void handleCompleteSetup()
+              }}
+            >
+              {t('setup_wizard_complete_setup')}
+            </PrimaryButton>
+          </div>
+        )
       }
     >
       <div className={styles.content}>
-        <div className={styles.recovery_content}>
-          <Icon name="error" className={styles.recovery_icon} />
-          <div className={styles.recovery_text}>
-            <StyledText desktopStyle="headingSmallBold">
-              {t('setup_wizard_recovery_account_details_title')}
-            </StyledText>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('setup_wizard_recovery_account_details_description')}
+        {isLoading ? (
+          <div className={styles.loading_content}>
+            <Icon name="ot-spinner" spin className={styles.loading_spinner} />
+            <StyledText
+              desktopStyle="headingSmallSemiBold"
+              className={styles.loading_text}
+            >
+              {t('setup_wizard_restarting_robot')}
             </StyledText>
           </div>
-          {submissionError != null ? (
-            <InlineNotification
-              type="error"
-              heading={t('setup_wizard_submission_error')}
-            />
-          ) : null}
-          <div className={styles.recovery_list}>
-            <div className={styles.detail_row}>
-              <StyledText desktopStyle="bodyDefaultSemiBold">
-                {t('username')}
+        ) : (
+          <div className={styles.recovery_content}>
+            <Icon name="error" className={styles.recovery_icon} />
+            <div className={styles.recovery_text}>
+              <StyledText desktopStyle="headingSmallBold">
+                {t('setup_wizard_recovery_account_details_title')}
               </StyledText>
               <StyledText desktopStyle="bodyDefaultRegular">
-                {RECOVERY_ACCOUNT_USERNAME}
+                {t('setup_wizard_recovery_account_details_description')}
               </StyledText>
             </div>
-            <div className={styles.detail_row}>
-              <StyledText desktopStyle="bodyDefaultSemiBold">
-                {t('login_form_password_field')}
-              </StyledText>
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {recoveryAccountPassword}
-              </StyledText>
+            {submissionError != null ? (
+              <InlineNotification
+                type="error"
+                heading={t('setup_wizard_submission_error')}
+              />
+            ) : null}
+            <div className={styles.recovery_list}>
+              <div className={styles.detail_row}>
+                <StyledText desktopStyle="bodyDefaultSemiBold">
+                  {t('username')}
+                </StyledText>
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {RECOVERY_ACCOUNT_USERNAME}
+                </StyledText>
+              </div>
+              <div className={styles.detail_row}>
+                <StyledText desktopStyle="bodyDefaultSemiBold">
+                  {t('login_form_password_field')}
+                </StyledText>
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {recoveryAccountPassword}
+                </StyledText>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </ModalShell>
   )

@@ -25,6 +25,7 @@ import {
   getConfig,
   getDevtoolsEnabled,
   getFeatureFlags,
+  getIncludeProtocolSourceInRunDownload,
   toggleConfigValue,
   toggleDevInternalFlag,
   toggleDevtools,
@@ -42,6 +43,7 @@ import {
 
 import styles from './robotsettingslist.module.css'
 
+import type { ReactNode } from 'react'
 import type { SetSettingOption } from '/app/organisms/ODD/RobotSettingsDashboard'
 import type { Dispatch, State } from '/app/redux/types'
 
@@ -50,7 +52,7 @@ interface RobotSettingsListProps {
   setCurrentOption: SetSettingOption
 }
 
-export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
+export function RobotSettingsList(props: RobotSettingsListProps): ReactNode {
   const { setCurrentOption } = props
   const { t, i18n } = useTranslation([
     'device_settings',
@@ -87,6 +89,9 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const { toggleERSettings, isEREnabled } = useErrorRecoverySettingsToggle()
   const automaticSoftwareUpdateDownloadsEnabled =
     useSelector(getConfig)?.update?.automaticallyDownloadUpdates
+  const includeProtocolSourceInRunDownload = useSelector(
+    getIncludeProtocolSourceInRunDownload
+  )
   const appLanguage = useSelector(getAppLanguage)
   const currentLanguageOption = LANGUAGES.find(lng => lng.value === appLanguage)
 
@@ -245,10 +250,25 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="verified"
         />
         <RobotSettingButton
-          settingName={i18n.format(
-            t('app_settings:error_recovery_mode'),
-            'titleCase'
+          settingName={t(
+            'app_settings:include_protocol_source_in_run_download'
           )}
+          dataTestId="RobotSettingButton_include_protocol_source_in_run_download"
+          settingInfo={t(
+            'app_settings:include_protocol_source_in_run_download_description_odd'
+          )}
+          iconName="download"
+          rightElement={
+            <OnOffToggle isOn={includeProtocolSourceInRunDownload} />
+          }
+          onClick={() => {
+            dispatch(
+              toggleConfigValue('protocols.includeProtocolSourceInRunDownload')
+            )
+          }}
+        />
+        <RobotSettingButton
+          settingName={t('app_settings:error_recovery_mode')}
           dataTestId="RobotSettingButton_error_recovery_mode"
           settingInfo={t('app_settings:error_recovery_mode_description')}
           iconName="recovery-alt"
@@ -308,7 +328,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   )
 }
 
-function FeatureFlags(): JSX.Element {
+function FeatureFlags(): ReactNode {
   const { t } = useTranslation('app_settings')
   const devInternalFlags = useSelector(getFeatureFlags)
   const dispatch = useDispatch<Dispatch>()

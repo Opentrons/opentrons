@@ -8,7 +8,7 @@ export interface SidePanelProps {
   children?: ReactNode
 }
 
-export function SidePanel(props: SidePanelProps): JSX.Element {
+export function SidePanel(props: SidePanelProps): ReactNode {
   return (
     <div className={styles.panel}>
       {props.title != null ? (

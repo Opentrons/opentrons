@@ -7,6 +7,7 @@ import { zoomNumberToString } from '/app/local-resources/images/utils/cameraUtil
 
 import styles from './cameracontrols.module.css'
 
+import type { ReactNode } from 'react'
 import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 
 export interface ZoomSettingsProps {
@@ -17,7 +18,7 @@ export interface ZoomSettingsProps {
 export function ZoomSettings({
   adjustZoom,
   zoom,
-}: ZoomSettingsProps): JSX.Element {
+}: ZoomSettingsProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   return (
@@ -51,7 +52,7 @@ function ZoomBtn({
   currentZoom,
   btnZoomValue,
   adjustZoom,
-}: ZoomBtnProps): JSX.Element {
+}: ZoomBtnProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const btnZoomValueString = zoomNumberToString(btnZoomValue)
 

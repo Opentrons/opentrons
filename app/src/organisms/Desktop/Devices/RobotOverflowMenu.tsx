@@ -43,7 +43,7 @@ interface RobotOverflowMenuProps extends StyleProps {
   robot: DiscoveredRobot
 }
 
-export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
+export function RobotOverflowMenu(props: RobotOverflowMenuProps): ReactNode {
   const { robot, ...styleProps } = props
   const { t } = useTranslation(['devices_landing', 'shared'])
   const {

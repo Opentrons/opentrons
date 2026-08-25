@@ -7,6 +7,7 @@ import { useCurrentRobotName } from '/app/redux/robot-auth'
 
 import { DocumentationRequired } from './DocumentationRequired'
 
+import type { ReactNode } from 'react'
 import type {
   DocumentationReport,
   DocumentedAction,
@@ -25,7 +26,7 @@ const DocumentationRequiredModalImpl = NiceModal.create(
     minReportLength: number
     onCancel?: () => void
     initialDocreport?: DocumentationReport
-  }): JSX.Element => {
+  }): ReactNode => {
     const modal = useModal()
     const robotName = useCurrentRobotName()
 

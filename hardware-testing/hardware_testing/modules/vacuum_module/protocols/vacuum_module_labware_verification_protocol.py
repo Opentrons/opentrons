@@ -18,7 +18,7 @@ metadata = {
 }
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.30",
+    "apiLevel": "2.31",
 }
 
 COLLAR_CHOICES: List[ParameterChoice] = [
@@ -68,6 +68,22 @@ FILTER_PLATE_CHOICES: List[ParameterChoice] = [
     {
         "display_name": "Nunc 96 1000µL Filter",
         "value": "thermoscientificnunc_96_wellplate_1000ul_filter",
+    },
+    {
+        "display_name": "Cytiva AcroPrep 96 350µL Filter",
+        "value": "cytiva_96_wellplate_350ul_filter",
+    },
+    {
+        "display_name": "Cytiva AcroPrep 96 1000µL NAB Long Tip",
+        "value": "cytiva_96_wellplate_1000ul_longtip_filter",
+    },
+    {
+        "display_name": "Luna Nanotech USP-096F 1000µL Silica",
+        "value": "lunanano_96_wellplate_1000ul_filter",
+    },
+    {
+        "display_name": "Empore C18-SD 96 1200µL Filter",
+        "value": "empore_96_wellplate_1200ul_c18_filter",
     },
     {
         "display_name": "InVitroVen Filter",
