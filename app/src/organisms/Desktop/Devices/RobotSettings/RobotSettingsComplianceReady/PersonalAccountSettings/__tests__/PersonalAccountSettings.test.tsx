@@ -40,6 +40,7 @@ const MOCK_SELF_RESPONSE = {
     scopes: [],
     locked: false,
     resetPassword: false,
+    resetPasswordReason: 'NONE',
   },
 } as AuthUserResponse
 

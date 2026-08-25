@@ -67,6 +67,7 @@ const MOCK_USERS_RESPONSE: AuthUsersResponse = {
       accountType: 'admin',
       locked: false,
       resetPassword: false,
+      resetPasswordReason: 'NONE',
     },
     {
       username: 'bob',
@@ -74,6 +75,7 @@ const MOCK_USERS_RESPONSE: AuthUsersResponse = {
       accountType: 'user',
       locked: true,
       resetPassword: false,
+      resetPasswordReason: 'NONE',
     },
   ],
   meta: {

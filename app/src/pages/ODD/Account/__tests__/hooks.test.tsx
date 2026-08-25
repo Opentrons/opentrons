@@ -82,6 +82,7 @@ describe('useAccountInfo', () => {
           accountType: 'user',
           locked: false,
           resetPassword: false,
+          resetPasswordReason: 'NONE',
         },
       },
       isLoading: false,

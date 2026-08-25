@@ -38,12 +38,16 @@ const OAUTH_RESPONSE: OAuth2TokenResponse = {
 }
 
 function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
+  const resetPassword = overrides.resetPassword ?? false
   return {
     username: 'alice',
     fullName: 'Alice',
     accountType: 'user',
     locked: false,
-    resetPassword: false,
+    resetPassword,
+    resetPasswordReason:
+      overrides.resetPasswordReason ??
+      (resetPassword ? 'ADMIN_FORCED' : 'NONE'),
     ...overrides,
   }
 }
