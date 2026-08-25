@@ -57,8 +57,8 @@ function mockSuccessfulLogin(): void {
   }))
 
   vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(({ onSuccess }) => ({
-    submitNewPassword: (username: string, _password: string) => {
-      onSuccess(username)
+    submitNewPassword: (username: string, password: string) => {
+      onSuccess(username, password)
     },
     isLoading: false,
   }))
@@ -211,12 +211,14 @@ describe('LoginModal', () => {
     expect(modalResolved).toBe(false)
   })
 
-  it('returns to login after setting a new password', async () => {
+  it('signs in after setting a new password', async () => {
+    let loginCallCount = 0
     vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
       submitPassword: (username: string, _password: string) => {
+        loginCallCount += 1
         onSuccess(
           username,
-          mockAuthUser({ resetPassword: true }),
+          mockAuthUser({ resetPassword: loginCallCount === 1 }),
           OAUTH_RESPONSE
         )
       },
@@ -224,8 +226,8 @@ describe('LoginModal', () => {
     }))
     vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(
       ({ onSuccess }) => ({
-        submitNewPassword: (username: string, _password: string) => {
-          onSuccess(username)
+        submitNewPassword: (username: string, password: string) => {
+          onSuccess(username, password)
         },
         isLoading: false,
       })
@@ -247,18 +249,9 @@ describe('LoginModal', () => {
     fillField('Confirm password', 'newpass123')
     clickPrimary('Confirm')
 
-    expect(
-      await screen.findByRole('heading', { name: 'Login' })
-    ).toBeInTheDocument()
-    expect(screen.getByLabelText('Password')).toBeInTheDocument()
-
-    let modalResolved = false
-    void Promise.resolve(resultPromise).then(() => {
-      modalResolved = true
-    })
-    await new Promise(resolve => setTimeout(resolve, 50))
-    expect(modalResolved).toBe(false)
-  })
+    expect(await screen.findByText('Password updated')).toBeInTheDocument()
+    await expect(resultPromise).resolves.toEqual({ username: 'alice' })
+  }, 10000)
 
   it('returns to the new-password step with a policy error when setting a password fails', async () => {
     vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({

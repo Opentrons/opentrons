@@ -68,7 +68,7 @@ describe('useSetNewPasswordAndSignIn', () => {
       )
     })
     await waitFor(() => {
-      expect(onSuccess).toHaveBeenCalledWith('alice')
+      expect(onSuccess).toHaveBeenCalledWith('alice', 'new-secret')
     })
     expect(onError).not.toHaveBeenCalled()
   })
