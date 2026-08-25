@@ -216,7 +216,10 @@ async def _report_unsigned_runs(
     app_state: AppState,
 ) -> None:
     """If access control enabled and run signoff required, log any unsigned runs."""
-    if not get_authentication_checker(app_state).access_control_status():
+    access_control_status = await get_authentication_checker(
+        app_state
+    ).access_control_status()
+    if not access_control_status:
         return
 
     sql_engine = await get_sql_engine(app_state)
