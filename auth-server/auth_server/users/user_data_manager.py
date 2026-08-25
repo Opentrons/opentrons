@@ -114,7 +114,7 @@ def _validate_fields_non_empty(
 
 def get_reset_password_reason(
     user: User, now: datetime.datetime, password_reset_time_sec: float | None
-) -> ResetPasswordReason:
+) -> ResetPasswordReason | None:
     """Return why the user must reset their password, if at all."""
     if user.reset_password_reason is not None:
         return ResetPasswordReason(user.reset_password_reason)
@@ -125,7 +125,7 @@ def get_reset_password_reason(
     )
     if password_is_expired:
         return ResetPasswordReason.PASSWORD_EXPIRED
-    return ResetPasswordReason.NONE
+    return None
 
 
 def must_reset_password(
@@ -133,8 +133,7 @@ def must_reset_password(
 ) -> bool:
     """Return whether the user must reset their password before full robot access."""
     return (
-        get_reset_password_reason(user, now, password_reset_time_sec)
-        != ResetPasswordReason.NONE
+        get_reset_password_reason(user, now, password_reset_time_sec) is not None
     )
 
 
@@ -164,7 +163,7 @@ class UserDataManager:
             fullName=user.full_name,
             accountType=account_type,
             locked=user.deactivated or is_failed_login_locked,
-            resetPassword=reset_password_reason != ResetPasswordReason.NONE,
+            resetPassword=reset_password_reason is not None,
             resetPasswordReason=reset_password_reason,
         )
 

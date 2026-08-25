@@ -19,7 +19,6 @@ class AccountType(StrEnum):
 class ResetPasswordReason(StrEnum):
     """Why a user must set a new password before full robot access."""
 
-    NONE = "NONE"
     FIRST_TIME_LOGIN = "FIRST_TIME_LOGIN"
     PASSWORD_EXPIRED = "PASSWORD_EXPIRED"
     ADMIN_FORCED = "ADMIN_FORCED"
@@ -121,14 +120,15 @@ class UserLoginStatusResponse(BaseModel):
     """Login-related user status for unauthenticated login UI."""
 
     resetPasswordReason: Annotated[
-        ResetPasswordReason,
+        ResetPasswordReason | None,
         Field(
+            default=None,
             description=(
                 "Why a new password must be set."
                 " See `UserResponse.resetPasswordReason` for details."
             ),
         ),
-    ]
+    ] = None
 
 
 class UserResponse(BaseModel):
@@ -158,19 +158,19 @@ class UserResponse(BaseModel):
         ),
     ]
     resetPasswordReason: Annotated[
-        ResetPasswordReason,
+        ResetPasswordReason | None,
         Field(
-            default=ResetPasswordReason.NONE,
+            default=None,
             description=(
                 "Why a new password must be set."
-                " `NONE` when the user does not need to reset their password."
+                " `null` when the user does not need to reset their password."
                 " `FIRST_TIME_LOGIN` when the user was created with a temporary password."
                 " `PASSWORD_EXPIRED` when the password exceeded passwordResetTime."
                 " `ADMIN_FORCED` when an administrator required a password change."
                 " If a stored reason and expiration both apply, the stored reason wins."
             ),
         ),
-    ] = ResetPasswordReason.NONE
+    ] = None
 
 
 class TemporaryPasswordResponse(UserResponse):

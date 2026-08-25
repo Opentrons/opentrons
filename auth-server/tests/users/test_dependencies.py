@@ -16,7 +16,7 @@ async def test_get_user_by_username_returns_user(decoy: Decoy) -> None:
         accountType=AccountType.USER,
         locked=False,
         resetPassword=False,
-        resetPasswordReason=ResetPasswordReason.NONE,
+        resetPasswordReason=None,
     )
     decoy.when(manager.get_user("alice")).then_return(expected)
 

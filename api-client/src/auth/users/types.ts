@@ -1,7 +1,6 @@
 export type AuthUserAccountType = 'admin' | 'user' | 'auditor' | 'service'
 
 export type AuthUserResetPasswordReason =
-  | 'NONE'
   | 'FIRST_TIME_LOGIN'
   | 'PASSWORD_EXPIRED'
   | 'ADMIN_FORCED'
@@ -12,7 +11,7 @@ export interface AuthUser {
   accountType: AuthUserAccountType
   locked: boolean
   resetPassword: boolean
-  resetPasswordReason: AuthUserResetPasswordReason
+  resetPasswordReason?: AuthUserResetPasswordReason | null
 }
 
 export interface AuthUserResponse {
@@ -38,7 +37,7 @@ export interface AuthUsersResponse {
 }
 
 export interface UserLoginStatus {
-  resetPasswordReason: AuthUserResetPasswordReason
+  resetPasswordReason?: AuthUserResetPasswordReason | null
 }
 
 export interface UserLoginStatusResponse {

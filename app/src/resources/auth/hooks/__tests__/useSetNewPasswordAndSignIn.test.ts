@@ -45,7 +45,7 @@ describe('useSetNewPasswordAndSignIn', () => {
         accountType: 'user',
         locked: false,
         resetPassword: false,
-        resetPasswordReason: 'NONE',
+        resetPasswordReason: null,
       },
     })
   })

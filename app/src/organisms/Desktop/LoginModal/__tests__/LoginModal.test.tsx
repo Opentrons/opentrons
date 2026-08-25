@@ -54,7 +54,7 @@ const AUTH_USER: AuthUser = {
   accountType: 'user',
   locked: false,
   resetPassword: false,
-  resetPasswordReason: 'NONE',
+  resetPasswordReason: null,
 }
 
 function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
@@ -64,7 +64,7 @@ function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
     resetPassword,
     resetPasswordReason:
       overrides.resetPasswordReason ??
-      (resetPassword ? 'ADMIN_FORCED' : 'NONE'),
+      (resetPassword ? 'ADMIN_FORCED' : null),
     ...overrides,
   }
 }

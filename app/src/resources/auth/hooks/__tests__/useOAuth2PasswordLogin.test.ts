@@ -84,7 +84,7 @@ describe('useOAuth2PasswordLogin', () => {
           accountType: 'user',
           locked: false,
           resetPassword: false,
-          resetPasswordReason: 'NONE',
+          resetPasswordReason: null,
         },
       } as AuthUserResponse,
     } as Awaited<ReturnType<typeof getSelf>>)

@@ -7,15 +7,14 @@ marks:
       - seed_users
 
 stages:
-  - name: GET login status for an existing user returns NONE
+  - name: GET login status for an existing user omits resetPasswordReason
     request:
       method: GET
       url: '{run_server.base_url}/auth/users/byUsername/testuser/loginStatus'
     response:
       status_code: 200
       json:
-        data:
-          resetPasswordReason: NONE
+        data: {}
 
   - name: GET login status for an unknown user returns 404
     request:

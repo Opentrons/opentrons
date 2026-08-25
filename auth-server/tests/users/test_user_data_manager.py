@@ -118,7 +118,7 @@ def test_create_user_success(
         accountType=AccountType.USER,
         locked=False,
         resetPassword=False,
-        resetPasswordReason=ResetPasswordReason.NONE,
+        resetPasswordReason=None,
         temporaryPassword=None,
     )
 
@@ -156,7 +156,7 @@ def test_create_user_hashes_password(
         accountType=AccountType.USER,
         locked=False,
         resetPassword=False,
-        resetPasswordReason=ResetPasswordReason.NONE,
+        resetPasswordReason=None,
         temporaryPassword=None,
     )
 
@@ -367,7 +367,7 @@ def test_get_user_returns_existing(
         accountType=AccountType.ADMIN,
         locked=False,
         resetPassword=False,
-        resetPasswordReason=ResetPasswordReason.NONE,
+        resetPasswordReason=None,
     )
 
 
@@ -396,7 +396,7 @@ def test_list_users_returns_all_users(
             accountType=AccountType.USER,
             locked=False,
             resetPassword=False,
-        resetPasswordReason=ResetPasswordReason.NONE,
+        resetPasswordReason=None,
         ),
         UserResponse(
             username="bob",
@@ -404,7 +404,7 @@ def test_list_users_returns_all_users(
             accountType=AccountType.ADMIN,
             locked=False,
             resetPassword=False,
-        resetPasswordReason=ResetPasswordReason.NONE,
+        resetPasswordReason=None,
         ),
     ]
 
@@ -430,7 +430,7 @@ def test_get_user_locked_when_failed_logins_reach_limit(
         accountType=AccountType.USER,
         locked=True,
         resetPassword=False,
-        resetPasswordReason=ResetPasswordReason.NONE,
+        resetPasswordReason=None,
     )
 
 
@@ -526,9 +526,9 @@ def test_must_reset_password(
         "expected",
     ),
     [
-        (3600, datetime.timedelta(minutes=30), None, ResetPasswordReason.NONE),
+        (3600, datetime.timedelta(minutes=30), None, None),
         (3600, datetime.timedelta(hours=2), None, ResetPasswordReason.PASSWORD_EXPIRED),
-        (None, datetime.timedelta(hours=2), None, ResetPasswordReason.NONE),
+        (None, datetime.timedelta(hours=2), None, None),
         (
             None,
             datetime.timedelta(minutes=30),
@@ -547,7 +547,7 @@ def test_get_reset_password_reason(
     password_reset_time_sec: float | None,
     password_age: datetime.timedelta,
     stored_reason: ResetPasswordReason | None,
-    expected: ResetPasswordReason,
+    expected: ResetPasswordReason | None,
 ) -> None:
     now = datetime.datetime.now(tz=datetime.UTC)
     user = _make_orm_user(
@@ -614,7 +614,7 @@ def test_update_user_username(
         accountType=AccountType.USER,
         locked=False,
         resetPassword=False,
-        resetPasswordReason=ResetPasswordReason.NONE,
+        resetPasswordReason=None,
     )
 
 

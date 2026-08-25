@@ -28,7 +28,6 @@ stages:
           accountType: user
           locked: false
           resetPassword: false
-          resetPasswordReason: NONE
   - name: List users as admin
     request:
       method: GET
@@ -58,7 +57,6 @@ stages:
           username: test_new_user
           locked: false
           resetPassword: false
-          resetPasswordReason: NONE
   - name: Update the user
     request:
       method: PATCH
@@ -78,7 +76,6 @@ stages:
           username: test_new_user
           locked: false
           resetPassword: false
-          resetPasswordReason: NONE
   - name: Update the username
     request:
       method: PATCH
@@ -97,7 +94,6 @@ stages:
           username: test_new_user_upd
           locked: false
           resetPassword: false
-          resetPasswordReason: NONE
   - name: Update the reset password flag
     request:
       method: PATCH
@@ -206,7 +202,6 @@ stages:
           username: test_new_user_upd
           locked: false
           resetPassword: false
-          resetPasswordReason: NONE
   - name: Get a new access token with the updated username and password
     request:
       method: POST
@@ -488,7 +483,6 @@ stages:
           accountType: user
           locked: false
           resetPassword: false
-          resetPasswordReason: NONE
   - name: Reject self update with a duplicate username
     request:
       method: PATCH
@@ -536,7 +530,6 @@ stages:
           accountType: user
           locked: false
           resetPassword: false
-          resetPasswordReason: NONE
 ---
 test_name: Creating a user with an existing username
 
