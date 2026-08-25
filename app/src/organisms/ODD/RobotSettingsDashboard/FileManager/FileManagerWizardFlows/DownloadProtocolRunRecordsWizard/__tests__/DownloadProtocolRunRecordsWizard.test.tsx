@@ -51,9 +51,8 @@ describe('DownloadProtocolRunRecordsWizard', () => {
     mockDownloadRuns = vi.fn().mockResolvedValue([mockRun])
     mockDeleteSelectedRuns = vi.fn().mockResolvedValue(undefined)
     vi.mocked(useDownloadSelectedRuns).mockReturnValue({
-      downloadRuns: mockDownloadRuns,
-      isDownloading: false,
-      hasError: false,
+      mutateAsync: mockDownloadRuns,
+      status: 'idle',
     } as any)
     vi.mocked(useDeleteSelectedRuns).mockReturnValue({
       deleteSelectedRuns: mockDeleteSelectedRuns,
@@ -78,7 +77,10 @@ describe('DownloadProtocolRunRecordsWizard', () => {
     await waitFor(() => {
       screen.getByText('All protocol files downloaded')
     })
-    expect(mockDownloadRuns).toHaveBeenCalledWith([mockRun], '/mnt/usb1')
+    expect(mockDownloadRuns).toHaveBeenCalledWith({
+      runs: [mockRun],
+      callTimeUsbPath: '/mnt/usb1',
+    })
     expect(mockDeleteSelectedRuns).not.toHaveBeenCalled()
   })
 
