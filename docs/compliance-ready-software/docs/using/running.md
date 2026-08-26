@@ -7,14 +7,41 @@ Opentrons Flex Compliance Ready Software requires users to document their reason
 
 This section includes examples that users might see while using a compliance ready Flex. For a full list of user actions that require documentation, see the [Documented Actions](../actions.md) appendix.
 
+## Sending protocols
+
+By default, users can only run protocols sent to your compliance ready Flex by an administrator. 
+ 
+Any user can import any valid Python protocol into the Opentrons App, and they'll appear in the **Protocols** tab on the left. There are two ways to send one of these protocols to your Flex: 
+
+* Click the three-dot menu on any protocol card and select **Send to Flex**. 
+* Click the protocol, then choose **Start setup** and your compliance ready Flex. 
+
+<figure class="screenshot" markdown>
+  ![Click to send a protocol to your compliance ready Flex.](../images/send-protocol.png)
+  <figcaption>Click to send a protocol to your compliance ready Flex.</figcaption>
+</figure>
+
+For either method, the Opentrons App will prompt administrators to document their reason for sending the protocol to the Flex. 
+
+<figure class="screenshot" markdown>
+  ![Click to send a protocol to your compliance ready Flex.](../images/document-sending-protocol.png)
+  <figcaption>Click to send a protocol to your compliance ready Flex.</figcaption>
+</figure>
+
+Since users can't send (and therefore run) protocols to the Flex by default, their accounts will be blocked from sending a protocol using either method. Administrators can change this: 
+
+<div class="instruction-list" markdown>
+
+1. Log in to Compliance Ready Software in the Opentrons App. 
+2. Use the three-dot menu at the right to access robot settings for your Flex. 
+3. Select the **Compliance Ready** tab. 
+4. Under **Actions requiring admin credentials**, toggle on or off the **Require admin credentials to send protocols to this robot** setting.
+
 ## Setting up a protocol
 
-After logging in on the Flex touchscreen or in the Opentrons App, you'll be able to start setting up a protocol. 
+After logging in on the Flex touchscreen or in the Opentrons App, you'll be able to start setting up a protocol.
 
-Click or tap the protocols tab to view all protocols loaded on the Flex. Remember that by default, your compliance ready Flex can only run Python protocols sent to the Flex by your lab's administrator.
-
-!!! note
-    Your lab can choose which users can send protocols to the Flex in [administrator settings](../admin.md).
+Click or tap the protocols tab to view all protocols loaded on the Flex. Remember that by default, your compliance ready Flex can only run Python protocols [sent to the Flex](#sending-protocols) by an administrator.
 
 After choosing any [runtime parameters](../../python-api/runtime-parameters/index.md) and clicking **Start setup**, your Flex will prompt you to document your reason for setting up the protocol.
 
@@ -42,12 +69,6 @@ In this example, you can still begin the protocol run. You'll see a warning on t
 
 If you need to make changes to the Flex or an attached instrument or module before you begin setup, you'll also need to add documentation for those [actions](../actions.md). 
 
-<!---------
-
-TODO:  
-- this image needs work: replaced dummy text for the documentation modal in figma, but the layer beneath is currently inaccessible
--------------->
-
 ## Running a protocol
 
 When you're finished setting up your protocol, tap **Start run** in the top right to begin. You'll need to document your reason for every action:
@@ -56,7 +77,7 @@ When you're finished setting up your protocol, tap **Start run** in the top righ
 * Pausing the protocol.
 * Completing a manual action, like moving labware, during a protocol.
 * Tapping **Capture image** during the protocol.
-* Completing error recovery during a protocol run.
+* Starting and completing error recovery during a protocol run.
 
 You won't be blocked from completing any of the actions listed above while your protocol runs, but you'll need to enter documentation *after* you complete them. 
 
@@ -70,3 +91,5 @@ For example, if you encounter an error during your protocol, you can choose from
   ![Add documentation after completing error recovery.](../images/recovery-action.png)
   <figcaption>You'll need to add documentation after completing error recovery.</figcaption>
 </figure>
+
+In processes like error recovery, shown above, the [list of actions](documentation.md#viewing-actions) requiring documentation can be cumulative—on a single screen, you might be prompted to add documentation for starting error recovery, choosing to retry the step, and successfully completing error recovery.
