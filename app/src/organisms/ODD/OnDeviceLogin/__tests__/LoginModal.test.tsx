@@ -273,7 +273,8 @@ describe('LoginModal', () => {
 
     mockUserLoginStatus('ADMIN_FORCED')
     await advanceFromUsername()
-    fillField('Password', 'temp-pass')
+    expect(screen.getByLabelText('One-time password')).toBeInTheDocument()
+    fillField('One-time password', 'temp-pass')
     clickPrimary('Confirm')
 
     expect(
@@ -314,7 +315,8 @@ describe('LoginModal', () => {
 
     mockUserLoginStatus('ADMIN_FORCED')
     await advanceFromUsername()
-    fillField('Password', 'temp-pass')
+    expect(screen.getByLabelText('One-time password')).toBeInTheDocument()
+    fillField('One-time password', 'temp-pass')
     clickPrimary('Confirm')
 
     await screen.findByRole('heading', { name: 'New password' })
@@ -363,7 +365,8 @@ describe('LoginModal', () => {
 
     mockUserLoginStatus('ADMIN_FORCED')
     await advanceFromUsername()
-    fillField('Password', 'temp-pass')
+    expect(screen.getByLabelText('One-time password')).toBeInTheDocument()
+    fillField('One-time password', 'temp-pass')
     clickPrimary('Confirm')
 
     await screen.findByRole('heading', { name: 'New password' })

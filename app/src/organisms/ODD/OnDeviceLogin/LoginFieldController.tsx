@@ -63,7 +63,8 @@ export const LoginFieldController = forwardRef<
       loginError != null && loginError !== '' ? loginError : null
     const passwordLabel = isPasswordResetRequired
       ? t('access_control:on_device_login_new_password')
-      : resetPasswordReason === 'FIRST_TIME_LOGIN'
+      : resetPasswordReason === 'FIRST_TIME_LOGIN' ||
+          resetPasswordReason === 'ADMIN_FORCED'
         ? t('access_control:on_device_login_one_time_password')
         : t('access_control:login_form_password_field')
 
