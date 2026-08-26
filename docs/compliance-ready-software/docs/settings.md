@@ -7,22 +7,29 @@ During Opentrons Flex Compliance Ready Software activation, an Opentrons-trained
 
 Adminstrator accounts have the option to change these settings again later. For more, see the full list of [administrator settings](admin.md).
 
-## Completing a run 
+## Download files after a run
 
-When you finish a protocol run, the responsible user must sign to mark the run as [complete](using/complete.md). This process adds the user's legal name and user ID to every action captured in the protocol and documentation.
+All Flex robots have a limited storage capacity for the [files](using/files.md) they generate. To save space, compliance ready Flex robots will not save audit logs to the robot by default.
 
-You can decide to set the Opentrons App as the only place runs can be completed. Users will need to:
+This means that after each protocol run, all users will be prompted to download audit logs in the Opentrons App.
+
+<figure class="screenshot" markdown>
+![Prompt on the Flex touchscreen to download audit logs from the Opentrons App.](images/download-logs-odd.png)
+<figcaption>By default, you'll need to download audit logs from the Opentrons App immediately after a protocol run.</figcaption>
+</figure>
+
+Administrators can change this setting:
 
 <div class="instruction-list" markdown>
 
-1. Sign for the run in the Opentrons App, instead of on the Flex's touchscreen.
-2. Download protocol [files](using/files.md) from the Opentrons App. 
+1. Log in to your compliance ready Flex and click the three-dot menu on the right to access your robot's settings.
+2. Select the **Compliance Ready** tab. 
+3. Under **Audit log requirements**, toggle on and off the **Require downloading audit logs in the Opentrons App at the end of a protocol run** setting.
+4. Document your reason for updating this setting.
 
-## File downloads
+## Download folder
 
-When you run protocols, your compliance ready Flex locally generates different files, including *audit logs*, containing robot and protocol data. These files are yours to safely store, and are never viewed or stored by Opentrons. Read more about [files](using/files.md) in this manual.
-
-If you choose to restrict users to signing for a run only in the Opentrons App, you'll also need to configure the app to download the audit logs associated with each protocol run to a storage location. 
+When you require users to download audit logs from the Opentrons App, you'll can also configure the app to download all logs to a default storage location. 
 
 <figure class="screenshot" markdown>
 ![Image showing how to choose a storage location.](images/storage-location.png)
@@ -34,4 +41,4 @@ Click the :material-cog: in the lower left to access **App settings**. Select th
 If robot settings, like your Flex's name, are ever changed, you may need to repeat this process.
 
 !!! note
-    There's more than one way to move files from your Flex to a storage location. You can also attach a [USB](devices.md) and move the files to a computer yourself from the Flex touchscreen.
+    There's more than one way to save your files. You can attach a [USB](devices.md)and move the files to a computer yourself from the Flex touchscreen.

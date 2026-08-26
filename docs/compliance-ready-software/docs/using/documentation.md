@@ -14,7 +14,7 @@ This section covers how users will add documentation. For a full list of user ac
 
 ## Adding documentation
 
-Opentrons Flex Compliance Ready Software adds checkpoints to prompt all users to document nearly every robot and protocol action they complete on the robot. Users will see a prompt on both the Opentrons App and Flex touchscreen to add documentation after completing actions like pipette calibration or protocol setup.
+Opentrons Flex Compliance Ready Software adds checkpoints to prompt all users to document nearly every robot and protocol action they complete on the robot. A "Documentation required" screen opens on both the Opentrons App and Flex touchscreen after completing actions like pipette calibration or protocol setup, and blocks users from moving forward until they've added their text.
 
 On the Flex touchscreen, users can use the on-screen, collapsible keyboard to add text on the touchscreen.
 
@@ -31,50 +31,39 @@ On the Flex touchscreen, users can use the on-screen, collapsible keyboard to ad
    
     Flex also supports an [external keyboard](../devices.md), attached via USB, to type documentation.
 
-On the touchscreen, tap **View actions** in the top right to view a description of your user action, like "setting Thermocyler lid temperature to 45 °C" or "updating camera preferences." 
+Since documentation is required for the action, you can't bypass this screen. If you didn't mean to complete this action, you can always tap the back arrow in the upper left.
 
-Users can also add text in the Opentrons App. Here, you'll always see the user actions requiring documentation on the right. 
+Users can also add text in the Opentrons App. Here, you'll also see a [list of actions](#viewing-actions) requiring documentation on the right. Read more in the section below.
 
 <figure class="screenshot" markdown>
   ![Add documentation in the Opentrons App.](../images/documentation-required-app.png)
   <figcaption>Add documentation on the Flex touchscreen.</figcaption>
 </figure>
 
+Click **Cancel action** if you didn't mean to complete the action.
+
 You'll see the same screen on the Flex touchscreen and in the Opentrons App every time you need to add documentation, no matter which step you're on.
 
 When you're finished, click **Confirm** to save your text and move on.
 
-<!----
-TODO: 
-- replace dummy text, I put a lil too much detail in there
--  need to confirm that the documentation required screen pops up simultaneouly on BOTH odd and app
------>
-
 ## Viewing actions
 
-While working on the bench, you'll see several prompts to add documentation in the same workflow. In case you've stepped away, forgot which action you started, or simply want to view a list of every user action during your session, you can click **View Actions** when adding documentation on the Flex touchscreen.
+While working on the bench, you'll see several prompts to add documentation in the same workflow. In the Opentrons App, you'll always see a list of actions requiring documentation in the same place you enter documentation.
+
+On your Flex itself, the "Documentation required" screen fills the entire touchscreen. In case you've stepped away or simply forgot which action you started, you can tap **View Actions** in the upper right.
 
 <figure class="screenshot" markdown>
-  ![View the list of actions on the Flex touchscreen.](../images/view-actions-odd.png)
-  <figcaption>View a list of actions requiring documentation on the Flex touchscreen.</figcaption>
+  ![Add documentation on the Flex touchscreen.](../images/view-actions-odd.png)
+  <figcaption>Add documentation on the Flex touchscreen.</figcaption>
 </figure>
-
-Click each action to view its documentation. When you're finished, click **Confirm** to save your text.
-
-<!----
-- update dummy text for this image
------>
 
 ## Documentation Settings
 
-Administrators can customize documentation settings in the Opentrons App. In **Robot Settings**, choose the **Compliance Ready** tab. Under **Audit log requirements**, administrators can update settings:  
+Administrators can customize documentation settings in the Opentrons App. Click the three-dot menu to the right of your robot's name to access **Robot Settings**. Then, choose the **Compliance Ready** tab. Under **Audit log requirements**, administrators can update settings:  
 
 *  **Require documentation for robot actions**: on by default.
 *  **Minimum length of documentation for robot actions**: default of 20 characters.
 
-See the complete list of administrator-customizable [settings](../admin.md) for more.
+If you choose to no longer require documentation for robot actions, the user ID for the currently logged in user will still be attached to every user action in the protocol and included in the audit log. However, the Opentrons App and Flex touchscreen will never prompt users to enter documentation. Users without appropriate credentials will still be blocked from completing certain actions and updating settings.
 
-<!----
-- triple check that these settings can only be accessed from the app 
-- add some text for the require documentation setting?... if this is off, users dont' see documentation modals, but I assume their user actions are still added to the protocol audit log
------>
+See the complete list of administrator-customizable [settings](../admin.md) for more.

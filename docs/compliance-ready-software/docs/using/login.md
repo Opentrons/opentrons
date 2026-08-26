@@ -12,18 +12,18 @@ If your lab uses more than one Opentrons robot, you can still use the same Opent
   <figcaption>View your Flex's status and attached instruments, modules, and devices before login.</figcaption>
 </figure>
 
-<!---------
-
-TODO and comments: 
-- replace this image with "compliance ready" badge next to the flex's name (in CRS folder)
-- define run history in the glossary
--------------->
-
 Until you're logged in, you'll only be able to view some information in the Opentrons App:
 
 * Robot status, including attached hardware and deck configuration.
-* Protocol *run history*, including viewing and downloading protocol run records.
-* Protocols imported into your Opentrons App from the **Protocols** tab on the left.
+* Protocol *run history*, including viewing and downloading *protocol run records*.
+* Protocols imported into your Opentrons App, in the **Protocols** tab on the left.
+
+You can log in by clicking **Log in** in the upper right. The Opentrons App will also prompt you to log in whenever you attempt to complete an action that requires credentials or documentation. 
+
+<figure class="screenshot" markdown>
+  ![Image showing login in the Opentrons App.](../images/login-app.png)
+  <figcaption>The Opentrons App prompts users to log in.</figcaption>
+</figure>
 
 Your Flex touchscreen will appear locked until you log in.
 

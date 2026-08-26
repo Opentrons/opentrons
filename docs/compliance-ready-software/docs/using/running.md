@@ -9,12 +9,12 @@ This section includes examples that users might see while using a compliance rea
 
 ## Setting up a protocol
 
-After logging in on the Flex touchscreen or in the Opentrons App, you'll be able to start setting up for a protocol. 
+After logging in on the Flex touchscreen or in the Opentrons App, you'll be able to start setting up a protocol. 
 
 Click or tap the protocols tab to view all protocols loaded on the Flex. Remember that by default, your compliance ready Flex can only run Python protocols sent to the Flex by your lab's administrator.
 
 !!! note
-    Your lab can choose which users can send approved protocols in [administrator settings](../admin.md).
+    Your lab can choose which users can send protocols to the Flex in [administrator settings](../admin.md).
 
 After choosing any [runtime parameters](../../python-api/runtime-parameters/index.md) and clicking **Start setup**, your Flex will prompt you to document your reason for setting up the protocol.
 
