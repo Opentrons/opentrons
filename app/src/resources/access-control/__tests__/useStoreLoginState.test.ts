@@ -44,7 +44,6 @@ describe('useStoreLoginState', () => {
         accountType: 'user',
         locked: false,
         resetPassword: false,
-        resetPasswordReason: null,
       },
       {
         token_type: 'Bearer',
@@ -81,7 +80,6 @@ describe('useStoreLoginState', () => {
         accountType: 'user',
         locked: false,
         resetPassword: false,
-        resetPasswordReason: null,
       },
       {
         token_type: 'Bearer',
@@ -102,7 +100,6 @@ describe('useStoreLoginState', () => {
         accountType: 'user',
         locked: false,
         resetPassword: false,
-        resetPasswordReason: null,
       },
       {
         token_type: 'Basic',

@@ -1,16 +1,13 @@
 """User store – pure data access layer for user persistence."""
 
 import datetime
-from typing import Any
 
 from sqlalchemy import select, update
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session, sessionmaker
 
 from auth_server.persistence.orm_models import FailedLogin, User
-from auth_server.users.models import AccountType, ResetPasswordReason
-
-_UNSET: Any = object()
+from auth_server.users.models import AccountType
 
 
 class UserStore:
@@ -50,7 +47,7 @@ class UserStore:
         full_name: str,
         account_type: str,
         now: datetime.datetime,
-        reset_password_reason: ResetPasswordReason | None = None,
+        reset_password: bool,
     ) -> User:
         """Create a user, persist it, and return it."""
         new_user = User(
@@ -59,9 +56,7 @@ class UserStore:
             full_name=full_name,
             account_type=AccountType(account_type),
             password_set_at=now,
-            reset_password_reason=(
-                reset_password_reason.value if reset_password_reason is not None else None
-            ),
+            reset_password=reset_password,
         )
         with self._session() as session:
             session.add(new_user)
@@ -88,7 +83,7 @@ class UserStore:
         hashed_password: str | None = None,
         full_name: str | None = None,
         account_type: str | None = None,
-        reset_password_reason: ResetPasswordReason | None | Any = _UNSET,
+        reset_password: bool | None = None,
         deactivated: bool | None = None,
         *,
         now: datetime.datetime,
@@ -111,12 +106,8 @@ class UserStore:
                 user.full_name = full_name
             if account_type is not None:
                 user.account_type = AccountType(account_type)
-            if reset_password_reason is not _UNSET:
-                user.reset_password_reason = (
-                    reset_password_reason.value
-                    if reset_password_reason is not None
-                    else None
-                )
+            if reset_password is not None:
+                user.reset_password = reset_password
             if deactivated is not None:
                 user.deactivated = deactivated
 
@@ -154,9 +145,5 @@ class UserStore:
     def mark_all_reset_password(self) -> None:
         """Require every user to set a new password on their next login."""
         with self._session() as session:
-            session.execute(
-                update(User).values(
-                    reset_password_reason=ResetPasswordReason.ADMIN_FORCED.value
-                )
-            )
+            session.execute(update(User).values(reset_password=True))
             session.commit()

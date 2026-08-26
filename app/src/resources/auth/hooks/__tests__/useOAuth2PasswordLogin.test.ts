@@ -84,7 +84,6 @@ describe('useOAuth2PasswordLogin', () => {
           accountType: 'user',
           locked: false,
           resetPassword: false,
-          resetPasswordReason: null,
         },
       } as AuthUserResponse,
     } as Awaited<ReturnType<typeof getSelf>>)
@@ -114,7 +113,6 @@ describe('useOAuth2PasswordLogin', () => {
       accountType: 'user',
       locked: false,
       resetPassword: true,
-      resetPasswordReason: 'ADMIN_FORCED',
     }
     mockGetSelf.mockResolvedValue({
       data: { data: user } as AuthUserResponse,

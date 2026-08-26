@@ -16,14 +16,6 @@ class AccountType(StrEnum):
     SERVICE = "service"
 
 
-class ResetPasswordReason(StrEnum):
-    """Why a user must set a new password before full robot access."""
-
-    FIRST_TIME_LOGIN = "FIRST_TIME_LOGIN"
-    PASSWORD_EXPIRED = "PASSWORD_EXPIRED"
-    ADMIN_FORCED = "ADMIN_FORCED"
-
-
 USERNAME_MAX_LENGTH = 20
 
 Username = Annotated[
@@ -116,21 +108,6 @@ class UpdateSelf(BaseModel):
     ] = None
 
 
-class UserLoginStatusResponse(BaseModel):
-    """Login-related user status for unauthenticated login UI."""
-
-    resetPasswordReason: Annotated[
-        ResetPasswordReason | None,
-        Field(
-            default=None,
-            description=(
-                "Why a new password must be set."
-                " See `UserResponse.resetPasswordReason` for details."
-            ),
-        ),
-    ] = None
-
-
 class UserResponse(BaseModel):
     """Response body for a user (no password)."""
 
@@ -157,20 +134,20 @@ class UserResponse(BaseModel):
             )
         ),
     ]
-    resetPasswordReason: Annotated[
-        ResetPasswordReason | None,
+
+
+class UserLoginStatus(BaseModel):
+    """Pre-authentication login hints for a user."""
+
+    resetPassword: Annotated[
+        bool,
         Field(
-            default=None,
             description=(
-                "Why a new password must be set."
-                " `null` when the user does not need to reset their password."
-                " `FIRST_TIME_LOGIN` when the user was created with a temporary password."
-                " `PASSWORD_EXPIRED` when the password exceeded passwordResetTime."
-                " `ADMIN_FORCED` when an administrator required a password change."
-                " If a stored reason and expiration both apply, the stored reason wins."
-            ),
+                "If true, the user must sign in with a temporary or one-time password"
+                " and set a new password before full robot access."
+            )
         ),
-    ] = None
+    ]
 
 
 class TemporaryPasswordResponse(UserResponse):

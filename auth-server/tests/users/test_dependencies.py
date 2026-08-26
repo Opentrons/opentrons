@@ -3,7 +3,7 @@ from decoy import Decoy
 from fastapi import HTTPException
 
 from auth_server.users.dependencies import get_user_by_username
-from auth_server.users.models import AccountType, ResetPasswordReason, UserResponse
+from auth_server.users.models import AccountType, UserResponse
 from auth_server.users.user_data_manager import UserDataManager, UserNotFoundError
 
 
@@ -16,7 +16,6 @@ async def test_get_user_by_username_returns_user(decoy: Decoy) -> None:
         accountType=AccountType.USER,
         locked=False,
         resetPassword=False,
-        resetPasswordReason=None,
     )
     decoy.when(manager.get_user("alice")).then_return(expected)
 

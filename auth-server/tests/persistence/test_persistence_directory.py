@@ -133,7 +133,7 @@ async def test_prepare_active_subdirectory_creates_db_with_users_table(
             "full_name",
             "account_type",
             "password_set_at",
-            "reset_password_reason",
+            "reset_password",
             "deactivated",
         }
 

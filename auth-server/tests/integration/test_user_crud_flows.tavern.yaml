@@ -112,7 +112,6 @@ stages:
           username: test_new_user_upd
           locked: false
           resetPassword: true
-          resetPasswordReason: ADMIN_FORCED
   - name: Get the user information
     request:
       method: GET
@@ -128,7 +127,6 @@ stages:
           username: test_new_user_upd
           locked: false
           resetPassword: true
-          resetPasswordReason: ADMIN_FORCED
   - name: Reset the user's password to a temporary password
     request:
       method: POST
@@ -147,7 +145,6 @@ stages:
           username: test_new_user_upd
           locked: false
           resetPassword: true
-          resetPasswordReason: ADMIN_FORCED
           temporaryPassword: !anystr
 
   - name: Log in with the temporary password
@@ -606,7 +603,6 @@ stages:
           accountType: user
           locked: false
           resetPassword: true
-          resetPasswordReason: FIRST_TIME_LOGIN
           temporaryPassword: !anystr
 
   - name: Get the user and confirm resetPassword is true
@@ -624,7 +620,6 @@ stages:
           accountType: user
           locked: false
           resetPassword: true
-          resetPasswordReason: FIRST_TIME_LOGIN
 
   - name: User can log in with the temporary password but only gets self-write scopes
     request:
