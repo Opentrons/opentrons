@@ -25,7 +25,7 @@ export function DownloadProtocolRunRecordsWizard({
   const allRuns = runData?.data ?? []
 
   const documentationState = useDocumentationState()
-  const { downloadRuns } = useDownloadSelectedRuns(robotName)
+  const { mutateAsync: downloadRuns } = useDownloadSelectedRuns(robotName)
   const { deleteSelectedRuns } = useDeleteSelectedRuns(documentationState)
 
   const copyProps: ComponentProps<typeof DownloadDeleteRecordFlow>['copy'] = {
@@ -44,7 +44,9 @@ export function DownloadProtocolRunRecordsWizard({
       copy={copyProps}
       showChoiceScreen
       initialDeleteAfterDownload
-      onDownload={path => downloadRuns(allRuns, path)}
+      onDownload={path =>
+        downloadRuns({ runs: allRuns, callTimeUsbPath: path })
+      }
       onDelete={downloadedRuns =>
         deleteSelectedRuns(downloadedRuns).then(() => 'deleted' as const)
       }

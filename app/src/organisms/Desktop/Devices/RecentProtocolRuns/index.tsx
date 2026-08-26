@@ -7,6 +7,7 @@ import {
   INFO_TOAST,
   InfoScreen,
   StyledText,
+  SUCCESS_TOAST,
   WARNING_TOAST,
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
@@ -48,8 +49,10 @@ export function RecentProtocolRuns({
   const [showDeleteRecordsModal, setShowDeleteRecordsModal] =
     useState<boolean>(false)
   const documentationState = useDocumentationState()
-  const { downloadRuns, isDownloading: isDownloadingRuns } =
-    useDownloadSelectedRuns(robotName)
+  const {
+    mutateAsync: downloadSelectedRuns,
+    status: downloadSelectedRunsStatus,
+  } = useDownloadSelectedRuns(robotName)
   const { deleteSelectedRuns, deletingIds } =
     useDeleteSelectedRuns(documentationState)
 
@@ -64,14 +67,17 @@ export function RecentProtocolRuns({
       handleNoRuns('download')
       return
     }
-    if (!isDownloadingRuns) {
+    if (downloadSelectedRunsStatus !== 'loading') {
       const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
       const toastId = makeToast(
-        t('downloading_run_records') as string,
+        t('device_details:downloading_run_records') as string,
         INFO_TOAST,
-        { icon: toastIcon }
+        { icon: toastIcon, disableTimeout: true }
       )
-      void downloadRuns(runs)
+      void downloadSelectedRuns({ runs })
+        .then(() => {
+          makeToast(t('files_successfully_downloaded') as string, SUCCESS_TOAST)
+        })
         .catch((e: Error) => {
           makeToast(e.message, ERROR_TOAST, { closeButton: true })
         })
