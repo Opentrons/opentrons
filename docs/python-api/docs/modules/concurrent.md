@@ -19,7 +19,7 @@ When you use a Heater-Shaker, Temperature, or Thermocycler Module in your protoc
 
 | **Module** | **Concurrent commands** |
 | :----------|------------------------ |
-| Heater-Shaker Module | <ul><li>[`set_target_temperarature()`][opentrons.protocol_api.HeaterShakerContext.set_target_temperature]</li><li>[`set_shake_speed()`][opentrons.protocol_api.HeaterShakerContext.set_shake_speed]</li></ul> |
+| Heater-Shaker Module | <ul><li>[`set_target_temperature()`][opentrons.protocol_api.HeaterShakerContext.set_target_temperature]</li><li>[`set_shake_speed()`][opentrons.protocol_api.HeaterShakerContext.set_shake_speed]</li></ul> |
 | Temperature Module | <ul><li>[`start_set_temperature()`][opentrons.protocol_api.TemperatureModuleContext.start_set_temperature]</li></ul> |
 | Thermocycler Module | <ul><li>[`start_set_lid_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_lid_temperature]</li><li>[`start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature]</li><li>[`start_execute_profile()`][opentrons.protocol_api.ThermocyclerContext.start_execute_profile]</li></ul> |
 
