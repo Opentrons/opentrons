@@ -54,6 +54,7 @@ Use ripgrep (`Grep`) and file search (`Glob`) systematically:
    - **Top consumers** (optional): up to 5 example paths when count > 5
 
 Do not count:
+
 - Files inside the component's own folder (implementation, tests, stories)
 - Type-only re-exports that do not render the component
 
@@ -61,15 +62,16 @@ Do not count:
 
 Flag **Refactoring required: Yes** when ANY of the following appear in the component's source files:
 
-| Pattern | Example |
-| --- | --- |
-| CSS `@media` rule | `@media (width = 1024px)` in `.module.css` |
-| Styled-components `@media` | `` `@media ${RESPONSIVENESS.touchscreenMediaQuerySpecs}` `` |
-| `RESPONSIVENESS` import/usage | `import { RESPONSIVENESS } from '../../ui-style-constants'` |
-| `touchscreenMediaQuerySpecs` | Any reference |
-| Legacy styled-components blocks | `` styled.div` ... @media ...` `` |
+| Pattern                         | Example                                                     |
+| ------------------------------- | ----------------------------------------------------------- |
+| CSS `@media` rule               | `@media (width = 1024px)` in `.module.css`                  |
+| Styled-components `@media`      | `` `@media ${RESPONSIVENESS.touchscreenMediaQuerySpecs}` `` |
+| `RESPONSIVENESS` import/usage   | `import { RESPONSIVENESS } from '../../ui-style-constants'` |
+| `touchscreenMediaQuerySpecs`    | Any reference                                               |
+| Legacy styled-components blocks | `` styled.div` ... @media ...` ``                           |
 
 When media queries are found, include:
+
 - File path and line number(s)
 - The matched pattern (CSS module vs styled-components vs RESPONSIVENESS constant)
 - Note: Opentrons is migrating toward CSS Modules with design tokens from `components/src/styles/global.css`. Media-query-based responsive styling typically needs engineer-led refactoring.
