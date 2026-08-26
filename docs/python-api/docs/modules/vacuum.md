@@ -3,26 +3,29 @@ Title: "Python API: Vacuum Module"
 description: How to use the Vacuum Module in a Python protocol.
 ---
 
-The Vacuum Module is an automated filtration system for the Opentrons Flex liquid handling robot. This module enables Flex to run vacuum-based protocols for protein and peptide sample cleanup, solid-phase extraction, and nucleic acid extraction, all within in an enclosed system that includes waste collection. The module is represented in code by a [`VacuumModuleContext`][opentrons.protocol_api.VacuumModuleContext] object that includes methods for deck staging, vacuum pressure and power control, and system venting.
+The Vacuum Module is an automated filtration system for the Opentrons Flex liquid handling robot. This module enables Flex to run vacuum-based protocols for protein and peptide sample cleanup, solid-phase extraction, and nucleic acid extraction, all within in an enclosed system that includes waste collection.
 
-!!! tip
-    For module specifications, installation steps, use cases, chemical compatibility, and other hardware-related information, see the [Vacuum Module Instruction Manual](../../modules/index.md).
+The module is represented in code by a [`VacuumModuleContext`][opentrons.protocol_api.VacuumModuleContext] object that includes methods for deck staging and vacuum control.
+
+For hardware-related information, see the [Vacuum Module Instruction Manual](../../modules/index.md). <!--- landing page for now --->
 
 ## Filter plate load names
 
 See the [Opentrons Labware Library](https://labware.opentrons.com/) for filter plate and well plate API load names. You can also find the `loadName` for filter plates in the [definition files on Github](https://github.com/Opentrons/opentrons/tree/edge/shared-data/labware/definitions/2). When searching, note that all filter plate load names end with `_filter`.
 
-## Loading deck slots
+## Deck adapter
 
-The Vacuum Module uses a physical deck adapter to hold labware and other pieces used in a vacuum filter protocol. This adapter fits in deck slots A3–A4 on the Flex.
+The Vacuum Module requires a physical deck adapter to hold module components, labware, and other pieces used in a vacuum filtration protocol. This adapter is a single piece that fits in deck slots A3–A4 only.
 
 <figure markdown>
 ![Deck adapter with labeled features matching slots A3 and A4](images/deck_adapter_features.svg){ width="70%" }
 <figcaption>Vacuum Module deck adapter</figcaption>
 </figure>
 
-* **Slot A3:** This is the recessed half of the deck adapter that holds the vacuum base piece and its attached 6 mm hose that pulls waste to the carboy.
-* **Slot A4:** Known as "the dock," this is the raised half of the deck adapter. It's a staging or storage space for collars (and other parts of the vacuum stack) when they're not seated on the vacuum base or actively used in a protocol.
+* **Slot A3:** This is the recessed half of the deck adapter that holds the vacuum base piece and its attached 6 mm hose that pulls waste to the carboy. See the instruction manual (linked above) for installation steps.
+* **Slot A4:** Known as "the dock," this is the raised half of the deck adapter. It is a staging area for collars (and other parts of the vacuum stack) when they're not seated on the vacuum base or actively used in a protocol. You cannot store or put well plates on the dock.
+
+## Loading deck slots
 
 Load the module using [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module] with the load name, `vacuumModuleV1`:
 
@@ -87,7 +90,7 @@ collection_plate = spacer.load_labware(
 
 ## Moving labware
 
-<font color="red">ignore this section, not ready yet</font>
+<font color="red"><strong>ignore this section, not ready yet</strong></font>
 
 The collars and spacers are compatible with the Gripper. You can use the gripper to stack well plates on the collars and spacers and move the stack to the dock or onto the vacuum base to put samples under vacuum.
 
@@ -122,7 +125,7 @@ Two properties set the operational minimum and maximum gauge pressure limits for
 
 * [`min_gauge_pressure_mbar`][opentrons.protocol_api.VacuumModuleContext.min_gauge_pressure_mbar]: Returns `0` mbar (atmospheric pressure). However, you may never (or rarely) use this command. Instead, to vent or return the system to atmospheric pressure, call [`open_vent()`][opentrons.protocol_api.VacuumModuleContext.open_vent] or set `vent_after=True` rather than specifying `min_gauge_pressure_mbar`.
 
-* [`max_gauge_pressure_mbar`][opentrons.protocol_api.VacuumModuleContext.max_gauge_pressure_mbar]: Returns `-800` mbar, the maximum vacuum supported by the module. You can pass `max_gauge_pressure_mbar` in code to run the module at full vacuum capacity:
+* [`max_gauge_pressure_mbar`][opentrons.protocol_api.VacuumModuleContext.max_gauge_pressure_mbar]: Returns `-800` mbar, the maximum vacuum supported by the module. You can pass `max_gauge_pressure_mbar` in code to run the module at full vacuum capacity.
 
 ```python
 vacuum_task = vacuum.start_set_vacuum_pressure(
@@ -135,9 +138,9 @@ vacuum_task = vacuum.start_set_vacuum_pressure(
 
 ### Closed-loop pressure control
 
-In a closed loop, the module uses sensor data to reach and maintain the specified vacuum pressure. For example, calling [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure] tells the pump to reach and maintain a target vacuum while actively monitoring its sensors to keep the system at the specified pressure.
+In a closed loop, the module uses sensor data to reach and maintain a specific vacuum pressure. For example, when calling [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure] the pump will actively monitor its pressure sensor to keep the system at the specified vacuum.
 
-Also, this method returns a [task][opentrons.protocol_api.Task] (`Task`?) object representing concurrent execution. Pass the task to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to make the protocol wait for the system to return to atmospheric pressure before continuing.
+Also, this method returns a [Task][opentrons.protocol_api.Task] object representing concurrent execution. Pass the task to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to make the protocol wait for the system to return to atmospheric pressure before continuing.
 
 ```python
 # Set system pressure to -300 mbar for 30 seconds and then equalize to atmospheric
@@ -156,9 +159,9 @@ protocol.wait_for_tasks([vacuum_task])
 
 ### Open-loop power control
 
-In an open-loop, the module does not use sensor data. Instead, the pump runs according to specified duty cycle (power) %. The loop here is "open" because a sensor doesn't provide feedback to control the pump, the pump runs at the set power %.
+In an open-loop, the module does not use sensor data to reach and maintain a specific vacuum pressure. Instead, the pump just runs at a set proportion of its rated power or duty cycle. The loop here is "open" because a sensor doesn't provide feedback to control the pump.
 
-Also, this method returns a [task][opentrons.protocol_api.Task] (`Task`?) object representing concurrent execution. Pass the task to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to make the protocol wait for the system to return to atmospheric pressure before continuing.
+Also, this method returns a [Task][opentrons.protocol_api.Task] (`Task`?) object representing concurrent execution. Pass the task to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to make the protocol wait for the system to return to atmospheric pressure before continuing.
 
 ```python
 # Run pump at 60% power for 20 seconds
@@ -182,12 +185,14 @@ Use [`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start
 !!! note
     Multi-step profiles cannot combine `gauge_pressure_mbar` and `percent_power` arguments in the same profile. Specify pressure _or_ power for steps in a particular profile.
 
+<!--- trying in-line tabs below --->
+
 === "Pressure profile"
 
     In a multi-step pressure profile, each step requires `enable_pump: True` and a target `gauge_pressure_mbar` (from `0` to `-800` mbar). You can also specify an optional `hold_time_seconds` or `hold_time_minutes` for each stage. Use pressure steps when you need to reach and hold a specific vacuum across multiple stages, instead of open-loop pressure regulation.
 
     ```python
-    # Define multi-stage pressure steps
+    # Define the stages, pressure, and duration
     profile_steps = [
         {
             "enable_pump": True,
@@ -201,7 +206,7 @@ Use [`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start
         },
     ]
 
-    # Start profile execution
+    # Run the profile
     profile_task = vacuum.start_execute_profile(
         steps=profile_steps,
         repetitions=1,
@@ -216,7 +221,7 @@ Use [`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start
     In a multi-step power profile, each step requires `enable_pump: True` and a target `percent_power` (from `1` to `100` % duty cycle). Use power steps when you want fixed pump duty cycles across multiple stages instead of closed-loop pressure regulation.
 
     ```python
-    # Define multi-stage power steps
+    # Define the stages, power %, and duration
     profile_steps = [
         {
             "enable_pump": True,
@@ -230,7 +235,7 @@ Use [`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start
         },
     ]
 
-    # Start profile execution
+    # Run the profile
     profile_task = vacuum.start_execute_profile(
         steps=profile_steps,
         repetitions=1,
@@ -246,7 +251,7 @@ While commands like `start_set_vacuum_pressure()` automatically manage pump and 
 
 ### Stopping the pump
 
-Call [`stop_vacuum_pump()`][opentrons.protocol_api.VacuumModuleContext.stop_vacuum_pump] to immediately stop the vacuum pump motor. Stopping the pump does not vent the module. The system will remain under vacuum until a vent command is issued or it depressurizes naturally from small air leaks among staked up deck pieces.
+Call [`stop_vacuum_pump()`][opentrons.protocol_api.VacuumModuleContext.stop_vacuum_pump] to immediately stop the vacuum pump motor. Stopping the pump does not vent the module. The system will remain under vacuum until a vent command is issued or it depressurizes naturally from small air leaks between stacked deck pieces.
 
 ```python
 vacuum.stop_vacuum_pump()
@@ -254,7 +259,7 @@ vacuum.stop_vacuum_pump()
 
 ### Opening and closing the vent
 
-The vent valve regulates vacuum pressure inside the module.
+The vent valve regulates vacuum pressure inside the module. <!--- ask about using "solenoid" --->
 
 - [`open_vent()`][opentrons.protocol_api.VacuumModuleContext.open_vent]: opens the vent to release system vacuum and return the module to atmospheric pressure. Call this before removing labware if an asynchronous profile or pressure hold does not specify `vent_after=True`.
 
