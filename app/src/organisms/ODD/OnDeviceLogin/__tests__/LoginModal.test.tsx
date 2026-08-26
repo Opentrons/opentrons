@@ -18,7 +18,28 @@ import {
 
 import { showLoginModal } from '../LoginModal'
 
-import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
+import type {
+  AuthUser,
+  AuthUserResetPasswordReason,
+  OAuth2TokenResponse,
+} from '@opentrons/api-client'
+import { getUserLoginStatus } from '@opentrons/api-client'
+
+vi.mock('@opentrons/api-client', async importOriginal => {
+  const actual = (await importOriginal()) as Record<string, unknown>
+  return {
+    ...actual,
+    getUserLoginStatus: vi.fn(),
+  }
+})
+
+vi.mock('@opentrons/react-api-client', async importOriginal => {
+  const actual = (await importOriginal()) as Record<string, unknown>
+  return {
+    ...actual,
+    useHost: vi.fn(() => ({ hostname: 'localhost', port: 31950 })),
+  }
+})
 
 vi.mock('/app/redux/discovery', async importOriginal => {
   const actual = (await importOriginal()) as Record<string, unknown>
@@ -47,9 +68,17 @@ function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
     resetPassword,
     resetPasswordReason:
       overrides.resetPasswordReason ??
-      (resetPassword ? 'ADMIN_FORCED' : 'NONE'),
+      (resetPassword ? 'ADMIN_FORCED' : null),
     ...overrides,
   }
+}
+
+function mockUserLoginStatus(
+  resetPasswordReason: AuthUserResetPasswordReason | null = null
+): void {
+  vi.mocked(getUserLoginStatus).mockResolvedValue({
+    data: { data: { resetPasswordReason } },
+  } as Awaited<ReturnType<typeof getUserLoginStatus>>)
 }
 
 function mockSuccessfulLogin(): void {
@@ -114,8 +143,17 @@ function clickPrimary(name: 'Next' | 'Confirm'): void {
   fireEvent.click(screen.getByRole('button', { name }))
 }
 
+async function advanceFromUsername(): Promise<void> {
+  fillField('Username', 'alice')
+  clickPrimary('Next')
+  await waitFor(() => {
+    expect(screen.getByRole('button', { name: 'Confirm' })).toBeInTheDocument()
+  })
+}
+
 describe('LoginModal', () => {
   beforeEach(() => {
+    mockUserLoginStatus(null)
     vi.mocked(useOAuth2PasswordLogin).mockReturnValue({
       submitPassword: vi.fn(),
       isAuthLoading: false,
@@ -144,8 +182,7 @@ describe('LoginModal', () => {
     const resultPromise = clickOpenLoginModal()
     await waitForLoginModalOpen()
 
-    fillField('Username', 'alice')
-    clickPrimary('Next')
+    await advanceFromUsername()
     fillField('Password', 'secret123')
     clickPrimary('Confirm')
 
@@ -174,12 +211,48 @@ describe('LoginModal', () => {
     clickOpenLoginModal()
     await waitForLoginModalOpen()
 
-    fillField('Username', 'alice')
-    clickPrimary('Next')
+    await advanceFromUsername()
     fillField('Password', 'wrong')
     clickPrimary('Confirm')
 
     expect(screen.getByText('Login failed')).toBeInTheDocument()
+  })
+
+  it('switches to the new-password flow when first-time login requires a password reset', async () => {
+    vi.mocked(useOAuth2PasswordLogin).mockImplementation(({ onSuccess }) => ({
+      submitPassword: (username: string, _password: string) => {
+        onSuccess(
+          username,
+          mockAuthUser({
+            resetPassword: true,
+            resetPasswordReason: 'FIRST_TIME_LOGIN',
+          }),
+          OAUTH_RESPONSE
+        )
+      },
+      isAuthLoading: false,
+    }))
+
+    const clickOpenLoginModal = setupLoginModalTrigger()
+    const resultPromise = clickOpenLoginModal()
+    await waitForLoginModalOpen()
+
+    mockUserLoginStatus('FIRST_TIME_LOGIN')
+    await advanceFromUsername()
+    expect(screen.getByLabelText('One-time password')).toBeInTheDocument()
+    fillField('One-time password', 'temp-pass')
+    clickPrimary('Confirm')
+
+    expect(
+      await screen.findByRole('heading', { name: 'New password' })
+    ).toBeInTheDocument()
+
+    let modalResolved = false
+    void Promise.resolve(resultPromise).then(() => {
+      modalResolved = true
+    })
+    await new Promise(resolve => setTimeout(resolve, 50))
+    expect(modalResolved).toBe(false)
   })
 
   it('switches to the new-password flow when login requires a password reset', async () => {
@@ -198,8 +271,8 @@ describe('LoginModal', () => {
     const resultPromise = clickOpenLoginModal()
     await waitForLoginModalOpen()
 
-    fillField('Username', 'alice')
-    clickPrimary('Next')
+    mockUserLoginStatus('ADMIN_FORCED')
+    await advanceFromUsername()
     fillField('Password', 'temp-pass')
     clickPrimary('Confirm')
 
@@ -239,8 +312,8 @@ describe('LoginModal', () => {
     const resultPromise = clickOpenLoginModal()
     await waitForLoginModalOpen()
 
-    fillField('Username', 'alice')
-    clickPrimary('Next')
+    mockUserLoginStatus('ADMIN_FORCED')
+    await advanceFromUsername()
     fillField('Password', 'temp-pass')
     clickPrimary('Confirm')
 
@@ -251,10 +324,12 @@ describe('LoginModal', () => {
     fillField('Confirm password', 'newpass123')
     clickPrimary('Confirm')
 
+    await waitFor(() => {
+      expect(screen.getByLabelText('Password')).toBeInTheDocument()
+    })
     expect(
-      await screen.findByRole('heading', { name: 'Login' })
+      screen.getByRole('heading', { name: 'Login' })
     ).toBeInTheDocument()
-    expect(screen.getByLabelText('Password')).toBeInTheDocument()
 
     let modalResolved = false
     void Promise.resolve(resultPromise).then(() => {
@@ -286,8 +361,8 @@ describe('LoginModal', () => {
     void clickOpenLoginModal()
     await waitForLoginModalOpen()
 
-    fillField('Username', 'alice')
-    clickPrimary('Next')
+    mockUserLoginStatus('ADMIN_FORCED')
+    await advanceFromUsername()
     fillField('Password', 'temp-pass')
     clickPrimary('Confirm')
 

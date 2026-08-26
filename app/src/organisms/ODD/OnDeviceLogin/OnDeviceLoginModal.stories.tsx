@@ -60,6 +60,9 @@ export const Default: Story = {
     onCancel: action('onCancel'),
     loginError: null,
     onClearLoginError: action('onClearLoginError'),
+    onUsernameSubmit: async (username: string) => {
+      action('onUsernameSubmit')(username)
+    },
     passwordComplexity: null,
   },
 }
@@ -76,12 +79,23 @@ export const WithLoginError: Story = {
   },
 }
 
+/** First-time login: enter the admin-provided one-time password. */
+export const FirstTimeLogin: Story = {
+  args: {
+    ...Default.args,
+    step: 'password',
+    resetPasswordReason: 'FIRST_TIME_LOGIN',
+    initialUsername: 'alice',
+  },
+}
+
 /** Choose a new password after signing in with a temporary password. */
 export const PasswordResetRequired: Story = {
   args: {
     ...Default.args,
     step: 'password',
     isPasswordResetRequired: true,
+    resetPasswordReason: 'FIRST_TIME_LOGIN',
     initialUsername: 'alice',
   },
 }
@@ -92,6 +106,7 @@ export const PasswordResetConfirmPassword: Story = {
     ...Default.args,
     step: 'confirmPassword',
     isPasswordResetRequired: true,
+    resetPasswordReason: 'FIRST_TIME_LOGIN',
     initialUsername: 'alice',
   },
 }
