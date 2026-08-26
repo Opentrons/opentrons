@@ -10,7 +10,7 @@ import { saveFileToUsb } from '/app/redux/shell/remote'
 
 import { useDownloadSelectedRuns } from '../useDownloadSelectedRuns'
 
-import type * as React from 'react'
+import type { FunctionComponent } from 'react'
 import type { HostConfig, RunData } from '@opentrons/api-client'
 
 const mockJSZip = vi.hoisted(() => ({
@@ -52,7 +52,7 @@ const mockRunTwo = {
 } as unknown as RunData
 
 describe('useDownloadSelectedRuns', () => {
-  let wrapper: React.FunctionComponent<{ children: React.ReactNode }>
+  let wrapper: FunctionComponent<{ children: React.ReactNode }>
 
   beforeEach(() => {
     const queryClient = new QueryClient()
