@@ -18,7 +18,7 @@ See the [Opentrons Labware Library](https://labware.opentrons.com/) for filter p
 The Vacuum Module requires a physical deck adapter to hold module components, labware, and other pieces used in a vacuum filtration protocol. This adapter is a single piece that fits in deck slots A3–A4 only.
 
 <figure markdown>
-![Deck adapter with labeled features matching slots A3 and A4](images/deck_adapter_features.svg){ width="70%" }
+![Deck adapter with labeled features matching slots A3 and A4](images/deck_adapter_features.svg){ width="80%" }
 <figcaption>Vacuum Module deck adapter</figcaption>
 </figure>
 
