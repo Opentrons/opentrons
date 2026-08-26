@@ -402,9 +402,8 @@ describe('LoginModal', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
 
-    screen.getByText('Robot encryption key verification')
+    expect(screen.getAllByText('Robot encryption key')).toHaveLength(2)
     screen.getByText('Verify robot encryption key')
-    screen.getByLabelText('Robot encryption key')
     expect(screen.queryByText('Network Error')).toBeNull()
   })
 })

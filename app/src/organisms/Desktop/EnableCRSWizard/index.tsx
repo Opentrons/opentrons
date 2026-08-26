@@ -6,7 +6,7 @@ import {
   useForm,
   useFormContext,
 } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import {
@@ -296,10 +296,21 @@ function VerifyRobotEncryptionKeyPage({
         <div className={styles.step_body}>
           <div className={styles.text_block}>
             <StyledText desktopStyle="headingSmallBold">
-              {t('setup_wizard_verify_encryption_key_title')}
+              {t('device_settings:verify_robot_encryption_key')}
             </StyledText>
             <StyledText desktopStyle="bodyDefaultRegular">
-              {t('setup_wizard_verify_encryption_key_description')}
+              <Trans
+                t={t}
+                i18nKey="device_settings:enter_the_encryption_key"
+                components={{
+                  b: (
+                    <StyledText
+                      desktopStyle="bodyDefaultSemiBold"
+                      display="inline"
+                    />
+                  ),
+                }}
+              />
             </StyledText>
           </div>
           <InputField

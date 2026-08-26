@@ -68,8 +68,6 @@
   "setup_wizard_setup_title": "Set up Compliance Ready Software",
   "setup_wizard_submission_error": "Unable to enable Compliance Ready Software. Try again.",
   "setup_wizard_username_reserved": "This username is reserved. Choose a different username.",
-  "setup_wizard_verify_encryption_key_description": "Enter the encryption key displayed on your robot's touchscreen into the field below.",
-  "setup_wizard_verify_encryption_key_title": "Verify robot encryption key",
   "sign": "Sign",
   "sign_now": "Sign now",
   "sign_protocol_run": "Sign protocol run",
