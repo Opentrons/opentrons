@@ -16,6 +16,7 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
+import type { ReactNode } from 'react'
 import type {
   AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
@@ -36,7 +37,7 @@ interface VacuumModuleItemProps {
   selected?: boolean
 }
 
-export function VacuumModuleItem(props: VacuumModuleItemProps): JSX.Element {
+export function VacuumModuleItem(props: VacuumModuleItemProps): ReactNode {
   const { t } = useTranslation('deck_configuration')
 
   const {

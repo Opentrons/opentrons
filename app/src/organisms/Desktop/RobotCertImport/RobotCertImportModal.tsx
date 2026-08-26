@@ -13,13 +13,15 @@ import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/en
 import styles from './robot_cert_import.module.css'
 import { useHandleRobotCertImport } from './useHandleRobotCertImport'
 
+import type { ReactNode } from 'react'
+
 export interface RobotCertImportModalProps {
   onClose: () => unknown
 }
 
 export function RobotCertImportModal(
   props: RobotCertImportModalProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation(['device_settings'])
   const { requestKeyDisplay, clearKeyDisplay } =
     useUpdateClientDataEncryptionKeys()

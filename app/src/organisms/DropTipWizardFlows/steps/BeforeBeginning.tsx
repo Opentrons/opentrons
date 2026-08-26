@@ -25,6 +25,7 @@ import { MediumButton } from '../../../atoms/buttons'
 import { DT_ROUTES } from '../constants'
 import { DropTipFooterButtons } from '../shared'
 
+import type { ReactNode } from 'react'
 import type { DropTipWizardContainerProps } from '../types'
 
 import blowoutVideo from '../../../assets/videos/droptip-wizard/Blowout-Liquid.webm'
@@ -159,7 +160,7 @@ function DropTipOption({
   onClick: () => void
   videoSrc: string
   text: string
-}): JSX.Element {
+}): ReactNode {
   return (
     <Flex
       onClick={onClick}

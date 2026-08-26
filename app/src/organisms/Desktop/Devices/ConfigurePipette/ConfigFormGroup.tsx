@@ -21,7 +21,7 @@ export interface FormColumnProps {
   children: ReactNode
 }
 
-export function FormColumn(props: FormColumnProps): JSX.Element {
+export function FormColumn(props: FormColumnProps): ReactNode {
   return <div className={styles.form_column}>{props.children}</div>
 }
 
@@ -36,7 +36,7 @@ export interface ConfigFormGroupProps {
   control: Control<FormValues, any>
 }
 
-export function ConfigFormGroup(props: ConfigFormGroupProps): JSX.Element {
+export function ConfigFormGroup(props: ConfigFormGroupProps): ReactNode {
   const { groupLabel, groupError, formFields, control } = props
   const formattedError =
     groupError &&
@@ -73,7 +73,7 @@ export interface ConfigFormRowProps {
 const FIELD_ID_PREFIX = '__PipetteConfig__'
 const makeId = (name: string): string => `${FIELD_ID_PREFIX}.${name}`
 
-export function ConfigFormRow(props: ConfigFormRowProps): JSX.Element {
+export function ConfigFormRow(props: ConfigFormRowProps): ReactNode {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -98,7 +98,7 @@ export interface ConfigInputProps {
   control: Control<FormValues, any>
 }
 
-export function ConfigInput(props: ConfigInputProps): JSX.Element {
+export function ConfigInput(props: ConfigInputProps): ReactNode {
   const { displayField, control } = props
   const { name, units, displayName } = displayField
   const id = makeId(name)
@@ -132,7 +132,7 @@ export interface ConfigCheckboxProps {
   control: Control<FormValues, any>
 }
 
-export function ConfigCheckbox(props: ConfigCheckboxProps): JSX.Element {
+export function ConfigCheckbox(props: ConfigCheckboxProps): ReactNode {
   const { displayQuirkField, control } = props
   const { name, displayName } = displayQuirkField
   const id = makeId(name)
@@ -164,7 +164,7 @@ export interface ConfigQuirkGroupProps {
   control: Control<FormValues, any>
 }
 
-export function ConfigQuirkGroup(props: ConfigQuirkGroupProps): JSX.Element {
+export function ConfigQuirkGroup(props: ConfigQuirkGroupProps): ReactNode {
   const { quirks, control } = props
   return (
     <FormGroup className={styles.form_group}>

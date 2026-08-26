@@ -25,6 +25,7 @@ import { OddModal } from '/app/molecules/OddModal'
 import { UpdateInProgressModal } from './UpdateInProgressModal'
 import { UpdateResultsModal } from './UpdateResultsModal'
 
+import type { ReactNode } from 'react'
 import type { Subsystem } from '@opentrons/api-client'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
@@ -35,7 +36,7 @@ interface UpdateNeededModalProps {
   setInitiatedSubsystemUpdate: (subsystem: Subsystem | null) => void
 }
 
-export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
+export function UpdateNeededModal(props: UpdateNeededModalProps): ReactNode {
   const { onClose, shouldExit, subsystem, setInitiatedSubsystemUpdate } = props
   const { t } = useTranslation('firmware_update')
   const [updateId, setUpdateId] = useState<string | null>(null)

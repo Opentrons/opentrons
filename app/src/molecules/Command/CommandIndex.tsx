@@ -6,6 +6,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 export interface CommandIndexProps {
   index: string
   allowSpaceForNDigits?: number
@@ -14,7 +16,7 @@ export interface CommandIndexProps {
 export function CommandIndex({
   index,
   allowSpaceForNDigits,
-}: CommandIndexProps): JSX.Element {
+}: CommandIndexProps): ReactNode {
   return (
     <Flex
       justifyContent={JUSTIFY_FLEX_START}

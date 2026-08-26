@@ -6,6 +6,7 @@ import { PlayPauseButton } from '../PlayPauseButton'
 import { StopButton } from '../StopButton'
 import styles from './playpauseheader.module.css'
 
+import type { ReactNode } from 'react'
 import type { RunStatus } from '@opentrons/api-client'
 
 export interface ProtocolPlayPauseHeaderProps {
@@ -20,7 +21,7 @@ export function ProtocolPlayPauseHeader({
   onStop,
   onTogglePlayPause,
   protocolName,
-}: ProtocolPlayPauseHeaderProps): JSX.Element {
+}: ProtocolPlayPauseHeaderProps): ReactNode {
   const { t } = useTranslation('run_details')
 
   const currentRunStatus = t(`status_${runStatus}`)

@@ -47,9 +47,10 @@ import { Navbar } from './Navbar'
 import { ModalPortalRoot } from './portal'
 import { ReactQueryDevtools } from './tools'
 
+import type { ReactNode } from 'react'
 import type { RouteProps } from './types'
 
-export const DesktopApp = (): JSX.Element => {
+export const DesktopApp = (): ReactNode => {
   useSoftwareUpdatePoll()
   useRefreshAccessTokenOnActivity()
   useTrackRobotRestarts()

@@ -281,7 +281,7 @@ export function LabwareStackToolboxContainer({
   setDefineLiquidModal,
   selectedLabwareIds,
   setShowLiquidLayoutOverlay,
-}: LabwareStackToolboxContainerProps): JSX.Element {
+}: LabwareStackToolboxContainerProps): ReactNode {
   // All selectors moved here
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
   const { labware } = useSelector(getInitialDeckSetup)

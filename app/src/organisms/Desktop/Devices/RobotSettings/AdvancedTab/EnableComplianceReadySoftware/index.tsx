@@ -8,12 +8,14 @@ import { handleEnableCRSWizard } from '/app/organisms/Desktop/EnableCRSWizard'
 
 import styles from './index.module.css'
 
+import type { ReactNode } from 'react'
+
 interface Props {
   isRobotBusy: boolean
   robotName: string
 }
 
-export function EnableComplianceReadySoftware(props: Props): JSX.Element {
+export function EnableComplianceReadySoftware(props: Props): ReactNode {
   const { isRobotBusy, robotName } = props
   const { t } = useTranslation('device_settings')
 

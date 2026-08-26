@@ -349,7 +349,7 @@ interface CreateFileFormProps {
   setCurrentStepIndex: Dispatch<SetStateAction<number>>
 }
 
-function CreateFileForm(props: CreateFileFormProps): JSX.Element {
+function CreateFileForm(props: CreateFileFormProps): ReactNode {
   const {
     currentWizardStep,
     createProtocolFile,

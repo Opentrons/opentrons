@@ -20,6 +20,7 @@ import type {
   FlattenSimpleInterpolation,
   ThemedCssFunction,
 } from 'styled-components'
+import type { ReactNode } from 'react'
 import type { IconName, IconProps } from '../../icons'
 import type { StyleProps } from '../../primitives'
 
@@ -55,7 +56,7 @@ export interface ToastProps extends StyleProps {
 
 export const TOAST_ANIMATION_DURATION = 500
 
-export function Toast(props: ToastProps): JSX.Element {
+export function Toast(props: ToastProps): ReactNode {
   const {
     buttonText,
     message,

@@ -8,7 +8,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import type { ChangeEvent, Dispatch, ReactNode, SetStateAction } from 'react'
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
 import type { LiquidClassOption } from './hooks/useAssignLiquidClass'
@@ -27,7 +27,7 @@ export const LiquidClassesStepTools = ({
   setShowFormErrors,
   type,
   orderedLiquidClassOptions,
-}: LiquidClassesStepToolsProps): JSX.Element => {
+}: LiquidClassesStepToolsProps): ReactNode => {
   const { t } = useTranslation('liquids')
 
   return (

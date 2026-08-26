@@ -3,12 +3,14 @@ import { useRef } from 'react'
 import { Box } from '../../primitives'
 import styles from './stepmeter.module.css'
 
+import type { ReactNode } from 'react'
+
 interface StepMeterProps {
   totalSteps: number
   currentStep: number | null
 }
 
-export const StepMeter = (props: StepMeterProps): JSX.Element => {
+export const StepMeter = (props: StepMeterProps): ReactNode => {
   const { totalSteps, currentStep } = props
   const prevPercentComplete = useRef(0)
   const progress = currentStep ?? 0

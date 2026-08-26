@@ -13,12 +13,12 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 interface ConnectingNetworkProps {
   ssid: string
 }
-export function ConnectingNetwork({
-  ssid,
-}: ConnectingNetworkProps): JSX.Element {
+export function ConnectingNetwork({ ssid }: ConnectingNetworkProps): ReactNode {
   const { t } = useTranslation('device_settings')
   return (
     <Flex flexDirection={DIRECTION_COLUMN} flex="1" height="100%">

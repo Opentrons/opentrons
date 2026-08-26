@@ -17,6 +17,7 @@ import { SpinnerScreen } from '../shared/SpinnerScreen'
 import { SuccessScreen } from '../shared/SuccessScreen'
 import { UsbSelectionScreen } from '../shared/UsbSelectionScreen'
 
+import type { ReactNode } from 'react'
 import type { StepType } from '../shared/types'
 
 interface DownloadDiagnosticFilesWizardProps {
@@ -25,7 +26,7 @@ interface DownloadDiagnosticFilesWizardProps {
 
 export function DownloadDiagnosticFilesWizard({
   onClose,
-}: DownloadDiagnosticFilesWizardProps): JSX.Element {
+}: DownloadDiagnosticFilesWizardProps): ReactNode {
   const { t } = useTranslation('device_details')
   const robotName = useSelector(getLocalRobot)?.name ?? ''
 

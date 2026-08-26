@@ -1,6 +1,8 @@
 import { COLORS } from '../../../helix-design-system'
 
-export function OpentronsFlex96TiprackAdapter(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function OpentronsFlex96TiprackAdapter(): ReactNode {
   return (
     <svg>
       <path

@@ -12,6 +12,8 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 const baseRoundTabStyling = css`
   ${TYPOGRAPHY.pSemiBold}
   color: ${COLORS.black90};
@@ -82,7 +84,7 @@ export function RoundTab({
   tabName,
   end,
   minWidth,
-}: RoundTabProps): JSX.Element {
+}: RoundTabProps): ReactNode {
   const [targetProps, tooltipProps] = useHoverTooltip()
   return disabled ? (
     <>

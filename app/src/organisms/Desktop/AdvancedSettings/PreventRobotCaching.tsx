@@ -14,9 +14,10 @@ import {
 import { ToggleButton } from '/app/atoms/buttons'
 import { getConfig, toggleConfigValue } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
 
-export function PreventRobotCaching(): JSX.Element {
+export function PreventRobotCaching(): ReactNode {
   const { t } = useTranslation('app_settings')
   const disableRobotCache = useSelector((state: State) => {
     return getConfig(state)?.discovery.disableCache ?? false

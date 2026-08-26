@@ -15,6 +15,7 @@ import {
 
 import { getSavedStepForms } from '/protocol-designer/step-forms/selectors'
 
+import type { ReactNode } from 'react'
 import type { ProfileStepItem } from '/protocol-designer/form-types'
 import type { ThermocyclerCycleType } from '../StepForm/StepTools/ThermocyclerTools/ThermocyclerCycle'
 import type { ThermocyclerStepType } from '../StepForm/StepTools/ThermocyclerTools/ThermocyclerStep'
@@ -24,7 +25,7 @@ interface ThermocyclerProfileSubstepsProps {
 }
 export function ThermocyclerProfileSubsteps(
   props: ThermocyclerProfileSubstepsProps
-): JSX.Element {
+): ReactNode {
   const { stepId } = props
 
   const { t } = useTranslation('protocol_steps')
@@ -96,7 +97,7 @@ interface ThermocyclerSubstepProps {
   duration: string
 }
 
-function ThermocyclerSubstep(props: ThermocyclerSubstepProps): JSX.Element {
+function ThermocyclerSubstep(props: ThermocyclerSubstepProps): ReactNode {
   const { temperature, duration } = props
   const { t } = useTranslation(['application', 'protocol_steps'])
   return (

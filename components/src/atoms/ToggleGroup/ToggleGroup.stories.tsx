@@ -16,7 +16,7 @@ type ToggleGroupComponentProps = React.ComponentProps<
   typeof ToggleGroupComponent
 >
 
-const Template = (args: ToggleGroupComponentProps): JSX.Element => {
+const Template = (args: ToggleGroupComponentProps): React.ReactNode => {
   const [value, setValue] = React.useState<'left' | 'right'>('left')
 
   return (

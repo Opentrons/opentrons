@@ -78,7 +78,7 @@ const FLEX_SPACING_STYLE = css`
   }
 `
 
-export function SimpleWizardBodyContent(props: Props): JSX.Element {
+export function SimpleWizardBodyContent(props: Props): ReactNode {
   const {
     iconColor,
     children,

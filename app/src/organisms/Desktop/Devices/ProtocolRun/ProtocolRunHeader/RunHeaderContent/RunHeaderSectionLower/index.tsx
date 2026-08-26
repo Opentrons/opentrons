@@ -23,6 +23,7 @@ import { isSupportedVersion } from '../../utils'
 import { LabeledValue } from '../LabeledValue'
 import styles from './runheadersectionlower.module.css'
 
+import type { ReactNode } from 'react'
 import type { RunHeaderContentProps } from '..'
 
 // Note thd following minimum supported versions from Protocol Visualization PRD
@@ -35,7 +36,7 @@ export function RunHeaderSectionLower({
   runStatus,
   robotName,
   numberOfAtomicCommands,
-}: RunHeaderContentProps): JSX.Element {
+}: RunHeaderContentProps): ReactNode {
   const { t } = useTranslation('run_details')
   const navigate = useNavigate()
   const trackEvent = useTrackEvent()

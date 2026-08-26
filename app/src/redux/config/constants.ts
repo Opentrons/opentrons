@@ -7,7 +7,6 @@ export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
   'protocolTimeline',
   'enableLabwareCreator',
   'reactQueryDevtools',
-  'reactScan',
   'quickTransferProtocolContentsLog',
   'robotSearchBar',
   'showGitDetails',

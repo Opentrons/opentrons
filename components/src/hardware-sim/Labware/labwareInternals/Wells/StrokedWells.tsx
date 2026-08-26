@@ -14,7 +14,7 @@ export interface StrokedWellProps {
   strokeByWell?: WellStrokeByName
 }
 
-export function StrokedWellsComponent(props: StrokedWellProps): JSX.Element {
+export function StrokedWellsComponent(props: StrokedWellProps): ReactNode {
   const { definition, strokeByWell } = props
   return (
     <>

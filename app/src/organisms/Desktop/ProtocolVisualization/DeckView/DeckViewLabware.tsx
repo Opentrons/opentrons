@@ -13,7 +13,7 @@ import { DeckViewOverlay } from './DeckViewOverlay'
 import { LabwareCommandSummary } from './LabwareCommandSummary'
 import { LabwareOnDeck } from './LabwareOnDeck'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   DeckDefinition,
   Liquid,
@@ -37,7 +37,7 @@ interface DeckViewLabwareProps {
   selectedRunTimeCommand?: RunTimeCommand
 }
 
-export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
+export function DeckViewLabware(props: DeckViewLabwareProps): ReactNode {
   const {
     robotState,
     invariantContext,

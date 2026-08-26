@@ -12,6 +12,7 @@ import {
 import { withStyleProps } from '../hocs/withStyleProps'
 import { Icon } from './Icon'
 
+import type { ReactNode } from 'react'
 import type { ModuleType } from '@opentrons/shared-data'
 
 export type ModuleIconName =
@@ -40,7 +41,7 @@ interface ModuleIconProps {
   moduleType: ModuleType
 }
 
-function ModuleIconComponent(props: ModuleIconProps): JSX.Element {
+function ModuleIconComponent(props: ModuleIconProps): ReactNode {
   const { moduleType, ...styleProps } = props
   const iconName = MODULE_ICON_NAME_BY_TYPE[moduleType]
 

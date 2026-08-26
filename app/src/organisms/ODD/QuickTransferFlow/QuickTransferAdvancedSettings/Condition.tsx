@@ -24,7 +24,7 @@ import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 import { ACTIONS } from '../constants'
 import { getMaxConditioningVolume } from '../utils'
 
-import type { Dispatch } from 'react'
+import type { Dispatch, ReactNode } from 'react'
 import type {
   FlowRateKind,
   QuickTransferSummaryAction,
@@ -38,7 +38,7 @@ interface DelayProps {
   kind: FlowRateKind
 }
 
-export function Condition(props: DelayProps): JSX.Element {
+export function Condition(props: DelayProps): ReactNode {
   const { kind, onBack, state, dispatch } = props
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()

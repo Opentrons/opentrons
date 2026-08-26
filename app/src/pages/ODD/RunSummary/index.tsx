@@ -82,11 +82,12 @@ import { onDeviceDisplayFormatTimestamp } from '/app/transformations/runs'
 
 import { SignRun } from './SignRun'
 
+import type { ReactNode } from 'react'
 import type { IconName } from '@opentrons/components'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type { PipetteWithTip } from '/app/resources/instruments'
 
-export function RunSummary(): JSX.Element {
+export function RunSummary(): ReactNode {
   const { runId } = useParams<
     keyof OnDeviceRouteParams
   >() as OnDeviceRouteParams

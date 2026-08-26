@@ -18,6 +18,7 @@ import { getLocalRobot } from '/app/redux/discovery'
 import { CancelingRunModal } from '../CancelingRunModal'
 import styles from './confirmcancelmodal.module.css'
 
+import type { ReactNode } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface ConfirmCancelRunModalProps {
@@ -30,7 +31,7 @@ export function ConfirmCancelRunModal({
   runId,
   setShowConfirmCancelRunModal,
   isActiveRun,
-}: ConfirmCancelRunModalProps): JSX.Element {
+}: ConfirmCancelRunModalProps): ReactNode {
   const { t } = useTranslation(['run_details', 'shared'])
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? ''

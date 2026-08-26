@@ -13,6 +13,7 @@ import { getRobotStateTimeline } from '/protocol-designer/file-data/selectors'
 
 import { ErrorContents } from './ErrorContents'
 
+import type { ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
 import type { CommandCreatorError } from '@opentrons/step-generation'
 import type { MakeAlert } from './types'
@@ -32,7 +33,7 @@ const makeAlert: MakeAlert = (alertType, data, key) => (
   </Banner>
 )
 
-function TimelineAlertsComponent(props: StyleProps): JSX.Element | null {
+function TimelineAlertsComponent(props: StyleProps): ReactNode {
   const { t } = useTranslation('alert')
 
   const timeline = useSelector(getRobotStateTimeline)

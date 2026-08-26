@@ -7,6 +7,7 @@ import {
   isTerminalRunStatus,
 } from '/app/local-resources/runs/utils'
 
+import type { ReactNode } from 'react'
 import type { CameraData, RunStatus } from '@opentrons/api-client'
 
 type LiveStreamInfoScreenType =
@@ -41,7 +42,7 @@ export function LivestreamInfoScreen({
   type,
 }: {
   type: LiveStreamInfoScreenType
-}): JSX.Element {
+}): ReactNode {
   const { t } = useTranslation('run_details')
 
   switch (type) {

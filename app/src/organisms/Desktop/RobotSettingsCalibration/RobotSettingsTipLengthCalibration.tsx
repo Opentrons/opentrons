@@ -15,6 +15,7 @@ import { useAttachedPipettes } from '/app/resources/instruments'
 import { getDefaultTiprackDefForPipetteName } from '../Devices/constants'
 import { TipLengthCalibrationItems } from './CalibrationDetails/TipLengthCalibrationItems'
 
+import type { ReactNode } from 'react'
 import type { PipetteName } from '@opentrons/shared-data'
 import type { TipLengthCalibration } from '/app/redux/calibration/api-types'
 import type { FormattedPipetteOffsetCalibration } from '.'
@@ -37,7 +38,7 @@ export function RobotSettingsTipLengthCalibration({
   formattedPipetteOffsetCalibrations,
   robotName,
   isRobotBusy,
-}: RobotSettingsTipLengthCalibrationProps): JSX.Element {
+}: RobotSettingsTipLengthCalibrationProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   const attachedPipettes = useAttachedPipettes()

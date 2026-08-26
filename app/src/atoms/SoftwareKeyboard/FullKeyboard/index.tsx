@@ -11,7 +11,7 @@ import {
   softwareKeyboardButtonAttributes,
 } from '../constants'
 
-import type { MutableRefObject } from 'react'
+import type { MutableRefObject, ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { KeyboardLanguage, LayoutName } from '../types'
 
@@ -34,7 +34,7 @@ export function FullKeyboard({
   onChange,
   keyboardRef,
   debug = false,
-}: FullKeyboardProps): JSX.Element {
+}: FullKeyboardProps): ReactNode {
   const [layoutName, setLayoutName] = useState<LayoutName>('default')
 
   const appLanguage = useSelector(getAppLanguage)

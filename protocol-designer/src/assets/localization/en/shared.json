@@ -145,6 +145,8 @@
   "user_settings": "User Settings",
   "uses_standard_namespace": "Opentrons verified labware",
   "vacuum_dock": "Vacuum Module GEN1 Dock",
+  "vacuum_module_adjacent": "A Vacuum Module is adjacent to this slot. Modules cannot be placed next to a Vacuum Module.",
+  "vacuum_module_adjacent_to": "A module is adjacent to this slot. The Vacuum Module cannot be placed next to a module.",
   "version": "Version {{version}}",
   "view_release_notes": "View release notes",
   "warning": "WARNING:",

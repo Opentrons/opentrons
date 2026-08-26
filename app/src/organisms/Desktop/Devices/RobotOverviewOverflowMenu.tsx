@@ -43,7 +43,7 @@ import { RobotOutOfStorageModal } from './RobotOutOfStorageModal.tsx'
 import { DisconnectModal } from './RobotSettings/ConnectNetwork/DisconnectModal'
 import { handleUpdateBuildroot } from './RobotSettings/UpdateBuildroot'
 
-import type { MouseEvent, MouseEventHandler } from 'react'
+import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { Dispatch } from '/app/redux/types'
 
@@ -53,7 +53,7 @@ interface RobotOverviewOverflowMenuProps {
 
 export const RobotOverviewOverflowMenu = (
   props: RobotOverviewOverflowMenuProps
-): JSX.Element => {
+): ReactNode => {
   const { robot } = props
   const { t } = useTranslation(['devices_landing', 'robot_controls', 'shared'])
   const {

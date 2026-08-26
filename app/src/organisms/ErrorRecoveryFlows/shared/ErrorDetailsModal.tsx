@@ -57,7 +57,7 @@ type ErrorDetailsModalProps = Omit<
     allRunDefs: LabwareDefinition[]
   }
 
-export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
+export function ErrorDetailsModal(props: ErrorDetailsModalProps): ReactNode {
   const { failedCommand, toggleModal, isOnDevice } = props
   const errorKind = getErrorKind(failedCommand)
   const errorName = useErrorName(errorKind)
@@ -133,7 +133,7 @@ type ErrorDetailsModalType = ErrorDetailsModalProps & {
 
 export function ErrorDetailsModalDesktop(
   props: ErrorDetailsModalType
-): JSX.Element {
+): ReactNode {
   const { children, modalHeader, toggleModal, desktopType } = props
   const { t } = useTranslation(['error_recovery', 'branded'])
 
@@ -184,9 +184,7 @@ export function ErrorDetailsModalDesktop(
   )
 }
 
-export function ErrorDetailsModalODD(
-  props: ErrorDetailsModalType
-): JSX.Element {
+export function ErrorDetailsModalODD(props: ErrorDetailsModalType): ReactNode {
   const { children, modalHeader, toggleModal } = props
 
   return (
@@ -215,7 +213,7 @@ export function NotificationBanner({
   errorKind,
 }: {
   errorKind: ErrorKind
-}): JSX.Element {
+}): ReactNode {
   const buildContent = (): JSX.Element => {
     switch (errorKind) {
       case ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE:
@@ -257,7 +255,7 @@ export function NotificationBanner({
   return buildContent()
 }
 
-export function OverpressureBanner(): JSX.Element {
+export function OverpressureBanner(): ReactNode {
   const { t } = useTranslation('error_recovery')
 
   return (
@@ -269,7 +267,7 @@ export function OverpressureBanner(): JSX.Element {
   )
 }
 
-export function TipNotDetectedBanner(): JSX.Element {
+export function TipNotDetectedBanner(): ReactNode {
   const { t } = useTranslation('error_recovery')
 
   return (
@@ -281,7 +279,7 @@ export function TipNotDetectedBanner(): JSX.Element {
   )
 }
 
-export function GripperErrorBanner(): JSX.Element {
+export function GripperErrorBanner(): ReactNode {
   const { t } = useTranslation('error_recovery')
 
   return (
@@ -293,7 +291,7 @@ export function GripperErrorBanner(): JSX.Element {
   )
 }
 
-export function StallErrorBanner(): JSX.Element {
+export function StallErrorBanner(): ReactNode {
   const { t } = useTranslation('error_recovery')
 
   return (
@@ -305,7 +303,7 @@ export function StallErrorBanner(): JSX.Element {
   )
 }
 
-export function StackerStallErrorBanner(): JSX.Element {
+export function StackerStallErrorBanner(): ReactNode {
   const { t } = useTranslation('error_recovery')
 
   return (
@@ -317,7 +315,7 @@ export function StackerStallErrorBanner(): JSX.Element {
   )
 }
 
-export function LabwareMissingErrorBanner(): JSX.Element {
+export function LabwareMissingErrorBanner(): ReactNode {
   const { t } = useTranslation('error_recovery')
 
   return (
@@ -329,7 +327,7 @@ export function LabwareMissingErrorBanner(): JSX.Element {
   )
 }
 
-export function StackerShuttleMissingErrorBanner(): JSX.Element {
+export function StackerShuttleMissingErrorBanner(): ReactNode {
   const { t } = useTranslation('error_recovery')
 
   return (
@@ -341,7 +339,7 @@ export function StackerShuttleMissingErrorBanner(): JSX.Element {
   )
 }
 
-export function StackerShuttleStoreEmptyErrorBanner(): JSX.Element {
+export function StackerShuttleStoreEmptyErrorBanner(): ReactNode {
   const { t } = useTranslation('error_recovery')
 
   return (
@@ -353,7 +351,7 @@ export function StackerShuttleStoreEmptyErrorBanner(): JSX.Element {
   )
 }
 
-export function StackerShuttleOccupiedErrorBanner(): JSX.Element {
+export function StackerShuttleOccupiedErrorBanner(): ReactNode {
   const { t } = useTranslation('error_recovery')
 
   return (
@@ -365,7 +363,7 @@ export function StackerShuttleOccupiedErrorBanner(): JSX.Element {
   )
 }
 
-export function StackerHopperOrShuttleEmptyErrorBanner(): JSX.Element {
+export function StackerHopperOrShuttleEmptyErrorBanner(): ReactNode {
   const { t } = useTranslation('error_recovery')
 
   return (
@@ -377,7 +375,7 @@ export function StackerHopperOrShuttleEmptyErrorBanner(): JSX.Element {
   )
 }
 
-export function LabwareMissingOnShuttleErrorBanner(): JSX.Element {
+export function LabwareMissingOnShuttleErrorBanner(): ReactNode {
   const { t } = useTranslation('error_recovery')
 
   return (
@@ -389,7 +387,7 @@ export function LabwareMissingOnShuttleErrorBanner(): JSX.Element {
   )
 }
 
-export function NoLiquidDetectedBanner(): JSX.Element {
+export function NoLiquidDetectedBanner(): ReactNode {
   const { t } = useTranslation('error_recovery')
 
   return (
@@ -401,7 +399,7 @@ export function NoLiquidDetectedBanner(): JSX.Element {
   )
 }
 
-export function VacuumCarboyFullErrorBanner(): JSX.Element {
+export function VacuumCarboyFullErrorBanner(): ReactNode {
   const { t } = useTranslation('error_recovery')
 
   return (
@@ -412,7 +410,7 @@ export function VacuumCarboyFullErrorBanner(): JSX.Element {
   )
 }
 
-export function VacuumPressureNotReachedErrorBanner(): JSX.Element {
+export function VacuumPressureNotReachedErrorBanner(): ReactNode {
   const { t } = useTranslation('error_recovery')
 
   return (

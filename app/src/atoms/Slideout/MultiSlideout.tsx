@@ -1,10 +1,11 @@
 import { Slideout } from './index'
 
+import type { ReactNode } from 'react'
 import type { MultiSlideoutSpecs, SlideoutProps } from './index'
 
 type MultiSlideoutProps = SlideoutProps & MultiSlideoutSpecs
 
-export const MultiSlideout = (props: MultiSlideoutProps): JSX.Element => {
+export const MultiSlideout = (props: MultiSlideoutProps): ReactNode => {
   const {
     isExpanded,
     title,

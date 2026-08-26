@@ -22,6 +22,7 @@ import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
 import { handleUpdateBuildroot } from '../UpdateBuildroot'
 
+import type { ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 
 interface RobotServerVersionProps {
@@ -33,7 +34,7 @@ const GITHUB_LINK =
 
 export function RobotServerVersion({
   robotName,
-}: RobotServerVersionProps): JSX.Element {
+}: RobotServerVersionProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared', 'branded'])
   const robot = useRobot(robotName)
   const isFlex = useIsFlex(robotName)

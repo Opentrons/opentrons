@@ -7,6 +7,8 @@ import { SmallButton } from '/app/atoms/buttons'
 
 import styles from './shared.module.css'
 
+import type { ReactNode } from 'react'
+
 interface SuccessScreenProps {
   message: string
   onFinish: () => void
@@ -15,7 +17,7 @@ interface SuccessScreenProps {
 export function SuccessScreen({
   message,
   onFinish,
-}: SuccessScreenProps): JSX.Element {
+}: SuccessScreenProps): ReactNode {
   const { t, i18n } = useTranslation('shared')
 
   return (

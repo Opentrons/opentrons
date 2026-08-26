@@ -21,10 +21,12 @@ import {
 
 import { startDiscovery } from '/app/redux/discovery'
 
+import type { ReactNode } from 'react'
+
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'
 
-export function DevicesEmptyState(): JSX.Element {
+export function DevicesEmptyState(): ReactNode {
   const { t } = useTranslation('devices_landing')
   const dispatch = useDispatch()
 
