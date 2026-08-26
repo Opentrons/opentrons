@@ -19,8 +19,8 @@ import { TertiaryButton } from '/app/atoms/buttons'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useDownloadRobotLogs } from '/app/resources/devices/hooks'
 
-import type { IconProps } from '@opentrons/components'
 import type { MouseEventHandler } from 'react'
+import type { IconProps } from '@opentrons/components'
 
 interface TroubleshootingProps {
   robotName: string
