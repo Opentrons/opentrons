@@ -8,6 +8,8 @@ import { configureStore } from '@reduxjs/toolkit'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { getUserLoginStatus } from '@opentrons/api-client'
+
 import { i18n } from '/app/i18n'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { robotAuthReducer } from '/app/redux/robot-auth/slice'
@@ -23,7 +25,6 @@ import type {
   AuthUserResetPasswordReason,
   OAuth2TokenResponse,
 } from '@opentrons/api-client'
-import { getUserLoginStatus } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client', async importOriginal => {
   const actual = (await importOriginal()) as Record<string, unknown>
@@ -67,8 +68,7 @@ function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
     locked: false,
     resetPassword,
     resetPasswordReason:
-      overrides.resetPasswordReason ??
-      (resetPassword ? 'ADMIN_FORCED' : null),
+      overrides.resetPasswordReason ?? (resetPassword ? 'ADMIN_FORCED' : null),
     ...overrides,
   }
 }
@@ -329,9 +329,7 @@ describe('LoginModal', () => {
     await waitFor(() => {
       expect(screen.getByLabelText('Password')).toBeInTheDocument()
     })
-    expect(
-      screen.getByRole('heading', { name: 'Login' })
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Login' })).toBeInTheDocument()
 
     let modalResolved = false
     void Promise.resolve(resultPromise).then(() => {

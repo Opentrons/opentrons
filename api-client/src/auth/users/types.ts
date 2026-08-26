@@ -1,9 +1,7 @@
 export type AuthUserAccountType = 'admin' | 'user' | 'auditor' | 'service'
 
 export type AuthUserResetPasswordReason =
-  | 'FIRST_TIME_LOGIN'
-  | 'PASSWORD_EXPIRED'
-  | 'ADMIN_FORCED'
+  'FIRST_TIME_LOGIN' | 'PASSWORD_EXPIRED' | 'ADMIN_FORCED'
 
 export interface AuthUser {
   username: string

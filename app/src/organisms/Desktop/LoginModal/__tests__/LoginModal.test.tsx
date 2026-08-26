@@ -63,8 +63,7 @@ function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
     ...AUTH_USER,
     resetPassword,
     resetPasswordReason:
-      overrides.resetPasswordReason ??
-      (resetPassword ? 'ADMIN_FORCED' : null),
+      overrides.resetPasswordReason ?? (resetPassword ? 'ADMIN_FORCED' : null),
     ...overrides,
   }
 }

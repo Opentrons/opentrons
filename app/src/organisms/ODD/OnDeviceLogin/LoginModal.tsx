@@ -22,7 +22,11 @@ import {
 import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLogin.module.css'
 
-import type { AuthUser, AuthUserResetPasswordReason, OAuth2TokenResponse } from '@opentrons/api-client'
+import type {
+  AuthUser,
+  AuthUserResetPasswordReason,
+  OAuth2TokenResponse,
+} from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 import type { LoginStep } from './index'
 
