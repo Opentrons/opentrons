@@ -105,7 +105,7 @@ The Vacuum Module ships in three separate boxes containing all the components re
     !!! warning
         Connect the Vacuum Module to a grounded/earthed (⏚) electrical outlet only.
 
-23. Turn on the power to the Flex. After the robot reboots, then power on the Vacuum Module. The LED status light on the Control Box illuminates <font color="red"><strong>LED STATUS LIGHT CONDITION HERE</strong></font> when the module is ready for use.
+23. Turn on the power to the Flex. After the robot reboots, then power on the Vacuum Module. The LED status light on the Control Box illuminates solid white when the module is ready for use.
 
 </div>
 

@@ -122,7 +122,7 @@ Box 3 includes the waste collection carboy and cap, a carboy holder (to help pre
 
 <figure markdown>
 ![Borosilicate glass, 2 liter carboy and cap](../images/carboy-and-cap.png "2 liter glass carboy and cap")
-<figcaption>(1) Carboy and cap, 2 L<br></figcaption>
+<figcaption>(1) Carboy and cap</figcaption>
 </figure>
 
 <figure markdown>
@@ -182,7 +182,6 @@ The Control Box includes the vacuum pump, air/water separator, electronics, and 
       <td><strong>Pump type</strong></td>
       <td>The module uses a piston-driven pump to create vacuum. The pump's flow rate is 50.1 L/min (gas).<br>
         <p><strong>Note:</strong> Pump values reflect published hardware specifications. Operational performance is controlled by Opentrons Vacuum Module software.</p>
-        <font color="red">time to set vacuum?</font>
       </td>
    </tr>
     </tr>
