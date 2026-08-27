@@ -20,7 +20,9 @@ import {
   getAuthInputPatch,
   getFieldValuesFromSettings,
   isValidLogoutIdleTime,
+  isValidMaxNumberOfLoginAttempts,
   isValidPasswordComplexityMinimumLength,
+  MAX_NUMBER_OF_LOGIN_ATTEMPTS,
   MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
 } from './complianceReadySettingsHelper'
 import {
@@ -200,6 +202,15 @@ export function ComplianceReadySoftwareSettings({
             )}
             value={String(fieldValues.maxNumberOfLoginAttempts)}
             units={t('desktop_logins')}
+            min={1}
+            max={MAX_NUMBER_OF_LOGIN_ATTEMPTS}
+            validate={value =>
+              isValidMaxNumberOfLoginAttempts(value)
+                ? null
+                : t('desktop_maximum_login_attempts_invalid', {
+                    max: MAX_NUMBER_OF_LOGIN_ATTEMPTS,
+                  })
+            }
             onBlur={value => {
               handleAuthSettingInputBlur('maxNumberOfLoginAttempts', value)
             }}

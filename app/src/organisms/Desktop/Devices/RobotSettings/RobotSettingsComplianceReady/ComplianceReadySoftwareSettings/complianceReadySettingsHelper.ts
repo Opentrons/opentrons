@@ -21,6 +21,7 @@ import type {
 const SECONDS_PER_MINUTE = 60
 const SECONDS_PER_DAY = 24 * 60 * 60
 export const MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH = 256
+export const MAX_NUMBER_OF_LOGIN_ATTEMPTS = 5
 
 export function isValidLogoutIdleTime(value: string): boolean {
   const parsedValue = Number(value)
@@ -33,6 +34,18 @@ export function isValidPasswordComplexityMinimumLength(value: string): boolean {
     Number.isInteger(parsedValue) &&
     parsedValue > 0 &&
     parsedValue <= MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH
+  )
+}
+
+export function isValidMaxNumberOfLoginAttempts(value: string): boolean {
+  if (value === '') {
+    return true
+  }
+  const parsedValue = Number(value)
+  return (
+    Number.isInteger(parsedValue) &&
+    parsedValue > 0 &&
+    parsedValue <= MAX_NUMBER_OF_LOGIN_ATTEMPTS
   )
 }
 
@@ -134,6 +147,9 @@ export function getAuthInputPatch(
 ): PatchAuthSettingsRequest | null {
   switch (id) {
     case 'maxNumberOfLoginAttempts':
+      if (!isValidMaxNumberOfLoginAttempts(value)) {
+        return null
+      }
       return {
         data: { maxNumberOfLoginAttempts: value === '' ? null : Number(value) },
       }

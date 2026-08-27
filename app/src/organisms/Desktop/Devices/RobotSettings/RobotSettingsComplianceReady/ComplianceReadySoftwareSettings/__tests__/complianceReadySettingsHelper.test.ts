@@ -83,8 +83,20 @@ describe('getFieldValuesFromSettings', () => {
 describe('getAuthInputPatch', () => {
   it('should patch maxNumberOfLoginAttempts input', () => {
     expect(
-      getAuthInputPatch('maxNumberOfLoginAttempts', '10', BASE_FIELD_VALUES)
-    ).toEqual({ data: { maxNumberOfLoginAttempts: 10 } })
+      getAuthInputPatch('maxNumberOfLoginAttempts', '3', BASE_FIELD_VALUES)
+    ).toEqual({ data: { maxNumberOfLoginAttempts: 3 } })
+  })
+
+  it('should not patch maxNumberOfLoginAttempts when value is invalid', () => {
+    expect(
+      getAuthInputPatch('maxNumberOfLoginAttempts', '0', BASE_FIELD_VALUES)
+    ).toBeNull()
+    expect(
+      getAuthInputPatch('maxNumberOfLoginAttempts', '6', BASE_FIELD_VALUES)
+    ).toBeNull()
+    expect(
+      getAuthInputPatch('maxNumberOfLoginAttempts', '3.5', BASE_FIELD_VALUES)
+    ).toBeNull()
   })
 
   it('should patch idleLogout input with minute conversion', () => {

@@ -146,6 +146,7 @@
   "desktop_login_to_manage_compliance_ready_software_settings": "Log in to manage Compliance Ready Software settings",
   "desktop_logins": "logins",
   "desktop_maximum_login_attempts_before_account_deactivation": "Maximum login attempts before account deactivation",
+  "desktop_maximum_login_attempts_invalid": "Must be a whole number between 1 and {{max}}",
   "desktop_minimum_length_for_documentation_for_robot_actions": "Edit minimum length for documentation for robot actions",
   "desktop_minimum_password_length": "Minimum password length",
   "desktop_minimum_password_length_invalid": "Must be a whole number between 1 and {{max}}",
