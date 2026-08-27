@@ -8,6 +8,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useRobot } from '/app/redux-resources/robots'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
+import { logOut } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   useOAuth2PasswordLogin,
@@ -333,6 +334,22 @@ describe('LoginModal', () => {
     expect(screen.getByLabelText('New password')).toHaveFocus()
     screen.getByLabelText('Confirm password')
     screen.getByRole('button', { name: 'Confirm' })
+  })
+
+  it('logs out when closing the set new password view', () => {
+    mockLoginRequiringPasswordReset()
+
+    renderAndOpenLoginModal()
+    logInWithTempPassword()
+
+    fireEvent.click(
+      screen.getByTestId(
+        'ModalHeader_icon_close_Compliance Ready Software login'
+      )
+    )
+
+    expect(vi.mocked(logOut)).toHaveBeenCalledWith({ robotName: ROBOT_NAME })
+    expect(screen.queryByText('Your password has expired')).toBeNull()
   })
 
   it('returns to login after setting a new password', () => {

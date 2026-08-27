@@ -146,6 +146,9 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
     useState<boolean>(false)
 
   const handleClose = (): void => {
+    if (screen.kind === 'setNewPassword') {
+      dispatch(logOut({ robotName }))
+    }
     modal.resolve(null)
     modal.remove()
   }
