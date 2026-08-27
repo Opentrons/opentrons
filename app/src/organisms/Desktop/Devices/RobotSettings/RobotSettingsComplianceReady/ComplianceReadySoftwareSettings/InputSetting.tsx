@@ -14,7 +14,7 @@ export interface InputSettingProps {
   min?: number
   max?: number
   validate?: (value: string) => string | null
-  onBlur: (value: string) => void
+  onBlur: (value: string) => void | Promise<void>
 }
 
 export function InputSetting({
@@ -62,11 +62,13 @@ export function InputSetting({
             }
           }}
           onBlur={event => {
-            const value = event.target.value
-            const validationError = validate?.(value) ?? null
+            const blurredValue = event.target.value
+            const validationError = validate?.(blurredValue) ?? null
             setError(validationError)
             if (validationError == null) {
-              onBlur(value)
+              void Promise.resolve(onBlur(blurredValue)).catch(() => {
+                setInputValue(value)
+              })
             }
           }}
         />

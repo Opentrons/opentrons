@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
 import {
+  DocumentedMutationError,
   useAuditSettingsMutation,
   useAuditSettingsQuery,
   useAuthSettingsMutation,
@@ -166,6 +167,7 @@ describe('ComplianceReadySoftwareSettings', () => {
     } as ReturnType<typeof useAuditSettingsQuery>)
     vi.mocked(useAuthSettingsMutation).mockReturnValue({
       mutate: mockPatchAuthSettings,
+      mutateAsync: mockPatchAuthSettings,
     } as any)
     vi.mocked(usePatchRobotServerAccessControlSettingsMutation).mockReturnValue(
       {
@@ -174,6 +176,7 @@ describe('ComplianceReadySoftwareSettings', () => {
     )
     vi.mocked(useAuditSettingsMutation).mockReturnValue({
       mutate: mockPatchAuditSettings,
+      mutateAsync: mockPatchAuditSettings,
     } as any)
     vi.mocked(useUsersQuery).mockReturnValue(
       mockSuccessQueryResults({
@@ -399,6 +402,27 @@ describe('ComplianceReadySoftwareSettings', () => {
       expect(mockPatchAuthSettings).toHaveBeenCalledWith({
         data: { maxNumberOfLoginAttempts: 3 },
       })
+    })
+  })
+
+  it('should revert auth input values when documentation is cancelled', async () => {
+    mockPatchAuthSettings.mockRejectedValue(
+      new DocumentedMutationError('no_documentation_report')
+    )
+
+    render()
+    expandAccordion()
+
+    const loginAttemptsField = screen.getByLabelText(
+      'Maximum login attempts before account deactivation'
+    )
+    fireEvent.change(loginAttemptsField, { target: { value: '1' } })
+    expect(loginAttemptsField).toHaveValue(1)
+
+    fireEvent.blur(loginAttemptsField)
+
+    await waitFor(() => {
+      expect(loginAttemptsField).toHaveValue(5)
     })
   })
   it('should update audit input values without patching until blur', async () => {
