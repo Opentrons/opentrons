@@ -42,8 +42,8 @@ class User(Base):
     password_set_at: Mapped[datetime]
     # When true, the account was deactivated by an admin and cannot log in.
     deactivated: Mapped[bool] = mapped_column(server_default=false(), default=False)
-    # A flag that this user must reset their password for reasons other than time-based expiration.
-    reset_password: Mapped[bool] = mapped_column(server_default=false(), default=False)
+    # Why the user must reset their password for reasons other than time-based expiration.
+    reset_password_reason: Mapped[str | None] = mapped_column(default=None)
 
     failed_logins: Mapped[list[FailedLogin]] = relationship(
         order_by="FailedLogin.attempted_at",
