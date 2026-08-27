@@ -46,19 +46,19 @@ export function useDeleteRunMutation(
   >(
     documentationState,
     ['delete_run'],
-    ({
+    async ({
       variables: { runId },
       userNotes,
-    }: DocumentedMutationParameters<DeleteRunParams>) =>
-      deleteRun(host!, runId, userNotes).then(response => {
-        queryClient.removeQueries(getQueryKey(host, 'runs', runId))
-        queryClient
-          .invalidateQueries(getQueryKey(host, 'runs'))
-          .catch((e: Error) => {
-            console.error(`error invalidating runs query: ${e.message}`)
-          })
-        return response.data
-      }),
+    }: DocumentedMutationParameters<DeleteRunParams>) => {
+      const response = await deleteRun(host!, runId, userNotes)
+      queryClient.removeQueries(getQueryKey(host, 'runs', runId))
+      await queryClient
+        .invalidateQueries(getQueryKey(host, 'runs'))
+        .catch((e: Error) => {
+          console.error(`error invalidating runs query: ${e.message}`)
+        })
+      return response.data
+    },
     options
   )
 
