@@ -28,7 +28,7 @@ stages:
           accountType: user
           locked: false
           resetPassword: false
-          resetPasswordReason: NONE
+
   - name: List users as admin
     request:
       method: GET
@@ -58,7 +58,6 @@ stages:
           username: test_new_user
           locked: false
           resetPassword: false
-          resetPasswordReason: NONE
   - name: Update the user
     request:
       method: PATCH
@@ -78,7 +77,6 @@ stages:
           username: test_new_user
           locked: false
           resetPassword: false
-          resetPasswordReason: NONE
   - name: Update the username
     request:
       method: PATCH
@@ -97,7 +95,6 @@ stages:
           username: test_new_user_upd
           locked: false
           resetPassword: false
-          resetPasswordReason: NONE
   - name: Update the reset password flag
     request:
       method: PATCH
@@ -116,7 +113,6 @@ stages:
           username: test_new_user_upd
           locked: false
           resetPassword: true
-          resetPasswordReason: ADMIN_FORCED
   - name: Get the user information
     request:
       method: GET
@@ -132,7 +128,6 @@ stages:
           username: test_new_user_upd
           locked: false
           resetPassword: true
-          resetPasswordReason: ADMIN_FORCED
   - name: Reset the user's password to a temporary password
     request:
       method: POST
@@ -151,7 +146,6 @@ stages:
           username: test_new_user_upd
           locked: false
           resetPassword: true
-          resetPasswordReason: ADMIN_FORCED
           temporaryPassword: !anystr
 
   - name: Log in with the temporary password
@@ -206,7 +200,7 @@ stages:
           username: test_new_user_upd
           locked: false
           resetPassword: false
-          resetPasswordReason: NONE
+
   - name: Get a new access token with the updated username and password
     request:
       method: POST
@@ -488,7 +482,7 @@ stages:
           accountType: user
           locked: false
           resetPassword: false
-          resetPasswordReason: NONE
+
   - name: Reject self update with a duplicate username
     request:
       method: PATCH
@@ -536,7 +530,7 @@ stages:
           accountType: user
           locked: false
           resetPassword: false
-          resetPasswordReason: NONE
+
 ---
 test_name: Creating a user with an existing username
 
@@ -613,7 +607,6 @@ stages:
           accountType: user
           locked: false
           resetPassword: true
-          resetPasswordReason: FIRST_TIME_LOGIN
           temporaryPassword: !anystr
 
   - name: Get the user and confirm resetPassword is true
@@ -631,7 +624,6 @@ stages:
           accountType: user
           locked: false
           resetPassword: true
-          resetPasswordReason: FIRST_TIME_LOGIN
 
   - name: User can log in with the temporary password but only gets self-write scopes
     request:
