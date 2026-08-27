@@ -1,0 +1,57 @@
+test_name: User login status endpoint
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+      - seed_users
+
+stages:
+  - name: Login status is false for a user without reset required
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/byUsername/testuser/loginStatus'
+    response:
+      status_code: 200
+      json:
+        data:
+          resetPassword: false
+
+  - name: Create a user without a password
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: login_status_user
+          fullName: Login Status User
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 201
+      json:
+        data:
+          username: login_status_user
+          fullName: Login Status User
+          accountType: user
+          locked: false
+          resetPassword: true
+          temporaryPassword: !anystr
+
+  - name: Login status is true when reset password is required
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/byUsername/login_status_user/loginStatus'
+    response:
+      status_code: 200
+      json:
+        data:
+          resetPassword: true
+
+  - name: Login status returns 404 for unknown user
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/byUsername/unknown_user/loginStatus'
+    response:
+      status_code: 404

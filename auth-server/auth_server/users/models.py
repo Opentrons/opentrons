@@ -136,6 +136,20 @@ class UserResponse(BaseModel):
     ]
 
 
+class UserLoginStatus(BaseModel):
+    """Pre-authentication login hints for a user."""
+
+    resetPassword: Annotated[
+        bool,
+        Field(
+            description=(
+                "If true, the user must sign in with a temporary or one-time password"
+                " and set a new password before full robot access."
+            )
+        ),
+    ]
+
+
 class TemporaryPasswordResponse(UserResponse):
     """Response body for a user, optionally including a newly generated temporary password."""
 

@@ -315,7 +315,9 @@ export function UserManagement({
       {resetPasswordTemporaryPassword != null ? (
         <OneTimePasswordModal
           password={resetPasswordTemporaryPassword}
-          message={t('desktop_add_user_success_message') as string}
+          message={
+            t('desktop_reset_password_one_time_password_message') as string
+          }
           onConfirm={handleResetPasswordCancel}
           onClose={handleResetPasswordCancel}
         />

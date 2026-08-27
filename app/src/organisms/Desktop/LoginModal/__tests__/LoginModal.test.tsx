@@ -57,7 +57,10 @@ const AUTH_USER: AuthUser = {
 }
 
 function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
-  return { ...AUTH_USER, ...overrides }
+  return {
+    ...AUTH_USER,
+    ...overrides,
+  }
 }
 
 function mockLoginSuccess(
