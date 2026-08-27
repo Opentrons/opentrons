@@ -9,10 +9,18 @@ from opentrons.protocol_engine import DeckType
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 
 from robot_server.runs.run_process import DirectedRunProcess, register_all_needed_types
+from robot_server.service.logging import initialize_logging
+
+import logging
+
+log = logging.getLogger(__name__)
 
 
 def initialize_run_process(process_name: str) -> threading.Thread:
     """Build an instance of the DirectedRunProcess, create a thread to run it, and return a pyro daemon thread."""
+
+    initialize_logging()
+    log.info(f"run process {process_name} begins")
 
     def _start_and_run_process(process: DirectedRunProcess) -> None:
         process.loop = asyncio.new_event_loop()
