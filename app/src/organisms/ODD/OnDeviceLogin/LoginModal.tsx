@@ -1,4 +1,4 @@
-import { useCallback, useId, useState } from 'react'
+import { useCallback, useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
@@ -10,7 +10,7 @@ import {
   SUCCESS_TOAST,
   Toast,
 } from '@opentrons/components'
-import { useAuthSettingsQuery } from '@opentrons/react-api-client'
+import { useAuthSettingsQuery, useHost } from '@opentrons/react-api-client'
 
 import { getLocalRobot } from '/app/redux/discovery'
 import { useUsernameForRobot } from '/app/redux/robot-auth'
@@ -34,6 +34,8 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const modal = useModal()
   const { t } = useTranslation(['access_control'])
   const passwordUpdatedToastId = useId()
+  const host = useHost()
+  const shouldShowPasswordUpdatedToastRef = useRef(false)
   const [phase, setPhase] = useState<LoginModalPhase>('login')
   const [step, setStep] = useState<LoginStep>('username')
   const [loginError, setLoginError] = useState<string | null>(null)
@@ -80,34 +82,18 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
         setStep('password')
       } else {
         finishModal(username, {
-          showPasswordUpdatedToast: isChoosingNewPassword,
+          showPasswordUpdatedToast: shouldShowPasswordUpdatedToastRef.current,
         })
+        shouldShowPasswordUpdatedToastRef.current = false
       }
     },
-    [finishModal, storeLoginState, localRobotName, isChoosingNewPassword]
+    [finishModal, storeLoginState, localRobotName]
   )
 
   const dismissModal = useCallback((): void => {
     modal.resolve(null)
     modal.remove()
   }, [modal])
-
-  const handleNewPasswordSuccess = useCallback(
-    (username: string) => {
-      setLoginError(null)
-      setLoginUsername(username)
-      if (localRobotName != null) {
-        dispatch(logOut({ robotName: localRobotName }))
-      }
-      if (host != null) {
-        void queryClient.invalidateQueries(getSelfQueryKey(host))
-      }
-      setLoginResetPassword(false)
-      setPhase('login')
-      setStep('password')
-    },
-    [dispatch, host, localRobotName, queryClient]
-  )
 
   const handleUsernameSubmit = async (username: string): Promise<void> => {
     setLoginUsername(username)
@@ -135,6 +121,11 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const handleNewPasswordSuccess = useCallback(
     (username: string, newPassword: string) => {
       setLoginError(null)
+      shouldShowPasswordUpdatedToastRef.current = true
+      setLoginResetPassword(false)
+      setLoginUsername(username)
+      setPhase('login')
+      setStep('password')
       submitPassword(username, newPassword)
     },
     [submitPassword]

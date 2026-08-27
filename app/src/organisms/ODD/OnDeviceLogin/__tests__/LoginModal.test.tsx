@@ -323,14 +323,8 @@ describe('LoginModal', () => {
     })
     expect(screen.getByRole('heading', { name: 'Login' })).toBeInTheDocument()
 
-    let modalResolved = false
-    void Promise.resolve(resultPromise).then(() => {
-      modalResolved = true
-    })
-    await new Promise(resolve => setTimeout(resolve, 50))
-    expect(modalResolved).toBe(false)
-  })
     expect(await screen.findByText('Password updated')).toBeInTheDocument()
+    fireEvent.click(screen.getByTestId('Toast_success'))
     await expect(resultPromise).resolves.toEqual({ username: 'alice' })
   }, 10000)
 
