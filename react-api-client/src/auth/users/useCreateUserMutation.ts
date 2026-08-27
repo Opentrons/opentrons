@@ -1,7 +1,10 @@
+import { useQueryClient } from 'react-query'
+
 import { createUser } from '@opentrons/api-client'
 
 import { useDocumentedMutation } from '../../accessControl'
-import { getQueryKey, useHost } from '../../api'
+import { useHost } from '../../api'
+import { getUsersQueryKey } from './useUsersQuery'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -36,12 +39,15 @@ export function useCreateUserMutation(
   > = {}
 ): UseCreateUserMutationResult {
   const host = useHost()
+  const queryClient = useQueryClient()
   const mutation = useDocumentedMutation(
     documentationState,
     ['create_user'],
-    getQueryKey(host, 'auth', 'users'),
     ({ variables: data, userNotes }) =>
-      createUser(host!, data, userNotes).then(response => response.data),
+      createUser(host!, data, userNotes).then(response => {
+        void queryClient.invalidateQueries(getUsersQueryKey(host))
+        return response.data
+      }),
     options
   )
 
