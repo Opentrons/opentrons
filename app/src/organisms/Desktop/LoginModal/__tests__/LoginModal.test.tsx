@@ -119,7 +119,7 @@ function mockSetNewPasswordSuccess(
   vi.mocked(useSetNewPasswordAndSignIn).mockImplementation(({ onSuccess }) => ({
     submitNewPassword: (username: string, password: string) => {
       onSubmit?.(username, password)
-      onSuccess(username)
+      onSuccess(username, password)
     },
     isLoading: false,
   }))
@@ -191,8 +191,33 @@ describe('LoginModal', () => {
     screen.getByText('Compliance Ready Software login')
     expect(screen.getByLabelText('Username')).toHaveFocus()
     screen.getByLabelText('Password')
+    screen.getByRole('button', { name: 'Toggle password visibility' })
     screen.getByRole('button', { name: 'Forgot password?' })
     expect(screen.getByRole('button', { name: 'Log in' })).toBeEnabled()
+  })
+
+  it('masks the password and reveals it when the visibility toggle is clicked', () => {
+    renderAndOpenLoginModal()
+
+    fireEvent.change(screen.getByLabelText('Password'), {
+      target: { value: 'secret-password' },
+    })
+    const passwordInput = screen.getByLabelText('Password')
+    expect(passwordInput).toHaveAttribute('type', 'password')
+    expect(passwordInput).toHaveValue('secret-password')
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Toggle password visibility' })
+    )
+
+    expect(passwordInput).toHaveAttribute('type', 'text')
+    expect(passwordInput).toHaveValue('secret-password')
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Toggle password visibility' })
+    )
+
+    expect(passwordInput).toHaveAttribute('type', 'password')
   })
 
   it('shows required field errors when log in is clicked with empty fields', () => {
@@ -405,9 +430,8 @@ describe('LoginModal', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'Log in' }))
 
-    screen.getByText('Robot encryption key verification')
+    expect(screen.getAllByText('Robot encryption key')).toHaveLength(2)
     screen.getByText('Verify robot encryption key')
-    screen.getByLabelText('Robot encryption key')
     expect(screen.queryByText('Network Error')).toBeNull()
   })
 })

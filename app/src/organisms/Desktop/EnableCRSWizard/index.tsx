@@ -6,7 +6,7 @@ import {
   useForm,
   useFormContext,
 } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import {
@@ -296,10 +296,21 @@ function VerifyRobotEncryptionKeyPage({
         <div className={styles.step_body}>
           <div className={styles.text_block}>
             <StyledText desktopStyle="headingSmallBold">
-              {t('setup_wizard_verify_encryption_key_title')}
+              {t('device_settings:verify_robot_encryption_key')}
             </StyledText>
             <StyledText desktopStyle="bodyDefaultRegular">
-              {t('setup_wizard_verify_encryption_key_description')}
+              <Trans
+                t={t}
+                i18nKey="device_settings:enter_the_encryption_key"
+                components={{
+                  b: (
+                    <StyledText
+                      desktopStyle="bodyDefaultSemiBold"
+                      display="inline"
+                    />
+                  ),
+                }}
+              />
             </StyledText>
           </div>
           <InputField
@@ -400,7 +411,9 @@ function CreateAdminAccountPage({
       header={header}
       footer={
         <div className={styles.footer}>
-          <SecondaryButton onClick={onBack}>{t('shared:back')}</SecondaryButton>
+          <SecondaryButton type="button" onClick={onBack}>
+            {t('shared:back')}
+          </SecondaryButton>
           <PrimaryButton type="submit" form={formId}>
             {t('shared:next')}
           </PrimaryButton>
@@ -448,6 +461,9 @@ function CreateAdminAccountPage({
                   autoFocus
                   error={fieldState.error?.message}
                   {...field}
+                  // Validate only on Next submit. Form mode is onBlur, so
+                  // Back would otherwise mark empty fields as required on mousedown.
+                  onBlur={undefined}
                 />
               )}
             />
@@ -460,6 +476,7 @@ function CreateAdminAccountPage({
                   title={t('setup_wizard_legal_name')}
                   error={fieldState.error?.message}
                   {...field}
+                  onBlur={undefined}
                 />
               )}
             />

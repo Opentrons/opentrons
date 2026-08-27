@@ -14,7 +14,7 @@ from uuid import uuid4
 
 import Pyro5.api
 
-from opentrons.config import feature_flags
+from opentrons.config import feature_flags, robot_configs
 from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
 
 from . import run_process_entry_point
@@ -62,6 +62,10 @@ class RunProcessPyroProvider:
 
         self._teardown_signal = asyncio.Event()
         self._process_maintainer_task: asyncio.Task[None] | None = None
+        config = robot_configs.load()
+        self._run_log_level = logging._levelToName[
+            logging._nameToLevel.get(config.log_level.upper(), logging.INFO)
+        ]
 
     def initialize(self, access_control_mode: bool) -> None:
         """Called when server first starts up.
@@ -112,7 +116,9 @@ class RunProcessPyroProvider:
                 self._run_processes.append(
                     _RunProcess(
                         pyroname=pyro_id,
-                        process=self._start_run_process(process_name=pyro_id),
+                        process=self._start_run_process(
+                            process_name=pyro_id, log_level=self._run_log_level
+                        ),
                         status=_ProcessStatus.UNUSED,
                     )
                 )
@@ -121,7 +127,9 @@ class RunProcessPyroProvider:
                 self._simulating_run_processes.append(
                     _RunProcess(
                         pyroname=sim_pyro_id,
-                        process=self._start_run_process(process_name=sim_pyro_id),
+                        process=self._start_run_process(
+                            process_name=sim_pyro_id, log_level="NONE"
+                        ),
                         status=_ProcessStatus.UNUSED,
                     )
                 )
@@ -243,6 +251,7 @@ class RunProcessPyroProvider:
         user_name: str,
         main_group_id: int,
         supplemental_group_ids: list[int],
+        log_level: str,
     ) -> subprocess.Popen[bytes]:
         return subprocess.Popen(
             args=[
@@ -251,6 +260,8 @@ class RunProcessPyroProvider:
                 run_process_entry_point.__name__,
                 "--pyroname",
                 process_name,
+                "--loglevel",
+                log_level,
             ],
             env={k: v for k, v in os.environ.items()},
             user=user_name,
@@ -282,12 +293,15 @@ class RunProcessPyroProvider:
         await self._end_process(process=process.process)
         process_registry.remove(process)
 
-    def _start_run_process(self, process_name: str) -> subprocess.Popen[bytes]:
+    def _start_run_process(
+        self, process_name: str, log_level: str
+    ) -> subprocess.Popen[bytes]:
         return self._open_process(
             process_name=process_name,
             user_name=self._process_username,
             main_group_id=self._process_gid,
             supplemental_group_ids=self._supplemental_gids,
+            log_level=log_level,
         )
 
     def _set_user_subprocess_for(self, username: str) -> None:

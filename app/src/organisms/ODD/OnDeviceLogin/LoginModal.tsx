@@ -1,17 +1,19 @@
-import { useCallback, useState } from 'react'
-import { useQueryClient } from 'react-query'
-import { useDispatch, useSelector } from 'react-redux'
+import { useCallback, useId, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import { getUserLoginStatus } from '@opentrons/api-client'
 import {
-  getSelfQueryKey,
-  useAuthSettingsQuery,
-  useHost,
-} from '@opentrons/react-api-client'
+  POSITION_FIXED,
+  SPACING,
+  SUCCESS_TOAST,
+  Toast,
+} from '@opentrons/components'
+import { useAuthSettingsQuery } from '@opentrons/react-api-client'
 
 import { getLocalRobot } from '/app/redux/discovery'
-import { logOut, useUsernameForRobot } from '/app/redux/robot-auth'
+import { useUsernameForRobot } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
   DEFAULT_MIN_PASSWORD_LENGTH,
@@ -30,9 +32,8 @@ type LoginModalPhase = 'login' | 'chooseNewPassword'
 
 const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const modal = useModal()
-  const dispatch = useDispatch()
-  const host = useHost()
-  const queryClient = useQueryClient()
+  const { t } = useTranslation(['access_control'])
+  const passwordUpdatedToastId = useId()
   const [phase, setPhase] = useState<LoginModalPhase>('login')
   const [step, setStep] = useState<LoginStep>('username')
   const [loginError, setLoginError] = useState<string | null>(null)
@@ -41,6 +42,9 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   )
   const [loginResetPassword, setLoginResetPassword] = useState(false)
   const [isFetchingLoginStatus, setIsFetchingLoginStatus] = useState(false)
+  const [passwordUpdatedUsername, setPasswordUpdatedUsername] = useState<
+    string | null
+  >(null)
   const storeLoginState = useStoreLoginState()
   const localRobotName = useSelector(
     (state: State) => getLocalRobot(state)?.name ?? null
@@ -50,7 +54,15 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const isChoosingNewPassword = phase === 'chooseNewPassword'
 
   const finishModal = useCallback(
-    (username: string): void => {
+    (
+      username: string,
+      options?: { showPasswordUpdatedToast?: boolean }
+    ): void => {
+      if (options?.showPasswordUpdatedToast === true) {
+        setPasswordUpdatedUsername(username)
+        return
+      }
+
       modal.resolve({ username })
       modal.remove()
     },
@@ -67,10 +79,12 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
         setPhase('chooseNewPassword')
         setStep('password')
       } else {
-        finishModal(username)
+        finishModal(username, {
+          showPasswordUpdatedToast: isChoosingNewPassword,
+        })
       }
     },
-    [finishModal, storeLoginState, localRobotName]
+    [finishModal, storeLoginState, localRobotName, isChoosingNewPassword]
   )
 
   const dismissModal = useCallback((): void => {
@@ -117,6 +131,14 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
         setLoginError(message)
       },
     })
+
+  const handleNewPasswordSuccess = useCallback(
+    (username: string, newPassword: string) => {
+      setLoginError(null)
+      submitPassword(username, newPassword)
+    },
+    [submitPassword]
+  )
 
   const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
     useSetNewPasswordAndSignIn({
@@ -175,6 +197,20 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
         passwordComplexity={passwordComplexity}
         onCancel={handleCancel}
       />
+      {passwordUpdatedUsername != null ? (
+        <Toast
+          id={passwordUpdatedToastId}
+          message={t('on_device_login_password_updated') as string}
+          type={SUCCESS_TOAST}
+          displayType="odd"
+          position={POSITION_FIXED}
+          right={SPACING.spacing32}
+          bottom={SPACING.spacing32}
+          onClose={() => {
+            finishModal(passwordUpdatedUsername)
+          }}
+        />
+      ) : null}
     </div>
   )
 })

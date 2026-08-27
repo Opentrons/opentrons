@@ -37,7 +37,6 @@ def get_scope_set_of_account_type(
 
         elif account_type == AccountType.USER:
             result = {
-                Scope.PROTOCOL_ANALYSES_WRITE,
                 Scope.RESTART_WRITE,
                 Scope.ROBOT_CONTROL_WRITE,
                 Scope.ROBOT_SETTINGS_WRITE,

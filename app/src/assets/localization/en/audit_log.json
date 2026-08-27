@@ -18,7 +18,6 @@
   "create_camera_image_settings": "Updating camera image settings",
   "create_offsets": "Saving new labware offsets",
   "create_protocol": "Creating protocol",
-  "create_protocol_analysis": "Analyzing protocol on robot",
   "create_run": "Creating run",
   "create_user": "Creating user",
   "delete_log_period": "Deleting log period",

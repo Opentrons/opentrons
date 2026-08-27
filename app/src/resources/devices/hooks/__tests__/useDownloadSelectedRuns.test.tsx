@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
@@ -9,6 +10,7 @@ import { saveFileToUsb } from '/app/redux/shell/remote'
 
 import { useDownloadSelectedRuns } from '../useDownloadSelectedRuns'
 
+import type { FunctionComponent } from 'react'
 import type { HostConfig, RunData } from '@opentrons/api-client'
 
 const mockJSZip = vi.hoisted(() => ({
@@ -50,7 +52,14 @@ const mockRunTwo = {
 } as unknown as RunData
 
 describe('useDownloadSelectedRuns', () => {
+  let wrapper: FunctionComponent<{ children: React.ReactNode }>
+
   beforeEach(() => {
+    const queryClient = new QueryClient()
+    wrapper = ({ children }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    )
+
     when(vi.mocked(useHost)).calledWith().thenReturn(HOST_CONFIG)
     vi.mocked(useAllProtocolsQuery).mockReturnValue({ data: undefined } as any)
     vi.mocked(getRunRaw).mockResolvedValue({
@@ -69,17 +78,21 @@ describe('useDownloadSelectedRuns', () => {
   })
 
   it('should reject and not fetch when given an empty array', async () => {
-    const { result } = renderHook(() => useDownloadSelectedRuns(ROBOT_NAME))
+    const { result } = renderHook(() => useDownloadSelectedRuns(ROBOT_NAME), {
+      wrapper,
+    })
 
-    await expect(result.current.downloadRuns([])).rejects.toThrow()
+    await expect(result.current.mutateAsync({ runs: [] })).rejects.toThrow()
 
     expect(getRunRaw).not.toHaveBeenCalled()
   })
 
   it('should fetch every run, zip them, and save via the browser when no usbPath is given', async () => {
-    const { result } = renderHook(() => useDownloadSelectedRuns(ROBOT_NAME))
+    const { result } = renderHook(() => useDownloadSelectedRuns(ROBOT_NAME), {
+      wrapper,
+    })
 
-    await result.current.downloadRuns([mockRunOne, mockRunTwo])
+    await result.current.mutateAsync({ runs: [mockRunOne, mockRunTwo] })
 
     expect(getRunRaw).toHaveBeenCalledWith(
       HOST_CONFIG,
@@ -109,9 +122,14 @@ describe('useDownloadSelectedRuns', () => {
   })
 
   it('should save to the usbPath instead of the browser when provided', async () => {
-    const { result } = renderHook(() => useDownloadSelectedRuns(ROBOT_NAME))
+    const { result } = renderHook(() => useDownloadSelectedRuns(ROBOT_NAME), {
+      wrapper,
+    })
 
-    await result.current.downloadRuns([mockRunOne], '/mnt/usb')
+    await result.current.mutateAsync({
+      runs: [mockRunOne],
+      callTimeUsbPath: '/mnt/usb',
+    })
 
     expect(saveFileToUsb).toHaveBeenCalledWith(
       `/mnt/usb/${ROBOT_NAME}-run-records.zip`,
@@ -120,59 +138,47 @@ describe('useDownloadSelectedRuns', () => {
     expect(mockSaveAs).not.toHaveBeenCalled()
   })
 
-  it('should prefer a call-time usbPath over the one passed to the hook', async () => {
-    const { result } = renderHook(() => useDownloadSelectedRuns(ROBOT_NAME))
-
-    await result.current.downloadRuns([mockRunOne], '/mnt/other-usb')
-
-    expect(saveFileToUsb).toHaveBeenCalledWith(
-      `/mnt/other-usb/${ROBOT_NAME}-run-records.zip`,
-      expect.any(ArrayBuffer)
-    )
-  })
-
-  it('should set hasError and stop downloading when a run fails to fetch', async () => {
+  it('should reject when every run fails to fetch', async () => {
     vi.mocked(getRunRaw).mockRejectedValue(new Error('nope'))
-    const { result } = renderHook(() => useDownloadSelectedRuns(ROBOT_NAME))
+    const { result } = renderHook(() => useDownloadSelectedRuns(ROBOT_NAME), {
+      wrapper,
+    })
 
-    await result.current.downloadRuns([mockRunOne]).catch(() => {})
+    await expect(
+      result.current.mutateAsync({ runs: [mockRunOne] })
+    ).rejects.toThrow('Failed to download any of the selected run records.')
 
     await waitFor(() => {
-      expect(result.current.hasError).toEqual(true)
+      expect(result.current.status).toEqual('error')
     })
-    expect(result.current.isDownloading).toEqual(false)
   })
 
-  it('should ignore a second call while a download is already in flight', async () => {
-    let resolveFirstFetch: () => void = () => {}
+  it('should report a loading status while a download is in flight', async () => {
+    let resolveFetch: () => void = () => {}
     vi.mocked(getRunRaw).mockImplementation(
       () =>
         new Promise(resolve => {
-          resolveFirstFetch = () => {
+          resolveFetch = () => {
             resolve({
               data: { arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)) },
             } as any)
           }
         })
     )
-    const { result } = renderHook(() => useDownloadSelectedRuns(ROBOT_NAME))
-
-    const firstCall = result.current.downloadRuns([mockRunOne])
-    await waitFor(() => {
-      expect(result.current.isDownloading).toEqual(true)
+    const { result } = renderHook(() => useDownloadSelectedRuns(ROBOT_NAME), {
+      wrapper,
     })
 
-    await result.current.downloadRuns([mockRunTwo]).catch(() => {})
+    const firstCall = result.current.mutateAsync({ runs: [mockRunOne] })
+    await waitFor(() => {
+      expect(result.current.status).toEqual('loading')
+    })
 
-    expect(getRunRaw).toHaveBeenCalledTimes(1)
-    expect(getRunRaw).toHaveBeenCalledWith(
-      HOST_CONFIG,
-      'run-1',
-      DEFAULT_RUN_DOWNLOAD_PARAMS,
-      'blob'
-    )
-
-    resolveFirstFetch()
+    resolveFetch()
     await firstCall
+
+    await waitFor(() => {
+      expect(result.current.status).toEqual('success')
+    })
   })
 })
