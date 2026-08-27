@@ -23,4 +23,4 @@ If you choose to download [files](using/files.md) from the Flex touchscreen, you
   <figcaption>Add an external storage device to download files directly from the Flex.</figcaption>
 </figure>
 
-You can connect a USB storage device using the Flex's front USB port.
+You can connect a USB storage device using the Flex's front [USB port].

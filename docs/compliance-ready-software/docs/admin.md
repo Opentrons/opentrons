@@ -7,20 +7,16 @@ Administrators can customize compliance ready settings in the Opentrons App and 
 
 For a complete list of Flex robot settings, see the [Flex Instruction Manual]. 
 
-<!---------
-
-TODO + comments: 
-- properly link flex manual
--------------->
-
 ## Access settings
 
 In the Opentrons App, click the **Devices** page on the left side, then choose **Robot Settings**. Click the **Compliance Ready** tab to view available settings.
 
 <figure class="screenshot" markdown>
   ![Image showing an open keyboard for documentation on the Flex touchscreen.](images/crs-settings-app.png)
-  <figcaption>Use the keyboard to enter documentation on the Flex touchscreen.</figcaption>
+  <figcaption>Access Compliance Ready Software settings in the Opentrons App.</figcaption>
 </figure>
+
+The administrator view shown above includes personal account settings, user managament, and Compliance Ready Software settings. When logged in, users will only be able to manage their [personal account settings](#personal-account-settings).
 
 On the Flex touchscreen, tap the **Settings** tab, then **Compliance Ready Software**. 
 
@@ -50,7 +46,7 @@ Administrators can unlock or delete users accounts, reset passwords, or edit use
   <figcaption>Administrators can manage user accounts in compliance-ready settings.</figcaption>
 </figure>
 
-All accounts are locked by default after 5 failed login attempts. After unlocking an account, users will receive a one-time password, and can choose a new one after logging in.
+All accounts are locked by default after 5 failed login attempts. An administrator must unlock a locked account and provide the user with their one-time password. Users can choose a new password after successfully logging in.
 
 <figure class="screenshot" markdown>
   ![Image showing a one time password generation for a locked user account.](images/one-time.png)
@@ -69,30 +65,20 @@ Administrators can make changes to security, documentation, and storage settings
 | **Login attempts** | <ul><li>Maximum login attempts before the account locks.</li><li>Default: 5.</li></ul> |
 | **Passwords** | <ul><li>Time before user passwords must be changed (default: 30 days).</li></li><li>Password complexity, like minimum length (default: 20 characters) or special character requirements</li></ul> |
 | **Screen timeout** | <ul><li>Time before the Opentrons App or Flex touchscreen lock due to inactivity.</li><li>Default: 3 minutes.</li></ul> |
-| **User permissions** | <ul><li>Whether administrator credentials are required for updating the Flex, sending protocols to the Flex, or signing run protocol run records.</li></ul> |
+| **User permissions** | <ul><li>Whether administrator credentials are required to update the Flex, send protocols to the Flex, or sign to complete a protocol run.</li></ul> |
 | **Documentation** | <ul><li>Whether to require documentation for robot actions, like dropping attached tips or homing the gantry.</li><li>Set minimum character length (default: 20 characters).</li></ul> |
-| **Files** | <ul><li>Whether to require protocol logs to be signed and saved in the Opentrons App.</li><li>Automatically delete protocol logs when the Flex reaches its storage limit (20 logs).</li></ul> |
-<!---------
-
-TODO and comments: 
-- I chose a better name for these categories that I'll have to revert. sigh. example: "user permissions" instead of "Actions requiring admin credentials"
-- do both the app and ODD lock upon screen timeout? 
-------->
+| **Files** | <ul><li>Whether to require protocol logs to be in the Opentrons App.</li><li>Automatically delete protocol logs when the Flex reaches its storage limit (20 logs).</li></ul> |
 
 ## File source folder
 
 You can choose a location to automatically download and save [files](using/files.md) from the Opentrons App.
 
-Choose **App Settings** in the Opentrons App, then click the **Advanced** tab and click to select a folder.
+Click the :material-cog: in the lower left to access **App settings**. Select the **Advanced** tab and click **Select folder** to choose a storage location from your computer's directory.
+
+If robot settings, like your Flex's name, are ever changed, you may need to repeat this process.
 
 <figure class="screenshot" markdown>
   ![Image showing an open keyboard for documentation on the Flex touchscreen.](images/source-folder.png)
   <figcaption> Set a location on your computer to download files to from the Opentrons App.</figcaption>
 </figure>
-
-<!---------
-
-TODO + comments: 
-- do you need to enter documentation when setting or changing this storage location?
--------------->
 

@@ -7,11 +7,6 @@ All Flex robots locally generate files to store information about robot actions,
 
 This section covers the types of files on your compliance ready Flex and how to access and manage them.
 
-<!---------
-TODO and comments: 
-- link to relevant section for files in the flex manual
----->
-
 ## File types
 
 On any Flex, you can view the time and date of your recent protocol runs. Compliance Ready Software adds two specific file types, *audit logs* and *protocol run records*, to store additional user and protocol information. 
@@ -20,11 +15,15 @@ In total, your compliance ready Flex generates three types of files:
 
 | **Type** | **Description** | 
 | :--------|---------------- |
-| **Audit logs** | <ul><li>Contain user actions and documentation.</li></li><li>Grouped together for download by a *period*.</li></ul> |
+| **Audit logs** | <ul><li>Contain user actions and documentation.</li></li><li>Grouped together for download by a period.</li></ul> |
 | **Diagnostic files** | <ul><li>Includes troubleshooting logs and calibration logs.</li><li>May be needed when working with Opentrons Support.</li></ul> |
-| **Protocol run records** | <ul><li>Contain the name, date, and status (completed, canceled, or failed) for each protocol run.</li></ul> |
+| **Protocol run records** | <ul><li>Contain the name, date, and status (completed, canceled, or failed) for each protocol run.</li><li>By default, automatically deleted when the maximum of 20 run records are stored on the Flex.</li></ul> |
 
-Your Flex can store all three file types for up to 20 recent protocol runs. It's your lab's responsibility to manage these files, including downloading and storing in a secure location.
+Flex generates a protocol run record for each individual protocol run. If you run a PCR protocol 10 times, you'll have 10 different protocol run records. 
+
+Audit logs are grouped in a *period*. Log periods end after the Flex completes each protocol run or whenever the Flex boots, like after a robot software update.
+
+The files your Flex generates are never viewed or stored by Opentrons. It's your lab's responsibility to manage these files, including downloading and storing in a secure location.
 
 ## File manager
 
@@ -68,25 +67,52 @@ While storage is full, you won't be able to send or start new protocols on your 
 
 ## Download and delete files
 
-All users can download files, including audit logs, from your compliance ready Flex. 
+All users can download files, including audit logs, from your compliance ready Flex, even before logging in to Compliance Ready Software. However, you'll need to log in to delete files. Only administrators can delete files.
 
-In the file manager in the Opentrons App, you can click to expand each protocol run record and see the files that are included: the `.py` protocol file, a run log, labware offset data, and any images or CSV files generated during the protocol run. 
+Your files download as: 
 
-When you're ready to download, click the check boxes on the left to select individual files of any type for download.
+* **Audit logs**: A folder for each download, containing a `.zip` file with .JSON files for each log period.
+* **Diagnostic files**: An individual .JSON file for calibration logs or a `.zip` file for troubleshooting logs.
+* **Protocol run records**: A `.zip` file for each run record.
+
+By default, protocol run records are automatically deleted when the Flex's storage reaches its maximum of 20 run records. Administrators can change this [setting](../admin.md).
+
+This section takes a look at downloading and deleting files in the Opentrons App and on the Flex touchscreen.
+
+### Opentrons App
+
+In the file manager in the Opentrons App, click the check boxes for individual files in each section. Then, click at the top of each section to **Download selected** or **Delete selected**. Deleting files is irreversible, so the Opentrons App includes a reminder before you start.
 
 <figure class="screenshot" markdown>
-  ![Access the file manager in the app.](../images/file-manager-app.png)
-  <figcaption>Select individual or all files for download.</figcaption>
+  ![Download and delete selected audit logs.](../images/download-and-delete.png)
+  <figcaption>Download and delete selected audit logs.</figcaption>
 </figure>
 
-The app packages your selected files as a `.zip` file for download. You can use compliance ready [settings](../admin.md) to choose a default location for file downloads from the Opentrons App, or choose a location in your computer's files each time. 
+In the app's file manager, you can also click the arrow on the right to expand each protocol run record and see the files that are included: 
+
+* the Python protocol file. 
+* A protocol run log. 
+* Labware offset data.
+* Any images or CSV files generated during the protocol run.
+
+You can use compliance ready [settings](../admin.md) to choose a default location for file downloads from the Opentrons App, or choose a location in your computer's files each time. 
 
 <figure class="screenshot" markdown>
   ![Choose a download location from the Opentrons App.](../images/download-location.png)
   <figcaption>Choose a location for your files to download to.</figcaption>
 </figure>
 
-After downloading and safely storing in your lab's storage location, select files and choose **Delete selected**.
+
+### Flex touchscreen
+
+If you'd like to download files using the Flex touchscreen, you'll need to attach an external storage device.
+
+<figure class="screenshot" markdown>
+  ![Delete audit logs.](../images/devices.png)
+  <figcaption>View attached external devices on the Flex touchscreen.</figcaption>
+</figure> 
+
+Your compliance ready Flex supports USB storage devices via the [front USB port](../../flex/system-description/connections.md#usb-and-auxiliary-connections).
 
 On the Flex touchscreen, choose the file type you'd like to manage. Then, choose which files to download: 
 
@@ -98,33 +124,12 @@ On the Flex touchscreen, choose the file type you'd like to manage. Then, choose
   <figcaption>Download audit logs from the Flex touchscreen.</figcaption>
 </figure> 
 
-Both the Opentrons App or Flex touchscreen, shown below, include a reminder to make sure you're ready to delete files.
+!!! note
+     Remember that by default, your Flex does not store audit logs locally to save space. Administrators can update this [setting](../settings.md#download-files-after-a-run) to download these files from the Flex touchscreen.
+
+Like the Opentrons App, the Flex touchscreen includes a reminder to make sure you're ready to delete files.
 
 <figure class="screenshot" markdown>
   ![Delete audit logs.](../images/delete-crs-logs.png)
   <figcaption>Make sure all files are downloaded and safely stored before deleting.</figcaption>
 </figure> 
-
-If you'd like to download files using the Flex touchscreen, you'll need to attach an external storage device.
-
-<figure class="screenshot" markdown>
-  ![Delete audit logs.](../images/devices.png)
-  <figcaption>View attached external devices on the Flex touchscreen.</figcaption>
-</figure> 
-
-Your compliance ready Flex supports USB storage devices via the front USB port.
-
-<!---------
-
-TODO and comments: 
-- link to USB port section of Flex manual
-- shorten first image in this section; doesn't need to be this long
-- repeat text about 20 most recent runs correct for BOTH file types? 
-- maybe differentiate here between run history... just a list of runs and doesn't contain the same relevant information, but can still be confusing as far as download options go (it's also not in the file manager)
-- AND to ticket for regular flex changes here (have an image in extra images)
-- if I have text about how log periods "line up," that needs to go here...just an in general mention of log period too? 
-- for now, I've cut viewing files. just going to add this entire section when we have a log viewer.
-- "The app packages your selected files as a `.zip` file for download." TRUE??
-- do you tap the three dot menu, or tap and hold for an individual file from the ODD? 
-- you have to choose an external device from the odd? every time? 
--------------->
