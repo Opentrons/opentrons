@@ -415,12 +415,11 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         self.__token_store.save(
             _TokenIssuance(
                 client_id=client_id,
-                username=user.username,
+                user_id=user.id,
                 access_token=access_token,
                 refresh_token=refresh_token,
                 expires_at=expires_at,
                 scopes=stored_scopes,
-                fullname=user.full_name,
             )
         )
 
@@ -440,7 +439,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             refresh_token, now=self.__get_now()
         )
         if issuance is not None:
-            user = self.__user_store.get(issuance.username)
+            user = self.__user_store.get_by_id(issuance.user_id)
             if user is None:
                 return False
             # Set `.user` per the oauthlib docs.
@@ -486,29 +485,36 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         )
         if found_access_token is None:
             return None
-        else:
-            # Values defined by:
-            # https://datatracker.ietf.org/doc/html/rfc7662#section-2.2
-            # except ot_fullname, which is custom to us. if you add other custom fields,
-            # please prefix them with ot-.
-            return {
-                "scope": serialize_scopes(
-                    self.__get_effective_token_scopes(found_access_token)
-                ),
-                "username": found_access_token.username,
-                "ot_fullname": found_access_token.fullname,
-                # "active": True is set implicitly by oauthlib.
-            }
+
+        user = self.__get_user_for_token(found_access_token)
+        if user is None:
+            return None
+
+        # Values defined by:
+        # https://datatracker.ietf.org/doc/html/rfc7662#section-2.2
+        # except ot_fullname, which is custom to us. if you add other custom fields,
+        # please prefix them with ot_.
+        return {
+            "scope": serialize_scopes(
+                self.__get_effective_token_scopes(found_access_token)
+            ),
+            "username": user.username,
+            "ot_fullname": user.full_name,
+            # "active": True is set implicitly by oauthlib.
+        }
+
+    def __get_user_for_token(self, token: _TokenIssuance) -> ORMUser | None:
+        return self.__user_store.get_by_id(token.user_id)
 
     def __get_effective_token_scopes(self, token: _TokenIssuance) -> set[Scope]:
         """Return granted token scopes, updated for current settings and user state."""
-        live_scopes = self.__get_live_scopes_for_username(token.username)
+        live_scopes = self.__get_live_scopes_for_token(token)
         if not token.scopes:
             return live_scopes
         return token.scopes & live_scopes
 
-    def __get_live_scopes_for_username(self, username: str) -> set[Scope]:
-        user = self.__user_store.get(username)
+    def __get_live_scopes_for_token(self, token: _TokenIssuance) -> set[Scope]:
+        user = self.__get_user_for_token(token)
         if user is None:
             return set()
 
@@ -570,7 +576,7 @@ class _TokenIssuance:
     """Information about an access token that we've issued."""
 
     client_id: str
-    username: str
+    user_id: int
     access_token: str
     refresh_token: str | None
     # todo(mm, 2026-01-29): We might want expires_at to be a CLOCK_BOOTTIME value or something
@@ -578,7 +584,6 @@ class _TokenIssuance:
     expires_at: datetime
     # Empty when the client did not request an explicit scope ceiling.
     scopes: set[Scope]
-    fullname: str
 
 
 class _TokenStore:

@@ -554,6 +554,7 @@ stages:
       save:
         json:
           user_access_token: access_token
+          user_refresh_token: refresh_token
 
   - name: GET self works before the username change
     request:
@@ -599,6 +600,8 @@ stages:
       status_code: 200
       json:
         active: true
+        username: testuser_new
+        ot_fullname: Test User
       strict:
         - json:off
 
@@ -608,6 +611,39 @@ stages:
       url: '{run_server.base_url}/auth/users/self'
       headers:
         authorization: 'Bearer {user_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          username: testuser_new
+          fullName: Test User
+      strict:
+        - json:off
+
+  - name: Refresh token still works after username change
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: refresh_token
+        refresh_token: '{user_refresh_token}'
+    response:
+      status_code: 200
+      json:
+        access_token: !anystr
+      strict:
+        - json:off
+      save:
+        json:
+          refreshed_access_token: access_token
+
+  - name: GET self with the refreshed token returns the renamed user
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {refreshed_access_token}'
     response:
       status_code: 200
       json:
