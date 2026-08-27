@@ -9,7 +9,7 @@ description: "Box contents and physical specifications summary for module compon
 
 The Vacuum Module ships in 3 separate boxes.
 
-### Box 1: deck components
+### Box 1: manifold components
 
 Box 1 includes support grids, collars and spacers, and the vacuum manifold base. These pieces stack and hold well plates used in vacuum-rated protocols.
 
@@ -64,15 +64,20 @@ Box 1 includes support grids, collars and spacers, and the vacuum manifold base.
 
 </div>
 
-### Box 2: pump components
+### Box 2: module components
 
-Box 2 includes the Control Box (vacuum pump and electronics), a deck adapter (and screws), an IEC power cable, a USB A-B data cable, assorted fasteners, and L-key.
+Box 2 includes the Control Box (vacuum pump and electronics), carboy holder, a deck adapter (and screws), a power cable, a USB A-B data cable, assorted fasteners, and L-keys.
 
 <div class="parts-list" markdown>
 
 <figure markdown>
 ![Control Box, vacuum pump and electronics](../images/control-box.png "Control Box includes pump and electronics")
 <figcaption>(1) Control Box</figcaption>
+</figure>
+
+<figure markdown>
+![Carboy holder](../images/carboy-holder.png "Waste carboy holder")
+<figcaption>(1) Carboy holder</figcaption>
 </figure>
 
 <figure markdown>
@@ -99,21 +104,27 @@ Box 2 includes the Control Box (vacuum pump and electronics), a deck adapter (an
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Spare deck adapter screws, M4 x 10](../images/fasteners-deck.png "Spare deck adapter screws"){ width="70%" }
+![Spare deck adapter screws, M4 x 10](../images/fasteners-deck.png "Spare deck adapter screws"){ width="50%" }
 <figcaption>(2) Deck adapter screws, M4x10 metric thread</figcaption>
 </figure>
 
 <figure markdown>
-![Manifold screws, 4 and 2 extra](../images/fasteners-manifold.png){ width="80%" }
+![Manifold screws, 4 and 2 extra](../images/fasteners-manifold.png){ width="60%" }
 <figcaption>(6) Manifold screws,<br>7/64" Imperial thread</figcaption>
 </figure>
 
 </div>
 
-### Box 3: waste collection components
+### Box 3: carboy
 
-Box 3 includes the waste collection carboy and cap, a carboy holder (to help prevent tip-overs), vacuum hoses, hose clamps, along with extra quick connect/disconnect fittings and clamps (not shown here).
+Box 3 holds the 2 liter borosilicate glass carboy.
 
+<figure markdown>
+![Borosilicate glass, 2 liter carboy and cap](../images/carboy-and-cap.png "2 liter glass carboy and cap"){ width="70%" }
+<figcaption>(1) Carboy</figcaption>
+</figure>
+
+### Box 4: Cap and hoses
 * The carboy, cap, and hoses ship with quick connector fittings already installed at the factory.
 * The hoses are wrapped around the shaped foam padding in the bottom of the box.
 * You can use extra hardware (fittings and clamps) included in the box to create your own, customized set of vacuum hoses.
@@ -121,13 +132,13 @@ Box 3 includes the waste collection carboy and cap, a carboy holder (to help pre
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Borosilicate glass, 2 liter carboy and cap](../images/carboy-and-cap.png "2 liter glass carboy and cap")
-<figcaption>(1) Carboy and cap</figcaption>
+![Widemouth GL80 blue polypropylene carboy cap](../images/carboy-cap.png "GL80 carboy cap"){ width="90%" }
+<figcaption>(1) Carboy cap</figcaption>
 </figure>
 
 <figure markdown>
-![Carboy holder](../images/carboy-holder.png "Waste carboy holder")
-<figcaption>(1) Carboy holder</figcaption>
+![Carboy cap wrench](../images/carboy-cap-wrench.svg "Large diameter wrench for loosening the carboy cap")
+<figcaption>(1) Cap wrench</figcaption>
 </figure>
 
 </div>
@@ -135,22 +146,13 @@ Box 3 includes the waste collection carboy and cap, a carboy holder (to help pre
 <div class="parts-list" markdown>
 
 <figure markdown>
-![6 mm vacuum hose](../images/hose-6mm.svg "6 mm vacuum hose")
+![6 mm vacuum hose](../images/hose-6mm.png "6 mm vacuum hose"){ width="70%" }
 <figcaption>(1) 6 mm diameter hose,<br>2 m</figcaption>
 </figure>
 
 <figure markdown>
-![9 mm vacuum hose](../images/hose-9mm.svg)
+![9 mm vacuum hose](../images/hose-6mm.png){ width="70%" }
 <figcaption>(1) 9 mm diameter hose,<br>2 m</figcaption>
-</figure>
-
-</div>
-
-<div class="parts-list" markdown>
-
-<figure markdown>
-![Carboy cap wrench](../images/carboy-cap-wrench.svg "Large diameter wrench for loosening the carboy cap")
-<figcaption>(1) Carboy cap wrench</figcaption>
 </figure>
 
 </div>
