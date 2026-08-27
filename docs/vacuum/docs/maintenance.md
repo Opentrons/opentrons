@@ -58,7 +58,8 @@ The following table lists the chemicals you can use to clean the exterior of the
 |----|----|
 | Alcohol | Includes ethyl/ethanol, isopropyl, and methanol. Dilute to 70% for cleaning. Do not use 100% alcohol. |
 | Bleach | Dilute to 10% (1:10 bleach/water ratio) for cleaning. Do not use 100% bleach. |
-| Distilled water | You can use distilled water to clean or rinse your vacuum module. |
+| Distilled water | You can use distilled water to clean or rinse the module. |
+| Mild soap | You can use a mild soap to clean the surfaces of the module. |
 
 For cleaning or decontaminating vacuum hoses and the carboy, wear the required personal protective equipment (PPE) and follow your lab's procedures for handling biohazardous and other chemically hazardous waste.
 
