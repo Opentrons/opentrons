@@ -22,11 +22,7 @@ import {
 import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLogin.module.css'
 
-import type {
-  AuthUser,
-  AuthUserResetPasswordReason,
-  OAuth2TokenResponse,
-} from '@opentrons/api-client'
+import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 import type { LoginStep } from './index'
 
@@ -43,8 +39,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const [loginUsername, setLoginUsername] = useState<string | undefined>(
     undefined
   )
-  const [resetPasswordReason, setResetPasswordReason] =
-    useState<AuthUserResetPasswordReason | null>(null)
+  const [loginResetPassword, setLoginResetPassword] = useState(false)
   const [isFetchingLoginStatus, setIsFetchingLoginStatus] = useState(false)
   const storeLoginState = useStoreLoginState()
   const localRobotName = useSelector(
@@ -93,7 +88,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
       if (host != null) {
         void queryClient.invalidateQueries(getSelfQueryKey(host))
       }
-      setResetPasswordReason(null)
+      setLoginResetPassword(false)
       setPhase('login')
       setStep('password')
     },
@@ -107,9 +102,9 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
     setIsFetchingLoginStatus(true)
     try {
       const response = await getUserLoginStatus(host, username)
-      setResetPasswordReason(response.data.data.resetPasswordReason ?? null)
+      setLoginResetPassword(response.data.data.resetPassword)
     } catch {
-      setResetPasswordReason(null)
+      setLoginResetPassword(false)
     } finally {
       setIsFetchingLoginStatus(false)
     }
@@ -171,7 +166,7 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
             : isLoginAuthLoading || isFetchingLoginStatus
         }
         isPasswordResetRequired={isChoosingNewPassword}
-        resetPasswordReason={resetPasswordReason}
+        loginResetPassword={loginResetPassword}
         initialUsername={initialUsername}
         loginError={loginError}
         onClearLoginError={() => {

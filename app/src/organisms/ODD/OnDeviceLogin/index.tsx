@@ -10,7 +10,6 @@ import { LoginFieldController } from './LoginFieldController'
 import styles from './OnDeviceLogin.module.css'
 
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
-import type { AuthUserResetPasswordReason } from '@opentrons/api-client'
 import type { PasswordComplexityRequirements } from '/app/resources/auth'
 
 export type LoginStep = 'username' | 'password' | 'confirmPassword'
@@ -32,7 +31,7 @@ export interface OnDeviceLoginProps {
   /** New-password + confirm step after temporary-password login. */
   isPasswordResetRequired?: boolean
   /** Drives the login password field label after username lookup. */
-  resetPasswordReason?: AuthUserResetPasswordReason | null
+  loginResetPassword?: boolean
   initialUsername?: string
   /** Shown under the password field with error styling when login fails */
   loginError?: string | null
@@ -50,7 +49,7 @@ export function OnDeviceLogin({
   isAuthLoading,
   onCancel,
   isPasswordResetRequired = false,
-  resetPasswordReason = null,
+  loginResetPassword = false,
   initialUsername,
   loginError = null,
   onClearLoginError,
@@ -244,7 +243,7 @@ export function OnDeviceLogin({
               step={step}
               t={t}
               isPasswordResetRequired={isPasswordResetRequired}
-              resetPasswordReason={resetPasswordReason}
+              loginResetPassword={loginResetPassword}
               loginError={passwordPolicyError ?? loginError}
               confirmPasswordError={confirmPasswordError}
               usernameError={usernameError}

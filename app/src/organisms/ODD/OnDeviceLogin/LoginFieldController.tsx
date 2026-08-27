@@ -5,7 +5,6 @@ import { LoginFieldInput } from './LoginFieldInput'
 
 import type { TFunction } from 'i18next'
 import type { Control } from 'react-hook-form'
-import type { AuthUserResetPasswordReason } from '@opentrons/api-client'
 import type { LoginFormValues, LoginStep } from './index'
 
 export interface LoginFieldControllerProps {
@@ -13,7 +12,7 @@ export interface LoginFieldControllerProps {
   step: LoginStep
   t: TFunction
   isPasswordResetRequired: boolean
-  resetPasswordReason: AuthUserResetPasswordReason | null
+  loginResetPassword: boolean
   loginError: string | null
   confirmPasswordError: string | null
   usernameError: string | null
@@ -29,7 +28,7 @@ export const LoginFieldController = forwardRef<
     step,
     t,
     isPasswordResetRequired,
-    resetPasswordReason,
+    loginResetPassword,
     loginError,
     confirmPasswordError,
     usernameError,
@@ -63,8 +62,7 @@ export const LoginFieldController = forwardRef<
       loginError != null && loginError !== '' ? loginError : null
     const passwordLabel = isPasswordResetRequired
       ? t('access_control:on_device_login_new_password')
-      : resetPasswordReason === 'FIRST_TIME_LOGIN' ||
-          resetPasswordReason === 'ADMIN_FORCED'
+      : loginResetPassword
         ? t('access_control:on_device_login_one_time_password')
         : t('access_control:login_form_password_field')
 

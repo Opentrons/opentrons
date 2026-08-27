@@ -20,11 +20,7 @@ import {
 
 import { showLoginModal } from '../LoginModal'
 
-import type {
-  AuthUser,
-  AuthUserResetPasswordReason,
-  OAuth2TokenResponse,
-} from '@opentrons/api-client'
+import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
 
 vi.mock('@opentrons/api-client', async importOriginal => {
   const actual = (await importOriginal()) as Record<string, unknown>
@@ -60,24 +56,19 @@ const OAUTH_RESPONSE: OAuth2TokenResponse = {
 }
 
 function mockAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
-  const resetPassword = overrides.resetPassword ?? false
   return {
     username: 'alice',
     fullName: 'Alice',
     accountType: 'user',
     locked: false,
-    resetPassword,
-    resetPasswordReason:
-      overrides.resetPasswordReason ?? (resetPassword ? 'ADMIN_FORCED' : null),
+    resetPassword: false,
     ...overrides,
   }
 }
 
-function mockUserLoginStatus(
-  resetPasswordReason: AuthUserResetPasswordReason | null = null
-): void {
+function mockUserLoginStatus(resetPassword = false): void {
   vi.mocked(getUserLoginStatus).mockResolvedValue({
-    data: { data: { resetPasswordReason } },
+    data: { data: { resetPassword } },
   } as Awaited<ReturnType<typeof getUserLoginStatus>>)
 }
 
@@ -153,7 +144,7 @@ async function advanceFromUsername(): Promise<void> {
 
 describe('LoginModal', () => {
   beforeEach(() => {
-    mockUserLoginStatus(null)
+    mockUserLoginStatus(false)
     vi.mocked(useOAuth2PasswordLogin).mockReturnValue({
       submitPassword: vi.fn(),
       isAuthLoading: false,
@@ -225,7 +216,6 @@ describe('LoginModal', () => {
           username,
           mockAuthUser({
             resetPassword: true,
-            resetPasswordReason: 'FIRST_TIME_LOGIN',
           }),
           OAUTH_RESPONSE
         )
@@ -237,7 +227,7 @@ describe('LoginModal', () => {
     const resultPromise = clickOpenLoginModal()
     await waitForLoginModalOpen()
 
-    mockUserLoginStatus('FIRST_TIME_LOGIN')
+    mockUserLoginStatus(true)
     await advanceFromUsername()
     expect(screen.getByLabelText('One-time password')).toBeInTheDocument()
     fillField('One-time password', 'temp-pass')
@@ -271,7 +261,7 @@ describe('LoginModal', () => {
     const resultPromise = clickOpenLoginModal()
     await waitForLoginModalOpen()
 
-    mockUserLoginStatus('ADMIN_FORCED')
+    mockUserLoginStatus(true)
     await advanceFromUsername()
     expect(screen.getByLabelText('One-time password')).toBeInTheDocument()
     fillField('One-time password', 'temp-pass')
@@ -313,7 +303,7 @@ describe('LoginModal', () => {
     const resultPromise = clickOpenLoginModal()
     await waitForLoginModalOpen()
 
-    mockUserLoginStatus('ADMIN_FORCED')
+    mockUserLoginStatus(true)
     await advanceFromUsername()
     expect(screen.getByLabelText('One-time password')).toBeInTheDocument()
     fillField('One-time password', 'temp-pass')
@@ -361,7 +351,7 @@ describe('LoginModal', () => {
     void clickOpenLoginModal()
     await waitForLoginModalOpen()
 
-    mockUserLoginStatus('ADMIN_FORCED')
+    mockUserLoginStatus(true)
     await advanceFromUsername()
     expect(screen.getByLabelText('One-time password')).toBeInTheDocument()
     fillField('One-time password', 'temp-pass')

@@ -84,7 +84,7 @@ export const FirstTimeLogin: Story = {
   args: {
     ...Default.args,
     step: 'password',
-    resetPasswordReason: 'FIRST_TIME_LOGIN',
+    loginResetPassword: true,
     initialUsername: 'alice',
   },
 }
@@ -95,7 +95,6 @@ export const PasswordResetRequired: Story = {
     ...Default.args,
     step: 'password',
     isPasswordResetRequired: true,
-    resetPasswordReason: 'FIRST_TIME_LOGIN',
     initialUsername: 'alice',
   },
 }
@@ -106,7 +105,6 @@ export const PasswordResetConfirmPassword: Story = {
     ...Default.args,
     step: 'confirmPassword',
     isPasswordResetRequired: true,
-    resetPasswordReason: 'FIRST_TIME_LOGIN',
     initialUsername: 'alice',
   },
 }
