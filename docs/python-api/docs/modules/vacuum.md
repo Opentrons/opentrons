@@ -62,7 +62,7 @@ collar = vacuum.load_adapter_to_dock("opentrons_vacuum_manifold_collar_short")
 # Load the sample filter plate onto the staged collar
 filter_plate = collar.load_labware(
     load_name="millipore_96_wellplate_500ul_ultracel_filter",
-    label="Sample Filter Plate",
+    label="Sample Filter Plate"
 )
 ```
 
@@ -84,7 +84,7 @@ spacer = vacuum.load_adapter("opentrons_vacuum_manifold_spacer_short")
 # Load a collection plate on top of the spacer
 collection_plate = spacer.load_labware(
     load_name="opentrons_96_wellplate_200ul_pcr_full_skirt",
-    label="Collection Wellplate",
+    label="Collection Wellplate"
 )
 ```
 
@@ -136,9 +136,9 @@ vacuum_task = vacuum.start_set_vacuum_pressure(
 )
 ```
 
-### Closed-loop pressure control
+### Pressure control
 
-In a closed loop, the module uses sensor data to reach and maintain a specific vacuum pressure. For example, when calling [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure] the pump will actively monitor its pressure sensor to keep the system at the specified vacuum.
+You can set the Vacuum Module to reach and maintain a specific vacuum pressure (from `0` to `-800` mbar) by calling [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure]. When using this method, the module actively monitors its pressure sensor to maintain the target vacuum.
 
 Also, this method returns a [Task][opentrons.protocol_api.Task] object representing concurrent execution. Pass the task to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to make the protocol wait for the system to return to atmospheric pressure before continuing.
 
@@ -157,9 +157,9 @@ vacuum_task = vacuum.start_set_vacuum_pressure(
 protocol.wait_for_tasks([vacuum_task])
 ```
 
-### Open-loop power control
+### Power control
 
-In an open-loop, the module does not use sensor data to reach and maintain a specific vacuum pressure. Instead, the pump just runs at a set proportion of its rated power or duty cycle. The loop here is "open" because a sensor doesn't provide feedback to control the pump.
+You can set the Vacuum Module to run the pump motor at a specific power level (from `1` to `100`%) by calling [`start_set_vacuum_power()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_power]. When using this method, the module does not use sensor data. Instead, the pump runs at the set duty cycle level.
 
 Also, this method returns a [Task][opentrons.protocol_api.Task] (`Task`?) object representing concurrent execution. Pass the task to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to make the protocol wait for the system to return to atmospheric pressure before continuing.
 
@@ -169,7 +169,7 @@ power_task = vacuum.start_set_vacuum_power(
     percent_power=60,
     duration_s=20,
     vent_after=True,
-    equalize_timeout_s=5,
+    equalize_timeout_s=5
 )
 
 # Runs other pipetting or protocols actions while pump operates ...
@@ -197,13 +197,13 @@ Use [`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start
         {
             "enable_pump": True,
             "gauge_pressure_mbar": -200,
-            "hold_time_seconds": 15,
+            "hold_time_seconds": 15
         },
         {
             "enable_pump": True,
             "gauge_pressure_mbar": -500,
-            "hold_time_seconds": 30,
-        },
+            "hold_time_seconds": 30
+        }
     ]
 
     # Run the profile
@@ -211,7 +211,7 @@ Use [`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start
         steps=profile_steps,
         repetitions=1,
         vent_after=True,
-        equalize_timeout_s=10,
+        equalize_timeout_s=10
     )
     protocol.wait_for_tasks([profile_task])
     ```
@@ -226,13 +226,13 @@ Use [`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start
         {
             "enable_pump": True,
             "percent_power": 40,
-            "hold_time_seconds": 20,
+            "hold_time_seconds": 20
         },
         {
             "enable_pump": True,
             "percent_power": 80,
-            "hold_time_seconds": 30,
-        },
+            "hold_time_seconds": 30
+        }
     ]
 
     # Run the profile
@@ -240,35 +240,18 @@ Use [`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start
         steps=profile_steps,
         repetitions=1,
         vent_after=True,
-        equalize_timeout_s=10,
+        equalize_timeout_s=10
     )
     protocol.wait_for_tasks([profile_task])
     ```
 
-## Utility controls
+## Closing the vent
 
-While commands like `start_set_vacuum_pressure()` automatically manage pump and vent operations, these standalone utility methods give you direct control over the pump motor and vent valve.
+You can close the vent by using [`close_vent()`][opentrons.protocol_api.VacuumModuleContext.close_vent]. This is a standalone utility method used for testing, diagnostics, or sealing the system without running the pump.
 
-### Stopping the pump
+## Deactivating and depressurizing
 
-Call [`stop_vacuum_pump()`][opentrons.protocol_api.VacuumModuleContext.stop_vacuum_pump] to immediately stop the vacuum pump motor. Stopping the pump does not vent the module. The system will remain under vacuum until a vent command is issued or it depressurizes naturally from small air leaks between stacked deck pieces.
+You can stop the pump and depressurize the system separately by using the [`stop_vacuum_pump()`][opentrons.protocol_api.VacuumModuleContext.stop_vacuum_pump] and [`open_vent()`][opentrons.protocol_api.VacuumModuleContext.open_vent] methods, respectively. While commands like `start_set_vacuum_pressure()` automatically manage pump and vent operations, these two standalone utility methods give you direct control over the pump motor and vent valve.
 
-```python
-vacuum.stop_vacuum_pump()
-```
-
-### Opening and closing the vent
-
-The vent valve regulates vacuum pressure inside the module. <!--- ask about using "solenoid" --->
-
-- [`open_vent()`][opentrons.protocol_api.VacuumModuleContext.open_vent]: opens the vent to release system vacuum and return the module to atmospheric pressure. Call this before removing labware if an asynchronous profile or pressure hold does not specify `vent_after=True`.
-
-```python
-vacuum.open_vent()
-```
-
-- [`close_vent()`][opentrons.protocol_api.VacuumModuleContext.close_vent]: closes the vent so the system can seal and hold vacuum.
-
-```python
-vacuum.close_vent()
-```
+!!! note
+    The robot will not automatically deactivate the Vacuum Module at the end of a protocol. If you need to deactivate and depressurize the module after a protocol is completed or canceled, use these methods or the module controls on the device detail page in the Opentrons App.
