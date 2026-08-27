@@ -704,6 +704,116 @@ stages:
         - json:off
 
 ---
+test_name: Locking a user invalidates their existing tokens
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+      - seed_users
+
+stages:
+  - name: Log in as the regular user
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: testuser
+        password: testuserpassword
+    response:
+      status_code: 200
+      save:
+        json:
+          user_access_token: access_token
+          user_refresh_token: refresh_token
+
+  - name: Admin locks the user
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/byUsername/testuser'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          locked: true
+    response:
+      status_code: 200
+      json:
+        data:
+          locked: true
+      strict:
+        - json:off
+
+  - name: Pre-lock token is inactive
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/introspect'
+      data:
+        client_id: opentrons_app
+        token: '{user_access_token}'
+    response:
+      status_code: 200
+      json:
+        active: false
+      strict:
+        - json:off
+
+  - name: GET self with the pre-lock token is rejected
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {user_access_token}'
+    response:
+      status_code: 401
+
+  - name: PATCH self with the pre-lock token is rejected
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {user_access_token}'
+      json:
+        data:
+          fullName: Should Not Apply
+    response:
+      status_code: 401
+
+  - name: Refresh with the pre-lock token is rejected
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: refresh_token
+        refresh_token: '{user_refresh_token}'
+    response:
+      status_code: 400
+      json:
+        error: invalid_grant
+      strict:
+        - json:off
+
+  - name: Login is rejected while the account is locked
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: testuser
+        password: testuserpassword
+    response:
+      status_code: 400
+      json:
+        error: invalid_grant
+        opentrons_account_locked: true
+      strict:
+        - json:off
+
+---
 test_name: Creating a user with an existing username
 
 marks:
