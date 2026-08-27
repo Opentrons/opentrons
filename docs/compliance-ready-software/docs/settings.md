@@ -41,4 +41,4 @@ Click the :material-cog: in the lower left to access **App settings**. Select th
 If robot settings, like your Flex's name, are ever changed, you may need to repeat this process.
 
 !!! note
-    There's more than one way to save your files. You can attach a [USB](devices.md)and move the files to a computer yourself from the Flex touchscreen.
+    There's more than one way to save your files. You can attach a [USB](devices.md) and move the files to a computer yourself from the Flex touchscreen.

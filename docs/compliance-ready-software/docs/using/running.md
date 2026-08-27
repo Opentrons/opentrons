@@ -13,7 +13,7 @@ By default, users can only run protocols sent to your compliance ready Flex by a
  
 Any user can import any valid Python protocol into the Opentrons App, and they'll appear in the **Protocols** tab on the left. There are two ways to send one of these protocols to your Flex: 
 
-* Click the three-dot menu on any protocol card and select **Send to Flex**. 
+* Click the three-dot menu on any protocol card and select **Send to Opentrons Flex**. 
 * Click the protocol, then choose **Start setup** and your compliance ready Flex. 
 
 <figure class="screenshot" markdown>
@@ -28,7 +28,14 @@ For either method, the Opentrons App will prompt administrators to document thei
   <figcaption>Click to send a protocol to your compliance ready Flex.</figcaption>
 </figure>
 
-Since users can't send (and therefore run) protocols to the Flex by default, their accounts will be blocked from sending a protocol using either method. Administrators can change this: 
+Since users can't send (and therefore run) protocols to the Flex by default, their accounts will be blocked from sending a protocol using either method.
+
+<figure class="screenshot" markdown>
+  ![Click to send a protocol to your compliance ready Flex.](../images/user-blocked.png)
+  <figcaption>By default, users are blocked from sending protocols to the Flex.</figcaption>
+</figure>
+
+Administrators can change this setting to allow users to send protocols to your compliance ready Flex: 
 
 <div class="instruction-list" markdown>
 
@@ -81,15 +88,15 @@ When you're finished setting up your protocol, tap **Start run** in the top righ
 
 You won't be blocked from completing any of the actions listed above while your protocol runs, but you'll need to enter documentation *after* you complete them. 
 
-For example, if you encounter an error during your protocol, you can choose from the available recovery actions and give the Flex time to correct the error. You'll prompted to add documentation after either:
+For example, if you encounter an error during your protocol, you can choose from the available recovery actions and give the Flex time to correct the error. You'll prompted to add documentation when you:
 
-* Successfully completing [error recovery](../../flex/touchscreen/protocol-run.md#error-recovery).
-* Retrying or skipping the step causing the error. 
-* Canceling the protocol run.
+* Start or complete [error recovery](../../flex/touchscreen/protocol-run.md#error-recovery).
+* Retry or skip the step causing the error. 
+* Cancel the protocol run.
 
 <figure class="screenshot" markdown>
   ![Add documentation after completing error recovery.](../images/recovery-action.png)
-  <figcaption>You'll need to add documentation after completing error recovery.</figcaption>
+  <figcaption>You'll need to add documentation during error recovery.</figcaption>
 </figure>
 
-In processes like error recovery, shown above, the [list of actions](documentation.md#viewing-actions) requiring documentation can be cumulative—on a single screen, you might be prompted to add documentation for starting error recovery, choosing to retry the step, and successfully completing error recovery.
+In processes like error recovery, shown above on the Flex touchscreen, the [list of actions](documentation.md#viewing-actions) requiring documentation can be cumulative—on a single screen, you might be prompted to add documentation for starting error recovery, choosing to retry the step, and successfully completing error recovery.

@@ -22,11 +22,11 @@ By default, these files are not saved to the Flex to save space. You'll need to 
 
 <figure class="screenshot" markdown>
   ![Download audit logs.](../images/download-logs-odd.png)
-  <figcaption>Download audit logs from the Flex touchscreen.</figcaption>
+  <figcaption>The Flex touchscreen prompts you to download audit logs in the Opentrons App after a run.</figcaption>
 </figure>
 
 Administrators can [change](../settings.md#download-files-after-a-run) this setting to save audit logs locally on your Flex. Remember that you'll still need to frequently download and delete logs from the robot.
 
 When you're finished, end your session on the Flex by swiping down on the touchscreen or clicking the account icon in the top right to log out.
 
-You can download additional protocol [files](files.md#) before you log out, or in your next session. 
+You can download additional protocol files before you log out, or in your next session. 
