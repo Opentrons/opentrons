@@ -174,7 +174,7 @@ export function RecentProtocolRuns({
                       new Date(b.createdAt).getTime() -
                       new Date(a.createdAt).getTime()
                   )
-                  .map((run, index) => {
+                  .map(run => {
                     const protocol = protocols?.data?.data.find(
                       protocol => protocol.id === run.protocolId
                     )
@@ -192,7 +192,7 @@ export function RecentProtocolRuns({
                         robotName={robotName}
                         robotIsBusy={robotIsBusy}
                         isDeleting={deletingIds.has(run.id)}
-                        key={index}
+                        key={run.id}
                       />
                     )
                   })}
