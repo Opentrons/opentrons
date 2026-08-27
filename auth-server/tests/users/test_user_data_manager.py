@@ -13,7 +13,7 @@ from auth_server.users.models import (
     TemporaryPasswordResponse,
     UserResponse,
 )
-from auth_server.users.store import UserStore, _UNSET
+from auth_server.users.store import _UNSET, UserStore
 from auth_server.users.user_data_manager import (
     InvalidInputError,
     PasswordMissingSpecialCharactersError,
@@ -396,7 +396,7 @@ def test_list_users_returns_all_users(
             accountType=AccountType.USER,
             locked=False,
             resetPassword=False,
-        resetPasswordReason=ResetPasswordReason.NONE,
+            resetPasswordReason=ResetPasswordReason.NONE,
         ),
         UserResponse(
             username="bob",
@@ -404,7 +404,7 @@ def test_list_users_returns_all_users(
             accountType=AccountType.ADMIN,
             locked=False,
             resetPassword=False,
-        resetPasswordReason=ResetPasswordReason.NONE,
+            resetPasswordReason=ResetPasswordReason.NONE,
         ),
     ]
 
@@ -485,7 +485,10 @@ def test_get_user_reset_password_true_when_admin_flag_set(
 ) -> None:
     decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
     decoy.when(mock_store.get("flagged_user")).then_return(
-        _make_orm_user(username="flagged_user", reset_password_reason=ResetPasswordReason.ADMIN_FORCED)
+        _make_orm_user(
+            username="flagged_user",
+            reset_password_reason=ResetPasswordReason.ADMIN_FORCED,
+        )
     )
 
     result = manager.get_user("flagged_user")
@@ -555,9 +558,7 @@ def test_get_reset_password_reason(
         reset_password_reason=stored_reason,
     )
 
-    assert (
-        get_reset_password_reason(user, now, password_reset_time_sec) is expected
-    )
+    assert get_reset_password_reason(user, now, password_reset_time_sec) is expected
 
 
 # ── delete_user ─────────────────────────────────────────────────────
@@ -716,7 +717,9 @@ def test_update_user_password_clears_reset_password_flag(
 ) -> None:
     """Setting a new password clears resetPassword."""
     decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
-    updated = _make_orm_user(username="pw_user", reset_password_reason=ResetPasswordReason.ADMIN_FORCED)
+    updated = _make_orm_user(
+        username="pw_user", reset_password_reason=ResetPasswordReason.ADMIN_FORCED
+    )
     decoy.when(
         mock_store.update(
             "pw_user",
@@ -784,7 +787,9 @@ def test_reset_user_password(
     manager: UserDataManager,
 ) -> None:
     decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
-    updated = _make_orm_user(username="reset_me", reset_password_reason=ResetPasswordReason.ADMIN_FORCED)
+    updated = _make_orm_user(
+        username="reset_me", reset_password_reason=ResetPasswordReason.ADMIN_FORCED
+    )
     decoy.when(
         mock_store.update(
             "reset_me",
@@ -830,7 +835,9 @@ def test_reset_user_password_clears_failed_logins(
         SettingsResponseData(maxNumberOfLoginAttempts=3)
     )
     decoy.when(mock_store.get_failed_login_count("reset_me")).then_return(0)
-    updated = _make_orm_user(username="reset_me", reset_password_reason=ResetPasswordReason.ADMIN_FORCED)
+    updated = _make_orm_user(
+        username="reset_me", reset_password_reason=ResetPasswordReason.ADMIN_FORCED
+    )
     decoy.when(
         mock_store.update(
             "reset_me",
@@ -859,7 +866,9 @@ def test_reset_user_password_uses_password_complexity_settings(
             passwordComplexitySpecialCharacters=True,
         )
     )
-    updated = _make_orm_user(username="reset_me", reset_password_reason=ResetPasswordReason.ADMIN_FORCED)
+    updated = _make_orm_user(
+        username="reset_me", reset_password_reason=ResetPasswordReason.ADMIN_FORCED
+    )
     decoy.when(
         mock_store.update(
             "reset_me",

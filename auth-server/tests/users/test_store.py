@@ -98,9 +98,7 @@ def test_add_user_with_first_time_login_reason(user_store: UserStore) -> None:
     )
     fetched = user_store.get("first_time_login_user")
     assert fetched is not None
-    assert (
-        fetched.reset_password_reason == ResetPasswordReason.FIRST_TIME_LOGIN.value
-    )
+    assert fetched.reset_password_reason == ResetPasswordReason.FIRST_TIME_LOGIN.value
 
 
 def test_update_admin_forced_reset_password_reason(user_store: UserStore) -> None:
