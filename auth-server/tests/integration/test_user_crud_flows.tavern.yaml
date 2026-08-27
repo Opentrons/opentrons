@@ -537,6 +537,7 @@ test_name: /self routes still work after username change
 marks:
   - usefixtures:
       - run_server
+      - admin_access_token
       - seed_users
 
 stages:
@@ -579,12 +580,12 @@ stages:
         authorization: 'Bearer {user_access_token}'
       json:
         data:
-          username: testuser_new
+          username: testuser_2
     response:
       status_code: 200
       json:
         data:
-          username: testuser_new
+          username: testuser_2
           fullName: Test User
       strict:
         - json:off
@@ -600,7 +601,7 @@ stages:
       status_code: 200
       json:
         active: true
-        username: testuser_new
+        username: testuser_2
         ot_fullname: Test User
       strict:
         - json:off
@@ -615,7 +616,56 @@ stages:
       status_code: 200
       json:
         data:
-          username: testuser_new
+          username: testuser_2
+          fullName: Test User
+      strict:
+        - json:off
+
+  - name: Admin changes the user's username
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/byUsername/testuser_2'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          username: testuser_3
+    response:
+      status_code: 200
+      json:
+        data:
+          username: testuser_3
+          fullName: Test User
+      strict:
+        - json:off
+
+  - name: Pre-rename token is still active after admin username change
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/introspect'
+      data:
+        client_id: opentrons_app
+        token: '{user_access_token}'
+    response:
+      status_code: 200
+      json:
+        active: true
+        username: testuser_3
+        ot_fullname: Test User
+      strict:
+        - json:off
+
+  - name: GET self after admin username change returns the renamed user
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {user_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          username: testuser_3
           fullName: Test User
       strict:
         - json:off
@@ -648,7 +698,7 @@ stages:
       status_code: 200
       json:
         data:
-          username: testuser_new
+          username: testuser_3
           fullName: Test User
       strict:
         - json:off
