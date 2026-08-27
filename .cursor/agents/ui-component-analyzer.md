@@ -16,15 +16,15 @@ Search these UI component locations (in priority order):
 
 1. **Shared library** — `components/src/`
    - `atoms/`, `molecules/`, `organisms/`
-   - Also: `forms/`, `modals/`, `nav/`, `controls/`, `primitives/`, `structure/`
+   - Also: `forms/`, `modals/`, `nav/`, `controls/`
 2. **App-local components**
    - `app/src/` (atoms, molecules, organisms under `components/` or inline)
    - `protocol-designer/src/`
    - `opentrons-ai-client/src/`
-   - `labware-library/src/`, `labware-designer/src/`
+   - `labware-library/src/`,
    - `protocol-visualization/src/`
 
-Ignore Python robot packages, docs-only files, and generated output unless the user explicitly asks for them.
+Ignore `labware-designer/src/`, Python robot packages, docs-only files, and generated output unless the user explicitly asks for them.
 
 ## Workflow
 
