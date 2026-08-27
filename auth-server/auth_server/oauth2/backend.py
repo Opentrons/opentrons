@@ -488,6 +488,9 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
 
         user = self.__get_user_for_token(found_access_token)
         if user is None:
+            # The user was deleted, maybe.
+            return None
+        if user.deactivated:
             return None
 
         # Values defined by:
