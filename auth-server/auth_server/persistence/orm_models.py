@@ -38,12 +38,12 @@ class User(Base):
     hashed_password: Mapped[str]
     full_name: Mapped[str]
     account_type: Mapped[str]
+    # A flag that this user must reset their password for reasons other than time-based expiration.
+    reset_password: Mapped[bool] = mapped_column(server_default=false(), default=False)
     # When the user's current password was set. Used for time-based password expiration.
     password_set_at: Mapped[datetime]
     # When true, the account was deactivated by an admin and cannot log in.
     deactivated: Mapped[bool] = mapped_column(server_default=false(), default=False)
-    # A flag that this user must reset their password for reasons other than time-based expiration.
-    reset_password: Mapped[bool] = mapped_column(server_default=false(), default=False)
 
     failed_logins: Mapped[list[FailedLogin]] = relationship(
         order_by="FailedLogin.attempted_at",
