@@ -23,6 +23,8 @@ class SettingsResponseData(_StrictBaseModel):
 
     maxNumberOfLoginAttempts: int | None = pydantic.Field(
         default=5,
+        ge=1,
+        le=5,
         description="Max number of login attempts before account deactivation. Set to null to remove the limit.",
     )
     passwordResetTime: float | None = pydantic.Field(
@@ -65,7 +67,9 @@ class PatchSettingsRequestData(_StrictBaseModel):
     maxNumberOfLoginAttempts: Annotated[
         int | None,
         pydantic.Field(
-            description="Max number of login attempts before account deactivation."
+            ge=1,
+            le=MAX_NUMBER_OF_LOGIN_ATTEMPTS,
+            description="Max number of login attempts before account deactivation.",
         ),
     ] = None
     passwordResetTime: Annotated[

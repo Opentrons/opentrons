@@ -58,7 +58,7 @@ stages:
       json:
         data:
           idleLogout: 60.0
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
@@ -67,7 +67,7 @@ stages:
       status_code: 200
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
@@ -84,7 +84,7 @@ stages:
       status_code: 200
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
@@ -101,7 +101,7 @@ stages:
       status_code: 200
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
@@ -128,7 +128,7 @@ stages:
         Authorization: '{admin_access_token}'
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
@@ -138,7 +138,7 @@ stages:
       status_code: 200
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
@@ -226,12 +226,12 @@ stages:
         Authorization: '{admin_access_token}'
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
     response:
       status_code: 200
       json:
         data:
-          maxNumberOfLoginAttempts: 10
+          maxNumberOfLoginAttempts: 3
           passwordResetTime: null
           passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
