@@ -864,6 +864,8 @@ class InstrumentContext(publisher.CommandPublisher):
         Mix a volume of liquid by repeatedly aspirating and dispensing it in multiple
         locations.
 
+        Only available for Opentrons Flex.
+
         See [dynamic mix][dynamic-mix] for examples.
 
         Args:
