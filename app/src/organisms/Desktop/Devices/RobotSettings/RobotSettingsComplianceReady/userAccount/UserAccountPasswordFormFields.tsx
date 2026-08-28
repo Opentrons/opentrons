@@ -35,7 +35,6 @@ export function UserAccountPasswordFormFields<T extends FieldValues>({
             render={({ field, fieldState }) => (
               <PasswordInputField
                 value={field.value}
-                placeholder={t('desktop_password_placeholder')}
                 error={fieldState.error?.message}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
@@ -62,7 +61,6 @@ export function UserAccountPasswordFormFields<T extends FieldValues>({
             render={({ field, fieldState }) => (
               <PasswordInputField
                 value={field.value}
-                placeholder={t('desktop_password_placeholder')}
                 error={fieldState.error?.message}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
