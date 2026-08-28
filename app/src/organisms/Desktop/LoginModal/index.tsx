@@ -20,6 +20,7 @@ import {
 import { useHost } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
@@ -178,8 +179,9 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
     onError: handleError,
   })
 
+  const documentationState = useDocumentationState(undefined, robotName)
   const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
-    useSetNewPasswordAndSignIn({
+    useSetNewPasswordAndSignIn(documentationState, {
       onSuccess: (successfulUsername, _newPassword) => {
         dispatch(logOut({ robotName }))
         setScreen({
@@ -308,8 +310,9 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       <Modal
         title={t('access_control:desktop_login_modal_header')}
         onClose={uncloseable ? undefined : handleClose}
-        // Above SignRun and other run-header modals (zIndexOverlay: 1000).
-        zIndexOverlay={10001}
+        // Login is 10001 so it sits above SignRun (1000) and documentation (10000).
+        // Drop to 9999 on set-new-password so the documentation modal is visible.
+        zIndexOverlay={screen.kind === 'setNewPassword' ? 9999 : 10001}
         footer={<div className={styles.modal_footer_container}>{footer}</div>}
       >
         <div className={styles.content_container}>
