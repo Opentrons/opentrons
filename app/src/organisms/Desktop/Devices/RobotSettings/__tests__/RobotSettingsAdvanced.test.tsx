@@ -16,6 +16,7 @@ import {
   DisableStackerSensors,
   DisplayRobotName,
   EnableStatusLight,
+  FrontButtonRunControls,
   GantryHoming,
   LegacySettings,
   OpenJupyterControl,
@@ -45,6 +46,7 @@ vi.mock('/app/redux/shell/update', async importOriginal => {
 vi.mock('../AdvancedTab/DeviceReset')
 vi.mock('../AdvancedTab/DisplayRobotName')
 vi.mock('../AdvancedTab/EnableStatusLight')
+vi.mock('../AdvancedTab/FrontButtonRunControls')
 vi.mock('../AdvancedTab/GantryHoming')
 vi.mock('../AdvancedTab/LegacySettings')
 vi.mock('../AdvancedTab/OpenJupyterControl')
@@ -79,6 +81,9 @@ describe('RobotSettings Advanced tab', () => {
     )
     vi.mocked(GantryHoming).mockReturnValue(
       <div>Mock GantryHoming Section</div>
+    )
+    vi.mocked(FrontButtonRunControls).mockReturnValue(
+      <div>Mock FrontButtonRunControls Section</div>
     )
     vi.mocked(DeviceReset).mockReturnValue(<div>Mock DeviceReset Section</div>)
     vi.mocked(LegacySettings).mockReturnValue(
@@ -134,6 +139,17 @@ describe('RobotSettings Advanced tab', () => {
   it('should render GantryHoming section', () => {
     render()
     screen.getByText('Mock GantryHoming Section')
+  })
+
+  it('should render FrontButtonRunControls section for OT-2', () => {
+    render()
+    screen.getByText('Mock FrontButtonRunControls Section')
+  })
+
+  it('should not render FrontButtonRunControls section for Flex', () => {
+    when(useIsFlex).calledWith('otie').thenReturn(true)
+    render()
+    expect(screen.queryByText('Mock FrontButtonRunControls Section')).toBeNull()
   })
 
   it('should render DeviceReset section', () => {

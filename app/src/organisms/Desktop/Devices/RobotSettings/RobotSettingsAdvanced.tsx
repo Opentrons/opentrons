@@ -32,6 +32,7 @@ import {
   EnableErrorRecoveryMode,
   EnableStatusLight,
   FactoryMode,
+  FrontButtonRunControls,
   GantryHoming,
   LegacySettings,
   OpenJupyterControl,
@@ -181,6 +182,12 @@ export function RobotSettingsAdvanced({
             <Divider marginY={SPACING.spacing16} />
             <UsageSettings
               settings={findSettings('enableDoorSafetySwitch')}
+              robotName={robotName}
+              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
+            />
+            <Divider marginY={SPACING.spacing16} />
+            <FrontButtonRunControls
+              settings={findSettings('disableOT2FrontButton')}
               robotName={robotName}
               isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
