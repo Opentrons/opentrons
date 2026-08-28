@@ -68,7 +68,7 @@ class PatchSettingsRequestData(_StrictBaseModel):
         int | None,
         pydantic.Field(
             ge=1,
-            le=MAX_NUMBER_OF_LOGIN_ATTEMPTS,
+            le=5,
             description="Max number of login attempts before account deactivation.",
         ),
     ] = None

@@ -2,10 +2,11 @@ import pytest
 from pydantic import ValidationError
 
 from auth_server.settings.models import (
-    MAX_NUMBER_OF_LOGIN_ATTEMPTS,
     PatchSettingsRequestData,
     SettingsResponseData,
 )
+
+MAX_NUMBER_OF_LOGIN_ATTEMPTS = 5
 
 
 def test_max_number_of_login_attempts_accepts_valid_values() -> None:
