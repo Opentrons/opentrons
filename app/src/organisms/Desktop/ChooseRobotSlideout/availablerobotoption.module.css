@@ -18,3 +18,11 @@
   width: 4rem;
   height: 3.5625rem;
 }
+
+.sending_label {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-8);
+}

@@ -27,7 +27,7 @@ import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import { getAnalysisStatus } from '/app/transformations/analysis'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
-import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
+import { ChooseRobotSlideout, SendingButtonLabel } from '../ChooseRobotSlideout'
 
 import type { AxiosError } from 'axios'
 import type { IconProps, StyleProps } from '@opentrons/components'
@@ -59,6 +59,7 @@ export function SendProtocolToFlexSlideout(
 
   const [selectedRobot, setSelectedRobot] = useState<Robot | null>(null)
   const [runCreationError, setRunCreationError] = useState<string | null>(null)
+  const [isSending, setIsSending] = useState(false)
 
   const isSelectedRobotOnDifferentSoftwareVersion =
     useIsRobotOnWrongVersionOfSoftware(selectedRobot?.name ?? '')
@@ -121,6 +122,10 @@ export function SendProtocolToFlexSlideout(
   const icon: IconProps = { name: 'ot-spinner', spin: true }
 
   const handleSendClick = (): void => {
+    if (isSending) {
+      return
+    }
+    setIsSending(true)
     setRunCreationError(null)
     const toastId = makeToast(selectedRobot?.name ?? '', INFO_TOAST, {
       heading: `${t('sending')} ${protocolDisplayName}`,
@@ -175,6 +180,9 @@ export function SendProtocolToFlexSlideout(
         }
         onCloseClick()
       })
+      .finally(() => {
+        setIsSending(false)
+      })
   }
 
   return (
@@ -196,13 +204,14 @@ export function SendProtocolToFlexSlideout(
             onClick={handleSendClick}
             width="100%"
           >
-            {t('protocol_details:send')}
+            {isSending ? <SendingButtonLabel /> : t('protocol_details:send')}
           </PrimaryButton>
         }
         selectedRobot={selectedRobot}
         setSelectedRobot={setSelectedRobot}
         robotType={FLEX_ROBOT_TYPE}
         runCreationError={runCreationError}
+        isCreatingRun={isSending}
         reset={() => {
           setRunCreationError(null)
         }}
