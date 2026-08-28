@@ -43,7 +43,9 @@ describe('PersonalAccountSettingsEditForm', () => {
     expect(screen.getByDisplayValue('Alice Example')).toBeInTheDocument()
     screen.getByText('New password')
     screen.getByText('Confirm new password')
-    expect(screen.getAllByRole('button', { name: 'Show' })).toHaveLength(2)
+    expect(
+      screen.getAllByRole('button', { name: 'Toggle password visibility' })
+    ).toHaveLength(2)
     const saveButton = screen.getByRole('button', { name: 'Save' })
     expect(saveButton).toBeDisabled()
     fireEvent.click(saveButton)

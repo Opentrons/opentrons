@@ -5,8 +5,6 @@ import { InputField } from '@opentrons/components'
 import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 
-import styles from './passwordinputfield.module.css'
-
 import type { ChangeEvent, FocusEvent, JSX } from 'react'
 
 export interface PasswordInputFieldProps {
@@ -29,25 +27,26 @@ export function PasswordInputField({
 
   usePlaceCaretAtEndOnToggle(inputRef, showPassword, true)
 
+  const handleTogglePasswordVisibility = (): void => {
+    setShowPassword(current => !current)
+  }
+
   return (
-    <div className={styles.password_field_row}>
-      <div className={styles.password_field_input}>
-        <InputField
-          ref={inputRef}
-          type={showPassword ? 'text' : 'password'}
-          value={value}
-          placeholder={placeholder}
-          error={error}
-          onChange={onChange}
-          onBlur={onBlur}
+    <InputField
+      ref={inputRef}
+      type={showPassword ? 'text' : 'password'}
+      value={value}
+      placeholder={placeholder}
+      error={error}
+      onChange={onChange}
+      onBlur={onBlur}
+      rightElement={
+        <PasswordVisibilityToggle
+          isVisible={showPassword}
+          onToggle={handleTogglePasswordVisibility}
+          iconOnly
         />
-      </div>
-      <PasswordVisibilityToggle
-        isVisible={showPassword}
-        onToggle={() => {
-          setShowPassword(current => !current)
-        }}
-      />
-    </div>
+      }
+    />
   )
 }
