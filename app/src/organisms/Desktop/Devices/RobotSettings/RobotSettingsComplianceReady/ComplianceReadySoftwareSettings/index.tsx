@@ -114,8 +114,9 @@ export function ComplianceReadySoftwareSettings({
   ): Promise<void> => {
     const authPatch = getAuthInputPatch(id, value, fieldValues)
     if (authPatch != null) {
-      await patchAuthSettings(authPatch)
+      return patchAuthSettings(authPatch).then(() => undefined)
     }
+    return Promise.resolve()
   }
 
   const handleAuditSettingInputBlur = async (
@@ -124,8 +125,9 @@ export function ComplianceReadySoftwareSettings({
   ): Promise<void> => {
     const auditPatch = getAuditInputPatch(id, value, fieldValues)
     if (auditPatch != null) {
-      await patchAuditSettings(auditPatch)
+      return patchAuditSettings(auditPatch).then(() => undefined)
     }
+    return Promise.resolve()
   }
 
   const handleToggleChange = (
