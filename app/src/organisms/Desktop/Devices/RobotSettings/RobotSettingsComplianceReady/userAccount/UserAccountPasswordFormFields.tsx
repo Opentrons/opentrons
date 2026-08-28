@@ -26,7 +26,7 @@ export function UserAccountPasswordFormFields<T extends FieldValues>({
     <div className={styles.fields_row}>
       <div className={styles.field_group}>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('desktop_password')}
+          {t('desktop_new_password')}
         </StyledText>
         <div className={styles.field_group_value}>
           <Controller
@@ -35,7 +35,6 @@ export function UserAccountPasswordFormFields<T extends FieldValues>({
             render={({ field, fieldState }) => (
               <PasswordInputField
                 value={field.value}
-                placeholder={t('desktop_password_placeholder')}
                 error={fieldState.error?.message}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
@@ -46,7 +45,7 @@ export function UserAccountPasswordFormFields<T extends FieldValues>({
       </div>
       <div className={styles.field_group}>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('desktop_confirm_password')}
+          {t('desktop_confirm_new_password')}
         </StyledText>
         <div className={styles.field_group_value}>
           <Controller
@@ -54,15 +53,12 @@ export function UserAccountPasswordFormFields<T extends FieldValues>({
             name={'confirmPassword' as Path<T>}
             rules={{
               validate: value =>
-                (password as string) === '' ||
-                (value as string) === '' ||
                 (value as string) === (password as string) ||
                 (t('desktop_password_mismatch') as string),
             }}
             render={({ field, fieldState }) => (
               <PasswordInputField
                 value={field.value}
-                placeholder={t('desktop_password_placeholder')}
                 error={fieldState.error?.message}
                 onChange={field.onChange}
                 onBlur={field.onBlur}

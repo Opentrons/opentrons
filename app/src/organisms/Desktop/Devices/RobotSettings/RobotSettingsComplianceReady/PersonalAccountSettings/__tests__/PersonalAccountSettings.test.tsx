@@ -78,6 +78,12 @@ function openEditForm(): void {
   fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
 }
 
+function getPasswordInputs(container: HTMLElement): HTMLInputElement[] {
+  return Array.from(container.querySelectorAll('input')).filter(
+    (input): input is HTMLInputElement => input.type === 'password'
+  )
+}
+
 function createUsernameExistsError(): any {
   return {
     isAxiosError: true,
@@ -128,7 +134,7 @@ describe('PersonalAccountSettings', () => {
     openEditForm()
     expect(screen.getByDisplayValue('alice')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Alice Example')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled()
     expect(
       screen.queryByRole('button', { name: 'Edit' })
     ).not.toBeInTheDocument()
@@ -229,7 +235,7 @@ describe('PersonalAccountSettings', () => {
 
   it.each<{
     description: string
-    applyChange: () => void
+    applyChange: (container: HTMLElement) => void
     expectedData: { username?: string; password?: string }
   }>([
     {
@@ -243,21 +249,19 @@ describe('PersonalAccountSettings', () => {
     },
     {
       description: 'password only',
-      applyChange: () => {
-        screen
-          .getAllByPlaceholderText('************************')
-          .forEach(input => {
-            fireEvent.change(input, { target: { value: 'new-password' } })
-          })
+      applyChange: container => {
+        getPasswordInputs(container).forEach(input => {
+          fireEvent.change(input, { target: { value: 'new-password' } })
+        })
       },
       expectedData: { password: 'new-password' },
     },
   ])(
     'calls updateSelf with $description when password fields are otherwise empty',
     async ({ applyChange, expectedData }) => {
-      renderComponent()
+      const { container } = renderComponent()
       openEditForm()
-      applyChange()
+      applyChange(container)
       fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 
       await waitFor(() => {
