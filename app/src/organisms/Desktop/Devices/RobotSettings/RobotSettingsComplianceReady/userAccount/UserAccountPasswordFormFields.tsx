@@ -26,7 +26,7 @@ export function UserAccountPasswordFormFields<T extends FieldValues>({
     <div className={styles.fields_row}>
       <div className={styles.field_group}>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('desktop_password')}
+          {t('desktop_new_password')}
         </StyledText>
         <div className={styles.field_group_value}>
           <Controller
@@ -45,7 +45,7 @@ export function UserAccountPasswordFormFields<T extends FieldValues>({
       </div>
       <div className={styles.field_group}>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('desktop_confirm_password')}
+          {t('desktop_confirm_new_password')}
         </StyledText>
         <div className={styles.field_group_value}>
           <Controller

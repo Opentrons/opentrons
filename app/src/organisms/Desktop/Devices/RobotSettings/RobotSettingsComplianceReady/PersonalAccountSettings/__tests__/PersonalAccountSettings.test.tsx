@@ -134,6 +134,8 @@ describe('PersonalAccountSettings', () => {
     openEditForm()
     expect(screen.getByDisplayValue('alice')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Alice Example')).toBeInTheDocument()
+    screen.getByText('New password')
+    screen.getByText('Confirm new password')
     expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
     expect(
       screen.queryByRole('button', { name: 'Edit' })
