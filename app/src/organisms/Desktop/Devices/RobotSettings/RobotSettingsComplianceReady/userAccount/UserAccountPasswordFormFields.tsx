@@ -53,8 +53,6 @@ export function UserAccountPasswordFormFields<T extends FieldValues>({
             name={'confirmPassword' as Path<T>}
             rules={{
               validate: value =>
-                (password as string) === '' ||
-                (value as string) === '' ||
                 (value as string) === (password as string) ||
                 (t('desktop_password_mismatch') as string),
             }}
