@@ -700,8 +700,11 @@ ValidTarget = Union[WellTarget, PointTarget, DisposalTarget]
 def validate_dynamic_locations(
     location: Optional[Union[Location, Well, TrashBin, WasteChute]],
     end_location: Location,
+    robot_type: RobotType,
 ) -> None:
     """Given that we have an end_location we check that they're a vaild dynamic pair."""
+    if robot_type == "OT-2 Standard":
+        raise ValueError("Dyanmic pipetting not allowed on OT-2")
     if location is None:
         raise ValueError("Location must be supplied if using an End Location.")
     if not isinstance(location, Location):

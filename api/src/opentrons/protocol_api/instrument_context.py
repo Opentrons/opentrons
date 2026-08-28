@@ -343,7 +343,9 @@ class InstrumentContext(publisher.CommandPublisher):
         end_move_to_location: Optional[types.Location] = None
         end_meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None
         if end_location is not None:
-            validation.validate_dynamic_locations(location, end_location)
+            validation.validate_dynamic_locations(
+                location, end_location, self._protocol_core.robot_type
+            )
             end_target = validation.validate_location(
                 location=end_location, last_location=None
             )
@@ -619,7 +621,9 @@ class InstrumentContext(publisher.CommandPublisher):
         end_move_to_location: Optional[types.Location] = None
         end_meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None
         if end_location is not None:
-            validation.validate_dynamic_locations(location, end_location)
+            validation.validate_dynamic_locations(
+                location, end_location, self._protocol_core.robot_type
+            )
             end_target = validation.validate_location(
                 location=end_location, last_location=None
             )
