@@ -189,7 +189,7 @@
   "waiting_to_reach_temp_module": "Waiting for Temperature Module to reach {{temp}}",
   "waste_chute": "Waste Chute",
   "white": "white",
-  "with_lid_name": "with {{lidDisplayName}}",
+  "with_lid_name": " with {{lidDisplayName}}",
   "with_reference_of": "with reference of {{wavelength}} nm",
   "x": "X",
   "y": "Y",
