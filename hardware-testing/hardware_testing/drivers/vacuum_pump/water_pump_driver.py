@@ -209,7 +209,7 @@ class WaterPump(AbstractWaterPump):
                 self._logger.info(f"Water level difference: {water_level_diff} mm")
                 if current_water_level > water_level:
                     return True
-                if time.perf_counter() - start_time > 12:  # Timeout after 60 seconds
+                if time.perf_counter() - start_time > 14:  # Timeout after 60 seconds
                     self._logger.error("Water fill timed out")
                     return False
 

@@ -359,7 +359,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     manifold_collar = vm_mod.load_adapter_to_dock(ctx.params.collar)  # type: ignore[attr-defined]
     filter_plate = manifold_collar.load_labware("invitroven_filter_plate")
     source = ctx.load_labware("nest_1_reservoir_290ml", "C1")
-    source.set_offset(x=0, y=0, z=13)
+    source.set_offset(x=0, y=0, z=8)
     tip_rack.set_offset(x=0, y=0, z=0)
     # Load Pipette
     pip = ctx.load_instrument("flex_96channel_1000", "left", tip_racks=[tip_rack])

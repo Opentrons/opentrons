@@ -9,7 +9,8 @@ RASPBERRY_PIS = {
     "lldbot2": "10.14.19.141",
 }
 
-REMOTE_FOLDER = "/data/testing_data/vacuum-module-qc/"
+# REMOTE_FOLDER = "/data/testing_data/vacuum-module-qc/"
+REMOTE_FOLDER = "/data/vacuum_manifold_life_test_dvt/"
 OUTPUT_FOLDER = Path("./vacuum_module_data")
 
 
