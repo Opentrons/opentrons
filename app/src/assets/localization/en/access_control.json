@@ -40,6 +40,7 @@
   "on_device_login_password_required": "Password required",
   "on_device_login_password_updated": "Password updated",
   "on_device_login_username_required": "Username required",
+  "send_protocol_admin_credentials_required": "Admin credentials are required to send protocols to this robot.",
   "set_new_password_error_session_expired": "Your session has expired. Log in again to set a new password.",
   "set_new_password_error_update_failed": "Failed to update password. Try again.",
   "set_new_password_success": "Password reset for {{username}}",
