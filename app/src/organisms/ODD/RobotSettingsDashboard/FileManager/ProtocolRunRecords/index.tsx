@@ -2,13 +2,10 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  ALIGN_FLEX_END,
   Chip,
   COLORS,
   FLEX_MIN_CONTENT,
   ListItem,
-  OverflowBtn,
-  SPACING,
   StyledText,
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
@@ -19,6 +16,7 @@ import { formatTimestamp } from '/app/transformations/runs'
 
 import { ConfirmRunRecordModal } from '../FileManagerWizardFlows/ConfirmRunRecordModal'
 import { DownloadDeleteRunRecordWizard } from '../FileManagerWizardFlows/DownloadDeleteRunRecordWizard'
+import { OverflowMenuButton } from '../OverflowMenuButton'
 import styles from './protocolrunrecords.module.css'
 
 import type { ReactNode } from 'react'
@@ -90,12 +88,7 @@ export function ProtocolRunRecords(): ReactNode {
         const protocol = protocols.find(({ id }) => run.protocolId === id)
         const { chipType, listItemType } = runStatusToRecordProps(run.status)
         return (
-          <ListItem
-            key={run.id}
-            type={listItemType}
-            padding={SPACING.spacing24}
-            className={styles.record}
-          >
+          <ListItem key={run.id} type={listItemType} className={styles.record}>
             <div className={styles.record_content}>
               <StyledText
                 oddStyle="bodyTextSemiBold"
@@ -114,8 +107,7 @@ export function ProtocolRunRecords(): ReactNode {
                 background={false}
               />
             </div>
-            <OverflowBtn
-              justifySelf={ALIGN_FLEX_END}
+            <OverflowMenuButton
               onClick={() => {
                 handleOverflowClick(run)
               }}

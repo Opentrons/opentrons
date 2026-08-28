@@ -13,7 +13,7 @@ import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { robotAuthReducer } from '/app/redux/robot-auth'
 
-import { PersonalAccountSettings } from '../PersonalAccountSettings'
+import { PersonalAccountSettings } from '..'
 
 import type { RenderResult } from '@testing-library/react'
 import type { AuthUserResponse, UpdateSelfRequest } from '@opentrons/api-client'
@@ -129,8 +129,11 @@ describe('PersonalAccountSettings', () => {
     expect(screen.getByDisplayValue('alice')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Alice Example')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
+    expect(
+      screen.queryByRole('button', { name: 'Edit' })
+    ).not.toBeInTheDocument()
 
-    fireEvent.click(screen.getAllByRole('button', { name: 'Cancel' })[1]!)
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: 'Save' })

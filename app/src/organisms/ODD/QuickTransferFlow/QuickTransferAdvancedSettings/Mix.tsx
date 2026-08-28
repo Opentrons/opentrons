@@ -18,6 +18,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { i18n } from '/app/i18n'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
@@ -42,6 +43,7 @@ export function Mix(props: MixProps): ReactNode {
   const { t } = useTranslation('quick_transfer')
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = useRef(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
 
   const [mixIsEnabled, setMixIsEnabled] = useState<boolean>(
     kind === 'aspirate'
@@ -49,15 +51,19 @@ export function Mix(props: MixProps): ReactNode {
       : state.mixOnDispense != null
   )
   const [currentStep, setCurrentStep] = useState<number>(1)
-  const [mixVolume, setMixVolume] = useState<number | null>(
+  const existingMixVolume =
     kind === 'aspirate'
-      ? (state.mixOnAspirate?.mixVolume ?? null)
-      : (state.mixOnDispense?.mixVolume ?? null)
+      ? state.mixOnAspirate?.mixVolume
+      : state.mixOnDispense?.mixVolume
+  const existingMixReps =
+    kind === 'aspirate'
+      ? state.mixOnAspirate?.repetitions
+      : state.mixOnDispense?.repetitions
+  const [mixVolume, setMixVolume] = useState<string>(
+    existingMixVolume != null ? String(existingMixVolume) : ''
   )
-  const [mixReps, setMixReps] = useState<number | null>(
-    kind === 'aspirate'
-      ? (state.mixOnAspirate?.repetitions ?? null)
-      : (state.mixOnDispense?.repetitions ?? null)
+  const [mixReps, setMixReps] = useState<string>(
+    existingMixReps != null ? String(existingMixReps) : ''
   )
 
   const mixAction =
@@ -109,10 +115,16 @@ export function Mix(props: MixProps): ReactNode {
         setCurrentStep(3)
         break
       case 3:
-        if (mixVolume != null && mixReps != null) {
+        if (
+          parsedMixVolume.result === 'success' &&
+          parsedMixReps.result === 'success'
+        ) {
           dispatch({
             type: mixAction,
-            mixSettings: { mixVolume, repetitions: mixReps },
+            mixSettings: {
+              mixVolume: parsedMixVolume.data,
+              repetitions: parsedMixReps.data,
+            },
           })
           trackEventWithRobotSerial({
             name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,
@@ -135,30 +147,44 @@ export function Mix(props: MixProps): ReactNode {
   const tipVolume = Object.values(state.tipRack.wells)[0].totalLiquidVolume
 
   const volumeRange = { min: 1, max: Math.min(maxPipetteVolume, tipVolume) }
-  const volumeError =
-    mixVolume != null &&
-    (mixVolume < volumeRange.min || mixVolume > volumeRange.max)
-      ? t(`value_out_of_range`, {
-          min: volumeRange.min,
-          max: volumeRange.max,
+  const parsedMixVolume = parseNumericalInput(mixVolume, {
+    allowDecimal: false,
+    allowNegative: false,
+    min: volumeRange.min,
+    max: volumeRange.max,
+  })
+  const volumeErrorMessage =
+    parsedMixVolume.result === 'rangeError'
+      ? t('value_out_of_range', {
+          min: parsedMixVolume.min,
+          max: parsedMixVolume.max,
         })
-      : null
+      : parsedMixVolume.result === 'syntaxError'
+        ? t('enter_a_valid_number')
+        : null
 
   const repititionRange = { min: 1, max: 999 }
-  const repititionError =
-    mixReps != null &&
-    (mixReps < repititionRange.min || mixReps > repititionRange.max)
-      ? t(`value_out_of_range`, {
-          min: repititionRange.min,
-          max: repititionRange.max,
+  const parsedMixReps = parseNumericalInput(mixReps, {
+    allowDecimal: false,
+    allowNegative: false,
+    min: repititionRange.min,
+    max: repititionRange.max,
+  })
+  const repititionErrorMessage =
+    parsedMixReps.result === 'rangeError'
+      ? t('value_out_of_range', {
+          min: parsedMixReps.min,
+          max: parsedMixReps.max,
         })
-      : null
+      : parsedMixReps.result === 'syntaxError'
+        ? t('enter_a_valid_number')
+        : null
 
   let buttonIsDisabled = false
   if (currentStep === 2) {
-    buttonIsDisabled = mixVolume == null || volumeError != null
+    buttonIsDisabled = parsedMixVolume.result !== 'success'
   } else if (currentStep === 3) {
-    buttonIsDisabled = mixReps == null || repititionError != null
+    buttonIsDisabled = parsedMixReps.result !== 'success'
   }
 
   return createPortal(
@@ -219,13 +245,14 @@ export function Mix(props: MixProps): ReactNode {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              ref={inputElementRef}
               autoFocus
-              type="number"
+              type="text"
               value={mixVolume}
               label={t('mix_volume_µL')}
-              error={volumeError}
+              error={volumeErrorMessage}
               onChange={e => {
-                setMixVolume(Number(e.target.value))
+                setMixVolume(e.target.value)
               }}
             />
           </Flex>
@@ -237,10 +264,7 @@ export function Mix(props: MixProps): ReactNode {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={String(mixVolume ?? '')}
-              onChange={e => {
-                setMixVolume(Number(e))
-              }}
+              inputElementRef={inputElementRef}
             />
           </Flex>
         </Flex>
@@ -263,13 +287,14 @@ export function Mix(props: MixProps): ReactNode {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              ref={inputElementRef}
               autoFocus
-              type="number"
+              type="text"
               value={mixReps}
-              error={repititionError}
+              error={repititionErrorMessage}
               label={t('mix_repetitions')}
               onChange={e => {
-                setMixReps(Number(e.target.value))
+                setMixReps(e.target.value)
               }}
             />
           </Flex>
@@ -281,9 +306,7 @@ export function Mix(props: MixProps): ReactNode {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              onChange={e => {
-                setMixReps(Number(e))
-              }}
+              inputElementRef={inputElementRef}
             />
           </Flex>
         </Flex>

@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
@@ -20,7 +20,9 @@ import {
 import { useHost } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
+import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import { logOut } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
@@ -144,6 +146,9 @@ function LoginModalImpl(props: LoginModalImplProps): ReactNode {
     useState<boolean>(false)
 
   const handleClose = (): void => {
+    if (screen.kind === 'setNewPassword') {
+      dispatch(logOut({ robotName }))
+    }
     modal.resolve(null)
     modal.remove()
   }
@@ -175,7 +180,7 @@ function LoginModalImpl(props: LoginModalImplProps): ReactNode {
 
   const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
     useSetNewPasswordAndSignIn({
-      onSuccess: successfulUsername => {
+      onSuccess: (successfulUsername, _newPassword) => {
         dispatch(logOut({ robotName }))
         setScreen({
           kind: 'login',
@@ -406,6 +411,14 @@ function LoginView(props: LoginViewProps): ReactNode {
     onForgotPasswordClick,
   } = props
   const { t } = useTranslation()
+  const [showPassword, setShowPassword] = useState(false)
+  const passwordInputRef = useRef<HTMLInputElement>(null)
+
+  usePlaceCaretAtEndOnToggle(passwordInputRef, showPassword, true)
+
+  const handleTogglePasswordVisibility = (): void => {
+    setShowPassword(current => !current)
+  }
 
   return (
     <>
@@ -420,6 +433,7 @@ function LoginView(props: LoginViewProps): ReactNode {
 
       <form id={formId} onSubmit={onSubmit} className={styles.fields_container}>
         <InputField
+          autoFocus
           name="username"
           title={t('access_control:login_form_username_field')}
           type="text"
@@ -430,14 +444,22 @@ function LoginView(props: LoginViewProps): ReactNode {
           }}
         />
         <InputField
+          ref={passwordInputRef}
           name="password"
           title={t('access_control:login_form_password_field')}
-          type="password"
+          type={showPassword ? 'text' : 'password'}
           value={formData.logInPassword}
           error={formData.passwordRequiredError ?? formData.error ?? undefined}
           onChange={event => {
             onLogInPasswordChange(event.target.value)
           }}
+          rightElement={
+            <PasswordVisibilityToggle
+              isVisible={showPassword}
+              onToggle={handleTogglePasswordVisibility}
+              iconOnly
+            />
+          }
         />
         <div>
           <BasicButton type="button" underLine onClick={onForgotPasswordClick}>
@@ -493,6 +515,7 @@ function SetNewPasswordView(props: SetNewPasswordViewProps): ReactNode {
 
       <div className={styles.fields_container}>
         <InputField
+          autoFocus
           name="newPassword"
           title={t(
             'access_control:desktop_password_expired_new_password_field'

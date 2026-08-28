@@ -27,11 +27,6 @@ class Scope(enum.Enum):
         "Edit settings related to authentication, authorization, and access control.",
     )
 
-    PROTOCOL_ANALYSES_WRITE = (
-        "protocol_analyses.write",
-        "Create robot-side protocol analyses.",
-    )
-
     PROTOCOLS_WRITE = (
         "protocols.write",
         "Upload or delete protocols.",

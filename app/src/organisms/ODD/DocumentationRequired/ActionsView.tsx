@@ -6,6 +6,8 @@ import { COLORS } from '@opentrons/components'
 import { OddModal } from '/app/molecules/OddModal'
 import { ActionList } from '/app/organisms/ActionItems/ActionList'
 
+import styles from './documentationrequired.module.css'
+
 import type { ReactNode } from 'react'
 import type { IconName } from '@opentrons/components'
 import type { DocumentedAction } from '@opentrons/react-api-client'
@@ -29,8 +31,12 @@ const ActionsViewImpl = ({
       header={actionViewHeader}
       modalZIndex={1002}
       onOutsideClick={modal.remove}
+      overflow="hidden"
     >
-      <ActionList actionsToDocument={actionsToDocument} />
+      <ActionList
+        actionsToDocument={actionsToDocument}
+        className={styles.actions_view_list}
+      />
     </OddModal>
   )
 }

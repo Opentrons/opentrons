@@ -55,9 +55,9 @@ describe('Account', () => {
     screen.getByRole('heading', { name: 'Account' })
     screen.getByText('Username')
     screen.getByText('george_clooney')
-    screen.getByText('Legal Name')
+    screen.getByText('Legal name')
     screen.getByText('George Clooney')
-    screen.getByText('Manage robot users in the Opentrons App')
+    screen.getByText('Manage user account details in the Opentrons App')
   })
 
   it('renders a blank page, then navigates to the previous page, when the user is not logged in', async () => {
@@ -71,7 +71,7 @@ describe('Account', () => {
 
     screen.getByRole('heading', { name: 'Account' })
     screen.getByText('Username')
-    screen.getByText('Legal Name')
+    screen.getByText('Legal name')
 
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith(-1)
