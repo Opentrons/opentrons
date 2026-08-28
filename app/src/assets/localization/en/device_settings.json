@@ -175,7 +175,7 @@
   "free_disk_space": "The run may fail if storage space is not freed up by clearing images from a previous run record.",
   "front_button_run_controls": "Control runs with the front button",
   "front_button_run_controls_description": "When enabled, you can press the button on the front of the OT-2 to pause or resume an ongoing run. Requires a robot restart to take effect.",
-  "gantry_homing": "Home Gantry on Restart",
+  "gantry_homing": "Home gantry on restart",
   "gantry_homing_description": "Homes the gantry along the z-axis.",
   "go_to_advanced_settings": "Go to Advanced App Settings",
   "gripper_calibration_description": "Gripper calibration uses a metal pin to determine the gripper's exact position relative to precision-cut squares on deck slots.",
