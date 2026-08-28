@@ -504,6 +504,21 @@ function SetNewPasswordView(props: SetNewPasswordViewProps): JSX.Element {
     onPasswordFieldBlur,
   } = props
   const { t } = useTranslation()
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const newPasswordInputRef = useRef<HTMLInputElement>(null)
+  const confirmPasswordInputRef = useRef<HTMLInputElement>(null)
+
+  usePlaceCaretAtEndOnToggle(newPasswordInputRef, showNewPassword, true)
+  usePlaceCaretAtEndOnToggle(confirmPasswordInputRef, showConfirmPassword, true)
+
+  const handleToggleNewPasswordVisibility = (): void => {
+    setShowNewPassword(current => !current)
+  }
+
+  const handleToggleConfirmPasswordVisibility = (): void => {
+    setShowConfirmPassword(current => !current)
+  }
 
   return (
     <>
@@ -518,12 +533,13 @@ function SetNewPasswordView(props: SetNewPasswordViewProps): JSX.Element {
 
       <div className={styles.fields_container}>
         <InputField
+          ref={newPasswordInputRef}
           autoFocus
           name="newPassword"
           title={t(
             'access_control:desktop_password_expired_new_password_field'
           )}
-          type="password"
+          type={showNewPassword ? 'text' : 'password'}
           value={formData.newPassword}
           error={formData.error ?? undefined}
           onChange={event => {
@@ -532,13 +548,21 @@ function SetNewPasswordView(props: SetNewPasswordViewProps): JSX.Element {
           onBlur={() => {
             onPasswordFieldBlur()
           }}
+          rightElement={
+            <PasswordVisibilityToggle
+              isVisible={showNewPassword}
+              onToggle={handleToggleNewPasswordVisibility}
+              iconOnly
+            />
+          }
         />
         <InputField
+          ref={confirmPasswordInputRef}
           name="confirmPassword"
           title={t(
             'access_control:desktop_password_expired_confirm_password_field'
           )}
-          type="password"
+          type={showConfirmPassword ? 'text' : 'password'}
           value={formData.confirmPassword}
           error={formData.confirmPasswordError ?? undefined}
           onChange={event => {
@@ -547,6 +571,13 @@ function SetNewPasswordView(props: SetNewPasswordViewProps): JSX.Element {
           onBlur={() => {
             onPasswordFieldBlur()
           }}
+          rightElement={
+            <PasswordVisibilityToggle
+              isVisible={showConfirmPassword}
+              onToggle={handleToggleConfirmPasswordVisibility}
+              iconOnly
+            />
+          }
         />
       </div>
     </>

@@ -338,8 +338,70 @@ describe('LoginModal', () => {
     screen.getByText('Your password has expired')
     screen.getByText('Create a new password to use')
     expect(screen.getByLabelText('New password')).toHaveFocus()
-    screen.getByLabelText('Confirm password')
+    expect(screen.getByLabelText('New password')).toHaveAttribute(
+      'type',
+      'password'
+    )
+    expect(screen.getByLabelText('Confirm password')).toHaveAttribute(
+      'type',
+      'password'
+    )
+    expect(
+      screen.getAllByRole('button', { name: 'Toggle password visibility' })
+    ).toHaveLength(2)
     screen.getByRole('button', { name: 'Confirm' })
+  })
+
+  it('toggles new and confirm password visibility independently', () => {
+    mockLoginRequiringPasswordReset()
+
+    renderAndOpenLoginModal()
+    logInWithTempPassword()
+
+    fireEvent.change(screen.getByLabelText('New password'), {
+      target: { value: 'new-password' },
+    })
+    fireEvent.change(screen.getByLabelText('Confirm password'), {
+      target: { value: 'new-password' },
+    })
+
+    const [newPasswordToggle, confirmPasswordToggle] = screen.getAllByRole(
+      'button',
+      { name: 'Toggle password visibility' }
+    )
+
+    fireEvent.click(newPasswordToggle)
+    expect(screen.getByLabelText('New password')).toHaveAttribute(
+      'type',
+      'text'
+    )
+    expect(screen.getByLabelText('Confirm password')).toHaveAttribute(
+      'type',
+      'password'
+    )
+    expect(newPasswordToggle).toHaveAttribute('aria-pressed', 'true')
+    expect(confirmPasswordToggle).toHaveAttribute('aria-pressed', 'false')
+
+    fireEvent.click(confirmPasswordToggle)
+    expect(screen.getByLabelText('New password')).toHaveAttribute(
+      'type',
+      'text'
+    )
+    expect(screen.getByLabelText('Confirm password')).toHaveAttribute(
+      'type',
+      'text'
+    )
+    expect(confirmPasswordToggle).toHaveAttribute('aria-pressed', 'true')
+
+    fireEvent.click(newPasswordToggle)
+    expect(screen.getByLabelText('New password')).toHaveAttribute(
+      'type',
+      'password'
+    )
+    expect(screen.getByLabelText('Confirm password')).toHaveAttribute(
+      'type',
+      'text'
+    )
   })
 
   it('logs out when closing the set new password view', () => {
