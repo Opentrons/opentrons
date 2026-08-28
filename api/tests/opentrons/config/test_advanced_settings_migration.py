@@ -9,7 +9,7 @@ from opentrons.config.advanced_settings import _ensure, _migrate
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 40
+    return 41
 
 
 # make sure to set a boolean value in default_file_settings only if
@@ -22,6 +22,7 @@ def default_file_settings() -> Dict[str, Any]:
         "disableHomeOnBoot": None,
         "useOldAspirationFunctions": None,
         "enableDoorSafetySwitch": None,
+        "disableOT2FrontButton": None,
         "enableOT3HardwareController": None,
         "rearPanelIntegration": True,
         "disableStallDetection": None,
@@ -480,6 +481,18 @@ def v40_config(v39_config: Dict[str, Any]) -> Dict[str, Any]:
     return r
 
 
+@pytest.fixture
+def v41_config(v40_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v40_config.copy()
+    r.update(
+        {
+            "_version": 41,
+            "disableOT2FrontButton": None,
+        }
+    )
+    return r
+
+
 @pytest.fixture(
     params=[
         lazy_fixture("empty_settings"),
@@ -524,6 +537,7 @@ def v40_config(v39_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v38_config"),
         lazy_fixture("v39_config"),
         lazy_fixture("v40_config"),
+        lazy_fixture("v41_config"),
     ],
 )
 def old_settings(request: SubRequest) -> Dict[str, Any]:
@@ -605,6 +619,7 @@ def test_ensures_config() -> None:
         "disableHomeOnBoot": None,
         "useOldAspirationFunctions": None,
         "enableDoorSafetySwitch": None,
+        "disableOT2FrontButton": None,
         "enableOT3HardwareController": None,
         "rearPanelIntegration": None,
         "disableStallDetection": None,

@@ -25,6 +25,13 @@ def enable_door_safety_switch(robot_type: RobotTypeEnum) -> bool:
     return advs.get_setting_with_env_overload("enableDoorSafetySwitch", robot_type)
 
 
+def ot2_front_button_enabled() -> bool:
+    """Whether the OT-2 front button should be enabled."""
+    return not advs.get_setting_with_env_overload(
+        "disableOT2FrontButton", RobotTypeEnum.OT2
+    )
+
+
 def enable_ot3_hardware_controller() -> bool:
     """Get whether to use the OT-3 hardware controller."""
 

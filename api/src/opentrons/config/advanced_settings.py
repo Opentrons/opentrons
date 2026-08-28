@@ -149,6 +149,18 @@ settings = [
         default_true_on_robot_types=[RobotTypeEnum.FLEX],
     ),
     SettingDefinition(
+        _id="disableOT2FrontButton",
+        title="Disable OT-2 front button run controls",
+        description=(
+            "Do not use the OT-2 front button to pause and resume protocol "
+            "runs, and do not blink its light while a run is paused. Enable "
+            "this for compatibility with custom code that controls the front "
+            "button directly."
+        ),
+        restart_required=True,
+        robot_type=[RobotTypeEnum.OT2],
+    ),
+    SettingDefinition(
         _id="enableOT3HardwareController",
         title="Enable experimental OT-3 hardware controller",
         description=(
@@ -798,6 +810,16 @@ def _migrate39to40(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate40to41(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 41 of the feature flags file.
+
+    - Adds the disableOT2FrontButton config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["disableOT2FrontButton"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -839,6 +861,7 @@ _MIGRATIONS = [
     _migrate37to38,
     _migrate38to39,
     _migrate39to40,
+    _migrate40to41,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

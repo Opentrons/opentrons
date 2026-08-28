@@ -6,7 +6,7 @@ from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons_shared_data.robot.types import RobotTypeEnum
 
-from opentrons.config import CONFIG, advanced_settings
+from opentrons.config import CONFIG, advanced_settings, feature_flags
 
 
 @pytest.fixture
@@ -138,6 +138,23 @@ def test_get_advanced_setting_found(
         assert s is not None
         assert s.value == v
         assert s.definition == advanced_settings.settings_by_id[k]
+
+
+@pytest.mark.parametrize(
+    ("setting_value", "expected"),
+    [(None, True), (False, True), (True, False)],
+)
+def test_ot2_front_button_feature_flag(
+    clear_cache: None,
+    mock_read_settings_file_empty: MagicMock,
+    mock_settings_values_empty: Dict[str, Optional[bool]],
+    setting_value: Optional[bool],
+    expected: bool,
+) -> None:
+    """The OT-2 front button feature should be on unless explicitly disabled."""
+    mock_settings_values_empty["disableOT2FrontButton"] = setting_value
+
+    assert feature_flags.ot2_front_button_enabled() is expected
 
 
 @pytest.mark.parametrize(
