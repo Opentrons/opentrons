@@ -32,7 +32,7 @@ The `aspirate()` method includes the location parameters `location` and `end_loc
 - `location` accepts either a [`Well`][opentrons.protocol_api.Well] or a [`Location`][opentrons.types.Location]. 
 - `end_location` can only be used in combination with the `location` parameter. Both must be a [`Location`][opentrons.types.Location].
 
-*Changed in version 2.27*: Use the `end_location` parameter to specify multiple locations during an aspirate.
+*Changed in version 2.27*: Use the `end_location` parameter to specify multiple locations for a Flex pipette during an aspirate.
 
 If you specify a single `location` like the well `"A1"`, the pipette will aspirate from a default position 1 mm above the bottom center of that well. To change the default clearance, first set the `aspirate` attribute of [`well_bottom_clearance`][opentrons.protocol_api.InstrumentContext.well_bottom_clearance]:
 
@@ -149,7 +149,7 @@ The `dispense()` method includes the location parameters `location` and `end_loc
 - `location` accepts either a [`Well`][opentrons.protocol_api.Well] or a [`Location`][opentrons.types.Location]. 
 - `end_location` can only be used in combination iwth the `location` parameter. Both must be a [`Location`][opentrons.types.Location]. 
 
-*Changed in version 2.27*: Use the `end_location` parameter to specify multiple locations during a dispense.
+*Changed in version 2.27*: Use the `end_location` parameter to specify multiple locations for a Flex pipette during a dispense.
 
 If you specify a single `location` like the well `"B1"`, the pipette will dispense from a default position 1 mm above the bottom center of that well. To change the default clearance, set the `dispense` attribute of [`well_bottom_clearance`][opentrons.protocol_api.InstrumentContext.well_bottom_clearance]:
 
