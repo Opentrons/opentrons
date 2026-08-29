@@ -34,7 +34,7 @@ export function PerStepOverflowMenu(
 
   return (
     <div ref={perStepOverflowWrapperRef} className={styles.container}>
-      <MenuList>
+      <MenuList opensUpward={true}>
         {PLAYBACK_SPEED_OPTIONS.map(option => (
           <MenuItem
             key={option.seconds}
