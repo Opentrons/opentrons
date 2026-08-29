@@ -2,7 +2,7 @@
 
 import datetime
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -28,6 +28,14 @@ class UserStore:
         """Look up a user by username. Returns the User or None."""
         with self._session() as session:
             user = session.scalar(select(User).where(User.username == username))
+            if user is not None:
+                session.expunge(user)
+            return user
+
+    def get_by_id(self, user_id: int) -> User | None:
+        """Look up a user by primary key. Returns the User or None."""
+        with self._session() as session:
+            user = session.scalar(select(User).where(User.id == user_id))
             if user is not None:
                 session.expunge(user)
             return user
@@ -140,4 +148,10 @@ class UserStore:
             if user is None:
                 raise ValueError(f"User {username!r} not found")
             user.failed_logins.clear()
+            session.commit()
+
+    def mark_all_reset_password(self) -> None:
+        """Require every user to set a new password on their next login."""
+        with self._session() as session:
+            session.execute(update(User).values(reset_password=True))
             session.commit()

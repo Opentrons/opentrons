@@ -42,7 +42,7 @@ interface VacuumControlsProps {
   propsForFields: FieldPropsByName
   showFormErrors: boolean
 }
-export function VacuumControls(props: VacuumControlsProps): JSX.Element {
+export function VacuumControls(props: VacuumControlsProps): ReactNode {
   const { t } = useTranslation('protocol_steps')
   const { formData, propsForFields, showFormErrors } = props
   const [showProfileModal, setShowProfileModal] = useState<boolean>(false)

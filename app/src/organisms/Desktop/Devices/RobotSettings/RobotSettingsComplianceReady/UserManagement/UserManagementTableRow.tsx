@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next'
 
 import {
+  Chip,
+  ListItem,
   MenuItem,
   OverflowBtn,
   StyledText,
@@ -45,42 +47,29 @@ export function UserManagementTableRow({
     }
 
   return (
-    <tr>
-      <td className={styles.body_cell}>
-        <StyledText
-          desktopStyle="bodyDefaultRegular"
-          className={styles.body_cell_text}
-        >
+    <ListItem type="default">
+      <div className={styles.row}>
+        <StyledText desktopStyle="bodyDefaultRegular" className={styles.cell}>
           {user.username}
         </StyledText>
-      </td>
-      <td className={styles.body_cell}>
-        <StyledText
-          desktopStyle="bodyDefaultRegular"
-          className={styles.body_cell_text}
-        >
+        <StyledText desktopStyle="bodyDefaultRegular" className={styles.cell}>
           {user.fullName}
         </StyledText>
-      </td>
-      <td className={styles.body_cell}>
-        <StyledText
-          desktopStyle="bodyDefaultRegular"
-          className={styles.body_cell_text}
-        >
+        <StyledText desktopStyle="bodyDefaultRegular" className={styles.cell}>
           {t(`desktop_user_role_${user.accountType}`)}
         </StyledText>
-      </td>
-      <td className={styles.body_cell}>
-        <StyledText
-          desktopStyle="bodyDefaultRegular"
-          className={styles.body_cell_text}
-        >
-          {user.locked
-            ? t('desktop_user_status_locked')
-            : t('desktop_user_status_active')}
-        </StyledText>
-      </td>
-      <td className={styles.overflow_cell}>
+        <div className={styles.cell}>
+          <Chip
+            type={user.locked ? 'warning' : 'neutral'}
+            background={user.locked}
+            hasIcon={false}
+            text={
+              user.locked
+                ? t('desktop_user_status_locked')
+                : t('desktop_user_status_active')
+            }
+          />
+        </div>
         <div className={styles.overflow_cell_inner}>
           <OverflowBtn
             onClick={handleOverflowClick}
@@ -115,7 +104,7 @@ export function UserManagementTableRow({
             </>
           ) : null}
         </div>
-      </td>
-    </tr>
+      </div>
+    </ListItem>
   )
 }

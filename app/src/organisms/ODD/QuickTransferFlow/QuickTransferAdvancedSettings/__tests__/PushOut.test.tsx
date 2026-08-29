@@ -74,12 +74,13 @@ describe('PushOut', () => {
     await user.click(screen.getByText('Enabled'))
     await user.click(screen.getByText('Continue'))
     await user.click(screen.getByRole('button', { name: '1' }))
-    await user.click(screen.getByRole('button', { name: '0' }))
+    await user.click(screen.getByRole('button', { name: '.' }))
+    await user.click(screen.getByRole('button', { name: '5' }))
     await user.click(screen.getByText('Save'))
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_PUSH_OUT',
       pushOutSettings: {
-        volume: 10,
+        volume: 1.5,
       },
     })
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalledWith({

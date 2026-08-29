@@ -88,13 +88,6 @@ export function SignRun({
     trimmedName === '' || isLoading || nameError || loginGate !== 'done'
 
   useEffect(() => {
-    if (inputRef.current != null) {
-      inputRef.current.focus()
-    }
-    keyboardRef.current?.setInput(name)
-  }, [name])
-
-  useEffect(() => {
     if (isSigned) {
       onSigned?.()
     }
@@ -176,11 +169,8 @@ export function SignRun({
             onToggle={handleKeyboardToggle}
           >
             <FullKeyboard
-              onChange={(input: string) => {
-                handleNameChange(input)
-                inputRef.current?.focus()
-              }}
               keyboardRef={keyboardRef}
+              inputElementRef={inputRef}
             />
           </AccordionKeyboard>
         </div>

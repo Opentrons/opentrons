@@ -1,15 +1,10 @@
 import { useTranslation } from 'react-i18next'
 
-import {
-  ALIGN_FLEX_END,
-  ListItem,
-  OverflowBtn,
-  StyledText,
-  Tag,
-} from '@opentrons/components'
+import { ListItem, StyledText, Tag } from '@opentrons/components'
 
 import { formatTimestamp } from '/app/transformations/runs'
 
+import { OverflowMenuButton } from '../OverflowMenuButton'
 import styles from './compliancereadyfiles.module.css'
 
 import type { ReactNode } from 'react'
@@ -49,8 +44,7 @@ export function LogPeriodRow(props: LogPeriodRowProps): ReactNode {
           shrinkToContent
         />
       </div>
-      <OverflowBtn
-        justifySelf={ALIGN_FLEX_END}
+      <OverflowMenuButton
         onClick={() => {
           handleOverflowClick(logPeriodSummary)
         }}

@@ -135,7 +135,7 @@ export const HintsModal = (): ReactNode => {
   )
 }
 
-function BodyParagraph({ children }: PropsWithChildren): JSX.Element {
+function BodyParagraph({ children }: PropsWithChildren): ReactNode {
   return (
     <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.black90}>
       {children}

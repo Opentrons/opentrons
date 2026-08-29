@@ -203,4 +203,30 @@ describe('useLPCLabwareInfo', () => {
 
     expect(result.current.legacyOffsets).toEqual([])
   })
+
+  it('should handle empty stored offsets', () => {
+    vi.mocked(useNotifySearchLabwareOffsets).mockReturnValue({
+      data: undefined,
+    } as any)
+
+    vi.mocked(getUniqueValidLwLocationInfoByAnalysis).mockReturnValue([])
+    vi.mocked(getLPCSearchParams).mockReturnValue({ filters: [] })
+
+    const { result } = renderHook(() => {
+      return useLPCLabwareInfo({
+        runId: RUN_ID,
+        robotType: FLEX_ROBOT_TYPE,
+        labwareDefs: LABWARE_DEFS,
+        protocolData: PROTOCOL_DATA,
+      })
+    })
+
+    expect(result.current.storedOffsets).toEqual([])
+    expect(getLPCLabwareInfoFrom).toHaveBeenCalledWith({
+      currentOffsets: [],
+      lwLocInfo: [],
+      labwareDefs: LABWARE_DEFS,
+      protocolData: PROTOCOL_DATA,
+    })
+  })
 })

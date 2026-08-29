@@ -34,7 +34,7 @@ import {
 import { maskToInteger } from '/protocol-designer/steplist/fieldLevel/processing'
 
 import type { TFunction } from 'i18next'
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type { Initialization as InitializationState } from '@opentrons/step-generation'
 import type { FormData } from '/protocol-designer/form-types'
@@ -87,7 +87,7 @@ const getBadWavelengthError = (
   return null
 }
 
-export function Initialization(props: InitializationProps): JSX.Element {
+export function Initialization(props: InitializationProps): ReactNode {
   const { formData, propsForFields, showFormErrors } = props
   const [numWavelengths, setNumWavelengths] = useState<number>(
     (formData.wavelengths?.length as number) ?? 1
@@ -118,7 +118,7 @@ interface SelectModeProps {
   modeProps: FieldProps
 }
 
-function SelectMode(props: SelectModeProps): JSX.Element {
+function SelectMode(props: SelectModeProps): ReactNode {
   const { modeProps } = props
   const { t } = useTranslation('form')
   const buttonValues = ['single', 'multi']
@@ -158,7 +158,7 @@ interface InitializationEditorProps {
   showFormErrors: boolean
 }
 
-function IntializationEditor(props: InitializationEditorProps): JSX.Element {
+function IntializationEditor(props: InitializationEditorProps): ReactNode {
   const {
     formData,
     propsForFields,
@@ -270,7 +270,7 @@ interface WavelengthItemProps {
   error: string | null
 }
 
-function WavelengthItem(props: WavelengthItemProps): JSX.Element {
+function WavelengthItem(props: WavelengthItemProps): ReactNode {
   const {
     wavelength,
     wavelengths,
@@ -353,7 +353,7 @@ interface ReferenceWavelengthProps {
   propsForFields: FieldPropsByName
 }
 
-function ReferenceWavelength(props: ReferenceWavelengthProps): JSX.Element {
+function ReferenceWavelength(props: ReferenceWavelengthProps): ReactNode {
   const { formData, propsForFields } = props
   const { t } = useTranslation('form')
   const isExpanded = formData.referenceWavelengthActive === true

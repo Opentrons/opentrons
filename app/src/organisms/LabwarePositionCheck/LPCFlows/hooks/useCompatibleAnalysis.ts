@@ -13,7 +13,6 @@ import {
 import { getRunTimeParameterDataFromRun } from './utils'
 
 import type { Run } from '@opentrons/api-client'
-import type { DocumentationState } from '@opentrons/react-api-client'
 import type {
   CompletedProtocolAnalysis,
   RunTimeCommand,
@@ -30,8 +29,7 @@ export function useCompatibleAnalysis(
   runId: string | null,
   runRecord: Run | undefined,
   mostRecentAnalysis: CompletedProtocolAnalysis | null,
-  isFlex: boolean,
-  documentationState: DocumentationState
+  isFlex: boolean
 ): CompletedProtocolAnalysis | null {
   const [compatibleAnalysis, setCompatibleAnalysis] =
     useState<CompletedProtocolAnalysis | null>(null)
@@ -42,10 +40,8 @@ export function useCompatibleAnalysis(
 
   const trackEvent = useTrackEvent()
   const protocolId = runRecord?.data.protocolId ?? ''
-  const { createProtocolAnalysis } = useCreateProtocolAnalysisMutation(
-    documentationState,
-    protocolId
-  )
+  const { createProtocolAnalysis } =
+    useCreateProtocolAnalysisMutation(protocolId)
   const { data: freshAnalysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
     compatibleAnalysisId,

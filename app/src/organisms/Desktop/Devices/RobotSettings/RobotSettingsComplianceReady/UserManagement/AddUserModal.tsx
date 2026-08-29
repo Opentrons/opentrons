@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -7,24 +8,31 @@ import {
   ModalShell,
   PrimaryButton,
   SecondaryButton,
+  StyledText,
   WizardHeader,
 } from '@opentrons/components'
-import { useUpdateUserMutation } from '@opentrons/react-api-client'
+import { useCreateUserMutation } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { mapAuthUserMutationError } from '/app/resources/auth/mapAuthUserMutationError'
 
 import {
+  ADD_USER_WIZARD_CREATE_ACCOUNT_STEP,
+  ADD_USER_WIZARD_TOTAL_STEPS,
   MANAGEABLE_USER_ACCOUNT_TYPES,
   USERNAME_MAX_LENGTH,
-} from './userAccount/constants'
-import styles from './userAccount/userAccountForm.module.css'
-import { UserAccountIdentityFormFields } from './userAccount/UserAccountIdentityFormFields'
+} from '../userAccount/constants'
+import { OneTimePasswordModal } from '../userAccount/OneTimePasswordModal'
+import styles from '../userAccount/userAccountForm.module.css'
+import { UserAccountIdentityFormFields } from '../userAccount/UserAccountIdentityFormFields'
 
 import type { TFunction } from 'i18next'
 import type { JSX } from 'react'
-import type { AuthUser, AuthUserAccountType } from '@opentrons/api-client'
+import type {
+  AuthUserAccountType,
+  CreateUserRequest,
+} from '@opentrons/api-client'
 import type { DropdownOption } from '@opentrons/components'
 
 interface FormValues {
@@ -33,83 +41,76 @@ interface FormValues {
   accountType: AuthUserAccountType
 }
 
-export interface EditUserModalProps {
+export interface AddUserModalProps {
   robotName: string
-  user: AuthUser
   onClose: () => void
-  onUserUpdated?: () => void
+  onUserCreated?: () => void
 }
 
-export function EditUserModal({
+export function AddUserModal({
   robotName,
-  user,
   onClose,
-  onUserUpdated,
-}: EditUserModalProps): JSX.Element {
+  onUserCreated,
+}: AddUserModalProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared']) as {
     t: TFunction
   }
+  const [generatedPassword, setGeneratedPassword] = useState<string | null>(
+    null
+  )
   const documentationState = useDocumentationState(undefined, robotName)
-  const { updateUser, isLoading: isSaving } =
-    useUpdateUserMutation(documentationState)
+  const { createUser, isLoading: isSaving } =
+    useCreateUserMutation(documentationState)
   const { control, handleSubmit, watch, setValue, setError, clearErrors } =
     useForm<FormValues>({
       defaultValues: {
-        username: user.username,
-        fullName: user.fullName,
-        accountType: user.accountType,
+        username: '',
+        fullName: '',
+        accountType: 'admin',
       },
-      mode: 'onBlur',
+      mode: 'onSubmit',
       reValidateMode: 'onChange',
     })
 
-  const { username, fullName, accountType } = watch()
+  const { accountType } = watch()
   const accountTypeOptions: DropdownOption[] =
-    MANAGEABLE_USER_ACCOUNT_TYPES.map(type => ({
-      name: t(`desktop_user_role_${type}`),
-      value: type,
+    MANAGEABLE_USER_ACCOUNT_TYPES.map(accountType => ({
+      name: t(`desktop_user_role_${accountType}`),
+      value: accountType,
     }))
   const selectedAccountTypeOption =
     accountTypeOptions.find(option => option.value === accountType) ??
     accountTypeOptions[0]!
 
-  const trimmedUsername = username.trim()
-  const trimmedFullName = fullName.trim()
-  const hasChanges =
-    trimmedUsername !== user.username ||
-    trimmedFullName !== user.fullName ||
-    accountType !== user.accountType
-
-  const isSaveDisabled =
-    isSaving ||
-    !hasChanges ||
-    trimmedUsername === '' ||
-    trimmedFullName === '' ||
-    trimmedUsername.length > USERNAME_MAX_LENGTH
-
   const handleClose = (): void => {
     clearErrors()
+    setGeneratedPassword(null)
     onClose()
   }
 
-  const onSubmit = (): void => {
-    void updateUser({
-      username: user.username,
-      request: {
-        data: {
-          ...(trimmedUsername !== user.username
-            ? { username: trimmedUsername }
-            : {}),
-          ...(trimmedFullName !== user.fullName
-            ? { fullName: trimmedFullName }
-            : {}),
-          ...(accountType !== user.accountType ? { accountType } : {}),
-        },
+  const handleConfirm = (): void => {
+    onUserCreated?.()
+    handleClose()
+  }
+
+  const onSubmit = (data: FormValues): void => {
+    const request: CreateUserRequest = {
+      data: {
+        username: data.username.trim(),
+        fullName: data.fullName.trim(),
+        accountType: data.accountType,
       },
-    })
-      .then(() => {
-        onUserUpdated?.()
-        handleClose()
+    }
+
+    void createUser(request)
+      .then(response => {
+        const { temporaryPassword } = response.data
+        if (temporaryPassword != null) {
+          setGeneratedPassword(temporaryPassword)
+          clearErrors()
+        } else {
+          handleClose()
+        }
       })
       .catch(error => {
         const formError = mapAuthUserMutationError<FormValues>(error, t)
@@ -119,13 +120,27 @@ export function EditUserModal({
       })
   }
 
+  if (generatedPassword != null) {
+    return (
+      <OneTimePasswordModal
+        password={generatedPassword}
+        message={t('desktop_add_user_success_message') as string}
+        onConfirm={handleConfirm}
+        onClose={handleClose}
+      />
+    )
+  }
+
   return createPortal(
     <ModalShell
       width="31.25rem"
+      overflow="visible"
       header={
         <WizardHeader
-          title={t('desktop_edit_user')}
+          title={t('desktop_add_user')}
           onExit={handleClose}
+          currentStep={ADD_USER_WIZARD_CREATE_ACCOUNT_STEP}
+          totalSteps={ADD_USER_WIZARD_TOTAL_STEPS}
           hideStepText
           exitButtonCopy={t('shared:exit')}
         />
@@ -134,7 +149,16 @@ export function EditUserModal({
       <div className={styles.modal_content}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className={styles.form_fields}>
+            <div className={styles.form_intro}>
+              <StyledText desktopStyle="headingSmallBold">
+                {t('desktop_create_account') as string}
+              </StyledText>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('desktop_add_user_create_account_description') as string}
+              </StyledText>
+            </div>
             <UserAccountIdentityFormFields
+              autoFocusFirstField
               control={control}
               stacked
               usernameMaxLength={USERNAME_MAX_LENGTH}
@@ -159,8 +183,8 @@ export function EditUserModal({
               <SecondaryButton type="button" onClick={handleClose}>
                 {t('shared:cancel') as string}
               </SecondaryButton>
-              <PrimaryButton type="submit" disabled={isSaveDisabled}>
-                {t('shared:save') as string}
+              <PrimaryButton type="submit" disabled={isSaving}>
+                {t('desktop_create_account') as string}
               </PrimaryButton>
             </div>
           </div>

@@ -10,6 +10,10 @@ import {
 
 import { getTopPortalEl } from '/app/App/portal'
 
+import {
+  ADD_USER_WIZARD_ONE_TIME_PASSWORD_STEP,
+  ADD_USER_WIZARD_TOTAL_STEPS,
+} from './constants'
 import styles from './userAccountForm.module.css'
 
 import type { JSX } from 'react'
@@ -34,8 +38,10 @@ export function OneTimePasswordModal({
       width="31.25rem"
       header={
         <WizardHeader
-          title={t('desktop_one_time_password')}
+          title={t('desktop_add_user')}
           onExit={onClose}
+          currentStep={ADD_USER_WIZARD_ONE_TIME_PASSWORD_STEP}
+          totalSteps={ADD_USER_WIZARD_TOTAL_STEPS}
           hideStepText
           exitButtonCopy={t('shared:exit')}
         />

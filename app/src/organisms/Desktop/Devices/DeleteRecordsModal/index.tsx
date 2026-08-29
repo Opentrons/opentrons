@@ -21,10 +21,11 @@ interface DeleteRecordsModalProps {
 export function DeleteRecordsModal(props: DeleteRecordsModalProps): ReactNode {
   const { onClose, onConfirm, type } = props
   const { t } = useTranslation(['device_details', 'shared'])
-  const { title, description, recommendation } = ((): {
+  const { title, description, confirmation, recommendation } = ((): {
     title: string
     description: string
-    recommendation: string
+    confirmation: string
+    recommendation?: string
   } => {
     switch (type) {
       case 'allRuns':
@@ -34,6 +35,7 @@ export function DeleteRecordsModal(props: DeleteRecordsModalProps): ReactNode {
           recommendation: t(
             'device_details:delete_all_run_records_recommendation'
           ),
+          confirmation: t('delete_all'),
         }
       case 'selectedRuns':
         return {
@@ -41,17 +43,13 @@ export function DeleteRecordsModal(props: DeleteRecordsModalProps): ReactNode {
           description: t(
             'device_details:delete_selected_run_records_description'
           ),
-          recommendation: t(
-            'device_details:delete_selected_run_records_recommendation'
-          ),
+          confirmation: t('download_and_delete_all'),
         }
       case 'selectedLogs':
         return {
           title: t('device_details:delete_selected_logs'),
           description: t('device_details:delete_selected_logs_description'),
-          recommendation: t(
-            'device_details:delete_selected_logs_recommendation'
-          ),
+          confirmation: t('download_and_delete_all'),
         }
     }
   })()
@@ -63,16 +61,18 @@ export function DeleteRecordsModal(props: DeleteRecordsModalProps): ReactNode {
           <StyledText desktopStyle="bodyDefaultRegular">
             {description}
           </StyledText>
-          <StyledText desktopStyle="bodyDefaultRegular">
-            {recommendation}
-          </StyledText>
+          {recommendation != null ? (
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {recommendation}
+            </StyledText>
+          ) : null}
         </div>
         <div className={styles.button_row}>
           <SecondaryButton onClick={onClose}>
             {t('shared:cancel')}
           </SecondaryButton>
           <PrimaryButton variant="warning" onClick={onConfirm}>
-            {t('delete_all')}
+            {confirmation}
           </PrimaryButton>
         </div>
       </div>

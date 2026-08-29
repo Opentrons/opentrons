@@ -14,6 +14,7 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
+import type { ReactNode } from 'react'
 import type { ModuleModel } from '@opentrons/shared-data'
 import type { OT2ModuleType } from '../../types'
 
@@ -55,7 +56,7 @@ const MODULE_IMG_BY_TYPE: ModuleImg = {
 }
 
 const IMAGE_MAX_WIDTH = '96px'
-export function ModuleDiagram(props: ModuleDiagramProps): JSX.Element {
+export function ModuleDiagram(props: ModuleDiagramProps): ReactNode {
   const model = MODULE_IMG_BY_TYPE[props.type][props.model]
   return (
     <img

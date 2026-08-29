@@ -97,10 +97,18 @@ export function useSoftwareKeyboardControl(
         //    requires it.
         inputElement.focus()
         setValue(inputElement, newValue)
-        inputElement.setSelectionRange(
-          keyboardRef.current?.getCaretPosition() ?? null,
-          keyboardRef.current?.getCaretPositionEnd() ?? null
-        )
+        try {
+          inputElement.setSelectionRange(
+            keyboardRef.current?.getCaretPosition() ?? null,
+            keyboardRef.current?.getCaretPositionEnd() ?? null
+          )
+        } catch (e) {
+          console.warn(
+            'The software keyboard was unable to set the caret position while typing into an input.' +
+              ' This can happen if the input is type="number". Consider making it type="text".',
+            e
+          )
+        }
         inputElement.dispatchEvent(new Event('input', { bubbles: true }))
       },
     }),

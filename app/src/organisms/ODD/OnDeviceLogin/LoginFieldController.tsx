@@ -1,3 +1,4 @@
+import { forwardRef } from 'react'
 import { Controller } from 'react-hook-form'
 
 import { LoginFieldInput } from './LoginFieldInput'
@@ -13,18 +14,26 @@ export interface LoginFieldControllerProps {
   isPasswordResetRequired: boolean
   loginError: string | null
   confirmPasswordError: string | null
+  usernameError: string | null
   onClearFieldErrors: () => void
 }
 
-export function LoginFieldController({
-  control,
-  step,
-  t,
-  isPasswordResetRequired,
-  loginError,
-  confirmPasswordError,
-  onClearFieldErrors,
-}: LoginFieldControllerProps): JSX.Element | null {
+export const LoginFieldController = forwardRef<
+  HTMLInputElement,
+  LoginFieldControllerProps
+>(function LoginFieldController(
+  {
+    control,
+    step,
+    t,
+    isPasswordResetRequired,
+    loginError,
+    confirmPasswordError,
+    usernameError,
+    onClearFieldErrors,
+  },
+  ref
+): JSX.Element | null {
   if (step === 'username') {
     return (
       <Controller
@@ -33,9 +42,10 @@ export function LoginFieldController({
         name="username"
         render={({ field }) => (
           <LoginFieldInput
+            ref={ref}
             field={field}
             label={t('access_control:username')}
-            error={null}
+            error={usernameError}
             isPasswordField={false}
             onClearError={onClearFieldErrors}
             autoFocus
@@ -56,6 +66,7 @@ export function LoginFieldController({
         name="password"
         render={({ field }) => (
           <LoginFieldInput
+            ref={ref}
             field={field}
             label={
               isPasswordResetRequired
@@ -80,6 +91,7 @@ export function LoginFieldController({
         name="confirmPassword"
         render={({ field }) => (
           <LoginFieldInput
+            ref={ref}
             field={field}
             label={t('access_control:on_device_login_confirm_password')}
             error={confirmPasswordError}
@@ -93,4 +105,4 @@ export function LoginFieldController({
   }
 
   return null
-}
+})

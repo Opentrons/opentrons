@@ -15,7 +15,7 @@ import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
 
-import { UserManagement } from '../UserManagement'
+import { UserManagement } from '..'
 
 import type { RenderResult } from '@testing-library/react'
 import type { AuthUsersResponse } from '@opentrons/api-client'

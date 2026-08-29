@@ -38,7 +38,7 @@ import {
 } from '../../utils'
 import { ResetSettingsField } from '../MoveLiquidTools/ResetSettingsField'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 
@@ -55,7 +55,7 @@ export function SecondStepMixTools({
   formData,
   tab,
   setTab,
-}: SecondStepMixToolsProps): JSX.Element {
+}: SecondStepMixToolsProps): ReactNode {
   const { t, i18n } = useTranslation(['application', 'form'])
   const toolsComponentRef = useRef<HTMLDivElement | null>(null)
   const pipetteEntities = useSelector(getPipetteEntities)

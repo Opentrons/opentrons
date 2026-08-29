@@ -2,8 +2,6 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { TouchInputField } from '@opentrons/components'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
@@ -17,14 +15,6 @@ import type { QuickTransferSummaryState } from '../../types'
 vi.mock('/app/redux-resources/analytics')
 vi.mock('../utils')
 vi.mock('../../QuickTransferAdvancedSettings/BlowOut')
-
-vi.mock('@opentrons/components', async importOriginal => {
-  const actualComponents = await importOriginal<typeof TouchInputField>()
-  return {
-    ...actualComponents,
-    TouchInputField: vi.fn(),
-  }
-})
 
 const render = (props: ComponentProps<typeof PipettePath>) => {
   return renderWithProviders(<PipettePath {...props} />, {
@@ -177,17 +167,7 @@ describe('PipettePath', () => {
     const continueBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     await user.click(continueBtn)
 
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Disposal volume (µL)',
-        error: null,
-        type: 'number',
-        value: 20,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Disposal volume (µL)')).toHaveValue('20')
   })
 
   it('renders error on disposal volume screen if you select an out of range value', async () => {
@@ -210,17 +190,8 @@ describe('PipettePath', () => {
     await user.click(continueBtn)
     const oneButton = screen.getByText('1')
     await user.click(oneButton)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Disposal volume (µL)',
-        error: 'Value must be between 1 to 160',
-        type: 'number',
-        value: 201,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Disposal volume (µL)')).toHaveValue('201')
+    screen.getByText('Value must be between 1 to 160')
     const nextBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(nextBtn).toBeDisabled()
   })

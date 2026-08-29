@@ -26,6 +26,7 @@ import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { darkFill, lightFill } from './DeckSetupContainer'
 import { getAdjacentSlots } from './utils'
 
+import type { ReactNode } from 'react'
 import type {
   DeckLabelProps,
   StagingAreaLocation,
@@ -48,7 +49,7 @@ interface FixtureRenderProps {
   showHighlight?: boolean
   tagInfo?: DeckLabelProps[]
 }
-export const FixtureRender = (props: FixtureRenderProps): JSX.Element => {
+export const FixtureRender = (props: FixtureRenderProps): ReactNode => {
   const { fixture, cutout, deckDef, robotType, showHighlight, tagInfo } = props
   const deckSetup = useSelector(getInitialDeckSetup)
   const { labware, modules } = deckSetup

@@ -30,6 +30,42 @@ def test_get_returns_none_for_nonexistent_user(user_store: UserStore) -> None:
     assert user_store.get("nonexistent_user") is None
 
 
+def test_get_by_id_returns_user(user_store: UserStore) -> None:
+    """get_by_id should find a user by primary key."""
+    added = user_store.add(
+        username="test_user",
+        hashed_password=HASHED_PW,
+        full_name="Test User",
+        account_type=AccountType.USER,
+        now=_NOW,
+        reset_password=False,
+    )
+    fetched = user_store.get_by_id(added.id)
+    assert fetched is not None
+    assert fetched.username == "test_user"
+
+
+def test_get_by_id_returns_none_for_nonexistent_id(user_store: UserStore) -> None:
+    """get_by_id should return None when the id does not exist."""
+    assert user_store.get_by_id(999999) is None
+
+
+def test_get_by_id_stable_across_username_change(user_store: UserStore) -> None:
+    """get_by_id should still find the user after their username changes."""
+    added = user_store.add(
+        username="before_rename",
+        hashed_password=HASHED_PW,
+        full_name="Test User",
+        account_type=AccountType.USER,
+        now=_NOW,
+        reset_password=False,
+    )
+    user_store.update("before_rename", new_username="after_rename", now=_NOW)
+    fetched = user_store.get_by_id(added.id)
+    assert fetched is not None
+    assert fetched.username == "after_rename"
+
+
 def test_add_and_get_user(user_store: UserStore) -> None:
     """add should persist the user so get can find it."""
     user_store.add(
@@ -258,3 +294,31 @@ def test_failed_login_counter(user_store: UserStore) -> None:
     user_store.record_failed_login("user_a", datetime.datetime.now(tz=datetime.UTC))
     user_store.remove("user_a")
     assert user_store.get("user_a") is None
+
+
+def test_mark_all_reset_password(user_store: UserStore) -> None:
+    user_store.add(
+        username="user_a",
+        hashed_password=HASHED_PW,
+        full_name="User A",
+        account_type=AccountType.USER,
+        now=_NOW,
+        reset_password=False,
+    )
+    user_store.add(
+        username="user_b",
+        hashed_password=HASHED_PW,
+        full_name="User B",
+        account_type=AccountType.ADMIN,
+        now=_NOW,
+        reset_password=False,
+    )
+
+    user_store.mark_all_reset_password()
+
+    user_a = user_store.get("user_a")
+    user_b = user_store.get("user_b")
+    assert user_a is not None
+    assert user_b is not None
+    assert user_a.reset_password is True
+    assert user_b.reset_password is True

@@ -48,10 +48,9 @@ describe('RecentProtocolRuns', () => {
       <div>mock HistoricalProtocolRun</div>
     )
     vi.mocked(useDownloadSelectedRuns).mockReturnValue({
-      downloadRuns: mockDownloadRuns,
-      isDownloading: false,
-      hasError: false,
-    })
+      mutateAsync: mockDownloadRuns,
+      status: 'idle',
+    } as any)
     vi.mocked(useDeleteSelectedRuns).mockReturnValue({
       deleteSelectedRuns: mockDeleteRuns,
       deletingIds: new Set(),

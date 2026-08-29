@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { renderHook, screen, waitFor } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -11,7 +11,7 @@ import { getAppLanguage } from '/app/redux/config'
 
 import { FullKeyboard } from '..'
 
-import type { ComponentProps } from 'react'
+import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
 vi.mock('/app/redux/config', async () => {
   const actual = await vi.importActual('/app/redux/config')
@@ -21,8 +21,23 @@ vi.mock('/app/redux/config', async () => {
   }
 })
 
-const render = (props: ComponentProps<typeof FullKeyboard>) => {
-  return renderWithProviders(<FullKeyboard {...props} />)[0]
+function TestKeyboard(): JSX.Element {
+  const keyboardRef = useRef<KeyboardReactInterface | null>(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
+
+  return (
+    <>
+      <input data-testid="FullKeyboard_Input" ref={inputElementRef} />
+      <FullKeyboard
+        keyboardRef={keyboardRef}
+        inputElementRef={inputElementRef}
+      />
+    </>
+  )
+}
+
+const render = () => {
+  return renderWithProviders(<TestKeyboard />)[0]
 }
 
 const expectButtonsToBePresent = (buttonNames: string[]) => {
@@ -42,12 +57,7 @@ describe('FullKeyboard', () => {
   })
 
   it('should render FullKeyboard keyboard', () => {
-    const { result } = renderHook(() => useRef(null))
-    const props = {
-      onChange: vi.fn(),
-      keyboardRef: result.current,
-    }
-    render(props)
+    render()
     const expectedButtonNames = [
       'q',
       'w',
@@ -88,12 +98,7 @@ describe('FullKeyboard', () => {
 
   it('should render full keyboard when hitting ABC key', async () => {
     const user = userEvent.setup()
-    const { result } = renderHook(() => useRef(null))
-    const props = {
-      onChange: vi.fn(),
-      keyboardRef: result.current,
-    }
-    render(props)
+    render()
     const shiftKey = screen.getByRole('button', { name: 'ABC' })
     await user.click(shiftKey)
     const expectedButtonNames = [
@@ -136,12 +141,7 @@ describe('FullKeyboard', () => {
 
   it('should render full keyboard when hitting 123 key', async () => {
     const user = userEvent.setup()
-    const { result } = renderHook(() => useRef(null))
-    const props = {
-      onChange: vi.fn(),
-      keyboardRef: result.current,
-    }
-    render(props)
+    render()
     const numberKey = screen.getByRole('button', { name: '123' })
     await user.click(numberKey)
     const expectedButtonNames = [
@@ -185,12 +185,7 @@ describe('FullKeyboard', () => {
 
   it('should render the software keyboards when hitting #+= key', async () => {
     const user = userEvent.setup()
-    const { result } = renderHook(() => useRef(null))
-    const props = {
-      onChange: vi.fn(),
-      keyboardRef: result.current,
-    }
-    render(props)
+    render()
     const numberKey = screen.getByRole('button', { name: '123' })
     await user.click(numberKey)
     const symbolKey = screen.getByRole('button', { name: '#+=' })
@@ -228,28 +223,19 @@ describe('FullKeyboard', () => {
     expectButtonsToBePresent(expectedButtonNames)
   })
 
-  it('should call mock function when clicking a key', async () => {
+  it('should update the input when clicking keys', async () => {
     const user = userEvent.setup()
-    const { result } = renderHook(() => useRef(null))
-    const props = {
-      onChange: vi.fn(),
-      keyboardRef: result.current,
-    }
-    render(props)
-    const aKey = screen.getByRole('button', { name: 'a' })
-    await user.click(aKey)
-    expect(props.onChange).toHaveBeenCalled()
+    render()
+    await user.click(screen.getByRole('button', { name: 'a' }))
+    await user.click(screen.getByRole('button', { name: 'b' }))
+    await user.click(screen.getByRole('button', { name: 'c' }))
+    expect(screen.getByTestId('FullKeyboard_Input')).toHaveValue('abc')
   })
 
   it('should render chinese default labels when app language is zh-CN', () => {
     vi.mocked(getAppLanguage).mockReturnValue('zh-CN')
-    const { result } = renderHook(() => useRef(null))
-    const props = {
-      onChange: vi.fn(),
-      keyboardRef: result.current,
-    }
 
-    render(props)
+    render()
 
     expect(screen.getByRole('button', { name: '空格' })).toBeInTheDocument()
     expect(
@@ -260,13 +246,8 @@ describe('FullKeyboard', () => {
   it('should update labels when toggling keyboard language', async () => {
     vi.mocked(getAppLanguage).mockReturnValue('zh-CN')
     const user = userEvent.setup()
-    const { result } = renderHook(() => useRef(null))
-    const props = {
-      onChange: vi.fn(),
-      keyboardRef: result.current,
-    }
 
-    render(props)
+    render()
 
     const globeKey = screen
       .getAllByRole('button')

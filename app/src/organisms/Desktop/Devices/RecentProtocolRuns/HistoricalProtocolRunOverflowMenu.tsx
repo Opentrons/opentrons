@@ -37,7 +37,6 @@ import {
 import {
   isDocumentedMutationError,
   useDeleteRunImages,
-  useDeleteRunMutation,
 } from '@opentrons/react-api-client'
 
 import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
@@ -73,6 +72,7 @@ import type {
 } from 'react'
 import type { Run, RunData } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
+import type { UseDeleteRunMutationResult } from '@opentrons/react-api-client'
 import type { RunControls } from '/app/organisms/RunTimeControl'
 
 export interface HistoricalProtocolRunOverflowMenuProps {
@@ -80,6 +80,8 @@ export interface HistoricalProtocolRunOverflowMenuProps {
   robotName: string
   robotIsBusy: boolean
   runHasImages: boolean
+  deleteRun: UseDeleteRunMutationResult['deleteRun']
+  isDeletingRun: boolean
 }
 
 export function HistoricalProtocolRunOverflowMenu(
@@ -172,6 +174,8 @@ interface MenuDropdownProps extends HistoricalProtocolRunOverflowMenuProps {
   setShowRobotOutOfStorageModal: Dispatch<SetStateAction<boolean>>
   setShowOverflowMenu: Dispatch<SetStateAction<boolean>>
   runControls: RunControls
+  deleteRun: UseDeleteRunMutationResult['deleteRun']
+  isDeletingRun: boolean
 }
 function MenuDropdown(props: MenuDropdownProps): ReactNode {
   const { t } = useTranslation('device_details')
@@ -187,6 +191,8 @@ function MenuDropdown(props: MenuDropdownProps): ReactNode {
     setShowRobotOutOfStorageModal,
     setShowOverflowMenu,
     runControls,
+    deleteRun,
+    isDeletingRun,
   } = props
 
   const { id: runId } = run
@@ -208,8 +214,6 @@ function MenuDropdown(props: MenuDropdownProps): ReactNode {
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
 
-  const { deleteRun, isLoading: isDeletingRun } =
-    useDeleteRunMutation(documentationState)
   const robot = useRobot(robotName)
   const robotType = useRobotType(robotName)
 

@@ -1,7 +1,7 @@
 {
   "a_robot_software_update_is_available": "A robot software update is required to run protocols with this version of the Opentrons App. <robotLink>Go to Robot</robotLink>",
   "about_flex_gripper": "About Flex Gripper",
-  "account_page_footer": "Manage robot users in the Opentrons App",
+  "account_page_footer": "Manage user account details in the Opentrons App",
   "alternative_security_types_description": "The Opentrons App supports connecting Flex to various enterprise access points. Connect via USB and finish setup in the app.",
   "attach_a_pipette": "Attach a pipette to your Flex",
   "attach_a_pipette_for_quick_transfer": "To create a quick transfer, you need to attach a pipette to your Opentrons Flex.",

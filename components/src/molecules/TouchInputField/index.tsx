@@ -66,6 +66,8 @@ export interface TouchInputFieldProps {
   type?: 'text' | 'password' | 'number'
   /** optional props for data-testid */
   testId?: string
+  /** optional control rendered beside the input, vertically aligned to the field */
+  accessory?: ReactNode
 }
 
 export const TouchInputField = forwardRef<
@@ -89,6 +91,7 @@ export const TouchInputField = forwardRef<
     padding,
     type,
     testId,
+    accessory,
     ...inputProps
   } = props
 
@@ -123,6 +126,9 @@ export const TouchInputField = forwardRef<
               htmlFor={inputId}
               className={clsx(
                 styles.label,
+                {
+                  [styles.label_error]: hasError,
+                },
                 textAlign === TYPOGRAPHY.textAlignCenter
                   ? styles.align_center
                   : styles.align_left
@@ -133,64 +139,67 @@ export const TouchInputField = forwardRef<
           </div>
         ) : null}
 
-        <div
-          className={clsx(styles.outer, {
-            [styles.outer_error]: hasError,
-          })}
-          onClick={disabled === true ? undefined : onClick}
-        >
+        <div className={styles.input_set}>
           <div
-            style={inputFieldStyles}
-            className={clsx(
-              styles.input_field,
-              size === 'small'
-                ? styles.input_field_small
-                : styles.input_field_medium,
-              {
-                [styles.error]: hasError,
-              }
-            )}
-            onClick={() => {
-              internalRef.current?.focus()
-            }}
+            className={clsx(styles.outer, {
+              [styles.outer_error]: hasError,
+            })}
+            onClick={disabled === true ? undefined : onClick}
           >
-            <input
-              {...inputProps}
-              id={inputId}
-              data-testid={testId}
+            <div
+              style={inputFieldStyles}
               className={clsx(
-                styles.input,
-                size === 'small' ? styles.input_small : styles.input_medium,
-                type === 'password' ? styles.password_input : null,
-                textAlign === TYPOGRAPHY.textAlignCenter
-                  ? styles.align_center
-                  : styles.align_left
+                styles.input_field,
+                size === 'small'
+                  ? styles.input_field_small
+                  : styles.input_field_medium,
+                {
+                  [styles.error]: hasError,
+                }
               )}
-              value={value}
-              placeholder={placeHolder}
-              onWheel={event => {
-                event.currentTarget.blur()
+              onClick={() => {
+                internalRef.current?.focus()
               }}
-              type={type}
-              disabled={disabled}
-              ref={mergedRef}
-            />
-            {units != null ? (
-              <div
+            >
+              <input
+                {...inputProps}
+                id={inputId}
+                data-testid={testId}
                 className={clsx(
-                  styles.units,
+                  styles.input,
+                  size === 'small' ? styles.input_small : styles.input_medium,
+                  type === 'password' ? styles.password_input : null,
                   textAlign === TYPOGRAPHY.textAlignCenter
                     ? styles.align_center
-                    : styles.align_left,
-                  {
-                    [styles.units_disabled]: disabled,
-                  }
+                    : styles.align_left
                 )}
-              >
-                {units}
-              </div>
-            ) : null}
+                value={value}
+                placeholder={placeHolder}
+                onWheel={event => {
+                  event.currentTarget.blur()
+                }}
+                type={type}
+                disabled={disabled}
+                ref={mergedRef}
+              />
+              {units != null ? (
+                <div
+                  className={clsx(
+                    styles.units,
+                    textAlign === TYPOGRAPHY.textAlignCenter
+                      ? styles.align_center
+                      : styles.align_left,
+                    {
+                      [styles.units_disabled]: disabled,
+                    }
+                  )}
+                >
+                  {units}
+                </div>
+              ) : null}
+            </div>
           </div>
+          {accessory}
         </div>
 
         {caption != null ? (

@@ -7,12 +7,14 @@ import type { Control, FieldValues } from 'react-hook-form'
 
 export interface UserAccountIdentityFormFieldsProps<T extends FieldValues> {
   control: Control<T>
+  autoFocusFirstField?: boolean
   stacked?: boolean
   usernameMaxLength?: number
 }
 
 export function UserAccountIdentityFormFields<T extends FieldValues>({
   control,
+  autoFocusFirstField,
   stacked = false,
   usernameMaxLength,
 }: UserAccountIdentityFormFieldsProps<T>): JSX.Element {
@@ -20,6 +22,7 @@ export function UserAccountIdentityFormFields<T extends FieldValues>({
     return (
       <>
         <UserAccountUsernameField
+          autoFocus={autoFocusFirstField}
           control={control}
           usernameMaxLength={usernameMaxLength}
         />
@@ -31,6 +34,7 @@ export function UserAccountIdentityFormFields<T extends FieldValues>({
   return (
     <div className={styles.fields_row}>
       <UserAccountUsernameField
+        autoFocus={autoFocusFirstField}
         control={control}
         usernameMaxLength={usernameMaxLength}
       />

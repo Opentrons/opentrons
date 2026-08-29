@@ -1,6 +1,7 @@
 .container {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--spacing-8);
 }
 
@@ -29,6 +30,8 @@
 .record_content {
   display: grid;
   width: 100%;
+  align-items: center;
+  padding: var(--spacing-16) var(--spacing-24);
   gap: var(--spacing-24);
   grid-template-columns: 33% 33% 33%;
 }

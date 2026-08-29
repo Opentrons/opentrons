@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -15,11 +15,12 @@ import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
 import { BaseDeckTipSelection } from './BaseDeckTipSelection'
 import { TiprackSelectHover } from './TiprackSelectHover'
 import styles from './tipselectionwizard.module.css'
-import { getFirstSelectableTiprackId, getIsTiprackSelectable } from './utils'
+import { getIsTiprackSelectable } from './utils'
 
+import type { ReactNode } from 'react'
 import type { TipSelectionBaseProps } from './types'
 
-export function SelectTiprack(props: TipSelectionBaseProps): JSX.Element {
+export function SelectTiprack(props: TipSelectionBaseProps): ReactNode {
   const {
     selectedTiprackId,
     setSelectedTiprackId,
@@ -33,34 +34,6 @@ export function SelectTiprack(props: TipSelectionBaseProps): JSX.Element {
   const { labware: allLabware } = activeDeckSetup
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const { labwareEntities } = useSelector(getInvariantContext)
-
-  useEffect(() => {
-    if (selectedTiprackId !== null) {
-      return
-    }
-
-    const firstSelectableId = getFirstSelectableTiprackId({
-      allLabware,
-      formTiprackUri,
-      pipetteSpecs,
-      nozzles,
-      labwareEntities,
-      labwareRobotState: activeDeckSetup.labware,
-    })
-
-    if (firstSelectableId != null) {
-      setSelectedTiprackId(firstSelectableId)
-    }
-  }, [
-    selectedTiprackId,
-    allLabware,
-    formTiprackUri,
-    pipetteSpecs,
-    nozzles,
-    labwareEntities,
-    activeDeckSetup.labware,
-    setSelectedTiprackId,
-  ])
 
   const controls = (
     <>

@@ -54,6 +54,15 @@ def cleanup_persistence_temp_directory(persistence_root: Path) -> None:
         _log.warning(f"Error deleting {temp_directory.resolve()}.", exc_info=True)
 
 
+def clear_directory_contents(directory: Path) -> None:
+    """Delete everything inside directory without removing directory itself."""
+    for child in directory.iterdir():
+        if child.is_symlink() or not child.is_dir():
+            child.unlink()
+        else:
+            rmtree(child)
+
+
 class PersistenceResetter:
     """A FastAPI dependency to reset the server's persistence directory.
 
@@ -112,13 +121,16 @@ async def prepare_root(
             directory_to_reset=persistence_directory_root,
         ):
             _log.info(
-                f"{persistence_directory_root} was marked for reset. Deleting it."
+                f"{persistence_directory_root} was marked for reset."
+                " Clearing its contents."
             )
             # FIXME(mm, 2024-01-23): This can leave the persistence directory
-            # in a half-deleted state if it deletes the marker file, and then some
+            # in a half-cleared state if it deletes the marker file, and then some
             # of the other files, and then the device is power-cycled before it can
             # finish.
-            await to_thread.run_sync(rmtree, persistence_directory_root)
+            await to_thread.run_sync(
+                clear_directory_contents, persistence_directory_root
+            )
 
         await AsyncPath(persistence_directory_root).mkdir(parents=True, exist_ok=True)
         _log.info(f"Using directory {persistence_directory_root} for persistence.")

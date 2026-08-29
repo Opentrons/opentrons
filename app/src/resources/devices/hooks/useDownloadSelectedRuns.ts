@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMutation } from 'react-query'
 import { useSelector } from 'react-redux'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
@@ -11,42 +11,31 @@ import { saveFileToUsb } from '/app/redux/shell/remote'
 
 import { isEmptyDownloadResponse } from './utils/isEmptyDownloadResponse'
 
+import type { UseMutationResult } from 'react-query'
 import type { RunData } from '@opentrons/api-client'
 
-interface UseDownloadSelectedRunsResult {
-  downloadRuns: (
-    runs: readonly RunData[],
-    callTimeUsbPath?: string
-  ) => Promise<readonly RunData[]>
-  isDownloading: boolean
-  hasError: boolean
+export interface DownloadRunsVariables {
+  runs: readonly RunData[]
+  callTimeUsbPath?: string
 }
 
 export function useDownloadSelectedRuns(
   robotName: string
-): UseDownloadSelectedRunsResult {
+): UseMutationResult<readonly RunData[], unknown, DownloadRunsVariables> {
   const host = useHost()
-  const [isDownloading, setIsDownloading] = useState(false)
-  const [hasError, setHasError] = useState(false)
   const includeProtocolSource = useSelector(
     getIncludeProtocolSourceInRunDownload
   )
-
   const { data: protocols } = useAllProtocolsQuery()
 
-  const downloadRuns = async (
-    runs: readonly RunData[],
-    callTimeUsbPath?: string
-  ): Promise<readonly RunData[]> => {
+  const downloadRuns = async ({
+    runs,
+    callTimeUsbPath,
+  }: DownloadRunsVariables): Promise<readonly RunData[]> => {
     const currentHost = host
-    if (currentHost == null || runs.length === 0 || isDownloading) {
-      throw new Error(
-        'Unable to download: no host, nothing selected, or a download is already in progress.'
-      )
+    if (currentHost == null || runs.length === 0) {
+      throw new Error('Unable to download: no host, or nothing selected.')
     }
-
-    setIsDownloading(true)
-    setHasError(false)
 
     const zip = new JSZip()
     const params = {
@@ -87,29 +76,23 @@ export function useDownloadSelectedRuns(
 
     // If every single run failed, abort early without generating an empty zip file
     if (successfulRuns.length === 0) {
-      setHasError(true)
-      setIsDownloading(false)
       throw new Error('Failed to download any of the selected run records.')
     }
 
-    try {
-      const buffer = await zip.generateAsync({ type: 'arraybuffer' })
-      const filename = `${robotName}-run-records.zip`
+    const buffer = await zip.generateAsync({ type: 'arraybuffer' })
+    const filename = `${robotName}-run-records.zip`
 
-      if (callTimeUsbPath != null) {
-        await saveFileToUsb(`${callTimeUsbPath}/${filename}`, buffer)
-      } else {
-        saveAs(new Blob([buffer]), filename)
-      }
-
-      setIsDownloading(false)
-      return successfulRuns
-    } catch (e) {
-      setHasError(true)
-      setIsDownloading(false)
-      throw e
+    if (callTimeUsbPath != null) {
+      await saveFileToUsb(`${callTimeUsbPath}/${filename}`, buffer)
+    } else {
+      saveAs(new Blob([buffer]), filename)
     }
+
+    return successfulRuns
   }
 
-  return { downloadRuns, isDownloading, hasError }
+  // Downloading runs doesn't mutate robot state, so it doesn't need
+  // to go through useDocumentedMutation.
+  // eslint-disable-next-line opentrons/no-direct-use-mutation
+  return useMutation(downloadRuns)
 }

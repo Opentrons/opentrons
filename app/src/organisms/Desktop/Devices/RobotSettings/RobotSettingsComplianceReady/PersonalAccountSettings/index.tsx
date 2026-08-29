@@ -56,7 +56,7 @@ function LoggedOutMessage(): JSX.Element {
 export function PersonalAccountSettings({
   robotName,
 }: PersonalAccountSettingsProps): JSX.Element {
-  const { t } = useTranslation(['device_settings', 'shared']) as {
+  const { t } = useTranslation('device_settings') as {
     t: TFunction
   }
   const dispatch = useDispatch()
@@ -94,11 +94,7 @@ export function PersonalAccountSettings({
             <StyledText desktopStyle="bodyLargeSemiBold">
               {t('desktop_personal_account_settings') as string}
             </StyledText>
-            {isEditing ? (
-              <BasicButton type="button" underLine onClick={handleCancelEdit}>
-                {t('shared:cancel')}
-              </BasicButton>
-            ) : (
+            {!isEditing && (
               <BasicButton
                 type="button"
                 underLine

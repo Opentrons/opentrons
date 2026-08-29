@@ -22,9 +22,9 @@ import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
 
+import { ComplianceReadySoftwareSettings } from '..'
+import { RobotSettingsComplianceReady } from '../../index'
 import { UI_ONLY_FIELD_IDS } from '../complianceReadySettingsTypes'
-import { ComplianceReadySoftwareSettings } from '../ComplianceReadySoftwareSettings'
-import { RobotSettingsComplianceReady } from '../index'
 
 import type { RenderResult } from '@testing-library/react'
 import type {
@@ -94,7 +94,7 @@ vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
 }))
 vi.mock('/app/organisms/ToasterOven')
 
-vi.mock('../PersonalAccountSettings', () => ({
+vi.mock('../../PersonalAccountSettings', () => ({
   PersonalAccountSettings: () => null,
 }))
 
@@ -221,6 +221,61 @@ describe('ComplianceReadySoftwareSettings', () => {
       })
     ).toHaveAttribute('aria-expanded', 'false')
     expect(screen.queryByText('Login and security')).not.toBeInTheDocument()
+  })
+
+  it('should show password complexity confirmation before enabling requirements', async () => {
+    render()
+    expandAccordion()
+
+    fireEvent.click(
+      screen.getByRole('switch', {
+        name: 'Require password complexity',
+      })
+    )
+
+    screen.getByText('Require password complexity?')
+    screen.getByText('Users will need to reset their passwords')
+    screen.getByText(
+      'Updating this setting will sign out all users and require them to reset their passwords the next time they sign in.'
+    )
+    expect(mockPatchAuthSettings).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    expect(
+      screen.queryByText('Require password complexity?')
+    ).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('switch', {
+        name: 'Require password complexity',
+      })
+    ).toHaveAttribute('aria-checked', 'false')
+    expect(
+      screen.queryByText('Require special characters')
+    ).not.toBeInTheDocument()
+  })
+
+  it('should patch password complexity settings when confirmation is accepted', async () => {
+    render()
+    expandAccordion()
+
+    fireEvent.click(
+      screen.getByRole('switch', {
+        name: 'Require password complexity',
+      })
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+
+    await waitFor(() => {
+      expect(mockPatchAuthSettings).toHaveBeenCalledWith({
+        data: {
+          passwordComplexitySpecialCharacters: true,
+          passwordComplexityMinimumLength: 8,
+        },
+      })
+    })
+    screen.getByText('Require special characters')
   })
 
   it('should expand password reset sub-setting and patch on blur', async () => {

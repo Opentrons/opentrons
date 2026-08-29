@@ -26,6 +26,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { i18n } from '/app/i18n'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -54,8 +55,9 @@ export function DisposalVolume(props: DisposalVolumeProps): ReactNode {
   const { t } = useTranslation('quick_transfer')
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = useRef(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
   const [currentStep, setCurrentStep] = useState<number>(1)
-  const [volume, setVolume] = useState<number | null>(null)
+  const [volume, setVolume] = useState<string>('')
 
   const getInitialBlowoutLocation = (
     blowOut: typeof state.blowOutDispense
@@ -81,7 +83,7 @@ export function DisposalVolume(props: DisposalVolumeProps): ReactNode {
 
   const [selectedBlowoutLocation, setSelectedBlowoutLocation] =
     useState<string>(getInitialBlowoutLocation(state.blowOutDispense))
-  const [flowRate, setFlowRate] = useState<number | null>(null)
+  const [flowRate, setFlowRate] = useState<string>('')
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
   // If state.dropTipLocation is dropping tips into a trash fixture, then that is the
@@ -137,13 +139,27 @@ export function DisposalVolume(props: DisposalVolumeProps): ReactNode {
     (flowRatesForSupportedTip?.uiMaxFlowRate ?? 0) as number
   )
 
-  const flowRateError =
-    flowRate != null && (flowRate < minFlowRate || flowRate > maxFlowRate)
-      ? t(`value_out_of_range`, {
-          min: minFlowRate,
-          max: maxFlowRate,
+  const parsedVolume = parseNumericalInput(volume, {
+    allowDecimal: false,
+    allowNegative: false,
+  })
+  const volumeErrorMessage =
+    parsedVolume.result === 'syntaxError' ? t('enter_a_valid_number') : null
+  const parsedFlowRate = parseNumericalInput(flowRate, {
+    allowDecimal: false,
+    allowNegative: false,
+    min: minFlowRate,
+    max: maxFlowRate,
+  })
+  const flowRateErrorMessage =
+    parsedFlowRate.result === 'rangeError'
+      ? t('value_out_of_range', {
+          min: parsedFlowRate.min,
+          max: parsedFlowRate.max,
         })
-      : null
+      : parsedFlowRate.result === 'syntaxError'
+        ? t('enter_a_valid_number')
+        : null
 
   const handleClickBackOrExit = (): void => {
     currentStep > 1 ? setCurrentStep(currentStep - 1) : onBack()
@@ -156,8 +172,9 @@ export function DisposalVolume(props: DisposalVolumeProps): ReactNode {
       setCurrentStep(3)
     } else if (currentStep === 3) {
       if (
-        volume == null ||
-        flowRate == null ||
+        parsedVolume.result !== 'success' ||
+        parsedFlowRate.result !== 'success' ||
+        // todo(mm,2026-08-21): this null comparison looks wrong. selectedBlowoutLocation is always a string.
         selectedBlowoutLocation == null
       ) {
         return
@@ -172,9 +189,9 @@ export function DisposalVolume(props: DisposalVolumeProps): ReactNode {
       dispatch({
         type: ACTIONS.SET_DISPOSAL_VOLUME_DISPENSE,
         disposalVolumeDispenseSettings: {
-          volume,
+          volume: parsedVolume.data,
           blowOutLocation,
-          flowRate,
+          flowRate: parsedFlowRate.data,
         },
       })
       trackEventWithRobotSerial({
@@ -191,27 +208,11 @@ export function DisposalVolume(props: DisposalVolumeProps): ReactNode {
     currentStep < 3 ? t('shared:continue') : t('shared:save')
 
   let buttonIsDisabled = false
-  if (currentStep === 2) {
-    buttonIsDisabled = volume == null
+  if (currentStep === 1) {
+    buttonIsDisabled = parsedVolume.result !== 'success'
   }
   if (currentStep === 3) {
-    buttonIsDisabled = flowRate == null || flowRateError != null
-  }
-
-  const handleVolumeChange = (userInput: string): void => {
-    if (userInput === '') {
-      setVolume(null)
-    }
-    const parsedVolume = parseInt(userInput)
-    setVolume(!isNaN(parsedVolume) ? parsedVolume : null)
-  }
-
-  const handleFlowRateChange = (userInput: string): void => {
-    if (userInput === '') {
-      setFlowRate(null)
-    }
-    const parsedFlowRate = parseInt(userInput)
-    setFlowRate(!isNaN(parsedFlowRate) ? parsedFlowRate : null)
+    buttonIsDisabled = parsedFlowRate.result !== 'success'
   }
 
   return createPortal(
@@ -242,12 +243,14 @@ export function DisposalVolume(props: DisposalVolumeProps): ReactNode {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              ref={inputElementRef}
               autoFocus
               type="text"
-              value={String(volume ?? '')}
+              value={volume}
               label={t('disposal_volume_µL')}
+              error={volumeErrorMessage}
               onChange={e => {
-                handleVolumeChange(e.target.value as string)
+                setVolume(e.target.value)
               }}
             />
           </Flex>
@@ -259,10 +262,7 @@ export function DisposalVolume(props: DisposalVolumeProps): ReactNode {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={String(volume ?? '')}
-              onChange={e => {
-                handleVolumeChange(e)
-              }}
+              inputElementRef={inputElementRef}
             />
           </Flex>
         </Flex>
@@ -313,13 +313,14 @@ export function DisposalVolume(props: DisposalVolumeProps): ReactNode {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              ref={inputElementRef}
               autoFocus
               type="text"
-              value={String(flowRate ?? '')}
+              value={flowRate}
               label={t('blowout_flow_rate_µL')}
-              error={flowRateError}
+              error={flowRateErrorMessage}
               onChange={e => {
-                handleFlowRateChange(e.target.value as string)
+                setFlowRate(e.target.value)
               }}
             />
             <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
@@ -337,10 +338,7 @@ export function DisposalVolume(props: DisposalVolumeProps): ReactNode {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
-              initialValue={String(flowRate ?? '')}
-              onChange={e => {
-                handleFlowRateChange(e)
-              }}
+              inputElementRef={inputElementRef}
             />
           </Flex>
         </Flex>

@@ -275,7 +275,7 @@ interface AssignLiquidsModalContainerProps {
 
 export function AssignLiquidsModalContainer(
   props: AssignLiquidsModalContainerProps
-): JSX.Element | null {
+): ReactNode {
   const { showLiquidOverflowMenu, setDefineLiquidModal } = props
 
   // All selectors moved here

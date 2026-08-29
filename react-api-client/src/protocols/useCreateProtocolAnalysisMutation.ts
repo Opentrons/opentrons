@@ -1,8 +1,7 @@
-import { useQueryClient } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 
 import { createProtocolAnalysis } from '@opentrons/api-client'
 
-import { useDocumentedMutation } from '../accessControl'
 import { getQueryKey, useHost } from '../api'
 
 import type { AxiosError } from 'axios'
@@ -18,7 +17,6 @@ import type {
   RunTimeParameterFilesCreateData,
   RunTimeParameterValuesCreateData,
 } from '@opentrons/api-client'
-import type { DocumentationState } from '../accessControl'
 
 export interface CreateProtocolAnalysisVariables {
   protocolKey: string
@@ -45,7 +43,6 @@ export type UseCreateProtocolAnalysisMutationOptions = UseMutationOptions<
 >
 
 export function useCreateProtocolAnalysisMutation(
-  documentationState: DocumentationState,
   protocolId: string | null,
   hostOverride?: HostConfig | null,
   options: UseCreateProtocolAnalysisMutationOptions | undefined = {}
@@ -54,34 +51,38 @@ export function useCreateProtocolAnalysisMutation(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const queryClient = useQueryClient()
-  const mutation = useDocumentedMutation<
+  // Protocol analysis endpoint, does not require documentation.
+  // eslint-disable-next-line opentrons/no-direct-use-mutation
+  const mutation = useMutation<
     ProtocolAnalysisSummaryResult,
     AxiosError<ErrorResponse>,
     CreateProtocolAnalysisVariables
   >(
-    documentationState,
-    ['create_protocol_analysis'],
     getQueryKey(host, 'protocols', protocolId, 'analyses'),
-    async ({ variables, userNotes }) => {
-      const {
-        protocolKey,
-        runTimeParameterValues,
-        runTimeParameterFiles,
-        forceReAnalyze,
-      } = variables
-      const response = await createProtocolAnalysis(
+    ({
+      protocolKey,
+      runTimeParameterValues,
+      runTimeParameterFiles,
+      forceReAnalyze,
+    }) =>
+      createProtocolAnalysis(
         host!,
         protocolKey,
         runTimeParameterValues,
         runTimeParameterFiles,
-        forceReAnalyze,
-        userNotes
+        forceReAnalyze
       )
-      // Note: Not awaiting invalidateQueries() to preserve prior behavior.
-      // Not sure this is what we actually want.
-      void queryClient.invalidateQueries(getQueryKey(host, 'protocols'))
-      return response.data
-    },
+        .then(response => {
+          queryClient
+            .invalidateQueries(getQueryKey(host, 'protocols'))
+            .catch((e: Error) => {
+              throw e
+            })
+          return response.data
+        })
+        .catch((e: Error) => {
+          throw e
+        }),
     options
   )
   return {

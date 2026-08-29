@@ -1,4 +1,5 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
+import { useDragLayer } from 'react-dnd'
 import { useDispatch, useSelector } from 'react-redux'
 import values from 'lodash/values'
 
@@ -67,7 +68,7 @@ import {
 } from './utils'
 import { VacuumDockLabwareRenders } from './VacuumDockLabwareRenders'
 
-import type { ComponentProps, Dispatch, SetStateAction } from 'react'
+import type { ComponentProps, Dispatch, ReactNode, SetStateAction } from 'react'
 import type { ThermocyclerVizProps } from '@opentrons/components'
 import type {
   AddressableAreaName,
@@ -101,7 +102,7 @@ interface DeckSetupDetailsProps extends DeckSetupTerminalIdType {
   selectedZoomInSlot?: DeckSlotId
 }
 
-export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
+export function DeckSetupDetails(props: DeckSetupDetailsProps): ReactNode {
   const {
     activeDeckSetup,
     addEquipment,
@@ -145,9 +146,9 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   const [hoveredLabware, setHoveredLabware] = useState<
     LabwareOnDeckType | null | undefined
   >(null)
-  const [draggedLabware, setDraggedLabware] = useState<
-    LabwareOnDeckType | null | undefined
-  >(null)
+  const draggedLabware = useDragLayer(
+    monitor => monitor.getItem()?.labwareOnDeck ?? null
+  )
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const swapBlockedModule = getSwapBlockedModule({
     modulesById: activeDeckSetup.modules,
@@ -254,7 +255,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           deckConfiguration: deckConfig,
         })
       : getPositionFromSlotId(
-          adjustedMenuListId as string,
+          adjustedMenuListId,
           deckDef,
           ...(isMenuListIdForHopper ? [HOPPER_LABWARE_X_OFFSET] : [])
         )
@@ -432,7 +433,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                   setShowMenuListForId={setShowMenuListForId}
                   hover={hover}
                   setHoveredLabware={setHoveredLabware}
-                  setDraggedLabware={setDraggedLabware}
                   selectedZoomInSlot={selectedZoomInSlot}
                 />
               ) : null}
@@ -498,7 +498,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                       hover={hover}
                       slotPosition={[0, 0, 0]} // Module Component already handles nested positioning
                       setHoveredLabware={setHoveredLabware}
-                      setDraggedLabware={setDraggedLabware}
                       swapBlocked={
                         (swapBlockedModule || swapBlockedAdapter) &&
                         (labwareOnModule.id === hoveredLabware?.id ||
@@ -628,7 +627,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                   setShowMenuListForId={setShowMenuListForId}
                   hover={hover}
                   setHoveredLabware={setHoveredLabware}
-                  setDraggedLabware={setDraggedLabware}
                   selectedZoomInSlot={selectedZoomInSlot}
                   x={dockSlotPosition[0]}
                   y={dockSlotPosition[1]}
@@ -806,7 +804,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                 hover={hover}
                 slotPosition={slotPosition}
                 setHoveredLabware={setHoveredLabware}
-                setDraggedLabware={setDraggedLabware}
                 setHover={setHover}
                 setShowMenuListForId={setShowMenuListForId}
                 swapBlocked={
@@ -886,7 +883,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               itemId={slotOnDeck ?? ''}
               slotPosition={slotPosition}
               setHoveredLabware={setHoveredLabware}
-              setDraggedLabware={setDraggedLabware}
               setHover={setHover}
               setShowMenuListForId={setShowMenuListForId}
               swapBlocked={

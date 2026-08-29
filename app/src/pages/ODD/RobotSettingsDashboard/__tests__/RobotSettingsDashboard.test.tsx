@@ -270,7 +270,7 @@ describe('RobotSettingsDashboard', () => {
       )
     ).toHaveTextContent('Off')
     screen.getByText('Download protocol source file')
-    screen.getByText('Include protocol source file in run record downloads')
+    screen.getByText('Include protocol source file in run record downloads.')
     const toggle = screen.getByText('Download protocol source file')
     fireEvent.click(toggle)
     expect(mockDispatch).toHaveBeenCalledWith(

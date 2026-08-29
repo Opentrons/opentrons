@@ -22,6 +22,7 @@ import { ModuleLabel } from './ModuleLabel'
 import { SelectedLabwareRender } from './SelectedLabwareRender'
 import { SelectedModuleLabwareRender } from './SelectedModuleLabwareRender'
 
+import type { ReactNode } from 'react'
 import type { DeckLabelProps } from '@opentrons/components'
 import type {
   CoordinateTuple,
@@ -35,7 +36,7 @@ interface SelectedItemsProps {
   slotPosition: CoordinateTuple | null
   isSlotAHopper: boolean
 }
-export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
+export const SelectedItems = (props: SelectedItemsProps): ReactNode => {
   const { deckDef, robotType, slotPosition, isSlotAHopper } = props
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {

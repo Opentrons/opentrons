@@ -1,3 +1,5 @@
+"""Constants for system generated audit log messages."""
+
 from typing import Final
 
 MESSAGE_ROBOT_BOOT: Final = "Robot started up"
@@ -13,6 +15,7 @@ ACTION_ROBOT_BOOT: Final = "robot-boot"
 ACTION_LOG_PERIOD_START: Final = "log-period-begin"
 ACTION_LOG_PERIOD_END: Final = "log-period-end"
 ACTION_LOG_LOGGING_ERROR: Final = "log-error"
+ACTION_UNSIGNED_RUNS_WARNING: Final = "unsigned-runs-warning"
 
 ACCOUNT_NAME_SYSTEM: Final = "system"
 LEGAL_NAME_SYSTEM: Final = ""

@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import clsx from 'clsx'
 
 import { StyledText, TouchInputField } from '@opentrons/components'
 
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 
@@ -32,12 +33,7 @@ export function WifiPasswordInput({
     !isUnboxingFlowOngoing && styles.main_wrapper_with_top_margin
   )
 
-  useEffect(() => {
-    if (inputRef.current != null) {
-      inputRef.current.focus()
-    }
-    keyboardRef.current?.setInput(password)
-  }, [password])
+  usePlaceCaretAtEndOnToggle(inputRef, showPassword, true)
 
   return (
     <>
@@ -46,36 +42,28 @@ export function WifiPasswordInput({
           <StyledText oddStyle="bodyTextRegular">
             {t('enter_password')}
           </StyledText>
-          <div className={styles.input_row}>
-            <div className={styles.input_field_wrapper}>
-              <TouchInputField
-                aria-label="wifi_password"
-                value={password}
-                type={showPassword ? 'text' : 'password'}
-                ref={inputRef}
-                autoFocus
-                onChange={e => {
-                  setPassword(e.target.value)
+          <TouchInputField
+            aria-label="wifi_password"
+            value={password}
+            type={showPassword ? 'text' : 'password'}
+            ref={inputRef}
+            autoFocus
+            onChange={e => {
+              setPassword(e.target.value)
+            }}
+            accessory={
+              <PasswordVisibilityToggle
+                isVisible={showPassword}
+                onToggle={() => {
+                  setShowPassword(currentState => !currentState)
                 }}
               />
-            </div>
-            <PasswordVisibilityToggle
-              isVisible={showPassword}
-              onToggle={() => {
-                setShowPassword(currentState => !currentState)
-              }}
-            />
-          </div>
+            }
+          />
         </div>
       </div>
       <div className={styles.keyboard_wrapper}>
-        <FullKeyboard
-          onChange={e => {
-            e != null && setPassword(String(e))
-            inputRef?.current?.focus()
-          }}
-          keyboardRef={keyboardRef}
-        />
+        <FullKeyboard keyboardRef={keyboardRef} inputElementRef={inputRef} />
       </div>
     </>
   )

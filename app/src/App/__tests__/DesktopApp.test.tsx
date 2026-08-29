@@ -1,7 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -24,7 +23,6 @@ import { AlertsModal } from '/app/organisms/Desktop/Alerts/AlertsModal'
 
 import { ProtocolVisualization } from '/app/pages/Desktop/Protocols/ProtocolVisualization'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
-import { useFeatureFlag } from '/app/redux/config'
 
 import { DesktopApp } from '../DesktopApp'
 import { useSoftwareUpdatePoll } from '../hooks/useSoftwareUpdatePoll'
@@ -104,7 +102,6 @@ describe('DesktopApp', () => {
     vi.mocked(LocalizationProvider).mockImplementation(
       (props: LocalizationProviderProps) => <>{props.children}</>
     )
-    when(vi.mocked(useFeatureFlag)).calledWith('reactScan').thenReturn(false)
   })
   afterEach(() => {
     vi.resetAllMocks()

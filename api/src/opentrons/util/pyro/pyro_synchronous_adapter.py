@@ -160,9 +160,18 @@ def pyro_behavior(
     return decorator  # type: ignore
 
 
-def synchronous(func: Callable[P, T]) -> Callable[P, T]:
+def synchronous(func: Callable[P, T]) -> Callable[P, T]:  # noqa: C901
     """Decorator that makes an async function callable synchronously."""
     if not inspect.iscoroutinefunction(func):
+
+        @functools.wraps(func)
+        def _do(*args: P.args, **kwargs: P.kwargs) -> Any:
+            try:
+                return func(*args, **kwargs)
+            except BaseException:
+                log.exception(f"Pyro call of {func}")
+                raise
+
         return func  # no-op for non-async functions
 
     @functools.wraps(func)
@@ -190,7 +199,11 @@ def synchronous(func: Callable[P, T]) -> Callable[P, T]:
 
             # Execute the coroutine
             future = asyncio.run_coroutine_threadsafe(coro, loop)
-            return future.result()
+            try:
+                return future.result()
+            except BaseException:
+                log.exception(f"Pyro call of {func}")
+                raise
 
         else:
             raise RuntimeError("Instance event loop is not running.")

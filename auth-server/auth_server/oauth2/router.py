@@ -20,9 +20,10 @@ router = fastapi.APIRouter(prefix="/auth")
         The OAuth 2 token endpoint, as specified in RFC 6749.
 
         Omit `scope` to receive the scopes appropriate for the authenticated user
-        under current server settings. Clients may optionally include `scope` to
-        request a subset of those permissions; granted scopes are stored on the
-        token and may be further restricted when settings or user state changes.
+        under current server settings. Those scopes are calculated at use time and
+        may change when settings or user state changes. Clients may optionally
+        include `scope` to request a subset of those permissions; that ceiling is
+        stored on the token and further restricted when settings or user state changes.
         """),
     dependencies=[fastapi.Depends(skip_audit_logger)],
 )

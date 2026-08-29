@@ -15,7 +15,6 @@ export type DevInternalFlag =
   | 'protocolTimeline'
   | 'enableLabwareCreator'
   | 'reactQueryDevtools'
-  | 'reactScan'
   | 'quickTransferProtocolContentsLog'
   | 'robotSearchBar'
   | 'showGitDetails'

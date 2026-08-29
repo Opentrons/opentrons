@@ -20,8 +20,8 @@ export function ModuleEmptySelectorButtons(
   const { modules, addModule } = props
   return (
     <div className={styles.buttons_container}>
-      {[...modules]
-        .sort((moduleA, moduleB) => moduleA.localeCompare(moduleB))
+      {modules
+        .toSorted((moduleA, moduleB) => moduleA.localeCompare(moduleB))
         .map(moduleModel => (
           <div className={styles.button_container} key={moduleModel}>
             <EmptySelectorButton

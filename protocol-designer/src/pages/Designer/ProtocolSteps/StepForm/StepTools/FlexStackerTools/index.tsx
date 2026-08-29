@@ -38,10 +38,11 @@ import { getIsStackerStoreEnabled } from './utils.ts/getIsStackerStoreEnabled'
 import { getStoredLabwareDefinitions } from './utils.ts/getStoredLabwareDefinitions'
 import { getStoredLabwareInfo } from './utils.ts/getStoredLabwareInfo'
 
+import type { ReactNode } from 'react'
 import type { FlexStackerFormType } from '/protocol-designer/form-types'
 import type { StepFormProps } from '../../types'
 
-export function FlexStackerTools(props: StepFormProps): JSX.Element {
+export function FlexStackerTools(props: StepFormProps): ReactNode {
   const { formData, propsForFields, showFormErrors } = props
   const { t } = useTranslation('form')
   const dispatch = useDispatch()

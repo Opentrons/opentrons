@@ -7,7 +7,6 @@ import {
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
 import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
 import { useInitLPCStore } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore'
@@ -113,23 +112,12 @@ export function useLPCFlows({
   const { data: runRecord } = useNotifyRunQuery(runId ?? null, {
     refetchInterval: RUN_RECORD_INTERVAL_MS,
   })
-
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-
-  // useCompatibleAnalysis() may need to trigger a new analysis, and that may require
-  // the user to log in and enter a reason for interaction.
-  //
-  // todo(mm, 2026-08-10): This could perhaps be combined with our call to
-  // useMaintenanceRunDocumentation() to avoid prompting the user twice,
-  // but it's unclear which hook should be responsible for that.
-  const analysisDocumentationState = useDocumentationState()
-
   const compatibleFlexAnalysis = useCompatibleAnalysis(
     runId,
     runRecord,
     mostRecentAnalysis,
-    isFlex,
-    analysisDocumentationState
+    isFlex
   )
   const compatibleRobotAnalysis = isFlex
     ? compatibleFlexAnalysis

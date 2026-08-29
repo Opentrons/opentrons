@@ -1,7 +1,7 @@
 {
   "a_robot_software_update_is_available": "A robot software update is required to run protocols with this version of the desktop app. <robotLink>Go to Robot</robotLink>",
   "about_flex_gripper": "About Gripper",
-  "account_page_footer": "Manage robot users in the desktop app",
+  "account_page_footer": "Manage user account details in the desktop app",
   "alternative_security_types_description": "The robot supports connecting to various enterprise access points. Connect via USB and finish setup in the desktop app.",
   "attach_a_pipette": "Attach a pipette to your robot",
   "attach_a_pipette_for_quick_transfer": "To create a quick transfer, you need to attach a pipette to your robot.",

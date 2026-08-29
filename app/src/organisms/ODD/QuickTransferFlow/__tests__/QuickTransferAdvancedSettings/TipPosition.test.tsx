@@ -2,8 +2,6 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { TouchInputField } from '@opentrons/components'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
@@ -15,14 +13,6 @@ import type { QuickTransferSummaryState } from '../../types'
 
 vi.mock('/app/redux-resources/analytics')
 vi.mock('../utils')
-
-vi.mock('@opentrons/components', async importOriginal => {
-  const actualComponents = await importOriginal<typeof TouchInputField>()
-  return {
-    ...actualComponents,
-    TouchInputField: vi.fn(),
-  }
-})
 
 const render = (props: ComponentProps<typeof TipPositionEntry>) => {
   return renderWithProviders(<TipPositionEntry {...props} />, {
@@ -91,17 +81,9 @@ describe('TipPosition', () => {
     const user = userEvent.setup()
     screen.getByText('Aspirate tip position')
     screen.getByTestId('ChildNavigation_Primary_Button')
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Distance from bottom of well (mm)',
-        error: null,
-        type: 'text',
-        value: 10,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(
+      screen.getByLabelText('Distance from bottom of well (mm)')
+    ).toHaveValue('10')
     const exitBtn = screen.getByTestId('ChildNavigation_Back_Button')
     await user.click(exitBtn)
     expect(props.onBack).toHaveBeenCalled()
@@ -114,17 +96,9 @@ describe('TipPosition', () => {
     }
     render(props)
     screen.getByText('Dispense tip position')
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Distance from bottom of well (mm)',
-        error: null,
-        type: 'text',
-        value: 75,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(
+      screen.getByLabelText('Distance from bottom of well (mm)')
+    ).toHaveValue('75')
   })
 
   it('renders correct range if you enter incorrect value for aspirate', async () => {
@@ -133,17 +107,14 @@ describe('TipPosition', () => {
     const deleteBtn = screen.getByText('del')
     await user.click(deleteBtn)
     await user.click(deleteBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Distance from bottom of well (mm)',
-        error: 'Value must be between 1 to 52',
-        type: 'text',
-        value: 0,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(
+      screen.getByLabelText('Distance from bottom of well (mm)')
+    ).toHaveValue('')
+    await user.click(screen.getByText('0'))
+    expect(
+      screen.getByLabelText('Distance from bottom of well (mm)')
+    ).toHaveValue('0')
+    screen.getByText('Value must be between 1 to 52')
     const saveBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(saveBtn).toBeDisabled()
   })
@@ -158,17 +129,11 @@ describe('TipPosition', () => {
     const deleteBtn = screen.getByText('del')
     await user.click(deleteBtn)
     await user.click(deleteBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Distance from bottom of well (mm)',
-        error: 'Value must be between 1 to 202',
-        type: 'text',
-        value: 0,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    await user.click(screen.getByText('0'))
+    expect(
+      screen.getByLabelText('Distance from bottom of well (mm)')
+    ).toHaveValue('0')
+    screen.getByText('Value must be between 1 to 202')
     const saveBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(saveBtn).toBeDisabled()
   })

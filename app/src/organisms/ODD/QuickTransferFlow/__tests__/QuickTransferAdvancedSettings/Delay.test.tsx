@@ -2,8 +2,6 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { TouchInputField } from '@opentrons/components'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
@@ -15,14 +13,6 @@ import type { QuickTransferSummaryState } from '../../types'
 
 vi.mock('/app/redux-resources/analytics')
 vi.mock('../utils')
-
-vi.mock('@opentrons/components', async importOriginal => {
-  const actualComponents = await importOriginal<typeof TouchInputField>()
-  return {
-    ...actualComponents,
-    TouchInputField: vi.fn(),
-  }
-})
 
 const render = (props: ComponentProps<typeof Delay>) => {
   return renderWithProviders(<Delay {...props} />, {
@@ -103,17 +93,7 @@ describe('Delay', () => {
     await user.click(enabledBtn)
     const continueBtn = screen.getByText('Continue')
     await user.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Delay duration (seconds)',
-        error: null,
-        type: 'number',
-        value: null,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Delay duration (seconds)')).toHaveValue('')
   })
 
   it('calls dispatch button if you select disabled and save', async () => {
@@ -136,17 +116,8 @@ describe('Delay', () => {
     await user.click(continueBtn)
     const oneButton = screen.getByText('0')
     await user.click(oneButton)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Delay duration (seconds)',
-        error: 'Value must be between 0.1 to 9999999999',
-        type: 'number',
-        value: 0,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Delay duration (seconds)')).toHaveValue('0')
+    screen.getByText('Value must be between 0.1 to 9999999999')
     const nextBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(nextBtn).toBeDisabled()
   })
@@ -184,17 +155,7 @@ describe('Delay', () => {
     render(props)
     const continueBtn = screen.getByText('Continue')
     await user.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Delay duration (seconds)',
-        error: null,
-        type: 'number',
-        value: 15,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Delay duration (seconds)')).toHaveValue('15')
   })
 
   it('persists previously set value saved in state for dispense', async () => {
@@ -212,16 +173,6 @@ describe('Delay', () => {
     render(props)
     const continueBtn = screen.getByText('Continue')
     await user.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Delay duration (seconds)',
-        error: null,
-        type: 'number',
-        value: 20,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Delay duration (seconds)')).toHaveValue('20')
   })
 })
