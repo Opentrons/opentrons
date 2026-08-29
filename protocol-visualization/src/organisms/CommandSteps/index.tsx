@@ -43,6 +43,7 @@ export function CommandSteps(props: CommandStepsProps): ReactNode {
   } = props
   const { t } = useTranslation('protocol_visualization')
   const [isAtBottom, setIsAtBottom] = useState<boolean>(false)
+  const [searchQuery, setSearchQuery] = useState<string>('')
 
   // 親コンポーネントと同じフィルタリングルールを適用
   const filteredCommands = analysis.commands.filter(
@@ -109,6 +110,10 @@ export function CommandSteps(props: CommandStepsProps): ReactNode {
     }
   }
 
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+  }
+
   return (
     <div className={styles.detail_container}>
       <div className={styles.command_step}>
@@ -136,6 +141,15 @@ export function CommandSteps(props: CommandStepsProps): ReactNode {
             {t('percent_complete', { percent: percentComplete.toFixed(0) })}
           </StyledText>
         </div>
+        <div style={{ padding: '0 var(--spacing-16) var(--spacing-8)' }}>
+          <InputField
+            type="text"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            placeholder={t('search_commands_placeholder') ?? 'Search commands...'}
+            aria-label="Search Commands"
+          />
+        </div>
         <div
           className={`${styles.command_step_groups} ${isAtBottom ? styles.at_bottom : ''}`}
         >
@@ -148,6 +162,7 @@ export function CommandSteps(props: CommandStepsProps): ReactNode {
             setIsAtBottom={setIsAtBottom}
             milliSecondsPerFrame={milliSecondsPerFrame}
             isGlobalPlaying={isGlobalPlaying}
+            searchQuery={searchQuery}
           />
         </div>
       </div>

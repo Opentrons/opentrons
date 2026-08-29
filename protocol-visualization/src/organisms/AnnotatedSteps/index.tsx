@@ -32,6 +32,58 @@ interface AnnotatedStepsProps {
   setIsAtBottom?: Dispatch<SetStateAction<boolean>> // remove redux dependency
   milliSecondsPerFrame?: number
   isGlobalPlaying?: boolean
+  searchQuery?: string
+}
+
+function stemWord(word: string): string {
+  let s = word.toLowerCase()
+  if (s.length <= 3) return s
+  if (s.endsWith('ing') && s.length > 5) s = s.slice(0, -3)
+  else if (s.endsWith('ed') && s.length > 4) s = s.slice(0, -2)
+  else if (s.endsWith('s') && s.length > 3) s = s.slice(0, -1)
+  if (s.endsWith('e') && s.length > 3) s = s.slice(0, -1)
+  return s
+}
+
+function buildSearchCorpus(command: RunTimeCommand): string {
+  let corpus = `${command.commandType} ${command.id}`
+  try {
+    corpus += ` ${JSON.stringify((command as any).params ?? '')}`
+  } catch {}
+  corpus = corpus.toLowerCase()
+  const spaced = command.commandType.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase()
+  corpus += ` ${spaced}`
+  const ingMap: Record<string, string> = {
+    aspirate: 'aspirating',
+    dispense: 'dispensing',
+    pickUpTip: 'picking up tip',
+    dropTip: 'dropping tip',
+    blowout: 'blowing out',
+    blowOutInPlace: 'blowing out',
+    touchTip: 'touching tip',
+    airGapInPlace: 'air gap',
+  }
+  const ing = ingMap[command.commandType]
+  if (ing) corpus += ` ${ing}`
+  else {
+    const lower = command.commandType.toLowerCase()
+    if (lower.endsWith('e') && lower.length > 3) corpus += ` ${lower.slice(0, -1)}ing`
+  }
+  return corpus
+}
+
+function commandMatchesQuery(command: RunTimeCommand, query: string): boolean {
+  if (!query) return true
+  const q = query.trim().toLowerCase()
+  if (!q) return true
+  const corpus = buildSearchCorpus(command)
+  const tokens = q.split(/\s+/).filter(Boolean)
+  return tokens.some(token => {
+    if (corpus.includes(token)) return true
+    const st = stemWord(token)
+    if (st.length >= 3 && corpus.includes(st)) return true
+    return false
+  })
 }
 
 type GroupNode = Extract<GroupedCommands[number], { annotationId: string }>
@@ -96,6 +148,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): ReactNode {
     setIsAtBottom,
     milliSecondsPerFrame = DEFAULT_STEP_GROUP_MS,
     isGlobalPlaying = false,
+    searchQuery = '',
   } = props
   const { t } = useTranslation('protocol_visualization')
   const [showErrorDetailsModal, setShowErrorDetailsModal] =
@@ -144,9 +197,40 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): ReactNode {
     }
     return next
   }, [groupedCommands])
+
+  const normalizedQuery = searchQuery.trim().toLowerCase()
+
+  const searchFilteredCommands = useMemo(() => {
+    if (!normalizedQuery) return filteredCommands
+    return filteredCommands.filter(c => commandMatchesQuery(c, normalizedQuery))
+  }, [filteredCommands, normalizedQuery])
+
+  const searchFilteredGroupedCommands = useMemo(() => {
+    if (!normalizedQuery) return filteredGroupedCommands
+    if (filteredGroupedCommands == null) return null
+    const next: GroupedCommands = []
+    for (const node of filteredGroupedCommands) {
+      if ('annotationId' in node) {
+        const annotationMatch =
+          (node.annotation?.name ?? '').toLowerCase().includes(normalizedQuery) ||
+          (node.annotation?.description ?? '').toLowerCase().includes(normalizedQuery)
+        const matchingSubs = node.subCommands.filter(leaf =>
+          commandMatchesQuery(leaf.command, normalizedQuery)
+        )
+        if (annotationMatch) {
+          next.push(node)
+        } else if (matchingSubs.length > 0) {
+          next.push({ ...node, subCommands: matchingSubs })
+        }
+      } else if (commandMatchesQuery(node.command, normalizedQuery)) {
+        next.push(node)
+      }
+    }
+    return next
+  }, [filteredGroupedCommands, normalizedQuery])
   const groupedCommandsHighlightedInfo = useMemo(
     () =>
-      filteredGroupedCommands?.map(node => {
+      searchFilteredGroupedCommands?.map(node => {
         if ('annotationId' in node) {
           const updatedSubCommands = node.subCommands.map(subNode => ({
             ...subNode,
@@ -166,7 +250,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): ReactNode {
           isHighlighted: currentCommandId === node.command.id,
         }
       }),
-    [filteredGroupedCommands, currentCommandId]
+    [searchFilteredGroupedCommands, currentCommandId]
   )
 
   const lastVisibleAnalysisCommandId = useMemo(
@@ -264,7 +348,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): ReactNode {
         }
       })
     } else {
-      filteredCommands.forEach(command => {
+      searchFilteredCommands.forEach(command => {
         const currentCommandNumber = ++commandNumber
         const rowIndex = nextRows.length
         nextRows.push({
@@ -304,6 +388,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): ReactNode {
     }
   }, [
     groupedCommandsHighlightedInfo,
+    searchFilteredCommands,
     filteredCommands,
     currentCommandIndex,
     analysis.errors,
