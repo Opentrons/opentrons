@@ -88,6 +88,24 @@ describe('AddUserModal', () => {
     })
   })
 
+  it('shows an invalid character error when the username contains a space', async () => {
+    render(props)
+    const [usernameInput, legalNameInput] = screen.getAllByRole('textbox')
+    fireEvent.change(usernameInput, { target: { value: 'test user' } })
+    fireEvent.change(legalNameInput, { target: { value: 'Ada Lovelace' } })
+
+    await waitFor(() => {
+      screen.getByText(
+        'Usernames can include letters, numbers, and punctuation, but not spaces.'
+      )
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Create account' }))
+    await waitFor(() => {
+      expect(mockCreateUser).not.toHaveBeenCalled()
+    })
+  })
+
   it('creates a user when the form is valid', async () => {
     mockCreateUser.mockResolvedValue({
       data: { temporaryPassword: 'temp-password' },

@@ -25,6 +25,8 @@ import { getTopPortalEl } from '/app/App/portal'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useRobot } from '/app/redux-resources/robots'
 import { getRobotSerialNumber } from '/app/redux/discovery'
+import { getPasswordComplexityError } from '/app/resources/auth/getPasswordComplexityError'
+import { getUsernameValidationError } from '/app/resources/auth/getUsernameValidationError'
 import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/encryptionKeys'
 
 import { useHandleRobotCertImport } from '../RobotCertImport/useHandleRobotCertImport'
@@ -448,10 +450,16 @@ function CreateAdminAccountPage({
               rules={{
                 required: t('setup_wizard_field_required'),
                 validate: value => {
+                  const username = value.trim()
+                  if (
+                    getUsernameValidationError(username) === 'invalidCharacters'
+                  ) {
+                    return t('setup_wizard_username_invalid_characters')
+                  }
                   const isReserved = [
                     SERVICE_ACCOUNT_USERNAME,
                     RECOVERY_ACCOUNT_USERNAME,
-                  ].includes(value)
+                  ].includes(username)
                   return isReserved ? t('setup_wizard_username_reserved') : true
                 },
               }}
@@ -536,12 +544,20 @@ function AdminPasswordPage({
               control={control}
               rules={{
                 required: t('setup_wizard_field_required'),
-                minLength: {
-                  // Theoretically, the minimum password length is configurable on the server side,
-                  // but in practice, until Compliance Ready Software has been enabled,
-                  // there's no user-facing way to adjust it from the default of 8.
-                  value: 8,
-                  message: t('setup_wizard_password_too_short'),
+                validate: value => {
+                  const complexityError = getPasswordComplexityError(value, {
+                    // Until CRS is enabled there is no user-facing way to
+                    // change the server default of 8.
+                    minLength: 8,
+                    requireSpecialCharacters: false,
+                  })
+                  if (complexityError === 'tooShort') {
+                    return t('setup_wizard_password_too_short')
+                  }
+                  if (complexityError === 'invalidCharacters') {
+                    return t('setup_wizard_password_invalid_characters')
+                  }
+                  return true
                 },
               }}
               render={({ field, fieldState }) => (

@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
 
+import { hasOnlyAllowedCredentialCharacters } from '/app/resources/auth/credentialCharacters'
+
 import { PasswordInputField } from '../PasswordInputField'
 import styles from './userAccountForm.module.css'
 
@@ -32,6 +34,18 @@ export function UserAccountPasswordFormFields<T extends FieldValues>({
           <Controller
             control={control}
             name={'password' as Path<T>}
+            rules={{
+              validate: value => {
+                const password = value as string
+                if (password === '') {
+                  return true
+                }
+                return (
+                  hasOnlyAllowedCredentialCharacters(password) ||
+                  (t('desktop_password_invalid_characters') as string)
+                )
+              },
+            }}
             render={({ field, fieldState }) => (
               <PasswordInputField
                 value={field.value}
