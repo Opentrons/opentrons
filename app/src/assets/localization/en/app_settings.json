@@ -69,7 +69,7 @@
   "if_on_fetch_updates_in_the_background": "If on, fetch updates in the background when released.",
   "include_protocol_source_in_run_download": "Download protocol source file",
   "include_protocol_source_in_run_download_description": "When enabled, the protocol source file is included when downloading the protocol run record",
-  "include_protocol_source_in_run_download_description_odd": "Include protocol source file in run record downloads",
+  "include_protocol_source_in_run_download_description_odd": "Include protocol source file in run record downloads.",
   "installing_update": "Installing update...",
   "ip_available": "Available",
   "ip_description_first": "Enter an IP address or hostname to connect to a robot.",

@@ -19,6 +19,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { i18n } from '/app/i18n'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 
@@ -40,14 +41,17 @@ interface PushOutProps {
 
 export function PushOut(props: PushOutProps): ReactNode {
   const { kind, onBack, state, dispatch } = props
-  const { t } = useTranslation('quick_transfer')
+  const { t } = useTranslation(['quick_transfer', 'shared'])
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const keyboardRef = useRef(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
   const [pushOutIsEnabled, setPushOutIsEnabled] = useState<boolean | null>(
     state.pushOutDispense?.volume != null
   )
-  const [volume, setVolume] = useState<number | null>(
-    state.pushOutDispense?.volume ?? null
+  const [volume, setVolume] = useState<string>(
+    state.pushOutDispense?.volume != null
+      ? String(state.pushOutDispense.volume)
+      : ''
   )
   const [currentStep, setCurrentStep] = useState<number>(1)
 
@@ -93,11 +97,11 @@ export function PushOut(props: PushOutProps): ReactNode {
         setCurrentStep(2)
       }
     } else if (currentStep === 2) {
-      if (volume != null) {
+      if (parsedVolume.result === 'success') {
         dispatch({
           type: ACTIONS.SET_PUSH_OUT,
           pushOutSettings: {
-            volume,
+            volume: parsedVolume.data,
           },
         })
         trackEventWithRobotSerial({
@@ -111,16 +115,27 @@ export function PushOut(props: PushOutProps): ReactNode {
     }
   }
 
+  const pushOutMaxVolume = getMaxPushOutVolume(state.volume, state.pipette)
+  const parsedVolume = parseNumericalInput(volume, {
+    allowDecimal: true,
+    allowNegative: false,
+    min: 0,
+    max: pushOutMaxVolume,
+  })
   let buttonIsDisabled = false
   if (currentStep === 2) {
-    buttonIsDisabled = volume == null
+    buttonIsDisabled = parsedVolume.result !== 'success'
   }
 
-  const pushOutMaxVolume = getMaxPushOutVolume(state.volume, state.pipette)
-  const volumeError =
-    volume != null && volume > pushOutMaxVolume
-      ? t('value_out_of_range', { min: 0, max: pushOutMaxVolume })
-      : null
+  const volumeErrorMessage =
+    parsedVolume.result === 'rangeError'
+      ? t('value_out_of_range', {
+          min: parsedVolume.min,
+          max: parsedVolume.max,
+        })
+      : parsedVolume.result === 'syntaxError'
+        ? t('enter_a_valid_number')
+        : null
 
   return createPortal(
     <Flex position={POSITION_FIXED} backgroundColor={COLORS.white} width="100%">
@@ -176,13 +191,14 @@ export function PushOut(props: PushOutProps): ReactNode {
             marginTop={SPACING.spacing68}
           >
             <TouchInputField
+              ref={inputElementRef}
               autoFocus
-              type="number"
+              type="text"
               value={volume}
-              error={volumeError}
+              error={volumeErrorMessage}
               label={t('push_out_volume')}
               onChange={e => {
-                setVolume(Number(e.target.value))
+                setVolume(e.target.value)
               }}
             />
           </Flex>
@@ -193,11 +209,8 @@ export function PushOut(props: PushOutProps): ReactNode {
           >
             <NumericalKeyboard
               keyboardRef={keyboardRef}
+              inputElementRef={inputElementRef}
               isDecimal
-              initialValue={String(volume ?? '')}
-              onChange={e => {
-                setVolume(Number(e))
-              }}
             />
           </Flex>
         </Flex>

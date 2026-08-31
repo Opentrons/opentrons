@@ -87,7 +87,13 @@ function useFlexLPCLabwareInfo({
       refetchInterval: REFETCH_OFFSET_SEARCH_MS,
     }
   )
-  const storedOffsets = lwOffsetsData?.data
+
+  const storedOffsets = useMemo(
+    () =>
+      lwOffsetsData?.data ??
+      (searchLwOffsetsParams?.filters?.length === 0 ? [] : undefined),
+    [lwOffsetsData?.data, searchLwOffsetsParams?.filters]
+  )
 
   const labwareInfo = useMemo(
     () =>

@@ -170,13 +170,10 @@ export function ProtocolSetupParameters({
     }
   }
 
-  // todo(mm, 2026-08-10): This could perhaps be useLinkedDocumentationState so a single
-  // prompt could be reused across the multiple setup requests, but the promise chaining
-  // inside handleConfirmValues is hurting my brain.
-  const documentationState = useDocumentationState()
-
   const { createProtocolAnalysis, isLoading: isAnalysisLoading } =
-    useCreateProtocolAnalysisMutation(documentationState, protocolId, host)
+    useCreateProtocolAnalysisMutation(protocolId, host)
+
+  const documentationState = useDocumentationState()
 
   const { uploadCsvFile } = useUploadCsvFileMutation(
     documentationState,

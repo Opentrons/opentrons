@@ -2,8 +2,6 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { TouchInputField } from '@opentrons/components'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
@@ -15,14 +13,6 @@ import type { QuickTransferSummaryState } from '../../types'
 
 vi.mock('/app/redux-resources/analytics')
 vi.mock('../utils')
-
-vi.mock('@opentrons/components', async importOriginal => {
-  const actualComponents = await importOriginal<typeof TouchInputField>()
-  return {
-    ...actualComponents,
-    TouchInputField: vi.fn(),
-  }
-})
 
 const render = (props: ComponentProps<typeof AirGap>) => {
   return renderWithProviders(<AirGap {...props} />, {
@@ -97,17 +87,7 @@ describe('AirGap', () => {
     await user.click(enabledBtn)
     const continueBtn = screen.getByText('Continue')
     await user.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Air gap volume (µL)',
-        error: null,
-        type: 'number',
-        value: null,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Air gap volume (µL)')).toHaveValue('')
   })
 
   it('calls dispatch button if you select disabled and save', async () => {
@@ -131,17 +111,8 @@ describe('AirGap', () => {
     await user.click(screen.getByText('2'))
     await user.click(screen.getByText('0'))
     await user.click(screen.getByText('0'))
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Air gap volume (µL)',
-        error: 'Value must be between 0 to 195',
-        type: 'number',
-        value: 200,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Air gap volume (µL)')).toHaveValue('200')
+    screen.getByText('Value must be between 0 to 195')
     const saveBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(saveBtn).toBeDisabled()
   })
@@ -162,17 +133,7 @@ describe('AirGap', () => {
     await user.click(continueBtn)
     const numButton = screen.getByText('0')
     await user.click(numButton)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Air gap volume (µL)',
-        error: null,
-        type: 'number',
-        value: 0,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Air gap volume (µL)')).toHaveValue('0')
   })
 
   it('has correct range for aspirate with a multiDispense pipette path', async () => {
@@ -191,17 +152,7 @@ describe('AirGap', () => {
     await user.click(continueBtn)
     const numButton = screen.getByText('0')
     await user.click(numButton)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Air gap volume (µL)',
-        error: null,
-        type: 'number',
-        value: 0,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Air gap volume (µL)')).toHaveValue('0')
   })
 
   it('has correct range for and text for a dispense', async () => {
@@ -218,17 +169,7 @@ describe('AirGap', () => {
     await user.click(continueBtn)
     const numButton = screen.getByText('0')
     await user.click(numButton)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Air gap volume (µL)',
-        error: null,
-        type: 'number',
-        value: 0,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Air gap volume (µL)')).toHaveValue('0')
   })
 
   it('calls dispatch when an in range value is entered and saved', async () => {
@@ -258,17 +199,7 @@ describe('AirGap', () => {
     render(props)
     const continueBtn = screen.getByText('Continue')
     await user.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Air gap volume (µL)',
-        error: null,
-        type: 'number',
-        value: 4,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Air gap volume (µL)')).toHaveValue('4')
   })
 
   it('persists existing values if they are in state for dispense', async () => {
@@ -285,16 +216,6 @@ describe('AirGap', () => {
     render(props)
     const continueBtn = screen.getByText('Continue')
     await user.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Air gap volume (µL)',
-        error: null,
-        type: 'number',
-        value: 16,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Air gap volume (µL)')).toHaveValue('16')
   })
 })

@@ -21,26 +21,19 @@ export function mapAuthUserMutationError<T extends FieldValues>(
     return null
   }
 
-  const errorId = axios.isAxiosError(error)
-    ? error.response?.data?.errors?.[0]?.id
-    : null
+  const preferredError = getPreferredAuthErrorItem(error)
+  const errorId = preferredError?.id ?? null
 
   if (errorId === 'userAlreadyExists') {
     return {
       field: 'username' as Path<T>,
       error: {
         type: 'server',
-        message: t(
-          'desktop_personal_account_settings_username_exists_error'
-        ) as string,
+        message: t('desktop_personal_account_settings_username_exists_error'),
       },
     }
-  }
-
-  if (errorId === 'passwordTooShort') {
-    const requiredLength = axios.isAxiosError(error)
-      ? error.response?.data?.errors?.[0]?.meta?.requiredLength
-      : null
+  } else if (errorId === 'passwordTooShort') {
+    const requiredLength = preferredError?.meta?.requiredLength ?? null
 
     return {
       field: 'password' as Path<T>,
@@ -48,39 +41,103 @@ export function mapAuthUserMutationError<T extends FieldValues>(
         type: 'server',
         message:
           requiredLength != null
-            ? (t('desktop_password_too_short', {
+            ? t('desktop_password_too_short', {
                 minLength: requiredLength,
-              }) as string)
-            : (t('desktop_personal_account_settings_save_error') as string),
+              })
+            : t('desktop_personal_account_settings_save_error'),
       },
     }
-  }
-
-  if (errorId === 'passwordMissingSpecialCharacters') {
+  } else if (errorId === 'passwordMissingSpecialCharacters') {
     return {
       field: 'password' as Path<T>,
       error: {
         type: 'server',
-        message: t('desktop_password_missing_special_characters') as string,
+        message: t('desktop_password_missing_special_characters'),
       },
     }
-  }
-
-  if (errorId === 'passwordPreviouslyUsed') {
+  } else if (errorId === 'passwordPreviouslyUsed') {
     return {
       field: 'password' as Path<T>,
       error: {
         type: 'server',
-        message: t('desktop_password_previously_used') as string,
+        message: t('desktop_password_previously_used'),
+      },
+    }
+  } else {
+    return {
+      field: 'confirmPassword' as Path<T>,
+      error: {
+        type: 'server',
+        message: t('desktop_personal_account_settings_save_error'),
       },
     }
   }
+}
 
-  return {
-    field: 'confirmPassword' as Path<T>,
-    error: {
-      type: 'server',
-      message: t('desktop_personal_account_settings_save_error') as string,
-    },
+/** User-facing copy for the set-new-password (password reset) flow. */
+export function mapSetNewPasswordError(error: unknown, t: TFunction): string {
+  const preferredError = getPreferredAuthErrorItem(error)
+  const errorId = preferredError?.id ?? null
+
+  if (errorId === 'passwordTooShort') {
+    const requiredLength = preferredError?.meta?.requiredLength
+    return requiredLength != null
+      ? t('must_be_at_least_characters', {
+          ns: 'access_control',
+          minLength: requiredLength,
+        })
+      : t('set_new_password_error_update_failed', {
+          ns: 'access_control',
+        })
+  } else if (errorId === 'passwordMissingSpecialCharacters') {
+    return t('must_include_at_least_one_special_character', {
+      ns: 'access_control',
+    })
+  } else if (errorId === 'passwordPreviouslyUsed') {
+    return t('desktop_password_previously_used')
+  } else {
+    return t('set_new_password_error_update_failed', {
+      ns: 'access_control',
+    })
   }
+}
+
+interface AuthErrorItem {
+  id?: string
+  meta?: {
+    requiredLength?: number
+  }
+}
+
+function getAuthErrorItems(error: unknown): AuthErrorItem[] {
+  if (!axios.isAxiosError(error)) {
+    return []
+  }
+
+  const errors = error.response?.data?.errors
+  if (!Array.isArray(errors)) {
+    return []
+  }
+
+  return errors.filter(
+    (item): item is AuthErrorItem => item != null && typeof item === 'object'
+  )
+}
+
+/**
+ * Prefer length failures over special-character failures when both are present.
+ */
+function getPreferredAuthErrorItem(error: unknown): AuthErrorItem | null {
+  const items = getAuthErrorItems(error)
+  const tooShort = items.find(item => item.id === 'passwordTooShort')
+  if (tooShort != null) {
+    return tooShort
+  }
+  const missingSpecialCharacters = items.find(
+    item => item.id === 'passwordMissingSpecialCharacters'
+  )
+  if (missingSpecialCharacters != null) {
+    return missingSpecialCharacters
+  }
+  return items[0] ?? null
 }
