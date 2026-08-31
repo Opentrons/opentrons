@@ -78,6 +78,10 @@ FILTER_PLATE_CHOICES: List[ParameterChoice] = [
         "value": "cytiva_96_wellplate_1000ul_longtip_filter",
     },
     {
+        "display_name": "Cytiva AcroPrep 96 1000µL Short Tip",
+        "value": "cytiva_96_wellplate_1000ul_shorttip_filter",
+    },
+    {
         "display_name": "Luna Nanotech USP-096F 1000µL Silica",
         "value": "lunanano_96_wellplate_1000ul_filter",
     },
@@ -132,7 +136,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="filter_plate",
         display_name="Filter Plate",
         description="Filter plate loaded on the collar.",
-        default="millipore_96_wellplate_300ul_hts_filter",
+        default="cytiva_96_wellplate_1000ul_shorttip_filter",
         choices=FILTER_PLATE_CHOICES,
     )
     parameters.add_str(
