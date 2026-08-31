@@ -37,7 +37,7 @@ Users can also add text in the Opentrons App. Here, you'll also see a [list of a
 
 <figure class="screenshot" markdown>
   ![Add documentation in the Opentrons App.](../images/documentation-required-app.png)
-  <figcaption>Add documentation on the Flex touchscreen.</figcaption>
+  <figcaption>Add documentation in the Opentrons App.</figcaption>
 </figure>
 
 Click **Cancel action** if you didn't mean to complete the action.
@@ -54,7 +54,7 @@ On your Flex itself, the "Documentation required" screen fills the entire touchs
 
 <figure class="screenshot" markdown>
   ![Add documentation on the Flex touchscreen.](../images/view-actions-odd.png)
-  <figcaption>Add documentation on the Flex touchscreen.</figcaption>
+  <figcaption>Tap in the top right to see the Thermocycler Module action requiring documentation.</figcaption>
 </figure>
 
 ## Documentation Settings

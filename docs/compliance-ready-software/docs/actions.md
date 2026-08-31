@@ -16,27 +16,23 @@ Users will need to document their reason for updating robot settings:
 * Changing the Flex touchscreen language.
 * Turning the Flex's LED lights on or off.
 * Enabling the Flex's status light.
-* Updating privacy settings, like...
-* Updating recovery mode settings, including
+* Updating privacy settings.
+* Updating recovery mode settings.
 * Making changes to the Flex's on-deck camera's settings: brightness, zoom, contrast, or saturation.
 * Turning the Flex Stacker's labware detection sensors on or off.
 * Setting the Flex to home the gantry upon reset.
 * Placing the Flex in OEM mode for third-party use.
 * Resetting the Flex.
+* Updating Compliance Ready Software [settings](admin.md): 
+    * Updating the number of allowed login attempts.
+    * Customzing required password complexity.
+    * Customizing the length of time before screen timeout.
+    * Choosing whether to require administrator credentials to update the Flex, send protocols to the Flex, or sign to complete a run. 
+    * Choosing whether to require user documentation for robot actions. 
+    * Choosing whether to require audit logs to be downloaded from the Opentrons App. 
 
-By default, administrator credentials are required to update robot software. Adminstrators can update those permissions in [settings](admin.md).
+By default, administrator credentials are required to update robot software and to perform some compliance ready actions, like sending protocols to the Flex. Adminstrators can customize some of these permissions in [settings](admin.md).
 
-<!-----------
-
-- privacy settings list? 
-- recovery mode settings list? 
-- check stacker sensor language in the app
-- there are different kinds of reset in the app (has this been a thing?); maybe list them out here: (can choose to clear all data or clear individual data (robot calibration data, protocol run data, boot scripts, SSH public keys, or robot server data)),
-- surely these are also out of order as they appear in the app, probably neater to organize them that way
-- check whether the following advanced settings are disabled in CRS: update the channel to stable/beta/alpha releases; turning on dev tools
-- do you need to enter documentation for an incorrect wifi password? this is a lingering old note I had written down from who knows where, but check this
-
----------->
 
 ## Robot actions
 
@@ -54,20 +50,10 @@ From the **Devices** page in the Opentrons App, users can complete robot actions
    * Setting a target temperature for the Heater-Shaker, Thermocycler, or Temperature Module.
    * Opening or closing the Heater-Shaker's labware latch.
    * Deactivating a module.
+   * Setting up a new module.
 * Updating module and hardware deck slot locations.
+* Adding or removing items from the deck.
 * Homing Stacker shuttle.
-
-<!---------
-
-TODO: 
-- sending a protocol to the robot...should I include an asterisk for actions only admins can complete by default? 
-- adding or removing items from the deck
-- calibrating modules
-- if new modules are added and user clicks to launch setup
-- turning on developer tools? 
-- updating to stable/beta/alpha release channel? 
--------------->
-
 
 ## Protocol setup
 
@@ -88,16 +74,6 @@ When setting up a protocol, users will need to document their reason for:
     * Turning on live video.
 * Starting a run without applying labware offsets or resolving deck conflicts.
 
-<!---------
-
-TODO: 
-- link relevant sections of Flex manual so users can read more
-- can you start a protocol without resolving deck conflicts? am I making this up? 
-- add module actions here 
-- starting protocol setup from a different page?
-- documentation for X protocol is required for the first time after choosing rtps and clicking to start setup...don't know that this distinction matters, though...
--------------->
-
 ## Running a protocol 
 
 During a protocol, users will need to document their reason for:
@@ -113,11 +89,3 @@ During a protocol, users will need to document their reason for:
 * Clicking **Capture image** during the protocol.
 * Pausing the protocol.
 * Canceling the protocol run.
-
-<!---------
-
-TODO: 
-- when the documentation required screen pops up during a protocol, does the protocol pause? 
-- maybe change to "users will need to add documentation after" because that's true
-- include the list for error recovery i put in running.md
--------------->

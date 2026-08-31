@@ -5,7 +5,7 @@ description: "An overview of the Flex's compliance-ready setings, and who has pe
 
 Administrators can customize compliance ready settings in the Opentrons App and on the Flex touchscreen.
 
-For a complete list of Flex robot settings, see the [Flex Instruction Manual]. 
+For a complete list of Flex robot settings, see the [Flex Instruction Manual].
 
 ## Access settings
 
@@ -67,7 +67,7 @@ Administrators can make changes to security, documentation, and storage settings
 | **Screen timeout** | <ul><li>Time before the Opentrons App or Flex touchscreen lock due to inactivity.</li><li>Default: 3 minutes.</li></ul> |
 | **User permissions** | <ul><li>Whether administrator credentials are required to update the Flex, send protocols to the Flex, or sign to complete a protocol run.</li></ul> |
 | **Documentation** | <ul><li>Whether to require documentation for robot actions, like dropping attached tips or homing the gantry.</li><li>Set minimum character length (default: 20 characters).</li></ul> |
-| **Files** | <ul><li>Whether to require protocol logs to be in the Opentrons App.</li><li>Automatically delete protocol logs when the Flex reaches its storage limit (20 logs).</li></ul> |
+| **Files** | <ul><li>Whether to require protocol logs to be downloaded from the Opentrons App.</li><li>Automatically delete protocol logs when the Flex reaches its storage limit (20 logs).</li></ul> |
 
 ## File source folder
 
