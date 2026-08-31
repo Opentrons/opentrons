@@ -106,7 +106,7 @@ class Backend:
 
     def revoke_all_tokens(self) -> None:
         """Invalidate every issued access and refresh token."""
-        self._token_store._tokens.clear()
+        self._token_store.revoke_all()
 
     def create_introspect_response(
         self, body_form_data: list[tuple[str, str]], headers: dict[str, str]
@@ -397,9 +397,9 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             # This cast is because request.scopes is apparently mis-typed as a str; it's actually a list[str].
             scopes = cast(Any, request.scopes)
             assert _is_list_of_type(scopes, str)
-            stored_scopes = {Scope.from_api_name(s) for s in scopes}
+            requested_scopes = frozenset(Scope.from_api_name(s) for s in scopes)
         else:
-            stored_scopes = set()
+            requested_scopes = frozenset[Scope]()
 
         expires_in = token["expires_in"]
 
@@ -415,12 +415,11 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         self.__token_store.save(
             _TokenIssuance(
                 client_id=client_id,
-                username=user.username,
+                user_id=user.id,
                 access_token=access_token,
                 refresh_token=refresh_token,
                 expires_at=expires_at,
-                scopes=stored_scopes,
-                fullname=user.full_name,
+                requested_scopes=requested_scopes,
             )
         )
 
@@ -440,8 +439,8 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             refresh_token, now=self.__get_now()
         )
         if issuance is not None:
-            user = self.__user_store.get(issuance.username)
-            if user is None:
+            user = self.__user_store.get_by_id(issuance.user_id)
+            if user is None or user.deactivated:
                 return False
             # Set `.user` per the oauthlib docs.
             request.user = user  # type: ignore[attr-defined]
@@ -486,29 +485,39 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         )
         if found_access_token is None:
             return None
-        else:
-            # Values defined by:
-            # https://datatracker.ietf.org/doc/html/rfc7662#section-2.2
-            # except ot_fullname, which is custom to us. if you add other custom fields,
-            # please prefix them with ot-.
-            return {
-                "scope": serialize_scopes(
-                    self.__get_effective_token_scopes(found_access_token)
-                ),
-                "username": found_access_token.username,
-                "ot_fullname": found_access_token.fullname,
-                # "active": True is set implicitly by oauthlib.
-            }
+
+        user = self.__get_user_for_token(found_access_token)
+        if user is None:
+            # The user was deleted, maybe.
+            return None
+        if user.deactivated:
+            return None
+
+        # Values defined by:
+        # https://datatracker.ietf.org/doc/html/rfc7662#section-2.2
+        # except ot_fullname, which is custom to us. if you add other custom fields,
+        # please prefix them with ot_.
+        return {
+            "scope": serialize_scopes(
+                self.__get_effective_token_scopes(found_access_token)
+            ),
+            "username": user.username,
+            "ot_fullname": user.full_name,
+            # "active": True is set implicitly by oauthlib.
+        }
+
+    def __get_user_for_token(self, token: _TokenIssuance) -> ORMUser | None:
+        return self.__user_store.get_by_id(token.user_id)
 
     def __get_effective_token_scopes(self, token: _TokenIssuance) -> set[Scope]:
         """Return granted token scopes, updated for current settings and user state."""
-        live_scopes = self.__get_live_scopes_for_username(token.username)
-        if not token.scopes:
+        live_scopes = self.__get_live_scopes_for_token(token)
+        if not token.requested_scopes:
             return live_scopes
-        return token.scopes & live_scopes
+        return set(token.requested_scopes) & live_scopes
 
-    def __get_live_scopes_for_username(self, username: str) -> set[Scope]:
-        user = self.__user_store.get(username)
+    def __get_live_scopes_for_token(self, token: _TokenIssuance) -> set[Scope]:
+        user = self.__get_user_for_token(token)
         if user is None:
             return set()
 
@@ -565,20 +574,24 @@ class _CustomInvalidCredentialsError(oauthlib.oauth2.InvalidGrantError):
         return json.dumps(result)
 
 
-@dataclass
+@dataclass(frozen=True)
 class _TokenIssuance:
     """Information about an access token that we've issued."""
 
     client_id: str
-    username: str
+    user_id: int
     access_token: str
     refresh_token: str | None
     # todo(mm, 2026-01-29): We might want expires_at to be a CLOCK_BOOTTIME value or something
     # to resist problems from clock adjustment.
     expires_at: datetime
-    # Empty when the client did not request an explicit scope ceiling.
-    scopes: set[Scope]
-    fullname: str
+    requested_scopes: frozenset[Scope]
+    """The scopes that the client requested, which may be different from the scopes we'll actually grant.
+
+    (OAuth 2 lets a client intentionally limit its own scopes.)
+
+    Empty when the client did not request any specific scopes.
+    """
 
 
 class _TokenStore:
@@ -606,6 +619,9 @@ class _TokenStore:
             if self._is_active(token, now) and token.refresh_token == refresh_token:
                 return token
         return None
+
+    def revoke_all(self) -> None:
+        self._tokens.clear()
 
     @staticmethod
     def _is_active(token: _TokenIssuance, now: datetime) -> bool:

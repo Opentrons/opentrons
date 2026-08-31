@@ -71,6 +71,8 @@ import type { UseCreateRun } from '/app/organisms/Desktop/ChooseRobotToRunProtoc
 import type { Robot } from '/app/redux/discovery/types'
 import type { Dispatch, State } from '/app/redux/types'
 
+export { SendingButtonLabel } from './SendingButtonLabel'
+
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
   border-width: 1px;

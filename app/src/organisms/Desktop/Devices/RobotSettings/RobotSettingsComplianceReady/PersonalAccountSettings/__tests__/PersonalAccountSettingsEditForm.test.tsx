@@ -41,9 +41,13 @@ describe('PersonalAccountSettingsEditForm', () => {
     render(props)
     expect(screen.getByDisplayValue('alice')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Alice Example')).toBeInTheDocument()
-    expect(screen.getAllByRole('button', { name: 'Show' })).toHaveLength(2)
+    screen.getByText('New password')
+    screen.getByText('Confirm new password')
+    expect(
+      screen.getAllByRole('button', { name: 'Toggle password visibility' })
+    ).toHaveLength(2)
     const saveButton = screen.getByRole('button', { name: 'Save' })
-    expect(saveButton).toBeDisabled()
+    expect(saveButton).toBeEnabled()
     fireEvent.click(saveButton)
     expect(props.onCancel).not.toHaveBeenCalled()
     expect(props.onSave).not.toHaveBeenCalled()
@@ -73,6 +77,37 @@ describe('PersonalAccountSettingsEditForm', () => {
         data: { fullName: 'Alice Updated' },
       })
     })
+  })
+
+  it.each([
+    {
+      description: 'password is filled without confirmation',
+      fill: (
+        passwordInput: HTMLInputElement,
+        _confirmInput: HTMLInputElement
+      ) => {
+        fireEvent.change(passwordInput, { target: { value: 'new-password' } })
+      },
+    },
+    {
+      description: 'confirmation is filled without password',
+      fill: (
+        _passwordInput: HTMLInputElement,
+        confirmInput: HTMLInputElement
+      ) => {
+        fireEvent.change(confirmInput, { target: { value: 'new-password' } })
+      },
+    },
+  ])('does not save when $description', async ({ fill }) => {
+    const { container } = render(props)
+    const [passwordInput, confirmInput] = getPasswordInputs(container)
+    fill(passwordInput, confirmInput)
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Passwords do not match')).toBeInTheDocument()
+    })
+    expect(props.onSave).not.toHaveBeenCalled()
   })
 
   it('does not save whitespace-only username changes', async () => {
