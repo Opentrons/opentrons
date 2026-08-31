@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
 import { Icon, Modal, PrimaryButton, StyledText } from '@opentrons/components'
+import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
@@ -92,11 +93,13 @@ function DownloadAuditLogsModalContent({
     downloadAndDeleteAuditLog()
       .then(() => {
         modal.resolve(true)
+        modal.remove()
       })
-      .catch(error => {
+      .catch((error: unknown) => {
+        if (isDocumentedMutationError(error)) {
+          return
+        }
         modal.reject(error)
-      })
-      .finally(() => {
         modal.remove()
       })
   }
