@@ -5,6 +5,7 @@
   "audit_log_download_required": "Audit log download required",
   "audit_log_download_required_description": "Download the robot's audit logs before continuing.",
   "cancel_action": "Cancel action",
+  "delete_audit_logs_permission_required": "Permission required to delete audit logs. Log in with an authorized account.",
   "desktop_login_form_heading": "Log in",
   "desktop_login_form_subheading": "Log in to access robot controls.",
   "desktop_login_modal_header": "Compliance Ready Software login",
