@@ -162,8 +162,6 @@ Use [`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start
 !!! note
     Multi-step profiles cannot combine `gauge_pressure_mbar` and `percent_power` arguments in the same profile. Specify pressure _or_ power for steps in a particular profile.
 
-<!--- trying in-line tabs below --->
-
 === "Pressure profile"
 
     In a multi-step pressure profile, each step requires `enable_pump: True` and a target `gauge_pressure_mbar` (from `0` to `-800` mbar). You can also specify an optional `hold_time_seconds` or `hold_time_minutes` for each stage. Use pressure steps when you need to reach and hold a specific vacuum across multiple stages, instead of open-loop pressure regulation.
@@ -236,6 +234,9 @@ You can close the vent by using [`close_vent()`][opentrons.protocol_api.VacuumMo
 
 During a protocol, you can use the Flex Gripper to move well plates to and from the Vacuum Module.
 
+
+## Use cases
+
 ### Direct-to-waste
 
 This example demonstrates one way to move a filter plate onto the module for waste extraction. When finished, the robot returns the filter plate to its original deck location.
@@ -285,44 +286,3 @@ protocol.move_labware(
     use_gripper=True,
 )
 ```
-
-### From other modules
-
-The Gripper can move a filter plate or well plate from a deck slot or an on-deck module to a staged collar on the Vacuum Module via [`protocol.move_labware()`][moving-labware]. However, you must tell the module to prepare for this action first, in case it needs to open a lid or disengage a latch.
-
-<table>
-  <thead>
-    <tr>
-      <th>Module</th>
-      <th>Preparation</th>
-      <th>Method</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>Stacker</strong></td>
-      <td>
-        <ul>
-          <li>Retrieve from Stacker</li>
-          <li>Return to Stacker</li>
-        </ul>
-      </td>
-      <td>
-        <ul>
-          <li><a href="../../python-api/reference/flex-stacker/#opentrons.protocol_api.FlexStackerContext.retrieve"><code>stacker.retrieve()</code></a></li>
-          <li><a href="../../python-api/reference/flex-stacker/#opentrons.protocol_api.FlexStackerContext.store"><code>stacker.store()</code></a></li>
-        </ul>
-      </td>
-    </tr>
-    <tr>
-      <td><strong>Heater-Shaker</strong></td>
-      <td>Open latch</td>
-      <td><a href="../../python-api/reference/heater-shaker/#opentrons.protocol_api.HeaterShakerContext.open_labware_latch"><code>heater_shaker.open_labware_latch()</code></a></td>
-    </tr>
-    <tr>
-      <td><strong>Thermocycler</strong></td>
-      <td>Open lid</td>
-      <td><a href="../../python-api/reference/thermocycler/#opentrons.protocol_api.ThermocyclerContext.open_lid"><code>thermocycler.open_lid()</code></a></td>
-    </tr>
-  </tbody>
-</table>
