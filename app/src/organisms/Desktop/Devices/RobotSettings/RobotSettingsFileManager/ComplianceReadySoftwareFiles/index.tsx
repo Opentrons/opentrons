@@ -17,9 +17,10 @@ import {
 } from '@opentrons/react-api-client'
 
 import { Skeleton } from '/app/atoms/Skeleton'
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { DownloadAuditLogsModal } from '/app/organisms/Desktop/DownloadAuditLogsModal'
 import { useToaster } from '/app/organisms/ToasterOven'
+import { useEnsureAuditLogAuthorization } from '/app/resources/audit/useEnsureAuditLogAuthorization'
 import { useDeleteSelectedLogPeriods } from '/app/resources/devices/hooks/useDeleteSelectedLogPeriods'
 import { useDownloadSelectedLogPeriods } from '/app/resources/devices/hooks/useDownloadSelectedLogPeriods'
 
@@ -33,6 +34,7 @@ import { LogPeriodRow } from './LogPeriodRow'
 import type { ReactNode } from 'react'
 import type { LogPeriodSummary } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
+import type { DocumentedAction } from '@opentrons/react-api-client'
 import type { MakeToastOptions } from '/app/organisms/ToasterOven/ToasterContext'
 import type { DownloadedLogPeriod } from '/app/resources/devices/hooks/useDownloadSelectedLogPeriods'
 
@@ -40,6 +42,8 @@ const TOAST_STYLE: MakeToastOptions = {
   closeButton: true,
   width: '80%',
 }
+
+const DELETE_LOG_PERIODS_ACTIONS: DocumentedAction[] = ['delete_log_periods']
 
 interface ComplianceReadySoftwareFilesProps {
   robotName: string
@@ -51,7 +55,15 @@ export function ComplianceReadySoftwareFiles({
   const { t } = useTranslation('device_details')
   const { data: logPeriodSummariesData, status: logPeriodSummaryStatus } =
     useLogPeriodSummariesQuery()
-  const documentationState = useDocumentationState()
+  const { documentationState } = useLinkedDocumentationState(
+    DELETE_LOG_PERIODS_ACTIONS,
+    robotName,
+    robotName
+  )
+  const ensureAuthorized = useEnsureAuditLogAuthorization(
+    documentationState,
+    DELETE_LOG_PERIODS_ACTIONS
+  )
   const downloadLogPeriodsMutation = useDownloadSelectedLogPeriods(robotName)
   const {
     deleteSelectedLogPeriods,
@@ -98,6 +110,7 @@ export function ComplianceReadySoftwareFiles({
 
   const [showDeleteRecordsModal, setShowDeleteRecordsModal] =
     useState<boolean>(false)
+  const [isAuthorizing, setIsAuthorizing] = useState(false)
 
   const handleNoLogsSelected = useCallback(
     (type: 'delete' | 'download'): void => {
@@ -161,6 +174,23 @@ export function ComplianceReadySoftwareFiles({
       if (showModal) {
         setShowDeleteRecordsModal(false)
       }
+      const restoreDeleteModal = (): void => {
+        if (showModal) {
+          setShowDeleteRecordsModal(true)
+        }
+      }
+      setIsAuthorizing(true)
+      try {
+        await ensureAuthorized()
+      } catch (error) {
+        if (!isDocumentedMutationError(error)) {
+          makeToast((error as Error).message, ERROR_TOAST)
+        }
+        restoreDeleteModal()
+        return
+      } finally {
+        setIsAuthorizing(false)
+      }
       void downloadLogPeriodsMutation
         .mutateAsync({ logPeriods })
         .then(downloadedPeriods => {
@@ -196,14 +226,17 @@ export function ComplianceReadySoftwareFiles({
           if (!isDocumentedMutationError(e)) {
             makeToast(e.message, ERROR_TOAST)
           } else {
-            if (showModal) {
-              // reopen the delete modal if we fail; no flicker in practice
-              setShowDeleteRecordsModal(true)
-            }
+            restoreDeleteModal()
           }
         })
     },
-    [downloadLogPeriodsMutation, t, makeToast, deleteSelectedLogPeriods]
+    [
+      deleteSelectedLogPeriods,
+      downloadLogPeriodsMutation,
+      ensureAuthorized,
+      makeToast,
+      t,
+    ]
   )
 
   const handleDownloadSelected = useCallback(async (): Promise<void> => {
@@ -311,7 +344,9 @@ export function ComplianceReadySoftwareFiles({
       {showRequiredDownloadModal && (
         <DownloadAuditLogsModal
           onDownload={handleDownloadAndDeleteRequired}
-          isLoading={downloadLogPeriodsMutation.isLoading || isDeleting}
+          isLoading={
+            isAuthorizing || downloadLogPeriodsMutation.isLoading || isDeleting
+          }
         />
       )}
       <div className={fileManagerStyles.file_management_group}>
