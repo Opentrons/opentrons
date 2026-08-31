@@ -121,6 +121,23 @@ describe('PersonalAccountSettingsEditForm', () => {
     })
   })
 
+  it('shows an invalid character error when the username contains a space', async () => {
+    render(props)
+    fireEvent.change(screen.getByDisplayValue('alice'), {
+      target: { value: 'test user' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          'Usernames can include letters, numbers, and punctuation, but not spaces.'
+        )
+      ).toBeInTheDocument()
+    })
+    expect(props.onSave).not.toHaveBeenCalled()
+  })
+
   it('shows a required username error when the username is cleared', async () => {
     render(props)
     fireEvent.change(screen.getByDisplayValue('alice'), {
@@ -130,6 +147,25 @@ describe('PersonalAccountSettingsEditForm', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Username is required')).toBeInTheDocument()
+    })
+    expect(props.onSave).not.toHaveBeenCalled()
+  })
+
+  it('shows an invalid character error when the password contains a space', async () => {
+    const { container } = render(props)
+    const [passwordInput, confirmPasswordInput] = getPasswordInputs(container)
+    fireEvent.change(passwordInput, { target: { value: 'new password' } })
+    fireEvent.change(confirmPasswordInput, {
+      target: { value: 'new password' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          'Passwords can include letters, numbers, and punctuation, but not spaces.'
+        )
+      ).toBeInTheDocument()
     })
     expect(props.onSave).not.toHaveBeenCalled()
   })

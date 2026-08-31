@@ -13,6 +13,7 @@ import { useUpdateUserMutation } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { getUsernameValidationError } from '/app/resources/auth/getUsernameValidationError'
 import { mapAuthUserMutationError } from '/app/resources/auth/mapAuthUserMutationError'
 
 import {
@@ -85,7 +86,7 @@ export function EditUserModal({
     !hasChanges ||
     trimmedUsername === '' ||
     trimmedFullName === '' ||
-    trimmedUsername.length > USERNAME_MAX_LENGTH
+    getUsernameValidationError(trimmedUsername, USERNAME_MAX_LENGTH) != null
 
   const handleClose = (): void => {
     clearErrors()

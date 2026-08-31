@@ -15,11 +15,13 @@ from auth_server.users.models import (
 from auth_server.users.store import UserStore
 from auth_server.users.user_data_manager import (
     InvalidInputError,
+    PasswordContainsInvalidCharactersError,
     PasswordMissingSpecialCharactersError,
     PasswordPreviouslyUsedError,
     PasswordTooShortError,
     UserAlreadyExistsError,
     UserDataManager,
+    UsernameContainsInvalidCharactersError,
     UserNotFoundError,
     _generate_temporary_password,
     _password_complexity_requirements,
@@ -182,6 +184,28 @@ def test_create_user_empty_username_raises(manager: UserDataManager) -> None:
         )
 
 
+def test_create_user_password_with_spaces_raises(manager: UserDataManager) -> None:
+    with pytest.raises(PasswordContainsInvalidCharactersError, match="password"):
+        manager.create_user(
+            username="test_user",
+            password="valid pass",
+            full_name="X",
+            account_type=AccountType.USER,
+            now=matchers.IsA(datetime.datetime),
+        )
+
+
+def test_create_user_username_with_spaces_raises(manager: UserDataManager) -> None:
+    with pytest.raises(UsernameContainsInvalidCharactersError, match="username"):
+        manager.create_user(
+            username="test user",
+            password="validpass123",
+            full_name="X",
+            account_type=AccountType.USER,
+            now=matchers.IsA(datetime.datetime),
+        )
+
+
 def test_create_user_empty_password_raises(manager: UserDataManager) -> None:
     with pytest.raises(InvalidInputError, match="password"):
         manager.create_user(
@@ -283,8 +307,16 @@ def test_create_user_enforces_password_length(
         )
     assert exc_info.value.actual_length == minimum_length - 1
     assert exc_info.value.required_length == minimum_length
+    with pytest.raises(PasswordContainsInvalidCharactersError):
+        manager.create_user(
+            password="☃" * minimum_length,
+            username="test_user",
+            full_name="Test User",
+            account_type=AccountType.USER,
+            now=_NOW,
+        )
     manager.create_user(  # Should not raise.
-        password="☃" * minimum_length,
+        password="a" * minimum_length,
         username="test_user",
         full_name="Test User",
         account_type=AccountType.USER,
@@ -891,6 +923,11 @@ def test_generate_temporary_password_meets_complexity_rules() -> None:
 def test_update_user_empty_username_raises(manager: UserDataManager) -> None:
     with pytest.raises(InvalidInputError, match="username"):
         manager.update_user("testadmin", new_username="", now=_NOW)
+
+
+def test_update_user_username_with_spaces_raises(manager: UserDataManager) -> None:
+    with pytest.raises(UsernameContainsInvalidCharactersError, match="username"):
+        manager.update_user("testadmin", new_username="test user", now=_NOW)
 
 
 def test_update_user_short_password_raises(manager: UserDataManager) -> None:

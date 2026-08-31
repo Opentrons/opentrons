@@ -1,3 +1,5 @@
+import string
+
 import pytest
 from pydantic import ValidationError
 
@@ -33,3 +35,39 @@ def test_update_self_rejects_username_longer_than_max_length() -> None:
         UpdateSelf(username="a" * (USERNAME_MAX_LENGTH + 1))
 
     assert exc_info.value.errors()[0]["type"] == "string_too_long"
+
+
+@pytest.mark.parametrize("username", ["test user", " test", "test\tuser", "test\n"])
+def test_user_create_rejects_username_with_whitespace(username: str) -> None:
+    with pytest.raises(ValidationError) as exc_info:
+        UserCreate(
+            username=username,
+            fullName="Whitespace User",
+            accountType=AccountType.USER,
+        )
+
+    assert exc_info.value.errors()[0]["type"] == "string_pattern_mismatch"
+
+
+def test_user_create_accepts_letters_digits_and_password_punctuation() -> None:
+    username = "Aa1" + string.punctuation[:17]
+    assert len(username) <= USERNAME_MAX_LENGTH
+    UserCreate(
+        username=username,
+        fullName="Punctuation User",
+        accountType=AccountType.USER,
+    )
+
+
+def test_update_user_rejects_username_with_spaces() -> None:
+    with pytest.raises(ValidationError) as exc_info:
+        UpdateUser(username="test user")
+
+    assert exc_info.value.errors()[0]["type"] == "string_pattern_mismatch"
+
+
+def test_update_self_rejects_username_with_spaces() -> None:
+    with pytest.raises(ValidationError) as exc_info:
+        UpdateSelf(username="test user")
+
+    assert exc_info.value.errors()[0]["type"] == "string_pattern_mismatch"
