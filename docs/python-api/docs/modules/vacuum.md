@@ -228,13 +228,101 @@ Use [`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start
 
 You can stop the pump and depressurize the system separately by using the [`stop_vacuum_pump()`][opentrons.protocol_api.VacuumModuleContext.stop_vacuum_pump] and [`open_vent()`][opentrons.protocol_api.VacuumModuleContext.open_vent] methods, respectively. While commands like `start_set_vacuum_pressure()` automatically manage pump and vent operations, these two standalone utility methods give you direct control over the pump motor and vent valve.
 
-!!! note
-    The robot will not automatically deactivate the Vacuum Module at the end of a protocol. If you need to deactivate and depressurize the module after a protocol is completed or canceled, use these methods or the module controls on the device detail page in the Opentrons App.
-
 ### Closing the vent
 
 You can close the vent by using [`close_vent()`][opentrons.protocol_api.VacuumModuleContext.close_vent]. This is a standalone utility method used for testing, diagnostics, or sealing the system without running the pump.
 
-## Use case examples
+## Moving labware
 
+During a protocol, you can use the Flex Gripper to move well plates to and from the Vacuum Module.
 
+### Direct-to-waste
+
+This example demonstrates one way to move a filter plate onto the module for waste extraction. When finished, the robot returns the filter plate to its original deck location.
+
+```python
+# Stage a collar on the dock (slot A4) and load a filter plate in slot D1
+collar = vacuum.load_adapter_to_dock("opentrons_vacuum_manifold_collar_short")
+filter_plate = protocol.load_labware(
+    load_name="millipore_96_wellplate_300ul_filter",
+    location="D1",
+    label="Sample Filter Plate",
+)
+
+# Move the filter plate from slot D1 onto the collar
+protocol.move_labware(
+    labware=filter_plate,
+    new_location=collar,
+    use_gripper=True,
+)
+
+# Move the collar and filter plate stack onto the vacuum base in slot A3
+protocol.move_labware(
+    labware=collar,
+    new_location=vacuum,
+    use_gripper=True,
+)
+
+# Pull vacuum, extract waste and return system to atmospheric pressure
+filter_task = vacuum.start_set_vacuum_pressure(
+    gauge_pressure_mbar=-300,
+    duration_s=20,
+    vent_after=True,
+    equalize_timeout_s=5,
+)
+
+# Continue other pipetting or module actions simultaneously
+
+protocol.wait_for_tasks([filter_task])
+
+# Move the stack to the dock
+vacuum.move_to_dock(collar, use_gripper=True)
+
+# Return the filter plate to deck slot D1
+protocol.move_labware(
+    labware=filter_plate,
+    new_location="D1",
+    use_gripper=True,
+)
+```
+
+### From other modules
+
+The Gripper can move a filter plate or well plate from a deck slot or an on-deck module to a staged collar on the Vacuum Module via [`protocol.move_labware()`][moving-labware]. However, you must tell the module to prepare for this action first, in case it needs to open a lid or disengage a latch.
+
+<table>
+  <thead>
+    <tr>
+      <th>Module</th>
+      <th>Preparation</th>
+      <th>Method</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Stacker</strong></td>
+      <td>
+        <ul>
+          <li>Retrieve from Stacker</li>
+          <li>Return to Stacker</li>
+        </ul>
+      </td>
+      <td>
+        <ul>
+          <li><a href="../../python-api/reference/flex-stacker/#opentrons.protocol_api.FlexStackerContext.retrieve"><code>stacker.retrieve()</code></a></li>
+          <li><a href="../../python-api/reference/flex-stacker/#opentrons.protocol_api.FlexStackerContext.store"><code>stacker.store()</code></a></li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Heater-Shaker</strong></td>
+      <td>Open latch</td>
+      <td><a href="../../python-api/reference/heater-shaker/#opentrons.protocol_api.HeaterShakerContext.open_labware_latch"><code>heater_shaker.open_labware_latch()</code></a></td>
+    </tr>
+    <tr>
+      <td><strong>Thermocycler</strong></td>
+      <td>Open lid</td>
+      <td><a href="../../python-api/reference/thermocycler/#opentrons.protocol_api.ThermocyclerContext.open_lid"><code>thermocycler.open_lid()</code></a></td>
+    </tr>
+  </tbody>
+</table>
