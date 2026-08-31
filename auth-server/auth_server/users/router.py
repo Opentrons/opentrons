@@ -26,6 +26,7 @@ from auth_server.users.dependencies import get_user_by_username, get_user_data_m
 from auth_server.users.models import (
     AccountType,
     ErrorBody,
+    PasswordContainsInvalidCharactersErrorDetails,
     PasswordMissingSpecialCharactersErrorDetails,
     PasswordPreviouslyUsedErrorDetails,
     PasswordTooShortErrorDetails,
@@ -34,15 +35,18 @@ from auth_server.users.models import (
     UpdateUser,
     UserAlreadyExistsErrorDetails,
     UserCreate,
+    UsernameContainsInvalidCharactersErrorDetails,
     UserResponse,
 )
 from auth_server.users.user_data_manager import (
     InvalidInputError,
+    PasswordContainsInvalidCharactersError,
     PasswordMissingSpecialCharactersError,
     PasswordPreviouslyUsedError,
     PasswordTooShortError,
     UserAlreadyExistsError,
     UserDataManager,
+    UsernameContainsInvalidCharactersError,
 )
 
 router = fastapi.APIRouter()
@@ -61,7 +65,9 @@ router = fastapi.APIRouter()
             "model": ErrorBody[
                 PasswordTooShortErrorDetails
                 | PasswordMissingSpecialCharactersErrorDetails
+                | PasswordContainsInvalidCharactersErrorDetails
                 | UserAlreadyExistsErrorDetails
+                | UsernameContainsInvalidCharactersErrorDetails
             ]
         },
     },
@@ -105,6 +111,11 @@ async def post_users(
         raise APIError(
             fastapi.status.HTTP_400_BAD_REQUEST, _build_user_already_exists_error()
         )
+    except UsernameContainsInvalidCharactersError as e:
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST,
+            _build_username_contains_invalid_characters_error(),
+        ) from e
     except PasswordTooShortError as e:
         raise APIError(
             fastapi.status.HTTP_400_BAD_REQUEST, _build_password_too_short_error(e)
@@ -113,6 +124,11 @@ async def post_users(
         raise APIError(
             fastapi.status.HTTP_400_BAD_REQUEST,
             _build_password_missing_special_characters_error(e),
+        ) from e
+    except PasswordContainsInvalidCharactersError as e:
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST,
+            _build_password_contains_invalid_characters_error(),
         ) from e
     except InvalidInputError as e:
         # todo(mm, 2026-06-24): Convert this to a more structured error response.
@@ -211,14 +227,16 @@ async def delete_user(
             "model": ErrorBody[
                 PasswordTooShortErrorDetails
                 | PasswordMissingSpecialCharactersErrorDetails
+                | PasswordContainsInvalidCharactersErrorDetails
                 | PasswordPreviouslyUsedErrorDetails
                 | UserAlreadyExistsErrorDetails
+                | UsernameContainsInvalidCharactersErrorDetails
             ]
         },
     },
     dependencies=[fastapi.Depends(require_scopes(Scope.USERS_WRITE))],
 )
-async def update_user(
+async def update_user(  # noqa: C901
     request_body: RequestModel[UpdateUser],
     user: Annotated[UserResponse, fastapi.Depends(get_user_by_username)],
     user_data_manager: Annotated[
@@ -269,6 +287,11 @@ async def update_user(
         raise APIError(
             fastapi.status.HTTP_400_BAD_REQUEST, _build_user_already_exists_error()
         )
+    except UsernameContainsInvalidCharactersError as e:
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST,
+            _build_username_contains_invalid_characters_error(),
+        ) from e
     except PasswordTooShortError as e:
         raise APIError(
             fastapi.status.HTTP_400_BAD_REQUEST, _build_password_too_short_error(e)
@@ -277,6 +300,11 @@ async def update_user(
         raise APIError(
             fastapi.status.HTTP_400_BAD_REQUEST,
             _build_password_missing_special_characters_error(e),
+        ) from e
+    except PasswordContainsInvalidCharactersError as e:
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST,
+            _build_password_contains_invalid_characters_error(),
         ) from e
     except PasswordPreviouslyUsedError as e:
         raise APIError(
@@ -382,8 +410,10 @@ async def get_self(  # noqa: D103
             "model": ErrorBody[
                 PasswordTooShortErrorDetails
                 | PasswordMissingSpecialCharactersErrorDetails
+                | PasswordContainsInvalidCharactersErrorDetails
                 | PasswordPreviouslyUsedErrorDetails
                 | UserAlreadyExistsErrorDetails
+                | UsernameContainsInvalidCharactersErrorDetails
             ]
         },
         fastapi.status.HTTP_401_UNAUTHORIZED: {},
@@ -459,6 +489,11 @@ async def update_self(  # noqa: C901
         raise APIError(
             fastapi.status.HTTP_400_BAD_REQUEST, _build_user_already_exists_error()
         )
+    except UsernameContainsInvalidCharactersError as e:
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST,
+            _build_username_contains_invalid_characters_error(),
+        ) from e
     except PasswordTooShortError as e:
         raise APIError(
             fastapi.status.HTTP_400_BAD_REQUEST, _build_password_too_short_error(e)
@@ -467,6 +502,11 @@ async def update_self(  # noqa: C901
         raise APIError(
             fastapi.status.HTTP_400_BAD_REQUEST,
             _build_password_missing_special_characters_error(e),
+        ) from e
+    except PasswordContainsInvalidCharactersError as e:
+        raise APIError(
+            fastapi.status.HTTP_400_BAD_REQUEST,
+            _build_password_contains_invalid_characters_error(),
         ) from e
     except PasswordPreviouslyUsedError as e:
         raise APIError(
@@ -486,6 +526,18 @@ async def update_self(  # noqa: C901
 
 def _build_user_already_exists_error() -> ErrorBody[UserAlreadyExistsErrorDetails]:
     return ErrorBody(errors=[UserAlreadyExistsErrorDetails(id="userAlreadyExists")])
+
+
+def _build_username_contains_invalid_characters_error() -> ErrorBody[
+    UsernameContainsInvalidCharactersErrorDetails
+]:
+    return ErrorBody(
+        errors=[
+            UsernameContainsInvalidCharactersErrorDetails(
+                id="usernameContainsInvalidCharacters"
+            )
+        ]
+    )
 
 
 def _build_password_too_short_error(
@@ -511,6 +563,18 @@ def _build_password_missing_special_characters_error(
         errors=[
             PasswordMissingSpecialCharactersErrorDetails(
                 id="passwordMissingSpecialCharacters"
+            )
+        ]
+    )
+
+
+def _build_password_contains_invalid_characters_error() -> ErrorBody[
+    PasswordContainsInvalidCharactersErrorDetails
+]:
+    return ErrorBody(
+        errors=[
+            PasswordContainsInvalidCharactersErrorDetails(
+                id="passwordContainsInvalidCharacters"
             )
         ]
     )

@@ -9,6 +9,11 @@ from pwdlib import PasswordHash
 from auth_server.persistence.orm_models import User
 from auth_server.settings.models import SettingsResponseData
 from auth_server.settings.store import SettingsStore
+from auth_server.users.credential_characters import (
+    CREDENTIAL_ALLOWED_CHARACTERS,
+    CREDENTIAL_SPECIAL_CHARACTERS,
+    has_only_allowed_credential_characters,
+)
 from auth_server.users.is_account_locked import is_account_locked
 from auth_server.users.models import (
     AccountType,
@@ -21,7 +26,6 @@ password_hash = PasswordHash.recommended()
 
 _DEFAULT_MIN_PASSWORD_LENGTH = 8
 _ALPHANUMERIC = string.ascii_letters + string.digits
-_PASSWORD_SPECIAL_CHARACTERS = string.punctuation
 
 
 def _generate_temporary_password(
@@ -32,8 +36,7 @@ def _generate_temporary_password(
         return "".join(secrets.choice(_ALPHANUMERIC) for _ in range(min_length))
 
     return "".join(
-        secrets.choice(_ALPHANUMERIC + _PASSWORD_SPECIAL_CHARACTERS)
-        for _ in range(min_length)
+        secrets.choice(CREDENTIAL_ALLOWED_CHARACTERS) for _ in range(min_length)
     )
 
 
@@ -58,7 +61,13 @@ def _validate_password_complexity(
         raise PasswordTooShortError(
             actual_length=actual_length, required_length=min_length
         )
-    if require_special and not any(c in _PASSWORD_SPECIAL_CHARACTERS for c in password):
+    if not has_only_allowed_credential_characters(password):
+        raise PasswordContainsInvalidCharactersError(
+            "password must not contain spaces or other disallowed characters"
+        )
+    if require_special and not any(
+        c in CREDENTIAL_SPECIAL_CHARACTERS for c in password
+    ):
         raise PasswordMissingSpecialCharactersError()
 
 
@@ -89,8 +98,26 @@ class PasswordMissingSpecialCharactersError(InvalidInputError):
     """Raised when a password does not meet the configured requirements on special chars."""
 
 
+class PasswordContainsInvalidCharactersError(InvalidInputError):
+    """Raised when a password contains whitespace or other disallowed characters."""
+
+
 class PasswordPreviouslyUsedError(InvalidInputError):
     """Raised when a new password matches the user's current password."""
+
+
+class UsernameContainsInvalidCharactersError(InvalidInputError):
+    """Raised when a username contains whitespace or other disallowed characters."""
+
+
+def _validate_username_characters(username: str | None) -> None:
+    """Reject usernames that include whitespace or characters outside the allowlist."""
+    if username is None:
+        return
+    if not has_only_allowed_credential_characters(username):
+        raise UsernameContainsInvalidCharactersError(
+            "username must not contain spaces or other disallowed characters"
+        )
 
 
 def _validate_fields_non_empty(
@@ -162,6 +189,7 @@ class UserDataManager:
             full_name=full_name,
             account_type=account_type,
         )
+        _validate_username_characters(username)
         settings = self._settings_store.get_settings()
         reset_password = password is None
         if reset_password:
@@ -222,6 +250,7 @@ class UserDataManager:
             full_name=new_full_name,
             account_type=new_account_type,
         )
+        _validate_username_characters(new_username)
         if new_password is not None:
             _validate_password_complexity(
                 new_password, self._settings_store.get_settings()
