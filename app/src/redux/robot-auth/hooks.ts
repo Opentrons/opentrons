@@ -2,6 +2,8 @@ import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useMatch } from 'react-router-dom'
 
+import { useHost } from '@opentrons/react-api-client'
+
 import { getIsOnDevice } from '../config'
 import { getLocalRobot } from '../discovery'
 import {
@@ -80,8 +82,12 @@ export function useCurrentRobotName(): string | null {
   const isOnDevice = useSelector(getIsOnDevice)
   const deviceRouteMatch = useMatch('/devices/:robotName/*')
   const localRobotName = useSelector(getLocalRobot)?.name ?? null
-  const desktopRobotName = deviceRouteMatch?.params?.robotName ?? null
-  return isOnDevice ? localRobotName : desktopRobotName
+  const desktopRouteRobotName = deviceRouteMatch?.params?.robotName ?? null
+  const desktopHostRobotName = useHost()?.robotName ?? null
+
+  return isOnDevice
+    ? localRobotName
+    : (desktopRouteRobotName ?? desktopHostRobotName)
 }
 
 /** Log out of the robot the user is currently acting on. */
