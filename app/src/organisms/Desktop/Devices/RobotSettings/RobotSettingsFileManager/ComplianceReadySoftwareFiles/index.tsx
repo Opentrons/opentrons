@@ -18,6 +18,7 @@ import {
 
 import { Skeleton } from '/app/atoms/Skeleton'
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
+import { getAuditLogDeleteErrorMessage } from '/app/local-resources/access-control/utils'
 import { DownloadAuditLogsModal } from '/app/organisms/Desktop/DownloadAuditLogsModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useEnsureAuditLogAuthorization } from '/app/resources/audit/useEnsureAuditLogAuthorization'
@@ -52,7 +53,7 @@ interface ComplianceReadySoftwareFilesProps {
 export function ComplianceReadySoftwareFiles({
   robotName,
 }: ComplianceReadySoftwareFilesProps): ReactNode {
-  const { t } = useTranslation('device_details')
+  const { t } = useTranslation(['device_details', 'access_control'])
   const { data: logPeriodSummariesData, status: logPeriodSummaryStatus } =
     useLogPeriodSummariesQuery()
   const { documentationState } = useLinkedDocumentationState(
@@ -224,7 +225,16 @@ export function ComplianceReadySoftwareFiles({
         })
         .catch((e: Error) => {
           if (!isDocumentedMutationError(e)) {
-            makeToast(e.message, ERROR_TOAST)
+            makeToast(
+              getAuditLogDeleteErrorMessage(
+                e,
+                t(
+                  'access_control:delete_audit_logs_permission_required'
+                ) as string,
+                e.message
+              ),
+              ERROR_TOAST
+            )
           } else {
             restoreDeleteModal()
           }

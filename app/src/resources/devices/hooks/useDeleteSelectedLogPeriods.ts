@@ -9,6 +9,7 @@ import {
   useHost,
 } from '@opentrons/react-api-client'
 
+import { isForbiddenError } from '/app/local-resources/access-control/utils'
 import { logPeriodDeleteStarted } from '/app/redux/audit'
 
 import type { QueryKey } from 'react-query'
@@ -51,6 +52,7 @@ export function useDeleteSelectedLogPeriods(
 
       const processSequentially = async (): Promise<void> => {
         let hasDeleteError = false
+        let permissionError: unknown = null
         // process one logPeriod at a time so deletions are applied sequentially
         // rather than concurrently, and a single failure doesn't abort the rest
         // enforce deletion key is present for each deletion request
@@ -68,9 +70,17 @@ export function useDeleteSelectedLogPeriods(
             logPeriodId,
             { deletionKey },
             userNotes
-          ).catch(_ => (hasDeleteError = true))
+          ).catch(error => {
+            hasDeleteError = true
+            if (isForbiddenError(error)) {
+              permissionError = error
+            }
+          })
         }
 
+        if (isForbiddenError(permissionError)) {
+          throw permissionError
+        }
         if (hasDeleteError) {
           throw new Error('One or more logPeriods failed to delete')
         }

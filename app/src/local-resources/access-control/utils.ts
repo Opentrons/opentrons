@@ -1,5 +1,6 @@
 import axios from 'axios'
 
+import type { AxiosError } from 'axios'
 import type {
   DocumentationReport,
   DocumentationState,
@@ -36,12 +37,27 @@ export const ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE: DocumentationState = {
   accessControlEnabled: false,
 }
 
+export function isForbiddenError(error: unknown): error is AxiosError {
+  return axios.isAxiosError(error) && error.response?.status === 403
+}
+
+export function getAuditLogDeleteErrorMessage(
+  error: unknown,
+  permissionErrorMessage: string,
+  generalErrorMessage: string
+): string {
+  if (isForbiddenError(error)) {
+    return permissionErrorMessage
+  }
+  return generalErrorMessage
+}
+
 export function isProtocolWritePermissionError(error: unknown): boolean {
-  if (!axios.isAxiosError(error) || error.response?.status !== 403) {
+  if (!isForbiddenError(error)) {
     return false
   }
   const requiredScopes = (
-    error.response.data as { requiredScopes?: unknown } | undefined
+    error.response?.data as { requiredScopes?: unknown } | undefined
   )?.requiredScopes
   return (
     Array.isArray(requiredScopes) &&

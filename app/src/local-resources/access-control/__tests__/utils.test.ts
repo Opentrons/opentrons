@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  getAuditLogDeleteErrorMessage,
   getProtocolOrRunCreationErrorMessage,
+  isForbiddenError,
   isProtocolWritePermissionError,
 } from '../utils'
 
@@ -20,6 +22,53 @@ const permissionDeniedError = {
     },
   },
 }
+
+describe('isForbiddenError', () => {
+  it('is true for a 403 axios error', () => {
+    expect(isForbiddenError(permissionDeniedError)).toBe(true)
+  })
+
+  it('is false for a non-403 axios error', () => {
+    expect(
+      isForbiddenError({
+        isAxiosError: true,
+        response: { status: 500 },
+      })
+    ).toBe(false)
+  })
+
+  it('is false for a non-axios error', () => {
+    expect(
+      isForbiddenError(new Error('One or more logPeriods failed to delete'))
+    ).toBe(false)
+  })
+})
+
+describe('getAuditLogDeleteErrorMessage', () => {
+  const permissionMessage =
+    'Permission required to delete audit logs. Log in with an authorized account.'
+  const generalMessage = 'One or more logPeriods failed to delete'
+
+  it('returns the permission copy for a 403', () => {
+    expect(
+      getAuditLogDeleteErrorMessage(
+        permissionDeniedError,
+        permissionMessage,
+        generalMessage
+      )
+    ).toBe(permissionMessage)
+  })
+
+  it('returns the general copy for other errors', () => {
+    expect(
+      getAuditLogDeleteErrorMessage(
+        new Error(generalMessage),
+        permissionMessage,
+        generalMessage
+      )
+    ).toBe(generalMessage)
+  })
+})
 
 describe('isProtocolWritePermissionError', () => {
   it('is true for a 403 missing protocols.write', () => {
