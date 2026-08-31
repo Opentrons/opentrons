@@ -120,7 +120,7 @@ export interface AttachingModuleAction {
  * DocumentedActions for one-off mutations without more needed context.
  * These should match keys in audit_log.json
  */
-type AuditLogAction =
+export type AuditLogAction =
   | 'acknowledge_estop'
   | 'stop_run'
   | 'play_run'
