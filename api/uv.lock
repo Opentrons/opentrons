@@ -7,7 +7,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-05-11T14:24:25.734373Z"
+exclude-newer = "2026-08-24T19:53:30.386837Z"
 exclude-newer-span = "P1W"
 
 [[package]]
@@ -1406,7 +1406,7 @@ requires-dist = [
     { name = "packaging", specifier = ">=25.0" },
     { name = "pydantic", specifier = ">=2.0.0,<3" },
     { name = "pydantic-settings", specifier = ">=2,<3" },
-    { name = "pyro5", specifier = ">=5.16,<6" },
+    { name = "pyro5", specifier = ">=5.17,<6" },
     { name = "pyserial", specifier = ">=3.5" },
     { name = "pyusb", specifier = "==1.2.1" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
@@ -1430,7 +1430,7 @@ dev = [
     { name = "performance-metrics", editable = "../performance-metrics" },
     { name = "pydantic", specifier = "==2.11.7" },
     { name = "pydantic-settings", specifier = "==2.4.0" },
-    { name = "pyro5", specifier = "==5.16" },
+    { name = "pyro5", specifier = "==5.17" },
     { name = "pytest", specifier = ">=9.0.2" },
     { name = "pytest-asyncio", specifier = ">=1.3.0,<2" },
     { name = "pytest-cov", specifier = "==4.1.0" },
@@ -1459,7 +1459,7 @@ robot = [
     { name = "packaging", specifier = "==25.0" },
     { name = "pydantic", specifier = "==2.11.7" },
     { name = "pydantic-settings", specifier = "==2.4.0" },
-    { name = "pyro5", specifier = "==5.16" },
+    { name = "pyro5", specifier = "==5.17" },
     { name = "pyusb", specifier = "==1.2.1" },
     { name = "zipp", specifier = "==3.21.0" },
 ]
@@ -1860,14 +1860,14 @@ wheels = [
 
 [[package]]
 name = "pyro5"
-version = "5.16"
+version = "5.17"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "serpent" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6e/ab/38d7adb02f735f409e6af78951630f887590a885b2583c83cfe93a60b576/pyro5-5.16.tar.gz", hash = "sha256:d40418ed2acee0d9093daf5023ed0b0cb485a6b62342934adb9e801956f5738b", size = 448592, upload-time = "2025-12-21T18:33:58.552Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ba/b9/312055148dbd9d0c829d30e0fbc0cff9bcc6c6311bada80737879c7f5cc6/pyro5-5.17.tar.gz", hash = "sha256:cfac69638d80943aff9cc5f1466755dd0fef8aed0bb4bda41b5eb045818ce6fc", size = 268643, upload-time = "2026-06-19T23:40:52.703Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/75/4d/7713c06c1a9eaa35142e232e89da5300cac09156977204c730b28f37eaec/pyro5-5.16-py3-none-any.whl", hash = "sha256:ea33cad29993fd44ce394ef45950e8dc5805ee12c4dd76541a8dd11c40694706", size = 79294, upload-time = "2025-12-21T18:33:57.096Z" },
+    { url = "https://files.pythonhosted.org/packages/24/62/878386c290088c6f614bf50e59c362e23c8aaa86de9a1d74d4ee67108736/pyro5-5.17-py3-none-any.whl", hash = "sha256:0e08866d46fe4e315fd1a6403c66e354a6bc75c5cc3d19cd3495bb292ece4eaa", size = 79715, upload-time = "2026-06-19T23:40:51.28Z" },
 ]
 
 [[package]]

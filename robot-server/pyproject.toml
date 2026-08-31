@@ -28,7 +28,7 @@ dependencies = [
     "sqlalchemy==1.4.51",
     "paho-mqtt==1.6.1",
     "aiohttp>=3.12.14,<4",
-    "Pyro5>=5.16,<6",
+    "Pyro5>=5.17,<6",
 ]
 
 [dependency-groups]
@@ -51,7 +51,7 @@ robot = [
     "sqlalchemy==1.4.51",
     "paho-mqtt==1.6.1",
     "aiohttp==3.12.14",
-    "Pyro5==5.16",
+    "Pyro5==5.17",
 ]
 dev = [
     "ruff==0.14.10",
