@@ -88,29 +88,6 @@ collection_plate = spacer.load_labware(
 )
 ```
 
-## Moving labware
-
-<font color="red"><strong>ignore this section, not ready yet</strong></font>
-
-The collars and spacers are compatible with the Gripper. You can use the gripper to stack well plates on the collars and spacers and move the stack to the dock or onto the vacuum base to put samples under vacuum.
-
-```python
-protocol.move_labware(collar, new_location=vacuum, use_gripper=True)
-```
-
-After depressurizing the system, you can use the Gripper to return a stack to the dock using [`move_to_dock()`][opentrons.protocol_api.VacuumModuleContext.move_to_dock]:
-
-```python
-vacuum.move_to_doc(collar, use_gripper=True)
-```
-
-!!! note
-    You cannot move labware on or off the vacuum module while the pump is running or the system is under vacuum pressure. Return the system to return to atmospheric pressure (0 mbar) before moving labware with the Gripper or by hand.
-
-## Placeholder for stack and gripper
-
-<font color="red">Something something soon?</font>
-
 ## Controlling vacuum operations
 
 The Vacuum Module measures vacuum as gauge pressure in millibars (mbar). The module has an operational range from 0 mbar (atmospheric pressure) to -800 mbar, where lower (more negative) values represent a deeper vacuum.
@@ -245,13 +222,19 @@ Use [`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start
     protocol.wait_for_tasks([profile_task])
     ```
 
-## Closing the vent
+## Utility controls
 
-You can close the vent by using [`close_vent()`][opentrons.protocol_api.VacuumModuleContext.close_vent]. This is a standalone utility method used for testing, diagnostics, or sealing the system without running the pump.
-
-## Deactivating and depressurizing
+### Deactivating and depressurizing
 
 You can stop the pump and depressurize the system separately by using the [`stop_vacuum_pump()`][opentrons.protocol_api.VacuumModuleContext.stop_vacuum_pump] and [`open_vent()`][opentrons.protocol_api.VacuumModuleContext.open_vent] methods, respectively. While commands like `start_set_vacuum_pressure()` automatically manage pump and vent operations, these two standalone utility methods give you direct control over the pump motor and vent valve.
 
 !!! note
     The robot will not automatically deactivate the Vacuum Module at the end of a protocol. If you need to deactivate and depressurize the module after a protocol is completed or canceled, use these methods or the module controls on the device detail page in the Opentrons App.
+
+### Closing the vent
+
+You can close the vent by using [`close_vent()`][opentrons.protocol_api.VacuumModuleContext.close_vent]. This is a standalone utility method used for testing, diagnostics, or sealing the system without running the pump.
+
+## Use case examples
+
+
