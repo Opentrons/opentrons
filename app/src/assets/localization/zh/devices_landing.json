@@ -2,6 +2,8 @@
   "active": "激活",
   "available": "可用（{{count}}）",
   "check_same_network": "检查电脑和工作站是否连接在同一网络上",
+  "close_door_to_home": "请关闭机器人舱门以将龙门架归位",
+  "compliance_ready": "合规就绪",
   "connect_to_network": "连接到网络",
   "connection_troubleshooting_intro": "如果工作站的连接出现问题，请尝试执行以下故障排除任务。首先，仔细检查工作站电源是否打开",
   "deck_configuration": "甲板配置",
