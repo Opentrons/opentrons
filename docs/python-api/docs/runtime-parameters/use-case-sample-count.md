@@ -161,17 +161,23 @@ Now bring sample count into consideration as you [load the liquids][labeling-wel
 | Tagmentation Stop     | 10                    |
 | Tagmentation Wash Buffer | 900                |
 
-To calculate the total volume for each liquid, we'll multiply these numbers by `column_count` and by 1.1 (to ensure that the pipette can aspirate the required volume without drawing in air at the bottom of the well). This calculation can be done inline as the `volume` value of [`load_liquid()`][opentrons.protocol_api.Well.load_liquid]:
+To calculate the total volume for each liquid, we'll multiply these numbers by `column_count` and by 1.1 (to ensure that the pipette can aspirate the required volume without drawing in air at the bottom of the well). This calculation can be done inline as the `volume` value of [`Labware.load_liquid()`][opentrons.protocol_api.labware.Labware.load_liquid]:
 
 ```python
-reservoir["A1"].load_liquid(
-    liquid=ampure_liquid, volume=180 * column_count * 1.1
+reservoir.load_liquid(
+    wells=["A1"],
+    volume=180 * column_count * 1.1,
+    liquid=ampure_liquid,
 )
-reservoir["A2"].load_liquid(
-    liquid=tagstop_liquid, volume=10 * column_count * 1.1
+reservoir.load_liquid(
+    wells=["A2"],
+    volume=10 * column_count * 1.1,
+    liquid=tagstop_liquid,
 )
-reservoir["A4"].load_liquid(
-    liquid=twb_liquid, volume=900 * column_count * 1.1
+reservoir.load_liquid(
+    wells=["A4"],
+    volume=900 * column_count * 1.1,
+    liquid=twb_liquid,
 )
 ```
 Now, for example, the volume of AMPure beads to load will vary from 198 µL for a single sample column up to 792 µL for four columns.
@@ -193,7 +199,7 @@ sample_plate = hs_adapter.load_labware(
     label="Sample Plate",
 )
 ```
-Now we can construct a `for` loop to label each sample well with `load_liquid()`. The simplest way to do this is to combine our original *sample count* with the fact that the [`Labware.wells()`][opentrons.protocol_api.Labware.wells] accessor returns wells top-to-bottom, left-to-right:
+Now we can label each sample well with [`Labware.load_liquid()`][opentrons.protocol_api.labware.Labware.load_liquid]. The simplest way to do this is to combine our original *sample count* with the fact that the [`Labware.wells()`][opentrons.protocol_api.Labware.wells] accessor returns wells top-to-bottom, left-to-right:
 
 ```python
 # define sample liquid
@@ -202,8 +208,11 @@ sample_liquid = protocol.define_liquid(
 )
 
 # load 40 µL in each sample well
-for w in range(protocol.params.sample_count):
-    sample_plate.wells()[w].load_liquid(liquid=sample_liquid, volume=40)
+sample_plate.load_liquid(
+    wells=sample_plate.wells()[:protocol.params.sample_count],
+    volume=40,
+    liquid=sample_liquid,
+)
 ```
 
 ## Processing samples
