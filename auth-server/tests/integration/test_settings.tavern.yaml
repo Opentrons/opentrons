@@ -49,6 +49,18 @@ stages:
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
 
+  - name: PATCH passwordResetTime below one day is rejected
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          passwordResetTime: 1.0
+    response:
+      status_code: 422
+
   - name: PATCH more settings
     request:
       method: PATCH

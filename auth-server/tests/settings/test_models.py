@@ -2,6 +2,7 @@ import pytest
 from pydantic import ValidationError
 
 from auth_server.settings.models import (
+    MIN_PASSWORD_RESET_TIME_SEC,
     PatchSettingsRequestData,
     SettingsResponseData,
 )
@@ -38,3 +39,32 @@ def test_settings_response_rejects_out_of_range_login_attempts(
 ) -> None:
     with pytest.raises(ValidationError):
         SettingsResponseData(maxNumberOfLoginAttempts=invalid_value)
+
+
+def test_password_reset_time_accepts_valid_values() -> None:
+    assert (
+        SettingsResponseData(
+            passwordResetTime=MIN_PASSWORD_RESET_TIME_SEC
+        ).passwordResetTime
+        == MIN_PASSWORD_RESET_TIME_SEC
+    )
+    assert SettingsResponseData(passwordResetTime=None).passwordResetTime is None
+    assert PatchSettingsRequestData(passwordResetTime=None).model_dump(
+        exclude_unset=True
+    ) == {"passwordResetTime": None}
+
+
+@pytest.mark.parametrize("invalid_value", [0, -1, 1, MIN_PASSWORD_RESET_TIME_SEC - 1])
+def test_patch_settings_rejects_password_reset_time_below_minimum(
+    invalid_value: float,
+) -> None:
+    with pytest.raises(ValidationError):
+        PatchSettingsRequestData(passwordResetTime=invalid_value)
+
+
+@pytest.mark.parametrize("invalid_value", [0, -1, 1, MIN_PASSWORD_RESET_TIME_SEC - 1])
+def test_settings_response_rejects_password_reset_time_below_minimum(
+    invalid_value: float,
+) -> None:
+    with pytest.raises(ValidationError):
+        SettingsResponseData(passwordResetTime=invalid_value)

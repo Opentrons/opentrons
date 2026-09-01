@@ -5,7 +5,10 @@ import pytest
 from decoy import Decoy, matchers
 
 from auth_server.persistence.orm_models import User
-from auth_server.settings.models import SettingsResponseData
+from auth_server.settings.models import (
+    MIN_PASSWORD_RESET_TIME_SEC,
+    SettingsResponseData,
+)
 from auth_server.settings.store import SettingsStore
 from auth_server.users.models import (
     AccountType,
@@ -485,9 +488,9 @@ def test_get_user_reset_password_true_when_password_expired(
     manager: UserDataManager,
 ) -> None:
     decoy.when(mock_settings.get_settings()).then_return(
-        SettingsResponseData(passwordResetTime=3600)
+        SettingsResponseData(passwordResetTime=MIN_PASSWORD_RESET_TIME_SEC)
     )
-    expired_at = datetime.datetime.now(tz=datetime.UTC) - datetime.timedelta(hours=2)
+    expired_at = datetime.datetime.now(tz=datetime.UTC) - datetime.timedelta(days=2)
     decoy.when(mock_store.get("expired_user")).then_return(
         _make_orm_user(username="expired_user", password_set_at=expired_at)
     )
