@@ -121,7 +121,25 @@ describe('getAuthInputPatch', () => {
     ).toBeNull()
   })
 
+  it('should not patch passwordResetTime when value is below the minimum', () => {
+    expect(
+      getAuthInputPatch('passwordResetTime', '0', BASE_FIELD_VALUES)
+    ).toBeNull()
+    expect(
+      getAuthInputPatch('passwordResetTime', '-1', BASE_FIELD_VALUES)
+    ).toBeNull()
+    expect(
+      getAuthInputPatch('passwordResetTime', '0.5', BASE_FIELD_VALUES)
+    ).toBeNull()
+    expect(
+      getAuthInputPatch('passwordResetTime', 'abc', BASE_FIELD_VALUES)
+    ).toBeNull()
+  })
+
   it('should patch passwordResetTime with day conversion', () => {
+    expect(
+      getAuthInputPatch('passwordResetTime', '1', BASE_FIELD_VALUES)
+    ).toEqual({ data: { passwordResetTime: 1 * 24 * 60 * 60 } })
     expect(
       getAuthInputPatch('passwordResetTime', '30', BASE_FIELD_VALUES)
     ).toEqual({ data: { passwordResetTime: 30 * 24 * 60 * 60 } })

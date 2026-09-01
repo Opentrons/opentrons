@@ -22,6 +22,7 @@ const SECONDS_PER_MINUTE = 60
 const SECONDS_PER_DAY = 24 * 60 * 60
 export const MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH = 256
 export const MAX_NUMBER_OF_LOGIN_ATTEMPTS = 5
+export const MIN_PASSWORD_RESET_TIME_DAYS = 1
 
 export function isValidLogoutIdleTime(value: string): boolean {
   const parsedValue = Number(value)
@@ -46,6 +47,13 @@ export function isValidMaxNumberOfLoginAttempts(value: string): boolean {
     Number.isInteger(parsedValue) &&
     parsedValue > 0 &&
     parsedValue <= MAX_NUMBER_OF_LOGIN_ATTEMPTS
+  )
+}
+
+export function isValidPasswordResetTime(value: string): boolean {
+  const parsedValue = Number(value)
+  return (
+    Number.isFinite(parsedValue) && parsedValue >= MIN_PASSWORD_RESET_TIME_DAYS
   )
 }
 
@@ -159,7 +167,7 @@ export function getAuthInputPatch(
       }
       return { data: { idleLogout: Number(value) * SECONDS_PER_MINUTE } }
     case 'passwordResetTime':
-      if (value === '') {
+      if (!isValidPasswordResetTime(value)) {
         return null
       }
       return { data: { passwordResetTime: Number(value) * SECONDS_PER_DAY } }
