@@ -117,9 +117,6 @@ export function useSignRunFlow(
         logout()
         popToast()
         queryClient.removeQueries(getSelfQueryKey(host))
-      // prompt for login
-      // eslint-disable-next-line no-fallthrough -- just being cute :)
-      case 'idle':
         setLoginInFlight(true)
         void showLoginModal({ robotName, uncloseable: true })
           .then(result => {
@@ -134,6 +131,8 @@ export function useSignRunFlow(
             eatToast()
             setLoginInFlight(false)
           })
+        break
+      case 'idle':
         break
       // waiting for login to finish / self to settle
       case 'prompting':
