@@ -76,7 +76,7 @@ Flex 1-channel pipettes meet the following accuracy and precision specifications
       <td>50 µL</td>
       <td>10</td>
       <td>0.50%</td>
-      <td>±1.00%</td>
+      <td>±1.50%</td>
     </tr>
     <tr>
       <td>50 µL</td>
