@@ -118,8 +118,21 @@ export function useSignRunFlow(
         logout()
         popToast()
         queryClient.removeQueries(getSelfQueryKey(host))
-      // prompt for login on desktop only
-      // eslint-disable-next-line no-fallthrough -- just being cute :)
+        setLoginInFlight(true)
+        void showLoginModal({ robotName, uncloseable: true })
+          .then(result => {
+            if (result == null) {
+              eatToast()
+              setLoginInFlight(false)
+              return
+            }
+            setRefetchSelf(true)
+          })
+          .catch(() => {
+            eatToast()
+            setLoginInFlight(false)
+          })
+        break
       case 'idle':
         if (isOnDevice) {
           break
