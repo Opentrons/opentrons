@@ -4,8 +4,10 @@ import {
   A1_NOZZLE,
   ALL,
   COLUMN,
+  E1_NOZZLE,
   F1_NOZZLE,
   PARTIAL_COLUMN,
+  QUADRANT,
   ROW,
   SINGLE,
 } from '@opentrons/shared-data'
@@ -107,6 +109,15 @@ describe('getActiveNozzleAmount', () => {
       primaryNozzle: F1_NOZZLE,
     }
     expect(getActiveNozzleAmount(args)).toEqual(3)
+  })
+  it('should return 4 for a 8ch QUADRANT config with backLeftNozzle E1', () => {
+    const args = {
+      nozzles: QUADRANT,
+      pipetteSpec: MOCK_P8_SPECS,
+      primaryNozzle: A1_NOZZLE,
+      backLeftNozzle: E1_NOZZLE,
+    }
+    expect(getActiveNozzleAmount(args)).toEqual(4)
   })
   it('should return the pipette channels if ALL tip pick up', () => {
     const args8ch = {
