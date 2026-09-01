@@ -14,6 +14,7 @@ import { useCurrentRun } from '/app/resources/runs'
 import {
   DeviceReset,
   DisableStackerSensors,
+  DisableVacuumModuleWasteDetection,
   DisplayRobotName,
   EnableStatusLight,
   GantryHoming,
@@ -56,6 +57,7 @@ vi.mock('../AdvancedTab/UpdateRobotSoftware')
 vi.mock('../AdvancedTab/UsageSettings')
 vi.mock('../AdvancedTab/UseOlderAspirateBehavior')
 vi.mock('../AdvancedTab/DisableStackerSensors')
+vi.mock('../AdvancedTab/DisableVacuumModuleWasteDetection')
 vi.mock('/app/resources/runs')
 
 const render = () => {
@@ -117,6 +119,9 @@ describe('RobotSettings Advanced tab', () => {
     )
     vi.mocked(DisableStackerSensors).mockReturnValue(
       <div>Mock DisableStackerSensors Section</div>
+    )
+    vi.mocked(DisableVacuumModuleWasteDetection).mockReturnValue(
+      <div>Mock DisableVacuumModuleWasteDetection Section</div>
     )
     vi.mocked(useIsRobotBusy).mockReturnValue(false)
     vi.mocked(useCurrentRun).mockReturnValue(null)
@@ -234,5 +239,18 @@ describe('RobotSettings Advanced tab', () => {
     when(useIsFlex).calledWith('otie').thenReturn(true)
     render()
     screen.getByText('Mock DisableStackerSensors Section')
+  })
+
+  it('should not render DisableVacuumModuleWasteDetection section for OT-2', () => {
+    render()
+    expect(
+      screen.queryByText('Mock DisableVacuumModuleWasteDetection')
+    ).not.toBeInTheDocument()
+  })
+
+  it('should render DisableVacuumModuleWasteDetection section for Flex', () => {
+    when(useIsFlex).calledWith('otie').thenReturn(true)
+    render()
+    screen.getByText('Mock DisableVacuumModuleWasteDetection Section')
   })
 })

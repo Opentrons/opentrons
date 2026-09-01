@@ -28,6 +28,7 @@ import { useCurrentRun } from '/app/resources/runs'
 import {
   DeviceReset,
   DisableStackerSensors,
+  DisableVacuumModuleWasteDetection,
   DisplayRobotName,
   EnableErrorRecoveryMode,
   EnableStatusLight,
@@ -212,6 +213,15 @@ export function RobotSettingsAdvanced({
           <>
             <Divider marginY={SPACING.spacing16} />
             <DisableStackerSensors
+              robotName={robotName}
+              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
+            />
+          </>
+        ) : null}
+        {isFlex ? (
+          <>
+            <Divider marginY={SPACING.spacing16} />
+            <DisableVacuumModuleWasteDetection
               robotName={robotName}
               isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />

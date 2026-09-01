@@ -105,3 +105,9 @@ def hardware_subprocess_enabled() -> bool:
     # this patch should be REMOVED for releases >= 10.0.0
     # See: https://opentrons.atlassian.net/browse/EXEC-2897
     return False
+
+
+def vacuum_module_waste_detection_disabled() -> bool:
+    return advs.get_setting_with_env_overload(
+        "disableVacuumModuleWasteDetection", RobotTypeEnum.FLEX
+    )

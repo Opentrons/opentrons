@@ -244,6 +244,15 @@ settings = [
         robot_type=[RobotTypeEnum.FLEX],
         internal_only=True,
     ),
+    SettingDefinition(
+        _id="disableVacuumModuleWasteDetection",
+        title="Disable Vacuum Module's waste full detection features",
+        description=(
+            "Vacuum Modules will ignore when the waste is full. "
+            "Protocol runs will no longer raise the following recoverable error: Waste Full."
+        ),
+        robot_type=[RobotTypeEnum.FLEX],
+    ),
 ]
 
 
@@ -795,6 +804,16 @@ def _migrate40to41(previous: SettingsMap) -> SettingsMap:
     return {k: v for k, v in previous.items() if "allowStepGrouping" != k}
 
 
+def _migrate41to42(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 42 of the feature flags file.
+
+    -  Adds the disableVacuumModuleWasteDetection config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["disableVacuumModuleWasteDetection"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -837,6 +856,7 @@ _MIGRATIONS = [
     _migrate38to39,
     _migrate39to40,
     _migrate40to41,
+    _migrate41to42,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

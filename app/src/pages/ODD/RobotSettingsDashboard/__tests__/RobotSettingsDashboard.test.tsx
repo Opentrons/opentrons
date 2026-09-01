@@ -33,6 +33,7 @@ import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 import { useNetworkConnection } from '/app/resources/networking'
 import {
   useDisableStackerSensors,
+  useDisableVacuumModuleWasteDetection,
   useLEDLights,
 } from '/app/resources/robot-settings'
 
@@ -72,6 +73,7 @@ vi.mock('/app/organisms/ODD/RobotSettingsDashboard/Devices')
 const mockToggleLights = vi.fn()
 const mockToggleER = vi.fn()
 const mockToggleStackerSensors = vi.fn()
+const mockToggleWasteDetection = vi.fn()
 
 const render = () => {
   return renderWithProviders(
@@ -108,6 +110,10 @@ describe('RobotSettingsDashboard', () => {
     vi.mocked(useDisableStackerSensors).mockReturnValue({
       sensorsDisabled: false,
       toggleSensors: mockToggleStackerSensors,
+    })
+    vi.mocked(useDisableVacuumModuleWasteDetection).mockReturnValue({
+      wasteDetectionDisabled: false,
+      toggleWasteDetection: mockToggleWasteDetection,
     })
     vi.mocked(useNetworkConnection).mockReturnValue({} as any)
     vi.mocked(useErrorRecoverySettingsToggle).mockReturnValue({
@@ -259,6 +265,32 @@ describe('RobotSettingsDashboard', () => {
     render()
     expect(
       screen.getByTestId('RobotSettingButton_disable_stacker_sensors')
+    ).toHaveTextContent('On')
+  })
+
+  it('should render disable vacuum module waste detection copy, and calls toggleWasteDetection', () => {
+    render()
+    screen.getByText("Disable Vacuum Module's Waste Full Detection")
+
+    const toggle = screen.getByTestId(
+      'RobotSettingButton_disable_vacuum_module_waste_detection'
+    )
+    expect(toggle).toHaveTextContent('Off')
+
+    fireEvent.click(toggle)
+    expect(mockToggleWasteDetection).toHaveBeenCalled()
+  })
+
+  it('should render on toggle with vacuum module waste detection disabled', () => {
+    vi.mocked(useDisableVacuumModuleWasteDetection).mockReturnValue({
+      wasteDetectionDisabled: true,
+      toggleWasteDetection: mockToggleWasteDetection,
+    })
+    render()
+    expect(
+      screen.getByTestId(
+        'RobotSettingButton_disable_vacuum_module_waste_detection'
+      )
     ).toHaveTextContent('On')
   })
 

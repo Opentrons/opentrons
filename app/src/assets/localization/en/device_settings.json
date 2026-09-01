@@ -114,6 +114,8 @@
   "directly_connected_to_this_computer": "Directly connected to this computer.",
   "disable_stacker_sensors": "Disable Stacker Sensors for Labware Detection",
   "disable_stacker_sensors_description": "Applies to x- axis and z-axis for all connected Stackers.",
+  "disable_vacuum_module_waste_detection": "Disable Vacuum Module's Waste Full Detection",
+  "disable_vacuum_module_waste_detection_description": "Applies for all connected Vacuum Modules.",
   "disabled": "Disabled",
   "disconnect": "Disconnect",
   "disconnect_from_ssid": "Disconnect from {{ssid}}",
