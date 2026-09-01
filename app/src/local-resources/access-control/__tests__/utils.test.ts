@@ -42,6 +42,10 @@ describe('isForbiddenError', () => {
       isForbiddenError(new Error('One or more logPeriods failed to delete'))
     ).toBe(false)
   })
+
+  it('is false for a null error', () => {
+    expect(isForbiddenError(null)).toBe(false)
+  })
 })
 
 describe('getAuditLogDeleteErrorMessage', () => {

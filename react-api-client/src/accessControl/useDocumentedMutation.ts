@@ -165,12 +165,11 @@ async function runMutation<TData, TVariables>(
           ? (documentationState.docreport ?? '')
           : '',
     })
-    .catch(async e => {
+    .catch(async (e: unknown) => {
       console.log('hit error', e)
       console.log(documentationState)
       if (
-        e.isAxiosError &&
-        e.response?.status === 401 &&
+        isAxiosUnauthorizedError(e) &&
         documentationState.accessControlEnabled
       ) {
         console.log('hit 401')
@@ -183,4 +182,15 @@ async function runMutation<TData, TVariables>(
         )
       } else throw e
     })
+}
+
+function isAxiosUnauthorizedError(error: unknown): boolean {
+  if (error == null || typeof error !== 'object') {
+    return false
+  }
+  const axiosError = error as {
+    isAxiosError?: unknown
+    response?: { status?: unknown }
+  }
+  return axiosError.isAxiosError === true && axiosError.response?.status === 401
 }
