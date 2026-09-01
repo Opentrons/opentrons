@@ -5,7 +5,7 @@ description: How to use the Vacuum Module in a Python protocol.
 
 The Vacuum Module is an automated filtration system for the Opentrons Flex liquid handling robot. This module enables Flex to run vacuum-based protocols for protein and peptide sample cleanup, solid-phase extraction, and nucleic acid extraction, all within in an enclosed system that includes waste collection.
 
-The module is represented in code by a [`VacuumModuleContext`][opentrons.protocol_api.VacuumModuleContext] object that includes methods for deck staging and vacuum control.
+The module is represented in code by a [`VacuumModuleContext`][opentrons.protocol_api.VacuumModuleContext] object that includes methods for deck staging, labware movement, and vacuum control.
 
 For hardware-related information, see the [Vacuum Module Instruction Manual](../../modules/index.md). <!--- landing page for now --->
 
@@ -22,7 +22,7 @@ The Vacuum Module requires a physical deck adapter to hold module components, la
 <figcaption>Vacuum Module deck adapter</figcaption>
 </figure>
 
-* **Slot A3:** This is the recessed half of the deck adapter that holds the vacuum base piece and its attached 6 mm hose that pulls waste to the carboy. See the instruction manual (linked above) for installation steps.
+* **Slot A3:** This is the recessed half of the deck adapter that holds the vacuum base piece and its attached 6 mm hose. See the instruction manual (linked above) for installation steps.
 * **Slot A4:** Known as "the dock," this is the raised half of the deck adapter. It is a staging area for collars (and other parts of the vacuum stack) when they're not seated on the vacuum base or actively used in a protocol. You cannot store or put well plates on the dock.
 
 ## Loading deck slots
@@ -96,21 +96,21 @@ Keep in mind these best practices and limitations when including Gripper movemen
 
 | Activity | Description |
 |:----|:----|
-| **Deck placement** | Because filter plate wells can extend below the plate's sides or skirt, you cannot place a filter plate directly in an empty deck slot (the API will raise a `LabwareIsNotAllowedInLocationError`). Filter plates must sit on an adapter like a collar (slot A4), the vacuum base (slot A3), or on another well plate or module. |
+| **Deck placement** | Because filter plate wells can extend below the plate's sides or skirt, you cannot place a filter plate directly in an empty deck slot. If you do this, the API will raise a `LabwareIsNotAllowedInLocationError`. Filter plates must sit on an adapter like a collar (slot A4), the vacuum base (slot A3), or on another well plate or module. |
 | **Returning to dock** | Use [`vacuum.move_to_dock(collar, use_gripper=True)`][opentrons.protocol_api.VacuumModuleContext.move_to_dock] to move a collar stack from the vacuum base to the dock. |
 | **Stacking** | Including a `collar` in `move_labware()` automatically moves the collar and any filter or well plate placed on top of it. |
 | **Targeting locations** | Set `new_location=vacuum` to place collars or spacers on the vacuum base (slot A3), or `collar` to put well plates onto a collar staged on the dock (slot A4). |
 
 !!! note "Movement reminder"
-    You cannot move labware on or off the the module while the pump is running or while the system is under vacuum. Always pass asynchronous vacuum tasks to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] and wait until system pressure reaches 0 mbar before moving labware with the gripper.
+    You cannot move labware on or off the module while the pump is running or while the system is under vacuum. Always use [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to wait for vacuum operations to finish and pressure to return to 0 mbar before moving labware with the Gripper..
 
 ## Controlling vacuum operations
 
 The Vacuum Module measures vacuum as gauge pressure in millibars (mbar). The module has an operational range from 0 mbar (atmospheric pressure) to -800 mbar, where lower (more negative) values represent a deeper vacuum.
 
-Vacuum commands prefixed with `start_` (e.g., [`start_set_vacuum_pressure()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_pressure], [`start_set_vacuum_power()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_power], etc.) are non-blocking commands. These methods return a [`Task`][opentrons.protocol_api.Task] object that runs in the background, allowing the Flex to perform liquid handling or other module operations in parallel with the Vacuum Module. See [Concurrent Module Actions](concurrent.md) for more information about operating multiple modules simultaneously.
+Vacuum commands prefixed with `start_` (e.g., `start_set_vacuum_pressure()` or `start_set_vacuum_power()`) are non-blocking commands. These methods return a [`Task`][opentrons.protocol_api.Task] object that runs in the background, allowing the Flex to perform liquid handling or other module operations in parallel with the Vacuum Module. See [Concurrent Module Actions](concurrent.md) for more information about operating multiple modules simultaneously.
 
-The following sections describe how to configure minimum and maximum vacuum pressure, closed-loop pressure control, open-loop power regulation, and multi-step vacuum profiles.
+The following sections describe how to configure minimum and maximum vacuum pressure, set pressure levels, control the pump's duty cycle (power), and work with multi-step vacuum profiles.
 
 ### Minimum and maximum pressure limits
 
@@ -121,6 +121,7 @@ Two properties set the operational minimum and maximum gauge pressure limits for
 * [`max_gauge_pressure_mbar`][opentrons.protocol_api.VacuumModuleContext.max_gauge_pressure_mbar]: Returns `-800` mbar, the maximum vacuum supported by the module. You can pass `max_gauge_pressure_mbar` in code to run the module at full vacuum capacity.
 
 ```python
+# Setting maximum vacuum pressure
 vacuum_task = vacuum.start_set_vacuum_pressure(
     gauge_pressure_mbar=vacuum.max_gauge_pressure_mbar,
     duration_s=30,
@@ -154,7 +155,7 @@ protocol.wait_for_tasks([vacuum_task])
 
 You can set the Vacuum Module to run the pump motor at a specific power level (from `1` to `100`%) by calling [`start_set_vacuum_power()`][opentrons.protocol_api.VacuumModuleContext.start_set_vacuum_power]. When using this method, the module does not use sensor data. Instead, the pump runs at the set duty cycle level.
 
-Also, this method returns a [Task][opentrons.protocol_api.Task] (`Task`?) object representing concurrent execution. Pass the task to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to make the protocol wait for the system to return to atmospheric pressure before continuing.
+Also, this method returns a [Task][opentrons.protocol_api.Task] object representing concurrent execution. Pass the task to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to make the protocol wait for the system to return to atmospheric pressure before continuing.
 
 ```python
 # Run pump at 60% power for 20 seconds
@@ -180,7 +181,7 @@ Use [`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start
 
 === "Pressure profile"
 
-    In a multi-step pressure profile, each step requires `enable_pump: True` and a target `gauge_pressure_mbar` (from `0` to `-800` mbar). You can also specify an optional `hold_time_seconds` or `hold_time_minutes` for each stage. Use pressure steps when you need to reach and hold a specific vacuum across multiple stages, instead of open-loop pressure regulation.
+    In a multi-step pressure profile, each step requires `enable_pump: True` and a target `gauge_pressure_mbar` (from `0` to `-800` mbar), with an optional hold time. Unlike power profiles, the module actively monitors sensor feedback to reach and hold specified vacuum levels throughout a multi-stage protocol.
 
     ```python
     # Define the stages, pressure, and duration
@@ -209,7 +210,7 @@ Use [`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start
 
 === "Power profile"
 
-    In a multi-step power profile, each step requires `enable_pump: True` and a target `percent_power` (from `1` to `100` % duty cycle). Use power steps when you want fixed pump duty cycles across multiple stages instead of closed-loop pressure regulation.
+    In a multi-step power profile, each step requires `enable_pump: True` and a target `percent_power` (from `1` to `100`). Unlike pressure profiles, the module does not monitor sensor feedback to reach and hold a specified power level throughout a multi-stage protocol.
 
     ```python
     # Define the stages, power %, and duration
@@ -248,7 +249,7 @@ You can close the vent by using [`close_vent()`][opentrons.protocol_api.VacuumMo
 
 ## Use cases
 
-<font color="red"><strong>maybe remove this use case section?</strong></font>
+<font color="red"><strong>maybe remove this use case section? There's another.</strong></font>
 
 ### Direct-to-waste
 
@@ -299,3 +300,5 @@ protocol.move_labware(
     use_gripper=True,
 )
 ```
+
+### TBD or too many?
