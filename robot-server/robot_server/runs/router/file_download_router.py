@@ -5,7 +5,7 @@ from textwrap import dedent
 from typing import Annotated, List, Optional, Tuple, Union
 
 from fastapi import Depends, Query, Response, status
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from starlette.background import BackgroundTask
 
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -18,6 +18,7 @@ from robot_server.data_files.zip_utils import (
     collect_existing_run_images,
     collect_existing_run_output_csvs,
     create_download_staging_dir,
+    run_zip_generator,
     write_zip_for_download,
 )
 from robot_server.errors.error_responses import ErrorBody
@@ -112,7 +113,7 @@ async def download_run_files(
             description=("Include CSV output files."),
         ),
     ] = False,
-) -> Union[FileResponse, Response]:
+) -> Union[StreamingResponse, Response]:
     """Download selected files associated with a run as a zip archive.
 
     Arguments:
@@ -165,15 +166,16 @@ async def download_run_files(
             protocol_store=protocol_store,
             fallback_filename=f"{runId}.zip",
         )
-        zip_path = await write_zip_for_download(zip_entries, staging_path)
     except Exception:
         staging_dir.cleanup()
         raise
 
-    return FileResponse(
-        path=zip_path,
+    headers = {f"Content-Disposition": 'attachment; filename="{zip_filename}"'}
+
+    return StreamingResponse(
+        content=run_zip_generator(entries=zip_entries, staging_dir=staging_path),
         media_type="application/zip",
-        filename=zip_filename,
+        headers=headers,
         background=BackgroundTask(staging_dir.cleanup),
     )
 
