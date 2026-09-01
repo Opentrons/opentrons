@@ -15,7 +15,7 @@ See the [Opentrons Labware Library](https://labware.opentrons.com/) for filter p
 
 ## Deck adapter
 
-The Vacuum Module requires a physical deck adapter to hold module components, labware, and other pieces used in a vacuum filtration protocol. This adapter is a single piece that fits in deck slots A3–A4 only.
+The Vacuum Module requires a physical deck adapter to hold module components, labware, and other pieces used in a vacuum filtration protocol. This adapter is a single aluminum bracket that fits in deck slots A3–A4 only.
 
 <figure markdown>
 ![Deck adapter with labeled features matching slots A3 and A4](images/deck_adapter_features.svg){ width="80%" }
@@ -53,7 +53,7 @@ Collars support filter plates during vacuum extraction. The Vacuum Module includ
 | **Short** | 42 mm | `opentrons_vacuum_manifold_collar_short` |
 | **Tall** |72 mm | `opentrons_vacuum_manifold_collar_tall` |
 
-Stage a collar on the manifold dock (slot A4) using [`load_adapter_to_dock()`][opentrons.protocol_api.VacuumModuleContext.load_adapter_to_dock], then load your filter plate directly onto the staged collar:
+Stage a collar on the manifold doc (slot A4) using [`load_adapter_to_dock()`][opentrons.protocol_api.VacuumModuleContext.load_adapter_to_dock], then load your filter plate directly onto the staged collar:
 
 ```python
 # Load a short collar on the manifold dock (slot A4)
@@ -102,7 +102,7 @@ Keep in mind these best practices and limitations when including Gripper movemen
 | **Targeting locations** | Set `new_location=vacuum` to place collars or spacers on the vacuum base (slot A3), or `collar` to put well plates onto a collar staged on the dock (slot A4). |
 
 !!! note "Movement reminder"
-    You cannot move labware on or off the module while the pump is running or while the system is under vacuum. Always pass asynchronous vacuum tasks to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] and wait until system pressure reaches 0 mbar before moving labware with the gripper.
+    You cannot move labware on or off the the module while the pump is running or while the system is under vacuum. Always pass asynchronous vacuum tasks to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] and wait until system pressure reaches 0 mbar before moving labware with the gripper.
 
 ## Controlling vacuum operations
 
@@ -246,9 +246,9 @@ You can stop the pump and depressurize the system separately by using the [`stop
 
 You can close the vent by using [`close_vent()`][opentrons.protocol_api.VacuumModuleContext.close_vent]. This is a standalone utility method used for testing, diagnostics, or sealing the system without running the pump.
 
-<font color="red"><strong>maybe remove this section below?</strong></font>
-
 ## Use cases
+
+<font color="red"><strong>maybe remove this use case section?</strong></font>
 
 ### Direct-to-waste
 
