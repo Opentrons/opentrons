@@ -5,9 +5,7 @@ from typing import Final
 MESSAGE_ROBOT_BOOT: Final = "Robot started up"
 MESSAGE_LOG_PERIOD_END: Final = "Log period ended"
 MESSAGE_LOG_PERIOD_START: Final = "Log period begun"
-MESSAGE_NO_PREVIOUS_PERIOD: Final = (
-    "There was no previous log period saved. Either this is the first time this robot has booted or the previous log period was deleted."
-)
+MESSAGE_NO_PREVIOUS_PERIOD: Final = "There was no previous log period saved. Either this is the first time this robot has booted or the previous log period was deleted."
 MESSAGE_NO_PREVIOUS_LOG: Final = (
     "There was no previous log message. A log message has been deleted."
 )
