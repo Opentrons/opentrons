@@ -4,12 +4,12 @@ import { useTranslation } from 'react-i18next'
 import { updateSelf } from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
 
-import { mapAuthUserMutationError } from '../mapAuthUserMutationError'
+import { mapSetNewPasswordError } from '../mapAuthUserMutationError'
 
 import type { TFunction } from 'i18next'
 
 export interface UseSetNewPasswordAndSignInOptions {
-  onSuccess: (username: string) => void
+  onSuccess: (username: string, password: string) => void
   onError: (message: string) => void
 }
 
@@ -23,7 +23,7 @@ interface UseSetNewPasswordAndSignInResult {
  * temporary password and holds a valid access token.
  *
  * Submits the chosen password via `PATCH /auth/users/self`. Callers should then
- * return the user to the login screen so they can sign in with the new password.
+ * sign the user in again with the new password so they receive a full-scope token.
  */
 export function useSetNewPasswordAndSignIn(
   options: UseSetNewPasswordAndSignInOptions
@@ -42,7 +42,7 @@ export function useSetNewPasswordAndSignIn(
         onError(
           t('set_new_password_error_session_expired', {
             ns: 'access_control',
-          }) as string
+          })
         )
         return
       }
@@ -54,23 +54,13 @@ export function useSetNewPasswordAndSignIn(
           // but here, we need to specifically not ask for documentation as were in the middle of login
           // eslint-disable-next-line opentrons/no-direct-mutating
           await updateSelf(host, { data: { password } }, '')
-          onSuccess(username)
+          onSuccess(username, password)
         } catch (error) {
           console.error(
             'useSetNewPasswordAndSignIn: failed to update password',
             error
           )
-          const formError = mapAuthUserMutationError<{ password: string }>(
-            error,
-            t
-          )
-          onError(
-            formError?.field === 'password'
-              ? formError.error.message
-              : (t('set_new_password_error_update_failed', {
-                  ns: 'access_control',
-                }) as string)
-          )
+          onError(mapSetNewPasswordError(error, t))
         } finally {
           setIsLoading(false)
         }

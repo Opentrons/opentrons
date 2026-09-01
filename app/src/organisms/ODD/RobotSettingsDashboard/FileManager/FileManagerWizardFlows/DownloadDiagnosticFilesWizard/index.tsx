@@ -33,12 +33,12 @@ export function DownloadDiagnosticFilesWizard({
   const [step, setStep] = useState<StepType>(STEP_TYPES.USB)
   const [errorSubText, setErrorSubText] = useState('')
 
-  const { downloadLogs } = useDownloadRobotLogs(robotName)
+  const { mutateAsync: downloadLogs } = useDownloadRobotLogs(robotName)
   const { downloadCalibration } = useDownloadCalibrationData(robotName)
 
   const handleContinueFromUsb = (usbPath: string): void => {
     setStep(STEP_TYPES.DOWNLOADING)
-    Promise.all([downloadLogs(usbPath), downloadCalibration(usbPath)])
+    Promise.all([downloadLogs({ usbPath }), downloadCalibration(usbPath)])
       .then(() => {
         setStep(STEP_TYPES.SUCCESS)
       })

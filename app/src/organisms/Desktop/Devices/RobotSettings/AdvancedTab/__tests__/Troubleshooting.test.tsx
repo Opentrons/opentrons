@@ -111,10 +111,13 @@ describe('RobotSettings Troubleshooting', () => {
       downloadLogsButton.click()
     })
 
-    expect(downloadLogsButton).toBeDisabled()
     expect(MOCK_MAKE_TOAST).toBeCalledWith('Downloading logs...', 'info', {
       disableTimeout: true,
       icon: { name: 'ot-spinner', spin: true },
+    })
+
+    await waitFor(() => {
+      expect(downloadLogsButton).toBeDisabled()
     })
 
     await waitFor(

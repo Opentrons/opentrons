@@ -9,7 +9,9 @@ import {
   StyledText,
   Tag,
 } from '@opentrons/components'
+import { useDeleteRunMutation } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { DisplayRunStatus } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/DisplayRunStatus'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import { EMPTY_TIMESTAMP } from '/app/resources/runs'
@@ -67,6 +69,11 @@ export function HistoricalProtocolRun(
     }
   }
 
+  const documentationState = useDocumentationState()
+
+  const { deleteRun, isLoading: isDeletingRunSingle } =
+    useDeleteRunMutation(documentationState)
+
   return (
     <>
       <Flex
@@ -114,7 +121,7 @@ export function HistoricalProtocolRun(
             <Tag type="default" text={duration} shrinkToContent />
           </Flex>
         </Flex>
-        {isDeleting ? (
+        {isDeleting || isDeletingRunSingle ? (
           <Icon name="ot-spinner" spin size="1rem" color={COLORS.grey60} />
         ) : (
           <OverflowMenu
@@ -122,6 +129,8 @@ export function HistoricalProtocolRun(
             robotName={robotName}
             robotIsBusy={robotIsBusy}
             runHasImages={imageFileCount > 0}
+            deleteRun={deleteRun}
+            isDeletingRun={isDeletingRunSingle}
           />
         )}
       </Flex>

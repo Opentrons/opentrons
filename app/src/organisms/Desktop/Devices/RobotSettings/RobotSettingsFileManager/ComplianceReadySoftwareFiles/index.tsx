@@ -127,15 +127,15 @@ export function ComplianceReadySoftwareFiles({
         )
         await downloadLogPeriodsMutation
           .mutateAsync({ logPeriods })
-          .catch((error: Error) => {
-            makeToast(error.message, ERROR_TOAST, TOAST_STYLE)
-          })
           .then(() => {
             makeToast(
               t('files_successfully_downloaded') as string,
               SUCCESS_TOAST,
               TOAST_STYLE
             )
+          })
+          .catch((error: Error) => {
+            makeToast(error.message, ERROR_TOAST, TOAST_STYLE)
           })
           .finally(() => {
             eatToast(toastId)

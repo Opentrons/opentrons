@@ -1,0 +1,17 @@
+.overflow_button {
+  display: flex;
+  width: 3rem;
+  height: 3.75rem;
+  border-radius: var(--border-radius-8);
+  background-color: transparent;
+  cursor: default;
+
+  &:hover {
+    background-color: var(--grey-30);
+  }
+
+  &:active,
+  &:focus {
+    background-color: var(--grey-35);
+  }
+}

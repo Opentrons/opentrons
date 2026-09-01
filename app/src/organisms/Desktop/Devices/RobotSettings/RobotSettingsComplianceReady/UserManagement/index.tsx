@@ -17,11 +17,11 @@ import { useDocumentationState } from '/app/local-resources/access-control/useDo
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useUsernameForRobot } from '/app/redux/robot-auth'
 
-import { Accordion } from './Accordion'
+import { Accordion } from '../Accordion'
+import { SettingsConfirmationModal } from '../SettingsConfirmationModal'
+import { OneTimePasswordModal } from '../userAccount/OneTimePasswordModal'
 import { AddUserModal } from './AddUserModal'
 import { EditUserModal } from './EditUserModal'
-import { OneTimePasswordModal } from './userAccount/OneTimePasswordModal'
-import { UserAccountConfirmModal } from './userAccount/UserAccountConfirmModal'
 import styles from './usermanagement.module.css'
 import { UserManagementTableRow } from './UserManagementTableRow'
 
@@ -52,33 +52,23 @@ function UserManagementTable({
   const { t } = useTranslation('device_settings')
 
   return (
-    <table className={styles.table}>
-      <thead>
-        <tr>
-          <th className={styles.header_cell}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('desktop_username')}
-            </StyledText>
-          </th>
-          <th className={styles.header_cell}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('desktop_legal_name')}
-            </StyledText>
-          </th>
-          <th className={styles.header_cell}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('desktop_role')}
-            </StyledText>
-          </th>
-          <th className={styles.header_cell}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('desktop_status')}
-            </StyledText>
-          </th>
-          <th className={styles.header_cell} aria-hidden />
-        </tr>
-      </thead>
-      <tbody>
+    <div className={styles.list}>
+      <div className={styles.header_row}>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('desktop_username')}
+        </StyledText>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('desktop_legal_name')}
+        </StyledText>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('desktop_role')}
+        </StyledText>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('desktop_status')}
+        </StyledText>
+        <span className={styles.overflow_cell_inner} aria-hidden />
+      </div>
+      <div className={styles.rows}>
         {users.map(user => (
           <UserManagementTableRow
             key={user.username}
@@ -90,8 +80,8 @@ function UserManagementTable({
             onDeactivate={onDeactivate}
           />
         ))}
-      </tbody>
-    </table>
+      </div>
+    </div>
   )
 }
 
@@ -222,23 +212,25 @@ export function UserManagement({
 
   return (
     <Accordion id="user-management" title={t('desktop_user_management')}>
-      <UserManagementTable
-        users={users}
-        onEdit={setUserToEdit}
-        onDelete={setUserToDelete}
-        onActivate={setUserToActivate}
-        onResetPassword={setUserToResetPassword}
-        onDeactivate={setUserToDeactivate}
-      />
-      <div className={styles.add_user_button}>
-        <EmptySelectorButton
-          iconName="plus"
-          onClick={() => {
-            setShowAddUserModal(true)
-          }}
-          text={t('desktop_add_user')}
-          textAlignment="left"
+      <div className={styles.content}>
+        <UserManagementTable
+          users={users}
+          onEdit={setUserToEdit}
+          onDelete={setUserToDelete}
+          onActivate={setUserToActivate}
+          onResetPassword={setUserToResetPassword}
+          onDeactivate={setUserToDeactivate}
         />
+        <div className={styles.add_user_button}>
+          <EmptySelectorButton
+            iconName="plus"
+            onClick={() => {
+              setShowAddUserModal(true)
+            }}
+            text={t('desktop_add_user')}
+            textAlignment="left"
+          />
+        </div>
       </div>
       {showAddUserModal ? (
         <AddUserModal
@@ -272,7 +264,7 @@ export function UserManagement({
         />
       ) : null}
       {userToDelete != null ? (
-        <UserAccountConfirmModal
+        <SettingsConfirmationModal
           title={t('desktop_delete_user_modal_title') as string}
           heading={t('desktop_delete_user_modal_heading') as string}
           description={t('desktop_delete_user_modal_description') as string}
@@ -284,7 +276,7 @@ export function UserManagement({
         />
       ) : null}
       {userToActivate != null ? (
-        <UserAccountConfirmModal
+        <SettingsConfirmationModal
           title={t('desktop_activate_user_modal_title') as string}
           heading={t('desktop_activate_user_modal_heading') as string}
           description={t('desktop_activate_user_modal_description') as string}
@@ -297,7 +289,7 @@ export function UserManagement({
         />
       ) : null}
       {userToDeactivate != null ? (
-        <UserAccountConfirmModal
+        <SettingsConfirmationModal
           title={t('desktop_lock_user_modal_title') as string}
           heading={t('desktop_lock_user_modal_heading') as string}
           description={t('desktop_lock_user_modal_description') as string}
@@ -310,7 +302,7 @@ export function UserManagement({
         />
       ) : null}
       {userToResetPassword != null && resetPasswordTemporaryPassword == null ? (
-        <UserAccountConfirmModal
+        <SettingsConfirmationModal
           title={t('desktop_reset_password') as string}
           heading={t('desktop_reset_password_modal_heading') as string}
           description={t('desktop_reset_password_modal_description') as string}

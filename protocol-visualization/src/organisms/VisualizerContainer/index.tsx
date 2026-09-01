@@ -297,18 +297,20 @@ export function ProtocolVisualization(
             }}
             selectedRunTimeCommand={selectedRunTimeCommand}
           />
-          <PlayBackControls
-            isPlaying={isPlaying}
-            handlePlayPause={handlePlayPause}
-            currentCommandIndex={filteredSelectedCommandIndex}
-            numCommandLength={filteredCommands.length}
-            commands={filteredCommands}
-            setSelectedCommand={setSelectedCommand}
-            milliSecondsPerFrame={milliSecondsPerFrame}
-            setMilliSecondsPerFrame={setMilliSecondsPerFrame}
-            showStepDetails={showStepDetails}
-            onClickStepDetails={setShowStepDetails}
-          />
+          <div className={styles.controls_container}>
+            <PlayBackControls
+              isPlaying={isPlaying}
+              handlePlayPause={handlePlayPause}
+              currentCommandIndex={filteredSelectedCommandIndex}
+              numCommandLength={filteredCommands.length}
+              commands={filteredCommands}
+              setSelectedCommand={setSelectedCommand}
+              milliSecondsPerFrame={milliSecondsPerFrame}
+              setMilliSecondsPerFrame={setMilliSecondsPerFrame}
+              showStepDetails={showStepDetails}
+              onClickStepDetails={setShowStepDetails}
+            />
+          </div>
         </div>
         {/* Gutter between center & right */}
         <div

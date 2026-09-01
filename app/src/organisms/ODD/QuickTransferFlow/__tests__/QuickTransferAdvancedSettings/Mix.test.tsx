@@ -2,8 +2,6 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { TouchInputField } from '@opentrons/components'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
@@ -15,14 +13,6 @@ import type { QuickTransferSummaryState } from '../../types'
 
 vi.mock('/app/redux-resources/analytics')
 vi.mock('../utils')
-
-vi.mock('@opentrons/components', async importOriginal => {
-  const actualComponents = await importOriginal<typeof TouchInputField>()
-  return {
-    ...actualComponents,
-    TouchInputField: vi.fn(),
-  }
-})
 
 const render = (props: ComponentProps<typeof Mix>) => {
   return renderWithProviders(<Mix {...props} />, {
@@ -103,17 +93,7 @@ describe('Mix', () => {
     await user.click(enabledBtn)
     const continueBtn = screen.getByText('Continue')
     await user.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Mix volume (µL)',
-        error: null,
-        type: 'number',
-        value: null,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Mix volume (µL)')).toHaveValue('')
   })
 
   it('calls dispatch button if you select disabled and save', async () => {
@@ -136,17 +116,8 @@ describe('Mix', () => {
     await user.click(continueBtn)
     const oneButton = screen.getByText('0')
     await user.click(oneButton)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Mix volume (µL)',
-        error: 'Value must be between 1 to 200',
-        type: 'number',
-        value: 0,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Mix volume (µL)')).toHaveValue('0')
+    screen.getByText('Value must be between 1 to 200')
     const nextBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(nextBtn).toBeDisabled()
   })
@@ -164,17 +135,8 @@ describe('Mix', () => {
     await user.click(nextBtn)
     const zeroButton = screen.getByText('0')
     await user.click(zeroButton)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Mix repetitions',
-        error: 'Value must be between 1 to 999',
-        type: 'number',
-        value: 0,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Mix repetitions')).toHaveValue('0')
+    screen.getByText('Value must be between 1 to 999')
     const saveBtn = screen.getByTestId('ChildNavigation_Primary_Button')
     expect(saveBtn).toBeDisabled()
   })
@@ -213,29 +175,9 @@ describe('Mix', () => {
     render(props)
     const continueBtn = screen.getByText('Continue')
     await user.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Mix volume (µL)',
-        error: null,
-        type: 'number',
-        value: 15,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Mix volume (µL)')).toHaveValue('15')
     await user.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Mix repetitions',
-        error: null,
-        type: 'number',
-        value: 55,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Mix repetitions')).toHaveValue('55')
   })
 
   it('persists previously set value saved in state for dispense', async () => {
@@ -254,28 +196,8 @@ describe('Mix', () => {
     render(props)
     const continueBtn = screen.getByText('Continue')
     await user.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Mix volume (µL)',
-        error: null,
-        type: 'number',
-        value: 18,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Mix volume (µL)')).toHaveValue('18')
     await user.click(continueBtn)
-    expect(vi.mocked(TouchInputField)).toHaveBeenCalledWith(
-      {
-        autoFocus: true,
-        label: 'Mix repetitions',
-        error: null,
-        type: 'number',
-        value: 2,
-        onChange: expect.any(Function),
-      },
-      {}
-    )
+    expect(screen.getByLabelText('Mix repetitions')).toHaveValue('2')
   })
 })

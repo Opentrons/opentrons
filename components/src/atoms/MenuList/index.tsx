@@ -10,14 +10,22 @@ import { SPACING } from '../../ui-style-constants'
 
 import type { MouseEventHandler, ReactNode } from 'react'
 
+const MENU_OFFSET = '2.6rem'
+
 interface MenuListProps {
   children: ReactNode
   isOnDevice?: boolean
   onClick?: MouseEventHandler
+  opensUpward?: boolean
 }
 
 export const MenuList = (props: MenuListProps): JSX.Element | null => {
-  const { children, isOnDevice = false, onClick = null } = props
+  const {
+    children,
+    isOnDevice = false,
+    onClick = null,
+    opensUpward = false,
+  } = props
   return isOnDevice && onClick != null ? (
     <ModalShell
       borderRadius={BORDERS.borderRadius16}
@@ -34,12 +42,13 @@ export const MenuList = (props: MenuListProps): JSX.Element | null => {
     </ModalShell>
   ) : (
     <Flex
+      data-testid="MenuList" // todo (kk: 2026-08-25): replace data-testid with aria-label + role when refactoring this component
       borderRadius="4px 4px 0px 0px"
       zIndex={10}
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
       position={POSITION_ABSOLUTE}
       backgroundColor={COLORS.white}
-      top="2.6rem"
+      {...(opensUpward ? { bottom: MENU_OFFSET } : { top: MENU_OFFSET })}
       // todo(mm, 2026-05-28): This `right` value seems wrong.
       //
       // It means "place the right of the MenuList 4px to the left of the center of the

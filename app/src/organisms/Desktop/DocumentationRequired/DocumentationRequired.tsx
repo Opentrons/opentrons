@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -40,6 +40,8 @@ export function DocumentationRequired({
   const [inputText, setInputText] = useState<string>(initialDocreport ?? '')
   const [error, setError] = useState<string | null>(null)
 
+  const formId = useId()
+
   const handleInputChange = (value: string): void => {
     setInputText(value)
     setError(null)
@@ -65,7 +67,7 @@ export function DocumentationRequired({
   const footer = (
     <div className={styles.button_container}>
       <SecondaryButton onClick={onClose}>{t('cancel_action')}</SecondaryButton>
-      <PrimaryButton onClick={handleConfirm}>
+      <PrimaryButton type="submit" form={formId}>
         {t('shared:confirm')}
       </PrimaryButton>
     </div>
@@ -82,10 +84,11 @@ export function DocumentationRequired({
       overflowY="hidden"
       footer={footer}
     >
-      <div className={styles.container}>
+      <form className={styles.container} id={formId} onSubmit={handleConfirm}>
         <div className={styles.text_area_container}>
           <div className={styles.text_area_field_fill}>
             <TextAreaField
+              autoFocus
               multiline
               value={inputText}
               error={error}
@@ -108,7 +111,7 @@ export function DocumentationRequired({
             className={styles.action_list}
           />
         </div>
-      </div>
+      </form>
     </Modal>
   )
 }

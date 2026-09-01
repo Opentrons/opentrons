@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
-import { PasswordInputField } from '../PasswordInputField'
+import { PasswordInputField } from '..'
 
 import type { ComponentProps } from 'react'
 
@@ -40,29 +40,47 @@ describe('PasswordInputField', () => {
     )
   })
 
-  it('reveals the password when the visibility toggle is clicked', () => {
+  it('renders a Show button by default', () => {
+    render(props)
+    screen.getByRole('button', { name: 'Show' })
+  })
+
+  it('reveals the password when the Show button is clicked', () => {
     render({ ...props, value: 'secret' })
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Toggle password visibility' })
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
     const input = screen.getByDisplayValue('secret')
     expect(input).toHaveAttribute('type', 'text')
     expect(input).toHaveValue('secret')
+    screen.getByRole('button', { name: 'Hide' })
   })
 
-  it('keeps focus on the password input when the visibility toggle is clicked', async () => {
+  it('keeps focus on the password input when the Show button is clicked', async () => {
     const user = userEvent.setup()
     render({ ...props, value: 'secret' })
     const input = screen.getByDisplayValue('secret')
     input.focus()
     expect(input).toHaveFocus()
 
-    await user.click(
-      screen.getByRole('button', { name: 'Toggle password visibility' })
-    )
+    await user.click(screen.getByRole('button', { name: 'Show' }))
 
     expect(input).toHaveFocus()
     expect(input).toHaveAttribute('type', 'text')
+  })
+
+  it('places caret at end when toggling password visibility', async () => {
+    const user = userEvent.setup()
+    render({ ...props, value: 'secret' })
+    const input = screen.getByDisplayValue<HTMLInputElement>('secret')
+    input.focus()
+    input.setSelectionRange(3, 3)
+    expect(input.selectionStart).toBe(3)
+    expect(input.selectionEnd).toBe(3)
+
+    await user.click(screen.getByRole('button', { name: 'Show' }))
+
+    expect(input).toHaveFocus()
+    expect(input.selectionStart).toBe(input.value.length)
+    expect(input.selectionEnd).toBe(input.value.length)
   })
 
   it('calls onChange when the value changes', () => {

@@ -23,11 +23,15 @@ export function FileManagementSectionHeader(
       <StyledText desktopStyle="bodyLargeSemiBold">{titleText}</StyledText>
       {showButtons ? (
         <div className={styles.file_management_header_button_group}>
-          <BasicButton onClick={onDownloadSelected} iconName="download">
+          <BasicButton
+            onClick={onDownloadSelected}
+            iconName="download"
+            underLine
+          >
             {t('download_selected')}
           </BasicButton>
           {onDeleteSelected != null ? (
-            <BasicButton onClick={onDeleteSelected}>
+            <BasicButton onClick={onDeleteSelected} underLine>
               {t('delete_selected')}
             </BasicButton>
           ) : null}
