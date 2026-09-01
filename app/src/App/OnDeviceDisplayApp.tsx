@@ -278,9 +278,9 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                           />
                         ) : null}
 
-                        <NiceModal.Provider>
-                          <RobotEncryptionKeyTakeover>
-                            <ToasterOven>
+                        <ToasterOven>
+                          <NiceModal.Provider>
+                            <RobotEncryptionKeyTakeover>
                               <ProtocolReceiptToasts />
                               {!showModuleSetupModal ? (
                                 <ModuleAttachedToasts
@@ -294,9 +294,9 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                                 <OnDeviceDisplayAppRoutes />
                               </SharedScrollRefProvider>
                               <LoggedOutOverlayMount />
-                            </ToasterOven>
-                          </RobotEncryptionKeyTakeover>
-                        </NiceModal.Provider>
+                            </RobotEncryptionKeyTakeover>
+                          </NiceModal.Provider>
+                        </ToasterOven>
                       </MaintenanceRunTakeover>
                     </RobotUpdateProvider>
                   </DocumentationRequiredModalContext.Provider>
