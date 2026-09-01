@@ -77,6 +77,7 @@ export function SignRunModal({
     popToast,
     eatToast,
     documentationState,
+    false,
     onSigned
   )
 

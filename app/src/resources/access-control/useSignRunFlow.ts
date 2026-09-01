@@ -41,6 +41,7 @@ export function useSignRunFlow(
   popToast: () => void,
   eatToast: () => void,
   documentationState: DocumentationState,
+  isOnDevice: boolean,
   onSigned?: () => void
 ): SignRunFlowResult {
   const queryClient = useQueryClient()
@@ -117,9 +118,25 @@ export function useSignRunFlow(
         logout()
         popToast()
         queryClient.removeQueries(getSelfQueryKey(host))
-      // prompt for login
-      // eslint-disable-next-line no-fallthrough -- just being cute :)
+        setLoginInFlight(true)
+        void showLoginModal({ robotName, uncloseable: true })
+          .then(result => {
+            if (result == null) {
+              eatToast()
+              setLoginInFlight(false)
+              return
+            }
+            setRefetchSelf(true)
+          })
+          .catch(() => {
+            eatToast()
+            setLoginInFlight(false)
+          })
+        break
       case 'idle':
+        if (isOnDevice) {
+          break
+        }
         setLoginInFlight(true)
         void showLoginModal({ robotName, uncloseable: true })
           .then(result => {
@@ -153,6 +170,7 @@ export function useSignRunFlow(
     queryClient,
     robotName,
     showLoginModal,
+    isOnDevice,
   ])
 
   const signRun = useCallback(
