@@ -2,6 +2,7 @@ import { useCallback, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
+import clsx from 'clsx'
 
 import {
   POSITION_FIXED,
@@ -11,6 +12,7 @@ import {
 } from '@opentrons/components'
 import { useAuthSettingsQuery } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { getLocalRobot } from '/app/redux/discovery'
 import { useUsernameForRobot } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
@@ -105,8 +107,9 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
     [submitPassword]
   )
 
+  const documentationState = useDocumentationState()
   const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
-    useSetNewPasswordAndSignIn({
+    useSetNewPasswordAndSignIn(documentationState, {
       onSuccess: handleNewPasswordSuccess,
       onError: message => {
         setLoginError(message)
@@ -138,7 +141,12 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
       : loginUsername
 
   return (
-    <div className={styles.overlay}>
+    <div
+      className={clsx(
+        styles.overlay,
+        isChoosingNewPassword && styles.overlay_below_documentation
+      )}
+    >
       <OnDeviceLogin
         key={phase}
         step={step}
