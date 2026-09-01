@@ -7,10 +7,10 @@ A Vite app and Playwright suite for exercising **packed** builds of:
 - `@opentrons/step-generation`
 - `@opentrons/protocol-visualization`
 
-The demo app includes two pages: a **Deck map** page built with
-**ProtocolDeck** from `@opentrons/components`, and a **Protocol visualization**
-page built with `@opentrons/protocol-visualization`. Visual regression uses
-**Applitools Eyes**, not committed screenshots.
+The demo app includes two pages: a **Deck map** page with Flex and OT-2
+**ProtocolDeck** views from `@opentrons/components`, and a **Protocol
+visualization** page built with `@opentrons/protocol-visualization`. Visual
+regression uses **Applitools Eyes**, not committed screenshots.
 
 This project is the **reference external consumer**. It installs the four
 packages the way another app would (pack, patch manifests, link, install peer
@@ -209,6 +209,47 @@ what an external app must install (React, i18n, the four packages). Test tooling
 - **Legacy CI tag publishes** for `components@*` / `shared-data@*` tags may not
   match `publish.mts` output. Prefer `publish.mts` for all four packages.
 
+## Protocol fixtures
+
+Deck / visualization demos use paired protocol + analysis files under `src/`:
+
+| File                                       | Role                                                                                                                                                       |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Flex_Smoke_2_27.py`                       | Flex smoke source (API 2.27, 2 stackers + waste chute). From `analyses-snapshot-testing/.../Flex_S_2_7_P200_96_GRIP_HS_MB_TC_TM_SmokeTestWith2Stackers.py` |
+| `StackerAnalysis.json`                     | Analysis of the Flex smoke protocol                                                                                                                        |
+| `OT2_Smoke_2_19.py`                        | OT-2 smoke source (API 2.19, HS + TC + TM). From `opentrons-ot2` `.../OT2_S_v2_19_P300M_P20S_HS_TC_TM_SmokeTestV3.py`                                      |
+| `OT2_Smoke_2_19_cpx_4_tuberack_100ul.json` | Custom labware for the OT-2 smoke protocol                                                                                                                 |
+| `ot2Analysis.json`                         | Analysis of the OT-2 smoke protocol (regenerate from `opentrons-ot2`)                                                                                      |
+
+Keep each pair side by side so visual diffs can be traced to protocol commands.
+
+### Regenerate Flex analysis
+
+From the monorepo root (requires `api/.venv`):
+
+```bash
+api/.venv/bin/python -m opentrons.cli analyze \
+  js-package-testing/src/Flex_Smoke_2_27.py \
+  --check \
+  --json-output=js-package-testing/src/StackerAnalysis.json
+```
+
+Pretty-print the JSON afterward if you want readable diffs. Accept Applitools baselines after intentional analysis changes.
+
+### Regenerate OT-2 analysis
+
+This monorepo rejects OT-2 protocol analysis. Use the `opentrons-ot2` API venv (sibling checkout):
+
+```bash
+# from the Flex monorepo root; paths assume ../opentrons-ot2
+../opentrons-ot2/api/.venv/bin/python -m opentrons.cli analyze \
+  js-package-testing/src/OT2_Smoke_2_19_cpx_4_tuberack_100ul.json \
+  js-package-testing/src/OT2_Smoke_2_19.py \
+  --json-output=js-package-testing/src/ot2Analysis.json
+```
+
+Custom labware must be passed before the protocol file.
+
 ## Applitools Eyes
 
 Visual checks use [`@applitools/eyes-playwright`](https://www.npmjs.com/package/@applitools/eyes-playwright) with the fixture-based `eyes.check()` API. Baselines and diffs live in Applitools, not in this repo.
@@ -229,6 +270,15 @@ pnpm exec playwright show-report
 ```
 
 Use the Applitools UI to accept or reject visual changes when baselines need updating.
+
+Locally, Eyes diffs are reported but do not fail Playwright (`failTestsOnDiff` is off
+unless `CI` is set or you export `APPLITOOLS_FAIL_ON_DIFF=true`). CI still fails on
+diffs until baselines are accepted. To ignore diffs in any environment:
+
+```bash
+make test-ignore-diffs
+# or: APPLITOOLS_FAIL_ON_DIFF=false make test
+```
 
 ## Quick start
 
@@ -334,7 +384,11 @@ js-package-testing/
 │   ├── i18n.ts
 │   ├── styles.css
 │   ├── locale/en/protocol_visualization.json
-│   └── StackerAnalysis.json
+│   ├── Flex_Smoke_2_27.py
+│   ├── StackerAnalysis.json
+│   ├── OT2_Smoke_2_19.py
+│   ├── OT2_Smoke_2_19_cpx_4_tuberack_100ul.json
+│   └── ot2Analysis.json
 └── tests/
     ├── protocolDeck.spec.ts
     └── protocolVisualization.spec.ts
@@ -376,3 +430,5 @@ The bundled CSS for these packages uses **per-module hashed scoped names** (`[na
 - `protocol-visualization/vite.config.mts` -> `css.modules.generateScopedName`
 
 If a future change reverts those scoped names back to `'[local]'`, expect cross-component class collisions in the packed `lib/style.css` (for example the right rail panel collapsing, deck slot labels misrendering, or footer text getting clipped) because many modules share generic class names. The fix is to keep the hashed scoped name pattern in those library `vite.config.mts` files, not to add per-class overrides in this consumer.
+
+`PlayBackControls` uses `position: fixed`. The demo host (`.protocol_visualization_demo`) applies `transform: translateZ(0)` so that fixed bar is contained in the visualization frame rather than the browser viewport. Do not remove that transform without replacing it with another containing-block strategy.

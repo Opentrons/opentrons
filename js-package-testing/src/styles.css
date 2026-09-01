@@ -2,6 +2,13 @@
 @import url('@fontsource/public-sans/600.css');
 @import url('@fontsource/public-sans/700.css');
 
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
 * {
   font-family: 'Public Sans', sans-serif;
 }
@@ -11,8 +18,22 @@
   padding: var(--spacing-16);
 }
 
+.app_container_visualization {
+  display: flex;
+  overflow: hidden;
+  max-width: none;
+  height: 100vh;
+  box-sizing: border-box;
+  flex-direction: column;
+}
+
 .demo_header {
   margin-bottom: var(--spacing-32);
+}
+
+.app_container_visualization .demo_header {
+  flex-shrink: 0;
+  margin-bottom: var(--spacing-12);
 }
 
 .demo_lead {
@@ -20,11 +41,19 @@
   line-height: var(--lh-copy);
 }
 
+.app_container_visualization .demo_lead {
+  display: none;
+}
+
 .demo_nav {
   display: flex;
   flex-wrap: wrap;
   margin-top: var(--spacing-16);
   gap: var(--spacing-16);
+}
+
+.app_container_visualization .demo_nav {
+  margin-top: var(--spacing-8);
 }
 
 .demo_nav a {
@@ -42,6 +71,17 @@
   border-bottom: none;
 }
 
+.deck_map_grid {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--spacing-24);
+  gap: var(--spacing-32);
+}
+
+.deck_map_panel {
+  max-width: 75rem;
+}
+
 .analysis_info {
   padding: var(--spacing-16);
   margin-top: var(--spacing-16);
@@ -51,7 +91,8 @@
 
 .protocol_deck_container {
   overflow: hidden;
-  width: 75rem;
+  width: 100%;
+  max-width: 75rem;
   height: 50rem;
   box-sizing: border-box;
   padding: var(--spacing-16);
@@ -70,7 +111,44 @@
   background-color: var(--white);
 }
 
+.protocol_visualization_section {
+  display: flex;
+  max-width: none;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  padding-bottom: 0;
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.protocol_visualization_toolbar {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: var(--spacing-8);
+  gap: var(--spacing-16);
+}
+
 .protocol_visualization_demo {
+  /*
+   * PlayBackControls in @opentrons/protocol-visualization uses position: fixed
+   * (viewport-anchored). A transform on this host makes that fixed positioning
+   * relative to the demo frame so the play bar stays inside the visualization
+   * instead of floating on the page.
+   */
+  position: relative;
+  overflow: hidden;
   width: 100%;
-  height: 700px;
+  min-height: 0;
+  flex: 1;
+  border: 0.0625rem solid var(--grey-35);
+  border-radius: var(--border-radius-8);
+  background-color: var(--grey-10);
+  transform: translateZ(0);
+}
+
+.protocol_visualization_demo > [class*='layout_container'] {
+  height: 100%;
 }
