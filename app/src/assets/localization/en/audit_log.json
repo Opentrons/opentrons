@@ -72,6 +72,7 @@
   "sync_system_time": "Syncing robot system time",
   "toggle_analytics": "Toggling analytics",
   "toggle_devtools": "Toggling devtools",
+  "unlock_user": "Unlocking user account",
   "update_audit_settings": "Updating audit log settings",
   "update_auth_settings": "Updating authentication settings",
   "update_camera": "Updating camera settings",

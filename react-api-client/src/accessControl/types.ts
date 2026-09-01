@@ -199,6 +199,7 @@ export type AuditLogAction =
   | 'change_language'
   | 'toggle_analytics'
   | 'download_log_period'
+  | 'unlock_user'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.
