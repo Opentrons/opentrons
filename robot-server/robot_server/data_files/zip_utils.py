@@ -4,7 +4,9 @@ import asyncio
 import tempfile
 import zipfile
 from pathlib import Path
-from typing import Callable, Final, List, Optional, Tuple, Union
+from typing import AsyncIterator, Callable, Final, List, Optional, Tuple, Union
+
+from zipstream import ZIP_DEFLATED, ZipStream
 
 from opentrons import config
 from opentrons_shared_data.data_files import MimeType
@@ -109,6 +111,17 @@ def _write_zip_file(entries: List[Tuple[Path, str]], zip_path: Path) -> None:
     ) as zip_file:
         for source_path, archive_name in entries:
             zip_file.write(source_path, arcname=archive_name)
+
+
+async def run_zip_generator(
+    entries: List[Tuple[Path, str]],
+    staging_dir: Path,
+) -> AsyncIterator[bytes]:
+    run_zip_stream = ZipStream(compress_type=ZIP_DEFLATED)
+    for source_path, archive_name in entries:
+        run_zip_stream.add_path(source_path, archive_name)
+    async for chunk in run_zip_stream:
+        yield chunk
 
 
 async def write_zip_for_download(
