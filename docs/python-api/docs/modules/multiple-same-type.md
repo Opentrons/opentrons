@@ -45,12 +45,12 @@ metadata = {"apiLevel": "{{ apiLevel }}"}
 def run(protocol: protocol_api.ProtocolContext):
     # Load Temperature Module 1 in deck slot C1 on USB port 1
     temperature_module_1 = protocol.load_module(
-        load_name="temperature module gen2", location="1"
+        module_name="temperature module gen2", location="1"
     )
 
     # Load Temperature Module 2 in deck slot D3 on USB port 2
     temperature_module_2 = protocol.load_module(
-        load_name="temperature module gen2", location="3"
+        module_name="temperature module gen2", location="3"
     )
 ```
 The Temperature Modules are connected as shown here:

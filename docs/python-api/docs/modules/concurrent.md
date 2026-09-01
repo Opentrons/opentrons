@@ -65,14 +65,14 @@ Let's say your samples have to both reach a target temperature and incubate for 
 ```python
 
 # set Heater-Shaker temperature and shake speed
-heat_task = hs_mod.start_set_temperature(75)
+heat_task = hs_mod.set_target_temperature(75)
 hs_mod.set_shake_speed(300)
 
 # wait for module to finish heating
 protocol.wait_for_tasks([heat_task])
 
 # create timer for sample incubation
-hs_timer = create_timer(seconds=300)
+hs_timer = protocol.create_timer(seconds=300)
 
 # hold samples at target temperature
 protocol.wait_for_tasks([hs_timer])

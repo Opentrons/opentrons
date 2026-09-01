@@ -67,6 +67,28 @@ jobs:
             docs/site/
           retention-days: 1
 
+  test-docs-snippets:
+    name: Test docs snippets
+    timeout-minutes: 5
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - name: Setup UV
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
+        with:
+          python-version: '3.12'
+          enable-cache: true
+          cache-dependency-glob: './docs/uv.lock'
+      - name: Setup Docs Dependencies
+        working-directory: ./docs
+        run: make setup
+      - name: Test Docs Snippets
+        working-directory: ./docs
+        run: make test
+
   determine-deploy-config:
     name: Determine Deployment Configuration
     runs-on: ubuntu-24.04

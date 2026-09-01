@@ -24,6 +24,7 @@ Jupyter Notebook is structured around *cells*: discrete chunks of code that can 
 
 Rather than writing a `run()` function and embedding commands within it, start your notebook by importing `opentrons.execute` and calling [`opentrons.execute.get_protocol_api()`][opentrons.execute.get_protocol_api]. This function also replaces the `metadata` block of a standalone protocol by taking the minimum [API version](../versioning.md) as its argument. Then you can call [`ProtocolContext`][opentrons.protocol_api.ProtocolContext] methods in subsequent lines or cells:
 
+<!-- test: syntax-only -->
 ```python
 import opentrons.execute
 protocol = opentrons.execute.get_protocol_api("{{ apiLevel }}")
@@ -38,6 +39,7 @@ You should use the same [`ProtocolContext`][opentrons.protocol_api.ProtocolConte
 
 You can also use Jupyter to run a protocol that you have already written. To do so, first copy the entire text of the protocol into a cell and run that cell:
 
+<!-- test: skip -->
 ```python
 import opentrons.execute
 from opentrons import protocol_api
@@ -47,6 +49,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
 Since a typical protocol only *defines* the `run()` function but doesn't call it, this won't immediately cause the robot to move. To begin the run, instantiate a `ProtocolContext` and pass it to the `run()` function you just defined:
 
+<!-- test: syntax-only -->
 ```python
 protocol = opentrons.execute.get_protocol_api("{{ apiLevel }}")
 run(protocol)  # your protocol will now run

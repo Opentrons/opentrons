@@ -78,6 +78,8 @@ You can't use a reference wavelength when performing multiple measurements.
 ## Reading a plate
 
 Use [`AbsorbanceReaderContext.read()`][opentrons.protocol_api.AbsorbanceReaderContext.read] to have the module read the plate, using the parameters that you specified during initialization:
+
+<!-- test: continue-previous -->
 ```python
 pr_data = pr_mod.read()
 ```
@@ -86,6 +88,8 @@ pr_data = pr_mod.read()
 The `read()` method returns the results in a dictionary, which the above example saves to the variable `pr_data`.
 
 If you need to access this data after the conclusion of your protocol, add the `export_filename` parameter to instruct the API to output a CSV file, which is available in the Opentrons App by going to your Flex and viewing Recent Protocol Runs:
+
+<!-- test: continue-previous -->
 ```python
 pr_data = pr_mod.read(export_filename="plate_data")
 ```
@@ -119,6 +123,8 @@ pr_data[600]["H12"]  # value for well H12 at 600 nm
 pr_data[450]         # dict of all wells at 450 nm
 ```
 You can write additional code to transform this data in any way that you need. For example, you could use a list comprehension to create a list of only the 450 nm values for column 1, ordered by well from A1 to H1:
+
+<!-- test: continue-previous -->
 ```python
 [pr_data[450][w.well_name] for w in plate.columns()[0]]
 ```
