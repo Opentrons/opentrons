@@ -37,8 +37,8 @@ describe('DisableVacuumModuleWasteDetection', () => {
 
   it('should render text and toggle button', () => {
     render(props)
-    screen.getByText("Disable Vacuum Module's Waste Full Detection")
-    screen.getByText("Applies for all connected Vacuum Modules.")
+    screen.getByText("Disable Vacuum Module waste detection")
+    screen.getByText("Applies to all connected Vacuum Modules.")
     expect(
       screen.getByLabelText('disable_vacuum_module_waste_detection')
     ).toBeInTheDocument()
