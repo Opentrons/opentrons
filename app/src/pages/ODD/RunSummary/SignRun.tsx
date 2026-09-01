@@ -78,6 +78,7 @@ export function SignRun({
       popToast,
       eatToast,
       documentationState,
+      true,
       onSigned
     )
 
@@ -215,5 +216,6 @@ const SignRunModalImpl = NiceModal.create(
 )
 
 /** Open the ODD sign-run modal and await whether the run was signed. */
-export const showSignRunModal = (): Promise<boolean> =>
-  NiceModal.show(SignRunModalImpl)
+export const showSignRunModal = (
+  documentationState: DocumentationState
+): Promise<boolean> => NiceModal.show(SignRunModalImpl, { documentationState })
