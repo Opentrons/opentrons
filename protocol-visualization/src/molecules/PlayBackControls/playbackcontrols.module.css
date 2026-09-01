@@ -1,13 +1,14 @@
 .container {
-  position: fixed;
+  position: absolute;
   z-index: 10;
-  bottom: 2rem;
-  left: 50%;
+  right: var(--spacing-40);
+  bottom: var(--spacing-32);
+  left: var(--spacing-40);
   display: flex;
   overflow: visible;
-  width: 100%;
-  min-width: 26.25rem;
-  max-width: 43.75rem;
+  width: auto;
+  min-width: 21.25rem; /* 340px */
+  max-width: 50rem; /* 800px */
   height: 4.5rem;
   box-sizing: border-box;
   align-items: center;
@@ -15,7 +16,6 @@
   border-radius: var(--border-radius-full);
   background-color: var(--white);
   box-shadow: 0 0 6px 1px rgb(22 33 45 / 15%);
-  transform: translateX(-50%);
 }
 
 .controls_left {
