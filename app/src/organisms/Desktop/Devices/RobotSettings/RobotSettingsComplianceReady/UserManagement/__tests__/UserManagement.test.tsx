@@ -170,7 +170,9 @@ describe('UserManagement', () => {
       },
     })
 
-    expect(useUsersQuery).toHaveBeenCalledWith({ enabled: false })
+    expect(useUsersQuery).toHaveBeenLastCalledWith(
+      expect.objectContaining({ enabled: false })
+    )
     expandAccordion()
     expect(screen.queryByText('alice')).not.toBeInTheDocument()
   })
