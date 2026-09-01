@@ -44,7 +44,10 @@ const TOAST_STYLE: MakeToastOptions = {
   width: '80%',
 }
 
-const DELETE_LOG_PERIODS_ACTIONS: DocumentedAction[] = ['delete_log_periods']
+const DELETE_LOG_PERIODS_ACTIONS: DocumentedAction[] = [
+  'download_log_period',
+  'delete_log_periods',
+]
 
 interface ComplianceReadySoftwareFilesProps {
   robotName: string
@@ -87,10 +90,13 @@ export function ComplianceReadySoftwareFiles({
     [logPeriodSummariesData?.data]
   )
 
+  const [downloadModalDismissed, setDownloadModalDismissed] = useState(false)
+
   const showRequiredDownloadModal =
     !isLoadingAccessControlSettings &&
     requireDownloadSetting &&
-    periods.length > 1
+    periods.length > 1 &&
+    !downloadModalDismissed
 
   const {
     selectedIds,
@@ -357,6 +363,10 @@ export function ComplianceReadySoftwareFiles({
           isLoading={
             isAuthorizing || downloadLogPeriodsMutation.isLoading || isDeleting
           }
+          onClose={() => {
+            setDownloadModalDismissed(true)
+          }}
+          closeOnOutsideClick
         />
       )}
       <div className={fileManagerStyles.file_management_group}>
