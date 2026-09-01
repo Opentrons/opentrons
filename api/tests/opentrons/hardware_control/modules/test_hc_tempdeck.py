@@ -4,6 +4,7 @@ from typing import AsyncGenerator
 import pytest
 from decoy import Decoy, matchers
 
+from . import require_live_data_real_string
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control import ExecutionManager, modules
 from opentrons.hardware_control.modules.tempdeck import (
@@ -68,6 +69,7 @@ async def test_sim_state(subject: modules.AbstractModule) -> None:
     assert modules.ModuleDataValidator.is_temperature_module_data(live_data)
     assert live_data["currentTemp"] == subject.temperature
     assert live_data["targetTemp"] == subject.target
+    require_live_data_real_string(subject)
     status = subject.device_info
     assert status["serial"] == "dummySerialTD"
     # return v1 if sim_model is not passed
@@ -108,7 +110,7 @@ async def test_error_callback(
     decoy: Decoy,
     module_error_callback: ModuleErrorCallback,
 ) -> None:
-    """It should forward temperature check errors."""
+    """It should forward temperature check errors after debounce is exhausted."""
     mock_get_temp = decoy.mock(func=subject._driver.get_temperature)
     exc = Exception("oh no!")
     decoy.when(await mock_get_temp()).then_raise(exc)
@@ -116,19 +118,9 @@ async def test_error_callback(
     # TODO(sf,rh): this is EXEC-2757. wait_next_poll() doesn't handle disconnects
     # well and will raise before any HC-module-level error handling happens, aka
     # reconnect logic (driver-level error handling is fine, though)
-    with pytest.raises(Exception, match="oh no!"):
-        await subject._poller.wait_next_poll()
-    decoy.verify(
-        module_error_callback(
-            matchers.Anything(),
-            "temperatureModuleV1",
-            "/dev/ot_module_sim_tempdeck0",
-            "dummySerialTD",
-        ),
-        times=0,
-    )
-    with pytest.raises(Exception, match="oh no!"):
-        await subject._poller.wait_next_poll()
+    for _ in range(READER_ERROR_DEBOUNCE - 1):
+        with pytest.raises(Exception, match="oh no!"):
+            await subject._poller.wait_next_poll()
     decoy.verify(
         module_error_callback(
             matchers.Anything(),

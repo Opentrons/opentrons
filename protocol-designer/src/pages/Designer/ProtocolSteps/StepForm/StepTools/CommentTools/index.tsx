@@ -9,10 +9,10 @@ import {
   TextAreaField,
 } from '@opentrons/components'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { StepFormProps } from '../../types'
 
-export function CommentTools(props: StepFormProps): JSX.Element {
+export function CommentTools(props: StepFormProps): ReactNode {
   const { t, i18n } = useTranslation('form')
   const { propsForFields } = props
 

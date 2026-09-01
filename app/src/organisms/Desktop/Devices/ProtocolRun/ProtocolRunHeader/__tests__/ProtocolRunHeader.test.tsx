@@ -24,7 +24,10 @@ import {
 } from '../hooks'
 import { RunHeaderBannerContainer } from '../RunHeaderBannerContainer'
 import { RunHeaderContent } from '../RunHeaderContent'
-import { RunHeaderModalContainer } from '../RunHeaderModalContainer'
+import {
+  RunHeaderModalContainer,
+  useRunHeaderModalContainer,
+} from '../RunHeaderModalContainer'
 import { RunHeaderProtocolName } from '../RunHeaderProtocolName'
 
 import type { ComponentProps } from 'react'
@@ -33,6 +36,12 @@ vi.mock('react-router-dom')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/runs')
+vi.mock('/app/resources/runs/useIsDownloadAuditLogsRequired', () => ({
+  useIsDownloadAuditLogsRequired: () => ({
+    isRequired: false,
+    isLoading: false,
+  }),
+}))
 vi.mock('/app/redux/protocol-runs')
 vi.mock('../RunHeaderModalContainer')
 vi.mock('../RunHeaderBannerContainer')
@@ -46,6 +55,14 @@ vi.mock('/app/local-resources/images/hooks/useInitializeCameraState')
 const MOCK_PROTOCOL = 'MOCK_PROTOCOL'
 const MOCK_RUN_ID = 'MOCK_RUN_ID'
 const MOCK_ROBOT = 'MOCK_ROBOT'
+
+const MOCK_RUN_HEADER_MODAL_CONTAINER_UTILS = {
+  dropTipUtils: {
+    dropTipModalUtils: { showModal: false, modalProps: null },
+    dropTipWizardUtils: { showDTWiz: false, dtWizProps: null },
+    resetTipStatus: vi.fn(),
+  },
+}
 
 describe('ProtocolRunHeader', () => {
   let props: ComponentProps<typeof ProtocolRunHeader>
@@ -84,6 +101,9 @@ describe('ProtocolRunHeader', () => {
     vi.mocked(useRunAnalytics).mockImplementation(() => {})
     vi.mocked(useRunErrors).mockReturnValue([] as any)
     vi.mocked(useRunHeaderRunControls).mockReturnValue({} as any)
+    vi.mocked(useRunHeaderModalContainer).mockReturnValue(
+      MOCK_RUN_HEADER_MODAL_CONTAINER_UTILS as any
+    )
 
     vi.mocked(RunHeaderModalContainer).mockReturnValue(
       <div>MOCK_RUN_HEADER_MODAL_CONTAINER</div>
@@ -178,6 +198,8 @@ describe('ProtocolRunHeader', () => {
         enteredER: false,
         isResetRunLoading: false,
         runErrors: [],
+        closeCurrentRun: expect.any(Function),
+        isClosingCurrentRun: false,
       }),
       expect.anything()
     )

@@ -19,6 +19,16 @@ Welcome to the v10.2.0 release of the Opentrons Flex robot software! This releas
 
 ---
 
+## Opentrons Robot Software Changes in 10.0.0
+
+Welcome to the v10.0.0 release of the Opentrons Flex robot software! This release introduces Opentrons Flex Compliance Ready Software.
+
+### New Features
+
+- [Opentrons Flex Compliance Ready Software](https://opentrons.com/compliance-ready-software) is additional software installed on your Flex robot by Opentrons. It permanently enables features like role-based user access and required documentation for 21 CFR part 11-ready operation.
+
+---
+
 ## Opentrons Robot Software Changes in 9.1.2
 
 Welcome to the v9.1.2 release of the Opentrons Flex robot software! This release includes bug fixes and improvements.

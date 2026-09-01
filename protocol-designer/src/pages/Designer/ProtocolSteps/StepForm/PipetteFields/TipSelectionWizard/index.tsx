@@ -19,10 +19,11 @@ import { SelectTips } from './SelectTips'
 import { TipSelectionModal } from './TipSelectionModal'
 import {
   getAreAnyMatchingTipracksSelectable,
+  getFirstSelectableTiprackId,
   getIsTiprackSelectableAndValid,
 } from './utils'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   NozzleConfigurationStyle,
   PrimaryNozzleConfigurationStyle,
@@ -51,9 +52,7 @@ interface TipSelectionWizardProps {
   tipAccessibilityStatus: Record<string, Record<string, AccessibilityStatus>>
 }
 
-export function TipSelectionWizard(
-  props: TipSelectionWizardProps
-): JSX.Element {
+export function TipSelectionWizard(props: TipSelectionWizardProps): ReactNode {
   const {
     setShowTipSelectionModal,
     formTiprackUri,
@@ -71,22 +70,30 @@ export function TipSelectionWizard(
   } = props
   const { t } = useTranslation('tip_selection')
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
-  const [selectedTiprackId, setSelectedTiprackId] = useState<string | null>(
-    tiprackSelected
-  )
   const [showErrorBanner, setShowErrorBanner] = useState<boolean>(
     selectedTips.length > 0
   )
   const robotState = useSelector(getRobotStateAtActiveItem)
-  const tipState =
-    selectedTiprackId != null
-      ? robotState?.tipState.tipracks[selectedTiprackId]
-      : null
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const { labware: activeDeckSetupLabware } = activeDeckSetup
   const { pipetteEntities, labwareEntities } = useSelector(getInvariantContext)
   const { spec: pipetteSpecs } = pipetteEntities[pipetteId]
+  const firstSelectableTiprackId = getFirstSelectableTiprackId({
+    allLabware: activeDeckSetupLabware,
+    formTiprackUri,
+    pipetteSpecs,
+    nozzles,
+    labwareEntities,
+    labwareRobotState: activeDeckSetupLabware,
+  })
+  const [selectedTiprackId, setSelectedTiprackId] = useState<string | null>(
+    () => tiprackSelected ?? firstSelectableTiprackId
+  )
   const robotType = useSelector(getRobotType)
+  const tipState =
+    selectedTiprackId != null
+      ? robotState?.tipState.tipracks[selectedTiprackId]
+      : null
   const { makeSnackbar } = useKitchen()
 
   const deckDef = getDeckDefFromRobotType(robotType)

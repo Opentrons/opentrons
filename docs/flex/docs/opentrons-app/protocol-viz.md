@@ -50,6 +50,17 @@ For each step, additional protocol details appear on the right side of the scree
 <figcaption> Examples of additional protocol details available on the right side of the screen.</figcaption>
 </figure>
 
+## Step groups
+
+You can create [step groups](../../python-api/groups.md) in your Python protocols to make it easier to visualize long protocols, or protocols with multiple similar steps. Each group has a title (like "Prepare Modules") and an optional description. Not all steps in a protocol have to be contained in a group.
+
+<figure class="screenshot" markdown>
+![Image showing grouped steps in the timeline on the left.](../images/step-groups.png)
+<figcaption>A group of steps to assemble master mix reagents in the timeline on the left.</figcaption>
+</figure>
+
+Step groups appear in the protocol timeline on the left. In the example above, three groups combine related steps, like transferring all the required reagents to assemble a PCR master mix. Click the arrow to expand each group and view its steps. 
+
 ## Slot spotlights
 
 At any point in your protocol, hover over labware on the deck to see labware names. For a closer look, click any slot to open a slot spotlight in a new window.
@@ -69,10 +80,4 @@ When you import any protocol, the Opentrons App analyzes it for errors. You can 
 ![Image showing protocol visualization details for tips, labware, wells, and more.](../images/viz-error.png)
 </figure>
 
-In this example serial dilution protocol, the tip rack would run out of tips before the robot could complete the final transfer step. The visualization screen includes the number of errors at the top of the screen. Scroll in the timeline on the left to view the step the error occurs in, and click to view error details. 
-
-
-
-
-
-
+In this example serial dilution protocol, the tip rack would run out of tips before the robot could complete the final transfer step. Scroll in the timeline on the left to view the step the error occurs in, and click to view error details. 

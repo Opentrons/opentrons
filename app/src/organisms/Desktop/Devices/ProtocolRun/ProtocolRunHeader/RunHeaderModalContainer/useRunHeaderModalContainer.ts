@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useErrorRecoveryFlows } from '/app/organisms/ErrorRecoveryFlows'
 import { useApplyOffsets } from '/app/organisms/LabwarePositionCheck'
 import {
@@ -24,7 +25,10 @@ import {
   selectAreOffsetsApplied,
   selectOffsetSource,
 } from '/app/redux/protocol-runs'
-import { useCurrentRunId, useProtocolDetailsForRun } from '/app/resources/runs'
+import {
+  useCurrentRunId,
+  useQuickProtocolDetailsForRun,
+} from '/app/resources/runs'
 
 import { getFallbackRobotSerialNumber } from '../utils'
 import {
@@ -95,7 +99,7 @@ export function useRunHeaderModalContainer({
 }: UseRunHeaderModalContainerProps): UseRunHeaderModalContainerResult {
   const navigate = useNavigate()
 
-  const { displayName } = useProtocolDetailsForRun(runId)
+  const { displayName } = useQuickProtocolDetailsForRun(runId)
   const robot = useRobot(robotName)
   const robotSerialNumber = getFallbackRobotSerialNumber(robot)
   const trackEvent = useTrackEvent()
@@ -110,10 +114,14 @@ export function useRunHeaderModalContainer({
     useSelector(selectOffsetSource(runId)) === OFFSETS_CONFLICT
   const isThisRunCurrent = runId === useCurrentRunId()
   const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
-  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(runId)
   const areCameraPreferencesConfirmed = runRecord?.data.cameraSettings != null
+  const documentationState = useDocumentationState()
+  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(
+    runId,
+    documentationState
+  )
   const { mutateAsync: addCameraSettingsToRun } =
-    useAddCameraSettingsToRunMutation()
+    useAddCameraSettingsToRunMutation(documentationState)
   const runCameraSettings = useSelector((state: State) =>
     getCameraUsageState(state, runId)
   )

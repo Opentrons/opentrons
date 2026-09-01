@@ -13,7 +13,7 @@ export interface UseHomePipettesResult {
 
 export type UseHomePipettesProps = Pick<
   UseRobotControlCommandsProps,
-  'pipetteInfo' | 'onSettled'
+  'pipetteInfo' | 'onSuccess'
 >
 
 // Home pipettes except for plungers.

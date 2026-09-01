@@ -23,6 +23,7 @@ import { useCalibrationTaskList } from '/app/organisms/Desktop/Devices/hooks'
 import { useAttachedPipettes } from '/app/resources/instruments'
 import { useCurrentRunId, useRunHasStarted } from '/app/resources/runs'
 
+import type { ReactNode } from 'react'
 import type {
   DashboardCalDeckInvoker,
   DashboardCalOffsetInvoker,
@@ -43,7 +44,7 @@ export function CalibrationTaskList({
   tipLengthCalLauncher,
   deckCalLauncher,
   exitBeforeDeckConfigCompletion,
-}: CalibrationTaskListProps): JSX.Element {
+}: CalibrationTaskListProps): ReactNode {
   const prevActiveIndex = useRef<[number, number] | null>(null)
   const [hasLaunchedWizard, setHasLaunchedWizard] = useState<boolean>(false)
   const [showCompletionScreen, setShowCompletionScreen] =
@@ -115,7 +116,6 @@ export function CalibrationTaskList({
         width: 50rem;
         height: 47.5rem;
       `}
-      marginLeft="0"
     >
       {showCompletionScreen ? (
         <Flex

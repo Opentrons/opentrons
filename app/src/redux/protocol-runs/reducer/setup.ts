@@ -1,3 +1,12 @@
+import {
+  updateCameraEnablement,
+  updateCameraRecoveryEnablement,
+  updateCameraSpecificSettings,
+  updateCameraStreamEnablement,
+  updateCameraUsageSettings,
+  updateRunSetupStepsComplete,
+  updateRunSetupStepsRequired,
+} from '../actions'
 import * as Constants from '../constants'
 
 import type { ProtocolRunAction, RunSetupStatus } from '../types'
@@ -29,7 +38,7 @@ export function setupReducer(
   action: ProtocolRunAction
 ): RunSetupStatus {
   switch (action.type) {
-    case Constants.UPDATE_RUN_SETUP_STEPS_COMPLETE:
+    case updateRunSetupStepsComplete.type:
       return Constants.SETUP_STEP_KEYS.reduce(
         (currentState, step) => ({
           ...currentState,
@@ -42,7 +51,7 @@ export function setupReducer(
         state
       )
 
-    case Constants.UPDATE_RUN_SETUP_STEPS_REQUIRED:
+    case updateRunSetupStepsRequired.type:
       return Constants.SETUP_STEP_KEYS.reduce(
         (currentState, step) => ({
           ...currentState,
@@ -55,28 +64,31 @@ export function setupReducer(
         state
       )
 
-    case Constants.CAMERA_SETUP_STEP_KEY: {
+    case updateCameraEnablement.type:
+    case updateCameraRecoveryEnablement.type:
+    case updateCameraStreamEnablement.type:
+    case updateCameraUsageSettings.type: {
       const { runId, ...rest } = action.payload
+      return {
+        ...state,
+        [Constants.CAMERA_SETUP_STEP_KEY]: {
+          ...state[Constants.CAMERA_SETUP_STEP_KEY],
+          ...rest,
+        },
+      }
+    }
 
-      if ('cameraId' in rest && 'cameraImageSettings' in rest) {
-        return {
-          ...state,
-          [Constants.CAMERA_SETUP_STEP_KEY]: {
-            ...state[Constants.CAMERA_SETUP_STEP_KEY],
-            cameraImageSettings: {
-              ...state[Constants.CAMERA_SETUP_STEP_KEY].cameraImageSettings,
-              [rest.cameraId]: rest.cameraImageSettings,
-            },
+    case updateCameraSpecificSettings.type: {
+      const { cameraId, cameraImageSettings } = action.payload
+      return {
+        ...state,
+        [Constants.CAMERA_SETUP_STEP_KEY]: {
+          ...state[Constants.CAMERA_SETUP_STEP_KEY],
+          cameraImageSettings: {
+            ...state[Constants.CAMERA_SETUP_STEP_KEY].cameraImageSettings,
+            [cameraId]: cameraImageSettings,
           },
-        }
-      } else {
-        return {
-          ...state,
-          [Constants.CAMERA_SETUP_STEP_KEY]: {
-            ...state[Constants.CAMERA_SETUP_STEP_KEY],
-            ...rest,
-          },
-        }
+        },
       }
     }
 

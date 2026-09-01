@@ -23,7 +23,7 @@ import type { LabwareDefinition } from '@opentrons/shared-data'
 export default {
   title: 'ODD/Organisms/TerseOffsetTable',
   component: TerseOffsetTable,
-  parameters: VIEWPORT.touchScreenViewport,
+  ...VIEWPORT.touchScreenViewport,
 } as Meta
 
 // Note: 59rem(944px) is the size of ODD

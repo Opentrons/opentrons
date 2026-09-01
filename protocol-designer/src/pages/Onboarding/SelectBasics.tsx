@@ -24,10 +24,11 @@ import { BasicsButtons } from '../../components/molecules'
 import { PipetteInfoItem, SelectPipetteModal } from '../../components/organisms'
 import { WizardBody } from './WizardBody'
 
+import type { ReactNode } from 'react'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 import type { Gen, PipetteType, WizardTileProps } from './types'
 
-export function SelectBasics(props: WizardTileProps): JSX.Element {
+export function SelectBasics(props: WizardTileProps): ReactNode {
   const { setValue, proceed, watch } = props
   const { t } = useTranslation(['onboarding', 'shared'])
   const [mount, setMount] = useState<PipetteMount>('left')

@@ -12,12 +12,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import {
-  useCloseCurrentRun,
-  useIsRunCurrent,
-  useMostRecentRunId,
-} from '/app/resources/runs'
+import { useIsRunCurrent, useMostRecentRunId } from '/app/resources/runs'
 
+import type { ReactNode } from 'react'
 import type { RunHeaderBannerContainerProps } from '.'
 
 type TerminalBannerType = 'success' | 'error' | null
@@ -75,12 +72,12 @@ interface TerminalRunBannerContainerProps extends RunHeaderBannerContainerProps 
 // Contains all possible banners that render after the run reaches a terminal run status.
 export function TerminalRunBannerContainer(
   props: TerminalRunBannerContainerProps
-): JSX.Element {
+): ReactNode {
   const { bannerType } = props
 
   switch (bannerType) {
     case 'success':
-      return <ProtocolRunSuccessBanner />
+      return <ProtocolRunSuccessBanner {...props} />
     case 'error':
       return <ProtocolRunErrorBanner {...props} />
     default:
@@ -89,10 +86,11 @@ export function TerminalRunBannerContainer(
   }
 }
 
-function ProtocolRunSuccessBanner(): JSX.Element {
+function ProtocolRunSuccessBanner({
+  closeCurrentRun,
+  isClosingCurrentRun,
+}: RunHeaderBannerContainerProps): ReactNode {
   const { t } = useTranslation('run_details')
-
-  const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()
 
   const handleRunSuccessClick = (): void => {
     closeCurrentRun()
@@ -116,10 +114,9 @@ function ProtocolRunErrorBanner({
   runErrors,
   runStatus,
   runHeaderModalContainerUtils,
-}: RunHeaderBannerContainerProps): JSX.Element {
+  closeCurrentRun,
+}: RunHeaderBannerContainerProps): ReactNode {
   const { t } = useTranslation('run_details')
-
-  const { closeCurrentRun } = useCloseCurrentRun()
 
   const { highestPriorityError } = runErrors
 

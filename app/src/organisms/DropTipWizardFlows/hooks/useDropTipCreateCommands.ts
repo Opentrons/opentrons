@@ -67,7 +67,13 @@ export function useDropTipCreateCommands({
   const {
     chainRunCommands: chainRunFixitCommands,
     isCommandMutationLoading: isFixitCommandLoading,
-  } = useChainRunCommands(runId, failedCommandId)
+  } = useChainRunCommands(
+    runId,
+    commandDocState,
+    actionsToDocument,
+    addActionToDocument,
+    failedCommandId
+  )
 
   const { createMaintenanceCommand } = useCreateMaintenanceCommandMutation(
     commandDocState,
@@ -77,6 +83,9 @@ export function useDropTipCreateCommands({
 
   const { createRunCommand } = useCreateRunCommandMutation(
     runId,
+    commandDocState,
+    actionsToDocument,
+    addActionToDocument,
     failedCommandId
   )
 

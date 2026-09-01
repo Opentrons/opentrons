@@ -11,7 +11,7 @@ import {
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
 
 interface CreateNewTransferProps {
@@ -19,7 +19,7 @@ interface CreateNewTransferProps {
   exitButtonProps: ComponentProps<typeof SmallButton>
 }
 
-export function CreateNewTransfer(props: CreateNewTransferProps): JSX.Element {
+export function CreateNewTransfer(props: CreateNewTransferProps): ReactNode {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
   return (

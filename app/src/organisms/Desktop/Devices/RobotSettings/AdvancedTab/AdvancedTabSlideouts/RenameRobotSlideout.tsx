@@ -18,6 +18,7 @@ import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { Slideout } from '/app/atoms/Slideout'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { ANALYTICS_RENAME_ROBOT, useTrackEvent } from '/app/redux/analytics'
 import {
@@ -25,9 +26,10 @@ import {
   getReachableRobots,
   getUnreachableRobots,
   removeRobot,
+  startDiscovery,
 } from '/app/redux/discovery'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { FieldError, Resolver } from 'react-hook-form'
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { Dispatch, State } from '/app/redux/types'
@@ -52,7 +54,7 @@ export function RenameRobotSlideout({
   isExpanded,
   onCloseClick,
   robotName,
-}: RenameRobotSlideoutProps): JSX.Element {
+}: RenameRobotSlideoutProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const [previousRobotName, setPreviousRobotName] = useState<string>(robotName)
   const isFlex = useIsFlex(robotName)
@@ -132,8 +134,8 @@ export function RenameRobotSlideout({
     updateRobotName(newName)
     reset({ newRobotName: '' })
   }
-
-  const { updateRobotName } = useUpdateRobotNameMutation({
+  const documentationState = useDocumentationState()
+  const { updateRobotName } = useUpdateRobotNameMutation(documentationState, {
     onSuccess: (data: UpdatedRobotName) => {
       // TODO: 6/10/2022 kj for the robot name, we need to use GET: /server/name
       // data.name != null && navigate(`/devices/${data.name}/robot-settings`)
@@ -141,6 +143,8 @@ export function RenameRobotSlideout({
       // https://github.com/Opentrons/opentrons/issues/10709
       data.name != null && navigate('/devices')
       dispatch(removeRobot(previousRobotName))
+      // TODO(jj  07/15/2026): preserve ip address in hostsByIp during removal, to prevent having to search for the robot again
+      dispatch(startDiscovery())
     },
     onError: (error: Error) => {
       // TODO kj 5/25/2022: when a user lost connection while the user is renaming a robot,
@@ -191,7 +195,6 @@ export function RenameRobotSlideout({
             name="newRobotName"
             render={({ field, fieldState }) => (
               <InputField
-                id="newRobotName"
                 name="newRobotName"
                 type="text"
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {

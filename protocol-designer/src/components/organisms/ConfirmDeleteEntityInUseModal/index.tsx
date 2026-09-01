@@ -15,20 +15,21 @@ import { HandleEnter } from '/protocol-designer/components/atoms'
 
 import { getMainPagePortalEl } from '../Portal'
 
+import type { ReactNode } from 'react'
+
 interface ConfirmDeleteEntityInUseModalProps {
   onClose: () => void
   onConfirm: () => void
 }
 export function ConfirmDeleteEntityInUseModal(
   props: ConfirmDeleteEntityInUseModalProps
-): JSX.Element {
+): ReactNode {
   const { onClose, onConfirm } = props
   const { t } = useTranslation(['onboarding', 'shared'])
 
   return createPortal(
     <HandleEnter onEnter={onConfirm}>
       <Modal
-        marginLeft="0"
         zIndexOverlay={11}
         title={t(`are_you_sure_clear_slot`)}
         type="warning"

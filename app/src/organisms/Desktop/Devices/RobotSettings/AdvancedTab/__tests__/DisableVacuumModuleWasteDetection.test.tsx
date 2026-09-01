@@ -13,7 +13,6 @@ import type { ComponentProps } from 'react'
 
 vi.mock('/app/resources/robot-settings')
 
-const ROBOT_NAME = 'otie'
 const mockToggleWasteDetection = vi.fn()
 const render = (
   props: ComponentProps<typeof DisableVacuumModuleWasteDetection>
@@ -28,7 +27,6 @@ describe('DisableVacuumModuleWasteDetection', () => {
 
   beforeEach(() => {
     props = {
-      robotName: ROBOT_NAME,
       isRobotBusy: false,
     }
     vi.mocked(useDisableVacuumModuleWasteDetection).mockReturnValue({

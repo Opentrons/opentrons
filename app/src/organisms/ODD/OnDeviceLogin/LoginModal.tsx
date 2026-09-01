@@ -1,54 +1,67 @@
-import { useCallback, useState } from 'react'
-import { useQueryClient } from 'react-query'
+import { useCallback, useId, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
-import { getSelfQueryKey, useHost } from '@opentrons/react-api-client'
+import {
+  POSITION_FIXED,
+  SPACING,
+  SUCCESS_TOAST,
+  Toast,
+} from '@opentrons/components'
+import { useAuthSettingsQuery } from '@opentrons/react-api-client'
 
+import { getLocalRobot } from '/app/redux/discovery'
+import { useUsernameForRobot } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {
+  DEFAULT_MIN_PASSWORD_LENGTH,
   useOAuth2PasswordLogin,
   useSetNewPasswordAndSignIn,
 } from '/app/resources/auth'
 
-import { clearStaleAuthBeforeLogin } from './clearStaleAuthBeforeLogin'
 import { OnDeviceLogin } from './index'
 import styles from './OnDeviceLogin.module.css'
 
-import type { QueryClient } from 'react-query'
-import type {
-  AuthUser,
-  HostConfig,
-  OAuth2TokenResponse,
-} from '@opentrons/api-client'
+import type { ReactNode } from 'react'
+import type { AuthUser, OAuth2TokenResponse } from '@opentrons/api-client'
+import type { State } from '/app/redux/types'
 import type { LoginStep } from './index'
-
-export interface LoginModalResult {
-  username: string
-}
 
 type LoginModalPhase = 'login' | 'chooseNewPassword'
 
-const LoginModalImpl = NiceModal.create((): JSX.Element => {
+const LoginModalImpl = NiceModal.create((): ReactNode => {
   const modal = useModal()
-  const host = useHost()
-  const queryClient = useQueryClient()
+  const { t } = useTranslation(['access_control'])
+  const passwordUpdatedToastId = useId()
   const [phase, setPhase] = useState<LoginModalPhase>('login')
   const [step, setStep] = useState<LoginStep>('username')
   const [loginError, setLoginError] = useState<string | null>(null)
-  const [loggedInUsername, setLoggedInUsername] = useState<string | null>(null)
+  const [loginUsername, setLoginUsername] = useState<string | undefined>(
+    undefined
+  )
+  const [passwordUpdatedUsername, setPasswordUpdatedUsername] = useState<
+    string | null
+  >(null)
   const storeLoginState = useStoreLoginState()
+  const localRobotName = useSelector(
+    (state: State) => getLocalRobot(state)?.name ?? null
+  )
+  const loggedInUsername = useUsernameForRobot(localRobotName)
 
   const isChoosingNewPassword = phase === 'chooseNewPassword'
 
-  const invalidateSelfQuery = useCallback((): void => {
-    if (host == null) return
-    void queryClient.invalidateQueries(getSelfQueryKey(host))
-  }, [host, queryClient])
-
   const finishModal = useCallback(
-    (username: string): void => {
-      const result: LoginModalResult = { username }
-      modal.resolve(result)
+    (
+      username: string,
+      options?: { showPasswordUpdatedToast?: boolean }
+    ): void => {
+      if (options?.showPasswordUpdatedToast === true) {
+        setPasswordUpdatedUsername(username)
+        return
+      }
+
+      modal.resolve({ username })
       modal.remove()
     },
     [modal]
@@ -57,35 +70,25 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
   const handleLoginSuccess = useCallback(
     (username: string, user: AuthUser, response: OAuth2TokenResponse): void => {
       setLoginError(null)
-      storeLoginState(username, response)
-      invalidateSelfQuery()
+      storeLoginState(localRobotName, user, response)
 
       if (user.resetPassword) {
-        setLoggedInUsername(username)
+        setLoginUsername(username)
         setPhase('chooseNewPassword')
         setStep('password')
-        return
+      } else {
+        finishModal(username, {
+          showPasswordUpdatedToast: isChoosingNewPassword,
+        })
       }
-
-      finishModal(username)
     },
-    [finishModal, invalidateSelfQuery, storeLoginState]
+    [finishModal, storeLoginState, localRobotName, isChoosingNewPassword]
   )
 
   const dismissModal = useCallback((): void => {
     modal.resolve(null)
     modal.remove()
   }, [modal])
-
-  const handleNewPasswordSuccess = useCallback(
-    (username: string, response: OAuth2TokenResponse): void => {
-      setLoginError(null)
-      storeLoginState(username, response)
-      invalidateSelfQuery()
-      finishModal(username)
-    },
-    [finishModal, invalidateSelfQuery, storeLoginState]
-  )
 
   const { submitPassword, isAuthLoading: isLoginAuthLoading } =
     useOAuth2PasswordLogin({
@@ -95,20 +98,45 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
       },
     })
 
+  const handleNewPasswordSuccess = useCallback(
+    (username: string, newPassword: string) => {
+      setLoginError(null)
+      submitPassword(username, newPassword)
+    },
+    [submitPassword]
+  )
+
   const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
     useSetNewPasswordAndSignIn({
       onSuccess: handleNewPasswordSuccess,
       onError: message => {
         setLoginError(message)
+        setStep('password')
       },
     })
+
+  const { data: authSettings } = useAuthSettingsQuery({
+    enabled: isChoosingNewPassword,
+  })
+  const passwordComplexity =
+    isChoosingNewPassword && authSettings?.data != null
+      ? {
+          minLength:
+            authSettings.data.passwordComplexityMinimumLength ??
+            DEFAULT_MIN_PASSWORD_LENGTH,
+          requireSpecialCharacters:
+            authSettings.data.passwordComplexitySpecialCharacters === true,
+        }
+      : null
 
   const handleCancel = (): void => {
     dismissModal()
   }
 
   const initialUsername =
-    phase === 'chooseNewPassword' ? (loggedInUsername ?? undefined) : undefined
+    phase === 'chooseNewPassword'
+      ? (loggedInUsername ?? loginUsername)
+      : loginUsername
 
   return (
     <div className={styles.overlay}>
@@ -120,7 +148,9 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
           isChoosingNewPassword ? submitNewPassword : submitPassword
         }
         isAuthLoading={
-          isChoosingNewPassword ? isSetNewPasswordLoading : isLoginAuthLoading
+          isChoosingNewPassword
+            ? isSetNewPasswordLoading || isLoginAuthLoading
+            : isLoginAuthLoading
         }
         isPasswordResetRequired={isChoosingNewPassword}
         initialUsername={initialUsername}
@@ -128,8 +158,23 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
         onClearLoginError={() => {
           setLoginError(null)
         }}
+        passwordComplexity={passwordComplexity}
         onCancel={handleCancel}
       />
+      {passwordUpdatedUsername != null ? (
+        <Toast
+          id={passwordUpdatedToastId}
+          message={t('on_device_login_password_updated') as string}
+          type={SUCCESS_TOAST}
+          displayType="odd"
+          position={POSITION_FIXED}
+          right={SPACING.spacing32}
+          bottom={SPACING.spacing32}
+          onClose={() => {
+            finishModal(passwordUpdatedUsername)
+          }}
+        />
+      ) : null}
     </div>
   )
 })
@@ -137,13 +182,8 @@ const LoginModalImpl = NiceModal.create((): JSX.Element => {
 /**
  * Open the login modal and await the result.
  */
-export function showLoginModal(
-  queryClient: QueryClient,
-  hostConfig: HostConfig | null
-): Promise<LoginModalResult | null> {
-  return clearStaleAuthBeforeLogin(queryClient, hostConfig).then(
-    () => NiceModal.show(LoginModalImpl) as Promise<LoginModalResult | null>
-  )
+export function showLoginModal(): Promise<{ username: string } | null> {
+  return NiceModal.show(LoginModalImpl)
 }
 
 /**

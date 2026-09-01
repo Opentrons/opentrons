@@ -1,49 +1,50 @@
 import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 
 import {
-  fetchSettings,
-  getRobotSettings,
-  updateSetting,
-} from '/app/redux/robot-settings'
+  useRobotSettingsQuery,
+  useUpdateRobotSettingMutation,
+} from '@opentrons/react-api-client'
 
-import type { RobotSettings } from '/app/redux/robot-settings/types'
-import type { Dispatch, State } from '/app/redux/types'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
 const DISABLE_VACUUM_MODULE_WASTE_DETECTION =
   'disableVacuumModuleWasteDetection'
 
-export function useDisableVacuumModuleWasteDetection(robotName: string): {
+export function useDisableVacuumModuleWasteDetection(): {
   wasteDetectionDisabled: boolean
   toggleWasteDetection: () => void
 } {
   const [wasteDetectionDisabledCache, setWasteDetectionDisabledCache] =
     useState<boolean>(false)
+  const documentationState = useDocumentationState()
 
-  const dispatch = useDispatch<Dispatch>()
+  const { updateRobotSetting } =
+    useUpdateRobotSettingMutation(documentationState)
 
+  const robotSettingsQuery = useRobotSettingsQuery()
+  const settings = robotSettingsQuery.data?.settings ?? []
   const wasteDetectionDisabledFromSettings =
-    useSelector<State, RobotSettings>((state: State) =>
-      getRobotSettings(state, robotName)
-    ).find(setting => setting.id === DISABLE_VACUUM_MODULE_WASTE_DETECTION)
-      ?.value === true
+    settings.find(
+      setting => setting.id === DISABLE_VACUUM_MODULE_WASTE_DETECTION
+    )?.value === true
 
   useEffect(() => {
     setWasteDetectionDisabledCache(wasteDetectionDisabledFromSettings)
   }, [wasteDetectionDisabledFromSettings])
 
-  useEffect(() => {
-    dispatch(fetchSettings(robotName))
-  }, [dispatch, robotName])
-
   const toggleWasteDetection = (): void => {
-    setWasteDetectionDisabledCache(!wasteDetectionDisabledCache)
-    dispatch(
-      updateSetting(
-        robotName,
-        DISABLE_VACUUM_MODULE_WASTE_DETECTION,
-        !wasteDetectionDisabledCache
-      )
+    const newWasteDetectionDisabled = !wasteDetectionDisabledCache
+    setWasteDetectionDisabledCache(newWasteDetectionDisabled)
+    updateRobotSetting(
+      {
+        id: DISABLE_VACUUM_MODULE_WASTE_DETECTION,
+        value: newWasteDetectionDisabled,
+      },
+      {
+        onError: () => {
+          setWasteDetectionDisabledCache(wasteDetectionDisabledCache)
+        },
+      }
     )
   }
 

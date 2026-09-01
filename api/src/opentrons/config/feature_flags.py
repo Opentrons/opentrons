@@ -33,14 +33,6 @@ def enable_ot3_hardware_controller() -> bool:
     )
 
 
-def rear_panel_integration() -> bool:
-    """Whether to enable usb connected rear_panel for the OT-3."""
-
-    return advs.get_setting_with_env_overload(
-        "rearPanelIntegration", RobotTypeEnum.FLEX
-    )
-
-
 def stall_detection_enabled() -> bool:
     return not advs.get_setting_with_env_overload(
         "disableStallDetection", RobotTypeEnum.FLEX
@@ -88,23 +80,25 @@ def flex_stacker_tof_sensors_disabled() -> bool:
 
 
 def protocol_subprocess_enabled() -> bool:
-    # return advs.get_setting_with_env_overload(
-    #     "enableProtocolSubprocess", RobotTypeEnum.FLEX
-    # )
-    # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
-    # this patch should be REMOVED for releases >= 10.0.0
-    # See: https://opentrons.atlassian.net/browse/EXEC-2897
-    return False
+    return advs.get_setting_with_env_overload(
+        "enableProtocolSubprocess", RobotTypeEnum.FLEX
+    )
 
 
 def hardware_subprocess_enabled() -> bool:
-    # return advs.get_setting_with_env_overload(
-    #     "enableHardwareSubprocess", RobotTypeEnum.FLEX
-    # )
-    # NOTE: This is here to no-op the entire hardware layer entry process for robot versions below 10.0.0
-    # this patch should be REMOVED for releases >= 10.0.0
-    # See: https://opentrons.atlassian.net/browse/EXEC-2897
-    return False
+    return advs.get_setting_with_env_overload(
+        "enableHardwareSubprocess", RobotTypeEnum.FLEX
+    )
+
+
+def run_protocol_as_restricted_user() -> bool:
+    return advs.get_setting_with_env_overload(
+        "alwaysRunProtocolAsUser", RobotTypeEnum.FLEX
+    )
+
+
+def internal_96ch_attach() -> bool:
+    return advs.get_setting_with_env_overload("internal96chAttach", RobotTypeEnum.FLEX)
 
 
 def vacuum_module_waste_detection_disabled() -> bool:

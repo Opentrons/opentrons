@@ -27,7 +27,7 @@ interface CompleteConfirmationProps {
 
 export function CompleteConfirmation(
   props: CompleteConfirmationProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation('shared')
   const { proceed, flowName, body, visualAid } = props
   return (

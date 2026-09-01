@@ -14,6 +14,7 @@ import { getMainPagePortalEl } from '/protocol-designer/components/organisms'
 
 import { ThermocyclerProfileModal } from './ThermocyclerProfileModal'
 
+import type { ReactNode } from 'react'
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
 
@@ -23,7 +24,7 @@ interface ProfileStepsSummaryProps {
 }
 export function ProfileStepsSummary(
   props: ProfileStepsSummaryProps
-): JSX.Element {
+): ReactNode {
   const { formData, propsForFields } = props
   const { i18n, t } = useTranslation('form')
   const [showProfileModal, setShowProfileModal] = useState<boolean>(false)

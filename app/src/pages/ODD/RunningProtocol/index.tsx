@@ -19,7 +19,7 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 
-import { useGuardedAction } from '/app/local-resources/access-control/useGuardedAction'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useToastOnErrorImage } from '/app/local-resources/images/hooks/useToastOnErrorImage'
 import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import {
@@ -55,6 +55,7 @@ import {
 
 import styles from './runningprotocol.module.css'
 
+import type { ReactNode } from 'react'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type {
   CurrentRunningProtocolCommandProps,
@@ -75,7 +76,7 @@ const SCREEN_ORDER: ScreenOption[] = [
   'ImageGallery',
 ]
 
-export function RunningProtocol(): JSX.Element {
+export function RunningProtocol(): ReactNode {
   const { runId } = useParams<
     keyof OnDeviceRouteParams
   >() as OnDeviceRouteParams
@@ -108,8 +109,7 @@ export function RunningProtocol(): JSX.Element {
     staleTime: Infinity,
   })
 
-  // TODO(jj): figure out what to do with actionsToDocument
-  const docstate = useGuardedAction()
+  const docstate = useDocumentationState()
 
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
@@ -297,7 +297,7 @@ type CurrentOptionViewProps = CurrentRunningProtocolCommandProps &
 function CurrentOptionView({
   currentOption,
   ...rest
-}: CurrentOptionViewProps): JSX.Element {
+}: CurrentOptionViewProps): ReactNode {
   useToastOnErrorImage(rest.runId)
 
   switch (currentOption) {

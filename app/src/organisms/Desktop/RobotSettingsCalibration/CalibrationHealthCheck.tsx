@@ -24,21 +24,20 @@ import {
 } from '/app/redux/analytics'
 import * as Calibration from '/app/redux/calibration'
 import * as Config from '/app/redux/config'
-import * as Pipettes from '/app/redux/pipettes'
 import * as Sessions from '/app/redux/sessions'
 import { useDeckCalibrationStatus } from '/app/resources/calibration'
 import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
 } from '/app/resources/instruments'
+import { PIPETTE_MOUNTS } from '/app/resources/instruments/constants'
 
 import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 
-import type {
-  AttachedPipettesByMount,
-  PipetteCalibrationsByMount,
-} from '/app/redux/pipettes/types'
+import type { ReactNode } from 'react'
+import type { AttachedPipettesByMount } from '@opentrons/api-client'
 import type { DispatchRequestsType } from '/app/redux/robot-api'
+import type { PipetteCalibrationsByMount } from '/app/resources/instruments/types'
 
 interface CalibrationHealthCheckProps {
   buttonDisabledReason: string | null
@@ -52,7 +51,7 @@ const attachedPipetteCalPresent: (
   pipettes: AttachedPipettesByMount,
   pipetteCalibrations: PipetteCalibrationsByMount
 ) => boolean = (pipettes, pipetteCalibrations) =>
-  !Pipettes.PIPETTE_MOUNTS.some(
+  !PIPETTE_MOUNTS.some(
     mount =>
       pipettes?.[mount] != null &&
       (pipetteCalibrations[mount]?.offset == null ||
@@ -65,7 +64,7 @@ export function CalibrationHealthCheck({
   isPending,
   robotName,
   isRobotBusy,
-}: CalibrationHealthCheckProps): JSX.Element {
+}: CalibrationHealthCheckProps): ReactNode {
   const { t } = useTranslation([
     'device_settings',
     'robot_calibration',

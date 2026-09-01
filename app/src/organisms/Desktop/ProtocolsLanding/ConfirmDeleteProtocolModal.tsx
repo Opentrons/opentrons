@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
@@ -9,11 +8,12 @@ import {
   LegacyStyledText,
   Link,
   Modal,
+  PrimaryButton,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 
 interface ConfirmDeleteProtocolModalProps {
   cancelDeleteProtocol: MouseEventHandler<HTMLAnchorElement> | undefined
@@ -22,7 +22,7 @@ interface ConfirmDeleteProtocolModalProps {
 
 export function ConfirmDeleteProtocolModal(
   props: ConfirmDeleteProtocolModalProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation(['protocol_list', 'shared'])
   return (
     <Modal
@@ -44,9 +44,9 @@ export function ConfirmDeleteProtocolModal(
           >
             {t('shared:cancel')}
           </Link>
-          <AlertPrimaryButton onClick={props.handleClickDelete}>
+          <PrimaryButton variant="warning" onClick={props.handleClickDelete}>
             {t('yes_delete_this_protocol')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </Flex>
       </Flex>
     </Modal>

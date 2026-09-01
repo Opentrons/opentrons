@@ -31,7 +31,7 @@ const CONTROL_CHILDREN_STYLES = css`
   }
 `
 
-export const ControlContainer = (props: ControlContainerProps): JSX.Element => {
+export const ControlContainer = (props: ControlContainerProps): ReactNode => {
   const { title, children } = props
   return (
     <Flex width="100%" flexDirection={DIRECTION_COLUMN}>

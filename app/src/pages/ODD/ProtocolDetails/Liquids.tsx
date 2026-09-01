@@ -22,6 +22,8 @@ import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
 
 import { EmptySection } from './EmptySection'
 
+import type { ReactNode } from 'react'
+
 const Table = styled('table')`
   table-layout: ${SPACING.spacingAuto};
   width: 100%;
@@ -55,7 +57,7 @@ const TableDatum = styled('td')`
   }
 `
 
-export const Liquids = (props: { protocolId: string }): JSX.Element => {
+export const Liquids = (props: { protocolId: string }): ReactNode => {
   const { protocolId } = props
   const { data: protocolData } = useProtocolQuery(protocolId)
   const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(

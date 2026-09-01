@@ -7,6 +7,7 @@ import r2l_t2b from '/protocol-designer/assets/images/well-order_r2l-t2b.jpg'
 import t2b_l2r from '/protocol-designer/assets/images/well-order_t2b-l2r.jpg'
 import t2b_r2l from '/protocol-designer/assets/images/well-order_t2b-r2l.jpg'
 
+import type { ReactNode } from 'react'
 import type { WellOrderOption } from '/protocol-designer/form-types'
 
 interface WellOrderVisualizationProps {
@@ -27,7 +28,7 @@ const imageMap: Record<string, string> = {
 
 export function WellOrderVisualization(
   props: WellOrderVisualizationProps
-): JSX.Element {
+): ReactNode {
   const { firstValue, secondValue } = props
   const imageKey = `${firstValue}_${secondValue}`
 

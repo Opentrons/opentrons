@@ -23,6 +23,7 @@ import { getShellUpdateDataFiles } from '/app/redux/shell'
 
 import { EmptyFile } from './EmptyFile'
 
+import type { ReactNode } from 'react'
 import type { CsvFileData } from '@opentrons/api-client'
 import type {
   CsvFileParameter,
@@ -46,7 +47,7 @@ export function ChooseCsvFile({
   handleGoBack,
   parameter,
   setParameter,
-}: ChooseCsvFileProps): JSX.Element {
+}: ChooseCsvFileProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
 
   // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
@@ -131,7 +132,6 @@ export function ChooseCsvFile({
                       onChange={() => {
                         setCsvFileSelected({ id: csv.id, fileName: csv.name })
                       }}
-                      id={`${csv.id}-on-robot`}
                       isSelected={csvFileSelected?.id === csv.id}
                       maxLines={3}
                     />
@@ -166,7 +166,6 @@ export function ChooseCsvFile({
                               fileName,
                             })
                           }}
-                          id={`${csvFilePath.replace('/', '-')}}-on-usb`}
                           isSelected={csvFileSelected?.filePath === csvFilePath}
                           maxLines={3}
                         />

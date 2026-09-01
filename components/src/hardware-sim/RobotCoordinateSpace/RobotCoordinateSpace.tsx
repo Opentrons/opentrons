@@ -17,7 +17,7 @@ const AnimatedSvg = animated.svg as any as ComponentType<
 
 export function RobotCoordinateSpace(
   props: RobotCoordinateSpaceProps
-): JSX.Element {
+): ReactNode {
   const { animated: isAnimated = false, children, ...restProps } = props
 
   const allPassThroughProps = {

@@ -11,14 +11,8 @@ export const robotAdminReducer: Reducer<RobotAdminState, Action> = (
   action
 ) => {
   switch (action.type) {
-    case Constants.RESTART_STATUS_CHANGED:
-    case Constants.RESTART_FAILURE: {
-      // @ts-expect-error TODO: guard type better here, don't do default destructing
-      const { robotName, bootId = null, startTime = null } = action.payload
-      const restartStatus =
-        action.type === Constants.RESTART_FAILURE
-          ? Constants.RESTART_FAILED_STATUS
-          : action.payload.restartStatus
+    case Constants.RESTART_STATUS_CHANGED: {
+      const { robotName, bootId, startTime, restartStatus } = action.payload
 
       const robotState = state[robotName]
       const restartState = {
@@ -30,16 +24,6 @@ export const robotAdminReducer: Reducer<RobotAdminState, Action> = (
       return {
         ...state,
         [robotName]: { ...robotState, restart: restartState },
-      }
-    }
-
-    case Constants.FETCH_RESET_CONFIG_OPTIONS_SUCCESS: {
-      const { robotName, options } = action.payload
-      const robotState = state[robotName]
-
-      return {
-        ...state,
-        [robotName]: { ...robotState, resetConfigOptions: options },
       }
     }
   }

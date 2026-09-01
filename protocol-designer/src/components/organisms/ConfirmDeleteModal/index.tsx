@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
 import {
-  AlertPrimaryButton,
   ALIGN_FLEX_END,
   COLORS,
   Flex,
   Icon,
   Modal,
+  PrimaryButton,
   SecondaryButton,
   SPACING,
   StyledText,
@@ -18,7 +18,7 @@ import { selectDropdownItem } from '/protocol-designer/ui/steps/actions/actions'
 
 import { getMainPagePortalEl } from '../Portal'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type { ThunkDispatch } from '/protocol-designer/types'
 
 export const DELETE_PROFILE_CYCLE: 'deleteProfileCycle' = 'deleteProfileCycle'
@@ -46,7 +46,7 @@ interface Props {
   onContinueClick: ((event: MouseEvent) => unknown) | (() => unknown)
 }
 
-export function ConfirmDeleteModal(props: Props): JSX.Element {
+export function ConfirmDeleteModal(props: Props): ReactNode {
   const { i18n, t } = useTranslation(['modal', 'button'])
   const { modalType, onCancelClick, onContinueClick } = props
   const dispatch = useDispatch<ThunkDispatch<any>>()
@@ -67,7 +67,6 @@ export function ConfirmDeleteModal(props: Props): JSX.Element {
   }
   return createPortal(
     <Modal
-      marginLeft="0"
       title={t(`confirm_delete_modal.${modalType}.title`)}
       titleElement1={
         <Icon name="ot-alert" color={COLORS.yellow50} size="1.25rem" />
@@ -83,7 +82,8 @@ export function ConfirmDeleteModal(props: Props): JSX.Element {
               {cancelCopy}
             </StyledText>
           </SecondaryButton>
-          <AlertPrimaryButton
+          <PrimaryButton
+            variant="warning"
             onClick={(e: MouseEvent) => {
               handleContinueClick(e)
             }}
@@ -91,7 +91,7 @@ export function ConfirmDeleteModal(props: Props): JSX.Element {
             <StyledText desktopStyle="bodyDefaultSemiBold">
               {continueCopy}
             </StyledText>
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </Flex>
       }
     >

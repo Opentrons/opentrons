@@ -15,11 +15,11 @@ import {
 
 import { MediumButton } from '/app/atoms/buttons'
 
-import type { RequestState } from '/app/redux/robot-api/types'
+import type { ReactNode } from 'react'
 
 interface FailedToConnectProps {
   selectedSsid: string
-  requestState: RequestState | null
+  errorMessage?: string | null
   handleChangeNetwork: () => void
   handleTryAgain: () => void
   isInvalidPassword: boolean
@@ -27,11 +27,11 @@ interface FailedToConnectProps {
 
 export function FailedToConnect({
   selectedSsid,
-  requestState,
+  errorMessage,
   handleTryAgain,
   handleChangeNetwork,
   isInvalidPassword,
-}: FailedToConnectProps): JSX.Element {
+}: FailedToConnectProps): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
 
   return (
@@ -68,16 +68,11 @@ export function FailedToConnect({
                 ? t('incorrect_password_for_ssid', { ssid: selectedSsid })
                 : t('failed_to_connect_to_ssid', { ssid: selectedSsid })}
             </LegacyStyledText>
-            {!isInvalidPassword &&
-              requestState != null &&
-              'error' in requestState &&
-              requestState.error != null &&
-              'message' in requestState.error &&
-              requestState.error.message != null && (
-                <LegacyStyledText marginTop={SPACING.spacing16}>
-                  {requestState.error.message}
-                </LegacyStyledText>
-              )}
+            {!isInvalidPassword && errorMessage != null && (
+              <LegacyStyledText marginTop={SPACING.spacing16}>
+                {errorMessage}
+              </LegacyStyledText>
+            )}
           </Flex>
         </Flex>
       </Flex>

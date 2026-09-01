@@ -4,6 +4,7 @@
   height: 100%;
   box-sizing: border-box;
   padding: var(--spacing-16);
+  background-color: var(--grey-10);
 }
 
 .left_column {
@@ -19,11 +20,21 @@
 }
 
 .center_column {
+  position: relative;
   display: flex;
+  overflow: hidden;
   min-width: 9.25rem; /* 148px */
-  flex: 1;
+  min-height: 0;
+  flex: 1 1 auto;
   flex-direction: column;
-  overflow-y: auto;
+  align-items: stretch;
+}
+
+.controls_container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .right_column {

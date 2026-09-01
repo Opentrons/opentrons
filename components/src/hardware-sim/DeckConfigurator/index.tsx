@@ -59,7 +59,7 @@ interface DeckConfiguratorProps {
   moduleModel?: ModuleModel
 }
 
-export function DeckConfigurator(props: DeckConfiguratorProps): JSX.Element {
+export function DeckConfigurator(props: DeckConfiguratorProps): ReactNode {
   const {
     deckConfig,
     handleClickAdd,

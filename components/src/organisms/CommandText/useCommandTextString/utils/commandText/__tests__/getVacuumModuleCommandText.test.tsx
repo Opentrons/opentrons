@@ -6,6 +6,8 @@ import { i18n } from '../../../../../../i18n'
 import { renderWithProviders } from '../../../../../../testing/utils'
 import { getVacuumModuleCommandText } from '../getVacuumModuleCommandText'
 
+import type { ReactNode } from 'react'
+
 const baseCommandData = {
   allRunDefs: [],
   robotType: 'OT-3 Standard',
@@ -17,7 +19,7 @@ const baseCommandData = {
   },
 } as any
 
-function TestWrapper({ command }: { command: any }): JSX.Element {
+function TestWrapper({ command }: { command: any }): ReactNode {
   const { t } = useTranslation(['protocol_command_text', 'branded'])
   return (
     <div>{getVacuumModuleCommandText({ command, ...baseCommandData, t })}</div>

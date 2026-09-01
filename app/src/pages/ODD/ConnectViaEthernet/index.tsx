@@ -1,37 +1,33 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import {
   DIRECTION_COLUMN,
   Flex,
   SPACING,
   StepMeter,
-  useInterval,
 } from '@opentrons/components'
 
 import { NetworkDetailsModal } from '/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 import { getLocalRobot } from '/app/redux/discovery'
-import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
+import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 
 import { DisplayConnectionStatus } from './DisplayConnectionStatus'
 import { TitleHeader } from './TitleHeader'
 
-import type { Dispatch, State } from '/app/redux/types'
+import type { ReactNode } from 'react'
 
 const STATUS_REFRESH_MS = 5000
 
-export function ConnectViaEthernet(): JSX.Element {
+export function ConnectViaEthernet(): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared'])
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  const dispatch = useDispatch<Dispatch>()
   const [showNetworkDetailsModal, setShowNetworkDetailsModal] =
     useState<boolean>(false)
 
-  const { ethernet } = useSelector((state: State) =>
-    getNetworkInterfaces(state, robotName)
-  )
+  const { ethernet } = useNetworkInterfaces(robotName, STATUS_REFRESH_MS)
   const ipAddress =
     ethernet?.ipAddress != null ? ethernet.ipAddress : t('shared:no_data')
   const subnetMask =
@@ -41,8 +37,6 @@ export function ConnectViaEthernet(): JSX.Element {
   const headerTitle = t('ethernet')
   const isConnected =
     ipAddress !== t('shared:no_data') && subnetMask !== t('shared:no_data')
-
-  useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
 
   return (
     <>

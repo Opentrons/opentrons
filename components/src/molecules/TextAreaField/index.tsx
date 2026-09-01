@@ -58,8 +58,6 @@ interface TextAreaFieldProps extends NativeTextareaProps {
   leftElement?: ReactNode
   /** optional element to display aligned to the right of the input field */
   rightElement?: ReactNode
-  /** if true, style the background of textarea field to error state */
-  hasBackgroundError?: boolean
   /** optional prop to support focus when tapping text area */
   onWrapperClick?: MouseEventHandler<HTMLDivElement>
   /** optional prop to override textarea field border radius */
@@ -72,12 +70,14 @@ interface TextAreaFieldProps extends NativeTextareaProps {
   resize?: CSSProperties['resize']
   /** if true, clear out value and add '-' placeholder */
   isIndeterminate?: boolean
+  /** if true, stretch the textarea to fill available height in a flex column parent */
+  multiline?: boolean
 }
 
 export const TextAreaField = forwardRef<
   HTMLTextAreaElement,
   TextAreaFieldProps
->((props, ref): JSX.Element => {
+>((props, ref): ReactNode => {
   const {
     label,
     error,
@@ -86,13 +86,13 @@ export const TextAreaField = forwardRef<
     textAlign = 'left',
     leftElement,
     rightElement,
-    hasBackgroundError = false,
     onWrapperClick,
     borderRadius,
     padding,
     height,
     resize = 'none',
     isIndeterminate,
+    multiline = false,
     ...textareaProps
   } = props
   const {
@@ -113,14 +113,15 @@ export const TextAreaField = forwardRef<
   const wrapperClasses = clsx(
     styles.wrapper,
     error != null ? styles.warning_color : styles.default_color,
-    rawDisabled === true && styles.disabled
+    rawDisabled === true && styles.disabled,
+    multiline && styles.wrapper_multiline
   )
 
   const textareaClasses = clsx(
     styles.textarea,
     hasError && styles.textarea_error,
-    hasBackgroundError && styles.textarea_background_error,
-    isKeyboardFocus && styles.textarea_keyboard_focus
+    isKeyboardFocus && styles.textarea_keyboard_focus,
+    multiline && styles.textarea_multiline
   )
 
   const titleClasses = clsx(
@@ -135,7 +136,12 @@ export const TextAreaField = forwardRef<
 
   return (
     <div className={wrapperClasses}>
-      <div className={styles.column_container}>
+      <div
+        className={clsx(
+          styles.column_container,
+          multiline && styles.column_container_multiline
+        )}
+      >
         {label != null && (
           <div className={styles.label_row}>
             <label htmlFor={textareaId}>
@@ -162,10 +168,18 @@ export const TextAreaField = forwardRef<
           </div>
         )}
         <div
-          className={styles.clickable_column}
+          className={clsx(
+            styles.clickable_column,
+            multiline && styles.clickable_column_multiline
+          )}
           onClick={!rawDisabled ? onWrapperClick : undefined}
         >
-          <div className={textareaRowClasses}>
+          <div
+            className={clsx(
+              textareaRowClasses,
+              multiline && styles.textarea_row_multiline
+            )}
+          >
             {leftElement !== undefined && (
               <div className={styles.left_element_wrapper}>{leftElement}</div>
             )}

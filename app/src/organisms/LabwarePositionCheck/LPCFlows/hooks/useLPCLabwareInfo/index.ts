@@ -80,11 +80,20 @@ function useFlexLPCLabwareInfo({
   const { data: lwOffsetsData } = useNotifySearchLabwareOffsets(
     searchLwOffsetsParams,
     {
-      enabled: runStatus === RUN_STATUS_IDLE && robotType === FLEX_ROBOT_TYPE,
+      enabled:
+        runStatus === RUN_STATUS_IDLE &&
+        robotType === FLEX_ROBOT_TYPE &&
+        searchLwOffsetsParams?.filters?.length > 0,
       refetchInterval: REFETCH_OFFSET_SEARCH_MS,
     }
   )
-  const storedOffsets = lwOffsetsData?.data
+
+  const storedOffsets = useMemo(
+    () =>
+      lwOffsetsData?.data ??
+      (searchLwOffsetsParams?.filters?.length === 0 ? [] : undefined),
+    [lwOffsetsData?.data, searchLwOffsetsParams?.filters]
+  )
 
   const labwareInfo = useMemo(
     () =>
@@ -105,7 +114,7 @@ function useOT2LPCLabwareInfo({
   robotType,
 }: UseLPCLabwareInfoProps): Pick<UseLPCLabwareInfoResult, 'legacyOffsets'> {
   const { data: runRecord } = useNotifyRunQuery(runId ?? null, {
-    enabled: robotType === OT2_ROBOT_TYPE,
+    enabled: robotType === OT2_ROBOT_TYPE && runId != null,
   })
   const legacyOffsets = runRecord?.data?.labwareOffsets ?? []
 

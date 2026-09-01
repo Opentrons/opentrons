@@ -19,8 +19,9 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_LANGUAGE_UPDATED_ODD_SETTINGS } from '/app/redux/analytics'
 import { getAppLanguage, updateConfigValue } from '/app/redux/config'
+import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 import type { SetSettingOption } from './types'
 
@@ -49,7 +50,7 @@ const uuid: () => string = uuidv4
 
 export function LanguageSetting({
   setCurrentOption,
-}: LanguageSettingProps): JSX.Element {
+}: LanguageSettingProps): ReactNode {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
@@ -74,6 +75,15 @@ export function LanguageSetting({
     })
   }
 
+  const handleChangeAndLog = useHandleAndLog<ChangeEvent<HTMLInputElement>>(
+    handleChange,
+    'change_language',
+    event => ({
+      action: 'change language',
+      message: `user changed language to ${event.target.value}`,
+    })
+  )
+
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <ChildNavigation
@@ -95,7 +105,7 @@ export function LanguageSetting({
               type="radio"
               value={lng.value}
               checked={lng.value === appLanguage}
-              onChange={handleChange}
+              onChange={handleChangeAndLog}
             />
             <SettingButtonLabel
               htmlFor={lng.name}

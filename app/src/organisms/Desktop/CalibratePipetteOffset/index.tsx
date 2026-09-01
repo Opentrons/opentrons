@@ -30,7 +30,7 @@ import {
 } from '/app/organisms/Desktop/CalibrationPanels'
 import * as Sessions from '/app/redux/sessions'
 
-import type { ComponentType } from 'react'
+import type { ComponentType, ReactNode } from 'react'
 import type { Mount } from '@opentrons/components'
 import type { CalibrationPanelProps } from '/app/organisms/Desktop/CalibrationPanels/types'
 import type {
@@ -188,7 +188,7 @@ export function CalibratePipetteOffset({
 
 function PipetteOffsetCalibrationComplete(
   props: CalibrationPanelProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation('robot_calibration')
   const { cleanUpAndExit } = props
 

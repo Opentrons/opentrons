@@ -18,7 +18,7 @@ import {
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type { ChipType, IconName } from '@opentrons/components'
 import type { NetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
 import type { SetSettingOption } from '../types'
@@ -33,7 +33,7 @@ interface NetworkSettingsProps {
 export function NetworkSettings({
   networkConnection,
   setCurrentOption,
-}: NetworkSettingsProps): JSX.Element {
+}: NetworkSettingsProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const { isWifiConnected, isEthernetConnected, activeSsid } = networkConnection
 
@@ -103,12 +103,12 @@ function NetworkSettingButton({
   chipText,
   networkName,
   onClick,
-}: NetworkSettingButtonProps): JSX.Element {
+}: NetworkSettingButtonProps): ReactNode {
   const PUSHED_STATE_STYLE = css`
     &:active {
-      background-color: ${chipType === 'success'
-        ? COLORS.green40
-        : COLORS.grey50};
+      background-color: ${
+        chipType === 'success' ? COLORS.green40 : COLORS.grey50
+      };
     }
   `
 

@@ -16,8 +16,8 @@ import {
   OVERFLOW_SCROLL,
   SPACING,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
 
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useToastOnErrorImage } from '/app/local-resources/images/hooks/useToastOnErrorImage'
 import { RoundTab } from '/app/molecules/RoundTab'
 import { useSyncRobotClock } from '/app/organisms/Desktop/Devices/hooks'
@@ -31,19 +31,17 @@ import { RunPreview } from '/app/organisms/Desktop/Devices/RunPreview'
 import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
 import { useRobot, useRobotType } from '/app/redux-resources/robots'
-import { OPENTRONS_USB } from '/app/redux/discovery'
 import { fetchProtocols } from '/app/redux/protocol-storage'
-import { useAccessTokenForRobot } from '/app/redux/robot-auth'
-import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import {
   useCurrentRunId,
   useModuleRenderInfoForProtocolById,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
-  useProtocolDetailsForRun,
+  useQuickProtocolDetailsForRun,
   useRunStatuses,
 } from '/app/resources/runs'
 
+import type { ReactNode } from 'react'
 import type { ViewportListRef } from 'react-viewport-list'
 import type { DesktopRouteParams, ProtocolRunDetailsTab } from '/app/App/types'
 import type { Dispatch } from '/app/redux/types'
@@ -57,19 +55,12 @@ export function ProtocolRunDetails(): JSX.Element | null {
   const dispatch = useDispatch<Dispatch>()
 
   const robot = useRobot(robotName)
-  const token = useAccessTokenForRobot(robotName)
   useSyncRobotClock(robotName)
   useEffect(() => {
     dispatch(fetchProtocols())
   }, [dispatch])
   return robot != null ? (
-    <ApiHostProvider
-      key={robot.name}
-      hostname={robot.ip ?? null}
-      requestor={robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined}
-      robotName={robot.name}
-      token={token}
-    >
+    <ApiHostProvider key={robot.name} robotName={robotName}>
       <RobotCertRotator>
         <Box
           minWidth="32rem"
@@ -100,14 +91,14 @@ interface PageContentsProps {
   robotName: string
   protocolRunDetailsTab: ProtocolRunDetailsTab
 }
-function PageContents(props: PageContentsProps): JSX.Element {
+function PageContents(props: PageContentsProps): ReactNode {
   const { runId, robotName, protocolRunDetailsTab } = props
   const robotType = useRobotType(robotName)
   const run = useNotifyRunQuery(runId)
   const runRecordCameraSettings = run?.data?.data.cameraSettings ?? null
   const runTimestamp = run.data?.data.createdAt ?? ''
   const runStatus = run?.data?.data.status ?? null
-  const { displayName: protocolName } = useProtocolDetailsForRun(runId)
+  const { displayName: protocolName } = useQuickProtocolDetailsForRun(runId)
   const protocolRunHeaderRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<ViewportListRef | null>(null)
   const [jumpedIndex, setJumpedIndex] = useState<number | null>(null)
@@ -304,7 +295,7 @@ interface ParametersTabProps {
   protocolRunDetailsTab: ProtocolRunDetailsTab
 }
 
-const ParametersTab = (props: ParametersTabProps): JSX.Element => {
+const ParametersTab = (props: ParametersTabProps): ReactNode => {
   const { robotName, runId, protocolRunDetailsTab } = props
   const { t } = useTranslation('run_details')
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -368,7 +359,7 @@ const ModuleControlsTab = (
   )
 }
 
-const RunPreviewTab = (props: SetupTabProps): JSX.Element => {
+const RunPreviewTab = (props: SetupTabProps): ReactNode => {
   const { robotName, runId } = props
   const { t } = useTranslation('run_details')
 

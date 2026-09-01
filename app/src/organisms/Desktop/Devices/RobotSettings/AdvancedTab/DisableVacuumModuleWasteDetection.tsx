@@ -13,18 +13,18 @@ import {
 import { ToggleButton } from '/app/atoms/buttons'
 import { useDisableVacuumModuleWasteDetection } from '/app/resources/robot-settings'
 
+import type { ReactNode } from 'react'
+
 interface DisableVacuumModuleWasteDetectionProps {
-  robotName: string
   isRobotBusy: boolean
 }
 
 export function DisableVacuumModuleWasteDetection({
-  robotName,
   isRobotBusy,
-}: DisableVacuumModuleWasteDetectionProps): JSX.Element {
+}: DisableVacuumModuleWasteDetectionProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const { wasteDetectionDisabled, toggleWasteDetection } =
-    useDisableVacuumModuleWasteDetection(robotName)
+    useDisableVacuumModuleWasteDetection()
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -32,7 +32,6 @@ export function DisableVacuumModuleWasteDetection({
         <LegacyStyledText
           css={TYPOGRAPHY.pSemiBold}
           paddingBottom={SPACING.spacing4}
-          id="AdvancedSettings_disableVacuumModuleWasteDetection"
         >
           {t('disable_vacuum_module_waste_detection')}
         </LegacyStyledText>
@@ -44,7 +43,6 @@ export function DisableVacuumModuleWasteDetection({
         label="disable_vacuum_module_waste_detection"
         toggledOn={wasteDetectionDisabled}
         onClick={toggleWasteDetection}
-        id="RobotSettings_DisableVacuumModuleWasteDetectionToggleButton"
         disabled={isRobotBusy}
       />
     </Flex>

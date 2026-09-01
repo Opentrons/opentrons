@@ -116,11 +116,12 @@ class MaintenanceRunDataManager:
             The run resource.
         """
         if self._run_orchestrator_store.current_run_id is not None:
+            self._maintenance_runs_publisher.stop_publishing_for_maintenance_run()
             await self._run_orchestrator_store.clear()
 
         proxy_door_callback = None
         if ff.hardware_subprocess_enabled():
-            pyro_resource = get_pyro_resource()
+            pyro_resource = await get_pyro_resource()
             proxy_door_callback = (
                 pyro_resource.get_maintenance_run_door_watcher_callback()
             )
@@ -137,7 +138,7 @@ class MaintenanceRunDataManager:
         await camera.update_live_stream_status(
             self._run_orchestrator_store._robot_type,
             True,
-            camera_provider,
+            await camera_provider.get_camera_settings(),
             state_summary.cameraSettings,
         )
 
@@ -153,7 +154,7 @@ class MaintenanceRunDataManager:
 
         return maintenance_run_data
 
-    def get(self, run_id: str) -> MaintenanceRun:
+    async def get(self, run_id: str) -> MaintenanceRun:
         """Get a maintenance run resource.
 
         Args:
@@ -169,7 +170,7 @@ class MaintenanceRunDataManager:
         if current_id != run_id:
             raise MaintenanceRunNotFoundError(run_id=run_id)
         created_at = self._run_orchestrator_store.current_run_created_at
-        state_summary = self._get_state_summary(run_id=run_id)
+        state_summary = await self._get_state_summary(run_id=run_id)
 
         return _build_run(
             run_id=run_id,
@@ -197,23 +198,21 @@ class MaintenanceRunDataManager:
         """
         if run_id == self._run_orchestrator_store.current_run_id:
             await self._run_orchestrator_store.clear()
-            await (
-                self._maintenance_runs_publisher.publish_current_maintenance_run_async()
-            )
+            self._maintenance_runs_publisher.stop_publishing_for_maintenance_run()
 
             if camera_settings is not None:
                 # Restart the live stream for the external run when the maintenance run has ended.
                 await camera.update_live_stream_status(
                     self._run_orchestrator_store._robot_type,
                     True,
-                    camera_provider,
+                    await camera_provider.get_camera_settings(),
                     camera_settings,
                 )
 
         else:
             raise MaintenanceRunNotFoundError(run_id=run_id)
 
-    def get_commands_slice(
+    async def get_commands_slice(
         self,
         run_id: str,
         cursor: Optional[int],
@@ -231,12 +230,12 @@ class MaintenanceRunDataManager:
         """
         if run_id != self._run_orchestrator_store.current_run_id:
             raise MaintenanceRunNotFoundError(run_id=run_id)
-        the_slice = self._run_orchestrator_store.get_command_slice(
+        the_slice = await self._run_orchestrator_store.get_command_slice(
             cursor=cursor, length=length
         )
         return the_slice
 
-    def get_current_command(self, run_id: str) -> Optional[CommandPointer]:
+    async def get_current_command(self, run_id: str) -> Optional[CommandPointer]:
         """Get the "current" command, if any.
 
         See `ProtocolEngine.state_view.commands.get_current()` for the definition
@@ -246,14 +245,16 @@ class MaintenanceRunDataManager:
             run_id: ID of the run.
         """
         if self._run_orchestrator_store.current_run_id == run_id:
-            return self._run_orchestrator_store.get_current_command()
+            return await self._run_orchestrator_store.get_current_command()
         else:
             # todo(mm, 2024-05-20):
             # For historical runs to behave consistently with the current run,
             # this should be the most recently completed command, not `None`.
             return None
 
-    def get_recovery_target_command(self, run_id: str) -> Optional[CommandPointer]:
+    async def get_recovery_target_command(
+        self, run_id: str
+    ) -> Optional[CommandPointer]:
         """Get the current error recovery target.
 
         See `ProtocolEngine.state_view.commands.get_recovery_target()`.
@@ -262,12 +263,12 @@ class MaintenanceRunDataManager:
             run_id: ID of the run.
         """
         if self._run_orchestrator_store.current_run_id == run_id:
-            return self._run_orchestrator_store.get_command_recovery_target()
+            return await self._run_orchestrator_store.get_command_recovery_target()
         else:
             # Historical runs can't have any ongoing error recovery.
             return None
 
-    def get_command(self, run_id: str, command_id: str) -> Command:
+    async def get_command(self, run_id: str, command_id: str) -> Command:
         """Get a run's command by ID.
 
         Args:
@@ -280,7 +281,7 @@ class MaintenanceRunDataManager:
         """
         if run_id != self._run_orchestrator_store.current_run_id:
             raise MaintenanceRunNotFoundError(run_id=run_id)
-        return self._run_orchestrator_store.get_command(command_id=command_id)
+        return await self._run_orchestrator_store.get_command(command_id=command_id)
 
-    def _get_state_summary(self, run_id: str) -> Optional[StateSummary]:
-        return self._run_orchestrator_store.get_state_summary()
+    async def _get_state_summary(self, run_id: str) -> Optional[StateSummary]:
+        return await self._run_orchestrator_store.get_state_summary()

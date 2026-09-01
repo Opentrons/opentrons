@@ -17,13 +17,14 @@ import { MediumButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { appRestart, sendLog } from '/app/redux/shell'
 
+import type { ReactNode } from 'react'
 import type { FallbackProps } from 'react-error-boundary'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { Dispatch } from '/app/redux/types'
 
 export function OnDeviceDisplayAppFallback({
   error,
-}: FallbackProps): JSX.Element {
+}: FallbackProps): ReactNode {
   const { t } = useTranslation(['app_settings', 'branded'])
   const dispatch = useDispatch<Dispatch>()
   const handleRestartClick = (): void => {

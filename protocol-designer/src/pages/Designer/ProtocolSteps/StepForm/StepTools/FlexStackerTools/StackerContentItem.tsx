@@ -4,15 +4,15 @@ import { COLORS, ListItem, StyledText, Tag } from '@opentrons/components'
 
 import styles from './flexstackertools.module.css'
 
+import type { ReactNode } from 'react'
+
 interface StackerContentItemProps {
   primaryLabwareName: string
   hasLid: boolean
   isTiprack: boolean
   quantity?: number
 }
-export function StackerContentItem(
-  props: StackerContentItemProps
-): JSX.Element {
+export function StackerContentItem(props: StackerContentItemProps): ReactNode {
   const { primaryLabwareName, hasLid, isTiprack, quantity } = props
   const { t } = useTranslation('form')
   return (

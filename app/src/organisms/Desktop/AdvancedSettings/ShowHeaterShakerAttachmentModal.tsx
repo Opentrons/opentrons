@@ -14,9 +14,10 @@ import {
 import { ToggleButton } from '/app/atoms/buttons'
 import { getIsHeaterShakerAttached, updateConfigValue } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
-export function ShowHeaterShakerAttachmentModal(): JSX.Element {
+export function ShowHeaterShakerAttachmentModal(): ReactNode {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
   const isHeaterShakerAttachmentModalVisible = useSelector(
@@ -36,7 +37,6 @@ export function ShowHeaterShakerAttachmentModal(): JSX.Element {
         <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
-          id="AdvancedSettings_showHeaterShakerAttachmentModal"
         >
           {t('heater_shaker_attach_visible')}
         </LegacyStyledText>
@@ -48,7 +48,6 @@ export function ShowHeaterShakerAttachmentModal(): JSX.Element {
         label="show_heater_shaker_modal"
         toggledOn={!isHeaterShakerAttachmentModalVisible}
         onClick={toggleHeaterShakerModalVisibility}
-        id="AdvancedSettings_showHeaterShakerAttachmentBtn"
       />
     </Flex>
   )

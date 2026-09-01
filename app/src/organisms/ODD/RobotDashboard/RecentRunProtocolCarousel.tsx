@@ -9,6 +9,7 @@ import {
 
 import { RecentRunProtocolCard } from './RecentRunProtocolCard'
 
+import type { ReactNode } from 'react'
 import type { RunData } from '@opentrons/api-client'
 
 interface RecentRunProtocolCarouselProps {
@@ -32,7 +33,7 @@ const CarouselWrapper = styled.div`
 export function RecentRunProtocolCarousel({
   recentRunsOfUniqueProtocols,
   onCardResolved,
-}: RecentRunProtocolCarouselProps): JSX.Element {
+}: RecentRunProtocolCarouselProps): ReactNode {
   return (
     <CarouselWrapper>
       <Flex

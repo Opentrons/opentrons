@@ -77,7 +77,7 @@ interface RadioButtonProps extends StyleProps {
 }
 
 // used for ODD and helix
-export function RadioButton(props: RadioButtonProps): JSX.Element {
+export function RadioButton(props: RadioButtonProps): ReactNode {
   const {
     buttonLabel,
     buttonSubLabel,
@@ -192,13 +192,13 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
 const copyContainerStyle = (
   buttonSubLabel: RadioButtonSubLabel | undefined
 ): FlattenSimpleInterpolation => css`
-  flex-direction: ${buttonSubLabel?.align === 'vertical'
-    ? DIRECTION_COLUMN
-    : DIRECTION_ROW};
+  flex-direction: ${
+    buttonSubLabel?.align === 'vertical' ? DIRECTION_COLUMN : DIRECTION_ROW
+  };
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
-  align-items: ${buttonSubLabel?.align === 'vertical'
-    ? ALIGN_START
-    : ALIGN_CENTER};
+  align-items: ${
+    buttonSubLabel?.align === 'vertical' ? ALIGN_START : ALIGN_CENTER
+  };
   width: ${buttonSubLabel != null ? '100%' : ''};
   word-break: break-word;
 `
@@ -231,11 +231,9 @@ const SUBBUTTON_LABEL_STYLE = (
   isSelected: boolean,
   buttonSubLabel: RadioButtonSubLabel
 ): FlattenSimpleInterpolation => css`
-  color: ${disabled
-    ? COLORS.grey50
-    : isSelected
-      ? COLORS.white
-      : COLORS.grey60};
+  color: ${
+    disabled ? COLORS.grey50 : isSelected ? COLORS.white : COLORS.grey60
+  };
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: ${buttonSubLabel?.align === 'vertical' ? 2 : 1};

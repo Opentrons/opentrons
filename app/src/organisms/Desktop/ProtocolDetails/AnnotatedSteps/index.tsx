@@ -13,7 +13,7 @@ import {
   getLastVisibleAnalysisCommandId,
 } from './utils'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   AnalysisError,
   CompletedProtocolAnalysis,
@@ -63,10 +63,7 @@ interface ErrorPastStepsMessageRow {
 }
 
 type AnnotatedStepsRow =
-  | GroupRow
-  | CommandRow
-  | ErrorRow
-  | ErrorPastStepsMessageRow
+  GroupRow | CommandRow | ErrorRow | ErrorPastStepsMessageRow
 
 export interface ItemData {
   rows: AnnotatedStepsRow[]
@@ -89,7 +86,7 @@ export interface ItemData {
 const DEFAULT_ROW_HEIGHT_PX = 64
 const DEFAULT_STEP_GROUP_SECONDS = 2000
 
-export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
+export function AnnotatedSteps(props: AnnotatedStepsProps): ReactNode {
   const {
     analysis,
     currentCommandIndex,

@@ -11,7 +11,7 @@ import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import { PinnedProtocol } from './PinnedProtocol'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type { CardSizeType } from './PinnedProtocol'
 
@@ -25,7 +25,7 @@ interface PinnedProtocolCarouselProps {
 
 export function PinnedProtocolCarousel(
   props: PinnedProtocolCarouselProps
-): JSX.Element {
+): ReactNode {
   const {
     pinnedProtocols,
     longPress,

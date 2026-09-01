@@ -11,13 +11,14 @@ import {
   toggleDefaultOffsetInfoBanner,
 } from '/app/redux/protocol-runs'
 
+import type { ReactNode } from 'react'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
 type RenderedBanner = 'defaultInfo' | 'defaultAlert' | 'hardcodedInfo' | null
 
 export function OffsetBannerContainer({
   runId,
-}: LPCWizardContentProps): JSX.Element {
+}: LPCWizardContentProps): ReactNode {
   const { t } = useTranslation('labware_position_check')
   const dispatch = useDispatch()
   const selectedLwInfo = useSelector(selectSelectedLwOverview(runId))

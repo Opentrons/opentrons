@@ -7,6 +7,7 @@ from fastapi import Depends, status
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import module_calibration
 from opentrons.protocol_engine.types import Vec3f
+from opentrons_shared_data.errors.exceptions import APIRemoved
 from server_utils.fastapi_utils.light_router import LightRouter
 from server_utils.fastapi_utils.models.json_api import (
     MultiBodyMeta,
@@ -17,10 +18,10 @@ from server_utils.fastapi_utils.models.json_api import (
 from .module_data_mapper import ModuleDataMapper
 from .module_identifier import ModuleIdentifier
 from .module_models import AttachedModule, ModuleCalibrationData
-from robot_server.hardware import get_hardware
-from robot_server.service.legacy.routers.modules import (
-    get_modules as legacy_get_attached_modules,
+from robot_server.errors.error_responses import (
+    LegacyErrorResponse,
 )
+from robot_server.hardware import get_hardware
 from robot_server.versioning import get_requested_version
 
 modules_router = LightRouter()
@@ -43,13 +44,13 @@ async def get_attached_modules(
 ) -> PydanticResponse[SimpleMultiBody[AttachedModule]]:
     """Get a list of all attached modules."""
     if requested_version <= 2:
-        # TODO: can we use a redirect here or something
-        legacy_data = await legacy_get_attached_modules(
-            hardware=hardware,
-        )
-        return await PydanticResponse.create(
-            content=legacy_data  # type: ignore[arg-type]
-        )
+        raise LegacyErrorResponse.from_exc(
+            APIRemoved(
+                api_element="/modules v2",
+                current_version="3",
+                extra_message="The V2 response of GET /modules has been removed. Set the header opentrons-api-version: 3 to get the V3 response.",
+            )
+        ).as_error(status.HTTP_410_GONE)
 
     # Load any the module calibrations
     module_calibrations: Dict[str, module_calibration.ModuleCalibrationOffset] = {
@@ -57,30 +58,33 @@ async def get_attached_modules(
     }
 
     response_data: List[AttachedModule] = []
-    for mod in hardware.attached_modules:
-        serial_number = mod.device_info["serial"]
+    for mod in await hardware.get_attached_modules():
+        device_summary = await mod.get_state_summary()
+        serial_number = device_summary.device_info["serial"]
         calibrated = module_calibrations.get(serial_number)
-        module_identity = module_identifier.identify(mod.device_info)
+        module_identity = module_identifier.identify(device_summary.device_info)
 
         response_data.append(
             module_data_mapper.map_data(
-                model=mod.model(),
-                has_available_update=mod.has_available_update(),
+                model=device_summary.model,
+                has_available_update=device_summary.has_available_update,
                 module_identity=module_identity,
-                live_data=mod.live_data,
-                usb_port=mod.usb_port,
-                module_offset=ModuleCalibrationData.model_construct(
-                    offset=Vec3f(
-                        x=calibrated.offset.x,
-                        y=calibrated.offset.y,
-                        z=calibrated.offset.z,
-                    ),
-                    slot=calibrated.slot,
-                    source=calibrated.status.source,
-                    last_modified=calibrated.last_modified,
-                )
-                if calibrated
-                else None,
+                live_data=device_summary.live_data,
+                usb_port=device_summary.usb_port,
+                module_offset=(
+                    ModuleCalibrationData.model_construct(
+                        offset=Vec3f(
+                            x=calibrated.offset.x,
+                            y=calibrated.offset.y,
+                            z=calibrated.offset.z,
+                        ),
+                        slot=calibrated.slot,
+                        source=calibrated.status.source,
+                        last_modified=calibrated.last_modified,
+                    )
+                    if calibrated
+                    else None
+                ),
             )
         )
 

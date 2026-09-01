@@ -1,5 +1,4 @@
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
@@ -9,11 +8,14 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   Overlay,
   POSITION_ABSOLUTE,
+  PrimaryButton,
   SecondaryButton,
   SPACING,
   StyledText,
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
+
+import type { ReactNode } from 'react'
 
 export interface overlayButtonProps {
   onClick: () => void
@@ -27,7 +29,7 @@ export interface OverlayModalProps {
   secondaryButtonProps?: overlayButtonProps
 }
 
-export function OverlayModal(props: OverlayModalProps): JSX.Element {
+export function OverlayModal(props: OverlayModalProps): ReactNode {
   const { header, subText, primaryButtonProps, secondaryButtonProps } = props
   return (
     <Overlay
@@ -79,9 +81,12 @@ export function OverlayModal(props: OverlayModalProps): JSX.Element {
             </SecondaryButton>
           )}
           {primaryButtonProps && (
-            <AlertPrimaryButton onClick={primaryButtonProps?.onClick}>
+            <PrimaryButton
+              variant="warning"
+              onClick={primaryButtonProps?.onClick}
+            >
               {primaryButtonProps?.text}
-            </AlertPrimaryButton>
+            </PrimaryButton>
           )}
         </Flex>
       </Flex>

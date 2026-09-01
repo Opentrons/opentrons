@@ -22,7 +22,7 @@ describe('RunningProtocolSkeleton', () => {
 
   it('renders Skeletons when current option is CurrentRunningProtocolCommand', () => {
     render(props)
-    const skeletons = screen.getAllByTestId('Skeleton')
+    const skeletons = screen.getAllByRole('status')
     const buttons = screen.getAllByRole('button')
     expect(buttons.length).toBe(2)
     // Note Skeleton component checks width and height so here just check the number of skeletons and background-size
@@ -34,7 +34,7 @@ describe('RunningProtocolSkeleton', () => {
   it('renders Skeletons when current option is RunningProtocolCommandList', () => {
     props = { currentOption: 'RunningProtocolCommandList' }
     render(props)
-    const skeletons = screen.getAllByTestId('Skeleton')
+    const skeletons = screen.getAllByRole('status')
     const buttons = screen.getAllByRole('button')
     expect(buttons.length).toBe(2)
     expect(skeletons.length).toBe(8)

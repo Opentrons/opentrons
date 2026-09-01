@@ -1,6 +1,6 @@
 """opentrons.protocol_api.labware: classes and functions for labware handling
 
-This module provides things like :py:class:`Labware`, and :py:class:`Well`
+This module provides things like [`Labware`][opentrons.protocol_api.Labware], and [`Well`][opentrons.protocol_api.Well]
 to encapsulate labware instances used in protocols
 and their wells. It also provides helper functions to load and save labware
 and labware calibration offsets. It contains all the code necessary to
@@ -464,10 +464,10 @@ class Labware:
         :param core: The class that implements the public interface
                                of the class.
         :param APIVersion api_level: the API version to set for the instance.
-                                     The :py:class:`.Labware` will
+                                     The [`Labware`][opentrons.protocol_api.Labware] will
                                      conform to this level. If not specified,
                                      defaults to
-                                     :py:attr:`.MAX_SUPPORTED_VERSION`.
+                                     `MAX_SUPPORTED_VERSION`.
         """
         if api_version <= _IGNORE_API_VERSION_BREAKPOINT:
             api_version = _IGNORE_API_VERSION_BREAKPOINT
@@ -1312,7 +1312,7 @@ class Labware:
                 current_version=f"{self._api_version}",
             )
 
-        # This logic is the inverse of :py:meth:`next_tip`
+        # This logic is the inverse of `next_tip()`
         assert num_tips > 0, "Bad call to previous_tip: num_tips <= 0"
         assert isinstance(self._core, LegacyLabwareCore)
         well_core = self._core.get_tip_tracker().previous_tip(num_tips=num_tips)
@@ -1351,7 +1351,7 @@ class Labware:
                 extra_message="Use Labware.reset() instead.",
             )
 
-        # This logic is the inverse of :py:meth:`use_tips`
+        # This logic is the inverse of `use_tips()`
         assert num_channels > 0, "Bad call to return_tips: num_channels <= 0"
 
         assert isinstance(self._core, LegacyLabwareCore)
@@ -1618,13 +1618,13 @@ def load_from_definition(
         (shape, physical dimensions, etc), and so on. The correct shape of
         this definition is governed by the "labware-designer" project in
         the Opentrons/opentrons repo.
-    :param parent: A :py:class:`.Location` representing the location where
+    :param parent: A [`Location`][opentrons.types.Location] representing the location where
                    the front and left most point of the outside of labware is
                    (often the front-left corner of a slot on the deck).
     :param str label: An optional label that will override the labware's
                       display name from its definition
     :param api_level: the API version to set for the loaded labware
-                      instance. The :py:class:`.Labware` will
+                      instance. The [`Labware`][opentrons.protocol_api.Labware] will
                       conform to this level. If not specified,
                       defaults to ``APIVersion(2, 13)``.
     """
@@ -1660,7 +1660,7 @@ def load(
     :param load_name: A string to use for looking up a labware definition
         previously saved to disc. The definition file must have been saved in a
         known location
-    :param parent: A :py:class:`.Location` representing the location where
+    :param parent: A [`Location`][opentrons.types.Location] representing the location where
                    the front and left most point of the outside of labware is
                    (often the front-left corner of a slot on the deck).
     :param str label: An optional label that will override the labware's
@@ -1675,7 +1675,7 @@ def load(
         definitions. If no bundle is passed, these definitions will also be
         searched.
     :param api_level: the API version to set for the loaded labware
-                      instance. The :py:class:`.Labware` will
+                      instance. The [`Labware`][opentrons.protocol_api.Labware] will
                       conform to this level. If not specified,
                       defaults to ``APIVersion(2, 13)``.
     """

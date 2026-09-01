@@ -1,5 +1,4 @@
 import { Trans, useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 
 import {
   COLORS,
@@ -11,11 +10,12 @@ import {
 } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { OddModal } from '/app/molecules/OddModal'
-import { restartRobot } from '/app/redux/robot-admin'
+import { useRestartRobotMutation } from '/app/resources/devices/hooks/useRestartRobotMutation'
 
+import type { ReactNode } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-import type { Dispatch } from '/app/redux/types'
 
 interface RestartRobotConfirmationModalProps {
   robotName: string
@@ -26,14 +26,15 @@ interface RestartRobotConfirmationModalProps {
 export function RestartRobotConfirmationModal({
   robotName,
   setShowRestartRobotConfirmationModal,
-}: RestartRobotConfirmationModalProps): JSX.Element {
+}: RestartRobotConfirmationModalProps): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('restart_now'),
     iconName: 'ot-alert',
     iconColor: COLORS.yellow50,
   }
-  const dispatch = useDispatch<Dispatch>()
+  const documentationState = useDocumentationState()
+  const { restart } = useRestartRobotMutation(documentationState, robotName)
 
   return (
     <OddModal header={modalHeader}>
@@ -68,7 +69,9 @@ export function RestartRobotConfirmationModal({
             flex="1"
             buttonType="alert"
             buttonText={i18n.format(t('shared:restart'), 'capitalize')}
-            onClick={() => dispatch(restartRobot(robotName))}
+            onClick={() => {
+              restart()
+            }}
           />
         </Flex>
       </Flex>

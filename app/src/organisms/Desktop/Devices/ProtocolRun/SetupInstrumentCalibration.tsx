@@ -12,8 +12,8 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '/app/i18n'
 import { useIsFlex } from '/app/redux-resources/robots'
-import * as PipetteConstants from '/app/redux/pipettes/constants'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { PIPETTE_MOUNTS } from '/app/resources/instruments/constants'
 import { isGripperInCommands } from '/app/resources/protocols/utils'
 import {
   useMostRecentCompletedAnalysis,
@@ -26,6 +26,7 @@ import { SetupFlexPipetteCalibrationItem } from './SetupFlexPipetteCalibrationIt
 import { SetupGripperCalibrationItem } from './SetupGripperCalibrationItem'
 import { SetupPipetteCalibrationItem } from './SetupPipetteCalibrationItem'
 
+import type { ReactNode } from 'react'
 import type { GripperData } from '@opentrons/api-client'
 
 const EQUIPMENT_POLL_MS = 5000
@@ -38,7 +39,7 @@ interface SetupInstrumentCalibrationProps {
 export function SetupInstrumentCalibration({
   robotName,
   runId,
-}: SetupInstrumentCalibrationProps): JSX.Element {
+}: SetupInstrumentCalibrationProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
   const isFlex = useIsFlex(robotName)
@@ -63,14 +64,10 @@ export function SetupInstrumentCalibration({
       {getShowPipetteCalibrationWarning(instrumentsQueryData) && (
         <PipetteRecalibrationWarning />
       )}
-      <LegacyStyledText
-        color={COLORS.black90}
-        css={TYPOGRAPHY.pSemiBold}
-        id="PipetteCalibration_requiredPipettesTitle"
-      >
+      <LegacyStyledText color={COLORS.black90} css={TYPOGRAPHY.pSemiBold}>
         {i18n.format(t('required_instrument_calibrations'), 'titleCase')}
       </LegacyStyledText>
-      {PipetteConstants.PIPETTE_MOUNTS.map((mount, index) => {
+      {PIPETTE_MOUNTS.map((mount, index) => {
         const pipetteInfo = runPipetteInfoByMount[mount]
         if (pipetteInfo != null && !isFlex) {
           return (

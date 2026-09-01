@@ -13,20 +13,18 @@ import {
 
 import { DOC_URL } from '..'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 
 interface AppInfoProps {
   setShowAnnouncementModal: Dispatch<SetStateAction<boolean>>
 }
 
-export function AppInfo({
-  setShowAnnouncementModal,
-}: AppInfoProps): JSX.Element {
+export function AppInfo({ setShowAnnouncementModal }: AppInfoProps): ReactNode {
   const { t } = useTranslation('shared')
   const pdVersion = _OT_PD_VERSION_
 
   const handleSoftwareManualClick = (): void => {
-    window.open(DOC_URL, '_blank')
+    window.open(DOC_URL, '_blank', 'noopener')
   }
 
   return (

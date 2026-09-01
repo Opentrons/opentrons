@@ -61,13 +61,13 @@ import { ModuleEmptySelectorButtons } from '../ModuleEmptySelectorButtons'
 import { getNextAvailableModuleSlot, getSlotsWithCollisions } from '../utils'
 import { getModuleOnSlot } from './util'
 
+import type { ReactNode } from 'react'
 import type { AddressableAreaName, ModuleModel } from '@opentrons/shared-data'
 import type { StepType } from '/protocol-designer/form-types'
 import type { OT2ModuleType, ThunkDispatch } from '/protocol-designer/types'
 
 type MagneticModuleModels =
-  | typeof MAGNETIC_MODULE_V1
-  | typeof MAGNETIC_MODULE_V2
+  typeof MAGNETIC_MODULE_V1 | typeof MAGNETIC_MODULE_V2
 
 const mapModTypeToStepTypeOt2: Record<OT2ModuleType, StepType> = {
   heaterShakerModuleType: 'heaterShaker',
@@ -89,7 +89,7 @@ const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'fixedTrash',
 ]
 
-export function Ot2Modules(): JSX.Element {
+export function Ot2Modules(): ReactNode {
   const { t } = useTranslation(['onboarding', 'protocol_overview', 'shared'])
   const initialDeckSetup = useSelector(getInitialDeckSetup)
   const disableCollisionWarnings = useSelector(getDisableModuleRestrictions)
@@ -340,13 +340,13 @@ export function Ot2Modules(): JSX.Element {
               paddingTop={SPACING.spacing60}
             >
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-                {Object.values(modules).map((module, index) => {
+                {Object.values(modules).map(module => {
                   const { isModuleInUse, moduleId } = getModuleOnSlot(
                     savedSteps,
                     module
                   )
                   return (
-                    <ListItem type="default" key={`${module.model}_${index}`}>
+                    <ListItem type="default" key={module.id}>
                       <ListItemCustomize
                         linkText={t('remove')}
                         onClick={() => {

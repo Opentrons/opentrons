@@ -8,7 +8,7 @@ import { i18n } from '/app/i18n'
 import { useDropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
 import { handlePipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { ChoosePipette } from '/app/organisms/PipetteWizardFlows/ChoosePipette'
-import { mockLeftSpecs } from '/app/redux/pipettes/__fixtures__'
+import { mockLeftSpecs } from '/app/resources/instruments/__fixtures__'
 
 import { AboutPipetteSlideout } from '../AboutPipetteSlideout'
 import { FlexPipetteCard } from '../FlexPipetteCard'
@@ -58,6 +58,7 @@ describe('FlexPipetteCard', () => {
         },
       } as PipetteData,
       mount: 'left',
+      robotName: 'otie',
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -110,6 +111,7 @@ describe('FlexPipetteCard', () => {
         },
       } as PipetteData,
       mount: 'left',
+      robotName: 'otie',
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -136,6 +138,7 @@ describe('FlexPipetteCard', () => {
         },
       } as PipetteData,
       mount: 'left',
+      robotName: 'otie',
       isRunActive: false,
       isEstopNotDisengaged: false,
     }
@@ -164,6 +167,7 @@ describe('FlexPipetteCard', () => {
         },
       } as PipetteData,
       mount: 'left',
+      robotName: 'otie',
       isRunActive: false,
       isEstopNotDisengaged: true,
     }
@@ -185,6 +189,7 @@ describe('FlexPipetteCard', () => {
   it('renders choose pipette modal when attach button is pressed', () => {
     props = {
       mount: 'left',
+      robotName: 'otie',
       attachedPipette: null,
       pipetteModelSpecs: null,
       isRunActive: false,
@@ -235,6 +240,7 @@ describe('FlexPipetteCard', () => {
         ok: false,
       } as any,
       mount: 'left',
+      robotName: 'otie',
       pipetteModelSpecs: null,
       isRunActive: false,
       isEstopNotDisengaged: false,
@@ -255,6 +261,7 @@ describe('FlexPipetteCard', () => {
         ok: false,
       } as any,
       mount: 'left',
+      robotName: 'otie',
       pipetteModelSpecs: null,
       isRunActive: false,
       isEstopNotDisengaged: false,

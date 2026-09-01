@@ -12,9 +12,11 @@ import {
 
 import styles from './settingsicon.module.css'
 
+import type { ReactNode } from 'react'
+
 const BUTTON_NAME = 'Settings Icon Button'
 
-export const SettingsIcon = (): JSX.Element => {
+export const SettingsIcon = (): ReactNode => {
   const location = useLocation()
   const navigate = useNavigate()
 

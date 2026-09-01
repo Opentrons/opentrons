@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import first from 'lodash/first'
 import last from 'lodash/last'
 import { css } from 'styled-components'
 
-import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -34,6 +34,7 @@ import {
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { useInitializeCameraState } from '/app/local-resources/images/hooks/useInitializeCameraState'
 import { getIncompleteInstrumentCount } from '/app/local-resources/instruments'
@@ -50,6 +51,7 @@ import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import {
   AnalysisFailedModal,
   getUnmatchedModulesForProtocol,
+  ProtocolSetupButtonsSkeleton,
   ProtocolSetupInstruments,
   ProtocolSetupLabware,
   ProtocolSetupModulesAndDeck,
@@ -118,7 +120,7 @@ import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal
 
 import type { TFunction } from 'i18next'
 import type { FlattenSimpleInterpolation } from 'styled-components'
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { Run, RunStatus } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type {
@@ -154,6 +156,8 @@ interface PrepareToRunProps {
   isCameraRequired: boolean
   appCameraSettings: CameraState
   storageInfo: RobotStorageInfo
+  showConfirmCancelModal: boolean
+  setShowConfirmCancelModal: Dispatch<SetStateAction<boolean>>
 }
 
 function PrepareToRun({
@@ -172,13 +176,14 @@ function PrepareToRun({
   isCameraRequired,
   appCameraSettings,
   storageInfo,
-}: PrepareToRunProps): JSX.Element {
+  showConfirmCancelModal,
+  setShowConfirmCancelModal,
+}: PrepareToRunProps): ReactNode {
   const { t, i18n } = useTranslation([
     'protocol_setup',
     'shared',
     'deck_configuration',
   ])
-  const navigate = useNavigate()
   const { makeSnackbar } = useToaster()
   const { scrollRef, isScrolled } = useScrollPosition()
 
@@ -233,11 +238,6 @@ function PrepareToRun({
     }
   }, [mostRecentAnalysis?.status])
 
-  const onConfirmCancelClose = (): void => {
-    setShowConfirmCancelModal(false)
-    navigate(-1)
-  }
-
   const protocolHasModules =
     mostRecentAnalysis?.modules != null &&
     mostRecentAnalysis?.modules.length > 0
@@ -288,9 +288,6 @@ function PrepareToRun({
     parameter =>
       parameter.type === 'csv_file' || parameter.value !== parameter.default
   )
-
-  const [showConfirmCancelModal, setShowConfirmCancelModal] =
-    useState<boolean>(false)
 
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     robotType,
@@ -655,21 +652,22 @@ function PrepareToRun({
             )}
           </Flex>
           <Flex gridGap={SPACING.spacing16}>
-            <CloseButton
-              onClose={
-                !isLoading
-                  ? () => {
-                      setShowConfirmCancelModal(true)
-                    }
-                  : onConfirmCancelClose
-              }
-            />
-            <PlayButton
-              disabled={isLoading}
-              onPlay={!isLoading ? onPlay : undefined}
-              ready={!isLoading ? isReadyToRun : false}
-              isDoorOpen={doorStatus.isDoorOpen}
-            />
+            {!isLoading ? (
+              <>
+                <CloseButton
+                  onClose={() => {
+                    setShowConfirmCancelModal(true)
+                  }}
+                />
+                <PlayButton
+                  onPlay={onPlay}
+                  ready={isReadyToRun}
+                  isDoorOpen={doorStatus.isDoorOpen}
+                />
+              </>
+            ) : (
+              <ProtocolSetupButtonsSkeleton />
+            )}
           </Flex>
         </Flex>
       </Flex>
@@ -751,7 +749,6 @@ function PrepareToRun({
           runId={runId}
           setShowConfirmCancelRunModal={setShowConfirmCancelModal}
           isActiveRun={false}
-          protocolId={protocolId}
         />
       ) : null}
     </>
@@ -761,7 +758,7 @@ function PrepareToRun({
 const MAINTENANCE_RUN_POLL_MS = 5000
 const RUN_RECORD_REFETCH_MS = 5000
 
-export function ProtocolSetup(): JSX.Element {
+export function ProtocolSetup(): ReactNode {
   const { runId } = useParams<
     keyof OnDeviceRouteParams
   >() as OnDeviceRouteParams
@@ -781,7 +778,9 @@ export function ProtocolSetup(): JSX.Element {
     localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const trackEvent = useTrackEvent()
   const { play } = useRunControls(runId)
-  const { addCameraSettingsToRun } = useAddCameraSettingsToRunMutation()
+  const documentationState = useDocumentationState()
+  const { addCameraSettingsToRun } =
+    useAddCameraSettingsToRunMutation(documentationState)
   const [showAnalysisFailedModal, setShowAnalysisFailedModal] =
     useState<boolean>(true)
   const robotType = useRobotType(robotName)
@@ -800,11 +799,8 @@ export function ProtocolSetup(): JSX.Element {
     useNotifyCurrentMaintenanceRun({ refetchInterval: MAINTENANCE_RUN_POLL_MS })
       .data?.data.id != null
 
-  const navigate = useNavigate()
-
-  if (runStatus === RUN_STATUS_STOPPED) {
-    navigate('/protocols')
-  }
+  const [showConfirmCancelModal, setShowConfirmCancelModal] =
+    useState<boolean>(false)
 
   const { data: mostRecentAnalysis = null } =
     useProtocolAnalysisAsDocumentQuery(
@@ -859,7 +855,10 @@ export function ProtocolSetup(): JSX.Element {
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
 
   const offsetsConfirmed = useSelector(selectAreOffsetsApplied(runId))
-  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(runId)
+  const { applyOffsets, isApplyingOffsets } = useApplyOffsets(
+    runId,
+    documentationState
+  )
 
   const [cameraSettingsConfirmed, setCameraSettingsConfirmed] = useState(false)
   const { data: initialRobotCameraSettings } = useNotifyCamera({
@@ -994,6 +993,8 @@ export function ProtocolSetup(): JSX.Element {
         isCameraRequired={isCameraRequired}
         appCameraSettings={appCameraSettings}
         storageInfo={storageInfo}
+        showConfirmCancelModal={showConfirmCancelModal}
+        setShowConfirmCancelModal={setShowConfirmCancelModal}
       />
     ),
     instruments: (

@@ -14,6 +14,7 @@ import {
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import * as Sessions from '/app/redux/sessions'
 
+import type { ReactNode } from 'react'
 import type {
   SessionCommandString,
   SessionType,
@@ -37,7 +38,7 @@ const moveCommandBySessionType: {
   [Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK]:
     Sessions.sharedCalCommands.MOVE_TO_REFERENCE_POINT,
 }
-export function TipConfirmation(props: CalibrationPanelProps): JSX.Element {
+export function TipConfirmation(props: CalibrationPanelProps): ReactNode {
   const { sendCommands, sessionType } = props
   const { t } = useTranslation(['robot_calibration', 'shared'])
 

@@ -1,29 +1,23 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
 
 import { COLORS, JUSTIFY_FLEX_END, PrimaryButton } from '@opentrons/components'
-import { useModulesQuery } from '@opentrons/react-api-client'
+import {
+  isDocumentedMutationError,
+  useModulesQuery,
+  useUpdateModuleMutation,
+} from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
 } from '/app/molecules/SimpleWizardBody'
-import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
-import {
-  dismissRequest,
-  FAILURE,
-  getRequestById,
-  PENDING,
-  SUCCESS,
-} from '/app/redux/robot-api'
 
-import { useSendIdentifyModule } from './hooks'
-
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
-import type { Dispatch, State } from '/app/redux/types'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
 
 const EQUIPMENT_POLL_MS = 3000
@@ -31,42 +25,43 @@ const MODULE_TIMEOUT_MS = 60000
 const CHECKING_UPDATE_TIMEOUT_MS = 1000
 const NO_UPDATE_FOUND_TIMEOUT_MS = 2000
 interface UpdateFirmwareProps extends ModuleSetupWizardMaybePipetteStepProps {
-  robotName: string
   patchModuleAfterUpdate: (module: AttachedModule) => void
 }
 
-export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
+export function UpdateFirmware(props: UpdateFirmwareProps): ReactNode {
   const {
     proceed,
     setErrorMessage,
     attachedModule,
-    robotName,
     patchModuleAfterUpdate,
     setIsModuleUpdating,
     isOnDevice,
+    sendIdentifyModule,
   } = props
   const { t } = useTranslation('module_wizard_flows')
 
-  const dispatch = useDispatch<Dispatch>()
-  const sendIdentifyModule = useSendIdentifyModule()
-  const [getLatestRequestId, handleModuleApiRequests] = useModuleApiRequests()
   const moduleSerialNumber = props.attachedModule.serialNumber
   const [moduleRequestTimeoutId, setModuleRequestTimeoutId] =
     useState<ReturnType<typeof setTimeout> | null>(null)
   const [checkingFirmware, setCheckingFirmware] = useState(false)
   const [inProgress, setInProgress] = useState(false)
   const [shouldProceed, setShouldProceed] = useState(false)
+  const [pollForUpdatedModule, setPollForUpdatedModule] = useState(false)
 
-  const latestRequestId = getLatestRequestId(attachedModule.serialNumber)
-  const requestStatus = useSelector((state: State) => {
-    return latestRequestId != null
-      ? getRequestById(state, latestRequestId)
-      : null
-  })?.status
+  const documentationState = useDocumentationState()
+  const {
+    updateModule,
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+    reset: resetUpdateModule,
+  } = useUpdateModuleMutation(documentationState)
+
   const attachedModules =
     useModulesQuery({
       refetchInterval: EQUIPMENT_POLL_MS,
-      enabled: requestStatus === SUCCESS && inProgress,
+      enabled: pollForUpdatedModule,
     })?.data?.data ?? []
 
   useEffect(
@@ -74,7 +69,7 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
       const matchingModule = attachedModules.find(
         module => module.serialNumber === moduleSerialNumber
       )
-      if (matchingModule != null && requestStatus === SUCCESS) {
+      if (matchingModule != null && isSuccess) {
         if (moduleRequestTimeoutId != null) {
           clearTimeout(moduleRequestTimeoutId)
         }
@@ -82,10 +77,9 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
         if (matchingModule.hasAvailableUpdate) {
           setIsModuleUpdating(false)
           setInProgress(false)
+          setPollForUpdatedModule(false)
           setErrorMessage(t('firmware_update_failed') as string)
-          if (latestRequestId != null) {
-            dispatch(dismissRequest(latestRequestId))
-          }
+          resetUpdateModule()
           return
         }
         // Update passed
@@ -101,7 +95,7 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [attachedModules, requestStatus, moduleRequestTimeoutId, moduleSerialNumber]
+    [attachedModules, isSuccess, moduleRequestTimeoutId, moduleSerialNumber]
   )
 
   useEffect(
@@ -125,20 +119,27 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
 
   useEffect(
     () => {
-      if (requestStatus === PENDING) {
+      if (isLoading) {
         setInProgress(true)
-      } else if (requestStatus === FAILURE) {
+      } else if (isError) {
+        if (error != null && isDocumentedMutationError(error)) {
+          setIsModuleUpdating(false)
+          setInProgress(false)
+          resetUpdateModule()
+          return
+        }
         setIsModuleUpdating(false)
         setInProgress(false)
+        setPollForUpdatedModule(false)
         setErrorMessage(t('firmware_update_failed') as string)
-        if (latestRequestId != null) {
-          dispatch(dismissRequest(latestRequestId))
-        }
-      } else if (requestStatus === SUCCESS) {
+        resetUpdateModule()
+      } else if (isSuccess) {
+        setPollForUpdatedModule(true)
         // if the request succeeds but the module doesn't come back online within 60 seconds
         // we should display an error message
         const timeoutId = setTimeout(() => {
           setIsModuleUpdating(false)
+          setPollForUpdatedModule(false)
           setErrorMessage(t('firmware_update_failed') as string)
         }, MODULE_TIMEOUT_MS)
         setModuleRequestTimeoutId(timeoutId)
@@ -146,12 +147,12 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [requestStatus, setInProgress]
+    [isLoading, isError, isSuccess, error, setInProgress]
   )
 
   const handleUpdateFirmware = (): void => {
     setIsModuleUpdating(true)
-    handleModuleApiRequests(robotName, attachedModule.serialNumber)
+    updateModule(attachedModule.serialNumber)
   }
 
   if (checkingFirmware) {

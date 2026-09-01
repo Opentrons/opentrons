@@ -4,8 +4,18 @@ import json
 import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from typing import Any, NotRequired, TypeAlias, TypedDict, TypeGuard, cast, override
+from typing import (
+    Any,
+    Callable,
+    NotRequired,
+    Protocol,
+    TypedDict,
+    TypeGuard,
+    cast,
+    override,
+)
 
+import fastapi
 import oauthlib.common
 import oauthlib.oauth2
 import pydantic
@@ -15,8 +25,9 @@ from server_utils.auth.scopes import Scope, UnrecognizedScopeError, serialize_sc
 from auth_server.persistence.orm_models import User as ORMUser
 from auth_server.settings.store import SettingsStore
 from auth_server.users.is_account_locked import is_account_locked
+from auth_server.users.scopes import get_scope_set_of_user
 from auth_server.users.store import UserStore
-from auth_server.users.user_data_manager import get_scope_set_of_user, password_hash
+from auth_server.users.user_data_manager import must_reset_password, password_hash
 
 _log = logging.getLogger(__name__)
 
@@ -29,24 +40,95 @@ _log = logging.getLogger(__name__)
 # https://github.com/oauthlib/oauthlib/issues/641
 _CLIENT_ID = "opentrons_app"
 
-# todo(mm, 2026-01-30): There ought to be some HTTP endpoint to configure this.
-_TOKEN_LIFETIME = timedelta(days=30)
+
+class SendAuditLog(Protocol):
+    """Callback function to send an audit log out-of-band. Doesn't block."""
+
+    def __call__(self, action: str, message: str) -> None:
+        """See class docstring."""
+        ...
 
 
-Backend: TypeAlias = oauthlib.oauth2.LegacyApplicationServer
-"""A backend that our server can use to process OAuth 2 requests.
+class Backend:
+    """A backend that our server can use to process OAuth 2 requests."""
 
-"Legacy" in this case refers to the fact that it uses the "resource owner password
-credentials" grant type.
-"""
+    def __init__(
+        self,
+        user_store: UserStore,
+        settings_store: SettingsStore,
+        send_audit_log: SendAuditLog,
+    ) -> None:
+        self._user_store = user_store
+        self._settings_store = settings_store
+        self._token_store = _TokenStore()
 
+        def get_token_expires_in(request: oauthlib.common.Request) -> int:
+            idle_logout_setting = settings_store.get_settings().idleLogout
+            return int(idle_logout_setting)
 
-def build(user_store: UserStore, settings_store: SettingsStore) -> Backend:
-    """Return a backend that our server can use to process OAuth 2 requests."""
-    return oauthlib.oauth2.LegacyApplicationServer(
-        _RequestValidator(_TokenStore(), user_store, settings_store),
-        token_expires_in=int(_TOKEN_LIFETIME.total_seconds()),
-    )
+        # "Legacy" refers to the fact that it uses the "resource owner password credentials"
+        # grant type.
+        self._inner_backend = oauthlib.oauth2.LegacyApplicationServer(
+            _RequestValidator(
+                self._token_store,
+                user_store,
+                settings_store,
+                lambda: datetime.now(tz=UTC),
+                send_audit_log,
+            ),
+            token_expires_in=get_token_expires_in,
+        )
+
+    def create_token_response(
+        self, body_form_data: list[tuple[str, str]], headers: dict[str, str]
+    ) -> fastapi.Response:
+        """Process a request to the OAuth 2 token endpoint and return the response.
+
+        This is basically a type-safe wrapper around the underlying oauthlib implementation.
+        """
+        token_response: tuple[dict[str, str], str, int] = (
+            self._inner_backend.create_token_response(
+                # The uri param apparently does not matter.
+                uri="",
+                # We can assume the request was POST because the FastAPI layer will enforce it.
+                http_method="POST",
+                body=body_form_data,
+                headers=headers,
+            )
+        )
+        headers, body, status_code = token_response
+
+        return fastapi.Response(
+            headers=headers,
+            content=body,
+            status_code=status_code,
+        )
+
+    def revoke_all_tokens(self) -> None:
+        """Invalidate every issued access and refresh token."""
+        self._token_store.revoke_all()
+
+    def create_introspect_response(
+        self, body_form_data: list[tuple[str, str]], headers: dict[str, str]
+    ) -> fastapi.Response:
+        """Process a request to the OAuth 2 introspection endpoint and return the response.
+
+        This is basically a type-safe wrapper around the underlying oauthlib implementation.
+        """
+        headers, body, status_code = self._inner_backend.create_introspect_response(
+            # The uri param apparently does not matter.
+            uri="",
+            # We can assume the request was POST because the FastAPI layer will enforce it.
+            http_method="POST",
+            # The type stubs are wrong; `body` can in fact be a `list[tuple[str, str]]`.
+            body=body_form_data,  # type: ignore[arg-type]
+            headers=headers,
+        )
+        return fastapi.Response(
+            headers=headers,
+            content=body,
+            status_code=status_code,
+        )
 
 
 @dataclass
@@ -87,10 +169,15 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         token_store: _TokenStore,
         user_store: UserStore,
         settings_store: SettingsStore,
+        get_now: Callable[[], datetime],
+        send_audit_log: SendAuditLog,
     ) -> None:
         self.__token_store = token_store
         self.__user_store = user_store
         self.__settings_store = settings_store
+        self.__get_now = get_now
+        self.__send_audit_log = send_audit_log
+
         super().__init__()
 
     @override
@@ -99,7 +186,12 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         self, client_id: str, request: oauthlib.common.Request
     ) -> bool:
         """Simple validity check: does the client exist? Not banned?"""
-        return client_id == _CLIENT_ID
+        client_id_ok = client_id == _CLIENT_ID
+        if not client_id_ok:
+            self.__send_audit_log(
+                "login failed", f"login with client id {client_id} not allowed"
+            )
+        return client_id_ok
 
     @override
     @pydantic.validate_call(config=_validate_call_config)
@@ -114,8 +206,8 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         **kwargs: object,
     ) -> bool:
         """Is the client allowed to access the requested scopes?"""
-        assert isinstance(request.user, ORMUser)
-        user: ORMUser = request.user
+        user = cast(object, request.user)
+        assert isinstance(user, ORMUser)
 
         try:
             for scope in scopes:
@@ -126,12 +218,35 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             unrecognized_scope = False
 
         if unrecognized_scope:
+            self.__send_audit_log(
+                "login failed",
+                f"login for {user.username} requested unrecognized scopes: {scopes}",
+            )
             return False
 
         requested_scopes = set(scopes)
-        return requested_scopes.issubset(
-            s.api_name for s in get_scope_set_of_user(user)
+        scopes_ok = requested_scopes.issubset(
+            s.api_name
+            for s in get_scope_set_of_user(
+                user,
+                self.__settings_store.get_settings(),
+                must_reset_password(
+                    user,
+                    self.__get_now(),
+                    self.__settings_store.get_settings().passwordResetTime,
+                ),
+            )
         )
+        if not scopes_ok:
+            self.__send_audit_log(
+                "login failed",
+                f"login for {user.username} requested scopes it may not access",
+            )
+        else:
+            self.__send_audit_log(
+                "login succeeded", f"login for {user.username} succeeded"
+            )
+        return scopes_ok
 
     @override
     @pydantic.validate_call(config=_validate_call_config)
@@ -139,9 +254,20 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         self, client_id: str, request: oauthlib.common.Request
     ) -> list[str]:
         """Scopes that we'll authorize a client for, if it doesn't ask for any explicitly."""
-        assert isinstance(request.user, ORMUser)
-        user: ORMUser = request.user
-        return sorted(s.api_name for s in get_scope_set_of_user(user))
+        user = cast(object, request.user)
+        assert isinstance(user, ORMUser)
+
+        scopes = get_scope_set_of_user(
+            user,
+            self.__settings_store.get_settings(),
+            must_reset_password(
+                user,
+                self.__get_now(),
+                self.__settings_store.get_settings().passwordResetTime,
+            ),
+        )
+
+        return sorted(s.api_name for s in scopes)
 
     @override
     @pydantic.validate_call(config=_validate_call_config)
@@ -161,6 +287,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             request.client = _Client(client_id=client_id)  # type: ignore[attr-defined]
             return True
         else:
+            self.__send_audit_log("login failed", f"unrecognized client id {client_id}")
             return False
 
     @override
@@ -184,7 +311,16 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
 
         if user is None:
             # Unrecognized username.
+            self.__send_audit_log("login failed", f"unrecognized user name {username}")
             raise _CustomInvalidCredentialsError(login_attempts_remaining=None)
+
+        if user.deactivated:
+            self.__send_audit_log(
+                "login failed", f"user {username} failed to login: account is locked"
+            )
+            raise _CustomInvalidCredentialsError(
+                login_attempts_remaining=None, account_locked=True
+            )
 
         password_is_correct = password_hash.verify(password, user.hashed_password)
 
@@ -203,7 +339,17 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         )
 
         if is_currently_locked or not password_is_correct:
-            raise _CustomInvalidCredentialsError(attempts_remaining)
+            reason = (
+                "account is locked"
+                if is_currently_locked
+                else f"incorrect password, {attempts_remaining} attempts remaining"
+            )
+            self.__send_audit_log(
+                "login failed", f"user {username} failed to login: {reason}"
+            )
+            raise _CustomInvalidCredentialsError(
+                attempts_remaining, account_locked=is_currently_locked
+            )
 
         # If the credentials pass the gauntlet above, it's a successful login.
         self.__user_store.clear_failed_logins(username)
@@ -224,7 +370,12 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
     ) -> bool:
         """Return whether the given grant type is allowed for the given client."""
         # This server only supports username+password grants.
-        return grant_type in ("password", "refresh_token")
+        grant_ok = grant_type in ("password", "refresh_token")
+        if not grant_ok:
+            self.__send_audit_log(
+                "login failed", f"unacceptable grant type {grant_type}"
+            )
+        return grant_ok
 
     @override
     @pydantic.validate_call(config=_validate_call_config)
@@ -239,10 +390,16 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         access_token = token["access_token"]
         refresh_token = token.get("refresh_token", None)
 
-        # This cast is because request.scopes is apparently mis-typed as a str; it's actually a list[str].
-        scopes = cast(Any, request.scopes)
-        assert _is_list_of_type(scopes, str)
-        scopes = {Scope.from_api_name(s) for s in scopes}
+        # When the client omits `scope`, store nothing so effective scopes are
+        # calculated from current settings and user state at use time. When the
+        # client explicitly requests scopes, store that ceiling.
+        if request.scope is not None:
+            # This cast is because request.scopes is apparently mis-typed as a str; it's actually a list[str].
+            scopes = cast(Any, request.scopes)
+            assert _is_list_of_type(scopes, str)
+            requested_scopes = frozenset(Scope.from_api_name(s) for s in scopes)
+        else:
+            requested_scopes = frozenset[Scope]()
 
         expires_in = token["expires_in"]
 
@@ -252,17 +409,17 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         client_id = request.client_id
         assert isinstance(client_id, str)
 
-        now = _now()
+        now = self.__get_now()
         expires_at = now + timedelta(seconds=expires_in)
         self.__token_store.prune_inactive(now)
         self.__token_store.save(
             _TokenIssuance(
                 client_id=client_id,
-                username=user.username,
+                user_id=user.id,
                 access_token=access_token,
                 refresh_token=refresh_token,
                 expires_at=expires_at,
-                scopes=scopes,
+                requested_scopes=requested_scopes,
             )
         )
 
@@ -279,16 +436,19 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
     ) -> bool:
         """Check if a refresh token is valid."""
         issuance = self.__token_store.find_active_refresh_token(
-            refresh_token, now=_now()
+            refresh_token, now=self.__get_now()
         )
         if issuance is not None:
-            user = self.__user_store.get(issuance.username)
-            if user is None:
+            user = self.__user_store.get_by_id(issuance.user_id)
+            if user is None or user.deactivated:
                 return False
             # Set `.user` per the oauthlib docs.
             request.user = user  # type: ignore[attr-defined]
             return True
         else:
+            self.__send_audit_log(
+                "login expired", "client submitted an invalid refresh token"
+            )
             return False
 
     @override
@@ -301,9 +461,11 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         These will be passed on to the refreshed access token if the client did not
         specify a scope during the request.
         """
-        token = self.__token_store.find_active_refresh_token(refresh_token, now=_now())
+        token = self.__token_store.find_active_refresh_token(
+            refresh_token, now=self.__get_now()
+        )
         assert token is not None
-        return sorted(s.api_name for s in token.scopes)
+        return sorted(s.api_name for s in self.__get_effective_token_scopes(token))
 
     @override
     @pydantic.validate_call(config=_validate_call_config)
@@ -319,18 +481,56 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         # oauthlib sets `"active": True` on any non-None response, and our resource
         # servers interpret that as meaning "this is a currently valid access token".
         found_access_token = self.__token_store.find_active_access_token(
-            token, now=_now()
+            token, now=self.__get_now()
         )
         if found_access_token is None:
             return None
-        else:
-            # Values defined by:
-            # https://datatracker.ietf.org/doc/html/rfc7662#section-2.2
-            return {
-                "scope": serialize_scopes(found_access_token.scopes),
-                "username": found_access_token.username,
-                # "active": True is set implicitly by oauthlib.
-            }
+
+        user = self.__get_user_for_token(found_access_token)
+        if user is None:
+            # The user was deleted, maybe.
+            return None
+        if user.deactivated:
+            return None
+
+        # Values defined by:
+        # https://datatracker.ietf.org/doc/html/rfc7662#section-2.2
+        # except ot_fullname, which is custom to us. if you add other custom fields,
+        # please prefix them with ot_.
+        return {
+            "scope": serialize_scopes(
+                self.__get_effective_token_scopes(found_access_token)
+            ),
+            "username": user.username,
+            "ot_fullname": user.full_name,
+            # "active": True is set implicitly by oauthlib.
+        }
+
+    def __get_user_for_token(self, token: _TokenIssuance) -> ORMUser | None:
+        return self.__user_store.get_by_id(token.user_id)
+
+    def __get_effective_token_scopes(self, token: _TokenIssuance) -> set[Scope]:
+        """Return granted token scopes, updated for current settings and user state."""
+        live_scopes = self.__get_live_scopes_for_token(token)
+        if not token.requested_scopes:
+            return live_scopes
+        return set(token.requested_scopes) & live_scopes
+
+    def __get_live_scopes_for_token(self, token: _TokenIssuance) -> set[Scope]:
+        user = self.__get_user_for_token(token)
+        if user is None:
+            return set()
+
+        settings = self.__settings_store.get_settings()
+        return get_scope_set_of_user(
+            user,
+            settings,
+            must_reset_password(
+                user,
+                self.__get_now(),
+                settings.passwordResetTime,
+            ),
+        )
 
 
 class _CustomInvalidCredentialsError(oauthlib.oauth2.InvalidGrantError):
@@ -340,14 +540,18 @@ class _CustomInvalidCredentialsError(oauthlib.oauth2.InvalidGrantError):
     this way, but you gotta do what you gotta do.
     """
 
-    def __init__(self, login_attempts_remaining: int | None) -> None:
+    def __init__(
+        self, login_attempts_remaining: int | None, *, account_locked: bool = False
+    ) -> None:
         """Construct the error.
 
         Params:
             login_attempts_remaining: How many login attempts the user has left
                 before their account is locked, or `None` to omit that information.
+            account_locked: Whether the account is locked and requires admin unlock.
         """
         self.__login_attempts_remaining = login_attempts_remaining
+        self.__account_locked = account_locked
         super().__init__(
             description="Invalid credentials given.",  # Match oauthlib's default description.
             uri=None,
@@ -365,21 +569,29 @@ class _CustomInvalidCredentialsError(oauthlib.oauth2.InvalidGrantError):
             result["opentrons_login_attempts_remaining"] = (
                 self.__login_attempts_remaining
             )
+        if self.__account_locked:
+            result["opentrons_account_locked"] = True
         return json.dumps(result)
 
 
-@dataclass
+@dataclass(frozen=True)
 class _TokenIssuance:
     """Information about an access token that we've issued."""
 
     client_id: str
-    username: str
+    user_id: int
     access_token: str
     refresh_token: str | None
     # todo(mm, 2026-01-29): We might want expires_at to be a CLOCK_BOOTTIME value or something
     # to resist problems from clock adjustment.
     expires_at: datetime
-    scopes: set[Scope]
+    requested_scopes: frozenset[Scope]
+    """The scopes that the client requested, which may be different from the scopes we'll actually grant.
+
+    (OAuth 2 lets a client intentionally limit its own scopes.)
+
+    Empty when the client did not request any specific scopes.
+    """
 
 
 class _TokenStore:
@@ -408,6 +620,9 @@ class _TokenStore:
                 return token
         return None
 
+    def revoke_all(self) -> None:
+        self._tokens.clear()
+
     @staticmethod
     def _is_active(token: _TokenIssuance, now: datetime) -> bool:
         return token.expires_at > now
@@ -416,12 +631,9 @@ class _TokenStore:
 def _is_list_of_type[ElementT](
     alleged_list: object, expected_element_type: type[ElementT]
 ) -> TypeGuard[list[ElementT]]:
-    assert isinstance(alleged_list, list)
+    if not isinstance(alleged_list, list):
+        return False
     return all(
         isinstance(element, expected_element_type)
         for element in cast(list[object], alleged_list)
     )
-
-
-def _now() -> datetime:
-    return datetime.now(tz=UTC)

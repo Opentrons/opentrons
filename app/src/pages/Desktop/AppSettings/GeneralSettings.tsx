@@ -54,6 +54,7 @@ import {
   getAvailableShellUpdate,
 } from '/app/redux/shell'
 
+import type { ReactNode } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
 
 const SOFTWARE_SYNC_URL = 'https://support.opentrons.com/s/'
@@ -64,7 +65,7 @@ const ENABLE_APP_UPDATE_NOTIFICATIONS = 'Enable app update notifications'
 const ENABLE_UPDATE_AUTODOWNLOAD = 'Enable update autodownload'
 const uuid: () => string = uuidv4
 
-export function GeneralSettings(): JSX.Element {
+export function GeneralSettings(): ReactNode {
   const { t } = useTranslation(['app_settings', 'shared', 'branded'])
   const dispatch = useDispatch<Dispatch>()
   const trackEvent = useTrackEvent()
@@ -136,10 +137,7 @@ export function GeneralSettings(): JSX.Element {
         paddingY={SPACING.spacing24}
       >
         {showUpdateBanner && (
-          <Box
-            marginBottom={SPACING.spacing16}
-            id="GeneralSettings_updatebanner"
-          >
+          <Box marginBottom={SPACING.spacing16}>
             <Banner
               type="warning"
               onCloseClick={() => {
@@ -185,7 +183,6 @@ export function GeneralSettings(): JSX.Element {
               <LegacyStyledText
                 forwardedAs="p"
                 paddingBottom={SPACING.spacing8}
-                id="GeneralSettings_currentVersion"
               >
                 {CURRENT_VERSION}
               </LegacyStyledText>
@@ -195,7 +192,6 @@ export function GeneralSettings(): JSX.Element {
                   external
                   href={GITHUB_LINK}
                   css={TYPOGRAPHY.linkPSemiBold}
-                  id="GeneralSettings_GitHubLink"
                 >{` ${t('shared:github')}`}</Link>
               </LegacyStyledText>
             </Box>
@@ -206,7 +202,6 @@ export function GeneralSettings(): JSX.Element {
                 onClick={() => {
                   setShowUpdateModal(true)
                 }}
-                id="GeneralSettings_softwareUpdate"
               >
                 {t('view_software_update')}
               </TertiaryButton>
@@ -234,14 +229,10 @@ export function GeneralSettings(): JSX.Element {
                 onClick={() => {
                   setShowPreviousVersionModal(true)
                 }}
-                id="GeneralSettings_previousVersionLink"
               >
                 {t('restore_previous')}
               </Link>
-              <ExternalLink
-                href={SOFTWARE_SYNC_URL}
-                id="GeneralSettings_appAndRobotSync"
-              >
+              <ExternalLink href={SOFTWARE_SYNC_URL}>
                 {t('branded:versions_sync')}
               </ExternalLink>
             </Flex>
@@ -273,7 +264,6 @@ export function GeneralSettings(): JSX.Element {
             disabled={false}
             toggledOn={automaticUpdateDownloadEnabled === true}
             onClick={handleToggleAutomaticUpdateDownloads}
-            id="GeneralSettings_softwareUpdateAutodownload"
           />
         </Flex>
         <Flex
@@ -290,7 +280,6 @@ export function GeneralSettings(): JSX.Element {
             disabled={updateAlertEnabled === null}
             toggledOn={updateAlertEnabled === true}
             onClick={handleToggleUpdateAlerts}
-            id="GeneralSettings_softwareUpdateAlerts"
           />
         </Flex>
         <Divider marginY={SPACING.spacing24} />
@@ -306,7 +295,6 @@ export function GeneralSettings(): JSX.Element {
           </LegacyStyledText>
           <TertiaryButton
             marginLeft={SPACING_AUTO}
-            id="GeneralSettings_setUpConnection"
             onClick={() => {
               setShowConnectRobotSlideout(true)
             }}

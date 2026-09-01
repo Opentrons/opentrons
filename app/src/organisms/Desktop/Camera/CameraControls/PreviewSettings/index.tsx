@@ -1,23 +1,31 @@
 import { useTranslation } from 'react-i18next'
 
 import { Icon, SecondaryButton, StyledText } from '@opentrons/components'
+import { type DocumentationState } from '@opentrons/react-api-client'
 
 import { usePreviewImage } from '/app/resources/camera/usePreviewImage'
 
 import styles from './previewsettings.module.css'
 
+import type { ReactNode } from 'react'
 import type { CameraImageSettings } from '@opentrons/api-client'
 
 interface PreviewSettingsProps {
   settings: CameraImageSettings
   runId: string | null
+  documentationState: DocumentationState
 }
 
 export function PreviewSettings({
   settings,
   runId,
-}: PreviewSettingsProps): JSX.Element {
-  const { isLoading, imgPath, takePhoto } = usePreviewImage(settings, runId)
+  documentationState,
+}: PreviewSettingsProps): ReactNode {
+  const { isLoading, imgPath, takePhoto } = usePreviewImage(
+    settings,
+    runId,
+    documentationState
+  )
 
   return (
     <div className={styles.container}>
@@ -33,7 +41,7 @@ export function PreviewSettings({
   )
 }
 
-function PreviewImage({ imgPath }: { imgPath: string | null }): JSX.Element {
+function PreviewImage({ imgPath }: { imgPath: string | null }): ReactNode {
   const { t } = useTranslation('device_settings')
 
   if (imgPath != null) {
@@ -66,7 +74,7 @@ function PreviewImageBtn({
   isLoading,
   onClick,
   hasPreviewImg,
-}: PreviewImageBtnProps): JSX.Element {
+}: PreviewImageBtnProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   return (

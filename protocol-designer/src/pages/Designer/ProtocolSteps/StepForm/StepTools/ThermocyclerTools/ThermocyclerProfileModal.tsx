@@ -19,15 +19,14 @@ import {
 import { ThermocyclerCycle } from './ThermocyclerCycle'
 import { ThermocyclerStep } from './ThermocyclerStep'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
 import type { ThermocyclerCycleType } from './ThermocyclerCycle'
 import type { ThermocyclerStepType } from './ThermocyclerStep'
 
 export type ThermocyclerStepTypeGeneral =
-  | ThermocyclerCycleType
-  | ThermocyclerStepType
+  ThermocyclerCycleType | ThermocyclerStepType
 
 interface ThermocyclerModalProps {
   formData: FormData
@@ -37,7 +36,7 @@ interface ThermocyclerModalProps {
 
 export function ThermocyclerProfileModal(
   props: ThermocyclerModalProps
-): JSX.Element {
+): ReactNode {
   const { formData, propsForFields, setShowProfileModal } = props
   const { i18n, t } = useTranslation(['application', 'form'])
 
@@ -63,7 +62,6 @@ export function ThermocyclerProfileModal(
 
   return (
     <Modal
-      marginLeft="0"
       zIndexOverlay={11} // toolbox zIndex is set to 10
       title={t('form:step_edit_form.field.thermocyclerProfile.edit')}
       width="45rem"

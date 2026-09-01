@@ -20,7 +20,7 @@ import {
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 
-import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
+import { SmallButton, TouchFloatingActionButton } from '/app/atoms/buttons'
 import { Navigation } from '/app/organisms/ODD/Navigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_FLOW_STARTED } from '/app/redux/analytics'
@@ -38,12 +38,13 @@ import { PipetteNotAttachedErrorModal } from './PipetteNotAttachedErrorModal'
 import { ProtocolCard } from './ProtocolCard'
 import { sortProtocols } from './utils'
 
+import type { ReactNode } from 'react'
 import type { PipetteData } from '@opentrons/api-client'
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type { ProtocolsOnDeviceSortKey } from '/app/redux/config/types'
 import type { Dispatch } from '/app/redux/types'
 
-export function ProtocolDashboard(): JSX.Element {
+export function ProtocolDashboard(): ReactNode {
   const protocols = useAllProtocolsQuery()
   const runs = useNotifyAllRunsQuery()
   const { t } = useTranslation('protocol_info')
@@ -311,10 +312,11 @@ export function ProtocolDashboard(): JSX.Element {
           ) : pinnedProtocols.length === 0 ? (
             <NoProtocols />
           ) : null}
-          <FloatingActionButton
+          <TouchFloatingActionButton
             buttonText={t('quick_transfer')}
             iconName="plus"
             onClick={handleCreateNewQuickTransfer}
+            aria-label={t('create_quick_transfer')}
           />
         </Box>
       </Flex>

@@ -6,6 +6,7 @@ import { RobotCoordsForeignDiv } from '../../Deck'
 import { ThermocyclerGEN1 } from './ThermocyclerGEN1'
 import { ThermocyclerGEN2 } from './ThermocyclerGEN2'
 
+import type { ReactNode } from 'react'
 import type { ThermocyclerModuleModel } from '@opentrons/shared-data'
 
 const ROOM_TEMPERATURE_C = 23 // value taken from TC firmware
@@ -15,7 +16,7 @@ export interface ThermocyclerVizProps {
   model: ThermocyclerModuleModel
 }
 
-export function Thermocycler(props: ThermocyclerVizProps): JSX.Element {
+export function Thermocycler(props: ThermocyclerVizProps): ReactNode {
   const { lidMotorState, blockTargetTemp, model } = props
   const def = getModuleDef(model)
   if (lidMotorState === 'unknown') {

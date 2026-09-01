@@ -12,15 +12,13 @@ import {
 
 import { HandleEnter } from '/protocol-designer/components/atoms'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 
 interface IncompatibleTipsProps {
   onClose: () => void
   setAllowAllTipracks: Dispatch<SetStateAction<boolean>>
 }
-export function IncompatibleTipsModal(
-  props: IncompatibleTipsProps
-): JSX.Element {
+export function IncompatibleTipsModal(props: IncompatibleTipsProps): ReactNode {
   const { onClose, setAllowAllTipracks } = props
   const { t } = useTranslation(['onboarding', 'shared'])
 
@@ -32,7 +30,6 @@ export function IncompatibleTipsModal(
   return (
     <HandleEnter onEnter={handleShowAllTips}>
       <Modal
-        marginLeft="0"
         title={t('incompatible_tips')}
         type="warning"
         closeOnOutsideClick

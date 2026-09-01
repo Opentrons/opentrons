@@ -14,7 +14,6 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useHost } from '@opentrons/react-api-client'
 import {
   FLEX_STACKER_MODULE_TYPE,
   getFixtureDisplayName,
@@ -35,6 +34,7 @@ import { getModuleTooHot } from '/app/transformations/modules'
 import { getDoesModuleRequireCalibration } from './utils'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type {
   CutoutConfig,
@@ -112,13 +112,12 @@ export function ModuleTableItem({
   deckDef,
   robotName,
   comboFixtureId,
-}: ModuleTableItemProps): JSX.Element {
+}: ModuleTableItemProps): ReactNode {
   const { i18n, t } = useTranslation([
     'protocol_setup',
     'module_wizard_flows',
     'deck_configuration',
   ])
-  const host = useHost()!
 
   const { makeSnackbar } = useToaster()
 
@@ -130,7 +129,6 @@ export function ModuleTableItem({
         handleModuleWizardFlows({
           attachedModule: module.attachedModuleMatch,
           robotName,
-          host,
         })
       }
     } else {

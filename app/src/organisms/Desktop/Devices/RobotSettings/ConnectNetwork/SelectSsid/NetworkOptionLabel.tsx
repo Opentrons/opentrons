@@ -1,12 +1,12 @@
 import styled from 'styled-components'
 
+import { SECURITY_NONE } from '@opentrons/api-client'
 import { FONT_BODY_1_DARK, Icon, SPACING } from '@opentrons/components'
 
-import { SECURITY_NONE } from '/app/redux/networking'
-
 import type { StyledComponent } from 'styled-components'
+import type { ReactNode } from 'react'
+import type { WifiNetwork } from '@opentrons/api-client'
 import type { IconName } from '@opentrons/components'
-import type { WifiNetwork } from '/app/redux/networking/types'
 
 const SIGNAL_LEVEL_LOW: number = 25
 const SIGNAL_LEVEL_MED: number = 50
@@ -49,7 +49,7 @@ export interface NetworkOptionLabelProps extends WifiNetwork {
 
 export const NetworkOptionLabel = (
   props: NetworkOptionLabelProps
-): JSX.Element => {
+): ReactNode => {
   const { ssid, active, securityType, showConnectedIcon } = props
   const hasConnectedIcon = active && showConnectedIcon
   const hasSecureIcon = securityType !== SECURITY_NONE
@@ -64,11 +64,9 @@ export const NetworkOptionLabel = (
   )
 }
 
-export const NetworkActionLabel = ({
-  label,
-}: {
-  label: string
-}): JSX.Element => <StyledName padLeft={true}>{label}</StyledName>
+export const NetworkActionLabel = ({ label }: { label: string }): ReactNode => (
+  <StyledName padLeft={true}>{label}</StyledName>
+)
 
 const renderSignalIcon = (signal: number): JSX.Element => {
   let iconName: IconName

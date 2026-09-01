@@ -12,6 +12,8 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 const baseRoundTabStyling = css`
   ${TYPOGRAPHY.pSemiBold}
   color: ${COLORS.black90};
@@ -39,9 +41,18 @@ const disabledRoundTabStyling = css`
   }
 `
 
-const RoundNavLink = styled(NavLink)`
+interface RoundNavLinkProps {
+  minWidth?: string
+}
+
+const RoundNavLink = styled(NavLink)<RoundNavLinkProps>`
   ${baseRoundTabStyling}
   color: ${COLORS.black90};
+  ${({ minWidth }) =>
+    minWidth != null &&
+    css`
+      min-width: ${minWidth};
+    `}
 
   &:hover {
     background-color: ${COLORS.purple35};
@@ -62,6 +73,8 @@ interface RoundTabProps {
   tabDisabledReason?: string
   to: string
   tabName: string
+  end?: boolean
+  minWidth?: string
 }
 
 export function RoundTab({
@@ -69,7 +82,9 @@ export function RoundTab({
   tabDisabledReason,
   to,
   tabName,
-}: RoundTabProps): JSX.Element {
+  end,
+  minWidth,
+}: RoundTabProps): ReactNode {
   const [targetProps, tooltipProps] = useHoverTooltip()
   return disabled ? (
     <>
@@ -81,7 +96,7 @@ export function RoundTab({
       ) : null}
     </>
   ) : (
-    <RoundNavLink to={to} replace>
+    <RoundNavLink to={to} replace end={end} minWidth={minWidth}>
       {tabName}
     </RoundNavLink>
   )

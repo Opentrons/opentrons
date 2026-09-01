@@ -5,6 +5,7 @@ import '@testing-library/jest-dom/vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
 import { MaintenanceRunTakeover } from '../MaintenanceRunTakeover'
@@ -15,11 +16,8 @@ import type { MaintenanceRunStatus } from '../MaintenanceRunStatusProvider'
 
 vi.mock('../useMaintenanceRunTakeover')
 vi.mock('/app/resources/maintenance_runs')
-vi.mock('/app/local-resources/access-control/useGuardedAction', () => ({
-  useGuardedAction: () => ({
-    reasonForInteractionRequired: false,
-    isLoading: false,
-  }),
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
 }))
 
 const MOCK_MAINTENANCE_RUN: MaintenanceRunStatus = {

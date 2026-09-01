@@ -2,14 +2,16 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 
-import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
 import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { getPasswordComplexityError } from '/app/resources/auth'
 
 import { LoginFieldController } from './LoginFieldController'
 import styles from './OnDeviceLogin.module.css'
 
+import type { ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
+import type { PasswordComplexityRequirements } from '/app/resources/auth'
 
 export type LoginStep = 'username' | 'password' | 'confirmPassword'
 
@@ -33,6 +35,8 @@ export interface OnDeviceLoginProps {
   /** Shown under the password field with error styling when login fails */
   loginError?: string | null
   onClearLoginError?: () => void
+  /** Robot password policy for client-side validation on the new-password step. */
+  passwordComplexity: PasswordComplexityRequirements | null
 }
 
 export function OnDeviceLogin({
@@ -45,12 +49,17 @@ export function OnDeviceLogin({
   initialUsername,
   loginError = null,
   onClearLoginError,
-}: OnDeviceLoginProps): JSX.Element {
-  const { t } = useTranslation(['shared', 'device_settings'])
+  passwordComplexity,
+}: OnDeviceLoginProps): ReactNode {
+  const { t } = useTranslation(['shared', 'access_control'])
   const [confirmPasswordError, setConfirmPasswordError] = useState<
     string | null
   >(null)
-  const { control, watch, setValue } = useForm<LoginFormValues>({
+  const [passwordPolicyError, setPasswordPolicyError] = useState<string | null>(
+    null
+  )
+  const [usernameError, setUsernameError] = useState<string | null>(null)
+  const { control, watch } = useForm<LoginFormValues>({
     defaultValues: {
       username: initialUsername ?? '',
       password: '',
@@ -58,61 +67,86 @@ export function OnDeviceLogin({
     },
   })
 
-  const [showKeyboard, setShowKeyboard] = useState(false)
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
 
   const username = watch('username')
   const password = watch('password')
   const confirmPassword = watch('confirmPassword')
 
-  const activeFieldName: LoginFieldName =
-    step === 'username'
-      ? 'username'
-      : step === 'confirmPassword'
-        ? 'confirmPassword'
-        : 'password'
-
-  const keyboardFieldValue =
-    step === 'username'
-      ? username
-      : step === 'confirmPassword'
-        ? confirmPassword
-        : password
-
   const clearFieldErrors = (): void => {
     setConfirmPasswordError(null)
+    setPasswordPolicyError(null)
+    setUsernameError(null)
     onClearLoginError?.()
   }
 
-  // reset keyboard input when switching steps
-  useEffect(() => {
-    if (!showKeyboard) return
-    const kb = keyboardRef.current
-    if (kb == null) return
-    kb.setInput(keyboardFieldValue)
-  }, [step, showKeyboard, keyboardFieldValue])
-
   const handleNext = useCallback((): void => {
     if (step === 'username') {
-      if (username.trim() === '') return
+      if (username.trim() === '') {
+        setUsernameError(
+          t('on_device_login_username_required', {
+            ns: 'access_control',
+          }) as string
+        )
+        return
+      }
       onStepChange('password')
       return
     }
     if (step === 'password') {
-      if (password.trim() === '') return
+      if (password.trim() === '') {
+        setPasswordPolicyError(
+          t('on_device_login_password_required', {
+            ns: 'access_control',
+          }) as string
+        )
+        return
+      }
       if (isPasswordResetRequired) {
+        if (passwordComplexity != null) {
+          const complexityError = getPasswordComplexityError(
+            password,
+            passwordComplexity
+          )
+          if (complexityError === 'tooShort') {
+            setPasswordPolicyError(
+              t('must_be_at_least_characters', {
+                ns: 'access_control',
+                minLength: passwordComplexity.minLength,
+              }) as string
+            )
+            return
+          }
+          if (complexityError === 'missingSpecialCharacters') {
+            setPasswordPolicyError(
+              t('must_include_at_least_one_special_character', {
+                ns: 'access_control',
+              }) as string
+            )
+            return
+          }
+        }
         setConfirmPasswordError(null)
+        setPasswordPolicyError(null)
         onStepChange('confirmPassword')
         return
       }
       submitPassword(username, password)
       return
     }
-    if (confirmPassword.trim() === '') return
+    if (confirmPassword.trim() === '') {
+      setConfirmPasswordError(
+        t('on_device_login_password_required', {
+          ns: 'access_control',
+        }) as string
+      )
+      return
+    }
     if (confirmPassword !== password) {
       setConfirmPasswordError(
         t('on_device_login_password_mismatch', {
-          ns: 'device_settings',
+          ns: 'access_control',
         }) as string
       )
       return
@@ -127,19 +161,15 @@ export function OnDeviceLogin({
     isPasswordResetRequired,
     onStepChange,
     submitPassword,
+    passwordComplexity,
     t,
   ])
 
-  const primaryDisabled =
-    step === 'username'
-      ? username.trim() === ''
-      : step === 'password'
-        ? password.trim() === '' || isAuthLoading
-        : confirmPassword.trim() === '' || isAuthLoading
+  const primaryDisabled = isAuthLoading
 
   const header = isPasswordResetRequired
-    ? t('on_device_login_new_password', { ns: 'device_settings' })
-    : t('on_device_login', { ns: 'device_settings' })
+    ? t('on_device_login_new_password', { ns: 'access_control' })
+    : t('on_device_login', { ns: 'access_control' })
 
   const primaryButtonLabel =
     step === 'username' || (step === 'password' && isPasswordResetRequired)
@@ -197,35 +227,25 @@ export function OnDeviceLogin({
         <div className={styles.content_container}>
           <div className={styles.form_inner_container}>
             <LoginFieldController
+              ref={inputElementRef}
               control={control}
               step={step}
               t={t}
               isPasswordResetRequired={isPasswordResetRequired}
-              loginError={loginError}
+              loginError={passwordPolicyError ?? loginError}
               confirmPasswordError={confirmPasswordError}
+              usernameError={usernameError}
               onClearFieldErrors={clearFieldErrors}
-              onFocus={() => {
-                setShowKeyboard(true)
-              }}
             />
           </div>
         </div>
       </div>
-      {showKeyboard ? (
-        <div className={styles.keyboard_container}>
-          <AccordionKeyboard isOpen={showKeyboard} onToggle={() => {}}>
-            <FullKeyboard
-              onChange={(input: string) => {
-                setValue(activeFieldName, input, {
-                  shouldDirty: true,
-                  shouldTouch: true,
-                })
-              }}
-              keyboardRef={keyboardRef}
-            />
-          </AccordionKeyboard>
-        </div>
-      ) : null}
+      <div className={styles.keyboard_container}>
+        <FullKeyboard
+          keyboardRef={keyboardRef}
+          inputElementRef={inputElementRef}
+        />
+      </div>
     </>
   )
 }

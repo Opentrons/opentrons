@@ -6,6 +6,7 @@ import { SECURITY_NONE, SECURITY_WPA_PSK } from '../constants'
 import { useConnectFormField } from './form-state'
 import { FormRow } from './FormRow'
 
+import type { ReactNode } from 'react'
 import type {
   ControllerFieldState,
   ControllerRenderProps,
@@ -34,7 +35,7 @@ const makeEapOptionsGroup = (
   })),
 })
 
-export const SecurityField = (props: SecurityFieldProps): JSX.Element => {
+export const SecurityField = (props: SecurityFieldProps): ReactNode => {
   const { t } = useTranslation(['device_settings', 'shared'])
   const {
     id,

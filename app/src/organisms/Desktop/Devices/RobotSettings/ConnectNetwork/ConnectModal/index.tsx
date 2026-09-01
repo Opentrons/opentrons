@@ -10,12 +10,13 @@ import { useResetFormOnSecurityChange } from './form-state'
 import { FormModal } from './FormModal'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { Control, Resolver } from 'react-hook-form'
+import type { WifiKey } from '@opentrons/api-client'
 import type {
   ConnectFormValues,
   EapOption,
   WifiConfigureRequest,
-  WifiKey,
   WifiNetwork,
 } from '../types'
 
@@ -35,7 +36,7 @@ interface ConnectModalComponentProps extends ConnectModalProps {
   id: string
 }
 
-export const ConnectModal = (props: ConnectModalProps): JSX.Element => {
+export const ConnectModal = (props: ConnectModalProps): ReactNode => {
   const { t } = useTranslation(['device_settings', 'shared'])
   const { network, eapOptions, onConnect } = props
 
@@ -85,7 +86,7 @@ export const ConnectModal = (props: ConnectModalProps): JSX.Element => {
 
 export const ConnectModalComponent = (
   props: ConnectModalComponentProps
-): JSX.Element => {
+): ReactNode => {
   const { t } = useTranslation(['device_settings', 'shared'])
   const {
     robotName,

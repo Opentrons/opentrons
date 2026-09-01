@@ -14,6 +14,7 @@ import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
 import { TextOnlyButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useCameraSettingsValues } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 import { updateCameraSpecificSettings } from '/app/redux/protocol-runs'
 
@@ -21,6 +22,7 @@ import styles from './cameracontrols.module.css'
 import { PreviewSettings } from './PreviewSettings'
 import { ZoomSettings } from './ZoomSettings'
 
+import type { ReactNode } from 'react'
 import type { CameraImageSettings } from '@opentrons/api-client'
 import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 
@@ -32,12 +34,13 @@ export interface CameraControlsProps {
 export function CameraControls({
   onClose,
   runId,
-}: CameraControlsProps): JSX.Element {
+}: CameraControlsProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const settings = useCameraSettingsValues(runId)
   const dispatch = useDispatch()
-  const { createCameraImageSettings } = useCreateCameraImageSettings()
-
+  const documentationState = useDocumentationState()
+  const { createCameraImageSettings } =
+    useCreateCameraImageSettings(documentationState)
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSave = (): void => {
@@ -77,6 +80,7 @@ export function CameraControls({
         <div className={styles.content_container}>
           <CameraControlSettings settings={settings} />
           <PreviewSettings
+            documentationState={documentationState}
             settings={{
               zoom: settings.zoom,
               brightness: settings.brightness,
@@ -112,7 +116,7 @@ interface CameraControlSettingsProps {
 
 function CameraControlSettings({
   settings,
-}: CameraControlSettingsProps): JSX.Element {
+}: CameraControlSettingsProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   return (

@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
@@ -10,12 +9,15 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
+  PrimaryButton,
   SecondaryButton,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+
+import type { ReactNode } from 'react'
 
 interface ConfirmExitProps {
   back: () => void
@@ -24,7 +26,7 @@ interface ConfirmExitProps {
   body?: string
 }
 
-export function ConfirmExit(props: ConfirmExitProps): JSX.Element {
+export function ConfirmExit(props: ConfirmExitProps): ReactNode {
   const { t } = useTranslation('shared')
   const { back, exit, heading, body } = props
   return (
@@ -64,12 +66,13 @@ export function ConfirmExit(props: ConfirmExitProps): JSX.Element {
         <NeedHelpLink />
         <Flex gridGap={SPACING.spacing8}>
           <SecondaryButton onClick={back}>{t('go_back')}</SecondaryButton>
-          <AlertPrimaryButton
+          <PrimaryButton
+            variant="warning"
             onClick={exit}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
             {t('exit')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </Flex>
       </Flex>
     </Flex>

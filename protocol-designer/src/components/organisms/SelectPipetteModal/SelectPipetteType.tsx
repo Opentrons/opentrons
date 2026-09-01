@@ -11,7 +11,7 @@ import {
 
 import { PIPETTE_TYPES } from '/protocol-designer/pages/Onboarding/constants'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
 import type { PipetteMount, RobotType } from '@opentrons/shared-data'
 import type {
@@ -31,7 +31,7 @@ interface SelectPipetteTypeProps {
   setValue: UseFormSetValue<any>
 }
 
-export function SelectPipetteType(props: SelectPipetteTypeProps): JSX.Element {
+export function SelectPipetteType(props: SelectPipetteTypeProps): ReactNode {
   const {
     mount,
     robotType,

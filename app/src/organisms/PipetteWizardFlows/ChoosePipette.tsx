@@ -41,7 +41,7 @@ import singleChannelAndEightChannel from '/app/assets/images/change-pip/1_and_8_
 import ninetySixChannel from '/app/assets/images/change-pip/ninety-six-channel.png'
 import { SmallButton } from '/app/atoms/buttons'
 import { i18n } from '/app/i18n'
-import { usePromptForInteractionReason } from '/app/local-resources/access-control/usePromptForInteractionReason'
+import { usePromptForDocumentation } from '/app/local-resources/access-control/usePromptForDocumentation'
 import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
 import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
@@ -120,7 +120,7 @@ interface ChoosePipetteProps {
   exit: () => void
   mount: PipetteMount
 }
-export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
+export const ChoosePipette = (props: ChoosePipetteProps): ReactNode => {
   const { selectedPipette, setSelectedPipette, proceed, exit, mount } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation(['pipette_wizard_flows', 'shared', 'audit_log'])
@@ -130,7 +130,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
 
   const initialAction =
     mount === LEFT ? 'attach_pipette_left' : 'attach_pipette_right'
-  const initialDocstate = usePromptForInteractionReason([initialAction])
+  const initialDocstate = usePromptForDocumentation([initialAction], exit)
   const isWaitingForDocumentation = !isDocumentationProvided(initialDocstate)
 
   const bothMounts = getIsGantryEmpty(attachedPipettesByMount)
@@ -309,7 +309,7 @@ interface PipetteMountOptionProps extends StyleProps {
   onClick: () => void
   children: ReactNode
 }
-function PipetteMountOption(props: PipetteMountOptionProps): JSX.Element {
+function PipetteMountOption(props: PipetteMountOptionProps): ReactNode {
   const { isSelected, onClick, children, ...styleProps } = props
   return (
     <Flex

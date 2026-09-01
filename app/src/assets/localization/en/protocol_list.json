@@ -1,4 +1,5 @@
 {
+  "compliance_ready": "Compliance Ready",
   "csv_file_required": "CSV file required for analysis. Add the CSV during run setup.",
   "delete_protocol_message": " and its run history will be permanently deleted.",
   "delete_this_protocol": "Delete this protocol?",

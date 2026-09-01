@@ -71,6 +71,8 @@ class RunResource:
     protocol_id: Optional[str]
     created_at: datetime
     actions: List[RunAction]
+    signed_by: Optional[str]
+    log_period_id: Optional[str]
 
 
 @dataclass(frozen=True)
@@ -91,6 +93,8 @@ class BadRunResource:
     protocol_id: Optional[str]
     created_at: datetime
     actions: List[RunAction]
+    signed_by: Optional[str]
+    log_period_id: Optional[str]
     error: EnumeratedError
 
 
@@ -269,6 +273,29 @@ class RunStore:
 
         self._clear_caches()
 
+    def set_signed_by(self, run_id: str, signed_by: str) -> None:
+        """Set the signed_by value for a run.
+
+        Args:
+            run_id: The run to update.
+            signed_by: Signature of the user who reviewed the run.
+
+        Raises:
+            RunNotFoundError: The given run ID was not found in the store.
+        """
+        update = (
+            sqlalchemy.update(run_table)
+            .where(run_table.c.id == run_id)
+            .values(signed_by=signed_by)
+        )
+
+        with self._sql_engine.begin() as transaction:
+            if not self._run_exists(run_id, transaction):
+                raise RunNotFoundError(run_id=run_id)
+            transaction.execute(update)
+
+        self._clear_caches()
+
     def get_all_csv_rtp(self) -> List[CSVParameterRunResource]:
         """Get all of the csv rtp from the run_csv_rtp_table."""
         select_all_csv_rtp = sqlalchemy.select(run_csv_rtp_table).order_by(
@@ -307,6 +334,7 @@ class RunStore:
         run_id: str,
         created_at: datetime,
         protocol_id: Optional[str],
+        log_period_id: Optional[str],
     ) -> RunResource:
         """Insert run resource in the db.
 
@@ -314,6 +342,7 @@ class RunStore:
             run_id: Unique identifier to use for the run.
             created_at: Run creation timestamp.
             protocol_id: Protocol resource used by the run, if any.
+            log_period_id: The log period this run is associated with, if any
 
         Returns:
             The resource that was added to the store.
@@ -328,6 +357,8 @@ class RunStore:
             created_at=created_at,
             protocol_id=protocol_id,
             actions=[],
+            signed_by=None,
+            log_period_id=log_period_id,
         )
         insert = sqlalchemy.insert(run_table).values(
             _convert_run_to_sql_values(run=run)
@@ -880,7 +911,13 @@ class RunStore:
 
 
 # The columns that must be present in a row passed to _convert_row_to_run().
-_run_columns = [run_table.c.id, run_table.c.protocol_id, run_table.c.created_at]
+_run_columns = [
+    run_table.c.id,
+    run_table.c.protocol_id,
+    run_table.c.created_at,
+    run_table.c.signed_by,
+    run_table.c.log_period_id,
+]
 
 
 def _convert_row_to_csv_rtp(
@@ -906,6 +943,8 @@ def _convert_row_to_run(
     run_id = row.id
     protocol_id = row.protocol_id
     created_at = row.created_at
+    signed_by = row.signed_by
+    log_period_id = row.log_period_id
     # Checking the fundamental data types here are not covered by the error handling
     # because if they fire, the only thing we can do to address the issue is immediately
     # delete the row while we still have a handle on it from sql - we won't have any
@@ -914,6 +953,12 @@ def _convert_row_to_run(
     assert isinstance(run_id, str), f"Run ID {run_id} is not a string"
     assert protocol_id is None or isinstance(protocol_id, str), (
         f"Protocol ID {protocol_id} is not a string or None"
+    )
+    assert signed_by is None or isinstance(signed_by, str), (
+        f"signed_by {signed_by} is not a string or None"
+    )
+    assert log_period_id is None or isinstance(log_period_id, str), (
+        f"log_period_id {log_period_id} is not a string or None"
     )
     try:
         actions = [
@@ -932,11 +977,13 @@ def _convert_row_to_run(
             created_at=created_at,
             protocol_id=protocol_id,
             actions=[],
+            signed_by=signed_by,
             error=InvalidStoredData(
                 message="This run has invalid or unknown actions. It has likely been saved in a future version of software.",
                 detail={"kind": "bad-actions"},
                 wrapping=[PythonException(be)],
             ),
+            log_period_id=log_period_id,
         )
 
     return RunResource(
@@ -945,6 +992,8 @@ def _convert_row_to_run(
         created_at=created_at,
         protocol_id=protocol_id,
         actions=actions,
+        signed_by=signed_by,
+        log_period_id=log_period_id,
     )
 
 
@@ -953,6 +1002,8 @@ def _convert_run_to_sql_values(run: RunResource) -> Dict[str, object]:
         "id": run.run_id,
         "created_at": run.created_at,
         "protocol_id": run.protocol_id,
+        "signed_by": run.signed_by,
+        "log_period_id": run.log_period_id,
     }
 
 

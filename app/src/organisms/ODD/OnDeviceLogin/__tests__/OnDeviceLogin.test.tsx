@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { fireEvent, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
 import { OnDeviceLogin } from '..'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type * as ReactI18next from 'react-i18next'
 import type { LoginStep } from '..'
 
@@ -34,7 +35,7 @@ function renderLogin(
   const { initialStep = 'username', ...rest } = props
   const onStepChange = vi.fn()
 
-  function Wrapper(): JSX.Element {
+  function Wrapper(): ReactNode {
     const [step, setStep] = useState<LoginStep>(initialStep)
 
     const handleStepChange = (next: LoginStep): void => {
@@ -51,6 +52,7 @@ function renderLogin(
         onCancel={onCancel}
         onClearLoginError={onClearLoginError}
         loginError={null}
+        passwordComplexity={null}
         {...rest}
       />
     )
@@ -90,7 +92,7 @@ describe('OnDeviceLogin', () => {
       initialUsername: 'alice',
     })
 
-    fillField('device_settings:password', 'temp-pass')
+    fillField('access_control:login_form_password_field', 'temp-pass')
     clickPrimary('confirm')
 
     expect(submitPassword).toHaveBeenCalledWith('alice', 'temp-pass')
@@ -138,20 +140,43 @@ describe('OnDeviceLogin', () => {
       screen.getByRole('heading', { name: 'on_device_login_new_password' })
     ).toBeInTheDocument()
     expect(
-      screen.getByLabelText('device_settings:on_device_login_confirm_password')
+      screen.getByLabelText('access_control:on_device_login_confirm_password')
     ).toBeInTheDocument()
+  })
+
+  it('types into the login field with the software keyboard', async () => {
+    const user = userEvent.setup()
+    renderLogin({ initialStep: 'username' })
+
+    await user.click(screen.getByRole('button', { name: 'a' }))
+    await user.click(screen.getByRole('button', { name: 'b' }))
+
+    expect(screen.getByLabelText('access_control:username')).toHaveValue('ab')
   })
 
   it('advances from username to password', () => {
     const { onStepChange } = renderLogin({ initialStep: 'username' })
 
-    fillField('device_settings:username', 'alice')
+    fillField('access_control:username', 'alice')
     clickPrimary('next')
 
     expect(onStepChange).toHaveBeenCalledWith('password')
     expect(
-      screen.getByLabelText('device_settings:password')
+      screen.getByLabelText('access_control:login_form_password_field')
     ).toBeInTheDocument()
+  })
+
+  it('keeps next enabled and shows a required error when the username is empty', () => {
+    const { onStepChange } = renderLogin({ initialStep: 'username' })
+
+    const nextButton = screen.getByRole('button', { name: 'next' })
+    expect(nextButton).toBeEnabled()
+    fireEvent.click(nextButton)
+
+    expect(
+      screen.getByText('on_device_login_username_required')
+    ).toBeInTheDocument()
+    expect(onStepChange).not.toHaveBeenCalled()
   })
 
   it('submits credentials from the password step during normal login', () => {
@@ -160,10 +185,111 @@ describe('OnDeviceLogin', () => {
       initialUsername: 'alice',
     })
 
-    fillField('device_settings:password', 'secret123')
+    fillField('access_control:login_form_password_field', 'secret123')
     clickPrimary('confirm')
 
     expect(submitPassword).toHaveBeenCalledWith('alice', 'secret123')
+  })
+
+  it('keeps confirm enabled and shows a required error when the password is empty', () => {
+    const { submitPassword } = renderLogin({
+      initialStep: 'password',
+      initialUsername: 'alice',
+    })
+
+    const confirmButton = screen.getByRole('button', { name: 'confirm' })
+    expect(confirmButton).toBeEnabled()
+    fireEvent.click(confirmButton)
+
+    expect(
+      screen.getByText('on_device_login_password_required')
+    ).toBeInTheDocument()
+    expect(submitPassword).not.toHaveBeenCalled()
+  })
+
+  it('keeps next enabled and shows a required error when the new password is empty', () => {
+    const { onStepChange } = renderLogin({
+      initialStep: 'password',
+      isPasswordResetRequired: true,
+      initialUsername: 'alice',
+    })
+
+    const nextButton = screen.getByRole('button', { name: 'next' })
+    expect(nextButton).toBeEnabled()
+    fireEvent.click(nextButton)
+
+    expect(
+      screen.getByText('on_device_login_password_required')
+    ).toBeInTheDocument()
+    expect(onStepChange).not.toHaveBeenCalled()
+  })
+
+  it('shows a length error when the new password is too short', () => {
+    const { onStepChange } = renderLogin({
+      initialStep: 'password',
+      isPasswordResetRequired: true,
+      initialUsername: 'alice',
+      passwordComplexity: { minLength: 8, requireSpecialCharacters: true },
+    })
+
+    fillField('access_control:on_device_login_new_password', 'abc')
+    clickPrimary('next')
+
+    expect(screen.getByText('must_be_at_least_characters')).toBeInTheDocument()
+    expect(onStepChange).not.toHaveBeenCalled()
+  })
+
+  it('shows a special-character error when length is met but a special character is missing', () => {
+    const { onStepChange } = renderLogin({
+      initialStep: 'password',
+      isPasswordResetRequired: true,
+      initialUsername: 'alice',
+      passwordComplexity: { minLength: 8, requireSpecialCharacters: true },
+    })
+
+    fillField('access_control:on_device_login_new_password', 'password1')
+    clickPrimary('next')
+
+    expect(
+      screen.getByText('must_include_at_least_one_special_character')
+    ).toBeInTheDocument()
+    expect(onStepChange).not.toHaveBeenCalled()
+  })
+
+  it('shows the length error when both password policy rules fail', () => {
+    const { onStepChange } = renderLogin({
+      initialStep: 'password',
+      isPasswordResetRequired: true,
+      initialUsername: 'alice',
+      passwordComplexity: { minLength: 8, requireSpecialCharacters: true },
+    })
+
+    fillField('access_control:on_device_login_new_password', 'short')
+    clickPrimary('next')
+
+    expect(screen.getByText('must_be_at_least_characters')).toBeInTheDocument()
+    expect(
+      screen.queryByText('must_include_at_least_one_special_character')
+    ).not.toBeInTheDocument()
+    expect(onStepChange).not.toHaveBeenCalled()
+  })
+
+  it('advances to confirm password when the new password meets complexity rules', () => {
+    const { onStepChange, submitPassword } = renderLogin({
+      initialStep: 'password',
+      isPasswordResetRequired: true,
+      initialUsername: 'alice',
+      passwordComplexity: { minLength: 8, requireSpecialCharacters: true },
+    })
+
+    fillField('access_control:on_device_login_new_password', 'password!')
+    clickPrimary('next')
+
+    expect(onStepChange).toHaveBeenCalledWith('confirmPassword')
+    expect(submitPassword).not.toHaveBeenCalled()
+    expect(
+      screen.queryByText('must_be_at_least_characters')
+    ).not.toBeInTheDocument()
   })
 
   it('advances to confirm password when reset is required', () => {
@@ -173,13 +299,13 @@ describe('OnDeviceLogin', () => {
       initialUsername: 'alice',
     })
 
-    fillField('device_settings:on_device_login_new_password', 'newpass123')
+    fillField('access_control:on_device_login_new_password', 'newpass123')
     clickPrimary('next')
 
     expect(onStepChange).toHaveBeenCalledWith('confirmPassword')
     expect(submitPassword).not.toHaveBeenCalled()
     expect(
-      screen.getByLabelText('device_settings:on_device_login_confirm_password')
+      screen.getByLabelText('access_control:on_device_login_confirm_password')
     ).toBeInTheDocument()
   })
 
@@ -190,13 +316,30 @@ describe('OnDeviceLogin', () => {
       initialUsername: 'alice',
     })
 
-    fillField('device_settings:on_device_login_new_password', 'newpass123')
+    fillField('access_control:on_device_login_new_password', 'newpass123')
     clickPrimary('next')
-    fillField('device_settings:on_device_login_confirm_password', 'different')
+    fillField('access_control:on_device_login_confirm_password', 'different')
     clickPrimary('confirm')
 
     expect(
       screen.getByText('on_device_login_password_mismatch')
+    ).toBeInTheDocument()
+    expect(submitPassword).not.toHaveBeenCalled()
+  })
+
+  it('keeps confirm enabled and shows a required error when confirm password is empty', () => {
+    const { submitPassword } = renderLogin({
+      initialStep: 'confirmPassword',
+      isPasswordResetRequired: true,
+      initialUsername: 'alice',
+    })
+
+    const confirmButton = screen.getByRole('button', { name: 'confirm' })
+    expect(confirmButton).toBeEnabled()
+    fireEvent.click(confirmButton)
+
+    expect(
+      screen.getByText('on_device_login_password_required')
     ).toBeInTheDocument()
     expect(submitPassword).not.toHaveBeenCalled()
   })
@@ -208,9 +351,9 @@ describe('OnDeviceLogin', () => {
       initialUsername: 'alice',
     })
 
-    fillField('device_settings:on_device_login_new_password', 'newpass123')
+    fillField('access_control:on_device_login_new_password', 'newpass123')
     clickPrimary('next')
-    fillField('device_settings:on_device_login_confirm_password', 'newpass123')
+    fillField('access_control:on_device_login_confirm_password', 'newpass123')
     clickPrimary('confirm')
 
     expect(submitPassword).toHaveBeenCalledWith('alice', 'newpass123')
@@ -270,7 +413,7 @@ describe('OnDeviceLogin', () => {
 
     expect(onStepChange).toHaveBeenCalledWith('password')
     expect(
-      screen.getByLabelText('device_settings:on_device_login_new_password')
+      screen.getByLabelText('access_control:on_device_login_new_password')
     ).toBeInTheDocument()
   })
 })

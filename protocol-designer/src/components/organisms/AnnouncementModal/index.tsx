@@ -25,14 +25,14 @@ import {
 import { RELEASE_NOTES_URL } from '../KnowledgeLink'
 import { useAnnouncements } from './announcements'
 
+import type { ReactNode } from 'react'
+
 interface AnnouncementModalProps {
   isViewReleaseNotes?: boolean
   onClose?: () => void
 }
 
-export const AnnouncementModal = (
-  props: AnnouncementModalProps
-): JSX.Element => {
+export const AnnouncementModal = (props: AnnouncementModalProps): ReactNode => {
   const { onClose, isViewReleaseNotes = false } = props
   const { i18n, t } = useTranslation(['modal', 'button'])
   const announcements = useAnnouncements()
@@ -60,7 +60,6 @@ export const AnnouncementModal = (
       {showAnnouncementModal && (
         <Modal
           childrenPadding={SPACING.spacing24}
-          marginLeft="0"
           title={heading}
           type="info"
           width="47rem"

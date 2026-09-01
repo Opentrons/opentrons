@@ -15,9 +15,13 @@ import { UpdateRobotSoftware } from '../UpdateRobotSoftware'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('/app/redux/robot-settings/selectors')
+const mockStartUpdate = vi.hoisted(() => vi.fn())
+
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update/selectors')
+vi.mock('/app/resources/robot-update/RobotUpdateContext', () => ({
+  useRobotUpdateContext: () => ({ startUpdate: mockStartUpdate }),
+}))
 vi.mock('../../../hooks')
 
 const mockOnUpdateStart = vi.fn()

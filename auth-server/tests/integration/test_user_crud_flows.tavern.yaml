@@ -4,9 +4,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
-      - admin_scopes_list
-      - user_scopes_list
-      - reset_password_scopes_list
+      - seed_users
 
 stages:
   - name: Create a new user
@@ -29,24 +27,21 @@ stages:
           fullName: Test New User
           accountType: user
           locked: false
-          scopes: !force_original_structure '{user_scopes_list}'
           resetPassword: false
-  - name: Create a new user with a password less than 8 characters
+
+  - name: List users as admin
     request:
-      method: POST
+      method: GET
       url: '{run_server.base_url}/auth/users'
       headers:
         Authorization: '{admin_access_token}'
-      json:
-        data:
-          username: test_new_user_password_less_than_8_characters
-          password: '1234567'
-          fullName: Test New User
-          accountType: user
     response:
-      status_code: 400
+      status_code: 200
       json:
-        detail: Password must be at least 8 characters long
+        meta:
+          cursor: 0
+          totalLength: !anyint
+        data: !anylist
 
   - name: Get a user information
     request:
@@ -62,7 +57,6 @@ stages:
           fullName: Test New User
           username: test_new_user
           locked: false
-          scopes: !force_original_structure '{user_scopes_list}'
           resetPassword: false
   - name: Update the user
     request:
@@ -82,16 +76,14 @@ stages:
           fullName: Test New User Updated
           username: test_new_user
           locked: false
-          scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: false
-  - name: Update the username and password
+  - name: Update the username
     request:
       method: PATCH
       url: '{run_server.base_url}/auth/users/byUsername/test_new_user'
       json:
         data:
-          username: test_new_user_updated
-          password: securepassword123
+          username: test_new_user_upd
       headers:
         Authorization: '{admin_access_token}'
     response:
@@ -100,14 +92,13 @@ stages:
         data:
           accountType: admin
           fullName: Test New User Updated
-          username: test_new_user_updated
+          username: test_new_user_upd
           locked: false
-          scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: false
   - name: Update the reset password flag
     request:
       method: PATCH
-      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_updated'
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_upd'
       json:
         data:
           resetPassword: true
@@ -119,14 +110,13 @@ stages:
         data:
           accountType: admin
           fullName: Test New User Updated
-          username: test_new_user_updated
+          username: test_new_user_upd
           locked: false
-          scopes: !force_original_structure '{reset_password_scopes_list}'
           resetPassword: true
   - name: Get the user information
     request:
       method: GET
-      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_updated'
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_upd'
       headers:
         Authorization: '{admin_access_token}'
     response:
@@ -135,14 +125,13 @@ stages:
         data:
           accountType: admin
           fullName: Test New User Updated
-          username: test_new_user_updated
+          username: test_new_user_upd
           locked: false
-          scopes: !force_original_structure '{reset_password_scopes_list}'
           resetPassword: true
   - name: Reset the user's password to a temporary password
     request:
       method: POST
-      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_updated/resetPassword'
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_upd/resetPassword'
       headers:
         Authorization: '{admin_access_token}'
     response:
@@ -154,9 +143,8 @@ stages:
         data:
           accountType: admin
           fullName: Test New User Updated
-          username: test_new_user_updated
+          username: test_new_user_upd
           locked: false
-          scopes: !force_original_structure '{reset_password_scopes_list}'
           resetPassword: true
           temporaryPassword: !anystr
 
@@ -167,7 +155,7 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: password
-        username: test_new_user_updated
+        username: test_new_user_upd
         password: '{temporary_password}'
     response:
       status_code: 200
@@ -185,7 +173,7 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: password
-        username: test_new_user_updated
+        username: test_new_user_upd
         password: securepassword123
     response:
       status_code: 400
@@ -197,7 +185,7 @@ stages:
   - name: Admin sets a new password for the user
     request:
       method: PATCH
-      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_updated'
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_upd'
       headers:
         Authorization: '{admin_access_token}'
       json:
@@ -209,9 +197,8 @@ stages:
         data:
           accountType: admin
           fullName: Test New User Updated
-          username: test_new_user_updated
+          username: test_new_user_upd
           locked: false
-          scopes: !force_original_structure '{admin_scopes_list}'
           resetPassword: false
 
   - name: Get a new access token with the updated username and password
@@ -221,7 +208,7 @@ stages:
       data:
         client_id: opentrons_app
         grant_type: password
-        username: test_new_user_updated
+        username: test_new_user_upd
         password: securepassword123
     response:
       status_code: 200
@@ -233,7 +220,7 @@ stages:
   - name: Delete the user
     request:
       method: DELETE
-      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_updated'
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_upd'
       headers:
         Authorization: '{admin_access_token}'
     response:
@@ -242,7 +229,7 @@ stages:
   - name: Try to get the deleted user
     request:
       method: GET
-      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_updated'
+      url: '{run_server.base_url}/auth/users/byUsername/test_new_user_upd'
       headers:
         Authorization: '{admin_access_token}'
     response:
@@ -255,6 +242,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: Enable access control mode
@@ -376,3 +364,605 @@ stages:
       status_code: 200
       json:
         data: !force_original_structure '{regular_user_2_data}'
+
+---
+test_name: Updating self user profile
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+      - seed_users
+
+stages:
+  - name: Enable access control mode
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings/accessControlEnabled'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          accessControlEnabled: true
+    response:
+      status_code: 200
+      strict:
+        - json:off
+
+  - name: Create regular user 1 for self update tests
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: self_update_user_1
+          password: securepassword123
+          fullName: Self Update User 1
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 201
+      save:
+        json:
+          self_update_user_1_data: data
+
+  - name: Create regular user 2 for duplicate username tests
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: self_update_user_2
+          password: securepassword123
+          fullName: Self Update User 2
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 201
+
+  - name: Log in as regular user 1 for self update tests
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: self_update_user_1
+        password: securepassword123
+    response:
+      status_code: 200
+      save:
+        json:
+          self_update_user_1_access_token: access_token
+
+  - name: Empty self update is a no-op
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {self_update_user_1_access_token}'
+      json:
+        data: {}
+    response:
+      status_code: 200
+      json:
+        data: !force_original_structure '{self_update_user_1_data}'
+
+  - name: Self update with unchanged username is a no-op
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {self_update_user_1_access_token}'
+      json:
+        data:
+          username: self_update_user_1
+    response:
+      status_code: 200
+      json:
+        data: !force_original_structure '{self_update_user_1_data}'
+
+  - name: Self update can change full name
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {self_update_user_1_access_token}'
+      json:
+        data:
+          fullName: Self Update User 1 Renamed
+    response:
+      status_code: 200
+      json:
+        data:
+          username: self_update_user_1
+          fullName: Self Update User 1 Renamed
+          accountType: user
+          locked: false
+          resetPassword: false
+
+  - name: Reject self update with a duplicate username
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {self_update_user_1_access_token}'
+      json:
+        data:
+          username: self_update_user_2
+    response:
+      status_code: 400
+      json:
+        errors:
+          - id: userAlreadyExists
+
+  - name: Reject self update with an empty username
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {self_update_user_1_access_token}'
+      json:
+        data:
+          username: ''
+    response:
+      status_code: 400
+      json:
+        detail: username must not be empty
+
+  - name: Self update can change username
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {self_update_user_1_access_token}'
+      json:
+        data:
+          username: self_upd_user_1_ren
+    response:
+      status_code: 200
+      json:
+        data:
+          username: self_upd_user_1_ren
+          fullName: Self Update User 1 Renamed
+          accountType: user
+          locked: false
+          resetPassword: false
+
+---
+test_name: /self routes still work after username change
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+      - seed_users
+
+stages:
+  - name: Log in as the regular user
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: testuser
+        password: testuserpassword
+    response:
+      status_code: 200
+      save:
+        json:
+          user_access_token: access_token
+          user_refresh_token: refresh_token
+
+  - name: GET self works before the username change
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {user_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          username: testuser
+          fullName: Test User
+      strict:
+        - json:off
+
+  - name: Change only the username via self update
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {user_access_token}'
+      json:
+        data:
+          username: testuser_2
+    response:
+      status_code: 200
+      json:
+        data:
+          username: testuser_2
+          fullName: Test User
+      strict:
+        - json:off
+
+  - name: Pre-rename token is still active
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/introspect'
+      data:
+        client_id: opentrons_app
+        token: '{user_access_token}'
+    response:
+      status_code: 200
+      json:
+        active: true
+        username: testuser_2
+        ot_fullname: Test User
+      strict:
+        - json:off
+
+  - name: GET self with the pre-rename token returns the renamed user
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {user_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          username: testuser_2
+          fullName: Test User
+      strict:
+        - json:off
+
+  - name: Admin changes the user's username
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/byUsername/testuser_2'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          username: testuser_3
+    response:
+      status_code: 200
+      json:
+        data:
+          username: testuser_3
+          fullName: Test User
+      strict:
+        - json:off
+
+  - name: Pre-rename token is still active after admin username change
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/introspect'
+      data:
+        client_id: opentrons_app
+        token: '{user_access_token}'
+    response:
+      status_code: 200
+      json:
+        active: true
+        username: testuser_3
+        ot_fullname: Test User
+      strict:
+        - json:off
+
+  - name: GET self after admin username change returns the renamed user
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {user_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          username: testuser_3
+          fullName: Test User
+      strict:
+        - json:off
+
+  - name: Refresh token still works after username change
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: refresh_token
+        refresh_token: '{user_refresh_token}'
+    response:
+      status_code: 200
+      json:
+        access_token: !anystr
+      strict:
+        - json:off
+      save:
+        json:
+          refreshed_access_token: access_token
+
+  - name: GET self with the refreshed token returns the renamed user
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {refreshed_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          username: testuser_3
+          fullName: Test User
+      strict:
+        - json:off
+
+---
+test_name: Locking a user invalidates their existing tokens
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+      - seed_users
+
+stages:
+  - name: Log in as the regular user
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: testuser
+        password: testuserpassword
+    response:
+      status_code: 200
+      save:
+        json:
+          user_access_token: access_token
+          user_refresh_token: refresh_token
+
+  - name: Admin locks the user
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/byUsername/testuser'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          locked: true
+    response:
+      status_code: 200
+      json:
+        data:
+          locked: true
+      strict:
+        - json:off
+
+  - name: Pre-lock token is inactive
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/introspect'
+      data:
+        client_id: opentrons_app
+        token: '{user_access_token}'
+    response:
+      status_code: 200
+      json:
+        active: false
+      strict:
+        - json:off
+
+  - name: GET self with the pre-lock token is rejected
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {user_access_token}'
+    response:
+      status_code: 401
+
+  - name: PATCH self with the pre-lock token is rejected
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {user_access_token}'
+      json:
+        data:
+          fullName: Should Not Apply
+    response:
+      status_code: 401
+
+  - name: Refresh with the pre-lock token is rejected
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: refresh_token
+        refresh_token: '{user_refresh_token}'
+    response:
+      status_code: 400
+      json:
+        error: invalid_grant
+      strict:
+        - json:off
+
+  - name: Login is rejected while the account is locked
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: testuser
+        password: testuserpassword
+    response:
+      status_code: 400
+      json:
+        error: invalid_grant
+        opentrons_account_locked: true
+      strict:
+        - json:off
+
+---
+test_name: Creating a user with an existing username
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+      - seed_users
+
+stages:
+  - name: Create a user
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: duplicate_user_test
+          password: securepassword123!
+          fullName: Duplicate User Test
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 201
+
+  - name: Reject creating a user with an existing username
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: duplicate_user_test
+          password: securepassword123!
+          fullName: Another User
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 400
+      json:
+        errors:
+          - id: userAlreadyExists
+
+---
+test_name: Creating a user without a password requires password reset
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+      - seed_users
+
+stages:
+  - name: Create a user without a password
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: no_password_user
+          fullName: No Password User
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 201
+      save:
+        json:
+          temporary_password: data.temporaryPassword
+      json:
+        data:
+          username: no_password_user
+          fullName: No Password User
+          accountType: user
+          locked: false
+          resetPassword: true
+          temporaryPassword: !anystr
+
+  - name: Get the user and confirm resetPassword is true
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/byUsername/no_password_user'
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          username: no_password_user
+          fullName: No Password User
+          accountType: user
+          locked: false
+          resetPassword: true
+
+  - name: User can log in with the temporary password but only gets self-write scopes
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: no_password_user
+        password: '{temporary_password}'
+    response:
+      status_code: 200
+      json:
+        access_token: !anystr
+        refresh_token: !anystr
+        token_type: Bearer
+        expires_in: !anyint
+        scope: users.read.self users.write.self
+
+  - name: Reject creating a user with an empty password
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: empty_password_user
+          password: ''
+          fullName: Empty Password User
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 400
+      json:
+        detail: password must not be empty
+
+---
+test_name: Creating a user with a username that is too long
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+      - seed_users
+
+stages:
+  - name: Reject creating a user with a username longer than 20 characters
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: aaaaaaaaaaaaaaaaaaaaa
+          password: securepassword123!
+          fullName: Too Long Username User
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 422

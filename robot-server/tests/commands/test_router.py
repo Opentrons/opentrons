@@ -45,8 +45,12 @@ async def test_create_command(
         result=None,
     )
 
-    def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
-        decoy.when(run_orchestrator.get_command("abc123")).then_return(queued_command)
+    async def _stub_queued_command_state(
+        *_a: object, **_k: object
+    ) -> pe_commands.Command:
+        decoy.when(await run_orchestrator.get_command("abc123")).then_return(
+            queued_command
+        )
         return queued_command
 
     decoy.when(
@@ -99,7 +103,9 @@ async def test_create_command_wait_for_complete(
         )
     ).then_return(completed_command)
 
-    decoy.when(run_orchestrator.get_command("abc123")).then_return(completed_command)
+    decoy.when(await run_orchestrator.get_command("abc123")).then_return(
+        completed_command
+    )
 
     result = await create_command(
         RequestModel(data=command_create),
@@ -132,7 +138,7 @@ async def test_get_commands_list(
         params=pe_commands.HomeParams(),
     )
 
-    decoy.when(run_orchestrator.get_current_command()).then_return(
+    decoy.when(await run_orchestrator.get_current_command()).then_return(
         CommandPointer(
             command_id="abc123",
             command_key="command-key-1",
@@ -141,7 +147,7 @@ async def test_get_commands_list(
         )
     )
     decoy.when(
-        run_orchestrator.get_command_slice(
+        await run_orchestrator.get_command_slice(
             cursor=1337, length=42, include_fixit_commands=True
         )
     ).then_return(
@@ -172,7 +178,7 @@ async def test_get_command(
         params=pe_commands.HomeParams(),
     )
 
-    decoy.when(run_orchestrator.get_command("abc123")).then_return(command_1)
+    decoy.when(await run_orchestrator.get_command("abc123")).then_return(command_1)
 
     result = await get_command(commandId="abc123", orchestrator=run_orchestrator)
 
@@ -185,7 +191,7 @@ async def test_get_command_not_found(
     run_orchestrator: RunOrchestrator,
 ) -> None:
     """It should raise a 404 if command is not found."""
-    decoy.when(run_orchestrator.get_command("abc123")).then_raise(
+    decoy.when(await run_orchestrator.get_command("abc123")).then_raise(
         CommandDoesNotExistError("oh no")
     )
 

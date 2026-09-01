@@ -78,7 +78,7 @@ const FLEX_SPACING_STYLE = css`
   }
 `
 
-export function SimpleWizardBodyContent(props: Props): JSX.Element {
+export function SimpleWizardBodyContent(props: Props): ReactNode {
   const {
     iconColor,
     children,
@@ -97,8 +97,9 @@ export function SimpleWizardBodyContent(props: Props): JSX.Element {
     padding-bottom: ${SPACING.spacing32};
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      justify-content: ${props.justifyContentForOddButton ??
-      JUSTIFY_SPACE_BETWEEN};
+      justify-content: ${
+        props.justifyContentForOddButton ?? JUSTIFY_SPACE_BETWEEN
+      };
       padding-bottom: ${SPACING.spacing32};
       padding-left: ${SPACING.spacing32};
     }

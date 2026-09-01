@@ -38,13 +38,15 @@ import {
   useTooltip,
 } from '@opentrons/components'
 import {
-  ApiHostProvider,
+  isDocumentedMutationError,
   useUploadCsvFileMutation,
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, sortRuntimeParameters } from '@opentrons/shared-data'
 
 import { ToggleButton } from '/app/atoms/buttons'
 import { MultiSlideout } from '/app/atoms/Slideout/MultiSlideout'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useLogger } from '/app/logger'
 import { MiniCard } from '/app/molecules/MiniCard'
 import { UploadInput } from '/app/molecules/UploadInput'
@@ -54,10 +56,7 @@ import { getAnalysisStatus } from '/app/organisms/Desktop/ProtocolsLanding/utils
 import { LegacyApplyHistoricOffsets } from '/app/organisms/LegacyApplyHistoricOffsets'
 import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useRobotType } from '/app/redux-resources/robots'
-import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getStoredProtocols } from '/app/redux/protocol-storage'
-import { useAccessTokenForRobot } from '/app/redux/robot-auth'
-import { appShellUSBRequestor } from '/app/redux/shell/remote'
 import {
   getRunTimeParameterFilesForRun,
   getRunTimeParameterValuesForRun,
@@ -65,7 +64,7 @@ import {
 
 import { FileCard } from '../ChooseRobotSlideout/FileCard'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { Robot } from '/app/redux/discovery/types'
@@ -106,7 +105,6 @@ export function ChooseProtocolSlideoutComponent(
 
   const { robot, showSlideout, onCloseClick } = props
   const { name } = robot
-  const token = useAccessTokenForRobot(name)
   const robotType = useRobotType(name)
   const isFlex = robotType === FLEX_ROBOT_TYPE
 
@@ -179,16 +177,8 @@ export function ChooseProtocolSlideoutComponent(
     robot.ip
   )
 
-  const { uploadCsvFile } = useUploadCsvFileMutation(
-    {},
-    robot != null
-      ? {
-          hostname: robot.ip,
-          requestor:
-            robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined,
-        }
-      : null
-  )
+  const documentationState = useDocumentationState()
+  const { uploadCsvFile } = useUploadCsvFileMutation(documentationState)
 
   const srcFileObjects =
     selectedProtocol != null
@@ -225,7 +215,7 @@ export function ChooseProtocolSlideoutComponent(
         })
       },
     },
-    { hostname: robot.ip },
+    undefined,
     shouldApplyOffsets
       ? offsetCandidates.map(({ vector, location, definitionUri }) => ({
           vector,
@@ -252,26 +242,32 @@ export function ChooseProtocolSlideoutComponent(
           const varName = Promise.resolve(key)
           return Promise.all([fileResponse, varName])
         })
-      ).then(responseTuples => {
-        const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
-          Record<string, string>
-        >((acc, [uploadedFileResponse, variableName]) => {
-          return { ...acc, [variableName]: uploadedFileResponse.data.id }
-        }, {})
-        const runTimeParameterValues = getRunTimeParameterValuesForRun(
-          runTimeParametersOverrides
-        )
-        const runTimeParameterFiles = getRunTimeParameterFilesForRun(
-          runTimeParametersOverrides,
-          mappedResolvedCsvVariableToFileId
-        )
-        createRunFromProtocolSource({
-          files: srcFileObjects,
-          protocolKey: selectedProtocol.protocolKey,
-          runTimeParameterValues,
-          runTimeParameterFiles,
+      )
+        .then(responseTuples => {
+          const mappedResolvedCsvVariableToFileId = responseTuples.reduce<
+            Record<string, string>
+          >((acc, [uploadedFileResponse, variableName]) => {
+            return { ...acc, [variableName]: uploadedFileResponse.data.id }
+          }, {})
+          const runTimeParameterValues = getRunTimeParameterValuesForRun(
+            runTimeParametersOverrides
+          )
+          const runTimeParameterFiles = getRunTimeParameterFilesForRun(
+            runTimeParametersOverrides,
+            mappedResolvedCsvVariableToFileId
+          )
+          createRunFromProtocolSource({
+            files: srcFileObjects,
+            protocolKey: selectedProtocol.protocolKey,
+            runTimeParameterValues,
+            runTimeParameterFiles,
+          })
         })
-      })
+        .catch((error: unknown) => {
+          if (!isDocumentedMutationError(error)) {
+            throw error
+          }
+        })
     } else {
       logger.warn('failed to create protocol, no protocol selected')
     }
@@ -675,13 +671,7 @@ export function ChooseProtocolSlideoutComponent(
       maxSteps={hasRunTimeParameters ? 2 : 1}
       title={t('choose_protocol_to_run', { name })}
       footer={
-        <ApiHostProvider
-          hostname={robot.ip}
-          requestor={
-            robot?.ip === OPENTRONS_USB ? appShellUSBRequestor : undefined
-          }
-          token={token}
-        >
+        <>
           {currentPage === 1
             ? !isFlex && (
                 <LegacyApplyHistoricOffsets
@@ -707,7 +697,7 @@ export function ChooseProtocolSlideoutComponent(
               )
             : null}
           {hasRunTimeParameters ? multiPageFooter : singlePageFooter}
-        </ApiHostProvider>
+        </>
       }
     >
       {showSlideout ? (
@@ -733,7 +723,11 @@ export function ChooseProtocolSlideoutComponent(
 export function ChooseProtocolSlideout(
   props: ChooseProtocolSlideoutProps
 ): JSX.Element | null {
-  return <ChooseProtocolSlideoutComponent {...props} />
+  return (
+    <ApiHostProvider robotName={props.robot.name}>
+      <ChooseProtocolSlideoutComponent {...props} />
+    </ApiHostProvider>
+  )
 }
 
 interface StoredProtocolListProps {
@@ -744,7 +738,7 @@ interface StoredProtocolListProps {
   robot: Robot
 }
 
-function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
+function StoredProtocolList(props: StoredProtocolListProps): ReactNode {
   const {
     selectedProtocol,
     handleSelectProtocol,

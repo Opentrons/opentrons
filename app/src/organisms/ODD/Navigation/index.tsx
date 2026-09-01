@@ -14,7 +14,7 @@ import { useNetworkConnection } from '/app/resources/networking/hooks/useNetwork
 import styles from './navigation.module.css'
 import { NavigationMenu } from './NavigationMenu'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { ON_DEVICE_DISPLAY_PATHS } from '/app/App/OnDeviceDisplayApp'
 
 const NAV_LINKS: Array<(typeof ON_DEVICE_DISPLAY_PATHS)[number]> = [
@@ -32,15 +32,15 @@ interface NavigationProps {
   setNavMenuIsOpened?: Dispatch<SetStateAction<boolean>>
   longPressModalIsOpened?: boolean
 }
-export function Navigation(props: NavigationProps): JSX.Element {
+export function Navigation(props: NavigationProps): ReactNode {
   const { setNavMenuIsOpened, longPressModalIsOpened } = props
 
   const { t } = useTranslation('top_navigation')
 
   const location = useLocation()
-  const accountIcon = useAccountIconInitial()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
+  const accountIcon = useAccountIconInitial(robotName)
 
   const [showNavMenu, setShowNavMenu] = useState<boolean>(false)
 
@@ -168,7 +168,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
   )
 }
 
-const NavigationLink = (props: { to: string; name: string }): JSX.Element => (
+const NavigationLink = (props: { to: string; name: string }): ReactNode => (
   <NavLink
     to={props.to}
     className={({ isActive }) =>

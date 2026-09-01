@@ -5,7 +5,7 @@ import { LEFT, NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockAttachedPipetteInformation } from '/app/redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 import { RUN_ID_1 } from '/app/resources/runs/__fixtures__'
 
 import { FLOWS } from '../constants'
@@ -32,6 +32,9 @@ describe('MountingPlate', () => {
       flowType: FLOWS.ATTACH,
       errorMessage: null,
       setShowErrorMessage: vi.fn(),
+      isDoorOpenError: false,
+      setIsDoorOpenError: vi.fn(),
+      dismissDoorOpenError: vi.fn(),
       isRobotMoving: false,
       selectedPipette: NINETY_SIX_CHANNEL,
       isOnDevice: false,
