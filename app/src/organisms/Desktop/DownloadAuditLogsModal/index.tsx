@@ -17,11 +17,15 @@ import styles from './downloadauditlogsmodal.module.css'
 export interface DownloadAuditLogsModalProps {
   onDownload: () => void
   isLoading: boolean
+  closeOnOutsideClick?: boolean
+  onClose?: () => void
 }
 
 export function DownloadAuditLogsModal({
   onDownload,
   isLoading,
+  closeOnOutsideClick = false,
+  onClose,
 }: DownloadAuditLogsModalProps): JSX.Element {
   const { t } = useTranslation('access_control')
 
@@ -29,8 +33,9 @@ export function DownloadAuditLogsModal({
     <Modal
       type="warning"
       title={t('download_audit_logs')}
-      closeOnOutsideClick={false}
+      closeOnOutsideClick={closeOnOutsideClick}
       childrenPadding="var(--spacing-24)"
+      onClose={onClose}
     >
       <div className={styles.content}>
         <StyledText desktopStyle="bodyDefaultRegular">
