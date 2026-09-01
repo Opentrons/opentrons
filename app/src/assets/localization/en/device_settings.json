@@ -160,6 +160,7 @@
   "desktop_password_missing_special_characters": "Password must include a special character.",
   "desktop_password_placeholder": "************************",
   "desktop_password_previously_used": "Choose a different password. This password was used recently.",
+  "desktop_password_reset_time_invalid": "Must be at least {{min}} day",
   "desktop_password_too_short": "Password must be at least {{minLength}} characters.",
   "desktop_personal_account_settings": "Personal account settings",
   "desktop_personal_account_settings_save_error": "Unable to save account settings. Try again.",

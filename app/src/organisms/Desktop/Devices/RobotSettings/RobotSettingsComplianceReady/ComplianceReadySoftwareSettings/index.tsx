@@ -22,8 +22,10 @@ import {
   isValidLogoutIdleTime,
   isValidMaxNumberOfLoginAttempts,
   isValidPasswordComplexityMinimumLength,
+  isValidPasswordResetTime,
   MAX_NUMBER_OF_LOGIN_ATTEMPTS,
   MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
+  MIN_PASSWORD_RESET_TIME_DAYS,
 } from './complianceReadySettingsHelper'
 import {
   isAuditServerSettingKey,
@@ -227,6 +229,14 @@ export function ComplianceReadySoftwareSettings({
               label={t('desktop_length_of_time')}
               value={String(fieldValues.passwordResetTime)}
               units={t('desktop_days')}
+              min={MIN_PASSWORD_RESET_TIME_DAYS}
+              validate={value =>
+                isValidPasswordResetTime(value)
+                  ? null
+                  : t('desktop_password_reset_time_invalid', {
+                      min: MIN_PASSWORD_RESET_TIME_DAYS,
+                    })
+              }
               onBlur={value =>
                 handleAuthSettingInputBlur('passwordResetTime', value)
               }

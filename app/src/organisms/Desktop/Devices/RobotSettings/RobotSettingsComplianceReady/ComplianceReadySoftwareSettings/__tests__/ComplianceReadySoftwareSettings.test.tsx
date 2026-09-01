@@ -472,6 +472,33 @@ describe('ComplianceReadySoftwareSettings', () => {
     expect(mockPatchAuthSettings).not.toHaveBeenCalled()
     expect(idleLogoutField).toHaveValue(0)
   })
+
+  it('should not patch passwordResetTime when blurred value is below the minimum', async () => {
+    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+      data: {
+        data: {
+          ...MOCK_AUTH_SETTINGS.data,
+          passwordResetTime: 90 * 24 * 60 * 60,
+        },
+      },
+    } as ReturnType<typeof useAuthSettingsQuery>)
+
+    render()
+    expandAccordion()
+
+    const passwordResetTimeField = screen.getByLabelText('Edit length of time')
+    expect(passwordResetTimeField).toHaveValue(90)
+
+    fireEvent.change(passwordResetTimeField, { target: { value: '0' } })
+    fireEvent.blur(passwordResetTimeField)
+
+    await waitFor(() => {
+      screen.getByText('Must be at least 1 day')
+    })
+
+    expect(mockPatchAuthSettings).not.toHaveBeenCalled()
+    expect(passwordResetTimeField).toHaveValue(0)
+  })
 })
 
 describe('RobotSettingsComplianceReady', () => {
