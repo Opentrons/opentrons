@@ -352,12 +352,14 @@ async def reset_user_password(
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
+    oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> PydanticResponse[SimpleBody[TemporaryPasswordResponse]]:
     """Reset a user's password to a random temporary password."""
     result = user_data_manager.reset_user_password(
         user.username,
         now=datetime.datetime.now(tz=datetime.UTC),
     )
+    oauth2_backend.revoke_tokens_for_username(user.username)
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
         content=SimpleBody(data=result),
@@ -534,10 +536,11 @@ def _admin_update_revokes_existing_tokens(
 ) -> bool:
     """Return whether an admin update should invalidate the target user's sessions.
 
-    Username and role changes end existing sessions. Legal-name edits
-    and lock/unlock do not; lock is enforced separately via the deactivated flag.
+    Username, credential, and role changes end existing sessions.
     """
     if update.username is not None and update.username != existing.username:
+        return True
+    if update.password is not None:
         return True
     if update.accountType is not None and update.accountType != existing.accountType:
         return True
