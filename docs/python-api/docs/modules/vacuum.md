@@ -88,6 +88,22 @@ collection_plate = spacer.load_labware(
 )
 ```
 
+## Moving labware
+
+Vacuum Module collars, spacers, and filter plates are compatible with the Flex Gripper. You can call [`ProtocolContext.move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] and use the Gripper to move collars and well plates between the dock (slot A4), the vacuum base (slot A3), and other deck locations or modules.
+
+Keep in mind these best practices and limitations when including Gripper movements in your vacuum protocol:
+
+| Activity | Description |
+|:----|:----|
+| **Deck placement** | Because filter plate wells can extend below the plate's sides or skirt, you cannot place a filter plate directly in an empty deck slot (the API will raise a `LabwareIsNotAllowedInLocationError`). Filter plates must sit on an adapter like a collar (slot A4), the vacuum base (slot A3), or on another well plate or module. |
+| **Returning to dock** | Use [`vacuum.move_to_dock(collar, use_gripper=True)`][opentrons.protocol_api.VacuumModuleContext.move_to_dock] to move a collar stack from the vacuum base to the dock. |
+| **Stacking** | Including a `collar` in `move_labware()` automatically moves the collar and any filter or well plate placed on top of it. |
+| **Targeting locations** | Set `new_location=vacuum` to place collars or spacers on the vacuum base (slot A3), or `collar` to put well plates onto a collar staged on the dock (slot A4). |
+
+!!! note "Movement reminder"
+    You cannot move labware on or off the module while the pump is running or while the system is under vacuum. Always pass asynchronous vacuum tasks to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] and wait until system pressure reaches 0 mbar before moving labware with the gripper.
+
 ## Controlling vacuum operations
 
 The Vacuum Module measures vacuum as gauge pressure in millibars (mbar). The module has an operational range from 0 mbar (atmospheric pressure) to -800 mbar, where lower (more negative) values represent a deeper vacuum.
@@ -230,10 +246,7 @@ You can stop the pump and depressurize the system separately by using the [`stop
 
 You can close the vent by using [`close_vent()`][opentrons.protocol_api.VacuumModuleContext.close_vent]. This is a standalone utility method used for testing, diagnostics, or sealing the system without running the pump.
 
-## Moving labware
-
-During a protocol, you can use the Flex Gripper to move well plates to and from the Vacuum Module.
-
+<font color="red"><strong>maybe remove this section below?</strong></font>
 
 ## Use cases
 
