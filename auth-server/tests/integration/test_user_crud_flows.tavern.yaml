@@ -639,7 +639,7 @@ stages:
       strict:
         - json:off
 
-  - name: Pre-rename token is still active after admin username change
+  - name: Pre-rename token is inactive after admin username change
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/introspect'
@@ -649,28 +649,32 @@ stages:
     response:
       status_code: 200
       json:
-        active: true
-        username: testuser_3
-        ot_fullname: Test User
+        active: false
       strict:
         - json:off
 
-  - name: GET self after admin username change returns the renamed user
+  - name: GET self after admin username change is rejected
     request:
       method: GET
       url: '{run_server.base_url}/auth/users/self'
       headers:
         authorization: 'Bearer {user_access_token}'
     response:
-      status_code: 200
+      status_code: 401
+
+  - name: PATCH self after admin username change is rejected
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {user_access_token}'
       json:
         data:
-          username: testuser_3
-          fullName: Test User
-      strict:
-        - json:off
+          fullName: Should Not Apply
+    response:
+      status_code: 401
 
-  - name: Refresh token still works after username change
+  - name: Refresh token is rejected after admin username change
     request:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
@@ -679,27 +683,25 @@ stages:
         grant_type: refresh_token
         refresh_token: '{user_refresh_token}'
     response:
-      status_code: 200
+      status_code: 400
       json:
-        access_token: !anystr
+        error: invalid_grant
       strict:
         - json:off
-      save:
-        json:
-          refreshed_access_token: access_token
 
-  - name: GET self with the refreshed token returns the renamed user
+  - name: Renamed user can mint a new token
     request:
-      method: GET
-      url: '{run_server.base_url}/auth/users/self'
-      headers:
-        authorization: 'Bearer {refreshed_access_token}'
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: testuser_3
+        password: testuserpassword
     response:
       status_code: 200
       json:
-        data:
-          username: testuser_3
-          fullName: Test User
+        access_token: !anystr
       strict:
         - json:off
 
@@ -810,6 +812,205 @@ stages:
       json:
         error: invalid_grant
         opentrons_account_locked: true
+      strict:
+        - json:off
+
+---
+test_name: Changing a user's role invalidates their existing tokens
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+      - seed_users
+
+stages:
+  - name: Log in as the regular user
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: testuser
+        password: testuserpassword
+    response:
+      status_code: 200
+      save:
+        json:
+          user_access_token: access_token
+          user_refresh_token: refresh_token
+
+  - name: Admin changes the user's role
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/byUsername/testuser'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          accountType: auditor
+    response:
+      status_code: 200
+      json:
+        data:
+          accountType: auditor
+      strict:
+        - json:off
+
+  - name: Pre-role-change token is inactive
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/introspect'
+      data:
+        client_id: opentrons_app
+        token: '{user_access_token}'
+    response:
+      status_code: 200
+      json:
+        active: false
+      strict:
+        - json:off
+
+  - name: GET self with the pre-role-change token is rejected
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {user_access_token}'
+    response:
+      status_code: 401
+
+  - name: PATCH self with the pre-role-change token is rejected
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {user_access_token}'
+      json:
+        data:
+          fullName: Should Not Apply
+    response:
+      status_code: 401
+
+  - name: Refresh with the pre-role-change token is rejected
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: refresh_token
+        refresh_token: '{user_refresh_token}'
+    response:
+      status_code: 400
+      json:
+        error: invalid_grant
+      strict:
+        - json:off
+
+  - name: User can log in with the new role
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: testuser
+        password: testuserpassword
+    response:
+      status_code: 200
+      json:
+        access_token: !anystr
+        scope: users.read.others
+      strict:
+        - json:off
+
+---
+test_name: Changing a user's legal name does not invalidate their existing tokens
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+      - seed_users
+
+stages:
+  - name: Log in as the regular user
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: testuser
+        password: testuserpassword
+    response:
+      status_code: 200
+      save:
+        json:
+          user_access_token: access_token
+          user_refresh_token: refresh_token
+
+  - name: Admin changes the user's legal name
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/byUsername/testuser'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          fullName: Updated Legal Name
+    response:
+      status_code: 200
+      json:
+        data:
+          fullName: Updated Legal Name
+      strict:
+        - json:off
+
+  - name: Pre-change token is still active
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/introspect'
+      data:
+        client_id: opentrons_app
+        token: '{user_access_token}'
+    response:
+      status_code: 200
+      json:
+        active: true
+        username: testuser
+        ot_fullname: Updated Legal Name
+      strict:
+        - json:off
+
+  - name: GET self still works after legal name change
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        authorization: 'Bearer {user_access_token}'
+    response:
+      status_code: 200
+      json:
+        data:
+          username: testuser
+          fullName: Updated Legal Name
+      strict:
+        - json:off
+
+  - name: Refresh token still works after legal name change
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: refresh_token
+        refresh_token: '{user_refresh_token}'
+    response:
+      status_code: 200
+      json:
+        access_token: !anystr
       strict:
         - json:off
 
