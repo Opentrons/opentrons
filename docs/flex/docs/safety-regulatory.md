@@ -93,34 +93,28 @@ The Flex has not been evaluated for use with flammable liquids and should not be
 
 ## Regulatory compliance
 
-Opentrons Flex complies with all applicable requirements of the following safety and electromagnetic standards.
+You can find Flex compliance information on the sticker affixed to the back of the robot near the on/off switch and in the sections below.
 
-### Safety
+<figure markdown>
+![Flex regulatory and compliance sticker](images/regulatory-specs-sticker.png)
+<figcaption>Flex compliance sticker</figcaption>
+</figure>
 
-| Rule ID | Title |
-| :------ | :---- |
-| **IEC/UL/CSA 61010-1** |Safety Requirements for Electrical Equipment for Measurement, Control, and Laboratory Use – Part 1: General Requirements |
-| **IEC/UL/CSA 61010-2-051** | Particular requirements for laboratory equipment for mixing and stirring |
+These marks indicate Flex conforms to various international and regional regulatory directives and standards.
 
-### Electromagnetic compatibility
+| Symbol | Market Area | Description |
+|----|----|----|
+|![CE certification](images/certification-ce.png)| European Economic Area (EEA) | Declares compliance with all applicable European Union (EU) directives (e.g., Low Voltage Directive, Machinery Directive, EMC Directive, etc.) |
+|![UK post-Brexit certification](images/certification-uk.png)| Great Britain | This post-Brexit certification declares conformity with all applicable Designated Standards under United Kingdom statutory instruments<!-- "statutory instruments" is a real thing -->, excluding Northern Ireland and the EU. |
+|![Australia and New Zealand certification](images/certification-auz-nz.png)| Australia and New Zealand | Declares compliance with shared trans-Tasman electromagnetic (EMC) baseline standards for commercial radio noise limits.|
+|![North America Intertek listed certification](images/certification-us-can.png)| Canada and United States | Certified and third-party listed by Intertek testing laboratories (ETL control number: 5016401). |
 
-| Rule ID | Title |
-| :------ | :---- |
-| **EN/BSI 61326-1** | Electrical Equipment for Measurement, Control, and Laboratory Use – EMC Requirements – Part 1: General Requirements |
-| **FCC 47 CFR Part 15 Subpart B Class A** | Unintentional Radiators |
-| **IC ICES-003** | Spectrum Management and Telecommunications – Interference- Causing Equipment Standard – Information Technology Equipment (Including Digital Apparatus) |
+### North American compliance
 
-### FCC warnings and notes
+In the United States and Canada, safety auditors and facilities inspectors can verify Flex compliance through our Nationally Recognized Testing Laboratory (NRTL) listing data. Flex is certified and listed by Intertek, an accredited NRTL. The ETL control number is 5016401.
 
-**Warning:** Changes or modifications to this unit not expressly approved by Opentrons could void the user's authority to operate the equipment.
-
-This device complies with Part 15 of the FCC rules. Operation is subject to the following:
-
-- This device may not cause harmful interference.
-
-- This device must accept any interference received, including interference that may cause undesired operation.
-
-**Note:** This equipment has been tested and found to comply with the limits for a Class A digital device, pursuant to Part 15 of the FCC rules. These limits are designed to provide reasonable protection against harmful interference when the equipment is operated in a commercial environment. This equipment generates, uses, and can radiate radio frequency energy and, if not installed and used in accordance with the instruction manual, may cause harmful interference to radio communications. Operation of this equipment in a residential area is likely to cause harmful interference in which case the user will be required to correct the interference at their own expense.
+* **United States:** Conforms to UL STD 61010-1 (Electrical Safety Requirements for Laboratory Use) and UL STD 61010-2-051 (Particular Requirements for Laboratory Mixing and Stirring Equipment).
+* **Canada:** Certified to CSA STD C22.2 No. 61010-1-12 and CSA STD C22.2 No. 61010-2-051.
 
 ### Canada ISED compliance
 
@@ -130,9 +124,16 @@ This product meets the applicable Innovation, Science and Economic Development C
 
 Le présent produit est conforme aux spécifications techniques applicables d'Innovation, Sciences et Développement économique Canada.
 
-### Environmental warning
+### FCC warnings and notes
 
-**Warning:** Cancer and Reproductive Harm – <https://www.P65Warnings.ca.gov>
+**Warning:** Changes or modifications to this unit not expressly approved by Opentrons could void the user's authority to operate the equipment.
+
+This device complies with Part 15 of the FCC rules. Operation is subject to the following:
+
+- This device may not cause harmful interference.
+- This device must accept any interference received, including interference that may cause undesired operation.
+
+**Note:** This equipment has been tested and found to comply with the limits for a Class A digital device, pursuant to Part 15 of the FCC rules. These limits are designed to provide reasonable protection against harmful interference when the equipment is operated in a commercial environment. This equipment generates, uses, and can radiate radio frequency energy and, if not installed and used in accordance with the instruction manual, may cause harmful interference to radio communications. Operation of this equipment in a residential area is likely to cause harmful interference in which case the user will be required to correct the interference at their own expense.
 
 ### WEEE policy
 
@@ -143,16 +144,17 @@ Opentrons products that fall under the WEEE directive are labeled with the <img 
 
 If you or your business have Opentrons products that are at end of life or need to be discarded for a separate purpose, contact Opentrons for proper disposal and recycling.
 
-### Wi-Fi precertification
+### Wireless compliance
 
-The Wi-Fi module is precertified for use in many regions:
+Flex is compatible with 802.11 ac/a/b/g/n wireless networks using internal, dual-band 2.4/5 GHz antennas. This Wi-Fi capability makes the robot an intentional radio frequency radiator.
 
-- United States (FCC): FCC Identifier UAY-W8997-M1216
+* **Canada (ISED):** Certified under IC Identifier W8997-M1216. Unintentional emissions are constrained within Class A limits in accordance with ICES-003.
+* **China (MIIT):** Radio Transmission Equipment Type Approval Certificate Identifier CMIIT ID: 2023AP17820.
+* **EEA (CE):** Authorized under the harmonized Radio Equipment Directive (RED) via manufacturer self-declaration. Unintentional noise satisfies EN 61326-1 laboratory EMC parameters.
+* **India (WPC):** Equipment Type Approval Registration Number ETA-SD-20191005525 (issued via fast-track self-declaration clearing).
+* **Japan (TELEC/MIC):** Certified Ordinance Type Radio Equipment Registry Number 020-170034.
+* **United States (FCC):** Certified under FCC Identifier UAY-W8997-M1216. Unintentional high-frequency noise is limited within industrial boundaries pursuant to FCC 47 CFR Part 15 Subpart B Class A rules.
 
-- European Economic Area (CE): No public identifier (self-declaration)
+### California environmental warning
 
-- Canada (IC): Hardware Version Identification Number W8997-M1216
-
-- Japan (TELEC): Certified number 020-170034
-
-- India (WPC): Registration number ETA-SD-20191005525 (self-declaration)
+**Warning:** Cancer and Reproductive Harm – <https://www.P65Warnings.ca.gov>
