@@ -453,6 +453,8 @@ pipette.mix(repetitions=3, volume=100, final_push_out=10)
 ## Dynamic mix
 The [`dynamic_mix()`][opentrons.protocol_api.InstrumentContext.dynamic_mix] method lets you use Flex pipettes to aspirate and dispense repeatedly in multiple locations. 
 
+Dynamic pipetting actions are not supported for OT-2 pipettes, and the API will raise an error if you call them on an `InstrumentContext` representing an OT-2 pipette.
+
 Like the [`mix()`][opentrons.protocol_api.InstrumentContext.mix] method, it's designed to mix the contents of a well together using a single command rather than using multiple `aspirate()` and `dispense()` calls. Both methods include arguments that let you specify the number of times to mix, the volume (in µL) of liquid, and the well that contains the liquid you want to mix. [`dynamic_mix()`][opentrons.protocol_api.InstrumentContext.dynamic_mix] lets you additionally specify multiple aspirate and dispense locations: 
 
 ```python

@@ -864,7 +864,7 @@ class InstrumentContext(publisher.CommandPublisher):
         Mix a volume of liquid by repeatedly aspirating and dispensing it in multiple
         locations.
 
-        Only available for Opentrons Flex pipettes, and raises and error if used with an OT-2 pipette.
+        Only available for Opentrons Flex pipettes, and raises an error if used with an OT-2 pipette.
 
         See [dynamic mix][dynamic-mix] for examples.
 
