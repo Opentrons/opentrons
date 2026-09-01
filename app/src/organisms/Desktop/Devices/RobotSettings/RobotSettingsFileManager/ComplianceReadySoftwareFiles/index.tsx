@@ -229,15 +229,22 @@ export function ComplianceReadySoftwareFiles({
             deletionKeysByLogPeriodId
           )
         })
-        .catch((e: Error) => {
+        .then(() => {
+          setDownloadModalDismissed(true)
+        })
+        .catch((e: unknown) => {
           if (!isDocumentedMutationError(e)) {
+            const fallbackMessage =
+              e instanceof Error && e.message.length > 0
+                ? e.message
+                : t('some_logs_not_deleted')
             makeToast(
               getAuditLogDeleteErrorMessage(
                 e,
                 t(
                   'access_control:delete_audit_logs_permission_required'
                 ) as string,
-                e.message
+                fallbackMessage as string
               ),
               ERROR_TOAST
             )

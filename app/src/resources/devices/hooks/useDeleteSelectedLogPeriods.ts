@@ -78,7 +78,7 @@ export function useDeleteSelectedLogPeriods(
           })
         }
 
-        if (isForbiddenError(permissionError)) {
+        if (permissionError != null && isForbiddenError(permissionError)) {
           throw permissionError
         }
         if (hasDeleteError) {
