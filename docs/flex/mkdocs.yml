@@ -66,6 +66,7 @@ nav:
       - Using the Camera: opentrons-app/camera.md
   - Advanced Operations:
       - Advanced Operations: advanced-operation/index.md
+      - Compliance Ready Software: advanced-operation/compliance-ready.md
       - Flex Log Files: advanced-operation/log-files.md
       - Command Line Operation Over SSH: advanced-operation/command-line.md
       - Jupyter Notebook: advanced-operation/jupyter-notebook.md
