@@ -161,7 +161,7 @@ Box 3 holds the 2 liter borosilicate glass carboy.
 
 ### Control Box
 
-The Control Box includes the vacuum pump, air/water separator, electronics, and power supply.
+The Control Box houses the vacuum pump, air/water separator, electronics, and power supply.
 
 <table>
   <thead>
@@ -182,13 +182,21 @@ The Control Box includes the vacuum pump, air/water separator, electronics, and 
     <tr>
  <tr>
       <td><strong>Pump type</strong></td>
-      <td>The module uses a piston-driven pump to create vacuum. The pump's flow rate is 50.1 L/min (gas).<br>
-        <p><strong>Note:</strong> Pump values reflect published hardware specifications. Operational performance is controlled by Opentrons Vacuum Module software.</p>
-      </td>
+      <td>Piston-driven</td>
    </tr>
+   <tr>
+      <td><strong>Flow rate</strong></td>
+      <td>50.1 L/min (gas)<br>
+      <p><strong>Note:</strong> Pump values reflect published hardware specifications. Operational performance is controlled by Opentrons Vacuum Module software.</p>
+      </td>
     </tr>
+   <tr>
       <td><strong>Vacuum range<strong></td>
-      <td>Opentrons software and our Python API measure vacuum as gauge pressure in millibars (mbar), from 0 mbar (ambient atmospheric) to -881.31 mbar (maximum pump rating). In absolute pressure, this range is 1,013 mbar (sea level ambient) down to approximately 132 mbar.</td>
+      <td>
+        <ul>
+          <li>Gauge pressure: 0 mbar (ambient atmospheric) to -881.31 mbar (maximum pump rating).</li>
+          <li>Absolute pressure: 1,013 mbar (sea level ambient) to ~132 mbar.</li>
+      </td>
     </tr>
   </tbody>
 </table>
