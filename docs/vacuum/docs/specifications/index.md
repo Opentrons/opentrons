@@ -7,11 +7,11 @@ description: "Box contents and physical specifications summary for module compon
 
 ## Vacuum Module parts
 
-The Vacuum Module ships in 3 separate boxes.
+The Vacuum Module ships in separate boxes that contain all the components and hardware shown below.
 
-### Box 1: manifold components
+### Deck components
 
-Box 1 includes support grids, collars and spacers, and the vacuum manifold base. These pieces stack and hold well plates used in vacuum-rated protocols.
+Deck components install directly onto the Flex deck to support labware and different vacuum protocol profiles. These include the vacuum manifold base, collars, internal spacers, and plate support grids.
 
 <div class="parts-list" markdown>
 
@@ -31,7 +31,7 @@ Box 1 includes support grids, collars and spacers, and the vacuum manifold base.
 
 <figure markdown>
 ![Short vacuum collar](../images/collar-short.svg "Short vacuum collar")
-<figcaption>(1) Short collar, 42 mm </figcaption>
+<figcaption>(1) Short collar, 42 mm</figcaption>
 </figure>
 
 <figure markdown>
@@ -64,9 +64,9 @@ Box 1 includes support grids, collars and spacers, and the vacuum manifold base.
 
 </div>
 
-### Box 2: module components
+### Module components
 
-Box 2 includes the Control Box (vacuum pump and electronics), carboy holder, a deck adapter (and screws), a power cable, a USB A-B data cable, assorted fasteners, and L-keys.
+Module components provide the external power, vacuum, data communication, and mechanical items required to run the module. These include the Control Box (vacuum pump and electronics), carboy holder, deck adapter plate, cables, fasteners, and hex keys.
 
 <div class="parts-list" markdown>
 
@@ -81,7 +81,7 @@ Box 2 includes the Control Box (vacuum pump and electronics), carboy holder, a d
 </figure>
 
 <figure markdown>
-![Deck plate adapter](../images/deck-plate.png" Deck plate")
+![Deck plate adapter](../images/deck-plate.png "Deck plate")
 <figcaption>(1) Deck adapter</figcaption>
 </figure>
 
@@ -115,19 +115,17 @@ Box 2 includes the Control Box (vacuum pump and electronics), carboy holder, a d
 
 </div>
 
-### Box 3: carboy
+### Waste collection components
 
-Box 3 holds the 2 liter borosilicate glass carboy.
+Waste collection components connect directly to the manifold base and provide an enclosed liquid routing and storage system. These include the glass carboy, GL80 sealing cap, cap wrench, and vacuum tubing.
+
+* The carboy, cap, and hoses ship with quick-connect fittings installed at the factory.
+* Extra fittings and hose clamps are provided to assemble custom vacuum line lengths if needed.
 
 <figure markdown>
 ![Borosilicate glass, 2 liter carboy and cap](../images/carboy-and-cap.png "2 liter glass carboy and cap"){ width="70%" }
 <figcaption>(1) Carboy</figcaption>
 </figure>
-
-### Box 4: Cap and hoses
-* The carboy, cap, and hoses ship with quick connector fittings already installed at the factory.
-* The hoses are wrapped around the shaped foam padding in the bottom of the box.
-* You can use extra hardware (fittings and clamps) included in the box to create your own, customized set of vacuum hoses.
 
 <div class="parts-list" markdown>
 
@@ -151,7 +149,7 @@ Box 3 holds the 2 liter borosilicate glass carboy.
 </figure>
 
 <figure markdown>
-![9 mm vacuum hose](../images/hose-6mm.png){ width="70%" }
+![9 mm vacuum hose](../images/hose-9mm.png){ width="70%" }
 <figcaption>(1) 9 mm diameter hose,<br>2 m</figcaption>
 </figure>
 
