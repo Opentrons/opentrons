@@ -138,6 +138,39 @@ def _validate_fields_non_empty(
             raise InvalidInputError(f"{field_name} must not be empty")
 
 
+def _reject_disallowed_service_account_mutations(
+    existing_user: User,
+    *,
+    new_username: str | None,
+    new_full_name: str | None,
+    new_account_type: str | None,
+    new_locked: bool | None,
+) -> None:
+    """Reject identity and lock changes that service accounts do not allow."""
+    existing_type = AccountType(existing_user.account_type)
+    if (
+        new_account_type is not None
+        and AccountType(new_account_type) == AccountType.SERVICE
+        and existing_type != AccountType.SERVICE
+    ):
+        raise InvalidInputError("Cannot change an account's type to service.")
+
+    if existing_type != AccountType.SERVICE:
+        return
+
+    if new_username is not None and new_username != existing_user.username:
+        raise InvalidInputError("Service account username cannot be changed.")
+    if new_full_name is not None and new_full_name != existing_user.full_name:
+        raise InvalidInputError("Service account legal name cannot be changed.")
+    if (
+        new_account_type is not None
+        and AccountType(new_account_type) != AccountType.SERVICE
+    ):
+        raise InvalidInputError("Service account type cannot be changed.")
+    if new_locked is not None:
+        raise InvalidInputError("Service accounts cannot be locked or unlocked.")
+
+
 def must_reset_password(
     user: User, now: datetime.datetime, password_reset_time_sec: float | None
 ) -> bool:
@@ -159,12 +192,16 @@ class UserDataManager:
 
     def _to_response(self, user: User) -> UserResponse:
         settings = self._settings_store.get_settings()
-        is_failed_login_locked, _ = is_account_locked(
-            failed_login_count=self._user_store.get_failed_login_count(user.username),
-            max_attempts=settings.maxNumberOfLoginAttempts,
-        )
-
         account_type = AccountType(user.account_type)
+        is_failed_login_locked = False
+        if account_type != AccountType.SERVICE:
+            is_failed_login_locked, _ = is_account_locked(
+                failed_login_count=self._user_store.get_failed_login_count(
+                    user.username
+                ),
+                max_attempts=settings.maxNumberOfLoginAttempts,
+            )
+
         now = datetime.datetime.now(tz=datetime.UTC)
 
         return UserResponse(
@@ -229,6 +266,9 @@ class UserDataManager:
 
     def delete_user(self, username: str) -> None:
         """Delete a user or raise UserNotFoundError."""
+        user = self._user_store.get(username)
+        if user is not None and AccountType(user.account_type) == AccountType.SERVICE:
+            raise InvalidInputError("Service accounts cannot be deleted.")
         try:
             self._user_store.remove(username)
         except ValueError as e:
@@ -254,11 +294,19 @@ class UserDataManager:
             account_type=new_account_type,
         )
         _validate_username_characters(new_username)
+        existing_user = self._user_store.get(username_to_update)
+        if existing_user is not None:
+            _reject_disallowed_service_account_mutations(
+                existing_user,
+                new_username=new_username,
+                new_full_name=new_full_name,
+                new_account_type=new_account_type,
+                new_locked=new_locked,
+            )
         if new_password is not None:
             _validate_password_complexity(
                 new_password, self._settings_store.get_settings()
             )
-            existing_user = self._user_store.get(username_to_update)
             if existing_user is not None and password_hash.verify(
                 new_password, existing_user.hashed_password
             ):
