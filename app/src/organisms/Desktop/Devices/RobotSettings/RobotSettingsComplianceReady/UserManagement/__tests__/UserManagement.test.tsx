@@ -355,7 +355,9 @@ describe('UserManagement', () => {
     render()
     expandAccordion()
     fireEvent.click(
-      screen.getByRole('button', { name: 'UserManagement_overflowMenu_service' })
+      screen.getByRole('button', {
+        name: 'UserManagement_overflowMenu_service',
+      })
     )
 
     screen.getByRole('button', { name: 'Reset password' })

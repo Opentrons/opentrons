@@ -1093,6 +1093,7 @@ def test_update_user_rejects_current_password(
             now=_NOW,
         )
 
+
 def _make_service_user(
     username: str = "service",
     full_name: str = SERVICE_ACCOUNT_FULL_NAME,
@@ -1142,9 +1143,7 @@ def test_update_user_cannot_convert_to_service(
         _make_orm_user(username="alice", account_type=AccountType.USER)
     )
     with pytest.raises(InvalidInputError, match="type to service"):
-        manager.update_user(
-            "alice", now=_NOW, new_account_type=AccountType.SERVICE
-        )
+        manager.update_user("alice", now=_NOW, new_account_type=AccountType.SERVICE)
 
 
 def test_update_existing_service_legal_name_is_not_rewritten(
@@ -1221,9 +1220,7 @@ def test_update_service_user_allows_password_change(
         )
     ).then_return(existing)
 
-    result = manager.update_user(
-        "service", now=_NOW, new_password="newpassword2"
-    )
+    result = manager.update_user("service", now=_NOW, new_password="newpassword2")
     assert result.username == "service"
 
 
