@@ -11,7 +11,7 @@ For hardware-related information, see the [Vacuum Module Instruction Manual](../
 
 ## Filter plate load names
 
-See the [Opentrons Labware Library](https://labware.opentrons.com/) for filter plate and well plate API load names. You can also find the `loadName` for filter plates in the [definition files on Github](https://github.com/Opentrons/opentrons/tree/edge/shared-data/labware/definitions/2). When searching, note that all filter plate load names end with `_filter`.
+See the [Opentrons Labware Library](https://labware.opentrons.com/) for filter plate and well plate API load names. You can also find the `loadName` for filter plates in the [labware definition files](https://github.com/Opentrons/opentrons/tree/edge/shared-data/labware/definitions/2) on Github. When searching, note that all filter plate load names end with `_filter`.
 
 ## Deck adapter
 
@@ -181,8 +181,6 @@ Use [`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start
 
 === "Pressure profile"
 
-    In a multi-step pressure profile, each step requires `enable_pump: True` and a target `gauge_pressure_mbar` (from `0` to `-800` mbar), with an optional hold time. Unlike power profiles, the module actively monitors sensor feedback to reach and hold specified vacuum levels throughout a multi-stage protocol.
-
     ```python
     # Define the stages, pressure, and duration
     profile_steps = [
@@ -208,9 +206,9 @@ Use [`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start
     protocol.wait_for_tasks([profile_task])
     ```
 
-=== "Power profile"
+    In a multi-step pressure profile, each step requires `enable_pump: True` and a target `gauge_pressure_mbar` (from `0` to `-800` mbar), with an optional hold time. Unlike power profiles, the module actively monitors sensor feedback to reach and hold specified vacuum levels throughout a multi-stage protocol.
 
-    In a multi-step power profile, each step requires `enable_pump: True` and a target `percent_power` (from `1` to `100`). Unlike pressure profiles, the module does not monitor sensor feedback to reach and hold a specified power level throughout a multi-stage protocol.
+=== "Power profile"
 
     ```python
     # Define the stages, power %, and duration
@@ -237,6 +235,8 @@ Use [`start_execute_profile()`][opentrons.protocol_api.VacuumModuleContext.start
     protocol.wait_for_tasks([profile_task])
     ```
 
+    In a multi-step power profile, each step requires `enable_pump: True` and a target `percent_power` (from `1` to `100`). Unlike pressure profiles, the module does not monitor sensor feedback to reach and hold a specified power level throughout a multi-stage protocol.
+
 ## Utility controls
 
 ### Deactivating and depressurizing
@@ -249,7 +249,7 @@ You can close the vent by using [`close_vent()`][opentrons.protocol_api.VacuumMo
 
 ## Use cases
 
-<font color="red"><strong>maybe remove this use case section? There's another.</strong></font>
+<font color="red"><strong>maybe remove this use case section? This is getting long. Sub-pages?</strong></font>
 
 ### Direct-to-waste
 
