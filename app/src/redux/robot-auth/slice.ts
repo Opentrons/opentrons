@@ -3,6 +3,8 @@
 import { createSelector, createSlice } from '@reduxjs/toolkit'
 import isEqual from 'lodash/isEqual'
 
+import { isAdminEquivalentAccountType } from '/app/local-resources/access-control/utils'
+
 import { type ActionTypesFromSlice } from '../ActionTypesFromSlice'
 import { getLocalRobot } from '../discovery'
 
@@ -170,8 +172,11 @@ export function getLoggedInUserForRobot(
   return getAuthStateForRobot(state, robotName)?.user ?? null
 }
 
+/** True when the logged-in user has admin-equivalent privileges. */
 export function getIsAdminForRobot(state: State, robotName: string): boolean {
-  return getAuthStateForRobot(state, robotName)?.user.accountType === 'admin'
+  return isAdminEquivalentAccountType(
+    getAuthStateForRobot(state, robotName)?.user.accountType
+  )
 }
 
 /**

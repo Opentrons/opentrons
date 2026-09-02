@@ -1093,10 +1093,6 @@ def test_update_user_rejects_current_password(
             now=_NOW,
         )
 
-
-# ── service account immutability ────────────────────────────────────
-
-
 def _make_service_user(
     username: str = "service",
     full_name: str = SERVICE_ACCOUNT_FULL_NAME,
