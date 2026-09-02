@@ -16,6 +16,7 @@ from auth_server.users.credential_characters import (
 )
 from auth_server.users.is_account_locked import is_account_locked
 from auth_server.users.models import (
+    SERVICE_ACCOUNT_FULL_NAME,
     AccountType,
     TemporaryPasswordResponse,
     UserResponse,
@@ -183,6 +184,8 @@ class UserDataManager:
         now: datetime.datetime,
     ) -> TemporaryPasswordResponse:
         """Validate inputs, check for duplicates, and create a new user."""
+        if account_type == AccountType.SERVICE:
+            full_name = SERVICE_ACCOUNT_FULL_NAME
         _validate_fields_non_empty(
             username=username,
             password=password,

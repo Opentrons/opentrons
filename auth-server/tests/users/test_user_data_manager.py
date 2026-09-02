@@ -11,6 +11,7 @@ from auth_server.settings.models import (
 )
 from auth_server.settings.store import SettingsStore
 from auth_server.users.models import (
+    SERVICE_ACCOUNT_FULL_NAME,
     AccountType,
     TemporaryPasswordResponse,
     UserResponse,
@@ -121,6 +122,121 @@ def test_create_user_success(
         resetPassword=False,
         temporaryPassword=None,
     )
+
+
+def test_create_service_user_forces_legal_name(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    expected = _make_orm_user(
+        username="service",
+        full_name=SERVICE_ACCOUNT_FULL_NAME,
+        account_type=AccountType.SERVICE,
+    )
+    decoy.when(mock_store.get("service")).then_return(None)
+    decoy.when(
+        mock_store.add(
+            username="service",
+            hashed_password=matchers.IsA(str),
+            full_name=SERVICE_ACCOUNT_FULL_NAME,
+            account_type=AccountType.SERVICE,
+            now=matchers.IsA(datetime.datetime),
+            reset_password=False,
+        )
+    ).then_return(expected)
+
+    result = manager.create_user(
+        username="service",
+        password="validpass123",
+        full_name="Some Other Name",
+        account_type=AccountType.SERVICE,
+        now=_NOW,
+    )
+    assert result == TemporaryPasswordResponse(
+        username="service",
+        fullName=SERVICE_ACCOUNT_FULL_NAME,
+        accountType=AccountType.SERVICE,
+        locked=False,
+        resetPassword=False,
+        temporaryPassword=None,
+    )
+
+
+def test_create_service_user_ignores_empty_client_legal_name(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    expected = _make_orm_user(
+        username="service",
+        full_name=SERVICE_ACCOUNT_FULL_NAME,
+        account_type=AccountType.SERVICE,
+    )
+    decoy.when(mock_store.get("service")).then_return(None)
+    decoy.when(
+        mock_store.add(
+            username="service",
+            hashed_password=matchers.IsA(str),
+            full_name=SERVICE_ACCOUNT_FULL_NAME,
+            account_type=AccountType.SERVICE,
+            now=matchers.IsA(datetime.datetime),
+            reset_password=False,
+        )
+    ).then_return(expected)
+
+    result = manager.create_user(
+        username="service",
+        password="validpass123",
+        full_name="",
+        account_type=AccountType.SERVICE,
+        now=_NOW,
+    )
+    assert result.fullName == SERVICE_ACCOUNT_FULL_NAME
+
+
+@pytest.mark.parametrize(
+    "account_type",
+    [AccountType.ADMIN, AccountType.USER, AccountType.AUDITOR],
+)
+def test_create_non_service_user_keeps_provided_legal_name(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+    account_type: AccountType,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    expected = _make_orm_user(
+        username="keep_name",
+        full_name="Provided Name",
+        account_type=account_type,
+    )
+    decoy.when(mock_store.get("keep_name")).then_return(None)
+    decoy.when(
+        mock_store.add(
+            username="keep_name",
+            hashed_password=matchers.IsA(str),
+            full_name="Provided Name",
+            account_type=account_type,
+            now=matchers.IsA(datetime.datetime),
+            reset_password=False,
+        )
+    ).then_return(expected)
+
+    result = manager.create_user(
+        username="keep_name",
+        password="validpass123",
+        full_name="Provided Name",
+        account_type=account_type,
+        now=_NOW,
+    )
+    assert result.fullName == "Provided Name"
+    assert result.accountType == account_type
 
 
 def test_create_user_hashes_password(

@@ -18,6 +18,9 @@ class AccountType(StrEnum):
     SERVICE = "service"
 
 
+# Hardcoded legal name for every new service account.
+SERVICE_ACCOUNT_FULL_NAME = "Service Account"
+
 USERNAME_MAX_LENGTH = 20
 
 Username = Annotated[
