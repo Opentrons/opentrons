@@ -108,6 +108,16 @@ class Backend:
         """Invalidate every issued access and refresh token."""
         self._token_store.revoke_all()
 
+    def revoke_tokens_for_user(self, user_id: int) -> None:
+        """Invalidate every issued access and refresh token for one user."""
+        self._token_store.revoke_for_user(user_id)
+
+    def revoke_tokens_for_username(self, username: str) -> None:
+        """Invalidate every issued access and refresh token for the named user."""
+        user = self._user_store.get(username)
+        if user is not None:
+            self.revoke_tokens_for_user(user.id)
+
     def create_introspect_response(
         self, body_form_data: list[tuple[str, str]], headers: dict[str, str]
     ) -> fastapi.Response:
@@ -622,6 +632,9 @@ class _TokenStore:
 
     def revoke_all(self) -> None:
         self._tokens.clear()
+
+    def revoke_for_user(self, user_id: int) -> None:
+        self._tokens = [token for token in self._tokens if token.user_id != user_id]
 
     @staticmethod
     def _is_active(token: _TokenIssuance, now: datetime) -> bool:

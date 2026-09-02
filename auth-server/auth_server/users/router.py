@@ -22,6 +22,8 @@ from server_utils.fastapi_utils.models.json_api import (
 )
 
 from auth_server.api_error import APIError
+from auth_server.oauth2.backend import Backend
+from auth_server.oauth2.fastapi_dependencies import get_oauth2_backend
 from auth_server.users.dependencies import get_user_by_username, get_user_data_manager
 from auth_server.users.models import (
     AccountType,
@@ -242,6 +244,7 @@ async def update_user(  # noqa: C901
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
+    oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
     audit_logger: Annotated[
         AuditLogger,
         fastapi.Depends(get_audit_logger("update user", auto_log_request_body=False)),
@@ -316,6 +319,8 @@ async def update_user(  # noqa: C901
             status_code=fastapi.status.HTTP_400_BAD_REQUEST,
             detail=str(e),
         )
+    if _admin_update_revokes_existing_tokens(user, update_data):
+        oauth2_backend.revoke_tokens_for_username(updated_user.username)
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
         content=SimpleBody(data=updated_user),
@@ -347,12 +352,14 @@ async def reset_user_password(
     user_data_manager: Annotated[
         UserDataManager, fastapi.Depends(get_user_data_manager)
     ],
+    oauth2_backend: Annotated[Backend, fastapi.Depends(get_oauth2_backend)],
 ) -> PydanticResponse[SimpleBody[TemporaryPasswordResponse]]:
     """Reset a user's password to a random temporary password."""
     result = user_data_manager.reset_user_password(
         user.username,
         now=datetime.datetime.now(tz=datetime.UTC),
     )
+    oauth2_backend.revoke_tokens_for_username(user.username)
     return await PydanticResponse.create(
         status_code=fastapi.status.HTTP_200_OK,
         content=SimpleBody(data=result),
@@ -522,6 +529,22 @@ async def update_self(  # noqa: C901
         status_code=fastapi.status.HTTP_200_OK,
         content=SimpleBody(data=result),
     )
+
+
+def _admin_update_revokes_existing_tokens(
+    existing: UserResponse, update: UpdateUser
+) -> bool:
+    """Return whether an admin update should invalidate the target user's sessions.
+
+    Username, credential, and role changes end existing sessions.
+    """
+    if update.username is not None and update.username != existing.username:
+        return True
+    if update.password is not None:
+        return True
+    if update.accountType is not None and update.accountType != existing.accountType:
+        return True
+    return False
 
 
 def _build_user_already_exists_error() -> ErrorBody[UserAlreadyExistsErrorDetails]:
