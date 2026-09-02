@@ -114,22 +114,22 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     @classmethod
     def parse_get_waste_configs(cls, response: str) -> WasteConfigParameters:
         """Parse the get waste configs."""
-        pattern = r"E:(?P<E>\d) S:(?P<S>\d.+) P:(?P<P>\d.+) F:(?P<F>\d.+) D:(?P<D>\d.+) R:(?P<R>\d.+) C:(?P<C>\d.+) A:(?P<A>\d.+) M:(?P<M>\d.+) X:(?P<X>\d.+)"
+        pattern = (
+            r"E:(?P<E>\d) A:(?P<A>\d.+) G:(?P<G>\d.+) H:(?P<H>\d.+) "
+            r"T:(?P<T>\d.+) U:(?P<U>\d.+) N:(?P<N>\d.+)"
+        )
         _RE = re.compile(rf"^{GCODE.GET_WASTE_CONFIG} {pattern}$")
         match = _RE.match(response)
         if not match:
-            raise ValueError(f"Incorrect Response for get waste confis: {response}")
+            raise ValueError(f"Incorrect Response for get waste configs: {response}")
         return WasteConfigParameters(
-            bool(match.group("E")),
-            float(match.group("S")),
-            float(match.group("P")),
-            float(match.group("F")),
-            float(match.group("D")),
-            float(match.group("R")),
-            float(match.group("C")),
-            float(match.group("A")),
-            float(match.group("M")),
-            float(match.group("X")),
+            waste_detection_enabled=bool(int(match.group("E"))),
+            p_filter_alpha=float(match.group("A")),
+            g_sealed_max=float(match.group("G")),
+            flowing_dp_mbar=float(match.group("H")),
+            stable_hold_ms=float(match.group("T")),
+            stable_hold_deep_ms=float(match.group("U")),
+            min_waste_depth_mbar=float(match.group("N")),
         )
 
     @classmethod
@@ -419,29 +419,23 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     async def set_waste_configs(
         self,
         enable_waste_full_detection: bool,
-        p_window_start: Optional[float] = None,
-        p_window_end: Optional[float] = None,
-        baseline_fast_factor: Optional[float] = None,
-        max_delta_per_tick: Optional[float] = None,
-        max_rise_per_tick: Optional[float] = None,
-        max_cummulative_rise: Optional[float] = None,
         p_filter_alpha: Optional[float] = None,
-        min_window_time: Optional[float] = None,
-        max_window_time: Optional[float] = None,
+        g_sealed_max: Optional[float] = None,
+        flowing_dp_mbar: Optional[float] = None,
+        stable_hold_ms: Optional[float] = None,
+        stable_hold_deep_ms: Optional[float] = None,
+        min_waste_depth_mbar: Optional[float] = None,
     ) -> None:
         """Sets the Waste Full detection algorithm parameters"""
 
         command = GCODE.SET_WASTE_CONFIG.build_command()
         for letter, value in (
-            ("S", p_window_start),
-            ("P", p_window_end),
-            ("F", baseline_fast_factor),
-            ("D", max_delta_per_tick),
-            ("R", max_rise_per_tick),
-            ("C", max_cummulative_rise),
             ("A", p_filter_alpha),
-            ("M", min_window_time),
-            ("X", max_window_time),
+            ("G", g_sealed_max),
+            ("H", flowing_dp_mbar),
+            ("T", stable_hold_ms),
+            ("U", stable_hold_deep_ms),
+            ("N", min_waste_depth_mbar),
         ):
             if value is not None:
                 command.add_float(letter, value, GCODE_ROUNDING_PRECISION)

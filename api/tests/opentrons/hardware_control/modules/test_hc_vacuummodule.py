@@ -941,15 +941,12 @@ async def test_configure_device_applies_waste_and_pressure_defaults(
     decoy.verify(
         await mock_driver.set_waste_configs(
             enable_waste_full_detection=waste.waste_detection_enabled,
-            p_window_start=waste.p_window_start,
-            p_window_end=waste.p_window_end,
-            baseline_fast_factor=waste.baseline_fast_factor,
-            max_delta_per_tick=waste.max_delta_per_tick,
-            max_rise_per_tick=waste.max_rise_per_tick,
-            max_cummulative_rise=waste.max_cummulative_rise,
             p_filter_alpha=waste.p_filter_alpha,
-            min_window_time=waste.min_window_time,
-            max_window_time=waste.max_window_time,
+            g_sealed_max=waste.g_sealed_max,
+            flowing_dp_mbar=waste.flowing_dp_mbar,
+            stable_hold_ms=waste.stable_hold_ms,
+            stable_hold_deep_ms=waste.stable_hold_deep_ms,
+            min_waste_depth_mbar=waste.min_waste_depth_mbar,
         ),
     )
     pid = DEFAULT_PRESSURE_CONTROL_TUNINGS

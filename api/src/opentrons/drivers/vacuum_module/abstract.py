@@ -118,15 +118,12 @@ class AbstractVacuumModuleDriver(Protocol):
     async def set_waste_configs(
         self,
         enable_waste_full_detection: bool,
-        p_window_start: Optional[float] = None,
-        p_window_end: Optional[float] = None,
-        baseline_fast_factor: Optional[float] = None,
-        max_delta_per_tick: Optional[float] = None,
-        max_rise_per_tick: Optional[float] = None,
-        max_cummulative_rise: Optional[float] = None,
         p_filter_alpha: Optional[float] = None,
-        min_window_time: Optional[float] = None,
-        max_window_time: Optional[float] = None,
+        g_sealed_max: Optional[float] = None,
+        flowing_dp_mbar: Optional[float] = None,
+        stable_hold_ms: Optional[float] = None,
+        stable_hold_deep_ms: Optional[float] = None,
+        min_waste_depth_mbar: Optional[float] = None,
     ) -> None:
         """Sets the Waste Full detection algorithm parameters"""
         ...
