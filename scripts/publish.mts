@@ -284,7 +284,9 @@ async function smokeTestEsm(
 }
 
 async function smokeTestComponentsLocalization(): Promise<void> {
-  console.log('\n=== Smoke-testing Node-safe @opentrons/components/localization ===')
+  console.log(
+    '\n=== Smoke-testing Node-safe @opentrons/components/localization ==='
+  )
   const localizationPath = path.join(COMPONENTS_ROOT, 'lib', 'localization.mjs')
   try {
     const mod = await import(localizationPath)
@@ -294,7 +296,9 @@ async function smokeTestComponentsLocalization(): Promise<void> {
     console.log('  localization ESM smoke test PASSED')
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
-    console.error(`\n  FATAL: localization import failed in bare Node.\n  Error: ${message}`)
+    console.error(
+      `\n  FATAL: localization import failed in bare Node.\n  Error: ${message}`
+    )
     process.exit(1)
   }
 }
