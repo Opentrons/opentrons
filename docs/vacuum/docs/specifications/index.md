@@ -124,14 +124,14 @@ Waste collection components connect directly to the manifold base and provide an
 
 <figure markdown>
 ![Borosilicate glass, 2 liter carboy and cap](../images/carboy-and-cap.png "2 liter glass carboy and cap"){ width="70%" }
-<figcaption>(1) Carboy</figcaption>
+<figcaption>(1) Carboy, 2L</figcaption>
 </figure>
 
 <div class="parts-list" markdown>
 
 <figure markdown>
 ![Widemouth GL80 blue polypropylene carboy cap](../images/carboy-cap.png "GL80 carboy cap"){ width="90%" }
-<figcaption>(1) Carboy cap</figcaption>
+<figcaption>(1) Carboy cap, GL80</figcaption>
 </figure>
 
 <figure markdown>

@@ -74,8 +74,12 @@ A large cap wrench (or ring spanner) is included with the carboy. This tool slip
 <figcaption>Carboy cap wrench</figcaption>
 </figure>
 
+<!--- unclear if this is ready or even included 
+
 ### Hose clip
 
 The magnetic hose clip mounts to the top of the Control Box. It's designed to keep the end of a disconnected hose upright so trapped liquid does not drip onto workspace surfaces. Two circular cutouts on one end of the clip are sized for 6 mm and 9 mm vacuum hoses. To use the clip, press the free end of a vacuum hose into its corresponding cutout.
 
 <font color="red"><strong>IMAGE PLACEHOLDER</strong></font>
+
+--->
