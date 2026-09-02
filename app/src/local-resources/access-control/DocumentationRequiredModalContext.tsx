@@ -16,8 +16,10 @@ export interface DocumentationRequiredModalContextType {
   ) => Promise<DocumentationReport>
   showLoginModal: ({
     robotName,
+    key,
   }: {
     robotName: string
+    key?: string
   }) => Promise<{ username: string } | null>
   showSignRunModal: (documentationState: DocumentationState) => Promise<boolean>
   showDownloadLogsModal: (logPeriodId: string) => Promise<boolean>

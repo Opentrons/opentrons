@@ -259,6 +259,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                   <DocumentationRequiredModalContext.Provider
                     value={{
                       showDocumentationRequiredModal: requireDocumentation,
+                      // the ODD only ever logs in to its own robot, so robotName is unused
                       showLoginModal,
                       showSignRunModal,
                       showDownloadLogsModal,

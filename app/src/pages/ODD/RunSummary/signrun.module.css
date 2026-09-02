@@ -67,12 +67,12 @@
 }
 
 .signature_name {
+  display: block;
+  min-height: var(--spacing-24);
   color: var(--grey-50);
   font-size: var(--font-size-20);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-24);
-  min-height: var(--spacing-24);
-  display: block;
 }
 
 .signature_error_text {

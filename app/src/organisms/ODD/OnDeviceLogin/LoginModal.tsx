@@ -197,10 +197,10 @@ const LoginModalImpl = NiceModal.create(
 /**
  * Open the login modal and await the result.
  */
-export function showLoginModal(props: {
+export function showLoginModal(props?: {
   key?: string
 }): Promise<{ username: string } | null> {
-  return NiceModal.show(LoginModalImpl, props)
+  return NiceModal.show(LoginModalImpl, props ?? {})
 }
 
 /**
