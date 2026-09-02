@@ -345,7 +345,7 @@ describe('RobotSettingsDashboard', () => {
 
   it('should render disable vacuum module waste detection copy, and calls toggleWasteDetection', () => {
     render()
-    screen.getByText("Disable Vacuum Module's Waste Full Detection")
+    screen.getByText('Disable Vacuum Module waste detection')
 
     const toggle = screen.getByTestId(
       'RobotSettingButton_disable_vacuum_module_waste_detection'
