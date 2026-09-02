@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import clsx from 'clsx'
 
-import { Icon, StyledText, WARNING_TOAST } from '@opentrons/components'
+import { StyledText, WARNING_TOAST } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
@@ -66,7 +66,8 @@ export function SignRun({
   const { signRun, isSigned, isLoading, loginGate, name } = useSignRunFlow(
     runId,
     robotName,
-    async () => await showLoginModal(),
+    // use a random key to rerender modal on logout and log back in
+    showLoginModal,
     popToast,
     eatToast,
     documentationState,
@@ -100,64 +101,57 @@ export function SignRun({
     <OddModal
       header={{ title: t('sign_protocol_run') }}
       modalZIndex={MODAL_Z_INDEX}
+      key={name}
     >
-      {isLoading ? (
-        <div className={styles.loading_container}>
-          <Icon
-            name="ot-spinner"
-            className={styles.spinner}
-            aria-label="spinner"
-            spin
-          />
-        </div>
-      ) : (
-        <div className={styles.content_container}>
-          <div className={styles.form_section}>
-            <StyledText oddStyle="bodyTextRegular">
-              {t('sign_protocol_run_description')}
-            </StyledText>
-            <div className={styles.signature_field_container}>
-              <div
-                className={clsx(styles.signature_field, {
-                  [styles.signature_field_error]: signError,
-                })}
+      <div className={styles.content_container}>
+        <div className={styles.form_section}>
+          <StyledText oddStyle="bodyTextRegular">
+            {t('sign_protocol_run_description')}
+          </StyledText>
+          <div className={styles.signature_field_container}>
+            <div
+              className={clsx(styles.signature_field, {
+                [styles.signature_field_error]: signError,
+              })}
+            >
+              <button
+                type="button"
+                className={styles.signature_input_wrap}
+                aria-label={t('legal_name')}
+                aria-invalid={signError}
+                onClick={() => {
+                  if (loginGate === 'done') {
+                    setSigned(true)
+                    setSignError(false)
+                  }
+                }}
               >
-                <button
-                  type="button"
-                  className={styles.signature_input_wrap}
-                  aria-label={t('legal_name')}
-                  aria-invalid={signError}
-                  onClick={() => {
-                    if (loginGate === 'done') {
-                      setSigned(true)
-                      setSignError(false)
-                    }
-                  }}
+                <span
+                  className={clsx(styles.signature_text, {
+                    [styles.signature_text_signed]: signed,
+                  })}
                 >
-                  <span
-                    className={clsx(styles.signature_text, {
-                      [styles.signature_text_signed]: signed,
-                    })}
-                  >
-                    {signed ? name : t('tap_to_sign')}
-                  </span>
-                </button>
-                <span className={styles.signature_name}>{name ?? '  '}</span>
-              </div>
-              {signError ? (
-                <span className={styles.signature_error_text} role="alert">
-                  {t('signature_required')}
+                  {signed ? name : t('tap_to_sign')}
                 </span>
-              ) : null}
+              </button>
+              <span className={styles.signature_name}>{name ?? '  '}</span>
             </div>
+            {signError ? (
+              <span className={styles.signature_error_text} role="alert">
+                {t('signature_required')}
+              </span>
+            ) : null}
           </div>
-          <SmallButton
-            buttonText={t('submit')}
-            onClick={handleSign}
-            width="100%"
-          />
         </div>
-      )}
+        <SmallButton
+          buttonText={t('submit')}
+          onClick={handleSign}
+          width="100%"
+          iconName={isLoading ? 'ot-spinner' : undefined}
+          iconPlacement={isLoading ? 'endIcon' : undefined}
+          disabled={isLoading}
+        />
+      </div>
     </OddModal>
   )
 }

@@ -38,6 +38,7 @@ export function useSignRunFlow(
   showLoginModal: (props: {
     robotName: string
     uncloseable: boolean
+    key?: string
   }) => Promise<{ username: string } | null>,
   popToast: () => void,
   eatToast: () => void,
@@ -112,7 +113,12 @@ export function useSignRunFlow(
 
   const handleLogBackIn = useCallback(() => {
     setLoginInFlight(true)
-    void showLoginModal({ robotName, uncloseable: true })
+    void showLoginModal({
+      robotName,
+      uncloseable: true,
+      // forces rerender
+      key: crypto.randomUUID(),
+    })
       .then(result => {
         if (result == null) {
           eatToast()

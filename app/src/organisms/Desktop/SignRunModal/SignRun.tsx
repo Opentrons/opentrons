@@ -9,6 +9,7 @@ import {
   Icon,
   Modal,
   PrimaryButton,
+  SPACING,
   StyledText,
   WARNING_TOAST,
 } from '@opentrons/components'
@@ -71,16 +72,17 @@ export function SignRunModal({
     }
   }
 
-  const { signRun, isLoading, loginGate, name, logout } = useSignRunFlow(
-    runId,
-    robotName,
-    showLoginModal,
-    popToast,
-    eatToast,
-    documentationState,
-    false,
-    onSigned
-  )
+  const { signRun, isLoading, loginGate, name, logout, isSigned } =
+    useSignRunFlow(
+      runId,
+      robotName,
+      showLoginModal,
+      popToast,
+      eatToast,
+      documentationState,
+      false,
+      onSigned
+    )
 
   const handleSign = (): void => {
     if (!signed) {
@@ -98,6 +100,12 @@ export function SignRunModal({
     }
   }, [loginGate, signed])
 
+  useEffect(() => {
+    if (!isLoading && isSigned) {
+      onSigned?.()
+    }
+  }, [isLoading, isSigned, onSigned])
+
   const footer = (
     <div className={styles.modal_footer_container}>
       <BasicButton
@@ -111,7 +119,18 @@ export function SignRunModal({
       >
         {t('log_out')}
       </BasicButton>
-      <PrimaryButton onClick={handleSign}>{t('submit')}</PrimaryButton>
+      <PrimaryButton onClick={handleSign} disabled={isLoading}>
+        {t('submit')}
+        {isLoading ? (
+          <Icon
+            size="1rem"
+            name="ot-spinner"
+            spin
+            marginLeft={SPACING.spacing8}
+            alignSelf="center"
+          />
+        ) : null}
+      </PrimaryButton>
     </div>
   )
 
@@ -121,58 +140,47 @@ export function SignRunModal({
       closeOnOutsideClick={false}
       zIndexOverlay={1000}
       childrenPadding="var(--spacing-24)"
-      footer={isLoading ? null : footer}
+      footer={footer}
     >
-      {isLoading ? (
-        <div className={styles.loading_container}>
-          <Icon
-            name="ot-spinner"
-            className={styles.spinner}
-            aria-label="spinner"
-            spin
-          />
-        </div>
-      ) : (
-        <div className={styles.content_container}>
-          <StyledText desktopStyle="bodyDefaultRegular">
-            {t('sign_protocol_run_description')}
-          </StyledText>
-          <div className={styles.signature_field_container}>
-            <div
-              className={clsx(styles.signature_field, {
-                [styles.signature_field_error]: signError,
-              })}
+      <div className={styles.content_container}>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('sign_protocol_run_description')}
+        </StyledText>
+        <div className={styles.signature_field_container}>
+          <div
+            className={clsx(styles.signature_field, {
+              [styles.signature_field_error]: signError,
+            })}
+          >
+            <button
+              type="button"
+              className={styles.signature_input_wrap}
+              aria-label={t('legal_name')}
+              aria-invalid={signError}
+              onClick={() => {
+                if (loginGate === 'done') {
+                  setSigned(true)
+                  setSignError(false)
+                }
+              }}
             >
-              <button
-                type="button"
-                className={styles.signature_input_wrap}
-                aria-label={t('legal_name')}
-                aria-invalid={signError}
-                onClick={() => {
-                  if (loginGate === 'done') {
-                    setSigned(true)
-                    setSignError(false)
-                  }
-                }}
+              <span
+                className={clsx(styles.signature_text, {
+                  [styles.signature_text_signed]: signed,
+                })}
               >
-                <span
-                  className={clsx(styles.signature_text, {
-                    [styles.signature_text_signed]: signed,
-                  })}
-                >
-                  {signed ? name : t('click_to_sign')}
-                </span>
-              </button>
-              <span className={styles.signature_name}>{name}</span>
-            </div>
-            {signError ? (
-              <span className={styles.signature_error_text} role="alert">
-                {t('signature_required')}
+                {signed ? name : t('click_to_sign')}
               </span>
-            ) : null}
+            </button>
+            <span className={styles.signature_name}>{name}</span>
           </div>
+          {signError ? (
+            <span className={styles.signature_error_text} role="alert">
+              {t('signature_required')}
+            </span>
+          ) : null}
         </div>
-      )}
+      </div>
     </Modal>,
     getTopPortalEl()
   )
