@@ -335,12 +335,12 @@ export function Toast(props: ToastProps): JSX.Element {
           flexDirection={showODDStyle ? DIRECTION_ROW : DIRECTION_COLUMN}
           overflow="hidden"
           width={showODDStyle ? 'auto' : '100%'}
+          gap={showODDStyle ? SPACING.spacing4 : undefined}
         >
           {headingText.length > 0 ? (
             <StyledText
-              oddStyle="bodyTextSemiBold"
-              desktopStyle="bodyDefaultRegular"
-              marginRight={showODDStyle ? SPACING.spacing4 : undefined}
+              oddStyle="bodyTextBold"
+              desktopStyle="bodyDefaultSemiBold"
               maxWidth={showODDStyle ? '30.375rem' : 'auto'}
               overflow="hidden"
               textOverflow="ellipsis"
