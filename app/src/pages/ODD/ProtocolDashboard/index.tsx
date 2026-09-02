@@ -43,7 +43,13 @@ import type { ProtocolResource } from '@opentrons/shared-data'
 import type { ProtocolsOnDeviceSortKey } from '/app/redux/config/types'
 import type { Dispatch } from '/app/redux/types'
 
-export function ProtocolDashboard(): JSX.Element {
+export interface ProtocolDashboardProps {
+  isCRSEnabled: boolean
+}
+
+export function ProtocolDashboard({
+  isCRSEnabled,
+}: ProtocolDashboardProps): JSX.Element {
   const protocols = useAllProtocolsQuery()
   const runs = useNotifyAllRunsQuery()
   const { t } = useTranslation('protocol_info')
@@ -311,12 +317,14 @@ export function ProtocolDashboard(): JSX.Element {
           ) : pinnedProtocols.length === 0 ? (
             <NoProtocols />
           ) : null}
-          <TouchFloatingActionButton
-            buttonText={t('quick_transfer')}
-            iconName="plus"
-            onClick={handleCreateNewQuickTransfer}
-            aria-label={t('create_quick_transfer')}
-          />
+          {isCRSEnabled ? null : (
+            <TouchFloatingActionButton
+              buttonText={t('quick_transfer')}
+              iconName="plus"
+              onClick={handleCreateNewQuickTransfer}
+              aria-label={t('create_quick_transfer')}
+            />
+          )}
         </Box>
       </Flex>
     </>
