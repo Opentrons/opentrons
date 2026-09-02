@@ -249,7 +249,7 @@ You can close the vent by using [`close_vent()`][opentrons.protocol_api.VacuumMo
 
 ## Use cases
 
-<font color="red"><strong>maybe remove this use case section? This is getting long. Sub-pages?</strong></font>
+<font color="red"><strong>This section moves to</strong></font> [Example Protocols](../examples.md), <font color="red"><strong>and gets mentioned and linked at the beginning of this page.</strong></font>
 
 ### Direct-to-waste
 
