@@ -24,11 +24,12 @@ import type { DocumentationState } from '@opentrons/react-api-client'
 type LoginGate = 'idle' | 'prompting' | 'needsadmin' | 'done'
 
 export interface SignRunFlowResult {
-  signRun: (name: string) => void
+  signRun: () => void
   isLoading: boolean
   isSigned: boolean
   loginGate: LoginGate
-  correctName: string | undefined
+  name: string
+  logout: () => void
 }
 
 export function useSignRunFlow(
@@ -109,48 +110,43 @@ export function useSignRunFlow(
     }
   }, [refetchSelf, eatToast, queryClient, host])
 
+  const handleLogBackIn = useCallback(() => {
+    setLoginInFlight(true)
+    void showLoginModal({ robotName, uncloseable: true })
+      .then(result => {
+        if (result == null) {
+          eatToast()
+          setLoginInFlight(false)
+          return
+        }
+        setRefetchSelf(true)
+      })
+      .catch(() => {
+        eatToast()
+        setLoginInFlight(false)
+      })
+  }, [eatToast, robotName, showLoginModal, setLoginInFlight, setRefetchSelf])
+
+  const handleLogout = useCallback(() => {
+    logout()
+    queryClient.removeQueries(getSelfQueryKey(host))
+    handleLogBackIn()
+  }, [logout, queryClient, host, handleLogBackIn])
+
   useEffect(() => {
     if (isAuthLoading || isSelfFetching) {
       return
     }
     switch (loginGate) {
       case 'needsadmin':
-        logout()
+        handleLogout()
         popToast()
-        queryClient.removeQueries(getSelfQueryKey(host))
-        setLoginInFlight(true)
-        void showLoginModal({ robotName, uncloseable: true })
-          .then(result => {
-            if (result == null) {
-              eatToast()
-              setLoginInFlight(false)
-              return
-            }
-            setRefetchSelf(true)
-          })
-          .catch(() => {
-            eatToast()
-            setLoginInFlight(false)
-          })
         break
       case 'idle':
         if (isOnDevice) {
           break
         }
-        setLoginInFlight(true)
-        void showLoginModal({ robotName, uncloseable: true })
-          .then(result => {
-            if (result == null) {
-              eatToast()
-              setLoginInFlight(false)
-              return
-            }
-            setRefetchSelf(true)
-          })
-          .catch(() => {
-            eatToast()
-            setLoginInFlight(false)
-          })
+        handleLogBackIn()
         break
       // waiting for login to finish / self to settle
       case 'prompting':
@@ -160,42 +156,36 @@ export function useSignRunFlow(
         break
     }
   }, [
-    eatToast,
-    host,
+    handleLogout,
+    handleLogBackIn,
+    popToast,
     isAuthLoading,
     isSelfFetching,
     loginGate,
-    logout,
-    popToast,
-    queryClient,
-    robotName,
-    showLoginModal,
     isOnDevice,
   ])
 
-  const signRun = useCallback(
-    (name: string) => {
-      const trimmedName = name.trim()
-      if (!trimmedName || trimmedName !== self?.data?.fullName) {
-        return
+  const signRun = useCallback(() => {
+    const name = self?.data?.fullName ?? null
+    if (!name) {
+      return
+    }
+    signRunMutation(
+      { runId, name },
+      {
+        onSuccess: () => {
+          onSigned?.()
+        },
       }
-      signRunMutation(
-        { runId, name },
-        {
-          onSuccess: () => {
-            onSigned?.()
-          },
-        }
-      )
-    },
-    [self?.data?.fullName, signRunMutation, runId, onSigned]
-  )
+    )
+  }, [self?.data?.fullName, signRunMutation, runId, onSigned])
 
   return {
     signRun,
     isLoading,
     loginGate,
     isSigned,
-    correctName: self?.data?.fullName,
+    name: self?.data?.fullName ?? '',
+    logout: handleLogout,
   }
 }
