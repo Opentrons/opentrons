@@ -50,6 +50,10 @@ FILTER_PLATE_CHOICES: List[ParameterChoice] = [
         "value": "millipore_96_wellplate_300ul_hts_filter",
     },
     {
+        "display_name": "Millipore 96 300µL HTS IP",
+        "value": "millipore_96_wellplate_300ul_hts_ip_filter",
+    },
+    {
         "display_name": "Millipore 96 300µL PCR",
         "value": "millipore_96_wellplate_300ul_pcr_filter",
     },
@@ -70,19 +74,19 @@ FILTER_PLATE_CHOICES: List[ParameterChoice] = [
         "value": "thermoscientificnunc_96_wellplate_1000ul_filter",
     },
     {
-        "display_name": "Cytiva AcroPrep 96 350µL Filter",
+        "display_name": "Cytiva 96 350µL Filter",
         "value": "cytiva_96_wellplate_350ul_filter",
     },
     {
-        "display_name": "Cytiva AcroPrep 96 1000µL NAB Long Tip",
+        "display_name": "Cytiva 96 1000µL Long Tip",
         "value": "cytiva_96_wellplate_1000ul_longtip_filter",
     },
     {
-        "display_name": "Cytiva AcroPrep 96 1000µL Short Tip",
+        "display_name": "Cytiva 96 1000µL Short Tip",
         "value": "cytiva_96_wellplate_1000ul_shorttip_filter",
     },
     {
-        "display_name": "Luna Nanotech USP-096F 1000µL Silica",
+        "display_name": "Luna USP-096F 1000µL Silica",
         "value": "lunanano_96_wellplate_1000ul_filter",
     },
     {
