@@ -1,4 +1,5 @@
 import type { AxiosError } from 'axios'
+import type { AuthUserAccountType } from '@opentrons/api-client'
 import type {
   DocumentationReport,
   DocumentationState,
@@ -7,6 +8,13 @@ import type {
 const PROTOCOLS_WRITE_SCOPE = 'protocols.write'
 
 const MAX_ERROR_DETAIL_LENGTH = 255
+
+/** Admin and service accounts share the same privileged robot permissions. */
+export function isAdminEquivalentAccountType(
+  accountType: AuthUserAccountType | undefined
+): boolean {
+  return accountType === 'admin' || accountType === 'service'
+}
 
 export function isDocumentationReportValid(
   docreport: DocumentationReport,

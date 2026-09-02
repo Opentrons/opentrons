@@ -10,6 +10,7 @@ import {
   useSignRunMutation,
 } from '@opentrons/react-api-client'
 
+import { isAdminEquivalentAccountType } from '/app/local-resources/access-control/utils'
 import { useLogout } from '/app/redux/robot-auth'
 
 import { useNotifyRunQuery } from '../runs'
@@ -68,7 +69,7 @@ export function useSignRunFlow(
 
   const requireAdmin =
     authSettings?.data.requireAdminCredsForSignoffProtocol === true
-  const isAdmin = self?.data.accountType === 'admin'
+  const isAdmin = isAdminEquivalentAccountType(self?.data.accountType)
   const canSignProtocol = !requireAdmin || isAdmin
 
   const [loginInFlight, setLoginInFlight] = useState(false)

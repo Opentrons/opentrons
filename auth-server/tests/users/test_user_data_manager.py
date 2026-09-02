@@ -11,6 +11,7 @@ from auth_server.settings.models import (
 )
 from auth_server.settings.store import SettingsStore
 from auth_server.users.models import (
+    SERVICE_ACCOUNT_FULL_NAME,
     AccountType,
     TemporaryPasswordResponse,
     UserResponse,
@@ -66,9 +67,10 @@ def _make_orm_user(
     reset_password: bool = False,
     deactivated: bool = False,
     password_set_at: datetime.datetime = _NOW,
+    user_id: int | None = None,
 ) -> User:
     """Helper to build an ORM User for mock return values."""
-    return User(
+    user = User(
         username=username,
         hashed_password=hashed_password,
         full_name=full_name,
@@ -77,6 +79,9 @@ def _make_orm_user(
         deactivated=deactivated,
         password_set_at=password_set_at,
     )
+    if user_id is not None:
+        user.id = user_id
+    return user
 
 
 # ── create_user ─────────────────────────────────────────────────────
@@ -121,6 +126,121 @@ def test_create_user_success(
         resetPassword=False,
         temporaryPassword=None,
     )
+
+
+def test_create_service_user_forces_legal_name(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    expected = _make_orm_user(
+        username="service",
+        full_name=SERVICE_ACCOUNT_FULL_NAME,
+        account_type=AccountType.SERVICE,
+    )
+    decoy.when(mock_store.get("service")).then_return(None)
+    decoy.when(
+        mock_store.add(
+            username="service",
+            hashed_password=matchers.IsA(str),
+            full_name=SERVICE_ACCOUNT_FULL_NAME,
+            account_type=AccountType.SERVICE,
+            now=matchers.IsA(datetime.datetime),
+            reset_password=False,
+        )
+    ).then_return(expected)
+
+    result = manager.create_user(
+        username="service",
+        password="validpass123",
+        full_name="Some Other Name",
+        account_type=AccountType.SERVICE,
+        now=_NOW,
+    )
+    assert result == TemporaryPasswordResponse(
+        username="service",
+        fullName=SERVICE_ACCOUNT_FULL_NAME,
+        accountType=AccountType.SERVICE,
+        locked=False,
+        resetPassword=False,
+        temporaryPassword=None,
+    )
+
+
+def test_create_service_user_ignores_empty_client_legal_name(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    expected = _make_orm_user(
+        username="service",
+        full_name=SERVICE_ACCOUNT_FULL_NAME,
+        account_type=AccountType.SERVICE,
+    )
+    decoy.when(mock_store.get("service")).then_return(None)
+    decoy.when(
+        mock_store.add(
+            username="service",
+            hashed_password=matchers.IsA(str),
+            full_name=SERVICE_ACCOUNT_FULL_NAME,
+            account_type=AccountType.SERVICE,
+            now=matchers.IsA(datetime.datetime),
+            reset_password=False,
+        )
+    ).then_return(expected)
+
+    result = manager.create_user(
+        username="service",
+        password="validpass123",
+        full_name="",
+        account_type=AccountType.SERVICE,
+        now=_NOW,
+    )
+    assert result.fullName == SERVICE_ACCOUNT_FULL_NAME
+
+
+@pytest.mark.parametrize(
+    "account_type",
+    [AccountType.ADMIN, AccountType.USER, AccountType.AUDITOR],
+)
+def test_create_non_service_user_keeps_provided_legal_name(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+    account_type: AccountType,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    expected = _make_orm_user(
+        username="keep_name",
+        full_name="Provided Name",
+        account_type=account_type,
+    )
+    decoy.when(mock_store.get("keep_name")).then_return(None)
+    decoy.when(
+        mock_store.add(
+            username="keep_name",
+            hashed_password=matchers.IsA(str),
+            full_name="Provided Name",
+            account_type=account_type,
+            now=matchers.IsA(datetime.datetime),
+            reset_password=False,
+        )
+    ).then_return(expected)
+
+    result = manager.create_user(
+        username="keep_name",
+        password="validpass123",
+        full_name="Provided Name",
+        account_type=account_type,
+        now=_NOW,
+    )
+    assert result.fullName == "Provided Name"
+    assert result.accountType == account_type
 
 
 def test_create_user_hashes_password(
@@ -972,3 +1092,174 @@ def test_update_user_rejects_current_password(
             new_password=current_password,
             now=_NOW,
         )
+
+
+def _make_service_user(
+    username: str = "service",
+    full_name: str = SERVICE_ACCOUNT_FULL_NAME,
+) -> User:
+    return _make_orm_user(
+        username=username,
+        full_name=full_name,
+        account_type=AccountType.SERVICE,
+    )
+
+
+def test_delete_service_user_raises(
+    decoy: Decoy, mock_store: UserStore, manager: UserDataManager
+) -> None:
+    decoy.when(mock_store.get("service")).then_return(_make_service_user())
+    with pytest.raises(InvalidInputError, match="cannot be deleted"):
+        manager.delete_user("service")
+    decoy.verify(mock_store.remove("service"), times=0)
+
+
+@pytest.mark.parametrize(
+    ("update_kwargs", "match"),
+    [
+        ({"new_username": "renamed"}, "username cannot be changed"),
+        ({"new_full_name": "Some Other Name"}, "legal name cannot be changed"),
+        ({"new_account_type": AccountType.ADMIN}, "type cannot be changed"),
+        ({"new_locked": True}, "cannot be locked or unlocked"),
+        ({"new_locked": False}, "cannot be locked or unlocked"),
+    ],
+)
+def test_update_service_user_rejects_identity_and_lock_changes(
+    decoy: Decoy,
+    mock_store: UserStore,
+    manager: UserDataManager,
+    update_kwargs: dict[str, object],
+    match: str,
+) -> None:
+    decoy.when(mock_store.get("service")).then_return(_make_service_user())
+    with pytest.raises(InvalidInputError, match=match):
+        manager.update_user("service", now=_NOW, **update_kwargs)  # type: ignore[arg-type]
+
+
+def test_update_user_cannot_convert_to_service(
+    decoy: Decoy, mock_store: UserStore, manager: UserDataManager
+) -> None:
+    decoy.when(mock_store.get("alice")).then_return(
+        _make_orm_user(username="alice", account_type=AccountType.USER)
+    )
+    with pytest.raises(InvalidInputError, match="type to service"):
+        manager.update_user("alice", now=_NOW, new_account_type=AccountType.SERVICE)
+
+
+def test_update_existing_service_legal_name_is_not_rewritten(
+    decoy: Decoy, mock_store: UserStore, manager: UserDataManager
+) -> None:
+    """Robots created before the hardcoded name keep their stored legal name."""
+    decoy.when(mock_store.get("service")).then_return(
+        _make_service_user(full_name="Service Account (created by system)")
+    )
+    with pytest.raises(InvalidInputError, match="legal name cannot be changed"):
+        manager.update_user(
+            "service", now=_NOW, new_full_name=SERVICE_ACCOUNT_FULL_NAME
+        )
+
+
+def test_update_service_user_noop_identity_fields_succeed(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    existing = _make_service_user()
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    decoy.when(mock_store.get("service")).then_return(existing)
+    decoy.when(
+        mock_store.update(
+            "service",
+            new_username="service",
+            hashed_password=None,
+            full_name=SERVICE_ACCOUNT_FULL_NAME,
+            account_type=AccountType.SERVICE,
+            reset_password=False,
+            deactivated=None,
+            now=matchers.IsA(datetime.datetime),
+        )
+    ).then_return(existing)
+
+    result = manager.update_user(
+        "service",
+        now=_NOW,
+        new_username="service",
+        new_full_name=SERVICE_ACCOUNT_FULL_NAME,
+        new_account_type=AccountType.SERVICE,
+    )
+    assert result.username == "service"
+    assert result.fullName == SERVICE_ACCOUNT_FULL_NAME
+    assert result.accountType == AccountType.SERVICE
+
+
+def test_update_service_user_allows_password_change(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    existing = _make_orm_user(
+        username="service",
+        full_name=SERVICE_ACCOUNT_FULL_NAME,
+        account_type=AccountType.SERVICE,
+        hashed_password=password_hash.hash("oldpassword123"),
+    )
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    decoy.when(mock_store.get("service")).then_return(existing)
+    decoy.when(
+        mock_store.update(
+            "service",
+            new_username=None,
+            hashed_password=matchers.IsA(str),
+            full_name=None,
+            account_type=None,
+            reset_password=False,
+            deactivated=None,
+            now=matchers.IsA(datetime.datetime),
+        )
+    ).then_return(existing)
+
+    result = manager.update_user("service", now=_NOW, new_password="newpassword2")
+    assert result.username == "service"
+
+
+def test_reset_service_user_password(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(SettingsResponseData())
+    updated = _make_service_user()
+    updated.reset_password = True
+    decoy.when(
+        mock_store.update(
+            "service",
+            hashed_password=matchers.IsA(str),
+            reset_password=True,
+            deactivated=False,
+            now=matchers.IsA(datetime.datetime),
+        )
+    ).then_return(updated)
+
+    result = manager.reset_user_password("service", now=_NOW)
+    assert result.username == "service"
+    assert result.temporaryPassword is not None
+
+
+def test_get_service_user_not_locked_by_failed_logins(
+    decoy: Decoy,
+    mock_store: UserStore,
+    mock_settings: SettingsStore,
+    manager: UserDataManager,
+) -> None:
+    decoy.when(mock_settings.get_settings()).then_return(
+        SettingsResponseData(maxNumberOfLoginAttempts=3)
+    )
+    decoy.when(mock_store.get_failed_login_count("service")).then_return(5)
+    decoy.when(mock_store.get("service")).then_return(_make_service_user())
+
+    result = manager.get_user("service")
+    assert result.locked is False
+    assert result.accountType == AccountType.SERVICE

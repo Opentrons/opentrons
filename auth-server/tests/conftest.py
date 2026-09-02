@@ -32,6 +32,16 @@ def admin_scopes_str() -> str:
 
 
 @pytest.fixture
+def service_scopes_str() -> str:
+    """All the OAuth 2 scopes that a service account should have, as a space-separated string."""
+    return serialize_scopes(
+        get_scope_set_of_account_type(
+            AccountType.SERVICE, SettingsResponseData(), must_reset_password=False
+        )
+    )
+
+
+@pytest.fixture
 def user_scopes_str() -> str:
     """All the OAuth 2 scopes that a regular user should have, as a space-separated string."""
     return serialize_scopes(

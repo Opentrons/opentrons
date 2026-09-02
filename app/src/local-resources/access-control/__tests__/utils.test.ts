@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   getAuditLogDeleteErrorMessage,
   getProtocolOrRunCreationErrorMessage,
+  isAdminEquivalentAccountType,
   isForbiddenError,
   isProtocolWritePermissionError,
 } from '../utils'
@@ -153,5 +154,18 @@ describe('getProtocolOrRunCreationErrorMessage', () => {
         PERMISSION_ERROR
       )
     ).toBe(GENERAL_ERROR)
+  })
+})
+
+describe('isAdminEquivalentAccountType', () => {
+  it('returns true for admin and service accounts', () => {
+    expect(isAdminEquivalentAccountType('admin')).toBe(true)
+    expect(isAdminEquivalentAccountType('service')).toBe(true)
+  })
+
+  it('returns false for other account types and missing values', () => {
+    expect(isAdminEquivalentAccountType('user')).toBe(false)
+    expect(isAdminEquivalentAccountType('auditor')).toBe(false)
+    expect(isAdminEquivalentAccountType(undefined)).toBe(false)
   })
 })

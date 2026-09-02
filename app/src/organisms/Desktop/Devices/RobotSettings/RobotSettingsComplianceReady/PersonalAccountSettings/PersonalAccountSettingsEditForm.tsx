@@ -17,6 +17,7 @@ export interface PersonalAccountSettingsEditFormProps {
   username: string
   fullName: string
   isSaving: boolean
+  identityReadOnly?: boolean
   onSave: (data: UpdateSelfRequest) => Promise<void>
   onCancel: () => void
 }
@@ -32,6 +33,7 @@ export function PersonalAccountSettingsEditForm({
   username,
   fullName,
   isSaving,
+  identityReadOnly = false,
   onSave,
   onCancel,
 }: PersonalAccountSettingsEditFormProps): JSX.Element {
@@ -54,7 +56,8 @@ export function PersonalAccountSettingsEditForm({
     const trimmedUsername = data.username.trim()
     const trimmedFullName = data.fullName.trim()
     const hasProfileChanges =
-      trimmedUsername !== username || trimmedFullName !== fullName
+      !identityReadOnly &&
+      (trimmedUsername !== username || trimmedFullName !== fullName)
     const hasPasswordChange = data.password !== ''
 
     if (!hasProfileChanges && !hasPasswordChange) {
@@ -63,8 +66,12 @@ export function PersonalAccountSettingsEditForm({
 
     void onSave({
       data: {
-        ...(trimmedUsername !== username ? { username: trimmedUsername } : {}),
-        ...(trimmedFullName !== fullName ? { fullName: trimmedFullName } : {}),
+        ...(!identityReadOnly && trimmedUsername !== username
+          ? { username: trimmedUsername }
+          : {}),
+        ...(!identityReadOnly && trimmedFullName !== fullName
+          ? { fullName: trimmedFullName }
+          : {}),
         ...(hasPasswordChange ? { password: data.password } : {}),
       },
     }).catch(error => {
@@ -78,7 +85,10 @@ export function PersonalAccountSettingsEditForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className={styles.form_fields}>
-        <UserAccountIdentityFormFields control={control} />
+        <UserAccountIdentityFormFields
+          control={control}
+          readOnly={identityReadOnly}
+        />
         <UserAccountPasswordFormFields control={control} />
         <div className={styles.actions}>
           <SecondaryButton type="button" onClick={onCancel}>

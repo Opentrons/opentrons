@@ -112,6 +112,7 @@ export function PersonalAccountSettings({
                 username={loggedInUser.username}
                 fullName={loggedInUser.fullName}
                 isSaving={isSaving}
+                identityReadOnly={loggedInUser.accountType === 'service'}
                 onSave={handleSave}
                 onCancel={handleCancelEdit}
               />

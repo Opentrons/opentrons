@@ -25,6 +25,7 @@ from server_utils.auth.scopes import Scope, UnrecognizedScopeError, serialize_sc
 from auth_server.persistence.orm_models import User as ORMUser
 from auth_server.settings.store import SettingsStore
 from auth_server.users.is_account_locked import is_account_locked
+from auth_server.users.models import AccountType
 from auth_server.users.scopes import get_scope_set_of_user
 from auth_server.users.store import UserStore
 from auth_server.users.user_data_manager import must_reset_password, password_hash
@@ -347,6 +348,10 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             failed_login_count=failed_login_count,
             max_attempts=max_login_attempts,
         )
+        if AccountType(user.account_type) == AccountType.SERVICE:
+            # Service accounts must remain usable for Opentrons maintenance.
+            # Failed attempts are still recorded and audited.
+            is_currently_locked = False
 
         if is_currently_locked or not password_is_correct:
             reason = (

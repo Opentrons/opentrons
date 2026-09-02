@@ -44,7 +44,7 @@ export function useUsernameForRobot(robotName: string | null): string | null {
   return useSelector(selector)
 }
 
-/** Return whether the logged-in user for the given robot is an admin. */
+/** Return whether the logged-in user has admin-equivalent privileges. */
 export function useIsAdminForRobot(robotName: string): boolean {
   const selector = useCallback(
     (state: State) => getIsAdminForRobot(state, robotName),
