@@ -38,7 +38,7 @@ import type { ReactNode } from 'react'
 
 const WIZARD_MODAL_WIDTH = '31.25rem'
 const SERVICE_ACCOUNT_USERNAME = 'service'
-const SERVICE_ACCOUNT_FULL_NAME = 'Service Account (created by system)'
+const SERVICE_ACCOUNT_FULL_NAME = 'Service Account'
 const RECOVERY_ACCOUNT_USERNAME = 'recovery'
 const RECOVERY_ACCOUNT_FULL_NAME = 'Recovery Account (created by system)'
 

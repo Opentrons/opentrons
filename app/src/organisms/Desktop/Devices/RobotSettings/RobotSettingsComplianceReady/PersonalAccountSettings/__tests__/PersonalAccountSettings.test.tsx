@@ -304,4 +304,37 @@ describe('PersonalAccountSettings', () => {
       screen.queryByText('Unable to save account settings. Try again.')
     ).not.toBeInTheDocument()
   })
+
+  it('keeps username and legal name read-only for a service account', async () => {
+    const { container } = renderComponent({
+      perRobotAuthStates: {
+        [ROBOT_NAME]: {
+          ...MOCK_AUTH_STATE,
+          user: {
+            username: 'service',
+            fullName: 'Service Account',
+            accountType: 'service',
+          },
+        },
+      },
+      mostRecentRobotName: ROBOT_NAME,
+    })
+
+    openEditForm()
+    expect(screen.getByDisplayValue('service')).toHaveAttribute('readOnly')
+    expect(screen.getByDisplayValue('Service Account')).toHaveAttribute(
+      'readOnly'
+    )
+
+    getPasswordInputs(container).forEach(input => {
+      fireEvent.change(input, { target: { value: 'new-password' } })
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(mockUpdateSelf).toHaveBeenCalledWith({
+        data: { password: 'new-password' },
+      })
+    })
+  })
 })

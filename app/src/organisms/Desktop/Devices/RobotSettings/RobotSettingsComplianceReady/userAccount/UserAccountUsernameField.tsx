@@ -14,12 +14,14 @@ export interface UserAccountUsernameFieldProps<T extends FieldValues> {
   control: Control<T>
   autoFocus?: boolean
   usernameMaxLength?: number
+  readOnly?: boolean
 }
 
 export function UserAccountUsernameField<T extends FieldValues>({
   control,
   autoFocus,
   usernameMaxLength,
+  readOnly = false,
 }: UserAccountUsernameFieldProps<T>): JSX.Element {
   const { t } = useTranslation('device_settings')
   const requiredError = t(
@@ -81,6 +83,7 @@ export function UserAccountUsernameField<T extends FieldValues>({
             return (
               <InputField
                 autoFocus={autoFocus}
+                readOnly={readOnly}
                 value={field.value}
                 error={error}
                 caption={
