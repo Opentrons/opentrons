@@ -312,6 +312,12 @@ class RunOrchestrator(AbstractRunCoordinator):
             cursor=cursor, length=length, include_fixit_commands=include_fixit_commands
         )
 
+    async def get_length(self) -> int:
+        return self._protocol_engine.state_view.commands.get_length()
+
+    async def delete_command_slice_end(self, length: int) -> None:
+        self._protocol_engine.state_view.commands.delete_end_slice(length)
+
     async def get_command_annotations_slice(
         self, cursor: int, length: int
     ) -> CommandAnnotationsSlice:

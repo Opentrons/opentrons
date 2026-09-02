@@ -873,6 +873,12 @@ class CommandView:
             total_length=total_length,
         )
 
+    def delete_end_slice(self, length: int) -> None:
+        self._state.command_history.del_end_slice(length)
+
+    def get_length(self) -> int:
+        return self._state.command_history.length()
+
     def get_errors_slice(
         self,
         cursor: int,

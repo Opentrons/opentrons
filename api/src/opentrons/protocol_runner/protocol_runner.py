@@ -292,7 +292,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         await self._task_queue.join()
 
         run_data = self._protocol_engine.state_view.get_summary()
-        commands = self._protocol_engine.state_view.commands.get_all()
+        # commands = self._protocol_engine.state_view.commands.get_all()
         parameters = self.run_time_parameters
         command_annotations = (
             self._protocol_engine.state_view.commands.get_all_command_annotations()
@@ -301,7 +301,7 @@ class PythonAndLegacyRunner(AbstractRunner):
             self._protocol_engine.state_view.preconditions.get_precondition()
         )
         return RunResult(
-            commands=commands,
+            commands=[],
             state_summary=run_data,
             parameters=parameters,
             command_annotations=command_annotations,
@@ -449,12 +449,12 @@ class JsonRunner(AbstractRunner):
         await self._task_queue.join()
 
         run_data = self._protocol_engine.state_view.get_summary()
-        commands = self._protocol_engine.state_view.commands.get_all()
+        # commands = self._protocol_engine.state_view.commands.get_all()
         preconditions = (
             self._protocol_engine.state_view.preconditions.get_precondition()
         )
         return RunResult(
-            commands=commands,
+            commands=[],
             state_summary=run_data,
             parameters=[],
             command_annotations=self._command_annotations,
@@ -529,12 +529,12 @@ class LiveRunner(AbstractRunner):
         await self._task_queue.join()
 
         run_data = self._protocol_engine.state_view.get_summary()
-        commands = self._protocol_engine.state_view.commands.get_all()
+        # commands = self._protocol_engine.state_view.commands.get_all()
         preconditions = (
             self._protocol_engine.state_view.preconditions.get_precondition()
         )
         return RunResult(
-            commands=commands,
+            commands=[],
             state_summary=run_data,
             parameters=[],
             command_annotations=[],

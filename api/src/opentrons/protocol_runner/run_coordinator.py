@@ -189,6 +189,12 @@ class AbstractRunCoordinator(ABC):
         ...
 
     @abstractmethod
+    async def get_length(self) -> int: ...
+
+    @abstractmethod
+    async def delete_command_slice_end(self, length: int) -> None: ...
+
+    @abstractmethod
     async def get_command_annotations_slice(
         self, cursor: int, length: int
     ) -> CommandAnnotationsSlice:

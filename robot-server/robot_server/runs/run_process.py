@@ -412,6 +412,12 @@ class DirectedRunProcess(AbstractRunCoordinator):
             cursor, length, include_fixit_commands
         )
 
+    async def get_length(self) -> int:
+        return await self._guaranteed_run_orchestrator.get_length()
+
+    async def delete_command_slice_end(self, length: int) -> None:
+        await self._guaranteed_run_orchestrator.delete_command_slice_end(length)
+
     async def get_command_annotations_slice(
         self, cursor: int, length: int
     ) -> CommandAnnotationsSlice:

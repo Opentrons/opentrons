@@ -424,7 +424,20 @@ class RunOrchestratorStore:
             raise RunConflictError("Current run is not idle or stopped.")
 
         run_data = await self.run_coordinator.get_state_summary()
-        commands = await self.run_coordinator.get_all_commands()
+        # commands = await self.run_coordinator.get_all_commands()
+
+        command_length = await self.run_coordinator.get_length()
+        commands: List[Command] = []
+        while command_length > 0:
+            latest_commands = await self.run_coordinator.get_command_slice(
+                cursor=max(0, command_length - 100),
+                length=100,
+                include_fixit_commands=True,
+            )
+            await self.run_coordinator.delete_command_slice_end(100)
+            commands[:0] = latest_commands.commands
+            command_length -= len(latest_commands.commands)
+
         run_time_parameters = await self.run_coordinator.get_run_time_parameters()
         command_annotations = await self.run_coordinator.get_all_command_annotations()
         preconditions = await self.run_coordinator.get_preconditions()

@@ -6,6 +6,7 @@ from typing import List, Optional, Union
 import opentrons.protocol_runner.create_simulating_orchestrator as simulating_runner
 import opentrons.util.helpers as datetime_helper
 from opentrons.config import feature_flags
+from opentrons.protocol_engine import Command
 from opentrons.protocol_engine.errors import ErrorOccurrence
 from opentrons.protocol_engine.types import (
     CSVRuntimeParamPaths,
@@ -104,6 +105,20 @@ class ProtocolAnalyzer:
                     run_time_parameters=await self._coordinator.get_run_time_parameters(),
                 )
                 return
+
+            command_length = await self._coordinator.get_length()
+            commands: List[Command] = []
+            while command_length > 0:
+                latest_commands = await self._coordinator.get_command_slice(
+                    cursor=max(0, command_length - 100),
+                    length=100,
+                    include_fixit_commands=True,
+                )
+                await self._coordinator.delete_command_slice_end(100)
+                commands[:0] = latest_commands.commands
+                command_length -= len(latest_commands.commands)
+
+            result.commands = commands
 
             log.info(f'Completed analysis "{analysis_id}".')
 
