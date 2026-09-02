@@ -369,7 +369,9 @@ async def _do_analyze(
             command_preconditions=None,
         )
         return analysis
-    return await orchestrator.run(deck_configuration=[])
+    run_result = await orchestrator.run(deck_configuration=[])
+    run_result.commands = await orchestrator.get_all_commands()
+    return run_result
 
 
 async def _analyze(  # noqa: C901
