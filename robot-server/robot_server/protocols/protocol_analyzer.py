@@ -24,6 +24,7 @@ from opentrons_shared_data.robot.types import RobotType
 import robot_server.errors.error_mappers as em
 from robot_server.protocols.analysis_store import AnalysisStore
 from robot_server.protocols.protocol_store import ProtocolResource
+from robot_server.runs.run_orchestrator_store import construct_run_result
 from robot_server.runs.run_process import DirectedRunProcess
 from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
 
@@ -95,7 +96,7 @@ class ProtocolAnalyzer:
         assert self._coordinator is not None
         try:
             try:
-                engine_result = await self._coordinator.run(
+                await self._coordinator.run(
                     deck_configuration=[],
                 )
             except BaseException as error:
@@ -107,25 +108,7 @@ class ProtocolAnalyzer:
                 )
                 return
 
-            command_length = await self._coordinator.get_length()
-            commands: List[Command] = []
-            while command_length > 0:
-                latest_commands = await self._coordinator.get_command_slice(
-                    cursor=max(0, command_length - 100),
-                    length=100,
-                    include_fixit_commands=True,
-                )
-                await self._coordinator.delete_command_slice_end(100)
-                commands[:0] = latest_commands.commands
-                command_length = await self._coordinator.get_length()
-
-            result = RunResult(
-                commands=commands,
-                state_summary=engine_result.state_summary,
-                parameters=engine_result.parameters,
-                command_annotations=await self._coordinator.get_all_command_annotations(),
-                command_preconditions=engine_result.command_preconditions,
-            )
+            result = await construct_run_result(run_coordinator=self._coordinator)
 
             await self._analysis_store.update(
                 analysis_id=analysis_id,

@@ -176,6 +176,36 @@ def _get_hardware_listener(
     return run_handler_in_engine_thread_from_hardware_thread
 
 
+async def construct_run_result(
+    run_coordinator: Union[RunOrchestrator, DirectedRunProcess],
+) -> RunResult:
+    """Construct a RunResult by querying a run coordinator.
+
+    Of note, in order to prevent copies of the data appearing in both the robot-server and
+    the protocol process the commands are deleted to preserve memory.
+    """
+
+    command_length = await run_coordinator.get_length()
+    commands: List[Command] = []
+    while command_length > 0:
+        latest_commands = await run_coordinator.get_command_slice(
+            cursor=max(0, command_length - 100),
+            length=100,
+            include_fixit_commands=True,
+        )
+        await run_coordinator.delete_command_slice_end(100)
+        commands[:0] = latest_commands.commands
+        command_length = await run_coordinator.get_length()
+
+    return RunResult(
+        state_summary=await run_coordinator.get_state_summary(),
+        commands=commands,
+        parameters=await run_coordinator.get_run_time_parameters(),
+        command_annotations=await run_coordinator.get_all_command_annotations(),
+        command_preconditions=await run_coordinator.get_preconditions(),
+    )
+
+
 class RunOrchestratorStore:
     """Factory and in-memory storage for ProtocolEngine."""
 
@@ -424,25 +454,9 @@ class RunOrchestratorStore:
             raise RunConflictError("Current run is not idle or stopped.")
 
         try:
-            run_data = await self.run_coordinator.get_state_summary()
-
-            command_length = await self.run_coordinator.get_length()
-            commands: List[Command] = []
-            while command_length > 0:
-                latest_commands = await self.run_coordinator.get_command_slice(
-                    cursor=max(0, command_length - 100),
-                    length=100,
-                    include_fixit_commands=True,
-                )
-                await self.run_coordinator.delete_command_slice_end(100)
-                commands[:0] = latest_commands.commands
-                command_length = await self.run_coordinator.get_length()
-
-            run_time_parameters = await self.run_coordinator.get_run_time_parameters()
-            command_annotations = (
-                await self.run_coordinator.get_all_command_annotations()
+            run_result = await construct_run_result(
+                run_coordinator=self.run_coordinator
             )
-            preconditions = await self.run_coordinator.get_preconditions()
 
         finally:
             if feature_flags.protocol_subprocess_enabled():
@@ -453,13 +467,7 @@ class RunOrchestratorStore:
             self._run_coordinator = None
             self._current_run_id = None
 
-        return RunResult(
-            state_summary=run_data,
-            commands=commands,
-            parameters=run_time_parameters,
-            command_annotations=command_annotations,
-            command_preconditions=preconditions,
-        )
+        return run_result
 
     async def create_pyro(
         self,
