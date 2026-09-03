@@ -37,6 +37,6 @@ This stack omits spacers altogether to seat a sample filter plate directly on to
 This stack omits both the the spacers and the collection well plate. Instead, the filter plate rests directly on a short or tall collar, which sits on the vacuum base. When under vacuum, this configuration draws liquid through the filter plate and into the carboy.
 
 <figure markdown>
-  ![Waste disposal stack showing labeled parts](images/stack-filter-to-waste.png){ width="80%" }
+  ![Waste disposal stack showing labeled parts](images/stack-filter-to-waste.svg){ width="80%" }
   <figcaption>Waste disposal stack</figcaption>
 </figure>
