@@ -85,6 +85,7 @@ export function ComplianceReadySoftwareSettings({
   ] = useState(false)
   const [passwordComplexityToggleKey, setPasswordComplexityToggleKey] =
     useState(0)
+  const [settingsInputResetKey, setSettingsInputResetKey] = useState(0)
   const authSettingsQuery = useAuthSettingsQuery()
   const auditSettingsQuery = useAuditSettingsQuery()
   const robotServerAccessControlSettingsQuery =
@@ -110,13 +111,22 @@ export function ComplianceReadySoftwareSettings({
     ]
   )
 
+  const revertSettingsInputs = (): void => {
+    setSettingsInputResetKey(key => key + 1)
+  }
+
   const handleAuthSettingInputBlur = async (
     id: AuthSettingFieldId,
     value: string
   ): Promise<void> => {
     const authPatch = getAuthInputPatch(id, value, fieldValues)
     if (authPatch != null) {
-      await patchAuthSettings(authPatch)
+      try {
+        await patchAuthSettings(authPatch)
+      } catch (error) {
+        revertSettingsInputs()
+        throw error
+      }
     }
   }
 
@@ -126,7 +136,12 @@ export function ComplianceReadySoftwareSettings({
   ): Promise<void> => {
     const auditPatch = getAuditInputPatch(id, value, fieldValues)
     if (auditPatch != null) {
-      await patchAuditSettings(auditPatch)
+      try {
+        await patchAuditSettings(auditPatch)
+      } catch (error) {
+        revertSettingsInputs()
+        throw error
+      }
     }
   }
 
@@ -198,6 +213,7 @@ export function ComplianceReadySoftwareSettings({
           isLastSection={false}
         >
           <InputSetting
+            key={`maxNumberOfLoginAttempts-${settingsInputResetKey}`}
             label={t(
               'desktop_maximum_login_attempts_before_account_deactivation'
             )}
@@ -226,6 +242,7 @@ export function ComplianceReadySoftwareSettings({
             }}
           >
             <InputSetting
+              key={`passwordResetTime-${settingsInputResetKey}`}
               label={t('desktop_length_of_time')}
               value={String(fieldValues.passwordResetTime)}
               units={t('desktop_days')}
@@ -262,6 +279,7 @@ export function ComplianceReadySoftwareSettings({
               }}
             />
             <InputSetting
+              key={`passwordComplexityMinimumLength-${settingsInputResetKey}`}
               label={t('desktop_minimum_password_length')}
               value={String(fieldValues.passwordComplexityMinimumLength)}
               units={t('desktop_characters')}
@@ -284,6 +302,7 @@ export function ComplianceReadySoftwareSettings({
           </ComplianceReadyToggleField>
           <Divider />
           <InputSetting
+            key={`idleLogout-${settingsInputResetKey}`}
             label={t('desktop_auto_logout_inactivity_length')}
             value={String(fieldValues.idleLogout)}
             units={t('desktop_minutes')}
@@ -350,6 +369,7 @@ export function ComplianceReadySoftwareSettings({
             }}
           >
             <InputSetting
+              key={`minLengthOfReasonForInteraction-${settingsInputResetKey}`}
               label={t(
                 'desktop_minimum_length_for_documentation_for_robot_actions'
               )}

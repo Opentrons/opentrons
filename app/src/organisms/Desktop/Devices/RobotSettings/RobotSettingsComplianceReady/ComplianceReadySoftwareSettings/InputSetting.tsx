@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 
 import { COLORS, InputField, StyledText } from '@opentrons/components'
 
@@ -28,8 +28,16 @@ export function InputSetting({
   validate,
 }: InputSettingProps): JSX.Element {
   const inputId = useId()
+  const savedValueRef = useRef(value)
   const [inputValue, setInputValue] = useState(value)
   const [error, setError] = useState<string | null>(null)
+
+  savedValueRef.current = value
+
+  useEffect(() => {
+    setInputValue(value)
+    setError(null)
+  }, [value])
 
   return (
     <div className={styles.field_row}>
@@ -67,7 +75,7 @@ export function InputSetting({
             setError(validationError)
             if (validationError == null) {
               void Promise.resolve(onBlur(blurredValue)).catch(() => {
-                setInputValue(value)
+                setInputValue(savedValueRef.current)
               })
             }
           }}
