@@ -15,6 +15,8 @@
 //             false-positive. Set this flag to not do that check.
 // The release will be created as a prerelease if this is a prerelease tag.
 // It will always be created as a draft so that humans can review it before it goes live.
+// If a release for the tag already exists, its changelog is filled in instead and its
+// draft state is left alone.
 //
 // The changelog content will be in the body of the release.
 
@@ -187,6 +189,25 @@ async function buildChangelog(project, currentVersion, previousVersion) {
   return changelog
 }
 
+// The app build uploads its installers into the release for the tag, and will create the
+// release itself if it does not exist yet. Since this script can now run after that upload,
+// adopt any existing release for the tag rather than failing on a duplicate.
+async function existingReleaseForTag(octokit, tag) {
+  try {
+    const { data } = await octokit.rest.repos.getReleaseByTag({
+      owner: REPO_DETAILS.owner,
+      repo: REPO_DETAILS.repo,
+      tag,
+    })
+    return data
+  } catch (error) {
+    if (error.status === 404) {
+      return null
+    }
+    throw error
+  }
+}
+
 async function createRelease(token, tag, project, version, changelog, deploy) {
   const title = titleForRelease(project, version)
   const isPre = !!semver.prerelease(version)
@@ -195,6 +216,21 @@ async function createRelease(token, tag, project, version, changelog, deploy) {
       auth: token,
       userAgent: 'Opentrons Release Creator',
     })
+    const existing = await existingReleaseForTag(octokit, tag)
+    if (existing !== null) {
+      console.log(
+        `Release for ${tag} already exists (id ${existing.id}); adding the changelog to it.`
+      )
+      const { data } = await octokit.rest.repos.updateRelease({
+        owner: REPO_DETAILS.owner,
+        repo: REPO_DETAILS.repo,
+        release_id: existing.id,
+        name: title,
+        body: changelog,
+        prerelease: isPre,
+      })
+      return data.html_url
+    }
     const { data } = await octokit.rest.repos.createRelease({
       owner: REPO_DETAILS.owner,
       repo: REPO_DETAILS.repo,
