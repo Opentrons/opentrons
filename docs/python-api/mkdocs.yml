@@ -55,6 +55,7 @@ nav:
       - Command Line: advanced-control/command-line.md
       - Robot Motor Control: advanced-control/robot-motors.md
   - Example Protocols: examples.md
+  - Vacuum Module Miniprep Use Case: vacuum-module-example.md
   - Adapting from OT-2 to Flex: adapting-ot2-flex.md
   - API Reference:
       - Protocols: reference/protocols.md
