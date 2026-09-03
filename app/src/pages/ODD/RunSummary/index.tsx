@@ -228,9 +228,8 @@ export function RunSummary(): JSX.Element {
   } = useIsLogDeleted(logPeriodId ?? '')
 
   const isDownloadingRequired =
-    ((accessControlEnabled?.data.accessControlEnabled ?? false) &&
-      accessControlSettings?.data.requireLogsToBeSavedInApp) ??
-    false
+    (accessControlEnabled?.data.accessControlEnabled ?? false) &&
+    (accessControlSettings?.data.requireLogsToBeSavedInApp ?? false)
   const shouldPromptDownloadLog =
     !isRunRecordLoading &&
     !isSettingsLoading &&

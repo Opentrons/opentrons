@@ -27,8 +27,7 @@ export function useIsDownloadAuditLogsRequired(runId: string): {
     !runRecord?.data.signedBy
 
   const isDownloadingRequired =
-    !isAccessControlSettingsLoading &&
-    !!accessControlSettings?.data.requireLogsToBeSavedInApp
+    accessControlSettings?.data.requireLogsToBeSavedInApp ?? false
 
   const logPeriodId = runRecord?.data.logPeriodId
 
