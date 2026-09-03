@@ -77,10 +77,8 @@ export function ComplianceReadySoftwareFiles({
   const { makeToast, eatToast } = useToaster()
   const observer = useRef<HTMLDivElement>(null)
 
-  const {
-    data: accessControlSettings,
-    isLoading: isLoadingAccessControlSettings,
-  } = useGetRobotServerAccessControlSettingsQuery()
+  const { data: accessControlSettings } =
+    useGetRobotServerAccessControlSettingsQuery()
   const requireDownloadSetting =
     accessControlSettings?.data.requireLogsToBeSavedInApp ?? false
 
@@ -93,10 +91,7 @@ export function ComplianceReadySoftwareFiles({
   const [downloadModalDismissed, setDownloadModalDismissed] = useState(false)
 
   const showRequiredDownloadModal =
-    !isLoadingAccessControlSettings &&
-    requireDownloadSetting &&
-    periods.length > 1 &&
-    !downloadModalDismissed
+    requireDownloadSetting && periods.length > 1 && !downloadModalDismissed
 
   const {
     selectedIds,
