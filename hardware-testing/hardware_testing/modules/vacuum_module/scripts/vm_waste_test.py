@@ -14,7 +14,6 @@ import csv
 import serial.tools.list_ports  # type: ignore[import]
 
 # target_pressure = 600
-atm_pressure = 1013.25
 # Tunables (can move some to parameters)
 SETTLE_SEC = 21
 RUN_SEC = 35
@@ -171,9 +170,24 @@ async def vacuum_manifold(target_pressure: int) -> None:
     pump = await vacuum_module.VacuumModuleDriver.create(port=port, loop=loop)
 
     start_time = time.perf_counter()
-    target_to_pump = target_pressure - atm_pressure
+    target_to_pump = -1*target_pressure
     try:
-        await pump.set_vent_state(VentState.OPENED)
+        info = await pump.get_device_info()
+        fw = (
+            f"FW:{info['version']} HW:Opentrons-vacuum-module-{info['model']} "
+            f"SerialNo:{info['serial']}"
+        )
+        print("M115:", fw, flush=True)
+        await pump.set_waste_configs(enable_waste_full_detection=args.waste_full_detection, max_cummulative_rise=args.max_cummulative_rise)
+        waste_label = (
+            "enabled (M127 E1)" if args.waste_full_detection else "disabled (M127 E0)"
+        )
+        print(f"waste detection: {waste_label}", flush=True)
+        waste = await pump.get_waste_configs()
+        print("M128:", waste, flush=True)
+        print("M121:", await pump.get_vacuum_state(), flush=True)
+
+        await pump.set_vent_state(VentState.CLOSED)
         await asyncio.sleep(1)
         # Set Pressure and Vacuum to target for x amount of time.
         await pump.set_vacuum_state(
@@ -191,9 +205,10 @@ async def vacuum_manifold(target_pressure: int) -> None:
             duration_s=None,
         )
         # Vent the pump system to atmospheric pressure while pump is on
-        await pump.set_vent_state(VentState.CLOSED)
-        await read_data(file_name, pump, start_time, args.vent_sec + args.decay_sec)
         await pump.set_vent_state(VentState.OPENED)
+        await read_data(file_name, pump, start_time, args.vent_sec + args.decay_sec)
+        await pump.set_vent_state(VentState.CLOSED)
+
     except Exception as e:
         logging.error(f"vacuum_manifold error: {e}")
         raise
@@ -204,6 +219,7 @@ async def vacuum_manifold(target_pressure: int) -> None:
             gauge_pressure_mbar=target_to_pump,
             duration_s=None,
         )
+        await pump.disconnect()
 
 
 async def main(args: argparse.Namespace) -> None:
@@ -221,6 +237,8 @@ if __name__ == "__main__":
     parser.add_argument("--decay_sec", type=int, default=20)
     parser.add_argument("--settle_sec", type=int, default=21)
     parser.add_argument("--test_name", type=str, default="test_name")
+    parser.add_argument("--waste_full_detection", action="store_true")
+    parser.add_argument("--max_cummulative_rise", type=float, default=11.5)
     args = parser.parse_args()
 
     logging.info("Flow rate sensor initialized.")

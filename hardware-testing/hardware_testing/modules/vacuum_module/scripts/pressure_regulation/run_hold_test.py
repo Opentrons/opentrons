@@ -169,7 +169,8 @@ async def main(args: argparse.Namespace) -> int:
             f"SerialNo:{info['serial']}"
         )
         print("M115:", fw, flush=True)
-        await pump.set_waste_configs(enable_waste_full_detection=args.waste_detection)
+        await pump.set_waste_configs(enable_waste_full_detection=args.waste_detection,
+                                     max_cummulative_rise=args.max_cummulative_rise)
         waste_label = (
             "enabled (M127 E1)" if args.waste_detection else "disabled (M127 E0)"
         )
@@ -293,6 +294,14 @@ if __name__ == "__main__":
             "Result file format (default: json). json writes "
             f"{DEFAULT_JSON_PATH}; csv writes {DEFAULT_CSV_PATH} plus "
             "a sibling *_summary.csv; both writes all three."
+        ),
+    )
+    parser.add_argument(
+        "--max_cummulative_rise",
+        type=float,
+        default=11.5,
+        help=(
+            "Set the max cumulative rise (default: 11.5)"
         ),
     )
     args = parser.parse_args()
