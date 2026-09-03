@@ -32,10 +32,15 @@ const defaultProps: ComponentProps<typeof PlayBackControls> = {
   onClickStepDetails: mockOnClickStepDetails,
 }
 
-const render = (props: Partial<ComponentProps<typeof PlayBackControls>> = {}) => {
-  return renderWithProviders(<PlayBackControls {...defaultProps} {...props} />, {
-    i18nInstance: i18n,
-  })
+const render = (
+  props: Partial<ComponentProps<typeof PlayBackControls>> = {}
+) => {
+  return renderWithProviders(
+    <PlayBackControls {...defaultProps} {...props} />,
+    {
+      i18nInstance: i18n,
+    }
+  )
 }
 
 describe('PlayBackControls', () => {
