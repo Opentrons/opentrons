@@ -20,15 +20,15 @@ import {
   HEALTH_STATUS_OK,
   OPENTRONS_USB,
 } from '/app/redux/discovery'
-import { getNetworkInterfaces } from '/app/redux/networking'
+import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
 import { RobotStatusHeader } from '../RobotStatusHeader'
 
 import type { ComponentProps } from 'react'
 import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'
-import type { SimpleInterfaceStatus } from '/app/redux/networking/types'
 import type { State } from '/app/redux/types'
+import type { SimpleInterfaceStatus } from '/app/resources/networking/hooks'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/shell/remote', () => ({
@@ -37,8 +37,8 @@ vi.mock('/app/redux/shell/remote', () => ({
 }))
 vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/redux/discovery')
-vi.mock('/app/redux/networking')
 vi.mock('/app/redux-resources/robots')
+vi.mock('/app/resources/networking/hooks')
 vi.mock('/app/resources/runs')
 
 const MOCK_BUZZ = {
@@ -90,8 +90,8 @@ describe('RobotStatusHeader', () => {
           },
         },
       } as any)
-    when(getNetworkInterfaces)
-      .calledWith({} as State, 'buzz')
+    when(useNetworkInterfaces)
+      .calledWith('buzz', 5000)
       .thenReturn({ wifi: null, ethernet: null })
     when(getRobotAddressesByName)
       .calledWith({} as State, 'buzz')
@@ -112,8 +112,8 @@ describe('RobotStatusHeader', () => {
   })
 
   it('renders the model of robot and robot name - OT-3', () => {
-    when(getNetworkInterfaces)
-      .calledWith({} as State, 'buzz')
+    when(useNetworkInterfaces)
+      .calledWith('buzz', 5000)
       .thenReturn({ wifi: null, ethernet: null })
     when(getRobotAddressesByName)
       .calledWith({} as State, 'buzz')
@@ -158,8 +158,8 @@ describe('RobotStatusHeader', () => {
   })
 
   it('renders an ethernet icon when connected by wifi and ethernet', () => {
-    when(getNetworkInterfaces)
-      .calledWith({} as State, 'buzz')
+    when(useNetworkInterfaces)
+      .calledWith('buzz', 5000)
       .thenReturn({
         wifi: { ipAddress: WIFI_IP } as SimpleInterfaceStatus,
         ethernet: { ipAddress: ETHERNET_IP } as SimpleInterfaceStatus,
@@ -171,8 +171,8 @@ describe('RobotStatusHeader', () => {
   })
 
   it('renders a wifi icon when only connected by wifi', () => {
-    when(getNetworkInterfaces)
-      .calledWith({} as State, 'buzz')
+    when(useNetworkInterfaces)
+      .calledWith('buzz', 5000)
       .thenReturn({
         wifi: { ipAddress: WIFI_IP } as SimpleInterfaceStatus,
         ethernet: null,
@@ -189,8 +189,8 @@ describe('RobotStatusHeader', () => {
   })
 
   it('does not render a wifi or ethernet icon when discovery client cannot find a healthy robot at its network connection ip addresses', () => {
-    when(getNetworkInterfaces)
-      .calledWith({} as State, 'buzz')
+    when(useNetworkInterfaces)
+      .calledWith('buzz', 5000)
       .thenReturn({
         wifi: { ipAddress: WIFI_IP } as SimpleInterfaceStatus,
         ethernet: { ipAddress: ETHERNET_IP } as SimpleInterfaceStatus,

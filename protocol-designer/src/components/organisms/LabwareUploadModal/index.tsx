@@ -18,7 +18,9 @@ import { getLabwareUploadMessage } from '/protocol-designer/labware-defs/selecto
 
 import { LabwareUploadModalBody } from './LabwareUploadModalBody'
 
-export function LabwareUploadModal(): JSX.Element | null {
+import type { ReactNode } from 'react'
+
+export function LabwareUploadModal(): ReactNode {
   const message = useSelector(getLabwareUploadMessage)
   const dispatch = useDispatch()
   const { t } = useTranslation('shared')

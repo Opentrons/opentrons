@@ -13,6 +13,11 @@
       "import": "./lib/index.mjs",
       "require": "./lib/index.js"
     },
+    "./localization": {
+      "types": "./lib/localization.d.ts",
+      "import": "./lib/localization.mjs",
+      "require": "./lib/localization.js"
+    },
     "./styles": "./lib/style.css",
     "./styles/global": "./src/styles/global.css",
     "./styles/legacy": "./src/index.module.css",
@@ -51,10 +56,6 @@
     "react-remove-scroll": "2.4.3",
     "react-select": "5.4.0",
     "react-viewport-list": "6.3.0",
-    "redux": "5.0.1",
     "styled-components": "5.3.6"
-  },
-  "devDependencies": {
-    "react-redux": "8.1.2"
   }
 }

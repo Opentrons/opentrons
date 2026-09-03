@@ -1,14 +1,23 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
   CheckboxBasic,
+  ERROR_TOAST,
+  INFO_TOAST,
   InfoScreen,
   StyledText,
+  SUCCESS_TOAST,
   WARNING_TOAST,
 } from '@opentrons/components'
+import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useToaster } from '/app/organisms/ToasterOven'
+import {
+  useDeleteSelectedRuns,
+  useDownloadSelectedRuns,
+} from '/app/resources/devices/hooks'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import { DeleteRecordsModal } from '../../../DeleteRecordsModal'
@@ -18,11 +27,28 @@ import fileManagerStyles from '../robotsettingsfilemanager.module.css'
 import protocolRunRecordsStyles from './protocolrunrecords.module.css'
 import { RunRecord } from './RunRecord'
 
-export function ProtocolRunRecords(): JSX.Element {
+import type { ReactNode } from 'react'
+import type { IconProps } from '@opentrons/components'
+
+interface ProtocolRunRecordsProps {
+  robotName: string
+}
+
+export function ProtocolRunRecords({
+  robotName,
+}: ProtocolRunRecordsProps): ReactNode {
   const { t } = useTranslation('device_details')
-  const { makeToast } = useToaster()
+  const { makeToast, eatToast } = useToaster()
   const { data: runData } = useNotifyAllRunsQuery()
-  const runs = [...(runData?.data ?? [])]
+  const runs = useMemo(
+    () => [...(runData?.data ?? [])].reverse(),
+    [runData?.data]
+  )
+  const documentationState = useDocumentationState()
+  const { mutateAsync: downloadSelectedRuns, status: downloadRunsStatus } =
+    useDownloadSelectedRuns(robotName)
+  const { deleteSelectedRuns, deletingIds } =
+    useDeleteSelectedRuns(documentationState)
 
   const {
     selectedIds,
@@ -40,19 +66,64 @@ export function ProtocolRunRecords(): JSX.Element {
     })
   }
 
-  // no-op: download not yet implemented
   const handleDownloadSelected = (): void => {
     if (selectedIds.size === 0) {
       handleNoRunsSelected('download')
+      return
+    }
+    if (downloadRunsStatus !== 'loading') {
+      const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
+      const toastId = makeToast(
+        t('downloading_run_records') as string,
+        INFO_TOAST,
+        { disableTimeout: true, icon: toastIcon }
+      )
+      void downloadSelectedRuns({
+        runs: runs.filter(run => selectedIds.has(run.id)),
+      })
+        .then(() => {
+          makeToast(t('files_successfully_downloaded') as string, SUCCESS_TOAST)
+        })
+        .catch((e: Error) => {
+          makeToast(e.message, ERROR_TOAST, { closeButton: true })
+        })
+        .finally(() => {
+          eatToast(toastId)
+        })
     }
   }
 
-  const handleDeleteSelected = (): void => {
+  const handleClickDeleteSelected = (): void => {
     if (selectedIds.size === 0) {
       handleNoRunsSelected('delete')
       return
     }
     setShowDeleteRecordsModal(true)
+  }
+
+  const handleConfirmDeleteSelected = (): void => {
+    setShowDeleteRecordsModal(false)
+    const selectedRuns = runs.filter(run => selectedIds.has(run.id))
+    void downloadSelectedRuns({ runs: selectedRuns })
+      .then(successfullyDownloadedRuns => {
+        if (successfullyDownloadedRuns.length < selectedRuns.length) {
+          makeToast(t('some_runs_not_deleted') as string, WARNING_TOAST, {
+            closeButton: true,
+          })
+        }
+        if (successfullyDownloadedRuns.length === 0) {
+          return
+        }
+        return deleteSelectedRuns(successfullyDownloadedRuns)
+      })
+      .catch((error: Error) => {
+        if (isDocumentedMutationError(error)) {
+          // Re-open delete modal if it was a documented mutation error
+          setShowDeleteRecordsModal(true)
+        } else {
+          makeToast(error.message || 'Error processing records', ERROR_TOAST)
+        }
+      })
   }
 
   return (
@@ -62,17 +133,16 @@ export function ProtocolRunRecords(): JSX.Element {
           onClose={() => {
             setShowDeleteRecordsModal(false)
           }}
-          onConfirm={() => {
-            setShowDeleteRecordsModal(false)
-          }}
+          onConfirm={handleConfirmDeleteSelected}
           type="selectedRuns"
         />
       )}
       <div className={fileManagerStyles.file_management_group}>
         <FileManagementSectionHeader
           titleText={t('protocol_run_records')}
+          showButtons={isSomeSelected || isAllSelected}
           onDownloadSelected={handleDownloadSelected}
-          onDeleteSelected={handleDeleteSelected}
+          onDeleteSelected={handleClickDeleteSelected}
         />
         {runs.length === 0 ? (
           <InfoScreen content={t('no_recent_runs')} />
@@ -113,6 +183,7 @@ export function ProtocolRunRecords(): JSX.Element {
                 key={run.id}
                 run={run}
                 isSelected={selectedIds.has(run.id)}
+                isDeleting={deletingIds.has(run.id)}
                 onToggle={() => {
                   handleToggleRun(run.id)
                 }}

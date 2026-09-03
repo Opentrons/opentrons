@@ -15,9 +15,7 @@ export type DevInternalFlag =
   | 'protocolTimeline'
   | 'enableLabwareCreator'
   | 'reactQueryDevtools'
-  | 'reactScan'
   | 'quickTransferProtocolContentsLog'
-  | 'accessControlMode'
   | 'robotSearchBar'
   | 'showGitDetails'
 
@@ -300,4 +298,25 @@ export type ConfigV28 = Omit<ConfigV27, 'version'> & {
   }
 }
 
-export type Config = ConfigV28
+export type ConfigV29 = Omit<ConfigV28, 'version' | 'update'> & {
+  version: 29
+  update: ConfigV28['update'] & {
+    automaticallyDownloadUpdates: boolean
+  }
+}
+
+export type ConfigV30 = Omit<ConfigV29, 'version'> & {
+  version: 30
+  audit: {
+    logDirectory: string | null
+  }
+}
+
+export type ConfigV31 = Omit<ConfigV30, 'version' | 'protocols'> & {
+  version: 31
+  protocols: ConfigV30['protocols'] & {
+    includeProtocolSourceInRunDownload: boolean
+  }
+}
+
+export type Config = ConfigV31

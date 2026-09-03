@@ -20,20 +20,22 @@ import { getLocalRobot } from '/app/redux/discovery'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
 import {
   clearRobotUpdateSession,
+  downloadRobotUpdate,
   getRobotUpdateAvailable,
 } from '/app/redux/robot-update'
-import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
+import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
+import type { ReactNode } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
 
 const CHECK_UPDATES_DURATION = 10000 // Note: kj 1/10/2023 Currently set 10 sec later we may use a status from state
 
-export function UpdateRobotDuringOnboarding(): JSX.Element {
+export function UpdateRobotDuringOnboarding(): ReactNode {
   const [isShowCheckingUpdates, setIsShowCheckingUpdates] =
     useState<boolean>(true)
   const navigate = useNavigate()
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
-  const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
+  const { startUpdate } = useRobotUpdateContext()
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
   const robotUpdateType = useSelector((state: State) => {
@@ -94,7 +96,8 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
             <MediumButton
               flex="1"
               onClick={() => {
-                dispatchStartRobotUpdate(robotName)
+                dispatch(downloadRobotUpdate())
+                startUpdate(robotName)
               }}
               buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
             />
@@ -114,6 +117,10 @@ export function UpdateRobotDuringOnboarding(): JSX.Element {
         <UpdateRobotSoftware
           localRobot={localRobot}
           afterError={setErrorString}
+          afterCancel={() => {
+            dispatch(clearRobotUpdateSession())
+            navigate('/emergency-stop')
+          }}
           beforeCommittingSuccessfulUpdate={handleSuccessfulUpdate}
         />
       )}

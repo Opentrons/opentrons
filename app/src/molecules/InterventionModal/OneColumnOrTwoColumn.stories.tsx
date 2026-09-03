@@ -15,7 +15,7 @@ import { VisibleContainer } from './story-utils/VisibleContainer'
 import type { Meta, StoryObj } from '@storybook/react'
 import type * as React from 'react'
 
-function Wrapper(props: {}): JSX.Element {
+function Wrapper(props: {}): React.ReactNode {
   return (
     <OneColumnOrTwoColumn>
       <StandInContent>

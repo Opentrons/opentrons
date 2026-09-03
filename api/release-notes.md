@@ -6,9 +6,47 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 By installing and using Opentrons software, you agree to the Opentrons End-User License Agreement (EULA). You can view the EULA at [opentrons.com/eula](https://opentrons.com/eula).
 
-## Opentrons Robot Software Changes in 9.1.0
+## Opentrons Robot Software Changes in 10.2.0
 
-Welcome to the v9.1.0 release of the Opentrons Flex robot software! This release enables step grouping to better visualize and organize Python protocols, along with other new features, improvements, and bug fixes.
+Welcome to the v10.2.0 release of the Opentrons Flex robot software! This release introduces the Opentrons Vacuum Module, an on-deck vacuum filtration and purification module for the Opentrons Flex.
+
+### New Features
+
+- Use the Opentrons Vacuum Module to:
+  - Filter samples through filter and collection well plates.
+  - Control pressure, power, and vacuum profiles using new Python Protocol API methods.
+  - Collect waste in an off-deck waste carboy.
+
+---
+
+## Opentrons Robot Software Changes in 10.0.0
+
+Welcome to the v10.0.0 release of the Opentrons Flex robot software! This release introduces Opentrons Flex Compliance Ready Software.
+
+### New Features
+
+- [Opentrons Flex Compliance Ready Software](https://opentrons.com/compliance-ready-software) is additional software installed on your Flex robot by Opentrons. It permanently enables features like role-based user access and required documentation for 21 CFR part 11-ready operation.
+
+---
+
+## Opentrons Robot Software Changes in 9.1.2
+
+Welcome to the v9.1.2 release of the Opentrons Flex robot software! This release includes bug fixes and improvements.
+
+### Feature Improvements
+
+- Opentrons Flex 96 Filter Tip Racks (20 µL) are compatible with the Opentrons Flex Tip Rack Lid.
+
+### Bug Fixes
+
+- Flex 96-channel pipettes properly align over 8-well reservoirs for liquid handling with a single row of tips.
+- Fixes an issue where a Flex pipette cannot update its firmware.
+
+---
+
+## Opentrons Robot Software Changes in 9.1.1
+
+Welcome to the v9.1.1 release of the Opentrons Flex robot software! This release enables step grouping to better visualize and organize Python protocols, along with other new features, improvements, and bug fixes.
 
 ### New Features
 

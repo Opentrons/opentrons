@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -22,7 +22,6 @@ import {
   truncateString,
   TYPOGRAPHY,
   useHoverTooltip,
-  useInterval,
 } from '@opentrons/components'
 import {
   useAccessControlEnabledQuery,
@@ -36,13 +35,13 @@ import {
   HEALTH_STATUS_OK,
   OPENTRONS_USB,
 } from '/app/redux/discovery'
-import { fetchStatus, getNetworkInterfaces } from '/app/redux/networking'
+import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type { IconName, StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
-import type { Dispatch, State } from '/app/redux/types'
+import type { State } from '/app/redux/types'
 
 type RobotStatusHeaderProps = StyleProps &
   Pick<DiscoveredRobot, 'name' | 'local'> & {
@@ -55,7 +54,7 @@ interface RobotNameContainerProps {
   isGoToRun: boolean
 }
 
-export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
+export function RobotStatusHeader(props: RobotStatusHeaderProps): ReactNode {
   const { name, local, robotModel, ...styleProps } = props
   const { t, i18n } = useTranslation([
     'devices_landing',
@@ -64,7 +63,6 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   ])
   const navigate = useNavigate()
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const dispatch = useDispatch<Dispatch>()
 
   const { data: accessControlData } = useAccessControlEnabledQuery()
   const isComplianceReady =
@@ -104,16 +102,13 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           to={`/devices/${name}/protocol-runs/${currentRunId}/${
             currentRunStatus === RUN_STATUS_IDLE ? 'setup' : 'run-preview'
           }`}
-          id={`RobotStatusHeader_${String(name)}_goToRun`}
         >
           <QuaternaryButton>{t('go_to_run')}</QuaternaryButton>
         </Link>
       </Flex>
     ) : null
 
-  const { ethernet, wifi } = useSelector((state: State) =>
-    getNetworkInterfaces(state, name)
-  )
+  const { ethernet, wifi } = useNetworkInterfaces(name, STATUS_REFRESH_MS)
 
   const addresses = useSelector((state: State) =>
     getRobotAddressesByName(state, name)
@@ -147,8 +142,6 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
     tooltipTranslationKey = 'device_settings:wired_usb'
   }
 
-  useInterval(() => dispatch(fetchStatus(name)), STATUS_REFRESH_MS, true)
-
   const RobotNameContainer = styled.div`
     max-width: ${(props: RobotNameContainerProps) =>
       props.isGoToRun ? `150px` : undefined};
@@ -168,7 +161,6 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           desktopStyle="bodyDefaultRegular"
           color={COLORS.grey60}
           textTransform={TYPOGRAPHY.textTransformUppercase}
-          id={`RobotStatusHeader_${String(name)}_robotModel`}
         >
           {robotModel}
         </StyledText>
@@ -176,7 +168,6 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
           <RobotNameContainer isGoToRun={isGoToRun}>
             <StyledText
               desktopStyle="bodyLargeSemiBold"
-              id={`RobotStatusHeader_${String(name)}_robotName`}
               overflow="hidden"
               textOverflow="ellipsis"
             >

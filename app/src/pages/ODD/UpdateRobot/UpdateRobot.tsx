@@ -15,13 +15,15 @@ import { getLocalRobot } from '/app/redux/discovery'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
 import {
   clearRobotUpdateSession,
+  downloadRobotUpdate,
   getRobotUpdateAvailable,
 } from '/app/redux/robot-update'
-import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
+import { useRobotUpdateContext } from '/app/resources/robot-update/RobotUpdateContext'
 
+import type { ReactNode } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
 
-export function UpdateRobot(): JSX.Element {
+export function UpdateRobot(): ReactNode {
   const navigate = useNavigate()
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const localRobot = useSelector(getLocalRobot)
@@ -31,7 +33,7 @@ export function UpdateRobot(): JSX.Element {
       : null
   })
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
+  const { startUpdate } = useRobotUpdateContext()
   const dispatch = useDispatch<Dispatch>()
 
   const [errorString, setErrorString] = useState<string | null>(null)
@@ -54,7 +56,8 @@ export function UpdateRobot(): JSX.Element {
               flex="1"
               onClick={() => {
                 setErrorString(null)
-                dispatchStartRobotUpdate(robotName)
+                dispatch(downloadRobotUpdate())
+                startUpdate(robotName)
               }}
               buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
             />
@@ -72,6 +75,10 @@ export function UpdateRobot(): JSX.Element {
         <UpdateRobotSoftware
           localRobot={localRobot}
           afterError={setErrorString}
+          afterCancel={() => {
+            dispatch(clearRobotUpdateSession())
+            navigate(-1)
+          }}
         />
       )}
     </Flex>

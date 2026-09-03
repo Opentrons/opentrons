@@ -18,9 +18,10 @@ import {
   toggleDevtools,
 } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
-export function EnableDevTools(): JSX.Element {
+export function EnableDevTools(): ReactNode {
   const { t } = useTranslation('app_settings')
   const devToolsOn = useSelector(getDevtoolsEnabled)
   const dispatch = useDispatch<Dispatch>()
@@ -37,7 +38,6 @@ export function EnableDevTools(): JSX.Element {
         <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
-          id="AdvancedSettings_devTools"
         >
           {t('enable_dev_tools')}
         </LegacyStyledText>
@@ -49,7 +49,6 @@ export function EnableDevTools(): JSX.Element {
         label="enable_dev_tools"
         toggledOn={devToolsOn}
         onClick={toggleDevTools}
-        id="AdvancedSettings_devTooltoggle"
       />
     </Flex>
   )

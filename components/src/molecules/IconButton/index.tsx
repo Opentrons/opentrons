@@ -4,7 +4,12 @@ import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import styles from './iconbutton.module.css'
 
-import type { ComponentPropsWithoutRef, CSSProperties, MouseEvent } from 'react'
+import type {
+  ComponentPropsWithoutRef,
+  CSSProperties,
+  MouseEvent,
+  ReactNode,
+} from 'react'
 import type { IconName } from '../../icons'
 
 /**
@@ -80,6 +85,8 @@ interface IconButtonProps extends ComponentPropsWithoutRef<'button'> {
    * in the future, we will need to add a style for this
    */
   focusableDisabled?: boolean
+  /** improve extensibility of styling */
+  className?: string
 }
 
 /**
@@ -98,15 +105,17 @@ export function NewIconButton({
   'aria-label': ariaLabel,
   focusableDisabled = false,
   onClick,
+  className,
   ...restProps
-}: IconButtonProps): JSX.Element {
+}: IconButtonProps): ReactNode {
   const colors = COLOR_VARIANTS[variant]
   const iconSize = ICON_SIZES[size]
 
   const buttonClassName = clsx(
     styles.icon_button,
     styles[`variant_${variant}`],
-    styles[`size_${size}`]
+    styles[`size_${size}`],
+    className
   )
 
   const buttonStyle: CSSProperties = {

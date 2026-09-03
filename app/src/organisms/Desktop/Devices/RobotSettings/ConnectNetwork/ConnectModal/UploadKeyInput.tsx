@@ -1,14 +1,20 @@
 import { forwardRef } from 'react'
 import styled from 'styled-components'
 
-import { usePostWifiKeysMutation } from '@opentrons/react-api-client'
+import {
+  isDocumentedMutationError,
+  usePostWifiKeysMutation,
+} from '@opentrons/react-api-client'
 
-import type { ChangeEventHandler, ForwardedRef } from 'react'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+
+import type { ChangeEventHandler, ForwardedRef, ReactNode } from 'react'
 
 export interface UploadKeyInputProps {
   robotName: string
   label: string
   onUpload: (keyId: string) => unknown
+  onCancel: () => void
 }
 
 // TODO(mc, 2020-03-04): create styled HiddenInput in components library
@@ -26,10 +32,11 @@ const HiddenInput = styled.input`
 const UploadKeyInputComponent = (
   props: UploadKeyInputProps,
   ref: ForwardedRef<HTMLInputElement>
-): JSX.Element => {
-  const { label, onUpload } = props
+): ReactNode => {
+  const { label, onUpload, onCancel, robotName } = props
 
-  const { postWifiKeys } = usePostWifiKeysMutation()
+  const documentationState = useDocumentationState(undefined, robotName)
+  const { postWifiKeys } = usePostWifiKeysMutation(documentationState)
 
   const handleFileInput: ChangeEventHandler<HTMLInputElement> = event => {
     if (event.target.files && event.target.files.length > 0) {
@@ -39,6 +46,12 @@ const UploadKeyInputComponent = (
       postWifiKeys(file, {
         onSuccess: wifiKey => {
           onUpload(wifiKey.id)
+        },
+        onError: error => {
+          // User cancelled the documentation/login modal — return to prior screen.
+          if (isDocumentedMutationError(error)) {
+            onCancel()
+          }
         },
       })
     }

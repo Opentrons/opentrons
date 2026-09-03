@@ -19,6 +19,8 @@ stages:
     request:
       method: PATCH
       url: '{run_server.base_url}/audit/internal/loggingEnabled'
+      headers:
+        authorization: 'Bearer asdasd'
       json:
         data:
           loggingEnabled: true
@@ -45,6 +47,8 @@ stages:
     request:
       method: PATCH
       url: '{run_server.base_url}/audit/internal/loggingEnabled'
+      headers:
+        authorization: 'Bearer asdasd'
       json:
         data:
           loggingEnabled: false
@@ -59,7 +63,7 @@ stages:
           loggingEnabled: false
 
 ---
-test_name: generic settings endpoints
+test_name: Default settings
 
 marks:
   - usefixtures:
@@ -73,24 +77,88 @@ stages:
     response:
       status_code: 200
       json:
-        data: {}
+        data:
+          requireReasonForInteraction: true
+---
+test_name: PATCH /audit/external/settings updates settings
 
-  - name: PATCH /audit/external/settings returns the settings
+marks:
+  - usefixtures:
+      - run_server
+
+stages:
+  - name: GET initial settings
+    request:
+      method: GET
+      url: '{run_server.base_url}/audit/external/settings'
+    response:
+      status_code: 200
+      json:
+        data:
+          requireReasonForInteraction: true
+
+  - name: PATCH some settings
     request:
       method: PATCH
       url: '{run_server.base_url}/audit/external/settings'
+      headers:
+        opentrons-user-notes: hello
+        authorization: 'Bearer asdasda'
       json:
-        data: {}
+        data:
+          requireReasonForInteraction: false
+          minLengthOfReasonForInteraction: 1000
     response:
       status_code: 200
       json:
-        data: {}
+        data:
+          requireReasonForInteraction: false
+          minLengthOfReasonForInteraction: 1000
 
-  - name: DELETE /audit/external/settings resets the settings
+  - name: GET settings after PATCH returns updated value
     request:
-      method: DELETE
+      method: GET
       url: '{run_server.base_url}/audit/external/settings'
     response:
       status_code: 200
       json:
-        data: {}
+        data:
+          requireReasonForInteraction: false
+          minLengthOfReasonForInteraction: 1000
+
+---
+test_name: DELETE /audit/external/settings resets the settings
+
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: PATCH some settings
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/audit/external/settings'
+      headers:
+        opentrons-user-notes: hello
+        authorization: 'Bearer asdasdasd'
+      json:
+        data:
+          requireReasonForInteraction: false
+          minLengthOfReasonForInteraction: 1000
+    response:
+      status_code: 200
+      json:
+        data:
+          requireReasonForInteraction: false
+          minLengthOfReasonForInteraction: 1000
+
+  - name: DELETE resets the settings
+    request:
+      method: DELETE
+      url: '{run_server.base_url}/audit/external/settings'
+      headers:
+        authorization: 'Bearer asdasd'
+    response:
+      status_code: 200
+      json:
+        data:
+          requireReasonForInteraction: true

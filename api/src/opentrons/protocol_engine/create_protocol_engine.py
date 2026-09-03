@@ -19,6 +19,10 @@ from .state.state import EngineEventNotification, StateStore
 from .types import DeckConfigurationType, PostRunHardwareState
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import DoorState, HardwareEventHandler
+from opentrons.protocol_engine.execution.associated_command_error_recovery import (
+    AssociatedCommandErrorRecoveryOrchestrator,
+    default_associated_command_recovery_resolvers,
+)
 from opentrons.protocol_engine.execution.error_recovery_hardware_state_synchronizer import (
     ErrorRecoveryHardwareStateSynchronizer,
 )
@@ -83,13 +87,20 @@ async def create_protocol_engine(
         notify_publishers=notify_publishers,
         updates_callback=updates_callback,
     )
+    model_utils = ModelUtils()
     hardware_state_synchronizer = ErrorRecoveryHardwareStateSynchronizer(
         hardware_api, state_store
     )
     action_dispatcher = ActionDispatcher(state_store)
+    associated_command_error_recovery = AssociatedCommandErrorRecoveryOrchestrator(
+        state_store=state_store,
+        action_dispatcher=action_dispatcher,
+        resolvers=default_associated_command_recovery_resolvers(),
+        model_utils=model_utils,
+    )
+    action_dispatcher.add_handler(associated_command_error_recovery)
     action_dispatcher.add_handler(hardware_state_synchronizer)
     plugin_starter = PluginStarter(state_store, action_dispatcher)
-    model_utils = ModelUtils()
     hardware_stopper = HardwareStopper(hardware_api, state_store)
     door_watcher = DoorWatcher(
         state_store,
@@ -112,6 +123,7 @@ async def create_protocol_engine(
         module_data_provider=module_data_provider,
         file_provider=file_provider,
         camera_provider=camera_provider,
+        associated_command_error_recovery=associated_command_error_recovery,
     )
 
     # todo(mm, 2024-11-08): This is a quick hack to support the absorbance reader, which
@@ -209,7 +221,7 @@ async def _protocol_engine(
         else CameraProvider(),
     )
     try:
-        orchestrator.play(deck_configuration)
+        await orchestrator.play(deck_configuration)
         yield protocol_engine
     finally:
         await orchestrator.finish(

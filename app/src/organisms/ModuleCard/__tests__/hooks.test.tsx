@@ -5,19 +5,20 @@ import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
-import { heater_shaker_commands_with_results_key } from '@opentrons/shared-data'
-
-import { i18n } from '/app/i18n'
-import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
-import { useIsRobotBusy } from '/app/redux-resources/robots'
 import {
   mockHeaterShaker,
   mockMagneticModuleGen2,
   mockTemperatureModuleGen2,
   mockThermocycler,
   mockThermocyclerGen2,
-} from '/app/redux/modules/__fixtures__'
+} from '@opentrons/api-client'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
+import { heater_shaker_commands_with_results_key } from '@opentrons/shared-data'
+
+import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
+import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
+import { useIsRobotBusy } from '/app/redux-resources/robots'
 import {
   useCurrentRunId,
   useMostRecentCompletedAnalysis,
@@ -35,6 +36,9 @@ import type { FunctionComponent, ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux-resources/analytics')

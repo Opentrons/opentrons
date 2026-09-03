@@ -4,18 +4,23 @@ import {
   ALIGN_CENTER,
   ALIGN_END,
   Box,
+  ERROR_TOAST,
   Flex,
+  INFO_TOAST,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   SPACING,
   SPACING_AUTO,
+  SUCCESS_TOAST,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '/app/atoms/buttons'
-import { useDownloadRobotLogs } from '/app/organisms/Desktop/Devices/hooks'
+import { useToaster } from '/app/organisms/ToasterOven'
+import { useDownloadRobotLogs } from '/app/resources/devices/hooks'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
+import type { IconProps } from '@opentrons/components'
 
 interface TroubleshootingProps {
   robotName: string
@@ -23,13 +28,36 @@ interface TroubleshootingProps {
 
 export function Troubleshooting({
   robotName,
-}: TroubleshootingProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
-  const { downloadLogs, isDownloading, canDownload } =
-    useDownloadRobotLogs(robotName)
+}: TroubleshootingProps): ReactNode {
+  const { t } = useTranslation(['device_settings', 'device_details'])
+  const { makeToast, eatToast } = useToaster()
+  const {
+    mutateAsync: downloadLogs,
+    status: downloadLogsStatus,
+    canDownload,
+  } = useDownloadRobotLogs(robotName)
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = () => {
-    downloadLogs()
+    if (downloadLogsStatus !== 'loading') {
+      const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
+      const toastId = makeToast(t('downloading_logs') as string, INFO_TOAST, {
+        disableTimeout: true,
+        icon: toastIcon,
+      })
+      void downloadLogs({})
+        .then(() => {
+          makeToast(
+            t('device_details:files_successfully_downloaded') as string,
+            SUCCESS_TOAST
+          )
+        })
+        .catch((e: Error) => {
+          makeToast(e.message, ERROR_TOAST, { closeButton: true })
+        })
+        .finally(() => {
+          eatToast(toastId)
+        })
+    }
   }
 
   return (
@@ -55,10 +83,9 @@ export function Troubleshooting({
         </LegacyStyledText>
       </Box>
       <TertiaryButton
-        disabled={!canDownload || isDownloading}
+        disabled={!canDownload || downloadLogsStatus === 'loading'}
         marginLeft={SPACING_AUTO}
         onClick={handleClick}
-        id="AdvancedSettings_downloadLogsButton"
         alignSelf={ALIGN_END}
       >
         {t('download_logs')}

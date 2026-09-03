@@ -393,11 +393,21 @@ class FlexStackerStateUpdate:
 
 
 @dataclasses.dataclass
+class ModuleBackgroundCommandUpdate:
+    """Record the command that started a module's latest background operation."""
+
+    module_id: str
+    command_id: str
+
+
+@dataclasses.dataclass
 class VacuumModuleStateUpdate:
     """An update to the Vacuum Module state."""
 
     module_id: str
     pump_engaged: bool | NoChangeType = NO_CHANGE
+    residual_vacuum: bool | NoChangeType = NO_CHANGE
+    target_pressure: float | None | NoChangeType = NO_CHANGE
 
     @classmethod
     def create_or_override(
@@ -542,6 +552,8 @@ class StateUpdate:
     flex_stacker_state_update: FlexStackerStateUpdate | NoChangeType = NO_CHANGE
 
     vacuum_module_state_update: VacuumModuleStateUpdate | NoChangeType = NO_CHANGE
+
+    module_background_command: ModuleBackgroundCommandUpdate | NoChangeType = NO_CHANGE
 
     liquid_class_loaded: LiquidClassLoadedUpdate | NoChangeType = NO_CHANGE
 
@@ -988,6 +1000,26 @@ class StateUpdate:
                 self.vacuum_module_state_update, module_id
             ),
             pump_engaged=pump_engaged,
+        )
+        return self
+
+    def update_vacuum_module_residual_vacuum(
+        self, module_id: str, residual_vacuum: bool
+    ) -> Self:
+        """Set whether the chamber is modeled as still under vacuum."""
+        self.vacuum_module_state_update = dataclasses.replace(
+            VacuumModuleStateUpdate.create_or_override(
+                self.vacuum_module_state_update, module_id
+            ),
+            residual_vacuum=residual_vacuum,
+        )
+        return self
+
+    def record_module_background_command(self, module_id: str, command_id: str) -> Self:
+        """Record the command that started a module's latest background operation."""
+        self.module_background_command = ModuleBackgroundCommandUpdate(
+            module_id=module_id,
+            command_id=command_id,
         )
         return self
 

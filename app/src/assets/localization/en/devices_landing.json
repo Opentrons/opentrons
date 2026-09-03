@@ -2,6 +2,7 @@
   "active": "Active",
   "available": "Available ({{count}})",
   "check_same_network": "Check that the computer and robot are on the same network",
+  "close_door_to_home": "Close the robot door to home gantry",
   "compliance_ready": "Compliance Ready",
   "connect_to_network": "Connect to network",
   "connection_troubleshooting_intro": "If you’re having trouble with the robot’s connection, try these troubleshooting tasks. First, double check that the robot is powered on.",

@@ -3,20 +3,25 @@ import { useTranslation } from 'react-i18next'
 import {
   CheckboxBasic,
   COLORS,
+  ERROR_TOAST,
+  INFO_TOAST,
   StyledText,
-  WARNING_TOAST,
+  SUCCESS_TOAST,
 } from '@opentrons/components'
 
+import { useToaster } from '/app/organisms/ToasterOven'
 import {
   useDownloadCalibrationData,
   useDownloadRobotLogs,
-} from '/app/organisms/Desktop/Devices/hooks'
-import { useToaster } from '/app/organisms/ToasterOven'
+} from '/app/resources/devices/hooks'
 
 import { FileManagementSectionHeader } from '../FileManagementSectionHeader'
 import { useRecordSelection } from '../hooks/useRecordSelection'
 import fileManagerStyles from '../robotsettingsfilemanager.module.css'
 import styles from './diagnosticfiles.module.css'
+
+import type { ReactNode } from 'react'
+import type { IconProps } from '@opentrons/components'
 
 const DIAGNOSTIC_ROWS = [
   { id: 'troubleshooting', i18nKey: 'troubleshooting_logs' },
@@ -29,33 +34,60 @@ interface DiagnosticsFilesProps {
 
 export function DiagnosticsFiles({
   robotName,
-}: DiagnosticsFilesProps): JSX.Element {
+}: DiagnosticsFilesProps): ReactNode {
   const { t } = useTranslation('device_details')
-  const { makeToast } = useToaster()
+  const { makeToast, eatToast } = useToaster()
 
-  const { downloadLogs } = useDownloadRobotLogs(robotName)
-  const { downloadCalibration } = useDownloadCalibrationData(robotName)
+  const { mutateAsync: downloadLogs, status: downloadLogsStatus } =
+    useDownloadRobotLogs(robotName)
+  const { downloadCalibration, isLoading: isLoadingCalibration } =
+    useDownloadCalibrationData(robotName)
 
   const { selectedIds, isAllSelected, isSomeSelected, toggleAll, toggleOne } =
     useRecordSelection(DIAGNOSTIC_ROWS)
 
   const handleDownloadSelected = (): void => {
-    if (selectedIds.size === 0) {
-      makeToast(t('select_entry_to_download') as string, WARNING_TOAST)
+    const shouldDownloadLogs =
+      selectedIds.has('troubleshooting') && downloadLogsStatus !== 'loading'
+    const shouldDownloadCalibration =
+      selectedIds.has('calibration') && !isLoadingCalibration
+
+    if (!shouldDownloadLogs && !shouldDownloadCalibration) {
       return
     }
-    if (selectedIds.has('troubleshooting')) {
-      downloadLogs()
+
+    const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
+    const toastId = makeToast(
+      t('downloading_diagnostic_files') as string,
+      INFO_TOAST,
+      { disableTimeout: true, icon: toastIcon }
+    )
+
+    const downloads: Array<Promise<unknown>> = []
+    if (shouldDownloadLogs) {
+      downloads.push(downloadLogs({}))
     }
-    if (selectedIds.has('calibration')) {
-      downloadCalibration()
+    if (shouldDownloadCalibration) {
+      downloads.push(downloadCalibration())
     }
+
+    void Promise.all(downloads)
+      .then(() => {
+        makeToast(t('files_successfully_downloaded') as string, SUCCESS_TOAST)
+      })
+      .catch((e: Error) => {
+        makeToast(e.message, ERROR_TOAST, { closeButton: true })
+      })
+      .finally(() => {
+        eatToast(toastId)
+      })
   }
 
   return (
     <div className={fileManagerStyles.file_management_group}>
       <FileManagementSectionHeader
         titleText={t('diagnostic_files')}
+        showButtons={isSomeSelected || isAllSelected}
         onDownloadSelected={handleDownloadSelected}
       />
       <div className={fileManagerStyles.log_table}>

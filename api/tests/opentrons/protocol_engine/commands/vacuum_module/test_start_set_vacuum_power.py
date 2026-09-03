@@ -37,6 +37,7 @@ async def test_start_set_vacuum_power(
         equipment=equipment,
         movement=movement,
         task_handler=real_task_handler,
+        model_utils=model_utils,
     )
 
     duty_cycle = 77
@@ -90,8 +91,74 @@ async def test_start_set_vacuum_power(
     )
     expected_state_update = update_types.StateUpdate()
     expected_state_update.update_vacuum_module_pump_engaged("input-vacuum-id", True)
+    # No duration hold → residual vacuum remains (pump holds indefinitely)
+    expected_state_update.update_vacuum_module_residual_vacuum(
+        "input-vacuum-id", residual_vacuum=True
+    )
 
     assert result == SuccessData(
         public=expected_result,
         state_update=expected_state_update,
     )
+
+
+async def test_start_set_vacuum_power_waits_to_equalize(
+    decoy: Decoy,
+    state_view: StateView,
+    equipment: EquipmentHandler,
+    movement: MovementHandler,
+    real_task_handler: TaskHandler,
+    action_dispatcher: ActionDispatcher,
+    model_utils: ModelUtils,
+) -> None:
+    """It should wait for pressure equalization when equalizeTimeout is set."""
+    subject = StartSetVacuumPowerImpl(
+        state_view=state_view,
+        equipment=equipment,
+        movement=movement,
+        task_handler=real_task_handler,
+        model_utils=model_utils,
+    )
+
+    data = vm_commands.StartSetVacuumPowerParams(
+        moduleId="input-vacuum-id",
+        percentPower=77,
+        duration=10,
+        equalizeTimeout=30,
+        taskId="taskId",
+    )
+    expected_module_id = VacuumModuleId("vacuum-id")
+
+    vm_module_substate = decoy.mock(cls=VacuumModuleSubState)
+    vm_hardware = decoy.mock(cls=VacuumModule)
+
+    decoy.when(
+        state_view.modules.get_vacuum_module_substate("input-vacuum-id")
+    ).then_return(vm_module_substate)
+    decoy.when(model_utils.ensure_id("taskId")).then_return("taskId")
+    decoy.when(vm_module_substate.module_id).then_return(expected_module_id)
+    decoy.when(equipment.get_module_hardware_api(expected_module_id)).then_return(
+        vm_hardware
+    )
+    decoy.when(vm_hardware.pump_running).then_return(False)
+
+    task: Task | None = None
+
+    def _capture_task(action: Action) -> None:
+        nonlocal task
+        assert isinstance(action, StartTaskAction)
+        task = action.task
+
+    decoy.when(
+        action_dispatcher.dispatch(StartTaskAction(task=matchers.Anything()))  # type: ignore[func-returns-value]
+    ).then_do(_capture_task)
+
+    result = await subject.execute(data)
+    assert task is not None
+    await task.asyncioTask
+
+    decoy.verify(
+        await vm_hardware.wait_for_pressure_equalization(30),
+        times=1,
+    )
+    assert result.public.taskId == "taskId"

@@ -4,6 +4,7 @@ import { Icon } from '../icons'
 import styles from './buttons.module.css'
 import { FlatButton } from './FlatButton'
 
+import type { ReactNode } from 'react'
 import type { IconProps } from '../icons'
 import type { ButtonProps } from './Button'
 
@@ -18,7 +19,7 @@ interface Props extends ButtonProps {
  *
  * @deprecated Use {@link Btn} and {@link Icon}
  */
-export function IconButton(props: Props): JSX.Element {
+export function IconButton(props: Props): ReactNode {
   // TODO(mc, 2020-02-04): ButtonProps::name conflicts with IconProps::name
   // this component will need to be redone so underlying `button` can still
   // receive an HTML name for a11y

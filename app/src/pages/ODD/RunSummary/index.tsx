@@ -34,15 +34,19 @@ import {
   WRAP,
 } from '@opentrons/components'
 import {
+  useAccessControlEnabledQuery,
   useErrorRecoverySettings,
+  useGetRobotServerAccessControlSettingsQuery,
   useProtocolQuery,
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { RunTimer } from '/app/molecules/RunTimer'
 import { handleTipsAttachedModal } from '/app/organisms/DropTipWizardFlows'
+import { DownloadAuditLogsModal } from '/app/organisms/ODD/DownloadAuditLogsModal'
 import { RunFailedModal } from '/app/organisms/ODD/RunningProtocol'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import {
@@ -61,6 +65,7 @@ import {
   useTrackEvent,
 } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
+import { useIsLogDeleted } from '/app/resources/audit/useIsLogDeleted'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import { useTipAttachmentStatus } from '/app/resources/instruments'
 import {
@@ -75,23 +80,29 @@ import {
 } from '/app/resources/runs'
 import { onDeviceDisplayFormatTimestamp } from '/app/transformations/runs'
 
+import { SignRun } from './SignRun'
+
+import type { ReactNode } from 'react'
 import type { IconName } from '@opentrons/components'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type { PipetteWithTip } from '/app/resources/instruments'
 
-export function RunSummary(): JSX.Element {
+export function RunSummary(): ReactNode {
   const { runId } = useParams<
     keyof OnDeviceRouteParams
   >() as OnDeviceRouteParams
   const { t } = useTranslation('run_details')
   const navigate = useNavigate()
-  const { data: runRecord } = useNotifyRunQuery(runId, {
-    staleTime: Infinity,
-    onError: () => {
-      // in case the run is remotely deleted by a desktop app, navigate to the dash
-      navigate('/dashboard')
-    },
-  })
+  const { data: runRecord, isLoading: isRunRecordLoading } = useNotifyRunQuery(
+    runId,
+    {
+      staleTime: Infinity,
+      onError: () => {
+        // in case the run is remotely deleted by a desktop app, navigate to the dash
+        navigate('/dashboard')
+      },
+    }
+  )
   const isRunCurrent = useIsRunCurrent(runId)
   const runStatus = runRecord?.data.status ?? null
   const didRunSucceed = runStatus === RUN_STATUS_SUCCEEDED
@@ -146,6 +157,7 @@ export function RunSummary(): JSX.Element {
   const trackEvent = useTrackEvent()
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
+  const documentationState = useDocumentationState()
   const { closeCurrentRun } = useCloseCurrentRun()
   // Close the current run only if it's active and then execute the onSuccess callback. Prefer this wrapper over
   // closeCurrentRun directly, since the callback is swallowed if currentRun is null.
@@ -185,6 +197,49 @@ export function RunSummary(): JSX.Element {
     (hasCommandErrors && !cancelledWithoutRecovery) ||
     (runRecord?.data.errors != null && runRecord?.data.errors.length > 0)
   )
+
+  const {
+    data: accessControlEnabled,
+    isLoading: isAccessControlEnabledLoading,
+  } = useAccessControlEnabledQuery()
+  const {
+    data: accessControlSettings,
+    isLoading: isAccessControlSettingsLoading,
+  } = useGetRobotServerAccessControlSettingsQuery()
+  const isSettingsLoading =
+    isAccessControlEnabledLoading || isAccessControlSettingsLoading
+  const isSigningRequired =
+    (accessControlEnabled?.data.accessControlEnabled ?? false) &&
+    (accessControlSettings?.data.requireSignoffForProtocolLog ?? false)
+  const hasSignedBy =
+    runRecord?.data.signedBy != null && runRecord.data.signedBy !== ''
+  // Wait for runRecord after sign (cache cleared) so we don't re-prompt
+  // while signedBy is still missing from the refetch.
+  const shouldPromptSignRun =
+    !isRunRecordLoading &&
+    !isSettingsLoading &&
+    isSigningRequired &&
+    !hasSignedBy
+
+  const logPeriodId = runRecord?.data.logPeriodId ?? null
+  const {
+    isLoading: isLogDeletedLoading,
+    isDeleted: isLogDeleted,
+    isError: isLogDeletedError,
+  } = useIsLogDeleted(logPeriodId ?? '')
+
+  const isDownloadingRequired =
+    ((accessControlEnabled?.data.accessControlEnabled ?? false) &&
+      accessControlSettings?.data.requireLogsToBeSavedInApp) ??
+    false
+  const shouldPromptDownloadLog =
+    !isRunRecordLoading &&
+    !isSettingsLoading &&
+    isDownloadingRequired &&
+    !shouldPromptSignRun &&
+    !isLogDeletedLoading &&
+    !isLogDeletedError &&
+    !isLogDeleted
 
   let headerText: string | null = null
   if (runStatus === RUN_STATUS_SUCCEEDED) {
@@ -255,7 +310,12 @@ export function RunSummary(): JSX.Element {
   // TODO(jh, 05-30-24): EXEC-487. Refactor reset() so we can redirect to the setup page, showing the shimmer skeleton instead.
   const runAgain = (): void => {
     setShowRunAgainSpinner(true)
-    reset()
+    reset({
+      onError: () => {
+        // e.g. user cancelled the documentation modal
+        setShowRunAgainSpinner(false)
+      },
+    })
     if (isQuickTransfer) {
       trackEventWithRobotSerial({
         name: ANALYTICS_QUICK_TRANSFER_RERUN,
@@ -364,6 +424,14 @@ export function RunSummary(): JSX.Element {
       />
     </Flex>
   )
+
+  if (shouldPromptSignRun && !showSplash) {
+    return <SignRun runId={runId} documentationState={documentationState} />
+  }
+
+  if (shouldPromptDownloadLog && !showSplash) {
+    return <DownloadAuditLogsModal />
+  }
 
   return (
     <Btn

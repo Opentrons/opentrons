@@ -15,7 +15,9 @@ from typing import (
     Iterator,
     List,
     Optional,
+    Self,
     Tuple,
+    Type,
     cast,
 )
 from uuid import uuid4  # direct to avoid import cycles in service.dependencies
@@ -79,11 +81,16 @@ from .errors.robot_errors import (
 from .robot.control.estop_handler import EstopHandler
 from .service.task_runner import TaskRunner, get_task_runner
 from .settings import RobotServerSettings, get_settings
+from .simulator_calibration_seed import seed_simulator_calibration
 from .subsystems.firmware_update_manager import (
     FirmwareUpdateManager,
     UpdateProcessHandle,
 )
 from .subsystems.models import SubSystem
+from robot_server.service.pyro_utils.resource_utilities import (
+    get_pyro_resource,
+    register_hardware_state_store_to_pyro_resource,
+)
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -104,9 +111,7 @@ _hw_api_accessor = AppStateAccessor[ThreadManagedHardware]("hardware_api")
 _hw_subprocess_accessor = AppStateAccessor[HardwareControlAPI](
     "hardware_api_subprocess"
 )
-_hw_state_store_accessor = AppStateAccessor["HardwareStateStore"](
-    "hardware_state_store"
-)
+
 _init_task_accessor = AppStateAccessor["asyncio.Task[None]"]("hardware_init_task")
 _postinit_task_accessor = AppStateAccessor["asyncio.Task[None]"](
     "hardware_postinit_task"
@@ -115,14 +120,77 @@ _firmware_update_manager_accessor = AppStateAccessor[FirmwareUpdateManager](
     "firmware_update_manager"
 )
 _estop_handler_accessor = AppStateAccessor[EstopHandler]("estop_handler")
+_hw_state_store_accessor = AppStateAccessor["HardwareStateStore"](
+    "hardware_state_store"
+)
 
 
 class HardwareStateStore:
     """State Store to provide updated hardware resource data."""
 
+    @classmethod
+    async def build(
+        cls: Type[Self],
+        hardware_resource: ThreadManagedHardware | HardwareControlAPI,
+        app_state: AppState,
+    ) -> Self:
+        """Build a HardwareStateStore."""
+        if isinstance(hardware_resource, ThreadManager):
+            inner_hardware_resource: HardwareControlAPI = hardware_resource.wrapped()
+        else:
+            inner_hardware_resource = hardware_resource
+
+        attached_modules = await inner_hardware_resource.get_attached_modules()
+
+        def _get_hw_info() -> tuple[
+            dict[HwSubSystem, SubSystemState],
+            EstopState,
+            DoorState,
+            str | None,
+        ]:
+            return (
+                inner_hardware_resource.attached_subsystems,
+                inner_hardware_resource.get_estop_state(),
+                inner_hardware_resource.door_state,
+                inner_hardware_resource.module_door_serial,
+            )
+
+        (
+            attached_subsystems,
+            estop_state,
+            door_state,
+            module_door_serial,
+        ) = await asyncio.to_thread(_get_hw_info)
+
+        obj = cls(
+            inner_hardware_resource,
+            attached_modules,
+            attached_subsystems,
+            estop_state,
+            door_state,
+            module_door_serial,
+        )
+
+        if ff.hardware_subprocess_enabled():
+            register_hardware_state_store_to_pyro_resource(
+                app_state=app_state, hardware_store=obj
+            )
+            pyro_resource_proxy = await get_pyro_resource()
+            await obj.register_proxy_hardware_status_callback(
+                pyro_resource_proxy.create_hardware_state_update_callback()
+            )
+        else:
+            await obj.register_inprocess_hardware_status_callback()
+        return obj
+
     def __init__(
         self,
-        hardware_resource: ThreadManagedHardware | HardwareControlAPI,
+        hardware_resource: HardwareControlAPI,
+        attached_modules: list[AbstractModule],
+        attached_subsystems: dict[HwSubSystem, SubSystemState],
+        estop_state: EstopState,
+        door_state: DoorState,
+        module_door_serial: str | None,
     ) -> None:
         """State store for frequently queried Hardware API resources.
 
@@ -130,59 +198,64 @@ class HardwareStateStore:
         to the Hardware API, particularly things that are polled often. This is especially true when operating in
         subprocess mode.
         """
-        if isinstance(hardware_resource, ThreadManager):
-            self._hardware_resource = hardware_resource.wrapped()
-        else:
-            self._hardware_resource = hardware_resource
-        if ff.hardware_subprocess_enabled():
-            self._hardware_resource = hardware_resource
-            # In subprocess mode a proxy-safe callback is registered after initialization
-            self._unregister_hw_callback = None
-        else:
-            self._unregister_hw_callback = self._hardware_resource.register_callback(
-                self.update_hardware_status_callback
-            )
+        self._hardware_resource = hardware_resource
+        self._unregister_hw_callback: Callable[[], Awaitable[None]] | None = None
+        self._attached_modules = attached_modules
+        self._attached_subsystems = attached_subsystems
+        self._estop_state = estop_state
+        self._door_state = door_state
+        self._module_door_serial = module_door_serial
+        self._loop = asyncio.get_running_loop()
 
-        # Initialize hardware state values
-        self._attached_modules: List[AbstractModule] = (
-            self._hardware_resource.attached_modules
-        )
-        self._attached_subsystems: Dict[HwSubSystem, SubSystemState] = (
-            self._hardware_resource.attached_subsystems
-        )
-        self._estop_state: EstopState = self._hardware_resource.get_estop_state()
-        self._door_state: DoorState = self._hardware_resource.door_state
-
-    def update_hardware_status_callback(self, event: HardwareEvent) -> None:
+    async def update_hardware_status_callback(self, event: HardwareEvent) -> None:
         """Callback to update the Hardware State Store when changes occur on the hardware resource."""
         if isinstance(event, ModuleConnectedNotification) or isinstance(
             event, ModuleDisconnectedNotification
         ):
-            self._attached_modules = self._hardware_resource.attached_modules
+            self._attached_modules = (
+                await self._hardware_resource.get_attached_modules()
+            )
         if isinstance(event, SubsystemConnectionNotification):
-            self._attached_subsystems = self._hardware_resource.attached_subsystems
+            self._attached_subsystems = event.tracked_subsystems
         if isinstance(event, EstopStateNotification):
-            self._estop_state = self._hardware_resource.get_estop_state()
+            self._estop_state = event.new_state
         if isinstance(event, DoorStateNotification):
-            self._door_state = self._hardware_resource.door_state
+            self._door_state = event.new_state
+            self._module_door_serial = event.module_serial
 
-    def register_proxy_hardware_status_callback(
+    async def register_inprocess_hardware_status_callback(self) -> None:
+        """Register a normal function call status callback to a hardware API in the same process."""
+        if self._unregister_hw_callback is None:
+            self._unregister_hw_callback = (
+                await self._hardware_resource.register_callback_async(
+                    lambda event: cast(
+                        None,
+                        asyncio.run_coroutine_threadsafe(
+                            self.update_hardware_status_callback(event), self._loop
+                        ),
+                    )
+                )
+            )
+        else:
+            raise RuntimeError("Do not double initialize the hardware status callback")
+
+    async def register_proxy_hardware_status_callback(
         self, proxy_callback: HardwareEventHandler
     ) -> None:
         """Register a proxy of the hardware status callback to a remote Hardware API."""
         if self._unregister_hw_callback is None:
-            self._unregister_hw_callback = self._hardware_resource.register_callback(
-                proxy_callback
+            self._unregister_hw_callback = (
+                await self._hardware_resource.register_callback_async(proxy_callback)
             )
         else:
-            raise ValueError(
+            raise RuntimeError(
                 "Hardware State Store unregister callback should not be set ahead of proxy registration."
             )
 
-    def unregister_hardware_callback(self) -> None:
+    async def unregister_hardware_callback(self) -> None:
         """Callback to unregister the robot-server callback from the hardware process."""
         assert self._unregister_hw_callback is not None
-        self._unregister_hw_callback()
+        await self._unregister_hw_callback()
 
     @property
     def attached_modules(self) -> List[AbstractModule]:
@@ -199,20 +272,25 @@ class HardwareStateStore:
         """The current state of the machine's door."""
         return self._door_state
 
+    @property
+    def module_door_serial(self) -> str | None:
+        """The serial of a module with an open door."""
+        return self._module_door_serial
+
     def get_estop_state(self) -> EstopState:
         """Get the current Estop state."""
         return self._estop_state
 
 
-def get_hardware_state_store(
+async def get_hardware_state_store(
     app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> HardwareStateStore:
     """Get the Hardware State Store as a route dependency."""
     hardware_state_store = _hw_state_store_accessor.get_from(app_state)
-    if hardware_state_store is not None:
-        return hardware_state_store
-    else:
+
+    if hardware_state_store is None:
         raise HardwareNotYetInitialized().as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
+    return hardware_state_store
 
 
 class _ExcPassthrough(BaseException):
@@ -221,7 +299,9 @@ class _ExcPassthrough(BaseException):
 
 
 def start_initializing_hardware(
-    app_state: AppState, callbacks: Iterable[PostInitCallback]
+    app_state: AppState,
+    pyro_task: "asyncio.Task[None]",
+    callbacks: Iterable[PostInitCallback],
 ) -> None:
     """Initialize the hardware API singleton, attaching it to global state.
 
@@ -231,7 +311,7 @@ def start_initializing_hardware(
 
     if initialize_task is None:
         initialize_task = asyncio.create_task(
-            _initialize_hardware_api(app_state, callbacks)
+            _initialize_hardware_api(app_state, pyro_task, callbacks)
         )
         _init_task_accessor.set_on(app_state, initialize_task)
 
@@ -456,12 +536,16 @@ def get_ot3_hardware(
     if ff.hardware_subprocess_enabled():
         return cast(OT3API, hardware_resource)
 
-    assert isinstance(hardware_resource, ThreadManager)
-    if not hardware_resource.wraps_instance(OT3API):
-        raise NotSupportedOnOT2(
-            detail="This route is only available on a Flex."
-        ).as_error(status.HTTP_403_FORBIDDEN)
-    return cast(OT3API, hardware_resource.wrapped())
+    if isinstance(
+        hardware_resource, ThreadManager
+    ) and hardware_resource.wraps_instance(OT3API):
+        return cast(OT3API, hardware_resource.wrapped())
+    if isinstance(hardware_resource, OT3API):
+        return hardware_resource
+
+    raise NotSupportedOnOT2(detail="This route is only available on a Flex.").as_error(
+        status.HTTP_403_FORBIDDEN
+    )
 
 
 def get_ot2_hardware(
@@ -540,7 +624,7 @@ async def _postinit_ot2_tasks(
     hardware: ThreadManagedHardware,
     app_state: AppState,
     callbacks: Iterable[PostInitCallback],
-    hardware_store: HardwareStateStore,
+    hardware_store: "HardwareStateStore",
 ) -> None:
     """Tasks to run on an initialized OT-2 before it is ready to use."""
     try:
@@ -597,7 +681,7 @@ async def _postinit_ot3_tasks(
     hardware_resource: ThreadManagedHardware | HardwareControlAPI,
     app_state: AppState,
     callbacks: Iterable[PostInitCallback],
-    hardware_store: HardwareStateStore,
+    hardware_store: "HardwareStateStore",
 ) -> None:
     """Tasks to run on an initialized OT-3 before it is ready to use."""
     update_manager = await get_firmware_update_manager(
@@ -607,9 +691,12 @@ async def _postinit_ot3_tasks(
     )
 
     hardware = cast("OT3API", hardware_resource)
+    settings = get_settings()
 
     try:
         await _do_updates(hardware, update_manager)
+        if settings.simulator_configuration_file_path is not None:
+            seed_simulator_calibration(Path(settings.simulator_configuration_file_path))
         await hardware.cache_instruments()
         await _home_on_boot(hardware)
         await hardware.set_status_bar_state(StatusBarState.ACTIVATION)
@@ -727,7 +814,9 @@ def _format_exc(log_prefix: str) -> Iterator[None]:
 
 
 async def _initialize_hardware_api(
-    app_state: AppState, callbacks: Iterable[PostInitCallback]
+    app_state: AppState,
+    pyro_task: "asyncio.Task[None]",
+    callbacks: Iterable[PostInitCallback],
 ) -> None:
     """Initialize the HardwareAPI and attach it to global state."""
     app_settings = get_settings()
@@ -735,7 +824,7 @@ async def _initialize_hardware_api(
     try:
         if should_use_ot3():
             if ff.hardware_subprocess_enabled():
-                hardware = identify_hardware_process()
+                hardware = await identify_hardware_process()
                 _hw_subprocess_accessor.set_on(app_state, hardware)
             else:
                 hardware = await _initialize_ot3_robot(
@@ -748,8 +837,13 @@ async def _initialize_hardware_api(
             )
             _hw_api_accessor.set_on(app_state, hardware)
 
+        await pyro_task
+
         # Initialize the hardware state store
-        hardware_state_store = HardwareStateStore(hardware_resource=hardware)
+        hardware_state_store = await HardwareStateStore.build(
+            hardware_resource=hardware, app_state=app_state
+        )
+
         _hw_state_store_accessor.set_on(app_state, hardware_state_store)
 
         for callback in callbacks:

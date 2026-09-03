@@ -19,7 +19,7 @@ import { useNotifyRunQuery } from './useNotifyRunQuery'
 import type { LabwareOffset, Run } from '@opentrons/api-client'
 
 interface UseCloneRunResult {
-  cloneRun: () => void
+  cloneRun: (options?: { onError?: (error: unknown) => void }) => void
   isLoadingRun: boolean
   isCloning: boolean
 }
@@ -38,15 +38,11 @@ export function useCloneRun(
     documentationState,
     {
       onSuccess: response => {
-        const invalidateRuns = queryClient.invalidateQueries(
-          getQueryKey(host, 'runs')
-        )
-        const invalidateProtocols = queryClient.invalidateQueries(
-          getQueryKey(host, 'protocols', protocolKey)
-        )
-        Promise.all([invalidateRuns, invalidateProtocols]).catch((e: Error) => {
-          console.error(`error invalidating runs query: ${e.message}`)
-        })
+        queryClient
+          .invalidateQueries(getQueryKey(host, 'protocols', protocolKey))
+          .catch((e: Error) => {
+            console.error(`error invalidating protocol query: ${e.message}`)
+          })
         // The onSuccess callback is not awaited until query invalidation, because currently, in every instance this
         // onSuccessCallback is utilized, we only use it for navigating. We may need to revisit this.
         onSuccessCallback?.(response)
@@ -57,7 +53,7 @@ export function useCloneRun(
     protocolKey,
     host
   )
-  const cloneRun = (): void => {
+  const cloneRun = (options?: { onError?: (error: unknown) => void }): void => {
     if (runRecord != null) {
       const { protocolId, labwareOffsets } = runRecord.data
       const runTimeParameters =
@@ -75,12 +71,19 @@ export function useCloneRun(
           runTimeParameterFiles,
         })
       }
-      createRun({
-        protocolId,
-        labwareOffsets: mostRecentUniqueLabwareOffsets(labwareOffsets),
-        runTimeParameterValues,
-        runTimeParameterFiles,
-      })
+      createRun(
+        {
+          protocolId,
+          labwareOffsets: mostRecentUniqueLabwareOffsets(labwareOffsets),
+          runTimeParameterValues,
+          runTimeParameterFiles,
+        },
+        {
+          onError: error => {
+            options?.onError?.(error)
+          },
+        }
+      )
     } else {
       console.info('failed to clone run record, source run record not found')
     }

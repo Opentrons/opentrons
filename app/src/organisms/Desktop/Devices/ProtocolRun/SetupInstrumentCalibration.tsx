@@ -26,6 +26,7 @@ import { SetupFlexPipetteCalibrationItem } from './SetupFlexPipetteCalibrationIt
 import { SetupGripperCalibrationItem } from './SetupGripperCalibrationItem'
 import { SetupPipetteCalibrationItem } from './SetupPipetteCalibrationItem'
 
+import type { ReactNode } from 'react'
 import type { GripperData } from '@opentrons/api-client'
 
 const EQUIPMENT_POLL_MS = 5000
@@ -38,7 +39,7 @@ interface SetupInstrumentCalibrationProps {
 export function SetupInstrumentCalibration({
   robotName,
   runId,
-}: SetupInstrumentCalibrationProps): JSX.Element {
+}: SetupInstrumentCalibrationProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
   const isFlex = useIsFlex(robotName)
@@ -63,11 +64,7 @@ export function SetupInstrumentCalibration({
       {getShowPipetteCalibrationWarning(instrumentsQueryData) && (
         <PipetteRecalibrationWarning />
       )}
-      <LegacyStyledText
-        color={COLORS.black90}
-        css={TYPOGRAPHY.pSemiBold}
-        id="PipetteCalibration_requiredPipettesTitle"
-      >
+      <LegacyStyledText color={COLORS.black90} css={TYPOGRAPHY.pSemiBold}>
         {i18n.format(t('required_instrument_calibrations'), 'titleCase')}
       </LegacyStyledText>
       {PIPETTE_MOUNTS.map((mount, index) => {

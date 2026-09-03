@@ -5,11 +5,11 @@ import { captureException } from '@sentry/react'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
-  AlertPrimaryButton,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
   Flex,
   Modal,
+  PrimaryButton,
   SecondaryButton,
   SPACING,
   StyledText,
@@ -17,6 +17,7 @@ import {
 
 import { actions } from '../load-file'
 
+import type { ReactNode } from 'react'
 import type { FallbackProps } from 'react-error-boundary'
 import type { ThunkDispatch } from '../types'
 
@@ -25,7 +26,7 @@ const LOG_LEVEL = 'error'
 export function ProtocolDesignerAppFallback({
   error,
   resetErrorBoundary,
-}: FallbackProps): JSX.Element {
+}: FallbackProps): ReactNode {
   const { t } = useTranslation('shared')
   const dispatch: ThunkDispatch<any> = useDispatch()
   const errorId = uuidv4()
@@ -59,9 +60,9 @@ export function ProtocolDesignerAppFallback({
           <SecondaryButton onClick={handleDownloadProtocol}>
             {t('download_protocol')}
           </SecondaryButton>
-          <AlertPrimaryButton onClick={handleReloadClick}>
+          <PrimaryButton variant="warning" onClick={handleReloadClick}>
             {t('reload_app')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </Flex>
       </Flex>
     </Modal>

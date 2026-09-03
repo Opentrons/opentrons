@@ -12,9 +12,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { OddModalHeaderBaseProps } from './types'
 
-export function OddModalHeader(props: OddModalHeaderBaseProps): JSX.Element {
+export function OddModalHeader(props: OddModalHeaderBaseProps): ReactNode {
   const {
     title,
     hasExitIcon,

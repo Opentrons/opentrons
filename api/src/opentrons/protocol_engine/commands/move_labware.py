@@ -26,6 +26,7 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 
 from ..errors import (
+    LabwareIsNotAllowedInLocationError,
     LabwareMovementNotAllowedError,
     LabwareOffsetDoesNotExistError,
     NotSupportedOnRobotType,
@@ -310,6 +311,24 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 addressable_area_name=params.newLocation.slotName.id
             )
 
+        if isinstance(params.newLocation, DeckSlotLocation):
+            if not labware_validation.validate_definition_is_deck_slot_compatible(
+                current_labware_definition
+            ):
+                raise LabwareIsNotAllowedInLocationError(
+                    f'Labware "{current_labware.loadName}" cannot be moved onto a deck slot.'
+                )
+        elif isinstance(params.newLocation, AddressableAreaLocation):
+            area_name = params.newLocation.addressableAreaName
+            if fixture_validation.is_deck_slot(
+                area_name
+            ) and not labware_validation.validate_definition_is_deck_slot_compatible(
+                current_labware_definition
+            ):
+                raise LabwareIsNotAllowedInLocationError(
+                    f'Labware "{current_labware.loadName}" cannot be moved onto a deck slot.'
+                )
+
         available_new_location = self._state_view.geometry.ensure_location_not_occupied(
             params.newLocation, None, current_labware_definition
         )
@@ -356,6 +375,10 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             module = self._state_view.modules.get(available_new_location.moduleId)
             if module is not None and module.model == ModuleModel.ABSORBANCE_READER_V1:
                 self._state_view.labware.raise_if_labware_incompatible_with_plate_reader(
+                    current_labware_definition
+                )
+            if module is not None and module.model == ModuleModel.VACUUM_MODULE_V1:
+                self._state_view.labware.raise_if_labware_incompatible_with_vacuum_module(
                     current_labware_definition
                 )
 

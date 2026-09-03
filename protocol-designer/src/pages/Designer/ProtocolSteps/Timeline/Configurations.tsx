@@ -14,7 +14,7 @@ import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
 import { HardwareStep } from './HardwareStep'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 
 interface ConfigurationsProps {
   sidebarWidth: number
@@ -24,7 +24,7 @@ interface ConfigurationsProps {
 export function Configurations({
   sidebarWidth,
   showLiquidOverflowMenu,
-}: ConfigurationsProps): JSX.Element {
+}: ConfigurationsProps): ReactNode {
   const { t } = useTranslation('protocol_steps')
   return (
     <>

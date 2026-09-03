@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   CheckboxBasic,
   COLORS,
+  Icon,
   ListAccordion,
   StyledText,
   Tag,
@@ -14,20 +15,24 @@ import { formatTimestamp } from '/app/transformations/runs'
 import { DisplayRunStatus } from '../../../ProtocolRun/ProtocolRunHeader/DisplayRunStatus'
 import { useRunFileCount } from '../hooks/useRunFileCount'
 import styles from './protocolrunrecords.module.css'
+import { RunRecordDrawer } from './RunRecordDrawer'
 
+import type { ReactNode } from 'react'
 import type { RunData } from '@opentrons/api-client'
 
 interface RunRecordProps {
   run: RunData
   isSelected: boolean
+  isDeleting: boolean
   onToggle: () => void
 }
 
 export function RunRecord({
   run,
   isSelected,
+  isDeleting,
   onToggle,
-}: RunRecordProps): JSX.Element {
+}: RunRecordProps): ReactNode {
   const { t } = useTranslation('device_details')
   const protocols = useAllProtocolsQuery()
   const numFiles = useRunFileCount(run)
@@ -39,11 +44,15 @@ export function RunRecord({
         e.stopPropagation()
       }}
     >
-      <CheckboxBasic
-        checked={isSelected}
-        onChange={onToggle}
-        backgroundColor={COLORS.white}
-      />
+      {isDeleting ? (
+        <Icon name="ot-spinner" spin size="1rem" color={COLORS.grey60} />
+      ) : (
+        <CheckboxBasic
+          checked={isSelected}
+          onChange={onToggle}
+          backgroundColor={COLORS.white}
+        />
+      )}
     </div>
   )
 
@@ -81,7 +90,7 @@ export function RunRecord({
       headerChild={headerContent}
       tableHeaders={[]}
     >
-      <div>TODO: wire up drawer</div>
+      <RunRecordDrawer run={run} runProtocol={protocol} />
     </ListAccordion>
   )
 }

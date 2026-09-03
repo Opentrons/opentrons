@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   Btn,
@@ -20,6 +19,7 @@ import {
   OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
+  PrimaryButton,
   SPACING,
   TYPOGRAPHY,
   useConditionalConfirm,
@@ -37,7 +37,7 @@ import {
   openCustomLabwareDirectory,
 } from '/app/redux/custom-labware'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
@@ -49,7 +49,7 @@ interface CustomLabwareOverflowMenuProps {
 
 export function CustomLabwareOverflowMenu(
   props: CustomLabwareOverflowMenuProps
-): JSX.Element {
+): ReactNode {
   const { filename, onDelete } = props
   const { t } = useTranslation(['labware_landing', 'shared'])
   const dispatch = useDispatch<Dispatch>()
@@ -167,9 +167,9 @@ export function CustomLabwareOverflowMenu(
                 >
                   {t('shared:cancel')}
                 </Btn>
-                <AlertPrimaryButton onClick={handleClickDelete}>
+                <PrimaryButton variant="warning" onClick={handleClickDelete}>
                   {t('yes_delete_def')}
-                </AlertPrimaryButton>
+                </PrimaryButton>
               </Flex>
             </Flex>
           </Modal>,

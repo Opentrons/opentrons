@@ -5,6 +5,7 @@ import { customViewports } from '../../../../.storybook/preview'
 import * as Fixtures from './__fixtures__'
 
 import type { Meta, StoryObj } from '@storybook/react'
+import type { ReactNode } from 'react'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { CommandState } from './Command'
 
@@ -42,7 +43,7 @@ function safeCommandOfType(type: CommandType, index: number): RunTimeCommand {
   return commands[index]
 }
 
-function Wrapper(props: StorybookArgs): JSX.Element {
+function Wrapper(props: StorybookArgs): ReactNode {
   const command =
     props.selectCommandBy === 'protocol index'
       ? Fixtures.mockDoItAllTextData.commands[

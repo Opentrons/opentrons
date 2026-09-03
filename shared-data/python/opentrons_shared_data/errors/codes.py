@@ -88,6 +88,8 @@ class ErrorCodes(Enum):
     STACKER_HOPPER_LABWARE_FAILED = _code_from_dict_entry("3022")
     STACKER_SHUTTLE_OCCUPIED = _code_from_dict_entry("3023")
     BARCODE_SCANNER_FAILURE = _code_from_dict_entry("3024")
+    VACUUM_PRESSURE_NOT_REACHED = _code_from_dict_entry("3040")
+    VACUUM_WASTE_CONTAINER_FULL = _code_from_dict_entry("3041")
     GENERAL_ERROR = _code_from_dict_entry("4000")
     ROBOT_IN_USE = _code_from_dict_entry("4001")
     API_REMOVED = _code_from_dict_entry("4002")

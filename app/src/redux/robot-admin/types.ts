@@ -1,6 +1,4 @@
-import type { RobotApiRequestMeta } from '../robot-api/types'
-
-// common types
+// restart status tracking types
 
 export type RobotRestartStatus =
   | 'restart-pending'
@@ -8,36 +6,6 @@ export type RobotRestartStatus =
   | 'restart-succeeded'
   | 'restart-timed-out'
   | 'restart-failed'
-
-export type RobotAdminStatus =
-  'up' | 'down' | 'restart-pending' | 'restarting' | 'restart-failed'
-
-export interface ResetConfigOption {
-  id: string
-  name: string
-  description: string
-}
-
-export interface ResetConfigRequest {
-  resetLabwareOffsets: boolean
-
-  /**
-   * Options to pass as-is to `POST /settings/reset`.
-   * The possible keys are theoretically dynamic,
-   * coming from `GET /settings/reset/options`.
-   */
-  settingsResets: {
-    [optionId: string]: boolean | undefined
-  }
-}
-
-// action types
-
-export interface RestartRobotAction {
-  type: 'robotAdmin:RESTART'
-  payload: { robotName: string }
-  meta: Partial<RobotApiRequestMeta & { robot: true }>
-}
 
 export interface RestartStatusChangedAction {
   type: 'robotAdmin:RESTART_STATUS_CHANGED'
@@ -49,95 +17,7 @@ export interface RestartStatusChangedAction {
   }
 }
 
-export interface RestartRobotSuccessAction {
-  type: 'robotAdmin:RESTART_SUCCESS'
-  payload: { robotName: string }
-  meta: RobotApiRequestMeta | {}
-}
-
-export interface RestartRobotFailureAction {
-  type: 'robotAdmin:RESTART_FAILURE'
-  payload: { robotName: string; error: {} }
-  meta: RobotApiRequestMeta
-}
-
-export interface ShutdownRobotAction {
-  type: 'robotAdmin:SHUTDOWN'
-  payload: { robotName: string }
-  meta: Partial<RobotApiRequestMeta & { robot: true }>
-}
-
-export interface ShutdownRobotSuccessAction {
-  type: 'robotAdmin:SHUTDOWN_SUCCESS'
-  payload: { robotName: string }
-  meta: RobotApiRequestMeta | {}
-}
-
-export interface ShutdownRobotFailureAction {
-  type: 'robotAdmin:SHUTDOWN_FAILURE'
-  payload: { robotName: string; error: {} }
-  meta: RobotApiRequestMeta
-}
-
-export interface FetchResetConfigOptionsAction {
-  type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS'
-  payload: { robotName: string }
-  meta: RobotApiRequestMeta | {}
-}
-
-export interface FetchResetConfigOptionsSuccessAction {
-  type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS_SUCCESS'
-  payload: { robotName: string; options: ResetConfigOption[] }
-  meta: RobotApiRequestMeta
-}
-
-export interface FetchResetConfigOptionsFailureAction {
-  type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS_FAILURE'
-  payload: { robotName: string; error: {} }
-  meta: RobotApiRequestMeta
-}
-
-export interface ResetConfigAction {
-  type: 'robotAdmin:RESET_CONFIG'
-  payload: { robotName: string; resets: ResetConfigRequest }
-  meta: RobotApiRequestMeta | {}
-}
-
-export interface ResetConfigSuccessAction {
-  type: 'robotAdmin:RESET_CONFIG_SUCCESS'
-  payload: { robotName: string }
-  meta: RobotApiRequestMeta
-}
-
-export interface ResetConfigFailureAction {
-  type: 'robotAdmin:RESET_CONFIG_FAILURE'
-  payload: { robotName: string; error: {} }
-  meta: RobotApiRequestMeta
-}
-
-export interface SyncSystemTimeAction {
-  type: 'robotAdmin:SYNC_SYSTEM_TIME'
-  payload: { robotName: string }
-  meta: RobotApiRequestMeta | {}
-}
-
-export type RobotAdminAction =
-  | RestartRobotAction
-  | RestartStatusChangedAction
-  | RestartRobotSuccessAction
-  | RestartRobotFailureAction
-  | ShutdownRobotAction
-  | ShutdownRobotSuccessAction
-  | ShutdownRobotFailureAction
-  | FetchResetConfigOptionsAction
-  | FetchResetConfigOptionsSuccessAction
-  | FetchResetConfigOptionsFailureAction
-  | ResetConfigAction
-  | ResetConfigSuccessAction
-  | ResetConfigFailureAction
-  | SyncSystemTimeAction
-
-// state types
+export type RobotAdminAction = RestartStatusChangedAction
 
 export interface RestartState {
   bootId: string | null
@@ -146,9 +26,7 @@ export interface RestartState {
 }
 
 export type PerRobotAdminState = Partial<{
-  status: RobotAdminStatus
   restart: RestartState
-  resetConfigOptions: ResetConfigOption[]
 }>
 
 export type RobotAdminState = Partial<{

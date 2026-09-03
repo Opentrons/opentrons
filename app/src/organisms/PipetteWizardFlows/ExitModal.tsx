@@ -2,9 +2,9 @@ import { useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
 
 import {
-  AlertPrimaryButton,
   COLORS,
   JUSTIFY_FLEX_END,
+  PrimaryButton,
   SecondaryButton,
   SPACING,
   TYPOGRAPHY,
@@ -18,6 +18,7 @@ import {
 
 import { FLOWS } from './constants'
 
+import type { ReactNode } from 'react'
 import type { PipetteWizardFlow } from './types'
 
 interface ExitModalProps {
@@ -28,7 +29,7 @@ interface ExitModalProps {
   isOnDevice: boolean
 }
 
-export function ExitModal(props: ExitModalProps): JSX.Element {
+export function ExitModal(props: ExitModalProps): ReactNode {
   const { goBack, proceed, flowType, isOnDevice, isRobotMoving } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
 
@@ -71,12 +72,13 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
           <SecondaryButton onClick={goBack} marginRight={SPACING.spacing4}>
             {t('shared:go_back')}
           </SecondaryButton>
-          <AlertPrimaryButton
+          <PrimaryButton
+            variant="warning"
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             onClick={proceed}
           >
             {t('shared:exit')}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </>
       )}
     </SimpleWizardBody>

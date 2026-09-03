@@ -19,6 +19,7 @@ export const mockDropTipWizardContainerProps: DropTipWizardContainerProps = {
   issuedCommandsType: 'setup',
   activeMaintenanceRunId: 'MOCK_MAINTENANCE_RUN_ID',
   errorDetails: null,
+  clearErrorDetails: MOCK_FN,
   currentStep: CHOOSE_DROP_TIP_LOCATION,
   currentRoute: DT_ROUTES.DROP_TIP,
   currentStepIdx: 0,

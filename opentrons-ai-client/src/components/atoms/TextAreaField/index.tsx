@@ -83,8 +83,6 @@ export interface TextAreaFieldProps {
   showDeleteIcon?: boolean
   /** callback passed to optional delete icon onClick */
   onDelete?: () => void
-  /** if true, style the background of textarea field to error state */
-  hasBackgroundError?: boolean
   /** optional prop to override textarea field border radius */
   borderRadius?: string
   /** optional prop to override textarea field padding */
@@ -104,7 +102,6 @@ export const TextAreaField = forwardRef<
     tooltipText,
     tabIndex = 0,
     showDeleteIcon = false,
-    hasBackgroundError = false,
     onDelete,
     borderRadius,
     padding,
@@ -129,15 +126,10 @@ export const TextAreaField = forwardRef<
 
   const TEXTAREA_FIELD = css`
     display: flex;
-    background-color: ${hasBackgroundError ? COLORS.red30 : COLORS.white};
+    background-color: ${COLORS.white};
     border-radius: ${borderRadius ?? BORDERS.borderRadius4};
     padding: ${padding ?? SPACING.spacing8};
-    border: ${
-      hasBackgroundError
-        ? 'none'
-        : `1px ${BORDERS.styleSolid}
-        ${hasError ? COLORS.red50 : COLORS.grey50}`
-    };
+    border: 1px ${BORDERS.styleSolid} ${hasError ? COLORS.red50 : COLORS.grey50};
     font-size: ${TYPOGRAPHY.fontSizeP};
     width: 100%;
     height: ${height};

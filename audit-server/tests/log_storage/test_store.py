@@ -1,16 +1,21 @@
 """Tests for the audit log store."""
 
+from pathlib import Path
+
 import pytest
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session
 
+from audit_server.log_storage.models import UserLogEntry
 from audit_server.log_storage.store import (
     LogStore,
     NoActivePeriodError,
+    NoPeriodById,
+    PeriodIsActiveError,
 )
-from audit_server.log_storage.types import StoredLog
-from audit_server.persistence.orm_models import LogPeriod
+from audit_server.log_storage.types import LogPeriodEntries, StoredLog
+from audit_server.persistence.orm_models import LogPeriod, RobotLog
 
 
 @pytest.fixture
@@ -332,3 +337,128 @@ def test_list_periods_ordered_oldest_first(
     assert periods[1].startedAt > periods[0].startedAt
     assert periods[0].endedAt is not None
     assert periods[1].endedAt is None
+
+
+def test_get_period_entries(
+    subject_with_period: LogStore,
+) -> None:
+    """It should return the period entry for the given period"""
+    periods = subject_with_period.list_periods()
+    assert len(periods) == 1
+
+    period_id = periods[0].id
+
+    log_period_entry = subject_with_period.get_period_entries(str(period_id))
+    assert isinstance(log_period_entry, LogPeriodEntries)
+    assert log_period_entry.user_log.userLogEntries == [
+        UserLogEntry(
+            message="starting tests",
+            message_hash="asdasd",
+            message_sig="ddddd",
+            sig_version="1",
+        )
+    ]
+    assert log_period_entry.user_log.startedAt is not None
+    assert log_period_entry.user_log.endedAt is None
+
+    assert log_period_entry.robot_log_entries == []
+
+
+def test_get_period_details_aggregates_entries_in_database(
+    subject_with_period: LogStore,
+    db_engine: SQLEngine,
+    tmp_path: Path,
+) -> None:
+    """It should aggregate entry count and byte size without loading entries."""
+    subject_with_period.store_log(
+        StoredLog(
+            message="héllo",
+            message_hash="hash",
+            message_sig="signature",
+            sig_version="1",
+        )
+    )
+    period_id = subject_with_period.list_periods()[0].id
+    robot_log_path = tmp_path / "robot.log"
+    robot_log_path.write_bytes(b"robot log")
+    with Session(db_engine) as session:
+        with session.begin():
+            session.add(
+                RobotLog(
+                    log_period_id=period_id,
+                    file_path=str(robot_log_path),
+                    file_hash="file hash",
+                    file_sig="file signature",
+                    file_sig_version="1",
+                )
+            )
+
+    details = subject_with_period.get_period_details(str(period_id))
+
+    assert not isinstance(details, NoPeriodById)
+    assert details.id == period_id
+    assert details.recordCount == 2
+    assert details.totalSizeBytes == (
+        len("starting tests".encode())
+        + len("héllo".encode())
+        + robot_log_path.stat().st_size
+    )
+    assert details.attachedFilenames == ["robot.log"]
+
+
+def test_get_period_details_handles_no_period(subject: LogStore) -> None:
+    """It should return an exception if no period is found."""
+    exc = subject.get_period_details("1")
+    assert isinstance(exc, NoPeriodById)
+
+
+def test_get_period_details_handles_invalid_period_id(subject: LogStore) -> None:
+    """It should return a controlled exception for a non-integer period."""
+    exc = subject.get_period_details("ghghghghg")
+    assert isinstance(exc, NoPeriodById)
+
+
+def test_delete_period_fails_if_no_period_exists(subject_with_period: LogStore) -> None:
+    """It should not delete the period if it does not exist."""
+    result = subject_with_period.delete_period("33123123123")
+    assert isinstance(result, NoPeriodById)
+    assert len(subject_with_period.list_periods()) == 1
+
+
+def test_delete_period_fails_if_period_is_active(subject_with_period: LogStore) -> None:
+    """It should not delete the period if it is active."""
+    period_id = str(subject_with_period.list_periods()[0].id)
+    result = subject_with_period.delete_period(period_id)
+    assert isinstance(result, PeriodIsActiveError)
+
+
+def test_delete_period_deletes_period(
+    subject_with_period: LogStore, db_engine: SQLEngine
+) -> None:
+    """It should delete a period and all its collateral."""
+    period_id = str(subject_with_period.list_periods()[0].id)
+    subject_with_period.store_robot_log(
+        StoredLog(
+            message="asasda",
+            message_hash="asfasdas",
+            message_sig="sdsasd",
+            sig_version="gggg",
+        ),
+        file_path=Path("some/path"),
+    )
+    subject_with_period.end_period(
+        [
+            StoredLog(
+                message="asdasd",
+                message_hash="asdasd",
+                message_sig="sdasd",
+                sig_version="55",
+            )
+        ]
+    )
+    result = subject_with_period.delete_period(period_id)
+    assert result == ["some/path"]
+    with db_engine.connect() as connection:
+        assert connection.execute(text("select * from logperiod")).all() == []
+        assert connection.execute(text("select * from logentry")).all() == []
+        assert connection.execute(text("select * from robotlog")).all() == []

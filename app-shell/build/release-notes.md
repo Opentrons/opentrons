@@ -6,15 +6,54 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 
 By installing and using Opentrons software, you agree to the Opentrons End-User License Agreement (EULA). You can view the EULA at [opentrons.com/eula](https://opentrons.com/eula).
 
-## Opentrons App Changes in 9.1.0
+## Opentrons App Changes in 10.2.0
 
-Welcome to the v9.1.0 release of the Opentrons App! This release is designed specifically for use with Opentrons Flex and includes other new features, improvements, and bug fixes.
+Welcome to the v10.2.0 release of the Opentrons App! This release introduces the Opentrons Vacuum Module, an on-deck vacuum filtration and purification module for the Opentrons Flex.
 
-**OT-2 robots will no longer appear in the Opentrons App.** v9.1.0 will prompt you to get the separate Opentrons OT-2 App, or you can download it directly from <https://opentrons.com/app>.
+---
+
+## Opentrons App Changes in 10.0.0
+
+Welcome to the v10.0.0 release of the Opentrons App! This release introduces Opentrons Flex Compliance Ready Software and includes other feature improvements.
+
+## New Features
+
+- [Opentrons Flex Compliance Ready Software](https://opentrons.com/compliance-ready-software) is additional software installed on your Flex robot by Opentrons. It permanently enables features like role-based user access and required documentation for 21 CFR part 11-ready operation, and changes how you interact with the Flex touchscreen and Opentrons App:
+  - The app and touchscreen require user login to change settings, set up and run protocols, and complete robot actions like homing the gantry.
+  - The app and touchscreen include prompts to enter required documentation after nearly every robot action.
+- Use the new file manager to download files your Flex generates, like protocol run records (for all Flex robots) or audit logs that capture user actions and documentation (for Flex robots with Opentrons Flex Compliance Ready Software). Find the file manager under your robot's settings on the Flex touchscreen or in the Opentrons App.
+- The Flex now supports external keyboards via the front USB port.
+
+### Feature Improvements
+
+- For safety, the Flex limits motion when the robot door is open. Attached pipettes and the Flex gantry will no longer move when the robot door is opened while:
+  - Pipettes are being attached, detached, or calibrated.
+  - Pipettes drop tips outside of a protocol run.
+  - Users tap or click to home the gantry or a pipette on the Flex touchscreen or in the Opentrons App.
+
+---
+
+## Opentrons App Changes in 9.1.2
+
+Welcome to the v9.1.2 release of the Opentrons App! This release resolves a bug to prevent the Flex touchscreen from freezing while selecting runtime parameters for a protocol run.
+
+---
+
+## Opentrons App Changes in 9.1.1
+
+Welcome to the v9.1.1 release of the Opentrons App! This release is designed specifically for use with Opentrons Flex and includes other new features, improvements, and bug fixes.
+
+**OT-2 robots will no longer appear in the Opentrons App.** v9.1.1 will prompt you to get the separate Opentrons OT-2 App, or you can download it directly from <https://opentrons.com/app>.
+
+You'll need to use the Opentrons App to update from the previous release (v9.0.0) to any other release. Read about other changes to software updates below.
 
 ### New Features
 
 - Use the updated Opentrons App to control and work with your Flex, including running protocols. Download the OT-2 App to control the OT-2 liquid handling robot.
+- Adds a new setting to both the Opentrons App and Flex touchscreen ("Automatically Download Updates"). On the Flex touchscreen, this is turned off by default:
+  - When turned off, robot and app updates will not automatically download.
+  - When turned on, robot app updates will automatically download, but not be installed.
+  - After downloading an update, click to install.
 - View step groups added to your protocols in [visualization](https://docs.opentrons.com/flex/opentrons-app/protocol-viz/).
 - Attach and use a keyboard (via USB) to set up quick transfer protocols, enter passwords and runtime parameters, and more in the Opentrons App.
 - Adds the ability to turn off the Flex from the Opentrons App. Under Devices, click the three-dot menu for your robot, then click to **Turn off robot**. When it's time to restart your Flex, use the power switch on the rear panel.

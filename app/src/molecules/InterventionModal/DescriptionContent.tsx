@@ -7,6 +7,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 interface NotificationProps {
   notificationHeader?: string
   notificationMessage?: string
@@ -17,9 +19,7 @@ export interface DescriptionContentProps extends NotificationProps {
   message: string | JSX.Element
 }
 
-export function DescriptionContent(
-  props: DescriptionContentProps
-): JSX.Element {
+export function DescriptionContent(props: DescriptionContentProps): ReactNode {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}

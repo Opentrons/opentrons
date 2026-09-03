@@ -10,29 +10,46 @@ from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse
 
 from opentrons import __version__
-from opentrons.config import (
-    feature_flags as ff,
+from server_utils.audit import constants as log_constants
+from server_utils.audit.audit_server import (
+    SubmitAuditLogMessageData,
+)
+from server_utils.audit.fastapi import (
+    audit_logger_middleware,
+    build_audit_client,
+    get_audit_client,
+    install_audit_client,
 )
 from server_utils.auth.resource_server.fastapi import (
-    build_authorization_checker,
-    install_authorization_checker,
+    build_authentication_checker,
+    get_authentication_checker,
+    install_authentication_checker,
 )
+from server_utils.fastapi_utils.app_state import AppState
 from server_utils.fastapi_utils.server_timing_middleware import server_timing_middleware
 
+from .access_control.settings.store import get_access_control_setting_store
 from .errors.exception_handlers import exception_handlers
 from .hardware import (
     FrontButtonLightBlinker,
     clean_up_hardware,
-    get_hardware_state_store,
     start_initializing_hardware,
 )
 from .persistence.fastapi_dependencies import (
     clean_up_persistence,
+    get_active_persistence_directory,
+    get_sql_engine,
     initialize_images_directory,
     start_initializing_persistence,
 )
+from .protocols.dependencies import (
+    get_protocol_directory,
+    get_protocol_reader,
+    get_protocol_store,
+)
 from .router import router
 from .runs.dependencies import (
+    get_run_store,
     mark_light_control_startup_finished,
     set_up_run_process_pyro_provider,
     start_light_control_task,
@@ -43,12 +60,8 @@ from .service.notifications import (
     set_up_notification_client,
 )
 from .service.pyro_utils.pyro_resource import start_initializing_pyro_resource
-from .service.pyro_utils.resource_utilities import (
-    register_hardware_state_store_to_pyro_resource,
-)
 from .service.task_runner import set_up_task_runner
 from .settings import RobotServerSettings, get_settings
-from robot_server.service.pyro_utils.resource_utilities import get_pyro_resource
 
 _REDOC_CDN_URL = "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js"
 
@@ -72,9 +85,12 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
         blinker = FrontButtonLightBlinker()
         exit_stack.push_async_callback(blinker.clean_up)
+        # Always make an empty Robot Server Pyro Resource, and populate if appropriate
+        pyro_task = start_initializing_pyro_resource(app_state=app.state)
 
         start_initializing_hardware(
             app_state=app.state,
+            pyro_task=pyro_task,
             callbacks=[
                 # Flex light control:
                 (start_light_control_task, True),
@@ -103,44 +119,34 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         start_initializing_persistence(
             app_state=app.state,
             persistence_directory_root=persistence_directory,
-            done_callbacks=[
-                # For OT-2 light control only. The Flex status bar isn't handled here
-                # because it's currently tied to hardware and run status, not to
-                # initialization of the persistence layer.
-                blinker.mark_persistence_init_complete
-            ],
+            done_callbacks=[_report_unsigned_runs],
         )
         exit_stack.push_async_callback(clean_up_persistence, app.state)
 
-        authorization_checker = await exit_stack.enter_async_context(
-            build_authorization_checker(
+        authentication_checker = await exit_stack.enter_async_context(
+            build_authentication_checker(
                 auth_server_uds=settings.auth_server_uds,
                 auth_server_url=settings.auth_server_url,
             )
         )
-        install_authorization_checker(app.state, authorization_checker)
+        install_authentication_checker(app.state, authentication_checker)
+
+        audit_client = await exit_stack.enter_async_context(
+            build_audit_client(
+                audit_server_uds=settings.audit_server_uds,
+                audit_server_url=settings.audit_server_url,
+            )
+        )
+        install_audit_client(app.state, audit_client)
 
         exit_stack.enter_context(set_up_notification_client(app.state))
         initialize_pe_publisher_notifier(app.state)
 
-        # Always make an empty Robot Server Pyro Resource, and populate if appropriate
-        start_initializing_pyro_resource(app_state=app.state)
-
-        # Register the hardware state callback for pyro
-        # Must happen after completing both the hardware API initialization and the pyro resource setup
-        if ff.hardware_subprocess_enabled():
-            hardware_store = get_hardware_state_store(app.state)
-            register_hardware_state_store_to_pyro_resource(
-                app_state=app.state, hardware_store=hardware_store
-            )
-            pyro_resource_proxy = get_pyro_resource()
-            hardware_store.register_proxy_hardware_status_callback(
-                pyro_resource_proxy.create_hardware_state_update_callback()
-            )
-
         # Start the run process pyro provider so a process is ready when a run starts
         await exit_stack.enter_async_context(
-            set_up_run_process_pyro_provider(app.state)
+            set_up_run_process_pyro_provider(
+                app.state, await authentication_checker.access_control_status()
+            )
         )
 
         yield  # Start handling HTTP requests.
@@ -192,7 +198,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+app.middleware("http")(audit_logger_middleware)
 app.middleware("http")(server_timing_middleware())
 
 # main router
@@ -204,3 +210,53 @@ def _get_persistence_directory(settings: RobotServerSettings) -> Optional[Path]:
         return None
     else:
         return settings.persistence_directory
+
+
+async def _report_unsigned_runs(
+    app_state: AppState,
+) -> None:
+    """If access control enabled and run signoff required, log any unsigned runs."""
+    access_control_status = await get_authentication_checker(
+        app_state
+    ).access_control_status()
+    if not access_control_status:
+        return
+
+    sql_engine = await get_sql_engine(app_state)
+    access_control_settings_store = await get_access_control_setting_store(sql_engine)
+    if not access_control_settings_store.get_all().requireSignoffForProtocolLog:
+        return
+
+    run_store = await get_run_store(app_state, sql_engine)
+    unsigned_runs = [run for run in run_store.get_all() if run.signed_by is None]
+
+    if not unsigned_runs:
+        return
+
+    persistence_directory = await get_active_persistence_directory(app_state)
+    protocol_directory = await get_protocol_directory(app_state, persistence_directory)
+    protocol_store = await get_protocol_store(
+        app_state, sql_engine, protocol_directory, get_protocol_reader()
+    )
+
+    message = f"{len(unsigned_runs)} unsigned runs found in run history:"
+    for unsigned_run in unsigned_runs:
+        if unsigned_run.protocol_id is None:
+            message += f" run with no protocol created at {unsigned_run.created_at};"
+        else:
+            protocol = protocol_store.get(protocol_id=unsigned_run.protocol_id)
+            message += (
+                f" run for {protocol.source.main_file.name} ({protocol.source.content_hash})"
+                f" created at {unsigned_run.created_at};"
+            )
+
+    audit_client = get_audit_client(app_state)
+    await audit_client.submit_log_message(
+        SubmitAuditLogMessageData(
+            action=log_constants.ACTION_UNSIGNED_RUNS_WARNING,
+            accountName=log_constants.ACCOUNT_NAME_SYSTEM,
+            legalName=log_constants.LEGAL_NAME_SYSTEM,
+            message=message,
+            reason=None,
+        )
+    )

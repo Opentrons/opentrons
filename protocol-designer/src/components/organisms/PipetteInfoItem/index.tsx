@@ -17,6 +17,7 @@ import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 
+import type { ReactNode } from 'react'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 
 interface PipetteInfoItemProps {
@@ -27,7 +28,7 @@ interface PipetteInfoItemProps {
   cleanForm: () => void
 }
 
-export function PipetteInfoItem(props: PipetteInfoItemProps): JSX.Element {
+export function PipetteInfoItem(props: PipetteInfoItemProps): ReactNode {
   const { mount, pipetteName, tiprackDefURIs, editClick, cleanForm } = props
   const { t, i18n } = useTranslation('onboarding')
   const allLabware = useSelector(getLabwareDefsByURI)

@@ -21,7 +21,7 @@ export interface OneColumnOrTwoColumnProps extends StyleProps {
 export function OneColumnOrTwoColumn({
   children: [leftOrSingleElement, optionallyDisplayedRightElement],
   ...styleProps
-}: OneColumnOrTwoColumnProps): JSX.Element {
+}: OneColumnOrTwoColumnProps): ReactNode {
   return (
     <Flex
       flexDirection={DIRECTION_ROW}

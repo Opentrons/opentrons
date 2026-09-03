@@ -1,7 +1,5 @@
 """Testing suite for the RobotServerPyroResource."""
 
-import asyncio
-import inspect
 import socket
 import threading
 from typing import cast
@@ -25,13 +23,10 @@ from opentrons.protocol_engine.resources.file_provider import (
     FileProvider,
     UserDefinedCSVCmdFileNameMetadata,
 )
-from opentrons.util.pyro.pyro_client_async_adapter import (
-    AsyncClientPyroObject,
-    ClientPyroFunctionWrapper,
-)
+from opentrons.util.pyro.pyro_client_async_adapter import ClientPyroFunctionWrapper
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
+from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
 from opentrons_shared_data.data_files import DataFileInfo, MimeType
-from opentrons_shared_data.robot.types import RobotTypeEnum
 from server_utils.fastapi_utils.app_state import AppState
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
@@ -52,18 +47,6 @@ TEST_PYRO_TIMEOUT = 5
 
 
 @pytest.fixture
-def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
-        params = inspect.getfullargspec(func)
-        mock_get_ff = decoy.mock(func=func)
-        if any("robot_type" in p for p in params.args):
-            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
-        else:
-            decoy.when(mock_get_ff()).then_return(False)
-        monkeypatch.setattr(feature_flags, name, mock_get_ff)
-
-
-@pytest.fixture
 def ot3_hardware_api(decoy: Decoy, request: pytest.FixtureRequest) -> OT3API:
     """Get a mocked out OT3API."""
     request.node.add_marker("ot3_only")
@@ -79,7 +62,7 @@ def ot3_hardware_api(decoy: Decoy, request: pytest.FixtureRequest) -> OT3API:
 
 @pytest.fixture
 def mock_app_state(decoy: Decoy) -> AppState:
-    """Get a mock DataFilesStore."""
+    """Get a mock AppState."""
     return decoy.mock(cls=AppState)
 
 
@@ -133,21 +116,10 @@ async def _host_pyro_nameserver_and_ot3api(
     # Client-side requests below
     register_hardware_types()
     name_server_ready.wait(timeout=TEST_PYRO_TIMEOUT)
-    ns = pyro.locate_ns()
-
-    retries_counter = 0
-    while ns.count() < 3:
-        # Wait and try again, the resource isnt registered yet
-        await asyncio.sleep(0.01)
-        retries_counter += 1
-        if retries_counter > 10:
-            # Stop waiting for the nameserver, will fail on pyro.resolve (something is wrong with nameserver and/or daemon)
-            raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
-
-    uri = pyro.resolve(uri="PYRONAME:OT3API")
-    ot3_proxy = pyro.Proxy(uri)  # type: ignore
-    ot3_async = AsyncClientPyroObject(ot3_proxy)
-    rs_async = resource_utilities.get_pyro_resource()
+    ot3_async = await wait_for_proxy(proxy_name="OT3API", broadcast_mode=False)
+    if ot3_async is None:
+        raise TimeoutError("TEST FAILURE ON PYRO NAMESERVER.")
+    rs_async = await resource_utilities.get_pyro_resource()
 
     return (ot3_async, rs_async)
 
@@ -176,6 +148,7 @@ async def test_run_hardware_event_callback(
         robot_type="OT-3 Standard",
         deck_type=DeckType("ot3_standard"),
         run_process_pyro_provider=mock_run_process_pyro_provider,
+        access_control_status=False,
     )
 
     resource_utilities.register_run_orchestrator_store_to_pyro_resource(
@@ -381,13 +354,16 @@ async def test_run_hardware_state_update_callback(
         robot_type="OT-3 Standard",
         deck_type=DeckType("ot3_standard"),
         run_process_pyro_provider=mock_run_process_pyro_provider,
+        access_control_status=False,
     )
 
     resource_utilities.register_run_orchestrator_store_to_pyro_resource(
         mock_app_state, run_store
     )
 
-    hardware_store = HardwareStateStore(hardware_resource=ot3_hardware_api)
+    hardware_store = await HardwareStateStore.build(
+        hardware_resource=ot3_hardware_api, app_state=mock_app_state
+    )
 
     resource_utilities.register_hardware_state_store_to_pyro_resource(
         mock_app_state, hardware_store

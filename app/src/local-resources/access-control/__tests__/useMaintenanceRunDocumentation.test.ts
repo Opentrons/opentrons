@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   useAccessControlEnabledQuery,
-  useAuthSettingsQuery,
+  useAuditSettingsQuery,
 } from '@opentrons/react-api-client'
 
 import {
@@ -25,7 +25,7 @@ import type {
 } from '@opentrons/react-api-client'
 
 vi.mock('@opentrons/react-api-client', () => ({
-  useAuthSettingsQuery: vi.fn(),
+  useAuditSettingsQuery: vi.fn(),
   useAccessControlEnabledQuery: vi.fn(),
 }))
 
@@ -76,14 +76,14 @@ describe('isDocumentationProvided', () => {
 
 describe('useMaintenanceRunDocumentation', () => {
   beforeEach(() => {
-    vi.mocked(useAuthSettingsQuery).mockReturnValue({
+    vi.mocked(useAuditSettingsQuery).mockReturnValue({
       data: {
         data: {
           requireReasonForInteraction: true,
           minLengthOfReasonForInteraction: 10,
         },
       },
-    } as ReturnType<typeof useAuthSettingsQuery>)
+    } as ReturnType<typeof useAuditSettingsQuery>)
     vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
       data: {
         data: {

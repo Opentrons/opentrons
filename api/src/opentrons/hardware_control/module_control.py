@@ -137,6 +137,22 @@ class AttachedModulesControl:
     def available_peripherals(self) -> List[peripherals.AbstractPeripheral]:
         return self._available_peripherals
 
+    def _dedupe_available_modules(self, new_mod: modules.AbstractModule) -> None:
+        """
+        Remove any existing entry in _available_modules that shares new_mod's
+        serial, then append new_mod and re-sort.
+        """
+        if not self._api.is_simulator:
+            serial = new_mod.serial_number
+            if serial is not None:
+                self._available_modules = [
+                    m for m in self._available_modules if m.serial_number != serial
+                ]
+        self._available_modules.append(new_mod)
+        self._available_modules = sorted(
+            self._available_modules, key=modules.AbstractModule.sort_key
+        )
+
     async def clean_up(self) -> None:
         """Clean up all registered modules and emulator scanning tasks (if any)."""
         for module in self._available_modules:
@@ -164,10 +180,7 @@ class AttachedModulesControl:
         )
         if isinstance(type, modules.ModuleType):
             assert isinstance(device, modules.AbstractModule)
-            self._available_modules.append(device)
-            self._available_modules = sorted(
-                self._available_modules, key=modules.AbstractModule.sort_key
-            )
+            self._dedupe_available_modules(device)
         else:
             assert isinstance(device, peripherals.AbstractPeripheral)
             self._available_peripherals.append(device)
@@ -258,43 +271,42 @@ class AttachedModulesControl:
 
     async def _clear_old_modules(self) -> None:
         async with self._use_reconnect_lock():
-            for old_mod in self._recently_removed_modules:
+            for old_mod in list(self._recently_removed_modules):
                 # Important: this wants to be after the remove because this may trigger
                 # recursion back to here; we therefore want the module to already be
                 # removed so that the recursion terminates next loop
                 old_mod.disconnected_callback()
                 log.info(f"did not find {old_mod.serial_number}")
-                self._recently_removed_modules.remove(old_mod)
+                if old_mod in self._recently_removed_modules:
+                    self._recently_removed_modules.remove(old_mod)
                 await old_mod.cleanup()
+
+    async def _reconnect_single_module(self, old_mod: modules.AbstractModule) -> None:
+        """Find an attached module matching old_mod's serial and swap it in."""
+        for attached_mod in list(self._available_modules):
+            if attached_mod.serial_number != old_mod.serial_number:
+                continue
+            log.info(f"Found {old_mod.serial_number} was reconnected")
+            # Stop the new instance's poller/connection before reopening on old_mod.
+            await attached_mod.soft_cleanup()
+            # Stop the parked instance on the old path before rebinding.
+            await old_mod.soft_cleanup()
+            if attached_mod.port != old_mod.port:
+                log.info(f"module moved from {old_mod.port} to {attached_mod.port}")
+                await old_mod.move_port(attached_mod.port, attached_mod.usb_port)
+                log.info("Module port migration complete.")
+            await old_mod.attempt_reconnect()
+            log.info("Module reconnection complete.")
+            if old_mod in self._recently_removed_modules:
+                self._recently_removed_modules.remove(old_mod)
+            self._dedupe_available_modules(old_mod)
+            break
 
     async def _reconnect_patch(self) -> None:
         try:
-            for old_mod in self._recently_removed_modules:
+            for old_mod in list(self._recently_removed_modules):
                 log.info(f"Attempting to find and reconect {old_mod.serial_number}")
-                for attached_mod in self._available_modules:
-                    if attached_mod.serial_number == old_mod.serial_number:
-                        log.info(f"Found {old_mod.serial_number} was reconnected")
-                        # Move the port before cleaning up the old instance.
-                        # this will give it a chance to successfully retry sending whatever command
-                        # if it was disconnected in the middle of sending a command.
-                        # if it was in the middle of sending a command, it cant cleanup until that retry loop
-                        # succeeds or hits its limit
-                        if attached_mod.port != old_mod.port:
-                            log.info(
-                                f"module moved from {old_mod.port} to {attached_mod.port}"
-                            )
-                            await old_mod.move_port(
-                                attached_mod.port, attached_mod.usb_port
-                            )
-                        await attached_mod.soft_cleanup()
-                        await old_mod.soft_cleanup()
-                        await old_mod.attempt_reconnect()
-                        self._available_modules.remove(attached_mod)
-                        self._available_modules.append(old_mod)
-                        self._recently_removed_modules.remove(old_mod)
-                        self._available_modules = sorted(
-                            self._available_modules, key=modules.AbstractModule.sort_key
-                        )
+                await self._reconnect_single_module(old_mod)
         except BaseException:
             log.exception("Encountered an error during reconnect attempt.")
 
@@ -394,7 +406,7 @@ class AttachedModulesControl:
                     )
                 else:
                     assert isinstance(new_instance, modules.AbstractModule)
-                    self._available_modules.append(new_instance)
+                    self._dedupe_available_modules(new_instance)
                     log.info(
                         f"Module {device.name} discovered and attached"
                         f" at port {device.port}, new_instance: {new_instance}"

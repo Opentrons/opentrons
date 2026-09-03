@@ -17,6 +17,8 @@ import { FullKeyboard } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import type { Store, StoreEnhancer } from 'redux'
+import type { ReactNode } from 'react'
+import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
 const dummyConfig = {
   config: {
@@ -48,27 +50,32 @@ export default meta
 
 type Story = StoryObj<typeof FullKeyboard>
 
-const Keyboard = (): JSX.Element => {
+const Keyboard = (): ReactNode => {
   const [showKeyboard, setShowKeyboard] = useState(false)
   const [value, setValue] = useState<string>('')
-  const keyboardRef = useRef(null)
+  const keyboardRef = useRef<KeyboardReactInterface | null>(null)
+  const inputElementRef = useRef<HTMLInputElement>(null)
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
       <form id="test_form">
         <InputField
+          ref={inputElementRef}
           value={value}
           type="text"
           placeholder="When focusing, the keyboard shows up"
-          // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-          onFocus={() => setShowKeyboard(true)}
+          onFocus={() => {
+            setShowKeyboard(true)
+          }}
+          onChange={e => {
+            setValue(e.target.value)
+          }}
         />
       </form>
       <Flex position={POSITION_ABSOLUTE} top="20%" left="0" width="64rem">
         {showKeyboard && (
           <FullKeyboard
-            // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-            onChange={e => e != null && setValue(String(e))}
             keyboardRef={keyboardRef}
+            inputElementRef={inputElementRef}
           />
         )}
       </Flex>

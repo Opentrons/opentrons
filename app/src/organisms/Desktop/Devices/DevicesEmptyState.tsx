@@ -21,10 +21,12 @@ import {
 
 import { startDiscovery } from '/app/redux/discovery'
 
+import type { ReactNode } from 'react'
+
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/s/article/Troubleshooting-connection-problems'
 
-export function DevicesEmptyState(): JSX.Element {
+export function DevicesEmptyState(): ReactNode {
   const { t } = useTranslation('devices_landing')
   const dispatch = useDispatch()
 
@@ -42,7 +44,6 @@ export function DevicesEmptyState(): JSX.Element {
           forwardedAs="h1"
           fontWeight={FONT_WEIGHT_REGULAR}
           paddingBottom={SPACING.spacing16}
-          id="DevicesEmptyState_noRobotsFound"
           marginTop="20vh"
         >
           {t('no_robots_found')}
@@ -50,7 +51,6 @@ export function DevicesEmptyState(): JSX.Element {
         <Box paddingBottom={SPACING.spacing16}>
           <PrimaryButton
             onClick={handleRefresh}
-            id="DevicesEmptyState_refreshButton"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
           >
             {t('refresh')}
@@ -74,7 +74,6 @@ export function DevicesEmptyState(): JSX.Element {
           href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
           display={DISPLAY_FLEX}
           alignItems={ALIGN_CENTER}
-          id="DevicesEmptyState_troubleshootingConnectionProblems"
         >
           {t('troubleshooting_connection_problems')}
           <Icon

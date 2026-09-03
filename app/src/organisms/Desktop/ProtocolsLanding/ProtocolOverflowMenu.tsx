@@ -33,7 +33,7 @@ import {
 
 import { ConfirmDeleteProtocolModal } from './ConfirmDeleteProtocolModal'
 
-import type { MouseEvent, MouseEventHandler } from 'react'
+import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
 import type { StoredProtocolData } from '/app/redux/protocol-storage'
 import type { Dispatch } from '/app/redux/types'
@@ -47,7 +47,7 @@ interface ProtocolOverflowMenuProps extends StyleProps {
 
 export function ProtocolOverflowMenu(
   props: ProtocolOverflowMenuProps
-): JSX.Element {
+): ReactNode {
   const {
     storedProtocolData,
     handleRunProtocol,

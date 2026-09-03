@@ -1,22 +1,36 @@
 """Code for managing log storage and export."""
 
 from datetime import datetime, timezone
+from pathlib import Path
 
-from sqlalchemy import select
+from sqlalchemy import LargeBinary, cast, delete, func, select
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session, sessionmaker
 
-from .models import LogPeriodSummary
-from .types import StoredLog
-from audit_server.persistence.orm_models import LogEntry, LogPeriod
+from .models import (
+    LogPeriodDetails,
+    LogPeriodSummary,
+    UserLogEntry,
+    UserLogForExport,
+)
+from .types import LogPeriodEntries, RobotLogPaths, StoredLog
+from audit_server.persistence.orm_models import LogEntry, LogPeriod, RobotLog
 
 
 class NoLogInPeriodError(Exception):
     """A log period has no logs associated."""
 
 
+class NoPeriodById(Exception):
+    """There is no log period associated with given ID."""
+
+
 class NoActivePeriodError(Exception):
     """There is no currently-active log period."""
+
+
+class PeriodIsActiveError(Exception):
+    """The log period is active and may not be deleted."""
 
 
 class LogStore:
@@ -67,6 +81,72 @@ class LogStore:
         session.add(entry)
         session.add(log_period)
         return log.message_hash
+
+    def store_robot_log(self, robot_log: StoredLog, file_path: Path) -> str:
+        """Store a log period."""
+        with self._session() as session:
+            with session.begin():
+                current_period = self._current_period(session)
+                if not isinstance(current_period, LogPeriod):
+                    raise current_period
+                return self._do_store_robot_log(
+                    session, robot_log, file_path, current_period
+                )
+
+    def _do_store_robot_log(
+        self,
+        session: Session,
+        robot_log: StoredLog,
+        file_path: Path,
+        log_period: LogPeriod,
+    ) -> str:
+        entry = RobotLog(
+            log_period=log_period,
+            file_path=str(file_path),
+            file_hash=robot_log.message_hash,
+            file_sig=robot_log.message_sig,
+            file_sig_version=robot_log.sig_version,
+        )
+
+        session.add(entry)
+        session.add(log_period)
+
+        return robot_log.message_hash
+
+    def delete_period(
+        self, period_id: str
+    ) -> list[str] | NoPeriodById | PeriodIsActiveError:
+        """Delete a period. May not be active and must exist."""
+        try:
+            findable_id = int(period_id)
+        except Exception:
+            return NoPeriodById()
+        with self._session() as session:
+            with session.begin():
+                found_period = session.scalar(
+                    select(LogPeriod).where(LogPeriod.id == findable_id)
+                )
+                if found_period is None:
+                    return NoPeriodById()
+                if found_period.ended_at is None:
+                    return PeriodIsActiveError()
+
+                logs_delete_query = delete(LogEntry).where(
+                    LogEntry.log_period_id == findable_id
+                )
+                robot_log_paths = [
+                    robot_log.file_path for robot_log in found_period.robot_logs
+                ]
+                robot_logs_delete_query = delete(RobotLog).where(
+                    RobotLog.log_period_id == findable_id
+                )
+                log_period_delete_query = delete(LogPeriod).where(
+                    LogPeriod.id == findable_id
+                )
+                session.execute(logs_delete_query)
+                session.execute(robot_logs_delete_query)
+                session.execute(log_period_delete_query)
+                return robot_log_paths
 
     def end_period(self, end_period_logs: list[StoredLog]) -> str | NoActivePeriodError:
         """End a period, with the required end message and some previous supplemental messages.
@@ -147,6 +227,95 @@ class LogStore:
                 return latest_record
             return latest_record.message_hash
 
+    def get_period_entries(self, period_id: str) -> LogPeriodEntries | NoPeriodById:
+        """Get the given log period's user and robot log entries."""
+        with self._session() as session:
+            try:
+                log_period = session.scalar(
+                    select(LogPeriod).where(LogPeriod.id == int(period_id))
+                )
+            # This will raise if `period_id` is not an int
+            except ValueError:
+                return NoPeriodById()
+            if log_period is None:
+                return NoPeriodById()
+            user_log_entries = [
+                UserLogEntry(
+                    message=user_log.message,
+                    message_hash=user_log.message_hash,
+                    message_sig=user_log.message_sig,
+                    sig_version=user_log.sig_version,
+                )
+                for user_log in log_period.log_entries
+            ]
+            robot_log_entries = [
+                RobotLogPaths(
+                    file_path=robot_log.file_path,
+                    file_hash=robot_log.file_hash,
+                    file_sig=robot_log.file_sig,
+                    file_sig_version=robot_log.file_sig_version,
+                )
+                for robot_log in log_period.robot_logs
+            ]
+            return LogPeriodEntries(
+                user_log=UserLogForExport(
+                    userLogEntries=user_log_entries,
+                    startedAt=log_period.started_at,
+                    endedAt=log_period.ended_at,
+                ),
+                robot_log_entries=robot_log_entries,
+            )
+
+    def get_period_details(self, period_id: str) -> LogPeriodDetails | NoPeriodById:
+        """Get aggregate details for a log period without loading its log entries."""
+        try:
+            parsed_period_id = int(period_id)
+        except ValueError:
+            return NoPeriodById()
+
+        with self._session() as session:
+            details = session.execute(
+                select(
+                    LogPeriod.id,
+                    LogPeriod.started_at,
+                    LogPeriod.ended_at,
+                    func.count(LogEntry.id),
+                    func.coalesce(
+                        func.sum(func.length(cast(LogEntry.message, LargeBinary))), 0
+                    ),
+                )
+                .outerjoin(LogEntry, LogEntry.log_period_id == LogPeriod.id)
+                .where(LogPeriod.id == parsed_period_id)
+                .group_by(
+                    LogPeriod.id,
+                    LogPeriod.started_at,
+                    LogPeriod.ended_at,
+                )
+            ).one_or_none()
+            if details is None:
+                return NoPeriodById()
+
+            robot_log_paths = session.scalars(
+                select(RobotLog.file_path).where(
+                    RobotLog.log_period_id == parsed_period_id
+                )
+            ).all()
+            total_size_bytes = details[4]
+            for robot_log_path in robot_log_paths:
+                try:
+                    total_size_bytes += Path(robot_log_path).stat().st_size
+                except OSError:
+                    pass
+
+            return LogPeriodDetails(
+                id=str(details[0]),
+                startedAt=details[1],
+                endedAt=details[2],
+                recordCount=details[3],
+                totalSizeBytes=total_size_bytes,
+                attachedFilenames=[Path(path).name for path in robot_log_paths],
+            )
+
     def list_periods(self) -> list[LogPeriodSummary]:
         """Return all log periods, oldest first, with their entry IDs in ordinal order."""
         with self._session() as session:
@@ -155,7 +324,7 @@ class LogStore:
             ).all()
             return [
                 LogPeriodSummary(
-                    id=period.id,
+                    id=str(period.id),
                     startedAt=period.started_at,
                     endedAt=period.ended_at,
                 )

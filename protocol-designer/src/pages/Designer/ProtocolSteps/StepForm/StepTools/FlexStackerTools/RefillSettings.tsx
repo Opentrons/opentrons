@@ -22,6 +22,7 @@ import styles from './flexstackertools.module.css'
 import { MessageField } from './MessageField'
 import { StackerContentItem } from './StackerContentItem'
 
+import type { ReactNode } from 'react'
 import type {
   FlexStackerModuleState,
   LabwareEntity,
@@ -38,7 +39,7 @@ interface RefillSettingsProps {
   showFormErrors: boolean
 }
 
-export function RefillSettings(props: RefillSettingsProps): JSX.Element {
+export function RefillSettings(props: RefillSettingsProps): ReactNode {
   const {
     formData,
     propsForFields,

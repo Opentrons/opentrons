@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
@@ -33,14 +33,16 @@ import {
   getLabwareInfoByLiquidId,
   getLabwareLiquidRenderInfoFromStack,
   getModuleFromStack,
-  getSortedStartingDeckEntries,
   getStackedItemsOnStartingDeck,
+  getStacksWithLabware,
   HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { SmallButton, TouchFloatingActionButton } from '/app/atoms/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
+import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { getOffDeckRenderGroups } from '/app/resources/protocols/utils/getOffDeckRenderGroups'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
@@ -52,7 +54,7 @@ import {
 import { LabwareMapView } from './LabwareMapView'
 import { SetupLabwareStackView } from './SetupLabwareStackView'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { UseQueryResult } from 'react-query'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
 import type {
@@ -80,7 +82,7 @@ export function ProtocolSetupLabware({
   setSetupScreen,
   isConfirmed,
   setIsConfirmed,
-}: ProtocolSetupLabwareProps): JSX.Element {
+}: ProtocolSetupLabwareProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
   const [showMapView, setShowMapView] = useState<boolean>(true)
   const [selectedLabwareStack, setSelectedLabwareStack] = useState<
@@ -99,14 +101,21 @@ export function ProtocolSetupLabware({
         mostRecentAnalysis?.labware ?? [],
         mostRecentAnalysis?.modules ?? []
       ),
-    [mostRecentAnalysis]
+    [
+      mostRecentAnalysis?.commands,
+      mostRecentAnalysis?.labware,
+      mostRecentAnalysis?.modules,
+    ]
   )
   const labwareByLiquidId = useMemo(
     () => getLabwareInfoByLiquidId(mostRecentAnalysis?.commands ?? []),
-    [mostRecentAnalysis]
+    [mostRecentAnalysis?.commands]
   )
   const sortedStartingDeckEntries = useMemo(
-    () => getSortedStartingDeckEntries(startingDeck),
+    () =>
+      Object.entries(getStacksWithLabware(startingDeck))
+        .filter(([location]) => location !== 'offDeck')
+        .sort(([locationA], [locationB]) => locationA.localeCompare(locationB)),
     [startingDeck]
   )
   const offDeckItems = useMemo(
@@ -146,6 +155,19 @@ export function ProtocolSetupLabware({
     [attachedModules, protocolModulesInfo, deckConfig]
   )
 
+  const handleProceed = useHandleAndLog(
+    () => {
+      setIsConfirmed(true)
+      setSetupScreen('prepare to run')
+    },
+    'confirm_placements',
+    {
+      action: 'confirmed liquid and labware placements',
+      message:
+        'user confirmed liquid and labware placements before running protocol',
+    }
+  )
+
   return (
     <>
       {selectedLabwareStack != null && mostRecentAnalysis != null ? (
@@ -180,10 +202,7 @@ export function ProtocolSetupLabware({
             ) : (
               <SmallButton
                 buttonText={t('confirm_placements')}
-                onClick={() => {
-                  setIsConfirmed(true)
-                  setSetupScreen('prepare to run')
-                }}
+                onClick={handleProceed}
                 buttonCategory="rounded"
               />
             )}
@@ -214,23 +233,23 @@ export function ProtocolSetupLabware({
                     </StyledText>
                   </Flex>
                 </Flex>
-                {sortedStartingDeckEntries.map(({ location, stack }, index) => (
+                {sortedStartingDeckEntries.map(([key, value]) => (
                   <RowLabware
-                    key={`${location}_${index}`}
+                    key={key}
                     attachedProtocolModules={attachedProtocolModuleMatches}
                     refetchModules={moduleQuery.refetch}
-                    slotName={location}
-                    stackedItems={stack}
+                    slotName={key}
+                    stackedItems={value}
                     labwareByLiquidId={labwareByLiquidId}
                     onClick={setSelectedLabwareStack}
                   />
                 ))}
-                {offDeckItems?.map((item, index) => (
+                {offDeckItems.map(item => (
                   <RowLabware
-                    key={index}
+                    key={item.representativeItem.labwareId}
                     attachedProtocolModules={attachedProtocolModuleMatches}
                     refetchModules={moduleQuery.refetch}
-                    slotName={'offDeck'}
+                    slotName="offDeck"
                     offDeckQuantity={item.quantity}
                     stackedItems={item.stackedItems}
                     labwareByLiquidId={labwareByLiquidId}
@@ -269,10 +288,11 @@ interface LabwareLatchProps {
 function LabwareLatch({
   matchedHeaterShaker,
   refetchModules,
-}: LabwareLatchProps): JSX.Element {
+}: LabwareLatchProps): ReactNode {
   const { t } = useTranslation(['heater_shaker', 'protocol_setup'])
+  const documentationState = useDocumentationState()
   const { createLiveCommand, isLoading: isLiveCommandLoading } =
-    useCreateLiveCommandMutation()
+    useCreateLiveCommandMutation(documentationState)
   const [isRefetchingModules, setIsRefetchingModules] = useState(false)
   const isLatchLoading =
     isLiveCommandLoading ||
@@ -509,7 +529,7 @@ function RowLabware({
           {labwareLiquidRenderInfo.map((labware, index) => {
             const quantityTag = offDeckQuantity ?? labware.quantity
             return (
-              <>
+              <Fragment key={labware.labwareId}>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing4}
@@ -565,7 +585,7 @@ function RowLabware({
                     />
                   ) : null}
                 </Flex>
-              </>
+              </Fragment>
             )
           })}
         </Flex>

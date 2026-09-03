@@ -13,10 +13,10 @@ import {
 } from '@opentrons/components'
 
 import { TertiaryButton } from '/app/atoms/buttons'
-import { useDownloadCalibrationData } from '/app/organisms/Desktop/Devices/hooks'
+import { useDownloadCalibrationData } from '/app/resources/devices/hooks'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 
 // TODO(bc, 2022-02-08): replace with support article when available
 const FLEX_CALIBRATION_SUPPORT_URL = 'https://support.opentrons.com'
@@ -31,14 +31,14 @@ interface CalibrationDataDownloadProps {
 export function CalibrationDataDownload({
   robotName,
   setShowHowCalibrationWorksModal,
-}: CalibrationDataDownloadProps): JSX.Element {
+}: CalibrationDataDownloadProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'robot_calibration'])
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
   const { downloadCalibration } = useDownloadCalibrationData(robotName)
 
   const onClickSaveAs: MouseEventHandler = e => {
     e.preventDefault()
-    downloadCalibration()
+    void downloadCalibration()
   }
 
   return (

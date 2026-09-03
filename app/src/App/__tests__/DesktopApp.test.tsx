@@ -1,7 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -24,7 +23,6 @@ import { AlertsModal } from '/app/organisms/Desktop/Alerts/AlertsModal'
 
 import { ProtocolVisualization } from '/app/pages/Desktop/Protocols/ProtocolVisualization'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
-import { useFeatureFlag } from '/app/redux/config'
 
 import { DesktopApp } from '../DesktopApp'
 import { useSoftwareUpdatePoll } from '../hooks/useSoftwareUpdatePoll'
@@ -49,6 +47,12 @@ vi.mock('/app/redux/config')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../hooks/useSoftwareUpdatePoll')
 vi.mock('/app/pages/Desktop/Protocols/ProtocolVisualization')
+vi.mock('/app/resources/devices/hooks/useTrackRobotRestarts', () => ({
+  useTrackRobotRestarts: vi.fn(),
+}))
+vi.mock('/app/resources/robot-update/RobotUpdateProvider', () => ({
+  RobotUpdateProvider: ({ children }: { children: JSX.Element }) => children,
+}))
 
 const render = (path = '/') => {
   return renderWithProviders<State>(
@@ -98,7 +102,6 @@ describe('DesktopApp', () => {
     vi.mocked(LocalizationProvider).mockImplementation(
       (props: LocalizationProviderProps) => <>{props.children}</>
     )
-    when(vi.mocked(useFeatureFlag)).calledWith('reactScan').thenReturn(false)
   })
   afterEach(() => {
     vi.resetAllMocks()

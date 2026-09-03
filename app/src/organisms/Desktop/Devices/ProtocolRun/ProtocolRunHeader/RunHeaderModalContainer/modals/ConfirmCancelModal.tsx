@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import {
-  AlertPrimaryButton,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
@@ -12,6 +11,7 @@ import {
   LegacyStyledText,
   Link,
   Modal,
+  PrimaryButton,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -24,7 +24,7 @@ import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { RunStatus } from '@opentrons/api-client'
 
 export interface UseConfirmCancelModalResult {
@@ -49,9 +49,7 @@ export interface ConfirmCancelModalProps {
   runStatus: RunStatus | null
 }
 
-export function ConfirmCancelModal(
-  props: ConfirmCancelModalProps
-): JSX.Element {
+export function ConfirmCancelModal(props: ConfirmCancelModalProps): ReactNode {
   const { onClose, runId, robotName, runStatus } = props
   const documentationState = useDocumentationState()
   const { stopRun } = useStopRunMutation(documentationState)
@@ -108,7 +106,8 @@ export function ConfirmCancelModal(
               {t('cancel_run_modal_back')}
             </Link>
           )}
-          <AlertPrimaryButton
+          <PrimaryButton
+            variant="warning"
             onClick={cancelRun}
             disabled={isCanceling}
             minWidth="8rem"
@@ -118,7 +117,7 @@ export function ConfirmCancelModal(
             ) : (
               t('cancel_run_modal_confirm')
             )}
-          </AlertPrimaryButton>
+          </PrimaryButton>
         </Flex>
       </Flex>
     </Modal>,

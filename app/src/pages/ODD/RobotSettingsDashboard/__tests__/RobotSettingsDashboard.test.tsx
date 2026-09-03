@@ -1,9 +1,18 @@
+import { useDispatch } from 'react-redux'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import {
+  usePostLogMessageMutation,
+  usePostWifiConfigureMutation,
+  useRobotSettingsQuery,
+  useUpdateRobotSettingMutation,
+} from '@opentrons/react-api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
   DeviceReset,
@@ -11,6 +20,7 @@ import {
   LanguageSetting,
   NetworkSettings,
   Privacy,
+  RobotEncryptionKeySettingOption,
   RobotSystemVersion,
   TouchscreenBrightness,
   TouchScreenSleep,
@@ -20,15 +30,16 @@ import { CameraPreferences } from '/app/organisms/ODD/RobotSettingsDashboard/Cam
 import { FileManager } from '/app/organisms/ODD/RobotSettingsDashboard/FileManager'
 import {
   getAppLanguage,
-  getFeatureFlags,
+  getConfig,
+  getIncludeProtocolSourceInRunDownload,
+  toggleConfigValue,
   toggleDevtools,
 } from '/app/redux/config'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
-import { getRobotSettings } from '/app/redux/robot-settings'
 import { getRobotUpdateAvailable } from '/app/redux/robot-update'
 import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
-import { useNetworkConnection } from '/app/resources/networking'
+import { useNetworkConnection, useWifiList } from '/app/resources/networking'
 import {
   useDisableStackerSensors,
   useLEDLights,
@@ -36,14 +47,32 @@ import {
 
 import { RobotSettingsDashboard } from '../'
 
+import type { UseQueryResult } from 'react-query'
+import type { RobotSettingsResponse } from '@opentrons/api-client'
+import type { Config } from '/app/redux/config'
+
+vi.mock('react-redux', async () => {
+  const actual = await vi.importActual('react-redux')
+  return {
+    ...actual,
+    useDispatch: vi.fn(),
+  }
+})
+vi.mock('@opentrons/react-api-client')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 vi.mock('/app/resources/networking', async () => {
   const actual = await vi.importActual('/app/resources/networking')
-  return { ...actual, useNetworkConnection: vi.fn() }
+  return {
+    ...actual,
+    useNetworkConnection: vi.fn(),
+    useWifiList: vi.fn(),
+  }
 })
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/config')
-vi.mock('/app/redux/robot-settings')
 vi.mock('/app/resources/robot-settings')
 vi.mock('/app/resources/errorRecovery')
 vi.mock('/app/organisms/ODD/Navigation')
@@ -58,10 +87,17 @@ vi.mock('/app/organisms/ODD/RobotSettingsDashboard/LanguageSetting')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/CameraPreferences')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/Devices')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/FileManager')
+vi.mock(
+  '/app/organisms/ODD/RobotSettingsDashboard/RobotEncryptionKey/RobotEncryptionKeySettingOption'
+)
 
 const mockToggleLights = vi.fn()
 const mockToggleER = vi.fn()
 const mockToggleStackerSensors = vi.fn()
+const mockUpdateRobotSetting = vi.fn()
+const mockPostWifiConfigure = vi.fn()
+const mockResetWifiConfigure = vi.fn()
+const mockPostLogMessage = vi.fn()
 
 const render = () => {
   return renderWithProviders(
@@ -76,19 +112,31 @@ const render = () => {
 
 const MOCK_DEFAULT_LANGUAGE = 'en-US'
 
+const mockDispatch = vi.fn()
+
 // Note kj 01/25/2023 Currently test cases only check text since this PR is bare-bones for RobotSettings Dashboard
 describe('RobotSettingsDashboard', () => {
   beforeEach(() => {
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
-    vi.mocked(getRobotSettings).mockReturnValue([
-      {
-        id: 'disableHomeOnBoot',
-        title: 'Disable home on boot',
-        description: 'Prevent robot from homing motors on boot',
-        restart_required: false,
-        value: true,
+    vi.mocked(useUpdateRobotSettingMutation).mockReturnValue({
+      updateRobotSetting: mockUpdateRobotSetting,
+    } as unknown as ReturnType<typeof useUpdateRobotSettingMutation>)
+    vi.mocked(usePostLogMessageMutation).mockReturnValue({
+      postLogMessage: mockPostLogMessage,
+    } as any)
+    vi.mocked(useRobotSettingsQuery).mockReturnValue({
+      data: {
+        settings: [
+          {
+            id: 'disableHomeOnBoot',
+            title: 'Disable home on boot',
+            description: 'Prevent robot from homing motors on boot',
+            restart_required: false,
+            value: true,
+          },
+        ],
       },
-    ])
+    } as unknown as UseQueryResult<RobotSettingsResponse>)
     vi.mocked(useLEDLights).mockReturnValue({
       lightsEnabled: false,
       toggleLights: mockToggleLights,
@@ -98,12 +146,27 @@ describe('RobotSettingsDashboard', () => {
       toggleSensors: mockToggleStackerSensors,
     })
     vi.mocked(useNetworkConnection).mockReturnValue({} as any)
+    vi.mocked(useWifiList).mockReturnValue([])
+    vi.mocked(usePostWifiConfigureMutation).mockReturnValue({
+      postWifiConfigure: mockPostWifiConfigure,
+      mutate: mockPostWifiConfigure,
+      reset: mockResetWifiConfigure,
+      isLoading: false,
+      isSuccess: false,
+      isError: false,
+      error: null,
+      status: 'idle',
+    } as any)
     vi.mocked(useErrorRecoverySettingsToggle).mockReturnValue({
       isEREnabled: true,
       toggleERSettings: mockToggleER,
     })
     vi.mocked(getAppLanguage).mockReturnValue(MOCK_DEFAULT_LANGUAGE)
-    vi.mocked(getFeatureFlags).mockReturnValue({ accessControlMode: false })
+    vi.mocked(getConfig).mockReturnValue({
+      update: { automaticallyDownloadUpdates: false },
+    } as Config)
+    vi.mocked(getIncludeProtocolSourceInRunDownload).mockReturnValue(false)
+    vi.mocked(useDispatch).mockReturnValue(mockDispatch)
   })
 
   afterEach(() => {
@@ -117,39 +180,39 @@ describe('RobotSettingsDashboard', () => {
 
   it('should render setting buttons', () => {
     render()
-    screen.getByText('Robot Name')
+    screen.getByText('Robot name')
     screen.getByText('opentrons-robot-name')
-    screen.getByText('Robot System Version')
-    screen.getByText('Network Settings')
+    screen.getByText('Robot system version')
+    screen.getByText('Network settings')
     screen.getByText('Status LEDs')
-    screen.getByText('Recovery Mode')
+    screen.getByText('Recovery mode')
     screen.getByText(
       'Control the strip of color lights on the front of the robot.'
     )
-    screen.getByText('File Manager')
+    screen.getByText('File manager')
     screen.getByText('Download and delete robot files.')
-    screen.getByText('Touchscreen Sleep')
-    screen.getByText('Touchscreen Brightness')
+    screen.getByText('Touchscreen sleep')
+    screen.getByText('Touchscreen brightness')
     screen.getByText('Privacy')
     screen.getByText('Choose what data to share with Opentrons.')
-    screen.getByText('Device Reset')
-    screen.getByText('Camera Preferences')
+    screen.getByText('Device reset')
+    screen.getByText('Camera preferences')
     screen.getByText('Devices')
-    screen.getByText('Update Channel')
-    screen.getByText('Developer Tools')
+    screen.getByText('Update channel')
+    screen.getByText('Developer tools')
     screen.getByText('Access additional logging and feature flags.')
   })
 
   it('should render component when tapping robot name button', () => {
     render()
-    const button = screen.getByText('Robot Name')
+    const button = screen.getByText('Robot name')
     fireEvent.click(button)
-    screen.getByText('Robot Name')
+    screen.getByText('Robot name')
   })
 
   it('should render component when tapping robot system version', () => {
     render()
-    const button = screen.getByText('Robot System Version')
+    const button = screen.getByText('Robot system version')
     fireEvent.click(button)
     expect(vi.mocked(RobotSystemVersion)).toHaveBeenCalled()
   })
@@ -169,6 +232,59 @@ describe('RobotSettingsDashboard', () => {
     render()
     expect(
       screen.getByTestId('RobotSettingButton_display_led_lights')
+    ).toHaveTextContent('On')
+  })
+
+  it('should render text with auto download off and clicking it turns the setting on', () => {
+    render()
+    expect(
+      screen.getByTestId('RobotSettingButton_automatically_download_updates')
+    ).toHaveTextContent('Off')
+    const autodownload = screen.getByText('Automatically download updates')
+    fireEvent.click(autodownload)
+    expect(mockDispatch).toHaveBeenCalledWith(
+      toggleConfigValue('update.automaticallyDownloadUpdates')
+    )
+  })
+  it('should render text with auto download on and clicking it turns the setting off', () => {
+    vi.mocked(getConfig).mockReturnValue({
+      update: { automaticallyDownloadUpdates: true },
+    } as Config)
+
+    render()
+    expect(
+      screen.getByTestId('RobotSettingButton_automatically_download_updates')
+    ).toHaveTextContent('On')
+    const autodownload = screen.getByText('Automatically download updates')
+    fireEvent.click(autodownload)
+    expect(mockDispatch).toHaveBeenCalledWith(
+      toggleConfigValue('update.automaticallyDownloadUpdates')
+    )
+  })
+
+  it('should render text with download protocol source file off and clicking it turns the setting on', () => {
+    render()
+    expect(
+      screen.getByTestId(
+        'RobotSettingButton_include_protocol_source_in_run_download'
+      )
+    ).toHaveTextContent('Off')
+    screen.getByText('Download protocol source file')
+    screen.getByText('Include protocol source file in run record downloads.')
+    const toggle = screen.getByText('Download protocol source file')
+    fireEvent.click(toggle)
+    expect(mockDispatch).toHaveBeenCalledWith(
+      toggleConfigValue('protocols.includeProtocolSourceInRunDownload')
+    )
+  })
+
+  it('should render text with download protocol source file on', () => {
+    vi.mocked(getIncludeProtocolSourceInRunDownload).mockReturnValue(true)
+    render()
+    expect(
+      screen.getByTestId(
+        'RobotSettingButton_include_protocol_source_in_run_download'
+      )
     ).toHaveTextContent('On')
   })
 
@@ -199,7 +315,7 @@ describe('RobotSettingsDashboard', () => {
 
   it('should render disable stacker sensors copy, and calls toggleSensors', () => {
     render()
-    screen.getByText('Disable Stacker Sensors for Labware Detection')
+    screen.getByText('Disable Stacker sensors for labware detection')
 
     const toggle = screen.getByTestId(
       'RobotSettingButton_disable_stacker_sensors'
@@ -223,28 +339,28 @@ describe('RobotSettingsDashboard', () => {
 
   it('should render component when tapping network settings', () => {
     render()
-    const button = screen.getByText('Network Settings')
+    const button = screen.getByText('Network settings')
     fireEvent.click(button)
     expect(vi.mocked(NetworkSettings)).toHaveBeenCalled()
   })
 
   it('should render component when tapping display touchscreen sleep', () => {
     render()
-    const button = screen.getByText('Touchscreen Sleep')
+    const button = screen.getByText('Touchscreen sleep')
     fireEvent.click(button)
     expect(vi.mocked(TouchScreenSleep)).toHaveBeenCalled()
   })
 
   it('should render component when tapping touchscreen brightness', () => {
     render()
-    const button = screen.getByText('Touchscreen Brightness')
+    const button = screen.getByText('Touchscreen brightness')
     fireEvent.click(button)
     expect(vi.mocked(TouchscreenBrightness)).toHaveBeenCalled()
   })
 
   it('should render component when tapping camera preferences', () => {
     render()
-    const button = screen.getByText('Camera Preferences')
+    const button = screen.getByText('Camera preferences')
     fireEvent.click(button)
     expect(vi.mocked(CameraPreferences)).toHaveBeenCalled()
   })
@@ -258,28 +374,32 @@ describe('RobotSettingsDashboard', () => {
 
   it('should render component when tapping device rest', () => {
     render()
-    const button = screen.getByText('Device Reset')
+    const button = screen.getByText('Device reset')
     fireEvent.click(button)
     expect(vi.mocked(DeviceReset)).toHaveBeenCalled()
   })
 
   it('should render component when tapping update channel', () => {
     render()
-    const button = screen.getByText('Update Channel')
+    const button = screen.getByText('Update channel')
     fireEvent.click(button)
     expect(vi.mocked(UpdateChannel)).toHaveBeenCalled()
   })
 
   it('should render text with home gantry off', () => {
-    vi.mocked(getRobotSettings).mockReturnValue([
-      {
-        id: 'disableHomeOnBoot',
-        title: 'Disable home on boot',
-        description: 'Prevent robot from homing motors on boot',
-        restart_required: false,
-        value: false,
+    vi.mocked(useRobotSettingsQuery).mockReturnValue({
+      data: {
+        settings: [
+          {
+            id: 'disableHomeOnBoot',
+            title: 'Disable home on boot',
+            description: 'Prevent robot from homing motors on boot',
+            restart_required: false,
+            value: false,
+          },
+        ],
       },
-    ])
+    } as unknown as UseQueryResult<RobotSettingsResponse>)
     render()
     expect(
       screen.getByTestId('RobotSettingButton_home_gantry_on_restart')
@@ -288,7 +408,7 @@ describe('RobotSettingsDashboard', () => {
 
   it('should call a mock function when tapping enable dev tools', () => {
     render()
-    const button = screen.getByText('Developer Tools')
+    const button = screen.getByText('Developer tools')
     fireEvent.click(button)
     expect(vi.mocked(toggleDevtools)).toHaveBeenCalled()
   })
@@ -308,10 +428,10 @@ describe('RobotSettingsDashboard', () => {
     expect(vi.mocked(LanguageSetting)).toHaveBeenCalled()
   })
 
-  it('should render component when tapping File Manager', () => {
+  it('should render component when tapping File manager', () => {
     render()
 
-    const button = screen.getByText('File Manager')
+    const button = screen.getByText('File manager')
     fireEvent.click(button)
     expect(vi.mocked(FileManager)).toHaveBeenCalled()
   })
@@ -324,10 +444,9 @@ describe('RobotSettingsDashboard', () => {
   })
 
   it('should render the component when tapping show encryption key', () => {
-    vi.mocked(getFeatureFlags).mockReturnValue({ accessControlMode: true })
     render()
     const button = screen.getByText('Robot encryption key')
     fireEvent.click(button)
-    screen.getByText('View robot generated key')
+    expect(vi.mocked(RobotEncryptionKeySettingOption)).toHaveBeenCalled()
   })
 })

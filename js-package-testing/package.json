@@ -26,15 +26,14 @@
     "@types/react": "18.2.51",
     "@types/react-dom": "18.2.0",
     "@vitejs/plugin-react": "4.2.0",
-    "clsx": "2.1.1",
     "dotenv": "^16.6.1",
-    "i18next": "^19.8.3",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-i18next": "14.0.0",
-    "styled-components": "5.3.6",
     "typescript": "5.3.3",
     "vite": "7.3.5"
   },
-  "packageManager": "pnpm@10.32.1"
+  "packageManager": "pnpm@10.32.1",
+  "pnpm": {
+    "overrides": {
+      "lodash": "4.18.1"
+    }
+  }
 }

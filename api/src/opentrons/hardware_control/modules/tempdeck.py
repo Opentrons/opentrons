@@ -17,6 +17,7 @@ from opentrons.drivers.temp_deck import (
 from opentrons.drivers.types import Temperature
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.modules import errors, mod_abc, types, update
+from opentrons.hardware_control.modules.retry import retry_module_init
 from opentrons.hardware_control.modules.types import (
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
@@ -33,6 +34,8 @@ log = logging.getLogger(__name__)
 
 TEMP_POLL_INTERVAL_SECS = 1.0
 SIM_TEMP_POLL_INTERVAL_SECS = TEMP_POLL_INTERVAL_SECS / 20.0
+
+READER_ERROR_DEBOUNCE = DEFAULT_COMMAND_RETRIES * 4
 
 
 class TempDeck(mod_abc.AbstractModule):
@@ -73,13 +76,24 @@ class TempDeck(mod_abc.AbstractModule):
         """
         driver: AbstractTempDeckDriver
         if not simulating:
-            driver = await TempDeckDriver.create(port=port, loop=hw_control_loop)
             poll_interval_seconds = poll_interval_seconds or TEMP_POLL_INTERVAL_SECS
+
+            async def _init_driver() -> tuple[AbstractTempDeckDriver, Dict[str, str]]:
+                d = await TempDeckDriver.create(port=port, loop=hw_control_loop)
+                try:
+                    info = await d.get_device_info()
+                    return d, info
+                except BaseException:
+                    await d.disconnect()
+                    raise
+
+            driver, device_info = await retry_module_init(_init_driver, port=port)
         else:
             driver = SimulatingDriver(
                 sim_model=sim_model, serial_number=sim_serial_number
             )
             poll_interval_seconds = poll_interval_seconds or SIM_TEMP_POLL_INTERVAL_SECS
+            device_info = await driver.get_device_info()
 
         reader = TempDeckReader(driver=driver)
         poller = Poller(reader=reader, interval=poll_interval_seconds)
@@ -90,7 +104,7 @@ class TempDeck(mod_abc.AbstractModule):
             driver=driver,
             reader=reader,
             poller=poller,
-            device_info=await driver.get_device_info(),
+            device_info=device_info,
             hw_control_loop=hw_control_loop,
             disconnected_callback=disconnected_callback,
             error_callback=error_callback,
@@ -129,10 +143,11 @@ class TempDeck(mod_abc.AbstractModule):
         self._driver = driver
         self._reader = reader
         self._poller = poller
-        self._reader.set_error_callback(self.error_callback)
+        self._unsubscribe_reader = self._reader.set_error_callback(self.error_callback)
 
     async def soft_cleanup(self) -> None:
         """Stop the poller task."""
+        self._unsubscribe_reader()
         await self._poller.stop()
         await self._driver.disconnect()
 
@@ -167,7 +182,7 @@ class TempDeck(mod_abc.AbstractModule):
         """
         await self.wait_for_is_running()
         await self._driver.set_temperature(celsius)
-        await self._reader.read()
+        await self._poller.wait_next_good_poll()
 
     async def await_temperature(self, awaiting_temperature: Optional[float]) -> None:
         """Await a target temperature in degrees Celsius.
@@ -185,7 +200,7 @@ class TempDeck(mod_abc.AbstractModule):
             return
 
         await self.wait_for_is_running()
-        await self._reader.read()
+        await self._poller.wait_next_good_poll()
 
         async def _await_temperature() -> None:
             if awaiting_temperature is None:
@@ -205,7 +220,7 @@ class TempDeck(mod_abc.AbstractModule):
         if must_be_running:
             await self.wait_for_is_running()
         await self._driver.deactivate()
-        await self._reader.read()
+        await self._poller.wait_next_good_poll()
 
     @property
     def device_info(self) -> Dict[str, str]:
@@ -218,7 +233,7 @@ class TempDeck(mod_abc.AbstractModule):
             "targetTemp": self.target,
         }
         return {
-            "status": self.status,
+            "status": self.status.value,
             "data": data,
         }
 
@@ -332,13 +347,15 @@ class TempDeckReader(Reader):
         self.temperature = Temperature(current=25, target=None)
         self._driver = driver
         self._error_callback: Optional[Callable[[Exception], None]] = None
-        self._debounce_count = DEFAULT_COMMAND_RETRIES
+        self._debounce_count = READER_ERROR_DEBOUNCE
 
     async def read(self) -> None:
-        """Read the module's current and target temperatures."""
+        """Read the module's current and target temperatures.
+
+        Do not call directly, for the poller only."""
         self.temperature = await self._driver.get_temperature()
         # reset on success
-        self._debounce_count = DEFAULT_COMMAND_RETRIES
+        self._debounce_count = READER_ERROR_DEBOUNCE
 
     def set_error_callback(
         self, error_callback: Callable[[Exception], None]
@@ -352,9 +369,10 @@ class TempDeckReader(Reader):
     def on_error(self, exception: Exception) -> None:
         self._debounce_count -= 1
         if self._error_callback:
-            if self._debounce_count != 0:
+            if self._debounce_count > 0:
                 log.error(
                     f"Reader encountered error {exception} but has {self._debounce_count} tries left"
                 )
             else:
                 self._error_callback(exception)
+                self._debounce_count = READER_ERROR_DEBOUNCE

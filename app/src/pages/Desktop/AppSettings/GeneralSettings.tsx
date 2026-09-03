@@ -43,13 +43,18 @@ import {
   ANALYTICS_LANGUAGE_UPDATED_DESKTOP_APP_SETTINGS,
   useTrackEvent,
 } from '/app/redux/analytics'
-import { getAppLanguage, updateConfigValue } from '/app/redux/config'
+import {
+  getAppLanguage,
+  toggleConfigValue,
+  updateConfigValue,
+} from '/app/redux/config'
 import {
   checkShellUpdate,
   CURRENT_VERSION,
   getAvailableShellUpdate,
 } from '/app/redux/shell'
 
+import type { ReactNode } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
 
 const SOFTWARE_SYNC_URL = 'https://support.opentrons.com/s/'
@@ -57,9 +62,10 @@ const GITHUB_LINK =
   'https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md'
 
 const ENABLE_APP_UPDATE_NOTIFICATIONS = 'Enable app update notifications'
+const ENABLE_UPDATE_AUTODOWNLOAD = 'Enable update autodownload'
 const uuid: () => string = uuidv4
 
-export function GeneralSettings(): JSX.Element {
+export function GeneralSettings(): ReactNode {
   const { t } = useTranslation(['app_settings', 'shared', 'branded'])
   const dispatch = useDispatch<Dispatch>()
   const trackEvent = useTrackEvent()
@@ -90,14 +96,19 @@ export function GeneralSettings(): JSX.Element {
     useState<boolean>(updateAvailable)
   const [showConnectRobotSlideout, setShowConnectRobotSlideout] =
     useState(false)
-
+  const automaticUpdateDownloadEnabled = useSelector(
+    (s: State) => s.config?.update.automaticallyDownloadUpdates
+  )
   // may be enabled, disabled, or unknown (because config is loading)
   const updateAlertEnabled = useSelector((s: State) => {
     const ignored = getAlertIsPermanentlyIgnored(s, ALERT_APP_UPDATE_AVAILABLE)
     return ignored !== null ? !ignored : null
   })
   const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false)
-  const handleToggle = (): void => {
+  const handleToggleAutomaticUpdateDownloads = (): void => {
+    dispatch(toggleConfigValue('update.automaticallyDownloadUpdates'))
+  }
+  const handleToggleUpdateAlerts = (): void => {
     if (updateAlertEnabled !== null) {
       dispatch(
         updateAlertEnabled
@@ -126,10 +137,7 @@ export function GeneralSettings(): JSX.Element {
         paddingY={SPACING.spacing24}
       >
         {showUpdateBanner && (
-          <Box
-            marginBottom={SPACING.spacing16}
-            id="GeneralSettings_updatebanner"
-          >
+          <Box marginBottom={SPACING.spacing16}>
             <Banner
               type="warning"
               onCloseClick={() => {
@@ -175,7 +183,6 @@ export function GeneralSettings(): JSX.Element {
               <LegacyStyledText
                 forwardedAs="p"
                 paddingBottom={SPACING.spacing8}
-                id="GeneralSettings_currentVersion"
               >
                 {CURRENT_VERSION}
               </LegacyStyledText>
@@ -185,7 +192,6 @@ export function GeneralSettings(): JSX.Element {
                   external
                   href={GITHUB_LINK}
                   css={TYPOGRAPHY.linkPSemiBold}
-                  id="GeneralSettings_GitHubLink"
                 >{` ${t('shared:github')}`}</Link>
               </LegacyStyledText>
             </Box>
@@ -196,7 +202,6 @@ export function GeneralSettings(): JSX.Element {
                 onClick={() => {
                   setShowUpdateModal(true)
                 }}
-                id="GeneralSettings_softwareUpdate"
               >
                 {t('view_software_update')}
               </TertiaryButton>
@@ -224,14 +229,10 @@ export function GeneralSettings(): JSX.Element {
                 onClick={() => {
                   setShowPreviousVersionModal(true)
                 }}
-                id="GeneralSettings_previousVersionLink"
               >
                 {t('restore_previous')}
               </Link>
-              <ExternalLink
-                href={SOFTWARE_SYNC_URL}
-                id="GeneralSettings_appAndRobotSync"
-              >
+              <ExternalLink href={SOFTWARE_SYNC_URL}>
                 {t('branded:versions_sync')}
               </ExternalLink>
             </Flex>
@@ -242,8 +243,29 @@ export function GeneralSettings(): JSX.Element {
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
         >
-          {t('update_alerts')}
+          {t('software_update')}
         </LegacyStyledText>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+        >
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+              {t('automatically_download_updates')}
+            </LegacyStyledText>
+            <LegacyStyledText forwardedAs="p">
+              {t('when_enabled_updates_are_downloaded_automatically')}
+            </LegacyStyledText>
+          </Flex>
+          <ToggleButton
+            label={ENABLE_UPDATE_AUTODOWNLOAD}
+            marginRight={SPACING.spacing16}
+            disabled={false}
+            toggledOn={automaticUpdateDownloadEnabled === true}
+            onClick={handleToggleAutomaticUpdateDownloads}
+          />
+        </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
@@ -257,8 +279,7 @@ export function GeneralSettings(): JSX.Element {
             marginRight={SPACING.spacing16}
             disabled={updateAlertEnabled === null}
             toggledOn={updateAlertEnabled === true}
-            onClick={handleToggle}
-            id="GeneralSettings_softwareUpdateAlerts"
+            onClick={handleToggleUpdateAlerts}
           />
         </Flex>
         <Divider marginY={SPACING.spacing24} />
@@ -274,7 +295,6 @@ export function GeneralSettings(): JSX.Element {
           </LegacyStyledText>
           <TertiaryButton
             marginLeft={SPACING_AUTO}
-            id="GeneralSettings_setUpConnection"
             onClick={() => {
               setShowConnectRobotSlideout(true)
             }}

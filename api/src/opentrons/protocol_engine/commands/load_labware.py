@@ -108,7 +108,7 @@ class LoadLabwareImplementation(
             module = self._state_view.modules.get(location.moduleId)
         return module is not None and module.model == module_model
 
-    async def execute(
+    async def execute(  # noqa: C901
         self, params: LoadLabwareParams
     ) -> SuccessData[LoadLabwareResult]:
         """Load definition and calibration data necessary for a labware."""
@@ -152,6 +152,23 @@ class LoadLabwareImplementation(
             version=params.version,
         )
 
+        if isinstance(params.location, DeckSlotLocation):
+            if not labware_validation.validate_definition_is_deck_slot_compatible(
+                definition
+            ):
+                raise LabwareIsNotAllowedInLocationError(
+                    f'Labware "{params.loadName}" cannot be loaded onto a deck slot.'
+                )
+        elif isinstance(params.location, AddressableAreaLocation):
+            if fixture_validation.is_deck_slot(
+                params.location.addressableAreaName
+            ) and not labware_validation.validate_definition_is_deck_slot_compatible(
+                definition
+            ):
+                raise LabwareIsNotAllowedInLocationError(
+                    f'Labware "{params.loadName}" cannot be loaded onto a deck slot.'
+                )
+
         verified_location = self._state_view.geometry.ensure_location_not_occupied(
             params.location, None, definition
         )
@@ -175,6 +192,10 @@ class LoadLabwareImplementation(
             )
 
         elif self._is_loading_to_module(params.location, ModuleModel.VACUUM_MODULE_V1):
+            if isinstance(verified_location, ModuleLocation):
+                self._state_view.labware.raise_if_labware_incompatible_with_vacuum_module(
+                    loaded_labware.definition
+                )
             self._state_view.labware.raise_if_labware_incompatible_with_vacuum_module_dock(
                 verified_location, loaded_labware.definition
             )

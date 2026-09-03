@@ -17,6 +17,7 @@ import { usePipetteOffsetCalibrations } from '../Devices/hooks'
 import { PipetteRecalibrationWarning } from '../Devices/PipetteCard/PipetteRecalibrationWarning'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 
+import type { ReactNode } from 'react'
 import type { FormattedPipetteOffsetCalibration } from '.'
 
 interface RobotSettingsPipetteOffsetCalibrationProps {
@@ -29,7 +30,7 @@ export function RobotSettingsPipetteOffsetCalibration({
   formattedPipetteOffsetCalibrations,
   robotName,
   isRobotBusy,
-}: RobotSettingsPipetteOffsetCalibrationProps): JSX.Element {
+}: RobotSettingsPipetteOffsetCalibrationProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   const isFlex = useIsFlex(robotName)

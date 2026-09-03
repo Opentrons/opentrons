@@ -17,7 +17,7 @@ export function useSearchLabwareOffsets(
 ): UseQueryResult<SearchLabwareOffsetsResponse, AxiosError> {
   const host = useHost()
   const query = useQuery<SearchLabwareOffsetsResponse, AxiosError>(
-    getQueryKey(host, 'searchLabwareOffsets', data),
+    getQueryKey(host, 'labwareOffsets', data),
     () =>
       searchLabwareOffsets(host!, data)
         .then(response => response.data)

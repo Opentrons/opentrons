@@ -15,6 +15,7 @@ import {
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics'
 import {
   useCurrentRunId,
@@ -23,6 +24,7 @@ import {
 
 import { useVacuumModuleControls } from './VacuumModule/hooks/useVacuumModuleControls'
 
+import type { AttachedModule } from '@opentrons/api-client'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateHeaterCreateCommand,
@@ -36,7 +38,6 @@ import type {
   TemperatureModuleDeactivateCreateCommand,
   UnsafeFlexStackerPrepareShuttleCreateCommand,
 } from '@opentrons/shared-data'
-import type { AttachedModule } from '/app/redux/modules/types'
 
 export function useIsHeaterShakerInProtocol(): boolean {
   const currentRunId = useCurrentRunId()
@@ -53,7 +54,8 @@ interface LatchControls {
 }
 
 export function useLatchControls(module: AttachedModule): LatchControls {
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const documentationState = useDocumentationState()
+  const { createLiveCommand } = useCreateLiveCommandMutation(documentationState)
   const { reportModuleCommand } = useModuleCommandAnalytics()
   const isLatchClosed =
     module.moduleType === 'heaterShakerModuleType' &&
@@ -134,7 +136,8 @@ export function useModuleOverflowMenu(
   isIncompatibleWithOT3: boolean
 ): ModuleOverflowMenu {
   const { t } = useTranslation(['device_details', 'heater_shaker'])
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const documentationState = useDocumentationState()
+  const { createLiveCommand } = useCreateLiveCommandMutation(documentationState)
   const { toggleLatch, isLatchClosed } = useLatchControls(module)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { deactivateVacuum, openVent, closeVent } =
@@ -171,7 +174,6 @@ export function useModuleOverflowMenu(
   const aboutModuleBtn = (
     <MenuItem
       key={`about_module_${String(module.moduleModel)}`}
-      id={`about_module_${String(module.moduleModel)}`}
       data-testid={`about_module_${String(module.moduleModel)}`}
       disabled={isIncompatibleWithOT3}
       onClick={() => {
@@ -211,7 +213,6 @@ export function useModuleOverflowMenu(
     module.data.speedStatus !== 'idle' ? (
       <MenuItem
         key={`test_shake_${String(module.moduleModel)}`}
-        id={`test_shake_${String(module.moduleModel)}`}
         data-testid={`test_shake_${String(module.moduleModel)}`}
         disabled={isDisabled}
         onClick={() => {

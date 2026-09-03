@@ -18,11 +18,11 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { NAV_BAR_HEIGHT_REM } from '../../components/atoms'
 import { FlexHardware, Ot2Modules } from '../../components/organisms'
-import { useKitchen } from '../../components/organisms/Kitchen/useKitchen'
 import { getFileMetadata, getRobotType } from '../../file-data/selectors'
-import { getAdditionalEquipmentEntities } from '../../step-forms/selectors'
 
-export function Hardware(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function Hardware(): ReactNode {
   const { t } = useTranslation([
     'protocol_steps',
     'protocol_overview',
@@ -31,14 +31,7 @@ export function Hardware(): JSX.Element {
   ])
   const fileMetadata = useSelector(getFileMetadata)
   const navigate = useNavigate()
-  const { makeSnackbar } = useKitchen()
   const robotType = useSelector(getRobotType)
-  const additionalEquipmentEntities = useSelector(
-    getAdditionalEquipmentEntities
-  )
-  const hasTrash = Object.values(additionalEquipmentEntities).some(
-    ae => ae.name === 'trashBin' || ae.name === 'wasteChute'
-  )
 
   const protocolName =
     fileMetadata.protocolName != null && fileMetadata.protocolName !== ''
@@ -85,11 +78,7 @@ export function Hardware(): JSX.Element {
           </StyledText>
           <PrimaryButton
             onClick={() => {
-              if (hasTrash) {
-                navigate('/overview')
-              } else {
-                makeSnackbar(t('starting_deck_state:trash_required') as string)
-              }
+              navigate('/overview')
             }}
           >
             {t('shared:save')}

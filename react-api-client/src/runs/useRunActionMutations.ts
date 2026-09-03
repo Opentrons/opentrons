@@ -48,22 +48,37 @@ export function useRunActionMutations(
     }
   )
 
-  const { pauseRun, isLoading: isPauseRunActionLoading } = usePauseRunMutation({
-    onSuccess,
-  })
+  const { pauseRun, isLoading: isPauseRunActionLoading } = usePauseRunMutation(
+    documentationState,
+    {
+      onSuccess,
+    }
+  )
 
-  const { stopRun, isLoading: isStopRunActionLoading } =
-    useStopRunMutation(documentationState)
+  const { stopRun, isLoading: isStopRunActionLoading } = useStopRunMutation(
+    documentationState,
+    [],
+    {
+      onSuccess,
+    }
+  )
 
   const {
     resumeRunFromRecovery,
     isLoading: isResumeRunFromRecoveryActionLoading,
-  } = useResumeRunFromRecoveryMutation()
+  } = useResumeRunFromRecoveryMutation(documentationState, {
+    onSuccess,
+  })
 
   const {
     resumeRunFromRecoveryAssumingFalsePositive,
     isLoading: isResumeRunFromRecoveryAssumingFalsePositiveActionLoading,
-  } = useResumeRunFromRecoveryAssumingFalsePositiveMutation()
+  } = useResumeRunFromRecoveryAssumingFalsePositiveMutation(
+    documentationState,
+    {
+      onSuccess,
+    }
+  )
 
   return {
     playRun: () => {

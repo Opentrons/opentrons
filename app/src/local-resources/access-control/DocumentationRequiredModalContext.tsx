@@ -2,6 +2,7 @@ import { createContext } from 'react'
 
 import type {
   DocumentationReport,
+  DocumentationState,
   DocumentedAction,
 } from '@opentrons/react-api-client'
 
@@ -9,6 +10,7 @@ export interface DocumentationRequiredModalContextType {
   showDocumentationRequiredModal: (
     username: string,
     actionsToDocument: DocumentedAction[],
+    minReportLength: number,
     onCancel?: () => void,
     initialDocreport?: DocumentationReport
   ) => Promise<DocumentationReport>
@@ -17,6 +19,8 @@ export interface DocumentationRequiredModalContextType {
   }: {
     robotName: string
   }) => Promise<{ username: string } | null>
+  showSignRunModal: (documentationState: DocumentationState) => Promise<boolean>
+  showDownloadLogsModal: (logPeriodId: string) => Promise<boolean>
 }
 
 /**
@@ -27,10 +31,13 @@ export const DocumentationRequiredModalContext =
     showDocumentationRequiredModal: (
       username: string,
       actionsToDocument: DocumentedAction[],
+      minReportLength: number,
       onCancel?: () => void,
       initialDocreport?: DocumentationReport
     ) => {
       return Promise.resolve('' as DocumentationReport)
     },
     showLoginModal: () => Promise.resolve(null),
+    showSignRunModal: () => Promise.resolve(false),
+    showDownloadLogsModal: () => Promise.resolve(false),
   })

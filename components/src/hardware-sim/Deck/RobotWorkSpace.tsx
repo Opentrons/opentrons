@@ -47,7 +47,7 @@ export type RobotWorkSpaceProps = BaseProps & CSSProperties
  * SVG-transform them so they're displayed the correct way. This is needed because
  * SVG inverts y compared to Opentrons coordinates.
  */
-export function RobotWorkSpace(props: RobotWorkSpaceProps): JSX.Element {
+export function RobotWorkSpace(props: RobotWorkSpaceProps): ReactNode {
   const {
     children,
     deckLayerBlocklist = [],

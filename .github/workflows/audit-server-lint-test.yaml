@@ -5,7 +5,7 @@ name: 'audit-server test/lint'
 
 on:
   push:
-    paths:
+    paths: &paths
       - 'audit-server/**'
       - 'Makefile'
       - 'scripts/**.mk'
@@ -13,20 +13,15 @@ on:
       - '.github/workflows/audit-server-lint-test.yaml'
       - '.github/actions/python/**'
       - 'server-utils/**'
+      - 'shared-data/**'
+      - '!shared-data/js/**'
     branches: # ignore any release-related thing (handled elsewhere)
       - 'edge'
     tags-ignore:
       - '*'
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
-    paths:
-      - 'audit-server/**'
-      - 'Makefile'
-      - 'scripts/**.mk'
-      - 'scripts/**.py'
-      - '.github/workflows/audit-server-lint-test.yaml'
-      - '.github/actions/python/**'
-      - 'server-utils/**'
+    paths: *paths
   workflow_dispatch:
 
 permissions: {}
@@ -45,10 +40,9 @@ jobs:
     timeout-minutes: 10
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
-          fetch-depth: 0
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: '22.22.0'
@@ -63,10 +57,9 @@ jobs:
     needs: [lint]
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
-          fetch-depth: 0
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: '22.22.0'

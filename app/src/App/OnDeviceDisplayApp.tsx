@@ -59,11 +59,15 @@ import {
 } from '/app/redux/config'
 import { getLocalRobot } from '/app/redux/discovery'
 import { getIsShellReady, updateBrightness } from '/app/redux/shell'
+import { useTrackRobotRestarts } from '/app/resources/devices/hooks/useTrackRobotRestarts'
+import { RobotUpdateProvider } from '/app/resources/robot-update/RobotUpdateProvider'
 
 import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
 import { LocalizationProvider } from '../LocalizationProvider'
 import { requireDocumentation } from '../organisms/ODD/DocumentationRequired/requireDocumentation'
+import { showDownloadLogsModal } from '../organisms/ODD/DownloadAuditLogsModal'
 import { showLoginModal } from '../organisms/ODD/OnDeviceLogin/LoginModal'
+import { showSignRunModal } from '../pages/ODD/RunSummary/SignRun'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
 import { hackWindowNavigatorOnLine } from './hacks'
 import {
@@ -78,6 +82,7 @@ import { ODDTopLevelRedirects } from './ODDTopLevelRedirects'
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
 import { ModalPortalRoot } from './portal'
 
+import type { ReactNode } from 'react'
 import type { HostConfig } from '@opentrons/api-client'
 import type { Dispatch } from '/app/redux/types'
 
@@ -168,13 +173,14 @@ const TURN_OFF_BACKLIGHT = '7'
 
 const RETRY_DELAY_MS = 1000
 
-export const OnDeviceDisplayApp = (): JSX.Element => {
+export const OnDeviceDisplayApp = (): ReactNode => {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
 
   const [showModuleSetupModal, setShowModuleSetupModal] = useState(false)
 
   useSoftwareUpdatePoll()
+  useTrackRobotRestarts()
 
   // Normally, our hooks get the HostConfig from the nearest ApiHostProvider context.
   // But here at the app root, that doesn't exist. So we need to make sure we pass this
@@ -255,41 +261,45 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                     value={{
                       showDocumentationRequiredModal: requireDocumentation,
                       showLoginModal,
+                      showSignRunModal,
+                      showDownloadLogsModal,
                     }}
                   >
-                    <MaintenanceRunTakeover>
-                      <EstopTakeover />
-                      <FirmwareUpdateTakeover />
-                      {showModuleSetupModal && localRobot?.name != null ? (
-                        <ModuleWizardFlows
-                          showSetupLauncher={true}
-                          closeFlow={() => {
-                            setShowModuleSetupModal(false)
-                          }}
-                          robotName={localRobot.name}
-                        />
-                      ) : null}
+                    <RobotUpdateProvider>
+                      <MaintenanceRunTakeover>
+                        <EstopTakeover />
+                        <FirmwareUpdateTakeover />
+                        {showModuleSetupModal && localRobot?.name != null ? (
+                          <ModuleWizardFlows
+                            showSetupLauncher={true}
+                            closeFlow={() => {
+                              setShowModuleSetupModal(false)
+                            }}
+                            robotName={localRobot.name}
+                          />
+                        ) : null}
 
-                      <NiceModal.Provider>
-                        <RobotEncryptionKeyTakeover>
-                          <ToasterOven>
-                            <ProtocolReceiptToasts />
-                            {!showModuleSetupModal ? (
-                              <ModuleAttachedToasts
-                                openFlow={(open: boolean) => {
-                                  setShowModuleSetupModal(open)
-                                }}
-                              />
-                            ) : null}
+                        <NiceModal.Provider>
+                          <RobotEncryptionKeyTakeover>
+                            <ToasterOven>
+                              <ProtocolReceiptToasts />
+                              {!showModuleSetupModal ? (
+                                <ModuleAttachedToasts
+                                  openFlow={(open: boolean) => {
+                                    setShowModuleSetupModal(open)
+                                  }}
+                                />
+                              ) : null}
 
-                            <SharedScrollRefProvider>
-                              <OnDeviceDisplayAppRoutes />
-                            </SharedScrollRefProvider>
-                            <LoggedOutOverlayMount />
-                          </ToasterOven>
-                        </RobotEncryptionKeyTakeover>
-                      </NiceModal.Provider>
-                    </MaintenanceRunTakeover>
+                              <SharedScrollRefProvider>
+                                <OnDeviceDisplayAppRoutes />
+                              </SharedScrollRefProvider>
+                              <LoggedOutOverlayMount />
+                            </ToasterOven>
+                          </RobotEncryptionKeyTakeover>
+                        </NiceModal.Provider>
+                      </MaintenanceRunTakeover>
+                    </RobotUpdateProvider>
                   </DocumentationRequiredModalContext.Provider>
                 </>
               )}
@@ -314,7 +324,7 @@ const getTargetPath = (unfinishedUnboxingFlowRoute: string | null): string => {
 
 // split to a separate function because scrollRef rerenders on every route change
 // this avoids rerendering parent providers as well
-export function OnDeviceDisplayAppRoutes(): JSX.Element {
+export function OnDeviceDisplayAppRoutes(): ReactNode {
   const { isScrolling, refCallback, element } = useScrollRef()
   const location = useLocation()
   useEffect(

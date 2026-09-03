@@ -74,6 +74,7 @@ from opentrons.util.pyro.pyro_synchronous_adapter import (
     convert_result_to_wrapped_dict,
     pyro_behavior,
 )
+from opentrons_shared_data.errors import EnumeratedError
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     LabwareDefinition2,
@@ -167,13 +168,12 @@ class DirectedRunProcess(AbstractRunCoordinator):
         self._run_id: Optional[str] = None
         self._run_orchestrator: Optional[RunOrchestrator] = None
         self._loop: Optional[asyncio.AbstractEventLoop] = None
-        # Grab the Proxy resources for the Robot Server and OT3API - always expect the resources to be up before a run
-        self._robot_server_resource: RobotServerPyroResource = get_pyro_resource()
-        self._hardware_api: HardwareControlAPI = identify_hardware_process()
+        self._robot_server_resource: Optional[RobotServerPyroResource] = None
+        self._hardware_api: Optional[HardwareControlAPI] = None
         log.info(f"Directed Run Process initialized with Run ID: {self._run_id}")
 
     @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
-    def register_hardware_door_event(self) -> HardwareEventHandler:
+    async def register_hardware_door_event(self) -> HardwareEventHandler:
         """Create a callback for the door watcher on the hardware controller via the protocol engine.
 
         The returned callback is meant to run in the hardware API's thread.
@@ -188,6 +188,14 @@ class DirectedRunProcess(AbstractRunCoordinator):
                 )
 
         return door_event_handler
+
+    async def _connect_to_hardware_api(self) -> None:
+        """Initiate the run resource's connection to the hardware API."""
+        self._hardware_api = await identify_hardware_process()
+
+    async def _connect_to_robot_server_resource(self) -> None:
+        """Initiate the run resource's connection to the Robot-Server resource."""
+        self._robot_server_resource = await get_pyro_resource()
 
     @property
     def loop(self) -> asyncio.AbstractEventLoop:
@@ -214,6 +222,13 @@ class DirectedRunProcess(AbstractRunCoordinator):
         ] = None,
     ) -> None:
         """Create a run orchestrator and protocol engine for a given run."""
+        if self._hardware_api is None:
+            await self._connect_to_hardware_api()
+            assert self._hardware_api is not None
+        if self._robot_server_resource is None:
+            await self._connect_to_robot_server_resource()
+            assert self._robot_server_resource is not None
+
         self._run_id = run_id
 
         if protocol is not None:
@@ -248,7 +263,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
             run_id=run_id,
             protocol_engine=engine,
             hardware_api=self._hardware_api,
-            # camera_provider=camera_provider,
+            camera_provider=self._robot_server_resource.get_camera_provider(),
             protocol_config=protocol.source.config if protocol else None,
         )
 
@@ -267,7 +282,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
             orchestrator.prepare()
 
         for offset in labware_offsets:
-            orchestrator.add_labware_offset(offset)
+            await orchestrator.add_labware_offset(offset)
 
         self._run_orchestrator = orchestrator
 
@@ -288,9 +303,11 @@ class DirectedRunProcess(AbstractRunCoordinator):
         assert self._run_orchestrator is not None
         return self._run_orchestrator
 
-    def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
+    async def play(
+        self, deck_configuration: Optional[DeckConfigurationType] = None
+    ) -> None:
         """Start or resume the run."""
-        self._guaranteed_run_orchestrator.play(deck_configuration)
+        await self._guaranteed_run_orchestrator.play(deck_configuration)
 
     async def run(
         self,
@@ -303,17 +320,19 @@ class DirectedRunProcess(AbstractRunCoordinator):
             deck_configuration, protocol_source, run_time_param_values
         )
 
-    def pause(self) -> None:
+    async def pause(self) -> None:
         """Pause the run."""
-        self._guaranteed_run_orchestrator.pause()
+        await self._guaranteed_run_orchestrator.pause()
 
     async def stop(self) -> None:
         """Stop the run."""
         await self._guaranteed_run_orchestrator.stop()
 
-    def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
+    async def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
         """Resume the run from recovery."""
-        self._guaranteed_run_orchestrator.resume_from_recovery(reconcile_false_positive)
+        await self._guaranteed_run_orchestrator.resume_from_recovery(
+            reconcile_false_positive
+        )
 
     async def finish(
         self,
@@ -328,19 +347,19 @@ class DirectedRunProcess(AbstractRunCoordinator):
             error, drop_tips_after_run, set_run_status, post_run_hardware_state
         )
 
-    def get_state_summary(self) -> StateSummary:
+    async def get_state_summary(self) -> StateSummary:
         """Get protocol run data."""
-        return self._guaranteed_run_orchestrator.get_state_summary()
+        return await self._guaranteed_run_orchestrator.get_state_summary()
 
-    def get_preconditions(self) -> CommandPreconditions:
+    async def get_preconditions(self) -> CommandPreconditions:
         """Get the preconditions of a protocol run."""
-        return self._guaranteed_run_orchestrator.get_preconditions()
+        return await self._guaranteed_run_orchestrator.get_preconditions()
 
-    def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
+    async def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
         """Get loaded labware definitions."""
-        return self._guaranteed_run_orchestrator.get_loaded_labware_definitions()
+        return await self._guaranteed_run_orchestrator.get_loaded_labware_definitions()
 
-    def get_run_time_parameters(self) -> List[RunTimeParameter]:
+    async def get_run_time_parameters(self) -> List[RunTimeParameter]:
         """Get the list of run time parameters defined in the protocol, if any.
 
         This returns a list of all run time parameters with their validated definitions
@@ -355,29 +374,31 @@ class DirectedRunProcess(AbstractRunCoordinator):
         whose values were successfully set will have the client-requested values while
         the others will contain the default values.
         """
-        return self._guaranteed_run_orchestrator.get_run_time_parameters()
+        return await self._guaranteed_run_orchestrator.get_run_time_parameters()
 
-    def get_all_command_annotations(self) -> List[CommandAnnotation]:
+    async def get_all_command_annotations(self) -> List[CommandAnnotation]:
         """Get the list of command annotations defined in the protocol, if any."""
-        return self._guaranteed_run_orchestrator.get_all_command_annotations()
+        return await self._guaranteed_run_orchestrator.get_all_command_annotations()
 
-    def get_total_command_annotations_count(self) -> int:
+    async def get_total_command_annotations_count(self) -> int:
         """Get the total number of command annotations defined in the protocol, if any."""
-        return self._guaranteed_run_orchestrator.get_total_command_annotations_count()
+        return await self._guaranteed_run_orchestrator.get_total_command_annotations_count()
 
-    def get_command_annotation(self, annotation_id: str) -> CommandAnnotation:
+    async def get_command_annotation(self, annotation_id: str) -> CommandAnnotation:
         """Get the command annotation by ID."""
-        return self._guaranteed_run_orchestrator.get_command_annotation(annotation_id)
+        return await self._guaranteed_run_orchestrator.get_command_annotation(
+            annotation_id
+        )
 
-    def get_current_command(self) -> Optional[CommandPointer]:
+    async def get_current_command(self) -> Optional[CommandPointer]:
         """Get the "current" command, if any."""
-        return self._guaranteed_run_orchestrator.get_current_command()
+        return await self._guaranteed_run_orchestrator.get_current_command()
 
-    def get_most_recently_finalized_command(self) -> Optional[CommandPointer]:
+    async def get_most_recently_finalized_command(self) -> Optional[CommandPointer]:
         """Get the most recently finalized command, if any."""
-        return self._guaranteed_run_orchestrator.get_most_recently_finalized_command()
+        return await self._guaranteed_run_orchestrator.get_most_recently_finalized_command()
 
-    def get_command_slice(
+    async def get_command_slice(
         self, cursor: Optional[int], length: int, include_fixit_commands: bool
     ) -> CommandSlice:
         """Get a slice of run commands.
@@ -387,19 +408,19 @@ class DirectedRunProcess(AbstractRunCoordinator):
             length: Length of slice to return.
             include_fixit_commands: Get all command intents.
         """
-        return self._guaranteed_run_orchestrator.get_command_slice(
+        return await self._guaranteed_run_orchestrator.get_command_slice(
             cursor, length, include_fixit_commands
         )
 
-    def get_command_annotations_slice(
+    async def get_command_annotations_slice(
         self, cursor: int, length: int
     ) -> CommandAnnotationsSlice:
         """Get a slice of command annotations in the run."""
-        return self._guaranteed_run_orchestrator.get_command_annotations_slice(
+        return await self._guaranteed_run_orchestrator.get_command_annotations_slice(
             cursor, length
         )
 
-    def get_command_error_slice(
+    async def get_command_error_slice(
         self,
         cursor: int,
         length: int,
@@ -412,66 +433,72 @@ class DirectedRunProcess(AbstractRunCoordinator):
                 based on the last error occurrence.
             length: Length of slice to return.
         """
-        return self._guaranteed_run_orchestrator.get_command_error_slice(cursor, length)
+        return await self._guaranteed_run_orchestrator.get_command_error_slice(
+            cursor, length
+        )
 
-    def get_command_recovery_target(self) -> Optional[CommandPointer]:
+    async def get_command_recovery_target(self) -> Optional[CommandPointer]:
         """Get the current error recovery target."""
-        return self._guaranteed_run_orchestrator.get_command_recovery_target()
+        return await self._guaranteed_run_orchestrator.get_command_recovery_target()
 
-    def get_command(self, command_id: str) -> Command:
+    async def get_command(self, command_id: str) -> Command:
         """Get a run's command by ID."""
-        return self._guaranteed_run_orchestrator.get_command(command_id)
+        return await self._guaranteed_run_orchestrator.get_command(command_id)
 
-    def get_all_commands(self) -> List[Command]:
+    async def get_all_commands(self) -> List[Command]:
         """Get all run commands."""
-        return self._guaranteed_run_orchestrator.get_all_commands()
+        return await self._guaranteed_run_orchestrator.get_all_commands()
 
-    def get_command_errors(self) -> List[ErrorOccurrence]:
+    async def get_command_errors(self) -> List[ErrorOccurrence]:
         """Get all run command errors."""
-        return self._guaranteed_run_orchestrator.get_command_errors()
+        return await self._guaranteed_run_orchestrator.get_command_errors()
 
-    def get_run_status(self) -> EngineStatus:
+    async def get_run_status(self) -> EngineStatus:
         """Get the current execution status of the engine."""
-        return self._guaranteed_run_orchestrator.get_run_status()
+        return await self._guaranteed_run_orchestrator.get_run_status()
 
-    def get_is_run_terminal(self) -> bool:
+    async def get_is_run_terminal(self) -> bool:
         """Get whether engine is in a terminal state."""
-        return self._guaranteed_run_orchestrator.get_is_run_terminal()
+        return await self._guaranteed_run_orchestrator.get_is_run_terminal()
 
-    def get_camera_capture_image_settings(
+    async def get_camera_capture_image_settings(
         self,
     ) -> Dict[str, Any]:
         """Get camera capture image settings."""
-        return self._guaranteed_run_orchestrator.get_camera_capture_image_settings()
+        return (
+            await self._guaranteed_run_orchestrator.get_camera_capture_image_settings()
+        )
 
-    def run_has_started(self) -> bool:
+    async def run_has_started(self) -> bool:
         """Get whether the run has started."""
-        return self._guaranteed_run_orchestrator.run_has_started()
+        return await self._guaranteed_run_orchestrator.run_has_started()
 
-    def run_has_stopped(self) -> bool:
+    async def run_has_stopped(self) -> bool:
         """Get whether the run has stopped."""
-        return self._guaranteed_run_orchestrator.run_has_stopped()
+        return await self._guaranteed_run_orchestrator.run_has_stopped()
 
-    def add_labware_offset(
+    async def add_labware_offset(
         self, request: LabwareOffsetCreate | LegacyLabwareOffsetCreate
     ) -> LabwareOffset:
         """Add a new labware offset to state."""
-        return self._guaranteed_run_orchestrator.add_labware_offset(request)
+        return await self._guaranteed_run_orchestrator.add_labware_offset(request)
 
-    def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
+    async def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         """Add a new labware definition to state."""
-        return self._guaranteed_run_orchestrator.add_labware_definition(definition)
+        return await self._guaranteed_run_orchestrator.add_labware_definition(
+            definition
+        )
 
-    def add_camera_enablement_settings(
+    async def add_camera_enablement_settings(
         self,
         enablement_settings: CameraSettings,
     ) -> CameraSettings:
         """Add new camera enablement settings."""
-        return self._guaranteed_run_orchestrator.add_camera_enablement_settings(
+        return await self._guaranteed_run_orchestrator.add_camera_enablement_settings(
             enablement_settings
         )
 
-    def add_camera_capture_image_settings(
+    async def add_camera_capture_image_settings(
         self,
         camera_id: Optional[str] = None,
         resolution: Optional[Tuple[int, int]] = None,
@@ -482,7 +509,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
         saturation: Optional[float] = None,
     ) -> None:
         """Add new camera capture image settings."""
-        self._guaranteed_run_orchestrator.add_camera_capture_image_settings(
+        await self._guaranteed_run_orchestrator.add_camera_capture_image_settings(
             camera_id, resolution, zoom, pan, contrast, brightness, saturation
         )
 
@@ -500,12 +527,15 @@ class DirectedRunProcess(AbstractRunCoordinator):
             )
         )
 
-    def estop(self) -> None:
+    async def estop(self) -> None:
         """Handle an E-stop event from the hardware API."""
-        self._guaranteed_run_orchestrator.estop()
+        await self._guaranteed_run_orchestrator.estop()
 
     async def asynchronous_module_error(
-        self, module_model: HardwareModuleModel, module_serial: str | None
+        self,
+        module_model: HardwareModuleModel,
+        module_serial: str | None,
+        error: EnumeratedError | None = None,
     ) -> bool:
         """Handle an asynchronous module error reported by hardware.
 
@@ -513,7 +543,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
         False, the caller should not call finish() until it otherwise would.
         """
         return await self._guaranteed_run_orchestrator.asynchronous_module_error(
-            module_model, module_serial
+            module_model, module_serial, error
         )
 
     async def module_disconnected(
@@ -548,9 +578,9 @@ class DirectedRunProcess(AbstractRunCoordinator):
             protocol_source, run_time_param_values, run_time_param_paths, parse_mode
         )
 
-    def get_is_okay_to_clear(self) -> bool:
+    async def get_is_okay_to_clear(self) -> bool:
         """Get whether the engine is stopped or sitting idly, so it could be removed."""
-        return self._guaranteed_run_orchestrator.get_is_okay_to_clear()
+        return await self._guaranteed_run_orchestrator.get_is_okay_to_clear()
 
     def prepare(self) -> None:
         """Prepare live runner for a run."""
@@ -565,16 +595,16 @@ class DirectedRunProcess(AbstractRunCoordinator):
         return self._deck_type
 
     @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
-    def get_nozzle_maps(self) -> Mapping[str, NozzleMap]:
+    async def get_nozzle_maps(self) -> Mapping[str, NozzleMap]:
         """Get current nozzle maps keyed by pipette id."""
         # NOTE: For the sake of Pyro compatibility this method returns NozzleMap, a serializable type
-        return self._guaranteed_run_orchestrator.get_nozzle_maps()  # type: ignore
+        return await self._guaranteed_run_orchestrator.get_nozzle_maps()  # type: ignore
 
-    def get_tip_attached(self) -> Dict[str, bool]:
+    async def get_tip_attached(self) -> Dict[str, bool]:
         """Get current tip state keyed by pipette id."""
-        return self._guaranteed_run_orchestrator.get_tip_attached()
+        return await self._guaranteed_run_orchestrator.get_tip_attached()
 
-    def set_error_recovery_policy(
+    async def set_error_recovery_policy(
         self,
         error_recovery_rules: List[ErrorRecoveryRule],
         error_recovery_is_enabled: bool,
@@ -583,13 +613,13 @@ class DirectedRunProcess(AbstractRunCoordinator):
         policy = create_error_recovery_policy_from_rules(
             error_recovery_rules, error_recovery_is_enabled
         )
-        self._guaranteed_run_orchestrator.set_error_recovery_policy(policy)
+        await self._guaranteed_run_orchestrator.set_error_recovery_policy(policy)
 
     @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
-    def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
+    async def get_flex_stacker_substate(self) -> Mapping[str, FlexStackerSubState]:
         """Get current (if any) Flex Stacker Substates keyed by module id."""
-        return self._guaranteed_run_orchestrator.get_flex_stacker_substate()
+        return await self._guaranteed_run_orchestrator.get_flex_stacker_substate()
 
-    def clear_command_history(self) -> None:
+    async def clear_command_history(self) -> None:
         """Force cleanup of command history."""
-        self._guaranteed_run_orchestrator.clear_command_history()
+        await self._guaranteed_run_orchestrator.clear_command_history()

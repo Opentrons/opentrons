@@ -1,19 +1,23 @@
-import { useRef, useState } from 'react'
+import { forwardRef, useRef, useState } from 'react'
 
 import { setRefs, TouchInputField } from '@opentrons/components'
 
+import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 
-import styles from './OnDeviceLogin.module.css'
-
-import type { ChangeEvent } from 'react'
-import type { ControllerRenderProps, FieldPath } from 'react-hook-form'
+import type { ChangeEvent, ReactNode } from 'react'
+import type { ControllerRenderProps } from 'react-hook-form'
 import type { LoginFormValues } from './index'
 
-export interface LoginFieldInputProps<
-  TFieldName extends FieldPath<LoginFormValues> = FieldPath<LoginFormValues>,
-> {
-  field: ControllerRenderProps<LoginFormValues, TFieldName>
+// todo(mm, 2026-08-21): It seems like LoginFieldInput and LoginFieldController could
+// be refactored so only one needs to know about form fields.
+type FieldProps =
+  | ControllerRenderProps<LoginFormValues, 'username'>
+  | ControllerRenderProps<LoginFormValues, 'password'>
+  | ControllerRenderProps<LoginFormValues, 'confirmPassword'>
+
+export interface LoginFieldInputProps {
+  field: FieldProps
   label: string
   error: string | null
   isPasswordField: boolean
@@ -21,29 +25,23 @@ export interface LoginFieldInputProps<
   autoFocus?: boolean
 }
 
-export function LoginFieldInput<
-  TFieldName extends FieldPath<LoginFormValues> = FieldPath<LoginFormValues>,
->({
-  field,
-  label,
-  error,
-  isPasswordField,
-  onClearError,
-  autoFocus,
-}: LoginFieldInputProps<TFieldName>): JSX.Element {
+export const LoginFieldInput = forwardRef<
+  HTMLInputElement,
+  LoginFieldInputProps
+>(function LoginFieldInput(
+  { field, label, error, isPasswordField, onClearError, autoFocus },
+  ref
+): ReactNode {
   const [showPassword, setShowPassword] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isPasswordHidden = isPasswordField && !showPassword
   const inputType: 'text' | 'password' = isPasswordHidden ? 'password' : 'text'
 
-  const togglePasswordVisibility = (): void => {
-    setShowPassword(current => !current)
-    inputRef.current?.focus()
-  }
+  usePlaceCaretAtEndOnToggle(inputRef, showPassword, isPasswordField)
 
-  const inputField = (
+  return (
     <TouchInputField
-      ref={setRefs(inputRef, field.ref)}
+      ref={setRefs(ref, inputRef, field.ref)}
       autoFocus={autoFocus}
       type={inputType}
       label={label}
@@ -51,26 +49,21 @@ export function LoginFieldInput<
       value={field.value ?? ''}
       name={field.name}
       id={field.name}
-      onBlur={e => {
-        field.onBlur()
-        e.target.focus()
-      }}
+      onBlur={field.onBlur}
       onChange={(e: ChangeEvent<HTMLInputElement>) => {
         field.onChange(e.target.value)
         onClearError?.()
       }}
+      accessory={
+        isPasswordField ? (
+          <PasswordVisibilityToggle
+            isVisible={showPassword}
+            onToggle={() => {
+              setShowPassword(prev => !prev)
+            }}
+          />
+        ) : null
+      }
     />
   )
-
-  if (!isPasswordField) return inputField
-
-  return (
-    <div className={styles.password_field_row}>
-      <div className={styles.password_field_input}>{inputField}</div>
-      <PasswordVisibilityToggle
-        isVisible={showPassword}
-        onToggle={togglePasswordVisibility}
-      />
-    </div>
-  )
-}
+})

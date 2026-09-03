@@ -65,7 +65,7 @@ interface RobotConfigurationDetailsProps {
 
 export const RobotConfigurationDetails = (
   props: RobotConfigurationDetailsProps
-): JSX.Element => {
+): ReactNode => {
   const {
     leftMountPipetteName,
     rightMountPipetteName,
@@ -309,7 +309,7 @@ interface RobotConfigurationDetailsItemProps {
 
 export const RobotConfigurationDetailsItem = (
   props: RobotConfigurationDetailsItemProps
-): JSX.Element => {
+): ReactNode => {
   const { label, item } = props
   return (
     <Flex

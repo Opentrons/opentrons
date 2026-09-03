@@ -3,6 +3,7 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { DocumentationRequired } from './DocumentationRequired'
 import styles from './documentationrequired.module.css'
 
+import type { ReactNode } from 'react'
 import type {
   DocumentationReport,
   DocumentedAction,
@@ -12,14 +13,16 @@ const DocumentationRequiredModalImpl = NiceModal.create(
   ({
     username,
     actionsToDocument,
+    minReportLength,
     onCancel,
     initialDocreport,
   }: {
     username: string
     actionsToDocument: DocumentedAction[]
+    minReportLength: number
     onCancel?: () => void
     initialDocreport?: DocumentationReport
-  }): JSX.Element => {
+  }): ReactNode => {
     const modal = useModal()
 
     const handleConfirm = (note: string): void => {
@@ -42,6 +45,7 @@ const DocumentationRequiredModalImpl = NiceModal.create(
           onConfirm={handleConfirm}
           onBack={handleBack}
           initialDocreport={initialDocreport}
+          minReportLength={minReportLength}
         />
       </div>
     )
@@ -51,12 +55,14 @@ const DocumentationRequiredModalImpl = NiceModal.create(
 export const showDocumentationRequiredModal = (
   username: string,
   actionsToDocument: DocumentedAction[],
+  minReportLength: number,
   onCancel?: () => void,
   initialDocreport?: DocumentationReport
 ): Promise<DocumentationReport> =>
   NiceModal.show(DocumentationRequiredModalImpl, {
     username,
     actionsToDocument,
+    minReportLength,
     onCancel,
     initialDocreport,
   })

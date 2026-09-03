@@ -1,7 +1,7 @@
 """Request and response models for the audit-server settings endpoints."""
 
 from textwrap import dedent
-from typing import Annotated
+from typing import Annotated, ClassVar
 
 import pydantic
 
@@ -18,6 +18,15 @@ class SettingsResponseData(_StrictBaseModel):
     is used both to seed and to reset the setting.
     """
 
+    requireReasonForInteraction: bool = pydantic.Field(
+        default=True,
+        description="Require reason for interaction.",
+    )
+    minLengthOfReasonForInteraction: int | None = pydantic.Field(
+        default=None,
+        description="Minimum length of reason for interaction. Set to null to remove the requirement.",
+    )
+
 
 class PatchSettingsRequestData(_StrictBaseModel):
     """A request to change the generic settings.
@@ -26,6 +35,20 @@ class PatchSettingsRequestData(_StrictBaseModel):
     as optional fields defaulting to ``None``; only fields explicitly provided
     in the request body are updated.
     """
+
+    requireReasonForInteraction: Annotated[
+        bool | None,
+        pydantic.Field(description="Require reason for interaction."),
+    ] = None
+    minLengthOfReasonForInteraction: Annotated[
+        int | None,
+        pydantic.Field(description="Minimum length of reason for interaction."),
+    ] = None
+    _NON_NULLABLE_FIELDS: ClassVar[frozenset[str]] = frozenset(
+        {
+            "requireReasonForInteraction",
+        }
+    )
 
 
 class LoggingEnabledResponseData(pydantic.BaseModel):

@@ -11,7 +11,7 @@ export interface StackedLabeledControlProps {
 
 export function StackedLabeledControl(
   props: StackedLabeledControlProps
-): JSX.Element {
+): ReactNode {
   const { label, control, children } = props
 
   return (

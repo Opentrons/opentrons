@@ -90,7 +90,11 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     @classmethod
     def parse_get_pressure_pid(cls, response: str) -> PressureControlTunings:
         """Parse the get pressure pid."""
-        pattern = r"P:(?P<P>\d.+) I:(?P<I>\d.+) D:(?P<D>\d.+) O:(?P<O>-?\d.+) V:(?P<V>\d.+) H:(?P<H>\d.+) T:(?P<T>\d.+)"
+        pattern = (
+            r"P:(?P<P>\d.+) I:(?P<I>\d.+) D:(?P<D>\d.+) O:(?P<O>-?\d.+) "
+            r"V:(?P<V>\d.+) H:(?P<H>\d.+) T:(?P<T>\d.+) "
+            r"A:(?P<A>\d.+) S:(?P<S>\d.+)"
+        )
         _RE = re.compile(rf"^{GCODE.GET_PRESSURE_PID} {pattern}$")
         match = _RE.match(response)
         if not match:
@@ -103,6 +107,8 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             float(match.group("V")),
             float(match.group("H")),
             float(match.group("T")),
+            float(match.group("A")),
+            float(match.group("S")),
         )
 
     @classmethod
@@ -157,7 +163,11 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             loop=loop,
             error_keyword=VM_ERROR_KEYWORD,
             async_error_ack=VM_ASYNC_ERROR_ACK,
-            reset_buffer_before_write=True,
+            # Do not reset the input buffer before writes. Waste-full (and other async
+            # module errors) are one-shot UART notifications that can arrive between
+            # commands. Clearing the buffer on every write drops them before the
+            # next read can partition and raise them.
+            reset_buffer_before_write=False,
             error_codes=VacuumModuleErrorCodes,
         )
         return cls(connection)
@@ -199,6 +209,10 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     async def is_connected(self) -> bool:
         """Check connection to vacuum module."""
         return await self._connection.is_open()
+
+    async def move_port(self, new_port: str) -> None:
+        """Try to change the port of the underlying connection."""
+        await self._connection.update_port(new_port)
 
     def reset_serial_buffers(self) -> None:
         """Reset the input and output serial buffers."""
@@ -369,25 +383,26 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         k_velocity: Optional[float] = None,
         k_holding: Optional[float] = None,
         tolerance: Optional[float] = None,
+        approach_band: Optional[float] = None,
+        slew_end_fraction: Optional[float] = None,
         reset: bool = False,
     ) -> None:
-        """Sets the PID tuning parameters for the pressure control."""
+        """Sets the PID tuning parameters for pressure control."""
 
         command = GCODE.SET_PRESSURE_PID.build_command()
-        if kp is not None:
-            command.add_float("P", kp, GCODE_ROUNDING_PRECISION)
-        if ki is not None:
-            command.add_float("I", ki, GCODE_ROUNDING_PRECISION)
-        if kd is not None:
-            command.add_float("D", kd, GCODE_ROUNDING_PRECISION)
-        if overshoot is not None:
-            command.add_float("O", overshoot, GCODE_ROUNDING_PRECISION)
-        if k_velocity is not None:
-            command.add_float("V", k_velocity, GCODE_ROUNDING_PRECISION)
-        if k_holding is not None:
-            command.add_float("H", k_holding, GCODE_ROUNDING_PRECISION)
-        if tolerance is not None:
-            command.add_float("T", tolerance, GCODE_ROUNDING_PRECISION)
+        for letter, value in (
+            ("P", kp),
+            ("I", ki),
+            ("D", kd),
+            ("O", overshoot),
+            ("V", k_velocity),
+            ("H", k_holding),
+            ("T", tolerance),
+            ("A", approach_band),
+            ("S", slew_end_fraction),
+        ):
+            if value is not None:
+                command.add_float(letter, value, GCODE_ROUNDING_PRECISION)
         command.add_int("R", int(reset))
 
         resp = await self._connection.send_command(command)
@@ -401,7 +416,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         )
         return self.parse_get_pressure_pid(resp)
 
-    async def set_waste_configs(  # noqa: C901
+    async def set_waste_configs(
         self,
         enable_waste_full_detection: bool,
         p_window_start: Optional[float] = None,
@@ -417,24 +432,19 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         """Sets the Waste Full detection algorithm parameters"""
 
         command = GCODE.SET_WASTE_CONFIG.build_command()
-        if p_window_start is not None:
-            command.add_float("S", p_window_start, GCODE_ROUNDING_PRECISION)
-        if p_window_end is not None:
-            command.add_float("P", p_window_end, GCODE_ROUNDING_PRECISION)
-        if baseline_fast_factor is not None:
-            command.add_float("F", baseline_fast_factor, GCODE_ROUNDING_PRECISION)
-        if max_delta_per_tick is not None:
-            command.add_float("D", max_delta_per_tick, GCODE_ROUNDING_PRECISION)
-        if max_rise_per_tick is not None:
-            command.add_float("R", max_rise_per_tick, GCODE_ROUNDING_PRECISION)
-        if max_cummulative_rise is not None:
-            command.add_float("C", max_cummulative_rise, GCODE_ROUNDING_PRECISION)
-        if p_filter_alpha is not None:
-            command.add_float("A", p_filter_alpha, GCODE_ROUNDING_PRECISION)
-        if min_window_time is not None:
-            command.add_float("M", min_window_time, GCODE_ROUNDING_PRECISION)
-        if max_window_time is not None:
-            command.add_float("X", max_window_time, GCODE_ROUNDING_PRECISION)
+        for letter, value in (
+            ("S", p_window_start),
+            ("P", p_window_end),
+            ("F", baseline_fast_factor),
+            ("D", max_delta_per_tick),
+            ("R", max_rise_per_tick),
+            ("C", max_cummulative_rise),
+            ("A", p_filter_alpha),
+            ("M", min_window_time),
+            ("X", max_window_time),
+        ):
+            if value is not None:
+                command.add_float(letter, value, GCODE_ROUNDING_PRECISION)
         command.add_int("E", int(enable_waste_full_detection))
 
         resp = await self._connection.send_command(command)

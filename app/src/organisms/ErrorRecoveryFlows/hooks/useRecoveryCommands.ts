@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import head from 'lodash/head'
 
 import {
+  isDocumentedMutationError,
   useErrorRecoveryPolicy,
   useResumeRunFromRecoveryAssumingFalsePositiveMutation,
   useResumeRunFromRecoveryMutation,
@@ -9,7 +10,7 @@ import {
 } from '@opentrons/react-api-client'
 import { WELL_ORIGIN_TOP } from '@opentrons/shared-data'
 
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useErrorRecoveryDocumentation } from '/app/local-resources/access-control/useErrorRecoveryDocumentation'
 import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
 import {
   useChainRunCommands,
@@ -116,19 +117,46 @@ export function useRecoveryCommands({
   selectedRecoveryOption,
 }: UseRecoveryCommandsParams): UseRecoveryCommandsResult {
   const [ignoreErrors, setIgnoreErrors] = useState(false)
+  const {
+    documentationState,
+    actionsToDocument,
+    addActionToDocument,
+    resumeAndHandleErrorPolicyDocState,
+    clearResumeAndHandleErrorPolicyDocreport,
+  } = useErrorRecoveryDocumentation({
+    ignoreErrors,
+    recoverySessionKey: unvalidatedFailedCommand?.id ?? null,
+  })
 
-  const { proceedToRouteAndStep } = routeUpdateActions
+  const { proceedToRouteAndStep, handleMotionRouting, stashedMapRef } =
+    routeUpdateActions
   const { mutateAsync: resumeRunFromRecovery } =
-    useResumeRunFromRecoveryMutation()
+    useResumeRunFromRecoveryMutation(resumeAndHandleErrorPolicyDocState)
   const { mutateAsync: resumeRunFromRecoveryAssumingFalsePositive } =
-    useResumeRunFromRecoveryAssumingFalsePositiveMutation()
-
-  const documentationState = useDocumentationState()
+    useResumeRunFromRecoveryAssumingFalsePositiveMutation(
+      resumeAndHandleErrorPolicyDocState
+    )
   const { stopRun } = useStopRunMutation(documentationState)
-  const updateErrorRecoveryPolicy = useUpdateRecoveryPolicyWithStrategy(runId)
+
+  const updateErrorRecoveryPolicy = useUpdateRecoveryPolicyWithStrategy(
+    runId,
+    resumeAndHandleErrorPolicyDocState
+  )
   const currentRecoveryPolicy = useErrorRecoveryPolicy(runId)?.data?.data
   const { chainRunCommands } = useChainRunCommands(
     runId,
+    documentationState,
+    actionsToDocument,
+    addActionToDocument,
+    unvalidatedFailedCommand?.id,
+    currentRecoveryPolicy
+  )
+
+  const { chainRunCommands: chainRetryRunCommands } = useChainRunCommands(
+    runId,
+    documentationState,
+    [...actionsToDocument, 'retry_action'],
+    addActionToDocument,
     unvalidatedFailedCommand?.id,
     currentRecoveryPolicy
   )
@@ -137,6 +165,10 @@ export function useRecoveryCommands({
   const reportAndRouteFailedCmd = (e: Error): Promise<never> => {
     console.warn(`Error executing "fixit" command: ${e}`)
     analytics.reportActionSelectedResult(selectedRecoveryOption, 'failed')
+    // Drop any in-motion stash so a later documentation cancel (e.g. from the
+    // recovery-failed "back to menu" home) restores this error screen, not the
+    // pre-retry step that was stashed when the failed action began.
+    stashedMapRef.current = null
     void proceedToRouteAndStep(RECOVERY_MAP.ERROR_WHILE_RECOVERING.ROUTE)
 
     return Promise.reject(new Error(`Could not execute command: ${e}`))
@@ -145,14 +177,26 @@ export function useRecoveryCommands({
   const chainRunRecoveryCommands = useCallback(
     (
       commands: CreateCommand[],
-      continuePastFailure: boolean = false
-    ): Promise<CommandData[]> =>
-      chainRunCommands(commands, continuePastFailure)
-        // the catch never occurs if continuePastCommandFailure is "true"
-        .catch((e: Error) => reportAndRouteFailedCmd(e)),
+      continuePastFailure: boolean = false,
+      chain: typeof chainRunCommands = chainRunCommands
+    ): Promise<CommandData[]> => {
+      return (
+        chain(commands, continuePastFailure)
+          // the catch never occurs if continuePastCommandFailure is "true"
+          .catch((e: Error) => {
+            // User cancelled documentation/login — return to the screen from
+            // before this mutation (stashed by handleMotionRouting(true)).
+            // Callers such as launch may still close the wizard afterward.
+            if (isDocumentedMutationError(e)) {
+              return handleMotionRouting(false).then(() => Promise.reject(e))
+            }
+            return reportAndRouteFailedCmd(e)
+          })
+      )
+    },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [analytics, selectedRecoveryOption]
+    [analytics, selectedRecoveryOption, chainRunCommands, handleMotionRouting]
   )
 
   const buildRetryPrepMove = ():
@@ -298,12 +342,18 @@ export function useRecoveryCommands({
           // move back to the location of the command if it is an in-place command
           buildRetryPrepMove(),
           { commandType, params }, // retry the command that failed
-        ].filter(c => c != null) as CreateCommand[]
+        ].filter(c => c != null) as CreateCommand[],
+        false,
+        chainRetryRunCommands
       ) // the created command is the same command that failed
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [chainRunRecoveryCommands, unvalidatedFailedCommand?.key]
+    [
+      chainRunRecoveryCommands,
+      chainRetryRunCommands,
+      unvalidatedFailedCommand?.key,
+    ]
   )
 
   // Homes the Z-axis of all attached pipettes.
@@ -361,11 +411,16 @@ export function useRecoveryCommands({
 
           return updateErrorRecoveryPolicy(ignorePolicyRules, 'append')
             .then(() => Promise.resolve())
-            .catch((e: Error) =>
-              reportAndRouteFailedCmd(
+            .catch((e: Error) => {
+              // User cancelled documentation — let resumeRun/skipFailedCommand
+              // restore the previous screen instead of showing action-failed.
+              if (isDocumentedMutationError(e)) {
+                return Promise.reject(e)
+              }
+              return reportAndRouteFailedCmd(
                 new Error(`Failed to update recovery policy: ${e.message}`)
               )
-            )
+            })
         } else {
           return reportAndRouteFailedCmd(
             new Error('Could not execute command. No failed command.')
@@ -395,6 +450,15 @@ export function useRecoveryCommands({
           )
           makeSuccessToast()
         })
+        .catch((error: unknown) => {
+          // Allow a retry to re-prompt; policy may have already succeeded.
+          clearResumeAndHandleErrorPolicyDocreport()
+          if (isDocumentedMutationError(error)) {
+            return handleMotionRouting(false)
+          }
+          // Non-documentation failures already route to ERROR_WHILE_RECOVERING
+          // (e.g. via handleIgnoringErrorKind).
+        })
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -405,18 +469,41 @@ export function useRecoveryCommands({
       handleIgnoringErrorKind,
       selectedRecoveryOption,
       makeSuccessToast,
+      handleMotionRouting,
+      clearResumeAndHandleErrorPolicyDocreport,
     ]
   )
 
-  const cancelRun = useCallback(
-    (): void => {
-      analytics.reportActionSelectedResult(selectedRecoveryOption, 'succeeded')
-      stopRun(runId)
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [runId]
-  )
+  const cancelRun = useCallback((): void => {
+    stopRun(runId, {
+      onSuccess: () => {
+        analytics.reportActionSelectedResult(
+          selectedRecoveryOption,
+          'succeeded'
+        )
+      },
+      onError: (error: unknown) => {
+        // stopRun is not routed through chainRunRecoveryCommands, so handle
+        // documentation cancel here. Always return to confirm-cancel rather than
+        // restoring a DROP_TIP_FLOWS stash — after tips are removed, that would
+        // re-enter the drop tip wizard from the start.
+        if (isDocumentedMutationError(error)) {
+          stashedMapRef.current = null
+          void proceedToRouteAndStep(
+            RECOVERY_MAP.CANCEL_RUN.ROUTE,
+            RECOVERY_MAP.CANCEL_RUN.STEPS.CONFIRM_CANCEL
+          )
+        }
+      },
+    })
+  }, [
+    runId,
+    stopRun,
+    proceedToRouteAndStep,
+    stashedMapRef,
+    selectedRecoveryOption,
+    analytics,
+  ])
 
   const handleResumeAction = (): Promise<RunAction> => {
     if (isAssumeFalsePositiveResumeKind(failedCommand)) {
@@ -428,15 +515,25 @@ export function useRecoveryCommands({
 
   const skipFailedCommand = useCallback(
     (): void => {
-      void handleIgnoringErrorKind().then(() =>
-        handleResumeAction().then(() => {
+      void handleIgnoringErrorKind()
+        .then(() => handleResumeAction())
+        .then(() => {
           analytics.reportActionSelectedResult(
             selectedRecoveryOption,
             'succeeded'
           )
           makeSuccessToast()
         })
-      )
+        .catch((error: unknown) => {
+          // Allow a retry to re-prompt; policy may have already succeeded.
+          clearResumeAndHandleErrorPolicyDocreport()
+          if (isDocumentedMutationError(error)) {
+            return handleMotionRouting(false)
+          }
+          // Non-documentation failures already route to ERROR_WHILE_RECOVERING
+          // (e.g. via handleIgnoringErrorKind). Avoid an unhandled rejection
+          // from void call sites.
+        })
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -446,6 +543,8 @@ export function useRecoveryCommands({
       handleIgnoringErrorKind,
       selectedRecoveryOption,
       makeSuccessToast,
+      handleMotionRouting,
+      clearResumeAndHandleErrorPolicyDocreport,
     ]
   )
 

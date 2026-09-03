@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -32,6 +33,7 @@ import { useIsOEMMode } from '/app/resources/robot-settings'
 
 import { useRemoveActiveAppUpdateToast } from '../Alerts'
 
+import type { ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
 interface PlaceHolderErrorProps {
@@ -40,7 +42,7 @@ interface PlaceHolderErrorProps {
 
 const PlaceholderError = ({
   errorMessage,
-}: PlaceHolderErrorProps): JSX.Element => {
+}: PlaceHolderErrorProps): ReactNode => {
   const SOMETHING_WENT_WRONG = 'Something went wrong while updating your app.'
   const AN_UNKNOWN_ERROR_OCCURRED = 'An unknown error occurred.'
   const FALLBACK_ERROR_MESSAGE = `If you keep getting this message, try restarting your app and/or
@@ -83,11 +85,12 @@ export interface UpdateAppModalProps {
   closeModal: (arg0: boolean) => void
 }
 
-export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
+export function UpdateAppModal(props: UpdateAppModalProps): ReactNode {
   const { closeModal } = props
   const dispatch = useDispatch<Dispatch>()
   const isOEMMode = useIsOEMMode()
   const updateState = useSelector(getShellUpdateState)
+  const [doUpdateWhenReady, setDoUpdateWhenReady] = useState<boolean>(false)
   const {
     downloaded,
     downloading,
@@ -108,9 +111,11 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
   const { removeActiveAppUpdateToast } = useRemoveActiveAppUpdateToast()
   const availableAppUpdateVersion = useSelector(getAvailableShellUpdate) ?? ''
 
-  if (downloaded) {
-    setTimeout(() => dispatch(applyShellUpdate()), RESTART_APP_AFTER_TIME)
-  }
+  useEffect(() => {
+    if (downloaded && doUpdateWhenReady) {
+      setTimeout(() => dispatch(applyShellUpdate()), RESTART_APP_AFTER_TIME)
+    }
+  }, [downloaded, doUpdateWhenReady, dispatch])
 
   const handleRemindMeLaterClick = (): void => {
     navigate('/app-settings/general')
@@ -132,7 +137,6 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
         css={css`
           font-size: 0.875rem;
         `}
-        id="SoftwareUpdateReleaseNotesLink"
         marginLeft={SPACING.spacing32}
       >
         {t('release_notes')}
@@ -145,10 +149,13 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
           {t('remind_later')}
         </SecondaryButton>
         <PrimaryButton
-          onClick={() => dispatch(downloadShellUpdate())}
+          onClick={() => {
+            dispatch(downloadShellUpdate())
+            setDoUpdateWhenReady(true)
+          }}
           marginRight={SPACING.spacing12}
         >
-          {t('update_app_now')}
+          {t('update_and_restart')}
         </PrimaryButton>
       </Flex>
     </Flex>
@@ -167,7 +174,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
           <PlaceholderError errorMessage={error.message} />
         </Modal>
       ) : null}
-      {(downloading || downloaded) && error == null ? (
+      {doUpdateWhenReady && error == null ? (
         <Modal
           title={t('branded:opentrons_app_update')}
           css={LEGACY_MODAL_STYLE}
@@ -187,7 +194,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
           </Flex>
         </Modal>
       ) : null}
-      {!downloading && !downloaded && error == null ? (
+      {!doUpdateWhenReady && error == null ? (
         <Modal
           title={t('branded:opentrons_app_update_available')}
           onClose={() => {

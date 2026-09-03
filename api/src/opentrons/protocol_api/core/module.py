@@ -45,6 +45,16 @@ class AbstractModuleCore(ABC, Generic[LabwareCoreType]):
     def get_display_name(self) -> str:
         """Get the module's display name."""
 
+    def inject_async_gcode_response(
+        self,
+        gcode_response: str,
+        command: str,
+    ) -> None:
+        """Inject a firmware-style async G-code error for module testing."""
+        raise NotImplementedError(
+            "inject_async_gcode_response is not supported by this module."
+        )
+
 
 ModuleCoreType = TypeVar("ModuleCoreType", bound=AbstractModuleCore[Any])
 
@@ -228,13 +238,13 @@ class AbstractThermocyclerCore(
         Profile defined as a cycle of ``steps`` to repeat for a given number of ``repetitions``
 
         Note:
-            Unlike the :py:meth:`set_block_temperature`, either or both of
+            Unlike [`set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.set_block_temperature], either or both of
             'hold_time_minutes' and 'hold_time_seconds' must be defined
             and finite for each step.
         Args:
             steps: List of unique steps that make up a single cycle.
                 Each list item should be a dictionary that maps to
-                the parameters of the :py:meth:`set_block_temperature`
+                the parameters of the [`set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.set_block_temperature]
                 method with keys 'temperature', 'hold_time_seconds',
                 and 'hold_time_minutes'.
             repetitions: The number of times to repeat the cycled steps.
@@ -255,13 +265,13 @@ class AbstractThermocyclerCore(
         Profile defined as a cycle of ``steps`` to repeat for a given number of ``repetitions``
 
         Note:
-            Unlike the :py:meth:`execute_profile`, once the profile has started
+            Unlike [`execute_profile()`][opentrons.protocol_api.ThermocyclerContext.execute_profile], once the profile has started
             the protocol will immediately move on to the next command, rather than waiting
             for it to finish.
         Args:
             steps: List of unique steps that make up a single cycle.
                 Each list item should be a dictionary that maps to
-                the parameters of the :py:meth:`set_block_temperature`
+                the parameters of the [`set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.set_block_temperature]
                 method with keys 'temperature', 'hold_time_seconds',
                 and 'hold_time_minutes'.
             repetitions: The number of times to repeat the cycled steps.
@@ -568,6 +578,7 @@ class AbstractVacuumModuleCore(
         ramp_rate: float | None,
         timeout_s: int | None,
         vent_after: bool | None,
+        equalize_timeout_s: int | None = None,
     ) -> AbstractTaskCore:
         """Set vacuum pressure."""
 
@@ -579,6 +590,7 @@ class AbstractVacuumModuleCore(
         ramp_rate: float | None,
         timeout_s: int | None,
         vent_after: bool | None,
+        equalize_timeout_s: int | None = None,
     ) -> AbstractTaskCore:
         """Set vacuum power."""
 
@@ -590,13 +602,18 @@ class AbstractVacuumModuleCore(
 
     @abstractmethod
     def start_execute_profile(
-        self, steps: List[VacuumModuleStep], repetitions: int, vent_after: bool = False
+        self,
+        steps: List[VacuumModuleStep],
+        repetitions: int,
+        vent_after: bool = False,
+        equalize_timeout_s: int | None = None,
     ) -> AbstractTaskCore:
         """Start a vacuum module profile."""
 
     @abstractmethod
     def open_vent(
         self,
+        equalize_timeout_s: int | None = None,
     ) -> None:
         """Open the vent."""
 

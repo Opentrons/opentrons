@@ -86,6 +86,9 @@ export interface PipetteWizardStepProps {
   attachedPipettes: AttachedPipettesFromInstrumentsQuery
   setShowErrorMessage: Dispatch<SetStateAction<string | null>>
   errorMessage: string | null
+  isDoorOpenError: boolean
+  setIsDoorOpenError: Dispatch<SetStateAction<boolean>>
+  dismissDoorOpenError: () => void
   selectedPipette: SelectablePipettes
   isOnDevice: boolean | null
 }

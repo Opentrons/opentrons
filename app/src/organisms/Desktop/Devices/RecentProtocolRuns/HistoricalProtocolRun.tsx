@@ -3,12 +3,15 @@ import {
   BORDERS,
   COLORS,
   Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   StyledText,
   Tag,
 } from '@opentrons/components'
+import { useDeleteRunMutation } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { DisplayRunStatus } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/DisplayRunStatus'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import { EMPTY_TIMESTAMP } from '/app/resources/runs'
@@ -28,6 +31,7 @@ interface HistoricalProtocolRunProps {
   protocolName: string
   robotName: string
   robotIsBusy: boolean
+  isDeleting?: boolean
   protocolKey?: string
 }
 
@@ -36,7 +40,14 @@ interface HistoricalProtocolRunProps {
 export function HistoricalProtocolRun(
   props: HistoricalProtocolRunProps
 ): JSX.Element | null {
-  const { run, protocolName, robotIsBusy, robotName, protocolKey } = props
+  const {
+    run,
+    protocolName,
+    robotIsBusy,
+    robotName,
+    isDeleting = false,
+    protocolKey,
+  } = props
   const outputFileIds = useRunGeneratedDataFiles(run.id)
   const imageFileCount = outputFileIds.jpeg.length > 0 ? 1 : 0
   const totalOutputFiles = outputFileIds.csv.length + imageFileCount
@@ -57,6 +68,11 @@ export function HistoricalProtocolRun(
       duration = formatInterval(run.startedAt, new Date().toString())
     }
   }
+
+  const documentationState = useDocumentationState()
+
+  const { deleteRun, isLoading: isDeletingRunSingle } =
+    useDeleteRunMutation(documentationState)
 
   return (
     <>
@@ -105,12 +121,18 @@ export function HistoricalProtocolRun(
             <Tag type="default" text={duration} shrinkToContent />
           </Flex>
         </Flex>
-        <OverflowMenu
-          runId={run.id}
-          robotName={robotName}
-          robotIsBusy={robotIsBusy}
-          runHasImages={imageFileCount > 0}
-        />
+        {isDeleting || isDeletingRunSingle ? (
+          <Icon name="ot-spinner" spin size="1rem" color={COLORS.grey60} />
+        ) : (
+          <OverflowMenu
+            run={run}
+            robotName={robotName}
+            robotIsBusy={robotIsBusy}
+            runHasImages={imageFileCount > 0}
+            deleteRun={deleteRun}
+            isDeletingRun={isDeletingRunSingle}
+          />
+        )}
       </Flex>
     </>
   )

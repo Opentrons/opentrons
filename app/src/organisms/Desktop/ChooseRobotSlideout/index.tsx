@@ -64,6 +64,7 @@ import {
 import { AvailableRobotOption } from './AvailableRobotOption'
 import { FileCard } from './FileCard'
 
+import type { ReactNode } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type { RobotType, RunTimeParameter } from '@opentrons/shared-data'
 import type { SlideoutProps } from '/app/atoms/Slideout'
@@ -138,7 +139,7 @@ interface ChooseRobotSlideoutProps
 
 export function ChooseRobotSlideout(
   props: ChooseRobotSlideoutProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation(['protocol_details', 'shared', 'app_settings'])
   const {
     isExpanded,

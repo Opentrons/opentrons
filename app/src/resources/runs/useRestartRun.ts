@@ -10,7 +10,9 @@ export function useRestartRun(): () => void {
   return () => {
     if (mostRecentRunId != null) {
       closeCurrentRun({
-        onSuccess: cloneRun,
+        onSuccess: () => {
+          cloneRun()
+        },
       })
     }
   }

@@ -18,8 +18,9 @@
   },
   "parameters": {
     "format": "96Standard",
-    "quirks": ["filterPlate"],
+    "quirks": ["filterPlate", "noLabwarePositionCheck"],
     "isTiprack": false,
+    "isDeckSlotCompatible": false,
     "isMagneticModuleCompatible": false,
     "loadName": "millipore_96_wellplate_500ul_solvinet_filter"
   },
@@ -28,6 +29,8 @@
     "y": 0,
     "z": 0
   },
+  "gripForce": 15,
+  "gripHeightFromLabwareBottom": 11.91,
   "dimensions": {
     "xDimension": 127.8,
     "yDimension": 85.49,

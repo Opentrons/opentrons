@@ -3,13 +3,13 @@
   "moduleType": "vacuumModuleType",
   "model": "vacuumModuleV1",
   "labwareOffset": {
-    "x": 0,
+    "x": 0.4,
     "y": 0,
-    "z": 19
+    "z": 18.75
   },
   "features": {},
   "dimensions": {
-    "bareOverallHeight": 37,
+    "bareOverallHeight": 36.5,
     "overLabwareHeight": 0,
     "xDimension": 143,
     "yDimension": 101.5,
@@ -28,7 +28,7 @@
       "frontRightTop": {
         "x": 143,
         "y": 101.5,
-        "z": 37
+        "z": 36.5
       }
     }
   },
@@ -52,7 +52,7 @@
       "dropOffset": {
         "x": 0,
         "y": 0,
-        "z": 2
+        "z": 1
       }
     }
   },

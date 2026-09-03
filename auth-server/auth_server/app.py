@@ -1,6 +1,8 @@
 """The server's ASGI app object."""
 
-from contextlib import asynccontextmanager
+import asyncio
+import logging
+from contextlib import AsyncExitStack, asynccontextmanager
 from pathlib import Path
 from typing import AsyncGenerator, Optional
 
@@ -9,14 +11,25 @@ from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse
 
 from server_utils import systemd_utils
+from server_utils.audit.audit_server import (
+    Client as AuditClient,
+)
+from server_utils.audit.audit_server import (
+    SubmitAuditLogMessageData,
+)
+from server_utils.audit.fastapi import (
+    audit_logger_middleware,
+    build_audit_client,
+    install_audit_client,
+)
 from server_utils.auth.resource_server.fastapi import (
     AuthorizationError,
     handle_authorization_error,
-    install_authorization_checker,
+    install_authentication_checker,
 )
 
 from auth_server.api_error import APIError, handle_api_error
-from auth_server.authorization_checker import build_authorization_checker
+from auth_server.authentication_checker import build_authentication_checker
 from auth_server.oauth2.backend import Backend as OAuth2Backend
 from auth_server.oauth2.fastapi_dependencies import (
     install_oauth2_backend,
@@ -33,13 +46,18 @@ from auth_server.persistence.persistence_directory import (
     prepare_root,
 )
 from auth_server.server_settings import AuthServerSettings, get_settings
+from auth_server.settings.models import (
+    AUTH_SERVER_AUDIT_SYSTEM_FULLNAME,
+    AUTH_SERVER_AUDIT_SYSTEM_NAME,
+)
 from auth_server.settings.router import router as settings_router
 from auth_server.settings.store import SettingsStore, install_settings_store
 from auth_server.users.router import router as users_router
 from auth_server.users.store import UserStore
-from auth_server.users.user_data_manager import UserDataManager
 
 _REDOC_CDN_URL = "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js"
+
+_LOG = logging.getLogger(__name__)
 
 
 def _get_persistence_directory_root(settings: AuthServerSettings) -> Optional[Path]:
@@ -47,6 +65,28 @@ def _get_persistence_directory_root(settings: AuthServerSettings) -> Optional[Pa
     if settings.persistence_directory == "automatically_make_temporary":
         return None
     return settings.persistence_directory
+
+
+def _oauth_audit_log(audit_client: AuditClient, action: str, message: str) -> None:
+    asyncio.create_task(_do_oauth_audit_log(audit_client, action, message))
+
+
+async def _do_oauth_audit_log(
+    audit_client: AuditClient, action: str, message: str
+) -> None:
+    try:
+        await audit_client.submit_log_message(
+            SubmitAuditLogMessageData(
+                action=action,
+                message=message,
+                accountName=AUTH_SERVER_AUDIT_SYSTEM_NAME,
+                legalName=AUTH_SERVER_AUDIT_SYSTEM_FULLNAME,
+                reason=None,
+            )
+        )
+        _LOG.info(f"{action}: {message}")
+    except BaseException:
+        _LOG.exception("audit log for login failed")
 
 
 @asynccontextmanager
@@ -59,23 +99,30 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     active_subdirectory = await prepare_active_subdirectory(prepared_root)
     db_path = active_subdirectory / DB_FILE
 
-    with sql_engine_ctx(db_path) as engine:
+    async with AsyncExitStack() as exit_stack:
+        engine = exit_stack.enter_context(sql_engine_ctx(db_path))
         set_sql_engine(app.state, engine)
+        audit_client = await exit_stack.enter_async_context(
+            build_audit_client(
+                audit_server_uds=settings.audit_server_uds,
+                audit_server_url=settings.audit_server_url,
+            )
+        )
+        install_audit_client(app.state, audit_client)
 
         user_store = UserStore(sql_engine=engine)
         settings_store = SettingsStore(sql_engine=engine)
-        oauth2_backend = OAuth2Backend(user_store, settings_store)
-        install_oauth2_backend(app.state, oauth2_backend)
-        user_service = UserDataManager(
-            user_store=user_store, settings_store=settings_store
+        oauth2_backend = OAuth2Backend(
+            user_store,
+            settings_store,
+            lambda action, message: _oauth_audit_log(audit_client, action, message),
         )
-        user_service.seed_initial_users()
+        install_oauth2_backend(app.state, oauth2_backend)
         install_settings_store(app.state, settings_store)
-        authorization_checker = build_authorization_checker(
+        authentication_checker = build_authentication_checker(
             settings_store, oauth2_backend
         )
-        install_authorization_checker(app.state, authorization_checker)
-
+        install_authentication_checker(app.state, authentication_checker)
         systemd_utils.notify_up()
         yield
 
@@ -102,6 +149,7 @@ app = FastAPI(
     openapi_tags=_TAGS,
 )
 
+app.middleware("http")(audit_logger_middleware)
 
 app.exception_handler(APIError)(handle_api_error)
 app.exception_handler(AuthorizationError)(handle_authorization_error)

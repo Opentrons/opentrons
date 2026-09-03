@@ -2,6 +2,7 @@ import { COLOR_WARNING } from '../styles'
 import { Icon } from './Icon'
 import { ICON_DATA_BY_NAME } from './icon-data'
 
+import type { ReactNode } from 'react'
 import type { IconName, IconProps } from './Icon'
 
 export interface NotificationIconProps extends IconProps {
@@ -17,7 +18,7 @@ const SCALE_FACTOR = 3
  * Inline SVG icon component with additional nested notification icon. Takes
  * all the same props as Icon in addition to the ones listed above.
  */
-export function NotificationIcon(props: NotificationIconProps): JSX.Element {
+export function NotificationIcon(props: NotificationIconProps): ReactNode {
   const { childName, childColor, ...iconProps } = props
   const { viewBox } = ICON_DATA_BY_NAME[iconProps.name]
   const [x, y, width, height] = viewBox.split(' ').map(Number)

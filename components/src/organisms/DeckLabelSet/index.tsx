@@ -9,7 +9,7 @@ import { Box } from '../../primitives'
 import { POSITION_ABSOLUTE, POSITION_RELATIVE } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 
-import type { ForwardedRef } from 'react'
+import type { ForwardedRef, ReactNode } from 'react'
 import type { DeckLabelProps } from '../../molecules/DeckLabel'
 
 interface DeckLabelSetProps {
@@ -29,7 +29,7 @@ const HEIGHT_ADJUSTED = 30
 const DeckLabelSetComponent = (
   props: DeckLabelSetProps,
   ref: ForwardedRef<HTMLDivElement>
-): JSX.Element => {
+): ReactNode => {
   const {
     deckLabels,
     x,

@@ -12,7 +12,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons_shared_data.robot.types import RobotType
 from server_utils.util import call_once
 
-from .models import DiskDetails, Health, HealthLinks
+from .models import Health, HealthLinks
 from robot_server.disk_monitor.dependencies import get_disk_monitor
 from robot_server.disk_monitor.monitor import DiskMonitor
 from robot_server.hardware import get_hardware, get_robot_type
@@ -36,6 +36,10 @@ FLEX_LOG_PATHS = [
     "/logs/server.log",
     "/logs/update_server.log",
     "/logs/touchscreen.log",
+    "/logs/kernel.log",
+    "/logs/auth_server.log",
+    "/logs/audit_server.log",
+    "/logs/remote_access.log",
 ]
 VERSION_PATH = "/etc/VERSION.json"
 
@@ -129,7 +133,7 @@ health_router = APIRouter()
     response_model_exclude_none=True,
 )
 async def get_health(
-    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
+    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],  # SAFE
     # This endpoint doesn't actually need sql_engine. We use it in order to artificially
     # fail requests until the database has finished initializing. This plays into the
     # Opentrons App's current error handling. With a non-healthy /health, the app will
@@ -163,21 +167,19 @@ async def get_health(
         minimum_protocol_api_version = protocol_api.MIN_SUPPORTED_VERSION
         logs = OT2_LOG_PATHS
 
+    hardware_details = await hardware.get_hw_details()
+
     return Health(
         name=config.name(),
         api_version=versions.api_version,
-        fw_version=hardware.fw_version,
-        board_revision=hardware.board_revision,
+        fw_version=hardware_details.fw_version,
+        board_revision=hardware_details.board_revision,
         logs=logs,
         system_version=versions.system_version,
         maximum_protocol_api_version=list(protocol_api.MAX_SUPPORTED_VERSION),
         minimum_protocol_api_version=list(minimum_protocol_api_version),
         robot_model=robot_type,
         links=health_links,
-        robot_serial=(await hardware.get_serial_number()),
-        disk_details=DiskDetails(
-            systemAvailableMb=disk_monitor.get_available_disk_space_mb(),
-            systemTotalMb=disk_monitor.get_total_disk_space_mb(),
-            imagesDirectorySizeMb=disk_monitor.get_images_directory_size_mb(),
-        ),
+        robot_serial=hardware_details.serial_number,
+        disk_details=disk_monitor.get_details(),
     )

@@ -31,12 +31,11 @@ import { getLatestCurrentOffsets } from '/app/transformations/runs'
 
 import { LegacyCurrentOffsetsTable } from './LegacyCurrentOffsetsTable'
 
+import type { ReactNode } from 'react'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type { SetupLabwarePositionCheckProps } from '..'
 
-export function OT2SetupLPC(
-  props: SetupLabwarePositionCheckProps
-): JSX.Element {
+export function OT2SetupLPC(props: SetupLabwarePositionCheckProps): ReactNode {
   const { robotName, runId, setOffsetsConfirmed, offsetsConfirmed } = props
   const { t, i18n } = useTranslation('protocol_setup')
 
@@ -120,7 +119,6 @@ export function OT2SetupLPC(
           onClick={() => {
             setOffsetsConfirmed(true)
           }}
-          id="LPC_setOffsetsConfirmed"
           padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
           {...confirmOffsetsTargetProps}
           disabled={
@@ -140,7 +138,6 @@ export function OT2SetupLPC(
         <PrimaryButton
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           onClick={launchLPC}
-          id="LabwareSetup_checkLabwarePositionsButton"
           {...runLPCTargetProps}
           disabled={lpcDisabledReason !== null || isLaunchingLPC}
         >

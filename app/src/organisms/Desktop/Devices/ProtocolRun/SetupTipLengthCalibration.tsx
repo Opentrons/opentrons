@@ -16,6 +16,8 @@ import { useRunPipetteInfoByMount } from '/app/resources/runs'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 import { SetupTipLengthCalibrationButton } from './SetupTipLengthCalibrationButton'
 
+import type { ReactNode } from 'react'
+
 interface SetupTipLengthCalibrationProps {
   robotName: string
   runId: string
@@ -24,17 +26,13 @@ interface SetupTipLengthCalibrationProps {
 export function SetupTipLengthCalibration({
   robotName,
   runId,
-}: SetupTipLengthCalibrationProps): JSX.Element {
+}: SetupTipLengthCalibrationProps): ReactNode {
   const { t } = useTranslation(['protocol_setup', 'devices_landing'])
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-      <LegacyStyledText
-        color={COLORS.black90}
-        css={TYPOGRAPHY.pSemiBold}
-        id="TipRackCalibration_requiredTipLengthTitle"
-      >
+      <LegacyStyledText color={COLORS.black90} css={TYPOGRAPHY.pSemiBold}>
         {t('required_tip_racks_title')}
       </LegacyStyledText>
       {PIPETTE_MOUNTS.map(mount => {

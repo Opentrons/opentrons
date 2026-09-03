@@ -9,4 +9,32 @@ export interface LogPeriodSummariesResponse {
   meta: { totalLength: number }
 }
 
-export type DownloadedLogPeriodResponse = Blob | string
+export type DownloadedLogPeriodResponse = Blob
+
+export interface DeleteLogPeriodQueryParams {
+  deletionKey: string
+}
+
+export interface PostLogMessageData {
+  action: string
+  message: string
+}
+
+export interface PostLogMessageResponse {
+  data: {
+    loggedAt: string
+  }
+}
+
+export interface LogPeriodDetails {
+  id: string
+  startedAt: string
+  endedAt: string | null
+  recordCount: number
+  totalSizeBytes: number
+  attachedFilenames: string[]
+}
+
+export interface LogPeriodDetailsResponse {
+  data: LogPeriodDetails
+}

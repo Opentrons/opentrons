@@ -90,7 +90,7 @@ export interface ArrowProps {
   backgroundColor: string
 }
 
-export function Arrow(props: ArrowProps): JSX.Element {
+export function Arrow(props: ArrowProps): ReactNode {
   // shift arrows off the element
   const ARROW_ANCHOR_OFFSET = `-${ARROW_SIZE_PX}px;`
 

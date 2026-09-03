@@ -208,6 +208,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
 
     // the following commands currently don't effect tracked robot state
+    case 'setRailLights':
     case 'touchTip': // pipetting
     case 'configureForVolume':
     case 'loadPipette': // setup VVV
@@ -403,6 +404,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
     case 'heaterShaker/setAndWaitForShakeSpeed':
+    case 'heaterShaker/setShakeSpeed':
       forHeaterShakerSetTargetShakeSpeed(
         command.params,
         invariantContext,

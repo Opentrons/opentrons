@@ -2,11 +2,21 @@ import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
-import { COLORS, LegacyStyledText } from '@opentrons/components'
+import {
+  ALIGN_CENTER,
+  ALIGN_FLEX_END,
+  COLORS,
+  Flex,
+  JUSTIFY_FLEX_END,
+  LegacyStyledText,
+  PrimaryButton,
+  SPACING,
+} from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import { useGetModulesNeedingSetupThatCanCurrentlyBeSetUp } from '/app/App/hooks/useGetModulesNeedingSetup'
+import { SmallButton } from '/app/atoms/buttons'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import {
   SimpleWizardBody,
@@ -21,7 +31,6 @@ import { CheckStackerInstall } from './CheckStackerInstall'
 import { CloseDoor } from './CloseStackerDoor'
 import { SECTIONS } from './constants'
 import { DetachProbe } from './DetachProbe'
-import { useSendIdentifyModule } from './hooks'
 import { InstallShuttle } from './InstallShuttle'
 import { ModuleWizardScreen } from './ModuleWizardScreen'
 import { PlaceAdapter } from './PlaceAdapter'
@@ -31,6 +40,7 @@ import { Success } from './Success'
 import { UpdateFirmware } from './UpdateFirmware'
 import { useModuleSetupWizard } from './useModuleSetupWizard'
 
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 
 interface ModuleWizardFlowsProps {
@@ -68,7 +78,7 @@ export function ModuleWizardFlows(
     deckConfig,
   } = useModuleSetupWizard({ closeFlow, attachedModuleOnLaunch, onComplete })
 
-  const sendIdentifyModule = useSendIdentifyModule()
+  const sendIdentifyModule = wizardFlowBaseProps.sendIdentifyModule
   const [selectedModule, setSelectedModule] = useState<AttachedModule | null>(
     null
   )
@@ -157,6 +167,43 @@ export function ModuleWizardFlows(
             ),
           })}
         />
+      </ModuleWizardScreen>
+    )
+  } else if (wizardFlowBaseProps.isDoorOpenError) {
+    return (
+      <ModuleWizardScreen
+        isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+        isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
+        handleCleanUpAndClose={handleCleanUpAndClose}
+        currentStepIndex={currentStepIndex}
+        totalStepCount={totalStepCount}
+      >
+        <SimpleWizardBody
+          isSuccess={false}
+          iconColor={COLORS.red50}
+          header={t('door_is_open')}
+          subHeader={t('close_door_and_try_again')}
+        >
+          <Flex
+            width="100%"
+            justifyContent={JUSTIFY_FLEX_END}
+            alignItems={
+              wizardFlowBaseProps.isOnDevice ? ALIGN_CENTER : ALIGN_FLEX_END
+            }
+            gridGap={SPACING.spacing8}
+          >
+            {wizardFlowBaseProps.isOnDevice ? (
+              <SmallButton
+                buttonText={t('try_again')}
+                onClick={wizardFlowBaseProps.dismissDoorOpenError}
+              />
+            ) : (
+              <PrimaryButton onClick={wizardFlowBaseProps.dismissDoorOpenError}>
+                {t('try_again')}
+              </PrimaryButton>
+            )}
+          </Flex>
+        </SimpleWizardBody>
       </ModuleWizardScreen>
     )
   } else if (wizardFlowBaseProps.errorMessage != null) {
@@ -390,7 +437,6 @@ export function ModuleWizardFlows(
             {...wizardFlowBaseProps}
             attachedModule={wizardFlowBaseProps.attachedModule}
             attachedPipette={wizardFlowBaseProps.attachedPipette}
-            robotName={robotName}
             patchModuleAfterUpdate={patchModuleAfterUpdate}
           />
         </ModuleWizardScreen>
@@ -407,7 +453,7 @@ export const handleModuleWizardFlows = (
 }
 
 const NiceModalModuleWizardFlows = NiceModal.create(
-  (props: ModuleWizardFlowsModalProps): JSX.Element => {
+  (props: ModuleWizardFlowsModalProps): ReactNode => {
     const modal = useModal()
     const closeFlow = (): void => {
       modal.remove()

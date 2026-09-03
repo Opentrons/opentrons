@@ -329,12 +329,34 @@ async def test_set_pressure_control_tunings(
     connection.reset_mock()
 
 
+async def test_set_pressure_control_band_tunings(
+    subject: VacuumModuleDriver, connection: AsyncMock
+) -> None:
+    """It should send M125 with approach band (A) and slew end fraction (S)."""
+    connection.send_command.return_value = "M125"
+
+    await subject.set_pressure_control_tunings(
+        approach_band=80.0,
+        slew_end_fraction=0.30,
+    )
+
+    set_pressure_pid = (
+        types.GCODE.SET_PRESSURE_PID.build_command()
+        .add_float("A", 80.0)
+        .add_float("S", 0.30)
+        .add_int("R", 0)
+    )
+
+    connection.send_command.assert_any_call(set_pressure_pid)
+    connection.reset_mock()
+
+
 async def test_get_pressure_control_tunings(
     subject: VacuumModuleDriver, connection: AsyncMock
 ) -> None:
-    """It should send a get pressure pid command"""
+    """It should send a get pressure pid command and parse A/S fields."""
     connection.send_command.return_value = (
-        "M126 P:1.0 I:0.0 D:0.0 O:-2.0 V:20.0 H:43.0 T:0.2"
+        "M126 P:1.0 I:0.0 D:0.0 O:-2.0 V:20.0 H:43.0 T:0.2 A:80.0 S:0.30"
     )
 
     pressure_state = await subject.get_pressure_control_tunings()
@@ -343,4 +365,20 @@ async def test_get_pressure_control_tunings(
     connection.send_command.assert_any_call(get_pressure)
     connection.reset_mock()
 
-    assert pressure_state == types.PressureControlTunings(1, 0, 0, -2, 20, 43, 0.2)
+    assert pressure_state == types.PressureControlTunings(
+        1,
+        0,
+        0,
+        -2,
+        20,
+        43,
+        0.2,
+        80.0,
+        0.30,
+    )
+
+
+async def test_move_port(subject: VacuumModuleDriver, connection: AsyncMock) -> None:
+    """It should forward port moves to the serial connection."""
+    await subject.move_port("/dev/ot_module_vacuummodule6")
+    connection.update_port.assert_awaited_once_with("/dev/ot_module_vacuummodule6")

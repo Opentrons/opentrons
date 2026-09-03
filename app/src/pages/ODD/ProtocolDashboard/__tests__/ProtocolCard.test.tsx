@@ -3,23 +3,21 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
-  useMostRecentSuccessfulAnalysisAsDocumentQuery,
-  useProtocolAnalysisAsDocumentQuery,
+  useDeleteProtocolMutation,
+  useDeleteRunMutation,
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
-import { useFeatureFlag } from '/app/redux/config'
 
 import { ProtocolCard } from '../ProtocolCard'
 
 import type { ComponentProps } from 'react'
-import type { UseQueryResult } from 'react-query'
 import type { NavigateFunction } from 'react-router-dom'
 import type { Chip, UseLongPressResult } from '@opentrons/components'
 import type {
-  CompletedProtocolAnalysis,
+  ProtocolAnalysisSummary,
   ProtocolResource,
 } from '@opentrons/shared-data'
 
@@ -34,10 +32,18 @@ vi.mock('react-router-dom', async importOriginal => {
   }
 })
 vi.mock('@opentrons/react-api-client')
-vi.mock('/app/redux/config')
 vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
   useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
 }))
+vi.mock(
+  '/app/local-resources/access-control/useLinkedDocumentationState',
+  () => ({
+    useLinkedDocumentationState: () => ({
+      documentationState: ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+      clearDocreport: vi.fn(),
+    }),
+  })
+)
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Chip>()
   return {
@@ -45,6 +51,14 @@ vi.mock('@opentrons/components', async importOriginal => {
     Chip: vi.fn(() => <div>mock Chip</div>),
     useLongPress: () => mockUseLongPress(),
   }
+})
+
+const completedSummary = (
+  result: NonNullable<ProtocolAnalysisSummary['result']>
+): ProtocolAnalysisSummary => ({
+  id: `analysis-${result}`,
+  status: 'completed',
+  result,
 })
 
 const mockProtocol: ProtocolResource = {
@@ -60,9 +74,24 @@ const mockProtocol: ProtocolResource = {
     created: 1606853851893,
     tags: ['unitTest'],
   },
-  analysisSummaries: [],
+  analysisSummaries: [completedSummary('ok')],
   files: [],
   key: '26ed5a82-502f-4074-8981-57cdda1d066d',
+}
+
+const mockProtocolWithFailedAnalysis: ProtocolResource = {
+  ...mockProtocol,
+  analysisSummaries: [completedSummary('not-ok')],
+}
+
+const mockProtocolWithPendingAnalysis: ProtocolResource = {
+  ...mockProtocol,
+  analysisSummaries: [
+    {
+      id: 'pending-analysis',
+      status: 'pending',
+    },
+  ],
 }
 
 const mockProtocolWithCSV: ProtocolResource = {
@@ -78,7 +107,7 @@ const mockProtocolWithCSV: ProtocolResource = {
     created: 1606853851893,
     tags: ['unitTest'],
   },
-  analysisSummaries: [],
+  analysisSummaries: [completedSummary('parameter-value-required')],
   files: [],
   key: '26ed5a82-502f-4074-8981-57cdda1d066d',
 }
@@ -120,13 +149,12 @@ describe('ProtocolCard', () => {
       setTargetProtocolId: vi.fn(),
       setIsRequiredCSV: vi.fn(),
     }
-    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
-      data: { result: 'ok' } as any,
-    } as UseQueryResult<CompletedProtocolAnalysis>)
-    vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
-      data: { result: 'ok' } as any,
-    } as UseQueryResult<CompletedProtocolAnalysis>)
-    vi.mocked(useFeatureFlag).mockReturnValue(false)
+    vi.mocked(useDeleteProtocolMutation).mockReturnValue({
+      deleteProtocol: vi.fn(),
+    } as any)
+    vi.mocked(useDeleteRunMutation).mockReturnValue({
+      deleteRun: vi.fn(),
+    } as any)
   })
 
   it('should redirect to protocol details after short click', () => {
@@ -138,13 +166,7 @@ describe('ProtocolCard', () => {
   })
 
   it('should display the analysis failed error modal when clicking on the protocol', () => {
-    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
-      data: { result: 'error' } as any,
-    } as UseQueryResult<CompletedProtocolAnalysis>)
-    vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
-      data: { result: 'not-ok', errors: ['some analysis error'] } as any,
-    } as UseQueryResult<CompletedProtocolAnalysis>)
-    render(props)
+    render({ ...props, protocol: mockProtocolWithFailedAnalysis })
 
     fireEvent.click(screen.getByText('yay mock protocol'))
     screen.getByText('mock Chip')
@@ -169,15 +191,8 @@ describe('ProtocolCard', () => {
   })
 
   it('should display the analysis failed error modal when clicking on the protocol when doing a long pressing', async () => {
-    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
-      data: { result: 'error' } as any,
-    } as UseQueryResult<CompletedProtocolAnalysis>)
-    vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
-      data: { result: 'not-ok', errors: ['some analysis error'] } as any,
-    } as UseQueryResult<CompletedProtocolAnalysis>)
-
     mockLongPress.isLongPressed = true
-    render(props)
+    render({ ...props, protocol: mockProtocolWithFailedAnalysis })
 
     expect(props.longPress).toHaveBeenCalledWith(true)
     screen.getByText('mock Chip')
@@ -191,15 +206,8 @@ describe('ProtocolCard', () => {
   })
 
   it('should display a loading spinner when analysis is pending', async () => {
-    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
-      data: null as any,
-    } as UseQueryResult<CompletedProtocolAnalysis>)
-    vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
-      data: null as any,
-    } as UseQueryResult<CompletedProtocolAnalysis>)
-
     mockLongPress.isLongPressed = true
-    render(props)
+    render({ ...props, protocol: mockProtocolWithPendingAnalysis })
 
     expect(props.longPress).toHaveBeenCalledWith(true)
     screen.getByLabelText('Protocol is loading')
@@ -207,13 +215,6 @@ describe('ProtocolCard', () => {
   })
 
   it('should render text, yellow background color, and icon when a protocol requires a csv file', () => {
-    vi.mocked(useFeatureFlag).mockReturnValue(true)
-    vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
-      data: { result: 'parameter-value-required' } as any,
-    } as UseQueryResult<CompletedProtocolAnalysis>)
-    vi.mocked(useMostRecentSuccessfulAnalysisAsDocumentQuery).mockReturnValue({
-      data: { result: 'parameter-value-required' } as any,
-    } as UseQueryResult<CompletedProtocolAnalysis>)
     render({ ...props, protocol: mockProtocolWithCSV })
     screen.getByText('mock Chip')
     screen.getByTestId('protocol_card')

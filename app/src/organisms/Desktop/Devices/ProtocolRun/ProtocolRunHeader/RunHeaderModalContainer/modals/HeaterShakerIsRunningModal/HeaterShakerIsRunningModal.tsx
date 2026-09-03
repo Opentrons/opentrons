@@ -18,15 +18,16 @@ import {
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import { useAttachedModules } from '/app/resources/modules'
 
 import { HeaterShakerModuleCard } from './HeaterShakerModuleCard'
 import { getActiveHeaterShaker } from './utils'
 
-import type { AttachedModule } from '@opentrons/api-client'
+import type { ReactNode } from 'react'
+import type { AttachedModule, HeaterShakerModule } from '@opentrons/api-client'
 import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data'
-import type { HeaterShakerModule } from '/app/redux/modules/types'
 
 export type UseHeaterShakerIsRunningModalResult =
   | { showModal: true; module: HeaterShakerModule; toggleModal: () => void }
@@ -64,10 +65,11 @@ interface HeaterShakerIsRunningModalProps {
 
 export const HeaterShakerIsRunningModal = (
   props: HeaterShakerIsRunningModalProps
-): JSX.Element => {
+): ReactNode => {
   const { closeModal, module, startRun } = props
   const { t } = useTranslation('heater_shaker')
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const documentationState = useDocumentationState()
+  const { createLiveCommand } = useCreateLiveCommandMutation(documentationState)
   const attachedModules = useAttachedModules()
   const moduleIds = attachedModules
     .filter(
@@ -131,7 +133,6 @@ export const HeaterShakerIsRunningModal = (
           marginRight={SPACING.spacing8}
           padding={SPACING.spacing12}
           onClick={handleStopShake}
-          id="HeaterShakerIsRunningModal_stop_shaking"
         >
           {t('stop_shaking_start_run')}
         </SecondaryButton>
@@ -139,7 +140,6 @@ export const HeaterShakerIsRunningModal = (
           marginTop={SPACING.spacing24}
           padding={SPACING.spacing12}
           onClick={handleContinueShaking}
-          id="HeaterShakerIsRunningModal_keep_shaking"
         >
           {t('keep_shaking_start_run')}
         </PrimaryButton>

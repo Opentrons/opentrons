@@ -34,7 +34,7 @@ interface PantryProps {
  * @param children passes through and renders children
  * @returns
  */
-export function Kitchen({ children }: PantryProps): JSX.Element {
+export function Kitchen({ children }: PantryProps): ReactNode {
   const [toasts, setToasts] = useState<ToastProps[]>([])
   const [snackbar, setSnackbar] = useState<SnackbarProps | null>(null)
 

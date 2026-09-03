@@ -4,16 +4,25 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
+import { useResetConfigOptionsQuery } from '@opentrons/react-api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useIsFlex } from '/app/redux-resources/robots'
-import { getResetConfigOptions } from '/app/redux/robot-admin'
 
 import { DeviceResetSlideout } from '../DeviceResetSlideout'
 
+import type * as ReactApiClient from '@opentrons/react-api-client'
+
+vi.mock('@opentrons/react-api-client', async importOriginal => {
+  const actual = await importOriginal<typeof ReactApiClient>()
+  return {
+    ...actual,
+    useResetConfigOptionsQuery: vi.fn(),
+  }
+})
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/discovery')
-vi.mock('/app/redux/robot-admin/selectors')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../../../../hooks')
 
@@ -80,13 +89,15 @@ const render = () => {
 
 describe('RobotSettings DeviceResetSlideout', () => {
   beforeEach(() => {
-    vi.mocked(getResetConfigOptions).mockReturnValue(mockResetConfigOptions)
+    vi.mocked(useResetConfigOptionsQuery).mockReturnValue({
+      data: { options: mockResetConfigOptions },
+    } as any)
     vi.mocked(useIsFlex).mockReturnValue(false)
   })
 
   it('should render title, description, checkboxes, links and button: OT-2', () => {
     render()
-    screen.getByText('Device Reset')
+    screen.getByText('Device reset')
     screen.getByText('Resets cannot be undone')
     screen.getByText('Clear individual data')
     screen.getByText(

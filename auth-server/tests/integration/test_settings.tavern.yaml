@@ -16,15 +16,11 @@ stages:
           maxNumberOfLoginAttempts: 5
           passwordResetTime: null
           idleLogout: 180.0
-          requireReasonForInteraction: true
-          minLengthOfReasonForInteraction: null
           passwordComplexitySpecialCharacters: null
           passwordComplexityMinimumLength: null
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
-
-
 
 ---
 test_name: PATCH updates and returns new settings
@@ -33,6 +29,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: GET initial settings
@@ -48,8 +45,6 @@ stages:
           passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
           idleLogout: 180.0
-          requireReasonForInteraction: true
-          minLengthOfReasonForInteraction: null
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -67,7 +62,6 @@ stages:
           passwordResetTime: 2592000.0
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
-          requireReasonForInteraction: false
           requireAdminCredsWhenUpdatingRobotSoftware: false
     response:
       status_code: 200
@@ -78,8 +72,6 @@ stages:
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
           idleLogout: 60.0
-          requireReasonForInteraction: false
-          minLengthOfReasonForInteraction: null
           requireAdminCredsWhenUpdatingRobotSoftware: false
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -97,8 +89,6 @@ stages:
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
           idleLogout: 60.0
-          requireReasonForInteraction: false
-          minLengthOfReasonForInteraction: null
           requireAdminCredsWhenUpdatingRobotSoftware: false
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -116,8 +106,6 @@ stages:
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
           idleLogout: 60.0
-          requireReasonForInteraction: false
-          minLengthOfReasonForInteraction: null
           requireAdminCredsWhenUpdatingRobotSoftware: false
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -129,6 +117,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: PATCH to change some settings
@@ -144,8 +133,6 @@ stages:
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
           idleLogout: 60.0
-          requireReasonForInteraction: false
-          minLengthOfReasonForInteraction: 10
           requireAdminCredsWhenUpdatingRobotSoftware: false
     response:
       status_code: 200
@@ -156,34 +143,71 @@ stages:
           passwordComplexityMinimumLength: 8
           passwordComplexitySpecialCharacters: true
           idleLogout: 60.0
-          requireReasonForInteraction: false
-          minLengthOfReasonForInteraction: 10
           requireAdminCredsWhenUpdatingRobotSoftware: false
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
 
+  - name: Admin re-login after enabling password complexity
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: testadmin
+        password: testadminpassword
+    response:
+      status_code: 200
+      save:
+        json:
+          restricted_admin_token: access_token
+
+  - name: Admin sets a compliant password after complexity is enabled
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/users/self'
+      headers:
+        Authorization: 'Bearer {restricted_admin_token}'
+      json:
+        data:
+          password: Testadminrenewed1!
+    response:
+      status_code: 200
+      strict:
+        - json:off
+
+  - name: Admin re-login with compliant password
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: testadmin
+        password: Testadminrenewed1!
+    response:
+      status_code: 200
+      save:
+        json:
+          current_admin_token: access_token
 
   - name: DELETE resets everything except accessControlEnabled to its default
     request:
       method: DELETE
       url: '{run_server.base_url}/auth/settings'
       headers:
-        Authorization: '{admin_access_token}'
+        Authorization: 'Bearer {current_admin_token}'
     response:
       status_code: 200
       json:
         data:
           maxNumberOfLoginAttempts: 5
           passwordResetTime: null
-          minLengthOfReasonForInteraction: null
-          passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
           idleLogout: 180.0
-          requireReasonForInteraction: true
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
-
 
 test_name: DELETE resets to defaults except including accessControlEnabled when not in db
 
@@ -191,6 +215,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: PATCH to enable maxNumberOfLoginAttempts
@@ -211,8 +236,6 @@ stages:
           passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
           idleLogout: 180.0
-          requireReasonForInteraction: true
-          minLengthOfReasonForInteraction: null          
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -232,8 +255,6 @@ stages:
           passwordComplexityMinimumLength: null
           passwordComplexitySpecialCharacters: null
           idleLogout: 180.0
-          requireReasonForInteraction: true
-          minLengthOfReasonForInteraction: null
           requireAdminCredsWhenUpdatingRobotSoftware: true
           requireAdminCredsWhenSendingProtocolToRobot: true
           requireAdminCredsForSignoffProtocol: false
@@ -244,6 +265,7 @@ marks:
   - usefixtures:
       - run_server
       - admin_access_token
+      - seed_users
 
 stages:
   - name: GET access control enabled default

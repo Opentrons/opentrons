@@ -13,17 +13,17 @@ import {
 import { ToggleButton } from '/app/atoms/buttons'
 import { useDisableStackerSensors } from '/app/resources/robot-settings'
 
+import type { ReactNode } from 'react'
+
 interface DisableStackerSensorsProps {
-  robotName: string
   isRobotBusy: boolean
 }
 
 export function DisableStackerSensors({
-  robotName,
   isRobotBusy,
-}: DisableStackerSensorsProps): JSX.Element {
+}: DisableStackerSensorsProps): ReactNode {
   const { t } = useTranslation('device_settings')
-  const { sensorsDisabled, toggleSensors } = useDisableStackerSensors(robotName)
+  const { sensorsDisabled, toggleSensors } = useDisableStackerSensors()
 
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -31,7 +31,6 @@ export function DisableStackerSensors({
         <LegacyStyledText
           css={TYPOGRAPHY.pSemiBold}
           paddingBottom={SPACING.spacing4}
-          id="AdvancedSettings_disableStackerSensors"
         >
           {t('disable_stacker_sensors')}
         </LegacyStyledText>
@@ -43,7 +42,6 @@ export function DisableStackerSensors({
         label="disable_stacker_sensors"
         toggledOn={sensorsDisabled}
         onClick={toggleSensors}
-        id="RobotSettings_DisableStackerSensorsToggleButton"
         disabled={isRobotBusy}
       />
     </Flex>

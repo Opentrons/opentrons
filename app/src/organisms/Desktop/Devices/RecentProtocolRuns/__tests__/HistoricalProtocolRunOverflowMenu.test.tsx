@@ -4,13 +4,11 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import {
-  useDeleteRunImages,
-  useDeleteRunMutation,
-} from '@opentrons/react-api-client'
+import { useDeleteRunImages } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useRunControls } from '/app/organisms/RunTimeControl'
 import {
   useCameraAnalytics,
@@ -23,16 +21,18 @@ import {
 } from '/app/redux/analytics'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
-import { useIsEstopNotDisengaged } from '/app/resources/devices'
+import {
+  useDownloadRunRecord,
+  useIsEstopNotDisengaged,
+} from '/app/resources/devices'
 import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
-import { useDownloadRunLog } from '../../hooks'
 import runRecord from '../../ProtocolRun/ProtocolRunHeader/RunHeaderModalContainer/modals/__fixtures__/runRecord.json'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
 
 import type { ComponentProps } from 'react'
 import type { UseQueryResult } from 'react-query'
-import type { CommandsData } from '@opentrons/api-client'
+import type { CommandsData, RunData } from '@opentrons/api-client'
 
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/robot-update/selectors')
@@ -46,6 +46,9 @@ vi.mock('/app/resources/runs')
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux-resources/analytics')
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const render = (
   props: ComponentProps<typeof HistoricalProtocolRunOverflowMenu>
@@ -67,7 +70,7 @@ const ROBOT_NAME = 'otie'
 let mockTrackEvent: any
 let mockTrackProtocolRunEvent: any
 const mockDeleteRunImages = vi.fn().mockResolvedValue(undefined)
-const mockDownloadRunLog = vi.fn()
+const mockDownloadRunRecord = vi.fn()
 
 describe('HistoricalProtocolRunOverflowMenu', () => {
   let props: ComponentProps<typeof HistoricalProtocolRunOverflowMenu>
@@ -76,13 +79,10 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     mockTrackProtocolRunEvent = vi.fn(() => new Promise(resolve => resolve({})))
     vi.mocked(useIsRobotOnWrongVersionOfSoftware).mockReturnValue(false)
-    vi.mocked(useDownloadRunLog).mockReturnValue({
-      downloadRunLog: mockDownloadRunLog,
-      isRunLogLoading: false,
+    vi.mocked(useDownloadRunRecord).mockReturnValue({
+      downloadRunRecord: mockDownloadRunRecord,
+      isDownloading: false,
     })
-    vi.mocked(useDeleteRunMutation).mockReturnValue({
-      deleteRun: vi.fn(),
-    } as any)
 
     when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
@@ -116,10 +116,12 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       } as unknown as UseQueryResult<CommandsData>)
     when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
     props = {
-      runId: RUN_ID,
+      run: { id: RUN_ID } as RunData,
       robotName: ROBOT_NAME,
       robotIsBusy: false,
       runHasImages: true,
+      deleteRun: vi.fn(),
+      isDeletingRun: false,
     }
     when(vi.mocked(useRobot))
       .calledWith(ROBOT_NAME)
@@ -142,7 +144,7 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       name: 'View protocol run record',
     })
     const rerunBtn = screen.getByRole('button', { name: 'Rerun protocol now' })
-    screen.getByRole('button', { name: 'Download protocol run log' })
+    screen.getByRole('button', { name: 'Download protocol files' })
     const deleteBtn = screen.getByRole('button', {
       name: 'Delete protocol run record',
     })
@@ -157,7 +159,6 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
     expect(useRunControls).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
     fireEvent.click(deleteBtn)
-    expect(useDeleteRunMutation).toHaveBeenCalled()
   })
 
   it('disables the rerun protocol menu item if robot software update is available', () => {

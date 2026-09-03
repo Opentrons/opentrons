@@ -7,6 +7,7 @@ import { useCurrentRobotName } from '/app/redux/robot-auth'
 
 import { DocumentationRequired } from './DocumentationRequired'
 
+import type { ReactNode } from 'react'
 import type {
   DocumentationReport,
   DocumentedAction,
@@ -16,14 +17,16 @@ const DocumentationRequiredModalImpl = NiceModal.create(
   ({
     username,
     actionsToDocument,
+    minReportLength,
     onCancel,
     initialDocreport,
   }: {
     username: string
     actionsToDocument: DocumentedAction[]
+    minReportLength: number
     onCancel?: () => void
     initialDocreport?: DocumentationReport
-  }): JSX.Element => {
+  }): ReactNode => {
     const modal = useModal()
     const robotName = useCurrentRobotName()
 
@@ -46,6 +49,7 @@ const DocumentationRequiredModalImpl = NiceModal.create(
           actionsToDocument={actionsToDocument}
           onConfirm={handleConfirm}
           onClose={handleBack}
+          minReportLength={minReportLength}
           initialDocreport={initialDocreport}
         />
       </ApiHostProvider>,
@@ -57,12 +61,14 @@ const DocumentationRequiredModalImpl = NiceModal.create(
 export const showDocumentationRequiredModal = (
   username: string,
   actionsToDocument: DocumentedAction[],
+  minReportLength: number,
   onCancel?: () => void,
   initialDocreport?: DocumentationReport
 ): Promise<DocumentationReport> =>
   NiceModal.show(DocumentationRequiredModalImpl, {
     username,
     actionsToDocument,
+    minReportLength,
     onCancel,
     initialDocreport,
   })

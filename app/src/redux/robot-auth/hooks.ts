@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useMatch } from 'react-router-dom'
 
 import { getIsOnDevice } from '../config'
@@ -7,10 +7,14 @@ import { getLocalRobot } from '../discovery'
 import {
   getAuthStateForRobot,
   getCurrentUsernameForLocalRobot,
+  getIsAdminForRobot,
+  getLoggedInUserForRobot,
   getUsernameForRobot,
+  logOut,
 } from './slice'
 
 import type { State } from '../types'
+import type { LoggedInUserProfile } from './slice'
 
 /** Return the OAuth 2 access token to make requests to the given robot, if we have one. */
 export function useAccessTokenForRobot(
@@ -38,6 +42,26 @@ export function useUsernameForRobot(robotName: string | null): string | null {
   return useSelector(selector)
 }
 
+/** Return whether the logged-in user for the given robot is an admin. */
+export function useIsAdminForRobot(robotName: string): boolean {
+  const selector = useCallback(
+    (state: State) => getIsAdminForRobot(state, robotName),
+    [robotName]
+  )
+  return useSelector(selector)
+}
+
+/** Return the logged-in user profile for the given robot, if we are logged in to it. */
+export function useLoggedInUserForRobot(
+  robotName: string
+): LoggedInUserProfile | null {
+  const selector = useCallback(
+    (state: State) => getLoggedInUserForRobot(state, robotName),
+    [robotName]
+  )
+  return useSelector(selector)
+}
+
 /**
  * Return the username for the robot the user is currently acting on:
  * the local robot on ODD, or the robot being viewed on desktop.
@@ -58,4 +82,18 @@ export function useCurrentRobotName(): string | null {
   const localRobotName = useSelector(getLocalRobot)?.name ?? null
   const desktopRobotName = deviceRouteMatch?.params?.robotName ?? null
   return isOnDevice ? localRobotName : desktopRobotName
+}
+
+/** Log out of the robot the user is currently acting on. */
+export function useLogout(): () => void {
+  const dispatch = useDispatch()
+  const robotName = useCurrentRobotName()
+
+  return useCallback(() => {
+    if (robotName == null) {
+      console.warn("Couldn't identify the robot to log out of.")
+    } else {
+      dispatch(logOut({ robotName }))
+    }
+  }, [dispatch, robotName])
 }

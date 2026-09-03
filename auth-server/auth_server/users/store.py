@@ -2,7 +2,7 @@
 
 import datetime
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -24,17 +24,6 @@ class UserStore:
     def _session(self) -> Session:
         return self._session_factory()
 
-    def seed(self, users: list[User]) -> None:
-        """Insert users that don't already exist (matched by username)."""
-        with self._session() as session:
-            for user in users:
-                existing = session.scalar(
-                    select(User).where(User.username == user.username)
-                )
-                if existing is None:
-                    session.add(user)
-            session.commit()
-
     def get(self, username: str) -> User | None:
         """Look up a user by username. Returns the User or None."""
         with self._session() as session:
@@ -43,12 +32,30 @@ class UserStore:
                 session.expunge(user)
             return user
 
+    def get_by_id(self, user_id: int) -> User | None:
+        """Look up a user by primary key. Returns the User or None."""
+        with self._session() as session:
+            user = session.scalar(select(User).where(User.id == user_id))
+            if user is not None:
+                session.expunge(user)
+            return user
+
+    def get_all(self) -> list[User]:
+        """Return all users, ordered by username."""
+        with self._session() as session:
+            users = session.scalars(select(User).order_by(User.username)).all()
+            for user in users:
+                session.expunge(user)
+            return list(users)
+
     def add(
         self,
         username: str,
         hashed_password: str,
         full_name: str,
         account_type: str,
+        now: datetime.datetime,
+        reset_password: bool,
     ) -> User:
         """Create a user, persist it, and return it."""
         new_user = User(
@@ -56,6 +63,8 @@ class UserStore:
             hashed_password=hashed_password,
             full_name=full_name,
             account_type=AccountType(account_type),
+            password_set_at=now,
+            reset_password=reset_password,
         )
         with self._session() as session:
             session.add(new_user)
@@ -83,6 +92,9 @@ class UserStore:
         full_name: str | None = None,
         account_type: str | None = None,
         reset_password: bool | None = None,
+        deactivated: bool | None = None,
+        *,
+        now: datetime.datetime,
     ) -> User:
         """Update a user's fields and return the updated User.
 
@@ -92,18 +104,21 @@ class UserStore:
             user = session.scalar(select(User).where(User.username == username))
             if user is None:
                 raise ValueError(f"User {username!r} not found")
-            updates: dict[str, object] = {
-                "username": new_username,
-                "hashed_password": hashed_password,
-                "full_name": full_name,
-                "account_type": AccountType(account_type)
-                if account_type is not None
-                else None,
-                "reset_password": reset_password,
-            }
-            for attr, value in updates.items():
-                if value is not None:
-                    setattr(user, attr, value)
+
+            if new_username is not None:
+                user.username = new_username
+            if hashed_password is not None:
+                user.hashed_password = hashed_password
+                user.password_set_at = now
+            if full_name is not None:
+                user.full_name = full_name
+            if account_type is not None:
+                user.account_type = AccountType(account_type)
+            if reset_password is not None:
+                user.reset_password = reset_password
+            if deactivated is not None:
+                user.deactivated = deactivated
+
             session.commit()
             session.expunge(user)
             return user
@@ -133,4 +148,10 @@ class UserStore:
             if user is None:
                 raise ValueError(f"User {username!r} not found")
             user.failed_logins.clear()
+            session.commit()
+
+    def mark_all_reset_password(self) -> None:
+        """Require every user to set a new password on their next login."""
+        with self._session() as session:
+            session.execute(update(User).values(reset_password=True))
             session.commit()

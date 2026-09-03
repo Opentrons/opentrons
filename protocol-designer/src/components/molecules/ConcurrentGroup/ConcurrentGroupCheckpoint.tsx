@@ -1,5 +1,7 @@
 import { COLORS, Flex, SPACING, StyledText } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 interface ConcurrentGroupCheckpointProps {
   text: string
 }
@@ -7,7 +9,7 @@ interface ConcurrentGroupCheckpointProps {
 /** A non-interactable, system-provided step within a `ConcurrentGroup`. */
 export function ConcurrentGroupCheckpoint(
   props: ConcurrentGroupCheckpointProps
-): JSX.Element {
+): ReactNode {
   const { text } = props
   return (
     <Flex
@@ -27,7 +29,7 @@ export function ConcurrentGroupCheckpoint(
   )
 }
 
-function Bullet(): JSX.Element {
+function Bullet(): ReactNode {
   return (
     <svg width="0.25rem" height="0.25rem" viewBox="-1 -1 2 2">
       <circle fill="currentColor" cx="0" cy="0" r="1" />

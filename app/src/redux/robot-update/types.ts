@@ -1,4 +1,3 @@
-import type { ViewableRobot } from '../discovery/types'
 import type { RobotHost } from '../robot-api/types'
 
 export type RobotUpdateType = 'upgrade' | 'downgrade' | 'reinstall'
@@ -27,7 +26,7 @@ export interface RobotUpdateFileInfo {
 }
 
 // stage response from API
-// update-server/otupdate/buildroot/update_session.py
+// update-server/otupdate/common/session.py
 export type UpdateSessionStage =
   | 'awaiting-file'
   | 'validating'
@@ -46,7 +45,6 @@ export type UpdateSessionStep =
   | 'processFile'
   | 'commitUpdate'
   | 'restart'
-  | 'restarting'
   | 'finished'
 
 export interface RobotUpdateSession {
@@ -174,11 +172,6 @@ export type RobotUpdateAction =
       payload: { target: RobotUpdateTarget }
       meta: { shell: true }
     }
-  | {
-      type: 'robotUpdate:UPLOAD_FILE'
-      payload: { host: ViewableRobot; path: string; systemFile: string }
-      meta: { shell: true }
-    }
   | { type: 'robotUpdate:FILE_UPLOAD_DONE'; payload: string }
   | { type: 'robotUpdate:SET_SESSION_STEP'; payload: UpdateSessionStep }
   | { type: 'robotUpdate:CLEAR_SESSION' }
@@ -186,3 +179,4 @@ export type RobotUpdateAction =
   | { type: 'robotUpdate:FILE_UPLOAD_PROGRESS'; payload: number }
   | { type: 'robotUpdate:CHECKING_FOR_UPDATE'; payload: RobotUpdateTarget }
   | { type: 'robotUpdate:DOWNLOAD_DONE'; payload: RobotUpdateTarget }
+  | { type: 'robotUpdate:DOWNLOAD_UPDATE'; meta: { shell: true } }

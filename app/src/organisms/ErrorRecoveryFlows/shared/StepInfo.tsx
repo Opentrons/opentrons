@@ -7,7 +7,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
 import type { RecoveryContentProps } from '../types'
 
@@ -30,7 +30,7 @@ export function StepInfo({
   protocolAnalysis,
   allRunDefs,
   ...styleProps
-}: StepInfoProps): JSX.Element {
+}: StepInfoProps): ReactNode {
   const { t } = useTranslation('error_recovery')
   const { currentStepNumber, totalStepCount, hasRunDiverged } = stepCounts
 

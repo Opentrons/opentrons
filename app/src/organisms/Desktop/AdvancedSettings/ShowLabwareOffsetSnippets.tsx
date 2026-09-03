@@ -17,9 +17,10 @@ import {
   updateConfigValue,
 } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
-export function ShowLabwareOffsetSnippets(): JSX.Element {
+export function ShowLabwareOffsetSnippets(): ReactNode {
   const { t } = useTranslation(['app_settings', 'shared', 'branded'])
   const dispatch = useDispatch<Dispatch>()
   const isLabwareOffsetCodeSnippetsOn = useSelector(
@@ -41,7 +42,6 @@ export function ShowLabwareOffsetSnippets(): JSX.Element {
         <LegacyStyledText
           css={TYPOGRAPHY.h3SemiBold}
           paddingBottom={SPACING.spacing8}
-          id="AdvancedSettings_showLink"
         >
           {t('show_labware_offset_snippets')}
         </LegacyStyledText>
@@ -53,7 +53,6 @@ export function ShowLabwareOffsetSnippets(): JSX.Element {
         label="show_link_to_get_labware_offset_data"
         toggledOn={isLabwareOffsetCodeSnippetsOn}
         onClick={toggleLabwareOffsetData}
-        id="AdvancedSettings_showLinkToggleButton"
       />
     </Flex>
   )

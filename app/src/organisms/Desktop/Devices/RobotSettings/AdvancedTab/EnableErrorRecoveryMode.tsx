@@ -14,11 +14,13 @@ import {
 import { ToggleButton } from '/app/atoms/buttons'
 import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 
+import type { ReactNode } from 'react'
+
 export function EnableErrorRecoveryMode({
   isRobotBusy,
 }: {
   isRobotBusy: boolean
-}): JSX.Element {
+}): ReactNode {
   const { t } = useTranslation('app_settings')
   const { isEREnabled, toggleERSettings } = useErrorRecoverySettingsToggle()
 
@@ -33,7 +35,6 @@ export function EnableErrorRecoveryMode({
           <LegacyStyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            id="AdvancedSettings_Error_Recovery_Mode"
           >
             {t('error_recovery_mode')}
           </LegacyStyledText>
@@ -47,7 +48,6 @@ export function EnableErrorRecoveryMode({
         toggledOn={isEREnabled}
         onClick={toggleERSettings}
         disabled={isRobotBusy}
-        id="RobotSettings_enableErrorRecoveryModeToggleButton"
       />
     </Flex>
   )

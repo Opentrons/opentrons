@@ -193,3 +193,5 @@ export const VACUUM_SPACER_LOAD_NAMES: string[] = [
   'opentrons_vacuum_manifold_spacer_short',
   'opentrons_vacuum_manifold_spacer_tall',
 ]
+
+export const VACUUM_DOCK_DISPLAY_LOCATION: 'A4' = 'A4'

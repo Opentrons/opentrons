@@ -1,4 +1,6 @@
-export function FixedTrashText(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function FixedTrashText(): ReactNode {
   return (
     <g id="fixedTrashText" transform="translate(291.5, 322.5) scale(1, -1)">
       <path

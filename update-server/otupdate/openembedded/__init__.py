@@ -1,27 +1,36 @@
 """update-server implementation for openembedded systems"""
 
-import asyncio
 import logging
 from typing import Any, Mapping, Optional
 
-from aiohttp import web
+from fastapi import FastAPI
+from fastapi.openapi.docs import get_redoc_html
+from fastapi.responses import HTMLResponse
+from starlette.types import ASGIApp, Receive, Scope, Send
 
-from server_utils.auth.resource_server.authorization_checker import (
-    AuthorizationChecker,
+from server_utils.audit.audit_server import Client as AuditClient
+from server_utils.audit.fastapi import audit_logger_middleware, install_audit_client
+from server_utils.auth.resource_server.authentication_checker import (
+    AuthenticationChecker,
+)
+from server_utils.auth.resource_server.fastapi import (
+    AuthorizationError,
+    handle_authorization_error,
+    install_authentication_checker,
 )
 
+from otupdate._version import version as package_version
 from otupdate.common import (
-    auth,
     config,
     constants,
     control,
     name_management,
     ssh_key_management,
     update,
+    update_actions,
 )
+from otupdate.common.api_error import APIError, handle_api_error
 from otupdate.common.file_actions import load_version_file
-from otupdate.common.handler_type import Handler
-from otupdate.common.update_actions import FILE_ACTIONS_VARNAME
 from otupdate.openembedded.update_actions import (
     OT3UpdateActions,
     PartitionManager,
@@ -30,31 +39,44 @@ from otupdate.openembedded.update_actions import (
 
 OE_BUILTIN_VERSION_FILE = "/etc/VERSION.json"
 
+_REDOC_CDN_URL = "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js"
+
 
 LOG = logging.getLogger(__name__)
 
 
-@web.middleware
-async def log_error_middleware(
-    request: web.Request, handler: Handler
-) -> web.StreamResponse:
-    try:
-        resp = await handler(request)
-    except Exception:
-        LOG.exception(f"Exception serving {request.method} {request.path}")
-        raise
-    return resp
+class LogErrorMiddleware:
+    """Log a traceback for any exception that escapes a request handler.
+
+    This is raw ASGI rather than a Starlette `BaseHTTPMiddleware` so that it
+    doesn't interpose on the request body stream, which system update uploads
+    read incrementally.
+    """
+
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        try:
+            await self.app(scope, receive, send)
+        except Exception:
+            LOG.exception(f"Exception serving {scope['method']} {scope['path']}")
+            raise
 
 
 async def get_app(
     name_synchronizer: name_management.NameSynchronizer,
-    authorization_checker: AuthorizationChecker,
+    authentication_checker: AuthenticationChecker,
+    audit_client: AuditClient,
     system_version_file: Optional[str] = None,
     config_file_override: Optional[str] = None,
     name_override: Optional[str] = None,
     boot_id_override: Optional[str] = None,
-) -> web.Application:
-    """Build and return the aiohttp.web.Application that runs the server"""
+) -> FastAPI:
+    """Build and return the FastAPI application that runs the server"""
     if not system_version_file:
         system_version_file = OE_BUILTIN_VERSION_FILE
 
@@ -62,43 +84,59 @@ async def get_app(
     boot_id = boot_id_override or control.get_boot_id()
     config_obj = config.load(config_file_override)
 
-    app = web.Application(middlewares=[log_error_middleware])
-
-    app[config.CONFIG_VARNAME] = config_obj
-    app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
-    app[constants.SHUTDOWN_LOCK_NAME] = asyncio.Lock()
-    app[constants.DEVICE_BOOT_ID_NAME] = boot_id
-
-    rfs = RootFSInterface()
-    part_mgr = PartitionManager()
-    updater = OT3UpdateActions(rfs, part_mgr)
-    app[FILE_ACTIONS_VARNAME] = updater
-
-    name_management.install_name_synchronizer(name_synchronizer, app)
-    auth.install_authorization_checker(app, authorization_checker)
-
-    app.router.add_routes(
-        [
-            web.get(
-                "/server/update/health",
-                control.build_health_endpoint(health_response(version_dict=version)),
-            ),
-            web.post("/server/update/begin", update.begin),
-            web.post("/server/update/cancel", update.cancel),
-            web.get("/server/update/{session}/status", update.status),
-            web.post("/server/update/{session}/file", update.file_upload),
-            web.post("/server/update/{session}/commit", update.commit),
-            web.post("/server/restart", control.restart),
-            web.post("/server/shutdown", control.shutdown),
-            web.get("/server/ssh_keys", ssh_key_management.list_keys),
-            web.post("/server/ssh_keys", ssh_key_management.add),
-            web.post("/server/ssh_keys/from_local", ssh_key_management.add_from_local),
-            web.delete("/server/ssh_keys", ssh_key_management.clear),
-            web.delete("/server/ssh_keys/{key_md5}", ssh_key_management.remove),
-            web.post("/server/name", name_management.set_name_endpoint),
-            web.get("/server/name", name_management.get_name_endpoint),
-        ]
+    app = FastAPI(
+        title="Opentrons Update Server",
+        description=(
+            "The HTTP API that updates the robot's software and controls its"
+            " power state, name, and authorized ssh keys."
+        ),
+        version=package_version,
+        openapi_url="/server/openapi.json",
+        docs_url=None,
+        # redoc_url is replaced by our own /redoc router, below.
+        redoc_url=None,
     )
+
+    app.add_middleware(LogErrorMiddleware)
+    app.exception_handler(APIError)(handle_api_error)
+    app.exception_handler(AuthorizationError)(handle_authorization_error)
+    app.middleware("http")(audit_logger_middleware)
+
+    config.install_config(app.state, config_obj)
+    control.install_control(
+        app.state,
+        boot_id=boot_id,
+        health_response=health_response(version_dict=version),
+    )
+    update_actions.install_update_actions(
+        app.state, OT3UpdateActions(RootFSInterface(), PartitionManager())
+    )
+    name_management.install_name_synchronizer(name_synchronizer, app.state)
+    install_authentication_checker(app.state, authentication_checker)
+    install_audit_client(app.state, audit_client)
+
+    app.include_router(control.router)
+    app.include_router(update.router)
+    app.include_router(ssh_key_management.router)
+    app.include_router(name_management.router)
+
+    # This is a workaround for a broken /redoc page in versions of FastAPI <0.115.3.
+    # The page loads Redoc from a CDN, and the problem is that the default CDN URL
+    # uses a fragile version tag.
+    # https://github.com/Redocly/redoc/issues/2743
+    # https://github.com/fastapi/fastapi/pull/9700
+    @app.get("/server/redoc", include_in_schema=False)
+    async def redoc_html() -> HTMLResponse:  # noqa: D103
+        if app.openapi_url is None:
+            raise RuntimeError(
+                "Couldn't get OpenAPI URL from FastAPI."
+                + " This is probably some kind of misconfiguration."
+            )
+        return get_redoc_html(
+            openapi_url=app.openapi_url,
+            title=app.title,
+            redoc_js_url=_REDOC_CDN_URL,
+        )
 
     LOG.info(
         "Setup: "
@@ -107,7 +145,7 @@ async def get_app(
                 f"Device name: {await name_synchronizer.get_name()}",
                 "Openembedded version:         "
                 f"{version.get('openembedded_version', 'unknown')}",
-                f"\t(from git sha      {version.get('buildroot_sha', 'unknown')}",
+                f"\t(from git sha      {version.get('openembedded_sha', 'unknown')}",
                 "API version:               "
                 f"{version.get('opentrons_api_version', 'unknown')}",
                 f"\t(from git sha      {version.get('opentrons_api_sha', 'unknown')}",

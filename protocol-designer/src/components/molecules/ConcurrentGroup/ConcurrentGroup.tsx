@@ -6,7 +6,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import type { PropsWithChildren } from 'react'
+import type { PropsWithChildren, ReactNode } from 'react'
 
 interface ConcurrentGroupProps {
   /** Whether this `ConcurrentGroup` is part of the active step in the timeline. */
@@ -23,7 +23,7 @@ interface ConcurrentGroupProps {
  */
 export function ConcurrentGroup(
   props: PropsWithChildren<ConcurrentGroupProps>
-): JSX.Element {
+): ReactNode {
   const { active, children } = props
   return (
     <Flex
@@ -46,7 +46,7 @@ export function ConcurrentGroup(
   )
 }
 
-function OrnamentalLine(props: { active: boolean }): JSX.Element {
+function OrnamentalLine(props: { active: boolean }): ReactNode {
   const { active } = props
   return (
     <Box
