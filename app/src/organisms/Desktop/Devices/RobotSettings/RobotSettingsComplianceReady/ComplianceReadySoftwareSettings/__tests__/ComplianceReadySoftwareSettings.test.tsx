@@ -422,7 +422,11 @@ describe('ComplianceReadySoftwareSettings', () => {
     fireEvent.blur(loginAttemptsField)
 
     await waitFor(() => {
-      expect(loginAttemptsField).toHaveValue(5)
+      expect(
+        screen.getByLabelText(
+          'Maximum login attempts before account deactivation'
+        )
+      ).toHaveValue(5)
     })
   })
   it('should update audit input values without patching until blur', async () => {
