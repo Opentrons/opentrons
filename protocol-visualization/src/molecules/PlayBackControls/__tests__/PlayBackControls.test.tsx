@@ -55,13 +55,13 @@ describe('PlayBackControls', () => {
       name: 'Step details',
     })
 
-    playButton.focus()
-    expect(document.activeElement).toBe(playButton)
+    await user.tab()
+    expect(playButton).toHaveFocus()
 
     await user.tab()
-    expect(document.activeElement).toBe(speedButton)
+    expect(speedButton).toHaveFocus()
 
     await user.tab()
-    expect(document.activeElement).toBe(stepDetailsButton)
+    expect(stepDetailsButton).toHaveFocus()
   })
 })
