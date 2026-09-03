@@ -29,6 +29,7 @@ dependencies = [
     "paho-mqtt==1.6.1",
     "aiohttp>=3.12.14,<4",
     "Pyro5>=5.16,<6",
+    "zipstream-ng==1.9.3",
 ]
 
 [dependency-groups]
@@ -52,6 +53,7 @@ robot = [
     "paho-mqtt==1.6.1",
     "aiohttp==3.12.14",
     "Pyro5==5.16",
+    "zipstream-ng==1.9.3",
 ]
 dev = [
     "ruff==0.14.10",
@@ -236,4 +238,8 @@ module = [
     "Pyro5.*",
     "serpent"
 ]
+follow_untyped_imports = true
+
+[[tool.mypy.overrides]]
+module = ["zipstream-ng.*"]
 follow_untyped_imports = true
