@@ -4,7 +4,7 @@
   /* This z-index is chosen to beat everything else on the ODD. This overlay should
   appear over modals, toasts, everything. */
   z-index: 1500;
-  background-color: var(--transparent-black-10);
+  background-color: rgb(from var(--black-90) r g b / 20%);
   inset: 0;
 }
 
@@ -17,6 +17,7 @@
   justify-content: center;
   padding: var(--spacing-24);
   border-radius: var(--border-radius-8);
+  animation: fade-in 0.3s ease-out forwards;
   background-color: var(--black-90);
   color: var(--white);
 }
@@ -24,4 +25,14 @@
 .acm_icon {
   width: 4rem;
   height: 4rem;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }

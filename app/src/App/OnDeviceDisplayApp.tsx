@@ -66,6 +66,7 @@ import { DocumentationRequiredModalContext } from '../local-resources/access-con
 import { LocalizationProvider } from '../LocalizationProvider'
 import { requireDocumentation } from '../organisms/ODD/DocumentationRequired/requireDocumentation'
 import { showDownloadLogsModal } from '../organisms/ODD/DownloadAuditLogsModal'
+import { DragToLogOutOverlay } from '../organisms/ODD/OnDeviceLogin/DragToLogOutOverlay'
 import { showLoginModal } from '../organisms/ODD/OnDeviceLogin/LoginModal'
 import { showSignRunModal } from '../pages/ODD/RunSummary/SignRun'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
@@ -301,6 +302,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                                 />
                               </SharedScrollRefProvider>
                               <LoggedOutOverlayMount />
+                              <DragToLogOutOverlay />
                             </RobotEncryptionKeyTakeover>
                           </NiceModal.Provider>
                         </ToasterOven>
